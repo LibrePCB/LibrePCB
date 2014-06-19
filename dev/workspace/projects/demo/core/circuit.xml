@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<circuit compatible_downto="1" file_version="1">
+    <general>
+        <uuid>{573b731a-e0a9-4613-b7c1-86c01dfd7651}</uuid>
+    </general>
+    <netclasses>
+        <netclass uuid="{4b10268a-fec5-4230-8054-2dc966d625cd}" name="default"/>
+    </netclasses>
+    <netlist_signals>
+        <netlist_signal uuid="{5ae568aa-906e-48d2-9620-26803d99e256}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" name="GND"/>
+        <netlist_signal uuid="{b910765e-0d17-4a2d-80a0-af4af14ced69}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" name="N#13"/>
+        <netlist_signal uuid="{9e89f09d-7887-481b-b964-4811d0be545e}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" name="N#7"/>
+    </netlist_signals>
+    <assembly_variants>
+        <assembly_variant uuid="{6fe07dd4-aaee-4a28-ae35-d22c2904a461}" name="default"/>
+    </assembly_variants>
+    <generic_component_instances>
+        <generic_component_instance uuid="{7fe07dd4-aaee-4a28-ae35-d22c2904a462}">
+            <generic_component_uuid>{60000000-7785-4665-a3e6-fe8d5224ef37}</generic_component_uuid>
+            <symbol_variant_uuid>{5de93550-f32b-4663-89d8-2ade0c5982a8}</symbol_variant_uuid>
+            <attributes/>
+            <signal_mapping/>
+        </generic_component_instance>
+        <generic_component_instance uuid="{6fe07dd4-aaee-4a28-ae35-d22c2904a461}">
+            <generic_component_uuid>{60000001-3c94-4689-be29-92235ba993c5}</generic_component_uuid>
+            <symbol_variant_uuid>{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}</symbol_variant_uuid>
+            <attributes>
+                <!--<attribute name="NAME" type="text">U1</attribute>
+                <attribute name="VALUE" type="text">NE555</attribute>-->
+            </attributes>
+            <signal_mapping>
+                <map netlist_signal="{5ae568aa-906e-48d2-9620-26803d99e256}" generic_component_signal="{71a44db9-5e42-405f-b6e4-b4725ae37af3}"/>
+                <map netlist_signal="" generic_component_signal="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}"/>
+                <map netlist_signal="" generic_component_signal="{a9d3d159-fca9-417e-8bba-13829caa6ae5}"/>
+                <map netlist_signal="" generic_component_signal="{da30b112-9ab0-4715-8a6a-9e5414169fd4}"/>
+                <map netlist_signal="" generic_component_signal="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}"/>
+                <map netlist_signal="" generic_component_signal="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}"/>
+                <map netlist_signal="" generic_component_signal="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}"/>
+                <map netlist_signal="" generic_component_signal="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}"/>
+            </signal_mapping>
+        </generic_component_instance>
+        <generic_component_instance uuid="{1b6ffb10-1c00-47a1-a66a-b60afc6a8da9}">
+            <generic_component_uuid>{60000002-3c94-4689-be29-92235ba993c5}</generic_component_uuid>
+            <symbol_variant_uuid>{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}</symbol_variant_uuid>
+            <attributes/>
+            <signal_mapping/>
+        </generic_component_instance>
+        <generic_component_instance uuid="{aaaadfba-ffb2-4d96-ae4a-d26329006d79}">
+            <generic_component_uuid>{60000002-3c94-4689-be29-92235ba993c5}</generic_component_uuid>
+            <symbol_variant_uuid>{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}</symbol_variant_uuid>
+            <attributes/>
+            <signal_mapping/>
+        </generic_component_instance>
+        <generic_component_instance uuid="{f0e33b45-c3ac-49dc-8bd0-512d75ad014b}">
+            <generic_component_uuid>{60000002-3c94-4689-be29-92235ba993c5}</generic_component_uuid>
+            <symbol_variant_uuid>{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}</symbol_variant_uuid>
+            <attributes/>
+            <signal_mapping/>
+        </generic_component_instance>
+    </generic_component_instances>
+</circuit>

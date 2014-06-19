@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<symbol file_version="1" compatible_downto="1">
+    <meta>
+        <uuid>{20000004-9873-41f2-9ab1-bff6be4e5ea1}</uuid>
+        <version>2.1.1</version>
+        <author>EDA4U</author>
+        <created>2013-04-13 12:43:52</created>
+        <last_modified>2013-04-20 18:01:33</last_modified>
+        <category>{00000000-e485-4af1-9679-bd66e8055f07}</category>
+        <name locale="en_US">OpAmp Supply</name>
+        <description locale="en_US">blablabla...</description>
+        <keywords locale="en_US">word1, word2, word3</keywords>
+    </meta>
+    <changelog/>
+    <attachements/>
+    <geometry/>
+    <pins>
+        <pin uuid="{702df32a-635f-46e9-85d2-5b7e2c20aa87}" x="-15.24" y="0" length="5.08" angle="0" mirror="false" clock="false" neg="false">
+            <name locale="en_US">1</name>
+            <description locale="en_US">Pin 1</description>
+        </pin>
+        <pin uuid="{1339ffc8-afb2-4137-9d37-d9801ac2bfd0}" x="15.24" y="0" length="5.08" angle="180" mirror="false" clock="false" neg="false">
+            <name locale="en_US">2</name>
+            <description locale="en_US">Pin 2</description>
+        </pin>
+    </pins>
+</symbol>

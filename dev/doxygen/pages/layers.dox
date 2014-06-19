@@ -1,0 +1,109 @@
+/**
+
+    @page layers_documentation Layers
+
+    @tableofcontents
+
+    This is the documentation of the EDA4U layers.
+    
+    
+    
+    
+    @section layers_overwiew Overview
+    
+        There are three different Types of Layers:
+            - @ref layers_global "Global Layers (hardcoded)"
+            - @ref layers_workspace "Workspace Layers (stored in the workspace)"
+            - @ref layers_project "Project Layers (stored in the project file)"
+        
+        
+    @section layers_global Global Layers
+    
+        Alle notwendigen Layer sind fest in die Software einprogrammiert.
+        Die Nummern 1-899 sind für globale Layer reserviert.
+        Es wird zwischen Board- und Schaltplan-Layer unterschieden.
+        Die Farben und Schraffuren dieser Layer werden im Workspace gespeichert.
+
+        Es gibt folgende Board-Layer (Footprints/Layout):
+            - 1-99:   Kupferlagen (1=Top, 99=Bottom)
+            
+            - 100:    Pads
+            - 101:    Vias
+            
+            - 110:    Bohrungen durchkontaktiert ("drills")
+            - 111:    Bohrungen nicht durchkontaktiert ("holes")
+            
+            - 120:    Platinenumriss
+            - 121:    Ausfräsungen (innen)
+            
+            - 130:    Stoplack Oben
+            - 131:    Stoplack Unten
+            - 132:    Finish Oben
+            - 133:    Finish Unten
+            - 134:    Kleber Oben
+            - 135:    Kleber Unten
+            - 136:    Schablone Oben
+            - 137:    Schablone Unten
+            - 138:    Testpunkte Oben
+            - 139:    Testpunkte Unten
+            
+            - 150:    Bauteil-Referenzen Oben (Koordinaten-Kreuz)
+            - 151:    Bauteil-Referenzen Unten (Koordinaten-Kreuz)
+            - 152:    Bauteil-Umrisse Oben
+            - 153:    Bauteil-Umrisse Unten
+            - 154:    Bauteil-Ansicht Oben (Bauteile vervollständigt für einen Ausdruck)
+            - 155:    Bauteil-Ansicht Unten (Bauteile vervollständigt für einen Ausdruck)
+            - 156:    Bauteil-Namen Oben
+            - 157:    Bauteil-Namen Unten
+            - 158:    Bauteil-Werte Oben
+            - 159:    Bauteil-Werte Unten
+            
+            - 170:    Keepout Oben (keine Bauteile)
+            - 171:    Keepout Unten (keine Bauteile)
+            - 172:    Restrict Oben (kein Kupfer)
+            - 173:    Restrict Unten (kein Kupfer)
+            - 174:    Restrict Vias (keine Vias)
+            
+            - 190:    Unrouted
+            - 191:    Bemassungen
+            - 192:    Dokumentation??
+            - 193:    Referenz??
+            - 194:    DXF??
+
+        Es gibt folgende Schaltplan-Layer (Symbole/Schaltplan):
+            - 1:      Netze
+            - 2:      Busse
+            - 3:      Pins
+            
+            - 10:     Bauteil-Referenzen (Koordinaten-Kreuz)
+            - 11:     Bauteil-Umrisse
+            - 12:     Bauteil-Namen
+            - 13:     Bauteil-Werte
+            - 14:     Bauteil-Package-Namen
+
+            (- 20:     Gruppen-Rahmen)
+            (- 21:     Gruppen-Beschriftungen)
+            
+            - 30:     Text
+            
+            
+        TODO: Layer für Frontplatten-Ausschnitte usw.
+    
+    
+    @section layers_workspace Workspace Layers
+    
+        Für Workspace-Layer sind die Nummern 900-999 reserviert.
+        Sie werden im Workspace-Verzeichnis gespeichert.
+    
+    
+    @section layers_project Project Layers
+    
+        Beim Anlegen eines neuen Projektes werden alle Workspace-Layer ins Projekt kopiert.
+        Von da an werden für das geöffnete Projekt die Workspace-Layer nicht mehr berücksichtigt.
+        Verändert man die Workspace-Layer, hat dies auf das Projekt keinen Einfluss mehr.
+
+        Die Projekt-Layer haben damit automatisch auch den Nummernbereich 900-999.
+        
+*/
+
+

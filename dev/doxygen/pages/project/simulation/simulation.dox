@@ -1,0 +1,14 @@
+/**
+
+    @page project_simulation Project Simulation Documentation
+
+    @tableofcontents
+
+    This is the documentation of an EDA4U project simulation and all their specifications.
+    For each simulation there is a directory in the project's directory "simulations/".
+    
+    @section project_simulation_file_hierarchy File Hierarchy
+        The simulation's directory contains the following files:
+        - @subpage project_simulation_xml "simulation.xml"
+        
+*/

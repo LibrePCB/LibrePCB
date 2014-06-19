@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<board compatible_downto="1" file_version="1">
+    <general>
+        <uuid>{ebe1ce1b-9612-4db8-9898-ccab719ec21d}</uuid>
+        <circuit_uuid>{8a1f9e05-c711-4af4-9a7b-b1a585d6e4ed}</circuit_uuid>
+        <name>SMT Board 1</name>
+        <page_index>0</page_index>
+    </general>
+    <board_config>
+        <!--<layer_setup>(1+16)</layer_setup>
+        <layers>
+            <layer index="0" type="copper" layer="1" thickness="35000" />
+            <layer index="1" type="isolation" thickness="1500000" />
+            <layer index="2" type="copper" layer="99" thickness="35000" />
+        </layers>-->
+    </board_config>
+    <attributes/>
+    <packages>
+        <package uuid="{cb6501aa-f8c3-42ac-a9a0-8a9df0da3f05}">
+            <generic_component_instance_uuid>{6fe07dd4-aaee-4a28-ae35-d22c2904a461}</generic_component_instance_uuid>
+            <component_uuid>{70000000-3eb6-424e-982b-46fde466069a}</component_uuid>
+            <position x="12.7" y="12.7"/>
+            <angle>0</angle>
+            <mirror>false</mirror>
+        </package>
+        <package uuid="{cb6501aa-f8c3-42ac-a9a0-8a9df0da3f06}">
+            <generic_component_instance_uuid>{6fe07dd4-aaee-4a28-ae35-d22c2904a461}</generic_component_instance_uuid>
+            <component_uuid>{70000000-3eb6-424e-982b-46fde466069a}</component_uuid>
+            <position x="30.7" y="23.7"/>
+            <angle>0</angle>
+            <mirror>false</mirror>
+        </package>
+        <package uuid="{cb6501aa-f8c3-42ac-a9a0-8a9df0da3f07}">
+            <generic_component_instance_uuid>{6fe07dd4-aaee-4a28-ae35-d22c2904a461}</generic_component_instance_uuid>
+            <component_uuid>{70000000-3eb6-424e-982b-46fde466069a}</component_uuid>
+            <position x="23" y="40"/>
+            <angle>0</angle>
+            <mirror>false</mirror>
+        </package>
+    </packages>
+    <netlist_points>
+        <!--<netlist_point uuid="{129871b0-54c4-473e-b4bc-7414a07c2159}">
+            <netlist_signal_uuid>{8a1f9e05-c711-4af4-9a7b-b1a585d6e4ed}</netlist_signal_uuid>
+            <attached_to_pad>true</attached_to_pad>
+            <component_uuid>{cb6501aa-f8c3-42ac-a9a0-8a9df0da3f05}</component_uuid>
+            <component_package_uuid>0</component_package_uuid>
+            <pad_name>1</pad_name>
+        </netlist_point>-->
+    </netlist_points>
+    <netlist_lines/>
+</board>

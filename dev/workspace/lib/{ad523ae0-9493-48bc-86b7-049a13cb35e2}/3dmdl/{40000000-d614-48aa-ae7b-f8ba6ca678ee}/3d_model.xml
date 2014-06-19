@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model file_version="1" compatible_downto="1">
+    <meta>
+        <uuid>{40000000-d614-48aa-ae7b-f8ba6ca678ee}</uuid>
+        <version>1</version>
+        <author>EDA4U</author>
+        <created>2013-04-13 12:43:52</created>
+        <last_modified>2013-04-20 18:01:33</last_modified>
+        <category>{10000000-bf7f-4980-85cd-c73fcb164158}</category>
+        <name locale="en_US">test model 1</name>
+        <description locale="en_US">blablabla...</description>
+        <keywords locale="en_US">word1, word2, word3</keywords>
+    </meta>
+    <changelog/>
+    <attachements/>
+</model>

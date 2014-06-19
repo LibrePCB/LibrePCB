@@ -1,0 +1,24 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+# Others
+.DS_Store
+Thumbs.db
+*~
+*.pro.user*
+*.autosave
+
+# Directories
+dev/doxygen/output/
+build/

@@ -1,0 +1,15 @@
+/**
+
+    @page miscellaneous Miscellaneous Information
+
+    @tableofcontents
+
+    Some general information...
+    
+    
+    
+    
+        - EDA4U works internally ALWAYS with namometers (nm), stored in 64bit signed integer.
+          @warning 32bit signed integer could become scarce (max. +/- 2,14m), so never use 32bit integer for lengths!!
+        
+*/

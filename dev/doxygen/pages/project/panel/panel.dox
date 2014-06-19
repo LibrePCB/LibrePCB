@@ -1,0 +1,14 @@
+/**
+
+    @page project_panel Project Panel Documentation
+
+    @tableofcontents
+
+    This is the documentation of an EDA4U project panel and all their specifications.
+    For each panel there is a directory in the project's directory "panels/".
+    
+    @section project_panel_file_hierarchy File Hierarchy
+        The panel's directory contains the following files:
+        - @subpage project_panel_xml "panel.xml"
+        
+*/

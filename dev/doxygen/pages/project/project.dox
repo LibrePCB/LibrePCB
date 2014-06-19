@@ -1,0 +1,165 @@
+/**
+
+    @page project_documentation Project Documentation
+
+    @tableofcontents
+    
+    @warning    Die hier beschriebenen Dinge sind keineswegs in Stein gemeisselt, es kann sich noch vieles verändern.
+                Teilweise handelt es sich auch mehr um spontane Ideen, die noch weiter verfolgt werden sollten.
+                Es ist gut möglich, dass einige dieser Ideen sich als nicht nützlich erweisen und dadurch wieder entfernt werden.
+                Sie sind vorläufig einfach hier in der Doku festgehalten, damit sie nicht vergessen gehen.
+
+    This is the documentation of an EDA4U project and all their specifications.
+    
+    
+    
+    
+    @section project_file_structure_overwiew File Structure Overview
+    
+        There are two possibilities how an EDA4U project can be saved on the harddisc:
+            - @ref file_structure_dir
+            - @ref file_structure_zip
+        
+        
+        @subsection file_structure_dir Seperate files in a directory
+        
+            This is the variant, how EDA4U always works internally on opened projects.
+            All XML files, images and other files are stored in one directory and their subdirectories.
+                
+            With that method, the user is able to versioning a project with a version control system (SVN, GIT, ...).
+            There can work many people on the same project at the same time, and merge their changes together.
+                
+            On opening such project, EDA4U will copy the whole project directory to a temporary directory.
+            Now, all changes on the project will be saved in this temporary directory. 
+            Only on saving a project, the project files will be written back to the original project directory to overwrite them.
+            
+        @subsection file_structure_zip ZIP-Archive *.e4u
+                
+            This is the "normal", recommended variant how to save EDA4U projects if you don't need a version controling system.
+            The whole project directory with all their files will be compressed and saved in a ZIP archive.
+            So the user has the whole project in one single file, which means:
+                
+                - There is no risk of inconsistence of files inside a project (because he cannot edit them manually)
+                - The user's filesystem is cleaner, there are not "hundreds" of single files
+                - It's easier to handle with one single file than with a whole directory (send it by e-mail, make copies and so on)
+                
+            Internally, EDA4U will simply extract the *.e4u ZIP archive to a temporary directory and changes will be made there.
+            Every time you click "save project", this temporary directory will be zipped and the original *.e4u file will be overwritten.
+            It's neary the same system like the one used in the variant "\ref file_structure_dir".
+
+
+
+
+    @section project_file_hierarchy Project File Hierarchy
+    
+        In the project directory, there are only files from EDA4U, the user mustn't save other files there!
+        There are the following directories and files in a EDA4U project directory:
+        
+            - @ref project_dir_boards "boards/"
+                - board_name/
+                    - ...
+                - ...
+            - @ref project_dir_lib "lib/"
+                - {0af210c0-7625-4f8c-bc6d-c9f5b49b7024}/
+                    - ...
+                - ...
+            - @ref project_dir_panels "panels/"
+                - panel_name/
+                    - ...
+                - ...
+            - @ref project_dir_schematics "schematics/"
+                - schematic_name
+                    - ...
+                - ...
+            - @ref project_dir_simulations "simulations/"
+                - simulation_name
+                    - ...
+                - ...
+            - @ref project_dir_user "user/"
+                - ...
+            - @ref project_file_circuit_xml "circuit.xml"
+            - @ref project_file_project_xml "project.xml"
+        
+        
+        @subsection project_dir_boards Directory "boards/"
+        
+            In this directory there are all boards (PCB layouts) saved.
+            For each board, there is a seperate directory which is named by the board's name.
+            But the directory name mustn't contain special characters:
+                - only lower case letters, numbers and underlines are allowed - nothing more!
+                - all other characters (including spaces) will be replaced with underlines
+        
+            See @subpage project_board "project board description" for more information.
+    
+    
+        @subsection project_dir_lib Directory "lib/"
+        
+            In this directory there are all library elements (footprints, components, symbols, ...) saved which are needed in the project.
+            Each element is saved in his own directory which are named with the element's uuid.
+            These directories are 100 percent identical with the elements in the EDA4U library, these are 1:1 copies of them.
+            
+            If the user adds a new component to the project, this component and all its possible symbols, footprints and so on will be copied to this directory.
+            If the user removes a component, that component and all its possible symbols, footprints and so on, which aren't needed by other components in the project,
+            will be deleted immediately.
+            
+            See @ref library_documentation "library documentation" for more information.
+    
+    
+        @subsection project_dir_panels Directory "panels/"
+        
+            In this directory there are all panels saved.
+            For each panel, there is a seperate directory which is named by the panel's name.
+            But the directory name mustn't contain special characters:
+                - only lower case letters, numbers and underlines are allowed - nothing more!
+                - all other characters (including spaces) will be replaced with underlines
+        
+            See @subpage project_panel "project panel description" for more information.
+    
+    
+        @subsection project_dir_schematics Directory "schematics/"
+        
+            In this directory there are all schematics (pages) saved.
+            For each schematic, there is a seperate directory which is named by the schematic's name.
+            But the directory name mustn't contain special characters:
+                - only lower case letters, numbers and underlines are allowed - nothing more!
+                - all other characters (including spaces) will be replaced with underlines
+        
+            See @subpage project_schematic "project schematic description" for more information.
+    
+    
+        @subsection project_dir_simulations Directory "simulations/"
+        
+            In this directory there are all simulations saved.
+            For each simulation, there is a seperate directory which is named by the simulation's name.
+            But the directory name mustn't contain special characters:
+                - only lower case letters, numbers and underlines are allowed - nothing more!
+                - all other characters (including spaces) will be replaced with underlines
+        
+            See @subpage project_simulation "project simulation description" for more information.
+    
+    
+        @subsection project_dir_user Directory "user/"
+        
+            In this directory are all user related settings for that project saved.
+            It's important to have all this data in one directory, so the user only needs to ignore one directory if he uses a version contol system.
+            ALl data in this direcotory is not really important.
+            
+            @warning The user's version control system (if he uses one) needs to ignore this directory!
+
+            See @subpage project_user "project's user related settings" for more information. 
+    
+    
+        @subsection project_file_circuit_xml File "circuit.xml"
+        
+            This is the heart of every project. In this XML file there is the whole circuit with the netlist and all components saved.
+            
+            See @subpage project_circuit_xml "Project's circuit.xml Documentation"
+    
+    
+        @subsection project_file_project_xml File "project.xml"
+        
+            In this XML file are general information of the project saved.
+            
+            See @subpage project_xml "Project's project.xml Documentation"
+        
+*/

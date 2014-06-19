@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<repository file_version="1" compatible_downto="1">
+    <meta>
+        <uuid>{ad523ae0-9493-48bc-86b7-049a13cb35e2}</uuid>
+        <author>EDA4U</author>
+        <created>2013-04-13 12:43:52</created>
+        <last_modified>2013-04-20 18:01:33</last_modified>
+        <name locale="en_US">EDA4U Symbols</name>
+        <description locale="en_US">Official EDA4U Symbols</description>
+    </meta>
+    <!--<properties>
+        <publisher>EDA4U</publisher>
+        <url>http://www.address-to-repository.com</url>
+        <update_url>http://www.address-to-repository.com</update_url>
+        <public_key>4e9992605bb837267ebb4d66d8b10792</public_key>
+    </properties>
+    <dependencies>
+        <dependency name="EDA4U Base" uuid="{1b4e0fe9-06c6-441b-9692-3cf9dee9abc1}" url="http://www.address-to-repository.com" update_url="http://www.address-to-repository.com"/>
+    </dependencies>
+    <settings>
+        <active>true</active>
+        <get_updates>true</get_updates>
+        <download_files datasheets="true" images="true" others="false" />
+    </settings>-->
+</repository>

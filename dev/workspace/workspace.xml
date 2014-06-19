@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workspace>
+    <projects>
+        <project type="local" absolute="false">projects</project>
+    </projects>
+    <layers>
+        <layer id="1" name="top" description="Kupfer Oben" color="#000000" default_visible="true" />
+    </layers>
+    <layer_groups>
+        <group name="Top">
+            <id>2</id>
+            <id>4</id>
+        </group>
+        <group name="Bottom">
+            <id>1</id>
+            <id>3</id>
+        </group>
+    </layer_groups>
+</workspace>
