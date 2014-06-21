@@ -4,18 +4,24 @@
 #
 #-------------------------------------------------
 
-QT += core widgets opengl sql xml printsupport
+QT += core widgets
 
 TARGET = EDA4U
 TEMPLATE = app
+
+CONFIG += c++11
+
+#DEFINES += USE_32BIT_LENGTH_UNITS          # see units.h
 
 RESOURCES += \
     ressources.qrc
 
 SOURCES += \
-    src/main.cpp
+    src/main.cpp \
+    src/common/units.cpp
 
-HEADERS +=
+HEADERS += \
+    src/common/units.h
 
 FORMS +=
 
