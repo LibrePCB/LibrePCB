@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT += core widgets
+QT += core widgets opengl
 
 TARGET = EDA4U
 TEMPLATE = app
@@ -18,10 +18,14 @@ RESOURCES += \
 
 SOURCES += \
     src/main.cpp \
-    src/common/units.cpp
+    src/common/units.cpp \
+    src/common/cadscene.cpp \
+    src/common/cadview.cpp
 
 HEADERS += \
-    src/common/units.h
+    src/common/units.h \
+    src/common/cadscene.h \
+    src/common/cadview.h
 
 FORMS +=
 
