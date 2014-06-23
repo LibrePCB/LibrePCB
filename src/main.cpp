@@ -24,6 +24,9 @@
 #include <QtCore>
 #include <QApplication>
 #include <QTranslator>
+#include <QFileDialog>
+#include "workspace/workspace.h"
+#include "workspace/workspacechooserdialog.h"
 
 /*****************************************************************************************
  *  main()
@@ -42,8 +45,25 @@ int main(int argc, char* argv[])
     app.installTranslator(&appTranslator);
 
     QCoreApplication::setOrganizationName("EDA4U");
+    //QCoreApplication::setOrganizationDomain(""); ///< @todo
     QCoreApplication::setApplicationName("EDA4U");
     QCoreApplication::setApplicationVersion("0.0.1");
+
+    QDir workspaceDir;
+    workspaceDir.setPath(Workspace::getMostRecentlyUsedWorkspacePath());
+
+    if ((!workspaceDir.exists()) || (!Workspace::isValidWorkspaceDir(workspaceDir)))
+    {
+        WorkspaceChooserDialog dialog;
+
+        if (!dialog.exec())
+            return 0; // no workspace was choosed
+
+        workspaceDir = dialog.getChoosedWorkspaceDir();
+    }
+
+    Workspace ws(workspaceDir);
+    ws.showControlPanel();
 
     return app.exec();
 }
