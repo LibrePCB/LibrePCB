@@ -27,6 +27,7 @@
 #include "workspace.h"
 
 #include "../library/library.h"
+#include "../libedit/libraryeditor.h"
 #include "../project/project.h"
 #include "controlpanel/controlpanel.h"
 
@@ -40,7 +41,7 @@ using namespace project;
 Workspace::Workspace(const QDir& workspaceDir) :
     QObject(0), mWorkspaceDir(workspaceDir),
     mMetadataDir(workspaceDir.absoluteFilePath(".metadata/")),
-    mWorkspaceSettings(0), mControlPanel(0)
+    mWorkspaceSettings(0), mControlPanel(0), mLibrary(0), mLibraryEditor(0)
 {
     mWorkspaceDir.makeAbsolute();
     mMetadataDir.makeAbsolute();
@@ -56,19 +57,15 @@ Workspace::Workspace(const QDir& workspaceDir) :
     // all OK, let's load the workspace stuff!
 
     mLibrary = new Library(this);
-
     mControlPanel = new ControlPanel(this);
 }
 
 Workspace::~Workspace()
 {
-    // close all projects
-    QList<QString> openProjectsFilenames = mOpenProjects.keys();
-    foreach (QString filename, openProjectsFilenames)
-        closeProject(filename);
+    closeAllProjects(false);
 
     delete mControlPanel;           mControlPanel = 0;
-
+    delete mLibraryEditor;          mLibraryEditor = 0;
     delete mLibrary;                mLibrary = 0;
 
     delete mWorkspaceSettings;      mWorkspaceSettings = 0;
@@ -119,12 +116,33 @@ Project* Workspace::getOpenProject(const QString& filename)
 }
 
 /*****************************************************************************************
- *  General
+ *  Public Slots
  ****************************************************************************************/
 
 void Workspace::showControlPanel() const
 {
     mControlPanel->show();
+    mControlPanel->raise();
+}
+
+void Workspace::openLibraryEditor()
+{
+    if (!mLibraryEditor)
+        mLibraryEditor = new libedit::LibraryEditor(this);
+
+    mLibraryEditor->show();
+    mLibraryEditor->raise();
+}
+
+void Workspace::closeAllProjects(bool askForSave)
+{
+    Q_UNUSED(askForSave); ///< @todo show "save projects?" dialog if unsaved projects are open
+
+    QList<QString> openProjectsFilenames = mOpenProjects.keys();
+    foreach (QString filename, openProjectsFilenames)
+    {
+        closeProject(filename);
+    }
 }
 
 /*****************************************************************************************

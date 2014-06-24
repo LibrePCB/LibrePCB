@@ -58,6 +58,6 @@
         <file>img/actions/rotate_right.png</file>
         <file>img/actions/flip_horizontal.png</file>
         <file>img/actions/flip_vertical.png</file>
+        <file>img/app.png</file>
     </qresource>
 </RCC>
-

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CONTROLPANEL_H
-#define CONTROLPANEL_H
+#ifndef LIBRARYEDITOR_H
+#define LIBRARYEDITOR_H
 
 /*****************************************************************************************
  *  Includes
@@ -34,49 +34,42 @@
 class Workspace;
 
 namespace Ui {
-class ControlPanel;
+class LibraryEditor;
 }
 
 /*****************************************************************************************
- *  Class ControlPanel
+ *  Class LibraryEditor
  ****************************************************************************************/
 
+namespace libedit {
+
 /**
- * @brief The ControlPanel class
+ * @brief The LibraryEditor class
  *
- * @author ubruhin
- *
- * @date 2014-06-23
+ * @todo this is only a stub class...
  */
-class ControlPanel : public QMainWindow
+class LibraryEditor : public QMainWindow
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit ControlPanel(Workspace* workspace);
-        ~ControlPanel();
-
-    protected:
-
-        // Inherited Methods
-        virtual void closeEvent(QCloseEvent* event);
-
-    private slots:
-
-        // Actions
-        void on_actionAbout_triggered();
+        explicit LibraryEditor(Workspace* workspace);
+        ~LibraryEditor();
 
     private:
 
         // make the default constructor and the copy constructor inaccessable
-        ControlPanel();
-        ControlPanel(const ControlPanel& other) : QMainWindow(0) {Q_UNUSED(other);}
+        LibraryEditor();
+        LibraryEditor(const LibraryEditor& other);
 
-        Ui::ControlPanel* ui;
+        Ui::LibraryEditor* ui;
 
-        Workspace* mWorkspace;
+        Workspace* mWorkspace; ///< the pointer to the Workspace object (from the ctor)
+
 };
 
-#endif // CONTROLPANEL_H
+} // namespace libedit
+
+#endif // LIBRARYEDITOR_H

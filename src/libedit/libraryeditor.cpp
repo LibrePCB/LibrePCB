@@ -22,54 +22,29 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QtWidgets>
-#include <QFileDialog>
-#include "controlpanel.h"
-#include "ui_controlpanel.h"
+#include "libraryeditor.h"
+#include "ui_libraryeditor.h"
+#include "../workspace/workspace.h"
 
-#include "../workspace.h"
-#include "../../project/project.h"
-
-using namespace project;
+namespace libedit{
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ControlPanel::ControlPanel(Workspace* workspace) :
-    QMainWindow(0), ui(new Ui::ControlPanel), mWorkspace(workspace)
+LibraryEditor::LibraryEditor(Workspace* workspace) :
+    QMainWindow(0), ui(new Ui::LibraryEditor), mWorkspace(workspace)
 {
     ui->setupUi(this);
-
-    // connect some actions which are created with the Qt Designer
-    connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
-    connect(ui->actionOpen_Library_Editor, SIGNAL(triggered()), mWorkspace, SLOT(openLibraryEditor()));
-    connect(ui->actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
-
-    setWindowTitle("EDA4U Control Panel - " + mWorkspace->getWorkspaceDir().absolutePath());
 }
 
-ControlPanel::~ControlPanel()
+LibraryEditor::~LibraryEditor()
 {
     delete ui;              ui = 0;
-}
-
-void ControlPanel::closeEvent(QCloseEvent *event)
-{
-    Q_UNUSED(event);
-    mWorkspace->closeAllProjects(true); // close all projects, unsaved projects will ask for saving
-    QApplication::quit(); // if the control panel is closed, we will quit the whole application
-}
-
-/*****************************************************************************************
- *  Actions
- ****************************************************************************************/
-
-void ControlPanel::on_actionAbout_triggered()
-{
-    QMessageBox::about(this, "About", "EDA4U is a free & OpenSource Schematic/Layout-Editor");
 }
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
+
+} // namespace libedit

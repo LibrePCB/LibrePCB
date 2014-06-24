@@ -36,6 +36,10 @@ namespace library{
 class Library;
 }
 
+namespace libedit{
+class LibraryEditor;
+}
+
 namespace project{
 class Project;
 }
@@ -74,9 +78,6 @@ class Workspace : public QObject
         project::Project* getOpenProject(const QString& filename);
         const QHash<QString, project::Project*>& getOpenProjects() const {return mOpenProjects;}
 
-        // General
-        void showControlPanel() const;
-
         // Static Methods
         static bool isValidWorkspaceDir(const QDir& dir);
         static void createNewWorkspace(const QDir& dir);
@@ -84,6 +85,12 @@ class Workspace : public QObject
         static void setMostRecentlyUsedWorkspacePath(const QString& path);
         static QStringList getAllWorkspacePaths();
         static void setAllWorkspacePaths(const QStringList& paths);
+
+    public slots:
+
+        void showControlPanel() const;
+        void openLibraryEditor();
+        void closeAllProjects(bool askForSave = false);
 
     private:
 
@@ -97,6 +104,7 @@ class Workspace : public QObject
 
         ControlPanel* mControlPanel;
         library::Library* mLibrary;
+        libedit::LibraryEditor* mLibraryEditor;
         QHash<QString, project::Project*> mOpenProjects;
 
 };

@@ -65,5 +65,7 @@ int main(int argc, char* argv[])
     Workspace ws(workspaceDir);
     ws.showControlPanel();
 
+    QGuiApplication::setQuitOnLastWindowClosed(false);
+
     return app.exec();
 }
