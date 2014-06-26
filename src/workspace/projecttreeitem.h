@@ -17,72 +17,63 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CONTROLPANEL_H
-#define CONTROLPANEL_H
+#ifndef PROJECTTREEITEM_H
+#define PROJECTTREEITEM_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
-class Workspace;
-
-namespace Ui {
-class ControlPanel;
-}
+class Project;
 
 /*****************************************************************************************
- *  Class ControlPanel
+ *  Class ProjectTreeItem
  ****************************************************************************************/
 
 /**
- * @brief The ControlPanel class
+ * @brief The ProjectTreeItem class
  *
  * @author ubruhin
  *
- * @date 2014-06-23
+ * @date 2014-06-24
  */
-class ControlPanel : public QMainWindow
+class ProjectTreeItem
 {
-        Q_OBJECT
-
     public:
 
         // Constructors / Destructor
-        explicit ControlPanel(Workspace* workspace, QAbstractItemModel* projectTreeModel);
-        ~ControlPanel();
+        ProjectTreeItem(ProjectTreeItem* parent, const QDir& dir);
+        ~ProjectTreeItem();
 
-    protected:
-
-        // Inherited Methods
-        virtual void closeEvent(QCloseEvent* event);
-
-    private slots:
-
-        // Actions
-        void on_actionAbout_triggered();
-        void on_projectTreeView_clicked(const QModelIndex& index);
-        void on_projectTreeView_doubleClicked(const QModelIndex& index);
-        void on_projectTreeView_customContextMenuRequested(const QPoint& pos);
-
-        // QWebView
-        void webViewLinkClicked(const QUrl& url);
+        // Getters
+        const QDir& getDir()                    const {return mDir;}
+        unsigned int getDepth()                 const {return mDepth;}
+        int getColumnCount()                    const {return 1;}
+        ProjectTreeItem* getParent()            const {return mParent;}
+        ProjectTreeItem* getChild(int index)    const {return mChilds.value(index);}
+        int getChildCount()                     const {return mChilds.count();}
+        int getChildNumber()                    const;
+        QString getName();
+        bool isProject()                        const {return !mProjectFilename.isEmpty();}
+        const QString& getProjectFilename()     const {return mProjectFilename;}
 
     private:
 
         // make the default constructor and the copy constructor inaccessable
-        ControlPanel();
-        ControlPanel(const ControlPanel& other) : QMainWindow(0) {Q_UNUSED(other);}
+        ProjectTreeItem();
+        ProjectTreeItem(const ProjectTreeItem& other);
 
-        Ui::ControlPanel* ui;
-
-        Workspace* mWorkspace;
+        QDir mDir;
+        ProjectTreeItem* mParent;
+        unsigned int mDepth; ///< this is to avoid endless recursion in the parent-child relationship
+        QList<ProjectTreeItem*> mChilds;
+        QString mProjectFilename;
 };
 
-#endif // CONTROLPANEL_H
+#endif // PROJECTTREEITEM_H

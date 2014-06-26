@@ -24,7 +24,6 @@
 #include <QtCore>
 #include <QApplication>
 #include <QTranslator>
-#include <QFileDialog>
 #include "workspace/workspace.h"
 #include "workspace/workspacechooserdialog.h"
 
@@ -49,6 +48,10 @@ int main(int argc, char* argv[])
     QCoreApplication::setApplicationName("EDA4U");
     QCoreApplication::setApplicationVersion("0.0.1");
 
+    QGuiApplication::setQuitOnLastWindowClosed(false);
+
+    // Initialization finished, open the workspace...
+
     QDir workspaceDir;
     workspaceDir.setPath(Workspace::getMostRecentlyUsedWorkspacePath());
 
@@ -64,8 +67,6 @@ int main(int argc, char* argv[])
 
     Workspace ws(workspaceDir);
     ws.showControlPanel();
-
-    QGuiApplication::setQuitOnLastWindowClosed(false);
 
     return app.exec();
 }

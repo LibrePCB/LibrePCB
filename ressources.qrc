@@ -59,5 +59,11 @@
         <file>img/actions/flip_horizontal.png</file>
         <file>img/actions/flip_vertical.png</file>
         <file>img/app.png</file>
+        <file>img/places/folder_gray.png</file>
+        <file>img/places/folder_open_gray.png</file>
+        <file>img/places/folder_open.png</file>
+        <file>img/places/folder.png</file>
+        <file>img/places/folder_open_green.png</file>
+        <file>img/places/folder_green.png</file>
     </qresource>
 </RCC>

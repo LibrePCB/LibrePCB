@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT += core widgets opengl
+QT += core widgets opengl webkitwidgets
 
 TARGET = EDA4U
 TEMPLATE = app
@@ -29,7 +29,9 @@ SOURCES += \
     src/project/project.cpp \
     src/workspace/controlpanel/controlpanel.cpp \
     src/workspace/workspacechooserdialog.cpp \
-    src/libedit/libraryeditor.cpp
+    src/libedit/libraryeditor.cpp \
+    src/workspace/projecttreemodel.cpp \
+    src/workspace/projecttreeitem.cpp
 
 HEADERS += \
     src/common/units.h \
@@ -40,7 +42,9 @@ HEADERS += \
     src/project/project.h \
     src/workspace/controlpanel/controlpanel.h \
     src/workspace/workspacechooserdialog.h \
-    src/libedit/libraryeditor.h
+    src/libedit/libraryeditor.h \
+    src/workspace/projecttreemodel.h \
+    src/workspace/projecttreeitem.h
 
 FORMS += \
     src/workspace/controlpanel/controlpanel.ui \

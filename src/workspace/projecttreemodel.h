@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CONTROLPANEL_H
-#define CONTROLPANEL_H
+#ifndef PROJECTTREEMODEL_H
+#define PROJECTTREEMODEL_H
 
 /*****************************************************************************************
  *  Includes
@@ -32,57 +32,49 @@
  ****************************************************************************************/
 
 class Workspace;
-
-namespace Ui {
-class ControlPanel;
-}
+class ProjectTreeItem;
 
 /*****************************************************************************************
- *  Class ControlPanel
+ *  Class ProjectStub
  ****************************************************************************************/
 
 /**
- * @brief The ControlPanel class
+ * @brief The ProjectTreeModel class
  *
  * @author ubruhin
  *
- * @date 2014-06-23
+ * @date 2014-06-24
  */
-class ControlPanel : public QMainWindow
+class ProjectTreeModel : public QAbstractItemModel
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit ControlPanel(Workspace* workspace, QAbstractItemModel* projectTreeModel);
-        ~ControlPanel();
-
-    protected:
+        ProjectTreeModel(Workspace* workspace);
+        ~ProjectTreeModel();
 
         // Inherited Methods
-        virtual void closeEvent(QCloseEvent* event);
-
-    private slots:
-
-        // Actions
-        void on_actionAbout_triggered();
-        void on_projectTreeView_clicked(const QModelIndex& index);
-        void on_projectTreeView_doubleClicked(const QModelIndex& index);
-        void on_projectTreeView_customContextMenuRequested(const QPoint& pos);
-
-        // QWebView
-        void webViewLinkClicked(const QUrl& url);
+        virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
+        virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
+        virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const;
+        virtual QModelIndex parent(const QModelIndex& index) const;
+        virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+        virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 
     private:
 
         // make the default constructor and the copy constructor inaccessable
-        ControlPanel();
-        ControlPanel(const ControlPanel& other) : QMainWindow(0) {Q_UNUSED(other);}
+        ProjectTreeModel();
+        ProjectTreeModel(const ProjectTreeModel& other) : QAbstractItemModel(0) {Q_UNUSED(other);}
 
-        Ui::ControlPanel* ui;
+        // Private Methods
+        ProjectTreeItem* getItem(const QModelIndex& index) const;
 
         Workspace* mWorkspace;
+
+        ProjectTreeItem* mRootProjectDirectory;
 };
 
-#endif // CONTROLPANEL_H
+#endif // PROJECTTREEMODEL_H

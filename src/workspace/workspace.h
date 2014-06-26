@@ -31,6 +31,7 @@
  ****************************************************************************************/
 
 class ControlPanel;
+class ProjectTreeModel;
 
 namespace library{
 class Library;
@@ -63,10 +64,11 @@ class Workspace : public QObject
 
         // Constructors / Destructor
         explicit Workspace(const QDir& workspaceDir);
-        ~Workspace();
+        virtual ~Workspace();
 
         // Getters
         const QDir& getWorkspaceDir() const {return mWorkspaceDir;}
+        QString getUniquePath() const {return uniqueWorkspacePath(mWorkspaceDir.absolutePath());}
         const QDir& getMetadataDir() const {return mMetadataDir;}
         const QSettings& getWorkspaceSettings() const {return *mWorkspaceSettings;}
         library::Library* getLibrary() const {return mLibrary;}
@@ -85,6 +87,7 @@ class Workspace : public QObject
         static void setMostRecentlyUsedWorkspacePath(const QString& path);
         static QStringList getAllWorkspacePaths();
         static void setAllWorkspacePaths(const QStringList& paths);
+        static QString uniqueWorkspacePath(const QString& path);
 
     public slots:
 
@@ -105,6 +108,7 @@ class Workspace : public QObject
         ControlPanel* mControlPanel;
         library::Library* mLibrary;
         libedit::LibraryEditor* mLibraryEditor;
+        ProjectTreeModel* mProjectTreeModel;
         QHash<QString, project::Project*> mOpenProjects;
 
 };

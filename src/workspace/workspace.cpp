@@ -29,6 +29,7 @@
 #include "../library/library.h"
 #include "../libedit/libraryeditor.h"
 #include "../project/project.h"
+#include "projecttreemodel.h"
 #include "controlpanel/controlpanel.h"
 
 using namespace library;
@@ -41,7 +42,8 @@ using namespace project;
 Workspace::Workspace(const QDir& workspaceDir) :
     QObject(0), mWorkspaceDir(workspaceDir),
     mMetadataDir(workspaceDir.absoluteFilePath(".metadata/")),
-    mWorkspaceSettings(0), mControlPanel(0), mLibrary(0), mLibraryEditor(0)
+    mWorkspaceSettings(0), mControlPanel(0), mLibrary(0), mLibraryEditor(0),
+    mProjectTreeModel(0)
 {
     mWorkspaceDir.makeAbsolute();
     mMetadataDir.makeAbsolute();
@@ -56,8 +58,9 @@ Workspace::Workspace(const QDir& workspaceDir) :
 
     // all OK, let's load the workspace stuff!
 
+    mProjectTreeModel = new ProjectTreeModel(this);
     mLibrary = new Library(this);
-    mControlPanel = new ControlPanel(this);
+    mControlPanel = new ControlPanel(this, mProjectTreeModel);
 }
 
 Workspace::~Workspace()
@@ -67,6 +70,7 @@ Workspace::~Workspace()
     delete mControlPanel;           mControlPanel = 0;
     delete mLibraryEditor;          mLibraryEditor = 0;
     delete mLibrary;                mLibrary = 0;
+    delete mProjectTreeModel;       mProjectTreeModel = 0;
 
     delete mWorkspaceSettings;      mWorkspaceSettings = 0;
 }
@@ -209,6 +213,15 @@ void Workspace::setAllWorkspacePaths(const QStringList& paths)
          clientSettings.setValue("path", paths[i]);
     }
     clientSettings.endArray();
+}
+
+QString Workspace::uniqueWorkspacePath(const QString& path)
+{
+    QDir dir(path);
+    QString uniquePath = QDir::toNativeSeparators(dir.canonicalPath());
+    if (uniquePath.isEmpty())
+        throw std::runtime_error("Invalid path!");
+    return uniquePath;
 }
 
 /*****************************************************************************************
