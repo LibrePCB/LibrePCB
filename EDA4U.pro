@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT += core widgets opengl webkitwidgets
+QT += core widgets opengl webkitwidgets xml
 
 TARGET = EDA4U
 TEMPLATE = app
@@ -29,9 +29,19 @@ SOURCES += \
     src/project/project.cpp \
     src/workspace/controlpanel/controlpanel.cpp \
     src/workspace/workspacechooserdialog.cpp \
-    src/libedit/libraryeditor.cpp \
+    src/library_editor/libraryeditor.cpp \
     src/workspace/projecttreemodel.cpp \
-    src/workspace/projecttreeitem.cpp
+    src/workspace/projecttreeitem.cpp \
+    src/library/libraryelement.cpp \
+    src/library/symbol.cpp \
+    src/library/component.cpp \
+    src/library/footprint.cpp \
+    src/library/genericcomponent.cpp \
+    src/library/model.cpp \
+    src/library/package.cpp \
+    src/library/spicemodel.cpp \
+    src/library/componentcategory.cpp \
+    src/library/packagecategory.cpp
 
 HEADERS += \
     src/common/units.h \
@@ -42,12 +52,22 @@ HEADERS += \
     src/project/project.h \
     src/workspace/controlpanel/controlpanel.h \
     src/workspace/workspacechooserdialog.h \
-    src/libedit/libraryeditor.h \
+    src/library_editor/libraryeditor.h \
     src/workspace/projecttreemodel.h \
-    src/workspace/projecttreeitem.h
+    src/workspace/projecttreeitem.h \
+    src/library/libraryelement.h \
+    src/library/symbol.h \
+    src/library/component.h \
+    src/library/footprint.h \
+    src/library/genericcomponent.h \
+    src/library/model.h \
+    src/library/package.h \
+    src/library/spicemodel.h \
+    src/library/componentcategory.h \
+    src/library/packagecategory.h
 
 FORMS += \
     src/workspace/controlpanel/controlpanel.ui \
     src/workspace/workspacechooserdialog.ui \
-    src/libedit/libraryeditor.ui
+    src/library_editor/libraryeditor.ui
 

@@ -27,7 +27,7 @@
 #include "workspace.h"
 
 #include "../library/library.h"
-#include "../libedit/libraryeditor.h"
+#include "../library_editor/libraryeditor.h"
 #include "../project/project.h"
 #include "projecttreemodel.h"
 #include "controlpanel/controlpanel.h"
@@ -132,7 +132,7 @@ void Workspace::showControlPanel() const
 void Workspace::openLibraryEditor()
 {
     if (!mLibraryEditor)
-        mLibraryEditor = new libedit::LibraryEditor(this);
+        mLibraryEditor = new library_editor::LibraryEditor(this);
 
     mLibraryEditor->show();
     mLibraryEditor->raise();

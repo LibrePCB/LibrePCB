@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CONTROLPANEL_H
-#define CONTROLPANEL_H
+#ifndef LIBRARY_LIBRARYELEMENT_H
+#define LIBRARY_LIBRARYELEMENT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QtWidgets>
+#include <QDomDocument>
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -33,57 +33,40 @@
 
 class Workspace;
 
-namespace Ui {
-class ControlPanel;
-}
-
 /*****************************************************************************************
- *  Class ControlPanel
+ *  Class LibraryElement
  ****************************************************************************************/
 
+namespace library {
+
 /**
- * @brief The ControlPanel class
- *
- * @author ubruhin
- *
- * @date 2014-06-23
+ * @brief The LibraryElement class
  */
-class ControlPanel : public QMainWindow
+class LibraryElement : public QObject
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit ControlPanel(Workspace* workspace, QAbstractItemModel* projectTreeModel);
-        ~ControlPanel();
+        explicit LibraryElement(Workspace* workspace, const QString& xmlFilename,
+                                const QString& xmlRootNodeName);
+        virtual ~LibraryElement();
 
     protected:
 
-        // Inherited Methods
-        virtual void closeEvent(QCloseEvent* event);
-
-    private slots:
-
-        // Actions
-        void on_actionAbout_triggered();
-        void on_projectTreeView_clicked(const QModelIndex& index);
-        void on_projectTreeView_doubleClicked(const QModelIndex& index);
-        void on_projectTreeView_customContextMenuRequested(const QPoint& pos);
-
-        // QWebView
-        void webViewLinkClicked(const QUrl& url);
+        // General
+        Workspace* mWorkspace;
+        QString mXmlFilename;
 
     private:
 
         // make some methods inaccessible...
-        ControlPanel();
-        ControlPanel(const ControlPanel& other);
-        ControlPanel& operator=(const ControlPanel& rhs);
-
-        Ui::ControlPanel* ui;
-
-        Workspace* mWorkspace;
+        LibraryElement();
+        LibraryElement(const LibraryElement& other);
+        LibraryElement& operator=(const LibraryElement& rhs);
 };
 
-#endif // CONTROLPANEL_H
+} // namespace library
+
+#endif // LIBRARY_LIBRARYELEMENT_H

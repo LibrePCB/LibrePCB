@@ -89,6 +89,11 @@ class CADView : public QGraphicsView
 
     private:
 
+        // make some methods inaccessible...
+        CADView();
+        CADView(const CADView& other);
+        CADView& operator=(const CADView& rhs);
+
         GridType mGridType;
         QColor mGridColor;
 

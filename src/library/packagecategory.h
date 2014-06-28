@@ -17,61 +17,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_PROJECT_H
-#define PROJECT_PROJECT_H
+#ifndef LIBRARY_PACKAGECATEGORY_H
+#define LIBRARY_PACKAGECATEGORY_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
+#include "libraryelement.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Class PackageCategory
  ****************************************************************************************/
 
-class Workspace;
-
-/*****************************************************************************************
- *  Class Project
- ****************************************************************************************/
-
-namespace project {
+namespace library {
 
 /**
- * @brief The Project class
- *
- * @todo this is only a stub class...
+ * @brief The PackageCategory class
  */
-class Project : public QObject
+class PackageCategory : public LibraryElement
 {
         Q_OBJECT
 
     public:
 
-        // Constructors / Destructor
-        explicit Project(Workspace* workspace, const QString& filename);
-        ~Project();
-
-        // Getters
-        const QString& getFilename() const {return mFilename;}
-        QString getUniqueFilename() const {return uniqueProjectFilename(mFilename);}
-
-        // Static Methods
-        static QString uniqueProjectFilename(const QString& filename);
+        explicit PackageCategory(Workspace* workspace, const QString& xmlFilename);
+        virtual ~PackageCategory();
 
     private:
 
         // make some methods inaccessible...
-        Project();
-        Project(const Project& other);
-        Project& operator=(const Project& rhs);
-
-        Workspace* mWorkspace; ///< a pointer to the workspace
-        QString mFilename;
+        PackageCategory();
+        PackageCategory(const PackageCategory& other);
+        PackageCategory& operator=(const PackageCategory& rhs);
 
 };
 
-} // namespace project
+} // namespace library
 
-#endif // PROJECT_PROJECT_H
+#endif // LIBRARY_PACKAGECATEGORY_H

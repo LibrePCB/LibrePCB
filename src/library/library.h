@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_H
-#define LIBRARY_H
+#ifndef LIBRARY_LIBRARY_H
+#define LIBRARY_LIBRARY_H
 
 /*****************************************************************************************
  *  Includes
@@ -43,8 +43,10 @@ namespace library {
  *
  * @todo this is only a stub class...
  */
-class Library
+class Library : public QObject
 {
+        Q_OBJECT
+
     public:
 
         // Constructors / Destructor
@@ -53,14 +55,16 @@ class Library
 
     private:
 
-        // make the default constructor and the copy constructor inaccessable
+        // make some methods inaccessible...
         Library();
         Library(const Library& other);
+        Library& operator=(const Library& rhs);
 
+        // General
         Workspace* mWorkspace; ///< the pointer to the Workspace object (from the ctor)
 
 };
 
 } // namespace library
 
-#endif // LIBRARY_H
+#endif // LIBRARY_LIBRARY_H

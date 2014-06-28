@@ -17,61 +17,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_PROJECT_H
-#define PROJECT_PROJECT_H
+#ifndef LIBRARY_SPICEMODEL_H
+#define LIBRARY_SPICEMODEL_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
+#include "libraryelement.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Class SpiceModel
  ****************************************************************************************/
 
-class Workspace;
-
-/*****************************************************************************************
- *  Class Project
- ****************************************************************************************/
-
-namespace project {
+namespace library {
 
 /**
- * @brief The Project class
- *
- * @todo this is only a stub class...
+ * @brief The SpiceModel class
  */
-class Project : public QObject
+class SpiceModel : public LibraryElement
 {
         Q_OBJECT
 
     public:
 
-        // Constructors / Destructor
-        explicit Project(Workspace* workspace, const QString& filename);
-        ~Project();
-
-        // Getters
-        const QString& getFilename() const {return mFilename;}
-        QString getUniqueFilename() const {return uniqueProjectFilename(mFilename);}
-
-        // Static Methods
-        static QString uniqueProjectFilename(const QString& filename);
+        explicit SpiceModel(Workspace* workspace, const QString& xmlFilename);
+        virtual ~SpiceModel();
 
     private:
 
         // make some methods inaccessible...
-        Project();
-        Project(const Project& other);
-        Project& operator=(const Project& rhs);
-
-        Workspace* mWorkspace; ///< a pointer to the workspace
-        QString mFilename;
+        SpiceModel();
+        SpiceModel(const SpiceModel& other);
+        SpiceModel& operator=(const SpiceModel& rhs);
 
 };
 
-} // namespace project
+} // namespace library
 
-#endif // PROJECT_PROJECT_H
+#endif // LIBRARY_SPICEMODEL_H

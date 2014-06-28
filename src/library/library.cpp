@@ -32,7 +32,7 @@ namespace library{
  ****************************************************************************************/
 
 Library::Library(Workspace* workspace) :
-    mWorkspace(workspace)
+    QObject(0), mWorkspace(workspace)
 {
 }
 

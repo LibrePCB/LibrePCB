@@ -65,9 +65,10 @@ class ProjectTreeItem
 
     private:
 
-        // make the default constructor and the copy constructor inaccessable
+        // make some methods inaccessible...
         ProjectTreeItem();
         ProjectTreeItem(const ProjectTreeItem& other);
+        ProjectTreeItem& operator=(const ProjectTreeItem& rhs);
 
         QDir mDir;
         ProjectTreeItem* mParent;

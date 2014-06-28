@@ -37,7 +37,7 @@ namespace library{
 class Library;
 }
 
-namespace libedit{
+namespace library_editor{
 class LibraryEditor;
 }
 
@@ -97,9 +97,10 @@ class Workspace : public QObject
 
     private:
 
-        // make the default constructor and the copy constructor inaccessable
+        // make some methods inaccessible...
         Workspace();
-        Workspace(const Workspace& other) : QObject(0) {Q_UNUSED(other);}
+        Workspace(const Workspace& other);
+        Workspace& operator=(const Workspace& rhs);
 
         QDir mWorkspaceDir;
         QDir mMetadataDir;
@@ -107,7 +108,7 @@ class Workspace : public QObject
 
         ControlPanel* mControlPanel;
         library::Library* mLibrary;
-        libedit::LibraryEditor* mLibraryEditor;
+        library_editor::LibraryEditor* mLibraryEditor;
         ProjectTreeModel* mProjectTreeModel;
         QHash<QString, project::Project*> mOpenProjects;
 

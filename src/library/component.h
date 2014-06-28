@@ -17,61 +17,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_PROJECT_H
-#define PROJECT_PROJECT_H
+#ifndef LIBRARY_COMPONENT_H
+#define LIBRARY_COMPONENT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
+#include "libraryelement.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Class Component
  ****************************************************************************************/
 
-class Workspace;
-
-/*****************************************************************************************
- *  Class Project
- ****************************************************************************************/
-
-namespace project {
+namespace library {
 
 /**
- * @brief The Project class
- *
- * @todo this is only a stub class...
+ * @brief The Component class
  */
-class Project : public QObject
+class Component : public LibraryElement
 {
         Q_OBJECT
 
     public:
 
-        // Constructors / Destructor
-        explicit Project(Workspace* workspace, const QString& filename);
-        ~Project();
-
-        // Getters
-        const QString& getFilename() const {return mFilename;}
-        QString getUniqueFilename() const {return uniqueProjectFilename(mFilename);}
-
-        // Static Methods
-        static QString uniqueProjectFilename(const QString& filename);
+        explicit Component(Workspace* workspace, const QString& xmlFilename);
+        virtual ~Component();
 
     private:
 
         // make some methods inaccessible...
-        Project();
-        Project(const Project& other);
-        Project& operator=(const Project& rhs);
-
-        Workspace* mWorkspace; ///< a pointer to the workspace
-        QString mFilename;
+        Component();
+        Component(const Component& other);
+        Component& operator=(const Component& rhs);
 
 };
 
-} // namespace project
+} // namespace library
 
-#endif // PROJECT_PROJECT_H
+#endif // LIBRARY_COMPONENT_H

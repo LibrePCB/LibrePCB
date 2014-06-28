@@ -17,61 +17,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_PROJECT_H
-#define PROJECT_PROJECT_H
+#ifndef LIBRARY_GENERICCOMPONENT_H
+#define LIBRARY_GENERICCOMPONENT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
+#include "libraryelement.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Class GenericComponent
  ****************************************************************************************/
 
-class Workspace;
-
-/*****************************************************************************************
- *  Class Project
- ****************************************************************************************/
-
-namespace project {
+namespace library {
 
 /**
- * @brief The Project class
- *
- * @todo this is only a stub class...
+ * @brief The GenericComponent class
  */
-class Project : public QObject
+class GenericComponent : public LibraryElement
 {
         Q_OBJECT
 
     public:
 
-        // Constructors / Destructor
-        explicit Project(Workspace* workspace, const QString& filename);
-        ~Project();
-
-        // Getters
-        const QString& getFilename() const {return mFilename;}
-        QString getUniqueFilename() const {return uniqueProjectFilename(mFilename);}
-
-        // Static Methods
-        static QString uniqueProjectFilename(const QString& filename);
+        explicit GenericComponent(Workspace* workspace, const QString& xmlFilename);
+        virtual ~GenericComponent();
 
     private:
 
         // make some methods inaccessible...
-        Project();
-        Project(const Project& other);
-        Project& operator=(const Project& rhs);
-
-        Workspace* mWorkspace; ///< a pointer to the workspace
-        QString mFilename;
+        GenericComponent();
+        GenericComponent(const GenericComponent& other);
+        GenericComponent& operator=(const GenericComponent& rhs);
 
 };
 
-} // namespace project
+} // namespace library
 
-#endif // PROJECT_PROJECT_H
+#endif // LIBRARY_GENERICCOMPONENT_H

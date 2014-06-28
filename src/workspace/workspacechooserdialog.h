@@ -75,8 +75,9 @@ class WorkspaceChooserDialog : public QDialog
 
     private:
 
-        // make the copy constructor inaccessable
-        WorkspaceChooserDialog(const WorkspaceChooserDialog& other) : QDialog(0) {Q_UNUSED(other);}
+        // make some methods inaccessible...
+        WorkspaceChooserDialog(const WorkspaceChooserDialog& other);
+        WorkspaceChooserDialog& operator=(const WorkspaceChooserDialog& rhs);
 
         // Private Methods
         void saveWorkspacePaths() const;

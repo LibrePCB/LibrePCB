@@ -17,59 +17,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARYEDITOR_H
-#define LIBRARYEDITOR_H
-
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QtWidgets>
+#include "component.h"
+
+namespace library {
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Constructors / Destructor
  ****************************************************************************************/
 
-class Workspace;
+Component::Component(Workspace* workspace, const QString& xmlFilename) :
+    LibraryElement(workspace, xmlFilename, "component")
+{
+}
 
-namespace Ui {
-class LibraryEditor;
+Component::~Component()
+{
 }
 
 /*****************************************************************************************
- *  Class LibraryEditor
+ *  End of File
  ****************************************************************************************/
 
-namespace libedit {
-
-/**
- * @brief The LibraryEditor class
- *
- * @todo this is only a stub class...
- */
-class LibraryEditor : public QMainWindow
-{
-        Q_OBJECT
-
-    public:
-
-        // Constructors / Destructor
-        explicit LibraryEditor(Workspace* workspace);
-        ~LibraryEditor();
-
-    private:
-
-        // make the default constructor and the copy constructor inaccessable
-        LibraryEditor();
-        LibraryEditor(const LibraryEditor& other);
-
-        Ui::LibraryEditor* ui;
-
-        Workspace* mWorkspace; ///< the pointer to the Workspace object (from the ctor)
-
-};
-
-} // namespace libedit
-
-#endif // LIBRARYEDITOR_H
+} // namespace library

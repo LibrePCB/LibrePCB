@@ -17,61 +17,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_PROJECT_H
-#define PROJECT_PROJECT_H
+#ifndef LIBRARY_SYMBOL_H
+#define LIBRARY_SYMBOL_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
+#include "libraryelement.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Class Symbol
  ****************************************************************************************/
 
-class Workspace;
-
-/*****************************************************************************************
- *  Class Project
- ****************************************************************************************/
-
-namespace project {
+namespace library {
 
 /**
- * @brief The Project class
- *
- * @todo this is only a stub class...
+ * @brief The Symbol class
  */
-class Project : public QObject
+class Symbol : public LibraryElement
 {
         Q_OBJECT
 
     public:
 
-        // Constructors / Destructor
-        explicit Project(Workspace* workspace, const QString& filename);
-        ~Project();
-
-        // Getters
-        const QString& getFilename() const {return mFilename;}
-        QString getUniqueFilename() const {return uniqueProjectFilename(mFilename);}
-
-        // Static Methods
-        static QString uniqueProjectFilename(const QString& filename);
+        explicit Symbol(Workspace* workspace, const QString& xmlFilename);
+        virtual ~Symbol();
 
     private:
 
         // make some methods inaccessible...
-        Project();
-        Project(const Project& other);
-        Project& operator=(const Project& rhs);
-
-        Workspace* mWorkspace; ///< a pointer to the workspace
-        QString mFilename;
+        Symbol();
+        Symbol(const Symbol& other);
+        Symbol& operator=(const Symbol& rhs);
 
 };
 
-} // namespace project
+} // namespace library
 
-#endif // PROJECT_PROJECT_H
+#endif // LIBRARY_SYMBOL_H

@@ -22,29 +22,25 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "libraryeditor.h"
-#include "ui_libraryeditor.h"
-#include "../workspace/workspace.h"
+#include "genericcomponent.h"
 
-namespace libedit{
+namespace library {
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-LibraryEditor::LibraryEditor(Workspace* workspace) :
-    QMainWindow(0), ui(new Ui::LibraryEditor), mWorkspace(workspace)
+GenericComponent::GenericComponent(Workspace* workspace, const QString& xmlFilename) :
+    LibraryElement(workspace, xmlFilename, "generic_component")
 {
-    ui->setupUi(this);
 }
 
-LibraryEditor::~LibraryEditor()
+GenericComponent::~GenericComponent()
 {
-    delete ui;              ui = 0;
 }
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace libedit
+} // namespace library

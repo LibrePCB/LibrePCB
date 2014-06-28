@@ -65,9 +65,10 @@ class ProjectTreeModel : public QAbstractItemModel
 
     private:
 
-        // make the default constructor and the copy constructor inaccessable
+        // make some methods inaccessible...
         ProjectTreeModel();
-        ProjectTreeModel(const ProjectTreeModel& other) : QAbstractItemModel(0) {Q_UNUSED(other);}
+        ProjectTreeModel(const ProjectTreeModel& other);
+        ProjectTreeModel& operator=(const ProjectTreeModel& rhs);
 
         // Private Methods
         ProjectTreeItem* getItem(const QModelIndex& index) const;
