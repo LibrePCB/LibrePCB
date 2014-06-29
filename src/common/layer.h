@@ -1,24 +1,81 @@
+/*
+ * EDA4U - Professional EDA for everyone!
+ * Copyright (C) 2013 Urban Bruhin
+ * http://eda4u.ubruhin.ch/
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifndef LAYER_H
+#define LAYER_H
+
+/*****************************************************************************************
+ *  Includes
+ ****************************************************************************************/
+
+#include <QtCore>
+
+/*****************************************************************************************
+ *  Forward Declarations
+ ****************************************************************************************/
+
+class Workspace;
+
+/*****************************************************************************************
+ *  Class Layer
+ ****************************************************************************************/
+
 /**
+ * @brief The Layer class
+ */
+class Layer : public QObject
+{
+        Q_OBJECT
 
-    @page layers_documentation Layers
+    public:
 
+        explicit Layer(Workspace* workspace);
+        virtual ~Layer();
+
+    protected:
+
+        // General
+        Workspace* mWorkspace;
+
+    private:
+
+        // make some methods inaccessible...
+        Layer();
+        Layer(const Layer& other);
+        Layer& operator=(const Layer& rhs);
+};
+
+/*****************************************************************************************
+ *  Doxygen Documentation
+ ****************************************************************************************/
+
+/**
+    @page doc_layers Layers Documentation
     @tableofcontents
 
-    This is the documentation of the EDA4U layers.
-    
-    
-    
-    
     @section layers_overwiew Overview
-    
         There are three different Types of Layers:
             - @ref layers_global "Global Layers (hardcoded)"
-            - @ref layers_workspace "Workspace Layers (stored in the workspace)"
-            - @ref layers_project "Project Layers (stored in the project file)"
-        
-        
+            - @ref layers_workspace "Workspace Layers (stored in the workspace directory)"
+            - @ref layers_project "Project Layers (stored in the project directory)"
+
     @section layers_global Global Layers
-    
         Alle notwendigen Layer sind fest in die Software einprogrammiert.
         Die Nummern 1-899 sind für globale Layer reserviert.
         Es wird zwischen Board- und Schaltplan-Layer unterschieden.
@@ -26,16 +83,16 @@
 
         Es gibt folgende Board-Layer (Footprints/Layout):
             - 1-99:   Kupferlagen (1=Top, 99=Bottom)
-            
+
             - 100:    Pads
             - 101:    Vias
-            
+
             - 110:    Bohrungen durchkontaktiert ("drills")
             - 111:    Bohrungen nicht durchkontaktiert ("holes")
-            
+
             - 120:    Platinenumriss
             - 121:    Ausfräsungen (innen)
-            
+
             - 130:    Stoplack Oben
             - 131:    Stoplack Unten
             - 132:    Finish Oben
@@ -46,7 +103,7 @@
             - 137:    Schablone Unten
             - 138:    Testpunkte Oben
             - 139:    Testpunkte Unten
-            
+
             - 150:    Bauteil-Referenzen Oben (Koordinaten-Kreuz)
             - 151:    Bauteil-Referenzen Unten (Koordinaten-Kreuz)
             - 152:    Bauteil-Umrisse Oben
@@ -57,13 +114,13 @@
             - 157:    Bauteil-Namen Unten
             - 158:    Bauteil-Werte Oben
             - 159:    Bauteil-Werte Unten
-            
+
             - 170:    Keepout Oben (keine Bauteile)
             - 171:    Keepout Unten (keine Bauteile)
             - 172:    Restrict Oben (kein Kupfer)
             - 173:    Restrict Unten (kein Kupfer)
             - 174:    Restrict Vias (keine Vias)
-            
+
             - 190:    Unrouted
             - 191:    Bemassungen
             - 192:    Dokumentation??
@@ -74,7 +131,7 @@
             - 1:      Netze
             - 2:      Busse
             - 3:      Pins
-            
+
             - 10:     Bauteil-Referenzen (Koordinaten-Kreuz)
             - 11:     Bauteil-Umrisse
             - 12:     Bauteil-Namen
@@ -83,27 +140,22 @@
 
             (- 20:     Gruppen-Rahmen)
             (- 21:     Gruppen-Beschriftungen)
-            
+
             - 30:     Text
-            
-            
-        TODO: Layer für Frontplatten-Ausschnitte usw.
-    
-    
+
+        @todo: Layer für Frontplatten-Ausschnitte usw.
+
     @section layers_workspace Workspace Layers
-    
         Für Workspace-Layer sind die Nummern 900-999 reserviert.
         Sie werden im Workspace-Verzeichnis gespeichert.
-    
-    
-    @section layers_project Project Layers
-    
-        Beim Anlegen eines neuen Projektes werden alle Workspace-Layer ins Projekt kopiert.
-        Von da an werden für das geöffnete Projekt die Workspace-Layer nicht mehr berücksichtigt.
-        Verändert man die Workspace-Layer, hat dies auf das Projekt keinen Einfluss mehr.
 
+    @section layers_project Project Layers
+        Beim Anlegen eines neuen Projektes werden alle Workspace-Layer ins Projekt kopiert.
+        Von da an werden für das geöffnete Projekt die Workspace-Layer nicht mehr berücksichtigt,
+        er wird nur noch mit den Layern des Projektes gearbeitet.
+        Verändert man die Workspace-Layer, hat dies auf das Projekt keinen Einfluss mehr.
         Die Projekt-Layer haben damit automatisch auch den Nummernbereich 900-999.
-        
+
 */
 
-
+#endif // LAYER_H

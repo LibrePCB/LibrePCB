@@ -41,7 +41,7 @@ using namespace project;
 
 Workspace::Workspace(const QDir& workspaceDir) :
     QObject(0), mWorkspaceDir(workspaceDir),
-    mMetadataDir(workspaceDir.absoluteFilePath(".metadata/")),
+    mMetadataDir(workspaceDir.absoluteFilePath(".metadata" % QDir::separator())),
     mWorkspaceSettings(0), mControlPanel(0), mLibrary(0), mLibraryEditor(0),
     mProjectTreeModel(0)
 {

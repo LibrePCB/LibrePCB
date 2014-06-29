@@ -7,7 +7,7 @@
     
     @section documentation_pages Documentation
         - @subpage miscellaneous
-        - @subpage layers_documentation
+        - @subpage doc_layers
         - @subpage library_documentation
         - @subpage project_documentation
     

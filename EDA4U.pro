@@ -41,7 +41,8 @@ SOURCES += \
     src/library/package.cpp \
     src/library/spicemodel.cpp \
     src/library/componentcategory.cpp \
-    src/library/packagecategory.cpp
+    src/library/packagecategory.cpp \
+    src/common/layer.cpp
 
 HEADERS += \
     src/common/units.h \
@@ -64,7 +65,8 @@ HEADERS += \
     src/library/package.h \
     src/library/spicemodel.h \
     src/library/componentcategory.h \
-    src/library/packagecategory.h
+    src/library/packagecategory.h \
+    src/common/layer.h
 
 FORMS += \
     src/workspace/controlpanel/controlpanel.ui \
