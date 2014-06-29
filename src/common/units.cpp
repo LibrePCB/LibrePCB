@@ -83,18 +83,40 @@ Length Length::fromPx(qreal pixels, const Length& gridInterval)
 
 // Private Methods
 
+/**
+ * @brief Set the length from a floating point number in nanometers
+ *
+ * This is a helper method for the setLength*() methods.
+ *
+ * @param nanometers    A floating point number in nanometers.
+ *
+ * @note The parameter is NOT an integer although we don't use numbers smaller than
+ * one nanometer. This way, the range of this parameter is much greater and we can
+ * compare the value with the range of an integer. If the value is outside the range
+ * of an integer, we will throw an exception. If we would pass the length as an integer,
+ * we couldn't detect such under-/overflows!
+ */
 void Length::setLengthFromFloat(qreal nanometers)
 {
     if ((nanometers > std::numeric_limits<LengthBase_t>::max())
             || (nanometers < std::numeric_limits<LengthBase_t>::min()))
         throw std::range_error("Range error in the Length class!");
 
-    mNanometers = nanometers;
+    mNanometers = qRound(nanometers);
 }
 
 // Private Static Methods
 
 /**
+ * @brief Map a length in nanometers to a grid interval in nanometers
+ *
+ * This is a helper function for mapToGrid().
+ *
+ * @param nanometers    The length we want to map to the grid
+ * @param gridInterval  The grid interval
+ *
+ * @return  The length which is mapped to the grid (always a multiple of gridInterval)
+ *
  * @todo    does this work correctly with large 64bit integers?!
  *          and maybe there is a better, integer-based method for this purpose?
  */
@@ -107,12 +129,22 @@ LengthBase_t Length::mapNmToGrid(LengthBase_t nanometers, const Length& gridInte
 }
 
 /**
- * @todo    make this function better...this does not work for 32bit AND 64bit integers!
- *          and throw an exception if an range error occurs (under-/overflow)!
+ * @brief Convert a length from a QString (in millimeters) to an integer (in nanometers)
+ *
+ * This is a helper function for Length(const QString&) and setLengthMm().
+ *
+ * @param millimeters   A QString which contains a floating point number with maximum
+ *                      six decimals after the decimal point. The locale of the string
+ *                      have to be "C"! Example: QString("-1234.56") for -1234.56mm
+ *
+ * @return The length in nanometers
+ *
+ * @todo    don't use double for this purpose!
+ *          and throw an exception if a range error occurs (under-/overflow)!
  */
 LengthBase_t Length::mmStringToNm(const QString& millimeters)
 {
-    return millimeters.toInt();
+    return qRound(millimeters.toDouble() * 1e6);
 }
 
 // Non-Member Functions
@@ -158,9 +190,24 @@ Angle Angle::fromRad(qreal radians)
 
 // Private Static Methods
 
+/**
+ * @brief Convert an angle from a QString (in degrees) to an integer (in microdegrees)
+ *
+ * This is a helper function for Angle(const QString&) and setAngleDeg().
+ *
+ * @param degrees   A QString which contains a floating point number with maximum
+ *                  six decimals after the decimal point. The locale of the string
+ *                  have to be "C"! Example: QString("-123.456") for -123.456 degrees
+ *
+ * @return The angle in microdegrees
+ *
+ * @todo    don't use double for this purpose!
+ *          and map the angle to +/- 360 degrees BEFORE converting it to microdegrees!
+ *          throw an exception on range errors!
+ */
 qint32 Angle::degStringToMicrodeg(const QString& degrees)
 {
-    return fmod(degrees.toDouble(), 360e6); ///< @todo fmod is only for double, so not good for ARM!
+    return qRound(degrees.toDouble() * 1e6);
 }
 
 // Non-Member Functions
@@ -180,18 +227,6 @@ QDebug& operator<<(QDebug& stream, const Angle& angle)
 /*****************************************************************************************
  *  Class Point
  ****************************************************************************************/
-
-// Setters
-
-void Point::setXY(const QString& point, const QChar& sep)
-{
-    QStringList coordinates = point.split(sep, QString::SkipEmptyParts);
-    if (coordinates.count() != 2)
-        throw std::runtime_error("Invalid Point String!");
-
-    mX.setLengthMm(coordinates[0]);
-    mY.setLengthMm(coordinates[1]);
-}
 
 // General Methods
 
