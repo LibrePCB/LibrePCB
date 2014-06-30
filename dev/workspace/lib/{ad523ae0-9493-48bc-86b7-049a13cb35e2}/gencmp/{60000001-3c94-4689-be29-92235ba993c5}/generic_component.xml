@@ -10,8 +10,8 @@
             <category>{00000000-e485-4af1-9679-bd66e8055f07}</category>
         </categories>
         <name locale="en_US">NE555</name>
-        <description locale="en_US">asdfs</description>
-        <keywords locale="en_US">word1, word2, word3</keywords>
+        <description locale="en_US"><![CDATA[description in HTML...]]></description>
+        <keywords locale="en_US">word1 word2 word3...</keywords>
     </meta>
     <changelog/>
     <attachements/>
@@ -19,35 +19,35 @@
         <prefix norm="" default="true">U</prefix>
     </properties>
     <signals>
-        <signal uuid="{71a44db9-5e42-405f-b6e4-b4725ae37af3}" role="supply" required="true">
+        <signal uuid="{71a44db9-5e42-405f-b6e4-b4725ae37af3}" role="supply" required="true" negated="false" clock="false">
             <name locale="en_US">GND</name>
             <description locale="en_US"></description>
         </signal>
-        <signal uuid="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}" role="supply" required="true">
+        <signal uuid="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}" role="supply" required="true" negated="false" clock="false">
             <name locale="en_US">TRIGGER</name>
             <description locale="en_US"></description>
         </signal>
-        <signal uuid="{a9d3d159-fca9-417e-8bba-13829caa6ae5}" role="supply" required="true">
-            <name>OUTPUT</name>
+        <signal uuid="{a9d3d159-fca9-417e-8bba-13829caa6ae5}" role="supply" required="true" negated="false" clock="false">
+            <name locale="en_US">OUTPUT</name>
             <description locale="en_US"></description>
         </signal>
-        <signal uuid="{da30b112-9ab0-4715-8a6a-9e5414169fd4}" role="supply" required="true">
+        <signal uuid="{da30b112-9ab0-4715-8a6a-9e5414169fd4}" role="supply" required="true" negated="true" clock="false">
             <name locale="en_US">/RESET</name>
             <description locale="en_US"></description>
         </signal>
-        <signal uuid="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}" role="supply" required="true">
+        <signal uuid="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}" role="supply" required="true" negated="false" clock="false">
             <name locale="en_US">CONTROL</name>
             <description locale="en_US"></description>
         </signal>
-        <signal uuid="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}" role="supply" required="true">
+        <signal uuid="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}" role="supply" required="true" negated="false" clock="false">
             <name locale="en_US">THRESHOLD</name>
             <description locale="en_US"></description>
         </signal>
-        <signal uuid="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}" role="supply" required="true">
+        <signal uuid="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}" role="supply" required="true" negated="false" clock="false">
             <name locale="en_US">DISCHARGE</name>
             <description locale="en_US"></description>
         </signal>
-        <signal uuid="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}" role="supply" required="true">
+        <signal uuid="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}" role="supply" required="true" negated="false" clock="false">
             <name locale="en_US">VCC</name>
             <description locale="en_US"></description>
         </signal>
@@ -76,7 +76,6 @@
         <spice_model uuid="{2276fc5e-f67f-404c-aff5-02bc9bc71e87}" default="true">
             <name locale="en_US">simple</name>
             <description locale="en_US">simple, idealized spice model</description>
-            <author>Linear Technology</Author>
             <filename>NE555.sub</filename>
             <spice_model_name>NE555</spice_model_name>
             <signal_list>

@@ -12,8 +12,8 @@
         <generic_component>{60000001-3c94-4689-be29-92235ba993c5}</generic_component>
         <package>{50000000-7625-4f8c-bc6d-c9f5b49b7024}</package>
         <name locale="en_US">NE555P</name>
-        <description locale="en_US">blablabla...</description>
-        <keywords locale="en_US">word1, word2, word3</keywords>
+        <description locale="en_US"><![CDATA[description in HTML...]]></description>
+        <keywords locale="en_US">word1 word2 word3...</keywords>
     </meta>
     <changelog/>
     <attachements/>

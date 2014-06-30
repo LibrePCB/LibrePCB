@@ -10,8 +10,8 @@
             <category>{10000000-bf7f-4980-85cd-c73fcb164158}</category>
         </categories>
         <name locale="en_US">DIP08</name>
-        <description locale="en_US">blablabla...</description>
-        <keywords locale="en_US">DIP, DIP8, DIP08</keywords>
+        <description locale="en_US"><![CDATA[description in HTML...]]></description>
+        <keywords locale="en_US">DIP DIP8 DIP08</keywords>
     </meta>
     <changelog/>
     <attachements/>
@@ -28,6 +28,7 @@
         <text layer="96" value="${VALUE}" x="-2.9" y="-6.3" angle="0" size="3" v_align="top" h_align="left" ratio="0.08" mirror="false" font="proportional" />
     </geometry>
     <pads>
+        <!-- TODO: Format für die Pads muss noch genau festgelegt werden! -->
         <pad uuid="{c686d86d-35ac-4cb5-9528-cbe0e93a8183}" x="-3.81" y="2.54" angle="0" mirror="false" smd="false" drill="0.8" diameter="2.1" shape="round">
             <name locale="en_US">1</name>
             <description locale="en_US">Pad 1</description>
