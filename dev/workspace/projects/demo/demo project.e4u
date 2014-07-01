@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes'?>
 <project compatible_downto="1" file_version="1">
-    <general>
+    <meta>
         <uuid>{9e25a866-8877-4eca-be3e-2bc22f94a561}</uuid>
-    </general>
+    </meta>
     <attributes>
         <attribute type="text" name="NAME">EDA4U Beispielprojekt</attribute>
         <attribute type="text" name="DESCRIPTION">Das ist eine Beschreibung des Projektes</attribute>
@@ -34,16 +34,6 @@
         <attribute unit="cd" type="luminosity" name="LUMINOSITY">12.34</attribute>
         <!-- [cd]                               -->
     </attributes>
-    <layers>
-        <layer color="#FFFFFF" index="900" fill="solid" default_visibility="true" name="komischer layer..."/>
-    </layers>
-    <layer_groups>
-        <group index="0" name="Oberseite, ohne Beschriftungen">
-            <layer_id>1</layer_id>
-            <layer_id>2</layer_id>
-            <layer_id>900</layer_id>
-        </group>
-    </layer_groups>
     <changelog enabled="true">
         <items>
             <item datetime="2013-07-01 00:00:00" author="Spongebob">Kleine Änderung...</item>

@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes'?>
 <circuit compatible_downto="1" file_version="1">
-    <general>
+    <meta>
         <uuid>{573b731a-e0a9-4613-b7c1-86c01dfd7651}</uuid>
-    </general>
+    </meta>
     <netclasses>
         <netclass uuid="{4b10268a-fec5-4230-8054-2dc966d625cd}" name="default"/>
     </netclasses>

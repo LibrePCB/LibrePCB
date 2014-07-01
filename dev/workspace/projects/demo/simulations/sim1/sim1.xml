@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <simulation file_version="1" compatible_downto="1">
-    <general>
+    <meta>
         <uuid>{8a1f9e05-c711-4af4-9a7b-b1a585d6e4ed}</uuid>
         <circuit_uuid>{8a1f9e05-c711-4af4-9a7b-b1a585d6e4ed}</circuit_uuid>
         <name>Simulation 1</name>
-    </general>
+    </meta>
 </simulation>
 
 

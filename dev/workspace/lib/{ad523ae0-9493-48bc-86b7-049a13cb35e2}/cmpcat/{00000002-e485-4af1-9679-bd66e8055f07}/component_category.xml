@@ -4,8 +4,8 @@
         <uuid>{00000002-e485-4af1-9679-bd66e8055f07}</uuid>
         <version>1.1</version>
         <author>EDA4U</author>
-        <created>2013-04-13 12:43:52</created>
-        <last_modified>2013-04-20 18:01:33</last_modified>
+        <created>2013-04-13T12:43:52Z</created>
+        <last_modified>2013-04-20T18:01:33Z</last_modified>
         <parent>{00000000-e485-4af1-9679-bd66e8055f07}</parent>
         <name locale="en_US">Diodes</name>
         <description locale="en_US"><![CDATA[description in HTML...]]></description>

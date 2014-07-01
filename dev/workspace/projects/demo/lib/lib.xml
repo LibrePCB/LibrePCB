@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <project_library file_version="1" compatible_downto="1">
-    
-    <general>
-    </general>
 
     <symbols>
         <symbol uuid="{20000000-9bde-4a62-ad5e-5a7145d68613}" />

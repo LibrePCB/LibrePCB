@@ -1,21 +1,13 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes'?>
 <board compatible_downto="1" file_version="1">
-    <general>
+    <meta>
         <uuid>{fbe1ce1b-9612-4db8-9898-ccab719ec21d}</uuid>
         <circuit_uuid>{8a1f9e05-c711-4af4-9a7b-b1a585d6e4ed}</circuit_uuid>
         <name>THT Board 2</name>
         <page_index>1</page_index>
-    </general>
-    <board_config>
-        <!--<layer_setup>(1+16)</layer_setup>
-        <layers>
-            <layer index="0" type="copper" layer="1" thickness="35000" />
-            <layer index="1" type="isolation" thickness="1500000" />
-            <layer index="2" type="copper" layer="99" thickness="35000" />
-        </layers>-->
-    </board_config>
+    </meta>
     <attributes/>
     <packages/>
-    <netlist_points/>
-    <netlist_lines/>
+    <netpoints/>
+    <netlines/>
 </board>
