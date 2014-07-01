@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/i18n">
+        <file>eda4u_en.qm</file>
+        <file>eda4u_de.qm</file>
+        <file>eda4u_de_CH.qm</file>
+    </qresource>
+</RCC>

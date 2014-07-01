@@ -6,18 +6,41 @@
 
 QT += core widgets opengl webkitwidgets xml
 
-TARGET = EDA4U
+TARGET = eda4u
 TEMPLATE = app
 
 CONFIG += c++11
 
 #DEFINES += USE_32BIT_LENGTH_UNITS          # see units.h
 
-RC_ICONS = img/app.ico  # set the icon for windows
-ICON = img/app.icns     # set the icon for mac
+win32 {
+    # Windows-specific configurations
+    RC_ICONS = img/EDA4U.ico
+}
+
+macx {
+    # Mac-specific configurations
+    ICON = img/EDA4U.icns
+}
+
+unix:!macx {
+    # Linux/UNIX-specific configurations
+    target.path = /usr/local/bin
+    icon.path = /usr/share/pixmaps
+    icon.files = img/EDA4U.xpm
+    desktop.path = /usr/share/applications
+    desktop.files = EDA4U.desktop
+    INSTALLS += target icon desktop
+}
+
+TRANSLATIONS = i18n/eda4u_en.ts \
+    i18n/eda4u_de.ts \
+    i18n/eda4u_de_CH.ts
 
 RESOURCES += \
-    ressources.qrc
+    ressources.qrc \
+    img/images.qrc \
+    i18n/translations.qrc
 
 SOURCES += \
     src/main.cpp \
