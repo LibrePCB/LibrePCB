@@ -65,5 +65,6 @@
         <file>places/folder.png</file>
         <file>places/folder_open_green.png</file>
         <file>places/folder_green.png</file>
+        <file>actions/close.png</file>
     </qresource>
 </RCC>

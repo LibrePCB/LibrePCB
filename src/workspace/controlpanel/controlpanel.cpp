@@ -38,26 +38,26 @@ using namespace project;
  ****************************************************************************************/
 
 ControlPanel::ControlPanel(Workspace* workspace, QAbstractItemModel* projectTreeModel) :
-    QMainWindow(0), ui(new Ui::ControlPanel), mWorkspace(workspace)
+    QMainWindow(0), mUi(new Ui::ControlPanel), mWorkspace(workspace)
 {
-    ui->setupUi(this);
+    mUi->setupUi(this);
 
-    setWindowTitle("EDA4U Control Panel - " + mWorkspace->getWorkspaceDir().absolutePath());
+    setWindowTitle("EDA4U Control Panel - " % mWorkspace->getWorkspaceDir().absolutePath());
 
     // connect some actions which are created with the Qt Designer
-    connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
-    connect(ui->actionOpen_Library_Editor, SIGNAL(triggered()), mWorkspace, SLOT(openLibraryEditor()));
-    connect(ui->actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
+    connect(mUi->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
+    connect(mUi->actionOpen_Library_Editor, SIGNAL(triggered()), mWorkspace, SLOT(openLibraryEditor()));
+    connect(mUi->actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 
-    ui->projectTreeView->setModel(projectTreeModel);
+    mUi->projectTreeView->setModel(projectTreeModel);
 
-    ui->webView->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
-    connect(ui->webView, SIGNAL(linkClicked(QUrl)), this, SLOT(webViewLinkClicked(QUrl)));
+    mUi->webView->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+    connect(mUi->webView, SIGNAL(linkClicked(QUrl)), this, SLOT(webViewLinkClicked(QUrl)));
 }
 
 ControlPanel::~ControlPanel()
 {
-    delete ui;              ui = 0;
+    delete mUi;              mUi = 0;
 }
 
 void ControlPanel::closeEvent(QCloseEvent *event)
@@ -99,7 +99,7 @@ void ControlPanel::on_projectTreeView_clicked(const QModelIndex& index)
         htmlFile.close();
     } while (0);
 
-    ui->webView->setHtml(html);
+    mUi->webView->setHtml(html);
 }
 
 void ControlPanel::on_projectTreeView_doubleClicked(const QModelIndex& index)
@@ -118,7 +118,7 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(const QPoint& p
     QMenu menu;
     QMap<unsigned int, QAction*> actions;
 
-    QModelIndex index = ui->projectTreeView->indexAt(pos);
+    QModelIndex index = mUi->projectTreeView->indexAt(pos);
     ProjectTreeItem* item = 0;
 
     if (index.isValid())
@@ -128,12 +128,21 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(const QPoint& p
         {
             if (item->isProject())
             {
-                actions.insert(1, menu.addAction("Open Project"));
-                actions.insert(2, menu.addAction("Close Project"));
+                if (!mWorkspace->getOpenProject(item->getProjectFilename()))
+                {
+                    actions.insert(1, menu.addAction("Open Project"));
+                    actions.value(1)->setIcon(QIcon(":/img/actions/open.png"));
+                }
+                else
+                {
+                    actions.insert(2, menu.addAction("Close Project"));
+                    actions.value(2)->setIcon(QIcon(":/img/actions/close.png"));
+                }
                 actions.insert(3, menu.addSeparator());
             }
 
             actions.insert(4, menu.addAction("Open Directory"));
+            actions.value(4)->setIcon(QIcon(":/img/places/folder_open.png"));
             actions.insert(5, menu.addSeparator());
         }
     }
@@ -146,11 +155,11 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(const QPoint& p
     switch (actions.key(menu.exec(QCursor::pos()), 0))
     {
         case 1: // open project
-            qDebug() << "open" << item->getName();
+            mWorkspace->openProject(item->getProjectFilename());
             break;
 
         case 2: // close project
-            qDebug() << "close" << item->getName();
+            mWorkspace->closeProject(item->getProjectFilename(), true);
             break;
 
         case 4: // open project directory

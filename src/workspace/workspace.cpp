@@ -87,26 +87,36 @@ Project* Workspace::openProject(const QString& filename)
     {
         openProject = new Project(this, filename);
         mOpenProjects.insert(Project::uniqueProjectFilename(filename), openProject);
+        openProject->showSchematicEditor();
     }
 
     return openProject;
 }
 
-void Workspace::closeProject(const QString& filename)
+bool Workspace::closeProject(const QString& filename, bool askForSave)
 {
-    Project* openProject = getOpenProject(filename);
-    if (openProject)
-    {
-        mOpenProjects.remove(Project::uniqueProjectFilename(filename));
-        delete openProject;
-    }
+    return closeProject(getOpenProject(filename), askForSave);
 }
 
-void Workspace::closeProject(Project* project)
+bool Workspace::closeProject(Project* project, bool askForSave)
 {
-    QString filename = mOpenProjects.key(project, QString());
-    if (!filename.isEmpty())
-        closeProject(filename);
+    if (!project)
+        return true;
+
+    bool success = true;
+
+    if (askForSave)
+        success = project->close();
+
+    if (success)
+        delete project;
+
+    return success;
+}
+
+void Workspace::unregisterOpenProject(Project* project)
+{
+    mOpenProjects.remove(project->getUniqueFilename());
 }
 
 Project* Workspace::getOpenProject(const QString& filename)
@@ -140,12 +150,10 @@ void Workspace::openLibraryEditor()
 
 void Workspace::closeAllProjects(bool askForSave)
 {
-    Q_UNUSED(askForSave); ///< @todo show "save projects?" dialog if unsaved projects are open
-
     QList<QString> openProjectsFilenames = mOpenProjects.keys();
     foreach (QString filename, openProjectsFilenames)
     {
-        closeProject(filename);
+        closeProject(filename, askForSave);
     }
 }
 

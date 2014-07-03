@@ -65,7 +65,9 @@ SOURCES += \
     src/library/spicemodel.cpp \
     src/library/componentcategory.cpp \
     src/library/packagecategory.cpp \
-    src/common/layer.cpp
+    src/common/layer.cpp \
+    src/project/schematics/schematiceditor.cpp \
+    src/project/circuit/circuit.cpp
 
 HEADERS += \
     src/common/units.h \
@@ -89,10 +91,13 @@ HEADERS += \
     src/library/spicemodel.h \
     src/library/componentcategory.h \
     src/library/packagecategory.h \
-    src/common/layer.h
+    src/common/layer.h \
+    src/project/schematics/schematiceditor.h \
+    src/project/circuit/circuit.h
 
 FORMS += \
     src/workspace/controlpanel/controlpanel.ui \
     src/workspace/workspacechooserdialog.ui \
-    src/library_editor/libraryeditor.ui
+    src/library_editor/libraryeditor.ui \
+    src/project/schematics/schematiceditor.ui
 

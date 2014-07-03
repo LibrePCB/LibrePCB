@@ -25,12 +25,18 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <QMainWindow>
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
 class Workspace;
+
+namespace project {
+class Circuit;
+class SchematicEditor;
+}
 
 /*****************************************************************************************
  *  Class Project
@@ -57,8 +63,17 @@ class Project : public QObject
         const QString& getFilename() const {return mFilename;}
         QString getUniqueFilename() const {return uniqueProjectFilename(mFilename);}
 
+        // General Methods
+        bool windowIsAboutToClose(QMainWindow* window);
+
         // Static Methods
         static QString uniqueProjectFilename(const QString& filename);
+
+    public slots:
+
+        void showSchematicEditor();
+        void save();
+        bool close(QWidget* messageBoxParent = 0);
 
     private:
 
@@ -69,6 +84,11 @@ class Project : public QObject
 
         Workspace* mWorkspace; ///< a pointer to the workspace
         QString mFilename;
+
+        // General
+        bool mHasUnsavedChanges;
+        Circuit* mCircuit;
+        SchematicEditor* mSchematicEditor;
 
 };
 

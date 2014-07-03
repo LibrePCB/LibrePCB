@@ -17,73 +17,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CONTROLPANEL_H
-#define CONTROLPANEL_H
-
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
 #include <QtWidgets>
+#include "circuit.h"
+#include "../project.h"
+
+namespace project {
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Constructors / Destructor
  ****************************************************************************************/
 
-class Workspace;
+Circuit::Circuit(Project* project) :
+    QObject(0), mProject(project)
+{
+}
 
-namespace Ui {
-class ControlPanel;
+Circuit::~Circuit()
+{
 }
 
 /*****************************************************************************************
- *  Class ControlPanel
+ *  End of File
  ****************************************************************************************/
 
-/**
- * @brief The ControlPanel class
- *
- * @author ubruhin
- *
- * @date 2014-06-23
- */
-class ControlPanel : public QMainWindow
-{
-        Q_OBJECT
-
-    public:
-
-        // Constructors / Destructor
-        explicit ControlPanel(Workspace* workspace, QAbstractItemModel* projectTreeModel);
-        ~ControlPanel();
-
-    protected:
-
-        // Inherited Methods
-        virtual void closeEvent(QCloseEvent* event);
-
-    private slots:
-
-        // Actions
-        void on_actionAbout_triggered();
-        void on_projectTreeView_clicked(const QModelIndex& index);
-        void on_projectTreeView_doubleClicked(const QModelIndex& index);
-        void on_projectTreeView_customContextMenuRequested(const QPoint& pos);
-
-        // QWebView
-        void webViewLinkClicked(const QUrl& url);
-
-    private:
-
-        // make some methods inaccessible...
-        ControlPanel();
-        ControlPanel(const ControlPanel& other);
-        ControlPanel& operator=(const ControlPanel& rhs);
-
-        Ui::ControlPanel* mUi;
-
-        Workspace* mWorkspace;
-};
-
-#endif // CONTROLPANEL_H
+} // namespace project

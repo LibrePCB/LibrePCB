@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CONTROLPANEL_H
-#define CONTROLPANEL_H
+#ifndef PROJECT_SCHEMATICEDITOR_H
+#define PROJECT_SCHEMATICEDITOR_H
 
 /*****************************************************************************************
  *  Includes
@@ -31,59 +31,53 @@
  *  Forward Declarations
  ****************************************************************************************/
 
-class Workspace;
-
 namespace Ui {
-class ControlPanel;
+class SchematicEditor;
+}
+
+namespace project {
+class Project;
 }
 
 /*****************************************************************************************
- *  Class ControlPanel
+ *  Class SchematicEditor
  ****************************************************************************************/
 
+namespace project {
+
 /**
- * @brief The ControlPanel class
- *
- * @author ubruhin
- *
- * @date 2014-06-23
+ * @brief The SchematicEditor class
  */
-class ControlPanel : public QMainWindow
+class SchematicEditor : public QMainWindow
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit ControlPanel(Workspace* workspace, QAbstractItemModel* projectTreeModel);
-        ~ControlPanel();
+        explicit SchematicEditor(Project* project);
+        ~SchematicEditor();
 
     protected:
 
-        // Inherited Methods
-        virtual void closeEvent(QCloseEvent* event);
+        void closeEvent(QCloseEvent* event);
 
     private slots:
 
         // Actions
-        void on_actionAbout_triggered();
-        void on_projectTreeView_clicked(const QModelIndex& index);
-        void on_projectTreeView_doubleClicked(const QModelIndex& index);
-        void on_projectTreeView_customContextMenuRequested(const QPoint& pos);
-
-        // QWebView
-        void webViewLinkClicked(const QUrl& url);
+        void on_actionClose_Project_triggered();
 
     private:
 
         // make some methods inaccessible...
-        ControlPanel();
-        ControlPanel(const ControlPanel& other);
-        ControlPanel& operator=(const ControlPanel& rhs);
+        SchematicEditor();
+        SchematicEditor(const SchematicEditor& other);
+        SchematicEditor& operator=(const SchematicEditor& rhs);
 
-        Ui::ControlPanel* mUi;
-
-        Workspace* mWorkspace;
+        Project* mProject;
+        Ui::SchematicEditor* mUi;
 };
 
-#endif // CONTROLPANEL_H
+} // namespace project
+
+#endif // PROJECT_SCHEMATICEDITOR_H

@@ -75,8 +75,9 @@ class Workspace : public QObject
 
         // Project Management
         project::Project* openProject(const QString& filename);
-        void closeProject(const QString& filename);
-        void closeProject(project::Project* project);
+        bool closeProject(const QString& filename, bool askForSave);
+        bool closeProject(project::Project* project, bool askForSave);
+        void unregisterOpenProject(project::Project* project);
         project::Project* getOpenProject(const QString& filename);
         const QHash<QString, project::Project*>& getOpenProjects() const {return mOpenProjects;}
 

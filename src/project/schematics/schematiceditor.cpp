@@ -17,73 +17,60 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CONTROLPANEL_H
-#define CONTROLPANEL_H
-
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
 #include <QtWidgets>
+#include "schematiceditor.h"
+#include "ui_schematiceditor.h"
+#include "../project.h"
+
+namespace project {
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Constructors / Destructor
  ****************************************************************************************/
 
-class Workspace;
+SchematicEditor::SchematicEditor(Project* project) :
+    QMainWindow(0), mProject(project), mUi(new Ui::SchematicEditor)
+{
+    mUi->setupUi(this);
 
-namespace Ui {
-class ControlPanel;
+    // connect some actions which are created with the Qt Designer
+    connect(mUi->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
+    connect(mUi->actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
+}
+
+SchematicEditor::~SchematicEditor()
+{
+    delete mUi;     mUi = 0;
 }
 
 /*****************************************************************************************
- *  Class ControlPanel
+ *  Inherited Methods
  ****************************************************************************************/
 
-/**
- * @brief The ControlPanel class
- *
- * @author ubruhin
- *
- * @date 2014-06-23
- */
-class ControlPanel : public QMainWindow
+void SchematicEditor::closeEvent(QCloseEvent* event)
 {
-        Q_OBJECT
+    if (!mProject->windowIsAboutToClose(this))
+        event->ignore();
+    else
+        QMainWindow::closeEvent(event);
+}
 
-    public:
+/*****************************************************************************************
+ *  Actions
+ ****************************************************************************************/
 
-        // Constructors / Destructor
-        explicit ControlPanel(Workspace* workspace, QAbstractItemModel* projectTreeModel);
-        ~ControlPanel();
+void SchematicEditor::on_actionClose_Project_triggered()
+{
+    mProject->close(this);
+}
 
-    protected:
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-        // Inherited Methods
-        virtual void closeEvent(QCloseEvent* event);
-
-    private slots:
-
-        // Actions
-        void on_actionAbout_triggered();
-        void on_projectTreeView_clicked(const QModelIndex& index);
-        void on_projectTreeView_doubleClicked(const QModelIndex& index);
-        void on_projectTreeView_customContextMenuRequested(const QPoint& pos);
-
-        // QWebView
-        void webViewLinkClicked(const QUrl& url);
-
-    private:
-
-        // make some methods inaccessible...
-        ControlPanel();
-        ControlPanel(const ControlPanel& other);
-        ControlPanel& operator=(const ControlPanel& rhs);
-
-        Ui::ControlPanel* mUi;
-
-        Workspace* mWorkspace;
-};
-
-#endif // CONTROLPANEL_H
+} // namespace project

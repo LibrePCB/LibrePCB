@@ -25,6 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <QtWidgets>
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -45,13 +46,35 @@ class Layer : public QObject
 
     public:
 
-        explicit Layer(Workspace* workspace);
+        // Constructors / Destructor
+        explicit Layer(Workspace* workspace, const QString& iniFilename);
         virtual ~Layer();
+
+        // Getters
+        unsigned int getId() const {return mId;}
+        const QString& getName() const {return mName;}
+        const QPen& getPen(bool selected) const {return selected ? mPenSelected : mPen;}
+        const QBrush& getBrush(bool selected) const {return selected ? mBrushSelected : mBrush;}
+
+        // Setters
+        //void setColor(const QColor& color);
+        //void setSelectedColor(const QColor& color);
+        //void setWidth(qreal width);
+        //void setBrushStyle(Qt::BrushStyle brushStyle);
 
     protected:
 
         // General
         Workspace* mWorkspace;
+        QString mIniFilename;
+
+        // Attributes
+        unsigned int mId;
+        QString mName;
+        QPen mPen;
+        QPen mPenSelected;
+        QBrush mBrush;
+        QBrush mBrushSelected;
 
     private:
 
@@ -138,8 +161,8 @@ class Layer : public QObject
             - 13:     Bauteil-Werte
             - 14:     Bauteil-Package-Namen
 
-            (- 20:     Gruppen-Rahmen)
-            (- 21:     Gruppen-Beschriftungen)
+            - 20:     (Gruppen-Rahmen)
+            - 21:     (Gruppen-Beschriftungen)
 
             - 30:     Text
 

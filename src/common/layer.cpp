@@ -29,8 +29,8 @@
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Layer::Layer(Workspace* workspace) :
-    QObject(0), mWorkspace(workspace)
+Layer::Layer(Workspace* workspace, const QString& iniFilename) :
+    QObject(0), mWorkspace(workspace), mIniFilename(iniFilename)
 {
 }
 

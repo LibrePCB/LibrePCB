@@ -24,20 +24,102 @@
 #include <QtCore>
 #include "project.h"
 #include "../workspace/workspace.h"
+#include "circuit/circuit.h"
+#include "schematics/schematiceditor.h"
 
-namespace project{
+namespace project {
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
 Project::Project(Workspace* workspace, const QString& filename) :
-    QObject(0), mWorkspace(workspace), mFilename(filename)
+    QObject(0), mWorkspace(workspace), mFilename(filename), mHasUnsavedChanges(false)
 {
+    mCircuit = new Circuit(this);
+    mSchematicEditor = new SchematicEditor(this);
 }
 
 Project::~Project()
 {
+    mWorkspace->unregisterOpenProject(this); // inform the workspace that this project will get destroyed
+
+    delete mSchematicEditor;        mSchematicEditor = 0;
+    delete mCircuit;                mCircuit = 0;
+}
+
+/*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+bool Project::windowIsAboutToClose(QMainWindow* window)
+{
+    int countOfOpenWindows = mSchematicEditor->isVisible();
+
+    if (countOfOpenWindows <= 1)
+    {
+        // the last open window (schematic editor, board editor, ...) is about to close.
+        // --> close the whole project
+        return close(window);
+    }
+
+    return true; // this is not the last open window, so no problem to close it...
+}
+
+/*****************************************************************************************
+ *  Public Slots
+ ****************************************************************************************/
+
+void Project::showSchematicEditor()
+{
+    mSchematicEditor->show();
+    mSchematicEditor->raise();
+}
+
+void Project::save()
+{
+    if (!mHasUnsavedChanges)
+        return;
+
+    // todo: save project
+
+    mHasUnsavedChanges = false;
+}
+
+bool Project::close(QWidget* messageBoxParent)
+{
+    if (!mHasUnsavedChanges)
+    {
+        // no unsaved changes --> the project can be closed
+        deleteLater();  // this project object will be deleted later in the event loop
+        return true;
+    }
+
+    if (!messageBoxParent)
+    {
+        if (mSchematicEditor->isVisible())
+            messageBoxParent = mSchematicEditor;
+    }
+
+    QMessageBox::StandardButton choice = QMessageBox::question(messageBoxParent,
+         tr("Save Project?"), tr("You have unsaved changes in the project.\n"
+         "Do you want to save them bevore closing the project?"),
+         QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
+
+    switch (choice)
+    {
+        case QMessageBox::Yes: // save and close project
+            save();
+            deleteLater();  // this project object will be deleted later in the event loop
+            return true;
+
+        case QMessageBox::No: // close project without saving
+            deleteLater();  // this project object will be deleted later in the event loop
+            return true;
+
+        default: // cancel, don't close the project
+            return false;
+    }
 }
 
 /*****************************************************************************************

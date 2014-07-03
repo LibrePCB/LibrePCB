@@ -17,73 +17,50 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CONTROLPANEL_H
-#define CONTROLPANEL_H
+#ifndef PROJECT_CIRCUIT_H
+#define PROJECT_CIRCUIT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
-#include <QtCore>
-#include <QtWidgets>
+#include <QObject>
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
-class Workspace;
-
-namespace Ui {
-class ControlPanel;
+namespace project {
+class Project;
 }
 
 /*****************************************************************************************
- *  Class ControlPanel
+ *  Class SchematicEditor
  ****************************************************************************************/
 
-/**
- * @brief The ControlPanel class
- *
- * @author ubruhin
- *
- * @date 2014-06-23
- */
-class ControlPanel : public QMainWindow
+namespace project {
+
+class Circuit : public QObject
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit ControlPanel(Workspace* workspace, QAbstractItemModel* projectTreeModel);
-        ~ControlPanel();
-
-    protected:
-
-        // Inherited Methods
-        virtual void closeEvent(QCloseEvent* event);
-
-    private slots:
-
-        // Actions
-        void on_actionAbout_triggered();
-        void on_projectTreeView_clicked(const QModelIndex& index);
-        void on_projectTreeView_doubleClicked(const QModelIndex& index);
-        void on_projectTreeView_customContextMenuRequested(const QPoint& pos);
-
-        // QWebView
-        void webViewLinkClicked(const QUrl& url);
+        explicit Circuit(Project* project);
+        ~Circuit();
 
     private:
 
         // make some methods inaccessible...
-        ControlPanel();
-        ControlPanel(const ControlPanel& other);
-        ControlPanel& operator=(const ControlPanel& rhs);
+        Circuit();
+        Circuit(const Circuit& other);
+        Circuit& operator=(const Circuit& rhs);
 
-        Ui::ControlPanel* mUi;
+        Project* mProject;
 
-        Workspace* mWorkspace;
 };
 
-#endif // CONTROLPANEL_H
+} // namespace project
+
+#endif // PROJECT_CIRCUIT_H

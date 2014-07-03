@@ -35,18 +35,25 @@ int main(int argc, char* argv[])
 {
     QApplication app(argc, argv);
 
-    QTranslator qtTranslator;
-    qtTranslator.load("qt_" % QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-    app.installTranslator(&qtTranslator);
-
-    QTranslator appTranslator;
-    appTranslator.load("eda4u_" % QLocale::system().name(), ":/i18n");
-    app.installTranslator(&appTranslator);
-
     QCoreApplication::setOrganizationName("EDA4U");
     //QCoreApplication::setOrganizationDomain(""); ///< @todo
     QCoreApplication::setApplicationName("EDA4U");
     QCoreApplication::setApplicationVersion("0.0.1");
+
+    // Install Qt translations
+    QTranslator qtTranslator;
+    qtTranslator.load("qt_" % QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+    app.installTranslator(&qtTranslator);
+
+    // Install language translations (like "de" for German)
+    QTranslator appTranslator1;
+    appTranslator1.load("eda4u_" % QLocale::system().name().left(2), ":/i18n");
+    app.installTranslator(&appTranslator1);
+
+    // Install language/country translations (like "de_ch" for German/Switzerland)
+    QTranslator appTranslator2;
+    appTranslator2.load("eda4u_" % QLocale::system().name(), ":/i18n");
+    app.installTranslator(&appTranslator2);
 
     QGuiApplication::setQuitOnLastWindowClosed(false);
 
