@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Name=EDA4U
+Comment=Design Schematics and PCB's
+Comment[de]=Entwerfen eines Schaltplans oder einer Platine
+GenericName=PCB Designer
+Categories=Development;Engineering;Electronics;
+Type=Application
+Terminal=false
+Icon=eda4u
+Exec=eda4u %U
+MimeType=application/x-eda4u-project

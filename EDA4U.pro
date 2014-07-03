@@ -15,22 +15,26 @@ CONFIG += c++11
 
 win32 {
     # Windows-specific configurations
-    RC_ICONS = img/EDA4U.ico
+    RC_ICONS = packaging/windows/img/eda4u.ico
 }
 
 macx {
     # Mac-specific configurations
-    ICON = img/EDA4U.icns
+    ICON = packaging/mac/img/eda4u.icns
 }
 
 unix:!macx {
     # Linux/UNIX-specific configurations
     target.path = /usr/local/bin
     icon.path = /usr/share/pixmaps
-    icon.files = img/EDA4U.xpm
+    icon.files = packaging/unix/img/eda4u.xpm
     desktop.path = /usr/share/applications
-    desktop.files = EDA4U.desktop
-    INSTALLS += target icon desktop
+    desktop.files = packaging/unix/eda4u.desktop
+    mimexml.path = /usr/share/mime/packages
+    mimexml.files = packaging/unix/mime/eda4u.xml
+    mimedesktop.path = /usr/share/mimelnk/application
+    mimedesktop.files = packaging/unix/mime/x-eda4u-project.desktop
+    INSTALLS += target icon desktop mimexml mimedesktop
 }
 
 TRANSLATIONS = i18n/eda4u_en.ts \

@@ -78,37 +78,30 @@ void ControlPanel::on_actionAbout_triggered()
 
 void ControlPanel::on_projectTreeView_clicked(const QModelIndex& index)
 {
-    QString html;
-
     ProjectTreeItem* item = static_cast<ProjectTreeItem*>(index.internalPointer());
     if (!item)
         return;
 
-    do
-    {
-        if (!item->isProject())
-            break;
+    QString htmlFilename;
 
-        QString htmlFilename = QFileInfo(item->getProjectFilename()).absoluteDir().absoluteFilePath("description.html");
-        QFile htmlFile(htmlFilename);
-        if (!htmlFile.exists())
-            break;
-        if (!htmlFile.open(QFile::ReadOnly))
-            break;
-        html = htmlFile.readAll();
-        htmlFile.close();
-    } while (0);
+    if (item->isProject())
+        htmlFilename = item->getDir().absoluteFilePath("description" % QDir::separator() % "index.html");
 
-    mUi->webView->setHtml(html);
+    mUi->webView->setUrl(QUrl::fromLocalFile(htmlFilename));
 }
 
 void ControlPanel::on_projectTreeView_doubleClicked(const QModelIndex& index)
 {
     ProjectTreeItem* item = static_cast<ProjectTreeItem*>(index.internalPointer());
+
     if (!item)
         return;
+
     if (!item->isProject())
+    {
+        mUi->projectTreeView->setExpanded(index, !mUi->projectTreeView->isExpanded(index));
         return;
+    }
 
     mWorkspace->openProject(item->getProjectFilename());
 }
@@ -140,9 +133,22 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(const QPoint& p
                 }
                 actions.insert(3, menu.addSeparator());
             }
+            else
+            {
+                // a folder or a file is selected
+
+                actions.insert(7, menu.addAction("New Project"));
+                actions.value(7)->setIcon(QIcon(":/img/actions/new.png"));
+            }
+
+            actions.insert(8, menu.addAction("New Folder"));
+            actions.value(8)->setIcon(QIcon(":/img/actions/new_folder.png"));
+
+            actions.insert(9, menu.addSeparator());
 
             actions.insert(4, menu.addAction("Open Directory"));
             actions.value(4)->setIcon(QIcon(":/img/places/folder_open.png"));
+
             actions.insert(5, menu.addSeparator());
         }
     }

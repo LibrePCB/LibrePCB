@@ -1,9 +1,0 @@
-[Desktop Entry]
-Version=0.0.1
-Name=EDA4U
-Comment=Design Schematics and PCB's
-Type=Application
-Icon=EDA4U
-Terminal=false
-Exec=eda4u
-Categories=Development;Engineering;Electronics;

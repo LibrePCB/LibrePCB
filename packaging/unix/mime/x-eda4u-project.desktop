@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=MimeType
+MimeType=application/x-eda4u-project
+Icon=eda4u
+Patterns=*.e4u
+Comment=EDA4u Project

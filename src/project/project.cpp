@@ -22,6 +22,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <stdexcept>
 #include "project.h"
 #include "../workspace/workspace.h"
 #include "circuit/circuit.h"
@@ -34,8 +35,11 @@ namespace project {
  ****************************************************************************************/
 
 Project::Project(Workspace* workspace, const QString& filename) :
-    QObject(0), mWorkspace(workspace), mFilename(filename), mHasUnsavedChanges(false)
+    QObject(0), mWorkspace(workspace), mFileInfo(filename), mHasUnsavedChanges(false)
 {
+    if ((!mFileInfo.exists()) || (!mFileInfo.isFile()) || (mFileInfo.suffix() != "e4u"))
+        throw std::runtime_error("invalid project file!");
+
     mCircuit = new Circuit(this);
     mSchematicEditor = new SchematicEditor(this);
 }

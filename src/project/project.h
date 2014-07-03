@@ -60,8 +60,9 @@ class Project : public QObject
         ~Project();
 
         // Getters
-        const QString& getFilename() const {return mFilename;}
-        QString getUniqueFilename() const {return uniqueProjectFilename(mFilename);}
+        QString getFilename() const {return mFileInfo.filePath();}
+        QString getUniqueFilename() const {return uniqueProjectFilename(getFilename());}
+        QDir getDir() const {return mFileInfo.dir();}
 
         // General Methods
         bool windowIsAboutToClose(QMainWindow* window);
@@ -83,7 +84,7 @@ class Project : public QObject
         Project& operator=(const Project& rhs);
 
         Workspace* mWorkspace; ///< a pointer to the workspace
-        QString mFilename;
+        QFileInfo mFileInfo; ///< a QFileinfo object of the project file (*.e4u)
 
         // General
         bool mHasUnsavedChanges;
