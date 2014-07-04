@@ -37,7 +37,11 @@ int main(int argc, char* argv[])
 
     QCoreApplication::setOrganizationName("EDA4U");
     //QCoreApplication::setOrganizationDomain(""); ///< @todo
+#ifdef GIT_BRANCH
+    QCoreApplication::setApplicationName(QString("EDA4U_git-%1").arg(GIT_BRANCH));
+#else
     QCoreApplication::setApplicationName("EDA4U");
+#endif
     QCoreApplication::setApplicationVersion("0.0.1");
 
     // Install Qt translations
