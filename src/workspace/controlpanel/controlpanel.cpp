@@ -37,7 +37,9 @@ using namespace project;
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ControlPanel::ControlPanel(Workspace* workspace, QAbstractItemModel* projectTreeModel) :
+ControlPanel::ControlPanel(Workspace* workspace, QAbstractItemModel* projectTreeModel,
+                           QAbstractItemModel* recentProjectsModel,
+                           QAbstractItemModel* favoriteProjectsModel) :
     QMainWindow(0), mUi(new Ui::ControlPanel), mWorkspace(workspace)
 {
     mUi->setupUi(this);
@@ -50,6 +52,8 @@ ControlPanel::ControlPanel(Workspace* workspace, QAbstractItemModel* projectTree
     connect(mUi->actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 
     mUi->projectTreeView->setModel(projectTreeModel);
+    mUi->recentProjectsListView->setModel(recentProjectsModel);
+    mUi->favoriteProjectsListView->setModel(favoriteProjectsModel);
 
     mUi->webView->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
     connect(mUi->webView, SIGNAL(linkClicked(QUrl)), this, SLOT(webViewLinkClicked(QUrl)));
@@ -198,6 +202,16 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(const QPoint& p
 void ControlPanel::webViewLinkClicked(const QUrl& url)
 {
     QDesktopServices::openUrl(url);
+}
+
+void ControlPanel::on_recentProjectsListView_clicked(const QModelIndex &index)
+{
+    QString filename = index.data(Qt::UserRole).toString();
+
+    if (filename.isEmpty())
+        return;
+
+    mWorkspace->openProject(filename);
 }
 
 /*****************************************************************************************

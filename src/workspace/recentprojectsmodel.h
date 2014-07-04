@@ -17,15 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CONTROLPANEL_H
-#define CONTROLPANEL_H
+#ifndef RECENTPROJECTSMODEL_H
+#define RECENTPROJECTSMODEL_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -33,60 +32,40 @@
 
 class Workspace;
 
-namespace Ui {
-class ControlPanel;
-}
-
 /*****************************************************************************************
- *  Class ControlPanel
+ *  Class RecentProjectsModel
  ****************************************************************************************/
 
 /**
- * @brief The ControlPanel class
- *
- * @author ubruhin
- *
- * @date 2014-06-23
+ * @brief The RecentProjectsModel class
  */
-class ControlPanel : public QMainWindow
+class RecentProjectsModel : public QAbstractListModel
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit ControlPanel(Workspace* workspace, QAbstractItemModel* projectTreeModel,
-                              QAbstractItemModel* recentProjectsModel,
-                              QAbstractItemModel* favoriteProjectsModel);
-        ~ControlPanel();
+        explicit RecentProjectsModel(Workspace* workspace);
+        ~RecentProjectsModel();
 
-    protected:
-
-        // Inherited Methods
-        virtual void closeEvent(QCloseEvent* event);
-
-    private slots:
-
-        // Actions
-        void on_actionAbout_triggered();
-        void on_projectTreeView_clicked(const QModelIndex& index);
-        void on_projectTreeView_doubleClicked(const QModelIndex& index);
-        void on_projectTreeView_customContextMenuRequested(const QPoint& pos);
-        void on_recentProjectsListView_clicked(const QModelIndex &index);
-
-        // QWebView
-        void webViewLinkClicked(const QUrl& url);
+        // General Methods
+        void setLastRecentProject(const QString& filename);
 
     private:
 
         // make some methods inaccessible...
-        ControlPanel();
-        ControlPanel(const ControlPanel& other);
-        ControlPanel& operator=(const ControlPanel& rhs);
+        RecentProjectsModel();
+        RecentProjectsModel(const RecentProjectsModel& other);
+        RecentProjectsModel& operator=(const RecentProjectsModel& rhs);
 
-        Ui::ControlPanel* mUi;
+        // Inherited Methods
+        int rowCount(const QModelIndex& parent = QModelIndex()) const;
+        QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 
-        Workspace* mWorkspace;
+        Workspace* mWorkspace; ///< a pointer to the Workspace object
+        QList<QFileInfo> mRecentProjects;
+
 };
 
-#endif // CONTROLPANEL_H
+#endif // RECENTPROJECTSMODEL_H

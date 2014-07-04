@@ -30,6 +30,7 @@
 #include "../library_editor/libraryeditor.h"
 #include "../project/project.h"
 #include "projecttreemodel.h"
+#include "recentprojectsmodel.h"
 #include "controlpanel/controlpanel.h"
 
 using namespace library;
@@ -43,7 +44,7 @@ Workspace::Workspace(const QDir& workspaceDir) :
     QObject(0), mWorkspaceDir(workspaceDir),
     mMetadataDir(workspaceDir.absoluteFilePath(".metadata" % QDir::separator())),
     mWorkspaceSettings(0), mControlPanel(0), mLibrary(0), mLibraryEditor(0),
-    mProjectTreeModel(0)
+    mProjectTreeModel(0), mRecentProjectsModel(0), mFavoriteProjectsModel(0)
 {
     mWorkspaceDir.makeAbsolute();
     mMetadataDir.makeAbsolute();
@@ -58,9 +59,12 @@ Workspace::Workspace(const QDir& workspaceDir) :
 
     // all OK, let's load the workspace stuff!
 
+    mRecentProjectsModel = new RecentProjectsModel(this);
+    mFavoriteProjectsModel = new QStringListModel();
     mProjectTreeModel = new ProjectTreeModel(this);
     mLibrary = new Library(this);
-    mControlPanel = new ControlPanel(this, mProjectTreeModel);
+    mControlPanel = new ControlPanel(this, mProjectTreeModel, mRecentProjectsModel,
+                                     mFavoriteProjectsModel);
 }
 
 Workspace::~Workspace()
@@ -71,6 +75,8 @@ Workspace::~Workspace()
     delete mLibraryEditor;          mLibraryEditor = 0;
     delete mLibrary;                mLibrary = 0;
     delete mProjectTreeModel;       mProjectTreeModel = 0;
+    delete mFavoriteProjectsModel;  mFavoriteProjectsModel = 0;
+    delete mRecentProjectsModel;    mRecentProjectsModel = 0;
 
     delete mWorkspaceSettings;      mWorkspaceSettings = 0;
 }
@@ -87,6 +93,7 @@ Project* Workspace::openProject(const QString& filename)
     {
         openProject = new Project(this, filename);
         mOpenProjects.insert(Project::uniqueProjectFilename(filename), openProject);
+        mRecentProjectsModel->setLastRecentProject(filename);
         openProject->showSchematicEditor();
     }
 

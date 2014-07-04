@@ -133,6 +133,9 @@ QVariant ProjectTreeItem::data(const QModelIndex& index, int role) const
             break;
         }
 
+        case Qt::StatusTipRole:
+            return mFileInfo.absoluteFilePath();
+
         default:
             return QVariant();
     }

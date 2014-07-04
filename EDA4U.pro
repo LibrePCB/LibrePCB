@@ -72,7 +72,8 @@ SOURCES += \
     src/library/packagecategory.cpp \
     src/common/layer.cpp \
     src/project/schematics/schematiceditor.cpp \
-    src/project/circuit/circuit.cpp
+    src/project/circuit/circuit.cpp \
+    src/workspace/recentprojectsmodel.cpp
 
 HEADERS += \
     src/common/units.h \
@@ -98,7 +99,8 @@ HEADERS += \
     src/library/packagecategory.h \
     src/common/layer.h \
     src/project/schematics/schematiceditor.h \
-    src/project/circuit/circuit.h
+    src/project/circuit/circuit.h \
+    src/workspace/recentprojectsmodel.h
 
 FORMS += \
     src/workspace/controlpanel/controlpanel.ui \

@@ -32,6 +32,7 @@
 
 class ControlPanel;
 class ProjectTreeModel;
+class RecentProjectsModel;
 
 namespace library{
 class Library;
@@ -70,7 +71,7 @@ class Workspace : public QObject
         const QDir& getWorkspaceDir() const {return mWorkspaceDir;}
         QString getUniquePath() const {return uniqueWorkspacePath(mWorkspaceDir.absolutePath());}
         const QDir& getMetadataDir() const {return mMetadataDir;}
-        const QSettings& getWorkspaceSettings() const {return *mWorkspaceSettings;}
+        QString getWorkspaceSettingsIniFilename() const {return mWorkspaceSettings->fileName();}
         library::Library* getLibrary() const {return mLibrary;}
 
         // Project Management
@@ -112,7 +113,8 @@ class Workspace : public QObject
         library_editor::LibraryEditor* mLibraryEditor;
         ProjectTreeModel* mProjectTreeModel;
         QHash<QString, project::Project*> mOpenProjects;
-
+        RecentProjectsModel* mRecentProjectsModel;
+        QStringListModel* mFavoriteProjectsModel;
 };
 
 #endif // WORKSPACE_H

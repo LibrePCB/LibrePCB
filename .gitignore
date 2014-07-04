@@ -22,3 +22,6 @@ Thumbs.db
 # Directories
 dev/doxygen/output/
 build/
+
+# Workspace
+dev/workspace/.metadata/settings.ini
