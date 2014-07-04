@@ -84,8 +84,8 @@ void ControlPanel::on_projectTreeView_clicked(const QModelIndex& index)
 
     QString htmlFilename;
 
-    if (item->isProject())
-        htmlFilename = item->getDir().absoluteFilePath("description" % QDir::separator() % "index.html");
+    if ((item->getType() == ProjectTreeItem::ProjectFolder) || (item->getType() == ProjectTreeItem::ProjectFile))
+        htmlFilename = item->getFileInfo().dir().absoluteFilePath("description" % QDir::separator() % "index.html");
 
     mUi->webView->setUrl(QUrl::fromLocalFile(htmlFilename));
 }
@@ -97,13 +97,24 @@ void ControlPanel::on_projectTreeView_doubleClicked(const QModelIndex& index)
     if (!item)
         return;
 
-    if (!item->isProject())
+    switch (item->getType())
     {
-        mUi->projectTreeView->setExpanded(index, !mUi->projectTreeView->isExpanded(index));
-        return;
-    }
+        case ProjectTreeItem::File:
+            QDesktopServices::openUrl(QUrl::fromLocalFile(item->getFileInfo().absoluteFilePath()));
+            break;
 
-    mWorkspace->openProject(item->getProjectFilename());
+        case ProjectTreeItem::Folder:
+        case ProjectTreeItem::ProjectFolder:
+            mUi->projectTreeView->setExpanded(index, !mUi->projectTreeView->isExpanded(index));
+            break;
+
+        case ProjectTreeItem::ProjectFile:
+            mWorkspace->openProject(item->getFileInfo().filePath());
+            break;
+
+        default:
+            break;
+    }
 }
 
 void ControlPanel::on_projectTreeView_customContextMenuRequested(const QPoint& pos)
@@ -119,9 +130,9 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(const QPoint& p
         item = static_cast<ProjectTreeItem*>(index.internalPointer());
         if (item)
         {
-            if (item->isProject())
+            if (item->getType() == ProjectTreeItem::ProjectFile)
             {
-                if (!mWorkspace->getOpenProject(item->getProjectFilename()))
+                if (!mWorkspace->getOpenProject(item->getFileInfo().absoluteFilePath()))
                 {
                     actions.insert(1, menu.addAction("Open Project"));
                     actions.value(1)->setIcon(QIcon(":/img/actions/open.png"));
@@ -161,15 +172,15 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(const QPoint& p
     switch (actions.key(menu.exec(QCursor::pos()), 0))
     {
         case 1: // open project
-            mWorkspace->openProject(item->getProjectFilename());
+            mWorkspace->openProject(item->getFileInfo().absoluteFilePath());
             break;
 
         case 2: // close project
-            mWorkspace->closeProject(item->getProjectFilename(), true);
+            mWorkspace->closeProject(item->getFileInfo().absoluteFilePath(), true);
             break;
 
         case 4: // open project directory
-            QDesktopServices::openUrl(QUrl("file:///" % item->getDir().absolutePath(), QUrl::TolerantMode));
+            QDesktopServices::openUrl(QUrl::fromLocalFile(item->getFileInfo().absoluteFilePath()));
             break;
 
         case 6: // show files (checkable)

@@ -68,5 +68,7 @@
         <file>actions/close.png</file>
         <file>actions/new_file.png</file>
         <file>actions/new_folder.png</file>
+        <file>places/file.png</file>
+        <file>empty.png</file>
     </qresource>
 </RCC>

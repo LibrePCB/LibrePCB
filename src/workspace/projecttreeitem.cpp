@@ -23,29 +23,57 @@
 
 #include <QtCore>
 #include <QtWidgets>
+#include <stdexcept>
 #include "projecttreeitem.h"
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ProjectTreeItem::ProjectTreeItem(ProjectTreeItem* parent, const QDir& dir) :
-    mDir(dir), mParent(parent), mDepth(parent ? parent->getDepth() + 1 : 0)
+ProjectTreeItem::ProjectTreeItem(ProjectTreeItem* parent, const QString& filename) :
+    mFileInfo(filename), mParent(parent), mDepth(parent ? parent->getDepth() + 1 : 0)
 {
-    QStringList projectFiles = dir.entryList(QStringList("*.e4u"), QDir::Files);
-    if (projectFiles.count() == 1)
+    if (!mFileInfo.exists())
+        throw std::runtime_error("file or folder does not exist!");
+
+    QMimeDatabase db;
+    mMimeType = db.mimeTypeForFile(mFileInfo);
+
+    if (mFileInfo.isDir())
     {
-        // there is exactly one project file in this directory, so it's a project directory
-        mProjectFilename = mDir.absoluteFilePath(projectFiles[0]);
+        // it's a directory
+        QDir dir(mFileInfo.filePath());
+
+        QStringList projectFiles = dir.entryList(QStringList("*.e4u"), QDir::Files);
+        if (projectFiles.count() == 1)
+        {
+            // it's a project folder
+            mType = ProjectFolder;
+        }
+        else
+        {
+            // it's a normal folder
+            mType = Folder;
+        }
+
+        // scan folder and add child items
+        if (mDepth < 15) // limit the maximum depth in the project directory to avoid endless recursion
+        {
+            QFileInfoList items = dir.entryInfoList(QDir::Files | QDir::Dirs |
+                                                    QDir::NoDotAndDotDot,
+                                                    QDir::DirsFirst | QDir::Name);
+            foreach (QFileInfo item, items)
+                mChilds.append(new ProjectTreeItem(this, item.absoluteFilePath()));
+        }
     }
-    /*else*/ if (mDepth < 12) // limit the maximum depth in the project directory to avoid endless recursion
+    else if (mFileInfo.isFile())
     {
-        // this is NOT a project directory, so we will load all subdirectories as childs
-        QStringList files = mDir.entryList(/*QDir::Files |*/ QDir::Dirs | QDir::NoDotAndDotDot,
-                                           QDir::DirsFirst | QDir::Name);
-        foreach (QString subDirName, files)
-            mChilds.append(new ProjectTreeItem(this, QDir(mDir.absoluteFilePath(subDirName))));
-    }
+        // it's a file
+        if (mFileInfo.suffix() == "e4u")
+            mType = ProjectFile;
+        else
+            mType = File;
+    }    
 }
 
 ProjectTreeItem::~ProjectTreeItem()
@@ -65,9 +93,50 @@ int ProjectTreeItem::getChildNumber() const
         return 0;
 }
 
-QString ProjectTreeItem::getName()
+QVariant ProjectTreeItem::data(const QModelIndex& index, int role) const
 {
-    return mDir.dirName();
+    if (!index.isValid())
+        return QVariant();
+
+    switch (role)
+    {
+        case Qt::DisplayRole:
+            return mFileInfo.fileName();
+
+        case Qt::DecorationRole:
+        {
+            switch (mType)
+            {
+                case File:
+                    return QIcon::fromTheme(mMimeType.iconName(), QIcon(":/img/places/file.png"));
+
+                case Folder:
+                case ProjectFolder:
+                    return QIcon::fromTheme(mMimeType.iconName(), QIcon(":/img/places/folder.png"));
+
+                case ProjectFile:
+                    return QIcon::fromTheme(mMimeType.iconName(), QIcon(":/img/app.png"));
+            }
+        }
+
+        case Qt::FontRole:
+        {
+            if (mType == ProjectFile)
+            {
+                /*if (mWorkspace->getOpenProject(item->getProjectFilename()))
+                {
+                    QFont font;
+                    font.setBold(true);
+                    return font;
+                }*/
+            }
+            break;
+        }
+
+        default:
+            return QVariant();
+    }
+    return QVariant();
 }
 
 /*****************************************************************************************

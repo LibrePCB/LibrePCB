@@ -35,7 +35,7 @@ ProjectTreeModel::ProjectTreeModel(Workspace* workspace) :
     QAbstractItemModel(0), mWorkspace(workspace)
 {
     QDir projectsDir(mWorkspace->getWorkspaceDir().absoluteFilePath("projects"));
-    mRootProjectDirectory = new ProjectTreeItem(0, projectsDir);
+    mRootProjectDirectory = new ProjectTreeItem(0, projectsDir.absolutePath());
 }
 
 ProjectTreeModel::~ProjectTreeModel()
@@ -102,45 +102,8 @@ QVariant ProjectTreeModel::headerData(int section, Qt::Orientation orientation, 
 
 QVariant ProjectTreeModel::data(const QModelIndex& index, int role) const
 {
-    if (!index.isValid())
-        return QVariant();
-
     ProjectTreeItem* item = getItem(index);
-
-    switch (role)
-    {
-        case Qt::DisplayRole:
-            return item->getName();
-
-        case Qt::DecorationRole:
-        {
-            if (item->isProject())
-            {
-                if (mWorkspace->getOpenProject(item->getProjectFilename()))
-                    return QIcon(":img/places/folder_open_green.png");
-                else
-                    return QIcon(":img/places/folder.png");
-            }
-            else
-                return QIcon(":img/places/folder_gray.png");
-        }
-
-        //case Qt::ToolTipRole:
-        //    return item->getDir().absolutePath();
-
-        case Qt::FontRole:
-        {
-            QFont font;
-            if (!item->isProject())
-                return font;
-            if (mWorkspace->getOpenProject(item->getProjectFilename()))
-                font.setBold(true);
-            return font;
-        }
-
-        default:
-            return QVariant();
-    }
+    return item->data(index, role);
 }
 
 /*****************************************************************************************

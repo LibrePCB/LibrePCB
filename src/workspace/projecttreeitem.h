@@ -47,21 +47,28 @@ class ProjectTreeItem
 {
     public:
 
+        // Types
+        enum ItemType_t {
+            File,
+            Folder,
+            ProjectFile,
+            ProjectFolder,
+        };
+
         // Constructors / Destructor
-        ProjectTreeItem(ProjectTreeItem* parent, const QDir& dir);
+        ProjectTreeItem(ProjectTreeItem* parent, const QString& filename);
         ~ProjectTreeItem();
 
         // Getters
-        const QDir& getDir()                    const {return mDir;}
+        ItemType_t getType()                    const {return mType;}
+        const QFileInfo& getFileInfo()          const {return mFileInfo;}
         unsigned int getDepth()                 const {return mDepth;}
         int getColumnCount()                    const {return 1;}
         ProjectTreeItem* getParent()            const {return mParent;}
         ProjectTreeItem* getChild(int index)    const {return mChilds.value(index);}
         int getChildCount()                     const {return mChilds.count();}
         int getChildNumber()                    const;
-        QString getName();
-        bool isProject()                        const {return !mProjectFilename.isEmpty();}
-        const QString& getProjectFilename()     const {return mProjectFilename;}
+        QVariant data(const QModelIndex& index, int role) const;
 
     private:
 
@@ -70,11 +77,12 @@ class ProjectTreeItem
         ProjectTreeItem(const ProjectTreeItem& other);
         ProjectTreeItem& operator=(const ProjectTreeItem& rhs);
 
-        QDir mDir;
+        QFileInfo mFileInfo;
         ProjectTreeItem* mParent;
+        ItemType_t mType;
+        QMimeType mMimeType;
         unsigned int mDepth; ///< this is to avoid endless recursion in the parent-child relationship
         QList<ProjectTreeItem*> mChilds;
-        QString mProjectFilename;
 };
 
 #endif // PROJECTTREEITEM_H
