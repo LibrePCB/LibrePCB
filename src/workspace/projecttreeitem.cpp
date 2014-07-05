@@ -23,8 +23,8 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include <stdexcept>
 #include "projecttreeitem.h"
+#include "../common/exceptions.h"
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -34,7 +34,8 @@ ProjectTreeItem::ProjectTreeItem(ProjectTreeItem* parent, const QString& filenam
     mFileInfo(filename), mParent(parent), mDepth(parent ? parent->getDepth() + 1 : 0)
 {
     if (!mFileInfo.exists())
-        throw std::runtime_error("file or folder does not exist!");
+        throw RuntimeError(QString("file or folder does not exist: \"%1\"").arg(filename),
+                           __FILE__, __LINE__);
 
     QMimeDatabase db;
     mMimeType = db.mimeTypeForFile(mFileInfo);

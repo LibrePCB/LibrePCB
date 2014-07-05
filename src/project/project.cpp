@@ -22,8 +22,8 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <stdexcept>
 #include "project.h"
+#include "../common/exceptions.h"
 #include "../workspace/workspace.h"
 #include "circuit/circuit.h"
 #include "schematics/schematiceditor.h"
@@ -38,7 +38,7 @@ Project::Project(Workspace* workspace, const QString& filename) :
     QObject(0), mWorkspace(workspace), mFileInfo(filename), mHasUnsavedChanges(false)
 {
     if ((!mFileInfo.exists()) || (!mFileInfo.isFile()) || (mFileInfo.suffix() != "e4u"))
-        throw std::runtime_error("invalid project file!");
+        throw RuntimeError(QString("Invalid project file: \"%1\"").arg(filename), __FILE__, __LINE__);
 
     mCircuit = new Circuit(this);
     mSchematicEditor = new SchematicEditor(this);
@@ -135,7 +135,7 @@ QString Project::uniqueProjectFilename(const QString& filename)
     QFileInfo fileInfo(filename);
     QString uniqueFilename = QDir::toNativeSeparators(fileInfo.canonicalFilePath());
     if (uniqueFilename.isEmpty())
-        throw std::runtime_error("Invalid filename!");
+        throw RuntimeError(QString("Invalid filename: \"%1\"").arg(filename), __FILE__, __LINE__);
     return uniqueFilename;
 }
 

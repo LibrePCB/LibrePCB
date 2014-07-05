@@ -609,6 +609,23 @@ QDebug& operator<<(QDebug& stream, const Angle& angle);
  * A Point object consists always of two Length objects. Basically, this is the only goal
  * of this class, but it will provide also some useful addidional methods.
  *
+ * @note Please note that the origin (0px;0px) of the QGraphics* objects is always at the
+ * @b top left corner, whereas the origin (0mm;0mm) of most CAD programs is at the
+ * @b bottom left corner. As we want to have the origin at the @b bottom left corner,
+ * like every good CAD program, we need to invert the Y-coordinate on every conversion
+ * between nanometers/millimeters and pixels (for QGraphics* objects), in both directions.
+ * This means, every time you need to convert a position from a QGraphics* object to
+ * millimeters (or another unit), you have to create a Point object and set the coordinate
+ * with Point::setPointPx() or Point::fromPx(). These methods will invert the
+ * Y-coordinate and you will have the right coordinate in the object. On the other hand,
+ * if you have to convert a coordinate from millimeters (or another unit) to pixels for
+ * a QGraphics* object, you have to use the method Point::toPxQPointF(), which will
+ * also invert the Y-coordinate. You should never convert an X and/or Y coordinate with
+ * seperate Length objects - which would be possible, but then the sign of the Y-coordinate
+ * is wrong! It is also not allowed to get the Y-coordinate in pixels with calling
+ * Point.getY().toPx(), this way the sign of the value in pixels is also wrong! You should
+ * use Point.toPxQPointF().y() instead for this purpose.
+ *
  * @see class Length
  *
  * @author ubruhin
@@ -658,6 +675,33 @@ class Point
          * @param y     The new Y coordinate as a Length object
          */
         void setY(const Length& y) {mY = y;}
+
+        /// @see Length::setLengthNm()
+        /// @warning Be careful with this method! Maybe you should call mapToGrid() afterwards!
+        void setPointNm(LengthBase_t nmX, LengthBase_t nmY) {mX.setLengthNm(nmX);
+                                                             mY.setLengthNm(nmY);}
+
+        /// @see Length::setLengthMm()
+        /// @warning Be careful with this method! Maybe you should call mapToGrid() afterwards!
+        void setPointMm(const QPointF& millimeters) {mX.setLengthMm(millimeters.x());
+                                                     mY.setLengthMm(millimeters.y());}
+
+        /// @see Length::setLengthInch()
+        /// @warning Be careful with this method! Maybe you should call mapToGrid() afterwards!
+        void setPointInch(const QPointF& inches) {mX.setLengthInch(inches.x());
+                                                  mY.setLengthInch(inches.y());}
+
+        /// @see Length::setLengthMil()
+        /// @warning Be careful with this method! Maybe you should call mapToGrid() afterwards!
+        void setPointMil(const QPointF& mils) {mX.setLengthMil(mils.x());
+                                               mX.setLengthMil(mils.y());}
+
+        /// @see Length::setLengthPx()
+        /// @warning Be careful with this method! Maybe you should call mapToGrid() afterwards!
+        /// @note This method is useful to read the position of a QGraphics* object.
+        ///       For this purpose, this method will invert the Y-coordinate.
+        void setPointPx(const QPointF& pixels) {mX.setLengthPx(pixels.x());
+                                                mY.setLengthPx(-pixels.y());} // invert Y!
 
 
         // Getters
@@ -726,12 +770,13 @@ class Point
          * @return The point in pixels
          *
          * @note This method is useful to set the position of a QGraphics* object.
+         *       For this purpose, this method will invert the Y-coordinate.
          *
          * @warning Be careful with this method, as it can decrease the precision!
          *
          * @see Length::toPx()
          */
-        QPointF toPxQPointF() const {return QPointF(mX.toPx(), mY.toPx());}
+        QPointF toPxQPointF() const {return QPointF(mX.toPx(), -mY.toPx());} // invert Y!
 
 
         // General
@@ -774,6 +819,8 @@ class Point
         static Point fromMil(const QPointF& mils,                   const Length& gridInterval = Length(0));
 
         /// @see Length::fromPx()
+        /// @note These methods are useful to read the position of a QGraphics* object.
+        ///       For this purpose, these methods will invert the Y-coordinate.
         static Point fromPx(qreal pixelsX, qreal pixelsY,           const Length& gridInterval = Length(0));
         static Point fromPx(const QPointF& pixels,                  const Length& gridInterval = Length(0));
 

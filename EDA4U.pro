@@ -100,7 +100,8 @@ HEADERS += \
     src/common/layer.h \
     src/project/schematics/schematiceditor.h \
     src/project/circuit/circuit.h \
-    src/workspace/recentprojectsmodel.h
+    src/workspace/recentprojectsmodel.h \
+    src/common/exceptions.h
 
 FORMS += \
     src/workspace/controlpanel/controlpanel.ui \

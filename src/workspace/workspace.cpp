@@ -23,9 +23,8 @@
 
 #include <QtCore>
 #include <QFileDialog>
-#include <stdexcept>
 #include "workspace.h"
-
+#include "../common/exceptions.h"
 #include "../library/library.h"
 #include "../library_editor/libraryeditor.h"
 #include "../project/project.h"
@@ -50,12 +49,14 @@ Workspace::Workspace(const QDir& workspaceDir) :
     mMetadataDir.makeAbsolute();
 
     if ((!mWorkspaceDir.exists()) || (!mMetadataDir.exists()))
-        throw std::runtime_error("Invalid workspace path!");
+        throw RuntimeError(QString("Invalid workspace path: \"%1\"")
+                           .arg(mWorkspaceDir.absolutePath()), __FILE__, __LINE__);
 
     mWorkspaceSettings = new QSettings(mMetadataDir.absoluteFilePath("settings.ini"), QSettings::IniFormat);
 
     if ((!mWorkspaceSettings->isWritable()) || (mWorkspaceSettings->status() != QSettings::NoError))
-        throw std::runtime_error("Error with the workspace settings! Check file permissions!");
+        throw RuntimeError("Error with the workspace settings! Check file permissions!",
+                           __FILE__, __LINE__);
 
     // all OK, let's load the workspace stuff!
 
@@ -182,13 +183,16 @@ bool Workspace::isValidWorkspaceDir(const QDir& dir)
 void Workspace::createNewWorkspace(const QDir& dir)
 {
     if (isValidWorkspaceDir(dir))
-        throw std::runtime_error("There is already a workspace in the selected directory!");
+        throw RuntimeError("There is already a workspace in the selected directory!",
+                           __FILE__, __LINE__);
 
     if (!dir.exists())
-        throw std::runtime_error("The selected directory does not exist!");
+        throw RuntimeError("The selected directory does not exist!",
+                           __FILE__, __LINE__);
 
     if (!dir.mkdir(".metadata"))
-        throw std::runtime_error("The .metadata directory could not be created!");
+        throw RuntimeError("The .metadata directory could not be created!",
+                           __FILE__, __LINE__);
 }
 
 QString Workspace::getMostRecentlyUsedWorkspacePath()
@@ -235,7 +239,7 @@ QString Workspace::uniqueWorkspacePath(const QString& path)
     QDir dir(path);
     QString uniquePath = QDir::toNativeSeparators(dir.canonicalPath());
     if (uniquePath.isEmpty())
-        throw std::runtime_error("Invalid path!");
+        throw RuntimeError(QString("Invalid path: \"%1\"").arg(path), __FILE__, __LINE__);
     return uniquePath;
 }
 

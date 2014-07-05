@@ -24,6 +24,7 @@
 #include <QtCore>
 #include <QApplication>
 #include <QTranslator>
+#include "common/exceptions.h"
 #include "workspace/workspace.h"
 #include "workspace/workspacechooserdialog.h"
 
@@ -79,5 +80,27 @@ int main(int argc, char* argv[])
     Workspace ws(workspaceDir);
     ws.showControlPanel();
 
-    return app.exec();
+    // please note that we shouldn't show a dialog or message box in the catch() blocks!
+    // from http://qt-project.org/doc/qt-5/exceptionsafety.html:
+    //      "After an exception is thrown, the connection to the windowing server might
+    //      already be closed. It is not safe to call a GUI related function after
+    //      catching an exception."
+    try
+    {
+        return app.exec();
+    }
+    catch (Exception& e)
+    {
+        qFatal("UNCAUGHT EXCEPTION: %s --- PROGRAM EXITED", e.getDebugString().toUtf8().constData());
+    }
+    catch (std::exception& e)
+    {
+        qFatal("UNCAUGHT EXCEPTION: %s --- PROGRAM EXITED", e.what());
+    }
+    catch (...)
+    {
+        qFatal("UNCAUGHT EXCEPTION --- PROGRAM EXITED");
+    }
+
+    return -1;
 }

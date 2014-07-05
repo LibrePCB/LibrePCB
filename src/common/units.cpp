@@ -23,8 +23,8 @@
 
 #include <QtCore>
 #include <limits>
-#include <stdexcept>
 #include "units.h"
+#include "exceptions.h"
 
 /*****************************************************************************************
  *  Class Length
@@ -100,7 +100,7 @@ void Length::setLengthFromFloat(qreal nanometers)
 {
     if ((nanometers > std::numeric_limits<LengthBase_t>::max())
             || (nanometers < std::numeric_limits<LengthBase_t>::min()))
-        throw std::range_error("Range error in the Length class!");
+        throw RangeError("Range error in the Length class!", __FILE__, __LINE__);
 
     mNanometers = qRound(nanometers);
 }
@@ -289,7 +289,7 @@ Point Point::fromPx(qreal pixelsX, qreal pixelsY, const Length& gridInterval)
 {
     Point p;
     p.mX.setLengthPx(pixelsX);
-    p.mY.setLengthPx(pixelsY);
+    p.mY.setLengthPx(-pixelsY); // invert Y!
     return p.mapToGrid(gridInterval);
 }
 
