@@ -11,7 +11,7 @@ TEMPLATE = app
 
 CONFIG += c++11
 
-exists(.git):DEFINES += GIT_BRANCH=\\\"$$system(git rev-parse --abbrev-ref HEAD)\\\"
+exists(.git):DEFINES += GIT_BRANCH=\\\"master\\\"
 #DEFINES += USE_32BIT_LENGTH_UNITS          # see units.h
 
 win32 {
