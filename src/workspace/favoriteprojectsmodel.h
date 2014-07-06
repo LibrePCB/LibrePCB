@@ -17,15 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CONTROLPANEL_H
-#define CONTROLPANEL_H
+#ifndef FAVORITEPROJECTSMODEL_H
+#define FAVORITEPROJECTSMODEL_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -33,61 +32,41 @@
 
 class Workspace;
 
-namespace Ui {
-class ControlPanel;
-}
-
 /*****************************************************************************************
- *  Class ControlPanel
+ *  Class FavoriteProjectsModel
  ****************************************************************************************/
 
 /**
- * @brief The ControlPanel class
- *
- * @author ubruhin
- *
- * @date 2014-06-23
+ * @brief The FavoriteProjectsModel class
  */
-class ControlPanel : public QMainWindow
+class FavoriteProjectsModel : public QAbstractListModel
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit ControlPanel(Workspace* workspace, QAbstractItemModel* projectTreeModel,
-                              QAbstractItemModel* recentProjectsModel,
-                              QAbstractItemModel* favoriteProjectsModel);
-        ~ControlPanel();
+        explicit FavoriteProjectsModel(Workspace* workspace);
+        ~FavoriteProjectsModel();
 
-    protected:
-
-        // Inherited Methods
-        virtual void closeEvent(QCloseEvent* event);
-
-    private slots:
-
-        // Actions
-        void on_actionAbout_triggered();
-        void on_projectTreeView_clicked(const QModelIndex& index);
-        void on_projectTreeView_doubleClicked(const QModelIndex& index);
-        void on_projectTreeView_customContextMenuRequested(const QPoint& pos);
-        void on_recentProjectsListView_clicked(const QModelIndex &index);
-        void on_favoriteProjectsListView_clicked(const QModelIndex &index);
-
-        // QWebView
-        void webViewLinkClicked(const QUrl& url);
+        // General Methods
+        void addFavoriteProject(const QString& filename);
+        void removeFavoriteProject(const QString& filename);
 
     private:
 
         // make some methods inaccessible...
-        ControlPanel();
-        ControlPanel(const ControlPanel& other);
-        ControlPanel& operator=(const ControlPanel& rhs);
+        FavoriteProjectsModel();
+        FavoriteProjectsModel(const FavoriteProjectsModel& other);
+        FavoriteProjectsModel& operator=(const FavoriteProjectsModel& rhs);
 
-        Ui::ControlPanel* mUi;
+        // Inherited Methods
+        int rowCount(const QModelIndex& parent = QModelIndex()) const;
+        QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 
-        Workspace* mWorkspace;
+        Workspace* mWorkspace; ///< a pointer to the Workspace object
+        QList<QFileInfo> mFavoriteProjects;
+
 };
 
-#endif // CONTROLPANEL_H
+#endif // FAVORITEPROJECTSMODEL_H

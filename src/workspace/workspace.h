@@ -33,6 +33,7 @@
 class ControlPanel;
 class ProjectTreeModel;
 class RecentProjectsModel;
+class FavoriteProjectsModel;
 
 namespace library{
 class Library;
@@ -114,7 +115,7 @@ class Workspace : public QObject
         ProjectTreeModel* mProjectTreeModel;
         QHash<QString, project::Project*> mOpenProjects;
         RecentProjectsModel* mRecentProjectsModel;
-        QStringListModel* mFavoriteProjectsModel;
+        FavoriteProjectsModel* mFavoriteProjectsModel;
 };
 
 #endif // WORKSPACE_H

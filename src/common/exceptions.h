@@ -1,6 +1,3 @@
-#ifndef EXCEPTIONS_H
-#define EXCEPTIONS_H
-
 /*
  * EDA4U - Professional EDA for everyone!
  * Copyright (C) 2013 Urban Bruhin
@@ -19,6 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#ifndef EXCEPTIONS_H
+#define EXCEPTIONS_H
 
 /*****************************************************************************************
  *  Includes
@@ -77,7 +77,7 @@ class Exception : public QException
 {
     public:
 
-        Exception(const QString& msg, const char* file = 0, int line = 0) :
+        Exception(const QString& msg, const char* file = "", int line = 0) :
             mMsg(msg), mFile(file), mLine(line) {}
 
         // Getters
@@ -141,7 +141,7 @@ class LogicError : public Exception
 {
     public:
 
-        LogicError(const QString& msg, const char* file = 0, int line = 0) :
+        LogicError(const QString& msg, const char* file = "", int line = 0) :
             Exception(msg, file, line) {}
 
         // Getters
@@ -172,7 +172,7 @@ class RuntimeError : public Exception
 {
     public:
 
-        RuntimeError(const QString& msg, const char* file = 0, int line = 0) :
+        RuntimeError(const QString& msg, const char* file = "", int line = 0) :
             Exception(msg, file, line) {}
 
         // Getters
@@ -203,7 +203,7 @@ class RangeError : public Exception
 {
     public:
 
-        RangeError(const QString& msg, const char* file = 0, int line = 0) :
+        RangeError(const QString& msg, const char* file = "", int line = 0) :
             Exception(msg, file, line) {}
 
         // Getters

@@ -23,31 +23,31 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include "recentprojectsmodel.h"
+#include "favoriteprojectsmodel.h"
 #include "workspace.h"
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-RecentProjectsModel::RecentProjectsModel(Workspace* workspace) :
+FavoriteProjectsModel::FavoriteProjectsModel(Workspace* workspace) :
     QAbstractListModel(0), mWorkspace(workspace)
 {
     QSettings settings(mWorkspace->getWorkspaceSettingsIniFilename(), QSettings::IniFormat);
-    int count = settings.beginReadArray("recent_projects");
+    int count = settings.beginReadArray("favorite_projects");
     for (int i = 0; i < count; i++)
     {
          settings.setArrayIndex(i);
          QFileInfo fileInfo(settings.value("filepath").toString());
 
-         beginInsertRows(QModelIndex(), mRecentProjects.count(), mRecentProjects.count());
-         mRecentProjects.append(fileInfo);
+         beginInsertRows(QModelIndex(), mFavoriteProjects.count(), mFavoriteProjects.count());
+         mFavoriteProjects.append(fileInfo);
          endInsertRows();
     }
     settings.endArray();
 }
 
-RecentProjectsModel::~RecentProjectsModel()
+FavoriteProjectsModel::~FavoriteProjectsModel()
 {
 }
 
@@ -55,62 +55,57 @@ RecentProjectsModel::~RecentProjectsModel()
  *  General Methods
  ****************************************************************************************/
 
-void RecentProjectsModel::setLastRecentProject(const QString& filename)
+void FavoriteProjectsModel::addFavoriteProject(const QString& filename)
 {
     QFileInfo fileInfo(filename);
 
-    // if the filename is already in the list, we just have to move it to the top of the list
-    for (int i = 0; i < mRecentProjects.count(); i++)
-    {
-        if (mRecentProjects.at(i) == fileInfo)
-        {
-            if (i == 0)
-                return; // the filename is already on top of the list, so nothing to do here...
-
-            beginMoveRows(QModelIndex(), i, i, QModelIndex(), 0);
-            mRecentProjects.move(i, 0);
-            endMoveRows();
-            return;
-        }
-    }
-
-    // limit the maximum count of entries in the list
-    while (mRecentProjects.count() >= 5)
-    {
-        beginRemoveRows(QModelIndex(), mRecentProjects.count()-1, mRecentProjects.count()-1);
-        mRecentProjects.takeLast();
-        endRemoveRows();
-    }
+    // if the filename is already in the list, we have nothing to do
+    if (mFavoriteProjects.contains(fileInfo))
+        return;
 
     // add the new filename to the list
-    beginInsertRows(QModelIndex(), 0, 0);
-    mRecentProjects.prepend(fileInfo);
+    beginInsertRows(QModelIndex(), mFavoriteProjects.count(), mFavoriteProjects.count());
+    mFavoriteProjects.append(fileInfo);
     endInsertRows();
 
     // save the new list in the workspace
     QSettings settings(mWorkspace->getWorkspaceSettingsIniFilename(), QSettings::IniFormat);
-    settings.beginWriteArray("recent_projects");
-    for (int i = 0; i < mRecentProjects.count(); i++)
+    settings.beginWriteArray("favorite_projects");
+    for (int i = 0; i < mFavoriteProjects.count(); i++)
     {
         settings.setArrayIndex(i);
-        settings.setValue("filepath", mRecentProjects.at(i).filePath());
+        settings.setValue("filepath", mFavoriteProjects.at(i).filePath());
     }
     settings.endArray();
+}
+
+void FavoriteProjectsModel::removeFavoriteProject(const QString& filename)
+{
+    QFileInfo fileInfo(filename);
+
+    int index = mFavoriteProjects.indexOf(fileInfo);
+
+    if (index >= 0)
+    {
+        beginRemoveRows(QModelIndex(), index, index);
+        mFavoriteProjects.removeAt(index);
+        endRemoveRows();
+    }
 }
 
 /*****************************************************************************************
  *  Inherited Methods
  ****************************************************************************************/
 
-int RecentProjectsModel::rowCount(const QModelIndex& parent) const
+int FavoriteProjectsModel::rowCount(const QModelIndex& parent) const
 {
     if (parent.isValid())
         return 0;
     else
-        return mRecentProjects.count();
+        return mFavoriteProjects.count();
 }
 
-QVariant RecentProjectsModel::data(const QModelIndex& index, int role) const
+QVariant FavoriteProjectsModel::data(const QModelIndex& index, int role) const
 {
     if (!index.isValid())
         return QVariant();
@@ -118,15 +113,15 @@ QVariant RecentProjectsModel::data(const QModelIndex& index, int role) const
     switch (role)
     {
         case Qt::DisplayRole:
-            return mRecentProjects.at(index.row()).fileName();
+            return mFavoriteProjects.at(index.row()).fileName();
 
         case Qt::ToolTipRole:
         case Qt::StatusTipRole:
         case Qt::UserRole:
-            return mRecentProjects.at(index.row()).absoluteFilePath();
+            return mFavoriteProjects.at(index.row()).absoluteFilePath();
 
         case Qt::DecorationRole:
-            return QIcon(":/img/actions/recent.png");
+            return QIcon(":/img/actions/bookmark.png");
 
         default:
             return QVariant();

@@ -214,6 +214,16 @@ void ControlPanel::on_recentProjectsListView_clicked(const QModelIndex &index)
     mWorkspace->openProject(filename);
 }
 
+void ControlPanel::on_favoriteProjectsListView_clicked(const QModelIndex &index)
+{
+    QString filename = index.data(Qt::UserRole).toString();
+
+    if (filename.isEmpty())
+        return;
+
+    mWorkspace->openProject(filename);
+}
+
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/

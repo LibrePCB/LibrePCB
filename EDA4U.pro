@@ -73,7 +73,8 @@ SOURCES += \
     src/common/layer.cpp \
     src/project/schematics/schematiceditor.cpp \
     src/project/circuit/circuit.cpp \
-    src/workspace/recentprojectsmodel.cpp
+    src/workspace/recentprojectsmodel.cpp \
+    src/workspace/favoriteprojectsmodel.cpp
 
 HEADERS += \
     src/common/units.h \
@@ -101,6 +102,7 @@ HEADERS += \
     src/project/schematics/schematiceditor.h \
     src/project/circuit/circuit.h \
     src/workspace/recentprojectsmodel.h \
+    src/workspace/favoriteprojectsmodel.h \
     src/common/exceptions.h
 
 FORMS += \

@@ -30,6 +30,7 @@
 #include "../project/project.h"
 #include "projecttreemodel.h"
 #include "recentprojectsmodel.h"
+#include "favoriteprojectsmodel.h"
 #include "controlpanel/controlpanel.h"
 
 using namespace library;
@@ -61,7 +62,7 @@ Workspace::Workspace(const QDir& workspaceDir) :
     // all OK, let's load the workspace stuff!
 
     mRecentProjectsModel = new RecentProjectsModel(this);
-    mFavoriteProjectsModel = new QStringListModel();
+    mFavoriteProjectsModel = new FavoriteProjectsModel(this);
     mProjectTreeModel = new ProjectTreeModel(this);
     mLibrary = new Library(this);
     mControlPanel = new ControlPanel(this, mProjectTreeModel, mRecentProjectsModel,
