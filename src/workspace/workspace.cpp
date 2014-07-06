@@ -138,6 +138,21 @@ Project* Workspace::getOpenProject(const QString& filename)
         return 0;
 }
 
+bool Workspace::isFavoriteProject(const QString& filename) const
+{
+    return mFavoriteProjectsModel->isFavoriteProject(filename);
+}
+
+void Workspace::addFavoriteProject(const QString& filename)
+{
+    mFavoriteProjectsModel->addFavoriteProject(filename);
+}
+
+void Workspace::removeFavoriteProject(const QString& filename)
+{
+    mFavoriteProjectsModel->removeFavoriteProject(filename);
+}
+
 /*****************************************************************************************
  *  Public Slots
  ****************************************************************************************/

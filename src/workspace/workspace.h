@@ -82,6 +82,9 @@ class Workspace : public QObject
         void unregisterOpenProject(project::Project* project);
         project::Project* getOpenProject(const QString& filename);
         const QHash<QString, project::Project*>& getOpenProjects() const {return mOpenProjects;}
+        bool isFavoriteProject(const QString& filename) const;
+        void addFavoriteProject(const QString& filename);
+        void removeFavoriteProject(const QString& filename);
 
         // Static Methods
         static bool isValidWorkspaceDir(const QDir& dir);

@@ -56,7 +56,14 @@ ControlPanel::ControlPanel(Workspace* workspace, QAbstractItemModel* projectTree
     mUi->favoriteProjectsListView->setModel(favoriteProjectsModel);
 
     mUi->webView->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
-    connect(mUi->webView, SIGNAL(linkClicked(QUrl)), this, SLOT(webViewLinkClicked(QUrl)));
+    connect(mUi->webView, &QWebView::linkClicked, [](const QUrl& url){QDesktopServices::openUrl(url);});
+
+    // restore all settings
+    QSettings settings(mWorkspace->getWorkspaceSettingsIniFilename(), QSettings::IniFormat);
+    restoreGeometry(settings.value("controlpanel/window_geometry").toByteArray());
+    restoreState(settings.value("controlpanel/window_state").toByteArray());
+    mUi->splitter_h->restoreState(settings.value("controlpanel/splitter_h_state").toByteArray());
+    mUi->splitter_v->restoreState(settings.value("controlpanel/splitter_v_state").toByteArray());
 }
 
 ControlPanel::~ControlPanel()
@@ -67,8 +74,19 @@ ControlPanel::~ControlPanel()
 void ControlPanel::closeEvent(QCloseEvent *event)
 {
     Q_UNUSED(event);
-    mWorkspace->closeAllProjects(true); // close all projects, unsaved projects will ask for saving
-    QApplication::quit(); // if the control panel is closed, we will quit the whole application
+
+    // save all settings
+    QSettings settings(mWorkspace->getWorkspaceSettingsIniFilename(), QSettings::IniFormat);
+    settings.setValue("controlpanel/window_geometry", saveGeometry());
+    settings.setValue("controlpanel/window_state", saveState());
+    settings.setValue("controlpanel/splitter_h_state", mUi->splitter_h->saveState());
+    settings.setValue("controlpanel/splitter_v_state", mUi->splitter_v->saveState());
+
+    // close all projects, unsaved projects will ask for saving
+    mWorkspace->closeAllProjects(true);
+
+    // if the control panel is closed, we will quit the whole application
+    QApplication::quit();
 }
 
 /*****************************************************************************************
@@ -138,40 +156,51 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(const QPoint& p
             {
                 if (!mWorkspace->getOpenProject(item->getFileInfo().absoluteFilePath()))
                 {
+                    // this project is not open
                     actions.insert(1, menu.addAction("Open Project"));
                     actions.value(1)->setIcon(QIcon(":/img/actions/open.png"));
                 }
                 else
                 {
+                    // this project is open
                     actions.insert(2, menu.addAction("Close Project"));
                     actions.value(2)->setIcon(QIcon(":/img/actions/close.png"));
                 }
-                actions.insert(3, menu.addSeparator());
+
+                if (mWorkspace->isFavoriteProject(item->getFileInfo().filePath()))
+                {
+                    // this is a favorite project
+                    actions.insert(3, menu.addAction("Remove from favorites"));
+                    actions.value(3)->setIcon(QIcon(":/img/actions/bookmark.png"));
+                }
+                else
+                {
+                    // this is not a favorite project
+                    actions.insert(4, menu.addAction("Add to favorites"));
+                    actions.value(4)->setIcon(QIcon(":/img/actions/bookmark_gray.png"));
+                }
+
+                actions.insert(100, menu.addSeparator());
             }
             else
             {
                 // a folder or a file is selected
 
-                actions.insert(7, menu.addAction("New Project"));
-                actions.value(7)->setIcon(QIcon(":/img/actions/new.png"));
+                actions.insert(10, menu.addAction("New Project"));
+                actions.value(10)->setIcon(QIcon(":/img/actions/new.png"));
             }
 
-            actions.insert(8, menu.addAction("New Folder"));
-            actions.value(8)->setIcon(QIcon(":/img/actions/new_folder.png"));
+            actions.insert(20, menu.addAction("New Folder"));
+            actions.value(20)->setIcon(QIcon(":/img/actions/new_folder.png"));
 
-            actions.insert(9, menu.addSeparator());
+            actions.insert(101, menu.addSeparator());
 
-            actions.insert(4, menu.addAction("Open Directory"));
-            actions.value(4)->setIcon(QIcon(":/img/places/folder_open.png"));
+            actions.insert(21, menu.addAction("Open Directory"));
+            actions.value(21)->setIcon(QIcon(":/img/places/folder_open.png"));
 
-            actions.insert(5, menu.addSeparator());
+            actions.insert(102, menu.addSeparator());
         }
     }
-
-    static bool showFiles = false;
-    actions.insert(6, menu.addAction("Show Files"));
-    actions.value(6)->setCheckable(true);
-    actions.value(6)->setChecked(showFiles);
 
     switch (actions.key(menu.exec(QCursor::pos()), 0))
     {
@@ -183,13 +212,22 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(const QPoint& p
             mWorkspace->closeProject(item->getFileInfo().absoluteFilePath(), true);
             break;
 
-        case 4: // open project directory
-            QDesktopServices::openUrl(QUrl::fromLocalFile(item->getFileInfo().absoluteFilePath()));
+        case 3: // remove project from favorites
+            mWorkspace->removeFavoriteProject(item->getFileInfo().filePath());
             break;
 
-        case 6: // show files (checkable)
-            showFiles = actions.value(6)->isChecked();
-            qDebug() << "show files = " << showFiles;
+        case 4: // add project to favorites
+            mWorkspace->addFavoriteProject(item->getFileInfo().filePath());
+            break;
+
+        case 10: // new project
+            break;
+
+        case 20: // new folder
+            break;
+
+        case 21: // open project directory
+            QDesktopServices::openUrl(QUrl::fromLocalFile(item->getFileInfo().absoluteFilePath()));
             break;
 
         default:
@@ -199,29 +237,54 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(const QPoint& p
     qDeleteAll(actions);
 }
 
-void ControlPanel::webViewLinkClicked(const QUrl& url)
+void ControlPanel::on_recentProjectsListView_entered(const QModelIndex &index)
 {
-    QDesktopServices::openUrl(url);
+    QFileInfo fileInfo(index.data(Qt::UserRole).toString());
+    QString htmlFilename = fileInfo.dir().absoluteFilePath("description" %
+                                                           QDir::separator() %
+                                                           "index.html");
+    mUi->webView->setUrl(QUrl::fromLocalFile(htmlFilename));
+}
+
+void ControlPanel::on_favoriteProjectsListView_entered(const QModelIndex &index)
+{
+    QFileInfo fileInfo(index.data(Qt::UserRole).toString());
+    QString htmlFilename = fileInfo.dir().absoluteFilePath("description" %
+                                                           QDir::separator() %
+                                                           "index.html");
+    mUi->webView->setUrl(QUrl::fromLocalFile(htmlFilename));
 }
 
 void ControlPanel::on_recentProjectsListView_clicked(const QModelIndex &index)
 {
-    QString filename = index.data(Qt::UserRole).toString();
-
-    if (filename.isEmpty())
+    QFileInfo fileInfo(index.data(Qt::UserRole).toString());
+    if ((!fileInfo.isFile()) || (!fileInfo.exists()))
         return;
 
-    mWorkspace->openProject(filename);
+    mWorkspace->openProject(fileInfo.filePath());
 }
 
 void ControlPanel::on_favoriteProjectsListView_clicked(const QModelIndex &index)
 {
-    QString filename = index.data(Qt::UserRole).toString();
-
-    if (filename.isEmpty())
+    QFileInfo fileInfo(index.data(Qt::UserRole).toString());
+    if ((!fileInfo.isFile()) || (!fileInfo.exists()))
         return;
 
-    mWorkspace->openProject(filename);
+    mWorkspace->openProject(fileInfo.filePath());
+}
+
+void ControlPanel::on_favoriteProjectsListView_customContextMenuRequested(const QPoint &pos)
+{
+    QModelIndex index = mUi->favoriteProjectsListView->indexAt(pos);
+    if (!index.isValid())
+        return;
+
+    QMenu menu;
+    QAction* removeAction = menu.addAction(QIcon(":/img/actions/cancel.png"),
+                                           "Remove from favorites");
+
+    if (menu.exec(QCursor::pos()) == removeAction)
+        mWorkspace->removeFavoriteProject(index.data(Qt::UserRole).toString());
 }
 
 /*****************************************************************************************

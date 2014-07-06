@@ -72,11 +72,11 @@ class ControlPanel : public QMainWindow
         void on_projectTreeView_clicked(const QModelIndex& index);
         void on_projectTreeView_doubleClicked(const QModelIndex& index);
         void on_projectTreeView_customContextMenuRequested(const QPoint& pos);
+        void on_recentProjectsListView_entered(const QModelIndex &index);
+        void on_favoriteProjectsListView_entered(const QModelIndex &index);
         void on_recentProjectsListView_clicked(const QModelIndex &index);
         void on_favoriteProjectsListView_clicked(const QModelIndex &index);
-
-        // QWebView
-        void webViewLinkClicked(const QUrl& url);
+        void on_favoriteProjectsListView_customContextMenuRequested(const QPoint &pos);
 
     private:
 

@@ -55,6 +55,12 @@ FavoriteProjectsModel::~FavoriteProjectsModel()
  *  General Methods
  ****************************************************************************************/
 
+bool FavoriteProjectsModel::isFavoriteProject(const QString& filename) const
+{
+    QFileInfo fileInfo(filename);
+    return mFavoriteProjects.contains(fileInfo);
+}
+
 void FavoriteProjectsModel::addFavoriteProject(const QString& filename)
 {
     QFileInfo fileInfo(filename);

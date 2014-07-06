@@ -2,6 +2,7 @@
     <qresource prefix="/img">
         <file>actions/apply.png</file>
         <file>actions/bookmark.png</file>
+        <file>actions/bookmark_gray.png</file>
         <file>actions/cancel.png</file>
         <file>actions/chip.png</file>
         <file>actions/copy.png</file>

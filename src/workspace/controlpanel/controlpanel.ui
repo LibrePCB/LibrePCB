@@ -20,7 +20,7 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
-     <widget class="QSplitter" name="splitter_2">
+     <widget class="QSplitter" name="splitter_h">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
@@ -59,7 +59,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget1">
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
          <widget class="QFrame" name="frame">
@@ -131,14 +131,14 @@
          </widget>
         </item>
         <item>
-         <widget class="QSplitter" name="splitter">
+         <widget class="QSplitter" name="splitter_v">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
           <property name="childrenCollapsible">
            <bool>false</bool>
           </property>
-          <widget class="QWidget" name="">
+          <widget class="QWidget" name="layoutWidget2">
            <layout class="QHBoxLayout" name="horizontalLayout">
             <item>
              <widget class="QGroupBox" name="groupBox_2">
@@ -166,6 +166,9 @@
                    <verstretch>0</verstretch>
                   </sizepolicy>
                  </property>
+                 <property name="mouseTracking">
+                  <bool>true</bool>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">QListView
 { 
@@ -174,12 +177,10 @@
 }
 QListView::item:hover 
 {
-	padding:2px;
     background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 170, 255, 100), stop:1 rgba(0, 170, 255, 0));
 }
 QListView::item 
 {
-	padding:2px;
 	color: blue; 
 }</string>
                  </property>
@@ -235,6 +236,12 @@ QListView::item
                    <verstretch>0</verstretch>
                   </sizepolicy>
                  </property>
+                 <property name="mouseTracking">
+                  <bool>true</bool>
+                 </property>
+                 <property name="contextMenuPolicy">
+                  <enum>Qt::CustomContextMenu</enum>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">QListView
 { 
@@ -243,12 +250,10 @@ QListView::item
 }
 QListView::item:hover 
 {
-	padding:2px;
     background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 170, 255, 100), stop:1 rgba(0, 170, 255, 0));
 }
 QListView::item 
 {
-	padding:2px;
 	color: blue; 
 }</string>
                  </property>

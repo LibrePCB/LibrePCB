@@ -50,6 +50,7 @@ class FavoriteProjectsModel : public QAbstractListModel
         ~FavoriteProjectsModel();
 
         // General Methods
+        bool isFavoriteProject(const QString& filename) const;
         void addFavoriteProject(const QString& filename);
         void removeFavoriteProject(const QString& filename);
 
