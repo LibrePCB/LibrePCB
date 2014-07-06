@@ -26,9 +26,9 @@
 #include <QFileDialog>
 #include "controlpanel.h"
 #include "ui_controlpanel.h"
-
 #include "../workspace.h"
 #include "../../project/project.h"
+#include "../projecttreemodel.h"
 #include "../projecttreeitem.h"
 
 using namespace project;
@@ -44,7 +44,10 @@ ControlPanel::ControlPanel(Workspace* workspace, QAbstractItemModel* projectTree
 {
     mUi->setupUi(this);
 
-    setWindowTitle("EDA4U Control Panel - " % mWorkspace->getWorkspaceDir().absolutePath());
+    QString nativePath = QDir::toNativeSeparators(mWorkspace->getWorkspaceDir().absolutePath());
+
+    setWindowTitle(QString(tr("EDA4U Control Panel - %1")).arg(nativePath));
+    mUi->statusBar->addWidget(new QLabel(QString(tr("Workspace: %1")).arg(nativePath)));
 
     // connect some actions which are created with the Qt Designer
     connect(mUi->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
@@ -58,12 +61,7 @@ ControlPanel::ControlPanel(Workspace* workspace, QAbstractItemModel* projectTree
     mUi->webView->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
     connect(mUi->webView, &QWebView::linkClicked, [](const QUrl& url){QDesktopServices::openUrl(url);});
 
-    // restore all settings
-    QSettings settings(mWorkspace->getWorkspaceSettingsIniFilename(), QSettings::IniFormat);
-    restoreGeometry(settings.value("controlpanel/window_geometry").toByteArray());
-    restoreState(settings.value("controlpanel/window_state").toByteArray());
-    mUi->splitter_h->restoreState(settings.value("controlpanel/splitter_h_state").toByteArray());
-    mUi->splitter_v->restoreState(settings.value("controlpanel/splitter_v_state").toByteArray());
+    loadSettings();
 }
 
 ControlPanel::~ControlPanel()
@@ -75,12 +73,7 @@ void ControlPanel::closeEvent(QCloseEvent *event)
 {
     Q_UNUSED(event);
 
-    // save all settings
-    QSettings settings(mWorkspace->getWorkspaceSettingsIniFilename(), QSettings::IniFormat);
-    settings.setValue("controlpanel/window_geometry", saveGeometry());
-    settings.setValue("controlpanel/window_state", saveState());
-    settings.setValue("controlpanel/splitter_h_state", mUi->splitter_h->saveState());
-    settings.setValue("controlpanel/splitter_v_state", mUi->splitter_v->saveState());
+    saveSettings();
 
     // close all projects, unsaved projects will ask for saving
     mWorkspace->closeAllProjects(true);
@@ -90,12 +83,81 @@ void ControlPanel::closeEvent(QCloseEvent *event)
 }
 
 /*****************************************************************************************
+ *  General private methods
+ ****************************************************************************************/
+
+void ControlPanel::saveSettings()
+{
+    QSettings settings(mWorkspace->getWorkspaceSettingsIniFilename(), QSettings::IniFormat);
+
+    // main window
+    settings.setValue("controlpanel/window_geometry", saveGeometry());
+    settings.setValue("controlpanel/window_state", saveState());
+    settings.setValue("controlpanel/splitter_h_state", mUi->splitter_h->saveState());
+    settings.setValue("controlpanel/splitter_v_state", mUi->splitter_v->saveState());
+
+    // projects treeview (expanded items)
+    ProjectTreeModel* model = dynamic_cast<ProjectTreeModel*>(mUi->projectTreeView->model());
+    if (model)
+    {
+        QStringList list;
+        foreach (QModelIndex index, model->getPersistentIndexList())
+        {
+            if (mUi->projectTreeView->isExpanded(index))
+                list.append(index.data(Qt::UserRole).toString());
+        }
+        settings.setValue("controlpanel/expanded_projecttreeview_items", QVariant::fromValue(list));
+    }
+}
+
+void ControlPanel::loadSettings()
+{
+    QSettings settings(mWorkspace->getWorkspaceSettingsIniFilename(), QSettings::IniFormat);
+
+    // main window
+    restoreGeometry(settings.value("controlpanel/window_geometry").toByteArray());
+    restoreState(settings.value("controlpanel/window_state").toByteArray());
+    mUi->splitter_h->restoreState(settings.value("controlpanel/splitter_h_state").toByteArray());
+    mUi->splitter_v->restoreState(settings.value("controlpanel/splitter_v_state").toByteArray());
+
+    // projects treeview (expanded items)
+    ProjectTreeModel* model = dynamic_cast<ProjectTreeModel*>(mUi->projectTreeView->model());
+    if (model)
+    {
+        QStringList list = settings.value("controlpanel/expanded_projecttreeview_items").toStringList();
+        foreach (QString item, list)
+        {
+            QModelIndexList items = model->match(model->index(0, 0), Qt::UserRole, QVariant::fromValue(item), 1, Qt::MatchExactly | Qt::MatchWrap | Qt::MatchRecursive);
+            if (!items.isEmpty())
+                mUi->projectTreeView->setExpanded(items.first(), true);
+        }
+    }
+}
+
+/*****************************************************************************************
  *  Actions
  ****************************************************************************************/
 
 void ControlPanel::on_actionAbout_triggered()
 {
-    QMessageBox::about(this, "About", "EDA4U is a free & OpenSource Schematic/Layout-Editor");
+    QMessageBox::about(this, tr("About"),
+                       tr("EDA4U is a free & OpenSource Schematic/Layout-Editor"));
+}
+
+void ControlPanel::on_actionOpen_Project_triggered()
+{
+    QSettings settings(mWorkspace->getWorkspaceSettingsIniFilename(), QSettings::IniFormat);
+    QString lastOpenedFile = settings.value("controlpanel/last_open_project",
+                             mWorkspace->getWorkspaceDir().absolutePath()).toString();
+
+    QString filename = QFileDialog::getOpenFileName(this, tr("Open Project"), lastOpenedFile,
+                                    tr("EDA4U project files (%1)").arg("*.e4u"));
+
+    if (filename.isNull())
+        return;
+
+    settings.setValue("controlpanel/last_open_project", filename);
+    mWorkspace->openProject(filename);
 }
 
 void ControlPanel::on_projectTreeView_clicked(const QModelIndex& index)
@@ -157,26 +219,26 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(const QPoint& p
                 if (!mWorkspace->getOpenProject(item->getFileInfo().absoluteFilePath()))
                 {
                     // this project is not open
-                    actions.insert(1, menu.addAction("Open Project"));
+                    actions.insert(1, menu.addAction(tr("Open Project")));
                     actions.value(1)->setIcon(QIcon(":/img/actions/open.png"));
                 }
                 else
                 {
                     // this project is open
-                    actions.insert(2, menu.addAction("Close Project"));
+                    actions.insert(2, menu.addAction(tr("Close Project")));
                     actions.value(2)->setIcon(QIcon(":/img/actions/close.png"));
                 }
 
                 if (mWorkspace->isFavoriteProject(item->getFileInfo().filePath()))
                 {
                     // this is a favorite project
-                    actions.insert(3, menu.addAction("Remove from favorites"));
+                    actions.insert(3, menu.addAction(tr("Remove from favorites")));
                     actions.value(3)->setIcon(QIcon(":/img/actions/bookmark.png"));
                 }
                 else
                 {
                     // this is not a favorite project
-                    actions.insert(4, menu.addAction("Add to favorites"));
+                    actions.insert(4, menu.addAction(tr("Add to favorites")));
                     actions.value(4)->setIcon(QIcon(":/img/actions/bookmark_gray.png"));
                 }
 
@@ -186,16 +248,16 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(const QPoint& p
             {
                 // a folder or a file is selected
 
-                actions.insert(10, menu.addAction("New Project"));
+                actions.insert(10, menu.addAction(tr("New Project")));
                 actions.value(10)->setIcon(QIcon(":/img/actions/new.png"));
             }
 
-            actions.insert(20, menu.addAction("New Folder"));
+            actions.insert(20, menu.addAction(tr("New Folder")));
             actions.value(20)->setIcon(QIcon(":/img/actions/new_folder.png"));
 
             actions.insert(101, menu.addSeparator());
 
-            actions.insert(21, menu.addAction("Open Directory"));
+            actions.insert(21, menu.addAction(tr("Open Directory")));
             actions.value(21)->setIcon(QIcon(":/img/places/folder_open.png"));
 
             actions.insert(102, menu.addSeparator());
@@ -273,6 +335,36 @@ void ControlPanel::on_favoriteProjectsListView_clicked(const QModelIndex &index)
     mWorkspace->openProject(fileInfo.filePath());
 }
 
+void ControlPanel::on_recentProjectsListView_customContextMenuRequested(const QPoint &pos)
+{
+    QModelIndex index = mUi->recentProjectsListView->indexAt(pos);
+    if (!index.isValid())
+        return;
+
+    bool isFavorite = mWorkspace->isFavoriteProject(index.data(Qt::UserRole).toString());
+
+    QMenu menu;
+    QAction* action;
+    if (isFavorite)
+    {
+        action = menu.addAction(QIcon(":/img/actions/bookmark.png"),
+                                           tr("Remove from favorites"));
+    }
+    else
+    {
+        action = menu.addAction(QIcon(":/img/actions/bookmark_gray.png"),
+                                           tr("Add to favorites"));
+    }
+
+    if (menu.exec(QCursor::pos()) == action)
+    {
+        if (isFavorite)
+            mWorkspace->removeFavoriteProject(index.data(Qt::UserRole).toString());
+        else
+            mWorkspace->addFavoriteProject(index.data(Qt::UserRole).toString());
+    }
+}
+
 void ControlPanel::on_favoriteProjectsListView_customContextMenuRequested(const QPoint &pos)
 {
     QModelIndex index = mUi->favoriteProjectsListView->indexAt(pos);
@@ -281,7 +373,7 @@ void ControlPanel::on_favoriteProjectsListView_customContextMenuRequested(const 
 
     QMenu menu;
     QAction* removeAction = menu.addAction(QIcon(":/img/actions/cancel.png"),
-                                           "Remove from favorites");
+                                           tr("Remove from favorites"));
 
     if (menu.exec(QCursor::pos()) == removeAction)
         mWorkspace->removeFavoriteProject(index.data(Qt::UserRole).toString());

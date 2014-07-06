@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>765</width>
-    <height>534</height>
+    <width>873</width>
+    <height>621</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,6 +19,18 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>6</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
     <item>
      <widget class="QSplitter" name="splitter_h">
       <property name="orientation">
@@ -31,6 +43,9 @@
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <item>
          <widget class="QTreeView" name="projectTreeView">
+          <property name="mouseTracking">
+           <bool>true</bool>
+          </property>
           <property name="contextMenuPolicy">
            <enum>Qt::CustomContextMenu</enum>
           </property>
@@ -70,12 +85,15 @@
            </sizepolicy>
           </property>
           <property name="frameShape">
-           <enum>QFrame::StyledPanel</enum>
+           <enum>QFrame::NoFrame</enum>
           </property>
           <property name="frameShadow">
            <enum>QFrame::Raised</enum>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <property name="rightMargin">
+            <number>9</number>
+           </property>
            <item>
             <widget class="QPushButton" name="newProjectButton">
              <property name="text">
@@ -131,7 +149,17 @@
          </widget>
         </item>
         <item>
+         <widget class="Line" name="line">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QSplitter" name="splitter_v">
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
@@ -168,6 +196,9 @@
                  </property>
                  <property name="mouseTracking">
                   <bool>true</bool>
+                 </property>
+                 <property name="contextMenuPolicy">
+                  <enum>Qt::CustomContextMenu</enum>
                  </property>
                  <property name="styleSheet">
                   <string notr="true">QListView
@@ -335,7 +366,7 @@ QListView::item
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>765</width>
+     <width>873</width>
      <height>20</height>
     </rect>
    </property>

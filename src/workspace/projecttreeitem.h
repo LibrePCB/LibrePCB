@@ -68,7 +68,7 @@ class ProjectTreeItem
         ProjectTreeItem* getChild(int index)    const {return mChilds.value(index);}
         int getChildCount()                     const {return mChilds.count();}
         int getChildNumber()                    const;
-        QVariant data(const QModelIndex& index, int role) const;
+        QVariant data(int role) const;
 
     private:
 

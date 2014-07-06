@@ -36,6 +36,10 @@ int main(int argc, char* argv[])
 {
     QApplication app(argc, argv);
 
+    // this is to remove the ugly frames around widgets in all status bars...
+    // (from http://www.qtcentre.org/threads/1904)
+    app.setStyleSheet("QStatusBar::item { border: 0px solid black; }");
+
     QCoreApplication::setOrganizationName("EDA4U");
     //QCoreApplication::setOrganizationDomain(""); ///< @todo
 #ifdef GIT_BRANCH

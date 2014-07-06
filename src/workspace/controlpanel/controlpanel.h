@@ -69,6 +69,7 @@ class ControlPanel : public QMainWindow
 
         // Actions
         void on_actionAbout_triggered();
+        void on_actionOpen_Project_triggered();
         void on_projectTreeView_clicked(const QModelIndex& index);
         void on_projectTreeView_doubleClicked(const QModelIndex& index);
         void on_projectTreeView_customContextMenuRequested(const QPoint& pos);
@@ -76,6 +77,7 @@ class ControlPanel : public QMainWindow
         void on_favoriteProjectsListView_entered(const QModelIndex &index);
         void on_recentProjectsListView_clicked(const QModelIndex &index);
         void on_favoriteProjectsListView_clicked(const QModelIndex &index);
+        void on_recentProjectsListView_customContextMenuRequested(const QPoint &pos);
         void on_favoriteProjectsListView_customContextMenuRequested(const QPoint &pos);
 
     private:
@@ -84,6 +86,10 @@ class ControlPanel : public QMainWindow
         ControlPanel();
         ControlPanel(const ControlPanel& other);
         ControlPanel& operator=(const ControlPanel& rhs);
+
+        // General private methods
+        void saveSettings();
+        void loadSettings();
 
         Ui::ControlPanel* mUi;
 

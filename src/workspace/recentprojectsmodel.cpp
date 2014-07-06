@@ -120,10 +120,10 @@ QVariant RecentProjectsModel::data(const QModelIndex& index, int role) const
         case Qt::DisplayRole:
             return mRecentProjects.at(index.row()).fileName();
 
-        case Qt::ToolTipRole:
+        //case Qt::ToolTipRole:
         case Qt::StatusTipRole:
         case Qt::UserRole:
-            return mRecentProjects.at(index.row()).absoluteFilePath();
+            return QDir::toNativeSeparators(mRecentProjects.at(index.row()).absoluteFilePath());
 
         case Qt::DecorationRole:
             return QIcon(":/img/actions/recent.png");

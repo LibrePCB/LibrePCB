@@ -55,6 +55,9 @@ class ProjectTreeModel : public QAbstractItemModel
         ProjectTreeModel(Workspace* workspace);
         ~ProjectTreeModel();
 
+        // General
+        QModelIndexList getPersistentIndexList() const {return persistentIndexList();}
+
         // Inherited Methods
         virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
         virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;

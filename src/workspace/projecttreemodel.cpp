@@ -103,7 +103,7 @@ QVariant ProjectTreeModel::headerData(int section, Qt::Orientation orientation, 
 QVariant ProjectTreeModel::data(const QModelIndex& index, int role) const
 {
     ProjectTreeItem* item = getItem(index);
-    return item->data(index, role);
+    return item->data(role);
 }
 
 /*****************************************************************************************

@@ -121,10 +121,10 @@ QVariant FavoriteProjectsModel::data(const QModelIndex& index, int role) const
         case Qt::DisplayRole:
             return mFavoriteProjects.at(index.row()).fileName();
 
-        case Qt::ToolTipRole:
+        //case Qt::ToolTipRole:
         case Qt::StatusTipRole:
         case Qt::UserRole:
-            return mFavoriteProjects.at(index.row()).absoluteFilePath();
+            return QDir::toNativeSeparators(mFavoriteProjects.at(index.row()).absoluteFilePath());
 
         case Qt::DecorationRole:
             return QIcon(":/img/actions/bookmark.png");

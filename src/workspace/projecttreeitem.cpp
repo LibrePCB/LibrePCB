@@ -94,11 +94,8 @@ int ProjectTreeItem::getChildNumber() const
         return 0;
 }
 
-QVariant ProjectTreeItem::data(const QModelIndex& index, int role) const
+QVariant ProjectTreeItem::data(int role) const
 {
-    if (!index.isValid())
-        return QVariant();
-
     switch (role)
     {
         case Qt::DisplayRole:
@@ -121,21 +118,13 @@ QVariant ProjectTreeItem::data(const QModelIndex& index, int role) const
         }
 
         case Qt::FontRole:
-        {
-            if (mType == ProjectFile)
-            {
-                /*if (mWorkspace->getOpenProject(item->getProjectFilename()))
-                {
-                    QFont font;
-                    font.setBold(true);
-                    return font;
-                }*/
-            }
             break;
-        }
 
         case Qt::StatusTipRole:
-            return mFileInfo.absoluteFilePath();
+            return QDir::toNativeSeparators(mFileInfo.absoluteFilePath());
+
+        case Qt::UserRole:
+            return QDir::toNativeSeparators(mFileInfo.absoluteFilePath());
 
         default:
             return QVariant();
