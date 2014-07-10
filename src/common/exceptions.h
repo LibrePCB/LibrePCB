@@ -106,7 +106,12 @@ class Exception : public QException
          *
          * @return the message as a UTF-8 C-string (const char*)
          */
-        const char* what() const _GLIBCXX_USE_NOEXCEPT override {return mMsg.toUtf8().constData();}
+        const char* what() const _GLIBCXX_USE_NOEXCEPT override
+        {
+            static QByteArray utf8string;
+            utf8string = mMsg.toUtf8();
+            return utf8string.constData();
+        }
 
         // Inherited from QException
         virtual void raise() const {throw *this;}
