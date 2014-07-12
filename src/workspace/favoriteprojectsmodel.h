@@ -61,6 +61,9 @@ class FavoriteProjectsModel : public QAbstractListModel
         FavoriteProjectsModel(const FavoriteProjectsModel& other);
         FavoriteProjectsModel& operator=(const FavoriteProjectsModel& rhs);
 
+        // General Methods
+        void save();
+
         // Inherited Methods
         int rowCount(const QModelIndex& parent = QModelIndex()) const;
         QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;

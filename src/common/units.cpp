@@ -81,6 +81,38 @@ Length Length::fromPx(qreal pixels, const Length& gridInterval)
     return l.mapToGrid(gridInterval);
 }
 
+QString Length::measurementUnitToString(MeasurementUnit unit)
+{
+    switch (unit)
+    {
+        case Length::millimeters:
+            return QString("millimeters");
+        case Length::micrometers:
+            return QString("micrometers");
+        case Length::inches:
+            return QString("inches");
+        case Length::mils:
+            return QString("mils");
+        default:
+            throw RuntimeError("Invalid unit passed!", __FILE__, __LINE__);
+    }
+}
+
+Length::MeasurementUnit Length::measurementUnitFromString(const QString& unit,
+                                                          MeasurementUnit defaultValue)
+{
+    if (unit == "millimeters")
+        return Length::millimeters;
+    else if (unit == "micrometers")
+        return Length::micrometers;
+    else if (unit == "inches")
+        return Length::inches;
+    else if (unit == "mils")
+        return Length::mils;
+    else
+        return defaultValue;
+}
+
 // Private Methods
 
 /**

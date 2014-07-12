@@ -41,7 +41,7 @@ Project::Project(Workspace* workspace, const QString& filename) :
         throw RuntimeError(QString("Invalid project file: \"%1\"").arg(filename), __FILE__, __LINE__);
 
     mCircuit = new Circuit(this);
-    mSchematicEditor = new SchematicEditor(this);
+    mSchematicEditor = new SchematicEditor(mWorkspace, this);
 }
 
 Project::~Project()

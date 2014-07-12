@@ -34,6 +34,7 @@ class ControlPanel;
 class ProjectTreeModel;
 class RecentProjectsModel;
 class FavoriteProjectsModel;
+class WorkspaceSettings;
 
 namespace library{
 class Library;
@@ -52,13 +53,19 @@ class Project;
  ****************************************************************************************/
 
 /**
- * @brief The Workspace class
+ * @brief The Workspace class represents a workspace with all its data (library, projects,
+ * settings, ...)
+ *
+ * There can be only one Workspace object in an application instance. That object is
+ * created in the main() function and is like the "topmost class of the whole application".
+ *
+ * To access the settings of the workspace, use the method #getSettings().
  *
  * @author ubruhin
  *
  * @date 2014-06-23
  */
-class Workspace : public QObject
+class Workspace final : public QObject
 {
         Q_OBJECT
 
@@ -66,13 +73,12 @@ class Workspace : public QObject
 
         // Constructors / Destructor
         explicit Workspace(const QDir& workspaceDir);
-        virtual ~Workspace();
+        ~Workspace();
 
         // Getters
         const QDir& getWorkspaceDir() const {return mWorkspaceDir;}
         QString getUniquePath() const {return uniqueWorkspacePath(mWorkspaceDir.absolutePath());}
-        const QDir& getMetadataDir() const {return mMetadataDir;}
-        QString getWorkspaceSettingsIniFilename() const {return mWorkspaceSettings->fileName();}
+        WorkspaceSettings* getSettings() const {return mWorkspaceSettings;}
         library::Library* getLibrary() const {return mLibrary;}
 
         // Project Management
@@ -108,17 +114,15 @@ class Workspace : public QObject
         Workspace(const Workspace& other);
         Workspace& operator=(const Workspace& rhs);
 
-        QDir mWorkspaceDir;
-        QDir mMetadataDir;
-        QSettings* mWorkspaceSettings;
-
-        ControlPanel* mControlPanel;
-        library::Library* mLibrary;
-        library_editor::LibraryEditor* mLibraryEditor;
-        ProjectTreeModel* mProjectTreeModel;
-        QHash<QString, project::Project*> mOpenProjects;
-        RecentProjectsModel* mRecentProjectsModel;
-        FavoriteProjectsModel* mFavoriteProjectsModel;
+        QDir mWorkspaceDir; ///< a QDir object which represents the workspace directory
+        WorkspaceSettings* mWorkspaceSettings; ///< the WorkspaceSettings object
+        ControlPanel* mControlPanel; ///< the control panel window
+        library::Library* mLibrary; ///< the library of the workspace (with SQLite database)
+        library_editor::LibraryEditor* mLibraryEditor; ///< the library editor
+        ProjectTreeModel* mProjectTreeModel; ///< a tree model for the whole projects directory
+        QHash<QString, project::Project*> mOpenProjects; ///< a list of all open projects
+        RecentProjectsModel* mRecentProjectsModel; ///< a list model of all recent projects
+        FavoriteProjectsModel* mFavoriteProjectsModel; ///< a list model of all favorite projects
 };
 
 #endif // WORKSPACE_H

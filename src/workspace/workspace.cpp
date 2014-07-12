@@ -32,6 +32,7 @@
 #include "recentprojectsmodel.h"
 #include "favoriteprojectsmodel.h"
 #include "controlpanel/controlpanel.h"
+#include "workspacesettings.h"
 
 using namespace library;
 using namespace project;
@@ -42,22 +43,15 @@ using namespace project;
 
 Workspace::Workspace(const QDir& workspaceDir) :
     QObject(0), mWorkspaceDir(workspaceDir),
-    mMetadataDir(workspaceDir.absoluteFilePath(".metadata" % QDir::separator())),
     mWorkspaceSettings(0), mControlPanel(0), mLibrary(0), mLibraryEditor(0),
     mProjectTreeModel(0), mRecentProjectsModel(0), mFavoriteProjectsModel(0)
 {
     mWorkspaceDir.makeAbsolute();
-    mMetadataDir.makeAbsolute();
 
-    if ((!mWorkspaceDir.exists()) || (!mMetadataDir.exists()))
-        throw RuntimeError(QString("Invalid workspace path: \"%1\"")
-                           .arg(mWorkspaceDir.absolutePath()), __FILE__, __LINE__);
+    if (!mWorkspaceDir.exists())
+        throw RuntimeError(QString("Invalid workspace path: \"%1\"").arg(workspaceDir.path()), __FILE__, __LINE__);
 
-    mWorkspaceSettings = new QSettings(mMetadataDir.absoluteFilePath("settings.ini"), QSettings::IniFormat);
-
-    if ((!mWorkspaceSettings->isWritable()) || (mWorkspaceSettings->status() != QSettings::NoError))
-        throw RuntimeError("Error with the workspace settings! Check file permissions!",
-                           __FILE__, __LINE__);
+    mWorkspaceSettings = new WorkspaceSettings(this, mWorkspaceDir.absoluteFilePath(".metadata" % QDir::separator()));
 
     // all OK, let's load the workspace stuff!
 

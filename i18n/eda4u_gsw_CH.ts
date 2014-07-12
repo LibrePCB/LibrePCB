@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="de_DE">
+<TS version="2.1" language="gsw_CH">
 <context>
     <name>ControlPanel</name>
     <message>
@@ -13,7 +13,7 @@
         <location filename="../src/workspace/controlpanel/controlpanel.ui" line="445"/>
         <location filename="../src/workspace/controlpanel/controlpanel.cpp" line="253"/>
         <source>New Project</source>
-        <translation>Neues Projekt</translation>
+        <translation>Nüüs Projekt</translation>
     </message>
     <message>
         <location filename="../src/workspace/controlpanel/controlpanel.ui" line="117"/>
@@ -21,12 +21,12 @@
         <location filename="../src/workspace/controlpanel/controlpanel.cpp" line="155"/>
         <location filename="../src/workspace/controlpanel/controlpanel.cpp" line="224"/>
         <source>Open Project</source>
-        <translation>Projekt öffnen</translation>
+        <translation>Projekt öffnä</translation>
     </message>
     <message>
         <location filename="../src/workspace/controlpanel/controlpanel.ui" line="134"/>
         <source>Library Editor</source>
-        <translation>Bibliotheks-Editor</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/workspace/controlpanel/controlpanel.ui" line="186"/>
@@ -153,7 +153,7 @@
     <message>
         <location filename="../src/library_editor/libraryeditor.ui" line="14"/>
         <source>Library Editor</source>
-        <translation type="unfinished">Bibliotheks-Editor</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -400,7 +400,7 @@
     <message>
         <location filename="../src/workspace/workspacesettingsdialog.ui" line="113"/>
         <source>Library Editor</source>
-        <translation type="unfinished">Bibliotheks-Editor</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/workspace/workspacesettingsdialog.ui" line="154"/>
@@ -415,7 +415,7 @@
     <message>
         <location filename="../src/workspace/workspacesettingsdialog.ui" line="188"/>
         <source>Changing the language needs to restart the application.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nachem Ändere vode Sprach muesch s&apos;Programm nüü starte.</translation>
     </message>
     <message>
         <location filename="../src/workspace/workspacesettingsdialog.ui" line="198"/>

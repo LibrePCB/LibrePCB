@@ -75,6 +75,24 @@ class Length
 {
     public:
 
+        // Types
+
+        /**
+         * @brief The MeasurementUnit type
+         *
+         * This type is used to specify the measurement unit which is used for something,
+         * for example the unit for the grid of a CADView.
+         *
+         * @see Length::measurementUnitToString(), Length::measurementUnitFromString()
+         */
+        enum MeasurementUnit {
+            millimeters,
+            micrometers,
+            inches,
+            mils
+        };
+
+
         //  Constructors
 
         /**
@@ -341,6 +359,32 @@ class Length
          * (which is often required), you need to call mapToGrid() afterwards!
          */
         static Length fromPx(qreal pixels, const Length& gridInterval = Length(0));
+
+        /**
+         * @brief Convert a MeasurementUnit value to a string
+         *
+         * This method is useful to save a measurement unit in textfiles (like ini
+         * or xml). This is much better than simple store the integer value of the enum!
+         *
+         * @param unit  The unit to convert
+         *
+         * @return The unit as a string
+         */
+        static QString measurementUnitToString(MeasurementUnit unit);
+
+        /**
+         * @brief Convert a string to a MeasurementUnit value
+         *
+         * This method is useful to load a measurement unit from textfiles (like ini
+         * or xml). This is much better than simple store the integer value of the enum!
+         *
+         * @param unit  The unit as a string (converted with measurementUnitToString())
+         * @param defaultValue  The value which will be returned if the conversion fails
+         *
+         * @return The converted MeasurementUnit value
+         */
+        static MeasurementUnit measurementUnitFromString(const QString& unit,
+                                                         MeasurementUnit defaultValue);
 
         // Operators
         Length& operator=(const Length& rhs)        {mNanometers = rhs.mNanometers; return *this;}

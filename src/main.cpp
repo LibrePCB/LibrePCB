@@ -54,9 +54,14 @@ int main(int argc, char* argv[])
     qtTranslator.load("qt_" % QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
     app.installTranslator(&qtTranslator);
 
+    // Install system language translations (all system languages defined in the system settings, in the defined order)
+    QTranslator systemTranslator;
+    systemTranslator.load(QLocale::system(), "eda4u", "_", ":/i18n/");
+    app.installTranslator(&systemTranslator);
+
     // Install language translations (like "de" for German)
     QTranslator appTranslator1;
-    appTranslator1.load("eda4u_" % QLocale::system().name().left(2), ":/i18n");
+    appTranslator1.load("eda4u_" % QLocale::system().name().split("_").at(0), ":/i18n");
     app.installTranslator(&appTranslator1);
 
     // Install language/country translations (like "de_ch" for German/Switzerland)

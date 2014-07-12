@@ -25,6 +25,7 @@
 #include <QtWidgets>
 #include "recentprojectsmodel.h"
 #include "workspace.h"
+#include "workspacesettings.h"
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -33,7 +34,7 @@
 RecentProjectsModel::RecentProjectsModel(Workspace* workspace) :
     QAbstractListModel(0), mWorkspace(workspace)
 {
-    QSettings settings(mWorkspace->getWorkspaceSettingsIniFilename(), QSettings::IniFormat);
+    QSettings settings(mWorkspace->getSettings()->getFilepath(), QSettings::IniFormat);
     int count = settings.beginReadArray("recent_projects");
     for (int i = 0; i < count; i++)
     {
@@ -55,6 +56,19 @@ RecentProjectsModel::~RecentProjectsModel()
  *  General Methods
  ****************************************************************************************/
 
+void RecentProjectsModel::save()
+{
+    // save the new list in the workspace
+    QSettings settings(mWorkspace->getSettings()->getFilepath(), QSettings::IniFormat);
+    settings.beginWriteArray("recent_projects");
+    for (int i = 0; i < mRecentProjects.count(); i++)
+    {
+        settings.setArrayIndex(i);
+        settings.setValue("filepath", mRecentProjects.at(i).filePath());
+    }
+    settings.endArray();
+}
+
 void RecentProjectsModel::setLastRecentProject(const QString& filename)
 {
     QFileInfo fileInfo(filename);
@@ -70,6 +84,7 @@ void RecentProjectsModel::setLastRecentProject(const QString& filename)
             beginMoveRows(QModelIndex(), i, i, QModelIndex(), 0);
             mRecentProjects.move(i, 0);
             endMoveRows();
+            save();
             return;
         }
     }
@@ -86,16 +101,7 @@ void RecentProjectsModel::setLastRecentProject(const QString& filename)
     beginInsertRows(QModelIndex(), 0, 0);
     mRecentProjects.prepend(fileInfo);
     endInsertRows();
-
-    // save the new list in the workspace
-    QSettings settings(mWorkspace->getWorkspaceSettingsIniFilename(), QSettings::IniFormat);
-    settings.beginWriteArray("recent_projects");
-    for (int i = 0; i < mRecentProjects.count(); i++)
-    {
-        settings.setArrayIndex(i);
-        settings.setValue("filepath", mRecentProjects.at(i).filePath());
-    }
-    settings.endArray();
+    save();
 }
 
 /*****************************************************************************************

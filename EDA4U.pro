@@ -38,9 +38,10 @@ unix:!macx {
     INSTALLS += target icon desktop mimexml mimedesktop
 }
 
-TRANSLATIONS = i18n/eda4u_en.ts \
+TRANSLATIONS = \
     i18n/eda4u_de.ts \
-    i18n/eda4u_de_CH.ts
+    i18n/eda4u_de_CH.ts \
+    i18n/eda4u_gsw_CH.ts
 
 RESOURCES += \
     ressources.qrc \
@@ -74,7 +75,9 @@ SOURCES += \
     src/project/schematics/schematiceditor.cpp \
     src/project/circuit/circuit.cpp \
     src/workspace/recentprojectsmodel.cpp \
-    src/workspace/favoriteprojectsmodel.cpp
+    src/workspace/favoriteprojectsmodel.cpp \
+    src/workspace/workspacesettings.cpp \
+    src/workspace/workspacesettingsdialog.cpp
 
 HEADERS += \
     src/common/units.h \
@@ -103,11 +106,14 @@ HEADERS += \
     src/project/circuit/circuit.h \
     src/workspace/recentprojectsmodel.h \
     src/workspace/favoriteprojectsmodel.h \
-    src/common/exceptions.h
+    src/common/exceptions.h \
+    src/workspace/workspacesettings.h \
+    src/workspace/workspacesettingsdialog.h
 
 FORMS += \
     src/workspace/controlpanel/controlpanel.ui \
     src/workspace/workspacechooserdialog.ui \
     src/library_editor/libraryeditor.ui \
-    src/project/schematics/schematiceditor.ui
+    src/project/schematics/schematiceditor.ui \
+    src/workspace/workspacesettingsdialog.ui
 

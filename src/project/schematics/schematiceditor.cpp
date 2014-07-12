@@ -26,6 +26,8 @@
 #include "schematiceditor.h"
 #include "ui_schematiceditor.h"
 #include "../project.h"
+#include "../../workspace/workspace.h"
+#include "../../workspace/workspacesettings.h"
 
 namespace project {
 
@@ -33,18 +35,28 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SchematicEditor::SchematicEditor(Project* project) :
-    QMainWindow(0), mProject(project), mUi(new Ui::SchematicEditor)
+SchematicEditor::SchematicEditor(Workspace* workspace, Project* project) :
+    QMainWindow(0), mWorkspace(workspace), mProject(project), mUi(new Ui::SchematicEditor)
 {
     mUi->setupUi(this);
 
     // connect some actions which are created with the Qt Designer
     connect(mUi->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
     connect(mUi->actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
+
+    // Restore Window Geometry
+    QSettings s(mWorkspace->getSettings()->getFilepath(), QSettings::IniFormat);
+    restoreGeometry(s.value("schematic_editor/window_geometry").toByteArray());
+    restoreState(s.value("schematic_editor/window_state").toByteArray());
 }
 
 SchematicEditor::~SchematicEditor()
 {
+    // Save Window Geometry
+    QSettings s(mWorkspace->getSettings()->getFilepath(), QSettings::IniFormat);
+    s.setValue("schematic_editor/window_geometry", saveGeometry());
+    s.setValue("schematic_editor/window_state", saveState());
+
     delete mUi;     mUi = 0;
 }
 

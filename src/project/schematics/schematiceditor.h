@@ -31,6 +31,8 @@
  *  Forward Declarations
  ****************************************************************************************/
 
+class Workspace;
+
 namespace Ui {
 class SchematicEditor;
 }
@@ -55,7 +57,7 @@ class SchematicEditor : public QMainWindow
     public:
 
         // Constructors / Destructor
-        explicit SchematicEditor(Project* project);
+        explicit SchematicEditor(Workspace* workspace, Project* project);
         ~SchematicEditor();
 
     protected:
@@ -74,6 +76,8 @@ class SchematicEditor : public QMainWindow
         SchematicEditor(const SchematicEditor& other);
         SchematicEditor& operator=(const SchematicEditor& rhs);
 
+        // General Attributes
+        Workspace* mWorkspace;
         Project* mProject;
         Ui::SchematicEditor* mUi;
 };

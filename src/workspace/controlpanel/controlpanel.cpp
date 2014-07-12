@@ -27,6 +27,7 @@
 #include "controlpanel.h"
 #include "ui_controlpanel.h"
 #include "../workspace.h"
+#include "../workspacesettings.h"
 #include "../../project/project.h"
 #include "../projecttreemodel.h"
 #include "../projecttreeitem.h"
@@ -53,6 +54,7 @@ ControlPanel::ControlPanel(Workspace* workspace, QAbstractItemModel* projectTree
     connect(mUi->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
     connect(mUi->actionOpen_Library_Editor, SIGNAL(triggered()), mWorkspace, SLOT(openLibraryEditor()));
     connect(mUi->actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
+    connect(mUi->actionWorkspace_Settings, SIGNAL(triggered()), mWorkspace->getSettings(), SLOT(showSettingsDialog()));
 
     mUi->projectTreeView->setModel(projectTreeModel);
     mUi->recentProjectsListView->setModel(recentProjectsModel);
@@ -88,7 +90,7 @@ void ControlPanel::closeEvent(QCloseEvent *event)
 
 void ControlPanel::saveSettings()
 {
-    QSettings settings(mWorkspace->getWorkspaceSettingsIniFilename(), QSettings::IniFormat);
+    QSettings settings(mWorkspace->getSettings()->getFilepath(), QSettings::IniFormat);
 
     // main window
     settings.setValue("controlpanel/window_geometry", saveGeometry());
@@ -112,7 +114,7 @@ void ControlPanel::saveSettings()
 
 void ControlPanel::loadSettings()
 {
-    QSettings settings(mWorkspace->getWorkspaceSettingsIniFilename(), QSettings::IniFormat);
+    QSettings settings(mWorkspace->getSettings()->getFilepath(), QSettings::IniFormat);
 
     // main window
     restoreGeometry(settings.value("controlpanel/window_geometry").toByteArray());
@@ -146,7 +148,7 @@ void ControlPanel::on_actionAbout_triggered()
 
 void ControlPanel::on_actionOpen_Project_triggered()
 {
-    QSettings settings(mWorkspace->getWorkspaceSettingsIniFilename(), QSettings::IniFormat);
+    QSettings settings(mWorkspace->getSettings()->getFilepath(), QSettings::IniFormat);
     QString lastOpenedFile = settings.value("controlpanel/last_open_project",
                              mWorkspace->getWorkspaceDir().absolutePath()).toString();
 
