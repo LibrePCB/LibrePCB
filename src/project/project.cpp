@@ -25,6 +25,7 @@
 #include "project.h"
 #include "../common/exceptions.h"
 #include "../workspace/workspace.h"
+#include "library/projectlibrary.h"
 #include "circuit/circuit.h"
 #include "schematics/schematiceditor.h"
 
@@ -35,12 +36,14 @@ namespace project {
  ****************************************************************************************/
 
 Project::Project(Workspace* workspace, const QString& filename) :
-    QObject(0), mWorkspace(workspace), mFileInfo(filename), mHasUnsavedChanges(false)
+    QObject(0), mWorkspace(workspace), mFileInfo(filename), mUndoStack(0)
 {
     if ((!mFileInfo.exists()) || (!mFileInfo.isFile()) || (mFileInfo.suffix() != "e4u"))
         throw RuntimeError(QString("Invalid project file: \"%1\"").arg(filename), __FILE__, __LINE__);
 
-    mCircuit = new Circuit(this);
+    mUndoStack = new QUndoStack(0);
+    mProjectLibrary = new ProjectLibrary(mWorkspace, this);
+    mCircuit = new Circuit(mWorkspace, this);
     mSchematicEditor = new SchematicEditor(mWorkspace, this);
 }
 
@@ -50,6 +53,8 @@ Project::~Project()
 
     delete mSchematicEditor;        mSchematicEditor = 0;
     delete mCircuit;                mCircuit = 0;
+    delete mProjectLibrary;         mProjectLibrary = 0;
+    delete mUndoStack;              mUndoStack = 0;
 }
 
 /*****************************************************************************************
@@ -82,17 +87,15 @@ void Project::showSchematicEditor()
 
 void Project::save()
 {
-    if (!mHasUnsavedChanges)
+    if (mUndoStack->isClean())
         return;
 
     // todo: save project
-
-    mHasUnsavedChanges = false;
 }
 
 bool Project::close(QWidget* messageBoxParent)
 {
-    if (!mHasUnsavedChanges)
+    if (mUndoStack->isClean())
     {
         // no unsaved changes --> the project can be closed
         deleteLater();  // this project object will be deleted later in the event loop

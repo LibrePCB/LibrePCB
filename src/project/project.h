@@ -25,7 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QMainWindow>
+#include <QtWidgets>
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -34,6 +34,7 @@
 class Workspace;
 
 namespace project {
+class ProjectLibrary;
 class Circuit;
 class SchematicEditor;
 }
@@ -47,9 +48,21 @@ namespace project {
 /**
  * @brief The Project class
  *
- * @todo this is only a stub class...
+ * This class represents a whole project with all the content of its directory:
+ *  - circuit with schematics and boards
+ *  - the project's library
+ *  - project settings
+ *  - an schematic editor, board editor and other windows
+ *  - ...
+ *
+ * Project objects will be created in a Workspace object. The constructor of the Project
+ * class needs the filepath to a project file. Then the project will be opened. The
+ * destructor will close the project (without saving). Use the method #save() to write the
+ * whole project to the harddisc.
+ *
+ * The project uses the "Command Design Pattern" for undo/redo actions. See #mUndoStack.
  */
-class Project : public QObject
+class Project final : public QObject
 {
         Q_OBJECT
 
@@ -63,6 +76,7 @@ class Project : public QObject
         QString getFilename() const {return mFileInfo.filePath();}
         QString getUniqueFilename() const {return uniqueProjectFilename(getFilename());}
         QDir getDir() const {return mFileInfo.dir();}
+        const QUndoStack* getUndoStack() const {return mUndoStack;}
 
         // General Methods
         bool windowIsAboutToClose(QMainWindow* window);
@@ -87,9 +101,29 @@ class Project : public QObject
         QFileInfo mFileInfo; ///< a QFileinfo object of the project file (*.e4u)
 
         // General
-        bool mHasUnsavedChanges;
+        ProjectLibrary* mProjectLibrary;
         Circuit* mCircuit;
         SchematicEditor* mSchematicEditor;
+
+        /**
+         * @brief The undo stack of all commands applied to the project (used for undo/redo)
+         *
+         * All applied commands to the project are stored in this stack. Each command is an
+         * object which inherits from QUndoCommand. The stack is also used to determine if
+         * the state of the project has changed since it was saved the last time.
+         *
+         * @warning Each change to the whole project must be implemented as a QUndoCommand
+         * and must be pushed to this undo stack! Other changes will not activate the save
+         * action in the toolbar, and maybe cause other problems. Only changes not related
+         * to the circuit/board/schematic/..., like project/user-specific settings, cached
+         * data, window positions and so on, do not need to be pushed to the undo stack as
+         * an undo command does not make sense on such changes.
+         *
+         * @note For more information about the whole undo/redo concept, read the documentation
+         * "Overview of Qt's Undo Framework" (http://qt-project.org/doc/qt-5/qundo.html)
+         * and other documentations about the "Command Design Pattern".
+         */
+        QUndoStack* mUndoStack;
 
 };
 

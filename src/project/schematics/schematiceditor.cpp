@@ -44,6 +44,20 @@ SchematicEditor::SchematicEditor(Workspace* workspace, Project* project) :
     connect(mUi->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
     connect(mUi->actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 
+    // connect the undo/redo actions with the QUndoStack of the project
+    connect(mProject->getUndoStack(), &QUndoStack::undoTextChanged,
+            [this](const QString& text){mUi->actionUndo->setText(text);});
+    mUi->actionUndo->setText(mProject->getUndoStack()->undoText());
+    connect(mProject->getUndoStack(), &QUndoStack::canUndoChanged,
+            [this](bool can){mUi->actionUndo->setEnabled(can);});
+    mUi->actionUndo->setEnabled(mProject->getUndoStack()->canUndo());
+    connect(mProject->getUndoStack(), &QUndoStack::redoTextChanged,
+            [this](const QString& text){mUi->actionRedo->setText(text);});
+    mUi->actionRedo->setText(mProject->getUndoStack()->redoText());
+    connect(mProject->getUndoStack(), &QUndoStack::canRedoChanged,
+            [this](bool can){mUi->actionRedo->setEnabled(can);});
+    mUi->actionRedo->setEnabled(mProject->getUndoStack()->canRedo());
+
     // Restore Window Geometry
     QSettings s(mWorkspace->getSettings()->getFilepath(), QSettings::IniFormat);
     restoreGeometry(s.value("schematic_editor/window_geometry").toByteArray());

@@ -17,68 +17,59 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CIRCUIT_H
-#define PROJECT_CIRCUIT_H
+#ifndef PROJECT_BOARD_H
+#define PROJECT_BOARD_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
+#include <QtWidgets>
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
-class QDomDocument;
-class QDomElement;
-
 class Workspace;
 
 namespace project {
 class Project;
+class Circuit;
 }
 
 /*****************************************************************************************
- *  Class SchematicEditor
+ *  Class Board
  ****************************************************************************************/
 
 namespace project {
 
-class Circuit final : public QObject
+/**
+ * @brief The Board class
+ */
+class Board final : public QObject
 {
         Q_OBJECT
 
     public:
 
-        // Constructors / Destructor
-        explicit Circuit(Workspace* workspace, Project* project);
-        ~Circuit();
-
-        // General Methods
-        void save();
+        explicit Board(Workspace* workspace, Project* project, Circuit* circuit);
+        ~Board();
 
     private:
 
         // make some methods inaccessible...
-        Circuit();
-        Circuit(const Circuit& other);
-        Circuit& operator=(const Circuit& rhs);
+        Board();
+        Board(const Board& other);
+        Board& operator=(const Board& rhs);
 
         // General
         Workspace* mWorkspace; ///< A pointer to the Workspace object (from the constructor)
         Project* mProject; ///< A pointer to the Project object (from the constructor)
-
-        // File "core/circuit.xml"
-        QString mXmlFilepath;
-        QDomDocument* mDomDocument;
-        QDomElement* mRootDomElement;
-
-        // Circuit Attributes from the XML file
-        QUuid mUuid;
+        Circuit* mCircuit; ///< A pointer to the Circuit object (from the constructor)
 
 };
 
 } // namespace project
 
-#endif // PROJECT_CIRCUIT_H
+#endif // PROJECT_BOARD_H

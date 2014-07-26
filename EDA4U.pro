@@ -77,7 +77,10 @@ SOURCES += \
     src/workspace/recentprojectsmodel.cpp \
     src/workspace/favoriteprojectsmodel.cpp \
     src/workspace/workspacesettings.cpp \
-    src/workspace/workspacesettingsdialog.cpp
+    src/workspace/workspacesettingsdialog.cpp \
+    src/project/schematics/schematic.cpp \
+    src/project/boards/board.cpp \
+    src/project/library/projectlibrary.cpp
 
 HEADERS += \
     src/common/units.h \
@@ -108,7 +111,10 @@ HEADERS += \
     src/workspace/favoriteprojectsmodel.h \
     src/common/exceptions.h \
     src/workspace/workspacesettings.h \
-    src/workspace/workspacesettingsdialog.h
+    src/workspace/workspacesettingsdialog.h \
+    src/project/schematics/schematic.h \
+    src/project/boards/board.h \
+    src/project/library/projectlibrary.h
 
 FORMS += \
     src/workspace/controlpanel/controlpanel.ui \
