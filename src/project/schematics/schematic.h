@@ -26,6 +26,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
+#include "../../common/cadscene.h"
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -45,9 +46,13 @@ class Circuit;
 namespace project {
 
 /**
- * @brief The Schematic class
+ * @brief The Schematic class represents one schematic page of a project and is always
+ * part of a circuit
+ *
+ * This class inherits from QGraphicsScene (through CADScene). This way, a schematic page
+ * can be shown directly in a QGraphicsView (resp. CADView).
  */
-class Schematic final : public QObject
+class Schematic final : public CADScene
 {
         Q_OBJECT
 

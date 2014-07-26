@@ -23,7 +23,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include "board.h"
+#include "genericcomponentinstance.h"
 
 namespace project {
 
@@ -31,12 +31,13 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Board::Board(Workspace* workspace, Project* project, Circuit* circuit) :
-    CADScene(), mWorkspace(workspace), mProject(project), mCircuit(circuit)
+GenericComponentInstance::GenericComponentInstance(Workspace* workspace, Project* project,
+                                                   Circuit* circuit) :
+    QObject(0), mWorkspace(workspace), mProject(project), mCircuit(circuit)
 {
 }
 
-Board::~Board()
+GenericComponentInstance::~GenericComponentInstance()
 {
 }
 

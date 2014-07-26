@@ -23,7 +23,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include "board.h"
+#include "netclass.h"
 
 namespace project {
 
@@ -31,12 +31,12 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Board::Board(Workspace* workspace, Project* project, Circuit* circuit) :
-    CADScene(), mWorkspace(workspace), mProject(project), mCircuit(circuit)
+NetClass::NetClass(Workspace* workspace, Project* project, Circuit* circuit) :
+    QObject(0), mWorkspace(workspace), mProject(project), mCircuit(circuit)
 {
 }
 
-Board::~Board()
+NetClass::~NetClass()
 {
 }
 

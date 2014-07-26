@@ -58,7 +58,6 @@ class CADScene : public QGraphicsScene
     private:
 
         // make some methods inaccessible...
-        CADScene();
         CADScene(const CADScene& other);
         CADScene& operator=(const CADScene& rhs);
 

@@ -32,7 +32,7 @@ namespace project {
  ****************************************************************************************/
 
 Schematic::Schematic(Workspace* workspace, Project* project, Circuit* circuit) :
-    QObject(0), mWorkspace(workspace), mProject(project), mCircuit(circuit)
+    CADScene(), mWorkspace(workspace), mProject(project), mCircuit(circuit)
 {
 }
 

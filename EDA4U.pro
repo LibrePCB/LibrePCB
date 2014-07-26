@@ -80,7 +80,10 @@ SOURCES += \
     src/workspace/workspacesettingsdialog.cpp \
     src/project/schematics/schematic.cpp \
     src/project/boards/board.cpp \
-    src/project/library/projectlibrary.cpp
+    src/project/library/projectlibrary.cpp \
+    src/project/circuit/netclass.cpp \
+    src/project/circuit/netsignal.cpp \
+    src/project/circuit/genericcomponentinstance.cpp
 
 HEADERS += \
     src/common/units.h \
@@ -114,7 +117,10 @@ HEADERS += \
     src/workspace/workspacesettingsdialog.h \
     src/project/schematics/schematic.h \
     src/project/boards/board.h \
-    src/project/library/projectlibrary.h
+    src/project/library/projectlibrary.h \
+    src/project/circuit/netclass.h \
+    src/project/circuit/netsignal.h \
+    src/project/circuit/genericcomponentinstance.h
 
 FORMS += \
     src/workspace/controlpanel/controlpanel.ui \

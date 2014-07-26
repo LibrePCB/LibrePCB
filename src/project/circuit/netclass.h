@@ -17,16 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_BOARD_H
-#define PROJECT_BOARD_H
+#ifndef PROJECT_NETCLASS_H
+#define PROJECT_NETCLASS_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QtWidgets>
-#include "../../common/cadscene.h"
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -40,40 +38,38 @@ class Circuit;
 }
 
 /*****************************************************************************************
- *  Class Board
+ *  Class NetClass
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The Board class represents a PCB of a project and is always part of a circuit
- *
- * This class inherits from QGraphicsScene (through CADScene). This way, a Board can be
- * shown directly in a QGraphicsView (resp. CADView).
+ * @brief The NetClass class
  */
-class Board final : public CADScene
+class NetClass : public QObject
 {
         Q_OBJECT
 
     public:
 
-        explicit Board(Workspace* workspace, Project* project, Circuit* circuit);
-        ~Board();
+        // Constructors / Destructor
+        explicit NetClass(Workspace* workspace, Project* project, Circuit* circuit);
+        ~NetClass();
 
     private:
 
         // make some methods inaccessible...
-        Board();
-        Board(const Board& other);
-        Board& operator=(const Board& rhs);
+        NetClass();
+        NetClass(const NetClass& other);
+        NetClass& operator=(const NetClass& rhs);
 
         // General
-        Workspace* mWorkspace; ///< A pointer to the Workspace object (from the constructor)
-        Project* mProject; ///< A pointer to the Project object (from the constructor)
-        Circuit* mCircuit; ///< A pointer to the Circuit object (from the constructor)
+        Workspace* mWorkspace;
+        Project* mProject;
+        Circuit* mCircuit;
 
 };
 
 } // namespace project
 
-#endif // PROJECT_BOARD_H
+#endif // PROJECT_NETCLASS_H
