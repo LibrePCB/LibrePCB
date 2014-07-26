@@ -162,6 +162,11 @@ void ControlPanel::on_actionOpen_Project_triggered()
     mWorkspace->openProject(filename);
 }
 
+void ControlPanel::on_actionClose_all_open_projects_triggered()
+{
+    mWorkspace->closeAllProjects(true);
+}
+
 void ControlPanel::on_projectTreeView_clicked(const QModelIndex& index)
 {
     ProjectTreeItem* item = static_cast<ProjectTreeItem*>(index.internalPointer());

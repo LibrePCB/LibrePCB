@@ -87,10 +87,19 @@ Project* Workspace::openProject(const QString& filename)
 
     if (!openProject)
     {
-        openProject = new Project(this, filename);
-        mOpenProjects.insert(Project::uniqueProjectFilename(filename), openProject);
-        mRecentProjectsModel->setLastRecentProject(filename);
-        openProject->showSchematicEditor();
+        try
+        {
+            openProject = new Project(this, filename);
+            mOpenProjects.insert(Project::uniqueProjectFilename(filename), openProject);
+            mRecentProjectsModel->setLastRecentProject(filename);
+            openProject->showSchematicEditor();
+        }
+        catch (Exception& e)
+        {
+            QMessageBox::critical(mControlPanel, tr("Error while opening project"),
+                          QString(tr("The project \"%1\" could not be opened!\n\nError: %2"))
+                          .arg(filename, e.getMsg()));
+        }
     }
 
     return openProject;

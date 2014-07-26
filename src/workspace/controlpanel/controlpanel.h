@@ -70,6 +70,7 @@ class ControlPanel : public QMainWindow
         // Actions
         void on_actionAbout_triggered();
         void on_actionOpen_Project_triggered();
+        void on_actionClose_all_open_projects_triggered();
         void on_projectTreeView_clicked(const QModelIndex& index);
         void on_projectTreeView_doubleClicked(const QModelIndex& index);
         void on_projectTreeView_customContextMenuRequested(const QPoint& pos);

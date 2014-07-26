@@ -376,6 +376,7 @@ QListView::item
     </property>
     <addaction name="actionNew_Project"/>
     <addaction name="actionOpen_Project"/>
+    <addaction name="actionClose_all_open_projects"/>
     <addaction name="separator"/>
     <addaction name="actionSwitch_Workspace"/>
     <addaction name="separator"/>
@@ -475,6 +476,15 @@ QListView::item
    </property>
    <property name="text">
     <string>Open Library Editor</string>
+   </property>
+  </action>
+  <action name="actionClose_all_open_projects">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/close.png</normaloff>:/img/actions/close.png</iconset>
+   </property>
+   <property name="text">
+    <string>Close all open projects</string>
    </property>
   </action>
  </widget>
