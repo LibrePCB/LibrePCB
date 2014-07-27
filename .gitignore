@@ -25,3 +25,6 @@ build/
 
 # Workspace
 dev/workspace/.metadata/settings.ini
+
+# Compiled Translation Files
+i18n/*.qm
