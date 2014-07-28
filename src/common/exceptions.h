@@ -44,6 +44,9 @@
  * The Exception class adds member variables for a message, and the filename and line number
  * where the exception was thrown. They all must be passed to the constructor.
  *
+ * @note Every exception will automatically print a debug message (see #Debug) of type
+ *       Debug::DebugLevel::Exception.
+ *
  * Example how to use exceptions:
  *
  * @code
@@ -77,14 +80,37 @@ class Exception : public QException
 {
     public:
 
-        Exception(const QString& msg, const char* file = "", int line = 0) :
-            mMsg(msg), mFile(file), mLine(line) {}
+        // Constructor
+
+        /**
+         * @brief The constructor which is used to throw an exception
+         *
+         * @param msg   An error message (always in english!)
+         * @param file  The source file where the exception was thrown (use __FILE__)
+         * @param line  The line number where the exception was thrown (use __LINE__)
+         */
+        Exception(const QString& msg, const char* file, int line);
+
 
         // Getters
-        virtual const char* getType()   const {return "Exception";}
-        const QString&      getMsg()    const {return mMsg;}
-        const QString&      getFile()   const {return mFile;}
-        int                 getLine()   const {return mLine;}
+
+        /**
+         * @brief Get the error message
+         * @return The error message
+         */
+        const QString&  getMsg()    const {return mMsg;}
+
+        /**
+         * @brief Get the source file where the exception was thrown
+         * @return The filename
+         */
+        const QString&  getFile()   const {return mFile;}
+
+        /**
+         * @brief Get the line number where the exception was thrown
+         * @return The line number
+         */
+        int             getLine()   const {return mLine;}
 
         /**
          * @brief Get a debug string with all important informations of the exception
@@ -92,11 +118,7 @@ class Exception : public QException
          * @return A QString like "[LogicError] foobar not found!
          *                         (thrown in main.cpp at line 42)"
          */
-        QString getDebugString() const
-        {
-            return QString("[%1] %2 (thrown in %3 at line %4)")
-                    .arg(getType()).arg(mMsg).arg(mFile).arg(mLine);
-        }
+        QString getDebugString() const;
 
         /**
          * @brief reimplemented from std::exception::what()
@@ -104,16 +126,12 @@ class Exception : public QException
          * @warning This method is only for compatibility reasons with the base class
          * std::exception. Normally, you should not use this method. Use getMsg() instead!
          *
-         * @return the message as a UTF-8 C-string (const char*)
+         * @return the message as a C-string (const char*) in the local encoding
          */
-        const char* what() const noexcept override
-        {
-            static QByteArray utf8string;
-            utf8string = mMsg.toUtf8();
-            return utf8string.constData();
-        }
+        const char* what() const noexcept override;
 
-        // Inherited from QException
+
+        // Inherited from QException (see QException documentation for more details)
         virtual void raise() const {throw *this;}
         virtual Exception* clone() const {return new Exception(*this);}
 
@@ -146,11 +164,10 @@ class LogicError : public Exception
 {
     public:
 
-        LogicError(const QString& msg, const char* file = "", int line = 0) :
-            Exception(msg, file, line) {}
-
-        // Getters
-        virtual const char* getType() const {return "LogicError";}
+        /**
+         * @copydoc Exception::Exception
+         */
+        LogicError(const QString& msg, const char* file, int line);
 
         // Inherited from Exception
         virtual void raise() const {throw *this;}
@@ -177,11 +194,10 @@ class RuntimeError : public Exception
 {
     public:
 
-        RuntimeError(const QString& msg, const char* file = "", int line = 0) :
-            Exception(msg, file, line) {}
-
-        // Getters
-        virtual const char* getType() const {return "RuntimeError";}
+        /**
+         * @copydoc Exception::Exception
+         */
+        RuntimeError(const QString& msg, const char* file, int line);
 
         // Inherited from Exception
         virtual void raise() const {throw *this;}
@@ -208,11 +224,10 @@ class RangeError : public Exception
 {
     public:
 
-        RangeError(const QString& msg, const char* file = "", int line = 0) :
-            Exception(msg, file, line) {}
-
-        // Getters
-        virtual const char* getType() const {return "RangeError";}
+        /**
+         * @copydoc Exception::Exception
+         */
+        RangeError(const QString& msg, const char* file, int line);
 
         // Inherited from Exception
         virtual void raise() const {throw *this;}

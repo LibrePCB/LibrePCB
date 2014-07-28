@@ -124,6 +124,9 @@ void Debug::print(DebugLevel level, const QString& msg, const char* file, int li
         case Warning:
             levelStr = "WARNING";
             break;
+        case Exception:
+            levelStr = "EXCEPTION";
+            break;
         case Critical:
             levelStr = "CRITICAL";
             break;

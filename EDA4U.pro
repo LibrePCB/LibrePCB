@@ -76,6 +76,7 @@ SOURCES += \
     src/project/circuit/circuit.cpp \
     src/workspace/recentprojectsmodel.cpp \
     src/workspace/favoriteprojectsmodel.cpp \
+    src/common/exceptions.cpp \
     src/workspace/workspacesettings.cpp \
     src/workspace/workspacesettingsdialog.cpp \
     src/project/schematics/schematic.cpp \

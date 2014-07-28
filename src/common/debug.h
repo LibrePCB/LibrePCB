@@ -39,6 +39,9 @@
  * Qt's debug functions qDebug(), qWarning(), qCritical() and qFatal(). You can use
  * these functions in your source code, and the Debug class will handle these messages.
  *
+ * Additionally, all exceptions of the type Exception (from exceptions.h) or a subclass
+ * of it, will automatically print a debug message of type Debug::DebugLevel::Exception.
+ *
  * This class can write messages to the stderr output and to a log file. You can set
  * seperate debug levels for both. By default, logging to a file is disabled.
  *
@@ -58,9 +61,10 @@ class Debug final
             Nothing = 0,    ///< 0: nothing
             Fatal,          ///< 1: fatal errors [qFatal()] --> this will quit the application!
             Critical,       ///< 2: errors [qCritical()]
-            Warning,        ///< 3: warnings [qWarning()]
-            DebugMsg,       ///< 4: irrelevant debug messages (a lot of messages!) [qDebug()]
-            All,            ///< 5: all
+            Exception,      ///< 3: throwed exceptions of (sub)class Exception
+            Warning,        ///< 4: warnings [qWarning()]
+            DebugMsg,       ///< 5: irrelevant debug messages (a lot of messages!) [qDebug()]
+            All,            ///< 6: all
         };
 
 
