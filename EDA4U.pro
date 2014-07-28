@@ -83,7 +83,8 @@ SOURCES += \
     src/project/library/projectlibrary.cpp \
     src/project/circuit/netclass.cpp \
     src/project/circuit/netsignal.cpp \
-    src/project/circuit/genericcomponentinstance.cpp
+    src/project/circuit/genericcomponentinstance.cpp \
+    src/common/debug.cpp
 
 HEADERS += \
     src/common/units.h \
@@ -120,7 +121,8 @@ HEADERS += \
     src/project/library/projectlibrary.h \
     src/project/circuit/netclass.h \
     src/project/circuit/netsignal.h \
-    src/project/circuit/genericcomponentinstance.h
+    src/project/circuit/genericcomponentinstance.h \
+    src/common/debug.h
 
 FORMS += \
     src/workspace/controlpanel/controlpanel.ui \

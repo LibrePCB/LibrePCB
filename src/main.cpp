@@ -24,6 +24,7 @@
 #include <QtCore>
 #include <QApplication>
 #include <QTranslator>
+#include "common/debug.h"
 #include "common/exceptions.h"
 #include "workspace/workspace.h"
 #include "workspace/workspacechooserdialog.h"
@@ -36,10 +37,8 @@ int main(int argc, char* argv[])
 {
     QApplication app(argc, argv);
 
-    // this is to remove the ugly frames around widgets in all status bars...
-    // (from http://www.qtcentre.org/threads/1904)
-    app.setStyleSheet("QStatusBar::item { border: 0px solid black; }");
-
+    // Set the organization / application names must be done very early because some other
+    // classes will use these values (for example QSettings, Debug (for the file logging path))!
     QCoreApplication::setOrganizationName("EDA4U");
     //QCoreApplication::setOrganizationDomain(""); ///< @todo
 #ifdef GIT_BRANCH
@@ -48,6 +47,10 @@ int main(int argc, char* argv[])
     QCoreApplication::setApplicationName("EDA4U");
 #endif
     QCoreApplication::setApplicationVersion("0.0.1");
+
+
+    Debug::instance(); // this creates the Debug object and installs the message handler.
+
 
     // Install Qt translations
     QTranslator qtTranslator;
@@ -69,7 +72,15 @@ int main(int argc, char* argv[])
     appTranslator2.load("eda4u_" % QLocale::system().name(), ":/i18n");
     app.installTranslator(&appTranslator2);
 
+
     QGuiApplication::setQuitOnLastWindowClosed(false);
+
+
+    // this is to remove the ugly frames around widgets in all status bars...
+    // (from http://www.qtcentre.org/threads/1904)
+    app.setStyleSheet("QStatusBar::item { border: 0px solid black; }");
+
+
 
     // Initialization finished, open the workspace...
 
