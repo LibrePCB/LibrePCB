@@ -85,6 +85,7 @@ SOURCES += \
     src/project/circuit/netclass.cpp \
     src/project/circuit/netsignal.cpp \
     src/project/circuit/genericcomponentinstance.cpp \
+    src/common/systeminfo.cpp \
     src/common/debug.cpp
 
 HEADERS += \
@@ -123,6 +124,7 @@ HEADERS += \
     src/project/circuit/netclass.h \
     src/project/circuit/netsignal.h \
     src/project/circuit/genericcomponentinstance.h \
+    src/common/systeminfo.h \
     src/common/debug.h
 
 FORMS += \
