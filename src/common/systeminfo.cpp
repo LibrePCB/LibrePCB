@@ -24,22 +24,21 @@
 #include <QtCore>
 #include <QHostInfo>
 #include "systeminfo.h"
-#include "exceptions.h"
 
 /*****************************************************************************************
  *  Static Methods
  ****************************************************************************************/
 
-QString SystemInfo::getUsername()
+QString SystemInfo::getUsername() noexcept
 {
     QString username("");
 
     // this line should work for most UNIX, Linux, Mac and Windows systems
-    username = QString(qgetenv("USERNAME")).remove("\n").trimmed();
+    username = QString(qgetenv("USERNAME")).trimmed();
 
     // if the environment variable "USERNAME" is not set, we will try "USER"
     if (username.isEmpty())
-        username = QString(qgetenv("USER")).remove("\n").trimmed();
+        username = QString(qgetenv("USER")).trimmed();
 
     if (username.isEmpty())
         qWarning() << "Could not determine the system's username!";
@@ -47,22 +46,22 @@ QString SystemInfo::getUsername()
     return username;
 }
 
-QString SystemInfo::getFullUsername()
+QString SystemInfo::getFullUsername() noexcept
 {
     QString username("");
 
 #if (defined(Q_OS_UNIX) || defined(Q_OS_LINUX)) && (!defined(Q_OS_MACX)) // For UNIX and Linux
-    QProcess process;
     QString command("grep \"^$USER:\" /etc/passwd | awk -F: '{print $5}'");
+    QProcess process;
     process.start("sh", QStringList() << "-c" << command);
-    process.waitForFinished(1000);
-    username = QString(process.readAllStandardOutput()).remove("\n").trimmed();
+    process.waitForFinished(500);
+    username = QString(process.readAllStandardOutput()).remove("\n").remove("\r").trimmed();
 #elif defined(Q_OS_MACX) // For Mac OS X
     // TODO
 #elif defined(Q_OS_WIN) // For Windows
     // TODO
 #else
-    throw LogicError("Unknown operating system!", __FILE__, __LINE__);
+#error Unknown operating system!
 #endif
 
     if (username.isEmpty())
@@ -71,7 +70,7 @@ QString SystemInfo::getFullUsername()
     return username;
 }
 
-QString SystemInfo::getHostname()
+QString SystemInfo::getHostname() noexcept
 {
     QString hostname = QHostInfo::localHostName();
 

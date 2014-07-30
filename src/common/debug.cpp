@@ -115,23 +115,23 @@ void Debug::print(DebugLevel level, const QString& msg, const char* file, int li
     if ((mDebugLevelStderr < level) && ((mDebugLevelLogFile < level) || (!mLogFile)))
         return; // if there is nothing to print, we will return immediately from this function
 
-    const char* levelStr = "";
+    const char* levelStr = "---------"; // the debug level string has always 9 characters
     switch (level)
     {
         case DebugMsg:
-            levelStr = "DEBUG";
+            levelStr = "DEBUG-MSG";
             break;
         case Warning:
-            levelStr = "WARNING";
+            levelStr = " WARNING ";
             break;
         case Exception:
             levelStr = "EXCEPTION";
             break;
         case Critical:
-            levelStr = "CRITICAL";
+            levelStr = "CRITICAL ";
             break;
         case Fatal:
-            levelStr = "FATAL";
+            levelStr = "  FATAL  ";
             break;
         default:
             break;

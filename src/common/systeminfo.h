@@ -34,14 +34,14 @@
  * @brief This class provides some methods to get information from the operating system
  *
  * For example, this class is used to get the name of the user which is logged in and the
- * hostname of the computer to create a project lock file (see @ref doc_project_lock).
+ * hostname of the computer to create a lock file (see class FileLock).
  *
  * @note Only static methods are available. You cannot create objects of this class.
  *
  * @author ubruhin
  * @date 2014-07-28
  */
-class SystemInfo
+class SystemInfo final
 {
     public:
 
@@ -52,7 +52,7 @@ class SystemInfo
          *
          * @todo test this method on windows and mac!
          */
-        static QString getUsername();
+        static QString getUsername() noexcept;
 
         /**
          * @brief Get the full name of the user which is logged in (like "Homer Simpson")
@@ -62,7 +62,7 @@ class SystemInfo
          * @todo complete this method for mac and windows systems!
          * @todo maybe there is a better solution for UNIX/Linux?
          */
-        static QString getFullUsername();
+        static QString getFullUsername() noexcept;
 
         /**
          * @brief Get the hostname of the computer (like "homer-workstation")
@@ -71,7 +71,7 @@ class SystemInfo
          *
          * @todo test this method on windows and mac!
          */
-        static QString getHostname();
+        static QString getHostname() noexcept;
 
 
     private:
