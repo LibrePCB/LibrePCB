@@ -22,6 +22,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <gtest/gtest.h>
 #include <common/debug.h>
 #include <common/exceptions.h>
 
@@ -31,17 +32,14 @@
 
 int main(int argc, char *argv[])
 {
-    Q_UNUSED(argc);
-    Q_UNUSED(argv);
-    
     Debug::instance(); // this creates the Debug object and installs the message handler.
 
     // suppress messages from the application (we need only messages from the test framework)
     qInstallMessageHandler(0); // remove the message handler from the Debug class
     Debug::instance()->setDebugLevelLogFile(Debug::Nothing);
     Debug::instance()->setDebugLevelStderr(Debug::Nothing);
-    
-    // TODO
 
-    return 0;
+    ::testing::InitGoogleTest(&argc, argv);
+
+    return RUN_ALL_TESTS();
 }

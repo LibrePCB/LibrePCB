@@ -19,8 +19,15 @@ QT -= gui widgets
 CONFIG += console
 CONFIG -= app_bundle
 
+PRE_TARGETDEPS += $${DESTDIR}/libgtest.a
+
 INCLUDEPATH += \
+    ../3rdparty/gtest/include \
     ../src
+
+LIBS += \
+    -L$${DESTDIR} \
+    -lgtest
 
 SOURCES += main.cpp \
     ../src/common/debug.cpp \
