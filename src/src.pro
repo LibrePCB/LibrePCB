@@ -7,9 +7,13 @@
 TEMPLATE = app
 TARGET = eda4u
 
-QT += core widgets opengl webkitwidgets xml
+# Set the path for the generated binary
+GENERATED_DIR = ../generated
 
-CONFIG += c++11
+# Use common project definitions
+include(../common.pri)
+
+QT += core widgets opengl webkitwidgets xml
 
 exists(../.git):DEFINES += GIT_BRANCH=\\\"master\\\"
 #DEFINES += USE_32BIT_LENGTH_UNITS          # see units.h

@@ -7,12 +7,25 @@
 TEMPLATE = app
 TARGET = tests
 
-QT += core testlib
-QT -= widgets
+# Set the path for the generated binary
+GENERATED_DIR = ../generated
 
-CONFIG += c++11 console testcase
+# Use common project definitions
+include(../common.pri)
+
+QT += core
+QT -= gui widgets
+
+CONFIG += console
 CONFIG -= app_bundle
 
-SOURCES += main.cpp
+INCLUDEPATH += \
+    ../src
 
-HEADERS +=
+SOURCES += main.cpp \
+    ../src/common/debug.cpp \
+    ../src/common/exceptions.cpp
+
+HEADERS += \
+    ../src/common/debug.h \
+    ../src/common/exceptions.h
