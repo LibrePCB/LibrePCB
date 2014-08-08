@@ -90,7 +90,8 @@ SOURCES += \
     project/circuit/genericcomponentinstance.cpp \
     common/systeminfo.cpp \
     common/debug.cpp \
-    common/filelock.cpp
+    common/filelock.cpp \
+    common/filepath.cpp
 
 HEADERS += \
     common/units.h \
@@ -130,7 +131,8 @@ HEADERS += \
     project/circuit/genericcomponentinstance.h \
     common/systeminfo.h \
     common/debug.h \
-    common/filelock.h
+    common/filelock.h \
+    common/filepath.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \
