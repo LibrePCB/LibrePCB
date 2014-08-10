@@ -25,7 +25,6 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "exceptions.h"
 
 /*****************************************************************************************
  *  Class FilePath
@@ -75,34 +74,23 @@
  * <b>How the class #FilePath works and how to use it</b>
  *
  * The class #FilePath represents a well-formatted filepath to a file or directory and
- * provides methods to convert paths between different formats. The main principe of this
- * class is very simple but powerful: <b>It's not possible to create a #FilePath object of
- * a filepath which is not well-formatted!</b> So every existing #FilePath object
- * represents always "automatically" a well-formatted filepath! This means, if you use
- * #FilePath instead of QStings, you never have to check if a filepath is well-formatted.
- *
- * There is only one little disadvantage of this principe: The constructor will throw an
- * exception if you pass a filepath which cannot be converted to a well-formatted filepath.
- * So you should always keep in mind that you may use a try/catch-block on creating a
- * #FilePath object. Be careful if you use #FilePath objects (by value) as class attributes.
+ * provides methods to convert paths between different formats. Every #FilePath object
+ * represents either a well-formatted filepath or an invalid object (see #isValid()). It's
+ * not possible to create #FilePath objects with non-well-formatted filepaths.
  *
  * <b>Example:</b>
  * @code
- * FilePath fp("C:\foo\bar.txt"); // a file (this line can throw an exception!)
+ * FilePath fp("C:\foo\bar.txt"); // a file
  * qDebug(fp.toStr());            // "C:/foo/bar.txt" <-- this is the well-formatted filepath
  * qDebug(fp.toNative());         // "C:\foo\bar.txt" on Windows, otherwise "C:/foo/bar.txt"
- * fp.setPathEx("/foo/bar/");     // a directory (this line can throw an exception!)
+ * fp.setPath("/foo/bar/");       // a directory
  * qDebug(fp.toStr());            // "/foo/bar" <-- well-formatted (no slash at the end!)
  * qDebug(fp.toNative());         // "\foo\bar" on Windows, otherwise "/foo/bar"
  * @endcode
  *
  * @note    A filepath represented by a FilePath object do not need to exist on the file
- *          system. All methods of this class do not depend on whether a filepath exists
- *          or not, with one exception: The method #toUnique() tries to resolve symbolic
- *          links, which is only possible if the filepath exists. But nevertheless it will
- *          never return invalid or empty paths (the original filepath will be returned
- *          instead). There are also methods to check if the filepath points to an existing
- *          file (#isExistingFile()) or to an existing directory (#isExistingDir()).
+ *          system. Most methods of this class do not depend on whether a filepath exists
+ *          or not. Exceptions: #toUnique(), #isExistingFile(), #isExistingDir().
  *
  * @warning Please consider that the conversion from filepaths with backslashes as
  *          directory separator (Windows style) to filepaths with slashes as directory
@@ -131,117 +119,50 @@ class FilePath final
         // Constructors / Destructor
 
         /**
+         * @brief The default constructor (this will create an invalid object!)
+         */
+        FilePath() noexcept;
+
+        /**
          * @brief Constructor to create a #FilePath object from a QString
          *
-         * The passed filepath will be converted to a well-formatted filepath if possible.
-         * Otherwise, this constructor throws an exception.
-         *
-         * @param filepath  See #setPath()
-         *
-         * @throw Exception If the conversion fails, the constructor will throw an
-         *                  Exception. This is to deny creating objects with
-         *                  non-well-formatted paths.
+         * @param filepath      See #setPath()
          */
-        FilePath(const QString& filepath) throw (Exception);
+        explicit FilePath(const QString& filepath) noexcept;
 
         /**
          * @brief The copy constructor
          *
-         * This constructor will never throw an exception because "other" contains always
-         * a well-formatted filepath, so the new object will also contain a well-formatted
-         * filepath.
-         *
-         * @param other     The object to copy
+         * @param other         The object to copy
          */
-        FilePath(const FilePath& other) noexcept : mPath(other.mPath) {}
+        FilePath(const FilePath& other) noexcept;
 
 
         // Setters
 
         /**
-         * @brief Set a new filepath (without throwing an exception)
-         *
-         * Exactly the same as #setPathEx() except that this method will never throw an
-         * exception. Instead, this method has a return value.
+         * @brief Set a new filepath
          *
          * @param filepath  An absolute (!) filepath to a file or directory (the target do
          *                  not need to exist). On Windows, both forward ("/") and
          *                  backward ("\") slashes are allowed as directory separators
          *                  (also mixed in one filepath). On other operating systems, only
          *                  forward slashes ("/") are allowed!. Also ".", ".." and
-         *                  redundant slashes are allowed.
+         *                  redundant directory separators are allowed.
          *
-         * @return true on success, false on error (then the old filepath will be kept!)
-         *
-         * @see #setPathEx()
+         * @return true on success, false on error (then this object will be invalid!)
          */
         bool setPath(const QString& filepath) noexcept;
-
-        /**
-         * @brief Set a new filepath (with throwing an exception if the conversion fails)
-         *
-         * Exactly the same as #setPath() except that this method will throw an exception
-         * if the specified filepath cannot be converted to a well-formatted filepath.
-         *
-         * @param filepath  See #setPath()
-         *
-         * @throw Exception If the new filepath could not be converted to a well-formatted
-         *                  filepath, an Exception will be thrown (and the old filepath
-         *                  will be kept!).
-         *
-         * @see #setPath()
-         */
-        void setPathEx(const QString& filepath) throw (Exception);
 
 
         // Getters
 
         /**
-         * @brief Get the absolute and well-formatted filepath as a QString
+         * @brief Check whether this object contains a valid filepath or not
          *
-         * @return The absolute and well-formatted filepath
+         * @return true if the filepath is valid, false if not
          */
-        const QString& toStr() const noexcept {return mPath;}
-
-        /**
-         * @brief Get the absolute filepath with native directory separators ("/" resp. "\")
-         *
-         * @return  The same absolute filepath, but with native separators (on other
-         *          platforms than Windows, this filepath is identical to the
-         *          well-formatted filepath)
-         */
-        QString toNative() const noexcept {return QDir::toNativeSeparators(mPath);}
-
-        /**
-         * @brief Get a unique version of the filepath (resolve symbolic links if possible)
-         *
-         * Because of symbolic links, the user is able to have different paths which all
-         * point to the same file/directory. But sometimes you want to determine whether
-         * two paths point to the same file/directory ("equal paths") or not ("different
-         * paths"). For this purpose you can use #toUnique(). This method will resolve
-         * symbolic links if possible (this is only possible if the filepath exists!).
-         * If the filepath does not exist, this method will return the same as #toStr().
-         *
-         * @return  The filepath with resolved symbolic links (if possible, otherwise the
-         *          unchanged filepath which equals to #toStr())
-         */
-        QString toUnique() const noexcept;
-
-        /**
-         * @brief Convert an absolute filepath to a relative filepath (relative to another
-         *        filepath)
-         *
-         * @param base  The base of the relative filepath (the part which will be removed
-         *              from the absolute filepath). This must be a filepath to a
-         *              directory, paths to a file will produce wrong results!
-         *
-         * @return A well-formatted filepath with the exception that it is not absolute
-         *
-         * @note This method is very useful to store relative paths in (text) files.
-         *
-         * @see #fromRelative()
-         */
-        QString toRelative(const FilePath& base) const noexcept;
+        bool isValid() const noexcept {return mIsValid;}
 
         /**
          * @brief Check if the specified filepath is an existing file
@@ -257,6 +178,117 @@ class FilePath final
          */
         bool isExistingDir() const noexcept;
 
+        /**
+         * @brief Check if the specified filepath is the root directory
+         *
+         * @return True if the filepath is the filesystem root, false otherwise
+         */
+        bool isRoot() const noexcept;
+
+        /**
+         * @brief Get the absolute and well-formatted filepath as a QString
+         *
+         * @return  The absolute and well-formatted filepath, or an empty QString if this
+         *          object is invalid.
+         */
+        QString toStr() const noexcept;
+
+        /**
+         * @brief Get the absolute filepath with native directory separators ("/" resp. "\")
+         *
+         * @return  The same as #toStr(), but with native separators (on other platforms
+         *          than Windows, this method is identical to #toStr())
+         */
+        QString toNative() const noexcept;
+
+        /**
+         * @brief Get a unique version of the filepath (resolve symbolic links if possible)
+         *
+         * Because of symbolic links, the user is able to have different paths which all
+         * point to the same file/directory. But sometimes you want to determine whether
+         * two paths point to the same file/directory ("equal paths") or not ("different
+         * paths"). For this purpose you can use #toUnique(). This method will resolve
+         * symbolic links if possible (this is only possible if the filepath exists!).
+         * If the filepath does not exist, this method will return the same as #toStr().
+         *
+         * @return  The filepath with resolved symbolic links (if possible, otherwise the
+         *          unchanged filepath)
+         */
+        FilePath toUnique() const noexcept;
+
+        /**
+         * @brief Convert an absolute filepath to a relative filepath (relative to another
+         *        filepath)
+         *
+         * @param base  The base of the relative filepath (the part which will be removed
+         *              from the absolute filepath). This must be a filepath to a
+         *              directory, paths to a file will produce wrong results!
+         *
+         * @return  A relative filepath with "/" as directory separators (can contain "../")
+         *
+         * @note This method is very useful to store relative paths in (text) files.
+         *
+         * @see #fromRelative()
+         */
+        QString toRelative(const FilePath& base) const noexcept;
+
+        /**
+         * @brief Get the basename of the file or directory
+         *
+         * @return The filename before the first '.' character
+         */
+        QString getBasename() const noexcept;
+
+        /**
+         * @brief Get the complete basename of the file or directory
+         *
+         * @return The filename before the last '.' character
+         */
+        QString getCompleteBasename() const noexcept;
+
+        /**
+         * @brief Get the suffix of the file or directory
+         *
+         * @return The filename after the last '.' character
+         */
+        QString getSuffix() const noexcept;
+
+        /**
+         * @brief Get the complete suffix of the file or directory
+         *
+         * @return The filename after the first '.' character
+         */
+        QString getCompleteSuffix() const noexcept;
+
+        /**
+         * @brief Get the whole filename (without the path) of the file or directory
+         *
+         * @return The whole filename
+         */
+        QString getFilename() const noexcept;
+
+        /**
+         * @brief Get the filepath of the parent directory of the file or directory
+         *
+         * @return  A FilePath object with the parent directory (can be invalid if you try
+         *          to get the parent directory of the filesystem root!)
+         */
+        FilePath getParentDir() const noexcept;
+
+        /**
+         * @brief Get the filepath to a file or directory which is relative to this filepath
+         *
+         * @param filename  A relative filepath to a file or directory,
+         *                  like "file.txt" or "subdir/file.txt"
+         *
+         * @return A FilePath object to the specified file or directory
+         *
+         * @warning This method works only correct if this filepath represents a directory!
+         *
+         * @note This method is equal to FilePath#fromRelative(*this, filename);
+         */
+        FilePath getPathTo(const QString& filename) const noexcept;
+
 
         // Static Methods
 
@@ -270,39 +302,33 @@ class FilePath final
          *
          * @return A #FilePath object with the absolute filepath
          *
-         * @throw Exception If there was an error while creating the absolute filepath,
-         *                  this method throws an exception.
-         *
          * @note This method is very useful to load relative paths from (text) files.
          *
          * @see #toRelative()
          */
-        static FilePath fromRelative(const FilePath& base, const QString& relative);
+        static FilePath fromRelative(const FilePath& base, const QString& relative) noexcept;
 
 
         // Operator Overloadings
 
         /**
          * @brief The assign operator to copy a FilePath into another FilePath object
-         *
-         * @warning This method will always success, so it never throws an exception.
-         *          But you should take care if you want to assign a QString to a FilePath
-         *          object. As there is such a constructor without the keyword "explicit",
-         *          this will work, but the implicit called constructor could throw an
-         *          exception! So it's possible to write <tt>myPathObj = myQStringObj;</tt>,
-         *          but this line can throw an exception.
          */
         FilePath& operator=(const FilePath& rhs) noexcept;
+
+        /**
+         * @brief The "==" operator to compare two FilePath objects
+         *
+         * @note This method compares the return values of #toStr() of both objects.
+         *
+         * @return true if both filepaths are identical, false otherwise
+         */
+        bool operator==(const FilePath& rhs) noexcept;
 
 
     private:
 
         // Private Methods
-
-        /**
-         * @brief Make the default constructor inaccessible
-         */
-        FilePath();
 
         /**
          * @brief Make a filepath well-formatted (except making it absolute!)
@@ -317,7 +343,12 @@ class FilePath final
 
         // Attributes
 
-        QString mPath; ///< the absolute and well-formatted filepath
+        bool mIsValid;
+        QFileInfo mFileInfo; ///< the absolute and well-formatted filepath in a QFileInfo
 };
+
+// Non-Member Functions
+QDataStream& operator<<(QDataStream& stream, const FilePath& filepath);
+QDebug& operator<<(QDebug& stream, const FilePath& filepath);
 
 #endif // FILEPATH_H

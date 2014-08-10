@@ -28,9 +28,23 @@
  *  Constructors / Destructor
  ****************************************************************************************/
 
-FilePath::FilePath(const QString& filepath) throw (Exception)
+FilePath::FilePath() noexcept :
+    mIsValid(false), mFileInfo()
 {
-    FilePath::setPathEx(filepath);
+    mFileInfo.setCaching(false);
+}
+
+FilePath::FilePath(const QString& filepath) noexcept :
+    mIsValid(false), mFileInfo()
+{
+    mFileInfo.setCaching(false);
+    FilePath::setPath(filepath);
+}
+
+FilePath::FilePath(const FilePath& other) noexcept :
+    mIsValid(other.mIsValid), mFileInfo(other.mFileInfo)
+{
+    mFileInfo.setCaching(false);
 }
 
 /*****************************************************************************************
@@ -39,56 +53,131 @@ FilePath::FilePath(const QString& filepath) throw (Exception)
 
 bool FilePath::setPath(const QString& filepath) noexcept
 {
-    try {setPathEx(filepath);}
-    catch (Exception&) {return false;}
-    return true;
-}
+    mIsValid = false;
+    mFileInfo.setFile(makeWellFormatted(filepath));
 
-void FilePath::setPathEx(const QString& filepath) throw (Exception)
-{
-    QString newPath = makeWellFormatted(filepath);
+    if (mFileInfo.isAbsolute()) // check if the filepath is absolute
+        mIsValid = true;
 
-    // "newPath" is our new filepath, let's check if it is absolute
-    if (!QDir::isAbsolutePath(newPath))
-    {
-        throw RuntimeError(QString("\"%1\" is not an absolute filepath!").arg(newPath),
-                           __FILE__, __LINE__);
-    }
-
-    // all ok --> apply the new filepath
-    mPath = newPath;
+    return mIsValid;
 }
 
 /*****************************************************************************************
  *  Getters
  ****************************************************************************************/
 
-QString FilePath::toUnique() const noexcept
-{
-    QFileInfo info(mPath);
-    QString unique = makeWellFormatted(info.canonicalFilePath());
-    if (!unique.isEmpty())
-        return unique;
-    else
-        return mPath;
-}
-
-QString FilePath::toRelative(const FilePath& base) const noexcept
-{
-    QDir baseDir(base.mPath);
-    return makeWellFormatted(baseDir.relativeFilePath(mPath));
-}
-
 bool FilePath::isExistingFile() const noexcept
 {
-    QFileInfo info(mPath);
-    return (info.isFile() && info.exists());
+    if (!mIsValid)
+        return false;
+
+    return (mFileInfo.isFile() && mFileInfo.exists());
 }
 
 bool FilePath::isExistingDir() const noexcept
 {
-    QFileInfo info(mPath);
-    return (info.isDir() && info.exists());
+    if (!mIsValid)
+        return false;
+
+    return (mFileInfo.isDir() && mFileInfo.exists());
+}
+
+bool FilePath::isRoot() const noexcept
+{
+    // do not use QFileInfo::isRoot() because it's not the same as QDir::isRoot()!
+    QDir dir(mFileInfo.filePath());
+    return mIsValid && dir.isRoot();
+}
+
+QString FilePath::toStr() const noexcept
+{
+    if (!mIsValid)
+        return QString();
+
+    return mFileInfo.filePath();
+}
+
+QString FilePath::toNative() const noexcept
+{
+    if (!mIsValid)
+        return QString();
+
+    return QDir::toNativeSeparators(mFileInfo.filePath());
+}
+
+FilePath FilePath::toUnique() const noexcept
+{
+    if (!mIsValid)
+        return FilePath();
+
+    FilePath unique(mFileInfo.canonicalFilePath());
+
+    if (!unique.isValid())
+        unique = *this;
+
+    return unique;
+}
+
+QString FilePath::toRelative(const FilePath& base) const noexcept
+{
+    if ((!mIsValid) || (!base.mIsValid))
+        return QString();
+
+    QDir baseDir(base.mFileInfo.filePath());
+    return makeWellFormatted(baseDir.relativeFilePath(mFileInfo.filePath()));
+}
+
+QString FilePath::getBasename() const noexcept
+{
+    if (mIsValid)
+        return mFileInfo.baseName();
+    else
+        return QString();
+}
+
+QString FilePath::getCompleteBasename() const noexcept
+{
+    if (mIsValid)
+        return mFileInfo.completeBaseName();
+    else
+        return QString();
+}
+
+QString FilePath::getSuffix() const noexcept
+{
+    if (mIsValid)
+        return mFileInfo.suffix();
+    else
+        return QString();
+}
+
+QString FilePath::getCompleteSuffix() const noexcept
+{
+    if (mIsValid)
+        return mFileInfo.completeSuffix();
+    else
+        return QString();
+}
+
+QString FilePath::getFilename() const noexcept
+{
+    if (mIsValid)
+        return mFileInfo.fileName();
+    else
+        return QString();
+}
+
+FilePath FilePath::getParentDir() const noexcept
+{
+    if ((!mIsValid) || (isRoot()))
+        return FilePath();
+
+    return FilePath(mFileInfo.dir().path());
+}
+
+FilePath FilePath::getPathTo(const QString& filename) const noexcept
+{
+    return FilePath(mFileInfo.filePath() % QLatin1Char('/') % filename);
 }
 
 /*****************************************************************************************
@@ -97,18 +186,30 @@ bool FilePath::isExistingDir() const noexcept
 
 FilePath& FilePath::operator=(const FilePath& rhs) noexcept
 {
-    mPath = rhs.mPath;
+    mFileInfo = rhs.mFileInfo;
+    mIsValid = rhs.mIsValid;
     return *this;
+}
+
+bool FilePath::operator==(const FilePath& rhs) noexcept
+{
+    if (mIsValid != rhs.mIsValid)
+        return false;
+    if (mFileInfo.filePath() != rhs.mFileInfo.filePath())
+        return false;
+    return true;
 }
 
 /*****************************************************************************************
  *  Static Methods
  ****************************************************************************************/
 
-FilePath FilePath::fromRelative(const FilePath& base, const QString& relative)
+FilePath FilePath::fromRelative(const FilePath& base, const QString& relative) noexcept
 {
-    QDir baseDir(base.mPath);
-    return FilePath(baseDir.absoluteFilePath(relative));
+    if (!base.mIsValid)
+        return FilePath();
+
+    return FilePath(base.mFileInfo.filePath() % QLatin1Char('/') % relative);
 }
 
 QString FilePath::makeWellFormatted(const QString& filepath) noexcept
@@ -123,6 +224,22 @@ QString FilePath::makeWellFormatted(const QString& filepath) noexcept
         newPath.chop(1); // remove the last character
 
     return newPath;
+}
+
+/*****************************************************************************************
+ *  Non-Member Functions
+ ****************************************************************************************/
+
+QDataStream& operator<<(QDataStream& stream, const FilePath& filepath)
+{
+    stream << filepath.toStr();
+    return stream;
+}
+
+QDebug& operator<<(QDebug& stream, const FilePath& filepath)
+{
+    stream << QString("FilePath(%1)").arg(filepath.toStr());
+    return stream;
 }
 
 /*****************************************************************************************
