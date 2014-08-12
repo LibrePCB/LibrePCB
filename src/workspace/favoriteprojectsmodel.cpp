@@ -31,19 +31,20 @@
  *  Constructors / Destructor
  ****************************************************************************************/
 
-FavoriteProjectsModel::FavoriteProjectsModel(Workspace* workspace) :
+FavoriteProjectsModel::FavoriteProjectsModel(Workspace& workspace) :
     QAbstractListModel(0), mWorkspace(workspace)
 {
-    QSettings settings(mWorkspace->getSettings()->getFilepath(), QSettings::IniFormat);
+    QSettings settings(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(),
+                       QSettings::IniFormat);
+
     int count = settings.beginReadArray("favorite_projects");
     for (int i = 0; i < count; i++)
     {
-         settings.setArrayIndex(i);
-         QFileInfo fileInfo(settings.value("filepath").toString());
-
-         beginInsertRows(QModelIndex(), mFavoriteProjects.count(), mFavoriteProjects.count());
-         mFavoriteProjects.append(fileInfo);
-         endInsertRows();
+        settings.setArrayIndex(i);
+        FilePath filepath(settings.value("filepath").toString());
+        beginInsertRows(QModelIndex(), mFavoriteProjects.count(), mFavoriteProjects.count());
+        mFavoriteProjects.append(filepath);
+        endInsertRows();
     }
     settings.endArray();
 }
@@ -59,42 +60,39 @@ FavoriteProjectsModel::~FavoriteProjectsModel()
 void FavoriteProjectsModel::save()
 {
     // save the new list in the workspace
-    QSettings settings(mWorkspace->getSettings()->getFilepath(), QSettings::IniFormat);
+    QSettings settings(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(),
+                       QSettings::IniFormat);
+
     settings.beginWriteArray("favorite_projects");
     for (int i = 0; i < mFavoriteProjects.count(); i++)
     {
         settings.setArrayIndex(i);
-        settings.setValue("filepath", mFavoriteProjects.at(i).filePath());
+        settings.setValue("filepath", mFavoriteProjects.at(i).toNative());
     }
     settings.endArray();
 }
 
-bool FavoriteProjectsModel::isFavoriteProject(const QString& filename) const
+bool FavoriteProjectsModel::isFavoriteProject(const FilePath& filepath) const
 {
-    QFileInfo fileInfo(filename);
-    return mFavoriteProjects.contains(fileInfo);
+    return mFavoriteProjects.contains(filepath);
 }
 
-void FavoriteProjectsModel::addFavoriteProject(const QString& filename)
+void FavoriteProjectsModel::addFavoriteProject(const FilePath& filepath)
 {
-    QFileInfo fileInfo(filename);
-
-    // if the filename is already in the list, we have nothing to do
-    if (mFavoriteProjects.contains(fileInfo))
+    // if the filepath is already in the list, we have nothing to do
+    if (mFavoriteProjects.contains(filepath))
         return;
 
-    // add the new filename to the list
+    // add the new filepath to the list
     beginInsertRows(QModelIndex(), mFavoriteProjects.count(), mFavoriteProjects.count());
-    mFavoriteProjects.append(fileInfo);
+    mFavoriteProjects.append(filepath);
     endInsertRows();
     save();
 }
 
-void FavoriteProjectsModel::removeFavoriteProject(const QString& filename)
+void FavoriteProjectsModel::removeFavoriteProject(const FilePath& filepath)
 {
-    QFileInfo fileInfo(filename);
-
-    int index = mFavoriteProjects.indexOf(fileInfo);
+    int index = mFavoriteProjects.indexOf(filepath);
 
     if (index >= 0)
     {
@@ -125,12 +123,12 @@ QVariant FavoriteProjectsModel::data(const QModelIndex& index, int role) const
     switch (role)
     {
         case Qt::DisplayRole:
-            return mFavoriteProjects.at(index.row()).fileName();
+            return mFavoriteProjects.at(index.row()).getFilename();
 
         //case Qt::ToolTipRole:
         case Qt::StatusTipRole:
         case Qt::UserRole:
-            return QDir::toNativeSeparators(mFavoriteProjects.at(index.row()).absoluteFilePath());
+            return mFavoriteProjects.at(index.row()).toNative();
 
         case Qt::DecorationRole:
             return QIcon(":/img/actions/bookmark.png");

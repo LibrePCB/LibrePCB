@@ -52,7 +52,7 @@ class ProjectTreeModel : public QAbstractItemModel
     public:
 
         // Constructors / Destructor
-        ProjectTreeModel(Workspace* workspace);
+        ProjectTreeModel(Workspace& workspace);
         ~ProjectTreeModel();
 
         // General
@@ -76,7 +76,7 @@ class ProjectTreeModel : public QAbstractItemModel
         // Private Methods
         ProjectTreeItem* getItem(const QModelIndex& index) const;
 
-        Workspace* mWorkspace;
+        Workspace& mWorkspace;
 
         ProjectTreeItem* mRootProjectDirectory;
 };

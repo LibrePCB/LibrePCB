@@ -26,6 +26,7 @@
 
 #include <QtCore>
 #include "../common/units.h"
+#include "../common/filepath.h"
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -61,6 +62,14 @@ class WorkspaceSettingsDialog;
  * QSettings object and pass the filepath to the "settings.ini" file an use the
  * QSettings::IniFormat parameter. To get the filepath to the "settings.ini", you can use
  * the method WorkspaceSettings#getFilepath() without any arguments.
+ *
+ * @todo Make some improvements. For example, in load() there is no exception handling.
+ *       If a conversion from QVariant to another type fails, we should print a log
+ *       message and load the default value instead. At the moment, wrong values can
+ *       be loaded in case of an error. Additionally, the setter methods do not have
+ *       the ability to return any information whether the value could be set successfully
+ *       or not. Maybe it would be useful to outsource each property in a separate object
+ *       (inclusive load/save methods, default value, <b>and a QWidget for the dialog</b>)?
  */
 class WorkspaceSettings final : public QObject
 {
@@ -69,22 +78,8 @@ class WorkspaceSettings final : public QObject
     public:
 
         // Constructors / Destructor
-        explicit WorkspaceSettings(Workspace* workspace, const QString& metadataPath);
+        explicit WorkspaceSettings(Workspace& workspace);
         ~WorkspaceSettings();
-
-
-        // Getters: General
-
-        /**
-         * @brief Get the absolute filepath to a file in the ".metadata" directory
-         *
-         * @param filename  The name of a file in the .metadata directory.
-         *                  The filename can contain subfolders.
-         *                  "settings.ini" is the default filename.
-         *
-         * @return The absolute filepath (with native separators) to the specified file
-         */
-        QString getFilepath(const QString& filename = "settings.ini") const;
 
 
         // Getters: Settings attributes
@@ -110,6 +105,13 @@ class WorkspaceSettings final : public QObject
          */
         Length::MeasurementUnit getAppDefMeasUnit() const {return mAppDefMeasUnit;}
 
+        /**
+         * @brief Get the autosave interval for projects (in seconds)
+         *
+         * @return See #mProjectAutosaveInterval
+         */
+        unsigned int getProjectAutosaveInterval() const {return mProjectAutosaveInterval;}
+
 
         // Setters: Settings attributes
 
@@ -126,6 +128,13 @@ class WorkspaceSettings final : public QObject
          * @param unit      The new unit (see Length::MeasurementUnit)
          */
         void setAppDefMeasUnit(Length::MeasurementUnit unit);
+
+        /**
+         * @brief Set the autosave interval for projects (in seconds)
+         *
+         * @param interval  Zero to disable autosave (See #mProjectAutosaveInterval)
+         */
+        void setProjectAutosaveInterval(unsigned int interval);
 
 
     public slots:
@@ -160,8 +169,8 @@ class WorkspaceSettings final : public QObject
 
 
         // General Attributes
-        Workspace* mWorkspace; ///< a pointer to the Workspace object
-        QDir mMetadataDir; ///< a QDir object for the ".metadata" directory in the workspace
+        Workspace& mWorkspace; ///< a pointer to the Workspace object
+        FilePath mMetadataPath; ///< the ".metadata" directory in the workspace
         QList<QTranslator*> mInstalledTranslators; ///< see constructor/destructor code
 
 
@@ -184,6 +193,20 @@ class WorkspaceSettings final : public QObject
          * Default: Length::millimeters
          */
         Length::MeasurementUnit mAppDefMeasUnit;
+
+        /**
+         * @brief The interval of the autosave mechanism of projects (in seconds)
+         *
+         * This value is used by the class project#Project for the autosave mechanism.
+         * A value of zero means that the autosave mechanism is disabled! A value greater
+         * than zero defines the time interval in seconds.
+         *
+         * Default: 600 seconds (10 minutes)
+         *
+         * @todo Add this parameter to the settings dialog WorkspaceSettingsDialog (maybe
+         *       in minutes instead of seconds)
+         */
+        unsigned int mProjectAutosaveInterval;
 };
 
 #endif // WORKSPACESETTINGS_H

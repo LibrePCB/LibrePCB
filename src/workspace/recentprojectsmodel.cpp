@@ -31,18 +31,19 @@
  *  Constructors / Destructor
  ****************************************************************************************/
 
-RecentProjectsModel::RecentProjectsModel(Workspace* workspace) :
+RecentProjectsModel::RecentProjectsModel(Workspace& workspace) :
     QAbstractListModel(0), mWorkspace(workspace)
 {
-    QSettings settings(mWorkspace->getSettings()->getFilepath(), QSettings::IniFormat);
+    QSettings settings(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(),
+                       QSettings::IniFormat);
+
     int count = settings.beginReadArray("recent_projects");
     for (int i = 0; i < count; i++)
     {
          settings.setArrayIndex(i);
-         QFileInfo fileInfo(settings.value("filepath").toString());
-
+         FilePath filepath(settings.value("filepath").toString());
          beginInsertRows(QModelIndex(), mRecentProjects.count(), mRecentProjects.count());
-         mRecentProjects.append(fileInfo);
+         mRecentProjects.append(filepath);
          endInsertRows();
     }
     settings.endArray();
@@ -59,24 +60,24 @@ RecentProjectsModel::~RecentProjectsModel()
 void RecentProjectsModel::save()
 {
     // save the new list in the workspace
-    QSettings settings(mWorkspace->getSettings()->getFilepath(), QSettings::IniFormat);
+    QSettings settings(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(),
+                       QSettings::IniFormat);
+
     settings.beginWriteArray("recent_projects");
     for (int i = 0; i < mRecentProjects.count(); i++)
     {
         settings.setArrayIndex(i);
-        settings.setValue("filepath", mRecentProjects.at(i).filePath());
+        settings.setValue("filepath", mRecentProjects.at(i).toNative());
     }
     settings.endArray();
 }
 
-void RecentProjectsModel::setLastRecentProject(const QString& filename)
+void RecentProjectsModel::setLastRecentProject(const FilePath& filepath)
 {
-    QFileInfo fileInfo(filename);
-
-    // if the filename is already in the list, we just have to move it to the top of the list
+    // if the filepath is already in the list, we just have to move it to the top of the list
     for (int i = 0; i < mRecentProjects.count(); i++)
     {
-        if (mRecentProjects.at(i) == fileInfo)
+        if (mRecentProjects.at(i).toStr() == filepath.toStr())
         {
             if (i == 0)
                 return; // the filename is already on top of the list, so nothing to do here...
@@ -97,9 +98,9 @@ void RecentProjectsModel::setLastRecentProject(const QString& filename)
         endRemoveRows();
     }
 
-    // add the new filename to the list
+    // add the new filepath to the list
     beginInsertRows(QModelIndex(), 0, 0);
-    mRecentProjects.prepend(fileInfo);
+    mRecentProjects.prepend(filepath);
     endInsertRows();
     save();
 }
@@ -124,12 +125,14 @@ QVariant RecentProjectsModel::data(const QModelIndex& index, int role) const
     switch (role)
     {
         case Qt::DisplayRole:
-            return mRecentProjects.at(index.row()).fileName();
+        {
+            return mRecentProjects.at(index.row()).getFilename();
+        }
 
         //case Qt::ToolTipRole:
         case Qt::StatusTipRole:
         case Qt::UserRole:
-            return QDir::toNativeSeparators(mRecentProjects.at(index.row()).absoluteFilePath());
+            return mRecentProjects.at(index.row()).toNative();
 
         case Qt::DecorationRole:
             return QIcon(":/img/actions/recent.png");

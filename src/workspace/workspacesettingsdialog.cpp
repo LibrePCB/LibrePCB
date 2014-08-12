@@ -24,19 +24,22 @@
 #include <QtCore>
 #include "workspacesettingsdialog.h"
 #include "ui_workspacesettingsdialog.h"
+#include "workspace.h"
 #include "workspacesettings.h"
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WorkspaceSettingsDialog::WorkspaceSettingsDialog(WorkspaceSettings* settings) :
-    QDialog(0), mUi(new Ui::WorkspaceSettingsDialog), mSettings(settings)
+WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
+                                                 WorkspaceSettings& settings) :
+    QDialog(0), mUi(new Ui::WorkspaceSettingsDialog), mWorkspace(workspace),
+    mSettings(settings)
 {
     mUi->setupUi(this);
 
     // load the window geometry
-    QSettings s(mSettings->getFilepath(), QSettings::IniFormat);
+    QSettings s(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(), QSettings::IniFormat);
     restoreGeometry(s.value("workspace_settings_dialog/window_geometry").toByteArray());
 
     // adjust the category list width to its content
@@ -49,7 +52,7 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(WorkspaceSettings* settings) :
 WorkspaceSettingsDialog::~WorkspaceSettingsDialog()
 {
     // save the window geometry
-    QSettings s(mSettings->getFilepath(), QSettings::IniFormat);
+    QSettings s(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(), QSettings::IniFormat);
     s.setValue("workspace_settings_dialog/window_geometry", saveGeometry());
 
     delete mUi;         mUi = 0;
@@ -85,7 +88,7 @@ void WorkspaceSettingsDialog::load()
     }
 
     // select the current language in the language list
-    int index = mUi->appLanguageList->findData(mSettings->getAppLocaleName());
+    int index = mUi->appLanguageList->findData(mSettings.getAppLocaleName());
     mUi->appLanguageList->setCurrentIndex(index >= 0 ? index : 0);
 
     // fill the measurement unit list for the application's default measurement unit
@@ -101,14 +104,14 @@ void WorkspaceSettingsDialog::load()
 
     // select the application's current default measurement unit
     index = mUi->appDefMeasUnitList->findData(Length::measurementUnitToString(
-                                                  mSettings->getAppDefMeasUnit()));
+                                                  mSettings.getAppDefMeasUnit()));
     mUi->appDefMeasUnitList->setCurrentIndex(index);
 }
 
 bool WorkspaceSettingsDialog::save()
 {
-    mSettings->setAppLocaleName(mUi->appLanguageList->currentData().toString());
-    mSettings->setAppDefMeasUnit(Length::measurementUnitFromString(
+    mSettings.setAppLocaleName(mUi->appLanguageList->currentData().toString());
+    mSettings.setAppDefMeasUnit(Length::measurementUnitFromString(
                                      mUi->appDefMeasUnitList->currentData().toString(),
                                      Length::millimeters));
 

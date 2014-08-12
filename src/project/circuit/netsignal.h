@@ -53,7 +53,7 @@ class NetSignal : public QObject
     public:
 
         // Constructors / Destructor
-        explicit NetSignal(Workspace* workspace, Project* project, Circuit* circuit);
+        explicit NetSignal(Workspace& workspace, Project& project, Circuit& circuit);
         ~NetSignal();
 
     private:
@@ -64,9 +64,9 @@ class NetSignal : public QObject
         NetSignal& operator=(const NetSignal& rhs);
 
         // General
-        Workspace* mWorkspace;
-        Project* mProject;
-        Circuit* mCircuit;
+        Workspace& mWorkspace;
+        Project& mProject;
+        Circuit& mCircuit;
 
 };
 

@@ -53,7 +53,7 @@ class NetClass : public QObject
     public:
 
         // Constructors / Destructor
-        explicit NetClass(Workspace* workspace, Project* project, Circuit* circuit);
+        explicit NetClass(Workspace& workspace, Project& project, Circuit& circuit);
         ~NetClass();
 
     private:
@@ -64,9 +64,9 @@ class NetClass : public QObject
         NetClass& operator=(const NetClass& rhs);
 
         // General
-        Workspace* mWorkspace;
-        Project* mProject;
-        Circuit* mCircuit;
+        Workspace& mWorkspace;
+        Project& mProject;
+        Circuit& mCircuit;
 
 };
 

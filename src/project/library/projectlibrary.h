@@ -61,7 +61,8 @@ class ProjectLibrary final : public QObject
 
     public:
 
-        explicit ProjectLibrary(Workspace* workspace, Project* project);
+        // Constructors / Destructor
+        explicit ProjectLibrary(Workspace& workspace, Project& project, bool restore);
         ~ProjectLibrary();
 
         // Getters: Library Elements
@@ -81,9 +82,9 @@ class ProjectLibrary final : public QObject
         ProjectLibrary& operator=(const ProjectLibrary& rhs);
 
         // General
-        Workspace* mWorkspace; ///< a pointer to the Workspace object (from the constructor)
-        Project* mProject; ///< a pointer to the Project object (from the constructor)
-        QDir mLibraryDir; ///< a QDir object that represents the "lib" directory of the project
+        Workspace& mWorkspace; ///< a reference to the Workspace object (from the ctor)
+        Project& mProject; ///< a reference to the Project object (from the ctor)
+        //QDir mLibraryDir; ///< a QDir object that represents the "lib" directory of the project
 
         // The Library Elements
         QHash<QUuid, const library::Symbol*> mSymbols;

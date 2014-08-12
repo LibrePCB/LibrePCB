@@ -25,6 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include "../common/filepath.h"
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -56,12 +57,12 @@ class ProjectTreeItem
         };
 
         // Constructors / Destructor
-        ProjectTreeItem(ProjectTreeItem* parent, const QString& filename);
+        ProjectTreeItem(ProjectTreeItem* parent, const FilePath& filepath);
         ~ProjectTreeItem();
 
         // Getters
         ItemType_t getType()                    const {return mType;}
-        const QFileInfo& getFileInfo()          const {return mFileInfo;}
+        const FilePath& getFilePath()           const {return mFilePath;}
         unsigned int getDepth()                 const {return mDepth;}
         int getColumnCount()                    const {return 1;}
         ProjectTreeItem* getParent()            const {return mParent;}
@@ -77,7 +78,7 @@ class ProjectTreeItem
         ProjectTreeItem(const ProjectTreeItem& other);
         ProjectTreeItem& operator=(const ProjectTreeItem& rhs);
 
-        QFileInfo mFileInfo;
+        FilePath mFilePath;
         ProjectTreeItem* mParent;
         ItemType_t mType;
         QMimeType mMimeType;

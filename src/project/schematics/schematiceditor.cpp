@@ -35,31 +35,32 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SchematicEditor::SchematicEditor(Workspace* workspace, Project* project) :
+SchematicEditor::SchematicEditor(Workspace& workspace, Project& project) :
     QMainWindow(0), mWorkspace(workspace), mProject(project), mUi(new Ui::SchematicEditor)
 {
     mUi->setupUi(this);
 
     // connect some actions which are created with the Qt Designer
+    connect(mUi->actionSave_Project, SIGNAL(triggered()), &mProject, SLOT(save()));
     connect(mUi->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
     connect(mUi->actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 
     // connect the undo/redo actions with the QUndoStack of the project
-    connect(mProject->getUndoStack(), &QUndoStack::undoTextChanged,
+    connect(mProject.getUndoStack(), &QUndoStack::undoTextChanged,
             [this](const QString& text){mUi->actionUndo->setText(text);});
-    mUi->actionUndo->setText(mProject->getUndoStack()->undoText());
-    connect(mProject->getUndoStack(), &QUndoStack::canUndoChanged,
+    mUi->actionUndo->setText(mProject.getUndoStack()->undoText());
+    connect(mProject.getUndoStack(), &QUndoStack::canUndoChanged,
             [this](bool can){mUi->actionUndo->setEnabled(can);});
-    mUi->actionUndo->setEnabled(mProject->getUndoStack()->canUndo());
-    connect(mProject->getUndoStack(), &QUndoStack::redoTextChanged,
+    mUi->actionUndo->setEnabled(mProject.getUndoStack()->canUndo());
+    connect(mProject.getUndoStack(), &QUndoStack::redoTextChanged,
             [this](const QString& text){mUi->actionRedo->setText(text);});
-    mUi->actionRedo->setText(mProject->getUndoStack()->redoText());
-    connect(mProject->getUndoStack(), &QUndoStack::canRedoChanged,
+    mUi->actionRedo->setText(mProject.getUndoStack()->redoText());
+    connect(mProject.getUndoStack(), &QUndoStack::canRedoChanged,
             [this](bool can){mUi->actionRedo->setEnabled(can);});
-    mUi->actionRedo->setEnabled(mProject->getUndoStack()->canRedo());
+    mUi->actionRedo->setEnabled(mProject.getUndoStack()->canRedo());
 
     // Restore Window Geometry
-    QSettings s(mWorkspace->getSettings()->getFilepath(), QSettings::IniFormat);
+    QSettings s(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(), QSettings::IniFormat);
     restoreGeometry(s.value("schematic_editor/window_geometry").toByteArray());
     restoreState(s.value("schematic_editor/window_state").toByteArray());
 }
@@ -67,7 +68,7 @@ SchematicEditor::SchematicEditor(Workspace* workspace, Project* project) :
 SchematicEditor::~SchematicEditor()
 {
     // Save Window Geometry
-    QSettings s(mWorkspace->getSettings()->getFilepath(), QSettings::IniFormat);
+    QSettings s(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(), QSettings::IniFormat);
     s.setValue("schematic_editor/window_geometry", saveGeometry());
     s.setValue("schematic_editor/window_state", saveState());
 
@@ -80,7 +81,7 @@ SchematicEditor::~SchematicEditor()
 
 void SchematicEditor::closeEvent(QCloseEvent* event)
 {
-    if (!mProject->windowIsAboutToClose(this))
+    if (!mProject.windowIsAboutToClose(this))
         event->ignore();
     else
         QMainWindow::closeEvent(event);
@@ -92,7 +93,7 @@ void SchematicEditor::closeEvent(QCloseEvent* event)
 
 void SchematicEditor::on_actionClose_Project_triggered()
 {
-    mProject->close(this);
+    mProject.close(this);
 }
 
 /*****************************************************************************************

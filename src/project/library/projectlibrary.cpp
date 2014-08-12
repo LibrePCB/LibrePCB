@@ -41,12 +41,14 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ProjectLibrary::ProjectLibrary(Workspace* workspace, Project* project) :
-    QObject(0), mWorkspace(workspace), mProject(project),
-    mLibraryDir(project->getDir().absoluteFilePath("lib"))
+ProjectLibrary::ProjectLibrary(Workspace& workspace, Project& project, bool restore) :
+    QObject(0), mWorkspace(workspace), mProject(project)//,
+    //mLibraryDir(project->getDir().absoluteFilePath("lib"))
 {
-    if (!mLibraryDir.exists())
-        throw RuntimeError(QString("The library path \"%1\" does not exist!").arg(mLibraryDir.path()), __FILE__, __LINE__);
+    Q_UNUSED(restore)
+
+    //if (!mLibraryDir.exists())
+    //    throw RuntimeError(QString("The library path \"%1\" does not exist!").arg(mLibraryDir.path()), __FILE__, __LINE__);
 
     // TODO: Load all library elements
 }

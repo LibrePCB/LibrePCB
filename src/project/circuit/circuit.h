@@ -25,6 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include "../../common/exceptions.h"
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -40,11 +41,17 @@ class Project;
 }
 
 /*****************************************************************************************
- *  Class SchematicEditor
+ *  Class Circuit
  ****************************************************************************************/
 
 namespace project {
 
+/**
+ * @brief The Circuit class
+ *
+ * @author ubruhin
+ * @date 2014-07-03
+ */
 class Circuit final : public QObject
 {
         Q_OBJECT
@@ -52,11 +59,11 @@ class Circuit final : public QObject
     public:
 
         // Constructors / Destructor
-        explicit Circuit(Workspace* workspace, Project* project);
-        ~Circuit();
+        explicit Circuit(Workspace& workspace, Project& project, bool restore) throw (Exception);
+        ~Circuit() noexcept;
 
         // General Methods
-        void save();
+        bool save(bool toOriginal, QStringList& errors) noexcept;
 
     private:
 
@@ -66,16 +73,13 @@ class Circuit final : public QObject
         Circuit& operator=(const Circuit& rhs);
 
         // General
-        Workspace* mWorkspace; ///< A pointer to the Workspace object (from the constructor)
-        Project* mProject; ///< A pointer to the Project object (from the constructor)
+        Workspace& mWorkspace; ///< A reference to the Workspace object (from the ctor)
+        Project& mProject; ///< A reference to the Project object (from the ctor)
 
         // File "core/circuit.xml"
         QString mXmlFilepath;
         QDomDocument* mDomDocument;
         QDomElement* mRootDomElement;
-
-        // Circuit Attributes from the XML file
-        QUuid mUuid;
 
 };
 

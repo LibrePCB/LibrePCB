@@ -57,7 +57,7 @@ class Board final : public CADScene
 
     public:
 
-        explicit Board(Workspace* workspace, Project* project, Circuit* circuit);
+        explicit Board(Workspace& workspace, Project& project, Circuit& circuit);
         ~Board();
 
     private:
@@ -68,9 +68,9 @@ class Board final : public CADScene
         Board& operator=(const Board& rhs);
 
         // General
-        Workspace* mWorkspace; ///< A pointer to the Workspace object (from the constructor)
-        Project* mProject; ///< A pointer to the Project object (from the constructor)
-        Circuit* mCircuit; ///< A pointer to the Circuit object (from the constructor)
+        Workspace& mWorkspace; ///< A reference to the Workspace object (from the ctor)
+        Project& mProject; ///< A reference to the Project object (from the ctor)
+        Circuit& mCircuit; ///< A reference to the Circuit object (from the ctor)
 
 };
 

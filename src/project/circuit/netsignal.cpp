@@ -31,7 +31,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-NetSignal::NetSignal(Workspace* workspace, Project* project, Circuit* circuit) :
+NetSignal::NetSignal(Workspace& workspace, Project& project, Circuit& circuit) :
     QObject(0), mWorkspace(workspace), mProject(project), mCircuit(circuit)
 {
 }

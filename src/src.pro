@@ -60,7 +60,6 @@ SOURCES += \
     library/library.cpp \
     project/project.cpp \
     workspace/controlpanel/controlpanel.cpp \
-    workspace/workspacechooserdialog.cpp \
     library_editor/libraryeditor.cpp \
     workspace/projecttreemodel.cpp \
     workspace/projecttreeitem.cpp \
@@ -101,7 +100,6 @@ HEADERS += \
     library/library.h \
     project/project.h \
     workspace/controlpanel/controlpanel.h \
-    workspace/workspacechooserdialog.h \
     library_editor/libraryeditor.h \
     workspace/projecttreemodel.h \
     workspace/projecttreeitem.h \

@@ -31,8 +31,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-GenericComponentInstance::GenericComponentInstance(Workspace* workspace, Project* project,
-                                                   Circuit* circuit) :
+GenericComponentInstance::GenericComponentInstance(Workspace& workspace, Project& project,
+                                                   Circuit& circuit) :
     QObject(0), mWorkspace(workspace), mProject(project), mCircuit(circuit)
 {
 }

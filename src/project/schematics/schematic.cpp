@@ -31,7 +31,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Schematic::Schematic(Workspace* workspace, Project* project, Circuit* circuit) :
+Schematic::Schematic(Workspace& workspace, Project& project, Circuit& circuit) :
     CADScene(), mWorkspace(workspace), mProject(project), mCircuit(circuit)
 {
 }

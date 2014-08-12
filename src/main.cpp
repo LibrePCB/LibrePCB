@@ -26,8 +26,39 @@
 #include <QTranslator>
 #include "common/debug.h"
 #include "common/exceptions.h"
+#include "common/filepath.h"
 #include "workspace/workspace.h"
-#include "workspace/workspacechooserdialog.h"
+
+/*****************************************************************************************
+ *  app.exec()
+ ****************************************************************************************/
+
+static int appExec() noexcept
+{
+    // please note that we shouldn't show a dialog or message box in the catch() blocks!
+    // from http://qt-project.org/doc/qt-5/exceptionsafety.html:
+    //      "After an exception is thrown, the connection to the windowing server might
+    //      already be closed. It is not safe to call a GUI related function after
+    //      catching an exception."
+    try
+    {
+        return QApplication::exec();
+    }
+    catch (Exception& e)
+    {
+        qFatal("UNCAUGHT EXCEPTION: %s --- PROGRAM EXITED", e.getDebugString().toUtf8().constData());
+    }
+    catch (std::exception& e)
+    {
+        qFatal("UNCAUGHT EXCEPTION: %s --- PROGRAM EXITED", e.what());
+    }
+    catch (...)
+    {
+        qFatal("UNCAUGHT EXCEPTION --- PROGRAM EXITED");
+    }
+
+    return -1;
+}
 
 /*****************************************************************************************
  *  main()
@@ -84,43 +115,27 @@ int main(int argc, char* argv[])
 
     // Initialization finished, open the workspace...
 
-    QDir workspaceDir;
-    workspaceDir.setPath(Workspace::getMostRecentlyUsedWorkspacePath());
+    FilePath wsPath(Workspace::getMostRecentlyUsedWorkspacePath());
 
-    if ((!workspaceDir.exists()) || (!Workspace::isValidWorkspaceDir(workspaceDir)))
+    if (!Workspace::isValidWorkspacePath(wsPath))
     {
-        WorkspaceChooserDialog dialog;
+        wsPath = Workspace::chooseWorkspacePath();
+        if (!wsPath.isValid())
+            return 0;
 
-        if (!dialog.exec())
-            return 0; // no workspace was choosed
-
-        workspaceDir = dialog.getChoosedWorkspaceDir();
+        Workspace::setMostRecentlyUsedWorkspacePath(wsPath);
     }
 
-    Workspace ws(workspaceDir);
-    ws.showControlPanel();
-
-    // please note that we shouldn't show a dialog or message box in the catch() blocks!
-    // from http://qt-project.org/doc/qt-5/exceptionsafety.html:
-    //      "After an exception is thrown, the connection to the windowing server might
-    //      already be closed. It is not safe to call a GUI related function after
-    //      catching an exception."
     try
     {
-        return app.exec();
-    }
-    catch (Exception& e)
-    {
-        qFatal("UNCAUGHT EXCEPTION: %s --- PROGRAM EXITED", e.getDebugString().toUtf8().constData());
-    }
-    catch (std::exception& e)
-    {
-        qFatal("UNCAUGHT EXCEPTION: %s --- PROGRAM EXITED", e.what());
+        Workspace ws(wsPath); // this can throw an exception
+        ws.showControlPanel();
+
+        return appExec();
     }
     catch (...)
     {
-        qFatal("UNCAUGHT EXCEPTION --- PROGRAM EXITED");
+        qFatal("Could not open the workspace \"%s\" --- PROGRAM EXITED", qPrintable(wsPath.toStr()));
+        return -1;
     }
-
-    return -1;
 }

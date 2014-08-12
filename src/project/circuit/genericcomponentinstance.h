@@ -53,8 +53,8 @@ class GenericComponentInstance : public QObject
     public:
 
         // Constructors / Destructor
-        explicit GenericComponentInstance(Workspace* workspace, Project* project,
-                                          Circuit* circuit);
+        explicit GenericComponentInstance(Workspace& workspace, Project& project,
+                                          Circuit& circuit);
         ~GenericComponentInstance();
 
     private:
@@ -65,9 +65,9 @@ class GenericComponentInstance : public QObject
         GenericComponentInstance& operator=(const GenericComponentInstance& rhs);
 
         // General
-        Workspace* mWorkspace;
-        Project* mProject;
-        Circuit* mCircuit;
+        Workspace& mWorkspace;
+        Project& mProject;
+        Circuit& mCircuit;
 
 };
 

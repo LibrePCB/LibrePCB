@@ -25,6 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include "../common/filepath.h"
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -46,11 +47,11 @@ class RecentProjectsModel : public QAbstractListModel
     public:
 
         // Constructors / Destructor
-        explicit RecentProjectsModel(Workspace* workspace);
+        explicit RecentProjectsModel(Workspace& workspace);
         ~RecentProjectsModel();
 
         // General Methods
-        void setLastRecentProject(const QString& filename);
+        void setLastRecentProject(const FilePath& filepath);
 
     private:
 
@@ -66,8 +67,8 @@ class RecentProjectsModel : public QAbstractListModel
         int rowCount(const QModelIndex& parent = QModelIndex()) const;
         QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 
-        Workspace* mWorkspace; ///< a pointer to the Workspace object
-        QList<QFileInfo> mRecentProjects;
+        Workspace& mWorkspace; ///< a reference to the Workspace object
+        QList<FilePath> mRecentProjects;
 
 };
 

@@ -25,6 +25,8 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include "../common/exceptions.h"
+#include "../common/filepath.h"
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -72,34 +74,72 @@ class Workspace final : public QObject
     public:
 
         // Constructors / Destructor
-        explicit Workspace(const QDir& workspaceDir);
+
+        /**
+         * @brief Constructor to open an existing workspace
+         *
+         * @param wsPath    The filepath to the workspace directory
+         *
+         * @throw Exception If the workspace could not be opened, this constructor throws
+         *                  an exception.
+         */
+        explicit Workspace(const FilePath& wsPath) throw (Exception);
+
+        /**
+         * The destructor
+         */
         ~Workspace();
 
+
         // Getters
-        const QDir& getWorkspaceDir() const {return mWorkspaceDir;}
-        QString getUniquePath() const {return uniqueWorkspacePath(mWorkspaceDir.absolutePath());}
-        WorkspaceSettings* getSettings() const {return mWorkspaceSettings;}
-        library::Library* getLibrary() const {return mLibrary;}
+
+        /**
+         * @brief Get the filepath to the workspace directory
+         */
+        const FilePath& getPath() const {return mPath;}
+
+        /**
+         * @brief Get the filepath to the ".metadata" directory in the workspace
+         */
+        const FilePath& getMetadataPath() const {return mMetadataPath;}
+
+        /**
+         * @brief Get the filepath to the "projects" directory in the workspace
+         */
+        const FilePath& getProjectsPath() const {return mProjectsPath;}
+
+        /**
+         * @brief Get the filepath to the "library" directory in the workspace
+         */
+        const FilePath& getLibraryPath() const {return mLibraryPath;}
+
+        /**
+         * @brief Get the workspace settings
+         */
+        WorkspaceSettings& getSettings() const {return *mWorkspaceSettings;}
+
+        /**
+         * @brief Get the workspace library
+         */
+        library::Library& getLibrary() const {return *mLibrary;}
+
 
         // Project Management
-        project::Project* openProject(const QString& filename);
-        bool closeProject(const QString& filename, bool askForSave);
+        project::Project* openProject(const FilePath& filepath) noexcept;
+        bool closeProject(const FilePath& filepath, bool askForSave);
         bool closeProject(project::Project* project, bool askForSave);
         void unregisterOpenProject(project::Project* project);
-        project::Project* getOpenProject(const QString& filename);
-        const QHash<QString, project::Project*>& getOpenProjects() const {return mOpenProjects;}
-        bool isFavoriteProject(const QString& filename) const;
-        void addFavoriteProject(const QString& filename);
-        void removeFavoriteProject(const QString& filename);
+        project::Project* getOpenProject(const FilePath& filepath);
+        bool isFavoriteProject(const FilePath& filepath) const;
+        void addFavoriteProject(const FilePath& filepath);
+        void removeFavoriteProject(const FilePath& filepath);
 
         // Static Methods
-        static bool isValidWorkspaceDir(const QDir& dir);
-        static void createNewWorkspace(const QDir& dir);
-        static QString getMostRecentlyUsedWorkspacePath();
-        static void setMostRecentlyUsedWorkspacePath(const QString& path);
-        static QStringList getAllWorkspacePaths();
-        static void setAllWorkspacePaths(const QStringList& paths);
-        static QString uniqueWorkspacePath(const QString& path);
+        static bool isValidWorkspacePath(const FilePath& path);
+        static bool createNewWorkspace(const FilePath& path);
+        static FilePath getMostRecentlyUsedWorkspacePath();
+        static void setMostRecentlyUsedWorkspacePath(const FilePath& path);
+        static FilePath chooseWorkspacePath();
 
     public slots:
 
@@ -114,7 +154,10 @@ class Workspace final : public QObject
         Workspace(const Workspace& other);
         Workspace& operator=(const Workspace& rhs);
 
-        QDir mWorkspaceDir; ///< a QDir object which represents the workspace directory
+        FilePath mPath; ///< a FilePath object which represents the workspace directory
+        FilePath mMetadataPath; ///< the directory ".metadata"
+        FilePath mProjectsPath; ///< the directory "projects"
+        FilePath mLibraryPath; ///< the directory "library"
         WorkspaceSettings* mWorkspaceSettings; ///< the WorkspaceSettings object
         ControlPanel* mControlPanel; ///< the control panel window
         library::Library* mLibrary; ///< the library of the workspace (with SQLite database)

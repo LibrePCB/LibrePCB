@@ -55,7 +55,7 @@ class ControlPanel : public QMainWindow
     public:
 
         // Constructors / Destructor
-        explicit ControlPanel(Workspace* workspace, QAbstractItemModel* projectTreeModel,
+        explicit ControlPanel(Workspace& workspace, QAbstractItemModel* projectTreeModel,
                               QAbstractItemModel* recentProjectsModel,
                               QAbstractItemModel* favoriteProjectsModel);
         ~ControlPanel();
@@ -94,7 +94,7 @@ class ControlPanel : public QMainWindow
 
         Ui::ControlPanel* mUi;
 
-        Workspace* mWorkspace;
+        Workspace& mWorkspace;
 };
 
 #endif // CONTROLPANEL_H

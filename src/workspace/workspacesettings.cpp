@@ -31,17 +31,18 @@
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WorkspaceSettings::WorkspaceSettings(Workspace* workspace, const QString& metadataPath) :
-    QObject(0), mWorkspace(workspace), mMetadataDir(metadataPath)
+WorkspaceSettings::WorkspaceSettings(Workspace& workspace) :
+    QObject(0), mWorkspace(workspace), mMetadataPath(workspace.getMetadataPath())
 {
-    mMetadataDir.makeAbsolute();
-
-    // check if the .metadata directory is valid
-    if ((!mMetadataDir.exists()) || (mMetadataDir.dirName() != ".metadata"))
-        throw RuntimeError(QString("Invalid workspace metadata path: \"%1\"").arg(metadataPath), __FILE__, __LINE__);
+    // check if the metadata directory exists
+    if (!mMetadataPath.isExistingDir())
+    {
+        throw RuntimeError(QString("Invalid workspace metadata path: \"%1\"")
+                           .arg(mMetadataPath.toStr()), __FILE__, __LINE__);
+    }
 
     // check if the file settings.ini is writable
-    QSettings s(getFilepath(), QSettings::IniFormat);
+    QSettings s(mMetadataPath.getPathTo("settings.ini").toStr(), QSettings::IniFormat);
     if ((!s.isWritable()) || (s.status() != QSettings::NoError))
         throw RuntimeError("Error with the workspace settings! Check file permissions!", __FILE__, __LINE__);
 
@@ -82,12 +83,16 @@ WorkspaceSettings::~WorkspaceSettings()
 
 void WorkspaceSettings::load()
 {
-    QSettings s(getFilepath(), QSettings::IniFormat);
+    QSettings s(mMetadataPath.getPathTo("settings.ini").toStr(), QSettings::IniFormat);
+    s.beginGroup("settings");
 
-    setAppLocaleName(s.value("settings/app_locale_name", QString()).toString());
+    setAppLocaleName(s.value("app_locale_name", QString()).toString());
     setAppDefMeasUnit(Length::measurementUnitFromString(
-                          s.value("settings/app_default_measurement_unit").toString(),
+                          s.value("app_default_measurement_unit").toString(),
                           Length::millimeters));
+    setProjectAutosaveInterval(s.value("project_autosave_interval", 600).toUInt());
+
+    s.endGroup();
 }
 
 /*****************************************************************************************
@@ -105,19 +110,10 @@ void WorkspaceSettings::showSettingsDialog()
         return;
     }
 
-    dialog = new WorkspaceSettingsDialog(this);
+    dialog = new WorkspaceSettingsDialog(mWorkspace, *this);
     dialog->exec();
     delete dialog;
     dialog = 0;
-}
-
-/*****************************************************************************************
- *  Getters: General
- ****************************************************************************************/
-
-QString WorkspaceSettings::getFilepath(const QString& filename) const
-{
-    return QDir::toNativeSeparators(mMetadataDir.absoluteFilePath(filename));
 }
 
 /*****************************************************************************************
@@ -131,7 +127,7 @@ void WorkspaceSettings::setAppLocaleName(const QString& name)
 
     mAppLocaleName = name;
 
-    QSettings s(getFilepath(), QSettings::IniFormat);
+    QSettings s(mMetadataPath.getPathTo("settings.ini").toStr(), QSettings::IniFormat);
     s.setValue("settings/app_locale_name", mAppLocaleName);
 }
 
@@ -142,9 +138,20 @@ void WorkspaceSettings::setAppDefMeasUnit(Length::MeasurementUnit unit)
 
     mAppDefMeasUnit = unit;
 
-    QSettings s(getFilepath(), QSettings::IniFormat);
+    QSettings s(mMetadataPath.getPathTo("settings.ini").toStr(), QSettings::IniFormat);
     s.setValue("settings/app_default_measurement_unit",
                Length::measurementUnitToString(mAppDefMeasUnit));
+}
+
+void WorkspaceSettings::setProjectAutosaveInterval(unsigned int interval)
+{
+    if (interval == mProjectAutosaveInterval)
+        return;
+
+    mProjectAutosaveInterval = interval;
+
+    QSettings s(mMetadataPath.getPathTo("settings.ini").toStr(), QSettings::IniFormat);
+    s.setValue("settings/project_autosave_interval", mProjectAutosaveInterval);
 }
 
 /*****************************************************************************************

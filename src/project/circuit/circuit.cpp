@@ -34,17 +34,19 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Circuit::Circuit(Workspace* workspace, Project* project) :
-    QObject(0), mWorkspace(workspace), mProject(project),
-    mDomDocument(0), mRootDomElement(0)
+Circuit::Circuit(Workspace& workspace, Project& project, bool restore) throw (Exception) :
+    QObject(0), mWorkspace(workspace), mProject(project), mDomDocument(0),
+    mRootDomElement(0)
 {
-    // get the absolute filepath to "core/circuit.xml"
-    mXmlFilepath = QDir::toNativeSeparators(mProject->getDir().absoluteFilePath("core/circuit.xml"));
+    // get the absolute filepath to "core/circuit.xml" (UNIX style)
+    //mXmlFilepath = mProject->getDir().filePath("core/circuit.xml");
 
     try
     {
+        // TODO
+
         // load the XML file in "mDomDocument" and create "mRootDomElement"
-        QFile xmlFile(mXmlFilepath);
+        /*QFile xmlFile(mXmlFilepath);
         if (!xmlFile.exists())
             throw RuntimeError(QString("File \"%1\" not found!").arg(mXmlFilepath), __FILE__, __LINE__);
         if (!xmlFile.open(QIODevice::ReadOnly))
@@ -55,24 +57,22 @@ Circuit::Circuit(Workspace* workspace, Project* project) :
         xmlFile.close();
         mRootDomElement = new QDomElement(mDomDocument->firstChildElement("circuit"));
         if (mRootDomElement->isNull())
-            throw RuntimeError(QString("Invalid XML in \"%1\"!").arg(mXmlFilepath), __FILE__, __LINE__);
+            throw RuntimeError(QString("Invalid XML in \"%1\"!").arg(mXmlFilepath), __FILE__, __LINE__);*/
 
         // all ok, now read the XML content
 
-        mUuid = mRootDomElement->firstChildElement("meta").firstChildElement("uuid").text();
-        if (mUuid.isNull())
-            throw RuntimeError(QString("Invalid circuit UUID!"), __FILE__, __LINE__);
+        // TODO
     }
     catch (...)
     {
         // free allocated memory and rethrow the exception
-        delete mRootDomElement;
         delete mDomDocument;
+        delete mRootDomElement;
         throw;
     }
 }
 
-Circuit::~Circuit()
+Circuit::~Circuit() noexcept
 {
     delete mRootDomElement;     mRootDomElement = 0;
     delete mDomDocument;        mDomDocument = 0;
@@ -82,17 +82,28 @@ Circuit::~Circuit()
  *  General Methods
  ****************************************************************************************/
 
-void Circuit::save()
+bool Circuit::save(bool toOriginal, QStringList& errors) noexcept
 {
+    bool success = true;
+    /*QString tilde = toOriginal ? "" : "~";
+
     // Save "core/circuit.xml"
-    QFile xmlFile(mXmlFilepath);
-    if (!xmlFile.exists())
-        throw RuntimeError(QString("File \"%1\" not found!").arg(mXmlFilepath), __FILE__, __LINE__);
-    if (!xmlFile.open(QIODevice::WriteOnly))
-        throw RuntimeError(QString("Cannot open file \"%1\"!").arg(mXmlFilepath), __FILE__, __LINE__);
-    QTextStream stream(&xmlFile);
-    stream << mDomDocument->toString(4);
-    xmlFile.close();
+    QFile xmlFile(mXmlFilepath % tilde);
+    {
+        success = false;
+        errors.append(QString(tr("Could not open the file \"%1\"!")).arg(xmlFile.fileName()));
+        qCritical() << "Could not open the circuit file:" << xmlFile.fileName();
+    }
+    QByteArray fileContent = mDomDocument->toByteArray(4);
+    if (xmlFile.write(fileContent) != fileContent.size())
+    {
+        success = false;
+        errors.append(QString(tr("Could not write to the file \"%1\"!")).arg(xmlFile.fileName()));
+        qCritical() << "Could not write to the circuit file:" << xmlFile.fileName();
+    }
+    xmlFile.close();*/
+
+    return success;
 }
 
 /*****************************************************************************************

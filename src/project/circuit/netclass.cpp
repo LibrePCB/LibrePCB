@@ -31,7 +31,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-NetClass::NetClass(Workspace* workspace, Project* project, Circuit* circuit) :
+NetClass::NetClass(Workspace& workspace, Project& project, Circuit& circuit) :
     QObject(0), mWorkspace(workspace), mProject(project), mCircuit(circuit)
 {
 }
