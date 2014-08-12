@@ -23,9 +23,11 @@ INCLUDEPATH += \
     ../src
 
 SOURCES += main.cpp \
+    ../src/common/filepath.cpp \
     ../src/common/debug.cpp \
     ../src/common/exceptions.cpp
 
 HEADERS += \
+    ../src/common/filepath.h \
     ../src/common/debug.h \
     ../src/common/exceptions.h
