@@ -24,6 +24,7 @@
 #include <QtCore>
 #include "filelock.h"
 #include "systeminfo.h"
+#include "filepath.h"
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -35,7 +36,7 @@ FileLock::FileLock() noexcept :
     // nothing to do...
 }
 
-FileLock::FileLock(const QString& filepath) noexcept :
+FileLock::FileLock(const FilePath& filepath) noexcept :
     mLockFilepath(), mLockedByThisObject(false)
 {
     setFileToLock(filepath);
@@ -51,36 +52,34 @@ FileLock::~FileLock() noexcept
  *  Setters
  ****************************************************************************************/
 
-void FileLock::setFileToLock(const QString& filepath) noexcept
+bool FileLock::setFileToLock(const FilePath& filepath) noexcept
 {
     if (mLockedByThisObject)
     {
         qCritical() << "it's not allowed to set a new filepath while the lock is active!!";
-        return;
+        return false;
     }
 
     // determine the filepath for the lock file
-    QFileInfo fileInfo(filepath);
-    mLockFilepath = fileInfo.dir().absoluteFilePath(".~lock." % fileInfo.fileName() % "#");
+    QString lockFileName = QStringLiteral(".~lock.") % filepath.getFilename() % QStringLiteral("#");
+    mLockFilepath = filepath.getParentDir().getPathTo(lockFileName);
 
-    // make some checks...
-    if (filepath != QDir::fromNativeSeparators(filepath)) // check UNIX style
-        qWarning() << "not UNIX style:" << filepath;
-    if (!fileInfo.isAbsolute()) // check absolute path
-        qWarning() << "not an absolute path:" << filepath;
-    if (!fileInfo.dir().exists()) // check directory
-        qWarning() << "directory does not exist:" << filepath;
-    if (mLockFilepath.isEmpty())
-        qCritical() << "invalid filepath passed to setFileToLock():" << filepath;
+    if (!mLockFilepath.isValid())
+    {
+        qCritical() << "invalid lock filepath!";
+        return false;
+    }
+
+    return true;
 }
 
 /*****************************************************************************************
  *  Getters
  ****************************************************************************************/
 
-const QString& FileLock::getLockFilepath() const noexcept
+const FilePath& FileLock::getLockFilepath() const noexcept
 {
-    if (mLockFilepath.isEmpty())
+    if (!mLockFilepath.isValid())
         qCritical() << "getLockFilepath() was called before setFileToLock()!";
 
     return mLockFilepath;
@@ -88,13 +87,13 @@ const QString& FileLock::getLockFilepath() const noexcept
 
 FileLock::LockStatus FileLock::getStatus() const noexcept
 {
-    if (mLockFilepath.isEmpty())
+    if (!mLockFilepath.isValid())
     {
         qCritical() << "getStatus() was called before setFileToLock()!";
         return Error;
     }
 
-    QFile file(mLockFilepath);
+    QFile file(mLockFilepath.toStr());
 
     if (!file.exists())
     {
@@ -104,7 +103,7 @@ FileLock::LockStatus FileLock::getStatus() const noexcept
 
     if (!file.open(QIODevice::ReadOnly))
     {
-        qWarning() << "Could not open the lock file:" << mLockFilepath;
+        qWarning() << "Could not open the lock file:" << mLockFilepath.toStr();
         return Error;
     }
 
@@ -142,7 +141,7 @@ FileLock::LockStatus FileLock::getStatus() const noexcept
 
 bool FileLock::lock() noexcept
 {
-    if (mLockFilepath.isEmpty())
+    if (!mLockFilepath.isValid())
     {
         qCritical() << "lock() was called before setFileToLock()!";
         return false;
@@ -157,17 +156,26 @@ bool FileLock::lock() noexcept
                           QString::number(QCoreApplication::applicationPid()),
                           QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
 
-    QFile file(mLockFilepath);
+    // create all parent directories (if they do not exist)
+    if (!mLockFilepath.getParentDir().mkPath())
+    {
+        qWarning() << "Could not create directories of the path" << mLockFilepath.toStr();
+        // do not return here; if the directories do really not exist, writing to the
+        // lock file will also abort...
+        //return false;
+    }
+
+    QFile file(mLockFilepath.toStr());
     if (!file.open(QIODevice::WriteOnly))
     {
-        qWarning() << "Could not open the lock file:" << mLockFilepath;
+        qWarning() << "Could not open the lock file:" << mLockFilepath.toStr();
         return false;
     }
 
     QByteArray utf8content = content.toUtf8();
     if (file.write(utf8content) != utf8content.length())
     {
-        qWarning() << "Could not write to the lock file:" << mLockFilepath;
+        qWarning() << "Could not write to the lock file:" << mLockFilepath.toStr();
         file.close();
         return false;
     }
@@ -179,18 +187,18 @@ bool FileLock::lock() noexcept
 
 bool FileLock::unlock() noexcept
 {
-    if (mLockFilepath.isEmpty())
+    if (!mLockFilepath.isValid())
     {
         qCritical() << "unlock() was called before setFileToLock()!";
         return false;
     }
 
-    QFile file(mLockFilepath);
+    QFile file(mLockFilepath.toStr());
     if (file.exists())
     {
         if (!file.remove())
         {
-            qWarning() << "Could not remove the lock file:" << mLockFilepath;
+            qWarning() << "Could not remove the lock file:" << mLockFilepath.toStr();
             return false;
         }
     }

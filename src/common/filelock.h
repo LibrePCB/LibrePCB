@@ -25,6 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include "filepath.h"
 
 /*****************************************************************************************
  *  Class FileLock
@@ -92,9 +93,9 @@
  *  {
  *      public:
  *          MyFileOpeningClass() // constructor
- *              : myLock("C:/myFile.txt") // variant 1 to set the filepath
+ *              : myLock(FilePath("C:/myFile.txt")) // variant 1 to set the filepath
  *          {
- *              myLock.setFileToLock("C:/myFile.txt"); // variant 2 to set the filepath
+ *              myLock.setFileToLock(FilePath("C:/myFile.txt")); // variant 2
  *              switch (myLock.getStatus())
  *              {
  *                  case Unlocked:
@@ -170,7 +171,7 @@ class FileLock final
          *
          * @param filepath  See #setFileToLock()
          */
-        explicit FileLock(const QString& filepath) noexcept;
+        explicit FileLock(const FilePath& filepath) noexcept;
 
         /**
          * @brief The destructor (this may also unlock the locked file)
@@ -185,11 +186,11 @@ class FileLock final
         /**
          * @brief Specify the file for which you need the lock (NOT the lock file itself!)
          *
-         * @param filepath      The absolute filepath to the file to lock (UNIX style!)
+         * @param filepath      The filepath to the file to lock (it do not need to exist)
          *
-         * @warning     The filepath do not need to exist, but the directory must exist!
+         * @return true if success, false if not
          */
-        void setFileToLock(const QString& filepath) noexcept;
+        bool setFileToLock(const FilePath& filepath) noexcept;
 
 
         // Getters
@@ -197,9 +198,9 @@ class FileLock final
         /**
          * @brief Get the filepath of the lock file (NOT the file passed by setFileToLock()!)
          *
-         * @return The absolute filepath to the lock file (UNIX style)
+         * @return The filepath to the lock file (invalid if no valid filepath was set)
          */
-        const QString& getLockFilepath() const noexcept;
+        const FilePath& getLockFilepath() const noexcept;
 
         /**
          * @brief Get the lock status of the specified file
@@ -247,13 +248,12 @@ class FileLock final
         FileLock& operator=(const FileLock& rhs);
 
         /**
-         * @brief The absolute filepath to the lock file (UNIX style)
+         * @brief The filepath to the lock file
          *
          * Example: If the filepath "C:/foo/goo.xml" was passed to setFileToLock(),
          *          this attribute will have the value "C:/foo/.~lock.goo.xml#".
-         *          This attribute will be returned by getLockFilepath().
          */
-        QString mLockFilepath;
+        FilePath mLockFilepath;
 
         /**
          * @brief This attribute defines if the lock is active by this object
