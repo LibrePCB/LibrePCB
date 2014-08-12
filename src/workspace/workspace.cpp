@@ -47,7 +47,7 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
     mPath(wsPath),
     mMetadataPath(wsPath.getPathTo(".metadata")),
     mProjectsPath(wsPath.getPathTo("projects")),
-    mLibraryPath(wsPath.getPathTo("library")),
+    mLibraryPath(wsPath.getPathTo("lib")),
     mWorkspaceSettings(0), mControlPanel(0), mLibrary(0), mLibraryEditor(0),
     mProjectTreeModel(0), mRecentProjectsModel(0), mFavoriteProjectsModel(0)
 {
