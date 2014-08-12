@@ -9,7 +9,7 @@
         - @subpage miscellaneous
         - @subpage doc_layers
         - @subpage library_documentation
-        - @subpage project_documentation
+        - @subpage doc_project
     
     @section related_pages Related Pages
         - @ref todo
