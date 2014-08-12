@@ -23,6 +23,7 @@
 
 #include <QtCore>
 #include "debug.h"
+#include "filepath.h"
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -30,14 +31,13 @@
 
 Debug::Debug() :
     mDebugLevelStderr(All), mDebugLevelLogFile(Nothing),
-    mStderrStream(new QTextStream(stderr)), mLogFile(0)
+    mStderrStream(new QTextStream(stderr)), mLogFilepath(), mLogFile(0)
 {
     // determine the filename of the log file which will be used if logging is enabled
-    QDir dataDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
-    QDir logDir(dataDir.absoluteFilePath("logs"));
-    logDir.mkpath(logDir.absolutePath());
-    mLogFilename = QDir::toNativeSeparators(logDir.absoluteFilePath(
-                        QDateTime::currentDateTime().toString(Qt::ISODate) % ".log"));
+    QString datetime = QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss");
+    QString dataDir = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+    if (!dataDir.isEmpty())
+        mLogFilepath.setPath(dataDir % "/logs/" % datetime % ".log");
 
     // install the message handler for Qt's debug functions (qDebug(), ...)
     qInstallMessageHandler(messageHandler);
@@ -73,15 +73,21 @@ void Debug::setDebugLevelLogFile(DebugLevel level)
     if ((mDebugLevelLogFile == Nothing) && (level != Nothing))
     {
         // enable logging to file
-        mLogFile = new QFile(mLogFilename);
+        mLogFilepath.getParentDir().mkPath();
+        mLogFile = new QFile(mLogFilepath.toStr());
         bool success = mLogFile->open(QFile::WriteOnly);
         if (success)
-            qDebug() << "enabled logging to file" << mLogFilename;
+        {
+            mDebugLevelLogFile = level; // activate logging to file immediately!
+            qDebug() << "enabled logging to file" << mLogFilepath.toNative();
+            qDebug() << "Qt version:" << qVersion();
+        }
         else
         {
+            qWarning() << "cannot enable logging to file" << mLogFilepath.toNative();
+            qWarning() << "error message:" << mLogFile->errorString();
             delete mLogFile;
             mLogFile = 0;
-            qWarning() << "cannot enable logging to file" << mLogFilename;
         }
     }
     else if ((mDebugLevelLogFile != Nothing) && (level == Nothing) && (mLogFile))
@@ -105,9 +111,9 @@ Debug::DebugLevel Debug::getDebugLevelLogFile() const
     return mDebugLevelLogFile;
 }
 
-const QString& Debug::getLogFilename() const
+const FilePath& Debug::getLogFilepath() const
 {
-    return mLogFilename;
+    return mLogFilepath;
 }
 
 void Debug::print(DebugLevel level, const QString& msg, const char* file, int line)
@@ -137,20 +143,20 @@ void Debug::print(DebugLevel level, const QString& msg, const char* file, int li
             break;
     }
 
-    QString logMsg = QString("[%1] %2 (%3:%4)\n").arg(levelStr, msg.toLocal8Bit().constData(), file).arg(line);
+    QString logMsg = QString("[%1] %2 (%3:%4)").arg(levelStr, msg.toLocal8Bit().constData(),
+                                                    file).arg(line);
 
     if (mDebugLevelStderr >= level)
     {
         // write to stderr
-        *mStderrStream << logMsg;
-        mStderrStream->flush();
+        *mStderrStream << logMsg << endl;
     }
 
     if ((mDebugLevelLogFile >= level) && (mLogFile))
     {
         // write to the log file
-        mLogFile->write(logMsg.toLocal8Bit());
-        mLogFile->flush();
+        QTextStream logFileStream(mLogFile);
+        logFileStream << logMsg << endl;
     }
 }
 

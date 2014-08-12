@@ -25,6 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include "filepath.h"
 
 /*****************************************************************************************
  *  Class Debug
@@ -107,7 +108,7 @@ class Debug final
          *
          * @return The filename of the log file (the file may do not exist)
          */
-        const QString& getLogFilename() const;
+        const FilePath& getLogFilepath() const;
 
         /**
          * @brief Print a message to stderr/logfile (with respect to the current debug level)
@@ -161,7 +162,7 @@ class Debug final
         DebugLevel mDebugLevelStderr;   ///< the current debug level for the stderr output
         DebugLevel mDebugLevelLogFile;  ///< the current debug level for the log file
         QTextStream* mStderrStream;     ///< the stream to stderr
-        QString mLogFilename;           ///< the filename for the log file
+        FilePath mLogFilepath;          ///< the filepath for the log file
         QFile* mLogFile;                ///< NULL if file logging is disabled
 
 };
