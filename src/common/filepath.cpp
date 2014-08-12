@@ -58,6 +58,8 @@ bool FilePath::setPath(const QString& filepath) noexcept
 
     if (mFileInfo.isAbsolute()) // check if the filepath is absolute
         mIsValid = true;
+    else
+        qDebug() << "filepath is not absolute:" << filepath << "-->" << mFileInfo.filePath();
 
     return mIsValid;
 }
@@ -178,6 +180,18 @@ FilePath FilePath::getParentDir() const noexcept
 FilePath FilePath::getPathTo(const QString& filename) const noexcept
 {
     return FilePath(mFileInfo.filePath() % QLatin1Char('/') % filename);
+}
+
+/*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+bool FilePath::mkPath() const noexcept
+{
+    if (!mIsValid)
+        return false;
+
+    return QDir().mkpath(mFileInfo.filePath());
 }
 
 /*****************************************************************************************

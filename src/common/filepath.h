@@ -290,6 +290,20 @@ class FilePath final
         FilePath getPathTo(const QString& filename) const noexcept;
 
 
+        // General Methods
+
+        /**
+         * @brief Create all directories of this filepath (with all parent directories)
+         *
+         * @warning You should call this method only if this filepath represents a path to
+         *          a directory! If it points to a file (which does not exist), this
+         *          method will create a directory with the file's name (like "foo.txt")!
+         *
+         * @return true if success, false if not
+         */
+        bool mkPath() const noexcept;
+
+
         // Static Methods
 
         /**
