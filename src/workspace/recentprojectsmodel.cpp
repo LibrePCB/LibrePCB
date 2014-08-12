@@ -41,7 +41,8 @@ RecentProjectsModel::RecentProjectsModel(Workspace& workspace) :
     for (int i = 0; i < count; i++)
     {
          settings.setArrayIndex(i);
-         FilePath filepath(settings.value("filepath").toString());
+         FilePath filepath = FilePath::fromRelative(mWorkspace.getPath(),
+                                                    settings.value("filepath").toString());
          beginInsertRows(QModelIndex(), mRecentProjects.count(), mRecentProjects.count());
          mRecentProjects.append(filepath);
          endInsertRows();
@@ -67,7 +68,7 @@ void RecentProjectsModel::save()
     for (int i = 0; i < mRecentProjects.count(); i++)
     {
         settings.setArrayIndex(i);
-        settings.setValue("filepath", mRecentProjects.at(i).toNative());
+        settings.setValue("filepath", mRecentProjects.at(i).toRelative(mWorkspace.getPath()));
     }
     settings.endArray();
 }

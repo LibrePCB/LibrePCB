@@ -108,7 +108,7 @@ void ControlPanel::saveSettings()
         foreach (QModelIndex index, model->getPersistentIndexList())
         {
             if (mUi->projectTreeView->isExpanded(index))
-                list.append(index.data(Qt::UserRole).toString());
+                list.append(FilePath(index.data(Qt::UserRole).toString()).toRelative(mWorkspace.getPath()));
         }
         settings.setValue("expanded_projecttreeview_items", QVariant::fromValue(list));
     }
@@ -136,8 +136,9 @@ void ControlPanel::loadSettings()
         QStringList list = settings.value("expanded_projecttreeview_items").toStringList();
         foreach (QString item, list)
         {
+            FilePath filepath = FilePath::fromRelative(mWorkspace.getPath(), item);
             QModelIndexList items = model->match(model->index(0, 0), Qt::UserRole,
-                QVariant::fromValue(item), 1, Qt::MatchExactly | Qt::MatchWrap | Qt::MatchRecursive);
+                QVariant::fromValue(filepath.toStr()), 1, Qt::MatchExactly | Qt::MatchWrap | Qt::MatchRecursive);
             if (!items.isEmpty())
                 mUi->projectTreeView->setExpanded(items.first(), true);
         }

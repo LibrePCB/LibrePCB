@@ -41,7 +41,8 @@ FavoriteProjectsModel::FavoriteProjectsModel(Workspace& workspace) :
     for (int i = 0; i < count; i++)
     {
         settings.setArrayIndex(i);
-        FilePath filepath(settings.value("filepath").toString());
+        FilePath filepath = FilePath::fromRelative(mWorkspace.getPath(),
+                                                   settings.value("filepath").toString());
         beginInsertRows(QModelIndex(), mFavoriteProjects.count(), mFavoriteProjects.count());
         mFavoriteProjects.append(filepath);
         endInsertRows();
@@ -67,7 +68,7 @@ void FavoriteProjectsModel::save()
     for (int i = 0; i < mFavoriteProjects.count(); i++)
     {
         settings.setArrayIndex(i);
-        settings.setValue("filepath", mFavoriteProjects.at(i).toNative());
+        settings.setValue("filepath", mFavoriteProjects.at(i).toRelative(mWorkspace.getPath()));
     }
     settings.endArray();
 }
