@@ -90,7 +90,8 @@ SOURCES += \
     common/systeminfo.cpp \
     common/debug.cpp \
     common/filelock.cpp \
-    common/filepath.cpp
+    common/filepath.cpp \
+    common/xmlfile.cpp
 
 HEADERS += \
     common/units.h \
@@ -130,7 +131,8 @@ HEADERS += \
     common/systeminfo.h \
     common/debug.h \
     common/filelock.h \
-    common/filepath.h
+    common/filepath.h \
+    common/xmlfile.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \
