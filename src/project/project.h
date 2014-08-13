@@ -34,9 +34,7 @@
  *  Forward Declarations
  ****************************************************************************************/
 
-class QDomDocument;
-class QDomElement;
-
+class XmlFile;
 class Workspace;
 
 namespace project {
@@ -110,7 +108,14 @@ class Project final : public QObject
          *
          * @return The absolute filepath
          */
-        const FilePath& getFilepath() const noexcept;
+        const FilePath& getFilepath() const noexcept {return mFilepath;}
+
+        /**
+         * @brief Get the path to the project directory
+         *
+         * @return The filepath to the project directory
+         */
+        const FilePath& getPath() const noexcept {return mPath;}
 
         /**
          * @brief Get a pointer to the undo stack of the project
@@ -202,9 +207,9 @@ class Project final : public QObject
         Workspace& mWorkspace; ///< a reference to the workspace
 
         // Project File (*.e4u)
-        FilePath mFilePath; ///< the filepath of the *.e4u project file
-        QDomDocument* mDomDocument;
-        QDomElement* mRootDomElement;
+        FilePath mPath; ///< the path to the project directory
+        FilePath mFilepath; ///< the filepath of the *.e4u project file
+        XmlFile* mXmlFile;
         FileLock mFileLock; ///< See @ref doc_project_lock
 
         // General

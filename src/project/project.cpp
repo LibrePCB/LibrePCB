@@ -25,6 +25,7 @@
 #include <QDomDocument>
 #include "project.h"
 #include "../common/exceptions.h"
+#include "../common/xmlfile.h"
 #include "../workspace/workspace.h"
 #include "../workspace/workspacesettings.h"
 #include "library/projectlibrary.h"
@@ -41,16 +42,17 @@ namespace project {
  ****************************************************************************************/
 
 Project::Project(Workspace& workspace, const FilePath& filepath) throw (Exception) :
-    QObject(0), mWorkspace(workspace), mFilePath(filepath), mDomDocument(0),
-    mRootDomElement(0), mFileLock(filepath), mUndoStack(0), mProjectLibrary(0),
-    mCircuit(0), mSchematicEditor(0)
+    QObject(0), mWorkspace(workspace), mPath(filepath.getParentDir()),
+    mFilepath(filepath), mXmlFile(0), mFileLock(filepath), mUndoStack(0),
+    mProjectLibrary(0), mCircuit(0), mSchematicEditor(0)
 {
     // Check if the filepath is valid
-    if ((!mFilePath.isExistingFile()) || (mFilePath.getSuffix() != "e4u"))
+    if ((!mFilepath.isExistingFile()) || (mFilepath.getSuffix() != "e4u")
+            || (!mPath.isExistingDir()))
     {
         QMessageBox::critical(0, tr("Invalid filepath"), QString(tr("The project "
-            "filepath is not valid: \"%1\"")).arg(mFilePath.toNative()));
-        throw RuntimeError(QString("Invalid project file: \"%1\"").arg(mFilePath.toStr()),
+            "filepath is not valid: \"%1\"")).arg(mFilepath.toNative()));
+        throw RuntimeError(QString("Invalid project file: \"%1\"").arg(mFilepath.toStr()),
                            __FILE__, __LINE__);
     }
 
@@ -118,6 +120,7 @@ Project::Project(Workspace& workspace, const FilePath& filepath) throw (Exceptio
         throw RuntimeError("Error while locking the project!", __FILE__, __LINE__);
     }
 
+
     // OK - the project is locked and can be opened!
     // Until this line, there was no memory allocated on the heap. But in the rest of the
     // constructor, a lot of object will be created on the heap. If an exception is
@@ -125,41 +128,18 @@ Project::Project(Workspace& workspace, const FilePath& filepath) throw (Exceptio
     // This is done by a try/catch block. In the catch-block, all allocated memory will
     // be freed. Then the exception is rethrown to leave the constructor.
 
-    QString tilde = restoreBackup ? "~" : ""; // this is to append to filenames...
-
     try
     {
-        // load the project XML file in "mDomDocument" and create "mRootDomElement"
-        QFile projectFile(mFilePath.toStr() % tilde);
-        if ((!projectFile.exists()) && (restoreBackup)) // the temporary file does not exist
-            projectFile.setFileName(mFilePath.toStr()); // so we will open the original file
-        if (!projectFile.open(QIODevice::ReadOnly))
+        // try to open the XML project file
+        try
         {
-            QMessageBox::critical(0, tr("Cannot open the project"),
-                QString(tr("The project file \"%1\" could not be opened!"))
-                .arg(QDir::toNativeSeparators(projectFile.fileName())));
-            throw RuntimeError(QString("Cannot open file \"%1\"!")
-                               .arg(projectFile.fileName()), __FILE__, __LINE__);
+            mXmlFile = new XmlFile(mFilepath, restoreBackup, "project");
         }
-        mDomDocument = new QDomDocument();
-        if (!mDomDocument->setContent(&projectFile))
+        catch (Exception& e)
         {
             QMessageBox::critical(0, tr("Cannot open the project"),
-                QString(tr("The project file \"%1\" could not be read!"))
-                .arg(QDir::toNativeSeparators(projectFile.fileName())));
-            projectFile.close();
-            throw RuntimeError(QString("Cannot read file \"%1\"!")
-                               .arg(projectFile.fileName()), __FILE__, __LINE__);
-        }
-        projectFile.close();
-        mRootDomElement = new QDomElement(mDomDocument->firstChildElement("project"));
-        if (mRootDomElement->isNull())
-        {
-            QMessageBox::critical(0, tr("Cannot open the project"),
-                QString(tr("The project file \"%1\" contains invalid XML!"))
-                .arg(QDir::toNativeSeparators(projectFile.fileName())));
-            throw RuntimeError(QString("Invalid XML in \"%1\"!")
-                               .arg(projectFile.fileName()), __FILE__, __LINE__);
+                QString(tr("Error while opening the project file: %1")).arg(e.getMsg()));
+            throw;
         }
 
         // the project seems to be ready to open, so we will create all needed objects
@@ -175,8 +155,7 @@ Project::Project(Workspace& workspace, const FilePath& filepath) throw (Exceptio
         delete mCircuit;                mCircuit = 0;
         delete mProjectLibrary;         mProjectLibrary = 0;
         delete mUndoStack;              mUndoStack = 0;
-        delete mRootDomElement;         mRootDomElement = 0;
-        delete mDomDocument;            mDomDocument = 0;
+        delete mXmlFile;                mXmlFile = 0;
         throw; // ...and rethrow the exception
     }
 
@@ -199,24 +178,14 @@ Project::~Project() noexcept
 
     // stop the autosave timer and remove all temporary files
     mAutoSaveTimer.stop();
-    QFile::remove(mFilePath.toStr() % "~");
+    QFile::remove(mFilepath.toStr() % "~");
 
     // free the allocated memory in the reverse order of their allocation
     delete mSchematicEditor;        mSchematicEditor = 0;
     delete mCircuit;                mCircuit = 0;
     delete mProjectLibrary;         mProjectLibrary = 0;
     delete mUndoStack;              mUndoStack = 0;
-    delete mRootDomElement;         mRootDomElement = 0;
-    delete mDomDocument;            mDomDocument = 0;
-}
-
-/*****************************************************************************************
- *  Getters
- ****************************************************************************************/
-
-const FilePath& Project::getFilepath() const noexcept
-{
-    return mFilePath;
+    delete mXmlFile;                mXmlFile = 0;
 }
 
 /*****************************************************************************************
@@ -349,21 +318,15 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     QString tilde = toOriginal ? "" : "~";
 
     // Save *.e4u project file
-    QFile projectFile(mFilePath.toStr() % tilde);
-    if (!projectFile.open(QIODevice::WriteOnly))
+    try
+    {
+        mXmlFile->save(toOriginal);
+    }
+    catch (Exception& e)
     {
         success = false;
-        errors.append(QString(tr("Could not open the file \"%1\"!")).arg(projectFile.fileName()));
-        qCritical() << "Could not open the project file:" << projectFile.fileName();
+        errors.append(e.getMsg());
     }
-    QByteArray projectFileContent = mDomDocument->toByteArray(4);
-    if (projectFile.write(projectFileContent) != projectFileContent.size())
-    {
-        success = false;
-        errors.append(QString(tr("Could not write to the file \"%1\"!")).arg(projectFile.fileName()));
-        qCritical() << "Could not write to the project file:" << projectFile.fileName();
-    }
-    projectFile.close();
 
     // Save other components
     if (!mCircuit->save(toOriginal, errors))

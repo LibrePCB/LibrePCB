@@ -25,6 +25,7 @@
 #include <QtWidgets>
 #include <QDomDocument>
 #include "../../common/exceptions.h"
+#include "../../common/xmlfile.h"
 #include "circuit.h"
 #include "../project.h"
 
@@ -35,47 +36,38 @@ namespace project {
  ****************************************************************************************/
 
 Circuit::Circuit(Workspace& workspace, Project& project, bool restore) throw (Exception) :
-    QObject(0), mWorkspace(workspace), mProject(project), mDomDocument(0),
-    mRootDomElement(0)
+    QObject(0), mWorkspace(workspace), mProject(project),
+    mXmlFilepath(project.getPath().getPathTo("core/circuit.xml")), mXmlFile(0)
 {
-    // get the absolute filepath to "core/circuit.xml" (UNIX style)
-    //mXmlFilepath = mProject->getDir().filePath("core/circuit.xml");
+    // try to open the XML file "circuit.xml"
+    try
+    {
+        mXmlFile = new XmlFile(mXmlFilepath, restore, "circuit");
+    }
+    catch (Exception& e)
+    {
+        QMessageBox::critical(0, tr("Cannot open the circuit"),
+            QString(tr("Error while opening the circuit file: %1")).arg(e.getMsg()));
+        throw;
+    }
+
+    // OK - XML file is open --> now load the whole circuit stuff
 
     try
     {
-        // TODO
-
-        // load the XML file in "mDomDocument" and create "mRootDomElement"
-        /*QFile xmlFile(mXmlFilepath);
-        if (!xmlFile.exists())
-            throw RuntimeError(QString("File \"%1\" not found!").arg(mXmlFilepath), __FILE__, __LINE__);
-        if (!xmlFile.open(QIODevice::ReadOnly))
-            throw RuntimeError(QString("Cannot open file \"%1\"!").arg(mXmlFilepath), __FILE__, __LINE__);
-        mDomDocument = new QDomDocument();
-        if (!mDomDocument->setContent(&xmlFile))
-            throw RuntimeError(QString("Cannot load file \"%1\"!").arg(mXmlFilepath), __FILE__, __LINE__);
-        xmlFile.close();
-        mRootDomElement = new QDomElement(mDomDocument->firstChildElement("circuit"));
-        if (mRootDomElement->isNull())
-            throw RuntimeError(QString("Invalid XML in \"%1\"!").arg(mXmlFilepath), __FILE__, __LINE__);*/
-
-        // all ok, now read the XML content
-
         // TODO
     }
     catch (...)
     {
         // free allocated memory and rethrow the exception
-        delete mDomDocument;
-        delete mRootDomElement;
+        delete mXmlFile;     mXmlFile = 0;
         throw;
     }
 }
 
 Circuit::~Circuit() noexcept
 {
-    delete mRootDomElement;     mRootDomElement = 0;
-    delete mDomDocument;        mDomDocument = 0;
+    delete mXmlFile;        mXmlFile = 0;
 }
 
 /*****************************************************************************************
@@ -85,23 +77,17 @@ Circuit::~Circuit() noexcept
 bool Circuit::save(bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
-    /*QString tilde = toOriginal ? "" : "~";
 
     // Save "core/circuit.xml"
-    QFile xmlFile(mXmlFilepath % tilde);
+    try
+    {
+        mXmlFile->save(toOriginal);
+    }
+    catch (Exception& e)
     {
         success = false;
-        errors.append(QString(tr("Could not open the file \"%1\"!")).arg(xmlFile.fileName()));
-        qCritical() << "Could not open the circuit file:" << xmlFile.fileName();
+        errors.append(e.getMsg());
     }
-    QByteArray fileContent = mDomDocument->toByteArray(4);
-    if (xmlFile.write(fileContent) != fileContent.size())
-    {
-        success = false;
-        errors.append(QString(tr("Could not write to the file \"%1\"!")).arg(xmlFile.fileName()));
-        qCritical() << "Could not write to the circuit file:" << xmlFile.fileName();
-    }
-    xmlFile.close();*/
 
     return success;
 }

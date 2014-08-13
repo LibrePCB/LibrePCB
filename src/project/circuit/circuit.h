@@ -26,14 +26,13 @@
 
 #include <QtCore>
 #include "../../common/exceptions.h"
+#include "../../common/filepath.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
-class QDomDocument;
-class QDomElement;
-
+class XmlFile;
 class Workspace;
 
 namespace project {
@@ -77,9 +76,8 @@ class Circuit final : public QObject
         Project& mProject; ///< A reference to the Project object (from the ctor)
 
         // File "core/circuit.xml"
-        QString mXmlFilepath;
-        QDomDocument* mDomDocument;
-        QDomElement* mRootDomElement;
+        FilePath mXmlFilepath;
+        XmlFile* mXmlFile;
 
 };
 
