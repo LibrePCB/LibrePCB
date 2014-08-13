@@ -73,7 +73,6 @@ SOURCES += \
     library/spicemodel.cpp \
     library/componentcategory.cpp \
     library/packagecategory.cpp \
-    common/layer.cpp \
     project/schematics/schematiceditor.cpp \
     project/circuit/circuit.cpp \
     workspace/recentprojectsmodel.cpp \
@@ -91,6 +90,7 @@ SOURCES += \
     common/debug.cpp \
     common/filelock.cpp \
     common/filepath.cpp \
+    common/schematiclayer.cpp \
     common/xmlfile.cpp
 
 HEADERS += \
@@ -114,7 +114,6 @@ HEADERS += \
     library/spicemodel.h \
     library/componentcategory.h \
     library/packagecategory.h \
-    common/layer.h \
     project/schematics/schematiceditor.h \
     project/circuit/circuit.h \
     workspace/recentprojectsmodel.h \
@@ -132,6 +131,7 @@ HEADERS += \
     common/debug.h \
     common/filelock.h \
     common/filepath.h \
+    common/schematiclayer.h \
     common/xmlfile.h
 
 FORMS += \

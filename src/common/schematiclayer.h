@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LAYER_H
-#define LAYER_H
+#ifndef SCHEMATICLAYER_H
+#define SCHEMATICLAYER_H
 
 /*****************************************************************************************
  *  Includes
@@ -34,21 +34,21 @@
 class Workspace;
 
 /*****************************************************************************************
- *  Class Layer
+ *  Class SchematicLayer
  ****************************************************************************************/
 
 /**
- * @brief The Layer class
+ * @brief The SchematicLayer class
  */
-class Layer : public QObject
+class SchematicLayer : public QObject
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit Layer(Workspace* workspace, const QString& iniFilename);
-        virtual ~Layer();
+        explicit SchematicLayer(Workspace& workspace);
+        virtual ~SchematicLayer();
 
         // Getters
         unsigned int getId() const {return mId;}
@@ -65,8 +65,7 @@ class Layer : public QObject
     protected:
 
         // General
-        Workspace* mWorkspace;
-        QString mIniFilename;
+        Workspace& mWorkspace;
 
         // Attributes
         unsigned int mId;
@@ -79,9 +78,9 @@ class Layer : public QObject
     private:
 
         // make some methods inaccessible...
-        Layer();
-        Layer(const Layer& other);
-        Layer& operator=(const Layer& rhs);
+        SchematicLayer();
+        SchematicLayer(const SchematicLayer& other);
+        SchematicLayer& operator=(const SchematicLayer& rhs);
 };
 
 /*****************************************************************************************
@@ -181,4 +180,4 @@ class Layer : public QObject
 
 */
 
-#endif // LAYER_H
+#endif // SCHEMATICLAYER_H
