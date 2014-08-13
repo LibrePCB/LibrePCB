@@ -24,6 +24,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "netclass.h"
+#include "../../common/exceptions.h"
 
 namespace project {
 
@@ -31,13 +32,43 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-NetClass::NetClass(Workspace& workspace, Project& project, Circuit& circuit) :
-    QObject(0), mWorkspace(workspace), mProject(project), mCircuit(circuit)
+NetClass::NetClass(Workspace& workspace, Project& project, Circuit& circuit,
+                   const QDomElement& domElement) :
+    QObject(0), mWorkspace(workspace), mProject(project), mCircuit(circuit),
+    mDomElement(domElement)
 {
+    mUuid = mDomElement.attribute("uuid");
+    mName = mDomElement.attribute("name");
 }
 
 NetClass::~NetClass()
 {
+}
+
+/*****************************************************************************************
+ *  Static Methods
+ ****************************************************************************************/
+
+void NetClass::loadFromCircuit(Workspace& workspace, Project& project,
+                               Circuit& circuit, const QDomElement& node,
+                               QHash<QUuid, NetClass*>& list)
+{
+    qDebug() << "load netclasses...";
+    QDomElement item = node.firstChildElement("netclass");
+    while (!item.isNull())
+    {
+        NetClass* netclass = new NetClass(workspace, project, circuit, item);
+        if (list.contains(netclass->getUuid()))
+        {
+            QMessageBox::critical(0, tr("Error loading netclasses"), QString(tr(
+                "The UUID %1 exists multiple times!")).arg(netclass->getUuid().toString()));
+            throw RuntimeError(QString("The UUID %1 exists multiple times!")
+                .arg(netclass->getUuid().toString()), __FILE__, __LINE__);
+        }
+        list.insert(netclass->getUuid(), netclass);
+        item = item.nextSiblingElement("netclass");
+    }
+    qDebug() << list.count() << "netclasses successfully loaded!";
 }
 
 /*****************************************************************************************

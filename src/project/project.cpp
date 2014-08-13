@@ -46,6 +46,8 @@ Project::Project(Workspace& workspace, const FilePath& filepath) throw (Exceptio
     mFilepath(filepath), mXmlFile(0), mFileLock(filepath), mUndoStack(0),
     mProjectLibrary(0), mCircuit(0), mSchematicEditor(0)
 {
+    qDebug() << "load project...";
+
     // Check if the filepath is valid
     if ((!mFilepath.isExistingFile()) || (mFilepath.getSuffix() != "e4u")
             || (!mPath.isExistingDir()))
@@ -169,6 +171,8 @@ Project::Project(Workspace& workspace, const FilePath& filepath) throw (Exceptio
         connect(&mAutoSaveTimer, SIGNAL(timeout()), this, SLOT(autosave()));
         mAutoSaveTimer.start(intervalSecs);
     }
+
+    qDebug() << "project successfully loaded!";
 }
 
 Project::~Project() noexcept

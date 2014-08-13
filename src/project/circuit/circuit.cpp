@@ -28,6 +28,7 @@
 #include "../../common/xmlfile.h"
 #include "circuit.h"
 #include "../project.h"
+#include "netclass.h"
 
 namespace project {
 
@@ -39,6 +40,8 @@ Circuit::Circuit(Workspace& workspace, Project& project, bool restore) throw (Ex
     QObject(0), mWorkspace(workspace), mProject(project),
     mXmlFilepath(project.getPath().getPathTo("core/circuit.xml")), mXmlFile(0)
 {
+    qDebug() << "load circuit...";
+
     // try to open the XML file "circuit.xml"
     try
     {
@@ -55,19 +58,29 @@ Circuit::Circuit(Workspace& workspace, Project& project, bool restore) throw (Ex
 
     try
     {
-        // TODO
+        QDomElement tmpNode; // for temporary use...
+        QDomElement root = mXmlFile->getRoot();
+
+        // Load all netclasses
+        tmpNode = root.firstChildElement("netclasses");
+        NetClass::loadFromCircuit(mWorkspace, mProject, *this, tmpNode, mNetClasses);
+
     }
     catch (...)
     {
         // free allocated memory and rethrow the exception
-        delete mXmlFile;     mXmlFile = 0;
+        qDeleteAll(mNetClasses);    mNetClasses.clear();
+        delete mXmlFile;            mXmlFile = 0;
         throw;
     }
+
+    qDebug() << "circuit successfully loaded!";
 }
 
 Circuit::~Circuit() noexcept
 {
-    delete mXmlFile;        mXmlFile = 0;
+    qDeleteAll(mNetClasses);    mNetClasses.clear();
+    delete mXmlFile;            mXmlFile = 0;
 }
 
 /*****************************************************************************************

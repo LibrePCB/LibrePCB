@@ -25,6 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <QDomElement>
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -46,15 +47,25 @@ namespace project {
 /**
  * @brief The NetClass class
  */
-class NetClass : public QObject
+class NetClass final : public QObject
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit NetClass(Workspace& workspace, Project& project, Circuit& circuit);
+        explicit NetClass(Workspace& workspace, Project& project, Circuit& circuit,
+                          const QDomElement& domElement);
         ~NetClass();
+
+        // Getters
+        const QUuid& getUuid() const {return mUuid;}
+        const QString& getName() const {return mName;}
+
+        // Static Methods
+        static void loadFromCircuit(Workspace& workspace, Project& project,
+                                    Circuit& circuit, const QDomElement& node,
+                                    QHash<QUuid, NetClass*>& list);
 
     private:
 
@@ -67,6 +78,11 @@ class NetClass : public QObject
         Workspace& mWorkspace;
         Project& mProject;
         Circuit& mCircuit;
+        QDomElement mDomElement;
+
+        // Attributes
+        QUuid mUuid;
+        QString mName;
 
 };
 

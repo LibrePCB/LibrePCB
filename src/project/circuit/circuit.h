@@ -37,6 +37,7 @@ class Workspace;
 
 namespace project {
 class Project;
+class NetClass;
 }
 
 /*****************************************************************************************
@@ -78,6 +79,8 @@ class Circuit final : public QObject
         // File "core/circuit.xml"
         FilePath mXmlFilepath;
         XmlFile* mXmlFile;
+
+        QHash<QUuid, NetClass*> mNetClasses;
 
 };
 
