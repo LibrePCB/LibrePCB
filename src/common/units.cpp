@@ -94,7 +94,8 @@ QString Length::measurementUnitToString(MeasurementUnit unit)
         case Length::mils:
             return QString("mils");
         default:
-            throw RuntimeError("Invalid unit passed!", __FILE__, __LINE__);
+            throw LogicError(__FILE__, __LINE__, QString("unit = %1").arg(unit),
+                QCoreApplication::translate("Length", "Unit conversion failed!"));
     }
 }
 
@@ -130,9 +131,14 @@ Length::MeasurementUnit Length::measurementUnitFromString(const QString& unit,
  */
 void Length::setLengthFromFloat(qreal nanometers)
 {
-    if ((nanometers > std::numeric_limits<LengthBase_t>::max())
-            || (nanometers < std::numeric_limits<LengthBase_t>::min()))
-        throw RangeError("Range error in the Length class!", __FILE__, __LINE__);
+    LengthBase_t min = std::numeric_limits<LengthBase_t>::min();
+    LengthBase_t max = std::numeric_limits<LengthBase_t>::max();
+    if ((nanometers > max) || (nanometers < min))
+    {
+        throw RangeError(__FILE__, __LINE__, QString("value=%1; min=%2; max=%3")
+                         .arg(nanometers).arg(min).arg(max),
+                         QCoreApplication::translate("Length", "Range error!"));
+    }
 
     mNanometers = qRound(nanometers);
 }

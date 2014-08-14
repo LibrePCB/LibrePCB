@@ -37,14 +37,18 @@ WorkspaceSettings::WorkspaceSettings(Workspace& workspace) :
     // check if the metadata directory exists
     if (!mMetadataPath.isExistingDir())
     {
-        throw RuntimeError(QString("Invalid workspace metadata path: \"%1\"")
-                           .arg(mMetadataPath.toStr()), __FILE__, __LINE__);
+        throw RuntimeError(__FILE__, __LINE__, mMetadataPath.toStr(), QString(
+            tr("Invalid workspace metadata path: \"%1\"")).arg(mMetadataPath.toNative()));
     }
 
     // check if the file settings.ini is writable
     QSettings s(mMetadataPath.getPathTo("settings.ini").toStr(), QSettings::IniFormat);
     if ((!s.isWritable()) || (s.status() != QSettings::NoError))
-        throw RuntimeError("Error with the workspace settings! Check file permissions!", __FILE__, __LINE__);
+    {
+        throw RuntimeError(__FILE__, __LINE__, QString("status = %1").arg(s.status()),
+            QString(tr("Error while opening \"%1\"! Please check write permissions!"))
+            .arg(QDir::toNativeSeparators(s.fileName())));
+    }
 
     load(); // Load all settings
 

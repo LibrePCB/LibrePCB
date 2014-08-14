@@ -42,29 +42,19 @@ Circuit::Circuit(Workspace& workspace, Project& project, bool restore) throw (Ex
 {
     qDebug() << "load circuit...";
 
-    // try to open the XML file "circuit.xml"
     try
     {
+        // try to open the XML file "circuit.xml"
         mXmlFile = new XmlFile(mXmlFilepath, restore, "circuit");
-    }
-    catch (Exception& e)
-    {
-        QMessageBox::critical(0, tr("Cannot open the circuit"),
-            QString(tr("Error while opening the circuit file: %1")).arg(e.getMsg()));
-        throw;
-    }
 
-    // OK - XML file is open --> now load the whole circuit stuff
+        // OK - XML file is open --> now load the whole circuit stuff
 
-    try
-    {
         QDomElement tmpNode; // for temporary use...
         QDomElement root = mXmlFile->getRoot();
 
         // Load all netclasses
         tmpNode = root.firstChildElement("netclasses");
         NetClass::loadFromCircuit(mWorkspace, mProject, *this, tmpNode, mNetClasses);
-
     }
     catch (...)
     {
@@ -99,7 +89,7 @@ bool Circuit::save(bool toOriginal, QStringList& errors) noexcept
     catch (Exception& e)
     {
         success = false;
-        errors.append(e.getMsg());
+        errors.append(e.getUserMsg());
     }
 
     return success;

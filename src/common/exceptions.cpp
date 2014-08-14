@@ -29,31 +29,39 @@
  *  Class Exception
  ****************************************************************************************/
 
-Exception::Exception(const QString& msg, const char* file, int line) :
-    mMsg(msg), mFile(file), mLine(line)
+Exception::Exception(const char* file, int line, const QString& debugMsg,
+                     const QString& userMsg) :
+    mDebugMsg(debugMsg), mUserMsg(userMsg), mFile(file), mLine(line)
 {
     // the filename and line number will be added in the Debug class, not here!
-    Debug::instance()->print(Debug::Exception, msg, file, line);
+    Debug::instance()->print(Debug::Exception, mDebugMsg, file, line);
 }
 
-QString Exception::getDebugString() const
+Exception::Exception(const Exception& other) :
+    mDebugMsg(other.mDebugMsg), mUserMsg(other.mUserMsg), mFile(other.mFile),
+    mLine(other.mLine)
 {
-    return QString("%1 (thrown at %2:%3)").arg(mMsg, mFile).arg(mLine);
 }
 
 const char* Exception::what() const noexcept
 {
-    static QByteArray utf8string;
-    utf8string = mMsg.toLocal8Bit();
-    return utf8string.constData();
+    static QByteArray localMsg;
+    localMsg = mUserMsg.toLocal8Bit();
+    return localMsg.constData();
 }
 
 /*****************************************************************************************
  *  Class LogicError
  ****************************************************************************************/
 
-LogicError::LogicError(const QString& msg, const char* file, int line) :
-    Exception(msg, file, line)
+LogicError::LogicError(const char* file, int line, const QString& debugMsg,
+                       const QString& userMsg) :
+    Exception(file, line, debugMsg, userMsg)
+{
+}
+
+LogicError::LogicError(const LogicError& other) :
+    Exception(other)
 {
 }
 
@@ -61,8 +69,14 @@ LogicError::LogicError(const QString& msg, const char* file, int line) :
  *  Class RuntimeError
  ****************************************************************************************/
 
-RuntimeError::RuntimeError(const QString& msg, const char* file, int line) :
-    Exception(msg, file, line)
+RuntimeError::RuntimeError(const char* file, int line, const QString& debugMsg,
+                           const QString& userMsg) :
+    Exception(file, line, debugMsg, userMsg)
+{
+}
+
+RuntimeError::RuntimeError(const RuntimeError& other) :
+    Exception(other)
 {
 }
 
@@ -70,8 +84,29 @@ RuntimeError::RuntimeError(const QString& msg, const char* file, int line) :
  *  Class RangeError
  ****************************************************************************************/
 
-RangeError::RangeError(const QString& msg, const char* file, int line) :
-    Exception(msg, file, line)
+RangeError::RangeError(const char* file, int line, const QString& debugMsg,
+                       const QString& userMsg) :
+    Exception(file, line, debugMsg, userMsg)
+{
+}
+
+RangeError::RangeError(const RangeError& other) :
+    Exception(other)
+{
+}
+
+/*****************************************************************************************
+ *  Class UserCanceled
+ ****************************************************************************************/
+
+UserCanceled::UserCanceled(const char* file, int line, const QString& debugMsg,
+                           const QString& userMsg) :
+    Exception(file, line, debugMsg, userMsg)
+{
+}
+
+UserCanceled::UserCanceled(const UserCanceled& other) :
+    Exception(other)
 {
 }
 

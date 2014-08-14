@@ -44,16 +44,16 @@ XmlFile::XmlFile(const FilePath& filepath, bool restore,
     // check if the file exists
     if (!xmlFilepath.isExistingFile())
     {
-        throw RuntimeError(QString("The file \"%1\" does not exist!")
-                           .arg(xmlFilepath.toNative()), __FILE__, __LINE__);
+        throw RuntimeError(__FILE__, __LINE__, xmlFilepath.toStr(),
+            QString(tr("The file \"%1\" does not exist!")).arg(xmlFilepath.toNative()));
     }
 
     // try opening the file
     QFile file(xmlFilepath.toStr());
     if (!file.open(QIODevice::ReadOnly))
     {
-        throw RuntimeError(QString("Cannot open file \"%1\": %2")
-            .arg(xmlFilepath.toNative(), file.errorString()), __FILE__, __LINE__);
+        throw RuntimeError(__FILE__, __LINE__, xmlFilepath.toStr(), QString(tr("Cannot "
+            "open file \"%1\": %2")).arg(xmlFilepath.toNative(), file.errorString()));
     }
 
     // load XML into mDomDocument
@@ -62,23 +62,28 @@ XmlFile::XmlFile(const FilePath& filepath, bool restore,
     int errColumn;
     if (!mDomDocument.setContent(&file, &errMsg, &errLine, &errColumn))
     {
-        throw RuntimeError(QString("Cannot read XML file \"%1\": %2 [%3:%4]").arg(
-            xmlFilepath.toNative(), errMsg).arg(errLine, errColumn), __FILE__, __LINE__);
+        file.reset();
+        QString line = file.readAll().split('\n').at(errLine-1);
+        throw RuntimeError(__FILE__, __LINE__, QString("%1: %2 [%3:%4] LINE:%5")
+            .arg(xmlFilepath.toStr(), errMsg).arg(errLine).arg(errColumn).arg(line),
+            QString(tr("Error while parsing XML in file \"%1\": %2 [%3:%4]"))
+            .arg(xmlFilepath.toNative(), errMsg).arg(errLine).arg(errColumn));
     }
 
     // check if the root node exists
     QDomElement rootNode = getRoot();
     if (rootNode.isNull())
     {
-        throw RuntimeError(QString("No XML root node found in \"%1\"!")
-                           .arg(xmlFilepath.toNative()), __FILE__, __LINE__);
+        throw RuntimeError(__FILE__, __LINE__, xmlFilepath.toStr(),
+            QString(tr("No XML root node found in \"%1\"!")).arg(xmlFilepath.toNative()));
     }
 
     // check the name of the root node, if desired
     if ((!rootName.isEmpty()) && (rootNode.tagName() != rootName))
     {
-        throw RuntimeError(QString("XML root node in \"%1\" is \"%2\", but should be \"%3\"!")
-            .arg(xmlFilepath.toNative(), rootNode.tagName(), rootName), __FILE__, __LINE__);
+        throw RuntimeError(__FILE__, __LINE__, QString("%1: \"%2\"!=\"%3\"")
+            .arg(xmlFilepath.toStr(), rootNode.nodeName(), rootName),
+            QString(tr("Invalid root node in \"%1\"!")).arg(xmlFilepath.toNative()));
     }
 }
 
@@ -107,7 +112,7 @@ void XmlFile::create(const FilePath& filepath, const QString& rootName) throw (E
     QDomDocument dom;
     QString errMsg;
     if (!dom.setContent(xmlTmpl.arg(rootName), &errMsg))
-        throw LogicError("Could not set DOM content: " % errMsg, __FILE__, __LINE__);
+        throw LogicError(__FILE__, __LINE__, errMsg, tr("Could not set XML DOM content!"));
 
     saveDomDocument(dom, filepath);
 }
@@ -125,20 +130,27 @@ void XmlFile::saveDomDocument(const QDomDocument& domDocument,
     QFile file(filepath.toStr());
     if (!file.open(QIODevice::WriteOnly))
     {
-        throw RuntimeError(QString("Could not open or create file \"%1\": %2").arg(
-                           filepath.toNative(), file.errorString()), __FILE__, __LINE__);
+        throw RuntimeError(__FILE__, __LINE__, QString("%1: %2 [%3]")
+            .arg(filepath.toStr(), file.errorString()).arg(file.error()),
+            QString(tr("Could not open or create file \"%1\": %2"))
+            .arg(filepath.toNative(), file.errorString()));
     }
 
     QByteArray content = domDocument.toByteArray(4);
     if (content.isEmpty())
-        throw LogicError("XML DOM Document is empty!", __FILE__, __LINE__);
+    {
+        throw LogicError(__FILE__, __LINE__, filepath.toStr(),
+                         tr("XML DOM Document is empty!"));
+    }
 
     qint64 written = file.write(content);
     if (written != content.size())
     {
-        qCritical() << "only" << written << "of" << content.size() << "bytes written!";
-        throw RuntimeError(QString("Could not write to file \"%1\": %2").arg(
-                           filepath.toNative(), file.errorString()), __FILE__, __LINE__);
+        throw RuntimeError(__FILE__, __LINE__,
+            QString("%1: %2 (only %3 of %4 bytes written)")
+            .arg(filepath.toStr(), file.errorString()).arg(written).arg(content.size()),
+            QString(tr("Could not write to file \"%1\": %2"))
+            .arg(filepath.toNative(), file.errorString()));
     }
 }
 

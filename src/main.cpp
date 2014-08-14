@@ -22,6 +22,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <QtWidgets>
 #include <QApplication>
 #include <QTranslator>
 #include "common/debug.h"
@@ -46,7 +47,7 @@ static int appExec() noexcept
     }
     catch (Exception& e)
     {
-        qFatal("UNCAUGHT EXCEPTION: %s --- PROGRAM EXITED", e.getDebugString().toUtf8().constData());
+        qFatal("UNCAUGHT EXCEPTION: %s --- PROGRAM EXITED", qPrintable(e.getUserMsg()));
     }
     catch (std::exception& e)
     {
@@ -115,27 +116,45 @@ int main(int argc, char* argv[])
 
     // Initialization finished, open the workspace...
 
+    bool chooseAnotherWorkspace = false;
     FilePath wsPath(Workspace::getMostRecentlyUsedWorkspacePath());
 
-    if (!Workspace::isValidWorkspacePath(wsPath))
+    do
     {
-        wsPath = Workspace::chooseWorkspacePath();
-        if (!wsPath.isValid())
-            return 0;
+        if ((!Workspace::isValidWorkspacePath(wsPath)) || (chooseAnotherWorkspace))
+        {
+            wsPath = Workspace::chooseWorkspacePath();
+            if (!wsPath.isValid())
+                return 0;
 
-        Workspace::setMostRecentlyUsedWorkspacePath(wsPath);
-    }
+            Workspace::setMostRecentlyUsedWorkspacePath(wsPath);
+        }
 
-    try
-    {
-        Workspace ws(wsPath); // this can throw an exception
-        ws.showControlPanel();
+        chooseAnotherWorkspace = false;
 
-        return appExec();
-    }
-    catch (...)
-    {
-        qFatal("Could not open the workspace \"%s\" --- PROGRAM EXITED", qPrintable(wsPath.toStr()));
-        return -1;
-    }
+        try
+        {
+            Workspace ws(wsPath); // this can throw an exception
+            ws.showControlPanel();
+
+            return appExec();
+        }
+        catch (UserCanceled& e)
+        {
+            return 0; // quit the application
+        }
+        catch (Exception& e)
+        {
+            int btn = QMessageBox::question(0, QCoreApplication::translate("Workspace",
+                        "Cannot open the workspace"), QString(QCoreApplication::translate(
+                        "Workspace", "The workspace \"%1\" cannot be opened: %2\n\n"
+                        "Do you want to choose another workspace?"))
+                        .arg(wsPath.toNative(), e.getUserMsg()));
+
+            if (btn == QMessageBox::Yes)
+                chooseAnotherWorkspace = true;
+            else
+                return 0; // quit the application
+        }
+    } while (chooseAnotherWorkspace);
 }

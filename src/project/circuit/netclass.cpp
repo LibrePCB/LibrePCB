@@ -60,10 +60,9 @@ void NetClass::loadFromCircuit(Workspace& workspace, Project& project,
         NetClass* netclass = new NetClass(workspace, project, circuit, item);
         if (list.contains(netclass->getUuid()))
         {
-            QMessageBox::critical(0, tr("Error loading netclasses"), QString(tr(
-                "The UUID %1 exists multiple times!")).arg(netclass->getUuid().toString()));
-            throw RuntimeError(QString("The UUID %1 exists multiple times!")
-                .arg(netclass->getUuid().toString()), __FILE__, __LINE__);
+            throw RuntimeError(__FILE__, __LINE__, netclass->getUuid().toString(),
+                QString(tr("The netclass UUID %1 exists multiple times!"))
+                .arg(netclass->getUuid().toString()));
         }
         list.insert(netclass->getUuid(), netclass);
         item = item.nextSiblingElement("netclass");

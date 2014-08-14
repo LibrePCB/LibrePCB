@@ -52,10 +52,8 @@ Project::Project(Workspace& workspace, const FilePath& filepath) throw (Exceptio
     if ((!mFilepath.isExistingFile()) || (mFilepath.getSuffix() != "e4u")
             || (!mPath.isExistingDir()))
     {
-        QMessageBox::critical(0, tr("Invalid filepath"), QString(tr("The project "
-            "filepath is not valid: \"%1\"")).arg(mFilepath.toNative()));
-        throw RuntimeError(QString("Invalid project file: \"%1\"").arg(mFilepath.toStr()),
-                           __FILE__, __LINE__);
+        throw RuntimeError(__FILE__, __LINE__, mFilepath.toStr(),
+            QString(tr("Invalid project file: \"%1\"")).arg(mFilepath.toNative()));
     }
 
     // Check if the project is locked (already open or application was crashed). In case
@@ -73,9 +71,8 @@ Project::Project(Workspace& workspace, const FilePath& filepath) throw (Exceptio
         case FileLock::Locked:
         {
             // the project is locked by another application instance
-            QMessageBox::critical(0, tr("Project is locked"), tr("The project is already "
-                                  "opened by another application instance or user!"));
-            throw RuntimeError("Project is already open!", __FILE__, __LINE__);
+            throw RuntimeError(__FILE__, __LINE__, QString(), tr("The project is already "
+                               "opened by another application instance or user!"));
             break; // just to be on the safe side...
         }
 
@@ -96,8 +93,7 @@ Project::Project(Workspace& workspace, const FilePath& filepath) throw (Exceptio
                     break;
                 case QMessageBox::Cancel: // abort opening the project
                 default:
-                    throw Exception("Opening the project was aborted by the user...",
-                                    __FILE__, __LINE__);
+                    throw UserCanceled(__FILE__, __LINE__, "canceled by the user");
                     break; // just to be on the safe side...
             }
             break;
@@ -106,9 +102,8 @@ Project::Project(Workspace& workspace, const FilePath& filepath) throw (Exceptio
         case FileLock::Error:
         default:
         {
-            QMessageBox::critical(0, tr("Problem with project lock file"),
-                                  tr("Could not read the project lock file!"));
-            throw RuntimeError("Could not read the project lock file!", __FILE__, __LINE__);
+            throw RuntimeError(__FILE__, __LINE__, QString(),
+                               tr("Could not read the project lock file!"));
             break; // just to be on the safe side...
         }
     }
@@ -116,10 +111,9 @@ Project::Project(Workspace& workspace, const FilePath& filepath) throw (Exceptio
     // the project can be opened by this application, so we will lock the whole project
     if (!mFileLock.lock())
     {
-        QMessageBox::critical(0, tr("Lock Error"), QString(tr("Error while locking the "
-            "project!\nDo you have write permissions to the file \"%1\"?"))
-            .arg(mFileLock.getLockFilepath().toNative()));
-        throw RuntimeError("Error while locking the project!", __FILE__, __LINE__);
+        throw RuntimeError(__FILE__, __LINE__, mFileLock.getLockFilepath().toStr(),
+            QString(tr("Error while locking the project!\nDo you have write permissions "
+            "to the file \"%1\"?")).arg(mFileLock.getLockFilepath().toNative()));
     }
 
 
@@ -133,16 +127,7 @@ Project::Project(Workspace& workspace, const FilePath& filepath) throw (Exceptio
     try
     {
         // try to open the XML project file
-        try
-        {
-            mXmlFile = new XmlFile(mFilepath, restoreBackup, "project");
-        }
-        catch (Exception& e)
-        {
-            QMessageBox::critical(0, tr("Cannot open the project"),
-                QString(tr("Error while opening the project file: %1")).arg(e.getMsg()));
-            throw;
-        }
+        mXmlFile = new XmlFile(mFilepath, restoreBackup, "project");
 
         // the project seems to be ready to open, so we will create all needed objects
         mUndoStack = new QUndoStack(0);
@@ -329,7 +314,7 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     catch (Exception& e)
     {
         success = false;
-        errors.append(e.getMsg());
+        errors.append(e.getUserMsg());
     }
 
     // Save other components

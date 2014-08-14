@@ -53,9 +53,8 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
 {
     if ((!mPath.isExistingDir()) || (!mMetadataPath.isExistingDir()))
     {
-        QMessageBox::critical(0, tr("Error"), tr("The workspace path is invalid!"));
-        throw RuntimeError(QString("Invalid workspace path: \"%1\"")
-                           .arg(mPath.toStr()), __FILE__, __LINE__);
+        throw RuntimeError(__FILE__, __LINE__, mPath.toStr(),
+            QString(tr("Invalid workspace path: \"%1\"")).arg(mPath.toNative()));
     }
 
     if (!mProjectsPath.mkPath())
@@ -78,16 +77,13 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
     }
     catch (Exception& e)
     {
-        QMessageBox::critical(0, tr("Error"), QString(tr("Could not open the workspace!"
-                                              "\n\nError message:\n%1")).arg(e.getMsg()));
-
+        // free allocated memory and rethrow the exception
         delete mControlPanel;           mControlPanel = 0;
         delete mLibrary;                mLibrary = 0;
         delete mProjectTreeModel;       mProjectTreeModel = 0;
         delete mFavoriteProjectsModel;  mFavoriteProjectsModel = 0;
         delete mRecentProjectsModel;    mRecentProjectsModel = 0;
         delete mWorkspaceSettings;      mWorkspaceSettings = 0;
-
         throw;
     }
 }
@@ -102,7 +98,6 @@ Workspace::~Workspace()
     delete mProjectTreeModel;       mProjectTreeModel = 0;
     delete mFavoriteProjectsModel;  mFavoriteProjectsModel = 0;
     delete mRecentProjectsModel;    mRecentProjectsModel = 0;
-
     delete mWorkspaceSettings;      mWorkspaceSettings = 0;
 }
 
@@ -126,20 +121,31 @@ Project* Workspace::openProject(const FilePath& filepath) noexcept
     {
         try
         {
-            // If a fatal error occurs while opening the project, the user gets a message
-            // box with the error message. This is done directly where the error occurs.
-            // Additionally, the project's constructor will throw an exception to indicate
-            // that the project cannot be opened. We will catch that exception here.
+            // If a fatal error occurs while opening the project, the project's
+            // constructor will throw an exception. We will catch that exception here and
+            // show a message box to print the error message to the monitor. Only
+            // exceptions of type "UserCanceled" are ignored.
             openProject = new Project(*this, filepath);
-            mOpenProjects.insert(filepath.toUnique().toStr(), openProject);
-            mRecentProjectsModel->setLastRecentProject(filepath);
-            openProject->showSchematicEditor();
+        }
+        catch (UserCanceled& e)
+        {
+            // the user has canceled opening the project, so we ignore this exception...
+            qDebug() << "Aborted opening the project!";
+            return 0;
         }
         catch (Exception& e)
         {
-            qWarning() << "Aborted opening the project!";
-            delete openProject; openProject = 0;
+            // opening the project was interrupted by an exception!
+            qDebug() << "Aborted opening the project!";
+            QMessageBox::critical(mControlPanel, tr("Cannot open the project!"),
+                                  e.getUserMsg());
+            return 0;
         }
+
+        // project successfully opened!
+        mOpenProjects.insert(filepath.toUnique().toStr(), openProject);
+        mRecentProjectsModel->setLastRecentProject(filepath);
+        openProject->showSchematicEditor();
     }
 
     return openProject;
