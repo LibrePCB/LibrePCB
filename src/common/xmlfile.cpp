@@ -36,6 +36,8 @@ XmlFile::XmlFile(const FilePath& filepath, bool restore,
                  const QString& rootName) throw (Exception) :
     QObject(0), mFilepath(filepath), mDomDocument()
 {
+    mDomDocument.implementation().setInvalidDataPolicy(QDomImplementation::ReturnNullNode);
+
     // decide if we open the original file (*.xml) or the backup (*.xml~)
     FilePath xmlFilepath(mFilepath.toStr() % '~');
     if ((!restore) || (!xmlFilepath.isExistingFile()))

@@ -44,10 +44,10 @@
  * the static method #create() you can create new, empty XML files.
  *
  * @note    This class is also able to load from and save to backup files ("~" at the end
- *          of the filename).
+ *          of the filename). See @ref doc_project_save for more details.
  *
  * @warning Do not use QDomElement objects from #getRoot() after the #XmlFile object is
- *          destroyed!
+ *          destroyed! Dostroying the XmlFile object will also destroy the whole DOM tree!
  *
  * @author ubruhin
  * @date 2014-08-13
@@ -75,7 +75,10 @@ class XmlFile final : public QObject
          * @param rootName  If this is not an empty string, the constructor compares the
          *                  XML root node name with this value. If they are not identical,
          *                  the constructor throws an exception. This is useful to check
-         *                  if the specified XML file has the expected content.
+         *                  if the specified XML file has the expected content. If you
+         *                  want to open a XML file with unknown content, use an empty
+         *                  QString for this parameter and check the root node name with
+         *                  <tt>getRoot().nodeName()</tt> afterwards.
          *
          * @throw Exception If the specified XML file could not be opened successful, an
          *                  exception will be thrown.
@@ -101,9 +104,10 @@ class XmlFile final : public QObject
         /**
          * @brief Get the root of the XML file as a QDomElement
          *
-         * Because the constructor has already checked whether this QDomElement is valid
-         * or not (QDomElement::isNull()) this object is always valid. You do not have to
-         * call QDomElement::isNull() to check this.
+         * @note    Because the constructor has already checked whether this QDomElement
+         *          is valid or not (<tt>QDomElement::isNull()</tt>) this object is always
+         *          valid. You do not have to call <tt>QDomElement::isNull()</tt> to check
+         *          this.
          *
          * @return The XML root element
          */
@@ -133,7 +137,8 @@ class XmlFile final : public QObject
          *
          * @throw Exception If an error occurs, this method throws an exception.
          */
-        static void create(const FilePath& filepath, const QString& rootName) throw (Exception);
+        static void create(const FilePath& filepath, const QString& rootName)
+                           throw (Exception);
 
 
     private:
