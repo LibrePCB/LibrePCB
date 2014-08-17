@@ -25,16 +25,16 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <QDomElement>
+#include "../../common/exceptions.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
-class Workspace;
-
 namespace project {
-class Project;
 class Circuit;
+class NetClass;
 }
 
 /*****************************************************************************************
@@ -46,15 +46,33 @@ namespace project {
 /**
  * @brief The NetSignal class
  */
-class NetSignal : public QObject
+class NetSignal final : public QObject
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit NetSignal(Workspace& workspace, Project& project, Circuit& circuit);
-        ~NetSignal();
+        explicit NetSignal(Circuit& circuit, const QDomElement& domElement) throw (Exception);
+        ~NetSignal() noexcept;
+
+        // Getters
+        const QUuid& getUuid() const noexcept {return mUuid;}
+        const QString& getName() const noexcept {return mName;}
+        bool hasAutoName() const noexcept {return mAutoName;}
+        NetClass* getNetClass() const noexcept {return mNetClass;}
+
+        // Setters
+        void setName(const QString& name) throw (Exception);
+
+        // General Methods
+        void addToDomTree(QDomElement& parent) throw (Exception);
+        void removeFromDomTree(QDomElement& parent) throw (Exception);
+
+        // Static Methods
+        static NetSignal* create(Circuit& circuit, QDomDocument& doc,
+                                 const QUuid& netclass, const QString& name,
+                                 bool autoName) throw (Exception);
 
     private:
 
@@ -64,10 +82,14 @@ class NetSignal : public QObject
         NetSignal& operator=(const NetSignal& rhs);
 
         // General
-        Workspace& mWorkspace;
-        Project& mProject;
         Circuit& mCircuit;
+        QDomElement mDomElement;
 
+        // Attributes
+        QUuid mUuid;
+        QString mName;
+        bool mAutoName;
+        NetClass* mNetClass;
 };
 
 } // namespace project

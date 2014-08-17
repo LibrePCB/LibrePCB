@@ -26,16 +26,14 @@
 
 #include <QtCore>
 #include <QDomElement>
+#include "../../common/exceptions.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
-class Workspace;
-
 namespace project {
-class Project;
-class Circuit;
+class NetSignal;
 }
 
 /*****************************************************************************************
@@ -54,18 +52,27 @@ class NetClass final : public QObject
     public:
 
         // Constructors / Destructor
-        explicit NetClass(Workspace& workspace, Project& project, Circuit& circuit,
-                          const QDomElement& domElement);
-        ~NetClass();
+        explicit NetClass(const QDomElement& domElement) throw (Exception);
+        ~NetClass() noexcept;
 
         // Getters
-        const QUuid& getUuid() const {return mUuid;}
-        const QString& getName() const {return mName;}
+        const QUuid& getUuid() const noexcept {return mUuid;}
+        const QString& getName() const noexcept {return mName;}
+        int getNetSignalCount() const noexcept {return mNetSignals.count();}
+
+        // Setters
+        void setName(const QString& name) throw (Exception);
+
+        // NetSignal Methods
+        void registerNetSignal(NetSignal* signal);
+        void unregisterNetSignal(NetSignal* signal);
+
+        // General Methods
+        void addToDomTree(QDomElement& parent) throw (Exception);
+        void removeFromDomTree(QDomElement& parent) throw (Exception);
 
         // Static Methods
-        static void loadFromCircuit(Workspace& workspace, Project& project,
-                                    Circuit& circuit, const QDomElement& node,
-                                    QHash<QUuid, NetClass*>& list);
+        static NetClass* create(QDomDocument& doc, const QString& name) throw (Exception);
 
     private:
 
@@ -75,15 +82,13 @@ class NetClass final : public QObject
         NetClass& operator=(const NetClass& rhs);
 
         // General
-        Workspace& mWorkspace;
-        Project& mProject;
-        Circuit& mCircuit;
         QDomElement mDomElement;
 
         // Attributes
         QUuid mUuid;
         QString mName;
 
+        QHash<QUuid, NetSignal*> mNetSignals;
 };
 
 } // namespace project

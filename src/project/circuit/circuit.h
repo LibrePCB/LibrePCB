@@ -38,6 +38,7 @@ class Workspace;
 namespace project {
 class Project;
 class NetClass;
+class NetSignal;
 }
 
 /*****************************************************************************************
@@ -62,6 +63,20 @@ class Circuit final : public QObject
         explicit Circuit(Workspace& workspace, Project& project, bool restore) throw (Exception);
         ~Circuit() noexcept;
 
+        // NetClass Methods
+        NetClass* getNetClassByUuid(const QUuid& uuid) const noexcept;
+        NetClass* getNetClassByName(const QString& name) const noexcept;
+        NetClass* createNetClass(const QString& name) throw (Exception);
+        void addNetClass(NetClass* netclass, bool toDomTree = true) throw (Exception);
+        void removeNetClass(NetClass* netclass) throw (Exception);
+
+        // NetSignal Methods
+        NetSignal* getNetSignalByUuid(const QUuid& uuid) const noexcept;
+        NetSignal* getNetSignalByName(const QString& name) const noexcept;
+        NetSignal* createNetSignal(const QUuid& netclass) throw (Exception);
+        void addNetSignal(NetSignal* netsignal, bool toDomTree = true) throw (Exception);
+        void removeNetSignal(NetSignal* netsignal) throw (Exception);
+
         // General Methods
         bool save(bool toOriginal, QStringList& errors) noexcept;
 
@@ -81,7 +96,7 @@ class Circuit final : public QObject
         XmlFile* mXmlFile;
 
         QHash<QUuid, NetClass*> mNetClasses;
-
+        QHash<QUuid, NetSignal*> mNetSignals;
 };
 
 } // namespace project

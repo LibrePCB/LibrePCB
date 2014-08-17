@@ -24,6 +24,9 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "netsignal.h"
+#include "netclass.h"
+#include "../../common/exceptions.h"
+#include "circuit.h"
 
 namespace project {
 
@@ -31,13 +34,108 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-NetSignal::NetSignal(Workspace& workspace, Project& project, Circuit& circuit) :
-    QObject(0), mWorkspace(workspace), mProject(project), mCircuit(circuit)
+NetSignal::NetSignal(Circuit& circuit, const QDomElement& domElement) throw (Exception) :
+    QObject(0), mCircuit(circuit), mDomElement(domElement)
 {
+    mUuid = mDomElement.attribute("uuid");
+    if(mUuid.isNull())
+    {
+        throw RuntimeError(__FILE__, __LINE__, mDomElement.attribute("uuid"),
+            QString(tr("Invalid netsignal UUID: \"%1\"")).arg(mDomElement.attribute("uuid")));
+    }
+
+    mName = mDomElement.attribute("name");
+    if(mName.isEmpty())
+    {
+        throw RuntimeError(__FILE__, __LINE__, mUuid.toString(),
+            QString(tr("Name of netsignal \"%1\" is empty!")).arg(mUuid.toString()));
+    }
+
+    mAutoName = (mDomElement.attribute("auto_name") == "true");
+
+    mNetClass = mCircuit.getNetClassByUuid(mDomElement.attribute("netclass"));
+    if (!mNetClass)
+    {
+        throw RuntimeError(__FILE__, __LINE__, mDomElement.attribute("netclass"),
+            QString(tr("Invalid netclass UUID: \"%1\""))
+            .arg(mDomElement.attribute("netclass")));
+    }
+
+    // all ok, register this netsignal by its netclass
+    mNetClass->registerNetSignal(this);
 }
 
-NetSignal::~NetSignal()
+NetSignal::~NetSignal() noexcept
 {
+    mNetClass->unregisterNetSignal(this);
+}
+
+/*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
+
+void NetSignal::setName(const QString& name) throw (Exception)
+{
+    if(name.isEmpty())
+    {
+        throw RuntimeError(__FILE__, __LINE__, QString(),
+            tr("The new netsignal name must not be empty!"));
+    }
+
+    mDomElement.setAttribute("name", name);
+    mName = name;
+
+    mDomElement.setAttribute("auto_name", "false");
+    mAutoName = false;
+}
+
+/*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+void NetSignal::addToDomTree(QDomElement& parent) throw (Exception)
+{
+    if (parent.nodeName() != "netsignals")
+        throw LogicError(__FILE__, __LINE__, parent.nodeName(), tr("Invalid node name!"));
+
+    QDomElement newElement = parent.appendChild(mDomElement).toElement();
+    if (newElement.isNull())
+        throw LogicError(__FILE__, __LINE__, QString(), tr("Could not append DOM node!"));
+
+    mDomElement = newElement;
+}
+
+void NetSignal::removeFromDomTree(QDomElement& parent) throw (Exception)
+{
+    if (parent.nodeName() != "netsignals")
+        throw LogicError(__FILE__, __LINE__, parent.nodeName(), tr("Invalid node name!"));
+
+    if (parent.removeChild(mDomElement).isNull())
+    {
+        throw LogicError(__FILE__, __LINE__, QString(),
+                         tr("Could not remove node from DOM tree!"));
+    }
+}
+
+/*****************************************************************************************
+ *  Static Methods
+ ****************************************************************************************/
+
+NetSignal* NetSignal::create(Circuit& circuit, QDomDocument& doc, const QUuid& netclass,
+                             const QString& name, bool autoName) throw (Exception)
+{
+    QDomElement node = doc.createElement("netsignal");
+    if (node.isNull())
+        throw LogicError(__FILE__, __LINE__, QString(), tr("Could not create DOM node!"));
+
+    // fill the new QDomElement with all the needed content
+    node.setAttribute("uuid", QUuid::createUuid().toString()); // generate random UUID
+    node.setAttribute("name", name);
+    node.setAttribute("auto_name", autoName ? "true" : "false");
+    node.setAttribute("netclass", netclass.toString());
+
+    // create and return the new NetSignal object
+    return new NetSignal(circuit, node);
 }
 
 /*****************************************************************************************
