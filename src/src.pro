@@ -92,7 +92,11 @@ SOURCES += \
     common/filepath.cpp \
     common/schematiclayer.cpp \
     common/xmlfile.cpp \
-    library/librarybaseelement.cpp
+    library/librarybaseelement.cpp \
+    project/circuit/cmd/cmdnetclassadd.cpp \
+    project/circuit/cmd/cmdnetclassremove.cpp \
+    project/circuit/cmd/cmdnetsignaladd.cpp \
+    project/circuit/cmd/cmdnetsignalremove.cpp
 
 HEADERS += \
     common/units.h \
@@ -134,7 +138,11 @@ HEADERS += \
     common/filepath.h \
     common/schematiclayer.h \
     common/xmlfile.h \
-    library/librarybaseelement.h
+    library/librarybaseelement.h \
+    project/circuit/cmd/cmdnetclassadd.h \
+    project/circuit/cmd/cmdnetclassremove.h \
+    project/circuit/cmd/cmdnetsignaladd.h \
+    project/circuit/cmd/cmdnetsignalremove.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \
