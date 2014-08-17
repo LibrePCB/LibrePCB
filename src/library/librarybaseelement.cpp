@@ -17,55 +17,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_LIBRARYELEMENT_H
-#define LIBRARY_LIBRARYELEMENT_H
-
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
 #include <QDomDocument>
+#include <QDomElement>
 #include "librarybaseelement.h"
-
-/*****************************************************************************************
- *  Forward Declarations
- ****************************************************************************************/
-
-class Workspace;
-
-/*****************************************************************************************
- *  Class LibraryElement
- ****************************************************************************************/
 
 namespace library {
 
-/**
- * @brief The LibraryElement class
- */
-class LibraryElement : public LibraryBaseElement
+/*****************************************************************************************
+ *  Constructors / Destructor
+ ****************************************************************************************/
+
+LibraryBaseElement::LibraryBaseElement(Workspace* workspace, const QString& xmlFilename,
+                                       const QString& xmlRootNodeName) :
+    QObject(0), mWorkspace(workspace), mXmlFilename(xmlFilename)
 {
-        Q_OBJECT
+    Q_UNUSED(xmlRootNodeName);
+}
 
-    public:
+LibraryBaseElement::~LibraryBaseElement()
+{
+}
 
-        // Constructors / Destructor
-        explicit LibraryElement(Workspace* workspace, const QString& xmlFilename,
-                                const QString& xmlRootNodeName);
-        virtual ~LibraryElement();
-
-    protected:
-
-        // General
-
-    private:
-
-        // make some methods inaccessible...
-        LibraryElement();
-        LibraryElement(const LibraryElement& other);
-        LibraryElement& operator=(const LibraryElement& rhs);
-};
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
 } // namespace library
-
-#endif // LIBRARY_LIBRARYELEMENT_H

@@ -91,7 +91,8 @@ SOURCES += \
     common/filelock.cpp \
     common/filepath.cpp \
     common/schematiclayer.cpp \
-    common/xmlfile.cpp
+    common/xmlfile.cpp \
+    library/librarybaseelement.cpp
 
 HEADERS += \
     common/units.h \
@@ -132,7 +133,8 @@ HEADERS += \
     common/filelock.h \
     common/filepath.h \
     common/schematiclayer.h \
-    common/xmlfile.h
+    common/xmlfile.h \
+    library/librarybaseelement.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \

@@ -17,16 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_LIBRARYELEMENT_H
-#define LIBRARY_LIBRARYELEMENT_H
+#ifndef LIBRARY_LIBRARYBASEELEMENT_H
+#define LIBRARY_LIBRARYBASEELEMENT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
-#include <QtCore>
-#include <QDomDocument>
-#include "librarybaseelement.h"
+#include <QObject>
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -35,37 +33,39 @@
 class Workspace;
 
 /*****************************************************************************************
- *  Class LibraryElement
+ *  Class LibraryBaseElement
  ****************************************************************************************/
 
 namespace library {
 
 /**
- * @brief The LibraryElement class
+ * @brief The LibraryBaseElement class
  */
-class LibraryElement : public LibraryBaseElement
+class LibraryBaseElement : public QObject
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit LibraryElement(Workspace* workspace, const QString& xmlFilename,
+        explicit LibraryBaseElement(Workspace* workspace, const QString& xmlFilename,
                                 const QString& xmlRootNodeName);
-        virtual ~LibraryElement();
+        virtual ~LibraryBaseElement();
 
     protected:
 
         // General
+        Workspace* mWorkspace;
+        QString mXmlFilename;
 
     private:
 
         // make some methods inaccessible...
-        LibraryElement();
-        LibraryElement(const LibraryElement& other);
-        LibraryElement& operator=(const LibraryElement& rhs);
+        LibraryBaseElement();
+        LibraryBaseElement(const LibraryBaseElement& other);
+        LibraryBaseElement& operator=(const LibraryBaseElement& rhs);
 };
 
 } // namespace library
 
-#endif // LIBRARY_LIBRARYELEMENT_H
+#endif // LIBRARY_LIBRARYBASEELEMENT_H

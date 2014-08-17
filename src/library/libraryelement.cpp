@@ -34,9 +34,8 @@ namespace library {
 
 LibraryElement::LibraryElement(Workspace* workspace, const QString& xmlFilename,
                                const QString& xmlRootNodeName) :
-    QObject(0), mWorkspace(workspace), mXmlFilename(xmlFilename)
+    LibraryBaseElement(workspace, xmlFilename, xmlRootNodeName)
 {
-    Q_UNUSED(xmlRootNodeName);
 }
 
 LibraryElement::~LibraryElement()
