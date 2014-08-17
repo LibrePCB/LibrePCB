@@ -165,9 +165,8 @@ Project::~Project() noexcept
     // inform the workspace that this project will get destroyed
     mWorkspace.unregisterOpenProject(this);
 
-    // stop the autosave timer and remove all temporary files
+    // stop the autosave timer
     mAutoSaveTimer.stop();
-    QFile::remove(mFilepath.toStr() % "~");
 
     // delete all command objects in the undo stack (must be done before other important
     // objects are deleted, as undo command objects can hold pointers/references to them!)

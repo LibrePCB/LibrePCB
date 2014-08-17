@@ -91,6 +91,8 @@ XmlFile::XmlFile(const FilePath& filepath, bool restore,
 
 XmlFile::~XmlFile()
 {
+    // remove temporary file
+    QFile::remove(mFilepath.toStr() % "~");
 }
 
 /*****************************************************************************************
