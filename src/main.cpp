@@ -157,4 +157,6 @@ int main(int argc, char* argv[])
                 return 0; // quit the application
         }
     } while (chooseAnotherWorkspace);
+
+    return 0;
 }

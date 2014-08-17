@@ -73,18 +73,18 @@ XmlFile::XmlFile(const FilePath& filepath, bool restore,
     }
 
     // check if the root node exists
-    QDomElement rootNode = getRoot();
-    if (rootNode.isNull())
+    mDomRoot = mDomDocument.documentElement();
+    if (mDomRoot.isNull())
     {
         throw RuntimeError(__FILE__, __LINE__, xmlFilepath.toStr(),
             QString(tr("No XML root node found in \"%1\"!")).arg(xmlFilepath.toNative()));
     }
 
     // check the name of the root node, if desired
-    if ((!rootName.isEmpty()) && (rootNode.tagName() != rootName))
+    if ((!rootName.isEmpty()) && (mDomRoot.tagName() != rootName))
     {
         throw RuntimeError(__FILE__, __LINE__, QString("%1: \"%2\"!=\"%3\"")
-            .arg(xmlFilepath.toStr(), rootNode.nodeName(), rootName),
+            .arg(xmlFilepath.toStr(), mDomRoot.nodeName(), rootName),
             QString(tr("Invalid root node in \"%1\"!")).arg(xmlFilepath.toNative()));
     }
 }

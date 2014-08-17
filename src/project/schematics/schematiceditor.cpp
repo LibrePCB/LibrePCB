@@ -46,15 +46,19 @@ SchematicEditor::SchematicEditor(Workspace& workspace, Project& project) :
     connect(mUi->actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 
     // connect the undo/redo actions with the QUndoStack of the project
+    connect(mUi->actionUndo, SIGNAL(triggered()), mProject.getUndoStack(), SLOT(undo()));
+    connect(mUi->actionRedo, SIGNAL(triggered()), mProject.getUndoStack(), SLOT(redo()));
     connect(mProject.getUndoStack(), &QUndoStack::undoTextChanged,
-            [this](const QString& text){mUi->actionUndo->setText(text);});
-    mUi->actionUndo->setText(mProject.getUndoStack()->undoText());
+            [this](const QString& text)
+            {mUi->actionUndo->setText(text.isEmpty() ? tr("Undo") : text);});
+    //mUi->actionUndo->setText(mProject.getUndoStack()->undoText()); // would clear the text!
     connect(mProject.getUndoStack(), &QUndoStack::canUndoChanged,
             [this](bool can){mUi->actionUndo->setEnabled(can);});
     mUi->actionUndo->setEnabled(mProject.getUndoStack()->canUndo());
     connect(mProject.getUndoStack(), &QUndoStack::redoTextChanged,
-            [this](const QString& text){mUi->actionRedo->setText(text);});
-    mUi->actionRedo->setText(mProject.getUndoStack()->redoText());
+            [this](const QString& text)
+            {mUi->actionRedo->setText(text.isEmpty() ? tr("Redo") : text);});
+    //mUi->actionRedo->setText(mProject.getUndoStack()->redoText()); // would clear the text!
     connect(mProject.getUndoStack(), &QUndoStack::canRedoChanged,
             [this](bool can){mUi->actionRedo->setEnabled(can);});
     mUi->actionRedo->setEnabled(mProject.getUndoStack()->canRedo());

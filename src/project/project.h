@@ -124,6 +124,13 @@ class Project final : public QObject
          */
         const QUndoStack* getUndoStack() const noexcept {return mUndoStack;}
 
+        /**
+         * @brief Get the Circuit object
+         *
+         * @return A reference to the Circuit object
+         */
+        Circuit& getCircuit() const noexcept {return *mCircuit;}
+
 
         // General Methods
 
@@ -144,6 +151,15 @@ class Project final : public QObject
          * @return true if the window can be closed, false if closing the window is denied
          */
         bool windowIsAboutToClose(QMainWindow* window);
+
+        /**
+         * @brief Execute a command and push it to the undo stack
+         *
+         * @param cmd   The command to execute
+         *
+         * @throw Exception If the command cannot be executed, an exception will be thrown
+         */
+        void executeCommand(QUndoCommand* cmd) throw (Exception);
 
 
     public slots:

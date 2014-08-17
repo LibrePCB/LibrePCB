@@ -169,6 +169,10 @@ Project::~Project() noexcept
     mAutoSaveTimer.stop();
     QFile::remove(mFilepath.toStr() % "~");
 
+    // delete all command objects in the undo stack (must be done before other important
+    // objects are deleted, as undo command objects can hold pointers/references to them!)
+    mUndoStack->clear();
+
     // free the allocated memory in the reverse order of their allocation
     delete mSchematicEditor;        mSchematicEditor = 0;
     delete mCircuit;                mCircuit = 0;
@@ -196,6 +200,11 @@ bool Project::windowIsAboutToClose(QMainWindow* window)
     return true; // this is not the last open window, so no problem to close it...
 }
 
+void Project::executeCommand(QUndoCommand* cmd) throw (Exception)
+{
+    mUndoStack->push(cmd);
+}
+
 /*****************************************************************************************
  *  Public Slots
  ****************************************************************************************/
@@ -204,6 +213,7 @@ void Project::showSchematicEditor()
 {
     mSchematicEditor->show();
     mSchematicEditor->raise();
+    mSchematicEditor->activateWindow();
 }
 
 bool Project::save() noexcept

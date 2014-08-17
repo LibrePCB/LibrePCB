@@ -102,16 +102,25 @@ class XmlFile final : public QObject
         const FilePath& getFilepath() const noexcept {return mFilepath;}
 
         /**
+         * @brief Get the DOM document of the XML file
+         *
+         * @return A reference to the QDomDocument of the XML file
+         */
+        QDomDocument& getDocument() noexcept {return mDomDocument;}
+
+        /**
          * @brief Get the root of the XML file as a QDomElement
          *
          * @note    Because the constructor has already checked whether this QDomElement
          *          is valid or not (<tt>QDomElement::isNull()</tt>) this object is always
          *          valid. You do not have to call <tt>QDomElement::isNull()</tt> to check
-         *          this.
+         *          this (OK, if you "damage" the DOM tree after it was loaded from the
+         *          file, this method could return an invalid QDomElement, but if this
+         *          happens, we have a big problem anyway... ;-) ).
          *
          * @return The XML root element
          */
-        QDomElement getRoot() const noexcept {return mDomDocument.documentElement();}
+        QDomElement& getRoot() noexcept {return mDomRoot;}
 
 
         // General Methods
@@ -173,6 +182,11 @@ class XmlFile final : public QObject
          * @brief The whole XML DOM tree
          */
         QDomDocument mDomDocument;
+
+        /**
+         * @brief The root element of #mDomDocument
+         */
+        QDomElement mDomRoot;
 
 };
 

@@ -145,8 +145,9 @@ Project* Workspace::openProject(const FilePath& filepath) noexcept
         // project successfully opened!
         mOpenProjects.insert(filepath.toUnique().toStr(), openProject);
         mRecentProjectsModel->setLastRecentProject(filepath);
-        openProject->showSchematicEditor();
     }
+
+    openProject->showSchematicEditor();
 
     return openProject;
 }
