@@ -18,6 +18,7 @@ Thumbs.db
 *~
 *.pro.user*
 *.autosave
+.~lock.*
 
 # Directories
 dev/doxygen/output/
