@@ -25,6 +25,8 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include "../../common/exceptions.h"
+#include "../../common/filepath.h"
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -62,17 +64,18 @@ class ProjectLibrary final : public QObject
     public:
 
         // Constructors / Destructor
-        explicit ProjectLibrary(Workspace& workspace, Project& project, bool restore);
-        ~ProjectLibrary();
+        explicit ProjectLibrary(Workspace& workspace, Project& project, bool restore)
+                                throw (Exception);
+        ~ProjectLibrary() noexcept;
 
         // Getters: Library Elements
-        const library::Symbol*           getSymbol(const QUuid& uuid) const;
-        const library::Footprint*        getFootprint(const QUuid& uuid) const;
-        const library::Model*            getModel(const QUuid& uuid) const;
-        const library::SpiceModel*       getSpiceModel(const QUuid& uuid) const;
-        const library::Package*          getPackage(const QUuid& uuid) const;
-        const library::GenericComponent* getGenericComponent(const QUuid& uuid) const;
-        const library::Component*        getComponent(const QUuid& uuid) const;
+        const library::Symbol*           getSymbol(const QUuid& uuid) const noexcept;
+        const library::Footprint*        getFootprint(const QUuid& uuid) const noexcept;
+        const library::Model*            getModel(const QUuid& uuid) const noexcept;
+        const library::SpiceModel*       getSpiceModel(const QUuid& uuid) const noexcept;
+        const library::Package*          getPackage(const QUuid& uuid) const noexcept;
+        const library::GenericComponent* getGenericComponent(const QUuid& uuid) const noexcept;
+        const library::Component*        getComponent(const QUuid& uuid) const noexcept;
 
     private:
 
@@ -81,10 +84,15 @@ class ProjectLibrary final : public QObject
         ProjectLibrary(const ProjectLibrary& other);
         ProjectLibrary& operator=(const ProjectLibrary& rhs);
 
+        // Private Methods
+        template <typename ElementType>
+        void loadElements(const FilePath& directory, const QString& type,
+                          QHash<QUuid, const ElementType*>& elementList) noexcept;
+
         // General
         Workspace& mWorkspace; ///< a reference to the Workspace object (from the ctor)
         Project& mProject; ///< a reference to the Project object (from the ctor)
-        //QDir mLibraryDir; ///< a QDir object that represents the "lib" directory of the project
+        FilePath mLibraryPath; ///< the "lib" directory of the project
 
         // The Library Elements
         QHash<QUuid, const library::Symbol*> mSymbols;

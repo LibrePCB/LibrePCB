@@ -24,6 +24,7 @@
 #include <QtCore>
 #include "../../common/exceptions.h"
 #include "projectlibrary.h"
+#include "../../common/filepath.h"
 #include "../project.h"
 #include "../../library/symbol.h"
 #include "../../library/footprint.h"
@@ -41,21 +42,36 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ProjectLibrary::ProjectLibrary(Workspace& workspace, Project& project, bool restore) :
-    QObject(0), mWorkspace(workspace), mProject(project)//,
-    //mLibraryDir(project->getDir().absoluteFilePath("lib"))
+ProjectLibrary::ProjectLibrary(Workspace& workspace, Project& project, bool restore)
+                              throw (Exception) :
+    QObject(0), mWorkspace(workspace), mProject(project),
+    mLibraryPath(project.getPath().getPathTo("lib"))
 {
+    qDebug() << "load project library...";
+
     Q_UNUSED(restore)
 
-    //if (!mLibraryDir.exists())
-    //    throw RuntimeError(QString("The library path \"%1\" does not exist!").arg(mLibraryDir.path()), __FILE__, __LINE__);
+    if (!mLibraryPath.isExistingDir())
+    {
+        throw RuntimeError(__FILE__, __LINE__, mLibraryPath.toStr(), QString(
+            tr("The library path \"%1\" does not exist!")).arg(mLibraryPath.toNative()));
+    }
 
-    // TODO: Load all library elements
+    // Load all library elements
+    loadElements<Symbol>(mLibraryPath.getPathTo("sym"), "symbols", mSymbols);
+    loadElements<Footprint>(mLibraryPath.getPathTo("fpt"), "footprints", mFootprints);
+    loadElements<Model>(mLibraryPath.getPathTo("3dmdl"), "3d models", mModels);
+    loadElements<SpiceModel>(mLibraryPath.getPathTo("spcmdl"), "spice models", mSpiceModels);
+    loadElements<Package>(mLibraryPath.getPathTo("pkg"), "packages", mPackages);
+    loadElements<GenericComponent>(mLibraryPath.getPathTo("gencmp"), "generic components", mGenericComponents);
+    loadElements<Component>(mLibraryPath.getPathTo("cmp"), "components", mComponents);
+
+    qDebug() << "project library successfully loaded!";
 }
 
-ProjectLibrary::~ProjectLibrary()
+ProjectLibrary::~ProjectLibrary() noexcept
 {
-    // Delete all library elements
+    // Delete all library elements (in reverse order of their creation)
     qDeleteAll(mComponents);            mComponents.clear();
     qDeleteAll(mGenericComponents);     mGenericComponents.clear();
     qDeleteAll(mPackages);              mPackages.clear();
@@ -69,41 +85,111 @@ ProjectLibrary::~ProjectLibrary()
  *  Getters: Library Elements
  ****************************************************************************************/
 
-const Symbol* ProjectLibrary::getSymbol(const QUuid& uuid) const
+const Symbol* ProjectLibrary::getSymbol(const QUuid& uuid) const noexcept
 {
     return mSymbols.value(uuid, 0);
 }
 
-const Footprint* ProjectLibrary::getFootprint(const QUuid& uuid) const
+const Footprint* ProjectLibrary::getFootprint(const QUuid& uuid) const noexcept
 {
     return mFootprints.value(uuid, 0);
 }
 
-const Model* ProjectLibrary::getModel(const QUuid& uuid) const
+const Model* ProjectLibrary::getModel(const QUuid& uuid) const noexcept
 {
     return mModels.value(uuid, 0);
 }
 
-const SpiceModel* ProjectLibrary::getSpiceModel(const QUuid& uuid) const
+const SpiceModel* ProjectLibrary::getSpiceModel(const QUuid& uuid) const noexcept
 {
     return mSpiceModels.value(uuid, 0);
 }
 
-const Package* ProjectLibrary::getPackage(const QUuid& uuid) const
+const Package* ProjectLibrary::getPackage(const QUuid& uuid) const noexcept
 {
     return mPackages.value(uuid, 0);
 }
 
-const GenericComponent* ProjectLibrary::getGenericComponent(const QUuid& uuid) const
+const GenericComponent* ProjectLibrary::getGenericComponent(const QUuid& uuid) const noexcept
 {
     return mGenericComponents.value(uuid, 0);
 }
 
-const Component* ProjectLibrary::getComponent(const QUuid& uuid) const
+const Component* ProjectLibrary::getComponent(const QUuid& uuid) const noexcept
 {
     return mComponents.value(uuid, 0);
 }
 
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+template <typename ElementType>
+void ProjectLibrary::loadElements(const FilePath& directory, const QString& type,
+                                  QHash<QUuid, const ElementType*>& elementList) noexcept
+{
+    QDir dir(directory.toStr());
+
+    // search all subdirectories which have a valid UUID as directory name
+    dir.setFilter(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::Readable);
+    foreach (const QString& dirname, dir.entryList())
+    {
+        FilePath subdirPath(directory.getPathTo(dirname));
+
+        if (!subdirPath.isExistingDir())
+        {
+            qDebug() << "Directory does not exist:" << subdirPath.toStr();
+            continue;
+        }
+
+        // check the directory name (is it a valid UUID?)
+        QUuid dirUuid(dirname);
+        if (dirUuid.isNull())
+        {
+            qDebug() << "Found a directory in the library which is not an UUID:" << subdirPath.toStr();
+            continue;
+        }
+
+        // search for XML files in this subdirectory
+        QDir subdir(subdirPath.toStr());
+        subdir.setFilter(QDir::Files | QDir::Readable);
+        subdir.setNameFilters(QStringList() << "*.xml");
+        foreach (const QString& filename, subdir.entryList())
+        {
+            FilePath filepath(subdirPath.getPathTo(filename));
+
+            if (!filepath.isExistingFile())
+            {
+                qDebug() << "File does not exist:" << filepath.toStr();
+                continue;
+            }
+
+            // try loading the library element
+            try
+            {
+                ElementType* element = new ElementType(&mWorkspace, filepath.toStr());
+
+                /*if (element->getUuid() != dirUuid)
+                {
+                    qWarning() << "Invalid UUID in library file" << filepath.toStr()
+                        << "(" << element->getUuid().toString() << "instead of"
+                        << dirUuid.toString() << ")";
+                    continue;
+                }*/
+                /// @todo
+                //elementList.insert(element->getUuid(), element);
+
+                elementList.insert(dirUuid, element);
+            }
+            catch (Exception& e)
+            {
+                qWarning() << "Could not load the library XML file:" << filepath.toStr();
+            }
+        }
+    }
+
+    qDebug() << "successfully loaded" << elementList.count() << qPrintable(type);
+}
 
 /*****************************************************************************************
  *  End of File

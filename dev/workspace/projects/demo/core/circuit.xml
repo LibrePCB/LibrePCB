@@ -13,11 +13,11 @@
         <variant name="default" uuid="{6fe07dd4-aaee-4a28-ae35-d22c2904a461}"/>
     </assembly_variants>
     <generic_component_instances>
-        <instance generic_component="{60000000-7785-4665-a3e6-fe8d5224ef37}" uuid="{7fe07dd4-aaee-4a28-ae35-d22c2904a462}">
+        <instance generic_component="{60000000-7785-4665-a3e6-fe8d5224ef37}" uuid="{7fe07dd4-aaee-4a28-ae35-d22c2904a462}" name="U1">
             <attributes/>
             <signal_mapping/>
         </instance>
-        <instance generic_component="{60000001-3c94-4689-be29-92235ba993c5}" uuid="{6fe07dd4-aaee-4a28-ae35-d22c2904a461}">
+        <instance generic_component="{60000001-3c94-4689-be29-92235ba993c5}" uuid="{6fe07dd4-aaee-4a28-ae35-d22c2904a461}" name="U2">
             <attributes/>
             <signal_mapping>
                 <map comp_signal="{71a44db9-5e42-405f-b6e4-b4725ae37af3}" netsignal="{5ae568aa-906e-48d2-9620-26803d99e256}"/>
@@ -30,15 +30,15 @@
                 <map comp_signal="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}" netsignal=""/>
             </signal_mapping>
         </instance>
-        <instance generic_component="{60000002-3c94-4689-be29-92235ba993c5}" uuid="{1b6ffb10-1c00-47a1-a66a-b60afc6a8da9}">
+        <instance generic_component="{60000002-3c94-4689-be29-92235ba993c5}" uuid="{1b6ffb10-1c00-47a1-a66a-b60afc6a8da9}" name="U3">
             <attributes/>
             <signal_mapping/>
         </instance>
-        <instance generic_component="{60000002-3c94-4689-be29-92235ba993c5}" uuid="{aaaadfba-ffb2-4d96-ae4a-d26329006d79}">
+        <instance generic_component="{60000002-3c94-4689-be29-92235ba993c5}" uuid="{aaaadfba-ffb2-4d96-ae4a-d26329006d79}" name="U4">
             <attributes/>
             <signal_mapping/>
         </instance>
-        <instance generic_component="{60000002-3c94-4689-be29-92235ba993c5}" uuid="{f0e33b45-c3ac-49dc-8bd0-512d75ad014b}">
+        <instance generic_component="{60000002-3c94-4689-be29-92235ba993c5}" uuid="{f0e33b45-c3ac-49dc-8bd0-512d75ad014b}" name="U5">
             <attributes/>
             <signal_mapping/>
         </instance>

@@ -131,6 +131,14 @@ class Project final : public QObject
          */
         Circuit& getCircuit() const noexcept {return *mCircuit;}
 
+        /**
+         * @brief Get the ProjectLibrary object which contains all library elements used
+         *        in this project
+         *
+         * @return A reference to the ProjectLibrary object
+         */
+        ProjectLibrary& getLibrary() const noexcept {return *mProjectLibrary;}
+
 
         // General Methods
 
