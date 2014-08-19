@@ -57,14 +57,29 @@ ProjectLibrary::ProjectLibrary(Workspace& workspace, Project& project, bool rest
             tr("The library path \"%1\" does not exist!")).arg(mLibraryPath.toNative()));
     }
 
-    // Load all library elements
-    loadElements<Symbol>(mLibraryPath.getPathTo("sym"), "symbols", mSymbols);
-    loadElements<Footprint>(mLibraryPath.getPathTo("fpt"), "footprints", mFootprints);
-    loadElements<Model>(mLibraryPath.getPathTo("3dmdl"), "3d models", mModels);
-    loadElements<SpiceModel>(mLibraryPath.getPathTo("spcmdl"), "spice models", mSpiceModels);
-    loadElements<Package>(mLibraryPath.getPathTo("pkg"), "packages", mPackages);
-    loadElements<GenericComponent>(mLibraryPath.getPathTo("gencmp"), "generic components", mGenericComponents);
-    loadElements<Component>(mLibraryPath.getPathTo("cmp"), "components", mComponents);
+    try
+    {
+        // Load all library elements
+        loadElements<Symbol>(mLibraryPath.getPathTo("sym"), "symbols", mSymbols);
+        loadElements<Footprint>(mLibraryPath.getPathTo("fpt"), "footprints", mFootprints);
+        loadElements<Model>(mLibraryPath.getPathTo("3dmdl"), "3d models", mModels);
+        loadElements<SpiceModel>(mLibraryPath.getPathTo("spcmdl"), "spice models", mSpiceModels);
+        loadElements<Package>(mLibraryPath.getPathTo("pkg"), "packages", mPackages);
+        loadElements<GenericComponent>(mLibraryPath.getPathTo("gencmp"), "generic components", mGenericComponents);
+        loadElements<Component>(mLibraryPath.getPathTo("cmp"), "components", mComponents);
+    }
+    catch (Exception &e)
+    {
+        // free the allocated memory in the reverse order of their allocation...
+        qDeleteAll(mComponents);            mComponents.clear();
+        qDeleteAll(mGenericComponents);     mGenericComponents.clear();
+        qDeleteAll(mPackages);              mPackages.clear();
+        qDeleteAll(mSpiceModels);           mSpiceModels.clear();
+        qDeleteAll(mModels);                mModels.clear();
+        qDeleteAll(mFootprints);            mFootprints.clear();
+        qDeleteAll(mSymbols);               mSymbols.clear();
+        throw; // ...and rethrow the exception
+    }
 
     qDebug() << "project library successfully loaded!";
 }
@@ -126,7 +141,8 @@ const Component* ProjectLibrary::getComponent(const QUuid& uuid) const noexcept
 
 template <typename ElementType>
 void ProjectLibrary::loadElements(const FilePath& directory, const QString& type,
-                                  QHash<QUuid, const ElementType*>& elementList) noexcept
+                                  QHash<QUuid, const ElementType*>& elementList)
+                                  throw (Exception)
 {
     QDir dir(directory.toStr());
 
@@ -169,6 +185,7 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
             {
                 ElementType* element = new ElementType(&mWorkspace, filepath.toStr());
 
+                /// @todo
                 /*if (element->getUuid() != dirUuid)
                 {
                     qWarning() << "Invalid UUID in library file" << filepath.toStr()
@@ -176,8 +193,15 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
                         << dirUuid.toString() << ")";
                     continue;
                 }*/
-                /// @todo
-                //elementList.insert(element->getUuid(), element);
+
+                /// @todo in the following lines, use "element->getUuid()" instead of "dirUuid"
+
+                if (elementList.contains(dirUuid))
+                {
+                    throw RuntimeError(__FILE__, __LINE__, dirUuid.toString(),
+                        QString(tr("There are multiple library elements with the same "
+                        "UUID in the directory \"%1\"")).arg(subdirPath.toNative()));
+                }
 
                 elementList.insert(dirUuid, element);
             }

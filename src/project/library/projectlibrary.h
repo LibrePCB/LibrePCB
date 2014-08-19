@@ -87,7 +87,7 @@ class ProjectLibrary final : public QObject
         // Private Methods
         template <typename ElementType>
         void loadElements(const FilePath& directory, const QString& type,
-                          QHash<QUuid, const ElementType*>& elementList) noexcept;
+                          QHash<QUuid, const ElementType*>& elementList) throw (Exception);
 
         // General
         Workspace& mWorkspace; ///< a reference to the Workspace object (from the ctor)
