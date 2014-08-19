@@ -60,14 +60,10 @@ NetSignal::NetSignal(Circuit& circuit, const QDomElement& domElement) throw (Exc
             QString(tr("Invalid netclass UUID: \"%1\""))
             .arg(mDomElement.attribute("netclass")));
     }
-
-    // all ok, register this netsignal by its netclass
-    mNetClass->registerNetSignal(this);
 }
 
 NetSignal::~NetSignal() noexcept
 {
-    mNetClass->unregisterNetSignal(this);
 }
 
 /*****************************************************************************************
@@ -93,27 +89,47 @@ void NetSignal::setName(const QString& name) throw (Exception)
  *  General Methods
  ****************************************************************************************/
 
-void NetSignal::addToDomTree(QDomElement& parent) throw (Exception)
+void NetSignal::addToCircuit(bool addNode, QDomElement& parent) throw (Exception)
 {
-    if (parent.nodeName() != "netsignals")
-        throw LogicError(__FILE__, __LINE__, parent.nodeName(), tr("Invalid node name!"));
+    if (addNode)
+    {
+        if (parent.nodeName() != "netsignals")
+            throw LogicError(__FILE__, __LINE__, parent.nodeName(), tr("Invalid node name!"));
 
-    QDomElement newElement = parent.appendChild(mDomElement).toElement();
-    if (newElement.isNull())
-        throw LogicError(__FILE__, __LINE__, QString(), tr("Could not append DOM node!"));
+        if (parent.appendChild(mDomElement).isNull())
+            throw LogicError(__FILE__, __LINE__, QString(), tr("Could not append DOM node!"));
+    }
 
-    mDomElement = newElement;
+    try
+    {
+        mNetClass->registerNetSignal(this);
+    }
+    catch (Exception& e)
+    {
+        parent.removeChild(mDomElement); // revert appending the DOM node
+        throw;
+    }
 }
 
-void NetSignal::removeFromDomTree(QDomElement& parent) throw (Exception)
+void NetSignal::removeFromCircuit(bool removeNode, QDomElement& parent) throw (Exception)
 {
-    if (parent.nodeName() != "netsignals")
-        throw LogicError(__FILE__, __LINE__, parent.nodeName(), tr("Invalid node name!"));
-
-    if (parent.removeChild(mDomElement).isNull())
+    if (removeNode)
     {
-        throw LogicError(__FILE__, __LINE__, QString(),
-                         tr("Could not remove node from DOM tree!"));
+        if (parent.nodeName() != "netsignals")
+            throw LogicError(__FILE__, __LINE__, parent.nodeName(), tr("Invalid node name!"));
+
+        if (parent.removeChild(mDomElement).isNull())
+            throw LogicError(__FILE__, __LINE__, QString(), tr("Could not remove node from DOM tree!"));
+    }
+
+    try
+    {
+         mNetClass->unregisterNetSignal(this);
+    }
+    catch (Exception& e)
+    {
+        parent.appendChild(mDomElement); // revert removing the DOM node
+        throw;
     }
 }
 

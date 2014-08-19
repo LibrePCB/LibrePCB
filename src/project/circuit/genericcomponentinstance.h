@@ -25,16 +25,19 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <QDomElement>
+#include "../../common/exceptions.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
-class Workspace;
-
 namespace project {
-class Project;
 class Circuit;
+}
+
+namespace library {
+class GenericComponent;
 }
 
 /*****************************************************************************************
@@ -53,9 +56,26 @@ class GenericComponentInstance : public QObject
     public:
 
         // Constructors / Destructor
-        explicit GenericComponentInstance(Workspace& workspace, Project& project,
-                                          Circuit& circuit);
-        ~GenericComponentInstance();
+        explicit GenericComponentInstance(Circuit& circuit, const QDomElement& domElement)
+                                          throw (Exception);
+        ~GenericComponentInstance() noexcept;
+
+        // Getters
+        const QUuid& getUuid() const noexcept {return mUuid;}
+        const QString& getName() const noexcept {return mName;}
+        const library::GenericComponent& getGenComp() const noexcept {return *mGenComp;}
+
+        // Setters
+        void setName(const QString& name) throw (Exception);
+
+        // General Methods
+        void addToCircuit(bool addNode, QDomElement& parent) throw (Exception);
+        void removeFromCircuit(bool removeNode, QDomElement& parent) throw (Exception);
+
+        // Static Methods
+        static GenericComponentInstance* create(Circuit& circuit, QDomDocument& doc,
+                                                const QUuid& genericComponent,
+                                                const QString& name) throw (Exception);
 
     private:
 
@@ -65,10 +85,13 @@ class GenericComponentInstance : public QObject
         GenericComponentInstance& operator=(const GenericComponentInstance& rhs);
 
         // General
-        Workspace& mWorkspace;
-        Project& mProject;
         Circuit& mCircuit;
+        QDomElement mDomElement;
 
+        // Attributes
+        QUuid mUuid;
+        QString mName;
+        const library::GenericComponent* mGenComp;
 };
 
 } // namespace project

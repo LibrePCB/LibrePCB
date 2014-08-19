@@ -30,6 +30,7 @@
 #include "../project.h"
 #include "netclass.h"
 #include "netsignal.h"
+#include "genericcomponentinstance.h"
 
 namespace project {
 
@@ -72,12 +73,27 @@ Circuit::Circuit(Workspace& workspace, Project& project, bool restore) throw (Ex
             tmpNode = tmpNode.nextSiblingElement("netsignal");
         }
         qDebug() << mNetSignals.count() << "netsignals successfully loaded!";
+
+        // Load all generic component instances
+        tmpNode = root.firstChildElement("generic_component_instances")
+                  .firstChildElement("instance");
+        while (!tmpNode.isNull())
+        {
+            GenericComponentInstance* genComp = new GenericComponentInstance(*this, tmpNode);
+            addGenCompInstance(genComp, false);
+            tmpNode = tmpNode.nextSiblingElement("instance");
+        }
+        qDebug() << mGenCompInstances.count() << "generic component instances successfully loaded!";
     }
     catch (...)
     {
-        // free allocated memory and rethrow the exception
-        qDeleteAll(mNetSignals);    mNetSignals.clear();
-        qDeleteAll(mNetClasses);    mNetClasses.clear();
+        // free allocated memory (see comments in the destructor) and rethrow the exception
+        foreach (GenericComponentInstance* genCompInstance, mGenCompInstances)
+            try { removeGenCompInstance(genCompInstance, false, true); } catch (...) {}
+        foreach (NetSignal* netsignal, mNetSignals)
+            try { removeNetSignal(netsignal, false, true); } catch (...) {}
+        foreach (NetClass* netclass, mNetClasses)
+            try { removeNetClass(netclass, false, true); } catch (...) {}
         delete mXmlFile;            mXmlFile = 0;
         throw;
     }
@@ -87,8 +103,18 @@ Circuit::Circuit(Workspace& workspace, Project& project, bool restore) throw (Ex
 
 Circuit::~Circuit() noexcept
 {
-    qDeleteAll(mNetSignals);    mNetSignals.clear();
-    qDeleteAll(mNetClasses);    mNetClasses.clear();
+    // delete all generic component instances (and catch all throwed exceptions)
+    foreach (GenericComponentInstance* genCompInstance, mGenCompInstances)
+        try { removeGenCompInstance(genCompInstance, false, true); } catch (...) {}
+
+    // delete all netsignals (and catch all throwed exceptions)
+    foreach (NetSignal* netsignal, mNetSignals)
+        try { removeNetSignal(netsignal, false, true); } catch (...) {}
+
+    // delete all netclasses (and catch all throwed exceptions)
+    foreach (NetClass* netclass, mNetClasses)
+        try { removeNetClass(netclass, false, true); } catch (...) {}
+
     delete mXmlFile;            mXmlFile = 0;
 }
 
@@ -139,32 +165,36 @@ void Circuit::addNetClass(NetClass* netclass, bool toDomTree) throw (Exception)
     if (toDomTree)
     {
         QDomElement parent = mXmlFile->getRoot().firstChildElement("netclasses");
-        netclass->addToDomTree(parent);
+        netclass->addToDomTree(parent); // can throw an exception
     }
 
     mNetClasses.insert(netclass->getUuid(), netclass);
 }
 
-void Circuit::removeNetClass(NetClass* netclass) throw (Exception)
+void Circuit::removeNetClass(NetClass* netclass, bool fromDomTree, bool deleteNetClass) throw (Exception)
 {
     Q_CHECK_PTR(netclass);
     Q_ASSERT(mNetClasses.contains(netclass->getUuid()));
 
     // the netclass cannot be removed if there are already netsignals with that netclass!
-    foreach (NetSignal* netsignal, mNetSignals)
+    if (netclass->getNetSignalCount() > 0)
     {
-        if (netsignal->getNetClass() == netclass)
-        {
-            throw RuntimeError(__FILE__, __LINE__, QString("%1:%2")
-                .arg(netclass->getUuid().toString(), netsignal->getUuid().toString()),
-                QString(tr("There are already signals in the netclass \"%1\"!"))
-                .arg(netclass->getName()));
-        }
+        throw RuntimeError(__FILE__, __LINE__, QString("%1:%2")
+            .arg(netclass->getUuid().toString()).arg(netclass->getNetSignalCount()),
+            QString(tr("There are already signals in the netclass \"%1\"!"))
+            .arg(netclass->getName()));
     }
 
-    QDomElement parent = mXmlFile->getRoot().firstChildElement("netclasses");
-    netclass->removeFromDomTree(parent);
+    if (fromDomTree)
+    {
+        QDomElement parent = mXmlFile->getRoot().firstChildElement("netclasses");
+        netclass->removeFromDomTree(parent); // can throw an exception
+    }
+
     mNetClasses.remove(netclass->getUuid());
+
+    if (deleteNetClass)
+        delete netclass;
 }
 
 /*****************************************************************************************
@@ -218,16 +248,13 @@ void Circuit::addNetSignal(NetSignal* netsignal, bool toDomTree) throw (Exceptio
             .arg(netsignal->getName()));
     }
 
-    if (toDomTree)
-    {
-        QDomElement parent = mXmlFile->getRoot().firstChildElement("netsignals");
-        netsignal->addToDomTree(parent);
-    }
+    QDomElement parent = mXmlFile->getRoot().firstChildElement("netsignals");
+    netsignal->addToCircuit(toDomTree, parent); // can throw an exception
 
     mNetSignals.insert(netsignal->getUuid(), netsignal);
 }
 
-void Circuit::removeNetSignal(NetSignal* netsignal) throw (Exception)
+void Circuit::removeNetSignal(NetSignal* netsignal, bool fromDomTree, bool deleteNetSignal) throw (Exception)
 {
     Q_CHECK_PTR(netsignal);
     Q_ASSERT(mNetSignals.contains(netsignal->getUuid()));
@@ -235,8 +262,84 @@ void Circuit::removeNetSignal(NetSignal* netsignal) throw (Exception)
     // TODO: check if there are component signals connected with that signal
 
     QDomElement parent = mXmlFile->getRoot().firstChildElement("netsignals");
-    netsignal->removeFromDomTree(parent);
+    netsignal->removeFromCircuit(fromDomTree, parent); // can throw an exception
+
     mNetSignals.remove(netsignal->getUuid());
+
+    if (deleteNetSignal)
+        delete netsignal;
+}
+
+/*****************************************************************************************
+ *  GenericComponentInstance Methods
+ ****************************************************************************************/
+
+GenericComponentInstance* Circuit::getGenCompInstanceByUuid(const QUuid& uuid) const noexcept
+{
+    return mGenCompInstances.value(uuid, 0);
+}
+
+GenericComponentInstance* Circuit::getGenCompInstanceByName(const QString& name) const noexcept
+{
+    foreach (GenericComponentInstance* genCompInstance, mGenCompInstances)
+    {
+        if (genCompInstance->getName() == name)
+            return genCompInstance;
+    }
+    return 0;
+}
+
+GenericComponentInstance* Circuit::createGenCompInstance(const QUuid& genComp,
+                                                         const QString& name)
+                                                         throw (Exception)
+{
+    return GenericComponentInstance::create(*this, mXmlFile->getDocument(), genComp, name);
+}
+
+void Circuit::addGenCompInstance(GenericComponentInstance* genCompInstance,
+                                 bool toDomTree) throw (Exception)
+{
+    Q_CHECK_PTR(genCompInstance);
+
+    // check if there is no generic component with the same uuid in the list
+    if (getGenCompInstanceByUuid(genCompInstance->getUuid()))
+    {
+        throw RuntimeError(__FILE__, __LINE__, genCompInstance->getUuid().toString(),
+            QString(tr("There is already a component with the UUID \"%1\"!"))
+            .arg(genCompInstance->getUuid().toString()));
+    }
+
+    // check if there is no generic component with the same name in the list
+    if (getGenCompInstanceByName(genCompInstance->getName()))
+    {
+        throw RuntimeError(__FILE__, __LINE__, genCompInstance->getUuid().toString(),
+            QString(tr("There is already a component with the name \"%1\"!"))
+            .arg(genCompInstance->getName()));
+    }
+
+    QDomElement parent = mXmlFile->getRoot().firstChildElement("generic_component_instances");
+    genCompInstance->addToCircuit(toDomTree, parent); // can throw an exception
+
+    mGenCompInstances.insert(genCompInstance->getUuid(), genCompInstance);
+}
+
+void Circuit::removeGenCompInstance(GenericComponentInstance* genCompInstance,
+                                    bool fromDomTree, bool deleteGenCompInstance)
+                                    throw (Exception)
+{
+    Q_CHECK_PTR(genCompInstance);
+    Q_ASSERT(mGenCompInstances.contains(genCompInstance->getUuid()));
+
+    // TODO: check if there are still objects like symbols or footprints which use this
+    // generic component
+
+    QDomElement parent = mXmlFile->getRoot().firstChildElement("generic_component_instances");
+    genCompInstance->removeFromCircuit(fromDomTree, parent); // can throw an exception
+
+    mGenCompInstances.remove(genCompInstance->getUuid());
+
+    if (deleteGenCompInstance)
+        delete genCompInstance;
 }
 
 /*****************************************************************************************

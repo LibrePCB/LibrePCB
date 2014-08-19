@@ -53,6 +53,7 @@ NetClass::NetClass(const QDomElement& domElement) throw (Exception) :
 
 NetClass::~NetClass() noexcept
 {
+    Q_ASSERT(mNetSignals.count() == 0);
 }
 
 /*****************************************************************************************
@@ -100,11 +101,8 @@ void NetClass::addToDomTree(QDomElement& parent) throw (Exception)
     if (parent.nodeName() != "netclasses")
         throw LogicError(__FILE__, __LINE__, parent.nodeName(), tr("Invalid node name!"));
 
-    QDomElement newElement = parent.appendChild(mDomElement).toElement();
-    if (newElement.isNull())
+    if (parent.appendChild(mDomElement).isNull())
         throw LogicError(__FILE__, __LINE__, QString(), tr("Could not append DOM node!"));
-
-    mDomElement = newElement;
 }
 
 void NetClass::removeFromDomTree(QDomElement& parent) throw (Exception)
@@ -113,10 +111,7 @@ void NetClass::removeFromDomTree(QDomElement& parent) throw (Exception)
         throw LogicError(__FILE__, __LINE__, parent.nodeName(), tr("Invalid node name!"));
 
     if (parent.removeChild(mDomElement).isNull())
-    {
-        throw LogicError(__FILE__, __LINE__, QString(),
-                         tr("Could not remove node from DOM tree!"));
-    }
+        throw LogicError(__FILE__, __LINE__, QString(), tr("Could not remove node from DOM tree!"));
 }
 
 /*****************************************************************************************

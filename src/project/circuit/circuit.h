@@ -39,6 +39,7 @@ namespace project {
 class Project;
 class NetClass;
 class NetSignal;
+class GenericComponentInstance;
 }
 
 /*****************************************************************************************
@@ -63,19 +64,33 @@ class Circuit final : public QObject
         explicit Circuit(Workspace& workspace, Project& project, bool restore) throw (Exception);
         ~Circuit() noexcept;
 
+        // Getters
+        Project& getProject() const noexcept {return mProject;}
+
         // NetClass Methods
         NetClass* getNetClassByUuid(const QUuid& uuid) const noexcept;
         NetClass* getNetClassByName(const QString& name) const noexcept;
         NetClass* createNetClass(const QString& name) throw (Exception);
         void addNetClass(NetClass* netclass, bool toDomTree = true) throw (Exception);
-        void removeNetClass(NetClass* netclass) throw (Exception);
+        void removeNetClass(NetClass* netclass, bool fromDomTree = true,
+                            bool deleteNetClass = false) throw (Exception);
 
         // NetSignal Methods
         NetSignal* getNetSignalByUuid(const QUuid& uuid) const noexcept;
         NetSignal* getNetSignalByName(const QString& name) const noexcept;
         NetSignal* createNetSignal(const QUuid& netclass) throw (Exception);
         void addNetSignal(NetSignal* netsignal, bool toDomTree = true) throw (Exception);
-        void removeNetSignal(NetSignal* netsignal) throw (Exception);
+        void removeNetSignal(NetSignal* netsignal, bool fromDomTree = true,
+                             bool deleteNetSignal = false) throw (Exception);
+
+        // GenericComponentInstance Methods
+        GenericComponentInstance* getGenCompInstanceByUuid(const QUuid& uuid) const noexcept;
+        GenericComponentInstance* getGenCompInstanceByName(const QString& name) const noexcept;
+        GenericComponentInstance* createGenCompInstance(const QUuid& genComp,
+                                                        const QString& name) throw (Exception);
+        void addGenCompInstance(GenericComponentInstance* genCompInstance, bool toDomTree = true) throw (Exception);
+        void removeGenCompInstance(GenericComponentInstance* genCompInstance, bool fromDomTree = true,
+                             bool deleteGenCompInstance = false) throw (Exception);
 
         // General Methods
         bool save(bool toOriginal, QStringList& errors) noexcept;
@@ -97,6 +112,7 @@ class Circuit final : public QObject
 
         QHash<QUuid, NetClass*> mNetClasses;
         QHash<QUuid, NetSignal*> mNetSignals;
+        QHash<QUuid, GenericComponentInstance*> mGenCompInstances;
 };
 
 } // namespace project

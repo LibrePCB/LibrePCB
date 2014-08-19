@@ -60,14 +60,14 @@ class NetSignal final : public QObject
         const QUuid& getUuid() const noexcept {return mUuid;}
         const QString& getName() const noexcept {return mName;}
         bool hasAutoName() const noexcept {return mAutoName;}
-        NetClass* getNetClass() const noexcept {return mNetClass;}
+        NetClass& getNetClass() const noexcept {return *mNetClass;}
 
         // Setters
         void setName(const QString& name) throw (Exception);
 
         // General Methods
-        void addToDomTree(QDomElement& parent) throw (Exception);
-        void removeFromDomTree(QDomElement& parent) throw (Exception);
+        void addToCircuit(bool addNode, QDomElement& parent) throw (Exception);
+        void removeFromCircuit(bool removeNode, QDomElement& parent) throw (Exception);
 
         // Static Methods
         static NetSignal* create(Circuit& circuit, QDomDocument& doc,

@@ -24,6 +24,10 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "genericcomponentinstance.h"
+#include "../../common/exceptions.h"
+#include "circuit.h"
+#include "../project.h"
+#include "../library/projectlibrary.h"
 
 namespace project {
 
@@ -31,14 +35,126 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-GenericComponentInstance::GenericComponentInstance(Workspace& workspace, Project& project,
-                                                   Circuit& circuit) :
-    QObject(0), mWorkspace(workspace), mProject(project), mCircuit(circuit)
+GenericComponentInstance::GenericComponentInstance(Circuit& circuit,
+                                                   const QDomElement& domElement)
+                                                   throw (Exception) :
+    QObject(0), mCircuit(circuit), mDomElement(domElement)
+{
+    mUuid = mDomElement.attribute("uuid");
+    if(mUuid.isNull())
+    {
+        throw RuntimeError(__FILE__, __LINE__, mDomElement.attribute("uuid"),
+            QString(tr("Invalid generic component instance UUID: \"%1\""))
+            .arg(mDomElement.attribute("uuid")));
+    }
+
+    mName = mDomElement.attribute("name");
+    if(mName.isEmpty())
+    {
+        throw RuntimeError(__FILE__, __LINE__, mUuid.toString(),
+            QString(tr("Name of generic component instance \"%1\" is empty!"))
+            .arg(mUuid.toString()));
+    }
+
+    mGenComp = mCircuit.getProject().getLibrary().getGenericComponent(
+                   mDomElement.attribute("generic_component"));
+    if (!mGenComp)
+    {
+        throw RuntimeError(__FILE__, __LINE__, mDomElement.attribute("generic_component"),
+            QString(tr("The generic component with the UUID \"%1\" does not exist in the "
+            "project's library!")).arg(mDomElement.attribute("generic_component")));
+    }
+}
+
+GenericComponentInstance::~GenericComponentInstance() noexcept
 {
 }
 
-GenericComponentInstance::~GenericComponentInstance()
+/*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
+
+void GenericComponentInstance::setName(const QString& name) throw (Exception)
 {
+    if(name.isEmpty())
+    {
+        throw RuntimeError(__FILE__, __LINE__, QString(),
+            tr("The new component name must not be empty!"));
+    }
+
+    mDomElement.setAttribute("name", name);
+    mName = name;
+}
+
+/*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+void GenericComponentInstance::addToCircuit(bool addNode, QDomElement& parent) throw (Exception)
+{
+    if (addNode)
+    {
+        if (parent.nodeName() != "generic_component_instances")
+            throw LogicError(__FILE__, __LINE__, parent.nodeName(), tr("Invalid node name!"));
+
+        if (parent.appendChild(mDomElement).isNull())
+            throw LogicError(__FILE__, __LINE__, QString(), tr("Could not append DOM node!"));
+    }
+
+    /*try
+    {
+        mNetClass->registerNetSignal(this);
+    }
+    catch (Exception& e)
+    {
+        parent.removeChild(mDomElement); // revert appending the DOM node
+        throw;
+    }*/
+}
+
+void GenericComponentInstance::removeFromCircuit(bool removeNode, QDomElement& parent) throw (Exception)
+{
+    if (removeNode)
+    {
+        if (parent.nodeName() != "generic_component_instances")
+            throw LogicError(__FILE__, __LINE__, parent.nodeName(), tr("Invalid node name!"));
+
+        if (parent.removeChild(mDomElement).isNull())
+            throw LogicError(__FILE__, __LINE__, QString(), tr("Could not remove node from DOM tree!"));
+    }
+
+    /*try
+    {
+         mNetClass->unregisterNetSignal(this);
+    }
+    catch (Exception& e)
+    {
+        parent.appendChild(mDomElement); // revert removing the DOM node
+        throw;
+    }*/
+}
+
+/*****************************************************************************************
+ *  Static Methods
+ ****************************************************************************************/
+
+GenericComponentInstance* GenericComponentInstance::create(Circuit& circuit,
+                                                           QDomDocument& doc,
+                                                           const QUuid& genericComponent,
+                                                           const QString& name)
+                                                           throw (Exception)
+{
+    QDomElement node = doc.createElement("instance");
+    if (node.isNull())
+        throw LogicError(__FILE__, __LINE__, QString(), tr("Could not create DOM node!"));
+
+    // fill the new QDomElement with all the needed content
+    node.setAttribute("uuid", QUuid::createUuid().toString()); // generate random UUID
+    node.setAttribute("name", name);
+    node.setAttribute("generic_component", genericComponent.toString());
+
+    // create and return the new GenericComponentInstance object
+    return new GenericComponentInstance(circuit, node);
 }
 
 /*****************************************************************************************
