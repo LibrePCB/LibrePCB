@@ -149,12 +149,12 @@ Project::Project(Workspace& workspace, const FilePath& filepath) throw (Exceptio
     // project successfully opened! :-)
 
     // setup the timer for automatic backups, if enabled in the settings
-    int intervalSecs = 1000 * mWorkspace.getSettings().getProjectAutosaveInterval();
+    int intervalSecs =  mWorkspace.getSettings().getProjectAutosaveInterval();
     if (intervalSecs > 0)
     {
         // autosaving is enabled --> start the timer
         connect(&mAutoSaveTimer, SIGNAL(timeout()), this, SLOT(autosave()));
-        mAutoSaveTimer.start(intervalSecs);
+        mAutoSaveTimer.start(1000 * intervalSecs);
     }
 
     qDebug() << "project successfully loaded!";
