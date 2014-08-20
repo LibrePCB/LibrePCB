@@ -28,6 +28,7 @@
 #include "../project.h"
 #include "../../workspace/workspace.h"
 #include "../../workspace/workspacesettings.h"
+#include "../../common/undostack.h"
 
 namespace project {
 
@@ -46,22 +47,18 @@ SchematicEditor::SchematicEditor(Workspace& workspace, Project& project) :
     connect(mUi->actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 
     // connect the undo/redo actions with the QUndoStack of the project
-    connect(mUi->actionUndo, SIGNAL(triggered()), mProject.getUndoStack(), SLOT(undo()));
-    connect(mUi->actionRedo, SIGNAL(triggered()), mProject.getUndoStack(), SLOT(redo()));
-    connect(mProject.getUndoStack(), &QUndoStack::undoTextChanged,
-            [this](const QString& text)
-            {mUi->actionUndo->setText(text.isEmpty() ? tr("Undo") : text);});
-    //mUi->actionUndo->setText(mProject.getUndoStack()->undoText()); // would clear the text!
-    connect(mProject.getUndoStack(), &QUndoStack::canUndoChanged,
-            [this](bool can){mUi->actionUndo->setEnabled(can);});
-    mUi->actionUndo->setEnabled(mProject.getUndoStack()->canUndo());
-    connect(mProject.getUndoStack(), &QUndoStack::redoTextChanged,
-            [this](const QString& text)
-            {mUi->actionRedo->setText(text.isEmpty() ? tr("Redo") : text);});
-    //mUi->actionRedo->setText(mProject.getUndoStack()->redoText()); // would clear the text!
-    connect(mProject.getUndoStack(), &QUndoStack::canRedoChanged,
-            [this](bool can){mUi->actionRedo->setEnabled(can);});
-    mUi->actionRedo->setEnabled(mProject.getUndoStack()->canRedo());
+    connect(&mProject.getUndoStack(), &UndoStack::undoTextChanged,
+            [this](const QString& text){mUi->actionUndo->setText(text);});
+    mUi->actionUndo->setText(mProject.getUndoStack().getUndoText());
+    connect(&mProject.getUndoStack(), SIGNAL(canUndoChanged(bool)),
+            mUi->actionUndo, SLOT(setEnabled(bool)));
+    mUi->actionUndo->setEnabled(mProject.getUndoStack().canUndo());
+    connect(&mProject.getUndoStack(), &UndoStack::redoTextChanged,
+            [this](const QString& text){mUi->actionRedo->setText(text);});
+    mUi->actionRedo->setText(mProject.getUndoStack().getRedoText());
+    connect(&mProject.getUndoStack(), SIGNAL(canRedoChanged(bool)),
+            mUi->actionRedo, SLOT(setEnabled(bool)));
+    mUi->actionRedo->setEnabled(mProject.getUndoStack().canRedo());
 
     // Restore Window Geometry
     QSettings s(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(), QSettings::IniFormat);
@@ -98,6 +95,30 @@ void SchematicEditor::closeEvent(QCloseEvent* event)
 void SchematicEditor::on_actionClose_Project_triggered()
 {
     mProject.close(this);
+}
+
+void SchematicEditor::on_actionUndo_triggered()
+{
+    try
+    {
+        mProject.getUndoStack().undo();
+    }
+    catch (Exception& e)
+    {
+        QMessageBox::critical(this, tr("Undo failed"), e.getUserMsg());
+    }
+}
+
+void SchematicEditor::on_actionRedo_triggered()
+{
+    try
+    {
+        mProject.getUndoStack().redo();
+    }
+    catch (Exception& e)
+    {
+        QMessageBox::critical(this, tr("Redo failed"), e.getUserMsg());
+    }
 }
 
 /*****************************************************************************************

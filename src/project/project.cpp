@@ -22,7 +22,6 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QDomDocument>
 #include "project.h"
 #include "../common/exceptions.h"
 #include "../common/xmlfile.h"
@@ -34,6 +33,7 @@
 #include "../common/systeminfo.h"
 #include "../common/filelock.h"
 #include "../common/filepath.h"
+#include "../common/undostack.h"
 
 namespace project {
 
@@ -130,7 +130,7 @@ Project::Project(Workspace& workspace, const FilePath& filepath) throw (Exceptio
         mXmlFile = new XmlFile(mFilepath, restoreBackup, "project");
 
         // the project seems to be ready to open, so we will create all needed objects
-        mUndoStack = new QUndoStack(0);
+        mUndoStack = new UndoStack();
         mProjectLibrary = new ProjectLibrary(mWorkspace, *this, restoreBackup);
         mCircuit = new Circuit(mWorkspace, *this, restoreBackup);
         mSchematicEditor = new SchematicEditor(mWorkspace, *this);
@@ -197,11 +197,6 @@ bool Project::windowIsAboutToClose(QMainWindow* window)
     }
 
     return true; // this is not the last open window, so no problem to close it...
-}
-
-void Project::executeCommand(QUndoCommand* cmd) throw (Exception)
-{
-    mUndoStack->push(cmd);
 }
 
 /*****************************************************************************************

@@ -26,6 +26,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
+#include "../../../common/undocommand.h"
 #include "../../../common/exceptions.h"
 
 /*****************************************************************************************
@@ -46,24 +47,23 @@ namespace project {
 /**
  * @brief The CmdNetClassRemove class
  */
-class CmdNetClassRemove final : public QUndoCommand
+class CmdNetClassRemove final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
         explicit CmdNetClassRemove(Circuit& circuit, NetClass* netclass,
-                                   QUndoCommand* parent = 0);
-        ~CmdNetClassRemove();
+                                   UndoCommand* parent = 0) throw (Exception);
+        ~CmdNetClassRemove() noexcept;
 
-        // Inherited from QUndoCommand
-        void redo();
-        void undo();
+        // Inherited from UndoCommand
+        void redo() throw (Exception) override;
+        void undo() throw (Exception) override;
 
     private:
 
         Circuit& mCircuit;
         NetClass* mNetClass;
-        bool mIsRemoved;
 };
 
 } // namespace project

@@ -36,6 +36,7 @@
 
 class XmlFile;
 class Workspace;
+class UndoStack;
 
 namespace project {
 class ProjectLibrary;
@@ -118,11 +119,11 @@ class Project final : public QObject
         const FilePath& getPath() const noexcept {return mPath;}
 
         /**
-         * @brief Get a pointer to the undo stack of the project
+         * @brief Get a reference to the undo stack of the project
          *
-         * @return A pointer to the QUndoStack object (read only)
+         * @return A reference to the UndoStack object
          */
-        const QUndoStack* getUndoStack() const noexcept {return mUndoStack;}
+        UndoStack& getUndoStack() const noexcept {return *mUndoStack;}
 
         /**
          * @brief Get the Circuit object
@@ -159,15 +160,6 @@ class Project final : public QObject
          * @return true if the window can be closed, false if closing the window is denied
          */
         bool windowIsAboutToClose(QMainWindow* window);
-
-        /**
-         * @brief Execute a command and push it to the undo stack
-         *
-         * @param cmd   The command to execute
-         *
-         * @throw Exception If the command cannot be executed, an exception will be thrown
-         */
-        void executeCommand(QUndoCommand* cmd) throw (Exception);
 
 
     public slots:
@@ -238,7 +230,7 @@ class Project final : public QObject
 
         // General
         QTimer mAutoSaveTimer; ///< the timer for the periodically automatic saving functionality (see also @ref doc_project_save)
-        QUndoStack* mUndoStack; ///< See @ref doc_project_undostack
+        UndoStack* mUndoStack; ///< See @ref doc_project_undostack
         ProjectLibrary* mProjectLibrary;
         Circuit* mCircuit;
         SchematicEditor* mSchematicEditor;
@@ -283,6 +275,8 @@ class Project final : public QObject
 
 
     @section doc_project_undostack The undo/redo system (Command Design Pattern)
+
+        @todo update documentation: use own undo cmd/stack classes instead of Qt classes
 
         It's very important to have an undo and a redo command for the whole project
         (and maybe also for independent parts of the project). For this purpose we use

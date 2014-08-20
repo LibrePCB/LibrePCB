@@ -68,6 +68,8 @@ class SchematicEditor : public QMainWindow
 
         // Actions
         void on_actionClose_Project_triggered();
+        void on_actionUndo_triggered();
+        void on_actionRedo_triggered();
 
     private:
 

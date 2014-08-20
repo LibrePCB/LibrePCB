@@ -33,32 +33,50 @@ namespace project {
  ****************************************************************************************/
 
 CmdNetSignalRemove::CmdNetSignalRemove(Circuit& circuit, NetSignal* netsignal,
-                                     QUndoCommand* parent) :
-    QUndoCommand(QCoreApplication::translate("CmdNetSignalRemove", "Remove netsignal"), parent),
-    mCircuit(circuit), mNetSignal(netsignal), mIsRemoved(false)
+                                     UndoCommand* parent) throw (Exception) :
+    UndoCommand(QCoreApplication::translate("CmdNetSignalRemove", "Remove netsignal"), parent),
+    mCircuit(circuit), mNetSignal(netsignal)
 {
 }
 
-CmdNetSignalRemove::~CmdNetSignalRemove()
+CmdNetSignalRemove::~CmdNetSignalRemove() noexcept
 {
-    if (mIsRemoved)
+    if (mIsExecuted)
         delete mNetSignal;
 }
 
 /*****************************************************************************************
- *  Inherited from QUndoCommand
+ *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdNetSignalRemove::redo()
+void CmdNetSignalRemove::redo() throw (Exception)
 {
-    mCircuit.removeNetSignal(mNetSignal);
-    mIsRemoved = true;
+    mCircuit.removeNetSignal(mNetSignal); // throws an exception on error
+
+    try
+    {
+        UndoCommand::redo(); // throws an exception on error
+    }
+    catch (Exception& e)
+    {
+        mCircuit.addNetSignal(mNetSignal);
+        throw;
+    }
 }
 
-void CmdNetSignalRemove::undo()
+void CmdNetSignalRemove::undo() throw (Exception)
 {
-    mCircuit.addNetSignal(mNetSignal);
-    mIsRemoved = false;
+    mCircuit.addNetSignal(mNetSignal); // throws an exception on error
+
+    try
+    {
+        UndoCommand::undo(); // throws an exception on error
+    }
+    catch (Exception& e)
+    {
+        mCircuit.removeNetSignal(mNetSignal);
+        throw;
+    }
 }
 
 /*****************************************************************************************

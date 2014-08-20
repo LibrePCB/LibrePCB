@@ -33,32 +33,50 @@ namespace project {
  ****************************************************************************************/
 
 CmdNetClassRemove::CmdNetClassRemove(Circuit& circuit, NetClass* netclass,
-                                     QUndoCommand* parent) :
-    QUndoCommand(QCoreApplication::translate("CmdNetClassRemove", "Remove netclass"), parent),
-    mCircuit(circuit), mNetClass(netclass), mIsRemoved(false)
+                                     UndoCommand* parent) throw (Exception) :
+    UndoCommand(QCoreApplication::translate("CmdNetClassRemove", "Remove netclass"), parent),
+    mCircuit(circuit), mNetClass(netclass)
 {
 }
 
-CmdNetClassRemove::~CmdNetClassRemove()
+CmdNetClassRemove::~CmdNetClassRemove() noexcept
 {
-    if (mIsRemoved)
+    if (mIsExecuted)
         delete mNetClass;
 }
 
 /*****************************************************************************************
- *  Inherited from QUndoCommand
+ *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdNetClassRemove::redo()
+void CmdNetClassRemove::redo() throw (Exception)
 {
-    mCircuit.removeNetClass(mNetClass);
-    mIsRemoved = true;
+    mCircuit.removeNetClass(mNetClass); // throws an exception on error
+
+    try
+    {
+        UndoCommand::redo(); // throws an exception on error
+    }
+    catch (Exception& e)
+    {
+        mCircuit.addNetClass(mNetClass);
+        throw;
+    }
 }
 
-void CmdNetClassRemove::undo()
+void CmdNetClassRemove::undo() throw (Exception)
 {
-    mCircuit.addNetClass(mNetClass);
-    mIsRemoved = false;
+    mCircuit.addNetClass(mNetClass); // throws an exception on error
+
+    try
+    {
+        UndoCommand::undo(); // throws an exception on error
+    }
+    catch (Exception& e)
+    {
+        mCircuit.removeNetClass(mNetClass);
+        throw;
+    }
 }
 
 /*****************************************************************************************

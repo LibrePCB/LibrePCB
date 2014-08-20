@@ -32,35 +32,54 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdNetSignalAdd::CmdNetSignalAdd(Circuit& circuit, const QUuid& netclass, QUndoCommand* parent) :
-    QUndoCommand(QCoreApplication::translate("CmdNetSignalAdd", "Add netsignal"), parent),
-    mCircuit(circuit), mNetClass(netclass), mNetSignal(0), mIsAdded(false)
+CmdNetSignalAdd::CmdNetSignalAdd(Circuit& circuit, const QUuid& netclass,
+                                 UndoCommand* parent) throw (Exception) :
+    UndoCommand(QCoreApplication::translate("CmdNetSignalAdd", "Add netsignal"), parent),
+    mCircuit(circuit), mNetClass(netclass), mNetSignal(0)
 {
 }
 
-CmdNetSignalAdd::~CmdNetSignalAdd()
+CmdNetSignalAdd::~CmdNetSignalAdd() noexcept
 {
-    if (!mIsAdded)
+    if (!mIsExecuted)
         delete mNetSignal;
 }
 
 /*****************************************************************************************
- *  Inherited from QUndoCommand
+ *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdNetSignalAdd::redo()
+void CmdNetSignalAdd::redo() throw (Exception)
 {
     if (!mNetSignal) // only the first time
-        mNetSignal = mCircuit.createNetSignal(mNetClass);
+        mNetSignal = mCircuit.createNetSignal(mNetClass); // throws an exception on error
 
-    mCircuit.addNetSignal(mNetSignal);
-    mIsAdded = true;
+    mCircuit.addNetSignal(mNetSignal); // throws an exception on error
+
+    try
+    {
+        UndoCommand::redo(); // throws an exception on error
+    }
+    catch (Exception& e)
+    {
+        mCircuit.removeNetSignal(mNetSignal);
+        throw;
+    }
 }
 
-void CmdNetSignalAdd::undo()
+void CmdNetSignalAdd::undo() throw (Exception)
 {
-    mCircuit.removeNetSignal(mNetSignal);
-    mIsAdded = false;
+    mCircuit.removeNetSignal(mNetSignal); // throws an exception on error
+
+    try
+    {
+        UndoCommand::undo(); // throws an exception on error
+    }
+    catch (Exception& e)
+    {
+        mCircuit.addNetSignal(mNetSignal);
+        throw;
+    }
 }
 
 /*****************************************************************************************

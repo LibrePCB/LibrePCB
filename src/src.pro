@@ -96,7 +96,9 @@ SOURCES += \
     project/circuit/cmd/cmdnetclassadd.cpp \
     project/circuit/cmd/cmdnetclassremove.cpp \
     project/circuit/cmd/cmdnetsignaladd.cpp \
-    project/circuit/cmd/cmdnetsignalremove.cpp
+    project/circuit/cmd/cmdnetsignalremove.cpp \
+    common/undocommand.cpp \
+    common/undostack.cpp
 
 HEADERS += \
     common/units.h \
@@ -142,7 +144,9 @@ HEADERS += \
     project/circuit/cmd/cmdnetclassadd.h \
     project/circuit/cmd/cmdnetclassremove.h \
     project/circuit/cmd/cmdnetsignaladd.h \
-    project/circuit/cmd/cmdnetsignalremove.h
+    project/circuit/cmd/cmdnetsignalremove.h \
+    common/undocommand.h \
+    common/undostack.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \

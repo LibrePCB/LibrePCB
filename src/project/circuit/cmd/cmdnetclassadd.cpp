@@ -32,35 +32,54 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdNetClassAdd::CmdNetClassAdd(Circuit& circuit, const QString& name, QUndoCommand* parent) :
-    QUndoCommand(QCoreApplication::translate("CmdNetClassAdd", "Add netclass"), parent),
-    mCircuit(circuit), mName(name), mNetClass(0), mIsAdded(false)
+CmdNetClassAdd::CmdNetClassAdd(Circuit& circuit, const QString& name,
+                               UndoCommand* parent) throw (Exception) :
+    UndoCommand(QCoreApplication::translate("CmdNetClassAdd", "Add netclass"), parent),
+    mCircuit(circuit), mName(name), mNetClass(0)
 {
 }
 
-CmdNetClassAdd::~CmdNetClassAdd()
+CmdNetClassAdd::~CmdNetClassAdd() noexcept
 {
-    if (!mIsAdded)
+    if (!mIsExecuted)
         delete mNetClass;
 }
 
 /*****************************************************************************************
- *  Inherited from QUndoCommand
+ *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdNetClassAdd::redo()
+void CmdNetClassAdd::redo() throw (Exception)
 {
     if (!mNetClass) // only the first time
-        mNetClass = mCircuit.createNetClass(mName);
+        mNetClass = mCircuit.createNetClass(mName); // throws an exception on error
 
-    mCircuit.addNetClass(mNetClass);
-    mIsAdded = true;
+    mCircuit.addNetClass(mNetClass); // throws an exception on error
+
+    try
+    {
+        UndoCommand::redo(); // throws an exception on error
+    }
+    catch (Exception &e)
+    {
+        mCircuit.removeNetClass(mNetClass);
+        throw;
+    }
 }
 
-void CmdNetClassAdd::undo()
+void CmdNetClassAdd::undo() throw (Exception)
 {
-    mCircuit.removeNetClass(mNetClass);
-    mIsAdded = false;
+    mCircuit.removeNetClass(mNetClass); // throws an exception on error
+
+    try
+    {
+        UndoCommand::undo();
+    }
+    catch (Exception& e)
+    {
+        mCircuit.addNetClass(mNetClass);
+        throw;
+    }
 }
 
 /*****************************************************************************************
