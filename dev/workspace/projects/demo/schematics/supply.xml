@@ -2,80 +2,24 @@
 <schematic compatible_downto="1" file_version="1">
     <meta>
         <uuid>{cb6501aa-f8c3-42ac-a9a0-8a9df0da3f05}</uuid>
-        <circuit_uuid>{8a1f9e05-c711-4af4-9a7b-b1a585d6e4ed}</circuit_uuid>
         <name>Seite 1</name>
-        <page_index>0</page_index>
     </meta>
     <attributes>
-        <attribute type="text" name="NAME">Seite 1</attribute>
-        <attribute type="text" name="DESCRIPTION">sdfg...</attribute>
-        <attribute type="text" name="AUTHOR">Irgend Jemand</attribute>
-        <attribute type="text" name="VERSION">0.1</attribute>
+        <attribute name="NAME" type="text">Seite 1</attribute>
+        <attribute name="DESCRIPTION" type="text">sdfg...</attribute>
+        <attribute name="AUTHOR" type="text">Irgend Jemand</attribute>
+        <attribute name="VERSION" type="text">0.1</attribute>
     </attributes>
     <symbols>
-        <symbol uuid="{8a1f9e05-c711-4af4-9a7b-b1a585d6e4ed}">
-            <generic_component_instance>{7fe07dd4-aaee-4a28-ae35-d22c2904a462}</generic_component_instance>
-            <symbol_item>{6bd99bbf-7d36-457f-ae93-8b06b869ee4b}</symbol_item>
-            <position x="0" y="0"/>
-            <angle>0</angle>
-            <mirror>false</mirror>
-        </symbol>
-        <symbol uuid="{b52fac3b-5d3f-47df-88af-4aa87b9b2f39}">
-            <generic_component_instance>{6fe07dd4-aaee-4a28-ae35-d22c2904a461}</generic_component_instance>
-            <symbol_item>{adae210d-c505-487b-9fe8-834a24f14638}</symbol_item>
-            <position x="165.1" y="172.72"/>
-            <angle>0</angle>
-            <mirror>false</mirror>
-        </symbol>
-        <symbol uuid="{d2c6c292-2a7e-44a7-ac59-9187649876a1}">
-            <generic_component_instance>{1b6ffb10-1c00-47a1-a66a-b60afc6a8da9}</generic_component_instance>
-            <symbol_item>{adae210d-c505-487b-9fe8-834a24f14638}</symbol_item>
-            <position x="48.26" y="132.08"/>
-            <angle>0</angle>
-            <mirror>false</mirror>
-        </symbol>
-        <symbol uuid="{1912350b-8b0b-431d-8df5-3d81d1da41d9}">
-            <generic_component_instance>{1b6ffb10-1c00-47a1-a66a-b60afc6a8da9}</generic_component_instance>
-            <symbol_item>{bdae210d-c505-487b-9fe8-834a24f14638}</symbol_item>
-            <position x="48.26" y="83.82"/>
-            <angle>0</angle>
-            <mirror>false</mirror>
-        </symbol>
-        <symbol uuid="{6d3b3642-094d-4106-8f36-238911f2ba18}">
-            <generic_component_instance>{1b6ffb10-1c00-47a1-a66a-b60afc6a8da9}</generic_component_instance>
-            <symbol_item>{cdae210d-c505-487b-9fe8-834a24f14638}</symbol_item>
-            <position x="48.26" y="40.64"/>
-            <angle>0</angle>
-            <mirror>false</mirror>
-        </symbol>
-        <symbol uuid="{d9a3902d-2071-4abd-9496-f7df0b42f738}">
-            <generic_component_instance>{aaaadfba-ffb2-4d96-ae4a-d26329006d79}</generic_component_instance>
-            <symbol_item>{adae210d-c505-487b-9fe8-834a24f14638}</symbol_item>
-            <position x="193.04" y="111.76"/>
-            <angle>0</angle>
-            <mirror>false</mirror>
-        </symbol>
-        <symbol uuid="{071f99a2-1c4f-4c49-9e39-e434b5b8281c}">
-            <generic_component_instance>{f0e33b45-c3ac-49dc-8bd0-512d75ad014b}</generic_component_instance>
-            <symbol_item>{adae210d-c505-487b-9fe8-834a24f14638}</symbol_item>
-            <position x="236.22" y="66.04"/>
-            <angle>0</angle>
-            <mirror>false</mirror>
-        </symbol>
-        <symbol uuid="{0a8065fa-d575-4c5b-81c4-c1b4002a9059}">
-            <generic_component_instance>{f0e33b45-c3ac-49dc-8bd0-512d75ad014b}</generic_component_instance>
-            <symbol_item>{bdae210d-c505-487b-9fe8-834a24f14638}</symbol_item>
-            <position x="254" y="101.6"/>
-            <angle>0</angle>
-            <mirror>false</mirror>
-        </symbol>
-        <symbol uuid="{8fdea235-cc60-494f-907e-81450934cb49}">
-            <generic_component_instance>{f0e33b45-c3ac-49dc-8bd0-512d75ad014b}</generic_component_instance>
-            <symbol_item>{cdae210d-c505-487b-9fe8-834a24f14638}</symbol_item>
-            <position x="266.7" y="127"/>
-            <angle>0</angle>
-            <mirror>false</mirror>
-        </symbol>
+        <symbol uuid="{8a1f9e05-c711-4af4-9a7b-b1a585d6e4ed}" gen_comp_instance="{7fe07dd4-aaee-4a28-ae35-d22c2904a462}" symbol_item="{6bd99bbf-7d36-457f-ae93-8b06b869ee4b}" x="0" y="0" angle="0" mirror="false"/>
+        <symbol uuid="{b52fac3b-5d3f-47df-88af-4aa87b9b2f39}" gen_comp_instance="{6fe07dd4-aaee-4a28-ae35-d22c2904a461}" symbol_item="{adae210d-c505-487b-9fe8-834a24f14638}" x="165.1" y="172.72" angle="0" mirror="false"/>
+        <symbol uuid="{d2c6c292-2a7e-44a7-ac59-9187649876a1}" gen_comp_instance="{1b6ffb10-1c00-47a1-a66a-b60afc6a8da9}" symbol_item="{adae210d-c505-487b-9fe8-834a24f14638}" x="48.26" y="132.08" angle="0" mirror="false"/>
+        <symbol uuid="{1912350b-8b0b-431d-8df5-3d81d1da41d9}" gen_comp_instance="{1b6ffb10-1c00-47a1-a66a-b60afc6a8da9}" symbol_item="{bdae210d-c505-487b-9fe8-834a24f14638}" x="48.26" y="83.82" angle="0" mirror="false"/>
+        <symbol uuid="{6d3b3642-094d-4106-8f36-238911f2ba18}" gen_comp_instance="{1b6ffb10-1c00-47a1-a66a-b60afc6a8da9}" symbol_item="{cdae210d-c505-487b-9fe8-834a24f14638}" x="48.26" y="40.64" angle="0" mirror="false"/>
+        <symbol uuid="{d9a3902d-2071-4abd-9496-f7df0b42f738}" gen_comp_instance="{aaaadfba-ffb2-4d96-ae4a-d26329006d79}" symbol_item="{adae210d-c505-487b-9fe8-834a24f14638}" x="193.04" y="111.76" angle="0" mirror="false"/>
+        <symbol uuid="{071f99a2-1c4f-4c49-9e39-e434b5b8281c}" gen_comp_instance="{f0e33b45-c3ac-49dc-8bd0-512d75ad014b}" symbol_item="{adae210d-c505-487b-9fe8-834a24f14638}" x="236.22" y="66.04" angle="0" mirror="false"/>
+        <symbol uuid="{0a8065fa-d575-4c5b-81c4-c1b4002a9059}" gen_comp_instance="{f0e33b45-c3ac-49dc-8bd0-512d75ad014b}" symbol_item="{bdae210d-c505-487b-9fe8-834a24f14638}" x="254" y="101.6" angle="0" mirror="false"/>
+        <symbol uuid="{8fdea235-cc60-494f-907e-81450934cb49}" gen_comp_instance="{f0e33b45-c3ac-49dc-8bd0-512d75ad014b}" symbol_item="{cdae210d-c505-487b-9fe8-834a24f14638}" x="266.7" y="127" angle="0" mirror="false"/>
     </symbols>
     <netpoints>
         <netpoint uuid="{129871b0-54c4-473e-b4bc-7414a07c2159}">
