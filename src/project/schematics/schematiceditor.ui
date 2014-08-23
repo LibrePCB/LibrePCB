@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>616</width>
-    <height>367</height>
+    <width>690</width>
+    <height>507</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -37,7 +37,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>616</width>
+     <width>690</width>
      <height>20</height>
     </rect>
    </property>
@@ -80,6 +80,16 @@
     <property name="title">
      <string>Tools</string>
     </property>
+    <addaction name="actionToolSelect"/>
+    <addaction name="actionToolMove"/>
+    <addaction name="actionToolDrawText"/>
+    <addaction name="actionToolDrawRectangle"/>
+    <addaction name="actionToolDrawPolygon"/>
+    <addaction name="actionToolDrawCircle"/>
+    <addaction name="actionToolDrawEllipse"/>
+    <addaction name="separator"/>
+    <addaction name="actionToolDrawWire"/>
+    <addaction name="actionToolAddComponent"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -92,6 +102,9 @@
   <widget class="QToolBar" name="fileToolbar">
    <property name="windowTitle">
     <string>toolBar</string>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
@@ -116,6 +129,9 @@
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
@@ -126,15 +142,18 @@
    <addaction name="actionZoom_Out"/>
    <addaction name="actionZoom_All"/>
   </widget>
-  <widget class="QToolBar" name="toolBar">
+  <widget class="QToolBar" name="editToolbar">
    <property name="windowTitle">
     <string>toolBar</string>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
    </property>
    <attribute name="toolBarArea">
     <enum>LeftToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
-    <bool>false</bool>
+    <bool>true</bool>
    </attribute>
    <addaction name="actionRotate_CCW"/>
    <addaction name="actionRotate_CW"/>
@@ -142,6 +161,31 @@
    <addaction name="actionCopy"/>
    <addaction name="actionPaste"/>
    <addaction name="actionRemove"/>
+  </widget>
+  <widget class="QToolBar" name="toolsToolbar">
+   <property name="windowTitle">
+    <string>toolBar_2</string>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>LeftToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionToolSelect"/>
+   <addaction name="actionToolMove"/>
+   <addaction name="separator"/>
+   <addaction name="actionToolDrawText"/>
+   <addaction name="actionToolDrawRectangle"/>
+   <addaction name="actionToolDrawPolygon"/>
+   <addaction name="actionToolDrawCircle"/>
+   <addaction name="actionToolDrawEllipse"/>
+   <addaction name="separator"/>
+   <addaction name="actionToolDrawWire"/>
+   <addaction name="actionToolAddComponent"/>
   </widget>
   <action name="actionQuit">
    <property name="icon">
@@ -356,6 +400,90 @@
    </property>
    <property name="text">
     <string>Close Project</string>
+   </property>
+  </action>
+  <action name="actionToolSelect">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/select.png</normaloff>:/img/actions/select.png</iconset>
+   </property>
+   <property name="text">
+    <string>Select</string>
+   </property>
+  </action>
+  <action name="actionToolAddComponent">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/chip.png</normaloff>:/img/actions/chip.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Component</string>
+   </property>
+  </action>
+  <action name="actionToolDrawWire">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/drawWire.png</normaloff>:/img/actions/drawWire.png</iconset>
+   </property>
+   <property name="text">
+    <string>Draw Wire</string>
+   </property>
+  </action>
+  <action name="actionToolMove">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/move.png</normaloff>:/img/actions/move.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move</string>
+   </property>
+  </action>
+  <action name="actionToolDrawText">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/draw_text.png</normaloff>:/img/actions/draw_text.png</iconset>
+   </property>
+   <property name="text">
+    <string>Draw Text</string>
+   </property>
+   <property name="toolTip">
+    <string>Draw Text</string>
+   </property>
+  </action>
+  <action name="actionToolDrawPolygon">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/draw_polygon.png</normaloff>:/img/actions/draw_polygon.png</iconset>
+   </property>
+   <property name="text">
+    <string>Draw Polygon</string>
+   </property>
+  </action>
+  <action name="actionToolDrawRectangle">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/draw_rectangle.png</normaloff>:/img/actions/draw_rectangle.png</iconset>
+   </property>
+   <property name="text">
+    <string>Draw Rectangle</string>
+   </property>
+  </action>
+  <action name="actionToolDrawCircle">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/draw_circle.png</normaloff>:/img/actions/draw_circle.png</iconset>
+   </property>
+   <property name="text">
+    <string>Draw Circle</string>
+   </property>
+  </action>
+  <action name="actionToolDrawEllipse">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/draw_ellipse.png</normaloff>:/img/actions/draw_ellipse.png</iconset>
+   </property>
+   <property name="text">
+    <string>Draw Ellipse</string>
    </property>
   </action>
  </widget>
