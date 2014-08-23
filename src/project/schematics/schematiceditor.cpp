@@ -29,6 +29,7 @@
 #include "../../workspace/workspace.h"
 #include "../../workspace/workspacesettings.h"
 #include "../../common/undostack.h"
+#include "schematic.h"
 
 namespace project {
 
@@ -64,6 +65,11 @@ SchematicEditor::SchematicEditor(Workspace& workspace, Project& project) :
     QSettings s(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(), QSettings::IniFormat);
     restoreGeometry(s.value("schematic_editor/window_geometry").toByteArray());
     restoreState(s.value("schematic_editor/window_state").toByteArray());
+
+    // Load first schematic page
+    mUi->graphicsView->setGridType(CADView::gridLines);
+    if (mProject.getSchematicCount() > 0)
+        mUi->graphicsView->setScene(mProject.getSchematicByIndex(0));
 }
 
 SchematicEditor::~SchematicEditor()

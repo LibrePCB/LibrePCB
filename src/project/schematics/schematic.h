@@ -26,17 +26,19 @@
 
 #include <QtCore>
 #include <QtWidgets>
+#include "../../common/filepath.h"
+#include "../../common/exceptions.h"
 #include "../../common/cadscene.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
-class Workspace;
+class XmlFile;
 
 namespace project {
 class Project;
-class Circuit;
+class SymbolInstance;
 }
 
 /*****************************************************************************************
@@ -58,8 +60,16 @@ class Schematic final : public CADScene
 
     public:
 
-        explicit Schematic(Workspace& workspace, Project& project, Circuit& circuit);
-        ~Schematic();
+        explicit Schematic(Project& project, const FilePath& filepath, bool restore)
+                           throw (Exception);
+        ~Schematic() noexcept;
+
+        // Getters
+        const FilePath& getFilePath() const noexcept {return mFilePath;}
+        Project& getProject() const noexcept {return mProject;}
+
+        // General Methods
+        bool save(bool toOriginal, QStringList& errors) noexcept;
 
     private:
 
@@ -69,9 +79,15 @@ class Schematic final : public CADScene
         Schematic& operator=(const Schematic& rhs);
 
         // General
-        Workspace& mWorkspace; ///< A reference to the Workspace object (from the ctor)
         Project& mProject; ///< A reference to the Project object (from the ctor)
-        Circuit& mCircuit; ///< A reference to the Circuit object (from the ctor)
+        FilePath mFilePath; ///< the filepath of the schematic *.xml file (from the ctor)
+        XmlFile* mXmlFile;
+
+        // Attributes
+        QUuid mUuid;
+        QString mName;
+
+        QHash<QUuid, SymbolInstance*> mSymbols;
 
 };
 

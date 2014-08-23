@@ -34,6 +34,7 @@
 #include "../common/filelock.h"
 #include "../common/filepath.h"
 #include "../common/undostack.h"
+#include "schematics/schematic.h"
 
 namespace project {
 
@@ -130,15 +131,34 @@ Project::Project(Workspace& workspace, const FilePath& filepath) throw (Exceptio
         mXmlFile = new XmlFile(mFilepath, restoreBackup, "project");
 
         // the project seems to be ready to open, so we will create all needed objects
+
         mUndoStack = new UndoStack();
         mProjectLibrary = new ProjectLibrary(mWorkspace, *this, restoreBackup);
         mCircuit = new Circuit(mWorkspace, *this, restoreBackup);
+
+        // Load all schematics
+        FilePath schematicsPath(mPath.getPathTo("schematics"));
+        QSettings schematicsIni(schematicsPath.getPathTo("schematics.ini").toStr(),
+                                QSettings::IniFormat);
+        int schematicsCount = schematicsIni.beginReadArray("pages");
+        for (int i = 0; i < schematicsCount; i++)
+        {
+            schematicsIni.setArrayIndex(i);
+            FilePath filepath = FilePath::fromRelative(schematicsPath,
+                                    schematicsIni.value("page").toString());
+            Schematic* schematic = new Schematic(*this, filepath, restoreBackup);
+            mSchematics.append(schematic);
+        }
+        schematicsIni.endArray();
+        qDebug() << mSchematics.count() << "schematics successfully loaded!";
+
         mSchematicEditor = new SchematicEditor(mWorkspace, *this);
     }
     catch (...)
     {
         // free the allocated memory in the reverse order of their allocation...
         delete mSchematicEditor;        mSchematicEditor = 0;
+        qDeleteAll(mSchematics);        mSchematics.clear();
         delete mCircuit;                mCircuit = 0;
         delete mProjectLibrary;         mProjectLibrary = 0;
         delete mUndoStack;              mUndoStack = 0;
@@ -174,10 +194,14 @@ Project::~Project() noexcept
 
     // free the allocated memory in the reverse order of their allocation
     delete mSchematicEditor;        mSchematicEditor = 0;
+    qDeleteAll(mSchematics);        mSchematics.clear();
     delete mCircuit;                mCircuit = 0;
     delete mProjectLibrary;         mProjectLibrary = 0;
     delete mUndoStack;              mUndoStack = 0;
     delete mXmlFile;                mXmlFile = 0;
+
+    // remove backup file "schematics/schematics.ini~"
+    QFile::remove(mPath.getPathTo("schematics/schematics.ini~").toStr());
 }
 
 /*****************************************************************************************
@@ -321,9 +345,47 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
         errors.append(e.getUserMsg());
     }
 
-    // Save other components
+    // Save circuit
     if (!mCircuit->save(toOriginal, errors))
         success = false;
+
+    // Save schematics
+    foreach (Schematic* schematic, mSchematics)
+    {
+        if (!schematic->save(toOriginal, errors))
+            success = false;
+    }
+
+    // Save "schematics/schematics.ini"
+    FilePath schematicsPath(mPath.getPathTo("schematics"));
+    QSettings schematicsIni(schematicsPath.getPathTo("schematics.ini" % tilde).toStr(),
+                            QSettings::IniFormat);
+    if (schematicsIni.isWritable())
+    {
+        schematicsIni.remove("pages");
+        schematicsIni.beginWriteArray("pages");
+        for (int i = 0; i < mSchematics.count(); i++)
+        {
+            schematicsIni.setArrayIndex(i);
+            schematicsIni.setValue("page", mSchematics.at(i)->getFilePath()
+                                           .toRelative(schematicsPath));
+        }
+        schematicsIni.endArray();
+        schematicsIni.sync();
+        if (schematicsIni.status() != QSettings::NoError)
+        {
+            success = false;
+            errors.append(QString(tr("Could not write to file \"%1\": %2")
+                                  .arg(QDir::toNativeSeparators(schematicsIni.fileName()))
+                                  .arg(schematicsIni.status())));
+        }
+    }
+    else
+    {
+        success = false;
+        errors.append(QString(tr("Could not write to file \"%1\"")
+                              .arg(QDir::toNativeSeparators(schematicsIni.fileName()))));
+    }
 
     return success;
 }

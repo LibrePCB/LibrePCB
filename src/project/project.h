@@ -42,6 +42,7 @@ namespace project {
 class ProjectLibrary;
 class Circuit;
 class SchematicEditor;
+class Schematic;
 }
 
 /*****************************************************************************************
@@ -140,6 +141,22 @@ class Project final : public QObject
          */
         ProjectLibrary& getLibrary() const noexcept {return *mProjectLibrary;}
 
+        /**
+         * @brief Get the count of schematic pages
+         *
+         * @return Count of schematics
+         */
+        int getSchematicCount() const noexcept {return mSchematics.count();}
+
+        /**
+         * @brief Get the schematic page at a specific index
+         *
+         * @param index     The page index (zero is the first)
+         *
+         * @return A pointer to the specified schematic, or NULL if index is invalid
+         */
+        Schematic* getSchematicByIndex(int index) const noexcept {return mSchematics.value(index);}
+
 
         // General Methods
 
@@ -233,6 +250,7 @@ class Project final : public QObject
         UndoStack* mUndoStack; ///< See @ref doc_project_undostack
         ProjectLibrary* mProjectLibrary;
         Circuit* mCircuit;
+        QList<Schematic*> mSchematics;
         SchematicEditor* mSchematicEditor;
 };
 
