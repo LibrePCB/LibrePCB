@@ -25,8 +25,8 @@
 #include <QDomDocument>
 #include <QDomElement>
 #include "xmlfile.h"
-#include "../common/exceptions.h"
-#include "../common/filepath.h"
+#include "exceptions.h"
+#include "filepath.h"
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -89,7 +89,7 @@ XmlFile::XmlFile(const FilePath& filepath, bool restore,
     }
 }
 
-XmlFile::~XmlFile()
+XmlFile::~XmlFile() noexcept
 {
     // remove temporary file
     QFile::remove(mFilepath.toStr() % "~");
@@ -98,6 +98,29 @@ XmlFile::~XmlFile()
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
+
+void XmlFile::remove() const throw (Exception)
+{
+    bool success = true;
+
+    if (QFile::exists(mFilepath.toStr()))
+    {
+        if (!QFile::remove(mFilepath.toStr()))
+            success = false;
+    }
+
+    if (QFile::exists(mFilepath.toStr() % '~'))
+    {
+        if (!QFile::remove(mFilepath.toStr() % '~'))
+            success = false;
+    }
+
+    if (!success)
+    {
+        throw RuntimeError(__FILE__, __LINE__, mFilepath.toStr(),
+            QString(tr("Could not remove file \"%1\"")).arg(mFilepath.toNative()));
+    }
+}
 
 void XmlFile::save(bool toOriginal) throw (Exception)
 {
@@ -109,8 +132,18 @@ void XmlFile::save(bool toOriginal) throw (Exception)
  *  Static Methods
  ****************************************************************************************/
 
-void XmlFile::create(const FilePath& filepath, const QString& rootName) throw (Exception)
+XmlFile* XmlFile::create(const FilePath& filepath, const QString& rootName) throw (Exception)
 {
+    // remove the file if it exists already
+    if (filepath.isExistingFile())
+    {
+        if (!QFile::remove(filepath.toStr()))
+        {
+            throw RuntimeError(__FILE__, __LINE__, filepath.toStr(),
+                QString(tr("Cannot remove file \"%1\"")).arg(filepath.toNative()));
+        }
+    }
+
     QString xmlTmpl("<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n<%1/>");
 
     QDomDocument dom;
@@ -118,7 +151,9 @@ void XmlFile::create(const FilePath& filepath, const QString& rootName) throw (E
     if (!dom.setContent(xmlTmpl.arg(rootName), &errMsg))
         throw LogicError(__FILE__, __LINE__, errMsg, tr("Could not set XML DOM content!"));
 
-    saveDomDocument(dom, filepath);
+    saveDomDocument(dom, FilePath(filepath.toStr() % '~'));
+
+    return new XmlFile(filepath, true, rootName);
 }
 
 /*****************************************************************************************

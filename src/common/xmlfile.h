@@ -27,8 +27,8 @@
 #include <QtCore>
 #include <QDomDocument>
 #include <QDomElement>
-#include "../common/exceptions.h"
-#include "../common/filepath.h"
+#include "exceptions.h"
+#include "filepath.h"
 
 /*****************************************************************************************
  *  Class XmlFile
@@ -88,6 +88,8 @@ class XmlFile final : public QObject
 
         /**
          * @brief The destructor
+         *
+         * Removes the temporary file
          */
         ~XmlFile() noexcept;
 
@@ -126,6 +128,16 @@ class XmlFile final : public QObject
         // General Methods
 
         /**
+         * @brief Remove the XML file (and its backup file) from the filesystem
+         *
+         * @throw Exception If the files could not be removed successfully
+         *
+         * @warning You must not call #save() after calling this method, as this would
+         *          re-create the removed files!
+         */
+        void remove() const throw (Exception);
+
+        /**
          * @brief Save the whole XML DOM tree back to the XML file
          *
          * @param toOriginal    If true, the XML will be written to the original file. If
@@ -141,13 +153,21 @@ class XmlFile final : public QObject
         /**
          * @brief Create a new XML file with the XML header and a root node
          *
+         * If the file does already exist, it will be overwritten.
+         *
+         * @note This method will NOT create the original file specified with "filepath"!
+         *       Instead it will only create it's backup file (*.xml~). You need to call
+         *       #save() afterwards if you also want to create the original file.
+         *
          * @param filepath  The filepath of the new XML file
          * @param rootName  The name of the XML root node (no special characters!!)
          *
+         * @return A pointer to the new XmlFile object
+         *
          * @throw Exception If an error occurs, this method throws an exception.
          */
-        static void create(const FilePath& filepath, const QString& rootName)
-                           throw (Exception);
+        static XmlFile* create(const FilePath& filepath, const QString& rootName)
+                               throw (Exception);
 
 
     private:
