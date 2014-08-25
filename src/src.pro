@@ -100,7 +100,9 @@ SOURCES += \
     common/undocommand.cpp \
     common/undostack.cpp \
     project/schematics/symbolinstance.cpp \
-    common/inifile.cpp
+    common/inifile.cpp \
+    project/schematics/cmd/cmdschematicadd.cpp \
+    project/schematics/cmd/cmdschematicremove.cpp
 
 HEADERS += \
     common/units.h \
@@ -150,7 +152,9 @@ HEADERS += \
     common/undocommand.h \
     common/undostack.h \
     project/schematics/symbolinstance.h \
-    common/inifile.h
+    common/inifile.h \
+    project/schematics/cmd/cmdschematicadd.h \
+    project/schematics/cmd/cmdschematicremove.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \
