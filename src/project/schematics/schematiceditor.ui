@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>690</width>
-    <height>507</height>
+    <width>920</width>
+    <height>562</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -37,7 +37,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>690</width>
+     <width>920</width>
      <height>20</height>
     </rect>
    </property>
@@ -150,10 +150,10 @@
     <bool>false</bool>
    </property>
    <attribute name="toolBarArea">
-    <enum>LeftToolBarArea</enum>
+    <enum>TopToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
-    <bool>true</bool>
+    <bool>false</bool>
    </attribute>
    <addaction name="actionRotate_CCW"/>
    <addaction name="actionRotate_CW"/>

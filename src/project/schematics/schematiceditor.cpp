@@ -30,6 +30,7 @@
 #include "../../workspace/workspacesettings.h"
 #include "../../common/undostack.h"
 #include "schematic.h"
+#include "schematicpagesdock.h"
 
 namespace project {
 
@@ -38,16 +39,21 @@ namespace project {
  ****************************************************************************************/
 
 SchematicEditor::SchematicEditor(Workspace& workspace, Project& project) :
-    QMainWindow(0), mWorkspace(workspace), mProject(project), mUi(new Ui::SchematicEditor)
+    QMainWindow(0), mWorkspace(workspace), mProject(project), mUi(new Ui::SchematicEditor),
+    mPagesDock(0)
 {
     mUi->setupUi(this);
+
+    // Add Dock Widgets
+    mPagesDock = new SchematicPagesDock(mProject);
+    addDockWidget(Qt::LeftDockWidgetArea, mPagesDock, Qt::Vertical);
 
     // connect some actions which are created with the Qt Designer
     connect(mUi->actionSave_Project, SIGNAL(triggered()), &mProject, SLOT(save()));
     connect(mUi->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
     connect(mUi->actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 
-    // connect the undo/redo actions with the QUndoStack of the project
+    // connect the undo/redo actions with the UndoStack of the project
     connect(&mProject.getUndoStack(), &UndoStack::undoTextChanged,
             [this](const QString& text){mUi->actionUndo->setText(text);});
     mUi->actionUndo->setText(mProject.getUndoStack().getUndoText());
@@ -79,7 +85,8 @@ SchematicEditor::~SchematicEditor()
     s.setValue("schematic_editor/window_geometry", saveGeometry());
     s.setValue("schematic_editor/window_state", saveState());
 
-    delete mUi;     mUi = 0;
+    delete mPagesDock;      mPagesDock = 0;
+    delete mUi;             mUi = 0;
 }
 
 /*****************************************************************************************

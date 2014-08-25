@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SCHEMATICEDITOR_H
-#define PROJECT_SCHEMATICEDITOR_H
+#ifndef PROJECT_SCHEMATICPAGESDOCK_H
+#define PROJECT_SCHEMATICPAGESDOCK_H
 
 /*****************************************************************************************
  *  Includes
@@ -31,63 +31,59 @@
  *  Forward Declarations
  ****************************************************************************************/
 
-class Workspace;
-
-namespace Ui {
-class SchematicEditor;
-}
-
 namespace project {
 class Project;
+}
+
+namespace Ui {
 class SchematicPagesDock;
 }
 
 /*****************************************************************************************
- *  Class SchematicEditor
+ *  Class SchematicPagesDock
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The SchematicEditor class
+ * @brief The SchematicPagesDock class
  */
-class SchematicEditor : public QMainWindow
+class SchematicPagesDock final : public QDockWidget
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit SchematicEditor(Workspace& workspace, Project& project);
-        ~SchematicEditor();
+        explicit SchematicPagesDock(Project& project);
+        ~SchematicPagesDock();
 
-    protected:
+        // Inherited from QDockWidget
+        void resizeEvent(QResizeEvent* event);
 
-        void closeEvent(QCloseEvent* event);
+    public slots:
+
+        void schematicAdded(int newIndex);
+        void schematicRemoved(int oldIndex);
 
     private slots:
 
-        // Actions
-        void on_actionClose_Project_triggered();
-        void on_actionUndo_triggered();
-        void on_actionRedo_triggered();
+        // UI
+        void on_btnNewSchematic_clicked();
+        void on_btnRemoveSchematic_clicked();
 
     private:
 
         // make some methods inaccessible...
-        SchematicEditor();
-        SchematicEditor(const SchematicEditor& other);
-        SchematicEditor& operator=(const SchematicEditor& rhs);
+        SchematicPagesDock();
+        SchematicPagesDock(const SchematicPagesDock& other);
+        SchematicPagesDock& operator=(const SchematicPagesDock& rhs);
 
-        // General Attributes
-        Workspace& mWorkspace;
+        // General
         Project& mProject;
-        Ui::SchematicEditor* mUi;
-
-        // Docks
-        SchematicPagesDock* mPagesDock;
+        Ui::SchematicPagesDock* mUi;
 };
 
 } // namespace project
 
-#endif // PROJECT_SCHEMATICEDITOR_H
+#endif // PROJECT_SCHEMATICPAGESDOCK_H

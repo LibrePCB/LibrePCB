@@ -100,6 +100,7 @@ SOURCES += \
     common/undocommand.cpp \
     common/undostack.cpp \
     project/schematics/symbolinstance.cpp \
+    project/schematics/schematicpagesdock.cpp \
     common/inifile.cpp \
     project/schematics/cmd/cmdschematicadd.cpp \
     project/schematics/cmd/cmdschematicremove.cpp
@@ -152,6 +153,7 @@ HEADERS += \
     common/undocommand.h \
     common/undostack.h \
     project/schematics/symbolinstance.h \
+    project/schematics/schematicpagesdock.h \
     common/inifile.h \
     project/schematics/cmd/cmdschematicadd.h \
     project/schematics/cmd/cmdschematicremove.h
@@ -161,7 +163,8 @@ FORMS += \
     workspace/workspacechooserdialog.ui \
     library_editor/libraryeditor.ui \
     project/schematics/schematiceditor.ui \
-    workspace/workspacesettingsdialog.ui
+    workspace/workspacesettingsdialog.ui \
+    project/schematics/schematicpagesdock.ui
 
 
 # Custom compiler "lrelease" for qm generation
