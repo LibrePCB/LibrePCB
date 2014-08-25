@@ -40,6 +40,7 @@ class SchematicEditor;
 namespace project {
 class Project;
 class SchematicPagesDock;
+class UnplacedSymbolsDock;
 }
 
 /*****************************************************************************************
@@ -86,6 +87,7 @@ class SchematicEditor : public QMainWindow
 
         // Docks
         SchematicPagesDock* mPagesDock;
+        UnplacedSymbolsDock* mUnplacedSymbolsDock;
 };
 
 } // namespace project

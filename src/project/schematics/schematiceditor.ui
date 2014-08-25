@@ -75,6 +75,9 @@
     <property name="title">
      <string>View</string>
     </property>
+    <addaction name="actionZoom_In"/>
+    <addaction name="actionZoom_Out"/>
+    <addaction name="actionZoom_All"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">

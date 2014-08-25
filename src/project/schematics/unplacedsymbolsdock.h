@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CADVIEW_H
-#define CADVIEW_H
+#ifndef PROJECT_UNPLACEDSYMBOLSDOCK_H
+#define PROJECT_UNPLACEDSYMBOLSDOCK_H
 
 /*****************************************************************************************
  *  Includes
@@ -26,82 +26,50 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include "units.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
-class CADScene;
+namespace project {
+class Project;
+}
+
+namespace Ui {
+class UnplacedSymbolsDock;
+}
 
 /*****************************************************************************************
- *  Class CADView
+ *  Class UnplacedSymbolsDock
  ****************************************************************************************/
 
+namespace project {
+
 /**
- * @brief The CADView class
- *
- * @author ubruhin
- *
- * @date 2014-06-22
+ * @brief The UnplacedSymbolsDock class
  */
-class CADView : public QGraphicsView
+class UnplacedSymbolsDock final : public QDockWidget
 {
         Q_OBJECT
 
     public:
 
-        // Enums
-        enum GridType {noGrid, gridLines, gridDots};
-
         // Constructors / Destructor
-        explicit CADView(QWidget* parent = 0);
-        virtual ~CADView();
-
-        // Getters
-        CADScene*       getCadScene()   const;
-        GridType        getGridType()   const {return mGridType;}
-        const QColor&   getGridColor()  const {return mGridColor;}
-
-        // Setters
-        void setGridType(GridType type);
-        void setGridColor(const QColor& color);
-
-        // Static Functions
-        static qreal getZoomFactor() {return sZoomFactor;}
-        static void setZoomFactor(qreal factor) {sZoomFactor = factor;}
-
-    public slots:
-
-        // Zoom Functions
-        void zoomIn();
-        void zoomOut();
-        void zoomAll();
-
-    protected:
-
-        // Inherited Methods
-        virtual void drawBackground(QPainter* painter, const QRectF& rect);
-        virtual void wheelEvent(QWheelEvent* event);
-        virtual void mouseMoveEvent(QMouseEvent* event);
-
-    signals:
-
-        void mousePosChanged(const Point& newPos);
+        explicit UnplacedSymbolsDock(Project& project);
+        ~UnplacedSymbolsDock();
 
     private:
 
         // make some methods inaccessible...
-        CADView();
-        CADView(const CADView& other);
-        CADView& operator=(const CADView& rhs);
+        UnplacedSymbolsDock();
+        UnplacedSymbolsDock(const UnplacedSymbolsDock& other);
+        UnplacedSymbolsDock& operator=(const UnplacedSymbolsDock& rhs);
 
-        GridType mGridType;
-        QColor mGridColor;
-
-        // Static Variables
-        static qreal sZoomFactor;
-
+        // General
+        Project& mProject;
+        Ui::UnplacedSymbolsDock* mUi;
 };
 
-#endif // CADVIEW_H
+} // namespace project
+
+#endif // PROJECT_UNPLACEDSYMBOLSDOCK_H

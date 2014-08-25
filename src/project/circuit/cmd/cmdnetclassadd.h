@@ -25,7 +25,6 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QtWidgets>
 #include "../../../common/undocommand.h"
 #include "../../../common/exceptions.h"
 

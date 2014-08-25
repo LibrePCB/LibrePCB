@@ -17,54 +17,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDNETSIGNALREMOVE_H
-#define PROJECT_CMDNETSIGNALREMOVE_H
-
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../../../common/undocommand.h"
-#include "../../../common/exceptions.h"
-
-/*****************************************************************************************
- *  Forward Declarations
- ****************************************************************************************/
+#include <QtWidgets>
+#include "unplacedsymbolsdock.h"
+#include "ui_unplacedsymbolsdock.h"
+#include "../project.h"
 
 namespace project {
-class Circuit;
-class NetSignal;
+
+/*****************************************************************************************
+ *  Constructors / Destructor
+ ****************************************************************************************/
+
+UnplacedSymbolsDock::UnplacedSymbolsDock(Project& project) :
+    QDockWidget(0), mProject(project), mUi(new Ui::UnplacedSymbolsDock)
+{
+    mUi->setupUi(this);
+}
+
+UnplacedSymbolsDock::~UnplacedSymbolsDock()
+{
+    delete mUi;         mUi = 0;
 }
 
 /*****************************************************************************************
- *  Class CmdNetSignalRemove
+ *  End of File
  ****************************************************************************************/
 
-namespace project {
-
-/**
- * @brief The CmdNetSignalRemove class
- */
-class CmdNetSignalRemove final : public UndoCommand
-{
-    public:
-
-        // Constructors / Destructor
-        explicit CmdNetSignalRemove(Circuit& circuit, NetSignal* netsignal,
-                                   UndoCommand* parent = 0) throw (Exception);
-        ~CmdNetSignalRemove() noexcept;
-
-        // Inherited from UndoCommand
-        void redo() throw (Exception) override;
-        void undo() throw (Exception) override;
-
-    private:
-
-        Circuit& mCircuit;
-        NetSignal* mNetSignal;
-};
-
 } // namespace project
-
-#endif // PROJECT_CMDNETSIGNALREMOVE_H

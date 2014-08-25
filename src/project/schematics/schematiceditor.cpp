@@ -31,6 +31,7 @@
 #include "../../common/undostack.h"
 #include "schematic.h"
 #include "schematicpagesdock.h"
+#include "unplacedsymbolsdock.h"
 
 namespace project {
 
@@ -40,18 +41,23 @@ namespace project {
 
 SchematicEditor::SchematicEditor(Workspace& workspace, Project& project) :
     QMainWindow(0), mWorkspace(workspace), mProject(project), mUi(new Ui::SchematicEditor),
-    mPagesDock(0)
+    mPagesDock(0), mUnplacedSymbolsDock(0)
 {
     mUi->setupUi(this);
 
     // Add Dock Widgets
     mPagesDock = new SchematicPagesDock(mProject);
     addDockWidget(Qt::LeftDockWidgetArea, mPagesDock, Qt::Vertical);
+    mUnplacedSymbolsDock = new UnplacedSymbolsDock(mProject);
+    addDockWidget(Qt::RightDockWidgetArea, mUnplacedSymbolsDock, Qt::Vertical);
 
     // connect some actions which are created with the Qt Designer
     connect(mUi->actionSave_Project, SIGNAL(triggered()), &mProject, SLOT(save()));
     connect(mUi->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
     connect(mUi->actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
+    connect(mUi->actionZoom_In, SIGNAL(triggered()), mUi->graphicsView, SLOT(zoomIn()));
+    connect(mUi->actionZoom_Out, SIGNAL(triggered()), mUi->graphicsView, SLOT(zoomOut()));
+    connect(mUi->actionZoom_All, SIGNAL(triggered()), mUi->graphicsView, SLOT(zoomAll()));
 
     // connect the undo/redo actions with the UndoStack of the project
     connect(&mProject.getUndoStack(), &UndoStack::undoTextChanged,
@@ -85,8 +91,9 @@ SchematicEditor::~SchematicEditor()
     s.setValue("schematic_editor/window_geometry", saveGeometry());
     s.setValue("schematic_editor/window_state", saveState());
 
-    delete mPagesDock;      mPagesDock = 0;
-    delete mUi;             mUi = 0;
+    delete mUnplacedSymbolsDock;    mUnplacedSymbolsDock = 0;
+    delete mPagesDock;              mPagesDock = 0;
+    delete mUi;                     mUi = 0;
 }
 
 /*****************************************************************************************

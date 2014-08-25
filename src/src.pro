@@ -103,7 +103,8 @@ SOURCES += \
     project/schematics/schematicpagesdock.cpp \
     common/inifile.cpp \
     project/schematics/cmd/cmdschematicadd.cpp \
-    project/schematics/cmd/cmdschematicremove.cpp
+    project/schematics/cmd/cmdschematicremove.cpp \
+    project/schematics/unplacedsymbolsdock.cpp
 
 HEADERS += \
     common/units.h \
@@ -156,7 +157,8 @@ HEADERS += \
     project/schematics/schematicpagesdock.h \
     common/inifile.h \
     project/schematics/cmd/cmdschematicadd.h \
-    project/schematics/cmd/cmdschematicremove.h
+    project/schematics/cmd/cmdschematicremove.h \
+    project/schematics/unplacedsymbolsdock.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \
@@ -164,7 +166,8 @@ FORMS += \
     library_editor/libraryeditor.ui \
     project/schematics/schematiceditor.ui \
     workspace/workspacesettingsdialog.ui \
-    project/schematics/schematicpagesdock.ui
+    project/schematics/schematicpagesdock.ui \
+    project/schematics/unplacedsymbolsdock.ui
 
 
 # Custom compiler "lrelease" for qm generation
