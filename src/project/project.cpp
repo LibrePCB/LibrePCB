@@ -25,6 +25,7 @@
 #include "project.h"
 #include "../common/exceptions.h"
 #include "../common/xmlfile.h"
+#include "../common/inifile.h"
 #include "../workspace/workspace.h"
 #include "../workspace/workspacesettings.h"
 #include "library/projectlibrary.h"
@@ -44,8 +45,8 @@ namespace project {
 
 Project::Project(Workspace& workspace, const FilePath& filepath) throw (Exception) :
     QObject(0), mWorkspace(workspace), mPath(filepath.getParentDir()),
-    mFilepath(filepath), mXmlFile(0), mFileLock(filepath), mUndoStack(0),
-    mProjectLibrary(0), mCircuit(0), mSchematicEditor(0)
+    mFilepath(filepath), mXmlFile(0), mFileLock(filepath), mSchematicsIniFile(0),
+    mUndoStack(0), mProjectLibrary(0), mCircuit(0), mSchematicEditor(0)
 {
     qDebug() << "load project...";
 
@@ -60,7 +61,7 @@ Project::Project(Workspace& workspace, const FilePath& filepath) throw (Exceptio
     // Check if the project is locked (already open or application was crashed). In case
     // of a crash, the user can decide if the last backup should be restored. If the
     // project should be opened, the lock file will be created/updated here.
-    bool restoreBackup = false;
+    bool restore = false;
     switch (mFileLock.getStatus())
     {
         case FileLock::Unlocked:
@@ -87,10 +88,10 @@ Project::Project(Workspace& workspace, const FilePath& filepath) throw (Exceptio
             switch (btn)
             {
                 case QMessageBox::Yes: // open the project and restore the last backup
-                    restoreBackup = true;
+                    restore = true;
                     break;
                 case QMessageBox::No: // open the project without restoring the last backup
-                    restoreBackup = false;
+                    restore = false;
                     break;
                 case QMessageBox::Cancel: // abort opening the project
                 default:
@@ -128,28 +129,28 @@ Project::Project(Workspace& workspace, const FilePath& filepath) throw (Exceptio
     try
     {
         // try to open the XML project file
-        mXmlFile = new XmlFile(mFilepath, restoreBackup, "project");
+        mXmlFile = new XmlFile(mFilepath, restore, "project");
 
         // the project seems to be ready to open, so we will create all needed objects
 
         mUndoStack = new UndoStack();
-        mProjectLibrary = new ProjectLibrary(mWorkspace, *this, restoreBackup);
-        mCircuit = new Circuit(mWorkspace, *this, restoreBackup);
+        mProjectLibrary = new ProjectLibrary(mWorkspace, *this, restore);
+        mCircuit = new Circuit(mWorkspace, *this, restore);
 
         // Load all schematics
-        FilePath schematicsPath(mPath.getPathTo("schematics"));
-        QSettings schematicsIni(schematicsPath.getPathTo("schematics.ini").toStr(),
-                                QSettings::IniFormat);
-        int schematicsCount = schematicsIni.beginReadArray("pages");
+        mSchematicsIniFile = new IniFile(mPath.getPathTo("schematics/schematics.ini"), restore);
+        QSettings* schematicsSettings = mSchematicsIniFile->createQSettings();
+        int schematicsCount = schematicsSettings->beginReadArray("pages");
         for (int i = 0; i < schematicsCount; i++)
         {
-            schematicsIni.setArrayIndex(i);
-            FilePath filepath = FilePath::fromRelative(schematicsPath,
-                                    schematicsIni.value("page").toString());
-            Schematic* schematic = new Schematic(*this, filepath, restoreBackup);
-            mSchematics.append(schematic);
+            schematicsSettings->setArrayIndex(i);
+            FilePath filepath = FilePath::fromRelative(mPath.getPathTo("schematics"),
+                                    schematicsSettings->value("page").toString());
+            Schematic* schematic = new Schematic(*this, filepath, restore);
+            addSchematic(schematic, -1, false);
         }
-        schematicsIni.endArray();
+        schematicsSettings->endArray();
+        mSchematicsIniFile->releaseQSettings(schematicsSettings);
         qDebug() << mSchematics.count() << "schematics successfully loaded!";
 
         mSchematicEditor = new SchematicEditor(mWorkspace, *this);
@@ -158,7 +159,9 @@ Project::Project(Workspace& workspace, const FilePath& filepath) throw (Exceptio
     {
         // free the allocated memory in the reverse order of their allocation...
         delete mSchematicEditor;        mSchematicEditor = 0;
-        qDeleteAll(mSchematics);        mSchematics.clear();
+        foreach (Schematic* schematic, mSchematics)
+            try { removeSchematic(schematic, false, true); } catch (...) {}
+        delete mSchematicsIniFile;      mSchematicsIniFile = 0;
         delete mCircuit;                mCircuit = 0;
         delete mProjectLibrary;         mProjectLibrary = 0;
         delete mUndoStack;              mUndoStack = 0;
@@ -193,20 +196,129 @@ Project::~Project() noexcept
     mUndoStack->clear();
 
     // free the allocated memory in the reverse order of their allocation
+
     delete mSchematicEditor;        mSchematicEditor = 0;
-    qDeleteAll(mSchematics);        mSchematics.clear();
+
+    // delete all schematics (and catch all throwed exceptions)
+    foreach (Schematic* schematic, mSchematics)
+        try { removeSchematic(schematic, false, true); } catch (...) {}
+
+    delete mSchematicsIniFile;      mSchematicsIniFile = 0;
     delete mCircuit;                mCircuit = 0;
     delete mProjectLibrary;         mProjectLibrary = 0;
     delete mUndoStack;              mUndoStack = 0;
     delete mXmlFile;                mXmlFile = 0;
+}
 
-    // remove backup file "schematics/schematics.ini~"
-    QFile::remove(mPath.getPathTo("schematics/schematics.ini~").toStr());
+/*****************************************************************************************
+ *  Getters
+ ****************************************************************************************/
+
+int Project::getSchematicIndex(Schematic* schematic) const noexcept
+{
+    return mSchematics.indexOf(schematic);
+}
+
+Schematic* Project::getSchematicByUuid(const QUuid& uuid) const noexcept
+{
+    foreach (Schematic* schematic, mSchematics)
+    {
+        if (schematic->getUuid() == uuid)
+            return schematic;
+    }
+
+    return 0;
+}
+
+Schematic* Project::getSchematicByName(const QString& name) const noexcept
+{
+    foreach (Schematic* schematic, mSchematics)
+    {
+        if (schematic->getName() == name)
+            return schematic;
+    }
+
+    return 0;
 }
 
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
+
+Schematic* Project::createSchematic(const QString& name) throw (Exception)
+{
+    QString basename = name; /// @todo remove special characters to create a valid filename!
+    FilePath filepath = mPath.getPathTo("schematics/" % basename % ".xml");
+    return Schematic::create(*this, filepath, name);
+}
+
+void Project::addSchematic(Schematic* schematic, int newIndex, bool toList) throw (Exception)
+{
+    Q_CHECK_PTR(schematic);
+
+    if ((newIndex < 0) || (newIndex > mSchematics.count()))
+        newIndex = mSchematics.count();
+
+    if (getSchematicByUuid(schematic->getUuid()))
+    {
+        throw RuntimeError(__FILE__, __LINE__, schematic->getUuid().toString(),
+            QString(tr("There is already a schematic with the UUID \"%1\"!"))
+            .arg(schematic->getUuid().toString()));
+    }
+
+    if (getSchematicByName(schematic->getName()))
+    {
+        throw RuntimeError(__FILE__, __LINE__, schematic->getName(),
+            QString(tr("There is already a schematic with the name \"%1\"!"))
+            .arg(schematic->getName()));
+    }
+
+    mSchematics.insert(newIndex, schematic);
+
+    if (toList)
+    {
+        // add schematic to "schematics/schematics.ini"
+        try
+        {
+            updateSchematicsList(); // can throw an exception
+        }
+        catch (Exception& e)
+        {
+            mSchematics.removeAt(newIndex); // revert insert()
+            throw;
+        }
+    }
+
+    emit schematicAdded(newIndex);
+}
+
+void Project::removeSchematic(Schematic* schematic, bool fromList, bool deleteSchematic) throw (Exception)
+{
+    Q_CHECK_PTR(schematic);
+
+    int index = mSchematics.indexOf(schematic);
+    Q_ASSERT(index >= 0);
+    mSchematics.removeAt(index);
+
+    if (fromList)
+    {
+        // remove schematic from "schematics/schematics.ini"
+        try
+        {
+            updateSchematicsList(); // can throw an exception
+        }
+        catch (Exception& e)
+        {
+            mSchematics.insert(index, schematic); // revert removeAt()
+            throw;
+        }
+    }
+
+    emit schematicRemoved(index);
+
+    if (deleteSchematic)
+        delete schematic;
+}
 
 bool Project::windowIsAboutToClose(QMainWindow* window)
 {
@@ -329,6 +441,23 @@ bool Project::close(QWidget* msgBoxParent)
  *  Private Methods
  ****************************************************************************************/
 
+void Project::updateSchematicsList() throw (Exception)
+{
+    QSettings* s = mSchematicsIniFile->createQSettings(); // can throw an exception
+
+    FilePath schematicsPath(mPath.getPathTo("schematics"));
+    s->remove("pages");
+    s->beginWriteArray("pages");
+    for (int i = 0; i < mSchematics.count(); i++)
+    {
+        s->setArrayIndex(i);
+        s->setValue("page", mSchematics.at(i)->getFilePath().toRelative(schematicsPath));
+    }
+    s->endArray();
+
+    mSchematicsIniFile->releaseQSettings(s);
+}
+
 bool Project::save(bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
@@ -349,7 +478,7 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     if (!mCircuit->save(toOriginal, errors))
         success = false;
 
-    // Save schematics
+    // Save all schematics (*.xml files)
     foreach (Schematic* schematic, mSchematics)
     {
         if (!schematic->save(toOriginal, errors))
@@ -357,34 +486,14 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     }
 
     // Save "schematics/schematics.ini"
-    FilePath schematicsPath(mPath.getPathTo("schematics"));
-    QSettings schematicsIni(schematicsPath.getPathTo("schematics.ini" % tilde).toStr(),
-                            QSettings::IniFormat);
-    if (schematicsIni.isWritable())
+    try
     {
-        schematicsIni.remove("pages");
-        schematicsIni.beginWriteArray("pages");
-        for (int i = 0; i < mSchematics.count(); i++)
-        {
-            schematicsIni.setArrayIndex(i);
-            schematicsIni.setValue("page", mSchematics.at(i)->getFilePath()
-                                           .toRelative(schematicsPath));
-        }
-        schematicsIni.endArray();
-        schematicsIni.sync();
-        if (schematicsIni.status() != QSettings::NoError)
-        {
-            success = false;
-            errors.append(QString(tr("Could not write to file \"%1\": %2")
-                                  .arg(QDir::toNativeSeparators(schematicsIni.fileName()))
-                                  .arg(schematicsIni.status())));
-        }
+        mSchematicsIniFile->save(toOriginal);
     }
-    else
+    catch (Exception& e)
     {
         success = false;
-        errors.append(QString(tr("Could not write to file \"%1\"")
-                              .arg(QDir::toNativeSeparators(schematicsIni.fileName()))));
+        errors.append(e.getUserMsg());
     }
 
     return success;

@@ -35,6 +35,7 @@
  ****************************************************************************************/
 
 class XmlFile;
+class IniFile;
 class Workspace;
 class UndoStack;
 
@@ -142,6 +143,13 @@ class Project final : public QObject
         ProjectLibrary& getLibrary() const noexcept {return *mProjectLibrary;}
 
         /**
+         * @brief Get the page index of a specific schematic
+         *
+         * @return the schematic index (-1 if the schematic does not exist)
+         */
+        int getSchematicIndex(Schematic* schematic) const noexcept;
+
+        /**
          * @brief Get the count of schematic pages
          *
          * @return Count of schematics
@@ -157,8 +165,62 @@ class Project final : public QObject
          */
         Schematic* getSchematicByIndex(int index) const noexcept {return mSchematics.value(index);}
 
+        /**
+         * @brief Get the schematic page with a specific UUID
+         *
+         * @param uuid      The schematic UUID
+         *
+         * @return A pointer to the specified schematic, or NULL if uuid is invalid
+         */
+        Schematic* getSchematicByUuid(const QUuid& uuid) const noexcept;
+
+        /**
+         * @brief Get the schematic page with a specific name
+         *
+         * @param name      The schematic name
+         *
+         * @return A pointer to the specified schematic, or NULL if name is invalid
+         */
+        Schematic* getSchematicByName(const QString& name) const noexcept;
+
 
         // General Methods
+
+        /**
+         * @brief Create a new schematic (page)
+         *
+         * @param name  The schematic page name
+         *
+         * @return A pointer to the new schematic
+         *
+         * @throw Exception This method throws an exception on error.
+         */
+        Schematic* createSchematic(const QString& name) throw (Exception);
+
+        /**
+         * @brief Add an existing schematic to this project
+         *
+         * @param schematic     The schematic to add
+         * @param newIndex      The desired index in the list (after inserting it)
+         * @param toList        If true, the schematic will be added to the schematics
+         *                      list in "schematics/schematics.ini"
+         *
+         * @throw Exception     On error
+         */
+        void addSchematic(Schematic* schematic, int newIndex = -1, bool toList = true) throw (Exception);
+
+        /**
+         * @brief Remove a schematic from this project
+         *
+         * @param schematic         The schematic to remove
+         * @param fromList          If true, the schematic will be removed from the
+         *                          schematics list in "schematics/schematics.ini"
+         * @param deleteSchematic   If true, the schematic object will be deleted
+         *
+         * @throw Exception     On error
+         */
+        void removeSchematic(Schematic* schematic, bool fromList = true,
+                             bool deleteSchematic = false) throw (Exception);
 
         /**
          * @brief Inform the project that a project related window is about to close
@@ -226,6 +288,11 @@ class Project final : public QObject
         bool close(QWidget* msgBoxParent = 0);
 
 
+    signals:
+
+        void schematicAdded(int newIndex);
+        void schematicRemoved(int oldIndex);
+
     private:
 
         // make some methods inaccessible...
@@ -234,6 +301,7 @@ class Project final : public QObject
         Project& operator=(const Project& rhs);
 
         // Private Methods
+        void updateSchematicsList() throw (Exception);
         bool save(bool toOriginal, QStringList& errors) noexcept;
 
         // General
@@ -244,6 +312,9 @@ class Project final : public QObject
         FilePath mFilepath; ///< the filepath of the *.e4u project file
         XmlFile* mXmlFile;
         FileLock mFileLock; ///< See @ref doc_project_lock
+
+        // Other Files
+        IniFile* mSchematicsIniFile; ///< schematics/schematics.ini
 
         // General
         QTimer mAutoSaveTimer; ///< the timer for the periodically automatic saving functionality (see also @ref doc_project_save)

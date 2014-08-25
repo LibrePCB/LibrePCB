@@ -25,7 +25,6 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QtWidgets>
 #include "../../common/filepath.h"
 #include "../../common/exceptions.h"
 #include "../../common/cadscene.h"
@@ -67,9 +66,17 @@ class Schematic final : public CADScene
         // Getters
         const FilePath& getFilePath() const noexcept {return mFilePath;}
         Project& getProject() const noexcept {return mProject;}
+        const QUuid& getUuid() const noexcept {return mUuid;}
+        const QString& getName() const noexcept {return mName;}
+        const QIcon& getIcon() const noexcept {return mIcon;}
 
         // General Methods
+        void removeFiles() const throw (Exception);
         bool save(bool toOriginal, QStringList& errors) noexcept;
+
+        // Static Methods
+        static Schematic* create(Project& project, const FilePath& filepath,
+                                 const QString& name) throw (Exception);
 
     private:
 
@@ -77,6 +84,9 @@ class Schematic final : public CADScene
         Schematic();
         Schematic(const Schematic& other);
         Schematic& operator=(const Schematic& rhs);
+
+        // Private Methods
+        void updateIcon() noexcept;
 
         // General
         Project& mProject; ///< A reference to the Project object (from the ctor)
@@ -86,6 +96,7 @@ class Schematic final : public CADScene
         // Attributes
         QUuid mUuid;
         QString mName;
+        QIcon mIcon;
 
         QHash<QUuid, SymbolInstance*> mSymbols;
 

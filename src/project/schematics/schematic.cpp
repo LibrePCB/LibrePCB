@@ -22,7 +22,6 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QtWidgets>
 #include "schematic.h"
 #include "../../common/xmlfile.h"
 #include "../project.h"
@@ -71,6 +70,8 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore)
             mSymbols.insert(symbol->getUuid(), symbol);
             tmpNode = tmpNode.nextSiblingElement("symbol");
         }
+
+        updateIcon();
     }
     catch (...)
     {
@@ -91,6 +92,11 @@ Schematic::~Schematic()
  *  General Methods
  ****************************************************************************************/
 
+void Schematic::removeFiles() const throw (Exception)
+{
+    mXmlFile->remove();
+}
+
 bool Schematic::save(bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
@@ -106,6 +112,61 @@ bool Schematic::save(bool toOriginal, QStringList& errors) noexcept
     }
 
     return success;
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+void Schematic::updateIcon() noexcept
+{
+    QRectF rect;
+    if (items().count() > 0)
+        rect = itemsBoundingRect();
+    else
+        rect = QRectF(0, 0, 300, 200);
+
+    QPixmap pixmap(rect.size().toSize());
+    pixmap.fill(Qt::white);
+    QPainter painter(&pixmap);
+    render(&painter, QRectF(), rect);
+    mIcon = QIcon(pixmap);
+}
+
+/*****************************************************************************************
+ *  Static Methods
+ ****************************************************************************************/
+
+Schematic* Schematic::create(Project& project, const FilePath& filepath,
+                             const QString& name) throw (Exception)
+{
+    // create XML file with root node
+    XmlFile* file = XmlFile::create(filepath, "schematic");
+
+    // create node "meta" with schematic UUID and name
+    QDomElement metaNode = file->getDocument().createElement("meta");
+    QDomElement uuidNode = file->getDocument().createElement("uuid");
+    QDomElement nameNode = file->getDocument().createElement("name");
+    QDomText uuidText = file->getDocument().createTextNode(QUuid::createUuid().toString());
+    QDomText nameText = file->getDocument().createTextNode(name);
+    uuidNode.appendChild(uuidText);
+    nameNode.appendChild(nameText);
+    metaNode.appendChild(uuidNode);
+    metaNode.appendChild(nameNode);
+    file->getRoot().appendChild(metaNode);
+
+    try
+    {
+        file->save(false); // write new (temporary) XML file to filesystem
+        Schematic* schematic = new Schematic(project, filepath, true); // create new Schematic
+        delete file; // this will remove the temporary file, so don't do this earlier!
+        return schematic;
+    }
+    catch (Exception& e)
+    {
+        delete file;
+        throw;
+    }
 }
 
 /*****************************************************************************************
