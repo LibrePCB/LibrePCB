@@ -17,84 +17,64 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SCHEMATICEDITOR_H
-#define PROJECT_SCHEMATICEDITOR_H
+#ifndef PROJECT_SCHEMATICEDITORFSM_H
+#define PROJECT_SCHEMATICEDITORFSM_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
-class Workspace;
-
-namespace Ui {
+namespace project {
 class SchematicEditor;
 }
 
-namespace project {
-class Project;
-class SchematicPagesDock;
-class UnplacedSymbolsDock;
-class SchematicEditorFsm;
-}
-
 /*****************************************************************************************
- *  Class SchematicEditor
+ *  Class SchematicEditorFsm
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The SchematicEditor class
+ * @brief The SchematicEditorFsm class
  */
-class SchematicEditor : public QMainWindow
+class SchematicEditorFsm final : public QObject
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit SchematicEditor(Workspace& workspace, Project& project);
-        ~SchematicEditor();
+        explicit SchematicEditorFsm(SchematicEditor& editor) noexcept;
+        ~SchematicEditorFsm() noexcept;
 
-    protected:
-
-        void closeEvent(QCloseEvent* event);
-
-    private slots:
-
-        // Actions
-        void on_actionClose_Project_triggered();
-        void on_actionUndo_triggered();
-        void on_actionRedo_triggered();
+        // General Methods
+        void processEvent(QEvent* event) noexcept;
 
     private:
 
-        // make some methods inaccessible...
-        SchematicEditor();
-        SchematicEditor(const SchematicEditor& other);
-        SchematicEditor& operator=(const SchematicEditor& rhs);
+        // Private Helper Methods
+        void updateToolsToolbar();
 
         // General Attributes
-        Workspace& mWorkspace;
-        Project& mProject;
-        Ui::SchematicEditor* mUi;
+        SchematicEditor& mEditor;
 
-        // Docks
-        SchematicPagesDock* mPagesDock;
-        UnplacedSymbolsDock* mUnplacedSymbolsDock;
-
-        // Finite State Machine
-        SchematicEditorFsm* mFsm;
-        friend class SchematicEditorFsm; // the FSM needs access to private attributes
+        // FSM States
+        enum State {
+            Initial,
+            Select,
+            Move,
+            DrawWires,
+            AddComponents
+        };
+        State mCurrentState;
 };
 
 } // namespace project
 
-#endif // PROJECT_SCHEMATICEDITOR_H
+#endif // PROJECT_SCHEMATICEDITORFSM_H

@@ -104,7 +104,9 @@ SOURCES += \
     common/inifile.cpp \
     project/schematics/cmd/cmdschematicadd.cpp \
     project/schematics/cmd/cmdschematicremove.cpp \
-    project/schematics/unplacedsymbolsdock.cpp
+    project/schematics/unplacedsymbolsdock.cpp \
+    project/schematics/fsm/schematiceditorfsm.cpp \
+    project/schematics/fsm/schematiceditorevent.cpp
 
 HEADERS += \
     common/units.h \
@@ -158,7 +160,9 @@ HEADERS += \
     common/inifile.h \
     project/schematics/cmd/cmdschematicadd.h \
     project/schematics/cmd/cmdschematicremove.h \
-    project/schematics/unplacedsymbolsdock.h
+    project/schematics/unplacedsymbolsdock.h \
+    project/schematics/fsm/schematiceditorfsm.h \
+    project/schematics/fsm/schematiceditorevent.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \

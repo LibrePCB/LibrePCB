@@ -190,6 +190,21 @@
    <addaction name="actionToolDrawWire"/>
    <addaction name="actionToolAddComponent"/>
   </widget>
+  <widget class="QToolBar" name="commandToolbar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>true</bool>
+   </attribute>
+   <addaction name="actionCommandAbort"/>
+  </widget>
   <action name="actionQuit">
    <property name="icon">
     <iconset resource="../../../img/images.qrc">
@@ -487,6 +502,18 @@
    </property>
    <property name="text">
     <string>Draw Ellipse</string>
+   </property>
+  </action>
+  <action name="actionCommandAbort">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/stop.png</normaloff>:/img/actions/stop.png</iconset>
+   </property>
+   <property name="text">
+    <string>Abort Command</string>
+   </property>
+   <property name="shortcut">
+    <string>Esc</string>
    </property>
   </action>
  </widget>

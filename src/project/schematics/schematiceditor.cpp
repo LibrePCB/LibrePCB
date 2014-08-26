@@ -32,6 +32,8 @@
 #include "schematic.h"
 #include "schematicpagesdock.h"
 #include "unplacedsymbolsdock.h"
+#include "fsm/schematiceditorfsm.h"
+#include "fsm/schematiceditorevent.h"
 
 namespace project {
 
@@ -41,7 +43,7 @@ namespace project {
 
 SchematicEditor::SchematicEditor(Workspace& workspace, Project& project) :
     QMainWindow(0), mWorkspace(workspace), mProject(project), mUi(new Ui::SchematicEditor),
-    mPagesDock(0), mUnplacedSymbolsDock(0)
+    mPagesDock(0), mUnplacedSymbolsDock(0), mFsm(0)
 {
     mUi->setupUi(this);
 
@@ -58,6 +60,20 @@ SchematicEditor::SchematicEditor(Workspace& workspace, Project& project) :
     connect(mUi->actionZoom_In, SIGNAL(triggered()), mUi->graphicsView, SLOT(zoomIn()));
     connect(mUi->actionZoom_Out, SIGNAL(triggered()), mUi->graphicsView, SLOT(zoomOut()));
     connect(mUi->actionZoom_All, SIGNAL(triggered()), mUi->graphicsView, SLOT(zoomAll()));
+
+    // connect the "tools" toolbar with the state machine
+    connect(mUi->actionToolSelect, &QAction::triggered,
+            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::StartSelect));});
+    connect(mUi->actionToolMove, &QAction::triggered,
+            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::StartMove));});
+    connect(mUi->actionToolDrawWire, &QAction::triggered,
+            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::StartDrawWires));});
+    connect(mUi->actionToolAddComponent, &QAction::triggered,
+            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::StartAddComponents));});
+
+    // connect the "command" toolbar with the state machine
+    connect(mUi->actionCommandAbort, &QAction::triggered,
+            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::AbortCommand));});
 
     // connect the undo/redo actions with the UndoStack of the project
     connect(&mProject.getUndoStack(), &UndoStack::undoTextChanged,
@@ -82,6 +98,8 @@ SchematicEditor::SchematicEditor(Workspace& workspace, Project& project) :
     mUi->graphicsView->setGridType(CADView::gridLines);
     if (mProject.getSchematicCount() > 0)
         mUi->graphicsView->setScene(mProject.getSchematicByIndex(0));
+
+    mFsm = new SchematicEditorFsm(*this);
 }
 
 SchematicEditor::~SchematicEditor()
@@ -91,6 +109,7 @@ SchematicEditor::~SchematicEditor()
     s.setValue("schematic_editor/window_geometry", saveGeometry());
     s.setValue("schematic_editor/window_state", saveState());
 
+    delete mFsm;                    mFsm = 0;
     delete mUnplacedSymbolsDock;    mUnplacedSymbolsDock = 0;
     delete mPagesDock;              mPagesDock = 0;
     delete mUi;                     mUi = 0;
