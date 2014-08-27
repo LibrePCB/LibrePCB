@@ -17,48 +17,49 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SCHEMATICEDITOREVENT_H
-#define PROJECT_SCHEMATICEDITOREVENT_H
+#ifndef PROJECT_SES_DRAWWIRE_H
+#define PROJECT_SES_DRAWWIRE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
+#include <QtWidgets>
+#include "schematiceditorstate.h"
 
 /*****************************************************************************************
- *  Class SchematicEditorEvent
+ *  Class SES_DrawWire
  ****************************************************************************************/
 
 namespace project {
 
+
 /**
- * @brief The SchematicEditorEvent class
+ * @brief The SES_DrawWire class
  */
-class SchematicEditorEvent : public QEvent
+class SES_DrawWire final : public SchematicEditorState
 {
+        Q_OBJECT
+
     public:
 
-        // FSM events (codes used for QEvent::type)
-        enum EventType {
-            _First = QEvent::User, // the first user defined type after all Qt types
-            AbortCommand,
-            StartSelect,
-            StartMove,
-            StartDrawText,
-            StartDrawRect,
-            StartDrawPolygon,
-            StartDrawCircle,
-            StartDrawEllipse,
-            StartDrawWire,
-            StartAddComponent
-        };
-
         // Constructors / Destructor
-        SchematicEditorEvent(EventType type);
-        virtual ~SchematicEditorEvent();
+        explicit SES_DrawWire(SchematicEditor& editor);
+        ~SES_DrawWire();
+
+        // General Methods
+        State process(QEvent* event) noexcept;
+        void entry(State previousState) noexcept;
+        void exit(State nextState) noexcept;
+
+    private:
+
+        // Widgets for the command toolbar
+        QLabel* mWidthLabel;
+        QComboBox* mWidthComboBox;
 };
 
 } // namespace project
 
-#endif // PROJECT_SCHEMATICEDITOREVENT_H
+#endif // PROJECT_SES_DRAWWIRE_H

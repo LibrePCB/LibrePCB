@@ -75,6 +75,9 @@
     <property name="title">
      <string>View</string>
     </property>
+    <addaction name="actionGrid"/>
+    <addaction name="actionLayers"/>
+    <addaction name="separator"/>
     <addaction name="actionZoom_In"/>
     <addaction name="actionZoom_Out"/>
     <addaction name="actionZoom_All"/>
@@ -204,6 +207,20 @@
     <bool>true</bool>
    </attribute>
    <addaction name="actionCommandAbort"/>
+   <addaction name="separator"/>
+  </widget>
+  <widget class="QToolBar" name="view2toolbar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>LeftToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionLayers"/>
+   <addaction name="actionGrid"/>
   </widget>
   <action name="actionQuit">
    <property name="icon">
@@ -215,6 +232,9 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::QuitRole</enum>
    </property>
   </action>
   <action name="actionSave_Project">
@@ -237,10 +257,16 @@
    <property name="text">
     <string>About</string>
    </property>
+   <property name="menuRole">
+    <enum>QAction::AboutRole</enum>
+   </property>
   </action>
   <action name="actionAbout_Qt">
    <property name="text">
     <string>About Qt</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::AboutQtRole</enum>
    </property>
   </action>
   <action name="actionPrint">
@@ -514,6 +540,24 @@
    </property>
    <property name="shortcut">
     <string>Esc</string>
+   </property>
+  </action>
+  <action name="actionLayers">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/layers.png</normaloff>:/img/actions/layers.png</iconset>
+   </property>
+   <property name="text">
+    <string>Layers</string>
+   </property>
+  </action>
+  <action name="actionGrid">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/grid.png</normaloff>:/img/actions/grid.png</iconset>
+   </property>
+   <property name="text">
+    <string>Grid</string>
    </property>
   </action>
  </widget>

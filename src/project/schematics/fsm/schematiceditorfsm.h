@@ -25,14 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
-
-/*****************************************************************************************
- *  Forward Declarations
- ****************************************************************************************/
-
-namespace project {
-class SchematicEditor;
-}
+#include "schematiceditorstate.h"
 
 /*****************************************************************************************
  *  Class SchematicEditorFsm
@@ -43,7 +36,7 @@ namespace project {
 /**
  * @brief The SchematicEditorFsm class
  */
-class SchematicEditorFsm final : public QObject
+class SchematicEditorFsm final : public SchematicEditorState
 {
         Q_OBJECT
 
@@ -54,25 +47,12 @@ class SchematicEditorFsm final : public QObject
         ~SchematicEditorFsm() noexcept;
 
         // General Methods
-        void processEvent(QEvent* event) noexcept;
+        bool processEvent(QEvent* event, bool deleteEvent = false) noexcept;
 
     private:
 
-        // Private Helper Methods
-        void updateToolsToolbar();
-
-        // General Attributes
-        SchematicEditor& mEditor;
-
-        // FSM States
-        enum State {
-            Initial,
-            Select,
-            Move,
-            DrawWires,
-            AddComponents
-        };
-        State mCurrentState;
+        // General Methods
+        State process(QEvent* event) noexcept;
 };
 
 } // namespace project

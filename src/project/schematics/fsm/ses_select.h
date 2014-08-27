@@ -17,48 +17,42 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SCHEMATICEDITOREVENT_H
-#define PROJECT_SCHEMATICEDITOREVENT_H
+#ifndef PROJECT_SES_SELECT_H
+#define PROJECT_SES_SELECT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
+#include "schematiceditorstate.h"
 
 /*****************************************************************************************
- *  Class SchematicEditorEvent
+ *  Class SES_Select
  ****************************************************************************************/
 
 namespace project {
 
+
 /**
- * @brief The SchematicEditorEvent class
+ * @brief The SES_Select class
  */
-class SchematicEditorEvent : public QEvent
+class SES_Select final : public SchematicEditorState
 {
+        Q_OBJECT
+
     public:
 
-        // FSM events (codes used for QEvent::type)
-        enum EventType {
-            _First = QEvent::User, // the first user defined type after all Qt types
-            AbortCommand,
-            StartSelect,
-            StartMove,
-            StartDrawText,
-            StartDrawRect,
-            StartDrawPolygon,
-            StartDrawCircle,
-            StartDrawEllipse,
-            StartDrawWire,
-            StartAddComponent
-        };
-
         // Constructors / Destructor
-        SchematicEditorEvent(EventType type);
-        virtual ~SchematicEditorEvent();
+        explicit SES_Select(SchematicEditor& editor);
+        ~SES_Select();
+
+        // General Methods
+        State process(QEvent* event) noexcept;
+        void entry(State previousState) noexcept;
+        void exit(State nextState) noexcept;
 };
 
 } // namespace project
 
-#endif // PROJECT_SCHEMATICEDITOREVENT_H
+#endif // PROJECT_SES_SELECT_H

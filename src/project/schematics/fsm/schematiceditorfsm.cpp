@@ -28,6 +28,15 @@
 #include "schematiceditorevent.h"
 #include "../schematiceditor.h"
 #include "ui_schematiceditor.h"
+#include "ses_select.h"
+#include "ses_move.h"
+#include "ses_drawtext.h"
+#include "ses_drawrect.h"
+#include "ses_drawpolygon.h"
+#include "ses_drawcircle.h"
+#include "ses_drawellipse.h"
+#include "ses_drawwire.h"
+#include "ses_addcomponents.h"
 
 namespace project {
 
@@ -36,10 +45,22 @@ namespace project {
  ****************************************************************************************/
 
 SchematicEditorFsm::SchematicEditorFsm(SchematicEditor& editor) noexcept :
-    QObject(0), mEditor(editor), mCurrentState(Initial)
+    SchematicEditorState(editor)
 {
+    // create all substates
+    mSubStates.insert(State_Select, new SES_Select(mEditor));
+    mSubStates.insert(State_Move, new SES_Move(mEditor));
+    mSubStates.insert(State_DrawText, new SES_DrawText(mEditor));
+    mSubStates.insert(State_DrawRect, new SES_DrawRect(mEditor));
+    mSubStates.insert(State_DrawPolygon, new SES_DrawPolygon(mEditor));
+    mSubStates.insert(State_DrawCircle, new SES_DrawCircle(mEditor));
+    mSubStates.insert(State_DrawEllipse, new SES_DrawEllipse(mEditor));
+    mSubStates.insert(State_DrawWire, new SES_DrawWire(mEditor));
+    mSubStates.insert(State_AddComponent, new SES_AddComponents(mEditor));
+
     // go to state "Select"
-    processEvent(new SchematicEditorEvent(SchematicEditorEvent::StartSelect));
+    mCurrentState = State_Select;
+    mSubStates[mCurrentState]->entry(State_Initial);
 }
 
 SchematicEditorFsm::~SchematicEditorFsm() noexcept
@@ -50,71 +71,31 @@ SchematicEditorFsm::~SchematicEditorFsm() noexcept
  *  General Methods
  ****************************************************************************************/
 
-void SchematicEditorFsm::processEvent(QEvent* event) noexcept
+bool SchematicEditorFsm::processEvent(QEvent* event, bool deleteEvent) noexcept
 {
-    switch (static_cast<int>(event->type()))
-    {
-        case SchematicEditorEvent::AbortCommand:
-        case SchematicEditorEvent::StartSelect:
-            mCurrentState = Select;
-            updateToolsToolbar();
-            break;
-        case SchematicEditorEvent::StartMove:
-            mCurrentState = Move;
-            updateToolsToolbar();
-            break;
-        case SchematicEditorEvent::StartDrawWires:
-            mCurrentState = DrawWires;
-            updateToolsToolbar();
-            break;
-        case SchematicEditorEvent::StartAddComponents:
-            mCurrentState = AddComponents;
-            updateToolsToolbar();
-            break;
-        default:
-            break;
-    }
-
-    delete event;
+    event->ignore();
+    process(event); // the "isAccepted" flag is set here if the event was accepted
+    bool accepted = event->isAccepted();
+    if (deleteEvent)
+        delete event;
+    return accepted;
 }
 
-/*****************************************************************************************
- *  Private Helper Methods
- ****************************************************************************************/
-
-void SchematicEditorFsm::updateToolsToolbar()
+SchematicEditorState::State SchematicEditorFsm::process(QEvent* event) noexcept
 {
-    foreach (QAction* action, mEditor.mUi->toolsToolbar->actions())
+    State next = mSubStates[mCurrentState]->process(event);
+
+    if (next != mCurrentState)
     {
-        action->setChecked(false);
-        action->setCheckable(false);
+        Q_ASSERT(mSubStates.contains(next));
+
+        // switch to the next state
+        mSubStates[mCurrentState]->exit(next);
+        mSubStates[next]->entry(mCurrentState);
+        mCurrentState = next;
     }
 
-    QAction* active = 0;
-
-    switch (mCurrentState)
-    {
-        case Select:
-            active = mEditor.mUi->actionToolSelect;
-            break;
-        case Move:
-            active = mEditor.mUi->actionToolMove;
-            break;
-        case DrawWires:
-            active = mEditor.mUi->actionToolDrawWire;
-            break;
-        case AddComponents:
-            active = mEditor.mUi->actionToolAddComponent;
-            break;
-        default:
-            break;
-    }
-
-    if (active)
-    {
-        active->setCheckable(true);
-        active->setChecked(true);
-    }
+    return mCurrentState; // this is not really used...
 }
 
 /*****************************************************************************************

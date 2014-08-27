@@ -17,48 +17,52 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SCHEMATICEDITOREVENT_H
-#define PROJECT_SCHEMATICEDITOREVENT_H
-
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-
-/*****************************************************************************************
- *  Class SchematicEditorEvent
- ****************************************************************************************/
+#include "schematiceditorstate.h"
 
 namespace project {
 
-/**
- * @brief The SchematicEditorEvent class
- */
-class SchematicEditorEvent : public QEvent
+/*****************************************************************************************
+ *  Constructors / Destructor
+ ****************************************************************************************/
+
+SchematicEditorState::SchematicEditorState(SchematicEditor& editor) :
+    QObject(0), mEditor(editor), mCurrentState(State_Initial)
 {
-    public:
+}
 
-        // FSM events (codes used for QEvent::type)
-        enum EventType {
-            _First = QEvent::User, // the first user defined type after all Qt types
-            AbortCommand,
-            StartSelect,
-            StartMove,
-            StartDrawText,
-            StartDrawRect,
-            StartDrawPolygon,
-            StartDrawCircle,
-            StartDrawEllipse,
-            StartDrawWire,
-            StartAddComponent
-        };
+SchematicEditorState::~SchematicEditorState()
+{
+    // exit the current substate
+    if (mSubStates.contains(mCurrentState))
+        mSubStates[mCurrentState]->exit(State_Initial);
 
-        // Constructors / Destructor
-        SchematicEditorEvent(EventType type);
-        virtual ~SchematicEditorEvent();
-};
+    mCurrentState = State_Initial; // switch to an invalid state
+
+    // delete all substates
+    qDeleteAll(mSubStates);     mSubStates.clear();
+}
+
+/*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+void SchematicEditorState::entry(State previousState) noexcept
+{
+    Q_UNUSED(previousState);
+}
+
+void SchematicEditorState::exit(State nextState) noexcept
+{
+    Q_UNUSED(nextState);
+}
+
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
 } // namespace project
-
-#endif // PROJECT_SCHEMATICEDITOREVENT_H

@@ -33,7 +33,6 @@
 #include "schematicpagesdock.h"
 #include "unplacedsymbolsdock.h"
 #include "fsm/schematiceditorfsm.h"
-#include "fsm/schematiceditorevent.h"
 
 namespace project {
 
@@ -61,20 +60,6 @@ SchematicEditor::SchematicEditor(Workspace& workspace, Project& project) :
     connect(mUi->actionZoom_Out, SIGNAL(triggered()), mUi->graphicsView, SLOT(zoomOut()));
     connect(mUi->actionZoom_All, SIGNAL(triggered()), mUi->graphicsView, SLOT(zoomAll()));
 
-    // connect the "tools" toolbar with the state machine
-    connect(mUi->actionToolSelect, &QAction::triggered,
-            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::StartSelect));});
-    connect(mUi->actionToolMove, &QAction::triggered,
-            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::StartMove));});
-    connect(mUi->actionToolDrawWire, &QAction::triggered,
-            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::StartDrawWires));});
-    connect(mUi->actionToolAddComponent, &QAction::triggered,
-            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::StartAddComponents));});
-
-    // connect the "command" toolbar with the state machine
-    connect(mUi->actionCommandAbort, &QAction::triggered,
-            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::AbortCommand));});
-
     // connect the undo/redo actions with the UndoStack of the project
     connect(&mProject.getUndoStack(), &UndoStack::undoTextChanged,
             [this](const QString& text){mUi->actionUndo->setText(text);});
@@ -89,6 +74,42 @@ SchematicEditor::SchematicEditor(Workspace& workspace, Project& project) :
             mUi->actionRedo, SLOT(setEnabled(bool)));
     mUi->actionRedo->setEnabled(mProject.getUndoStack().canRedo());
 
+    mFsm = new SchematicEditorFsm(*this);
+
+    // connect the "tools" toolbar with the state machine (the second line of the lambda
+    // functions is a workaround to set the checked attribute of the QActions properly)
+    connect(mUi->actionToolSelect, &QAction::triggered,
+            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::StartSelect), true);
+                     mUi->actionToolSelect->setChecked(mUi->actionToolSelect->isCheckable());});
+    connect(mUi->actionToolMove, &QAction::triggered,
+            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::StartMove), true);
+                     mUi->actionToolMove->setChecked(mUi->actionToolMove->isCheckable());});
+    connect(mUi->actionToolDrawText, &QAction::triggered,
+            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::StartDrawText), true);
+                     mUi->actionToolDrawText->setChecked(mUi->actionToolDrawText->isCheckable());});
+    connect(mUi->actionToolDrawRectangle, &QAction::triggered,
+            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::StartDrawRect), true);
+                     mUi->actionToolDrawRectangle->setChecked(mUi->actionToolDrawRectangle->isCheckable());});
+    connect(mUi->actionToolDrawPolygon, &QAction::triggered,
+            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::StartDrawPolygon), true);
+                     mUi->actionToolDrawPolygon->setChecked(mUi->actionToolDrawPolygon->isCheckable());});
+    connect(mUi->actionToolDrawCircle, &QAction::triggered,
+            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::StartDrawCircle), true);
+                     mUi->actionToolDrawCircle->setChecked(mUi->actionToolDrawCircle->isCheckable());});
+    connect(mUi->actionToolDrawEllipse, &QAction::triggered,
+            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::StartDrawEllipse), true);
+                     mUi->actionToolDrawEllipse->setChecked(mUi->actionToolDrawEllipse->isCheckable());});
+    connect(mUi->actionToolDrawWire, &QAction::triggered,
+            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::StartDrawWire), true);
+                     mUi->actionToolDrawWire->setChecked(mUi->actionToolDrawWire->isCheckable());});
+    connect(mUi->actionToolAddComponent, &QAction::triggered,
+            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::StartAddComponent), true);
+                     mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());});
+
+    // connect the "command" toolbar with the state machine
+    connect(mUi->actionCommandAbort, &QAction::triggered,
+            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::AbortCommand), true);});
+
     // Restore Window Geometry
     QSettings s(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(), QSettings::IniFormat);
     restoreGeometry(s.value("schematic_editor/window_geometry").toByteArray());
@@ -98,8 +119,6 @@ SchematicEditor::SchematicEditor(Workspace& workspace, Project& project) :
     mUi->graphicsView->setGridType(CADView::gridLines);
     if (mProject.getSchematicCount() > 0)
         mUi->graphicsView->setScene(mProject.getSchematicByIndex(0));
-
-    mFsm = new SchematicEditorFsm(*this);
 }
 
 SchematicEditor::~SchematicEditor()

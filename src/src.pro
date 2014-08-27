@@ -106,7 +106,17 @@ SOURCES += \
     project/schematics/cmd/cmdschematicremove.cpp \
     project/schematics/unplacedsymbolsdock.cpp \
     project/schematics/fsm/schematiceditorfsm.cpp \
-    project/schematics/fsm/schematiceditorevent.cpp
+    project/schematics/fsm/schematiceditorevent.cpp \
+    project/schematics/fsm/schematiceditorstate.cpp \
+    project/schematics/fsm/ses_select.cpp \
+    project/schematics/fsm/ses_move.cpp \
+    project/schematics/fsm/ses_drawtext.cpp \
+    project/schematics/fsm/ses_drawrect.cpp \
+    project/schematics/fsm/ses_drawpolygon.cpp \
+    project/schematics/fsm/ses_drawcircle.cpp \
+    project/schematics/fsm/ses_drawellipse.cpp \
+    project/schematics/fsm/ses_drawwire.cpp \
+    project/schematics/fsm/ses_addcomponents.cpp
 
 HEADERS += \
     common/units.h \
@@ -162,7 +172,17 @@ HEADERS += \
     project/schematics/cmd/cmdschematicremove.h \
     project/schematics/unplacedsymbolsdock.h \
     project/schematics/fsm/schematiceditorfsm.h \
-    project/schematics/fsm/schematiceditorevent.h
+    project/schematics/fsm/schematiceditorevent.h \
+    project/schematics/fsm/schematiceditorstate.h \
+    project/schematics/fsm/ses_select.h \
+    project/schematics/fsm/ses_move.h \
+    project/schematics/fsm/ses_drawtext.h \
+    project/schematics/fsm/ses_drawrect.h \
+    project/schematics/fsm/ses_drawpolygon.h \
+    project/schematics/fsm/ses_drawcircle.h \
+    project/schematics/fsm/ses_drawellipse.h \
+    project/schematics/fsm/ses_drawwire.h \
+    project/schematics/fsm/ses_addcomponents.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \
