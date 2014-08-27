@@ -39,7 +39,7 @@ qreal CADView::sZoomFactor = 1.15;
 
 CADView::CADView(QWidget* parent) :
     QGraphicsView(parent),
-    mGridType(noGrid), mGridColor(Qt::lightGray)
+    mGridType(noGrid), mGridColor(Qt::lightGray), mOriginCrossColor(Qt::black)
 {
     setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing| QPainter::SmoothPixmapTransform);
     //setViewport(new QGLWidget(QGLFormat(QGL::DoubleBuffer | QGL::AlphaChannel | QGL::SampleBuffers)));
@@ -122,6 +122,7 @@ void CADView::drawBackground(QPainter* painter, const QRectF& rect)
     // draw background color
     painter->fillRect(rect, backgroundBrush());
 
+    // draw background grid lines
     if (scaleFactor >= (qreal)0.5)
     {
         switch (mGridType)
@@ -157,6 +158,13 @@ void CADView::drawBackground(QPainter* painter, const QRectF& rect)
                 break;
         }
     }
+
+    // draw origin cross
+    QPen originPen(mOriginCrossColor);
+    originPen.setWidth(0);
+    painter->setPen(originPen);
+    painter->drawLine(-21.6, 0, 21.6, 0);
+    painter->drawLine(0, -21.6, 0, 21.6);
 }
 
 void CADView::wheelEvent(QWheelEvent* event)
@@ -188,8 +196,15 @@ void CADView::mouseMoveEvent(QMouseEvent* event)
     {
         try
         {
-            Point pos = Point::fromPx(mapToScene(event->pos()));
-            emit mousePosChanged(pos);
+            Point pos = Point::fromPx(mapToScene(event->pos()),
+                                      getCadScene()->getGridInterval());
+
+            // emit the signal only if the position has really changed
+            if (pos != mLastMouseMoveEventPos)
+            {
+                emit mousePosChanged(pos);
+                mLastMouseMoveEventPos = pos;
+            }
         }
         catch (...)
         {

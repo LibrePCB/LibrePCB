@@ -98,6 +98,9 @@ class CADView : public QGraphicsView
 
         GridType mGridType;
         QColor mGridColor;
+        QColor mOriginCrossColor;
+
+        Point mLastMouseMoveEventPos;
 
         // Static Variables
         static qreal sZoomFactor;

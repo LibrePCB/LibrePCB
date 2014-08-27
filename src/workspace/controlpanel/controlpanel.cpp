@@ -180,6 +180,17 @@ void ControlPanel::on_actionClose_all_open_projects_triggered()
     mWorkspace.closeAllProjects(true);
 }
 
+void ControlPanel::on_actionSwitch_Workspace_triggered()
+{
+    FilePath wsPath = Workspace::chooseWorkspacePath();
+    if (!wsPath.isValid())
+        return;
+
+    Workspace::setMostRecentlyUsedWorkspacePath(wsPath);
+    QMessageBox::information(this, tr("Workspace changed"),
+        tr("The chosen workspace will be used after restarting the application."));
+}
+
 void ControlPanel::on_projectTreeView_clicked(const QModelIndex& index)
 {
     ProjectTreeItem* item = static_cast<ProjectTreeItem*>(index.internalPointer());
