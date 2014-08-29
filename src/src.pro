@@ -116,7 +116,9 @@ SOURCES += \
     project/schematics/fsm/ses_drawcircle.cpp \
     project/schematics/fsm/ses_drawellipse.cpp \
     project/schematics/fsm/ses_drawwire.cpp \
-    project/schematics/fsm/ses_addcomponents.cpp
+    project/schematics/fsm/ses_addcomponents.cpp \
+    project/schematics/schematicnetpoint.cpp \
+    project/schematics/schematicnetline.cpp
 
 HEADERS += \
     common/units.h \
@@ -182,7 +184,9 @@ HEADERS += \
     project/schematics/fsm/ses_drawcircle.h \
     project/schematics/fsm/ses_drawellipse.h \
     project/schematics/fsm/ses_drawwire.h \
-    project/schematics/fsm/ses_addcomponents.h
+    project/schematics/fsm/ses_addcomponents.h \
+    project/schematics/schematicnetpoint.h \
+    project/schematics/schematicnetline.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \

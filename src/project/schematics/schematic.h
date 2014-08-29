@@ -38,6 +38,8 @@ class XmlFile;
 namespace project {
 class Project;
 class SymbolInstance;
+class SchematicNetPoint;
+class SchematicNetLine;
 }
 
 /*****************************************************************************************
@@ -63,12 +65,26 @@ class Schematic final : public CADScene
                            throw (Exception);
         ~Schematic() noexcept;
 
-        // Getters
+        // Getters: Attributes
         const FilePath& getFilePath() const noexcept {return mFilePath;}
         Project& getProject() const noexcept {return mProject;}
         const QUuid& getUuid() const noexcept {return mUuid;}
         const QString& getName() const noexcept {return mName;}
         const QIcon& getIcon() const noexcept {return mIcon;}
+
+        // SchematicNetPoint Methods
+        SchematicNetPoint* getNetPointByUuid(const QUuid& uuid) const noexcept;
+        SchematicNetPoint* createNetPoint(const QUuid& netsignal) throw (Exception);
+        void addNetPoint(SchematicNetPoint* netpoint, bool toDomTree = true) throw (Exception);
+        void removeNetPoint(SchematicNetPoint* netpoint, bool fromDomTree = true,
+                            bool deleteNetPoint = false) throw (Exception);
+
+        // SchematicNetLine Methods
+        SchematicNetLine* getNetLineByUuid(const QUuid& uuid) const noexcept;
+        SchematicNetLine* createNetLine(const QUuid& startPoint, const QUuid& endPoint) throw (Exception);
+        void addNetLine(SchematicNetLine* netline, bool toDomTree = true) throw (Exception);
+        void removeNetLine(SchematicNetLine* netline, bool fromDomTree = true,
+                           bool deleteNetLine = false) throw (Exception);
 
         // General Methods
         void removeFiles() const throw (Exception);
@@ -99,7 +115,8 @@ class Schematic final : public CADScene
         QIcon mIcon;
 
         QHash<QUuid, SymbolInstance*> mSymbols;
-
+        QHash<QUuid, SchematicNetPoint*> mNetPoints;
+        QHash<QUuid, SchematicNetLine*> mNetLines;
 };
 
 } // namespace project

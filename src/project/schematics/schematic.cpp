@@ -26,6 +26,8 @@
 #include "../../common/xmlfile.h"
 #include "../project.h"
 #include "symbolinstance.h"
+#include "schematicnetpoint.h"
+#include "schematicnetline.h"
 
 namespace project {
 
@@ -71,11 +73,33 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore)
             tmpNode = tmpNode.nextSiblingElement("symbol");
         }
 
+        // Load all netpoints
+        tmpNode = mXmlFile->getRoot().firstChildElement("netpoints").firstChildElement("netpoint");
+        while (!tmpNode.isNull())
+        {
+            SchematicNetPoint* netpoint = new SchematicNetPoint(*this, tmpNode);
+            addNetPoint(netpoint, false);
+            tmpNode = tmpNode.nextSiblingElement("netpoint");
+        }
+
+        // Load all netlines
+        tmpNode = mXmlFile->getRoot().firstChildElement("netlines").firstChildElement("netline");
+        while (!tmpNode.isNull())
+        {
+            SchematicNetLine* netline = new SchematicNetLine(*this, tmpNode);
+            addNetLine(netline, false);
+            tmpNode = tmpNode.nextSiblingElement("netline");
+        }
+
         updateIcon();
     }
     catch (...)
     {
         // free the allocated memory in the reverse order of their allocation...
+        foreach (SchematicNetLine* netline, mNetLines)
+            try { removeNetLine(netline, false, true); } catch (...) {}
+        foreach (SchematicNetPoint* netpoint, mNetPoints)
+            try { removeNetPoint(netpoint, false, true); } catch (...) {}
         qDeleteAll(mSymbols);           mSymbols.clear();
         delete mXmlFile;                mXmlFile = 0;
         throw; // ...and rethrow the exception
@@ -84,8 +108,118 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore)
 
 Schematic::~Schematic()
 {
+    // delete all netlines (and catch all throwed exceptions)
+    foreach (SchematicNetLine* netline, mNetLines)
+        try { removeNetLine(netline, false, true); } catch (...) {}
+    // delete all netpoints (and catch all throwed exceptions)
+    foreach (SchematicNetPoint* netpoint, mNetPoints)
+        try { removeNetPoint(netpoint, false, true); } catch (...) {}
+
     qDeleteAll(mSymbols);           mSymbols.clear();
     delete mXmlFile;                mXmlFile = 0;
+}
+
+/*****************************************************************************************
+ *  SchematicNetPoint Methods
+ ****************************************************************************************/
+
+SchematicNetPoint* Schematic::getNetPointByUuid(const QUuid& uuid) const noexcept
+{
+    return mNetPoints.value(uuid, 0);
+}
+
+SchematicNetPoint* Schematic::createNetPoint(const QUuid& netsignal) throw (Exception)
+{
+    return SchematicNetPoint::create(*this, mXmlFile->getDocument(), netsignal);
+}
+
+void Schematic::addNetPoint(SchematicNetPoint* netpoint, bool toDomTree) throw (Exception)
+{
+    Q_CHECK_PTR(netpoint);
+
+    // check if there is no netpoint with the same uuid in the list
+    if (getNetPointByUuid(netpoint->getUuid()))
+    {
+        throw RuntimeError(__FILE__, __LINE__, netpoint->getUuid().toString(),
+            QString(tr("There is already a netpoint with the UUID \"%1\"!"))
+            .arg(netpoint->getUuid().toString()));
+    }
+
+    QDomElement parent = mXmlFile->getRoot().firstChildElement("netpoints");
+    netpoint->addToSchematic(*this, toDomTree, parent); // can throw an exception
+
+    mNetPoints.insert(netpoint->getUuid(), netpoint);
+}
+
+void Schematic::removeNetPoint(SchematicNetPoint* netpoint, bool fromDomTree,
+                               bool deleteNetPoint) throw (Exception)
+{
+    Q_CHECK_PTR(netpoint);
+    Q_ASSERT(mNetPoints.contains(netpoint->getUuid()));
+
+    // the netpoint cannot be removed if there are already netlines connected to it!
+    if (netpoint->getLinesCount() > 0)
+    {
+        throw RuntimeError(__FILE__, __LINE__, QString("%1:%2")
+            .arg(netpoint->getUuid().toString()).arg(netpoint->getLinesCount()),
+            QString(tr("There are already netlines connected to the netpoint \"%1\"!"))
+            .arg(netpoint->getUuid().toString()));
+    }
+
+    QDomElement parent = mXmlFile->getRoot().firstChildElement("netpoints");
+    netpoint->removeFromSchematic(*this, fromDomTree, parent); // can throw an exception
+
+    mNetPoints.remove(netpoint->getUuid());
+
+    if (deleteNetPoint)
+        delete netpoint;
+}
+
+/*****************************************************************************************
+ *  SchematicNetLine Methods
+ ****************************************************************************************/
+
+SchematicNetLine* Schematic::getNetLineByUuid(const QUuid& uuid) const noexcept
+{
+    return mNetLines.value(uuid, 0);
+}
+
+SchematicNetLine* Schematic::createNetLine(const QUuid& startPoint, const QUuid& endPoint) throw (Exception)
+{
+    return SchematicNetLine::create(*this, mXmlFile->getDocument(), startPoint, endPoint);
+}
+
+void Schematic::addNetLine(SchematicNetLine* netline, bool toDomTree) throw (Exception)
+{
+    Q_CHECK_PTR(netline);
+
+    // check if there is no netline with the same uuid in the list
+    if (getNetLineByUuid(netline->getUuid()))
+    {
+        throw RuntimeError(__FILE__, __LINE__, netline->getUuid().toString(),
+            QString(tr("There is already a netline with the UUID \"%1\"!"))
+            .arg(netline->getUuid().toString()));
+    }
+
+    QDomElement parent = mXmlFile->getRoot().firstChildElement("netlines");
+    netline->addToSchematic(*this, toDomTree, parent); // can throw an exception
+
+    mNetLines.insert(netline->getUuid(), netline);
+}
+
+void Schematic::removeNetLine(SchematicNetLine* netline, bool fromDomTree,
+                              bool deleteNetLine) throw (Exception)
+{
+    Q_CHECK_PTR(netline);
+    Q_ASSERT(mNetLines.contains(netline->getUuid()));
+
+    QDomElement parent = mXmlFile->getRoot().firstChildElement("netlines");
+    netline->removeFromSchematic(*this, fromDomTree, parent); // can throw an exception
+
+    mNetLines.remove(netline->getUuid());
+
+    if (deleteNetLine)
+        delete netline;
 }
 
 /*****************************************************************************************

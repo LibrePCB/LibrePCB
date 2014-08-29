@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Schematic Editor</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../../../img/images.qrc">
+    <normaloff>:/img/actions/schematic.png</normaloff>:/img/actions/schematic.png</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <property name="leftMargin">

@@ -11,7 +11,9 @@
         <attribute name="VERSION" type="text">0.1</attribute>
     </attributes>
     <symbols>
-        <symbol uuid="{8a1f9e05-c711-4af4-9a7b-b1a585d6e4ed}" gen_comp_instance="{7fe07dd4-aaee-4a28-ae35-d22c2904a462}" symbol_item="{6bd99bbf-7d36-457f-ae93-8b06b869ee4b}" x="0" y="0" angle="0" mirror="false"/>
+        <symbol uuid="{8a1f9e05-c711-4af4-9a7b-b1a585d6e4ed}" gen_comp_instance="{7fe07dd4-aaee-4a28-ae35-d22c2904a462}" symbol_item="{6bd99bbf-7d36-457f-ae93-8b06b869ee4b}">
+            <position x="0" y="0" angle="0" mirror="false"/>
+        </symbol>
     </symbols>
     <netpoints/>
     <netlines/>
