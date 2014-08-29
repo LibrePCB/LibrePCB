@@ -25,6 +25,8 @@
  ****************************************************************************************/
 
 #include <QObject>
+#include "common/xmlfile.h"
+#include "common/filepath.h"
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -48,15 +50,28 @@ class LibraryBaseElement : public QObject
     public:
 
         // Constructors / Destructor
-        explicit LibraryBaseElement(Workspace* workspace, const QString& xmlFilename,
-                                const QString& xmlRootNodeName);
+        explicit LibraryBaseElement(Workspace* workspace, const FilePath& xmlFilePath,
+                                    const QString& xmlRootNodeName);
         virtual ~LibraryBaseElement();
+
+        // Getters
+
+        const QUuid& getUuid() const {return mUuid;}
+        const QString& getVersion() const {return mVersion;}
+        const QString& getAuthor() const {return mAuthor;}
+        const QDateTime& getCreated() const {return mCreated;}
+        const QDateTime& getLastModified() const {return mLastModified;}
+        const QUuid& getCategoryUuid() const {return mCategoryUuid;}
+        QString getName(const QString& locale = QString()) const;
+        QString getDescription(const QString& locale = QString()) const;
+        QString getKeywords(const QString& locale = QString()) const;
+        const QHash<QString, QString>& getNames() const {return mNames;}
+        const QHash<QString, QString>& getDescriptions() const {return mDescriptions;}
+        const QHash<QString, QString>& getKeywords() const {return mKeywords;}
 
     protected:
 
         // General
-        Workspace* mWorkspace;
-        QString mXmlFilename;
 
     private:
 
@@ -64,6 +79,20 @@ class LibraryBaseElement : public QObject
         LibraryBaseElement();
         LibraryBaseElement(const LibraryBaseElement& other);
         LibraryBaseElement& operator=(const LibraryBaseElement& rhs);
+
+        Workspace* mWorkspace;
+        XmlFile* mXmlFile;
+
+        //General Attributes
+        QUuid mUuid;
+        QString mVersion;
+        QString mAuthor;
+        QDateTime mCreated;
+        QDateTime mLastModified;
+        QUuid mCategoryUuid;
+        QHash<QString, QString> mNames;
+        QHash<QString, QString> mDescriptions;
+        QHash<QString, QString> mKeywords;
 };
 
 } // namespace library

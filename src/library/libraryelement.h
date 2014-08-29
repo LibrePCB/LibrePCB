@@ -50,7 +50,7 @@ class LibraryElement : public LibraryBaseElement
     public:
 
         // Constructors / Destructor
-        explicit LibraryElement(Workspace* workspace, const QString& xmlFilename,
+        explicit LibraryElement(Workspace* workspace, const FilePath& xmlFilePath,
                                 const QString& xmlRootNodeName);
         virtual ~LibraryElement();
 

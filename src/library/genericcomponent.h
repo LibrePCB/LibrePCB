@@ -42,7 +42,7 @@ class GenericComponent : public LibraryElement
 
     public:
 
-        explicit GenericComponent(Workspace* workspace, const QString& xmlFilename);
+        explicit GenericComponent(Workspace* workspace, const FilePath& xmlFilePath);
         virtual ~GenericComponent();
 
     private:

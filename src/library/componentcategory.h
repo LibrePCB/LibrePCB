@@ -42,7 +42,7 @@ class ComponentCategory : public LibraryElement
 
     public:
 
-        explicit ComponentCategory(Workspace* workspace, const QString& xmlFilename);
+        explicit ComponentCategory(Workspace* workspace, const FilePath& xmlFilePath);
         virtual ~ComponentCategory();
 
     private:

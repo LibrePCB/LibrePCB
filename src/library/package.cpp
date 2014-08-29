@@ -30,8 +30,8 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Package::Package(Workspace* workspace, const QString& xmlFilename) :
-    LibraryElement(workspace, xmlFilename, "package")
+Package::Package(Workspace* workspace, const FilePath& xmlFilePath) :
+    LibraryElement(workspace, xmlFilePath, "package")
 {
 }
 

@@ -30,8 +30,8 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SpiceModel::SpiceModel(Workspace* workspace, const QString& xmlFilename) :
-    LibraryElement(workspace, xmlFilename, "spice_model")
+SpiceModel::SpiceModel(Workspace* workspace, const FilePath& xmlFilePath) :
+    LibraryElement(workspace, xmlFilePath, "spice_model")
 {
 }
 

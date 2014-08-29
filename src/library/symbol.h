@@ -42,7 +42,7 @@ class Symbol : public LibraryElement
 
     public:
 
-        explicit Symbol(Workspace* workspace, const QString& xmlFilename);
+        explicit Symbol(Workspace* workspace, const FilePath& xmlFilePath);
         virtual ~Symbol();
 
     private:

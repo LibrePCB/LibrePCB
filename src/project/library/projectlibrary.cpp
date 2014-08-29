@@ -183,7 +183,7 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
             // try loading the library element
             try
             {
-                ElementType* element = new ElementType(&mWorkspace, filepath.toStr());
+                ElementType* element = new ElementType(&mWorkspace, filepath);
 
                 /// @todo
                 /*if (element->getUuid() != dirUuid)

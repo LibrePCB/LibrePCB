@@ -42,7 +42,7 @@ class PackageCategory : public LibraryElement
 
     public:
 
-        explicit PackageCategory(Workspace* workspace, const QString& xmlFilename);
+        explicit PackageCategory(Workspace* workspace, const FilePath& xmlFilePath);
         virtual ~PackageCategory();
 
     private:

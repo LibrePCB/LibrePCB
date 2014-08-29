@@ -42,7 +42,7 @@ class Model : public LibraryElement
 
     public:
 
-        explicit Model(Workspace* workspace, const QString& xmlFilename);
+        explicit Model(Workspace* workspace, const FilePath& xmlFilePath);
         virtual ~Model();
 
     private:
