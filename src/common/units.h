@@ -431,7 +431,7 @@ class Length
 
 // Non-Member Functions
 QDataStream& operator<<(QDataStream& stream, const Length& length);
-QDebug& operator<<(QDebug& stream, const Length& length);
+QDebug operator<<(QDebug stream, const Length& length);
 
 /*****************************************************************************************
  *  Class Angle
@@ -636,7 +636,7 @@ class Angle
 
 // Non-Member Functions
 QDataStream& operator<<(QDataStream& stream, const Angle& angle);
-QDebug& operator<<(QDebug& stream, const Angle& angle);
+QDebug operator<<(QDebug stream, const Angle& angle);
 
 /*****************************************************************************************
  *  Class Point
@@ -888,6 +888,6 @@ class Point
 
 // Non-Member Functions
 QDataStream& operator<<(QDataStream& stream, const Point& point);
-QDebug& operator<<(QDebug& stream, const Point& point);
+QDebug operator<<(QDebug stream, const Point& point);
 
 #endif // UNITS_H

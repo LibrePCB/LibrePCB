@@ -158,6 +158,14 @@ void CADView::drawBackground(QPainter* painter, const QRectF& rect)
                 break;
         }
     }
+}
+
+void CADView::drawForeground(QPainter* painter, const QRectF& rect)
+{
+    Q_UNUSED(rect);
+
+    if (!getCadScene())
+        return;
 
     // draw origin cross
     QPen originPen(mOriginCrossColor);

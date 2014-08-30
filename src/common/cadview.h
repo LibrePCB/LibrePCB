@@ -82,6 +82,7 @@ class CADView : public QGraphicsView
 
         // Inherited Methods
         virtual void drawBackground(QPainter* painter, const QRectF& rect);
+        virtual void drawForeground(QPainter* painter, const QRectF& rect);
         virtual void wheelEvent(QWheelEvent* event);
         virtual void mouseMoveEvent(QMouseEvent* event);
 

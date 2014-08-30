@@ -193,7 +193,7 @@ QDataStream& operator<<(QDataStream& stream, const Length& length)
     return stream;
 }
 
-QDebug& operator<<(QDebug& stream, const Length& length)
+QDebug operator<<(QDebug stream, const Length& length)
 {
     stream << QString("Length(%1mm)").arg(length.toMm());
     return stream;
@@ -256,7 +256,7 @@ QDataStream& operator<<(QDataStream& stream, const Angle& angle)
     return stream;
 }
 
-QDebug& operator<<(QDebug& stream, const Angle& angle)
+QDebug operator<<(QDebug stream, const Angle& angle)
 {
     stream << QString("Angle(%1°)").arg(angle.toDeg());
     return stream;
@@ -344,7 +344,7 @@ QDataStream& operator<<(QDataStream& stream, const Point& point)
     return stream;
 }
 
-QDebug& operator<<(QDebug& stream, const Point& point)
+QDebug operator<<(QDebug stream, const Point& point)
 {
     stream << QString("Point(%1mm, %2mm)").arg(point.toMmQPointF().x()).arg(point.toMmQPointF().y());
     return stream;
