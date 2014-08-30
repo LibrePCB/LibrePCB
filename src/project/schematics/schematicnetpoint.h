@@ -37,6 +37,7 @@ class QGraphicsEllipseItem;
 
 namespace project {
 class Schematic;
+class NetSignal;
 class SchematicNetLine;
 }
 
@@ -66,6 +67,8 @@ class SchematicNetPoint final : public QObject
         int getLinesCount() const noexcept {return mLines.count();}
 
         // General Methods
+        void registerNetLine(SchematicNetLine* netline) noexcept;
+        void unregisterNetLine(SchematicNetLine* netline) noexcept;
         void addToSchematic(Schematic& schematic, bool addNode,
                             QDomElement& parent) throw (Exception);
         void removeFromSchematic(Schematic& schematic, bool removeNode,
@@ -89,6 +92,7 @@ class SchematicNetPoint final : public QObject
 
         // Attributes
         QUuid mUuid;
+        NetSignal* mNetSignal;
         bool mAttached;
         Point mPosition;
 

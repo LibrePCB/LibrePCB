@@ -62,11 +62,9 @@ SchematicNetLine::SchematicNetLine(Schematic& schematic, const QDomElement& domE
             .arg(mDomElement.attribute("end_point")));
     }
 
-    QLineF line(mStartPoint->getPosition().toPxQPointF(),
-                mEndPoint->getPosition().toPxQPointF());
+
     mItem = new QGraphicsLineItem();
     mItem->setPen(QPen(Qt::darkGreen, 1));
-    mItem->setLine(line);
 }
 
 SchematicNetLine::~SchematicNetLine() noexcept
@@ -77,6 +75,13 @@ SchematicNetLine::~SchematicNetLine() noexcept
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
+
+void SchematicNetLine::updateLine() noexcept
+{
+    QLineF line(mStartPoint->getPosition().toPxQPointF(),
+                mEndPoint->getPosition().toPxQPointF());
+    mItem->setLine(line);
+}
 
 void SchematicNetLine::addToSchematic(Schematic& schematic, bool addNode,
                                       QDomElement& parent) throw (Exception)
@@ -91,6 +96,8 @@ void SchematicNetLine::addToSchematic(Schematic& schematic, bool addNode,
     }
 
     schematic.addItem(mItem);
+    mStartPoint->registerNetLine(this);
+    mEndPoint->registerNetLine(this);
 }
 
 void SchematicNetLine::removeFromSchematic(Schematic& schematic, bool removeNode,
@@ -105,6 +112,8 @@ void SchematicNetLine::removeFromSchematic(Schematic& schematic, bool removeNode
             throw LogicError(__FILE__, __LINE__, QString(), tr("Could not remove node from DOM tree!"));
     }
 
+    mStartPoint->unregisterNetLine(this);
+    mEndPoint->unregisterNetLine(this);
     schematic.removeItem(mItem);
 }
 

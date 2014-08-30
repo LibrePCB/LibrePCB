@@ -69,7 +69,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore)
         while (!tmpNode.isNull())
         {
             SymbolInstance* symbol = new SymbolInstance(*this, tmpNode);
-            mSymbols.insert(symbol->getUuid(), symbol);
+            addSymbol(symbol, false);
             tmpNode = tmpNode.nextSiblingElement("symbol");
         }
 
@@ -100,7 +100,8 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore)
             try { removeNetLine(netline, false, true); } catch (...) {}
         foreach (SchematicNetPoint* netpoint, mNetPoints)
             try { removeNetPoint(netpoint, false, true); } catch (...) {}
-        qDeleteAll(mSymbols);           mSymbols.clear();
+        foreach (SymbolInstance* symbol, mSymbols)
+            try { removeSymbol(symbol, false, true); } catch (...) {}
         delete mXmlFile;                mXmlFile = 0;
         throw; // ...and rethrow the exception
     }
@@ -114,9 +115,68 @@ Schematic::~Schematic()
     // delete all netpoints (and catch all throwed exceptions)
     foreach (SchematicNetPoint* netpoint, mNetPoints)
         try { removeNetPoint(netpoint, false, true); } catch (...) {}
+    // delete all symbols (and catch all throwed exceptions)
+    foreach (SymbolInstance* symbol, mSymbols)
+        try { removeSymbol(symbol, false, true); } catch (...) {}
 
-    qDeleteAll(mSymbols);           mSymbols.clear();
     delete mXmlFile;                mXmlFile = 0;
+}
+
+/*****************************************************************************************
+ *  SymbolInstance Methods
+ ****************************************************************************************/
+
+SymbolInstance* Schematic::getSymbolByUuid(const QUuid& uuid) const noexcept
+{
+    return mSymbols.value(uuid, 0);
+}
+
+SymbolInstance* Schematic::createSymbol(const QUuid& genCompInstance,
+                                        const QUuid& symbolItem) throw (Exception)
+{
+    return SymbolInstance::create(*this, mXmlFile->getDocument(), genCompInstance, symbolItem);
+}
+
+void Schematic::addSymbol(SymbolInstance* symbol, bool toDomTree) throw (Exception)
+{
+    Q_CHECK_PTR(symbol);
+
+    // check if there is no symbol with the same uuid in the list
+    if (getSymbolByUuid(symbol->getUuid()))
+    {
+        throw RuntimeError(__FILE__, __LINE__, symbol->getUuid().toString(),
+            QString(tr("There is already a symbol with the UUID \"%1\"!"))
+            .arg(symbol->getUuid().toString()));
+    }
+
+    QDomElement parent = mXmlFile->getRoot().firstChildElement("symbols");
+    symbol->addToSchematic(*this, toDomTree, parent); // can throw an exception
+
+    mSymbols.insert(symbol->getUuid(), symbol);
+}
+
+void Schematic::removeSymbol(SymbolInstance* symbol, bool fromDomTree,
+                             bool deleteSymbol) throw (Exception)
+{
+    Q_CHECK_PTR(symbol);
+    Q_ASSERT(mSymbols.contains(symbol->getUuid()));
+
+    // the symbol cannot be removed if there are already netpoints connected to it!
+    /*if (symbol->getNetPointCount() > 0)
+    {
+        throw RuntimeError(__FILE__, __LINE__, QString("%1:%2")
+            .arg(symbol->getUuid().toString()).arg(symbol->getNetPointCount()),
+            QString(tr("There are already netpoints connected to the symbol \"%1\"!"))
+            .arg(symbol->getUuid().toString()));
+    }*/
+
+    QDomElement parent = mXmlFile->getRoot().firstChildElement("symbols");
+    symbol->removeFromSchematic(*this, fromDomTree, parent); // can throw an exception
+
+    mSymbols.remove(symbol->getUuid());
+
+    if (deleteSymbol)
+        delete symbol;
 }
 
 /*****************************************************************************************
@@ -254,16 +314,13 @@ bool Schematic::save(bool toOriginal, QStringList& errors) noexcept
 
 void Schematic::updateIcon() noexcept
 {
-    QRectF rect;
-    if (items().count() > 0)
-        rect = itemsBoundingRect();
-    else
-        rect = QRectF(0, 0, 300, 200);
+    QRectF source = itemsBoundingRect().adjusted(-20, -20, 20, 20);
+    QRect target(0, 0, 297, 210); // DIN A4 format :-)
 
-    QPixmap pixmap(rect.size().toSize());
+    QPixmap pixmap(target.size());
     pixmap.fill(Qt::white);
     QPainter painter(&pixmap);
-    render(&painter, QRectF(), rect);
+    render(&painter, target, source);
     mIcon = QIcon(pixmap);
 }
 

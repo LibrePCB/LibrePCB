@@ -42,12 +42,12 @@ namespace project {
 
 SchematicEditor::SchematicEditor(Workspace& workspace, Project& project) :
     QMainWindow(0), mWorkspace(workspace), mProject(project), mUi(new Ui::SchematicEditor),
-    mPagesDock(0), mUnplacedSymbolsDock(0), mFsm(0)
+    mActiveSchematicIndex(-1), mPagesDock(0), mUnplacedSymbolsDock(0), mFsm(0)
 {
     mUi->setupUi(this);
 
     // Add Dock Widgets
-    mPagesDock = new SchematicPagesDock(mProject);
+    mPagesDock = new SchematicPagesDock(mProject, *this);
     addDockWidget(Qt::LeftDockWidgetArea, mPagesDock, Qt::Vertical);
     mUnplacedSymbolsDock = new UnplacedSymbolsDock(mProject);
     addDockWidget(Qt::RightDockWidgetArea, mUnplacedSymbolsDock, Qt::Vertical);
@@ -118,7 +118,7 @@ SchematicEditor::SchematicEditor(Workspace& workspace, Project& project) :
     // Load first schematic page
     mUi->graphicsView->setGridType(CADView::gridLines);
     if (mProject.getSchematicCount() > 0)
-        mUi->graphicsView->setScene(mProject.getSchematicByIndex(0));
+        setActiveSchematicIndex(0);
 }
 
 SchematicEditor::~SchematicEditor()
@@ -132,6 +132,21 @@ SchematicEditor::~SchematicEditor()
     delete mUnplacedSymbolsDock;    mUnplacedSymbolsDock = 0;
     delete mPagesDock;              mPagesDock = 0;
     delete mUi;                     mUi = 0;
+}
+
+/*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
+
+void SchematicEditor::setActiveSchematicIndex(int index)
+{
+    if (index == mActiveSchematicIndex)
+        return;
+
+    mUi->graphicsView->setScene(mProject.getSchematicByIndex(index));
+
+    emit activeSchematicChanged(mActiveSchematicIndex, index);
+    mActiveSchematicIndex = index;
 }
 
 /*****************************************************************************************

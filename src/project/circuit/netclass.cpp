@@ -76,7 +76,7 @@ void NetClass::setName(const QString& name) throw (Exception)
  *  NetSignal Methods
  ****************************************************************************************/
 
-void NetClass::registerNetSignal(NetSignal* signal)
+void NetClass::registerNetSignal(NetSignal* signal) noexcept
 {
     Q_CHECK_PTR(signal);
     Q_ASSERT(!mNetSignals.contains(signal->getUuid()));
@@ -84,7 +84,7 @@ void NetClass::registerNetSignal(NetSignal* signal)
     mNetSignals.insert(signal->getUuid(), signal);
 }
 
-void NetClass::unregisterNetSignal(NetSignal* signal)
+void NetClass::unregisterNetSignal(NetSignal* signal) noexcept
 {
     Q_CHECK_PTR(signal);
     Q_ASSERT(mNetSignals.contains(signal->getUuid()));
@@ -96,22 +96,32 @@ void NetClass::unregisterNetSignal(NetSignal* signal)
  *  General Methods
  ****************************************************************************************/
 
-void NetClass::addToDomTree(QDomElement& parent) throw (Exception)
+void NetClass::addToCircuit(bool addNode, QDomElement& parent) throw (Exception)
 {
-    if (parent.nodeName() != "netclasses")
-        throw LogicError(__FILE__, __LINE__, parent.nodeName(), tr("Invalid node name!"));
+    Q_ASSERT(mNetSignals.isEmpty());
 
-    if (parent.appendChild(mDomElement).isNull())
-        throw LogicError(__FILE__, __LINE__, QString(), tr("Could not append DOM node!"));
+    if (addNode)
+    {
+        if (parent.nodeName() != "netclasses")
+            throw LogicError(__FILE__, __LINE__, parent.nodeName(), tr("Invalid node name!"));
+
+        if (parent.appendChild(mDomElement).isNull())
+            throw LogicError(__FILE__, __LINE__, QString(), tr("Could not append DOM node!"));
+    }
 }
 
-void NetClass::removeFromDomTree(QDomElement& parent) throw (Exception)
+void NetClass::removeFromCircuit(bool removeNode, QDomElement& parent) throw (Exception)
 {
-    if (parent.nodeName() != "netclasses")
-        throw LogicError(__FILE__, __LINE__, parent.nodeName(), tr("Invalid node name!"));
+    Q_ASSERT(mNetSignals.isEmpty());
 
-    if (parent.removeChild(mDomElement).isNull())
-        throw LogicError(__FILE__, __LINE__, QString(), tr("Could not remove node from DOM tree!"));
+    if (removeNode)
+    {
+        if (parent.nodeName() != "netclasses")
+            throw LogicError(__FILE__, __LINE__, parent.nodeName(), tr("Invalid node name!"));
+
+        if (parent.removeChild(mDomElement).isNull())
+            throw LogicError(__FILE__, __LINE__, QString(), tr("Could not remove node from DOM tree!"));
+    }
 }
 
 /*****************************************************************************************

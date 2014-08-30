@@ -26,11 +26,14 @@
 
 #include <QtCore>
 #include <QDomElement>
+#include "../../common/units.h"
 #include "../../common/exceptions.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
+
+class QGraphicsRectItem;
 
 namespace project {
 class Schematic;
@@ -67,6 +70,17 @@ class SymbolInstance final : public QObject
         // Getters
         const QUuid& getUuid() const noexcept {return mUuid;}
 
+        // General Methods
+        void addToSchematic(Schematic& schematic, bool addNode,
+                            QDomElement& parent) throw (Exception);
+        void removeFromSchematic(Schematic& schematic, bool removeNode,
+                                 QDomElement& parent) throw (Exception);
+
+        // Static Methods
+        static SymbolInstance* create(Schematic& schematic, QDomDocument& doc,
+                                      const QUuid& genCompInstance,
+                                      const QUuid& symbolItem) throw (Exception);
+
     private:
 
         // make some methods inaccessible...
@@ -77,10 +91,12 @@ class SymbolInstance final : public QObject
         // General
         Schematic& mSchematic;
         QDomElement mDomElement;
+        QGraphicsRectItem* mItem;
 
         // Attributes
         QUuid mUuid;
         GenericComponentInstance* mGenCompInstance;
+        Point mPosition;
 };
 
 } // namespace project

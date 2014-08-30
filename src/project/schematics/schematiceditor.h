@@ -63,6 +63,12 @@ class SchematicEditor : public QMainWindow
         explicit SchematicEditor(Workspace& workspace, Project& project);
         ~SchematicEditor();
 
+        // Getters
+        int getActiveSchematicIndex() const noexcept {return mActiveSchematicIndex;}
+
+        // Setters
+        void setActiveSchematicIndex(int index);
+
     protected:
 
         void closeEvent(QCloseEvent* event);
@@ -73,6 +79,10 @@ class SchematicEditor : public QMainWindow
         void on_actionClose_Project_triggered();
         void on_actionUndo_triggered();
         void on_actionRedo_triggered();
+
+    signals:
+
+        void activeSchematicChanged(int oldIndex, int newIndex);
 
     private:
 
@@ -85,6 +95,8 @@ class SchematicEditor : public QMainWindow
         Workspace& mWorkspace;
         Project& mProject;
         Ui::SchematicEditor* mUi;
+
+        int mActiveSchematicIndex;
 
         // Docks
         SchematicPagesDock* mPagesDock;

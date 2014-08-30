@@ -27,6 +27,7 @@
 #include "ui_schematicpagesdock.h"
 #include "../project.h"
 #include "schematic.h"
+#include "schematiceditor.h"
 #include "cmd/cmdschematicadd.h"
 #include "cmd/cmdschematicremove.h"
 #include "../../common/undostack.h"
@@ -37,8 +38,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SchematicPagesDock::SchematicPagesDock(Project& project) :
-    QDockWidget(0), mProject(project), mUi(new Ui::SchematicPagesDock)
+SchematicPagesDock::SchematicPagesDock(Project& project, SchematicEditor& editor) :
+    QDockWidget(0), mProject(project), mEditor(editor), mUi(new Ui::SchematicPagesDock)
 {
     mUi->setupUi(this);
 
@@ -47,8 +48,13 @@ SchematicPagesDock::SchematicPagesDock(Project& project) :
         schematicAdded(i);
 
     // connect signals/slots
+    connect(&mEditor, SIGNAL(activeSchematicChanged(int,int)),
+            this, SLOT(activeSchematicChanged(int,int)));
     connect(&mProject, SIGNAL(schematicAdded(int)), this, SLOT(schematicAdded(int)));
     connect(&mProject, SIGNAL(schematicRemoved(int)), this, SLOT(schematicRemoved(int)));
+
+    // select the current schematic page
+    mUi->listWidget->setCurrentRow(mEditor.getActiveSchematicIndex());
 }
 
 SchematicPagesDock::~SchematicPagesDock()
@@ -74,6 +80,12 @@ void SchematicPagesDock::resizeEvent(QResizeEvent* event)
  *  Public Slots
  ****************************************************************************************/
 
+void SchematicPagesDock::activeSchematicChanged(int oldIndex, int newIndex)
+{
+    Q_UNUSED(oldIndex);
+    mUi->listWidget->setCurrentRow(newIndex);
+}
+
 void SchematicPagesDock::schematicAdded(int newIndex)
 {
     Schematic* schematic = mProject.getSchematicByIndex(newIndex);
@@ -86,7 +98,6 @@ void SchematicPagesDock::schematicAdded(int newIndex)
     QListWidgetItem* item = new QListWidgetItem();
     item->setText(schematic->getName());
     item->setIcon(schematic->getIcon());
-    item->setData(Qt::UserRole, qVariantFromValue(schematic));
     mUi->listWidget->insertItem(newIndex, item);
 }
 
@@ -134,6 +145,11 @@ void SchematicPagesDock::on_btnRemoveSchematic_clicked()
     {
         QMessageBox::critical(this, tr("Error"), e.getUserMsg());
     }
+}
+
+void SchematicPagesDock::on_listWidget_currentRowChanged(int currentRow)
+{
+    mEditor.setActiveSchematicIndex(currentRow);
 }
 
 /*****************************************************************************************

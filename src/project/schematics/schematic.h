@@ -72,6 +72,14 @@ class Schematic final : public CADScene
         const QString& getName() const noexcept {return mName;}
         const QIcon& getIcon() const noexcept {return mIcon;}
 
+        // SymbolInstance Methods
+        SymbolInstance* getSymbolByUuid(const QUuid& uuid) const noexcept;
+        SymbolInstance* createSymbol(const QUuid& genCompInstance,
+                                     const QUuid& symbolItem) throw (Exception);
+        void addSymbol(SymbolInstance* symbol, bool toDomTree = true) throw (Exception);
+        void removeSymbol(SymbolInstance* symbol, bool fromDomTree = true,
+                          bool deleteSymbol = false) throw (Exception);
+
         // SchematicNetPoint Methods
         SchematicNetPoint* getNetPointByUuid(const QUuid& uuid) const noexcept;
         SchematicNetPoint* createNetPoint(const QUuid& netsignal) throw (Exception);

@@ -64,6 +64,7 @@ class SchematicNetLine final : public QObject
         const QUuid& getUuid() const noexcept {return mUuid;}
 
         // General Methods
+        void updateLine() noexcept;
         void addToSchematic(Schematic& schematic, bool addNode,
                             QDomElement& parent) throw (Exception);
         void removeFromSchematic(Schematic& schematic, bool removeNode,

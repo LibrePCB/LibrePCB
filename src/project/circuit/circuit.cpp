@@ -162,11 +162,8 @@ void Circuit::addNetClass(NetClass* netclass, bool toDomTree) throw (Exception)
             .arg(netclass->getName()));
     }
 
-    if (toDomTree)
-    {
-        QDomElement parent = mXmlFile->getRoot().firstChildElement("netclasses");
-        netclass->addToDomTree(parent); // can throw an exception
-    }
+    QDomElement parent = mXmlFile->getRoot().firstChildElement("netclasses");
+    netclass->addToCircuit(toDomTree, parent); // can throw an exception
 
     mNetClasses.insert(netclass->getUuid(), netclass);
 }
@@ -185,11 +182,8 @@ void Circuit::removeNetClass(NetClass* netclass, bool fromDomTree, bool deleteNe
             .arg(netclass->getName()));
     }
 
-    if (fromDomTree)
-    {
-        QDomElement parent = mXmlFile->getRoot().firstChildElement("netclasses");
-        netclass->removeFromDomTree(parent); // can throw an exception
-    }
+    QDomElement parent = mXmlFile->getRoot().firstChildElement("netclasses");
+    netclass->removeFromCircuit(fromDomTree, parent); // can throw an exception
 
     mNetClasses.remove(netclass->getUuid());
 
@@ -259,7 +253,14 @@ void Circuit::removeNetSignal(NetSignal* netsignal, bool fromDomTree, bool delet
     Q_CHECK_PTR(netsignal);
     Q_ASSERT(mNetSignals.contains(netsignal->getUuid()));
 
-    // TODO: check if there are component signals connected with that signal
+    // the netsignal cannot be removed if there are already netpoints with that netsignal!
+    if (netsignal->getNetPointCount() > 0)
+    {
+        throw LogicError(__FILE__, __LINE__, QString("%1:%2")
+            .arg(netsignal->getUuid().toString()).arg(netsignal->getNetPointCount()),
+            QString(tr("There are already elements in the netsignal \"%1\"!"))
+            .arg(netsignal->getName()));
+    }
 
     QDomElement parent = mXmlFile->getRoot().firstChildElement("netsignals");
     netsignal->removeFromCircuit(fromDomTree, parent); // can throw an exception

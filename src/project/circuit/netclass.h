@@ -64,12 +64,12 @@ class NetClass final : public QObject
         void setName(const QString& name) throw (Exception);
 
         // NetSignal Methods
-        void registerNetSignal(NetSignal* signal);
-        void unregisterNetSignal(NetSignal* signal);
+        void registerNetSignal(NetSignal* signal) noexcept;
+        void unregisterNetSignal(NetSignal* signal) noexcept;
 
         // General Methods
-        void addToDomTree(QDomElement& parent) throw (Exception);
-        void removeFromDomTree(QDomElement& parent) throw (Exception);
+        void addToCircuit(bool addNode, QDomElement& parent) throw (Exception);
+        void removeFromCircuit(bool removeNode, QDomElement& parent) throw (Exception);
 
         // Static Methods
         static NetClass* create(QDomDocument& doc, const QString& name) throw (Exception);

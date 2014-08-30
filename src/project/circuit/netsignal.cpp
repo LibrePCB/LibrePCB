@@ -89,8 +89,24 @@ void NetSignal::setName(const QString& name) throw (Exception)
  *  General Methods
  ****************************************************************************************/
 
+void NetSignal::registerSchematicNetPoint(SchematicNetPoint* netpoint) noexcept
+{
+    Q_CHECK_PTR(netpoint);
+    Q_ASSERT(!mSchematicNetPoints.contains(netpoint));
+    mSchematicNetPoints.append(netpoint);
+}
+
+void NetSignal::unregisterSchematicNetPoint(SchematicNetPoint* netpoint) noexcept
+{
+    Q_CHECK_PTR(netpoint);
+    Q_ASSERT(mSchematicNetPoints.contains(netpoint));
+    mSchematicNetPoints.removeOne(netpoint);
+}
+
 void NetSignal::addToCircuit(bool addNode, QDomElement& parent) throw (Exception)
 {
+    Q_ASSERT(mSchematicNetPoints.isEmpty());
+
     if (addNode)
     {
         if (parent.nodeName() != "netsignals")
@@ -100,19 +116,13 @@ void NetSignal::addToCircuit(bool addNode, QDomElement& parent) throw (Exception
             throw LogicError(__FILE__, __LINE__, QString(), tr("Could not append DOM node!"));
     }
 
-    try
-    {
-        mNetClass->registerNetSignal(this);
-    }
-    catch (Exception& e)
-    {
-        parent.removeChild(mDomElement); // revert appending the DOM node
-        throw;
-    }
+    mNetClass->registerNetSignal(this);
 }
 
 void NetSignal::removeFromCircuit(bool removeNode, QDomElement& parent) throw (Exception)
 {
+    Q_ASSERT(mSchematicNetPoints.isEmpty());
+
     if (removeNode)
     {
         if (parent.nodeName() != "netsignals")
@@ -122,15 +132,7 @@ void NetSignal::removeFromCircuit(bool removeNode, QDomElement& parent) throw (E
             throw LogicError(__FILE__, __LINE__, QString(), tr("Could not remove node from DOM tree!"));
     }
 
-    try
-    {
-         mNetClass->unregisterNetSignal(this);
-    }
-    catch (Exception& e)
-    {
-        parent.appendChild(mDomElement); // revert removing the DOM node
-        throw;
-    }
+    mNetClass->unregisterNetSignal(this);
 }
 
 /*****************************************************************************************

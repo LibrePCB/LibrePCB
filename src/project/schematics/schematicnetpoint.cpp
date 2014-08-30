@@ -26,6 +26,9 @@
 #include "schematicnetpoint.h"
 #include "schematic.h"
 #include "schematicnetline.h"
+#include "../project.h"
+#include "../circuit/circuit.h"
+#include "../circuit/netsignal.h"
 
 namespace project {
 
@@ -35,7 +38,7 @@ namespace project {
 
 SchematicNetPoint::SchematicNetPoint(Schematic& schematic, const QDomElement& domElement)
                                      throw (Exception) :
-    QObject(0), mSchematic(schematic), mDomElement(domElement), mItem(0)
+    QObject(0), mSchematic(schematic), mDomElement(domElement), mItem(0), mNetSignal(0)
 {
     mUuid = mDomElement.attribute("uuid");
     if(mUuid.isNull())
@@ -43,6 +46,14 @@ SchematicNetPoint::SchematicNetPoint(Schematic& schematic, const QDomElement& do
         throw RuntimeError(__FILE__, __LINE__, mDomElement.attribute("uuid"),
             QString(tr("Invalid net point UUID: \"%1\""))
             .arg(mDomElement.attribute("uuid")));
+    }
+
+    QString netSignalUuid = mDomElement.attribute("netsignal");
+    mNetSignal = mSchematic.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
+    if(!mNetSignal)
+    {
+        throw RuntimeError(__FILE__, __LINE__, netSignalUuid,
+            QString(tr("Invalid net signal UUID: \"%1\"")).arg(netSignalUuid));
     }
 
     mAttached = (mDomElement.firstChildElement("attached").text() == "true");
@@ -72,6 +83,22 @@ SchematicNetPoint::~SchematicNetPoint() noexcept
  *  General Methods
  ****************************************************************************************/
 
+void SchematicNetPoint::registerNetLine(SchematicNetLine* netline) noexcept
+{
+    Q_CHECK_PTR(netline);
+    Q_ASSERT(!mLines.contains(netline));
+    mLines.append(netline);
+    netline->updateLine();
+}
+
+void SchematicNetPoint::unregisterNetLine(SchematicNetLine* netline) noexcept
+{
+    Q_CHECK_PTR(netline);
+    Q_ASSERT(mLines.contains(netline));
+    mLines.removeOne(netline);
+    netline->updateLine();
+}
+
 void SchematicNetPoint::addToSchematic(Schematic& schematic, bool addNode,
                                        QDomElement& parent) throw (Exception)
 {
@@ -84,6 +111,7 @@ void SchematicNetPoint::addToSchematic(Schematic& schematic, bool addNode,
             throw LogicError(__FILE__, __LINE__, QString(), tr("Could not append DOM node!"));
     }
 
+    mNetSignal->registerSchematicNetPoint(this);
     schematic.addItem(mItem);
 }
 
@@ -100,6 +128,7 @@ void SchematicNetPoint::removeFromSchematic(Schematic& schematic, bool removeNod
     }
 
     schematic.removeItem(mItem);
+    mNetSignal->unregisterSchematicNetPoint(this);
 }
 
 /*****************************************************************************************

@@ -22,6 +22,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <QGraphicsRectItem>
 #include "symbolinstance.h"
 #include "schematic.h"
 #include "../project.h"
@@ -35,7 +36,7 @@ namespace project {
 
 SymbolInstance::SymbolInstance(Schematic& schematic, const QDomElement& domElement)
                                throw (Exception) :
-    QObject(0), mSchematic(schematic), mDomElement(domElement)
+    QObject(0), mSchematic(schematic), mDomElement(domElement), mItem(0)
 {
     mUuid = mDomElement.attribute("uuid");
     if(mUuid.isNull())
@@ -53,10 +54,74 @@ SymbolInstance::SymbolInstance(Schematic& schematic, const QDomElement& domEleme
             QString(tr("No generic component with the UUID \"%1\" found in the circuit!"))
                            .arg(gcUuid));
     }
+
+    mItem = new QGraphicsRectItem(-10, -10, 20, 20);
+    mItem->setPen(QPen(Qt::darkRed, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    mItem->setBrush(QBrush(Qt::yellow, Qt::SolidPattern));
+
+    mPosition.setX(Length::fromMm(mDomElement.firstChildElement("position").attribute("x")));
+    mPosition.setY(Length::fromMm(mDomElement.firstChildElement("position").attribute("y")));
+    mItem->setPos(mPosition.toPxQPointF());
 }
 
 SymbolInstance::~SymbolInstance() noexcept
 {
+    delete mItem;       mItem = 0;
+}
+
+/*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+void SymbolInstance::addToSchematic(Schematic& schematic, bool addNode,
+                                       QDomElement& parent) throw (Exception)
+{
+    if (addNode)
+    {
+        if (parent.nodeName() != "symbols")
+            throw LogicError(__FILE__, __LINE__, parent.nodeName(), tr("Invalid node name!"));
+
+        if (parent.appendChild(mDomElement).isNull())
+            throw LogicError(__FILE__, __LINE__, QString(), tr("Could not append DOM node!"));
+    }
+
+    schematic.addItem(mItem);
+}
+
+void SymbolInstance::removeFromSchematic(Schematic& schematic, bool removeNode,
+                                            QDomElement& parent) throw (Exception)
+{
+    if (removeNode)
+    {
+        if (parent.nodeName() != "symbols")
+            throw LogicError(__FILE__, __LINE__, parent.nodeName(), tr("Invalid node name!"));
+
+        if (parent.removeChild(mDomElement).isNull())
+            throw LogicError(__FILE__, __LINE__, QString(), tr("Could not remove node from DOM tree!"));
+    }
+
+    schematic.removeItem(mItem);
+}
+
+/*****************************************************************************************
+ *  Static Methods
+ ****************************************************************************************/
+
+SymbolInstance* SymbolInstance::create(Schematic& schematic, QDomDocument& doc,
+                                       const QUuid& genCompInstance,
+                                       const QUuid& symbolItem) throw (Exception)
+{
+    QDomElement node = doc.createElement("symbol");
+    if (node.isNull())
+        throw LogicError(__FILE__, __LINE__, QString(), tr("Could not create DOM node!"));
+
+    // fill the new QDomElement with all the needed content
+    node.setAttribute("uuid", QUuid::createUuid().toString()); // generate random UUID
+    node.setAttribute("gen_comp_instance", genCompInstance.toString());
+    node.setAttribute("symbol_item", symbolItem.toString());
+
+    // create and return the new SymbolInstance object
+    return new SymbolInstance(schematic, node);
 }
 
 /*****************************************************************************************

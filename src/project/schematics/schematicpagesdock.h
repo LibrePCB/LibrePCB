@@ -33,6 +33,7 @@
 
 namespace project {
 class Project;
+class SchematicEditor;
 }
 
 namespace Ui {
@@ -55,7 +56,7 @@ class SchematicPagesDock final : public QDockWidget
     public:
 
         // Constructors / Destructor
-        explicit SchematicPagesDock(Project& project);
+        explicit SchematicPagesDock(Project& project, SchematicEditor& editor);
         ~SchematicPagesDock();
 
         // Inherited from QDockWidget
@@ -63,6 +64,7 @@ class SchematicPagesDock final : public QDockWidget
 
     public slots:
 
+        void activeSchematicChanged(int oldIndex, int newIndex);
         void schematicAdded(int newIndex);
         void schematicRemoved(int oldIndex);
 
@@ -71,6 +73,7 @@ class SchematicPagesDock final : public QDockWidget
         // UI
         void on_btnNewSchematic_clicked();
         void on_btnRemoveSchematic_clicked();
+        void on_listWidget_currentRowChanged(int currentRow);
 
     private:
 
@@ -81,6 +84,7 @@ class SchematicPagesDock final : public QDockWidget
 
         // General
         Project& mProject;
+        SchematicEditor& mEditor;
         Ui::SchematicPagesDock* mUi;
 };
 
