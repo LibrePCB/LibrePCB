@@ -72,12 +72,16 @@ ControlPanel::~ControlPanel()
 
 void ControlPanel::closeEvent(QCloseEvent *event)
 {
-    Q_UNUSED(event);
-
     saveSettings();
 
     // close all projects, unsaved projects will ask for saving
-    mWorkspace.closeAllProjects(true);
+    if (!mWorkspace.closeAllProjects(true))
+    {
+        event->ignore();
+        return; // do NOT close the application, there are still open projects!
+    }
+
+    QMainWindow::closeEvent(event);
 
     // if the control panel is closed, we will quit the whole application
     QApplication::quit();

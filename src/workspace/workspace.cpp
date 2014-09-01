@@ -173,6 +173,17 @@ bool Workspace::closeProject(Project* project, bool askForSave)
     return success;
 }
 
+bool Workspace::closeAllProjects(bool askForSave)
+{
+    bool success = true;
+    foreach (Project* project, mOpenProjects)
+    {
+        if (!closeProject(project, askForSave))
+            success = false;
+    }
+    return success;
+}
+
 void Workspace::unregisterOpenProject(Project* project)
 {
     mOpenProjects.remove(project->getFilepath().toUnique().toStr());
@@ -226,13 +237,6 @@ void Workspace::openLibraryEditor()
 
     mLibraryEditor->show();
     mLibraryEditor->raise();
-}
-
-void Workspace::closeAllProjects(bool askForSave)
-{
-    QList<Project*> openProjects = mOpenProjects.values();
-    foreach (Project* project, openProjects)
-        closeProject(project, askForSave);
 }
 
 /*****************************************************************************************

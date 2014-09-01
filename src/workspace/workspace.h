@@ -128,6 +128,7 @@ class Workspace final : public QObject
         project::Project* openProject(const FilePath& filepath) noexcept;
         bool closeProject(const FilePath& filepath, bool askForSave);
         bool closeProject(project::Project* project, bool askForSave);
+        bool closeAllProjects(bool askForSave = false);
         void unregisterOpenProject(project::Project* project);
         project::Project* getOpenProject(const FilePath& filepath);
         bool isFavoriteProject(const FilePath& filepath) const;
@@ -145,7 +146,6 @@ class Workspace final : public QObject
 
         void showControlPanel() const;
         void openLibraryEditor();
-        void closeAllProjects(bool askForSave = false);
 
     private:
 
