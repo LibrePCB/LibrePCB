@@ -30,7 +30,7 @@
  ****************************************************************************************/
 
 CADScene::CADScene(const Length& gridInterval) :
-    QGraphicsScene(), mGridInterval(gridInterval)
+    QGraphicsScene(), mEventHandlerObject(0), mGridInterval(gridInterval)
 {
 }
 
@@ -42,9 +42,48 @@ CADScene::~CADScene()
  *  Setters
  ****************************************************************************************/
 
+void CADScene::setEventHandlerObject(IF_CADSceneEventHandler* object)
+{
+    mEventHandlerObject = object;
+}
+
 void CADScene::setGridInterval(const Length& newInterval)
 {
     mGridInterval = newInterval;
+}
+
+/*****************************************************************************************
+ *  Inherited from QGraphicsScene
+ ****************************************************************************************/
+
+void CADScene::mousePressEvent(QGraphicsSceneMouseEvent* mouseEvent)
+{
+    if (mEventHandlerObject)
+    {
+        if (mEventHandlerObject->cadSceneEventHandler(mouseEvent))
+            return;
+    }
+    QGraphicsScene::mousePressEvent(mouseEvent);
+}
+
+void CADScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* mouseEvent)
+{
+    if (mEventHandlerObject)
+    {
+        if (mEventHandlerObject->cadSceneEventHandler(mouseEvent))
+            return;
+    }
+    QGraphicsScene::mouseReleaseEvent(mouseEvent);
+}
+
+void CADScene::mouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent)
+{
+    if (mEventHandlerObject)
+    {
+        if (mEventHandlerObject->cadSceneEventHandler(mouseEvent))
+            return;
+    }
+    QGraphicsScene::mouseMoveEvent(mouseEvent);
 }
 
 /*****************************************************************************************

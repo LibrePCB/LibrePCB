@@ -198,33 +198,6 @@ void CADView::wheelEvent(QWheelEvent* event)
     //    scale((qreal)1 / sZoomFactor, (qreal)1 / sZoomFactor); // Zoom out
 }
 
-void CADView::mouseMoveEvent(QMouseEvent* event)
-{
-    if (scene())
-    {
-        try
-        {
-            Point pos = Point::fromPx(mapToScene(event->pos()),
-                                      getCadScene()->getGridInterval());
-
-            // emit the signal only if the position has really changed
-            if (pos != mLastMouseMoveEventPos)
-            {
-                emit mousePosChanged(pos);
-                mLastMouseMoveEventPos = pos;
-            }
-        }
-        catch (...)
-        {
-            // If the cursor is outside the +/-2.147 meters for the 32bit type LengthBase_t,
-            // the Length class will throw a range error. This would be not good, so we catch
-            // that exception and ignore it...
-        }
-    }
-
-    QGraphicsView::mouseMoveEvent(event);
-}
-
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/

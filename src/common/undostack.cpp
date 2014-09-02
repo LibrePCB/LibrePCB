@@ -144,7 +144,7 @@ void UndoStack::execCmd(UndoCommand* cmd, bool autoMerge) throw (Exception)
         mCurrentIndex++;
 
         // emit signals
-        emit undoTextChanged(cmd->getText());
+        emit undoTextChanged(QString(tr("Undo: %1")).arg(cmd->getText()));
         emit redoTextChanged(tr("Redo"));
         emit canUndoChanged(true);
         emit canRedoChanged(false);
@@ -163,6 +163,9 @@ void UndoStack::beginCommand(const QString& text) throw (Exception)
     UndoCommand* cmd = new UndoCommand(text);
     execCmd(cmd, false); // throws an exception on error; emits all signals; does NOT merge
     mCommandActive = true;
+
+    // emit signals
+    emit canUndoChanged(false);
 }
 
 void UndoStack::appendToCommand(UndoCommand* cmd) throw (Exception)
@@ -199,6 +202,10 @@ void UndoStack::endCommand() throw (Exception)
         throw LogicError(__FILE__, __LINE__, QString(), tr("No command active!"));
 
     mCommandActive = false;
+
+    // emit signals
+    emit canUndoChanged(canUndo());
+    emit commandEnded();
 }
 
 void UndoStack::abortCommand() throw (Exception)
@@ -224,14 +231,8 @@ void UndoStack::abortCommand() throw (Exception)
 
 void UndoStack::undo() throw (Exception)
 {
-    if (!canUndo())
+    if ((!canUndo()) || (mCommandActive)) // if a command is active, undo() is not allowed
         return;
-
-    if (mCommandActive) // if a command is active, undo() is the same as abortCommand()
-    {
-        abortCommand();
-        return;
-    }
 
     mCommands[mCurrentIndex-1]->undo(); // throws an exception on error
     mCurrentIndex--;

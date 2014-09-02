@@ -194,20 +194,16 @@ class UndoStack final : public QObject
         /**
          * @brief End the currently active command and revert the changes
          *
-         * @note While a command is active at the moment, calling #undo() has the same
-         *       effect as calling #abortCommand().
-         *
          * @throw Exception This method throws an exception if there is no command active
          *                  at the moment (#isCommandActive()) or if an error occurs.
          */
         void abortCommand() throw (Exception);
 
         /**
-         * @brief Undo the last command (or abort the currently active command)
+         * @brief Undo the last command
          *
          * @note If you call this method while another command is currently active
-         *       (#isCommandActive()), this method will automatically call #abortCommand()
-         *       instead (which is totally equal to call #abortCommand() instead).
+         *       (#isCommandActive()), this method will do nothing.
          *
          * @throw Exception If an error occurs, this class tries to revert all changes
          *                  to restore the state of BEFORE calling this method. But there
@@ -240,6 +236,7 @@ class UndoStack final : public QObject
         void canUndoChanged(bool canUndo);
         void canRedoChanged(bool canRedo);
         void cleanChanged(bool clean);
+        void commandEnded();
         void commandAborted();
 
 

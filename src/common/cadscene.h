@@ -29,6 +29,21 @@
 #include "units.h"
 
 /*****************************************************************************************
+ *  Interface IF_CADSceneEventHandler
+ ****************************************************************************************/
+
+/**
+ * @brief The CADViewEventReceiver class
+ */
+class IF_CADSceneEventHandler
+{
+    public:
+
+        /// The event handler method
+        virtual bool cadSceneEventHandler(QEvent* event) = 0;
+};
+
+/*****************************************************************************************
  *  Class CADScene
  ****************************************************************************************/
 
@@ -53,7 +68,15 @@ class CADScene : public QGraphicsScene
         const Length& getGridInterval() const {return mGridInterval;}
 
         // Setters
+        void setEventHandlerObject(IF_CADSceneEventHandler* object);
         void setGridInterval(const Length& newInterval);
+
+    protected:
+
+        // Inherited from QGraphicsScene
+        virtual void mousePressEvent(QGraphicsSceneMouseEvent* mouseEvent);
+        virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* mouseEvent);
+        virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent);
 
     private:
 
@@ -61,6 +84,7 @@ class CADScene : public QGraphicsScene
         CADScene(const CADScene& other);
         CADScene& operator=(const CADScene& rhs);
 
+        IF_CADSceneEventHandler* mEventHandlerObject;
         Length mGridInterval;
 
 };

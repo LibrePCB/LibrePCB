@@ -84,11 +84,6 @@ class CADView : public QGraphicsView
         virtual void drawBackground(QPainter* painter, const QRectF& rect);
         virtual void drawForeground(QPainter* painter, const QRectF& rect);
         virtual void wheelEvent(QWheelEvent* event);
-        virtual void mouseMoveEvent(QMouseEvent* event);
-
-    signals:
-
-        void mousePosChanged(const Point& newPos);
 
     private:
 
@@ -105,7 +100,6 @@ class CADView : public QGraphicsView
 
         // Static Variables
         static qreal sZoomFactor;
-
 };
 
 #endif // CADVIEW_H
