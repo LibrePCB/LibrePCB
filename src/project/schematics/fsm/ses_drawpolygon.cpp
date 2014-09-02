@@ -45,11 +45,11 @@ SES_DrawPolygon::~SES_DrawPolygon()
  *  General Methods
  ****************************************************************************************/
 
-SchematicEditorState::State SES_DrawPolygon::process(QEvent* event) noexcept
+SchematicEditorState::State SES_DrawPolygon::process(SchematicEditorEvent* event) noexcept
 {
-    SchematicEditorState::State nextState;
+    SchematicEditorState::State nextState = State_DrawPolygon;
 
-    switch (static_cast<int>(event->type()))
+    switch (event->getType())
     {
         case SchematicEditorEvent::AbortCommand:
         case SchematicEditorEvent::StartSelect:
@@ -66,10 +66,6 @@ SchematicEditorState::State SES_DrawPolygon::process(QEvent* event) noexcept
 
         case SchematicEditorEvent::StartDrawRect:
             nextState = State_DrawRect;
-            break;
-
-        case SchematicEditorEvent::StartDrawPolygon:
-            nextState = State_DrawPolygon;
             break;
 
         case SchematicEditorEvent::StartDrawCircle:
@@ -89,7 +85,6 @@ SchematicEditorState::State SES_DrawPolygon::process(QEvent* event) noexcept
             break;
 
         default:
-            nextState = State_DrawPolygon;
             break;
     }
 

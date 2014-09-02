@@ -45,11 +45,11 @@ SES_DrawEllipse::~SES_DrawEllipse()
  *  General Methods
  ****************************************************************************************/
 
-SchematicEditorState::State SES_DrawEllipse::process(QEvent* event) noexcept
+SchematicEditorState::State SES_DrawEllipse::process(SchematicEditorEvent* event) noexcept
 {
-    SchematicEditorState::State nextState;
+    SchematicEditorState::State nextState = State_DrawEllipse;
 
-    switch (static_cast<int>(event->type()))
+    switch (event->getType())
     {
         case SchematicEditorEvent::AbortCommand:
         case SchematicEditorEvent::StartSelect:
@@ -76,10 +76,6 @@ SchematicEditorState::State SES_DrawEllipse::process(QEvent* event) noexcept
             nextState = State_DrawCircle;
             break;
 
-        case SchematicEditorEvent::StartDrawEllipse:
-            nextState = State_DrawEllipse;
-            break;
-
         case SchematicEditorEvent::StartDrawWire:
             nextState = State_DrawWire;
             break;
@@ -89,7 +85,6 @@ SchematicEditorState::State SES_DrawEllipse::process(QEvent* event) noexcept
             break;
 
         default:
-            nextState = State_DrawEllipse;
             break;
     }
 

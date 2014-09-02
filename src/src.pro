@@ -86,6 +86,7 @@ SOURCES += \
     project/circuit/netclass.cpp \
     project/circuit/netsignal.cpp \
     project/circuit/genericcomponentinstance.cpp \
+    project/circuit/gencompsignalinstance.cpp \
     common/systeminfo.cpp \
     common/debug.cpp \
     common/filelock.cpp \
@@ -118,7 +119,11 @@ SOURCES += \
     project/schematics/fsm/ses_drawwire.cpp \
     project/schematics/fsm/ses_addcomponents.cpp \
     project/schematics/schematicnetpoint.cpp \
-    project/schematics/schematicnetline.cpp
+    project/schematics/schematicnetline.cpp \
+    project/schematics/cmd/cmdschematicnetpointadd.cpp \
+    project/schematics/cmd/cmdschematicnetpointremove.cpp \
+    project/schematics/cmd/cmdschematicnetlineadd.cpp \
+    project/schematics/cmd/cmdschematicnetlineremove.cpp
 
 HEADERS += \
     common/units.h \
@@ -154,6 +159,7 @@ HEADERS += \
     project/circuit/netclass.h \
     project/circuit/netsignal.h \
     project/circuit/genericcomponentinstance.h \
+    project/circuit/gencompsignalinstance.h \
     common/systeminfo.h \
     common/debug.h \
     common/filelock.h \
@@ -186,7 +192,11 @@ HEADERS += \
     project/schematics/fsm/ses_drawwire.h \
     project/schematics/fsm/ses_addcomponents.h \
     project/schematics/schematicnetpoint.h \
-    project/schematics/schematicnetline.h
+    project/schematics/schematicnetline.h \
+    project/schematics/cmd/cmdschematicnetpointadd.h \
+    project/schematics/cmd/cmdschematicnetpointremove.h \
+    project/schematics/cmd/cmdschematicnetlineadd.h \
+    project/schematics/cmd/cmdschematicnetlineremove.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \

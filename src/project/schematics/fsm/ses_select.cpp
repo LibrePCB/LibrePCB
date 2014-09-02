@@ -33,7 +33,7 @@ namespace project {
  ****************************************************************************************/
 
 SES_Select::SES_Select(SchematicEditor& editor) :
-    SchematicEditorState(editor)
+    SchematicEditorState(editor), mPreviousState(State_Initial)
 {
 }
 
@@ -45,17 +45,12 @@ SES_Select::~SES_Select()
  *  General Methods
  ****************************************************************************************/
 
-SchematicEditorState::State SES_Select::process(QEvent* event) noexcept
+SchematicEditorState::State SES_Select::process(SchematicEditorEvent* event) noexcept
 {
-    SchematicEditorState::State nextState;
+    SchematicEditorState::State nextState = State_Select;
 
-    switch (static_cast<int>(event->type()))
+    switch (event->getType())
     {
-        case SchematicEditorEvent::AbortCommand:
-        case SchematicEditorEvent::StartSelect:
-            nextState = State_Select;
-            break;
-
         case SchematicEditorEvent::StartMove:
             nextState = State_Move;
             break;
@@ -88,8 +83,37 @@ SchematicEditorState::State SES_Select::process(QEvent* event) noexcept
             nextState = State_AddComponent;
             break;
 
+        case SchematicEditorEvent::SchematicSceneEvent:
+        {
+            QEvent* qevent = dynamic_cast<SEE_RedirectedQEvent*>(event)->getQEvent();
+            switch (qevent->type())
+            {
+                case QEvent::GraphicsSceneMousePress:
+                {
+                    QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
+
+                    switch (sceneEvent->button())
+                    {
+                        case Qt::RightButton:
+                        {
+                            // switch back to the last command (previous state)
+                            nextState = mPreviousState;
+                            break;
+                        }
+
+                        default:
+                            break;
+                    }
+                    break;
+                }
+
+                default:
+                    break;
+            }
+            break;
+        }
+
         default:
-            nextState = State_Select;
             break;
     }
 
@@ -98,7 +122,7 @@ SchematicEditorState::State SES_Select::process(QEvent* event) noexcept
 
 void SES_Select::entry(State previousState) noexcept
 {
-    Q_UNUSED(previousState);
+    mPreviousState = previousState;
 
     mEditor.mUi->actionToolSelect->setCheckable(true);
     mEditor.mUi->actionToolSelect->setChecked(true);

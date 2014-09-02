@@ -48,7 +48,7 @@ class SES_DrawRect final : public SchematicEditorState
         ~SES_DrawRect();
 
         // General Methods
-        State process(QEvent* event) noexcept;
+        State process(SchematicEditorEvent* event) noexcept;
         void entry(State previousState) noexcept;
         void exit(State nextState) noexcept;
 };

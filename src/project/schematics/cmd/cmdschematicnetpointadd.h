@@ -17,42 +17,60 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SES_DRAWTEXT_H
-#define PROJECT_SES_DRAWTEXT_H
+#ifndef PROJECT_CMDSCHEMATICNETPOINTADD_H
+#define PROJECT_CMDSCHEMATICNETPOINTADD_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include "schematiceditorstate.h"
+#include "../../../common/undocommand.h"
+#include "../../../common/units.h"
+#include "../../../common/exceptions.h"
 
 /*****************************************************************************************
- *  Class SES_DrawText
+ *  Forward Declarations
+ ****************************************************************************************/
+
+namespace project {
+class Schematic;
+class SchematicNetPoint;
+}
+
+/*****************************************************************************************
+ *  Class CmdSchematicNetPointAdd
  ****************************************************************************************/
 
 namespace project {
 
-
 /**
- * @brief The SES_DrawText class
+ * @brief The CmdSchematicNetPointAdd class
  */
-class SES_DrawText final : public SchematicEditorState
+class CmdSchematicNetPointAdd final : public UndoCommand
 {
-        Q_OBJECT
-
     public:
 
         // Constructors / Destructor
-        explicit SES_DrawText(SchematicEditor& editor);
-        ~SES_DrawText();
+        explicit CmdSchematicNetPointAdd(Schematic& schematic, const QUuid& netsignal,
+                                         const Point& position, UndoCommand* parent = 0) throw (Exception);
+        ~CmdSchematicNetPointAdd() noexcept;
 
-        // General Methods
-        State process(SchematicEditorEvent* event) noexcept;
-        void entry(State previousState) noexcept;
-        void exit(State nextState) noexcept;
+        // Getters
+        SchematicNetPoint* getNetPoint() const noexcept {return mNetPoint;}
+
+        // Inherited from UndoCommand
+        void redo() throw (Exception) override;
+        void undo() throw (Exception) override;
+
+    private:
+
+        Schematic& mSchematic;
+        QUuid mNetSignal;
+        Point mPosition;
+        SchematicNetPoint* mNetPoint;
 };
 
 } // namespace project
 
-#endif // PROJECT_SES_DRAWTEXT_H
+#endif // PROJECT_CMDSCHEMATICNETPOINTADD_H

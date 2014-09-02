@@ -80,6 +80,22 @@ SchematicNetPoint::~SchematicNetPoint() noexcept
 }
 
 /*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
+
+void SchematicNetPoint::setPosition(const Point& position) noexcept
+{
+    mPosition = position;
+    mDomElement.firstChildElement("position").setAttribute("x", mPosition.getX().toMmString());
+    mDomElement.firstChildElement("position").setAttribute("y", mPosition.getY().toMmString());
+
+    mItem->setPos(mPosition.toPxQPointF());
+
+    foreach (SchematicNetLine* line, mLines)
+        line->updateLine();
+}
+
+/*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
@@ -136,7 +152,7 @@ void SchematicNetPoint::removeFromSchematic(Schematic& schematic, bool removeNod
  ****************************************************************************************/
 
 SchematicNetPoint* SchematicNetPoint::create(Schematic& schematic, QDomDocument& doc,
-                                             const QUuid& netsignal) throw (Exception)
+                                             const QUuid& netsignal, const Point& position) throw (Exception)
 {
     QDomElement node = doc.createElement("netpoint");
     if (node.isNull())
@@ -145,6 +161,10 @@ SchematicNetPoint* SchematicNetPoint::create(Schematic& schematic, QDomDocument&
     // fill the new QDomElement with all the needed content
     node.setAttribute("uuid", QUuid::createUuid().toString()); // generate random UUID
     node.setAttribute("netsignal", netsignal.toString());
+    QDomElement posNode = doc.createElement("position");
+    posNode.setAttribute("x", position.getX().toMmString());
+    posNode.setAttribute("y", position.getY().toMmString());
+    node.appendChild(posNode);
 
     // create and return the new SchematicNetPoint object
     return new SchematicNetPoint(schematic, node);

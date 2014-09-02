@@ -17,42 +17,60 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SES_DRAWTEXT_H
-#define PROJECT_SES_DRAWTEXT_H
+#ifndef PROJECT_CMDSCHEMATICNETLINEADD_H
+#define PROJECT_CMDSCHEMATICNETLINEADD_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include "schematiceditorstate.h"
+#include "../../../common/undocommand.h"
+#include "../../../common/exceptions.h"
 
 /*****************************************************************************************
- *  Class SES_DrawText
+ *  Forward Declarations
+ ****************************************************************************************/
+
+namespace project {
+class Schematic;
+class SchematicNetPoint;
+class SchematicNetLine;
+}
+
+/*****************************************************************************************
+ *  Class CmdSchematicNetLineAdd
  ****************************************************************************************/
 
 namespace project {
 
-
 /**
- * @brief The SES_DrawText class
+ * @brief The CmdSchematicNetLineAdd class
  */
-class SES_DrawText final : public SchematicEditorState
+class CmdSchematicNetLineAdd final : public UndoCommand
 {
-        Q_OBJECT
-
     public:
 
         // Constructors / Destructor
-        explicit SES_DrawText(SchematicEditor& editor);
-        ~SES_DrawText();
+        explicit CmdSchematicNetLineAdd(Schematic& schematic, const QUuid& startPoint,
+                                        const QUuid& endPoint, UndoCommand* parent = 0) throw (Exception);
+        ~CmdSchematicNetLineAdd() noexcept;
 
-        // General Methods
-        State process(SchematicEditorEvent* event) noexcept;
-        void entry(State previousState) noexcept;
-        void exit(State nextState) noexcept;
+        // Getters
+        SchematicNetLine* getNetLine() const noexcept {return mNetLine;}
+
+        // Inherited from UndoCommand
+        void redo() throw (Exception) override;
+        void undo() throw (Exception) override;
+
+    private:
+
+        Schematic& mSchematic;
+        QUuid mStartPoint;
+        QUuid mEndPoint;
+        SchematicNetLine* mNetLine;
 };
 
 } // namespace project
 
-#endif // PROJECT_SES_DRAWTEXT_H
+#endif // PROJECT_CMDSCHEMATICNETLINEADD_H

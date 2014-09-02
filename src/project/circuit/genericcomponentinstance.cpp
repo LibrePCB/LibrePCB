@@ -28,6 +28,7 @@
 #include "circuit.h"
 #include "../project.h"
 #include "../library/projectlibrary.h"
+#include "gencompsignalinstance.h"
 
 namespace project {
 
@@ -64,10 +65,23 @@ GenericComponentInstance::GenericComponentInstance(Circuit& circuit,
             QString(tr("The generic component with the UUID \"%1\" does not exist in the "
             "project's library!")).arg(mDomElement.attribute("generic_component")));
     }
+
+    QDomElement tmpNode; // for temporary use...
+
+    // load all signal instances
+    tmpNode = mDomElement.firstChildElement("signal_mapping").firstChildElement("map");
+    while (!tmpNode.isNull())
+    {
+        GenCompSignalInstance* signal = new GenCompSignalInstance(*this, tmpNode);
+        mSignals.insert(signal->getCompSignalUuid(), signal);
+        tmpNode = tmpNode.nextSiblingElement("map");
+    }
+    // TODO: compare the signal count with the generic component object of the library
 }
 
 GenericComponentInstance::~GenericComponentInstance() noexcept
 {
+    qDeleteAll(mSignals);       mSignals.clear();
 }
 
 /*****************************************************************************************
@@ -101,15 +115,8 @@ void GenericComponentInstance::addToCircuit(bool addNode, QDomElement& parent) t
             throw LogicError(__FILE__, __LINE__, QString(), tr("Could not append DOM node!"));
     }
 
-    /*try
-    {
-        mNetClass->registerNetSignal(this);
-    }
-    catch (Exception& e)
-    {
-        parent.removeChild(mDomElement); // revert appending the DOM node
-        throw;
-    }*/
+    foreach (GenCompSignalInstance* signal, mSignals)
+        signal->addToCircuit();
 }
 
 void GenericComponentInstance::removeFromCircuit(bool removeNode, QDomElement& parent) throw (Exception)
@@ -123,15 +130,8 @@ void GenericComponentInstance::removeFromCircuit(bool removeNode, QDomElement& p
             throw LogicError(__FILE__, __LINE__, QString(), tr("Could not remove node from DOM tree!"));
     }
 
-    /*try
-    {
-         mNetClass->unregisterNetSignal(this);
-    }
-    catch (Exception& e)
-    {
-        parent.appendChild(mDomElement); // revert removing the DOM node
-        throw;
-    }*/
+    foreach (GenCompSignalInstance* signal, mSignals)
+        signal->removeFromCircuit();
 }
 
 /*****************************************************************************************

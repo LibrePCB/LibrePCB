@@ -71,9 +71,8 @@ SchematicEditorFsm::~SchematicEditorFsm() noexcept
  *  General Methods
  ****************************************************************************************/
 
-bool SchematicEditorFsm::processEvent(QEvent* event, bool deleteEvent) noexcept
+bool SchematicEditorFsm::processEvent(SchematicEditorEvent* event, bool deleteEvent) noexcept
 {
-    event->ignore();
     process(event); // the "isAccepted" flag is set here if the event was accepted
     bool accepted = event->isAccepted();
     if (deleteEvent)
@@ -81,7 +80,7 @@ bool SchematicEditorFsm::processEvent(QEvent* event, bool deleteEvent) noexcept
     return accepted;
 }
 
-SchematicEditorState::State SchematicEditorFsm::process(QEvent* event) noexcept
+SchematicEditorState::State SchematicEditorFsm::process(SchematicEditorEvent* event) noexcept
 {
     State next = mSubStates[mCurrentState]->process(event);
 

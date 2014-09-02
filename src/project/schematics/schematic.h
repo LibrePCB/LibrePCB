@@ -82,7 +82,7 @@ class Schematic final : public CADScene
 
         // SchematicNetPoint Methods
         SchematicNetPoint* getNetPointByUuid(const QUuid& uuid) const noexcept;
-        SchematicNetPoint* createNetPoint(const QUuid& netsignal) throw (Exception);
+        SchematicNetPoint* createNetPoint(const QUuid& netsignal, const Point& position) throw (Exception);
         void addNetPoint(SchematicNetPoint* netpoint, bool toDomTree = true) throw (Exception);
         void removeNetPoint(SchematicNetPoint* netpoint, bool fromDomTree = true,
                             bool deleteNetPoint = false) throw (Exception);

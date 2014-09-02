@@ -22,9 +22,9 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "schematiceditorstate.h"
-#include "../schematiceditor.h"
-#include "../../project.h"
+#include "cmdschematicnetpointadd.h"
+#include "../schematic.h"
+#include "../schematicnetpoint.h"
 
 namespace project {
 
@@ -32,36 +32,54 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SchematicEditorState::SchematicEditorState(SchematicEditor& editor) :
-    QObject(0), mProject(editor.getProject()), mCircuit(editor.getProject().getCircuit()),
-    mEditor(editor), mCurrentState(State_Initial)
+CmdSchematicNetPointAdd::CmdSchematicNetPointAdd(Schematic& schematic, const QUuid& netsignal,
+                                                 const Point& position, UndoCommand* parent) throw (Exception) :
+    UndoCommand(QCoreApplication::translate("CmdSchematicNetPointAdd", "Add netpoint"), parent),
+    mSchematic(schematic), mNetSignal(netsignal), mPosition(position), mNetPoint(0)
 {
 }
 
-SchematicEditorState::~SchematicEditorState()
+CmdSchematicNetPointAdd::~CmdSchematicNetPointAdd() noexcept
 {
-    // exit the current substate
-    if (mSubStates.contains(mCurrentState))
-        mSubStates[mCurrentState]->exit(State_Initial);
-
-    mCurrentState = State_Initial; // switch to an invalid state
-
-    // delete all substates
-    qDeleteAll(mSubStates);     mSubStates.clear();
+    if ((mNetPoint) && (!mIsExecuted))
+        delete mNetPoint;
 }
 
 /*****************************************************************************************
- *  General Methods
+ *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void SchematicEditorState::entry(State previousState) noexcept
+void CmdSchematicNetPointAdd::redo() throw (Exception)
 {
-    Q_UNUSED(previousState);
+    if (!mNetPoint) // only the first time
+        mNetPoint = mSchematic.createNetPoint(mNetSignal, mPosition); // throws an exception on error
+
+    mSchematic.addNetPoint(mNetPoint); // throws an exception on error
+
+    try
+    {
+        UndoCommand::redo(); // throws an exception on error
+    }
+    catch (Exception &e)
+    {
+        mSchematic.removeNetPoint(mNetPoint);
+        throw;
+    }
 }
 
-void SchematicEditorState::exit(State nextState) noexcept
+void CmdSchematicNetPointAdd::undo() throw (Exception)
 {
-    Q_UNUSED(nextState);
+    mSchematic.removeNetPoint(mNetPoint); // throws an exception on error
+
+    try
+    {
+        UndoCommand::undo();
+    }
+    catch (Exception& e)
+    {
+        mSchematic.addNetPoint(mNetPoint);
+        throw;
+    }
 }
 
 /*****************************************************************************************

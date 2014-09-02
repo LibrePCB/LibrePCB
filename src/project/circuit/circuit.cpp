@@ -253,11 +253,12 @@ void Circuit::removeNetSignal(NetSignal* netsignal, bool fromDomTree, bool delet
     Q_CHECK_PTR(netsignal);
     Q_ASSERT(mNetSignals.contains(netsignal->getUuid()));
 
-    // the netsignal cannot be removed if there are already netpoints with that netsignal!
-    if (netsignal->getNetPointCount() > 0)
+    // the netsignal cannot be removed if there are already elements with that netsignal!
+    if ((netsignal->getGenCompSignalCount() > 0) || (netsignal->getNetPointCount() > 0))
     {
-        throw LogicError(__FILE__, __LINE__, QString("%1:%2")
-            .arg(netsignal->getUuid().toString()).arg(netsignal->getNetPointCount()),
+        throw LogicError(__FILE__, __LINE__, QString("%1:%2/%3")
+            .arg(netsignal->getUuid().toString()).arg(netsignal->getGenCompSignalCount())
+            .arg(netsignal->getNetPointCount()),
             QString(tr("There are already elements in the netsignal \"%1\"!"))
             .arg(netsignal->getName()));
     }

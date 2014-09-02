@@ -63,8 +63,12 @@ class SchematicNetPoint final : public QObject
 
         // Getters
         const QUuid& getUuid() const noexcept {return mUuid;}
+        NetSignal* getNetSignal() const noexcept {return mNetSignal;}
         const Point& getPosition() const noexcept {return mPosition;}
         int getLinesCount() const noexcept {return mLines.count();}
+
+        // Setters
+        void setPosition(const Point& position) noexcept;
 
         // General Methods
         void registerNetLine(SchematicNetLine* netline) noexcept;
@@ -76,7 +80,7 @@ class SchematicNetPoint final : public QObject
 
         // Static Methods
         static SchematicNetPoint* create(Schematic& schematic, QDomDocument& doc,
-                                         const QUuid& netsignal) throw (Exception);
+                                         const QUuid& netsignal, const Point& position) throw (Exception);
 
     private:
 

@@ -26,6 +26,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
+#include "../../common/cadscene.h"
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -53,7 +54,7 @@ namespace project {
 /**
  * @brief The SchematicEditor class
  */
-class SchematicEditor : public QMainWindow
+class SchematicEditor : public QMainWindow, public IF_CADSceneEventHandler
 {
         Q_OBJECT
 
@@ -64,6 +65,7 @@ class SchematicEditor : public QMainWindow
         ~SchematicEditor();
 
         // Getters
+        Project& getProject() const noexcept {return mProject;}
         int getActiveSchematicIndex() const noexcept {return mActiveSchematicIndex;}
 
         // Setters
@@ -90,6 +92,9 @@ class SchematicEditor : public QMainWindow
         SchematicEditor();
         SchematicEditor(const SchematicEditor& other);
         SchematicEditor& operator=(const SchematicEditor& rhs);
+
+        // Private Methods
+        bool cadSceneEventHandler(QEvent* event);
 
         // General Attributes
         Workspace& mWorkspace;

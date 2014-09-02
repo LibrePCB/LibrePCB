@@ -35,6 +35,7 @@
 namespace project {
 class Circuit;
 class NetClass;
+class GenCompSignalInstance;
 class SchematicNetPoint;
 }
 
@@ -62,12 +63,15 @@ class NetSignal final : public QObject
         const QString& getName() const noexcept {return mName;}
         bool hasAutoName() const noexcept {return mAutoName;}
         NetClass& getNetClass() const noexcept {return *mNetClass;}
+        int getGenCompSignalCount() const noexcept {return mGenCompSignals.count();}
         int getNetPointCount() const noexcept {return mSchematicNetPoints.count();}
 
         // Setters
         void setName(const QString& name) throw (Exception);
 
         // General Methods
+        void registerGenCompSignal(GenCompSignalInstance* signal) noexcept;
+        void unregisterGenCompSignal(GenCompSignalInstance* signal) noexcept;
         void registerSchematicNetPoint(SchematicNetPoint* netpoint) noexcept;
         void unregisterSchematicNetPoint(SchematicNetPoint* netpoint) noexcept;
         void addToCircuit(bool addNode, QDomElement& parent) throw (Exception);
@@ -95,6 +99,8 @@ class NetSignal final : public QObject
         bool mAutoName;
         NetClass* mNetClass;
 
+        // Registered Elements of this Netclass
+        QList<GenCompSignalInstance*> mGenCompSignals;
         QList<SchematicNetPoint*> mSchematicNetPoints;
 };
 

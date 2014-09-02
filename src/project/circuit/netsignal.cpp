@@ -89,6 +89,20 @@ void NetSignal::setName(const QString& name) throw (Exception)
  *  General Methods
  ****************************************************************************************/
 
+void NetSignal::registerGenCompSignal(GenCompSignalInstance* signal) noexcept
+{
+    Q_CHECK_PTR(signal);
+    Q_ASSERT(!mGenCompSignals.contains(signal));
+    mGenCompSignals.append(signal);
+}
+
+void NetSignal::unregisterGenCompSignal(GenCompSignalInstance* signal) noexcept
+{
+    Q_CHECK_PTR(signal);
+    Q_ASSERT(mGenCompSignals.contains(signal));
+    mGenCompSignals.removeOne(signal);
+}
+
 void NetSignal::registerSchematicNetPoint(SchematicNetPoint* netpoint) noexcept
 {
     Q_CHECK_PTR(netpoint);

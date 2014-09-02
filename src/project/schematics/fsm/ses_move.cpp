@@ -45,19 +45,15 @@ SES_Move::~SES_Move()
  *  General Methods
  ****************************************************************************************/
 
-SchematicEditorState::State SES_Move::process(QEvent* event) noexcept
+SchematicEditorState::State SES_Move::process(SchematicEditorEvent* event) noexcept
 {
-    SchematicEditorState::State nextState;
+    SchematicEditorState::State nextState = State_Move;
 
-    switch (static_cast<int>(event->type()))
+    switch (event->getType())
     {
         case SchematicEditorEvent::AbortCommand:
         case SchematicEditorEvent::StartSelect:
             nextState = State_Select;
-            break;
-
-        case SchematicEditorEvent::StartMove:
-            nextState = State_Move;
             break;
 
         case SchematicEditorEvent::StartDrawText:
@@ -89,7 +85,6 @@ SchematicEditorState::State SES_Move::process(QEvent* event) noexcept
             break;
 
         default:
-            nextState = State_Move;
             break;
     }
 

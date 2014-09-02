@@ -23,6 +23,7 @@
 
 #include <QtCore>
 #include "schematic.h"
+#include "../../common/units.h"
 #include "../../common/xmlfile.h"
 #include "../project.h"
 #include "symbolinstance.h"
@@ -188,9 +189,9 @@ SchematicNetPoint* Schematic::getNetPointByUuid(const QUuid& uuid) const noexcep
     return mNetPoints.value(uuid, 0);
 }
 
-SchematicNetPoint* Schematic::createNetPoint(const QUuid& netsignal) throw (Exception)
+SchematicNetPoint* Schematic::createNetPoint(const QUuid& netsignal, const Point& position) throw (Exception)
 {
-    return SchematicNetPoint::create(*this, mXmlFile->getDocument(), netsignal);
+    return SchematicNetPoint::create(*this, mXmlFile->getDocument(), netsignal, position);
 }
 
 void Schematic::addNetPoint(SchematicNetPoint* netpoint, bool toDomTree) throw (Exception)

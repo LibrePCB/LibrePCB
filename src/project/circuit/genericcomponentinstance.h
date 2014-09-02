@@ -34,6 +34,7 @@
 
 namespace project {
 class Circuit;
+class GenCompSignalInstance;
 }
 
 namespace library {
@@ -61,6 +62,7 @@ class GenericComponentInstance : public QObject
         ~GenericComponentInstance() noexcept;
 
         // Getters
+        const Circuit& getCircuit() const noexcept {return mCircuit;}
         const QUuid& getUuid() const noexcept {return mUuid;}
         const QString& getName() const noexcept {return mName;}
         const library::GenericComponent& getGenComp() const noexcept {return *mGenComp;}
@@ -92,6 +94,7 @@ class GenericComponentInstance : public QObject
         QUuid mUuid;
         QString mName;
         const library::GenericComponent* mGenComp;
+        QHash<QUuid, GenCompSignalInstance*> mSignals;
 };
 
 } // namespace project

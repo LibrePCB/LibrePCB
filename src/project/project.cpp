@@ -389,6 +389,14 @@ bool Project::save() noexcept
 
 bool Project::autosave() noexcept
 {
+    if (mUndoStack->isCommandActive())
+    {
+        // the user is executing a command at the moment, so we should not save now,
+        // try it a few seconds later instead...
+        QTimer::singleShot(10000, this, SLOT(autosave()));
+        return false;
+    }
+
     QStringList errors;
 
     qDebug() << "Autosave the project...";

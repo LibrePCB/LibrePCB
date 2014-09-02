@@ -119,6 +119,9 @@ SchematicEditor::SchematicEditor(Workspace& workspace, Project& project) :
     mUi->graphicsView->setGridType(CADView::gridLines);
     if (mProject.getSchematicCount() > 0)
         setActiveSchematicIndex(0);
+
+    // mUi->graphicsView->zoomAll(); does not work here, must be executed in the event loop
+    QTimer::singleShot(0, mUi->graphicsView, SLOT(zoomAll()));
 }
 
 SchematicEditor::~SchematicEditor()
@@ -143,7 +146,16 @@ void SchematicEditor::setActiveSchematicIndex(int index)
     if (index == mActiveSchematicIndex)
         return;
 
+    // unregister event handler object
+    if (mUi->graphicsView->getCadScene())
+        mUi->graphicsView->getCadScene()->setEventHandlerObject(0);
+
+    // change scene
     mUi->graphicsView->setScene(mProject.getSchematicByIndex(index));
+
+    // register event handler object
+    if (mUi->graphicsView->getCadScene())
+        mUi->graphicsView->getCadScene()->setEventHandlerObject(this);
 
     emit activeSchematicChanged(mActiveSchematicIndex, index);
     mActiveSchematicIndex = index;
@@ -192,6 +204,16 @@ void SchematicEditor::on_actionRedo_triggered()
     {
         QMessageBox::critical(this, tr("Redo failed"), e.getUserMsg());
     }
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+bool SchematicEditor::cadSceneEventHandler(QEvent* event)
+{
+    SEE_RedirectedQEvent* e = new SEE_RedirectedQEvent(SchematicEditorEvent::SchematicSceneEvent, event);
+    return mFsm->processEvent(e, true);
 }
 
 /*****************************************************************************************

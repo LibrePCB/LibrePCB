@@ -32,6 +32,8 @@
  ****************************************************************************************/
 
 namespace project {
+class Project;
+class Circuit;
 class SchematicEditor;
 }
 
@@ -69,13 +71,15 @@ class SchematicEditorState : public QObject
         virtual ~SchematicEditorState();
 
         // General Methods
-        virtual State process(QEvent* event) noexcept = 0; // returns the next state
+        virtual State process(SchematicEditorEvent* event) noexcept = 0; // returns the next state
         virtual void entry(State previousState) noexcept;
         virtual void exit(State nextState) noexcept;
 
     protected:
 
         // General Attributes
+        Project& mProject;
+        Circuit& mCircuit;
         SchematicEditor& mEditor;
         State mCurrentState;
         QHash<State, SchematicEditorState*> mSubStates;

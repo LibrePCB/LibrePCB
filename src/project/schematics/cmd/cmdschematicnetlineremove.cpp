@@ -22,9 +22,9 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "schematiceditorstate.h"
-#include "../schematiceditor.h"
-#include "../../project.h"
+#include "cmdschematicnetlineremove.h"
+#include "../schematic.h"
+#include "../schematicnetline.h"
 
 namespace project {
 
@@ -32,36 +32,52 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SchematicEditorState::SchematicEditorState(SchematicEditor& editor) :
-    QObject(0), mProject(editor.getProject()), mCircuit(editor.getProject().getCircuit()),
-    mEditor(editor), mCurrentState(State_Initial)
+CmdSchematicNetLineRemove::CmdSchematicNetLineRemove(Schematic& schematic,
+                                                     SchematicNetLine* netline,
+                                                     UndoCommand* parent) throw (Exception) :
+    UndoCommand(QCoreApplication::translate("CmdSchematicNetLineRemove", "Remove netline"), parent),
+    mSchematic(schematic), mNetLine(netline)
 {
 }
 
-SchematicEditorState::~SchematicEditorState()
+CmdSchematicNetLineRemove::~CmdSchematicNetLineRemove() noexcept
 {
-    // exit the current substate
-    if (mSubStates.contains(mCurrentState))
-        mSubStates[mCurrentState]->exit(State_Initial);
-
-    mCurrentState = State_Initial; // switch to an invalid state
-
-    // delete all substates
-    qDeleteAll(mSubStates);     mSubStates.clear();
+    if (mIsExecuted)
+        delete mNetLine;
 }
 
 /*****************************************************************************************
- *  General Methods
+ *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void SchematicEditorState::entry(State previousState) noexcept
+void CmdSchematicNetLineRemove::redo() throw (Exception)
 {
-    Q_UNUSED(previousState);
+    mSchematic.removeNetLine(mNetLine); // throws an exception on error
+
+    try
+    {
+        UndoCommand::redo(); // throws an exception on error
+    }
+    catch (Exception& e)
+    {
+        mSchematic.addNetLine(mNetLine);
+        throw;
+    }
 }
 
-void SchematicEditorState::exit(State nextState) noexcept
+void CmdSchematicNetLineRemove::undo() throw (Exception)
 {
-    Q_UNUSED(nextState);
+    mSchematic.addNetLine(mNetLine); // throws an exception on error
+
+    try
+    {
+        UndoCommand::undo(); // throws an exception on error
+    }
+    catch (Exception& e)
+    {
+        mSchematic.removeNetLine(mNetLine);
+        throw;
+    }
 }
 
 /*****************************************************************************************

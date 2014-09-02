@@ -48,9 +48,13 @@ class SES_Select final : public SchematicEditorState
         ~SES_Select();
 
         // General Methods
-        State process(QEvent* event) noexcept;
+        State process(SchematicEditorEvent* event) noexcept;
         void entry(State previousState) noexcept;
         void exit(State nextState) noexcept;
+
+    private:
+
+        State mPreviousState;
 };
 
 } // namespace project

@@ -47,12 +47,12 @@ class SchematicEditorFsm final : public SchematicEditorState
         ~SchematicEditorFsm() noexcept;
 
         // General Methods
-        bool processEvent(QEvent* event, bool deleteEvent = false) noexcept;
+        bool processEvent(SchematicEditorEvent* event, bool deleteEvent = false) noexcept;
 
     private:
 
         // General Methods
-        State process(QEvent* event) noexcept;
+        State process(SchematicEditorEvent* event) noexcept;
 };
 
 } // namespace project

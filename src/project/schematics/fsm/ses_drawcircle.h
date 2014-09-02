@@ -48,7 +48,7 @@ class SES_DrawCircle final : public SchematicEditorState
         ~SES_DrawCircle();
 
         // General Methods
-        State process(QEvent* event) noexcept;
+        State process(SchematicEditorEvent* event) noexcept;
         void entry(State previousState) noexcept;
         void exit(State nextState) noexcept;
 };

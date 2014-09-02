@@ -17,55 +17,54 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef PROJECT_CMDSCHEMATICNETPOINTREMOVE_H
+#define PROJECT_CMDSCHEMATICNETPOINTREMOVE_H
+
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include "schematiceditorstate.h"
-#include "../schematiceditor.h"
-#include "../../project.h"
+#include "../../../common/undocommand.h"
+#include "../../../common/exceptions.h"
+
+/*****************************************************************************************
+ *  Forward Declarations
+ ****************************************************************************************/
+
+namespace project {
+class Schematic;
+class SchematicNetPoint;
+}
+
+/*****************************************************************************************
+ *  Class CmdSchematicNetPointRemove
+ ****************************************************************************************/
 
 namespace project {
 
-/*****************************************************************************************
- *  Constructors / Destructor
- ****************************************************************************************/
-
-SchematicEditorState::SchematicEditorState(SchematicEditor& editor) :
-    QObject(0), mProject(editor.getProject()), mCircuit(editor.getProject().getCircuit()),
-    mEditor(editor), mCurrentState(State_Initial)
+/**
+ * @brief The CmdSchematicNetPointRemove class
+ */
+class CmdSchematicNetPointRemove final : public UndoCommand
 {
-}
+    public:
 
-SchematicEditorState::~SchematicEditorState()
-{
-    // exit the current substate
-    if (mSubStates.contains(mCurrentState))
-        mSubStates[mCurrentState]->exit(State_Initial);
+        // Constructors / Destructor
+        explicit CmdSchematicNetPointRemove(Schematic& schematic, SchematicNetPoint* netpoint,
+                                            UndoCommand* parent = 0) throw (Exception);
+        ~CmdSchematicNetPointRemove() noexcept;
 
-    mCurrentState = State_Initial; // switch to an invalid state
+        // Inherited from UndoCommand
+        void redo() throw (Exception) override;
+        void undo() throw (Exception) override;
 
-    // delete all substates
-    qDeleteAll(mSubStates);     mSubStates.clear();
-}
+    private:
 
-/*****************************************************************************************
- *  General Methods
- ****************************************************************************************/
-
-void SchematicEditorState::entry(State previousState) noexcept
-{
-    Q_UNUSED(previousState);
-}
-
-void SchematicEditorState::exit(State nextState) noexcept
-{
-    Q_UNUSED(nextState);
-}
-
-/*****************************************************************************************
- *  End of File
- ****************************************************************************************/
+        Schematic& mSchematic;
+        SchematicNetPoint* mNetPoint;
+};
 
 } // namespace project
+
+#endif // PROJECT_CMDSCHEMATICNETPOINTREMOVE_H

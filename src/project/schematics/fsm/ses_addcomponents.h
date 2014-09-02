@@ -48,7 +48,7 @@ class SES_AddComponents final : public SchematicEditorState
         ~SES_AddComponents();
 
         // General Methods
-        State process(QEvent* event) noexcept;
+        State process(SchematicEditorEvent* event) noexcept;
         void entry(State previousState) noexcept;
         void exit(State nextState) noexcept;
 };

@@ -45,11 +45,11 @@ SES_AddComponents::~SES_AddComponents()
  *  General Methods
  ****************************************************************************************/
 
-SchematicEditorState::State SES_AddComponents::process(QEvent* event) noexcept
+SchematicEditorState::State SES_AddComponents::process(SchematicEditorEvent* event) noexcept
 {
-    SchematicEditorState::State nextState;
+    SchematicEditorState::State nextState = State_AddComponent;
 
-    switch (static_cast<int>(event->type()))
+    switch (event->getType())
     {
         case SchematicEditorEvent::AbortCommand:
         case SchematicEditorEvent::StartSelect:
@@ -84,12 +84,7 @@ SchematicEditorState::State SES_AddComponents::process(QEvent* event) noexcept
             nextState = State_DrawWire;
             break;
 
-        case SchematicEditorEvent::StartAddComponent:
-            nextState = State_AddComponent;
-            break;
-
         default:
-            nextState = State_AddComponent;
             break;
     }
 

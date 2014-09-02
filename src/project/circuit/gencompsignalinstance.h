@@ -17,65 +17,73 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SES_DRAWWIRE_H
-#define PROJECT_SES_DRAWWIRE_H
+#ifndef PROJECT_GENCOMPSIGNALINSTANCE_H
+#define PROJECT_GENCOMPSIGNALINSTANCE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QtWidgets>
-#include "schematiceditorstate.h"
+#include <QDomElement>
+#include "../../common/exceptions.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
 namespace project {
-class SchematicNetPoint;
+class GenericComponentInstance;
+class NetSignal;
 }
 
 /*****************************************************************************************
- *  Class SES_DrawWire
+ *  Class GenCompSignalInstance
  ****************************************************************************************/
 
 namespace project {
 
-
 /**
- * @brief The SES_DrawWire class
+ * @brief The GenCompSignalInstance class
  */
-class SES_DrawWire final : public SchematicEditorState
+class GenCompSignalInstance final : public QObject
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit SES_DrawWire(SchematicEditor& editor);
-        ~SES_DrawWire();
+        explicit GenCompSignalInstance(GenericComponentInstance& genCompInstance,
+                                       const QDomElement& domElement) throw (Exception);
+        ~GenCompSignalInstance() noexcept;
+
+        // Getters
+        const QUuid& getCompSignalUuid() const noexcept {return mCompSignalUuid;}
+        NetSignal* getNetSignal() const noexcept {return mNetSignal;}
 
         // General Methods
-        State process(SchematicEditorEvent* event) noexcept;
-        void entry(State previousState) noexcept;
-        void exit(State nextState) noexcept;
+        void addToCircuit() noexcept;
+        void removeFromCircuit() noexcept;
 
     private:
 
-        // Internal FSM States (substates)
-        enum SubState {
-            SubState_Idle, // initial substate
-            SubState_PositioningNetPoint
-        };
-        SubState mSubState;
-        SchematicNetPoint* mPositioningNetPoint;
+        // make some methods inaccessible...
+        GenCompSignalInstance();
+        GenCompSignalInstance(const GenCompSignalInstance& other);
+        GenCompSignalInstance& operator=(const GenCompSignalInstance& rhs);
 
-        // Widgets for the command toolbar
-        QLabel* mWidthLabel;
-        QComboBox* mWidthComboBox;
+        // General
+        GenericComponentInstance& mGenCompInstance;
+        QDomElement mDomElement;
+
+        // Attributes
+        QUuid mCompSignalUuid; ///< @todo replace this with a pointer to the component signal object
+        NetSignal* mNetSignal;
+
+        bool mAddedToCircuit;
+
 };
 
 } // namespace project
 
-#endif // PROJECT_SES_DRAWWIRE_H
+#endif // PROJECT_GENCOMPSIGNALINSTANCE_H

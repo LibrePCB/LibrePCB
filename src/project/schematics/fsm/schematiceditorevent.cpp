@@ -31,7 +31,7 @@ namespace project {
  ****************************************************************************************/
 
 SchematicEditorEvent::SchematicEditorEvent(EventType type) :
-    QEvent(static_cast<QEvent::Type>(type))
+    mType(type), mAccepted(false)
 {
 }
 

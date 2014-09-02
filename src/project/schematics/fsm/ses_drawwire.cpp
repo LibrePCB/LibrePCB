@@ -25,6 +25,14 @@
 #include "ses_drawwire.h"
 #include "../schematiceditor.h"
 #include "ui_schematiceditor.h"
+#include "../../../common/units.h"
+#include "../../../common/undostack.h"
+#include "../../project.h"
+#include "../../circuit/netsignal.h"
+#include "../../circuit/cmd/cmdnetsignaladd.h"
+#include "../schematicnetpoint.h"
+#include "../cmd/cmdschematicnetpointadd.h"
+#include "../cmd/cmdschematicnetlineadd.h"
 
 namespace project {
 
@@ -33,7 +41,8 @@ namespace project {
  ****************************************************************************************/
 
 SES_DrawWire::SES_DrawWire(SchematicEditor& editor) :
-    SchematicEditorState(editor), mWidthLabel(0), mWidthComboBox(0)
+    SchematicEditorState(editor), mSubState(SubState_Idle),
+    mWidthLabel(0), mWidthComboBox(0)
 {
 }
 
@@ -45,13 +54,25 @@ SES_DrawWire::~SES_DrawWire()
  *  General Methods
  ****************************************************************************************/
 
-SchematicEditorState::State SES_DrawWire::process(QEvent* event) noexcept
+SchematicEditorState::State SES_DrawWire::process(SchematicEditorEvent* event) noexcept
 {
-    SchematicEditorState::State nextState;
+    SchematicEditorState::State nextState = State_DrawWire;
 
-    switch (static_cast<int>(event->type()))
+    switch (event->getType())
     {
         case SchematicEditorEvent::AbortCommand:
+        {
+            // abort command
+            if (mSubState != SubState_Idle)
+            {
+                mProject.getUndoStack().abortCommand();
+                mSubState = SubState_Idle;
+            }
+            else
+                nextState = State_Select;
+            break;
+        }
+
         case SchematicEditorEvent::StartSelect:
             nextState = State_Select;
             break;
@@ -80,16 +101,139 @@ SchematicEditorState::State SES_DrawWire::process(QEvent* event) noexcept
             nextState = State_DrawEllipse;
             break;
 
-        case SchematicEditorEvent::StartDrawWire:
-            nextState = State_DrawWire;
-            break;
-
         case SchematicEditorEvent::StartAddComponent:
             nextState = State_AddComponent;
             break;
 
+        case SchematicEditorEvent::SchematicSceneEvent:
+        {
+            QEvent* qevent = dynamic_cast<SEE_RedirectedQEvent*>(event)->getQEvent();
+            switch (qevent->type())
+            {
+                case QEvent::GraphicsSceneMousePress:
+                {
+                    QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
+                    Point pos = Point::fromPx(sceneEvent->scenePos(), Length(2540000)); // TODO
+                    Schematic* schematic = mProject.getSchematicByIndex(
+                                               mEditor.mActiveSchematicIndex);
+
+                    switch (sceneEvent->button())
+                    {
+                        case Qt::LeftButton:
+                        {
+                            // next step on the draw wire command (place points/lines)
+
+                            switch (mSubState)
+                            {
+                                case SubState_Idle:
+                                {
+                                    // begin drawing a wire:
+                                    //  1) add a new netsignal
+                                    //  2) add two netpoints
+                                    //  3) add a netline between
+
+                                    mProject.getUndoStack().beginCommand(tr("Draw Wire"));
+
+                                    // add new netsignal
+                                    QUuid netclass = "{4b10268a-fec5-4230-8054-2dc966d625cd}"; // temporary
+                                    CmdNetSignalAdd* cmdSignalAdd = new CmdNetSignalAdd(mCircuit, netclass);
+                                    mProject.getUndoStack().appendToCommand(cmdSignalAdd);
+
+                                    // add first netpoint
+                                    CmdSchematicNetPointAdd* cmdNetPointAdd1 = new CmdSchematicNetPointAdd(
+                                        *schematic, cmdSignalAdd->getNetSignal()->getUuid(), pos);
+                                    mProject.getUndoStack().appendToCommand(cmdNetPointAdd1);
+
+                                    // add second netpoint
+                                    CmdSchematicNetPointAdd* cmdNetPointAdd2 = new CmdSchematicNetPointAdd(
+                                        *schematic, cmdSignalAdd->getNetSignal()->getUuid(), pos);
+                                    mProject.getUndoStack().appendToCommand(cmdNetPointAdd2);
+
+                                    // add netline
+                                    CmdSchematicNetLineAdd* cmdNetLineAdd = new CmdSchematicNetLineAdd(
+                                        *schematic, cmdNetPointAdd1->getNetPoint()->getUuid(),
+                                        cmdNetPointAdd2->getNetPoint()->getUuid());
+                                    mProject.getUndoStack().appendToCommand(cmdNetLineAdd);
+
+                                    mPositioningNetPoint = cmdNetPointAdd2->getNetPoint();
+                                    mSubState = SubState_PositioningNetPoint;
+                                    event->setAccepted(true);
+                                    break;
+                                }
+
+                                case SubState_PositioningNetPoint:
+                                {
+                                    // fix the current point and add a new point + line
+
+                                    // apply the current line
+                                    mProject.getUndoStack().endCommand();
+
+                                    // start new line
+                                    mProject.getUndoStack().beginCommand(tr("Draw Wire"));
+
+                                    // add netpoint
+                                    CmdSchematicNetPointAdd* cmdNetPointAdd = new CmdSchematicNetPointAdd(
+                                        *schematic, mPositioningNetPoint->getNetSignal()->getUuid(), pos);
+                                    mProject.getUndoStack().appendToCommand(cmdNetPointAdd);
+
+                                    // add netline
+                                    CmdSchematicNetLineAdd* cmdNetLineAdd = new CmdSchematicNetLineAdd(
+                                        *schematic, mPositioningNetPoint->getUuid(),
+                                        cmdNetPointAdd->getNetPoint()->getUuid());
+                                    mProject.getUndoStack().appendToCommand(cmdNetLineAdd);
+
+                                    mPositioningNetPoint = cmdNetPointAdd->getNetPoint();
+                                    event->setAccepted(true);
+                                    break;
+                                }
+
+                                default:
+                                    break;
+                            }
+                            break;
+                        }
+
+                        case Qt::RightButton:
+                        {
+                            // abort command
+                            if (mSubState != SubState_Idle)
+                            {
+                                mProject.getUndoStack().abortCommand();
+                                mSubState = SubState_Idle;
+                            }
+                            else
+                                nextState = State_Select;
+
+                            event->setAccepted(true);
+                            break;
+                        }
+
+                        default:
+                            break;
+                    }
+                    break;
+                }
+
+                case QEvent::GraphicsSceneMouseMove:
+                {
+                    QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
+                    Point pos = Point::fromPx(sceneEvent->scenePos(), Length(2540000)); // TODO
+
+                    if (mSubState == SubState_PositioningNetPoint)
+                    {
+                        mPositioningNetPoint->setPosition(pos);
+                        event->setAccepted(true);
+                    }
+                    break;
+                }
+
+                default:
+                    break;
+            }
+            break;
+        }
+
         default:
-            nextState = State_DrawWire;
             break;
     }
 

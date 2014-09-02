@@ -26,22 +26,23 @@
 
 #include <QtCore>
 
+namespace project {
+
 /*****************************************************************************************
  *  Class SchematicEditorEvent
  ****************************************************************************************/
 
-namespace project {
-
 /**
  * @brief The SchematicEditorEvent class
  */
-class SchematicEditorEvent : public QEvent
+class SchematicEditorEvent
 {
     public:
 
         // FSM events (codes used for QEvent::type)
         enum EventType {
             _First = QEvent::User, // the first user defined type after all Qt types
+            // Triggered Actions (SchematicEditorEvent objects)
             AbortCommand,
             StartSelect,
             StartMove,
@@ -51,12 +52,57 @@ class SchematicEditorEvent : public QEvent
             StartDrawCircle,
             StartDrawEllipse,
             StartDrawWire,
-            StartAddComponent
+            StartAddComponent,
+            // Redirected QEvent's (SES_RedirectedQEvent objects)
+            SchematicSceneEvent
         };
 
         // Constructors / Destructor
         SchematicEditorEvent(EventType type);
         virtual ~SchematicEditorEvent();
+
+        // Getters
+        EventType getType() const noexcept {return mType;}
+        bool isAccepted() const noexcept {return mAccepted;}
+
+        // Setters
+        virtual void setAccepted(bool accepted) noexcept {mAccepted = accepted;}
+
+    protected:
+
+        EventType mType;
+        bool mAccepted;
+};
+
+/*****************************************************************************************
+ *  Class SEE_RedirectedQEvent
+ ****************************************************************************************/
+
+/**
+ * @brief The SchematicEditorEvent class
+ */
+class SEE_RedirectedQEvent : public SchematicEditorEvent
+{
+    public:
+
+        // Constructors / Destructor
+        SEE_RedirectedQEvent(EventType type, QEvent* event) :
+            SchematicEditorEvent(type), mQEvent(event) {}
+        virtual ~SEE_RedirectedQEvent() {}
+
+        // Getters
+        QEvent* getQEvent() const noexcept {return mQEvent;}
+
+        // Setters
+        void setAccepted(bool accepted) noexcept
+        {
+            mQEvent->setAccepted(accepted);
+            SchematicEditorEvent::setAccepted(accepted);
+        }
+
+    private:
+
+        QEvent* mQEvent;
 };
 
 } // namespace project

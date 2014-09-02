@@ -22,9 +22,9 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "schematiceditorstate.h"
-#include "../schematiceditor.h"
-#include "../../project.h"
+#include "cmdschematicnetlineadd.h"
+#include "../schematic.h"
+#include "../schematicnetline.h"
 
 namespace project {
 
@@ -32,36 +32,54 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SchematicEditorState::SchematicEditorState(SchematicEditor& editor) :
-    QObject(0), mProject(editor.getProject()), mCircuit(editor.getProject().getCircuit()),
-    mEditor(editor), mCurrentState(State_Initial)
+CmdSchematicNetLineAdd::CmdSchematicNetLineAdd(Schematic& schematic, const QUuid& startPoint,
+                                               const QUuid& endPoint, UndoCommand* parent) throw (Exception) :
+    UndoCommand(QCoreApplication::translate("CmdSchematicNetLineAdd", "Add netline"), parent),
+    mSchematic(schematic), mStartPoint(startPoint), mEndPoint(endPoint), mNetLine(0)
 {
 }
 
-SchematicEditorState::~SchematicEditorState()
+CmdSchematicNetLineAdd::~CmdSchematicNetLineAdd() noexcept
 {
-    // exit the current substate
-    if (mSubStates.contains(mCurrentState))
-        mSubStates[mCurrentState]->exit(State_Initial);
-
-    mCurrentState = State_Initial; // switch to an invalid state
-
-    // delete all substates
-    qDeleteAll(mSubStates);     mSubStates.clear();
+    if ((mNetLine) && (!mIsExecuted))
+        delete mNetLine;
 }
 
 /*****************************************************************************************
- *  General Methods
+ *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void SchematicEditorState::entry(State previousState) noexcept
+void CmdSchematicNetLineAdd::redo() throw (Exception)
 {
-    Q_UNUSED(previousState);
+    if (!mNetLine) // only the first time
+        mNetLine = mSchematic.createNetLine(mStartPoint, mEndPoint); // throws an exception on error
+
+    mSchematic.addNetLine(mNetLine); // throws an exception on error
+
+    try
+    {
+        UndoCommand::redo(); // throws an exception on error
+    }
+    catch (Exception &e)
+    {
+        mSchematic.removeNetLine(mNetLine);
+        throw;
+    }
 }
 
-void SchematicEditorState::exit(State nextState) noexcept
+void CmdSchematicNetLineAdd::undo() throw (Exception)
 {
-    Q_UNUSED(nextState);
+    mSchematic.removeNetLine(mNetLine); // throws an exception on error
+
+    try
+    {
+        UndoCommand::undo();
+    }
+    catch (Exception& e)
+    {
+        mSchematic.addNetLine(mNetLine);
+        throw;
+    }
 }
 
 /*****************************************************************************************
