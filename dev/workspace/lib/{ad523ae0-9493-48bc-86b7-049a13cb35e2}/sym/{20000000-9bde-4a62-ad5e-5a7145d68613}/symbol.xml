@@ -19,17 +19,17 @@
     <changelog/>
     <attachements/>
     <geometry>
-        <rect layer="11" width="0.6" x1="0" y1="0" x2="297" y2="210" shape="false" />
-        <line layer="11" width="0.6" x1="150" y1="0" x2="150" y2="30" />
-        <line layer="11" width="0.6" x1="250" y1="0" x2="250" y2="30" />
-        <line layer="11" width="0.6" x1="150" y1="30" x2="297" y2="30" />
-        <line layer="11" width="0.6" x1="150" y1="12" x2="297" y2="12" />
-        <line layer="11" width="0.6" x1="250" y1="21" x2="297" y2="21" />
-        <text layer="30" value="${PROJECT::NAME}"       x="153" y="0"   angle="0" size="12" v_align="bottom" h_align="left" ratio="0.08" mirror="false" font="proportional" />
-        <text layer="30" value="${PAGE::LAST_MODIFIED}" x="253" y="22"  angle="0" size="7"  v_align="bottom" h_align="left" ratio="0.08" mirror="false" font="proportional" />
-        <text layer="30" value="${PAGE::NAME}"          x="153" y="12"  angle="0" size="18" v_align="bottom" h_align="left" ratio="0.08" mirror="false" font="proportional" />
-        <text layer="30" value="${PROJECT::AUTHOR}"     x="253" y="13"  angle="0" size="7"  v_align="bottom" h_align="left" ratio="0.08" mirror="false" font="proportional" />
-        <text layer="30" value="${PAGE::PAGE_X_OF_Y}"   x="253" y="2.5" angle="0" size="7"  v_align="bottom" h_align="left" ratio="0.08" mirror="false" font="proportional" />
+        <rect layer="10" width="0.6" x1="0" y1="0" x2="297" y2="210" shape="false" />
+        <line layer="10" width="0.6" x1="150" y1="0" x2="150" y2="30" />
+        <line layer="10" width="0.6" x1="250" y1="0" x2="250" y2="30" />
+        <line layer="10" width="0.6" x1="150" y1="30" x2="297" y2="30" />
+        <line layer="10" width="0.6" x1="150" y1="12" x2="297" y2="12" />
+        <line layer="10" width="0.6" x1="250" y1="21" x2="297" y2="21" />
+        <text layer="10" value="${PROJECT::NAME}"       x="153" y="0"   angle="0" size="12" v_align="bottom" h_align="left" ratio="0.08" mirror="false" font="proportional" />
+        <text layer="10" value="${PAGE::LAST_MODIFIED}" x="253" y="22"  angle="0" size="7"  v_align="bottom" h_align="left" ratio="0.08" mirror="false" font="proportional" />
+        <text layer="10" value="${PAGE::NAME}"          x="153" y="12"  angle="0" size="18" v_align="bottom" h_align="left" ratio="0.08" mirror="false" font="proportional" />
+        <text layer="10" value="${PROJECT::AUTHOR}"     x="253" y="13"  angle="0" size="7"  v_align="bottom" h_align="left" ratio="0.08" mirror="false" font="proportional" />
+        <text layer="10" value="${PAGE::PAGE_X_OF_Y}"   x="253" y="2.5" angle="0" size="7"  v_align="bottom" h_align="left" ratio="0.08" mirror="false" font="proportional" />
     </geometry>
     <pins/>
 </symbol>

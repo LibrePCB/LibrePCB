@@ -26,6 +26,8 @@
 #include "schematicnetline.h"
 #include "schematic.h"
 #include "schematicnetpoint.h"
+#include "../project.h"
+#include "../../common/schematiclayer.h"
 
 namespace project {
 
@@ -35,7 +37,7 @@ namespace project {
 
 SchematicNetLine::SchematicNetLine(Schematic& schematic, const QDomElement& domElement)
                                    throw (Exception) :
-    QObject(0), mSchematic(schematic), mDomElement(domElement), mItem(0),
+    QObject(0), mSchematic(schematic), mDomElement(domElement), mItem(0), mLayer(0),
     mStartPoint(0), mEndPoint(0)
 {
     mUuid = mDomElement.attribute("uuid");
@@ -62,9 +64,12 @@ SchematicNetLine::SchematicNetLine(Schematic& schematic, const QDomElement& domE
             .arg(mDomElement.attribute("end_point")));
     }
 
+    mLayer = mSchematic.getProject().getSchematicLayer(SchematicLayer::Nets);
+    if (!mLayer)
+        throw LogicError(__FILE__, __LINE__, QString(), tr("No Nets Layer found!"));
 
     mItem = new QGraphicsLineItem();
-    mItem->setPen(QPen(Qt::darkGreen, 1));
+    mItem->setPen(QPen(mLayer->getColor(), 1));
 }
 
 SchematicNetLine::~SchematicNetLine() noexcept

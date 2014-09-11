@@ -29,6 +29,7 @@
 #include "../project.h"
 #include "../circuit/circuit.h"
 #include "../circuit/netsignal.h"
+#include "../../common/schematiclayer.h"
 
 namespace project {
 
@@ -38,7 +39,8 @@ namespace project {
 
 SchematicNetPoint::SchematicNetPoint(Schematic& schematic, const QDomElement& domElement)
                                      throw (Exception) :
-    QObject(0), mSchematic(schematic), mDomElement(domElement), mItem(0), mNetSignal(0)
+    QObject(0), mSchematic(schematic), mDomElement(domElement), mItem(0), mLayer(0),
+    mNetSignal(0)
 {
     mUuid = mDomElement.attribute("uuid");
     if(mUuid.isNull())
@@ -58,9 +60,13 @@ SchematicNetPoint::SchematicNetPoint(Schematic& schematic, const QDomElement& do
 
     mAttached = (mDomElement.firstChildElement("attached").text() == "true");
 
+    mLayer = mSchematic.getProject().getSchematicLayer(SchematicLayer::Nets);
+    if (!mLayer)
+        throw LogicError(__FILE__, __LINE__, QString(), tr("No Nets Layer found!"));
+
     mItem = new QGraphicsEllipseItem(-2, -2, 4, 4);
-    mItem->setPen(QPen(Qt::darkGreen, 0));
-    mItem->setBrush(QBrush(Qt::darkGreen, Qt::SolidPattern));
+    mItem->setPen(QPen(mLayer->getColor(), 0));
+    mItem->setBrush(QBrush(mLayer->getColor(), Qt::SolidPattern));
 
     if (mAttached)
     {

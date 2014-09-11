@@ -34,6 +34,7 @@
  ****************************************************************************************/
 
 class QGraphicsEllipseItem;
+class SchematicLayer;
 
 namespace project {
 class Schematic;
@@ -93,6 +94,7 @@ class SchematicNetPoint final : public QObject
         Schematic& mSchematic;
         QDomElement mDomElement;
         QGraphicsEllipseItem* mItem;
+        SchematicLayer* mLayer;
 
         // Attributes
         QUuid mUuid;

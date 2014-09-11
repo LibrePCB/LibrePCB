@@ -27,6 +27,7 @@
 #include "schematic.h"
 #include "../project.h"
 #include "../circuit/circuit.h"
+#include "../../common/schematiclayer.h"
 
 namespace project {
 
@@ -36,7 +37,7 @@ namespace project {
 
 SymbolInstance::SymbolInstance(Schematic& schematic, const QDomElement& domElement)
                                throw (Exception) :
-    QObject(0), mSchematic(schematic), mDomElement(domElement), mItem(0)
+    QObject(0), mSchematic(schematic), mDomElement(domElement), mItem(0), mOutlineLayer(0)
 {
     mUuid = mDomElement.attribute("uuid");
     if(mUuid.isNull())
@@ -55,9 +56,13 @@ SymbolInstance::SymbolInstance(Schematic& schematic, const QDomElement& domEleme
                            .arg(gcUuid));
     }
 
+    mOutlineLayer = mSchematic.getProject().getSchematicLayer(SchematicLayer::SymbolOutlines);
+    if (!mOutlineLayer)
+        throw LogicError(__FILE__, __LINE__, QString(), tr("No Outline Layer found!"));
+
     mItem = new QGraphicsRectItem(-10, -10, 20, 20);
-    mItem->setPen(QPen(Qt::darkRed, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-    mItem->setBrush(QBrush(Qt::yellow, Qt::SolidPattern));
+    mItem->setPen(QPen(mOutlineLayer->getColor(), 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    mItem->setBrush(QBrush(mOutlineLayer->getFillColor(), Qt::SolidPattern));
 
     mPosition.setX(Length::fromMm(mDomElement.firstChildElement("position").attribute("x")));
     mPosition.setY(Length::fromMm(mDomElement.firstChildElement("position").attribute("y")));

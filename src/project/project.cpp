@@ -36,6 +36,7 @@
 #include "../common/filepath.h"
 #include "../common/undostack.h"
 #include "schematics/schematic.h"
+#include "../common/schematiclayer.h"
 
 namespace project {
 
@@ -137,6 +138,16 @@ Project::Project(Workspace& workspace, const FilePath& filepath) throw (Exceptio
         mProjectLibrary = new ProjectLibrary(mWorkspace, *this, restore);
         mCircuit = new Circuit(mWorkspace, *this, restore);
 
+        // Load all schematic layers
+        QList<unsigned int> schematicLayerIds;
+        schematicLayerIds << SchematicLayer::OriginCrosses
+            << SchematicLayer::SymbolOutlines << SchematicLayer::SymbolPinCircles
+            << SchematicLayer::SymbolPinNames << SchematicLayer::ComponentNames
+            << SchematicLayer::ComponentValues << SchematicLayer::Nets
+            << SchematicLayer::Busses;
+        foreach (unsigned int id, schematicLayerIds)
+            mSchematicLayers.insert(id, new SchematicLayer(id));
+
         // Load all schematics
         mSchematicsIniFile = new IniFile(mPath.getPathTo("schematics/schematics.ini"), restore);
         QSettings* schematicsSettings = mSchematicsIniFile->createQSettings();
@@ -162,6 +173,7 @@ Project::Project(Workspace& workspace, const FilePath& filepath) throw (Exceptio
         foreach (Schematic* schematic, mSchematics)
             try { removeSchematic(schematic, false, true); } catch (...) {}
         delete mSchematicsIniFile;      mSchematicsIniFile = 0;
+        qDeleteAll(mSchematicLayers);   mSchematicLayers.clear();
         delete mCircuit;                mCircuit = 0;
         delete mProjectLibrary;         mProjectLibrary = 0;
         delete mUndoStack;              mUndoStack = 0;
@@ -204,6 +216,7 @@ Project::~Project() noexcept
         try { removeSchematic(schematic, false, true); } catch (...) {}
 
     delete mSchematicsIniFile;      mSchematicsIniFile = 0;
+    qDeleteAll(mSchematicLayers);   mSchematicLayers.clear();
     delete mCircuit;                mCircuit = 0;
     delete mProjectLibrary;         mProjectLibrary = 0;
     delete mUndoStack;              mUndoStack = 0;
@@ -389,6 +402,9 @@ bool Project::save() noexcept
 
 bool Project::autosave() noexcept
 {
+    if (mUndoStack->isClean()) // do not save if there are no changes
+        return false;
+
     if (mUndoStack->isCommandActive())
     {
         // the user is executing a command at the moment, so we should not save now,

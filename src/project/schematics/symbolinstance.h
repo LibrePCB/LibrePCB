@@ -34,6 +34,7 @@
  ****************************************************************************************/
 
 class QGraphicsRectItem;
+class SchematicLayer;
 
 namespace project {
 class Schematic;
@@ -92,6 +93,7 @@ class SymbolInstance final : public QObject
         Schematic& mSchematic;
         QDomElement mDomElement;
         QGraphicsRectItem* mItem;
+        SchematicLayer* mOutlineLayer;
 
         // Attributes
         QUuid mUuid;

@@ -29,13 +29,104 @@
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SchematicLayer::SchematicLayer(Workspace& workspace) :
-    QObject(0), mWorkspace(workspace)
+SchematicLayer::SchematicLayer(unsigned int id) :
+    QObject(0), mId(id)
 {
+    switch (mId)
+    {
+        case OriginCrosses:
+            mName = tr("Origin Crosses");
+            mColor = Qt::lightGray;
+            mColorHighlighted = Qt::lightGray;
+            mFillColor = Qt::lightGray;
+            mFillColorHighlighted = Qt::lightGray;
+            break;
+
+        case SymbolOutlines:
+            mName = tr("Symbol Outlines");
+            mColor = Qt::darkRed;
+            mColorHighlighted = Qt::red;
+            mFillColor = QColor(255, 255, 0, 50);
+            mFillColorHighlighted = QColor(255, 255, 0, 80);
+            break;
+
+        case SymbolPinCircles:
+            mName = tr("Symbol Pin Circles");
+            mColor = Qt::green;
+            mColorHighlighted = Qt::green;
+            mFillColor = Qt::transparent;
+            mFillColorHighlighted = Qt::transparent;
+            break;
+
+        case SymbolPinNames:
+            mName = tr("Symbol Pin Names");
+            mColor = Qt::gray;
+            mColorHighlighted = Qt::lightGray;
+            mFillColor = Qt::gray;
+            mFillColorHighlighted = Qt::lightGray;
+            break;
+
+        case ComponentNames:
+            mName = tr("Component Names");
+            mColor = Qt::gray;
+            mColorHighlighted = Qt::lightGray;
+            mFillColor = Qt::gray;
+            mFillColorHighlighted = Qt::lightGray;
+            break;
+
+        case ComponentValues:
+            mName = tr("Component Values");
+            mColor = Qt::gray;
+            mColorHighlighted = Qt::lightGray;
+            mFillColor = Qt::gray;
+            mFillColorHighlighted = Qt::lightGray;
+            break;
+
+        case Nets:
+            mName = tr("Nets");
+            mColor = Qt::darkGreen;
+            mColorHighlighted = Qt::green;
+            mFillColor = Qt::darkGreen;
+            mFillColorHighlighted = Qt::green;
+            break;
+
+        case Busses:
+            mName = tr("Busses");
+            mColor = Qt::darkBlue;
+            mColorHighlighted = Qt::blue;
+            mFillColor = Qt::darkBlue;
+            mFillColorHighlighted = Qt::blue;
+            break;
+
+        default:
+            if (mId >= UserDefinedBaseId)
+            {
+                // TODO: this is a user-defined layer...
+            }
+            else
+            {
+                qCritical() << "invalid schematic layer id:" << mId;
+            }
+            break;
+    }
 }
 
 SchematicLayer::~SchematicLayer()
 {
+}
+
+/*****************************************************************************************
+ *  Getters
+ ****************************************************************************************/
+
+const QColor& SchematicLayer::getColor(bool highlighted) const
+{
+    return highlighted ? mColorHighlighted : mColor;
+}
+
+const QColor& SchematicLayer::getFillColor(bool highlighted) const
+{
+    return highlighted ? mFillColorHighlighted : mFillColor;
 }
 
 /*****************************************************************************************

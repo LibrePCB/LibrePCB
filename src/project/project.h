@@ -38,6 +38,7 @@ class XmlFile;
 class IniFile;
 class Workspace;
 class UndoStack;
+class SchematicLayer;
 
 namespace project {
 class ProjectLibrary;
@@ -141,6 +142,23 @@ class Project final : public QObject
          * @return A reference to the ProjectLibrary object
          */
         ProjectLibrary& getLibrary() const noexcept {return *mProjectLibrary;}
+
+        /**
+         * @brief Get all Schematic Layers
+         *
+         * @return A reference to the QHash with all schematic layers
+         */
+        const QHash<unsigned int, SchematicLayer*>& getSchematicLayers() const noexcept {return mSchematicLayers;}
+
+        /**
+         * @brief Get a Schematic Layer with a specific ID
+         *
+         * @param id    The ID of the layer
+         *
+         * @return  A pointer to the SchematicLayer object, or NULL if there is no layer
+         *          with the specified ID
+         */
+        SchematicLayer* getSchematicLayer(unsigned int id) const noexcept {return mSchematicLayers.value(id, 0);}
 
         /**
          * @brief Get the page index of a specific schematic
@@ -323,6 +341,7 @@ class Project final : public QObject
         Circuit* mCircuit;
         QList<Schematic*> mSchematics;
         SchematicEditor* mSchematicEditor;
+        QHash<unsigned int, SchematicLayer*> mSchematicLayers;
 };
 
 } // namespace project
@@ -365,50 +384,83 @@ class Project final : public QObject
 
     @section doc_project_undostack The undo/redo system (Command Design Pattern)
 
-        @todo update documentation: use own undo cmd/stack classes instead of Qt classes
-
         It's very important to have an undo and a redo command for the whole project
         (and maybe also for independent parts of the project). For this purpose we use
-        the "Command Design Pattern" respectively the Qt classes which implements this
-        design pattern: QUndoCommand, QUndoStack, QUndoGroup, QUndoView.
+        the "Command Design Pattern". Our common classes #UndoCommand and #UndoStack
+        implement this design pattern. Look at their documentation for more details.
 
-        @note Please read the documentation "Overview of Qt's Undo Framework"
-        (http://qt-project.org/doc/qt-5/qundo.html) for more information. Maybe other
-        documentations about the Command Design Pattern are also useful to understand
-        the undo/redo system.
+        @note The documentation "Overview of Qt's Undo Framework" (http://qt-project.org/doc/qt-5/qundo.html)
+        and/or other documentations about the Command Design Pattern may be useful to
+        understand the whole undo/redo system. Our own undo classes are quite similar to
+        Qt's classes QUndoCommand and QUndoStack.
 
-        There is a QUndoStack object for the whole project (project#Project#mUndoStack).
+        There is a #UndoStack object for the whole project (project#Project#mUndoStack).
         All important changes to the project which should appear in the undo stack
-        needs to be implemented as a subclass of QUndoCommand and must be appended to
+        needs to be implemented as a subclass of #UndoCommand and must be appended to
         project#Project#mUndoStack. Changes which do not need an undo action (like
         changing the color of a layer) can be done without the use of the undo/redo
-        system. These changes cannot be undone. Basically, all changes to the
+        system. These changes then cannot be undone. Basically, all changes to the
         circuit/schematics/boards and so on must have an undo action! If you are unsure
         if you should use the project's undo/redo system, try to answer the question
         "do the user wants to undo/redo this action with the undo/redo buttons in the
         schematic- or board-editor?".
 
-        It's possible to use seperate QUndoStack objects for independent parts of the
+        It's possible to use seperate #UndoStack objects for independent parts of the
         project. For example, changing the project settings could be done by using an
         undo/redo system to provide an undo command. But these undo stacks need their
         own undo/redo buttons. The undo/redo buttons in the schematic editor and in the
         board editor are only connected to the stack project#Project#mUndoStack.
 
-        QUndoCommands can also have an unlimited amount of child QUndoCommand objects.
+        #UndoCommand objects can also have an unlimited amount of child objects.
         This is very useful to group actions together. For example, if multiple symbols
         are selected in the schematic and the user wants to remove them all, multiple
-        QUndoCommand objects will be created (for each symbol one). But if the user
+        #UndoCommand objects will be created (one for each symbol). But if the user
         now wants to undo the deletion, the undo command (Ctrl+Z) will only bring back
-        one symbol, so the user needs to press the undo command multiple times. This
-        is not good. So we use the parent/child mechanism of QUndoCommand. This means,
-        we will still create a QUndoCommand for each removed symbol. But we will also
-        create a parent QUndoCommand for all these child commands. Only the parent command
+        the last symbol, so the user needs to press the undo command multiple times. This
+        is not good. So we use the parent/child mechanism of #UndoCommand. This means,
+        we will still create a #UndoCommand for each removed symbol. But we will also
+        create a parent #UndoCommand for all these child commands. Only the parent command
         will be added to the undo stack (for example project#Project#mUndoStack).
-        Now, if the user wants to undo the deletion, he only needs to press "Ctrl+Z"
-        (undo) once. And with pressing "Ctrl+Y" (redo) once, all symbols will be restored.
+        Now, if the user wants to undo the deletion, he only needs to press undo (Ctrl+Z)
+        once. And with pressing redo (Ctrl+Y) once, all symbols will be restored.
 
-        @see project#Project#mUndoStack
+        @see #UndoCommand, #UndoStack, project#Project#mUndoStack
         @see http://qt-project.org/doc/qt-5/qundo.html (Overview of Qt's Undo Framework)
+
+
+    @section doc_project_compatibility Compatibility between different application versions
+
+        @todo
+
+        We need a system to ensure that a project with all its files can be loaded and
+        saved with different application versions without corrupting the project.
+
+        For this purpose, the *.e4u XML file of each project has two attributes in the
+        root XML element: "project_version" and "compatible_downto". Both are unsigned
+        integer values, with a minimum value of "1". Zero is invalid.
+
+        "project_version" describes the version of all project files. For example, the
+        version "1" is a very old version. Version "2" supports some more features.
+        Version "3" has a new file format, which is not compatible to the older versions.
+        If a project is saved, the value from Project#sProjectFileVersion is written
+        to the "project_version" attribute of the project file.
+
+        But if you want to open a very new project with an old application version, the
+        "project_version" attribute of the project can be higher than the value in
+        Project#sProjectFileVersion. This means that the application cannot know if
+        it can open the project or not (if the version is backward-compatible). To avoid
+        this problem, there is an additional attribute in the project's XML files:
+        "compatible_downto". With this value, the XML file can "tell" the application,
+        if it can open the project or not. If "compatible_downto" is less or equal to
+        the application's Project#sProjectFileVersion, the application can open the
+        project, even if the application is older than the new project file format.
+        If a project is saved, the value from Project#sProjectFileCompatibleDowntoVersion
+        is written to the "compatible_downto" attribute of the project file.
+
+        @see project#Project#mProjectFileVersion,
+             project#Project#mProjectFileCompatibleDowntoVersion,
+             project#Project#sProjectFileVersion,
+             project#Project#sProjectFileCompatibleDowntoVersion
 
 
     @section doc_project_save Saving Procedere / Automatic Periodically Saving

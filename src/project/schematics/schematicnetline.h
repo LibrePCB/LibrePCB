@@ -34,6 +34,7 @@
  ****************************************************************************************/
 
 class QGraphicsLineItem;
+class SchematicLayer;
 
 namespace project {
 class Schematic;
@@ -85,6 +86,7 @@ class SchematicNetLine final : public QObject
         Schematic& mSchematic;
         QDomElement mDomElement;
         QGraphicsLineItem* mItem;
+        SchematicLayer* mLayer;
 
         // Attributes
         QUuid mUuid;

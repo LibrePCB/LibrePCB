@@ -39,41 +39,47 @@ class Workspace;
 
 /**
  * @brief The SchematicLayer class
+ *
+ * @note See @ref doc_schematic_layers for more information about the whole concept.
  */
-class SchematicLayer : public QObject
+class SchematicLayer final : public QObject
 {
         Q_OBJECT
 
     public:
 
+        // All Schematic Layer IDs
+        enum LayerID {
+
+            // General
+            OriginCrosses       = 1,
+
+            // Symbols
+            SymbolOutlines      = 10,
+            SymbolPinCircles    = 11,
+            SymbolPinNames      = 12,
+
+            // Symbols in a Schematic
+            ComponentNames      = 20,
+            ComponentValues     = 21,
+
+            // Circuit Stuff in a Schematic
+            Nets                = 30,
+            Busses              = 31,
+
+            // Begin of User defined Layers
+            UserDefinedBaseId   = 100
+        };
+
         // Constructors / Destructor
-        explicit SchematicLayer(Workspace& workspace);
-        virtual ~SchematicLayer();
+        explicit SchematicLayer(unsigned int id);
+        ~SchematicLayer();
 
         // Getters
         unsigned int getId() const {return mId;}
         const QString& getName() const {return mName;}
-        const QPen& getPen(bool selected) const {return selected ? mPenSelected : mPen;}
-        const QBrush& getBrush(bool selected) const {return selected ? mBrushSelected : mBrush;}
-
-        // Setters
-        //void setColor(const QColor& color);
-        //void setSelectedColor(const QColor& color);
-        //void setWidth(qreal width);
-        //void setBrushStyle(Qt::BrushStyle brushStyle);
-
-    protected:
-
-        // General
-        Workspace& mWorkspace;
-
-        // Attributes
-        unsigned int mId;
-        QString mName;
-        QPen mPen;
-        QPen mPenSelected;
-        QBrush mBrush;
-        QBrush mBrushSelected;
+        const QColor& getColor(bool highlighted = false) const;
+        const QColor& getFillColor(bool highlighted = false) const;
 
     private:
 
@@ -81,6 +87,14 @@ class SchematicLayer : public QObject
         SchematicLayer();
         SchematicLayer(const SchematicLayer& other);
         SchematicLayer& operator=(const SchematicLayer& rhs);
+
+        // Attributes
+        unsigned int mId;
+        QString mName;
+        QColor mColor;
+        QColor mColorHighlighted;
+        QColor mFillColor;
+        QColor mFillColorHighlighted;
 };
 
 /*****************************************************************************************
@@ -88,95 +102,39 @@ class SchematicLayer : public QObject
  ****************************************************************************************/
 
 /**
-    @page doc_layers Layers Documentation
+    @page doc_schematic_layers Schematic Layers Documentation
     @tableofcontents
 
-    @section layers_overwiew Overview
-        There are three different Types of Layers:
-            - @ref layers_global "Global Layers (hardcoded)"
-            - @ref layers_workspace "Workspace Layers (stored in the workspace directory)"
-            - @ref layers_project "Project Layers (stored in the project directory)"
+    @section doc_schematic_layer_class Class SchematicLayer
+        The class #SchematicLayer is used to representate symbol/schematic layers. for
+        each layer you need to create an object of that type.
 
-    @section layers_global Global Layers
-        Alle notwendigen Layer sind fest in die Software einprogrammiert.
-        Die Nummern 1-899 sind für globale Layer reserviert.
-        Es wird zwischen Board- und Schaltplan-Layer unterschieden.
-        Die Farben und Schraffuren dieser Layer werden im Workspace gespeichert.
+    @section doc_schematic_layer_attributes Layer Attributes
+        Each schematic layer has the following attibutes:
+            - ID:   An unsigned integer which identifies the layer (must be unique)
+            - Name: The name of the layer (translated into the user's language)
+            - Color:    The color which is used to draw elements of that layer
+            - Fill Color:   The color which is used to fill elements of that layer
+            - Color (highlighted): The color for highlighted (selected) elements
+            - Fill Color (highlighted): The fill color for highlighted (selected) elements
 
-        Es gibt folgende Board-Layer (Footprints/Layout):
-            - 1-99:   Kupferlagen (1=Top, 99=Bottom)
+    @section doc_schematic_layer_ids Layer IDs
+        The following layers exist:
+            - 1:    Origin Crosses
+            - 10:   Symbol Outlines
+            - 11:   Symbol Pin Circles
+            - 12:   Symbol Pin Names (Text)
+            - 20:   Component Names (Text)
+            - 21:   Component Values (Text)
+            - 30:   Nets (in Schematics, see project#SchematicNetPoint and project#SchematicNetLine)
+            - 31:   Busses (in Schematics)
 
-            - 100:    Pads
-            - 101:    Vias
+        @todo Add more layers:
+            - Various Texts
+            - Group Frames / Group Names
+            - Custom Layers (user defined)
 
-            - 110:    Bohrungen durchkontaktiert ("drills")
-            - 111:    Bohrungen nicht durchkontaktiert ("holes")
-
-            - 120:    Platinenumriss
-            - 121:    Ausfräsungen (innen)
-
-            - 130:    Stoplack Oben
-            - 131:    Stoplack Unten
-            - 132:    Finish Oben
-            - 133:    Finish Unten
-            - 134:    Kleber Oben
-            - 135:    Kleber Unten
-            - 136:    Schablone Oben
-            - 137:    Schablone Unten
-            - 138:    Testpunkte Oben
-            - 139:    Testpunkte Unten
-
-            - 150:    Bauteil-Referenzen Oben (Koordinaten-Kreuz)
-            - 151:    Bauteil-Referenzen Unten (Koordinaten-Kreuz)
-            - 152:    Bauteil-Umrisse Oben
-            - 153:    Bauteil-Umrisse Unten
-            - 154:    Bauteil-Ansicht Oben (Bauteile vervollständigt für einen Ausdruck)
-            - 155:    Bauteil-Ansicht Unten (Bauteile vervollständigt für einen Ausdruck)
-            - 156:    Bauteil-Namen Oben
-            - 157:    Bauteil-Namen Unten
-            - 158:    Bauteil-Werte Oben
-            - 159:    Bauteil-Werte Unten
-
-            - 170:    Keepout Oben (keine Bauteile)
-            - 171:    Keepout Unten (keine Bauteile)
-            - 172:    Restrict Oben (kein Kupfer)
-            - 173:    Restrict Unten (kein Kupfer)
-            - 174:    Restrict Vias (keine Vias)
-
-            - 190:    Unrouted
-            - 191:    Bemassungen
-            - 192:    Dokumentation??
-            - 193:    Referenz??
-            - 194:    DXF??
-
-        Es gibt folgende Schaltplan-Layer (Symbole/Schaltplan):
-            - 1:      Netze
-            - 2:      Busse
-            - 3:      Pins
-
-            - 10:     Bauteil-Referenzen (Koordinaten-Kreuz)
-            - 11:     Bauteil-Umrisse
-            - 12:     Bauteil-Namen
-            - 13:     Bauteil-Werte
-            - 14:     Bauteil-Package-Namen
-
-            - 20:     (Gruppen-Rahmen)
-            - 21:     (Gruppen-Beschriftungen)
-
-            - 30:     Text
-
-        @todo: Layer für Frontplatten-Ausschnitte usw.
-
-    @section layers_workspace Workspace Layers
-        Für Workspace-Layer sind die Nummern 900-999 reserviert.
-        Sie werden im Workspace-Verzeichnis gespeichert.
-
-    @section layers_project Project Layers
-        Beim Anlegen eines neuen Projektes werden alle Workspace-Layer ins Projekt kopiert.
-        Von da an werden für das geöffnete Projekt die Workspace-Layer nicht mehr berücksichtigt,
-        er wird nur noch mit den Layern des Projektes gearbeitet.
-        Verändert man die Workspace-Layer, hat dies auf das Projekt keinen Einfluss mehr.
-        Die Projekt-Layer haben damit automatisch auch den Nummernbereich 900-999.
+    @todo Add more details. See https://github.com/ubruhin/EDA4U/issues/4
 
 */
 
