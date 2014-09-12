@@ -124,6 +124,23 @@ class XmlFile final : public QObject
          */
         QDomElement& getRoot() noexcept {return mDomRoot;}
 
+        /**
+         * @brief Get the version of the file (the root node's attribute "file_version")
+         *
+         * @return The file version (or -1 if no version is defined in the file)
+         */
+        int getFileVersion() const noexcept {return mFileVersion;}
+
+
+        // Setters
+
+        /**
+         * @brief Set the version of the file (the root node's attribute "file_version")
+         *
+         * @param version   The new version number
+         */
+        void setFileVersion(int version) noexcept;
+
 
         // General Methods
 
@@ -207,6 +224,13 @@ class XmlFile final : public QObject
          * @brief The root element of #mDomDocument
          */
         QDomElement mDomRoot;
+
+        /**
+         * @brief The file version (attribute "file_version" in the root node)
+         *
+         * If the file does not contain the version number, this attribute is -1.
+         */
+        int mFileVersion;
 
 };
 

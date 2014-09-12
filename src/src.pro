@@ -15,6 +15,10 @@ include(../common.pri)
 
 QT += core widgets opengl webkitwidgets xml
 
+# Define the application version here
+DEFINES += APP_VERSION_MAJOR=0
+DEFINES += APP_VERSION_MINOR=1
+
 exists(../.git):DEFINES += GIT_BRANCH=\\\"master\\\"
 #DEFINES += USE_32BIT_LENGTH_UNITS          # see units.h
 

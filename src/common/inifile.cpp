@@ -31,7 +31,7 @@
  ****************************************************************************************/
 
 IniFile::IniFile(const FilePath& filepath, bool restore) throw (Exception) :
-    QObject(0), mFilepath(filepath)
+    QObject(0), mFilepath(filepath), mFileVersion(-1)
 {
     // decide if we open the original file (*.ini) or the backup (*.ini~)
     FilePath iniFilepath(mFilepath.toStr() % '~');
@@ -70,6 +70,13 @@ IniFile::IniFile(const FilePath& filepath, bool restore) throw (Exception) :
             QString(tr("Could not copy file \"%1\" to \"%2\"!"))
             .arg(iniFilepath.toNative(), mTmpFilepath.toNative()));
     }
+
+    // Read the file version
+    QSettings* s = createQSettings();
+    bool ok;
+    int version = s->value("meta/file_version").toInt(&ok);
+    mFileVersion = ok ? version : -1;
+    releaseQSettings(s);
 }
 
 IniFile::~IniFile() noexcept
@@ -79,6 +86,21 @@ IniFile::~IniFile() noexcept
     // remove temporary files
     QFile::remove(mTmpFilepath.toStr());
     QFile::remove(mFilepath.toStr() % "~");
+}
+
+/*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
+
+void IniFile::setFileVersion(int version) throw (Exception)
+{
+    QSettings* s = createQSettings();
+    // Maybe we do not need to convert the integer to a QString explicitely because
+    // QVariant can do this also. But as the method QString::number(int) is
+    // locale-independent for sure, we use that method to be on the save site.
+    s->setValue("meta/file_version", QString::number(version));
+    mFileVersion = version;
+    releaseQSettings(s);
 }
 
 /*****************************************************************************************
@@ -142,7 +164,7 @@ void IniFile::remove() const throw (Exception)
         }
     }
     else
-        qWarning() << "mSettings is not empty!";
+        qCritical() << "mSettings is not empty:" << mSettings.count();
 
     if (!success)
     {

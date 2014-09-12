@@ -90,6 +90,25 @@ class IniFile final : public QObject
          */
         const FilePath& getFilepath() const noexcept {return mFilepath;}
 
+        /**
+         * @brief Get the version of the file (the value of the key "meta/file_version")
+         *
+         * @return The file version (or -1 if no version is defined in the file)
+         */
+        int getFileVersion() const noexcept {return mFileVersion;}
+
+
+        // Setters
+
+        /**
+         * @brief Set the version of the file (the value of the key "meta/file_version")
+         *
+         * @param version   The new version number
+         *
+         * @throw Exception on error
+         */
+        void setFileVersion(int version) throw (Exception);
+
 
         // General Methods
 
@@ -176,6 +195,13 @@ class IniFile final : public QObject
          * @brief QSettings objects to access the INI file
          */
         QList<QSettings*> mSettings;
+
+        /**
+         * @brief The file version (attribute of key "meta/file_version")
+         *
+         * If the file does not contain the version number, this attribute is -1.
+         */
+        int mFileVersion;
 };
 
 #endif // INIFILE_H

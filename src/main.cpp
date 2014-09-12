@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
 #else
     QCoreApplication::setApplicationName("EDA4U");
 #endif
-    QCoreApplication::setApplicationVersion("0.0.1");
+    QCoreApplication::setApplicationVersion(QString("%1.%2").arg(APP_VERSION_MAJOR).arg(APP_VERSION_MINOR));
 
 
     Debug::instance(); // this creates the Debug object and installs the message handler.

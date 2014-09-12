@@ -34,7 +34,7 @@
 
 XmlFile::XmlFile(const FilePath& filepath, bool restore,
                  const QString& rootName) throw (Exception) :
-    QObject(0), mFilepath(filepath), mDomDocument()
+    QObject(0), mFilepath(filepath), mDomDocument(), mDomRoot(), mFileVersion(-1)
 {
     mDomDocument.implementation().setInvalidDataPolicy(QDomImplementation::ReturnNullNode);
 
@@ -87,12 +87,29 @@ XmlFile::XmlFile(const FilePath& filepath, bool restore,
             .arg(xmlFilepath.toStr(), mDomRoot.nodeName(), rootName),
             QString(tr("Invalid root node in \"%1\"!")).arg(xmlFilepath.toNative()));
     }
+
+    // read the file version
+    bool ok;
+    int version = mDomRoot.attribute("file_version").toInt(&ok);
+    mFileVersion = ok ? version : -1;
 }
 
 XmlFile::~XmlFile() noexcept
 {
     // remove temporary file
     QFile::remove(mFilepath.toStr() % "~");
+}
+
+/*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
+
+void XmlFile::setFileVersion(int version) noexcept
+{
+    // Do NOT use QDomElement::setAttribute(QString, int) as it will use the user's locale!
+    // Use the locale-independent QString::number(int) instead to convert the version number!
+    mDomRoot.setAttribute("file_version", QString::number(version));
+    mFileVersion = version;
 }
 
 /*****************************************************************************************
