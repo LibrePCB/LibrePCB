@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<generic_component file_version="1" compatible_downto="1">
+<!-- This file contains comments for documentation -->
+<generic_component file_version="0">
     <meta>
         <uuid>{60000001-3c94-4689-be29-92235ba993c5}</uuid>
         <version>1</version>
@@ -7,6 +8,7 @@
         <created>2013-04-13T12:43:52Z</created>
         <last_modified>2013-04-20T18:01:33Z</last_modified>
         <categories>
+            <!-- All Component Categories of this Generic Component -->
             <category>{00000000-e485-4af1-9679-bd66e8055f07}</category>
         </categories>
         <name locale="en_US">NE555</name>
@@ -15,10 +17,25 @@
     </meta>
     <changelog/>
     <attachements/>
-    <properties>
+    <prefixes>
+        <!--
+            Prefixes for the automatic generation of component names (X1, U5, L7,...). Attributes:
+                - norm:     This attribute can be used to specify different prefixes for different norms. For each norm there must be an entry in this DOM element. If there are no norms which specify the norm of this generic component, add only one DOM element with an empty string as the norm.
+                - default:  If the user has no preferred norm defined, we need a default prefix which is used in that case. For this purpose, there must always be exactly one entry with default="true"! If there exist multiple norms, we should always mark the most recently european norm as default (if there is one).
+        -->
         <prefix norm="" default="true">U</prefix>
-    </properties>
+    </prefixes>
     <signals>
+        <!--
+            All signals of this generic component (they can be connected to pads and pins). Attributes:
+                - uuid:         The uuid of the signal. Must be unique in this generic component.
+                - role:         The signal role (used for the ERC) TODO: which roles do exist?
+                - required:     If true, this signal must be always connected to the netlist of a project. Otherwise an ERC error will occur.
+                - negated:      Defines if the signal has an inverted logic (low active). This will automatically mark the connected symbol pin as inverted.
+                - clock:        Defines if the signal is a clock signal. This will automatically mark the connected symbol pin as a clock signal.
+                - name:         The signal name in different languages. WARNING: Do not change names to identify another signal (like change from "RST" to "GND") as the application uses the uuid (not the name!) to identify signals!
+                - description:  A short description of the signal (in different languages). This is optional.
+        -->
         <signal uuid="{71a44db9-5e42-405f-b6e4-b4725ae37af3}" role="supply" required="true" negated="false" clock="false">
             <name locale="en_US">GND</name>
             <description locale="en_US"></description>
@@ -53,26 +70,41 @@
         </signal>
     </signals>
     <symbol_variants>
+        <!--
+            Each generic component can define multiple symbol variants, and each symbol variant can contain multiple symbols.
+            
+            See section "prefixes" for more information about the attributes "norm" and "default" (same rules here).
+        -->
         <variant uuid="{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}" norm="DIN EN 1234" default="true">
             <name locale="en_US">Euro</name>
             <description locale="en_US">European Variant</description>
             <symbol_items>
+                <!--
+                    Attributes:
+                        - uuid:     The uuid of the symbol variant item (must be unique in its symbol variant)
+                        - symbol:   The uuid of the library symbol
+                        - add_order_index:  If the user adds this generic component with this symbol variant to the schematic, this attribute describes the order of adding all symbols to the schematic. Zero is the index of the first symbol to add. Use the index -1 for symbols which should not be added (this is normally not used!)
+                        - required: If this is true and this symbol is not places in the schematic, the ERC will give an error.
+                        - suffix:   The component name suffix of this symbol (e.g. "A", "B", "C" to produce component names like "IC1A", "IC1B", "IC1C"). Must be unique in the symbol variant!
+                -->
                 <item uuid="{adae210d-c505-487b-9fe8-834a24f14638}" symbol="{20000001-9873-41f2-9ab1-bff6be4e5ea1}" add_order_index="0" required="true" suffix="A">
                     <pin_signal_map>
-                        <map pin="{702df32a-635f-46e9-85d2-5b7e2c20aa87}" signal="{71a44db9-5e42-405f-b6e4-b4725ae37af3}" />
-                        <map pin="{1339ffc8-afb2-4137-9d37-d9801ac2bfd0}" signal="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}" />
-                        <map pin="{8207ee9b-89e5-41bc-a633-078952a6c370}" signal="{a9d3d159-fca9-417e-8bba-13829caa6ae5}" />
-                        <map pin="{b5ec7a0f-0f26-482e-a68e-e9a8f108cb80}" signal="{da30b112-9ab0-4715-8a6a-9e5414169fd4}" />
-                        <map pin="{10f7c99e-9751-409e-aace-d4fa0f21375f}" signal="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}" />
-                        <map pin="{255e12e0-00b7-4563-b82c-42a4899fddf1}" signal="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}" />
-                        <map pin="{b8aa2aa5-9b1b-4d9a-90c5-b584fe48f5a4}" signal="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}" />
-                        <map pin="{db2223ee-84ce-42ef-93b9-ac6a50b07805}" signal="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}" />
+                        <!-- This list must contain every pin of the specified symbol! Each pin can be connected to 0 or 1 generic component signal (empty signal uuid = not connected) -->
+                        <map pin="{702df32a-635f-46e9-85d2-5b7e2c20aa87}" signal="{71a44db9-5e42-405f-b6e4-b4725ae37af3}"/>
+                        <map pin="{1339ffc8-afb2-4137-9d37-d9801ac2bfd0}" signal="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}"/>
+                        <map pin="{8207ee9b-89e5-41bc-a633-078952a6c370}" signal="{a9d3d159-fca9-417e-8bba-13829caa6ae5}"/>
+                        <map pin="{b5ec7a0f-0f26-482e-a68e-e9a8f108cb80}" signal="{da30b112-9ab0-4715-8a6a-9e5414169fd4}"/>
+                        <map pin="{10f7c99e-9751-409e-aace-d4fa0f21375f}" signal="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}"/>
+                        <map pin="{255e12e0-00b7-4563-b82c-42a4899fddf1}" signal="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}"/>
+                        <map pin="{b8aa2aa5-9b1b-4d9a-90c5-b584fe48f5a4}" signal="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}"/>
+                        <map pin="{db2223ee-84ce-42ef-93b9-ac6a50b07805}" signal="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}"/>
                     </pin_signal_map>
                 </item>
             </symbol_items>
         </variant>
     </symbol_variants>
     <spice_models>
+        <!-- TODO -->
         <spice_model uuid="{2276fc5e-f67f-404c-aff5-02bc9bc71e87}" default="true">
             <name locale="en_US">simple</name>
             <description locale="en_US">simple, idealized spice model</description>

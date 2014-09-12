@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes'?>
-<symbol compatible_downto="1" file_version="1">
+<!-- This file contains comments for documentation -->
+<symbol file_version="0">
     <meta>
         <uuid>{20000001-9873-41f2-9ab1-bff6be4e5ea1}</uuid>
         <version>2.1.1</version>
@@ -7,6 +8,7 @@
         <created>2013-04-13T12:43:52Z</created>
         <last_modified>2013-04-20T18:01:33Z</last_modified>
         <categories>
+            <!-- All Component Categories of this Symbol -->
             <category>{00000000-e485-4af1-9679-bd66e8055f07}</category>
         </categories>
         <name locale="en_US">IC with 8 Pins</name>
@@ -16,40 +18,81 @@
     <changelog/>
     <attachements/>
     <geometry>
-        <rect layer="10" y1="-7.62" y2="5.08" x1="-10.16" x2="10.16" shape="true"/>
-        <text layer="20" ratio="0.08" v_align="bottom" value="${NAME}" font="proportional" size="3.175" angle="0" mirror="false" x="-10.16" y="5.08" h_align="left"/>
-        <text layer="21" ratio="0.08" v_align="top" value="${VALUE}" font="proportional" size="3.175" angle="0" mirror="false" x="-10.16" y="-7.62" h_align="left"/>
+        <!--
+            At the moment, there are only two types of geometry elements:
+            
+            polygon: This is used to draw lines, rectangles, arcs and polygons with lines and arcs. Attributes:
+                - layer:    The ID of the layer (see class SchematicLayer)
+                - width:    Line width in millimeters
+                - shape:    If true, this polygon will be filled with the fill color of the specified layer (may be transparent). This should be true for symbol outlines.
+                - start_x:  X coordinate of the first point of the polygon (in millimeters)
+                - start_y:  Y coordinate of the first point of the polygon (in millimeters)
+                
+                Segments: Each polygon must contain at least one segment. The order of them is important! Attributes:
+                    - type:     The type of this polygon segment: "line" or "arc"
+                    - end_x:    The X coordinate of the end point of this polygon segment (in millimeters)
+                    - end_y:    The Y coordinate of the end point of this polygon segment (in millimeters)
+                    - angle:    [only for arc segments] The angle of an arc segment (in degrees). Arc direction from start point: positive=CW, negative=CCW
+                
+            text: This is used to draw texts. Attributes:
+                - layer:    The ID of the layer (see class SchematicLayer)
+                - text:     The displayed text (can contain placeholders: ${NAME}, ${VALUE})
+                - x:        X coordinate of the text (in millimeters)
+                - y:        Y coordinate of the text (in millimeters)
+                - height:   X coordinate of the text (in millimeters)
+                - angle:    Height of the text (in millimeters)
+                - h_align:  Horizontal alignment (left, center, right)
+                - v_align:  Vertical alignment (top, center, bottom)
+        -->
+        <polygon layer="10" width="0.254" shape="true" start_x="-10.16" start_y="-7.62">
+            <segment type="line" end_x="-10.16" end_y="5.08"/>
+            <segment type="line" end_x="10.16" end_y="5.08"/>
+            <segment type="line" end_x="10.16" end_y="-7.62"/>
+            <segment type="line" end_x="-10.16" end_y="-7.62"/>
+        </polygon>
+        <text layer="20" v_align="bottom" text="${NAME}"  height="3.175" angle="0" x="-10.16" y="5.08"  h_align="left"/>
+        <text layer="21" v_align="top"    text="${VALUE}" height="3.175" angle="0" x="-10.16" y="-7.62" h_align="left"/>
     </geometry>
     <pins>
-        <pin uuid="{702df32a-635f-46e9-85d2-5b7e2c20aa87}" x="-15.24" y="2.54" length="5.08" angle="0">
+        <!--
+            Each pin of the symbol is defined here. Attributes:
+                - uuid:         The pin uuid (must be unique in this symbol)
+                - x:            X coordinate of the pin's connection point (in millimeters)
+                - y:            Y coordinate of the pin's connection point (in millimeters)
+                - length:       Length of the pin's line (in millimeters). The line will be drawn with the same layer as symbol outlines. The length can be zero if no line is wanted.
+                - angle:        The angle of the pin's line (in degrees). With respect to the pin's connection point: 0° = North, 90° = East, 180° = South, 270° = West
+                - name:         The name of the pin in different languages
+                - description:  An optional description in different languages
+        -->
+        <pin uuid="{702df32a-635f-46e9-85d2-5b7e2c20aa87}" x="-15.24" y="2.54" length="5.08" angle="90">
             <name locale="en_US">1</name>
             <description locale="en_US">Pin 1</description>
         </pin>
-        <pin uuid="{1339ffc8-afb2-4137-9d37-d9801ac2bfd0}" x="-15.24" y="0" length="5.08" angle="0">
+        <pin uuid="{1339ffc8-afb2-4137-9d37-d9801ac2bfd0}" x="-15.24" y="0" length="5.08" angle="90">
             <name locale="en_US">2</name>
             <description locale="en_US">Pin 2</description>
         </pin>
-        <pin uuid="{8207ee9b-89e5-41bc-a633-078952a6c370}" x="-15.24" y="-2.54" length="5.08" angle="0">
+        <pin uuid="{8207ee9b-89e5-41bc-a633-078952a6c370}" x="-15.24" y="-2.54" length="5.08" angle="90">
             <name locale="en_US">3</name>
             <description locale="en_US">Pin 3</description>
         </pin>
-        <pin uuid="{b5ec7a0f-0f26-482e-a68e-e9a8f108cb80}" x="-15.24" y="-5.08" length="5.08" angle="0">
+        <pin uuid="{b5ec7a0f-0f26-482e-a68e-e9a8f108cb80}" x="-15.24" y="-5.08" length="5.08" angle="90">
             <name locale="en_US">4</name>
             <description locale="en_US">Pin 4</description>
         </pin>
-        <pin uuid="{10f7c99e-9751-409e-aace-d4fa0f21375f}" x="15.24" y="-5.08" length="5.08" angle="180">
+        <pin uuid="{10f7c99e-9751-409e-aace-d4fa0f21375f}" x="15.24" y="-5.08" length="5.08" angle="270">
             <name locale="en_US">5</name>
             <description locale="en_US">Pin 5</description>
         </pin>
-        <pin uuid="{255e12e0-00b7-4563-b82c-42a4899fddf1}" x="15.24" y="-2.54" length="5.08" angle="180">
+        <pin uuid="{255e12e0-00b7-4563-b82c-42a4899fddf1}" x="15.24" y="-2.54" length="5.08" angle="270">
             <name locale="en_US">6</name>
             <description locale="en_US">Pin 6</description>
         </pin>
-        <pin uuid="{b8aa2aa5-9b1b-4d9a-90c5-b584fe48f5a4}" x="15.24" y="0" length="5.08" angle="180">
+        <pin uuid="{b8aa2aa5-9b1b-4d9a-90c5-b584fe48f5a4}" x="15.24" y="0" length="5.08" angle="270">
             <name locale="en_US">7</name>
             <description locale="en_US">Pin 7</description>
         </pin>
-        <pin uuid="{db2223ee-84ce-42ef-93b9-ac6a50b07805}" x="15.24" y="2.54" length="5.08" angle="180">
+        <pin uuid="{db2223ee-84ce-42ef-93b9-ac6a50b07805}" x="15.24" y="2.54" length="5.08" angle="270">
             <name locale="en_US">8</name>
             <description locale="en_US">Pin 8</description>
         </pin>

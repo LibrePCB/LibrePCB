@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<generic_component file_version="1" compatible_downto="1">
+<generic_component file_version="0">
     <meta>
         <uuid>{60000002-3c94-4689-be29-92235ba993c5}</uuid>
         <version>1</version>
@@ -15,9 +15,9 @@
     </meta>
     <changelog/>
     <attachements/>
-    <properties>
+    <prefixes>
         <prefix norm="" default="true">U</prefix>
-    </properties>
+    </prefixes>
     <signals/>
     <symbol_variants>
         <variant uuid="{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}" norm="DIN EN 1234" default="true">

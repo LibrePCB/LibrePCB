@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes'?>
-<circuit compatible_downto="1" file_version="1">
+<circuit file_version="0">
     <meta/>
     <netclasses>
         <netclass name="default" uuid="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>

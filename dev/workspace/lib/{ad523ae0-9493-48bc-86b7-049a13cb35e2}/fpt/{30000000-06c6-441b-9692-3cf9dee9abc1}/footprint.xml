@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<footprint file_version="1" compatible_downto="1">
+<!-- This file contains comments for documentation -->
+<footprint file_version="0">
     <meta>
         <uuid>{30000000-06c6-441b-9692-3cf9dee9abc1}</uuid>
         <version>1</version>
@@ -7,6 +8,7 @@
         <created>2013-04-13T12:43:52Z</created>
         <last_modified>2013-04-20T18:01:33Z</last_modified>
         <categories>
+            <!-- All Package Categories of this Footprint -->
             <category>{10000000-bf7f-4980-85cd-c73fcb164158}</category>
         </categories>
         <name locale="en_US">DIP08</name>
@@ -16,6 +18,7 @@
     <changelog/>
     <attachements/>
     <geometry>
+        <!-- TODO: The footprint/layout layers are not defined yet! -->
         <polygon layer="94" width="0.1" shape="true" start_x="-2.9" start_y="-6.3">
             <item index="0" type="line" end_x="2.9" end_y="-6.3" />
             <item index="1" type="line" end_x="2.9" end_y="3.7" />
@@ -28,7 +31,7 @@
         <text layer="96" value="${VALUE}" x="-2.9" y="-6.3" angle="0" size="3" v_align="top" h_align="left" ratio="0.08" mirror="false" font="proportional" />
     </geometry>
     <pads>
-        <!-- TODO: Format für die Pads muss noch genau festgelegt werden! -->
+        <!-- TODO: The pad format is not defined yet! -->
         <pad uuid="{c686d86d-35ac-4cb5-9528-cbe0e93a8183}" x="-3.81" y="2.54" angle="0" mirror="false" smd="false" drill="0.8" diameter="2.1" shape="round">
             <name locale="en_US">1</name>
             <description locale="en_US">Pad 1</description>

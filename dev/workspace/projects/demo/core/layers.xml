@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<project_layers file_version="1" compatible_downto="1">
+<project_layers file_version="0">
     <layers>
         <layer id="900" name="i am a layer" default_color="#FFFFFF" default_brush="solid" default_visibility="true" />
     </layers>

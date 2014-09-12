@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<panel file_version="1" compatible_downto="1">
+<panel file_version="0">
     <meta>
         <uuid>{cb6501aa-f8c3-42ac-a9a0-8a9df0da3f05}</uuid>
         <board_uuid>{ebe1ce1b-9612-4db8-9898-ccab719ec21d}</board_uuid>
