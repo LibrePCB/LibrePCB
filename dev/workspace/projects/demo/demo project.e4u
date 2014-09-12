@@ -1,7 +1,8 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes'?>
-<project compatible_downto="1" project_version="1">
+<project file_version="0">
     <meta/>
     <attributes>
+        <!-- TODO -->
         <attribute type="text" name="NAME">EDA4U Beispielprojekt</attribute>
         <attribute type="text" name="DESCRIPTION">Das ist eine Beschreibung des Projektes</attribute>
         <attribute type="text" name="AUTHOR">Irgend Jemand</attribute>
