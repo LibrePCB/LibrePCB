@@ -219,7 +219,7 @@ void IniFile::save(bool toOriginal) throw (Exception)
  *  Static Methods
  ****************************************************************************************/
 
-IniFile* IniFile::create(const FilePath& filepath) throw (Exception)
+IniFile* IniFile::create(const FilePath& filepath, int version) throw (Exception)
 {
     // remove the file if it exists already
     if (filepath.isExistingFile())
@@ -231,8 +231,15 @@ IniFile* IniFile::create(const FilePath& filepath) throw (Exception)
         }
     }
 
-    // create an empty file
-    QFile file(filepath.toStr());
+    // create all parent directories
+    if (!filepath.getParentDir().mkPath())
+    {
+        throw RuntimeError(__FILE__, __LINE__, filepath.toStr(), QString(tr("Cannot "
+            "create directory \"%1\"!")).arg(filepath.getParentDir().toNative()));
+    }
+
+    // create an empty temporary file
+    QFile file(filepath.toStr() % '~');
     if (!file.open(QIODevice::WriteOnly))
     {
         throw RuntimeError(__FILE__, __LINE__, filepath.toStr(), QString(tr("Cannot "
@@ -241,7 +248,21 @@ IniFile* IniFile::create(const FilePath& filepath) throw (Exception)
     file.close();
 
     // open and return the new INI file object
-    return new IniFile(filepath, false);
+    IniFile* obj = new IniFile(filepath, true);
+    if (version > -1)
+    {
+        try
+        {
+            obj->setFileVersion(version);
+            obj->save(false); // save to temporary file
+        }
+        catch (Exception& e)
+        {
+            delete obj;
+            throw;
+        }
+    }
+    return obj;
 }
 
 /*****************************************************************************************

@@ -178,13 +178,14 @@ class XmlFile final : public QObject
          *
          * @param filepath  The filepath of the new XML file
          * @param rootName  The name of the XML root node (no special characters!!)
+         * @param version   The file version, or -1 if no version number should be added
          *
          * @return A pointer to the new XmlFile object
          *
          * @throw Exception If an error occurs, this method throws an exception.
          */
-        static XmlFile* create(const FilePath& filepath, const QString& rootName)
-                               throw (Exception);
+        static XmlFile* create(const FilePath& filepath, const QString& rootName,
+                               int version = -1) throw (Exception);
 
 
     private:

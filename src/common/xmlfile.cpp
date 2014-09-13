@@ -149,7 +149,7 @@ void XmlFile::save(bool toOriginal) throw (Exception)
  *  Static Methods
  ****************************************************************************************/
 
-XmlFile* XmlFile::create(const FilePath& filepath, const QString& rootName) throw (Exception)
+XmlFile* XmlFile::create(const FilePath& filepath, const QString& rootName, int version) throw (Exception)
 {
     // remove the file if it exists already
     if (filepath.isExistingFile())
@@ -167,6 +167,13 @@ XmlFile* XmlFile::create(const FilePath& filepath, const QString& rootName) thro
     QString errMsg;
     if (!dom.setContent(xmlTmpl.arg(rootName), &errMsg))
         throw LogicError(__FILE__, __LINE__, errMsg, tr("Could not set XML DOM content!"));
+
+    QDomElement root = dom.documentElement();
+    if (root.isNull())
+        throw LogicError(__FILE__, __LINE__, rootName, tr("No DOM root found!"));
+
+    if (version > -1)
+        root.setAttribute("version", QString::number(version)); // see comment in #setFileVersion()
 
     saveDomDocument(dom, FilePath(filepath.toStr() % '~'));
 

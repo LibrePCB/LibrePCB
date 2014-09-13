@@ -32,7 +32,8 @@
  ****************************************************************************************/
 
 WorkspaceSettings::WorkspaceSettings(Workspace& workspace) :
-    QObject(0), mWorkspace(workspace), mMetadataPath(workspace.getMetadataPath())
+    QObject(0), mWorkspace(workspace), mMetadataPath(workspace.getMetadataPath()),
+    mAppLocaleName(), mAppDefMeasUnit(Length::millimeters), mProjectAutosaveInterval(600)
 {
     // check if the metadata directory exists
     if (!mMetadataPath.isExistingDir())

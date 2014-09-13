@@ -163,12 +163,13 @@ class IniFile final : public QObject
          *       #save() afterwards if you also want to create the original file.
          *
          * @param filepath  The filepath of the new INI file
+         * @param version   The file version, or -1 if no version number should be added
          *
          * @return A pointer to the new IniFile object
          *
          * @throw Exception If an error occurs, this method throws an exception.
          */
-        static IniFile* create(const FilePath& filepath) throw (Exception);
+        static IniFile* create(const FilePath& filepath, int version = -1) throw (Exception);
 
 
     private:
