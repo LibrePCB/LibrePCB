@@ -36,7 +36,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Schematic::Schematic(Project& project, const FilePath& filepath, bool restore)
+Schematic::Schematic(Project& project, const FilePath& filepath, bool restore, bool isNew)
                      throw (Exception):
     CADScene(), mProject(project), mFilePath(filepath), mXmlFile(0)
 {
@@ -75,21 +75,35 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore)
         }
 
         // Load all netpoints
-        tmpNode = mXmlFile->getRoot().firstChildElement("netpoints").firstChildElement("netpoint");
-        while (!tmpNode.isNull())
+        if (isNew)
         {
-            SchematicNetPoint* netpoint = new SchematicNetPoint(*this, tmpNode);
-            addNetPoint(netpoint, false);
-            tmpNode = tmpNode.nextSiblingElement("netpoint");
+            mXmlFile->getRoot().appendChild(mXmlFile->getDocument().createElement("netpoints"));
+        }
+        else
+        {
+            tmpNode = mXmlFile->getRoot().firstChildElement("netpoints").firstChildElement("netpoint");
+            while (!tmpNode.isNull())
+            {
+                SchematicNetPoint* netpoint = new SchematicNetPoint(*this, tmpNode);
+                addNetPoint(netpoint, false);
+                tmpNode = tmpNode.nextSiblingElement("netpoint");
+            }
         }
 
         // Load all netlines
-        tmpNode = mXmlFile->getRoot().firstChildElement("netlines").firstChildElement("netline");
-        while (!tmpNode.isNull())
+        if (isNew)
         {
-            SchematicNetLine* netline = new SchematicNetLine(*this, tmpNode);
-            addNetLine(netline, false);
-            tmpNode = tmpNode.nextSiblingElement("netline");
+            mXmlFile->getRoot().appendChild(mXmlFile->getDocument().createElement("netlines"));
+        }
+        else
+        {
+            tmpNode = mXmlFile->getRoot().firstChildElement("netlines").firstChildElement("netline");
+            while (!tmpNode.isNull())
+            {
+                SchematicNetLine* netline = new SchematicNetLine(*this, tmpNode);
+                addNetLine(netline, false);
+                tmpNode = tmpNode.nextSiblingElement("netline");
+            }
         }
 
         updateIcon();
@@ -333,7 +347,7 @@ Schematic* Schematic::create(Project& project, const FilePath& filepath,
                              const QString& name) throw (Exception)
 {
     // create XML file with root node
-    XmlFile* file = XmlFile::create(filepath, "schematic");
+    XmlFile* file = XmlFile::create(filepath, "schematic", 0);
 
     // create node "meta" with schematic UUID and name
     QDomElement metaNode = file->getDocument().createElement("meta");
@@ -350,7 +364,7 @@ Schematic* Schematic::create(Project& project, const FilePath& filepath,
     try
     {
         file->save(false); // write new (temporary) XML file to filesystem
-        Schematic* schematic = new Schematic(project, filepath, true); // create new Schematic
+        Schematic* schematic = new Schematic(project, filepath, true, true); // create new Schematic
         delete file; // this will remove the temporary file, so don't do this earlier!
         return schematic;
     }

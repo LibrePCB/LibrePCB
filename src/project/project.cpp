@@ -44,15 +44,16 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Project::Project(Workspace& workspace, const FilePath& filepath) throw (Exception) :
+Project::Project(Workspace& workspace, const FilePath& filepath, bool isNew) throw (Exception) :
     QObject(0), mWorkspace(workspace), mPath(filepath.getParentDir()),
-    mFilepath(filepath), mXmlFile(0), mFileLock(filepath), mSchematicsIniFile(0),
-    mUndoStack(0), mProjectLibrary(0), mCircuit(0), mSchematicEditor(0)
+    mFilepath(filepath), mXmlFile(0), mFileLock(filepath), mIsRestored(false),
+    mSchematicsIniFile(0), mUndoStack(0), mProjectLibrary(0), mCircuit(0),
+    mSchematicEditor(0)
 {
     qDebug() << "load project...";
 
     // Check if the filepath is valid
-    if ((!mFilepath.isExistingFile()) || (mFilepath.getSuffix() != "e4u")
+    if (((!isNew) && (!mFilepath.isExistingFile())) || (mFilepath.getSuffix() != "e4u")
             || (!mPath.isExistingDir()))
     {
         throw RuntimeError(__FILE__, __LINE__, mFilepath.toStr(),
@@ -62,7 +63,6 @@ Project::Project(Workspace& workspace, const FilePath& filepath) throw (Exceptio
     // Check if the project is locked (already open or application was crashed). In case
     // of a crash, the user can decide if the last backup should be restored. If the
     // project should be opened, the lock file will be created/updated here.
-    bool restore = false;
     switch (mFileLock.getStatus())
     {
         case FileLock::Unlocked:
@@ -89,10 +89,10 @@ Project::Project(Workspace& workspace, const FilePath& filepath) throw (Exceptio
             switch (btn)
             {
                 case QMessageBox::Yes: // open the project and restore the last backup
-                    restore = true;
+                    mIsRestored = true;
                     break;
                 case QMessageBox::No: // open the project without restoring the last backup
-                    restore = false;
+                    mIsRestored = false;
                     break;
                 case QMessageBox::Cancel: // abort opening the project
                 default:
@@ -130,13 +130,21 @@ Project::Project(Workspace& workspace, const FilePath& filepath) throw (Exceptio
     try
     {
         // try to open the XML project file
-        mXmlFile = new XmlFile(mFilepath, restore, "project");
+        mXmlFile = new XmlFile(mFilepath, mIsRestored || isNew, "project");
 
         // the project seems to be ready to open, so we will create all needed objects
 
         mUndoStack = new UndoStack();
-        mProjectLibrary = new ProjectLibrary(mWorkspace, *this, restore);
-        mCircuit = new Circuit(mWorkspace, *this, restore);
+
+        if (isNew)
+            mProjectLibrary = ProjectLibrary::create(mWorkspace, *this);
+        else
+            mProjectLibrary = new ProjectLibrary(mWorkspace, *this, mIsRestored);
+
+        if (isNew)
+            mCircuit = Circuit::create(mWorkspace, *this);
+        else
+            mCircuit = new Circuit(mWorkspace, *this, mIsRestored);
 
         // Load all schematic layers
         QList<unsigned int> schematicLayerIds;
@@ -149,7 +157,10 @@ Project::Project(Workspace& workspace, const FilePath& filepath) throw (Exceptio
             mSchematicLayers.insert(id, new SchematicLayer(id));
 
         // Load all schematics
-        mSchematicsIniFile = new IniFile(mPath.getPathTo("schematics/schematics.ini"), restore);
+        if (isNew)
+            mSchematicsIniFile = IniFile::create(mPath.getPathTo("schematics/schematics.ini"), 0);
+        else
+            mSchematicsIniFile = new IniFile(mPath.getPathTo("schematics/schematics.ini"), mIsRestored);
         QSettings* schematicsSettings = mSchematicsIniFile->createQSettings();
         int schematicsCount = schematicsSettings->beginReadArray("pages");
         for (int i = 0; i < schematicsCount; i++)
@@ -157,7 +168,7 @@ Project::Project(Workspace& workspace, const FilePath& filepath) throw (Exceptio
             schematicsSettings->setArrayIndex(i);
             FilePath filepath = FilePath::fromRelative(mPath.getPathTo("schematics"),
                                     schematicsSettings->value("page").toString());
-            Schematic* schematic = new Schematic(*this, filepath, restore);
+            Schematic* schematic = new Schematic(*this, filepath, mIsRestored);
             addSchematic(schematic, -1, false);
         }
         schematicsSettings->endArray();
@@ -402,7 +413,7 @@ bool Project::save() noexcept
 
 bool Project::autosave() noexcept
 {
-    if (mUndoStack->isClean()) // do not save if there are no changes
+    if ((!mIsRestored) && (mUndoStack->isClean())) // do not save if there are no changes
         return false;
 
     if (mUndoStack->isCommandActive())
@@ -429,7 +440,7 @@ bool Project::autosave() noexcept
 
 bool Project::close(QWidget* msgBoxParent)
 {
-    if (mUndoStack->isClean())
+    if ((!mIsRestored) && (mUndoStack->isClean()))
     {
         // no unsaved changes --> the project can be closed
         deleteLater();  // this project object will be deleted later in the event loop
@@ -485,7 +496,6 @@ void Project::updateSchematicsList() throw (Exception)
 bool Project::save(bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
-    QString tilde = toOriginal ? "" : "~";
 
     // Save *.e4u project file
     try
@@ -521,6 +531,50 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     }
 
     return success;
+}
+
+/*****************************************************************************************
+ *  Static Methods
+ ****************************************************************************************/
+
+Project* Project::create(Workspace& workspace, const FilePath& filepath) throw (Exception)
+{
+    if (filepath.isExistingDir() || filepath.isExistingFile())
+    {
+        throw RuntimeError(__FILE__, __LINE__, filepath.toStr(), QString(tr(
+            "The file or directory \"%1\" does already exist!")).arg(filepath.toNative()));
+    }
+
+    if (filepath.getSuffix() != "e4u")
+    {
+        throw RuntimeError(__FILE__, __LINE__, filepath.toStr(),
+            tr("The suffix of the project file must be \"e4u\"!"));
+    }
+
+    if (!filepath.getParentDir().mkPath())
+    {
+        throw RuntimeError(__FILE__, __LINE__, filepath.toStr(), QString(tr(
+            "Could not create the directory \"%1\"!")).arg(filepath.getParentDir().toNative()));
+    }
+
+    XmlFile* file = 0;
+    Project* project = 0;
+
+    try
+    {
+        file = XmlFile::create(filepath, "project", 0);
+        project = new Project(workspace, filepath, true);
+        project->save();
+        delete file;
+    }
+    catch (Exception& e)
+    {
+        delete project;
+        delete file;
+        throw;
+    }
+
+    return project;
 }
 
 /*****************************************************************************************

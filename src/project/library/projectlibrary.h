@@ -77,6 +77,10 @@ class ProjectLibrary final : public QObject
         const library::GenericComponent* getGenericComponent(const QUuid& uuid) const noexcept;
         const library::Component*        getComponent(const QUuid& uuid) const noexcept;
 
+        // Static Methods
+
+        static ProjectLibrary* create(Workspace& workspace, Project& project) throw (Exception);
+
     private:
 
         // make some methods inaccessible...

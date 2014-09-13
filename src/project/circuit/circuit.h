@@ -61,13 +61,15 @@ class Circuit final : public QObject
     public:
 
         // Constructors / Destructor
-        explicit Circuit(Workspace& workspace, Project& project, bool restore) throw (Exception);
+        explicit Circuit(Workspace& workspace, Project& project, bool restore,
+                         bool isNew = false) throw (Exception);
         ~Circuit() noexcept;
 
         // Getters
         Project& getProject() const noexcept {return mProject;}
 
         // NetClass Methods
+        const QHash<QUuid, NetClass*>& getNetClasses() const noexcept {return mNetClasses;}
         NetClass* getNetClassByUuid(const QUuid& uuid) const noexcept;
         NetClass* getNetClassByName(const QString& name) const noexcept;
         NetClass* createNetClass(const QString& name) throw (Exception);
@@ -94,6 +96,9 @@ class Circuit final : public QObject
 
         // General Methods
         bool save(bool toOriginal, QStringList& errors) noexcept;
+
+        // Static Methods
+        static Circuit* create(Workspace& workspace, Project& project) throw (Exception);
 
     private:
 

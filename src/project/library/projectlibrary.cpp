@@ -216,6 +216,16 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
 }
 
 /*****************************************************************************************
+ *  Static Methods
+ ****************************************************************************************/
+
+ProjectLibrary* ProjectLibrary::create(Workspace& workspace, Project& project) throw (Exception)
+{
+    project.getPath().getPathTo("lib").mkPath();
+    return new ProjectLibrary(workspace, project, true);
+}
+
+/*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 

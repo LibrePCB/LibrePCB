@@ -45,7 +45,8 @@ ControlPanel::ControlPanel(Workspace& workspace, QAbstractItemModel* projectTree
 {
     mUi->setupUi(this);
 
-    setWindowTitle(QString(tr("EDA4U Control Panel - %1")).arg(mWorkspace.getPath().toNative()));
+    setWindowTitle(QString(tr("Control Panel - EDA4U %1 - %2"))
+        .arg(QCoreApplication::applicationVersion()).arg(mWorkspace.getPath().toNative()));
     mUi->statusBar->addWidget(new QLabel(QString(tr("Workspace: %1"))
                                          .arg(mWorkspace.getPath().toNative())));
 
@@ -159,6 +160,24 @@ void ControlPanel::on_actionAbout_triggered()
 {
     QMessageBox::about(this, tr("About"),
                        tr("EDA4U is a free & OpenSource Schematic/Layout-Editor"));
+}
+
+void ControlPanel::on_actionNew_Project_triggered()
+{
+    QSettings settings(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(),
+                       QSettings::IniFormat);
+    QString lastNewFile = settings.value("controlpanel/last_new_project",
+                             mWorkspace.getPath().toStr()).toString();
+
+    FilePath filepath(QFileDialog::getSaveFileName(this, tr("New Project"), lastNewFile,
+                                    tr("EDA4U project files (%1)").arg("*.e4u")));
+
+    if (!filepath.isValid())
+        return;
+
+    settings.setValue("controlpanel/last_new_project", filepath.toNative());
+
+    mWorkspace.createProject(filepath);
 }
 
 void ControlPanel::on_actionOpen_Project_triggered()

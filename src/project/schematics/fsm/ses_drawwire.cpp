@@ -28,6 +28,8 @@
 #include "../../../common/units.h"
 #include "../../../common/undostack.h"
 #include "../../project.h"
+#include "../../circuit/circuit.h"
+#include "../../circuit/netclass.h"
 #include "../../circuit/netsignal.h"
 #include "../../circuit/cmd/cmdnetsignaladd.h"
 #include "../schematicnetpoint.h"
@@ -42,7 +44,7 @@ namespace project {
 
 SES_DrawWire::SES_DrawWire(SchematicEditor& editor) :
     SchematicEditorState(editor), mSubState(SubState_Idle),
-    mWidthLabel(0), mWidthComboBox(0)
+    mNetClassLabel(0), mNetClassComboBox(0), mWidthLabel(0), mWidthComboBox(0)
 {
 }
 
@@ -135,7 +137,9 @@ SchematicEditorState::State SES_DrawWire::process(SchematicEditorEvent* event) n
                                     mProject.getUndoStack().beginCommand(tr("Draw Wire"));
 
                                     // add new netsignal
-                                    QUuid netclass = "{4b10268a-fec5-4230-8054-2dc966d625cd}"; // temporary
+                                    QUuid netclass = mNetClassComboBox->currentData().toUuid();
+                                    if (netclass.isNull())
+                                        break;
                                     CmdNetSignalAdd* cmdSignalAdd = new CmdNetSignalAdd(mCircuit, netclass);
                                     mProject.getUndoStack().appendToCommand(cmdSignalAdd);
 
@@ -249,6 +253,17 @@ void SES_DrawWire::entry(State previousState) noexcept
     mEditor.mUi->actionToolDrawWire->setChecked(true);
 
     // Add widgets to the "command" toolbar
+    mNetClassLabel = new QLabel(tr("Netclass:"));
+    mEditor.mUi->commandToolbar->addWidget(mNetClassLabel);
+
+    mNetClassComboBox = new QComboBox();
+    mNetClassComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    mNetClassComboBox->setInsertPolicy(QComboBox::NoInsert);
+    foreach (NetClass* netclass, mEditor.getProject().getCircuit().getNetClasses())
+        mNetClassComboBox->addItem(netclass->getName(), netclass->getUuid());
+    mNetClassComboBox->setCurrentIndex(0);
+    mEditor.mUi->commandToolbar->addWidget(mNetClassComboBox);
+
     mWidthLabel = new QLabel(tr("Width:"));
     mEditor.mUi->commandToolbar->addWidget(mWidthLabel);
 
@@ -270,6 +285,8 @@ void SES_DrawWire::exit(State nextState) noexcept
     // Remove widgets from the "command" toolbar
     delete mWidthComboBox;      mWidthComboBox = 0;
     delete mWidthLabel;         mWidthLabel = 0;
+    delete mNetClassComboBox;   mNetClassComboBox = 0;
+    delete mNetClassLabel;      mNetClassLabel = 0;
 
     // Uncheck this state in the "tools" toolbar
     mEditor.mUi->actionToolDrawWire->setCheckable(false);

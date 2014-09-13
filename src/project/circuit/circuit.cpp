@@ -38,7 +38,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Circuit::Circuit(Workspace& workspace, Project& project, bool restore) throw (Exception) :
+Circuit::Circuit(Workspace& workspace, Project& project, bool restore, bool isNew) throw (Exception) :
     QObject(0), mWorkspace(workspace), mProject(project),
     mXmlFilepath(project.getPath().getPathTo("core/circuit.xml")), mXmlFile(0)
 {
@@ -55,22 +55,37 @@ Circuit::Circuit(Workspace& workspace, Project& project, bool restore) throw (Ex
         QDomElement root = mXmlFile->getRoot();
 
         // Load all netclasses
-        tmpNode = root.firstChildElement("netclasses").firstChildElement("netclass");
-        while (!tmpNode.isNull())
+        if (isNew)
         {
-            NetClass* netclass = new NetClass(tmpNode);
-            addNetClass(netclass, false);
-            tmpNode = tmpNode.nextSiblingElement("netclass");
+            root.appendChild(mXmlFile->getDocument().createElement("netclasses"));
+            addNetClass(createNetClass("default"));
+        }
+        else
+        {
+            tmpNode = root.firstChildElement("netclasses").firstChildElement("netclass");
+            while (!tmpNode.isNull())
+            {
+                NetClass* netclass = new NetClass(tmpNode);
+                addNetClass(netclass, false);
+                tmpNode = tmpNode.nextSiblingElement("netclass");
+            }
         }
         qDebug() << mNetClasses.count() << "netclasses successfully loaded!";
 
         // Load all netsignals
-        tmpNode = root.firstChildElement("netsignals").firstChildElement("netsignal");
-        while (!tmpNode.isNull())
+        if (isNew)
         {
-            NetSignal* netsignal = new NetSignal(*this, tmpNode);
-            addNetSignal(netsignal, false);
-            tmpNode = tmpNode.nextSiblingElement("netsignal");
+            root.appendChild(mXmlFile->getDocument().createElement("netsignals"));
+        }
+        else
+        {
+            tmpNode = root.firstChildElement("netsignals").firstChildElement("netsignal");
+            while (!tmpNode.isNull())
+            {
+                NetSignal* netsignal = new NetSignal(*this, tmpNode);
+                addNetSignal(netsignal, false);
+                tmpNode = tmpNode.nextSiblingElement("netsignal");
+            }
         }
         qDebug() << mNetSignals.count() << "netsignals successfully loaded!";
 
@@ -364,6 +379,31 @@ bool Circuit::save(bool toOriginal, QStringList& errors) noexcept
     }
 
     return success;
+}
+
+/*****************************************************************************************
+ *  Static Methods
+ ****************************************************************************************/
+
+Circuit* Circuit::create(Workspace& workspace, Project& project) throw (Exception)
+{
+    XmlFile* file = 0;
+    Circuit* circuit = 0;
+
+    try
+    {
+        file = XmlFile::create(project.getPath().getPathTo("core/circuit.xml"), "circuit", 0);
+        circuit = new Circuit(workspace, project, true, true);
+        delete file;
+    }
+    catch (Exception& e)
+    {
+        delete circuit;
+        delete file;
+        throw;
+    }
+
+    return circuit;
 }
 
 /*****************************************************************************************

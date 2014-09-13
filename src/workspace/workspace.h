@@ -125,6 +125,7 @@ class Workspace final : public QObject
 
 
         // Project Management
+        project::Project* createProject(const FilePath& filepath) noexcept;
         project::Project* openProject(const FilePath& filepath) noexcept;
         bool closeProject(const FilePath& filepath, bool askForSave);
         bool closeProject(project::Project* project, bool askForSave);

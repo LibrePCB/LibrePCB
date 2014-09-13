@@ -61,8 +61,8 @@ class Schematic final : public CADScene
 
     public:
 
-        explicit Schematic(Project& project, const FilePath& filepath, bool restore)
-                           throw (Exception);
+        explicit Schematic(Project& project, const FilePath& filepath, bool restore,
+                           bool isNew = false) throw (Exception);
         ~Schematic() noexcept;
 
         // Getters: Attributes

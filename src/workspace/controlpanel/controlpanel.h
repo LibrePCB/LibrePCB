@@ -69,6 +69,7 @@ class ControlPanel : public QMainWindow
 
         // Actions
         void on_actionAbout_triggered();
+        void on_actionNew_Project_triggered();
         void on_actionOpen_Project_triggered();
         void on_actionClose_all_open_projects_triggered();
         void on_actionSwitch_Workspace_triggered();

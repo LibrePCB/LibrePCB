@@ -91,13 +91,16 @@ class Project final : public QObject
          *
          * @param workspace     A pointer to the Workspace object
          * @param filepath      The filepath to the *.e4u project file
+         * @param isNew         True if the specified project is new (Do NOT set this
+         *                      parameter to true manually! Only #create() may do this)
          *
          * @throw Exception     If the project could not be opened successfully, the
          *                      constructor will throw an exception of type Exception
          *                      (or a subclass of it). Before throwing an exception, the
          *                      user will get a messagebox with the error message.
          */
-        explicit Project(Workspace& workspace, const FilePath& filepath) throw (Exception);
+        explicit Project(Workspace& workspace, const FilePath& filepath,
+                         bool isNew = false) throw (Exception);
 
         /**
          * @brief The destructor will close the whole project (without saving!)
@@ -259,6 +262,24 @@ class Project final : public QObject
         bool windowIsAboutToClose(QMainWindow* window);
 
 
+        // Static Methods
+
+        /**
+         * @brief Create a new project (and open it)
+         *
+         * This method will create all neccessary files and folders on the filesystem.
+         *
+         * @param workspace A reference to the workspace object
+         * @param filepath  The filepath to the new project file (must not exist already)
+         *
+         * @return  A pointer to the new Project object. You are responsible for deleting
+         *          the object (close the project) if it is no longer used.
+         *
+         * @throw Exception if an error occurs
+         */
+        static Project* create(Workspace& workspace, const FilePath& filepath) throw (Exception);
+
+
     public slots:
 
         /**
@@ -330,6 +351,7 @@ class Project final : public QObject
         FilePath mFilepath; ///< the filepath of the *.e4u project file
         XmlFile* mXmlFile;
         FileLock mFileLock; ///< See @ref doc_project_lock
+        bool mIsRestored;
 
         // Other Files
         IniFile* mSchematicsIniFile; ///< schematics/schematics.ini

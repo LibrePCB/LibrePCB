@@ -72,6 +72,8 @@ class SES_DrawWire final : public SchematicEditorState
         SchematicNetPoint* mPositioningNetPoint;
 
         // Widgets for the command toolbar
+        QLabel* mNetClassLabel;
+        QComboBox* mNetClassComboBox;
         QLabel* mWidthLabel;
         QComboBox* mWidthComboBox;
 };

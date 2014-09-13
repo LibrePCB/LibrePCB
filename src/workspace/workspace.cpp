@@ -105,6 +105,29 @@ Workspace::~Workspace()
  *  Project Management
  ****************************************************************************************/
 
+Project* Workspace::createProject(const FilePath& filepath) noexcept
+{
+    Project* project = 0;
+
+    try
+    {
+        project = Project::create(*this, filepath);
+    }
+    catch (Exception& e)
+    {
+        QMessageBox::critical(mControlPanel, tr("Cannot create the project!"), e.getUserMsg());
+        return 0;
+    }
+
+    // project successfully created and opened!
+    mOpenProjects.insert(filepath.toUnique().toStr(), project);
+    mRecentProjectsModel->setLastRecentProject(filepath);
+
+    project->showSchematicEditor();
+
+    return project;
+}
+
 Project* Workspace::openProject(const FilePath& filepath) noexcept
 {
     // Check if the filepath is an existing file
