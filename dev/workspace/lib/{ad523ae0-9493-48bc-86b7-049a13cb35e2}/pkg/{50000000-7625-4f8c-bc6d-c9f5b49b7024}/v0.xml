@@ -14,7 +14,7 @@
         <footprint>{30000000-06c6-441b-9692-3cf9dee9abc1}</footprint>
         <model>{40000000-d614-48aa-ae7b-f8ba6ca678ee}</model>
         <name locale="en_US">test package 1</name>
-        <description locale="en_US"><![CDATA[description in HTML...]]></description>
+        <description locale="en_US">description...</description>
         <keywords locale="en_US">word1 word2 word3...</keywords>
     </meta>
     <changelog/>

@@ -12,7 +12,7 @@
             <category>{10000000-bf7f-4980-85cd-c73fcb164158}</category>
         </categories>
         <name locale="en_US">DIP08</name>
-        <description locale="en_US"><![CDATA[description in HTML...]]></description>
+        <description locale="en_US">description...</description>
         <keywords locale="en_US">DIP DIP8 DIP08</keywords>
     </meta>
     <changelog/>

@@ -8,7 +8,7 @@
         <last_modified>2013-04-20T18:01:33Z</last_modified>
         <parent></parent>
         <name locale="en_US">test package category 2</name>
-        <description locale="en_US"><![CDATA[description in HTML...]]></description>
+        <description locale="en_US">description...</description>
         <keywords locale="en_US">word1 word2 word3...</keywords>
     </meta>
 </package_category>

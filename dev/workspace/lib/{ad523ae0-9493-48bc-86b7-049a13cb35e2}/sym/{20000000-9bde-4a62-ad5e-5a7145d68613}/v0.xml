@@ -11,31 +11,31 @@
         </categories>
         <name locale="en_US">A4 frame landscape</name>
         <name locale="de_CH">A4 Rahmä quär</name>
-        <description locale="en_US"><![CDATA[description in HTML...]]></description>
-        <description locale="de_CH"><![CDATA[beschriibig als HTML...]]></description>
+        <description locale="en_US">description...</description>
+        <description locale="de_CH">beschriibig...</description>
         <keywords locale="en_US">word1 word2 word3...</keywords>
         <keywords locale="de_CH">wort1 wort2 wort3...</keywords>
     </meta>
     <changelog/>
     <attachements/>
     <geometry>
-        <polygon layer="10" width="0.6" shape="false" start_x="0" start_y="0">
+        <polygon layer="10" width="0.6" fill="false" start_x="0" start_y="0">
             <segment type="line" end_x="0" end_y="210"/>
             <segment type="line" end_x="297" end_y="210"/>
             <segment type="line" end_x="297" end_y="0"/>
             <segment type="line" end_x="0" end_y="0"/>
         </polygon>
-        <polygon layer="10" width="0.6" shape="false" start_x="150" start_y="0">
+        <polygon layer="10" width="0.6" fill="false" start_x="150" start_y="0">
             <segment type="line" end_x="150" end_y="30"/>
             <segment type="line" end_x="297" end_y="30"/>
         </polygon>
-        <polygon layer="10" width="0.6" shape="false" start_x="250" start_y="0">
+        <polygon layer="10" width="0.6" fill="false" start_x="250" start_y="0">
             <segment type="line" end_x="250" end_y="30"/>
         </polygon>
-        <polygon layer="10" width="0.6" shape="false" start_x="150" start_y="12">
+        <polygon layer="10" width="0.6" fill="false" start_x="150" start_y="12">
             <segment type="line" end_x="297" end_y="12"/>
         </polygon>
-        <polygon layer="10" width="0.6" shape="false" start_x="250" start_y="21">
+        <polygon layer="10" width="0.6" fill="false" start_x="250" start_y="21">
             <segment type="line" end_x="297" end_y="21"/>
         </polygon>
         <text layer="10" text="${PROJECT::NAME}"       x="153" y="0"   angle="0" height="12" v_align="bottom" h_align="left"/>

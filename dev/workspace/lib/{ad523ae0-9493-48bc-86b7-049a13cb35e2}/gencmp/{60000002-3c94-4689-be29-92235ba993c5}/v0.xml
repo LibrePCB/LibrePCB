@@ -10,7 +10,7 @@
             <category>{00000000-e485-4af1-9679-bd66e8055f07}</category>
         </categories>
         <name locale="en_US">OpAmp</name>
-        <description locale="en_US"><![CDATA[description in HTML...]]></description>
+        <description locale="en_US">description...</description>
         <keywords locale="en_US">word1 word2 word3...</keywords>
     </meta>
     <changelog/>

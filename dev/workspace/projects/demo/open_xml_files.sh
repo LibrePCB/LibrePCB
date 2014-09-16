@@ -1,3 +1,3 @@
 #!/bin/sh
 
-gedit --new-window `find . -name *.xml | sort` &
+find . \( -name '*.xml' -o -name '*.e4u' \) -exec gedit --new-window {} +
