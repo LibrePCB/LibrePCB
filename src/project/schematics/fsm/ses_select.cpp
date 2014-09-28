@@ -25,6 +25,9 @@
 #include "ses_select.h"
 #include "../schematiceditor.h"
 #include "ui_schematiceditor.h"
+#include "../../project.h"
+#include "../schematicnetpoint.h"
+#include "../schematic.h"
 
 namespace project {
 
@@ -33,7 +36,7 @@ namespace project {
  ****************************************************************************************/
 
 SES_Select::SES_Select(SchematicEditor& editor) :
-    SchematicEditorState(editor), mPreviousState(State_Initial)
+    SchematicEditorState(editor), mPreviousState(State_Initial), mSubState(Idle)
 {
 }
 
@@ -91,18 +94,114 @@ SchematicEditorState::State SES_Select::process(SchematicEditorEvent* event) noe
                 case QEvent::GraphicsSceneMousePress:
                 {
                     QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
+                    Schematic* schematic = mProject.getSchematicByIndex(editorActiveSchematicIndex());
+                    if (!schematic)
+                        break;
 
                     switch (sceneEvent->button())
                     {
+                        case Qt::LeftButton:
+                        {
+                            bool selectedItemUnderMouse = false;
+                            QList<QGraphicsItem*> items = schematic->items(sceneEvent->scenePos());
+                            if (items.isEmpty())
+                                break;
+                            foreach (QGraphicsItem* item, items)
+                            {
+                                if (item->isSelected())
+                                {
+                                    selectedItemUnderMouse = true;
+                                    break;
+                                }
+                            }
+                            if ((!selectedItemUnderMouse) && (!items.isEmpty()))
+                            {
+                                // select only the top most item under the mouse
+                                schematic->clearSelection();
+                                items.first()->setSelected(true);
+                            }
+                            if (mSubState == Idle)
+                            {
+                                mMoveStartPoint = Point::fromPx(sceneEvent->scenePos(), schematic->getGridInterval());
+                                mSubState = Moving;
+                                event->setAccepted(true);
+                            }
+                            break;
+                        }
+
                         case Qt::RightButton:
                         {
                             // switch back to the last command (previous state)
                             nextState = mPreviousState;
+                            event->setAccepted(true);
                             break;
                         }
 
                         default:
                             break;
+                    }
+                    break;
+                }
+
+                case QEvent::GraphicsSceneMouseRelease:
+                {
+                    QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
+                    Schematic* schematic = mProject.getSchematicByIndex(editorActiveSchematicIndex());
+                    if (!schematic)
+                        break;
+
+                    switch (sceneEvent->button())
+                    {
+                        case Qt::LeftButton:
+                        {
+                            if (mSubState == Moving)
+                            {
+                                mSubState = Idle;
+                                event->setAccepted(true);
+                            }
+                            break;
+                        }
+
+                        default:
+                            break;
+                    }
+                    break;
+                }
+
+                case QEvent::GraphicsSceneMouseMove:
+                {
+                    QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
+                    Schematic* schematic = mProject.getSchematicByIndex(editorActiveSchematicIndex());
+                    if (!schematic)
+                        break;
+
+                    if (mSubState == Moving)
+                    {
+                        Point delta = Point::fromPx(sceneEvent->scenePos(), schematic->getGridInterval()) - mMoveStartPoint;
+
+                        if (delta.getLength() != 0)
+                        {
+                            // move selected elements
+                            foreach (QGraphicsItem* item, schematic->selectedItems())
+                            {
+                                Point newPos = Point::fromPx(item->scenePos() + delta.toPxQPointF(), schematic->getGridInterval());
+
+                                switch (item->type())
+                                {
+                                    case CADScene::Type_SchematicNetPoint:
+                                    {
+                                        SchematicNetPointGraphicsItem* i = qgraphicsitem_cast<SchematicNetPointGraphicsItem*>(item);
+                                        i->getNetPoint().setPosition(newPos);
+                                        break;
+                                    }
+
+                                    default:
+                                        break;
+                                }
+                            }
+
+                            mMoveStartPoint = mMoveStartPoint + delta;
+                        }
                     }
                     break;
                 }
@@ -124,16 +223,16 @@ void SES_Select::entry(State previousState) noexcept
 {
     mPreviousState = previousState;
 
-    mEditor.mUi->actionToolSelect->setCheckable(true);
-    mEditor.mUi->actionToolSelect->setChecked(true);
+    editorUi()->actionToolSelect->setCheckable(true);
+    editorUi()->actionToolSelect->setChecked(true);
 }
 
 void SES_Select::exit(State nextState) noexcept
 {
     Q_UNUSED(nextState);
 
-    mEditor.mUi->actionToolSelect->setCheckable(false);
-    mEditor.mUi->actionToolSelect->setChecked(false);
+    editorUi()->actionToolSelect->setCheckable(false);
+    editorUi()->actionToolSelect->setChecked(false);
 }
 
 /*****************************************************************************************

@@ -95,16 +95,16 @@ void SES_Move::entry(State previousState) noexcept
 {
     Q_UNUSED(previousState);
 
-    mEditor.mUi->actionToolMove->setCheckable(true);
-    mEditor.mUi->actionToolMove->setChecked(true);
+    editorUi()->actionToolMove->setCheckable(true);
+    editorUi()->actionToolMove->setChecked(true);
 }
 
 void SES_Move::exit(State nextState) noexcept
 {
     Q_UNUSED(nextState);
 
-    mEditor.mUi->actionToolMove->setCheckable(false);
-    mEditor.mUi->actionToolMove->setChecked(false);
+    editorUi()->actionToolMove->setCheckable(false);
+    editorUi()->actionToolMove->setChecked(false);
 }
 
 /*****************************************************************************************

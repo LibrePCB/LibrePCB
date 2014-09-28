@@ -34,12 +34,63 @@
 namespace project {
 
 /*****************************************************************************************
+ *  Class SchematicNetPointGraphicsItem
+ ****************************************************************************************/
+
+// Constructors / Destructor
+SchematicNetPointGraphicsItem::SchematicNetPointGraphicsItem(Schematic& schematic,
+                                                             SchematicNetPoint& point) throw (Exception) :
+    QGraphicsItem(), mSchematic(schematic), mPoint(point), mLayer(0)
+{
+    mLayer = mSchematic.getProject().getSchematicLayer(SchematicLayer::Nets);
+    if (!mLayer)
+    {
+        throw LogicError(__FILE__, __LINE__, QString(),
+            QCoreApplication::translate("SchematicNetPointGraphicsItem",
+                                        "No Nets Layer found!"));
+    }
+
+    setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemSendsScenePositionChanges);
+    setZValue(Schematic::ZValue_NetPoints);
+}
+
+SchematicNetPointGraphicsItem::~SchematicNetPointGraphicsItem() noexcept
+{
+}
+
+QRectF SchematicNetPointGraphicsItem::boundingRect() const
+{
+    return QRectF(-2, -2, 4, 4);
+}
+
+void SchematicNetPointGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+{
+    Q_UNUSED(widget);
+
+    bool highlight = option->state & QStyle::State_Selected;
+    painter->setPen(QPen(mLayer->getColor(highlight), 0));
+    painter->setBrush(QBrush(mLayer->getColor(highlight), Qt::SolidPattern));
+    painter->drawEllipse(boundingRect());
+}
+
+QVariant SchematicNetPointGraphicsItem::itemChange(GraphicsItemChange change,
+                                                   const QVariant& value)
+{
+    /*if ((scene()) && (change == ItemPositionHasChanged))
+    {
+        mPoint.setPosition(Point::fromPx(value.toPointF(), mSchematic.getGridInterval()));
+    }*/
+
+    return QGraphicsItem::itemChange(change, value);
+}
+
+/*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
 SchematicNetPoint::SchematicNetPoint(Schematic& schematic, const QDomElement& domElement)
                                      throw (Exception) :
-    QObject(0), mSchematic(schematic), mDomElement(domElement), mItem(0), mLayer(0),
+    QObject(0), mSchematic(schematic), mDomElement(domElement), mGraphicsItem(0),
     mNetSignal(0)
 {
     mUuid = mDomElement.attribute("uuid");
@@ -60,13 +111,7 @@ SchematicNetPoint::SchematicNetPoint(Schematic& schematic, const QDomElement& do
 
     mAttached = (mDomElement.firstChildElement("attached").text() == "true");
 
-    mLayer = mSchematic.getProject().getSchematicLayer(SchematicLayer::Nets);
-    if (!mLayer)
-        throw LogicError(__FILE__, __LINE__, QString(), tr("No Nets Layer found!"));
-
-    mItem = new QGraphicsEllipseItem(-2, -2, 4, 4);
-    mItem->setPen(QPen(mLayer->getColor(), 0));
-    mItem->setBrush(QBrush(mLayer->getColor(), Qt::SolidPattern));
+    mGraphicsItem = new SchematicNetPointGraphicsItem(mSchematic, *this);
 
     if (mAttached)
     {
@@ -76,13 +121,13 @@ SchematicNetPoint::SchematicNetPoint(Schematic& schematic, const QDomElement& do
     {
         mPosition.setX(Length::fromMm(mDomElement.firstChildElement("position").attribute("x")));
         mPosition.setY(Length::fromMm(mDomElement.firstChildElement("position").attribute("y")));
-        mItem->setPos(mPosition.toPxQPointF());
+        mGraphicsItem->setPos(mPosition.toPxQPointF());
     }
 }
 
 SchematicNetPoint::~SchematicNetPoint() noexcept
 {
-    delete mItem;       mItem = 0;
+    delete mGraphicsItem;           mGraphicsItem = 0;
 }
 
 /*****************************************************************************************
@@ -95,7 +140,7 @@ void SchematicNetPoint::setPosition(const Point& position) noexcept
     mDomElement.firstChildElement("position").setAttribute("x", mPosition.getX().toMmString());
     mDomElement.firstChildElement("position").setAttribute("y", mPosition.getY().toMmString());
 
-    mItem->setPos(mPosition.toPxQPointF());
+    mGraphicsItem->setPos(mPosition.toPxQPointF());
 
     foreach (SchematicNetLine* line, mLines)
         line->updateLine();
@@ -134,7 +179,7 @@ void SchematicNetPoint::addToSchematic(Schematic& schematic, bool addNode,
     }
 
     mNetSignal->registerSchematicNetPoint(this);
-    schematic.addItem(mItem);
+    schematic.addItem(mGraphicsItem);
 }
 
 void SchematicNetPoint::removeFromSchematic(Schematic& schematic, bool removeNode,
@@ -149,7 +194,7 @@ void SchematicNetPoint::removeFromSchematic(Schematic& schematic, bool removeNod
             throw LogicError(__FILE__, __LINE__, QString(), tr("Could not remove node from DOM tree!"));
     }
 
-    schematic.removeItem(mItem);
+    schematic.removeItem(mGraphicsItem);
     mNetSignal->unregisterSchematicNetPoint(this);
 }
 

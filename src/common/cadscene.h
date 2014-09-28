@@ -60,6 +60,22 @@ class CADScene : public QGraphicsScene
 
     public:
 
+        // Types
+
+        /**
+         * @brief All custom QGraphicsItem types which are used in CADScene
+         *
+         * See QGraphicsItem::Type for more information.
+         */
+        enum ItemType {
+            Type_UserType = QGraphicsItem::UserType, ///< the base number for user types
+            // Types which are used in schematic scenes
+            Type_SchematicNetPoint,         ///< project#SchematicNetPoint
+            Type_SchematicNetLine,          ///< project#SchematicNetLine
+            Type_SchematicSymbolInstance    ///< project#SymbolInstance
+        };
+
+
         // Constructors / Destructor
         explicit CADScene(const Length& gridInterval = Length(2540000));
         virtual ~CADScene();

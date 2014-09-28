@@ -95,16 +95,16 @@ void SES_DrawPolygon::entry(State previousState) noexcept
 {
     Q_UNUSED(previousState);
 
-    mEditor.mUi->actionToolDrawPolygon->setCheckable(true);
-    mEditor.mUi->actionToolDrawPolygon->setChecked(true);
+    editorUi()->actionToolDrawPolygon->setCheckable(true);
+    editorUi()->actionToolDrawPolygon->setChecked(true);
 }
 
 void SES_DrawPolygon::exit(State nextState) noexcept
 {
     Q_UNUSED(nextState);
 
-    mEditor.mUi->actionToolDrawPolygon->setCheckable(false);
-    mEditor.mUi->actionToolDrawPolygon->setChecked(false);
+    editorUi()->actionToolDrawPolygon->setCheckable(false);
+    editorUi()->actionToolDrawPolygon->setChecked(false);
 }
 
 /*****************************************************************************************

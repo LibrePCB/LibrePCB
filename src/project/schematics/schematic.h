@@ -61,6 +61,26 @@ class Schematic final : public CADScene
 
     public:
 
+        // Types
+
+        /**
+         * @brief Z Values of all items in a schematic scene (to define the stacking order)
+         *
+         * These values are used for QGraphicsItem::setZValue() to define the stacking
+         * order of all items in a schematic QGraphicsScene. We use integer values, even
+         * if the z-value of QGraphicsItem is a qreal attribute...
+         *
+         * Low number = background, high number = foreground
+         */
+        enum ItemZValue {
+            ZValue_Default = 0, ///< this is the default value (behind all other items)
+            ZValue_Symbols,     ///< Z Value for SymbolInstance items
+            ZValue_NetLines,    ///< Z value for SchematicNetLine items
+            ZValue_NetPoints    ///< Z value for SchematicNetPoint items
+        };
+
+
+        // Constructors / Destructor
         explicit Schematic(Project& project, const FilePath& filepath, bool restore,
                            bool isNew = false) throw (Exception);
         ~Schematic() noexcept;

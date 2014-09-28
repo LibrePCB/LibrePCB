@@ -64,6 +64,7 @@ class CADView : public QGraphicsView
         const QColor&   getGridColor()  const {return mGridColor;}
 
         // Setters
+        void setCadScene(CADScene* scene); ///< Use always this method instead of QGraphicsView::setScene()!
         void setGridType(GridType type);
         void setGridColor(const QColor& color);
 
@@ -84,6 +85,7 @@ class CADView : public QGraphicsView
         virtual void drawBackground(QPainter* painter, const QRectF& rect);
         virtual void drawForeground(QPainter* painter, const QRectF& rect);
         virtual void wheelEvent(QWheelEvent* event);
+        virtual void mouseMoveEvent(QMouseEvent* event);
 
     private:
 
@@ -92,11 +94,16 @@ class CADView : public QGraphicsView
         CADView(const CADView& other);
         CADView& operator=(const CADView& rhs);
 
+        // Private Methods
+        void updatePositionLabelText(const QPointF pos = QPointF(0, 0));
+
+
         GridType mGridType;
         QColor mGridColor;
         QColor mOriginCrossColor;
 
         Point mLastMouseMoveEventPos;
+        QLabel* mPositionLabel;
 
         // Static Variables
         static qreal sZoomFactor;

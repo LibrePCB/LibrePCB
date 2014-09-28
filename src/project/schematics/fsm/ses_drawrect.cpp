@@ -95,16 +95,16 @@ void SES_DrawRect::entry(State previousState) noexcept
 {
     Q_UNUSED(previousState);
 
-    mEditor.mUi->actionToolDrawRectangle->setCheckable(true);
-    mEditor.mUi->actionToolDrawRectangle->setChecked(true);
+    editorUi()->actionToolDrawRectangle->setCheckable(true);
+    editorUi()->actionToolDrawRectangle->setChecked(true);
 }
 
 void SES_DrawRect::exit(State nextState) noexcept
 {
     Q_UNUSED(nextState);
 
-    mEditor.mUi->actionToolDrawRectangle->setCheckable(false);
-    mEditor.mUi->actionToolDrawRectangle->setChecked(false);
+    editorUi()->actionToolDrawRectangle->setCheckable(false);
+    editorUi()->actionToolDrawRectangle->setChecked(false);
 }
 
 /*****************************************************************************************

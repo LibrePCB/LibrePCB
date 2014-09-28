@@ -95,16 +95,16 @@ void SES_DrawText::entry(State previousState) noexcept
 {
     Q_UNUSED(previousState);
 
-    mEditor.mUi->actionToolDrawText->setCheckable(true);
-    mEditor.mUi->actionToolDrawText->setChecked(true);
+    editorUi()->actionToolDrawText->setCheckable(true);
+    editorUi()->actionToolDrawText->setChecked(true);
 }
 
 void SES_DrawText::exit(State nextState) noexcept
 {
     Q_UNUSED(nextState);
 
-    mEditor.mUi->actionToolDrawText->setCheckable(false);
-    mEditor.mUi->actionToolDrawText->setChecked(false);
+    editorUi()->actionToolDrawText->setCheckable(false);
+    editorUi()->actionToolDrawText->setChecked(false);
 }
 
 /*****************************************************************************************

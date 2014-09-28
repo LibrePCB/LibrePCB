@@ -25,7 +25,9 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <QtWidgets>
 #include <QDomElement>
+#include "../../common/cadscene.h"
 #include "../../common/units.h"
 #include "../../common/exceptions.h"
 
@@ -33,14 +35,62 @@
  *  Forward Declarations
  ****************************************************************************************/
 
-class QGraphicsEllipseItem;
 class SchematicLayer;
 
 namespace project {
 class Schematic;
 class NetSignal;
 class SchematicNetLine;
+class SchematicNetPoint;
 }
+
+/*****************************************************************************************
+ *  Class SchematicNetPointGraphicsItem
+ ****************************************************************************************/
+
+namespace project {
+
+/**
+ * @brief The SchematicNetPointGraphicsItem class
+ */
+class SchematicNetPointGraphicsItem final : public QGraphicsItem
+{
+    public:
+
+        // Types
+
+        /// to make  qgraphicsitem_cast() working
+        enum {Type = CADScene::Type_SchematicNetPoint};
+
+        // Constructors / Destructor
+        explicit SchematicNetPointGraphicsItem(Schematic& schematic,
+                                               SchematicNetPoint& point) throw (Exception);
+
+        ~SchematicNetPointGraphicsItem() noexcept;
+
+        // Getters
+        SchematicNetPoint& getNetPoint() const {return mPoint;}
+
+        // Inherited from QGraphicsItem
+        int type() const {return Type;} ///< to make  qgraphicsitem_cast() working
+        QRectF boundingRect() const;
+        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
+        QVariant itemChange(GraphicsItemChange change, const QVariant& value);
+
+    private:
+
+        // make some methods inaccessible...
+        SchematicNetPointGraphicsItem();
+        SchematicNetPointGraphicsItem(const SchematicNetPointGraphicsItem& other);
+        SchematicNetPointGraphicsItem& operator=(const SchematicNetPointGraphicsItem& rhs);
+
+        // Attributes
+        Schematic& mSchematic;
+        SchematicNetPoint& mPoint;
+        SchematicLayer* mLayer;
+};
+
+} // namespace project
 
 /*****************************************************************************************
  *  Class SchematicNetPoint
@@ -93,8 +143,7 @@ class SchematicNetPoint final : public QObject
         // General
         Schematic& mSchematic;
         QDomElement mDomElement;
-        QGraphicsEllipseItem* mItem;
-        SchematicLayer* mLayer;
+        SchematicNetPointGraphicsItem* mGraphicsItem;
 
         // Attributes
         QUuid mUuid;

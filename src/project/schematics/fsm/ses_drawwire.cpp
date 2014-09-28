@@ -116,8 +116,7 @@ SchematicEditorState::State SES_DrawWire::process(SchematicEditorEvent* event) n
                 {
                     QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
                     Point pos = Point::fromPx(sceneEvent->scenePos(), Length(2540000)); // TODO
-                    Schematic* schematic = mProject.getSchematicByIndex(
-                                               mEditor.mActiveSchematicIndex);
+                    Schematic* schematic = mProject.getSchematicByIndex(editorActiveSchematicIndex());
 
                     switch (sceneEvent->button())
                     {
@@ -249,12 +248,12 @@ void SES_DrawWire::entry(State previousState) noexcept
     Q_UNUSED(previousState);
 
     // Check this state in the "tools" toolbar
-    mEditor.mUi->actionToolDrawWire->setCheckable(true);
-    mEditor.mUi->actionToolDrawWire->setChecked(true);
+    editorUi()->actionToolDrawWire->setCheckable(true);
+    editorUi()->actionToolDrawWire->setChecked(true);
 
     // Add widgets to the "command" toolbar
     mNetClassLabel = new QLabel(tr("Netclass:"));
-    mEditor.mUi->commandToolbar->addWidget(mNetClassLabel);
+    editorUi()->commandToolbar->addWidget(mNetClassLabel);
 
     mNetClassComboBox = new QComboBox();
     mNetClassComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
@@ -262,10 +261,10 @@ void SES_DrawWire::entry(State previousState) noexcept
     foreach (NetClass* netclass, mEditor.getProject().getCircuit().getNetClasses())
         mNetClassComboBox->addItem(netclass->getName(), netclass->getUuid());
     mNetClassComboBox->setCurrentIndex(0);
-    mEditor.mUi->commandToolbar->addWidget(mNetClassComboBox);
+    editorUi()->commandToolbar->addWidget(mNetClassComboBox);
 
     mWidthLabel = new QLabel(tr("Width:"));
-    mEditor.mUi->commandToolbar->addWidget(mWidthLabel);
+    editorUi()->commandToolbar->addWidget(mWidthLabel);
 
     mWidthComboBox = new QComboBox();
     mWidthComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
@@ -275,7 +274,7 @@ void SES_DrawWire::entry(State previousState) noexcept
     mWidthComboBox->addItem("0.254mm");
     mWidthComboBox->addItem("0.504mm");
     mWidthComboBox->setCurrentIndex(0);
-    mEditor.mUi->commandToolbar->addWidget(mWidthComboBox);
+    editorUi()->commandToolbar->addWidget(mWidthComboBox);
 }
 
 void SES_DrawWire::exit(State nextState) noexcept
@@ -289,8 +288,8 @@ void SES_DrawWire::exit(State nextState) noexcept
     delete mNetClassLabel;      mNetClassLabel = 0;
 
     // Uncheck this state in the "tools" toolbar
-    mEditor.mUi->actionToolDrawWire->setCheckable(false);
-    mEditor.mUi->actionToolDrawWire->setChecked(false);
+    editorUi()->actionToolDrawWire->setCheckable(false);
+    editorUi()->actionToolDrawWire->setChecked(false);
 }
 
 /*****************************************************************************************

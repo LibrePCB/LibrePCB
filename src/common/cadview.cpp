@@ -39,8 +39,14 @@ qreal CADView::sZoomFactor = 1.15;
 
 CADView::CADView(QWidget* parent) :
     QGraphicsView(parent),
-    mGridType(noGrid), mGridColor(Qt::lightGray), mOriginCrossColor(Qt::black)
+    mGridType(noGrid), mGridColor(Qt::lightGray), mOriginCrossColor(Qt::black),
+    mPositionLabel(0)
 {
+    mPositionLabel = new QLabel(this);
+    mPositionLabel->move(5, 5);
+    mPositionLabel->show();
+    updatePositionLabelText();
+
     setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing| QPainter::SmoothPixmapTransform);
     //setViewport(new QGLWidget(QGLFormat(QGL::DoubleBuffer | QGL::AlphaChannel | QGL::SampleBuffers)));
     setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
@@ -53,6 +59,7 @@ CADView::CADView(QWidget* parent) :
 
 CADView::~CADView()
 {
+    delete mPositionLabel;      mPositionLabel = 0;
 }
 
 /*****************************************************************************************
@@ -67,6 +74,12 @@ CADScene* CADView::getCadScene() const
 /*****************************************************************************************
  *  Setters
  ****************************************************************************************/
+
+void CADView::setCadScene(CADScene* scene)
+{
+    setScene(scene);
+    updatePositionLabelText();
+}
 
 void CADView::setGridType(GridType type)
 {
@@ -196,6 +209,28 @@ void CADView::wheelEvent(QWheelEvent* event)
     //    scale(sZoomFactor, sZoomFactor); // Zoom in
     //else
     //    scale((qreal)1 / sZoomFactor, (qreal)1 / sZoomFactor); // Zoom out
+}
+
+void CADView::mouseMoveEvent(QMouseEvent* event)
+{
+    if (getCadScene())
+        updatePositionLabelText(Point::fromPx(mapToScene(event->pos()),
+                                getCadScene()->getGridInterval()).toMmQPointF());
+    else
+        updatePositionLabelText();
+
+    QGraphicsView::mouseMoveEvent(event);
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+void CADView::updatePositionLabelText(const QPointF pos)
+{
+    qreal grid = getCadScene() ? getCadScene()->getGridInterval().toMm() : 0;
+    mPositionLabel->setText(QString("Grid: %1mm\nX: %2mm\nY: %3mm").arg(grid).arg(pos.x()).arg(pos.y()));
+    mPositionLabel->adjustSize();
 }
 
 /*****************************************************************************************

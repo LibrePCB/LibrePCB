@@ -26,6 +26,7 @@
 
 #include <QtCore>
 #include "schematiceditorevent.h"
+#include "../schematiceditor.h"
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -34,7 +35,6 @@
 namespace project {
 class Project;
 class Circuit;
-class SchematicEditor;
 }
 
 /*****************************************************************************************
@@ -83,6 +83,10 @@ class SchematicEditorState : public QObject
         SchematicEditor& mEditor;
         State mCurrentState;
         QHash<State, SchematicEditorState*> mSubStates;
+
+        // Methods to access private SchematicEditor members from SchematicEditorState subclasses
+        Ui::SchematicEditor* editorUi() {return mEditor.mUi;}
+        int editorActiveSchematicIndex() {return mEditor.mActiveSchematicIndex;}
 };
 
 } // namespace project

@@ -95,16 +95,16 @@ void SES_AddComponents::entry(State previousState) noexcept
 {
     Q_UNUSED(previousState);
 
-    mEditor.mUi->actionToolAddComponent->setCheckable(true);
-    mEditor.mUi->actionToolAddComponent->setChecked(true);
+    editorUi()->actionToolAddComponent->setCheckable(true);
+    editorUi()->actionToolAddComponent->setChecked(true);
 }
 
 void SES_AddComponents::exit(State nextState) noexcept
 {
     Q_UNUSED(nextState);
 
-    mEditor.mUi->actionToolAddComponent->setCheckable(false);
-    mEditor.mUi->actionToolAddComponent->setChecked(false);
+    editorUi()->actionToolAddComponent->setCheckable(false);
+    editorUi()->actionToolAddComponent->setChecked(false);
 }
 
 /*****************************************************************************************

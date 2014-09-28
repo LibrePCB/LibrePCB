@@ -70,6 +70,7 @@ SchematicNetLine::SchematicNetLine(Schematic& schematic, const QDomElement& domE
 
     mItem = new QGraphicsLineItem();
     mItem->setPen(QPen(mLayer->getColor(), 1));
+    mItem->setZValue(Schematic::ZValue_NetLines);
 }
 
 SchematicNetLine::~SchematicNetLine() noexcept

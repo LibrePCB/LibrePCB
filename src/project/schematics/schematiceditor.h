@@ -112,16 +112,6 @@ class SchematicEditor : public QMainWindow, public IF_CADSceneEventHandler
 
         // All FSM states need access to private attributes!
         friend class SchematicEditorState;
-        friend class SchematicEditorFsm;
-        friend class SES_Select;
-        friend class SES_Move;
-        friend class SES_DrawText;
-        friend class SES_DrawRect;
-        friend class SES_DrawPolygon;
-        friend class SES_DrawCircle;
-        friend class SES_DrawEllipse;
-        friend class SES_DrawWire;
-        friend class SES_AddComponents;
 };
 
 } // namespace project

@@ -69,11 +69,13 @@
     </property>
     <addaction name="actionUndo"/>
     <addaction name="actionRedo"/>
-   </widget>
-   <widget class="QMenu" name="menuDraw">
-    <property name="title">
-     <string>Draw</string>
-    </property>
+    <addaction name="separator"/>
+    <addaction name="actionRotate_CCW"/>
+    <addaction name="actionRotate_CW"/>
+    <addaction name="actionCopy"/>
+    <addaction name="actionCut"/>
+    <addaction name="actionPaste"/>
+    <addaction name="actionRemove"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -103,7 +105,6 @@
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
-   <addaction name="menuDraw"/>
    <addaction name="menuView"/>
    <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
@@ -111,7 +112,7 @@
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="fileToolbar">
    <property name="windowTitle">
-    <string>toolBar</string>
+    <string>File</string>
    </property>
    <property name="floatable">
     <bool>false</bool>
@@ -137,7 +138,7 @@
   </widget>
   <widget class="QToolBar" name="viewToolbar">
    <property name="windowTitle">
-    <string>toolBar</string>
+    <string>View</string>
    </property>
    <property name="floatable">
     <bool>false</bool>
@@ -154,7 +155,7 @@
   </widget>
   <widget class="QToolBar" name="editToolbar">
    <property name="windowTitle">
-    <string>toolBar</string>
+    <string>Edit</string>
    </property>
    <property name="floatable">
     <bool>false</bool>
@@ -174,7 +175,7 @@
   </widget>
   <widget class="QToolBar" name="toolsToolbar">
    <property name="windowTitle">
-    <string>toolBar_2</string>
+    <string>Tools</string>
    </property>
    <property name="floatable">
     <bool>false</bool>
@@ -199,7 +200,7 @@
   </widget>
   <widget class="QToolBar" name="commandToolbar">
    <property name="windowTitle">
-    <string>toolBar</string>
+    <string>Command</string>
    </property>
    <property name="floatable">
     <bool>false</bool>
@@ -215,7 +216,7 @@
   </widget>
   <widget class="QToolBar" name="view2toolbar">
    <property name="windowTitle">
-    <string>toolBar</string>
+    <string>View Tools</string>
    </property>
    <attribute name="toolBarArea">
     <enum>LeftToolBarArea</enum>

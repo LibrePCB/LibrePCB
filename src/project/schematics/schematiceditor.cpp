@@ -45,6 +45,8 @@ SchematicEditor::SchematicEditor(Workspace& workspace, Project& project) :
     mActiveSchematicIndex(-1), mPagesDock(0), mUnplacedSymbolsDock(0), mFsm(0)
 {
     mUi->setupUi(this);
+    setWindowTitle(QString("%1 - Schematic Editor - EDA4U %2.%3").arg(mProject.getFilepath().getFilename())
+                   .arg(APP_VERSION_MAJOR).arg(APP_VERSION_MINOR));
 
     // Add Dock Widgets
     mPagesDock = new SchematicPagesDock(mProject, *this);
@@ -151,7 +153,7 @@ void SchematicEditor::setActiveSchematicIndex(int index)
         mUi->graphicsView->getCadScene()->setEventHandlerObject(0);
 
     // change scene
-    mUi->graphicsView->setScene(mProject.getSchematicByIndex(index));
+    mUi->graphicsView->setCadScene(mProject.getSchematicByIndex(index));
 
     // register event handler object
     if (mUi->graphicsView->getCadScene())

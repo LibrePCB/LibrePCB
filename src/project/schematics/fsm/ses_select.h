@@ -26,6 +26,7 @@
 
 #include <QtCore>
 #include "schematiceditorstate.h"
+#include "../../../common/units.h"
 
 /*****************************************************************************************
  *  Class SES_Select
@@ -55,6 +56,15 @@ class SES_Select final : public SchematicEditorState
     private:
 
         State mPreviousState;
+
+        // Substates
+        enum SubState {
+            Idle,
+            Moving
+        };
+        SubState mSubState;
+
+        Point mMoveStartPoint;
 };
 
 } // namespace project

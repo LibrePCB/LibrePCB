@@ -61,6 +61,7 @@ SymbolInstance::SymbolInstance(Schematic& schematic, const QDomElement& domEleme
         throw LogicError(__FILE__, __LINE__, QString(), tr("No Outline Layer found!"));
 
     mItem = new QGraphicsRectItem(-10, -10, 20, 20);
+    mItem->setZValue(Schematic::ZValue_Symbols);
     mItem->setPen(QPen(mOutlineLayer->getColor(), 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     mItem->setBrush(QBrush(mOutlineLayer->getFillColor(), Qt::SolidPattern));
 

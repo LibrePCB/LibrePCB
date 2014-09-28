@@ -95,16 +95,16 @@ void SES_DrawCircle::entry(State previousState) noexcept
 {
     Q_UNUSED(previousState);
 
-    mEditor.mUi->actionToolDrawCircle->setCheckable(true);
-    mEditor.mUi->actionToolDrawCircle->setChecked(true);
+    editorUi()->actionToolDrawCircle->setCheckable(true);
+    editorUi()->actionToolDrawCircle->setChecked(true);
 }
 
 void SES_DrawCircle::exit(State nextState) noexcept
 {
     Q_UNUSED(nextState);
 
-    mEditor.mUi->actionToolDrawCircle->setCheckable(false);
-    mEditor.mUi->actionToolDrawCircle->setChecked(false);
+    editorUi()->actionToolDrawCircle->setCheckable(false);
+    editorUi()->actionToolDrawCircle->setChecked(false);
 }
 
 /*****************************************************************************************

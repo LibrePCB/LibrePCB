@@ -95,16 +95,16 @@ void SES_DrawEllipse::entry(State previousState) noexcept
 {
     Q_UNUSED(previousState);
 
-    mEditor.mUi->actionToolDrawEllipse->setCheckable(true);
-    mEditor.mUi->actionToolDrawEllipse->setChecked(true);
+    editorUi()->actionToolDrawEllipse->setCheckable(true);
+    editorUi()->actionToolDrawEllipse->setChecked(true);
 }
 
 void SES_DrawEllipse::exit(State nextState) noexcept
 {
     Q_UNUSED(nextState);
 
-    mEditor.mUi->actionToolDrawEllipse->setCheckable(false);
-    mEditor.mUi->actionToolDrawEllipse->setChecked(false);
+    editorUi()->actionToolDrawEllipse->setCheckable(false);
+    editorUi()->actionToolDrawEllipse->setChecked(false);
 }
 
 /*****************************************************************************************
