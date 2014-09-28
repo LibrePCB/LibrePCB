@@ -1,0 +1,49 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{31b7bee8-2de7-45bd-af1f-d493a47eb4cc}</uuid>
+        <name locale="en_US">TS</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-3.175" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="3.175"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="-0.635" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="1.905" width="0.254" layer="10" start_x="-4.445">
+            <segment type="line" end_x="-3.175" end_y="1.905"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.905" width="0.254" layer="10" start_x="-4.445">
+            <segment type="line" end_x="-3.175" end_y="-1.905"/>
+        </polygon>
+        <polygon fill="false" start_y="1.905" width="0.254" layer="10" start_x="-4.445">
+            <segment type="line" end_x="-4.445" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="-4.445">
+            <segment type="line" end_x="-4.445" end_y="-1.905"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-1.905" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-1.27">
+            <segment type="line" end_x="-0.635" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="-0.635">
+            <segment type="line" end_x="-1.27" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-4.445">
+            <segment type="line" end_x="-3.175" end_y="0"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-5.08" uuid="{221bf358-87c7-40ed-bb7e-e417360f64be}">
+            <name locale="en_US">P</name>
+        </pin>
+        <pin x="0" length="2.54" angle="270" y="5.08" uuid="{381b1b5b-a749-4cc2-8c60-5b89915eb220}">
+            <name locale="en_US">S</name>
+        </pin>
+    </pins>
+</symbol>

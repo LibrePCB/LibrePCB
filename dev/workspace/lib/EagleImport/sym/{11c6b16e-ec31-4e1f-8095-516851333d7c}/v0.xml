@@ -1,0 +1,94 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{11c6b16e-ec31-4e1f-8095-516851333d7c}</uuid>
+        <name locale="en_US">MAX7219</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="20.32" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="-22.86"/>
+        </polygon>
+        <polygon fill="false" start_y="-22.86" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="7.62" end_y="-22.86"/>
+        </polygon>
+        <polygon fill="false" start_y="-22.86" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="20.32" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="-10.16" end_y="20.32"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="12.7" length="5.08" angle="180" y="12.7" uuid="{bf7f741c-1e40-4935-8747-af1e86a22208}">
+            <name locale="en_US">DIG2</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="10.16" uuid="{0426744b-0984-4e8a-9280-463959b2ab7d}">
+            <name locale="en_US">DIG3</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="7.62" uuid="{b3564221-91d8-41b0-8a80-2e744d8f2ca6}">
+            <name locale="en_US">DIG4</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="5.08" uuid="{21b789af-b419-4a5e-ab92-e2def2320f25}">
+            <name locale="en_US">DIG5</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="2.54" uuid="{d20e057b-bbdf-4cf2-b4cd-f07bde860443}">
+            <name locale="en_US">DIG6</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="0" uuid="{06e4cdcf-2b9f-4de8-ace0-652fa9b97bac}">
+            <name locale="en_US">DIG7</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-2.54" uuid="{83f4c4bd-9972-4eb0-8c32-55da02234ff8}">
+            <name locale="en_US">SEGA</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-5.08" uuid="{68b12017-0b1a-4670-9cf7-50fbb95d708a}">
+            <name locale="en_US">SEGB</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-7.62" uuid="{121d6243-b90e-4b52-a036-d7714def406d}">
+            <name locale="en_US">SEGC</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-10.16" uuid="{f552dd71-aa9d-48dc-9bc6-e0e4b53110e8}">
+            <name locale="en_US">SEGD</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-12.7" uuid="{f38dcef8-1d17-4515-886e-7f6be1af1d83}">
+            <name locale="en_US">SEGE</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-15.24" uuid="{ea084657-d78b-4186-a6d6-c940af9de656}">
+            <name locale="en_US">SEGF</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-17.78" uuid="{5a38e9ac-2666-408d-8046-188e0bde9e1d}">
+            <name locale="en_US">SEGG</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-20.32" uuid="{9061957c-ecf6-47e9-99ed-be383c0e0a69}">
+            <name locale="en_US">SEGDP</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="15.24" uuid="{0f876029-1033-4f5d-9d59-ca41b65e9fd7}">
+            <name locale="en_US">DIG1</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="17.78" uuid="{1436e2eb-abc8-4782-847e-116afef5d2fe}">
+            <name locale="en_US">DIG0</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="7.62" uuid="{b7e12549-c7e6-42f5-b550-42618642474e}">
+            <name locale="en_US">DIN</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="5.08" uuid="{18d33bb6-324d-4df9-a511-45b31320b5d4}">
+            <name locale="en_US">DOUT</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="12.7" uuid="{d3391663-7d31-4630-a5a9-b364c7a57607}">
+            <name locale="en_US">LOAD</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="17.78" uuid="{76cbcce4-5483-4efb-bca6-b2def2a65839}">
+            <name locale="en_US">CLK</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="0" uuid="{0353c9c7-dfd9-46f6-807e-f7df8cc8cf5d}">
+            <name locale="en_US">ISET</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-20.32" uuid="{ac19ae01-b05a-4e0e-9807-7018088cb1fd}">
+            <name locale="en_US">GND@2</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-17.78" uuid="{6dd9364f-a917-4774-b2e1-d43c19a6c947}">
+            <name locale="en_US">GND@1</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-15.24" uuid="{a9da92b4-fc3d-4f4c-9038-9eadae4b00dc}">
+            <name locale="en_US">VCC</name>
+        </pin>
+    </pins>
+</symbol>

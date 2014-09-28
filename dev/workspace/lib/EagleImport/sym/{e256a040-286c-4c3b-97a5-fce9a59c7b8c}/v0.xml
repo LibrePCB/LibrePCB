@@ -1,0 +1,34 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{e256a040-286c-4c3b-97a5-fce9a59c7b8c}</uuid>
+        <name locale="en_US">LM2936-223</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="5.08"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="2.54" uuid="{b9aeeb6d-7cb9-460a-b270-e509d8aab3b5}">
+            <name locale="en_US">VIN</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="2.54" uuid="{8341eb5c-d1ee-4906-ab16-40449b00c18a}">
+            <name locale="en_US">VO</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="90" y="-7.62" uuid="{cc30f551-be46-40f2-9132-d277ed747e49}">
+            <name locale="en_US">GND@1</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-7.62" uuid="{de27abe5-9c1d-4baa-bdfa-b42981d5c18e}">
+            <name locale="en_US">GND@2</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,48 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{acf6ecd3-c83f-4746-a69e-5d20a2e53625}</uuid>
+        <name locale="en_US">POTI</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-3.81" width="0.254" layer="10" start_x="-0.762">
+            <segment type="line" end_x="0" end_y="-3.81"/>
+        </polygon>
+        <polygon fill="false" start_y="3.81" width="0.254" layer="10" start_x="0.762">
+            <segment type="line" end_x="0" end_y="3.81"/>
+        </polygon>
+        <polygon fill="false" start_y="3.81" width="0.254" layer="10" start_x="-0.762">
+            <segment type="line" end_x="-0.762" end_y="-3.81"/>
+        </polygon>
+        <polygon fill="false" start_y="-3.81" width="0.254" layer="10" start_x="0.762">
+            <segment type="line" end_x="0.762" end_y="3.81"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="1.651" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="1.651">
+            <segment type="line" end_x="-2.54" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-1.778" end_y="1.524"/>
+        </polygon>
+        <polygon fill="false" start_y="1.524" width="0.1524" layer="10" start_x="-1.778">
+            <segment type="line" end_x="-1.27" end_y="2.286"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-1.27" end_y="2.286"/>
+        </polygon>
+        <polygon fill="false" start_y="3.81" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="3.81" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="-0.762" end_y="3.81"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-3.81"/>
+        </polygon>
+        <polygon fill="false" start_y="-3.81" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0.762" end_y="-3.81"/>
+        </polygon>
+    </geometry>
+    <pins/>
+</symbol>

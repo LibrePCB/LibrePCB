@@ -1,0 +1,16 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{e2c904a0-71a7-4e13-9bdb-c0542e019d44}</uuid>
+        <name locale="en_US">GNDIO</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-0.254" width="0.254" layer="10" start_x="-1.905">
+            <segment type="line" end_x="1.905" end_y="0.254"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="270" y="2.54" uuid="{7af8b4e5-48ef-4134-97c2-b1c49b1be57a}">
+            <name locale="en_US">GNDIO</name>
+        </pin>
+    </pins>
+</symbol>

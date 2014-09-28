@@ -1,0 +1,1461 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{f3b19023-f78d-4345-8392-1958b63d68c1}</uuid>
+        <name locale="en_US">EP2C20F484</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="-81.28" length="5.08" angle="0" y="81.28" uuid="{090b57e8-21db-4f4b-8b07-1746025cd7e5}">
+            <name locale="en_US">IOC4</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="78.74" uuid="{4e587842-ca43-4175-aaad-6d1d686de434}">
+            <name locale="en_US">IOC3</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="76.2" uuid="{d7c3af6b-b528-4af0-9764-daaeab1af226}">
+            <name locale="en_US">IOD3</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="73.66" uuid="{fed20108-af1e-4c54-a6a8-d635ecddc057}">
+            <name locale="en_US">IOD4</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="71.12" uuid="{b6b77f51-9991-4a82-bd55-a84be57cdd26}">
+            <name locale="en_US">IOD5</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="68.58" uuid="{06d2a711-4ce0-45a0-8193-669d078746a5}">
+            <name locale="en_US">IOD6</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="66.04" uuid="{c013bc6a-1436-420f-8039-3d877ce1ea2a}">
+            <name locale="en_US">IOE3</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="63.5" uuid="{dc57b498-956e-4708-b3f9-4eaa4b88ea48}">
+            <name locale="en_US">IOE4</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="60.96" uuid="{8e6804b2-a202-43e4-afda-90351778b5e8}">
+            <name locale="en_US">IOC1</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="58.42" uuid="{0f618ccd-1c1a-42da-9e71-f659167216e1}">
+            <name locale="en_US">IOC2</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="55.88" uuid="{5ed8b1d3-b873-4150-a862-b95fa370840a}">
+            <name locale="en_US">IOF4</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="53.34" uuid="{de6c6c1c-2e53-4bb7-99b9-f1536b0b5e31}">
+            <name locale="en_US">IOG6</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="50.8" uuid="{0800560c-f1ef-43e3-afe2-9272f2107c13}">
+            <name locale="en_US">IOG5</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="48.26" uuid="{7b1cb974-2e60-4895-81c6-f96bdf13dd19}">
+            <name locale="en_US">IOF3</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="45.72" uuid="{027aefd6-58f9-4a2b-88fc-f72eb697f931}">
+            <name locale="en_US">IOD1</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="43.18" uuid="{05e26f9c-c182-4f21-ba5e-9a52de40a841}">
+            <name locale="en_US">IOD2</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="40.64" uuid="{55fe9884-03cb-4e0a-a7f7-e63cf48642a4}">
+            <name locale="en_US">IOG3</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="38.1" uuid="{9fbf51c0-4889-4bbf-beda-9b35328bf3da}">
+            <name locale="en_US">IOH4</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="35.56" uuid="{e16c077c-a2e2-4f21-907d-714ff133738e}">
+            <name locale="en_US">IOH5</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="33.02" uuid="{80a55abe-9a05-49cb-83a3-63ad5833e209}">
+            <name locale="en_US">IOH6</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="30.48" uuid="{78888f65-4f93-4313-be2b-c01104a801b3}">
+            <name locale="en_US">IOE1</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="27.94" uuid="{ce05983e-c706-4827-984d-52eafc159e90}">
+            <name locale="en_US">IOE2</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="25.4" uuid="{138e4a23-ee8a-4fa9-a370-127050a3c8cc}">
+            <name locale="en_US">IOF1</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="22.86" uuid="{a17e5922-1c58-4107-ab86-945b915ee434}">
+            <name locale="en_US">IOF2</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="20.32" uuid="{78b10753-4427-47ab-bb66-5fcfbde4dd4c}">
+            <name locale="en_US">IOH1</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="17.78" uuid="{5032b118-ac72-4c62-b9d7-d48bc3133db7}">
+            <name locale="en_US">IOH2</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="15.24" uuid="{3aeeddfe-a9c2-4081-b733-33567d573cf7}">
+            <name locale="en_US">IOL8</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="12.7" uuid="{3ad66b6a-e8c7-4e37-af37-9bcad4df7136}">
+            <name locale="en_US">IOH3</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="10.16" uuid="{419c70e9-f800-4095-b705-707d229ebe80}">
+            <name locale="en_US">IOJ4</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="7.62" uuid="{1d19d35d-ef30-4d24-9d6f-4d62459f177d}">
+            <name locale="en_US">IOJ1</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="5.08" uuid="{7ce37048-f043-455a-992c-5a25d33eff5f}">
+            <name locale="en_US">IOJ2</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="2.54" uuid="{eee0a0e1-7783-49c4-8d60-e59cd7fddfa2}">
+            <name locale="en_US">IOM5</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="0" uuid="{7219961e-4277-41e7-8367-b0600f7a4375}">
+            <name locale="en_US">IOM6</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="-2.54" uuid="{4799917a-8f9b-49a7-a832-0adbf8eb2a46}">
+            <name locale="en_US">ION1</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="-5.08" uuid="{c3ecb772-b57a-40cb-8dc2-225981c94958}">
+            <name locale="en_US">ION2</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="-7.62" uuid="{6b2e90e7-4cea-4779-8d03-67ec21809894}">
+            <name locale="en_US">IOP1</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="-10.16" uuid="{4e288897-cc18-4d46-b1a1-897b2d254c15}">
+            <name locale="en_US">IOP2</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="-12.7" uuid="{fc774062-29f6-44e3-b3c8-e85df6f7e9d5}">
+            <name locale="en_US">ION6</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="-15.24" uuid="{5bba358b-1813-4fe1-8b2a-067cc5eeca68}">
+            <name locale="en_US">IOP3</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="-17.78" uuid="{90eb736e-3755-48f3-b6ff-19ac4cdfe56a}">
+            <name locale="en_US">ION3</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="-20.32" uuid="{f45c95ec-3e64-49e8-beed-63ba064c7f5d}">
+            <name locale="en_US">ION4</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="-22.86" uuid="{2bf8d952-0b50-4fd2-acbc-a21c013126ce}">
+            <name locale="en_US">IOR8</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="-25.4" uuid="{9e0acc90-cfd2-49ad-9610-6244c7ab911c}">
+            <name locale="en_US">IOR7</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="-27.94" uuid="{00f46797-7205-4040-8955-653c4f5ff507}">
+            <name locale="en_US">IOP5</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="-30.48" uuid="{fb01fa29-957d-4c81-a58f-7cb914dd5cf5}">
+            <name locale="en_US">IOP6</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="-33.02" uuid="{5ab37f32-8826-4479-8223-abf4620aacc3}">
+            <name locale="en_US">IOR1</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="-35.56" uuid="{96d12203-cec6-4ece-8bd9-4453b5ea4c6a}">
+            <name locale="en_US">IOR2</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="-38.1" uuid="{355f0d5e-d990-4b67-81c2-de018e3ae883}">
+            <name locale="en_US">IOT1</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="-40.64" uuid="{d45f2ed6-6bed-43ce-ae85-3e2954a7d833}">
+            <name locale="en_US">IOT2</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="-43.18" uuid="{aa55a95b-19d5-41eb-8234-8bbac3cecb9b}">
+            <name locale="en_US">IOU1</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="-45.72" uuid="{70445dab-f265-4356-bc03-fa416c29980d}">
+            <name locale="en_US">IOU2</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="-48.26" uuid="{f191dde1-ec20-4dd9-8cdc-6200066387df}">
+            <name locale="en_US">IOR5</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="-50.8" uuid="{4c067bc8-4d0a-4b57-bd00-5f471b0474dc}">
+            <name locale="en_US">IOR6</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="-53.34" uuid="{ff7311fd-7857-4b76-bc3a-b8acaf93e968}">
+            <name locale="en_US">IOV1</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="-55.88" uuid="{7524bdff-de4a-46c8-b2d7-dbec876fbb25}">
+            <name locale="en_US">IOV2</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="-58.42" uuid="{2ef341e6-3f76-4cd8-9381-996d73747da7}">
+            <name locale="en_US">IOT5</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="-60.96" uuid="{b84ddc5e-886e-4a6d-93aa-83156d0d5125}">
+            <name locale="en_US">IOT6</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="-63.5" uuid="{d21bf5d1-c7ee-4731-9110-1caeebdcad55}">
+            <name locale="en_US">IOT3</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="-66.04" uuid="{7a7fdad5-9261-432f-9c89-e6d9250a9957}">
+            <name locale="en_US">IOU3</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="-68.58" uuid="{9dc43905-19f6-4397-9705-703e2e9bbdf7}">
+            <name locale="en_US">IOW1</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="-71.12" uuid="{08f6efc4-6213-4bc6-9e91-38fdbd17294f}">
+            <name locale="en_US">IOW2</name>
+        </pin>
+        <pin x="-81.28" length="5.08" angle="0" y="-73.66" uuid="{fed00fd8-de74-42c9-9767-e88e0724a63d}">
+            <name locale="en_US">IOY1</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="81.28" uuid="{3b0ce3ae-4fef-4104-b74a-e658611f594a}">
+            <name locale="en_US">IOY2</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="78.74" uuid="{7362e8c6-fbb0-4197-89e7-822a3d9e821f}">
+            <name locale="en_US">IOW3</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="76.2" uuid="{a65921c1-d208-40ab-aa4a-ad688e4d847f}">
+            <name locale="en_US">IOW4</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="73.66" uuid="{74104c85-d084-426d-91b1-6d730e00f716}">
+            <name locale="en_US">IOY3</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="71.12" uuid="{632468f3-71a9-4748-b845-b2a9f87bdcb1}">
+            <name locale="en_US">IOY4</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="68.58" uuid="{a72b11f6-687b-4a56-a934-c8fa2a97cfee}">
+            <name locale="en_US">IOW5</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="66.04" uuid="{94c3605a-66cc-4b60-af0f-f6628b932e3d}">
+            <name locale="en_US">IOU4</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="63.5" uuid="{00449bfe-1fd7-439c-8403-60dbe1897878}">
+            <name locale="en_US">IOV4</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="60.96" uuid="{ce316237-be03-4af9-8210-7f32f1f46e6e}">
+            <name locale="en_US">IOAA3</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="58.42" uuid="{d490a99f-7a9f-4590-9ebf-93a66b5f9cac}">
+            <name locale="en_US">IOAB3</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="55.88" uuid="{ec77a22b-3ab6-479e-97c1-8a1896641e0b}">
+            <name locale="en_US">IOAB4</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="53.34" uuid="{3747ca47-a06c-4f72-bcf5-5d54bbc48e92}">
+            <name locale="en_US">IOAA4</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="50.8" uuid="{59158615-8fdd-464f-a159-3008ccee5806}">
+            <name locale="en_US">IOY5</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="48.26" uuid="{49a1f315-aee1-4df4-bdcf-dee49b9918db}">
+            <name locale="en_US">IOY6</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="45.72" uuid="{37d12b75-8734-4313-b99b-712fab27344e}">
+            <name locale="en_US">IOAB5</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="43.18" uuid="{ed4f8986-f646-4988-88cd-b887a921e389}">
+            <name locale="en_US">IOAA5</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="40.64" uuid="{d1fa8059-4cf2-429a-bab3-380c8a999af8}">
+            <name locale="en_US">IOT8</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="38.1" uuid="{e55677d5-a194-4e5f-a84a-50784cb99b10}">
+            <name locale="en_US">IOT7</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="35.56" uuid="{601cee3f-a479-4176-8753-22a4598c82c5}">
+            <name locale="en_US">IOU8</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="33.02" uuid="{7771643b-c10b-4e12-bf80-cb0a39cc2a13}">
+            <name locale="en_US">IOY7</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="30.48" uuid="{4561ceca-dde1-47ac-8735-2a9a052c5fab}">
+            <name locale="en_US">IOP9</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="27.94" uuid="{b9d65e63-7b58-41b8-90b3-e748a972057c}">
+            <name locale="en_US">IOP8</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="25.4" uuid="{5d2d00c2-ab51-4b0e-b924-d31bf952acaa}">
+            <name locale="en_US">IOAB6</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="22.86" uuid="{dca42feb-893a-41e1-b53c-3e5b95e97acb}">
+            <name locale="en_US">IOAA6</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="20.32" uuid="{63b1645d-c3b2-49f1-a6b2-2283dd7db11e}">
+            <name locale="en_US">IOV8</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="17.78" uuid="{b73948a1-5863-4fa5-9a94-bcf2d3177fde}">
+            <name locale="en_US">IOW7</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="15.24" uuid="{c73858ce-4b74-46d1-a5a5-7855ce48d7e7}">
+            <name locale="en_US">IOW8</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="12.7" uuid="{3f078c0d-d0df-4a83-be4b-91e9c61c6dd4}">
+            <name locale="en_US">IOV9</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="10.16" uuid="{4c1b6162-8a37-4f2f-bddd-2a7aae1482ac}">
+            <name locale="en_US">IOAB7</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="7.62" uuid="{6b94bd83-3fe5-472b-9cf1-92400508abfe}">
+            <name locale="en_US">IOAA7</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="5.08" uuid="{09ea2262-27bb-4f0a-8184-2638af6cae8e}">
+            <name locale="en_US">IOY9</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="2.54" uuid="{d54311ba-3858-4655-9ed6-140e78b7a674}">
+            <name locale="en_US">IOW9</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="0" uuid="{111920c6-6730-4361-8562-ed772f6f4784}">
+            <name locale="en_US">IOU9</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="-2.54" uuid="{88a47b26-0aab-45f9-9665-a59556009ca3}">
+            <name locale="en_US">IOU10</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="-5.08" uuid="{c0f518f0-86b7-46eb-87d1-270cc4251e11}">
+            <name locale="en_US">IOR10</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="-7.62" uuid="{9d85a34d-fa29-4702-aafa-4da12959adac}">
+            <name locale="en_US">IOR9</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="-10.16" uuid="{eeb6a955-e230-4e71-88a8-b1918684e143}">
+            <name locale="en_US">IOAB8</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="-12.7" uuid="{4ac9387f-a5e6-42c7-b02f-564aeb3dbbea}">
+            <name locale="en_US">IOAA8</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="-15.24" uuid="{2ece604b-4669-4914-9d03-db48cbd1b207}">
+            <name locale="en_US">IOY10</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="-17.78" uuid="{b55dfd92-e093-4759-87ae-f4804db6978d}">
+            <name locale="en_US">IOAB9</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="-20.32" uuid="{0d709d87-bbe4-4eca-af04-afcaf457182f}">
+            <name locale="en_US">IOAA9</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="-22.86" uuid="{df4408e6-9f9c-43a5-87a7-38d7fc66c16f}">
+            <name locale="en_US">IOT11</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="-25.4" uuid="{60cef4cb-69e6-48c4-a98e-2f862760aefc}">
+            <name locale="en_US">IOR11</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="-27.94" uuid="{2a0e66bb-e66d-4243-bc02-da2f7a0b28c6}">
+            <name locale="en_US">IOW11</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="-30.48" uuid="{f1f18912-0bb8-45bf-be5e-df0e8e28251d}">
+            <name locale="en_US">IOV11</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="-33.02" uuid="{5b35645f-771c-4e44-9ff2-7ac23c0bbf4e}">
+            <name locale="en_US">IOAB10</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="-35.56" uuid="{c30876da-0a1e-4590-8502-8002b5a0d05f}">
+            <name locale="en_US">IOAA10</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="-38.1" uuid="{ccbf1a40-a323-4a3d-8955-af4a86ceabdf}">
+            <name locale="en_US">IOAB11</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="-40.64" uuid="{7a3a9beb-dae3-415c-9c25-8654c3e56e0e}">
+            <name locale="en_US">IOAA11</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="-43.18" uuid="{48e5a8a7-523a-4b20-8561-bd51017e8168}">
+            <name locale="en_US">IOAB12</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="-45.72" uuid="{a8b4304b-5e9b-4100-a747-a94ff2bedc3c}">
+            <name locale="en_US">IOAA12</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="-48.26" uuid="{3b3b22e2-34f2-4efd-bf39-0290ee76fa0b}">
+            <name locale="en_US">IOAB13</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="-50.8" uuid="{adab74b5-96e4-4a0e-97aa-fd0b2c36ecc2}">
+            <name locale="en_US">IOAA13</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="-53.34" uuid="{355b07c6-cb0b-4dd7-bc8f-56741ba25ebf}">
+            <name locale="en_US">IOT12</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="-55.88" uuid="{8f9e2072-cf6a-4086-8bd6-639abd6f5c95}">
+            <name locale="en_US">IOU13</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="-58.42" uuid="{3f48f2a7-e080-4a67-85a0-6f03ebb3f331}">
+            <name locale="en_US">IOY13</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="-60.96" uuid="{f0947f8d-6e00-48fc-84d1-3a6e3a193608}">
+            <name locale="en_US">IOR12</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="-63.5" uuid="{701df77f-4544-43c8-a04a-e200529a84f3}">
+            <name locale="en_US">IOAB14</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="-66.04" uuid="{ea5ee855-d901-4dc3-afa1-54f0acb90e6d}">
+            <name locale="en_US">IOAA14</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="-68.58" uuid="{c47d5406-2b5d-4f60-a635-24b5ed00e3a5}">
+            <name locale="en_US">IOAB15</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="-71.12" uuid="{3d796eed-8df8-41a6-8624-918fa91315f7}">
+            <name locale="en_US">IOAA15</name>
+        </pin>
+        <pin x="-55.88" length="5.08" angle="0" y="-73.66" uuid="{bd097f5f-cd88-4fb9-a0df-372d20d5f061}">
+            <name locale="en_US">IOAB16</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="81.28" uuid="{f12ec727-d1b7-4ebf-97d4-03d417a0804d}">
+            <name locale="en_US">IOAA16</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="78.74" uuid="{45788e6f-8a3c-48bb-aff2-9138bcde7492}">
+            <name locale="en_US">IOW14</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="76.2" uuid="{322c9c0b-099c-484a-9f8c-cb6759eb901b}">
+            <name locale="en_US">IOV14</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="73.66" uuid="{0ea0c774-8c3f-46ca-ab7c-1bce8e57a278}">
+            <name locale="en_US">IOAB17</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="71.12" uuid="{a0eecc02-9654-40ab-80f3-ace564cc710d}">
+            <name locale="en_US">IOAA17</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="68.58" uuid="{5d10cf04-5255-446b-b846-4456b8ef3dbf}">
+            <name locale="en_US">IOR13</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="66.04" uuid="{6eead2c2-32c9-4aea-a707-da1d8427f58b}">
+            <name locale="en_US">IOU14</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="63.5" uuid="{fcc5eb92-7a19-4e3a-a858-0cd8152e8563}">
+            <name locale="en_US">IOT15</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="60.96" uuid="{d7194333-4b0d-4798-b632-0d4c6ea48cb3}">
+            <name locale="en_US">IOY14</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="58.42" uuid="{70d2d90d-588c-4ca4-ba03-2dd185883acf}">
+            <name locale="en_US">IOW15</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="55.88" uuid="{d6305666-59d5-4453-9532-df47bc7ff2de}">
+            <name locale="en_US">IOR14</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="53.34" uuid="{902bf458-3b0a-4167-af88-d19c7e1ffecd}">
+            <name locale="en_US">IOR15</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="50.8" uuid="{50d37be2-9ad0-4c4d-891b-4b7fa7cca874}">
+            <name locale="en_US">IOAB18</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="48.26" uuid="{e73266f9-758a-4c3c-893d-52e72bd024a3}">
+            <name locale="en_US">IOAA18</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="45.72" uuid="{58bc0fc1-ba9a-43cc-bd17-e472fc822b6c}">
+            <name locale="en_US">IOY16</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="43.18" uuid="{c7caf115-95e0-4006-a7d6-460446c38317}">
+            <name locale="en_US">IOR16</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="40.64" uuid="{c16c906e-438d-4b71-b820-e9d9b82de795}">
+            <name locale="en_US">IOT16</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="38.1" uuid="{28954918-9194-4f0b-84b6-c85733447eb0}">
+            <name locale="en_US">IOU15</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="35.56" uuid="{4f469da6-3ef3-4ba6-94c0-d0ed914a4bac}">
+            <name locale="en_US">IOV15</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="33.02" uuid="{82ed0ba7-7676-4df6-8f81-8f2b5ad92e62}">
+            <name locale="en_US">IOY17</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="30.48" uuid="{36174f52-b40f-49e0-bd15-23468d377338}">
+            <name locale="en_US">IOW16</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="27.94" uuid="{65b92241-7220-4b84-b62e-14610dcc24c0}">
+            <name locale="en_US">IOAB19</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="25.4" uuid="{f779d784-6107-4d4a-a5c6-1aa4f86c254d}">
+            <name locale="en_US">IOAA19</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="22.86" uuid="{8da0723f-2989-45db-a22d-fc5f603730f8}">
+            <name locale="en_US">IOAB20</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="20.32" uuid="{daf1b14f-d237-45a0-8052-ea584f81f5ff}">
+            <name locale="en_US">IOAA20</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="17.78" uuid="{6f604ad2-e346-4cea-8b3a-c37f2863ada0}">
+            <name locale="en_US">IOY18</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="15.24" uuid="{e1ec60b4-3541-4a66-b22c-8901dd0f59a7}">
+            <name locale="en_US">IOV19</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="12.7" uuid="{b7788762-851f-4e5f-ba2e-51ffbbb58e67}">
+            <name locale="en_US">IOW20</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="10.16" uuid="{f1d481ee-17c5-4d9a-b5b3-9a414d8f9299}">
+            <name locale="en_US">IOY19</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="7.62" uuid="{3058a302-76bf-49b2-86c1-fce3bad8a73f}">
+            <name locale="en_US">IOY20</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="5.08" uuid="{ed41fb6c-9605-41a7-a783-79e888e42f53}">
+            <name locale="en_US">IOU18</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="2.54" uuid="{063f2d59-00f6-4471-be19-90749c2f75dc}">
+            <name locale="en_US">IOT18</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="0" uuid="{8e9f2740-9575-4b1b-a6ca-0e2504dcca86}">
+            <name locale="en_US">IOU19</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-2.54" uuid="{2094048d-8759-4584-95d1-6a7ed9e96300}">
+            <name locale="en_US">IOV20</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-5.08" uuid="{531ebb1f-8f16-4413-b113-b64cb1678f56}">
+            <name locale="en_US">IOW21</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-7.62" uuid="{4fd3e634-4a5a-4a0a-91d8-53f19e93a3ea}">
+            <name locale="en_US">IOW22</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-10.16" uuid="{f8308ba2-7259-4120-832a-724be844d00d}">
+            <name locale="en_US">IOU20</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-12.7" uuid="{d720c3d0-61dd-4a6b-8ce6-54d475776e5e}">
+            <name locale="en_US">IOR17</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-15.24" uuid="{876a852a-0d42-4460-a4d3-7b7265f17293}">
+            <name locale="en_US">IOY21</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-17.78" uuid="{4678b283-c9bd-4b02-9e08-65a2e05e9894}">
+            <name locale="en_US">IOY22</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-20.32" uuid="{17d858f1-44a0-4afc-9eea-39ef61c15d78}">
+            <name locale="en_US">IOV21</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-22.86" uuid="{b4363759-ff4c-458f-b76f-dca5045d939c}">
+            <name locale="en_US">IOV22</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-25.4" uuid="{ef17db03-bdf0-4031-9e92-d0f53996f8ba}">
+            <name locale="en_US">IOU21</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-27.94" uuid="{02523e56-5527-4669-be02-9f66fdd58cbb}">
+            <name locale="en_US">IOU22</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-30.48" uuid="{38fadf61-7578-4ad9-b1c2-ffd5cf8f951d}">
+            <name locale="en_US">IOR18</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-33.02" uuid="{79e820ea-8adf-4f15-95a5-af136e4ba29e}">
+            <name locale="en_US">IOR19</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-35.56" uuid="{dae212ad-eda2-4664-9f67-697ebc42686b}">
+            <name locale="en_US">IOP17</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-38.1" uuid="{f84518fe-b036-49bc-a42b-130732b092bc}">
+            <name locale="en_US">IOP18</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-40.64" uuid="{f2912a50-b6a4-4219-8816-f65a3845290d}">
+            <name locale="en_US">IOT21</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-43.18" uuid="{7f0f9e79-25e3-426b-9563-99fa0645b117}">
+            <name locale="en_US">IOT22</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-45.72" uuid="{8d9ce8af-875b-49f4-a793-eefa9df6831f}">
+            <name locale="en_US">IOR21</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-48.26" uuid="{067eb39a-391b-487f-bef0-e7efbf65483f}">
+            <name locale="en_US">IOR22</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-50.8" uuid="{96273e73-4479-4e44-968d-1d566e4f25b7}">
+            <name locale="en_US">IOR20</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-53.34" uuid="{5fdae767-0a49-4b06-a607-2328c13975da}">
+            <name locale="en_US">IOP15</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-55.88" uuid="{176751ea-6bc1-4031-a16e-b5c913ebe160}">
+            <name locale="en_US">ION15</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-58.42" uuid="{9029ccc3-d421-4b7c-89f2-701354a236bb}">
+            <name locale="en_US">ION21</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-60.96" uuid="{5928adf9-52e4-43b7-903c-eb2f23d90ed1}">
+            <name locale="en_US">ION22</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-63.5" uuid="{8ddc3a31-d1b3-4df7-924d-c17e83837499}">
+            <name locale="en_US">IOM19</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-66.04" uuid="{c30dfffb-1bee-4ce0-835f-ccc199907841}">
+            <name locale="en_US">IOM18</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-68.58" uuid="{0ad1df3c-c603-4f6b-bb24-dd4e0e1aed60}">
+            <name locale="en_US">IOL19</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-71.12" uuid="{f07e482e-1603-4d5c-8a94-4479c93935d7}">
+            <name locale="en_US">IOL18</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-73.66" uuid="{0e40f757-6768-4f27-85aa-ebeca551bd9e}">
+            <name locale="en_US">IOK21</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="81.28" uuid="{c28fd49b-3164-43fc-b349-837edb6fcaa5}">
+            <name locale="en_US">IOK22</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="78.74" uuid="{749f623f-2b7d-4833-911a-1f467b29d7d7}">
+            <name locale="en_US">IOJ21</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="76.2" uuid="{63a94f9f-e981-4b68-97c7-5a0687511cdf}">
+            <name locale="en_US">IOJ22</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="73.66" uuid="{e9e3c06d-7858-42d2-aceb-e50bf751b5cb}">
+            <name locale="en_US">IOJ20</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="71.12" uuid="{0ef3f18b-0721-4215-86dd-47db90ba7c5e}">
+            <name locale="en_US">IOH19</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="68.58" uuid="{63f806d3-20de-46e3-a559-f9f85ffbb8e7}">
+            <name locale="en_US">IOK20</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="66.04" uuid="{41cd74e0-99d6-44c7-bc78-a0a560eaeed5}">
+            <name locale="en_US">IOJ19</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="63.5" uuid="{4ef50559-2a75-4d2a-9c90-a71c3c56b062}">
+            <name locale="en_US">IOJ18</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="60.96" uuid="{5cef2c94-7a44-4cb4-a110-a11232679811}">
+            <name locale="en_US">IOJ17</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="58.42" uuid="{64600f21-1a47-459c-b87f-220038e69c39}">
+            <name locale="en_US">IOH16</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="55.88" uuid="{a1530487-e65c-4746-abcb-c967c546ca59}">
+            <name locale="en_US">IOJ15</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="53.34" uuid="{c5f39d2b-2a62-429e-b478-c7d3d97ccdbc}">
+            <name locale="en_US">IOG21</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="50.8" uuid="{89607022-8cea-497a-8ffe-eaf8c2b22229}">
+            <name locale="en_US">IOG22</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="48.26" uuid="{5bdbf113-91aa-4dd5-bdb0-d165afcbd1df}">
+            <name locale="en_US">IOF21</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="45.72" uuid="{2f18dc26-8528-4f70-941d-6db2421b2ee9}">
+            <name locale="en_US">IOF22</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="43.18" uuid="{74844b4c-9591-4426-adcd-6250b751704c}">
+            <name locale="en_US">IOH18</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="40.64" uuid="{d9e1dfbf-9b0f-47fb-86e7-05c87dae8275}">
+            <name locale="en_US">IOH17</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="38.1" uuid="{4cba9d5a-da7f-4741-9171-0d9f3ab40f27}">
+            <name locale="en_US">IOE21</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="35.56" uuid="{698ac350-5b23-4943-ba3d-ec93c5898923}">
+            <name locale="en_US">IOE22</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="33.02" uuid="{bdfe6d76-0878-416c-9410-be549b02ed2c}">
+            <name locale="en_US">IOD21</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="30.48" uuid="{67be0775-e621-44f0-bc19-8fd59f7d1e77}">
+            <name locale="en_US">IOD22</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="27.94" uuid="{dcfe5a1f-04b5-4f44-9451-bdfa0e436c04}">
+            <name locale="en_US">IOG17</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="25.4" uuid="{b565de24-c8be-4259-97b7-4c1d5deac046}">
+            <name locale="en_US">IOG18</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="22.86" uuid="{28ff4927-b8af-4f07-a1ef-e4025fb74ed6}">
+            <name locale="en_US">IOG20</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="20.32" uuid="{52f4e39f-c515-486b-9c1f-8ce479cb63c4}">
+            <name locale="en_US">IOE20</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="17.78" uuid="{13c476dc-7a37-4573-9213-03991bce3ecc}">
+            <name locale="en_US">IOF20</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="15.24" uuid="{e525d98c-bb8d-4526-83f1-2fa485facab6}">
+            <name locale="en_US">IOC21</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="12.7" uuid="{eb8d1acf-21a6-43df-b0e4-8a6ca67de5ce}">
+            <name locale="en_US">IOC22</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="10.16" uuid="{139d557f-a723-4587-b19f-6988a081db43}">
+            <name locale="en_US">IOC19</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="7.62" uuid="{f2211c18-38b0-452a-aaff-23ff1938d8b2}">
+            <name locale="en_US">IOC20</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="5.08" uuid="{def59932-5e5c-4cf7-8b30-bd273ba9e815}">
+            <name locale="en_US">IOD19</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="2.54" uuid="{6e179ea2-a592-472c-b477-dd9dbed4d6d6}">
+            <name locale="en_US">IOD20</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{d1f2550f-85fa-4cec-8a5c-e185e1f3a78e}">
+            <name locale="en_US">IOE19</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{2596cb56-60b8-4fe2-b89e-3218d312a53d}">
+            <name locale="en_US">IOE18</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{977350e0-0ff3-49e1-82c5-70f7b0340695}">
+            <name locale="en_US">IOC18</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{b505e425-2e98-4d1d-b745-4a0afdc8c0fc}">
+            <name locale="en_US">IOC17</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{8162fd48-3993-4604-b4be-5690c91e3435}">
+            <name locale="en_US">IOB20</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{7fc3db06-e323-41cc-92fa-28cf487ea3c1}">
+            <name locale="en_US">IOA20</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{db2bffa6-2b1a-4a10-b61f-c052e7f81402}">
+            <name locale="en_US">IOB19</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{b0bbd6b4-3543-4628-b1aa-9e50f690c0c5}">
+            <name locale="en_US">IOA19</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{09f12bee-3f7d-4111-a9b7-17b5d999eece}">
+            <name locale="en_US">IOB18</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{b9c4ba54-65f1-4d3a-b7a3-2bd51e6c2ae3}">
+            <name locale="en_US">IOA18</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{57b79934-b754-4282-b082-0944c3200f94}">
+            <name locale="en_US">IOG16</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{b591db06-906d-436d-a63c-dd43d3119d69}">
+            <name locale="en_US">IOH15</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{3e6b2750-549f-4dfa-b28a-cc2db48456b4}">
+            <name locale="en_US">IOC16</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-33.02" uuid="{c9c4ef7f-30a8-4bd1-bad0-c7c1d177ebb6}">
+            <name locale="en_US">IOD16</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-35.56" uuid="{01e2839f-c5af-423f-b990-6201c2a722db}">
+            <name locale="en_US">IOE15</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-38.1" uuid="{7f5765d1-6f13-478d-8aa7-ada3b76d7114}">
+            <name locale="en_US">IOH14</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-40.64" uuid="{b1ca9603-774b-4fe0-9a3e-cdedfb81566b}">
+            <name locale="en_US">IOJ14</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-43.18" uuid="{34b6baf6-948e-4b30-8f0b-23db3a8d7d9a}">
+            <name locale="en_US">IOD15</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-45.72" uuid="{e417d7ca-d4ba-4996-9891-7308ff193843}">
+            <name locale="en_US">IOC14</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-48.26" uuid="{6c282328-1c1a-4852-a1cc-9e68b91ffdb7}">
+            <name locale="en_US">IOG15</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-50.8" uuid="{585defc7-83e1-4015-b67b-5b573fda5bb7}">
+            <name locale="en_US">IOF15</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-53.34" uuid="{2d59a82c-f443-4cc3-bc6e-251db5273be2}">
+            <name locale="en_US">IOH13</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-55.88" uuid="{c03f178b-a12d-45f7-b64e-144c4f4b13a0}">
+            <name locale="en_US">IOB17</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-58.42" uuid="{a113c74d-9422-42cc-ac80-1672080cc94a}">
+            <name locale="en_US">IOA17</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-60.96" uuid="{ddb31461-6b77-4500-9723-8f4b9eebf2a2}">
+            <name locale="en_US">IOE14</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-63.5" uuid="{48beb5b8-5c98-4e5e-9c23-b4f69d175b21}">
+            <name locale="en_US">IOD14</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-66.04" uuid="{9ccdfb16-6b82-4021-bc3d-ac2eaf2f7cd1}">
+            <name locale="en_US">IOF14</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-68.58" uuid="{fba97820-72f8-45b6-911b-6d8192fab66e}">
+            <name locale="en_US">IOF13</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-71.12" uuid="{227b3a66-de92-497a-b295-7d3cbbd1e639}">
+            <name locale="en_US">IOB16</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-73.66" uuid="{07ff3329-6490-41bf-86ef-f6cfae5ed426}">
+            <name locale="en_US">IOA16</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="81.28" uuid="{b9fbb580-c685-406c-b0f3-6245007452fa}">
+            <name locale="en_US">IOB15</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="78.74" uuid="{fbe956f4-56d0-4778-a43e-c01a980e3d02}">
+            <name locale="en_US">IOA15</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="76.2" uuid="{9fd6b976-c373-4859-800d-f2ec5ba5f997}">
+            <name locale="en_US">IOH12</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="73.66" uuid="{505f0e5d-8dad-435a-abaf-95206a8fb8f0}">
+            <name locale="en_US">IOC13</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="71.12" uuid="{22a046f0-6425-46b8-8046-a2cd4e7756fd}">
+            <name locale="en_US">IOF12</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="68.58" uuid="{cc6e545b-2c8c-4361-9c17-01210cd29383}">
+            <name locale="en_US">IOG12</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="66.04" uuid="{b9be66ac-6766-4d99-8e84-70f5c096c44b}">
+            <name locale="en_US">IOB14</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="63.5" uuid="{275fb6c2-ecc5-4df6-aed7-ee99f2fe30a8}">
+            <name locale="en_US">IOA14</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="60.96" uuid="{6fac46d7-8285-4044-8cf9-efa7643386e6}">
+            <name locale="en_US">IOB13</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="58.42" uuid="{248cfd52-8c9d-4409-bc30-9d90f7f3e6e8}">
+            <name locale="en_US">IOA13</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="55.88" uuid="{04aac952-5658-40fb-bbfb-8a372494a278}">
+            <name locale="en_US">IOB11</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="53.34" uuid="{a5bb2470-b545-4190-b3f9-5e63f0a20a3f}">
+            <name locale="en_US">IOA11</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="50.8" uuid="{304ac846-1d2e-4676-89aa-2cfc57de1a88}">
+            <name locale="en_US">IOE11</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="48.26" uuid="{0e3e21f0-d26d-409a-93a1-dffabf3ae9ca}">
+            <name locale="en_US">IOD11</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="45.72" uuid="{e3c8efcb-ab7e-449a-b463-1c6686c0040e}">
+            <name locale="en_US">IOH11</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="43.18" uuid="{8491b38d-3edb-4edc-b1b8-9d26db0f2c2c}">
+            <name locale="en_US">IOG11</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="40.64" uuid="{611456cc-049d-467c-be60-ae66149f77b3}">
+            <name locale="en_US">IOB10</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="38.1" uuid="{ed9b91fa-3e41-45c8-977f-7900d3343cb9}">
+            <name locale="en_US">IOA10</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="35.56" uuid="{b7b589b8-8dac-467c-b03a-e67cfc8a7777}">
+            <name locale="en_US">IOF11</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="33.02" uuid="{a90952d9-93ac-475f-a704-672c7fdd18b0}">
+            <name locale="en_US">IOF10</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="30.48" uuid="{0832c206-e538-4485-9ed4-038025410ee5}">
+            <name locale="en_US">IOC10</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="27.94" uuid="{893b7f30-78a1-48fa-9586-537a05e8a952}">
+            <name locale="en_US">IOB9</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="25.4" uuid="{60070065-7159-48ce-ac2b-86bda088c5fc}">
+            <name locale="en_US">IOA9</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="22.86" uuid="{54b04a7a-e1b9-4b36-b868-09675877955b}">
+            <name locale="en_US">IOH10</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="20.32" uuid="{421757a6-ffad-4229-a0be-c87890f94e6d}">
+            <name locale="en_US">IOH9</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="17.78" uuid="{477fe6d5-3c24-4c3b-9eae-4da944dfd0f7}">
+            <name locale="en_US">IOE9</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="15.24" uuid="{2acd03c4-1bd2-4da9-97e8-fc698b021d86}">
+            <name locale="en_US">IOD9</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="12.7" uuid="{9ca41691-5ad1-4f18-8e00-cb4736332a81}">
+            <name locale="en_US">IOB8</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="10.16" uuid="{6bb748b8-3d5d-47af-a8da-c65d64a5c265}">
+            <name locale="en_US">IOA8</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="7.62" uuid="{2159bed9-56f9-47c8-a303-612d7a84055d}">
+            <name locale="en_US">IOB7</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="5.08" uuid="{23a73d2e-919e-4e52-a9f9-02549e63a0b6}">
+            <name locale="en_US">IOA7</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="2.54" uuid="{8d8c7631-6c70-4ab5-a28a-7d690e491642}">
+            <name locale="en_US">IOF9</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="0" uuid="{a55df5b3-fc22-4d09-b674-2c3b716558d8}">
+            <name locale="en_US">IOE8</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-2.54" uuid="{83d62012-3800-4d90-8135-4ef1f81edada}">
+            <name locale="en_US">IOD8</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-5.08" uuid="{b801c9c5-bdf6-41cc-8ecd-9de933044b3b}">
+            <name locale="en_US">IOC9</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-7.62" uuid="{1e667170-5143-43fc-ab7f-26e0978da272}">
+            <name locale="en_US">IOD7</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-10.16" uuid="{14d817b1-5ff1-4a88-85a1-d5d22381ee54}">
+            <name locale="en_US">IOF8</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-12.7" uuid="{f9797fd4-3e5f-4bd8-925d-98d7746252c0}">
+            <name locale="en_US">IOG8</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-15.24" uuid="{70cc8000-9238-48ad-8daf-ff7dff8dadd1}">
+            <name locale="en_US">IOH8</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-17.78" uuid="{4d19563f-7d61-464c-b07c-7cba64c8245a}">
+            <name locale="en_US">IOC7</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-20.32" uuid="{60d4dcc8-d19e-4646-a40f-5dac18d146d6}">
+            <name locale="en_US">IOE7</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-22.86" uuid="{5edec656-e1d7-4e51-89cb-cfbfc0ea615e}">
+            <name locale="en_US">IOG7</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-25.4" uuid="{74ced101-613a-4e51-a18b-cb7d0360c4a8}">
+            <name locale="en_US">IOH7</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-27.94" uuid="{ca97428e-ee2a-47b2-ac38-28160b34671e}">
+            <name locale="en_US">IOB6</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-30.48" uuid="{f450820b-f930-4ae5-9f28-b0797b10bb73}">
+            <name locale="en_US">IOA6</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-33.02" uuid="{7b0db31c-6ad7-4775-9433-cecd3776e279}">
+            <name locale="en_US">IOB5</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-35.56" uuid="{c5083ce5-1c18-4bbe-a8e2-bfbbe890a6d2}">
+            <name locale="en_US">IOA5</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-38.1" uuid="{140be7bf-dd3a-4dfc-aa92-3a14ebc255d4}">
+            <name locale="en_US">IOB4</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-40.64" uuid="{0db9303b-1ed5-4be6-b4e8-1c3b8474062b}">
+            <name locale="en_US">IOA4</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-43.18" uuid="{12af5cfa-d6e7-4e2c-8bf3-942560a19f58}">
+            <name locale="en_US">IOA3</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-45.72" uuid="{ef0292cc-9dfc-48a3-bcb9-9567bf52a6e1}">
+            <name locale="en_US">IOB3</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-48.26" uuid="{caaa1c34-7805-48b6-b171-6647bbba559d}">
+            <name locale="en_US">CLK0</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-50.8" uuid="{702e60eb-1053-4769-82ed-dbcc06b10596}">
+            <name locale="en_US">CLK1</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-53.34" uuid="{451fd832-d57f-45ec-9a4a-d102535e322c}">
+            <name locale="en_US">CLK2</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-55.88" uuid="{1b031d7e-65f5-4cda-a7b1-87c1006371cd}">
+            <name locale="en_US">CLK3</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-58.42" uuid="{2533e6d0-0642-4a0d-84b8-e607b776f57b}">
+            <name locale="en_US">CLK4</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-60.96" uuid="{33a7e486-37b8-4119-ac08-2fe48365f848}">
+            <name locale="en_US">CLK5</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-63.5" uuid="{a21ce7cc-4289-4213-87f0-367b4374505d}">
+            <name locale="en_US">CLK6</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-66.04" uuid="{d5a312dc-df27-46fb-8d80-b021a7525c32}">
+            <name locale="en_US">CLK7</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-68.58" uuid="{21a42e7b-070e-4bf1-b691-53cd4c3ed679}">
+            <name locale="en_US">CLK8</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-71.12" uuid="{385c66ba-cda2-4251-837a-a5e7613a0f0a}">
+            <name locale="en_US">CLK9</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-73.66" uuid="{2fb7469e-f31c-4991-8701-5a9f004598da}">
+            <name locale="en_US">CLK10</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="81.28" uuid="{51201eb7-aecd-448b-b002-539fef028437}">
+            <name locale="en_US">CLK11</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="78.74" uuid="{bdd3d1e2-248f-47b7-a9eb-cdabec927635}">
+            <name locale="en_US">CLK12</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="76.2" uuid="{f51ab952-0857-4aed-a970-3b2a7acd46a3}">
+            <name locale="en_US">CLK13</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="73.66" uuid="{207c0c68-6029-4f2f-9d5b-a06180309c46}">
+            <name locale="en_US">CLK14</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="71.12" uuid="{3ff45802-8cba-4855-91fd-03e39d3a7eac}">
+            <name locale="en_US">CLK15</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="68.58" uuid="{8a7dddbb-7c1a-47ff-872b-44a5677680d8}">
+            <name locale="en_US">DATA0</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="66.04" uuid="{b5529222-3ed1-4e7a-bc0f-ab37150c0f32}">
+            <name locale="en_US">DCLK</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="63.5" uuid="{aa027a61-312e-47f9-b128-60fd40ed1f90}">
+            <name locale="en_US">MSEL0</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="60.96" uuid="{ee32d177-0c39-4afe-92e4-6bf04695acfd}">
+            <name locale="en_US">MSEL1</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="58.42" uuid="{7e50f901-7810-456e-8fbb-784f41867692}">
+            <name locale="en_US">CONF_DONE</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="55.88" uuid="{4fe75486-94b7-4b4d-bde0-6b00d7fdce8f}">
+            <name locale="en_US">NCE</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="53.34" uuid="{bd0d7704-d92e-473b-8ef8-ed8216954ee3}">
+            <name locale="en_US">NCONFIG</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="50.8" uuid="{dce3169b-dcb7-43b7-9090-bef0a3dc0042}">
+            <name locale="en_US">NSTATUS</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="48.26" uuid="{86ae15a5-7d6d-4880-96da-cfa76789ff15}">
+            <name locale="en_US">TCK</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="45.72" uuid="{c66b3de8-298a-4755-85f3-4232b55ccaed}">
+            <name locale="en_US">TMS</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="43.18" uuid="{ba96bd37-4046-4321-8e38-03183e1c13cb}">
+            <name locale="en_US">TDI</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="40.64" uuid="{6f04ab81-4771-41ca-98f7-61f0946cb48f}">
+            <name locale="en_US">TDO</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="38.1" uuid="{88eacf9b-1b52-43b5-b68e-e59c4b98a8eb}">
+            <name locale="en_US">NC1</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="35.56" uuid="{44fa2c68-0d3d-4453-8a28-4042bf5cb1d1}">
+            <name locale="en_US">NC2</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="33.02" uuid="{07057b9c-0446-4e94-a8fe-3153397d9ca1}">
+            <name locale="en_US">NC3</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="30.48" uuid="{8a3c93cb-df51-43f7-90c9-37843dd73cda}">
+            <name locale="en_US">NC4</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="27.94" uuid="{fbed8bd6-4ed8-4db9-83c8-ab9c241df57f}">
+            <name locale="en_US">NC5</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="25.4" uuid="{0aeb1c24-adb7-4369-8dc6-57b2b576a9e4}">
+            <name locale="en_US">NC6</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="22.86" uuid="{4e0f4828-2123-4398-804a-ac7aa9eb05a8}">
+            <name locale="en_US">NC7</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="20.32" uuid="{3878cd49-ba6c-4408-b616-32fd943607d8}">
+            <name locale="en_US">NC8</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="17.78" uuid="{8c304a44-a656-4106-ac6b-24f95600435f}">
+            <name locale="en_US">NC9</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="15.24" uuid="{82bc4b03-15c9-4ac8-9a2c-5874ae304aed}">
+            <name locale="en_US">NC10</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="12.7" uuid="{89e4ad17-3e72-4fba-b25b-6b90a7c3c79d}">
+            <name locale="en_US">NC11</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="10.16" uuid="{f46ebd20-1936-4829-b8fb-9ab28c23b3bb}">
+            <name locale="en_US">NC12</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="7.62" uuid="{3282b538-6b41-41d0-b3f1-34083b8e02d4}">
+            <name locale="en_US">NC13</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="5.08" uuid="{8719e0f8-668b-4359-9f87-f51354dd58c4}">
+            <name locale="en_US">NC14</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="2.54" uuid="{e87f48c2-9065-4a4d-a59f-923566c07fe2}">
+            <name locale="en_US">NC15</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="0" uuid="{b7a497cb-5515-414c-a7d6-40ec2677eaab}">
+            <name locale="en_US">NC16</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-2.54" uuid="{7d27363c-c7ad-4858-a453-df06a3b3ddfc}">
+            <name locale="en_US">NC17</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-5.08" uuid="{79f90223-4a1a-49d7-992b-6fceaa38e739}">
+            <name locale="en_US">NC18</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-7.62" uuid="{d7f1dbb9-a574-4041-a863-a6620dadb068}">
+            <name locale="en_US">NC19</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-10.16" uuid="{fbcdf367-76c4-4399-9ee4-be486c05c99f}">
+            <name locale="en_US">NC20</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-12.7" uuid="{f4ff8f8a-46e2-4d35-aadb-e3041cb32dee}">
+            <name locale="en_US">NC21</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-15.24" uuid="{6177d85e-d55e-4e17-8491-98b63a86cc25}">
+            <name locale="en_US">NC22</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-17.78" uuid="{2966133e-88ea-4068-93a2-1cfa78b7134b}">
+            <name locale="en_US">NC23</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-20.32" uuid="{6053b3a6-215d-4ca2-9fc0-63d873093139}">
+            <name locale="en_US">NC24</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-22.86" uuid="{f077df3f-9661-4639-8e7b-af4bc4ec9a3f}">
+            <name locale="en_US">NC25</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-25.4" uuid="{58c3afef-cb96-49a4-b3e3-2d5d99d82d50}">
+            <name locale="en_US">NC26</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-27.94" uuid="{4604e9a1-f5dd-4425-a9ff-ca39cfe6fa24}">
+            <name locale="en_US">NC27</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-30.48" uuid="{d00b3088-115d-40dd-b9e5-dfca5f05154d}">
+            <name locale="en_US">NC28</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-33.02" uuid="{19581b91-4428-4fdc-8206-01f7954249b6}">
+            <name locale="en_US">NC29</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-35.56" uuid="{393876cc-6fe9-45fb-a074-4118f49a1c16}">
+            <name locale="en_US">NC30</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-38.1" uuid="{c8a37316-dbf5-431d-8ac8-1490b2a23460}">
+            <name locale="en_US">NC31</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-40.64" uuid="{38fbdbc6-a524-475d-a906-8f45a611d19f}">
+            <name locale="en_US">VCC@1</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-43.18" uuid="{8c1d077f-a10e-4dab-8e80-6dca781daf15}">
+            <name locale="en_US">VCC@2</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-45.72" uuid="{3bee227c-4e8c-40d2-9ae3-5152acfb8557}">
+            <name locale="en_US">VCC@3</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-48.26" uuid="{b523d6e6-5fce-4894-8e76-56d35ba158ed}">
+            <name locale="en_US">VCC@4</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-50.8" uuid="{dd648540-0302-43fc-8afe-e7aebdb2af21}">
+            <name locale="en_US">VCC@5</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-53.34" uuid="{7398e381-440c-4b06-83fa-47dcfd295923}">
+            <name locale="en_US">VCC@6</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-55.88" uuid="{05266a23-3a9b-4811-af4a-9fac3f7e27f6}">
+            <name locale="en_US">VCC@7</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-58.42" uuid="{bf2b83ad-a632-4837-b2dd-ecf5b62b24eb}">
+            <name locale="en_US">VCC@8</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-60.96" uuid="{605e6277-e184-4c02-af90-da9659ecc91c}">
+            <name locale="en_US">VCC@9</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-63.5" uuid="{e1c18bfd-f169-4753-8ac0-cabc25472295}">
+            <name locale="en_US">VCC@10</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-66.04" uuid="{5f6dcf24-8645-45a0-9d01-63dd1a0f3a1c}">
+            <name locale="en_US">VCC@11</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-68.58" uuid="{df12466c-0730-4347-bc32-dbe07d9e91af}">
+            <name locale="en_US">VCC@12</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-71.12" uuid="{7426fc32-522a-4ffe-9a22-3be7f35767a8}">
+            <name locale="en_US">VCC@13</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-73.66" uuid="{8b983918-8aff-4d0b-94b5-066db8a2af9d}">
+            <name locale="en_US">VCC@14</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="81.28" uuid="{8f6a939d-8fc5-49f3-b64e-0ea8f6edf772}">
+            <name locale="en_US">VCC@15</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="78.74" uuid="{53928060-b9e5-4a6b-8fc5-c224d31435ba}">
+            <name locale="en_US">VCC@16</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="76.2" uuid="{4bb91421-7f96-4235-a2d5-c07c713e5a12}">
+            <name locale="en_US">VCC@17</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="73.66" uuid="{392aa02a-6316-45dc-9d0e-5f3c440d818a}">
+            <name locale="en_US">VCC@18</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="71.12" uuid="{142821b4-e7cd-47a0-8cca-d60b69f98262}">
+            <name locale="en_US">VCC@19</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="68.58" uuid="{e53ba1b5-78bf-426b-99a3-90a0b266028f}">
+            <name locale="en_US">VCC@20</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="66.04" uuid="{039c4e32-19f7-4461-9cae-b8c8b6f9e1ea}">
+            <name locale="en_US">VCC@21</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="63.5" uuid="{07255154-4710-4bf3-8dc3-94127c863098}">
+            <name locale="en_US">VCC@22</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="60.96" uuid="{2e93bf7a-0572-4060-9d8c-acba087a3846}">
+            <name locale="en_US">VCC@23</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="58.42" uuid="{64ce2b79-0e73-4698-a61b-20f7b6bb7956}">
+            <name locale="en_US">VCC@24</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="55.88" uuid="{a5e5c7eb-bf8c-421a-932f-b75ff89eed45}">
+            <name locale="en_US">VCC@25</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="53.34" uuid="{9d05edb5-5983-4040-9609-eceaf48c0bde}">
+            <name locale="en_US">VCC@26</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="50.8" uuid="{8c57540e-14c7-44c6-81e7-625ed9535d54}">
+            <name locale="en_US">VCC@27</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="48.26" uuid="{c2449f86-2a9a-488b-b910-370776db880a}">
+            <name locale="en_US">VCC@28</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="45.72" uuid="{f48ad857-87f5-42bc-bf09-5997a44cc086}">
+            <name locale="en_US">VCC@29</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="43.18" uuid="{cfd40e4c-3d81-40ef-8546-fed08b4fdb85}">
+            <name locale="en_US">VCC@30</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="40.64" uuid="{ee85d433-30bd-465b-b9f5-44a56bb1721c}">
+            <name locale="en_US">VCC@31</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="38.1" uuid="{b5a26ec2-1071-4f85-8b41-131a223cf1db}">
+            <name locale="en_US">VCC@32</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="35.56" uuid="{7dbed333-7b29-4186-8573-fc5d8921a79c}">
+            <name locale="en_US">VCC@33</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="33.02" uuid="{d388aef4-0415-40d0-a968-b384fdfa4511}">
+            <name locale="en_US">VCC@34</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="30.48" uuid="{2d66ce3d-9647-4d22-8a78-e44494a3df37}">
+            <name locale="en_US">VCC@35</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="27.94" uuid="{382b0dca-3eeb-453b-b2e1-d8118ca37362}">
+            <name locale="en_US">VCC@36</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="25.4" uuid="{1d66293c-55ce-479b-9248-e78843844d5d}">
+            <name locale="en_US">VCC@37</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="22.86" uuid="{1e327573-e49e-482c-8278-6f86b3b66d99}">
+            <name locale="en_US">VCC@38</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="20.32" uuid="{eb29cba5-947f-44a7-89a4-65d2eae74aca}">
+            <name locale="en_US">VCC@39</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="17.78" uuid="{f464da5a-d9fa-4823-87b1-810a3592936a}">
+            <name locale="en_US">VCC@40</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="15.24" uuid="{765b6146-dfcb-4745-bddb-549fd4f6802b}">
+            <name locale="en_US">VCC@41</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="12.7" uuid="{858a8e61-ebed-47ec-a051-b4880dd0a654}">
+            <name locale="en_US">VCC@42</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="10.16" uuid="{22860979-436e-441f-adc2-4309c5e8c241}">
+            <name locale="en_US">VCC@43</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="7.62" uuid="{d430e03c-b0a8-481a-92b1-81417ee74933}">
+            <name locale="en_US">VCC@44</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="5.08" uuid="{747f7381-23da-4675-8f39-929cbe9cdea0}">
+            <name locale="en_US">VCC@45</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="2.54" uuid="{b52e57e1-e08e-44e9-b49a-4c2ddb37a43d}">
+            <name locale="en_US">VCC@46</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="0" uuid="{edde6136-b9f9-470c-a5b3-6c6a5c7df0f2}">
+            <name locale="en_US">VCC@47</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="-2.54" uuid="{0ff2a79c-416f-4572-8726-6b7d1d495df4}">
+            <name locale="en_US">VCC@48</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="-5.08" uuid="{c2cd21b6-b065-4e93-91f0-bc707aef727c}">
+            <name locale="en_US">VCC@49</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="-7.62" uuid="{0e2406cc-4934-44bf-aa04-53f56bee5e4c}">
+            <name locale="en_US">VCC@50</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="-10.16" uuid="{13c01066-b2d1-40a4-89bf-bb1244eaec68}">
+            <name locale="en_US">VCC@51</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="-12.7" uuid="{47c22a63-97b8-48a2-b666-c60c1b7a8f04}">
+            <name locale="en_US">VCC@52</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="-15.24" uuid="{a9094ca0-e58c-4791-b682-c81d3f1cdd5b}">
+            <name locale="en_US">VCC@53</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="-17.78" uuid="{3d314497-791f-422d-91ad-83034e1be576}">
+            <name locale="en_US">VCC@54</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="-20.32" uuid="{b600cc1c-cf41-4a9b-8b5c-ece06d155e0b}">
+            <name locale="en_US">VCC@55</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="-22.86" uuid="{d68d7645-0036-40e5-8b32-ff90eb5efc1d}">
+            <name locale="en_US">VCC@56</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="-25.4" uuid="{0a0d7f53-570d-4d16-8b49-0e3fa8507be0}">
+            <name locale="en_US">VCC@57</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="-27.94" uuid="{6ff38e67-118f-4711-abd8-038c6ad0cd7e}">
+            <name locale="en_US">VCC@58</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="-30.48" uuid="{0347ef6c-e3a6-4357-9783-6cc9d7f8d6d7}">
+            <name locale="en_US">VCC@59</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="-33.02" uuid="{9ea962d2-de1e-48a0-a671-f4d665675531}">
+            <name locale="en_US">GND@1</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="-35.56" uuid="{4b3537b4-e30a-4352-9272-fe2f6b027d7b}">
+            <name locale="en_US">GND@2</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="-38.1" uuid="{2d16f61d-22ed-4abe-b77e-f04add31a461}">
+            <name locale="en_US">GND@3</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="-40.64" uuid="{aa2b33f9-ebd5-4a85-87e2-de241b9ba291}">
+            <name locale="en_US">GND@4</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="-43.18" uuid="{3e811b81-2b71-4c3e-b274-9f5a32393ce1}">
+            <name locale="en_US">GND@5</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="-45.72" uuid="{7bb9e798-9110-41ea-817a-ef24544adfdb}">
+            <name locale="en_US">GND@6</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="-48.26" uuid="{1cb90f00-c430-4a53-a5b9-4ab7a9015758}">
+            <name locale="en_US">GND@7</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="-50.8" uuid="{884421b8-3ec6-48a2-9580-93d8108de8e5}">
+            <name locale="en_US">GND@8</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="-53.34" uuid="{2c22bd31-9406-4113-a709-72e4015045a8}">
+            <name locale="en_US">GND@9</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="-55.88" uuid="{88085fd1-c330-4a25-8afd-04a522c5fa0c}">
+            <name locale="en_US">GND@10</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="-58.42" uuid="{c876e54b-0fa4-45a8-906e-8f5137cc7388}">
+            <name locale="en_US">GND@11</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="-60.96" uuid="{48f8c4eb-eb1d-4510-a3b7-84c94caa003e}">
+            <name locale="en_US">GND@12</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="-63.5" uuid="{21ea7e04-7f07-45fb-8385-4e850d9b02c0}">
+            <name locale="en_US">GND@13</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="-66.04" uuid="{976f5848-84ee-46da-aaf8-55a0af141905}">
+            <name locale="en_US">GND@14</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="-68.58" uuid="{10b5aba2-2a95-419a-96cf-d19b0f97dfd0}">
+            <name locale="en_US">GND@15</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="-71.12" uuid="{94c591f3-e2b3-4e3d-8081-aba9d53be181}">
+            <name locale="en_US">GND@16</name>
+        </pin>
+        <pin x="71.12" length="5.08" angle="0" y="-73.66" uuid="{1cf3ec69-2509-40ea-b63e-092b54983433}">
+            <name locale="en_US">GND@17</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="81.28" uuid="{d9f0ca9a-f346-4ac4-9c2b-de98041786d6}">
+            <name locale="en_US">GND@18</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="78.74" uuid="{1536392d-45cc-4d9c-b2af-f26c3a6e4988}">
+            <name locale="en_US">GND@19</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="76.2" uuid="{a4315eaf-01d5-4845-9293-7872ea3faef1}">
+            <name locale="en_US">GND@20</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="73.66" uuid="{da10c39b-cffb-4004-9ce0-ac8bfb546220}">
+            <name locale="en_US">GND@21</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="71.12" uuid="{ccf8d33c-6565-4e97-bce5-e8b8a96e8343}">
+            <name locale="en_US">GND@22</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="68.58" uuid="{156af426-2480-4484-9ccb-10bbdbd74442}">
+            <name locale="en_US">GND@23</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="66.04" uuid="{02c8fc19-7834-4211-ba2b-ae9b9d1b7c53}">
+            <name locale="en_US">GND@24</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="63.5" uuid="{7d0d9ab3-4736-4274-977e-b79044050e22}">
+            <name locale="en_US">GND@25</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="60.96" uuid="{4039b9d0-2867-4e51-9c1c-c43e18860a8c}">
+            <name locale="en_US">GND@26</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="58.42" uuid="{c52e53f6-c43f-4e67-ae35-8a32b43aa94a}">
+            <name locale="en_US">GND@27</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="55.88" uuid="{e77be8f3-1254-457c-9561-567180382497}">
+            <name locale="en_US">GND@28</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="53.34" uuid="{ed35826a-2198-486e-98e5-57196b438686}">
+            <name locale="en_US">GND@29</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="50.8" uuid="{370b85ed-6844-437f-bc15-e5364fd1fa82}">
+            <name locale="en_US">GND@30</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="48.26" uuid="{b814faf7-7559-4c9b-aedf-c72b07d62dd4}">
+            <name locale="en_US">GND@31</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="45.72" uuid="{d4bce154-66f1-43b4-af35-ad037ca1164b}">
+            <name locale="en_US">GND@32</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="43.18" uuid="{33983b7e-a892-4da4-b1ef-1ed585cf5db9}">
+            <name locale="en_US">GND@33</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="40.64" uuid="{f354b3a7-ff43-41aa-8189-de94b20e7467}">
+            <name locale="en_US">GND@34</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="38.1" uuid="{554e9331-b13e-4afe-8fc9-241bcf37c242}">
+            <name locale="en_US">GND@35</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="35.56" uuid="{61486f75-394f-4a89-a9cd-6bdadf226e49}">
+            <name locale="en_US">GND@36</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="33.02" uuid="{03f7f627-a670-4690-9305-77a712c7a415}">
+            <name locale="en_US">GND@37</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="30.48" uuid="{7b315dd6-6591-42f3-8e5c-bd284353661b}">
+            <name locale="en_US">GND@38</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="27.94" uuid="{183bf63d-1588-4e0e-9f1c-14e362171af5}">
+            <name locale="en_US">GND@39</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="25.4" uuid="{90838ad7-c950-4a96-8b18-252d1f0deefe}">
+            <name locale="en_US">GND@40</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="22.86" uuid="{75b07577-f874-423a-ae9b-f495fb46ad67}">
+            <name locale="en_US">GND@41</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="20.32" uuid="{d1447c10-d58f-452b-a8df-eac72432a62f}">
+            <name locale="en_US">GND@42</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="17.78" uuid="{94cc75d0-ff15-4d0d-8bb9-6272e81d2dda}">
+            <name locale="en_US">GND@43</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="15.24" uuid="{0d94bb99-d66f-496d-8981-ee03b13b0984}">
+            <name locale="en_US">GND@44</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="12.7" uuid="{f3ebfccf-a8d8-4651-a8b3-330599b7b552}">
+            <name locale="en_US">GND@45</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="10.16" uuid="{fbcef724-3008-4bd5-b17a-14417eac32ed}">
+            <name locale="en_US">GND@46</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="7.62" uuid="{9b4a8df6-b489-47df-9e53-68513be258f5}">
+            <name locale="en_US">GND@47</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="5.08" uuid="{babb86c2-a6ad-483f-b946-9820636519c3}">
+            <name locale="en_US">GND@48</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="2.54" uuid="{c4409db3-5b86-49fd-baf2-7aa7a2f628b8}">
+            <name locale="en_US">GND@49</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="0" uuid="{2bd831f9-d405-485f-9d97-c936e6d7f4d8}">
+            <name locale="en_US">GND@50</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="-2.54" uuid="{c5aa600c-0560-444e-a678-ee9d40befef3}">
+            <name locale="en_US">GND@51</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="-5.08" uuid="{785f16e5-6363-4426-b5e2-732526302f60}">
+            <name locale="en_US">GND@52</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="-7.62" uuid="{0e42a58c-390e-4504-897a-371e54cf72c8}">
+            <name locale="en_US">GND@53</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="-10.16" uuid="{df5111f6-8c12-445d-9002-0e54fa26e40e}">
+            <name locale="en_US">GND@54</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="-12.7" uuid="{b52f609e-6b90-46b6-843f-f269afc25345}">
+            <name locale="en_US">GND@55</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="-15.24" uuid="{a811d0b0-4ac8-4b49-a163-d0a337a1b87a}">
+            <name locale="en_US">GND@56</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="-17.78" uuid="{2c42adbc-3315-424b-8f38-d19aaab89655}">
+            <name locale="en_US">GND@57</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="-20.32" uuid="{4147fc4f-2796-4eb9-be6d-40ef04eff3ae}">
+            <name locale="en_US">GND@58</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="-22.86" uuid="{b96d397b-7444-4752-a17a-8b1f4f191657}">
+            <name locale="en_US">GND@59</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="-25.4" uuid="{4f5d3811-69b0-416d-93a8-912326e78661}">
+            <name locale="en_US">GND@60</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="-27.94" uuid="{be201f0a-c162-4ee9-affd-e8a8666e60fe}">
+            <name locale="en_US">GND@61</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="-30.48" uuid="{56fe1159-cd68-40ed-9813-c3ba8a6ab4a9}">
+            <name locale="en_US">GND@62</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="-33.02" uuid="{67491f85-0611-4ad8-9e7f-d1b1efda71ba}">
+            <name locale="en_US">GND@63</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="-35.56" uuid="{585bf75f-5e35-4ce5-b00a-aea65d3f9124}">
+            <name locale="en_US">GND@64</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="-38.1" uuid="{c53e53d2-000c-48fd-b18c-ffe11068da42}">
+            <name locale="en_US">GND@65</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="-40.64" uuid="{43c8ae0b-ebb1-4d71-9796-93e797b9ed74}">
+            <name locale="en_US">GND@66</name>
+        </pin>
+        <pin x="96.52" length="5.08" angle="0" y="-43.18" uuid="{c052b8af-8e70-46cd-ade7-b5ae40f01a83}">
+            <name locale="en_US">GND@67</name>
+        </pin>
+    </pins>
+</symbol>

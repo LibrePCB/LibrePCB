@@ -1,0 +1,31 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{fa95cfdb-e82e-4504-9016-d08d7d6f4e8f}</uuid>
+        <name locale="en_US">EXP-3</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="-3.81">
+            <segment type="line" end_x="3.81" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="3.81">
+            <segment type="line" end_x="3.81" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="3.81">
+            <segment type="line" end_x="-3.81" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="-3.81">
+            <segment type="line" end_x="-3.81" end_y="2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="270" y="5.08" uuid="{4317dafa-6ab1-4814-acad-0d0062f961ca}">
+            <name locale="en_US">EXP@1</name>
+        </pin>
+        <pin x="0" length="2.54" angle="270" y="5.08" uuid="{6295c6c3-c4b7-402c-9f0f-28daefd2e272}">
+            <name locale="en_US">EXP@2</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="270" y="5.08" uuid="{931b3c0b-f8f3-4de2-a8b6-e6e4f4d697c1}">
+            <name locale="en_US">EXP@3</name>
+        </pin>
+    </pins>
+</symbol>

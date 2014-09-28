@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{2594c896-d1b7-4769-b13a-1d9a63ef846e}</uuid>
+        <name locale="en_US">ON-MOM</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-3.175" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="-1.524" end_y="3.048"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="1.27">
+            <segment type="line" end_x="2.54" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="3.175"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-1.27" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="3.175"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.1524" layer="10" start_x="0.508">
+            <segment type="line" end_x="1.016" end_y="1.524"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.1524" layer="10" start_x="0.508">
+            <segment type="line" end_x="1.016" end_y="1.016"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.1524" layer="10" start_x="0.508">
+            <segment type="line" end_x="1.524" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-5.08" uuid="{6d2113e7-98cc-413e-b7f0-331b5f321617}">
+            <name locale="en_US">P</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="270" y="5.08" uuid="{04b72ff0-a96f-4abe-af19-c217755fc103}">
+            <name locale="en_US">S</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="270" y="5.08" uuid="{a6efdac8-a328-4ace-9209-0a212638bb4f}">
+            <name locale="en_US">O</name>
+        </pin>
+    </pins>
+</symbol>

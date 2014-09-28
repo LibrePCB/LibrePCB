@@ -1,0 +1,31 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{ca93eeda-435f-424d-9496-baa7c32de515}</uuid>
+        <name locale="en_US">FUSE</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-0.762" width="0.254" layer="10" start_x="-3.81">
+            <segment type="line" end_x="3.81" end_y="-0.762"/>
+        </polygon>
+        <polygon fill="false" start_y="0.762" width="0.254" layer="10" start_x="3.81">
+            <segment type="line" end_x="-3.81" end_y="0.762"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.762" width="0.254" layer="10" start_x="3.81">
+            <segment type="line" end_x="3.81" end_y="0.762"/>
+        </polygon>
+        <polygon fill="false" start_y="0.762" width="0.254" layer="10" start_x="-3.81">
+            <segment type="line" end_x="-3.81" end_y="-0.762"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="2.54" end_y="0"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="5.08" length="2.54" angle="180" y="0" uuid="{9e778c6e-8a22-4c99-b319-13e93648f051}">
+            <name locale="en_US">2</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{1b5ed445-9be5-47b7-81ea-25c68d22a29b}">
+            <name locale="en_US">1</name>
+        </pin>
+    </pins>
+</symbol>

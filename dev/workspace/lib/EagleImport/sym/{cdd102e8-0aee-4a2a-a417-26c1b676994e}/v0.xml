@@ -1,0 +1,52 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{cdd102e8-0aee-4a2a-a417-26c1b676994e}</uuid>
+        <name locale="en_US">PWR-PP10</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-2.54" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="12.7" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="-15.24" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="-15.24" end_y="-2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="90" y="-5.08" uuid="{9a146188-50b6-4690-8143-88a948527b36}">
+            <name locale="en_US">PP@1</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="90" y="-5.08" uuid="{8062f0ab-9d4e-4894-9e0a-0defa941adb7}">
+            <name locale="en_US">PP@2</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="90" y="-5.08" uuid="{0136003a-e6cb-4129-ba02-a600c4496a30}">
+            <name locale="en_US">PP@3</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="90" y="-5.08" uuid="{b1758259-52fd-4fcb-a082-876757f87911}">
+            <name locale="en_US">PP@4</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="90" y="-5.08" uuid="{bc90605a-2d4e-4f24-aab9-a33f12663c87}">
+            <name locale="en_US">PP@5</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-5.08" uuid="{6ce10462-d138-4a5e-92db-305defb0a601}">
+            <name locale="en_US">PP@6</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-5.08" uuid="{173603ac-05ec-4a28-af27-05bc0ecb7760}">
+            <name locale="en_US">PP@7</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="90" y="-5.08" uuid="{82e153a4-536f-418e-983a-612d4fbe0086}">
+            <name locale="en_US">PP@8</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="90" y="-5.08" uuid="{f1443f1d-0df1-456a-aa40-b8e7feda51ba}">
+            <name locale="en_US">PP@9</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="90" y="-5.08" uuid="{6c8ec183-3bfb-4005-a3a0-ad872a2655d9}">
+            <name locale="en_US">PP@10</name>
+        </pin>
+    </pins>
+</symbol>

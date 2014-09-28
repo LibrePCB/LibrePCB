@@ -1,0 +1,34 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{eff0bf23-706a-409d-8f23-13949041acd5}</uuid>
+        <name locale="en_US">ANTENNA</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.2" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.2" layer="10" start_x="0">
+            <segment type="line" end_x="2.54" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.2" layer="10" start_x="0">
+            <segment type="line" end_x="-2.54" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.2" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.2" layer="10" start_x="2.54">
+            <segment type="line" end_x="1.27" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.2" layer="10" start_x="2.54">
+            <segment type="line" end_x="3.81" end_y="0"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-2.54" uuid="{5803ce29-3546-42f5-be6f-cd38cabed7ba}">
+            <name locale="en_US">ANT</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-2.54" uuid="{cb543ba5-526b-4885-8e36-50acfadec8be}">
+            <name locale="en_US">G</name>
+        </pin>
+    </pins>
+</symbol>

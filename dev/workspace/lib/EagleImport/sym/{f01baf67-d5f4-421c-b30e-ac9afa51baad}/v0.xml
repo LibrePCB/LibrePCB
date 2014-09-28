@@ -1,0 +1,88 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{f01baf67-d5f4-421c-b30e-ac9afa51baad}</uuid>
+        <name locale="en_US">LM13600</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="15.24" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="15.24" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="-12.7" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-12.7" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-3.81" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="3.81"/>
+        </polygon>
+        <polygon fill="false" start_y="3.81" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="2.54" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="-2.54" end_y="-3.81"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="-6.35">
+            <segment type="line" end_x="-2.54" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="-6.35">
+            <segment type="line" end_x="-2.54" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-5.08" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="6.35"/>
+        </polygon>
+        <polygon fill="false" start_y="1.397" width="0.1524" layer="10" start_x="-2.921">
+            <segment type="line" end_x="-2.159" end_y="1.397"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.397" width="0.1524" layer="10" start_x="-2.159">
+            <segment type="line" end_x="-2.921" end_y="-1.397"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="4.572">
+            <segment type="line" end_x="7.62" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.635" width="0.1524" layer="10" start_x="3.556">
+            <segment type="line" end_x="3.556" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.1524" layer="10" start_x="3.556">
+            <segment type="line" end_x="0.889" end_y="-7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="2.54" angle="0" y="-2.54" uuid="{43467877-e904-4b2b-8f07-069ee73f9863}">
+            <name locale="en_US">+IN</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="2.54" uuid="{df3a4ed1-f188-4fdf-848e-972ad1e4a919}">
+            <name locale="en_US">-IN</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-7.62" uuid="{5999b84c-bc15-4145-a245-7de056065696}">
+            <name locale="en_US">AMP/BIAS</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="7.62" uuid="{25848973-ff6a-4b98-b6bb-ec51c729a181}">
+            <name locale="en_US">DIODE/BIAS</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-5.08" uuid="{b9cdaf18-ee1f-4e49-b08e-280e55041092}">
+            <name locale="en_US">BUFF/IN</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="5.08" uuid="{b0ea1ac7-0f6a-4855-b245-ec10a3fa67b3}">
+            <name locale="en_US">BUFF/OUT</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="0" uuid="{4c8593d3-0f94-4604-a7a1-bcf0c6ce4e6e}">
+            <name locale="en_US">OUT</name>
+        </pin>
+    </pins>
+</symbol>

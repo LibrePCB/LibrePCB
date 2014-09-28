@@ -1,0 +1,43 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{635d11ad-e70f-4b5a-88ea-23d08889644b}</uuid>
+        <name locale="en_US">OPAMP_CS</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="5.08" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="5.08" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.4064" layer="10" start_x="5.08">
+            <segment type="line" end_x="-5.08" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="3.175" width="0.1524" layer="10" start_x="-3.81">
+            <segment type="line" end_x="-3.81" end_y="1.905"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="-4.445">
+            <segment type="line" end_x="-3.175" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="-4.445">
+            <segment type="line" end_x="-3.175" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-2.667"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-7.62" length="2.54" angle="0" y="-2.54" uuid="{64e4aa51-673e-42a8-922a-1f2c03d79a1f}">
+            <name locale="en_US">-IN</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="2.54" uuid="{b6884421-70f0-432f-a44b-00088648ea71}">
+            <name locale="en_US">+IN</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="0" uuid="{f3d46bae-2dd1-4987-ae4d-0f9d58bb4130}">
+            <name locale="en_US">OUT</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-7.62" uuid="{6da797cb-aaa6-482f-9f11-7455d5ea69c0}">
+            <name locale="en_US">!CS</name>
+        </pin>
+    </pins>
+</symbol>

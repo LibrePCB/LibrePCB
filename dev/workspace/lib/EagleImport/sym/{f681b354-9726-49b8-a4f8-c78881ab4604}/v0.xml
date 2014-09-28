@@ -1,0 +1,25 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{f681b354-9726-49b8-a4f8-c78881ab4604}</uuid>
+        <name locale="en_US">DRK</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.651" width="0.254" layer="10" start_x="-3.81">
+            <segment type="line" end_x="3.81" end_y="1.651"/>
+        </polygon>
+        <polygon fill="true" start_y="-0.889" width="0.254" layer="10" start_x="-3.81">
+            <segment type="line" end_x="3.81" end_y="-0.889"/>
+            <segment type="line" end_x="3.81" end_y="0.889"/>
+            <segment type="line" end_x="-3.81" end_y="0.889"/>
+            <segment type="line" end_x="-3.81" end_y="-0.889"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="7.62" length="5.08" angle="180" y="0" uuid="{74bcd274-371d-4cbb-bf16-ec95847672f5}">
+            <name locale="en_US">2</name>
+        </pin>
+        <pin x="-7.62" length="5.08" angle="0" y="0" uuid="{04e1bd2d-c3f1-49aa-a610-2e21962926ca}">
+            <name locale="en_US">1</name>
+        </pin>
+    </pins>
+</symbol>

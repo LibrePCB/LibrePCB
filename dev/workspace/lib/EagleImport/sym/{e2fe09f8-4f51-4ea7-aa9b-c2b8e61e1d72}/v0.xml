@@ -1,0 +1,39 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{e2fe09f8-4f51-4ea7-aa9b-c2b8e61e1d72}</uuid>
+        <name locale="en_US">TC1796NC</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="270" y="12.7" uuid="{5351d3f6-3eec-4553-bffc-fc0f261daa3e}">
+            <name locale="en_US">NC@0</name>
+        </pin>
+        <pin x="-2.54" length="5.08" angle="270" y="12.7" uuid="{2f68fffd-6c2e-48f6-b5e7-0e6d3dd43a50}">
+            <name locale="en_US">NC@1</name>
+        </pin>
+        <pin x="0" length="5.08" angle="270" y="12.7" uuid="{0c489ad5-cbd2-434e-9a4f-9be3c756ee59}">
+            <name locale="en_US">NC@2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="90" y="-15.24" uuid="{8519c184-58d4-44f5-a790-cf1f1abad70b}">
+            <name locale="en_US">NC@3</name>
+        </pin>
+        <pin x="-2.54" length="5.08" angle="90" y="-15.24" uuid="{4b822f4b-2a1a-45b4-ba8e-1f747a65abcc}">
+            <name locale="en_US">NC@4</name>
+        </pin>
+        <pin x="0" length="5.08" angle="90" y="-15.24" uuid="{c25ae425-1c9d-4e20-b30c-c628e18c4ac3}">
+            <name locale="en_US">NC@5</name>
+        </pin>
+        <pin x="2.54" length="5.08" angle="270" y="12.7" uuid="{5ca6f7c8-5238-44d2-90a2-2756c352d900}">
+            <name locale="en_US">NC@6</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="270" y="12.7" uuid="{fdc615e1-34ef-4d0c-9f3d-a7a08f37b0fe}">
+            <name locale="en_US">NC@7</name>
+        </pin>
+        <pin x="2.54" length="5.08" angle="90" y="-15.24" uuid="{7be289eb-03ac-4500-9fc5-3193682ef7b8}">
+            <name locale="en_US">NC@8</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="90" y="-15.24" uuid="{b992d928-2140-469c-9bb7-8013e2a468ed}">
+            <name locale="en_US">NC@9</name>
+        </pin>
+    </pins>
+</symbol>

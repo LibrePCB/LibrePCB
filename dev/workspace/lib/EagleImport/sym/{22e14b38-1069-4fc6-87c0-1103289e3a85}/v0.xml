@@ -1,0 +1,70 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{22e14b38-1069-4fc6-87c0-1103289e3a85}</uuid>
+        <name locale="en_US">AD421</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="12.7" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="-12.7" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-12.7" end_y="15.24"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="15.24" length="2.54" angle="180" y="10.16" uuid="{eca9c744-e51e-431c-86d1-b1c4475aed14}">
+            <name locale="en_US">DRIVE</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="0" uuid="{675bc37e-f2a7-418c-9510-876711af3ce2}">
+            <name locale="en_US">BOOST</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-5.08" uuid="{a2a19880-0660-4739-a186-cb8091b0de2e}">
+            <name locale="en_US">DATA</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-5.08" uuid="{4cfb189b-df18-42d2-847c-d427d62d41dd}">
+            <name locale="en_US">LOOP-RTN</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-20.32" uuid="{020bbfb8-4a93-4e61-9f83-7c96dee797b3}">
+            <name locale="en_US">C1</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="5.08" uuid="{a222d86c-c579-4bcd-819b-6466abd50e7f}">
+            <name locale="en_US">REFIN</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="2.54" uuid="{8c18dcdd-ae71-45cc-87fa-e5c9943d44a6}">
+            <name locale="en_US">REFOUT1</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="12.7" uuid="{97f82453-7069-4086-aad7-782f0221f705}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-15.24" uuid="{f39e7d04-7865-4522-8742-26612a84dd46}">
+            <name locale="en_US">COM</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="5.08" uuid="{c0c2f093-6aad-4b3f-ae36-4d0aa25b7c40}">
+            <name locale="en_US">COMP</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="90" y="-20.32" uuid="{8e38d1d6-dc3d-4f3a-8bdb-73f0f5ce1698}">
+            <name locale="en_US">C2</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="90" y="-20.32" uuid="{c97cb8a7-f3b9-4b0f-83e5-35b4ac5aa0cb}">
+            <name locale="en_US">C3</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-7.62" uuid="{0b0f3b1c-70a2-42a8-b9ea-e0aa52e65c20}">
+            <name locale="en_US">CLOCK</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-10.16" uuid="{25369ef1-03c4-4664-8b1a-07835ae708ef}">
+            <name locale="en_US">LATCH</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="0" uuid="{5765a9f1-9728-4e01-abc5-93d6266507e6}">
+            <name locale="en_US">REFOUT2</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="10.16" uuid="{a444dfd1-abee-4ef6-b8f6-f0cfbfde1b60}">
+            <name locale="en_US">LV</name>
+        </pin>
+    </pins>
+</symbol>

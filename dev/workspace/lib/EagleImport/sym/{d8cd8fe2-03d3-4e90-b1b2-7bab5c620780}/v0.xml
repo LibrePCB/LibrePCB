@@ -1,0 +1,145 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{d8cd8fe2-03d3-4e90-b1b2-7bab5c620780}</uuid>
+        <name locale="en_US">C0166MON</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="33.02" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="-15.24" end_y="-43.18"/>
+        </polygon>
+        <polygon fill="false" start_y="-43.18" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="15.24" end_y="-43.18"/>
+        </polygon>
+        <polygon fill="false" start_y="-43.18" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="15.24" end_y="33.02"/>
+        </polygon>
+        <polygon fill="false" start_y="33.02" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="-15.24" end_y="33.02"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="17.78" length="2.54" angle="180" y="25.4" uuid="{3c921e14-5920-4619-86ac-af65ab4c63fe}">
+            <name locale="en_US">BLUE</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="22.86" uuid="{8f3a8505-98ee-4127-8f93-520776901ef1}">
+            <name locale="en_US">VSYNC</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="20.32" uuid="{0d43015d-95dc-4491-b83a-f132299df5d6}">
+            <name locale="en_US">HSYNC</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="30.48" uuid="{4985e608-f99e-4cc2-8a7f-aaa88c1e712c}">
+            <name locale="en_US">VREF_DAC</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="27.94" uuid="{8e4d3f0f-3213-49cc-9d0e-7712995d2849}">
+            <name locale="en_US">RSET</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="25.4" uuid="{5dec3025-c356-4b63-b2cf-62b545788ddc}">
+            <name locale="en_US">COMP</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="17.78" uuid="{88d62b37-a094-4d82-aaf8-e5d96a0a37ae}">
+            <name locale="en_US">SLC/DDC1</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="15.24" uuid="{7a725d8c-b783-4cfd-b0e9-902ea80747ce}">
+            <name locale="en_US">SDA/DDC0</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="12.7" uuid="{ee0283e1-4066-47ab-add4-e5033ddebcbe}">
+            <name locale="en_US">VCLK</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="10.16" uuid="{85ff7af8-5ec8-4f87-ae08-14a361efd8b8}">
+            <name locale="en_US">VIN0</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-30.48" uuid="{db88abc2-7d91-4e42-ac54-086eabdd60c7}">
+            <name locale="en_US">BLUE_TV</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-33.02" uuid="{a482baee-3946-402b-b379-44b15a11fe77}">
+            <name locale="en_US">VCS</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-35.56" uuid="{afb364f8-4020-4ff8-9ce1-4a0068e5098b}">
+            <name locale="en_US">ODD_EVEN</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-38.1" uuid="{c469ecc3-3461-40db-a232-6dddd24627dd}">
+            <name locale="en_US">CVBS</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-25.4" uuid="{9d291b7d-12ec-4fa8-ace9-9dbd55a86a80}">
+            <name locale="en_US">IREF1_TV</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-27.94" uuid="{b8e9486d-5963-4278-8540-fe1f1f1b9129}">
+            <name locale="en_US">VREF1_TV</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-30.48" uuid="{0ae38538-ce3b-4706-a10d-147a84ae7986}">
+            <name locale="en_US">IREF2_TV</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-33.02" uuid="{fda83a5e-f351-477d-baae-15304d658f96}">
+            <name locale="en_US">VREF2_TV</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-40.64" uuid="{9f01b1de-426b-4e17-95b5-3d63755d021f}">
+            <name locale="en_US">VSSA_TV</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-38.1" uuid="{1ab1882a-bfbc-455f-8686-e4880a6c1a77}">
+            <name locale="en_US">VDDA_TV</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="27.94" uuid="{1b4f1e70-ebf9-4e8b-9744-e4739a45a15e}">
+            <name locale="en_US">GREEN</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="30.48" uuid="{4e9c3edc-517f-466f-86ff-0b60f5bbf721}">
+            <name locale="en_US">RED</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-27.94" uuid="{d581a3d0-0667-431b-8c9b-ef3d0936893c}">
+            <name locale="en_US">GREEN_TV</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-25.4" uuid="{74bb3d83-67f0-4eed-9490-1acaa18944be}">
+            <name locale="en_US">RED_TV</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="7.62" uuid="{628541a2-e3b1-4867-9e40-1dd50e53c55e}">
+            <name locale="en_US">VIN1</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="5.08" uuid="{4c141607-67ba-4670-8056-4e0189e082d9}">
+            <name locale="en_US">VIN2</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="2.54" uuid="{da449924-cf7c-41ed-bee3-aef355ae0011}">
+            <name locale="en_US">VIN3</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="0" uuid="{20922327-dbbf-4a2b-bd77-fccc2e8407d8}">
+            <name locale="en_US">VIN4</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-2.54" uuid="{1b7d56dc-9d5a-4ed0-bcc2-35b46096d793}">
+            <name locale="en_US">VIN5</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-5.08" uuid="{5bc67ace-e6bc-40c6-8cf7-6d2f16a06052}">
+            <name locale="en_US">VIN6</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-7.62" uuid="{07e7d1a9-33bd-41ad-8955-726817a645ff}">
+            <name locale="en_US">VIN7</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="10.16" uuid="{d4a2a289-a45a-4885-8575-b1ac3b83221a}">
+            <name locale="en_US">VDD_DAC1</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="7.62" uuid="{f9563d1f-2f26-47d3-9f59-f3bbf3e63156}">
+            <name locale="en_US">VDD_DAC2</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-12.7" uuid="{d159fc7b-d46a-48f8-856e-8f9629c780e4}">
+            <name locale="en_US">VDDGCKPLL</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-15.24" uuid="{e28ceba7-5592-4bb0-9c11-4053659a6251}">
+            <name locale="en_US">VDDDCKPLL</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-17.78" uuid="{8cb15605-a48c-402d-a4cd-fb989746bdc8}">
+            <name locale="en_US">VDDHCKPLL</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-20.32" uuid="{35741f61-08fc-498b-9644-db69e1d88ff9}">
+            <name locale="en_US">VDDDEVPLL</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="2.54" uuid="{ee96a433-ba43-430a-9dcb-3f731841aff1}">
+            <name locale="en_US">VSS_DAC1</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="0" uuid="{1248a602-6db9-4814-a1c9-3d56b18d1576}">
+            <name locale="en_US">VSS_DAC2</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-5.08" uuid="{cd71b6b9-f8d5-4a0f-843f-d22beabacb76}">
+            <name locale="en_US">VSS_DLL1</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-7.62" uuid="{38f8aff6-1984-476c-87a9-f350971dc189}">
+            <name locale="en_US">VSS_DLL2</name>
+        </pin>
+    </pins>
+</symbol>

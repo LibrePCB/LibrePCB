@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{e45a737b-e81b-4d9b-9a6a-d673d8b0cbbf}</uuid>
+        <name locale="en_US">F168_P6</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="12.7">
+            <segment type="line" end_x="-5.08" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="12.7" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.4064" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="5.08" angle="0" y="7.62" uuid="{b09cd257-99b9-4894-9156-1c5a940aabc2}">
+            <name locale="en_US">P6-0/!SC0</name>
+        </pin>
+        <pin x="-10.16" length="5.08" angle="0" y="5.08" uuid="{1d820e55-2202-4b39-909e-41c74fa7638b}">
+            <name locale="en_US">P6-1/!CS1</name>
+        </pin>
+        <pin x="-10.16" length="5.08" angle="0" y="2.54" uuid="{199e06e3-d51b-4276-9e81-b0b8f8ebea9f}">
+            <name locale="en_US">P6-2/!CS2</name>
+        </pin>
+        <pin x="-10.16" length="5.08" angle="0" y="0" uuid="{1aec7495-edb1-4d15-9492-f3d7320af71e}">
+            <name locale="en_US">P6-3/!CS3</name>
+        </pin>
+        <pin x="-10.16" length="5.08" angle="0" y="-2.54" uuid="{ed93d712-e460-416f-9899-9884e958e2ea}">
+            <name locale="en_US">P6-4/!CS4</name>
+        </pin>
+        <pin x="-10.16" length="5.08" angle="0" y="-5.08" uuid="{fff8f8dc-9890-49df-8235-549746d249c6}">
+            <name locale="en_US">P6-5/!HOLD</name>
+        </pin>
+        <pin x="-10.16" length="5.08" angle="0" y="-7.62" uuid="{2945c3fa-153d-4598-9d4b-8bdd05ea6318}">
+            <name locale="en_US">!!P6-6HLDA</name>
+        </pin>
+        <pin x="-10.16" length="5.08" angle="0" y="-10.16" uuid="{9fed1b2f-cd93-45ce-8600-60ab20135438}">
+            <name locale="en_US">P6-7/!BREQ</name>
+        </pin>
+    </pins>
+</symbol>

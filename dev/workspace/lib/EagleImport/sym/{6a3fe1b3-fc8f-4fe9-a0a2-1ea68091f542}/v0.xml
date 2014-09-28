@@ -1,0 +1,49 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{6a3fe1b3-fc8f-4fe9-a0a2-1ea68091f542}</uuid>
+        <name locale="en_US">R12-250</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-29.21"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{42cd89ba-fe03-4e22-be21-150d8ea7be47}">
+            <name locale="en_US">IOR1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{a18d5c65-3702-4e1b-954d-60a896965e7b}">
+            <name locale="en_US">IOR2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{e1c9f617-0a25-48a9-9c4d-0d42c5cbfa8c}">
+            <name locale="en_US">IOR3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{3fdf101d-0ea2-4597-8597-359abb8d77f6}">
+            <name locale="en_US">IOR4</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{91edf11b-c9a5-4b91-a2ea-ea410236e075}">
+            <name locale="en_US">IOR5</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{c14b0346-fb3c-4eab-b145-5b3b810d6f85}">
+            <name locale="en_US">IOR6</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-15.24" uuid="{ff3b3ddf-02b5-4e5f-9d07-4d160f518307}">
+            <name locale="en_US">IOR7</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-17.78" uuid="{4dd331bc-4e40-4cdf-aee6-bd020be3a2a2}">
+            <name locale="en_US">IOR8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-20.32" uuid="{33376414-16a5-4ceb-833b-e2797e1babce}">
+            <name locale="en_US">IOR9</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-22.86" uuid="{79bd9fb3-01a0-4209-bd67-6baf9d19a563}">
+            <name locale="en_US">IOR10</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-25.4" uuid="{546aa472-6e84-446f-8c37-4430542ec32b}">
+            <name locale="en_US">IOR11</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-27.94" uuid="{78311265-2e20-4774-9874-34da30f5a78f}">
+            <name locale="en_US">IOR12</name>
+        </pin>
+    </pins>
+</symbol>

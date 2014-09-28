@@ -1,0 +1,61 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{846be0ca-0b09-42fa-9215-47f179699fcb}</uuid>
+        <name locale="en_US">PORT3-10_12</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-39.37"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{28186039-b1b4-47dc-9f7a-f72c2dc9becd}">
+            <name locale="en_US">0/GPTU.0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{e95b9082-aa7d-43fe-8a0e-986171d90d88}">
+            <name locale="en_US">1/GPTU.1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{4d78e5ab-c638-4582-a98c-0e0cdcbd1a07}">
+            <name locale="en_US">2/GPTU.2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{d143eeb9-53c2-4008-be40-8e5b21588da0}">
+            <name locale="en_US">3/GPTU.3</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{d20b94ac-adc0-44b6-9fcb-f4db4db8f7e4}">
+            <name locale="en_US">4/GPTU.4</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{f0646ab2-50a2-46c1-a788-ff4f4ed104f9}">
+            <name locale="en_US">5/GPTU.5</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{74966aac-7f87-44b4-b53c-ffe29184fa0e}">
+            <name locale="en_US">6/GPTU.6</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{70283316-c9e9-4045-b81d-62e5a1f98fb5}">
+            <name locale="en_US">7/GPTU.7</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{912b1fa8-6c74-4ca0-8a7c-a2101cac1f50}">
+            <name locale="en_US">8/RXD1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{00fd5bee-0926-4ad7-b2f8-a825ea70cfc1}">
+            <name locale="en_US">9/TXD1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{87e9dbb5-e84a-4c45-9676-31f4586d77eb}">
+            <name locale="en_US">10/GPIO/RXD2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{18dd8697-4b74-496d-a177-0f1610ba1674}">
+            <name locale="en_US">11/GPIO/OSCBYP/TXD2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{6c7a22dc-b36b-4ccb-be5f-2ce019e27196}">
+            <name locale="en_US">12/EXI5IN/HWCFG0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-33.02" uuid="{1d988b83-7813-44ed-8d5e-013e7ff84e4c}">
+            <name locale="en_US">13/EXI6IN/HWCFG1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-35.56" uuid="{4895cd44-699e-4ad0-a56c-d31a30a61a0a}">
+            <name locale="en_US">14/EXI7IN/HWCFG2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-38.1" uuid="{484fb199-6d53-45e6-8217-27401a9448b4}">
+            <name locale="en_US">15/GPIO</name>
+        </pin>
+    </pins>
+</symbol>

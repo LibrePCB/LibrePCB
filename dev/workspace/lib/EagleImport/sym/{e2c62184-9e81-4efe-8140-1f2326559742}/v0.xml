@@ -1,0 +1,49 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{e2c62184-9e81-4efe-8140-1f2326559742}</uuid>
+        <name locale="en_US">AT45DB161D</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="10.16" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="-5.08" uuid="{39f153ba-f157-4fe5-b248-8a4faea9ac77}">
+            <name locale="en_US">!CS</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-2.54" uuid="{b70517be-ae4c-403c-b7c6-c34663128a20}">
+            <name locale="en_US">SCK</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="2.54" uuid="{b492f379-4b28-4a37-a241-c0ece65dd522}">
+            <name locale="en_US">SI</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="2.54" uuid="{2e64fe7a-518a-46a8-acba-7bccfa28b34a}">
+            <name locale="en_US">SO</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-7.62" uuid="{5e648d52-42a9-4fd9-8a87-5d52b0bb2ce7}">
+            <name locale="en_US">!WP</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="5.08" uuid="{6d4aa86a-739d-4be6-be52-4d5f2434ae2d}">
+            <name locale="en_US">RESET</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="0" uuid="{8c90def9-760f-4b10-922d-0004501a42e0}">
+            <name locale="en_US">RDY/!BUSY</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="5.08" uuid="{d7b486ad-8f14-493a-b44c-e98678b57c11}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-7.62" uuid="{e2f2c929-d240-4784-9fd1-688372fc8281}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

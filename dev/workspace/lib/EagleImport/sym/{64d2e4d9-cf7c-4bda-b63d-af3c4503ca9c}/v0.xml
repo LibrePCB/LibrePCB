@@ -1,0 +1,37 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{64d2e4d9-cf7c-4bda-b63d-af3c4503ca9c}</uuid>
+        <name locale="en_US">ZXLD1350ET5</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="5.08" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="5.08" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="-7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="5.08" uuid="{57e6e37b-dcdc-4085-90f5-8340676e038e}">
+            <name locale="en_US">LX</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-5.08" uuid="{b82b81c6-3569-4257-b0b1-46b895c4bad4}">
+            <name locale="en_US">ADJ</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="2.54" uuid="{92833beb-37a1-44f3-8f5d-a2aa23fcc45d}">
+            <name locale="en_US">VIN</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="-2.54" uuid="{e085d2c7-ed71-4e6c-ae70-2aabb4419bdf}">
+            <name locale="en_US">ISENSE</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="0" uuid="{886de4e1-50b8-473b-a647-77aac6ed7881}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,25 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{4cad4eda-935a-4397-a331-da0ff975a51f}</uuid>
+        <name locale="en_US">TP</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-0.762" width="0.254" layer="10" start_x="-0.762">
+            <segment type="line" end_x="0" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0.762" end_y="-0.762"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.762" width="0.254" layer="10" start_x="0.762">
+            <segment type="line" end_x="0" end_y="-1.524"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.524" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="-0.762" end_y="-0.762"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-2.54" uuid="{11d1f51d-ff19-42ee-bd5a-34cf6afd0fa3}">
+            <name locale="en_US">TP</name>
+        </pin>
+    </pins>
+</symbol>

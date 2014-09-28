@@ -1,0 +1,19 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{ada2447a-baab-4759-955c-df41226cf050}</uuid>
+        <name locale="en_US">MPINV</name>
+    </meta>
+    <geometry>
+        <polygon fill="true" start_y="-0.254" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="1.778" end_y="-0.254"/>
+            <segment type="line" end_x="1.778" end_y="0.254"/>
+            <segment type="line" end_x="0" end_y="0.254"/>
+            <segment type="line" end_x="0" end_y="-0.254"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{09d3dae1-0fcd-4525-9771-74e72e6fe3fa}">
+            <name locale="en_US">1</name>
+        </pin>
+    </pins>
+</symbol>

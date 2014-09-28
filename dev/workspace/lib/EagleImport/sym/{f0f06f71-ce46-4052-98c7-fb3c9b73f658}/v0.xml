@@ -1,0 +1,43 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{f0f06f71-ce46-4052-98c7-fb3c9b73f658}</uuid>
+        <name locale="en_US">OP-SHDOWN</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="3.175" width="0.1524" layer="10" start_x="-3.81">
+            <segment type="line" end_x="-3.81" end_y="1.905"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="-4.445">
+            <segment type="line" end_x="-3.175" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="-4.445">
+            <segment type="line" end_x="-3.175" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.6162" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="5.08" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.4064" layer="10" start_x="5.08">
+            <segment type="line" end_x="-5.08" end_y="5.08"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="5.08" angle="0" y="-2.54" uuid="{b4d4da32-871a-4a58-aff0-10fd90aadc30}">
+            <name locale="en_US">-IN</name>
+        </pin>
+        <pin x="-10.16" length="5.08" angle="0" y="2.54" uuid="{7fc74586-f0d1-4bb9-bfc6-130174af7ca7}">
+            <name locale="en_US">+IN</name>
+        </pin>
+        <pin x="10.16" length="5.08" angle="180" y="0" uuid="{24ed36c9-2ba8-4079-bb6a-715dfd89bf3c}">
+            <name locale="en_US">OUT</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-7.62" uuid="{9df949e3-b3d4-427f-a0ac-60c9d55f98df}">
+            <name locale="en_US">SHUTDOWN</name>
+        </pin>
+    </pins>
+</symbol>

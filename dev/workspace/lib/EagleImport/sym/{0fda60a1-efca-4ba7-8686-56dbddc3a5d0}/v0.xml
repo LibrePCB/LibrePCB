@@ -1,0 +1,49 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{0fda60a1-efca-4ba7-8686-56dbddc3a5d0}</uuid>
+        <name locale="en_US">NCP2820</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="12.7" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="-12.7" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-12.7" end_y="7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="2.54" angle="0" y="-2.54" uuid="{eadc0a6e-df83-4968-80e7-7b79bf8536a9}">
+            <name locale="en_US">INP</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="2.54" uuid="{7858cdad-925e-40e5-89fd-659cd0a2e0c6}">
+            <name locale="en_US">INM</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="90" y="-12.7" uuid="{46369172-dc2b-4690-962c-96ab6afcafeb}">
+            <name locale="en_US">!SD</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="90" y="-12.7" uuid="{0120529a-bb9c-4049-9181-5192faf3c5de}">
+            <name locale="en_US">GND@1</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-12.7" uuid="{bf86369b-f640-417c-ad2e-6e8a6f9a241f}">
+            <name locale="en_US">GND@2</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-5.08" uuid="{c6064616-c5d4-4a9c-aa94-7430ed96514b}">
+            <name locale="en_US">OUTM</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="2.54" uuid="{6c5d73b6-3d5a-413d-88cc-359500eeb0ae}">
+            <name locale="en_US">OUTP</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="270" y="10.16" uuid="{7ba04b14-28fe-4733-b14d-d2fc2e2bec4c}">
+            <name locale="en_US">VP@1</name>
+        </pin>
+        <pin x="0" length="2.54" angle="270" y="10.16" uuid="{74e51b1f-2af3-4d6d-bf2d-8363bff76453}">
+            <name locale="en_US">VP@2</name>
+        </pin>
+    </pins>
+</symbol>

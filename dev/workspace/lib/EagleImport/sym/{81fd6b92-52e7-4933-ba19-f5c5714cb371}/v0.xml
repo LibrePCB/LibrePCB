@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{81fd6b92-52e7-4933-ba19-f5c5714cb371}</uuid>
+        <name locale="en_US">RF2915P</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="15.24" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="15.24" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="-15.24" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="-15.24" end_y="-10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="5.08" angle="90" y="-15.24" uuid="{f56b8666-a825-438f-936b-15b7d4bf653f}">
+            <name locale="en_US">GND1</name>
+        </pin>
+        <pin x="-7.62" length="5.08" angle="90" y="-15.24" uuid="{bdea679d-148c-4a04-ac2b-d173b5e88e47}">
+            <name locale="en_US">GND2</name>
+        </pin>
+        <pin x="-2.54" length="5.08" angle="90" y="-15.24" uuid="{75259538-e34a-4718-a9c6-3add3242e014}">
+            <name locale="en_US">GND3</name>
+        </pin>
+        <pin x="2.54" length="5.08" angle="90" y="-15.24" uuid="{d8a57b75-6624-4176-b873-fb0270f7c199}">
+            <name locale="en_US">GND4</name>
+        </pin>
+        <pin x="7.62" length="5.08" angle="90" y="-15.24" uuid="{95cb8f83-e31e-4146-a8c6-f4a864e350a7}">
+            <name locale="en_US">GND5</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="270" y="15.24" uuid="{cdd0b9f8-7ce4-4d18-805a-91ea18c50243}">
+            <name locale="en_US">VCC1</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="270" y="15.24" uuid="{ce6257dc-28ea-4756-b547-023fc9ad62c1}">
+            <name locale="en_US">VCC3</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="90" y="-15.24" uuid="{eabe7498-d924-4612-82ad-b3589f2bc183}">
+            <name locale="en_US">GND6</name>
+        </pin>
+    </pins>
+</symbol>

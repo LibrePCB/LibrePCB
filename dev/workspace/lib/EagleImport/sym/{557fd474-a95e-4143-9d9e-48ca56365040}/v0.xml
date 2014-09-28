@@ -1,0 +1,61 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{557fd474-a95e-4143-9d9e-48ca56365040}</uuid>
+        <name locale="en_US">2CMP</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-2.6162" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="3.8862"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="5.08" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.4064" layer="10" start_x="5.08">
+            <segment type="line" end_x="-5.08" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="3.175" width="0.1524" layer="10" start_x="-3.81">
+            <segment type="line" end_x="-3.81" end_y="1.905"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="-4.445">
+            <segment type="line" end_x="-3.175" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="-4.445">
+            <segment type="line" end_x="-3.175" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="5.08">
+            <segment type="line" end_x="3.0226" end_y="-1.1176"/>
+        </polygon>
+        <polygon fill="false" start_y="-3.8862" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="-5.08"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-7.62" uuid="{ae9af25f-4701-4320-af92-70165634b9b3}">
+            <name locale="en_US">CMP1</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="-2.54" uuid="{81f72e66-6c1b-4be6-b3b7-c2d5b403220b}">
+            <name locale="en_US">-IN</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="2.54" uuid="{2f6767f9-c363-462c-adaa-61f58b54727b}">
+            <name locale="en_US">+IN</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="-2.54" uuid="{8dc0114f-6650-4204-8033-1ffd9198a207}">
+            <name locale="en_US">CMP2</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="0" uuid="{78691467-80f7-4002-9032-3b9e3fb32cdc}">
+            <name locale="en_US">OUT</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="270" y="7.62" uuid="{072b6d7f-ada9-43e9-827c-ecbe3c59f09c}">
+            <name locale="en_US">V+</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="90" y="-7.62" uuid="{73142d56-e829-4c7a-a954-3e8189de2f13}">
+            <name locale="en_US">V-</name>
+        </pin>
+    </pins>
+</symbol>

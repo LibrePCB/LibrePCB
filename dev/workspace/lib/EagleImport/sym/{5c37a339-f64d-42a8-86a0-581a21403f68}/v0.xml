@@ -1,0 +1,12 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{5c37a339-f64d-42a8-86a0-581a21403f68}</uuid>
+        <name locale="en_US">EXPOSED</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-2.54" uuid="{18fef4f1-0fd2-4ebe-a37b-f2ff6976ef2d}">
+            <name locale="en_US">EXP</name>
+        </pin>
+    </pins>
+</symbol>

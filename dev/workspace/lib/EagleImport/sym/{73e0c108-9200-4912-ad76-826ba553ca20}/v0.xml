@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{73e0c108-9200-4912-ad76-826ba553ca20}</uuid>
+        <name locale="en_US">TEN32423</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="15.24" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="15.24" end_y="12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="12.7" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="-15.24" end_y="12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="12.7" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="-15.24" end_y="-12.7"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-20.32" length="5.08" angle="0" y="-10.16" uuid="{262f7c0a-37cf-48aa-99e2-8c3c9f5ea11a}">
+            <name locale="en_US">-VIN2</name>
+        </pin>
+        <pin x="-20.32" length="5.08" angle="0" y="-5.08" uuid="{96924ab5-e75d-4e5a-b197-33ce8d73c3a4}">
+            <name locale="en_US">-VIN1</name>
+        </pin>
+        <pin x="-20.32" length="5.08" angle="0" y="5.08" uuid="{8c9057c0-3c68-4fb7-9d1f-4f3b620d0dee}">
+            <name locale="en_US">+VIN2</name>
+        </pin>
+        <pin x="-20.32" length="5.08" angle="0" y="10.16" uuid="{686fcae5-7e89-4925-a973-26ab95e56b6e}">
+            <name locale="en_US">+VIN1</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="180" y="10.16" uuid="{9ff36704-38ae-4ab6-b12d-8446fe8c449d}">
+            <name locale="en_US">+VOUT1</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="180" y="5.08" uuid="{670d0baf-8375-4ea1-9b51-ee333076ea35}">
+            <name locale="en_US">COMMON1</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="180" y="-5.08" uuid="{08aef528-b091-4d3d-86d5-f034b48e6481}">
+            <name locale="en_US">COMMON2</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="180" y="-10.16" uuid="{fa010145-28f6-4209-8341-8a847eeda8f3}">
+            <name locale="en_US">-VOUT2</name>
+        </pin>
+    </pins>
+</symbol>

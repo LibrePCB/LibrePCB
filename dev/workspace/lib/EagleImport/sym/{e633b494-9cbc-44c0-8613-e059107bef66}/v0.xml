@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{e633b494-9cbc-44c0-8613-e059107bef66}</uuid>
+        <name locale="en_US">MC9S12-PP</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="-5.08" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="2.54" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="5.08" length="2.54" angle="180" y="7.62" uuid="{42b8f276-0422-42b3-bfd8-e2df0ba0a114}">
+            <name locale="en_US">PP0</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="5.08" uuid="{8b939b20-59bd-4993-8186-7f28ee0dd954}">
+            <name locale="en_US">PP1</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="2.54" uuid="{00b17ce5-2c91-4699-b885-60a958413df5}">
+            <name locale="en_US">PP2</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="0" uuid="{3904232d-ef88-4f27-b9b5-a917dd1be673}">
+            <name locale="en_US">PP3</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="-2.54" uuid="{04ac85c1-1d1a-4455-a0a4-72571bc5bcd3}">
+            <name locale="en_US">PP4</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="-5.08" uuid="{0d3499db-28ac-46d3-ae59-7b676b85bf64}">
+            <name locale="en_US">PP5</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="-7.62" uuid="{c60763ec-4b87-4814-bf0d-e5b17132fb2b}">
+            <name locale="en_US">PP6</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="-10.16" uuid="{03964b86-959b-49b8-8153-6ab6d052adae}">
+            <name locale="en_US">PP7</name>
+        </pin>
+    </pins>
+</symbol>

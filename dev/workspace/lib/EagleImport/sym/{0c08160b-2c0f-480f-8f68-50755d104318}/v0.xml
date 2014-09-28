@@ -1,0 +1,25 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{0c08160b-2c0f-480f-8f68-50755d104318}</uuid>
+        <name locale="en_US">SCHRAUBKLEMME</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="0" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="12.7" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{98bfd78e-6c4d-4d73-b85e-2f5370489373}">
+            <name locale="en_US">K</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,31 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{833af8dd-1e27-47c4-b026-27d6499fbebb}</uuid>
+        <name locale="en_US">J11</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="5.08" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="5.08" end_y="7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="5.08" uuid="{6cb4ac70-7a31-4fa5-ac43-a46217eba2dd}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="2.54" uuid="{ef7cb0ab-4b84-4b62-998f-ed2a7712eb74}">
+            <name locale="en_US">2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{db80f458-62fa-4afe-872f-f84664b080b4}">
+            <name locale="en_US">3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{fa0695a0-7446-4d57-8846-f94c59b38fa2}">
+            <name locale="en_US">4</name>
+        </pin>
+    </pins>
+</symbol>

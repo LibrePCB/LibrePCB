@@ -1,0 +1,22 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{69701d84-a386-4cf3-ac19-945e7e5baa62}</uuid>
+        <name locale="en_US">DYNAMIC-MICROPHON</name>
+    </meta>
+    <geometry>
+        <polygon fill="true" start_y="-3.81" width="0.254" layer="10" start_x="4.826">
+            <segment type="line" end_x="5.334" end_y="-3.81"/>
+            <segment type="line" end_x="5.334" end_y="1.27"/>
+            <segment type="line" end_x="4.826" end_y="1.27"/>
+            <segment type="line" end_x="4.826" end_y="-3.81"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{a88b4632-141c-4a7d-bd50-e91278438c4b}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{bfe07869-1d18-4f65-be03-f03c86d6bee7}">
+            <name locale="en_US">2</name>
+        </pin>
+    </pins>
+</symbol>

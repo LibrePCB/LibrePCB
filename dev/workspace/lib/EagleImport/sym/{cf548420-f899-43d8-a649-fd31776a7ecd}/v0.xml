@@ -1,0 +1,97 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{cf548420-f899-43d8-a649-fd31776a7ecd}</uuid>
+        <name locale="en_US">XC5VLX110T_FF1738-MGTAVTTRX</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="22.86" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="22.86">
+            <segment type="line" end_x="22.86" end_y="-63.5"/>
+        </polygon>
+        <polygon fill="false" start_y="-63.5" width="0.254" layer="10" start_x="22.86">
+            <segment type="line" end_x="0" end_y="-63.5"/>
+        </polygon>
+        <polygon fill="false" start_y="-63.5" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{61533501-f387-4a38-a7fe-9ee514f8a088}">
+            <name locale="en_US">MGTAVTTRXC</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{06141c52-f3c4-4657-b3da-1021964d5d8b}">
+            <name locale="en_US">MGTAVTTRX_112</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{3ca10913-b9a5-4aa6-8ea0-d9772abeb209}">
+            <name locale="en_US">MGTAVTTRX_114</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{31414ca2-6d56-499b-8d50-f26210466060}">
+            <name locale="en_US">MGTAVTTRX_116</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{d2762871-6158-4e1e-8576-fe530c0d8301}">
+            <name locale="en_US">MGTAVTTRX_118</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{dd732bfe-245e-4aa0-a338-d713ba362fdd}">
+            <name locale="en_US">MGTAVTTRX_120</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{67cf60be-98c9-44e0-89e7-54b774170eff}">
+            <name locale="en_US">MGTAVTTRX_122</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{f71cef54-0d69-4a86-9f8b-9194a7e66e79}">
+            <name locale="en_US">MGTAVTTRX_124</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{bb8b96bc-f3d3-4b8b-a446-e8978fc0a4b8}">
+            <name locale="en_US">MGTAVTTRX_126</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{46ef5503-5092-458e-887e-dd73a3157dfd}">
+            <name locale="en_US">MGTAVTTTX_1121</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{a7070c0b-105a-4f21-b7c5-2c2716aabf61}">
+            <name locale="en_US">MGTAVTTTX_1122</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{73266243-63c7-4087-9098-d27f1608cd78}">
+            <name locale="en_US">MGTAVTTTX_1141</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{ecb97c77-3799-4055-ade8-6a9899632b30}">
+            <name locale="en_US">MGTAVTTTX_1142</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-33.02" uuid="{33b4fd42-e483-4f20-98f0-76a56d166538}">
+            <name locale="en_US">MGTAVTTTX_1161</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-35.56" uuid="{84ae3434-e591-4e98-8dcd-7f894ccff233}">
+            <name locale="en_US">MGTAVTTTX_1162</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-38.1" uuid="{a96d57b6-b51f-4b08-902b-787975d75bf1}">
+            <name locale="en_US">MGTAVTTTX_1181</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-40.64" uuid="{7aaec16b-db84-4e8b-afb5-e00d1f1fff4a}">
+            <name locale="en_US">MGTAVTTTX_1182</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-43.18" uuid="{024f212c-5070-4795-b1ff-726e67bdd845}">
+            <name locale="en_US">MGTAVTTTX_1201</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-45.72" uuid="{5a02dc12-63fe-46de-9caa-8cc845c5126b}">
+            <name locale="en_US">MGTAVTTTX_1202</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-48.26" uuid="{02393395-ec5b-421c-a3eb-fb7cd5791e4d}">
+            <name locale="en_US">MGTAVTTTX_1221</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-50.8" uuid="{c8269109-b3ef-4357-92c9-feec2781ef89}">
+            <name locale="en_US">MGTAVTTTX_1222</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-53.34" uuid="{590dfb16-b054-4bd9-97c3-225390391197}">
+            <name locale="en_US">MGTAVTTTX_1241</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-55.88" uuid="{662c7e50-05e8-41c6-9b61-aec1b17b122e}">
+            <name locale="en_US">MGTAVTTTX_1242</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-58.42" uuid="{0aa3842a-9e60-427a-8010-0408e8f1f398}">
+            <name locale="en_US">MGTAVTTTX_1261</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-60.96" uuid="{78a9f163-0cce-4b4e-bc97-37247b910ca9}">
+            <name locale="en_US">MGTAVTTTX_1262</name>
+        </pin>
+    </pins>
+</symbol>

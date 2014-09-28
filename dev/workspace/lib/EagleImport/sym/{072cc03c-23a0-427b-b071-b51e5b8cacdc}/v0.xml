@@ -1,0 +1,49 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{072cc03c-23a0-427b-b071-b51e5b8cacdc}</uuid>
+        <name locale="en_US">IJ-256</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-29.21" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{fd0b9a76-d5c3-4fcd-88d0-0b51b0ff86aa}">
+            <name locale="en_US">IOI1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{50061dbf-4cf2-4c7a-b508-066f7783ada3}">
+            <name locale="en_US">IOI2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{096a559a-fca8-43cf-acb4-3e9c1ee5c922}">
+            <name locale="en_US">IOI3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{59a93ef3-8f91-4bd3-b992-c5169d9618a4}">
+            <name locale="en_US">IOI5</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{34772ae4-8854-417a-906c-933eba89350e}">
+            <name locale="en_US">IOI12</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{692102c3-814e-4e6b-9de7-6e27cf40d9fa}">
+            <name locale="en_US">IOI14</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-15.24" uuid="{3688c23c-1233-4b12-8110-306c104481b0}">
+            <name locale="en_US">IOJ1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-17.78" uuid="{535558a6-4742-4314-bf45-ddb532645e6f}">
+            <name locale="en_US">IOJ2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-20.32" uuid="{d58aaea2-1dae-4c2c-bcec-13649f82f0e4}">
+            <name locale="en_US">IOJ3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-22.86" uuid="{25d9eecc-eb9f-4e72-9ff4-e3209f6f3ac5}">
+            <name locale="en_US">IOJ10</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-25.4" uuid="{d5d62683-1af3-449c-ad9d-414cd5774b73}">
+            <name locale="en_US">IOJ14</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-27.94" uuid="{02073c11-b14d-4e1d-8785-5a367a3e968b}">
+            <name locale="en_US">IOJ15</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,19 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{9db3c4de-a891-4eac-92b7-92b008ab4a43}</uuid>
+        <name locale="en_US">PINV</name>
+    </meta>
+    <geometry>
+        <polygon fill="true" start_y="-0.254" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="1.27" end_y="-0.254"/>
+            <segment type="line" end_x="1.27" end_y="0.254"/>
+            <segment type="line" end_x="0" end_y="0.254"/>
+            <segment type="line" end_x="0" end_y="-0.254"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{85a8cf85-2418-4085-9c98-c2726a1c0503}">
+            <name locale="en_US">1</name>
+        </pin>
+    </pins>
+</symbol>

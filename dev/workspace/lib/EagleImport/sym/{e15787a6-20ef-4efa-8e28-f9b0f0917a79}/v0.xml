@@ -1,0 +1,70 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{e15787a6-20ef-4efa-8e28-f9b0f0917a79}</uuid>
+        <name locale="en_US">MAX618</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-15.24" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-15.24" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="15.24"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="12.7" uuid="{e5f46843-1531-4c51-ad0b-37c370f080a7}">
+            <name locale="en_US">IN</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="12.7" uuid="{748f9ff2-c4e0-4027-a986-ec7a1e9ef5cb}">
+            <name locale="en_US">LX@1</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="0" uuid="{09411541-ca29-4acc-a638-3c041b4790bc}">
+            <name locale="en_US">FB</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="7.62" uuid="{5352410b-294c-4e0f-bc27-e25c2e9967fe}">
+            <name locale="en_US">!SHDN</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{d17c6e85-3f22-4d52-a512-e8080f51b063}">
+            <name locale="en_US">COMP</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{c6bc4014-6a11-4596-90d0-9f40e9cbd544}">
+            <name locale="en_US">VL</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{f8833e42-0ddf-4f11-b589-81f2b55f84c7}">
+            <name locale="en_US">GND@1</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{489bec98-28db-4f98-ae40-13d5fe109e8e}">
+            <name locale="en_US">GND@2</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-7.62" uuid="{c1a7f73e-142c-4212-8601-26cec55a8a90}">
+            <name locale="en_US">GND@3</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-10.16" uuid="{3e795d7e-ff0a-4d9a-9cd0-21317ce9aefa}">
+            <name locale="en_US">GND@4</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-12.7" uuid="{332d4118-0ecb-435e-a691-5a4b51cfff96}">
+            <name locale="en_US">GND@5</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-7.62" uuid="{260ee1a3-3f3d-4c27-be78-339240034284}">
+            <name locale="en_US">PGND@1</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-10.16" uuid="{61319ed1-faa1-48d7-89ab-c0ce0f1f3965}">
+            <name locale="en_US">PGND@2</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-12.7" uuid="{2b41ab9b-64c6-4855-8c4f-211f33b37eef}">
+            <name locale="en_US">PGND@3</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="10.16" uuid="{b4affa99-b470-4711-b38f-793f1ae54b5b}">
+            <name locale="en_US">LX@2</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="7.62" uuid="{6780da10-8f74-4ac1-b699-66e6131afd41}">
+            <name locale="en_US">LX@3</name>
+        </pin>
+    </pins>
+</symbol>

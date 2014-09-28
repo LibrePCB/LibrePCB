@@ -1,0 +1,64 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{ca833120-ba4c-4f60-a163-93d424bbb3b2}</uuid>
+        <name locale="en_US">GB2</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-2.54" width="0.3048" layer="10" start_x="0">
+            <segment type="line" end_x="2.54" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.3048" layer="10" start_x="0">
+            <segment type="line" end_x="-2.54" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.3048" layer="10" start_x="-2.54">
+            <segment type="line" end_x="0" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.3048" layer="10" start_x="2.54">
+            <segment type="line" end_x="0" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-1.27">
+            <segment type="line" end_x="0.635" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0.635" width="0.1524" layer="10" start_x="-0.635">
+            <segment type="line" end_x="-0.635" end_y="-0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="0.635" width="0.1524" layer="10" start_x="-0.635">
+            <segment type="line" end_x="0.635" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="0.635">
+            <segment type="line" end_x="1.27" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="0.635">
+            <segment type="line" end_x="-0.635" end_y="-0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="0.635" width="0.1524" layer="10" start_x="0.635">
+            <segment type="line" end_x="0.635" end_y="-0.635"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="270" y="5.08" uuid="{6ade7970-e47b-4891-adfe-dab683d7f7ca}">
+            <name locale="en_US">AC1</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-5.08" uuid="{ce523df3-d3bb-441f-a7c1-909634857f90}">
+            <name locale="en_US">AC2</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{8c1432ab-2800-46ef-b34f-a4c215b41af8}">
+            <name locale="en_US">-</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="0" uuid="{baf7b319-2c9d-4c99-ace7-856d649c5b27}">
+            <name locale="en_US">+</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="0" uuid="{461883d1-178f-4f3d-858f-2266c7d922e6}">
+            <name locale="en_US">-@2</name>
+        </pin>
+        <pin x="0" length="2.54" angle="270" y="7.62" uuid="{443e7a53-86e3-4fd9-902a-2ef0c1757f47}">
+            <name locale="en_US">AC1@2</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="0" uuid="{d633f226-55bd-458e-b94f-82deed3a0114}">
+            <name locale="en_US">+@2</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-7.62" uuid="{9a6f4781-12f1-48cd-8359-844de6ca07f1}">
+            <name locale="en_US">AC2@2</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,94 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{162fa0f0-1132-46fa-a753-72dbc381d899}</uuid>
+        <name locale="en_US">TC1796JTAG</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="25.4" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-12.7" end_y="-25.4"/>
+        </polygon>
+        <polygon fill="false" start_y="-25.4" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="25.4"/>
+        </polygon>
+        <polygon fill="false" start_y="25.4" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="-12.7" end_y="25.4"/>
+        </polygon>
+        <polygon fill="false" start_y="-25.4" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="-12.7" end_y="-25.4"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-17.78" length="5.08" angle="0" y="22.86" uuid="{65d9e3cf-82ae-4ff4-9dfa-f173139ed639}">
+            <name locale="en_US">!TRST</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="20.32" uuid="{bfdc31bf-d029-4170-89c4-4132601ec0dc}">
+            <name locale="en_US">TCK</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="17.78" uuid="{9a027803-fd9e-430a-9679-249852ed8707}">
+            <name locale="en_US">TDI</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="15.24" uuid="{a25791d3-e77f-45e2-a269-796b76003266}">
+            <name locale="en_US">TMS</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="12.7" uuid="{31421531-110e-494d-95ac-f9466ee3726b}">
+            <name locale="en_US">!BRKIN</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="22.86" uuid="{a5d02219-f8b5-4873-af4d-4f648f0f9f88}">
+            <name locale="en_US">!BRKOUT</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="20.32" uuid="{b49829ad-53c3-40f2-b864-d767eae72de9}">
+            <name locale="en_US">TDO</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="17.78" uuid="{7e3f922f-2335-487e-8dd6-78bb6e31ea6c}">
+            <name locale="en_US">TRCLK</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="15.24" uuid="{838d5aa6-88f7-48ba-860e-1ef5b71566d0}">
+            <name locale="en_US">TR.0</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="12.7" uuid="{fb9b1d69-6c48-4d8f-b2ab-458fe3df2e29}">
+            <name locale="en_US">TR.1</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="10.16" uuid="{8927b0e7-737a-4def-a9fb-fb214caa90fc}">
+            <name locale="en_US">TR.2</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="7.62" uuid="{3161fd73-708b-4d62-ac8d-28b75fe0cb93}">
+            <name locale="en_US">TR.3</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="5.08" uuid="{e4948cfc-b6d1-4a32-8dc8-9775612a7b79}">
+            <name locale="en_US">TR.4</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="2.54" uuid="{eadda81e-f4e7-4461-a0cb-c4a03836f959}">
+            <name locale="en_US">TR.5</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="0" uuid="{e5fe6c87-7124-40f0-8fb7-9a39c367e597}">
+            <name locale="en_US">TR.6</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-2.54" uuid="{0edf43a8-7a74-4435-9b1c-8b52e6a0fc81}">
+            <name locale="en_US">TR.7</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-5.08" uuid="{7e94cfc7-6bb6-4cff-8711-14d624bf99b4}">
+            <name locale="en_US">TR.8</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-7.62" uuid="{f1705b93-0d38-4471-a293-e559cbd4704d}">
+            <name locale="en_US">TR.9</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-10.16" uuid="{56f3323c-9629-4322-94aa-92891f15b817}">
+            <name locale="en_US">TR.10</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-12.7" uuid="{827c79e2-cdb3-4339-8699-407e575d10c3}">
+            <name locale="en_US">TR.11</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-15.24" uuid="{19053c52-8699-4349-bb2f-8d60255dc08b}">
+            <name locale="en_US">TR.12</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-17.78" uuid="{c1cc98a7-86f0-4e89-9c04-878958731401}">
+            <name locale="en_US">TR.13</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-20.32" uuid="{2cc54045-38aa-460d-9a59-be467c0c74d9}">
+            <name locale="en_US">TR.14</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-22.86" uuid="{c2dd21ef-8d72-49da-b4f3-e68e2bc80a5a}">
+            <name locale="en_US">TR.15</name>
+        </pin>
+    </pins>
+</symbol>

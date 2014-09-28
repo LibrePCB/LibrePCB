@@ -1,0 +1,34 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{3c4d21c5-a2d8-4c44-9fe9-ff1e3edfa605}</uuid>
+        <name locale="en_US">TMEXXXXS</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="5.08"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="5.08" angle="0" y="2.54" uuid="{657f1643-6033-4281-ae3c-73ec107e6958}">
+            <name locale="en_US">E+</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-2.54" uuid="{c06225ae-ff4a-42b5-84b4-513ed068c8c3}">
+            <name locale="en_US">E-</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="2.54" uuid="{a6935d10-283a-408f-877d-5df8b28e8b00}">
+            <name locale="en_US">A+</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-2.54" uuid="{2220485a-a60a-4d7e-827b-0cc13212bf02}">
+            <name locale="en_US">A-</name>
+        </pin>
+    </pins>
+</symbol>

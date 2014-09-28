@@ -1,0 +1,55 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{51691a95-84ee-4a09-8631-6cdca7515114}</uuid>
+        <name locale="en_US">HICUR_MALE4</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="5.08" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="1.27" end_y="1.27"/>
+        </polygon>
+        <polygon fill="true" start_y="1.016" width="0.254" layer="10" start_x="1.016">
+            <segment type="line" end_x="3.81" end_y="1.016"/>
+            <segment type="line" end_x="3.81" end_y="1.651"/>
+            <segment type="line" end_x="1.016" end_y="1.651"/>
+            <segment type="line" end_x="1.016" end_y="1.016"/>
+        </polygon>
+        <polygon fill="true" start_y="1.016" width="0.254" layer="10" start_x="1.016">
+            <segment type="line" end_x="3.81" end_y="1.016"/>
+            <segment type="line" end_x="3.81" end_y="1.651"/>
+            <segment type="line" end_x="1.016" end_y="1.651"/>
+            <segment type="line" end_x="1.016" end_y="1.016"/>
+        </polygon>
+        <polygon fill="true" start_y="1.016" width="0.254" layer="10" start_x="1.016">
+            <segment type="line" end_x="3.81" end_y="1.016"/>
+            <segment type="line" end_x="3.81" end_y="1.524"/>
+            <segment type="line" end_x="1.016" end_y="1.524"/>
+            <segment type="line" end_x="1.016" end_y="1.016"/>
+        </polygon>
+        <polygon fill="true" start_y="0.762" width="0.254" layer="10" start_x="1.016">
+            <segment type="line" end_x="4.064" end_y="0.762"/>
+            <segment type="line" end_x="4.064" end_y="1.778"/>
+            <segment type="line" end_x="1.016" end_y="1.778"/>
+            <segment type="line" end_x="1.016" end_y="0.762"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="5.08" uuid="{aea14186-bf1c-4d0b-a11e-2949062ab3a0}">
+            <name locale="en_US">S1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="2.54" uuid="{cf883468-5329-44cc-b3fe-99c684ce7661}">
+            <name locale="en_US">S2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{0caca88b-85ce-449f-b8b9-86e84d63a9df}">
+            <name locale="en_US">S3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{0d2432fd-f171-4e17-aa58-9a59cd00e3c0}">
+            <name locale="en_US">S4</name>
+        </pin>
+    </pins>
+</symbol>

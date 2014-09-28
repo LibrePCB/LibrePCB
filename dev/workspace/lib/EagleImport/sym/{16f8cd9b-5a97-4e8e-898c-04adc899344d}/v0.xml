@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{16f8cd9b-5a97-4e8e-898c-04adc899344d}</uuid>
+        <name locale="en_US">PIC12F629</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="12.7" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="-10.16" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="270" y="12.7" uuid="{220cd47a-eb4a-4468-b029-828e2d670fd1}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-10.16" uuid="{e78493ee-2bfd-4f4b-a957-3d22e3c1a702}">
+            <name locale="en_US">VSS</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{a793bc4c-75d8-4f15-980c-1ef9d5b35821}">
+            <name locale="en_US">GP5/CLKIN</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="7.62" uuid="{6b6e2d23-e439-481a-94d0-fa66848b31b7}">
+            <name locale="en_US">GP0</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{c73182db-297a-44b0-ba13-609b0d5c0043}">
+            <name locale="en_US">GP4/CLKOUT</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-2.54" uuid="{b9b94c47-42bd-4622-85c2-e9bb00d4cf43}">
+            <name locale="en_US">GP2</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="2.54" uuid="{29127267-6e5e-4f91-b280-ec7ff926f1a7}">
+            <name locale="en_US">GP1</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{0554b3ef-3a76-4d37-9a77-61c444d7ef25}">
+            <name locale="en_US">GP3</name>
+        </pin>
+    </pins>
+</symbol>

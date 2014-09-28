@@ -1,0 +1,52 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{fbaa3a25-206e-43f4-be0c-a42d7a359643}</uuid>
+        <name locale="en_US">ONCORE</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="25.4" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="-25.4"/>
+        </polygon>
+        <polygon fill="false" start_y="-25.4" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="-25.4"/>
+        </polygon>
+        <polygon fill="false" start_y="-25.4" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="25.4"/>
+        </polygon>
+        <polygon fill="false" start_y="25.4" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="25.4"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="17.78" uuid="{100e151c-d7a9-49f7-a7f6-f106244aab15}">
+            <name locale="en_US">BATTERY</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="22.86" uuid="{a30bbfe9-bd7a-4818-96ee-736455bebe0a}">
+            <name locale="en_US">+5V</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-22.86" uuid="{915bf75f-642a-4cc6-a4d3-e1e90a691942}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="12.7" uuid="{8ff4f0cb-849e-40ff-a87e-45acbbc50e6d}">
+            <name locale="en_US">VPP</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="7.62" uuid="{438ab5b2-c74f-401b-996a-d33417d01a81}">
+            <name locale="en_US">RTCM</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="2.54" uuid="{d17e1b0d-cc7a-4d8c-9f19-d17ea188f221}">
+            <name locale="en_US">1PPS</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-2.54" uuid="{8a209bd7-d77e-44a4-9aee-45d1118a4a0a}">
+            <name locale="en_US">1PPS_RTN</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-7.62" uuid="{4959a9e6-bda7-4c1e-b3c1-d301040849a5}">
+            <name locale="en_US">TXD</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-12.7" uuid="{fd34900a-7dfb-47db-bcbb-c6dc198e0850}">
+            <name locale="en_US">RXD</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-17.78" uuid="{411cdbf4-4722-4322-a410-99e5cb5bf9bc}">
+            <name locale="en_US">RTN</name>
+        </pin>
+    </pins>
+</symbol>

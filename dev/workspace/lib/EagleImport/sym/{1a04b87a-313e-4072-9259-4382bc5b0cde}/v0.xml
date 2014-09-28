@@ -1,0 +1,18 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{1a04b87a-313e-4072-9259-4382bc5b0cde}</uuid>
+        <name locale="en_US">ROTOR-20</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="-5.08" uuid="{a534f826-6302-4f48-aa61-e2f7f3cf3a6d}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-5.08" uuid="{48382f5a-6642-41c5-87b6-4da943e23d84}">
+            <name locale="en_US">2</name>
+        </pin>
+        <pin x="0" length="2.54" angle="270" y="10.16" uuid="{7d7a66ab-8c59-405f-8265-f7cf6c823817}">
+            <name locale="en_US">3</name>
+        </pin>
+    </pins>
+</symbol>

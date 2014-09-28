@@ -1,0 +1,106 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{6e8b01a4-2424-4c5b-9618-3de64ba9cac1}</uuid>
+        <name locale="en_US">A5191HRT</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="-17.78">
+            <segment type="line" end_x="17.78" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="17.78">
+            <segment type="line" end_x="17.78" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.254" layer="10" start_x="17.78">
+            <segment type="line" end_x="-17.78" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.254" layer="10" start_x="-17.78">
+            <segment type="line" end_x="-17.78" end_y="-17.78"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="270" y="20.32" uuid="{41fc23ea-0179-434e-b1d3-23589a8e7deb}">
+            <name locale="en_US">TEST1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="270" y="20.32" uuid="{b7c54dbf-f941-42f6-aeea-2eac6d45fce6}">
+            <name locale="en_US">TEST2</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="270" y="20.32" uuid="{3f81f492-857b-4a4d-b93b-4ea58093e371}">
+            <name locale="en_US">TEST3</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="270" y="20.32" uuid="{5e57150f-77b0-48b2-aadd-3919f38b13ae}">
+            <name locale="en_US">TEST4</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="7.62" uuid="{16cb53d8-4f4f-49bb-9cbb-870ab8473e14}">
+            <name locale="en_US">TEST5</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="5.08" uuid="{cb3371f8-230a-4ca2-9282-b68a0ec4a92e}">
+            <name locale="en_US">INRESET</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="2.54" uuid="{830da09d-e330-4acb-aa44-1ed69144424b}">
+            <name locale="en_US">TEST7</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="0" uuid="{7bfe76d7-810b-4932-9849-71deb08943c3}">
+            <name locale="en_US">TEST8</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="-2.54" uuid="{831ca0e2-2fcc-4a38-b26e-6c947f88eedb}">
+            <name locale="en_US">TEST9</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="-5.08" uuid="{ef11c766-d49d-42a9-bb19-36cb58c0c804}">
+            <name locale="en_US">OTXA</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="-7.62" uuid="{3ed5ed3a-e25c-4517-ba21-97d7076aabf6}">
+            <name locale="en_US">IAREF</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="90" y="-20.32" uuid="{0c5bbffb-467e-43f4-b0a9-f48f078ec621}">
+            <name locale="en_US">ICDREF</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="90" y="-20.32" uuid="{37154b81-2d32-4ce6-992e-b5079b885cc4}">
+            <name locale="en_US">OCBIAS</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="90" y="-20.32" uuid="{d0703c53-1a74-446d-b2aa-d2f6e11bd1e0}">
+            <name locale="en_US">TEST10</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-20.32" uuid="{a67bbe63-dc1c-4d2f-af48-19f15b5c7b07}">
+            <name locale="en_US">VDDA</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-20.32" uuid="{e90f2d4b-9737-4a68-9498-552f67e40b1b}">
+            <name locale="en_US">IRXA</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="90" y="-20.32" uuid="{0b85d463-058a-4db5-86c1-8ec1faec2c71}">
+            <name locale="en_US">ORXAF</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="90" y="-20.32" uuid="{6abc1980-0e61-4e14-9ccf-07a592bdbb2e}">
+            <name locale="en_US">IRXAC</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="-7.62" uuid="{f24b1d30-83f2-4c64-86af-f094b2c6626b}">
+            <name locale="en_US">OXTL</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="-5.08" uuid="{8a282c7d-bf7e-4109-b3b3-3d1981058e00}">
+            <name locale="en_US">IXTL</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="-2.54" uuid="{1a86fc43-f066-43d5-bb8a-3d46bfeb584f}">
+            <name locale="en_US">VSS</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="0" uuid="{dcefe724-e7c1-493b-80b0-b00ca598f72e}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="2.54" uuid="{48dc56d1-d670-4fb7-a3f9-3f1fba173392}">
+            <name locale="en_US">INRTS</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="5.08" uuid="{d9569472-088a-4f23-aa2f-46ec0db9c77d}">
+            <name locale="en_US">ITXD</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="7.62" uuid="{c19a99e1-64ef-408d-a006-91fd85b90023}">
+            <name locale="en_US">TEST11</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="270" y="20.32" uuid="{7e50c263-40a6-44f1-8848-9fac3e6cb43d}">
+            <name locale="en_US">ORXD</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="270" y="20.32" uuid="{d44ad6a5-6b9d-43fb-ad8b-6d0f7d5231ad}">
+            <name locale="en_US">OCD</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="270" y="20.32" uuid="{b2055c30-308b-40cd-ba01-de0cfe58a671}">
+            <name locale="en_US">TEST12</name>
+        </pin>
+    </pins>
+</symbol>

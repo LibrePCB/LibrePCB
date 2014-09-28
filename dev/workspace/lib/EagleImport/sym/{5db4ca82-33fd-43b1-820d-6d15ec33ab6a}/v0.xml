@@ -1,0 +1,43 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{5db4ca82-33fd-43b1-820d-6d15ec33ab6a}</uuid>
+        <name locale="en_US">PIN7</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="5.08" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="5.08" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="-2.54" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{6b3ba2e1-f8c1-476a-b4a6-ff0f5c58fe89}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-2.54" uuid="{8926a453-db31-44f9-9744-c842ce93c522}">
+            <name locale="en_US">2</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-5.08" uuid="{73b9f88a-2401-4be3-a090-8bcb48838f30}">
+            <name locale="en_US">3</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-7.62" uuid="{896d6d29-92eb-4a53-889e-387c8e6ec72b}">
+            <name locale="en_US">4</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-10.16" uuid="{dd3d06a1-8d03-43e5-89ee-f7fb9db0964d}">
+            <name locale="en_US">5</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-12.7" uuid="{703a2c9d-2ee1-49a3-ba86-0dd943854979}">
+            <name locale="en_US">6</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-15.24" uuid="{225b4c9e-2b92-47c3-91fe-414cf0b4a7f1}">
+            <name locale="en_US">7</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,70 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{a5b58c32-3036-4955-a4d7-486880c1ee5d}</uuid>
+        <name locale="en_US">T6164</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-17.78" width="0.4064" layer="10" start_x="12.7">
+            <segment type="line" end_x="-10.16" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="12.7" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.4064" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-17.78"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="5.08" angle="0" y="15.24" uuid="{7d82ca94-ba12-40d1-b41e-bd42ff8d1e85}">
+            <name locale="en_US">RX+I/P</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="12.7" uuid="{1aaf43e0-1db7-40c4-897f-9cb61c6490c7}">
+            <name locale="en_US">RX-I/P</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="7.62" uuid="{8d983d1c-800d-41f6-a4d3-5493b99d0082}">
+            <name locale="en_US">TX+I/P</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="5.08" uuid="{df3ede7d-c91f-42ce-96e5-5fd09452274c}">
+            <name locale="en_US">TX-I/P</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-7.62" uuid="{73862927-b8a1-4b04-87ac-91d83418f396}">
+            <name locale="en_US">I/PBIAS</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-10.16" uuid="{4a4ff8b0-0e52-4e8f-9cfe-86647312895f}">
+            <name locale="en_US">TCMCON</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="15.24" uuid="{2a3fcfc3-1e18-4710-972b-9fbef8df8b9c}">
+            <name locale="en_US">TX+O/P</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="12.7" uuid="{cd83fb9b-1793-4829-8a05-597197b53030}">
+            <name locale="en_US">TX-O/P</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="7.62" uuid="{9eed4b5d-1f3f-44e0-86eb-745c0630036c}">
+            <name locale="en_US">S+R</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="5.08" uuid="{25624c1d-bda1-4e02-aed1-fafebf1274d9}">
+            <name locale="en_US">S-R</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="0" uuid="{567bbae0-4eab-4dd3-a24a-cb38ef2d2889}">
+            <name locale="en_US">RXALARM</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-2.54" uuid="{86970d9c-3deb-47de-b8be-afb40dcd6e31}">
+            <name locale="en_US">PEAKCAP</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-7.62" uuid="{65f16d64-bed9-439c-b1af-335f51bb3695}">
+            <name locale="en_US">VCCA</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-10.16" uuid="{391197c5-52b1-4d82-8515-3e1d249ec582}">
+            <name locale="en_US">VCCD</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-12.7" uuid="{977fadf7-3bed-4382-87a5-c88fa0b186ff}">
+            <name locale="en_US">GNDA</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-15.24" uuid="{e3f33052-c041-4592-87b7-ad2421f02cc4}">
+            <name locale="en_US">GNDD</name>
+        </pin>
+    </pins>
+</symbol>

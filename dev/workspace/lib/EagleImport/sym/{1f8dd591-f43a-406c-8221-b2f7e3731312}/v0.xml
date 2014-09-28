@@ -1,0 +1,43 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{1f8dd591-f43a-406c-8221-b2f7e3731312}</uuid>
+        <name locale="en_US">TC4468</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="5.08" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-2.54" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.4064" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-7.62" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="0" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="5.08" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="0" end_y="0"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="5.08" angle="0" y="2.54" uuid="{ab34e02d-9413-48bb-8ad8-3056d2fa4681}">
+            <name locale="en_US">A</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-2.54" uuid="{5024041e-cfde-415c-ae9c-597894b4ad80}">
+            <name locale="en_US">B</name>
+        </pin>
+        <pin x="10.16" length="5.08" angle="180" y="0" uuid="{3700531c-99d5-4e15-8e1f-1066c5dafba3}">
+            <name locale="en_US">Y</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,37 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{bc54d184-37f9-4c20-942c-fbb45c0c1818}</uuid>
+        <name locale="en_US">PIN5</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="5.08" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="5.08" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="-2.54" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{6ffcb62a-91af-41b8-9b8a-9c6a4fb50e84}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-2.54" uuid="{40699a36-9a4a-457b-b791-57e67be9b79f}">
+            <name locale="en_US">2</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-5.08" uuid="{dbdd60b8-ce21-4705-b6be-7726baf2ffea}">
+            <name locale="en_US">3</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-7.62" uuid="{d0e639a1-79e5-4248-b1b0-ae8a493b8e57}">
+            <name locale="en_US">4</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-10.16" uuid="{1ff95c76-efd4-43d6-8751-a098f7bb04d9}">
+            <name locale="en_US">5</name>
+        </pin>
+    </pins>
+</symbol>

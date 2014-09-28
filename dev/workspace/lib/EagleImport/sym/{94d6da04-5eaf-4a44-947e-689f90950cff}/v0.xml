@@ -1,0 +1,358 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{94d6da04-5eaf-4a44-947e-689f90950cff}</uuid>
+        <name locale="en_US">XC5VLX110T_FF1738-VCCINT</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="27.94" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="27.94">
+            <segment type="line" end_x="27.94" end_y="-142.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-142.24" width="0.254" layer="10" start_x="27.94">
+            <segment type="line" end_x="0" end_y="-142.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-142.24" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{0e0a788a-180f-45ef-a82f-ec7964e648d6}">
+            <name locale="en_US">VCCINT@1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{6ae34e60-9e00-4c14-b72b-a27f17f5dea9}">
+            <name locale="en_US">VCCINT@2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{2039190c-b760-4d6e-a2ef-aaf0d8354956}">
+            <name locale="en_US">VCCINT@3</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{1c431c4d-b6bf-4d61-b71a-0f42ede6f196}">
+            <name locale="en_US">VCCINT@4</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{b9ee9c59-c6ff-459d-a128-6f99dfba325a}">
+            <name locale="en_US">VCCINT@5</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{4c47e501-bc62-4cc4-a52d-66b226719962}">
+            <name locale="en_US">VCCINT@6</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{0a0d04ce-feb3-4047-bd92-55c80a2c728d}">
+            <name locale="en_US">VCCINT@7</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{2fd1fd22-e83a-4ab4-a092-0c2d614ff867}">
+            <name locale="en_US">VCCINT@8</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{149cf9bf-e01f-4be4-b286-0988e295996d}">
+            <name locale="en_US">VCCINT@9</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{53522471-0c92-49dc-9a27-77be74098ffe}">
+            <name locale="en_US">VCCINT@10</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{69c11a8b-183b-46a1-824d-8b7ce2800daf}">
+            <name locale="en_US">VCCINT@11</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{9fa71b10-d6e3-427c-bb94-fa39dacb2a65}">
+            <name locale="en_US">VCCINT@12</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{91c0e50d-6a5a-4ace-995f-f58434489a80}">
+            <name locale="en_US">VCCINT@13</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-33.02" uuid="{7ec5c9b0-f941-4e92-9524-8e43167f69de}">
+            <name locale="en_US">VCCINT@14</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-35.56" uuid="{df6db9b6-c2af-4c15-83d0-cda656a996d8}">
+            <name locale="en_US">VCCINT@15</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-38.1" uuid="{a26d7503-ab92-4d48-a882-b1041ce1b82d}">
+            <name locale="en_US">VCCINT@16</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-40.64" uuid="{2423b4dc-9f81-40c3-8819-81c1439bd596}">
+            <name locale="en_US">VCCINT@17</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-43.18" uuid="{edab4184-4045-4c34-9a2a-a91d78076394}">
+            <name locale="en_US">VCCINT@18</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-45.72" uuid="{aae4d8e7-f548-4aa8-bd20-1f8b889acc66}">
+            <name locale="en_US">VCCINT@19</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-48.26" uuid="{bf69b484-cb7d-4db6-abed-ed8b465f1e98}">
+            <name locale="en_US">VCCINT@20</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-50.8" uuid="{db1e9530-df01-4912-84a5-dfc3ba3bbe37}">
+            <name locale="en_US">VCCINT@21</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-53.34" uuid="{cc948224-7a60-4307-9172-e07c2fab8daf}">
+            <name locale="en_US">VCCINT@22</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-55.88" uuid="{1a76338e-1f7e-452f-9c95-8b01b0f4f3b2}">
+            <name locale="en_US">VCCINT@23</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-58.42" uuid="{697e6740-5cb9-400f-b4f8-bff60b1ecb33}">
+            <name locale="en_US">VCCINT@24</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-60.96" uuid="{6afd0620-9d7e-4202-b8ec-d5715f6b599a}">
+            <name locale="en_US">VCCINT@25</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-63.5" uuid="{7ba2aa72-a110-4de2-9343-ae1cccec9358}">
+            <name locale="en_US">VCCINT@26</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-66.04" uuid="{c1b320e8-b8e2-49b2-bd89-3986d15df870}">
+            <name locale="en_US">VCCINT@27</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-68.58" uuid="{2e1944ce-84b1-4011-a3de-f63380f058f1}">
+            <name locale="en_US">VCCINT@28</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-71.12" uuid="{b51292c9-a85c-4b51-ae15-65ca4464d33c}">
+            <name locale="en_US">VCCINT@29</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-73.66" uuid="{cbc9ce47-97cb-4b1a-ad5b-6b2d79fbd2f4}">
+            <name locale="en_US">VCCINT@30</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-76.2" uuid="{44ccacc3-71b4-4468-b017-70416afa08f0}">
+            <name locale="en_US">VCCINT@31</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-78.74" uuid="{df725dc4-c776-4079-a068-85c8b6e81509}">
+            <name locale="en_US">VCCINT@32</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-81.28" uuid="{664e48c4-507e-4cd6-b6c8-7180d3034cb9}">
+            <name locale="en_US">VCCINT@33</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-83.82" uuid="{0520e4a0-ae48-48d5-95ef-aa2846795c5e}">
+            <name locale="en_US">VCCINT@34</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-86.36" uuid="{5cb89e55-9268-49d4-9698-57cc65fa26c7}">
+            <name locale="en_US">VCCINT@35</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-88.9" uuid="{d4a5a9c3-dbcb-446b-8dba-0a29e902ff7a}">
+            <name locale="en_US">VCCINT@36</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-91.44" uuid="{c190e3d9-4b73-45a6-aa8b-1b347e2eae24}">
+            <name locale="en_US">VCCINT@37</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-93.98" uuid="{2a0a8c31-7fa3-4a55-bfdf-baa4a9971588}">
+            <name locale="en_US">VCCINT@38</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-96.52" uuid="{868eeef2-e85f-4bcc-84ed-03245b1e4106}">
+            <name locale="en_US">VCCINT@39</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-99.06" uuid="{23789e7f-2176-4ecd-bdad-59ed8b755d6d}">
+            <name locale="en_US">VCCINT@40</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-101.6" uuid="{9a8ff34c-f7ad-44f6-a3af-d0c1c9ca37e7}">
+            <name locale="en_US">VCCINT@41</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-104.14" uuid="{0548d034-e303-402e-a6bc-218723a06ec2}">
+            <name locale="en_US">VCCINT@42</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-106.68" uuid="{fb7dd377-2a3e-4438-868b-8be95c269061}">
+            <name locale="en_US">VCCINT@43</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-109.22" uuid="{0f7bdb72-a91b-4509-8b42-b3b5829734b3}">
+            <name locale="en_US">VCCINT@44</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-111.76" uuid="{bd08773d-11b5-4666-96c4-05eaaacf370c}">
+            <name locale="en_US">VCCINT@45</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-114.3" uuid="{134086be-590c-4332-9352-3e2624dd68dd}">
+            <name locale="en_US">VCCINT@46</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-116.84" uuid="{ea4414bb-4775-4912-8447-53fea9200013}">
+            <name locale="en_US">VCCINT@47</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-119.38" uuid="{c621c078-f5e3-4c19-9f36-513773494815}">
+            <name locale="en_US">VCCINT@48</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-121.92" uuid="{69fa1df2-5d0b-4ef0-85d1-ce82b3c118eb}">
+            <name locale="en_US">VCCINT@49</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-124.46" uuid="{7b32d687-1d65-4b9c-96e1-7c1cfbcbacb2}">
+            <name locale="en_US">VCCINT@50</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-127" uuid="{5f3de935-4091-40a2-bbe8-76f5e1e10d4f}">
+            <name locale="en_US">VCCINT@51</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-129.54" uuid="{0e5a82ee-358a-44fe-a1ba-86812377a690}">
+            <name locale="en_US">VCCINT@52</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-132.08" uuid="{4863027c-5645-44f1-be0f-b61811f5a307}">
+            <name locale="en_US">VCCINT@53</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-134.62" uuid="{a6dcaeaf-e387-4e79-93e6-bdbacf0a68b7}">
+            <name locale="en_US">VCCINT@54</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-137.16" uuid="{aca807be-0273-4f5d-b40b-52188da846fc}">
+            <name locale="en_US">VCCINT@55</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-139.7" uuid="{61353548-2d8d-4f8f-8c23-7f1d1f5f7a22}">
+            <name locale="en_US">VCCINT@56</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="0" uuid="{02eba564-537a-4f46-a728-75ee3e25c0b3}">
+            <name locale="en_US">VCCINT@57</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-2.54" uuid="{27d07122-c5b3-48fa-8e51-64c753e94f9d}">
+            <name locale="en_US">VCCINT@58</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-5.08" uuid="{46e65d2b-a72a-437f-9a65-f15d0dc609df}">
+            <name locale="en_US">VCCINT@59</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-7.62" uuid="{2b78e879-b079-4b63-9eb1-5b50b27f3432}">
+            <name locale="en_US">VCCINT@60</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-10.16" uuid="{9f8a7159-13ab-428c-b2a6-c273cea2f8f1}">
+            <name locale="en_US">VCCINT@61</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-12.7" uuid="{dd72c45e-fff2-4e96-a05f-159ba41a7936}">
+            <name locale="en_US">VCCINT@62</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-15.24" uuid="{35233869-8710-4d88-9a27-59ce9a41b4f6}">
+            <name locale="en_US">VCCINT@63</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-17.78" uuid="{87391afa-7ba6-4754-8456-27d4be85ded4}">
+            <name locale="en_US">VCCINT@64</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-20.32" uuid="{ad6edc84-229a-4a94-8186-20647bde082b}">
+            <name locale="en_US">VCCINT@65</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-22.86" uuid="{db90c3ee-f578-4241-89a5-58d1533a5a73}">
+            <name locale="en_US">VCCINT@66</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-25.4" uuid="{21b16a10-b641-4214-a971-22ab2b257966}">
+            <name locale="en_US">VCCINT@67</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-27.94" uuid="{4ab69e5f-2ad1-42ae-912f-58635e8f8616}">
+            <name locale="en_US">VCCINT@68</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-30.48" uuid="{fb4c672a-5c09-49f6-81ad-bbb41870cfc0}">
+            <name locale="en_US">VCCINT@69</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-33.02" uuid="{d0e59cbd-6880-4dc6-a32a-99dcdb21694e}">
+            <name locale="en_US">VCCINT@70</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-35.56" uuid="{04f5a96d-742e-4d5e-ac13-ce674132b5a6}">
+            <name locale="en_US">VCCINT@71</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-38.1" uuid="{54393fe6-f3f5-4ba2-afd6-9a9652632a68}">
+            <name locale="en_US">VCCINT@72</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-40.64" uuid="{73b69fad-7820-42ab-80a5-8b54c24327d7}">
+            <name locale="en_US">VCCINT@73</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-43.18" uuid="{6037a7e3-923c-4c90-a6c4-5b8f0a18e2b1}">
+            <name locale="en_US">VCCINT@74</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-45.72" uuid="{63f06fbd-56f5-4f98-a637-1302bab21fd8}">
+            <name locale="en_US">VCCINT@75</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-48.26" uuid="{99b07ab5-ca50-4ee8-8ee8-9b5fbe66f397}">
+            <name locale="en_US">VCCINT@76</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-50.8" uuid="{8a40cf51-f5ef-48ad-b3ef-cb7c0d4103a8}">
+            <name locale="en_US">VCCINT@77</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-53.34" uuid="{33354cf5-0782-4a3f-a062-6aca219e65be}">
+            <name locale="en_US">VCCINT@78</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-55.88" uuid="{2fbd7cb4-90dd-4db3-ba3a-4495bf70c491}">
+            <name locale="en_US">VCCINT@79</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-58.42" uuid="{cef71e29-21d7-4150-a63a-c94ffe87e151}">
+            <name locale="en_US">VCCINT@80</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-60.96" uuid="{54897748-408a-4432-ac58-a1dc08beea62}">
+            <name locale="en_US">VCCINT@81</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-63.5" uuid="{4429ebed-0983-4b5c-a74d-6ece7bc60899}">
+            <name locale="en_US">VCCINT@82</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-66.04" uuid="{d5bf5491-c78f-464a-8645-552ebc63060d}">
+            <name locale="en_US">VCCINT@83</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-68.58" uuid="{d0045dcf-b592-4494-98d5-27c163b2656a}">
+            <name locale="en_US">VCCINT@84</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-71.12" uuid="{719e5696-8f0a-4441-8014-6188ef132f03}">
+            <name locale="en_US">VCCINT@85</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-73.66" uuid="{db9d00ed-b633-44c4-8f83-8105cc21fdb3}">
+            <name locale="en_US">VCCINT@86</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-76.2" uuid="{17c486f2-aeba-4319-8c32-4d8a6a90bf00}">
+            <name locale="en_US">VCCINT@87</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-78.74" uuid="{b1f8df75-bc99-4c0e-9243-d9f31597a1c6}">
+            <name locale="en_US">VCCINT@88</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-81.28" uuid="{f9b28bd5-0e3c-41d2-bbf1-d22d5b71e45a}">
+            <name locale="en_US">VCCINT@89</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-83.82" uuid="{fa22015b-1208-4633-8900-a87430a46384}">
+            <name locale="en_US">VCCINT@90</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-86.36" uuid="{53ce06fc-626e-49f7-b4fc-918c5f9af231}">
+            <name locale="en_US">VCCINT@91</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-88.9" uuid="{66489ce6-4b90-4555-96e2-f303e20b7732}">
+            <name locale="en_US">VCCINT@92</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-91.44" uuid="{9229a75b-0319-45b7-8197-f97c01883287}">
+            <name locale="en_US">VCCINT@93</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-93.98" uuid="{f044df69-82ec-4de4-a748-28fba9cb2160}">
+            <name locale="en_US">VCCINT@94</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-96.52" uuid="{075611ee-f503-4f05-b71b-d2f280f7a18f}">
+            <name locale="en_US">VCCINT@95</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-99.06" uuid="{6994d8a6-4db7-4d9b-9d55-04ad93c87a61}">
+            <name locale="en_US">VCCINT@96</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-101.6" uuid="{2ec4d791-58e9-455a-8ea2-763ae1a8fca3}">
+            <name locale="en_US">VCCINT@97</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-104.14" uuid="{182b48f7-a6c3-4e18-bb41-ff650f9881b3}">
+            <name locale="en_US">VCCINT@98</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-106.68" uuid="{c977669c-b879-436a-b2d4-bcc2d9046454}">
+            <name locale="en_US">VCCINT@99</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-109.22" uuid="{d8007d39-afb1-4c5f-8c47-1684f79181cb}">
+            <name locale="en_US">VCCINT@100</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-111.76" uuid="{d4956474-1409-403b-bbb3-db81e0b9c333}">
+            <name locale="en_US">VCCINT@101</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-114.3" uuid="{e70de770-76cb-4e7a-8dbb-11d0ba3adf2c}">
+            <name locale="en_US">VCCINT@102</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-116.84" uuid="{3da1234c-2cbc-4c32-ab44-03ab6c8fc892}">
+            <name locale="en_US">VCCINT@103</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-119.38" uuid="{89a41ded-00da-4536-b93d-f45377fb164f}">
+            <name locale="en_US">VCCINT@104</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-121.92" uuid="{88c916e2-786d-4007-b7a8-710f9bf521c8}">
+            <name locale="en_US">VCCINT@105</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-124.46" uuid="{6972b9c8-cf3f-492e-a14a-375f91cc97bc}">
+            <name locale="en_US">VCCINT@106</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-127" uuid="{f0ba289f-18bd-4564-ab91-4f06c2fd430d}">
+            <name locale="en_US">VCCINT@107</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-129.54" uuid="{8bbc6976-24b9-4d7c-9c5c-b43edf2821c3}">
+            <name locale="en_US">VCCINT@108</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-132.08" uuid="{af470e8c-6d34-437b-89a7-5e19ba44a305}">
+            <name locale="en_US">VCCINT@109</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-134.62" uuid="{ecf9ee50-86bf-412d-a816-922dbd554fff}">
+            <name locale="en_US">VCCINT@110</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-137.16" uuid="{f9cac007-071f-4958-88a8-9ab30fd128e3}">
+            <name locale="en_US">VCCINT@111</name>
+        </pin>
+        <pin x="33.02" length="5.08" angle="180" y="-139.7" uuid="{cfc02c16-967b-406a-9ec2-75a864ffb884}">
+            <name locale="en_US">VCCINT@112</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,64 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{2bb1cee0-ef1d-4884-8032-6f69f77fa727}</uuid>
+        <name locale="en_US">RCV420</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="17.78" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="15.24" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="15.24" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="-12.7" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-12.7" end_y="17.78"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="2.54" angle="0" y="5.08" uuid="{a6b83e75-23a8-409e-8215-f7dbb91783f3}">
+            <name locale="en_US">-IN</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-5.08" uuid="{8d63f17d-fa4c-47c7-be01-f604247496f5}">
+            <name locale="en_US">+IN</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="0" uuid="{b485d6c4-c45b-4be1-8470-7f5dd23a8fa6}">
+            <name locale="en_US">CT</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-10.16" uuid="{c91a4664-0d31-4b53-a4a8-62784cbb5f72}">
+            <name locale="en_US">RCVCOM</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-15.24" uuid="{77a89234-cc09-4879-87c2-50d224f7b51b}">
+            <name locale="en_US">REFCOM</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="15.24" uuid="{1254f4d9-0149-46af-baa8-23612a44957e}">
+            <name locale="en_US">V+</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-15.24" uuid="{6a07486c-732f-4c53-828f-daa58599284c}">
+            <name locale="en_US">V-</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="10.16" uuid="{45c9fc9e-85a8-434d-a030-aaf9582cb4c1}">
+            <name locale="en_US">REFIN</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="15.24" uuid="{2537f481-9e1c-4fdc-aab0-aad6a0b3a9cf}">
+            <name locale="en_US">RCVFB</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="10.16" uuid="{16c4f364-987e-4df2-8c79-24b8cba64659}">
+            <name locale="en_US">RCVOUT</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="5.08" uuid="{0cb1fd08-be8d-4c6b-888d-cff47d1a2cea}">
+            <name locale="en_US">REFOUT</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="0" uuid="{7488d7b3-fc2c-4910-a057-40e3f9e37278}">
+            <name locale="en_US">REFFB</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-5.08" uuid="{a3f00749-ebf4-4a70-a983-9a2a114ddc1e}">
+            <name locale="en_US">REFTRIMM</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-10.16" uuid="{5737075c-19f0-40b5-a9c6-1d8fbc4e44a1}">
+            <name locale="en_US">REFNOISE</name>
+        </pin>
+    </pins>
+</symbol>

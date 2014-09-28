@@ -1,0 +1,64 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{94fd0674-aec9-4a7d-8547-39184fc51d2e}</uuid>
+        <name locale="en_US">74608</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-15.24" width="0.4064" layer="10" start_x="-12.7">
+            <segment type="line" end_x="12.7" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-15.24" width="0.4064" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.4064" layer="10" start_x="12.7">
+            <segment type="line" end_x="-12.7" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.4064" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-12.7" end_y="-15.24"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-17.78" length="5.08" angle="0" y="-12.7" uuid="{bd643978-da49-48bb-bcda-b60bbc0147d1}">
+            <name locale="en_US">PRECHRG</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="10.16" uuid="{a564797d-ee9e-4397-b227-5aed88069eaf}">
+            <name locale="en_US">P/!N</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="0" uuid="{51ac6f68-08f5-482b-add4-a0a9ed1bd729}">
+            <name locale="en_US">R/!W_I</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-10.16" uuid="{d0359b08-3289-4aa7-b085-05c95912829a}">
+            <name locale="en_US">R/!W_O</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="7.62" uuid="{5f68a90e-7e18-424d-8c08-f142864d6752}">
+            <name locale="en_US">RAS_EN</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="5.08" uuid="{7c6ee514-8789-4270-a921-9cc4238b227e}">
+            <name locale="en_US">!RAS</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-2.54" uuid="{77adf179-2b44-4129-a1e1-741282bf043a}">
+            <name locale="en_US">!CAS</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="5.08" uuid="{f8ed7fad-a788-4bcc-b93f-757a06c4b044}">
+            <name locale="en_US">CAS/!HLD</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="12.7" uuid="{9f9147ac-a9b1-4418-b2cc-de163fb9f464}">
+            <name locale="en_US">ROW/!COL</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="-5.08" uuid="{e65363b2-4176-4e1e-acc7-b98211391642}">
+            <name locale="en_US">RC_RAH</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="12.7" uuid="{2f93a159-5905-47e7-9a41-287749b61d9c}">
+            <name locale="en_US">START</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="2.54" uuid="{21aa47df-8f4b-4db0-a58c-27a56f578fe9}">
+            <name locale="en_US">REFRESH</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="-7.62" uuid="{e1633a7f-8d15-4844-a956-6959b888bb96}">
+            <name locale="en_US">RC/CAS</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="-2.54" uuid="{ccc37201-75fa-4820-8bfd-328aae6fa14b}">
+            <name locale="en_US">RMW</name>
+        </pin>
+    </pins>
+</symbol>

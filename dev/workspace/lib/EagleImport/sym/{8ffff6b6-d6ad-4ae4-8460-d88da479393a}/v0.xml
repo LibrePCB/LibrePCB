@@ -1,0 +1,28 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{8ffff6b6-d6ad-4ae4-8460-d88da479393a}</uuid>
+        <name locale="en_US">JFET_N</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-3.81" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="3.81"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.905" width="0.254" layer="10" start_x="-1.524">
+            <segment type="line" end_x="-0.254" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.254" layer="10" start_x="-0.254">
+            <segment type="line" end_x="-1.524" end_y="-3.175"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{9b98ad63-33f8-42b9-8a5e-e24ff80c9c7e}">
+            <name locale="en_US">G</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="2.54" uuid="{03b976c9-fd4f-42f5-b2b4-3cab2a872fdb}">
+            <name locale="en_US">D</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-2.54" uuid="{e052d8e2-e55d-4d80-a94a-b527e33876a6}">
+            <name locale="en_US">S</name>
+        </pin>
+    </pins>
+</symbol>

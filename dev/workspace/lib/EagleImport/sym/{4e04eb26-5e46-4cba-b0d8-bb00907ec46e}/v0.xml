@@ -1,0 +1,34 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{4e04eb26-5e46-4cba-b0d8-bb00907ec46e}</uuid>
+        <name locale="en_US">COMMON4</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-5.842" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.254" layer="10" start_x="-5.842">
+            <segment type="line" end_x="-5.842" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-5.842" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2.54" angle="90" y="-5.08" uuid="{8d902c7f-7799-49fc-839f-9563ed7f6edd}">
+            <name locale="en_US">COM@1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="90" y="-5.08" uuid="{e50dcf4d-1f59-4938-9459-0677af026f6b}">
+            <name locale="en_US">COM@2</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-5.08" uuid="{d29d1ff6-80d8-4b6f-adf9-7e25021f8a2d}">
+            <name locale="en_US">COM@3</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-5.08" uuid="{a5f5cc8d-a14b-4fd2-8b2d-4de4ea488d52}">
+            <name locale="en_US">COM@4</name>
+        </pin>
+    </pins>
+</symbol>

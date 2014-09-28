@@ -1,0 +1,61 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{d55e165d-36db-42e6-b7b9-d2e75825fcb3}</uuid>
+        <name locale="en_US">IXP-GPIO</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-40.64"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{a8bae379-9244-454f-b7f3-147e81c22f9b}">
+            <name locale="en_US">GPIO0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{a7cfa0fa-505d-4004-8a23-a92571be786f}">
+            <name locale="en_US">GPIO1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{5c63fa73-209c-448e-8984-b44e6be2ced0}">
+            <name locale="en_US">GPIO2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{c10e0917-6a5f-435c-a20f-c639fe7a030c}">
+            <name locale="en_US">GPIO3</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{f280d440-f6c8-4e92-9ff6-ab8b72f68d2a}">
+            <name locale="en_US">GPIO4</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{0ad80d1b-68e2-441b-bfa5-7a907dfb22c9}">
+            <name locale="en_US">GPIO5</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{69fd7212-a3ea-4126-a8aa-6407c0eadbcc}">
+            <name locale="en_US">GPIO6</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{6ceae5cb-c267-44de-9ef6-749b599607cd}">
+            <name locale="en_US">GPIO7</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{abfb8ca5-6cd7-4f94-a5be-6ad1ee75454c}">
+            <name locale="en_US">GPIO8</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{d403490d-9504-4409-92ec-0d7c01cc969a}">
+            <name locale="en_US">GPIO9</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{c41ae4c8-c07a-4211-906c-4bbfc574c7e5}">
+            <name locale="en_US">GPIO10</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{e985afb8-fd1d-41b4-ba7b-142011afe10d}">
+            <name locale="en_US">GPIO11</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{6b51168b-55ce-4129-92fa-fb7270c06ab8}">
+            <name locale="en_US">GPIO12</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-33.02" uuid="{41b3296a-a567-48f8-a6ba-1a5e2588ce61}">
+            <name locale="en_US">GPIO13</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-35.56" uuid="{387f5423-5ddf-43d9-a553-4b3485e2522a}">
+            <name locale="en_US">GPIO14</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-38.1" uuid="{4566ea09-4050-4c42-899e-f9e9811e280f}">
+            <name locale="en_US">GPIO15</name>
+        </pin>
+    </pins>
+</symbol>

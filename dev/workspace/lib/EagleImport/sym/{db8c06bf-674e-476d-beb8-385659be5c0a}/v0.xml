@@ -1,0 +1,15 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{db8c06bf-674e-476d-beb8-385659be5c0a}</uuid>
+        <name locale="en_US">APWR</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-7.62" uuid="{45a7636a-2b47-4dcc-82a2-4c126fe22349}">
+            <name locale="en_US">VAGND</name>
+        </pin>
+        <pin x="0" length="2.54" angle="270" y="7.62" uuid="{e26ddcb9-4766-4c9b-a493-2164566016ab}">
+            <name locale="en_US">VAREF</name>
+        </pin>
+    </pins>
+</symbol>

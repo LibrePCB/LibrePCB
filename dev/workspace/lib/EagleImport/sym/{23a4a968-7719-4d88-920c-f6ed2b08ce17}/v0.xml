@@ -1,0 +1,37 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{23a4a968-7719-4d88-920c-f6ed2b08ce17}</uuid>
+        <name locale="en_US">IXP-UART</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-22.86"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{10fdedba-71b3-4ed6-9ed3-9ad1d0e7946f}">
+            <name locale="en_US">RXDATA0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{cc9c711f-9618-4ac6-9ece-698cb3332bc9}">
+            <name locale="en_US">TXDATA0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{9650a799-e076-4a30-b105-14b27626cea7}">
+            <name locale="en_US">CTS0_N</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{e34e546a-e6ca-4857-8fa4-a729bd51caf0}">
+            <name locale="en_US">RTS0_N</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{3f3fbd24-6ecd-4d10-beb7-5662cd9868a6}">
+            <name locale="en_US">RXDATA1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{453c988f-5398-42e8-a6fd-35165b6686bd}">
+            <name locale="en_US">TXDATA1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{89957334-031f-439a-8281-1d0a41571e22}">
+            <name locale="en_US">CTS1_N</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{7dece268-4a81-4c8e-a062-f09c84ef250b}">
+            <name locale="en_US">RTS1_N</name>
+        </pin>
+    </pins>
+</symbol>

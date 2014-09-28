@@ -1,0 +1,82 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{b6f68051-e7a6-424f-b6df-6d89f732878c}</uuid>
+        <name locale="en_US">PCM1718</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-17.78" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="-10.16" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="7.62" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-17.78"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="5.08" angle="0" y="15.24" uuid="{cf5fe74f-ad5f-453a-8d8d-e9517013c40e}">
+            <name locale="en_US">DIN</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="7.62" uuid="{c4acf02b-0078-49fa-9daf-f9f6163f6766}">
+            <name locale="en_US">XTI</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="5.08" uuid="{720506e0-27f4-4ef9-b683-21be60514889}">
+            <name locale="en_US">LRCIN</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="2.54" uuid="{3034e883-cf51-4e25-b0ef-4025f619b635}">
+            <name locale="en_US">BCKIN</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="0" uuid="{bef5a2d5-8a5b-4d7f-8504-1577eb11c6f7}">
+            <name locale="en_US">FOR</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-2.54" uuid="{00db1b49-433b-4d37-bf4b-83219eebc537}">
+            <name locale="en_US">DM0</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-5.08" uuid="{2cc731b3-f82a-409d-acb7-c8e64a7289af}">
+            <name locale="en_US">DM1</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-7.62" uuid="{b5aaedac-8fab-4f0f-b4ec-739b4084c55a}">
+            <name locale="en_US">MUTE</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-10.16" uuid="{a8a66ba7-887b-435a-aa70-c40739c411c7}">
+            <name locale="en_US">RSTB</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="7.62" uuid="{7000f515-aa87-4e21-b3f6-8846a5a7d91f}">
+            <name locale="en_US">XTO</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="5.08" uuid="{0401a927-47b1-4e5e-8651-4c39302c1bda}">
+            <name locale="en_US">ZERO</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="2.54" uuid="{a2d09d71-5cec-428e-8d0e-484602620c70}">
+            <name locale="en_US">CLKO</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="15.24" uuid="{75edf645-67c0-407c-ba77-3f0bf6cd0d29}">
+            <name locale="en_US">OUTR</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="12.7" uuid="{eb6d4a16-091e-4a7b-bd19-a810ce1a87ec}">
+            <name locale="en_US">OUTL</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-2.54" uuid="{b24936b0-9e9a-447a-8c4e-9dbe3ee19923}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-5.08" uuid="{25549018-db23-412b-a070-1b8a54467ab0}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-7.62" uuid="{3f5b063c-4efe-45d7-b6f5-1cafdd607d0a}">
+            <name locale="en_US">AGND</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-10.16" uuid="{c6cdbdfb-78bc-404b-9f3e-5577c01499f5}">
+            <name locale="en_US">DGND</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-12.7" uuid="{c631d087-4429-4255-af14-09f467890f5c}">
+            <name locale="en_US">D/C_R</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-15.24" uuid="{1d01b6b1-f3bc-4612-81e0-60c90bdec1c2}">
+            <name locale="en_US">D/C_L</name>
+        </pin>
+    </pins>
+</symbol>

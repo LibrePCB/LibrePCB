@@ -1,0 +1,25 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{8d3e7e2e-4a5f-4cdf-aa88-592a5ab349ee}</uuid>
+        <name locale="en_US">VBB</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="7.62" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="0" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{81b010fb-ce32-4d4c-9079-1b547c19dc4d}">
+            <name locale="en_US">VBB</name>
+        </pin>
+    </pins>
+</symbol>

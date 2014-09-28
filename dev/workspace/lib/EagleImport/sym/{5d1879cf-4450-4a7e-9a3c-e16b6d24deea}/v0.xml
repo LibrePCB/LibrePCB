@@ -1,0 +1,58 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{5d1879cf-4450-4a7e-9a3c-e16b6d24deea}</uuid>
+        <name locale="en_US">DAC0808D</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-17.78" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="-17.78"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="12.7" length="2.54" angle="180" y="12.7" uuid="{66fefab1-7e15-472c-aafb-e88bcb2d63d0}">
+            <name locale="en_US">IOUT</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="12.7" uuid="{506f846e-64ec-4f0e-9efe-0b9a3e231122}">
+            <name locale="en_US">A1</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="10.16" uuid="{1b50156b-02f2-4402-96e8-fc598b6ac907}">
+            <name locale="en_US">A2</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="7.62" uuid="{1a6669be-8a4c-4569-b23b-cb92c874554f}">
+            <name locale="en_US">A3</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{e144c2dd-07e3-4270-bccd-c2dc720df2d2}">
+            <name locale="en_US">A4</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{06e38391-0d32-4792-9dd6-3cd8a251130f}">
+            <name locale="en_US">A5</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{d1399119-840e-4931-8274-44470e62b623}">
+            <name locale="en_US">A6</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{29aceaec-4c98-46b7-b02c-c98bfed3194e}">
+            <name locale="en_US">A7</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{ab8272d1-d5d2-45c7-a547-ce06a3bbb02a}">
+            <name locale="en_US">A8</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-10.16" uuid="{88669986-d591-43d3-afcf-8bf49ddd6318}">
+            <name locale="en_US">VREF+</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-15.24" uuid="{0c7da260-ed5e-4235-b8a9-15d665595c54}">
+            <name locale="en_US">VREF-</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-10.16" uuid="{2fc7d7b1-1403-40d1-8d58-75bd29b91f28}">
+            <name locale="en_US">COMP</name>
+        </pin>
+    </pins>
+</symbol>

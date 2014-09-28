@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{26580d13-156a-40bd-a9d5-70c8b7a2bf29}</uuid>
+        <name locale="en_US">MC9S12-PF</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="-5.08" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="2.54" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="5.08" length="2.54" angle="180" y="7.62" uuid="{7289d753-eb28-4225-868d-fa398fba390b}">
+            <name locale="en_US">PF0</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="5.08" uuid="{a44228dd-15ff-4c95-bef9-3b16147be68e}">
+            <name locale="en_US">PF1</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="2.54" uuid="{4e92adaf-ab71-4ba7-b119-444b4158982d}">
+            <name locale="en_US">PF2</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="0" uuid="{c34090f2-5a77-4d47-99aa-3ec92e5cb06e}">
+            <name locale="en_US">PF3</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="-2.54" uuid="{e0526036-b852-4c65-b511-90776fa556eb}">
+            <name locale="en_US">PF4</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="-5.08" uuid="{858273f6-6b0a-45f5-90ec-681f5470b8a9}">
+            <name locale="en_US">PF5</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="-7.62" uuid="{bf5ef790-6767-42a0-bbdc-ad1382f60a5f}">
+            <name locale="en_US">PF6</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="-10.16" uuid="{ee33fd3e-1870-48d6-a965-791fe59b32ec}">
+            <name locale="en_US">PF7</name>
+        </pin>
+    </pins>
+</symbol>

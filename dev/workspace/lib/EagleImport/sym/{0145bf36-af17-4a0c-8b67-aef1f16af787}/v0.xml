@@ -1,0 +1,25 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{0145bf36-af17-4a0c-8b67-aef1f16af787}</uuid>
+        <name locale="en_US">MAF</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-0.889" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="1.27">
+            <segment type="line" end_x="2.54" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0.889" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-0.889"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.6096" layer="10" start_x="0">
+            <segment type="line" end_x="1.27" end_y="0"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="5.08" length="2.54" angle="180" y="0" uuid="{50ed9507-f1d5-4e7a-ba20-c867bdaad3b6}">
+            <name locale="en_US">SV</name>
+        </pin>
+    </pins>
+</symbol>

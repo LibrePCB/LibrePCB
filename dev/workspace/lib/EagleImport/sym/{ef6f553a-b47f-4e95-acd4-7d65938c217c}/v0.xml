@@ -1,0 +1,85 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{ef6f553a-b47f-4e95-acd4-7d65938c217c}</uuid>
+        <name locale="en_US">AN23</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-59.69"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="-58.42" uuid="{f5214d23-8636-4444-ba81-749f60c0d8df}">
+            <name locale="en_US">AN0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-55.88" uuid="{5958da69-9ebe-4b09-a0b7-364ef4db29e3}">
+            <name locale="en_US">AN1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-53.34" uuid="{4ba0f9ae-bde5-4fc2-81e0-0f2e54b21d89}">
+            <name locale="en_US">AN2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-50.8" uuid="{1270f515-f7c3-480a-93c0-3a6989a90a22}">
+            <name locale="en_US">AN3</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-48.26" uuid="{127986e6-7315-4175-aba0-09ee2390fcda}">
+            <name locale="en_US">AN4</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-45.72" uuid="{7e97df8f-81c9-4178-b7d8-af3af2780f1a}">
+            <name locale="en_US">AN5</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-43.18" uuid="{089cee95-3ff4-4f0c-a223-1e922ea1fc15}">
+            <name locale="en_US">AN6</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-40.64" uuid="{8771566e-a9bc-4ad0-a6a1-df9dab950fd1}">
+            <name locale="en_US">AN7</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-38.1" uuid="{183f6709-4ad9-4b22-b3ab-afbea16254cb}">
+            <name locale="en_US">AN8</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-35.56" uuid="{17a1a2e7-d688-41fd-9392-e0c32a22f0f3}">
+            <name locale="en_US">AN9</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-33.02" uuid="{2dd791d7-8bd8-46d8-9bfe-0bb963befdc1}">
+            <name locale="en_US">AN10</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{0d05fba3-4cc5-4741-9241-2481d3224de5}">
+            <name locale="en_US">AN11</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{3b776e13-ff0d-44b4-b12f-acb6b3f2d09a}">
+            <name locale="en_US">AN12</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{7217a4e4-67ff-4831-991f-9633be18858b}">
+            <name locale="en_US">AN13</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{5d0f8f4b-0326-4793-a206-5a9e6de3c625}">
+            <name locale="en_US">AN14</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{fd3f9dac-dcb1-4d0d-b5e1-d1626f4a9512}">
+            <name locale="en_US">AN15</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{d0ea1055-143e-49de-a18d-65da299af442}">
+            <name locale="en_US">AN16</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{6a34abda-48c7-4279-8f42-e86a6265c5b5}">
+            <name locale="en_US">AN17</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{7857897b-45c8-46a0-8eb8-a2fd385b9b60}">
+            <name locale="en_US">AN18</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{c8a5180b-163a-4809-8fe4-34e582c485ec}">
+            <name locale="en_US">AN19</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{be5c5d32-2334-4050-b220-995529da6531}">
+            <name locale="en_US">AN20</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{8bf1e30e-d860-4748-a0fd-fa9a7da00813}">
+            <name locale="en_US">AN21</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{78a387fd-d661-4bb4-aa8b-2eb19aa4ee56}">
+            <name locale="en_US">AN22</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{9adabbde-3145-4f42-97f0-ff2f8b4e2850}">
+            <name locale="en_US">AN23</name>
+        </pin>
+    </pins>
+</symbol>

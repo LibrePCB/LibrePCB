@@ -1,0 +1,103 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{13f59b5f-eefb-413d-b0ff-799b63595e98}</uuid>
+        <name locale="en_US">XC5VLX110T_FF1738-IO-AK</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="12.7" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-68.58"/>
+        </polygon>
+        <polygon fill="false" start_y="-68.58" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="0" end_y="-68.58"/>
+        </polygon>
+        <polygon fill="false" start_y="-68.58" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{dab7c549-b281-4963-8396-d6317b141aff}">
+            <name locale="en_US">IO_AK5</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{3ff3c783-096d-47ac-b495-188188a9cb55}">
+            <name locale="en_US">IO_AK7</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{310a6767-8509-4761-80c5-07f7ca2898ef}">
+            <name locale="en_US">IO_AK8</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{97868fc5-f02d-4bcf-aa0c-1414e117ec37}">
+            <name locale="en_US">IO_AK9</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{70600c79-0b47-47fc-92bb-73308750119d}">
+            <name locale="en_US">IO_AK10</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{3715f060-0ed0-4c0f-8d44-95cfdefdfc0e}">
+            <name locale="en_US">IO_AK12</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{8fa003ce-6730-4988-a1c9-3b5006d7a036}">
+            <name locale="en_US">IO_AK13</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{e8669e96-b409-4a58-bb1f-2c9ccc01c447}">
+            <name locale="en_US">IO_AK14</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{5c0912fd-1226-421b-a24a-7c1f0a1bf0d0}">
+            <name locale="en_US">IO_AK15</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{4a6cf795-c097-42a1-9158-85ab1a70614e}">
+            <name locale="en_US">IO_AK17</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{9bcd9a07-48ba-49c6-ae99-36e4e560d001}">
+            <name locale="en_US">IO_AK18</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{39df1056-01ba-4280-9708-1b069f9e0aaf}">
+            <name locale="en_US">IO_AK19</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{9d602063-e555-4392-8eb8-970da4451b97}">
+            <name locale="en_US">IO_AK24</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-33.02" uuid="{41fe6099-cd8f-437e-b609-4e29ab7ce0fa}">
+            <name locale="en_US">IO_AK25</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-35.56" uuid="{9de1d08c-4fc0-411d-bb32-a6e942bd435b}">
+            <name locale="en_US">IO_AK27</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-38.1" uuid="{c9939178-76bd-4a7e-8b4c-1a84c78cb6fa}">
+            <name locale="en_US">IO_AK28</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-40.64" uuid="{626bfcb0-a6d6-4fa3-8bbd-5a72363980e5}">
+            <name locale="en_US">IO_AK29</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-43.18" uuid="{69d4865d-e6c3-4114-89fb-adde18f728ca}">
+            <name locale="en_US">IO_AK30</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-45.72" uuid="{d5759adb-c777-4a61-b394-7f430bcc6749}">
+            <name locale="en_US">IO_AK32</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-48.26" uuid="{26b43325-ea40-4b4a-afb4-a06278278ad7}">
+            <name locale="en_US">IO_AK33</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-50.8" uuid="{5ce805d5-67f5-4799-9324-ab96bfd45dbf}">
+            <name locale="en_US">IO_AK34</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-53.34" uuid="{56a68158-2127-4efd-9c60-834af6210825}">
+            <name locale="en_US">IO_AK35</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-55.88" uuid="{be9826ca-441f-4914-b111-4a6275013490}">
+            <name locale="en_US">IO_AK37</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-58.42" uuid="{71917521-aac4-4457-9c68-4b76ae5b744f}">
+            <name locale="en_US">IO_AK38</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-60.96" uuid="{d783c14b-12e3-4018-a711-53616fb459ad}">
+            <name locale="en_US">IO_AK39</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-63.5" uuid="{a4205a50-f3a5-418b-a5dc-33bdb5bbe782}">
+            <name locale="en_US">IO_AK40</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-66.04" uuid="{406e1cb8-ad90-401a-b666-40f172ffd4d6}">
+            <name locale="en_US">IO_AK42</name>
+        </pin>
+    </pins>
+</symbol>

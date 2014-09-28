@@ -1,0 +1,55 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{27da8cbf-8f2c-401b-a8c1-baafe3f82def}</uuid>
+        <name locale="en_US">THERMO</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-2.54" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="0" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="-2.54" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="-2.54" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="0" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="-1.27">
+            <segment type="line" end_x="-1.27" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.635" width="0.1524" layer="10" start_x="-3.81">
+            <segment type="line" end_x="-3.81" end_y="-1.905"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.1524" layer="10" start_x="-4.445">
+            <segment type="line" end_x="-3.175" end_y="-1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{07eefd73-8347-4d32-bb6d-4c0304a469c6}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="180" y="0" uuid="{d5f0b898-9672-47d0-9352-5721aa17e0de}">
+            <name locale="en_US">2</name>
+        </pin>
+    </pins>
+</symbol>

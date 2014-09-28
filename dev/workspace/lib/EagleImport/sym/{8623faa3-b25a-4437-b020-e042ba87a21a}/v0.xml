@@ -1,0 +1,64 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{8623faa3-b25a-4437-b020-e042ba87a21a}</uuid>
+        <name locale="en_US">MAX807</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="20.32" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="12.7" end_y="20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="20.32" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="-12.7" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-12.7" end_y="20.32"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="2.54" angle="0" y="17.78" uuid="{fbeefa98-9d23-4b7c-95e9-db9aa83aafd9}">
+            <name locale="en_US">BATT</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="0" uuid="{7b99ddda-f666-451a-bc22-cea3461f6fe9}">
+            <name locale="en_US">PFI</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-15.24" uuid="{e23731fd-973a-451c-8225-692029625f23}">
+            <name locale="en_US">!CEIN</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="17.78" uuid="{132c3a9b-e8f4-4d1e-b6bc-0908de502bbc}">
+            <name locale="en_US">OUT</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="12.7" uuid="{7dcb72fd-aaa2-4c85-a20c-ad48cd71061d}">
+            <name locale="en_US">BATT_ON</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="5.08" uuid="{559c2407-6599-4db3-9264-a8b1961e4d06}">
+            <name locale="en_US">!LOWLINE</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="10.16" uuid="{2685a0b9-dc01-422d-a360-58e008a332e5}">
+            <name locale="en_US">BATT_OK</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="0" uuid="{c3efc016-b3b3-4b8d-8cd9-a79248a25158}">
+            <name locale="en_US">!PFO</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-15.24" uuid="{548a980e-e32a-47c9-b901-69a152c138e1}">
+            <name locale="en_US">!CEOUT</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-5.08" uuid="{cc255f9a-805c-4fbd-89bd-3185d0e42e2c}">
+            <name locale="en_US">RESET</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-7.62" uuid="{e0d1cb3b-e6d3-474a-98fd-53d5641fb73d}">
+            <name locale="en_US">!RESET</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-10.16" uuid="{f7b76729-72b4-4de6-b874-48e14a60ec28}">
+            <name locale="en_US">!WDO</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-5.08" uuid="{486b5bd8-9df5-4433-9b2e-71baa81d15f8}">
+            <name locale="en_US">!MR</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-10.16" uuid="{d9c1c174-9956-49e6-aa00-5d2b6b447627}">
+            <name locale="en_US">WDI</name>
+        </pin>
+    </pins>
+</symbol>

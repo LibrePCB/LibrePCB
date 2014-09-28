@@ -1,0 +1,28 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{006591cb-5ce8-4fc2-bc08-bc45ba057428}</uuid>
+        <name locale="en_US">MF</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="1.016" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="1.651" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="3.429"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.6096" layer="10" start_x="0">
+            <segment type="line" end_x="1.27" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="1.27" end_y="-2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="5.08" length="2.54" angle="180" y="2.54" uuid="{b37d7562-17a4-4341-a6d5-df4b1b4a4955}">
+            <name locale="en_US">B</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="-2.54" uuid="{f06c6e06-3f6b-49ab-9ce1-acfa5d7bd220}">
+            <name locale="en_US">S</name>
+        </pin>
+    </pins>
+</symbol>

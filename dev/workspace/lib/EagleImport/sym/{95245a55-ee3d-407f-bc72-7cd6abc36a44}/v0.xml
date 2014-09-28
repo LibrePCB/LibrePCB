@@ -1,0 +1,40 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{95245a55-ee3d-407f-bc72-7cd6abc36a44}</uuid>
+        <name locale="en_US">LM2574</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="7.62" uuid="{80151b8a-49b1-4fdd-bd78-fafbe3de112c}">
+            <name locale="en_US">IN</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="5.08" uuid="{5f7fe6ff-31b5-460d-a6ad-81ef4c58d81b}">
+            <name locale="en_US">OUT</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="90" y="-12.7" uuid="{77c4f909-7a39-40bd-b39d-f37d685172d9}">
+            <name locale="en_US">GND@PWR</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="7.62" uuid="{682cd021-08e0-4c1f-8170-5cd2688b6f48}">
+            <name locale="en_US">FB</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="90" y="-12.7" uuid="{ed98cfd1-4b3f-4f29-ab17-420f9be7b4d8}">
+            <name locale="en_US">!ON/OFF</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-12.7" uuid="{eb2c50d2-84c6-4bf4-88a6-3889ded3434e}">
+            <name locale="en_US">GNDSIG</name>
+        </pin>
+    </pins>
+</symbol>

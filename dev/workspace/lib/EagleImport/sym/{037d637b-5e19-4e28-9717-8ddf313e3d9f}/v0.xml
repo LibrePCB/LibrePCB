@@ -1,0 +1,61 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{037d637b-5e19-4e28-9717-8ddf313e3d9f}</uuid>
+        <name locale="en_US">F16</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-39.37" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{61b1f12c-8890-48b2-baaf-c4b9614124e1}">
+            <name locale="en_US">IOF1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{03c4aefa-aa0b-48a2-a285-39a6d4e385a8}">
+            <name locale="en_US">IOF2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{ad4c62c4-4898-4aa6-bfff-96dfff20eac7}">
+            <name locale="en_US">IOF3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{7b0cb59c-582a-4da1-84d6-fe91e8f45053}">
+            <name locale="en_US">IOF4</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{5f1c6476-b4b7-48e5-b1b1-cf46f6a95963}">
+            <name locale="en_US">IOF5</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{6133b69d-ba89-493a-b243-2be6fd7ef975}">
+            <name locale="en_US">IOF6</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-15.24" uuid="{24a98688-6bca-4918-8d0b-67de4382954b}">
+            <name locale="en_US">IOF7</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-17.78" uuid="{44250d80-e00e-4937-a3d2-af7b6e450d4c}">
+            <name locale="en_US">IOF8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-20.32" uuid="{26b9c856-2704-4558-a110-4268bb10b07b}">
+            <name locale="en_US">IOF9</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-22.86" uuid="{46b06d56-bc38-4e77-ab60-c7ff81994217}">
+            <name locale="en_US">IOF10</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-25.4" uuid="{06a7cd04-2a0d-4bc2-9222-f503ffb22695}">
+            <name locale="en_US">IOF11</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-27.94" uuid="{6fdfd859-e061-4a65-89cd-c6a32b404dfe}">
+            <name locale="en_US">IOF12</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-30.48" uuid="{b8a454ea-718c-4cd0-a50e-4516cbaafc2a}">
+            <name locale="en_US">IOF13</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-33.02" uuid="{4d37bceb-2a29-4633-99ad-7c6e4ea9cb29}">
+            <name locale="en_US">IOF14</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-35.56" uuid="{d0209f9a-0445-44e3-84e4-2960842a66c0}">
+            <name locale="en_US">IOF15</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-38.1" uuid="{cc215016-e75a-4e89-8b44-d6ea38add603}">
+            <name locale="en_US">IOF16</name>
+        </pin>
+    </pins>
+</symbol>

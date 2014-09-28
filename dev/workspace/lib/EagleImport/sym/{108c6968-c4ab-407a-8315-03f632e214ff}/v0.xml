@@ -1,0 +1,88 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{108c6968-c4ab-407a-8315-03f632e214ff}</uuid>
+        <name locale="en_US">XC5VLX110T_FF1738-IO-AT</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="12.7" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-55.88"/>
+        </polygon>
+        <polygon fill="false" start_y="-55.88" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="0" end_y="-55.88"/>
+        </polygon>
+        <polygon fill="false" start_y="-55.88" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{1521961f-737e-40af-b1ba-7df7cdac45f0}">
+            <name locale="en_US">IO_AT5</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{4ca18735-c0d9-465b-86a3-43e48f531fcf}">
+            <name locale="en_US">IO_AT6</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{f25d092e-f190-425b-a1bf-497c21f94a7d}">
+            <name locale="en_US">IO_AT7</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{ddab8c74-8a54-4a3c-a50b-5095f3106b08}">
+            <name locale="en_US">IO_AT14</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{1551c322-7e19-4bb7-b274-969c113809cf}">
+            <name locale="en_US">IO_AT15</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{b7044b4e-606c-4058-8013-ba85f290640a}">
+            <name locale="en_US">IO_AT16</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{06f62dab-38ce-40d3-be2a-592c6cb7c6d1}">
+            <name locale="en_US">IO_AT17</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{3b700213-465f-4271-aaf1-d5709f136dcb}">
+            <name locale="en_US">IO_AT19</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{deebe212-69c5-4c5f-973d-65c09b9f54ed}">
+            <name locale="en_US">IO_AT26</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{077a1cde-b288-4733-a5a3-7a7e3eb7d431}">
+            <name locale="en_US">IO_AT27</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{c1eb8c26-d461-4752-9ada-73769c7c4771}">
+            <name locale="en_US">IO_AT29</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{cd335868-6b75-49c8-9009-2dc3674fd0e9}">
+            <name locale="en_US">IO_AT30</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{18d28e06-6bda-497f-ba82-2678c98837aa}">
+            <name locale="en_US">IO_AT31</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-33.02" uuid="{9e94aca7-46bf-4698-95da-9df81351af49}">
+            <name locale="en_US">IO_AT32</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-35.56" uuid="{67aa80b6-fb41-47d2-94e7-4c39de8a3af8}">
+            <name locale="en_US">IO_AT34</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-38.1" uuid="{249ab96f-ee69-4f23-b37d-f34531d5b612}">
+            <name locale="en_US">IO_AT35</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-40.64" uuid="{0c65273c-33db-4744-9b60-390247b14dc4}">
+            <name locale="en_US">IO_AT36</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-43.18" uuid="{74031b33-2cfb-44c9-8e58-bad259a476d4}">
+            <name locale="en_US">IO_AT37</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-45.72" uuid="{89c45e66-16ff-4679-8ebf-aac78c28bcfd}">
+            <name locale="en_US">IO_AT39</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-48.26" uuid="{d2bf5bd5-f823-4452-be46-513ad7367aba}">
+            <name locale="en_US">IO_AT40</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-50.8" uuid="{79cca0f1-f28e-4541-a3f3-383668008b79}">
+            <name locale="en_US">IO_AT41</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-53.34" uuid="{bcb65144-9de6-4b09-9749-f0dd2eb580d2}">
+            <name locale="en_US">IO_AT42</name>
+        </pin>
+    </pins>
+</symbol>

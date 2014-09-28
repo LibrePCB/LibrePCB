@@ -1,0 +1,45 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{14ea10ec-bf8d-41ca-9fcd-ad8507cf9f0c}</uuid>
+        <name locale="en_US">D1V5</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0.635" width="0.4064" layer="10" start_x="-1.905">
+            <segment type="line" end_x="-1.905" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-3.81">
+            <segment type="line" end_x="-1.905" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.4064" layer="10" start_x="-1.905">
+            <segment type="line" end_x="-1.905" end_y="-0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.4064" layer="10" start_x="-0.635">
+            <segment type="line" end_x="-0.635" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.4064" layer="10" start_x="-0.635">
+            <segment type="line" end_x="-0.635" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-0.635">
+            <segment type="line" end_x="0.635" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0.635" width="0.254" layer="10" start_x="1.905">
+            <segment type="line" end_x="1.905" end_y="-0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="0.635" width="0.254" layer="10" start_x="-4.445">
+            <segment type="line" end_x="-4.445" end_y="-0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.6096" layer="10" start_x="0.635">
+            <segment type="line" end_x="1.27" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.6096" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.715" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="5.08" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-5.715" end_y="0"/>
+        </polygon>
+    </geometry>
+    <pins/>
+</symbol>

@@ -1,0 +1,40 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{f8c4f0a2-e57e-4f18-9203-c7a88c43573c}</uuid>
+        <name locale="en_US">SHIELD_2</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="3.81" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="3.81">
+            <segment type="line" end_x="5.08" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="5.08" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="16.51" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="3.81" end_y="16.51"/>
+        </polygon>
+        <polygon fill="false" start_y="16.51" width="0.254" layer="10" start_x="3.81">
+            <segment type="line" end_x="5.08" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="90" y="-2.54" uuid="{06091cb1-5e15-4430-9659-85b73e1fd340}">
+            <name locale="en_US">S1</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-2.54" uuid="{bb3ba5f6-7909-46b6-a6f4-46ade43c01fc}">
+            <name locale="en_US">S2</name>
+        </pin>
+    </pins>
+</symbol>

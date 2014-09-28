@@ -1,0 +1,49 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{3abe9157-73d2-437d-ae40-2b9374eb7eb3}</uuid>
+        <name locale="en_US">IGBT-P</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="1.016" end_y="-1.778"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.778" width="0.1524" layer="10" start_x="1.016">
+            <segment type="line" end_x="0" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="-0.889">
+            <segment type="line" end_x="-0.889" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-0.889" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.778" width="0.1524" layer="10" start_x="1.016">
+            <segment type="line" end_x="1.651" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.778" width="0.1524" layer="10" start_x="1.016">
+            <segment type="line" end_x="2.032" end_y="-1.778"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2.54" angle="0" y="-2.54" uuid="{08883997-fc84-486c-92f9-5081df25d860}">
+            <name locale="en_US">G</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-5.08" uuid="{702d21c0-881f-4588-9475-a9ad3a9930d7}">
+            <name locale="en_US">E</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="270" y="5.08" uuid="{db5e1479-8ee4-431a-b637-d99812613a39}">
+            <name locale="en_US">C</name>
+        </pin>
+    </pins>
+</symbol>

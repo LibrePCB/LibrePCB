@@ -1,0 +1,34 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{6388b7ad-cef2-46f1-ad86-aabc4454b8f4}</uuid>
+        <name locale="en_US">SWSPSTNI</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.4064" layer="10" start_x="-0.1524">
+            <segment type="line" end_x="-5.08" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-0.1524" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.4064" layer="10" start_x="5.588">
+            <segment type="line" end_x="5.588" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="0.635">
+            <segment type="line" end_x="4.445" end_y="0"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="10.16" length="2.54" angle="180" y="2.54" uuid="{2feda604-5290-4390-8764-6f2f08536300}">
+            <name locale="en_US">D</name>
+        </pin>
+        <pin x="-10.16" length="5.08" angle="0" y="0" uuid="{71ac6bb0-fc1b-482e-80a0-927a68f3d402}">
+            <name locale="en_US">IN</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-2.54" uuid="{d834a9b2-5fe3-4daa-82cc-98267315cd4c}">
+            <name locale="en_US">S</name>
+        </pin>
+    </pins>
+</symbol>

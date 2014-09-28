@@ -1,0 +1,34 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{295a4fe2-ece1-44d1-ac8c-ddd9379dedaf}</uuid>
+        <name locale="en_US">BNC-MGND</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="-0.762" end_y="-1.778"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="-0.508" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.3048" layer="10" start_x="-2.54">
+            <segment type="line" end_x="0" end_y="0.508"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.3048" layer="10" start_x="-2.54">
+            <segment type="line" end_x="0" end_y="-0.508"/>
+        </polygon>
+        <polygon fill="true" start_y="-0.254" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-0.254" end_y="-0.254"/>
+            <segment type="line" end_x="-0.254" end_y="0.254"/>
+            <segment type="line" end_x="-2.54" end_y="0.254"/>
+            <segment type="line" end_x="-2.54" end_y="-0.254"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="2.54" length="2.54" angle="180" y="0" uuid="{26efc91b-c574-43f8-bc33-8fc9bfd0d92b}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="180" y="-2.54" uuid="{3ec24f3e-4dc4-4b31-a21f-2736b785542a}">
+            <name locale="en_US">2</name>
+        </pin>
+    </pins>
+</symbol>

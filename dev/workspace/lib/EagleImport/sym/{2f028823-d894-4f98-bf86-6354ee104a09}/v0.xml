@@ -1,0 +1,31 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{2f028823-d894-4f98-bf86-6354ee104a09}</uuid>
+        <name locale="en_US">L4</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-13.97" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{8225bfca-8b73-4e96-9938-15decb75117c}">
+            <name locale="en_US">L4DAT0</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{13aa2789-c3eb-4210-8c63-b2e0bda52635}">
+            <name locale="en_US">L4DAT1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{fbed91a5-0f48-4726-9b9b-affa4fbe7470}">
+            <name locale="en_US">L4DAT2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{5fa3117c-4d03-460b-b610-28bbc49f2bd1}">
+            <name locale="en_US">L4DAT3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{206455a6-15a5-41cd-9cc1-567e482fa9d0}">
+            <name locale="en_US">L4CLK</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{5ea72aed-69c0-47cc-b9ee-19f532473f6d}">
+            <name locale="en_US">L4ACK</name>
+        </pin>
+    </pins>
+</symbol>

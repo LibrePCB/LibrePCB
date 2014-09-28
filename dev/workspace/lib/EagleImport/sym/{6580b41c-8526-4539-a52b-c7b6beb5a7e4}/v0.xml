@@ -1,0 +1,31 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{6580b41c-8526-4539-a52b-c7b6beb5a7e4}</uuid>
+        <name locale="en_US">MCP1525</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="5.08"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="2.54" uuid="{55bb0eb7-3ef8-4add-8394-e423300c595a}">
+            <name locale="en_US">VIN</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="2.54" uuid="{9d691e6e-6a42-4172-af64-9e724aa0a89f}">
+            <name locale="en_US">VO</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-2.54" uuid="{0a368289-f954-4e3c-9182-622df31d8b02}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

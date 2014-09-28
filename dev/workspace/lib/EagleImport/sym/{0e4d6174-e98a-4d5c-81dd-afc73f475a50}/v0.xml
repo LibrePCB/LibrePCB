@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{0e4d6174-e98a-4d5c-81dd-afc73f475a50}</uuid>
+        <name locale="en_US">HCS410</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="7.62" uuid="{76e7f77b-1cf1-4b42-92a8-efa79b537d4f}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-7.62" uuid="{1dcf3fb2-2ca9-4810-9a19-164ffb611da1}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{600b8742-1d35-41ff-924f-93fd524ef0da}">
+            <name locale="en_US">S0</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{5ffdb125-1b15-47b0-be44-1354d9c1ecf8}">
+            <name locale="en_US">S1</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="2.54" uuid="{327b2805-ccb2-40d2-8a92-3711fa447f70}">
+            <name locale="en_US">LC0</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="0" uuid="{4daaef32-9348-4bf7-948f-3e3d7d50e88a}">
+            <name locale="en_US">LC1</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{2da3befc-1012-4df8-82a8-d332546261bb}">
+            <name locale="en_US">S2/LED</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-5.08" uuid="{2becc54c-0309-4a90-9a75-71fbd52f0ddd}">
+            <name locale="en_US">PWM</name>
+        </pin>
+    </pins>
+</symbol>

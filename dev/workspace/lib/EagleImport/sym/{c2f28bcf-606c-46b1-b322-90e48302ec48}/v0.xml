@@ -1,0 +1,18 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{c2f28bcf-606c-46b1-b322-90e48302ec48}</uuid>
+        <name locale="en_US">PWR+-GR</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="0" length="2.54" angle="270" y="10.16" uuid="{5a017c42-e771-409d-a7c0-203560a25d20}">
+            <name locale="en_US">V+</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-10.16" uuid="{b65566d4-74e9-47ff-9a55-4e71908bcc9a}">
+            <name locale="en_US">V-</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{edffa4da-656f-4053-be7a-8ee86517c294}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

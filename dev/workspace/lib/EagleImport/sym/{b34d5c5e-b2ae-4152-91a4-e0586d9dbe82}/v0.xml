@@ -1,0 +1,34 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{b34d5c5e-b2ae-4152-91a4-e0586d9dbe82}</uuid>
+        <name locale="en_US">PHOTODIODE</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="1.905">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="-1.905" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="-1.905">
+            <segment type="line" end_x="1.905" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.397" width="0.254" layer="10" start_x="-1.905">
+            <segment type="line" end_x="1.905" end_y="1.397"/>
+        </polygon>
+        <polygon fill="false" start_y="1.016" width="0.1524" layer="10" start_x="-3.556">
+            <segment type="line" end_x="-4.572" end_y="2.032"/>
+        </polygon>
+        <polygon fill="false" start_y="1.778" width="0.1524" layer="10" start_x="-2.794">
+            <segment type="line" end_x="-3.81" end_y="2.794"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-2.54" uuid="{a3132879-4da6-48ed-bb69-3c00206d173a}">
+            <name locale="en_US">A</name>
+        </pin>
+        <pin x="0" length="2.54" angle="270" y="2.54" uuid="{1c063036-e018-46aa-93f1-64544043a6ec}">
+            <name locale="en_US">C</name>
+        </pin>
+    </pins>
+</symbol>

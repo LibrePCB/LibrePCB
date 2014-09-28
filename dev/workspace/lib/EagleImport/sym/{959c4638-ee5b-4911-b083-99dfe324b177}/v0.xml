@@ -1,0 +1,73 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{959c4638-ee5b-4911-b083-99dfe324b177}</uuid>
+        <name locale="en_US">DF1700</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="17.78" width="0.1524" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.1524" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="-20.32" width="0.1524" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="-20.32" width="0.1524" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="17.78"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{dba90051-719c-4377-90b3-7698e37cfebb}">
+            <name locale="en_US">SDI</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="7.62" uuid="{c210ea76-1ca1-4f4c-b2e9-0ee924506115}">
+            <name locale="en_US">BCKI</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="15.24" uuid="{4fdfcb5f-1d65-4442-8b38-acb7881e1819}">
+            <name locale="en_US">CKSL</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-17.78" uuid="{5f723689-e14e-4d5f-aae4-36bc1cc49aa6}">
+            <name locale="en_US">CKDV</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="10.16" uuid="{13d9f610-674a-4eff-8bff-7da386d6e1c2}">
+            <name locale="en_US">XTI</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-15.24" uuid="{7ca7fd10-25a0-47c3-b996-aefe543f1838}">
+            <name locale="en_US">VSS</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-15.24" uuid="{44b09c18-2102-4daa-8855-514e5623fcbf}">
+            <name locale="en_US">SYN</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-12.7" uuid="{864f8ea9-e989-4f91-b587-952087debc96}">
+            <name locale="en_US">RST</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{4b796dd3-9d94-413e-8058-f83c4629b05f}">
+            <name locale="en_US">/OW20</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-7.62" uuid="{59c59514-3057-4147-857b-ac93d53f61d3}">
+            <name locale="en_US">/OW18</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-17.78" uuid="{d53241a2-153f-43c4-8c72-d454e3362aed}">
+            <name locale="en_US">VSS@2</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="15.24" uuid="{a4d2c77a-ed90-40e8-92b4-9227fe1c4ba1}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="2.54" uuid="{fc113263-fc10-4d69-b780-fe7815ba7925}">
+            <name locale="en_US">DOR</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-5.08" uuid="{d06ad625-8950-4bfd-9709-e439411d4d8f}">
+            <name locale="en_US">DOL</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-2.54" uuid="{6853a60c-4483-47dc-8b6c-8b579924c080}">
+            <name locale="en_US">WCKO</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="0" uuid="{7bfd31a9-502a-4194-8b8a-709355378bef}">
+            <name locale="en_US">BCKO</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{56b45661-432c-4954-b14b-8ee929df9c8f}">
+            <name locale="en_US">LRCI</name>
+        </pin>
+    </pins>
+</symbol>

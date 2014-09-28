@@ -1,0 +1,322 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{a41c37ce-00b7-4830-b643-144e5fb3ba65}</uuid>
+        <name locale="en_US">EXP-100</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-62.23"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="22.86">
+            <segment type="line" end_x="22.86" end_y="-62.23"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="45.72">
+            <segment type="line" end_x="45.72" end_y="-62.23"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="68.58">
+            <segment type="line" end_x="68.58" end_y="-62.23"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{ac4eb775-a7db-432e-8daa-3651954b11dc}">
+            <name locale="en_US">EXP@1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{cae948f4-c2ae-480b-86a7-31d634836e61}">
+            <name locale="en_US">EXP@2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{103cffd5-17dc-47f3-ad98-fc3b17929eb9}">
+            <name locale="en_US">EXP@3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{feb5603e-ac99-4ba6-a00f-52c740ae024d}">
+            <name locale="en_US">EXP@4</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{4956632d-fcc2-4931-b77a-cc8a39f341f0}">
+            <name locale="en_US">EXP@5</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{47a1de1a-cf62-4719-9f27-fc03422bd56f}">
+            <name locale="en_US">EXP@6</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-15.24" uuid="{39fd741f-2b52-4cfa-8a2e-09313800e2ae}">
+            <name locale="en_US">EXP@7</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-17.78" uuid="{12e92a4e-4bd6-4d0a-82ff-16782eae661f}">
+            <name locale="en_US">EXP@8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-20.32" uuid="{bada360e-7e24-413b-b276-1573c1e54522}">
+            <name locale="en_US">EXP@9</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-22.86" uuid="{11579be4-5284-4b51-92f3-887bc318167d}">
+            <name locale="en_US">EXP@10</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-25.4" uuid="{e4944f29-9d95-4fe8-ba17-a4d6b1dc44fd}">
+            <name locale="en_US">EXP@11</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-27.94" uuid="{66f926f9-c717-4622-a269-4d4c1434de96}">
+            <name locale="en_US">EXP@12</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-30.48" uuid="{9ec05bac-8fd2-4c88-afdb-41e4c6bdf0bb}">
+            <name locale="en_US">EXP@13</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-33.02" uuid="{c5958575-0bf2-41a1-aa18-6e99d6d1ffa7}">
+            <name locale="en_US">EXP@14</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-35.56" uuid="{0db9e86f-5d38-4d47-98ea-73155f9b093c}">
+            <name locale="en_US">EXP@15</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-38.1" uuid="{cd1d3f2c-f5e0-4222-a09f-6880dbc87372}">
+            <name locale="en_US">EXP@16</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-40.64" uuid="{d8adac3e-73dd-4484-b432-5d028e0c57b5}">
+            <name locale="en_US">EXP@17</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-43.18" uuid="{7cd2d527-c412-4789-884a-71839b3c173c}">
+            <name locale="en_US">EXP@18</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-45.72" uuid="{4b5bb41a-e4a5-4200-bcb8-2fe35485f836}">
+            <name locale="en_US">EXP@19</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-48.26" uuid="{9ac6b07c-a2f5-4079-afe9-620eaaf6d784}">
+            <name locale="en_US">EXP@20</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-50.8" uuid="{06108815-2d1f-456b-89f1-59b744e029aa}">
+            <name locale="en_US">EXP@21</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-53.34" uuid="{4ed5ff7c-ab96-45da-ba9b-8cef2b180945}">
+            <name locale="en_US">EXP@22</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-55.88" uuid="{8abdc6b2-1483-4491-ae79-8e0c977eaf3f}">
+            <name locale="en_US">EXP@23</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-58.42" uuid="{30095537-b13a-4533-b06a-51fea05623f6}">
+            <name locale="en_US">EXP@24</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-60.96" uuid="{390a4a36-9817-4b54-ac7a-7c4e646e6fa8}">
+            <name locale="en_US">EXP@25</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="0" y="0" uuid="{4c4c6d62-b3ba-4535-929f-dc8736327f76}">
+            <name locale="en_US">EXP@26</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="0" y="-2.54" uuid="{0f65883a-be54-48f7-a4d6-36f10fa6b936}">
+            <name locale="en_US">EXP@27</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="0" y="-5.08" uuid="{8c5284ed-69b2-4d13-b89b-6622a9819a10}">
+            <name locale="en_US">EXP@28</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="0" y="-7.62" uuid="{7c788e03-f36e-4d85-9384-99af84d91151}">
+            <name locale="en_US">EXP@29</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="0" y="-10.16" uuid="{f15a7ae9-5c1c-4e61-8c3b-4a601d7cb759}">
+            <name locale="en_US">EXP@30</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="0" y="-12.7" uuid="{9494bb0d-aad3-4022-a5d8-572c9344dd47}">
+            <name locale="en_US">EXP@31</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="0" y="-15.24" uuid="{dd2daf15-872c-44b2-a7e7-860e318ecdd7}">
+            <name locale="en_US">EXP@32</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="0" y="-17.78" uuid="{da44a252-3dff-4e09-91fa-4c4566afcd90}">
+            <name locale="en_US">EXP@33</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="0" y="-20.32" uuid="{d75437a0-8c22-4778-a67d-0f638ba643ca}">
+            <name locale="en_US">EXP@34</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="0" y="-22.86" uuid="{5e8b58d7-e9e5-4e59-b835-4f78cf41d08a}">
+            <name locale="en_US">EXP@35</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="0" y="-25.4" uuid="{a9dc9bba-83a1-444c-b2f5-2455cb863e51}">
+            <name locale="en_US">EXP@36</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="0" y="-27.94" uuid="{95a9ce6c-5133-45ba-b179-570ae10cfa3c}">
+            <name locale="en_US">EXP@37</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="0" y="-30.48" uuid="{13c8d009-ddc8-4190-8643-38e3aafe35ff}">
+            <name locale="en_US">EXP@38</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="0" y="-33.02" uuid="{82967bfe-19c2-4414-a8b4-b84a6a4f21e4}">
+            <name locale="en_US">EXP@39</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="0" y="-35.56" uuid="{f050980e-ee9e-4868-9eeb-62d6a28671ef}">
+            <name locale="en_US">EXP@40</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="0" y="-38.1" uuid="{42e9d7ad-af6e-4646-8322-bde570d54de1}">
+            <name locale="en_US">EXP@41</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="0" y="-40.64" uuid="{40dbb9fd-86d3-458e-b39e-257269fb1a36}">
+            <name locale="en_US">EXP@42</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="0" y="-43.18" uuid="{3eeca60e-e753-4b49-b50d-9ba6ab37f142}">
+            <name locale="en_US">EXP@43</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="0" y="-45.72" uuid="{18349ffb-f3f5-421e-83e5-06af10e48392}">
+            <name locale="en_US">EXP@44</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="0" y="-48.26" uuid="{b557b82a-b00f-4c7d-a79c-3c38277ff0c4}">
+            <name locale="en_US">EXP@45</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="0" y="-50.8" uuid="{fe5e3c93-4f71-41d7-be49-f5481ece9434}">
+            <name locale="en_US">EXP@46</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="0" y="-53.34" uuid="{2b8c4f55-0343-4a61-b262-863e19567b45}">
+            <name locale="en_US">EXP@47</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="0" y="-55.88" uuid="{331a33ac-38c4-4e4b-adf3-b03dda6eb7e8}">
+            <name locale="en_US">EXP@48</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="0" y="-58.42" uuid="{de19ee79-b27e-45a4-a0ac-1392a434ecbf}">
+            <name locale="en_US">EXP@49</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="0" y="-60.96" uuid="{98932634-687c-4aa2-a9ba-0c2bbb78b103}">
+            <name locale="en_US">EXP@50</name>
+        </pin>
+        <pin x="43.18" length="2.54" angle="0" y="0" uuid="{3429b08c-a257-4ccc-a696-4310edd4ef72}">
+            <name locale="en_US">EXP@51</name>
+        </pin>
+        <pin x="43.18" length="2.54" angle="0" y="-2.54" uuid="{98677895-2f0e-4a54-baa4-cf80e34f661b}">
+            <name locale="en_US">EXP@52</name>
+        </pin>
+        <pin x="43.18" length="2.54" angle="0" y="-5.08" uuid="{4dcc2c5b-c8b5-4225-aca9-ecdfcb57c174}">
+            <name locale="en_US">EXP@53</name>
+        </pin>
+        <pin x="43.18" length="2.54" angle="0" y="-7.62" uuid="{4f1c3da9-d74d-4a72-ab03-778c31b8fd00}">
+            <name locale="en_US">EXP@54</name>
+        </pin>
+        <pin x="43.18" length="2.54" angle="0" y="-10.16" uuid="{d4278313-10e5-4b8e-8df7-4b439944520f}">
+            <name locale="en_US">EXP@55</name>
+        </pin>
+        <pin x="43.18" length="2.54" angle="0" y="-12.7" uuid="{3718b093-dc95-47b5-b18b-3e2ea68246db}">
+            <name locale="en_US">EXP@56</name>
+        </pin>
+        <pin x="43.18" length="2.54" angle="0" y="-15.24" uuid="{2b62bf11-a367-41d1-9be5-ebb080f5f364}">
+            <name locale="en_US">EXP@57</name>
+        </pin>
+        <pin x="43.18" length="2.54" angle="0" y="-17.78" uuid="{bebf6d59-e182-4abf-8cbe-184fdac10973}">
+            <name locale="en_US">EXP@58</name>
+        </pin>
+        <pin x="43.18" length="2.54" angle="0" y="-20.32" uuid="{4cb5e419-b19b-4fb3-ac33-2fc94134001c}">
+            <name locale="en_US">EXP@59</name>
+        </pin>
+        <pin x="43.18" length="2.54" angle="0" y="-22.86" uuid="{9b4428b6-25e8-418e-9779-d43d60a60469}">
+            <name locale="en_US">EXP@60</name>
+        </pin>
+        <pin x="43.18" length="2.54" angle="0" y="-25.4" uuid="{ca661334-6839-42b0-857d-680c4bb5239f}">
+            <name locale="en_US">EXP@61</name>
+        </pin>
+        <pin x="43.18" length="2.54" angle="0" y="-27.94" uuid="{14f7c1df-d27a-47ab-8b03-0dca0db6632b}">
+            <name locale="en_US">EXP@62</name>
+        </pin>
+        <pin x="43.18" length="2.54" angle="0" y="-30.48" uuid="{5fe1e975-2815-49c3-9773-e3db2a972aea}">
+            <name locale="en_US">EXP@63</name>
+        </pin>
+        <pin x="43.18" length="2.54" angle="0" y="-33.02" uuid="{04990c00-d202-4237-ae60-a16346c5a7dc}">
+            <name locale="en_US">EXP@64</name>
+        </pin>
+        <pin x="43.18" length="2.54" angle="0" y="-35.56" uuid="{f277ca99-a42c-4c48-92d6-487a742f4770}">
+            <name locale="en_US">EXP@65</name>
+        </pin>
+        <pin x="43.18" length="2.54" angle="0" y="-38.1" uuid="{c1334a59-d0dd-4258-8d51-9f3dcd3b6a16}">
+            <name locale="en_US">EXP@66</name>
+        </pin>
+        <pin x="43.18" length="2.54" angle="0" y="-40.64" uuid="{163e64a5-9048-4f87-aa82-0775689693aa}">
+            <name locale="en_US">EXP@67</name>
+        </pin>
+        <pin x="43.18" length="2.54" angle="0" y="-43.18" uuid="{570b69f6-2980-494d-852c-7f16b27a014b}">
+            <name locale="en_US">EXP@68</name>
+        </pin>
+        <pin x="43.18" length="2.54" angle="0" y="-45.72" uuid="{64bad86b-3f2c-4141-a15f-b572102bf05a}">
+            <name locale="en_US">EXP@69</name>
+        </pin>
+        <pin x="43.18" length="2.54" angle="0" y="-48.26" uuid="{dbbe5437-6a3c-47c6-831f-452c958d1a1a}">
+            <name locale="en_US">EXP@70</name>
+        </pin>
+        <pin x="43.18" length="2.54" angle="0" y="-50.8" uuid="{30350e9d-f136-4582-b042-478dc6efc135}">
+            <name locale="en_US">EXP@71</name>
+        </pin>
+        <pin x="43.18" length="2.54" angle="0" y="-53.34" uuid="{9c47485b-dc54-4f96-bd08-144eeed03c31}">
+            <name locale="en_US">EXP@72</name>
+        </pin>
+        <pin x="43.18" length="2.54" angle="0" y="-55.88" uuid="{336fe1b2-a1f5-49d9-aa62-c68006594803}">
+            <name locale="en_US">EXP@73</name>
+        </pin>
+        <pin x="43.18" length="2.54" angle="0" y="-58.42" uuid="{e1490143-506e-4727-b471-e1c3202dddac}">
+            <name locale="en_US">EXP@74</name>
+        </pin>
+        <pin x="43.18" length="2.54" angle="0" y="-60.96" uuid="{63409747-12d0-4dcb-a57a-ef072a017d60}">
+            <name locale="en_US">EXP@75</name>
+        </pin>
+        <pin x="66.04" length="2.54" angle="0" y="0" uuid="{990ef533-7856-487f-a5d7-1f2f704abe15}">
+            <name locale="en_US">EXP@76</name>
+        </pin>
+        <pin x="66.04" length="2.54" angle="0" y="-2.54" uuid="{54d42490-9425-47d9-8e0b-962b03bd34c3}">
+            <name locale="en_US">EXP@77</name>
+        </pin>
+        <pin x="66.04" length="2.54" angle="0" y="-5.08" uuid="{fcecd34d-b5a4-411f-9fb1-762f7e5ce577}">
+            <name locale="en_US">EXP@78</name>
+        </pin>
+        <pin x="66.04" length="2.54" angle="0" y="-7.62" uuid="{5baddc71-ab93-4e68-8ad9-eed061d758e4}">
+            <name locale="en_US">EXP@79</name>
+        </pin>
+        <pin x="66.04" length="2.54" angle="0" y="-10.16" uuid="{25a5c051-550f-4144-b895-0e52291747e7}">
+            <name locale="en_US">EXP@80</name>
+        </pin>
+        <pin x="66.04" length="2.54" angle="0" y="-12.7" uuid="{d774bd04-46f5-4a06-b5ad-4f45e4b24712}">
+            <name locale="en_US">EXP@81</name>
+        </pin>
+        <pin x="66.04" length="2.54" angle="0" y="-15.24" uuid="{da6e3c81-5071-4aac-8e28-6bbdec52308a}">
+            <name locale="en_US">EXP@82</name>
+        </pin>
+        <pin x="66.04" length="2.54" angle="0" y="-17.78" uuid="{1f8a054f-9e5e-43d1-b66b-1c8fa775369f}">
+            <name locale="en_US">EXP@83</name>
+        </pin>
+        <pin x="66.04" length="2.54" angle="0" y="-20.32" uuid="{9032927a-31c1-4742-b252-64a395809dd4}">
+            <name locale="en_US">EXP@84</name>
+        </pin>
+        <pin x="66.04" length="2.54" angle="0" y="-22.86" uuid="{d75bfcc0-7d2d-4e38-a024-f94a9885535c}">
+            <name locale="en_US">EXP@85</name>
+        </pin>
+        <pin x="66.04" length="2.54" angle="0" y="-25.4" uuid="{b58b8ec7-4115-4896-9886-2f6f801a90b7}">
+            <name locale="en_US">EXP@86</name>
+        </pin>
+        <pin x="66.04" length="2.54" angle="0" y="-27.94" uuid="{e4b3bf8a-b13f-4204-b283-fa3d2dd2ad94}">
+            <name locale="en_US">EXP@87</name>
+        </pin>
+        <pin x="66.04" length="2.54" angle="0" y="-30.48" uuid="{ec62343e-3219-455f-bade-31227ca3dbcc}">
+            <name locale="en_US">EXP@88</name>
+        </pin>
+        <pin x="66.04" length="2.54" angle="0" y="-33.02" uuid="{e849603c-36f6-4f0b-a17f-83b1158e6cec}">
+            <name locale="en_US">EXP@89</name>
+        </pin>
+        <pin x="66.04" length="2.54" angle="0" y="-35.56" uuid="{995f7400-8eb6-4a46-a06d-fc6c17a4525c}">
+            <name locale="en_US">EXP@90</name>
+        </pin>
+        <pin x="66.04" length="2.54" angle="0" y="-38.1" uuid="{d77e4c50-a74a-443c-b1a8-43a5fe70fdae}">
+            <name locale="en_US">EXP@91</name>
+        </pin>
+        <pin x="66.04" length="2.54" angle="0" y="-40.64" uuid="{589d42fa-189c-454f-9ac3-8ece475110e0}">
+            <name locale="en_US">EXP@92</name>
+        </pin>
+        <pin x="66.04" length="2.54" angle="0" y="-43.18" uuid="{eb0bf261-c3e6-4360-ad61-aa101d9164ed}">
+            <name locale="en_US">EXP@93</name>
+        </pin>
+        <pin x="66.04" length="2.54" angle="0" y="-45.72" uuid="{6e6fcd9b-de46-482c-b21a-1e34e47e3053}">
+            <name locale="en_US">EXP@94</name>
+        </pin>
+        <pin x="66.04" length="2.54" angle="0" y="-48.26" uuid="{e1c58698-fb89-4d7a-b2f5-6ad1460e1519}">
+            <name locale="en_US">EXP@95</name>
+        </pin>
+        <pin x="66.04" length="2.54" angle="0" y="-50.8" uuid="{1da13bff-91b5-425b-b81d-38af27ed6121}">
+            <name locale="en_US">EXP@96</name>
+        </pin>
+        <pin x="66.04" length="2.54" angle="0" y="-53.34" uuid="{812c2600-e528-47c6-ad99-6d6d64f15116}">
+            <name locale="en_US">EXP@97</name>
+        </pin>
+        <pin x="66.04" length="2.54" angle="0" y="-55.88" uuid="{45899fd5-927c-4626-b249-ac8fb29b2a30}">
+            <name locale="en_US">EXP@98</name>
+        </pin>
+        <pin x="66.04" length="2.54" angle="0" y="-58.42" uuid="{01ff8757-0a69-4e4d-9bf2-ba0aa9d5085a}">
+            <name locale="en_US">EXP@99</name>
+        </pin>
+        <pin x="66.04" length="2.54" angle="0" y="-60.96" uuid="{af1eb78c-e74c-4419-9954-17860ffb3d1c}">
+            <name locale="en_US">EXP@100</name>
+        </pin>
+    </pins>
+</symbol>

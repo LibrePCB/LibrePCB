@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{8ec55702-8329-41cc-ac94-b86bccb28f3d}</uuid>
+        <name locale="en_US">7482</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="-7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="12.7" length="5.08" angle="180" y="5.08" uuid="{5457a385-ced9-4124-9c44-10fa8304feb6}">
+            <name locale="en_US">S1</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="5.08" uuid="{f3a5c52b-43d3-43ae-a782-7b658f4c63e9}">
+            <name locale="en_US">A1</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="0" uuid="{13621c15-5437-4a1c-8cec-25de722cc106}">
+            <name locale="en_US">B1</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-5.08" uuid="{2d28634a-95e3-4869-a8ac-3a7e1f672b50}">
+            <name locale="en_US">C0</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-5.08" uuid="{4b1ef69a-3d1e-40d6-9b1a-872cb6f4792a}">
+            <name locale="en_US">C2</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="2.54" uuid="{2efc36ea-72d5-4ac5-a601-3494abd007df}">
+            <name locale="en_US">S2</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-2.54" uuid="{0e4a7083-fd91-47ec-900d-829cedd76af9}">
+            <name locale="en_US">B2</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="2.54" uuid="{c3f80466-ba4e-4873-83cc-7a5464450dad}">
+            <name locale="en_US">A2</name>
+        </pin>
+    </pins>
+</symbol>

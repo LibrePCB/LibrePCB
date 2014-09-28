@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{64c48590-2e6c-421d-8cba-9a4bbc0d64e1}</uuid>
+        <name locale="en_US">MAX663</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-12.7" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="5.08" angle="0" y="7.62" uuid="{7563016b-95d7-4f33-ac73-6517c085762a}">
+            <name locale="en_US">SENSE</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-5.08" uuid="{ff5fa105-cc3a-41f3-8650-a849b84896c1}">
+            <name locale="en_US">VIN(POS)</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="2.54" uuid="{c6cf3116-9685-4c4c-9942-d064c7701fb4}">
+            <name locale="en_US">VTC</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="5.08" uuid="{12ebd7b3-da70-4748-8e0a-7c9b1ed33da5}">
+            <name locale="en_US">VOUT2</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-10.16" uuid="{24c85e56-04b7-461b-a1c8-610e86a256d8}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="2.54" uuid="{4ea99ecc-c014-45ec-8637-7f81ed17a519}">
+            <name locale="en_US">SHDN</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="7.62" uuid="{65614f8d-d231-44c1-93bc-92deb9ada72e}">
+            <name locale="en_US">VOUT1</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="0" uuid="{f4f4c061-e73d-45e5-8aeb-a0caaebc8a88}">
+            <name locale="en_US">VSET</name>
+        </pin>
+    </pins>
+</symbol>

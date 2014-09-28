@@ -1,0 +1,117 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{1a1527b5-2011-497d-b4c9-57e256163c1e}</uuid>
+        <name locale="en_US">THERM36</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="5.08" length="2.54" angle="90" y="-2.54" uuid="{8a85fe37-ae47-4fe3-96de-247df817bd20}">
+            <name locale="en_US">GND@20</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-2.54" uuid="{c57bc6e5-431d-48a8-9968-225d865433dd}">
+            <name locale="en_US">GND@19</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-2.54" uuid="{ee5a88ae-1845-4109-b9c6-c934e5f40b14}">
+            <name locale="en_US">GND@18</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="90" y="-2.54" uuid="{5384aa8d-f94f-42ff-9d4f-223e83d73b2a}">
+            <name locale="en_US">GND@17</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="90" y="-2.54" uuid="{ed4a6187-9bae-4421-b95b-4458e223aba7}">
+            <name locale="en_US">GND@16</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="90" y="-2.54" uuid="{6d27326b-785e-404d-a14f-66061d686886}">
+            <name locale="en_US">GND@15</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="90" y="-2.54" uuid="{8d6878ad-6e7c-4fb0-969e-f490be70c347}">
+            <name locale="en_US">GND@14</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="90" y="-2.54" uuid="{3251aa50-97ef-4814-a49c-dbe5e47cf823}">
+            <name locale="en_US">GND@13</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="90" y="-2.54" uuid="{ba602b75-e2a6-4a4a-a7c2-b9f33858b1f6}">
+            <name locale="en_US">GND@12</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="90" y="-2.54" uuid="{53980e27-7aba-4a5e-bae9-042aa212f666}">
+            <name locale="en_US">GND@11</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="90" y="-2.54" uuid="{b8caf392-7aae-417e-9828-6d2e962197cb}">
+            <name locale="en_US">GND@10</name>
+        </pin>
+        <pin x="-22.86" length="2.54" angle="90" y="-2.54" uuid="{681eca7d-1ffa-4d21-836e-857a6d693758}">
+            <name locale="en_US">GND@9</name>
+        </pin>
+        <pin x="-25.4" length="2.54" angle="90" y="-2.54" uuid="{5b62f0ca-dddd-47d0-bec8-53fab58d3412}">
+            <name locale="en_US">GND@8</name>
+        </pin>
+        <pin x="-27.94" length="2.54" angle="90" y="-2.54" uuid="{1f8a9dd1-68ed-47b1-a095-104d7d22a6bd}">
+            <name locale="en_US">GND@7</name>
+        </pin>
+        <pin x="-30.48" length="2.54" angle="90" y="-2.54" uuid="{387e850d-98b8-42dc-ba71-b30a024455cf}">
+            <name locale="en_US">GND@6</name>
+        </pin>
+        <pin x="-33.02" length="2.54" angle="90" y="-2.54" uuid="{c74ff407-1306-49d0-855d-6b2b3a74d16d}">
+            <name locale="en_US">GND@5</name>
+        </pin>
+        <pin x="-35.56" length="2.54" angle="90" y="-2.54" uuid="{187c47d3-a45f-4f84-be2f-97626f16a7a8}">
+            <name locale="en_US">GND@4</name>
+        </pin>
+        <pin x="-38.1" length="2.54" angle="90" y="-2.54" uuid="{4b12dadb-a821-41b3-9369-724ca992b063}">
+            <name locale="en_US">GND@3</name>
+        </pin>
+        <pin x="-40.64" length="2.54" angle="90" y="-2.54" uuid="{c132f9c5-c9a3-4ce7-81b7-04ed77755ebb}">
+            <name locale="en_US">GND@2</name>
+        </pin>
+        <pin x="-43.18" length="2.54" angle="90" y="-2.54" uuid="{7f97fe11-d36d-4196-b3e9-010770028ab9}">
+            <name locale="en_US">GND@1</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="90" y="-2.54" uuid="{9ab728b8-82db-4586-807a-2c4da947144f}">
+            <name locale="en_US">GND@21</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="90" y="-2.54" uuid="{395f9fcc-1b6d-480c-ac5c-6f461309723e}">
+            <name locale="en_US">GND@22</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="90" y="-2.54" uuid="{5fba8d1f-ea24-41e5-9114-7046174e9c3f}">
+            <name locale="en_US">GND@24</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="90" y="-2.54" uuid="{d59b6c85-722b-4669-ba75-4745d44054db}">
+            <name locale="en_US">GND@25</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="90" y="-2.54" uuid="{7d875803-6d81-478d-884a-1041ec15a639}">
+            <name locale="en_US">GND@26</name>
+        </pin>
+        <pin x="22.86" length="2.54" angle="90" y="-2.54" uuid="{49fb3e8f-fcfb-4a1b-b22f-c49c83c3d979}">
+            <name locale="en_US">GND@27</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="90" y="-2.54" uuid="{5d20a2c6-78ce-4381-941f-90001ecca95d}">
+            <name locale="en_US">GND@23</name>
+        </pin>
+        <pin x="25.4" length="2.54" angle="90" y="-2.54" uuid="{cc1be513-a0b1-447c-9d5a-9da7032f7ab2}">
+            <name locale="en_US">GND@28</name>
+        </pin>
+        <pin x="27.94" length="2.54" angle="90" y="-2.54" uuid="{39ad25ef-dea3-488c-b3ef-9289f4d32540}">
+            <name locale="en_US">GND@29</name>
+        </pin>
+        <pin x="30.48" length="2.54" angle="90" y="-2.54" uuid="{beb22baa-d706-4a07-8eb0-c92680f42474}">
+            <name locale="en_US">GND@30</name>
+        </pin>
+        <pin x="33.02" length="2.54" angle="90" y="-2.54" uuid="{a115dbab-0036-4a5d-aa3d-7c83584717f6}">
+            <name locale="en_US">GND@31</name>
+        </pin>
+        <pin x="35.56" length="2.54" angle="90" y="-2.54" uuid="{42622a5f-3aaf-4a48-b017-28177c2cc082}">
+            <name locale="en_US">GND@32</name>
+        </pin>
+        <pin x="38.1" length="2.54" angle="90" y="-2.54" uuid="{f5c3bd2d-559f-4a93-a320-2e897536448a}">
+            <name locale="en_US">GND@33</name>
+        </pin>
+        <pin x="40.64" length="2.54" angle="90" y="-2.54" uuid="{70b335e1-838e-4367-812d-8afb5712bca4}">
+            <name locale="en_US">GND@34</name>
+        </pin>
+        <pin x="43.18" length="2.54" angle="90" y="-2.54" uuid="{763bc460-e3fe-47b3-ab44-94055d4d78de}">
+            <name locale="en_US">GND@35</name>
+        </pin>
+        <pin x="45.72" length="2.54" angle="90" y="-2.54" uuid="{85a5c7e5-a3da-45dd-9d0c-07567f870e62}">
+            <name locale="en_US">GND@36</name>
+        </pin>
+    </pins>
+</symbol>

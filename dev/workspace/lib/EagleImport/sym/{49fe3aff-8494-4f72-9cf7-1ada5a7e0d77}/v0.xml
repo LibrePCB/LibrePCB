@@ -1,0 +1,43 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{49fe3aff-8494-4f72-9cf7-1ada5a7e0d77}</uuid>
+        <name locale="en_US">TPM10515</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="12.7" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="-7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="5.08" angle="0" y="2.54" uuid="{98102484-b56b-4508-b083-6285448a8478}">
+            <name locale="en_US">AC1</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-2.54" uuid="{03cb5ec8-d832-400e-ac0e-a82e651a367d}">
+            <name locale="en_US">AC2</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="5.08" uuid="{a73336cb-8c7b-4191-80fa-8c9031aa4e51}">
+            <name locale="en_US">+VDC1</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="2.54" uuid="{57124363-39c1-4217-8fea-71421e238068}">
+            <name locale="en_US">COM1</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="0" uuid="{59a15b78-5994-446d-a5f5-22f3a9ee43dc}">
+            <name locale="en_US">-VDC1</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-2.54" uuid="{8af92ddd-2c98-409d-a5de-93441bc3df7f}">
+            <name locale="en_US">+DC2</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-5.08" uuid="{d243e157-0bfd-4829-8968-154c17086bb7}">
+            <name locale="en_US">-VDC2</name>
+        </pin>
+    </pins>
+</symbol>

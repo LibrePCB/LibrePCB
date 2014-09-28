@@ -1,0 +1,52 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{91b29a06-5564-4c4d-aa0e-5caa86783e01}</uuid>
+        <name locale="en_US">LM336</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="5.08" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="5.08" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="5.08" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="-5.08" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="5.08">
+            <segment type="line" end_x="-5.08" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.1524" layer="10" start_x="0.254">
+            <segment type="line" end_x="1.016" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.1524" layer="10" start_x="1.016">
+            <segment type="line" end_x="1.016" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.1524" layer="10" start_x="1.016">
+            <segment type="line" end_x="1.778" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.032" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-0.635"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-7.62" length="2.54" angle="0" y="0" uuid="{6bcd503d-3f60-4c8b-bb68-a53ffd9cd6a9}">
+            <name locale="en_US">A</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="0" uuid="{7b81e07e-1cc1-4879-8a62-6535e5185655}">
+            <name locale="en_US">C</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-7.62" uuid="{f2f0e308-4e5c-499b-a970-d4a1370761b3}">
+            <name locale="en_US">ADJ</name>
+        </pin>
+    </pins>
+</symbol>

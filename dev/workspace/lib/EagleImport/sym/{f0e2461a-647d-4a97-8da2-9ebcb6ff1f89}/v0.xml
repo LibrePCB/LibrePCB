@@ -1,0 +1,28 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{f0e2461a-647d-4a97-8da2-9ebcb6ff1f89}</uuid>
+        <name locale="en_US">R1PV</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-0.762" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="2.54" end_y="-0.762"/>
+        </polygon>
+        <polygon fill="false" start_y="0.762" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="-2.54" end_y="0.762"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.762" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="0.762"/>
+        </polygon>
+        <polygon fill="false" start_y="0.762" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="-0.762"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{8f3ce1fe-562f-4f36-ade8-0766c182656e}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="0" uuid="{a8919e3a-58f3-40c4-9514-ce4168157a01}">
+            <name locale="en_US">2</name>
+        </pin>
+    </pins>
+</symbol>

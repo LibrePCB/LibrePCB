@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{c807cf7c-6ab0-4fd9-92e2-dea270a4f66c}</uuid>
+        <name locale="en_US">F168_P7</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="12.7">
+            <segment type="line" end_x="-5.08" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="12.7" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.4064" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="5.08" angle="0" y="7.62" uuid="{1492bf26-66da-49fd-8297-85f8782a281c}">
+            <name locale="en_US">!P7-0POUT0</name>
+        </pin>
+        <pin x="-10.16" length="5.08" angle="0" y="5.08" uuid="{15d83098-1410-4020-857e-e82fda13d218}">
+            <name locale="en_US">P7-1/POUT1</name>
+        </pin>
+        <pin x="-10.16" length="5.08" angle="0" y="2.54" uuid="{4f8d961b-14ba-4295-82d1-6c4aa4a1dd63}">
+            <name locale="en_US">P7-2/POUT2</name>
+        </pin>
+        <pin x="-10.16" length="5.08" angle="0" y="0" uuid="{d9281d12-2dcd-4260-9571-03fe0a3db861}">
+            <name locale="en_US">P7-3/POUT3</name>
+        </pin>
+        <pin x="-10.16" length="5.08" angle="0" y="-2.54" uuid="{5ab15e15-4d69-4197-b7ba-33dbc504866f}">
+            <name locale="en_US">P7-4/CC28</name>
+        </pin>
+        <pin x="-10.16" length="5.08" angle="0" y="-5.08" uuid="{8bdec4cf-7ee8-4716-bb1c-6bfb39a9eabd}">
+            <name locale="en_US">P7-5/CC29</name>
+        </pin>
+        <pin x="-10.16" length="5.08" angle="0" y="-7.62" uuid="{5125ec82-ad66-4745-9855-8597445381e4}">
+            <name locale="en_US">P7-6/CC30</name>
+        </pin>
+        <pin x="-10.16" length="5.08" angle="0" y="-10.16" uuid="{202396f6-63e7-4f80-8342-2beb15f2d0f7}">
+            <name locale="en_US">P7-7/CC31</name>
+        </pin>
+    </pins>
+</symbol>

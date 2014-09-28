@@ -1,0 +1,40 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{6d85e911-9cf4-44eb-be6f-ec962a5c8e65}</uuid>
+        <name locale="en_US">LP3966-ADJ</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="-7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="12.7" length="2.54" angle="180" y="2.54" uuid="{e7e7c91a-7178-4e85-94e1-31cc0e566d0a}">
+            <name locale="en_US">VOUT</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{8bf3302f-14c7-4925-a68e-33eec0d9a2ad}">
+            <name locale="en_US">!SD</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{befa9b6c-8928-4a90-aab7-df32fef6cd09}">
+            <name locale="en_US">VIN</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-2.54" uuid="{bce84d95-f1eb-4232-ae64-4119818109a7}">
+            <name locale="en_US">ADJ</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="90" y="-10.16" uuid="{46ffde21-b1c8-461e-b83a-7fcb6e0bdf29}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="90" y="-10.16" uuid="{4724512f-a691-4d15-b344-65cac05a5124}">
+            <name locale="en_US">GND@1</name>
+        </pin>
+    </pins>
+</symbol>

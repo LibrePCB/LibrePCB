@@ -1,0 +1,12 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{2245bda7-53c6-4f2c-a4fd-df39d29111bf}</uuid>
+        <name locale="en_US">SD5000/B</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{455c6e53-9609-4d33-868e-a604e34308e7}">
+            <name locale="en_US">B</name>
+        </pin>
+    </pins>
+</symbol>

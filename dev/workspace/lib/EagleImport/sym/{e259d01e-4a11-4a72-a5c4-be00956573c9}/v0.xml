@@ -1,0 +1,118 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{e259d01e-4a11-4a72-a5c4-be00956573c9}</uuid>
+        <name locale="en_US">STM8S105C4-32</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-22.86" width="0.254" layer="10" start_x="-30.48">
+            <segment type="line" end_x="27.94" end_y="-22.86"/>
+        </polygon>
+        <polygon fill="false" start_y="-22.86" width="0.254" layer="10" start_x="27.94">
+            <segment type="line" end_x="27.94" end_y="20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="20.32" width="0.254" layer="10" start_x="27.94">
+            <segment type="line" end_x="-30.48" end_y="20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="20.32" width="0.254" layer="10" start_x="-30.48">
+            <segment type="line" end_x="-30.48" end_y="-22.86"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-33.02" length="2.54" angle="0" y="17.78" uuid="{472f7271-1247-442d-b062-6dd8551664ab}">
+            <name locale="en_US">NRST</name>
+        </pin>
+        <pin x="-33.02" length="2.54" angle="0" y="15.24" uuid="{4502c14c-ee4e-4488-9e64-42af03026e71}">
+            <name locale="en_US">PA1/OSC</name>
+        </pin>
+        <pin x="-33.02" length="2.54" angle="0" y="12.7" uuid="{f80f6005-2ecb-4b97-b4ac-9304a152ed9e}">
+            <name locale="en_US">PA2/OSCOUT</name>
+        </pin>
+        <pin x="-33.02" length="2.54" angle="0" y="10.16" uuid="{891b0a69-07e6-45c0-9481-f306d3111a11}">
+            <name locale="en_US">VSS</name>
+        </pin>
+        <pin x="-33.02" length="2.54" angle="0" y="7.62" uuid="{376e44e5-da77-4ce1-9c76-19f06ef0d303}">
+            <name locale="en_US">VCAP</name>
+        </pin>
+        <pin x="-33.02" length="2.54" angle="0" y="5.08" uuid="{7673ddde-fada-478a-bd8c-0a6e5a517681}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="-33.02" length="2.54" angle="0" y="2.54" uuid="{7997ff20-6f98-49b0-9038-1eaf3b7197b9}">
+            <name locale="en_US">VDDIO_1</name>
+        </pin>
+        <pin x="-33.02" length="2.54" angle="0" y="0" uuid="{11a61f27-1709-4b3f-ae3f-18c8c300e080}">
+            <name locale="en_US">PF4/AIN12</name>
+        </pin>
+        <pin x="-33.02" length="2.54" angle="0" y="-2.54" uuid="{4979a6a1-df84-4496-b34f-fd74246fc9e1}">
+            <name locale="en_US">VDDA</name>
+        </pin>
+        <pin x="-33.02" length="2.54" angle="0" y="-5.08" uuid="{b0e8c117-2f7f-4bae-ad90-09e50986d917}">
+            <name locale="en_US">VSSA</name>
+        </pin>
+        <pin x="-33.02" length="2.54" angle="0" y="-7.62" uuid="{9cb27f8e-f97e-4752-aa60-b57d8c0ec844}">
+            <name locale="en_US">PB5/AIN5[I2C_SDA]</name>
+        </pin>
+        <pin x="-33.02" length="2.54" angle="0" y="-10.16" uuid="{c45957f6-9dfc-4d3f-b90a-af2a0d1a99d1}">
+            <name locale="en_US">PB4/AIN4[I2C_SCL]</name>
+        </pin>
+        <pin x="-33.02" length="2.54" angle="0" y="-12.7" uuid="{bae9c463-4225-494a-8571-c64bad66aee2}">
+            <name locale="en_US">PB3/AIN3[TIM1_ETR]</name>
+        </pin>
+        <pin x="-33.02" length="2.54" angle="0" y="-15.24" uuid="{4c6faa64-0db6-4a16-9c6b-01af15661b6c}">
+            <name locale="en_US">PB2/AIN2[TIM1_CH3N]</name>
+        </pin>
+        <pin x="-33.02" length="2.54" angle="0" y="-17.78" uuid="{970bb423-5533-4d53-994a-438213903bfb}">
+            <name locale="en_US">PB1/AIN1[TIM1_CH2N]</name>
+        </pin>
+        <pin x="-33.02" length="2.54" angle="0" y="-20.32" uuid="{ee9a929a-e4db-42dd-9184-3862dc062678}">
+            <name locale="en_US">PB0/AIN0[TIM1_CH1N]</name>
+        </pin>
+        <pin x="30.48" length="2.54" angle="180" y="-20.32" uuid="{aa5aa124-ad24-4b2e-a424-be6694191c13}">
+            <name locale="en_US">PE5/SPI_NSS</name>
+        </pin>
+        <pin x="30.48" length="2.54" angle="180" y="-17.78" uuid="{3e37172e-2c12-49d6-ae31-f7f0f243195f}">
+            <name locale="en_US">PC1/TIM1_CH1/UART2_CK</name>
+        </pin>
+        <pin x="30.48" length="2.54" angle="180" y="-15.24" uuid="{976cb39f-1df0-474e-a22c-7f058c3a0525}">
+            <name locale="en_US">PC2/TIM1_CH2</name>
+        </pin>
+        <pin x="30.48" length="2.54" angle="180" y="-12.7" uuid="{3ff5c077-6ec1-4639-aa80-9c998d3e8045}">
+            <name locale="en_US">PC3/TIM1_CH3</name>
+        </pin>
+        <pin x="30.48" length="2.54" angle="180" y="-10.16" uuid="{2243d45a-6994-4cef-b107-093917a75d5c}">
+            <name locale="en_US">PC4/TIM1_CH4</name>
+        </pin>
+        <pin x="30.48" length="2.54" angle="180" y="-7.62" uuid="{c9f43afe-a945-4ffa-8f77-05eb13d5f6ce}">
+            <name locale="en_US">PC5/SPI_SCK</name>
+        </pin>
+        <pin x="30.48" length="2.54" angle="180" y="-5.08" uuid="{0cfdf8dd-25f4-4848-877a-ab30f97121e3}">
+            <name locale="en_US">PC6/SPI_MOSI</name>
+        </pin>
+        <pin x="30.48" length="2.54" angle="180" y="-2.54" uuid="{8eec3749-38a3-47ac-8ed4-f4fd8f786a3c}">
+            <name locale="en_US">PC7/SPI_MISO</name>
+        </pin>
+        <pin x="30.48" length="2.54" angle="180" y="0" uuid="{f325d0d2-8198-461c-ae2d-d7ce46613152}">
+            <name locale="en_US">PD0/TIM3_CH2[TIM1_BKIN][CLK_CCO]</name>
+        </pin>
+        <pin x="30.48" length="2.54" angle="180" y="2.54" uuid="{35e1b9bb-fe96-40cd-9379-c8cf6dce730a}">
+            <name locale="en_US">PD1/SWIM</name>
+        </pin>
+        <pin x="30.48" length="2.54" angle="180" y="5.08" uuid="{8ede4314-f771-4139-95f4-05f042c0f291}">
+            <name locale="en_US">PD2/TIM3_CH1[TIM2_CH3]</name>
+        </pin>
+        <pin x="30.48" length="2.54" angle="180" y="7.62" uuid="{e48853ba-7e28-4589-b429-8b6d79119802}">
+            <name locale="en_US">PD3/TIM2_CH2[ADC_ETR]</name>
+        </pin>
+        <pin x="30.48" length="2.54" angle="180" y="10.16" uuid="{a1f25f69-029b-47d1-a46e-0f7b31cbe3f1}">
+            <name locale="en_US">PD4/TIM2_CH1[BEEP]</name>
+        </pin>
+        <pin x="30.48" length="2.54" angle="180" y="12.7" uuid="{11003c9c-159b-4bfc-925f-e5f224e03de4}">
+            <name locale="en_US">PD5/UART2_TX</name>
+        </pin>
+        <pin x="30.48" length="2.54" angle="180" y="15.24" uuid="{b6d64553-8133-4bff-b280-7f31a3f43581}">
+            <name locale="en_US">PD6/UART2_RX</name>
+        </pin>
+        <pin x="30.48" length="2.54" angle="180" y="17.78" uuid="{a7d07e8f-743c-46ef-b277-c31684979b9e}">
+            <name locale="en_US">PD7/TLI[TIM1_CH4]</name>
+        </pin>
+    </pins>
+</symbol>

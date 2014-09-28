@@ -1,0 +1,43 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{55b00617-c862-4e5c-a91f-f1f829a526e7}</uuid>
+        <name locale="en_US">PHOTOCELL</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.413" width="0.1524" layer="10" start_x="-3.048">
+            <segment type="line" end_x="-1.651" end_y="1.016"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.1524" layer="10" start_x="-3.175">
+            <segment type="line" end_x="-1.778" end_y="-0.127"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="-1.016" end_y="-1.905"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.143" width="0.254" layer="10" start_x="1.016">
+            <segment type="line" end_x="-1.016" end_y="-0.381"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.381" width="0.254" layer="10" start_x="-1.016">
+            <segment type="line" end_x="1.016" end_y="0.381"/>
+        </polygon>
+        <polygon fill="false" start_y="0.381" width="0.254" layer="10" start_x="1.016">
+            <segment type="line" end_x="-1.016" end_y="1.143"/>
+        </polygon>
+        <polygon fill="false" start_y="1.143" width="0.254" layer="10" start_x="-1.016">
+            <segment type="line" end_x="1.016" end_y="1.905"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="1.016" end_y="1.905"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.905" width="0.254" layer="10" start_x="-1.016">
+            <segment type="line" end_x="1.016" end_y="-1.143"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="270" y="5.08" uuid="{330c440b-a388-4ae4-ba62-2f26dbb5398d}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-5.08" uuid="{8e5404ff-4d14-4070-913a-a48a329e0d8b}">
+            <name locale="en_US">2</name>
+        </pin>
+    </pins>
+</symbol>

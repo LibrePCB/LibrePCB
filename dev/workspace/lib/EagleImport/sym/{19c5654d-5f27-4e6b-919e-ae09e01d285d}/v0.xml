@@ -1,0 +1,43 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{19c5654d-5f27-4e6b-919e-ae09e01d285d}</uuid>
+        <name locale="en_US">LM3485</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-7.62" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="-10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="12.7" length="2.54" angle="180" y="5.08" uuid="{8ae170c7-4200-415e-aff9-4c98b29607d8}">
+            <name locale="en_US">ISENSE</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-2.54" uuid="{575e020a-e366-4b02-9161-064feeb7721a}">
+            <name locale="en_US">ADJ</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="2.54" uuid="{c61c6f67-ed57-4db4-b1ce-e1d1d9fd01c9}">
+            <name locale="en_US">VIN</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="0" uuid="{0904067b-837d-4a69-81a0-271cd652c7cb}">
+            <name locale="en_US">PGATE</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-5.08" uuid="{69c8fc73-08ee-4e3c-9242-2b1c238debb3}">
+            <name locale="en_US">FB</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-12.7" uuid="{1c27a9ee-fa7c-4275-a8f5-ff6b3069e1ec}">
+            <name locale="en_US">GND@1</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-12.7" uuid="{eb06984c-a5c9-467c-8904-d4c4f8c2f2ad}">
+            <name locale="en_US">GND@2</name>
+        </pin>
+    </pins>
+</symbol>

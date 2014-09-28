@@ -1,0 +1,15 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{0fa000ae-0b71-4e00-80e9-da3abc0b9745}</uuid>
+        <name locale="en_US">PWR+-</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="0" length="5.08" angle="270" y="7.62" uuid="{eedef430-f3a9-492d-8754-f2e5b08bd48e}">
+            <name locale="en_US">V+</name>
+        </pin>
+        <pin x="0" length="5.08" angle="90" y="-7.62" uuid="{e1abb47b-ff50-4dc7-8312-e01b55b06aa2}">
+            <name locale="en_US">V-</name>
+        </pin>
+    </pins>
+</symbol>

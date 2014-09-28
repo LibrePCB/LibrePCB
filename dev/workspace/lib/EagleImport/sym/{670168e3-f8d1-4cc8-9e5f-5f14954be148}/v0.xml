@@ -1,0 +1,40 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{670168e3-f8d1-4cc8-9e5f-5f14954be148}</uuid>
+        <name locale="en_US">BALUN-FILTER</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="10.16" length="2.54" angle="180" y="2.54" uuid="{d900d2f8-d03f-4cd5-accf-ffd5288111a5}">
+            <name locale="en_US">UNBAL</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="5.08" uuid="{49c64faf-91e9-4d8a-99d0-1e5dd43e86a9}">
+            <name locale="en_US">BAL@1</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="0" uuid="{ec3c07cd-1139-4260-a4af-d856a69e4587}">
+            <name locale="en_US">BAL@2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="90" y="-7.62" uuid="{a7890bf6-0bd4-4716-b752-721516438638}">
+            <name locale="en_US">GND@1</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-7.62" uuid="{558f6fb2-3902-43a8-8481-e7e3a46b3c32}">
+            <name locale="en_US">GND@2</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-7.62" uuid="{d5689d35-0c78-4854-984b-0bf3d1e67d0e}">
+            <name locale="en_US">GND@3</name>
+        </pin>
+    </pins>
+</symbol>

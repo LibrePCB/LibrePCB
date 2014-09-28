@@ -1,0 +1,61 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{15cf85a7-f3d1-4938-87ab-949ae9676984}</uuid>
+        <name locale="en_US">C16</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-39.37" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{5396ca92-8b43-44a0-a235-daed23b3b9ef}">
+            <name locale="en_US">IOC1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{ffef9299-ab06-4404-9390-974d9a6800b3}">
+            <name locale="en_US">IOC2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{13f3e73c-ba91-473d-b9d8-4fcd3b778d0a}">
+            <name locale="en_US">IOC3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{f335ab96-c60c-46d9-9adb-174999020889}">
+            <name locale="en_US">IOC4</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{0849131f-9acf-40b9-8837-2cf096860c35}">
+            <name locale="en_US">IOC5</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{821fe209-bcfe-41e9-a51c-3efbc2dd16c1}">
+            <name locale="en_US">IOC6</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-15.24" uuid="{014f77a8-b394-4d5c-9514-1f910b5c4f0e}">
+            <name locale="en_US">IOC7</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-17.78" uuid="{923a5730-8308-4291-a411-97c899026a34}">
+            <name locale="en_US">IOC8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-20.32" uuid="{c9f30b52-6783-4a26-9539-da446b9a33b7}">
+            <name locale="en_US">IOC9</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-22.86" uuid="{136bb32f-f9f3-45e7-96c8-1976c0764333}">
+            <name locale="en_US">IOC10</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-25.4" uuid="{27177276-a3a5-45b4-aeed-a010c4aa7b08}">
+            <name locale="en_US">IOC11</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-27.94" uuid="{141f7366-3739-454f-b619-9c899e75f1cd}">
+            <name locale="en_US">IOC12</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-30.48" uuid="{fe6f2401-ff19-482f-9bd2-e9f473581486}">
+            <name locale="en_US">IOC13</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-33.02" uuid="{25a79c43-c5b8-4893-8f3f-1207973cb74a}">
+            <name locale="en_US">IOC14</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-35.56" uuid="{6e262094-5979-4c41-854a-10842577d052}">
+            <name locale="en_US">IOC15</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-38.1" uuid="{59f43d43-6f02-4682-87d3-522e24089e0c}">
+            <name locale="en_US">IOC16</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,64 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{353261fa-b8ff-4802-b7e9-47ca4db10e2e}</uuid>
+        <name locale="en_US">IXP-EX</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-50.8"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{ca5098de-ec3b-4aa7-aac4-cb99295c04a0}">
+            <name locale="en_US">EX_RD_N</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{97032fa9-1198-471e-9ca1-cf79aad76b19}">
+            <name locale="en_US">EX_CS_N0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{c299ab1d-447e-4876-801c-c9243a655e1a}">
+            <name locale="en_US">EX_CS_N1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{a7cd12e6-4f00-4de8-a10e-8ccf3046ff46}">
+            <name locale="en_US">EX_CS_N2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{a56e450e-203e-4c17-87c2-40151af8a098}">
+            <name locale="en_US">EX_CS_N3</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{565e9cbc-4c6a-41ad-8848-8ad9b6efa3d9}">
+            <name locale="en_US">EX_CS_N4</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{dd8cf1a5-caa2-4aad-b373-0c9ee468b3b7}">
+            <name locale="en_US">EX_CLK</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{8c952020-c583-4f79-9326-8d82640a8104}">
+            <name locale="en_US">EX_ALE</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{40d261fc-373a-4f1e-a8e8-040278c4d7f8}">
+            <name locale="en_US">EX_WR_N</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{d0f73147-8d63-488a-bfde-c196aa0537c9}">
+            <name locale="en_US">EX_CS_N5</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{6f2e9647-364f-494b-8b7e-60a4ae4b09f3}">
+            <name locale="en_US">EX_CS_N6</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-33.02" uuid="{b3403c35-d54b-443b-95c9-00ff5da4fe1e}">
+            <name locale="en_US">EX_CS_N7</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-38.1" uuid="{6498ebe7-5a8f-4212-9cbb-489b40c1a72a}">
+            <name locale="en_US">EX_IO_WAIT_N</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-40.64" uuid="{dc75a262-a5a4-4085-84ed-7afda83c923d}">
+            <name locale="en_US">EX_RDY_N0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-43.18" uuid="{3f4551b7-a876-426a-a755-ab9a0c21c760}">
+            <name locale="en_US">EX_RDY_N1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-45.72" uuid="{0df045f4-74a9-40a7-9f6c-97770390bf4f}">
+            <name locale="en_US">EX_RDY_N2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-48.26" uuid="{a915ad93-b87c-4d7e-bc95-a24c81a30088}">
+            <name locale="en_US">EX_RDY_N3</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,25 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{ef1bab03-9e96-424a-84cc-c0666db18b52}</uuid>
+        <name locale="en_US">HFBU</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-0.889" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="0.889"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-1.524">
+            <segment type="line" end_x="0" end_y="0"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="2.54" length="2.54" angle="180" y="0" uuid="{fe74a7bb-e618-4bbb-a656-f7d1be57335d}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="180" y="-2.54" uuid="{6a3491c9-5001-4151-8132-bba23d59a508}">
+            <name locale="en_US">2</name>
+        </pin>
+    </pins>
+</symbol>

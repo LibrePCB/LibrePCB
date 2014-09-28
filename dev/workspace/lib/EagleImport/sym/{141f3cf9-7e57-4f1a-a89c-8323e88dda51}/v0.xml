@@ -1,0 +1,25 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{141f3cf9-7e57-4f1a-a89c-8323e88dda51}</uuid>
+        <name locale="en_US">VCC/2</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-1.905" width="0.254" layer="10" start_x="1.27">
+            <segment type="line" end_x="0" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="-1.27" end_y="-1.905"/>
+        </polygon>
+        <polygon fill="false" start_y="1.778" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="-1.27" end_y="-1.905"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.905" width="0.254" layer="10" start_x="1.27">
+            <segment type="line" end_x="0" end_y="1.778"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-2.54" uuid="{362edec7-18cb-4c32-a105-629c040794f9}">
+            <name locale="en_US">VCC/2</name>
+        </pin>
+    </pins>
+</symbol>

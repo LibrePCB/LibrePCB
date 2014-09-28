@@ -1,0 +1,40 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{ccdb997f-ecd3-4f9c-ad4f-0279a42f8eb9}</uuid>
+        <name locale="en_US">MAX291</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="5.08" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="5.08"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="5.08" angle="0" y="2.54" uuid="{c6029d19-5086-489f-bd9e-c900592d987b}">
+            <name locale="en_US">CLK</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-2.54" uuid="{4fe78092-f247-4408-85da-298d52947f0a}">
+            <name locale="en_US">OPO</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-2.54" uuid="{ef5c9b48-761b-4d12-86a1-cf3dc7ecd855}">
+            <name locale="en_US">OPI-</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="0" uuid="{7b157ba3-47d2-4e6f-81db-0e93e75b05db}">
+            <name locale="en_US">OUT</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="0" uuid="{beb3f223-1c6c-42b1-b05c-34c55a0959b1}">
+            <name locale="en_US">IN</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-5.08" uuid="{66577f05-5a95-47b7-8186-6f34f2738471}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

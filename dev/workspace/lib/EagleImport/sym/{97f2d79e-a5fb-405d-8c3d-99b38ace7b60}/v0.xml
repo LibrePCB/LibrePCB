@@ -1,0 +1,16 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{97f2d79e-a5fb-405d-8c3d-99b38ace7b60}</uuid>
+        <name locale="en_US">GND</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-0.635" width="0.3048" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="0.635"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{d363511f-d688-40fe-b27f-0173e208a996}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

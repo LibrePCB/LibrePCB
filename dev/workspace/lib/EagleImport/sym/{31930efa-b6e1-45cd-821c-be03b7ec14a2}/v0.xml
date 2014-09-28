@@ -1,0 +1,15 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{31930efa-b6e1-45cd-821c-be03b7ec14a2}</uuid>
+        <name locale="en_US">VSS_VDD</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="0" length="5.08" angle="270" y="7.62" uuid="{1cdf2e30-06e2-44f7-b2f6-bf4bfb7b2de6}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="0" length="5.08" angle="90" y="-7.62" uuid="{7954c943-98a3-4d43-bb71-4c18ff6719e7}">
+            <name locale="en_US">VSS</name>
+        </pin>
+    </pins>
+</symbol>

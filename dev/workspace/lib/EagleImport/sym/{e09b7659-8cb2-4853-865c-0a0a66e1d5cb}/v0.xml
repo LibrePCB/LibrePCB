@@ -1,0 +1,61 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{e09b7659-8cb2-4853-865c-0a0a66e1d5cb}</uuid>
+        <name locale="en_US">TPS61200</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="17.78" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="17.78"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="15.24" uuid="{da219c5c-dba7-4da1-b3b2-08d33a9689fd}">
+            <name locale="en_US">VIN</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="10.16" uuid="{0e35d260-8606-4d8d-90d4-ffeb134e9550}">
+            <name locale="en_US">EN</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{6cae5370-1e11-4c85-81a9-db0e3ea0a977}">
+            <name locale="en_US">PS</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{7dee2602-84f5-41c6-a566-9444cdd7fea2}">
+            <name locale="en_US">UVLO</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="0" uuid="{d7b8b961-d542-48fa-9dab-addc43a9db2d}">
+            <name locale="en_US">FB</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="5.08" uuid="{eec5aaec-67f2-4ce9-bc53-1b99c4ee1340}">
+            <name locale="en_US">VAUX</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="10.16" uuid="{3f67fd72-60d8-4ccf-94a8-4020d51f0e87}">
+            <name locale="en_US">VOUT</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="15.24" uuid="{730dd635-f29f-408c-8af8-978b543de30e}">
+            <name locale="en_US">L</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-15.24" uuid="{c4ff71ad-99e6-42ac-856e-36b58aed192e}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-5.08" uuid="{04175465-6614-40e0-9e13-cf15b2d7186a}">
+            <name locale="en_US">PGND</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-10.16" uuid="{71f048fd-4f9c-4585-b6c9-e1871db07fb3}">
+            <name locale="en_US">PP</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-12.7" uuid="{4d52cd56-1b41-4394-b421-4f393d6013f4}">
+            <name locale="en_US">PP@1</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-15.24" uuid="{819b6576-8164-4efa-846f-7f8c4100d00d}">
+            <name locale="en_US">PP@2</name>
+        </pin>
+    </pins>
+</symbol>

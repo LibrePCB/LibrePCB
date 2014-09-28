@@ -1,0 +1,12 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{e272f62e-50ed-4c9a-8246-3b48091ef32b}</uuid>
+        <name locale="en_US">VDD</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-2.54" uuid="{0bca5b3f-1431-4596-b740-cce8f4e72cde}">
+            <name locale="en_US">VDD</name>
+        </pin>
+    </pins>
+</symbol>

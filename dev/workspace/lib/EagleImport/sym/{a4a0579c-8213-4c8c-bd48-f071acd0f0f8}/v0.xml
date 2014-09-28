@@ -1,0 +1,109 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{a4a0579c-8213-4c8c-bd48-f071acd0f0f8}</uuid>
+        <name locale="en_US">IXP-PCI-AD</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-81.28"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{795ed37b-f70a-4dc3-a181-325a4bb78b97}">
+            <name locale="en_US">PCI_AD0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{773bb5b1-ab91-4c41-84a7-7adb256e3743}">
+            <name locale="en_US">PCI_AD1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{f48e951b-9f71-4669-a9b5-3b1d9c9c33d1}">
+            <name locale="en_US">PCI_AD2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{77accc37-1431-4810-8623-5f7badd0a6c8}">
+            <name locale="en_US">PCI_AD3</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{72e667f2-86af-482f-888f-c6192fd192c4}">
+            <name locale="en_US">PCI_AD4</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{e2ebe2f3-50e4-4d9f-a3d7-a81d7167514e}">
+            <name locale="en_US">PCI_AD5</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{01edced1-e317-4695-bdd9-8d95f685f58d}">
+            <name locale="en_US">PCI_AD6</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{f8264e28-3534-4303-850a-c9c6cddff8df}">
+            <name locale="en_US">PCI_AD7</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{d314f2a8-4b3f-4565-bb27-1fdf2bccdee5}">
+            <name locale="en_US">PCI_AD8</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{ab891164-488e-4459-984b-3cb6443786a1}">
+            <name locale="en_US">PCI_AD9</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{f61e5bcc-2174-4da9-ba25-eec025b9bd36}">
+            <name locale="en_US">PCI_AD10</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{43e358bc-7465-4e59-8228-dda48a4eecba}">
+            <name locale="en_US">PCI_AD11</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{d52d90ad-118e-4924-881b-227095ed70ca}">
+            <name locale="en_US">PCI_AD12</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-33.02" uuid="{c2df21f5-2aec-489e-860f-558f025580cf}">
+            <name locale="en_US">PCI_AD13</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-35.56" uuid="{8a30b421-30a6-4da2-a116-855ae19f707b}">
+            <name locale="en_US">PCI_AD14</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-38.1" uuid="{aab50a61-6140-4974-8ddb-0f4cc2d61955}">
+            <name locale="en_US">PCI_AD15</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-40.64" uuid="{60ab8a27-0996-4392-880d-9c918139c98c}">
+            <name locale="en_US">PCI_AD16</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-43.18" uuid="{5efe6c9a-2081-438e-baa2-6a557dddc679}">
+            <name locale="en_US">PCI_AD17</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-45.72" uuid="{bf53263f-2b1c-4221-b4fa-fcffc39f09b0}">
+            <name locale="en_US">PCI_AD18</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-48.26" uuid="{a22e5b3c-2de2-453c-a4cf-f3820e9dbdff}">
+            <name locale="en_US">PCI_AD19</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-50.8" uuid="{4b272b18-cc7a-410f-a90e-dd106b440576}">
+            <name locale="en_US">PCI_AD20</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-53.34" uuid="{8ded2dea-bb4f-453d-9120-b16fd06dcc32}">
+            <name locale="en_US">PCI_AD21</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-55.88" uuid="{22070b9c-98ec-49c4-8454-189450bb33f7}">
+            <name locale="en_US">PCI_AD22</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-58.42" uuid="{2f4c8e38-0e2b-4fb8-9912-30d38a00ca7d}">
+            <name locale="en_US">PCI_AD23</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-60.96" uuid="{307f6b80-6d96-4470-924b-9fc1c4618da2}">
+            <name locale="en_US">PCI_AD24</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-63.5" uuid="{1b9c0363-dad7-4bd0-b97a-cd945e40accb}">
+            <name locale="en_US">PCI_AD25</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-66.04" uuid="{89b80928-ec3b-45b4-b6ab-51c28d15caf3}">
+            <name locale="en_US">PCI_AD26</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-68.58" uuid="{f284170f-cf2d-4a77-895e-0910c2149ccf}">
+            <name locale="en_US">PCI_AD27</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-71.12" uuid="{6b516b90-4ba8-4a5c-b78a-88723c6a8c2c}">
+            <name locale="en_US">PCI_AD28</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-73.66" uuid="{a3e83d59-1368-4cd0-b1ba-e8691f6c57f5}">
+            <name locale="en_US">PCI_AD29</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-76.2" uuid="{7568860a-24fc-4cc2-a0e4-d1d7e13be826}">
+            <name locale="en_US">PCI_AD30</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-78.74" uuid="{cab99ac5-d3ad-4f4c-be12-09af020662d0}">
+            <name locale="en_US">PCI_AD31</name>
+        </pin>
+    </pins>
+</symbol>

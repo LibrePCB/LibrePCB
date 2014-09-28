@@ -1,0 +1,70 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{eac80ffe-c52e-443d-92fa-296c2c563c1a}</uuid>
+        <name locale="en_US">MX7520</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="17.78" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="-17.78"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="5.08" angle="0" y="15.24" uuid="{4ee486cf-18a2-4b30-8893-b188e815204a}">
+            <name locale="en_US">BIT1</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="12.7" uuid="{b274ebc9-de80-4566-8a7d-7a17780cafbb}">
+            <name locale="en_US">BIT2</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="10.16" uuid="{d742d360-03fa-4e81-8980-a29983245edb}">
+            <name locale="en_US">BIT3</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="7.62" uuid="{cb0ff0fc-e1e2-4aa5-959a-6d139dfa209f}">
+            <name locale="en_US">BIT4</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="5.08" uuid="{ac82f3e1-7c3f-4441-8165-826d222bb452}">
+            <name locale="en_US">BIT5</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="2.54" uuid="{cfad091a-f82c-4829-9216-5c5bea2d0944}">
+            <name locale="en_US">BIT6</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="0" uuid="{19da984f-9223-411a-bdda-f517f47de3ad}">
+            <name locale="en_US">BIT7</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-2.54" uuid="{ed93080b-326a-4e1e-b49d-3b946a71e243}">
+            <name locale="en_US">BIT8</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-5.08" uuid="{f8c387a0-1138-48c6-8b41-1c199c5ca9f4}">
+            <name locale="en_US">BIT9</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-7.62" uuid="{10b638c0-43ad-4c22-aa8d-cd1183780e0e}">
+            <name locale="en_US">BIT10</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-15.24" uuid="{10d474b1-1b7e-4e14-b8df-d1c66badc0fd}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-10.16" uuid="{0124b398-ef27-4acb-b509-aad736e15d03}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-12.7" uuid="{76ffaed5-9ace-48bd-84af-8c9cffddbfe8}">
+            <name locale="en_US">VREF</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-15.24" uuid="{557e294d-746c-455b-a9e1-1266110fc8cc}">
+            <name locale="en_US">RFB</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="15.24" uuid="{d2bce57c-8479-4046-9977-df04c0212733}">
+            <name locale="en_US">OUT1</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="10.16" uuid="{0d7ce719-91d6-40bc-ab7d-0e5c8ee00c73}">
+            <name locale="en_US">OUT2</name>
+        </pin>
+    </pins>
+</symbol>

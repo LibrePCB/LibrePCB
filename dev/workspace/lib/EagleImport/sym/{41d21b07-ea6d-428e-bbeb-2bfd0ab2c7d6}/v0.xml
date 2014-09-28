@@ -1,0 +1,118 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{41d21b07-ea6d-428e-bbeb-2bfd0ab2c7d6}</uuid>
+        <name locale="en_US">AD1983</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-22.86" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="15.24" end_y="-22.86"/>
+        </polygon>
+        <polygon fill="false" start_y="-22.86" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="15.24" end_y="20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="20.32" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="-15.24" end_y="20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="20.32" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="-15.24" end_y="-22.86"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-17.78" length="2.54" angle="0" y="17.78" uuid="{504da587-250a-47df-b197-eb46173500fe}">
+            <name locale="en_US">NC</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="15.24" uuid="{b491240c-71d8-45b1-ba89-2bd67b6f426d}">
+            <name locale="en_US">SDATA_OUT</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="12.7" uuid="{21adfbfe-2a2f-403a-a812-bf7111b839b9}">
+            <name locale="en_US">BIT_CLK</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="10.16" uuid="{a835675d-5e2f-4eb3-bb0e-bd25e7f55905}">
+            <name locale="en_US">DVSS</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="7.62" uuid="{b4ba44c9-01f7-47d0-8743-9cbcc914f932}">
+            <name locale="en_US">SDATA_IN</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="5.08" uuid="{73b79131-30e3-449a-b81e-cf5c80e225d1}">
+            <name locale="en_US">DVDD</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="2.54" uuid="{844ca27b-d9d5-4450-b5a5-f5654a639e0f}">
+            <name locale="en_US">SYNC</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="0" uuid="{1105228b-24af-422d-9082-e05a3266df08}">
+            <name locale="en_US">RESET</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-2.54" uuid="{af6b6947-00f7-46e9-bfa5-3e35f7c36f2c}">
+            <name locale="en_US">SENSE_A</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-5.08" uuid="{a26a5813-f260-41cb-afa7-289ca4456cbb}">
+            <name locale="en_US">NC@1</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-7.62" uuid="{055d856d-44e0-43f5-9b07-87bd70767de1}">
+            <name locale="en_US">NC@2</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-10.16" uuid="{a4592a53-a288-4c89-833a-9bd05ea6c7a9}">
+            <name locale="en_US">NC@3</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-12.7" uuid="{f60e35ba-06e8-44b1-a269-8ebd6b447576}">
+            <name locale="en_US">PORT-B_L</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-15.24" uuid="{0721a1f6-7761-4d89-b60f-147775a112bd}">
+            <name locale="en_US">PORT-B_R</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-17.78" uuid="{ae78440b-09c6-45a5-802a-0f6ad2d13fef}">
+            <name locale="en_US">PORT-C_L</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-20.32" uuid="{b433a01c-190f-4a2a-a57e-a569bb4ce6c3}">
+            <name locale="en_US">PORT-C_R</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-20.32" uuid="{87b15612-6a08-4755-b9a5-321b586be58a}">
+            <name locale="en_US">AVSS</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-17.78" uuid="{c2b7c19f-d7b8-4997-95ed-844911e10f0b}">
+            <name locale="en_US">VREF_FILT</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-15.24" uuid="{3716f91f-9703-4b92-887e-29805a23a5aa}">
+            <name locale="en_US">MIC_BIAS-B</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-12.7" uuid="{b32caf57-4799-43d9-94e2-d1e5d138b32a}">
+            <name locale="en_US">MIC_BIAS-C</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-10.16" uuid="{b4335c52-b1f3-4da0-af6b-09d74be27c6f}">
+            <name locale="en_US">SENSE_SRC</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-7.62" uuid="{a427b2a3-362d-4190-b54d-fd148b8ae1d4}">
+            <name locale="en_US">AVDD</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-5.08" uuid="{bea4738e-6988-45fd-90f4-c061874990c0}">
+            <name locale="en_US">PORT-D_L</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-2.54" uuid="{eabfa984-7fca-4fb4-991e-bc1b097a4c6c}">
+            <name locale="en_US">PORT-D_R</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="0" uuid="{f9b32dcf-2b86-4307-b6a1-2e020782caa7}">
+            <name locale="en_US">MONO_OUT</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="2.54" uuid="{039d5b66-76e3-4ac9-914d-57f54b3437d8}">
+            <name locale="en_US">AVDD@1</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="5.08" uuid="{a45f2381-3207-47e4-a1b8-67364870200c}">
+            <name locale="en_US">PORT-A_L</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="7.62" uuid="{32bda6ff-7a80-4574-bd55-41457b050da2}">
+            <name locale="en_US">PORT-A_R</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="10.16" uuid="{46b94824-5ef1-4396-ac87-572b4427743b}">
+            <name locale="en_US">AVSS@1</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="12.7" uuid="{07c91a47-26e9-4b63-9e17-0425189049d3}">
+            <name locale="en_US">GPIO_0/JS_1</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="15.24" uuid="{fd56b8ce-0552-4bd9-a498-0b28be93bacd}">
+            <name locale="en_US">GPIO_1/JS_0</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="17.78" uuid="{952dc4c7-f1c3-43eb-83f6-4f6e8aa13242}">
+            <name locale="en_US">S/PDIF_OUT</name>
+        </pin>
+    </pins>
+</symbol>

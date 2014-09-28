@@ -1,0 +1,24 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{4ebd2ff3-3fe7-4acb-a56d-e8c249062cd5}</uuid>
+        <name locale="en_US">V--></name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="15.24">
+            <segment type="line" end_x="13.97" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.1524" layer="10" start_x="13.97">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="13.97" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="15.24">
+            <segment type="line" end_x="13.97" end_y="-1.27"/>
+        </polygon>
+    </geometry>
+    <pins/>
+</symbol>

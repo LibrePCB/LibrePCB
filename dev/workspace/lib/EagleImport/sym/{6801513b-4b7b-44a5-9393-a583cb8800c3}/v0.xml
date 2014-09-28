@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{6801513b-4b7b-44a5-9393-a583cb8800c3}</uuid>
+        <name locale="en_US">E11-484</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-26.67" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{15328e30-835b-44da-8a56-f358628d46f8}">
+            <name locale="en_US">IOE1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{109bf22f-b061-4f2c-be94-ddbfb44ec99a}">
+            <name locale="en_US">IOE2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{c7c0b6b1-90ee-4806-a622-b83fbd20e06a}">
+            <name locale="en_US">IOE3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{2fdb054f-9a95-4c39-a045-f4aeba9b5158}">
+            <name locale="en_US">IOE4</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{53dbf648-105e-41a3-b7c3-da8e4930a4d1}">
+            <name locale="en_US">IOE5</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{dd4d0993-d8c0-4582-bb7f-27c429aa3c23}">
+            <name locale="en_US">IOE6</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-15.24" uuid="{0ec9f4ca-8197-4cde-b445-40724947a752}">
+            <name locale="en_US">IOE7</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-17.78" uuid="{941cdd4f-dbd6-4c5f-bd07-c52a45b6009d}">
+            <name locale="en_US">IOE8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-20.32" uuid="{8e899899-756f-496d-8384-b99df973de49}">
+            <name locale="en_US">IOE9</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-22.86" uuid="{80e64a32-5db3-49f8-9fef-713526be6ea0}">
+            <name locale="en_US">IOE10</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-25.4" uuid="{c913c3e8-db31-47cb-91a8-8704ee4626ec}">
+            <name locale="en_US">IOE11</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,40 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{7b6f8426-1f77-4a06-bf88-5be5262156fa}</uuid>
+        <name locale="en_US">DIL14/4</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="8.89" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="-8.89"/>
+        </polygon>
+        <polygon fill="false" start_y="-8.89" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="5.08" end_y="-8.89"/>
+        </polygon>
+        <polygon fill="false" start_y="-8.89" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="5.08" end_y="8.89"/>
+        </polygon>
+        <polygon fill="false" start_y="8.89" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="2.54" end_y="8.89"/>
+        </polygon>
+        <polygon fill="false" start_y="8.89" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-2.54" end_y="8.89"/>
+        </polygon>
+        <polygon fill="false" start_y="8.89" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="2.54" end_y="8.89"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-7.62" length="2.54" angle="0" y="7.62" uuid="{3247b272-7638-40de-843a-587aebf99a04}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="-7.62" uuid="{440949e0-6c00-4740-b874-d794c93f49f6}">
+            <name locale="en_US">7</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="-7.62" uuid="{e854fe71-434d-4e05-b607-23114bc95722}">
+            <name locale="en_US">8</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="7.62" uuid="{7fdd3505-42be-4060-8ca8-0a54c1e87451}">
+            <name locale="en_US">14</name>
+        </pin>
+    </pins>
+</symbol>

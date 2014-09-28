@@ -1,0 +1,43 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{a5d44f2c-2a07-4689-a9de-0b84affa1435}</uuid>
+        <name locale="en_US">HMC492</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="12.7" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="12.7" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="12.7"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="2.54" uuid="{b8311a1d-fc09-43c6-aae3-66007c5baa57}">
+            <name locale="en_US">IN</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-2.54" uuid="{5c6c576e-4253-4925-ae81-3d15b208064b}">
+            <name locale="en_US">!IN</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="2.54" uuid="{22f417de-504c-4cdc-b12d-b52004e48eb8}">
+            <name locale="en_US">OUT</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-2.54" uuid="{a03c29db-1b5c-4be7-8864-0f7d56580083}">
+            <name locale="en_US">!OUT</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="10.16" uuid="{3ac7d992-d720-40c8-a1a9-feb7b896bba4}">
+            <name locale="en_US">VCC@1</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="7.62" uuid="{f9035716-8131-4e7f-87d6-63537d8aa35c}">
+            <name locale="en_US">VCC@2</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-7.62" uuid="{e24b1dcd-fd8a-4943-b4ff-14e5171cc5b1}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

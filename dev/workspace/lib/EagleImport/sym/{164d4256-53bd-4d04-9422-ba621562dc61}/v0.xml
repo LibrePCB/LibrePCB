@@ -1,0 +1,37 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{164d4256-53bd-4d04-9422-ba621562dc61}</uuid>
+        <name locale="en_US">MIC5219A</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="5.08" uuid="{811d0cd2-caa0-44a4-af28-a9422790980d}">
+            <name locale="en_US">IN</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="0" uuid="{85506c1b-fa83-4c59-96a3-431d8045dd75}">
+            <name locale="en_US">EN</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="5.08" uuid="{de83b6cf-3f67-452a-a2a6-370bcf9da425}">
+            <name locale="en_US">OUT</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-5.08" uuid="{343f212e-3894-4596-9cbe-dee320765209}">
+            <name locale="en_US">ADJ</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-10.16" uuid="{4810aac6-2a06-4deb-ba27-9542448393c0}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

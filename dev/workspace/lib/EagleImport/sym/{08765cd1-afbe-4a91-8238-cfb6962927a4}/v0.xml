@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{08765cd1-afbe-4a91-8238-cfb6962927a4}</uuid>
+        <name locale="en_US">MAX752</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="5.08" angle="0" y="7.62" uuid="{1897c8c5-f46e-45da-8f45-bd306cd13cb3}">
+            <name locale="en_US">!SHDN</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="5.08" uuid="{985e3d6f-7ea9-4272-92ec-e87803a66287}">
+            <name locale="en_US">VREF</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-5.08" uuid="{0c07f886-b2de-4352-b521-432c8b8df8b3}">
+            <name locale="en_US">SS</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-2.54" uuid="{f2accaf0-31bb-474c-b4e6-22cfc7fb9aae}">
+            <name locale="en_US">CC</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-5.08" uuid="{cc20291b-7a8b-4da3-8cc6-deea6b6455c0}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="0" uuid="{789f52b2-119a-41c2-8646-aee5ecca379a}">
+            <name locale="en_US">V+</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="2.54" uuid="{b8841145-be3f-4470-80e5-b6b88acc518b}">
+            <name locale="en_US">NC</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="7.62" uuid="{539bb92e-a7d3-4bea-809f-ffe3f288137b}">
+            <name locale="en_US">LX</name>
+        </pin>
+    </pins>
+</symbol>

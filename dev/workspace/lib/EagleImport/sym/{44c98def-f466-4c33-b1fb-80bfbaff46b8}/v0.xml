@@ -1,0 +1,70 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{44c98def-f466-4c33-b1fb-80bfbaff46b8}</uuid>
+        <name locale="en_US">T2713</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-17.78" width="0.4064" layer="10" start_x="12.7">
+            <segment type="line" end_x="-15.24" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.4064" layer="10" start_x="-15.24">
+            <segment type="line" end_x="-15.24" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.4064" layer="10" start_x="-15.24">
+            <segment type="line" end_x="12.7" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.4064" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-17.78"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-20.32" length="5.08" angle="0" y="7.62" uuid="{0a63c8df-de2b-44d2-9d43-e475b0ea9e50}">
+            <name locale="en_US">PD</name>
+        </pin>
+        <pin x="-20.32" length="5.08" angle="0" y="5.08" uuid="{51ab690b-d0bc-4b84-b3d2-f58826338093}">
+            <name locale="en_US">ETAL</name>
+        </pin>
+        <pin x="-20.32" length="5.08" angle="0" y="2.54" uuid="{0a06057a-3306-4248-befc-e3e44fb55d29}">
+            <name locale="en_US">TOS</name>
+        </pin>
+        <pin x="-20.32" length="5.08" angle="0" y="0" uuid="{421773e0-9ad1-499c-afc1-45109882352d}">
+            <name locale="en_US">T-SELECT</name>
+        </pin>
+        <pin x="-20.32" length="5.08" angle="0" y="-5.08" uuid="{af651e94-3d91-42b0-872e-9a681f22dac3}">
+            <name locale="en_US">COMP2IN</name>
+        </pin>
+        <pin x="-20.32" length="5.08" angle="0" y="-2.54" uuid="{b9063e47-609c-40d2-a3ec-da6ebbf94d42}">
+            <name locale="en_US">COMP1IN</name>
+        </pin>
+        <pin x="-20.32" length="5.08" angle="0" y="-7.62" uuid="{d86239a9-f948-4489-8980-f5b2ce50b4a2}">
+            <name locale="en_US">RESET</name>
+        </pin>
+        <pin x="-20.32" length="5.08" angle="0" y="12.7" uuid="{8579f43a-7397-4eb9-88b5-c37aa945b7c7}">
+            <name locale="en_US">SIG_IN</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="7.62" uuid="{20b81569-f427-429f-bcb7-286cba080914}">
+            <name locale="en_US">OUT-1</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="5.08" uuid="{571e3ed7-d776-4514-8692-3b5177418177}">
+            <name locale="en_US">OUT-2</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="0" uuid="{c6c2d509-0d51-4bc4-9fae-b7ba9c6e508d}">
+            <name locale="en_US">XTAL</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-2.54" uuid="{7ec0394c-0d9e-45fb-8d04-ec9a3c4e0a2c}">
+            <name locale="en_US">COMP1OUT</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="12.7" uuid="{1756928b-8f5f-4993-9f6f-19c653a7ab9c}">
+            <name locale="en_US">SIG_OUT</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-10.16" uuid="{6053688f-a8b3-419d-b79d-99150792fb47}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-15.24" uuid="{e18458b6-1953-4459-a42d-edd5624cf12c}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-5.08" uuid="{95ce7600-fafc-4eb9-b0e7-09f995f35627}">
+            <name locale="en_US">REFOUT</name>
+        </pin>
+    </pins>
+</symbol>

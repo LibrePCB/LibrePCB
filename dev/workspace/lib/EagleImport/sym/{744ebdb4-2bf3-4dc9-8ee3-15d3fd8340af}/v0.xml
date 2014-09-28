@@ -1,0 +1,52 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{744ebdb4-2bf3-4dc9-8ee3-15d3fd8340af}</uuid>
+        <name locale="en_US">JACK-SWITCH</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="0" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="1.524" end_y="1.016"/>
+        </polygon>
+        <polygon fill="false" start_y="1.016" width="0.1524" layer="10" start_x="1.524">
+            <segment type="line" end_x="2.286" end_y="1.778"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-0.762" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-0.762">
+            <segment type="line" end_x="-0.762" end_y="2.286"/>
+        </polygon>
+        <polygon fill="false" start_y="2.286" width="0.254" layer="10" start_x="-0.762">
+            <segment type="line" end_x="-1.016" end_y="1.524"/>
+        </polygon>
+        <polygon fill="false" start_y="1.524" width="0.254" layer="10" start_x="-1.016">
+            <segment type="line" end_x="-0.508" end_y="1.524"/>
+        </polygon>
+        <polygon fill="false" start_y="1.524" width="0.254" layer="10" start_x="-0.508">
+            <segment type="line" end_x="-0.762" end_y="2.286"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="4.572" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="true" start_y="-0.508" width="0.254" layer="10" start_x="2.286">
+            <segment type="line" end_x="7.874" end_y="-0.508"/>
+            <segment type="line" end_x="7.874" end_y="0.508"/>
+            <segment type="line" end_x="2.286" end_y="0.508"/>
+            <segment type="line" end_x="2.286" end_y="-0.508"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2.54" angle="0" y="-2.54" uuid="{57ca86a0-39b8-4978-997c-a7be2cbb0484}">
+            <name locale="en_US">5</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="2.54" uuid="{4b7605de-ba95-48ab-ab2b-5b3ccef979ef}">
+            <name locale="en_US">3</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{186b6252-d49c-45fc-af49-32dba23599c7}">
+            <name locale="en_US">4</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,103 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{21c76dab-e391-421c-a338-3793cb2b462a}</uuid>
+        <name locale="en_US">ADSP-21161-CTRL1</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="35.56" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="-35.56"/>
+        </polygon>
+        <polygon fill="false" start_y="-35.56" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="-35.56"/>
+        </polygon>
+        <polygon fill="false" start_y="-35.56" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="35.56"/>
+        </polygon>
+        <polygon fill="false" start_y="35.56" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="35.56"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="15.24" uuid="{39db1dc2-ae77-4c17-954c-147021a726c6}">
+            <name locale="en_US">!IRQ0</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="12.7" uuid="{d1585342-ebac-4223-bcce-723bb815d6c5}">
+            <name locale="en_US">!IRQ1</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="10.16" uuid="{d7048ad3-8763-4d52-9f73-6ab28da49b3b}">
+            <name locale="en_US">!IRQ2</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="7.62" uuid="{deb3a368-dd25-4f79-8a9b-1dabe15462b9}">
+            <name locale="en_US">FLAG0</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="5.08" uuid="{a2e8a985-7c46-4824-b6d4-7ec3129b28d9}">
+            <name locale="en_US">FLAG1</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="2.54" uuid="{562270d2-1518-466c-a423-c352f856ef82}">
+            <name locale="en_US">FLAG2</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="0" uuid="{4df56362-60d9-4e70-ae7e-619feb59df47}">
+            <name locale="en_US">FLAG3</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-2.54" uuid="{2e9019aa-f265-4bf5-8096-cde8c727e2bb}">
+            <name locale="en_US">FLAG4</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-5.08" uuid="{751f82b9-31f1-45b6-8e34-1b74d7757202}">
+            <name locale="en_US">FLAG5</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-7.62" uuid="{d8f08cc2-3706-47d8-9f0b-0ce1293689e7}">
+            <name locale="en_US">FLAG6</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-10.16" uuid="{8cee0dfc-acff-499f-b045-4193d7d81ac7}">
+            <name locale="en_US">FLAG7</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-12.7" uuid="{f66a0f18-cf4c-4e89-8df1-064319a0b24f}">
+            <name locale="en_US">FLAG8</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-15.24" uuid="{f2699e75-b4c4-4c5d-90a5-b50078831319}">
+            <name locale="en_US">FLAG9</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-17.78" uuid="{23459808-1621-4d03-95aa-e37aabae2db4}">
+            <name locale="en_US">FLAG10</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-20.32" uuid="{911a385d-920a-4ae7-bb40-db00f87423fe}">
+            <name locale="en_US">FLAG11</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-22.86" uuid="{35d1efc9-5f00-4b3a-91df-682afbf5afc2}">
+            <name locale="en_US">TIMEXP</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-27.94" uuid="{dfa0f555-916a-427a-999c-94afb798b4ff}">
+            <name locale="en_US">ID0</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-30.48" uuid="{c4bf267b-5017-4e34-ad6e-32df010c3cb6}">
+            <name locale="en_US">ID1</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-33.02" uuid="{e94b2d3e-d7f4-4380-a3bf-4901a6986a49}">
+            <name locale="en_US">ID2</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-25.4" uuid="{eba7653e-6b4c-47f6-bc83-2e901b70dd78}">
+            <name locale="en_US">RPBA</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="20.32" uuid="{099225e0-6d5d-401f-875f-4957bf2ee5b6}">
+            <name locale="en_US">EBOOT</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="17.78" uuid="{b0b0d03d-d746-4367-a5f9-07e11410cc10}">
+            <name locale="en_US">LBOOT</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="33.02" uuid="{4536e2a1-e23d-4ef9-b826-4e478dd99197}">
+            <name locale="en_US">CLKIN</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="30.48" uuid="{3fb30659-180b-4641-bc62-f398d18f25eb}">
+            <name locale="en_US">XTAL</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="27.94" uuid="{28f02bde-3ec5-4203-ac09-7f8fe72866a4}">
+            <name locale="en_US">CLK_CFG0</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="25.4" uuid="{a33f55f1-e5a2-45f4-a7b0-ad31f20d7420}">
+            <name locale="en_US">CLK_CFG1</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="22.86" uuid="{089fbcdd-2668-4228-8224-834ebbbda221}">
+            <name locale="en_US">!CLKDBL</name>
+        </pin>
+    </pins>
+</symbol>

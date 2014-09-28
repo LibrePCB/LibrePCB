@@ -1,0 +1,15 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{d6135795-ebe5-4dfd-9f00-d97532b601a5}</uuid>
+        <name locale="en_US">PWR-VDDGND</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="0" length="5.08" angle="270" y="7.62" uuid="{3323f8f9-637a-4ff6-b602-880cbd413095}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="0" length="5.08" angle="90" y="-7.62" uuid="{7e4fb8aa-0f1e-4d55-9153-9be9c67d5d2e}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,21 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{5340d655-fa41-4c68-8773-0784b0a556b1}</uuid>
+        <name locale="en_US">MOUNT-HOLE</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="1.524" layer="10" start_x="0">
+            <segment type="line" end_x="1.27" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="1.524" layer="10" start_x="-1.27">
+            <segment type="line" end_x="0" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.0508" layer="10" start_x="-0.508">
+            <segment type="line" end_x="0.508" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0.508" width="0.0508" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-0.508"/>
+        </polygon>
+    </geometry>
+    <pins/>
+</symbol>

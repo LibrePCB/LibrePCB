@@ -1,0 +1,106 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{f4ee8acd-0941-4438-9328-ebe6536a8879}</uuid>
+        <name locale="en_US">AD1891</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-20.32" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="15.24" end_y="-20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="-20.32" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="15.24" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="-15.24" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="-15.24" end_y="-20.32"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-17.78" length="2.54" angle="0" y="15.24" uuid="{85ff048f-6e78-4fd0-ab86-e84facefd8aa}">
+            <name locale="en_US">N/C@1</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="12.7" uuid="{34f5f1dc-c3e8-4c51-9c03-23e804018f8e}">
+            <name locale="en_US">MCLK</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="10.16" uuid="{f9334875-33a7-493d-99b0-d5e983b7272c}">
+            <name locale="en_US">DATA_I</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="7.62" uuid="{e99465b6-7869-4792-8f16-063cbd646f62}">
+            <name locale="en_US">BCLK_I</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="5.08" uuid="{1fa70b70-5553-4b23-9279-bcdde4c35f65}">
+            <name locale="en_US">WCLK_I</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="2.54" uuid="{86e3d8b8-c594-4f92-a0ba-1ba89b37d8ec}">
+            <name locale="en_US">L!R!_I</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="0" uuid="{38eb2340-76c7-4821-8459-c75e157a8b03}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-2.54" uuid="{3acf4960-733c-490d-a839-06998f1a5183}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-5.08" uuid="{8024f00e-182e-4dbc-9d10-f537abd56c71}">
+            <name locale="en_US">N/C@2</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-7.62" uuid="{e680bf2e-aebf-469f-b5a8-164e1776eb82}">
+            <name locale="en_US">BKPOL_I</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-10.16" uuid="{29f4d971-f534-48b1-9284-643a7314d186}">
+            <name locale="en_US">TRGLR_I</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-12.7" uuid="{3db3b76a-115f-4770-bec8-1d88f29e1c9e}">
+            <name locale="en_US">MSBDLY_I</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-15.24" uuid="{003d59fb-d71b-4f75-8938-3e3cdf8a9981}">
+            <name locale="en_US">!RESET</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-17.78" uuid="{f861d5dd-2dae-4395-8bc9-270512462c54}">
+            <name locale="en_US">GND@1</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-17.78" uuid="{600c724d-893d-40f2-a10c-55221d6e120d}">
+            <name locale="en_US">MUTE_I</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-15.24" uuid="{34e3fd61-04f9-4811-beff-277d66feaec6}">
+            <name locale="en_US">MUTE_O</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-12.7" uuid="{d4ba6dbe-6b10-40f9-a07f-14264e1b375a}">
+            <name locale="en_US">MSBDLY_O</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-10.16" uuid="{3d398fee-532d-423d-8507-0ccdcc7f383f}">
+            <name locale="en_US">TRGLR_O</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-7.62" uuid="{de0a852d-a4ab-45e8-a12c-02082cb153d8}">
+            <name locale="en_US">BKPOL_O</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-5.08" uuid="{2b6a1f69-2f4f-49b5-b363-9400f96ce983}">
+            <name locale="en_US">N/C@3</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-2.54" uuid="{72e91ca2-586e-4197-b472-bed23092aa41}">
+            <name locale="en_US">GND@2</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="0" uuid="{eaef1403-cbe5-4bfe-b7f8-a4b1af63b30b}">
+            <name locale="en_US">VDD@1</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="2.54" uuid="{670c58b8-2846-49be-a42f-6224c4a2e0c1}">
+            <name locale="en_US">DATA_O</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="5.08" uuid="{c0c778f6-282e-4eb5-95f0-27944f7e8805}">
+            <name locale="en_US">L!R!_O</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="7.62" uuid="{dec53940-c5fd-424f-bbd6-3eaec5e98ce4}">
+            <name locale="en_US">WCLK_O</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="10.16" uuid="{1dbf463a-a9a1-478e-82f5-f61e9dff15fe}">
+            <name locale="en_US">BCLK_O</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="12.7" uuid="{27102ec6-cc29-4298-8fcb-454147d47fd0}">
+            <name locale="en_US">GND@3</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="15.24" uuid="{2c8c9b8d-81f1-4ea9-b935-fdca3f332669}">
+            <name locale="en_US">SETLSLW</name>
+        </pin>
+    </pins>
+</symbol>

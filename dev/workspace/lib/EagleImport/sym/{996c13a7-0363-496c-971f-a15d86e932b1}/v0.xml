@@ -1,0 +1,22 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{996c13a7-0363-496c-971f-a15d86e932b1}</uuid>
+        <name locale="en_US">SK</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="-3.81">
+            <segment type="line" end_x="-1.27" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.6096" layer="10" start_x="0">
+            <segment type="line" end_x="2.54" end_y="0"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="5.08" length="2.54" angle="180" y="0" uuid="{50772132-42fb-4309-8378-a3a9f47c1f88}">
+            <name locale="en_US">SK</name>
+        </pin>
+    </pins>
+</symbol>

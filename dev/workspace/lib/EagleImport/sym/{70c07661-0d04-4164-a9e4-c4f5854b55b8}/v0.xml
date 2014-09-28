@@ -1,0 +1,31 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{70c07661-0d04-4164-a9e4-c4f5854b55b8}</uuid>
+        <name locale="en_US">DN1</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.016" width="0.254" layer="10" start_x="-0.762">
+            <segment type="line" end_x="0" end_y="-1.016"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.016" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0.762" end_y="1.016"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.016" width="0.254" layer="10" start_x="0.762">
+            <segment type="line" end_x="0" end_y="-1.016"/>
+        </polygon>
+        <polygon fill="false" start_y="1.016" width="0.254" layer="10" start_x="0.762">
+            <segment type="line" end_x="-0.762" end_y="1.016"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.016" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="-0.762" end_y="-1.016"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="270" y="2.54" uuid="{2eab8519-5b32-41df-9e05-d077501ab75d}">
+            <name locale="en_US">A</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-2.54" uuid="{1068802d-98ea-419e-b0dd-7ec94f0fa8cd}">
+            <name locale="en_US">C</name>
+        </pin>
+    </pins>
+</symbol>

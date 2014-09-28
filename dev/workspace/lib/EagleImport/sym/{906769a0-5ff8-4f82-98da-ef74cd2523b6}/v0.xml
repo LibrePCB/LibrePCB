@@ -1,0 +1,37 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{906769a0-5ff8-4f82-98da-ef74cd2523b6}</uuid>
+        <name locale="en_US">MAX1551</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="-2.54" uuid="{57e15450-576e-4e64-aa0f-cc382e494488}">
+            <name locale="en_US">USB</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="2.54" uuid="{fb0282bd-473b-42cd-b49a-05adf72235f0}">
+            <name locale="en_US">DC</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="5.08" uuid="{274d847f-fffd-434a-8b6f-6766281dc069}">
+            <name locale="en_US">BAT</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="0" uuid="{2e48d3a8-e98b-4c99-902a-7b96dd101a5b}">
+            <name locale="en_US">!POK</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-5.08" uuid="{78536dd8-10f7-4a9e-8f30-44e626a85be6}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

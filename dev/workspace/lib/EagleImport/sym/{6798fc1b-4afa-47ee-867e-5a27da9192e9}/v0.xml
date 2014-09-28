@@ -1,0 +1,28 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{6798fc1b-4afa-47ee-867e-5a27da9192e9}</uuid>
+        <name locale="en_US">LM4041</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.905" width="0.254" layer="10" start_x="1.27">
+            <segment type="line" end_x="1.27" end_y="1.524"/>
+        </polygon>
+        <polygon fill="false" start_y="1.524" width="0.254" layer="10" start_x="1.27">
+            <segment type="line" end_x="0" end_y="1.524"/>
+        </polygon>
+        <polygon fill="false" start_y="1.524" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="-1.27" end_y="1.524"/>
+        </polygon>
+        <polygon fill="false" start_y="1.524" width="0.254" layer="10" start_x="-1.27">
+            <segment type="line" end_x="-1.27" end_y="1.143"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-2.54" uuid="{81d8bac9-455e-41b4-a203-0c048d651d34}">
+            <name locale="en_US">A</name>
+        </pin>
+        <pin x="0" length="2.54" angle="270" y="2.54" uuid="{9008ed2d-bf39-4b8b-8975-4a2fe96abe7b}">
+            <name locale="en_US">C</name>
+        </pin>
+    </pins>
+</symbol>

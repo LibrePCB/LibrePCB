@@ -1,0 +1,118 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{4edbc0e9-a86d-41b0-94ed-ae47c1edd8eb}</uuid>
+        <name locale="en_US">XC5VLX110T_FF1738-MGTRX</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="20.32" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="20.32">
+            <segment type="line" end_x="20.32" end_y="-81.28"/>
+        </polygon>
+        <polygon fill="false" start_y="-81.28" width="0.254" layer="10" start_x="20.32">
+            <segment type="line" end_x="0" end_y="-81.28"/>
+        </polygon>
+        <polygon fill="false" start_y="-81.28" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{e481ef21-ecce-4af4-b99f-5f0cea629534}">
+            <name locale="en_US">MGTRXN0_112</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{759dac26-cf1f-4be2-8cc5-4d42937218f9}">
+            <name locale="en_US">MGTRXN0_114</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{53ba5ae2-e7e6-4fed-89ed-d89371313174}">
+            <name locale="en_US">MGTRXN0_116</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{fe876658-f9af-43d7-b1e0-20da58f250a3}">
+            <name locale="en_US">MGTRXN0_118</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{443cc10a-e040-452b-bb19-586a717322f0}">
+            <name locale="en_US">MGTRXN0_120</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{c09ce69e-6dfd-42f1-aaa3-04c647c02653}">
+            <name locale="en_US">MGTRXN0_122</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{1adeac1a-5487-4285-a564-a5ce6d62e39c}">
+            <name locale="en_US">MGTRXN0_124</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{767049e4-f4ce-4b94-b39c-d30f587ccf23}">
+            <name locale="en_US">MGTRXN0_126</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{9753ca94-94c9-4f8f-915d-9dfc5dc34a98}">
+            <name locale="en_US">MGTRXN1_112</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{ed832f57-2ffb-4cdf-bec3-05f8e7ee2b95}">
+            <name locale="en_US">MGTRXN1_114</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{cb42aa68-0780-40ed-bc2c-d762fa31a3f3}">
+            <name locale="en_US">MGTRXN1_116</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{2c7707a8-3b0f-433e-a1ea-a1e9abdd22cd}">
+            <name locale="en_US">MGTRXN1_118</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{1b549c3d-b9d9-46d5-98f3-362bc3fee17e}">
+            <name locale="en_US">MGTRXN1_120</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-33.02" uuid="{72b8ff50-86f2-458b-9413-8bd19bbdf97d}">
+            <name locale="en_US">MGTRXN1_122</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-35.56" uuid="{3c37d252-8421-4aa8-9d17-320a83a081b8}">
+            <name locale="en_US">MGTRXN1_124</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-38.1" uuid="{96f38f3d-7b99-4b46-8334-038ce491524b}">
+            <name locale="en_US">MGTRXN1_126</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-40.64" uuid="{cdb71d5c-0e85-44d3-8631-12dc8ae0ac15}">
+            <name locale="en_US">MGTRXP0_112</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-43.18" uuid="{7aa8f9ca-432d-4dd7-a73e-ea453b8ac12b}">
+            <name locale="en_US">MGTRXP0_114</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-45.72" uuid="{222d68ba-3a93-4509-8ebb-5fd74539c7b5}">
+            <name locale="en_US">MGTRXP0_116</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-48.26" uuid="{d48b9ff0-9948-407d-9c44-ef88f7674e3e}">
+            <name locale="en_US">MGTRXP0_118</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-50.8" uuid="{8dfb7494-2899-41b2-83a1-c43bd41b2535}">
+            <name locale="en_US">MGTRXP0_120</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-53.34" uuid="{f17b2b52-5b72-4872-ac7e-ee1dac5c093a}">
+            <name locale="en_US">MGTRXP0_122</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-55.88" uuid="{ee440495-10ed-4c82-93c8-7e127b588647}">
+            <name locale="en_US">MGTRXP0_124</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-58.42" uuid="{a927fccf-a53c-497b-9edd-f909549c1168}">
+            <name locale="en_US">MGTRXP0_126</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-60.96" uuid="{b1250888-cf90-4b5b-8a7f-7e7a1be4a02a}">
+            <name locale="en_US">MGTRXP1_112</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-63.5" uuid="{9a6e776a-2f1f-44e2-8fc0-59467efd5f3d}">
+            <name locale="en_US">MGTRXP1_114</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-66.04" uuid="{695e44e4-7541-4e15-89d2-fb6bed9a4a61}">
+            <name locale="en_US">MGTRXP1_116</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-68.58" uuid="{eb63f157-6e68-4a2b-8c95-5bcb9ec6c68f}">
+            <name locale="en_US">MGTRXP1_118</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-71.12" uuid="{72438e9a-e200-4d1a-be0f-43c4be2b04e4}">
+            <name locale="en_US">MGTRXP1_120</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-73.66" uuid="{8886cb8f-24c8-4d26-a0a8-1bbe2cb7da8d}">
+            <name locale="en_US">MGTRXP1_122</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-76.2" uuid="{92be96e8-505b-4ff1-a9c2-adacc5ac75d4}">
+            <name locale="en_US">MGTRXP1_124</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-78.74" uuid="{0405dfa4-cb17-43ff-aaef-38d343186f05}">
+            <name locale="en_US">MGTRXP1_126</name>
+        </pin>
+    </pins>
+</symbol>

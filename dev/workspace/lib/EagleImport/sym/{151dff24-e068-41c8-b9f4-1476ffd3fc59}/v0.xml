@@ -1,0 +1,28 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{151dff24-e068-41c8-b9f4-1476ffd3fc59}</uuid>
+        <name locale="en_US">SJ</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0.635" width="1.27" layer="10" start_x="0.381">
+            <segment type="line" end_x="0.381" end_y="-0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.635" width="1.27" layer="10" start_x="-0.381">
+            <segment type="line" end_x="-0.381" end_y="0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="1.651" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-1.651" end_y="0"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="5.08" length="2.54" angle="180" y="0" uuid="{db2d84b8-594d-4430-a93e-a7b30ce6cf6f}">
+            <name locale="en_US">2</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{e9af5c8e-43f3-4582-a327-581d6e0f75f7}">
+            <name locale="en_US">1</name>
+        </pin>
+    </pins>
+</symbol>

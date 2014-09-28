@@ -1,0 +1,73 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{494b1f2b-ec62-4c73-a842-0fcb8c0c5b26}</uuid>
+        <name locale="en_US">PRESS-SENSE</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.1016" layer="10" start_x="5.08">
+            <segment type="line" end_x="2.54" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-3.81" width="0.1016" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.1016" layer="10" start_x="-2.54">
+            <segment type="line" end_x="5.08" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.1016" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="3.81"/>
+        </polygon>
+        <polygon fill="false" start_y="3.81" width="0.1016" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1016" layer="10" start_x="-2.54">
+            <segment type="line" end_x="2.54" end_y="-3.81"/>
+        </polygon>
+        <polygon fill="false" start_y="-3.81" width="0.1016" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="-6.35"/>
+        </polygon>
+        <polygon fill="false" start_y="-6.35" width="0.1016" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-3.81" width="0.1016" layer="10" start_x="-2.54">
+            <segment type="line" end_x="2.54" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="10.16" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="5.08" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="5.08" end_y="-6.35"/>
+        </polygon>
+        <polygon fill="false" start_y="-6.35" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="5.08" end_y="3.81"/>
+        </polygon>
+        <polygon fill="false" start_y="3.81" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="5.08" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="3.81" width="0.1016" layer="10" start_x="-2.54">
+            <segment type="line" end_x="5.08" end_y="3.81"/>
+        </polygon>
+        <polygon fill="false" start_y="-6.35" width="0.1016" layer="10" start_x="2.54">
+            <segment type="line" end_x="5.08" end_y="-6.35"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="270" y="7.62" uuid="{6aa9f457-4257-48b5-8736-b42af04f1ce9}">
+            <name locale="en_US">VS</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-10.16" uuid="{8c8014f6-039b-4344-8df1-65da9a345aa1}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="2.54" uuid="{9071f426-726c-426b-9073-234239ccece5}">
+            <name locale="en_US">VO+</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-5.08" uuid="{01f50f68-3702-46b8-b914-8f3a8b1fcba9}">
+            <name locale="en_US">VO-</name>
+        </pin>
+    </pins>
+</symbol>

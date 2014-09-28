@@ -1,0 +1,73 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{fd55459c-e2ff-48b4-963d-361c64a2bfc6}</uuid>
+        <name locale="en_US">CASE4COM</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.286" width="0.254" layer="10" start_x="-1.778">
+            <segment type="line" end_x="-0.762" end_y="2.286"/>
+        </polygon>
+        <polygon fill="false" start_y="2.286" width="0.254" layer="10" start_x="0.762">
+            <segment type="line" end_x="1.778" end_y="2.286"/>
+        </polygon>
+        <polygon fill="false" start_y="2.286" width="0.254" layer="10" start_x="3.302">
+            <segment type="line" end_x="4.318" end_y="2.286"/>
+        </polygon>
+        <polygon fill="false" start_y="2.286" width="0.254" layer="10" start_x="6.096">
+            <segment type="line" end_x="5.334" end_y="2.286"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="6.096" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="4.318">
+            <segment type="line" end_x="3.302" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="1.524" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="-1.524">
+            <segment type="line" end_x="-2.54" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="-3.302">
+            <segment type="line" end_x="-4.318" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-6.096" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="2.286" width="0.254" layer="10" start_x="-4.318">
+            <segment type="line" end_x="-3.302" end_y="2.286"/>
+        </polygon>
+        <polygon fill="false" start_y="2.286" width="0.254" layer="10" start_x="-6.096">
+            <segment type="line" end_x="-5.08" end_y="2.286"/>
+        </polygon>
+        <polygon fill="false" start_y="0.508" width="0.254" layer="10" start_x="-6.096">
+            <segment type="line" end_x="-6.096" end_y="1.524"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.524" width="0.254" layer="10" start_x="-6.096">
+            <segment type="line" end_x="-6.096" end_y="-0.508"/>
+        </polygon>
+        <polygon fill="false" start_y="-3.302" width="0.254" layer="10" start_x="-6.096">
+            <segment type="line" end_x="-6.096" end_y="-2.286"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="-6.096">
+            <segment type="line" end_x="-6.096" end_y="-4.064"/>
+        </polygon>
+        <polygon fill="false" start_y="1.524" width="0.254" layer="10" start_x="6.096">
+            <segment type="line" end_x="6.096" end_y="0.508"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="5.08" length="2.54" angle="90" y="-7.62" uuid="{c3a16913-40a8-4b42-bc46-2af511b383b0}">
+            <name locale="en_US">COM@4</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="90" y="-7.62" uuid="{173ef8c9-ef46-4f9a-9c08-bed0102d681f}">
+            <name locale="en_US">COM@2</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-7.62" uuid="{6a4b47b5-0d79-494d-9829-881f5538547c}">
+            <name locale="en_US">COM@3</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="90" y="-7.62" uuid="{8fa186ff-7310-4fab-b93d-063bc1516209}">
+            <name locale="en_US">COM@1</name>
+        </pin>
+    </pins>
+</symbol>

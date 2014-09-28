@@ -1,0 +1,97 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{132e0a77-b779-4c69-b2c5-0d51fedd9a58}</uuid>
+        <name locale="en_US">XC5VLX110T_FF1738-IO-AM</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="12.7" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-63.5"/>
+        </polygon>
+        <polygon fill="false" start_y="-63.5" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="0" end_y="-63.5"/>
+        </polygon>
+        <polygon fill="false" start_y="-63.5" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{ec692ca8-47dc-4312-9c8b-42a87060100a}">
+            <name locale="en_US">IO_AM6</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{a4d4bb17-8496-4470-868f-eb971786f344}">
+            <name locale="en_US">IO_AM7</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{8df0e25d-0bf9-409f-9171-156298b7a269}">
+            <name locale="en_US">IO_AM8</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{8460609a-5d85-4d4d-94ec-3cf8487e3215}">
+            <name locale="en_US">IO_AM9</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{2f332c2b-de66-477b-b6a1-4d89621d2be3}">
+            <name locale="en_US">IO_AM13</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{fa507d52-a551-4041-acac-2e86c2186b27}">
+            <name locale="en_US">IO_AM14</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{810ae60d-8cbf-4a04-a183-a009e9e25a58}">
+            <name locale="en_US">IO_AM16</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{b6d3dcf7-49dd-41df-9637-32d7b19a9466}">
+            <name locale="en_US">IO_AM17</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{cf5adec4-608c-4d3e-a954-1a7c960044d8}">
+            <name locale="en_US">IO_AM18</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{77a5f55e-4b59-4945-ac3f-992beac45b13}">
+            <name locale="en_US">IO_AM19</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{990418bc-7418-441d-83ca-a3d571b56cce}">
+            <name locale="en_US">IO_AM24</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{0a5a741b-8662-4166-8ded-62ec69706347}">
+            <name locale="en_US">IO_AM26</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{9a98638a-6ba3-4c47-96f7-3a8b1e12d135}">
+            <name locale="en_US">IO_AM27</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-33.02" uuid="{2d051527-bd7f-40d5-90dc-91c948385f13}">
+            <name locale="en_US">IO_AM28</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-35.56" uuid="{434d472e-7135-454b-ba11-8109620dd15a}">
+            <name locale="en_US">IO_AM29</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-38.1" uuid="{4261ff58-3ed1-483c-a4fe-4676179a6a74}">
+            <name locale="en_US">IO_AM31</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-40.64" uuid="{67c14354-fcc8-4285-8541-d23a27a99da6}">
+            <name locale="en_US">IO_AM32</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-43.18" uuid="{2ae9c4dc-14f1-4c75-ba70-142b0419995b}">
+            <name locale="en_US">IO_AM33</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-45.72" uuid="{c41060c8-f8de-4e2c-82c4-c6bed6b99f40}">
+            <name locale="en_US">IO_AM34</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-48.26" uuid="{7290b241-253b-463e-ac2c-62cd1431a3f1}">
+            <name locale="en_US">IO_AM36</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-50.8" uuid="{cbbc501e-6be1-4dfa-a68a-a7f189556c8c}">
+            <name locale="en_US">IO_AM37</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-53.34" uuid="{ffc5d428-62e7-48b9-86a2-8adcab60f98b}">
+            <name locale="en_US">IO_AM38</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-55.88" uuid="{d6596b1d-ee97-4830-a7f9-cec508c18802}">
+            <name locale="en_US">IO_AM39</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-58.42" uuid="{5a713544-958c-4769-abc5-ab8f1a4dcd10}">
+            <name locale="en_US">IO_AM41</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-60.96" uuid="{1b82c280-5190-4dcc-a35b-4e072250e4b6}">
+            <name locale="en_US">IO_AM42</name>
+        </pin>
+    </pins>
+</symbol>

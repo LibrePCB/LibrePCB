@@ -1,0 +1,49 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{a9e08c24-5b83-47d8-bcba-8b63e1ebef16}</uuid>
+        <name locale="en_US">LASERDH</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="-1.27">
+            <segment type="line" end_x="1.27" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="1.27">
+            <segment type="line" end_x="-1.27" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="1.27">
+            <segment type="line" end_x="1.27" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="-1.27">
+            <segment type="line" end_x="-1.27" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="1.27">
+            <segment type="line" end_x="1.27" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="3.302" width="0.2032" layer="10" start_x="0.254">
+            <segment type="line" end_x="-0.762" end_y="2.286"/>
+        </polygon>
+        <polygon fill="false" start_y="2.286" width="0.2032" layer="10" start_x="-0.762">
+            <segment type="line" end_x="0.254" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.286" width="0.2032" layer="10" start_x="-0.762">
+            <segment type="line" end_x="-0.508" end_y="3.302"/>
+        </polygon>
+        <polygon fill="false" start_y="2.794" width="0.2032" layer="10" start_x="1.524">
+            <segment type="line" end_x="0.508" end_y="1.778"/>
+        </polygon>
+        <polygon fill="false" start_y="1.778" width="0.2032" layer="10" start_x="0.508">
+            <segment type="line" end_x="1.524" end_y="2.032"/>
+        </polygon>
+        <polygon fill="false" start_y="1.778" width="0.2032" layer="10" start_x="0.508">
+            <segment type="line" end_x="0.762" end_y="2.794"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{cd13de13-adda-4fc4-9111-88f8526820c9}">
+            <name locale="en_US">A</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="180" y="0" uuid="{8b69c844-1d16-419c-9bbe-747860e5108c}">
+            <name locale="en_US">C</name>
+        </pin>
+    </pins>
+</symbol>

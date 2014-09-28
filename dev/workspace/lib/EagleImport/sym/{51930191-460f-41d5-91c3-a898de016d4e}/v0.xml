@@ -1,0 +1,37 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{51930191-460f-41d5-91c3-a898de016d4e}</uuid>
+        <name locale="en_US">C2</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-2.032"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-0.508"/>
+        </polygon>
+        <polygon fill="true" start_y="-1.016" width="0.254" layer="10" start_x="-2.032">
+            <segment type="line" end_x="2.032" end_y="-1.016"/>
+            <segment type="line" end_x="2.032" end_y="-0.508"/>
+            <segment type="line" end_x="-2.032" end_y="-0.508"/>
+            <segment type="line" end_x="-2.032" end_y="-1.016"/>
+        </polygon>
+        <polygon fill="true" start_y="-2.032" width="0.254" layer="10" start_x="-2.032">
+            <segment type="line" end_x="2.032" end_y="-2.032"/>
+            <segment type="line" end_x="2.032" end_y="-1.524"/>
+            <segment type="line" end_x="-2.032" end_y="-1.524"/>
+            <segment type="line" end_x="-2.032" end_y="-2.032"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="270" y="2.54" uuid="{cdfccef9-543d-4fee-b396-c98573e5d6a4}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-5.08" uuid="{10bd9f51-1b86-4b94-80af-b5dd12d14775}">
+            <name locale="en_US">2</name>
+        </pin>
+        <pin x="0" length="2.54" angle="270" y="-2.54" uuid="{18360f6c-da29-4280-a451-51d315d9c262}">
+            <name locale="en_US">3</name>
+        </pin>
+    </pins>
+</symbol>

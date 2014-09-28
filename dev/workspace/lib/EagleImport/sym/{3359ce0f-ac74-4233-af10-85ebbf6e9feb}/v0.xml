@@ -1,0 +1,40 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{3359ce0f-ac74-4233-af10-85ebbf6e9feb}</uuid>
+        <name locale="en_US">MAX680</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-10.16" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="5.08" angle="0" y="2.54" uuid="{cab064d5-3aae-4c78-afb8-ed762e9eb0ad}">
+            <name locale="en_US">C1-</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="7.62" uuid="{13c9f359-d4e2-49e1-a28e-9e694a36469f}">
+            <name locale="en_US">C1+</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-2.54" uuid="{f1e963d2-b378-42b7-bb8e-071603e886fe}">
+            <name locale="en_US">C2+</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-7.62" uuid="{5782257d-3a0e-479d-ae94-acdfa1f700ee}">
+            <name locale="en_US">C2-</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="7.62" uuid="{35559da3-346b-4dcd-b9d7-23c4e1d9977d}">
+            <name locale="en_US">V+</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="2.54" uuid="{43b388a2-f8d9-4072-a2f1-38d61488314f}">
+            <name locale="en_US">V-</name>
+        </pin>
+    </pins>
+</symbol>

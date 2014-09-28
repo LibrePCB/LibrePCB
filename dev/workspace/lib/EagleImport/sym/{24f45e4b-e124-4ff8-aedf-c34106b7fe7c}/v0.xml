@@ -1,0 +1,42 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{24f45e4b-e124-4ff8-aedf-c34106b7fe7c}</uuid>
+        <name locale="en_US">5PWR6GND</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="270" y="7.62" uuid="{bf98dcae-c1d1-483b-bf0b-fc8f5bfa7f73}">
+            <name locale="en_US">VCC@1</name>
+        </pin>
+        <pin x="-2.54" length="5.08" angle="270" y="7.62" uuid="{c9fc1efb-fa6c-4d09-82ba-905e092609c3}">
+            <name locale="en_US">VCC@2</name>
+        </pin>
+        <pin x="0" length="5.08" angle="270" y="7.62" uuid="{626b2bfc-b6c8-4be4-a746-8fd476f94e41}">
+            <name locale="en_US">VCC@3</name>
+        </pin>
+        <pin x="2.54" length="5.08" angle="270" y="7.62" uuid="{d0383704-eea9-4d0f-a578-31cc9f2b09e0}">
+            <name locale="en_US">VCC@4</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="270" y="7.62" uuid="{2a754354-6cd6-4f71-8550-9e277a9ba036}">
+            <name locale="en_US">VCC@5</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="90" y="-7.62" uuid="{f271c867-ff63-4787-bcf1-26b49dd3bdb1}">
+            <name locale="en_US">GND@1</name>
+        </pin>
+        <pin x="-2.54" length="5.08" angle="90" y="-7.62" uuid="{290c8785-6023-44ce-af10-82d7b540420d}">
+            <name locale="en_US">GND@2</name>
+        </pin>
+        <pin x="0" length="5.08" angle="90" y="-7.62" uuid="{2a0e0fef-e5a2-4e87-b242-79b41c5c2d5f}">
+            <name locale="en_US">GND@3</name>
+        </pin>
+        <pin x="2.54" length="5.08" angle="90" y="-7.62" uuid="{cd21898b-93fc-4bfc-b4f8-57d3fe00272c}">
+            <name locale="en_US">GND@4</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="90" y="-7.62" uuid="{ffb4b6ac-b2b0-4dd9-8c63-005bc2a2617c}">
+            <name locale="en_US">GND@5</name>
+        </pin>
+        <pin x="7.62" length="5.08" angle="90" y="-7.62" uuid="{9ff99ec3-3edf-4960-b2e9-acd4a147826b}">
+            <name locale="en_US">GND@6</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,16 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{9a2c7e7f-eb9f-4a92-854e-700a4abc0671}</uuid>
+        <name locale="en_US">R-P</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="8.128"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-5.08" uuid="{f9969573-3494-4f80-b7ed-775c943f8af3}">
+            <name locale="en_US">2</name>
+        </pin>
+    </pins>
+</symbol>

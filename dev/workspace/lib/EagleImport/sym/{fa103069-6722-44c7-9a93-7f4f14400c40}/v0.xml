@@ -1,0 +1,43 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{fa103069-6722-44c7-9a93-7f4f14400c40}</uuid>
+        <name locale="en_US">SHIELD-2</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="1.27">
+            <segment type="line" end_x="-3.81" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="-1.27">
+            <segment type="line" end_x="-1.27" end_y="1.778"/>
+        </polygon>
+        <polygon fill="false" start_y="1.778" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-1.27" end_y="1.778"/>
+        </polygon>
+        <polygon fill="false" start_y="1.778" width="0.254" layer="10" start_x="-1.27">
+            <segment type="line" end_x="0" end_y="1.778"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="-2.032">
+            <segment type="line" end_x="-0.508" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="0.762" width="0.254" layer="10" start_x="-1.524">
+            <segment type="line" end_x="-1.016" end_y="0.762"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="1.27">
+            <segment type="line" end_x="1.27" end_y="3.302"/>
+        </polygon>
+        <polygon fill="false" start_y="3.302" width="0.1524" layer="10" start_x="1.27">
+            <segment type="line" end_x="-3.81" end_y="3.302"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-3.81">
+            <segment type="line" end_x="-3.81" end_y="3.302"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-2.54" uuid="{1acf0f01-1384-42e0-bfd7-16cd5013c79b}">
+            <name locale="en_US">SH@2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="90" y="-2.54" uuid="{763b9ee2-91ed-48b7-b820-933bc82f264f}">
+            <name locale="en_US">SH@1</name>
+        </pin>
+    </pins>
+</symbol>

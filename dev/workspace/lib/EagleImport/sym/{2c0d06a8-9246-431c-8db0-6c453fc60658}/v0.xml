@@ -1,0 +1,52 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{2c0d06a8-9246-431c-8db0-6c453fc60658}</uuid>
+        <name locale="en_US">565</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-12.7" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="12.7" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="12.7" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="-12.7"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="10.16" uuid="{c9a7b155-b6c3-4e3a-8c1d-6463cc66c109}">
+            <name locale="en_US">IN1</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="10.16" uuid="{118f91d8-03e2-4820-ad48-f96149fba8ae}">
+            <name locale="en_US">CT</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{c6e9f475-fcce-46be-8519-be68008c2853}">
+            <name locale="en_US">IN2</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="0" uuid="{ecdb63bd-599d-4185-908f-db4034cdb1fe}">
+            <name locale="en_US">CV</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="5.08" uuid="{794ba80b-c07b-42a6-82dc-7ae9084257b7}">
+            <name locale="en_US">RT</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{26a13a86-1a72-4b22-a8ea-e8784895e0a5}">
+            <name locale="en_US">VCO_IN</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{30e1e6a6-6a44-4696-a986-eb9e38567d28}">
+            <name locale="en_US">VCO_OUT</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-5.08" uuid="{a5511fbd-4a4a-4b91-ac9a-956d9ee8ef38}">
+            <name locale="en_US">REF</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-10.16" uuid="{a05fe7d9-392c-48c5-b6f7-863fbcec800a}">
+            <name locale="en_US">V+</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-10.16" uuid="{4c8f3164-8b9d-4a53-a82c-179ab564baa6}">
+            <name locale="en_US">V-</name>
+        </pin>
+    </pins>
+</symbol>

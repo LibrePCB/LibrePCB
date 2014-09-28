@@ -1,0 +1,73 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{aea2fe16-9619-4880-a63e-22a18f97530f}</uuid>
+        <name locale="en_US">PCI</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-52.07"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{256c8476-c45b-4f8d-946d-95c40bafda0b}">
+            <name locale="en_US">P_PAR</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{3577fce3-3f30-45ca-a344-7d6423d91c1a}">
+            <name locale="en_US">!P_SERR</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{bbe17238-fb86-4b6e-944a-7201006f2610}">
+            <name locale="en_US">!P_PERR</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{e2df8f84-73c8-4581-9ff2-d8096e8745c0}">
+            <name locale="en_US">!P_STOP</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{8394de37-dd20-45d6-ae33-b04779088762}">
+            <name locale="en_US">!P_DEVSEL</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{a0585d9c-69bf-4f1d-8441-e982bc1954f1}">
+            <name locale="en_US">!P_TRDY</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{1e86aea2-9016-417c-8160-1491266e275e}">
+            <name locale="en_US">!P_FRAME</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{98d53174-13c7-432b-95a5-01db3ec40e38}">
+            <name locale="en_US">!P_IRDY</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-33.02" uuid="{a83467c3-4158-4486-ac31-e64453996108}">
+            <name locale="en_US">!P_LOCK</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-35.56" uuid="{37aad5d1-8e18-4e68-812d-d005793b5940}">
+            <name locale="en_US">!P_INTA</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-38.1" uuid="{a19b1f5f-5a4d-4f87-8873-3525bb3236d0}">
+            <name locale="en_US">!P_INTB</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-40.64" uuid="{b03e2152-e34c-4db7-a520-91e22bcdd9ce}">
+            <name locale="en_US">!P_PME</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-43.18" uuid="{0f6465cb-a275-4cfb-9df2-0828af421e5c}">
+            <name locale="en_US">!P_REQ</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-45.72" uuid="{17bab0f8-f5c9-4c0b-9e86-76674899d23e}">
+            <name locale="en_US">!P_GNT</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-48.26" uuid="{af22c584-b51f-4969-bd36-f6d23126cdce}">
+            <name locale="en_US">P_IDSEL</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-50.8" uuid="{c9a85fe3-c591-4bab-9f99-4145214c033e}">
+            <name locale="en_US">P_CLK33</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{411064a4-0239-4b88-a4fa-424872231974}">
+            <name locale="en_US">!P_CBE0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{77d8ffd4-dbba-4088-9b5e-1bc2f3edd1e8}">
+            <name locale="en_US">!P_CBE1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{aa4d7af7-c6b0-4646-8d8b-02e0b5eb0a29}">
+            <name locale="en_US">!P_CBE2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{9096adf9-7473-4d91-bbb3-06990b359442}">
+            <name locale="en_US">!P_CBE3</name>
+        </pin>
+    </pins>
+</symbol>

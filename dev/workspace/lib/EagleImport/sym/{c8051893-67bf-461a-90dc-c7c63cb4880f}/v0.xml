@@ -1,0 +1,52 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{c8051893-67bf-461a-90dc-c7c63cb4880f}</uuid>
+        <name locale="en_US">MAX1676</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="12.7" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="-12.7" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-12.7" end_y="15.24"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="15.24" length="2.54" angle="180" y="5.08" uuid="{aec29290-1471-4bcf-bd92-649ecc1b1e42}">
+            <name locale="en_US">SHDN/</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="5.08" uuid="{3def3c69-1707-4450-bbb1-0eb8f7aa7412}">
+            <name locale="en_US">LBI</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-2.54" uuid="{b7c09c9f-3f68-41bb-ae19-31257c93d33b}">
+            <name locale="en_US">LBO/</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-5.08" uuid="{a1c639dc-9a73-4145-a0af-41bcef1d833f}">
+            <name locale="en_US">REF</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-7.62" uuid="{c229f5b8-c1d3-4832-9cbf-bae486f8a04a}">
+            <name locale="en_US">FB</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="12.7" uuid="{33e8654f-588e-4298-8bb2-5f1beaff96fc}">
+            <name locale="en_US">LX</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="7.62" uuid="{66083ec5-cfb2-4568-b857-c9d0ded318ee}">
+            <name locale="en_US">OUT</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-12.7" uuid="{5676954b-f05d-4b46-a8ab-e6edc2966611}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="12.7" uuid="{8a697a06-2c77-46ad-a269-e8e3c82c800c}">
+            <name locale="en_US">BATT</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="2.54" uuid="{e4b947f6-616d-431c-8cca-a6c3f5324446}">
+            <name locale="en_US">CSEL</name>
+        </pin>
+    </pins>
+</symbol>

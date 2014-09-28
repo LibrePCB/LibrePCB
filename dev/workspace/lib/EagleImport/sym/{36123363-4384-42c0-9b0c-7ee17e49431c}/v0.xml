@@ -1,0 +1,40 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{36123363-4384-42c0-9b0c-7ee17e49431c}</uuid>
+        <name locale="en_US">AD780</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="10.16" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-7.62" end_y="-7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="5.08" uuid="{6abb8030-effd-4f5d-aeca-aebcc9cd7fe6}">
+            <name locale="en_US">+VIN</name>
+        </pin>
+        <pin x="-7.62" length="0" angle="0" y="0" uuid="{d06a55b3-91e6-445b-ba33-e84f0ef0ce16}">
+            <name locale="en_US">TEMP</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="0" uuid="{59329fd7-de83-4494-8c00-6498251af3e2}">
+            <name locale="en_US">TRIM</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="5.08" uuid="{3ff98d26-7c7b-408e-80ba-36b2d0e84f6e}">
+            <name locale="en_US">VOUT</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-5.08" uuid="{68db343b-3c12-4c72-978d-d31128f79cab}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-5.08" uuid="{3fdad027-222c-416b-a396-044d1ca477b3}">
+            <name locale="en_US">O/P</name>
+        </pin>
+    </pins>
+</symbol>

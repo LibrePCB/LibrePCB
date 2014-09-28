@@ -1,0 +1,16 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{4ed7e40a-b12f-4432-8a23-dbdc3638857a}</uuid>
+        <name locale="en_US">GNDINT</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="-1.905">
+            <segment type="line" end_x="1.905" end_y="0"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="270" y="2.54" uuid="{acd8d8dd-3427-4f60-b4af-a15418a1476e}">
+            <name locale="en_US">GNDINT</name>
+        </pin>
+    </pins>
+</symbol>

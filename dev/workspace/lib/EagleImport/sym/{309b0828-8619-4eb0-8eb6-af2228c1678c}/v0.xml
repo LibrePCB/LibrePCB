@@ -1,0 +1,214 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{309b0828-8619-4eb0-8eb6-af2228c1678c}</uuid>
+        <name locale="en_US">GS4911B</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-38.1" width="0.2032" layer="10" start_x="-38.1">
+            <segment type="line" end_x="35.56" end_y="-38.1"/>
+        </polygon>
+        <polygon fill="false" start_y="-38.1" width="0.2032" layer="10" start_x="35.56">
+            <segment type="line" end_x="35.56" end_y="35.56"/>
+        </polygon>
+        <polygon fill="false" start_y="35.56" width="0.2032" layer="10" start_x="35.56">
+            <segment type="line" end_x="-38.1" end_y="35.56"/>
+        </polygon>
+        <polygon fill="false" start_y="35.56" width="0.2032" layer="10" start_x="-38.1">
+            <segment type="line" end_x="-38.1" end_y="-38.1"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-40.64" length="2.54" angle="0" y="17.78" uuid="{50d16fe4-abe9-4962-a208-0500500f4e6f}">
+            <name locale="en_US">LOCK_LOST</name>
+        </pin>
+        <pin x="-40.64" length="2.54" angle="0" y="15.24" uuid="{f6ee1ae7-c3b9-4990-a209-4d3bf3f61751}">
+            <name locale="en_US">REF_LOST</name>
+        </pin>
+        <pin x="-40.64" length="2.54" angle="0" y="12.7" uuid="{62f92955-56ea-4cca-a1ee-6771b3ba37e4}">
+            <name locale="en_US">VID_PLL_VDD</name>
+        </pin>
+        <pin x="-40.64" length="2.54" angle="0" y="10.16" uuid="{f7f4a08f-f808-437c-980a-a1650aa26d89}">
+            <name locale="en_US">VID_PLL_GND</name>
+        </pin>
+        <pin x="-40.64" length="2.54" angle="0" y="7.62" uuid="{fb0bccd1-fd3f-4e7f-9789-032667ec73cf}">
+            <name locale="en_US">XTAL_VDD</name>
+        </pin>
+        <pin x="-40.64" length="2.54" angle="0" y="5.08" uuid="{b4552e23-4dd8-4b5d-a502-b8d796f5301f}">
+            <name locale="en_US">X1</name>
+        </pin>
+        <pin x="-40.64" length="2.54" angle="0" y="2.54" uuid="{0fe455f6-9844-4e02-acb3-5f4f7ab488f3}">
+            <name locale="en_US">X2</name>
+        </pin>
+        <pin x="-40.64" length="2.54" angle="0" y="0" uuid="{f89c700d-1201-4afe-9f71-a610e5028bd9}">
+            <name locale="en_US">XTAL_GND</name>
+        </pin>
+        <pin x="-40.64" length="2.54" angle="0" y="-2.54" uuid="{41f0b42e-d656-4805-b1d9-15d7d279af3d}">
+            <name locale="en_US">CORE_GND</name>
+        </pin>
+        <pin x="-40.64" length="2.54" angle="0" y="-5.08" uuid="{96442445-cbbb-4291-bf3c-5932b30728f8}">
+            <name locale="en_US">AVDD</name>
+        </pin>
+        <pin x="-40.64" length="2.54" angle="0" y="-7.62" uuid="{9873fdc2-ccac-4482-9f6e-a5b2345b6c28}">
+            <name locale="en_US">NC</name>
+        </pin>
+        <pin x="-40.64" length="2.54" angle="0" y="-10.16" uuid="{aa8e1599-dab1-4143-95ad-47f5cf2652d9}">
+            <name locale="en_US">AGND</name>
+        </pin>
+        <pin x="-40.64" length="2.54" angle="0" y="-12.7" uuid="{633e83c1-eaf1-49f5-8868-d2ccb0aff5d2}">
+            <name locale="en_US">AUD_PLL_GND</name>
+        </pin>
+        <pin x="-40.64" length="2.54" angle="0" y="-15.24" uuid="{bb9a2e9b-5e14-4b69-845e-abfc65adee89}">
+            <name locale="en_US">AUD_PLL_VDD</name>
+        </pin>
+        <pin x="-40.64" length="2.54" angle="0" y="-17.78" uuid="{b7d43034-33f6-4ba6-b563-36c7ec9fb249}">
+            <name locale="en_US">10FID</name>
+        </pin>
+        <pin x="-40.64" length="2.54" angle="0" y="-20.32" uuid="{5d83cc8e-388b-4780-995f-79865943b935}">
+            <name locale="en_US">HSYNC</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="90" y="-40.64" uuid="{a4f059b9-3c4a-4814-b5c8-d4dcb5e22d5d}">
+            <name locale="en_US">VSYNC</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="90" y="-40.64" uuid="{e0f0bf5d-b64d-4808-b7a8-ecbebb35e100}">
+            <name locale="en_US">IO_VDD</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="90" y="-40.64" uuid="{e9169e35-4d15-4704-b811-690127007d25}">
+            <name locale="en_US">FSYNC</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="90" y="-40.64" uuid="{4a101a44-29e3-4492-9f3e-6d896949e06d}">
+            <name locale="en_US">NC@1</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="90" y="-40.64" uuid="{e8d8e563-c115-4044-b454-e13534cf5111}">
+            <name locale="en_US">VID_STD0</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="90" y="-40.64" uuid="{f7337bda-d2ba-4333-b817-13f0bf80e447}">
+            <name locale="en_US">VID_STD1</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="90" y="-40.64" uuid="{cb4aa9fe-ca52-4aed-9b6b-5dfe7ca3618e}">
+            <name locale="en_US">VID_STD2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="90" y="-40.64" uuid="{59abc674-ae85-433f-92ce-077ea2ee401a}">
+            <name locale="en_US">VID_STD3</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-40.64" uuid="{e020348f-fb99-4f26-a30b-1ae393a7a88a}">
+            <name locale="en_US">VID_STD4</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-40.64" uuid="{4dcb6594-eba1-4f99-ab37-4b4bfc6788a4}">
+            <name locale="en_US">CORE_VDD</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="90" y="-40.64" uuid="{cfc22f5c-6088-479b-a01c-0423d5d1ed2a}">
+            <name locale="en_US">VID_STD5</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="90" y="-40.64" uuid="{2de72a81-aac3-4ad1-969c-1b29a02bf4a9}">
+            <name locale="en_US">ACLK1</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="90" y="-40.64" uuid="{310dcbc1-5373-4cbf-a689-74912c23ea18}">
+            <name locale="en_US">ACLK2</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="90" y="-40.64" uuid="{cd1316bf-0bc6-4b90-8ef3-bdcb064a204a}">
+            <name locale="en_US">ACLK3</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="90" y="-40.64" uuid="{732e1458-d765-4581-99a6-78af857cdbf2}">
+            <name locale="en_US">IO_VDD@1</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="90" y="-40.64" uuid="{2c73ab0b-5b7d-4f9a-abf2-da85f4b4e66c}">
+            <name locale="en_US">ASR_SEL2</name>
+        </pin>
+        <pin x="38.1" length="2.54" angle="180" y="-20.32" uuid="{13ef4610-e746-49ff-b4bc-60011f7d1334}">
+            <name locale="en_US">ASR_SEL1</name>
+        </pin>
+        <pin x="38.1" length="2.54" angle="180" y="-17.78" uuid="{e997437e-3333-4be1-a57e-f9c114928dad}">
+            <name locale="en_US">ASR_SEL0</name>
+        </pin>
+        <pin x="38.1" length="2.54" angle="180" y="-15.24" uuid="{7d6e372f-4551-4bb6-b7cb-21339470e60b}">
+            <name locale="en_US">TIMING_OUT_1</name>
+        </pin>
+        <pin x="38.1" length="2.54" angle="180" y="-12.7" uuid="{00e3bc82-e9e4-4ced-a6fd-309f43e76f28}">
+            <name locale="en_US">TIMING_OUT_2</name>
+        </pin>
+        <pin x="38.1" length="2.54" angle="180" y="-10.16" uuid="{bf9f1fa6-ab32-425a-934b-ad2d2ee688d0}">
+            <name locale="en_US">TIMING_OUT_3</name>
+        </pin>
+        <pin x="38.1" length="2.54" angle="180" y="-7.62" uuid="{198c89af-bf86-4374-a1a5-aa025c6105b0}">
+            <name locale="en_US">IO_VDD@2</name>
+        </pin>
+        <pin x="38.1" length="2.54" angle="180" y="-5.08" uuid="{178f4c49-3a32-40e7-972a-f0a41f89f988}">
+            <name locale="en_US">TIMING_OUT_4</name>
+        </pin>
+        <pin x="38.1" length="2.54" angle="180" y="-2.54" uuid="{c8152504-4612-40bc-a0f7-4be7edcb8dd4}">
+            <name locale="en_US">TIMING_OUT_5</name>
+        </pin>
+        <pin x="38.1" length="2.54" angle="180" y="0" uuid="{5776bc48-af05-4fa4-ba0c-10de8ca45112}">
+            <name locale="en_US">TIMING_OUT_6</name>
+        </pin>
+        <pin x="38.1" length="2.54" angle="180" y="2.54" uuid="{7f55f8ee-d9a6-44ab-865c-138ac1d70523}">
+            <name locale="en_US">TIMING_OUT_7</name>
+        </pin>
+        <pin x="38.1" length="2.54" angle="180" y="5.08" uuid="{da6d3c81-0183-49f3-8710-faebde7c9d6d}">
+            <name locale="en_US">TIMING_OUT_8</name>
+        </pin>
+        <pin x="38.1" length="2.54" angle="180" y="7.62" uuid="{5cc48bb8-f55b-4b46-b946-168adf9e5c19}">
+            <name locale="en_US">CORE_VDD@1</name>
+        </pin>
+        <pin x="38.1" length="2.54" angle="180" y="10.16" uuid="{028ed9df-b7f9-4857-8e61-622a0d728703}">
+            <name locale="en_US">LVDS/PCLK3_VDD</name>
+        </pin>
+        <pin x="38.1" length="2.54" angle="180" y="12.7" uuid="{224f40ed-13ef-4744-bcbc-288275e35a19}">
+            <name locale="en_US">!PCLK3</name>
+        </pin>
+        <pin x="38.1" length="2.54" angle="180" y="15.24" uuid="{05c9f757-9b01-4e26-9e3a-b2c27f16f03d}">
+            <name locale="en_US">PCLK3</name>
+        </pin>
+        <pin x="38.1" length="2.54" angle="180" y="17.78" uuid="{1c1dd7a3-b72d-4a21-b454-8b599f162b5c}">
+            <name locale="en_US">LVDS/PCLK3_GND</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="270" y="38.1" uuid="{3a30f3fe-4f99-42e0-919f-ef53d19f2ad9}">
+            <name locale="en_US">PCLK2</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="270" y="38.1" uuid="{f7dbc42e-96cc-4f48-8e7b-8ed406aadb71}">
+            <name locale="en_US">IO_VDD@3</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="270" y="38.1" uuid="{95fec3d1-d0da-405e-b786-72c42094dcf2}">
+            <name locale="en_US">PCLK1</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="270" y="38.1" uuid="{aaabfda7-8d58-455e-945a-61d4d5a72159}">
+            <name locale="en_US">PCLK1&amp;2_GND</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="270" y="38.1" uuid="{519fab93-e1d6-4e72-a967-38354c56016b}">
+            <name locale="en_US">PCLK1&amp;2_VDD</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="270" y="38.1" uuid="{1ae34c9e-454f-4aea-8551-a9be56674fe4}">
+            <name locale="en_US">PHS_VDD</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="270" y="38.1" uuid="{21282fef-ea50-477f-bc8b-9d0987b6d9b3}">
+            <name locale="en_US">PHS_GND</name>
+        </pin>
+        <pin x="0" length="2.54" angle="270" y="38.1" uuid="{15f0df72-cc2e-46d6-bd48-1dae83f95aa0}">
+            <name locale="en_US">JTAG/!HOST</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="270" y="38.1" uuid="{d06ecd75-fdc9-4191-b456-8379e3f705a8}">
+            <name locale="en_US">SCLK_TCLK</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="270" y="38.1" uuid="{0633ab05-95c5-4ed2-a189-87deadbc2bf0}">
+            <name locale="en_US">SDIN_TDI</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="270" y="38.1" uuid="{a5cf0f27-17ad-4bed-b2e6-0256ae1ea505}">
+            <name locale="en_US">SDOUT_TDO</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="270" y="38.1" uuid="{30339da0-77cb-47dd-a280-cedd5aa23165}">
+            <name locale="en_US">!CS!_TMS</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="270" y="38.1" uuid="{d8fd8b06-9086-42bb-9732-9348ad61de18}">
+            <name locale="en_US">!RESET</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="270" y="38.1" uuid="{4f5f2003-48e3-4014-9de0-6de82566b073}">
+            <name locale="en_US">IO_VDD@4</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="270" y="38.1" uuid="{85124237-8c14-403a-a687-7b9f1da34da8}">
+            <name locale="en_US">NC@2</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="270" y="38.1" uuid="{3d66c291-dd43-48ee-9157-1871b083e6dd}">
+            <name locale="en_US">!GENCLOCK</name>
+        </pin>
+    </pins>
+</symbol>

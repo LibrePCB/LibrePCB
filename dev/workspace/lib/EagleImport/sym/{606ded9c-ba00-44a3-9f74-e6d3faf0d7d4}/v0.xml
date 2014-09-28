@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{606ded9c-ba00-44a3-9f74-e6d3faf0d7d4}</uuid>
+        <name locale="en_US">XR-1015</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="-12.7" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-12.7" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.4064" layer="10" start_x="-12.7">
+            <segment type="line" end_x="10.16" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-17.78" length="5.08" angle="0" y="2.54" uuid="{dc72daa2-f1c7-4c15-96e8-36600faa2fdc}">
+            <name locale="en_US">5/!10</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="-2.54" uuid="{f3d4e78d-80e7-415f-b558-04af2e7669fd}">
+            <name locale="en_US">CLOCKIN</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="0" uuid="{4f1d3f7a-8916-4a6e-ad5d-8734a5a8889c}">
+            <name locale="en_US">ANAREF</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="5.08" uuid="{71adeb6a-1c58-4b06-b010-7b01ee0e4988}">
+            <name locale="en_US">FLTIN</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="5.08" uuid="{147cb42b-861d-4444-838b-57f3605ab8d9}">
+            <name locale="en_US">FLTOUT</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="2.54" uuid="{5fbd5b2d-5da1-442e-9e52-2b11301d3cf0}">
+            <name locale="en_US">CLOCK/2</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-2.54" uuid="{69982746-cce4-4f4c-be3e-fd57e3b7e584}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-5.08" uuid="{78516e6e-65d2-4ae5-beb2-04aa42026fa9}">
+            <name locale="en_US">VSS</name>
+        </pin>
+    </pins>
+</symbol>

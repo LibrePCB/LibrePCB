@@ -1,0 +1,19 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{7109e47f-26b6-4d06-83f4-8c082bf5883b}</uuid>
+        <name locale="en_US">+3V3</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-1.905" width="0.254" layer="10" start_x="1.27">
+            <segment type="line" end_x="0" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="-1.27" end_y="-1.905"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-2.54" uuid="{fcb27fc7-83a7-4c64-b74b-ff10d1ec69b6}">
+            <name locale="en_US">+3V3</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,48 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{1f8da39a-ae97-4e72-bf05-2949eadb9bfa}</uuid>
+        <name locale="en_US">4PWR9VSS</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="-7.62" length="5.08" angle="270" y="7.62" uuid="{fe03042c-ddc6-43f5-bdcb-57f4cc216165}">
+            <name locale="en_US">VCC@1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="270" y="7.62" uuid="{e45f4dda-696f-4b68-b41f-bf40c192a1c5}">
+            <name locale="en_US">VCC@2</name>
+        </pin>
+        <pin x="-2.54" length="5.08" angle="270" y="7.62" uuid="{96d46e07-2eb7-44bc-9b96-82f88e5119a0}">
+            <name locale="en_US">VCC@3</name>
+        </pin>
+        <pin x="0" length="5.08" angle="270" y="7.62" uuid="{bb59e0eb-d4f4-4769-bb6b-221c78058c65}">
+            <name locale="en_US">VCC@4</name>
+        </pin>
+        <pin x="-2.54" length="5.08" angle="90" y="-7.62" uuid="{5decaac5-bd91-4907-9f9a-90957516e417}">
+            <name locale="en_US">VSS@3</name>
+        </pin>
+        <pin x="0" length="5.08" angle="90" y="-7.62" uuid="{185df6f1-416d-4475-a49d-d1cc3a8ea010}">
+            <name locale="en_US">VSS@4</name>
+        </pin>
+        <pin x="2.54" length="5.08" angle="90" y="-7.62" uuid="{17d76909-dd05-44aa-be20-a29ff064205c}">
+            <name locale="en_US">VSS@5</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="90" y="-7.62" uuid="{415fb5a9-ac66-4f2e-81cf-c4f1c83715ce}">
+            <name locale="en_US">VSS@6</name>
+        </pin>
+        <pin x="7.62" length="5.08" angle="90" y="-7.62" uuid="{267bf0c9-683d-4b55-81d4-454853bc0200}">
+            <name locale="en_US">VSS@7</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="90" y="-7.62" uuid="{b0434090-c947-4b59-b230-86e4a5fb1675}">
+            <name locale="en_US">VSS@2</name>
+        </pin>
+        <pin x="-7.62" length="5.08" angle="90" y="-7.62" uuid="{29c2cae0-6622-4263-99cd-63a23474e8b0}">
+            <name locale="en_US">VSS@1</name>
+        </pin>
+        <pin x="10.16" length="5.08" angle="90" y="-7.62" uuid="{3bc2771e-ad7a-4f0e-a65d-b008d746e292}">
+            <name locale="en_US">VSS@8</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="90" y="-7.62" uuid="{d993eaa3-b17a-4530-8273-6a2c1367dfaa}">
+            <name locale="en_US">VSS@9</name>
+        </pin>
+    </pins>
+</symbol>

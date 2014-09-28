@@ -1,0 +1,79 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{307ef0b3-d564-43ce-8c6f-e0ca5f3b794c}</uuid>
+        <name locale="en_US">DTTL</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0.254" width="0.254" layer="10" start_x="-4.318">
+            <segment type="line" end_x="-2.54" end_y="0.254"/>
+        </polygon>
+        <polygon fill="false" start_y="0.254" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-3.556" end_y="-0.254"/>
+        </polygon>
+        <polygon fill="false" start_y="0.254" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-3.556" end_y="0.762"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="-4.318">
+            <segment type="line" end_x="-2.54" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-3.556" end_y="-1.778"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-3.556" end_y="-0.762"/>
+        </polygon>
+        <polygon fill="false" start_y="3.81" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-5.08" end_y="3.81"/>
+        </polygon>
+        <polygon fill="false" start_y="3.81" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="-3.81"/>
+        </polygon>
+        <polygon fill="false" start_y="-3.81" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="7.62" end_y="-3.81"/>
+        </polygon>
+        <polygon fill="false" start_y="-3.81" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="3.81"/>
+        </polygon>
+        <polygon fill="false" start_y="0.762" width="0.254" layer="10" start_x="-3.556">
+            <segment type="line" end_x="-3.556" end_y="-0.254"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.762" width="0.254" layer="10" start_x="-3.556">
+            <segment type="line" end_x="-3.556" end_y="-1.778"/>
+        </polygon>
+        <polygon fill="false" start_y="0.254" width="0.254" layer="10" start_x="-0.762">
+            <segment type="line" end_x="0" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="-0.762" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="-0.762">
+            <segment type="line" end_x="-1.524" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="-1.524">
+            <segment type="line" end_x="-0.762" end_y="0.254"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="-0.762">
+            <segment type="line" end_x="-0.762" end_y="0.254"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="-0.762">
+            <segment type="line" end_x="-0.762" end_y="-2.032"/>
+        </polygon>
+        <polygon fill="true" start_y="0.254" width="0.254" layer="10" start_x="-1.524">
+            <segment type="line" end_x="0" end_y="0.254"/>
+            <segment type="line" end_x="0" end_y="0.508"/>
+            <segment type="line" end_x="-1.524" end_y="0.508"/>
+            <segment type="line" end_x="-1.524" end_y="0.254"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="10.16" length="2.54" angle="180" y="2.54" uuid="{e0e5046c-1763-4adc-b146-c253aacb204f}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-2.54" uuid="{4c7e1bd0-f6d4-4fb5-bbce-e29a6235c2af}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="0" uuid="{fbc9c94f-4c99-4e0f-81da-f22c14cd2e24}">
+            <name locale="en_US">OUT</name>
+        </pin>
+    </pins>
+</symbol>

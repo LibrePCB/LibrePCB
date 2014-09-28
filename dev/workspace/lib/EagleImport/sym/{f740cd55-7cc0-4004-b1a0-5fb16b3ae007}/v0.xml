@@ -1,0 +1,70 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{f740cd55-7cc0-4004-b1a0-5fb16b3ae007}</uuid>
+        <name locale="en_US">T5670</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-12.7" width="0.4064" layer="10" start_x="15.24">
+            <segment type="line" end_x="-12.7" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.4064" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-12.7" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.4064" layer="10" start_x="-12.7">
+            <segment type="line" end_x="15.24" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.4064" layer="10" start_x="15.24">
+            <segment type="line" end_x="15.24" end_y="-12.7"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-17.78" length="5.08" angle="0" y="12.7" uuid="{c169fa95-37d8-48cd-b38c-445c128b9f45}">
+            <name locale="en_US">NRZIN</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="10.16" uuid="{ee061f95-43ec-4e50-ace6-d61ef9ed6b75}">
+            <name locale="en_US">TYCLKIN</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="7.62" uuid="{5382cb76-0063-4ccd-bc1c-b74f8da66543}">
+            <name locale="en_US">B8ZS/!AMI</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="5.08" uuid="{0a2a4938-d074-42a9-b2a2-152d8d5eaf10}">
+            <name locale="en_US">!+B8ZSIN</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="-5.08" uuid="{a4986ae6-afad-468b-aefa-01184194880c}">
+            <name locale="en_US">LOOP-TEST</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="2.54" uuid="{a7335b03-6977-479b-bb7b-e405618f70d1}">
+            <name locale="en_US">!-B8ZSIN</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="0" uuid="{bb54e739-2de5-495c-8f84-bffdbfab5bf2}">
+            <name locale="en_US">!RAIS</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="-2.54" uuid="{fd8fd53e-328a-4cc7-96d3-7f0739f688c0}">
+            <name locale="en_US">RXCLKIN</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="180" y="12.7" uuid="{9757ef97-c1ba-4f77-9e2d-43e5f201e855}">
+            <name locale="en_US">NRZOUT</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="180" y="10.16" uuid="{7fdf9e00-f324-4124-a247-24bccec0f52c}">
+            <name locale="en_US">RXCLKOP</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="180" y="7.62" uuid="{68c0b2c5-e4cf-4083-85c6-9146d94d7b95}">
+            <name locale="en_US">AISOUT</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="180" y="0" uuid="{12369c03-1e03-47e9-b187-6c4ed85ccd54}">
+            <name locale="en_US">ERROR</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="180" y="2.54" uuid="{fffabeef-01b7-4488-8c57-4b30e176888d}">
+            <name locale="en_US">-B8ZSOUT</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="180" y="5.08" uuid="{3eaecee3-a7e2-48ac-953e-4d42f8c70199}">
+            <name locale="en_US">+B8ZSOUT</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="180" y="-5.08" uuid="{85e36aa7-0d7e-43de-9ce7-7b45139d31ba}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="180" y="-10.16" uuid="{3c380dca-049a-46c3-880b-51f726753efc}">
+            <name locale="en_US">VSS</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,49 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{367582a4-1641-4f3b-84e7-7cb82284293c}</uuid>
+        <name locale="en_US">OV6920</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="12.7" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="12.7" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="12.7"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{f4a2c376-5373-4ca3-9917-88e8f28f5eb8}">
+            <name locale="en_US">XCLK1</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{2dc7875c-9c4d-46dd-ac7e-68a13bc0ddf4}">
+            <name locale="en_US">XCLK2</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{5bfcc3d0-a91b-4647-b6c4-ae1cc90b07ba}">
+            <name locale="en_US">SIO_C</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{41632002-a53c-4264-ba72-71e7f4fb0164}">
+            <name locale="en_US">SIO_D</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="0" uuid="{c98e0033-ab25-4e25-90de-97b1d2a03daa}">
+            <name locale="en_US">VTO</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="10.16" uuid="{6cc66ba1-08df-4c82-985b-e27df333eab5}">
+            <name locale="en_US">AVDD</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="10.16" uuid="{80c5093a-87d3-471b-a86e-4e6ed112c014}">
+            <name locale="en_US">DVDD</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-7.62" uuid="{4a8768a1-df14-4645-b7f8-c4f388eb2447}">
+            <name locale="en_US">DGND/AGND</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="5.08" uuid="{8fb19260-1598-4768-8d2a-c17680843bd6}">
+            <name locale="en_US">VREF2</name>
+        </pin>
+    </pins>
+</symbol>

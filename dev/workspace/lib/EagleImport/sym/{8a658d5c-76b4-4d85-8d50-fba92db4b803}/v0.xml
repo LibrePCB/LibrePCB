@@ -1,0 +1,43 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{8a658d5c-76b4-4d85-8d50-fba92db4b803}</uuid>
+        <name locale="en_US">OPAMP+-</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="5.08" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="5.08" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.4064" layer="10" start_x="5.08">
+            <segment type="line" end_x="-5.08" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="3.175" width="0.1524" layer="10" start_x="-3.81">
+            <segment type="line" end_x="-3.81" end_y="1.905"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="-4.445">
+            <segment type="line" end_x="-3.175" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="-4.445">
+            <segment type="line" end_x="-3.175" end_y="-2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-7.62" length="2.54" angle="0" y="-2.54" uuid="{330dff3a-cc98-400c-8597-3079ac321e03}">
+            <name locale="en_US">-IN</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="2.54" uuid="{876a1ab8-3a92-4c01-ac43-43094c84347e}">
+            <name locale="en_US">+IN</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="0" uuid="{38a5d868-7e73-4b1e-81fa-29a3549b63d4}">
+            <name locale="en_US">OUT</name>
+        </pin>
+        <pin x="0" length="5.08" angle="270" y="7.62" uuid="{38df164a-7c68-4b8f-9ee5-34f56b36c967}">
+            <name locale="en_US">V+</name>
+        </pin>
+        <pin x="0" length="5.08" angle="90" y="-7.62" uuid="{30d7ab3f-38e0-485c-bdde-17a29451a05f}">
+            <name locale="en_US">V-</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,52 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{bd9af4f0-063d-4f8d-aa73-3ecaca0ef163}</uuid>
+        <name locale="en_US">TOTX173</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-3.81">
+            <segment type="line" end_x="5.08" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="5.08" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="-3.81" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="-3.81">
+            <segment type="line" end_x="-3.81" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.254" width="0.4064" layer="10" start_x="-5.334">
+            <segment type="line" end_x="-9.144" end_y="-0.254"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.254" width="0.4064" layer="10" start_x="-9.144">
+            <segment type="line" end_x="-7.112" end_y="-1.016"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.254" width="0.4064" layer="10" start_x="-9.144">
+            <segment type="line" end_x="-7.112" end_y="0.508"/>
+        </polygon>
+        <polygon fill="false" start_y="2.794" width="0.4064" layer="10" start_x="-5.334">
+            <segment type="line" end_x="-9.144" end_y="2.794"/>
+        </polygon>
+        <polygon fill="false" start_y="2.794" width="0.4064" layer="10" start_x="-9.144">
+            <segment type="line" end_x="-7.112" end_y="2.032"/>
+        </polygon>
+        <polygon fill="false" start_y="2.794" width="0.4064" layer="10" start_x="-9.144">
+            <segment type="line" end_x="-7.112" end_y="3.556"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="7.62" length="2.54" angle="180" y="2.54" uuid="{88d7529d-c2e1-480a-a8a2-2475bf4c9eca}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="-2.54" uuid="{f21a89aa-6b32-446a-8420-7f7b02eac871}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="0" uuid="{863d19ab-f563-4561-b5a5-15287ea625cb}">
+            <name locale="en_US">RLED</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="5.08" uuid="{0c71441f-c10f-4877-ac59-a01d1afa2f08}">
+            <name locale="en_US">IN</name>
+        </pin>
+    </pins>
+</symbol>

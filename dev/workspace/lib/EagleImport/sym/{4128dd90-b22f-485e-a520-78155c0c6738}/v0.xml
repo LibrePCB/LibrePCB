@@ -1,0 +1,40 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{4128dd90-b22f-485e-a520-78155c0c6738}</uuid>
+        <name locale="en_US">LP3966-SENSE</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="-7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="12.7" length="2.54" angle="180" y="2.54" uuid="{69ca597a-1952-43ca-ba2f-1522203eea14}">
+            <name locale="en_US">VOUT</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{c2e7fbc8-4429-41c9-924a-f1ccd5774ccb}">
+            <name locale="en_US">!SD</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{7e50a149-38c8-44fc-a684-3db2f23e50bc}">
+            <name locale="en_US">VIN</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-2.54" uuid="{651f2ecd-e96a-432b-94fa-4fb0bd4675f4}">
+            <name locale="en_US">SENSE</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="90" y="-10.16" uuid="{368a8b0a-d1fd-4f36-997e-da0ae55e6e05}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="90" y="-10.16" uuid="{4dbe2871-2e8b-4a0f-a27f-8a2d18169bd2}">
+            <name locale="en_US">GND@1</name>
+        </pin>
+    </pins>
+</symbol>

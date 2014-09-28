@@ -1,0 +1,40 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{ac71b0e8-8d70-4aff-b930-d75d4517abc6}</uuid>
+        <name locale="en_US">CONDENSER-MICROPHON</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-1.27" width="0.1524" layer="10" start_x="1.27">
+            <segment type="line" end_x="2.032" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.254" width="0.1524" layer="10" start_x="2.032">
+            <segment type="line" end_x="2.032" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.1524" layer="10" start_x="2.032">
+            <segment type="line" end_x="2.032" end_y="-2.286"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.254" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="-2.286"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="3.302" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="true" start_y="-3.81" width="0.254" layer="10" start_x="4.826">
+            <segment type="line" end_x="5.334" end_y="-3.81"/>
+            <segment type="line" end_x="5.334" end_y="1.27"/>
+            <segment type="line" end_x="4.826" end_y="1.27"/>
+            <segment type="line" end_x="4.826" end_y="-3.81"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{ee54c139-4c79-46ae-9335-7a97509262b1}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{1b85db60-c33f-4ba0-9b1d-d9cc4911e3c7}">
+            <name locale="en_US">2</name>
+        </pin>
+    </pins>
+</symbol>

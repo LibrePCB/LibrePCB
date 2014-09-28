@@ -1,0 +1,94 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{2a7523ac-2b69-4530-aa0f-e19107773095}</uuid>
+        <name locale="en_US">HIP4086</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="25.4" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="25.4"/>
+        </polygon>
+        <polygon fill="false" start_y="25.4" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-27.94"/>
+        </polygon>
+        <polygon fill="false" start_y="-27.94" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-27.94"/>
+        </polygon>
+        <polygon fill="false" start_y="-27.94" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="25.4"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{d06239d1-ff94-4bcb-b62f-624882a3dbf0}">
+            <name locale="en_US">!AHI</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="10.16" uuid="{0a36c29d-9187-48fb-8b12-28e1a16f65cd}">
+            <name locale="en_US">DIS</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="22.86" uuid="{9ce0c863-9c08-42d9-9744-e3028da952dd}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="15.24" uuid="{9529f22c-167a-43ba-a227-ca2ed27869a1}">
+            <name locale="en_US">UVLO</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{b05cffca-d0aa-4f06-834f-b7e0784cd0ab}">
+            <name locale="en_US">RFSH</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{82e5999e-8766-45eb-94ec-b6a27ed8d7f2}">
+            <name locale="en_US">ALI</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="20.32" uuid="{74c53997-027c-4c2c-a1ce-88bc421c5fbc}">
+            <name locale="en_US">RDEL</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-25.4" uuid="{fc964795-6abc-48f3-b3d2-c5fb77357aad}">
+            <name locale="en_US">VSS</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="17.78" uuid="{2f9a8aae-30f2-4f0b-a3b7-cb55fdbf8d0d}">
+            <name locale="en_US">AHB</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="7.62" uuid="{1d6a058f-7249-4e44-bcfa-f0db4c9f1cb8}">
+            <name locale="en_US">AHO</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="5.08" uuid="{2412cc1d-8051-48f9-8ff6-d0778a39e5c7}">
+            <name locale="en_US">AHS</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-15.24" uuid="{51ea302d-af05-40c1-9ecc-4ceca74b2c4a}">
+            <name locale="en_US">ALO</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-17.78" uuid="{cceb9d24-fc8c-403f-9e5e-5f8dadc14385}">
+            <name locale="en_US">BLO</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-20.32" uuid="{2b2b4413-191e-4383-aeca-fb4656fd7c79}">
+            <name locale="en_US">CLO</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="0" uuid="{f64dfe2a-ea62-49be-bc61-da9d54fdf0e8}">
+            <name locale="en_US">BHO</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-7.62" uuid="{6ad4736b-c47b-4a21-90e6-83f390d55c66}">
+            <name locale="en_US">CHO</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-10.16" uuid="{1474d4df-f3ff-4c38-bdc1-f25d6ffd3558}">
+            <name locale="en_US">!BHI</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-12.7" uuid="{4e0a604a-044b-490e-9127-c3927daaf271}">
+            <name locale="en_US">BLI</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-17.78" uuid="{86a475f2-7ad9-412d-8fcf-f5aa9b310a1b}">
+            <name locale="en_US">!CHI</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-20.32" uuid="{e44bf9a3-7537-47a2-b4b2-a986ef49ad64}">
+            <name locale="en_US">CLI</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="15.24" uuid="{9f9dd20f-8a58-4ff0-800e-ebcdc6cc331e}">
+            <name locale="en_US">BHB</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="12.7" uuid="{154ccf9a-009d-4d56-ae50-2dff0433ad20}">
+            <name locale="en_US">CHB</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-2.54" uuid="{deada819-05e8-4465-9a9c-cfb96b5d6b72}">
+            <name locale="en_US">BHS</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-10.16" uuid="{a8c2b93b-f607-4a15-8afd-31dfa1802cbd}">
+            <name locale="en_US">CHS</name>
+        </pin>
+    </pins>
+</symbol>

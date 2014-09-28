@@ -1,0 +1,70 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{ddc91098-3e0d-4a88-b119-70d980913b29}</uuid>
+        <name locale="en_US">74922</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="15.24"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="10.16" uuid="{ccb1879a-3c7b-4288-bda1-f3b1fe974f5c}">
+            <name locale="en_US">Y1</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="7.62" uuid="{1d66c170-d329-438a-a347-e56f58248294}">
+            <name locale="en_US">Y2</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{2b12fa9f-03ee-4191-ab98-c78b60f49c90}">
+            <name locale="en_US">Y3</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{612ee846-1f0b-4773-a6ee-cc8638971e17}">
+            <name locale="en_US">Y4</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="12.7" uuid="{89d0b6d0-314f-422f-bb0c-cecf6876b81d}">
+            <name locale="en_US">OSC</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-15.24" uuid="{51246e91-0f94-4d97-abb9-a194121761f7}">
+            <name locale="en_US">KBM</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{382ab37f-66bf-4ac9-be05-c602a70a6c92}">
+            <name locale="en_US">X1</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-10.16" uuid="{064e91e3-094e-4566-ae1b-e73887333d00}">
+            <name locale="en_US">X2</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-7.62" uuid="{75590285-e0cf-4b26-9c0f-5b318e33bd07}">
+            <name locale="en_US">X3</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{8da621c9-c497-4c50-803b-3c00d036ec80}">
+            <name locale="en_US">X4</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="7.62" uuid="{11463705-0277-4305-a2c8-4c62b1650362}">
+            <name locale="en_US">DATA_AV</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-10.16" uuid="{6914e2b6-0bec-4d62-a1de-e9e7596a70d9}">
+            <name locale="en_US">!OE</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="2.54" uuid="{7cddfa71-7b2a-4535-9b11-06b93b8bb047}">
+            <name locale="en_US">OUTA</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="0" uuid="{042df7b9-a56f-48cc-b9b0-4a691f855178}">
+            <name locale="en_US">OUTB</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-2.54" uuid="{a5d76ccf-41b7-4cbb-b333-a4aeba8b6a32}">
+            <name locale="en_US">OUTC</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-5.08" uuid="{ed80e76e-fc71-428a-8111-814a4c9b7a09}">
+            <name locale="en_US">OUTD</name>
+        </pin>
+    </pins>
+</symbol>

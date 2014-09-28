@@ -1,0 +1,43 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{3f89dc0a-2179-4acc-b99f-3852455048ee}</uuid>
+        <name locale="en_US">RN06</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="2.54" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="-2.54" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{538fb268-d9cf-4ec9-8f67-7321791cebdb}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="0" uuid="{65b97e0d-8ad6-48bf-b3fb-d1ec61e2239e}">
+            <name locale="en_US">2</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="0" uuid="{56bb105e-427d-472e-8f64-c3067a73c007}">
+            <name locale="en_US">3</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="0" uuid="{12be5d0b-5939-4709-a99d-b4a50cc365c6}">
+            <name locale="en_US">4</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="0" uuid="{5c593eb9-faab-45e2-ad8e-df1d2ab6d2aa}">
+            <name locale="en_US">5</name>
+        </pin>
+        <pin x="25.4" length="2.54" angle="180" y="0" uuid="{d86331a1-470b-45a0-a29d-b4eedd001f38}">
+            <name locale="en_US">6</name>
+        </pin>
+        <pin x="30.48" length="2.54" angle="180" y="0" uuid="{2d7db640-fc5e-43ad-b98d-48125c1d075e}">
+            <name locale="en_US">7</name>
+        </pin>
+    </pins>
+</symbol>

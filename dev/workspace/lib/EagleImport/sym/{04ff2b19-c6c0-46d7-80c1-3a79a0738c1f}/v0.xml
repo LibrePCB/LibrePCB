@@ -1,0 +1,12 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{04ff2b19-c6c0-46d7-80c1-3a79a0738c1f}</uuid>
+        <name locale="en_US">RESET</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{a62755cf-f63c-4375-a222-6659f2ef11a9}">
+            <name locale="en_US">RESET</name>
+        </pin>
+    </pins>
+</symbol>

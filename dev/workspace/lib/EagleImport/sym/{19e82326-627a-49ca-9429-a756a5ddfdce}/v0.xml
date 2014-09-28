@@ -1,0 +1,31 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{19e82326-627a-49ca-9429-a756a5ddfdce}</uuid>
+        <name locale="en_US">P03</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="-6.35"/>
+        </polygon>
+        <polygon fill="false" start_y="-6.35" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="5.08" end_y="-6.35"/>
+        </polygon>
+        <polygon fill="false" start_y="-6.35" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="5.08" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="-2.54" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{0bed7fb7-1a02-4635-8165-cfdf50b417bc}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-2.54" uuid="{c9f090bf-04a5-4179-8d89-d38a5768f85c}">
+            <name locale="en_US">2</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-5.08" uuid="{213d9dc8-21fc-4ace-b0c4-3ecc07627571}">
+            <name locale="en_US">3</name>
+        </pin>
+    </pins>
+</symbol>

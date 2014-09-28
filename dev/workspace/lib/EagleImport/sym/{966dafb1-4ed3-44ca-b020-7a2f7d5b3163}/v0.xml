@@ -1,0 +1,70 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{966dafb1-4ed3-44ca-b020-7a2f7d5b3163}</uuid>
+        <name locale="en_US">U2400B</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="17.78" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="12.7" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="-10.16" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="17.78"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="15.24" uuid="{63b5f3ce-e46a-4247-a6a6-4f22237d137e}">
+            <name locale="en_US">+VS</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-15.24" uuid="{07ad85c8-0e83-434b-96e3-58b992c4d554}">
+            <name locale="en_US">VREF</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-10.16" uuid="{ee674608-8143-4520-babb-d2410e7f8eb7}">
+            <name locale="en_US">VMAX</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-12.7" uuid="{fbbc15eb-ea4c-4586-ba75-205371eb9374}">
+            <name locale="en_US">VMIN</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-10.16" uuid="{2632f700-cf8d-432d-96fe-2a6a24bb1e90}">
+            <name locale="en_US">TEMP</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{375e433f-13a3-4220-a3e6-4cda4b7f15e4}">
+            <name locale="en_US">PWM</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="12.7" uuid="{9366286f-74f2-4c36-b656-d08f8b8fb4cc}">
+            <name locale="en_US">OSC</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{391dc596-71be-47da-bff8-b81e617465e4}">
+            <name locale="en_US">SYNC</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="7.62" uuid="{c01f230f-b1fc-44ae-aed7-b96ef9c770a5}">
+            <name locale="en_US">STATUS</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-2.54" uuid="{47786243-9d48-443a-87a0-5f6f26a079a9}">
+            <name locale="en_US">DISCHARGE</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="7.62" uuid="{55a06c73-485e-486b-ac69-63c9c7fa807a}">
+            <name locale="en_US">TIME</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="10.16" uuid="{c8d2ea1a-97c3-4a2c-9794-69de18c63f25}">
+            <name locale="en_US">MODE</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-15.24" uuid="{4b223238-3ec3-46c4-a8f7-82d40b4ffd03}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="12.7" uuid="{a3c9b120-900b-4cc7-b653-0185d7af5056}">
+            <name locale="en_US">0.5HZ</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{45a4c50c-2646-4d69-ae61-6ff22becc611}">
+            <name locale="en_US">FAILURE</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="2.54" uuid="{14b6f842-6fd7-48fa-ba02-77d9175a21ed}">
+            <name locale="en_US">CHARGE</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,76 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{eeaa9990-9e0e-4933-a64b-706c00299dc7}</uuid>
+        <name locale="en_US">LM1872</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-22.86" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="7.62" end_y="-22.86"/>
+        </polygon>
+        <polygon fill="false" start_y="-22.86" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="20.32" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="-10.16" end_y="20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="20.32" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="-22.86"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="12.7" uuid="{e14fda98-fbee-4a89-9771-e5aec2e3ecbd}">
+            <name locale="en_US">XTL</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{378b3e9a-601b-44ad-975c-5b913d047323}">
+            <name locale="en_US">MXI</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="12.7" uuid="{52be79bf-3336-4a81-9fb9-e7f59d1d2c8e}">
+            <name locale="en_US">Q1</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{f451bded-7aa3-4ddd-a004-bef9155932e6}">
+            <name locale="en_US">VBS</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="17.78" uuid="{f90f3e71-5271-4369-b20f-115c7256bb66}">
+            <name locale="en_US">LO</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-15.24" uuid="{0d175790-f163-4355-8b2f-dd23aa37fe44}">
+            <name locale="en_US">MXQ</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-20.32" uuid="{5e89107e-f6bc-474c-877e-2760cd385713}">
+            <name locale="en_US">IFI</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="10.16" uuid="{26a013e8-7cf3-4bb9-b401-fefe2972e307}">
+            <name locale="en_US">Q2</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="5.08" uuid="{a8ddea3f-30c5-404d-824f-49d5888607c5}">
+            <name locale="en_US">QCA</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="2.54" uuid="{e0fc36d8-bd7b-4c45-a2ea-e565a44f4aae}">
+            <name locale="en_US">QEA</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-2.54" uuid="{820bcae5-9116-4f0d-b7b0-97e46a3c2524}">
+            <name locale="en_US">QCB</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-5.08" uuid="{147fc392-9765-42ac-89ba-2109fcf2d9b8}">
+            <name locale="en_US">QEB</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="7.62" uuid="{6ac0ee91-d508-436b-b0b0-76ae740914e6}">
+            <name locale="en_US">GND@1</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-15.24" uuid="{e3238d6f-b46e-4196-8827-17c0cdee5b9e}">
+            <name locale="en_US">GND@2</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="17.78" uuid="{96259585-7bf5-4d60-854a-1bd3f1f82f62}">
+            <name locale="en_US">V+</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-10.16" uuid="{34e014ff-a282-40e7-b8a1-f70011fd3929}">
+            <name locale="en_US">SYNC</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-10.16" uuid="{7d7b7e0b-37b8-478f-af28-300e7a8dcc0f}">
+            <name locale="en_US">AGC</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-20.32" uuid="{ed3a1c31-4195-44c3-b3e4-617b08099f4b}">
+            <name locale="en_US">IFQ</name>
+        </pin>
+    </pins>
+</symbol>

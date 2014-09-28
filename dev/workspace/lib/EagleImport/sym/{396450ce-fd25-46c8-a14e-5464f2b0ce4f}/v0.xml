@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{396450ce-fd25-46c8-a14e-5464f2b0ce4f}</uuid>
+        <name locale="en_US">LM3525-L</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="7.62" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-10.16" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{c7a1529d-032c-45b9-8885-0cbfbdcdcb3a}">
+            <name locale="en_US">IN</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{ffa34976-bf68-48e8-92d0-cac001962b67}">
+            <name locale="en_US">FLAG</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{b23cc43f-70d3-444d-bea5-89ee1dc961fe}">
+            <name locale="en_US">!EN</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{ca8a2f50-c16f-448f-8aa1-a8abbf5a2fb3}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="2.54" uuid="{d506c351-2614-4a53-be12-93c28b51ec7d}">
+            <name locale="en_US">OUT</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="0" uuid="{a9c238c1-ce96-4751-81f9-4261a26be3fe}">
+            <name locale="en_US">OUT@1</name>
+        </pin>
+        <pin x="7.62" length="0" angle="180" y="-2.54" uuid="{9b95a83c-a1b6-420f-b0ee-3d2359d665c8}">
+            <name locale="en_US">NC</name>
+        </pin>
+        <pin x="7.62" length="0" angle="180" y="-5.08" uuid="{09326272-4b1e-45d3-bfd3-0bb83e399c5f}">
+            <name locale="en_US">NC@1</name>
+        </pin>
+    </pins>
+</symbol>

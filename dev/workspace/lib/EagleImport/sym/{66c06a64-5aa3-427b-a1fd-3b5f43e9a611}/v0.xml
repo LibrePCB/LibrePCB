@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{66c06a64-5aa3-427b-a1fd-3b5f43e9a611}</uuid>
+        <name locale="en_US">MC34161</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="10.16" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="12.7" length="2.54" angle="180" y="7.62" uuid="{9864cd23-ee0b-4139-9b76-029ff18450de}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-7.62" uuid="{f8f6461f-03e1-44a4-b262-3bf9dff814c8}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="2.54" uuid="{b4965d00-fa65-487e-a476-26f317578c8c}">
+            <name locale="en_US">OUT1</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-2.54" uuid="{d979b35e-ba92-4264-afd0-03707967bdc8}">
+            <name locale="en_US">OUT2</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="7.62" uuid="{5ffd8846-e129-40b6-8134-34fc2ecd2946}">
+            <name locale="en_US">VREF</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="2.54" uuid="{bc970f83-0878-47af-976d-bc2c4063a513}">
+            <name locale="en_US">MODE</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-2.54" uuid="{d70eaea8-12ab-4826-9ed5-6ca8b5da3a32}">
+            <name locale="en_US">IN1</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-7.62" uuid="{ac1c42ed-c477-4907-bc7b-aa13f84da855}">
+            <name locale="en_US">IN2</name>
+        </pin>
+    </pins>
+</symbol>

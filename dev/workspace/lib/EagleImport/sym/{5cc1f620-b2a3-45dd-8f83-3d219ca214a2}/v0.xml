@@ -1,0 +1,64 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{5cc1f620-b2a3-45dd-8f83-3d219ca214a2}</uuid>
+        <name locale="en_US">TC1796P3</name>
+    </meta>
+    <geometry>
+        <polygon fill="true" start_y="-39.37" width="0.254" layer="10" start_x="-1.27">
+            <segment type="line" end_x="0" end_y="-39.37"/>
+            <segment type="line" end_x="0" end_y="1.27"/>
+            <segment type="line" end_x="-1.27" end_y="1.27"/>
+            <segment type="line" end_x="-1.27" end_y="-39.37"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="5.08" length="5.08" angle="180" y="-38.1" uuid="{18a11655-6bb3-4a8f-b8a4-d694ac21167d}">
+            <name locale="en_US">P3.0</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-35.56" uuid="{aa7a77e2-1919-4d91-b7d1-421952aee63e}">
+            <name locale="en_US">P3.1</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-33.02" uuid="{c19bb0d9-59a9-41b2-867f-ac93507a3d81}">
+            <name locale="en_US">P3.2</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-30.48" uuid="{298b5d17-5316-49e1-b482-5954b87693bf}">
+            <name locale="en_US">P3.3</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-27.94" uuid="{1fad0cbd-28e2-4dfd-9ef1-ff787db7c92e}">
+            <name locale="en_US">P3.4</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-25.4" uuid="{4e1aac46-ebfa-43a9-871d-dccd157aaff6}">
+            <name locale="en_US">P3.5</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-22.86" uuid="{68ba13ea-71e8-4010-9a74-f27cdef7cec5}">
+            <name locale="en_US">P3.6</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-20.32" uuid="{621b394a-d0d4-45b5-a8d1-5a34a022f7c5}">
+            <name locale="en_US">P3.7</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-17.78" uuid="{76b779c9-ee3d-40ad-8b46-e8e8ab2ab9d8}">
+            <name locale="en_US">P3.8</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-15.24" uuid="{33f6adbb-69a5-463d-b2b5-a43a43555b12}">
+            <name locale="en_US">P3.9</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-12.7" uuid="{db03b254-979d-4b01-b871-37fb1a7aa865}">
+            <name locale="en_US">P3.10</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-10.16" uuid="{b016d2ec-9d26-4e31-ade6-722861fee782}">
+            <name locale="en_US">P3.11</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-7.62" uuid="{0794412f-bb10-49d1-a87a-b6d53d180a1e}">
+            <name locale="en_US">P3.12</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-5.08" uuid="{785705bc-d24a-4b48-bffb-286873634ca0}">
+            <name locale="en_US">P3.13</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-2.54" uuid="{41063707-e732-4d59-8e17-65cb4d0d989f}">
+            <name locale="en_US">P3.14</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="0" uuid="{b6139ddb-98fe-4890-ac6d-2e262c10df89}">
+            <name locale="en_US">P3.15</name>
+        </pin>
+    </pins>
+</symbol>

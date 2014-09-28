@@ -1,0 +1,52 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{7c36fadd-cb28-4aad-9bfa-4f4bd9018512}</uuid>
+        <name locale="en_US">ISO7221</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="12.7" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="-10.16" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="6.35" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-3.81"/>
+        </polygon>
+        <polygon fill="false" start_y="6.35" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="-3.81"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{a3703ecf-d2f2-4a82-959c-bf7ed7618532}">
+            <name locale="en_US">VCC1</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="5.08" uuid="{c2444f49-a62b-4895-aab2-13e623403db2}">
+            <name locale="en_US">VCC2</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{e7331025-f8d2-43b2-b850-ec88c55dfbb8}">
+            <name locale="en_US">GND1</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-2.54" uuid="{987bd324-424c-4919-b229-bf7c54e64c18}">
+            <name locale="en_US">GND2</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="2.54" uuid="{bf5a6dda-e890-492f-90cb-ccaee311c328}">
+            <name locale="en_US">INA</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{1d41e2e5-bbe9-427b-aaae-888d2c8d9287}">
+            <name locale="en_US">INB</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{49d5e0a0-3b68-4151-9283-c99dcba3f35f}">
+            <name locale="en_US">OUTA</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="0" uuid="{3b9fec05-2917-4a10-9445-209f0015d11b}">
+            <name locale="en_US">OUTB</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,82 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{1a4b5820-3ae7-41b2-84ac-94adc3daf9ac}</uuid>
+        <name locale="en_US">DIL18</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="11.43" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="-11.43"/>
+        </polygon>
+        <polygon fill="false" start_y="-11.43" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="5.08" end_y="-11.43"/>
+        </polygon>
+        <polygon fill="false" start_y="-11.43" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="5.08" end_y="11.43"/>
+        </polygon>
+        <polygon fill="false" start_y="11.43" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="2.54" end_y="11.43"/>
+        </polygon>
+        <polygon fill="false" start_y="11.43" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-2.54" end_y="11.43"/>
+        </polygon>
+        <polygon fill="false" start_y="11.43" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="2.54" end_y="11.43"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-7.62" length="2.54" angle="0" y="10.16" uuid="{27cb2a69-c4fe-498b-9130-8a9ab30f0bcc}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="7.62" uuid="{7a59da03-78d4-4bd4-bc18-ea5a5430e7ad}">
+            <name locale="en_US">2</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="5.08" uuid="{16985028-06cf-43dd-b04a-4ffa26c7c685}">
+            <name locale="en_US">3</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="2.54" uuid="{b2b84ce1-c590-4142-964f-2a8bbdd7853a}">
+            <name locale="en_US">4</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="0" uuid="{acfc1e2b-f3d3-450d-884b-a147760df078}">
+            <name locale="en_US">5</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="-2.54" uuid="{0fa0109a-d424-4ffc-a573-413597dfd553}">
+            <name locale="en_US">6</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="-5.08" uuid="{98a522f6-b869-4630-8ce1-b1b4d9710bdc}">
+            <name locale="en_US">7</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="-7.62" uuid="{bc76c765-d5b6-4c6c-a0a7-fc72cd870524}">
+            <name locale="en_US">8</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="-10.16" uuid="{5344d9c0-8374-4b61-ae7c-54a29c036365}">
+            <name locale="en_US">9</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="-10.16" uuid="{f4b5cf4c-db76-40de-b8d4-e87dee896746}">
+            <name locale="en_US">10</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="-7.62" uuid="{a80e5c44-d082-4a14-b20f-494746f59281}">
+            <name locale="en_US">11</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="-5.08" uuid="{c35e7ee2-ca54-4ac4-b6a0-c5df77de4d85}">
+            <name locale="en_US">12</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="-2.54" uuid="{54daa3a7-8447-48dd-a53b-2d1f31ee5457}">
+            <name locale="en_US">13</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="0" uuid="{c29e9b80-7359-44cb-88f9-823951e1f83c}">
+            <name locale="en_US">14</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="2.54" uuid="{004aed7f-da41-4432-8720-c9ee06b27696}">
+            <name locale="en_US">15</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="5.08" uuid="{896a18bc-6dc1-4149-a02b-89a6c156aa63}">
+            <name locale="en_US">16</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="7.62" uuid="{2d7c524b-570a-48ae-ab4b-e863ec71d7bc}">
+            <name locale="en_US">17</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="10.16" uuid="{60654872-dee1-49ce-bcd0-08daf196b09c}">
+            <name locale="en_US">18</name>
+        </pin>
+    </pins>
+</symbol>

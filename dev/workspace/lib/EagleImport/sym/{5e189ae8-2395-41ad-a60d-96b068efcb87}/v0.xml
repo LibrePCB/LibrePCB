@@ -1,0 +1,25 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{5e189ae8-2395-41ad-a60d-96b068efcb87}</uuid>
+        <name locale="en_US">J</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-1.27" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.1524" layer="10" start_x="-1.27">
+            <segment type="line" end_x="1.27" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="1.27" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{541e37f8-b236-49ed-972c-4c68b1cc1de4}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="0" uuid="{d31c6726-a3f9-42c2-a5d9-04611bb0d853}">
+            <name locale="en_US">2</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,729 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{b60fe914-c598-4828-a9a4-8029756b8dac}</uuid>
+        <name locale="en_US">XCV100_PQ240_1532</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="-30.48" length="5.08" angle="0" y="81.28" uuid="{c0bb41ab-c3ae-4dcb-93d0-28b98e0e788c}">
+            <name locale="en_US">GND@4</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="78.74" uuid="{26fc0b60-7c3e-4ab1-9641-4ec86ed83c96}">
+            <name locale="en_US">TMS</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="76.2" uuid="{05304562-b50d-4217-a84e-43457c7eccc4}">
+            <name locale="en_US">PAD239</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="73.66" uuid="{06ac31bf-a16d-4f3f-8dc0-e40fd5383d8f}">
+            <name locale="en_US">PAD237</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="71.12" uuid="{d7239d4d-0669-404a-9df7-c1b47449925a}">
+            <name locale="en_US">PAD236</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="68.58" uuid="{1248b37c-7d24-4b0c-8ce5-6c59559f9b66}">
+            <name locale="en_US">PAD234</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="66.04" uuid="{b3fc0dc4-a981-4abd-acb6-8e16a4dfa4a9}">
+            <name locale="en_US">PAD233</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="63.5" uuid="{6c5e8299-79ad-4659-b0eb-c76d555bce85}">
+            <name locale="en_US">GND@5</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="60.96" uuid="{eae4a92d-e30b-48ab-a545-8a5a769e2d07}">
+            <name locale="en_US">PAD232</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="58.42" uuid="{28f4e324-208f-49d6-abae-8985752d4ea7}">
+            <name locale="en_US">PAD231</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="55.88" uuid="{145307fc-bd89-4406-9af6-e2892c32cd0c}">
+            <name locale="en_US">PAD228</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="53.34" uuid="{aa6f1c00-068a-48f3-ac66-aba604ea43ba}">
+            <name locale="en_US">PAD226</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="50.8" uuid="{2650f9d2-54fa-495c-beb5-77e519472db2}">
+            <name locale="en_US">PAD225</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="48.26" uuid="{fab4424c-765f-4ebe-9bcf-21a4bbaa6c1b}">
+            <name locale="en_US">GND@6</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="45.72" uuid="{8de203f5-04cd-4034-a86b-25e077b89309}">
+            <name locale="en_US">VCCO@4</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="43.18" uuid="{a457bc9f-067a-48d2-aaac-3fed281f6deb}">
+            <name locale="en_US">VDD@3</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="40.64" uuid="{5cf9c08c-9942-4856-bf66-8d2313755807}">
+            <name locale="en_US">PAD224</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="38.1" uuid="{1a74e973-8b06-46cb-9fd1-7d3d0060ca67}">
+            <name locale="en_US">PAD223</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="35.56" uuid="{717d287a-d4b5-407e-8be0-d6ea0a810758}">
+            <name locale="en_US">PAD221</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="33.02" uuid="{44825662-469f-4b05-83cf-94a8186a0fb4}">
+            <name locale="en_US">PAD219</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="30.48" uuid="{20156645-c682-40bd-90da-5030327f0947}">
+            <name locale="en_US">PAD218</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="27.94" uuid="{1386a5ff-a429-49e9-ac99-ac97704edd86}">
+            <name locale="en_US">GND@7</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="25.4" uuid="{8bdabc55-02ac-476a-bb11-b94c4a175ad7}">
+            <name locale="en_US">PAD217</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="22.86" uuid="{76f0bdaa-846b-4f5c-9d77-b38328d70a56}">
+            <name locale="en_US">PAD216</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="20.32" uuid="{cb19e85b-1516-4668-b45f-70dac9d454c3}">
+            <name locale="en_US">PAD215</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="17.78" uuid="{07bb9a7e-ffdb-456f-8837-d1b2d3b3465f}">
+            <name locale="en_US">PAD214</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="15.24" uuid="{74469df8-ec92-4c0b-966d-619104339dc3}">
+            <name locale="en_US">PAD212</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="12.7" uuid="{45b69f90-bda1-4e34-804c-3fd4421e4402}">
+            <name locale="en_US">PAD211</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="10.16" uuid="{1973fba3-63df-4fab-850d-fe495724789f}">
+            <name locale="en_US">GND@8</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="7.62" uuid="{86a9f46c-9466-4d7c-9518-1bfa5565f55e}">
+            <name locale="en_US">VCCO@5</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="5.08" uuid="{8c187cae-5b50-42c5-86dd-8b825a91199e}">
+            <name locale="en_US">PAD210</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="2.54" uuid="{06614005-f63d-44f2-96ff-0e49ac9f78af}">
+            <name locale="en_US">VDD@4</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="0" uuid="{7d3bab9b-dad4-4c0b-80a6-ff0c4eb2228d}">
+            <name locale="en_US">PAD207</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-2.54" uuid="{f335dd5b-dfd8-4535-b73f-48a2a9e43114}">
+            <name locale="en_US">PAD206</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-5.08" uuid="{1d8c9dc1-7f03-425d-89ed-55b6dc0645f2}">
+            <name locale="en_US">PAD205</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-7.62" uuid="{2560f3fb-59e1-430c-9148-6f8eef54dbcf}">
+            <name locale="en_US">PAD204</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-10.16" uuid="{5fbdc681-220c-4fb6-bca8-3f415c7ed03c}">
+            <name locale="en_US">GND@9</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-12.7" uuid="{e6661996-5d0d-4b83-9e34-203cda73cae3}">
+            <name locale="en_US">PAD203</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-15.24" uuid="{ac19df60-36a9-4856-8e3a-b18f942e78ef}">
+            <name locale="en_US">PAD202</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-17.78" uuid="{71b0c8b6-1d36-45ac-92ec-6475f9fed7b4}">
+            <name locale="en_US">PAD200</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-20.32" uuid="{99f31023-d0be-42d3-a9db-992dc84af420}">
+            <name locale="en_US">PAD198</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-22.86" uuid="{aaafd91f-ae19-4c25-9f7b-f00a0b58bcf5}">
+            <name locale="en_US">PAD197</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-25.4" uuid="{6315a73c-e899-42d5-a660-f0cb0fae31d4}">
+            <name locale="en_US">VDD@5</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-27.94" uuid="{178b0aa6-0f00-4100-af3e-0789b8de1c11}">
+            <name locale="en_US">VCCO@6</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-30.48" uuid="{206d5f9b-b6f4-4692-9f6e-54e4f93a3fde}">
+            <name locale="en_US">GND@10</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-33.02" uuid="{34dda0e1-2dfc-4049-98a6-95c5acc1488c}">
+            <name locale="en_US">PAD196</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-35.56" uuid="{fce7564b-6b3a-4332-aaec-2a7b40de907a}">
+            <name locale="en_US">PAD195</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-38.1" uuid="{9c7bd7f5-220e-4459-8a97-6e0f57eca396}">
+            <name locale="en_US">PAD193</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-40.64" uuid="{b63c5403-64c6-422c-9b64-22432c1aaf42}">
+            <name locale="en_US">PAD190</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-43.18" uuid="{af0c7771-ffc1-4a79-b7db-662ff3350478}">
+            <name locale="en_US">PAD189</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-45.72" uuid="{cd9e9aa0-b6a9-4da5-80f5-1ce2ec00deb0}">
+            <name locale="en_US">GND@11</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-48.26" uuid="{e380c09a-0571-49d5-a300-9ee68c071b9c}">
+            <name locale="en_US">PAD188</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-50.8" uuid="{8b0c2de9-c435-4cd4-913c-fce9ff5e7632}">
+            <name locale="en_US">PAD187</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-53.34" uuid="{60959a87-112f-4f8e-afad-cfee145e8433}">
+            <name locale="en_US">PAD185</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-55.88" uuid="{72faac35-2cac-4107-a567-f607a23474a9}">
+            <name locale="en_US">PAD184</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-58.42" uuid="{08eed60d-5d1b-41ad-aaa4-a7c87474e189}">
+            <name locale="en_US">PAD182</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-60.96" uuid="{b11fcaaa-1bde-4244-a6be-8c6fa55ad42e}">
+            <name locale="en_US">PAD181</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-63.5" uuid="{e8f112cd-6225-42d7-aada-8fa421ea54b7}">
+            <name locale="en_US">M1</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-66.04" uuid="{baf8fcde-874a-4f0b-a45d-e452ca15aeca}">
+            <name locale="en_US">GND@12</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-68.58" uuid="{f4f303e4-e958-4219-90e6-9ddd84418cbd}">
+            <name locale="en_US">M0</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-71.12" uuid="{3c991812-7999-40bc-81ef-65b2537f5481}">
+            <name locale="en_US">VCCO@7</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-73.66" uuid="{05afb635-e143-4be9-a210-08774fc166fc}">
+            <name locale="en_US">M2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="81.28" uuid="{4af6359e-622a-4ca1-81c5-f14cd6df5a48}">
+            <name locale="en_US">PAD180</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="78.74" uuid="{890bdd68-fb05-4338-b196-374b560407a1}">
+            <name locale="en_US">PAD179</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="76.2" uuid="{8cd62c8c-2d0b-405d-8314-08e1eb040f18}">
+            <name locale="en_US">PAD177</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="73.66" uuid="{b8deed66-5c94-4279-afcb-c169bb2edb61}">
+            <name locale="en_US">PAD176</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="71.12" uuid="{1b6222de-4547-41bd-8c06-12ed38fef746}">
+            <name locale="en_US">PAD174</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="68.58" uuid="{1c9af795-9a98-4d2c-930e-49056c30a851}">
+            <name locale="en_US">PAD173</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="66.04" uuid="{d0efd5bd-4ae8-497d-9220-4fea3bdfd9fd}">
+            <name locale="en_US">GND@13</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="63.5" uuid="{e59c9d6b-5600-4865-8a09-0f2d7a56e07b}">
+            <name locale="en_US">PAD172</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="60.96" uuid="{fd9fa297-421e-4b6d-abb6-6da169d85c0d}">
+            <name locale="en_US">PAD171</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="58.42" uuid="{6aa3701f-1bf3-435d-9a19-486373da54d6}">
+            <name locale="en_US">PAD168</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="55.88" uuid="{245649c3-ba2b-4a2e-981f-eaba18b55a2e}">
+            <name locale="en_US">PAD166</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="53.34" uuid="{1a0d5f16-7a98-432c-9312-80aac2fb6994}">
+            <name locale="en_US">PAD165</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="50.8" uuid="{bd6f20c4-6e26-461b-9af6-78845e6f514e}">
+            <name locale="en_US">GND@14</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="48.26" uuid="{96aabbe2-4806-47c4-b02d-b9144b586fe4}">
+            <name locale="en_US">VCCO@8</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="45.72" uuid="{85d37e2d-e83b-4e43-a561-af6960ef5bc1}">
+            <name locale="en_US">VDD@6</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="43.18" uuid="{ef64a12e-7fc8-4d61-a975-a581064db766}">
+            <name locale="en_US">PAD164</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="40.64" uuid="{e3bddd1c-5395-456c-b11f-6df241009744}">
+            <name locale="en_US">PAD163</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="38.1" uuid="{3d475b06-0da7-4b8f-8d6c-bf27a4089e25}">
+            <name locale="en_US">PAD161</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="35.56" uuid="{578b5666-ecc3-472c-8903-d85964c81841}">
+            <name locale="en_US">PAD159</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="33.02" uuid="{15cf622b-7e1b-46c1-b463-a39efe985920}">
+            <name locale="en_US">PAD158</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="30.48" uuid="{2b2fafee-a028-42e9-a857-765797634709}">
+            <name locale="en_US">GND@15</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="27.94" uuid="{4d5aa058-0578-47c4-8b9f-aa35aa74243e}">
+            <name locale="en_US">PAD157</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="25.4" uuid="{f1c05779-7b3c-46ea-9d21-be6702bc8102}">
+            <name locale="en_US">PAD156</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="22.86" uuid="{ca4dc04f-594a-4392-b946-d27104c8ce56}">
+            <name locale="en_US">PAD155</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="20.32" uuid="{edf8379a-6e35-45ef-83b4-50f6e058c8a2}">
+            <name locale="en_US">PAD154</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="17.78" uuid="{27074648-dc08-4156-bf6a-f7b3a0636074}">
+            <name locale="en_US">VDD@7</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="15.24" uuid="{c6d41b73-a2e9-4dff-b34f-05066ecbf367}">
+            <name locale="en_US">GCLKPAD1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="12.7" uuid="{b896bf09-efac-422c-a5ce-e79139c8fc44}">
+            <name locale="en_US">VCCO@9</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="10.16" uuid="{fd5b6be3-4021-4886-851e-2afe4026d89c}">
+            <name locale="en_US">GND@16</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="7.62" uuid="{ce5364e1-84b9-4d67-9bb0-5d3da117509b}">
+            <name locale="en_US">GCLKPAD0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="5.08" uuid="{33aca849-b4c5-42e6-b97a-c113796e902f}">
+            <name locale="en_US">PAD149</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="2.54" uuid="{8017631c-28bf-45f1-848c-4c6503d81b1c}">
+            <name locale="en_US">PAD147</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{26db6af6-b4e9-44b8-9408-3b54be4ae6a3}">
+            <name locale="en_US">PAD146</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{6b12cf9b-33e2-4f93-9a57-1d3f6344aabe}">
+            <name locale="en_US">PAD145</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{1759e033-4c5d-4ec0-8864-acaca03a9558}">
+            <name locale="en_US">PAD144</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{e5672c99-feba-4c10-bddc-7d79e1b98a86}">
+            <name locale="en_US">GND@17</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{c70c9454-2d31-4552-9007-1e60a8c8f02d}">
+            <name locale="en_US">PAD143</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{a54077f6-948e-4baa-aec8-7acd7edc9078}">
+            <name locale="en_US">PAD142</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{933826bd-4c47-4d76-bba6-2bf75a07cb68}">
+            <name locale="en_US">PAD140</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{e25d46e6-ca19-4c51-803b-2a55462ed0bc}">
+            <name locale="en_US">PAD138</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{16c981ed-6a05-44fd-a353-9245b268c26e}">
+            <name locale="en_US">PAD137</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{d08907cb-bf21-4691-a3df-260b5eb0bb72}">
+            <name locale="en_US">VDD@8</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{095e31cb-1a95-4c24-bfe9-9bfc4b969e97}">
+            <name locale="en_US">VCCO@10</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{0db4bdce-6108-47d6-9d8a-088096cd8265}">
+            <name locale="en_US">GND@18</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{047ecc27-f25c-421f-ab79-e7b0bc1c4b96}">
+            <name locale="en_US">PAD136</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-33.02" uuid="{3fe83b10-1dc6-4603-9479-758d86e563af}">
+            <name locale="en_US">PAD135</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-35.56" uuid="{480a9e0b-d113-43a9-9033-013adfce151e}">
+            <name locale="en_US">PAD133</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-38.1" uuid="{49101b78-5038-4be2-80f5-6eb3be69dcd8}">
+            <name locale="en_US">PAD130</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-40.64" uuid="{0ed21b39-26fd-40da-9e18-49a57e923155}">
+            <name locale="en_US">PAD129</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-43.18" uuid="{173344f4-d9a0-44c7-a8e3-e23d0d0408e7}">
+            <name locale="en_US">GND@19</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-45.72" uuid="{136ae402-92ad-4640-b25f-7ec663edb0b4}">
+            <name locale="en_US">PAD128</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-48.26" uuid="{03e4f276-5184-498a-baa1-335774b64e25}">
+            <name locale="en_US">PAD127</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-50.8" uuid="{2eaf20ef-1507-4d58-ba7a-637e1ad1e92a}">
+            <name locale="en_US">PAD125</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-53.34" uuid="{a38630c4-d64d-44f9-94ed-ca2991b44283}">
+            <name locale="en_US">PAD124</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-55.88" uuid="{fd213bf0-7fa2-4263-8e30-c696d2f970a1}">
+            <name locale="en_US">PAD122</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-58.42" uuid="{ac2dddde-fc94-48d4-a00c-23a502e1cdbf}">
+            <name locale="en_US">PAD121</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-60.96" uuid="{19f4fdae-42b9-4048-85d9-9891439e26a8}">
+            <name locale="en_US">GND@20</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-63.5" uuid="{17c35a5f-4781-4ef0-bf1f-c639f70dd180}">
+            <name locale="en_US">DONE</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-66.04" uuid="{a67007eb-ad5f-4692-bfb0-747a6323f03b}">
+            <name locale="en_US">VCCO@11</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-68.58" uuid="{f03e7091-eda0-4c7c-9273-59055ca1631e}">
+            <name locale="en_US">PROGRAM_B</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-71.12" uuid="{99cb039f-7447-4391-a71e-466d0b9103d6}">
+            <name locale="en_US">INIT</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-73.66" uuid="{ed247ab4-97b3-4d20-8638-be3dda85059f}">
+            <name locale="en_US">PAD119</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="81.28" uuid="{ac579b65-1b7e-4b91-af25-63f1d2f321de}">
+            <name locale="en_US">PAD117</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="78.74" uuid="{223d5003-7bb5-4d8a-be31-c4ae8bfb4435}">
+            <name locale="en_US">PAD116</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="76.2" uuid="{96f0c635-f7e0-4f45-93bc-d6458bcc745c}">
+            <name locale="en_US">PAD114</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="73.66" uuid="{52f954a4-811e-4e2a-a7ed-366282321d0e}">
+            <name locale="en_US">PAD113</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="71.12" uuid="{5cf76fb8-a5bb-4b62-8a18-e300b1d0ee7f}">
+            <name locale="en_US">GND@21</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="68.58" uuid="{90486d71-d964-45f6-abec-849aef7ad3c4}">
+            <name locale="en_US">PAD112</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="66.04" uuid="{a9f23e15-78eb-47cb-b3c9-f44cdcf00237}">
+            <name locale="en_US">PAD111</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="63.5" uuid="{cb02061c-4065-4a6f-958a-33aabd947ed2}">
+            <name locale="en_US">PAD108</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="60.96" uuid="{6c820aa5-16e8-40b8-a18c-912caf66fa3d}">
+            <name locale="en_US">PAD106</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="58.42" uuid="{605f34a3-6d23-4923-b225-6b9ca6f4928b}">
+            <name locale="en_US">PAD105</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="55.88" uuid="{2722c18e-abd4-409b-8fc8-343a515de98d}">
+            <name locale="en_US">GND@22</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="53.34" uuid="{b60f366a-b659-4ad2-94f4-5bfbf19f48e2}">
+            <name locale="en_US">VCCO@12</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="50.8" uuid="{4d2e2fdb-5ef4-44ec-92fe-d638609b2486}">
+            <name locale="en_US">VDD@9</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="48.26" uuid="{c32efe99-7f5a-4526-ba06-b54b4f9873a3}">
+            <name locale="en_US">PAD104</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="45.72" uuid="{d790fd60-1959-43a2-b6bf-d91e164107b5}">
+            <name locale="en_US">PAD103</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="43.18" uuid="{7a0990cf-038d-4db8-9791-224a1ae4d7ea}">
+            <name locale="en_US">PAD101</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="40.64" uuid="{32271ca8-1f5e-47aa-9839-d31e19471637}">
+            <name locale="en_US">PAD99</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="38.1" uuid="{585f8a39-c2b9-4fa2-a358-114f9fb9344e}">
+            <name locale="en_US">PAD98</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="35.56" uuid="{bb48e590-549c-45da-b455-92d193044e12}">
+            <name locale="en_US">GND@23</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="33.02" uuid="{b41d283d-2863-41e5-a619-0915a27c3b0a}">
+            <name locale="en_US">PAD97</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="30.48" uuid="{cb62c989-aa68-47e6-a882-2a5eca1655fe}">
+            <name locale="en_US">PAD96</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="27.94" uuid="{a86976f2-40b1-465e-9c5d-912e404879cc}">
+            <name locale="en_US">PAD95</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="25.4" uuid="{7e3b300c-14ec-4eb3-9585-868d9c2e2262}">
+            <name locale="en_US">PAD94</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="22.86" uuid="{f3c26b6a-0eec-4efb-83b6-abf323d7024e}">
+            <name locale="en_US">VDD@10</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="20.32" uuid="{bddf5b74-3dbd-4344-8b53-27bcf7d22d6c}">
+            <name locale="en_US">PAD91</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="17.78" uuid="{543f0229-5855-4b76-8222-e982b7c82f61}">
+            <name locale="en_US">VCCO@13</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="15.24" uuid="{44050a29-93a9-4a2d-afeb-fc3afaf51466}">
+            <name locale="en_US">GND@24</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="12.7" uuid="{d190a6bf-e1c6-487e-b709-a8db95aab518}">
+            <name locale="en_US">PAD90</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="10.16" uuid="{e68ef9cb-1c2a-49f7-bc10-e1da9ff84302}">
+            <name locale="en_US">PAD89</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="7.62" uuid="{b2cedcda-1704-4109-8fb3-23262d709f3b}">
+            <name locale="en_US">PAD87</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="5.08" uuid="{ad6271c1-e7bb-4abd-88fb-cb64523b4fa3}">
+            <name locale="en_US">PAD86</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="2.54" uuid="{df1755d2-103d-4356-af26-9a5e8e32eebe}">
+            <name locale="en_US">PAD85</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="0" uuid="{bb99f7f1-c8fd-40dd-88c2-b1e82f043966}">
+            <name locale="en_US">PAD84</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-2.54" uuid="{867959e9-cd80-4979-a5ce-f801c5b2247d}">
+            <name locale="en_US">GND@25</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-5.08" uuid="{699930ef-35b5-48c3-9710-1f29bbe822a8}">
+            <name locale="en_US">PAD83</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-7.62" uuid="{3703470e-ef49-4442-aa55-2f48e3c68e54}">
+            <name locale="en_US">PAD82</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-10.16" uuid="{2553eaf4-fde7-4bf0-b670-790cb86426e2}">
+            <name locale="en_US">PAD80</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-12.7" uuid="{25af19f5-9778-462d-93cc-492850f06472}">
+            <name locale="en_US">PAD78</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-15.24" uuid="{a186dfc8-11e0-403d-bf0f-ba3f2861a718}">
+            <name locale="en_US">PAD77</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-17.78" uuid="{79131b5d-b322-43ba-acda-283199862b0c}">
+            <name locale="en_US">VDD@11</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-20.32" uuid="{059c84bf-19a4-457f-b733-380d74a1a848}">
+            <name locale="en_US">VCCO@14</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-22.86" uuid="{74268943-2b7f-407a-a6f5-ba575cf0e422}">
+            <name locale="en_US">GND@26</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-25.4" uuid="{c9bdd9d3-46aa-4c12-8e17-a97401d92efc}">
+            <name locale="en_US">PAD76</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-27.94" uuid="{6119bf9d-e45d-4110-b8c3-e5f405bff618}">
+            <name locale="en_US">PAD75</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-30.48" uuid="{3658d577-a2db-415f-95c3-8e90ef76ec39}">
+            <name locale="en_US">PAD73</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-33.02" uuid="{9f1015eb-0941-4a47-aeaf-a9a3403985c6}">
+            <name locale="en_US">PAD70</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-35.56" uuid="{69947cc9-c8b1-4011-9252-e8c3826eb7d2}">
+            <name locale="en_US">PAD69</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-38.1" uuid="{65672471-3d57-4e9e-a5ac-1d6d18d1767d}">
+            <name locale="en_US">GND@27</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-40.64" uuid="{46399d1d-244e-4c81-8ac6-4a588189323a}">
+            <name locale="en_US">PAD68</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-43.18" uuid="{d8d80ec8-ca36-4fcb-8118-86c0385b301d}">
+            <name locale="en_US">PAD67</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-45.72" uuid="{9409f616-8ee6-4e2d-bae8-64aae057ffa0}">
+            <name locale="en_US">PAD65</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-48.26" uuid="{400b0fda-69cf-4023-a446-28091fa9279f}">
+            <name locale="en_US">PAD64</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-50.8" uuid="{91d35904-5f3c-4942-af3c-452f401913a9}">
+            <name locale="en_US">PAD62</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-53.34" uuid="{49d5a3f8-8ab6-4065-af29-0dbfc162a326}">
+            <name locale="en_US">PAD61</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-55.88" uuid="{603ae18d-ce72-4717-884e-e58080eb911c}">
+            <name locale="en_US">CCLK</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-58.42" uuid="{88289eb8-b82c-439e-aac7-fc93cb623a4b}">
+            <name locale="en_US">VCCO@15</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-60.96" uuid="{d14d17be-d2b5-4049-9055-941945cd62f7}">
+            <name locale="en_US">TDO</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-63.5" uuid="{01664fdc-59e3-4850-8bbd-77fc6ccb656d}">
+            <name locale="en_US">GND@28</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-66.04" uuid="{239ee4ca-1671-42ee-90d0-6930a17a6d50}">
+            <name locale="en_US">TDI</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-68.58" uuid="{08c5f8a1-8361-4cc3-bb64-682ef85c1023}">
+            <name locale="en_US">PAD60</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-71.12" uuid="{7454b47d-1679-44bb-8263-7d2a0aecb3bc}">
+            <name locale="en_US">PAD59</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="0" y="-73.66" uuid="{8cad43e8-8a8b-419c-806e-dae91f834aaf}">
+            <name locale="en_US">PAD57</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="81.28" uuid="{878a2bfd-8afe-4eee-bb35-b9e84607ce42}">
+            <name locale="en_US">PAD56</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="78.74" uuid="{886c4d5d-e13f-4fa2-80e1-55d823c900e2}">
+            <name locale="en_US">PAD54</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="76.2" uuid="{3b3546bc-2bce-4cb4-85e6-ef5a2fecb85c}">
+            <name locale="en_US">PAD53</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="73.66" uuid="{d02ff1aa-e0ee-425d-94a8-fead2a4affc4}">
+            <name locale="en_US">GND@29</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="71.12" uuid="{473ca897-cb13-4129-92d7-b762a49adb6e}">
+            <name locale="en_US">PAD52</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="68.58" uuid="{ac3062ce-77bf-49ad-bcd1-86ddeee15c15}">
+            <name locale="en_US">PAD51</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="66.04" uuid="{501ae568-44df-4904-a7f8-a266bb78e52c}">
+            <name locale="en_US">PAD48</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="63.5" uuid="{aebb9cb5-fa13-466c-a0c0-d5113dc555f2}">
+            <name locale="en_US">PAD46</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="60.96" uuid="{3e3975a6-4201-4787-9f07-bb60c1ad43c7}">
+            <name locale="en_US">PAD45</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="58.42" uuid="{98af266a-fcf5-4d35-b76f-c1eaffce891a}">
+            <name locale="en_US">GND@30</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="55.88" uuid="{18a54db7-1ed9-474c-a8bd-26e5b32b9c8c}">
+            <name locale="en_US">VCCO@16</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="53.34" uuid="{e16b1247-6c26-4e68-bb76-1b3ea22820f0}">
+            <name locale="en_US">VDD@12</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="50.8" uuid="{9d10094d-0879-4fb7-b18d-43bfe8bf237d}">
+            <name locale="en_US">PAD44</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="48.26" uuid="{851098fc-faec-46da-bee3-6823713f1f86}">
+            <name locale="en_US">PAD43</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="45.72" uuid="{d7264051-0478-44fb-9c9f-adb3f06c738f}">
+            <name locale="en_US">PAD41</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="43.18" uuid="{0fb60d9e-220a-46b0-8ffe-eebcb1ff6276}">
+            <name locale="en_US">PAD39</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="40.64" uuid="{c4e261f3-b199-49be-8ee1-490e467e9f26}">
+            <name locale="en_US">PAD38</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="38.1" uuid="{06c1972c-c19b-4953-ba3c-55a00b6d671c}">
+            <name locale="en_US">GND@31</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="35.56" uuid="{3b245e2b-78fd-46bb-8a9b-9e12b01acd87}">
+            <name locale="en_US">PAD37</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="33.02" uuid="{71264df5-a0f6-485f-a9c2-3873d74e65a1}">
+            <name locale="en_US">PAD36</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="30.48" uuid="{28fa6ece-9c47-4ef2-9107-ced1c2b33dcf}">
+            <name locale="en_US">PAD35</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="27.94" uuid="{0c55d23e-8680-4182-be02-1a3a2abfc0e1}">
+            <name locale="en_US">PAD34</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="25.4" uuid="{037269d6-b423-4f4b-8177-e0336a0100aa}">
+            <name locale="en_US">PAD32</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="22.86" uuid="{c0149c1a-cb75-4894-9c20-75f0ccf996a0}">
+            <name locale="en_US">GCLKPAD2</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="20.32" uuid="{db6788ad-fa70-41fb-82f0-0529f42cd67b}">
+            <name locale="en_US">GND@32</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="17.78" uuid="{439a8230-cfa9-4f34-a9fd-554b69d57769}">
+            <name locale="en_US">VCCO@1</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="15.24" uuid="{e3641428-cbd5-4873-adc5-e7b7e3f12aa5}">
+            <name locale="en_US">GCLKPAD3</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="12.7" uuid="{0c25c3d6-7b8a-40dd-aff0-7908cb59437d}">
+            <name locale="en_US">VDD@1</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="10.16" uuid="{13c8f0dd-6eed-415f-9cf2-cc49da8580e6}">
+            <name locale="en_US">PAD27</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="7.62" uuid="{183852c7-0b5f-43fa-abaa-be2f832a56f8}">
+            <name locale="en_US">PAD26</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="5.08" uuid="{f8ce9322-67f0-4f4e-bf53-c316635acd35}">
+            <name locale="en_US">PAD25</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="2.54" uuid="{506c9ca6-3023-4355-a611-eb453e11aedc}">
+            <name locale="en_US">PAD24</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="0" uuid="{fbe483c9-5ea6-4138-80d3-74bbc9d32c60}">
+            <name locale="en_US">GND@1</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-2.54" uuid="{f499efed-d69c-4e36-bac0-a0f3c3311369}">
+            <name locale="en_US">PAD23</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-5.08" uuid="{b8a55370-3cb8-4cc1-8b3c-94445a2a191f}">
+            <name locale="en_US">PAD22</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-7.62" uuid="{2b24ce03-bd1c-4aa2-bff7-dea47790f675}">
+            <name locale="en_US">PAD20</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-10.16" uuid="{0a462f8c-1e55-4863-8b99-7c21410a3102}">
+            <name locale="en_US">PAD18</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-12.7" uuid="{347c0844-0d0f-477c-8d69-a2e622dddfbe}">
+            <name locale="en_US">PAD17</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-15.24" uuid="{cca7232e-22e6-4872-b54f-472b6dce4e55}">
+            <name locale="en_US">VDD@2</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-17.78" uuid="{81cbb4d3-1839-4e06-90f4-f2faf2be57a0}">
+            <name locale="en_US">VCCO@2</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-20.32" uuid="{32ada063-8fd1-461a-9eba-5426c0f4f714}">
+            <name locale="en_US">GND@2</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-22.86" uuid="{dc3dcaaf-cb16-456c-82ec-d1c7a7231e8d}">
+            <name locale="en_US">PAD16</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-25.4" uuid="{5a102e7b-90f6-438a-ac68-c1e02e424cbd}">
+            <name locale="en_US">PAD15</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-27.94" uuid="{1b55bfd1-2d37-4028-bf8c-aff9fd5ee248}">
+            <name locale="en_US">PAD13</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-30.48" uuid="{953b9723-c572-4c1f-94ea-e25a9b431e40}">
+            <name locale="en_US">PAD10</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-33.02" uuid="{0d184000-ee70-442a-a206-5a724d5a7c61}">
+            <name locale="en_US">PAD9</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-35.56" uuid="{27bdc334-c40c-4281-b8ac-fad16991f6ab}">
+            <name locale="en_US">GND@3</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-38.1" uuid="{9f0399fe-b23c-4a1b-8e62-532f5a0cc974}">
+            <name locale="en_US">PAD8</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-40.64" uuid="{90ddd01b-f922-455c-b06b-4f6b3ee5ecc5}">
+            <name locale="en_US">PAD7</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-43.18" uuid="{a51e4c7f-6e1f-4b1a-850a-28afcab13696}">
+            <name locale="en_US">PAD5</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-45.72" uuid="{a16c7a15-5850-448a-b4d1-9a4c0839f9ca}">
+            <name locale="en_US">PAD4</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-48.26" uuid="{d9a83e0d-32fa-4a07-8cea-bfacb412b692}">
+            <name locale="en_US">PAD2</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-50.8" uuid="{583c5399-8d55-45a7-bd3b-8d5d76c91c76}">
+            <name locale="en_US">TCK</name>
+        </pin>
+        <pin x="45.72" length="5.08" angle="0" y="-53.34" uuid="{dba37581-fdcc-4e15-8d32-205e2038fc7b}">
+            <name locale="en_US">VCCO@3</name>
+        </pin>
+    </pins>
+</symbol>

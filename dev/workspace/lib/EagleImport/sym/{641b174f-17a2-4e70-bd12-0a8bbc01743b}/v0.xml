@@ -1,0 +1,82 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{641b174f-17a2-4e70-bd12-0a8bbc01743b}</uuid>
+        <name locale="en_US">NE556</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="-20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="-20.32" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="-20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="-20.32" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="-2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="12.7" length="2.54" angle="180" y="-5.08" uuid="{6b04d112-54b0-4cd7-8597-8bfcda60a71a}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-7.62" uuid="{ade36059-070e-49c2-be15-f6db2cf03450}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="5.08" uuid="{99be0ba7-07de-4b97-9786-e8df5b3b3607}">
+            <name locale="en_US">CONT1</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="2.54" uuid="{6dc0bc86-5ee0-4bcb-8b7e-6655ce96318b}">
+            <name locale="en_US">RESET1</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="0" uuid="{57d5d605-0052-426e-a533-14c5e64dc840}">
+            <name locale="en_US">OUT1</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{71549e0e-2c50-46cc-8a6d-1ff11f3e2f6d}">
+            <name locale="en_US">TRES1</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{bea49329-a0d6-45de-8462-04309624c2aa}">
+            <name locale="en_US">TRIG1</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{6e474ee5-8e96-4b80-82fe-1884f2d35717}">
+            <name locale="en_US">DIS1</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-12.7" uuid="{e16d7a65-d3c2-4307-964f-83b3f925599f}">
+            <name locale="en_US">TRES2</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-15.24" uuid="{6ab7e675-4f12-4324-8a55-ece7907e48b3}">
+            <name locale="en_US">TRIG2</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-17.78" uuid="{64f43e7b-7ef3-4b0a-b34c-d8f434fc07df}">
+            <name locale="en_US">DIS2</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-15.24" uuid="{85b07c18-eb6d-475c-988b-204df96b881c}">
+            <name locale="en_US">RESET2</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-12.7" uuid="{9db56bf8-21df-436a-94fc-55cfd20f9a14}">
+            <name locale="en_US">CONT2</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-17.78" uuid="{c08f865e-0c2b-4f14-839b-1f906be7ca9f}">
+            <name locale="en_US">OUT2</name>
+        </pin>
+    </pins>
+</symbol>

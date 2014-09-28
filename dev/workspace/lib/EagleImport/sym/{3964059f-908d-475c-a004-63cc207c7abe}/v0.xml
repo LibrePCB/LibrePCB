@@ -1,0 +1,79 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{3964059f-908d-475c-a004-63cc207c7abe}</uuid>
+        <name locale="en_US">XTR101A</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-22.86" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="22.86" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="22.86">
+            <segment type="line" end_x="-15.24" end_y="22.86"/>
+        </polygon>
+        <polygon fill="false" start_y="22.86" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="-15.24" end_y="-22.86"/>
+        </polygon>
+        <polygon fill="false" start_y="20.32" width="0.1524" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="19.685"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.1524" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="16.51"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.1524" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="-17.145"/>
+        </polygon>
+        <polygon fill="false" start_y="-15.24" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-13.97"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.1524" layer="10" start_x="5.08">
+            <segment type="line" end_x="5.08" end_y="-10.795"/>
+        </polygon>
+        <polygon fill="false" start_y="12.7" width="0.1524" layer="10" start_x="5.08">
+            <segment type="line" end_x="5.08" end_y="10.795"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-17.78" length="2.54" angle="0" y="7.62" uuid="{2bf4330e-4658-427c-b269-dce87a62501f}">
+            <name locale="en_US">-IN</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-7.62" uuid="{e945023b-7d3b-42e9-bee3-0dc3f3f83509}">
+            <name locale="en_US">+IN</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="2.54" uuid="{d2deb6f7-630a-4ed2-8ae5-db4df60f8619}">
+            <name locale="en_US">SPAN_0</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-2.54" uuid="{da83a3ed-df30-4239-b82c-ebd70b6b4cf9}">
+            <name locale="en_US">SPAN_1</name>
+        </pin>
+        <pin x="-10.16" length="5.08" angle="270" y="25.4" uuid="{44440ea0-5f17-4576-ac23-bcc6f5cef033}">
+            <name locale="en_US">IREF1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="270" y="22.86" uuid="{c403a983-2f31-4d72-949a-453aa01435fa}">
+            <name locale="en_US">IREF2</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="90" y="-17.78" uuid="{07d2f0ce-ac1b-443c-b452-49e94d5814f3}">
+            <name locale="en_US">OUT</name>
+        </pin>
+        <pin x="10.16" length="5.08" angle="90" y="-12.7" uuid="{e5d18de4-b8d2-44e6-b864-b065ee130c7a}">
+            <name locale="en_US">BW</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="90" y="-10.16" uuid="{2cd53623-8731-45ea-a323-4e3e6a6d8119}">
+            <name locale="en_US">E</name>
+        </pin>
+        <pin x="0" length="5.08" angle="90" y="-20.32" uuid="{5d86abfc-d76e-49f1-b81c-c45a9ec29005}">
+            <name locale="en_US">ZADJ</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="270" y="17.78" uuid="{437bc6c0-c676-4eba-a49d-bf27f82d2249}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="-10.16" length="5.08" angle="90" y="-25.4" uuid="{9fc2a2f9-7ccb-4919-b922-4de3e158b6fa}">
+            <name locale="en_US">ZA_0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="90" y="-22.86" uuid="{844214e0-da5b-412d-8722-b7a2b6d05a8a}">
+            <name locale="en_US">ZA_1</name>
+        </pin>
+        <pin x="25.4" length="2.54" angle="180" y="0" uuid="{ccb19b3d-d41c-40d1-84f0-629ecd5295cd}">
+            <name locale="en_US">B</name>
+        </pin>
+    </pins>
+</symbol>

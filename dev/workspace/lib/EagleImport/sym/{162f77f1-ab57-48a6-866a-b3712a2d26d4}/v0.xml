@@ -1,0 +1,118 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{162f77f1-ab57-48a6-866a-b3712a2d26d4}</uuid>
+        <name locale="en_US">PCI-LD</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="40.64" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="-43.18"/>
+        </polygon>
+        <polygon fill="false" start_y="-43.18" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="12.7" end_y="-43.18"/>
+        </polygon>
+        <polygon fill="false" start_y="-43.18" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="40.64"/>
+        </polygon>
+        <polygon fill="false" start_y="40.64" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="-10.16" end_y="40.64"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="-12.7" uuid="{e214a3b7-944e-42b2-ba14-e637604aab51}">
+            <name locale="en_US">LD20/LD11/LAD11</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="27.94" uuid="{b94bd625-24f5-4835-95b2-875276985df2}">
+            <name locale="en_US">LD4/LD27/LAD27</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="35.56" uuid="{35f69d79-2325-4c04-b72e-adf70d22cfc2}">
+            <name locale="en_US">LD1/LD30/LAD30</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-38.1" uuid="{49fd7ff7-7def-496e-b10c-164c70b3e4f9}">
+            <name locale="en_US">LD30/LD1/LAD1</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-30.48" uuid="{6c4de43f-fd95-424c-9910-ebb4abf22c20}">
+            <name locale="en_US">LD27/LD4/LAD4</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-20.32" uuid="{64bb6deb-29ff-496b-9637-1555eb34f2e9}">
+            <name locale="en_US">LD23/LD8/LAD8</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-10.16" uuid="{39fe0c23-1f59-4135-b6dd-bf6bc1017f3c}">
+            <name locale="en_US">LD19/LD12/LAD12</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{7beeb23a-f75f-4c60-87dd-a792f23d35a7}">
+            <name locale="en_US">LD14/LD17/LAD17</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="10.16" uuid="{bf52daa2-b0f9-4b0a-86d7-7a2df8d91c45}">
+            <name locale="en_US">LD11/LD20/LAD20</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="20.32" uuid="{3d9527d2-c81b-4e57-8eca-5448a13a5d98}">
+            <name locale="en_US">LD7/LD24/LAD24</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="30.48" uuid="{d228742f-2cbf-448c-b630-786972106b7f}">
+            <name locale="en_US">LD3/LD28/LAD28</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-33.02" uuid="{efafeb1b-6776-46e1-b020-64d04e2c033c}">
+            <name locale="en_US">LD28/LD3/LAD3</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-27.94" uuid="{c40d3203-e075-44f4-adc8-1a45aadd59ff}">
+            <name locale="en_US">LD26/LD5/LAD5</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-17.78" uuid="{b97bed3e-9192-46f0-a800-4bef3202bec3}">
+            <name locale="en_US">LD22/LD9/LAD9</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-7.62" uuid="{cf4e60b7-c433-465e-b5a2-b4e913ac1103}">
+            <name locale="en_US">LD18/LD13/LAD13</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{afaaa30c-63f2-4a0f-bf0b-a05068828248}">
+            <name locale="en_US">LD15/LD16/LAD16</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="7.62" uuid="{8520157b-5224-4428-878a-bfdb42183c9c}">
+            <name locale="en_US">LD12/LD19/LAD19</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="17.78" uuid="{5c02aef3-ad66-4afa-ac5c-ab4129e051ce}">
+            <name locale="en_US">LD8LD23/LAD23</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="22.86" uuid="{14c4f784-12c0-41d4-b20e-578c38f49555}">
+            <name locale="en_US">LD6/LD25/LAD25</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="33.02" uuid="{32bc8ce9-f9f5-4127-bdbe-21c69adf107d}">
+            <name locale="en_US">LD2LD29/LAD29</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-40.64" uuid="{2ef0dd40-6db0-40b2-b275-949ee35396f3}">
+            <name locale="en_US">LD31/LD0/LAD0</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-25.4" uuid="{2d3b61de-0432-4bed-9a06-fd8d01f1c48a}">
+            <name locale="en_US">LD25/LD6/LAD6</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-22.86" uuid="{6b770d23-60d8-4d5b-87be-5e19d36a2e11}">
+            <name locale="en_US">LD24/LD7/LAD7</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-15.24" uuid="{b119d9cb-2897-4d96-98d1-2ab33612add9}">
+            <name locale="en_US">LD21/LD10/LAD10</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{2a7d7743-5be0-4b9c-a4f1-9b06d3fca9b9}">
+            <name locale="en_US">LD17/LD14/LAD14</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{f5efa738-b84e-4a89-91d9-28d19d1173ca}">
+            <name locale="en_US">LD16/LD15/LAD15</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{fddd9c46-1af2-483a-a610-35f4155e7f33}">
+            <name locale="en_US">LD13/LD18/LAD18</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="12.7" uuid="{61e46496-dc95-4e15-85a9-ad93579b467f}">
+            <name locale="en_US">LD10/LD21/LAD21</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="15.24" uuid="{fcbd3f89-a283-468f-8683-c54c965fa4a3}">
+            <name locale="en_US">LD9/LD22/LAD22</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="25.4" uuid="{77efc9bb-a817-4a70-8063-b29ce63c0b04}">
+            <name locale="en_US">LD5/LD26/LAD26</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="38.1" uuid="{5bd76f7c-7212-47c4-b833-925d0019b9b9}">
+            <name locale="en_US">LD0/LD31/LAD31</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-35.56" uuid="{a30426b5-988a-4bb8-b3f1-206e9ddae0da}">
+            <name locale="en_US">LD29/LD2/LAD2</name>
+        </pin>
+    </pins>
+</symbol>

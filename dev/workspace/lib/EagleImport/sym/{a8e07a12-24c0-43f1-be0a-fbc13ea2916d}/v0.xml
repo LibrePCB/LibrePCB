@@ -1,0 +1,37 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{a8e07a12-24c0-43f1-be0a-fbc13ea2916d}</uuid>
+        <name locale="en_US">ILD4001</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="12.7" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.4064" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="12.7">
+            <segment type="line" end_x="-10.16" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{f19c6942-7b3b-435d-baed-9a46917c5377}">
+            <name locale="en_US">VS</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{8b31c674-3c10-469f-baec-a94cba2575d5}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{68acc675-45a9-450a-8fb9-dd8243000b7a}">
+            <name locale="en_US">EN/PWM</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="2.54" uuid="{af1035bd-79b6-4ce3-9d04-0d5a2b44c0de}">
+            <name locale="en_US">VSENSE</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-2.54" uuid="{02af7572-298d-4e8a-a0af-a39e78b24c28}">
+            <name locale="en_US">VDRIVE</name>
+        </pin>
+    </pins>
+</symbol>

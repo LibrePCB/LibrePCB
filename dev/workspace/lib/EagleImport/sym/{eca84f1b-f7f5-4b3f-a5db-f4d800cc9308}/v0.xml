@@ -1,0 +1,31 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{eca84f1b-f7f5-4b3f-a5db-f4d800cc9308}</uuid>
+        <name locale="en_US">LH0070</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-5.08" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="5.08" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.4064" layer="10" start_x="5.08">
+            <segment type="line" end_x="5.08" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.4064" layer="10" start_x="5.08">
+            <segment type="line" end_x="-5.08" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="-5.08"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-7.62" length="2.54" angle="0" y="0" uuid="{d8b57565-d25b-4595-9dce-24fd0121eefb}">
+            <name locale="en_US">IN</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-7.62" uuid="{109e3476-ce0c-48a7-95ce-4a0b656706d8}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="0" uuid="{9c35fcb0-bbf6-4792-a0d7-6c03107a0ef7}">
+            <name locale="en_US">OUT</name>
+        </pin>
+    </pins>
+</symbol>

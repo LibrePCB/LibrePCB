@@ -1,0 +1,43 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{907426f5-c6f8-465e-a984-98eaad3feba5}</uuid>
+        <name locale="en_US">DC+-R</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{de6b3c5f-aa52-4ae9-b412-70a9792f52e9}">
+            <name locale="en_US">+VIN</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{570f4a35-8e52-4b60-81bb-a86cc848106a}">
+            <name locale="en_US">-VIN</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="5.08" uuid="{c16cb7a8-c64e-4652-b9b9-f8dab0a4f8c7}">
+            <name locale="en_US">+VOUT</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="0" uuid="{ea637321-a9cd-49f1-b4e4-90782af2eb34}">
+            <name locale="en_US">COM</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-5.08" uuid="{da5ab3f4-5826-4620-93be-b8f969e7b1fc}">
+            <name locale="en_US">-VOUT</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{9032f069-1364-4692-b5e9-07329b705e1e}">
+            <name locale="en_US">REM</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{26b5b190-3400-4be7-9325-f7963afea413}">
+            <name locale="en_US">SYNC</name>
+        </pin>
+    </pins>
+</symbol>

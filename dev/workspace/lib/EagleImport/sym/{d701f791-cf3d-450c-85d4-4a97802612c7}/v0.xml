@@ -1,0 +1,16 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{d701f791-cf3d-450c-85d4-4a97802612c7}</uuid>
+        <name locale="en_US">KL+V</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="1.778">
+            <segment type="line" end_x="2.54" end_y="0"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="5.08" length="2.54" angle="180" y="0" uuid="{7c9f54c5-e686-4c5b-8122-0f59c10c1645}">
+            <name locale="en_US">KL</name>
+        </pin>
+    </pins>
+</symbol>

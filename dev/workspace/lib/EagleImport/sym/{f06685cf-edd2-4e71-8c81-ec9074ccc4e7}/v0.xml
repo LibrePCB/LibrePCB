@@ -1,0 +1,31 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{f06685cf-edd2-4e71-8c81-ec9074ccc4e7}</uuid>
+        <name locale="en_US">LM4041-ADJ</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.905" width="0.254" layer="10" start_x="1.27">
+            <segment type="line" end_x="1.27" end_y="1.524"/>
+        </polygon>
+        <polygon fill="false" start_y="1.524" width="0.254" layer="10" start_x="1.27">
+            <segment type="line" end_x="0" end_y="1.524"/>
+        </polygon>
+        <polygon fill="false" start_y="1.524" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="-1.27" end_y="1.524"/>
+        </polygon>
+        <polygon fill="false" start_y="1.524" width="0.254" layer="10" start_x="-1.27">
+            <segment type="line" end_x="-1.27" end_y="1.143"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-2.54" uuid="{b1179cf3-5c8a-44cd-94a2-711654f80a6f}">
+            <name locale="en_US">A</name>
+        </pin>
+        <pin x="0" length="2.54" angle="270" y="2.54" uuid="{1708a5d4-24f0-4811-97c2-aba5348d8180}">
+            <name locale="en_US">C</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{f5f2ecbd-b6c5-4e52-b719-ce9aadf60e1d}">
+            <name locale="en_US">FB</name>
+        </pin>
+    </pins>
+</symbol>

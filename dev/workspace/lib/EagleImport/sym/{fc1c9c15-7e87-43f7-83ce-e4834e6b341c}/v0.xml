@@ -1,0 +1,52 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{fc1c9c15-7e87-43f7-83ce-e4834e6b341c}</uuid>
+        <name locale="en_US">LM5030</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="10.16" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-7.62" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="15.24"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="12.7" uuid="{f1762a0a-9774-47f5-9bdd-3747d1209b0e}">
+            <name locale="en_US">VIN</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="7.62" uuid="{b9584c94-ef8e-40b5-a44d-042884581e8f}">
+            <name locale="en_US">VFB</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="2.54" uuid="{75f82c74-e08e-4cc5-9fec-f73cd4b96fe2}">
+            <name locale="en_US">COMP</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-10.16" uuid="{1015abcf-8145-4a38-b211-8bac956040bf}">
+            <name locale="en_US">SS</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-2.54" uuid="{547b421b-b35b-45c8-8016-52dee2d97479}">
+            <name locale="en_US">RT</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-5.08" uuid="{2b10949f-2f6c-4bc4-9d06-36fc11f13fb7}">
+            <name locale="en_US">CS</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="5.08" uuid="{4a012864-6318-47e7-bc9a-a5e065463696}">
+            <name locale="en_US">OUT1</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-2.54" uuid="{7a175038-f034-4d51-96cf-a9022eb89046}">
+            <name locale="en_US">OUT2</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="12.7" uuid="{727527d7-437c-4399-9967-a207fc9862c0}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-10.16" uuid="{f533f145-34d8-4cad-bd94-d54eb3691bda}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

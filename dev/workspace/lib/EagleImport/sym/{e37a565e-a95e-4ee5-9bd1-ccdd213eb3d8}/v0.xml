@@ -1,0 +1,28 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{e37a565e-a95e-4ee5-9bd1-ccdd213eb3d8}</uuid>
+        <name locale="en_US">DROSSEL</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.286" width="0.254" layer="10" start_x="-3.048">
+            <segment type="line" end_x="5.588" end_y="2.286"/>
+        </polygon>
+        <polygon fill="false" start_y="1.778" width="0.254" layer="10" start_x="-3.048">
+            <segment type="line" end_x="5.588" end_y="1.778"/>
+        </polygon>
+        <polygon fill="true" start_y="-1.27" width="0.254" layer="10" start_x="-2.794">
+            <segment type="line" end_x="5.334" end_y="-1.27"/>
+            <segment type="line" end_x="5.334" end_y="1.27"/>
+            <segment type="line" end_x="-2.794" end_y="1.27"/>
+            <segment type="line" end_x="-2.794" end_y="-1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{c25404eb-7b45-487c-b705-27cba7aea30d}">
+            <name locale="en_US">3</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="0" uuid="{55ab61be-b84e-4d72-8cd5-57f564aeaed2}">
+            <name locale="en_US">4</name>
+        </pin>
+    </pins>
+</symbol>

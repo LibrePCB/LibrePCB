@@ -1,0 +1,70 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{a1d97bb6-3126-49c0-bee0-cdb3c1658534}</uuid>
+        <name locale="en_US">UNC5804</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="17.78" width="0.254" layer="10" start_x="-17.78">
+            <segment type="line" end_x="15.24" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="15.24" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="-17.78" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="-17.78">
+            <segment type="line" end_x="-17.78" end_y="17.78"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="17.78" length="2.54" angle="180" y="15.24" uuid="{78967b44-ce31-4d57-88d9-491036c51ad5}">
+            <name locale="en_US">OUTPUTA</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-5.08" uuid="{a73353f1-63f1-48e6-ae33-819c9174bb14}">
+            <name locale="en_US">OUTPUTB</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="5.08" uuid="{c5398d86-98f9-4a8a-aba7-54cc393678fc}">
+            <name locale="en_US">OUTPUTC</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-15.24" uuid="{fc7fa9fa-e42c-40c4-9fc6-5d19b7676175}">
+            <name locale="en_US">OUTPUTD</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="10.16" uuid="{95135559-8dad-4fcf-a46c-bd4ecfa93225}">
+            <name locale="en_US">KAC</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-10.16" uuid="{828a2c58-9bdd-4f24-a238-1aa7893a5b3c}">
+            <name locale="en_US">KBD</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="10.16" uuid="{651a274f-8ade-42cc-8fb7-ee88644781b6}">
+            <name locale="en_US">OUTPUT_ENABLE</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="7.62" uuid="{0bb04891-58c6-4a02-83b8-821c67c613eb}">
+            <name locale="en_US">DIRECTION</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="5.08" uuid="{28d43aa1-58d6-4db6-ad64-dc3dab4bd911}">
+            <name locale="en_US">STEP</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="2.54" uuid="{d1706fd6-a198-4efb-8783-26d937ebfc0e}">
+            <name locale="en_US">HALF-STEP</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="15.24" uuid="{8da69c33-7736-4277-b519-404ad939de8d}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="-7.62" uuid="{84065387-3433-4bfe-b4c8-b6be721f189f}">
+            <name locale="en_US">GND@1</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="-10.16" uuid="{de06f13a-8288-4da0-85b4-f3a6f58999f0}">
+            <name locale="en_US">GND@2</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="-12.7" uuid="{c6f3d542-3ffc-4fb4-a8ac-dca6df24d6d6}">
+            <name locale="en_US">GND@3</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="-15.24" uuid="{24d5c9f4-58f0-4f0a-a669-d1dfa91ce8b2}">
+            <name locale="en_US">GND@4</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="0" uuid="{e522738a-6dea-4cfc-af55-ebb3c8f29334}">
+            <name locale="en_US">ONE-PHASE</name>
+        </pin>
+    </pins>
+</symbol>

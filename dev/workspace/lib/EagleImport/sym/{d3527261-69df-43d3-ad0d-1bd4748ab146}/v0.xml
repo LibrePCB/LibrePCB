@@ -1,0 +1,88 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{d3527261-69df-43d3-ad0d-1bd4748ab146}</uuid>
+        <name locale="en_US">DSP56F807-PORT</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="33.02" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="33.02"/>
+        </polygon>
+        <polygon fill="false" start_y="33.02" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-35.56"/>
+        </polygon>
+        <polygon fill="false" start_y="-35.56" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-35.56"/>
+        </polygon>
+        <polygon fill="false" start_y="-35.56" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="33.02"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="30.48" uuid="{5bec2e3c-da64-4852-a8bf-9efec60077cd}">
+            <name locale="en_US">GPIOB0</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="27.94" uuid="{94275f57-5725-43fe-be04-ae3e7ca6b9a0}">
+            <name locale="en_US">GPIOB1</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="25.4" uuid="{95f16003-f71b-4759-926a-78ea332f23cd}">
+            <name locale="en_US">GPIOB2</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="22.86" uuid="{c46cc264-5b4b-4f38-b1e0-b0ad421388fa}">
+            <name locale="en_US">GPIOB3</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="20.32" uuid="{6590994a-ad52-4b0f-bae0-482e4e95c014}">
+            <name locale="en_US">GPIOB4</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="17.78" uuid="{6780d6f2-c8ee-41b5-9e9f-d4aab22471fd}">
+            <name locale="en_US">GPIOB5</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="15.24" uuid="{a9d17e8a-bcc1-4c57-937d-157bb7cbd20d}">
+            <name locale="en_US">GPIOB6</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="12.7" uuid="{d521cc1d-8a28-46d3-a638-84a70fef510f}">
+            <name locale="en_US">GPIOB7</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="7.62" uuid="{643089e1-90d7-416e-832e-910c85cddae4}">
+            <name locale="en_US">GPIOD0</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{1c6acc5e-da87-44d8-ba60-8fa989f7885b}">
+            <name locale="en_US">GPIOD1</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{bd5646cb-161f-4623-8221-e4f2f335405e}">
+            <name locale="en_US">GPIOD2</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{3ecdb68f-e6c5-4a43-aa9c-10a59400179d}">
+            <name locale="en_US">GPIOD3</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{4a3e8fa9-17f8-491d-8098-4cf7ba71e4cf}">
+            <name locale="en_US">GPIOD4</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{4f0dede9-83f4-46f5-909e-b45577d426c8}">
+            <name locale="en_US">GPIOD5</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-7.62" uuid="{e387c1d2-e79a-4160-952b-5041f7ed2664}">
+            <name locale="en_US">GPIOD6/TXD1</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-10.16" uuid="{fa805410-6bba-4c5d-8c05-ebb0187262c0}">
+            <name locale="en_US">GPIOD7/RXD1</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-33.02" uuid="{dbe6e241-4970-40a5-bdca-cadbfccb070a}">
+            <name locale="en_US">GPIOE7/!SS</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-25.4" uuid="{7ddab6fb-5794-4e8d-9f66-7e878c5b7835}">
+            <name locale="en_US">GPIOE4/SCLK</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-30.48" uuid="{a22fa037-4aec-4147-8468-5482ae3433b3}">
+            <name locale="en_US">GPIOE6/MISO</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-27.94" uuid="{c2ec9840-5945-4901-a064-9c28f01ae255}">
+            <name locale="en_US">GPIOE5/MOSI</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-15.24" uuid="{139b36a0-2a0a-4774-a115-91ad60a23f26}">
+            <name locale="en_US">GPIOE0/TXD0</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-17.78" uuid="{077cb709-ce25-4504-aceb-f09ece5b911f}">
+            <name locale="en_US">GPIOE1/RXD0</name>
+        </pin>
+    </pins>
+</symbol>

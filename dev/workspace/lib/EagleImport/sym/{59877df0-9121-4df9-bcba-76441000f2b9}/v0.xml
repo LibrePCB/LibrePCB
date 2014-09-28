@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{59877df0-9121-4df9-bcba-76441000f2b9}</uuid>
+        <name locale="en_US">UC3842</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="7.62" uuid="{0b90cd16-f194-4155-9cdd-5f439868b461}">
+            <name locale="en_US">COMP</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{53ccadc5-8a17-46be-955e-203bfdcca82c}">
+            <name locale="en_US">VFB</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{7cb4ff7f-a097-4b26-9b71-6ea378b8f683}">
+            <name locale="en_US">ISENSE</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-7.62" uuid="{1712695b-c3fb-4b91-a26d-c9d83e6d34a0}">
+            <name locale="en_US">RT/CT</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-7.62" uuid="{07736d8c-3ea7-4042-94d1-68c06a495042}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-2.54" uuid="{f94664e0-140c-4edc-8c08-a761076c81a5}">
+            <name locale="en_US">OUT</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="2.54" uuid="{bdefd05c-0966-420f-bc46-dd21216df36a}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="7.62" uuid="{154b9b64-fb7e-456c-bb8b-d88222b2a626}">
+            <name locale="en_US">VREF</name>
+        </pin>
+    </pins>
+</symbol>

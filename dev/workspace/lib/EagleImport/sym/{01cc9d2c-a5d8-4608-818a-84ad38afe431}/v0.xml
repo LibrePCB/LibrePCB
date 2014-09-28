@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{01cc9d2c-a5d8-4608-818a-84ad38afe431}</uuid>
+        <name locale="en_US">LF198</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{bd857118-b414-42b0-be2e-6accaaf5bcd8}">
+            <name locale="en_US">IN</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="270" y="12.7" uuid="{a64d2393-76a5-4550-a617-3ee54705c34c}">
+            <name locale="en_US">V+</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-12.7" uuid="{764ea078-aebe-4e69-b591-5a2d0942b7a7}">
+            <name locale="en_US">V-</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{e3ccb874-4790-4570-90f5-7433a2e18c02}">
+            <name locale="en_US">!SH</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="2.54" uuid="{4ea0145c-1105-4eff-b840-70c598289bfa}">
+            <name locale="en_US">OUT</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-7.62" uuid="{ff372dca-a47d-49c4-81d3-a9b6e87a1e3f}">
+            <name locale="en_US">LOGREF</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="90" y="-12.7" uuid="{a2cf4fac-0de1-49ea-a82c-f25d054ada2c}">
+            <name locale="en_US">OFFSET</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{5a05f30f-34af-4797-8e5a-e0429b1185d0}">
+            <name locale="en_US">CHOLD</name>
+        </pin>
+    </pins>
+</symbol>

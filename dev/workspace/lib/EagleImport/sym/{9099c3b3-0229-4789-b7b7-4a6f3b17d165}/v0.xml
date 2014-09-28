@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{9099c3b3-0229-4789-b7b7-4a6f3b17d165}</uuid>
+        <name locale="en_US">SDE2506</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="10.16" length="2.54" angle="180" y="7.62" uuid="{49867f28-dd06-49f3-b7ae-3c88bc787041}">
+            <name locale="en_US">CLK</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="5.08" uuid="{d915d51a-be5b-4b91-801e-9debc951e267}">
+            <name locale="en_US">CE/</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="2.54" uuid="{a8248772-f096-4b9a-9142-0bbe597a9a3e}">
+            <name locale="en_US">D</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-2.54" uuid="{22906985-af8a-47e3-9b4c-05d4fb364e65}">
+            <name locale="en_US">NC</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-5.08" uuid="{d7c9e46b-6dd2-477b-8d4f-55b54e48e25a}">
+            <name locale="en_US">TP</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-7.62" uuid="{93ec7454-9e63-4e5f-adcb-43ccd6e2d7db}">
+            <name locale="en_US">TG</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-7.62" uuid="{8e734919-a52e-4a0a-b205-aa9587a6b9a7}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="7.62" uuid="{4c7802e0-c12d-4589-99b6-62aa56a97adf}">
+            <name locale="en_US">VCC</name>
+        </pin>
+    </pins>
+</symbol>

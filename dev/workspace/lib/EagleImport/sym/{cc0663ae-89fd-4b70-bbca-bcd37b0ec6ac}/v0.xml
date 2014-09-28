@@ -1,0 +1,55 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{cc0663ae-89fd-4b70-bbca-bcd37b0ec6ac}</uuid>
+        <name locale="en_US">STA013PW</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="20.32" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="20.32" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-22.86"/>
+        </polygon>
+        <polygon fill="false" start_y="-22.86" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-22.86"/>
+        </polygon>
+        <polygon fill="false" start_y="-22.86" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="20.32"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{0c8ae9c4-cb01-4b67-bf84-4d6de92f6826}">
+            <name locale="en_US">PVDD</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{d5e7ddd3-d659-4c4b-8994-556558cf154a}">
+            <name locale="en_US">PVSS</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="17.78" uuid="{0baf446a-8bad-4a3d-9e50-8ab180d8b71b}">
+            <name locale="en_US">VDD_1</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="7.62" uuid="{bef7717b-8da8-47cf-ac97-8c7c616f1f16}">
+            <name locale="en_US">VDD_2</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-2.54" uuid="{1d05c93e-906e-4c7f-bd07-2a251f6e1bec}">
+            <name locale="en_US">VDD_3</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-12.7" uuid="{36f6d31f-8db3-446c-801a-f00aca4f7c40}">
+            <name locale="en_US">VDD_4</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="12.7" uuid="{d9b43f60-d393-45e4-a5d9-b06c681e7f5a}">
+            <name locale="en_US">VSS_1</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="2.54" uuid="{2c81b2c8-0156-4542-aa19-849a09e3ad45}">
+            <name locale="en_US">VSS_2</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-7.62" uuid="{d4a44285-2435-4e50-a101-98f32e339c47}">
+            <name locale="en_US">VSS_3</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-17.78" uuid="{8069abcb-e842-46d1-8b61-5ab0368b7dff}">
+            <name locale="en_US">VSS_4</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-20.32" uuid="{907214fd-befd-4d61-9524-09622cb8fc64}">
+            <name locale="en_US">VSS_5</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,16 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{5294036f-7ce1-4b9c-aa90-5dc7cec57c0b}</uuid>
+        <name locale="en_US">MVAL</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.6096" layer="10" start_x="0">
+            <segment type="line" end_x="1.27" end_y="0"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{63fef7fe-81e8-4153-8b88-d4377bed999c}">
+            <name locale="en_US">S</name>
+        </pin>
+    </pins>
+</symbol>

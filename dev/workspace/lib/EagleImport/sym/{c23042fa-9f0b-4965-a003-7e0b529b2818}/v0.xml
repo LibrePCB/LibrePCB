@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{c23042fa-9f0b-4965-a003-7e0b529b2818}</uuid>
+        <name locale="en_US">MX584N</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-10.16" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="15.24" length="5.08" angle="180" y="7.62" uuid="{db68a346-1399-448d-bbcc-ad4b56715c60}">
+            <name locale="en_US">10,0V</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="5.08" uuid="{e7c10257-8ef6-4286-8544-53e335f7ac7e}">
+            <name locale="en_US">5,0V</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="2.54" uuid="{e28886df-8a53-4af4-9fea-e650cebbbb65}">
+            <name locale="en_US">2,5V</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-7.62" uuid="{dc561c24-852f-49e4-a98b-98e12e5706b7}">
+            <name locale="en_US">COMMON</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-2.54" uuid="{612a1c15-9743-4e41-b35a-b42be211c5c9}">
+            <name locale="en_US">+VS</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="7.62" uuid="{4cd67deb-320f-4ce0-8cb1-595f83965bf7}">
+            <name locale="en_US">CAP</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="2.54" uuid="{ae96a0a8-c8dc-466f-8797-4eea8108d5a0}">
+            <name locale="en_US">VBG</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-2.54" uuid="{28250cb7-64af-4277-872f-9a2fde777c0e}">
+            <name locale="en_US">STROBE</name>
+        </pin>
+    </pins>
+</symbol>

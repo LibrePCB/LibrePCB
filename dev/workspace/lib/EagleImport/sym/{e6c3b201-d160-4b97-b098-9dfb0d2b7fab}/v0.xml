@@ -1,0 +1,34 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{e6c3b201-d160-4b97-b098-9dfb0d2b7fab}</uuid>
+        <name locale="en_US">DC+</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="5.08" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="5.08"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{56d72c0c-65f2-4195-99cb-337c56036323}">
+            <name locale="en_US">+VIN</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{524de71c-ec73-4495-8547-460919575a42}">
+            <name locale="en_US">-VIN</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="2.54" uuid="{85caaa45-1894-4fd4-a63c-d55db59488b5}">
+            <name locale="en_US">+VOUT</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-2.54" uuid="{2c5521c3-cfda-4993-a139-68b5cf46b266}">
+            <name locale="en_US">-VOUT</name>
+        </pin>
+    </pins>
+</symbol>

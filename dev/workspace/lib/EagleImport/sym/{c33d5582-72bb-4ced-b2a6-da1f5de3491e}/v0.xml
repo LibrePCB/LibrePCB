@@ -1,0 +1,12 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{c33d5582-72bb-4ced-b2a6-da1f5de3491e}</uuid>
+        <name locale="en_US">VPP</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-2.54" uuid="{cf6bf18b-1960-45fc-9587-6a42cfc2a971}">
+            <name locale="en_US">VPP</name>
+        </pin>
+    </pins>
+</symbol>

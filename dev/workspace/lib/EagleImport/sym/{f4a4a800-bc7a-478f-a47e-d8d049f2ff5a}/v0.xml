@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{f4a4a800-bc7a-478f-a47e-d8d049f2ff5a}</uuid>
+        <name locale="en_US">LP2951</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="12.7" length="2.54" angle="180" y="7.62" uuid="{08c8aa31-71de-4b12-99cf-5004501ba20e}">
+            <name locale="en_US">OUT</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="5.08" uuid="{01236acd-9852-445e-8e47-20d80858c05c}">
+            <name locale="en_US">SENSE</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="7.62" uuid="{ef9829c2-d10e-4605-b5cf-4cd649b3a43f}">
+            <name locale="en_US">IN</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-2.54" uuid="{0121ac76-a62b-4fbb-801c-2cc2fdec0a9e}">
+            <name locale="en_US">FB</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{aed0f5f0-28a4-47e4-9245-971f80de3e00}">
+            <name locale="en_US">SH-DOWN</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-7.62" uuid="{b8e3bcea-13c0-4bee-9690-4c5c336eb7ce}">
+            <name locale="en_US">!ERROR</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="2.54" uuid="{798af06d-6b9b-4d75-8c2f-d6b8ceef06ac}">
+            <name locale="en_US">VOTAB</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-7.62" uuid="{3bb71099-da49-43ce-aa17-bd953425436b}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,37 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{1104ba06-1f01-43ed-9dc3-e7efcee8f1c2}</uuid>
+        <name locale="en_US">RN04</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="2.54" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="-2.54" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{990c5cdc-3dd2-4417-84ab-31df3ec918e2}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="0" uuid="{00fdbdb7-0196-45fb-8f4b-c040458b16ac}">
+            <name locale="en_US">2</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="0" uuid="{2e6fdf03-19b0-4050-89be-aaa4fee23843}">
+            <name locale="en_US">3</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="0" uuid="{dec8cfc1-758a-4f2a-ac90-b40f504a23e8}">
+            <name locale="en_US">4</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="0" uuid="{1b9a199f-3c7b-40c9-ac1b-797496d94ae0}">
+            <name locale="en_US">5</name>
+        </pin>
+    </pins>
+</symbol>

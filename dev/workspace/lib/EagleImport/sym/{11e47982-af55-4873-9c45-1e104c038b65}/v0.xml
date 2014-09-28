@@ -1,0 +1,28 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{11e47982-af55-4873-9c45-1e104c038b65}</uuid>
+        <name locale="en_US">MTA-02</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="-1.27">
+            <segment type="line" end_x="-1.27" end_y="-1.905"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.905" width="0.254" layer="10" start_x="3.81">
+            <segment type="line" end_x="-1.27" end_y="-1.905"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.905" width="0.254" layer="10" start_x="3.81">
+            <segment type="line" end_x="3.81" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="-1.27">
+            <segment type="line" end_x="3.81" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-2.54" uuid="{0d425cb1-aa4e-4a93-be25-5f196f86341f}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-2.54" uuid="{8a388a20-4593-4304-a124-d8ed8c3793f6}">
+            <name locale="en_US">2</name>
+        </pin>
+    </pins>
+</symbol>

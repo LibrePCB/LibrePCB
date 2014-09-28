@@ -1,0 +1,82 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{e43f286f-fa30-4902-9435-04fb81068c76}</uuid>
+        <name locale="en_US">USB</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="6.35" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="-2.54" end_y="6.35"/>
+        </polygon>
+        <polygon fill="false" start_y="6.35" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="-3.81"/>
+        </polygon>
+        <polygon fill="false" start_y="-3.81" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="2.54" end_y="-3.81"/>
+        </polygon>
+        <polygon fill="false" start_y="6.35" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="5.715"/>
+        </polygon>
+        <polygon fill="false" start_y="5.715" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="1.27" end_y="5.715"/>
+        </polygon>
+        <polygon fill="false" start_y="5.715" width="0.254" layer="10" start_x="1.27">
+            <segment type="line" end_x="1.27" end_y="4.445"/>
+        </polygon>
+        <polygon fill="false" start_y="4.445" width="0.254" layer="10" start_x="1.27">
+            <segment type="line" end_x="2.54" end_y="4.445"/>
+        </polygon>
+        <polygon fill="false" start_y="4.445" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="3.175"/>
+        </polygon>
+        <polygon fill="false" start_y="3.175" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="1.27" end_y="3.175"/>
+        </polygon>
+        <polygon fill="false" start_y="3.175" width="0.254" layer="10" start_x="1.27">
+            <segment type="line" end_x="1.27" end_y="1.905"/>
+        </polygon>
+        <polygon fill="false" start_y="1.905" width="0.254" layer="10" start_x="1.27">
+            <segment type="line" end_x="2.54" end_y="1.905"/>
+        </polygon>
+        <polygon fill="false" start_y="1.905" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="0.635" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="1.27" end_y="0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="0.635" width="0.254" layer="10" start_x="1.27">
+            <segment type="line" end_x="1.27" end_y="-0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.635" width="0.254" layer="10" start_x="1.27">
+            <segment type="line" end_x="2.54" end_y="-0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.635" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="-1.905"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.905" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="1.27" end_y="-1.905"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.905" width="0.254" layer="10" start_x="1.27">
+            <segment type="line" end_x="1.27" end_y="-3.175"/>
+        </polygon>
+        <polygon fill="false" start_y="-3.175" width="0.254" layer="10" start_x="1.27">
+            <segment type="line" end_x="2.54" end_y="-3.175"/>
+        </polygon>
+        <polygon fill="false" start_y="-3.175" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="-3.81"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2.54" angle="0" y="5.08" uuid="{8ca2c1ad-44d5-4366-973b-95f8f17630b3}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="2.54" uuid="{be3d4929-baca-4bac-bbe3-782e656bb3d1}">
+            <name locale="en_US">2</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{1fa10b37-aa32-43ce-b57e-cedfa2a8fe4b}">
+            <name locale="en_US">3</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-2.54" uuid="{b1ac1aa8-6106-4dba-922e-4b3ea3b57c94}">
+            <name locale="en_US">4</name>
+        </pin>
+    </pins>
+</symbol>

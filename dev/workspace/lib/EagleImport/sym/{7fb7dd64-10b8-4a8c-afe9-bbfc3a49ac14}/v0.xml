@@ -1,0 +1,40 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{7fb7dd64-10b8-4a8c-afe9-bbfc3a49ac14}</uuid>
+        <name locale="en_US">IR4427</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="10.16" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="2.54" uuid="{d0b97df3-0242-4bf0-9c74-69e161fa5903}">
+            <name locale="en_US">INA</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-2.54" uuid="{9acf7e69-c415-4442-87ab-8c560397a245}">
+            <name locale="en_US">INB</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="2.54" uuid="{ea48845d-fb66-41b5-aa27-f4dc7aefb02f}">
+            <name locale="en_US">OUTA</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-2.54" uuid="{d5cb4173-b5a1-4421-aa90-cce8e9877dfa}">
+            <name locale="en_US">OUTB</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-5.08" uuid="{8530a827-b10d-467f-a6e4-9a45216304d3}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="5.08" uuid="{2f41bd53-dc40-4bf4-93b1-a72bf481c544}">
+            <name locale="en_US">VS</name>
+        </pin>
+    </pins>
+</symbol>

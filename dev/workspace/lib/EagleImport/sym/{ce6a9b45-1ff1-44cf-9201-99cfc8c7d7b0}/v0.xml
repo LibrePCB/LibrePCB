@@ -1,0 +1,34 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{ce6a9b45-1ff1-44cf-9201-99cfc8c7d7b0}</uuid>
+        <name locale="en_US">BATTERY</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="3.81" width="0.4064" layer="10" start_x="-1.27">
+            <segment type="line" end_x="-1.27" end_y="-3.81"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.4064" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="3.81" width="0.4064" layer="10" start_x="1.27">
+            <segment type="line" end_x="1.27" end_y="-3.81"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.4064" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-1.524" end_y="0"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="5.08" length="2.54" angle="180" y="0" uuid="{bea90fcd-9ac9-4586-858e-184f70e3c9d6}">
+            <name locale="en_US">-</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{bba8f4e0-b6a6-4784-a683-cea4c1d66c56}">
+            <name locale="en_US">+</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="180" y="0" uuid="{0c31387e-745b-41c8-8714-8e4d4a8af54c}">
+            <name locale="en_US">+@1</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,37 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{c501b2e6-128f-4948-a8d7-01fb1098d71f}</uuid>
+        <name locale="en_US">HPR_105</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="15.24" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="15.24" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="-15.24" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="-15.24" end_y="-5.08"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="90" y="-7.62" uuid="{00cb666f-9dba-4850-a46b-e6d33eaae80b}">
+            <name locale="en_US">VIN</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="90" y="-7.62" uuid="{01fe12cc-79a8-4585-9a20-ecb247979d83}">
+            <name locale="en_US">GND1</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-7.62" uuid="{a04a94c4-5782-446d-bc1d-91f1c2369b9d}">
+            <name locale="en_US">V-</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="90" y="-7.62" uuid="{4415110c-4b2e-46b4-921b-9f072831206b}">
+            <name locale="en_US">GND2</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="90" y="-7.62" uuid="{7453a8c0-bab1-41b0-8cf3-e38b1c005a46}">
+            <name locale="en_US">V+</name>
+        </pin>
+    </pins>
+</symbol>

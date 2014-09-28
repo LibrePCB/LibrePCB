@@ -1,0 +1,37 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{26472252-68e5-4bd7-b10e-6c7ee021823c}</uuid>
+        <name locale="en_US">M5-CTRL</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-21.59"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{4d5a67cf-aef2-4b4a-82cb-8dcec7dfd174}">
+            <name locale="en_US">TDI</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{13ed88cb-7447-4bd0-987d-d8c5563df58a}">
+            <name locale="en_US">TMS</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{56d00dff-ee24-424f-9302-aa8d67d0bed3}">
+            <name locale="en_US">TCK</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{2dafb53c-54ea-4b70-aa6c-c0a2a98912f6}">
+            <name locale="en_US">TDO</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{726f58fe-4d0b-4e67-aebc-d3bf007b7f9e}">
+            <name locale="en_US">CLK0/I0</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-15.24" uuid="{e4cf0c0a-d58c-4b86-ba3a-266d21256a9a}">
+            <name locale="en_US">CLK1/I1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-17.78" uuid="{7ce9e36b-b480-4dfd-a36e-e65ab96bf671}">
+            <name locale="en_US">CLK2/I2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-20.32" uuid="{26072712-b533-4a8a-9402-d54ec95a24a7}">
+            <name locale="en_US">CLK3/I3</name>
+        </pin>
+    </pins>
+</symbol>

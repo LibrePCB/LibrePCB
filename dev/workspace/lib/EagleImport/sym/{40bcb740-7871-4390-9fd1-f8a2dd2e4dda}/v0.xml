@@ -1,0 +1,28 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{40bcb740-7871-4390-9fd1-f8a2dd2e4dda}</uuid>
+        <name locale="en_US">524-130E</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-11.43" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{d12f669e-ec2b-4179-ad94-87a79857634c}">
+            <name locale="en_US">IO514</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{8df2b473-4a5b-4eec-b58f-17e98053d7f5}">
+            <name locale="en_US">IO521</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{dafa736a-d061-4472-9879-8416c8f70fe8}">
+            <name locale="en_US">IO522</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{1b353225-2d03-4e3f-b57d-2666568130d8}">
+            <name locale="en_US">IO523</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{a6b85f72-f678-4427-94f0-5661c157041a}">
+            <name locale="en_US">IO524</name>
+        </pin>
+    </pins>
+</symbol>

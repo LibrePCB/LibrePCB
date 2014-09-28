@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{7362dd78-dd9e-452e-8113-aacb33c3b7bf}</uuid>
+        <name locale="en_US">DIP01</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="5.08" width="0.4064" layer="10" start_x="-1.905">
+            <segment type="line" end_x="-1.905" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.4064" layer="10" start_x="-1.905">
+            <segment type="line" end_x="1.905" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.4064" layer="10" start_x="1.905">
+            <segment type="line" end_x="1.905" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.4064" layer="10" start_x="-1.905">
+            <segment type="line" end_x="1.905" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="0.508">
+            <segment type="line" end_x="-0.508" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="-0.508">
+            <segment type="line" end_x="0.508" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="0.508">
+            <segment type="line" end_x="0.508" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="-0.508">
+            <segment type="line" end_x="-0.508" end_y="2.54"/>
+        </polygon>
+        <polygon fill="true" start_y="-2.286" width="0.254" layer="10" start_x="-0.254">
+            <segment type="line" end_x="0.254" end_y="-2.286"/>
+            <segment type="line" end_x="0.254" end_y="0"/>
+            <segment type="line" end_x="-0.254" end_y="0"/>
+            <segment type="line" end_x="-0.254" end_y="-2.286"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="270" y="7.62" uuid="{29d4e4a0-5dc4-4f12-addb-5d38266a8539}">
+            <name locale="en_US">2</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-7.62" uuid="{57c83336-754f-4a31-bf27-7bdedefc2d2c}">
+            <name locale="en_US">1</name>
+        </pin>
+    </pins>
+</symbol>

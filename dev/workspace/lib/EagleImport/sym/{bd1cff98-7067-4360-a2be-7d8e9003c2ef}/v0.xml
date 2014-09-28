@@ -1,0 +1,40 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{bd1cff98-7067-4360-a2be-7d8e9003c2ef}</uuid>
+        <name locale="en_US">R</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-0.889" width="0.254" layer="10" start_x="-3.81">
+            <segment type="line" end_x="3.81" end_y="-0.889"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.889" width="0.254" layer="10" start_x="3.81">
+            <segment type="line" end_x="3.81" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0.889" width="0.254" layer="10" start_x="3.81">
+            <segment type="line" end_x="-3.81" end_y="0.889"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.889" width="0.254" layer="10" start_x="-3.81">
+            <segment type="line" end_x="-3.81" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="3.81">
+            <segment type="line" end_x="5.08" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="3.81">
+            <segment type="line" end_x="3.81" end_y="0.889"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-3.81" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="-3.81">
+            <segment type="line" end_x="-3.81" end_y="0.889"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="5.08" length="0" angle="180" y="0" uuid="{11517d3b-7a7b-4e1a-b77f-391652295ff0}">
+            <name locale="en_US">2</name>
+        </pin>
+        <pin x="-5.08" length="0" angle="0" y="0" uuid="{07d60603-72e6-44a6-8014-ca44e074440b}">
+            <name locale="en_US">1</name>
+        </pin>
+    </pins>
+</symbol>

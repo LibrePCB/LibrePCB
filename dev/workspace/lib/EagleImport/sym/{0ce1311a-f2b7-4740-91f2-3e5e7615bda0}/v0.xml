@@ -1,0 +1,43 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{0ce1311a-f2b7-4740-91f2-3e5e7615bda0}</uuid>
+        <name locale="en_US">TLE5205-2</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{d0b79da9-1f8b-4daf-a457-98274399bdc6}">
+            <name locale="en_US">EF</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{baf75042-ec2b-4d84-a67c-c3f896b83319}">
+            <name locale="en_US">IN1</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{7080a559-c6b6-40ac-b44a-987f3217f78e}">
+            <name locale="en_US">IN2</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="2.54" uuid="{d187b61a-cf0c-400e-a479-54d750ae7bc7}">
+            <name locale="en_US">OUT1</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-2.54" uuid="{2816965c-be74-48ce-bd41-bda310d9cba8}">
+            <name locale="en_US">OUT2</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="7.62" uuid="{111345a7-3e4b-4e70-877a-d61b7f713b17}">
+            <name locale="en_US">VS</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-7.62" uuid="{341eb287-a607-4bed-b6d0-5d954c9fe561}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

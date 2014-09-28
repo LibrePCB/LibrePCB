@@ -1,0 +1,70 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{9b53dc89-237b-4e0b-b642-ada1b7cd5ee3}</uuid>
+        <name locale="en_US">INA102</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-15.24" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="15.24" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-15.24" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="15.24" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="-12.7" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-12.7" end_y="-15.24"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="17.78" length="2.54" angle="180" y="-7.62" uuid="{14cdf1d1-3ead-49ed-9fb4-e17ccc9f8359}">
+            <name locale="en_US">OFFADJ@1</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="7.62" uuid="{de1b0721-c66e-4897-b7fd-1c70dfe8c9c8}">
+            <name locale="en_US">*10</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="5.08" uuid="{d0e2554c-751d-44ca-a5ab-9766e3bf5ecc}">
+            <name locale="en_US">*100</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="2.54" uuid="{3d685261-7ad7-4a2e-a9e7-65a6d654c3f4}">
+            <name locale="en_US">*1000</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="0" uuid="{18c69020-928d-4bd9-9ac8-a1bf0e698841}">
+            <name locale="en_US">*1000GS</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-5.08" uuid="{ac8152a4-0eb6-4b59-b047-cedce8467218}">
+            <name locale="en_US">G_SENSE</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-2.54" uuid="{98d9903c-480f-45c5-8ca1-c35bb6e29200}">
+            <name locale="en_US">G_SET</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-12.7" uuid="{ebe1c0db-fedd-489c-88e4-ff082ff52d9d}">
+            <name locale="en_US">CMRTRIM</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-5.08" uuid="{6ab226e8-1c1c-4cb5-9d95-8a78aa3290a4}">
+            <name locale="en_US">-VCC</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="2.54" uuid="{5348cb8d-5355-48c0-949d-f82f81fdc1b8}">
+            <name locale="en_US">COMMON</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="7.62" uuid="{56ffa117-945b-4644-b219-d0d0a635d7c0}">
+            <name locale="en_US">OUTPUT</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-2.54" uuid="{f4380863-9331-4908-9173-ef2ebfe3e36d}">
+            <name locale="en_US">+VCC</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="12.7" uuid="{9ef43e50-e1ca-478b-ad79-81b030cbe229}">
+            <name locale="en_US">FILTER</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="12.7" uuid="{4da0be73-b202-4977-adf7-c5fe4cc40461}">
+            <name locale="en_US">-IN</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-10.16" uuid="{0bfeafef-083f-4653-8bf2-2ce18acbdbdd}">
+            <name locale="en_US">+IN</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-10.16" uuid="{3db7f10e-a374-440a-add1-d886fd8e55fb}">
+            <name locale="en_US">OFFADJ@2</name>
+        </pin>
+    </pins>
+</symbol>

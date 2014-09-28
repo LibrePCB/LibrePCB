@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{4d48ae81-2f2d-4cb4-850a-819b361f2e1c}</uuid>
+        <name locale="en_US">ICM7242</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-10.16" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="-10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="5.08" angle="0" y="7.62" uuid="{7dfb1830-3e6a-48d7-87c8-489d70695347}">
+            <name locale="en_US">RESET</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-7.62" uuid="{608be3f9-af67-4bf7-88b8-b68834018e27}">
+            <name locale="en_US">TRIG</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="2.54" uuid="{e2292c61-1e5e-4b8f-b4a6-002d87527df8}">
+            <name locale="en_US">128/256</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="2.54" uuid="{fd08db16-502d-466c-918a-0837b845686b}">
+            <name locale="en_US">TB</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-7.62" uuid="{2393103b-2927-4830-9d5a-220c273a89d1}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-2.54" uuid="{92169d71-ef69-456a-9306-ae3c080f6828}">
+            <name locale="en_US">V+</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="7.62" uuid="{35d1d7b0-e77b-43cf-84b3-bc0574397a9d}">
+            <name locale="en_US">OUT-2</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-2.54" uuid="{93b939f1-1126-45c1-91e9-5b9a6537a0b5}">
+            <name locale="en_US">RC</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,25 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{78cb3403-b789-43f4-820d-dc083e2c1137}</uuid>
+        <name locale="en_US">DM385_I2C</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-15.24"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{a18ca5ce-77bd-4aaf-9d79-cc91f1076f0b}">
+            <name locale="en_US">I2C1SCL</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{32bca1ed-0d7d-4f8d-80aa-f50df6ab34b5}">
+            <name locale="en_US">I2C1SDA</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{58104d36-9709-4004-ac93-4eea44627fad}">
+            <name locale="en_US">I2C0SCL</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{e54637c7-79b0-401c-8c2e-05887836a03c}">
+            <name locale="en_US">I2C0SDA</name>
+        </pin>
+    </pins>
+</symbol>

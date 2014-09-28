@@ -1,0 +1,40 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{5003dc34-53e7-4662-ba30-e300d211c653}</uuid>
+        <name locale="en_US">TPS5410</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="5.08" uuid="{cb63767b-631c-4862-af9a-90ce56750eb5}">
+            <name locale="en_US">VIN</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-2.54" uuid="{b7c018ab-8a03-4f3c-ae8e-da3a3b7f2e16}">
+            <name locale="en_US">ENA</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-7.62" uuid="{6966e4be-9599-497e-a288-da029d2867e1}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-5.08" uuid="{645c12e0-2281-435d-803e-2e4a830d4100}">
+            <name locale="en_US">VSENSE</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="0" uuid="{d251cb35-8a23-4085-a6b6-8e03e37aae80}">
+            <name locale="en_US">BOOT</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="5.08" uuid="{a3247e0c-829e-43db-ae59-216c9182225d}">
+            <name locale="en_US">PH</name>
+        </pin>
+    </pins>
+</symbol>

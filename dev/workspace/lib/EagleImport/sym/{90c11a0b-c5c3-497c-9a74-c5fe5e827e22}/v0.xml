@@ -1,0 +1,28 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{90c11a0b-c5c3-497c-9a74-c5fe5e827e22}</uuid>
+        <name locale="en_US">AD590</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="4.572" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="3.048"/>
+        </polygon>
+        <polygon fill="false" start_y="3.81" width="0.1524" layer="10" start_x="-0.889">
+            <segment type="line" end_x="0.889" end_y="3.81"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.1524" layer="10" start_x="-0.889">
+            <segment type="line" end_x="0.889" end_y="-1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="270" y="7.62" uuid="{05cefd8e-9bdd-4afa-adcd-c83c7ca06f39}">
+            <name locale="en_US">+</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-5.08" uuid="{e4c33c8f-9dc7-48ce-bffa-c1dfafbc87d7}">
+            <name locale="en_US">-</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{a89c7a6c-c832-4879-9bc8-d4b21d45e2d7}">
+            <name locale="en_US">CAN</name>
+        </pin>
+    </pins>
+</symbol>

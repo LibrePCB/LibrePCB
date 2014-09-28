@@ -1,0 +1,43 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{f236576c-af5c-49c4-b5ae-cd943093b075}</uuid>
+        <name locale="en_US">7414</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="5.08" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="5.08" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.4064" layer="10" start_x="5.08">
+            <segment type="line" end_x="-5.08" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.1524" layer="10" start_x="-0.762">
+            <segment type="line" end_x="-1.778" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.1524" layer="10" start_x="-2.032">
+            <segment type="line" end_x="-3.048" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.1524" layer="10" start_x="-2.032">
+            <segment type="line" end_x="-0.762" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.1524" layer="10" start_x="-0.762">
+            <segment type="line" end_x="0.127" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.1524" layer="10" start_x="-3.937">
+            <segment type="line" end_x="-3.048" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.1524" layer="10" start_x="-3.048">
+            <segment type="line" end_x="-1.778" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="5.08" angle="0" y="0" uuid="{408a03ae-ed7b-4154-9bd7-88bfc8e97e05}">
+            <name locale="en_US">I</name>
+        </pin>
+        <pin x="10.16" length="5.08" angle="180" y="0" uuid="{ae808bd3-5d65-4ea7-803d-e6eff8bdfea7}">
+            <name locale="en_US">O</name>
+        </pin>
+    </pins>
+</symbol>

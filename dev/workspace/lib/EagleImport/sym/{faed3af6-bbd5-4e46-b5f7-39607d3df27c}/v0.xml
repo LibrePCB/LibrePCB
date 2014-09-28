@@ -1,0 +1,37 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{faed3af6-bbd5-4e46-b5f7-39607d3df27c}</uuid>
+        <name locale="en_US">PORT0-10_12</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-19.05"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{9bcef17b-3331-455f-9f28-59a19f92650f}">
+            <name locale="en_US">0/EXI0IN</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{09765983-1d7d-4291-890d-590a81cbb2c5}">
+            <name locale="en_US">1/EXI1IN/DATA_IN</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{ee406354-ab8e-4a26-9d72-556c144be3f6}">
+            <name locale="en_US">2/EXI2IN/DATA_OUT</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{634d3da5-c348-4114-94ad-98a82d333c46}">
+            <name locale="en_US">3/EXI3IN/MCLK</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{02b41512-c3e0-4acf-9d1f-89d396b330bb}">
+            <name locale="en_US">4/GPIO/SCLK</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{1ba92f8f-0f1b-498f-99f6-2718a6a144bb}">
+            <name locale="en_US">5/GPIO/LRCK</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{06bc3d17-3a24-4847-aa72-523f9dd4c7de}">
+            <name locale="en_US">6/GPIO/MUTE0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{0f742acc-f777-4537-b500-7cb1e01d4a82}">
+            <name locale="en_US">7/GPIO/MUTE1</name>
+        </pin>
+    </pins>
+</symbol>

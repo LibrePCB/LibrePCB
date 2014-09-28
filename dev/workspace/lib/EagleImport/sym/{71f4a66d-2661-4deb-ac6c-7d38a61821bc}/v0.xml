@@ -1,0 +1,16 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{71f4a66d-2661-4deb-ac6c-7d38a61821bc}</uuid>
+        <name locale="en_US">VSS</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="-1.27">
+            <segment type="line" end_x="1.27" end_y="0"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="5.08" angle="270" y="5.08" uuid="{aae3aa2a-502b-4d0a-9fb0-8631107a9030}">
+            <name locale="en_US">VSS</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,70 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{4d794cbe-3584-46c4-b12e-17214cf0b8d2}</uuid>
+        <name locale="en_US">XR-C277</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-17.78" width="0.4064" layer="10" start_x="12.7">
+            <segment type="line" end_x="-12.7" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.4064" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-12.7" end_y="20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="20.32" width="0.4064" layer="10" start_x="-12.7">
+            <segment type="line" end_x="12.7" end_y="20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="20.32" width="0.4064" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-17.78"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-17.78" length="5.08" angle="0" y="17.78" uuid="{cccc7285-9a6c-4614-94f9-d3148ab4a8e0}">
+            <name locale="en_US">PA1_IN</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="15.24" uuid="{b6ee72fd-1082-4370-8ce5-ba72eae0c4a3}">
+            <name locale="en_US">PA2_IN</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="2.54" uuid="{d7a7fc5b-1a8b-4cbc-8851-0a41410bf0fb}">
+            <name locale="en_US">DOUT-</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="0" uuid="{72b05205-1a65-4542-9fd1-b4e2899bdbbf}">
+            <name locale="en_US">C@1</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="17.78" uuid="{a3db7663-cdd2-4ff4-ac04-d84c98f703b1}">
+            <name locale="en_US">PA1_OUT</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="15.24" uuid="{c85bc3de-5a38-4895-846b-bd3e690ab468}">
+            <name locale="en_US">PA2_OUT</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="10.16" uuid="{03d2152c-b49b-4eca-b6f1-dba9a9702977}">
+            <name locale="en_US">ALBO_OUT</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="7.62" uuid="{541a3402-e08c-4dfa-957c-f1ab3c1a9cd2}">
+            <name locale="en_US">ALBO_TERM</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="5.08" uuid="{ea9a7327-924e-4d68-9765-a5fa79b85b34}">
+            <name locale="en_US">DOUT+</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="-10.16" uuid="{57983851-9924-4015-bef4-fbef12de8d7f}">
+            <name locale="en_US">LC_TANK</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="-15.24" uuid="{79ad8a4d-fca8-49ca-9f22-f142c381b863}">
+            <name locale="en_US">CONT</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-2.54" uuid="{c2611160-52a4-4efc-9b7b-d4b9de0c0827}">
+            <name locale="en_US">C@2</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-7.62" uuid="{56668d09-4a44-4de5-adba-443dfc8f113d}">
+            <name locale="en_US">V+6,3</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-10.16" uuid="{0dbcb205-88d4-43d8-a0ca-e4a3964f4188}">
+            <name locale="en_US">V+4,3</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-12.7" uuid="{972afb8e-5239-4c6e-9f57-4c7c87874e23}">
+            <name locale="en_US">AGND</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-15.24" uuid="{1561c959-30e9-44b3-8ebf-2e968bfbb99b}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,21 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{84aacef9-8240-43db-8b6d-b49e438f3b60}</uuid>
+        <name locale="en_US">VDD-GND-2</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="0" length="2.54" angle="270" y="5.08" uuid="{bef98db6-452c-4a00-a90a-825b95810d4e}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-7.62" uuid="{ad2fe145-b0d7-423f-a99c-26b6cc3ed01f}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="270" y="5.08" uuid="{ad0e88d1-531d-4122-ac66-da89bf081ca8}">
+            <name locale="en_US">VDD@1</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-7.62" uuid="{12287917-2907-47b9-b869-ecd51db68667}">
+            <name locale="en_US">GND@1</name>
+        </pin>
+    </pins>
+</symbol>

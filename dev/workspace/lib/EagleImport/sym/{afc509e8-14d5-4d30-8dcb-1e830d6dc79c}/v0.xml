@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{afc509e8-14d5-4d30-8dcb-1e830d6dc79c}</uuid>
+        <name locale="en_US">MCP3202</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{40bfcf48-9fb2-4730-a929-64348a1d1d90}">
+            <name locale="en_US">!CS!/SHDN</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="2.54" uuid="{22b82992-95a3-42bf-8a61-da1f7dd9377e}">
+            <name locale="en_US">CH0</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-5.08" uuid="{a4be02d7-928c-47db-bd61-7daffe20737e}">
+            <name locale="en_US">CH1</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-7.62" uuid="{8988ca33-f9b4-4ac1-8cb7-2c36879aa25b}">
+            <name locale="en_US">VSS</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{751df3d8-2573-4c43-918a-783a469f5e60}">
+            <name locale="en_US">DIN</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{659793e0-5b99-4388-b327-a6cf1ed001c1}">
+            <name locale="en_US">DOUT</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{2d944e23-3097-4fdc-a738-e187bed7e2c0}">
+            <name locale="en_US">CLK</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{3051b35a-d8e9-4bf6-8c92-0d97b8d88216}">
+            <name locale="en_US">VDD/VREF</name>
+        </pin>
+    </pins>
+</symbol>

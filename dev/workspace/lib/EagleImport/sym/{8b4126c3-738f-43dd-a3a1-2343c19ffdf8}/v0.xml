@@ -1,0 +1,34 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{8b4126c3-738f-43dd-a3a1-2343c19ffdf8}</uuid>
+        <name locale="en_US">LM340S</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="7.62" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-5.08" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="5.08"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="90" y="-5.08" uuid="{cfa64750-4ea4-4642-bca2-ee166307f3d0}">
+            <name locale="en_US">GND@1</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="2.54" uuid="{e7b8593b-a349-4527-8130-bf2368307870}">
+            <name locale="en_US">IN</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="2.54" uuid="{7c29ba94-f6ad-4e9c-971f-52a1d049d7f2}">
+            <name locale="en_US">OUT</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-5.08" uuid="{45acf279-4ac3-44ed-96ec-160ebbd644ee}">
+            <name locale="en_US">GND@2</name>
+        </pin>
+    </pins>
+</symbol>

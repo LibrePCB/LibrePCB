@@ -1,0 +1,12 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{d6e5d0b0-5dd0-4310-8e92-ecc0640bb3b6}</uuid>
+        <name locale="en_US">VDDINT</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="0" length="2.54" angle="270" y="2.54" uuid="{83a2752b-b4f3-40c2-b81f-e282600a8295}">
+            <name locale="en_US">VDDINT</name>
+        </pin>
+    </pins>
+</symbol>

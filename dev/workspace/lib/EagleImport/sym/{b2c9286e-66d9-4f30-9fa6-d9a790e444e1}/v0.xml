@@ -1,0 +1,22 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{b2c9286e-66d9-4f30-9fa6-d9a790e444e1}</uuid>
+        <name locale="en_US">FEM-HIGHCUR</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.6096" layer="10" start_x="1.27">
+            <segment type="line" end_x="1.27" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.6096" layer="10" start_x="1.27">
+            <segment type="line" end_x="2.286" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.6096" layer="10" start_x="1.27">
+            <segment type="line" end_x="2.286" end_y="-1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{21a5f7c1-dcce-40bb-84d8-a108a4a4dc19}">
+            <name locale="en_US">B</name>
+        </pin>
+    </pins>
+</symbol>

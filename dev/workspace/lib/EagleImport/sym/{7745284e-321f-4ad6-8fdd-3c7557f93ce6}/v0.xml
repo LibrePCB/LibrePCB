@@ -1,0 +1,121 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{7745284e-321f-4ad6-8fdd-3c7557f93ce6}</uuid>
+        <name locale="en_US">DM385_GPM</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-99.06"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{f1dec257-e708-459e-ae93-80d17b8319b5}">
+            <name locale="en_US">GPMCCS3N</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{b2e970c8-cfa0-4acc-b438-cde01ecbb957}">
+            <name locale="en_US">GPMCCS4N</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{e48cadbc-5e23-4dd5-a5ff-330c68065306}">
+            <name locale="en_US">GPMCCS0N</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{1c928699-9701-4b07-a288-db6c3e463a17}">
+            <name locale="en_US">GPMCCS1N</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{aee6585d-4837-402a-ade9-089cad4f40b8}">
+            <name locale="en_US">GPMCCS2N</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-81.28" uuid="{48bd93a0-d3ba-437b-9c92-509d36f958e3}">
+            <name locale="en_US">GPMCCLK</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-83.82" uuid="{1bc170b1-b930-4663-a0db-289044d5c5a0}">
+            <name locale="en_US">GPMCADVNALE</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-86.36" uuid="{04c92448-c717-44d4-b79b-95131e8b8f0b}">
+            <name locale="en_US">GPMCOEREN</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-88.9" uuid="{3bebe750-490a-45b8-b4f0-0d0330dcbf5d}">
+            <name locale="en_US">GPMCWEN</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-91.44" uuid="{0feb8679-8ea2-4058-9e76-0133f1e86502}">
+            <name locale="en_US">GPMCBE0NCLE</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-93.98" uuid="{d1c89e91-ddcf-4e80-89ca-9d01d6d8f7fc}">
+            <name locale="en_US">GPMCBE1N</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-96.52" uuid="{dc52a1db-3c2a-456e-bf5a-1db83875d192}">
+            <name locale="en_US">GPMCWAIT0</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-17.78" uuid="{cf979827-35e6-4a2b-bfad-c7b5c348fb5d}">
+            <name locale="en_US">GPMCD0</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-20.32" uuid="{32ba8b02-7d05-482b-9eef-a87fc7cb90b5}">
+            <name locale="en_US">GPMCD1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-22.86" uuid="{e46b8aa8-57ac-457f-80c8-ad164fe0d5fe}">
+            <name locale="en_US">GPMCD2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-25.4" uuid="{33e0e171-d46a-4861-9a48-7b6365483ce6}">
+            <name locale="en_US">GPMCD3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-27.94" uuid="{23fb16cf-16eb-439b-95d1-cc235cf1b817}">
+            <name locale="en_US">GPMCD4</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-30.48" uuid="{936da5d7-ba1a-46b6-96fc-bd6af7a17c23}">
+            <name locale="en_US">GPMCD5</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-33.02" uuid="{bee268a1-e50d-49e9-b827-077a51228b67}">
+            <name locale="en_US">GPMCD6</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-35.56" uuid="{0d84d9f7-33ff-4321-b457-455300c1a08e}">
+            <name locale="en_US">GPMCD7</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-38.1" uuid="{e2379d55-7de4-42f0-b0f5-bff298358d5a}">
+            <name locale="en_US">GPMCD8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-40.64" uuid="{1f32c50f-dea5-43de-bfa0-1753982e00e8}">
+            <name locale="en_US">GPMCD9</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-43.18" uuid="{2d3f3379-b10c-413c-8e46-a28275693264}">
+            <name locale="en_US">GPMCD10</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-45.72" uuid="{a605baad-bc31-48cd-bda5-10f0db4167e8}">
+            <name locale="en_US">GPMCD11</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-48.26" uuid="{8fb90c0d-0e54-4f92-85d1-dfb93266b31f}">
+            <name locale="en_US">GPMCD12</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-50.8" uuid="{2e97a193-0200-4b3e-8bc9-a4e4b17e101d}">
+            <name locale="en_US">GPMCD13</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-53.34" uuid="{9b3bfff2-a941-49ac-8c9f-3fc26ee51208}">
+            <name locale="en_US">GPMCD14</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-55.88" uuid="{b2072b38-bab6-4091-b336-6f657e9d9610}">
+            <name locale="en_US">GPMCD15</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-76.2" uuid="{f4439388-12e9-4d3b-90e3-594c046f61d3}">
+            <name locale="en_US">GPMCA23</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-73.66" uuid="{291058d6-d03c-4616-aa3d-a3f6704e4ab4}">
+            <name locale="en_US">GPMCA22</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-71.12" uuid="{e75a781b-cf63-41ed-965e-834fa939bc0e}">
+            <name locale="en_US">GPMCA21</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-68.58" uuid="{5b2091b1-f8f1-4282-8fce-d400dfa732ae}">
+            <name locale="en_US">GPMCA20</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-66.04" uuid="{2668adf0-a9bd-4e78-8491-4a744659d3e8}">
+            <name locale="en_US">GPMCA19</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-63.5" uuid="{28e967d6-806b-4d68-ad9b-8a64c260a6bc}">
+            <name locale="en_US">GPMCA18</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-60.96" uuid="{8540aa02-1fa2-40f2-b013-622d9bfa7d4f}">
+            <name locale="en_US">GPMCA17</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-58.42" uuid="{b213b927-6434-444d-b2a4-0d19edc98ddc}">
+            <name locale="en_US">GPMCA16</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,49 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{b7ba4dab-4b59-4346-b728-b5abebd16dd1}</uuid>
+        <name locale="en_US">LAMP</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.286" width="0.4064" layer="10" start_x="4.064">
+            <segment type="line" end_x="4.064" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.4064" layer="10" start_x="4.064">
+            <segment type="line" end_x="2.54" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.4064" layer="10" start_x="-1.524">
+            <segment type="line" end_x="-1.524" end_y="2.286"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.4064" layer="10" start_x="0">
+            <segment type="line" end_x="-1.524" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.4064" layer="10" start_x="2.54">
+            <segment type="line" end_x="0" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="1.2959" end_y="2.5651"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="1.2954">
+            <segment type="line" end_x="2.5654" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="2.286" width="0.4064" layer="10" start_x="-1.524">
+            <segment type="line" end_x="1.2957" end_y="5.1055"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.4064" layer="10" start_x="1.2954">
+            <segment type="line" end_x="4.0894" end_y="2.286"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-5.08" uuid="{31f1a1dc-d938-456e-8ea6-a7a57f449a04}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-5.08" uuid="{fbb0bc21-2cf7-48f1-9df8-2e7f0213a34b}">
+            <name locale="en_US">2</name>
+        </pin>
+    </pins>
+</symbol>

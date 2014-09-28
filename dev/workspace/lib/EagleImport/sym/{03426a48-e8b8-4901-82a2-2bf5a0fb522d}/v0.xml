@@ -1,0 +1,34 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{03426a48-e8b8-4901-82a2-2bf5a0fb522d}</uuid>
+        <name locale="en_US">B7</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-16.51"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{0dcc5b79-a7e8-4d67-ba53-0ed8d95efa88}">
+            <name locale="en_US">IOB1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{c255c20a-ab5e-4892-8c01-ce850e61bbdd}">
+            <name locale="en_US">IOB2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{83acbd46-6892-4565-86ca-6746703f82f9}">
+            <name locale="en_US">IOB3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{06424e77-8fb3-4e95-b980-036c65708dfb}">
+            <name locale="en_US">IOB4</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{edacc9cd-77bf-4160-a408-9a33c7c72977}">
+            <name locale="en_US">IOB5</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{e3531e18-3354-4b30-9089-b3d319cf970b}">
+            <name locale="en_US">IOB6</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-15.24" uuid="{67fa395a-7fde-4b11-b070-acfe1d38fda4}">
+            <name locale="en_US">IOB7</name>
+        </pin>
+    </pins>
+</symbol>

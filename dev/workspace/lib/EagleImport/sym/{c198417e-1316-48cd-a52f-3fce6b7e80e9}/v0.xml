@@ -1,0 +1,43 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{c198417e-1316-48cd-a52f-3fce6b7e80e9}</uuid>
+        <name locale="en_US">CHOKE</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.794" width="0.254" layer="10" start_x="-3.048">
+            <segment type="line" end_x="5.588" end_y="2.794"/>
+        </polygon>
+        <polygon fill="false" start_y="2.286" width="0.254" layer="10" start_x="-3.048">
+            <segment type="line" end_x="5.588" end_y="2.286"/>
+        </polygon>
+        <polygon fill="false" start_y="0.762" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-1.016" end_y="0.762"/>
+        </polygon>
+        <polygon fill="false" start_y="0.762" width="0.254" layer="10" start_x="-1.016">
+            <segment type="line" end_x="0.508" end_y="0.762"/>
+        </polygon>
+        <polygon fill="false" start_y="0.762" width="0.254" layer="10" start_x="0.508">
+            <segment type="line" end_x="2.032" end_y="0.762"/>
+        </polygon>
+        <polygon fill="false" start_y="0.762" width="0.254" layer="10" start_x="2.032">
+            <segment type="line" end_x="3.556" end_y="0.762"/>
+        </polygon>
+        <polygon fill="false" start_y="0.762" width="0.254" layer="10" start_x="3.556">
+            <segment type="line" end_x="5.08" end_y="0.762"/>
+        </polygon>
+        <polygon fill="false" start_y="0.762" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0.762" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="5.08" end_y="0"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{473b52b4-5ff2-498f-b096-1373a9f22847}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="0" uuid="{106a998c-e86a-488c-b3b5-f0b318f2b8a1}">
+            <name locale="en_US">4</name>
+        </pin>
+    </pins>
+</symbol>

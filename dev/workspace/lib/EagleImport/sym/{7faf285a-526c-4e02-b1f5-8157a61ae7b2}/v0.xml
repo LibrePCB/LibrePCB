@@ -1,0 +1,64 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{7faf285a-526c-4e02-b1f5-8157a61ae7b2}</uuid>
+        <name locale="en_US">XC5VLX110T_FF1738-IO-AE</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="12.7" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-35.56"/>
+        </polygon>
+        <polygon fill="false" start_y="-35.56" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="0" end_y="-35.56"/>
+        </polygon>
+        <polygon fill="false" start_y="-35.56" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{069cb6c2-6453-4861-a7f9-07e62fa955f7}">
+            <name locale="en_US">IO_AE5</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{29d3dd7e-1c40-409c-a310-448c174efd0c}">
+            <name locale="en_US">IO_AE7</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{8cff0713-5216-4485-b938-e42338ed2c45}">
+            <name locale="en_US">IO_AE8</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{83af996b-44d4-4674-88b4-60488d7bbe70}">
+            <name locale="en_US">IO_AE9</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{f627a6ac-c009-4856-8ce6-29d641c1e007}">
+            <name locale="en_US">IO_AE10</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{6ffeb056-9979-434c-8c14-b51bd2e406dd}">
+            <name locale="en_US">IO_AE32</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{9337b415-a4e8-4d8b-bb3d-4b5cac2d1ee4}">
+            <name locale="en_US">IO_AE33</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{ef6be377-f8b6-4d90-87fc-78b8a170dd6e}">
+            <name locale="en_US">IO_AE34</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{2c2c6c29-7652-4303-aa29-714aa4934edf}">
+            <name locale="en_US">IO_AE35</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{5709d9f6-81ea-4071-a72c-f890dd80ccba}">
+            <name locale="en_US">IO_AE37</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{cc98aa70-b25f-4a84-9177-0df48652a36d}">
+            <name locale="en_US">IO_AE38</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{f93dd324-d766-47f8-8e70-0cf97bf63e00}">
+            <name locale="en_US">IO_AE39</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{98dbf715-ad1c-4217-8759-6dedf4b23d10}">
+            <name locale="en_US">IO_AE40</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-33.02" uuid="{7c138812-5816-4ea1-b8a3-bb56c1510db1}">
+            <name locale="en_US">IO_AE42</name>
+        </pin>
+    </pins>
+</symbol>

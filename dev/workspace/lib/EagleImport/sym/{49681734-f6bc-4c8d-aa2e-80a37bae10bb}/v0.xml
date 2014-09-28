@@ -1,0 +1,34 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{49681734-f6bc-4c8d-aa2e-80a37bae10bb}</uuid>
+        <name locale="en_US">82B715</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="12.7" length="5.08" angle="180" y="-7.62" uuid="{1660d98d-d25f-41dc-adf8-a0825fac4663}">
+            <name locale="en_US">LX</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="5.08" uuid="{434301d4-5999-4c0b-a69d-a6883bf0d8b4}">
+            <name locale="en_US">LY</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-7.62" uuid="{61c6f409-a879-4e6f-81c6-5522f0194668}">
+            <name locale="en_US">SX</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="5.08" uuid="{ef6d1c39-d865-43b0-8b1b-bfe904e05a1c}">
+            <name locale="en_US">SY</name>
+        </pin>
+    </pins>
+</symbol>

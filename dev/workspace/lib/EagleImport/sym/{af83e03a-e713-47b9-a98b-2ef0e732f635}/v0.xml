@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{af83e03a-e713-47b9-a98b-2ef0e732f635}</uuid>
+        <name locale="en_US">ICL7660</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-10.16" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="-10.16" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="7.62" end_y="-10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="5.08" angle="0" y="7.62" uuid="{17c99aeb-a6b8-4533-8336-007d08b7270f}">
+            <name locale="en_US">LV</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-2.54" uuid="{e01750a0-91bb-4cf9-a8a5-4f2fb2553385}">
+            <name locale="en_US">CAP-</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-7.62" uuid="{f7d31e94-d5fc-4d93-a0b8-1b6d97b3a9c6}">
+            <name locale="en_US">NC</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="7.62" uuid="{39182265-cd71-4ee9-8191-4b146f1c7544}">
+            <name locale="en_US">VOUT</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-7.62" uuid="{b358a199-8fdf-4907-811d-1c37f8246bbb}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-2.54" uuid="{c81a4a4e-b752-42b4-9825-bfda4da2d0c1}">
+            <name locale="en_US">V+</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="2.54" uuid="{745ec94b-107c-4350-b473-ef186f33abf0}">
+            <name locale="en_US">OSC</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="2.54" uuid="{bbbf22f2-def6-4639-90f0-2c3ad3790445}">
+            <name locale="en_US">CAP+</name>
+        </pin>
+    </pins>
+</symbol>

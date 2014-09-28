@@ -1,0 +1,55 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{899c86be-cc5c-4468-ae5e-9a1b25566fbe}</uuid>
+        <name locale="en_US">ACS750XCA-050</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="4.445" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="1.016"/>
+        </polygon>
+        <polygon fill="false" start_y="0.3048" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="-4.445"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.0508" layer="10" start_x="-4.572">
+            <segment type="line" end_x="-4.572" end_y="-0.254"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.0508" layer="10" start_x="-4.064">
+            <segment type="line" end_x="-4.064" end_y="-0.254"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.0508" layer="10" start_x="-4.572">
+            <segment type="line" end_x="-4.064" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.254" width="0.0508" layer="10" start_x="-4.572">
+            <segment type="line" end_x="-4.064" end_y="-0.254"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="90" y="-12.7" uuid="{96aaa3a1-1e84-47ae-9ce7-c6dc5b24df5a}">
+            <name locale="en_US">IP-</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="270" y="12.7" uuid="{dd667e6d-5cf2-4ba6-93ec-c9bb484e944d}">
+            <name locale="en_US">IP+</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-5.08" uuid="{2f59c19b-9389-4300-9716-db0a1dd8f35a}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="5.08" uuid="{2589122d-440e-4ce6-a2ab-dec1c0e83799}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="0" uuid="{81f66374-db91-4d6d-9c17-7ab7ff41e7a6}">
+            <name locale="en_US">VOUT</name>
+        </pin>
+    </pins>
+</symbol>

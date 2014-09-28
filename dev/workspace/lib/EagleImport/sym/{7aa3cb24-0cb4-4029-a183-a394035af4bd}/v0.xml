@@ -1,0 +1,67 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{7aa3cb24-0cb4-4029-a183-a394035af4bd}</uuid>
+        <name locale="en_US">MAX420</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="3.175" width="0.1524" layer="10" start_x="-1.27">
+            <segment type="line" end_x="-1.27" end_y="1.905"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="-1.905">
+            <segment type="line" end_x="-0.635" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="-1.905">
+            <segment type="line" end_x="-0.635" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="3.8862"/>
+        </polygon>
+        <polygon fill="false" start_y="5.0546" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="2.6162"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.6162" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-3.9116" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="7.62">
+            <segment type="line" end_x="5.1562" end_y="1.3208"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="-2.54" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.4064" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.4064" layer="10" start_x="-2.54">
+            <segment type="line" end_x="7.62" end_y="0"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="10.16" length="2.54" angle="180" y="2.54" uuid="{f8317b45-8636-4316-9f09-2c7c862c98be}">
+            <name locale="en_US">CRETN</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="270" y="7.62" uuid="{d0962619-6663-4b6d-a1b6-6d0d6ab9f5c9}">
+            <name locale="en_US">CEXTA</name>
+        </pin>
+        <pin x="-7.62" length="5.08" angle="0" y="-2.54" uuid="{1003f4be-a54a-49ec-a694-0d1a94ac745a}">
+            <name locale="en_US">-IN</name>
+        </pin>
+        <pin x="-7.62" length="5.08" angle="0" y="2.54" uuid="{89067c72-f6cd-4244-bfd9-7a108c0f8fbd}">
+            <name locale="en_US">+IN</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="0" uuid="{f2eab6fc-b2db-4ceb-82cd-04a33c81630f}">
+            <name locale="en_US">OUT</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-7.62" uuid="{f6a23157-e5e3-4a47-94a5-aefa9908813a}">
+            <name locale="en_US">CEXTB</name>
+        </pin>
+        <pin x="0" length="2.54" angle="270" y="7.62" uuid="{7760054b-eac4-49b5-9f6e-2d214daff128}">
+            <name locale="en_US">V+</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-7.62" uuid="{20ca7cba-d308-491d-aaef-f54fc80ce02b}">
+            <name locale="en_US">V-</name>
+        </pin>
+    </pins>
+</symbol>

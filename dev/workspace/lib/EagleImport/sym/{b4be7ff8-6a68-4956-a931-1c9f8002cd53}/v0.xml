@@ -1,0 +1,64 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{b4be7ff8-6a68-4956-a931-1c9f8002cd53}</uuid>
+        <name locale="en_US">7447</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-10.16" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="-10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="5.08" angle="0" y="5.08" uuid="{26f178ad-7278-4dbd-ba20-2936da945639}">
+            <name locale="en_US">IB</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="2.54" uuid="{1c8087f4-7606-4b72-b918-ea905ca27a90}">
+            <name locale="en_US">IC</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-7.62" uuid="{009f8808-c4c2-4bbb-a560-c3c48e8c025a}">
+            <name locale="en_US">LT</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-2.54" uuid="{d297f447-3c57-45fe-8507-3e1da37ba28b}">
+            <name locale="en_US">BI/RBO</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-5.08" uuid="{fa083a0e-d293-4ea1-a2fb-a21888ab3206}">
+            <name locale="en_US">RBI</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="0" uuid="{24e45165-2eae-4b5b-8e15-b5d9985b0c56}">
+            <name locale="en_US">ID</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="7.62" uuid="{0ba92608-e8a3-4e76-b70c-c098190bbe8f}">
+            <name locale="en_US">IA</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-2.54" uuid="{60701a18-e53c-4a1f-b1bb-f2d3e80a85c4}">
+            <name locale="en_US">E</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="0" uuid="{168860ba-bf7f-4826-b9a6-4bf239aa8f3c}">
+            <name locale="en_US">D</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="2.54" uuid="{bc48448c-4fd6-4c57-899d-cce58cde20c7}">
+            <name locale="en_US">C</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="5.08" uuid="{0486337f-8374-47c1-86b1-5f147ea46f39}">
+            <name locale="en_US">B</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="7.62" uuid="{0dbd40b5-76b9-4c94-9269-8026cdf5a90d}">
+            <name locale="en_US">A</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-7.62" uuid="{9a948a6f-e9a5-4b7d-a832-094d7bc61a75}">
+            <name locale="en_US">G</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-5.08" uuid="{babc38f6-c9a3-49f9-b324-98511bc1dd11}">
+            <name locale="en_US">F</name>
+        </pin>
+    </pins>
+</symbol>

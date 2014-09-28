@@ -1,0 +1,34 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{21b045ef-2024-472e-87c9-f5c99a20723b}</uuid>
+        <name locale="en_US">CINCH</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="3.556" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="1.27" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="1.27">
+            <segment type="line" end_x="2.286" end_y="-1.016"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.016" width="0.1524" layer="10" start_x="2.286">
+            <segment type="line" end_x="2.794" end_y="-0.508"/>
+        </polygon>
+        <polygon fill="true" start_y="-2.667" width="0.254" layer="10" start_x="3.429">
+            <segment type="line" end_x="4.191" end_y="-2.667"/>
+            <segment type="line" end_x="4.191" end_y="0.127"/>
+            <segment type="line" end_x="3.429" end_y="0.127"/>
+            <segment type="line" end_x="3.429" end_y="-2.667"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{c0b474c9-9357-43b7-82bd-3e2846ff349f}">
+            <name locale="en_US">T</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{8038aac8-445e-403b-9eba-2ed5c14d4c79}">
+            <name locale="en_US">S</name>
+        </pin>
+    </pins>
+</symbol>

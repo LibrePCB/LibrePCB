@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{4b9fb44e-1086-4ed7-8ffe-b936b2e33167}</uuid>
+        <name locale="en_US">LT1166</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="10.16" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-15.24" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-7.62" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-15.24" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="15.24"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="0" uuid="{b380bd12-c3c0-4786-a5bb-1ff45fa7375f}">
+            <name locale="en_US">VIN</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="12.7" uuid="{413a5984-b69e-464f-a546-f569fba7a18e}">
+            <name locale="en_US">VTOP</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-12.7" uuid="{79c2e212-22b3-4a6c-8e45-7a1a8753bdd7}">
+            <name locale="en_US">VBOTTOM</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="7.62" uuid="{56fdcca7-e173-41bc-bf18-2627428820b2}">
+            <name locale="en_US">SENSE+</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-7.62" uuid="{ea49b1ec-8a29-4d66-9e5c-9c4f89582411}">
+            <name locale="en_US">SENSE-</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="5.08" uuid="{2ed1196f-3e69-4386-be4f-ff214facf9f1}">
+            <name locale="en_US">ILIM+</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-5.08" uuid="{522c8507-108a-414d-9fa3-14b3fd9f2db6}">
+            <name locale="en_US">ILIM-</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="0" uuid="{614f1621-0c07-4954-866d-ba1dd8a1d3fb}">
+            <name locale="en_US">VOUT</name>
+        </pin>
+    </pins>
+</symbol>

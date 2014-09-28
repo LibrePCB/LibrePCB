@@ -1,0 +1,19 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{38fe3ea7-271f-426e-a150-a205ce2885bd}</uuid>
+        <name locale="en_US">MPIN</name>
+    </meta>
+    <geometry>
+        <polygon fill="true" start_y="-0.254" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="1.778" end_y="-0.254"/>
+            <segment type="line" end_x="1.778" end_y="0.254"/>
+            <segment type="line" end_x="0" end_y="0.254"/>
+            <segment type="line" end_x="0" end_y="-0.254"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{9df1368b-e8e3-4662-915c-a2152f0a25ad}">
+            <name locale="en_US">1</name>
+        </pin>
+    </pins>
+</symbol>

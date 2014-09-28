@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{0d2c6b3e-8086-4330-8e48-356b65587952}</uuid>
+        <name locale="en_US">VN460SP</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="0" uuid="{543d5fe7-6cdb-4220-bb9c-18f0dfbed521}">
+            <name locale="en_US">IN</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-7.62" uuid="{15d2fb27-284d-40d5-9094-d6ab93cf51f0}">
+            <name locale="en_US">ST</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="2.54" uuid="{1ef6269d-2baa-4d7d-a919-0c05be58b774}">
+            <name locale="en_US">OUT1</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="270" y="10.16" uuid="{8a60f90b-dec7-4830-ab13-eeb980dc3efd}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-12.7" uuid="{c4a4ca4d-f5f6-45ae-a3fe-9fc77a989fb1}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="0" uuid="{eff869c6-9127-4a50-85a8-011872d6e18c}">
+            <name locale="en_US">OUT2</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-2.54" uuid="{afa970ff-a5d0-4b2a-aa65-7db0c6d61264}">
+            <name locale="en_US">OUT3</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-5.08" uuid="{8fe11750-5fcd-485e-a0ae-ee81fe86dd2e}">
+            <name locale="en_US">OUT4</name>
+        </pin>
+    </pins>
+</symbol>

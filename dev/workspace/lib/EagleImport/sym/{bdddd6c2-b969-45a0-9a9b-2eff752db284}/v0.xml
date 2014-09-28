@@ -1,0 +1,25 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{bdddd6c2-b969-45a0-9a9b-2eff752db284}</uuid>
+        <name locale="en_US">SHIELD</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="1.778">
+            <segment type="line" end_x="-1.778" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.762" width="0.1524" layer="10" start_x="1.27">
+            <segment type="line" end_x="-1.27" end_y="-0.762"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.524" width="0.1524" layer="10" start_x="0.762">
+            <segment type="line" end_x="-0.762" end_y="-1.524"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.286" width="0.1524" layer="10" start_x="0.254">
+            <segment type="line" end_x="-0.254" end_y="-2.286"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="270" y="2.54" uuid="{8b29e5ae-7e4d-4bf1-b6ae-da1bae604202}">
+            <name locale="en_US">1</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,12 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{49b354fb-9d4b-467b-aacd-346179286548}</uuid>
+        <name locale="en_US">KLV</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="5.08" length="2.54" angle="180" y="0" uuid="{2d541713-9749-4fef-8b59-baf968393f5c}">
+            <name locale="en_US">KL</name>
+        </pin>
+    </pins>
+</symbol>

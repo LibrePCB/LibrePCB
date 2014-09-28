@@ -1,0 +1,34 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{5bc67c47-1b05-4d33-ba61-9b45bd14a7b5}</uuid>
+        <name locale="en_US">ICE-TEST</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="0" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="2.54" uuid="{32386e90-76be-4701-850a-9cf470687173}">
+            <name locale="en_US">TMS</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{6561dca5-8ae2-488e-b547-e17c1c4d91cc}">
+            <name locale="en_US">TDO</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{233489f4-e07a-40c3-a7c6-cfe432e4f288}">
+            <name locale="en_US">TDI</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{850dfb37-9276-40bc-9448-22313b933cb0}">
+            <name locale="en_US">TCK</name>
+        </pin>
+    </pins>
+</symbol>

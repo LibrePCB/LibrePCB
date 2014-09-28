@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{e8dab48b-4266-40b7-b915-80aba10a3fdb}</uuid>
+        <name locale="en_US">LIS3L02AQ3</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="-7.62" uuid="{98ae774e-92a4-4a8e-951e-52089cd10779}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{d22bfe72-d6ce-40f9-8da8-0b3acf55043c}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="0" uuid="{0010782a-8bcb-43c7-b5c8-de0e21f8e1e5}">
+            <name locale="en_US">VOUTY</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{67d5f3d8-2531-4fc8-8de5-388f65efaba2}">
+            <name locale="en_US">PD</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{1463df60-9d6e-4d09-9252-dce5a8710c7c}">
+            <name locale="en_US">ST</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="2.54" uuid="{4c8027c6-9d1a-4a0c-899c-8d1127388b2a}">
+            <name locale="en_US">VOUTX</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-2.54" uuid="{f144b7a9-f525-433e-b1df-31b1952d36ad}">
+            <name locale="en_US">VOUTZ</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{5dd9c00b-ffd2-428f-b833-26a7f24d713e}">
+            <name locale="en_US">FS</name>
+        </pin>
+    </pins>
+</symbol>

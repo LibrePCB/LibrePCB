@@ -1,0 +1,34 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{b50a4532-bebb-4e32-95bf-d1a707b275be}</uuid>
+        <name locale="en_US">CPOL</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-0.889" width="0.254" layer="10" start_x="-1.524">
+            <segment type="line" end_x="1.524" end_y="-0.889"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.889" width="0.254" layer="10" start_x="1.524">
+            <segment type="line" end_x="1.524" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="-1.524">
+            <segment type="line" end_x="-1.524" end_y="-0.889"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="-1.524">
+            <segment type="line" end_x="1.524" end_y="0"/>
+        </polygon>
+        <polygon fill="true" start_y="-2.54" width="0.254" layer="10" start_x="-1.651">
+            <segment type="line" end_x="1.651" end_y="-2.54"/>
+            <segment type="line" end_x="1.651" end_y="-1.651"/>
+            <segment type="line" end_x="-1.651" end_y="-1.651"/>
+            <segment type="line" end_x="-1.651" end_y="-2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-5.08" uuid="{f55de3b1-6a39-4d91-a404-27a6cea3d136}">
+            <name locale="en_US">-</name>
+        </pin>
+        <pin x="0" length="2.54" angle="270" y="2.54" uuid="{c39ae94b-0a2f-47d0-a5e4-ab3a3b911c80}">
+            <name locale="en_US">+</name>
+        </pin>
+    </pins>
+</symbol>

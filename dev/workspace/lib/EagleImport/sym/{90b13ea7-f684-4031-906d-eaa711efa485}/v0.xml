@@ -1,0 +1,61 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{90b13ea7-f684-4031-906d-eaa711efa485}</uuid>
+        <name locale="en_US">DM385_MCA</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-45.72"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="-33.02" uuid="{8270b8ec-47df-44aa-8aef-804c8a77d533}">
+            <name locale="en_US">MCA1AXR1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-30.48" uuid="{343b438b-95e7-473e-a82b-3fcb5155df85}">
+            <name locale="en_US">MCA1AXR0</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-40.64" uuid="{27d9e72c-edcf-4c00-9ced-67e24204d80e}">
+            <name locale="en_US">MCA1AFSX</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-35.56" uuid="{cb4f5eeb-168d-4fcd-a84a-6be0694ffb82}">
+            <name locale="en_US">MCA1ACLKX</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-43.18" uuid="{5e84302c-2025-4e96-8264-3b72f79f9037}">
+            <name locale="en_US">MCA1AFSR</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-38.1" uuid="{9d5fb49b-f186-4447-84f0-024f273fdb63}">
+            <name locale="en_US">MCA1ACLKR</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{0738ffa7-560e-427c-99db-7e24680b1bf0}">
+            <name locale="en_US">MCA0AXR3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{399962d4-be4b-4e3e-8907-cb25f18bf014}">
+            <name locale="en_US">MCA0AXR4</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-15.24" uuid="{853ee7ab-8b8e-4779-8d6f-a290f777005b}">
+            <name locale="en_US">MCA0AXR5</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-17.78" uuid="{6bf8f14f-c643-425f-b7bc-5ad606a03ce5}">
+            <name locale="en_US">MCA0ACLKX</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-22.86" uuid="{2e2c9797-ef7d-4636-a9ab-24f340b19424}">
+            <name locale="en_US">MCA0AFSX</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-20.32" uuid="{2219223a-8079-4e33-b7c7-e1fb23eeaa64}">
+            <name locale="en_US">MCA0ACLKR</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{82ff7eec-5b05-4707-b7d9-e290dcaf273e}">
+            <name locale="en_US">MCA0AXR2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{02152982-75ac-4e5b-b0e3-d64cfbe18fa7}">
+            <name locale="en_US">MCA0AXR1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{4d821f1b-bc32-4ade-b42a-da7d1d959466}">
+            <name locale="en_US">MCA0AXR0</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-25.4" uuid="{9d4039f7-f665-4b13-afa3-6e99c32c3259}">
+            <name locale="en_US">MCA0AFSR</name>
+        </pin>
+    </pins>
+</symbol>

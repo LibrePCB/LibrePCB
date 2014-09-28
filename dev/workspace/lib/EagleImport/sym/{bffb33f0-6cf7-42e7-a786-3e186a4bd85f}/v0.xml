@@ -1,0 +1,64 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{bffb33f0-6cf7-42e7-a786-3e186a4bd85f}</uuid>
+        <name locale="en_US">LM5015</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="12.7" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="12.7" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="12.7"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="10.16" uuid="{c01060bf-f17e-4f21-94fd-81b907832f88}">
+            <name locale="en_US">VIN</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{3cb76063-8284-4aea-81b6-38bebea858df}">
+            <name locale="en_US">EN</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{3188bb88-098b-43fc-b082-18d89595ea84}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-12.7" uuid="{a505bc50-e7f8-44f0-ba6d-23f7813c35e6}">
+            <name locale="en_US">CFB</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-15.24" uuid="{82156205-5a10-4125-a3d9-e3483746de97}">
+            <name locale="en_US">PGND</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{9dfb6e18-39aa-4b31-afc0-237444cade43}">
+            <name locale="en_US">RT</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-10.16" uuid="{f644ad7d-c23f-411c-9a66-5c0caf7b10b5}">
+            <name locale="en_US">SS</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="10.16" uuid="{611144b5-9189-4ee2-943a-005f73881c48}">
+            <name locale="en_US">PVIN</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="7.62" uuid="{9e246cfa-7adf-4a21-8673-323a5523ed27}">
+            <name locale="en_US">HO</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="5.08" uuid="{13439204-80bd-4b8f-b5b9-4fba06c022f1}">
+            <name locale="en_US">BST</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="0" uuid="{27d60c99-68ad-4354-b574-fb17541dbab6}">
+            <name locale="en_US">LO</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-7.62" uuid="{1d78f6c6-7987-40cb-9eb2-e9a12f9d2778}">
+            <name locale="en_US">COMP</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-5.08" uuid="{7a2d03e2-ef74-4bd7-909e-69373110913f}">
+            <name locale="en_US">FB</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-15.24" uuid="{d2f3856d-3433-4175-bc6e-2d6ea4ca2cf4}">
+            <name locale="en_US">AGND</name>
+        </pin>
+    </pins>
+</symbol>

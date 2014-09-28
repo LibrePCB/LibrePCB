@@ -1,0 +1,40 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{e22b5b1d-507a-4a32-959d-90fa972b22aa}</uuid>
+        <name locale="en_US">MC10180</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="-7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="12.7" length="5.08" angle="180" y="2.54" uuid="{3d3c3641-91d4-4c1a-91eb-d6fd2f3acf94}">
+            <name locale="en_US">!S</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="0" uuid="{9c84d8f9-8b47-4d66-9943-292fc5af422b}">
+            <name locale="en_US">CO</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="0" uuid="{b843abb4-e956-4c27-9353-7a530ae3bb6e}">
+            <name locale="en_US">CI</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="5.08" uuid="{7ec9ef3d-89b4-428b-9d8c-463d41c02488}">
+            <name locale="en_US">A</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="2.54" uuid="{36d40acf-ba3e-401d-9aa4-e7d88a72d878}">
+            <name locale="en_US">B</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="5.08" uuid="{5f925921-edda-4d1a-900a-f12dffc4df64}">
+            <name locale="en_US">S</name>
+        </pin>
+    </pins>
+</symbol>

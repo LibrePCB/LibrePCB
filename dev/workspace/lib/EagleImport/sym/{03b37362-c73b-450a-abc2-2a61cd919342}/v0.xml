@@ -1,0 +1,91 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{03b37362-c73b-450a-abc2-2a61cd919342}</uuid>
+        <name locale="en_US">SLA7070M</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="20.32" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="12.7" end_y="20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="20.32" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-22.86"/>
+        </polygon>
+        <polygon fill="false" start_y="-22.86" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="-15.24" end_y="-22.86"/>
+        </polygon>
+        <polygon fill="false" start_y="-22.86" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="-15.24" end_y="20.32"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="15.24" length="2.54" angle="180" y="17.78" uuid="{15a81af4-212b-4bed-862a-82b791eefb50}">
+            <name locale="en_US">OUTA@1</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="15.24" uuid="{7f21dd6e-6619-4539-a561-d8a101584b39}">
+            <name locale="en_US">OUTA@2</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="10.16" uuid="{54fe6efe-60fa-4056-9397-896d2dc0c88a}">
+            <name locale="en_US">!OUTA@1</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="7.62" uuid="{ea9199ad-4986-41e6-b244-64a22049b99b}">
+            <name locale="en_US">!OUTA@2</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-5.08" uuid="{c3f14390-56d9-4ba5-8654-b60c9fbba174}">
+            <name locale="en_US">OUTB@1</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-7.62" uuid="{a84bea37-1365-48d4-a5c7-f054cf7fd7b2}">
+            <name locale="en_US">OUTB@2</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-12.7" uuid="{168f4cb9-8da6-4d80-b8fd-8923370629fd}">
+            <name locale="en_US">!OUTB@1</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-15.24" uuid="{34b10c17-f273-4b7b-95d7-e52f55fd3208}">
+            <name locale="en_US">!OUTB@2</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="2.54" uuid="{5b9385d2-0481-448e-a961-86d414c1a87b}">
+            <name locale="en_US">SENSEA</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-20.32" uuid="{25b2b992-9dc0-429f-b4f3-07829f8e86a1}">
+            <name locale="en_US">SENSEB</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="17.78" uuid="{3dbb9ccd-689d-4a8d-a1f8-6c6608919b3d}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="15.24" uuid="{d31d2df6-eba4-46b8-9a99-f88a1e95518d}">
+            <name locale="en_US">VBB</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-20.32" uuid="{6eb3ffa3-3bc4-40b7-ad22-92526d724286}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-10.16" uuid="{d1f9723c-06c4-4f95-a695-2fcf4de4df88}">
+            <name locale="en_US">REF/SLEEP1</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="10.16" uuid="{d854de19-6169-4e9a-8d11-669503c7d31e}">
+            <name locale="en_US">RESET</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="7.62" uuid="{7f1f0118-78c4-4825-9411-166542bd4a33}">
+            <name locale="en_US">CLOCK</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="5.08" uuid="{894def0e-23cb-43b1-9e3c-4f995e0c683d}">
+            <name locale="en_US">!FR</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="2.54" uuid="{85041404-b6c9-4d41-8b0f-b5af020365c3}">
+            <name locale="en_US">M1</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="0" uuid="{87ff2353-dbc3-4f6d-871b-a4b39cb7a1e6}">
+            <name locale="en_US">M2</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-2.54" uuid="{bf744c67-42ea-4bc3-81f1-458d7d6219be}">
+            <name locale="en_US">M3</name>
+        </pin>
+        <pin x="-2.54" length="0" angle="0" y="-22.86" uuid="{cf946c61-dbf1-4eee-bde9-6f819c5fbc58}">
+            <name locale="en_US">NC</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-7.62" uuid="{6a7c1719-c466-48f9-9f04-3eb7938bae8a}">
+            <name locale="en_US">FLAG</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-15.24" uuid="{ff61e91e-851d-415e-ab91-b55be38aeeba}">
+            <name locale="en_US">SYNC</name>
+        </pin>
+    </pins>
+</symbol>

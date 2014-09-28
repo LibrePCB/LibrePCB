@@ -1,0 +1,70 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{eb213937-5b83-4812-98d8-85334665cdc4}</uuid>
+        <name locale="en_US">LPC1102</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="-40.64">
+            <segment type="line" end_x="38.1" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="38.1">
+            <segment type="line" end_x="38.1" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="38.1">
+            <segment type="line" end_x="-40.64" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-40.64">
+            <segment type="line" end_x="-40.64" end_y="-12.7"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-43.18" length="2.54" angle="0" y="7.62" uuid="{e156bd90-4fdc-4c92-a022-b21d3fcccb68}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="-43.18" length="2.54" angle="0" y="5.08" uuid="{5601bae5-fd2a-4b5d-ac6a-7e76c294f428}">
+            <name locale="en_US">PIO0_8/MISO/CT16B0_MAT0</name>
+        </pin>
+        <pin x="-43.18" length="2.54" angle="0" y="2.54" uuid="{b15b76de-4e8f-495d-83e5-4ebc5c336ac1}">
+            <name locale="en_US">PIO0_9/MOSI/CT16B0_MAT1</name>
+        </pin>
+        <pin x="-43.18" length="2.54" angle="0" y="0" uuid="{e4565f5a-6c80-4a60-97f1-475dc20a5d39}">
+            <name locale="en_US">SWCLK/PIO0_10/SCK/CT16B0_MAT2</name>
+        </pin>
+        <pin x="-43.18" length="2.54" angle="0" y="-2.54" uuid="{349df181-497d-4b25-a31d-166ba1c923d7}">
+            <name locale="en_US">VSS</name>
+        </pin>
+        <pin x="-43.18" length="2.54" angle="0" y="-5.08" uuid="{358b6c2e-1807-488a-a9bf-73c5e62ff501}">
+            <name locale="en_US">XTALIN</name>
+        </pin>
+        <pin x="-43.18" length="2.54" angle="0" y="-7.62" uuid="{c464c709-cb4b-41f2-89ce-5c8a1d6b51f7}">
+            <name locale="en_US">R/PIO1_0/AD1/CT32B1_CAP0</name>
+        </pin>
+        <pin x="-43.18" length="2.54" angle="0" y="-10.16" uuid="{8436737d-b478-4bf8-ad9f-ab0b5f639a8b}">
+            <name locale="en_US">R/PIO0_11/AD0/CT32B0_MAT3</name>
+        </pin>
+        <pin x="40.64" length="2.54" angle="180" y="-10.16" uuid="{1ad85c97-42ca-404a-ae0c-c6218e176e98}">
+            <name locale="en_US">RESET/PIO0_0</name>
+        </pin>
+        <pin x="40.64" length="2.54" angle="180" y="-7.62" uuid="{b9c8a02d-3b0a-4c23-a1e1-7297e1eea6d0}">
+            <name locale="en_US">PIO1_6/RXD/CT32B0_MAT0</name>
+        </pin>
+        <pin x="40.64" length="2.54" angle="180" y="-5.08" uuid="{c7fc7592-7917-4058-8b28-50cc651f6c53}">
+            <name locale="en_US">R/PIO1_2/AD3/CT32B1_MAT1</name>
+        </pin>
+        <pin x="40.64" length="2.54" angle="180" y="-2.54" uuid="{c52c148a-4e09-4be0-9207-ecc11b0e4d29}">
+            <name locale="en_US">R/PIO1_1/AD2/CT32B1_MAT0</name>
+        </pin>
+        <pin x="40.64" length="2.54" angle="180" y="0" uuid="{07dd1d8e-6ea7-4e04-99e4-529158ae1e15}">
+            <name locale="en_US">PIO1_7/TXD/CT32B0_MAT1</name>
+        </pin>
+        <pin x="40.64" length="2.54" angle="180" y="2.54" uuid="{15e6c79f-ab26-4841-b63d-ca30d019683d}">
+            <name locale="en_US">VDD@1</name>
+        </pin>
+        <pin x="40.64" length="2.54" angle="180" y="5.08" uuid="{8d8bacc9-6736-4f2f-a4ff-44cdf4241876}">
+            <name locale="en_US">VSS@1</name>
+        </pin>
+        <pin x="40.64" length="2.54" angle="180" y="7.62" uuid="{8834b8a6-db7e-42cb-ab7e-cd24dd70901a}">
+            <name locale="en_US">SWDIO/PIO1_3/AD4/CT32B1_MAT2</name>
+        </pin>
+    </pins>
+</symbol>

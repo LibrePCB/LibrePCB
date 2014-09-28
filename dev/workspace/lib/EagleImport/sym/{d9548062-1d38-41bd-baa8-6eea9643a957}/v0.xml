@@ -1,0 +1,55 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{d9548062-1d38-41bd-baa8-6eea9643a957}</uuid>
+        <name locale="en_US">IGFET-DN-2GDS</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-1.27" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="-1.27">
+            <segment type="line" end_x="-1.2192" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="3.683" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-3.683"/>
+        </polygon>
+        <polygon fill="false" start_y="0.635" width="0.254" layer="10" start_x="1.905">
+            <segment type="line" end_x="0.635" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.635" width="0.254" layer="10" start_x="1.905">
+            <segment type="line" end_x="0.635" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="2.54" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="-1.27">
+            <segment type="line" end_x="-1.27" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-1.27" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="-1.27">
+            <segment type="line" end_x="-1.27" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{6c82e0d4-493f-431f-8ddf-0816a237177c}">
+            <name locale="en_US">G2</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-2.54" uuid="{027d1287-aa29-4fb8-ab3b-efde04b6da60}">
+            <name locale="en_US">G1</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="2.54" uuid="{991c966b-2ada-4bcf-9533-2826b072aa74}">
+            <name locale="en_US">D</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-2.54" uuid="{03e34168-4d63-49c8-980d-40ca1f5946f4}">
+            <name locale="en_US">S</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,16 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{3438b6ee-ca01-4953-9555-1299d23bbfd4}</uuid>
+        <name locale="en_US">SKB</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0.762" width="0.254" layer="10" start_x="2.032">
+            <segment type="line" end_x="0.508" end_y="-0.762"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{c03f7041-9e1a-4ea5-b2f2-6666dd552c17}">
+            <name locale="en_US">1</name>
+        </pin>
+    </pins>
+</symbol>

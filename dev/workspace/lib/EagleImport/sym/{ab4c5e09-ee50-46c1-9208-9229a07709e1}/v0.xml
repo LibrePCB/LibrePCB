@@ -1,0 +1,22 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{ab4c5e09-ee50-46c1-9208-9229a07709e1}</uuid>
+        <name locale="en_US">ASPINF</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0.254" width="0.254" layer="10" start_x="1.27">
+            <segment type="line" end_x="0" end_y="0.254"/>
+        </polygon>
+        <polygon fill="false" start_y="0.254" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-0.254"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.254" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="1.27" end_y="-0.254"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{72addc0e-bdf3-4eb6-bae0-da26733bb31c}">
+            <name locale="en_US">1</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,43 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{2523905e-9db0-4e34-89c0-ede8d0b9559b}</uuid>
+        <name locale="en_US">PINHD_1V</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0.381" width="0.1524" layer="10" start_x="0.508">
+            <segment type="line" end_x="0.762" end_y="0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="0.635" width="0.1524" layer="10" start_x="0.762">
+            <segment type="line" end_x="1.524" end_y="0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="0.635" width="0.1524" layer="10" start_x="1.524">
+            <segment type="line" end_x="1.778" end_y="0.381"/>
+        </polygon>
+        <polygon fill="false" start_y="0.381" width="0.1524" layer="10" start_x="1.778">
+            <segment type="line" end_x="1.778" end_y="-0.381"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.381" width="0.1524" layer="10" start_x="1.778">
+            <segment type="line" end_x="1.524" end_y="-0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.635" width="0.1524" layer="10" start_x="1.524">
+            <segment type="line" end_x="0.762" end_y="-0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.635" width="0.1524" layer="10" start_x="0.762">
+            <segment type="line" end_x="0.508" end_y="-0.381"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.381" width="0.1524" layer="10" start_x="0.508">
+            <segment type="line" end_x="0.508" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="0.508">
+            <segment type="line" end_x="0.508" end_y="0.381"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0.508" end_y="0"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{b0f832a4-6404-4e98-aeba-7fda19fc9930}">
+            <name locale="en_US">1</name>
+        </pin>
+    </pins>
+</symbol>

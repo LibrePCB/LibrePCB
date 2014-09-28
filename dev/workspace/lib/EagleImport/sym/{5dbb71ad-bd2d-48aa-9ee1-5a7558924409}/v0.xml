@@ -1,0 +1,37 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{5dbb71ad-bd2d-48aa-9ee1-5a7558924409}</uuid>
+        <name locale="en_US">REF02</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="-7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="2.54" uuid="{7c7a3e6a-ee1d-4e5c-864d-184f9c12dcdd}">
+            <name locale="en_US">OPT</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-5.08" uuid="{d32ab814-cd9a-4d9e-8733-229e29899ef6}">
+            <name locale="en_US">VO</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="0" uuid="{2418e056-f261-4645-8d58-959c33c5944e}">
+            <name locale="en_US">TRM</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="5.08" uuid="{6737a058-58e2-47c0-8b59-e29c3d88a05f}">
+            <name locale="en_US">V+</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-5.08" uuid="{ff081aa0-fd33-4df5-bc52-3ad6ac347436}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

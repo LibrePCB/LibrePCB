@@ -1,0 +1,43 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{c78c6710-f208-4be1-89a8-e814113f28ec}</uuid>
+        <name locale="en_US">STROKO</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.016" width="0.254" layer="10" start_x="3.81">
+            <segment type="line" end_x="-3.81" end_y="1.016"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.016" width="0.254" layer="10" start_x="-3.81">
+            <segment type="line" end_x="-3.81" end_y="1.016"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.016" width="0.254" layer="10" start_x="-3.81">
+            <segment type="line" end_x="3.81" end_y="-1.016"/>
+        </polygon>
+        <polygon fill="true" start_y="1.651" width="0.254" layer="10" start_x="-3.81">
+            <segment type="line" end_x="3.81" end_y="1.651"/>
+            <segment type="line" end_x="3.81" end_y="3.429"/>
+            <segment type="line" end_x="-3.81" end_y="3.429"/>
+            <segment type="line" end_x="-3.81" end_y="1.651"/>
+        </polygon>
+        <polygon fill="true" start_y="-3.429" width="0.254" layer="10" start_x="-3.81">
+            <segment type="line" end_x="3.81" end_y="-3.429"/>
+            <segment type="line" end_x="3.81" end_y="-1.651"/>
+            <segment type="line" end_x="-3.81" end_y="-1.651"/>
+            <segment type="line" end_x="-3.81" end_y="-3.429"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="7.62" length="5.08" angle="180" y="2.54" uuid="{94393f4e-5589-483d-bcf8-687fef9ed74e}">
+            <name locale="en_US">2</name>
+        </pin>
+        <pin x="-7.62" length="5.08" angle="0" y="2.54" uuid="{2453ae85-a3f9-4d94-8f27-9712e01777d5}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="-7.62" length="5.08" angle="0" y="-2.54" uuid="{179a36fa-554b-4e2d-b65a-c359a55de6a3}">
+            <name locale="en_US">3</name>
+        </pin>
+        <pin x="7.62" length="5.08" angle="180" y="-2.54" uuid="{19898369-bf71-482c-90c7-398d04b14579}">
+            <name locale="en_US">4</name>
+        </pin>
+    </pins>
+</symbol>

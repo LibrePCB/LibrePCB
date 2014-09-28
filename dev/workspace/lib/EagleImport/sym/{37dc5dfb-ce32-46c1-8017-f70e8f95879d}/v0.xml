@@ -1,0 +1,31 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{37dc5dfb-ce32-46c1-8017-f70e8f95879d}</uuid>
+        <name locale="en_US">LM50</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="0" uuid="{2c1d9e8b-3d79-49f2-b567-8ca87973b052}">
+            <name locale="en_US">+VS</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="0" uuid="{4ba29890-e00a-472b-a9fe-939a25f97c82}">
+            <name locale="en_US">VO</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-7.62" uuid="{ec57e2f7-e1c5-456d-9028-81228f1a0596}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,52 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{82a43c35-2f02-49c1-945a-30a0e66c2cef}</uuid>
+        <name locale="en_US">EXP10</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="12.7" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="7.62" end_y="12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="12.7" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-15.24" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-2.54" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-15.24" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="12.7"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2.54" angle="0" y="10.16" uuid="{6a7a76bd-c4b0-4e7d-9418-f7f768b350ba}">
+            <name locale="en_US">EXP</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="7.62" uuid="{a7594bf8-e9ca-4020-97d2-b6b7a3421452}">
+            <name locale="en_US">EXP@1</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="5.08" uuid="{6555704e-999d-4f4f-bda0-8f1409f8320a}">
+            <name locale="en_US">EXP@2</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="2.54" uuid="{660cd60b-17ff-47d8-bbc7-fed84670ebc2}">
+            <name locale="en_US">EXP@3</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{91d812f4-17c7-4252-a07e-399c51218ecb}">
+            <name locale="en_US">EXP@4</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-2.54" uuid="{33ee4d7d-8699-4d15-af6a-fd77da9fc359}">
+            <name locale="en_US">EXP@5</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-5.08" uuid="{b636d8da-6b5f-4937-b21d-8b5c0809c920}">
+            <name locale="en_US">EXP@6</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-7.62" uuid="{5c002634-da16-428a-bc08-4761c4918609}">
+            <name locale="en_US">EXP@7</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-10.16" uuid="{d7d8c57e-d06a-4aed-b2e9-e3dff9499898}">
+            <name locale="en_US">EXP@8</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-12.7" uuid="{52d43ab8-37c5-4c61-9a63-cc22ac22f3b7}">
+            <name locale="en_US">EXP@9</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,19 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{0f86f894-ff88-4b49-a070-ddd28854f6db}</uuid>
+        <name locale="en_US">MV2</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.6096" layer="10" start_x="1.27">
+            <segment type="line" end_x="0" end_y="0"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{e624291e-1ac3-47bc-bdee-312fb13bb8d7}">
+            <name locale="en_US">S@2</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{bc2f15d1-9146-4293-b4e7-d0e451d7ffc0}">
+            <name locale="en_US">S@1</name>
+        </pin>
+    </pins>
+</symbol>

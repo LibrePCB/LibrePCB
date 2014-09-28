@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{00599547-e2fc-42a9-b2b9-20ac08a73d02}</uuid>
+        <name locale="en_US">6016CONT</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-26.67"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{3d6da9bf-0930-456b-be5c-e34a61813e70}">
+            <name locale="en_US">CONF_DONE</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{45fa5f9a-aadb-442a-9ead-953104678e6e}">
+            <name locale="en_US">!CE</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{bc6af2c5-38e0-4a3b-a676-e9dcf445077b}">
+            <name locale="en_US">!STATUS</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{98cc5e14-24bc-4795-a24b-bfe5194e1333}">
+            <name locale="en_US">!CONFIG</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-15.24" uuid="{f69b1202-dcff-4df9-9860-8be05ee13ea0}">
+            <name locale="en_US">DCLK</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{75b89c9c-7248-43bd-bdd1-540d26adaafc}">
+            <name locale="en_US">MSEL</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{f5fb9357-73df-438c-bd06-b4fa2973a98e}">
+            <name locale="en_US">DATA0</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-25.4" uuid="{351fa8de-d0f4-4a7c-8aff-2aa4fa5d4bb6}">
+            <name locale="en_US">GCLK4</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-17.78" uuid="{58f5625f-74ac-4ea1-8aa4-75240e4ddfea}">
+            <name locale="en_US">GCLK1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-20.32" uuid="{b441453b-66c9-4cf5-baf5-cd76e55d2fbf}">
+            <name locale="en_US">GCLK2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-22.86" uuid="{1b28abb0-17ed-4cd1-a918-77166351ffcf}">
+            <name locale="en_US">GCLK3</name>
+        </pin>
+    </pins>
+</symbol>

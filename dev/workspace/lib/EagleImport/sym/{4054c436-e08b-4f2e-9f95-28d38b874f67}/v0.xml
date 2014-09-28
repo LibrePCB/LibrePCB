@@ -1,0 +1,70 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{4054c436-e08b-4f2e-9f95-28d38b874f67}</uuid>
+        <name locale="en_US">SLA7052</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="17.78" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="12.7" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="-12.7" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-12.7" end_y="17.78"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="15.24" length="2.54" angle="180" y="12.7" uuid="{f9ee1120-fe1a-4ca3-a1cb-55afb20a458b}">
+            <name locale="en_US">OUTA</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="7.62" uuid="{0d3dc4f0-3723-4511-86ca-60f4772f0245}">
+            <name locale="en_US">!OUTA</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-7.62" uuid="{ed2b6543-35ff-4513-bc64-4583dacde1a7}">
+            <name locale="en_US">OUTB</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-12.7" uuid="{82eef858-95cc-4336-a188-7260905c3e34}">
+            <name locale="en_US">!OUTB</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="15.24" uuid="{fe122d20-bd36-4903-92bd-b79bf0de48ec}">
+            <name locale="en_US">GATEA</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-5.08" uuid="{6450fe05-7796-4641-903c-59b72f2a9384}">
+            <name locale="en_US">GATEB</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="5.08" uuid="{ca08cd77-ee5a-4112-b65f-25fac42c83d0}">
+            <name locale="en_US">SENSEA</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-15.24" uuid="{3e47fc98-7ddf-49f3-8c8f-67f1922d997f}">
+            <name locale="en_US">SENSEB</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="10.16" uuid="{c00cefb3-76ee-481e-9a6e-7964f1c491e2}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-15.24" uuid="{300b1b41-4c30-46d4-8ca7-251f54268779}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="15.24" uuid="{f90ebeac-6494-41f7-9d23-0a8f06d9ed52}">
+            <name locale="en_US">VBB</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="0" uuid="{efbb502c-0814-42f3-838c-b41998cdf173}">
+            <name locale="en_US">DIRECTION</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="2.54" uuid="{693f3785-8bfb-4f5e-90d4-121d7f8ff426}">
+            <name locale="en_US">CLOCK</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-2.54" uuid="{ab42eab7-8304-457f-a7e4-475c7777792b}">
+            <name locale="en_US">SYNC</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-5.08" uuid="{07435c37-ba2c-4024-a4c5-f4f98633e268}">
+            <name locale="en_US">FULL/HALF</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-10.16" uuid="{19ea0744-35b3-45b6-b539-54772d2a3544}">
+            <name locale="en_US">REF</name>
+        </pin>
+    </pins>
+</symbol>

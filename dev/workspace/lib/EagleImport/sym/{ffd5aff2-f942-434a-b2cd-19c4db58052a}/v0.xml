@@ -1,0 +1,22 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{ffd5aff2-f942-434a-b2cd-19c4db58052a}</uuid>
+        <name locale="en_US">TPR</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-0.762" width="0.254" layer="10" start_x="0.762">
+            <segment type="line" end_x="0" end_y="-2.286"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.286" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="-0.762" end_y="-0.762"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.762" width="0.254" layer="10" start_x="-0.762">
+            <segment type="line" end_x="0.762" end_y="-0.762"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-2.54" uuid="{235a7c21-0add-49a2-8f89-2e416ee8e1d8}">
+            <name locale="en_US">PP</name>
+        </pin>
+    </pins>
+</symbol>

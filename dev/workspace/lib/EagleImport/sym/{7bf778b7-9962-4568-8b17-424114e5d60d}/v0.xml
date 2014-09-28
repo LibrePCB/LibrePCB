@@ -1,0 +1,82 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{7bf778b7-9962-4568-8b17-424114e5d60d}</uuid>
+        <name locale="en_US">15-I/O-1</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="22.86" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="12.7" end_y="22.86"/>
+        </polygon>
+        <polygon fill="false" start_y="22.86" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="-20.32" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="-12.7" end_y="-20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="-20.32" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-12.7" end_y="22.86"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="17.78" length="5.08" angle="180" y="20.32" uuid="{8ec604bd-2101-4b04-b401-4436a144ee50}">
+            <name locale="en_US">(SCK)PB7</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="17.78" uuid="{3866c7e5-ed14-480b-91af-12cfd9a3d41a}">
+            <name locale="en_US">(MISO)PB6</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="15.24" uuid="{5a2bbd30-4e84-4516-b4ca-47ec75cf8738}">
+            <name locale="en_US">(MOSI)PB5</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="12.7" uuid="{ecb116f2-3134-418c-b8e7-ff1ce4f3afe8}">
+            <name locale="en_US">PB4</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="10.16" uuid="{57a69a7d-f67e-4f6c-899d-7754879b0fdf}">
+            <name locale="en_US">PB3</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="7.62" uuid="{9c26f9b7-3edd-431e-8fba-d66f5d1e4473}">
+            <name locale="en_US">PB2</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="5.08" uuid="{403e0c73-7b9c-4ad0-a8a1-ff548ed08403}">
+            <name locale="en_US">(AIN1)PB1</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="2.54" uuid="{919103a8-ceac-4251-979d-87b8c7498201}">
+            <name locale="en_US">(AIN0)PB0</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-2.54" uuid="{80a9b232-0838-412a-ae4f-90f1060a7653}">
+            <name locale="en_US">PD6</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-5.08" uuid="{3e036f6c-4f5a-4f88-b160-e07dee215ce5}">
+            <name locale="en_US">PD5</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-7.62" uuid="{0cb20756-0a1e-49ec-905c-9ec387f391bb}">
+            <name locale="en_US">(T0)PD4</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-10.16" uuid="{760af101-5da1-4da6-baea-df59cea3c2ad}">
+            <name locale="en_US">PD3</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-12.7" uuid="{4cdda557-d061-4d21-9651-c2de75ef678e}">
+            <name locale="en_US">(INT0)PD2</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-15.24" uuid="{9a829a7d-082b-4c26-8c94-8302e0b919d8}">
+            <name locale="en_US">PD1</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-17.78" uuid="{6414c57c-ed6f-4a9e-b1f4-ad3900df99cd}">
+            <name locale="en_US">PD0</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="0" uuid="{23d8738a-d94b-4383-9865-cc4d2e4b742f}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="2.54" uuid="{5588ea56-9710-43d8-b4c0-fb08b129325b}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="7.62" uuid="{8b1e4454-4357-4e7c-9d24-24d3ea2b8307}">
+            <name locale="en_US">XTAL1</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="12.7" uuid="{8c688798-4b41-420a-b96f-e4b9cc3acadb}">
+            <name locale="en_US">XTAL2</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="20.32" uuid="{eb445d37-886e-4f0f-a859-af11d9d5396b}">
+            <name locale="en_US">RESET</name>
+        </pin>
+    </pins>
+</symbol>

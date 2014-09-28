@@ -1,0 +1,129 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{7f4468ef-d853-41fb-ae66-8b7665681dc9}</uuid>
+        <name locale="en_US">SH7751-PWRQ_Q</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="-22.86" length="2.54" angle="270" y="7.62" uuid="{c26b1be8-5ccf-444f-a167-f00243c66701}">
+            <name locale="en_US">VDDQ</name>
+        </pin>
+        <pin x="-22.86" length="2.54" angle="90" y="-5.08" uuid="{8c39f048-0f90-4d80-a3a6-91c0b8dc76ba}">
+            <name locale="en_US">VSSQ</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="270" y="7.62" uuid="{a40a57a6-fc36-487c-b2ed-5a95c5d49b68}">
+            <name locale="en_US">VDDQ@1</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="90" y="-5.08" uuid="{ddaefe78-00fe-49ec-8dc0-fb421e3192bd}">
+            <name locale="en_US">VSSQ@1</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="270" y="7.62" uuid="{33d30566-7f67-4cd0-9d13-d72f2009c7fd}">
+            <name locale="en_US">VDDQ@2</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="90" y="-5.08" uuid="{a6ce673f-f067-4dc7-b3d8-81e19161b0f5}">
+            <name locale="en_US">VSSQ@2</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="270" y="7.62" uuid="{892bbc68-bbfb-4fc3-8419-35edc2d2341c}">
+            <name locale="en_US">VDDQ@3</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="90" y="-5.08" uuid="{645cb4d9-9f02-4fc4-8e03-2b0ed099a966}">
+            <name locale="en_US">VSSQ@3</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="270" y="7.62" uuid="{5d8371d0-0947-4fc6-b87d-c449723fbbc5}">
+            <name locale="en_US">VDDQ@4</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="90" y="-5.08" uuid="{93340508-785d-4caa-b37f-62b212bacbad}">
+            <name locale="en_US">VSSQ@4</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="270" y="7.62" uuid="{15d319e5-9aec-448e-9a94-3a71bff2a970}">
+            <name locale="en_US">VDDQ@5</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="90" y="-5.08" uuid="{b3f8c63e-1761-4d6b-af59-2c61fb815c50}">
+            <name locale="en_US">VSSQ@5</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="270" y="7.62" uuid="{9edd5dcb-7b6c-408c-8758-57ba3109e024}">
+            <name locale="en_US">VDDQ@6</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="90" y="-5.08" uuid="{1cb369b0-eda1-4706-8094-20fe637a3a57}">
+            <name locale="en_US">VSSQ@6</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="270" y="7.62" uuid="{58e7c243-792f-4d44-ae39-0c70d53ea053}">
+            <name locale="en_US">VDDQ@7</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="90" y="-5.08" uuid="{a197d33a-42f6-45a7-a18d-8fe853652de8}">
+            <name locale="en_US">VSSQ@7</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="270" y="7.62" uuid="{404723ff-0e3e-40bb-80c0-73ae8c8fbff4}">
+            <name locale="en_US">VDDQ@8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="90" y="-5.08" uuid="{f556362a-3303-49bf-bd7c-5a2d324d427c}">
+            <name locale="en_US">VSSQ@8</name>
+        </pin>
+        <pin x="0" length="2.54" angle="270" y="7.62" uuid="{f37fbe6f-4058-41d9-8776-08a8737fb900}">
+            <name locale="en_US">VDDQ@9</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-5.08" uuid="{c943c5d1-9567-41ce-a2b0-ee6a175c963b}">
+            <name locale="en_US">VSSQ@9</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="270" y="7.62" uuid="{24091d3e-1f3f-4ca1-a100-db7c960bd6c3}">
+            <name locale="en_US">VDDQ@10</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-5.08" uuid="{53e90c46-14ed-4c50-a505-20c0e054838a}">
+            <name locale="en_US">VSSQ@10</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="270" y="7.62" uuid="{50105d61-b4d6-43ec-a3cc-23f120bc5218}">
+            <name locale="en_US">VDDQ@11</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="90" y="-5.08" uuid="{2aee3b46-f5a9-4e81-9a37-65c982c9b8e6}">
+            <name locale="en_US">VSSQ@11</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="270" y="7.62" uuid="{c0a1773d-4372-4a42-9406-1fe182b9dc3e}">
+            <name locale="en_US">VDDQ@12</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="90" y="-5.08" uuid="{33a35419-57f6-40a2-928a-62237d719c9c}">
+            <name locale="en_US">VSSQ@12</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="270" y="7.62" uuid="{e9292c37-aecb-42e0-b1b7-7a98ff0e1782}">
+            <name locale="en_US">VDDQ@13</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="90" y="-5.08" uuid="{8a4e3b97-af41-4d28-bb0b-4f5369542baa}">
+            <name locale="en_US">VSSQ@13</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="270" y="7.62" uuid="{0def4e63-25fc-400b-8aa6-079279ba78ab}">
+            <name locale="en_US">VDDQ@14</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="270" y="7.62" uuid="{66600182-ebc0-4898-be21-a336c3755ab3}">
+            <name locale="en_US">VDDQ@15</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="90" y="-5.08" uuid="{92147812-0f2c-46bb-9d6e-ef3264f0c5c9}">
+            <name locale="en_US">VSSQ@14</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="270" y="7.62" uuid="{16195cee-f9e6-4f95-868f-669518ae1390}">
+            <name locale="en_US">VDDQ@16</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="90" y="-5.08" uuid="{ac14e5f0-3a8c-49fa-83ce-3f7452fdea6f}">
+            <name locale="en_US">VSSQ@15</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="270" y="7.62" uuid="{c1bdedab-19e8-4025-a2d2-92d50803478c}">
+            <name locale="en_US">VDDQ@17</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="90" y="-5.08" uuid="{b9090233-6056-4f7a-a81b-e3d0766bb8ce}">
+            <name locale="en_US">VSSQ@16</name>
+        </pin>
+        <pin x="22.86" length="2.54" angle="270" y="7.62" uuid="{51e85e31-b838-4cc9-9d84-876b78758dba}">
+            <name locale="en_US">VDDQ@18</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="90" y="-5.08" uuid="{0a67553c-9bfd-45df-9c2d-483458a6956a}">
+            <name locale="en_US">VSSQ@17</name>
+        </pin>
+        <pin x="25.4" length="2.54" angle="270" y="7.62" uuid="{36c121e8-853e-4ca9-a86b-4dc085e8936f}">
+            <name locale="en_US">VDDQ@19</name>
+        </pin>
+        <pin x="22.86" length="2.54" angle="90" y="-5.08" uuid="{9881f6b7-fed1-47d9-8e6c-9a76245c0697}">
+            <name locale="en_US">VSSQ@18</name>
+        </pin>
+        <pin x="25.4" length="2.54" angle="90" y="-5.08" uuid="{1a4762cc-def7-4808-a527-27c5fe81baed}">
+            <name locale="en_US">VSSQ@19</name>
+        </pin>
+    </pins>
+</symbol>

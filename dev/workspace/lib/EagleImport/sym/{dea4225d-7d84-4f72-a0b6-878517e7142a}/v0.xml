@@ -1,0 +1,64 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{dea4225d-7d84-4f72-a0b6-878517e7142a}</uuid>
+        <name locale="en_US">AD8367</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-17.78">
+            <segment type="line" end_x="17.78" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="17.78">
+            <segment type="line" end_x="17.78" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="17.78">
+            <segment type="line" end_x="-17.78" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-17.78">
+            <segment type="line" end_x="-17.78" end_y="7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-20.32" length="2.54" angle="0" y="-2.54" uuid="{a208ba9d-1c96-49e8-b034-84cf2912ec63}">
+            <name locale="en_US">ICOM@1</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="-5.08" uuid="{86c94abd-c4f6-480c-a268-1fcf9f0632cd}">
+            <name locale="en_US">ICOM@2</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="-7.62" uuid="{0be47cb4-ca24-4d94-8d96-3ae4bcee105d}">
+            <name locale="en_US">OCOM</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="-7.62" uuid="{45f27063-336f-430a-b1be-e4b57b8d198e}">
+            <name locale="en_US">ICOM@3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="270" y="10.16" uuid="{7dc9e523-d5ea-4e59-8aea-33af68440610}">
+            <name locale="en_US">VPSI</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="270" y="10.16" uuid="{c4787ef3-d339-40a6-be25-a4b29faa9dc7}">
+            <name locale="en_US">VPSO</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="90" y="-12.7" uuid="{9fe48744-82bd-4705-b06e-99fc1eb6cafa}">
+            <name locale="en_US">EN</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="5.08" uuid="{3f8d7183-90af-4284-b90f-5387578bcf65}">
+            <name locale="en_US">DECL</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="2.54" uuid="{3d580ff5-95fa-4e19-8701-b0b606eb4b08}">
+            <name locale="en_US">HPFL</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="-2.54" uuid="{372aba8f-03ce-4abb-a859-74287a9603fb}">
+            <name locale="en_US">VOUT</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="2.54" uuid="{e68e733d-2904-40c5-840f-85d8f65be968}">
+            <name locale="en_US">IN</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="90" y="-12.7" uuid="{667a948e-a008-4b4b-9f8c-6ff5842940bb}">
+            <name locale="en_US">MODE</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-12.7" uuid="{342682cd-aae6-48e0-a1c1-1a6ea400f15b}">
+            <name locale="en_US">GAIN</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="90" y="-12.7" uuid="{6ad4274f-a362-4732-af2c-c4fd57a27dd5}">
+            <name locale="en_US">DETO</name>
+        </pin>
+    </pins>
+</symbol>

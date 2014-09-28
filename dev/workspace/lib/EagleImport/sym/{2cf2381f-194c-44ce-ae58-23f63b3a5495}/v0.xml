@@ -1,0 +1,55 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{2cf2381f-194c-44ce-ae58-23f63b3a5495}</uuid>
+        <name locale="en_US">AD102</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="12.7" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="12.7" end_y="12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="12.7" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-15.24" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="-15.24" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-15.24" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="-15.24" end_y="12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.1524" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.1524" layer="10" start_x="-7.62">
+            <segment type="line" end_x="0" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="-7.62" end_y="5.08"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-17.78" length="2.54" angle="0" y="10.16" uuid="{1fad8faf-3997-4eac-bb6e-9878d232db5b}">
+            <name locale="en_US">FB</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="2.54" uuid="{efb16ea3-02d9-417d-9ff7-e1e0d3cf783c}">
+            <name locale="en_US">IN-</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-2.54" uuid="{d4319a1a-f365-4d4f-b48d-bf303ac2e1b7}">
+            <name locale="en_US">IN+</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-10.16" uuid="{70bf536d-e94d-448d-b834-0fbb1c64398f}">
+            <name locale="en_US">ICOM</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="2.54" uuid="{83f9c3ae-44c5-42a6-9cd7-6ea93a729fdc}">
+            <name locale="en_US">OUT_HI</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-2.54" uuid="{fa547d03-22a0-4660-b41e-124b9dbcda92}">
+            <name locale="en_US">OUT_LO</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="10.16" uuid="{22c4f7fa-8907-4dcf-872c-e1da1a6c9b32}">
+            <name locale="en_US">+15V_DC</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-10.16" uuid="{520b242d-a969-42d7-9808-222fdc22c593}">
+            <name locale="en_US">PWRCOM</name>
+        </pin>
+    </pins>
+</symbol>

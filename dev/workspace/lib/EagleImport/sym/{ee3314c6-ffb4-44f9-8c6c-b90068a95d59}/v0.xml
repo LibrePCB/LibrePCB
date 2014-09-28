@@ -1,0 +1,64 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{ee3314c6-ffb4-44f9-8c6c-b90068a95d59}</uuid>
+        <name locale="en_US">XTR110A</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-12.7" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-15.24" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="15.24" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-15.24" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="15.24" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="-12.7" end_y="15.24"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="2.54" angle="0" y="12.7" uuid="{c65a188e-4918-427a-bbd7-76628619eab7}">
+            <name locale="en_US">V_FORCE</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="10.16" uuid="{1dd86896-0bcc-4e21-b969-bf0c3c47336b}">
+            <name locale="en_US">V_SENSE</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="7.62" uuid="{642ba6da-a8b6-4c74-8b68-823f2a254465}">
+            <name locale="en_US">V_ADJUST</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="2.54" uuid="{6acdaf8c-6e63-4cb8-919b-cf3a262ca0f2}">
+            <name locale="en_US">VIN(10)</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-5.08" uuid="{b484a9f7-44c5-4037-bb1b-efe7308ff215}">
+            <name locale="en_US">VREF_IN</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-12.7" uuid="{0e0458e3-cb61-4e3d-805d-3bed992c3210}">
+            <name locale="en_US">VIN(5V)</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="12.7" uuid="{3f962765-03f9-4d1a-91a5-1de21891b4f0}">
+            <name locale="en_US">SRES</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="10.16" uuid="{9cd1b13e-d9f1-43a2-b110-f7e9cbef4fe3}">
+            <name locale="en_US">SSENSE</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="5.08" uuid="{51c04840-af15-4faf-ab50-7070eb33d22b}">
+            <name locale="en_US">GATE</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="0" uuid="{2d0ab70f-1878-4a3d-a1a1-8733ea33e6fb}">
+            <name locale="en_US">OFFSET1</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-2.54" uuid="{0d48fa4e-3a00-4027-a4b8-e28d8a99d910}">
+            <name locale="en_US">OFFSET2</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-7.62" uuid="{8af0584e-4d30-494c-9206-925b3db36ec9}">
+            <name locale="en_US">SPAN</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-10.16" uuid="{3cdf9725-4f01-440f-96ca-fc7ef45e582d}">
+            <name locale="en_US">4MASPAN</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-12.7" uuid="{8fc566f8-1fb3-4444-8215-670ef1c40ae0}">
+            <name locale="en_US">16MASPAN</name>
+        </pin>
+    </pins>
+</symbol>

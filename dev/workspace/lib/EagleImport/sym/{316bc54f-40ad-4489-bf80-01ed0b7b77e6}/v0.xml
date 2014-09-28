@@ -1,0 +1,58 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{316bc54f-40ad-4489-bf80-01ed0b7b77e6}</uuid>
+        <name locale="en_US">BQ27501</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="12.7" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="12.7" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-15.24" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-15.24" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="12.7"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{8a164655-fa47-48bc-8180-03269d1632bd}">
+            <name locale="en_US">BAT_LOW</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="10.16" uuid="{f3d88eb8-4379-4ac1-90c9-e74e2d0750a2}">
+            <name locale="en_US">BI/TOUT</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="5.08" uuid="{06a00a89-1a67-4fc7-9ecf-219cc7ba3039}">
+            <name locale="en_US">TS</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="0" uuid="{8dcb3d60-89de-40f2-957b-55efabb7d8d9}">
+            <name locale="en_US">BAT</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="10.16" uuid="{70ef46f9-ab04-4c43-afb7-11ddac9df305}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-12.7" uuid="{cb063ac4-8975-4398-ae75-04d483bcd03e}">
+            <name locale="en_US">VSS</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-5.08" uuid="{b1b89731-15ad-4b1e-865b-889cdcaf1e32}">
+            <name locale="en_US">SRP</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-7.62" uuid="{77b36597-d78c-41f7-9859-3071b8b83631}">
+            <name locale="en_US">SRN</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-12.7" uuid="{64075087-b91c-45e5-9af5-f1a6d97e4a0e}">
+            <name locale="en_US">RID</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{30e94977-1abf-4867-94db-a22388c0c0f6}">
+            <name locale="en_US">SDA</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{f3779fcf-809b-4376-b0e2-6be2897d31d2}">
+            <name locale="en_US">SCL</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{80c1c4ec-5d2b-45cc-b691-58dae788d96d}">
+            <name locale="en_US">!BAT_GD</name>
+        </pin>
+    </pins>
+</symbol>

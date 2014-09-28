@@ -1,0 +1,64 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{8948414a-8b01-488f-9be1-08eac2532c85}</uuid>
+        <name locale="en_US">SSM2166</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="17.78" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="17.78" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.254" layer="10" start_x="17.78">
+            <segment type="line" end_x="17.78" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="17.78">
+            <segment type="line" end_x="-15.24" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="-15.24" end_y="17.78"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-17.78" length="2.54" angle="0" y="-2.54" uuid="{7f756d48-cfb0-4915-9608-333cc6a8ce7a}">
+            <name locale="en_US">+IN</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="15.24" uuid="{e2ec9515-d809-43b5-b65d-f01ef48915e1}">
+            <name locale="en_US">V+</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-15.24" uuid="{dde5612d-0b51-4c65-9880-c06f35d3d4f7}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="15.24" uuid="{d45b246e-97ed-453f-a50a-1ba62bdea6cd}">
+            <name locale="en_US">BUFOUT</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="0" uuid="{e247d9a2-4e41-4edf-846a-8582b120edff}">
+            <name locale="en_US">VOUT</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="12.7" uuid="{5ad56328-5912-439d-b2b2-f2abe61c4fe9}">
+            <name locale="en_US">VCAIN</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="-15.24" uuid="{eb66245d-d073-40c4-ba1f-4112194e1a73}">
+            <name locale="en_US">AVGCAP</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="-12.7" uuid="{88f09c8e-44dc-47c7-b6ec-a8d5b3545dd4}">
+            <name locale="en_US">COMP</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="2.54" uuid="{81ad498d-1f3e-4393-a67e-5115945222be}">
+            <name locale="en_US">-IN</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="7.62" uuid="{c3a072b7-eb4e-46d3-a0fd-3add7c0c6c1f}">
+            <name locale="en_US">VCAR</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="5.08" uuid="{1b8ebf8e-ed75-43c0-ba32-2c5a7da79762}">
+            <name locale="en_US">VCA_GAIN_ADJ</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-12.7" uuid="{d2a392ba-125c-497a-87e8-e59e6061f384}">
+            <name locale="en_US">POWER_DOWN</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="-5.08" uuid="{9b21e0fa-e5e2-41c4-b8aa-5e669affb317}">
+            <name locale="en_US">NOIS_GATE_SET</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="-7.62" uuid="{bf49629d-227c-43e9-96f5-0e9bdcc86749}">
+            <name locale="en_US">ROTATION_POINT_SET</name>
+        </pin>
+    </pins>
+</symbol>

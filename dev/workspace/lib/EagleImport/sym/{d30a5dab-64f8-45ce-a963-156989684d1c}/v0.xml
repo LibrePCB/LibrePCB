@@ -1,0 +1,61 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{d30a5dab-64f8-45ce-a963-156989684d1c}</uuid>
+        <name locale="en_US">XC5VLX110T_FF1738-IO-AU</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="12.7" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-33.02"/>
+        </polygon>
+        <polygon fill="false" start_y="-33.02" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="0" end_y="-33.02"/>
+        </polygon>
+        <polygon fill="false" start_y="-33.02" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{358889e8-f679-47c8-8e41-5900486ada86}">
+            <name locale="en_US">IO_AU6</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{4657755d-552b-488a-ae86-ee4ae4433fdf}">
+            <name locale="en_US">IO_AU28</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{8ab5409d-8f86-4fa6-84b6-ba47fa9b067d}">
+            <name locale="en_US">IO_AU29</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{f6080030-56d8-467b-9011-a53ead5402a3}">
+            <name locale="en_US">IO_AU31</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{fcc06e46-a613-461e-9e97-172d83baadb9}">
+            <name locale="en_US">IO_AU32</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{6e2db9ff-232f-4593-9df0-097c372b9902}">
+            <name locale="en_US">IO_AU33</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{3f79b253-ee63-409e-95a2-58ec086ef228}">
+            <name locale="en_US">IO_AU34</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{9bac4dcb-2073-413f-b045-6d151c92068c}">
+            <name locale="en_US">IO_AU36</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{64f8de79-9056-4095-9e88-00f56193981a}">
+            <name locale="en_US">IO_AU37</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{835edad1-da1a-4311-900f-4a2edb87e67e}">
+            <name locale="en_US">IO_AU38</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{47cefaf9-ee4e-47e9-a8c6-a34c623f9f78}">
+            <name locale="en_US">IO_AU39</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{175b3ba6-a91a-45c3-9d61-d83d71d585b5}">
+            <name locale="en_US">IO_AU41</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{6eaee06c-7e39-4fbe-ace5-9f11256f9293}">
+            <name locale="en_US">IO_AU42</name>
+        </pin>
+    </pins>
+</symbol>

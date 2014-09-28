@@ -1,0 +1,34 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{c7a1bc1a-5702-47f4-a8fa-4c8a423660cd}</uuid>
+        <name locale="en_US">ZXSC300</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="7.62" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-5.08" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-7.62" length="2.54" angle="0" y="5.08" uuid="{d79a7580-6cde-4397-9c75-9a8d907bdbac}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="-5.08" uuid="{40765d4a-24e6-4612-875e-9df72a101e4b}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="2.54" uuid="{3c21913e-559b-4ff6-bbcf-8b7b50ed1d5d}">
+            <name locale="en_US">VDRIVE</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-2.54" uuid="{7ac10440-d5da-4444-a974-1cdc9dc8f70c}">
+            <name locale="en_US">ISENSE</name>
+        </pin>
+    </pins>
+</symbol>

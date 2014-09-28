@@ -1,0 +1,82 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{e4479996-930a-4d97-9783-fe1311143ad5}</uuid>
+        <name locale="en_US">13IO-2SS</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-17.78" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="-17.78"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="-7.62" uuid="{59aba323-0359-4efc-acc7-fbd793aaeba7}">
+            <name locale="en_US">T0CKI</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{9ae530c2-d57b-48aa-8459-5e30f23412e1}">
+            <name locale="en_US">!MCLR</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{737fe320-77fb-4ede-bb3c-bbe52e0c0d7e}">
+            <name locale="en_US">OSC2</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-15.24" uuid="{c3386c58-84a7-4c84-ab2b-06df51d772cc}">
+            <name locale="en_US">RA0</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-12.7" uuid="{95076f71-3e61-49dc-af53-b58ea1428056}">
+            <name locale="en_US">RA1</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-10.16" uuid="{09ba17aa-cf94-4490-86bb-b07b5cb0739d}">
+            <name locale="en_US">RA2</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-7.62" uuid="{907a2789-bb23-4beb-9e42-0045eb6d381b}">
+            <name locale="en_US">RA3</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-2.54" uuid="{d206b8e2-6a34-4c32-984d-ca07e7cc962b}">
+            <name locale="en_US">RB0</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="0" uuid="{0e2b2191-d627-4ca8-a7d5-ab274bc58459}">
+            <name locale="en_US">RB1</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="2.54" uuid="{5ac42856-3214-4512-81f9-08d13d20969d}">
+            <name locale="en_US">RB2</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="5.08" uuid="{ccbc5431-c0ab-4427-b7b8-d57b4cfa142a}">
+            <name locale="en_US">RB3</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="7.62" uuid="{923a2ba6-5802-4878-86c7-633146dfbd61}">
+            <name locale="en_US">RB4</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="10.16" uuid="{c0fb5b51-daa6-42bc-a704-9f081e6840a1}">
+            <name locale="en_US">RB5</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="12.7" uuid="{776c27dd-373d-4a55-bed6-6a5bf314e7be}">
+            <name locale="en_US">RB6</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="15.24" uuid="{8a946fe3-a888-4398-aff2-6dd3a55ee1f8}">
+            <name locale="en_US">RB7</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-15.24" uuid="{5fa8b764-28f1-4980-a672-f3f444e159b4}">
+            <name locale="en_US">VSS@1</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-12.7" uuid="{6834f738-1ffe-4224-bdb0-a946dba2f1ef}">
+            <name locale="en_US">VSS</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="12.7" uuid="{1dde96c1-755a-4df2-9919-c98f598b975b}">
+            <name locale="en_US">VDD@1</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="15.24" uuid="{c23e82dd-22ad-43a7-9726-5018727b9649}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="7.62" uuid="{d9da534a-601b-4de5-8b22-9a81bdb85e4d}">
+            <name locale="en_US">OSC1</name>
+        </pin>
+    </pins>
+</symbol>

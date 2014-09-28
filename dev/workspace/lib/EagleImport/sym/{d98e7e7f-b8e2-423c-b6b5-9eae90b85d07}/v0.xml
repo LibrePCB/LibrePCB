@@ -1,0 +1,130 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{d98e7e7f-b8e2-423c-b6b5-9eae90b85d07}</uuid>
+        <name locale="en_US">TAS5261</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="22.86" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="15.24" end_y="22.86"/>
+        </polygon>
+        <polygon fill="false" start_y="22.86" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="15.24" end_y="-25.4"/>
+        </polygon>
+        <polygon fill="false" start_y="-25.4" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="-15.24" end_y="-25.4"/>
+        </polygon>
+        <polygon fill="false" start_y="-25.4" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="-15.24" end_y="22.86"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-17.78" length="2.54" angle="0" y="20.32" uuid="{c0497626-8fb8-476f-b2a1-3aa857aba80e}">
+            <name locale="en_US">BST_A</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="17.78" uuid="{267e21a0-34de-4ac1-8542-f54f32ae23ea}">
+            <name locale="en_US">GVDD_A</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="15.24" uuid="{1996166d-c6f3-4046-bc9a-f6a46ffaf087}">
+            <name locale="en_US">!OTW</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="12.7" uuid="{ae12ca45-7d7e-4080-be2a-8d30e2d8273e}">
+            <name locale="en_US">!SD</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="10.16" uuid="{918f2105-fd71-441b-bd64-26f2e7747342}">
+            <name locale="en_US">!RESET</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="7.62" uuid="{c7387903-5e0c-415b-8df4-6eeb6230e334}">
+            <name locale="en_US">PWM_A</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="5.08" uuid="{89a99dc9-3f14-41f5-9b01-4d32363a157a}">
+            <name locale="en_US">OC_ADJ</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="2.54" uuid="{9e36fca6-8f80-403c-8bc0-cc2262ace23e}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="0" uuid="{3287e546-7651-449d-a502-2dcdeaaf7460}">
+            <name locale="en_US">AGND</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-2.54" uuid="{6a97e26a-fd60-47b1-9be9-0c4860cec6a7}">
+            <name locale="en_US">VREG</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-5.08" uuid="{d847faba-40f1-4131-b684-bb37ca581370}">
+            <name locale="en_US">M3</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-7.62" uuid="{51287aeb-bf40-4cb5-a984-2ed1fe1d4d3f}">
+            <name locale="en_US">M2</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-10.16" uuid="{532916e0-c06a-430b-b9b1-09d05840f9c6}">
+            <name locale="en_US">M1</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-12.7" uuid="{dbdf38a7-0c82-4806-b18a-16bafcd23661}">
+            <name locale="en_US">PWM_B</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-15.24" uuid="{c9642ad5-648f-4c52-a648-012adf507946}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-17.78" uuid="{55549bf8-8dd8-4562-ace0-1df69c731257}">
+            <name locale="en_US">GND@1</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-20.32" uuid="{1bfecaf0-448c-4d38-afb8-25bd0938620b}">
+            <name locale="en_US">GVDD_B</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-22.86" uuid="{0a2b01e7-9abb-4ccb-98f9-590b59345126}">
+            <name locale="en_US">BST_B</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-22.86" uuid="{9ad22525-454f-429c-8096-09beb8976f56}">
+            <name locale="en_US">PVDD_B@1</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-20.32" uuid="{93733c81-1f4f-457a-b3af-d5c3436ba867}">
+            <name locale="en_US">PVDD_B@2</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-17.78" uuid="{2fec16b3-45c8-409e-a4d5-11d797e5eeac}">
+            <name locale="en_US">PVDD_B@3</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-15.24" uuid="{5cb38176-c5a5-4be2-814b-6afb382c22c2}">
+            <name locale="en_US">PGND@1</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-12.7" uuid="{8c3b14b6-791b-49fe-9fc2-86170dee8813}">
+            <name locale="en_US">PGND@2</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-10.16" uuid="{85f7f370-bde5-4f0d-91f1-9794df1063fd}">
+            <name locale="en_US">PGND@3</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-7.62" uuid="{461d1d9d-0964-4a00-8eba-ea223f252981}">
+            <name locale="en_US">OUT_B@1</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-5.08" uuid="{054d6d5e-aa4b-4845-8826-b916186caf94}">
+            <name locale="en_US">OUT_B@2</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-2.54" uuid="{c9361cda-fe2f-4ea2-9a29-b5ec3d56d77d}">
+            <name locale="en_US">OUT_B@3</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="0" uuid="{2e87dee8-72b7-412d-9586-a0149a008456}">
+            <name locale="en_US">OUT_A@1</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="2.54" uuid="{fceb6394-b274-4210-a50e-a175233ab104}">
+            <name locale="en_US">OUT_A@2</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="5.08" uuid="{fd66289c-4d0c-448e-95da-93ecf13de30b}">
+            <name locale="en_US">OUT_A@3</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="15.24" uuid="{ee3909f6-549e-4d0d-9c1e-5c006796ae70}">
+            <name locale="en_US">PVDD_A@1</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="17.78" uuid="{85d5dc6e-8e61-4a99-8e84-dcaa00d31921}">
+            <name locale="en_US">PVDD_A@2</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="20.32" uuid="{cdf6080e-ed75-47ac-a62f-5d761d327188}">
+            <name locale="en_US">PVDD_A@3</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="7.62" uuid="{0543def4-9280-45ab-ac88-d58b5bf01ae9}">
+            <name locale="en_US">PGND@4</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="10.16" uuid="{84bbd8b1-bf71-425b-9d43-80096d14aead}">
+            <name locale="en_US">PGND@5</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="12.7" uuid="{dda0dfa2-652f-4bfb-b119-aa66ae122806}">
+            <name locale="en_US">PGND@6</name>
+        </pin>
+    </pins>
+</symbol>

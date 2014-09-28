@@ -1,0 +1,16 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{2958e21c-5f17-4de6-a4e9-2655ca36537b}</uuid>
+        <name locale="en_US">GNDI</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="-1.905">
+            <segment type="line" end_x="1.905" end_y="0"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="270" y="2.54" uuid="{c00c26a7-c261-4bdc-a6b5-534b8e399a5f}">
+            <name locale="en_US">GNDI</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,15 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{23b6e04d-5317-4a2f-9bdc-a71309cf124a}</uuid>
+        <name locale="en_US">PWRN</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="0" length="5.08" angle="270" y="7.62" uuid="{3ea8b6ce-555d-4921-9658-41070bd4ef2f}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="0" length="5.08" angle="90" y="-7.62" uuid="{e5d48254-c13d-4ebd-abe2-e94c29212093}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

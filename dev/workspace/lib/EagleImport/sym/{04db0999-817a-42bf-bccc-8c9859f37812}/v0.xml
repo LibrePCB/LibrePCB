@@ -1,0 +1,55 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{04db0999-817a-42bf-bccc-8c9859f37812}</uuid>
+        <name locale="en_US">L6203</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="12.7" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="-12.7" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-12.7" end_y="7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="15.24" length="2.54" angle="180" y="-5.08" uuid="{c0c41096-8430-421a-88c7-a15e0a9a33a4}">
+            <name locale="en_US">CBOOT2</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-2.54" uuid="{1bb71c20-cf90-4911-ad52-0aa6b681b512}">
+            <name locale="en_US">OUT2</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="5.08" uuid="{bbad52b8-0cd0-4084-91b4-f05943675298}">
+            <name locale="en_US">VREF</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="270" y="10.16" uuid="{b9d138db-46a1-4036-af89-b194fa5a5625}">
+            <name locale="en_US">VS</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="90" y="-12.7" uuid="{5170e1da-e667-4649-9c7a-a3f7873a5abe}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-2.54" uuid="{f5fc32ac-0396-4252-abc5-a181b54e399b}">
+            <name locale="en_US">IN2</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="2.54" uuid="{bf2a9f72-5811-409d-a375-974a9e5ebd82}">
+            <name locale="en_US">ENABLE</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="0" uuid="{5a82b401-280d-4c19-9a26-a39b694601bd}">
+            <name locale="en_US">IN1</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="0" uuid="{624f7a0f-d4ee-4965-af2a-7264c9954a8d}">
+            <name locale="en_US">OUT1</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="2.54" uuid="{73a927f0-6bca-4399-bc9b-49e98da2964e}">
+            <name locale="en_US">CBOOT1</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-5.08" uuid="{720ac3c6-54bb-497f-bf35-f403c9bd127d}">
+            <name locale="en_US">SENSE</name>
+        </pin>
+    </pins>
+</symbol>

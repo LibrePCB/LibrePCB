@@ -1,0 +1,31 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{b491d08a-7688-4da8-aace-6287cdb79b46}</uuid>
+        <name locale="en_US">78XX</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-5.08" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="5.08" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.4064" layer="10" start_x="5.08">
+            <segment type="line" end_x="5.08" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.4064" layer="10" start_x="5.08">
+            <segment type="line" end_x="-5.08" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="-5.08"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-7.62" length="2.54" angle="0" y="0" uuid="{db17e94d-3952-4935-803a-89d79cbfba22}">
+            <name locale="en_US">IN</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-7.62" uuid="{bf8143c8-36ad-47a5-9265-f57397e3ef41}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="0" uuid="{88930582-2615-437c-8b07-33d6f0c75de0}">
+            <name locale="en_US">OUT</name>
+        </pin>
+    </pins>
+</symbol>

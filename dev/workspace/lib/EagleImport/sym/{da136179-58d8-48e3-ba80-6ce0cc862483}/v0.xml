@@ -1,0 +1,58 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{da136179-58d8-48e3-ba80-6ce0cc862483}</uuid>
+        <name locale="en_US">AFNOR</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="8.89" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-6.35" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-11.43" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-6.35" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="6.35" end_y="-11.43"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="6.35" end_y="8.89"/>
+        </polygon>
+        <polygon fill="false" start_y="8.89" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="-11.43"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="-6.35">
+            <segment type="line" end_x="5.08" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-11.43" width="0.254" layer="10" start_x="6.35">
+            <segment type="line" end_x="6.35" end_y="8.89"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="-6.35" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="7.62" uuid="{43a9c354-a968-4d0a-914a-1be603b9bc75}">
+            <name locale="en_US">C1</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="5.08" uuid="{fdd94980-c454-4db1-87ef-403c61bbed90}">
+            <name locale="en_US">C2</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="2.54" uuid="{29a47803-79a9-4333-8016-ac3d22e6b835}">
+            <name locale="en_US">C3</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="0" uuid="{604c3c24-4fec-4a48-9b6a-50c7baf77c3c}">
+            <name locale="en_US">C4</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-2.54" uuid="{a84d704d-9e76-4862-a855-8b92075d79eb}">
+            <name locale="en_US">C5</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-5.08" uuid="{8218c989-f059-4661-8f91-8a64bc683fac}">
+            <name locale="en_US">C6</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-7.62" uuid="{6592bc70-8e0b-43a8-a7f1-f316b3d0c454}">
+            <name locale="en_US">C7</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-10.16" uuid="{50d09b88-91e0-4003-b497-b1fca4ad6c60}">
+            <name locale="en_US">C8</name>
+        </pin>
+    </pins>
+</symbol>

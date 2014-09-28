@@ -1,0 +1,19 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{695230ac-bc63-47c5-b42a-44343e770b2c}</uuid>
+        <name locale="en_US">NO</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="1.778" end_y="-2.032"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-5.08" uuid="{50c71ab2-edd3-4b38-add5-14ff38e86f63}">
+            <name locale="en_US">D</name>
+        </pin>
+        <pin x="0" length="2.54" angle="270" y="5.08" uuid="{e7bdeb88-abc7-4bbe-a33e-8abc6aea685e}">
+            <name locale="en_US">E</name>
+        </pin>
+    </pins>
+</symbol>

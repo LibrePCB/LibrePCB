@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{48ddc129-5027-40f2-9950-361b544f76aa}</uuid>
+        <name locale="en_US">BQ2000</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="10.16" length="2.54" angle="180" y="-2.54" uuid="{cb90ca53-5e8e-48bd-a60e-f83d9fe1d996}">
+            <name locale="en_US">SNS</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="90" y="-12.7" uuid="{cc032d39-3bb2-4b49-a836-ee620d5b268c}">
+            <name locale="en_US">VSS</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="7.62" uuid="{713a97f4-770f-4c3d-8551-f5eebfbf29a2}">
+            <name locale="en_US">!LED</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="0" uuid="{146ea63a-c5ff-4802-bc39-729275f49462}">
+            <name locale="en_US">BAT</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="5.08" uuid="{978b445c-634c-44ac-ab65-a217dde4918b}">
+            <name locale="en_US">MOD</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="270" y="12.7" uuid="{96e9520b-89f5-4d7e-869f-bdf5988dc495}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="0" uuid="{1b44368f-553f-476c-8179-e005b54225c2}">
+            <name locale="en_US">RC</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-7.62" uuid="{ed61a651-04b5-4554-b430-f7d63334c0dd}">
+            <name locale="en_US">TS</name>
+        </pin>
+    </pins>
+</symbol>

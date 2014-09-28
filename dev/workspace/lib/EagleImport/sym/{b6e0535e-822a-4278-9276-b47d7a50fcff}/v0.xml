@@ -1,0 +1,43 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{b6e0535e-822a-4278-9276-b47d7a50fcff}</uuid>
+        <name locale="en_US">HSWA2-30DR+</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="7.62" uuid="{1cc6efca-cd8b-442c-9d0c-e6a8e9019697}">
+            <name locale="en_US">RF1</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="2.54" uuid="{0f0c4435-8f40-4dc4-85d3-d829b4dc4c03}">
+            <name locale="en_US">RF2</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="5.08" uuid="{b0dd870a-9e65-4767-a628-b5167974ae7d}">
+            <name locale="en_US">RFCOM</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-2.54" uuid="{93ec09a1-2253-487a-b78d-fe340d798177}">
+            <name locale="en_US">C1</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-5.08" uuid="{1d88c0a2-7894-4474-8262-46c93deeeade}">
+            <name locale="en_US">C2</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-2.54" uuid="{72ba5a7d-7b74-4e1b-b150-58b5883f749a}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-5.08" uuid="{22cb1b68-3a47-4944-8b81-2ba63834740b}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

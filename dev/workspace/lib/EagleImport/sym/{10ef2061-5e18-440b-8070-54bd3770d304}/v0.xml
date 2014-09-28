@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{10ef2061-5e18-440b-8070-54bd3770d304}</uuid>
+        <name locale="en_US">DC+2</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="5.08" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="5.08"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{40154580-80e8-45e9-a61e-8b330a20ba8e}">
+            <name locale="en_US">+VIN</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{11c9bdb7-4545-473d-ade1-5d028eeb4698}">
+            <name locale="en_US">-VIN</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="2.54" uuid="{00c7e770-d438-4700-9db5-b6213c47534f}">
+            <name locale="en_US">+VOUT</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-2.54" uuid="{1af420be-4557-4238-b277-80a415684a04}">
+            <name locale="en_US">-VOUT</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="2.54" uuid="{fb03d503-7ab6-442a-9f4c-ee17342f466c}">
+            <name locale="en_US">+VOUT1</name>
+        </pin>
+        <pin x="17.78" length="5.08" angle="180" y="-2.54" uuid="{0856249a-4f6d-4485-bc4f-2bcf01f2a6c1}">
+            <name locale="en_US">-VOUT1</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="-2.54" uuid="{824e0d50-0e30-4433-846a-0c480613c2f3}">
+            <name locale="en_US">-VIN1</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="2.54" uuid="{c5ea14c6-7e99-411f-8be7-e372055df05b}">
+            <name locale="en_US">+VIN1</name>
+        </pin>
+    </pins>
+</symbol>

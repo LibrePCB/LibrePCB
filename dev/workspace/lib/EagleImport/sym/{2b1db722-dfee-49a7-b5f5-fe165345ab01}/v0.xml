@@ -1,0 +1,43 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{2b1db722-dfee-49a7-b5f5-fe165345ab01}</uuid>
+        <name locale="en_US">IGFET-DN-GDS</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-1.2192" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="3.683" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-3.683"/>
+        </polygon>
+        <polygon fill="false" start_y="0.635" width="0.254" layer="10" start_x="1.905">
+            <segment type="line" end_x="0.635" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.635" width="0.254" layer="10" start_x="1.905">
+            <segment type="line" end_x="0.635" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="-1.143">
+            <segment type="line" end_x="-1.143" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="2.54" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="-2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="5.08" length="5.08" angle="180" y="2.54" uuid="{72edd9bd-9215-4724-9ed3-1b3f4bcc2a51}">
+            <name locale="en_US">D</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-2.54" uuid="{920c9b3f-86ab-4ecc-b08d-06848a1791ca}">
+            <name locale="en_US">S</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-2.54" uuid="{3c4d08f0-d494-41f2-8de5-53dacdba83aa}">
+            <name locale="en_US">G</name>
+        </pin>
+    </pins>
+</symbol>

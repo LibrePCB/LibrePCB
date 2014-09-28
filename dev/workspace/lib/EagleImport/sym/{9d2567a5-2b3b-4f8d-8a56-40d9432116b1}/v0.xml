@@ -1,0 +1,64 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{9d2567a5-2b3b-4f8d-8a56-40d9432116b1}</uuid>
+        <name locale="en_US">MAX670</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-15.24" width="0.4064" layer="10" start_x="-12.7">
+            <segment type="line" end_x="10.16" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="-12.7" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-15.24" width="0.4064" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-12.7" end_y="15.24"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="15.24" length="5.08" angle="180" y="12.7" uuid="{f47d3535-5cc9-41a4-9650-8db942fd7ece}">
+            <name locale="en_US">VOUT-S1</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="10.16" uuid="{e8c7c197-7bc1-4fac-bf9e-1e88dfda3ed4}">
+            <name locale="en_US">VOUT-S2</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="7.62" uuid="{f2fea1af-6716-452e-bce7-3ac3261e4721}">
+            <name locale="en_US">OUT-F</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-7.62" uuid="{a764a346-844d-490e-9a78-df61c772afc2}">
+            <name locale="en_US">GND-F</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-10.16" uuid="{37022f5b-b5f4-4a3b-b6e5-5afbe7444604}">
+            <name locale="en_US">GND-S1</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-12.7" uuid="{c219ba7d-ee2b-4992-bd90-7c6c56bd6b41}">
+            <name locale="en_US">GND-S2</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-2.54" uuid="{49b69e2a-3d67-48c2-990c-33f3380caf2c}">
+            <name locale="en_US">+15V</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="12.7" uuid="{fd29f57f-aa76-475e-b678-e2c9b2de4a70}">
+            <name locale="en_US">OADJ</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="7.62" uuid="{4f6e2164-cf6d-4663-b67b-b13119450d4d}">
+            <name locale="en_US">FADJ</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="5.08" uuid="{f94fe6ea-ea73-4219-ae76-a3c71631c3da}">
+            <name locale="en_US">FADJ@1</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="-7.62" uuid="{ccac281b-302e-48d2-9cbe-0a9fb90c9b32}">
+            <name locale="en_US">NC</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="-10.16" uuid="{753e0c3e-a301-41ec-8d76-155efe16af73}">
+            <name locale="en_US">NC@1</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="-12.7" uuid="{da273921-b28e-4429-b8c9-f223407d0e70}">
+            <name locale="en_US">NC@2</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="-2.54" uuid="{b452213d-3681-4edf-b015-68c6b1c2322a}">
+            <name locale="en_US">TP</name>
+        </pin>
+    </pins>
+</symbol>

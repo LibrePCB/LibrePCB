@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{2e0633f1-3917-4d22-8246-4e9ff8f59768}</uuid>
+        <name locale="en_US">BD6230</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="10.16" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="12.7" length="2.54" angle="180" y="0" uuid="{1a67de01-b396-43eb-a5e7-0f5bd5953730}">
+            <name locale="en_US">OUT1</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-2.54" uuid="{8a863d1b-b9de-4aba-a465-db484ddff823}">
+            <name locale="en_US">OUT2</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="0" uuid="{c41cd092-df4c-4a85-a269-12d9fc79a079}">
+            <name locale="en_US">FIN</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-2.54" uuid="{3469d294-ae1f-486c-8c77-480ba90dd010}">
+            <name locale="en_US">RIN</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="2.54" uuid="{4779bee4-8914-4ee5-b572-87fb39d6c739}">
+            <name locale="en_US">VREF</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="7.62" uuid="{ba07b4a0-4262-4a03-aac4-0c7b24839621}">
+            <name locale="en_US">VCC@1</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="5.08" uuid="{d5600a37-38a2-44cb-88b6-019cc4143c7b}">
+            <name locale="en_US">VCC@2</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-7.62" uuid="{e312d760-c6f9-4cf1-b872-ac3a00186205}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

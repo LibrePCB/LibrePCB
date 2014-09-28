@@ -1,0 +1,64 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{874e266f-fa17-4bef-8cb8-3387165a2780}</uuid>
+        <name locale="en_US">VLBUS</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="17.78" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="-20.32" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="-20.32" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="17.78"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="15.24" length="5.08" angle="180" y="15.24" uuid="{0b51d95d-f731-417e-930e-eaf39363709c}">
+            <name locale="en_US">VL_ADS</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="12.7" uuid="{82a72d22-3567-4a8d-99a2-165124af2a55}">
+            <name locale="en_US">VL_BE0</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="0" uuid="{4a43a3fb-d224-450b-a253-ea487a14c011}">
+            <name locale="en_US">VL_BRDY</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-2.54" uuid="{ee92146f-c989-4131-8d06-ad679db692b2}">
+            <name locale="en_US">VL_D/C</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-5.08" uuid="{2184a271-65ff-4817-9f50-1e9df8dfeb82}">
+            <name locale="en_US">VL_LCLK</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-7.62" uuid="{f0159686-023a-454f-84c6-4fcbfc708025}">
+            <name locale="en_US">VL_LDEV</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-10.16" uuid="{cea15743-6734-4e6a-8e55-e1dba931e46f}">
+            <name locale="en_US">VL_LRDY</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-12.7" uuid="{82372cfc-b62e-445d-9803-1729c118ea3b}">
+            <name locale="en_US">VL_M/IO</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-15.24" uuid="{d3883e71-b82a-4af2-90c9-b306baa345d0}">
+            <name locale="en_US">VL_RST</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-17.78" uuid="{ec4c26f6-7e1d-4ec0-a89f-83d45ab1e63f}">
+            <name locale="en_US">VL_W/R</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="10.16" uuid="{33ad8bcd-d8d4-4495-b4c6-3e0e04dfc7d7}">
+            <name locale="en_US">VL_BE1</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="7.62" uuid="{fbede842-4047-40c4-8ab4-dc737f38d97d}">
+            <name locale="en_US">VL_BE2</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="5.08" uuid="{ff7f2456-d2fc-4652-9804-3ebb1ced20c3}">
+            <name locale="en_US">VL_BE3</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="2.54" uuid="{a91c3fc6-7f45-47c2-ba6b-0b33f689ecb3}">
+            <name locale="en_US">VL_BLAST</name>
+        </pin>
+    </pins>
+</symbol>

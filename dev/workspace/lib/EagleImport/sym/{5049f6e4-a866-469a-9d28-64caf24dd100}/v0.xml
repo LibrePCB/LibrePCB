@@ -1,0 +1,40 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{5049f6e4-a866-469a-9d28-64caf24dd100}</uuid>
+        <name locale="en_US">BNC-FGND</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="-0.762" end_y="-1.778"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="-0.508" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0.508" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-0.762" end_y="0.508"/>
+        </polygon>
+        <polygon fill="false" start_y="0.508" width="0.254" layer="10" start_x="-0.762">
+            <segment type="line" end_x="-0.508" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="-0.508">
+            <segment type="line" end_x="-0.762" end_y="-0.508"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.508" width="0.254" layer="10" start_x="-0.762">
+            <segment type="line" end_x="-2.54" end_y="-0.508"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.3048" layer="10" start_x="-2.54">
+            <segment type="line" end_x="0" end_y="0.508"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.3048" layer="10" start_x="-2.54">
+            <segment type="line" end_x="0" end_y="-0.508"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="2.54" length="2.54" angle="180" y="0" uuid="{12776268-9bdb-4ac8-a4b3-fb15685fb82f}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="180" y="-2.54" uuid="{7473449f-7707-4920-b5cb-394d2b67ea38}">
+            <name locale="en_US">2</name>
+        </pin>
+    </pins>
+</symbol>

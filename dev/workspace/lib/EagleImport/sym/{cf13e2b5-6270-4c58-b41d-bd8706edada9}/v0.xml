@@ -1,0 +1,79 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{cf13e2b5-6270-4c58-b41d-bd8706edada9}</uuid>
+        <name locale="en_US">SMF51-4</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.032" width="0.1016" layer="10" start_x="1.27">
+            <segment type="line" end_x="1.27" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="0.508" width="0.1016" layer="10" start_x="1.27">
+            <segment type="line" end_x="1.27" end_y="-0.254"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.016" width="0.1016" layer="10" start_x="1.27">
+            <segment type="line" end_x="1.27" end_y="-1.778"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1016" layer="10" start_x="1.27">
+            <segment type="line" end_x="1.27" end_y="-3.356"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="-0.254">
+            <segment type="line" end_x="-0.254" end_y="-3.3866"/>
+        </polygon>
+        <polygon fill="false" start_y="-3.3866" width="0.254" layer="10" start_x="-0.254">
+            <segment type="line" end_x="-0.254" end_y="-1.6932"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.6934" width="0.254" layer="10" start_x="-0.254">
+            <segment type="line" end_x="-0.254" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="-0.254">
+            <segment type="line" end_x="-0.254" end_y="1.6934"/>
+        </polygon>
+        <polygon fill="false" start_y="1.6934" width="0.254" layer="10" start_x="-0.254">
+            <segment type="line" end_x="-0.254" end_y="3.3866"/>
+        </polygon>
+        <polygon fill="false" start_y="3.3866" width="0.254" layer="10" start_x="-0.254">
+            <segment type="line" end_x="-0.254" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="3.556" width="0.1016" layer="10" start_x="1.27">
+            <segment type="line" end_x="1.27" end_y="2.794"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.1016" layer="10" start_x="1.27">
+            <segment type="line" end_x="1.27" end_y="4.318"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="2.794">
+            <segment type="line" end_x="2.794" end_y="0.8466"/>
+        </polygon>
+        <polygon fill="false" start_y="0.8466" width="0.254" layer="10" start_x="2.794">
+            <segment type="line" end_x="2.794" end_y="-0.8466"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.8466" width="0.254" layer="10" start_x="2.794">
+            <segment type="line" end_x="2.794" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.524" width="0.1524" layer="10" start_x="-2.032">
+            <segment type="line" end_x="3.81" end_y="0.508"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.1524" layer="10" start_x="3.556">
+            <segment type="line" end_x="4.064" end_y="-0.254"/>
+        </polygon>
+        <polygon fill="false" start_y="-4.064" width="0.1016" layer="10" start_x="1.27">
+            <segment type="line" end_x="1.27" end_y="-4.88"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{5ffafc6c-f081-4a75-9542-8b95c5b0a4f5}">
+            <name locale="en_US">E1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="5.08" uuid="{f58ba0ec-7d08-403d-8579-f75ae8a28ec8}">
+            <name locale="en_US">A1</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="-2.54" uuid="{3f10db60-35bf-4e09-bed0-fc921ebfe25a}">
+            <name locale="en_US">E2</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="2.54" uuid="{de2d0bd3-2399-4d9b-b3a6-ac8ef871b27c}">
+            <name locale="en_US">A2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{e3ff0a2b-6061-4e18-8d97-42916d1fb573}">
+            <name locale="en_US">Z</name>
+        </pin>
+    </pins>
+</symbol>

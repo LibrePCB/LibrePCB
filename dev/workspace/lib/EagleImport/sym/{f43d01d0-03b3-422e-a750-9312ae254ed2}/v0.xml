@@ -1,0 +1,106 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{f43d01d0-03b3-422e-a750-9312ae254ed2}</uuid>
+        <name locale="en_US">XR-1020</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-20.32" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="-20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="-20.32" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="22.86"/>
+        </polygon>
+        <polygon fill="false" start_y="22.86" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="22.86"/>
+        </polygon>
+        <polygon fill="false" start_y="22.86" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="-20.32"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="5.08" angle="0" y="0" uuid="{c80b9694-c83d-4113-badc-b906ccfa0a44}">
+            <name locale="en_US">S0</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-2.54" uuid="{a98370b1-b1f0-4187-b29e-3ffbdd719e08}">
+            <name locale="en_US">S1</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-5.08" uuid="{72e2c3b2-e3ff-4609-b258-288564cac25a}">
+            <name locale="en_US">S2</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-7.62" uuid="{8bb04417-f87c-4302-b73b-4bae4d0814c3}">
+            <name locale="en_US">S3</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-10.16" uuid="{2cfa29e9-06a6-400b-a3cb-a1d7b482e463}">
+            <name locale="en_US">S4</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-12.7" uuid="{d1aa8e09-fbb8-4bae-b5c7-981bd000e086}">
+            <name locale="en_US">S5</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-15.24" uuid="{a7c15fda-1bd8-4dd2-b15c-f3595a814c64}">
+            <name locale="en_US">S6</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-17.78" uuid="{788647fc-2341-4bc8-9809-6d7781d59641}">
+            <name locale="en_US">S7</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="7.62" uuid="{df419873-560e-498d-b054-b5d429c57ff2}">
+            <name locale="en_US">!S</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="5.08" uuid="{11c3e11c-aff3-4d2d-9d1b-9d955a0dd92f}">
+            <name locale="en_US">!CS</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="20.32" uuid="{3eef5b57-87fa-473e-96ad-eeffc31f5d8f}">
+            <name locale="en_US">NIN</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="12.7" uuid="{8ec8f257-a016-43cd-b18a-52053c70aa15}">
+            <name locale="en_US">HPIN</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="15.24" uuid="{aa7ea8c0-d672-4465-bc8b-86e9aa8f004d}">
+            <name locale="en_US">1KIN</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="17.78" uuid="{8c4f12f5-1508-49df-82ac-9c4b97ecd4a8}">
+            <name locale="en_US">FLTIN</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="10.16" uuid="{4c23d86c-8619-4eb5-b452-3d504445948e}">
+            <name locale="en_US">XTIN</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="10.16" uuid="{290b54b6-f7e8-4a3e-951a-2df7d704b109}">
+            <name locale="en_US">CLKIN</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="20.32" uuid="{70ce0ce7-f885-4237-8eb2-070fc73cca57}">
+            <name locale="en_US">NOUT</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="17.78" uuid="{3df4d35e-a8d6-4cf3-b46e-5eeab27ca415}">
+            <name locale="en_US">FLTOUT</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="15.24" uuid="{f4652716-9977-4736-84a0-f3989f5c46fa}">
+            <name locale="en_US">1KOUT</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="12.7" uuid="{b87a0d4d-2ba8-4af5-8b0e-f22a93634a56}">
+            <name locale="en_US">HPOUT</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="5.08" uuid="{54bed75a-0c36-4895-9f78-7153f4b6154a}">
+            <name locale="en_US">XTOUT</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-17.78" uuid="{6a46d45e-e191-4511-a633-e6e7b6655056}">
+            <name locale="en_US">DGND</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-15.24" uuid="{3f2a918e-364f-4f83-92f6-dbaf148c330d}">
+            <name locale="en_US">AGND</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-12.7" uuid="{769e51da-00e7-4b7a-9228-deeb82bf02ed}">
+            <name locale="en_US">VSSD</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-10.16" uuid="{86758b46-d6e6-4498-98fc-c596d1ab0860}">
+            <name locale="en_US">VSSA</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-7.62" uuid="{9ade9e09-4eb2-417a-9dbd-a6d34aeadefa}">
+            <name locale="en_US">VDDD</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-5.08" uuid="{253aeb06-db92-4dac-9518-233ec7193cba}">
+            <name locale="en_US">VDDA</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="0" uuid="{8975744f-ad74-4274-a734-769e513c0ec6}">
+            <name locale="en_US">NC</name>
+        </pin>
+    </pins>
+</symbol>

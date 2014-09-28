@@ -1,0 +1,12 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{f16f9ee7-c938-41e6-8887-79f8751cc813}</uuid>
+        <name locale="en_US">VL_PIN</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="2.54" length="2.54" angle="180" y="0" uuid="{2d4ecf13-7468-4625-b837-1611d3c3b4bd}">
+            <name locale="en_US">VL</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,22 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{5be2af3c-9434-4794-984f-d9be5903b641}</uuid>
+        <name locale="en_US">GND3</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="-1.27">
+            <segment type="line" end_x="1.27" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="1.27">
+            <segment type="line" end_x="0" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="-1.27" end_y="0"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="270" y="2.54" uuid="{6f29f8e4-a48d-43d8-929e-816ac136b78c}">
+            <name locale="en_US">GND3</name>
+        </pin>
+    </pins>
+</symbol>

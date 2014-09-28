@@ -1,0 +1,154 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{7aa93d1f-a5e1-4239-a78a-71ded7bc6063}</uuid>
+        <name locale="en_US">XC9536_PC44</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-25.4" width="0.254" layer="10" start_x="-25.4">
+            <segment type="line" end_x="25.4" end_y="-25.4"/>
+        </polygon>
+        <polygon fill="false" start_y="-25.4" width="0.254" layer="10" start_x="25.4">
+            <segment type="line" end_x="25.4" end_y="25.4"/>
+        </polygon>
+        <polygon fill="false" start_y="25.4" width="0.254" layer="10" start_x="25.4">
+            <segment type="line" end_x="-25.4" end_y="25.4"/>
+        </polygon>
+        <polygon fill="false" start_y="25.4" width="0.254" layer="10" start_x="-25.4">
+            <segment type="line" end_x="-25.4" end_y="-25.4"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-30.48" length="5.08" angle="0" y="12.7" uuid="{125a1e2b-678d-4cad-b482-eb813a218d54}">
+            <name locale="en_US">PB01/00</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="10.16" uuid="{3f7b6e71-6336-4fa0-8c56-130365253691}">
+            <name locale="en_US">PB00/00</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="7.62" uuid="{0d84abf5-efcc-4054-b36c-30ca8dcc3382}">
+            <name locale="en_US">PB00/01</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="5.08" uuid="{9962f6c3-6fdb-4f24-b677-2ea75f22b976}">
+            <name locale="en_US">PB00/03</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="2.54" uuid="{708e96dc-2329-4f6d-90b9-c3b749c25081}">
+            <name locale="en_US">PB00/02</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="0" uuid="{cda20fa1-6f32-48ef-b107-2a90ef30d9e1}">
+            <name locale="en_US">PB00/04</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-2.54" uuid="{9dea2b01-3d8a-4d1d-bc1a-6f62669dfb69}">
+            <name locale="en_US">PB00/06</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-5.08" uuid="{cf7eb63f-7390-4672-803a-4b54bfa64996}">
+            <name locale="en_US">PB00/05</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-7.62" uuid="{ab33c596-dff9-449f-964f-d7ea015cb8f5}">
+            <name locale="en_US">PB00/07</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-10.16" uuid="{a9d5e759-f910-4bf2-a3f7-be3b9555d205}">
+            <name locale="en_US">VSSIO@1</name>
+        </pin>
+        <pin x="-30.48" length="5.08" angle="0" y="-12.7" uuid="{0ce609f3-ebe0-4c80-9da3-f9ce1248ffbb}">
+            <name locale="en_US">PB00/08</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="90" y="-30.48" uuid="{349239b3-e897-47ff-a3d9-82fa2778428b}">
+            <name locale="en_US">PB00/09</name>
+        </pin>
+        <pin x="-10.16" length="5.08" angle="90" y="-30.48" uuid="{bcd88bf5-b6b7-40f8-b878-46413b91d700}">
+            <name locale="en_US">PB00/10</name>
+        </pin>
+        <pin x="-7.62" length="5.08" angle="90" y="-30.48" uuid="{3fff6714-2664-4744-b5d9-6749fe2206e1}">
+            <name locale="en_US">PB00/11</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="90" y="-30.48" uuid="{f5c865a9-dd74-4e7f-8a06-2a8beb888101}">
+            <name locale="en_US">TDI</name>
+        </pin>
+        <pin x="-2.54" length="5.08" angle="90" y="-30.48" uuid="{4cde627f-96bb-4812-83dc-e339381dbc32}">
+            <name locale="en_US">TMS</name>
+        </pin>
+        <pin x="0" length="5.08" angle="90" y="-30.48" uuid="{c8aa42b5-8f7d-4119-b782-7c7937cebf8d}">
+            <name locale="en_US">TCK</name>
+        </pin>
+        <pin x="2.54" length="5.08" angle="90" y="-30.48" uuid="{4e212982-d07e-4e72-bdfb-87b9f55f6e98}">
+            <name locale="en_US">PB00/12</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="90" y="-30.48" uuid="{3285cb01-b070-43a4-b021-aef21a78c2a4}">
+            <name locale="en_US">PB00/13</name>
+        </pin>
+        <pin x="7.62" length="5.08" angle="90" y="-30.48" uuid="{c89cadb6-cbcd-47c2-99b9-dd8b8290c1e7}">
+            <name locale="en_US">PB00/14</name>
+        </pin>
+        <pin x="10.16" length="5.08" angle="90" y="-30.48" uuid="{1f25bd22-d2a6-4693-8be6-8200e446d564}">
+            <name locale="en_US">VCCINT@1</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="90" y="-30.48" uuid="{7d303bb1-751c-4805-b822-a8376c0e087a}">
+            <name locale="en_US">PB00/15</name>
+        </pin>
+        <pin x="30.48" length="5.08" angle="180" y="-12.7" uuid="{1340438b-71d4-4bbe-aba2-0e7e30051f0d}">
+            <name locale="en_US">VSSINT@1</name>
+        </pin>
+        <pin x="30.48" length="5.08" angle="180" y="-10.16" uuid="{13a4425b-11b6-4fb3-9071-1add2e8bdb52}">
+            <name locale="en_US">PB00/16</name>
+        </pin>
+        <pin x="30.48" length="5.08" angle="180" y="-7.62" uuid="{5c992ef2-9ce0-4aeb-8977-a5823d6f68b8}">
+            <name locale="en_US">PB01/16</name>
+        </pin>
+        <pin x="30.48" length="5.08" angle="180" y="-5.08" uuid="{b2be6b4e-bc17-433b-a22c-07480255d6e7}">
+            <name locale="en_US">PB01/15</name>
+        </pin>
+        <pin x="30.48" length="5.08" angle="180" y="-2.54" uuid="{fc1f7129-145f-44e7-9266-e891d2e94657}">
+            <name locale="en_US">PB01/14</name>
+        </pin>
+        <pin x="30.48" length="5.08" angle="180" y="0" uuid="{cc0c692a-124d-46f8-af65-80f277631595}">
+            <name locale="en_US">PB01/13</name>
+        </pin>
+        <pin x="30.48" length="5.08" angle="180" y="2.54" uuid="{52105b2f-b75b-45d7-9f71-9ecbaa4f417e}">
+            <name locale="en_US">PB01/12</name>
+        </pin>
+        <pin x="30.48" length="5.08" angle="180" y="5.08" uuid="{fa43fdae-82b2-4a9a-ae87-7d97561022d0}">
+            <name locale="en_US">TDO</name>
+        </pin>
+        <pin x="30.48" length="5.08" angle="180" y="7.62" uuid="{618c6322-27c4-45f7-900f-e35a0ec1a729}">
+            <name locale="en_US">VSSIO@2</name>
+        </pin>
+        <pin x="30.48" length="5.08" angle="180" y="10.16" uuid="{8bb84236-d4c8-4dfc-8368-920636cde456}">
+            <name locale="en_US">VCCIO@1</name>
+        </pin>
+        <pin x="30.48" length="5.08" angle="180" y="12.7" uuid="{ce602f0d-420c-48c3-8613-1a39bcc2afbb}">
+            <name locale="en_US">PB01/11</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="270" y="30.48" uuid="{b61fd3fa-e083-4b73-9e03-37f9971716e1}">
+            <name locale="en_US">PB01/10</name>
+        </pin>
+        <pin x="10.16" length="5.08" angle="270" y="30.48" uuid="{c6a9fa88-1791-4231-b6eb-b1b4ff67b103}">
+            <name locale="en_US">PB01/09</name>
+        </pin>
+        <pin x="7.62" length="5.08" angle="270" y="30.48" uuid="{7cb140f1-350e-42b1-9ee3-03bce1c722f1}">
+            <name locale="en_US">PB01/08</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="270" y="30.48" uuid="{277f6873-b1d3-411b-b9c3-55576c4d876a}">
+            <name locale="en_US">PB01/07</name>
+        </pin>
+        <pin x="2.54" length="5.08" angle="270" y="30.48" uuid="{3d9e5207-438e-498b-a347-5be42c171345}">
+            <name locale="en_US">PB01/06</name>
+        </pin>
+        <pin x="0" length="5.08" angle="270" y="30.48" uuid="{8697cfd5-3752-43fa-a447-a11027b1bff0}">
+            <name locale="en_US">PB01/05</name>
+        </pin>
+        <pin x="-2.54" length="5.08" angle="270" y="30.48" uuid="{a2d66376-3fd6-45ae-b38c-fbff5f40bb7d}">
+            <name locale="en_US">PB01/04</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="270" y="30.48" uuid="{358205f6-d65b-493e-a949-058537301cc1}">
+            <name locale="en_US">VCCINT/VPP</name>
+        </pin>
+        <pin x="-7.62" length="5.08" angle="270" y="30.48" uuid="{f129a93b-14ca-4df6-92f5-3dda2a827a87}">
+            <name locale="en_US">PB01/02</name>
+        </pin>
+        <pin x="-10.16" length="5.08" angle="270" y="30.48" uuid="{5402c9a0-556e-4de7-a498-ece4b721a1d6}">
+            <name locale="en_US">PB01/03</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="270" y="30.48" uuid="{f3e51d9c-3099-45b8-a74e-935254e7109d}">
+            <name locale="en_US">PB01/01</name>
+        </pin>
+    </pins>
+</symbol>

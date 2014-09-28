@@ -1,0 +1,67 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{0b36c09c-615a-4bdd-a1f3-6a709fcb1821}</uuid>
+        <name locale="en_US">PWR6-2-7</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="15.24" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="15.24" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="-15.24" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="-15.24" end_y="5.08"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="270" y="7.62" uuid="{3292208a-f949-4c1f-94e3-77aac1a5a6af}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="270" y="7.62" uuid="{8c88a3fd-aa8d-4350-8f2c-81ca0e32de2e}">
+            <name locale="en_US">VCC@1</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="90" y="-7.62" uuid="{106bf01c-5d81-499a-9f74-4c136c320867}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="90" y="-7.62" uuid="{bd51cb94-91de-441a-bca7-46bd9f46095a}">
+            <name locale="en_US">GND@1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="90" y="-7.62" uuid="{a5c5063c-7f8d-4d6f-8623-535f75bb1a5a}">
+            <name locale="en_US">GND@2</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-7.62" uuid="{b5823f90-1a50-4b2d-b3b2-5ead8815c932}">
+            <name locale="en_US">GND@3</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-7.62" uuid="{1e560591-c158-4103-8518-b13b69e139e9}">
+            <name locale="en_US">GND@4</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="90" y="-7.62" uuid="{4c376959-de1e-4f57-a317-03a5d949f9b2}">
+            <name locale="en_US">GND@5</name>
+        </pin>
+        <pin x="0" length="2.54" angle="270" y="7.62" uuid="{b9e31e3d-539d-4732-b981-8fd761ab6549}">
+            <name locale="en_US">VCCIO</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="270" y="7.62" uuid="{9a7d0b70-6ade-4174-909e-c182afdc7e57}">
+            <name locale="en_US">VCCIO@1</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="270" y="7.62" uuid="{9b4c8d9e-6f1a-4ab3-979b-9a1b8075a1c2}">
+            <name locale="en_US">VCCIO@2</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="270" y="7.62" uuid="{0a40ef72-2ca0-48fd-988e-e05007fb1c46}">
+            <name locale="en_US">VCCIO@3</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="270" y="7.62" uuid="{b62b8667-3c80-47e2-86f4-d0cea6ec8a9f}">
+            <name locale="en_US">VCCIO@4</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="270" y="7.62" uuid="{d360260e-8c2e-4fe8-ad81-367ec76be161}">
+            <name locale="en_US">VCCIO@5</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="90" y="-7.62" uuid="{dddfe27d-2052-4c85-ad38-8384f89bf2da}">
+            <name locale="en_US">GND@6</name>
+        </pin>
+    </pins>
+</symbol>

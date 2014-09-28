@@ -1,0 +1,37 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{497f8545-cb8f-42ea-8844-5d531e75b835}</uuid>
+        <name locale="en_US">EMCO-HVDC-A</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{138eb4e5-2cbb-48f3-a2cf-e1ff74ef54b3}">
+            <name locale="en_US">+IN</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{b96d3d2a-1225-4411-b9fb-244f9fe0dbce}">
+            <name locale="en_US">-IN</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="5.08" uuid="{66b4e3d8-a45c-4b02-b858-9bd26b1774a5}">
+            <name locale="en_US">+HVOUT</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{64fe8c31-eafe-4423-8a4d-581e3899b344}">
+            <name locale="en_US">CONTROL</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="0" uuid="{43a28041-d364-4800-bfc7-c642af640874}">
+            <name locale="en_US">-HVOUT</name>
+        </pin>
+    </pins>
+</symbol>

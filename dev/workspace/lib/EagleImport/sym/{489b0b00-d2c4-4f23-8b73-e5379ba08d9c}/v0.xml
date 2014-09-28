@@ -1,0 +1,91 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{489b0b00-d2c4-4f23-8b73-e5379ba08d9c}</uuid>
+        <name locale="en_US">XC167-POWER</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="20.32">
+            <segment type="line" end_x="20.32" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.254" layer="10" start_x="20.32">
+            <segment type="line" end_x="20.32" end_y="20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="20.32" width="0.254" layer="10" start_x="20.32">
+            <segment type="line" end_x="-15.24" end_y="20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="20.32" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="-15.24" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="-15.24" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="20.32" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="20.32" end_y="17.78"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-20.32" length="5.08" angle="0" y="15.24" uuid="{454cb732-309e-485d-a4fe-20f92d678ed5}">
+            <name locale="en_US">VDDP</name>
+        </pin>
+        <pin x="-20.32" length="5.08" angle="0" y="12.7" uuid="{7db35241-e6a0-4730-9c0f-d4382ca3b8ce}">
+            <name locale="en_US">VDDP@1</name>
+        </pin>
+        <pin x="-20.32" length="5.08" angle="0" y="10.16" uuid="{1e27f1b4-769b-4d09-a9b6-feaccaa61cbd}">
+            <name locale="en_US">VDDP@2</name>
+        </pin>
+        <pin x="-20.32" length="5.08" angle="0" y="7.62" uuid="{edd6ca17-40de-461d-bbe1-9b96e71391cd}">
+            <name locale="en_US">VDDP@3</name>
+        </pin>
+        <pin x="-20.32" length="5.08" angle="0" y="5.08" uuid="{cc953acf-abbd-4183-9072-26263ee45f71}">
+            <name locale="en_US">VDDP@4</name>
+        </pin>
+        <pin x="-20.32" length="5.08" angle="0" y="2.54" uuid="{6c3e9d1e-9638-4eb1-a5c3-3e54c23ada84}">
+            <name locale="en_US">VDDP@5</name>
+        </pin>
+        <pin x="-20.32" length="5.08" angle="0" y="0" uuid="{c27a6367-8237-48fb-812a-ecc255821e9c}">
+            <name locale="en_US">VDDP@6</name>
+        </pin>
+        <pin x="-20.32" length="5.08" angle="0" y="-2.54" uuid="{06c41460-5ca9-41fb-97f6-6f866a1d48b7}">
+            <name locale="en_US">VSSP</name>
+        </pin>
+        <pin x="-20.32" length="5.08" angle="0" y="-5.08" uuid="{b1c53657-91c5-4c1a-bde7-dc015ff9a4bd}">
+            <name locale="en_US">VSSP@1</name>
+        </pin>
+        <pin x="-20.32" length="5.08" angle="0" y="-7.62" uuid="{5fa75240-cb2b-45cf-a742-67959de14235}">
+            <name locale="en_US">VSSP@2</name>
+        </pin>
+        <pin x="-20.32" length="5.08" angle="0" y="-10.16" uuid="{e0c5c361-53d9-4211-8a44-b5415a3f46ac}">
+            <name locale="en_US">VSSP@3</name>
+        </pin>
+        <pin x="-20.32" length="5.08" angle="0" y="-12.7" uuid="{9fe2d365-fc94-4594-8726-9f5a8999e3c9}">
+            <name locale="en_US">VSSP@4</name>
+        </pin>
+        <pin x="-20.32" length="5.08" angle="0" y="-15.24" uuid="{05fa85b6-b6d1-416b-8c38-0b3087a6adca}">
+            <name locale="en_US">VSSP@5</name>
+        </pin>
+        <pin x="25.4" length="5.08" angle="180" y="15.24" uuid="{6303fb7e-0dc3-457a-9c02-5ae71d48a77d}">
+            <name locale="en_US">VDDI</name>
+        </pin>
+        <pin x="25.4" length="5.08" angle="180" y="12.7" uuid="{5ff27215-b44d-457e-8fbe-7bb21252d590}">
+            <name locale="en_US">VDDI@1</name>
+        </pin>
+        <pin x="25.4" length="5.08" angle="180" y="10.16" uuid="{b5994ccf-174a-4acb-bb98-51a5630322e7}">
+            <name locale="en_US">VDDI@2</name>
+        </pin>
+        <pin x="25.4" length="5.08" angle="180" y="-2.54" uuid="{4097e26c-2731-4e39-8738-e8d248ed2852}">
+            <name locale="en_US">VSSI</name>
+        </pin>
+        <pin x="25.4" length="5.08" angle="180" y="-5.08" uuid="{199bd054-75a9-41e8-aeca-40499b510dd1}">
+            <name locale="en_US">VSSI@1</name>
+        </pin>
+        <pin x="25.4" length="5.08" angle="180" y="-7.62" uuid="{9a45a098-ecab-4693-b05c-ef53c6485d80}">
+            <name locale="en_US">VSSI@2</name>
+        </pin>
+        <pin x="25.4" length="5.08" angle="180" y="-10.16" uuid="{9573f07e-f1d0-47f4-a16d-f658c2f5ecf0}">
+            <name locale="en_US">VSSI@3</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,16 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{e985d399-a779-49aa-9099-a4f69c1e352c}</uuid>
+        <name locale="en_US">THERMAL</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-1.016" width="1.016" layer="10" start_x="-0.508">
+            <segment type="line" end_x="0.508" end_y="-1.016"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="270" y="2.54" uuid="{04b4e7be-deb3-45fe-bdd9-bc6818be9626}">
+            <name locale="en_US">TH</name>
+        </pin>
+    </pins>
+</symbol>

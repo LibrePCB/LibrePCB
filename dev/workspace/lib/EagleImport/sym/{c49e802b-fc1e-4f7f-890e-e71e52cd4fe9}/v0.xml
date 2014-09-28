@@ -1,0 +1,28 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{c49e802b-fc1e-4f7f-890e-e71e52cd4fe9}</uuid>
+        <name locale="en_US">TR-S1</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-3.81" width="0.254" layer="10" start_x="1.651">
+            <segment type="line" end_x="1.651" end_y="3.81"/>
+        </polygon>
+        <polygon fill="true" start_y="-3.81" width="0.254" layer="10" start_x="-0.889">
+            <segment type="line" end_x="0.889" end_y="-3.81"/>
+            <segment type="line" end_x="0.889" end_y="3.81"/>
+            <segment type="line" end_x="-0.889" end_y="3.81"/>
+            <segment type="line" end_x="-0.889" end_y="-3.81"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="5.08" angle="270" y="7.62" uuid="{3c307853-0b68-4cf5-afa3-4da1d645ab6f}">
+            <name locale="en_US">3</name>
+        </pin>
+        <pin x="0" length="5.08" angle="90" y="-7.62" uuid="{288a0846-8034-4508-9b1c-ea2597629f7e}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{1b78bcfa-0a8b-41b3-9ace-2fbdc74a761d}">
+            <name locale="en_US">2</name>
+        </pin>
+    </pins>
+</symbol>

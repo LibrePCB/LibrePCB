@@ -1,0 +1,49 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{ea82f202-9fa7-45ca-b773-774cedb0af0d}</uuid>
+        <name locale="en_US">ER-RECEIVER</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="15.24"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="10.16" uuid="{f5142793-367d-4edd-8cda-1a93d6e65d8c}">
+            <name locale="en_US">ANT</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="12.7" uuid="{d4431e23-eb3d-4756-80f3-5cd61bd689d3}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-7.62" uuid="{de551a3a-e81d-4323-88f6-10f336c18a54}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="0" uuid="{bb7f8b39-fbe9-46d6-905d-4d9e5c368849}">
+            <name locale="en_US">SDI</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-10.16" uuid="{ca1947bc-6c97-47b0-ad5c-5f5213bb5805}">
+            <name locale="en_US">RFGND</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="7.62" uuid="{4430c2d8-f453-4d09-8219-b10d87b0b82e}">
+            <name locale="en_US">RSSI</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="2.54" uuid="{70419d07-46d1-4ca3-9ec9-2050eb34322c}">
+            <name locale="en_US">SDO</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="5.08" uuid="{1abeb5fa-64a0-4967-abaa-50da34dc62c3}">
+            <name locale="en_US">BSY</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-2.54" uuid="{16fc4931-3b67-42c4-a6b1-e5b02b012cea}">
+            <name locale="en_US">RDY</name>
+        </pin>
+    </pins>
+</symbol>

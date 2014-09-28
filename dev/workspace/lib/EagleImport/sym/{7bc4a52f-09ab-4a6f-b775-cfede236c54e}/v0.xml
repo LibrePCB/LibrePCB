@@ -1,0 +1,19 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{7bc4a52f-09ab-4a6f-b775-cfede236c54e}</uuid>
+        <name locale="en_US">FEM2</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0.889" width="0.254" layer="10" start_x="0.889">
+            <segment type="line" end_x="0.889" end_y="-0.889"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{0a806db5-7ca5-488e-bbb1-058fe34ad0d5}">
+            <name locale="en_US">B</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{efb8650b-ef30-47fa-85c5-97b9992300bf}">
+            <name locale="en_US">A</name>
+        </pin>
+    </pins>
+</symbol>

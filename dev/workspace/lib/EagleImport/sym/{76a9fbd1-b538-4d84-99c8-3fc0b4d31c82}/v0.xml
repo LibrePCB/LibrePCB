@@ -1,0 +1,49 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{76a9fbd1-b538-4d84-99c8-3fc0b4d31c82}</uuid>
+        <name locale="en_US">SH7751-SER</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-31.75"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{0837f6ac-671f-4bc1-8f8a-8971182e48dd}">
+            <name locale="en_US">TXD</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-15.24" uuid="{d3d64f57-b1ac-4dbd-9c36-de37c2a1b359}">
+            <name locale="en_US">MD2/RXD2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{21a6c60e-e795-4a4f-9563-481641afe760}">
+            <name locale="en_US">RXD</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-30.48" uuid="{fed9da85-3220-4322-91e0-87a6e2f0407e}">
+            <name locale="en_US">MD8/!RTS2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{e0c0efa7-9eeb-4d6a-a95b-38cbcee82e70}">
+            <name locale="en_US">SCK</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{05cd8863-da25-45db-a424-9ec4353fab10}">
+            <name locale="en_US">MD1/TXD2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{ba96ad0b-347c-4ddc-8395-2fd84c5d9c54}">
+            <name locale="en_US">MD0/SCK2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-27.94" uuid="{b416e341-7a88-4b83-997e-862b871005be}">
+            <name locale="en_US">MD7/CTS2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-17.78" uuid="{4be2abea-238b-4464-9051-52fe25d98894}">
+            <name locale="en_US">MD3/!CE2A</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-20.32" uuid="{6b95f0cb-d8ac-4d2f-a214-3d1eca163a51}">
+            <name locale="en_US">MD4/!CE2B</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-22.86" uuid="{62a834ac-f94e-4ed8-bfce-d3a7e843b353}">
+            <name locale="en_US">MD5</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-25.4" uuid="{a9e60d2e-418d-4121-825c-c3ff87512381}">
+            <name locale="en_US">MD6/!IOIS16</name>
+        </pin>
+    </pins>
+</symbol>

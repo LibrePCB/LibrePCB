@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{d12800b3-390c-44f6-af84-159e8e84cf41}</uuid>
+        <name locale="en_US">LS7184</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="12.7" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="-10.16" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{a7dcbac9-1623-4d0e-b289-271de01392cb}">
+            <name locale="en_US">RBIAS</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="7.62" uuid="{0da86948-7267-4707-8e42-990e5484ab36}">
+            <name locale="en_US">+VDC</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{74f75fe3-665c-4191-918c-0d1fa5c62ef9}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{005277cc-0757-42de-9744-f35cbccf8352}">
+            <name locale="en_US">AIN</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{6d70ca7f-6d12-458c-aaaf-71f74f9715be}">
+            <name locale="en_US">BIN</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{b9e58d31-ffdc-4a92-b8da-c64f719a903f}">
+            <name locale="en_US">MODE</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="2.54" uuid="{3e045fa4-9495-4180-b3dd-fa0f9eb7faa2}">
+            <name locale="en_US">CLOCK</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="0" uuid="{6fc9003c-1644-4f32-8eae-02ac634944f2}">
+            <name locale="en_US">UP/!DN</name>
+        </pin>
+    </pins>
+</symbol>

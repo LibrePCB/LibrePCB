@@ -1,0 +1,28 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{3f88fc55-19fe-4ea6-b168-0e3414a40349}</uuid>
+        <name locale="en_US">PINQ</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-1.27" width="0.3048" layer="10" start_x="1.27">
+            <segment type="line" end_x="2.54" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.3048" layer="10" start_x="2.54">
+            <segment type="line" end_x="1.27" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.3048" layer="10" start_x="1.27">
+            <segment type="line" end_x="0" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.3048" layer="10" start_x="0">
+            <segment type="line" end_x="1.27" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="-2.54" end_y="0"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="0" angle="0" y="0" uuid="{83407c08-c7ce-4e1f-a971-864683ec5e80}">
+            <name locale="en_US">1</name>
+        </pin>
+    </pins>
+</symbol>

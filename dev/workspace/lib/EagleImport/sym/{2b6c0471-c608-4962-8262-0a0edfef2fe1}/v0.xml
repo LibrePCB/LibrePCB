@@ -1,0 +1,43 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{2b6c0471-c608-4962-8262-0a0edfef2fe1}</uuid>
+        <name locale="en_US">SMR6-I</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-0.508" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="-2.54" end_y="-0.508"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.508" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="3.048"/>
+        </polygon>
+        <polygon fill="false" start_y="3.048" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="5.08" end_y="3.048"/>
+        </polygon>
+        <polygon fill="true" start_y="3.81" width="0.254" layer="10" start_x="-2.794">
+            <segment type="line" end_x="5.334" end_y="3.81"/>
+            <segment type="line" end_x="5.334" end_y="6.35"/>
+            <segment type="line" end_x="-2.794" end_y="6.35"/>
+            <segment type="line" end_x="-2.794" end_y="3.81"/>
+        </polygon>
+        <polygon fill="true" start_y="-3.81" width="0.254" layer="10" start_x="-2.794">
+            <segment type="line" end_x="5.334" end_y="-3.81"/>
+            <segment type="line" end_x="5.334" end_y="-1.27"/>
+            <segment type="line" end_x="-2.794" end_y="-1.27"/>
+            <segment type="line" end_x="-2.794" end_y="-3.81"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2.54" angle="0" y="5.08" uuid="{1991473a-e3fc-4a9e-9f10-f85b518d37c2}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="5.08" uuid="{4c306b35-43dc-42da-b703-c9d81edea045}">
+            <name locale="en_US">8</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-2.54" uuid="{e4b9617e-880c-4a9c-befe-3ef514d1b2bc}">
+            <name locale="en_US">4</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="-2.54" uuid="{106ad553-c6ac-4179-a94b-9c49240e944a}">
+            <name locale="en_US">5</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,112 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{81e80caa-78ce-40cb-a3cd-3fe0a2f78ca2}</uuid>
+        <name locale="en_US">TMS320VC5509-D</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="3.81" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-80.01"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{ed8df5d4-57ea-4657-8219-3485fd8524a5}">
+            <name locale="en_US">DX0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{8891ded1-7b93-4fd6-b9c3-90c885f20d55}">
+            <name locale="en_US">EMU0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{ac4e8066-fa8d-4854-8a04-f6a7864e043c}">
+            <name locale="en_US">EMU1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{0834047d-2dd1-450c-9c02-f3e7fbd8879a}">
+            <name locale="en_US">FSR0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{ebb226e0-a1dd-4e0c-b13f-ed1218a26d28}">
+            <name locale="en_US">FSX0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-33.02" uuid="{09e0a2ce-e972-49b3-9671-dc8985281dda}">
+            <name locale="en_US">GPIO0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-35.56" uuid="{e3df0cf4-31fc-424a-8ebb-3da8720dae6b}">
+            <name locale="en_US">GPIO1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-38.1" uuid="{c19dd076-0c41-4ba6-8598-8915aef36ec2}">
+            <name locale="en_US">GPIO2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-40.64" uuid="{5c8dc3da-6a6e-4f60-a05c-f13d4fc512c6}">
+            <name locale="en_US">GPIO3</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-43.18" uuid="{02af0299-8e5b-4f93-8baa-7922286ed6fd}">
+            <name locale="en_US">GPIO4</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-45.72" uuid="{a5454a99-693a-45db-a573-2b19c61f87ca}">
+            <name locale="en_US">GPIO5</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-48.26" uuid="{b0672eaf-0dd9-420f-8e78-a116edf0cd75}">
+            <name locale="en_US">GPIO6</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-50.8" uuid="{500b8feb-7563-41d8-afcf-b5894d72c6f7}">
+            <name locale="en_US">GPIO7</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-53.34" uuid="{4bb61414-da2b-4a3c-bff3-d654e3f50fe7}">
+            <name locale="en_US">NC1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-55.88" uuid="{8017ed4d-7e0a-4daf-a086-764bd55472b3}">
+            <name locale="en_US">NC2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-58.42" uuid="{1ec0855c-ec24-4e5a-af30-a087bb812c12}">
+            <name locale="en_US">NINT0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-60.96" uuid="{2bdee072-b035-4d2b-97e2-8f7d2615429b}">
+            <name locale="en_US">NINT1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-63.5" uuid="{8d1f6f38-e55f-4107-b3f1-3809c2e0c66a}">
+            <name locale="en_US">NINT2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-66.04" uuid="{9a20f434-0b68-49c5-b272-4987a08e67ca}">
+            <name locale="en_US">NINT3</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-68.58" uuid="{49953b41-693a-4662-954c-2618d344a277}">
+            <name locale="en_US">NINT4</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-71.12" uuid="{51101524-9625-4a53-9922-0b733c9cc440}">
+            <name locale="en_US">NRESET</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-73.66" uuid="{ef23c1eb-f917-4168-b96e-0c7580b23291}">
+            <name locale="en_US">PU</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-76.2" uuid="{bee97645-fe31-47c4-903e-768d94572e38}">
+            <name locale="en_US">RTCINX1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-78.74" uuid="{32cc7b1a-d284-45ec-92af-1b6724d31622}">
+            <name locale="en_US">RTCINX2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="2.54" uuid="{1259b857-aecb-407f-a255-08993716aee0}">
+            <name locale="en_US">ADVDD</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{3ed8b69e-2a44-4deb-af02-37cb0de6e99e}">
+            <name locale="en_US">ADVSS</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{6737c90f-efe8-4cbc-a764-200c0414f1bb}">
+            <name locale="en_US">AIN0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{ca1ba231-97d5-44fa-8ef7-e138f1a0a6a0}">
+            <name locale="en_US">AIN1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{f3d235d1-e0e0-401d-adcb-315f1e331316}">
+            <name locale="en_US">AIN2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{1479aa66-3839-41c8-b541-a5756d814d84}">
+            <name locale="en_US">AIN3</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{1a3be6ab-a451-42dc-b04a-b08d2b6c8297}">
+            <name locale="en_US">AVDD</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{bc22ea23-c2d5-4611-96c5-1e34f4f61c30}">
+            <name locale="en_US">AVSS@1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{6cbc4473-38cc-4ff9-b1fe-1cea62a69632}">
+            <name locale="en_US">AVSS@2</name>
+        </pin>
+    </pins>
+</symbol>

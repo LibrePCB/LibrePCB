@@ -1,0 +1,82 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{c698e028-891e-43be-b82c-5f0688866835}</uuid>
+        <name locale="en_US">16-I/O-1</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="20.32" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="15.24" end_y="20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="20.32" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="15.24" end_y="-27.94"/>
+        </polygon>
+        <polygon fill="false" start_y="-27.94" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="-15.24" end_y="-27.94"/>
+        </polygon>
+        <polygon fill="false" start_y="-27.94" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="-15.24" end_y="20.32"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="20.32" length="5.08" angle="180" y="-2.54" uuid="{9b69215e-6b6e-438c-be5b-d5698d194329}">
+            <name locale="en_US">PC6</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="180" y="-5.08" uuid="{1a17e82d-a848-45e9-974e-e6f1e534212d}">
+            <name locale="en_US">PC5</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="180" y="-7.62" uuid="{a10c7c93-6806-443f-84a3-2ce9db310a3d}">
+            <name locale="en_US">PC4</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="180" y="-10.16" uuid="{76570172-de9e-4208-ac2e-6f187a9aec44}">
+            <name locale="en_US">PC3</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="180" y="-12.7" uuid="{bb39967a-19fd-4abc-8203-e2ba1a9a62dc}">
+            <name locale="en_US">PC2</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="180" y="-15.24" uuid="{71b88e46-4842-499c-9de3-0dc3cc9398a2}">
+            <name locale="en_US">PC1</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="180" y="-17.78" uuid="{504b9927-68d2-4274-a7ed-666d7382073e}">
+            <name locale="en_US">PC0</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="180" y="15.24" uuid="{2d6a8566-90a2-4ff6-9208-3490e71cad74}">
+            <name locale="en_US">(ADC3)PB4</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="180" y="12.7" uuid="{063e2314-c069-4cd5-aeb9-44972bfe1590}">
+            <name locale="en_US">(ADC2)PB3</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="180" y="10.16" uuid="{dce54718-afc7-405c-bc4c-e24143debe31}">
+            <name locale="en_US">(ADC1)PB2</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="180" y="7.62" uuid="{28bd5037-c391-427f-a2ed-6044e900577c}">
+            <name locale="en_US">(OCP)PB1</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="180" y="5.08" uuid="{2038c9a7-9c77-4f62-815f-0f216d938e19}">
+            <name locale="en_US">(AVREF)PB0</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="180" y="-22.86" uuid="{2cd5a0c4-e6da-49f4-880c-b7c775bd9bae}">
+            <name locale="en_US">PD1</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="180" y="-25.4" uuid="{f744186e-b335-447d-8dca-84a3609f24bb}">
+            <name locale="en_US">PD0</name>
+        </pin>
+        <pin x="-20.32" length="5.08" angle="0" y="5.08" uuid="{f55b7145-5e4b-4473-bf5c-2197ff4d9438}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="-20.32" length="5.08" angle="0" y="7.62" uuid="{9f7232b4-49a9-4c6a-84e7-ff834090bb4f}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="-20.32" length="5.08" angle="0" y="15.24" uuid="{74ce1272-078b-419a-97f0-3450b2a66efe}">
+            <name locale="en_US">AGND</name>
+        </pin>
+        <pin x="-20.32" length="5.08" angle="0" y="17.78" uuid="{832427d5-bcf6-480b-9359-ff41cdbe325e}">
+            <name locale="en_US">AVCC</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="180" y="0" uuid="{db319510-d708-451c-ba73-fd0058b41763}">
+            <name locale="en_US">PC7</name>
+        </pin>
+        <pin x="20.32" length="5.08" angle="180" y="17.78" uuid="{ce37a74f-8e1d-45a9-b850-e1bff4c9edb6}">
+            <name locale="en_US">(ADC0)PB5</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,100 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{348bc23e-a9e3-4375-be87-43b16ca2cfbe}</uuid>
+        <name locale="en_US">DSP56F807-PWM</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="20.32" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="12.7" end_y="20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="20.32" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="-20.32" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="-12.7" end_y="-20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="-20.32" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-12.7" end_y="20.32"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="15.24" length="2.54" angle="180" y="-2.54" uuid="{253aea5e-3881-4897-b72a-20396f7476f4}">
+            <name locale="en_US">PWMB0</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-5.08" uuid="{bbbaa7c3-5d5c-4820-a841-05599ee52d4b}">
+            <name locale="en_US">PWMB1</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-7.62" uuid="{0e0fb428-261d-449e-9a7a-a3ba8a50b7e4}">
+            <name locale="en_US">PWMB2</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-10.16" uuid="{6df20d05-58bc-4c0f-a4a4-c998464d6a85}">
+            <name locale="en_US">PWMB3</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-12.7" uuid="{022f9f5f-d0ba-453b-8bd9-b7dab4c430fb}">
+            <name locale="en_US">PWMB4</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-15.24" uuid="{16c7a3ac-a634-4fff-8a29-d79ebaa4908b}">
+            <name locale="en_US">PWMB5</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="17.78" uuid="{3dc06fc3-5d8f-4b93-9f16-0852b9af1e97}">
+            <name locale="en_US">PWMA0</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="15.24" uuid="{6c0fac41-2b0d-428d-9290-319f1bb4e0d8}">
+            <name locale="en_US">PWMA1</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="12.7" uuid="{443c4cdb-abbd-4621-98f4-0aac8e02184a}">
+            <name locale="en_US">PWMA2</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="10.16" uuid="{eac6c7b3-417d-4cab-bf6a-6852ac20de7e}">
+            <name locale="en_US">PWMA3</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="7.62" uuid="{a9a905fb-8a4f-43e9-a27f-512f8e01a671}">
+            <name locale="en_US">PWMA4</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="5.08" uuid="{545c6e9f-14d8-4f6c-b303-2d3e0b74cf0a}">
+            <name locale="en_US">PWMA5</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-10.16" uuid="{dd481e47-6ef1-4d9e-9688-7051f6474313}">
+            <name locale="en_US">FAULTB0</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-12.7" uuid="{6ed2ee05-d2d2-4fb3-be50-4c5a6144778f}">
+            <name locale="en_US">FAULTB1</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-15.24" uuid="{3ecea019-d598-4af0-947f-03e62bdc1f86}">
+            <name locale="en_US">FAULTB2</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-17.78" uuid="{b2f8d6fb-d31d-4204-8386-fcae6ff2ed86}">
+            <name locale="en_US">FAULTB3</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="10.16" uuid="{92ae6fa6-eb5e-4083-b2f4-776118814296}">
+            <name locale="en_US">FAULTA0</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="7.62" uuid="{afddd1e4-d536-4f07-a773-48fe551e6c24}">
+            <name locale="en_US">FAULTA1</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="5.08" uuid="{253a96ea-1a6e-4124-88e6-3243987d065d}">
+            <name locale="en_US">FAULTA2</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="2.54" uuid="{ebcb3a5b-c471-4597-a134-795e748fa1d3}">
+            <name locale="en_US">FAULTA3</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="17.78" uuid="{aa951f8b-6038-4f76-a971-3de4e31ecf7f}">
+            <name locale="en_US">ISA0</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="15.24" uuid="{c92da853-0f45-46d2-a4bd-8bccd1f2b8fd}">
+            <name locale="en_US">ISA1</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="12.7" uuid="{2aa0fc50-7ce2-40bd-ad71-8ebf9e9c9800}">
+            <name locale="en_US">ISA2</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-2.54" uuid="{22f4454f-1347-4933-aa43-3ce771d48c5b}">
+            <name locale="en_US">ISB0</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-5.08" uuid="{204324f7-b348-46f7-b143-87fe3849b5e9}">
+            <name locale="en_US">ISB1</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-7.62" uuid="{17267721-5d51-4b9c-88f3-52f6a457d9b8}">
+            <name locale="en_US">ISB2</name>
+        </pin>
+    </pins>
+</symbol>

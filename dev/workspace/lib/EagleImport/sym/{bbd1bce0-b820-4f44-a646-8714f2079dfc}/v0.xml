@@ -1,0 +1,31 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{bbd1bce0-b820-4f44-a646-8714f2079dfc}</uuid>
+        <name locale="en_US">SH7751-AU</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-13.97"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{342943cf-af8b-4fa1-bb6f-fee901467214}">
+            <name locale="en_US">AUDSYNC</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{5748920a-f31a-4445-bd88-5ca59a0d362e}">
+            <name locale="en_US">AUDCK</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{d50f8a77-5676-4dcf-80aa-709d5605781f}">
+            <name locale="en_US">AUDATA0</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{0862fa41-532f-4897-8761-d7be3d8d8a8f}">
+            <name locale="en_US">AUDATA1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{420011cd-b5e8-41d4-b275-89221a580215}">
+            <name locale="en_US">AUDATA2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{50036204-a2f4-4f27-8b05-a9ec3eb92fe2}">
+            <name locale="en_US">AUDATA3</name>
+        </pin>
+    </pins>
+</symbol>

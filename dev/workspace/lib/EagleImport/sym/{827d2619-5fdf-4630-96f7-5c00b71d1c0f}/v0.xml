@@ -1,0 +1,15 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{827d2619-5fdf-4630-96f7-5c00b71d1c0f}</uuid>
+        <name locale="en_US">OSCPWR</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="-2.54" length="5.08" angle="0" y="0" uuid="{32a4c18a-2843-43fe-a086-afc9118d7dbd}">
+            <name locale="en_US">OSCGND</name>
+        </pin>
+        <pin x="-2.54" length="5.08" angle="0" y="2.54" uuid="{f279a3fb-c4c2-45ad-b5c5-49ccb0990293}">
+            <name locale="en_US">OSCVCC</name>
+        </pin>
+    </pins>
+</symbol>

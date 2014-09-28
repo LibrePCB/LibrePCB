@@ -1,0 +1,103 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{330dcdee-3950-4d67-b3db-861efaa39539}</uuid>
+        <name locale="en_US">IXP-ETH</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-91.44"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{bf686b9d-875a-4693-a969-7882c98e78e0}">
+            <name locale="en_US">ETH_TXDATA0:0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-35.56" uuid="{600fd7e8-fc21-45d9-9509-c016fbef5721}">
+            <name locale="en_US">ETH_COL0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-88.9" uuid="{07efaeac-94b2-4138-9f88-8f7d617df812}">
+            <name locale="en_US">ETH_TXEN1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-83.82" uuid="{768f1890-1e53-42a8-9ddf-817fbf104912}">
+            <name locale="en_US">ETH_RXDV1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-38.1" uuid="{1ee2a942-59bd-4e9c-8a26-70be4b047feb}">
+            <name locale="en_US">ETH_COL1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{2923ffe5-e75c-4446-8509-e9ebecbd92b6}">
+            <name locale="en_US">ETH_TXCLK0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{3c10994b-3da6-4baa-b09a-1dcbd2424adb}">
+            <name locale="en_US">ETH_TXDATA0:1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{929a6353-96cd-4779-b0ea-f4ad60268a38}">
+            <name locale="en_US">ETH_TXDATA0:2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{16ee06fa-bf67-4df1-9f8d-5e6afdeccad8}">
+            <name locale="en_US">ETH_TXDATA0:3</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{6440c33d-425d-4a94-8fe6-512fe4790fa3}">
+            <name locale="en_US">ETH_TXEN0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{84c86a7b-4759-4e69-9a73-d02a03edcab8}">
+            <name locale="en_US">ETH_RXCLK0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{a1eb7542-3aa5-44ed-882e-df02ae6faed0}">
+            <name locale="en_US">ETH_RXDATA0:0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{c339859d-d8e1-4eba-bff1-c66ced26d4c6}">
+            <name locale="en_US">ETH_RXDATA0:1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{e9036065-7aa4-4617-a5cc-fd12e65a33d6}">
+            <name locale="en_US">ETH_RXDATA0:2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{f5818d3c-9f56-4fe4-b5f4-a6aba353540c}">
+            <name locale="en_US">ETH_RXDATA0:3</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{c80e191d-39d8-424c-b777-6620ef8e1f72}">
+            <name locale="en_US">ETH_RXDV0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-43.18" uuid="{dce3b180-94f1-4b80-aa6b-37a04fc75e98}">
+            <name locale="en_US">ETH_CRS0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-48.26" uuid="{7591b39d-7fe5-4446-a98c-1d69c262cf0e}">
+            <name locale="en_US">ETH_MDIO</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-50.8" uuid="{2b5c681a-f5b9-4280-9f78-e6c811d4e113}">
+            <name locale="en_US">ETH_MDC</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-55.88" uuid="{acd70ae5-8a9b-4133-91c1-e885c5e835eb}">
+            <name locale="en_US">ETH_TXCLK1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-71.12" uuid="{071cc07b-cf54-474b-ad6c-b873937e0cf2}">
+            <name locale="en_US">ETH_RXCLK1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-73.66" uuid="{e5e7a79f-5c42-469e-8dfe-37060f2a9fc1}">
+            <name locale="en_US">ETH_RXDATA1:0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-76.2" uuid="{92c38a84-35ea-4577-ac77-b0121d5a9915}">
+            <name locale="en_US">ETH_RXDATA1:1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-78.74" uuid="{7c7cc372-8d32-4a04-a969-42ea934dceff}">
+            <name locale="en_US">ETH_RXDATA1:2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-81.28" uuid="{c589344f-7d06-47dc-afbc-ee1fc28f1231}">
+            <name locale="en_US">ETH_RXDATA1:3</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-45.72" uuid="{0ca21df2-c6e3-47d7-8563-9743bfe9b123}">
+            <name locale="en_US">ETH_CRS1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-58.42" uuid="{60c0805a-febe-4cbd-b198-5c13c50d97aa}">
+            <name locale="en_US">ETH_TXDATA1:0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-60.96" uuid="{85e7d041-dab2-4d1e-a044-b34ebb02c7c0}">
+            <name locale="en_US">ETH_TXDATA1:1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-63.5" uuid="{9b010918-8723-4356-a7b6-44cbcf756d2d}">
+            <name locale="en_US">ETH_TXDATA1:2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-66.04" uuid="{645aafc7-0611-4434-8a89-ab66208b4ebc}">
+            <name locale="en_US">ETH_TXDATA1:3</name>
+        </pin>
+    </pins>
+</symbol>

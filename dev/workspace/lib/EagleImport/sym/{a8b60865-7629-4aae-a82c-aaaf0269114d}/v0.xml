@@ -1,0 +1,28 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{a8b60865-7629-4aae-a82c-aaaf0269114d}</uuid>
+        <name locale="en_US">G_VCCVEE</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="5.08" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="3.556"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="-3.302"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="-0.508" end_y="-2.032"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="270" y="7.62" uuid="{1008cae1-b477-4410-a4b5-38c26aa15299}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="90" y="-7.62" uuid="{360529cf-082a-45be-90ad-998f36656e77}">
+            <name locale="en_US">VEE</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-7.62" uuid="{3746eb40-624b-425b-a96e-387ae11afc86}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

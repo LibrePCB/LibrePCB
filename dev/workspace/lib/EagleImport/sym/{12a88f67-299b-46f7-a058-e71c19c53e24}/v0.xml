@@ -1,0 +1,19 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{12a88f67-299b-46f7-a058-e71c19c53e24}</uuid>
+        <name locale="en_US">FVAL2</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0.889" width="0.254" layer="10" start_x="0.889">
+            <segment type="line" end_x="0.889" end_y="-0.889"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{51f0e240-5241-48ef-9ba7-e4e12fa63596}">
+            <name locale="en_US">B</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{a024231b-ede2-4cae-88b3-a775540dcbbc}">
+            <name locale="en_US">A</name>
+        </pin>
+    </pins>
+</symbol>

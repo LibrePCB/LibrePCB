@@ -1,0 +1,15 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{3f4a8610-b4ea-4535-af93-64f97d79db1a}</uuid>
+        <name locale="en_US">SELAB</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{f135c9db-44ee-43ee-93d2-1feff95ae3e9}">
+            <name locale="en_US">SELA</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{2109601a-9986-42bd-956c-3da753a22456}">
+            <name locale="en_US">SELB</name>
+        </pin>
+    </pins>
+</symbol>

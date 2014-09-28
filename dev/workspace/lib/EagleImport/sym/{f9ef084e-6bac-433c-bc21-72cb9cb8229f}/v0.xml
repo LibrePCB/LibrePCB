@@ -1,0 +1,12 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{f9ef084e-6bac-433c-bc21-72cb9cb8229f}</uuid>
+        <name locale="en_US">VEE</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-2.54" uuid="{1d407994-068c-4662-a15d-6cef390193c6}">
+            <name locale="en_US">VEE</name>
+        </pin>
+    </pins>
+</symbol>

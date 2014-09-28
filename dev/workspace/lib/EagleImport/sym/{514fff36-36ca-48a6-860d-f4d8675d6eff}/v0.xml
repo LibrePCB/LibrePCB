@@ -1,0 +1,27 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{514fff36-36ca-48a6-860d-f4d8675d6eff}</uuid>
+        <name locale="en_US">1VCC5GND</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="0" length="5.08" angle="270" y="7.62" uuid="{21758286-fcf9-4785-b916-5ad12854fc1e}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="90" y="-7.62" uuid="{83426d28-f98c-4725-9293-772dea2df506}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="-2.54" length="5.08" angle="90" y="-7.62" uuid="{e096350a-61f3-4bbd-b85b-e1e64687a2d9}">
+            <name locale="en_US">GND@1</name>
+        </pin>
+        <pin x="0" length="5.08" angle="90" y="-7.62" uuid="{6d4b3e53-24b4-44c0-97e3-59cc1bcf02f7}">
+            <name locale="en_US">GND@2</name>
+        </pin>
+        <pin x="2.54" length="5.08" angle="90" y="-7.62" uuid="{7b0f636d-4610-4f79-815b-79bdce2fddff}">
+            <name locale="en_US">GND@3</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="90" y="-7.62" uuid="{902e1a90-ab3e-42ef-8d08-9b72127178f3}">
+            <name locale="en_US">GND@4</name>
+        </pin>
+    </pins>
+</symbol>

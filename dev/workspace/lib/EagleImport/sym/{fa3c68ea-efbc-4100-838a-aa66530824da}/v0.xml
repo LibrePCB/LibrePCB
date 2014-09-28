@@ -1,0 +1,25 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{fa3c68ea-efbc-4100-838a-aa66530824da}</uuid>
+        <name locale="en_US">VDDP</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="-1.27" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="1.27" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.254" layer="10" start_x="-1.27">
+            <segment type="line" end_x="0" end_y="-1.778"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.778" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="1.27" end_y="-2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="5.08" angle="90" y="-5.08" uuid="{6e78d387-49e4-4064-b1c0-ed3cba7e80f8}">
+            <name locale="en_US">VDDP</name>
+        </pin>
+    </pins>
+</symbol>

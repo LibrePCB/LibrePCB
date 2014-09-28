@@ -1,0 +1,22 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{edadd989-2796-423e-b221-ea5f357b3805}</uuid>
+        <name locale="en_US">DR</name>
+    </meta>
+    <geometry>
+        <polygon fill="true" start_y="-0.889" width="0.254" layer="10" start_x="-3.81">
+            <segment type="line" end_x="3.81" end_y="-0.889"/>
+            <segment type="line" end_x="3.81" end_y="0.889"/>
+            <segment type="line" end_x="-3.81" end_y="0.889"/>
+            <segment type="line" end_x="-3.81" end_y="-0.889"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="7.62" length="5.08" angle="180" y="0" uuid="{885852de-ddc8-43e4-81e5-440d0e1cb590}">
+            <name locale="en_US">2</name>
+        </pin>
+        <pin x="-7.62" length="5.08" angle="0" y="0" uuid="{c62172c0-3597-45b2-b71d-764b0b23d266}">
+            <name locale="en_US">1</name>
+        </pin>
+    </pins>
+</symbol>

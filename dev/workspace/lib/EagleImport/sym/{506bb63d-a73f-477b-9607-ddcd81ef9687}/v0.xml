@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{506bb63d-a73f-477b-9607-ddcd81ef9687}</uuid>
+        <name locale="en_US">555</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-10.16" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="-10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="7.62" uuid="{0cc41ae2-ebe1-4af6-b6b7-c81c1ec8dcfb}">
+            <name locale="en_US">TR</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="7.62" uuid="{52250577-9149-4758-a27d-2a461fdf5d96}">
+            <name locale="en_US">Q</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="2.54" uuid="{5e6968a4-9710-463d-a0d1-d3c3a17a2968}">
+            <name locale="en_US">R</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-2.54" uuid="{9b66013d-d97a-4637-a80d-12b09927ce6e}">
+            <name locale="en_US">CV</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-2.54" uuid="{b031dda0-361d-420f-ba83-dcf970c1759c}">
+            <name locale="en_US">THR</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="2.54" uuid="{ce6565dd-e523-4aef-b500-e8a2410cf9fb}">
+            <name locale="en_US">DIS</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-7.62" uuid="{a6068f22-6c12-4d73-a6d4-9c5c530443ab}">
+            <name locale="en_US">V+</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-7.62" uuid="{d0aa1758-4dcb-4011-86e7-033ca8e68b38}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

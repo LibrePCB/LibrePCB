@@ -1,0 +1,49 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{a97e13d8-a7b9-4c8d-9aee-318c20170a66}</uuid>
+        <name locale="en_US">TPOT</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="-0.762">
+            <segment type="line" end_x="-0.762" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.254" layer="10" start_x="0.762">
+            <segment type="line" end_x="0.762" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="1.651" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="1.651">
+            <segment type="line" end_x="-1.8796" end_y="1.7526"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="0.762">
+            <segment type="line" end_x="-0.762" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.254" layer="10" start_x="-0.762">
+            <segment type="line" end_x="0.762" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="-0.508"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.508" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-3.048" end_y="-1.524"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.508" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.032" end_y="-1.524"/>
+        </polygon>
+        <polygon fill="false" start_y="1.2939" width="0.1524" layer="10" start_x="-2.1597">
+            <segment type="line" end_x="-1.7018" end_y="2.2352"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-5.08" uuid="{798c9049-e767-429f-93da-17418314bebf}">
+            <name locale="en_US">A</name>
+        </pin>
+        <pin x="0" length="2.54" angle="270" y="5.08" uuid="{58daf082-6df2-47b7-abf1-0c1d9562a234}">
+            <name locale="en_US">E</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="0" uuid="{3a63c08c-69e5-498a-ab98-509e2658380b}">
+            <name locale="en_US">S</name>
+        </pin>
+    </pins>
+</symbol>

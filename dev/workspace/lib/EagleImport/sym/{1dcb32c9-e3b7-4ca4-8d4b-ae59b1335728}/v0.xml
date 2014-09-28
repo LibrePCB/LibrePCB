@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{1dcb32c9-e3b7-4ca4-8d4b-ae59b1335728}</uuid>
+        <name locale="en_US">MAX662</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-12.7" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="12.7" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="-10.16" end_y="12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="12.7" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="7.62" end_y="-12.7"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="5.08" angle="0" y="5.08" uuid="{61a08bf3-283a-4f5a-abe3-619773f6efb9}">
+            <name locale="en_US">SHDN</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-10.16" uuid="{12097d27-f693-4bb3-b9c9-7cb8937952fd}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="10.16" uuid="{f0ba02d3-f1ea-4b83-8780-f178743e2497}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="10.16" uuid="{5afc7615-cf47-4be1-8b9c-a60890283d02}">
+            <name locale="en_US">VOUT</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="0" uuid="{725f823d-f86a-4b9b-a1b6-f679695d7d6f}">
+            <name locale="en_US">C1+</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-2.54" uuid="{6450b167-326c-44a5-9e94-059b8d3947fb}">
+            <name locale="en_US">C1-</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-7.62" uuid="{401dc928-3a6e-49c0-b2eb-0c2924ae85df}">
+            <name locale="en_US">C2+</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-10.16" uuid="{6f532e4b-5884-47a9-af73-b630bbe377e3}">
+            <name locale="en_US">C2-</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{181416d3-fc2b-41cb-8f16-0ec7b5bb847f}</uuid>
+        <name locale="en_US">TLE5009</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="12.7" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="-10.16" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="15.24" length="2.54" angle="180" y="5.08" uuid="{4616773a-2815-4a5d-8756-17743c1499c1}">
+            <name locale="en_US">COS_P</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="2.54" uuid="{49d4dcab-92d8-4b24-92cf-6f1a41802e00}">
+            <name locale="en_US">COS_N</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-2.54" uuid="{cb0698cd-5f3c-4d92-b8ba-dd2bcf5eab27}">
+            <name locale="en_US">SIN_P</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-5.08" uuid="{d9ebdd3c-2293-447f-8cb0-4faede824eec}">
+            <name locale="en_US">SIN_N</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{f7a7152d-e537-4617-a841-d76e9d123ec9}">
+            <name locale="en_US">GND@1</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{3776541d-52b9-42ec-96e4-766215a9b4f7}">
+            <name locale="en_US">GND@2</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{12456a02-fb73-4f18-a060-569463760727}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{1d21bc33-018b-4d76-acd7-0a2a7804942a}">
+            <name locale="en_US">VGMR</name>
+        </pin>
+    </pins>
+</symbol>

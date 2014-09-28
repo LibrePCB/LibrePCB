@@ -1,0 +1,61 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{3360799a-3dcb-4320-b9d1-4442c7ccf445}</uuid>
+        <name locale="en_US">OPA548</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0.635" width="0.1524" layer="10" start_x="-3.81">
+            <segment type="line" end_x="-3.81" end_y="-0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-4.445">
+            <segment type="line" end_x="-3.175" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.1524" layer="10" start_x="-4.445">
+            <segment type="line" end_x="-3.175" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="1.3462"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="0.0762"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.2192" width="0.1524" layer="10" start_x="2.6924">
+            <segment type="line" end_x="5.08" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="5.08" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-6.4262" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="5.08" end_y="-2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="7.62" length="2.54" angle="180" y="0" uuid="{7f9ba5e3-385c-4bcd-bcf5-4594a1e35132}">
+            <name locale="en_US">ILIM</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="-5.08" uuid="{1d7641e1-3d08-4d90-acea-abe1f3939260}">
+            <name locale="en_US">-IN</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="0" uuid="{692c8ac6-eaae-4abb-a02b-f528bf2a53a3}">
+            <name locale="en_US">+IN</name>
+        </pin>
+        <pin x="0" length="2.54" angle="270" y="5.08" uuid="{644ca007-2e65-4857-ab29-adb2747fa44b}">
+            <name locale="en_US">E/S</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="-2.54" uuid="{0d6ed574-162d-441b-8cdf-32bf07ef06a2}">
+            <name locale="en_US">OUT</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="270" y="5.08" uuid="{d3220a59-f5cc-4525-8649-d3c90ceec078}">
+            <name locale="en_US">V+</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="90" y="-10.16" uuid="{bd4e5a17-73f7-42fb-a7e8-58d441be0372}">
+            <name locale="en_US">V-</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,28 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{2e8c348c-326e-4703-a50c-a2934f1b7a87}</uuid>
+        <name locale="en_US">KL-1</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0.254" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="-0.254"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.254" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-1.016" end_y="-0.254"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.254" width="0.254" layer="10" start_x="-1.016">
+            <segment type="line" end_x="-1.016" end_y="0.254"/>
+        </polygon>
+        <polygon fill="false" start_y="0.254" width="0.254" layer="10" start_x="-1.016">
+            <segment type="line" end_x="-2.54" end_y="0.254"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-7.62" length="2.54" angle="0" y="0" uuid="{516ead00-9923-454f-a8d0-3695d81ba5b4}">
+            <name locale="en_US">-1</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{37572c96-35c6-4049-8a87-6179ee308c64}">
+            <name locale="en_US">B-1</name>
+        </pin>
+    </pins>
+</symbol>

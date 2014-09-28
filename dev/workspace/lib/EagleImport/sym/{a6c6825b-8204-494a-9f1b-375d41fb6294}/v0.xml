@@ -1,0 +1,82 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{a6c6825b-8204-494a-9f1b-375d41fb6294}</uuid>
+        <name locale="en_US">TC1920PWR2</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-57.15"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="5.08" length="5.08" angle="180" y="-7.62" uuid="{4969fbbb-d13f-4f38-9b6d-e9c00d4b424f}">
+            <name locale="en_US">VDDR@0</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-10.16" uuid="{0c2b7047-226c-4dee-9edc-e27d60964c99}">
+            <name locale="en_US">VDDR@1</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-12.7" uuid="{bb7c1e85-2853-4c3e-a743-bdfd0d62a6fc}">
+            <name locale="en_US">VDD_SB</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-15.24" uuid="{0e9e6e96-4604-4b23-8302-0755d207e3c0}">
+            <name locale="en_US">VDD_GUARD</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-17.78" uuid="{0c213901-74dd-4e92-ade1-7ebc63b3a3bc}">
+            <name locale="en_US">VSS_GUARD@1</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-20.32" uuid="{ebaaf7b4-e5fe-4cc9-b889-d131f374bfef}">
+            <name locale="en_US">VSS_GUARD@2</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-22.86" uuid="{c40d1272-932c-4047-8621-0a3dd21f80d4}">
+            <name locale="en_US">VGND_COD</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-25.4" uuid="{61ad9998-01f5-40e2-99ab-3d55b793c3d6}">
+            <name locale="en_US">VREF_COD</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-27.94" uuid="{5ed99c0e-26ab-493f-b785-8d743f3022d3}">
+            <name locale="en_US">VSSP_COD@0</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-2.54" uuid="{e17ad56f-4f5f-4b1c-abec-787284f00143}">
+            <name locale="en_US">VSSP_OSC@0</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-30.48" uuid="{fb05edbb-3229-4a6e-9d59-0eeb5c5fc78a}">
+            <name locale="en_US">VSSA_COD@0</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-5.08" uuid="{256f4e03-aae5-4862-aed6-94c43e623e90}">
+            <name locale="en_US">VSSP_OSC@1</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-33.02" uuid="{c2ded428-bffe-4b6d-8786-2af2d6c886a1}">
+            <name locale="en_US">VDDP_COD@0</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="0" uuid="{20778dcf-89a5-4be1-9653-a97dea960694}">
+            <name locale="en_US">VDDP_OSC@1</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-35.56" uuid="{10811a94-0d2d-47d9-ad00-f0d9cb2230f6}">
+            <name locale="en_US">VAGND_ADC</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-38.1" uuid="{b1b75805-3376-4e2e-86d7-f15188976c49}">
+            <name locale="en_US">VAREF_ADC</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-40.64" uuid="{af09ac27-1a18-497e-b1fa-2451dc627e90}">
+            <name locale="en_US">VSSA_ADC</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-43.18" uuid="{aa288318-8025-4c61-a96c-f0d35f42d87f}">
+            <name locale="en_US">VSSP_ADC@0</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-45.72" uuid="{049c759f-7ff0-409d-8cb7-73c371dceebf}">
+            <name locale="en_US">VSSP_ADC@1</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-48.26" uuid="{0a863899-50ab-492f-a500-7843c22d8d90}">
+            <name locale="en_US">VSSP_ADC@2</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-50.8" uuid="{6712d5f4-dcb9-45dc-bd25-7ee517e789e7}">
+            <name locale="en_US">VDDP_ADC</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-53.34" uuid="{aaa94572-d402-4534-9224-51853916abec}">
+            <name locale="en_US">VSS_PLL</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-55.88" uuid="{f284c83d-0934-4e31-a5a7-59ee1679e4e8}">
+            <name locale="en_US">VDD_PLL</name>
+        </pin>
+    </pins>
+</symbol>

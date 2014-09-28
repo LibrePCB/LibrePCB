@@ -1,0 +1,40 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{eee0ce8f-5fb5-4aed-a91a-c6487e70cd87}</uuid>
+        <name locale="en_US">OP5</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-21.59" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{0b3ee0ac-6568-401d-93ae-bbbcc7b56071}">
+            <name locale="en_US">IOO1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{270f3f00-fa79-4986-afab-66cc0b634600}">
+            <name locale="en_US">IOO2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{a9d93b18-5701-421f-bb99-a9ecb5a92d10}">
+            <name locale="en_US">IOO3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{69e953d1-8fd6-45b8-b04c-bbf246d99714}">
+            <name locale="en_US">IOO4</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{2f74ca0a-acce-45a7-93f7-df3b0e7e3a40}">
+            <name locale="en_US">IOP1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{2f38d69e-f713-47cb-a4c6-8c240d09f132}">
+            <name locale="en_US">IOP2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-15.24" uuid="{fb8ace2b-8b71-45ad-b774-bb85d7afdb3e}">
+            <name locale="en_US">IOP3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-17.78" uuid="{f70bed17-8afc-4178-af52-346789f0e60a}">
+            <name locale="en_US">IOP4</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-20.32" uuid="{470e97c1-5ff1-4b29-9d76-9819c95b81c4}">
+            <name locale="en_US">IOP5</name>
+        </pin>
+    </pins>
+</symbol>

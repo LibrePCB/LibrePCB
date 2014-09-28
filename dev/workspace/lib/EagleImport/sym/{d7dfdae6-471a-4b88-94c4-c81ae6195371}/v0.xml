@@ -1,0 +1,37 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{d7dfdae6-471a-4b88-94c4-c81ae6195371}</uuid>
+        <name locale="en_US">IGFET-DN-GDSB</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-1.2192" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="3.683" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-3.683"/>
+        </polygon>
+        <polygon fill="false" start_y="0.635" width="0.254" layer="10" start_x="1.905">
+            <segment type="line" end_x="0.635" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.635" width="0.254" layer="10" start_x="1.905">
+            <segment type="line" end_x="0.635" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="-1.143">
+            <segment type="line" end_x="-1.143" end_y="-2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="5.08" length="5.08" angle="180" y="2.54" uuid="{003bc57b-1a26-4abf-8fd1-851fb9a8b01c}">
+            <name locale="en_US">D</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-2.54" uuid="{2110b862-abf1-4353-9890-37c69700dd6a}">
+            <name locale="en_US">S</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-2.54" uuid="{860cf96c-d098-451b-9c21-f7dfa14d48be}">
+            <name locale="en_US">G</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="0" uuid="{40129246-2383-430c-acf7-3723de5e12a3}">
+            <name locale="en_US">B</name>
+        </pin>
+    </pins>
+</symbol>

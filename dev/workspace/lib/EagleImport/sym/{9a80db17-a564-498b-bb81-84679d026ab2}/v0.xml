@@ -1,0 +1,94 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{9a80db17-a564-498b-bb81-84679d026ab2}</uuid>
+        <name locale="en_US">MCF537X-IO</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="17.78" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="17.78">
+            <segment type="line" end_x="17.78" end_y="-76.2"/>
+        </polygon>
+        <polygon fill="false" start_y="-76.2" width="0.254" layer="10" start_x="17.78">
+            <segment type="line" end_x="0" end_y="-76.2"/>
+        </polygon>
+        <polygon fill="false" start_y="-76.2" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="-35.56" uuid="{efd25726-ab32-4032-9d2d-9189d53e1211}">
+            <name locale="en_US">U1TXD</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-38.1" uuid="{c50e1e98-df3f-4864-b555-ad3a9a4e5bbd}">
+            <name locale="en_US">U1RXD</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-43.18" uuid="{6631b0ab-aeaf-47cb-97ae-760a8071e3bf}">
+            <name locale="en_US">U1CTS</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-40.64" uuid="{9420980f-63e8-4a74-a5b5-6323f0bccd08}">
+            <name locale="en_US">U1RTS</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{a377a81e-b662-4573-b486-d7bd682c6514}">
+            <name locale="en_US">I2C_SCL2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{ce4bebba-6ce3-455b-800d-b2b399da56d1}">
+            <name locale="en_US">I2C_SDA2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-68.58" uuid="{b551b367-6c1f-4fda-a418-6e437213fed0}">
+            <name locale="en_US">PWM3</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-71.12" uuid="{a183b97d-f0e4-4fad-bdf9-4076cd6882f6}">
+            <name locale="en_US">PWM5</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-73.66" uuid="{6e895e69-49cf-45ee-9b59-8aaf7add0663}">
+            <name locale="en_US">PWM7</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-66.04" uuid="{61b7a9b3-305d-4a86-84cd-f9882ba6933a}">
+            <name locale="en_US">PWM1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{6a83ea3c-0895-4a59-820c-218857a81d4d}">
+            <name locale="en_US">USBOTG_P</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{1b64d647-21c1-4d4c-bac7-9bfec80db426}">
+            <name locale="en_US">USBOTG_M</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{00b2fa8f-0dbb-4389-afc4-468147993f47}">
+            <name locale="en_US">USBHOST_P</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{32e24b5c-41d9-459e-8078-14a6defa21db}">
+            <name locale="en_US">USBHOST_M</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{2d41f2aa-7990-4a46-9181-9d1d7993b178}">
+            <name locale="en_US">U0RTS</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{6994417d-453f-4d8c-98b5-69367fbb54a4}">
+            <name locale="en_US">U0CTS</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{39667b6f-e13c-43b5-b2db-4ee725680781}">
+            <name locale="en_US">U0TXD</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{640878b3-8598-4bd5-8c24-568d0c523436}">
+            <name locale="en_US">U0RXD</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-55.88" uuid="{f840c1d7-96a5-45ca-aef1-8c3df9f6e914}">
+            <name locale="en_US">QSPI_CS0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-58.42" uuid="{ce2822c1-6a38-4796-bb19-e88cb08d90e5}">
+            <name locale="en_US">QSPI_CS1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-53.34" uuid="{1621347b-c03f-4949-8491-c056a1058669}">
+            <name locale="en_US">QSPI_DOUT</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-60.96" uuid="{b5fec855-5465-473b-a5eb-86871f41705a}">
+            <name locale="en_US">QSPI_CS2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-50.8" uuid="{c9c8e271-989c-4085-bf54-29d63a0fba2c}">
+            <name locale="en_US">QSPI_DIN</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-48.26" uuid="{20fa7c7b-7487-4947-ac6c-9b34e412a60e}">
+            <name locale="en_US">QSPI_CLK</name>
+        </pin>
+    </pins>
+</symbol>

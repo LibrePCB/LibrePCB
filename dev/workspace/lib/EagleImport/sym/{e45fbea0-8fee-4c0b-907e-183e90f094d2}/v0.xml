@@ -1,0 +1,82 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{e45fbea0-8fee-4c0b-907e-183e90f094d2}</uuid>
+        <name locale="en_US">C8051F330D</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="22.86" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-12.7" end_y="-22.86"/>
+        </polygon>
+        <polygon fill="false" start_y="-22.86" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="10.16" end_y="-22.86"/>
+        </polygon>
+        <polygon fill="false" start_y="-22.86" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="22.86"/>
+        </polygon>
+        <polygon fill="false" start_y="22.86" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-12.7" end_y="22.86"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="2.54" angle="0" y="-20.32" uuid="{11468300-61c0-4511-9a25-c1fa6b08b128}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="20.32" uuid="{76307488-7307-49da-9789-ad9db2f8bfc1}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="15.24" uuid="{9cb7fcff-1c04-4058-b5a8-4747c751d180}">
+            <name locale="en_US">!!RSTC2CK</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="17.78" uuid="{4200c553-407d-420e-bf1f-ca8cae973aa6}">
+            <name locale="en_US">P0.1</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="15.24" uuid="{668fd05d-40e0-4d1d-84dd-b59ecf809b7e}">
+            <name locale="en_US">P0.2</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="12.7" uuid="{d8005118-4eae-4530-930d-966343560695}">
+            <name locale="en_US">P0.3</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="10.16" uuid="{bf77d345-061c-4e18-9033-457def54cd25}">
+            <name locale="en_US">P0.4</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="7.62" uuid="{eab89218-06f7-4607-84d9-89524edd582f}">
+            <name locale="en_US">P0.5</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="5.08" uuid="{f624ef03-c40d-4243-a81d-de56d308521b}">
+            <name locale="en_US">P0.6</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="2.54" uuid="{6e38fd67-9a1d-4e8d-835f-a3feabbc12b9}">
+            <name locale="en_US">P0.7</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-2.54" uuid="{2932081c-0c69-43e8-bb07-f91031d2687b}">
+            <name locale="en_US">P1.0</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="20.32" uuid="{419df21f-e215-4d95-8160-f720b6195818}">
+            <name locale="en_US">P0.0</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-5.08" uuid="{866be7b6-5899-46e5-a941-0ee554ffbb7e}">
+            <name locale="en_US">P1.1</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-7.62" uuid="{eb3e1dcb-4c36-4b6e-902f-e2b9e6b2013f}">
+            <name locale="en_US">P1.2</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-10.16" uuid="{079d47a1-135e-41f2-b52d-a96d12a25f0b}">
+            <name locale="en_US">P1.3</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-12.7" uuid="{7c3bbe0f-fc42-47e4-82fd-e2738a8f1f2f}">
+            <name locale="en_US">P1.4</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-15.24" uuid="{a47d4e4b-3bcd-46f6-9ce8-40efc8c09d19}">
+            <name locale="en_US">P1.5</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-17.78" uuid="{1109c3f4-5c60-4777-b854-e6527980b3c2}">
+            <name locale="en_US">P1.6</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-20.32" uuid="{dbd26aaf-b1f9-42e0-851e-952d74d46671}">
+            <name locale="en_US">P1.7</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="10.16" uuid="{fab8b82e-b7e9-4984-b951-83e7c7d8e441}">
+            <name locale="en_US">P2.0/C2D</name>
+        </pin>
+    </pins>
+</symbol>

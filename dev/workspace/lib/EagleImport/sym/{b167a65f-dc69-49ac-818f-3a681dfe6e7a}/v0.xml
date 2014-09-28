@@ -1,0 +1,25 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{b167a65f-dc69-49ac-818f-3a681dfe6e7a}</uuid>
+        <name locale="en_US">PINHD1</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-2.54" width="0.4064" layer="10" start_x="-6.35">
+            <segment type="line" end_x="1.27" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.4064" layer="10" start_x="1.27">
+            <segment type="line" end_x="1.27" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.4064" layer="10" start_x="1.27">
+            <segment type="line" end_x="-6.35" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.4064" layer="10" start_x="-6.35">
+            <segment type="line" end_x="-6.35" end_y="-2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{58150548-9463-470f-b2de-b569f8276313}">
+            <name locale="en_US">1</name>
+        </pin>
+    </pins>
+</symbol>

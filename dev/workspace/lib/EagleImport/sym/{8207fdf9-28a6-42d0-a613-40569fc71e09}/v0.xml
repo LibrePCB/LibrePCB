@@ -1,0 +1,49 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{8207fdf9-28a6-42d0-a613-40569fc71e09}</uuid>
+        <name locale="en_US">4</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="6.985" end_y="0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="0.635" width="0.254" layer="10" start_x="6.985">
+            <segment type="line" end_x="3.175" end_y="0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="0.635" width="0.254" layer="10" start_x="3.175">
+            <segment type="line" end_x="2.54" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="1.905" end_y="0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="0.635" width="0.254" layer="10" start_x="1.905">
+            <segment type="line" end_x="-1.905" end_y="0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="0.635" width="0.254" layer="10" start_x="-1.905">
+            <segment type="line" end_x="-2.54" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-3.175" end_y="0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="0.635" width="0.254" layer="10" start_x="-3.175">
+            <segment type="line" end_x="-6.985" end_y="0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="0.635" width="0.254" layer="10" start_x="-6.985">
+            <segment type="line" end_x="-7.62" end_y="0"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-7.62" length="2.54" angle="90" y="-2.54" uuid="{f712f02f-3f8b-4255-8abf-af8f06d3ff85}">
+            <name locale="en_US">P@1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="90" y="-2.54" uuid="{e0b23465-6b24-426d-9596-afd4bcea145b}">
+            <name locale="en_US">P@2</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-2.54" uuid="{9ce8ac26-da48-49fe-bfc4-3c1b909a0dd1}">
+            <name locale="en_US">P@3</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="90" y="-2.54" uuid="{c4fbd561-97dd-4524-b3cf-d61ce61a7636}">
+            <name locale="en_US">P@4</name>
+        </pin>
+    </pins>
+</symbol>

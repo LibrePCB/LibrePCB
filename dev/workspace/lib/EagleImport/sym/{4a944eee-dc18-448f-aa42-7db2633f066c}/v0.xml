@@ -1,0 +1,25 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{4a944eee-dc18-448f-aa42-7db2633f066c}</uuid>
+        <name locale="en_US">FV2</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-0.508" width="0.4064" layer="10" start_x="1.524">
+            <segment type="line" end_x="0" end_y="-0.508"/>
+        </polygon>
+        <polygon fill="false" start_y="0.508" width="0.4064" layer="10" start_x="1.524">
+            <segment type="line" end_x="0" end_y="0.508"/>
+        </polygon>
+        <polygon fill="false" start_y="0.508" width="0.4064" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-0.508"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{eca0552c-5f5b-40b4-9e73-3127c9780182}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{c7fb1178-f330-409e-8291-d39fee12f427}">
+            <name locale="en_US">1@1</name>
+        </pin>
+    </pins>
+</symbol>

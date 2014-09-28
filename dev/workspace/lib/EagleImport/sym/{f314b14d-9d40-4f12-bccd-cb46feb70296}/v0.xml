@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{f314b14d-9d40-4f12-bccd-cb46feb70296}</uuid>
+        <name locale="en_US">TES3-DUAL</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="12.7" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="-10.16" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="15.24" length="2.54" angle="180" y="-5.08" uuid="{2ac0fba9-a13c-4309-8a02-8f3c6ba476b2}">
+            <name locale="en_US">-OUT</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="7.62" uuid="{db026f7d-3b08-4598-b7c4-797cfeedc0c0}">
+            <name locale="en_US">+OUT</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="7.62" uuid="{04851f5f-056d-4b1e-aadb-85e735352330}">
+            <name locale="en_US">+IN@1</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{f3d6523e-81c1-4ddc-8685-34a83537c0dd}">
+            <name locale="en_US">+IN@2</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{1c9a6f89-3288-4d7b-b09f-dd37876ab756}">
+            <name locale="en_US">-IN@1</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{4c10f102-e938-453a-8914-5487e4106342}">
+            <name locale="en_US">-IN@2</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="2.54" uuid="{50a61ed7-722f-4bff-a08e-549504bbd213}">
+            <name locale="en_US">COM@1</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="0" uuid="{9d03a276-e202-4acd-bc4e-765c3d302a86}">
+            <name locale="en_US">COM@2</name>
+        </pin>
+    </pins>
+</symbol>

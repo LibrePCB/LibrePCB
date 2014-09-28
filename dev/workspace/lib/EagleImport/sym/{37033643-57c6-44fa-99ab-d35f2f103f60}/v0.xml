@@ -1,0 +1,61 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{37033643-57c6-44fa-99ab-d35f2f103f60}</uuid>
+        <name locale="en_US">AD536</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="12.7" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-15.24" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="-10.16" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-15.24" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="-2.54" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="2.54" end_y="-7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="7.62" uuid="{94a92a0c-ed48-48cf-b260-bd55ae883e31}">
+            <name locale="en_US">VIN</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="2.54" uuid="{14b892af-8ab6-4f0c-b9cc-d4faa26bce14}">
+            <name locale="en_US">RL</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-12.7" uuid="{59d5b8b2-71fa-4e62-a199-3aaf041be728}">
+            <name locale="en_US">-VS</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="7.62" uuid="{b9f399bc-c011-468c-960e-34bbd20d7eb8}">
+            <name locale="en_US">CAV</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{8c8536ec-8586-47a0-a27e-a39781ba254a}">
+            <name locale="en_US">IOUT</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="12.7" uuid="{6d0cd978-66df-4d6e-b4e3-cb55de60cc08}">
+            <name locale="en_US">+VS</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-12.7" uuid="{3624ae56-0073-4d2e-82b8-b0e912ee5a33}">
+            <name locale="en_US">COM</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-2.54" uuid="{b14738e1-6cdd-45ce-ae0a-f2e956af3870}">
+            <name locale="en_US">DB</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-7.62" uuid="{a840cf42-ab17-484f-9c4a-17de6a0824c9}">
+            <name locale="en_US">BIN</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-7.62" uuid="{1f249424-e257-4292-989e-9f6b5b6a227c}">
+            <name locale="en_US">BOUT</name>
+        </pin>
+    </pins>
+</symbol>

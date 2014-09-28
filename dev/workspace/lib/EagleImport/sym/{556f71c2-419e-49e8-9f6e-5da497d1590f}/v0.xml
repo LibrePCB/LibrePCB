@@ -1,0 +1,30 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{556f71c2-419e-49e8-9f6e-5da497d1590f}</uuid>
+        <name locale="en_US">CPUPWR</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="-7.62" length="2.54" angle="270" y="2.54" uuid="{107079ec-1fbb-4077-be01-956b73f83897}">
+            <name locale="en_US">CPUVCC@1</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="270" y="2.54" uuid="{54f02a2d-6da2-4eb3-a140-ba0060179b67}">
+            <name locale="en_US">CPUVCC@2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="270" y="2.54" uuid="{dafba8e8-a7d6-487a-aa23-246c1277d71b}">
+            <name locale="en_US">CPUVCC@3</name>
+        </pin>
+        <pin x="0" length="2.54" angle="270" y="2.54" uuid="{ab3e0034-0f34-4cbc-abbf-a35adc8b622c}">
+            <name locale="en_US">CPUVCC@4</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="270" y="2.54" uuid="{57a107dd-a598-4436-9890-9dad88d557b7}">
+            <name locale="en_US">CPUVCC@5</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="270" y="2.54" uuid="{5087fba4-d78b-44b5-bc95-5716474f490e}">
+            <name locale="en_US">CPUVCC@6</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="270" y="2.54" uuid="{20ed14e0-3c3d-4261-ac11-09b766a1485c}">
+            <name locale="en_US">CPUVCC@7</name>
+        </pin>
+    </pins>
+</symbol>

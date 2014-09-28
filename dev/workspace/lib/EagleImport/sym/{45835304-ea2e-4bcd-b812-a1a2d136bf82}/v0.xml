@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{45835304-ea2e-4bcd-b812-a1a2d136bf82}</uuid>
+        <name locale="en_US">REF02</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="5.08" angle="0" y="7.62" uuid="{0713247f-a277-4c69-9539-6981b3440fbd}">
+            <name locale="en_US">TRIM</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-2.54" uuid="{4c7f0bf3-2c97-4e29-9ae7-2786b453ad87}">
+            <name locale="en_US">NC@1</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="0" uuid="{152863ed-e44f-4478-bf66-3f990b7ea856}">
+            <name locale="en_US">NC</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-5.08" uuid="{ac48d462-89f4-41b0-b9e7-9b5bface7d24}">
+            <name locale="en_US">NC@2</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="5.08" uuid="{c826c35d-58f3-4062-a11d-2a956b4fa3be}">
+            <name locale="en_US">TEMP</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-5.08" uuid="{819d2397-2d23-4f78-97ad-e270c6d552d1}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="0" uuid="{5b049fbb-f022-4828-a46d-38a0ec1de739}">
+            <name locale="en_US">V-IN</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="7.62" uuid="{e25cc860-c94e-4a17-9b95-7c917a5a9320}">
+            <name locale="en_US">V-OUT</name>
+        </pin>
+    </pins>
+</symbol>

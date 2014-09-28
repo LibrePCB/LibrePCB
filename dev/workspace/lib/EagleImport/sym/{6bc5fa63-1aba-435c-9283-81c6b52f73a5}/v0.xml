@@ -1,0 +1,25 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{6bc5fa63-1aba-435c-9283-81c6b52f73a5}</uuid>
+        <name locale="en_US">NC4</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-8.89"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="5.08" length="5.08" angle="180" y="0" uuid="{a4a9ebf0-2e29-485c-9114-1d5815ff9fa2}">
+            <name locale="en_US">RESERVED@0</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-2.54" uuid="{4566d147-1943-46f1-9f02-0bd005256802}">
+            <name locale="en_US">RESERVED@1</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-5.08" uuid="{f6de32e4-9cdb-4d9d-a66b-daaa4694811f}">
+            <name locale="en_US">RESERVED@2</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-7.62" uuid="{59f14aaf-ca57-4096-b017-9558cf3fc1e2}">
+            <name locale="en_US">RESERVED@3</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,34 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{0136a0c0-b8f3-4583-8ec6-deb9c4c612f3}</uuid>
+        <name locale="en_US">TLXX</name>
+    </meta>
+    <geometry>
+        <polygon fill="true" start_y="3.81" width="0.254" layer="10" start_x="-2.794">
+            <segment type="line" end_x="5.334" end_y="3.81"/>
+            <segment type="line" end_x="5.334" end_y="6.35"/>
+            <segment type="line" end_x="-2.794" end_y="6.35"/>
+            <segment type="line" end_x="-2.794" end_y="3.81"/>
+        </polygon>
+        <polygon fill="true" start_y="-3.81" width="0.254" layer="10" start_x="-2.794">
+            <segment type="line" end_x="5.334" end_y="-3.81"/>
+            <segment type="line" end_x="5.334" end_y="-1.27"/>
+            <segment type="line" end_x="-2.794" end_y="-1.27"/>
+            <segment type="line" end_x="-2.794" end_y="-3.81"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2.54" angle="0" y="5.08" uuid="{86158b5d-4c98-481d-9ce8-c4df24c2cf68}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="5.08" uuid="{106e9270-bb08-48fc-a653-75f3363298db}">
+            <name locale="en_US">2</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-2.54" uuid="{f19b9829-130d-4ba6-8986-96b215111a3f}">
+            <name locale="en_US">3</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="-2.54" uuid="{4ff9df10-ac6a-41f2-90cb-ffd5f47b8b9a}">
+            <name locale="en_US">4</name>
+        </pin>
+    </pins>
+</symbol>

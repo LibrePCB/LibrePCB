@@ -1,0 +1,70 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{10cb1ac0-da31-40a9-9dd5-d1c199af33ef}</uuid>
+        <name locale="en_US">AS850</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="20.32" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="20.32" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="-20.32" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="-20.32" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="20.32"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="12.7" uuid="{717cafb4-e785-4ca6-99d4-6dbe7fd84926}">
+            <name locale="en_US">ETR</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="10.16" uuid="{5737db0a-a793-4d82-aba9-496719129f7a}">
+            <name locale="en_US">ETS</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="7.62" uuid="{79f07009-864a-4b1f-9311-8db786fdb1e2}">
+            <name locale="en_US">VBAT</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{95a45182-3feb-4667-879f-33a6b5cf9eaf}">
+            <name locale="en_US">RSHH</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{b3b58724-0255-4b1f-bbf0-2601e17e4346}">
+            <name locale="en_US">RSHL</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="5.08" uuid="{41ec4748-0216-4d63-a819-cb5fc6097a47}">
+            <name locale="en_US">SLCK</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="2.54" uuid="{eebc28c7-a676-430b-8f0c-8e2e1a850084}">
+            <name locale="en_US">SDAT</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="0" uuid="{f2220ce2-570f-4ea7-9ab0-360e6efee4a1}">
+            <name locale="en_US">INTN</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{ee69aefd-e983-4263-92a0-ee08f274c3f2}">
+            <name locale="en_US">REF</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-12.7" uuid="{edf1d2c6-5fc2-40d0-a1b6-d9f4f41497f0}">
+            <name locale="en_US">AGND</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-10.16" uuid="{12266ef8-e7dd-4b14-87fc-5438a73a4f0e}">
+            <name locale="en_US">VSSA</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="17.78" uuid="{5bb1455f-f83c-498c-8e1f-270eb9cb622c}">
+            <name locale="en_US">VDDD</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-17.78" uuid="{30a9c36e-4d31-4990-b2df-bf9ab800f879}">
+            <name locale="en_US">VSSD</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-7.62" uuid="{8c74124d-d988-4949-9630-71ee2603065a}">
+            <name locale="en_US">VDDA</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="15.24" uuid="{39995ec3-14a0-4b3d-a8d8-cb9c163b29a2}">
+            <name locale="en_US">CLK</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="10.16" uuid="{222f9fc4-f05b-4dd0-9fcc-563163f0e222}">
+            <name locale="en_US">EZPRG</name>
+        </pin>
+    </pins>
+</symbol>

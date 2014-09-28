@@ -1,0 +1,40 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{51fc2102-94f9-4e8d-8348-39cad4627b85}</uuid>
+        <name locale="en_US">XR-567</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-10.16" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="-5.08" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="-10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="5.08" angle="0" y="0" uuid="{0d5e75d1-c69b-4451-983e-09c3a3766869}">
+            <name locale="en_US">OPF</name>
+        </pin>
+        <pin x="-10.16" length="5.08" angle="0" y="-2.54" uuid="{3cf7588e-a1d7-4ee4-98ff-505fac63b183}">
+            <name locale="en_US">LPLF</name>
+        </pin>
+        <pin x="-10.16" length="5.08" angle="0" y="5.08" uuid="{614c0522-6fdd-4019-b7d0-0e7d9898c159}">
+            <name locale="en_US">IN</name>
+        </pin>
+        <pin x="-10.16" length="5.08" angle="0" y="-5.08" uuid="{e2401a7d-c798-465d-bbeb-826a93ddec69}">
+            <name locale="en_US">R</name>
+        </pin>
+        <pin x="-10.16" length="5.08" angle="0" y="-7.62" uuid="{eb5bbef8-8291-4286-837d-91ec8f945e03}">
+            <name locale="en_US">C</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="5.08" uuid="{30d6a91e-8191-4684-852b-047aaef97bf4}">
+            <name locale="en_US">OUT</name>
+        </pin>
+    </pins>
+</symbol>

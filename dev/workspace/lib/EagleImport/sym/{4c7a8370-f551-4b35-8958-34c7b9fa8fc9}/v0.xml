@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{4c7a8370-f551-4b35-8958-34c7b9fa8fc9}</uuid>
+        <name locale="en_US">Q11-599</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-26.67" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{9f8df12f-4b02-44ea-859c-6c5a3e06d3f2}">
+            <name locale="en_US">IOQ1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{692428d8-a167-4776-96bb-a2a1f60bfa4b}">
+            <name locale="en_US">IOQ2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{90a7f6ab-3aab-4d5b-bd71-36fcf0dbdeff}">
+            <name locale="en_US">IOQ3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{8e759537-d296-4ab9-9e86-d3922d00c08e}">
+            <name locale="en_US">IOQ4</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{c46d989c-2f91-4430-9dd0-8677987c5733}">
+            <name locale="en_US">IOQ5</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{d7d00283-d6fa-4c3a-8d9a-b1dd939f7f1b}">
+            <name locale="en_US">IOQ6</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-15.24" uuid="{e07ee49f-23d2-4dd9-b29c-a74834065b82}">
+            <name locale="en_US">IOQ7</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-17.78" uuid="{36f004d8-9b2b-4eff-a9a4-cf2d6cc181a7}">
+            <name locale="en_US">IOQ8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-20.32" uuid="{22a93e42-3b42-419c-bd35-3f50d12e520a}">
+            <name locale="en_US">IOQ9</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-22.86" uuid="{7110fce0-9fb8-4aae-905e-07b98153f3a0}">
+            <name locale="en_US">IOQ10</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-25.4" uuid="{db48880f-ae28-4719-9fe0-473e6b485fad}">
+            <name locale="en_US">IOQ11</name>
+        </pin>
+    </pins>
+</symbol>

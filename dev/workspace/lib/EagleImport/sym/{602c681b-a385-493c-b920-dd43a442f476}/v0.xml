@@ -1,0 +1,12 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{602c681b-a385-493c-b920-dd43a442f476}</uuid>
+        <name locale="en_US">GND</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-2.54" uuid="{6fba6138-3028-4fa1-a539-80ccea03a5b5}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

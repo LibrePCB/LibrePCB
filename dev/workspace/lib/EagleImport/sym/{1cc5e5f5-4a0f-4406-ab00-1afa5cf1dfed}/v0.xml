@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{1cc5e5f5-4a0f-4406-ab00-1afa5cf1dfed}</uuid>
+        <name locale="en_US">C0166BAS</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="17.78" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="12.7" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="-2.54" end_y="17.78"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2.54" angle="0" y="15.24" uuid="{0eb16ba9-b624-4ba6-b70d-2807215a92b5}">
+            <name locale="en_US">SYSRSTI</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="10.16" uuid="{3d5eb620-5aa9-4516-9f62-b73b5fef946c}">
+            <name locale="en_US">XTALI</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="5.08" uuid="{c635a5e4-bf22-4cc9-8bca-ec8e693b2223}">
+            <name locale="en_US">XTALO</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{9a5f6f50-ff50-4e5c-8d0b-b1860e03aed5}">
+            <name locale="en_US">HCLK</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-2.54" uuid="{da99dede-51d7-4200-8ff4-7d2e0b6beed3}">
+            <name locale="en_US">DEV_CLK</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-7.62" uuid="{5b07ab69-77df-4945-9457-6e7ce83def9a}">
+            <name locale="en_US">GCLK2X</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-10.16" uuid="{aeccfe73-7cc2-43fa-9a52-b25b32fac9b1}">
+            <name locale="en_US">DCLK</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-15.24" uuid="{4d3da510-0aaf-4252-ac93-7b56e90c97b1}">
+            <name locale="en_US">SCAN_EN</name>
+        </pin>
+    </pins>
+</symbol>

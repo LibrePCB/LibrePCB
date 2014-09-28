@@ -1,0 +1,52 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{352492ba-3e88-4254-b712-2c83d278eadf}</uuid>
+        <name locale="en_US">FUSE2</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-1.905" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="1.905" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="-1.905">
+            <segment type="line" end_x="-1.905" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="-1.905">
+            <segment type="line" end_x="-2.54" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="-1.905">
+            <segment type="line" end_x="1.905" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="1.905">
+            <segment type="line" end_x="1.905" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="1.905">
+            <segment type="line" end_x="-1.905" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="1.905">
+            <segment type="line" end_x="2.54" end_y="-1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{7f2b0b72-ad22-44d7-8e3b-55da406e36e4}">
+            <name locale="en_US">1A</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="0" uuid="{68e0cd4d-b635-47a9-9418-f9fd468bb747}">
+            <name locale="en_US">2A</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{a2037cfc-3a7b-4dd6-8ad4-8ca2628e0f89}">
+            <name locale="en_US">1B</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="180" y="0" uuid="{94e0607e-2915-455d-b6f0-fea5461a40ef}">
+            <name locale="en_US">2B</name>
+        </pin>
+    </pins>
+</symbol>

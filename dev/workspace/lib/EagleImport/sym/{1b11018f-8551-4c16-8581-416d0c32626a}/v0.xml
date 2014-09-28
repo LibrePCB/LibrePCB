@@ -1,0 +1,37 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{1b11018f-8551-4c16-8581-416d0c32626a}</uuid>
+        <name locale="en_US">BUF602</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="-2.54" uuid="{f24d1183-f0d6-4f91-82e2-590a8b156255}">
+            <name locale="en_US">VREF</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="2.54" uuid="{a9988ba5-7035-4d2d-971f-204ddc112314}">
+            <name locale="en_US">IN</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="0" uuid="{2246683e-e53a-472b-a3cf-f898aaf52ad8}">
+            <name locale="en_US">OUT</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="5.08" uuid="{a80457be-2a5d-45cc-9955-ccdfe89682a2}">
+            <name locale="en_US">V+</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-5.08" uuid="{0ff65c84-f028-4350-8a7a-41cfcd05b563}">
+            <name locale="en_US">V-</name>
+        </pin>
+    </pins>
+</symbol>

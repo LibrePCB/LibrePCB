@@ -1,0 +1,127 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{0140d3c8-fabf-4c9b-84f7-8e1de272f514}</uuid>
+        <name locale="en_US">OMAPL138Z-E</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-95.25" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{792d6f15-1ac3-4f60-9347-4024bcb0f63a}">
+            <name locale="en_US">VPIFCLKIN0_UHPIHCSN_GP67_UPP2XTXCLK</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{7fe248ec-1cc7-451a-b553-d0a2f15d20c0}">
+            <name locale="en_US">VPIFCLKIN1_UHPIHDS1N_GP66</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{f243cd3c-0afd-4ca3-ab8e-fbf56c78948f}">
+            <name locale="en_US">VPIFCLKIN2_MMCSD1DAT3_GP64</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{4c08de24-2cbe-424e-9dfd-5a80ca813a54}">
+            <name locale="en_US">VPIFCLKIN3_MMCSD1DAT1_GP62</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{e52e1781-f984-4fcc-8bcb-9d580af91aa4}">
+            <name locale="en_US">VPIFCLKO2_MMCSD1DAT2_GP63</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{2893b21d-8cee-4a0a-8850-8f620849f37d}">
+            <name locale="en_US">VPIFCLKO3_GP61</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{292fa5b6-c982-403d-8f44-6ce2541f1d11}">
+            <name locale="en_US">VPIFDIN0_UHPIHD8_UPPD8_RMIICRSDV</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{8838ed64-7299-4baf-b22f-18291a10eafb}">
+            <name locale="en_US">VPIFDIN1_UHPIHD9_UPPD9_RMIIMHZ50CLK</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{46fde5de-6383-4892-ad49-259aa1a3efb5}">
+            <name locale="en_US">VPIFDIN2_UHPIHD10_UPPD10_RMIIRXER</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{532bd533-b536-476a-9231-3ef96952d256}">
+            <name locale="en_US">VPIFDIN3_UHPIHD11_UPPD11_RMIIRXD0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{0e75a86f-3c34-49e1-bf69-a4be2cb5401a}">
+            <name locale="en_US">VPIFDIN4_UHPIHD12_UPPD12_RMIIRXD1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{cfe3bf96-5e56-43de-8621-150487d6efcc}">
+            <name locale="en_US">VPIFDIN5_UHPIHD13_UPPD13_RMIITXEN</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{96a67ed7-9ab6-4ba7-839b-2580dbd3f34d}">
+            <name locale="en_US">VPIFDIN6_UHPIHD14_UPPD14_RMIITXD0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-33.02" uuid="{e1ea85fd-5a3c-4d91-81b2-e4692d9ba8de}">
+            <name locale="en_US">VPIFDIN7_UHPIHD15_UPPD15_RMIITXD1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-35.56" uuid="{8a0aa3ba-e77a-4b11-be29-13411631cc16}">
+            <name locale="en_US">VPIFDIN8_UHPIHD0_UPPD0_GP65</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-38.1" uuid="{c8907b58-28de-4544-880d-d08ccc82e856}">
+            <name locale="en_US">VPIFDIN9_UHPIHD1_UPPD1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-40.64" uuid="{4c9fe3d2-86b7-4912-a87d-170985d46093}">
+            <name locale="en_US">VPIFDIN10_UHPIHD2_UPPD2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-43.18" uuid="{9de2462b-3260-46e1-80d9-278073c3fa13}">
+            <name locale="en_US">VPIFDIN11_UHPIHD3_UPPD3</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-45.72" uuid="{d5c5b96c-3a91-4b88-83fa-8cf8046d681a}">
+            <name locale="en_US">VPIFDIN12_UHPIHD4_UPPD4</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-48.26" uuid="{a0d571cc-c3f2-4f73-bc61-66bab0f6d922}">
+            <name locale="en_US">VPIFDIN13FIELD_UHPIHD5_UPPD5</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-50.8" uuid="{eb3ddafd-fd06-4867-8170-c939b75068ec}">
+            <name locale="en_US">VPIFDIN14HSYNC_UHPIHD6_UPPD6</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-53.34" uuid="{30b1c976-2206-448a-b560-dfde54888d76}">
+            <name locale="en_US">VPIFDIN15VSYNC_UHPIHD7_UPPD7</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-55.88" uuid="{3b038785-0728-423d-9bb4-78d62edfb341}">
+            <name locale="en_US">VPIFDOUT0_LCDD0_UPPXD8_GP78</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-58.42" uuid="{b289ab83-16c1-4494-ba84-08bb7b46c1b1}">
+            <name locale="en_US">VPIFDOUT1_LCDD1_UPPXD9_GP79</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-60.96" uuid="{2a94eeb2-7cf6-4e3a-847e-4f0b703dff95}">
+            <name locale="en_US">VPIFDOUT2_LCDD2_UPPXD10_GP710</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-63.5" uuid="{a5ea0440-5248-4cad-ae74-ab94ceff26af}">
+            <name locale="en_US">VPIFDOUT3_LCDD3_UPPXD11_GP711</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-66.04" uuid="{d323fdd6-cda5-4371-89d3-6057e6ac957e}">
+            <name locale="en_US">VPIFDOUT4_LCDD4_UPPXD12_GP712</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-68.58" uuid="{6dc91861-fab7-4984-8c52-89e396c603d3}">
+            <name locale="en_US">VPIFDOUT5_LCDD5_UPPXD13_GP713</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-71.12" uuid="{291c5705-337b-4dc1-ab15-6661af43fd07}">
+            <name locale="en_US">VPIFDOUT6_LCDD6_UPPXD14_GP714</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-73.66" uuid="{65274091-a03a-4289-8ec7-7ff516f24de7}">
+            <name locale="en_US">VPIFDOUT7_LCDD7_UPPXD15_GP715</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-76.2" uuid="{7df790c0-20b4-4e4a-8d36-ea8a3805b743}">
+            <name locale="en_US">VPIFDOUT8_LCDD8_UPPXD0_GP70_BOOT0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-78.74" uuid="{9999a4f0-6035-4843-a760-04806cdfde33}">
+            <name locale="en_US">VPIFDOUT9_LCDD9_UPPXD1_GP71_BOOT1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-81.28" uuid="{d71902ff-8e8a-4f7a-8ffb-50fcaf459f9a}">
+            <name locale="en_US">VPIFDOUT10_LCDD10_UPPXD2_GP72_BOOT2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-83.82" uuid="{4b4c58a7-6695-4e42-be80-697abda5177f}">
+            <name locale="en_US">VPIFDOUT11_LCDD11_UPPXD3_GP73_BOOT3</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-86.36" uuid="{3aae2fa9-5fa2-4f5b-b000-206523fc6cc9}">
+            <name locale="en_US">VPIFDOUT12_LCDD12_UPPXD4_GP74_BOOT4</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-88.9" uuid="{6a2b9164-e0f1-42e4-b4b9-c8b4c39f4bf9}">
+            <name locale="en_US">VPIFDOUT13_LCDD13_UPPXD5_GP75_BOOT5</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-91.44" uuid="{ff30f28c-3999-4511-b67e-9344bd3892b3}">
+            <name locale="en_US">VPIFDOUT14_LCDD14_UPPXD6_GP76_BOOT6</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-93.98" uuid="{0de9f4e4-4f43-41cb-bd0c-7516b04fa3eb}">
+            <name locale="en_US">VPIFDOUT15_LCDD15_UPPXD7_GP77_BOOT7</name>
+        </pin>
+    </pins>
+</symbol>

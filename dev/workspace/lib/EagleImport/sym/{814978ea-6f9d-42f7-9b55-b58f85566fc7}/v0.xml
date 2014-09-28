@@ -1,0 +1,58 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{814978ea-6f9d-42f7-9b55-b58f85566fc7}</uuid>
+        <name locale="en_US">74321</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-10.16" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="12.7" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="12.7" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="-10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="5.08" angle="0" y="2.54" uuid="{5fed306d-ae4b-43fe-a2d7-60bb3e0d53de}">
+            <name locale="en_US">TK1</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="0" uuid="{587abfcd-6e10-458f-9f8b-8e5b76ab4459}">
+            <name locale="en_US">TK2</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="10.16" uuid="{b64a18d1-e225-434b-9f23-3899e3621b48}">
+            <name locale="en_US">FFQ</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="10.16" uuid="{905276da-ede2-469f-ab54-f5f126539bbf}">
+            <name locale="en_US">FFD</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-2.54" uuid="{280fb7dd-8186-4dcc-a388-8b8a5f752e77}">
+            <name locale="en_US">F/4</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="5.08" uuid="{15561ecd-40ed-4699-b7c1-6d3f34579df0}">
+            <name locale="en_US">F</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-7.62" uuid="{d0a63ecd-2fad-425e-b039-12c704d1053c}">
+            <name locale="en_US">!F*</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-5.08" uuid="{025fc051-955f-434b-bc08-445ea266e875}">
+            <name locale="en_US">F*</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="2.54" uuid="{3043e9f1-5b79-4740-bcea-776893e9a287}">
+            <name locale="en_US">!F</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="0" uuid="{a7cf7945-3477-45dc-b2f5-0d00b2de7bf4}">
+            <name locale="en_US">F/2</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-5.08" uuid="{247fc2d3-ad3f-4f0f-a009-2fcab4bfd940}">
+            <name locale="en_US">XTL@1</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-7.62" uuid="{9c908c8e-9b88-47a4-83df-cf29f8d7a4aa}">
+            <name locale="en_US">XTL@2</name>
+        </pin>
+    </pins>
+</symbol>

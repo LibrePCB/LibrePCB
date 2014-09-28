@@ -1,0 +1,49 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{ea9c5c04-f509-48bf-9c1e-395215d8e308}</uuid>
+        <name locale="en_US">T1P2S</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="5.715" width="0.254" layer="10" start_x="1.27">
+            <segment type="line" end_x="1.27" end_y="-8.255"/>
+        </polygon>
+        <polygon fill="true" start_y="-7.62" width="0.254" layer="10" start_x="-2.286">
+            <segment type="line" end_x="0.254" end_y="-7.62"/>
+            <segment type="line" end_x="0.254" end_y="5.08"/>
+            <segment type="line" end_x="-2.286" end_y="5.08"/>
+            <segment type="line" end_x="-2.286" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="true" start_y="0" width="0.254" layer="10" start_x="2.286">
+            <segment type="line" end_x="4.826" end_y="0"/>
+            <segment type="line" end_x="4.826" end_y="5.08"/>
+            <segment type="line" end_x="2.286" end_y="5.08"/>
+            <segment type="line" end_x="2.286" end_y="0"/>
+        </polygon>
+        <polygon fill="true" start_y="-7.62" width="0.254" layer="10" start_x="2.286">
+            <segment type="line" end_x="4.826" end_y="-7.62"/>
+            <segment type="line" end_x="4.826" end_y="-2.54"/>
+            <segment type="line" end_x="2.286" end_y="-2.54"/>
+            <segment type="line" end_x="2.286" end_y="-7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="5.08" uuid="{0a0eeffb-a97b-4e8f-baa2-dcfd14f910b9}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{c52c93a2-6f6d-4922-a093-3825a4e9f3a7}">
+            <name locale="en_US">2</name>
+        </pin>
+        <pin x="7.62" length="5.08" angle="180" y="-7.62" uuid="{377cf08a-b760-48aa-928e-6fd8ad9122b2}">
+            <name locale="en_US">3</name>
+        </pin>
+        <pin x="7.62" length="5.08" angle="180" y="-2.54" uuid="{aed55e29-e219-4139-905e-f2a977a99ef1}">
+            <name locale="en_US">4</name>
+        </pin>
+        <pin x="7.62" length="5.08" angle="180" y="0" uuid="{b59888e8-e6f3-46e2-a149-884197df3534}">
+            <name locale="en_US">5</name>
+        </pin>
+        <pin x="7.62" length="5.08" angle="180" y="5.08" uuid="{2d4730ab-f7a6-4bff-b355-396e03e84df3}">
+            <name locale="en_US">6</name>
+        </pin>
+    </pins>
+</symbol>

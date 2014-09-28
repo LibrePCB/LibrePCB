@@ -1,0 +1,15 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{631f532d-fd9c-472a-a331-86fc62d16e2d}</uuid>
+        <name locale="en_US">PAD-N</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.016" width="0.254" layer="10" start_x="-1.016">
+            <segment type="line" end_x="1.016" end_y="-1.016"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.016" width="0.254" layer="10" start_x="-1.016">
+            <segment type="line" end_x="1.016" end_y="1.016"/>
+        </polygon>
+    </geometry>
+    <pins/>
+</symbol>

@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{82a706fc-e793-4818-8fe1-72a2f94f5f15}</uuid>
+        <name locale="en_US">ICL7650</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-10.16" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="-10.16" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="5.08" angle="0" y="7.62" uuid="{e74f6494-d6bf-45f4-a9d0-505a0aa76e09}">
+            <name locale="en_US">+IN</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="2.54" uuid="{914ad940-890d-4aa3-a279-9fbc6c9de66d}">
+            <name locale="en_US">-IN</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-2.54" uuid="{b4449243-4f6b-4f72-ba0a-cbd4f2872cfa}">
+            <name locale="en_US">CEXTA</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-5.08" uuid="{492bb7a3-00be-4415-b9fd-b72288cb250e}">
+            <name locale="en_US">CEXTB</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-7.62" uuid="{14d59a6d-7a24-4bb0-8c39-a3709ef71fc9}">
+            <name locale="en_US">CRETN</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-5.08" uuid="{d45c67ec-a092-47ce-b338-3e3e7f2bec35}">
+            <name locale="en_US">V-</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="0" uuid="{73336259-33c5-4bf1-ade8-3fd15ccbd751}">
+            <name locale="en_US">V+</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="7.62" uuid="{ddc58fbf-80ff-4ca4-91df-67706756b79e}">
+            <name locale="en_US">OUT</name>
+        </pin>
+    </pins>
+</symbol>

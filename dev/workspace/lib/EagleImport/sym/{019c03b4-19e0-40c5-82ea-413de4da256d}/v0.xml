@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{019c03b4-19e0-40c5-82ea-413de4da256d}</uuid>
+        <name locale="en_US">MLX10803</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="12.7" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="-10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="7.62" uuid="{78a5f0e8-eace-459b-be5e-d15d692146ac}">
+            <name locale="en_US">VREF</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{c3640d0a-710f-4dc9-9fef-4bb6a1393aca}">
+            <name locale="en_US">ROSC</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{1c7b5395-4647-4c72-9706-37d4059cde37}">
+            <name locale="en_US">IREF1</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-7.62" uuid="{0fee6277-62dc-4c0f-9ff1-8fe6a51fb33b}">
+            <name locale="en_US">IREF2</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-7.62" uuid="{00789cfd-722f-441b-82c4-9c2833787533}">
+            <name locale="en_US">RSENSE</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-2.54" uuid="{92e610d4-ad5d-4e10-addc-f30d7282f80e}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="2.54" uuid="{8d16bbf3-e163-420b-a0db-cdb2580838f6}">
+            <name locale="en_US">DRVGATE</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="7.62" uuid="{076483db-cbf9-41df-9402-f9ccef018006}">
+            <name locale="en_US">VS/PWM</name>
+        </pin>
+    </pins>
+</symbol>

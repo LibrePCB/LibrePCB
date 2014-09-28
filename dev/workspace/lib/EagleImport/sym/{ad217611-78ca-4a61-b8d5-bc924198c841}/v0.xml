@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{ad217611-78ca-4a61-b8d5-bc924198c841}</uuid>
+        <name locale="en_US">MCP3550</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="12.7" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="10.16" end_y="12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="12.7" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-7.62" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="12.7"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="5.08" uuid="{37d389a6-248b-41e9-9a0a-7c710a0a8627}">
+            <name locale="en_US">VREF</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="0" uuid="{4358f8ff-440e-4f06-9e60-e2213cee3f6b}">
+            <name locale="en_US">VIN+</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-5.08" uuid="{daa93fdc-ea35-4e6d-a22d-4bdb130a2a77}">
+            <name locale="en_US">VIN-</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="10.16" uuid="{98b998f4-f42c-4d67-af5f-7e846b1a66cd}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-10.16" uuid="{dcb69187-c299-4df3-b584-0ae7fa60f4bf}">
+            <name locale="en_US">VSS</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="2.54" uuid="{513c8399-25f4-43cd-97ff-59affa1e7de6}">
+            <name locale="en_US">!CS</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-7.62" uuid="{b3816d71-39a2-4526-8e70-91d5656f8ca1}">
+            <name locale="en_US">SDO/!RDY</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-2.54" uuid="{66c07211-9396-4cb1-ba75-f4a73347c794}">
+            <name locale="en_US">SCK</name>
+        </pin>
+    </pins>
+</symbol>

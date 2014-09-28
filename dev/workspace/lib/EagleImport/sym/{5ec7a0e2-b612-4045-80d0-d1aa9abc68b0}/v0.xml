@@ -1,0 +1,73 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{5ec7a0e2-b612-4045-80d0-d1aa9abc68b0}</uuid>
+        <name locale="en_US">TMS320C6720-DVDD</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-49.53"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{1a23f903-4c6a-4808-a26e-9060b580f545}">
+            <name locale="en_US">DVDD</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{408d9359-f178-407c-9b80-7ed0d9594073}">
+            <name locale="en_US">DVDD@1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{e21bb687-89ee-4e25-be8e-19dd04b08121}">
+            <name locale="en_US">DVDD@2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{98682cda-6d1b-422d-b349-934c9e5331f5}">
+            <name locale="en_US">DVDD@3</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{89d1dad1-d273-4cdf-b6ed-7d9bedc6ad91}">
+            <name locale="en_US">DVDD@4</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{ec72998d-aa34-4bdf-9ad2-60aaa8d3170d}">
+            <name locale="en_US">DVDD@5</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{ab12a13f-6304-4ffc-82fe-c0eb4ef93a1b}">
+            <name locale="en_US">DVDD@6</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{ceedf932-e880-438b-9f82-33001477d9b0}">
+            <name locale="en_US">DVDD@7</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{3e8745b5-7c0a-4788-91c4-f18344513aec}">
+            <name locale="en_US">DVDD@8</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{fbe711f1-4639-4728-9511-0cb3e150b5e9}">
+            <name locale="en_US">DVDD@9</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{721f0d97-b0ef-43ea-af2c-7826d022e37d}">
+            <name locale="en_US">DVDD@10</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{0fddba3b-268e-442f-96b2-8f187721c035}">
+            <name locale="en_US">DVDD@11</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{f2f54608-279e-4735-8085-556d742bb860}">
+            <name locale="en_US">DVDD@12</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-33.02" uuid="{c4e4917f-4bf0-4302-ac1e-56fee3ccb0d6}">
+            <name locale="en_US">DVDD@13</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-35.56" uuid="{f6c08102-fafd-4b06-947d-5578a2516798}">
+            <name locale="en_US">DVDD@14</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-38.1" uuid="{67f1f317-d641-42b1-a838-ccbebe8dbd0e}">
+            <name locale="en_US">DVDD@15</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-40.64" uuid="{f9de8e0f-2e33-49dd-b38e-1dcac69ded27}">
+            <name locale="en_US">DVDD@16</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-43.18" uuid="{a0418f89-2d29-4cf9-b10d-8b94a83de81f}">
+            <name locale="en_US">DVDD@17</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-45.72" uuid="{b458f5d8-1e92-4c4f-8c79-7bc7dcbf21db}">
+            <name locale="en_US">DVDD@18</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-48.26" uuid="{99d9676c-31cd-482d-a265-398746c4398c}">
+            <name locale="en_US">DVDD@19</name>
+        </pin>
+    </pins>
+</symbol>

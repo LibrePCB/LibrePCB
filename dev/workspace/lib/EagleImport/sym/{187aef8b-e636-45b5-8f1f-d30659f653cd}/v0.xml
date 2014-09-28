@@ -1,0 +1,22 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{187aef8b-e636-45b5-8f1f-d30659f653cd}</uuid>
+        <name locale="en_US">RN_1</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-0.508" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="0.762">
+            <segment type="line" end_x="-2.54" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{df66cb4b-7d34-4775-8556-1d159b1543ca}">
+            <name locale="en_US">1</name>
+        </pin>
+    </pins>
+</symbol>

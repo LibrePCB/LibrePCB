@@ -1,0 +1,70 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{f5a6d92c-d003-449a-9eae-8865b85d3025}</uuid>
+        <name locale="en_US">FT230X</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="12.7" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="-12.7" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-12.7" end_y="-12.7"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="2.54" angle="0" y="7.62" uuid="{cc75451e-6f0a-4737-ad94-5412d0ced711}">
+            <name locale="en_US">TXD</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="5.08" uuid="{b51723c7-e4fb-491f-be30-3d23ae8e3391}">
+            <name locale="en_US">!RTS</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="2.54" uuid="{f180fe96-f124-420e-9887-fbf6ba19af17}">
+            <name locale="en_US">VCCIO</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="0" uuid="{9f9d0035-6e75-47f0-8f5c-d9e52ba77558}">
+            <name locale="en_US">RXD</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-2.54" uuid="{3574dc47-442d-4342-ad81-ab223ee719cc}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-5.08" uuid="{455a1ef5-8b15-4ab6-80b1-de71858b7121}">
+            <name locale="en_US">!CTS</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-7.62" uuid="{c37ae5cf-dd4c-4d2e-809a-84904fab7003}">
+            <name locale="en_US">CBUS2</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-10.16" uuid="{bf16b977-1528-456d-b5a2-7437bf93de9e}">
+            <name locale="en_US">USBDP</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-10.16" uuid="{d658a55e-6981-4cb7-9f5c-088a6d73dd50}">
+            <name locale="en_US">USBDM</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-7.62" uuid="{25ea995a-52bd-4f35-8919-67e2819d1596}">
+            <name locale="en_US">3V3OUT</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-5.08" uuid="{8fe0e3bd-20e9-4535-9bdc-0a71d45ff8aa}">
+            <name locale="en_US">!RESET</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-2.54" uuid="{5030207c-9d2e-4c2a-bc29-475b0e55aa44}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="0" uuid="{456198d8-a335-44aa-a546-a60dcdc87d92}">
+            <name locale="en_US">GND@1</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="2.54" uuid="{adffc15c-8a17-4c10-bc87-ba35759e5009}">
+            <name locale="en_US">CBUS1</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="5.08" uuid="{db8a28f1-ffd4-428e-96c6-6ce0fa8815e5}">
+            <name locale="en_US">CBUS0</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="7.62" uuid="{dcd9ae8a-d440-401d-85cf-09a9919f18ce}">
+            <name locale="en_US">CBUS3</name>
+        </pin>
+    </pins>
+</symbol>

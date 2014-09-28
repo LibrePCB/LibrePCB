@@ -1,0 +1,115 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{2f72a887-5cc0-41da-a174-f89eb1d76708}</uuid>
+        <name locale="en_US">DM385_CVDD</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-93.98"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{37db631a-d464-426b-888e-29f162ea0665}">
+            <name locale="en_US">CVDDARM@1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{69ae1271-8817-4b35-839a-4b49feb729c8}">
+            <name locale="en_US">CVDDARM@2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{22017943-3513-42a2-9afb-6c00d589146a}">
+            <name locale="en_US">CVDDARM@3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{53fc5324-b316-4219-8dea-1c3ab0f67179}">
+            <name locale="en_US">CVDDARM@4</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{27b6a9ba-82e0-45fd-8cc2-276d376f8cb7}">
+            <name locale="en_US">CVDDARM@5</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-15.24" uuid="{9694a778-a524-4c60-9bf3-21a46da2f163}">
+            <name locale="en_US">CVDDARM@6</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-20.32" uuid="{21402933-cd14-4d64-82c4-cdb12a31241c}">
+            <name locale="en_US">CVDDHDVICP@1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-22.86" uuid="{cca0537b-3d59-4792-b829-526ca18d6c48}">
+            <name locale="en_US">CVDDHDVICP@2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-25.4" uuid="{11d06e01-27ba-4e37-aca3-1319dbc4e035}">
+            <name locale="en_US">CVDDHDVICP@3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-27.94" uuid="{bd9f9b19-5195-4ab2-9665-c3870159bb70}">
+            <name locale="en_US">CVDDHDVICP@4</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-30.48" uuid="{aa94e50e-d568-45f3-a25e-f626f37986bd}">
+            <name locale="en_US">CVDDHDVICP@5</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-35.56" uuid="{39a9b41d-6587-42ce-8d24-972206bfa4d0}">
+            <name locale="en_US">CVDD@1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-38.1" uuid="{a9a030e5-31a6-4613-8930-485ad37db13d}">
+            <name locale="en_US">CVDD@2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-40.64" uuid="{75d389b1-3dcb-4be3-8c77-6c33ce5ce865}">
+            <name locale="en_US">CVDD@3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-43.18" uuid="{aff2a161-59ac-40b3-b76b-2dda2ab75b79}">
+            <name locale="en_US">CVDD@4</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-45.72" uuid="{86891ebf-3696-4929-979c-4c3c76d5a032}">
+            <name locale="en_US">CVDD@5</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-48.26" uuid="{b7ecb512-b787-422b-b937-f4ff70482a7b}">
+            <name locale="en_US">CVDD@6</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-50.8" uuid="{61b18340-6212-406e-bf3b-e77438fdcf9a}">
+            <name locale="en_US">CVDD@7</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-53.34" uuid="{5eacd374-06f8-45bf-89f8-3f99370364a1}">
+            <name locale="en_US">CVDD@8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-55.88" uuid="{efcf0bec-9ef5-4557-b8ee-75cd7266322f}">
+            <name locale="en_US">CVDD@9</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-58.42" uuid="{12c16329-4cd1-4d3b-a869-e3d02e2d836b}">
+            <name locale="en_US">CVDD@10</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-60.96" uuid="{bc337bf3-d58c-4603-b8fd-674e01db510a}">
+            <name locale="en_US">CVDD@11</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-63.5" uuid="{f56e0c01-375f-41c1-afe0-c074ecc2b22c}">
+            <name locale="en_US">CVDD@12</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-66.04" uuid="{56d874a1-2953-4da8-be25-0ce9362c0f91}">
+            <name locale="en_US">CVDD@13</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-68.58" uuid="{08c81231-c5ff-4974-84b2-18763550b007}">
+            <name locale="en_US">CVDD@14</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-71.12" uuid="{84b350f8-895b-4dd3-bf65-f500aaa7c49f}">
+            <name locale="en_US">CVDD@15</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-73.66" uuid="{e9d9df69-c483-49d8-86b7-10fd5264ce35}">
+            <name locale="en_US">CVDD@16</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-76.2" uuid="{baf37ba1-c609-465c-ae22-b68999c989ad}">
+            <name locale="en_US">CVDD@17</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-78.74" uuid="{7d9d008e-c5f5-420f-89f7-4dcfc3bf0982}">
+            <name locale="en_US">CVDD@18</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-81.28" uuid="{443d175d-282f-4e49-a146-1d541c753850}">
+            <name locale="en_US">CVDD@19</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-83.82" uuid="{fd052690-3e2f-4a3d-989e-df031b3d5df4}">
+            <name locale="en_US">CVDD@20</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-86.36" uuid="{b73d1578-6225-4f17-9880-bf12b719265b}">
+            <name locale="en_US">CVDD@21</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-88.9" uuid="{a77a8794-041c-495e-828f-da880db1fa8b}">
+            <name locale="en_US">CVDD@22</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-91.44" uuid="{743009b5-5c58-4bae-a6fc-4a5b2b3a59f4}">
+            <name locale="en_US">CVDD@23</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,12 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{8ffedf8a-1d6d-4275-8fb3-93492bd535a4}</uuid>
+        <name locale="en_US">VCC</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="0" length="2.54" angle="270" y="2.54" uuid="{abcf3e9a-7784-44b3-9f58-8ad017cb58d8}">
+            <name locale="en_US">VCC</name>
+        </pin>
+    </pins>
+</symbol>

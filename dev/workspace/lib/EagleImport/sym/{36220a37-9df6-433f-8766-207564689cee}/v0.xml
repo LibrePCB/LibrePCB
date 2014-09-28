@@ -1,0 +1,37 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{36220a37-9df6-433f-8766-207564689cee}</uuid>
+        <name locale="en_US">S-X2</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.905"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-2.413"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.413" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="-1.27" end_y="1.905"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="2.54" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="2.54" end_y="-2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-5.08" uuid="{3ee3fb80-a791-43d3-af12-b9c0acf56105}">
+            <name locale="en_US">PA</name>
+        </pin>
+        <pin x="0" length="2.54" angle="270" y="5.08" uuid="{b838c0b1-5086-4129-a256-c4ff0766438f}">
+            <name locale="en_US">SA</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="270" y="5.08" uuid="{906cb85f-9e01-46f4-ae59-5ff95cc416a2}">
+            <name locale="en_US">SB</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-5.08" uuid="{9bb1e0f4-673a-4137-9eb2-f56a3387d3f2}">
+            <name locale="en_US">PB</name>
+        </pin>
+    </pins>
+</symbol>

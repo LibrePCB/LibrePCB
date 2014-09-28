@@ -1,0 +1,52 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{c0e599dc-ead5-4a05-ad14-fa8a877a751b}</uuid>
+        <name locale="en_US">STEREO-JACK3</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-1.524" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="-1.524">
+            <segment type="line" end_x="0" end_y="1.016"/>
+        </polygon>
+        <polygon fill="false" start_y="1.016" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0.508" end_y="1.524"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="0.508" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.1524" layer="10" start_x="0.508">
+            <segment type="line" end_x="4.318" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.1524" layer="10" start_x="4.318">
+            <segment type="line" end_x="4.826" end_y="-1.778"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="0.762" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="0.762">
+            <segment type="line" end_x="2.54" end_y="-0.762"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.762" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="3.048" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="true" start_y="-2.667" width="0.254" layer="10" start_x="5.207">
+            <segment type="line" end_x="6.604" end_y="-2.667"/>
+            <segment type="line" end_x="6.604" end_y="2.667"/>
+            <segment type="line" end_x="5.207" end_y="2.667"/>
+            <segment type="line" end_x="5.207" end_y="-2.667"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2.54" angle="0" y="-5.08" uuid="{b06b9e80-b64c-4298-9871-4b03e138e2a1}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="2.54" uuid="{d87846c0-6205-4297-ba16-c9e46099971d}">
+            <name locale="en_US">2</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-2.54" uuid="{b1d0437e-f774-4cee-b8a0-0cc69ba99ad4}">
+            <name locale="en_US">3</name>
+        </pin>
+    </pins>
+</symbol>

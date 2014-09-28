@@ -1,0 +1,31 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{3cfbf4fd-7a2a-44e0-b494-3d9e8d087d1a}</uuid>
+        <name locale="en_US">78ADJ</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-5.08" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="5.08" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.4064" layer="10" start_x="5.08">
+            <segment type="line" end_x="5.08" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.4064" layer="10" start_x="5.08">
+            <segment type="line" end_x="-5.08" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="-5.08"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-7.62" length="2.54" angle="0" y="0" uuid="{e63ad179-05fd-4753-bb6c-dd7862c23ff9}">
+            <name locale="en_US">IN</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-7.62" uuid="{26414477-c122-461a-a7a2-26019b175e08}">
+            <name locale="en_US">ADJ</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="0" uuid="{4e690525-ff4a-4365-a10f-8d9f665e8a37}">
+            <name locale="en_US">OUT</name>
+        </pin>
+    </pins>
+</symbol>

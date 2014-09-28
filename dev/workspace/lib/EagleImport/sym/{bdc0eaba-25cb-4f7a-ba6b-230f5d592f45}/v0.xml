@@ -1,0 +1,16 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{bdc0eaba-25cb-4f7a-ba6b-230f5d592f45}</uuid>
+        <name locale="en_US">F</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-0.889" width="0.254" layer="10" start_x="-0.889">
+            <segment type="line" end_x="-0.889" end_y="0.889"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="2.54" length="2.54" angle="180" y="0" uuid="{377f135d-1c98-4a86-85c9-f191087e7671}">
+            <name locale="en_US">B</name>
+        </pin>
+    </pins>
+</symbol>

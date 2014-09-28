@@ -1,0 +1,31 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{9417b936-e98e-47e7-889b-0d2343192386}</uuid>
+        <name locale="en_US">LP2950</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="5.08" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="5.08" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="-5.08" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="5.08"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-7.62" length="2.54" angle="0" y="2.54" uuid="{426da81e-6744-4dc9-84dd-19ff3edf71c4}">
+            <name locale="en_US">I</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="2.54" uuid="{a34b6796-6fa0-4d2e-b1fd-ac775e8ddf5c}">
+            <name locale="en_US">O</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-7.62" uuid="{b4c4a306-e030-4f70-adae-f697a0a2bf1c}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

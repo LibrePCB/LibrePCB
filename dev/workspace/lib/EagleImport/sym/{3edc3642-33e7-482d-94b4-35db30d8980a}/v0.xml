@@ -1,0 +1,43 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{3edc3642-33e7-482d-94b4-35db30d8980a}</uuid>
+        <name locale="en_US">TLE4242</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="7.62" uuid="{dd161092-2352-4658-a85f-858ac00a69bd}">
+            <name locale="en_US">IN</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="2.54" uuid="{927d1c4c-14b1-41b0-a544-be9bd1e5c627}">
+            <name locale="en_US">PWM</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="0" uuid="{4355343e-f399-4660-8894-16e948f487fa}">
+            <name locale="en_US">REF</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-2.54" uuid="{6ca9d6c3-4338-450f-ae21-f37224f81430}">
+            <name locale="en_US">D</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="7.62" uuid="{71546110-f4c0-443f-bc2e-9fc692ca1164}">
+            <name locale="en_US">Q</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-7.62" uuid="{1aeb3c22-c0be-4dbe-847e-5e533decc3d9}">
+            <name locale="en_US">ST</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-7.62" uuid="{7b90c575-777f-4dd0-be18-ac3a40b08095}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

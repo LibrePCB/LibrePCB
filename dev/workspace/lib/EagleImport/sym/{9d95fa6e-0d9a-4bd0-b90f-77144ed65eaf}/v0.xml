@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{9d95fa6e-0d9a-4bd0-b90f-77144ed65eaf}</uuid>
+        <name locale="en_US">STEREO-JACK</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="5.08" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-1.016" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.1524" layer="10" start_x="-1.016">
+            <segment type="line" end_x="2.54" end_y="1.524"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-1.524" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="-1.524">
+            <segment type="line" end_x="0" end_y="1.016"/>
+        </polygon>
+        <polygon fill="false" start_y="1.016" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0.508" end_y="1.778"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="5.207" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="1.524" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="3.048" end_y="2.286"/>
+        </polygon>
+        <polygon fill="true" start_y="-2.667" width="0.254" layer="10" start_x="5.207">
+            <segment type="line" end_x="6.604" end_y="-2.667"/>
+            <segment type="line" end_x="6.604" end_y="2.667"/>
+            <segment type="line" end_x="5.207" end_y="2.667"/>
+            <segment type="line" end_x="5.207" end_y="-2.667"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2.54" angle="0" y="-2.54" uuid="{42a98424-97de-42dc-a5d9-4737a51c2cb7}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="5.08" uuid="{58c6cbde-1e57-4f03-af19-ccc2e6eacd60}">
+            <name locale="en_US">2</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="2.54" uuid="{76e8f484-e4aa-4cc5-b3d7-ca4cf3f72cb3}">
+            <name locale="en_US">3</name>
+        </pin>
+    </pins>
+</symbol>

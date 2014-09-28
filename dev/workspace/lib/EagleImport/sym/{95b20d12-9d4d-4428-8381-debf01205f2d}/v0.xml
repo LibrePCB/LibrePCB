@@ -1,0 +1,49 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{95b20d12-9d4d-4428-8381-debf01205f2d}</uuid>
+        <name locale="en_US">CONNECT-VALUE</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.143" width="0.254" layer="10" start_x="0.889">
+            <segment type="line" end_x="0.889" end_y="0.762"/>
+        </polygon>
+        <polygon fill="false" start_y="0.762" width="0.254" layer="10" start_x="0.889">
+            <segment type="line" end_x="0.508" end_y="0.381"/>
+        </polygon>
+        <polygon fill="false" start_y="0.381" width="0.254" layer="10" start_x="0.508">
+            <segment type="line" end_x="0.127" end_y="0.381"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.381" width="0.254" layer="10" start_x="0.127">
+            <segment type="line" end_x="0.508" end_y="-0.381"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.381" width="0.254" layer="10" start_x="0.508">
+            <segment type="line" end_x="0.889" end_y="-0.762"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.762" width="0.254" layer="10" start_x="0.889">
+            <segment type="line" end_x="0.889" end_y="-1.143"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.143" width="0.254" layer="10" start_x="1.651">
+            <segment type="line" end_x="1.651" end_y="-0.762"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.762" width="0.254" layer="10" start_x="1.651">
+            <segment type="line" end_x="2.032" end_y="-0.381"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.381" width="0.254" layer="10" start_x="2.032">
+            <segment type="line" end_x="2.413" end_y="-0.381"/>
+        </polygon>
+        <polygon fill="false" start_y="0.381" width="0.254" layer="10" start_x="2.413">
+            <segment type="line" end_x="2.032" end_y="0.381"/>
+        </polygon>
+        <polygon fill="false" start_y="0.381" width="0.254" layer="10" start_x="2.032">
+            <segment type="line" end_x="1.651" end_y="0.762"/>
+        </polygon>
+        <polygon fill="false" start_y="0.762" width="0.254" layer="10" start_x="1.651">
+            <segment type="line" end_x="1.651" end_y="1.143"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{35e333aa-084f-431f-ac6d-b22dda5e05b5}">
+            <name locale="en_US">1</name>
+        </pin>
+    </pins>
+</symbol>

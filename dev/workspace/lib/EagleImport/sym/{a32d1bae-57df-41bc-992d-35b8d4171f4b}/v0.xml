@@ -1,0 +1,43 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{a32d1bae-57df-41bc-992d-35b8d4171f4b}</uuid>
+        <name locale="en_US">DCP0124D</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-10.16" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="-7.62" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="-10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="5.08" angle="0" y="5.08" uuid="{ebf28403-6b3b-436c-b7ee-2d3c08249060}">
+            <name locale="en_US">SYIN</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="5.08" uuid="{d3f94b3b-98e3-490c-abb3-290019e6bc29}">
+            <name locale="en_US">SYOUT</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-2.54" uuid="{60a23fe2-d4f0-4bf1-8842-108c0e3c48d3}">
+            <name locale="en_US">-VOUT</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-2.54" uuid="{29dff052-6b4e-4b1a-b818-c67a637029a3}">
+            <name locale="en_US">VS</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="0" uuid="{c48445bd-faed-4e1e-bb00-1de83e39a1cc}">
+            <name locale="en_US">+VOUT</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-7.62" uuid="{4be75981-bd96-401e-adb9-3276e868ad06}">
+            <name locale="en_US">0V</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-7.62" uuid="{397dab2c-bdd3-446b-a3d5-0c6f6ccd88a2}">
+            <name locale="en_US">0V@1</name>
+        </pin>
+    </pins>
+</symbol>

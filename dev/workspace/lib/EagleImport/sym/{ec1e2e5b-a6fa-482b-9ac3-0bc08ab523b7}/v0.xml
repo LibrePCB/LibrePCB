@@ -1,0 +1,91 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{ec1e2e5b-a6fa-482b-9ac3-0bc08ab523b7}</uuid>
+        <name locale="en_US">DM385_VDD</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-73.66"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="-43.18" uuid="{38219563-d56c-4bfc-aa17-1e41272e0462}">
+            <name locale="en_US">VDDAARMPLL1P8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{ecd40df3-90bc-464a-9feb-97b59276782d}">
+            <name locale="en_US">VDDAAUDIOPLL1P8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{1de03be8-631d-439b-b1d6-4d97eb282d51}">
+            <name locale="en_US">VDDAVDAC1P8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{3ad98918-1b13-40cb-96bb-2c85094c537c}">
+            <name locale="en_US">VDDACSI21P8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{43a0c085-0fb7-4731-9dab-82b753f72648}">
+            <name locale="en_US">VDDADDRPLL1P8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{e97743c4-cd6e-49c9-870f-c0d63bdb4c18}">
+            <name locale="en_US">VDDAHDDAC1P1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-15.24" uuid="{9e88638e-d3b4-4847-9ec1-45d83cdb39b2}">
+            <name locale="en_US">VDDAHDDAC1P8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-17.78" uuid="{13116e84-5b41-43a6-a214-a9021070dc1d}">
+            <name locale="en_US">VDDAHDMI1P8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-20.32" uuid="{c4910a68-1804-4011-80b1-667fb98d387d}">
+            <name locale="en_US">VDDAL3L41P8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-22.86" uuid="{7d9dde49-a38d-4cee-8fd6-47b492f1f9fc}">
+            <name locale="en_US">VDDAHDVICPPLL1P8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-25.4" uuid="{ebb060fe-e350-4455-a827-112be975b76f}">
+            <name locale="en_US">VDDAHDDACREF1P8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-27.94" uuid="{28fc5f95-469b-4642-90b4-a4cbdf7f0fdc}">
+            <name locale="en_US">VDDAVIDPLL1P8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-30.48" uuid="{41e7f6f6-4871-4c03-af62-f1af230978e9}">
+            <name locale="en_US">VDDAUSB01P8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-33.02" uuid="{0601869c-bc8e-4a47-9a29-9b3c81a9db20}">
+            <name locale="en_US">VDDAUSB11P8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-35.56" uuid="{9d3f255e-48b2-4b78-a9c3-54a083b18637}">
+            <name locale="en_US">VDDAUSB3P3@1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-38.1" uuid="{e118a816-9501-41c9-bbfc-2350761b8533}">
+            <name locale="en_US">VDDAUSB3P3@2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-40.64" uuid="{e8103ac8-4259-4aca-9439-384d7fa88821}">
+            <name locale="en_US">VDDAPCIE1P8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-48.26" uuid="{d7a20637-efa0-4160-973a-8d149c4084e4}">
+            <name locale="en_US">VDDSOSC01P8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-50.8" uuid="{4ee140aa-47b7-4f7b-9eaa-a9ca7ff889c7}">
+            <name locale="en_US">VDDSOSC11P8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-55.88" uuid="{374f3599-7742-4047-827e-304f6a7aaae1}">
+            <name locale="en_US">VDDA1P8@1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-58.42" uuid="{87b2f271-54c6-4cb9-b0e6-b094eb618923}">
+            <name locale="en_US">VDDA1P8@2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-60.96" uuid="{1a2e6dfd-66f4-4cf6-addc-8808b02dc440}">
+            <name locale="en_US">VDDA1P8@3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-63.5" uuid="{955c3353-7ddc-43d7-b948-54abc7dd32fe}">
+            <name locale="en_US">VDDA1P8@4</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-66.04" uuid="{91d93648-4623-490f-b555-a8d8144d641a}">
+            <name locale="en_US">VDDA1P8@5</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-68.58" uuid="{8574314d-aae9-4e5b-8460-17a1c745c2a7}">
+            <name locale="en_US">VDDA1P8@6</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-71.12" uuid="{1166ddff-4539-4e6c-8aa1-6c32b6e95bd2}">
+            <name locale="en_US">VDDA1P8@7</name>
+        </pin>
+    </pins>
+</symbol>

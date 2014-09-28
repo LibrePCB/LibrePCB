@@ -1,0 +1,73 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{d91b2687-82c6-4e92-b278-cfa3263bbd9d}</uuid>
+        <name locale="en_US">MOUNT-PAD-SQUARE</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.032" width="1.016" layer="10" start_x="0.254">
+            <segment type="line" end_x="2.032" end_y="0.254"/>
+        </polygon>
+        <polygon fill="false" start_y="0.254" width="1.016" layer="10" start_x="-2.032">
+            <segment type="line" end_x="-0.254" end_y="2.032"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.254" width="1.016" layer="10" start_x="-2.032">
+            <segment type="line" end_x="-0.254" end_y="-2.032"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.032" width="1.016" layer="10" start_x="0.254">
+            <segment type="line" end_x="2.032" end_y="-0.254"/>
+        </polygon>
+        <polygon fill="true" start_y="0.254" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-1.524" end_y="0.254"/>
+            <segment type="line" end_x="-1.524" end_y="2.54"/>
+            <segment type="line" end_x="-2.54" end_y="2.54"/>
+            <segment type="line" end_x="-2.54" end_y="0.254"/>
+        </polygon>
+        <polygon fill="true" start_y="1.524" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-0.254" end_y="1.524"/>
+            <segment type="line" end_x="-0.254" end_y="2.54"/>
+            <segment type="line" end_x="-2.54" end_y="2.54"/>
+            <segment type="line" end_x="-2.54" end_y="1.524"/>
+        </polygon>
+        <polygon fill="true" start_y="-2.54" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-1.524" end_y="-2.54"/>
+            <segment type="line" end_x="-1.524" end_y="-0.254"/>
+            <segment type="line" end_x="-2.54" end_y="-0.254"/>
+            <segment type="line" end_x="-2.54" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="true" start_y="-2.54" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-0.254" end_y="-2.54"/>
+            <segment type="line" end_x="-0.254" end_y="-1.524"/>
+            <segment type="line" end_x="-2.54" end_y="-1.524"/>
+            <segment type="line" end_x="-2.54" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="true" start_y="-2.54" width="0.254" layer="10" start_x="1.524">
+            <segment type="line" end_x="2.54" end_y="-2.54"/>
+            <segment type="line" end_x="2.54" end_y="-0.254"/>
+            <segment type="line" end_x="1.524" end_y="-0.254"/>
+            <segment type="line" end_x="1.524" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="true" start_y="-2.54" width="0.254" layer="10" start_x="0.254">
+            <segment type="line" end_x="2.54" end_y="-2.54"/>
+            <segment type="line" end_x="2.54" end_y="-1.524"/>
+            <segment type="line" end_x="0.254" end_y="-1.524"/>
+            <segment type="line" end_x="0.254" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="true" start_y="1.524" width="0.254" layer="10" start_x="0.254">
+            <segment type="line" end_x="2.54" end_y="1.524"/>
+            <segment type="line" end_x="2.54" end_y="2.54"/>
+            <segment type="line" end_x="0.254" end_y="2.54"/>
+            <segment type="line" end_x="0.254" end_y="1.524"/>
+        </polygon>
+        <polygon fill="true" start_y="0.254" width="0.254" layer="10" start_x="1.524">
+            <segment type="line" end_x="2.54" end_y="0.254"/>
+            <segment type="line" end_x="2.54" end_y="2.54"/>
+            <segment type="line" end_x="1.524" end_y="2.54"/>
+            <segment type="line" end_x="1.524" end_y="0.254"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{fca54db4-0f9e-420d-bbfc-712d36c2b135}">
+            <name locale="en_US">MOUNT</name>
+        </pin>
+    </pins>
+</symbol>

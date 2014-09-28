@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{845d46bf-8ae8-42bd-9f7f-031b3c47c888}</uuid>
+        <name locale="en_US">TLC77XX</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="5.08" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="5.08"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{f9660059-d7bf-4e01-8235-52e22762e6cc}">
+            <name locale="en_US">CONTROL</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{a9d3c83d-59cb-4f9b-ab57-da907c0e5268}">
+            <name locale="en_US">!RESIN</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{e689bc7b-0e39-47c8-b501-deb2b2cfa37b}">
+            <name locale="en_US">CT</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{d5c9b707-4e2b-4bb0-83a3-dad8657cbddc}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-5.08" uuid="{724da7f1-0e68-4679-97fb-8fd86922d7bd}">
+            <name locale="en_US">!RESET</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-2.54" uuid="{c94f2c1a-e53b-4348-a792-51a285ef51e2}">
+            <name locale="en_US">RESET</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="0" uuid="{8aed809b-bc6e-4312-a166-fcaa670ac914}">
+            <name locale="en_US">SENSE</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="2.54" uuid="{b853bc57-4eb6-40a3-bdfb-1e10b0a08360}">
+            <name locale="en_US">VDD</name>
+        </pin>
+    </pins>
+</symbol>

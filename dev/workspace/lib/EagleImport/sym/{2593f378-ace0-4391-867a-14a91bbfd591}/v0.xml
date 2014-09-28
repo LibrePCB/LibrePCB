@@ -1,0 +1,19 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{2593f378-ace0-4391-867a-14a91bbfd591}</uuid>
+        <name locale="en_US">+05V</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.1524" layer="10" start_x="-0.635">
+            <segment type="line" end_x="0.635" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="0.635" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.905"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-2.54" uuid="{702ec238-76f8-4b4b-befc-4bc23b13cdeb}">
+            <name locale="en_US">+5V</name>
+        </pin>
+    </pins>
+</symbol>

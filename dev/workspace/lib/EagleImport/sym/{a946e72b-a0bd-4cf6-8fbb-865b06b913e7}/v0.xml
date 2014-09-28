@@ -1,0 +1,34 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{a946e72b-a0bd-4cf6-8fbb-865b06b913e7}</uuid>
+        <name locale="en_US">C-FILTER</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="2.54" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="1.778" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="2.54" end_y="1.778"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.778" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="2.54" end_y="-1.778"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-0.635"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{b69fc1cb-5843-4fa9-b1aa-5796d143387e}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="0" uuid="{5de5657e-397c-4e7e-9f6c-ab782f1cd157}">
+            <name locale="en_US">3</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-5.08" uuid="{05098407-618c-4b86-8f0d-6ce2f120d779}">
+            <name locale="en_US">2@1</name>
+        </pin>
+        <pin x="0" length="2.54" angle="270" y="-2.54" uuid="{50c4dd61-5b02-4675-bb74-485385a27e5f}">
+            <name locale="en_US">2@2</name>
+        </pin>
+    </pins>
+</symbol>

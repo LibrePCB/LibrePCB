@@ -1,0 +1,37 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{5756342e-27d8-483a-bccc-ce67a6da3029}</uuid>
+        <name locale="en_US">VARISTOR</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.016" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="-1.016"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.016" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="-2.54" end_y="-1.016"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.016" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="1.016"/>
+        </polygon>
+        <polygon fill="false" start_y="1.016" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="2.54" end_y="1.016"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.032" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.032" end_y="-2.032"/>
+        </polygon>
+        <polygon fill="false" start_y="2.032" width="0.254" layer="10" start_x="-2.032">
+            <segment type="line" end_x="-2.54" end_y="2.032"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.032" width="0.254" layer="10" start_x="2.032">
+            <segment type="line" end_x="-2.032" end_y="2.032"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="5.08" length="2.54" angle="180" y="0" uuid="{852bd21b-4659-44bc-b7d9-cbc51b377d65}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{158ce35b-6fd1-449a-b8cc-c5f486641db8}">
+            <name locale="en_US">2</name>
+        </pin>
+    </pins>
+</symbol>

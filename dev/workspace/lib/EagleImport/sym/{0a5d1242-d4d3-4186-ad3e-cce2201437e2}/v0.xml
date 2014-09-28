@@ -1,0 +1,151 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{0a5d1242-d4d3-4186-ad3e-cce2201437e2}</uuid>
+        <name locale="en_US">OMAP-L138_ZCE-B</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-115.57" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{b8f1a890-712e-4e77-903a-c722d164475c}">
+            <name locale="en_US">DDRA0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{2b4eda9d-dddb-45e6-8ec1-b61e7a32464e}">
+            <name locale="en_US">DDRA1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{7040c735-0448-42e8-a27d-36eea687a7b9}">
+            <name locale="en_US">DDRA2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{79a7e0f9-3f95-470a-9969-87fd7b002dcd}">
+            <name locale="en_US">DDRA3</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{1a22134b-e563-42a3-8d91-ac820a3bbc17}">
+            <name locale="en_US">DDRA4</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{ea6dce74-1442-4653-bf72-b9a8866c0eba}">
+            <name locale="en_US">DDRA5</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{b87bfa55-911f-4a4e-8c45-d0c31a46faca}">
+            <name locale="en_US">DDRA6</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{594beeb1-d10e-438e-a20f-6d76bc9a6dad}">
+            <name locale="en_US">DDRA7</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{b2679f7e-c487-41c9-b3b0-cd8e88371594}">
+            <name locale="en_US">DDRA8</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{b13b58ed-2b1f-4898-a03e-9f7585ce31b2}">
+            <name locale="en_US">DDRA9</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{42b96004-16b4-4ea1-84dd-4ffaec6e371f}">
+            <name locale="en_US">DDRA10</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{a07f4f7d-d499-4d68-8017-33f093ac6ed1}">
+            <name locale="en_US">DDRA11</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{a57ff74e-c99d-4185-b076-32c8e1db20aa}">
+            <name locale="en_US">DDRA12</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-33.02" uuid="{187d3d6e-a2c3-41d6-9acb-2a27f452aa8a}">
+            <name locale="en_US">DDRA13</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-35.56" uuid="{dd7b4224-b017-4902-806b-69f5ef6c18d1}">
+            <name locale="en_US">DDRBA0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-38.1" uuid="{318af1af-22c9-4056-be70-31b29747e8aa}">
+            <name locale="en_US">DDRBA1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-40.64" uuid="{09cd5596-b59d-494c-99f9-41b4fc7601f7}">
+            <name locale="en_US">DDRBA2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-43.18" uuid="{5bd71dfa-83aa-4936-8f32-a4748af0ee81}">
+            <name locale="en_US">DDRCASN</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-45.72" uuid="{bc00b8b9-4bbb-4a25-9744-77472c8a45d2}">
+            <name locale="en_US">DDRCKE</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-48.26" uuid="{34ce1a94-def8-4d94-8ddf-2a50436ba6d8}">
+            <name locale="en_US">DDRCLKN</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-50.8" uuid="{326961c6-9f4c-4a77-af10-164dae6a438b}">
+            <name locale="en_US">DDRCLKP</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-53.34" uuid="{6427d2ed-7e83-4cdd-99c5-601e0738e3e5}">
+            <name locale="en_US">DDRCSN</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-55.88" uuid="{73b68699-ff3e-4d0b-b797-d22e7f59ef18}">
+            <name locale="en_US">DDRD0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-58.42" uuid="{84fc04e8-ac2f-41c7-9819-27f42f3b9ab9}">
+            <name locale="en_US">DDRD1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-60.96" uuid="{cbc32d2f-f2cd-4bc0-bdc6-88b94d070200}">
+            <name locale="en_US">DDRD2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-63.5" uuid="{14f5160a-b6e6-4b82-b9e9-cada055bcd85}">
+            <name locale="en_US">DDRD3</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-66.04" uuid="{cb462aef-e4d5-4a81-8cf7-fefdd6124737}">
+            <name locale="en_US">DDRD4</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-68.58" uuid="{7a41ddec-43c9-41b6-95ad-fafdd8834e50}">
+            <name locale="en_US">DDRD5</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-71.12" uuid="{5c4b4ff8-04e6-4566-903d-f03a763fbe86}">
+            <name locale="en_US">DDRD6</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-73.66" uuid="{18a3ce05-f647-4d97-a926-6cd836614ede}">
+            <name locale="en_US">DDRD7</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-76.2" uuid="{e3479acb-169b-4e48-b25a-a552ba4e620b}">
+            <name locale="en_US">DDRD8</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-78.74" uuid="{17c58b4b-a8fc-409e-b49f-142edf2e3ece}">
+            <name locale="en_US">DDRD9</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-81.28" uuid="{dbaee861-e10a-4df0-b56d-d79c31363211}">
+            <name locale="en_US">DDRD10</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-83.82" uuid="{3e24e39b-5f1c-439a-adcc-51125dfb90ae}">
+            <name locale="en_US">DDRD11</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-86.36" uuid="{9d9d8802-7ace-4bf1-88ac-8392fd34c8c3}">
+            <name locale="en_US">DDRD12</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-88.9" uuid="{9490442d-61f5-46f3-9f9f-1ea33aa71b71}">
+            <name locale="en_US">DDRD13</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-91.44" uuid="{d5aaad40-308c-491a-a359-abb7bb665b2e}">
+            <name locale="en_US">DDRD14</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-93.98" uuid="{c2c21b6a-f53c-4622-bd1c-e41a14073f3e}">
+            <name locale="en_US">DDRD15</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-96.52" uuid="{b85e0ee9-c5ab-4c35-b4be-cf66d0769eaa}">
+            <name locale="en_US">DDRDQGATE0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-99.06" uuid="{86f012c6-815b-423e-8780-ffb0b7217b49}">
+            <name locale="en_US">DDRDQGATE1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-101.6" uuid="{e57fb699-3a40-422d-9346-4f8ef6703f60}">
+            <name locale="en_US">DDRDQM0N</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-104.14" uuid="{a29d5fa9-e106-48ae-8cd4-e24f24caa175}">
+            <name locale="en_US">DDRDQM1N</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-106.68" uuid="{44dafb8c-99ad-4af3-9a80-1dcbba866cea}">
+            <name locale="en_US">DDRDQS0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-109.22" uuid="{fa620c9b-6f5b-477a-9e77-048a189b601d}">
+            <name locale="en_US">DDRDQS1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-111.76" uuid="{22ae6b9f-be4d-4ca3-9a16-86d1b2caecfc}">
+            <name locale="en_US">DDRRASN</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-114.3" uuid="{87f0fe54-54c9-49e7-a46e-c88d7ae29624}">
+            <name locale="en_US">DDRWEN</name>
+        </pin>
+    </pins>
+</symbol>

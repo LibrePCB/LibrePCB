@@ -1,0 +1,70 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{e2522db5-03e8-4f30-ae48-a4db27c8cf83}</uuid>
+        <name locale="en_US">82C84A</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-25.4" width="0.4064" layer="10" start_x="-12.7">
+            <segment type="line" end_x="7.62" end_y="-25.4"/>
+        </polygon>
+        <polygon fill="false" start_y="-25.4" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="20.32" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="-12.7" end_y="20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="20.32" width="0.4064" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-12.7" end_y="-25.4"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-17.78" length="5.08" angle="0" y="-2.54" uuid="{9ebfc16a-6339-42a5-be05-9937076d85d9}">
+            <name locale="en_US">CSYNC</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="7.62" uuid="{8029b825-081e-472c-b962-9d5b3f056da0}">
+            <name locale="en_US">PCLK</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="-10.16" uuid="{11938b92-cb90-4ec0-a5e8-b7c0853ed2b7}">
+            <name locale="en_US">!AEN1</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="-7.62" uuid="{6b8e4cd4-fa60-4132-9ecb-9a978e32a03b}">
+            <name locale="en_US">RDY1</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-2.54" uuid="{5596dc17-3af2-40df-a5c3-40c0080cc89b}">
+            <name locale="en_US">READY</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="-15.24" uuid="{ae9e3f52-a9b0-426a-8042-e12bd8d257a8}">
+            <name locale="en_US">RDY2</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="-17.78" uuid="{922922be-8fb2-41da-9f1f-19bd71f0480b}">
+            <name locale="en_US">!AEN2</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="2.54" uuid="{ea9c906c-6675-4be2-bc02-37c22fdadbcc}">
+            <name locale="en_US">CLK</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="17.78" uuid="{47fb6678-1f45-4697-ae6a-e507e5033dd6}">
+            <name locale="en_US">RESET</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="10.16" uuid="{fee823f7-8236-4981-b12c-3ab72b313908}">
+            <name locale="en_US">!RES</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="12.7" uuid="{4d84e6da-f4b3-424b-8446-71c6a613e4c7}">
+            <name locale="en_US">OSC</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="5.08" uuid="{1809b460-6208-4870-ab0d-19cf2f62b827}">
+            <name locale="en_US">F/!C</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="0" uuid="{f8f1c443-5bce-4351-8024-1cc7d78639c5}">
+            <name locale="en_US">EFI</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="-22.86" uuid="{6b2ca44d-67f8-4313-a2e8-be8fcb4157f8}">
+            <name locale="en_US">!ASYNC</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="15.24" uuid="{dd13067b-8838-4528-8fb0-66fe79f343d6}">
+            <name locale="en_US">X2</name>
+        </pin>
+        <pin x="-17.78" length="5.08" angle="0" y="17.78" uuid="{e0c4a754-0540-4fd6-b35a-8c810765e46a}">
+            <name locale="en_US">X1</name>
+        </pin>
+    </pins>
+</symbol>

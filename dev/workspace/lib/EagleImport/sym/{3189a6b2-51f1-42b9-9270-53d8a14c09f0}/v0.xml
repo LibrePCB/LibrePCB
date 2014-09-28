@@ -1,0 +1,61 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{3189a6b2-51f1-42b9-9270-53d8a14c09f0}</uuid>
+        <name locale="en_US">PORT2-10_12</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-39.37"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{847253c1-9df5-44f8-a923-431c7c9557ed}">
+            <name locale="en_US">0/GPIO/RXDCAN0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{e6a38134-7257-4191-8cbf-9e36a13dc91b}">
+            <name locale="en_US">1/GPIO/TXDCAN0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{33dd9ceb-66ef-4bd7-bc3c-4dd36418bf0f}">
+            <name locale="en_US">2/GPIO/RXDCAN1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{cba17b6f-c809-4928-a86c-a5038ba0752d}">
+            <name locale="en_US">3/GPIO/TXDCAN1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{28061c9a-8463-4b97-8ba4-c91a965bedd7}">
+            <name locale="en_US">4/GPIO</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{8cf96348-a697-4834-b7c2-aad4e613a65f}">
+            <name locale="en_US">5/GPIO</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{e3020028-53ad-4be0-b152-fff713d2ab4f}">
+            <name locale="en_US">6/SCL</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{8862c70a-709c-4e45-94e9-daba9c651df7}">
+            <name locale="en_US">7/SDA</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{1bb72aa0-e802-4284-8bf1-e56c1681ca2d}">
+            <name locale="en_US">8/GPIO</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{f005bae2-7db9-4a7c-827c-dcc01c954bee}">
+            <name locale="en_US">9/GPIO</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{9b8ef72e-8465-44ab-b75b-d1c284f579b6}">
+            <name locale="en_US">10/RXD0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{89559ab5-30d1-4437-9b7d-bdacfd22c6ed}">
+            <name locale="en_US">11/TXD0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{86d82709-93d7-46b0-b36d-10e178c50b56}">
+            <name locale="en_US">12/SCLK</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-33.02" uuid="{f3a370f2-03cf-49e9-9837-75d6e42c12aa}">
+            <name locale="en_US">13/MRST</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-35.56" uuid="{174acff1-f5c0-4653-9e65-ca6ad67c16af}">
+            <name locale="en_US">14/MTSR</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-38.1" uuid="{afeafa43-da5a-4037-bda2-d4eeb8510a9b}">
+            <name locale="en_US">15/GPIO/EXI4IN/PLL_CLC.LOCK</name>
+        </pin>
+    </pins>
+</symbol>

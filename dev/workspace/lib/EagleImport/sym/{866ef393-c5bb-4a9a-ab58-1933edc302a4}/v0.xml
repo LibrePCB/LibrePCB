@@ -1,0 +1,25 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{866ef393-c5bb-4a9a-ab58-1933edc302a4}</uuid>
+        <name locale="en_US">TBU</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-0.889" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="0.889"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-1.524">
+            <segment type="line" end_x="0" end_y="0"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="2.54" length="2.54" angle="180" y="0" uuid="{35a9a5c5-87c5-44a5-a0ca-700acd7c7741}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="180" y="-2.54" uuid="{de30474b-87ba-48a5-912b-994d9d11c02f}">
+            <name locale="en_US">2</name>
+        </pin>
+    </pins>
+</symbol>

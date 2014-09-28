@@ -1,0 +1,67 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{f9ce2240-9bfb-4f6f-b23c-dfe09578ca78}</uuid>
+        <name locale="en_US">LSM303DLHC</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="-15.24" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="10.16" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-15.24" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.1524" layer="10" start_x="-13.97">
+            <segment type="line" end_x="-11.43" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-13.97">
+            <segment type="line" end_x="-11.43" end_y="0"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="12.7" length="2.54" angle="180" y="5.08" uuid="{33ef7999-fb1f-42d9-aac4-f897c9b5b65d}">
+            <name locale="en_US">SDA</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="2.54" uuid="{6d8d2862-1e88-48ba-96b8-557e5f1b5c01}">
+            <name locale="en_US">SLC</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="0" uuid="{21928409-f988-4ba4-b052-c042e6c2eb61}">
+            <name locale="en_US">INT1</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-2.54" uuid="{ce911b88-1c9c-424f-9135-c3e4a6a1b6e7}">
+            <name locale="en_US">INT2</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-10.16" uuid="{6451899b-a9d0-430b-b396-52535b48b27d}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="10.16" uuid="{2b842113-1ddb-4006-b5d9-03468dcad835}">
+            <name locale="en_US">VDD_IO</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="12.7" uuid="{b861abd0-4f2c-494c-a300-65c12f48c333}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="90" y="-20.32" uuid="{1f4fcb3a-bbaf-446c-8cac-1cde2e8ddef3}">
+            <name locale="en_US">C1</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-15.24" uuid="{e20ea02b-cd4f-4a52-90df-a9ec8a1fe658}">
+            <name locale="en_US">RSVD@1</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-12.7" uuid="{b25239df-296e-4643-9ffc-806eb562a736}">
+            <name locale="en_US">RSVD@2</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-5.08" uuid="{ddd83615-b3c2-4e28-9166-1d72f5d6adaa}">
+            <name locale="en_US">DRDY</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="90" y="-20.32" uuid="{4fac1930-d9c6-4656-92a5-ae54fbdb1c85}">
+            <name locale="en_US">SETP</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="90" y="-20.32" uuid="{6d6a7a6c-57b6-491a-87f7-48682e6bedc9}">
+            <name locale="en_US">SETC</name>
+        </pin>
+    </pins>
+</symbol>

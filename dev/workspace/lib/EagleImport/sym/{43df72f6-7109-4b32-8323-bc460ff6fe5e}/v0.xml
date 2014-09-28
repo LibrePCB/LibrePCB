@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{43df72f6-7109-4b32-8323-bc460ff6fe5e}</uuid>
+        <name locale="en_US">TPS773XX</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="12.7" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="-10.16" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{d0ab92bc-5c3e-4b7e-9c64-e055b2ea58f9}">
+            <name locale="en_US">FB\SENSE</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{58f6e182-0507-46bb-a7c8-b7d6fe1c2139}">
+            <name locale="en_US">!RESET</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{eebe23b3-823f-47d0-98c5-8558225f4819}">
+            <name locale="en_US">!EN</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{421c8de3-2f14-4819-84ff-43cae939bb38}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-2.54" uuid="{9e7c57b9-0350-45f6-923e-a2c8fe9301b8}">
+            <name locale="en_US">IN@1</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="0" uuid="{5edf67be-d0e6-4eea-98f3-f7392bea1616}">
+            <name locale="en_US">IN@2</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="2.54" uuid="{8f247776-26a0-4a4a-9238-35749bd36a75}">
+            <name locale="en_US">OUT@1</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="5.08" uuid="{9369b195-094a-48fc-b8c4-960ad170cd62}">
+            <name locale="en_US">OUT@2</name>
+        </pin>
+    </pins>
+</symbol>

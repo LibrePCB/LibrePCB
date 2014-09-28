@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{e1a2ed13-086a-42fc-8ff4-ad6533936e1c}</uuid>
+        <name locale="en_US">K11-672</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-26.67" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{23f87e9c-06c7-4f11-8f6d-d07cf618f494}">
+            <name locale="en_US">IOK1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{569e10d1-f14d-4f1e-a94b-0399b2ebaf60}">
+            <name locale="en_US">IOK2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{4e9fd1cb-767b-41c7-8fc9-6dc307128e62}">
+            <name locale="en_US">IOK3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{091ed570-1cbc-438d-8c92-81ba974fead7}">
+            <name locale="en_US">IOK4</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{f65c19c5-c135-4235-9dc3-3528f5f643ca}">
+            <name locale="en_US">IOK5</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{3fff4503-fd5d-4f6f-a209-59174408d66b}">
+            <name locale="en_US">IOK6</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-15.24" uuid="{fdf173ff-2185-42a1-afa8-9bf3f9b2937f}">
+            <name locale="en_US">IOK7</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-17.78" uuid="{3e986798-c977-4de4-8174-704e2d1420ef}">
+            <name locale="en_US">IOK8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-20.32" uuid="{3212e2b4-c0d4-4e5a-b8a6-bf842112510a}">
+            <name locale="en_US">IOK9</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-22.86" uuid="{70987a7f-9a5d-4797-a4f9-983e86017e06}">
+            <name locale="en_US">IOK10</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-25.4" uuid="{f8bca933-386f-4eef-9a4c-9312a61dd04d}">
+            <name locale="en_US">IOK11</name>
+        </pin>
+    </pins>
+</symbol>

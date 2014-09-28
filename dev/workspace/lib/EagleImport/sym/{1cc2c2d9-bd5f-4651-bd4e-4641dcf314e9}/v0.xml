@@ -1,0 +1,34 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{1cc2c2d9-bd5f-4651-bd4e-4641dcf314e9}</uuid>
+        <name locale="en_US">THYRD</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="1.27">
+            <segment type="line" end_x="1.27" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="-1.27">
+            <segment type="line" end_x="1.27" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="1.27">
+            <segment type="line" end_x="-1.27" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="1.27">
+            <segment type="line" end_x="1.27" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.254" layer="10" start_x="-1.27">
+            <segment type="line" end_x="-1.27" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="2.54" length="2.54" angle="180" y="0" uuid="{d2f4ecd6-7acd-489d-a7d4-ac846d6439e4}">
+            <name locale="en_US">C</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{68a0f781-054b-49a2-b67f-8a487b673798}">
+            <name locale="en_US">A</name>
+        </pin>
+    </pins>
+</symbol>

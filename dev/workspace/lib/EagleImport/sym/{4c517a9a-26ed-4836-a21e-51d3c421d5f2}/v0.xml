@@ -1,0 +1,31 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{4c517a9a-26ed-4836-a21e-51d3c421d5f2}</uuid>
+        <name locale="en_US">LT1021</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="5.08"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="2.54" uuid="{202a5b44-eb9e-4cb9-8cd6-f0b10d9dac8c}">
+            <name locale="en_US">IN</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="2.54" uuid="{baf6df75-e72e-4628-a90f-8fb361211e52}">
+            <name locale="en_US">OUT</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-5.08" uuid="{6c494c3a-61a9-4bde-b0b7-d32ada28ea06}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

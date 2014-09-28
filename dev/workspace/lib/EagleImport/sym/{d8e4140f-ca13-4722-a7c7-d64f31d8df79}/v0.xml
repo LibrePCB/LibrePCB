@@ -1,0 +1,76 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{d8e4140f-ca13-4722-a7c7-d64f31d8df79}</uuid>
+        <name locale="en_US">XBEE</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="27.94" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-12.7" end_y="-30.48"/>
+        </polygon>
+        <polygon fill="false" start_y="-30.48" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="15.24" end_y="-30.48"/>
+        </polygon>
+        <polygon fill="false" start_y="-30.48" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="15.24" end_y="27.94"/>
+        </polygon>
+        <polygon fill="false" start_y="27.94" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="-12.7" end_y="27.94"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="2.54" angle="0" y="25.4" uuid="{e8340787-524c-4356-8bae-fa585e2cd007}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="7.62" uuid="{6e918624-198a-409b-bdb3-91f424430160}">
+            <name locale="en_US">DOUT</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="10.16" uuid="{c3813391-1350-45a6-9bef-9b87959383bb}">
+            <name locale="en_US">DIN/!CONFIG</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="2.54" uuid="{d5375971-6dac-4fa9-b757-923155c79353}">
+            <name locale="en_US">CD/DOUT_EN/DO8</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="22.86" uuid="{44b12d50-545f-40a8-afd4-b183651d3fc3}">
+            <name locale="en_US">!RESET</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="15.24" uuid="{693aaa1d-3ce3-457c-957b-6c2f1112f59f}">
+            <name locale="en_US">PWM0/RSSI</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="0" uuid="{14167a65-7918-48a3-8fef-307e4c935d6c}">
+            <name locale="en_US">!DTR!/SLEEP_RQ/DI8</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-27.94" uuid="{3e8c794d-2706-425b-84e9-30c90cc9b2a0}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-10.16" uuid="{50dfeef4-512b-4f21-88f0-6f27b0f9545e}">
+            <name locale="en_US">RF_TX/AD4/DIO4</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-2.54" uuid="{04d28ecb-fb73-4d96-820f-658af806be1b}">
+            <name locale="en_US">!CTS!/DIO7</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="17.78" uuid="{70ba2e98-84c4-40d4-827b-3ae4b505db67}">
+            <name locale="en_US">ON/!SLEEP</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-25.4" uuid="{b866e40f-efd4-436a-9a83-79173859ee3d}">
+            <name locale="en_US">VREF</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-7.62" uuid="{7d76b99a-f668-4d59-bb9f-a7d3fe6375a5}">
+            <name locale="en_US">ASSOC/AD5/DIO5</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-5.08" uuid="{8af0ba97-d080-4a7d-a00a-940858bbbb1a}">
+            <name locale="en_US">!RTS!/AD6/DIO6</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-12.7" uuid="{85fe46c1-35a7-4ef9-9c27-885ce41ecaad}">
+            <name locale="en_US">COORD_SEL/AD3/DIO3</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-15.24" uuid="{7528e942-cc9e-472e-a1a2-bed02751e462}">
+            <name locale="en_US">AD2/DIO2</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-17.78" uuid="{52f846cc-1825-4f58-ab69-497ea9d2fc37}">
+            <name locale="en_US">AD1/DIO1</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-20.32" uuid="{b87646dc-8a71-4a56-86bc-b745bf6dbb42}">
+            <name locale="en_US">AD0/DIO0</name>
+        </pin>
+    </pins>
+</symbol>

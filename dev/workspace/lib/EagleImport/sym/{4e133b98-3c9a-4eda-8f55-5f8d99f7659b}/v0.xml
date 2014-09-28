@@ -1,0 +1,37 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{4e133b98-3c9a-4eda-8f55-5f8d99f7659b}</uuid>
+        <name locale="en_US">OPAMP</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="5.08" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="5.08" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.4064" layer="10" start_x="5.08">
+            <segment type="line" end_x="-5.08" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="3.175" width="0.1524" layer="10" start_x="-3.81">
+            <segment type="line" end_x="-3.81" end_y="1.905"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="-4.445">
+            <segment type="line" end_x="-3.175" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="-4.445">
+            <segment type="line" end_x="-3.175" end_y="-2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-7.62" length="2.54" angle="0" y="-2.54" uuid="{43290da4-f562-4c34-8fd0-df8efa3db5f4}">
+            <name locale="en_US">-IN</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="2.54" uuid="{ffb5a26a-1f7b-4bd5-93e4-b50b2ee5a5c8}">
+            <name locale="en_US">+IN</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="0" uuid="{b5dfc4d9-377f-45e5-afc9-f97ac0aa8c46}">
+            <name locale="en_US">OUT</name>
+        </pin>
+    </pins>
+</symbol>

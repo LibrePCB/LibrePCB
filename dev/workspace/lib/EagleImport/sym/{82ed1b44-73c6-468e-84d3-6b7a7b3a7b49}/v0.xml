@@ -1,0 +1,43 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{82ed1b44-73c6-468e-84d3-6b7a7b3a7b49}</uuid>
+        <name locale="en_US">MC9S12-PK</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="-5.08" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="2.54" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="5.08" length="2.54" angle="180" y="7.62" uuid="{ae162670-fd95-4b1e-ab08-77c3942da7dc}">
+            <name locale="en_US">PK0</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="5.08" uuid="{40017791-0a2b-4234-8962-9f487602554a}">
+            <name locale="en_US">PK1</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="2.54" uuid="{f087e726-9d6c-4564-9f2a-34505d272a30}">
+            <name locale="en_US">PK2</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="0" uuid="{2cc4df85-73bd-49eb-bf79-4ab7006e23e0}">
+            <name locale="en_US">PK3</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="-2.54" uuid="{be73dc48-1a33-4086-9315-dfc5e2529d89}">
+            <name locale="en_US">PK4</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="-5.08" uuid="{19663870-192a-4168-82ac-2bf771f9c5a5}">
+            <name locale="en_US">PK5</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="-10.16" uuid="{307c4b34-0fc9-4ba8-bb2d-d21549659b7c}">
+            <name locale="en_US">PK7</name>
+        </pin>
+    </pins>
+</symbol>

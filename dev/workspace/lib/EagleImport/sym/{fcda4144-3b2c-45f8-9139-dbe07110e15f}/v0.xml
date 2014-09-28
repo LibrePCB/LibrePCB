@@ -1,0 +1,43 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{fcda4144-3b2c-45f8-9139-dbe07110e15f}</uuid>
+        <name locale="en_US">X10-599</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-24.13" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{ae8afc52-ff4a-482c-8945-42cc9a325d4f}">
+            <name locale="en_US">IOX1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{6275e40e-ffde-4020-9ec7-108b4c290162}">
+            <name locale="en_US">IOX2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{3c91e3d9-d2ea-440e-919c-2e3ba9fe7c3d}">
+            <name locale="en_US">IOX3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{0e88e112-3cde-4477-835d-12c69b27ccb8}">
+            <name locale="en_US">IOX4</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{5eb9daed-009c-4fbd-9178-5da423d490b7}">
+            <name locale="en_US">IOX5</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{4c1a673b-6652-48ae-9f67-ba8af5af25b0}">
+            <name locale="en_US">IOX6</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-15.24" uuid="{52015617-3e2b-4d5f-ad57-ff4750d974db}">
+            <name locale="en_US">IOX7</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-17.78" uuid="{3a79732a-e430-4b2c-a409-5e1a2b504355}">
+            <name locale="en_US">IOX8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-20.32" uuid="{34b2258d-bc39-4f71-a580-e111d473cea0}">
+            <name locale="en_US">IOX9</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-22.86" uuid="{cdf22380-0821-4d05-ad02-d385cd7048ab}">
+            <name locale="en_US">IOX10</name>
+        </pin>
+    </pins>
+</symbol>

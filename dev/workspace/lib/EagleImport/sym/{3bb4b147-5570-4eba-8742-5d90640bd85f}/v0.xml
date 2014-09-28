@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{3bb4b147-5570-4eba-8742-5d90640bd85f}</uuid>
+        <name locale="en_US">N11-599</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-26.67" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{cf50261e-2213-4c03-9df6-81bb2c9ec826}">
+            <name locale="en_US">ION1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{cf7a7a62-2a7f-45f0-822d-d2e33efb0b80}">
+            <name locale="en_US">ION2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{8b3de4a9-8a48-4425-8abf-48212d258020}">
+            <name locale="en_US">ION3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{74d94061-d2e6-4881-83bb-6a8816e4f194}">
+            <name locale="en_US">ION4</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{5b36d0f2-f241-4b02-81c4-98cd48a964a6}">
+            <name locale="en_US">ION5</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{54eda4dd-722f-45b7-9efc-a0569b817827}">
+            <name locale="en_US">ION6</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-15.24" uuid="{dc4b8286-c3b3-4911-b76d-d6fc734ba76d}">
+            <name locale="en_US">ION7</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-17.78" uuid="{fbb85445-6d32-4513-8689-4aee1f1104fc}">
+            <name locale="en_US">ION8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-20.32" uuid="{e5e3a4c9-e0bb-43a3-b398-db8bfa7e0c4c}">
+            <name locale="en_US">ION9</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-22.86" uuid="{b2fa0170-fa0e-4b04-9fbf-0f64df1ef4d1}">
+            <name locale="en_US">ION10</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-25.4" uuid="{dec7777f-9c1e-478e-810d-95f2ace6e838}">
+            <name locale="en_US">ION11</name>
+        </pin>
+    </pins>
+</symbol>

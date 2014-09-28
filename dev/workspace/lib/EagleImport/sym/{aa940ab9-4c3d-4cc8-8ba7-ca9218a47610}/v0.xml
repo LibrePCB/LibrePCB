@@ -1,0 +1,64 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{aa940ab9-4c3d-4cc8-8ba7-ca9218a47610}</uuid>
+        <name locale="en_US">PIC16F688</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-33.02">
+            <segment type="line" end_x="35.56" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="35.56">
+            <segment type="line" end_x="35.56" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="35.56">
+            <segment type="line" end_x="-33.02" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-33.02">
+            <segment type="line" end_x="-33.02" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-35.56" length="2.54" angle="0" y="7.62" uuid="{91f917e1-3d59-48b6-9cf5-25246dbc4402}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="-35.56" length="2.54" angle="0" y="2.54" uuid="{010fae08-1626-42bc-9312-09a5647cdfe2}">
+            <name locale="en_US">RA4/AN3/!T1G!/OSC2/CLKOUT</name>
+        </pin>
+        <pin x="-35.56" length="2.54" angle="0" y="0" uuid="{90a40f0c-9516-4bb5-b32b-a1fe2b1cf31e}">
+            <name locale="en_US">RA3/!MCLR!/VPP</name>
+        </pin>
+        <pin x="-35.56" length="2.54" angle="0" y="5.08" uuid="{a61acc9a-f65d-4946-a869-e49c50011070}">
+            <name locale="en_US">RA5/T1CKI/OSC1/CLKIN</name>
+        </pin>
+        <pin x="38.1" length="2.54" angle="180" y="5.08" uuid="{7ef600aa-5861-4963-b515-ad5095c4b20b}">
+            <name locale="en_US">RA0/AN0/C1IN+/ICSPDAT/ULPWU</name>
+        </pin>
+        <pin x="38.1" length="2.54" angle="180" y="2.54" uuid="{e4e04500-3d65-4c08-be18-6dd6c0300a3d}">
+            <name locale="en_US">RA1/AN1/C1IN-/VREF/ICSPCLK</name>
+        </pin>
+        <pin x="38.1" length="2.54" angle="180" y="0" uuid="{f593dce9-f991-41d9-a9b2-d4bd9072dc7f}">
+            <name locale="en_US">RA2/AN2/T0CKI/INT/C1OUT</name>
+        </pin>
+        <pin x="38.1" length="2.54" angle="180" y="-7.62" uuid="{3b5b7af7-fb3d-46dd-8c50-602260470903}">
+            <name locale="en_US">RC2/AN6</name>
+        </pin>
+        <pin x="38.1" length="2.54" angle="180" y="-5.08" uuid="{c2e1e624-0a91-4754-b0a3-bbae3ddba54e}">
+            <name locale="en_US">RC1/AN5/C2IN</name>
+        </pin>
+        <pin x="38.1" length="2.54" angle="180" y="-2.54" uuid="{59721e9b-f58e-4f84-80fb-2999889c1231}">
+            <name locale="en_US">RC0/AN4/C2IN+</name>
+        </pin>
+        <pin x="-35.56" length="2.54" angle="0" y="-2.54" uuid="{3d7ee3c4-7535-4dd2-b46d-90a24b24c6fb}">
+            <name locale="en_US">RC5/RX/DT</name>
+        </pin>
+        <pin x="-35.56" length="2.54" angle="0" y="-5.08" uuid="{99cbff07-4ece-426f-8b55-ad3ace397849}">
+            <name locale="en_US">RC4/C2OUT/TX/CK</name>
+        </pin>
+        <pin x="-35.56" length="2.54" angle="0" y="-7.62" uuid="{5d182bff-847f-4099-9d22-cb5315e730ce}">
+            <name locale="en_US">RC3/AN7</name>
+        </pin>
+        <pin x="38.1" length="2.54" angle="180" y="7.62" uuid="{958fe077-41de-45a5-aeac-94da6a14460d}">
+            <name locale="en_US">VSS</name>
+        </pin>
+    </pins>
+</symbol>

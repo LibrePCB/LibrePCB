@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{d258195e-2b67-4cb7-b49b-5180071eba50}</uuid>
+        <name locale="en_US">MC1350</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="7.62" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-15.24" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-10.16" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-15.24" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="15.24"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{8acdb210-5643-4394-b7c8-dc51c656d6fc}">
+            <name locale="en_US">IN-</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{cf5a3b01-ebe6-4018-9931-7fd351b60647}">
+            <name locale="en_US">IN+</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="7.62" uuid="{b9ceef57-c946-4eab-92f6-93e7c6c639a8}">
+            <name locale="en_US">AGC</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="12.7" uuid="{aac94e4f-402d-4203-9187-9c12e7deb1fe}">
+            <name locale="en_US">V+</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-12.7" uuid="{00497b87-8fcc-4120-b22e-840517cfb9b0}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="2.54" uuid="{1721cf14-6994-44f5-b28b-60aeab7ef072}">
+            <name locale="en_US">OUT+</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-2.54" uuid="{b61ea663-ea61-4363-9917-ef89e3edb87f}">
+            <name locale="en_US">OUT-</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-7.62" uuid="{47eb2050-0347-4c06-b3be-01f730b1f85c}">
+            <name locale="en_US">45/58MHZ</name>
+        </pin>
+    </pins>
+</symbol>

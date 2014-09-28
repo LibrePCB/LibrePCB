@@ -1,0 +1,34 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{a0c29419-84b8-4182-9242-00b1d0faff9d}</uuid>
+        <name locale="en_US">LT1236</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="5.08" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="5.08" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="-5.08" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-7.62" length="2.54" angle="0" y="5.08" uuid="{ed28f340-c3c2-4942-aab9-ae22c0b59798}">
+            <name locale="en_US">VIN</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="2.54" uuid="{9c923385-7462-404e-a388-6a8d36c3385d}">
+            <name locale="en_US">OUT</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="0" uuid="{fd460837-f710-42ec-8b6d-f1a1bec344e9}">
+            <name locale="en_US">TRIM</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="-2.54" uuid="{b67caf7a-86af-4014-9ea3-a4f6bd8efd1f}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

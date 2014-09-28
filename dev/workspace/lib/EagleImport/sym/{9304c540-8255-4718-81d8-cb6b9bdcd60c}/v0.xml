@@ -1,0 +1,79 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{9304c540-8255-4718-81d8-cb6b9bdcd60c}</uuid>
+        <name locale="en_US">MAX200</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-17.78" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="15.24"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="5.08" angle="0" y="7.62" uuid="{cbd7fa6f-7163-4146-9e63-07f7bea2b3ff}">
+            <name locale="en_US">T3IN</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="5.08" uuid="{3e36ebaa-1fc3-44bc-9501-658b5fe4eb56}">
+            <name locale="en_US">T4IN</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="12.7" uuid="{248b8fbb-a8f0-40bd-8852-e6607c8fc741}">
+            <name locale="en_US">T1IN</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="10.16" uuid="{1f4dd571-6079-4d7f-88f0-0a5808a63535}">
+            <name locale="en_US">T2IN</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="12.7" uuid="{dc12ca2d-dd3c-41ad-acd7-c5c0c5360ce1}">
+            <name locale="en_US">T1OUT</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-12.7" uuid="{24a6f2c7-0262-4221-8a0f-9ce2027aa84e}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-15.24" uuid="{23b58e49-0ca7-41b8-8d24-79b66f230ddf}">
+            <name locale="en_US">V-</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-5.08" uuid="{a2cfaf5e-8b6d-4b2d-9342-4eb4e36208ea}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-15.24" uuid="{ce30fad6-ee41-4b41-ba85-0d2c7409201e}">
+            <name locale="en_US">C2-</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-7.62" uuid="{c46a675c-42c4-4ecb-a949-01e8383e4c38}">
+            <name locale="en_US">C1-</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-5.08" uuid="{8dfbbef2-ad9d-49f5-8469-5443aecd22ac}">
+            <name locale="en_US">C1+</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="10.16" uuid="{b66b5947-7341-457d-9b8d-8bf5774bf51b}">
+            <name locale="en_US">T2OUT</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="5.08" uuid="{ced239b2-0a34-4650-95b5-08591836d930}">
+            <name locale="en_US">T4OUT</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="2.54" uuid="{cd54c36f-d2f9-4c29-9d49-bd71c737778a}">
+            <name locale="en_US">T5OUT</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-10.16" uuid="{54a10e25-1f29-4c1c-bc8e-62a7542388d6}">
+            <name locale="en_US">V+</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-12.7" uuid="{5201d241-e4ec-4f89-b6c5-d0a57117d8a3}">
+            <name locale="en_US">C2+</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="7.62" uuid="{c8615d38-9202-4137-8aab-b2e5045a196d}">
+            <name locale="en_US">T3OUT</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="2.54" uuid="{f34725a3-4e69-46dd-8f07-23c630130559}">
+            <name locale="en_US">T5IN</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="0" uuid="{6c92bd6f-38b2-4dfb-8cb5-d5ea94c532aa}">
+            <name locale="en_US">SHDN</name>
+        </pin>
+    </pins>
+</symbol>

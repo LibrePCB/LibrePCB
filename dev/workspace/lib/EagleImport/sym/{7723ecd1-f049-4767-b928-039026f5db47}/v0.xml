@@ -1,0 +1,106 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{7723ecd1-f049-4767-b928-039026f5db47}</uuid>
+        <name locale="en_US">HFM1300</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-15.24" width="0.254" layer="10" start_x="17.78">
+            <segment type="line" end_x="6.35" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-15.24" width="0.254" layer="10" start_x="6.35">
+            <segment type="line" end_x="-8.89" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-15.24" width="0.254" layer="10" start_x="-8.89">
+            <segment type="line" end_x="-17.78" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-15.24" width="0.254" layer="10" start_x="-17.78">
+            <segment type="line" end_x="-17.78" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-17.78">
+            <segment type="line" end_x="-17.78" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="-17.78">
+            <segment type="line" end_x="17.78" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="17.78">
+            <segment type="line" end_x="17.78" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.4064" layer="10" start_x="-15.24">
+            <segment type="line" end_x="-12.7" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-12.7" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.4064" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-12.7" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.4064" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-12.7" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.4064" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-7.62" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.1524" layer="10" start_x="-17.78">
+            <segment type="line" end_x="-8.89" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.1524" layer="10" start_x="-8.89">
+            <segment type="line" end_x="-8.89" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.1524" layer="10" start_x="-8.89">
+            <segment type="line" end_x="6.35" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.1524" layer="10" start_x="6.35">
+            <segment type="line" end_x="6.35" end_y="-15.24"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="2.54" angle="90" y="-17.78" uuid="{b8c15acb-69e9-429e-980e-aecaabcafe62}">
+            <name locale="en_US">CASEGND@1</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="90" y="-17.78" uuid="{de57290f-89bd-4f38-bce1-e8641ea3d897}">
+            <name locale="en_US">GND@2</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="90" y="-17.78" uuid="{2bd98ef3-6a4e-46f8-8c30-363e6e8d09a1}">
+            <name locale="en_US">GND@3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="90" y="-17.78" uuid="{56fe9700-450a-42e9-b79d-86579412a233}">
+            <name locale="en_US">GND@4</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-17.78" uuid="{5d6f2c13-f7f8-4827-a0c9-741aafaa48ea}">
+            <name locale="en_US">GND@5</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-17.78" uuid="{971a61d6-a056-4396-a550-3148f07e2942}">
+            <name locale="en_US">GND@6</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="90" y="-17.78" uuid="{8e4cc428-8507-4be5-9075-39663d6e743c}">
+            <name locale="en_US">GND@7</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="90" y="-17.78" uuid="{a77d40b8-f724-4b7b-8744-03ba11d147c5}">
+            <name locale="en_US">CASEGND@2</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="-7.62" uuid="{b9fc97da-1324-4dc4-bdb9-5a900d2d79f6}">
+            <name locale="en_US">ADJ</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="12.7" uuid="{10a5b41e-f19a-4dc6-acd8-b45de76f4c80}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="0" uuid="{24454e82-780b-4788-8c32-2023c8db6689}">
+            <name locale="en_US">SIGOUT1</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="-2.54" uuid="{14ec15b0-4e05-44dd-a405-48ab6f5ce577}">
+            <name locale="en_US">SIGOUT2</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="-12.7" uuid="{d40b4d67-573f-473b-ae7d-90576d7ea25c}">
+            <name locale="en_US">HIGND</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="2.54" uuid="{8d0b17ea-1844-48fa-ad6f-e8cf93fe8e28}">
+            <name locale="en_US">!PKT</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="5.08" uuid="{c466f0d0-e092-4572-976e-aa71eeb8da99}">
+            <name locale="en_US">!SQ</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="7.62" uuid="{b2ed572b-71da-4325-a634-aaa1b8419f62}">
+            <name locale="en_US">!SQLED</name>
+        </pin>
+    </pins>
+</symbol>

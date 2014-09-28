@@ -1,0 +1,19 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{364b3eef-6460-477e-8e92-262fc2f2e377}</uuid>
+        <name locale="en_US">IXP-USB</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-5.08"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{c40237c9-8600-451b-b684-39d3dc12c2fd}">
+            <name locale="en_US">DNEG</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{5ef5a19c-b060-4be9-b2d5-5ddc7809ee26}">
+            <name locale="en_US">DPOS</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,37 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{64f3b28f-56fa-4bd2-8957-70d0c781cfab}</uuid>
+        <name locale="en_US">DR2W</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="-3.81">
+            <segment type="line" end_x="3.81" end_y="0"/>
+        </polygon>
+        <polygon fill="true" start_y="1.651" width="0.254" layer="10" start_x="-3.81">
+            <segment type="line" end_x="3.81" end_y="1.651"/>
+            <segment type="line" end_x="3.81" end_y="3.429"/>
+            <segment type="line" end_x="-3.81" end_y="3.429"/>
+            <segment type="line" end_x="-3.81" end_y="1.651"/>
+        </polygon>
+        <polygon fill="true" start_y="-3.429" width="0.254" layer="10" start_x="-3.81">
+            <segment type="line" end_x="3.81" end_y="-3.429"/>
+            <segment type="line" end_x="3.81" end_y="-1.651"/>
+            <segment type="line" end_x="-3.81" end_y="-1.651"/>
+            <segment type="line" end_x="-3.81" end_y="-3.429"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="7.62" length="5.08" angle="180" y="2.54" uuid="{6ff76294-603e-4f97-b363-241a93ccbe34}">
+            <name locale="en_US">W1E</name>
+        </pin>
+        <pin x="-7.62" length="5.08" angle="0" y="2.54" uuid="{2d45ee0e-130b-4205-b544-6cf746218b9c}">
+            <name locale="en_US">W1A</name>
+        </pin>
+        <pin x="7.62" length="5.08" angle="180" y="-2.54" uuid="{ceba1b02-592c-4fde-a251-82fd7ed40a3e}">
+            <name locale="en_US">W2E</name>
+        </pin>
+        <pin x="-7.62" length="5.08" angle="0" y="-2.54" uuid="{c2d331c0-00b3-4642-8372-209c4ae7edb2}">
+            <name locale="en_US">W2A</name>
+        </pin>
+    </pins>
+</symbol>

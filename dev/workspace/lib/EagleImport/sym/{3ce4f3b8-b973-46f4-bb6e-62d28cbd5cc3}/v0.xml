@@ -1,0 +1,40 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{3ce4f3b8-b973-46f4-bb6e-62d28cbd5cc3}</uuid>
+        <name locale="en_US">JP2E</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.4064" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.4064" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.4064" layer="10" start_x="-0.635">
+            <segment type="line" end_x="3.175" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.4064" layer="10" start_x="3.175">
+            <segment type="line" end_x="3.175" end_y="0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="0.635" width="0.4064" layer="10" start_x="3.175">
+            <segment type="line" end_x="-0.635" end_y="0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="0.635" width="0.4064" layer="10" start_x="-0.635">
+            <segment type="line" end_x="-0.635" end_y="0"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-2.54" uuid="{d6400545-2085-487b-980c-b7b60273a80e}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-2.54" uuid="{fb524dee-8385-464f-be24-778423c9b032}">
+            <name locale="en_US">2</name>
+        </pin>
+    </pins>
+</symbol>

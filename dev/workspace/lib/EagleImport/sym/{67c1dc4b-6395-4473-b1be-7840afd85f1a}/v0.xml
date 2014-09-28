@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{67c1dc4b-6395-4473-b1be-7840afd85f1a}</uuid>
+        <name locale="en_US">MAX1674</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="12.7" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="-12.7" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-12.7" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="2.54" angle="0" y="7.62" uuid="{16939dd4-ec6f-4d16-aa32-8dc17739ce7b}">
+            <name locale="en_US">SHDN/</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="2.54" uuid="{4bf653cc-016b-46ba-891c-9e5a7d38bc48}">
+            <name locale="en_US">LBI</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-2.54" uuid="{e1b893c0-30cd-4857-bc80-6585b53f5d22}">
+            <name locale="en_US">LBO/</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-2.54" uuid="{21fcd517-0dee-460d-abb6-1df210605848}">
+            <name locale="en_US">REF</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="90" y="-12.7" uuid="{4370e856-268c-45a7-9232-715fd5760d27}">
+            <name locale="en_US">FB</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="7.62" uuid="{f4cb3b52-8fb1-48e0-b407-8c5a32e72093}">
+            <name locale="en_US">LX</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="2.54" uuid="{b2c53ff8-8b67-4c1c-b51f-38af5d8abb39}">
+            <name locale="en_US">OUT</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-12.7" uuid="{d986f226-c0c9-4989-b67f-06bc64b6876d}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

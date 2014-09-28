@@ -1,0 +1,16 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{7f5b9834-fff7-46f1-90f0-92d761c1c673}</uuid>
+        <name locale="en_US">K-PIN</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-1.905"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-2.54" uuid="{0980a6bd-a9dd-47ff-b072-17a304ea1596}">
+            <name locale="en_US">-</name>
+        </pin>
+    </pins>
+</symbol>

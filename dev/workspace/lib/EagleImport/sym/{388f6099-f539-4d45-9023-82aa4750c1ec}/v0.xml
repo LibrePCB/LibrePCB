@@ -1,0 +1,31 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{388f6099-f539-4d45-9023-82aa4750c1ec}</uuid>
+        <name locale="en_US">SD5000</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="5.08" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="5.08"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="-2.54" uuid="{b325f047-2889-4e60-994d-ca070a6734ff}">
+            <name locale="en_US">S</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-2.54" uuid="{04a1ce38-fa73-4211-9e30-5c92d155b081}">
+            <name locale="en_US">D</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="2.54" uuid="{5a3521c0-001e-4df4-b30a-d435b697ae8d}">
+            <name locale="en_US">G</name>
+        </pin>
+    </pins>
+</symbol>

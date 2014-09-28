@@ -1,0 +1,49 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{42e34186-bc7a-4219-b7d5-43719cd1b271}</uuid>
+        <name locale="en_US">LM4995</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="20.32" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="20.32">
+            <segment type="line" end_x="20.32" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="20.32">
+            <segment type="line" end_x="-2.54" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2.54" angle="0" y="2.54" uuid="{4830e1a2-6287-4837-8bf5-702a7dbc4668}">
+            <name locale="en_US">IN+</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="7.62" uuid="{787a92f6-4723-4810-83bd-35ca85007e9b}">
+            <name locale="en_US">IN-</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-7.62" uuid="{ee2ae069-1719-43de-b639-0b7959ca6c46}">
+            <name locale="en_US">!SHDOWN</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-2.54" uuid="{2504cbe8-b079-43fb-96fd-c214f470bede}">
+            <name locale="en_US">BYPASS</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="270" y="12.7" uuid="{0ca4323f-2e66-4fc6-980e-c20f62f55f4c}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="90" y="-12.7" uuid="{e3e3d253-fd20-4646-8e69-4da5f7e471ba}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="22.86" length="2.54" angle="180" y="2.54" uuid="{b7f06016-c65c-498a-97d8-1ca85905729d}">
+            <name locale="en_US">VOL1-</name>
+        </pin>
+        <pin x="22.86" length="2.54" angle="180" y="-2.54" uuid="{107d86ed-72a8-4186-954b-1a8828e03af7}">
+            <name locale="en_US">VOL2+</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="90" y="-12.7" uuid="{a0780bc3-118a-4b20-aa50-b64f6fdd1442}">
+            <name locale="en_US">GND@1</name>
+        </pin>
+    </pins>
+</symbol>

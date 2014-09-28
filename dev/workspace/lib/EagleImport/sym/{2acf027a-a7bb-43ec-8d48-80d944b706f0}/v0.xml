@@ -1,0 +1,25 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{2acf027a-a7bb-43ec-8d48-80d944b706f0}</uuid>
+        <name locale="en_US">PIN-MV</name>
+    </meta>
+    <geometry>
+        <polygon fill="true" start_y="-0.254" width="0.254" layer="10" start_x="-0.508">
+            <segment type="line" end_x="0.508" end_y="-0.254"/>
+            <segment type="line" end_x="0.508" end_y="0.254"/>
+            <segment type="line" end_x="-0.508" end_y="0.254"/>
+            <segment type="line" end_x="-0.508" end_y="-0.254"/>
+        </polygon>
+        <polygon fill="true" start_y="-0.254" width="0.254" layer="10" start_x="-0.508">
+            <segment type="line" end_x="0.508" end_y="-0.254"/>
+            <segment type="line" end_x="0.508" end_y="0.254"/>
+            <segment type="line" end_x="-0.508" end_y="0.254"/>
+            <segment type="line" end_x="-0.508" end_y="-0.254"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{baa78b87-126c-4a93-9fb5-5e85f42ed642}">
+            <name locale="en_US">1</name>
+        </pin>
+    </pins>
+</symbol>

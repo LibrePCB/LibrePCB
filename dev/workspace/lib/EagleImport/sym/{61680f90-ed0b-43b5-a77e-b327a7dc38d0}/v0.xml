@@ -1,0 +1,28 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{61680f90-ed0b-43b5-a77e-b327a7dc38d0}</uuid>
+        <name locale="en_US">DIODE</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-1.905" width="0.254" layer="10" start_x="-1.27">
+            <segment type="line" end_x="1.27" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="1.27">
+            <segment type="line" end_x="-1.27" end_y="1.905"/>
+        </polygon>
+        <polygon fill="false" start_y="1.905" width="0.254" layer="10" start_x="-1.27">
+            <segment type="line" end_x="-1.27" end_y="-1.905"/>
+        </polygon>
+        <polygon fill="false" start_y="1.905" width="0.254" layer="10" start_x="1.397">
+            <segment type="line" end_x="1.397" end_y="-1.905"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{976b8f22-5eb0-4143-803d-61e478589aea}">
+            <name locale="en_US">A</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="180" y="0" uuid="{95678b83-7a35-4ceb-9562-af46984420c3}">
+            <name locale="en_US">C</name>
+        </pin>
+    </pins>
+</symbol>

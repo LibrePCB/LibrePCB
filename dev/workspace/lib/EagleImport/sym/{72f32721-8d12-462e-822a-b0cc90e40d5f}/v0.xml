@@ -1,0 +1,40 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{72f32721-8d12-462e-822a-b0cc90e40d5f}</uuid>
+        <name locale="en_US">PQ6CB11X1CP</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="5.08" uuid="{c4d9c5cd-9f88-419c-9f62-819d5f365ee0}">
+            <name locale="en_US">VIN</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="5.08" uuid="{17a0f42a-0e21-4bcf-bdcf-749204fe61d2}">
+            <name locale="en_US">VSW</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="0" uuid="{3ca791b9-ed2e-4dc0-b8c5-e6e2802919e2}">
+            <name locale="en_US">CTRL</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-5.08" uuid="{d3de153d-6b7b-4484-9b7d-4f579ec89408}">
+            <name locale="en_US">FB</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="0" uuid="{16ec3adc-ecf4-4950-a85c-b01e6b959e4f}">
+            <name locale="en_US">VO</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-5.08" uuid="{f6769d2f-8e17-47a5-a7ad-fdf1874119be}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

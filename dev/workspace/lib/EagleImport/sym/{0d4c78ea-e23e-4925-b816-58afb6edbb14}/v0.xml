@@ -1,0 +1,28 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{0d4c78ea-e23e-4925-b816-58afb6edbb14}</uuid>
+        <name locale="en_US">SUB</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="5.08" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="5.08" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="-5.08" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-7.62" length="2.54" angle="0" y="0" uuid="{2facd88f-bc2d-4d80-a72c-9c006afb6625}">
+            <name locale="en_US">SUB@1</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="-2.54" uuid="{0ec5aa1c-e7b1-4651-b7bd-1c377748ebb9}">
+            <name locale="en_US">SUB@2</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,12 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{4a043f5f-414a-4e54-9220-82907700ca8d}</uuid>
+        <name locale="en_US">+UB</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="0" length="2.54" angle="270" y="2.54" uuid="{cc551373-8070-4a0f-9d95-54b7a2335187}">
+            <name locale="en_US">+UB</name>
+        </pin>
+    </pins>
+</symbol>

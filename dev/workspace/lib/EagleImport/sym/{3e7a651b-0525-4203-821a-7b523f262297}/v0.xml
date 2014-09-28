@@ -1,0 +1,64 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{3e7a651b-0525-4203-821a-7b523f262297}</uuid>
+        <name locale="en_US">4500</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-17.78" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="-17.78"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="5.08" angle="0" y="-10.16" uuid="{2a3b82cf-15c6-4c6e-896b-86543efd6b63}">
+            <name locale="en_US">X1</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="12.7" uuid="{a6d584e5-ec4c-4b9f-ab48-57e95f5e8765}">
+            <name locale="en_US">DATA</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="12.7" uuid="{6f0e76ab-9fd4-4726-9b52-3461447416f8}">
+            <name locale="en_US">WRITE</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-15.24" uuid="{0daae0b8-c3a9-4d97-b851-de7cebbb7430}">
+            <name locale="en_US">X2</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-5.08" uuid="{6220a687-77a9-481b-9545-349f9652c213}">
+            <name locale="en_US">RST</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="7.62" uuid="{2b036c07-b54a-4eea-b6b7-e767fb188bbd}">
+            <name locale="en_US">I0</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="7.62" uuid="{da1077ae-20b4-4d57-a44c-b6885992786d}">
+            <name locale="en_US">RR</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="5.08" uuid="{463379b8-c85c-4777-a11c-cf69f86d2a41}">
+            <name locale="en_US">I1</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="2.54" uuid="{5347d7a8-76a1-482e-8d0e-cd54dbdc3e63}">
+            <name locale="en_US">I2</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="0" uuid="{29e38a99-8a91-43b0-87d6-0133462ecf46}">
+            <name locale="en_US">I3</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="5.08" uuid="{e895baa0-abae-44ca-97db-2607752be5d7}">
+            <name locale="en_US">JMP</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="2.54" uuid="{ae179463-399e-4715-bc24-0692dd578b1c}">
+            <name locale="en_US">RTN</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="0" uuid="{d61acbc1-1750-4b7b-b78b-e3e67895f9b4}">
+            <name locale="en_US">FLAGO</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-2.54" uuid="{d357226b-5c7a-4894-b25d-4c9e686e9b69}">
+            <name locale="en_US">FLAGF</name>
+        </pin>
+    </pins>
+</symbol>

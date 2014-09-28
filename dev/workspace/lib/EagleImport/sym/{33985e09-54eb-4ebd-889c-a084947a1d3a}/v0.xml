@@ -1,0 +1,52 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{33985e09-54eb-4ebd-889c-a084947a1d3a}</uuid>
+        <name locale="en_US">TM044H</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-12.7" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="-12.7"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="5.08" angle="0" y="7.62" uuid="{fe64c037-27ff-4c46-909e-fb9d9494a6e5}">
+            <name locale="en_US">IN+</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="5.08" uuid="{f08e9ca2-d91d-4fdb-9b86-32fa2644df1c}">
+            <name locale="en_US">IN-</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-7.62" uuid="{5481c9f6-f1b4-44a2-8082-ecc6e582e8c5}">
+            <name locale="en_US">ALBO</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="0" uuid="{f7ced5ce-4edd-43f0-9d8b-747980bbdd51}">
+            <name locale="en_US">A+</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-2.54" uuid="{2bc1a087-b895-4e5e-8eee-34323314d8b8}">
+            <name locale="en_US">A-</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="7.62" uuid="{b0d7a8a8-662d-4022-a71c-45ee481d7f6f}">
+            <name locale="en_US">OUT+</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="5.08" uuid="{02d2ea53-2280-4282-b010-e98c01729b8d}">
+            <name locale="en_US">OUT-</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="2.54" uuid="{015beca5-9388-400e-bdd3-67fb388b3cea}">
+            <name locale="en_US">OUT-@1</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-10.16" uuid="{d73f0ea3-5b82-42cb-a45d-f924cc57ec1b}">
+            <name locale="en_US">FIL</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-10.16" uuid="{1ba7a959-2136-4f4b-9489-672de24d2a2b}">
+            <name locale="en_US">CMD</name>
+        </pin>
+    </pins>
+</symbol>

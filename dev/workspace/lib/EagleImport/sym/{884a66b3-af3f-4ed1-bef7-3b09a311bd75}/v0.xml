@@ -1,0 +1,58 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{884a66b3-af3f-4ed1-bef7-3b09a311bd75}</uuid>
+        <name locale="en_US">MC34119</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="5.842" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="-5.842"/>
+        </polygon>
+        <polygon fill="false" start_y="5.842" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="-3.8862" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.842" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.8542" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="7.62">
+            <segment type="line" end_x="6.35" end_y="0.4572"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="7.62">
+            <segment type="line" end_x="6.35" end_y="-0.5588"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="1.778"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="-2.54" uuid="{555b4f34-75d8-46ef-8892-d50335ed5c75}">
+            <name locale="en_US">CD</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="90" y="-7.62" uuid="{3b058fe5-54f7-494f-9807-58bbdd230da5}">
+            <name locale="en_US">FC1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="90" y="-7.62" uuid="{c8ffca40-8cc8-414a-9051-1e48f1db8c18}">
+            <name locale="en_US">FC2</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-7.62" uuid="{0e187fc5-754e-4e53-8586-4e6314b786c8}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="2.54" uuid="{a93ba71d-cc77-4bae-a7a1-ab51febf5daa}">
+            <name locale="en_US">IN</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="270" y="7.62" uuid="{f684928a-3f9a-4583-bec8-2485649b0756}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="270" y="5.08" uuid="{e3730155-be49-4c63-8c39-7deaec6b5082}">
+            <name locale="en_US">VO1</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="90" y="-5.08" uuid="{a955ecbf-fc6b-422c-b148-aff9bf44f6df}">
+            <name locale="en_US">VO2</name>
+        </pin>
+    </pins>
+</symbol>

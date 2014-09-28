@@ -1,0 +1,109 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{9a6f96d0-3d8d-4b2f-a7e1-39b4d4b688aa}</uuid>
+        <name locale="en_US">IXP-ADDR</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-81.28"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{ff5dd94c-4d2d-42a5-bd9d-7a0f2b84cba7}">
+            <name locale="en_US">ADDR0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{2e2dcdd7-5b56-4566-af84-75d61494067a}">
+            <name locale="en_US">ADDR1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{b70c1270-8a9b-4ae5-9aeb-879b5e6ef20b}">
+            <name locale="en_US">ADDR2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{f3d66252-e95b-4d04-9392-f1436ac8ac41}">
+            <name locale="en_US">ADDR3</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{aaea67df-0369-4a17-af8b-6004532cf559}">
+            <name locale="en_US">ADDR4</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{443f0274-2999-48b6-bd39-2b0764427253}">
+            <name locale="en_US">ADDR5</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{2a0df2e9-b2dc-4b9b-b7c4-c96859b7831c}">
+            <name locale="en_US">ADDR6</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{efd7f389-09d6-4cfe-a41f-a2e5bcd4996b}">
+            <name locale="en_US">ADDR7</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{eceb260a-6c23-4eff-8150-075cf20874ee}">
+            <name locale="en_US">ADDR8</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{eb496f1c-0222-4a2a-8843-a78645225b08}">
+            <name locale="en_US">ADDR9</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{a50d874e-2e37-4f59-a1ad-8bfb37bb0d32}">
+            <name locale="en_US">ADDR10</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{dfd0b053-6539-4159-859f-739088934d6a}">
+            <name locale="en_US">ADDR11</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{d91abc08-c3a0-4667-973a-5a5d2fef58af}">
+            <name locale="en_US">ADDR12</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-33.02" uuid="{56a88062-7be6-4b70-8938-2fd761d1ba89}">
+            <name locale="en_US">ADDR13</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-35.56" uuid="{f854010c-4a82-47f5-85ff-ea7ab0599f39}">
+            <name locale="en_US">ADDR14</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-38.1" uuid="{572015a9-75cd-41bc-987f-e28290ee3f57}">
+            <name locale="en_US">ADDR15</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-40.64" uuid="{78ecfbb1-2dc6-44ad-b08b-bac402dbbfa6}">
+            <name locale="en_US">ADDR16</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-43.18" uuid="{f1a8439d-abfd-44e5-bd67-d7b3f25e58bf}">
+            <name locale="en_US">ADDR17</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-45.72" uuid="{85feb17a-83a1-46f9-8bc4-cd29ab875fb7}">
+            <name locale="en_US">ADDR18</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-48.26" uuid="{8b373117-71bf-4ca1-8078-f7f023127a41}">
+            <name locale="en_US">ADDR19</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-50.8" uuid="{9fae9a24-2e6c-485a-b0d4-0ee0b206697c}">
+            <name locale="en_US">ADDR20</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-53.34" uuid="{c6898381-8d72-4826-80cf-34424ebec54c}">
+            <name locale="en_US">ADDR21</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-55.88" uuid="{0051aeb3-9f78-4111-b9c3-60fd88d2aab0}">
+            <name locale="en_US">ADDR22</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-58.42" uuid="{5423e261-a714-4c8c-8d09-922085fb0528}">
+            <name locale="en_US">ADDR23</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-60.96" uuid="{a6affbc1-848f-4c24-8d82-b7a202d018b7}">
+            <name locale="en_US">ADDR24</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-63.5" uuid="{e61f43a9-351c-42ac-84e2-c4c007fcc702}">
+            <name locale="en_US">ADDR25</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-66.04" uuid="{cfa1ac04-949c-465e-ae7a-8192936ef398}">
+            <name locale="en_US">ADDR26</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-68.58" uuid="{c512c838-9c32-468a-ac7c-1ee3561f07dc}">
+            <name locale="en_US">ADDR27</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-71.12" uuid="{e2ecb376-dd4e-4a25-8d40-c52a9ab2ed99}">
+            <name locale="en_US">ADDR28</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-73.66" uuid="{3d6b5394-bff6-4a1a-ba25-643765b8ea1c}">
+            <name locale="en_US">ADDR29</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-76.2" uuid="{fc562b30-f6b7-40c8-8623-9a51985b2f3e}">
+            <name locale="en_US">ADDR30</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-78.74" uuid="{30e17b3c-b937-46ca-850a-98b294367128}">
+            <name locale="en_US">ADDR31</name>
+        </pin>
+    </pins>
+</symbol>

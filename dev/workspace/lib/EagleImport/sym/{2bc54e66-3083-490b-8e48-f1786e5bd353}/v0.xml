@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{2bc54e66-3083-490b-8e48-f1786e5bd353}</uuid>
+        <name locale="en_US">REF200</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="-10.16" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="-7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="5.08" angle="0" y="7.62" uuid="{983c4777-250d-4192-b978-7bafe4ad24d5}">
+            <name locale="en_US">MIN</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="7.62" uuid="{7824f410-2f19-44e2-aba0-c34b56ce3a1e}">
+            <name locale="en_US">MOUT</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="2.54" uuid="{df0e2967-eba2-48c7-a5cb-092637de1a3b}">
+            <name locale="en_US">I1H</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="0" uuid="{2378b77b-6c80-43c8-99b2-5d4e5d77d072}">
+            <name locale="en_US">I2H</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="2.54" uuid="{8ba56af8-fdbb-47b4-8280-0cdafe4578ce}">
+            <name locale="en_US">I1L</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="0" uuid="{29aee365-849a-409c-b9f1-2d99bf4d3c36}">
+            <name locale="en_US">I2L</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-5.08" uuid="{72cf4c45-fdb9-4248-9ca0-d71198b27da1}">
+            <name locale="en_US">MCOM</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-5.08" uuid="{4435d689-92d3-47b9-9361-1d4631a9ce0f}">
+            <name locale="en_US">SUBST</name>
+        </pin>
+    </pins>
+</symbol>

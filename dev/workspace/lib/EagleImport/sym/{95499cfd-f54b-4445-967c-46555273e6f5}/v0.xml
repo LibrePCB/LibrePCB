@@ -1,0 +1,118 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{95499cfd-f54b-4445-967c-46555273e6f5}</uuid>
+        <name locale="en_US">XC5VLX110T_FF1738-MGTTXN</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="20.32" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="20.32">
+            <segment type="line" end_x="20.32" end_y="-81.28"/>
+        </polygon>
+        <polygon fill="false" start_y="-81.28" width="0.254" layer="10" start_x="20.32">
+            <segment type="line" end_x="0" end_y="-81.28"/>
+        </polygon>
+        <polygon fill="false" start_y="-81.28" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{3d188f90-c5d4-49a0-bb33-ae5c4d1a2e28}">
+            <name locale="en_US">MGTTXN0_112</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{9cfedb0f-a97b-41ea-9104-435801866dad}">
+            <name locale="en_US">MGTTXN0_114</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{8854b8aa-e13d-4b7c-b2af-4c6aff011e8f}">
+            <name locale="en_US">MGTTXN0_116</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{ba1f662f-37d9-4379-b147-57017532fc57}">
+            <name locale="en_US">MGTTXN0_118</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{1e662dbe-5d7a-4edb-a28a-942d66f7133a}">
+            <name locale="en_US">MGTTXN0_120</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{1da486e0-24d1-426e-b0c8-1579d35ea6a9}">
+            <name locale="en_US">MGTTXN0_122</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{028ea3a0-a6c2-47ac-9e62-39d50aafe6d6}">
+            <name locale="en_US">MGTTXN0_124</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{e8317749-25c7-4187-87ca-10b37402e72e}">
+            <name locale="en_US">MGTTXN0_126</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{b35a934a-be88-452c-824e-5ac6220344bf}">
+            <name locale="en_US">MGTTXN1_112</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{331cb59b-e5b1-4e5f-9095-2379f46c362f}">
+            <name locale="en_US">MGTTXN1_114</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{8c5fe228-20a3-4a6c-bf1c-57d94e526e30}">
+            <name locale="en_US">MGTTXN1_116</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{0fced6cc-313a-4303-b319-3ed3a64e1538}">
+            <name locale="en_US">MGTTXN1_118</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{699653a5-b4fa-4c53-bcfc-0c058ebe4a7c}">
+            <name locale="en_US">MGTTXN1_120</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-33.02" uuid="{a135b897-46aa-437e-b7a3-416286fb3327}">
+            <name locale="en_US">MGTTXN1_122</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-35.56" uuid="{7927b2d2-c8a5-497a-96ad-c3b9e62b7406}">
+            <name locale="en_US">MGTTXN1_124</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-38.1" uuid="{747d1c75-5d59-4bfc-8eb2-ab8ac58d125f}">
+            <name locale="en_US">MGTTXN1_126</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-40.64" uuid="{59fb9a58-b81e-48d9-9056-c9e50e4f051d}">
+            <name locale="en_US">MGTTXP0_112</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-43.18" uuid="{bf571f79-b93f-4055-bb0b-1ad33ba227de}">
+            <name locale="en_US">MGTTXP0_114</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-45.72" uuid="{2d6b94aa-0b53-4237-9d34-0969b2216f6e}">
+            <name locale="en_US">MGTTXP0_116</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-48.26" uuid="{aeb9aa0d-4edf-463a-bd58-de015e5a1957}">
+            <name locale="en_US">MGTTXP0_118</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-50.8" uuid="{2820ad01-09d8-492a-857c-dce90b2f103a}">
+            <name locale="en_US">MGTTXP0_120</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-53.34" uuid="{f82ab569-8a76-4ede-a950-1fdc566b32a7}">
+            <name locale="en_US">MGTTXP0_122</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-55.88" uuid="{a2ec8b5d-a319-4c61-8773-1eaa232e51bb}">
+            <name locale="en_US">MGTTXP0_124</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-58.42" uuid="{600fbac5-55ce-442c-97d1-1967ac06eea5}">
+            <name locale="en_US">MGTTXP0_126</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-60.96" uuid="{3d81c923-f97b-4858-a409-93074011c5d6}">
+            <name locale="en_US">MGTTXP1_112</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-63.5" uuid="{7640a735-675c-4c9e-98ab-c4d570bfd387}">
+            <name locale="en_US">MGTTXP1_114</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-66.04" uuid="{9e78c392-57bc-42e4-ada9-b3f31aee8860}">
+            <name locale="en_US">MGTTXP1_116</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-68.58" uuid="{5fcc6ff2-13c6-4a42-9ecc-0a7acd03aab8}">
+            <name locale="en_US">MGTTXP1_118</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-71.12" uuid="{71fc2b87-e41d-4691-811d-2c3b8e924317}">
+            <name locale="en_US">MGTTXP1_120</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-73.66" uuid="{e4019db2-9282-4477-bcb3-4a012198a021}">
+            <name locale="en_US">MGTTXP1_122</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-76.2" uuid="{9328f511-07ca-4867-992a-d9d0845fc96a}">
+            <name locale="en_US">MGTTXP1_124</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-78.74" uuid="{94f648be-7a94-4ef6-9efd-617bd43bca9f}">
+            <name locale="en_US">MGTTXP1_126</name>
+        </pin>
+    </pins>
+</symbol>

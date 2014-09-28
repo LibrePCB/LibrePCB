@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{0417afe9-a644-43fe-a7b6-6087ef9881e1}</uuid>
+        <name locale="en_US">MC9S12-PE</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="-5.08" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="2.54" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="5.08" length="2.54" angle="180" y="7.62" uuid="{c75af9dc-d12d-488a-bbc0-33d629cfa1d1}">
+            <name locale="en_US">PE0</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="5.08" uuid="{76331701-af05-4040-b5f2-edfd860cb860}">
+            <name locale="en_US">PE1</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="2.54" uuid="{d63028bd-dd9f-49bf-9009-fe5b1f69a6f9}">
+            <name locale="en_US">PE2</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="0" uuid="{daf3dc65-b075-49e8-ac1b-d13a199bc1f5}">
+            <name locale="en_US">PE3</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="-2.54" uuid="{0e133d47-be7b-4633-bf65-1265b4cf05af}">
+            <name locale="en_US">PE4</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="-5.08" uuid="{d1085cf3-03dc-4414-8ea9-aa9d84a62d1a}">
+            <name locale="en_US">PE5</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="-7.62" uuid="{d0d95737-c9ed-4f14-8750-9b5e95c25d9c}">
+            <name locale="en_US">PE6</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="-10.16" uuid="{0425605e-0813-4dd2-8066-bb86e8a94a3f}">
+            <name locale="en_US">PE7</name>
+        </pin>
+    </pins>
+</symbol>

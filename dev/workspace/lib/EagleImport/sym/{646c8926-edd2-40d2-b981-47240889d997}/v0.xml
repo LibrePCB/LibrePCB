@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{646c8926-edd2-40d2-b981-47240889d997}</uuid>
+        <name locale="en_US">ICL7665</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-10.16" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="-10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="5.08" angle="0" y="7.62" uuid="{3276ecec-d32a-4aeb-a41f-72e142c0c759}">
+            <name locale="en_US">HYST1</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-2.54" uuid="{95bb1e79-8257-41cd-aa0b-0b2d614d568e}">
+            <name locale="en_US">SET1</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-7.62" uuid="{504b78a5-9d39-45a6-badc-e906b93e1b09}">
+            <name locale="en_US">SET2</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="7.62" uuid="{e76ac509-6f7a-461f-b546-66aa79860c45}">
+            <name locale="en_US">OUT1</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-7.62" uuid="{22693d4c-4a07-49cd-adce-921b64cd55f4}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-2.54" uuid="{13d82429-b42b-4518-bd23-c979f69138af}">
+            <name locale="en_US">V+</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="2.54" uuid="{9babfddf-ba3e-4446-9fa8-1bce822f9945}">
+            <name locale="en_US">OUT2</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="2.54" uuid="{543b2c42-564f-4e27-b4b6-7b3b53e98d2a}">
+            <name locale="en_US">HYST2</name>
+        </pin>
+    </pins>
+</symbol>

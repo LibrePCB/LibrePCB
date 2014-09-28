@@ -1,0 +1,64 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{bdfbcd65-3c0e-4c3b-9cc0-c43e13b5297b}</uuid>
+        <name locale="en_US">TX4PIN</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-10.16" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="1.905" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="5.08" end_y="0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="0.635" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="2.54" end_y="-0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="1.905" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="0.635" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="-0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.905" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="5.08" end_y="-3.175"/>
+        </polygon>
+        <polygon fill="false" start_y="-3.175" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="2.54" end_y="-4.445"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.905" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="-3.175"/>
+        </polygon>
+        <polygon fill="false" start_y="-3.175" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="-4.445"/>
+        </polygon>
+        <polygon fill="false" start_y="0.635" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="0.635" end_y="0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="-3.175" width="0.254" layer="10" start_x="0.635">
+            <segment type="line" end_x="2.54" end_y="-3.175"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="-7.62" uuid="{828b81e8-fd78-48ff-a85d-5a67fe24be6c}">
+            <name locale="en_US">TXGND</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{8b26a973-70f0-485a-8feb-d53b98b660bd}">
+            <name locale="en_US">TXIN+</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{a9c09f79-4f62-497c-a603-3649ba2ccb99}">
+            <name locale="en_US">TXIN-</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="7.62" uuid="{8ee175e7-a526-4413-bb05-e5c574b8f222}">
+            <name locale="en_US">TXVCC</name>
+        </pin>
+    </pins>
+</symbol>

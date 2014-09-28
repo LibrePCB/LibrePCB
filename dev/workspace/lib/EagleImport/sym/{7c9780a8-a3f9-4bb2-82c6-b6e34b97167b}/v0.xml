@@ -1,0 +1,33 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{7c9780a8-a3f9-4bb2-82c6-b6e34b97167b}</uuid>
+        <name locale="en_US">+VBB</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="-7.62" length="2.54" angle="270" y="2.54" uuid="{1cd42614-a0af-4e10-aedb-972bfb9a4a3c}">
+            <name locale="en_US">+VBB@1</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="270" y="2.54" uuid="{89e2bcc7-2a6a-41fc-8bfe-5efe3c5c2c2d}">
+            <name locale="en_US">+VBB@2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="270" y="2.54" uuid="{89c441bd-91a7-4048-97f0-dcb451164037}">
+            <name locale="en_US">+VBB@3</name>
+        </pin>
+        <pin x="0" length="2.54" angle="270" y="2.54" uuid="{27cd584a-3c70-4240-8da7-18396c491b9f}">
+            <name locale="en_US">+VBB@4</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="270" y="2.54" uuid="{34828cf6-cbda-4cd6-9e41-b3e09a02bf96}">
+            <name locale="en_US">+VBB@5</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="270" y="2.54" uuid="{27f12fee-1a4f-4a93-bce6-07c1a645dce6}">
+            <name locale="en_US">+VBB@6</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="270" y="2.54" uuid="{c4ca41e3-3895-4435-9dd4-37e8dab7f8bf}">
+            <name locale="en_US">+VBB@7</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="270" y="2.54" uuid="{00dd0040-8196-45a9-b455-f229df6a8f31}">
+            <name locale="en_US">+VBB@8</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,70 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{b8251bcc-a203-4618-8c17-a0448f2de3ec}</uuid>
+        <name locale="en_US">UDA1320</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="20.32" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="12.7" end_y="20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="20.32" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="-20.32" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="-12.7" end_y="-20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="-20.32" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-12.7" end_y="20.32"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="2.54" angle="0" y="12.7" uuid="{0a715be7-23ed-495e-a694-53bf7342f5de}">
+            <name locale="en_US">BCK</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="10.16" uuid="{39c26205-0fcc-4b9a-8110-0aca7ae5dcbb}">
+            <name locale="en_US">WS</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="7.62" uuid="{da865874-6379-4e71-a764-c31a3c457240}">
+            <name locale="en_US">DATAI</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="2.54" uuid="{06b76beb-b6dc-4313-acd1-8645096cf89f}">
+            <name locale="en_US">SYSCLK</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-10.16" uuid="{007ed8ad-4b14-4c80-9782-ebe57715cacc}">
+            <name locale="en_US">VOUTL</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="0" uuid="{e17d987e-92a6-405f-938c-3b9d8791ae2d}">
+            <name locale="en_US">VOUTR</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="10.16" uuid="{3d5fa6fb-9732-42ba-8610-0d9c0f4312ea}">
+            <name locale="en_US">VREFDAC</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-2.54" uuid="{80d66861-d156-408a-b39d-9ae7e9ffc47d}">
+            <name locale="en_US">APPSEL</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-5.08" uuid="{17540749-6a3b-4291-892a-ba56f6d4b89d}">
+            <name locale="en_US">APPL0</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-7.62" uuid="{6c14c4ac-b26d-4949-b842-90b37482f30e}">
+            <name locale="en_US">APPL1</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-10.16" uuid="{803a799e-7ff0-4f3c-b97d-20d62dbfbc2b}">
+            <name locale="en_US">APPL2</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-12.7" uuid="{b9aeb746-dbd7-49a6-81db-6a23b9cb14d7}">
+            <name locale="en_US">APPL3</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-17.78" uuid="{f7d69d94-f218-498d-a148-c1ca630c0668}">
+            <name locale="en_US">VSSA</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-17.78" uuid="{82e27b56-e3e8-4c31-9dd4-36f4936dbe78}">
+            <name locale="en_US">VSSD</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="17.78" uuid="{b3f1fca4-b755-4b4a-b1b2-35d50915c835}">
+            <name locale="en_US">VDDD</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="17.78" uuid="{18bc159f-865b-41b7-9157-80521452f180}">
+            <name locale="en_US">VDDA</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,142 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{3f0e8c69-f802-48a9-9830-4e7ce9f7d9f2}</uuid>
+        <name locale="en_US">TPS65020</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="25.4" width="0.254" layer="10" start_x="-25.4">
+            <segment type="line" end_x="25.4" end_y="25.4"/>
+        </polygon>
+        <polygon fill="false" start_y="25.4" width="0.254" layer="10" start_x="25.4">
+            <segment type="line" end_x="25.4" end_y="-25.4"/>
+        </polygon>
+        <polygon fill="false" start_y="-25.4" width="0.254" layer="10" start_x="25.4">
+            <segment type="line" end_x="-25.4" end_y="-25.4"/>
+        </polygon>
+        <polygon fill="false" start_y="-25.4" width="0.254" layer="10" start_x="-25.4">
+            <segment type="line" end_x="-25.4" end_y="25.4"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-27.94" length="2.54" angle="0" y="12.7" uuid="{5213fad8-4846-4219-8e80-de52dfa8df8b}">
+            <name locale="en_US">DEFDCDC3</name>
+        </pin>
+        <pin x="-27.94" length="2.54" angle="0" y="10.16" uuid="{236a710c-229b-4eb8-b0e5-47e3fa88d620}">
+            <name locale="en_US">VDCDC3</name>
+        </pin>
+        <pin x="-27.94" length="2.54" angle="0" y="7.62" uuid="{f78d119c-64aa-48e2-a87d-99249f166f95}">
+            <name locale="en_US">PGND3</name>
+        </pin>
+        <pin x="-27.94" length="2.54" angle="0" y="5.08" uuid="{7dd40b23-b2c8-4bd0-9c7e-5cc314b20881}">
+            <name locale="en_US">L3</name>
+        </pin>
+        <pin x="-27.94" length="2.54" angle="0" y="2.54" uuid="{6108960b-9b98-4a95-8dd8-f4e4ae222228}">
+            <name locale="en_US">VINDCDC3</name>
+        </pin>
+        <pin x="-27.94" length="2.54" angle="0" y="0" uuid="{963a0941-ae09-4b61-84a3-ebea6648a66c}">
+            <name locale="en_US">VINDCDC1</name>
+        </pin>
+        <pin x="-27.94" length="2.54" angle="0" y="-2.54" uuid="{c23019fb-82e1-497f-9202-1c664911e730}">
+            <name locale="en_US">L1</name>
+        </pin>
+        <pin x="-27.94" length="2.54" angle="0" y="-5.08" uuid="{2e938d8c-cb34-43c0-9d28-fcc6be6a0aa5}">
+            <name locale="en_US">PGND1</name>
+        </pin>
+        <pin x="-27.94" length="2.54" angle="0" y="-7.62" uuid="{60b4bc9c-69f5-4f37-8e63-9f18623a333e}">
+            <name locale="en_US">VDCDC1</name>
+        </pin>
+        <pin x="-27.94" length="2.54" angle="0" y="-10.16" uuid="{05ab3781-1976-4ae9-b6d7-04549aa9627f}">
+            <name locale="en_US">DEFDCDC1</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="90" y="-27.94" uuid="{cdc9ccdf-a70c-40e5-8d4d-7859d9b61da8}">
+            <name locale="en_US">!HOT_RESET</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="90" y="-27.94" uuid="{19a23e17-556b-41c7-95a8-9ffeeebc88cb}">
+            <name locale="en_US">PB_IN</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="90" y="-27.94" uuid="{9b12f607-ac02-46bf-bc68-9900aab57496}">
+            <name locale="en_US">PB_OUT</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="90" y="-27.94" uuid="{ce0dbb6c-76b9-41c6-8941-6ed249970e60}">
+            <name locale="en_US">VSYSIN</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-27.94" uuid="{82b16a3e-c19e-4cbb-8b8b-28624c9ff8c3}">
+            <name locale="en_US">VBACKUP</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-27.94" uuid="{92baeeea-3f8a-4235-a3d7-8cde4feb746b}">
+            <name locale="en_US">VRTC</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="90" y="-27.94" uuid="{85d2280b-67da-4dc1-a465-884a1cf6adc0}">
+            <name locale="en_US">AGND2</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="90" y="-27.94" uuid="{01bc8954-fa04-4eae-a661-3c4829ca4b97}">
+            <name locale="en_US">VLDO2</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="90" y="-27.94" uuid="{ca486d02-5099-4f89-a653-03d26dc751db}">
+            <name locale="en_US">VINLDO</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="90" y="-27.94" uuid="{7f98448e-bad3-4997-8e7f-7ec5e35649c8}">
+            <name locale="en_US">VLDO1</name>
+        </pin>
+        <pin x="27.94" length="2.54" angle="180" y="-10.16" uuid="{ce78e832-bbc4-433f-84cf-ecb362640ac3}">
+            <name locale="en_US">!LOWBAT</name>
+        </pin>
+        <pin x="27.94" length="2.54" angle="180" y="-7.62" uuid="{92b9d264-ef88-4b76-8c82-2c4a11d9221a}">
+            <name locale="en_US">LDO_EN</name>
+        </pin>
+        <pin x="27.94" length="2.54" angle="180" y="-5.08" uuid="{d3da9a4d-e523-478e-b6b9-9880d963428c}">
+            <name locale="en_US">DCDC3_EN</name>
+        </pin>
+        <pin x="27.94" length="2.54" angle="180" y="-2.54" uuid="{edb21faf-3822-48a4-ab53-6dcc158d1376}">
+            <name locale="en_US">DCDC2_EN</name>
+        </pin>
+        <pin x="27.94" length="2.54" angle="180" y="0" uuid="{b97c6135-0df1-4a6e-9914-24b977acb4af}">
+            <name locale="en_US">DCDC1_EN</name>
+        </pin>
+        <pin x="27.94" length="2.54" angle="180" y="2.54" uuid="{cf3554f1-ee8d-4747-ac42-0d9c3dd3788a}">
+            <name locale="en_US">TRESPWRON</name>
+        </pin>
+        <pin x="27.94" length="2.54" angle="180" y="5.08" uuid="{358e49ba-1415-4882-ae4b-d901261036fc}">
+            <name locale="en_US">!RESPWRON</name>
+        </pin>
+        <pin x="27.94" length="2.54" angle="180" y="7.62" uuid="{5462d799-10a9-48d1-8337-3e77ddf5feb2}">
+            <name locale="en_US">!INT</name>
+        </pin>
+        <pin x="27.94" length="2.54" angle="180" y="10.16" uuid="{090889e2-2a4a-4fa5-81d9-491e88671695}">
+            <name locale="en_US">SDAT</name>
+        </pin>
+        <pin x="27.94" length="2.54" angle="180" y="12.7" uuid="{d656830b-4805-4b8e-a8fd-12c6cb0e73ae}">
+            <name locale="en_US">SCLK</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="270" y="27.94" uuid="{f19807c3-b75f-4265-a242-ce4843fcab48}">
+            <name locale="en_US">!PWRFAIL</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="270" y="27.94" uuid="{8306a5f0-b5d8-402c-b05f-2ffd14d46354}">
+            <name locale="en_US">DEFDCDC2</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="270" y="27.94" uuid="{8bf7943f-2995-4c62-af2c-1e17969e9df8}">
+            <name locale="en_US">VDCDC2</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="270" y="27.94" uuid="{8584463a-e2f1-4b98-adfe-21376abd8de8}">
+            <name locale="en_US">PGND2</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="270" y="27.94" uuid="{4484ef1d-75fc-4a5b-8f97-da229df40337}">
+            <name locale="en_US">L2</name>
+        </pin>
+        <pin x="0" length="2.54" angle="270" y="27.94" uuid="{dcab619f-b631-45b9-971d-a6297a3dee4d}">
+            <name locale="en_US">VINDCDC2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="270" y="27.94" uuid="{f8b346d8-4790-455c-b7ca-2c4cbecc37b7}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="270" y="27.94" uuid="{af62814e-2acc-4793-8c29-bde8f5b6ddfa}">
+            <name locale="en_US">PWRFAIL_SNS</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="270" y="27.94" uuid="{e2b881d4-6835-4c82-bf42-3e043720b1f8}">
+            <name locale="en_US">LOWBAT_SNS</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="270" y="27.94" uuid="{9336524f-ffd9-49d4-a090-5eda8059ed14}">
+            <name locale="en_US">AGND1</name>
+        </pin>
+    </pins>
+</symbol>

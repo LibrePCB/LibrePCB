@@ -1,0 +1,79 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{8c6b9550-6202-49ce-b859-a4d867f3d75a}</uuid>
+        <name locale="en_US">100P503C</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-67.31" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="-20.32" uuid="{c9bbfcd6-761e-4436-aeee-c380cf92ce91}">
+            <name locale="en_US">/CE</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{36e5dfa8-3b7b-478e-ae7b-3e3155a626e9}">
+            <name locale="en_US">/CEO</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{0535d7d2-fd42-4023-9f75-68e2bde35ba1}">
+            <name locale="en_US">/CONFIG</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{1d9242f9-3cf2-427f-b859-d1815a0081e3}">
+            <name locale="en_US">/STATUS</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{a75eda9e-eb0a-41da-ac83-52eb86cbc5a1}">
+            <name locale="en_US">CONF_DONE</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-25.4" uuid="{1b6be746-49ad-4d6c-ad06-82e9e8eee749}">
+            <name locale="en_US">DATA0</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-22.86" uuid="{71053bae-4420-4dd8-8481-e6edf74110b2}">
+            <name locale="en_US">DCLK</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-58.42" uuid="{ac758eac-bea6-474c-9c1b-990e3f5efc20}">
+            <name locale="en_US">GCLK0</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-60.96" uuid="{d3b31a8d-1349-42c1-994e-def40cb1c7ad}">
+            <name locale="en_US">GCLK1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-66.04" uuid="{7e78e455-94d9-46c6-9467-6e6fe38551c4}">
+            <name locale="en_US">GND_CKLK</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-45.72" uuid="{8ca1ecbf-5eef-4393-91e8-d5bc23a92409}">
+            <name locale="en_US">IN0</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-48.26" uuid="{60a14411-aed5-4a94-b366-65cba1832731}">
+            <name locale="en_US">IN1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-50.8" uuid="{0f4243b4-3b60-4318-b7b8-88f1a5f60851}">
+            <name locale="en_US">IN2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-53.34" uuid="{26117e48-0097-4d16-bcf2-80416d29c670}">
+            <name locale="en_US">IN3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-17.78" uuid="{c8d2afb3-6b53-444c-8820-ce11af56770e}">
+            <name locale="en_US">MSEL0</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-15.24" uuid="{04ec31e5-6861-400a-bbe4-b9a2c435f17e}">
+            <name locale="en_US">MSEL1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-30.48" uuid="{6209f87e-070f-434c-82e6-b337470b1070}">
+            <name locale="en_US">TCK</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-40.64" uuid="{16b83b67-d01e-49a9-b28b-82ae220f4195}">
+            <name locale="en_US">TDI</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-33.02" uuid="{21fe0118-6027-4cc0-a077-fec0f4bd3498}">
+            <name locale="en_US">TDO</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-35.56" uuid="{b7788bb0-883f-4240-a134-f4b42a1babcd}">
+            <name locale="en_US">TMS</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-38.1" uuid="{366ebb32-3625-4afa-b00a-c632d6c54cb8}">
+            <name locale="en_US">TRST</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{400b8f31-4407-46a0-8b81-c404b3a00d3a}">
+            <name locale="en_US">VCC_CKLK</name>
+        </pin>
+    </pins>
+</symbol>

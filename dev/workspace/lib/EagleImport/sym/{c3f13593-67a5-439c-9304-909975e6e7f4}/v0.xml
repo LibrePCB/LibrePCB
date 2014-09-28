@@ -1,0 +1,37 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{c3f13593-67a5-439c-9304-909975e6e7f4}</uuid>
+        <name locale="en_US">7453</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="-7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="-5.08" uuid="{18b0a7c7-133f-46ef-a7a1-1608dbfdba54}">
+            <name locale="en_US">A</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="5.08" uuid="{543be242-9baa-4723-ac26-367ad3f2a38c}">
+            <name locale="en_US">Y1</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="2.54" uuid="{1a4e79cf-8d55-45f8-886c-6fbb7e055e9e}">
+            <name locale="en_US">Y2</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="2.54" uuid="{7b9944a1-cf8a-4abf-a4d5-e95f653f26f9}">
+            <name locale="en_US">COM</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-2.54" uuid="{e342d900-e1b3-49da-9409-9e33ca570828}">
+            <name locale="en_US">INH</name>
+        </pin>
+    </pins>
+</symbol>

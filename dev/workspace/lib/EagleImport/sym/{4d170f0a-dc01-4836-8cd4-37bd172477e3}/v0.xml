@@ -1,0 +1,67 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{4d170f0a-dc01-4836-8cd4-37bd172477e3}</uuid>
+        <name locale="en_US">OPAMP-BAL-CMP</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="3.175" width="0.1524" layer="10" start_x="-3.81">
+            <segment type="line" end_x="-3.81" end_y="1.905"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="-4.445">
+            <segment type="line" end_x="-3.175" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="-4.445">
+            <segment type="line" end_x="-3.175" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="3.8862"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="1.3462"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="-1.3462"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="5.08" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="5.08" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="-3.8862"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-2.6162"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-7.62" length="2.54" angle="0" y="-2.54" uuid="{b031e9cb-a3b4-4cb2-854b-8a60b10b5f00}">
+            <name locale="en_US">-IN</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="2.54" uuid="{8e30344e-6b43-4b8f-9675-05c7e2f55ab2}">
+            <name locale="en_US">+IN</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="270" y="7.62" uuid="{0f53b11d-979a-4b4b-9bb7-40223d4f7e7d}">
+            <name locale="en_US">BAL2</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="0" uuid="{0964703a-8320-4bd6-af49-e43a177985c4}">
+            <name locale="en_US">OUT</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-7.62" uuid="{52ae2269-1bdf-4ef7-9bf2-a508e3baedcb}">
+            <name locale="en_US">BAL1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="270" y="7.62" uuid="{e459de4e-1145-4818-af21-a1e9eb614698}">
+            <name locale="en_US">V+</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-7.62" uuid="{59f27bc2-9a0a-468d-8eac-2c679ab66dcf}">
+            <name locale="en_US">COMP</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="90" y="-7.62" uuid="{11f34444-abb0-48f4-8e70-5e93a092bbfd}">
+            <name locale="en_US">V-</name>
+        </pin>
+    </pins>
+</symbol>

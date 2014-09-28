@@ -1,0 +1,37 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{f904b5f4-2d4e-4c4f-a5c8-1de444db3e36}</uuid>
+        <name locale="en_US">USB-SHIELD</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="1.27" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="1.27">
+            <segment type="line" end_x="2.54" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="19.05"/>
+        </polygon>
+        <polygon fill="false" start_y="20.32" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="1.27" end_y="20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="20.32" width="0.254" layer="10" start_x="1.27">
+            <segment type="line" end_x="2.54" end_y="19.05"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-7.62" length="2.54" angle="90" y="-2.54" uuid="{697ab306-00b1-4dcc-a0bc-93cda81240db}">
+            <name locale="en_US">S1</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="90" y="-2.54" uuid="{988fa5f9-82e2-46d2-ba05-9498eebe4695}">
+            <name locale="en_US">S2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="90" y="-2.54" uuid="{666bf2ab-56ad-4135-988c-516ecda276f2}">
+            <name locale="en_US">S3</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-2.54" uuid="{f6d5d0fb-485c-4967-b7e7-4cd931eb73c5}">
+            <name locale="en_US">S4</name>
+        </pin>
+    </pins>
+</symbol>

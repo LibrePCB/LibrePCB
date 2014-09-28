@@ -1,0 +1,61 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{c94dd16f-8d0d-43fc-821c-6909c802e688}</uuid>
+        <name locale="en_US">IXP-EX-DATA</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-40.64"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{37783235-2770-4077-958c-96c8a0c89d9b}">
+            <name locale="en_US">EX_DATA0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{a4a0e9ae-86c5-46ac-bf58-08c56341b287}">
+            <name locale="en_US">EX_DATA1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{994aab9e-987d-4c8a-93af-e091302c0edc}">
+            <name locale="en_US">EX_DATA2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{6d15e60c-786b-4c51-9b69-3375a3f04ccd}">
+            <name locale="en_US">EX_DATA3</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{cc2b23ed-0e71-4d46-a794-ea09b78fd537}">
+            <name locale="en_US">EX_DATA4</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{ecc5d563-ea53-4590-92b3-2e652d58be37}">
+            <name locale="en_US">EX_DATA5</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{78f5f562-eb7d-4976-a772-2459acf3c26b}">
+            <name locale="en_US">EX_DATA6</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{7a5d7567-7904-40a4-8652-5b0d6148117d}">
+            <name locale="en_US">EX_DATA7</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{2a1c3252-caac-4196-8171-540c893461bf}">
+            <name locale="en_US">EX_DATA8</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{28854c82-4817-4502-9855-a43acf2ced80}">
+            <name locale="en_US">EX_DATA9</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{01672fb7-9d57-4700-9cb3-598ac1b2035f}">
+            <name locale="en_US">EX_DATA10</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{98a1cda7-937d-4957-a066-f4055a3ff24f}">
+            <name locale="en_US">EX_DATA11</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{e310bb82-a548-4458-a619-5f00ca4df9ac}">
+            <name locale="en_US">EX_DATA12</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-33.02" uuid="{74c7197d-52b9-49b9-abbd-e05631ff6d54}">
+            <name locale="en_US">EX_DATA13</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-35.56" uuid="{6f95167a-ec5e-4939-bb73-7736a1df6c0f}">
+            <name locale="en_US">EX_DATA14</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-38.1" uuid="{d71cf7ba-cb2e-41c4-ac02-031c5bef80b0}">
+            <name locale="en_US">EX_DATA15</name>
+        </pin>
+    </pins>
+</symbol>

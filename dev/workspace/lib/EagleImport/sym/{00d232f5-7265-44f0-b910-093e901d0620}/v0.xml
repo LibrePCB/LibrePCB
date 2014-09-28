@@ -1,0 +1,25 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{00d232f5-7265-44f0-b910-093e901d0620}</uuid>
+        <name locale="en_US">S-SIL</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.4064" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="5.3975"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.3975" width="0.4064" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.4064" layer="10" start_x="0">
+            <segment type="line" end_x="-2.54" end_y="2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="270" y="7.62" uuid="{f94ffc8c-260e-4fc3-beff-300922518313}">
+            <name locale="en_US">S</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-7.62" uuid="{747b9721-70e7-43de-90b8-214fcce2fa79}">
+            <name locale="en_US">P</name>
+        </pin>
+    </pins>
+</symbol>

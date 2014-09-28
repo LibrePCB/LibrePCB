@@ -1,0 +1,22 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{d4f39876-24f9-47ee-a72f-98c6661dcce3}</uuid>
+        <name locale="en_US">FEMREC</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0.635" width="0.3048" layer="10" start_x="0">
+            <segment type="line" end_x="2.3114" end_y="0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.635" width="0.3048" layer="10" start_x="2.3114">
+            <segment type="line" end_x="0" end_y="-0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.635" width="0.3048" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="0.635"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{3317715c-eb74-4d91-b238-94d1e78bd1be}">
+            <name locale="en_US">P</name>
+        </pin>
+    </pins>
+</symbol>

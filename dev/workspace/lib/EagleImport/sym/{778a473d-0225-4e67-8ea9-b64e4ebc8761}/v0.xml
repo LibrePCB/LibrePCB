@@ -1,0 +1,25 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{778a473d-0225-4e67-8ea9-b64e4ebc8761}</uuid>
+        <name locale="en_US">363-30B</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-8.89"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{0940e2cd-591b-4145-b3a7-d7ce29a29368}">
+            <name locale="en_US">IO352</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{536b2d60-3def-40a6-ab63-71d726fa2354}">
+            <name locale="en_US">IO361</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{19221bc9-4b8e-47cc-ac30-4bbc0748f8b7}">
+            <name locale="en_US">IO362</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{6d091cc4-4794-4e04-996c-26feb0e62908}">
+            <name locale="en_US">IO363</name>
+        </pin>
+    </pins>
+</symbol>

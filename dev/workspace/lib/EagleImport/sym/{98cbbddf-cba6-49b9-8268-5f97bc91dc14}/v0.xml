@@ -1,0 +1,64 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{98cbbddf-cba6-49b9-8268-5f97bc91dc14}</uuid>
+        <name locale="en_US">LME49600</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="-3.81">
+            <segment type="line" end_x="-3.81" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="-3.81">
+            <segment type="line" end_x="-3.81" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="-3.81">
+            <segment type="line" end_x="7.62" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-3.81" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-3.81" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.1524" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-4.699" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.1524" layer="10" start_x="-0.635">
+            <segment type="line" end_x="0" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-3.429"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="-2.413"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="2.286"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="7.62" end_y="-7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-7.62" length="2.54" angle="0" y="0" uuid="{09a7ef33-5ee7-4c24-a638-72eddf23bb5a}">
+            <name locale="en_US">IN</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="0" uuid="{e6faf1df-d263-4ead-bcd9-db5db8f5d958}">
+            <name locale="en_US">OUT</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="-7.62" uuid="{df26d0b5-9206-4996-8653-d57ecb30ce85}">
+            <name locale="en_US">BW</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-10.16" uuid="{40783987-2219-4d29-87d4-0899398b116e}">
+            <name locale="en_US">VEE@1</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="270" y="7.62" uuid="{9111a7fd-c6b5-4d20-a7e3-665e53e15ce9}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="90" y="-10.16" uuid="{5e8e349c-4765-4a22-ad67-b558b0337824}">
+            <name locale="en_US">VEE@2</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="90" y="-10.16" uuid="{08c2cf19-6559-4f18-8b38-cd5fbca6ce99}">
+            <name locale="en_US">VEE@3</name>
+        </pin>
+    </pins>
+</symbol>

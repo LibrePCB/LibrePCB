@@ -1,0 +1,55 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{03c4c4fd-3377-40f9-aba7-09a5b2a33ec0}</uuid>
+        <name locale="en_US">100L16</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-34.29" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{eae6f7aa-72a0-433a-abff-ba0f4e578b79}">
+            <name locale="en_US">IOL1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{870710a9-e68f-4361-8184-f6accd5b1f8e}">
+            <name locale="en_US">IOL2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{820e4a6e-fa52-4d8f-84de-2a9b1c4676d3}">
+            <name locale="en_US">IOL3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{6fadb8dc-5782-4875-bee5-e52860e8e528}">
+            <name locale="en_US">IOL4</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{ed004b9d-0662-4880-aabf-7291016c7cf1}">
+            <name locale="en_US">IOL5</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{818329c9-fd11-487e-91d6-64b6689eef12}">
+            <name locale="en_US">IOL6</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-15.24" uuid="{97e618a2-b5bd-44c3-9082-9affad16fd4a}">
+            <name locale="en_US">IOL7</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-17.78" uuid="{1c360591-cb50-440f-a66b-13f66403e976}">
+            <name locale="en_US">IOL8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-20.32" uuid="{40dad69b-d714-4257-816d-25607d2827b5}">
+            <name locale="en_US">IOL10</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-22.86" uuid="{85961a6e-92cb-47e9-97d3-f0b4fc57fd1d}">
+            <name locale="en_US">IOL11</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-25.4" uuid="{3b631fba-bc0f-4048-bc47-c36f563f2091}">
+            <name locale="en_US">IOL12</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-27.94" uuid="{d303072e-06d0-4287-b045-9f6472fdfa70}">
+            <name locale="en_US">IOL13</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-30.48" uuid="{ba02bcf0-3a3a-4f8d-b918-2dfa17f2bb67}">
+            <name locale="en_US">IOL15</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-33.02" uuid="{40c9d635-b923-4f57-a10d-b73a061f84ef}">
+            <name locale="en_US">IOL16</name>
+        </pin>
+    </pins>
+</symbol>

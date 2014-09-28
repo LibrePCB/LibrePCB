@@ -1,0 +1,31 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{c97d3b41-19e4-44bb-96bf-9810189538e4}</uuid>
+        <name locale="en_US">L2</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-13.97" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{6844e57a-4911-4589-a6fc-04c623a16fc4}">
+            <name locale="en_US">L2DAT0</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{902b6880-b69b-48ca-8fb6-54f8f55a7373}">
+            <name locale="en_US">L2DAT1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{a355b0f6-8884-4779-a0e7-c7cee89da147}">
+            <name locale="en_US">L2DAT2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{29a4c45b-0a95-4e7e-97bb-1bff20f09413}">
+            <name locale="en_US">L2DAT3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{009202b6-1e6d-4d57-bbf0-9fe06cc2ae90}">
+            <name locale="en_US">L2CLK</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{87361edb-3846-4637-bba9-5f9e6470c5b1}">
+            <name locale="en_US">L2ACK</name>
+        </pin>
+    </pins>
+</symbol>

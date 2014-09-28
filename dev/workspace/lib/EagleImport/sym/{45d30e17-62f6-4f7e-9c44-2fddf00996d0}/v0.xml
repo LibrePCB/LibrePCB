@@ -1,0 +1,12 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{45d30e17-62f6-4f7e-9c44-2fddf00996d0}</uuid>
+        <name locale="en_US">NC</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{01cefb9b-cc02-4d37-9602-0d6d8917efdb}">
+            <name locale="en_US">NC</name>
+        </pin>
+    </pins>
+</symbol>

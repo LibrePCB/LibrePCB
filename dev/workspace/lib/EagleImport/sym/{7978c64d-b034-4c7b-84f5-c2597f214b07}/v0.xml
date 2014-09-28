@@ -1,0 +1,37 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{7978c64d-b034-4c7b-84f5-c2597f214b07}</uuid>
+        <name locale="en_US">JTAG-OCSD</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-19.05"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{6f367316-6dc1-4016-8863-e42f2f519f17}">
+            <name locale="en_US">!TRST</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{850c4156-3cbc-44db-837b-4755677f8298}">
+            <name locale="en_US">TCK</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{e5bc1337-d8ee-4d81-9b07-e961028a96e1}">
+            <name locale="en_US">TDI</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{ce10ccee-bb60-4668-8599-c23322b7e7e8}">
+            <name locale="en_US">TDO</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{50552a1d-181e-4554-beec-af740d3cfe33}">
+            <name locale="en_US">TMS</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{a296274b-9d1b-48fd-a001-e5ac43bd6d14}">
+            <name locale="en_US">!OCDSE</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{42a0312f-d580-45a2-9700-7adafc5e7610}">
+            <name locale="en_US">!BRKIN</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{193eadc1-ca73-4baa-9b6f-bb4d59461fc5}">
+            <name locale="en_US">!BRKOUT</name>
+        </pin>
+    </pins>
+</symbol>

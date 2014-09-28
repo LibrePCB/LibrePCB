@@ -1,0 +1,43 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{a3ff9b5b-0b2e-4c37-93d1-8fcb0629ca7d}</uuid>
+        <name locale="en_US">MC9S12-PP-80</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="-5.08" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="2.54" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="5.08" length="2.54" angle="180" y="7.62" uuid="{ee0bd688-86b0-43dd-8fc0-1ebc64789f17}">
+            <name locale="en_US">PP0</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="5.08" uuid="{b1fedc87-d6d4-48f5-9e1e-cbe47019a6f1}">
+            <name locale="en_US">PP1</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="2.54" uuid="{9f380ab2-072f-4433-842c-6e0ac92acda6}">
+            <name locale="en_US">PP2</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="0" uuid="{7f592a03-2798-4074-bab8-83f257f230e8}">
+            <name locale="en_US">PP3</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="-2.54" uuid="{4aaad4d4-ae70-4e9b-be69-ac1cd46792c0}">
+            <name locale="en_US">PP4</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="-5.08" uuid="{2b55b28d-9e93-449f-b8dc-54ec963f8f1d}">
+            <name locale="en_US">PP5</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="-10.16" uuid="{5eff2a1d-c8b4-4abb-b7ea-ae3b110195b0}">
+            <name locale="en_US">PP7</name>
+        </pin>
+    </pins>
+</symbol>

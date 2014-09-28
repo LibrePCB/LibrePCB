@@ -1,0 +1,85 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{0cd59146-e2e0-416e-a01b-675ab1d2d817}</uuid>
+        <name locale="en_US">T7024</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="20.32" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="15.24" end_y="20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="20.32" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="15.24" end_y="-22.86"/>
+        </polygon>
+        <polygon fill="false" start_y="-22.86" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="-12.7" end_y="-22.86"/>
+        </polygon>
+        <polygon fill="false" start_y="-22.86" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-12.7" end_y="20.32"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="2.54" angle="0" y="17.78" uuid="{9d0deb13-a7e8-4b4e-af1c-0f0e65e0af22}">
+            <name locale="en_US">RX_ON</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="15.24" uuid="{01fcaa5d-d509-460d-8c8b-fd81d4f70c46}">
+            <name locale="en_US">PU</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="10.16" uuid="{0b39bf8a-be68-4bb1-86fc-328e29abcfde}">
+            <name locale="en_US">VS_LNA</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="7.62" uuid="{10d9b006-dbea-49a4-bb1d-8f0f9c318b97}">
+            <name locale="en_US">LNA_OUT</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="5.08" uuid="{8b966821-7185-45f0-b531-9fc0e90d1565}">
+            <name locale="en_US">LNA_IN</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="0" uuid="{12656997-20b2-44d2-97f6-49a8cab634af}">
+            <name locale="en_US">RAMP</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-5.08" uuid="{e2aa0bf3-d7f6-4d85-93ee-541668f51aa9}">
+            <name locale="en_US">PA_IN</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-15.24" uuid="{fd7f886a-3e74-4554-8936-db5c6f7e7ff4}">
+            <name locale="en_US">V3_PA_OUT@1</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="2.54" uuid="{058d2956-8c95-4d1f-8de4-cb84bbbfd2be}">
+            <name locale="en_US">V1_PA</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-5.08" uuid="{d2cade30-da02-45c3-8806-4c6386573320}">
+            <name locale="en_US">V2_PA@1</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="12.7" uuid="{678477e1-69d6-4be7-8ced-8baa5e84a41d}">
+            <name locale="en_US">R_SWITCH</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="17.78" uuid="{44e6fe98-a9b4-42b8-a756-94f635e318c0}">
+            <name locale="en_US">SWITCH_OUT</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-10.16" uuid="{04229e5f-6672-47a7-b808-9058665b0536}">
+            <name locale="en_US">GND@1</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-12.7" uuid="{36855b03-8c47-471e-98ad-907b80098330}">
+            <name locale="en_US">GND@2</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-15.24" uuid="{1a36b8f6-865a-4d05-ba1f-f9ea88898e92}">
+            <name locale="en_US">GND@3</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-17.78" uuid="{3c4dacfc-2829-4802-92ee-427b0a60dd53}">
+            <name locale="en_US">GND@4</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-20.32" uuid="{496c3f2c-372b-4f8a-9579-a6a701378428}">
+            <name locale="en_US">GND@5</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-12.7" uuid="{091b91a1-ee9d-4007-9d37-ba3cc6aa8d53}">
+            <name locale="en_US">V3_PA_OUT@2</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-10.16" uuid="{f2094c14-f4a3-4621-bad5-873744a8fd3c}">
+            <name locale="en_US">V3_PA_OUT@3</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-2.54" uuid="{873beb60-1b49-4057-897a-a6d6d4608fa9}">
+            <name locale="en_US">V2_PA@2</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-20.32" uuid="{a37fbdb7-2dc8-4b22-8b09-3a76e32e723a}">
+            <name locale="en_US">EXP</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,15 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{9b41508e-e92d-4eb3-8432-60f1d95885aa}</uuid>
+        <name locale="en_US">APWR</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="0" length="5.08" angle="270" y="7.62" uuid="{f3a727f7-07a6-4142-93de-1d2c13613a3f}">
+            <name locale="en_US">AVCC@1</name>
+        </pin>
+        <pin x="0" length="5.08" angle="90" y="-7.62" uuid="{0ad98d2e-360f-4965-9f0b-de0a96ead876}">
+            <name locale="en_US">AGND@1</name>
+        </pin>
+    </pins>
+</symbol>

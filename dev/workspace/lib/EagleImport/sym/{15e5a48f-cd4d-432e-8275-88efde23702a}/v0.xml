@@ -1,0 +1,52 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{15e5a48f-cd4d-432e-8275-88efde23702a}</uuid>
+        <name locale="en_US">GB</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-2.54" width="0.3048" layer="10" start_x="0">
+            <segment type="line" end_x="2.54" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.3048" layer="10" start_x="0">
+            <segment type="line" end_x="-2.54" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.3048" layer="10" start_x="-2.54">
+            <segment type="line" end_x="0" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.3048" layer="10" start_x="2.54">
+            <segment type="line" end_x="0" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-1.27">
+            <segment type="line" end_x="0.635" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0.635" width="0.1524" layer="10" start_x="-0.635">
+            <segment type="line" end_x="-0.635" end_y="-0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="0.635" width="0.1524" layer="10" start_x="-0.635">
+            <segment type="line" end_x="0.635" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="0.635">
+            <segment type="line" end_x="1.27" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="0.635">
+            <segment type="line" end_x="-0.635" end_y="-0.635"/>
+        </polygon>
+        <polygon fill="false" start_y="0.635" width="0.1524" layer="10" start_x="0.635">
+            <segment type="line" end_x="0.635" end_y="-0.635"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="270" y="5.08" uuid="{f154f7e0-1837-4971-821d-806e44777d61}">
+            <name locale="en_US">AC1</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-5.08" uuid="{ebd6b25a-1ce6-4f0d-a293-3e6758ea3c11}">
+            <name locale="en_US">AC2</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{2ced41a6-1e41-4acd-8b2b-ac230ce1c49b}">
+            <name locale="en_US">-</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="0" uuid="{3dbc262e-9c49-4fee-9c76-8340b4d3590e}">
+            <name locale="en_US">+</name>
+        </pin>
+    </pins>
+</symbol>

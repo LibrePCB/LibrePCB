@@ -1,0 +1,34 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{0d11a8dc-475b-4d07-960b-2ac655576aee}</uuid>
+        <name locale="en_US">VREG-O2</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="6.35" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="7.62" end_y="6.35"/>
+        </polygon>
+        <polygon fill="false" start_y="6.35" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-5.08" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="6.35"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-5.08" uuid="{71db6834-d90a-4370-9ca1-dcbcb39732d8}">
+            <name locale="en_US">GND/ADJ</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="5.08" uuid="{6b6c11b9-b92e-4919-8e01-3a741f30f39e}">
+            <name locale="en_US">IN</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="5.08" uuid="{c2a7098a-d6d1-450a-8501-e96cee138eae}">
+            <name locale="en_US">OUT</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="2.54" uuid="{1973f3d9-540b-4973-a791-0b5f6ad0d6c1}">
+            <name locale="en_US">OUT@1</name>
+        </pin>
+    </pins>
+</symbol>

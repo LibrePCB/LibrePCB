@@ -1,0 +1,52 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{bf296c3d-d1ae-4fe3-aeb9-d32a3e1c12c7}</uuid>
+        <name locale="en_US">NEB1R</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="0" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="1.524" end_y="1.016"/>
+        </polygon>
+        <polygon fill="false" start_y="1.016" width="0.1524" layer="10" start_x="1.524">
+            <segment type="line" end_x="2.286" end_y="1.778"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-0.762" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-0.762">
+            <segment type="line" end_x="-0.762" end_y="2.286"/>
+        </polygon>
+        <polygon fill="false" start_y="2.286" width="0.254" layer="10" start_x="-0.762">
+            <segment type="line" end_x="-1.016" end_y="1.524"/>
+        </polygon>
+        <polygon fill="false" start_y="1.524" width="0.254" layer="10" start_x="-1.016">
+            <segment type="line" end_x="-0.508" end_y="1.524"/>
+        </polygon>
+        <polygon fill="false" start_y="1.524" width="0.254" layer="10" start_x="-0.508">
+            <segment type="line" end_x="-0.762" end_y="2.286"/>
+        </polygon>
+        <polygon fill="true" start_y="-3.048" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="2.794" end_y="-3.048"/>
+            <segment type="line" end_x="2.794" end_y="-2.032"/>
+            <segment type="line" end_x="-2.54" end_y="-2.032"/>
+            <segment type="line" end_x="-2.54" end_y="-3.048"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2.54" angle="0" y="-2.54" uuid="{0eabb11b-c30a-43fe-a0b9-643de07a6e81}">
+            <name locale="en_US">1@1</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="2.54" uuid="{317e3f1a-95fe-4669-a378-85b2cffdc18b}">
+            <name locale="en_US">3</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{e65013b9-a361-467d-a8a7-17c161da6ea6}">
+            <name locale="en_US">2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="180" y="-2.54" uuid="{f017535d-724a-4c99-85e6-cba3c2a8ee83}">
+            <name locale="en_US">1@2</name>
+        </pin>
+    </pins>
+</symbol>

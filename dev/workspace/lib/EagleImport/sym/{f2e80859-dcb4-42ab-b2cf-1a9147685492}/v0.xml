@@ -1,0 +1,70 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{f2e80859-dcb4-42ab-b2cf-1a9147685492}</uuid>
+        <name locale="en_US">MC14536</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-15.24" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-15.24" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="15.24"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="12.7" uuid="{a9c1d612-3cd1-458b-be4d-81913bf84e8c}">
+            <name locale="en_US">RESET</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="10.16" uuid="{b4afd234-3811-4bbd-bc97-78824312fc19}">
+            <name locale="en_US">SET</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="7.62" uuid="{d9282dd7-02b5-433e-b885-81e2de1efddd}">
+            <name locale="en_US">8-BYPASS</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{09eaa5cb-460f-4145-8bc7-ded9d5086c88}">
+            <name locale="en_US">IN</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{1b288c48-7fa0-416a-9210-e05f106fa056}">
+            <name locale="en_US">OSC-INH</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{90d099f2-aa19-4b00-bf89-e8e3e24f5dc4}">
+            <name locale="en_US">CLOCK-INH</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-12.7" uuid="{8846ed50-e756-4704-a778-771a21ff2242}">
+            <name locale="en_US">MONO-IN</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-7.62" uuid="{a451f572-ce5d-4006-8fa9-7120eb18f821}">
+            <name locale="en_US">DECODE</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{144d5b22-1f79-4f63-9e38-dbbf60bb860e}">
+            <name locale="en_US">A</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{04c436a9-8e59-424b-a24f-e03010eea607}">
+            <name locale="en_US">B</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-7.62" uuid="{7a448e2f-73da-42fd-bbe5-9ce9d7fba0d5}">
+            <name locale="en_US">C</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-10.16" uuid="{f5e266df-dc68-4128-b1fa-3c9938680f05}">
+            <name locale="en_US">D</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="0" uuid="{10f7cc2f-d8fb-42c6-ac4f-ac7f341df076}">
+            <name locale="en_US">OUT1</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-2.54" uuid="{a9f9dc10-2a31-414c-a440-9bb045e31557}">
+            <name locale="en_US">OUT2</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="12.7" uuid="{01950b5a-1883-4afa-809b-b2e8d1f95463}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-12.7" uuid="{245af392-abd7-4f21-87ca-7f90f160c3e1}">
+            <name locale="en_US">VSS</name>
+        </pin>
+    </pins>
+</symbol>

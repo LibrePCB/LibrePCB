@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{30943e7e-b338-4fbb-b268-0f17bcafafd7}</uuid>
+        <name locale="en_US">MAX635</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-12.7" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="7.62" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="12.7" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="12.7" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="-10.16" end_y="12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="12.7"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="5.08" angle="0" y="0" uuid="{b6ccf3e7-b87e-4358-8dfc-d8a936596f15}">
+            <name locale="en_US">VFB</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="10.16" uuid="{689953d4-826a-4ebe-b934-147027c47dd2}">
+            <name locale="en_US">LBI</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="5.08" uuid="{fcc0cd76-a4a7-4e1e-822d-c2773a89f98f}">
+            <name locale="en_US">VREF</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="10.16" uuid="{065da940-a99f-439f-a6ca-85a5aad00dfe}">
+            <name locale="en_US">-VOUT</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-10.16" uuid="{8c16af02-db79-4c74-b7a8-285e89f45619}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-5.08" uuid="{1ce90316-fe5c-42b0-882c-066e6b0b1bc8}">
+            <name locale="en_US">+VS</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="7.62" uuid="{109d067c-96fb-4fb8-ac29-3d2993d52599}">
+            <name locale="en_US">LBO</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="2.54" uuid="{6f4349b0-cdc4-4c47-8b44-e8829d22660c}">
+            <name locale="en_US">LX</name>
+        </pin>
+    </pins>
+</symbol>

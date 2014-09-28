@@ -1,0 +1,34 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{ce582549-6a9f-4a18-8c12-53766d03a55a}</uuid>
+        <name locale="en_US">USB-4</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="2.54" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="-2.54" end_y="7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2.54" angle="0" y="5.08" uuid="{81e72b13-3e36-4a94-82d3-2b2d3d45b57e}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="2.54" uuid="{82a1edcc-3786-4ec5-85d2-49de8f61d663}">
+            <name locale="en_US">2</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{f6399e62-4c8b-4d85-bf77-81104ca0d118}">
+            <name locale="en_US">3</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="-2.54" uuid="{14f430fb-c864-4000-8d9c-5c52e352d2a8}">
+            <name locale="en_US">4</name>
+        </pin>
+    </pins>
+</symbol>

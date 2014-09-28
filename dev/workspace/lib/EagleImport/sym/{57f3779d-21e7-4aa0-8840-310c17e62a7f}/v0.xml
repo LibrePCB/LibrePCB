@@ -1,0 +1,52 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{57f3779d-21e7-4aa0-8840-310c17e62a7f}</uuid>
+        <name locale="en_US">ISO1050</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="4.572" width="0.0762" layer="10" start_x="-1.397">
+            <segment type="line" end_x="-1.397" end_y="-6.985"/>
+        </polygon>
+        <polygon fill="false" start_y="4.572" width="0.0762" layer="10" start_x="1.524">
+            <segment type="line" end_x="1.524" end_y="-6.985"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{38703516-2708-4f2a-88b8-21c70db36dc0}">
+            <name locale="en_US">RXD</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{137e10d3-8d06-49c6-9b02-06db7e78e886}">
+            <name locale="en_US">TXD</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="0" uuid="{600375b3-c477-4fad-a7b2-0d7c457cc86f}">
+            <name locale="en_US">CANH</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-2.54" uuid="{b632c701-0ec3-4c4c-8a39-4c563e49282b}">
+            <name locale="en_US">CANL</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{d5434be5-bd9a-4362-8a3c-739bf959514e}">
+            <name locale="en_US">GND1</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-5.08" uuid="{b55bc6b0-08b4-4df4-8a15-b6234c465047}">
+            <name locale="en_US">GND2</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{f0dd5917-fb31-4862-b1b9-608b801276e7}">
+            <name locale="en_US">VCC1</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="2.54" uuid="{7eeafe51-9a62-40ae-93ab-7536dede2bfd}">
+            <name locale="en_US">VCC2</name>
+        </pin>
+    </pins>
+</symbol>

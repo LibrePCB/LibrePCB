@@ -1,0 +1,94 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{79dee551-551b-4aa2-934a-82217f155fee}</uuid>
+        <name locale="en_US">DIP03</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="3.048">
+            <segment type="line" end_x="2.032" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="2.032">
+            <segment type="line" end_x="3.048" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="3.048">
+            <segment type="line" end_x="3.048" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="2.032">
+            <segment type="line" end_x="2.032" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="0.508">
+            <segment type="line" end_x="-0.508" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="-0.508">
+            <segment type="line" end_x="0.508" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="0.508">
+            <segment type="line" end_x="0.508" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-0.508">
+            <segment type="line" end_x="-0.508" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-2.032">
+            <segment type="line" end_x="-3.048" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="-3.048">
+            <segment type="line" end_x="-2.032" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="-2.032">
+            <segment type="line" end_x="-2.032" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-3.048">
+            <segment type="line" end_x="-3.048" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.4064" layer="10" start_x="4.445">
+            <segment type="line" end_x="-4.445" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.4064" layer="10" start_x="-4.445">
+            <segment type="line" end_x="-4.445" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.4064" layer="10" start_x="-4.445">
+            <segment type="line" end_x="4.445" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.4064" layer="10" start_x="4.445">
+            <segment type="line" end_x="4.445" end_y="5.08"/>
+        </polygon>
+        <polygon fill="true" start_y="0.254" width="0.254" layer="10" start_x="-2.794">
+            <segment type="line" end_x="-2.286" end_y="0.254"/>
+            <segment type="line" end_x="-2.286" end_y="1.27"/>
+            <segment type="line" end_x="-2.794" end_y="1.27"/>
+            <segment type="line" end_x="-2.794" end_y="0.254"/>
+        </polygon>
+        <polygon fill="true" start_y="0.254" width="0.254" layer="10" start_x="-0.254">
+            <segment type="line" end_x="0.254" end_y="0.254"/>
+            <segment type="line" end_x="0.254" end_y="1.27"/>
+            <segment type="line" end_x="-0.254" end_y="1.27"/>
+            <segment type="line" end_x="-0.254" end_y="0.254"/>
+        </polygon>
+        <polygon fill="true" start_y="0.254" width="0.254" layer="10" start_x="2.286">
+            <segment type="line" end_x="2.794" end_y="0.254"/>
+            <segment type="line" end_x="2.794" end_y="1.27"/>
+            <segment type="line" end_x="2.286" end_y="1.27"/>
+            <segment type="line" end_x="2.286" end_y="0.254"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="2.54" length="2.54" angle="270" y="7.62" uuid="{d696d1b3-4945-4738-af19-a72d62953c41}">
+            <name locale="en_US">4</name>
+        </pin>
+        <pin x="0" length="2.54" angle="270" y="7.62" uuid="{8f552971-ab3e-4ee7-a94e-6ac0595685a7}">
+            <name locale="en_US">5</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="270" y="7.62" uuid="{4b15c382-6853-4467-85f3-94bc9286ba73}">
+            <name locale="en_US">6</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="90" y="-5.08" uuid="{25461c38-ba92-4dde-abaf-d9e43152a56b}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-5.08" uuid="{e766e754-3c2c-4e51-af9e-48f8874d4596}">
+            <name locale="en_US">2</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-5.08" uuid="{d463e78a-bc04-40f7-8275-bdb801c660da}">
+            <name locale="en_US">3</name>
+        </pin>
+    </pins>
+</symbol>

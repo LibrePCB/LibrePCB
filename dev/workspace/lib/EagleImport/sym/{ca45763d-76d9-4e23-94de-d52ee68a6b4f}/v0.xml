@@ -1,0 +1,12 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{ca45763d-76d9-4e23-94de-d52ee68a6b4f}</uuid>
+        <name locale="en_US">-V</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="0" length="5.08" angle="90" y="-5.08" uuid="{37d1e557-6530-442a-9a7e-651a588c0a46}">
+            <name locale="en_US">V-</name>
+        </pin>
+    </pins>
+</symbol>

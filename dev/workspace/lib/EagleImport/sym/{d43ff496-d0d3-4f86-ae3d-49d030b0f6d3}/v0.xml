@@ -1,0 +1,106 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{d43ff496-d0d3-4f86-ae3d-49d030b0f6d3}</uuid>
+        <name locale="en_US">T6166</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-27.94" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="-27.94"/>
+        </polygon>
+        <polygon fill="false" start_y="-27.94" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="25.4"/>
+        </polygon>
+        <polygon fill="false" start_y="25.4" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="25.4"/>
+        </polygon>
+        <polygon fill="false" start_y="25.4" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="-27.94"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="5.08" angle="0" y="22.86" uuid="{fc939ba6-e085-408e-8183-377705d361bd}">
+            <name locale="en_US">S+R</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="20.32" uuid="{bea5d863-2182-4a6a-8f3f-52023d6ae9cc}">
+            <name locale="en_US">S-R</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-15.24" uuid="{2af8955f-7c18-4c1b-bab2-fc9603888f7a}">
+            <name locale="en_US">BLS</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="0" uuid="{039bbf72-70d0-4832-a85c-d97599efabef}">
+            <name locale="en_US">RX2MHZ</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-2.54" uuid="{68c78980-9d92-42fb-9c4c-71bb95388834}">
+            <name locale="en_US">RXCK2MHZ</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-5.08" uuid="{6c78f351-e988-48f7-b430-8aed3c62b369}">
+            <name locale="en_US">TX256KHZ</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-7.62" uuid="{8984a3f9-0487-47fb-aead-0811af343af4}">
+            <name locale="en_US">TX2MHZ</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="12.7" uuid="{40df861b-3c36-41ac-8f95-a08ec99cf947}">
+            <name locale="en_US">RXCKOUT</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-17.78" uuid="{5e5ca181-5904-47de-aaf9-bb57814edac3}">
+            <name locale="en_US">BLANK</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="7.62" uuid="{265debbf-1caa-492f-89ad-ef3b8dc0a07b}">
+            <name locale="en_US">TS1T</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="5.08" uuid="{6ee880fc-1ef1-47c7-9bd9-eac475a1e220}">
+            <name locale="en_US">TS2T</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-20.32" uuid="{104159cb-6508-4225-b8fc-a2151624a56b}">
+            <name locale="en_US">TTSEL</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-22.86" uuid="{32d86154-8e1f-4ad2-b1c3-44166579d3de}">
+            <name locale="en_US">ALARMIN</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-25.4" uuid="{542e83f7-e133-46f8-bc62-290fffa21138}">
+            <name locale="en_US">PCMIN</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="15.24" uuid="{7e8ab0fc-c4ff-4ad4-9b31-6c3f0a0f8fdc}">
+            <name locale="en_US">TS1R</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="12.7" uuid="{fbe232e1-3dac-4508-a1c3-a0104079680e}">
+            <name locale="en_US">TS2R</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-10.16" uuid="{d496c487-3176-4d3a-9737-e8c363414280}">
+            <name locale="en_US">RTSEL</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="22.86" uuid="{a2485a99-b137-4d9e-bcfd-a8623f991504}">
+            <name locale="en_US">T+R</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="20.32" uuid="{0b487109-3874-46a8-8918-f200598cefcd}">
+            <name locale="en_US">T-R</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-15.24" uuid="{390da00a-143d-4c6f-ae6f-2fe8528580ad}">
+            <name locale="en_US">PCMOUT</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="15.24" uuid="{4f3cb201-224a-46fb-9ef9-1693175c49bf}">
+            <name locale="en_US">ALARM</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="10.16" uuid="{4853ff68-e37e-4ef7-82ac-a8ebf335df45}">
+            <name locale="en_US">BDT</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="7.62" uuid="{42a5b9c8-c74a-4686-a51a-5fb011f3e33c}">
+            <name locale="en_US">BIT</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="5.08" uuid="{711d3f85-faec-4273-92da-d537173431bb}">
+            <name locale="en_US">CS</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="2.54" uuid="{61266348-f116-40c6-b013-87bb8623c4bd}">
+            <name locale="en_US">BDR</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="0" uuid="{2508b8f0-47c1-42db-b9e8-6553306a30df}">
+            <name locale="en_US">BIR</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-25.4" uuid="{0496cc10-fc57-46bf-ad23-f4006457c59a}">
+            <name locale="en_US">VSS</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-20.32" uuid="{f736ebf4-5a5e-429a-ac26-f004b607d7bc}">
+            <name locale="en_US">VCC</name>
+        </pin>
+    </pins>
+</symbol>

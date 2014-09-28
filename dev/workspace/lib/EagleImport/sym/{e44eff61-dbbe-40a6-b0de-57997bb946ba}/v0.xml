@@ -1,0 +1,40 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{e44eff61-dbbe-40a6-b0de-57997bb946ba}</uuid>
+        <name locale="en_US">T1P1SM</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="3.175" width="0.254" layer="10" start_x="1.27">
+            <segment type="line" end_x="1.27" end_y="-3.175"/>
+        </polygon>
+        <polygon fill="true" start_y="-2.54" width="0.254" layer="10" start_x="-1.905">
+            <segment type="line" end_x="0.127" end_y="-2.54"/>
+            <segment type="line" end_x="0.127" end_y="2.54"/>
+            <segment type="line" end_x="-1.905" end_y="2.54"/>
+            <segment type="line" end_x="-1.905" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="true" start_y="-2.54" width="0.254" layer="10" start_x="2.413">
+            <segment type="line" end_x="4.445" end_y="-2.54"/>
+            <segment type="line" end_x="4.445" end_y="2.54"/>
+            <segment type="line" end_x="2.413" end_y="2.54"/>
+            <segment type="line" end_x="2.413" end_y="-2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="2.54" uuid="{61297031-fc92-4842-8232-62b47a84aa88}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{d99ed25d-df52-43d0-a615-099e3e3bceeb}">
+            <name locale="en_US">2</name>
+        </pin>
+        <pin x="7.62" length="5.08" angle="180" y="-2.54" uuid="{f032c78a-3205-4826-8bfe-7c5e90d1ce2a}">
+            <name locale="en_US">3</name>
+        </pin>
+        <pin x="7.62" length="5.08" angle="180" y="0" uuid="{fdffceb0-3b2e-4620-8d86-1e402b3c520a}">
+            <name locale="en_US">4</name>
+        </pin>
+        <pin x="7.62" length="5.08" angle="180" y="2.54" uuid="{008f13d7-de16-4dfb-a3b1-05fe35ce1e44}">
+            <name locale="en_US">5</name>
+        </pin>
+    </pins>
+</symbol>

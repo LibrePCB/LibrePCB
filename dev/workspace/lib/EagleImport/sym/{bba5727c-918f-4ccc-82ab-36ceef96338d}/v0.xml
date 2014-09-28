@@ -1,0 +1,49 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{bba5727c-918f-4ccc-82ab-36ceef96338d}</uuid>
+        <name locale="en_US">MTA-1_9</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="-11.43">
+            <segment type="line" end_x="-11.43" end_y="-1.905"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.905" width="0.254" layer="10" start_x="11.43">
+            <segment type="line" end_x="-11.43" end_y="-1.905"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.905" width="0.254" layer="10" start_x="11.43">
+            <segment type="line" end_x="11.43" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="-11.43">
+            <segment type="line" end_x="11.43" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="90" y="-2.54" uuid="{b2c0d00e-861c-49a8-994b-828b75dcfc4b}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="90" y="-2.54" uuid="{dfcaf876-4da9-4ff5-aae5-a95be43105e4}">
+            <name locale="en_US">2</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="90" y="-2.54" uuid="{54df8803-b39b-4d81-9f2c-ce9121914448}">
+            <name locale="en_US">3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="90" y="-2.54" uuid="{b1b700c3-c5b9-4ba2-887d-46624212df83}">
+            <name locale="en_US">4</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-2.54" uuid="{99db7f1d-beed-40ff-b5c4-45fc160a1923}">
+            <name locale="en_US">5</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-2.54" uuid="{dae318d5-9b26-4ca2-ab5b-b4eaa6dbf673}">
+            <name locale="en_US">6</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="90" y="-2.54" uuid="{1a32fd96-e42d-4066-a578-4495da8adef5}">
+            <name locale="en_US">7</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="90" y="-2.54" uuid="{63514c13-9c6e-48ac-ba45-8adfa89b5836}">
+            <name locale="en_US">8</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="90" y="-2.54" uuid="{8738e234-8196-4767-bc0f-7102dcec73a2}">
+            <name locale="en_US">9</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,55 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{4982c6c4-e0e4-4dda-b4c1-d2e9b92fc443}</uuid>
+        <name locale="en_US">ANT-XXX-SP</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="2.54" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="3.81"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="0" end_y="3.81"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="5.08" end_y="3.81"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="0" uuid="{dfa03454-ad85-4d60-acd6-3053e0869e7e}">
+            <name locale="en_US">ANT</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="90" y="-7.62" uuid="{ae66d785-d943-464a-925c-b97cf17bbf7c}">
+            <name locale="en_US">GND@1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="90" y="-7.62" uuid="{60bb53bd-4de2-428e-bb15-8280c1e63c9f}">
+            <name locale="en_US">GND@2</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-7.62" uuid="{ff09e38e-23c7-47c0-81f0-858a87104b9c}">
+            <name locale="en_US">GND@3</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-7.62" uuid="{f407d7fd-81cf-45fc-9711-dbd18bdbae2d}">
+            <name locale="en_US">GND@4</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="90" y="-7.62" uuid="{9c073ecb-34ca-4bce-adcc-0d9e8773a226}">
+            <name locale="en_US">GND@5</name>
+        </pin>
+    </pins>
+</symbol>

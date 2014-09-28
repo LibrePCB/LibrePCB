@@ -1,0 +1,40 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{a869fc0b-e726-4a10-8ad1-1ecafe03093b}</uuid>
+        <name locale="en_US">ST95P08</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="5.08" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="5.08" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="-5.08" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-7.62" length="2.54" angle="0" y="7.62" uuid="{03770d37-25ee-4680-ba75-4ae9644b15e1}">
+            <name locale="en_US">!HOLD</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="2.54" uuid="{a2d59cc5-e473-4123-b1fd-e52ebcfaafd1}">
+            <name locale="en_US">!W</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="0" uuid="{aa51f272-ebaa-4633-affb-fd35ab29412f}">
+            <name locale="en_US">!S</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="-2.54" uuid="{724ab1b5-c8a8-43ca-9f4f-82fd3744ebf2}">
+            <name locale="en_US">C</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="-7.62" uuid="{09ac8277-c9d4-429d-a922-3a1624bc7489}">
+            <name locale="en_US">D</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="-7.62" uuid="{76ca32d5-0283-46fa-b912-9ab71a744208}">
+            <name locale="en_US">Q</name>
+        </pin>
+    </pins>
+</symbol>

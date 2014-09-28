@@ -1,0 +1,76 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{94238f5b-2624-4902-9131-d6c0f8343eb0}</uuid>
+        <name locale="en_US">MCF537X-FEC</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="17.78" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="17.78">
+            <segment type="line" end_x="17.78" end_y="-45.72"/>
+        </polygon>
+        <polygon fill="false" start_y="-45.72" width="0.254" layer="10" start_x="17.78">
+            <segment type="line" end_x="0" end_y="-45.72"/>
+        </polygon>
+        <polygon fill="false" start_y="-45.72" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{b6f41295-caee-42a8-b3c6-f6460c0f9eb2}">
+            <name locale="en_US">FEC_MDIO</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{4bc2b0b2-bab2-43c1-9cab-5a7169dd27a3}">
+            <name locale="en_US">FEC_TXER</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{d02889f1-3500-41c9-a0a5-020718d128c7}">
+            <name locale="en_US">FEC_TXCLK</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{1d4f73ac-a4f8-4670-bfc6-0b7be3d8dd65}">
+            <name locale="en_US">FEC_RXD1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{1ea53e9c-36eb-49f2-ad53-d524e66503b0}">
+            <name locale="en_US">FEC_RXCLK</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{f4d463c0-317a-4da9-a373-0acb42281041}">
+            <name locale="en_US">FEC_CRS</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{801502a0-4f45-4cae-b84f-2012c12f6485}">
+            <name locale="en_US">FEC_MDC</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{f3bd627b-b49a-4604-8bb8-3a772b65ebeb}">
+            <name locale="en_US">FEC_TXD1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{e8e70694-c2b1-4daf-b1b9-ae8b1f2e304c}">
+            <name locale="en_US">FEC_TXEN</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{70c2f73b-f63d-409a-a4a8-c6fdd958389c}">
+            <name locale="en_US">FEC_RXD0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{033cad19-c1d6-4249-bc4d-716d2844413a}">
+            <name locale="en_US">FEC_RXDV</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{513f51e3-1d0b-44d3-9548-caebe9830591}">
+            <name locale="en_US">FEC_COL</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{79443359-068c-4aa2-98db-436d189ce5a0}">
+            <name locale="en_US">FEC_TXD0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-38.1" uuid="{77e86e30-4050-40a8-9f74-0c39fe4d941b}">
+            <name locale="en_US">FEC_TXD2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-40.64" uuid="{dad60d94-a0ab-4b93-8de8-f6ee015034cd}">
+            <name locale="en_US">FEC_RXER</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-43.18" uuid="{8a4dd8ba-6742-487f-bcac-6f5c723b8c6d}">
+            <name locale="en_US">FEC_RXD3</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-33.02" uuid="{6aca6504-aa33-4a4d-bea7-905a267b5a41}">
+            <name locale="en_US">FEC_TXD3</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-35.56" uuid="{846bce11-6ea9-4c79-ab5f-3835ea375de3}">
+            <name locale="en_US">FEC_RXD2</name>
+        </pin>
+    </pins>
+</symbol>

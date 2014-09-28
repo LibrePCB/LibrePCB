@@ -1,0 +1,55 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{b0217ce9-5386-4f19-ab8f-31550feb79b1}</uuid>
+        <name locale="en_US">G7H7</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-34.29" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{f0d4e51e-49e5-4f99-bd48-0806b7bc321a}">
+            <name locale="en_US">IOG1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{6e0a23e0-3741-4e0b-90b1-ac794fbbc952}">
+            <name locale="en_US">IOG2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{a044b099-83c0-4110-94c6-0092953cc320}">
+            <name locale="en_US">IOG3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{ec748888-d296-4d1c-be07-bdc4d467a558}">
+            <name locale="en_US">IOG4</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{17ccd3db-dbf0-4e86-bd25-a15c051dd09b}">
+            <name locale="en_US">IOG5</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{37c849e3-f58e-42e4-9dc6-0c51a2ee1903}">
+            <name locale="en_US">IOG6</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-15.24" uuid="{fe2b2000-0ee0-41bc-8a9c-f930d91bbc74}">
+            <name locale="en_US">IOG7</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-17.78" uuid="{7345faf2-1b32-4375-a2b3-ba33a83202c3}">
+            <name locale="en_US">IOH1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-20.32" uuid="{cc66a1af-6016-4c0c-b7bd-98a716650fd5}">
+            <name locale="en_US">IOH2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-22.86" uuid="{5424395b-2daf-492a-ba65-acb0aa34b59e}">
+            <name locale="en_US">IOH3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-25.4" uuid="{7a046aba-366a-4c6b-b120-83468a27ac37}">
+            <name locale="en_US">IOH4</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-27.94" uuid="{e34db38f-f59e-4af2-83f1-9fdfe13f2927}">
+            <name locale="en_US">IOH5</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-30.48" uuid="{cf9cdf54-d133-4670-9ac9-aeb691ec8dee}">
+            <name locale="en_US">IOH6</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-33.02" uuid="{da37b9a5-eb73-4710-963b-c7e188a29916}">
+            <name locale="en_US">IOH7</name>
+        </pin>
+    </pins>
+</symbol>

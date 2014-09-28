@@ -1,0 +1,70 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{21e08aaf-311c-412b-82df-d8110814625f}</uuid>
+        <name locale="en_US">F168_P5</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="20.32" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="-7.62" end_y="20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="20.32" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="-22.86"/>
+        </polygon>
+        <polygon fill="false" start_y="-22.86" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="10.16" end_y="-22.86"/>
+        </polygon>
+        <polygon fill="false" start_y="-22.86" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="20.32"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="5.08" angle="0" y="17.78" uuid="{3ce3237a-3ac3-4a1e-b322-04a84338d5ef}">
+            <name locale="en_US">P5-0/AN0</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="15.24" uuid="{77ac3f85-5f4e-4d7d-a52a-5f392730f43e}">
+            <name locale="en_US">P5-1/AN1</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="12.7" uuid="{74fbb466-03c2-4449-a92a-6ea256727473}">
+            <name locale="en_US">P5-2/AN2</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="10.16" uuid="{360bbd9e-539c-463f-8565-ce91746c8e2e}">
+            <name locale="en_US">P5-3/AN3</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="7.62" uuid="{501ac15e-02f4-4626-bbc4-5269830aa818}">
+            <name locale="en_US">P5-4/AN4</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="5.08" uuid="{692a133e-13a4-4695-8b44-4acdd60d3c19}">
+            <name locale="en_US">P5-5/AN5</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="2.54" uuid="{0e8c3f93-f4fb-4e26-8458-f5e24bab4298}">
+            <name locale="en_US">P5-6/AN6</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="0" uuid="{d3bf6ca7-4d72-4488-9495-33bfbd56960d}">
+            <name locale="en_US">P5-7/AN7</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-2.54" uuid="{0b2046f6-e211-4a2b-ac3e-33d7ae5687e0}">
+            <name locale="en_US">P5-8/AN8</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-5.08" uuid="{ccfa2283-602a-4d80-bafd-3ef96f173570}">
+            <name locale="en_US">P5-9/AN9</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-7.62" uuid="{bd0b6d85-6c3c-4ee8-bb4c-2308af708d79}">
+            <name locale="en_US">P5-10/AN10</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-10.16" uuid="{9292b7ab-2555-4cef-b3c0-f909a76a69d1}">
+            <name locale="en_US">P5-11/AN11</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-12.7" uuid="{f2930185-173f-4f0b-89a8-949e8a8f12f5}">
+            <name locale="en_US">P5-12/AN12</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-15.24" uuid="{aa314ea0-f0f3-44da-8759-1f406c3259d3}">
+            <name locale="en_US">P5-13/AN13</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-17.78" uuid="{55dbf38b-aabb-4716-a17c-174280a78f55}">
+            <name locale="en_US">P5-14/AN14</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-20.32" uuid="{59acf578-9732-4b9d-a65e-67bb5d735979}">
+            <name locale="en_US">P5-15/AN15</name>
+        </pin>
+    </pins>
+</symbol>

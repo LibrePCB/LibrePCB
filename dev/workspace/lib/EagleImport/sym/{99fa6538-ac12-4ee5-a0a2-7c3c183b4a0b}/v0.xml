@@ -1,0 +1,64 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{99fa6538-ac12-4ee5-a0a2-7c3c183b4a0b}</uuid>
+        <name locale="en_US">IXP-UTP-OP</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-46.99"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{876d6bc0-dcd5-4859-bf84-554cc716ea3f}">
+            <name locale="en_US">UTP_OP_CLK</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{26fbd270-0577-4f07-9506-a82a5d706868}">
+            <name locale="en_US">UTP_OP_SOC</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{839b6596-bf7a-4fc7-96e1-75f09a57b3da}">
+            <name locale="en_US">UTP_OP_DATA0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{a1155901-9b65-4c22-be35-08d558e87bd9}">
+            <name locale="en_US">UTP_OP_DATA1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{23e023b5-46c8-4546-8a5d-8c05191df804}">
+            <name locale="en_US">UTP_OP_DATA2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{08ec769f-04db-41c1-b530-ee9313eabc6f}">
+            <name locale="en_US">UTP_OP_DATA3</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{a7c625d8-2ec9-4f44-a51b-1bcc5d299983}">
+            <name locale="en_US">UTP_OP_DATA4</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{4ce9f791-53f5-4d6b-bb70-0ef8c95bc18a}">
+            <name locale="en_US">UTP_OP_DATA5</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{d4cab6a3-3be1-4b86-a204-94a2705065e8}">
+            <name locale="en_US">UTP_OP_DATA6</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{402ee6b1-d661-4e1d-8baf-9a2ec7f85449}">
+            <name locale="en_US">UTP_OP_DATA7</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-33.02" uuid="{1ed8a5ef-86a2-44cb-bf41-f6b04285cc63}">
+            <name locale="en_US">UTP_OP_ADDR0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-35.56" uuid="{4ebedf80-187c-4fd4-8a71-9eee914a7f31}">
+            <name locale="en_US">UTP_OP_ADDR1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-38.1" uuid="{1700afd5-8542-46ef-904c-f5c20f0592e0}">
+            <name locale="en_US">UTP_OP_ADDR2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-40.64" uuid="{38c3df38-4883-4879-b43a-d3c64c4292e0}">
+            <name locale="en_US">UTP_OP_ADDR3</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-43.18" uuid="{e5b971ae-185d-49ed-b6d4-619d9c708c7e}">
+            <name locale="en_US">UTP_OP_ADDR4</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-45.72" uuid="{b6dfef8c-6cda-48a2-ab12-75c74ae14ac2}">
+            <name locale="en_US">UTP_OP_FCI</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{67758cee-5a07-48f7-8cde-e942e08e5eae}">
+            <name locale="en_US">UTP_OP_FCO</name>
+        </pin>
+    </pins>
+</symbol>

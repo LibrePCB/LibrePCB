@@ -1,0 +1,91 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{0f4d442f-9e7a-407e-9ef0-2b93fca3c619}</uuid>
+        <name locale="en_US">TMS320VC5509-E</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-64.77" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{787f77ad-7047-461c-b7d6-77542bb2fddf}">
+            <name locale="en_US">S10</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{8cf7611b-ff30-40aa-a60b-a325154e7a70}">
+            <name locale="en_US">S11</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{f408f3c7-cbc5-4f45-a0a4-320760f81980}">
+            <name locale="en_US">S12</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{412e4529-3a84-45fb-a1b7-921ea9a46aec}">
+            <name locale="en_US">S13</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{6ae70658-5289-4672-b096-5346be0f0754}">
+            <name locale="en_US">S14</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{f1a67765-4b27-46b8-87a3-b5b57f0a12fe}">
+            <name locale="en_US">S15</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{2ac4de23-28a7-435e-977c-660326386317}">
+            <name locale="en_US">S20</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{ec937144-8ec4-4bf3-8910-eb466dabeb2a}">
+            <name locale="en_US">S21</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{9b20e8a1-1823-41c2-a5de-f2a2242f4a17}">
+            <name locale="en_US">S22</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{a09176c1-6e47-4c60-846a-83039f047c0c}">
+            <name locale="en_US">S23</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{97ae1317-1fc3-4911-9960-34cacedb3260}">
+            <name locale="en_US">S24</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{b95ceb10-5b65-4a08-9baa-53e1f8d3740c}">
+            <name locale="en_US">S25</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{97531a46-31a1-438a-870b-dab637f4634b}">
+            <name locale="en_US">SCL</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-33.02" uuid="{5174715c-5c6b-4830-b6ff-26cc26cc5782}">
+            <name locale="en_US">SDA</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-35.56" uuid="{acccad9d-ec3a-4eed-ad99-49386ef8bdd6}">
+            <name locale="en_US">TCK</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-38.1" uuid="{78a4ae1f-5ff5-4ec6-93b9-be70fb8f9cdd}">
+            <name locale="en_US">TDI</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-40.64" uuid="{c6b6dca0-6697-402e-b4ad-2e55a86c6724}">
+            <name locale="en_US">TDO</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-43.18" uuid="{c23d4144-489b-4725-833f-0ba73d34ad9e}">
+            <name locale="en_US">TINOUT0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-45.72" uuid="{e4646a70-b061-43f1-8395-5280f2bc947f}">
+            <name locale="en_US">TMS</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-48.26" uuid="{27b20584-a36b-48ad-bd44-b48d5bf66960}">
+            <name locale="en_US">TRST</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-50.8" uuid="{709f2c2e-323a-4a8e-80e6-45f62ef7228e}">
+            <name locale="en_US">USBPLLVDD</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-53.34" uuid="{997b80a9-4602-45b4-b93f-04f7f73c3e6d}">
+            <name locale="en_US">USBPLLVSS</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-55.88" uuid="{3b07ec5f-69d6-4461-beb4-28a5fe3fd869}">
+            <name locale="en_US">USBVDD</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-58.42" uuid="{67498332-0389-4984-b492-3cc79c5047f3}">
+            <name locale="en_US">X1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-60.96" uuid="{38f4e57a-8b5a-4cbe-bc6a-a638e345db02}">
+            <name locale="en_US">X2CLKIN</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-63.5" uuid="{65b354a8-5abb-4a2f-9e6c-a8f0ec639bdd}">
+            <name locale="en_US">XF</name>
+        </pin>
+    </pins>
+</symbol>

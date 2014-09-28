@@ -1,0 +1,64 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{4e4cdb47-ade5-48d8-94f6-061cfc04fb7b}</uuid>
+        <name locale="en_US">74275</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-15.24" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-15.24" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="-15.24"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="5.08" angle="0" y="12.7" uuid="{b098346a-a982-4c6e-b44b-ee65d0d2efe4}">
+            <name locale="en_US">2N@1</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="10.16" uuid="{3cf2b551-a747-46f3-a381-3e60bbb65cc3}">
+            <name locale="en_US">2N@2</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="7.62" uuid="{e3265338-09e7-45e4-8e0c-86b13129c775}">
+            <name locale="en_US">2N@3</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="5.08" uuid="{09b2d227-bdfc-4237-bb45-f1bdfb3a22be}">
+            <name locale="en_US">2N@4</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-5.08" uuid="{8fc0e99c-6928-4cde-9d33-360784c26b95}">
+            <name locale="en_US">C2N@1</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-7.62" uuid="{0f3170fe-5dfe-4dd4-9ac5-e1359243bfa1}">
+            <name locale="en_US">C2N@2</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="2.54" uuid="{a27c4bca-5ade-47e1-be57-2f63d76d40d5}">
+            <name locale="en_US">2N@5</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="7.62" uuid="{af140978-7a56-401d-940d-3a5b0fffcc1d}">
+            <name locale="en_US">2N+0</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="2.54" uuid="{bc23c09b-9dae-4bfa-b20a-e898c57b3974}">
+            <name locale="en_US">C2N+1</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="10.16" uuid="{46614661-aaef-41a7-b9b3-359d5f269e60}">
+            <name locale="en_US">2N+1</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="12.7" uuid="{bf10f48a-dad1-48f8-a2e4-a8a3bbf475ec}">
+            <name locale="en_US">2N+2</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-12.7" uuid="{2e00ce71-5c75-4f33-80cc-fdfc4a8b8a9f}">
+            <name locale="en_US">G</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="0" uuid="{3a45a2b5-3b2e-4758-a999-2547e9407b80}">
+            <name locale="en_US">2N@6</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-2.54" uuid="{8c7eaca0-da57-4763-a3bf-4319dd28ce41}">
+            <name locale="en_US">2N@7</name>
+        </pin>
+    </pins>
+</symbol>

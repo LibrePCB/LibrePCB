@@ -1,0 +1,73 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{6ac26ba2-abd2-475b-a27f-76a5dd726d79}</uuid>
+        <name locale="en_US">XC5VLX110T_FF1738-MGTREFCLKN</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="22.86" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="22.86">
+            <segment type="line" end_x="22.86" end_y="-43.18"/>
+        </polygon>
+        <polygon fill="false" start_y="-43.18" width="0.254" layer="10" start_x="22.86">
+            <segment type="line" end_x="0" end_y="-43.18"/>
+        </polygon>
+        <polygon fill="false" start_y="-43.18" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{aa5a77ff-5ff9-4e02-8ff6-2e5809847bad}">
+            <name locale="en_US">MGTREFCLKN_112</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{75fbe228-c2ff-4a1d-9ed3-700df58c72e5}">
+            <name locale="en_US">MGTREFCLKN_114</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{f508653e-b541-4795-bb4d-84cabf0290c8}">
+            <name locale="en_US">MGTREFCLKN_116</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{d4979f88-fffd-4045-abf5-909b88a25490}">
+            <name locale="en_US">MGTREFCLKN_118</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{fa199b48-2083-44d5-af6f-f4e7e380895f}">
+            <name locale="en_US">MGTREFCLKN_120</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{2b5d687f-f899-41a6-a791-f8493bb3189b}">
+            <name locale="en_US">MGTREFCLKN_122</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{2450e407-3c4a-4130-9189-5a520da007fc}">
+            <name locale="en_US">MGTREFCLKN_124</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{46e75e10-c4a7-41d3-9751-3fc201c204d0}">
+            <name locale="en_US">MGTREFCLKN_126</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{fe0aecb7-5a6e-4a48-9ac3-4e06a414c492}">
+            <name locale="en_US">MGTREFCLKP_112</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{53ad03f9-3f6f-48c9-98e2-c5e039cf47ad}">
+            <name locale="en_US">MGTREFCLKP_114</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{5c0a0981-67ae-44fd-8b13-5726c39f8bc2}">
+            <name locale="en_US">MGTREFCLKP_116</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{7d661016-7368-45e8-83b9-0bb12487dc57}">
+            <name locale="en_US">MGTREFCLKP_118</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{072b5a95-8f86-403d-af95-f7336b569f1a}">
+            <name locale="en_US">MGTREFCLKP_120</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-33.02" uuid="{2f621768-e69a-448b-9f54-32cbdd2b3bd4}">
+            <name locale="en_US">MGTREFCLKP_122</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-35.56" uuid="{97e9be3a-d811-4ed9-b549-b4ef71e54d4b}">
+            <name locale="en_US">MGTREFCLKP_124</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-38.1" uuid="{338ce921-702f-427a-8d2b-f5eabeb8c4fe}">
+            <name locale="en_US">MGTREFCLKP_126</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-40.64" uuid="{6df97235-e298-4037-afad-6dc348f66a6f}">
+            <name locale="en_US">MGTRREF_112</name>
+        </pin>
+    </pins>
+</symbol>

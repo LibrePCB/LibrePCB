@@ -1,0 +1,88 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{f4bf85fc-bf77-4519-9177-e5fb55d5185f}</uuid>
+        <name locale="en_US">74651</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-20.32" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="-20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="-20.32" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="20.32" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="20.32" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="-20.32"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="5.08" angle="0" y="-10.16" uuid="{9887b306-f658-4685-af56-d82073faf044}">
+            <name locale="en_US">CAB</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-12.7" uuid="{4b137be6-ef59-4e8f-ae2f-9ee14d81be22}">
+            <name locale="en_US">SAB</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-5.08" uuid="{85e65ee8-d620-4a0c-82a9-a140c014928f}">
+            <name locale="en_US">GAB</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="17.78" uuid="{072c1356-fe27-4f59-b213-7c2819272834}">
+            <name locale="en_US">A1</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="15.24" uuid="{014b903c-28df-4865-a5c8-e81521bfd05c}">
+            <name locale="en_US">A2</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="12.7" uuid="{e4ba7309-04d9-4c44-b105-ad2a8c764b6b}">
+            <name locale="en_US">A3</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="10.16" uuid="{96ad55a9-f3eb-4a6e-afa8-bf98a29b8996}">
+            <name locale="en_US">A4</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="7.62" uuid="{c07e342f-38fa-4342-af0d-3e94b76940f0}">
+            <name locale="en_US">A5</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="5.08" uuid="{80ad1cca-eeca-4982-a78d-f013397ef1d7}">
+            <name locale="en_US">A6</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="2.54" uuid="{bfd6de81-b3bb-47b2-809a-7b6f9da07eda}">
+            <name locale="en_US">A7</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="0" uuid="{de5d2097-7126-4e0b-a3cf-158a0c2082cd}">
+            <name locale="en_US">A8</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="0" uuid="{295034aa-5371-4b2a-bafd-17777bdee552}">
+            <name locale="en_US">B8</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="2.54" uuid="{9548df00-187e-484f-82d7-2c7f0314da6b}">
+            <name locale="en_US">B7</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="5.08" uuid="{9d5e0a98-1efd-47e2-8af3-ba4dd65c5862}">
+            <name locale="en_US">B6</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="7.62" uuid="{a4e565fd-1b39-415e-806b-24aba64f4d04}">
+            <name locale="en_US">B5</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="10.16" uuid="{22dfa6ec-837c-4f0f-beab-87c9d6797c60}">
+            <name locale="en_US">B4</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="12.7" uuid="{bf159401-3183-4f21-a11e-1b9325f02446}">
+            <name locale="en_US">B3</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="15.24" uuid="{22f4f653-5f8b-4f6f-92d6-a8348f696515}">
+            <name locale="en_US">B2</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="17.78" uuid="{61ae6aaa-bd68-49e2-83d1-ed785d6001ef}">
+            <name locale="en_US">B1</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-7.62" uuid="{02ca8629-c192-4d5d-8398-1bc1c5f4adb3}">
+            <name locale="en_US">GBA</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-17.78" uuid="{b3710472-13a0-4a02-83b1-2c1436f3dcbe}">
+            <name locale="en_US">SBA</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-15.24" uuid="{0c639576-0f67-4419-b430-fe0036aa1950}">
+            <name locale="en_US">CBA</name>
+        </pin>
+    </pins>
+</symbol>

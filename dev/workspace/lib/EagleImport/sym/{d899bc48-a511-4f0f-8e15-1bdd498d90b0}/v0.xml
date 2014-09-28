@@ -1,0 +1,64 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{d899bc48-a511-4f0f-8e15-1bdd498d90b0}</uuid>
+        <name locale="en_US">XR-1093</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-15.24" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-15.24" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="-15.24"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="15.24" length="5.08" angle="180" y="15.24" uuid="{6e5652be-d301-4ad6-86a5-3ebe8215835c}">
+            <name locale="en_US">OUT63</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="12.7" uuid="{d40b01f3-6dc4-4647-8ec9-3d993c97cfa0}">
+            <name locale="en_US">OUT250</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="10.16" uuid="{a251a167-aec3-41ad-97fb-beda5d4086b7}">
+            <name locale="en_US">OUT1K</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="7.62" uuid="{ae46d360-8f00-4437-8d6b-95e1e005519d}">
+            <name locale="en_US">OUT4K</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="5.08" uuid="{19f86904-6c48-48b9-a242-1755f53a3fc4}">
+            <name locale="en_US">CLK/2</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="2.54" uuid="{7e7341aa-f2da-4c51-976c-ef51e2a5a88c}">
+            <name locale="en_US">OUTPK</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="15.24" uuid="{35348b7a-6851-4392-b4e5-33fb4296e462}">
+            <name locale="en_US">INPUT</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-5.08" uuid="{0e86ca1b-ce74-4ff5-8c13-79564396601b}">
+            <name locale="en_US">10K/!16K</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-7.62" uuid="{bae18897-21ef-4881-a582-02f27d34c62a}">
+            <name locale="en_US">CLKC</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-10.16" uuid="{ab51dec9-ceda-43d3-9c40-72adb6e42a6b}">
+            <name locale="en_US">CLKR</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-12.7" uuid="{e8ab5a8f-70ec-45fa-9410-de1bd8f7058a}">
+            <name locale="en_US">SELECT</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-2.54" uuid="{2f95b3a2-0d6e-4a68-857f-7f7c8bcef346}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-7.62" uuid="{e85969a5-56b3-4ff8-ab0c-3c57415133f4}">
+            <name locale="en_US">VSS</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-12.7" uuid="{d5508500-a923-4210-9563-722809101521}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

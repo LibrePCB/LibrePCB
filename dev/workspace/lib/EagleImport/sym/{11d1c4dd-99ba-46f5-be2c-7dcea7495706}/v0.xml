@@ -1,0 +1,12 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{11d1c4dd-99ba-46f5-be2c-7dcea7495706}</uuid>
+        <name locale="en_US">SPECIAL_DRILL</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{eb752871-3c25-4600-baf5-40ae980ddcc5}">
+            <name locale="en_US">1</name>
+        </pin>
+    </pins>
+</symbol>

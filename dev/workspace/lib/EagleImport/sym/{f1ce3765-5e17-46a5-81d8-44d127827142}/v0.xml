@@ -1,0 +1,145 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{f1ce3765-5e17-46a5-81d8-44d127827142}</uuid>
+        <name locale="en_US">TMS320C6720-UHPI</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-110.49"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{34ea59eb-e9b1-409b-9b38-fc6ebe8ed669}">
+            <name locale="en_US">UHPI_HD0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{a0a9b5fd-dc03-48cc-801d-db2f307b89f3}">
+            <name locale="en_US">UHPI_HD1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{49089863-cd11-4ddb-a997-01dac4c85637}">
+            <name locale="en_US">UHPI_HD2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{f5fb3c7c-f91f-49fd-ba67-a4dd5358da80}">
+            <name locale="en_US">UHPI_HD3</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{4e2dbd27-78c3-458b-a9dc-43515540dc8c}">
+            <name locale="en_US">UHPI_HD4</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{1bb343f8-fdf6-423c-870e-a4b8fcc939c6}">
+            <name locale="en_US">UHPI_HD5</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{3eb40185-3b53-4964-bd65-aa697b1da0af}">
+            <name locale="en_US">UHPI_HD6</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{dfb8d321-9f01-49f4-b1c4-bdeb9193962e}">
+            <name locale="en_US">UHPI_HD7</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{5c8f261b-1af5-4924-8275-5e80dc99d415}">
+            <name locale="en_US">UHPI_HD8</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{e627fd17-287b-4b48-9255-7e92dab67a79}">
+            <name locale="en_US">UHPI_HD9</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{df419b15-d25a-4dba-814f-aa6ae378fd85}">
+            <name locale="en_US">UHPI_HD10</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{552bb00e-2dee-4a10-bfd2-53483b8c5e18}">
+            <name locale="en_US">UHPI_HD11</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{f8a5893d-878d-4966-a6d1-73f737ad4f68}">
+            <name locale="en_US">UHPI_HD12</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-33.02" uuid="{b1596741-57dd-4e5a-8acf-0b3ff9f97db3}">
+            <name locale="en_US">UHPI_HD13</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-35.56" uuid="{91e5bb08-7f0d-4fea-b4a6-5d4c81575ac2}">
+            <name locale="en_US">UHPI_HD14</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-38.1" uuid="{c51e0e2c-f025-4ee1-b05e-536f0d149bc4}">
+            <name locale="en_US">UHPI_HD15</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-40.64" uuid="{e9054095-ba3e-4fb0-82cb-e47242a51dcf}">
+            <name locale="en_US">UHPI_HD16/HHWIL</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-43.18" uuid="{3daca86a-2c7f-4e7d-9d6e-5328c30d23e1}">
+            <name locale="en_US">UHPI_HD17</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-45.72" uuid="{cc56718c-5184-48ff-9869-5566e124f221}">
+            <name locale="en_US">UHPI_HD18</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-48.26" uuid="{7efbd2f2-4504-42a1-94c2-5af5025cf9a8}">
+            <name locale="en_US">UHPI_HD19</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-50.8" uuid="{320fabb6-5a71-42fb-b4c0-35cff00f2433}">
+            <name locale="en_US">UHPI_HD20</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-53.34" uuid="{7dffde51-d20e-4acb-a590-8eab3bb4ebcd}">
+            <name locale="en_US">UHPI_HD21</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-55.88" uuid="{2585b45a-7302-43aa-a43d-70e09f39aece}">
+            <name locale="en_US">UHPI_HD22</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-58.42" uuid="{36408e98-4900-4694-bf88-a50cff105d2b}">
+            <name locale="en_US">UHPI_HD23</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-60.96" uuid="{3d673ce7-8cc6-42d7-86a0-15eba1628eb2}">
+            <name locale="en_US">UHPI_HD24</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-63.5" uuid="{5dada394-4646-4346-a6e6-55d94d97b766}">
+            <name locale="en_US">UHPI_HD25</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-66.04" uuid="{f5f2eefa-5980-4768-ba98-a481cac9e6b3}">
+            <name locale="en_US">UHPI_HD26</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-68.58" uuid="{bd0c1bdd-279e-423a-b541-cc53eea3261a}">
+            <name locale="en_US">UHPI_HD27</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-71.12" uuid="{543f63b8-33a6-4144-8dd1-66409b2c5204}">
+            <name locale="en_US">UHPI_HD28</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-73.66" uuid="{4f164f10-a477-4ab1-836a-59da5f4dc898}">
+            <name locale="en_US">UHPI_HD29</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-76.2" uuid="{86a22e46-a500-4df0-8a5b-98cca6b29c06}">
+            <name locale="en_US">UHPI_HD30</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-78.74" uuid="{0630bcab-7008-4f31-b873-8d271c7efb97}">
+            <name locale="en_US">UHPI_HD31</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-81.28" uuid="{6b5d33d1-397d-40c2-b963-2332c2646be6}">
+            <name locale="en_US">UHPI_HBE0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-83.82" uuid="{8314d0e6-6c1b-47cb-b949-475f77448c32}">
+            <name locale="en_US">UHPI_HBE1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-86.36" uuid="{3b6b2723-4a0c-47f6-ba45-8dcd09478d94}">
+            <name locale="en_US">UHPI_HBE2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-88.9" uuid="{7c9c3acc-e2e1-4ded-b0e1-473b5b20fbd8}">
+            <name locale="en_US">UHPI_HBE3</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-91.44" uuid="{4deb0f31-b1a0-4dc0-9568-512bbcc05149}">
+            <name locale="en_US">UHPI_HCNTL0</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-93.98" uuid="{521ee1d7-b969-4bbf-b190-fc6020f1e21c}">
+            <name locale="en_US">UHPI_HCNTL1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-96.52" uuid="{a60f8e84-2ee4-4e40-80d8-e634a62c0e95}">
+            <name locale="en_US">UHPI_HAS</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-99.06" uuid="{cb39035f-dc6e-4af0-88c4-d9c4e169af38}">
+            <name locale="en_US">UHPI_HRW</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-101.6" uuid="{efc4459a-cf70-4087-b0a0-a8d0d1093b13}">
+            <name locale="en_US">UHPI_HDS1</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-104.14" uuid="{4201bcd3-47c2-407d-b2c2-46e3097b0c08}">
+            <name locale="en_US">UHPI_HDS2</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-106.68" uuid="{9c59143b-db29-41e8-b21b-ea188c44dd63}">
+            <name locale="en_US">UHPI_HCS</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-109.22" uuid="{03aa6bda-e2ad-4ef1-bdf7-929c67040b2d}">
+            <name locale="en_US">UHPI_HRDY</name>
+        </pin>
+    </pins>
+</symbol>

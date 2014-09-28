@@ -1,0 +1,36 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{ca99bfe5-6f22-46ea-84f6-056595ce42ee}</uuid>
+        <name locale="en_US">ELKO</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-0.889" width="0.254" layer="10" start_x="-1.524">
+            <segment type="line" end_x="1.524" end_y="-0.889"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.889" width="0.254" layer="10" start_x="1.524">
+            <segment type="line" end_x="1.524" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="-1.524">
+            <segment type="line" end_x="-1.524" end_y="-0.889"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="-1.524">
+            <segment type="line" end_x="0" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="1.524" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="true" start_y="-2.54" width="0.254" layer="10" start_x="-1.651">
+            <segment type="line" end_x="1.651" end_y="-2.54"/>
+            <segment type="line" end_x="1.651" end_y="-1.651"/>
+            <segment type="line" end_x="-1.651" end_y="-1.651"/>
+            <segment type="line" end_x="-1.651" end_y="-2.54"/>
+        </polygon>
+    </geometry>
+    <pins/>
+</symbol>

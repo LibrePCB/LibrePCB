@@ -1,0 +1,79 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{d715c430-73d4-4fad-982f-55c4304fa3a7}</uuid>
+        <name locale="en_US">ST11</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-54.61" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{937b2a3e-4329-49d1-9e06-ca50d35289b9}">
+            <name locale="en_US">IOS1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{829a7505-715b-466c-925e-45dd3b235889}">
+            <name locale="en_US">IOS2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{ade9296c-1054-44f0-9a59-b304f320bda6}">
+            <name locale="en_US">IOS3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{09f2ac86-c7eb-4a79-8641-48ed66cc67e2}">
+            <name locale="en_US">IOS4</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{167db489-c438-4ef7-b8cb-bd4fc71ce7fa}">
+            <name locale="en_US">IOS5</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{2c335328-c3f9-461e-a619-516fc9b86ff1}">
+            <name locale="en_US">IOS6</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-15.24" uuid="{18219218-fcd6-431d-a555-34c828f6d71f}">
+            <name locale="en_US">IOS7</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-17.78" uuid="{0409dd28-bb6f-4566-883c-54ba8d5b72c3}">
+            <name locale="en_US">IOS8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-20.32" uuid="{352dcd15-32f6-49ae-9ac4-341564ec774e}">
+            <name locale="en_US">IOS9</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-22.86" uuid="{7348daf5-87c9-4f76-9092-41bc4e4fce2d}">
+            <name locale="en_US">IOS10</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-25.4" uuid="{a607df3d-3543-4ffb-8592-7d62a4994050}">
+            <name locale="en_US">IOS11</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-27.94" uuid="{d13955d4-e6fa-4bee-b7bf-c454a5dc1a39}">
+            <name locale="en_US">IOT1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-30.48" uuid="{cae442f2-3e69-47fc-8498-d5bbfeb8d904}">
+            <name locale="en_US">IOT2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-33.02" uuid="{95e40dce-63ae-4704-80ab-3ca62c7a8d55}">
+            <name locale="en_US">IOT3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-35.56" uuid="{b45c5d93-80d7-4b00-aa0d-3ae0e19c7617}">
+            <name locale="en_US">IOT4</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-38.1" uuid="{00d6b70c-3553-4125-99f0-75dd100ed2c3}">
+            <name locale="en_US">IOT5</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-40.64" uuid="{3d5ad201-8ba7-49dd-820d-409d7af83759}">
+            <name locale="en_US">IOT6</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-43.18" uuid="{497028b7-3a3b-4c97-9f91-8d1a612c060a}">
+            <name locale="en_US">IOT7</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-45.72" uuid="{32de9f24-4661-43a0-8b9a-7dc33b392aad}">
+            <name locale="en_US">IOT8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-48.26" uuid="{18662b18-8437-4285-90f0-64a955dd3505}">
+            <name locale="en_US">IOT9</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-50.8" uuid="{2624da93-89c9-4a6d-a788-d9a78e6ff59f}">
+            <name locale="en_US">IOT10</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-53.34" uuid="{cfa5c7c6-b52d-47dc-a2ac-1c4b8bcda2ac}">
+            <name locale="en_US">IOT11</name>
+        </pin>
+    </pins>
+</symbol>

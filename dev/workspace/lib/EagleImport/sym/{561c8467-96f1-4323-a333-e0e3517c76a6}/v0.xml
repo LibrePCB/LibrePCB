@@ -1,0 +1,127 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{561c8467-96f1-4323-a333-e0e3517c76a6}</uuid>
+        <name locale="en_US">TEA5764HN</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-30.48" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="15.24" end_y="-30.48"/>
+        </polygon>
+        <polygon fill="false" start_y="-30.48" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="15.24" end_y="30.48"/>
+        </polygon>
+        <polygon fill="false" start_y="30.48" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="-15.24" end_y="30.48"/>
+        </polygon>
+        <polygon fill="false" start_y="30.48" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="-15.24" end_y="-30.48"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-17.78" length="2.54" angle="0" y="-5.08" uuid="{f1745166-bc0e-4434-9188-0ee7b7461722}">
+            <name locale="en_US">LOOPSW</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-7.62" uuid="{468779d2-fd05-4937-89d0-44ba9166a4ef}">
+            <name locale="en_US">CPOUT</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-10.16" uuid="{45689f72-d613-4f33-a842-582db6509c3f}">
+            <name locale="en_US">LO1</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-12.7" uuid="{ab5d04d6-9a6a-4d28-af91-c5ac74f7b8b0}">
+            <name locale="en_US">LO2</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-15.24" uuid="{1cd08242-244e-437c-82a5-aabcc3d64d3f}">
+            <name locale="en_US">CD1</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-22.86" uuid="{7e074afb-a833-4bbc-8f3e-8984804b1e30}">
+            <name locale="en_US">PILLP</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-20.32" uuid="{3a28db39-b87d-4066-b920-fae11977468e}">
+            <name locale="en_US">SWPORT</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-10.16" uuid="{bab19416-d15e-4bfe-baee-23d9d379db05}">
+            <name locale="en_US">BUSENBABLE</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-12.7" uuid="{8e2eddde-a7f3-4eb7-b934-f6eab919feca}">
+            <name locale="en_US">VREFDIG</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-15.24" uuid="{8ae23bc3-ff2e-4515-9a77-07a00d2faef9}">
+            <name locale="en_US">SCL</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-17.78" uuid="{61a96078-48ff-4b34-bab2-fc363c2edb57}">
+            <name locale="en_US">SDA</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-20.32" uuid="{98d6720a-6533-40f9-a70b-e7f37d01d74a}">
+            <name locale="en_US">GNDD</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-22.86" uuid="{88d6ed05-54eb-43de-94d7-15fbafd9e22b}">
+            <name locale="en_US">GNDD@1</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="0" uuid="{62869f93-4a94-4562-a00c-364daffcb897}">
+            <name locale="en_US">VCCD</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-2.54" uuid="{6fd95a47-12bf-4f11-abae-07e798187a6b}">
+            <name locale="en_US">CD2/INTCON3</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-5.08" uuid="{b995adb9-4d20-4fd9-955c-2f6e2c746dfb}">
+            <name locale="en_US">INTCON2</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-25.4" uuid="{542c2954-d7b1-403d-bcb2-6dd34b1fd20d}">
+            <name locale="en_US">GNDD@2</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="7.62" uuid="{43571a94-b3ee-4b33-ac82-253eb002e442}">
+            <name locale="en_US">INTX</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-7.62" uuid="{d98acb1f-b71b-41dc-bd36-d2438ed34b48}">
+            <name locale="en_US">INTCON1</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="20.32" uuid="{39947081-9e48-4120-a5c6-15455e58f12e}">
+            <name locale="en_US">TMUTE</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="15.24" uuid="{115751c2-5bb3-4d8b-8228-c9a7c7e0166f}">
+            <name locale="en_US">VAFR</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="12.7" uuid="{66a60ad8-2751-4259-a143-5c197a642ea6}">
+            <name locale="en_US">VAFL</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="25.4" uuid="{67004d47-f4bc-441b-bdd1-0de6173e4393}">
+            <name locale="en_US">MPXOUT</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-27.94" uuid="{2cd0e3a6-65fc-4d8f-af15-1b5a4b6a65e5}">
+            <name locale="en_US">GNDD@3</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="0" uuid="{75a813d6-f5fc-4b14-9a70-7dee1867a1c1}">
+            <name locale="en_US">GNDA</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="22.86" uuid="{4e707ab1-6f47-42bb-bf1e-520cf87fc60f}">
+            <name locale="en_US">FREQIN</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="20.32" uuid="{eb355ad6-b4f3-48aa-b1df-6c5b5615f079}">
+            <name locale="en_US">XTAL</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="27.94" uuid="{3ff77dcb-403c-4317-89be-e7c94d2e2fc2}">
+            <name locale="en_US">VCCA</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="15.24" uuid="{22912425-ded0-4844-93d9-fd5547fb68cb}">
+            <name locale="en_US">CD3</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="12.7" uuid="{8ab793f5-c151-4475-8402-86281cf49038}">
+            <name locale="en_US">RFIN1</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="10.16" uuid="{bcb65474-892b-4bfd-a6bb-d07d469d861d}">
+            <name locale="en_US">RFIN2</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="7.62" uuid="{d72675ea-b275-43f5-a22b-2600c552e6e6}">
+            <name locale="en_US">GNDRF</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="5.08" uuid="{690f3050-7753-4114-8761-5cecc7ae36e2}">
+            <name locale="en_US">CAGC</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="27.94" uuid="{55c1593d-fca5-40f9-83b5-8dd4995701c8}">
+            <name locale="en_US">MPXIN</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-27.94" uuid="{a95583da-09c1-49b3-84d4-524a160dde30}">
+            <name locale="en_US">TH</name>
+        </pin>
+    </pins>
+</symbol>

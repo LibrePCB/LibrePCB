@@ -1,0 +1,40 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{a2789fc9-40b1-40c0-baed-f8b4ad2870e5}</uuid>
+        <name locale="en_US">LP3963</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="-7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="12.7" length="2.54" angle="180" y="2.54" uuid="{3e0d5f86-802f-45e8-9282-94b4c99ed614}">
+            <name locale="en_US">VOUT</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{14994863-25b7-4a10-a2d7-1c4d787db6ae}">
+            <name locale="en_US">!SD</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{c6a1743f-5618-40af-a943-5df6e1c4bd97}">
+            <name locale="en_US">VIN</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-2.54" uuid="{1285593a-da75-4bd4-bad3-78c02865590f}">
+            <name locale="en_US">!ERROR</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="90" y="-10.16" uuid="{042903c1-2397-4ce8-8c7c-804de318dc1d}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="90" y="-10.16" uuid="{4dc50420-dbb2-49e8-87eb-08a8a016883a}">
+            <name locale="en_US">GND@1</name>
+        </pin>
+    </pins>
+</symbol>

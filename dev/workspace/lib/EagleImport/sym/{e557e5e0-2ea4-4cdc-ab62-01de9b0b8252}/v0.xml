@@ -1,0 +1,40 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{e557e5e0-2ea4-4cdc-ab62-01de9b0b8252}</uuid>
+        <name locale="en_US">TASTER</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.3048" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-1.5875" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.3048" layer="10" start_x="-1.5875">
+            <segment type="line" end_x="0.635" end_y="1.5875"/>
+        </polygon>
+        <polygon fill="false" start_y="0.635" width="0.3048" layer="10" start_x="0.635">
+            <segment type="line" end_x="0.635" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.3048" layer="10" start_x="0.635">
+            <segment type="line" end_x="2.54" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.127" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="3.81"/>
+        </polygon>
+        <polygon fill="false" start_y="3.81" width="0.127" layer="10" start_x="-0.635">
+            <segment type="line" end_x="0.635" end_y="3.81"/>
+        </polygon>
+        <polygon fill="false" start_y="3.81" width="0.127" layer="10" start_x="-0.635">
+            <segment type="line" end_x="-0.635" end_y="3.4925"/>
+        </polygon>
+        <polygon fill="false" start_y="3.81" width="0.127" layer="10" start_x="0.635">
+            <segment type="line" end_x="0.635" end_y="3.4925"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="5.08" length="2.54" angle="180" y="0" uuid="{a3e55418-08b4-4ba8-baeb-55ab56efd527}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{d3c91093-6597-4d1b-a31b-f303b8ab0ecd}">
+            <name locale="en_US">2</name>
+        </pin>
+    </pins>
+</symbol>

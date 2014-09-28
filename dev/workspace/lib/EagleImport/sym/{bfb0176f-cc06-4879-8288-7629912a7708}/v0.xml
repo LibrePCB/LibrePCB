@@ -1,0 +1,37 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{bfb0176f-cc06-4879-8288-7629912a7708}</uuid>
+        <name locale="en_US">BTS555</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="5.08" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="5.08" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="5.08">
+            <segment type="line" end_x="-5.08" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-7.62" length="2.54" angle="0" y="2.54" uuid="{47a4ed17-8fe9-41f6-8505-e4356d3e423a}">
+            <name locale="en_US">IN</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="90" y="-7.62" uuid="{71cc068d-2f2b-4cb2-8b0f-c0ccee4efbc5}">
+            <name locale="en_US">IS</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="5.08" uuid="{cdabaaba-c044-4c08-9a80-99635fbe71af}">
+            <name locale="en_US">VBB</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="0" uuid="{2c01eafb-a0c7-49f4-a9ae-7023eeb8f6b5}">
+            <name locale="en_US">O1</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="-2.54" uuid="{cd99e292-8ed6-4b95-91a0-4e6f7c53af1e}">
+            <name locale="en_US">O2</name>
+        </pin>
+    </pins>
+</symbol>

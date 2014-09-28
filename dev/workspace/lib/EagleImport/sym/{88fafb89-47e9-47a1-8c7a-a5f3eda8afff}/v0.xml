@@ -1,0 +1,37 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{88fafb89-47e9-47a1-8c7a-a5f3eda8afff}</uuid>
+        <name locale="en_US">LT1129</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="5.08"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="2.54" uuid="{d3ff1d65-de5b-4246-a445-5e8683cfde06}">
+            <name locale="en_US">IN</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="2.54" uuid="{1786fab1-769f-49c2-8146-79d69fd90a1f}">
+            <name locale="en_US">OUT</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-2.54" uuid="{63869a11-c2ca-4fad-afdb-de3a317a27c4}">
+            <name locale="en_US">!SHDN</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="0" uuid="{a8848dc6-94e3-44e8-8003-8f11bc1fab00}">
+            <name locale="en_US">SENSE</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-10.16" uuid="{076a1f7b-0362-47b4-9fbd-dce1d613047b}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

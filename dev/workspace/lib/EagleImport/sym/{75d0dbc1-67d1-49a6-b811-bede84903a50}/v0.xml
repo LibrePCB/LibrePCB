@@ -1,0 +1,52 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{75d0dbc1-67d1-49a6-b811-bede84903a50}</uuid>
+        <name locale="en_US">AD7992</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="12.7" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="12.7" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="12.7"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{b80e35fc-8e61-4abd-b694-d54518ed70a3}">
+            <name locale="en_US">VIN1</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{3df7f69a-dea2-4a15-ae4c-1ba61feb7349}">
+            <name locale="en_US">VIN2</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="10.16" uuid="{3ae41926-47d9-4aca-b0a8-dc8301b511aa}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="0" uuid="{c1812543-ff78-49c8-b32f-65d536ace321}">
+            <name locale="en_US">AS</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{c0533447-da53-4d94-9aff-11291035a51f}">
+            <name locale="en_US">AGND</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-5.08" uuid="{db3676f0-ac4f-41de-956f-69e3502957e7}">
+            <name locale="en_US">SDA</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-2.54" uuid="{688e7464-0517-4579-802c-6bc37a87ef2f}">
+            <name locale="en_US">SCL</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="5.08" uuid="{7dda6d53-6f55-48ae-863c-11224f57e0ce}">
+            <name locale="en_US">ALERT</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="7.62" uuid="{dc638dff-7ba3-4043-8d77-c30bb4469f6d}">
+            <name locale="en_US">!CONVST</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-7.62" uuid="{6605e2c1-4f7d-4f5c-a7c1-c34736a266cb}">
+            <name locale="en_US">AGND@1</name>
+        </pin>
+    </pins>
+</symbol>

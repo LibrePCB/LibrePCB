@@ -1,0 +1,64 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{522f3e6b-8cf7-4f54-a16a-fc6f27641107}</uuid>
+        <name locale="en_US">4415</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-17.78" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="-17.78"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="5.08" angle="0" y="-10.16" uuid="{7f1a4d29-71bd-4822-a0e3-8bc517a9d23f}">
+            <name locale="en_US">CLK</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="15.24" uuid="{82aae2ae-e4a3-49d5-8796-6a27a72bc0f5}">
+            <name locale="en_US">SETA</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="15.24" uuid="{e38057fa-d732-42fa-af3a-76e3702a47c1}">
+            <name locale="en_US">OA</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-15.24" uuid="{70da0d8d-ee42-4eae-8b34-0f62d94c94cc}">
+            <name locale="en_US">!INH</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="2.54" uuid="{8fc45bb0-6998-4e72-a140-49fcc8e50270}">
+            <name locale="en_US">ST2</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="0" uuid="{ae0b7331-cc15-4b2d-aadf-611cba6c0903}">
+            <name locale="en_US">!ST1</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-2.54" uuid="{97423aaf-f5d4-462c-97a7-748924728600}">
+            <name locale="en_US">!DIS</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-5.08" uuid="{730c20e0-8c98-4a7d-bc75-56f28eb5cae3}">
+            <name locale="en_US">!SET</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="12.7" uuid="{7689bbd2-dd52-4c0e-96f2-f93399805537}">
+            <name locale="en_US">SETB</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="10.16" uuid="{db0186e0-5f02-41a2-9a6e-7b97887108ae}">
+            <name locale="en_US">SETC</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="7.62" uuid="{f9fa8024-5f6c-4bb4-aed6-e67180b03eee}">
+            <name locale="en_US">SETD</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="12.7" uuid="{84a9a95c-e373-4b0d-8bd3-14d0e321faad}">
+            <name locale="en_US">OB</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="10.16" uuid="{b98098ef-8475-4669-aa1c-e2ee327cd31e}">
+            <name locale="en_US">OC</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="7.62" uuid="{6ca5fa95-2686-433f-8f3f-466cdd6ef946}">
+            <name locale="en_US">OD</name>
+        </pin>
+    </pins>
+</symbol>

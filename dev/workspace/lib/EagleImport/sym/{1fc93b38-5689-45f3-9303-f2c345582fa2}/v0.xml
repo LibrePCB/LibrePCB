@@ -1,0 +1,73 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{1fc93b38-5689-45f3-9303-f2c345582fa2}</uuid>
+        <name locale="en_US">STA013</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="17.78" width="0.254" layer="10" start_x="-22.86">
+            <segment type="line" end_x="22.86" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.254" layer="10" start_x="22.86">
+            <segment type="line" end_x="22.86" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="22.86">
+            <segment type="line" end_x="-22.86" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.254" layer="10" start_x="-22.86">
+            <segment type="line" end_x="-22.86" end_y="17.78"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-25.4" length="2.54" angle="0" y="15.24" uuid="{87556d6d-cfd8-44ac-a8ee-9bb6931cf56c}">
+            <name locale="en_US">!RESET</name>
+        </pin>
+        <pin x="-25.4" length="2.54" angle="0" y="12.7" uuid="{37fca240-2b6c-49d7-b9a7-498a73ca59d7}">
+            <name locale="en_US">SDA</name>
+        </pin>
+        <pin x="-25.4" length="2.54" angle="0" y="10.16" uuid="{7d0d40b2-1044-4799-bb2f-ee8f47aaa7a8}">
+            <name locale="en_US">SCL</name>
+        </pin>
+        <pin x="-25.4" length="2.54" angle="0" y="5.08" uuid="{091b0462-8894-4920-9df5-e7bd5f5aa53f}">
+            <name locale="en_US">SDI</name>
+        </pin>
+        <pin x="-25.4" length="2.54" angle="0" y="2.54" uuid="{1f00147d-eb72-42dd-a41d-1cab386fcd86}">
+            <name locale="en_US">SCKR</name>
+        </pin>
+        <pin x="-25.4" length="2.54" angle="0" y="0" uuid="{54623050-b034-458b-8386-f2ae8c0513bd}">
+            <name locale="en_US">BIT_EN</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="90" y="-20.32" uuid="{21b6b0eb-77e8-4f1e-8dde-0ba0bbe6dc1d}">
+            <name locale="en_US">!SRC_INT</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="90" y="-20.32" uuid="{8fea136c-5268-471c-94de-c006cc8317e6}">
+            <name locale="en_US">OUT/DATA</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="90" y="-20.32" uuid="{8a5e537c-29f2-4f71-a5ff-bdb0c968994a}">
+            <name locale="en_US">XTI</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="90" y="-20.32" uuid="{0e9be418-1fa3-40ba-b853-862a2e12e420}">
+            <name locale="en_US">XTO</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-20.32" uuid="{840f8f0e-ac7f-439d-b906-8389925621e0}">
+            <name locale="en_US">OCLK</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="90" y="-20.32" uuid="{27d76736-82e1-4ead-92fe-f39dbb9b6fcc}">
+            <name locale="en_US">!TESTEN</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="90" y="-20.32" uuid="{caff7991-09f3-487c-bd6c-2a5d17ee657e}">
+            <name locale="en_US">SCANEN</name>
+        </pin>
+        <pin x="25.4" length="2.54" angle="180" y="5.08" uuid="{3111229e-657d-4950-aacc-4d714228d46b}">
+            <name locale="en_US">SDO</name>
+        </pin>
+        <pin x="25.4" length="2.54" angle="180" y="2.54" uuid="{77533595-5edd-480b-b8f7-b509f1cd1e16}">
+            <name locale="en_US">SCKT</name>
+        </pin>
+        <pin x="25.4" length="2.54" angle="180" y="0" uuid="{1ed08e67-0465-4962-a69a-8a754f0d8188}">
+            <name locale="en_US">LRCKT</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="90" y="-20.32" uuid="{95bac0a0-9968-47ff-9c39-927ed5e49468}">
+            <name locale="en_US">FILT</name>
+        </pin>
+    </pins>
+</symbol>

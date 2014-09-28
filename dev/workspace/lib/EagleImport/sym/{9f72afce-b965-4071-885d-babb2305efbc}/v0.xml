@@ -1,0 +1,12 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{9f72afce-b965-4071-885d-babb2305efbc}</uuid>
+        <name locale="en_US">AGND</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-2.54" uuid="{ff7d9a04-4b60-4a93-b172-97eef4f5c395}">
+            <name locale="en_US">AGND</name>
+        </pin>
+    </pins>
+</symbol>

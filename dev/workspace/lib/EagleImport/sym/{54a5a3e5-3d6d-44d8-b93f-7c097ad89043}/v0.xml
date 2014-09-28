@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{54a5a3e5-3d6d-44d8-b93f-7c097ad89043}</uuid>
+        <name locale="en_US">TL770X</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="12.7" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="-12.7" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-12.7" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="2.54" angle="0" y="7.62" uuid="{3f2a0a07-c75b-40b2-9551-1c9184c32adc}">
+            <name locale="en_US">+VS</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-5.08" uuid="{2a0bf9af-2301-4b6b-8b8d-8ce02b4a60c6}">
+            <name locale="en_US">CT</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="2.54" uuid="{016a7e35-3368-403c-a98b-16d07d83d6e9}">
+            <name locale="en_US">SENSE</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="0" uuid="{996bce3e-9c0b-429d-b897-e22d65b561e3}">
+            <name locale="en_US">!RESIN</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-10.16" uuid="{381f5f37-750a-4df6-9785-202b19ec5589}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="5.08" uuid="{c52b5737-1e8d-46f8-bb57-d63b35024a5f}">
+            <name locale="en_US">RESET</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="0" uuid="{04dc28a8-8908-41e4-a984-2cf791b61f2c}">
+            <name locale="en_US">!RESET</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-7.62" uuid="{5eb0ccbc-8f1f-45ea-aa85-3033e1d415a7}">
+            <name locale="en_US">REF</name>
+        </pin>
+    </pins>
+</symbol>

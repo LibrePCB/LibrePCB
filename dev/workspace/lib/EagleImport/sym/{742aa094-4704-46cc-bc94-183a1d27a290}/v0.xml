@@ -1,0 +1,76 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{742aa094-4704-46cc-bc94-183a1d27a290}</uuid>
+        <name locale="en_US">TLV320AC</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="20.32" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="15.24" end_y="20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="20.32" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="15.24" end_y="-20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="-20.32" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="-15.24" end_y="-20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="-20.32" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="-15.24" end_y="20.32"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-17.78" length="2.54" angle="0" y="17.78" uuid="{01f765cd-82e7-466e-a017-c00dcf3a688b}">
+            <name locale="en_US">!PDN</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-10.16" uuid="{b907d435-e168-4949-85b5-3a0bd4d7a6ef}">
+            <name locale="en_US">EARA</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-12.7" uuid="{5abb2d21-2d8b-4895-aee3-12b54bcaaf53}">
+            <name locale="en_US">EARB</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-15.24" uuid="{2425d2b7-63d6-40a9-b487-855a320b20e5}">
+            <name locale="en_US">EARGS</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="12.7" uuid="{2760a598-883d-4266-8860-5ac0163ad0fc}">
+            <name locale="en_US">!MICMUTE</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-5.08" uuid="{0706b8b8-82fc-4efc-addc-1f76855c6afa}">
+            <name locale="en_US">DCLKR</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-17.78" uuid="{cbb1c7f1-f811-4724-83a6-08bb3f90675e}">
+            <name locale="en_US">DIN</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-12.7" uuid="{b1f56a2c-f20b-45a8-849a-7f38f0b4789b}">
+            <name locale="en_US">FSR</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-17.78" uuid="{1ea89471-700a-4d97-92dd-21f209fa5145}">
+            <name locale="en_US">!EARMUTE</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-2.54" uuid="{6bfae367-6880-42bf-a859-bfbeaae603d4}">
+            <name locale="en_US">CLK</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="7.62" uuid="{9a26b675-d682-4e69-bc6d-ac1ea95f0e65}">
+            <name locale="en_US">FSX</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="12.7" uuid="{9fa060f9-3025-4ee7-9039-b830c1f66dfa}">
+            <name locale="en_US">DOUT</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="0" uuid="{ea42c6d5-e29a-4841-9712-495fdbc87297}">
+            <name locale="en_US">!TSX-DCLKX</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="17.78" uuid="{fed7f3f0-daaa-49f1-a94a-2965e2d19751}">
+            <name locale="en_US">!LINSEL</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="0" uuid="{61b36184-d2d0-49a0-a3ee-0316755ae265}">
+            <name locale="en_US">VMID</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="10.16" uuid="{78af1dba-7893-4ca3-9071-f79f3e944c69}">
+            <name locale="en_US">MICIN</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="5.08" uuid="{0cb651d7-0ade-4e68-a55b-5fff98c36beb}">
+            <name locale="en_US">MICGS</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-2.54" uuid="{829cc5f1-2e40-4b94-a13e-996be596f721}">
+            <name locale="en_US">MICBIAS</name>
+        </pin>
+    </pins>
+</symbol>

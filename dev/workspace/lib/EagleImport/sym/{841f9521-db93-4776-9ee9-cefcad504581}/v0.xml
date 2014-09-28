@@ -1,0 +1,79 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{841f9521-db93-4776-9ee9-cefcad504581}</uuid>
+        <name locale="en_US">XC5VLX110T_FF1738-IO-E</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="12.7" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-48.26"/>
+        </polygon>
+        <polygon fill="false" start_y="-48.26" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="0" end_y="-48.26"/>
+        </polygon>
+        <polygon fill="false" start_y="-48.26" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{3668c1dc-bf5a-4b5d-bdad-b4d11862cb9d}">
+            <name locale="en_US">IO_E5</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{9f4eb2be-96d0-4737-8c40-01ff3c42b41c}">
+            <name locale="en_US">IO_E7</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{1c4fcd82-c88c-4177-9a47-10737e6411ed}">
+            <name locale="en_US">IO_E8</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{e62b2d47-6a8d-4650-ab5f-2cc2adc9542f}">
+            <name locale="en_US">IO_E9</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{b041e2f7-96b2-42c3-b1c3-1e6cfa572765}">
+            <name locale="en_US">IO_E10</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-12.7" uuid="{0a2aefea-5933-4b29-b13c-e5bc3665ad98}">
+            <name locale="en_US">IO_E12</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-15.24" uuid="{925a8fb9-89d3-4ce0-b6a5-38682880d565}">
+            <name locale="en_US">IO_E13</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-17.78" uuid="{d3fed008-cc48-4096-bbfb-32a8c1c70707}">
+            <name locale="en_US">IO_E14</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-20.32" uuid="{42da7163-d706-4c4f-944b-d99e59e26a01}">
+            <name locale="en_US">IO_E15</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-22.86" uuid="{0812e06a-898d-4f18-a8e1-af292d046a7b}">
+            <name locale="en_US">IO_E17</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-25.4" uuid="{e3b82a0d-b679-43a4-a15c-9a7aa859759d}">
+            <name locale="en_US">IO_E18</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-27.94" uuid="{a55b732e-f417-4702-b15c-9c8720575b5f}">
+            <name locale="en_US">IO_E32</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-30.48" uuid="{f5d735a3-f489-4692-a5a2-c80bca46c93d}">
+            <name locale="en_US">IO_E33</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-33.02" uuid="{9aa3d8a3-e572-418b-8a7b-32b4dc873f92}">
+            <name locale="en_US">IO_E34</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-35.56" uuid="{4ac9c9eb-71b3-41cd-adb4-12b59d066d05}">
+            <name locale="en_US">IO_E35</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-38.1" uuid="{e590d331-20e6-4ff4-9f37-471e23812c67}">
+            <name locale="en_US">IO_E37</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-40.64" uuid="{f75e8a2c-748d-4ac4-a211-3f35c0cda409}">
+            <name locale="en_US">IO_E38</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-43.18" uuid="{53ab4fa5-9bb4-423a-afb0-1a650fc7cbca}">
+            <name locale="en_US">IO_E39</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-45.72" uuid="{610f95b3-ff75-43ee-a008-f0f1782fcc5e}">
+            <name locale="en_US">IO_E40</name>
+        </pin>
+    </pins>
+</symbol>

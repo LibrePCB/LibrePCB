@@ -1,0 +1,82 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{06b3b7c6-6d86-4952-8afc-8d28780f5a79}</uuid>
+        <name locale="en_US">HCPL-7800</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="15.24" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="15.24" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="-12.7" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-12.7" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="-3.81">
+            <segment type="line" end_x="-2.54" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="-3.81">
+            <segment type="line" end_x="-2.54" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="7.239" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="-7.239"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.239" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="0" end_y="-5.207"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.207" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="5.207"/>
+        </polygon>
+        <polygon fill="false" start_y="5.207" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="-2.54" end_y="7.239"/>
+        </polygon>
+        <polygon fill="false" start_y="3.175" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="6.35" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="6.35">
+            <segment type="line" end_x="2.54" end_y="-3.175"/>
+        </polygon>
+        <polygon fill="false" start_y="-3.175" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="3.175"/>
+        </polygon>
+        <polygon fill="false" start_y="2.032" width="0.1524" layer="10" start_x="0.635">
+            <segment type="line" end_x="1.905" end_y="1.143"/>
+        </polygon>
+        <polygon fill="false" start_y="0.762" width="0.1524" layer="10" start_x="0.635">
+            <segment type="line" end_x="1.905" end_y="-0.127"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.508" width="0.1524" layer="10" start_x="0.635">
+            <segment type="line" end_x="1.905" end_y="-1.397"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="2.54" angle="0" y="7.62" uuid="{0ed6c28f-ceae-4019-a3cf-9f28a857ab2f}">
+            <name locale="en_US">VDD1</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-7.62" uuid="{5202bc66-c27e-4ae9-bf4d-3937f7bde432}">
+            <name locale="en_US">GND1</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="2.54" uuid="{b5e4ff58-c4d5-458c-a6d7-9f80eeec9aa4}">
+            <name locale="en_US">VIN+</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-2.54" uuid="{7365412f-1256-41cc-b929-91362905e3cd}">
+            <name locale="en_US">VIN-</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="2.54" uuid="{84228103-f279-4943-b4ed-1aa70894439c}">
+            <name locale="en_US">VOUT+</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-2.54" uuid="{11b3ce0e-fa68-4432-99f1-1ae66443bcdf}">
+            <name locale="en_US">VOUT-</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="7.62" uuid="{c14e9061-5527-4283-8a4e-e57e96866e3e}">
+            <name locale="en_US">VDD2</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-7.62" uuid="{eeda5163-1adb-440a-a4d3-6402842d4995}">
+            <name locale="en_US">GND2</name>
+        </pin>
+    </pins>
+</symbol>

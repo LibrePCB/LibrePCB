@@ -1,0 +1,106 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{8475defe-c5dc-4788-b808-129914115f4a}</uuid>
+        <name locale="en_US">T5684</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="25.4" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="25.4"/>
+        </polygon>
+        <polygon fill="false" start_y="25.4" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="25.4"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="5.08" angle="0" y="22.86" uuid="{dd65fc28-5a68-4785-be67-ee2062fe144b}">
+            <name locale="en_US">LCLK</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="20.32" uuid="{64ce5dc8-9950-4e6e-880b-369f479ac282}">
+            <name locale="en_US">TCLK</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="17.78" uuid="{1a34cee1-2bff-4f48-9be4-7231e9fa0c64}">
+            <name locale="en_US">TPOS</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="15.24" uuid="{259ea452-8ebb-4921-abce-18476fa31e45}">
+            <name locale="en_US">TNEG</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="12.7" uuid="{997af55d-3e8a-4726-afd7-af111faf7cf8}">
+            <name locale="en_US">MODE</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="10.16" uuid="{f5c2d995-63da-464b-993f-006b02933868}">
+            <name locale="en_US">PD</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="7.62" uuid="{b823d688-a1c6-4eca-836b-4588d8168217}">
+            <name locale="en_US">CLKDS</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="5.08" uuid="{bec9a193-e2b1-42e6-88f5-e774fa76b56a}">
+            <name locale="en_US">MTIP</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="2.54" uuid="{15f6b269-437c-4271-a068-8c8039add587}">
+            <name locale="en_US">MRING</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="0" uuid="{39b1f41a-1873-48c5-8bcc-b8a37a189d14}">
+            <name locale="en_US">RTIP</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-2.54" uuid="{a708a84c-4dce-4267-b613-72d7276922e1}">
+            <name locale="en_US">RRING</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-5.08" uuid="{0771a46c-dcff-489a-91b0-ebb1c07ee41e}">
+            <name locale="en_US">LEN0</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-7.62" uuid="{2e707757-259e-4289-abcf-8082ef1f18b8}">
+            <name locale="en_US">LEN1</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-10.16" uuid="{320f5b3c-d893-45a1-b211-fcb150b89e1f}">
+            <name locale="en_US">LEN2</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-12.7" uuid="{33e714fb-ddfc-4977-b637-bb67a7b2065f}">
+            <name locale="en_US">TAOS</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-15.24" uuid="{edddaeb8-7377-4e9f-90bb-8f95ed50bf1c}">
+            <name locale="en_US">TEST</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="22.86" uuid="{e9fe5a5a-e8de-4cae-aa7b-6f01ed08aaca}">
+            <name locale="en_US">RPOS</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="20.32" uuid="{735b5718-ccde-4c18-9ef7-ddbcca26638b}">
+            <name locale="en_US">RNEG</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="17.78" uuid="{76aa4a01-b442-43f7-a284-b0687265b4a3}">
+            <name locale="en_US">RCLK</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="15.24" uuid="{4a62ef44-3b44-4265-9641-a5f6175ce743}">
+            <name locale="en_US">DPM</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="12.7" uuid="{3aec94cd-5128-4b08-8995-39182cbe2493}">
+            <name locale="en_US">LOS</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="10.16" uuid="{d8f838b6-2f9c-45e2-bdc1-fb8d0a7eba10}">
+            <name locale="en_US">TTIP</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="7.62" uuid="{cb775a10-382b-4a19-8564-be43c35aa040}">
+            <name locale="en_US">TRING</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="2.54" uuid="{546a40b6-69f7-45c2-963c-abf0c6ecdb73}">
+            <name locale="en_US">NC</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-15.24" uuid="{881333db-2662-4017-a508-89966befaf7a}">
+            <name locale="en_US">RGND</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-12.7" uuid="{419ed7b0-51d6-4262-b4b1-8a5abc97f507}">
+            <name locale="en_US">TGND</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-10.16" uuid="{0ddbfab7-0ebb-4b13-8618-0bbb674dca06}">
+            <name locale="en_US">RVDD</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-7.62" uuid="{c2a35102-307e-4d64-90c9-cafb21d104d2}">
+            <name locale="en_US">TVDD</name>
+        </pin>
+    </pins>
+</symbol>

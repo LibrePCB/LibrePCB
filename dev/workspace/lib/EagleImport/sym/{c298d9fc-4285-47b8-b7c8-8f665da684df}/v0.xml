@@ -1,0 +1,19 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{c298d9fc-4285-47b8-b7c8-8f665da684df}</uuid>
+        <name locale="en_US">SWITCH-NO</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="2.54" end_y="0.889"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{27f69120-b53d-4a49-9b82-54815c654f6f}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="0" uuid="{e8560685-5865-4f8d-baf2-de6c829b05cd}">
+            <name locale="en_US">2</name>
+        </pin>
+    </pins>
+</symbol>

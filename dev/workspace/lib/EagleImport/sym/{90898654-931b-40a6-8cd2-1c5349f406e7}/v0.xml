@@ -1,0 +1,73 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{90898654-931b-40a6-8cd2-1c5349f406e7}</uuid>
+        <name locale="en_US">ML4624</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="20.32" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="12.7" end_y="20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="20.32" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="12.7" end_y="-22.86"/>
+        </polygon>
+        <polygon fill="false" start_y="-22.86" width="0.254" layer="10" start_x="12.7">
+            <segment type="line" end_x="-12.7" end_y="-22.86"/>
+        </polygon>
+        <polygon fill="false" start_y="-22.86" width="0.254" layer="10" start_x="-12.7">
+            <segment type="line" end_x="-12.7" end_y="20.32"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="2.54" angle="0" y="2.54" uuid="{61e0ef55-a9d2-4b38-9a78-cea1606b209f}">
+            <name locale="en_US">VIN+</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-2.54" uuid="{928225e4-e69d-4897-88e0-0f29b96a11b3}">
+            <name locale="en_US">VIN-</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-7.62" uuid="{2eb5cae8-f88d-43a3-b096-14848effc373}">
+            <name locale="en_US">VDC</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-12.7" uuid="{9f41c55a-7e68-4732-b33a-b28fc5324abe}">
+            <name locale="en_US">VREF</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="-17.78" uuid="{0ae03ff6-1f43-4ed1-bc63-d2fdda789e7f}">
+            <name locale="en_US">VTHADJ</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="17.78" uuid="{10cbb8d3-c389-4b53-8188-b04689ff6562}">
+            <name locale="en_US">CTIMER</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="12.7" uuid="{4840522b-5c4a-47d8-b203-6eb7ac24ac36}">
+            <name locale="en_US">CF1</name>
+        </pin>
+        <pin x="-15.24" length="2.54" angle="0" y="7.62" uuid="{f37c937e-767b-4909-baab-e3005de2d561}">
+            <name locale="en_US">CF2</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="10.16" uuid="{15a9c650-2267-4573-b5b2-04878ccf7eb5}">
+            <name locale="en_US">ECL+</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="5.08" uuid="{5ed52a25-647a-458d-a571-5300d2296e47}">
+            <name locale="en_US">ECL-</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="0" uuid="{8a7cd462-dd35-4bd6-9e89-0f958d3ec857}">
+            <name locale="en_US">TTLOUT</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-5.08" uuid="{e252b209-359b-4b20-992c-b5cc425c2c06}">
+            <name locale="en_US">!CMPENABLE</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-10.16" uuid="{c2639fdc-ac7d-4a60-a8c4-a61707b7ea35}">
+            <name locale="en_US">!TTLMON</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="15.24" uuid="{196775e9-3600-466c-b20b-646f6115d9f2}">
+            <name locale="en_US">VCC@TTL</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="17.78" uuid="{9ba19e76-06fe-4d16-bf96-252b084500aa}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-20.32" uuid="{6d6b8a36-6947-4385-8dc1-fa7628dc0f18}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="180" y="-17.78" uuid="{791b2650-6257-418a-ac44-2d02a7ff52c4}">
+            <name locale="en_US">GND@TTL</name>
+        </pin>
+    </pins>
+</symbol>

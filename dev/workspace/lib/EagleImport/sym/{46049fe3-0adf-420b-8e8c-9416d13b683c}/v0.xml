@@ -1,0 +1,94 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{46049fe3-0adf-420b-8e8c-9416d13b683c}</uuid>
+        <name locale="en_US">DSP56F807-ANA</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="25.4" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="10.16" end_y="25.4"/>
+        </polygon>
+        <polygon fill="false" start_y="25.4" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-27.94"/>
+        </polygon>
+        <polygon fill="false" start_y="-27.94" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-7.62" end_y="-27.94"/>
+        </polygon>
+        <polygon fill="false" start_y="-27.94" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="25.4"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="12.7" length="2.54" angle="180" y="15.24" uuid="{be3f98ed-9892-4131-af13-239064537dd4}">
+            <name locale="en_US">ANA0</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="12.7" uuid="{e0f3aa64-321a-4cdd-bf83-cb6e63623848}">
+            <name locale="en_US">ANA1</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="10.16" uuid="{fa9ff6fb-741f-4b93-9e0e-9f014fc67bcd}">
+            <name locale="en_US">ANA2</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="7.62" uuid="{462c35e0-a1b3-4f1f-b613-a5c45753fd63}">
+            <name locale="en_US">ANA3</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="5.08" uuid="{180d25a9-8ed2-40f9-82a7-bc6b7ea17396}">
+            <name locale="en_US">ANA4</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="2.54" uuid="{c306d2fd-20a4-4e9e-877d-f11fab691d65}">
+            <name locale="en_US">ANA5</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="0" uuid="{e3656cb4-0fe2-4ee1-81ae-45a4eca643ab}">
+            <name locale="en_US">ANA6</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-2.54" uuid="{57041886-502d-4fb6-b1c3-85d9f2d246c7}">
+            <name locale="en_US">ANA7</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-7.62" uuid="{90ecde04-c211-4a9a-acbe-ff3bfe6b2f60}">
+            <name locale="en_US">ANB0</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-10.16" uuid="{49438e62-ba1d-4eaa-9056-82028e2d5060}">
+            <name locale="en_US">ANB1</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-12.7" uuid="{0631b754-8e17-4284-b6af-4af7481db78b}">
+            <name locale="en_US">ANB2</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-15.24" uuid="{575d66e6-a21f-487c-ab33-85bb4ce99a6e}">
+            <name locale="en_US">ANB3</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-17.78" uuid="{663af02f-f3b0-4a8c-9044-fbcef52150a5}">
+            <name locale="en_US">ANB4</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-20.32" uuid="{4e227cd0-2130-4d2f-8ce3-46e4b173053d}">
+            <name locale="en_US">ANB5</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-22.86" uuid="{aea956ab-f488-4909-b09e-696a7bd15c47}">
+            <name locale="en_US">ANB6</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-25.4" uuid="{31bd12f6-b0d5-445a-8af4-579f5affd8d9}">
+            <name locale="en_US">ANB7</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="22.86" uuid="{c4aaef05-2c52-4fc9-9d45-c06600a2b7f6}">
+            <name locale="en_US">VREF</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="20.32" uuid="{e17b8e70-e114-456b-a531-882d456dd36f}">
+            <name locale="en_US">VREF2</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="17.78" uuid="{ef867b7c-a619-4714-83b2-1bfe29a7747f}">
+            <name locale="en_US">VDDA</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="15.24" uuid="{c1b04bdc-b196-43cc-a7f0-e7cebbd1abdb}">
+            <name locale="en_US">VDDA@1</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="12.7" uuid="{37e43536-f0b3-4a33-8f2c-257c1e2cef6d}">
+            <name locale="en_US">VDDA@2</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-5.08" uuid="{9c38bab2-eb10-499b-aa55-0a5464b46b26}">
+            <name locale="en_US">VSSA</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-7.62" uuid="{aaee3ee7-54bf-4fde-abc0-211543b34d26}">
+            <name locale="en_US">VSSA@1</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-10.16" uuid="{d2fb7ee4-565e-4ba7-a4bb-edabe7ae8b4b}">
+            <name locale="en_US">VSSA@2</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,19 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{b058f926-feff-4c07-a9a5-5576235a346d}</uuid>
+        <name locale="en_US">PAD</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.016" width="0.254" layer="10" start_x="-1.016">
+            <segment type="line" end_x="1.016" end_y="-1.016"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.016" width="0.254" layer="10" start_x="-1.016">
+            <segment type="line" end_x="1.016" end_y="1.016"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="2.54" length="2.54" angle="180" y="0" uuid="{d06a5a80-489f-4bda-a090-fce42ecc8412}">
+            <name locale="en_US">P</name>
+        </pin>
+    </pins>
+</symbol>

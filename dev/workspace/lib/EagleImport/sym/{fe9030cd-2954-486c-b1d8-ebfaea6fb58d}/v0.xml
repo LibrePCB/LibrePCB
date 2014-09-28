@@ -1,0 +1,52 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{fe9030cd-2954-486c-b1d8-ebfaea6fb58d}</uuid>
+        <name locale="en_US">TC1796P6</name>
+    </meta>
+    <geometry>
+        <polygon fill="true" start_y="-29.21" width="0.254" layer="10" start_x="-1.27">
+            <segment type="line" end_x="0" end_y="-29.21"/>
+            <segment type="line" end_x="0" end_y="1.27"/>
+            <segment type="line" end_x="-1.27" end_y="1.27"/>
+            <segment type="line" end_x="-1.27" end_y="-29.21"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="5.08" length="5.08" angle="180" y="0" uuid="{13e4a25f-6886-47a7-8446-bccb56e9bcf4}">
+            <name locale="en_US">P6.15</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-2.54" uuid="{465b295e-1f97-4057-94c7-b15d60e6d4fc}">
+            <name locale="en_US">P6.14</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-5.08" uuid="{7f6d4efb-75d4-4585-b615-bc21e0842357}">
+            <name locale="en_US">P6.13</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-7.62" uuid="{fb007d40-9a9d-44db-bf7e-c11f0ebf30fe}">
+            <name locale="en_US">P6.12</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-27.94" uuid="{6fc37ceb-1085-4fb9-b475-b0988237b251}">
+            <name locale="en_US">P6.4</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-25.4" uuid="{645df4d8-c883-434c-a470-f134fd443be3}">
+            <name locale="en_US">P6.5</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-22.86" uuid="{ba1306d7-39b3-47ac-8445-18c6620afd33}">
+            <name locale="en_US">P6.6</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-20.32" uuid="{fb26eeed-4da1-459a-8b58-961719e5381c}">
+            <name locale="en_US">P6.7</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-17.78" uuid="{01431c05-5a43-4051-a860-0f2589be90e4}">
+            <name locale="en_US">P6.8</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-15.24" uuid="{442a1d71-e646-4ade-b030-97a4c12f0919}">
+            <name locale="en_US">P6.9</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-12.7" uuid="{b553b4ff-40ad-40b5-b837-ad4a9f6bc96d}">
+            <name locale="en_US">P6.10</name>
+        </pin>
+        <pin x="5.08" length="5.08" angle="180" y="-10.16" uuid="{e7f20409-0230-4291-a2e2-6c2420a942f0}">
+            <name locale="en_US">P6.11</name>
+        </pin>
+    </pins>
+</symbol>

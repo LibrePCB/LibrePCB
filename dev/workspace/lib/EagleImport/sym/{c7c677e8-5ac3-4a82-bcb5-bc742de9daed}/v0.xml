@@ -1,0 +1,30 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{c7c677e8-5ac3-4a82-bcb5-bc742de9daed}</uuid>
+        <name locale="en_US">PWR5+2</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="0" length="7.62" angle="270" y="10.16" uuid="{02117aa3-8280-431a-8478-763c48cd37ac}">
+            <name locale="en_US">VDD</name>
+        </pin>
+        <pin x="2.54" length="7.62" angle="270" y="10.16" uuid="{1f3889d8-8a89-42ae-b668-138d71b0990c}">
+            <name locale="en_US">AVDD</name>
+        </pin>
+        <pin x="0" length="7.62" angle="90" y="-10.16" uuid="{63de966a-1631-49fe-872b-769cb2cdc3b4}">
+            <name locale="en_US">VSS@0</name>
+        </pin>
+        <pin x="2.54" length="7.62" angle="90" y="-10.16" uuid="{1d0d7c77-0728-45f7-b09c-e45d0ae5c8f0}">
+            <name locale="en_US">VSS@1</name>
+        </pin>
+        <pin x="5.08" length="7.62" angle="90" y="-10.16" uuid="{e2e86dc3-410e-4f90-a0d7-fd36082d36cf}">
+            <name locale="en_US">AVSS</name>
+        </pin>
+        <pin x="7.62" length="7.62" angle="270" y="10.16" uuid="{7cfb6f29-62ae-4c95-a903-68221619333e}">
+            <name locale="en_US">VREF</name>
+        </pin>
+        <pin x="7.62" length="7.62" angle="90" y="-10.16" uuid="{24928acc-3749-4321-b14b-6013647e0a5a}">
+            <name locale="en_US">AVREF-</name>
+        </pin>
+    </pins>
+</symbol>

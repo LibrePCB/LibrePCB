@@ -1,0 +1,52 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{d80a6ca1-edcd-42f2-873d-c53745420680}</uuid>
+        <name locale="en_US">MAX1759</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="7.62" uuid="{2eae88df-d00c-429e-9ef1-23cb092190db}">
+            <name locale="en_US">IN@1</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{3df96446-e4d5-4c8b-98b2-c918055e1807}">
+            <name locale="en_US">IN@2</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-10.16" uuid="{0b765ba8-501a-4bb5-b609-fe19d91381ff}">
+            <name locale="en_US">!SHDN</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-2.54" uuid="{f708e489-d482-4c53-bf87-3e15ce38f84d}">
+            <name locale="en_US">POK</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-7.62" uuid="{bcee6c98-1c63-4f6b-8315-c8a3f8ef40cf}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="2.54" uuid="{f5bb8e97-ac18-4e1a-8d80-45f731035a1a}">
+            <name locale="en_US">FB</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="7.62" uuid="{4e6bc1fe-fc9a-4a8f-a19b-3a391a10dc79}">
+            <name locale="en_US">OUT</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-10.16" uuid="{39692142-b621-4f75-8168-1787ff0f8e3b}">
+            <name locale="en_US">PGND</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{4ef17dca-bc5d-4ca0-b03a-2df2a0b81722}">
+            <name locale="en_US">CXP</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{96aaebfa-8b44-444f-986d-d82c792674d5}">
+            <name locale="en_US">CXN</name>
+        </pin>
+    </pins>
+</symbol>

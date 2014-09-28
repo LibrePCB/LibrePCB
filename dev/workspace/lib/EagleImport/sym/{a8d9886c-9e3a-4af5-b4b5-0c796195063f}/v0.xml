@@ -1,0 +1,18 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{a8d9886c-9e3a-4af5-b4b5-0c796195063f}</uuid>
+        <name locale="en_US">2VCC1VEE</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="0" length="5.08" angle="90" y="-7.62" uuid="{9934bcb0-c5c6-456b-9f2e-02d4cd41f34b}">
+            <name locale="en_US">VEE</name>
+        </pin>
+        <pin x="0" length="5.08" angle="270" y="7.62" uuid="{1da575b3-8ec9-4692-86f2-ddca40db8a6f}">
+            <name locale="en_US">VCC@1</name>
+        </pin>
+        <pin x="2.54" length="5.08" angle="270" y="7.62" uuid="{4da39d06-fc94-4c3c-a944-ad0de0e068df}">
+            <name locale="en_US">VCC@2</name>
+        </pin>
+    </pins>
+</symbol>

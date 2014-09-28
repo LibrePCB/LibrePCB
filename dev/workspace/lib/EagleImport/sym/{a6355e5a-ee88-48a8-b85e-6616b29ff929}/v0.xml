@@ -1,0 +1,40 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{a6355e5a-ee88-48a8-b85e-6616b29ff929}</uuid>
+        <name locale="en_US">MC10134</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="-7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="12.7" length="5.08" angle="180" y="5.08" uuid="{461ed9c8-5ae7-4d01-8fea-90cc077ff564}">
+            <name locale="en_US">Q</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-5.08" uuid="{50b0d6f8-aea4-4d6c-a383-63fa5b2be9b8}">
+            <name locale="en_US">!Q</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="5.08" uuid="{7bdd9e63-42b4-4be8-aacd-fd68360848a8}">
+            <name locale="en_US">D1</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="2.54" uuid="{112c494d-fcf3-4df9-ad4d-41bec9fcf7e7}">
+            <name locale="en_US">D2</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="0" uuid="{94b7fbea-6497-4f33-9196-836fe37ad29d}">
+            <name locale="en_US">A-SEL</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-5.08" uuid="{0b7218c7-7a1d-4360-aab7-ca95408d1d3d}">
+            <name locale="en_US">CE</name>
+        </pin>
+    </pins>
+</symbol>

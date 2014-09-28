@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{ac265e38-31f4-4a2b-bf06-aa304242c50e}</uuid>
+        <name locale="en_US">ISO122</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-12.7" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-12.7"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="5.08" angle="0" y="12.7" uuid="{dd241e21-10e4-418c-84dc-1a8d60042c3a}">
+            <name locale="en_US">VIN</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="12.7" uuid="{4147df4d-9625-4125-a158-d18dd4792221}">
+            <name locale="en_US">VOUT</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="7.62" uuid="{650c8e1c-a909-435c-b32c-860ab698bd41}">
+            <name locale="en_US">+VS1</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="5.08" uuid="{742d120c-67dd-4835-9985-a51315e8200d}">
+            <name locale="en_US">-VS1</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="0" uuid="{11520518-774c-4355-a089-da8fabab8536}">
+            <name locale="en_US">+VS2</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-2.54" uuid="{6afeb1e0-b74a-4dce-acca-a60e8266d893}">
+            <name locale="en_US">-VS2</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-7.62" uuid="{69f593f5-4584-484d-8176-fee742963f2d}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-10.16" uuid="{d8209835-fbfb-421c-9e2d-e49188626ab1}">
+            <name locale="en_US">GND@1</name>
+        </pin>
+    </pins>
+</symbol>

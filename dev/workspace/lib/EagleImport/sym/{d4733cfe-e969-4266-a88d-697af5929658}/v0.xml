@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{d4733cfe-e969-4266-a88d-697af5929658}</uuid>
+        <name locale="en_US">MAX667</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-10.16" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="-10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="-10.16" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="12.7" length="5.08" angle="180" y="-7.62" uuid="{6d28753d-55cc-44b3-8888-56893e0654d6}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="7.62" uuid="{48922a7d-9433-4beb-8ad5-bf563df0a04c}">
+            <name locale="en_US">IN</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="-2.54" uuid="{67063c4c-ed17-4c99-917c-f52e025569d2}">
+            <name locale="en_US">LBO</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="7.62" uuid="{02fcea3d-4c0a-45ab-883a-724ee21beb8a}">
+            <name locale="en_US">OUT</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="2.54" uuid="{ccfee3ee-a64e-450e-811e-f8d7e1649717}">
+            <name locale="en_US">DD</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="5.08" uuid="{511490b2-1164-460c-8b3b-14c5831c7f58}">
+            <name locale="en_US">SHDN</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-7.62" uuid="{cacbeea1-260e-46af-a268-f5d604819ed8}">
+            <name locale="en_US">SET</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-2.54" uuid="{cbf823fd-3656-42b6-ba2d-ce169801f958}">
+            <name locale="en_US">LBI</name>
+        </pin>
+    </pins>
+</symbol>

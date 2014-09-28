@@ -1,0 +1,76 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{1e93b06a-aa5e-4125-b68b-b26078d3ee5e}</uuid>
+        <name locale="en_US">K200-CTR</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-62.23" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="-20.32" uuid="{4733f4c4-1ad4-44f7-8687-847536af3e15}">
+            <name locale="en_US">/CE</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{c06d6bf9-b4cd-490f-b120-c0baf90b72f3}">
+            <name locale="en_US">/CEO</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{c07d7da0-f8ab-45e5-a699-3aff67ed4dc7}">
+            <name locale="en_US">/CONFIG</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{5867f9ba-69bc-4aeb-8873-92b4954f731c}">
+            <name locale="en_US">/STATUS</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{184501b8-9258-4357-9baf-b8ff370923e2}">
+            <name locale="en_US">CONF_DONE</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-25.4" uuid="{6b8b067a-cf8f-4fb3-bb0e-4799d29642cc}">
+            <name locale="en_US">DATA0</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-22.86" uuid="{8326b552-ec77-440b-84ee-5927106bce03}">
+            <name locale="en_US">DCLK</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-58.42" uuid="{15c05bc2-3092-43c5-86cd-cc132ce10695}">
+            <name locale="en_US">GCLK</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-60.96" uuid="{a0585edc-58d4-4a4f-8760-b2459b1bbb83}">
+            <name locale="en_US">GCLK1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-45.72" uuid="{47534b90-f15c-4f53-abeb-3d800126e438}">
+            <name locale="en_US">IN0</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-48.26" uuid="{fda22947-4e5d-4d9f-b1fb-b00537dc5119}">
+            <name locale="en_US">IN1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-50.8" uuid="{b83045ed-8822-4c02-a4fe-866543c309b0}">
+            <name locale="en_US">IN2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-53.34" uuid="{a70d70e4-18b4-4f0b-b47b-7d09733e544d}">
+            <name locale="en_US">IN3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-17.78" uuid="{a729f0ea-1582-436d-bf0a-491439d2ea11}">
+            <name locale="en_US">MSEL0</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-15.24" uuid="{6c30e11c-42c4-4cbc-bff7-2203d2c6b834}">
+            <name locale="en_US">MSEL1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-30.48" uuid="{f5648b38-d785-4cd5-9b5d-5c8380d2c59f}">
+            <name locale="en_US">TCK</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-40.64" uuid="{0c8e16c3-d25a-4965-bcf4-694bb0453a61}">
+            <name locale="en_US">TDI</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-33.02" uuid="{e97750aa-c467-44f3-b4e2-e2542bc20267}">
+            <name locale="en_US">TDO</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-35.56" uuid="{b75ce550-a4cd-4655-81cd-4cd75a3c446e}">
+            <name locale="en_US">TMS</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-38.1" uuid="{26165694-e2db-4ce0-b96e-c66a9f560f29}">
+            <name locale="en_US">TRST</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{cb0bc670-6bec-45a6-99ba-57bac3edb093}">
+            <name locale="en_US">VCC_CKLK</name>
+        </pin>
+    </pins>
+</symbol>

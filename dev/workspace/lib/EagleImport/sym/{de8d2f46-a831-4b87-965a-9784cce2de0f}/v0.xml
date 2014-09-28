@@ -1,0 +1,24 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{de8d2f46-a831-4b87-965a-9784cce2de0f}</uuid>
+        <name locale="en_US">NC5</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="0" length="7.62" angle="270" y="10.16" uuid="{dc3203cc-a9c3-4ca2-9006-bdd1fb131573}">
+            <name locale="en_US">NC@0</name>
+        </pin>
+        <pin x="2.54" length="7.62" angle="270" y="10.16" uuid="{526a2e51-dae0-437a-84c7-52977b88573c}">
+            <name locale="en_US">NC@1</name>
+        </pin>
+        <pin x="-2.54" length="7.62" angle="90" y="-10.16" uuid="{c6930a49-398b-457f-88b6-739f252214c1}">
+            <name locale="en_US">NC@2</name>
+        </pin>
+        <pin x="2.54" length="7.62" angle="90" y="-10.16" uuid="{ace9f0ad-5bee-43d0-910b-50d91eb06ed2}">
+            <name locale="en_US">NC@3</name>
+        </pin>
+        <pin x="0" length="7.62" angle="90" y="-10.16" uuid="{c53dbbf3-f814-4000-b87e-24f78b6f8af7}">
+            <name locale="en_US">NC@4</name>
+        </pin>
+    </pins>
+</symbol>

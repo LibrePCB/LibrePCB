@@ -1,0 +1,19 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{9a7b5dc6-8494-4b9f-a73c-b0ebf8ead008}</uuid>
+        <name locale="en_US">VCCINT</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-1.905" width="0.254" layer="10" start_x="1.27">
+            <segment type="line" end_x="0" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="-1.27" end_y="-1.905"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-2.54" uuid="{f85b97da-a50e-4437-9b25-16ff25f19c28}">
+            <name locale="en_US">VCCINT</name>
+        </pin>
+    </pins>
+</symbol>

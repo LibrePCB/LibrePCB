@@ -1,0 +1,67 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{d7f0d4f1-3cbf-499b-b4c2-c157b1bda3ae}</uuid>
+        <name locale="en_US">OPAMP2NC</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="3.175" width="0.1524" layer="10" start_x="-1.27">
+            <segment type="line" end_x="-1.27" end_y="1.905"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="-1.905">
+            <segment type="line" end_x="-0.635" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="-1.905">
+            <segment type="line" end_x="-0.635" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="3.8862"/>
+        </polygon>
+        <polygon fill="false" start_y="5.0546" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="2.6162"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.6162" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="2.54" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-3.9116" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="7.62">
+            <segment type="line" end_x="5.1562" end_y="1.3208"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.4064" layer="10" start_x="7.62">
+            <segment type="line" end_x="-2.54" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="5.08" width="0.4064" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.4064" layer="10" start_x="-2.54">
+            <segment type="line" end_x="7.62" end_y="0"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="10.16" length="2.54" angle="180" y="2.54" uuid="{01ad5a8e-9b3d-4c28-a462-69e10dc52de4}">
+            <name locale="en_US">NC</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="270" y="7.62" uuid="{92958a2c-f5ee-48c8-a03c-b6acf731c0bf}">
+            <name locale="en_US">NC@1</name>
+        </pin>
+        <pin x="-7.62" length="5.08" angle="0" y="-2.54" uuid="{6cfc4eca-cad9-4f97-8c60-d5865590a07b}">
+            <name locale="en_US">-IN</name>
+        </pin>
+        <pin x="-7.62" length="5.08" angle="0" y="2.54" uuid="{b4174ec5-6905-45ed-ab9c-961dd500ac8f}">
+            <name locale="en_US">+IN</name>
+        </pin>
+        <pin x="12.7" length="5.08" angle="180" y="0" uuid="{a9a3f092-0a66-4ee8-aaf7-d18af7947a9c}">
+            <name locale="en_US">OUT</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-7.62" uuid="{44108a08-3842-45cb-9269-82275ed40263}">
+            <name locale="en_US">NC@2</name>
+        </pin>
+        <pin x="0" length="2.54" angle="270" y="7.62" uuid="{b2533c45-c6aa-4496-acf3-ce816fa7d49d}">
+            <name locale="en_US">V+</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-7.62" uuid="{fdc87404-6dbc-4c21-be74-38dd39821052}">
+            <name locale="en_US">V-</name>
+        </pin>
+    </pins>
+</symbol>

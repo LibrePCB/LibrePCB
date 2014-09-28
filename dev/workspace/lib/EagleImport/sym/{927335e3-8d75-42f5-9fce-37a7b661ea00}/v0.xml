@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{927335e3-8d75-42f5-9fce-37a7b661ea00}</uuid>
+        <name locale="en_US">A11-672</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-26.67" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{94d40070-6889-439c-8d2d-822bad32b2ce}">
+            <name locale="en_US">IOA1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{59bb6d17-0c4c-47f0-a9f9-72bdc4fc9c83}">
+            <name locale="en_US">IOA2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{dff4870f-e5cd-432f-99ed-092457d67cbc}">
+            <name locale="en_US">IOA3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{cf67658e-8fad-4d61-9b3e-92866f8f40e6}">
+            <name locale="en_US">IOA4</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{5523d196-5c3a-42bb-8720-0e58f303f4d6}">
+            <name locale="en_US">IOA5</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{0ab16e97-b995-4e20-8d40-3a61cc28d1d6}">
+            <name locale="en_US">IOA6</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-15.24" uuid="{f434c64d-deeb-4c64-a332-ff863bf96d75}">
+            <name locale="en_US">IOA7</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-17.78" uuid="{dfa3724a-edb1-4fd8-91dc-00e42b7031b1}">
+            <name locale="en_US">IOA8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-20.32" uuid="{93881a1d-5049-45fb-a2b6-1793fab35905}">
+            <name locale="en_US">IOA9</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-22.86" uuid="{5a5e1653-e9e2-485d-a5a1-3768646785e6}">
+            <name locale="en_US">IOA10</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-25.4" uuid="{56bbcb03-7735-4693-8eae-669648138968}">
+            <name locale="en_US">IOA11</name>
+        </pin>
+    </pins>
+</symbol>

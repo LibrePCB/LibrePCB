@@ -1,0 +1,15 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{d85d823e-f5b9-452b-868a-2306c0bae9cd}</uuid>
+        <name locale="en_US">VCCVSS</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="0" length="2.54" angle="270" y="7.62" uuid="{131ef6cb-a54e-4f27-8628-f98da09678e3}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-7.62" uuid="{71f2d5db-a096-429b-afb8-8827155df26a}">
+            <name locale="en_US">VSS</name>
+        </pin>
+    </pins>
+</symbol>

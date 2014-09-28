@@ -1,0 +1,15 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{18476586-90d7-4ce1-a9c5-6c1278fa4168}</uuid>
+        <name locale="en_US">VSSE_VDD</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="0" length="5.08" angle="270" y="7.62" uuid="{fd55782d-f2f7-4321-b5a2-a460fe227fa8}">
+            <name locale="en_US">VDDE</name>
+        </pin>
+        <pin x="0" length="5.08" angle="90" y="-7.62" uuid="{18904df7-6503-4025-ae95-745830606cfb}">
+            <name locale="en_US">VSSE</name>
+        </pin>
+    </pins>
+</symbol>

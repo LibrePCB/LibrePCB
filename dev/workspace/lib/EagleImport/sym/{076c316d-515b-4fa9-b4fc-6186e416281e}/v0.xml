@@ -1,0 +1,37 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{076c316d-515b-4fa9-b4fc-6186e416281e}</uuid>
+        <name locale="en_US">RCD-24/W/X2</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{5b71f5ca-e39b-4993-895d-f8af1346ca84}">
+            <name locale="en_US">VIN</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{7106d5cf-7490-4a8e-a792-69b3b343643f}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="5.08" uuid="{81b8a582-d0ee-4868-a833-f3bc4e3b7896}">
+            <name locale="en_US">OUT+</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="0" uuid="{d5dc31a2-a095-44e9-af45-d85200f21de4}">
+            <name locale="en_US">OUT-</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{772c7e80-edc8-487f-8fc1-1f5a1c11a3fc}">
+            <name locale="en_US">PWM-ON/OFF</name>
+        </pin>
+    </pins>
+</symbol>

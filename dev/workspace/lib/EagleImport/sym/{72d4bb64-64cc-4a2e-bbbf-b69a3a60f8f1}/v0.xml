@@ -1,0 +1,70 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{72d4bb64-64cc-4a2e-bbbf-b69a3a60f8f1}</uuid>
+        <name locale="en_US">A3946</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="7.62" uuid="{396caa58-f400-4f98-a897-52174fcd3b5a}">
+            <name locale="en_US">VBB</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{944ad47c-d8ae-4724-be5f-56170c98ccf3}">
+            <name locale="en_US">FAULT</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="2.54" uuid="{37386a05-3417-433b-8262-a00f5fa6b896}">
+            <name locale="en_US">IN1</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{0b7464d1-3d0b-458a-b92f-73b175ea8163}">
+            <name locale="en_US">IN2</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-2.54" uuid="{2eb5ad47-17ac-4785-b056-72ce31312930}">
+            <name locale="en_US">RESET</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{99331ac9-47ed-4720-b0b1-3e3de4ad6e48}">
+            <name locale="en_US">DT</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-7.62" uuid="{d83ec69e-b63e-496c-8ef3-89e118f06c63}">
+            <name locale="en_US">VREF</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-10.16" uuid="{3cc22db2-efb3-4355-8ebd-317b6d510a35}">
+            <name locale="en_US">PGND</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-10.16" uuid="{399614f9-8bfe-4fe7-8232-dea434cb12dc}">
+            <name locale="en_US">LGND</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-7.62" uuid="{ad5e2c71-b460-4713-bf70-f6cd07c9f63e}">
+            <name locale="en_US">VREG</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-2.54" uuid="{716dadd7-0438-4cdf-bdd8-6d027942d276}">
+            <name locale="en_US">CP1</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-5.08" uuid="{158c5159-10f0-4660-82a9-9340660e790b}">
+            <name locale="en_US">CP2</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="0" uuid="{02f90ffb-9134-402c-a229-5c4ce38fbb17}">
+            <name locale="en_US">GL</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="5.08" uuid="{707be403-07e0-4c84-b927-588a9256b728}">
+            <name locale="en_US">GH</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="7.62" uuid="{44e581ac-ba11-4946-a9a3-44ab80985759}">
+            <name locale="en_US">BOOT</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="2.54" uuid="{0c1639e2-d295-4bb4-a445-06cf9965f99b}">
+            <name locale="en_US">S</name>
+        </pin>
+    </pins>
+</symbol>

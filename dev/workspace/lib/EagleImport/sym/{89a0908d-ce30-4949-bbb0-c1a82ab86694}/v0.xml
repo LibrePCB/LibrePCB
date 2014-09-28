@@ -1,0 +1,31 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{89a0908d-ce30-4949-bbb0-c1a82ab86694}</uuid>
+        <name locale="en_US">74125</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.4064" layer="10" start_x="5.08">
+            <segment type="line" end_x="-5.08" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.4064" layer="10" start_x="5.08">
+            <segment type="line" end_x="-5.08" end_y="-5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.08" width="0.4064" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="5.08"/>
+        </polygon>
+        <polygon fill="false" start_y="4.318" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="5.08"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="270" y="7.62" uuid="{29a35d59-473e-4bae-99f2-1b4a92489ce3}">
+            <name locale="en_US">OE</name>
+        </pin>
+        <pin x="-10.16" length="5.08" angle="0" y="0" uuid="{2cebe5f7-82b4-4695-9d04-cc29e0ada7fe}">
+            <name locale="en_US">I</name>
+        </pin>
+        <pin x="10.16" length="5.08" angle="180" y="0" uuid="{843fb798-475c-4a21-96b1-9a294cd36623}">
+            <name locale="en_US">O</name>
+        </pin>
+    </pins>
+</symbol>

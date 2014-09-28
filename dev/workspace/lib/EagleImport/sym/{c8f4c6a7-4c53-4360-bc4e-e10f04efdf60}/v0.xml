@@ -1,0 +1,25 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{c8f4c6a7-4c53-4360-bc4e-e10f04efdf60}</uuid>
+        <name locale="en_US">SH7751-NC</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-8.89"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{21ae1553-c6e7-4d21-bb9e-d8745ac93736}">
+            <name locale="en_US">NC@1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{de74d28e-9a3d-4bc8-bbab-f7df407cad23}">
+            <name locale="en_US">NC@2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{981ecdc7-70a5-43a5-885d-9f1388993701}">
+            <name locale="en_US">NC@3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{94b9f7cc-148a-4ece-8545-b24c85c6ce68}">
+            <name locale="en_US">NC@4</name>
+        </pin>
+    </pins>
+</symbol>

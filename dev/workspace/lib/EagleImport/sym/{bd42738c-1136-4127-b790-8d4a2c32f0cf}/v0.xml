@@ -1,0 +1,82 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{bd42738c-1136-4127-b790-8d4a2c32f0cf}</uuid>
+        <name locale="en_US">L6204</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="17.78" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="17.78">
+            <segment type="line" end_x="17.78" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-15.24" width="0.254" layer="10" start_x="17.78">
+            <segment type="line" end_x="-15.24" end_y="-15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="-15.24" width="0.254" layer="10" start_x="-15.24">
+            <segment type="line" end_x="-15.24" end_y="15.24"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="20.32" length="2.54" angle="180" y="5.08" uuid="{55805405-5465-4341-9fbe-e1fd778beb72}">
+            <name locale="en_US">OUT2</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="12.7" uuid="{ebe9a1f6-cbf2-4653-bf1c-3cd30e176aef}">
+            <name locale="en_US">VBOOT</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="270" y="17.78" uuid="{cfd9743e-a0d6-4668-987f-e5699df2422a}">
+            <name locale="en_US">VS1</name>
+        </pin>
+        <pin x="15.24" length="2.54" angle="90" y="-17.78" uuid="{7ff71379-bd39-4b1c-be85-f30b793c7ce6}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="5.08" uuid="{6189c0d3-9790-4c72-a9d2-a45964e6f217}">
+            <name locale="en_US">IN2</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="2.54" uuid="{c2ce6f86-19fa-43e8-bc5b-d14f7d45384f}">
+            <name locale="en_US">ENABLE1</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="7.62" uuid="{935b8b99-3b70-4c4f-b6cd-3a86f182da86}">
+            <name locale="en_US">IN1</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="7.62" uuid="{12047156-7b5f-47c9-bd21-56941749b518}">
+            <name locale="en_US">OUT1</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-12.7" uuid="{e37d723c-b875-4121-801f-e264def129b5}">
+            <name locale="en_US">BOOTSTRAP</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="90" y="-17.78" uuid="{64b06e74-a898-46c8-83d9-229d4f09c853}">
+            <name locale="en_US">GND@1</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="90" y="-17.78" uuid="{e998d930-da42-48a0-ba35-aaae4441f6ac}">
+            <name locale="en_US">GND@2</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="90" y="-17.78" uuid="{9d094c67-f1a7-4874-92d8-4c99e06b8e53}">
+            <name locale="en_US">GND@3</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="2.54" uuid="{adcc57f5-9a70-414b-b0f6-bf0d70086095}">
+            <name locale="en_US">SENSE1</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="-7.62" uuid="{c469d915-864f-402e-acb2-6152de58e980}">
+            <name locale="en_US">SENSE2</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-2.54" uuid="{703c62ef-85b3-4f21-b38b-75576e505cc7}">
+            <name locale="en_US">IN3</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-5.08" uuid="{35c9922d-3262-445b-811b-547861c8606a}">
+            <name locale="en_US">IN4</name>
+        </pin>
+        <pin x="-17.78" length="2.54" angle="0" y="-7.62" uuid="{9d7affc8-09ab-4460-9181-ff1fe4cbf78f}">
+            <name locale="en_US">ENABLE2</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="-2.54" uuid="{921d112c-952b-487f-8ea0-6ac06850c4e1}">
+            <name locale="en_US">OUT3</name>
+        </pin>
+        <pin x="20.32" length="2.54" angle="180" y="-5.08" uuid="{e073f0bb-1cd2-4cbe-bec1-2dc1d2e82087}">
+            <name locale="en_US">OUT4</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="270" y="17.78" uuid="{97424f60-9df5-4bb8-99d9-2151f567043d}">
+            <name locale="en_US">VS2</name>
+        </pin>
+    </pins>
+</symbol>

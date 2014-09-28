@@ -1,0 +1,12 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{0e700d87-478d-4e2e-95af-e80fc7bc0bb9}</uuid>
+        <name locale="en_US">THERMAL</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{55503955-5b7f-4129-86cc-0f3b9d470212}">
+            <name locale="en_US">TH</name>
+        </pin>
+    </pins>
+</symbol>

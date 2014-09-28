@@ -1,0 +1,34 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{b73c7e2c-2d49-4dbb-8a4a-82d3d49c024a}</uuid>
+        <name locale="en_US">L-PULSE+</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.397" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="-2.54" end_y="1.397"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-1.27" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-1.27">
+            <segment type="line" end_x="0" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="1.27">
+            <segment type="line" end_x="2.54" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="1.27" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="2.032" width="0.254" layer="10" start_x="2.54">
+            <segment type="line" end_x="-2.54" end_y="2.032"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2.54" angle="0" y="0" uuid="{b1d7aa9f-5e8e-4ffe-a386-b0fe7a3c3376}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="5.08" length="2.54" angle="180" y="0" uuid="{bf621a3d-fbef-4afa-ba14-07b2a95b7b6d}">
+            <name locale="en_US">2</name>
+        </pin>
+    </pins>
+</symbol>

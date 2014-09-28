@@ -1,0 +1,18 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{7d79687b-d78e-4050-9080-1bf215e60dc6}</uuid>
+        <name locale="en_US">2V+V-</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="0" length="2.54" angle="270" y="7.62" uuid="{63bc6beb-9212-4d7e-bdec-10f33fd64cb5}">
+            <name locale="en_US">V+</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-7.62" uuid="{0d9850a4-4cb8-4df4-8788-6cd4b76a90e0}">
+            <name locale="en_US">V-</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="270" y="7.62" uuid="{d332c4f0-d51f-4398-8277-3039e821d522}">
+            <name locale="en_US">V+@1</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,115 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{1630bf2a-c74f-4916-a523-3717f1ff808d}</uuid>
+        <name locale="en_US">ZIF-18</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="12.7" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="-13.97"/>
+        </polygon>
+        <polygon fill="false" start_y="-13.97" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="-13.97"/>
+        </polygon>
+        <polygon fill="false" start_y="-13.97" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-2.54" end_y="15.24"/>
+        </polygon>
+        <polygon fill="false" start_y="15.24" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-2.54" end_y="12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="12.7" width="0.254" layer="10" start_x="-2.54">
+            <segment type="line" end_x="-5.08" end_y="12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="12.7" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-6.35" end_y="12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="12.7" width="0.254" layer="10" start_x="-6.35">
+            <segment type="line" end_x="-7.62" end_y="12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="12.7" width="0.254" layer="10" start_x="-6.35">
+            <segment type="line" end_x="-6.35" end_y="16.51"/>
+        </polygon>
+        <polygon fill="false" start_y="16.51" width="0.254" layer="10" start_x="-6.35">
+            <segment type="line" end_x="-7.62" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="21.59"/>
+        </polygon>
+        <polygon fill="false" start_y="21.59" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-6.35" end_y="22.86"/>
+        </polygon>
+        <polygon fill="false" start_y="22.86" width="0.254" layer="10" start_x="-6.35">
+            <segment type="line" end_x="-5.08" end_y="22.86"/>
+        </polygon>
+        <polygon fill="false" start_y="22.86" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-3.81" end_y="21.59"/>
+        </polygon>
+        <polygon fill="false" start_y="21.59" width="0.254" layer="10" start_x="-3.81">
+            <segment type="line" end_x="-3.81" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.254" layer="10" start_x="-3.81">
+            <segment type="line" end_x="-5.08" end_y="16.51"/>
+        </polygon>
+        <polygon fill="false" start_y="16.51" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="12.7"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="10.16" uuid="{b25e28b2-1c87-4a3c-bb8e-26d6d6f75bac}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="7.62" uuid="{549e92ab-d643-43b9-aba4-490beb779341}">
+            <name locale="en_US">2</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="5.08" uuid="{47fb6856-e3fe-447c-b466-fdf1e242f8ed}">
+            <name locale="en_US">3</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="2.54" uuid="{5b836128-7c0e-4f71-98dd-2025db86beeb}">
+            <name locale="en_US">4</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="0" uuid="{a58a15fb-cf76-46a4-a443-8a677fca6b8e}">
+            <name locale="en_US">5</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-2.54" uuid="{63087625-bbdd-48a3-981a-6bee724f0488}">
+            <name locale="en_US">6</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-5.08" uuid="{0be020e7-dd3f-4aab-939e-6cb31b2c18f0}">
+            <name locale="en_US">7</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-7.62" uuid="{4b4e006a-72ef-45ee-973a-6447a4ea073d}">
+            <name locale="en_US">8</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-10.16" uuid="{ba389e18-0c1d-4bf8-b06a-81980ef1cf44}">
+            <name locale="en_US">9</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-10.16" uuid="{1f279bcd-313a-4daf-8a46-4cded78b231e}">
+            <name locale="en_US">10</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-7.62" uuid="{caa255d4-f9c6-4be4-bae9-07f43b38e6fc}">
+            <name locale="en_US">11</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-5.08" uuid="{ff169038-9e3b-4d1c-a5fb-31adc226e157}">
+            <name locale="en_US">12</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="-2.54" uuid="{5189f95f-e595-43ba-8362-a9c4cc29119d}">
+            <name locale="en_US">13</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="0" uuid="{4ae55f6c-9cee-450f-93ef-9fd983c9be3e}">
+            <name locale="en_US">14</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="2.54" uuid="{293f59c0-1792-481a-833d-7e16faed0de5}">
+            <name locale="en_US">15</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="5.08" uuid="{e29930f5-da2c-4a1a-9c16-4c76fbcc80c3}">
+            <name locale="en_US">16</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="7.62" uuid="{efeb7064-ad26-4281-8d50-f8ab9a513608}">
+            <name locale="en_US">17</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="10.16" uuid="{5bc3abdd-a256-4f99-8971-cc282684d5e7}">
+            <name locale="en_US">18</name>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,82 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{35135d3d-943c-4588-8209-f0403ffe4cf7}</uuid>
+        <name locale="en_US">ADSP-21161-PAR</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="27.94" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-5.08" end_y="-27.94"/>
+        </polygon>
+        <polygon fill="false" start_y="-27.94" width="0.254" layer="10" start_x="-5.08">
+            <segment type="line" end_x="6.35" end_y="-27.94"/>
+        </polygon>
+        <polygon fill="false" start_y="-27.94" width="0.254" layer="10" start_x="6.35">
+            <segment type="line" end_x="6.35" end_y="27.94"/>
+        </polygon>
+        <polygon fill="false" start_y="27.94" width="0.254" layer="10" start_x="6.35">
+            <segment type="line" end_x="-5.08" end_y="27.94"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-7.62" length="2.54" angle="0" y="25.4" uuid="{f4683fb0-afb2-4cd5-b51a-b5e1f65026b0}">
+            <name locale="en_US">L0CLK</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="22.86" uuid="{24b7f43d-32e0-410f-9ff7-6bfc65b1280b}">
+            <name locale="en_US">L0ACK</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="20.32" uuid="{4733ee01-4d89-4c0b-b429-1da65116c236}">
+            <name locale="en_US">L0DAT0</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="17.78" uuid="{0f473b5f-be09-4e8e-b5b2-c96731a63605}">
+            <name locale="en_US">L0DAT1</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="15.24" uuid="{83eb4332-396a-4f38-9ce5-21bc944b7f9e}">
+            <name locale="en_US">L0DAT2</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="12.7" uuid="{bfabdc07-376a-4c2c-b569-9d9eb5013ff9}">
+            <name locale="en_US">L0DAT3</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="10.16" uuid="{b6bd7e75-2455-44b8-80cb-0344d82fe2d4}">
+            <name locale="en_US">L0DAT4</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="7.62" uuid="{d23417f2-db50-4647-af69-a271dad9448f}">
+            <name locale="en_US">L0DAT5</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="5.08" uuid="{87d8e4b4-d33c-4899-9d96-3b3f7baf65bb}">
+            <name locale="en_US">L0DAT6</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="2.54" uuid="{d1ab8ee8-e01b-4489-ac23-e44b5546b3bd}">
+            <name locale="en_US">L0DAT7</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="-2.54" uuid="{c8bb8f32-4501-45ae-aba7-c542de10c80f}">
+            <name locale="en_US">L1CLK</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="-5.08" uuid="{532d1427-2c46-4804-8a9f-d11b82a492a7}">
+            <name locale="en_US">L1ACK</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="-7.62" uuid="{9c84ae77-d69a-4a52-b762-398d092acf38}">
+            <name locale="en_US">L1DAT0</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="-10.16" uuid="{8ea7ee25-97f7-4f47-927e-e70c21aeaf6a}">
+            <name locale="en_US">L1DAT1</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="-12.7" uuid="{1c7a533b-3ca5-4698-8897-e08da77cf912}">
+            <name locale="en_US">L1DAT2</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="-15.24" uuid="{e2b72e2f-2df9-4556-ad6d-001fc8c09270}">
+            <name locale="en_US">L1DAT3</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="-17.78" uuid="{92aaba7a-8ee0-4441-bdc8-ac4f50046a57}">
+            <name locale="en_US">L1DAT4</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="-20.32" uuid="{e2ffbb04-b2c9-4f89-85f0-7ee5be524bdd}">
+            <name locale="en_US">L1DAT5</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="-22.86" uuid="{fce33b60-8684-42fb-8d02-146e5283556d}">
+            <name locale="en_US">L1DAT6</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="-25.4" uuid="{8d8763e2-d306-4cd3-958f-718ac6dabf92}">
+            <name locale="en_US">L1DAT7</name>
+        </pin>
+    </pins>
+</symbol>

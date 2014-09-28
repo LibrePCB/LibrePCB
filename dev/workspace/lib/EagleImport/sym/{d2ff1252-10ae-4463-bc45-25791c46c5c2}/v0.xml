@@ -1,0 +1,88 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{d2ff1252-10ae-4463-bc45-25791c46c5c2}</uuid>
+        <name locale="en_US">TDA8501</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="20.32" width="0.254" layer="10" start_x="-17.78">
+            <segment type="line" end_x="15.24" end_y="20.32"/>
+        </polygon>
+        <polygon fill="false" start_y="20.32" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="15.24" end_y="-22.86"/>
+        </polygon>
+        <polygon fill="false" start_y="-22.86" width="0.254" layer="10" start_x="15.24">
+            <segment type="line" end_x="-17.78" end_y="-22.86"/>
+        </polygon>
+        <polygon fill="false" start_y="-22.86" width="0.254" layer="10" start_x="-17.78">
+            <segment type="line" end_x="-17.78" end_y="20.32"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-20.32" length="2.54" angle="0" y="-2.54" uuid="{8d67d2d8-c333-4455-92ba-216744483c78}">
+            <name locale="en_US">-(R-Y)</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="-17.78" uuid="{fe4540f1-95e1-4d44-a997-df3e1e1b5dfd}">
+            <name locale="en_US">MCONTROL</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="-5.08" uuid="{778fdec4-87f6-493e-b138-abe1599e34bb}">
+            <name locale="en_US">-(B-Y)</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="-15.24" uuid="{fc3968a7-9123-4a54-bf12-4b7945afe92b}">
+            <name locale="en_US">H/2</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="-7.62" uuid="{19f34a0e-5f0d-4f87-9452-189106d84dda}">
+            <name locale="en_US">Y</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="17.78" uuid="{accbcbaf-fb2f-4f57-a170-353878227ee4}">
+            <name locale="en_US">UOFFSET</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="7.62" uuid="{e36c558a-f89b-44e7-92dd-902dec49960f}">
+            <name locale="en_US">RED</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="5.08" uuid="{b18d89f5-0c61-4422-a071-e3760ed2ddaa}">
+            <name locale="en_US">GREEN</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="2.54" uuid="{09f569eb-70f5-4fbf-8744-db671809057d}">
+            <name locale="en_US">BLUE</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="15.24" uuid="{9a50f344-b946-48f3-8d06-71a38d6dc647}">
+            <name locale="en_US">VOFFSET</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="12.7" uuid="{e4f7f770-7ab4-4855-8fe7-3e5d45d932bf}">
+            <name locale="en_US">VREF</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-2.54" uuid="{9ae5b3da-6244-4636-b4e1-6a47735cdc07}">
+            <name locale="en_US">CHROMA</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="12.7" uuid="{b0242709-14a4-4cf9-b2ca-89cd89cb91b3}">
+            <name locale="en_US">FLT</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="7.62" uuid="{2055bfa6-1133-496f-ac2e-95f07b861a7d}">
+            <name locale="en_US">CVBS</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="-12.7" uuid="{a02647bb-843d-49a4-9861-ab55bba60625}">
+            <name locale="en_US">PAL/NTSC-Y/Y+SYNC</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-20.32" uuid="{d35b029c-893e-4718-8e89-8763a6fe4f19}">
+            <name locale="en_US">NOTCH</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-7.62" uuid="{076d67ee-63ef-451e-b250-789d8847d937}">
+            <name locale="en_US">Y+SYNCOUT2V</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="-10.16" uuid="{0f2a0e22-ef27-4246-9a50-677a9166c932}">
+            <name locale="en_US">Y+SYNCIN</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="2.54" uuid="{244fb6ba-74e2-4ea6-b1ce-f07d57addd8b}">
+            <name locale="en_US">BURSTADJ</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="-10.16" uuid="{cc0cc750-9a79-4b0d-9509-0decba70d836}">
+            <name locale="en_US">Y+SYNCOUT1V</name>
+        </pin>
+        <pin x="17.78" length="2.54" angle="180" y="17.78" uuid="{d7826ead-5029-430d-b169-d73a4e98d77d}">
+            <name locale="en_US">OSC</name>
+        </pin>
+        <pin x="-20.32" length="2.54" angle="0" y="-20.32" uuid="{032a7902-a57f-41e4-8564-a64e33920dbe}">
+            <name locale="en_US">CS</name>
+        </pin>
+    </pins>
+</symbol>

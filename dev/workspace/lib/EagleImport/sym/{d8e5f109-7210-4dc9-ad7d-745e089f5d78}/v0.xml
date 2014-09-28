@@ -1,0 +1,61 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{d8e5f109-7210-4dc9-ad7d-745e089f5d78}</uuid>
+        <name locale="en_US">IO61-94</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-39.37" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{de80d774-76ac-4f36-9caa-4abc8e098559}">
+            <name locale="en_US">IO61</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{a6b8bed1-cb6b-47bf-a5e2-0774b87c5887}">
+            <name locale="en_US">IO62</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{121c57a0-4a47-484b-9b80-4b8a5d3f01be}">
+            <name locale="en_US">IO63</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{1c04082b-2dba-4e30-8441-f2a704f5e520}">
+            <name locale="en_US">IO64</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{7828408c-ffbe-44e8-a580-781d8bd305d8}">
+            <name locale="en_US">IO71</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{1678e023-d45f-4984-aded-e70c4909f460}">
+            <name locale="en_US">IO72</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-15.24" uuid="{1620408e-f584-494d-abcf-4a35365a453a}">
+            <name locale="en_US">IO73</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-17.78" uuid="{3593def6-5f54-4da8-a414-975c4df5d596}">
+            <name locale="en_US">IO74</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-20.32" uuid="{8153bec6-d763-420a-b427-2cb1e93fa316}">
+            <name locale="en_US">IO81</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-22.86" uuid="{fd09fea3-8486-4d21-a16d-813449573a65}">
+            <name locale="en_US">IO82</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-25.4" uuid="{ae66320c-88bd-41c1-a122-2ae987356cd1}">
+            <name locale="en_US">IO83</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-27.94" uuid="{b6264741-0320-4dee-9ad2-9495aa323017}">
+            <name locale="en_US">IO84</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-30.48" uuid="{b638b965-995b-4e0b-955a-2610e2d3fa00}">
+            <name locale="en_US">IO91</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-33.02" uuid="{6a3b1ca7-6835-4148-9c0e-eee909651a66}">
+            <name locale="en_US">IO92</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-35.56" uuid="{076a7deb-7506-4441-824b-92ea77b05beb}">
+            <name locale="en_US">IO93</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-38.1" uuid="{f750b064-86de-48f5-b70b-85d7b1626ef2}">
+            <name locale="en_US">IO94</name>
+        </pin>
+    </pins>
+</symbol>

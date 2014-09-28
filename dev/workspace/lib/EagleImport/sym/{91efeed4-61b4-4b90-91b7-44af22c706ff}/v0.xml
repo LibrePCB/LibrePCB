@@ -1,0 +1,76 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{91efeed4-61b4-4b90-91b7-44af22c706ff}</uuid>
+        <name locale="en_US">PS</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-4.572" width="0.1524" layer="10" start_x="0.635">
+            <segment type="line" end_x="-0.635" end_y="-4.572"/>
+        </polygon>
+        <polygon fill="false" start_y="-4.572" width="0.1524" layer="10" start_x="0.635">
+            <segment type="line" end_x="0.635" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="0.635">
+            <segment type="line" end_x="-0.635" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="-0.635">
+            <segment type="line" end_x="-0.635" end_y="-4.572"/>
+        </polygon>
+        <polygon fill="false" start_y="-3.048" width="0.1524" layer="10" start_x="0.381">
+            <segment type="line" end_x="-0.381" end_y="-2.794"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.794" width="0.1524" layer="10" start_x="-0.381">
+            <segment type="line" end_x="0.381" end_y="-2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="0.381">
+            <segment type="line" end_x="-0.381" end_y="-2.286"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.286" width="0.1524" layer="10" start_x="-0.381">
+            <segment type="line" end_x="0.381" end_y="-2.032"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.032" width="0.1524" layer="10" start_x="0.381">
+            <segment type="line" end_x="-0.381" end_y="-1.778"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.778" width="0.1524" layer="10" start_x="-0.381">
+            <segment type="line" end_x="0.381" end_y="-1.524"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.524" width="0.1524" layer="10" start_x="0.381">
+            <segment type="line" end_x="-0.381" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.1524" layer="10" start_x="-0.381">
+            <segment type="line" end_x="0.381" end_y="-1.016"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.016" width="0.1524" layer="10" start_x="0.381">
+            <segment type="line" end_x="-0.381" end_y="-0.762"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.762" width="0.1524" layer="10" start_x="-0.381">
+            <segment type="line" end_x="0.381" end_y="-0.508"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.207" width="0.1524" layer="10" start_x="0.508">
+            <segment type="line" end_x="-0.508" end_y="-5.207"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.207" width="0.1524" layer="10" start_x="-0.508">
+            <segment type="line" end_x="-0.508" end_y="-5.715"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.715" width="0.1524" layer="10" start_x="-0.508">
+            <segment type="line" end_x="0" end_y="-6.35"/>
+        </polygon>
+        <polygon fill="false" start_y="-6.35" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0.508" end_y="-5.715"/>
+        </polygon>
+        <polygon fill="false" start_y="-5.715" width="0.1524" layer="10" start_x="0.508">
+            <segment type="line" end_x="0.508" end_y="-5.207"/>
+        </polygon>
+        <polygon fill="true" start_y="-5.207" width="0.254" layer="10" start_x="-0.381">
+            <segment type="line" end_x="0.381" end_y="-5.207"/>
+            <segment type="line" end_x="0.381" end_y="-4.572"/>
+            <segment type="line" end_x="-0.381" end_y="-4.572"/>
+            <segment type="line" end_x="-0.381" end_y="-5.207"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="270" y="2.54" uuid="{5ebe1970-2daa-497f-a71a-f2ecc89f3c9b}">
+            <name locale="en_US">TP</name>
+        </pin>
+    </pins>
+</symbol>

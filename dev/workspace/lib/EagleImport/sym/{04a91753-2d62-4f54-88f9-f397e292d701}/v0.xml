@@ -1,0 +1,52 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{04a91753-2d62-4f54-88f9-f397e292d701}</uuid>
+        <name locale="en_US">S13-250</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-31.75"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{18f32be7-35a3-4c00-910b-ba426fb38c28}">
+            <name locale="en_US">IOS1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{4a532fe6-f29c-4d8d-b296-8bc6a89657a9}">
+            <name locale="en_US">IOS2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{a7c8f8c2-4a3f-4386-bbfd-a7da9a36ad94}">
+            <name locale="en_US">IOS3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{08aaeda7-e13d-4daf-837b-1ad6b4268e0f}">
+            <name locale="en_US">IOS4</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{204033d0-5a3b-4451-bdc3-254b092d0422}">
+            <name locale="en_US">IOS5</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{c23940f6-e47c-45ce-8ead-d523d575c891}">
+            <name locale="en_US">IOS6</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-15.24" uuid="{1e60c7e2-7830-4ddb-9abf-bffec75d841f}">
+            <name locale="en_US">IOS7</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-17.78" uuid="{239dc072-c2cb-4e3c-a3b6-32314e88e613}">
+            <name locale="en_US">IOS8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-20.32" uuid="{4357cb85-2c19-4249-85c4-5fff77915c84}">
+            <name locale="en_US">IOS9</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-22.86" uuid="{d5704f85-4f5f-443b-b0e5-4bc382fbadfb}">
+            <name locale="en_US">IOS10</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-25.4" uuid="{7d040232-bdd3-4afd-ac70-549cf2efcd35}">
+            <name locale="en_US">IOS11</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-27.94" uuid="{782ec26c-73e6-4222-8db4-d6a594b803b2}">
+            <name locale="en_US">IOS12</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-30.48" uuid="{359b3152-a90d-4942-be63-ac391c81e78a}">
+            <name locale="en_US">IOS13</name>
+        </pin>
+    </pins>
+</symbol>

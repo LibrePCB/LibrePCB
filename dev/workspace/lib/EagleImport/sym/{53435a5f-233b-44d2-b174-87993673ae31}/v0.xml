@@ -1,0 +1,15 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{53435a5f-233b-44d2-b174-87993673ae31}</uuid>
+        <name locale="en_US">NC2</name>
+    </meta>
+    <geometry/>
+    <pins>
+        <pin x="0" length="5.08" angle="270" y="7.62" uuid="{5554ee6e-da40-4df3-ab1b-53af67187756}">
+            <name locale="en_US">NC@0</name>
+        </pin>
+        <pin x="0" length="5.08" angle="90" y="-7.62" uuid="{e0a22f0b-3594-4ec8-971c-ff728dbd69c8}">
+            <name locale="en_US">NC@1</name>
+        </pin>
+    </pins>
+</symbol>

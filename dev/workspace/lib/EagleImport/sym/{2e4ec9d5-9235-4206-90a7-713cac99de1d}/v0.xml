@@ -1,0 +1,25 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{2e4ec9d5-9235-4206-90a7-713cac99de1d}</uuid>
+        <name locale="en_US">PPAD</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="1.27" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.1524" layer="10" start_x="1.27">
+            <segment type="line" end_x="0" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="-1.27" end_y="-1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="-1.27" width="0.1524" layer="10" start_x="-1.27">
+            <segment type="line" end_x="0" end_y="-2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="270" y="2.54" uuid="{3543ba23-a03e-442f-ba1c-2dc3f7a079ea}">
+            <name locale="en_US">TP</name>
+        </pin>
+    </pins>
+</symbol>

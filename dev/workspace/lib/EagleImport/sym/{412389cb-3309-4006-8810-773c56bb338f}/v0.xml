@@ -1,0 +1,52 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{412389cb-3309-4006-8810-773c56bb338f}</uuid>
+        <name locale="en_US">R-4POL</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="3.048" width="0.254" layer="10" start_x="-3.81">
+            <segment type="line" end_x="-3.81" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="-3.81">
+            <segment type="line" end_x="-3.81" end_y="-0.508"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.508" width="0.254" layer="10" start_x="-3.81">
+            <segment type="line" end_x="3.81" end_y="-0.508"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.508" width="0.254" layer="10" start_x="3.81">
+            <segment type="line" end_x="3.81" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="3.81">
+            <segment type="line" end_x="3.81" end_y="3.048"/>
+        </polygon>
+        <polygon fill="false" start_y="3.048" width="0.254" layer="10" start_x="3.81">
+            <segment type="line" end_x="-3.81" end_y="3.048"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="-5.08">
+            <segment type="line" end_x="-3.81" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.1524" layer="10" start_x="-3.81">
+            <segment type="line" end_x="-5.08" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="5.08">
+            <segment type="line" end_x="3.81" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="1.27" width="0.1524" layer="10" start_x="3.81">
+            <segment type="line" end_x="5.08" end_y="0"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-7.62" length="2.54" angle="0" y="0" uuid="{bbf72894-fcc9-44ff-ae35-e8de457996f6}">
+            <name locale="en_US">PT100-A2</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="0" uuid="{13dee85b-415b-4a00-bddf-ccf8aa25e11a}">
+            <name locale="en_US">PT100-B2</name>
+        </pin>
+        <pin x="-7.62" length="2.54" angle="0" y="2.54" uuid="{b7259ff0-a0fb-4a93-92e3-94c35eb9c999}">
+            <name locale="en_US">PT100-A1</name>
+        </pin>
+        <pin x="7.62" length="2.54" angle="180" y="2.54" uuid="{35503cc4-6479-4a59-9003-b079d695b6ad}">
+            <name locale="en_US">PT100-B1</name>
+        </pin>
+    </pins>
+</symbol>

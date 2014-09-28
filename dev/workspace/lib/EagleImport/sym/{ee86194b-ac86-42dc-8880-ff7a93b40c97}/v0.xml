@@ -1,0 +1,19 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{ee86194b-ac86-42dc-8880-ff7a93b40c97}</uuid>
+        <name locale="en_US">-4.1V</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.1524" layer="10" start_x="-0.635">
+            <segment type="line" end_x="0.635" end_y="1.27"/>
+        </polygon>
+        <polygon fill="false" start_y="0.635" width="0.1524" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.905"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="90" y="-2.54" uuid="{4ef830b6-9e20-406b-809f-8bbe7a3bdb2c}">
+            <name locale="en_US">-4.1V</name>
+        </pin>
+    </pins>
+</symbol>

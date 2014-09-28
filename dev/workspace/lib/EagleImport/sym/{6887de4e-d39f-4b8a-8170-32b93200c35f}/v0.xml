@@ -1,0 +1,28 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{6887de4e-d39f-4b8a-8170-32b93200c35f}</uuid>
+        <name locale="en_US">IXP-JTAG</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="2.54" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-12.7"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="-2.54" uuid="{3511f718-09ce-4a24-940a-f89ebbf0c2cc}">
+            <name locale="en_US">TDI</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-5.08" uuid="{a12dd1bf-ca7b-40b7-a304-316e4da0770e}">
+            <name locale="en_US">TDO</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{5527a280-7b1b-4bef-802c-94cb04e97f4f}">
+            <name locale="en_US">TMS</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-7.62" uuid="{dc4f1cbe-ce70-44e9-96f2-d27d4394ea98}">
+            <name locale="en_US">TRST_N</name>
+        </pin>
+        <pin x="-5.08" length="5.08" angle="0" y="-10.16" uuid="{d33d4cbf-b585-4465-9bfa-ae93b1b55b7a}">
+            <name locale="en_US">TCK</name>
+        </pin>
+    </pins>
+</symbol>

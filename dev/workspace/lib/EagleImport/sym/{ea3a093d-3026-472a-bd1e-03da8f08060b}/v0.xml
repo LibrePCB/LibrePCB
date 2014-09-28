@@ -1,0 +1,40 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{ea3a093d-3026-472a-bd1e-03da8f08060b}</uuid>
+        <name locale="en_US">KV</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.3048" layer="10" start_x="-2.159">
+            <segment type="line" end_x="-2.159" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.3048" layer="10" start_x="0.889">
+            <segment type="line" end_x="-0.889" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.3048" layer="10" start_x="0.889">
+            <segment type="line" end_x="2.159" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.3048" layer="10" start_x="-0.889">
+            <segment type="line" end_x="-2.159" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.3048" layer="10" start_x="-2.159">
+            <segment type="line" end_x="0.889" end_y="2.54"/>
+        </polygon>
+        <polygon fill="false" start_y="0" width="0.3048" layer="10" start_x="2.159">
+            <segment type="line" end_x="-0.889" end_y="0"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.3048" layer="10" start_x="2.159">
+            <segment type="line" end_x="2.159" end_y="0"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="270" y="5.08" uuid="{71584873-9a3e-4eb3-bb1b-348a811c3d01}">
+            <name locale="en_US">1</name>
+        </pin>
+        <pin x="0" length="2.54" angle="90" y="-2.54" uuid="{12df7cc6-7d63-4671-a2cd-aaa69e62831b}">
+            <name locale="en_US">2</name>
+        </pin>
+        <pin x="-2.54" length="0" angle="180" y="0" uuid="{8b022da4-87df-4afd-91f3-1e082fc02504}">
+            <name locale="en_US">3</name>
+        </pin>
+    </pins>
+</symbol>

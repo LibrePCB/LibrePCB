@@ -1,0 +1,37 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{4a756f49-f419-41f1-a022-3dccb303f4c1}</uuid>
+        <name locale="en_US">MIC5219B</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="7.62" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="-7.62"/>
+        </polygon>
+        <polygon fill="false" start_y="-7.62" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="7.62"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="5.08" uuid="{b9c42b68-db09-423f-b4c7-d62ea1168a9a}">
+            <name locale="en_US">IN</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="0" uuid="{114a4d73-4a29-4029-99a8-69232e46ec61}">
+            <name locale="en_US">EN</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="5.08" uuid="{94f28e8b-a8c8-456a-93cb-78063cf86605}">
+            <name locale="en_US">OUT</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-5.08" uuid="{22297901-869d-44ab-b169-c592cf7eb4fe}">
+            <name locale="en_US">BYP</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-10.16" uuid="{25682fa9-0e82-4533-a4c4-09ce199c63bf}">
+            <name locale="en_US">GND</name>
+        </pin>
+    </pins>
+</symbol>

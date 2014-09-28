@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{6ddf6cd1-860a-4ad9-947c-bc4c5b3cd7a0}</uuid>
+        <name locale="en_US">C14-30Q</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="-26.67" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="1.27"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{fc8effb2-c21b-41cf-9b2d-5acee2a233c7}">
+            <name locale="en_US">IOC1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{fa74d0c1-ee7b-436f-8df9-ab367f64e829}">
+            <name locale="en_US">IOC2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{15b1cf29-d5ad-41b3-b712-63bb6574db09}">
+            <name locale="en_US">IOC3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{fbeec0f8-01dd-4f46-a4f1-5b5ee45b05ec}">
+            <name locale="en_US">IOC4</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{74b495e5-f482-4f52-aece-c05eab426b58}">
+            <name locale="en_US">IOC7</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{b3a0e833-64d9-41d1-9510-3c1b07facec6}">
+            <name locale="en_US">IOC8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-15.24" uuid="{dc3092e1-bc1b-40ef-b1fa-8889db1d1fec}">
+            <name locale="en_US">IOC9</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-17.78" uuid="{5ff72651-1717-41b5-8893-d956411d1c77}">
+            <name locale="en_US">IOC10</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-20.32" uuid="{0e1e6439-ed8d-4b3c-97cb-aeb3db346dfc}">
+            <name locale="en_US">IOC11</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-22.86" uuid="{3d5bfec4-d45d-42ea-b90a-f50a2beab2cb}">
+            <name locale="en_US">IOC12</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-25.4" uuid="{545672c9-479b-46db-833f-3fed7cb4197a}">
+            <name locale="en_US">IOC14</name>
+        </pin>
+    </pins>
+</symbol>

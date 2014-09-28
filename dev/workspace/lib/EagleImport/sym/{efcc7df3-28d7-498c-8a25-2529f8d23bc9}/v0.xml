@@ -1,0 +1,16 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{efcc7df3-28d7-498c-8a25-2529f8d23bc9}</uuid>
+        <name locale="en_US">PM-VN</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0" width="0.4064" layer="10" start_x="0.254">
+            <segment type="line" end_x="-1.524" end_y="0"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="5.08" angle="0" y="0" uuid="{a3ffce5a-3545-4ec3-8fee-6247a78e206a}">
+            <name locale="en_US">1</name>
+        </pin>
+    </pins>
+</symbol>

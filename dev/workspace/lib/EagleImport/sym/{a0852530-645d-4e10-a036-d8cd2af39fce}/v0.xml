@@ -1,0 +1,46 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{a0852530-645d-4e10-a036-d8cd2af39fce}</uuid>
+        <name locale="en_US">L5973D</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="12.7" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="12.7" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="12.7"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="2.54" angle="0" y="5.08" uuid="{5fa014f6-5120-4daf-9a5d-e2d6716cf4b4}">
+            <name locale="en_US">VREF</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="10.16" uuid="{1b937019-cba2-4f00-b7d8-f50e44eb3ac1}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="0" uuid="{797d864c-9503-485c-899b-64ae1973d822}">
+            <name locale="en_US">SYNC</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-5.08" uuid="{7b58686f-7054-428b-bc18-29fb5e436cf9}">
+            <name locale="en_US">COMP</name>
+        </pin>
+        <pin x="-12.7" length="2.54" angle="0" y="-10.16" uuid="{95a8b660-3026-4ecc-9580-a38bf2e0ad97}">
+            <name locale="en_US">INH</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-10.16" uuid="{cfad89f8-411f-4067-8b70-809c6ce95919}">
+            <name locale="en_US">GND</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="-2.54" uuid="{b64dd8c7-83af-4d78-9073-2c1e9282897f}">
+            <name locale="en_US">FB</name>
+        </pin>
+        <pin x="12.7" length="2.54" angle="180" y="10.16" uuid="{e2dd46bc-0913-4a6b-9bb2-ad3250fac4e3}">
+            <name locale="en_US">OUT</name>
+        </pin>
+    </pins>
+</symbol>

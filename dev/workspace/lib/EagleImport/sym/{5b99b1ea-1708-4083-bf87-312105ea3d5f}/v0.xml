@@ -1,0 +1,67 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{5b99b1ea-1708-4083-bf87-312105ea3d5f}</uuid>
+        <name locale="en_US">F168_P3</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="17.78" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="-7.62" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="-25.4"/>
+        </polygon>
+        <polygon fill="false" start_y="-25.4" width="0.4064" layer="10" start_x="-7.62">
+            <segment type="line" end_x="10.16" end_y="-25.4"/>
+        </polygon>
+        <polygon fill="false" start_y="-25.4" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="17.78"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-12.7" length="5.08" angle="0" y="15.24" uuid="{3ab60b75-ab5e-41d7-924f-75cc8a55be77}">
+            <name locale="en_US">P3-0/TOIN</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="12.7" uuid="{6684c00a-2016-46c6-a62f-3150366e5f37}">
+            <name locale="en_US">P3-1/T6OUT</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="10.16" uuid="{5e01fbbe-482f-486d-ba88-69350715f878}">
+            <name locale="en_US">P3-2/CAPIN</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="7.62" uuid="{bcac70dc-fbfc-42bb-88ef-8fcb71721932}">
+            <name locale="en_US">P3-3/T3OUT</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="5.08" uuid="{740d0e23-ef52-4d6f-9d93-08c42486dd98}">
+            <name locale="en_US">P3-4/T3EUD</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="2.54" uuid="{d442f905-b467-4b70-886e-4c7746a01063}">
+            <name locale="en_US">P3-5/T4IN</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="0" uuid="{a06c5c57-8a83-44d5-899e-9b2ebff77d8a}">
+            <name locale="en_US">P3-6/T3IN</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-2.54" uuid="{44bff388-6647-4678-904b-457d43b7060e}">
+            <name locale="en_US">P3-7/T2IN</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-5.08" uuid="{9ed785f5-8ffc-4ea7-a180-945955aa7086}">
+            <name locale="en_US">P3-8/MRST</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-7.62" uuid="{3b3c6acc-359a-44cd-95b4-9c2b99d909ee}">
+            <name locale="en_US">P3-9/MTSR</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-10.16" uuid="{828dec67-be50-47e5-b620-e17fe08b8d5b}">
+            <name locale="en_US">P3-10/TXD0</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-12.7" uuid="{21bad010-1ed8-4180-b4ee-bdf1228b1293}">
+            <name locale="en_US">P3-11/RXD0</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-15.24" uuid="{b57d604d-a807-4879-8e72-e96ad6a1fab4}">
+            <name locale="en_US">P3-12/!BHE</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-17.78" uuid="{95b0cd6a-1737-400f-af4d-62fa56a5e656}">
+            <name locale="en_US">P3-13/SCLK</name>
+        </pin>
+        <pin x="-12.7" length="5.08" angle="0" y="-22.86" uuid="{52e42558-12f5-4e29-aa00-7b92edd6b7c6}">
+            <name locale="en_US">P3-15/CLKO</name>
+        </pin>
+    </pins>
+</symbol>

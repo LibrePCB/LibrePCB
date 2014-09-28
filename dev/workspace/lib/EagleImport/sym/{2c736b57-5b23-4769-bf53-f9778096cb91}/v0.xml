@@ -1,0 +1,40 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{2c736b57-5b23-4769-bf53-f9778096cb91}</uuid>
+        <name locale="en_US">RXM-XXX-LR</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="7.62" end_y="10.16"/>
+        </polygon>
+        <polygon fill="false" start_y="10.16" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="7.62" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="7.62">
+            <segment type="line" end_x="-7.62" end_y="-12.7"/>
+        </polygon>
+        <polygon fill="false" start_y="-12.7" width="0.254" layer="10" start_x="-7.62">
+            <segment type="line" end_x="-7.62" end_y="10.16"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-10.16" length="2.54" angle="0" y="-10.16" uuid="{843dce41-9cba-4f32-8403-f47210fdfdf3}">
+            <name locale="en_US">GND@1</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-7.62" uuid="{3d0dc5eb-d0cf-4361-876c-005a66263c98}">
+            <name locale="en_US">GND@2</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="7.62" uuid="{6f6f546f-8193-4cdf-a9fd-e8568a1d496a}">
+            <name locale="en_US">VCC</name>
+        </pin>
+        <pin x="10.16" length="2.54" angle="180" y="5.08" uuid="{634e5d10-dc0f-4111-bc92-fd77ccd4ac45}">
+            <name locale="en_US">RSSI</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="-2.54" uuid="{8d46afb2-f500-4508-93bd-844a99ca106b}">
+            <name locale="en_US">DATA</name>
+        </pin>
+        <pin x="-10.16" length="2.54" angle="0" y="2.54" uuid="{c8b5f821-87c3-46c4-9560-8950159e953b}">
+            <name locale="en_US">PDN</name>
+        </pin>
+    </pins>
+</symbol>

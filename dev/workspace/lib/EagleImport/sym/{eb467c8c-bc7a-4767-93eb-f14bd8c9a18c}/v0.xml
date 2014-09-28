@@ -1,0 +1,22 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{eb467c8c-bc7a-4767-93eb-f14bd8c9a18c}</uuid>
+        <name locale="en_US">FPINV</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="0.508" width="0.254" layer="10" start_x="-1.778">
+            <segment type="line" end_x="0" end_y="0.508"/>
+        </polygon>
+        <polygon fill="false" start_y="0.508" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-0.508"/>
+        </polygon>
+        <polygon fill="false" start_y="-0.508" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="-1.778" end_y="-0.508"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="2.54" length="2.54" angle="180" y="0" uuid="{20247e4e-f78f-44e2-ae12-df9ff31abb85}">
+            <name locale="en_US">1</name>
+        </pin>
+    </pins>
+</symbol>

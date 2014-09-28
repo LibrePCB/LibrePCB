@@ -1,0 +1,64 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{85371579-1395-4bcd-9be6-0e59eaadc0ef}</uuid>
+        <name locale="en_US">MAX3232</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="17.78" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="10.16" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="10.16" end_y="17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="-17.78" width="0.4064" layer="10" start_x="10.16">
+            <segment type="line" end_x="-10.16" end_y="-17.78"/>
+        </polygon>
+        <polygon fill="false" start_y="17.78" width="0.4064" layer="10" start_x="-10.16">
+            <segment type="line" end_x="-10.16" end_y="-17.78"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-15.24" length="5.08" angle="0" y="15.24" uuid="{370b4eaa-1adf-4480-86ea-36e20b264afc}">
+            <name locale="en_US">C1+</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="10.16" uuid="{f2ddcb7e-fd36-41d4-9885-32bd862703ad}">
+            <name locale="en_US">C1-</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="5.08" uuid="{929b2448-68d7-4468-af75-bbe1c6d8246a}">
+            <name locale="en_US">C2+</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="0" uuid="{0d5394c4-89f5-4442-b03f-4dc0e2b5821e}">
+            <name locale="en_US">C2-</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-5.08" uuid="{02aca160-4ebc-492c-8e27-c7ed65b1b6e3}">
+            <name locale="en_US">T1IN</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-7.62" uuid="{71d176ab-2990-4efb-9029-9caa689fe58d}">
+            <name locale="en_US">T2IN</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-12.7" uuid="{27cec824-e559-4030-811f-f4d8f2b989fc}">
+            <name locale="en_US">R1OUT</name>
+        </pin>
+        <pin x="-15.24" length="5.08" angle="0" y="-15.24" uuid="{ef79319a-1714-4e6d-9d3f-55570d4cc2c3}">
+            <name locale="en_US">R2OUT</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="12.7" uuid="{27c3c870-921f-4833-9b8b-f9fb7b64eaa2}">
+            <name locale="en_US">V+</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="7.62" uuid="{b4f3149c-f81a-410a-9bb7-20851eef4afa}">
+            <name locale="en_US">V-</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-5.08" uuid="{c7b45f4c-03bb-4eae-994b-7e465e116dfc}">
+            <name locale="en_US">T1OUT</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-7.62" uuid="{a8f14a4b-4841-43a5-8629-59536c63d5a1}">
+            <name locale="en_US">T2OUT</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-12.7" uuid="{d673a75f-3ed8-4103-8ebd-37b24bcc419e}">
+            <name locale="en_US">R1IN</name>
+        </pin>
+        <pin x="15.24" length="5.08" angle="180" y="-15.24" uuid="{ed9399a3-3512-401e-b2c3-fd47ced78f81}">
+            <name locale="en_US">R2IN</name>
+        </pin>
+    </pins>
+</symbol>

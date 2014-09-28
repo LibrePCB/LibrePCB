@@ -1,0 +1,55 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{3f52ea55-63de-4890-bed6-151b928182c2}</uuid>
+        <name locale="en_US">T14-250</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.27" width="0.254" layer="10" start_x="0">
+            <segment type="line" end_x="0" end_y="-34.29"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{66bb1e8f-776e-4109-a76b-a8611832911f}">
+            <name locale="en_US">IOT1</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-2.54" uuid="{51fb1e1f-61ae-4261-9e7a-025226817758}">
+            <name locale="en_US">IOT2</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-5.08" uuid="{3310ad5d-b666-4c55-84e6-c3e9df754114}">
+            <name locale="en_US">IOT3</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-7.62" uuid="{f3eafb52-e31a-4132-84b3-9c282f67f953}">
+            <name locale="en_US">IOT4</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-10.16" uuid="{109fcd60-2883-47a7-88e4-bce91f1d922a}">
+            <name locale="en_US">IOT5</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-12.7" uuid="{fe24931e-1a52-4169-aea4-37ad2be2cfce}">
+            <name locale="en_US">IOT6</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-15.24" uuid="{a5a8d8b6-cd06-4869-a7bd-4b0c6c9c0022}">
+            <name locale="en_US">IOT7</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-17.78" uuid="{499274cb-2f29-4060-a8bd-3c8841295ed9}">
+            <name locale="en_US">IOT8</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-20.32" uuid="{c3ead670-1d96-4c38-a38d-52e3626d7680}">
+            <name locale="en_US">IOT9</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-22.86" uuid="{2af286f8-787c-43bd-b38b-ded6485ebbb2}">
+            <name locale="en_US">IOT10</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-25.4" uuid="{8a783750-8157-495c-bec0-157c098e0f41}">
+            <name locale="en_US">IOT11</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-27.94" uuid="{507d5754-c153-4a9a-afeb-a269c4c0e6ee}">
+            <name locale="en_US">IOT12</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-30.48" uuid="{002cc822-fb77-4f80-b15f-5f8bceaecc3f}">
+            <name locale="en_US">IOT13</name>
+        </pin>
+        <pin x="-2.54" length="2.54" angle="0" y="-33.02" uuid="{e2a02cbe-bcf9-4c0b-8f01-f0b622560704}">
+            <name locale="en_US">IOT14</name>
+        </pin>
+    </pins>
+</symbol>

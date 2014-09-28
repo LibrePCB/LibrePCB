@@ -1,0 +1,58 @@
+<symbol file_version="0">
+    <meta>
+        <uuid>{8a75917f-33a0-4996-8fc4-017c5c097a71}</uuid>
+        <name locale="en_US">PNP</name>
+    </meta>
+    <geometry>
+        <polygon fill="false" start_y="1.6779" width="0.1524" layer="10" start_x="2.0861">
+            <segment type="line" end_x="1.5781" end_y="2.5941"/>
+        </polygon>
+        <polygon fill="false" start_y="2.5941" width="0.1524" layer="10" start_x="1.5781">
+            <segment type="line" end_x="0.5159" end_y="1.478"/>
+        </polygon>
+        <polygon fill="false" start_y="1.478" width="0.1524" layer="10" start_x="0.5159">
+            <segment type="line" end_x="2.0861" end_y="1.6779"/>
+        </polygon>
+        <polygon fill="false" start_y="2.54" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="1.808" end_y="2.1239"/>
+        </polygon>
+        <polygon fill="false" start_y="-2.54" width="0.1524" layer="10" start_x="2.54">
+            <segment type="line" end_x="0.508" end_y="-1.524"/>
+        </polygon>
+        <polygon fill="false" start_y="1.778" width="0.254" layer="10" start_x="1.905">
+            <segment type="line" end_x="1.524" end_y="2.413"/>
+        </polygon>
+        <polygon fill="false" start_y="2.413" width="0.254" layer="10" start_x="1.524">
+            <segment type="line" end_x="0.762" end_y="1.651"/>
+        </polygon>
+        <polygon fill="false" start_y="1.651" width="0.254" layer="10" start_x="0.762">
+            <segment type="line" end_x="1.778" end_y="1.778"/>
+        </polygon>
+        <polygon fill="false" start_y="1.778" width="0.254" layer="10" start_x="1.778">
+            <segment type="line" end_x="1.524" end_y="2.159"/>
+        </polygon>
+        <polygon fill="false" start_y="2.159" width="0.254" layer="10" start_x="1.524">
+            <segment type="line" end_x="1.143" end_y="1.905"/>
+        </polygon>
+        <polygon fill="false" start_y="1.905" width="0.254" layer="10" start_x="1.143">
+            <segment type="line" end_x="1.524" end_y="1.905"/>
+        </polygon>
+        <polygon fill="true" start_y="-2.54" width="0.254" layer="10" start_x="-0.254">
+            <segment type="line" end_x="0.508" end_y="-2.54"/>
+            <segment type="line" end_x="0.508" end_y="2.54"/>
+            <segment type="line" end_x="-0.254" end_y="2.54"/>
+            <segment type="line" end_x="-0.254" end_y="-2.54"/>
+        </polygon>
+    </geometry>
+    <pins>
+        <pin x="-2.54" length="2.54" angle="0" y="0" uuid="{02371466-14a1-477f-ba28-43d458fd9fbe}">
+            <name locale="en_US">B</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="270" y="5.08" uuid="{3cf5ed6f-da97-4034-808d-b294a32acad0}">
+            <name locale="en_US">E</name>
+        </pin>
+        <pin x="2.54" length="2.54" angle="90" y="-5.08" uuid="{adfa1fd2-cb10-4dc9-9964-f3ac085697de}">
+            <name locale="en_US">C</name>
+        </pin>
+    </pins>
+</symbol>
