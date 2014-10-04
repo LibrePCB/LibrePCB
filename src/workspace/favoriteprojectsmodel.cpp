@@ -25,7 +25,7 @@
 #include <QtWidgets>
 #include "favoriteprojectsmodel.h"
 #include "workspace.h"
-#include "workspacesettings.h"
+#include "settings/workspacesettings.h"
 
 /*****************************************************************************************
  *  Constructors / Destructor

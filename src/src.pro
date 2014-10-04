@@ -82,8 +82,8 @@ SOURCES += \
     workspace/recentprojectsmodel.cpp \
     workspace/favoriteprojectsmodel.cpp \
     common/exceptions.cpp \
-    workspace/workspacesettings.cpp \
-    workspace/workspacesettingsdialog.cpp \
+    workspace/settings/workspacesettings.cpp \
+    workspace/settings/workspacesettingsdialog.cpp \
     project/schematics/schematic.cpp \
     project/boards/board.cpp \
     project/library/projectlibrary.cpp \
@@ -127,7 +127,11 @@ SOURCES += \
     project/schematics/cmd/cmdschematicnetpointadd.cpp \
     project/schematics/cmd/cmdschematicnetpointremove.cpp \
     project/schematics/cmd/cmdschematicnetlineadd.cpp \
-    project/schematics/cmd/cmdschematicnetlineremove.cpp
+    project/schematics/cmd/cmdschematicnetlineremove.cpp \
+    workspace/settings/workspacesettingsitem.cpp \
+    workspace/settings/items/wsi_applocale.cpp \
+    workspace/settings/items/wsi_projectautosaveinterval.cpp \
+    workspace/settings/items/wsi_appdefaultmeasurementunit.cpp
 
 HEADERS += \
     common/units.h \
@@ -155,8 +159,8 @@ HEADERS += \
     workspace/recentprojectsmodel.h \
     workspace/favoriteprojectsmodel.h \
     common/exceptions.h \
-    workspace/workspacesettings.h \
-    workspace/workspacesettingsdialog.h \
+    workspace/settings/workspacesettings.h \
+    workspace/settings/workspacesettingsdialog.h \
     project/schematics/schematic.h \
     project/boards/board.h \
     project/library/projectlibrary.h \
@@ -200,14 +204,18 @@ HEADERS += \
     project/schematics/cmd/cmdschematicnetpointadd.h \
     project/schematics/cmd/cmdschematicnetpointremove.h \
     project/schematics/cmd/cmdschematicnetlineadd.h \
-    project/schematics/cmd/cmdschematicnetlineremove.h
+    project/schematics/cmd/cmdschematicnetlineremove.h \
+    workspace/settings/workspacesettingsitem.h \
+    workspace/settings/items/wsi_applocale.h \
+    workspace/settings/items/wsi_projectautosaveinterval.h \
+    workspace/settings/items/wsi_appdefaultmeasurementunit.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \
     workspace/workspacechooserdialog.ui \
     library_editor/libraryeditor.ui \
     project/schematics/schematiceditor.ui \
-    workspace/workspacesettingsdialog.ui \
+    workspace/settings/workspacesettingsdialog.ui \
     project/schematics/schematicpagesdock.ui \
     project/schematics/unplacedsymbolsdock.ui
 

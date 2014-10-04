@@ -27,7 +27,7 @@
 #include "controlpanel.h"
 #include "ui_controlpanel.h"
 #include "../workspace.h"
-#include "../workspacesettings.h"
+#include "../settings/workspacesettings.h"
 #include "../../project/project.h"
 #include "../projecttreemodel.h"
 #include "../projecttreeitem.h"

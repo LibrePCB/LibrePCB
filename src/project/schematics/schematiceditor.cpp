@@ -27,7 +27,7 @@
 #include "ui_schematiceditor.h"
 #include "../project.h"
 #include "../../workspace/workspace.h"
-#include "../../workspace/workspacesettings.h"
+#include "../../workspace/settings/workspacesettings.h"
 #include "../../common/undostack.h"
 #include "schematic.h"
 #include "schematicpagesdock.h"

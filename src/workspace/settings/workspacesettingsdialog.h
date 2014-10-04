@@ -46,9 +46,11 @@ class WorkspaceSettingsDialog;
  * @brief The WorkspaceSettingsDialog class
  *
  * This dialog class implements a GUI for all workspace settings. An instance of
- * WorkspaceSettingsDialog is created on calling WorkspaceSettings::showSettingsDialog().
- * There must not exist more than one instance of this class at the same time in the
- * same application instance!
+ * WorkspaceSettingsDialog is created in the class WorkspaceSettings. There must not exist
+ * more than one instance of this class at the same time in the same application instance!
+ *
+ * @author ubruhin
+ * @date 2014-07-12
  */
 class WorkspaceSettingsDialog final : public QDialog
 {
@@ -59,6 +61,12 @@ class WorkspaceSettingsDialog final : public QDialog
         // Constructors / Destructor
         explicit WorkspaceSettingsDialog(Workspace& workspace, WorkspaceSettings& settings);
         ~WorkspaceSettingsDialog();
+
+    protected:
+
+        // Inherited from QDialog
+        void accept();
+        void reject();
 
     private slots:
 
@@ -71,30 +79,6 @@ class WorkspaceSettingsDialog final : public QDialog
         WorkspaceSettingsDialog();
         WorkspaceSettingsDialog(const WorkspaceSettingsDialog& other);
         WorkspaceSettingsDialog& operator=(const WorkspaceSettingsDialog& rhs);
-
-        // General Methods
-
-        /**
-         * @brief The method QDialog::accept() is redefined here...
-         *
-         * ...becase the dialog can close only after the settings are applied successfully.
-         * If the settings can't be applied, this method blocks the accept() command.
-         */
-        void accept();
-
-        /**
-         * @brief Load all settings from the WorkspaceSettings object
-         *        and update all GUI widgets. This is done in the constructor.
-         */
-        void load();
-
-        /**
-         * @brief Save all (changed) settings to the WorkspaceSettings object
-         *
-         * @return  If all settings were saved successfully, this method will return true.
-         *          Otherwise (e.g. some settings are invalid) it will return false.
-         */
-        bool save();
 
 
         // General Attributes

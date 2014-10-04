@@ -27,7 +27,7 @@
 #include "../common/xmlfile.h"
 #include "../common/inifile.h"
 #include "../workspace/workspace.h"
-#include "../workspace/workspacesettings.h"
+#include "../workspace/settings/workspacesettings.h"
 #include "library/projectlibrary.h"
 #include "circuit/circuit.h"
 #include "schematics/schematiceditor.h"
@@ -195,7 +195,7 @@ Project::Project(Workspace& workspace, const FilePath& filepath, bool isNew) thr
     // project successfully opened! :-)
 
     // setup the timer for automatic backups, if enabled in the settings
-    int intervalSecs =  mWorkspace.getSettings().getProjectAutosaveInterval();
+    int intervalSecs =  mWorkspace.getSettings().getProjectAutosaveInterval()->getInterval();
     if (intervalSecs > 0)
     {
         // autosaving is enabled --> start the timer

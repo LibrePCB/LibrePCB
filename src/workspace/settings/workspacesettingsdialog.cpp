@@ -22,9 +22,10 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <QtWidgets>
 #include "workspacesettingsdialog.h"
 #include "ui_workspacesettingsdialog.h"
-#include "workspace.h"
+#include "../workspace.h"
 #include "workspacesettings.h"
 
 /*****************************************************************************************
@@ -38,15 +39,17 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
 {
     mUi->setupUi(this);
 
+    // Add all settings widgets
+    mUi->generalLayout->addRow(mSettings.getAppLocale()->getLabelText(),
+                               mSettings.getAppLocale()->getWidget());
+    mUi->generalLayout->addRow(mSettings.getAppDefMeasUnit()->getLabelText(),
+                               mSettings.getAppDefMeasUnit()->getComboBox());
+    mUi->generalLayout->addRow(mSettings.getProjectAutosaveInterval()->getLabelText(),
+                               mSettings.getProjectAutosaveInterval()->getWidget());
+
     // load the window geometry
     QSettings s(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(), QSettings::IniFormat);
     restoreGeometry(s.value("workspace_settings_dialog/window_geometry").toByteArray());
-
-    // adjust the category list width to its content
-    mUi->categoryListWidget->setMinimumWidth(mUi->categoryListWidget->sizeHintForColumn(0));
-
-    // Load all settings
-    load();
 }
 
 WorkspaceSettingsDialog::~WorkspaceSettingsDialog()
@@ -55,42 +58,32 @@ WorkspaceSettingsDialog::~WorkspaceSettingsDialog()
     QSettings s(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(), QSettings::IniFormat);
     s.setValue("workspace_settings_dialog/window_geometry", saveGeometry());
 
+    // Remove all settings widgets from the dialog (important for memory management!)
+    mSettings.getAppLocale()->getWidget()->setParent(0);
+    mSettings.getAppDefMeasUnit()->getComboBox()->setParent(0);
+    mSettings.getProjectAutosaveInterval()->getWidget()->setParent(0);
+
     delete mUi;         mUi = 0;
 }
 
 /*****************************************************************************************
- *  General Methods
+ *  Inherited from QDialog
  ****************************************************************************************/
 
 void WorkspaceSettingsDialog::accept()
 {
-    if (save())             // the dialog can only be closed after all settings are...
-        QDialog::accept();  // ...saved successfully, otherwise the dialog stays open
+    mSettings.applyAll();
+    QDialog::accept();
 }
 
-void WorkspaceSettingsDialog::load()
+void WorkspaceSettingsDialog::reject()
 {
-    // fill the application language list with values
-    mUi->appLanguageList->clear();
-    mUi->appLanguageList->addItem(tr("System Default"));
-    QDir translations(":/i18n/");
-    foreach (QString filename, translations.entryList(QDir::Files, QDir::Name))
-    {
-        filename.remove("eda4u_");
-        QFileInfo fileInfo(filename);
-        if (fileInfo.suffix() == "qm")
-        {
-            QLocale loc(fileInfo.baseName());
-            QString str(loc.nativeLanguageName() % " (" % loc.nativeCountryName() % ")");
-            if (mUi->appLanguageList->findData(loc.name()) < 0)
-                mUi->appLanguageList->addItem(str, loc.name());
-        }
-    }
+    mSettings.revertAll();
+    QDialog::reject();
+}
 
-    // select the current language in the language list
-    int index = mUi->appLanguageList->findData(mSettings.getAppLocaleName());
-    mUi->appLanguageList->setCurrentIndex(index >= 0 ? index : 0);
-
+/*void WorkspaceSettingsDialog::load()
+{
     // fill the measurement unit list for the application's default measurement unit
     mUi->appDefMeasUnitList->clear();
     mUi->appDefMeasUnitList->addItem(tr("Millimeters"),
@@ -103,20 +96,20 @@ void WorkspaceSettingsDialog::load()
                                      Length::measurementUnitToString(Length::mils));
 
     // select the application's current default measurement unit
-    index = mUi->appDefMeasUnitList->findData(Length::measurementUnitToString(
-                                                  mSettings.getAppDefMeasUnit()));
-    mUi->appDefMeasUnitList->setCurrentIndex(index);
-}
+    //index = mUi->appDefMeasUnitList->findData(Length::measurementUnitToString(
+    //                                              mSettings.getAppDefMeasUnit()));
+    //mUi->appDefMeasUnitList->setCurrentIndex(index);
+}*/
 
-bool WorkspaceSettingsDialog::save()
+/*bool WorkspaceSettingsDialog::save()
 {
-    mSettings.setAppLocaleName(mUi->appLanguageList->currentData().toString());
+    //mSettings.setAppLocaleName(mUi->appLanguageList->currentData().toString());
     mSettings.setAppDefMeasUnit(Length::measurementUnitFromString(
                                      mUi->appDefMeasUnitList->currentData().toString(),
                                      Length::millimeters));
 
     return true;
-}
+}*/
 
 /*****************************************************************************************
  *  Private Slots for the GUI elements
@@ -124,8 +117,31 @@ bool WorkspaceSettingsDialog::save()
 
 void WorkspaceSettingsDialog::on_buttonBox_clicked(QAbstractButton *button)
 {
-    if (mUi->buttonBox->buttonRole(button) == QDialogButtonBox::ApplyRole)
-        save();
+    switch (mUi->buttonBox->buttonRole(button))
+    {
+        case QDialogButtonBox::AcceptRole:
+        case QDialogButtonBox::ApplyRole:
+            mSettings.applyAll();
+            break;
+
+        case QDialogButtonBox::RejectRole:
+            mSettings.revertAll();
+            break;
+
+        case QDialogButtonBox::ResetRole:
+        {
+            int answer = QMessageBox::question(this, tr("Restore default settings"),
+                tr("Are you sure to reset all settings to their default values?\n"
+                   "After applying you cannot undo this change."));
+            if (answer == QMessageBox::Yes)
+                mSettings.restoreDefaults();
+            break;
+        }
+
+        default:
+            qCritical() << "invalid button role:" << mUi->buttonBox->buttonRole(button);
+            break;
+    }
 }
 
 /*****************************************************************************************

@@ -33,7 +33,7 @@
 #include "recentprojectsmodel.h"
 #include "favoriteprojectsmodel.h"
 #include "controlpanel/controlpanel.h"
-#include "workspacesettings.h"
+#include "settings/workspacesettings.h"
 
 using namespace library;
 using namespace project;
