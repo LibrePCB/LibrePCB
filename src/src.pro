@@ -131,7 +131,8 @@ SOURCES += \
     workspace/settings/workspacesettingsitem.cpp \
     workspace/settings/items/wsi_applocale.cpp \
     workspace/settings/items/wsi_projectautosaveinterval.cpp \
-    workspace/settings/items/wsi_appdefaultmeasurementunit.cpp
+    workspace/settings/items/wsi_appdefaultmeasurementunit.cpp \
+    workspace/settings/items/wsi_librarylocaleorder.cpp
 
 HEADERS += \
     common/units.h \
@@ -208,7 +209,8 @@ HEADERS += \
     workspace/settings/workspacesettingsitem.h \
     workspace/settings/items/wsi_applocale.h \
     workspace/settings/items/wsi_projectautosaveinterval.h \
-    workspace/settings/items/wsi_appdefaultmeasurementunit.h
+    workspace/settings/items/wsi_appdefaultmeasurementunit.h \
+    workspace/settings/items/wsi_librarylocaleorder.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \

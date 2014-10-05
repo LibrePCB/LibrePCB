@@ -48,14 +48,14 @@ void WorkspaceSettingsItem::saveValue(const QString& key, const QVariant& value)
 {
     QSettings s(mSettings.getMetadataPath().getPathTo("settings.ini").toStr(),
                 QSettings::IniFormat);
-    s.setValue(key, value);
+    s.setValue("settings/" % key, value);
 }
 
 QVariant WorkspaceSettingsItem::loadValue(const QString& key, const QVariant& defaultValue) const
 {
     QSettings s(mSettings.getMetadataPath().getPathTo("settings.ini").toStr(),
                 QSettings::IniFormat);
-    return s.value(key, defaultValue);
+    return s.value("settings/" % key, defaultValue);
 }
 
 /*****************************************************************************************

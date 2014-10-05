@@ -118,6 +118,10 @@ void WSI_AppLocale::revert()
     updateComboBoxIndex();
 }
 
+/*****************************************************************************************
+ *  Public Slots
+ ****************************************************************************************/
+
 void WSI_AppLocale::comboBoxIndexChanged(int index)
 {
     mAppLocaleTmp = mComboBox->itemData(index).toString();

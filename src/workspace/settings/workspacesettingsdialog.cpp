@@ -40,12 +40,18 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
     mUi->setupUi(this);
 
     // Add all settings widgets
+
+    // tab: general
     mUi->generalLayout->addRow(mSettings.getAppLocale()->getLabelText(),
                                mSettings.getAppLocale()->getWidget());
     mUi->generalLayout->addRow(mSettings.getAppDefMeasUnit()->getLabelText(),
                                mSettings.getAppDefMeasUnit()->getComboBox());
     mUi->generalLayout->addRow(mSettings.getProjectAutosaveInterval()->getLabelText(),
                                mSettings.getProjectAutosaveInterval()->getWidget());
+
+    // tab: library
+    mUi->libraryLayout->addRow(mSettings.getLibLocaleOrder()->getLabelText(),
+                               mSettings.getLibLocaleOrder()->getWidget());
 
     // load the window geometry
     QSettings s(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(), QSettings::IniFormat);
@@ -59,10 +65,16 @@ WorkspaceSettingsDialog::~WorkspaceSettingsDialog()
     s.setValue("workspace_settings_dialog/window_geometry", saveGeometry());
 
     // Remove all settings widgets from the dialog (important for memory management!)
+
+    // tab: general
     mSettings.getAppLocale()->getWidget()->setParent(0);
     mSettings.getAppDefMeasUnit()->getComboBox()->setParent(0);
     mSettings.getProjectAutosaveInterval()->getWidget()->setParent(0);
 
+    // tab: library
+    mSettings.getLibLocaleOrder()->getWidget()->setParent(0);
+
+    // delete private member objects
     delete mUi;         mUi = 0;
 }
 
