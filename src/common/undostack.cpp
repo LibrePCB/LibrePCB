@@ -201,6 +201,13 @@ void UndoStack::endCommand() throw (Exception)
     if (!mCommandActive)
         throw LogicError(__FILE__, __LINE__, QString(), tr("No command active!"));
 
+    if (mCommands.last()->getChildCount() == 0)
+    {
+        // the last command is empty --> remove it from the stack!
+        abortCommand();
+        return;
+    }
+
     mCommandActive = false;
 
     // emit signals
@@ -215,7 +222,7 @@ void UndoStack::abortCommand() throw (Exception)
     if (!mCommandActive)
         throw LogicError(__FILE__, __LINE__, QString(), tr("No command active!"));
 
-    mCommands[mCurrentIndex-1]->undo(); // throws an exception on error
+    mCommands.last()->undo(); // throws an exception on error
     mCurrentIndex--;
     mCommandActive = false;
     delete mCommands.takeLast(); // delete and remove the aborted command from the stack
