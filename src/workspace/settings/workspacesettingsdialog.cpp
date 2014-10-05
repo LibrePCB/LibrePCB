@@ -54,15 +54,15 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
                                mSettings.getLibLocaleOrder()->getWidget());
 
     // load the window geometry
-    QSettings s(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(), QSettings::IniFormat);
-    restoreGeometry(s.value("workspace_settings_dialog/window_geometry").toByteArray());
+    QSettings clientSettings;
+    restoreGeometry(clientSettings.value("workspace_settings_dialog/window_geometry").toByteArray());
 }
 
 WorkspaceSettingsDialog::~WorkspaceSettingsDialog()
 {
     // save the window geometry
-    QSettings s(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(), QSettings::IniFormat);
-    s.setValue("workspace_settings_dialog/window_geometry", saveGeometry());
+    QSettings clientSettings;
+    clientSettings.setValue("workspace_settings_dialog/window_geometry", saveGeometry());
 
     // Remove all settings widgets from the dialog (important for memory management!)
 
@@ -93,35 +93,6 @@ void WorkspaceSettingsDialog::reject()
     mSettings.revertAll();
     QDialog::reject();
 }
-
-/*void WorkspaceSettingsDialog::load()
-{
-    // fill the measurement unit list for the application's default measurement unit
-    mUi->appDefMeasUnitList->clear();
-    mUi->appDefMeasUnitList->addItem(tr("Millimeters"),
-                                     Length::measurementUnitToString(Length::millimeters));
-    mUi->appDefMeasUnitList->addItem(tr("Micrometers"),
-                                     Length::measurementUnitToString(Length::micrometers));
-    mUi->appDefMeasUnitList->addItem(tr("Inches"),
-                                     Length::measurementUnitToString(Length::inches));
-    mUi->appDefMeasUnitList->addItem(tr("Mils"),
-                                     Length::measurementUnitToString(Length::mils));
-
-    // select the application's current default measurement unit
-    //index = mUi->appDefMeasUnitList->findData(Length::measurementUnitToString(
-    //                                              mSettings.getAppDefMeasUnit()));
-    //mUi->appDefMeasUnitList->setCurrentIndex(index);
-}*/
-
-/*bool WorkspaceSettingsDialog::save()
-{
-    //mSettings.setAppLocaleName(mUi->appLanguageList->currentData().toString());
-    mSettings.setAppDefMeasUnit(Length::measurementUnitFromString(
-                                     mUi->appDefMeasUnitList->currentData().toString(),
-                                     Length::millimeters));
-
-    return true;
-}*/
 
 /*****************************************************************************************
  *  Private Slots for the GUI elements

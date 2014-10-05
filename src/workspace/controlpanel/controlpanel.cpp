@@ -94,16 +94,14 @@ void ControlPanel::closeEvent(QCloseEvent *event)
 
 void ControlPanel::saveSettings()
 {
-    QSettings settings(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(),
-                       QSettings::IniFormat);
-
-    settings.beginGroup("controlpanel");
+    QSettings clientSettings;
+    clientSettings.beginGroup("controlpanel");
 
     // main window
-    settings.setValue("window_geometry", saveGeometry());
-    settings.setValue("window_state", saveState());
-    settings.setValue("splitter_h_state", mUi->splitter_h->saveState());
-    settings.setValue("splitter_v_state", mUi->splitter_v->saveState());
+    clientSettings.setValue("window_geometry", saveGeometry());
+    clientSettings.setValue("window_state", saveState());
+    clientSettings.setValue("splitter_h_state", mUi->splitter_h->saveState());
+    clientSettings.setValue("splitter_v_state", mUi->splitter_v->saveState());
 
     // projects treeview (expanded items)
     ProjectTreeModel* model = dynamic_cast<ProjectTreeModel*>(mUi->projectTreeView->model());
@@ -115,30 +113,28 @@ void ControlPanel::saveSettings()
             if (mUi->projectTreeView->isExpanded(index))
                 list.append(FilePath(index.data(Qt::UserRole).toString()).toRelative(mWorkspace.getPath()));
         }
-        settings.setValue("expanded_projecttreeview_items", QVariant::fromValue(list));
+        clientSettings.setValue("expanded_projecttreeview_items", QVariant::fromValue(list));
     }
 
-    settings.endGroup();
+    clientSettings.endGroup();
 }
 
 void ControlPanel::loadSettings()
 {
-    QSettings settings(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(),
-                       QSettings::IniFormat);
-
-    settings.beginGroup("controlpanel");
+    QSettings clientSettings;
+    clientSettings.beginGroup("controlpanel");
 
     // main window
-    restoreGeometry(settings.value("window_geometry").toByteArray());
-    restoreState(settings.value("window_state").toByteArray());
-    mUi->splitter_h->restoreState(settings.value("splitter_h_state").toByteArray());
-    mUi->splitter_v->restoreState(settings.value("splitter_v_state").toByteArray());
+    restoreGeometry(clientSettings.value("window_geometry").toByteArray());
+    restoreState(clientSettings.value("window_state").toByteArray());
+    mUi->splitter_h->restoreState(clientSettings.value("splitter_h_state").toByteArray());
+    mUi->splitter_v->restoreState(clientSettings.value("splitter_v_state").toByteArray());
 
     // projects treeview (expanded items)
     ProjectTreeModel* model = dynamic_cast<ProjectTreeModel*>(mUi->projectTreeView->model());
     if (model)
     {
-        QStringList list = settings.value("expanded_projecttreeview_items").toStringList();
+        QStringList list = clientSettings.value("expanded_projecttreeview_items").toStringList();
         foreach (QString item, list)
         {
             FilePath filepath = FilePath::fromRelative(mWorkspace.getPath(), item);
@@ -149,7 +145,7 @@ void ControlPanel::loadSettings()
         }
     }
 
-    settings.endGroup();
+    clientSettings.endGroup();
 }
 
 /*****************************************************************************************

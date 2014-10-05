@@ -113,9 +113,9 @@ SchematicEditor::SchematicEditor(Workspace& workspace, Project& project) :
             [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::AbortCommand), true);});
 
     // Restore Window Geometry
-    QSettings s(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(), QSettings::IniFormat);
-    restoreGeometry(s.value("schematic_editor/window_geometry").toByteArray());
-    restoreState(s.value("schematic_editor/window_state").toByteArray());
+    QSettings clientSettings;
+    restoreGeometry(clientSettings.value("schematic_editor/window_geometry").toByteArray());
+    restoreState(clientSettings.value("schematic_editor/window_state").toByteArray());
 
     // Load first schematic page
     mUi->graphicsView->setGridType(CADView::gridLines);
@@ -129,9 +129,9 @@ SchematicEditor::SchematicEditor(Workspace& workspace, Project& project) :
 SchematicEditor::~SchematicEditor()
 {
     // Save Window Geometry
-    QSettings s(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(), QSettings::IniFormat);
-    s.setValue("schematic_editor/window_geometry", saveGeometry());
-    s.setValue("schematic_editor/window_state", saveState());
+    QSettings clientSettings;
+    clientSettings.setValue("schematic_editor/window_geometry", saveGeometry());
+    clientSettings.setValue("schematic_editor/window_state", saveState());
 
     delete mFsm;                    mFsm = 0;
     delete mUnplacedSymbolsDock;    mUnplacedSymbolsDock = 0;
