@@ -132,7 +132,9 @@ SOURCES += \
     workspace/settings/items/wsi_applocale.cpp \
     workspace/settings/items/wsi_projectautosaveinterval.cpp \
     workspace/settings/items/wsi_appdefaultmeasurementunit.cpp \
-    workspace/settings/items/wsi_librarylocaleorder.cpp
+    workspace/settings/items/wsi_librarylocaleorder.cpp \
+    project/circuit/editnetclassesdialog.cpp \
+    project/circuit/cmd/cmdnetclasssetname.cpp
 
 HEADERS += \
     common/units.h \
@@ -210,7 +212,9 @@ HEADERS += \
     workspace/settings/items/wsi_applocale.h \
     workspace/settings/items/wsi_projectautosaveinterval.h \
     workspace/settings/items/wsi_appdefaultmeasurementunit.h \
-    workspace/settings/items/wsi_librarylocaleorder.h
+    workspace/settings/items/wsi_librarylocaleorder.h \
+    project/circuit/editnetclassesdialog.h \
+    project/circuit/cmd/cmdnetclasssetname.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \
@@ -219,7 +223,8 @@ FORMS += \
     project/schematics/schematiceditor.ui \
     workspace/settings/workspacesettingsdialog.ui \
     project/schematics/schematicpagesdock.ui \
-    project/schematics/unplacedsymbolsdock.ui
+    project/schematics/unplacedsymbolsdock.ui \
+    project/circuit/editnetclassesdialog.ui
 
 
 # Custom compiler "lrelease" for qm generation

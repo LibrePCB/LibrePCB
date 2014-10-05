@@ -33,6 +33,7 @@
 #include "schematicpagesdock.h"
 #include "unplacedsymbolsdock.h"
 #include "fsm/schematiceditorfsm.h"
+#include "../circuit/circuit.h"
 
 namespace project {
 
@@ -61,6 +62,8 @@ SchematicEditor::SchematicEditor(Workspace& workspace, Project& project) :
     connect(mUi->actionZoom_In, SIGNAL(triggered()), mUi->graphicsView, SLOT(zoomIn()));
     connect(mUi->actionZoom_Out, SIGNAL(triggered()), mUi->graphicsView, SLOT(zoomOut()));
     connect(mUi->actionZoom_All, SIGNAL(triggered()), mUi->graphicsView, SLOT(zoomAll()));
+    connect(mUi->actionEditNetclasses, &QAction::triggered,
+            [this](){mProject.getCircuit().execEditNetClassesDialog(this);});
 
     // connect the undo/redo actions with the UndoStack of the project
     connect(&mProject.getUndoStack(), &UndoStack::undoTextChanged,

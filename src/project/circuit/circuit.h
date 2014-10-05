@@ -76,6 +76,7 @@ class Circuit final : public QObject
         void addNetClass(NetClass* netclass, bool toDomTree = true) throw (Exception);
         void removeNetClass(NetClass* netclass, bool fromDomTree = true,
                             bool deleteNetClass = false) throw (Exception);
+        void execEditNetClassesDialog(QWidget* parent = 0) noexcept;
 
         // NetSignal Methods
         NetSignal* getNetSignalByUuid(const QUuid& uuid) const noexcept;
@@ -99,6 +100,7 @@ class Circuit final : public QObject
 
         // Static Methods
         static Circuit* create(Workspace& workspace, Project& project) throw (Exception);
+
 
     private:
 

@@ -31,6 +31,7 @@
 #include "netclass.h"
 #include "netsignal.h"
 #include "genericcomponentinstance.h"
+#include "editnetclassesdialog.h"
 
 namespace project {
 
@@ -204,6 +205,19 @@ void Circuit::removeNetClass(NetClass* netclass, bool fromDomTree, bool deleteNe
 
     if (deleteNetClass)
         delete netclass;
+}
+
+void Circuit::execEditNetClassesDialog(QWidget* parent) noexcept
+{
+    try
+    {
+        EditNetClassesDialog dialog(*this, parent);
+        dialog.exec();
+    }
+    catch (Exception& e)
+    {
+        QMessageBox::critical(parent, tr("Error"), e.getUserMsg());
+    }
 }
 
 /*****************************************************************************************

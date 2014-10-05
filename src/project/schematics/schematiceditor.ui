@@ -76,6 +76,8 @@
     <addaction name="actionCut"/>
     <addaction name="actionPaste"/>
     <addaction name="actionRemove"/>
+    <addaction name="separator"/>
+    <addaction name="actionEditNetclasses"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -563,6 +565,11 @@
    </property>
    <property name="text">
     <string>Grid</string>
+   </property>
+  </action>
+  <action name="actionEditNetclasses">
+   <property name="text">
+    <string>Net Classes</string>
    </property>
   </action>
  </widget>
