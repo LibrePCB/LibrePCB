@@ -34,6 +34,7 @@
 #include "unplacedsymbolsdock.h"
 #include "fsm/schematiceditorfsm.h"
 #include "../circuit/circuit.h"
+#include "../../common/dialogs/gridsettingsdialog.h"
 
 namespace project {
 
@@ -208,6 +209,21 @@ void SchematicEditor::on_actionRedo_triggered()
     catch (Exception& e)
     {
         QMessageBox::critical(this, tr("Redo failed"), e.getUserMsg());
+    }
+}
+
+void SchematicEditor::on_actionGrid_triggered()
+{
+    if (!mUi->graphicsView->getCadScene()) return;
+
+    GridSettingsDialog dialog(mWorkspace, mUi->graphicsView->getGridType(),
+                              mUi->graphicsView->getCadScene()->getGridInterval(),
+                              LengthUnit::millimeters(), this);
+
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        mUi->graphicsView->setGridType(dialog.getGridType());
+        // TODO
     }
 }
 

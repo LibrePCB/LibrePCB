@@ -27,6 +27,223 @@
 #include "exceptions.h"
 
 /*****************************************************************************************
+ *  Class LengthUnit
+ ****************************************************************************************/
+
+// Static Variables
+
+LengthUnit::LengthUnit_t LengthUnit::sDefaultUnit = LengthUnit::LengthUnit_millimeters;
+
+// General Methods
+
+QString LengthUnit::toString() const noexcept
+{
+    switch (mUnit)
+    {
+        case LengthUnit_millimeters:
+            return QString("millimeters");
+        case LengthUnit_micrometers:
+            return QString("micrometers");
+        case LengthUnit_nanometers:
+            return QString("nanometers");
+        case LengthUnit_inches:
+            return QString("inches");
+        case LengthUnit_mils:
+            return QString("mils");
+        default:
+            qCritical() << "invalid length unit:" << mUnit;
+            Q_ASSERT(false);
+            return QString();
+    }
+}
+
+QString LengthUnit::toStringTr() const noexcept
+{
+    switch (mUnit)
+    {
+        case LengthUnit_millimeters:
+            return QCoreApplication::translate("LengthUnit", "Millimeters");
+        case LengthUnit_micrometers:
+            return QCoreApplication::translate("LengthUnit", "Micrometers");
+        case LengthUnit_nanometers:
+            return QCoreApplication::translate("LengthUnit", "Nanometers");
+        case LengthUnit_inches:
+            return QCoreApplication::translate("LengthUnit", "Inches");
+        case LengthUnit_mils:
+            return QCoreApplication::translate("LengthUnit", "Mils");
+        default:
+            qCritical() << "invalid length unit:" << mUnit;
+            Q_ASSERT(false);
+            return QString();
+    }
+}
+
+QString LengthUnit::toShortStringTr() const noexcept
+{
+    switch (mUnit)
+    {
+        case LengthUnit_millimeters:
+            return QCoreApplication::translate("LengthUnit", "mm");
+        case LengthUnit_micrometers:
+            return QCoreApplication::translate("LengthUnit", "μm");
+        case LengthUnit_nanometers:
+            return QCoreApplication::translate("LengthUnit", "nm");
+        case LengthUnit_inches:
+            return QCoreApplication::translate("LengthUnit", "″");
+        case LengthUnit_mils:
+            return QCoreApplication::translate("LengthUnit", "mils");
+        default:
+            qCritical() << "invalid length unit:" << mUnit;
+            Q_ASSERT(false);
+            return QString();
+    }
+}
+
+qreal LengthUnit::convertToUnit(const Length& length) const noexcept
+{
+    switch (mUnit)
+    {
+        case LengthUnit_millimeters:
+            return length.toMm();
+        case LengthUnit_micrometers:
+            return length.toMm() * (qreal)1000;
+        case LengthUnit_nanometers:
+            return (qreal)length.toNm();
+        case LengthUnit_inches:
+            return length.toInch();
+        case LengthUnit_mils:
+            return length.toMil();
+        default:
+            qCritical() << "invalid length unit:" << mUnit;
+            Q_ASSERT(false);
+            return 0;
+    }
+}
+
+QPointF LengthUnit::convertToUnit(const Point& point) const noexcept
+{
+    switch (mUnit)
+    {
+        case LengthUnit_millimeters:
+            return point.toMmQPointF();
+        case LengthUnit_micrometers:
+            return point.toMmQPointF() * (qreal)1000;
+        case LengthUnit_nanometers:
+            return point.toMmQPointF() * (qreal)1000000;
+        case LengthUnit_inches:
+            return point.toInchQPointF();
+        case LengthUnit_mils:
+            return point.toMilQPointF();
+        default:
+            qCritical() << "invalid length unit:" << mUnit;
+            Q_ASSERT(false);
+            return QPointF();
+    }
+}
+
+Length LengthUnit::convertFromUnit(qreal length) const noexcept
+{
+    switch (mUnit)
+    {
+        case LengthUnit_millimeters:
+            return Length::fromMm(length);
+        case LengthUnit_micrometers:
+            return Length::fromMm(length / (qreal)1000);
+        case LengthUnit_nanometers:
+            return Length::fromMm(length / (qreal)1000000);
+        case LengthUnit_inches:
+            return Length::fromInch(length);
+        case LengthUnit_mils:
+            return Length::fromMil(length);
+        default:
+            qCritical() << "invalid length unit:" << mUnit;
+            Q_ASSERT(false);
+            return Length(0);
+    }
+}
+
+Point LengthUnit::convertFromUnit(const QPointF& point) const noexcept
+{
+    switch (mUnit)
+    {
+        case LengthUnit_millimeters:
+            return Point::fromMm(point);
+        case LengthUnit_micrometers:
+            return Point::fromMm(point / (qreal)1000);
+        case LengthUnit_nanometers:
+            return Point::fromMm(point / (qreal)1000000);
+        case LengthUnit_inches:
+            return Point::fromInch(point);
+        case LengthUnit_mils:
+            return Point::fromMil(point);
+        default:
+            qCritical() << "invalid length unit:" << mUnit;
+            Q_ASSERT(false);
+            return Point(Length(0), Length(0));
+    }
+}
+
+// Static Methods
+
+LengthUnit LengthUnit::fromIndex(int index, const LengthUnit& defaultUnit, bool* ok) noexcept
+{
+    if ((index >= 0) && (index < LengthUnit_COUNT))
+    {
+        if (ok) *ok = true;
+        return LengthUnit(static_cast<LengthUnit_t>(index));
+    }
+    else
+    {
+        if (ok) *ok = false;
+        return defaultUnit;
+    }
+}
+
+LengthUnit LengthUnit::fromString(const QString& unitString,
+                                  const LengthUnit& defaultUnit, bool* ok) noexcept
+{
+    if (ok) *ok = true;
+
+    if (unitString == "millimeters")
+        return LengthUnit(LengthUnit_millimeters);
+    else if (unitString == "micrometers")
+        return LengthUnit(LengthUnit_micrometers);
+    else if (unitString == "nanometers")
+        return LengthUnit(LengthUnit_nanometers);
+    else if (unitString == "inches")
+        return LengthUnit(LengthUnit_inches);
+    else if (unitString == "mils")
+        return LengthUnit(LengthUnit_mils);
+    else
+    {
+        if (ok) *ok = false;
+        return defaultUnit;
+    }
+}
+
+QList<LengthUnit> LengthUnit::getAllUnits() noexcept
+{
+    QList<LengthUnit> list;
+    for (int i = 0; i < LengthUnit_COUNT; i++)
+        list.append(LengthUnit(static_cast<LengthUnit_t>(i)));
+    return list;
+}
+
+// Non-Member Functions
+
+QDataStream& operator<<(QDataStream& stream, const LengthUnit& unit)
+{
+    stream << unit.toString();
+    return stream;
+}
+
+QDebug operator<<(QDebug stream, const LengthUnit& unit)
+{
+    stream << QString("LengthUnit(%1)").arg(unit.toString());
+    return stream;
+}
+
+/*****************************************************************************************
  *  Class Length
  ****************************************************************************************/
 
@@ -79,39 +296,6 @@ Length Length::fromPx(qreal pixels, const Length& gridInterval)
     Length l;
     l.setLengthPx(pixels);
     return l.mapToGrid(gridInterval);
-}
-
-QString Length::measurementUnitToString(MeasurementUnit unit)
-{
-    switch (unit)
-    {
-        case Length::millimeters:
-            return QString("millimeters");
-        case Length::micrometers:
-            return QString("micrometers");
-        case Length::inches:
-            return QString("inches");
-        case Length::mils:
-            return QString("mils");
-        default:
-            throw LogicError(__FILE__, __LINE__, QString("unit = %1").arg(unit),
-                QCoreApplication::translate("Length", "Unit conversion failed!"));
-    }
-}
-
-Length::MeasurementUnit Length::measurementUnitFromString(const QString& unit,
-                                                          MeasurementUnit defaultValue)
-{
-    if (unit == "millimeters")
-        return Length::millimeters;
-    else if (unit == "micrometers")
-        return Length::micrometers;
-    else if (unit == "inches")
-        return Length::inches;
-    else if (unit == "mils")
-        return Length::mils;
-    else
-        return defaultValue;
 }
 
 // Private Methods

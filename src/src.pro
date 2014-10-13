@@ -131,10 +131,11 @@ SOURCES += \
     workspace/settings/workspacesettingsitem.cpp \
     workspace/settings/items/wsi_applocale.cpp \
     workspace/settings/items/wsi_projectautosaveinterval.cpp \
-    workspace/settings/items/wsi_appdefaultmeasurementunit.cpp \
     workspace/settings/items/wsi_librarylocaleorder.cpp \
     project/circuit/editnetclassesdialog.cpp \
-    project/circuit/cmd/cmdnetclasssetname.cpp
+    project/circuit/cmd/cmdnetclasssetname.cpp \
+    common/dialogs/gridsettingsdialog.cpp \
+    workspace/settings/items/wsi_appdefaultmeasurementunits.cpp
 
 HEADERS += \
     common/units.h \
@@ -211,10 +212,11 @@ HEADERS += \
     workspace/settings/workspacesettingsitem.h \
     workspace/settings/items/wsi_applocale.h \
     workspace/settings/items/wsi_projectautosaveinterval.h \
-    workspace/settings/items/wsi_appdefaultmeasurementunit.h \
     workspace/settings/items/wsi_librarylocaleorder.h \
     project/circuit/editnetclassesdialog.h \
-    project/circuit/cmd/cmdnetclasssetname.h
+    project/circuit/cmd/cmdnetclasssetname.h \
+    common/dialogs/gridsettingsdialog.h \
+    workspace/settings/items/wsi_appdefaultmeasurementunits.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \
@@ -224,7 +226,8 @@ FORMS += \
     workspace/settings/workspacesettingsdialog.ui \
     project/schematics/schematicpagesdock.ui \
     project/schematics/unplacedsymbolsdock.ui \
-    project/circuit/editnetclassesdialog.ui
+    project/circuit/editnetclassesdialog.ui \
+    common/dialogs/gridsettingsdialog.ui
 
 
 # Custom compiler "lrelease" for qm generation

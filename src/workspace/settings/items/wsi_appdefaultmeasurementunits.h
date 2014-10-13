@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WSI_APPDEFAULTMEASUREMENTUNIT_H
-#define WSI_APPDEFAULTMEASUREMENTUNIT_H
+#ifndef WSI_APPDEFAULTMEASUREMENTUNITS_H
+#define WSI_APPDEFAULTMEASUREMENTUNITS_H
 
 /*****************************************************************************************
  *  Includes
@@ -28,32 +28,32 @@
 #include "../../../common/units.h"
 
 /*****************************************************************************************
- *  Class WSI_AppDefaultMeasurementUnit
+ *  Class WSI_AppDefaultMeasurementUnits
  ****************************************************************************************/
 
 /**
- * @brief The WSI_AppDefaultMeasurementUnit class represents the application's default
- *        measurement unit
+ * @brief The WSI_AppDefaultMeasurementUnits class represents the application's default
+ *        measurement units (for example the application's default length unit)
  *
  * @author ubruhin
  * @date 2014-10-04
  */
-class WSI_AppDefaultMeasurementUnit final : public WorkspaceSettingsItem
+class WSI_AppDefaultMeasurementUnits final : public WorkspaceSettingsItem
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit WSI_AppDefaultMeasurementUnit(WorkspaceSettings& settings);
-        ~WSI_AppDefaultMeasurementUnit();
+        explicit WSI_AppDefaultMeasurementUnits(WorkspaceSettings& settings);
+        ~WSI_AppDefaultMeasurementUnits();
 
         // Getters
-        Length::MeasurementUnit getMeasUnit() const {return mMeasurementUnit;}
+        const LengthUnit& getLengthUnit() const {return mLengthUnit;}
 
         // Getters: Widgets
-        QString getLabelText() const {return tr("Default Measurement Unit:");}
-        QComboBox* getComboBox() const {return mComboBox;}
+        QString getLengthUnitLabelText() const {return tr("Default Length Unit:");}
+        QComboBox* getLengthUnitComboBox() const {return mLengthUnitComboBox;}
 
         // General Methods
         void restoreDefault();
@@ -64,33 +64,33 @@ class WSI_AppDefaultMeasurementUnit final : public WorkspaceSettingsItem
     public slots:
 
         // Public Slots
-        void comboBoxIndexChanged(int index);
+        void lengthUnitComboBoxIndexChanged(int index);
 
 
     private:
 
         // make some methods inaccessible...
-        WSI_AppDefaultMeasurementUnit();
-        WSI_AppDefaultMeasurementUnit(const WSI_AppDefaultMeasurementUnit& other);
-        WSI_AppDefaultMeasurementUnit& operator=(const WSI_AppDefaultMeasurementUnit& rhs);
+        WSI_AppDefaultMeasurementUnits();
+        WSI_AppDefaultMeasurementUnits(const WSI_AppDefaultMeasurementUnits& other);
+        WSI_AppDefaultMeasurementUnits& operator=(const WSI_AppDefaultMeasurementUnits& rhs);
 
 
         // Private Methods
-        void updateComboBoxIndex();
+        void updateLengthUnitComboBoxIndex();
 
 
         // General Attributes
 
         /**
-         * @brief The application's default measurement unit
+         * @brief The application's default length unit
          *
-         * Default: Length::millimeters
+         * Default: millimeters
          */
-        Length::MeasurementUnit mMeasurementUnit;
-        Length::MeasurementUnit mMeasurementUnitTmp;
+        LengthUnit mLengthUnit;
+        LengthUnit mLengthUnitTmp;
 
         // Widgets
-        QComboBox* mComboBox;
+        QComboBox* mLengthUnitComboBox;
 };
 
-#endif // WSI_APPDEFAULTMEASUREMENTUNIT_H
+#endif // WSI_APPDEFAULTMEASUREMENTUNITS_H

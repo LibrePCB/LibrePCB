@@ -53,7 +53,7 @@ WorkspaceSettings::WorkspaceSettings(Workspace& workspace) :
 
     // load all settings items
     mItems.append(mAppLocale = new WSI_AppLocale(*this));
-    mItems.append(mAppDefMeasUnit = new WSI_AppDefaultMeasurementUnit(*this));
+    mItems.append(mAppDefMeasUnits = new WSI_AppDefaultMeasurementUnits(*this));
     mItems.append(mProjectAutosaveInterval = new WSI_ProjectAutosaveInterval(*this));
     mItems.append(mLibraryLocaleOrder = new WSI_LibraryLocaleOrder(*this));
 

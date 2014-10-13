@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SCHEMATICEDITOR_H
-#define PROJECT_SCHEMATICEDITOR_H
+#ifndef GRIDSETTINGSDIALOG_H
+#define GRIDSETTINGSDIALOG_H
 
 /*****************************************************************************************
  *  Includes
@@ -26,7 +26,8 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include "../../common/cadscene.h"
+#include "../units.h"
+#include "../cadview.h"
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -35,86 +36,61 @@
 class Workspace;
 
 namespace Ui {
-class SchematicEditor;
-}
-
-namespace project {
-class Project;
-class SchematicPagesDock;
-class UnplacedSymbolsDock;
-class SchematicEditorFsm;
+class GridSettingsDialog;
 }
 
 /*****************************************************************************************
- *  Class SchematicEditor
+ *  Class GridSettingsDialog
  ****************************************************************************************/
 
-namespace project {
-
 /**
- * @brief The SchematicEditor class
+ * @brief The GridSettingsDialog class
+ *
+ * @author ubruhin
+ * @date 2014-10-13
  */
-class SchematicEditor : public QMainWindow, public IF_CADSceneEventHandler
+class GridSettingsDialog final : public QDialog
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit SchematicEditor(Workspace& workspace, Project& project);
-        ~SchematicEditor();
+        explicit GridSettingsDialog(Workspace& workspace, CADView::GridType type,
+                                    const Length& interval, const LengthUnit& unit,
+                                    QWidget* parent = 0);
+        ~GridSettingsDialog();
 
         // Getters
-        Project& getProject() const noexcept {return mProject;}
-        int getActiveSchematicIndex() const noexcept {return mActiveSchematicIndex;}
+        CADView::GridType getGridType() const noexcept {return mType;}
+        const Length& getGridInterval() const noexcept {return mInterval;}
+        const LengthUnit& getUnit() const noexcept {return mUnit;}
 
-        // Setters
-        void setActiveSchematicIndex(int index);
-
-    protected:
-
-        void closeEvent(QCloseEvent* event);
 
     private slots:
 
-        // Actions
-        void on_actionClose_Project_triggered();
-        void on_actionUndo_triggered();
-        void on_actionRedo_triggered();
-        void on_actionGrid_triggered();
-
-    signals:
-
-        void activeSchematicChanged(int oldIndex, int newIndex);
+        // Private Slots
+        void rbtnGroupClicked(int id);
+        void spbxIntervalChanged(double arg1);
+        void cbxUnitsChanged(int index);
+        void buttonBoxClicked(QAbstractButton *button);
 
     private:
 
         // make some methods inaccessible...
-        SchematicEditor();
-        SchematicEditor(const SchematicEditor& other);
-        SchematicEditor& operator=(const SchematicEditor& rhs);
+        GridSettingsDialog();
+        GridSettingsDialog(const GridSettingsDialog& other);
+        GridSettingsDialog& operator=(const GridSettingsDialog& rhs);
 
         // Private Methods
-        bool cadSceneEventHandler(QEvent* event);
+        void updateInternalRepresentation() noexcept;
 
         // General Attributes
+        Ui::GridSettingsDialog* mUi;
         Workspace& mWorkspace;
-        Project& mProject;
-        Ui::SchematicEditor* mUi;
-
-        int mActiveSchematicIndex;
-
-        // Docks
-        SchematicPagesDock* mPagesDock;
-        UnplacedSymbolsDock* mUnplacedSymbolsDock;
-
-        // Finite State Machine
-        SchematicEditorFsm* mFsm;
-
-        // All FSM states need access to private attributes!
-        friend class SchematicEditorState;
+        CADView::GridType mType;
+        Length mInterval;
+        LengthUnit mUnit;
 };
 
-} // namespace project
-
-#endif // PROJECT_SCHEMATICEDITOR_H
+#endif // GRIDSETTINGSDIALOG_H
