@@ -32,8 +32,6 @@
  *  Forward Declarations
  ****************************************************************************************/
 
-class Workspace;
-
 namespace Ui {
 class SchematicEditor;
 }
@@ -61,7 +59,7 @@ class SchematicEditor : public QMainWindow, public IF_CADSceneEventHandler
     public:
 
         // Constructors / Destructor
-        explicit SchematicEditor(Workspace& workspace, Project& project);
+        explicit SchematicEditor(Project& project);
         ~SchematicEditor();
 
         // Getters
@@ -98,7 +96,6 @@ class SchematicEditor : public QMainWindow, public IF_CADSceneEventHandler
         bool cadSceneEventHandler(QEvent* event);
 
         // General Attributes
-        Workspace& mWorkspace;
         Project& mProject;
         Ui::SchematicEditor* mUi;
 

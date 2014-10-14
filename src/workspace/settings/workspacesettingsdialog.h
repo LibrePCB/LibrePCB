@@ -31,7 +31,6 @@
  *  Forward Declarations
  ****************************************************************************************/
 
-class Workspace;
 class WorkspaceSettings;
 
 namespace Ui {
@@ -59,7 +58,7 @@ class WorkspaceSettingsDialog final : public QDialog
     public:
 
         // Constructors / Destructor
-        explicit WorkspaceSettingsDialog(Workspace& workspace, WorkspaceSettings& settings);
+        explicit WorkspaceSettingsDialog(WorkspaceSettings& settings);
         ~WorkspaceSettingsDialog();
 
     protected:
@@ -83,9 +82,7 @@ class WorkspaceSettingsDialog final : public QDialog
 
         // General Attributes
         Ui::WorkspaceSettingsDialog* mUi;
-        Workspace& mWorkspace; ///< a pointer to the Workspace object
         WorkspaceSettings& mSettings; ///< a pointer to the WorkspaceSettings object
-
 };
 
 #endif // WORKSPACESETTINGSDIALOG_H

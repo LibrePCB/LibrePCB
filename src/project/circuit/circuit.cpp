@@ -39,8 +39,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Circuit::Circuit(Workspace& workspace, Project& project, bool restore, bool isNew) throw (Exception) :
-    QObject(0), mWorkspace(workspace), mProject(project),
+Circuit::Circuit(Project& project, bool restore, bool isNew) throw (Exception) :
+    QObject(0), mProject(project),
     mXmlFilepath(project.getPath().getPathTo("core/circuit.xml")), mXmlFile(0)
 {
     qDebug() << "load circuit...";
@@ -399,7 +399,7 @@ bool Circuit::save(bool toOriginal, QStringList& errors) noexcept
  *  Static Methods
  ****************************************************************************************/
 
-Circuit* Circuit::create(Workspace& workspace, Project& project) throw (Exception)
+Circuit* Circuit::create(Project& project) throw (Exception)
 {
     XmlFile* file = 0;
     Circuit* circuit = 0;
@@ -407,7 +407,7 @@ Circuit* Circuit::create(Workspace& workspace, Project& project) throw (Exceptio
     try
     {
         file = XmlFile::create(project.getPath().getPathTo("core/circuit.xml"), "circuit", 0);
-        circuit = new Circuit(workspace, project, true, true);
+        circuit = new Circuit(project, true, true);
         delete file;
     }
     catch (Exception& e)

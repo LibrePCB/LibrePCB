@@ -42,7 +42,7 @@ class GenericComponent : public LibraryElement
 
     public:
 
-        explicit GenericComponent(Workspace* workspace, const FilePath& xmlFilePath);
+        explicit GenericComponent(const FilePath& xmlFilePath);
         virtual ~GenericComponent();
 
     private:

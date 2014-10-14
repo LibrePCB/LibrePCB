@@ -42,8 +42,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SchematicEditor::SchematicEditor(Workspace& workspace, Project& project) :
-    QMainWindow(0), mWorkspace(workspace), mProject(project), mUi(new Ui::SchematicEditor),
+SchematicEditor::SchematicEditor(Project& project) :
+    QMainWindow(0), mProject(project), mUi(new Ui::SchematicEditor),
     mActiveSchematicIndex(-1), mPagesDock(0), mUnplacedSymbolsDock(0), mFsm(0)
 {
     mUi->setupUi(this);
@@ -216,7 +216,7 @@ void SchematicEditor::on_actionGrid_triggered()
 {
     if (!mUi->graphicsView->getCadScene()) return;
 
-    GridSettingsDialog dialog(mWorkspace, mUi->graphicsView->getGridType(),
+    GridSettingsDialog dialog(mUi->graphicsView->getGridType(),
                               mUi->graphicsView->getCadScene()->getGridInterval(),
                               LengthUnit::millimeters(), this);
 

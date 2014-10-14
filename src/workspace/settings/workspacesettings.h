@@ -38,7 +38,6 @@
  *  Forward Declarations
  ****************************************************************************************/
 
-class Workspace;
 class WorkspaceSettingsDialog;
 
 /*****************************************************************************************
@@ -79,7 +78,7 @@ class WorkspaceSettings final : public QObject
     public:
 
         // Constructors / Destructor
-        explicit WorkspaceSettings(Workspace& workspace);
+        WorkspaceSettings();
         ~WorkspaceSettings();
 
 
@@ -113,13 +112,11 @@ class WorkspaceSettings final : public QObject
     private:
 
         // make some methods inaccessible...
-        WorkspaceSettings();
         WorkspaceSettings(const WorkspaceSettings& other);
         WorkspaceSettings& operator=(const WorkspaceSettings& rhs);
 
 
         // General Attributes
-        Workspace& mWorkspace; ///< a pointer to the Workspace object
         FilePath mMetadataPath; ///< the ".metadata" directory in the workspace
         WorkspaceSettingsDialog* mDialog; ///< the settings dialog
 

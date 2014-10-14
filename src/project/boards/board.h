@@ -32,8 +32,6 @@
  *  Forward Declarations
  ****************************************************************************************/
 
-class Workspace;
-
 namespace project {
 class Project;
 class Circuit;
@@ -57,7 +55,7 @@ class Board final : public CADScene
 
     public:
 
-        explicit Board(Workspace& workspace, Project& project, Circuit& circuit);
+        explicit Board(Project& project, Circuit& circuit);
         ~Board();
 
     private:
@@ -68,7 +66,6 @@ class Board final : public CADScene
         Board& operator=(const Board& rhs);
 
         // General
-        Workspace& mWorkspace; ///< A reference to the Workspace object (from the ctor)
         Project& mProject; ///< A reference to the Project object (from the ctor)
         Circuit& mCircuit; ///< A reference to the Circuit object (from the ctor)
 

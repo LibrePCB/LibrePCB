@@ -44,11 +44,10 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Project::Project(Workspace& workspace, const FilePath& filepath, bool isNew) throw (Exception) :
-    QObject(0), mWorkspace(workspace), mPath(filepath.getParentDir()),
-    mFilepath(filepath), mXmlFile(0), mFileLock(filepath), mIsRestored(false),
-    mSchematicsIniFile(0), mUndoStack(0), mProjectLibrary(0), mCircuit(0),
-    mSchematicEditor(0)
+Project::Project(const FilePath& filepath, bool isNew) throw (Exception) :
+    QObject(0), mPath(filepath.getParentDir()), mFilepath(filepath), mXmlFile(0),
+    mFileLock(filepath), mIsRestored(false), mSchematicsIniFile(0), mUndoStack(0),
+    mProjectLibrary(0), mCircuit(0), mSchematicEditor(0)
 {
     qDebug() << "load project...";
 
@@ -137,14 +136,14 @@ Project::Project(Workspace& workspace, const FilePath& filepath, bool isNew) thr
         mUndoStack = new UndoStack();
 
         if (isNew)
-            mProjectLibrary = ProjectLibrary::create(mWorkspace, *this);
+            mProjectLibrary = ProjectLibrary::create(*this);
         else
-            mProjectLibrary = new ProjectLibrary(mWorkspace, *this, mIsRestored);
+            mProjectLibrary = new ProjectLibrary(*this, mIsRestored);
 
         if (isNew)
-            mCircuit = Circuit::create(mWorkspace, *this);
+            mCircuit = Circuit::create(*this);
         else
-            mCircuit = new Circuit(mWorkspace, *this, mIsRestored);
+            mCircuit = new Circuit(*this, mIsRestored);
 
         // Load all schematic layers
         QList<unsigned int> schematicLayerIds;
@@ -175,7 +174,7 @@ Project::Project(Workspace& workspace, const FilePath& filepath, bool isNew) thr
         mSchematicsIniFile->releaseQSettings(schematicsSettings);
         qDebug() << mSchematics.count() << "schematics successfully loaded!";
 
-        mSchematicEditor = new SchematicEditor(mWorkspace, *this);
+        mSchematicEditor = new SchematicEditor(*this);
     }
     catch (...)
     {
@@ -195,7 +194,7 @@ Project::Project(Workspace& workspace, const FilePath& filepath, bool isNew) thr
     // project successfully opened! :-)
 
     // setup the timer for automatic backups, if enabled in the settings
-    int intervalSecs =  mWorkspace.getSettings().getProjectAutosaveInterval()->getInterval();
+    int intervalSecs =  Workspace::instance().getSettings().getProjectAutosaveInterval()->getInterval();
     if (intervalSecs > 0)
     {
         // autosaving is enabled --> start the timer
@@ -209,7 +208,7 @@ Project::Project(Workspace& workspace, const FilePath& filepath, bool isNew) thr
 Project::~Project() noexcept
 {
     // inform the workspace that this project will get destroyed
-    mWorkspace.unregisterOpenProject(this);
+    Workspace::instance().unregisterOpenProject(this);
 
     // stop the autosave timer
     mAutoSaveTimer.stop();
@@ -537,7 +536,7 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
  *  Static Methods
  ****************************************************************************************/
 
-Project* Project::create(Workspace& workspace, const FilePath& filepath) throw (Exception)
+Project* Project::create(const FilePath& filepath) throw (Exception)
 {
     if (filepath.isExistingDir() || filepath.isExistingFile())
     {
@@ -563,7 +562,7 @@ Project* Project::create(Workspace& workspace, const FilePath& filepath) throw (
     try
     {
         file = XmlFile::create(filepath, "project", 0);
-        project = new Project(workspace, filepath, true);
+        project = new Project(filepath, true);
         project->save();
         delete file;
     }

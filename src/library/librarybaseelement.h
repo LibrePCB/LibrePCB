@@ -29,12 +29,6 @@
 #include "common/filepath.h"
 
 /*****************************************************************************************
- *  Forward Declarations
- ****************************************************************************************/
-
-class Workspace;
-
-/*****************************************************************************************
  *  Class LibraryBaseElement
  ****************************************************************************************/
 
@@ -50,7 +44,7 @@ class LibraryBaseElement : public QObject
     public:
 
         // Constructors / Destructor
-        explicit LibraryBaseElement(Workspace* workspace, const FilePath& xmlFilePath,
+        explicit LibraryBaseElement(const FilePath& xmlFilePath,
                                     const QString& xmlRootNodeName);
         virtual ~LibraryBaseElement();
 
@@ -80,7 +74,7 @@ class LibraryBaseElement : public QObject
         LibraryBaseElement(const LibraryBaseElement& other);
         LibraryBaseElement& operator=(const LibraryBaseElement& rhs);
 
-        Workspace* mWorkspace;
+
         XmlFile* mXmlFile;
 
         //General Attributes

@@ -42,10 +42,9 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ProjectLibrary::ProjectLibrary(Workspace& workspace, Project& project, bool restore)
+ProjectLibrary::ProjectLibrary(Project& project, bool restore)
                               throw (Exception) :
-    QObject(0), mWorkspace(workspace), mProject(project),
-    mLibraryPath(project.getPath().getPathTo("lib"))
+    QObject(0), mProject(project), mLibraryPath(project.getPath().getPathTo("lib"))
 {
     qDebug() << "load project library...";
 
@@ -183,7 +182,7 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
             // try loading the library element
             try
             {
-                ElementType* element = new ElementType(&mWorkspace, filepath);
+                ElementType* element = new ElementType(filepath);
 
                 /// @todo
                 /*if (element->getUuid() != dirUuid)
@@ -219,10 +218,10 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
  *  Static Methods
  ****************************************************************************************/
 
-ProjectLibrary* ProjectLibrary::create(Workspace& workspace, Project& project) throw (Exception)
+ProjectLibrary* ProjectLibrary::create(Project& project) throw (Exception)
 {
     project.getPath().getPathTo("lib").mkPath();
-    return new ProjectLibrary(workspace, project, true);
+    return new ProjectLibrary(project, true);
 }
 
 /*****************************************************************************************

@@ -42,7 +42,7 @@ class Component : public LibraryElement
 
     public:
 
-        explicit Component(Workspace* workspace, const FilePath& xmlFilePath);
+        explicit Component(const FilePath& xmlFilePath);
         virtual ~Component();
 
     private:

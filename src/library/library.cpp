@@ -31,8 +31,8 @@ namespace library{
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Library::Library(Workspace* workspace) :
-    QObject(0), mWorkspace(workspace)
+Library::Library() :
+    QObject(0)
 {
 }
 

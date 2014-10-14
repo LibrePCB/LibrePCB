@@ -27,12 +27,6 @@
 #include <QtCore>
 
 /*****************************************************************************************
- *  Forward Declarations
- ****************************************************************************************/
-
-class Workspace;
-
-/*****************************************************************************************
  *  Class Library
  ****************************************************************************************/
 
@@ -50,19 +44,14 @@ class Library : public QObject
     public:
 
         // Constructors / Destructor
-        explicit Library(Workspace* workspace);
+        Library();
         ~Library();
 
     private:
 
         // make some methods inaccessible...
-        Library();
         Library(const Library& other);
         Library& operator=(const Library& rhs);
-
-        // General
-        Workspace* mWorkspace; ///< the pointer to the Workspace object (from the ctor)
-
 };
 
 } // namespace library

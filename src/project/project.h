@@ -36,7 +36,6 @@
 
 class XmlFile;
 class IniFile;
-class Workspace;
 class UndoStack;
 class SchematicLayer;
 
@@ -89,7 +88,6 @@ class Project final : public QObject
          *          The destructor then will close the project. It's not possible to
          *          close a project without destroying the Project instance.
          *
-         * @param workspace     A pointer to the Workspace object
          * @param filepath      The filepath to the *.e4u project file
          * @param isNew         True if the specified project is new (Do NOT set this
          *                      parameter to true manually! Only #create() may do this)
@@ -99,8 +97,7 @@ class Project final : public QObject
          *                      (or a subclass of it). Before throwing an exception, the
          *                      user will get a messagebox with the error message.
          */
-        explicit Project(Workspace& workspace, const FilePath& filepath,
-                         bool isNew = false) throw (Exception);
+        explicit Project(const FilePath& filepath, bool isNew = false) throw (Exception);
 
         /**
          * @brief The destructor will close the whole project (without saving!)
@@ -269,7 +266,6 @@ class Project final : public QObject
          *
          * This method will create all neccessary files and folders on the filesystem.
          *
-         * @param workspace A reference to the workspace object
          * @param filepath  The filepath to the new project file (must not exist already)
          *
          * @return  A pointer to the new Project object. You are responsible for deleting
@@ -277,7 +273,7 @@ class Project final : public QObject
          *
          * @throw Exception if an error occurs
          */
-        static Project* create(Workspace& workspace, const FilePath& filepath) throw (Exception);
+        static Project* create(const FilePath& filepath) throw (Exception);
 
 
     public slots:
@@ -343,8 +339,6 @@ class Project final : public QObject
         void updateSchematicsList() throw (Exception);
         bool save(bool toOriginal, QStringList& errors) noexcept;
 
-        // General
-        Workspace& mWorkspace; ///< a reference to the workspace
 
         // Project File (*.e4u)
         FilePath mPath; ///< the path to the project directory

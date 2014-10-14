@@ -38,6 +38,8 @@
 using namespace library;
 using namespace project;
 
+Workspace* Workspace::sInstance = 0;
+
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
@@ -51,28 +53,31 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
     mWorkspaceSettings(0), mControlPanel(0), mLibrary(0), mLibraryEditor(0),
     mProjectTreeModel(0), mRecentProjectsModel(0), mFavoriteProjectsModel(0)
 {
-    if ((!mPath.isExistingDir()) || (!mMetadataPath.isExistingDir()))
-    {
-        throw RuntimeError(__FILE__, __LINE__, mPath.toStr(),
-            QString(tr("Invalid workspace path: \"%1\"")).arg(mPath.toNative()));
-    }
-
-    if (!mProjectsPath.mkPath())
-        qWarning() << "could not make path" << mProjectsPath;
-    if (!mLibraryPath.mkPath())
-        qWarning() << "could not make path" << mLibraryPath;
-
-
-    // all OK, let's load the workspace stuff!
+    if (sInstance != 0) throw LogicError(__FILE__, __LINE__); // should never happen...
+    sInstance = this;
 
     try
     {
-        mWorkspaceSettings = new WorkspaceSettings(*this);
-        mRecentProjectsModel = new RecentProjectsModel(*this);
-        mFavoriteProjectsModel = new FavoriteProjectsModel(*this);
-        mProjectTreeModel = new ProjectTreeModel(*this);
-        mLibrary = new Library(this);
-        mControlPanel = new ControlPanel(*this, mProjectTreeModel, mRecentProjectsModel,
+        // check the workspace path
+        if ((!mPath.isExistingDir()) || (!mMetadataPath.isExistingDir()))
+        {
+            throw RuntimeError(__FILE__, __LINE__, mPath.toStr(),
+                QString(tr("Invalid workspace path: \"%1\"")).arg(mPath.toNative()));
+        }
+
+        if (!mProjectsPath.mkPath())
+            qWarning() << "could not make path" << mProjectsPath;
+        if (!mLibraryPath.mkPath())
+            qWarning() << "could not make path" << mLibraryPath;
+
+        // all OK, let's load the workspace stuff!
+
+        mWorkspaceSettings = new WorkspaceSettings();
+        mRecentProjectsModel = new RecentProjectsModel();
+        mFavoriteProjectsModel = new FavoriteProjectsModel();
+        mProjectTreeModel = new ProjectTreeModel();
+        mLibrary = new Library();
+        mControlPanel = new ControlPanel(mProjectTreeModel, mRecentProjectsModel,
                                          mFavoriteProjectsModel);
     }
     catch (Exception& e)
@@ -84,6 +89,8 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
         delete mFavoriteProjectsModel;  mFavoriteProjectsModel = 0;
         delete mRecentProjectsModel;    mRecentProjectsModel = 0;
         delete mWorkspaceSettings;      mWorkspaceSettings = 0;
+
+        sInstance = 0;
         throw;
     }
 }
@@ -99,6 +106,8 @@ Workspace::~Workspace()
     delete mFavoriteProjectsModel;  mFavoriteProjectsModel = 0;
     delete mRecentProjectsModel;    mRecentProjectsModel = 0;
     delete mWorkspaceSettings;      mWorkspaceSettings = 0;
+
+    sInstance = 0;
 }
 
 /*****************************************************************************************
@@ -111,7 +120,7 @@ Project* Workspace::createProject(const FilePath& filepath) noexcept
 
     try
     {
-        project = Project::create(*this, filepath);
+        project = Project::create(filepath);
     }
     catch (Exception& e)
     {
@@ -148,7 +157,7 @@ Project* Workspace::openProject(const FilePath& filepath) noexcept
             // constructor will throw an exception. We will catch that exception here and
             // show a message box to print the error message to the monitor. Only
             // exceptions of type "UserCanceled" are ignored.
-            openProject = new Project(*this, filepath);
+            openProject = new Project(filepath);
         }
         catch (UserCanceled& e)
         {
@@ -250,7 +259,7 @@ void Workspace::openLibraryEditor()
     try
     {
         if (!mLibraryEditor)
-            mLibraryEditor = new library_editor::LibraryEditor(this);
+            mLibraryEditor = new library_editor::LibraryEditor();
     }
     catch (...)
     {

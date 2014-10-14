@@ -42,7 +42,7 @@ class Footprint : public LibraryElement
 
     public:
 
-        explicit Footprint(Workspace* workspace, const FilePath& xmlFilePath);
+        explicit Footprint(const FilePath& xmlFilePath);
         virtual ~Footprint();
 
     private:

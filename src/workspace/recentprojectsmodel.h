@@ -28,12 +28,6 @@
 #include "../common/filepath.h"
 
 /*****************************************************************************************
- *  Forward Declarations
- ****************************************************************************************/
-
-class Workspace;
-
-/*****************************************************************************************
  *  Class RecentProjectsModel
  ****************************************************************************************/
 
@@ -47,7 +41,7 @@ class RecentProjectsModel : public QAbstractListModel
     public:
 
         // Constructors / Destructor
-        explicit RecentProjectsModel(Workspace& workspace);
+        RecentProjectsModel();
         ~RecentProjectsModel();
 
         // General Methods
@@ -56,7 +50,6 @@ class RecentProjectsModel : public QAbstractListModel
     private:
 
         // make some methods inaccessible...
-        RecentProjectsModel();
         RecentProjectsModel(const RecentProjectsModel& other);
         RecentProjectsModel& operator=(const RecentProjectsModel& rhs);
 
@@ -67,7 +60,6 @@ class RecentProjectsModel : public QAbstractListModel
         int rowCount(const QModelIndex& parent = QModelIndex()) const;
         QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 
-        Workspace& mWorkspace; ///< a reference to the Workspace object
         QList<FilePath> mRecentProjects;
 
 };

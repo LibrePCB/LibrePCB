@@ -31,7 +31,6 @@
  *  Forward Declarations
  ****************************************************************************************/
 
-class Workspace;
 class ProjectTreeItem;
 
 /*****************************************************************************************
@@ -52,7 +51,7 @@ class ProjectTreeModel : public QAbstractItemModel
     public:
 
         // Constructors / Destructor
-        ProjectTreeModel(Workspace& workspace);
+        ProjectTreeModel();
         ~ProjectTreeModel();
 
         // General
@@ -69,15 +68,13 @@ class ProjectTreeModel : public QAbstractItemModel
     private:
 
         // make some methods inaccessible...
-        ProjectTreeModel();
         ProjectTreeModel(const ProjectTreeModel& other);
         ProjectTreeModel& operator=(const ProjectTreeModel& rhs);
 
         // Private Methods
         ProjectTreeItem* getItem(const QModelIndex& index) const;
 
-        Workspace& mWorkspace;
-
+        // Attributes
         ProjectTreeItem* mRootProjectDirectory;
 };
 

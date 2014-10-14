@@ -29,12 +29,6 @@
 #include "librarybaseelement.h"
 
 /*****************************************************************************************
- *  Forward Declarations
- ****************************************************************************************/
-
-class Workspace;
-
-/*****************************************************************************************
  *  Class LibraryElement
  ****************************************************************************************/
 
@@ -50,8 +44,7 @@ class LibraryElement : public LibraryBaseElement
     public:
 
         // Constructors / Destructor
-        explicit LibraryElement(Workspace* workspace, const FilePath& xmlFilePath,
-                                const QString& xmlRootNodeName);
+        explicit LibraryElement(const FilePath& xmlFilePath, const QString& xmlRootNodeName);
         virtual ~LibraryElement();
 
     protected:

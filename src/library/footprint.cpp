@@ -30,8 +30,8 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Footprint::Footprint(Workspace* workspace, const FilePath& xmlFilePath) :
-    LibraryElement(workspace, xmlFilePath, "footprint")
+Footprint::Footprint(const FilePath& xmlFilePath) :
+    LibraryElement(xmlFilePath, "footprint")
 {
 }
 

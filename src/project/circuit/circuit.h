@@ -33,7 +33,6 @@
  ****************************************************************************************/
 
 class XmlFile;
-class Workspace;
 
 namespace project {
 class Project;
@@ -61,8 +60,7 @@ class Circuit final : public QObject
     public:
 
         // Constructors / Destructor
-        explicit Circuit(Workspace& workspace, Project& project, bool restore,
-                         bool isNew = false) throw (Exception);
+        explicit Circuit(Project& project, bool restore, bool isNew = false) throw (Exception);
         ~Circuit() noexcept;
 
         // Getters
@@ -99,7 +97,7 @@ class Circuit final : public QObject
         bool save(bool toOriginal, QStringList& errors) noexcept;
 
         // Static Methods
-        static Circuit* create(Workspace& workspace, Project& project) throw (Exception);
+        static Circuit* create(Project& project) throw (Exception);
 
 
     private:
@@ -110,7 +108,6 @@ class Circuit final : public QObject
         Circuit& operator=(const Circuit& rhs);
 
         // General
-        Workspace& mWorkspace; ///< A reference to the Workspace object (from the ctor)
         Project& mProject; ///< A reference to the Project object (from the ctor)
 
         // File "core/circuit.xml"

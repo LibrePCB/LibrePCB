@@ -143,6 +143,18 @@ class Workspace final : public QObject
         static void setMostRecentlyUsedWorkspacePath(const FilePath& path);
         static FilePath chooseWorkspacePath();
 
+        /**
+         * @brief Get the Workspace singleton instance
+         *
+         * @warning You must be sure that the singleton Workspace object was already
+         *          created before calling this method the first time! Otherwise the
+         *          application will crash (for debugging purposes there is a Q_ASSERT()
+         *          in this method to detect such an error).
+         *
+         * @return A reference to the singleton Workspace object
+         */
+        static Workspace& instance() noexcept {Q_ASSERT(sInstance); return *sInstance;}
+
     public slots:
 
         void showControlPanel() const;
@@ -167,6 +179,9 @@ class Workspace final : public QObject
         QHash<QString, project::Project*> mOpenProjects; ///< a list of all open projects
         RecentProjectsModel* mRecentProjectsModel; ///< a list model of all recent projects
         FavoriteProjectsModel* mFavoriteProjectsModel; ///< a list model of all favorite projects
+
+        // static variables
+        static Workspace* sInstance;
 };
 
 #endif // WORKSPACE_H

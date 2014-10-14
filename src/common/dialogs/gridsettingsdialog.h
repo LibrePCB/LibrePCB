@@ -33,8 +33,6 @@
  *  Forward Declarations
  ****************************************************************************************/
 
-class Workspace;
-
 namespace Ui {
 class GridSettingsDialog;
 }
@@ -56,9 +54,8 @@ class GridSettingsDialog final : public QDialog
     public:
 
         // Constructors / Destructor
-        explicit GridSettingsDialog(Workspace& workspace, CADView::GridType type,
-                                    const Length& interval, const LengthUnit& unit,
-                                    QWidget* parent = 0);
+        explicit GridSettingsDialog(CADView::GridType type, const Length& interval,
+                                    const LengthUnit& unit, QWidget* parent = 0);
         ~GridSettingsDialog();
 
         // Getters
@@ -87,7 +84,6 @@ class GridSettingsDialog final : public QDialog
 
         // General Attributes
         Ui::GridSettingsDialog* mUi;
-        Workspace& mWorkspace;
         CADView::GridType mType;
         Length mInterval;
         LengthUnit mUnit;

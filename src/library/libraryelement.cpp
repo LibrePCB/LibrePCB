@@ -32,9 +32,8 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-LibraryElement::LibraryElement(Workspace* workspace, const FilePath& xmlFilePath,
-                               const QString& xmlRootNodeName) :
-    LibraryBaseElement(workspace, xmlFilePath, xmlRootNodeName)
+LibraryElement::LibraryElement(const FilePath& xmlFilePath, const QString& xmlRootNodeName) :
+    LibraryBaseElement(xmlFilePath, xmlRootNodeName)
 {
 }
 

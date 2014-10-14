@@ -31,8 +31,8 @@
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WorkspaceSettings::WorkspaceSettings(Workspace& workspace) :
-    QObject(0), mWorkspace(workspace), mMetadataPath(workspace.getMetadataPath()), mDialog(0),
+WorkspaceSettings::WorkspaceSettings() :
+    QObject(0), mMetadataPath(Workspace::instance().getMetadataPath()), mDialog(0),
     mAppLocale(0), mProjectAutosaveInterval(0), mLibraryLocaleOrder(0)
 {
     // check if the metadata directory exists
@@ -58,7 +58,7 @@ WorkspaceSettings::WorkspaceSettings(Workspace& workspace) :
     mItems.append(mLibraryLocaleOrder = new WSI_LibraryLocaleOrder(*this));
 
     // load the settings dialog
-    mDialog = new WorkspaceSettingsDialog(mWorkspace, *this);
+    mDialog = new WorkspaceSettingsDialog(*this);
 }
 
 WorkspaceSettings::~WorkspaceSettings()

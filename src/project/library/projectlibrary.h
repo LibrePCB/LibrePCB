@@ -32,8 +32,6 @@
  *  Forward Declarations
  ****************************************************************************************/
 
-class Workspace;
-
 namespace project {
 class Project;
 }
@@ -64,8 +62,7 @@ class ProjectLibrary final : public QObject
     public:
 
         // Constructors / Destructor
-        explicit ProjectLibrary(Workspace& workspace, Project& project, bool restore)
-                                throw (Exception);
+        explicit ProjectLibrary(Project& project, bool restore) throw (Exception);
         ~ProjectLibrary() noexcept;
 
         // Getters: Library Elements
@@ -79,7 +76,7 @@ class ProjectLibrary final : public QObject
 
         // Static Methods
 
-        static ProjectLibrary* create(Workspace& workspace, Project& project) throw (Exception);
+        static ProjectLibrary* create(Project& project) throw (Exception);
 
     private:
 
@@ -94,7 +91,6 @@ class ProjectLibrary final : public QObject
                           QHash<QUuid, const ElementType*>& elementList) throw (Exception);
 
         // General
-        Workspace& mWorkspace; ///< a reference to the Workspace object (from the ctor)
         Project& mProject; ///< a reference to the Project object (from the ctor)
         FilePath mLibraryPath; ///< the "lib" directory of the project
 

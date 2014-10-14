@@ -32,9 +32,9 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-LibraryBaseElement::LibraryBaseElement(Workspace* workspace, const FilePath& xmlFilePath,
+LibraryBaseElement::LibraryBaseElement(const FilePath& xmlFilePath,
                                        const QString& xmlRootNodeName) :
-    QObject(0), mWorkspace(workspace)
+    QObject(0), mXmlFile(0)
 {
     mXmlFile = new XmlFile(xmlFilePath, 0);
     Q_UNUSED(xmlRootNodeName);
@@ -42,6 +42,7 @@ LibraryBaseElement::LibraryBaseElement(Workspace* workspace, const FilePath& xml
 
 LibraryBaseElement::~LibraryBaseElement()
 {
+    delete mXmlFile;        mXmlFile = 0;
 }
 
 /*****************************************************************************************

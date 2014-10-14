@@ -42,7 +42,7 @@ class Package : public LibraryElement
 
     public:
 
-        explicit Package(Workspace* workspace, const FilePath& xmlFilePath);
+        explicit Package(const FilePath& xmlFilePath);
         virtual ~Package();
 
     private:

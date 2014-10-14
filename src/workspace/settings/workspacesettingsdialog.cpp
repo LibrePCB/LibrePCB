@@ -32,10 +32,8 @@
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
-                                                 WorkspaceSettings& settings) :
-    QDialog(0), mUi(new Ui::WorkspaceSettingsDialog), mWorkspace(workspace),
-    mSettings(settings)
+WorkspaceSettingsDialog::WorkspaceSettingsDialog(WorkspaceSettings& settings) :
+    QDialog(0), mUi(new Ui::WorkspaceSettingsDialog), mSettings(settings)
 {
     mUi->setupUi(this);
 

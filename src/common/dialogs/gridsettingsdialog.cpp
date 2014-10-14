@@ -32,11 +32,11 @@
  *  Constructors / Destructor
  ****************************************************************************************/
 
-GridSettingsDialog::GridSettingsDialog(Workspace& workspace, CADView::GridType type,
+GridSettingsDialog::GridSettingsDialog(CADView::GridType type,
                                        const Length& interval, const LengthUnit& unit,
                                        QWidget* parent) :
-    QDialog(parent), mUi(new Ui::GridSettingsDialog), mWorkspace(workspace), mType(type),
-    mInterval(interval), mUnit(unit)
+    QDialog(parent), mUi(new Ui::GridSettingsDialog), mType(type), mInterval(interval),
+    mUnit(unit)
 {
     mUi->setupUi(this);
 
@@ -56,13 +56,13 @@ GridSettingsDialog::GridSettingsDialog(Workspace& workspace, CADView::GridType t
     // update spinbox value
     mUi->spbxInterval->setValue(mUnit.convertToUnit(mInterval));
 
-    updateInternalRepresentation();
-
     // connect UI signal with slots
     connect(mUi->rbtnGroup, SIGNAL(buttonClicked(int)), this, SLOT(rbtnGroupClicked(int)));
     connect(mUi->spbxInterval, SIGNAL(valueChanged(double)), this, SLOT(spbxIntervalChanged(double)));
     connect(mUi->cbxUnits, SIGNAL(currentIndexChanged(int)), this, SLOT(cbxUnitsChanged(int)));
     connect(mUi->buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(buttonBoxClicked(QAbstractButton*)));
+
+    updateInternalRepresentation();
 }
 
 GridSettingsDialog::~GridSettingsDialog()
@@ -97,9 +97,21 @@ void GridSettingsDialog::buttonBoxClicked(QAbstractButton *button)
 {
     if (mUi->buttonBox->buttonRole(button) == QDialogButtonBox::ResetRole)
     {
-        // @todo: load these values from workspace settings
-        mInterval.setLengthMm(2.54);
-        mUnit = LengthUnit::millimeters();
+        mType = CADView::gridLines;
+        mInterval.setLengthNm(2540000); // 2.54mm is the default grid interval
+        mUnit = Workspace::instance().getSettings().getAppDefMeasUnits()->getLengthUnit();
+
+        // update widgets
+        mUi->rbtnGroup->blockSignals(true);
+        mUi->cbxUnits->blockSignals(true);
+        mUi->spbxInterval->blockSignals(true);
+        mUi->rbtnGroup->button(mType)->setChecked(true);
+        mUi->cbxUnits->setCurrentIndex(mUnit.getIndex());
+        mUi->spbxInterval->setValue(mUnit.convertToUnit(mInterval));
+        mUi->rbtnGroup->blockSignals(false);
+        mUi->cbxUnits->blockSignals(false);
+        mUi->spbxInterval->blockSignals(false);
+        updateInternalRepresentation();
     }
 }
 

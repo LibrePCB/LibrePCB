@@ -42,7 +42,7 @@ class SpiceModel : public LibraryElement
 
     public:
 
-        explicit SpiceModel(Workspace* workspace, const FilePath& xmlFilePath);
+        explicit SpiceModel(const FilePath& xmlFilePath);
         virtual ~SpiceModel();
 
     private:
