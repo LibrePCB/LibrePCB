@@ -25,6 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include "../common/filelock.h"
 #include "../common/exceptions.h"
 #include "../common/filepath.h"
 
@@ -168,6 +169,7 @@ class Workspace final : public QObject
         Workspace& operator=(const Workspace& rhs);
 
         FilePath mPath; ///< a FilePath object which represents the workspace directory
+        FileLock mLock; ///< to lock the whole workspace (allow only one app instance)
         FilePath mMetadataPath; ///< the directory ".metadata"
         FilePath mProjectsPath; ///< the directory "projects"
         FilePath mLibraryPath; ///< the directory "library"

@@ -46,7 +46,7 @@ Workspace* Workspace::sInstance = 0;
 
 Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
     QObject(0),
-    mPath(wsPath),
+    mPath(wsPath), mLock(wsPath.getPathTo("workspace")),
     mMetadataPath(wsPath.getPathTo(".metadata")),
     mProjectsPath(wsPath.getPathTo("projects")),
     mLibraryPath(wsPath.getPathTo("lib")),
@@ -63,6 +63,42 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
         {
             throw RuntimeError(__FILE__, __LINE__, mPath.toStr(),
                 QString(tr("Invalid workspace path: \"%1\"")).arg(mPath.toNative()));
+        }
+
+        // Check if the workspace is locked (already open or application was crashed).
+        switch (mLock.getStatus())
+        {
+            case FileLock::Unlocked:
+                break; // nothing to do here (the workspace will be locked later)
+
+            case FileLock::Locked:
+            {
+                // the workspace is locked by another application instance
+                throw RuntimeError(__FILE__, __LINE__, QString(), tr("The workspace is already "
+                                   "opened by another application instance or user!"));
+            }
+
+            case FileLock::StaleLock:
+            {
+                // ignore stale lock as there is nothing to restore
+                qWarning() << "There was a stale lock on the workspace:" << mPath;
+                break;
+            }
+
+            case FileLock::Error:
+            default:
+            {
+                throw RuntimeError(__FILE__, __LINE__, QString(),
+                                   tr("Could not read the workspace lock file!"));
+            }
+        }
+
+        // the workspace can be opened by this application, so we will lock it
+        if (!mLock.lock())
+        {
+            throw RuntimeError(__FILE__, __LINE__, mLock.getLockFilepath().toStr(),
+                QString(tr("Error while locking the workspace!\nDo you have write "
+                "permissions to the file \"%1\"?")).arg(mLock.getLockFilepath().toNative()));
         }
 
         if (!mProjectsPath.mkPath())
