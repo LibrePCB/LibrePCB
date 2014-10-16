@@ -84,11 +84,13 @@ void CADView::setCadScene(CADScene* scene)
 void CADView::setGridType(GridType type)
 {
     mGridType = type;
+    QGraphicsView::setBackgroundBrush(QBrush(Qt::NoBrush)); // this will repaint the background
 }
 
 void CADView::setGridColor(const QColor& color)
 {
     mGridColor = color;
+    QGraphicsView::setBackgroundBrush(QBrush(Qt::NoBrush)); // this will repaint the background
 }
 
 /*****************************************************************************************
@@ -126,7 +128,9 @@ void CADView::drawBackground(QPainter* painter, const QRectF& rect)
     qreal top = qFloor(rect.top() / gridIntervalPixels) * gridIntervalPixels;
 
     QPen gridPen(mGridColor);
-    gridPen.setWidth(0);
+    gridPen.setCapStyle(Qt::RoundCap);
+    gridPen.setWidth((mGridType == gridDots) ? 2 : 1);
+    gridPen.setCosmetic(true);
 
     painter->setPen(gridPen);
     painter->setBrush(backgroundBrush());
