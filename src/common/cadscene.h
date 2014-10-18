@@ -26,7 +26,6 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include "units.h"
 
 /*****************************************************************************************
  *  Interface IF_CADSceneEventHandler
@@ -77,15 +76,12 @@ class CADScene : public QGraphicsScene
 
 
         // Constructors / Destructor
-        explicit CADScene(const Length& gridInterval = Length(2540000));
+        explicit CADScene();
         virtual ~CADScene();
-
-        // Getters
-        const Length& getGridInterval() const {return mGridInterval;}
 
         // Setters
         void setEventHandlerObject(IF_CADSceneEventHandler* object);
-        void setGridInterval(const Length& newInterval);
+
 
     protected:
 
@@ -101,8 +97,6 @@ class CADScene : public QGraphicsScene
         CADScene& operator=(const CADScene& rhs);
 
         IF_CADSceneEventHandler* mEventHandlerObject;
-        Length mGridInterval;
-
 };
 
 #endif // CADSCENE_H

@@ -29,8 +29,8 @@
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CADScene::CADScene(const Length& gridInterval) :
-    QGraphicsScene(), mEventHandlerObject(0), mGridInterval(gridInterval)
+CADScene::CADScene() :
+    QGraphicsScene(), mEventHandlerObject(0)
 {
 }
 
@@ -45,11 +45,6 @@ CADScene::~CADScene()
 void CADScene::setEventHandlerObject(IF_CADSceneEventHandler* object)
 {
     mEventHandlerObject = object;
-}
-
-void CADScene::setGridInterval(const Length& newInterval)
-{
-    mGridInterval = newInterval;
 }
 
 /*****************************************************************************************

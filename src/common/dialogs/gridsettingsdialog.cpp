@@ -35,7 +35,8 @@
 GridSettingsDialog::GridSettingsDialog(CADView::GridType type,
                                        const Length& interval, const LengthUnit& unit,
                                        QWidget* parent) :
-    QDialog(parent), mUi(new Ui::GridSettingsDialog), mType(type), mInterval(interval),
+    QDialog(parent), mUi(new Ui::GridSettingsDialog), mInitialType(type),
+    mInitialInterval(interval), mInitialUnit(unit), mType(type), mInterval(interval),
     mUnit(unit)
 {
     mUi->setupUi(this);
@@ -60,6 +61,8 @@ GridSettingsDialog::GridSettingsDialog(CADView::GridType type,
     connect(mUi->rbtnGroup, SIGNAL(buttonClicked(int)), this, SLOT(rbtnGroupClicked(int)));
     connect(mUi->spbxInterval, SIGNAL(valueChanged(double)), this, SLOT(spbxIntervalChanged(double)));
     connect(mUi->cbxUnits, SIGNAL(currentIndexChanged(int)), this, SLOT(cbxUnitsChanged(int)));
+    connect(mUi->btnMul2, SIGNAL(clicked()), this, SLOT(btnMul2Clicked()));
+    connect(mUi->btnDiv2, SIGNAL(clicked()), this, SLOT(btnDiv2Clicked()));
     connect(mUi->buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(buttonBoxClicked(QAbstractButton*)));
 
     updateInternalRepresentation();
@@ -78,12 +81,14 @@ void GridSettingsDialog::rbtnGroupClicked(int id)
 {
     if (id < 0) return;
     mType = static_cast<CADView::GridType>(id);
+    emit gridTypeChanged(mType);
 }
 
 void GridSettingsDialog::spbxIntervalChanged(double arg1)
 {
     mInterval = mUnit.convertFromUnit(arg1);
     updateInternalRepresentation();
+    emit gridIntervalChanged(mInterval);
 }
 
 void GridSettingsDialog::cbxUnitsChanged(int index)
@@ -91,28 +96,59 @@ void GridSettingsDialog::cbxUnitsChanged(int index)
     mUnit = LengthUnit::fromIndex(index, LengthUnit::millimeters());
     mUi->spbxInterval->setValue(mUnit.convertToUnit(mInterval));
     updateInternalRepresentation();
+    emit gridIntervalChanged(mInterval);
+    emit gridIntervalUnitChanged(mUnit);
+}
+
+void GridSettingsDialog::btnMul2Clicked()
+{
+    mUi->spbxInterval->setValue(mUi->spbxInterval->value() * 2);
+}
+
+void GridSettingsDialog::btnDiv2Clicked()
+{
+    mUi->spbxInterval->setValue(mUi->spbxInterval->value() / 2);
 }
 
 void GridSettingsDialog::buttonBoxClicked(QAbstractButton *button)
 {
-    if (mUi->buttonBox->buttonRole(button) == QDialogButtonBox::ResetRole)
+    switch (mUi->buttonBox->buttonRole(button))
     {
-        mType = CADView::gridLines;
-        mInterval.setLengthNm(2540000); // 2.54mm is the default grid interval
-        mUnit = Workspace::instance().getSettings().getAppDefMeasUnits()->getLengthUnit();
+        case QDialogButtonBox::AcceptRole:
+            // nothing to do here
+            break;
 
-        // update widgets
-        mUi->rbtnGroup->blockSignals(true);
-        mUi->cbxUnits->blockSignals(true);
-        mUi->spbxInterval->blockSignals(true);
-        mUi->rbtnGroup->button(mType)->setChecked(true);
-        mUi->cbxUnits->setCurrentIndex(mUnit.getIndex());
-        mUi->spbxInterval->setValue(mUnit.convertToUnit(mInterval));
-        mUi->rbtnGroup->blockSignals(false);
-        mUi->cbxUnits->blockSignals(false);
-        mUi->spbxInterval->blockSignals(false);
-        updateInternalRepresentation();
+        case QDialogButtonBox::ResetRole:
+        {
+            mType = CADView::gridLines;
+            mInterval.setLengthNm(2540000); // 2.54mm is the default grid interval
+            mUnit = Workspace::instance().getSettings().getAppDefMeasUnits()->getLengthUnit();
+
+            // update widgets
+            mUi->rbtnGroup->blockSignals(true);
+            mUi->cbxUnits->blockSignals(true);
+            mUi->spbxInterval->blockSignals(true);
+            mUi->rbtnGroup->button(mType)->setChecked(true);
+            mUi->cbxUnits->setCurrentIndex(mUnit.getIndex());
+            mUi->spbxInterval->setValue(mUnit.convertToUnit(mInterval));
+            mUi->rbtnGroup->blockSignals(false);
+            mUi->cbxUnits->blockSignals(false);
+            mUi->spbxInterval->blockSignals(false);
+            updateInternalRepresentation();
+            break;
+        }
+
+        default:
+            // restore initial settings
+            mType = mInitialType;
+            mInterval = mInitialInterval;
+            mUnit = mInitialUnit;
+            break;
     }
+
+    emit gridTypeChanged(mType);
+    emit gridIntervalChanged(mInterval);
+    emit gridIntervalUnitChanged(mUnit);
 }
 
 /*****************************************************************************************

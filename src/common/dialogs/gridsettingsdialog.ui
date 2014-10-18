@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>453</width>
-    <height>203</height>
+    <width>503</width>
+    <height>205</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -118,23 +118,50 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QDoubleSpinBox" name="spbxInterval">
-        <property name="buttonSymbols">
-         <enum>QAbstractSpinBox::NoButtons</enum>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="spacing">
+         <number>0</number>
         </property>
-        <property name="decimals">
-         <number>6</number>
-        </property>
-        <property name="minimum">
-         <double>0.000001000000000</double>
-        </property>
-        <property name="maximum">
-         <double>1000000000.000000000000000</double>
-        </property>
-        <property name="value">
-         <double>2.540000000000000</double>
-        </property>
-       </widget>
+        <item>
+         <widget class="QDoubleSpinBox" name="spbxInterval">
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::NoButtons</enum>
+          </property>
+          <property name="decimals">
+           <number>6</number>
+          </property>
+          <property name="minimum">
+           <double>0.000001000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1000000000.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>2.540000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnMul2">
+          <property name="text">
+           <string>-</string>
+          </property>
+          <property name="arrowType">
+           <enum>Qt::UpArrow</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnDiv2">
+          <property name="text">
+           <string>+</string>
+          </property>
+          <property name="arrowType">
+           <enum>Qt::DownArrow</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>
@@ -150,12 +177,6 @@
     </widget>
    </item>
   </layout>
-  <zorder>groupBox</zorder>
-  <zorder>groupBox_2</zorder>
-  <zorder>buttonBox</zorder>
-  <zorder>rbtnNoGrid</zorder>
-  <zorder>rbtnDots</zorder>
-  <zorder>rbtnLines</zorder>
  </widget>
  <resources/>
  <connections>

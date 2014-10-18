@@ -40,6 +40,7 @@ qreal CADView::sZoomFactor = 1.15;
 CADView::CADView(QWidget* parent) :
     QGraphicsView(parent),
     mGridType(noGrid), mGridColor(Qt::lightGray), mOriginCrossColor(Qt::black),
+    mGridInterval(2540000), mGridIntervalUnit(LengthUnit::millimeters()),
     mPositionLabel(0)
 {
     mPositionLabel = new QLabel(this);
@@ -93,6 +94,17 @@ void CADView::setGridColor(const QColor& color)
     QGraphicsView::setBackgroundBrush(QBrush(Qt::NoBrush)); // this will repaint the background
 }
 
+void CADView::setGridInterval(const Length& newInterval)
+{
+    mGridInterval = newInterval;
+    QGraphicsView::setBackgroundBrush(QBrush(Qt::NoBrush)); // this will repaint the background
+}
+
+void CADView::setGridIntervalUnit(const LengthUnit& newUnit)
+{
+    mGridIntervalUnit = newUnit;
+}
+
 /*****************************************************************************************
  *  Zoom Functions
  ****************************************************************************************/
@@ -122,7 +134,7 @@ void CADView::drawBackground(QPainter* painter, const QRectF& rect)
     if (!getCadScene())
         return;
 
-    qreal gridIntervalPixels = getCadScene()->getGridInterval().toPx();
+    qreal gridIntervalPixels = mGridInterval.toPx();
     qreal scaleFactor = width() / rect.width();
     qreal left = qFloor(rect.left() / gridIntervalPixels) * gridIntervalPixels;
     qreal top = qFloor(rect.top() / gridIntervalPixels) * gridIntervalPixels;
@@ -140,7 +152,7 @@ void CADView::drawBackground(QPainter* painter, const QRectF& rect)
     painter->fillRect(rect, backgroundBrush());
 
     // draw background grid lines
-    if (scaleFactor >= (qreal)0.5)
+    if (gridIntervalPixels * scaleFactor >= (qreal)3)
     {
         switch (mGridType)
         {
@@ -218,8 +230,7 @@ void CADView::wheelEvent(QWheelEvent* event)
 void CADView::mouseMoveEvent(QMouseEvent* event)
 {
     if (getCadScene())
-        updatePositionLabelText(Point::fromPx(mapToScene(event->pos()),
-                                getCadScene()->getGridInterval()).toMmQPointF());
+        updatePositionLabelText(Point::fromPx(mapToScene(event->pos()), mGridInterval).toMmQPointF());
     else
         updatePositionLabelText();
 
@@ -232,8 +243,8 @@ void CADView::mouseMoveEvent(QMouseEvent* event)
 
 void CADView::updatePositionLabelText(const QPointF pos)
 {
-    qreal grid = getCadScene() ? getCadScene()->getGridInterval().toMm() : 0;
-    mPositionLabel->setText(QString("Grid: %1mm\nX: %2mm\nY: %3mm").arg(grid).arg(pos.x()).arg(pos.y()));
+    mPositionLabel->setText(QString("Grid: %1mm\nX: %2mm\nY: %3mm")
+                            .arg(mGridInterval.toMm()).arg(pos.x()).arg(pos.y()));
     mPositionLabel->adjustSize();
 }
 

@@ -122,7 +122,8 @@ SchematicEditorState::State SES_Select::process(SchematicEditorEvent* event) noe
                             }
                             if (mSubState == Idle)
                             {
-                                mMoveStartPoint = Point::fromPx(sceneEvent->scenePos(), schematic->getGridInterval());
+                                mMoveStartPoint = Point::fromPx(sceneEvent->scenePos(),
+                                                  editorUi()->graphicsView->getGridInterval());
                                 mSubState = Moving;
                                 event->setAccepted(true);
                             }
@@ -177,14 +178,17 @@ SchematicEditorState::State SES_Select::process(SchematicEditorEvent* event) noe
 
                     if (mSubState == Moving)
                     {
-                        Point delta = Point::fromPx(sceneEvent->scenePos(), schematic->getGridInterval()) - mMoveStartPoint;
+                        Point delta = Point::fromPx(sceneEvent->scenePos(),
+                                      editorUi()->graphicsView->getGridInterval())
+                                      - mMoveStartPoint;
 
                         if (delta.getLength() != 0)
                         {
                             // move selected elements
                             foreach (QGraphicsItem* item, schematic->selectedItems())
                             {
-                                Point newPos = Point::fromPx(item->scenePos() + delta.toPxQPointF(), schematic->getGridInterval());
+                                Point newPos = Point::fromPx(item->scenePos() + delta.toPxQPointF(),
+                                               editorUi()->graphicsView->getGridInterval());
 
                                 switch (item->type())
                                 {

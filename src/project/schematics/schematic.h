@@ -25,6 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include "../../common/units.h"
 #include "../../common/filepath.h"
 #include "../../common/exceptions.h"
 #include "../../common/cadscene.h"

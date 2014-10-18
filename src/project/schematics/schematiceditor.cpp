@@ -214,17 +214,18 @@ void SchematicEditor::on_actionRedo_triggered()
 
 void SchematicEditor::on_actionGrid_triggered()
 {
-    if (!mUi->graphicsView->getCadScene()) return;
-
     GridSettingsDialog dialog(mUi->graphicsView->getGridType(),
-                              mUi->graphicsView->getCadScene()->getGridInterval(),
-                              LengthUnit::millimeters(), this);
+                              mUi->graphicsView->getGridInterval(),
+                              mUi->graphicsView->getGridIntervalUnit(), this);
 
-    if (dialog.exec() == QDialog::Accepted)
-    {
-        mUi->graphicsView->setGridType(dialog.getGridType());
-        // TODO
-    }
+    connect(&dialog, &GridSettingsDialog::gridTypeChanged,
+            [this](CADView::GridType type){mUi->graphicsView->setGridType(type);});
+    connect(&dialog, &GridSettingsDialog::gridIntervalChanged,
+            [this](const Length& interval){mUi->graphicsView->setGridInterval(interval);});
+    connect(&dialog, &GridSettingsDialog::gridIntervalUnitChanged,
+            [this](const LengthUnit& unit){mUi->graphicsView->setGridIntervalUnit(unit);});
+
+    dialog.exec();
 }
 
 /*****************************************************************************************

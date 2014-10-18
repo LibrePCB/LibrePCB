@@ -59,14 +59,18 @@ class CADView : public QGraphicsView
         virtual ~CADView();
 
         // Getters
-        CADScene*       getCadScene()   const;
-        GridType        getGridType()   const {return mGridType;}
-        const QColor&   getGridColor()  const {return mGridColor;}
+        CADScene*           getCadScene()           const;
+        GridType            getGridType()           const {return mGridType;}
+        const QColor&       getGridColor()          const {return mGridColor;}
+        const Length&       getGridInterval()       const {return mGridInterval;}
+        const LengthUnit&   getGridIntervalUnit()   const {return mGridIntervalUnit;}
 
         // Setters
         void setCadScene(CADScene* scene); ///< Use always this method instead of QGraphicsView::setScene()!
         void setGridType(GridType type);
         void setGridColor(const QColor& color);
+        void setGridInterval(const Length& newInterval);
+        void setGridIntervalUnit(const LengthUnit& newUnit);
 
         // Static Functions
         static qreal getZoomFactor() {return sZoomFactor;}
@@ -101,6 +105,8 @@ class CADView : public QGraphicsView
         GridType mGridType;
         QColor mGridColor;
         QColor mOriginCrossColor;
+        Length mGridInterval;
+        LengthUnit mGridIntervalUnit;
 
         Point mLastMouseMoveEventPos;
         QLabel* mPositionLabel;

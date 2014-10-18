@@ -70,7 +70,17 @@ class GridSettingsDialog final : public QDialog
         void rbtnGroupClicked(int id);
         void spbxIntervalChanged(double arg1);
         void cbxUnitsChanged(int index);
+        void btnMul2Clicked();
+        void btnDiv2Clicked();
         void buttonBoxClicked(QAbstractButton *button);
+
+
+    signals:
+
+        void gridTypeChanged(CADView::GridType type);
+        void gridIntervalChanged(const Length& interval);
+        void gridIntervalUnitChanged(const LengthUnit& unit);
+
 
     private:
 
@@ -84,6 +94,9 @@ class GridSettingsDialog final : public QDialog
 
         // General Attributes
         Ui::GridSettingsDialog* mUi;
+        CADView::GridType mInitialType;
+        Length mInitialInterval;
+        LengthUnit mInitialUnit;
         CADView::GridType mType;
         Length mInterval;
         LengthUnit mUnit;
