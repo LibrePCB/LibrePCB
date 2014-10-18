@@ -156,7 +156,7 @@ Project* Workspace::createProject(const FilePath& filepath) noexcept
 
     try
     {
-        project = Project::create(filepath);
+        project = new Project(filepath, true);
     }
     catch (Exception& e)
     {
@@ -193,7 +193,7 @@ Project* Workspace::openProject(const FilePath& filepath) noexcept
             // constructor will throw an exception. We will catch that exception here and
             // show a message box to print the error message to the monitor. Only
             // exceptions of type "UserCanceled" are ignored.
-            openProject = new Project(filepath);
+            openProject = new Project(filepath, false);
         }
         catch (UserCanceled& e)
         {

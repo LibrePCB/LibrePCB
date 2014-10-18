@@ -60,7 +60,7 @@ class Circuit final : public QObject
     public:
 
         // Constructors / Destructor
-        explicit Circuit(Project& project, bool restore, bool isNew = false) throw (Exception);
+        explicit Circuit(Project& project, bool restore, bool create) throw (Exception);
         ~Circuit() noexcept;
 
         // Getters
@@ -95,9 +95,6 @@ class Circuit final : public QObject
 
         // General Methods
         bool save(bool toOriginal, QStringList& errors) noexcept;
-
-        // Static Methods
-        static Circuit* create(Project& project) throw (Exception);
 
 
     private:

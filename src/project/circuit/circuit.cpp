@@ -39,7 +39,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Circuit::Circuit(Project& project, bool restore, bool isNew) throw (Exception) :
+Circuit::Circuit(Project& project, bool restore, bool create) throw (Exception) :
     QObject(0), mProject(project),
     mXmlFilepath(project.getPath().getPathTo("core/circuit.xml")), mXmlFile(0)
 {
@@ -47,8 +47,11 @@ Circuit::Circuit(Project& project, bool restore, bool isNew) throw (Exception) :
 
     try
     {
-        // try to open the XML file "circuit.xml"
-        mXmlFile = new XmlFile(mXmlFilepath, restore, "circuit");
+        // try to create/open the XML file "circuit.xml"
+        if (create)
+            mXmlFile = XmlFile::create(mXmlFilepath, "circuit", 0);
+        else
+            mXmlFile = new XmlFile(mXmlFilepath, restore, "circuit");
 
         // OK - XML file is open --> now load the whole circuit stuff
 
@@ -56,43 +59,35 @@ Circuit::Circuit(Project& project, bool restore, bool isNew) throw (Exception) :
         QDomElement root = mXmlFile->getRoot();
 
         // Load all netclasses
-        if (isNew)
-        {
+        if (root.firstChildElement("netclasses").isNull())
             root.appendChild(mXmlFile->getDocument().createElement("netclasses"));
-            addNetClass(createNetClass("default"));
-        }
-        else
+        tmpNode = root.firstChildElement("netclasses").firstChildElement("netclass");
+        while (!tmpNode.isNull())
         {
-            tmpNode = root.firstChildElement("netclasses").firstChildElement("netclass");
-            while (!tmpNode.isNull())
-            {
-                NetClass* netclass = new NetClass(tmpNode);
-                addNetClass(netclass, false);
-                tmpNode = tmpNode.nextSiblingElement("netclass");
-            }
+            NetClass* netclass = new NetClass(tmpNode);
+            addNetClass(netclass, false);
+            tmpNode = tmpNode.nextSiblingElement("netclass");
         }
+        if (mNetClasses.isEmpty())
+            addNetClass(createNetClass("default")); // add a netclass with name "default"
         qDebug() << mNetClasses.count() << "netclasses successfully loaded!";
 
         // Load all netsignals
-        if (isNew)
-        {
+        if (root.firstChildElement("netsignals").isNull())
             root.appendChild(mXmlFile->getDocument().createElement("netsignals"));
-        }
-        else
+        tmpNode = root.firstChildElement("netsignals").firstChildElement("netsignal");
+        while (!tmpNode.isNull())
         {
-            tmpNode = root.firstChildElement("netsignals").firstChildElement("netsignal");
-            while (!tmpNode.isNull())
-            {
-                NetSignal* netsignal = new NetSignal(*this, tmpNode);
-                addNetSignal(netsignal, false);
-                tmpNode = tmpNode.nextSiblingElement("netsignal");
-            }
+            NetSignal* netsignal = new NetSignal(*this, tmpNode);
+            addNetSignal(netsignal, false);
+            tmpNode = tmpNode.nextSiblingElement("netsignal");
         }
         qDebug() << mNetSignals.count() << "netsignals successfully loaded!";
 
         // Load all generic component instances
-        tmpNode = root.firstChildElement("generic_component_instances")
-                  .firstChildElement("instance");
+        if (root.firstChildElement("generic_component_instances").isNull())
+            root.appendChild(mXmlFile->getDocument().createElement("generic_component_instances"));
+        tmpNode = root.firstChildElement("generic_component_instances").firstChildElement("instance");
         while (!tmpNode.isNull())
         {
             GenericComponentInstance* genComp = new GenericComponentInstance(*this, tmpNode);
@@ -393,31 +388,6 @@ bool Circuit::save(bool toOriginal, QStringList& errors) noexcept
     }
 
     return success;
-}
-
-/*****************************************************************************************
- *  Static Methods
- ****************************************************************************************/
-
-Circuit* Circuit::create(Project& project) throw (Exception)
-{
-    XmlFile* file = 0;
-    Circuit* circuit = 0;
-
-    try
-    {
-        file = XmlFile::create(project.getPath().getPathTo("core/circuit.xml"), "circuit", 0);
-        circuit = new Circuit(project, true, true);
-        delete file;
-    }
-    catch (Exception& e)
-    {
-        delete circuit;
-        delete file;
-        throw;
-    }
-
-    return circuit;
 }
 
 /*****************************************************************************************

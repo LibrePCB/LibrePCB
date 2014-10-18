@@ -44,19 +44,39 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Project::Project(const FilePath& filepath, bool isNew) throw (Exception) :
+Project::Project(const FilePath& filepath, bool create) throw (Exception) :
     QObject(0), mPath(filepath.getParentDir()), mFilepath(filepath), mXmlFile(0),
     mFileLock(filepath), mIsRestored(false), mSchematicsIniFile(0), mUndoStack(0),
     mProjectLibrary(0), mCircuit(0), mSchematicEditor(0)
 {
-    qDebug() << "load project...";
+    qDebug() << (create ? "create project..." : "open project...");
 
     // Check if the filepath is valid
-    if (((!isNew) && (!mFilepath.isExistingFile())) || (mFilepath.getSuffix() != "e4u")
-            || (!mPath.isExistingDir()))
+    if (mFilepath.getSuffix() != "e4u")
     {
         throw RuntimeError(__FILE__, __LINE__, mFilepath.toStr(),
-            QString(tr("Invalid project file: \"%1\"")).arg(mFilepath.toNative()));
+            tr("The suffix of the project file must be \"e4u\"!"));
+    }
+    if (create)
+    {
+        if (mFilepath.isExistingDir() || mFilepath.isExistingFile())
+        {
+            throw RuntimeError(__FILE__, __LINE__, mFilepath.toStr(), QString(tr(
+                "The file \"%1\" does already exist!")).arg(mFilepath.toNative()));
+        }
+        if (!mPath.mkPath())
+        {
+            throw RuntimeError(__FILE__, __LINE__, mPath.toStr(), QString(tr(
+                "Could not create the directory \"%1\"!")).arg(mPath.toNative()));
+        }
+    }
+    else
+    {
+        if (((!mFilepath.isExistingFile())) || (!mPath.isExistingDir()))
+        {
+            throw RuntimeError(__FILE__, __LINE__, mFilepath.toStr(),
+                QString(tr("Invalid project file: \"%1\"")).arg(mFilepath.toNative()));
+        }
     }
 
     // Check if the project is locked (already open or application was crashed). In case
@@ -128,22 +148,17 @@ Project::Project(const FilePath& filepath, bool isNew) throw (Exception) :
 
     try
     {
-        // try to open the XML project file
-        mXmlFile = new XmlFile(mFilepath, mIsRestored || isNew, "project");
+        // try to create/open the XML project file
+        if (create)
+            mXmlFile = XmlFile::create(mFilepath, "project", 0);
+        else
+            mXmlFile = new XmlFile(mFilepath, mIsRestored, "project");
 
         // the project seems to be ready to open, so we will create all needed objects
 
         mUndoStack = new UndoStack();
-
-        if (isNew)
-            mProjectLibrary = ProjectLibrary::create(*this);
-        else
-            mProjectLibrary = new ProjectLibrary(*this, mIsRestored);
-
-        if (isNew)
-            mCircuit = Circuit::create(*this);
-        else
-            mCircuit = new Circuit(*this, mIsRestored);
+        mProjectLibrary = new ProjectLibrary(*this, mIsRestored);
+        mCircuit = new Circuit(*this, mIsRestored, create);
 
         // Load all schematic layers
         QList<unsigned int> schematicLayerIds;
@@ -156,7 +171,7 @@ Project::Project(const FilePath& filepath, bool isNew) throw (Exception) :
             mSchematicLayers.insert(id, new SchematicLayer(id));
 
         // Load all schematics
-        if (isNew)
+        if (create)
             mSchematicsIniFile = IniFile::create(mPath.getPathTo("schematics/schematics.ini"), 0);
         else
             mSchematicsIniFile = new IniFile(mPath.getPathTo("schematics/schematics.ini"), mIsRestored);
@@ -175,6 +190,8 @@ Project::Project(const FilePath& filepath, bool isNew) throw (Exception) :
         qDebug() << mSchematics.count() << "schematics successfully loaded!";
 
         mSchematicEditor = new SchematicEditor(*this);
+
+        if (create) save(); // write all files to harddisc
     }
     catch (...)
     {
@@ -530,50 +547,6 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     }
 
     return success;
-}
-
-/*****************************************************************************************
- *  Static Methods
- ****************************************************************************************/
-
-Project* Project::create(const FilePath& filepath) throw (Exception)
-{
-    if (filepath.isExistingDir() || filepath.isExistingFile())
-    {
-        throw RuntimeError(__FILE__, __LINE__, filepath.toStr(), QString(tr(
-            "The file or directory \"%1\" does already exist!")).arg(filepath.toNative()));
-    }
-
-    if (filepath.getSuffix() != "e4u")
-    {
-        throw RuntimeError(__FILE__, __LINE__, filepath.toStr(),
-            tr("The suffix of the project file must be \"e4u\"!"));
-    }
-
-    if (!filepath.getParentDir().mkPath())
-    {
-        throw RuntimeError(__FILE__, __LINE__, filepath.toStr(), QString(tr(
-            "Could not create the directory \"%1\"!")).arg(filepath.getParentDir().toNative()));
-    }
-
-    XmlFile* file = 0;
-    Project* project = 0;
-
-    try
-    {
-        file = XmlFile::create(filepath, "project", 0);
-        project = new Project(filepath, true);
-        project->save();
-        delete file;
-    }
-    catch (Exception& e)
-    {
-        delete project;
-        delete file;
-        throw;
-    }
-
-    return project;
 }
 
 /*****************************************************************************************

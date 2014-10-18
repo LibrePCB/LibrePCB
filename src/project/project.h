@@ -81,23 +81,26 @@ class Project final : public QObject
         // Constructors / Destructor
 
         /**
-         * @brief The constructor to open an existing project with all its content
+         * @brief The constructor to create or open a project with all its content
          *
          * @note    The constructor will always try to open the specified project. You
          *          cannot create an instance of Project without opening the project.
          *          The destructor then will close the project. It's not possible to
          *          close a project without destroying the Project instance.
          *
-         * @param filepath      The filepath to the *.e4u project file
-         * @param isNew         True if the specified project is new (Do NOT set this
-         *                      parameter to true manually! Only #create() may do this)
+         * @param filepath      The filepath to the new or existing *.e4u project file
+         * @param create        True if the specified project does not exist already and
+         *                      must be created. The method #open() will use "false",
+         *                      the method #create() will use "true" for this parameter.
          *
-         * @throw Exception     If the project could not be opened successfully, the
-         *                      constructor will throw an exception of type Exception
-         *                      (or a subclass of it). Before throwing an exception, the
-         *                      user will get a messagebox with the error message.
+         * @throw Exception     If the project could not be created/opened successfully,
+         *                      the constructor will throw an exception of type #Exception
+         *                      (or a subclass of it). The catcher of the exception should
+         *                      then show a message box with the error message. Only
+         *                      exceptions of type #UserCanceled should be ignored (no
+         *                      msg box) because the user has aborted opening the project.
          */
-        explicit Project(const FilePath& filepath, bool isNew = false) throw (Exception);
+        explicit Project(const FilePath& filepath, bool create) throw (Exception);
 
         /**
          * @brief The destructor will close the whole project (without saving!)
@@ -257,23 +260,6 @@ class Project final : public QObject
          * @return true if the window can be closed, false if closing the window is denied
          */
         bool windowIsAboutToClose(QMainWindow* window);
-
-
-        // Static Methods
-
-        /**
-         * @brief Create a new project (and open it)
-         *
-         * This method will create all neccessary files and folders on the filesystem.
-         *
-         * @param filepath  The filepath to the new project file (must not exist already)
-         *
-         * @return  A pointer to the new Project object. You are responsible for deleting
-         *          the object (close the project) if it is no longer used.
-         *
-         * @throw Exception if an error occurs
-         */
-        static Project* create(const FilePath& filepath) throw (Exception);
 
 
     public slots:

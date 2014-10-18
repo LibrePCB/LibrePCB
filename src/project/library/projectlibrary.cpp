@@ -42,8 +42,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ProjectLibrary::ProjectLibrary(Project& project, bool restore)
-                              throw (Exception) :
+ProjectLibrary::ProjectLibrary(Project& project, bool restore) throw (Exception) :
     QObject(0), mProject(project), mLibraryPath(project.getPath().getPathTo("lib"))
 {
     qDebug() << "load project library...";
@@ -52,8 +51,11 @@ ProjectLibrary::ProjectLibrary(Project& project, bool restore)
 
     if (!mLibraryPath.isExistingDir())
     {
-        throw RuntimeError(__FILE__, __LINE__, mLibraryPath.toStr(), QString(
-            tr("The library path \"%1\" does not exist!")).arg(mLibraryPath.toNative()));
+        if (!mLibraryPath.mkPath())
+        {
+            throw RuntimeError(__FILE__, __LINE__, mLibraryPath.toStr(), QString(
+                tr("Could not create the directory \"%1\"!")).arg(mLibraryPath.toNative()));
+        }
     }
 
     try
@@ -212,16 +214,6 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
     }
 
     qDebug() << "successfully loaded" << elementList.count() << qPrintable(type);
-}
-
-/*****************************************************************************************
- *  Static Methods
- ****************************************************************************************/
-
-ProjectLibrary* ProjectLibrary::create(Project& project) throw (Exception)
-{
-    project.getPath().getPathTo("lib").mkPath();
-    return new ProjectLibrary(project, true);
 }
 
 /*****************************************************************************************
