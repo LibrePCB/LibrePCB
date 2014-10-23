@@ -249,13 +249,13 @@ QDebug operator<<(QDebug stream, const LengthUnit& unit)
 
 // General Methods
 
-Length Length::mappedToGrid(const Length& gridInterval) const
+Length Length::mappedToGrid(const Length& gridInterval) const noexcept
 {
     Length length(*this);
     return length.mapToGrid(gridInterval);
 }
 
-Length& Length::mapToGrid(const Length& gridInterval)
+Length& Length::mapToGrid(const Length& gridInterval) noexcept
 {
     mNanometers = mapNmToGrid(mNanometers, gridInterval);
     return *this;
@@ -263,35 +263,35 @@ Length& Length::mapToGrid(const Length& gridInterval)
 
 // Static Methods
 
-Length Length::fromMm(qreal millimeters, const Length& gridInterval)
+Length Length::fromMm(qreal millimeters, const Length& gridInterval) throw (RangeError)
 {
     Length l;
     l.setLengthMm(millimeters);
     return l.mapToGrid(gridInterval);
 }
 
-Length Length::fromMm(const QString& millimeters, const Length& gridInterval)
+Length Length::fromMm(const QString& millimeters, const Length& gridInterval) throw (Exception)
 {
     Length l;
     l.setLengthMm(millimeters);
     return l.mapToGrid(gridInterval);
 }
 
-Length Length::fromInch(qreal inches, const Length& gridInterval)
+Length Length::fromInch(qreal inches, const Length& gridInterval) throw (RangeError)
 {
     Length l;
     l.setLengthInch(inches);
     return l.mapToGrid(gridInterval);
 }
 
-Length Length::fromMil(qreal mils, const Length& gridInterval)
+Length Length::fromMil(qreal mils, const Length& gridInterval) throw (RangeError)
 {
     Length l;
     l.setLengthMil(mils);
     return l.mapToGrid(gridInterval);
 }
 
-Length Length::fromPx(qreal pixels, const Length& gridInterval)
+Length Length::fromPx(qreal pixels, const Length& gridInterval) throw (RangeError)
 {
     Length l;
     l.setLengthPx(pixels);
@@ -300,49 +300,24 @@ Length Length::fromPx(qreal pixels, const Length& gridInterval)
 
 // Private Methods
 
-/**
- * @brief Set the length from a floating point number in nanometers
- *
- * This is a helper method for the setLength*() methods.
- *
- * @param nanometers    A floating point number in nanometers.
- *
- * @note The parameter is NOT an integer although we don't use numbers smaller than
- * one nanometer. This way, the range of this parameter is much greater and we can
- * compare the value with the range of an integer. If the value is outside the range
- * of an integer, we will throw an exception. If we would pass the length as an integer,
- * we couldn't detect such under-/overflows!
- */
-void Length::setLengthFromFloat(qreal nanometers)
+void Length::setLengthFromFloat(qreal nanometers) throw (RangeError)
 {
     LengthBase_t min = std::numeric_limits<LengthBase_t>::min();
     LengthBase_t max = std::numeric_limits<LengthBase_t>::max();
-    if ((nanometers > max) || (nanometers < min))
+    qreal value = qRound(nanometers);
+    if ((value > max) || (value < min))
     {
         throw RangeError(__FILE__, __LINE__, QString("value=%1; min=%2; max=%3")
-                         .arg(nanometers).arg(min).arg(max),
+                         .arg(value).arg(min).arg(max),
                          QCoreApplication::translate("Length", "Range error!"));
     }
 
-    mNanometers = qRound(nanometers);
+    mNanometers = value;
 }
 
 // Private Static Methods
 
-/**
- * @brief Map a length in nanometers to a grid interval in nanometers
- *
- * This is a helper function for mapToGrid().
- *
- * @param nanometers    The length we want to map to the grid
- * @param gridInterval  The grid interval
- *
- * @return  The length which is mapped to the grid (always a multiple of gridInterval)
- *
- * @todo    does this work correctly with large 64bit integers?!
- *          and maybe there is a better, integer-based method for this purpose?
- */
-LengthBase_t Length::mapNmToGrid(LengthBase_t nanometers, const Length& gridInterval)
+LengthBase_t Length::mapNmToGrid(LengthBase_t nanometers, const Length& gridInterval) noexcept
 {
     if (gridInterval.mNanometers != 0)
         return qRound((qreal)nanometers / gridInterval.mNanometers) * gridInterval.mNanometers;
@@ -350,23 +325,16 @@ LengthBase_t Length::mapNmToGrid(LengthBase_t nanometers, const Length& gridInte
         return nanometers;
 }
 
-/**
- * @brief Convert a length from a QString (in millimeters) to an integer (in nanometers)
- *
- * This is a helper function for Length(const QString&) and setLengthMm().
- *
- * @param millimeters   A QString which contains a floating point number with maximum
- *                      six decimals after the decimal point. The locale of the string
- *                      have to be "C"! Example: QString("-1234.56") for -1234.56mm
- *
- * @return The length in nanometers
- *
- * @todo    don't use double for this purpose!
- *          and throw an exception if a range error occurs (under-/overflow)!
- */
-LengthBase_t Length::mmStringToNm(const QString& millimeters)
+LengthBase_t Length::mmStringToNm(const QString& millimeters) throw (Exception)
 {
-    return qRound(millimeters.toDouble() * 1e6);
+    bool ok;
+    qreal nm = qRound(QLocale::c().toDouble(millimeters, &ok) * 1e6);
+    if (!ok)
+    {
+        throw Exception(__FILE__, __LINE__, millimeters, QString(QCoreApplication::
+            translate("Length", "Invalid length string: \"%1\"")).arg(millimeters));
+    }
+    return nm;
 }
 
 // Non-Member Functions
@@ -389,21 +357,21 @@ QDebug operator<<(QDebug stream, const Length& length)
 
 // Static Methods
 
-Angle Angle::fromDeg(qreal degrees)
+Angle Angle::fromDeg(qreal degrees) noexcept
 {
     Angle angle;
     angle.setAngleDeg(degrees);
     return angle;
 }
 
-Angle Angle::fromDeg(const QString& degrees)
+Angle Angle::fromDeg(const QString& degrees) throw (Exception)
 {
     Angle angle;
     angle.setAngleDeg(degrees);
     return angle;
 }
 
-Angle Angle::fromRad(qreal radians)
+Angle Angle::fromRad(qreal radians) noexcept
 {
     Angle angle;
     angle.setAngleRad(radians);
@@ -412,24 +380,16 @@ Angle Angle::fromRad(qreal radians)
 
 // Private Static Methods
 
-/**
- * @brief Convert an angle from a QString (in degrees) to an integer (in microdegrees)
- *
- * This is a helper function for Angle(const QString&) and setAngleDeg().
- *
- * @param degrees   A QString which contains a floating point number with maximum
- *                  six decimals after the decimal point. The locale of the string
- *                  have to be "C"! Example: QString("-123.456") for -123.456 degrees
- *
- * @return The angle in microdegrees
- *
- * @todo    don't use double for this purpose!
- *          and map the angle to +/- 360 degrees BEFORE converting it to microdegrees!
- *          throw an exception on range errors!
- */
-qint32 Angle::degStringToMicrodeg(const QString& degrees)
+qint32 Angle::degStringToMicrodeg(const QString& degrees) throw (Exception)
 {
-    return qRound(degrees.toDouble() * 1e6);
+    bool ok;
+    qreal angle = qRound(QLocale::c().toDouble(degrees, &ok) * 1e6);
+    if (!ok)
+    {
+        throw Exception(__FILE__, __LINE__, degrees, QString(QCoreApplication::
+            translate("Angle", "Invalid angle string: \"%1\"")).arg(degrees));
+    }
+    return angle;
 }
 
 // Non-Member Functions
@@ -452,14 +412,14 @@ QDebug operator<<(QDebug stream, const Angle& angle)
 
 // General Methods
 
-Point Point::mappedToGrid(const Length& gridInterval) const
+Point Point::mappedToGrid(const Length& gridInterval) const noexcept
 {
     Point p(*this);
     p.mapToGrid(gridInterval);
     return p;
 }
 
-Point& Point::mapToGrid(const Length& gridInterval)
+Point& Point::mapToGrid(const Length& gridInterval) noexcept
 {
     mX.mapToGrid(gridInterval);
     mY.mapToGrid(gridInterval);
@@ -468,7 +428,7 @@ Point& Point::mapToGrid(const Length& gridInterval)
 
 // Static Methods
 
-Point Point::fromMm(qreal millimetersX, qreal millimetersY, const Length& gridInterval)
+Point Point::fromMm(qreal millimetersX, qreal millimetersY, const Length& gridInterval) throw (RangeError)
 {
     Point p;
     p.mX.setLengthMm(millimetersX);
@@ -476,12 +436,12 @@ Point Point::fromMm(qreal millimetersX, qreal millimetersY, const Length& gridIn
     return p.mapToGrid(gridInterval);
 }
 
-Point Point::fromMm(const QPointF& millimeters, const Length& gridInterval)
+Point Point::fromMm(const QPointF& millimeters, const Length& gridInterval) throw (RangeError)
 {
     return fromMm(millimeters.x(), millimeters.y(), gridInterval);
 }
 
-Point Point::fromInch(qreal inchesX, qreal inchesY, const Length& gridInterval)
+Point Point::fromInch(qreal inchesX, qreal inchesY, const Length& gridInterval) throw (RangeError)
 {
     Point p;
     p.mX.setLengthInch(inchesX);
@@ -489,12 +449,12 @@ Point Point::fromInch(qreal inchesX, qreal inchesY, const Length& gridInterval)
     return p.mapToGrid(gridInterval);
 }
 
-Point Point::fromInch(const QPointF& inches, const Length& gridInterval)
+Point Point::fromInch(const QPointF& inches, const Length& gridInterval) throw (RangeError)
 {
     return fromInch(inches.x(), inches.y(), gridInterval);
 }
 
-Point Point::fromMil(qreal milsX, qreal milsY, const Length& gridInterval)
+Point Point::fromMil(qreal milsX, qreal milsY, const Length& gridInterval) throw (RangeError)
 {
     Point p;
     p.mX.setLengthMil(milsX);
@@ -502,12 +462,12 @@ Point Point::fromMil(qreal milsX, qreal milsY, const Length& gridInterval)
     return p.mapToGrid(gridInterval);
 }
 
-Point Point::fromMil(const QPointF& mils, const Length& gridInterval)
+Point Point::fromMil(const QPointF& mils, const Length& gridInterval) throw (RangeError)
 {
     return fromMil(mils.x(), mils.y(), gridInterval);
 }
 
-Point Point::fromPx(qreal pixelsX, qreal pixelsY, const Length& gridInterval)
+Point Point::fromPx(qreal pixelsX, qreal pixelsY, const Length& gridInterval) throw (RangeError)
 {
     Point p;
     p.mX.setLengthPx(pixelsX);
@@ -515,7 +475,7 @@ Point Point::fromPx(qreal pixelsX, qreal pixelsY, const Length& gridInterval)
     return p.mapToGrid(gridInterval);
 }
 
-Point Point::fromPx(const QPointF& pixels, const Length& gridInterval)
+Point Point::fromPx(const QPointF& pixels, const Length& gridInterval) throw (RangeError)
 {
     return fromPx(pixels.x(), pixels.y(), gridInterval);
 }

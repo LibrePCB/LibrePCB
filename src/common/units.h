@@ -25,6 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include "exceptions.h"
 
 /*****************************************************************************************
  *  Typedefs
@@ -384,37 +385,21 @@ class Length
          *
          * The length will be initialized with zero nanometers.
          */
-        Length() : Length(0) {}
+        Length() noexcept : Length(0) {}
 
         /**
          * @brief Copy Constructor
          *
          * @param length        Another Length object
          */
-        Length(const Length& length) : mNanometers(length.mNanometers) {}
+        Length(const Length& length) noexcept : mNanometers(length.mNanometers) {}
 
         /**
          * @brief Constructor with length in nanometers
          *
          * @param nanometers    The length in nanometers
          */
-        explicit Length(LengthBase_t nanometers)    : mNanometers(nanometers) {}
-
-        /**
-         * @brief Constructor with length in millimeters as a QString
-         *
-         * This constructor can be used to create a Length object from a QString which
-         * contains a floating point number in millimeters, like QString("1234.56") for
-         * 1234.56mm. The string must not depend on the locale settings (see QLocale),
-         * it have always to represent a number in the "C" locale. The maximum count of
-         * decimals after the decimal point is 6, because the 6th decimal represents one
-         * nanometer.
-         *
-         * @param millimeters   A QString with the length in millimeters
-         *
-         * @note This constructor is useful to read lengths from XML files!
-         */
-        explicit Length(const QString& millimeters) : mNanometers(mmStringToNm(millimeters)) {}
+        explicit Length(LengthBase_t nanometers) noexcept : mNanometers(nanometers) {}
 
 
         // Setters
@@ -424,7 +409,7 @@ class Length
          *
          * @param nanometers    The length in nanometers
          */
-        void setLengthNm(LengthBase_t nanometers) {mNanometers = nanometers;}
+        void setLengthNm(LengthBase_t nanometers) noexcept {mNanometers = nanometers;}
 
         /**
          * @brief Set the length in millimeters
@@ -434,18 +419,24 @@ class Length
          * @warning Please note that this method can decrease the precision of the length!
          * If you need a length which is located exactly on the grid of a QGraphicsView
          * (which is often required), you need to call mapToGrid() afterwards!
+         *
+         * @throws RangeError   If the argument is out of range, a RangeError exception
+         *                      will be thrown
          */
-        void setLengthMm(qreal millimeters) {setLengthFromFloat(millimeters * 1e6);}
+        void setLengthMm(qreal millimeters) throw (RangeError) {setLengthFromFloat(millimeters * 1e6);}
 
         /**
          * @brief Set the length in millimeters, represented in a QString
          *
-         * @param millimeters   See Length(const QString&)
+         * @param millimeters   See #fromMm(const QString&)
          *
          * @note This method is useful to read lengths from XML files! The problem with
          * decreased precision does NOT exist by using this method!
+         *
+         * @throw Exception     If the string is not valid or the number is out of range,
+         *                      an Exception will be thrown
          */
-        void setLengthMm(const QString& millimeters) {mNanometers = mmStringToNm(millimeters);}
+        void setLengthMm(const QString& millimeters) throw (Exception) {mNanometers = mmStringToNm(millimeters);}
 
         /**
          * @brief Set the length in inches
@@ -455,8 +446,11 @@ class Length
          * @warning Please note that this method can decrease the precision of the length!
          * If you need a length which is located exactly on the grid of a QGraphicsView
          * (which is often required), you need to call mapToGrid() afterwards!
+         *
+         * @throws RangeError   If the argument is out of range, a RangeError exception
+         *                      will be thrown
          */
-        void setLengthInch(qreal inches) {setLengthFromFloat(inches * sNmPerInch);}
+        void setLengthInch(qreal inches) throw (Exception) {setLengthFromFloat(inches * sNmPerInch);}
 
         /**
          * @brief Set the length in mils (1/1000 inch)
@@ -466,8 +460,11 @@ class Length
          * @warning Please note that this method can decrease the precision of the length!
          * If you need a length which is located exactly on the grid of a QGraphicsView
          * (which is often required), you need to call mapToGrid() afterwards!
+         *
+         * @throws RangeError   If the argument is out of range, a RangeError exception
+         *                      will be thrown
          */
-        void setLengthMil(qreal mils) {setLengthFromFloat(mils * sNmPerMil);}
+        void setLengthMil(qreal mils) throw (Exception) {setLengthFromFloat(mils * sNmPerMil);}
 
         /**
          * @brief Set the length in pixels (from QGraphics* objects)
@@ -479,8 +476,11 @@ class Length
          * @warning Please note that this method can decrease the precision of the length!
          * If you need a length which is located exactly on the grid of a QGraphicsView
          * (which is often required), you need to call mapToGrid() afterwards!
+         *
+         * @throws RangeError   If the argument is out of range, a RangeError exception
+         *                      will be thrown
          */
-        void setLengthPx(qreal pixels) {setLengthFromFloat(pixels * sNmPerPixel);}
+        void setLengthPx(qreal pixels) throw (Exception) {setLengthFromFloat(pixels * sNmPerPixel);}
 
 
         // Conversions
@@ -490,7 +490,7 @@ class Length
          *
          * @return The length in nanometers
          */
-        LengthBase_t toNm() const {return mNanometers;}
+        LengthBase_t toNm() const noexcept {return mNanometers;}
 
         /**
          * @brief Get the length in millimeters
@@ -499,7 +499,7 @@ class Length
          *
          * @warning Be careful with this method, as it can decrease the precision!
          */
-        qreal toMm() const {return (qreal)mNanometers / 1e6;}
+        qreal toMm() const noexcept {return (qreal)mNanometers / 1e6;}
 
         /**
          * @brief Get the length in millimeters as a QString
@@ -512,7 +512,7 @@ class Length
          *
          * @todo don't use double for this purpose!
          */
-        QString toMmString() const {return QString().setNum(toMm(), 'f', 6);}
+        QString toMmString() const noexcept {return QLocale::c().toString(toMm(), 'f', 6);}
 
         /**
          * @brief Get the length in inches
@@ -521,7 +521,7 @@ class Length
          *
          * @warning Be careful with this method, as it can decrease the precision!
          */
-        qreal toInch() const {return (qreal)mNanometers / sNmPerInch;}
+        qreal toInch() const noexcept {return (qreal)mNanometers / sNmPerInch;}
 
         /**
          * @brief Get the length in mils (1/1000 inches)
@@ -530,7 +530,7 @@ class Length
          *
          * @warning Be careful with this method, as it can decrease the precision!
          */
-        qreal toMil() const {return (qreal)mNanometers / sNmPerMil;}
+        qreal toMil() const noexcept {return (qreal)mNanometers / sNmPerMil;}
 
         /**
          * @brief Get the length in pixels (for QGraphics* objects)
@@ -541,7 +541,7 @@ class Length
          *
          * @warning Be careful with this method, as it can decrease the precision!
          */
-        qreal toPx() const {return mNanometers * sPixelsPerNm;}
+        qreal toPx() const noexcept {return mNanometers * sPixelsPerNm;}
 
 
         // General Methods
@@ -556,7 +556,7 @@ class Length
          *
          * @see mapToGrid()
          */
-        Length mappedToGrid(const Length& gridInterval) const;
+        Length mappedToGrid(const Length& gridInterval) const noexcept;
 
         /**
          * @brief Map this Length object to a specific grid interval
@@ -568,7 +568,7 @@ class Length
          *
          * @see mappedToGrid()
          */
-        Length& mapToGrid(const Length& gridInterval);
+        Length& mapToGrid(const Length& gridInterval) noexcept;
 
 
         // Static Functions
@@ -584,11 +584,21 @@ class Length
          * @warning Please note that this method can decrease the precision of the length!
          * If you need a length which is located exactly on the grid of a QGraphicsView
          * (which is often required), you need to call mapToGrid() afterwards!
+         *
+         * @throws RangeError   If the argument is out of range, a RangeError exception
+         *                      will be thrown
          */
-        static Length fromMm(qreal millimeters, const Length& gridInterval = Length(0));
+        static Length fromMm(qreal millimeters, const Length& gridInterval = Length(0)) throw (RangeError);
 
         /**
          * @brief Get a Length object with a specific length and map it to a specific grid
+         *
+         * This method can be used to create a Length object from a QString which
+         * contains a floating point number in millimeters, like QString("123.456") for
+         * 123.456 millimeters. The string must not depend on the locale settings (see
+         * QLocale), it have always to represent a number in the "C" locale. The maximum
+         * count of decimals after the decimal point is 6, because the 6th decimal
+         * represents one nanometer.
          *
          * @param millimeters   See setLengthMm(const QString&)
          * @param gridInterval  See mapToGrid()
@@ -597,8 +607,11 @@ class Length
          *
          * @note This method is useful to read lengths from XML files! The problem with
          * decreased precision does NOT exist by using this method!
+         *
+         * @throw Exception     If the argument is invalid or out of range, an Exception
+         *                      will be thrown
          */
-        static Length fromMm(const QString& millimeters, const Length& gridInterval = Length(0));
+        static Length fromMm(const QString& millimeters, const Length& gridInterval = Length(0)) throw (Exception);
 
         /**
          * @brief Get a Length object with a specific length and map it to a specific grid
@@ -611,8 +624,11 @@ class Length
          * @warning Please note that this method can decrease the precision of the length!
          * If you need a length which is located exactly on the grid of a QGraphicsView
          * (which is often required), you need to call mapToGrid() afterwards!
+         *
+         * @throws RangeError   If the argument is out of range, a RangeError exception
+         *                      will be thrown
          */
-        static Length fromInch(qreal inches, const Length& gridInterval = Length(0));
+        static Length fromInch(qreal inches, const Length& gridInterval = Length(0)) throw (RangeError);
 
         /**
          * @brief Get a Length object with a specific length and map it to a specific grid
@@ -625,8 +641,11 @@ class Length
          * @warning Please note that this method can decrease the precision of the length!
          * If you need a length which is located exactly on the grid of a QGraphicsView
          * (which is often required), you need to call mapToGrid() afterwards!
+         *
+         * @throws RangeError   If the argument is out of range, a RangeError exception
+         *                      will be thrown
          */
-        static Length fromMil(qreal mils, const Length& gridInterval = Length(0));
+        static Length fromMil(qreal mils, const Length& gridInterval = Length(0)) throw (RangeError);
 
         /**
          * @brief Get a Length object with a specific length and map it to a specific grid
@@ -641,8 +660,11 @@ class Length
          * @warning Please note that this method can decrease the precision of the length!
          * If you need a length which is located exactly on the grid of a QGraphicsView
          * (which is often required), you need to call mapToGrid() afterwards!
+         *
+         * @throws RangeError   If the argument is out of range, a RangeError exception
+         *                      will be thrown
          */
-        static Length fromPx(qreal pixels, const Length& gridInterval = Length(0));
+        static Length fromPx(qreal pixels, const Length& gridInterval = Length(0)) throw (RangeError);
 
 
         // Operators
@@ -670,11 +692,56 @@ class Length
     private:
 
         // Private Functions
-        void setLengthFromFloat(qreal nanometers);
+
+        /**
+         * @brief Set the length from a floating point number in nanometers
+         *
+         * This is a helper method for the setLength*() methods.
+         *
+         * @param nanometers    A floating point number in nanometers.
+         *
+         * @note The parameter is NOT an integer although we don't use numbers smaller than
+         * one nanometer. This way, the range of this parameter is much greater and we can
+         * compare the value with the range of an integer. If the value is outside the range
+         * of an integer, we will throw an exception. If we would pass the length as an integer,
+         * we couldn't detect such under-/overflows!
+         */
+        void setLengthFromFloat(qreal nanometers) throw (RangeError);
+
 
         // Private Static Functions
-        static LengthBase_t mapNmToGrid(LengthBase_t nanometers, const Length& gridInterval);
-        static LengthBase_t mmStringToNm(const QString& millimeters);
+
+        /**
+         * @brief Map a length in nanometers to a grid interval in nanometers
+         *
+         * This is a helper function for mapToGrid().
+         *
+         * @param nanometers    The length we want to map to the grid
+         * @param gridInterval  The grid interval
+         *
+         * @return  The length which is mapped to the grid (always a multiple of gridInterval)
+         *
+         * @todo    does this work correctly with large 64bit integers?!
+         *          and maybe there is a better, integer-based method for this purpose?
+         */
+        static LengthBase_t mapNmToGrid(LengthBase_t nanometers, const Length& gridInterval) noexcept;
+
+        /**
+         * @brief Convert a length from a QString (in millimeters) to an integer (in nanometers)
+         *
+         * This is a helper function for Length(const QString&) and setLengthMm().
+         *
+         * @param millimeters   A QString which contains a floating point number with maximum
+         *                      six decimals after the decimal point. The locale of the string
+         *                      have to be "C"! Example: QString("-1234.56") for -1234.56mm
+         *
+         * @return The length in nanometers
+         *
+         * @todo    don't use double for this purpose!
+         *          and throw an exception if a range error occurs (under-/overflow)!
+         */
+        static LengthBase_t mmStringToNm(const QString& millimeters) throw (Exception);
+
 
         // Private Member Variables
         LengthBase_t mNanometers;  ///< the length in nanometers
@@ -704,7 +771,10 @@ QDebug operator<<(QDebug stream, const Length& length);
  * It's very important to have a consistent angle type over the whole project.
  *
  * All angles are stored in the integer base type int32_t. The internal unit is always
- * microdegrees, but this class provides also some converting methods to other units.
+ * microdegrees, but this class provides also some converting methods to other units. The
+ * range of the angle is -360°...+360°. So each angle can be represented in two different
+ * ways (for example +270° is equal to -90°). Angles outside this range are mapped to this
+ * range (modulo), the sign will be the same as before.
  *
  * @author ubruhin
  * @date 2014-06-21
@@ -718,37 +788,21 @@ class Angle
         /**
          * @brief Default Constructor
          */
-        Angle() : Angle(0) {}
+        Angle() noexcept : Angle(0) {}
 
         /**
          * @brief Copy Constructor
          *
          * @param angle         Another Angle object
          */
-        Angle(const Angle& angle) : mMicrodegrees(angle.mMicrodegrees) {}
+        Angle(const Angle& angle) noexcept : mMicrodegrees(angle.mMicrodegrees) {}
 
         /**
          * @brief Constructor with an angle in microdegrees
          *
          * @param microdegrees  The angle in microdegrees
          */
-        explicit Angle(qint32 microdegrees) : mMicrodegrees(microdegrees % 360000000) {}
-
-        /**
-         * @brief Constructor with an angle in degrees as a QString
-         *
-         * This constructor can be used to create an Angle object from a QString which
-         * contains a floating point number in degrees, like QString("123.456") for
-         * 123.456 degrees. The string must not depend on the locale settings (see
-         * QLocale), it have always to represent a number in the "C" locale. The maximum
-         * count of decimals after the decimal point is 6, because the 6th decimal
-         * represents one microdegree.
-         *
-         * @param degrees       The QString with the angle in microdegrees
-         *
-         * @note This constructor is useful to read angles from XML files!
-         */
-        explicit Angle(const QString& degrees) : mMicrodegrees(degStringToMicrodeg(degrees)) {}
+        explicit Angle(qint32 microdegrees) noexcept : mMicrodegrees(microdegrees % 360000000) {}
 
 
         // Setters
@@ -758,7 +812,7 @@ class Angle
          *
          * @param microdegrees  The angle in microdegrees
          */
-        void setAngleMicroDeg(qint32 microdegrees) {mMicrodegrees = microdegrees % 360000000;}
+        void setAngleMicroDeg(qint32 microdegrees) noexcept {mMicrodegrees = microdegrees % 360000000;}
 
         /**
          * @brief Set the angle in degrees
@@ -771,16 +825,18 @@ class Angle
          *
          * @todo fmod is only for double, so not good for ARM!
          */
-        void setAngleDeg(qreal degrees) {mMicrodegrees = fmod(degrees * 1e6, 360e6);}
+        void setAngleDeg(qreal degrees) noexcept {mMicrodegrees = fmod(degrees * 1e6, 360e6);}
 
         /**
          * @brief Set the angle in degrees, represented in a QString
          *
-         * @param degrees       See Angle(const QString&)
+         * This method is useful to read angles from XML files.
          *
-         * @note This method is useful to read angles from XML files.
+         * @param degrees       See fromDeg(const QString&)
+         *
+         * @throw Exception     If the argument is invalid, an Exception will be thrown
          */
-        void setAngleDeg(const QString& degrees) {mMicrodegrees = degStringToMicrodeg(degrees);}
+        void setAngleDeg(const QString& degrees) throw (Exception) {mMicrodegrees = degStringToMicrodeg(degrees);}
 
         /**
          * @brief Set the angle in radians
@@ -793,7 +849,7 @@ class Angle
          *
          * @todo fmod is only for double, so not good for ARM!
          */
-        void setAngleRad(qreal radians) {mMicrodegrees = fmod(radians * 180e6 / M_PI, 360e6);}
+        void setAngleRad(qreal radians) noexcept {mMicrodegrees = fmod(radians * 180e6 / (qreal)M_PI, 360e6);}
 
 
         // Conversions
@@ -803,14 +859,14 @@ class Angle
          *
          * @return The angle in microdegrees
          */
-        qint32 toMicroDeg() const {return mMicrodegrees;}
+        qint32 toMicroDeg() const noexcept {return mMicrodegrees;}
 
         /**
          * @brief Get the Angle in degrees
          *
          * @return The Angle in degrees
          */
-        qreal toDeg() const {return (qreal)mMicrodegrees / 1e6;}
+        qreal toDeg() const noexcept {return (qreal)mMicrodegrees / 1e6;}
 
         /**
          * @brief Get the angle in degrees as a QString
@@ -821,14 +877,14 @@ class Angle
          *
          * @todo don't use double for this purpose!
          */
-        QString toDegString() const {return QString().setNum(toDeg(), 'f', 6);}
+        QString toDegString() const noexcept {return QLocale::c().toString(toDeg(), 'f', 6);}
 
         /**
          * @brief Get the angle in radians
          *
          * @return The angle in radians
          */
-        qreal toRad() const {return (qreal)mMicrodegrees * M_PI / 180e6;}
+        qreal toRad() const noexcept {return (qreal)mMicrodegrees * (qreal)M_PI / 180e6;}
 
 
         // Static Functions
@@ -840,16 +896,25 @@ class Angle
          *
          * @return A new Angle object with the specified angle
          */
-        static Angle fromDeg(qreal degrees);
+        static Angle fromDeg(qreal degrees) noexcept;
 
         /**
          * @brief Get an Angle object with a specific angle
          *
+         * This method can be used to create an Angle object from a QString which
+         * contains a floating point number in degrees, like QString("123.456") for
+         * 123.456 degrees. The string must not depend on the locale settings (see
+         * QLocale), it have always to represent a number in the "C" locale. The maximum
+         * count of decimals after the decimal point is 6, because the 6th decimal
+         * represents one microdegree.
+         *
          * @param degrees   See setAngleDeg(const QString&)
          *
          * @return A new Angle object with the specified angle
+         *
+         * @throw Exception     If the argument is invalid, an Exception will be thrown
          */
-        static Angle fromDeg(const QString& degrees);
+        static Angle fromDeg(const QString& degrees) throw (Exception);
 
         /**
          * @brief Get an Angle object with a specific angle
@@ -858,7 +923,7 @@ class Angle
          *
          * @return A new Angle object with the specified angle
          */
-        static Angle fromRad(qreal radians);
+        static Angle fromRad(qreal radians) noexcept;
 
 
         // Operators
@@ -886,11 +951,27 @@ class Angle
     private:
 
         // Private Static Functions
-        static qint32 degStringToMicrodeg(const QString& degrees);
+
+        /**
+         * @brief Convert an angle from a QString (in degrees) to an integer (in microdegrees)
+         *
+         * This is a helper function for Angle(const QString&) and setAngleDeg().
+         *
+         * @param degrees   A QString which contains a floating point number with maximum
+         *                  six decimals after the decimal point. The locale of the string
+         *                  have to be "C"! Example: QString("-123.456") for -123.456 degrees
+         *
+         * @return The angle in microdegrees
+         *
+         * @todo    don't use double for this purpose!
+         *          and map the angle to +/- 360 degrees BEFORE converting it to microdegrees!
+         *          throw an exception on range errors!
+         */
+        static qint32 degStringToMicrodeg(const QString& degrees) throw (Exception);
+
 
         // Private Member Variables
         qint32 mMicrodegrees;   ///< the angle in microdegrees
-
 };
 
 // Non-Member Functions
@@ -945,14 +1026,14 @@ class Point
          *
          * The object will be initialized with X=Length(0) and Y=Length(0).
          */
-        Point() : Point(Length(0), Length(0)) {}
+        Point() noexcept : Point(Length(0), Length(0)) {}
 
         /**
          * @brief Copy Constructor
          *
          * @param point     Another Point object
          */
-        Point(const Point& point) : mX(point.mX), mY(point.mY) {}
+        Point(const Point& point) noexcept : mX(point.mX), mY(point.mY) {}
 
         /**
          * @brief Constructor for passing two Length objects
@@ -960,7 +1041,7 @@ class Point
          * @param x     The X coordinate as a Length object
          * @param y     The Y coordinate as a Length object
          */
-        explicit Point(const Length& x, const Length& y) : mX(x), mY(y) {}
+        explicit Point(const Length& x, const Length& y) noexcept : mX(x), mY(y) {}
 
 
         // Setters
@@ -970,41 +1051,41 @@ class Point
          *
          * @param x     The new X coordinate as a Length object
          */
-        void setX(const Length& x) {mX = x;}
+        void setX(const Length& x) noexcept {mX = x;}
 
         /**
          * @brief Set the Y coordinate
          *
          * @param y     The new Y coordinate as a Length object
          */
-        void setY(const Length& y) {mY = y;}
+        void setY(const Length& y) noexcept {mY = y;}
 
         /// @see Length::setLengthNm()
         /// @warning Be careful with this method! Maybe you should call mapToGrid() afterwards!
-        void setPointNm(LengthBase_t nmX, LengthBase_t nmY) {mX.setLengthNm(nmX);
-                                                             mY.setLengthNm(nmY);}
+        void setPointNm(LengthBase_t nmX, LengthBase_t nmY) noexcept {mX.setLengthNm(nmX);
+                                                                      mY.setLengthNm(nmY);}
 
         /// @see Length::setLengthMm()
         /// @warning Be careful with this method! Maybe you should call mapToGrid() afterwards!
-        void setPointMm(const QPointF& millimeters) {mX.setLengthMm(millimeters.x());
-                                                     mY.setLengthMm(millimeters.y());}
+        void setPointMm(const QPointF& millimeters) throw (RangeError) {mX.setLengthMm(millimeters.x());
+                                                                        mY.setLengthMm(millimeters.y());}
 
         /// @see Length::setLengthInch()
         /// @warning Be careful with this method! Maybe you should call mapToGrid() afterwards!
-        void setPointInch(const QPointF& inches) {mX.setLengthInch(inches.x());
-                                                  mY.setLengthInch(inches.y());}
+        void setPointInch(const QPointF& inches) throw (Exception) {mX.setLengthInch(inches.x());
+                                                                    mY.setLengthInch(inches.y());}
 
         /// @see Length::setLengthMil()
         /// @warning Be careful with this method! Maybe you should call mapToGrid() afterwards!
-        void setPointMil(const QPointF& mils) {mX.setLengthMil(mils.x());
-                                               mX.setLengthMil(mils.y());}
+        void setPointMil(const QPointF& mils) throw (Exception) {mX.setLengthMil(mils.x());
+                                                                 mX.setLengthMil(mils.y());}
 
         /// @see Length::setLengthPx()
         /// @warning Be careful with this method! Maybe you should call mapToGrid() afterwards!
         /// @note This method is useful to read the position of a QGraphics* object.
         ///       For this purpose, this method will invert the Y-coordinate.
-        void setPointPx(const QPointF& pixels) {mX.setLengthPx(pixels.x());
-                                                mY.setLengthPx(-pixels.y());} // invert Y!
+        void setPointPx(const QPointF& pixels) throw (Exception) {mX.setLengthPx(pixels.x());
+                                                                  mY.setLengthPx(-pixels.y());} // invert Y!
 
 
         // Getters
@@ -1014,14 +1095,14 @@ class Point
          *
          * @return The Length object of the X coordinate
          */
-        const Length& getX() const {return mX;}
+        const Length& getX() const noexcept {return mX;}
 
         /**
          * @brief Get the Y coordinate
          *
          * @return The Length object of the Y coordinate
          */
-        const Length& getY() const {return mY;}
+        const Length& getY() const noexcept {return mY;}
 
         /**
          * @brief Get the length of the vector if X and Y represents a vector
@@ -1029,7 +1110,7 @@ class Point
          *
          * @return The length of this vector (as a Length object)
          */
-        Length getLength() const {return Length(qSqrt(mX.toNm()*mX.toNm() + mY.toNm()*mY.toNm()));}
+        Length getLength() const noexcept {return Length(qSqrt(mX.toNm()*mX.toNm() + mY.toNm()*mY.toNm()));}
 
 
         // Conversions
@@ -1043,7 +1124,7 @@ class Point
          *
          * @see Length::toMm()
          */
-        QPointF toMmQPointF() const {return QPointF(mX.toMm(), mY.toMm());}
+        QPointF toMmQPointF() const noexcept {return QPointF(mX.toMm(), mY.toMm());}
 
         /**
          * @brief Get the point as a QPointF object in inches
@@ -1054,7 +1135,7 @@ class Point
          *
          * @see Length::toInch()
          */
-        QPointF toInchQPointF() const {return QPointF(mX.toInch(), mY.toInch());}
+        QPointF toInchQPointF() const noexcept {return QPointF(mX.toInch(), mY.toInch());}
 
         /**
          * @brief Get the point as a QPointF object in mils (1/1000 inches)
@@ -1065,7 +1146,7 @@ class Point
          *
          * @see Length::toMil()
          */
-        QPointF toMilQPointF() const {return QPointF(mX.toMil(), mY.toMil());}
+        QPointF toMilQPointF() const noexcept {return QPointF(mX.toMil(), mY.toMil());}
 
         /**
          * @brief Get the point as a QPointF object in pixels (for QGraphics* objects)
@@ -1079,7 +1160,7 @@ class Point
          *
          * @see Length::toPx()
          */
-        QPointF toPxQPointF() const {return QPointF(mX.toPx(), -mY.toPx());} // invert Y!
+        QPointF toPxQPointF() const noexcept {return QPointF(mX.toPx(), -mY.toPx());} // invert Y!
 
 
         // General
@@ -1093,7 +1174,7 @@ class Point
          *
          * @see Length::mappedToGrid()
          */
-        Point mappedToGrid(const Length& gridInterval) const;
+        Point mappedToGrid(const Length& gridInterval) const noexcept;
 
         /**
          * @brief Map this Point object to a specific grid interval
@@ -1104,28 +1185,28 @@ class Point
          *
          * @see Length::mapToGrid()
          */
-        Point& mapToGrid(const Length& gridInterval);
+        Point& mapToGrid(const Length& gridInterval) noexcept;
 
 
         // Static Functions
 
         /// @see Length::fromMm(qreal, const Length&)
-        static Point fromMm(qreal millimetersX, qreal millimetersY, const Length& gridInterval = Length(0));
-        static Point fromMm(const QPointF& millimeters,             const Length& gridInterval = Length(0));
+        static Point fromMm(qreal millimetersX, qreal millimetersY, const Length& gridInterval = Length(0)) throw (RangeError);
+        static Point fromMm(const QPointF& millimeters,             const Length& gridInterval = Length(0)) throw (RangeError);
 
         /// @see Length::fromInch()
-        static Point fromInch(qreal inchesX, qreal inchesY,         const Length& gridInterval = Length(0));
-        static Point fromInch(const QPointF& inches,                const Length& gridInterval = Length(0));
+        static Point fromInch(qreal inchesX, qreal inchesY,         const Length& gridInterval = Length(0)) throw (RangeError);
+        static Point fromInch(const QPointF& inches,                const Length& gridInterval = Length(0)) throw (RangeError);
 
         /// @see Length::fromMil()
-        static Point fromMil(qreal milsX, qreal milsY,              const Length& gridInterval = Length(0));
-        static Point fromMil(const QPointF& mils,                   const Length& gridInterval = Length(0));
+        static Point fromMil(qreal milsX, qreal milsY,              const Length& gridInterval = Length(0)) throw (RangeError);
+        static Point fromMil(const QPointF& mils,                   const Length& gridInterval = Length(0)) throw (RangeError);
 
         /// @see Length::fromPx()
         /// @note These methods are useful to read the position of a QGraphics* object.
         ///       For this purpose, these methods will invert the Y-coordinate.
-        static Point fromPx(qreal pixelsX, qreal pixelsY,           const Length& gridInterval = Length(0));
-        static Point fromPx(const QPointF& pixels,                  const Length& gridInterval = Length(0));
+        static Point fromPx(qreal pixelsX, qreal pixelsY,           const Length& gridInterval = Length(0)) throw (RangeError);
+        static Point fromPx(const QPointF& pixels,                  const Length& gridInterval = Length(0)) throw (RangeError);
 
         // Operators
         Point&  operator=(const Point& rhs)        {mX = rhs.mX; mY = rhs.mY; return *this;}
