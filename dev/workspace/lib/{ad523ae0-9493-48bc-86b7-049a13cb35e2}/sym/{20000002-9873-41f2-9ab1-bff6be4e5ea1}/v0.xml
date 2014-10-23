@@ -17,7 +17,10 @@
     <attachements/>
     <geometry>
         <polygon layer="10" width="0.254" fill="true" start_x="-10.16" start_y="-7.62">
+            <segment type="line" end_x="10.16" end_y="-7.62"/>
             <segment type="line" end_x="10.16" end_y="5.08"/>
+            <segment type="line" end_x="-10.16" end_y="5.08"/>
+            <segment type="line" end_x="-10.16" end_y="-7.62"/>
         </polygon>
         <text layer="20" text="${NAME}"  x="-10.16" y="5.08"  angle="0" height="3.175" v_align="bottom" h_align="left"/>
         <text layer="21" text="${VALUE}" x="-10.16" y="-7.62" angle="0" height="3.175" v_align="top"    h_align="left"/>
