@@ -68,18 +68,18 @@ SchematicLayer::SchematicLayer(unsigned int id) :
 
         case ComponentNames:
             mName = tr("Component Names");
-            mColor = Qt::gray;
-            mColorHighlighted = Qt::lightGray;
-            mFillColor = Qt::gray;
-            mFillColorHighlighted = Qt::lightGray;
+            mColor = Qt::darkGray;
+            mColorHighlighted = Qt::gray;
+            mFillColor = Qt::darkGray;
+            mFillColorHighlighted = Qt::gray;
             break;
 
         case ComponentValues:
             mName = tr("Component Values");
-            mColor = Qt::gray;
-            mColorHighlighted = Qt::lightGray;
-            mFillColor = Qt::gray;
-            mFillColorHighlighted = Qt::lightGray;
+            mColor = Qt::darkGray;
+            mColorHighlighted = Qt::gray;
+            mFillColor = Qt::darkGray;
+            mFillColorHighlighted = Qt::gray;
             break;
 
         case Nets:

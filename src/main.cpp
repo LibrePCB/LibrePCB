@@ -23,8 +23,8 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include <QApplication>
 #include <QTranslator>
+#include "common/application.h"
 #include "common/debug.h"
 #include "common/exceptions.h"
 #include "common/filepath.h"
@@ -43,7 +43,7 @@ static int appExec() noexcept
     //      catching an exception."
     try
     {
-        return QApplication::exec();
+        return Application::exec();
     }
     catch (Exception& e)
     {
@@ -67,18 +67,18 @@ static int appExec() noexcept
 
 int main(int argc, char* argv[])
 {
-    QApplication app(argc, argv);
+    Application app(argc, argv);
 
     // Set the organization / application names must be done very early because some other
     // classes will use these values (for example QSettings, Debug (for the file logging path))!
-    QCoreApplication::setOrganizationName("EDA4U");
+    Application::setOrganizationName("EDA4U");
     //QCoreApplication::setOrganizationDomain(""); ///< @todo
 #ifdef GIT_BRANCH
-    QCoreApplication::setApplicationName(QString("EDA4U_git-%1").arg(GIT_BRANCH));
+    Application::setApplicationName(QString("EDA4U_git-%1").arg(GIT_BRANCH));
 #else
-    QCoreApplication::setApplicationName("EDA4U");
+    Application::setApplicationName("EDA4U");
 #endif
-    QCoreApplication::setApplicationVersion(QString("%1.%2").arg(APP_VERSION_MAJOR).arg(APP_VERSION_MINOR));
+    Application::setApplicationVersion(QString("%1.%2").arg(APP_VERSION_MAJOR).arg(APP_VERSION_MINOR));
 
 
     Debug::instance(); // this creates the Debug object and installs the message handler.
@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
     app.installTranslator(&appTranslator2);
 
 
-    QGuiApplication::setQuitOnLastWindowClosed(false);
+    Application::setQuitOnLastWindowClosed(false);
 
 
     // this is to remove the ugly frames around widgets in all status bars...
@@ -134,9 +134,10 @@ int main(int argc, char* argv[])
 
         try
         {
-            Workspace ws(wsPath); // this can throw an exception
-            ws.showControlPanel();
-
+            // The Workspace constructor can throw an exception. If the workspace was
+            // opened successfully, the control panel will be shown automatically.
+            Workspace ws(wsPath);
+            Q_UNUSED(ws);
             return appExec();
         }
         catch (UserCanceled& e)
@@ -145,8 +146,8 @@ int main(int argc, char* argv[])
         }
         catch (Exception& e)
         {
-            int btn = QMessageBox::question(0, QCoreApplication::translate("Workspace",
-                        "Cannot open the workspace"), QString(QCoreApplication::translate(
+            int btn = QMessageBox::question(0, Application::translate("Workspace",
+                        "Cannot open the workspace"), QString(Application::translate(
                         "Workspace", "The workspace \"%1\" cannot be opened: %2\n\n"
                         "Do you want to choose another workspace?"))
                         .arg(wsPath.toNative(), e.getUserMsg()));

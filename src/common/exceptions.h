@@ -99,7 +99,7 @@ class Exception : public QException
          *                  parameter debugMsg instead.
          */
         Exception(const char* file, int line, const QString& debugMsg = QString(),
-                  const QString& userMsg = QString());
+                  const QString& userMsg = QString("Exception"));
 
         /**
          * @brief The copy constructor (needed for #clone())
@@ -185,7 +185,7 @@ class LogicError : public Exception
          * @copydoc Exception::Exception
          */
         LogicError(const char* file, int line, const QString& debugMsg = QString(),
-                   const QString& userMsg = QString());
+                   const QString& userMsg = QString("Logic Error"));
 
         /**
          * @brief The copy constructor (needed for #clone())
@@ -223,7 +223,7 @@ class RuntimeError : public Exception
          * @copydoc Exception::Exception
          */
         RuntimeError(const char* file, int line, const QString& debugMsg = QString(),
-                     const QString& userMsg = QString());
+                     const QString& userMsg = QString("Runtime Error"));
 
         /**
          * @brief The copy constructor (needed for #clone())
@@ -259,7 +259,7 @@ class RangeError : public Exception
          * @copydoc Exception::Exception
          */
         RangeError(const char* file, int line, const QString& debugMsg = QString(),
-                   const QString& userMsg = QString());
+                   const QString& userMsg = QString("Range Error"));
 
         /**
          * @brief The copy constructor (needed for #clone())
@@ -308,7 +308,7 @@ class UserCanceled : public Exception
          * @copydoc Exception::Exception
          */
         UserCanceled(const char* file, int line, const QString& debugMsg = QString(),
-                   const QString& userMsg = QString());
+                   const QString& userMsg = QString("User Canceled"));
 
         /**
          * @brief The copy constructor (needed for #clone())

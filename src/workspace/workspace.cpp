@@ -115,6 +115,7 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
         mLibrary = new Library();
         mControlPanel = new ControlPanel(mProjectTreeModel, mRecentProjectsModel,
                                          mFavoriteProjectsModel);
+        showControlPanel();
     }
     catch (Exception& e)
     {
