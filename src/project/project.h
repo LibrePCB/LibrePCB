@@ -90,8 +90,7 @@ class Project final : public QObject
          *
          * @param filepath      The filepath to the new or existing *.e4u project file
          * @param create        True if the specified project does not exist already and
-         *                      must be created. The method #open() will use "false",
-         *                      the method #create() will use "true" for this parameter.
+         *                      must be created.
          *
          * @throw Exception     If the project could not be created/opened successfully,
          *                      the constructor will throw an exception of type #Exception

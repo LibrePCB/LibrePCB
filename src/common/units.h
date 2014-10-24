@@ -98,7 +98,7 @@ class LengthUnit final
          *
          * @warning The enum must begin with value 0 and end with LengthUnit_COUNT.
          *          Between these values the enum must not contain unused indexes!
-         *          This is neccessary for #toInt() and #fromInt().
+         *          This is neccessary for #getIndex() and #fromIndex().
          */
         enum LengthUnit_t {
             LengthUnit_millimeters = 0,
@@ -344,7 +344,7 @@ class LengthUnit final
         /**
          * @brief The application's default length unit which is used by the default constructor
          *
-         * Until #setDefaultValue() was called, this variable contains the value
+         * Until #setDefaultUnit() was called, this variable contains the value
          * LengthUnit_millimeters.
          *
          * @see #LengthUnit(), #setDefaultUnit()
@@ -428,7 +428,7 @@ class Length
         /**
          * @brief Set the length in millimeters, represented in a QString
          *
-         * @param millimeters   See #fromMm(const QString&)
+         * @param millimeters   See #fromMm(const QString&, const Length&)
          *
          * @note This method is useful to read lengths from XML files! The problem with
          * decreased precision does NOT exist by using this method!
