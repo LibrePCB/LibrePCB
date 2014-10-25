@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="65cm" height="25cm" viewBox="-141 79 1282 482" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <g>
+    <rect style="fill: #ffffff" x="660" y="220" width="225.6" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="660" y="220" width="225.6" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="772.8" y="239">Circuit</text>
+    <rect style="fill: #ffffff" x="660" y="248" width="225.6" height="52"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="660" y="248" width="225.6" height="52"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="663" y="262">-Netlist (Classes + Signals)</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="663" y="278">-Generic Components</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="663" y="294">-Assembly Variants</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="980" y="100" width="160" height="320"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="980" y="100" width="160" height="320"/>
+    <rect style="fill: #ffffff" x="980" y="80" width="127.2" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="980" y="80" width="127.2" height="20"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="982" y="94">Schematic Editor</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="200" y="100" width="350" height="380"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="200" y="100" width="350" height="380"/>
+    <rect style="fill: #ffffff" x="200" y="80" width="96.4" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="200" y="80" width="96.4" height="20"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="202" y="94">Board Editor</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="1000" y="120" width="125.5" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1000" y="120" width="125.5" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1062.75" y="139">Schematic</text>
+    <rect style="fill: #ffffff" x="1000" y="148" width="125.5" height="52"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1000" y="148" width="125.5" height="52"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1003" y="162">-Symbols</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1003" y="178">-Netlist Points</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1003" y="194">-Netlist Lines</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="210" y="290" width="132.25" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="210" y="290" width="132.25" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="276.125" y="309">Model Viewer</text>
+    <rect style="fill: #ffffff" x="210" y="318" width="132.25" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="210" y="318" width="132.25" height="8"/>
+    <rect style="fill: #ffffff" x="210" y="326" width="132.25" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="210" y="326" width="132.25" height="8"/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="992.67" y1="164.408" x2="892.93" y2="251.592"/>
+    <polygon style="fill: #000000" points="998.316,159.472 994.078,169.817 992.67,164.408 987.497,162.288 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="998.316,159.472 994.078,169.817 992.67,164.408 987.497,162.288 "/>
+    <polygon style="fill: #000000" points="887.284,256.528 891.522,246.183 892.93,251.592 898.103,253.712 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="887.284,256.528 891.522,246.183 892.93,251.592 898.103,253.712 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="990.358" y1="259.349" x2="895.242" y2="272.651"/>
+    <polygon style="fill: #000000" points="997.785,258.31 988.574,264.647 990.358,259.349 987.189,254.743 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="997.785,258.31 988.574,264.647 990.358,259.349 987.189,254.743 "/>
+    <polygon style="fill: #000000" points="887.815,273.69 897.026,267.353 895.242,272.651 898.411,277.257 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="887.815,273.69 897.026,267.353 895.242,272.651 898.411,277.257 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="991.631" y1="353.025" x2="893.969" y2="294.975"/>
+    <polygon style="fill: #000000" points="998.078,356.857 986.927,356.046 991.631,353.025 992.037,347.45 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="998.078,356.857 986.927,356.046 991.631,353.025 992.037,347.45 "/>
+    <polygon style="fill: #000000" points="887.522,291.143 898.673,291.954 893.969,294.975 893.563,300.55 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="887.522,291.143 898.673,291.954 893.969,294.975 893.563,300.55 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="651.07" y1="254.122" x2="525.333" y2="199.52"/>
+    <polygon style="fill: #000000" points="657.949,257.109 646.785,257.712 651.07,254.122 650.768,248.54 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="657.949,257.109 646.785,257.712 651.07,254.122 650.768,248.54 "/>
+    <polygon style="fill: #000000" points="518.453,196.532 529.618,195.929 525.333,199.52 525.634,205.102 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="518.453,196.532 529.618,195.929 525.333,199.52 525.634,205.102 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="650.286" y1="274.656" x2="526.116" y2="283.044"/>
+    <polygon style="fill: #000000" points="657.769,274.151 648.129,279.813 650.286,274.656 647.455,269.836 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="657.769,274.151 648.129,279.813 650.286,274.656 647.455,269.836 "/>
+    <polygon style="fill: #000000" points="518.633,283.549 528.274,277.887 526.116,283.044 528.948,287.864 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="518.633,283.549 528.274,277.887 526.116,283.044 528.948,287.864 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="651.539" y1="294.817" x2="524.863" y2="366.942"/>
+    <polygon style="fill: #000000" points="658.057,291.106 651.841,300.399 651.539,294.817 646.893,291.709 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="658.057,291.106 651.841,300.399 651.539,294.817 646.893,291.709 "/>
+    <polygon style="fill: #000000" points="518.346,370.652 524.562,361.36 524.863,366.942 529.51,370.05 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="518.346,370.652 524.562,361.36 524.863,366.942 529.51,370.05 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="390" y1="174" x2="345.973" y2="280.996"/>
+    <polygon style="fill: #000000" points="343.119,287.932 342.3,276.782 345.973,280.996 351.548,280.587 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="343.119,287.932 342.3,276.782 345.973,280.996 351.548,280.587 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="348.089" y1="341.805" x2="390" y2="398"/>
+    <polygon style="fill: #000000" points="343.605,335.792 353.591,340.819 348.089,341.805 345.575,346.798 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="343.605,335.792 353.591,340.819 348.089,341.805 345.575,346.798 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="350.818" y1="299.343" x2="390" y2="278"/>
+    <polygon style="fill: #000000" points="344.232,302.93 350.622,293.756 350.818,299.343 355.405,302.538 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="344.232,302.93 350.622,293.756 350.818,299.343 355.405,302.538 "/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="580" y="440" width="380" height="120"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="580" y="440" width="380" height="120"/>
+    <rect style="fill: #ffffff" x="580" y="420" width="134.9" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="580" y="420" width="134.9" height="20"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="582" y="434">Simulation Editor</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="720" y="460" width="110.1" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="720" y="460" width="110.1" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="775.05" y="479">Simulation</text>
+    <rect style="fill: #ffffff" x="720" y="488" width="110.1" height="52"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="720" y="488" width="110.1" height="52"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="723" y="502">-Netlist</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="723" y="518">-Components</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="723" y="534">-SPICE Models</text>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="660.821" y1="452.159" x2="772.8" y2="300"/>
+    <polygon style="fill: #000000" points="656.375,458.199 658.276,447.181 660.821,452.159 666.33,453.109 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="656.375,458.199 658.276,447.181 660.821,452.159 666.33,453.109 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="774.913" y1="450.265" x2="772.8" y2="300"/>
+    <polygon style="fill: #000000" points="775.019,457.764 769.878,447.835 774.913,450.265 779.877,447.695 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="775.019,457.764 769.878,447.835 774.913,450.265 779.877,447.695 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="889.139" y1="452.264" x2="772.8" y2="300"/>
+    <polygon style="fill: #000000" points="893.692,458.223 883.648,453.313 889.139,452.264 891.594,447.242 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="893.692,458.223 883.648,453.313 889.139,452.264 891.594,447.242 "/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="-140" y="100" width="320" height="380"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-140" y="100" width="320" height="380"/>
+    <rect style="fill: #ffffff" x="-140" y="80" width="134.9" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-140" y="80" width="134.9" height="20"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-138" y="94">FrontPanel Editor</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="-130" y="290" width="132.25" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-130" y="290" width="132.25" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="-63.875" y="309">Model Viewer</text>
+    <rect style="fill: #ffffff" x="-130" y="318" width="132.25" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-130" y="318" width="132.25" height="8"/>
+    <rect style="fill: #ffffff" x="-130" y="326" width="132.25" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-130" y="326" width="132.25" height="8"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="40" y="240" width="113.3" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="40" y="240" width="113.3" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="96.65" y="259">Front Panel</text>
+    <rect style="fill: #ffffff" x="40" y="268" width="113.3" height="52"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="40" y="268" width="113.3" height="52"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="43" y="282">-Packages</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="43" y="298">-Drills</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="43" y="314">-Shapes</text>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="390" y1="134" x2="163.033" y2="134"/>
+    <polygon style="fill: #000000" points="155.533,134 165.533,129 163.033,134 165.533,139 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="155.533,134 165.533,129 163.033,134 165.533,139 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="390" y1="254" x2="163.033" y2="254"/>
+    <polygon style="fill: #000000" points="155.533,254 165.533,249 163.033,254 165.533,259 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="155.533,254 165.533,249 163.033,254 165.533,259 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="390" y1="374" x2="163.033" y2="374"/>
+    <polygon style="fill: #000000" points="155.533,374 165.533,369 163.033,374 165.533,379 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="155.533,374 165.533,369 163.033,374 165.533,379 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="40" y1="158" x2="4.94456" y2="280.639"/>
+    <polygon style="fill: #000000" points="2.88329,287.85 0.824189,276.861 4.94456,280.639 10.4391,279.609 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="2.88329,287.85 0.824189,276.861 4.94456,280.639 10.4391,279.609 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="40" y1="278" x2="10.2857" y2="298.476"/>
+    <polygon style="fill: #000000" points="4.10999,302.731 9.50725,292.94 10.2857,298.476 15.1814,301.174 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="4.10999,302.731 9.50725,292.94 10.2857,298.476 15.1814,301.174 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="7.21332" y1="342.387" x2="40" y2="398"/>
+    <polygon style="fill: #000000" points="3.40435,335.926 12.7902,342.001 7.21332,342.387 4.17578,347.08 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="3.40435,335.926 12.7902,342.001 7.21332,342.387 4.17578,347.08 "/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="1000" y="220" width="125.5" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1000" y="220" width="125.5" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1062.75" y="239">Schematic</text>
+    <rect style="fill: #ffffff" x="1000" y="248" width="125.5" height="52"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1000" y="248" width="125.5" height="52"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1003" y="262">-Symbols</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1003" y="278">-Netlist Points</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1003" y="294">-Netlist Lines</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="1000" y="320" width="125.5" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1000" y="320" width="125.5" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1062.75" y="339">Schematic</text>
+    <rect style="fill: #ffffff" x="1000" y="348" width="125.5" height="52"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1000" y="348" width="125.5" height="52"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1003" y="362">-Symbols</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1003" y="378">-Netlist Points</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1003" y="394">-Netlist Lines</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="600" y="460" width="110.1" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="600" y="460" width="110.1" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="655.05" y="479">Simulation</text>
+    <rect style="fill: #ffffff" x="600" y="488" width="110.1" height="52"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="600" y="488" width="110.1" height="52"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="603" y="502">-Netlist</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="603" y="518">-Components</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="603" y="534">-SPICE Models</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="840" y="460" width="110.1" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="840" y="460" width="110.1" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="895.05" y="479">Simulation</text>
+    <rect style="fill: #ffffff" x="840" y="488" width="110.1" height="52"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="840" y="488" width="110.1" height="52"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="843" y="502">-Netlist</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="843" y="518">-Components</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="843" y="534">-SPICE Models</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="390" y="120" width="125.5" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="390" y="120" width="125.5" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="452.75" y="139">Board</text>
+    <rect style="fill: #ffffff" x="390" y="148" width="125.5" height="68"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="390" y="148" width="125.5" height="68"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="162">-Components</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="178">-Packages</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="194">-Netlist Points</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="210">-Netlist Lines</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="40" y="120" width="113.3" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="40" y="120" width="113.3" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="96.65" y="139">Front Panel</text>
+    <rect style="fill: #ffffff" x="40" y="148" width="113.3" height="52"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="40" y="148" width="113.3" height="52"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="43" y="162">-Packages</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="43" y="178">-Drills</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="43" y="194">-Shapes</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="40" y="360" width="113.3" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="40" y="360" width="113.3" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="96.65" y="379">Front Panel</text>
+    <rect style="fill: #ffffff" x="40" y="388" width="113.3" height="52"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="40" y="388" width="113.3" height="52"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="43" y="402">-Packages</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="43" y="418">-Drills</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="43" y="434">-Shapes</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="390" y="240" width="125.5" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="390" y="240" width="125.5" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="452.75" y="259">Board</text>
+    <rect style="fill: #ffffff" x="390" y="268" width="125.5" height="68"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="390" y="268" width="125.5" height="68"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="282">-Components</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="298">-Packages</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="314">-Netlist Points</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="330">-Netlist Lines</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="390" y="360" width="125.5" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="390" y="360" width="125.5" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="452.75" y="379">Board</text>
+    <rect style="fill: #ffffff" x="390" y="388" width="125.5" height="68"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="390" y="388" width="125.5" height="68"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="402">-Components</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="418">-Packages</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="434">-Netlist Points</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="450">-Netlist Lines</text>
+  </g>
+</svg>

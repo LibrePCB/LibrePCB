@@ -1,0 +1,459 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="93cm" height="71cm" viewBox="-942 -221 1851 1404" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <g>
+    <rect style="fill: #ffedef" x="-900" y="880" width="1720" height="300" rx="20" ry="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 4; stroke-linejoin: round; stroke-dasharray: 20 8 4 8; stroke: #ffedef" x="-900" y="880" width="1720" height="300" rx="20" ry="20"/>
+  </g>
+  <g>
+    <rect style="fill: #e7e9ff" x="0" y="-100" width="580" height="900" rx="20" ry="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 4; stroke-linejoin: round; stroke-dasharray: 20 8 4 8; stroke: #e7e9ff" x="0" y="-100" width="580" height="900" rx="20" ry="20"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffd2" x="-900" y="-94.1422" width="780" height="894.142" rx="20" ry="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 4; stroke-linejoin: round; stroke-dasharray: 20 8 4 8; stroke: #ffffd2" x="-900" y="-94.1422" width="780" height="894.142" rx="20" ry="20"/>
+  </g>
+  <g>
+    <rect style="fill: #ffbdbd" x="280" y="100" width="259.35" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke-linejoin: round; stroke: #000000" x="280" y="100" width="259.35" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="409.675" y="116">&lt;&lt;QObject&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="409.675" y="135">GenericComponentInstance</text>
+  </g>
+  <g>
+    <rect style="fill: #ffbdbd" x="-740" y="20" width="153.6" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke-linejoin: round; stroke: #000000" x="-740" y="20" width="153.6" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-663.2" y="36">&lt;&lt;QObject&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="-663.2" y="55">SymbolInstance</text>
+  </g>
+  <g>
+    <rect style="fill: #ffbdbd" x="20" y="-220" width="94.7" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke-linejoin: round; stroke: #000000" x="20" y="-220" width="94.7" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="67.35" y="-204">&lt;&lt;QObject&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="67.35" y="-185">Project</text>
+  </g>
+  <g>
+    <rect style="fill: #ffbdbd" x="-500" y="340" width="182.25" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke-linejoin: round; stroke: #000000" x="-500" y="340" width="182.25" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-408.875" y="356">&lt;&lt;QObject&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="-408.875" y="375">SymbolPinInstance</text>
+  </g>
+  <g>
+    <rect style="fill: #ffff94" x="-880" y="-60" width="103.35" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke-linejoin: round; stroke: #000000" x="-880" y="-60" width="103.35" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-828.325" y="-44">&lt;&lt;CADScene&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="-828.325" y="-25">Schematic</text>
+  </g>
+  <g>
+    <rect style="fill: #ffff94" x="800" y="-60" width="102.4" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke-linejoin: round; stroke: #000000" x="800" y="-60" width="102.4" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="851.2" y="-44">&lt;&lt;CADScene&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="851.2" y="-25">Board</text>
+  </g>
+  <g>
+    <rect style="fill: #bfd4ff" x="-740" y="580" width="182.55" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke-linejoin: round; stroke: #000000" x="-740" y="580" width="182.55" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-648.725" y="596">&lt;&lt;QGraphicsItem&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="-648.725" y="615">SchematicNetPoint</text>
+  </g>
+  <g>
+    <rect style="fill: #bfd4ff" x="-740" y="720" width="173.2" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke-linejoin: round; stroke: #000000" x="-740" y="720" width="173.2" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-653.4" y="736">&lt;&lt;QGraphicsItem&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="-653.4" y="755">SchematicNetLine</text>
+  </g>
+  <g>
+    <rect style="fill: #ffbdbd" x="180" y="500" width="98.05" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke-linejoin: round; stroke: #000000" x="180" y="500" width="98.05" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="229.025" y="516">&lt;&lt;QObject&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="229.025" y="535">NetSignal</text>
+  </g>
+  <g>
+    <rect style="fill: #ffbdbd" x="180" y="360" width="94.7" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke-linejoin: round; stroke: #000000" x="180" y="360" width="94.7" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="227.35" y="376">&lt;&lt;QObject&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="227.35" y="395">NetClass</text>
+  </g>
+  <g>
+    <rect style="fill: #ffbdbd" x="20" y="-60" width="94.7" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke-linejoin: round; stroke: #000000" x="20" y="-60" width="94.7" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="67.35" y="-44">&lt;&lt;QObject&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="67.35" y="-25">Circuit</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="67.35,-150.828 67.35,-161 67.35,-62.0056 67.35,-61.0056 "/>
+    <polygon style="fill: #000000" points="67.35,-176 72.15,-162 67.35,-148 62.55,-162 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="67.35,-176 72.15,-162 67.35,-148 62.55,-162 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="69.35" y="-115.503"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="78.35" y="-164"> mProject</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="78.35" y="-148">1</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="71.35" y="-81.0056"> mCircuit</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="71.35" y="-65.0056">1</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="67.35,9.17157 67.35,382 180,382 "/>
+    <polygon style="fill: #000000" points="67.35,-16 72.15,-2 67.35,12 62.55,-2 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="67.35,-16 72.15,-2 67.35,12 62.55,-2 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="123.675" y="378"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="78.35" y="-4"> mCircuit</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="78.35" y="12">1</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="176" y="378"> mNetclasses</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="176" y="394">0..*</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="67.35,9.17157 67.35,522 180,522 "/>
+    <polygon style="fill: #000000" points="67.35,-16 72.15,-2 67.35,12 62.55,-2 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="67.35,-16 72.15,-2 67.35,12 62.55,-2 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="123.675" y="518"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="78.35" y="-4"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="176" y="518"> mNetSignals</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="176" y="534">0..*</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="67.35,9.17157 67.35,122 280,122 "/>
+    <polygon style="fill: #000000" points="67.35,-16 72.15,-2 67.35,12 62.55,-2 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="67.35,-16 72.15,-2 67.35,12 62.55,-2 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="173.675" y="118"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="78.35" y="-4"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="276" y="118"> mGenericComponents</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="276" y="134">0..*</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-828.325,9.17157 -828.325,42 -740,42 "/>
+    <polygon style="fill: #000000" points="-828.325,-16 -823.525,-2 -828.325,12 -833.125,-2 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-828.325,-16 -823.525,-2 -828.325,12 -833.125,-2 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-784.162" y="38"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-817.325" y="-4"> mSchematic</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-817.325" y="12">1</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="-744" y="38"> mSymbols</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="-744" y="54">0..*</text>
+  </g>
+  <g>
+    <rect style="fill: #ffbdbd" x="280" y="260" width="229.45" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="280" y="260" width="229.45" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="394.725" y="276">&lt;&lt;QObject&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="394.725" y="295">GenCompSignalInstance</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="409.675,169.172 409.675,209 394.725,209 394.725,260 "/>
+    <polygon style="fill: #000000" points="409.675,144 414.475,158 409.675,172 404.875,158 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="409.675,144 414.475,158 409.675,172 404.875,158 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="402.2" y="205"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="420.675" y="156"> mGenComp</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="420.675" y="172">1</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="398.725" y="240"> mSignals</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="398.725" y="256">0..*</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-663.2,89.1716 -663.2,122 -500,122 "/>
+    <polygon style="fill: #000000" points="-663.2,64 -658.4,78 -663.2,92 -668,78 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-663.2,64 -658.4,78 -663.2,92 -668,78 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-581.6" y="118"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-652.2" y="76"> mSymbolInstance</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-652.2" y="92">1</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="-504" y="118"> mGraphicsItem</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="-504" y="134">1</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="67.35,-150.828 67.35,-140 -828.324,-140 -828.324,-60 "/>
+    <polygon style="fill: #000000" points="67.35,-176 72.15,-162 67.35,-148 62.55,-162 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="67.35,-176 72.15,-162 67.35,-148 62.55,-162 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-380.487" y="-144"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="78.35" y="-164"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-824.324" y="-80"> mSchematics</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-824.324" y="-64">0..*</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="67.35,-150.828 67.35,-140 851.2,-140 851.2,-60 "/>
+    <polygon style="fill: #000000" points="67.35,-176 72.15,-162 67.35,-148 62.55,-162 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="67.35,-176 72.15,-162 67.35,-148 62.55,-162 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="459.275" y="-144"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="78.35" y="-164"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="855.2" y="-80"> mBoards</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="855.2" y="-64">0..*</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-828.325,9.17157 -828.325,602 -740,602 "/>
+    <polygon style="fill: #000000" points="-828.325,-16 -823.525,-2 -828.325,12 -833.125,-2 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-828.325,-16 -823.525,-2 -828.325,12 -833.125,-2 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-784.162" y="598"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-817.325" y="-4"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="-744" y="598"> mNetPoints</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="-744" y="614">0..*</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-828.325,9.17157 -828.325,742 -740,742 "/>
+    <polygon style="fill: #000000" points="-828.325,-16 -823.525,-2 -828.325,12 -833.125,-2 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-828.325,-16 -823.525,-2 -828.325,12 -833.125,-2 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-784.162" y="738"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-817.325" y="-4"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="-744" y="738"> mNetLines</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="-744" y="754">0..*</text>
+  </g>
+  <g>
+    <rect style="fill: #bfd4ff" x="-500" y="100" width="196.85" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-500" y="100" width="196.85" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-401.575" y="116">&lt;&lt;&lt;QGraphicsItem&gt;&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="-401.575" y="135">SymbolGraphicsItem</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-663.2,89.1716 -663.2,362 -500,362 "/>
+    <polygon style="fill: #000000" points="-663.2,64 -658.4,78 -663.2,92 -668,78 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-663.2,64 -658.4,78 -663.2,92 -668,78 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-581.6" y="358"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-652.2" y="76"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="-504" y="358"> mPinInstances</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="-504" y="374">0..*</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="282.522,522 394.725,522 394.725,308.472 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="296.286,514 280.286,522 296.286,530 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="402.725,322.236 394.725,306.236 386.725,322.236 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="336.388" y="518"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="298.05" y="518"> mNetSignal</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="298.05" y="534">0..1</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="405.725" y="316"> mGenCompSignals</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="405.725" y="332">0..*</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="227.35,408.472 227.35,450 229.024,450 229.024,495.528 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="235.35,422.236 227.35,406.236 219.35,422.236 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="221.024,481.764 229.024,497.764 237.024,481.764 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="228.187" y="446"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="238.35" y="416"> mNetClass</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="238.35" y="432">1</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="240.024" y="480"> mNetSignals</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="240.024" y="496">0..*</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-581.928,42 409.675,42 409.675,95.5279 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-568.164,34 -584.164,42 -568.164,50 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="401.675,81.7639 409.675,97.7639 417.675,81.7639 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-88.3625" y="38"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-566.4" y="38"> mSymbolInstances</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-566.4" y="54">0..*</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="420.675" y="80"> mGenCompInstance</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="420.675" y="96">1</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="275.528,282 -80,282 -80,362 -313.278,362 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="261.764,290 277.764,282 261.764,274 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-299.514,354 -315.514,362 -299.514,370 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-78" y="318"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="260" y="278"> mGenCompSignalInstance</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="260" y="294">0..1</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-297.75" y="358"> mSymbolPinInstances</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-297.75" y="374">0..*</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-648.725,628.472 -648.725,672 -653.4,672 -653.4,715.528 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-640.725,642.236 -648.725,626.236 -656.725,642.236 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-661.4,701.764 -653.4,717.764 -645.4,701.764 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-651.062" y="668"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-637.725" y="636"> mStartPoint/mEndPoint</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-637.725" y="652">2</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-642.4" y="700"> mLines</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-642.4" y="716">0..*</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-408.876,388.472 -408.876,520 -648.726,520 -648.726,575.528 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-400.876,402.236 -408.876,386.236 -416.876,402.236 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-656.726,561.764 -648.726,577.764 -640.726,561.764 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-528.801" y="516">only if "mAttached==true"</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-397.876" y="396"> mSymbolPin</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-397.876" y="412">0..1</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-637.726" y="560"> mNetPoint</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-637.726" y="576">0..1</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="229.025,548.472 229.025,602 -552.978,602 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="237.025,562.236 229.025,546.236 221.025,562.236 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-539.214,594 -555.214,602 -539.214,610 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-164.213" y="598"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="240.025" y="556"> mNetSignal</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="240.025" y="572">1</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-537.45" y="598"> mSchematicNetPoints</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-537.45" y="614">0..*</text>
+  </g>
+  <g>
+    <rect style="fill: #bfd4ff" x="-500" y="220" width="225.5" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-500" y="220" width="225.5" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-387.25" y="236">&lt;&lt;&lt;QGraphicsItem&gt;&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="-387.25" y="255">SymbolPinGraphicsItem</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-401.575,169.172 -401.575,189 -387.25,189 -387.25,220 "/>
+    <polygon style="fill: #000000" points="-401.575,144 -396.775,158 -401.575,172 -406.375,158 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-401.575,144 -396.775,158 -401.575,172 -406.375,158 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-394.412" y="185"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-390.575" y="156"> mSymbolItem</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-390.575" y="172">1</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-383.25" y="200"> mPinItems</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-383.25" y="216">0..*</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-387.25,268.472 -387.25,302 -408.875,302 -408.875,335.528 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-379.25,282.236 -387.25,266.236 -395.25,282.236 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-416.875,321.764 -408.875,337.764 -400.875,321.764 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-398.063" y="298"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-376.25" y="276"> mSymbolPinGraphicsItem</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-376.25" y="292">1</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-397.875" y="320"> mSymbolPinInstance</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-397.875" y="336">1</text>
+  </g>
+  <g>
+    <rect style="fill: #ffbdbd" x="-720" y="1100" width="138.35" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-720" y="1100" width="138.35" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-650.825" y="1116">&lt;&lt;QObject&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="-650.825" y="1135">ProjectLibrary</text>
+  </g>
+  <g>
+    <rect style="fill: #ffbdbd" x="-420" y="920" width="94.7" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-420" y="920" width="94.7" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-372.65" y="936">&lt;&lt;QObject&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="-372.65" y="955">Symbol</text>
+  </g>
+  <g>
+    <rect style="fill: #ffbdbd" x="-220" y="1040" width="105.2" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-220" y="1040" width="105.2" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-167.4" y="1056">&lt;&lt;QObject&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="-167.4" y="1075">SymbolPin</text>
+  </g>
+  <g>
+    <rect style="fill: #ffbdbd" x="460" y="920" width="152.4" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="460" y="920" width="152.4" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="536.2" y="936">&lt;&lt;QObject&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="536.2" y="955">GenCompSignal</text>
+  </g>
+  <g>
+    <rect style="fill: #ffbdbd" x="-140" y="920" width="182.3" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-140" y="920" width="182.3" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-48.85" y="936">&lt;&lt;QObject&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="-48.85" y="955">GenericComponent</text>
+  </g>
+  <g>
+    <rect style="fill: #ffbdbd" x="260" y="1040" width="176.55" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="260" y="1040" width="176.55" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="348.275" y="1056">&lt;&lt;QObject&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="348.275" y="1075">GenCompSymbVar</text>
+  </g>
+  <g>
+    <rect style="fill: #ffbdbd" x="580" y="1120" width="217.65" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="580" y="1120" width="217.65" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="688.825" y="1136">&lt;&lt;QObject&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="688.825" y="1155">GenCompSymbVarItem</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="67.35,-150.828 67.35,-140 -940,-140 -940,1122 -720,1122 "/>
+    <polygon style="fill: #000000" points="67.35,-176 72.15,-162 67.35,-148 62.55,-162 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="67.35,-176 72.15,-162 67.35,-148 62.55,-162 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-436.325" y="-144"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="78.35" y="-164"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="-724" y="1118"> mProjectLibrary</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="-724" y="1134">1</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-556.478,1122 -372.65,1122 -372.65,964 "/>
+    <polygon style="fill: #000000" points="-581.65,1122 -567.65,1117.2 -553.65,1122 -567.65,1126.8 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-581.65,1122 -567.65,1117.2 -553.65,1122 -567.65,1126.8 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-477.15" y="1118"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-549.65" y="1118"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-368.65" y="976"> mSymbols</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-368.65" y="992">0..*</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-556.478,1122 -48.85,1122 -48.85,964 "/>
+    <polygon style="fill: #000000" points="-581.65,1122 -567.65,1117.2 -553.65,1122 -567.65,1126.8 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-581.65,1122 -567.65,1117.2 -553.65,1122 -567.65,1126.8 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-315.25" y="1118"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-549.65" y="1118"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-44.85" y="976"> mGenericComponents</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-44.85" y="992">0..*</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-300.128,942 -265.65,942 -265.65,1062 -220,1062 "/>
+    <polygon style="fill: #000000" points="-325.3,942 -311.3,937.2 -297.3,942 -311.3,946.8 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-325.3,942 -311.3,937.2 -297.3,942 -311.3,946.8 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-263.65" y="998"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-293.3" y="938"> mSymbol</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-293.3" y="954">1</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="-224" y="1058"> mPins</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="-224" y="1074">0..*</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="67.4716,942 57.3,942 459,942 460,942 "/>
+    <polygon style="fill: #000000" points="42.3,942 56.3,937.2 70.3,942 56.3,946.8 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="42.3,942 56.3,937.2 70.3,942 56.3,946.8 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="258.15" y="938"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="74.3" y="938"> mGenComp</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="74.3" y="954">1</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="456" y="938"> mSignals</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="456" y="954">0..*</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="67.4716,942 120,942 120,1062 260,1062 "/>
+    <polygon style="fill: #000000" points="42.3,942 56.3,937.2 70.3,942 56.3,946.8 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="42.3,942 56.3,937.2 70.3,942 56.3,946.8 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="122" y="998"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="74.3" y="938"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="256" y="1058"> mSymbolVariants</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="256" y="1074">1..*</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="461.722,1062 515.275,1062 515.275,1142 580,1142 "/>
+    <polygon style="fill: #000000" points="436.55,1062 450.55,1057.2 464.55,1062 450.55,1066.8 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="436.55,1062 450.55,1057.2 464.55,1062 450.55,1066.8 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="517.275" y="1098"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="468.55" y="1058"> mSymbolVariant</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="468.55" y="1074">1</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="576" y="1138"> mItems</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="576" y="1154">1..*</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-740,64 -740,440 -340,440 -340,860 688.824,860 688.824,1115.53 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="680.824,1101.76 688.824,1117.76 696.824,1101.76 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-338" y="646"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-736" y="76"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="699.824" y="1100"> mSymbVarItem</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="699.824" y="1116">1</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-317.75,384 -317.75,840 -167.4,840 -167.4,1035.53 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-175.4,1021.76 -167.4,1037.76 -159.4,1021.76 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-242.575" y="836"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-313.75" y="396"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-156.4" y="1020"> mSymbolPin</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-156.4" y="1036">1</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-740,64 -740,460 -372.65,460 -372.65,915.528 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-380.65,901.764 -372.65,917.764 -364.65,901.764 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-556.325" y="456"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-736" y="76"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-361.65" y="900"> mSymbol</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-361.65" y="916">1</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="509.45,282 536.2,282 536.2,915.528 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="528.2,901.764 536.2,917.764 544.2,901.764 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="522.825" y="278"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="513.45" y="278"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="547.2" y="900"> mGenCompSignal</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="547.2" y="916">1</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="280,144 280,180 -48.85,180 -48.85,915.528 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-56.85,901.764 -48.85,917.764 -40.85,901.764 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="115.575" y="176"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="284" y="156"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-37.85" y="900"> mGenericComponent</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-37.85" y="916">1</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="280,144 280,200 -20,200 -20,840 348.276,840 348.276,1035.53 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="340.276,1021.76 348.276,1037.76 356.276,1021.76 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-18" y="516"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="284" y="156"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="359.276" y="1020"> mGenCompSymbVar</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="359.276" y="1036">1</text>
+  </g>
+</svg>

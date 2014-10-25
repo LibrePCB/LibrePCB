@@ -32,15 +32,42 @@
         </instance>
         <instance generic_component="{60000002-3c94-4689-be29-92235ba993c5}" uuid="{1b6ffb10-1c00-47a1-a66a-b60afc6a8da9}" name="U3" symbol_variant="{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}">
             <attributes/>
-            <signal_mapping/>
+            <signal_mapping>
+                <map comp_signal="{71a44db9-5e42-405f-b6e4-b4725ae37af3}" netsignal=""/>
+                <map comp_signal="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}" netsignal=""/>
+                <map comp_signal="{a9d3d159-fca9-417e-8bba-13829caa6ae5}" netsignal=""/>
+                <map comp_signal="{da30b112-9ab0-4715-8a6a-9e5414169fd4}" netsignal=""/>
+                <map comp_signal="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}" netsignal=""/>
+                <map comp_signal="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}" netsignal=""/>
+                <map comp_signal="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}" netsignal=""/>
+                <map comp_signal="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}" netsignal=""/>
+            </signal_mapping>
         </instance>
         <instance generic_component="{60000002-3c94-4689-be29-92235ba993c5}" uuid="{aaaadfba-ffb2-4d96-ae4a-d26329006d79}" name="U4" symbol_variant="{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}">
             <attributes/>
-            <signal_mapping/>
+            <signal_mapping>
+                <map comp_signal="{71a44db9-5e42-405f-b6e4-b4725ae37af3}" netsignal=""/>
+                <map comp_signal="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}" netsignal=""/>
+                <map comp_signal="{a9d3d159-fca9-417e-8bba-13829caa6ae5}" netsignal=""/>
+                <map comp_signal="{da30b112-9ab0-4715-8a6a-9e5414169fd4}" netsignal=""/>
+                <map comp_signal="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}" netsignal=""/>
+                <map comp_signal="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}" netsignal=""/>
+                <map comp_signal="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}" netsignal=""/>
+                <map comp_signal="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}" netsignal=""/>
+            </signal_mapping>
         </instance>
         <instance generic_component="{60000002-3c94-4689-be29-92235ba993c5}" uuid="{f0e33b45-c3ac-49dc-8bd0-512d75ad014b}" name="U5" symbol_variant="{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}">
             <attributes/>
-            <signal_mapping/>
+            <signal_mapping>
+                <map comp_signal="{71a44db9-5e42-405f-b6e4-b4725ae37af3}" netsignal=""/>
+                <map comp_signal="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}" netsignal=""/>
+                <map comp_signal="{a9d3d159-fca9-417e-8bba-13829caa6ae5}" netsignal=""/>
+                <map comp_signal="{da30b112-9ab0-4715-8a6a-9e5414169fd4}" netsignal=""/>
+                <map comp_signal="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}" netsignal=""/>
+                <map comp_signal="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}" netsignal=""/>
+                <map comp_signal="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}" netsignal=""/>
+                <map comp_signal="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}" netsignal=""/>
+            </signal_mapping>
         </instance>
     </generic_component_instances>
 </circuit>
