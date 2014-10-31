@@ -136,7 +136,8 @@ SOURCES += \
     project/circuit/cmd/cmdnetclasssetname.cpp \
     common/dialogs/gridsettingsdialog.cpp \
     workspace/settings/items/wsi_appdefaultmeasurementunits.cpp \
-    common/application.cpp
+    common/application.cpp \
+    common/version.cpp
 
 HEADERS += \
     common/units.h \
@@ -218,7 +219,8 @@ HEADERS += \
     project/circuit/cmd/cmdnetclasssetname.h \
     common/dialogs/gridsettingsdialog.h \
     workspace/settings/items/wsi_appdefaultmeasurementunits.h \
-    common/application.h
+    common/application.h \
+    common/version.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \
