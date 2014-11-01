@@ -57,7 +57,7 @@ class Version final
          *
          * @param version   See #setVersion()
          */
-        Version(const QString& version) noexcept;
+        explicit Version(const QString& version) noexcept;
 
         /**
          * Destructor
@@ -125,6 +125,11 @@ class Version final
 
 
     private:
+
+        // make some methods inaccessible...
+        Version(const Version& other);
+        Version& operator=(const Version& rhs);
+
 
         // Private Methods
 

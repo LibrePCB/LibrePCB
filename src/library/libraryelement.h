@@ -26,6 +26,7 @@
 
 #include <QtCore>
 #include <QDomDocument>
+#include "../common/exceptions.h"
 #include "librarybaseelement.h"
 
 /*****************************************************************************************
@@ -35,7 +36,8 @@
 namespace library {
 
 /**
- * @brief The LibraryElement class
+ * @brief The LibraryElement class extends the LibraryBaseElement class with some
+ *        attributes and methods which are used for all library classes except categories.
  */
 class LibraryElement : public LibraryBaseElement
 {
@@ -44,12 +46,13 @@ class LibraryElement : public LibraryBaseElement
     public:
 
         // Constructors / Destructor
-        explicit LibraryElement(const FilePath& xmlFilePath, const QString& xmlRootNodeName);
-        virtual ~LibraryElement();
+        explicit LibraryElement(const FilePath& xmlFilePath,
+                                const QString& xmlRootNodeName) throw (Exception);
+        virtual ~LibraryElement() noexcept;
 
-    protected:
+        // Getters: Attributes
+        const QList<QUuid>& getCategories() const noexcept {return mCategories;}
 
-        // General
 
     private:
 
@@ -57,6 +60,12 @@ class LibraryElement : public LibraryBaseElement
         LibraryElement();
         LibraryElement(const LibraryElement& other);
         LibraryElement& operator=(const LibraryElement& rhs);
+
+
+    protected:
+
+        // General Library Element Attributes
+        QList<QUuid> mCategories;
 };
 
 } // namespace library

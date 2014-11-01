@@ -167,50 +167,28 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
             continue;
         }
 
-        // search for XML files in this subdirectory
-        QDir subdir(subdirPath.toStr());
-        subdir.setFilter(QDir::Files | QDir::Readable);
-        subdir.setNameFilters(QStringList() << "*.xml");
-        foreach (const QString& filename, subdir.entryList())
+        // search for the XML file with the same version as the application
+        FilePath filepath(subdirPath.getPathTo(QString("v%1.xml").arg(APP_VERSION_MAJOR)));
+
+        // load the library element --> an exception will be thrown on error
+        ElementType* element = new ElementType(filepath);
+
+        if (element->getUuid() != dirUuid)
         {
-            FilePath filepath(subdirPath.getPathTo(filename));
-
-            if (!filepath.isExistingFile())
-            {
-                qDebug() << "File does not exist:" << filepath.toStr();
-                continue;
-            }
-
-            // try loading the library element
-            try
-            {
-                ElementType* element = new ElementType(filepath);
-
-                /// @todo
-                /*if (element->getUuid() != dirUuid)
-                {
-                    qWarning() << "Invalid UUID in library file" << filepath.toStr()
-                        << "(" << element->getUuid().toString() << "instead of"
-                        << dirUuid.toString() << ")";
-                    continue;
-                }*/
-
-                /// @todo in the following lines, use "element->getUuid()" instead of "dirUuid"
-
-                if (elementList.contains(dirUuid))
-                {
-                    throw RuntimeError(__FILE__, __LINE__, dirUuid.toString(),
-                        QString(tr("There are multiple library elements with the same "
-                        "UUID in the directory \"%1\"")).arg(subdirPath.toNative()));
-                }
-
-                elementList.insert(dirUuid, element);
-            }
-            catch (Exception& e)
-            {
-                qWarning() << "Could not load the library XML file:" << filepath.toStr();
-            }
+            throw RuntimeError(__FILE__, __LINE__, filepath.toStr(),
+                QString(tr("Invalid UUID in file \"%1\": \"%2\" instead of \"%3\""))
+                .arg(filepath.toNative(), element->getUuid().toString(),
+                dirUuid.toString()));
         }
+
+        if (elementList.contains(element->getUuid()))
+        {
+            throw RuntimeError(__FILE__, __LINE__, element->getUuid().toString(),
+                QString(tr("There are multiple library elements with the same "
+                "UUID in the directory \"%1\"")).arg(subdirPath.toNative()));
+        }
+
+        elementList.insert(element->getUuid(), element);
     }
 
     qDebug() << "successfully loaded" << elementList.count() << qPrintable(type);

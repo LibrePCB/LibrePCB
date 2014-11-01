@@ -32,12 +32,30 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-LibraryElement::LibraryElement(const FilePath& xmlFilePath, const QString& xmlRootNodeName) :
+LibraryElement::LibraryElement(const FilePath& xmlFilePath,
+                               const QString& xmlRootNodeName) throw (Exception) :
     LibraryBaseElement(xmlFilePath, xmlRootNodeName)
 {
+    QDomElement tmpNode;
+
+    // read category UUIDs
+    if (mDomRoot.firstChildElement("meta").firstChildElement("categories").isNull())
+        mDomRoot.firstChildElement("meta").appendChild(mXmlFile->getDocument().createElement("categories"));
+    tmpNode = mDomRoot.firstChildElement("meta").firstChildElement("categories").firstChildElement("category");
+    while (!tmpNode.isNull())
+    {
+        QUuid uuid(tmpNode.text());
+        if (uuid.isNull())
+        {
+            throw RuntimeError(__FILE__, __LINE__, mXmlFilepath.toStr(), QString(
+                tr("Invalid category UUID in file \"%1\".")).arg(mXmlFilepath.toNative()));
+        }
+        mCategories.append(uuid);
+        tmpNode = tmpNode.nextSiblingElement("category");
+    }
 }
 
-LibraryElement::~LibraryElement()
+LibraryElement::~LibraryElement() noexcept
 {
 }
 
