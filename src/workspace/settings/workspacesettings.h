@@ -33,6 +33,7 @@
 #include "items/wsi_appdefaultmeasurementunits.h"
 #include "items/wsi_projectautosaveinterval.h"
 #include "items/wsi_librarylocaleorder.h"
+#include "items/wsi_librarynormorder.h"
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -87,10 +88,12 @@ class WorkspaceSettings final : public QObject
 
 
         // Getters: Settings Items
-        WSI_AppLocale* getAppLocale() const {return mAppLocale;}
-        WSI_AppDefaultMeasurementUnits* getAppDefMeasUnits() const {return mAppDefMeasUnits;}
-        WSI_ProjectAutosaveInterval* getProjectAutosaveInterval() const {return mProjectAutosaveInterval;}
-        WSI_LibraryLocaleOrder* getLibLocaleOrder() const {return mLibraryLocaleOrder;}
+        WSI_AppLocale* getAppLocale() const noexcept {return mAppLocale;}
+        WSI_AppDefaultMeasurementUnits* getAppDefMeasUnits() const noexcept {return mAppDefMeasUnits;}
+        WSI_ProjectAutosaveInterval* getProjectAutosaveInterval() const noexcept {return mProjectAutosaveInterval;}
+        WSI_LibraryLocaleOrder* getLibLocaleOrder() const noexcept {return mLibraryLocaleOrder;}
+        WSI_LibraryNormOrder* getLibNormOrder() const noexcept {return mLibraryNormOrder;}
+
 
         // General Methods
         void restoreDefaults() noexcept;
@@ -127,6 +130,7 @@ class WorkspaceSettings final : public QObject
         WSI_AppDefaultMeasurementUnits* mAppDefMeasUnits;
         WSI_ProjectAutosaveInterval* mProjectAutosaveInterval;
         WSI_LibraryLocaleOrder* mLibraryLocaleOrder;
+        WSI_LibraryNormOrder* mLibraryNormOrder;
 };
 
 #endif // WORKSPACESETTINGS_H

@@ -137,10 +137,14 @@ SOURCES += \
     common/dialogs/gridsettingsdialog.cpp \
     workspace/settings/items/wsi_appdefaultmeasurementunits.cpp \
     common/application.cpp \
+    library/gencompsignal.cpp \
+    library/gencompsymbvar.cpp \
+    library/gencompsymbvaritem.cpp \
     library/symbolpin.cpp \
     library/symbolpolygon.cpp \
     library/symboltext.cpp \
-    common/version.cpp
+    common/version.cpp \
+    workspace/settings/items/wsi_librarynormorder.cpp
 
 HEADERS += \
     common/units.h \
@@ -223,10 +227,14 @@ HEADERS += \
     common/dialogs/gridsettingsdialog.h \
     workspace/settings/items/wsi_appdefaultmeasurementunits.h \
     common/application.h \
+    library/gencompsignal.h \
+    library/gencompsymbvar.h \
+    library/gencompsymbvaritem.h \
     library/symbolpin.h \
     library/symbolpolygon.h \
     library/symboltext.h \
-    common/version.h
+    common/version.h \
+    workspace/settings/items/wsi_librarynormorder.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \

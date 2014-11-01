@@ -50,6 +50,8 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(WorkspaceSettings& settings) :
     // tab: library
     mUi->libraryLayout->addRow(mSettings.getLibLocaleOrder()->getLabelText(),
                                mSettings.getLibLocaleOrder()->getWidget());
+    mUi->libraryLayout->addRow(mSettings.getLibNormOrder()->getLabelText(),
+                               mSettings.getLibNormOrder()->getWidget());
 
     // load the window geometry
     QSettings clientSettings;
@@ -71,6 +73,7 @@ WorkspaceSettingsDialog::~WorkspaceSettingsDialog()
 
     // tab: library
     mSettings.getLibLocaleOrder()->getWidget()->setParent(0);
+    mSettings.getLibNormOrder()->getWidget()->setParent(0);
 
     // delete private member objects
     delete mUi;         mUi = 0;
