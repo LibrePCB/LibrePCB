@@ -1060,6 +1060,24 @@ class Point
          */
         void setY(const Length& y) noexcept {mY = y;}
 
+        /**
+         * @brief Set the X coordinate from a string in millimeters
+         *
+         * @param mm    A string with the new X coordinate in millimeters
+         *
+         * @throws Exception    If the string is not valid, an exception will be thrown.
+         */
+        void setXmm(const QString& mm) throw (Exception) {mX.setLengthMm(mm);}
+
+        /**
+         * @brief Set the Y coordinate from a string in millimeters
+         *
+         * @param mm    A string with the new Y coordinate in millimeters
+         *
+         * @throws Exception    If the string is not valid, an exception will be thrown.
+         */
+        void setYmm(const QString& mm) throw (Exception) {mY.setLengthMm(mm);}
+
         /// @see Length::setLengthNm()
         /// @warning Be careful with this method! Maybe you should call mapToGrid() afterwards!
         void setPointNm(LengthBase_t nmX, LengthBase_t nmY) noexcept {mX.setLengthNm(nmX);

@@ -26,6 +26,9 @@
 
 #include <QtCore>
 #include "libraryelement.h"
+#include "symbolpin.h"
+#include "symbolpolygon.h"
+#include "symboltext.h"
 
 /*****************************************************************************************
  *  Class Symbol
@@ -36,14 +39,22 @@ namespace library {
 /**
  * @brief The Symbol class
  */
-class Symbol : public LibraryElement
+class Symbol final : public LibraryElement
 {
         Q_OBJECT
 
     public:
 
-        explicit Symbol(const FilePath& xmlFilePath);
-        virtual ~Symbol();
+        // Constructors / Destructor
+        explicit Symbol(const FilePath& xmlFilePath) throw (Exception);
+        ~Symbol() noexcept;
+
+        // Getters
+        const SymbolPin* getPinByUuid(const QUuid& uuid) const noexcept {return mPins.value(uuid);}
+        const QHash<QUuid, const SymbolPin*>& getPins() const noexcept {return mPins;}
+        const QList<const SymbolPolygon*>& getPolygons() const noexcept {return mPolygons;}
+        const QList<const SymbolText*>& getTexts() const noexcept {return mTexts;}
+
 
     private:
 
@@ -52,6 +63,11 @@ class Symbol : public LibraryElement
         Symbol(const Symbol& other);
         Symbol& operator=(const Symbol& rhs);
 
+
+        // Symbol Attributes
+        QHash<QUuid, const SymbolPin*> mPins;
+        QList<const SymbolPolygon*> mPolygons;
+        QList<const SymbolText*> mTexts;
 };
 
 } // namespace library

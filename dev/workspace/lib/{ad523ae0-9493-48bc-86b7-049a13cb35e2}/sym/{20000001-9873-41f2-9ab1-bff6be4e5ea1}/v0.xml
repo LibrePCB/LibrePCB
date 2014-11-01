@@ -39,8 +39,8 @@
                 - text:     The displayed text (can contain placeholders: ${NAME}, ${VALUE})
                 - x:        X coordinate of the text (in millimeters)
                 - y:        Y coordinate of the text (in millimeters)
-                - height:   X coordinate of the text (in millimeters)
-                - angle:    Height of the text (in millimeters)
+                - height:   Height of the text (in millimeters)
+                - angle:    Angle of the text (in degrees)
                 - h_align:  Horizontal alignment (left, center, right)
                 - v_align:  Vertical alignment (top, center, bottom)
         -->

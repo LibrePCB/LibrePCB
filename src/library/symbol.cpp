@@ -30,13 +30,57 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Symbol::Symbol(const FilePath& xmlFilePath) :
+Symbol::Symbol(const FilePath& xmlFilePath) throw (Exception) :
     LibraryElement(xmlFilePath, "symbol")
 {
+    QDomElement tmpNode;
+
+    // Load all pins
+    if (mDomRoot.firstChildElement("pins").isNull())
+        mDomRoot.appendChild(mXmlFile->getDocument().createElement("pins"));
+    tmpNode = mDomRoot.firstChildElement("pins").firstChildElement("pin");
+    while (!tmpNode.isNull())
+    {
+        SymbolPin* pin = new SymbolPin(*this, tmpNode);
+        if (mPins.contains(pin->getUuid()))
+        {
+            throw RuntimeError(__FILE__, __LINE__, pin->getUuid().toString(),
+                QString(tr("The pin \"%1\" exists multiple times in \"%2\"."))
+                .arg(pin->getUuid().toString(), mXmlFilepath.toNative()));
+        }
+        mPins.insert(pin->getUuid(), pin);
+        tmpNode = tmpNode.nextSiblingElement("pin");
+    }
+
+    // Load all geometry elements
+    if (mDomRoot.firstChildElement("geometry").isNull())
+        mDomRoot.appendChild(mXmlFile->getDocument().createElement("geometry"));
+    tmpNode = mDomRoot.firstChildElement("geometry").firstChildElement();
+    while (!tmpNode.isNull())
+    {
+        if (tmpNode.nodeName() == "polygon")
+        {
+            mPolygons.append(new SymbolPolygon(*this, tmpNode));
+        }
+        else if (tmpNode.nodeName() == "text")
+        {
+            mTexts.append(new SymbolText(*this, tmpNode));
+        }
+        else
+        {
+            throw RuntimeError(__FILE__, __LINE__, tmpNode.nodeName(),
+                QString(tr("Unknown geometry element \"%1\" in \"%2\"."))
+                .arg(tmpNode.nodeName(), mXmlFilepath.toNative()));
+        }
+        tmpNode = tmpNode.nextSiblingElement();
+    }
 }
 
-Symbol::~Symbol()
+Symbol::~Symbol() noexcept
 {
+    qDeleteAll(mTexts);         mTexts.clear();
+    qDeleteAll(mPolygons);      mPolygons.clear();
+    qDeleteAll(mPins);          mPins.clear();
 }
 
 /*****************************************************************************************

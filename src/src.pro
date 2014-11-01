@@ -137,6 +137,9 @@ SOURCES += \
     common/dialogs/gridsettingsdialog.cpp \
     workspace/settings/items/wsi_appdefaultmeasurementunits.cpp \
     common/application.cpp \
+    library/symbolpin.cpp \
+    library/symbolpolygon.cpp \
+    library/symboltext.cpp \
     common/version.cpp
 
 HEADERS += \
@@ -220,6 +223,9 @@ HEADERS += \
     common/dialogs/gridsettingsdialog.h \
     workspace/settings/items/wsi_appdefaultmeasurementunits.h \
     common/application.h \
+    library/symbolpin.h \
+    library/symbolpolygon.h \
+    library/symboltext.h \
     common/version.h
 
 FORMS += \
