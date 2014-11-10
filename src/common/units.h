@@ -399,7 +399,7 @@ class Length
          *
          * @param nanometers    The length in nanometers
          */
-        explicit Length(LengthBase_t nanometers) noexcept : mNanometers(nanometers) {}
+        Length(LengthBase_t nanometers) noexcept : mNanometers(nanometers) {}
 
 
         // Setters
@@ -1129,6 +1129,13 @@ class Point
          * @return The length of this vector (as a Length object)
          */
         Length getLength() const noexcept {return Length(qSqrt(mX.toNm()*mX.toNm() + mY.toNm()*mY.toNm()));}
+
+        /**
+         * @brief Check if the position represents the origin (X == 0 and Y == 0)
+         *
+         * @return True if X = Y = 0, otherwise false
+         */
+        bool isOrigin() const noexcept {return ((mX == 0) && (mY == 0));}
 
 
         // Conversions
