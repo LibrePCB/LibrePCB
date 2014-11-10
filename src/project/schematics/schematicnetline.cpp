@@ -69,7 +69,7 @@ SchematicNetLine::SchematicNetLine(Schematic& schematic, const QDomElement& domE
         throw LogicError(__FILE__, __LINE__, QString(), tr("No Nets Layer found!"));
 
     mItem = new QGraphicsLineItem();
-    mItem->setPen(QPen(mLayer->getColor(), 1));
+    mItem->setPen(QPen(mLayer->getColor(), 1, Qt::SolidLine, Qt::RoundCap));
     mItem->setZValue(Schematic::ZValue_NetLines);
 }
 

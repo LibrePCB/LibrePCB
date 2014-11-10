@@ -17,76 +17,60 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SES_SELECT_H
-#define PROJECT_SES_SELECT_H
+#ifndef PROJECT_CMDSYMBOLINSTANCEMOVE_H
+#define PROJECT_CMDSYMBOLINSTANCEMOVE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include "schematiceditorstate.h"
+#include "../../../common/undocommand.h"
+#include "../../../common/exceptions.h"
 #include "../../../common/units.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
-class UndoCommand;
-
 namespace project {
-class CmdSymbolInstanceMove;
+class SymbolInstance;
 }
 
 /*****************************************************************************************
- *  Class SES_Select
+ *  Class CmdSymbolInstanceMove
  ****************************************************************************************/
 
 namespace project {
 
-
 /**
- * @brief The SES_Select class
+ * @brief The CmdSymbolInstanceMove class
  */
-class SES_Select final : public SchematicEditorState
+class CmdSymbolInstanceMove final : public UndoCommand
 {
-        Q_OBJECT
-
     public:
 
         // Constructors / Destructor
-        explicit SES_Select(SchematicEditor& editor);
-        ~SES_Select();
+        explicit CmdSymbolInstanceMove(SymbolInstance& symbol, UndoCommand* parent = 0) throw (Exception);
+        ~CmdSymbolInstanceMove() noexcept;
 
         // General Methods
-        State process(SchematicEditorEvent* event) noexcept;
-        void entry(State previousState) noexcept;
-        void exit(State nextState) noexcept;
+        void setDeltaToStartPosTemporary(Point& deltaPos) noexcept;
+
+        // Inherited from UndoCommand
+        void redo() throw (Exception) override;
+        void undo() throw (Exception) override;
+
 
     private:
 
-        // Private Methods
-        State processSubStateIdle(SchematicEditorEvent* event) noexcept;
-        State processSubStateIdleSceneEvent(SchematicEditorEvent* event) noexcept;
-        State processSubStateMoving(SchematicEditorEvent* event) noexcept;
-        State processSubStateMovingSceneEvent(SchematicEditorEvent* event) noexcept;
-
-
-        State mPreviousState;
-
-        // Substates
-        enum SubState {
-            SubState_Idle,
-            SubState_Moving
-        };
-        SubState mSubState;
-
-        Point mMoveStartPos; // not mapped to grid!
-        Point mLastMouseMoveDeltaPos; // mapped to grid
-        UndoCommand* mParentCommand;
-        QList<CmdSymbolInstanceMove*> mSymbolInstanceMoveCommands;
+        SymbolInstance& mSymbolInstance;
+        Point mStartPos;
+        Point mDeltaPos;
+        Point mEndPos;
+        bool mRedoOrUndoCalled;
 };
 
 } // namespace project
 
-#endif // PROJECT_SES_SELECT_H
+#endif // PROJECT_CMDSYMBOLINSTANCEMOVE_H

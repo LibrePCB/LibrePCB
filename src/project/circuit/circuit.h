@@ -88,6 +88,7 @@ class Circuit final : public QObject
         GenericComponentInstance* getGenCompInstanceByUuid(const QUuid& uuid) const noexcept;
         GenericComponentInstance* getGenCompInstanceByName(const QString& name) const noexcept;
         GenericComponentInstance* createGenCompInstance(const QUuid& genComp,
+                                                        const QUuid& symbolVariant,
                                                         const QString& name) throw (Exception);
         void addGenCompInstance(GenericComponentInstance* genCompInstance, bool toDomTree = true) throw (Exception);
         void removeGenCompInstance(GenericComponentInstance* genCompInstance, bool fromDomTree = true,

@@ -22,12 +22,17 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QGraphicsRectItem>
 #include "symbolinstance.h"
 #include "schematic.h"
 #include "../project.h"
 #include "../circuit/circuit.h"
 #include "../../common/schematiclayer.h"
+#include "../../library/symbolgraphicsitem.h"
+#include "../library/projectlibrary.h"
+#include "../circuit/genericcomponentinstance.h"
+#include "../../library/genericcomponent.h"
+#include "../../library/symbol.h"
+#include "symbolpininstance.h"
 
 namespace project {
 
@@ -37,7 +42,8 @@ namespace project {
 
 SymbolInstance::SymbolInstance(Schematic& schematic, const QDomElement& domElement)
                                throw (Exception) :
-    QObject(0), mSchematic(schematic), mDomElement(domElement), mItem(0), mOutlineLayer(0)
+    QObject(0), mSchematic(schematic), mDomElement(domElement), mSymbVarItem(0),
+    mSymbol(0), mGraphicsItem(0), mGenCompInstance(0)
 {
     mUuid = mDomElement.attribute("uuid");
     if(mUuid.isNull())
@@ -56,23 +62,74 @@ SymbolInstance::SymbolInstance(Schematic& schematic, const QDomElement& domEleme
                            .arg(gcUuid));
     }
 
-    mOutlineLayer = mSchematic.getProject().getSchematicLayer(SchematicLayer::SymbolOutlines);
-    if (!mOutlineLayer)
-        throw LogicError(__FILE__, __LINE__, QString(), tr("No Outline Layer found!"));
+    mPosition.setXmm(mDomElement.firstChildElement("position").attribute("x"));
+    mPosition.setYmm(mDomElement.firstChildElement("position").attribute("y"));
 
-    mItem = new QGraphicsRectItem(-10, -10, 20, 20);
-    mItem->setZValue(Schematic::ZValue_Symbols);
-    mItem->setPen(QPen(mOutlineLayer->getColor(), 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-    mItem->setBrush(QBrush(mOutlineLayer->getFillColor(), Qt::SolidPattern));
+    QString symbVarItemUuid = mDomElement.attribute("symbol_item");
+    mSymbVarItem = mGenCompInstance->getSymbolVariant().getItemByUuid(symbVarItemUuid);
+    if (!mSymbVarItem)
+    {
+        throw RuntimeError(__FILE__, __LINE__, symbVarItemUuid,
+            QString(tr("The symbol variant item UUID \"%1\" is invalid.")).arg(symbVarItemUuid));
+    }
 
-    mPosition.setX(Length::fromMm(mDomElement.firstChildElement("position").attribute("x")));
-    mPosition.setY(Length::fromMm(mDomElement.firstChildElement("position").attribute("y")));
-    mItem->setPos(mPosition.toPxQPointF());
+    mSymbol = mSchematic.getProject().getLibrary().getSymbol(mSymbVarItem->getSymbolUuid());
+    if (!mSymbol)
+    {
+        throw RuntimeError(__FILE__, __LINE__, mSymbVarItem->getSymbolUuid().toString(),
+            QString(tr("No symbol with the UUID \"%1\" found in the project's library."))
+            .arg(mSymbVarItem->getSymbolUuid().toString()));
+    }
+
+    foreach (const library::SymbolPin* pin, mSymbol->getPins())
+    {
+        SymbolPinInstance* pinInstance = new SymbolPinInstance(*this, pin->getUuid());
+        if (mPinInstances.contains(pin->getUuid()))
+        {
+            throw RuntimeError(__FILE__, __LINE__, pin->getUuid().toString(),
+                QString(tr("The symbol pin UUID \"%1\" is defined multiple times."))
+                .arg(pin->getUuid().toString()));
+        }
+        if (!mSymbVarItem->getPinSignalMap().contains(pin->getUuid()))
+        {
+            throw RuntimeError(__FILE__, __LINE__, pin->getUuid().toString(),
+                QString(tr("Symbol pin UUID \"%1\" not found in pin-signal-map."))
+                .arg(pin->getUuid().toString()));
+        }
+        mPinInstances.insert(pin->getUuid(), pinInstance);
+    }
+    if (mPinInstances.count() != mSymbVarItem->getPinSignalMap().count())
+    {
+        throw RuntimeError(__FILE__, __LINE__,
+            QString("%1!=%2").arg(mPinInstances.count()).arg(mSymbVarItem->getPinSignalMap().count()),
+            QString(tr("The pin count of the symbol instance \"%1\" does not match with "
+            "the pin-signal-map")).arg(mUuid.toString()));
+    }
+
+    mGraphicsItem = new library::SymbolGraphicsItem(*mSymbol, this);
+    mGraphicsItem->setPos(mPosition.toPxQPointF());
 }
 
 SymbolInstance::~SymbolInstance() noexcept
 {
-    delete mItem;       mItem = 0;
+    delete mGraphicsItem;           mGraphicsItem = 0;
+    qDeleteAll(mPinInstances);      mPinInstances.clear();
+}
+
+/*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
+
+void SymbolInstance::setPosition(const Point& newPos, bool permanent) throw (Exception)
+{
+    if (permanent)
+    {
+        mPosition = newPos;
+        mDomElement.firstChildElement("position").setAttribute("x", mPosition.getX().toMmString());
+        mDomElement.firstChildElement("position").setAttribute("y", mPosition.getY().toMmString());
+    }
+
+    mGraphicsItem->setPos(newPos.toPxQPointF());
 }
 
 /*****************************************************************************************
@@ -82,6 +139,8 @@ SymbolInstance::~SymbolInstance() noexcept
 void SymbolInstance::addToSchematic(Schematic& schematic, bool addNode,
                                        QDomElement& parent) throw (Exception)
 {
+    mGenCompInstance->registerSymbolInstance(mSymbVarItem->getUuid(), mSymbol->getUuid(), this);
+
     if (addNode)
     {
         if (parent.nodeName() != "symbols")
@@ -91,12 +150,14 @@ void SymbolInstance::addToSchematic(Schematic& schematic, bool addNode,
             throw LogicError(__FILE__, __LINE__, QString(), tr("Could not append DOM node!"));
     }
 
-    schematic.addItem(mItem);
+    schematic.addItem(mGraphicsItem);
 }
 
 void SymbolInstance::removeFromSchematic(Schematic& schematic, bool removeNode,
                                             QDomElement& parent) throw (Exception)
 {
+    mGenCompInstance->unregisterSymbolInstance(mSymbVarItem->getUuid(), this);
+
     if (removeNode)
     {
         if (parent.nodeName() != "symbols")
@@ -106,7 +167,7 @@ void SymbolInstance::removeFromSchematic(Schematic& schematic, bool removeNode,
             throw LogicError(__FILE__, __LINE__, QString(), tr("Could not remove node from DOM tree!"));
     }
 
-    schematic.removeItem(mItem);
+    schematic.removeItem(mGraphicsItem);
 }
 
 /*****************************************************************************************

@@ -39,9 +39,8 @@ class SchematicEditorEvent
 {
     public:
 
-        // FSM events (codes used for QEvent::type)
+        // FSM event types
         enum EventType {
-            _First = QEvent::User, // the first user defined type after all Qt types
             // Triggered Actions (SchematicEditorEvent objects)
             AbortCommand,
             StartSelect,
@@ -53,7 +52,7 @@ class SchematicEditorEvent
             StartDrawEllipse,
             StartDrawWire,
             StartAddComponent,
-            // Redirected QEvent's (SES_RedirectedQEvent objects)
+            // Redirected QEvent's (SEE_RedirectedQEvent objects)
             SchematicSceneEvent
         };
 

@@ -42,6 +42,8 @@ class Schematic;
 class NetSignal;
 class SchematicNetLine;
 class SchematicNetPoint;
+class SymbolInstance;
+class SymbolPinInstance;
 }
 
 /*****************************************************************************************
@@ -131,7 +133,11 @@ class SchematicNetPoint final : public QObject
 
         // Static Methods
         static SchematicNetPoint* create(Schematic& schematic, QDomDocument& doc,
-                                         const QUuid& netsignal, const Point& position) throw (Exception);
+                                         const QUuid& netsignal, const Point& position)
+                                         throw (Exception);
+        static SchematicNetPoint* create(Schematic& schematic, QDomDocument& doc,
+                                         const QUuid& netsignal, const QUuid& symbol,
+                                         const QUuid& pin) throw (Exception);
 
     private:
 
@@ -150,6 +156,8 @@ class SchematicNetPoint final : public QObject
         NetSignal* mNetSignal;
         bool mAttached;
         Point mPosition;
+        SymbolInstance* mSymbolInstance;
+        SymbolPinInstance* mPinInstance;
 
         QList<SchematicNetLine*> mLines;
 };

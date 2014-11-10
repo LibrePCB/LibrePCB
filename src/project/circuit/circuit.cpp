@@ -316,10 +316,11 @@ GenericComponentInstance* Circuit::getGenCompInstanceByName(const QString& name)
 }
 
 GenericComponentInstance* Circuit::createGenCompInstance(const QUuid& genComp,
+                                                         const QUuid& symbolVariant,
                                                          const QString& name)
                                                          throw (Exception)
 {
-    return GenericComponentInstance::create(*this, mXmlFile->getDocument(), genComp, name);
+    return GenericComponentInstance::create(*this, mXmlFile->getDocument(), genComp, symbolVariant, name);
 }
 
 void Circuit::addGenCompInstance(GenericComponentInstance* genCompInstance,

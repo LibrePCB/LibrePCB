@@ -34,7 +34,13 @@
 
 namespace project {
 class GenericComponentInstance;
+class SymbolPinInstance;
 class NetSignal;
+class Circuit;
+}
+
+namespace library {
+class GenCompSignal;
 }
 
 /*****************************************************************************************
@@ -53,17 +59,37 @@ class GenCompSignalInstance final : public QObject
     public:
 
         // Constructors / Destructor
-        explicit GenCompSignalInstance(GenericComponentInstance& genCompInstance,
+        explicit GenCompSignalInstance(Circuit& circuit,
+                                       GenericComponentInstance& genCompInstance,
                                        const QDomElement& domElement) throw (Exception);
         ~GenCompSignalInstance() noexcept;
 
         // Getters
-        const QUuid& getCompSignalUuid() const noexcept {return mCompSignalUuid;}
-        NetSignal* getNetSignal() const noexcept {return mNetSignal;}
+        const library::GenCompSignal& getCompSignal() const noexcept {return *mGenCompSignal;}
+        const NetSignal* getNetSignal() const noexcept {return mNetSignal;}
+
+
+        // Setters
+
+        /**
+         * @brief (Re-)Connect/Disconnect this component signal to/from a circuit's netsignal
+         *
+         * @warning This method must always be called from inside an UndoCommand!
+         *
+         * @param netsignal     - (Re-)Connect: A Pointer to the new netsignal
+         *                      - Disconnect: 0
+         *
+         * @throw Exception     This method throws an exception in case of an error
+         */
+        void setNetSignal(NetSignal* netsignal) throw (Exception);
+
 
         // General Methods
-        void addToCircuit() noexcept;
-        void removeFromCircuit() noexcept;
+        void registerSymbolPinInstance(SymbolPinInstance* pin) throw (Exception);
+        void unregisterSymbolPinInstance(SymbolPinInstance* pin) throw (Exception);
+        void addToCircuit() throw (Exception);
+        void removeFromCircuit() throw (Exception);
+
 
     private:
 
@@ -73,15 +99,15 @@ class GenCompSignalInstance final : public QObject
         GenCompSignalInstance& operator=(const GenCompSignalInstance& rhs);
 
         // General
+        Circuit& mCircuit;
         GenericComponentInstance& mGenCompInstance;
         QDomElement mDomElement;
 
         // Attributes
-        QUuid mCompSignalUuid; ///< @todo replace this with a pointer to the component signal object
+        const library::GenCompSignal* mGenCompSignal;
+        QList<SymbolPinInstance*> mSymbolPinInstances;
         NetSignal* mNetSignal;
-
         bool mAddedToCircuit;
-
 };
 
 } // namespace project

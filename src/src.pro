@@ -144,9 +144,11 @@ SOURCES += \
     library/symbolpolygon.cpp \
     library/symboltext.cpp \
     library/symbolgraphicsitem.cpp \
+    project/schematics/symbolpininstance.cpp \
     library/symbolpingraphicsitem.cpp \
     common/version.cpp \
-    workspace/settings/items/wsi_librarynormorder.cpp
+    workspace/settings/items/wsi_librarynormorder.cpp \
+    project/schematics/cmd/cmdsymbolinstancemove.cpp
 
 HEADERS += \
     common/units.h \
@@ -236,9 +238,11 @@ HEADERS += \
     library/symbolpolygon.h \
     library/symboltext.h \
     library/symbolgraphicsitem.h \
+    project/schematics/symbolpininstance.h \
     library/symbolpingraphicsitem.h \
     common/version.h \
-    workspace/settings/items/wsi_librarynormorder.h
+    workspace/settings/items/wsi_librarynormorder.h \
+    project/schematics/cmd/cmdsymbolinstancemove.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \

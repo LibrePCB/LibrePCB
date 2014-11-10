@@ -35,6 +35,7 @@
 #include "../schematicnetpoint.h"
 #include "../cmd/cmdschematicnetpointadd.h"
 #include "../cmd/cmdschematicnetlineadd.h"
+#include "../schematic.h"
 
 namespace project {
 
@@ -135,26 +136,50 @@ SchematicEditorState::State SES_DrawWire::process(SchematicEditorEvent* event) n
 
                                     mProject.getUndoStack().beginCommand(tr("Draw Wire"));
 
-                                    // add new netsignal
-                                    QUuid netclass = mNetClassComboBox->currentData().toUuid();
-                                    if (netclass.isNull())
-                                        break;
-                                    CmdNetSignalAdd* cmdSignalAdd = new CmdNetSignalAdd(mCircuit, netclass);
-                                    mProject.getUndoStack().appendToCommand(cmdSignalAdd);
+                                    // check if there is an existing netpoint ander the mouse
+                                    SchematicNetPoint* firstNetPoint = 0;
+                                    QList<QGraphicsItem*> items = schematic->items(sceneEvent->scenePos());
+                                    foreach (QGraphicsItem* item, items)
+                                    {
+                                        if (item->type() == CADScene::Type_SchematicNetPoint)
+                                        {
+                                            SchematicNetPointGraphicsItem* i = qgraphicsitem_cast<SchematicNetPointGraphicsItem*>(item);
+                                            firstNetPoint = &(i->getNetPoint());
+                                            break;
+                                        }
+                                    }
 
-                                    // add first netpoint
-                                    CmdSchematicNetPointAdd* cmdNetPointAdd1 = new CmdSchematicNetPointAdd(
-                                        *schematic, cmdSignalAdd->getNetSignal()->getUuid(), pos);
-                                    mProject.getUndoStack().appendToCommand(cmdNetPointAdd1);
+                                    NetSignal* netsignal = 0;
+
+                                    if (firstNetPoint)
+                                    {
+                                        netsignal = firstNetPoint->getNetSignal();
+                                    }
+                                    else
+                                    {
+                                        // add new netsignal
+                                        QUuid netclass = mNetClassComboBox->currentData().toUuid();
+                                        if (netclass.isNull())
+                                            break;
+                                        CmdNetSignalAdd* cmdSignalAdd = new CmdNetSignalAdd(mCircuit, netclass);
+                                        mProject.getUndoStack().appendToCommand(cmdSignalAdd);
+                                        netsignal = cmdSignalAdd->getNetSignal();
+
+                                        // add first netpoint
+                                        CmdSchematicNetPointAdd* cmdNetPointAdd1 = new CmdSchematicNetPointAdd(
+                                            *schematic, cmdSignalAdd->getNetSignal()->getUuid(), pos);
+                                        mProject.getUndoStack().appendToCommand(cmdNetPointAdd1);
+                                        firstNetPoint = cmdNetPointAdd1->getNetPoint();
+                                    }
 
                                     // add second netpoint
                                     CmdSchematicNetPointAdd* cmdNetPointAdd2 = new CmdSchematicNetPointAdd(
-                                        *schematic, cmdSignalAdd->getNetSignal()->getUuid(), pos);
+                                        *schematic, netsignal->getUuid(), pos);
                                     mProject.getUndoStack().appendToCommand(cmdNetPointAdd2);
 
                                     // add netline
                                     CmdSchematicNetLineAdd* cmdNetLineAdd = new CmdSchematicNetLineAdd(
-                                        *schematic, cmdNetPointAdd1->getNetPoint()->getUuid(),
+                                        *schematic, firstNetPoint->getUuid(),
                                         cmdNetPointAdd2->getNetPoint()->getUuid());
                                     mProject.getUndoStack().appendToCommand(cmdNetLineAdd);
 

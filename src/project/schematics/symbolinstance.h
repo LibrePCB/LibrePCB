@@ -39,10 +39,13 @@ class SchematicLayer;
 namespace project {
 class Schematic;
 class GenericComponentInstance;
+class SymbolPinInstance;
 }
 
 namespace library {
 class Symbol;
+class GenCompSymbVarItem;
+class SymbolGraphicsItem;
 }
 
 /*****************************************************************************************
@@ -69,7 +72,16 @@ class SymbolInstance final : public QObject
         ~SymbolInstance() noexcept;
 
         // Getters
+        Schematic& getSchematic() const noexcept {return mSchematic;}
         const QUuid& getUuid() const noexcept {return mUuid;}
+        const Point& getPosition() const noexcept {return mPosition;}
+        SymbolPinInstance* getPinInstance(const QUuid& pinUuid) const noexcept {return mPinInstances.value(pinUuid);}
+        GenericComponentInstance& getGenCompInstance() const noexcept {return *mGenCompInstance;}
+        const library::Symbol& getSymbol() const noexcept {return *mSymbol;}
+        const library::GenCompSymbVarItem& getGenCompSymbVarItem() const noexcept {return *mSymbVarItem;}
+
+        // Setters
+        void setPosition(const Point& newPos, bool permanent = true) throw (Exception);
 
         // General Methods
         void addToSchematic(Schematic& schematic, bool addNode,
@@ -92,8 +104,10 @@ class SymbolInstance final : public QObject
         // General
         Schematic& mSchematic;
         QDomElement mDomElement;
-        QGraphicsRectItem* mItem;
-        SchematicLayer* mOutlineLayer;
+        const library::GenCompSymbVarItem* mSymbVarItem;
+        const library::Symbol* mSymbol;
+        QHash<QUuid, SymbolPinInstance*> mPinInstances; ///< key: symbol pin UUID
+        library::SymbolGraphicsItem* mGraphicsItem;
 
         // Attributes
         QUuid mUuid;

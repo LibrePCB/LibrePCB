@@ -35,10 +35,12 @@
 namespace project {
 class Circuit;
 class GenCompSignalInstance;
+class SymbolInstance;
 }
 
 namespace library {
 class GenericComponent;
+class GenCompSymbVar;
 }
 
 /*****************************************************************************************
@@ -62,22 +64,44 @@ class GenericComponentInstance : public QObject
         ~GenericComponentInstance() noexcept;
 
         // Getters
-        const Circuit& getCircuit() const noexcept {return mCircuit;}
         const QUuid& getUuid() const noexcept {return mUuid;}
         const QString& getName() const noexcept {return mName;}
+        unsigned int getUsedSymbolsCount() const noexcept {return mSymbolInstances.count();}
+        GenCompSignalInstance* getSignalInstance(const QUuid& signalUuid) const noexcept {return mSignals.value(signalUuid);}
         const library::GenericComponent& getGenComp() const noexcept {return *mGenComp;}
+        const library::GenCompSymbVar& getSymbolVariant() const noexcept {return *mGenCompSymbVar;}
+
 
         // Setters
+
+        /**
+         * @brief Set the name of this generic component instance in the circuit
+         *
+         * @warning You have to check if there is no other component with the same name in
+         *          the whole circuit! This method will not check if the name is unique.
+         * @warning This method must always be called from inside an UndoCommand!
+         *
+         * @param name  The new name of this component in the circuit (must not be empty)
+         *
+         * @throw Exception If the new name is invalid, an exception will be thrown
+         */
         void setName(const QString& name) throw (Exception);
+
 
         // General Methods
         void addToCircuit(bool addNode, QDomElement& parent) throw (Exception);
         void removeFromCircuit(bool removeNode, QDomElement& parent) throw (Exception);
+        void registerSymbolInstance(const QUuid& itemUuid, const QUuid& symbolUuid,
+                                    const SymbolInstance* instance) throw (Exception);
+        void unregisterSymbolInstance(const QUuid& itemUuid, const SymbolInstance* symbol)
+                                      throw (Exception);
 
         // Static Methods
         static GenericComponentInstance* create(Circuit& circuit, QDomDocument& doc,
                                                 const QUuid& genericComponent,
+                                                const QUuid& symbolVariant,
                                                 const QString& name) throw (Exception);
+
 
     private:
 
@@ -86,15 +110,40 @@ class GenericComponentInstance : public QObject
         GenericComponentInstance(const GenericComponentInstance& other);
         GenericComponentInstance& operator=(const GenericComponentInstance& rhs);
 
+
         // General
         Circuit& mCircuit;
         QDomElement mDomElement;
+        bool mAddedToCircuit;
+
 
         // Attributes
+
+        /// @brief The unique UUID of this component instance in the circuit
         QUuid mUuid;
+
+        /// @brief The unique name of this component instance in the circuit (e.g. "R42")
         QString mName;
+
+        /// @brief Pointer to the generic component in the project's library
         const library::GenericComponent* mGenComp;
+
+        /// @brief Pointer to the used symbol variant of #mGenComp
+        const library::GenCompSymbVar* mGenCompSymbVar;
+
+        /// @brief All signal instances (Key: generic component signal UUID)
         QHash<QUuid, GenCompSignalInstance*> mSignals;
+
+        /**
+         * @brief All registered symbol instances (must be empty if this generic component
+         *        instance is not added to circuit)
+         *
+         * - Key:   UUID of the symbol variant item (library#GenCompSymbVarItem)
+         * - Value: Pointer to the registered symbol instance
+         *
+         * @see #registerSymbolInstance(), #unregisterSymbolInstance()
+         */
+        QHash<QUuid, const SymbolInstance*> mSymbolInstances;
 };
 
 } // namespace project

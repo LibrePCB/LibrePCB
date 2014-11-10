@@ -29,6 +29,7 @@
 #include "../project.h"
 #include "../library/projectlibrary.h"
 #include "gencompsignalinstance.h"
+#include "../../library/genericcomponent.h"
 
 namespace project {
 
@@ -39,7 +40,8 @@ namespace project {
 GenericComponentInstance::GenericComponentInstance(Circuit& circuit,
                                                    const QDomElement& domElement)
                                                    throw (Exception) :
-    QObject(0), mCircuit(circuit), mDomElement(domElement)
+    QObject(0), mCircuit(circuit), mDomElement(domElement), mAddedToCircuit(false),
+    mGenComp(0), mGenCompSymbVar(0)
 {
     mUuid = mDomElement.attribute("uuid");
     if(mUuid.isNull())
@@ -66,21 +68,45 @@ GenericComponentInstance::GenericComponentInstance(Circuit& circuit,
             "project's library!")).arg(mDomElement.attribute("generic_component")));
     }
 
+    mGenCompSymbVar = mGenComp->getSymbolVariantByUuid(mDomElement.attribute("symbol_variant"));
+    if (!mGenCompSymbVar)
+    {
+        throw RuntimeError(__FILE__, __LINE__, mDomElement.attribute("symbol_variant"),
+            QString(tr("No symbol variant with the UUID \"%1\" found."))
+            .arg(mDomElement.attribute("symbol_variant")));
+    }
+
     QDomElement tmpNode; // for temporary use...
 
     // load all signal instances
     tmpNode = mDomElement.firstChildElement("signal_mapping").firstChildElement("map");
     while (!tmpNode.isNull())
     {
-        GenCompSignalInstance* signal = new GenCompSignalInstance(*this, tmpNode);
-        mSignals.insert(signal->getCompSignalUuid(), signal);
+        GenCompSignalInstance* signal = new GenCompSignalInstance(mCircuit, *this, tmpNode);
+        if (mSignals.contains(signal->getCompSignal().getUuid()))
+        {
+            throw RuntimeError(__FILE__, __LINE__, signal->getCompSignal().getUuid().toString(),
+                QString(tr("The signal with the UUID \"%1\" is defined multiple times."))
+                .arg(signal->getCompSignal().getUuid().toString()));
+        }
+        mSignals.insert(signal->getCompSignal().getUuid(), signal);
         tmpNode = tmpNode.nextSiblingElement("map");
     }
-    // TODO: compare the signal count with the generic component object of the library
+    if (mSignals.count() != mGenComp->getSignals().count())
+    {
+        throw RuntimeError(__FILE__, __LINE__,
+            QString("%1!=%2").arg(mSignals.count()).arg(mGenComp->getSignals().count()),
+            QString(tr("The signal count of the generic component instance \"%1\" does "
+            "not match with the signal count of the generic component \"%2\"."))
+            .arg(mUuid.toString()).arg(mGenComp->getUuid().toString()));
+    }
 }
 
 GenericComponentInstance::~GenericComponentInstance() noexcept
 {
+    Q_ASSERT(!mAddedToCircuit);
+    Q_ASSERT(mSymbolInstances.isEmpty());
+
     qDeleteAll(mSignals);       mSignals.clear();
 }
 
@@ -92,7 +118,7 @@ void GenericComponentInstance::setName(const QString& name) throw (Exception)
 {
     if(name.isEmpty())
     {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__, name,
             tr("The new component name must not be empty!"));
     }
 
@@ -106,6 +132,9 @@ void GenericComponentInstance::setName(const QString& name) throw (Exception)
 
 void GenericComponentInstance::addToCircuit(bool addNode, QDomElement& parent) throw (Exception)
 {
+    if (mAddedToCircuit)
+        throw LogicError(__FILE__, __LINE__);
+
     if (addNode)
     {
         if (parent.nodeName() != "generic_component_instances")
@@ -117,12 +146,24 @@ void GenericComponentInstance::addToCircuit(bool addNode, QDomElement& parent) t
 
     foreach (GenCompSignalInstance* signal, mSignals)
         signal->addToCircuit();
+
+    mAddedToCircuit = true;
 }
 
 void GenericComponentInstance::removeFromCircuit(bool removeNode, QDomElement& parent) throw (Exception)
 {
+    if (!mAddedToCircuit)
+        throw LogicError(__FILE__, __LINE__);
+
     if (removeNode)
     {
+        // check if all generic component signals are disconnected from circuit net signals
+        foreach (GenCompSignalInstance* signal, mSignals)
+        {
+            if (signal->getNetSignal())
+                throw LogicError(__FILE__, __LINE__);
+        }
+
         if (parent.nodeName() != "generic_component_instances")
             throw LogicError(__FILE__, __LINE__, parent.nodeName(), tr("Invalid node name!"));
 
@@ -132,6 +173,50 @@ void GenericComponentInstance::removeFromCircuit(bool removeNode, QDomElement& p
 
     foreach (GenCompSignalInstance* signal, mSignals)
         signal->removeFromCircuit();
+
+    mAddedToCircuit = false;
+}
+
+void GenericComponentInstance::registerSymbolInstance(const QUuid& itemUuid,
+                                                      const QUuid& symbolUuid,
+                                                      const SymbolInstance* instance) throw (Exception)
+{
+    if (!mAddedToCircuit)
+        throw LogicError(__FILE__, __LINE__, itemUuid.toString());
+
+    const library::GenCompSymbVarItem* item = mGenCompSymbVar->getItemByUuid(itemUuid);
+    if (!item)
+    {
+        throw RuntimeError(__FILE__, __LINE__, itemUuid.toString(), QString(tr(
+            "Invalid symbol item UUID in circuit: \"%1\".")).arg(itemUuid.toString()));
+    }
+
+    if (symbolUuid != item->getSymbolUuid())
+    {
+        throw RuntimeError(__FILE__, __LINE__, symbolUuid.toString(), QString(tr(
+            "Invalid symbol UUID in circuit: \"%1\".")).arg(symbolUuid.toString()));
+    }
+
+    if (mSymbolInstances.contains(item->getUuid()))
+    {
+        throw RuntimeError(__FILE__, __LINE__, item->getUuid().toString(), QString(tr(
+            "Symbol item UUID already exists in circuit: \"%1\".")).arg(item->getUuid().toString()));
+    }
+
+    mSymbolInstances.insert(itemUuid, instance);
+}
+
+void GenericComponentInstance::unregisterSymbolInstance(const QUuid& itemUuid,
+                                                        const SymbolInstance* symbol) throw (Exception)
+{
+    if (!mAddedToCircuit)
+        throw LogicError(__FILE__, __LINE__, itemUuid.toString());
+    if (!mSymbolInstances.contains(itemUuid))
+        throw LogicError(__FILE__, __LINE__, itemUuid.toString());
+    if (symbol != mSymbolInstances.value(itemUuid))
+        throw LogicError(__FILE__, __LINE__, itemUuid.toString());
+
+    mSymbolInstances.remove(itemUuid);
 }
 
 /*****************************************************************************************
@@ -141,6 +226,7 @@ void GenericComponentInstance::removeFromCircuit(bool removeNode, QDomElement& p
 GenericComponentInstance* GenericComponentInstance::create(Circuit& circuit,
                                                            QDomDocument& doc,
                                                            const QUuid& genericComponent,
+                                                           const QUuid& symbolVariant,
                                                            const QString& name)
                                                            throw (Exception)
 {
@@ -152,6 +238,7 @@ GenericComponentInstance* GenericComponentInstance::create(Circuit& circuit,
     node.setAttribute("uuid", QUuid::createUuid().toString()); // generate random UUID
     node.setAttribute("name", name);
     node.setAttribute("generic_component", genericComponent.toString());
+    node.setAttribute("symbol_variant", symbolVariant.toString());
 
     // create and return the new GenericComponentInstance object
     return new GenericComponentInstance(circuit, node);

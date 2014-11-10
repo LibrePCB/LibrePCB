@@ -28,6 +28,9 @@
 #include "../../project.h"
 #include "../schematicnetpoint.h"
 #include "../schematic.h"
+#include "../../../library/symbolgraphicsitem.h"
+#include "../cmd/cmdsymbolinstancemove.h"
+#include "../../../common/undostack.h"
 
 namespace project {
 
@@ -36,7 +39,8 @@ namespace project {
  ****************************************************************************************/
 
 SES_Select::SES_Select(SchematicEditor& editor) :
-    SchematicEditorState(editor), mPreviousState(State_Initial), mSubState(Idle)
+    SchematicEditorState(editor), mPreviousState(State_Initial), mSubState(SubState_Idle),
+    mParentCommand(0)
 {
 }
 
@@ -50,163 +54,174 @@ SES_Select::~SES_Select()
 
 SchematicEditorState::State SES_Select::process(SchematicEditorEvent* event) noexcept
 {
+    switch (mSubState)
+    {
+        case SubState_Idle:
+            return processSubStateIdle(event);
+        case SubState_Moving:
+            return processSubStateMoving(event);
+        default:
+            return State_Select;
+    }
+}
+
+void SES_Select::entry(State previousState) noexcept
+{
+    mPreviousState = (previousState != State_Initial) ? previousState : State_Select;
+
+    editorUi()->actionToolSelect->setCheckable(true);
+    editorUi()->actionToolSelect->setChecked(true);
+}
+
+void SES_Select::exit(State nextState) noexcept
+{
+    Q_UNUSED(nextState);
+
+    editorUi()->actionToolSelect->setCheckable(false);
+    editorUi()->actionToolSelect->setChecked(false);
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+SchematicEditorState::State SES_Select::processSubStateIdle(SchematicEditorEvent* event) noexcept
+{
     SchematicEditorState::State nextState = State_Select;
 
     switch (event->getType())
     {
         case SchematicEditorEvent::StartMove:
             nextState = State_Move;
+            event->setAccepted(true);
             break;
 
         case SchematicEditorEvent::StartDrawText:
             nextState = State_DrawText;
+            event->setAccepted(true);
             break;
 
         case SchematicEditorEvent::StartDrawRect:
             nextState = State_DrawRect;
+            event->setAccepted(true);
             break;
 
         case SchematicEditorEvent::StartDrawPolygon:
             nextState = State_DrawPolygon;
+            event->setAccepted(true);
             break;
 
         case SchematicEditorEvent::StartDrawCircle:
             nextState = State_DrawCircle;
+            event->setAccepted(true);
             break;
 
         case SchematicEditorEvent::StartDrawEllipse:
             nextState = State_DrawEllipse;
+            event->setAccepted(true);
             break;
 
         case SchematicEditorEvent::StartDrawWire:
             nextState = State_DrawWire;
+            event->setAccepted(true);
             break;
 
         case SchematicEditorEvent::StartAddComponent:
             nextState = State_AddComponent;
+            event->setAccepted(true);
             break;
 
         case SchematicEditorEvent::SchematicSceneEvent:
+            nextState = processSubStateIdleSceneEvent(event);
+            break;
+
+        default:
+            break;
+    }
+
+    return nextState;
+}
+
+SchematicEditorState::State SES_Select::processSubStateIdleSceneEvent(SchematicEditorEvent* event) noexcept
+{
+    SchematicEditorState::State nextState = State_Select;
+    QEvent* qevent = dynamic_cast<SEE_RedirectedQEvent*>(event)->getQEvent();
+    Q_CHECK_PTR(qevent);
+
+    switch (qevent->type())
+    {
+        case QEvent::GraphicsSceneMousePress:
         {
-            QEvent* qevent = dynamic_cast<SEE_RedirectedQEvent*>(event)->getQEvent();
-            switch (qevent->type())
+            QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
+            Schematic* schematic = mProject.getSchematicByIndex(editorActiveSchematicIndex());
+            Q_CHECK_PTR(sceneEvent); if (!sceneEvent) break;
+            Q_CHECK_PTR(schematic); if (!schematic) break;
+
+            switch (sceneEvent->button())
             {
-                case QEvent::GraphicsSceneMousePress:
+                case Qt::LeftButton:
                 {
-                    QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-                    Schematic* schematic = mProject.getSchematicByIndex(editorActiveSchematicIndex());
-                    if (!schematic)
-                        break;
-
-                    switch (sceneEvent->button())
+                    // handle items selection
+                    bool selectedItemUnderMouse = false;
+                    QList<QGraphicsItem*> items = schematic->items(sceneEvent->scenePos());
+                    if (items.isEmpty()) break; // no items under mouse
+                    foreach (QGraphicsItem* item, items)
                     {
-                        case Qt::LeftButton:
+                        if (item->isSelected())
                         {
-                            bool selectedItemUnderMouse = false;
-                            QList<QGraphicsItem*> items = schematic->items(sceneEvent->scenePos());
-                            if (items.isEmpty())
+                            selectedItemUnderMouse = true;
+                            break;
+                        }
+                    }
+                    if (!selectedItemUnderMouse)
+                    {
+                        // select only the top most item under the mouse
+                        schematic->clearSelection();
+                        items.first()->setSelected(true);
+                    }
+                    event->setAccepted(true);
+
+                    // get all selected items
+                    QList<SymbolInstance*> selectedSymbolInstances;
+                    foreach (QGraphicsItem* item, schematic->selectedItems())
+                    {
+                        switch (item->type())
+                        {
+                            case CADScene::Type_SchematicSymbolInstance:
+                            {
+                                library::SymbolGraphicsItem* i = qgraphicsitem_cast<library::SymbolGraphicsItem*>(item);
+                                selectedSymbolInstances.append(i->getSymbolInstance());
                                 break;
-                            foreach (QGraphicsItem* item, items)
-                            {
-                                if (item->isSelected())
-                                {
-                                    selectedItemUnderMouse = true;
-                                    break;
-                                }
                             }
-                            if ((!selectedItemUnderMouse) && (!items.isEmpty()))
-                            {
-                                // select only the top most item under the mouse
-                                schematic->clearSelection();
-                                items.first()->setSelected(true);
-                            }
-                            if (mSubState == Idle)
-                            {
-                                mMoveStartPoint = Point::fromPx(sceneEvent->scenePos(),
-                                                  editorUi()->graphicsView->getGridInterval());
-                                mSubState = Moving;
-                                event->setAccepted(true);
-                            }
-                            break;
+                            default:
+                                break;
                         }
-
-                        case Qt::RightButton:
-                        {
-                            // switch back to the last command (previous state)
-                            nextState = mPreviousState;
-                            event->setAccepted(true);
-                            break;
-                        }
-
-                        default:
-                            break;
                     }
+
+                    // abort if no items are selected
+                    if (selectedSymbolInstances.isEmpty()) break;
+
+                    // create move commands for all selected items
+                    Q_ASSERT(mParentCommand == 0);
+                    Q_ASSERT(mSymbolInstanceMoveCommands.isEmpty());
+                    mParentCommand = new UndoCommand(tr("Move Schematic Items"));
+                    foreach (SymbolInstance* instance, selectedSymbolInstances)
+                    {
+                        CmdSymbolInstanceMove* cmd = new CmdSymbolInstanceMove(*instance, mParentCommand);
+                        mSymbolInstanceMoveCommands.append(cmd);
+                    }
+
+                    // switch to substate SubState_Moving
+                    mSubState = SubState_Moving;
+                    mMoveStartPos = Point::fromPx(sceneEvent->scenePos()); // not mapped to grid!
                     break;
                 }
 
-                case QEvent::GraphicsSceneMouseRelease:
+                case Qt::RightButton:
                 {
-                    QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-                    Schematic* schematic = mProject.getSchematicByIndex(editorActiveSchematicIndex());
-                    if (!schematic)
-                        break;
-
-                    switch (sceneEvent->button())
-                    {
-                        case Qt::LeftButton:
-                        {
-                            if (mSubState == Moving)
-                            {
-                                mSubState = Idle;
-                                event->setAccepted(true);
-                            }
-                            break;
-                        }
-
-                        default:
-                            break;
-                    }
-                    break;
-                }
-
-                case QEvent::GraphicsSceneMouseMove:
-                {
-                    QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-                    Schematic* schematic = mProject.getSchematicByIndex(editorActiveSchematicIndex());
-                    if (!schematic)
-                        break;
-
-                    if (mSubState == Moving)
-                    {
-                        Point delta = Point::fromPx(sceneEvent->scenePos(),
-                                      editorUi()->graphicsView->getGridInterval())
-                                      - mMoveStartPoint;
-
-                        if (delta.getLength() != 0)
-                        {
-                            // move selected elements
-                            foreach (QGraphicsItem* item, schematic->selectedItems())
-                            {
-                                Point newPos = Point::fromPx(item->scenePos() + delta.toPxQPointF(),
-                                               editorUi()->graphicsView->getGridInterval());
-
-                                switch (item->type())
-                                {
-                                    case CADScene::Type_SchematicNetPoint:
-                                    {
-                                        SchematicNetPointGraphicsItem* i = qgraphicsitem_cast<SchematicNetPointGraphicsItem*>(item);
-                                        i->getNetPoint().setPosition(newPos);
-                                        break;
-                                    }
-
-                                    default:
-                                        break;
-                                }
-                            }
-
-                            mMoveStartPoint = mMoveStartPoint + delta;
-                        }
-                    }
+                    // switch back to the last command (previous state)
+                    nextState = mPreviousState;
+                    event->setAccepted(true);
                     break;
                 }
 
@@ -223,20 +238,112 @@ SchematicEditorState::State SES_Select::process(SchematicEditorEvent* event) noe
     return nextState;
 }
 
-void SES_Select::entry(State previousState) noexcept
+SchematicEditorState::State SES_Select::processSubStateMoving(SchematicEditorEvent* event) noexcept
 {
-    mPreviousState = previousState;
+    SchematicEditorState::State nextState = State_Select;
 
-    editorUi()->actionToolSelect->setCheckable(true);
-    editorUi()->actionToolSelect->setChecked(true);
+    switch (event->getType())
+    {
+        case SchematicEditorEvent::SchematicSceneEvent:
+            nextState = processSubStateMovingSceneEvent(event);
+            break;
+
+        default:
+            break;
+    }
+
+    return nextState;
 }
 
-void SES_Select::exit(State nextState) noexcept
+SchematicEditorState::State SES_Select::processSubStateMovingSceneEvent(SchematicEditorEvent* event) noexcept
 {
-    Q_UNUSED(nextState);
+    SchematicEditorState::State nextState = State_Select;
+    QEvent* qevent = dynamic_cast<SEE_RedirectedQEvent*>(event)->getQEvent();
+    Q_CHECK_PTR(qevent);
 
-    editorUi()->actionToolSelect->setCheckable(false);
-    editorUi()->actionToolSelect->setChecked(false);
+    // Always accept graphics scene events, even if we do not react on some of the events!
+    // This will give us the full control over the graphics scene. Otherwise, the graphics
+    // scene can react on some events and disturb our state machine.
+    event->setAccepted(true);
+
+    switch (qevent->type())
+    {
+        case QEvent::GraphicsSceneMouseRelease:
+        {
+            QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
+            Schematic* schematic = mProject.getSchematicByIndex(editorActiveSchematicIndex());
+            Q_CHECK_PTR(sceneEvent); if (!sceneEvent) break;
+            Q_CHECK_PTR(schematic); if (!schematic) break;
+            Point delta = Point::fromPx(sceneEvent->scenePos()) - mMoveStartPos;
+            delta.mapToGrid(editorUi()->graphicsView->getGridInterval());
+
+            switch (sceneEvent->button())
+            {
+                case Qt::LeftButton: // stop moving items
+                {
+                    Q_CHECK_PTR(mParentCommand);
+                    Q_ASSERT(!mSymbolInstanceMoveCommands.isEmpty());
+
+                    // move selected elements
+                    foreach (CmdSymbolInstanceMove* cmd, mSymbolInstanceMoveCommands)
+                        cmd->setDeltaToStartPosTemporary(delta);
+
+                    // set position of all selected elements permanent
+                    try
+                    {
+                        if (delta.isOrigin())
+                        {
+                            // items were not moved, do not execute the commands
+                            delete mParentCommand; // this will also delete all objects in mSymbolInstanceMoveCommands
+                        }
+                        else
+                        {
+                            // items were moved, add commands to the project's undo stack
+                            mProject.getUndoStack().execCmd(mParentCommand); // can throw an exception
+                        }
+                        mSymbolInstanceMoveCommands.clear();
+                        mParentCommand = 0;
+                        mSubState = SubState_Idle;
+                    }
+                    catch (Exception& e)
+                    {
+                        // stay in the substate SubState_Moving
+                    }
+                    break;
+                }
+
+                default:
+                    break;
+            }
+            break;
+        }
+
+        case QEvent::GraphicsSceneMouseMove:
+        {
+            QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
+            Schematic* schematic = mProject.getSchematicByIndex(editorActiveSchematicIndex());
+            Q_CHECK_PTR(sceneEvent); if (!sceneEvent) break;
+            Q_CHECK_PTR(schematic); if (!schematic) break;
+            Q_CHECK_PTR(mParentCommand);
+            Q_ASSERT(!mSymbolInstanceMoveCommands.isEmpty());
+
+            // get delta position
+            Point delta = Point::fromPx(sceneEvent->scenePos()) - mMoveStartPos;
+            delta.mapToGrid(editorUi()->graphicsView->getGridInterval());
+            if (delta == mLastMouseMoveDeltaPos) break; // do not move any items
+
+            // move selected elements
+            foreach (CmdSymbolInstanceMove* cmd, mSymbolInstanceMoveCommands)
+                cmd->setDeltaToStartPosTemporary(delta);
+            mLastMouseMoveDeltaPos = delta;
+            break;
+        }
+
+        default:
+            break;
+    }
+
+    return nextState;
 }
 
 /*****************************************************************************************

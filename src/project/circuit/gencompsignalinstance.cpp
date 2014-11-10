@@ -24,6 +24,7 @@
 #include "genericcomponentinstance.h"
 #include "circuit.h"
 #include "netsignal.h"
+#include "../../library/genericcomponent.h"
 
 namespace project {
 
@@ -31,23 +32,24 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-GenCompSignalInstance::GenCompSignalInstance(GenericComponentInstance& genCompInstance,
+GenCompSignalInstance::GenCompSignalInstance(Circuit& circuit,
+                                             GenericComponentInstance& genCompInstance,
                                              const QDomElement& domElement) throw (Exception) :
-    QObject(0), mGenCompInstance(genCompInstance), mDomElement(domElement), mNetSignal(0),
-    mAddedToCircuit(false)
+    QObject(0), mCircuit(circuit), mGenCompInstance(genCompInstance), mDomElement(domElement),
+    mGenCompSignal(0), mNetSignal(0), mAddedToCircuit(false)
 {
-    mCompSignalUuid = mDomElement.attribute("comp_signal");
-    if(mCompSignalUuid.isNull())
+    QString genCompSignalUuid = mDomElement.attribute("comp_signal");
+    mGenCompSignal = mGenCompInstance.getGenComp().getSignalByUuid(genCompSignalUuid);
+    if(!mGenCompSignal)
     {
-        throw RuntimeError(__FILE__, __LINE__, mDomElement.attribute("comp_signal"),
-            QString(tr("Invalid component signal UUID: \"%1\""))
-            .arg(mDomElement.attribute("comp_signal")));
+        throw RuntimeError(__FILE__, __LINE__, genCompSignalUuid, QString(
+            tr("Invalid component signal UUID: \"%1\"")).arg(genCompSignalUuid));
     }
 
     QString netsignalUuid = mDomElement.attribute("netsignal");
     if (!netsignalUuid.isEmpty())
     {
-        mNetSignal = mGenCompInstance.getCircuit().getNetSignalByUuid(netsignalUuid);
+        mNetSignal = mCircuit.getNetSignalByUuid(netsignalUuid);
         if(!mNetSignal)
         {
             throw RuntimeError(__FILE__, __LINE__, netsignalUuid,
@@ -58,24 +60,77 @@ GenCompSignalInstance::GenCompSignalInstance(GenericComponentInstance& genCompIn
 
 GenCompSignalInstance::~GenCompSignalInstance() noexcept
 {
-    if (mAddedToCircuit)
-        qWarning() << "generic component signal instance is still added to circuit!";
+    Q_ASSERT(!mAddedToCircuit);
+    Q_ASSERT(mSymbolPinInstances.isEmpty());
+}
+
+/*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
+
+void GenCompSignalInstance::setNetSignal(NetSignal* netsignal) throw (Exception)
+{
+    if (!mAddedToCircuit)
+        throw LogicError(__FILE__, __LINE__);
+
+    if (mNetSignal)
+        mNetSignal->unregisterGenCompSignal(this);
+
+    if (netsignal)
+        netsignal->registerGenCompSignal(this);
+
+    if (netsignal)
+        mDomElement.setAttribute("netsignal", netsignal->getUuid().toString());
+    else
+        mDomElement.setAttribute("netsignal", "");
+
+    mNetSignal = netsignal;
 }
 
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
-void GenCompSignalInstance::addToCircuit() noexcept
+void GenCompSignalInstance::registerSymbolPinInstance(SymbolPinInstance* pin) throw (Exception)
 {
+    Q_CHECK_PTR(pin);
+
+    if (!mAddedToCircuit)
+        throw LogicError(__FILE__, __LINE__);
+    if (mSymbolPinInstances.contains(pin))
+        throw LogicError(__FILE__, __LINE__);
+
+    mSymbolPinInstances.append(pin);
+}
+
+void GenCompSignalInstance::unregisterSymbolPinInstance(SymbolPinInstance* pin) throw (Exception)
+{
+    Q_CHECK_PTR(pin);
+
+    if (!mAddedToCircuit)
+        throw LogicError(__FILE__, __LINE__);
+    if (!mSymbolPinInstances.contains(pin))
+        throw LogicError(__FILE__, __LINE__);
+
+    mSymbolPinInstances.removeAll(pin);
+}
+
+void GenCompSignalInstance::addToCircuit() throw (Exception)
+{
+    if (!mSymbolPinInstances.isEmpty())
+        throw LogicError(__FILE__, __LINE__);
+
     if (mNetSignal)
         mNetSignal->registerGenCompSignal(this);
 
     mAddedToCircuit = true;
 }
 
-void GenCompSignalInstance::removeFromCircuit() noexcept
+void GenCompSignalInstance::removeFromCircuit() throw (Exception)
 {
+    if (!mSymbolPinInstances.isEmpty())
+        throw LogicError(__FILE__, __LINE__);
+
     if (mNetSignal)
         mNetSignal->unregisterGenCompSignal(this);
 
