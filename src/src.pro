@@ -143,6 +143,8 @@ SOURCES += \
     library/symbolpin.cpp \
     library/symbolpolygon.cpp \
     library/symboltext.cpp \
+    library/symbolgraphicsitem.cpp \
+    library/symbolpingraphicsitem.cpp \
     common/version.cpp \
     workspace/settings/items/wsi_librarynormorder.cpp
 
@@ -233,6 +235,8 @@ HEADERS += \
     library/symbolpin.h \
     library/symbolpolygon.h \
     library/symboltext.h \
+    library/symbolgraphicsitem.h \
+    library/symbolpingraphicsitem.h \
     common/version.h \
     workspace/settings/items/wsi_librarynormorder.h
 
