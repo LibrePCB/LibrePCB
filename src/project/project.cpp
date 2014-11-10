@@ -161,13 +161,7 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
         mCircuit = new Circuit(*this, mIsRestored, create);
 
         // Load all schematic layers
-        QList<unsigned int> schematicLayerIds;
-        schematicLayerIds << SchematicLayer::OriginCrosses
-            << SchematicLayer::SymbolOutlines << SchematicLayer::SymbolPinCircles
-            << SchematicLayer::SymbolPinNames << SchematicLayer::ComponentNames
-            << SchematicLayer::ComponentValues << SchematicLayer::Nets
-            << SchematicLayer::Busses;
-        foreach (unsigned int id, schematicLayerIds)
+        foreach (unsigned int id, SchematicLayer::getAllLayerIDs())
             mSchematicLayers.insert(id, new SchematicLayer(id));
 
         // Load all schematics

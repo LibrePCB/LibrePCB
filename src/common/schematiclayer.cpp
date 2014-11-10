@@ -130,5 +130,19 @@ const QColor& SchematicLayer::getFillColor(bool highlighted) const
 }
 
 /*****************************************************************************************
+ *  Static Methods
+ ****************************************************************************************/
+
+QList<SchematicLayer::LayerID> SchematicLayer::getAllLayerIDs() noexcept
+{
+    QList<LayerID> IDs;
+    IDs << SchematicLayer::OriginCrosses    << SchematicLayer::SymbolOutlines
+        << SchematicLayer::SymbolPinCircles << SchematicLayer::SymbolPinNames
+        << SchematicLayer::ComponentNames   << SchematicLayer::ComponentValues
+        << SchematicLayer::Nets             << SchematicLayer::Busses;
+    return IDs;
+}
+
+/*****************************************************************************************
  *  End of File
  ****************************************************************************************/

@@ -75,6 +75,10 @@ class SchematicLayer final : public QObject
         const QColor& getColor(bool highlighted = false) const;
         const QColor& getFillColor(bool highlighted = false) const;
 
+        // Static Methods
+        static QList<LayerID> getAllLayerIDs() noexcept;
+
+
     private:
 
         // make some methods inaccessible...

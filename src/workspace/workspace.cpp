@@ -34,6 +34,7 @@
 #include "favoriteprojectsmodel.h"
 #include "controlpanel/controlpanel.h"
 #include "settings/workspacesettings.h"
+#include "../common/schematiclayer.h"
 
 using namespace library;
 using namespace project;
@@ -108,6 +109,10 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
 
         // all OK, let's load the workspace stuff!
 
+        // Load all schematic layers
+        foreach (unsigned int id, SchematicLayer::getAllLayerIDs())
+            mSchematicLayers.insert(id, new SchematicLayer(id));
+
         mWorkspaceSettings = new WorkspaceSettings();
         mRecentProjectsModel = new RecentProjectsModel();
         mFavoriteProjectsModel = new FavoriteProjectsModel();
@@ -126,6 +131,7 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
         delete mFavoriteProjectsModel;  mFavoriteProjectsModel = 0;
         delete mRecentProjectsModel;    mRecentProjectsModel = 0;
         delete mWorkspaceSettings;      mWorkspaceSettings = 0;
+        qDeleteAll(mSchematicLayers);   mSchematicLayers.clear();
 
         sInstance = 0;
         throw;
@@ -143,6 +149,7 @@ Workspace::~Workspace()
     delete mFavoriteProjectsModel;  mFavoriteProjectsModel = 0;
     delete mRecentProjectsModel;    mRecentProjectsModel = 0;
     delete mWorkspaceSettings;      mWorkspaceSettings = 0;
+    qDeleteAll(mSchematicLayers);   mSchematicLayers.clear();
 
     sInstance = 0;
 }

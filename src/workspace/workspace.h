@@ -38,6 +38,7 @@ class ProjectTreeModel;
 class RecentProjectsModel;
 class FavoriteProjectsModel;
 class WorkspaceSettings;
+class SchematicLayer;
 
 namespace library{
 class Library;
@@ -124,6 +125,23 @@ class Workspace final : public QObject
          */
         library::Library& getLibrary() const {return *mLibrary;}
 
+        /**
+         * @brief Get all Schematic Layers
+         *
+         * @return A reference to the QHash with all schematic layers
+         */
+        const QHash<unsigned int, SchematicLayer*>& getSchematicLayers() const noexcept {return mSchematicLayers;}
+
+        /**
+         * @brief Get a Schematic Layer with a specific ID
+         *
+         * @param id    The ID of the layer
+         *
+         * @return  A pointer to the SchematicLayer object, or NULL if there is no layer
+         *          with the specified ID
+         */
+        SchematicLayer* getSchematicLayer(unsigned int id) const noexcept {return mSchematicLayers.value(id, 0);}
+
 
         // Project Management
         project::Project* createProject(const FilePath& filepath) noexcept;
@@ -181,6 +199,7 @@ class Workspace final : public QObject
         QHash<QString, project::Project*> mOpenProjects; ///< a list of all open projects
         RecentProjectsModel* mRecentProjectsModel; ///< a list model of all recent projects
         FavoriteProjectsModel* mFavoriteProjectsModel; ///< a list model of all favorite projects
+        QHash<unsigned int, SchematicLayer*> mSchematicLayers; ///< all workspace schematic layers
 
         // static variables
         static Workspace* sInstance;
