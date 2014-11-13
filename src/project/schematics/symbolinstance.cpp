@@ -186,6 +186,12 @@ SymbolInstance* SymbolInstance::create(Schematic& schematic, QDomDocument& doc,
     node.setAttribute("uuid", QUuid::createUuid().toString()); // generate random UUID
     node.setAttribute("gen_comp_instance", genCompInstance.toString());
     node.setAttribute("symbol_item", symbolItem.toString());
+    QDomElement posNode = doc.createElement("position");
+    posNode.setAttribute("x", "0");
+    posNode.setAttribute("y", "0");
+    posNode.setAttribute("angle", "0");
+    posNode.setAttribute("mirror", "false");
+    node.appendChild(posNode);
 
     // create and return the new SymbolInstance object
     return new SymbolInstance(schematic, node);

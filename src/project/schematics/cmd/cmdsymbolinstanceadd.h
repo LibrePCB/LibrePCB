@@ -17,85 +17,60 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SES_ADDCOMPONENTS_H
-#define PROJECT_SES_ADDCOMPONENTS_H
+#ifndef PROJECT_CMDSYMBOLINSTANCEADD_H
+#define PROJECT_CMDSYMBOLINSTANCEADD_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include "schematiceditorstate.h"
+#include "../../../common/undocommand.h"
+#include "../../../common/exceptions.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
-namespace library {
-class GenericComponent;
-class GenCompSymbVar;
-class GenCompSymbVarItem;
-}
-
 namespace project {
+class Schematic;
 class GenericComponentInstance;
 class SymbolInstance;
-class CmdSymbolInstanceMove;
 }
 
 /*****************************************************************************************
- *  Class SES_AddComponents
+ *  Class CmdSymbolInstanceAdd
  ****************************************************************************************/
 
 namespace project {
 
-
 /**
- * @brief The SES_AddComponents class
+ * @brief The CmdSymbolInstanceAdd class
  */
-class SES_AddComponents final : public SchematicEditorState
+class CmdSymbolInstanceAdd final : public UndoCommand
 {
-        Q_OBJECT
-
     public:
 
         // Constructors / Destructor
-        explicit SES_AddComponents(SchematicEditor& editor);
-        ~SES_AddComponents();
+        explicit CmdSymbolInstanceAdd(Schematic& schematic, GenericComponentInstance& genComp,
+                                      const QUuid& symbolItem, UndoCommand* parent = 0) throw (Exception);
+        ~CmdSymbolInstanceAdd() noexcept;
 
-        // General Methods
-        State process(SchematicEditorEvent* event) noexcept;
-        void entry(State previousState) noexcept;
-        void exit(State nextState) noexcept;
+        // Getters
+        SymbolInstance* getSymbolInstance() const noexcept {return mSymbolInstance;}
 
+        // Inherited from UndoCommand
+        void redo() throw (Exception) override;
+        void undo() throw (Exception) override;
 
     private:
 
-        // Private Methods
-        State processSubStateIdle(SchematicEditorEvent* event) noexcept;
-        State processSubStateAdding(SchematicEditorEvent* event) noexcept;
-        State processSubStateAddingSceneEvent(SchematicEditorEvent* event) noexcept;
-
-
-        // Attributes
-
-        enum SubState_t {
-            SubState_Idle,
-            SubState_Adding
-        };
-
-        SubState_t mSubState;
-        State mPreviousState;
-        bool mUndoCommandActive;
-
-        // information about the current symbol to place
-        const library::GenericComponent* mGenComp;
-        const library::GenCompSymbVar* mGenCompSymbVar;
-        const library::GenCompSymbVarItem* mCurrentSymbVarItem;
-        SymbolInstance* mCurrentSymbolToPlace;
-        CmdSymbolInstanceMove* mCurrentSymboleMoveCommand;
+        Schematic& mSchematic;
+        GenericComponentInstance& mGenCompInstance;
+        QUuid mSymbolItemUuid;
+        SymbolInstance* mSymbolInstance;
 };
 
 } // namespace project
 
-#endif // PROJECT_SES_ADDCOMPONENTS_H
+#endif // PROJECT_CMDSYMBOLINSTANCEADD_H

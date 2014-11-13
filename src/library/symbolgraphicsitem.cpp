@@ -168,12 +168,19 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
         else if (text->getAlign() & Qt::AlignBottom)
             textRect = QRectF(text->getPosition().toPxQPointF().x()/factor, text->getPosition().toPxQPointF().y()/factor-0.1*text->getHeight().toPx()/factor, 0, 0);
 
+        QString textStr = text->getText();
+        if (mSymbolInstance)
+        {
+            if (textStr == "${NAME}") // TODO: this is only a test...
+                textStr = mSymbolInstance->getGenCompInstance().getName();
+        }
+
         // draw text
         painter->save();
         painter->scale(factor, factor);
         painter->setFont(font);
         painter->drawText(textRect, text->getAlign() | Qt::TextSingleLine | Qt::TextDontClip,
-                          text->getText(), &textRect);
+                          textStr, &textRect);
         painter->restore();
     }
 
@@ -184,7 +191,7 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
         if (layer)
         {
             unsigned int count = mSymbolInstance->getGenCompInstance().getUsedSymbolsCount();
-            unsigned int maxCount = mSymbolInstance->getGenCompInstance().getSymbolVariant().getSymbolItems().count();
+            unsigned int maxCount = mSymbolInstance->getGenCompInstance().getSymbolVariant().getItems().count();
             QFont font;
             font.setFamily("Monospace");
             font.setPixelSize(3);

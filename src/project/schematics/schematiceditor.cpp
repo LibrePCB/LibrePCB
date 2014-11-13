@@ -110,6 +110,8 @@ SchematicEditor::SchematicEditor(Project& project) :
                      mUi->actionToolDrawWire->setChecked(mUi->actionToolDrawWire->isCheckable());});
     connect(mUi->actionToolAddComponent, &QAction::triggered,
             [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::StartAddComponent), true);
+                     mFsm->processEvent(new SEE_SetAddComponentParams("{60000002-3c94-4689-be29-92235ba993c5}",
+                                                                      "{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}"), true);
                      mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());});
 
     // connect the "command" toolbar with the state machine

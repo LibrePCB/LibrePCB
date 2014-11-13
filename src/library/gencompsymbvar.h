@@ -67,9 +67,9 @@ class GenCompSymbVar final : public QObject
         const QHash<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
 
         // Getters: Symbol Items
-        const QHash<QUuid, const GenCompSymbVarItem*>& getSymbolItems() const noexcept {return mSymbolItems;}
+        const QHash<QUuid, const GenCompSymbVarItem*>& getItems() const noexcept {return mSymbolItems;}
         const GenCompSymbVarItem* getItemByUuid(const QUuid& uuid) const noexcept {return mSymbolItems.value(uuid, 0);}
-
+        const GenCompSymbVarItem* getItemByAddOrderIndex(unsigned int index) const noexcept;
 
     private:
 

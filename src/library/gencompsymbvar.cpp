@@ -76,6 +76,8 @@ GenCompSymbVar::GenCompSymbVar(GenericComponent& genComp,
                 QString(tr("The symbol variant \"%1\" in \"%2\" has no symbol items defined."))
                 .arg(mUuid.toString(), mGenericComponent.getXmlFilepath().toNative()));
         }
+
+        // TODO: check if the add order index is starting from 0, has no duplicates and so on...
     }
     catch (Exception& e)
     {
@@ -101,6 +103,16 @@ QString GenCompSymbVar::getName(const QString& locale) const noexcept
 QString GenCompSymbVar::getDescription(const QString& locale) const noexcept
 {
     return LibraryBaseElement::localeStringFromList(mDescriptions, locale);
+}
+
+const GenCompSymbVarItem* GenCompSymbVar::getItemByAddOrderIndex(unsigned int index) const noexcept
+{
+    foreach (const GenCompSymbVarItem* item, mSymbolItems)
+    {
+        if (item->getAddOrderIndex() == static_cast<int>(index))
+            return item;
+    }
+    return 0;
 }
 
 /*****************************************************************************************

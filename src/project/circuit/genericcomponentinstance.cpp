@@ -239,6 +239,43 @@ GenericComponentInstance* GenericComponentInstance::create(Circuit& circuit,
     node.setAttribute("name", name);
     node.setAttribute("generic_component", genericComponent.toString());
     node.setAttribute("symbol_variant", symbolVariant.toString());
+    QDomElement signalMapNode = doc.createElement("signal_mapping");
+
+    // TODO: add signals dynamically...
+
+    QDomElement todo1 = doc.createElement("map");
+    todo1.setAttribute("comp_signal", "{71a44db9-5e42-405f-b6e4-b4725ae37af3}");
+    signalMapNode.appendChild(todo1);
+
+    QDomElement todo2 = doc.createElement("map");
+    todo2.setAttribute("comp_signal", "{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}");
+    signalMapNode.appendChild(todo2);
+
+    QDomElement todo3 = doc.createElement("map");
+    todo3.setAttribute("comp_signal", "{a9d3d159-fca9-417e-8bba-13829caa6ae5}");
+    signalMapNode.appendChild(todo3);
+
+    QDomElement todo4 = doc.createElement("map");
+    todo4.setAttribute("comp_signal", "{da30b112-9ab0-4715-8a6a-9e5414169fd4}");
+    signalMapNode.appendChild(todo4);
+
+    QDomElement todo5 = doc.createElement("map");
+    todo5.setAttribute("comp_signal", "{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}");
+    signalMapNode.appendChild(todo5);
+
+    QDomElement todo6 = doc.createElement("map");
+    todo6.setAttribute("comp_signal", "{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}");
+    signalMapNode.appendChild(todo6);
+
+    QDomElement todo7 = doc.createElement("map");
+    todo7.setAttribute("comp_signal", "{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}");
+    signalMapNode.appendChild(todo7);
+
+    QDomElement todo8 = doc.createElement("map");
+    todo8.setAttribute("comp_signal", "{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}");
+    signalMapNode.appendChild(todo8);
+
+    node.appendChild(signalMapNode);
 
     // create and return the new GenericComponentInstance object
     return new GenericComponentInstance(circuit, node);

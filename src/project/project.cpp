@@ -507,6 +507,12 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
 
+    if (mUndoStack->isCommandActive())
+    {
+        errors.append(tr("A command is active at the moment."));
+        return false;
+    }
+
     // Save *.e4u project file
     try
     {

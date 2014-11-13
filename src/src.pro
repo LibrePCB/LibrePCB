@@ -148,7 +148,9 @@ SOURCES += \
     library/symbolpingraphicsitem.cpp \
     common/version.cpp \
     workspace/settings/items/wsi_librarynormorder.cpp \
-    project/schematics/cmd/cmdsymbolinstancemove.cpp
+    project/schematics/cmd/cmdsymbolinstancemove.cpp \
+    project/circuit/cmd/cmdgencompinstanceadd.cpp \
+    project/schematics/cmd/cmdsymbolinstanceadd.cpp
 
 HEADERS += \
     common/units.h \
@@ -242,7 +244,9 @@ HEADERS += \
     library/symbolpingraphicsitem.h \
     common/version.h \
     workspace/settings/items/wsi_librarynormorder.h \
-    project/schematics/cmd/cmdsymbolinstancemove.h
+    project/schematics/cmd/cmdsymbolinstancemove.h \
+    project/circuit/cmd/cmdgencompinstanceadd.h \
+    project/schematics/cmd/cmdsymbolinstanceadd.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \

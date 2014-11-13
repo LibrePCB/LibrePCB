@@ -53,7 +53,9 @@ class SchematicEditorEvent
             StartDrawWire,
             StartAddComponent,
             // Redirected QEvent's (SEE_RedirectedQEvent objects)
-            SchematicSceneEvent
+            SchematicSceneEvent,
+            // Special Events
+            SetAddComponentParams, ///< @see project#SEE_SetAddComponentParams
         };
 
         // Constructors / Destructor
@@ -78,7 +80,7 @@ class SchematicEditorEvent
  ****************************************************************************************/
 
 /**
- * @brief The SchematicEditorEvent class
+ * @brief The SEE_RedirectedQEvent class
  */
 class SEE_RedirectedQEvent : public SchematicEditorEvent
 {
@@ -102,6 +104,35 @@ class SEE_RedirectedQEvent : public SchematicEditorEvent
     private:
 
         QEvent* mQEvent;
+};
+
+/*****************************************************************************************
+ *  Class SEE_SetAddComponentParams
+ ****************************************************************************************/
+
+/**
+ * @brief The SEE_SetAddComponentParams class
+ *
+ * @see project#SES_AddComponents
+ */
+class SEE_SetAddComponentParams : public SchematicEditorEvent
+{
+    public:
+
+        // Constructors / Destructor
+        SEE_SetAddComponentParams(const QUuid& genComp, const QUuid& symbVar) :
+            SchematicEditorEvent(SetAddComponentParams),
+            mGenCompUuid(genComp), mSymbVarUuid(symbVar) {}
+        virtual ~SEE_SetAddComponentParams() {}
+
+        // Getters
+        const QUuid& getGenCompUuid() const noexcept {return mGenCompUuid;}
+        const QUuid& getSymbVarUuid() const noexcept {return mSymbVarUuid;}
+
+    private:
+
+        QUuid mGenCompUuid;
+        QUuid mSymbVarUuid;
 };
 
 } // namespace project
