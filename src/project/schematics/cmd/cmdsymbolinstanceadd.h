@@ -25,6 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include "../../../common/units.h"
 #include "../../../common/undocommand.h"
 #include "../../../common/exceptions.h"
 
@@ -53,7 +54,9 @@ class CmdSymbolInstanceAdd final : public UndoCommand
 
         // Constructors / Destructor
         explicit CmdSymbolInstanceAdd(Schematic& schematic, GenericComponentInstance& genComp,
-                                      const QUuid& symbolItem, UndoCommand* parent = 0) throw (Exception);
+                                      const QUuid& symbolItem, const Point& position = Point(),
+                                      const Angle& angle = Angle(), bool mirror = false,
+                                      UndoCommand* parent = 0) throw (Exception);
         ~CmdSymbolInstanceAdd() noexcept;
 
         // Getters
@@ -65,9 +68,15 @@ class CmdSymbolInstanceAdd final : public UndoCommand
 
     private:
 
+        // Attributes from the constructor
         Schematic& mSchematic;
         GenericComponentInstance& mGenCompInstance;
         QUuid mSymbolItemUuid;
+        Point mPosition;
+        Angle mAngle;
+        bool mMirror;
+
+        /// @brief The created symbol instance
         SymbolInstance* mSymbolInstance;
 };
 

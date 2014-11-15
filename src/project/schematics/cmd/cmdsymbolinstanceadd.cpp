@@ -34,11 +34,14 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSymbolInstanceAdd::CmdSymbolInstanceAdd(Schematic& schematic, GenericComponentInstance& genComp,
-                                           const QUuid& symbolItem, UndoCommand* parent) throw (Exception) :
+CmdSymbolInstanceAdd::CmdSymbolInstanceAdd(Schematic& schematic,
+                                           GenericComponentInstance& genComp,
+                                           const QUuid& symbolItem, const Point& position,
+                                           const Angle& angle, bool mirror,
+                                           UndoCommand* parent) throw (Exception) :
     UndoCommand(QCoreApplication::translate("CmdSymbolInstanceAdd", "Add symbol instance"), parent),
     mSchematic(schematic), mGenCompInstance(genComp), mSymbolItemUuid(symbolItem),
-    mSymbolInstance(0)
+    mPosition(position), mAngle(angle), mMirror(mirror), mSymbolInstance(0)
 {
 }
 
@@ -55,7 +58,10 @@ CmdSymbolInstanceAdd::~CmdSymbolInstanceAdd() noexcept
 void CmdSymbolInstanceAdd::redo() throw (Exception)
 {
     if (!mSymbolInstance) // only the first time
-        mSymbolInstance = mSchematic.createSymbol(mGenCompInstance.getUuid(), mSymbolItemUuid); // throws an exception on error
+    {
+        mSymbolInstance = mSchematic.createSymbol(mGenCompInstance.getUuid(), mSymbolItemUuid,
+                                                  mPosition, mAngle, mMirror); // throws an exception on error
+    }
 
     mSchematic.addSymbol(mSymbolInstance); // throws an exception on error
 

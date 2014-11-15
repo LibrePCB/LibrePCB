@@ -33,6 +33,8 @@
 #include "../cmd/cmdsymbolinstanceadd.h"
 #include "../../circuit/genericcomponentinstance.h"
 #include "../cmd/cmdsymbolinstancemove.h"
+#include "../symbolinstance.h"
+#include "../schematic.h"
 
 namespace project {
 
@@ -132,13 +134,19 @@ SchematicEditorState::State SES_AddComponents::processSubStateIdle(SchematicEdit
         {
             try
             {
-                // start adding the selected component
+                // start adding the specified component
 
                 Q_ASSERT(!mUndoCommandActive);
                 SEE_SetAddComponentParams* e = dynamic_cast<SEE_SetAddComponentParams*>(event);
                 Schematic* schematic = mProject.getSchematicByIndex(editorActiveSchematicIndex());
                 Q_CHECK_PTR(e);
                 Q_CHECK_PTR(schematic);
+
+                // get the scene position where the new symbol should be placed
+                QPoint cursorPos = editorUi()->graphicsView->mapFromGlobal(QCursor::pos());
+                QPoint boundedCursorPos = QPoint(qBound(0, cursorPos.x(), editorUi()->graphicsView->width()),
+                                                 qBound(0, cursorPos.y(), editorUi()->graphicsView->height()));
+                Point p = Point::fromPx(editorUi()->graphicsView->mapToScene(boundedCursorPos)); // TODO
 
                 // search the generic component in the library
                 Q_ASSERT(!e->getGenCompUuid().isNull());
@@ -160,12 +168,12 @@ SchematicEditorState::State SES_AddComponents::processSubStateIdle(SchematicEdit
                 }
 
                 // start a new command
-                mProject.getUndoStack().beginCommand(tr("Add Generic Component"));
+                mProject.getUndoStack().beginCommand(tr("Add Generic Component to Schematic"));
                 mUndoCommandActive = true;
 
                 // create a new generic component instance and add it to the circuit
-                CmdGenCompInstanceAdd* cmd = new CmdGenCompInstanceAdd(mCircuit,
-                                                 mGenComp->getUuid(), mGenCompSymbVar->getUuid());
+                CmdGenCompInstanceAdd* cmd = new CmdGenCompInstanceAdd(mCircuit, *mGenComp,
+                                                                       *mGenCompSymbVar);
                 mProject.getUndoStack().appendToCommand(cmd);
 
                 // create the first symbol instance and add it to the schematic
@@ -177,7 +185,7 @@ SchematicEditorState::State SES_AddComponents::processSubStateIdle(SchematicEdit
                                    "symbols.")).arg(e->getGenCompUuid().toString()));
                 }
                 CmdSymbolInstanceAdd* cmd2 = new CmdSymbolInstanceAdd(*schematic,
-                    *(cmd->getGenCompInstance()), mCurrentSymbVarItem->getUuid());
+                    *(cmd->getGenCompInstance()), mCurrentSymbVarItem->getUuid(), p);
                 mProject.getUndoStack().appendToCommand(cmd2);
                 mCurrentSymbolToPlace = cmd2->getSymbolInstance();
                 Q_CHECK_PTR(mCurrentSymbolToPlace);
@@ -281,7 +289,7 @@ SchematicEditorState::State SES_AddComponents::processSubStateAddingSceneEvent(S
 
             // set temporary position of the current symbol
             Q_CHECK_PTR(mCurrentSymboleMoveCommand);
-            mCurrentSymboleMoveCommand->setDeltaToStartPosTemporary(p);
+            mCurrentSymboleMoveCommand->setAbsolutePosTemporary(p);
             break;
         }
 
@@ -297,25 +305,45 @@ SchematicEditorState::State SES_AddComponents::processSubStateAddingSceneEvent(S
             {
                 case Qt::LeftButton:
                 {
-                    // place the symbol
                     try
                     {
                         // place the current symbol finally
-                        mCurrentSymboleMoveCommand->setDeltaToStartPosTemporary(p);
+                        mCurrentSymboleMoveCommand->setAbsolutePosTemporary(p);
                         mProject.getUndoStack().appendToCommand(mCurrentSymboleMoveCommand);
-
-                        // all symbols placed, finish the whole command
-                        mProject.getUndoStack().endCommand();
-                        mUndoCommandActive = false;
-
-                        // reset attributes, go back to idle state
-                        mGenComp = 0;
-                        mGenCompSymbVar = 0;
-                        mCurrentSymbVarItem = 0;
-                        mCurrentSymbolToPlace = 0;
                         mCurrentSymboleMoveCommand = 0;
-                        mSubState = SubState_Idle;
-                        nextState = mPreviousState;
+
+                        // check if there is a next symbol to add
+                        mCurrentSymbVarItem = mGenCompSymbVar->getItemByAddOrderIndex(
+                                              mCurrentSymbVarItem->getAddOrderIndex() + 1);
+
+                        if (mCurrentSymbVarItem)
+                        {
+                            // create the next symbol instance and add it to the schematic
+                            CmdSymbolInstanceAdd* cmd = new CmdSymbolInstanceAdd(*schematic,
+                                mCurrentSymbolToPlace->getGenCompInstance(),
+                                mCurrentSymbVarItem->getUuid(), p);
+                            mProject.getUndoStack().appendToCommand(cmd);
+                            mCurrentSymbolToPlace = cmd->getSymbolInstance();
+                            Q_CHECK_PTR(mCurrentSymbolToPlace);
+
+                            // add command to move the current symbol
+                            mCurrentSymboleMoveCommand = new CmdSymbolInstanceMove(*mCurrentSymbolToPlace);
+                        }
+                        else
+                        {
+                            // all symbols placed, finish the whole command
+                            mProject.getUndoStack().endCommand();
+                            mUndoCommandActive = false;
+
+                            // reset attributes, go back to idle state
+                            mGenComp = 0;
+                            mGenCompSymbVar = 0;
+                            mCurrentSymbVarItem = 0;
+                            mCurrentSymbolToPlace = 0;
+                            mCurrentSymboleMoveCommand = 0;
+                            mSubState = SubState_Idle;
+                            nextState = mPreviousState;
+                        }
                     }
                     catch (Exception& e)
                     {

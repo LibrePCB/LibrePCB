@@ -55,6 +55,7 @@ class CmdSymbolInstanceMove final : public UndoCommand
         ~CmdSymbolInstanceMove() noexcept;
 
         // General Methods
+        void setAbsolutePosTemporary(Point& absPos) noexcept;
         void setDeltaToStartPosTemporary(Point& deltaPos) noexcept;
 
         // Inherited from UndoCommand

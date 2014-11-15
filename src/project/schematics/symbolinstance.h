@@ -91,8 +91,9 @@ class SymbolInstance final : public QObject
 
         // Static Methods
         static SymbolInstance* create(Schematic& schematic, QDomDocument& doc,
-                                      const QUuid& genCompInstance,
-                                      const QUuid& symbolItem) throw (Exception);
+                                      const QUuid& genCompInstance, const QUuid& symbolItem,
+                                      const Point& position = Point(), const Angle& angle = Angle(),
+                                      bool mirror = false) throw (Exception);
 
     private:
 

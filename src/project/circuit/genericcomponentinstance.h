@@ -98,8 +98,8 @@ class GenericComponentInstance : public QObject
 
         // Static Methods
         static GenericComponentInstance* create(Circuit& circuit, QDomDocument& doc,
-                                                const QUuid& genericComponent,
-                                                const QUuid& symbolVariant,
+                                                const library::GenericComponent& genComp,
+                                                const library::GenCompSymbVar& symbVar,
                                                 const QString& name) throw (Exception);
 
 

@@ -146,10 +146,12 @@ SymbolInstance* Schematic::getSymbolByUuid(const QUuid& uuid) const noexcept
     return mSymbols.value(uuid, 0);
 }
 
-SymbolInstance* Schematic::createSymbol(const QUuid& genCompInstance,
-                                        const QUuid& symbolItem) throw (Exception)
+SymbolInstance* Schematic::createSymbol(const QUuid& genCompInstance, const QUuid& symbolItem,
+                                        const Point& position, const Angle& angle,
+                                        bool mirror) throw (Exception)
 {
-    return SymbolInstance::create(*this, mXmlFile->getDocument(), genCompInstance, symbolItem);
+    return SymbolInstance::create(*this, mXmlFile->getDocument(), genCompInstance,
+                                  symbolItem, position, angle, mirror);
 }
 
 void Schematic::addSymbol(SymbolInstance* symbol, bool toDomTree) throw (Exception)

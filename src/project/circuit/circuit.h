@@ -41,6 +41,11 @@ class NetSignal;
 class GenericComponentInstance;
 }
 
+namespace library {
+class GenericComponent;
+class GenCompSymbVar;
+}
+
 /*****************************************************************************************
  *  Class Circuit
  ****************************************************************************************/
@@ -87,8 +92,8 @@ class Circuit final : public QObject
         // GenericComponentInstance Methods
         GenericComponentInstance* getGenCompInstanceByUuid(const QUuid& uuid) const noexcept;
         GenericComponentInstance* getGenCompInstanceByName(const QString& name) const noexcept;
-        GenericComponentInstance* createGenCompInstance(const QUuid& genComp,
-                                                        const QUuid& symbolVariant,
+        GenericComponentInstance* createGenCompInstance(const library::GenericComponent& genComp,
+                                                        const library::GenCompSymbVar& symbVar,
                                                         const QString& name) throw (Exception);
         void addGenCompInstance(GenericComponentInstance* genCompInstance, bool toDomTree = true) throw (Exception);
         void removeGenCompInstance(GenericComponentInstance* genCompInstance, bool fromDomTree = true,

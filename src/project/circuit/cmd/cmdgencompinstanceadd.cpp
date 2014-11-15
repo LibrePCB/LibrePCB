@@ -32,26 +32,13 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdGenCompInstanceAdd::CmdGenCompInstanceAdd(Circuit& circuit, const QUuid& genComp,
-                                             const QUuid& symbVar, UndoCommand* parent) throw (Exception) :
+CmdGenCompInstanceAdd::CmdGenCompInstanceAdd(Circuit& circuit,
+                                             const library::GenericComponent& genComp,
+                                             const library::GenCompSymbVar& symbVar,
+                                             UndoCommand* parent) throw (Exception) :
     UndoCommand(QCoreApplication::translate("CmdGenCompInstanceAdd", "Add generic component"), parent),
-    mCircuit(circuit), mGenCompUuid(genComp), mSymbVarUuid(symbVar), mGenCompInstance(0)
+    mCircuit(circuit), mGenComp(genComp), mSymbVar(symbVar), mGenCompInstance(0)
 {
-    /*mGenComp = mProject.getLibrary().getGenericComponent(e->getGenCompUuid());
-    if (!mGenComp)
-    {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
-            QString(tr("The generic component with the UUID \"%1\" was not found "
-            "in the project's library.")).arg(e->getGenCompUuid().toString()));
-    }
-
-    mGenCompSymbVar = mGenComp->getSymbolVariantByUuid(e->getSymbVarUuid());
-    if (!mGenCompSymbVar)
-    {
-        throw RuntimeError(__FILE__, __LINE__, QString(), QString(tr("The symbol "
-            "variant with the UUID \"%1\" was not found in the generic component "
-            "\"%2\".")).arg(e->getSymbVarUuid().toString(), e->getGenCompUuid().toString()));
-    }*/
 }
 
 CmdGenCompInstanceAdd::~CmdGenCompInstanceAdd() noexcept
@@ -68,7 +55,7 @@ void CmdGenCompInstanceAdd::redo() throw (Exception)
 {
     if (!mGenCompInstance) // only the first time
     {
-        mGenCompInstance = mCircuit.createGenCompInstance(mGenCompUuid, mSymbVarUuid,
+        mGenCompInstance = mCircuit.createGenCompInstance(mGenComp, mSymbVar,
                            QString("TODO_%1").arg(qrand())); // throws an exception on error
     }
 

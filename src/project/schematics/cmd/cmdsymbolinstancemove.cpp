@@ -40,13 +40,20 @@ CmdSymbolInstanceMove::CmdSymbolInstanceMove(SymbolInstance& symbol, UndoCommand
 
 CmdSymbolInstanceMove::~CmdSymbolInstanceMove() noexcept
 {
-    if ((!mRedoOrUndoCalled) && (mDeltaPos != Point()))
+    if ((!mRedoOrUndoCalled) && (!mDeltaPos.isOrigin()))
         mSymbolInstance.setPosition(mStartPos, false);
 }
 
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
+
+void CmdSymbolInstanceMove::setAbsolutePosTemporary(Point& absPos) noexcept
+{
+    Q_ASSERT(mRedoOrUndoCalled == false);
+    mDeltaPos = absPos - mStartPos;
+    mSymbolInstance.setPosition(absPos, false);
+}
 
 void CmdSymbolInstanceMove::setDeltaToStartPosTemporary(Point& deltaPos) noexcept
 {

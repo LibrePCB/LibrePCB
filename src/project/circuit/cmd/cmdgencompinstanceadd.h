@@ -37,6 +37,11 @@ class Circuit;
 class GenericComponentInstance;
 }
 
+namespace library {
+class GenericComponent;
+class GenCompSymbVar;
+}
+
 /*****************************************************************************************
  *  Class CmdGenCompInstanceAdd
  ****************************************************************************************/
@@ -51,9 +56,10 @@ class CmdGenCompInstanceAdd final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit CmdGenCompInstanceAdd(Circuit& circuit, const QUuid& genComp,
-                                       const QUuid& symbVar, UndoCommand* parent = 0)
-                                       throw (Exception);
+        explicit CmdGenCompInstanceAdd(Circuit& circuit,
+                                       const library::GenericComponent& genComp,
+                                       const library::GenCompSymbVar& symbVar,
+                                       UndoCommand* parent = 0) throw (Exception);
         ~CmdGenCompInstanceAdd() noexcept;
 
         // Getters
@@ -65,9 +71,12 @@ class CmdGenCompInstanceAdd final : public UndoCommand
 
     private:
 
+        // Attributes from the constructor
         Circuit& mCircuit;
-        QUuid mGenCompUuid;
-        QUuid mSymbVarUuid;
+        const library::GenericComponent& mGenComp;
+        const library::GenCompSymbVar& mSymbVar;
+
+        /// @brief The created generic component instance
         GenericComponentInstance* mGenCompInstance;
 };
 

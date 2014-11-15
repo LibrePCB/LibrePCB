@@ -175,8 +175,9 @@ void SymbolInstance::removeFromSchematic(Schematic& schematic, bool removeNode,
  ****************************************************************************************/
 
 SymbolInstance* SymbolInstance::create(Schematic& schematic, QDomDocument& doc,
-                                       const QUuid& genCompInstance,
-                                       const QUuid& symbolItem) throw (Exception)
+                                       const QUuid& genCompInstance, const QUuid& symbolItem,
+                                       const Point& position, const Angle& angle,
+                                       bool mirror) throw (Exception)
 {
     QDomElement node = doc.createElement("symbol");
     if (node.isNull())
@@ -187,10 +188,10 @@ SymbolInstance* SymbolInstance::create(Schematic& schematic, QDomDocument& doc,
     node.setAttribute("gen_comp_instance", genCompInstance.toString());
     node.setAttribute("symbol_item", symbolItem.toString());
     QDomElement posNode = doc.createElement("position");
-    posNode.setAttribute("x", "0");
-    posNode.setAttribute("y", "0");
-    posNode.setAttribute("angle", "0");
-    posNode.setAttribute("mirror", "false");
+    posNode.setAttribute("x", position.getX().toMmString());
+    posNode.setAttribute("y", position.getY().toMmString());
+    posNode.setAttribute("angle", angle.toDegString());
+    posNode.setAttribute("mirror", mirror ? "true" : "false");
     node.appendChild(posNode);
 
     // create and return the new SymbolInstance object

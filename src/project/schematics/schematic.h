@@ -95,8 +95,9 @@ class Schematic final : public CADScene
 
         // SymbolInstance Methods
         SymbolInstance* getSymbolByUuid(const QUuid& uuid) const noexcept;
-        SymbolInstance* createSymbol(const QUuid& genCompInstance,
-                                     const QUuid& symbolItem) throw (Exception);
+        SymbolInstance* createSymbol(const QUuid& genCompInstance, const QUuid& symbolItem,
+                                     const Point& position = Point(), const Angle& angle = Angle(),
+                                     bool mirror = false) throw (Exception);
         void addSymbol(SymbolInstance* symbol, bool toDomTree = true) throw (Exception);
         void removeSymbol(SymbolInstance* symbol, bool fromDomTree = true,
                           bool deleteSymbol = false) throw (Exception);

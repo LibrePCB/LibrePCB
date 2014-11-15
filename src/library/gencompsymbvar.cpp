@@ -57,6 +57,7 @@ GenCompSymbVar::GenCompSymbVar(GenericComponent& genComp,
         LibraryBaseElement::readLocaleDomNodes(mGenericComponent.getXmlFilepath(), mDomElement, "description", mDescriptions);
 
         // Load all symbol variant items
+        QList<int> addOrderIndexes; // contains all add order indexes except -1
         tmpNode = mDomElement.firstChildElement("symbol_items").firstChildElement("item");
         while (!tmpNode.isNull())
         {
@@ -67,17 +68,40 @@ GenCompSymbVar::GenCompSymbVar(GenericComponent& genComp,
                     QString(tr("The symbol variant item \"%1\" exists multiple times in \"%2\"."))
                     .arg(item->getUuid().toString(), mGenericComponent.getXmlFilepath().toNative()));
             }
+            if (item->getAddOrderIndex() != -1)
+            {
+                if (addOrderIndexes.contains(item->getAddOrderIndex()))
+                {
+                    throw RuntimeError(__FILE__, __LINE__, item->getUuid().toString(),
+                        QString(tr("The symbol variant \"%1\" in \"%2\" has add order "
+                        "index duplicates.")).arg(mUuid.toString(),
+                        mGenericComponent.getXmlFilepath().toNative()));
+                }
+                else
+                    addOrderIndexes.append(item->getAddOrderIndex());
+            }
             mSymbolItems.insert(item->getUuid(), item);
             tmpNode = tmpNode.nextSiblingElement("item");
         }
-        if (mSymbolItems.isEmpty())
+        // check if there are symbol items with an add order index >= 0
+        if (addOrderIndexes.isEmpty())
         {
             throw RuntimeError(__FILE__, __LINE__, mGenericComponent.getXmlFilepath().toStr(),
-                QString(tr("The symbol variant \"%1\" in \"%2\" has no symbol items defined."))
-                .arg(mUuid.toString(), mGenericComponent.getXmlFilepath().toNative()));
+                QString(tr("The symbol variant \"%1\" in \"%2\" has no symbol items with "
+                "an add order index >= 0 defined.")).arg(mUuid.toString(),
+                mGenericComponent.getXmlFilepath().toNative()));
         }
-
-        // TODO: check if the add order index is starting from 0, has no duplicates and so on...
+        // check if there are no unused add order indexes in between all indexes
+        qSort(addOrderIndexes);
+        for (int i = 0; i < addOrderIndexes.count(); i++)
+        {
+            if (addOrderIndexes[i] != i)
+            {
+                throw RuntimeError(__FILE__, __LINE__, mUuid.toString(), QString(tr(
+                    "The symbol variant \"%1\" in \"%2\" has invalid add order indexes."))
+                    .arg(mUuid.toString(), mGenericComponent.getXmlFilepath().toNative()));
+            }
+        }
     }
     catch (Exception& e)
     {
