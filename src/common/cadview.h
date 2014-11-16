@@ -60,6 +60,7 @@ class CADView : public QGraphicsView
 
         // Getters
         CADScene*           getCadScene()           const;
+        QRectF              getVisibleSceneRect()   const;
         GridType            getGridType()           const {return mGridType;}
         const QColor&       getGridColor()          const {return mGridColor;}
         const Length&       getGridInterval()       const {return mGridInterval;}
@@ -67,6 +68,7 @@ class CADView : public QGraphicsView
 
         // Setters
         void setCadScene(CADScene* scene); ///< Use always this method instead of QGraphicsView::setScene()!
+        void setVisibleSceneRect(const QRectF& rect);
         void setGridType(GridType type);
         void setGridColor(const QColor& color);
         void setGridInterval(const Length& newInterval);

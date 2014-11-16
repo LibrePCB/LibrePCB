@@ -72,6 +72,11 @@ CADScene* CADView::getCadScene() const
     return dynamic_cast<CADScene*>(scene());
 }
 
+QRectF CADView::getVisibleSceneRect() const
+{
+    return mapToScene(viewport()->rect()).boundingRect();
+}
+
 /*****************************************************************************************
  *  Setters
  ****************************************************************************************/
@@ -80,6 +85,11 @@ void CADView::setCadScene(CADScene* scene)
 {
     setScene(scene);
     updatePositionLabelText();
+}
+
+void CADView::setVisibleSceneRect(const QRectF& rect)
+{
+    fitInView(rect, Qt::KeepAspectRatio);
 }
 
 void CADView::setGridType(GridType type)
