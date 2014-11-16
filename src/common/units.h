@@ -928,6 +928,8 @@ class Angle
 
         // Operators
         Angle&  operator=(const Angle& rhs)         {mMicrodegrees = rhs.mMicrodegrees; return *this;}
+        Angle&  operator+=(const Angle& rhs)        {mMicrodegrees = (mMicrodegrees + rhs.mMicrodegrees) % 360000000; return *this;}
+        Angle&  operator-=(const Angle& rhs)        {mMicrodegrees = (mMicrodegrees - rhs.mMicrodegrees) % 360000000; return *this;}
         Angle   operator+(const Angle& rhs) const   {return Angle(mMicrodegrees + rhs.mMicrodegrees);}
         Angle   operator-(const Angle& rhs) const   {return Angle(mMicrodegrees - rhs.mMicrodegrees);}
         Angle   operator*(const Angle& rhs) const   {return Angle(mMicrodegrees * rhs.mMicrodegrees);}
