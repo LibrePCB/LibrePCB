@@ -190,7 +190,7 @@ void XmlFile::saveDomDocument(const QDomDocument& domDocument,
     if (!filepath.getParentDir().mkPath())
         qWarning() << "could not make path for file" << filepath.toNative();
 
-    QFile file(filepath.toStr());
+    QSaveFile file(filepath.toStr());
     if (!file.open(QIODevice::WriteOnly))
     {
         throw RuntimeError(__FILE__, __LINE__, QString("%1: %2 [%3]")
@@ -214,6 +214,12 @@ void XmlFile::saveDomDocument(const QDomDocument& domDocument,
             .arg(filepath.toStr(), file.errorString()).arg(written).arg(content.size()),
             QString(tr("Could not write to file \"%1\": %2"))
             .arg(filepath.toNative(), file.errorString()));
+    }
+
+    if (!file.commit())
+    {
+        throw RuntimeError(__FILE__, __LINE__, QString(), QString(tr("Could not write to "
+            "file \"%1\": %2")).arg(filepath.toNative(), file.errorString()));
     }
 }
 
