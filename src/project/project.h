@@ -34,6 +34,7 @@
  *  Forward Declarations
  ****************************************************************************************/
 
+class QPrinter;
 class XmlFile;
 class IniFile;
 class UndoStack;
@@ -243,6 +244,18 @@ class Project final : public QObject
                              bool deleteSchematic = false) throw (Exception);
 
         /**
+         * @brief Export the schematic pages as a PDF
+         *
+         * @param filepath  The filepath where the PDF should be saved. If the file exists
+         *                  already, it will be overwritten.
+         *
+         * @throw Exception     On error
+         *
+         * @todo add more parameters (paper size, orientation, pages to print, ...)
+         */
+        void exportSchematicsAsPdf(const FilePath& filepath) throw (Exception);
+
+        /**
          * @brief Inform the project that a project related window is about to close
          *
          * The project will be closed and destroyed automatically after the last opened
@@ -323,14 +336,15 @@ class Project final : public QObject
         // Private Methods
         void updateSchematicsList() throw (Exception);
         bool save(bool toOriginal, QStringList& errors) noexcept;
+        void printSchematicPages(QPrinter& printer, QList<unsigned int>& pages) throw (Exception);
 
 
         // Project File (*.e4u)
         FilePath mPath; ///< the path to the project directory
         FilePath mFilepath; ///< the filepath of the *.e4u project file
-        XmlFile* mXmlFile;
+        XmlFile* mXmlFile; ///< the *.e4u project file
         FileLock mFileLock; ///< See @ref doc_project_lock
-        bool mIsRestored;
+        bool mIsRestored; ///< the constructor will set this to true if the project was restored
 
         // Other Files
         IniFile* mSchematicsIniFile; ///< schematics/schematics.ini

@@ -242,6 +242,23 @@ void SchematicEditor::on_actionGrid_triggered()
     dialog.exec();
 }
 
+void SchematicEditor::on_actionPDF_Export_triggered()
+{
+    try
+    {
+        QString filename = QFileDialog::getSaveFileName(this, tr("PDF Export"),
+                                                        QDir::homePath(), "*.pdf");
+        if (filename.isEmpty()) return;
+        if (!filename.endsWith(".pdf")) filename.append(".pdf");
+        FilePath filepath(filename);
+        mProject.exportSchematicsAsPdf(filepath); // this method can throw an exception
+    }
+    catch (Exception& e)
+    {
+        QMessageBox::warning(this, tr("Error"), e.getUserMsg());
+    }
+}
+
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
