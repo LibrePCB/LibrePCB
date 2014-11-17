@@ -119,6 +119,8 @@ class Schematic final : public CADScene
         // General Methods
         void removeFiles() const throw (Exception);
         bool save(bool toOriginal, QStringList& errors) noexcept;
+        void saveViewSceneRect(const QRectF& rect) noexcept {mViewRect = rect;}
+        const QRectF& restoreViewSceneRect() const noexcept {return mViewRect;}
 
         // Static Methods
         static Schematic* create(Project& project, const FilePath& filepath,
@@ -138,6 +140,8 @@ class Schematic final : public CADScene
         Project& mProject; ///< A reference to the Project object (from the ctor)
         FilePath mFilePath; ///< the filepath of the schematic *.xml file (from the ctor)
         XmlFile* mXmlFile;
+
+        QRectF mViewRect;
 
         // Attributes
         QUuid mUuid;

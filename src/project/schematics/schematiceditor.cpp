@@ -154,16 +154,28 @@ void SchematicEditor::setActiveSchematicIndex(int index)
     if (index == mActiveSchematicIndex)
         return;
 
-    // unregister event handler object
-    if (mUi->graphicsView->getCadScene())
-        mUi->graphicsView->getCadScene()->setEventHandlerObject(0);
+    // get the currently displayed schematic scene
+    Schematic* schematic = dynamic_cast<Schematic*>(mUi->graphicsView->getCadScene());
+
+    if (schematic)
+    {
+        // save current view scene rect
+        schematic->saveViewSceneRect(mUi->graphicsView->getVisibleSceneRect());
+        // unregister event handler object
+        schematic->setEventHandlerObject(0);
+    }
 
     // change scene
-    mUi->graphicsView->setCadScene(mProject.getSchematicByIndex(index));
+    schematic = mProject.getSchematicByIndex(index);
+    mUi->graphicsView->setCadScene(schematic);
 
-    // register event handler object
-    if (mUi->graphicsView->getCadScene())
-        mUi->graphicsView->getCadScene()->setEventHandlerObject(this);
+    if (schematic)
+    {
+        // register event handler object
+        schematic->setEventHandlerObject(this);
+        // restore view scene rect
+        mUi->graphicsView->setVisibleSceneRect(schematic->restoreViewSceneRect());
+    }
 
     emit activeSchematicChanged(mActiveSchematicIndex, index);
     mActiveSchematicIndex = index;
