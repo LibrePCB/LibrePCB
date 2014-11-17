@@ -363,6 +363,10 @@ Schematic* Schematic::create(Project& project, const FilePath& filepath,
     metaNode.appendChild(nameNode);
     file->getRoot().appendChild(metaNode);
 
+    // create node "symbols" (empty)
+    QDomElement symbolsNode = file->getDocument().createElement("symbols");
+    file->getRoot().appendChild(symbolsNode);
+
     try
     {
         file->save(false); // write new (temporary) XML file to filesystem
