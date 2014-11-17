@@ -63,10 +63,6 @@ SymbolPinInstance::~SymbolPinInstance()
 
 void SymbolPinInstance::registerNetPoint(SchematicNetPoint* netpoint)
 {
-    /*Q_ASSERT(!mRegisteredSchematicNetPoints.contains(netpoint));
-    mRegisteredSchematicNetPoints.append(netpoint);
-    netpoint->setPosition(mSymbolInstance.getPosition() + mSymbolPin->getPosition());*/
-
     Q_ASSERT(mRegisteredSchematicNetPoint == 0);
     mRegisteredSchematicNetPoint = netpoint;
     mRegisteredSchematicNetPoint->setPosition(mSymbolInstance.getPosition() + mSymbolPin->getPosition());
@@ -74,9 +70,7 @@ void SymbolPinInstance::registerNetPoint(SchematicNetPoint* netpoint)
 
 void SymbolPinInstance::unregisterNetPoint(SchematicNetPoint* netpoint)
 {
-    /*Q_ASSERT(mRegisteredSchematicNetPoints.contains(netpoint));
-    mRegisteredSchematicNetPoints.removeAll(netpoint);*/
-
+    Q_UNUSED(netpoint); // to avoid compiler warning in release mode
     Q_ASSERT(mRegisteredSchematicNetPoint == netpoint);
     mRegisteredSchematicNetPoint = 0;
 }
