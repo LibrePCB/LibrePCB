@@ -55,7 +55,7 @@ class SES_Select final : public SchematicEditorState
     public:
 
         // Constructors / Destructor
-        explicit SES_Select(SchematicEditor& editor);
+        explicit SES_Select(SchematicEditor& editor, Ui::SchematicEditor& editorUi);
         ~SES_Select();
 
         // General Methods

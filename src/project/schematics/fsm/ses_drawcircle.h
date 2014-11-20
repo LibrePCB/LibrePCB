@@ -44,7 +44,7 @@ class SES_DrawCircle final : public SchematicEditorState
     public:
 
         // Constructors / Destructor
-        explicit SES_DrawCircle(SchematicEditor& editor);
+        explicit SES_DrawCircle(SchematicEditor& editor, Ui::SchematicEditor& editorUi);
         ~SES_DrawCircle();
 
         // General Methods

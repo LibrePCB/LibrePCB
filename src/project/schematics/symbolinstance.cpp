@@ -64,6 +64,7 @@ SymbolInstance::SymbolInstance(Schematic& schematic, const QDomElement& domEleme
 
     mPosition.setXmm(mDomElement.firstChildElement("position").attribute("x"));
     mPosition.setYmm(mDomElement.firstChildElement("position").attribute("y"));
+    mAngle.setAngleDeg(mDomElement.firstChildElement("position").attribute("angle"));
 
     QString symbVarItemUuid = mDomElement.attribute("symbol_item");
     mSymbVarItem = mGenCompInstance->getSymbolVariant().getItemByUuid(symbVarItemUuid);
@@ -108,6 +109,7 @@ SymbolInstance::SymbolInstance(Schematic& schematic, const QDomElement& domEleme
 
     mGraphicsItem = new library::SymbolGraphicsItem(*mSymbol, this);
     mGraphicsItem->setPos(mPosition.toPxQPointF());
+    mGraphicsItem->setRotation(mAngle.toDeg());
 }
 
 SymbolInstance::~SymbolInstance() noexcept
@@ -130,6 +132,17 @@ void SymbolInstance::setPosition(const Point& newPos, bool permanent) throw (Exc
     }
 
     mGraphicsItem->setPos(newPos.toPxQPointF());
+}
+
+void SymbolInstance::setAngle(const Angle& newAngle, bool permanent) throw (Exception)
+{
+    if (permanent)
+    {
+        mAngle = newAngle;
+        mDomElement.firstChildElement("position").setAttribute("angle", mAngle.toDegString());
+    }
+
+    mGraphicsItem->setRotation(newAngle.toDeg());
 }
 
 /*****************************************************************************************

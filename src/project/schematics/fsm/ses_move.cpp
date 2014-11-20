@@ -32,8 +32,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SES_Move::SES_Move(SchematicEditor& editor) :
-    SchematicEditorState(editor)
+SES_Move::SES_Move(SchematicEditor& editor, Ui::SchematicEditor& editorUi) :
+    SchematicEditorState(editor, editorUi)
 {
 }
 
@@ -84,6 +84,15 @@ SchematicEditorState::State SES_Move::process(SchematicEditorEvent* event) noexc
             nextState = State_AddComponent;
             break;
 
+        case SchematicEditorEvent::SwitchToSchematicPage:
+        {
+            SEE_SwitchToSchematicPage* e = dynamic_cast<SEE_SwitchToSchematicPage*>(event);
+            Q_CHECK_PTR(e);
+            SEE_SwitchToSchematicPage::changeActiveSchematicIndex(mProject, mEditor, mEditorUi,
+                                                                  e->getSchematicIndex());
+            break;
+        }
+
         default:
             break;
     }
@@ -95,16 +104,16 @@ void SES_Move::entry(State previousState) noexcept
 {
     Q_UNUSED(previousState);
 
-    editorUi()->actionToolMove->setCheckable(true);
-    editorUi()->actionToolMove->setChecked(true);
+    mEditorUi.actionToolMove->setCheckable(true);
+    mEditorUi.actionToolMove->setChecked(true);
 }
 
 void SES_Move::exit(State nextState) noexcept
 {
     Q_UNUSED(nextState);
 
-    editorUi()->actionToolMove->setCheckable(false);
-    editorUi()->actionToolMove->setChecked(false);
+    mEditorUi.actionToolMove->setCheckable(false);
+    mEditorUi.actionToolMove->setChecked(false);
 }
 
 /*****************************************************************************************

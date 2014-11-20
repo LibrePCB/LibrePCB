@@ -32,8 +32,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SES_DrawEllipse::SES_DrawEllipse(SchematicEditor& editor) :
-    SchematicEditorState(editor)
+SES_DrawEllipse::SES_DrawEllipse(SchematicEditor& editor, Ui::SchematicEditor& editorUi) :
+    SchematicEditorState(editor, editorUi)
 {
 }
 
@@ -84,6 +84,15 @@ SchematicEditorState::State SES_DrawEllipse::process(SchematicEditorEvent* event
             nextState = State_AddComponent;
             break;
 
+        case SchematicEditorEvent::SwitchToSchematicPage:
+        {
+            SEE_SwitchToSchematicPage* e = dynamic_cast<SEE_SwitchToSchematicPage*>(event);
+            Q_CHECK_PTR(e);
+            SEE_SwitchToSchematicPage::changeActiveSchematicIndex(mProject, mEditor, mEditorUi,
+                                                                  e->getSchematicIndex());
+            break;
+        }
+
         default:
             break;
     }
@@ -95,16 +104,16 @@ void SES_DrawEllipse::entry(State previousState) noexcept
 {
     Q_UNUSED(previousState);
 
-    editorUi()->actionToolDrawEllipse->setCheckable(true);
-    editorUi()->actionToolDrawEllipse->setChecked(true);
+    mEditorUi.actionToolDrawEllipse->setCheckable(true);
+    mEditorUi.actionToolDrawEllipse->setChecked(true);
 }
 
 void SES_DrawEllipse::exit(State nextState) noexcept
 {
     Q_UNUSED(nextState);
 
-    editorUi()->actionToolDrawEllipse->setCheckable(false);
-    editorUi()->actionToolDrawEllipse->setChecked(false);
+    mEditorUi.actionToolDrawEllipse->setCheckable(false);
+    mEditorUi.actionToolDrawEllipse->setChecked(false);
 }
 
 /*****************************************************************************************

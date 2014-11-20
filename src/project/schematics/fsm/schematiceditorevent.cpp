@@ -23,6 +23,10 @@
 
 #include <QtCore>
 #include "schematiceditorevent.h"
+#include "../../project.h"
+#include "../schematiceditor.h"
+#include "ui_schematiceditor.h"
+#include "../schematic.h"
 
 namespace project {
 
@@ -37,6 +41,39 @@ SchematicEditorEvent::SchematicEditorEvent(EventType type) :
 
 SchematicEditorEvent::~SchematicEditorEvent()
 {
+}
+
+/*****************************************************************************************
+ *  Class SEE_SwitchToSchematicPage
+ ****************************************************************************************/
+
+void SEE_SwitchToSchematicPage::changeActiveSchematicIndex(Project& project,
+                                                           SchematicEditor& editor,
+                                                           Ui::SchematicEditor& editorUi,
+                                                           unsigned int newIndex) noexcept
+{
+    // get the currently displayed schematic scene
+    Schematic* schematic = editor.getActiveSchematic();
+
+    if (schematic)
+    {
+        // save current view scene rect
+        schematic->saveViewSceneRect(editorUi.graphicsView->getVisibleSceneRect());
+        // unregister event handler object
+        schematic->setEventHandlerObject(0);
+    }
+
+    // change scene
+    schematic = project.getSchematicByIndex(newIndex);
+    editorUi.graphicsView->setCadScene(schematic);
+
+    if (schematic)
+    {
+        // register event handler object
+        schematic->setEventHandlerObject(&editor);
+        // restore view scene rect
+        editorUi.graphicsView->setVisibleSceneRect(schematic->restoreViewSceneRect());
+    }
 }
 
 /*****************************************************************************************

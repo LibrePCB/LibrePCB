@@ -27,6 +27,7 @@
 #include <QtCore>
 #include "schematiceditorevent.h"
 #include "../schematiceditor.h"
+#include "ui_schematiceditor.h"
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -67,7 +68,7 @@ class SchematicEditorState : public QObject
         };
 
         // Constructors / Destructor
-        explicit SchematicEditorState(SchematicEditor& editor);
+        explicit SchematicEditorState(SchematicEditor& editor, Ui::SchematicEditor& editorUi);
         virtual ~SchematicEditorState();
 
         // General Methods
@@ -77,16 +78,13 @@ class SchematicEditorState : public QObject
 
     protected:
 
-        // General Attributes
+        // General Attributes which are needed by some state objects
         Project& mProject;
         Circuit& mCircuit;
         SchematicEditor& mEditor;
+        Ui::SchematicEditor& mEditorUi; ///< allows access to SchematicEditor UI
         State mCurrentState;
         QHash<State, SchematicEditorState*> mSubStates;
-
-        // Methods to access private SchematicEditor members from SchematicEditorState subclasses
-        Ui::SchematicEditor* editorUi() {return mEditor.mUi;}
-        int editorActiveSchematicIndex() {return mEditor.mActiveSchematicIndex;}
 };
 
 } // namespace project

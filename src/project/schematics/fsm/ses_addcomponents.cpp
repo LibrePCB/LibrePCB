@@ -42,8 +42,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SES_AddComponents::SES_AddComponents(SchematicEditor& editor) :
-    SchematicEditorState(editor), mSubState(SubState_Idle), mPreviousState(State_Select),
+SES_AddComponents::SES_AddComponents(SchematicEditor& editor, Ui::SchematicEditor& editorUi) :
+    SchematicEditorState(editor, editorUi), mSubState(SubState_Idle), mPreviousState(State_Select),
     mUndoCommandActive(false), mGenComp(0), mGenCompSymbVar(0), mCurrentSymbVarItem(0),
     mCurrentSymbolToPlace(0), mCurrentSymboleMoveCommand(0)
 {
@@ -73,18 +73,19 @@ SchematicEditorState::State SES_AddComponents::process(SchematicEditorEvent* eve
 
 void SES_AddComponents::entry(State previousState) noexcept
 {
+    Q_ASSERT(previousState != State_AddComponent); // avoid staying in this state forever
     mPreviousState = previousState;
 
-    editorUi()->actionToolAddComponent->setCheckable(true);
-    editorUi()->actionToolAddComponent->setChecked(true);
+    mEditorUi.actionToolAddComponent->setCheckable(true);
+    mEditorUi.actionToolAddComponent->setChecked(true);
 }
 
 void SES_AddComponents::exit(State nextState) noexcept
 {
     Q_UNUSED(nextState);
 
-    editorUi()->actionToolAddComponent->setCheckable(false);
-    editorUi()->actionToolAddComponent->setChecked(false);
+    mEditorUi.actionToolAddComponent->setCheckable(false);
+    mEditorUi.actionToolAddComponent->setChecked(false);
 }
 
 /*****************************************************************************************
@@ -97,39 +98,6 @@ SchematicEditorState::State SES_AddComponents::processSubStateIdle(SchematicEdit
 
     switch (event->getType())
     {
-        case SchematicEditorEvent::AbortCommand:
-        case SchematicEditorEvent::StartSelect:
-            nextState = State_Select;
-            break;
-
-        case SchematicEditorEvent::StartMove:
-            nextState = State_Move;
-            break;
-
-        case SchematicEditorEvent::StartDrawText:
-            nextState = State_DrawText;
-            break;
-
-        case SchematicEditorEvent::StartDrawRect:
-            nextState = State_DrawRect;
-            break;
-
-        case SchematicEditorEvent::StartDrawPolygon:
-            nextState = State_DrawPolygon;
-            break;
-
-        case SchematicEditorEvent::StartDrawCircle:
-            nextState = State_DrawCircle;
-            break;
-
-        case SchematicEditorEvent::StartDrawEllipse:
-            nextState = State_DrawEllipse;
-            break;
-
-        case SchematicEditorEvent::StartDrawWire:
-            nextState = State_DrawWire;
-            break;
-
         case SchematicEditorEvent::SetAddComponentParams:
         {
             try
@@ -138,15 +106,15 @@ SchematicEditorState::State SES_AddComponents::processSubStateIdle(SchematicEdit
 
                 Q_ASSERT(!mUndoCommandActive);
                 SEE_SetAddComponentParams* e = dynamic_cast<SEE_SetAddComponentParams*>(event);
-                Schematic* schematic = mProject.getSchematicByIndex(editorActiveSchematicIndex());
+                Schematic* schematic = mEditor.getActiveSchematic();
                 Q_CHECK_PTR(e);
                 Q_CHECK_PTR(schematic);
 
                 // get the scene position where the new symbol should be placed
-                QPoint cursorPos = editorUi()->graphicsView->mapFromGlobal(QCursor::pos());
-                QPoint boundedCursorPos = QPoint(qBound(0, cursorPos.x(), editorUi()->graphicsView->width()),
-                                                 qBound(0, cursorPos.y(), editorUi()->graphicsView->height()));
-                Point p = Point::fromPx(editorUi()->graphicsView->mapToScene(boundedCursorPos)); // TODO
+                QPoint cursorPos = mEditorUi.graphicsView->mapFromGlobal(QCursor::pos());
+                QPoint boundedCursorPos = QPoint(qBound(0, cursorPos.x(), mEditorUi.graphicsView->width()),
+                                                 qBound(0, cursorPos.y(), mEditorUi.graphicsView->height()));
+                Point p = Point::fromPx(mEditorUi.graphicsView->mapToScene(boundedCursorPos)); // TODO
 
                 // search the generic component in the library
                 Q_ASSERT(!e->getGenCompUuid().isNull());
@@ -209,6 +177,12 @@ SchematicEditorState::State SES_AddComponents::processSubStateIdle(SchematicEdit
             break;
         }
 
+        case SchematicEditorEvent::AbortCommand:
+            qWarning() << "it should never be possible to leave this state before "
+                          "starting to add a new component!";
+            nextState = mPreviousState;
+            break;
+
         default:
             break;
     }
@@ -222,42 +196,36 @@ SchematicEditorState::State SES_AddComponents::processSubStateAdding(SchematicEd
 
     switch (event->getType())
     {
-        /*case SchematicEditorEvent::AbortCommand:
-        case SchematicEditorEvent::StartSelect:
-            nextState = State_Select;
-            break;
-
-        case SchematicEditorEvent::StartMove:
-            nextState = State_Move;
-            break;
-
-        case SchematicEditorEvent::StartDrawText:
-            nextState = State_DrawText;
-            break;
-
-        case SchematicEditorEvent::StartDrawRect:
-            nextState = State_DrawRect;
-            break;
-
-        case SchematicEditorEvent::StartDrawPolygon:
-            nextState = State_DrawPolygon;
-            break;
-
-        case SchematicEditorEvent::StartDrawCircle:
-            nextState = State_DrawCircle;
-            break;
-
-        case SchematicEditorEvent::StartDrawEllipse:
-            nextState = State_DrawEllipse;
-            break;
-
-        case SchematicEditorEvent::StartDrawWire:
-            nextState = State_DrawWire;
-            break;*/
-
         case SchematicEditorEvent::SchematicSceneEvent:
             nextState = processSubStateAddingSceneEvent(event);
             break;
+
+        case SchematicEditorEvent::AbortCommand:
+        {
+            try
+            {
+                // delete the current move command
+                Q_CHECK_PTR(mCurrentSymboleMoveCommand);
+                delete mCurrentSymboleMoveCommand;
+                mCurrentSymboleMoveCommand = 0;
+
+                // abort the whole command
+                mProject.getUndoStack().abortCommand();
+                mUndoCommandActive = false;
+
+                // reset attributes, go back to idle state
+                mGenComp = 0;
+                mGenCompSymbVar = 0;
+                mCurrentSymbVarItem = 0;
+                mCurrentSymbolToPlace = 0;
+                mSubState = SubState_Idle;
+                nextState = mPreviousState;
+            }
+            catch (Exception& e)
+            {
+                QMessageBox::warning(&mEditor, tr("Error"), e.getUserMsg());
+            }
+        }
 
         default:
             break;
@@ -282,7 +250,7 @@ SchematicEditorState::State SES_AddComponents::processSubStateAddingSceneEvent(S
         case QEvent::GraphicsSceneMouseMove:
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-            Schematic* schematic = mProject.getSchematicByIndex(editorActiveSchematicIndex());
+            Schematic* schematic = mEditor.getActiveSchematic();
             Q_CHECK_PTR(sceneEvent); if (!sceneEvent) break;
             Q_CHECK_PTR(schematic); if (!schematic) break;
             Point p = Point::fromPx(sceneEvent->scenePos(), Length(2540000)); // TODO
@@ -293,10 +261,11 @@ SchematicEditorState::State SES_AddComponents::processSubStateAddingSceneEvent(S
             break;
         }
 
+        case QEvent::GraphicsSceneMouseDoubleClick:
         case QEvent::GraphicsSceneMousePress:
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-            Schematic* schematic = mProject.getSchematicByIndex(editorActiveSchematicIndex());
+            Schematic* schematic = mEditor.getActiveSchematic();
             Q_CHECK_PTR(sceneEvent); if (!sceneEvent) break;
             Q_CHECK_PTR(schematic); if (!schematic) break;
             Point p = Point::fromPx(sceneEvent->scenePos(), Length(2540000)); // TODO
@@ -354,6 +323,16 @@ SchematicEditorState::State SES_AddComponents::processSubStateAddingSceneEvent(S
 
                 case Qt::RightButton:
                 {
+                    try
+                    {
+                        // rotate symbol
+                        mCurrentSymboleMoveCommand->rotate90degreesCCW();
+                    }
+                    catch (Exception& e)
+                    {
+                        // TODO
+                    }
+
                     break;
                 }
 

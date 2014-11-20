@@ -57,6 +57,7 @@ class CmdSymbolInstanceMove final : public UndoCommand
         // General Methods
         void setAbsolutePosTemporary(Point& absPos) noexcept;
         void setDeltaToStartPosTemporary(Point& deltaPos) noexcept;
+        void rotate90degreesCCW() noexcept;
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;
@@ -69,6 +70,9 @@ class CmdSymbolInstanceMove final : public UndoCommand
         Point mStartPos;
         Point mDeltaPos;
         Point mEndPos;
+        Angle mStartAngle;
+        Angle mDeltaAngle;
+        Angle mEndAngle;
         bool mRedoOrUndoCalled;
 };
 

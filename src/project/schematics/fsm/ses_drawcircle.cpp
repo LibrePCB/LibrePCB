@@ -32,8 +32,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SES_DrawCircle::SES_DrawCircle(SchematicEditor& editor) :
-    SchematicEditorState(editor)
+SES_DrawCircle::SES_DrawCircle(SchematicEditor& editor, Ui::SchematicEditor& editorUi) :
+    SchematicEditorState(editor, editorUi)
 {
 }
 
@@ -84,6 +84,15 @@ SchematicEditorState::State SES_DrawCircle::process(SchematicEditorEvent* event)
             nextState = State_AddComponent;
             break;
 
+        case SchematicEditorEvent::SwitchToSchematicPage:
+        {
+            SEE_SwitchToSchematicPage* e = dynamic_cast<SEE_SwitchToSchematicPage*>(event);
+            Q_CHECK_PTR(e);
+            SEE_SwitchToSchematicPage::changeActiveSchematicIndex(mProject, mEditor, mEditorUi,
+                                                                  e->getSchematicIndex());
+            break;
+        }
+
         default:
             break;
     }
@@ -95,16 +104,16 @@ void SES_DrawCircle::entry(State previousState) noexcept
 {
     Q_UNUSED(previousState);
 
-    editorUi()->actionToolDrawCircle->setCheckable(true);
-    editorUi()->actionToolDrawCircle->setChecked(true);
+    mEditorUi.actionToolDrawCircle->setCheckable(true);
+    mEditorUi.actionToolDrawCircle->setChecked(true);
 }
 
 void SES_DrawCircle::exit(State nextState) noexcept
 {
     Q_UNUSED(nextState);
 
-    editorUi()->actionToolDrawCircle->setCheckable(false);
-    editorUi()->actionToolDrawCircle->setChecked(false);
+    mEditorUi.actionToolDrawCircle->setCheckable(false);
+    mEditorUi.actionToolDrawCircle->setChecked(false);
 }
 
 /*****************************************************************************************

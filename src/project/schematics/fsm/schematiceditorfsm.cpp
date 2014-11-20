@@ -44,19 +44,19 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SchematicEditorFsm::SchematicEditorFsm(SchematicEditor& editor) noexcept :
-    SchematicEditorState(editor)
+SchematicEditorFsm::SchematicEditorFsm(SchematicEditor& editor, Ui::SchematicEditor& editorUi) noexcept :
+    SchematicEditorState(editor, editorUi)
 {
     // create all substates
-    mSubStates.insert(State_Select, new SES_Select(mEditor));
-    mSubStates.insert(State_Move, new SES_Move(mEditor));
-    mSubStates.insert(State_DrawText, new SES_DrawText(mEditor));
-    mSubStates.insert(State_DrawRect, new SES_DrawRect(mEditor));
-    mSubStates.insert(State_DrawPolygon, new SES_DrawPolygon(mEditor));
-    mSubStates.insert(State_DrawCircle, new SES_DrawCircle(mEditor));
-    mSubStates.insert(State_DrawEllipse, new SES_DrawEllipse(mEditor));
-    mSubStates.insert(State_DrawWire, new SES_DrawWire(mEditor));
-    mSubStates.insert(State_AddComponent, new SES_AddComponents(mEditor));
+    mSubStates.insert(State_Select, new SES_Select(mEditor, mEditorUi));
+    mSubStates.insert(State_Move, new SES_Move(mEditor, mEditorUi));
+    mSubStates.insert(State_DrawText, new SES_DrawText(mEditor, mEditorUi));
+    mSubStates.insert(State_DrawRect, new SES_DrawRect(mEditor, mEditorUi));
+    mSubStates.insert(State_DrawPolygon, new SES_DrawPolygon(mEditor, mEditorUi));
+    mSubStates.insert(State_DrawCircle, new SES_DrawCircle(mEditor, mEditorUi));
+    mSubStates.insert(State_DrawEllipse, new SES_DrawEllipse(mEditor, mEditorUi));
+    mSubStates.insert(State_DrawWire, new SES_DrawWire(mEditor, mEditorUi));
+    mSubStates.insert(State_AddComponent, new SES_AddComponents(mEditor, mEditorUi));
 
     // go to state "Select"
     mCurrentState = State_Select;

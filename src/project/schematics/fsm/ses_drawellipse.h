@@ -44,7 +44,7 @@ class SES_DrawEllipse final : public SchematicEditorState
     public:
 
         // Constructors / Destructor
-        explicit SES_DrawEllipse(SchematicEditor& editor);
+        explicit SES_DrawEllipse(SchematicEditor& editor, Ui::SchematicEditor& editorUi);
         ~SES_DrawEllipse();
 
         // General Methods

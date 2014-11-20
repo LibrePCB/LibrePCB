@@ -34,14 +34,18 @@ namespace project {
 CmdSymbolInstanceMove::CmdSymbolInstanceMove(SymbolInstance& symbol, UndoCommand* parent) throw (Exception) :
     UndoCommand(QCoreApplication::translate("CmdSchematicNetLineAdd", "Add netline"), parent),
     mSymbolInstance(symbol), mStartPos(symbol.getPosition()), mDeltaPos(0, 0),
-    mEndPos(symbol.getPosition()), mRedoOrUndoCalled(false)
+    mEndPos(symbol.getPosition()), mStartAngle(symbol.getAngle()), mDeltaAngle(0),
+    mEndAngle(symbol.getAngle()), mRedoOrUndoCalled(false)
 {
 }
 
 CmdSymbolInstanceMove::~CmdSymbolInstanceMove() noexcept
 {
     if ((!mRedoOrUndoCalled) && (!mDeltaPos.isOrigin()))
+    {
         mSymbolInstance.setPosition(mStartPos, false);
+        mSymbolInstance.setAngle(mStartAngle, false);
+    }
 }
 
 /*****************************************************************************************
@@ -62,6 +66,13 @@ void CmdSymbolInstanceMove::setDeltaToStartPosTemporary(Point& deltaPos) noexcep
     mSymbolInstance.setPosition(mStartPos + mDeltaPos, false);
 }
 
+void CmdSymbolInstanceMove::rotate90degreesCCW() noexcept
+{
+    Q_ASSERT(mRedoOrUndoCalled == false);
+    mDeltaAngle -= Angle(90000000L);
+    mSymbolInstance.setAngle(mStartAngle + mDeltaAngle, false);
+}
+
 /*****************************************************************************************
  *  Inherited from UndoCommand
  ****************************************************************************************/
@@ -71,7 +82,9 @@ void CmdSymbolInstanceMove::redo() throw (Exception)
     mRedoOrUndoCalled = true;
     UndoCommand::redo(); // throws an exception on error
     mEndPos = mStartPos + mDeltaPos;
+    mEndAngle = mStartAngle + mDeltaAngle;
     mSymbolInstance.setPosition(mEndPos);
+    mSymbolInstance.setAngle(mEndAngle);
 }
 
 void CmdSymbolInstanceMove::undo() throw (Exception)
@@ -79,6 +92,7 @@ void CmdSymbolInstanceMove::undo() throw (Exception)
     mRedoOrUndoCalled = true;
     UndoCommand::undo();
     mSymbolInstance.setPosition(mStartPos);
+    mSymbolInstance.setAngle(mStartAngle);
 }
 
 /*****************************************************************************************

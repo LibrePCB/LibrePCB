@@ -44,7 +44,7 @@ class SES_Move final : public SchematicEditorState
     public:
 
         // Constructors / Destructor
-        explicit SES_Move(SchematicEditor& editor);
+        explicit SES_Move(SchematicEditor& editor, Ui::SchematicEditor& editorUi);
         ~SES_Move();
 
         // General Methods

@@ -32,8 +32,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SES_DrawPolygon::SES_DrawPolygon(SchematicEditor& editor) :
-    SchematicEditorState(editor)
+SES_DrawPolygon::SES_DrawPolygon(SchematicEditor& editor, Ui::SchematicEditor& editorUi) :
+    SchematicEditorState(editor, editorUi)
 {
 }
 
@@ -84,6 +84,15 @@ SchematicEditorState::State SES_DrawPolygon::process(SchematicEditorEvent* event
             nextState = State_AddComponent;
             break;
 
+        case SchematicEditorEvent::SwitchToSchematicPage:
+        {
+            SEE_SwitchToSchematicPage* e = dynamic_cast<SEE_SwitchToSchematicPage*>(event);
+            Q_CHECK_PTR(e);
+            SEE_SwitchToSchematicPage::changeActiveSchematicIndex(mProject, mEditor, mEditorUi,
+                                                                  e->getSchematicIndex());
+            break;
+        }
+
         default:
             break;
     }
@@ -95,16 +104,16 @@ void SES_DrawPolygon::entry(State previousState) noexcept
 {
     Q_UNUSED(previousState);
 
-    editorUi()->actionToolDrawPolygon->setCheckable(true);
-    editorUi()->actionToolDrawPolygon->setChecked(true);
+    mEditorUi.actionToolDrawPolygon->setCheckable(true);
+    mEditorUi.actionToolDrawPolygon->setChecked(true);
 }
 
 void SES_DrawPolygon::exit(State nextState) noexcept
 {
     Q_UNUSED(nextState);
 
-    editorUi()->actionToolDrawPolygon->setCheckable(false);
-    editorUi()->actionToolDrawPolygon->setChecked(false);
+    mEditorUi.actionToolDrawPolygon->setCheckable(false);
+    mEditorUi.actionToolDrawPolygon->setChecked(false);
 }
 
 /*****************************************************************************************

@@ -43,8 +43,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SES_DrawWire::SES_DrawWire(SchematicEditor& editor) :
-    SchematicEditorState(editor), mSubState(SubState_Idle),
+SES_DrawWire::SES_DrawWire(SchematicEditor& editor, Ui::SchematicEditor& editorUi) :
+    SchematicEditorState(editor, editorUi), mSubState(SubState_Idle),
     mNetClassLabel(0), mNetClassComboBox(0), mWidthLabel(0), mWidthComboBox(0)
 {
 }
@@ -117,7 +117,7 @@ SchematicEditorState::State SES_DrawWire::process(SchematicEditorEvent* event) n
                 {
                     QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
                     Point pos = Point::fromPx(sceneEvent->scenePos(), Length(2540000)); // TODO
-                    Schematic* schematic = mProject.getSchematicByIndex(editorActiveSchematicIndex());
+                    Schematic* schematic = mEditor.getActiveSchematic();
 
                     switch (sceneEvent->button())
                     {
@@ -261,6 +261,18 @@ SchematicEditorState::State SES_DrawWire::process(SchematicEditorEvent* event) n
             break;
         }
 
+        case SchematicEditorEvent::SwitchToSchematicPage:
+        {
+            if (mSubState == SubState_Idle)
+            {
+                SEE_SwitchToSchematicPage* e = dynamic_cast<SEE_SwitchToSchematicPage*>(event);
+                Q_CHECK_PTR(e);
+                SEE_SwitchToSchematicPage::changeActiveSchematicIndex(mProject, mEditor, mEditorUi,
+                                                                      e->getSchematicIndex());
+            }
+            break;
+        }
+
         default:
             break;
     }
@@ -273,12 +285,12 @@ void SES_DrawWire::entry(State previousState) noexcept
     Q_UNUSED(previousState);
 
     // Check this state in the "tools" toolbar
-    editorUi()->actionToolDrawWire->setCheckable(true);
-    editorUi()->actionToolDrawWire->setChecked(true);
+    mEditorUi.actionToolDrawWire->setCheckable(true);
+    mEditorUi.actionToolDrawWire->setChecked(true);
 
     // Add widgets to the "command" toolbar
     mNetClassLabel = new QLabel(tr("Netclass:"));
-    editorUi()->commandToolbar->addWidget(mNetClassLabel);
+    mEditorUi.commandToolbar->addWidget(mNetClassLabel);
 
     mNetClassComboBox = new QComboBox();
     mNetClassComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
@@ -286,10 +298,10 @@ void SES_DrawWire::entry(State previousState) noexcept
     foreach (NetClass* netclass, mEditor.getProject().getCircuit().getNetClasses())
         mNetClassComboBox->addItem(netclass->getName(), netclass->getUuid());
     mNetClassComboBox->setCurrentIndex(0);
-    editorUi()->commandToolbar->addWidget(mNetClassComboBox);
+    mEditorUi.commandToolbar->addWidget(mNetClassComboBox);
 
     mWidthLabel = new QLabel(tr("Width:"));
-    editorUi()->commandToolbar->addWidget(mWidthLabel);
+    mEditorUi.commandToolbar->addWidget(mWidthLabel);
 
     mWidthComboBox = new QComboBox();
     mWidthComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
@@ -299,7 +311,7 @@ void SES_DrawWire::entry(State previousState) noexcept
     mWidthComboBox->addItem("0.254mm");
     mWidthComboBox->addItem("0.504mm");
     mWidthComboBox->setCurrentIndex(0);
-    editorUi()->commandToolbar->addWidget(mWidthComboBox);
+    mEditorUi.commandToolbar->addWidget(mWidthComboBox);
 }
 
 void SES_DrawWire::exit(State nextState) noexcept
@@ -313,8 +325,8 @@ void SES_DrawWire::exit(State nextState) noexcept
     delete mNetClassLabel;      mNetClassLabel = 0;
 
     // Uncheck this state in the "tools" toolbar
-    editorUi()->actionToolDrawWire->setCheckable(false);
-    editorUi()->actionToolDrawWire->setChecked(false);
+    mEditorUi.actionToolDrawWire->setCheckable(false);
+    mEditorUi.actionToolDrawWire->setChecked(false);
 }
 
 /*****************************************************************************************

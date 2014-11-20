@@ -43,7 +43,7 @@ class SchematicEditorFsm final : public SchematicEditorState
     public:
 
         // Constructors / Destructor
-        explicit SchematicEditorFsm(SchematicEditor& editor) noexcept;
+        explicit SchematicEditorFsm(SchematicEditor& editor, Ui::SchematicEditor& editorUi) noexcept;
         ~SchematicEditorFsm() noexcept;
 
         // General Methods

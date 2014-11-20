@@ -26,6 +26,20 @@
 
 #include <QtCore>
 
+/*****************************************************************************************
+ *  Forward Declarations
+ ****************************************************************************************/
+
+namespace project {
+class Project;
+class Schematic;
+class SchematicEditor;
+}
+
+namespace Ui {
+class SchematicEditor;
+}
+
 namespace project {
 
 /*****************************************************************************************
@@ -41,7 +55,7 @@ class SchematicEditorEvent
 
         // FSM event types
         enum EventType {
-            // Triggered Actions (SchematicEditorEvent objects)
+            // Triggered Actions (SchematicEditorEvent objects, no additional parameters)
             AbortCommand,
             StartSelect,
             StartMove,
@@ -52,10 +66,11 @@ class SchematicEditorEvent
             StartDrawEllipse,
             StartDrawWire,
             StartAddComponent,
-            // Redirected QEvent's (SEE_RedirectedQEvent objects)
+            // Redirected QEvent's (SEE_RedirectedQEvent objects, with pointer to a QEvent)
             SchematicSceneEvent,
-            // Special Events
+            // Special Events (with some additional parameters)
             SetAddComponentParams, ///< @see project#SEE_SetAddComponentParams
+            SwitchToSchematicPage, ///< @see project#SEE_SwitchToSchematicPage
         };
 
         // Constructors / Destructor
@@ -133,6 +148,36 @@ class SEE_SetAddComponentParams : public SchematicEditorEvent
 
         QUuid mGenCompUuid;
         QUuid mSymbVarUuid;
+};
+
+/*****************************************************************************************
+ *  Class SEE_SwitchToSchematicPage
+ ****************************************************************************************/
+
+/**
+ * @brief The SEE_SwitchToSchematicPage class
+ */
+class SEE_SwitchToSchematicPage : public SchematicEditorEvent
+{
+    public:
+
+        // Constructors / Destructor
+        SEE_SwitchToSchematicPage(unsigned int schematicIndex) :
+            SchematicEditorEvent(SwitchToSchematicPage),
+            mSchematicIndex(schematicIndex) {}
+        virtual ~SEE_SwitchToSchematicPage() {}
+
+        // Getters
+        unsigned int getSchematicIndex() const noexcept {return mSchematicIndex;}
+
+        // Static Methods
+        static void changeActiveSchematicIndex(Project& project, SchematicEditor& editor,
+                                               Ui::SchematicEditor& editorUi,
+                                               unsigned int newIndex) noexcept;
+
+    private:
+
+        unsigned int mSchematicIndex;
 };
 
 } // namespace project

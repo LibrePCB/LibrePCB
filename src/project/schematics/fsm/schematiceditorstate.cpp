@@ -32,9 +32,9 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SchematicEditorState::SchematicEditorState(SchematicEditor& editor) :
+SchematicEditorState::SchematicEditorState(SchematicEditor& editor, Ui::SchematicEditor& editorUi) :
     QObject(0), mProject(editor.getProject()), mCircuit(editor.getProject().getCircuit()),
-    mEditor(editor), mCurrentState(State_Initial)
+    mEditor(editor), mEditorUi(editorUi), mCurrentState(State_Initial)
 {
 }
 

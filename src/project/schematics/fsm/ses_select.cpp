@@ -38,8 +38,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SES_Select::SES_Select(SchematicEditor& editor) :
-    SchematicEditorState(editor), mPreviousState(State_Initial), mSubState(SubState_Idle),
+SES_Select::SES_Select(SchematicEditor& editor, Ui::SchematicEditor& editorUi) :
+    SchematicEditorState(editor, editorUi), mPreviousState(State_Initial), mSubState(SubState_Idle),
     mParentCommand(0)
 {
 }
@@ -69,16 +69,16 @@ void SES_Select::entry(State previousState) noexcept
 {
     mPreviousState = (previousState != State_Initial) ? previousState : State_Select;
 
-    editorUi()->actionToolSelect->setCheckable(true);
-    editorUi()->actionToolSelect->setChecked(true);
+    mEditorUi.actionToolSelect->setCheckable(true);
+    mEditorUi.actionToolSelect->setChecked(true);
 }
 
 void SES_Select::exit(State nextState) noexcept
 {
     Q_UNUSED(nextState);
 
-    editorUi()->actionToolSelect->setCheckable(false);
-    editorUi()->actionToolSelect->setChecked(false);
+    mEditorUi.actionToolSelect->setCheckable(false);
+    mEditorUi.actionToolSelect->setChecked(false);
 }
 
 /*****************************************************************************************
@@ -135,6 +135,15 @@ SchematicEditorState::State SES_Select::processSubStateIdle(SchematicEditorEvent
             nextState = processSubStateIdleSceneEvent(event);
             break;
 
+        case SchematicEditorEvent::SwitchToSchematicPage:
+        {
+            SEE_SwitchToSchematicPage* e = dynamic_cast<SEE_SwitchToSchematicPage*>(event);
+            Q_CHECK_PTR(e);
+            SEE_SwitchToSchematicPage::changeActiveSchematicIndex(mProject, mEditor, mEditorUi,
+                                                                  e->getSchematicIndex());
+            break;
+        }
+
         default:
             break;
     }
@@ -153,7 +162,7 @@ SchematicEditorState::State SES_Select::processSubStateIdleSceneEvent(SchematicE
         case QEvent::GraphicsSceneMousePress:
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-            Schematic* schematic = mProject.getSchematicByIndex(editorActiveSchematicIndex());
+            Schematic* schematic = mEditor.getActiveSchematic();
             Q_CHECK_PTR(sceneEvent); if (!sceneEvent) break;
             Q_CHECK_PTR(schematic); if (!schematic) break;
 
@@ -271,11 +280,11 @@ SchematicEditorState::State SES_Select::processSubStateMovingSceneEvent(Schemati
         case QEvent::GraphicsSceneMouseRelease:
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-            Schematic* schematic = mProject.getSchematicByIndex(editorActiveSchematicIndex());
+            Schematic* schematic = mEditor.getActiveSchematic();
             Q_CHECK_PTR(sceneEvent); if (!sceneEvent) break;
             Q_CHECK_PTR(schematic); if (!schematic) break;
             Point delta = Point::fromPx(sceneEvent->scenePos()) - mMoveStartPos;
-            delta.mapToGrid(editorUi()->graphicsView->getGridInterval());
+            delta.mapToGrid(mEditorUi.graphicsView->getGridInterval());
 
             switch (sceneEvent->button())
             {
@@ -321,7 +330,7 @@ SchematicEditorState::State SES_Select::processSubStateMovingSceneEvent(Schemati
         case QEvent::GraphicsSceneMouseMove:
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-            Schematic* schematic = mProject.getSchematicByIndex(editorActiveSchematicIndex());
+            Schematic* schematic = mEditor.getActiveSchematic();
             Q_CHECK_PTR(sceneEvent); if (!sceneEvent) break;
             Q_CHECK_PTR(schematic); if (!schematic) break;
             Q_CHECK_PTR(mParentCommand);
@@ -329,7 +338,7 @@ SchematicEditorState::State SES_Select::processSubStateMovingSceneEvent(Schemati
 
             // get delta position
             Point delta = Point::fromPx(sceneEvent->scenePos()) - mMoveStartPos;
-            delta.mapToGrid(editorUi()->graphicsView->getGridInterval());
+            delta.mapToGrid(mEditorUi.graphicsView->getGridInterval());
             if (delta == mLastMouseMoveDeltaPos) break; // do not move any items
 
             // move selected elements

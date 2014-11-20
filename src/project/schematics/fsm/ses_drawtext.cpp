@@ -32,8 +32,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SES_DrawText::SES_DrawText(SchematicEditor& editor) :
-    SchematicEditorState(editor)
+SES_DrawText::SES_DrawText(SchematicEditor& editor, Ui::SchematicEditor& editorUi) :
+    SchematicEditorState(editor, editorUi)
 {
 }
 
@@ -84,6 +84,15 @@ SchematicEditorState::State SES_DrawText::process(SchematicEditorEvent* event) n
             nextState = State_AddComponent;
             break;
 
+        case SchematicEditorEvent::SwitchToSchematicPage:
+        {
+            SEE_SwitchToSchematicPage* e = dynamic_cast<SEE_SwitchToSchematicPage*>(event);
+            Q_CHECK_PTR(e);
+            SEE_SwitchToSchematicPage::changeActiveSchematicIndex(mProject, mEditor, mEditorUi,
+                                                                  e->getSchematicIndex());
+            break;
+        }
+
         default:
             break;
     }
@@ -95,16 +104,16 @@ void SES_DrawText::entry(State previousState) noexcept
 {
     Q_UNUSED(previousState);
 
-    editorUi()->actionToolDrawText->setCheckable(true);
-    editorUi()->actionToolDrawText->setChecked(true);
+    mEditorUi.actionToolDrawText->setCheckable(true);
+    mEditorUi.actionToolDrawText->setChecked(true);
 }
 
 void SES_DrawText::exit(State nextState) noexcept
 {
     Q_UNUSED(nextState);
 
-    editorUi()->actionToolDrawText->setCheckable(false);
-    editorUi()->actionToolDrawText->setChecked(false);
+    mEditorUi.actionToolDrawText->setCheckable(false);
+    mEditorUi.actionToolDrawText->setChecked(false);
 }
 
 /*****************************************************************************************

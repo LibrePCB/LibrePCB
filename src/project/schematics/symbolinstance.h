@@ -75,6 +75,7 @@ class SymbolInstance final : public QObject
         Schematic& getSchematic() const noexcept {return mSchematic;}
         const QUuid& getUuid() const noexcept {return mUuid;}
         const Point& getPosition() const noexcept {return mPosition;}
+        const Angle& getAngle() const noexcept {return mAngle;}
         SymbolPinInstance* getPinInstance(const QUuid& pinUuid) const noexcept {return mPinInstances.value(pinUuid);}
         GenericComponentInstance& getGenCompInstance() const noexcept {return *mGenCompInstance;}
         const library::Symbol& getSymbol() const noexcept {return *mSymbol;}
@@ -82,6 +83,7 @@ class SymbolInstance final : public QObject
 
         // Setters
         void setPosition(const Point& newPos, bool permanent = true) throw (Exception);
+        void setAngle(const Angle& newAngle, bool permanent = true) throw (Exception);
 
         // General Methods
         void addToSchematic(Schematic& schematic, bool addNode,
@@ -114,6 +116,7 @@ class SymbolInstance final : public QObject
         QUuid mUuid;
         GenericComponentInstance* mGenCompInstance;
         Point mPosition;
+        Angle mAngle;
 };
 
 } // namespace project

@@ -32,8 +32,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SES_DrawRect::SES_DrawRect(SchematicEditor& editor) :
-    SchematicEditorState(editor)
+SES_DrawRect::SES_DrawRect(SchematicEditor& editor, Ui::SchematicEditor& editorUi) :
+    SchematicEditorState(editor, editorUi)
 {
 }
 
@@ -84,6 +84,15 @@ SchematicEditorState::State SES_DrawRect::process(SchematicEditorEvent* event) n
             nextState = State_AddComponent;
             break;
 
+        case SchematicEditorEvent::SwitchToSchematicPage:
+        {
+            SEE_SwitchToSchematicPage* e = dynamic_cast<SEE_SwitchToSchematicPage*>(event);
+            Q_CHECK_PTR(e);
+            SEE_SwitchToSchematicPage::changeActiveSchematicIndex(mProject, mEditor, mEditorUi,
+                                                                  e->getSchematicIndex());
+            break;
+        }
+
         default:
             break;
     }
@@ -95,16 +104,16 @@ void SES_DrawRect::entry(State previousState) noexcept
 {
     Q_UNUSED(previousState);
 
-    editorUi()->actionToolDrawRectangle->setCheckable(true);
-    editorUi()->actionToolDrawRectangle->setChecked(true);
+    mEditorUi.actionToolDrawRectangle->setCheckable(true);
+    mEditorUi.actionToolDrawRectangle->setChecked(true);
 }
 
 void SES_DrawRect::exit(State nextState) noexcept
 {
     Q_UNUSED(nextState);
 
-    editorUi()->actionToolDrawRectangle->setCheckable(false);
-    editorUi()->actionToolDrawRectangle->setChecked(false);
+    mEditorUi.actionToolDrawRectangle->setCheckable(false);
+    mEditorUi.actionToolDrawRectangle->setChecked(false);
 }
 
 /*****************************************************************************************

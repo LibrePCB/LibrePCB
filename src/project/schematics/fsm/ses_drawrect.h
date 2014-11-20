@@ -44,7 +44,7 @@ class SES_DrawRect final : public SchematicEditorState
     public:
 
         // Constructors / Destructor
-        explicit SES_DrawRect(SchematicEditor& editor);
+        explicit SES_DrawRect(SchematicEditor& editor, Ui::SchematicEditor& editorUi);
         ~SES_DrawRect();
 
         // General Methods

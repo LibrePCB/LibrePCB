@@ -80,7 +80,8 @@ SchematicEditor::SchematicEditor(Project& project) :
             mUi->actionRedo, SLOT(setEnabled(bool)));
     mUi->actionRedo->setEnabled(mProject.getUndoStack().canRedo());
 
-    mFsm = new SchematicEditorFsm(*this);
+    // build the whole editor state machine with all its state objects
+    mFsm = new SchematicEditorFsm(*this, *mUi);
 
     // connect the "tools" toolbar with the state machine (the second line of the lambda
     // functions is a workaround to set the checked attribute of the QActions properly)
@@ -146,37 +147,31 @@ SchematicEditor::~SchematicEditor()
 }
 
 /*****************************************************************************************
+ *  Getters
+ ****************************************************************************************/
+
+Schematic* SchematicEditor::getActiveSchematic() const noexcept
+{
+    return dynamic_cast<Schematic*>(mUi->graphicsView->scene());
+}
+
+/*****************************************************************************************
  *  Setters
  ****************************************************************************************/
 
-void SchematicEditor::setActiveSchematicIndex(int index)
+bool SchematicEditor::setActiveSchematicIndex(int index) noexcept
 {
     if (index == mActiveSchematicIndex)
-        return;
+        return true;
 
-    // get the currently displayed schematic scene
-    Schematic* schematic = dynamic_cast<Schematic*>(mUi->graphicsView->getCadScene());
+    // let the FSM process the event
+    SEE_SwitchToSchematicPage* event = new SEE_SwitchToSchematicPage(index);
+    mFsm->processEvent(event);
+    bool accepted = event->isAccepted();
+    delete event;
+    if (!accepted) return false;
 
-    if (schematic)
-    {
-        // save current view scene rect
-        schematic->saveViewSceneRect(mUi->graphicsView->getVisibleSceneRect());
-        // unregister event handler object
-        schematic->setEventHandlerObject(0);
-    }
-
-    // change scene
-    schematic = mProject.getSchematicByIndex(index);
-    mUi->graphicsView->setCadScene(schematic);
-
-    if (schematic)
-    {
-        // register event handler object
-        schematic->setEventHandlerObject(this);
-        // restore view scene rect
-        mUi->graphicsView->setVisibleSceneRect(schematic->restoreViewSceneRect());
-    }
-
+    // schematic page has changed!
     emit activeSchematicChanged(mActiveSchematicIndex, index);
     mActiveSchematicIndex = index;
 }

@@ -38,6 +38,7 @@ class SchematicEditor;
 
 namespace project {
 class Project;
+class Schematic;
 class SchematicPagesDock;
 class UnplacedSymbolsDock;
 class SchematicEditorFsm;
@@ -65,9 +66,10 @@ class SchematicEditor : public QMainWindow, public IF_CADSceneEventHandler
         // Getters
         Project& getProject() const noexcept {return mProject;}
         int getActiveSchematicIndex() const noexcept {return mActiveSchematicIndex;}
+        Schematic* getActiveSchematic() const noexcept;
 
         // Setters
-        void setActiveSchematicIndex(int index);
+        bool setActiveSchematicIndex(int index) noexcept;
 
     protected:
 
@@ -108,9 +110,6 @@ class SchematicEditor : public QMainWindow, public IF_CADSceneEventHandler
 
         // Finite State Machine
         SchematicEditorFsm* mFsm;
-
-        // All FSM states need access to private attributes!
-        friend class SchematicEditorState;
 };
 
 } // namespace project
