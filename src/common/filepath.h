@@ -179,6 +179,13 @@ class FilePath final
         bool isExistingDir() const noexcept;
 
         /**
+         * @brief Check if the specified filepath is an existing, empty directory
+         *
+         * @return true if the path points to an existing, empty directory, false otherwise
+         */
+        bool isEmptyDir() const noexcept;
+
+        /**
          * @brief Check if the specified filepath is the root directory
          *
          * @return True if the filepath is the filesystem root, false otherwise

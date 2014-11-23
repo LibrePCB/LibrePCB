@@ -84,6 +84,15 @@ bool FilePath::isExistingDir() const noexcept
     return (mFileInfo.isDir() && mFileInfo.exists());
 }
 
+bool FilePath::isEmptyDir() const noexcept
+{
+    if (!isExistingDir())
+        return false;
+
+    QDir dir(mFileInfo.filePath());
+    return (dir.count() == 0);
+}
+
 bool FilePath::isRoot() const noexcept
 {
     // do not use QFileInfo::isRoot() because it's not the same as QDir::isRoot()!

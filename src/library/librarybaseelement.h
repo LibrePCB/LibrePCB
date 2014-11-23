@@ -52,6 +52,7 @@ class LibraryBaseElement : public QObject
 
         // Getters: General
         const FilePath& getXmlFilepath() const noexcept {return mXmlFilepath;}
+        int getXmlFileVersion() const noexcept {return mXmlFile->getFileVersion();}
 
         // Getters: Attributes
         const QUuid& getUuid() const noexcept {return mUuid;}

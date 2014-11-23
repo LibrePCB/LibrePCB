@@ -165,10 +165,11 @@ void ControlPanel::on_actionNew_Project_triggered()
 {
     QSettings settings(Workspace::instance().getMetadataPath().getPathTo("settings.ini").toStr(),
                        QSettings::IniFormat);
-    QString lastNewFile = settings.value("controlpanel/last_new_project",
-                             Workspace::instance().getPath().toStr()).toString();
+    FilePath lastNewFile(settings.value("controlpanel/last_new_project").toString());
+    if (!lastNewFile.getParentDir().isExistingDir())
+        lastNewFile.setPath(Workspace::instance().getProjectsPath().toStr());
 
-    FilePath filepath(QFileDialog::getSaveFileName(this, tr("New Project"), lastNewFile,
+    FilePath filepath(QFileDialog::getSaveFileName(this, tr("New Project"), lastNewFile.toStr(),
                                     tr("EDA4U project files (%1)").arg("*.e4u")));
 
     if (!filepath.isValid())
