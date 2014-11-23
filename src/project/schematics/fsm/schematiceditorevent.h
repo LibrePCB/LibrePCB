@@ -128,6 +128,10 @@ class SEE_RedirectedQEvent : public SchematicEditorEvent
 /**
  * @brief The SEE_SetAddComponentParams class
  *
+ * An event of this type must be created and passed to the FSM after entering the state
+ * project#SES_AddComponents to specify which component should be added to the
+ * circuit. The symbols of that component will then be added to the active schematic.
+ *
  * @see project#SES_AddComponents
  */
 class SEE_SetAddComponentParams : public SchematicEditorEvent
@@ -156,6 +160,15 @@ class SEE_SetAddComponentParams : public SchematicEditorEvent
 
 /**
  * @brief The SEE_SwitchToSchematicPage class
+ *
+ * If someone (the user or the application) wants to switch to another schematic page in
+ * the schematic editor, this is not allowed at any time (for example, while drawing a
+ * netline in the active schematic, you cannot switch to another schematic). So this type
+ * of event must be processed by the FSM. The FSM then will only decide whether changing
+ * the schematic is allowed (event accepted) or not (event rejected). If the event was
+ * accepted, the schematic editor then will switch to the requested schematic page.
+ *
+ * @see project#SchematicEditor#setActiveSchematicIndex()
  */
 class SEE_SwitchToSchematicPage : public SchematicEditorEvent
 {
@@ -170,14 +183,9 @@ class SEE_SwitchToSchematicPage : public SchematicEditorEvent
         // Getters
         unsigned int getSchematicIndex() const noexcept {return mSchematicIndex;}
 
-        // Static Methods
-        static void changeActiveSchematicIndex(Project& project, SchematicEditor& editor,
-                                               Ui::SchematicEditor& editorUi,
-                                               unsigned int newIndex) noexcept;
-
     private:
 
-        unsigned int mSchematicIndex;
+        unsigned int mSchematicIndex; ///< the requested schematic page index
 };
 
 } // namespace project

@@ -55,16 +55,16 @@ class SchematicEditorState : public QObject
 
         // FSM States
         enum State {
-            State_Initial, // only for initialization and destruction
-            State_Select,
-            State_Move,
-            State_DrawText,
-            State_DrawRect,
-            State_DrawPolygon,
-            State_DrawCircle,
-            State_DrawEllipse,
-            State_DrawWire,
-            State_AddComponent
+            State_Initial,      ///< only for initialization and destruction
+            State_Select,       ///< @see project#SES_Select
+            State_Move,         ///< @see project#SES_Move
+            State_DrawText,     ///< @see project#SES_DrawText
+            State_DrawRect,     ///< @see project#SES_DrawRect
+            State_DrawPolygon,  ///< @see project#SES_DrawPolygon
+            State_DrawCircle,   ///< @see project#SES_DrawCircle
+            State_DrawEllipse,  ///< @see project#SES_DrawEllipse
+            State_DrawWire,     ///< @see project#SES_DrawWire
+            State_AddComponent  ///< @see project#SES_AddComponents
         };
 
         // Constructors / Destructor

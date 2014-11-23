@@ -59,7 +59,7 @@ GenericComponentInstance::GenericComponentInstance(Circuit& circuit,
             .arg(mUuid.toString()));
     }
 
-    mGenComp = mCircuit.getProject().getLibrary().getGenericComponent(
+    mGenComp = mCircuit.getProject().getLibrary().getGenComp(
                    mDomElement.attribute("generic_component"));
     if (!mGenComp)
     {

@@ -138,9 +138,8 @@ SchematicEditorState::State SES_Select::processSubStateIdle(SchematicEditorEvent
         case SchematicEditorEvent::SwitchToSchematicPage:
         {
             SEE_SwitchToSchematicPage* e = dynamic_cast<SEE_SwitchToSchematicPage*>(event);
-            Q_CHECK_PTR(e);
-            SEE_SwitchToSchematicPage::changeActiveSchematicIndex(mProject, mEditor, mEditorUi,
-                                                                  e->getSchematicIndex());
+            Q_CHECK_PTR(e); Q_UNUSED(e);
+            e->setAccepted(true);
             break;
         }
 

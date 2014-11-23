@@ -61,13 +61,13 @@ ProjectLibrary::ProjectLibrary(Project& project, bool restore) throw (Exception)
     try
     {
         // Load all library elements
-        loadElements<Symbol>(mLibraryPath.getPathTo("sym"), "symbols", mSymbols);
-        loadElements<Footprint>(mLibraryPath.getPathTo("fpt"), "footprints", mFootprints);
-        loadElements<Model>(mLibraryPath.getPathTo("3dmdl"), "3d models", mModels);
-        loadElements<SpiceModel>(mLibraryPath.getPathTo("spcmdl"), "spice models", mSpiceModels);
-        loadElements<Package>(mLibraryPath.getPathTo("pkg"), "packages", mPackages);
+        loadElements<Symbol>          (mLibraryPath.getPathTo("sym"),    "symbols",            mSymbols);
+        loadElements<Footprint>       (mLibraryPath.getPathTo("fpt"),    "footprints",         mFootprints);
+        loadElements<Model>           (mLibraryPath.getPathTo("3dmdl"),  "3d models",          mModels);
+        loadElements<SpiceModel>      (mLibraryPath.getPathTo("spcmdl"), "spice models",       mSpiceModels);
+        loadElements<Package>         (mLibraryPath.getPathTo("pkg"),    "packages",           mPackages);
         loadElements<GenericComponent>(mLibraryPath.getPathTo("gencmp"), "generic components", mGenericComponents);
-        loadElements<Component>(mLibraryPath.getPathTo("cmp"), "components", mComponents);
+        loadElements<Component>       (mLibraryPath.getPathTo("cmp"),    "components",         mComponents);
     }
     catch (Exception &e)
     {
@@ -126,7 +126,7 @@ const Package* ProjectLibrary::getPackage(const QUuid& uuid) const noexcept
     return mPackages.value(uuid, 0);
 }
 
-const GenericComponent* ProjectLibrary::getGenericComponent(const QUuid& uuid) const noexcept
+const GenericComponent* ProjectLibrary::getGenComp(const QUuid& uuid) const noexcept
 {
     return mGenericComponents.value(uuid, 0);
 }

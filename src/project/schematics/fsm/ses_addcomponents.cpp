@@ -118,7 +118,7 @@ SchematicEditorState::State SES_AddComponents::processSubStateIdle(SchematicEdit
 
                 // search the generic component in the library
                 Q_ASSERT(!e->getGenCompUuid().isNull());
-                mGenComp = mProject.getLibrary().getGenericComponent(e->getGenCompUuid());
+                mGenComp = mProject.getLibrary().getGenComp(e->getGenCompUuid());
                 if (!mGenComp)
                 {
                     throw Exception(__FILE__, __LINE__, QString(),

@@ -109,11 +109,6 @@ SchematicEditor::SchematicEditor(Project& project) :
     connect(mUi->actionToolDrawWire, &QAction::triggered,
             [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::StartDrawWire), true);
                      mUi->actionToolDrawWire->setChecked(mUi->actionToolDrawWire->isCheckable());});
-    connect(mUi->actionToolAddComponent, &QAction::triggered,
-            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::StartAddComponent), true);
-                     mFsm->processEvent(new SEE_SetAddComponentParams("{60000002-3c94-4689-be29-92235ba993c5}",
-                                                                      "{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}"), true);
-                     mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());});
 
     // connect the "command" toolbar with the state machine
     connect(mUi->actionCommandAbort, &QAction::triggered,
@@ -164,16 +159,37 @@ bool SchematicEditor::setActiveSchematicIndex(int index) noexcept
     if (index == mActiveSchematicIndex)
         return true;
 
-    // let the FSM process the event
+    // "Ask" the FSM if changing the scene is allowed at the moment.
+    // If the FSM accepts the event, we can switch to the specified schematic page.
     SEE_SwitchToSchematicPage* event = new SEE_SwitchToSchematicPage(index);
     mFsm->processEvent(event);
     bool accepted = event->isAccepted();
     delete event;
-    if (!accepted) return false;
+    if (!accepted) return false; // changing the schematic page is not allowed!
+
+    // event accepted --> change the schematic page
+    Schematic* schematic = getActiveSchematic();
+    if (schematic)
+    {
+        // save current view scene rect
+        schematic->saveViewSceneRect(mUi->graphicsView->getVisibleSceneRect());
+        // unregister event handler object
+        schematic->setEventHandlerObject(0);
+    }
+    schematic = mProject.getSchematicByIndex(index);
+    mUi->graphicsView->setCadScene(schematic);
+    if (schematic)
+    {
+        // register event handler object
+        schematic->setEventHandlerObject(this);
+        // restore view scene rect
+        mUi->graphicsView->setVisibleSceneRect(schematic->restoreViewSceneRect());
+    }
 
     // schematic page has changed!
     emit activeSchematicChanged(mActiveSchematicIndex, index);
     mActiveSchematicIndex = index;
+    return true;
 }
 
 /*****************************************************************************************
@@ -252,6 +268,29 @@ void SchematicEditor::on_actionPDF_Export_triggered()
     {
         QMessageBox::warning(this, tr("Error"), e.getUserMsg());
     }
+}
+
+void SchematicEditor::on_actionToolAddComponent_triggered()
+{
+    // start adding components
+    SchematicEditorEvent* addEvent = new SchematicEditorEvent(SchematicEditorEvent::StartAddComponent);
+    bool accepted = mFsm->processEvent(addEvent, true);
+    mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
+    if (!accepted) return;
+
+    // pass all required parameters to the FSM
+    QUuid genCompUuid = "{60000002-3c94-4689-be29-92235ba993c5}";
+    QUuid symbVarUuid = "{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}";
+    //FilePath genCompFilepath("/media/Daten/Eigene_Dateien/Programmieren/QT_Creator/EDA4U/EDA4U/dev/workspace/lib/{ad523ae0-9493-48bc-86b7-049a13cb35e2}/gencmp/{60000002-3c94-4689-be29-92235ba993c5}/v0.xml");
+    //QHash<QUuid, FilePath> requiredSymbols;
+    //requiredSymbols.insert("{20000002-9873-41f2-9ab1-bff6be4e5ea1}", FilePath("/media/Daten/Eigene_Dateien/Programmieren/QT_Creator/EDA4U/EDA4U/dev/workspace/lib/{ad523ae0-9493-48bc-86b7-049a13cb35e2}/sym/{20000002-9873-41f2-9ab1-bff6be4e5ea1}/v0.xml"));
+    //requiredSymbols.insert("{20000003-9873-41f2-9ab1-bff6be4e5ea1}", FilePath("/media/Daten/Eigene_Dateien/Programmieren/QT_Creator/EDA4U/EDA4U/dev/workspace/lib/{ad523ae0-9493-48bc-86b7-049a13cb35e2}/sym/{20000003-9873-41f2-9ab1-bff6be4e5ea1}/v0.xml"));
+    //requiredSymbols.insert("{20000004-9873-41f2-9ab1-bff6be4e5ea1}", FilePath("/media/Daten/Eigene_Dateien/Programmieren/QT_Creator/EDA4U/EDA4U/dev/workspace/lib/{ad523ae0-9493-48bc-86b7-049a13cb35e2}/sym/{20000004-9873-41f2-9ab1-bff6be4e5ea1}/v0.xml"));
+    SEE_SetAddComponentParams* paramsEvent = new SEE_SetAddComponentParams(genCompUuid,
+                                                                           symbVarUuid);
+    accepted = mFsm->processEvent(paramsEvent, true);
+    mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
+    if (!accepted) return;
 }
 
 /*****************************************************************************************

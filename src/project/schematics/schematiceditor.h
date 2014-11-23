@@ -83,6 +83,7 @@ class SchematicEditor : public QMainWindow, public IF_CADSceneEventHandler
         void on_actionRedo_triggered();
         void on_actionGrid_triggered();
         void on_actionPDF_Export_triggered();
+        void on_actionToolAddComponent_triggered();
 
     signals:
 

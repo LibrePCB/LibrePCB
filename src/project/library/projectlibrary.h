@@ -66,13 +66,13 @@ class ProjectLibrary final : public QObject
         ~ProjectLibrary() noexcept;
 
         // Getters: Library Elements
-        const library::Symbol*           getSymbol(const QUuid& uuid) const noexcept;
-        const library::Footprint*        getFootprint(const QUuid& uuid) const noexcept;
-        const library::Model*            getModel(const QUuid& uuid) const noexcept;
-        const library::SpiceModel*       getSpiceModel(const QUuid& uuid) const noexcept;
-        const library::Package*          getPackage(const QUuid& uuid) const noexcept;
-        const library::GenericComponent* getGenericComponent(const QUuid& uuid) const noexcept;
-        const library::Component*        getComponent(const QUuid& uuid) const noexcept;
+        const library::Symbol*           getSymbol(     const QUuid& uuid) const noexcept;
+        const library::Footprint*        getFootprint(  const QUuid& uuid) const noexcept;
+        const library::Model*            getModel(      const QUuid& uuid) const noexcept;
+        const library::SpiceModel*       getSpiceModel( const QUuid& uuid) const noexcept;
+        const library::Package*          getPackage(    const QUuid& uuid) const noexcept;
+        const library::GenericComponent* getGenComp(    const QUuid& uuid) const noexcept;
+        const library::Component*        getComponent(  const QUuid& uuid) const noexcept;
 
 
     private:
