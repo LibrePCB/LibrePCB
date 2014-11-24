@@ -35,7 +35,17 @@ namespace project {
 CmdSchematicNetPointAdd::CmdSchematicNetPointAdd(Schematic& schematic, const QUuid& netsignal,
                                                  const Point& position, UndoCommand* parent) throw (Exception) :
     UndoCommand(QCoreApplication::translate("CmdSchematicNetPointAdd", "Add netpoint"), parent),
-    mSchematic(schematic), mNetSignal(netsignal), mPosition(position), mNetPoint(0)
+    mSchematic(schematic), mNetSignal(netsignal), mAttachedToSymbol(false),
+    mPosition(position), mSymbol(), mPin(), mNetPoint(0)
+{
+}
+
+CmdSchematicNetPointAdd::CmdSchematicNetPointAdd(Schematic& schematic, const QUuid& netsignal,
+                                                 const QUuid& symbol, const QUuid& pin,
+                                                 UndoCommand* parent) throw (Exception) :
+    UndoCommand(QCoreApplication::translate("CmdSchematicNetPointAdd", "Add netpoint"), parent),
+    mSchematic(schematic), mNetSignal(netsignal), mAttachedToSymbol(true),
+    mPosition(), mSymbol(symbol), mPin(pin), mNetPoint(0)
 {
 }
 
@@ -52,7 +62,12 @@ CmdSchematicNetPointAdd::~CmdSchematicNetPointAdd() noexcept
 void CmdSchematicNetPointAdd::redo() throw (Exception)
 {
     if (!mNetPoint) // only the first time
-        mNetPoint = mSchematic.createNetPoint(mNetSignal, mPosition); // throws an exception on error
+    {
+        if (mAttachedToSymbol)
+            mNetPoint = mSchematic.createNetPoint(mNetSignal, mSymbol, mPin); // throws an exception on error
+        else
+            mNetPoint = mSchematic.createNetPoint(mNetSignal, mPosition); // throws an exception on error
+    }
 
     mSchematic.addNetPoint(mNetPoint); // throws an exception on error
 

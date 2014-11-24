@@ -32,6 +32,7 @@
 #include "../../common/schematiclayer.h"
 #include "symbolinstance.h"
 #include "symbolpininstance.h"
+#include "../circuit/gencompsignalinstance.h"
 
 namespace project {
 
@@ -130,10 +131,22 @@ SchematicNetPoint::SchematicNetPoint(Schematic& schematic, const QDomElement& do
         }
         QString pinUuid = mDomElement.firstChildElement("pin").text();
         mPinInstance = mSymbolInstance->getPinInstance(pinUuid);
-        if (!mSymbolInstance)
+        if (!mPinInstance)
         {
             throw RuntimeError(__FILE__, __LINE__, pinUuid,
                 QString(tr("Invalid symbol pin instance UUID: \"%1\"")).arg(pinUuid));
+        }
+        const GenCompSignalInstance* compSignal = mPinInstance->getGenCompSignalInstance();
+        if (!compSignal)
+        {
+            throw RuntimeError(__FILE__, __LINE__, pinUuid,
+                QString(tr("The symbol pin instance \"%1\" has no signal.")).arg(pinUuid));
+        }
+        const NetSignal* netsignal = compSignal->getNetSignal();
+        if (netsignal != mNetSignal)
+        {
+            throw RuntimeError(__FILE__, __LINE__, pinUuid, QString(tr("Netsignal of "
+                "netpoint \"%1\" does not match with the pin netsignal.")).arg(mUuid.toString()));
         }
     }
     else
@@ -234,7 +247,8 @@ SchematicNetPoint* SchematicNetPoint::create(Schematic& schematic, QDomDocument&
     node.setAttribute("uuid", QUuid::createUuid().toString()); // generate random UUID
     node.setAttribute("netsignal", netsignal.toString());
     QDomElement attachedNode = doc.createElement("attached");
-    attachedNode.setNodeValue("false");
+    QDomText attachedText = doc.createTextNode("false");
+    attachedNode.appendChild(attachedText);
     node.appendChild(attachedNode);
     QDomElement posNode = doc.createElement("position");
     posNode.setAttribute("x", position.getX().toMmString());
@@ -257,13 +271,16 @@ SchematicNetPoint* SchematicNetPoint::create(Schematic& schematic, QDomDocument&
     node.setAttribute("uuid", QUuid::createUuid().toString()); // generate random UUID
     node.setAttribute("netsignal", netsignal.toString());
     QDomElement attachedNode = doc.createElement("attached");
-    attachedNode.setNodeValue("true");
+    QDomText attachedText = doc.createTextNode("true");
+    attachedNode.appendChild(attachedText);
     node.appendChild(attachedNode);
     QDomElement symbolNode = doc.createElement("symbol");
-    symbolNode.setNodeValue(symbol.toString());
+    QDomText symbolText = doc.createTextNode(symbol.toString());
+    symbolNode.appendChild(symbolText);
     node.appendChild(symbolNode);
     QDomElement pinNode = doc.createElement("pin");
-    pinNode.setNodeValue(pin.toString());
+    QDomText pinText = doc.createTextNode(pin.toString());
+    pinNode.appendChild(pinText);
     node.appendChild(pinNode);
 
     // create and return the new SchematicNetPoint object

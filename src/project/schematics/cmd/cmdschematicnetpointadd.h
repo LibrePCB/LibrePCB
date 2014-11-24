@@ -54,6 +54,9 @@ class CmdSchematicNetPointAdd final : public UndoCommand
         // Constructors / Destructor
         explicit CmdSchematicNetPointAdd(Schematic& schematic, const QUuid& netsignal,
                                          const Point& position, UndoCommand* parent = 0) throw (Exception);
+        explicit CmdSchematicNetPointAdd(Schematic& schematic, const QUuid& netsignal,
+                                         const QUuid& symbol, const QUuid& pin,
+                                         UndoCommand* parent = 0) throw (Exception);
         ~CmdSchematicNetPointAdd() noexcept;
 
         // Getters
@@ -67,7 +70,10 @@ class CmdSchematicNetPointAdd final : public UndoCommand
 
         Schematic& mSchematic;
         QUuid mNetSignal;
+        bool mAttachedToSymbol;
         Point mPosition;
+        QUuid mSymbol;
+        QUuid mPin;
         SchematicNetPoint* mNetPoint;
 };
 
