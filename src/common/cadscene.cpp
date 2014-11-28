@@ -81,6 +81,16 @@ void CADScene::mouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent)
     QGraphicsScene::mouseMoveEvent(mouseEvent);
 }
 
+void CADScene::wheelEvent(QGraphicsSceneWheelEvent* event)
+{
+    if (mEventHandlerObject)
+    {
+        if (mEventHandlerObject->cadSceneEventHandler(event))
+            return;
+    }
+    QGraphicsScene::wheelEvent(event);
+}
+
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/

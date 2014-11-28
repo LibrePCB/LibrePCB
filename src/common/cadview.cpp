@@ -216,6 +216,26 @@ void CADView::drawForeground(QPainter* painter, const QRectF& rect)
 
 void CADView::wheelEvent(QWheelEvent* event)
 {
+    if (scene())
+    {
+        // First, redirect the event to the scene. If the scene has an event handler
+        // object (like SchematicEditor), the event may first go through a finite state
+        // machine. If the FSM accepts the event, we will disable zooming with the wheel.
+        // Note: This code fragment is copied from Qt's "qgraphicsview.cpp" (Qt 5.3.2)
+        QGraphicsSceneWheelEvent wheelEvent(QEvent::GraphicsSceneWheel);
+        wheelEvent.setWidget(viewport());
+        wheelEvent.setScenePos(mapToScene(event->pos()));
+        wheelEvent.setScreenPos(event->globalPos());
+        wheelEvent.setButtons(event->buttons());
+        wheelEvent.setModifiers(event->modifiers());
+        wheelEvent.setDelta(event->delta());
+        wheelEvent.setOrientation(event->orientation());
+        wheelEvent.setAccepted(false);
+        QApplication::sendEvent(scene(), &wheelEvent);
+        event->setAccepted(wheelEvent.isAccepted());
+        if (event->isAccepted()) return; // the scene (or an FSM) has accepted the event
+    }
+
     // Zoom
     const QPointF p0scene = mapToScene(event->pos());
     qreal scaleFactor = (event->delta() > 0) ? sZoomFactor : (qreal)1 / sZoomFactor;

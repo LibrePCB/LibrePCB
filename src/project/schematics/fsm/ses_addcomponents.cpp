@@ -242,8 +242,9 @@ SchematicEditorState::State SES_AddComponents::processSubStateAddingSceneEvent(S
 
     // Always accept graphics scene events, even if we do not react on some of the events!
     // This will give us the full control over the graphics scene. Otherwise, the graphics
-    // scene can react on some events and disturb our state machine.
-    event->setAccepted(true);
+    // scene can react on some events and disturb our state machine. Only the wheel event
+    // is ignored because otherwise the view will not allow to zoom with the mouse wheel.
+    if (qevent->type() != QEvent::GraphicsSceneWheel) event->setAccepted(true);
 
     switch (qevent->type())
     {
