@@ -86,6 +86,9 @@ class CADScene : public QGraphicsScene
     protected:
 
         // Inherited from QGraphicsScene
+        virtual void keyPressEvent(QKeyEvent* keyEvent);
+        virtual void keyReleaseEvent(QKeyEvent* keyEvent);
+        virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent);
         virtual void mousePressEvent(QGraphicsSceneMouseEvent* mouseEvent);
         virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* mouseEvent);
         virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent);

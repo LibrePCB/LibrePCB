@@ -51,6 +51,36 @@ void CADScene::setEventHandlerObject(IF_CADSceneEventHandler* object)
  *  Inherited from QGraphicsScene
  ****************************************************************************************/
 
+void CADScene::keyPressEvent(QKeyEvent* keyEvent)
+{
+    if (mEventHandlerObject)
+    {
+        if (mEventHandlerObject->cadSceneEventHandler(keyEvent))
+            return;
+    }
+    QGraphicsScene::keyPressEvent(keyEvent);
+}
+
+void CADScene::keyReleaseEvent(QKeyEvent* keyEvent)
+{
+    if (mEventHandlerObject)
+    {
+        if (mEventHandlerObject->cadSceneEventHandler(keyEvent))
+            return;
+    }
+    QGraphicsScene::keyReleaseEvent(keyEvent);
+}
+
+void CADScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent)
+{
+    if (mEventHandlerObject)
+    {
+        if (mEventHandlerObject->cadSceneEventHandler(mouseEvent))
+            return;
+    }
+    QGraphicsScene::mouseDoubleClickEvent(mouseEvent);
+}
+
 void CADScene::mousePressEvent(QGraphicsSceneMouseEvent* mouseEvent)
 {
     if (mEventHandlerObject)
