@@ -68,10 +68,12 @@ class CADScene : public QGraphicsScene
          */
         enum ItemType {
             Type_UserType = QGraphicsItem::UserType, ///< the base number for user types
+            // Types which are used in library elements
+            Type_Symbol,                    ///< library#Symbol
+            Type_SymbolPin,                 ///< library#SymbolPin
             // Types which are used in schematic scenes
             Type_SchematicNetPoint,         ///< project#SchematicNetPoint
             Type_SchematicNetLine,          ///< project#SchematicNetLine
-            Type_SchematicSymbolInstance    ///< project#SymbolInstance
         };
 
 

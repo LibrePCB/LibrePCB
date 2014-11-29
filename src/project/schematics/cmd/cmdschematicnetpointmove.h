@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDSCHEMATICNETPOINTADD_H
-#define PROJECT_CMDSCHEMATICNETPOINTADD_H
+#ifndef PROJECT_CMDSCHEMATICNETPOINTMOVE_H
+#define PROJECT_CMDSCHEMATICNETPOINTMOVE_H
 
 /*****************************************************************************************
  *  Includes
@@ -26,56 +26,52 @@
 
 #include <QtCore>
 #include "../../../common/undocommand.h"
-#include "../../../common/units.h"
 #include "../../../common/exceptions.h"
+#include "../../../common/units.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
 namespace project {
-class Schematic;
 class SchematicNetPoint;
 }
 
 /*****************************************************************************************
- *  Class CmdSchematicNetPointAdd
+ *  Class CmdSchematicNetPointMove
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The CmdSchematicNetPointAdd class
+ * @brief The CmdSchematicNetPointMove class
  */
-class CmdSchematicNetPointAdd final : public UndoCommand
+class CmdSchematicNetPointMove final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdSchematicNetPointAdd(Schematic& schematic, const QUuid& netsignal,
-                                         const Point& position, UndoCommand* parent = 0) throw (Exception);
-        explicit CmdSchematicNetPointAdd(Schematic& schematic, const QUuid& symbol,
-                                         const QUuid& pin, UndoCommand* parent = 0) throw (Exception);
-        ~CmdSchematicNetPointAdd() noexcept;
+        explicit CmdSchematicNetPointMove(SchematicNetPoint& point, UndoCommand* parent = 0) throw (Exception);
+        ~CmdSchematicNetPointMove() noexcept;
 
-        // Getters
-        SchematicNetPoint* getNetPoint() const noexcept {return mNetPoint;}
+        // General Methods
+        void setAbsolutePosTemporary(Point& absPos) noexcept;
+        void setDeltaToStartPosTemporary(Point& deltaPos) noexcept;
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;
         void undo() throw (Exception) override;
 
+
     private:
 
-        Schematic& mSchematic;
-        QUuid mNetSignal;
-        bool mAttachedToSymbol;
-        Point mPosition;
-        QUuid mSymbol;
-        QUuid mPin;
-        SchematicNetPoint* mNetPoint;
+        SchematicNetPoint& mNetPoint;
+        Point mStartPos;
+        Point mDeltaPos;
+        Point mEndPos;
+        bool mRedoOrUndoCalled;
 };
 
 } // namespace project
 
-#endif // PROJECT_CMDSCHEMATICNETPOINTADD_H
+#endif // PROJECT_CMDSCHEMATICNETPOINTMOVE_H

@@ -40,61 +40,74 @@
         </symbol>
     </symbols>
     <netpoints>
-        <netpoint uuid="{129871b0-54c4-473e-b4bc-7414a07c2159}" netsignal="{5ae568aa-906e-48d2-9620-26803d99e256}">
+        <netpoint uuid="{129871b0-54c4-473e-b4bc-7414a07c2159}">
             <attached>true</attached>
             <symbol>{b52fac3b-5d3f-47df-88af-4aa87b9b2f39}</symbol>
             <pin>{702df32a-635f-46e9-85d2-5b7e2c20aa87}</pin>
         </netpoint>
-        <netpoint uuid="{bba3a2c9-e6b2-4d8b-b2d3-8c9304d1785a}" netsignal="{5ae568aa-906e-48d2-9620-26803d99e256}">
+        <netpoint uuid="{bba3a2c9-e6b2-4d8b-b2d3-8c9304d1785a}">
             <attached>false</attached>
+            <netsignal>{5ae568aa-906e-48d2-9620-26803d99e256}</netsignal>
             <position x="127" y="170.18"/>
         </netpoint>
-        <netpoint uuid="{a64bb3b6-40a7-4563-b9e8-d21a66483e8c}" netsignal="{5ae568aa-906e-48d2-9620-26803d99e256}">
+        <netpoint uuid="{a64bb3b6-40a7-4563-b9e8-d21a66483e8c}">
             <attached>false</attached>
+            <netsignal>{5ae568aa-906e-48d2-9620-26803d99e256}</netsignal>
             <position x="116.84" y="139.7"/>
         </netpoint>
-        <netpoint uuid="{92a4e38d-59a7-4fdc-83e4-227f258b8de2}" netsignal="{5ae568aa-906e-48d2-9620-26803d99e256}">
+        <netpoint uuid="{92a4e38d-59a7-4fdc-83e4-227f258b8de2}">
             <attached>false</attached>
+            <netsignal>{5ae568aa-906e-48d2-9620-26803d99e256}</netsignal>
             <position x="147.32" y="81.28"/>
         </netpoint>
-        <netpoint uuid="{72f23b29-c6dd-43f6-a161-5e7ecb1ece4e}" netsignal="{5ae568aa-906e-48d2-9620-26803d99e256}">
+        <netpoint uuid="{72f23b29-c6dd-43f6-a161-5e7ecb1ece4e}">
             <attached>false</attached>
+            <netsignal>{5ae568aa-906e-48d2-9620-26803d99e256}</netsignal>
             <position x="231.14" y="134.62"/>
         </netpoint>
-        <netpoint uuid="{8ac55d32-01b1-4cdf-ae4c-addb310e822b}" netsignal="{b910765e-0d17-4a2d-80a0-af4af14ced69}">
+        <netpoint uuid="{8ac55d32-01b1-4cdf-ae4c-addb310e822b}">
             <attached>false</attached>
+            <netsignal>{b910765e-0d17-4a2d-80a0-af4af14ced69}</netsignal>
             <position x="60.96" y="162.56"/>
         </netpoint>
-        <netpoint uuid="{89aaf2ad-c6d4-4e7e-a05b-5d29bc0d131f}" netsignal="{b910765e-0d17-4a2d-80a0-af4af14ced69}">
+        <netpoint uuid="{89aaf2ad-c6d4-4e7e-a05b-5d29bc0d131f}">
             <attached>false</attached>
+            <netsignal>{b910765e-0d17-4a2d-80a0-af4af14ced69}</netsignal>
             <position x="78.74" y="182.88"/>
         </netpoint>
-        <netpoint uuid="{7358dfc9-8bbe-4a2d-94c3-4dba9b4092f5}" netsignal="{b910765e-0d17-4a2d-80a0-af4af14ced69}">
+        <netpoint uuid="{7358dfc9-8bbe-4a2d-94c3-4dba9b4092f5}">
             <attached>false</attached>
+            <netsignal>{b910765e-0d17-4a2d-80a0-af4af14ced69}</netsignal>
             <position x="101.6" y="157.48"/>
         </netpoint>
-        <netpoint uuid="{645a9c94-1d1d-4ee2-9b9b-97d05d97e086}" netsignal="{b910765e-0d17-4a2d-80a0-af4af14ced69}">
+        <netpoint uuid="{645a9c94-1d1d-4ee2-9b9b-97d05d97e086}">
             <attached>false</attached>
+            <netsignal>{b910765e-0d17-4a2d-80a0-af4af14ced69}</netsignal>
             <position x="76.2" y="132.08"/>
         </netpoint>
-        <netpoint uuid="{1696d706-e74f-4739-bce0-f537ef69b30d}" netsignal="{b910765e-0d17-4a2d-80a0-af4af14ced69}">
+        <netpoint uuid="{1696d706-e74f-4739-bce0-f537ef69b30d}">
             <attached>false</attached>
+            <netsignal>{b910765e-0d17-4a2d-80a0-af4af14ced69}</netsignal>
             <position x="78.74" y="165.1"/>
         </netpoint>
-        <netpoint uuid="{148059c8-568d-4e2d-9592-06427b084ea1}" netsignal="{9e89f09d-7887-481b-b964-4811d0be545e}">
+        <netpoint uuid="{148059c8-568d-4e2d-9592-06427b084ea1}">
             <attached>false</attached>
+            <netsignal>{9e89f09d-7887-481b-b964-4811d0be545e}</netsignal>
             <position x="241.3" y="190.5"/>
         </netpoint>
-        <netpoint uuid="{4bec1194-949d-498c-aa7c-a17a9b72e714}" netsignal="{9e89f09d-7887-481b-b964-4811d0be545e}">
+        <netpoint uuid="{4bec1194-949d-498c-aa7c-a17a9b72e714}">
             <attached>false</attached>
+            <netsignal>{9e89f09d-7887-481b-b964-4811d0be545e}</netsignal>
             <position x="248.92" y="167.64"/>
         </netpoint>
-        <netpoint uuid="{bd1e71e6-aef5-457d-97a4-867c08296993}" netsignal="{9e89f09d-7887-481b-b964-4811d0be545e}">
+        <netpoint uuid="{bd1e71e6-aef5-457d-97a4-867c08296993}">
             <attached>false</attached>
+            <netsignal>{9e89f09d-7887-481b-b964-4811d0be545e}</netsignal>
             <position x="231.14" y="180.34"/>
         </netpoint>
-        <netpoint uuid="{9f2689d4-a241-43ab-b4a4-f18f2cc15264}" netsignal="{9e89f09d-7887-481b-b964-4811d0be545e}">
+        <netpoint uuid="{9f2689d4-a241-43ab-b4a4-f18f2cc15264}">
             <attached>false</attached>
+            <netsignal>{9e89f09d-7887-481b-b964-4811d0be545e}</netsignal>
             <position x="231.14" y="154.94"/>
         </netpoint>
     </netpoints>

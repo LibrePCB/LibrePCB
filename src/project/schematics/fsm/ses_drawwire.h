@@ -63,6 +63,12 @@ class SES_DrawWire final : public SchematicEditorState
 
     private:
 
+        // Private Methods
+        State processSubStateIdle(SchematicEditorEvent* event) noexcept;
+        State processSubStatePositioning(SchematicEditorEvent* event) noexcept;
+        State processIdleSceneEvent(SchematicEditorEvent* event) noexcept;
+        State processPositioningSceneEvent(SchematicEditorEvent* event) noexcept;
+
         // Internal FSM States (substates)
         enum SubState {
             SubState_Idle, // initial substate

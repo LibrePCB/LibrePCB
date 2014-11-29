@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDSCHEMATICNETPOINTADD_H
-#define PROJECT_CMDSCHEMATICNETPOINTADD_H
+#ifndef PROJECT_CMDGENCOMPSIGINSTSETNETSIGNAL_H
+#define PROJECT_CMDGENCOMPSIGINSTSETNETSIGNAL_H
 
 /*****************************************************************************************
  *  Includes
@@ -26,7 +26,6 @@
 
 #include <QtCore>
 #include "../../../common/undocommand.h"
-#include "../../../common/units.h"
 #include "../../../common/exceptions.h"
 
 /*****************************************************************************************
@@ -34,32 +33,28 @@
  ****************************************************************************************/
 
 namespace project {
-class Schematic;
-class SchematicNetPoint;
+class GenCompSignalInstance;
+class NetSignal;
 }
 
 /*****************************************************************************************
- *  Class CmdSchematicNetPointAdd
+ *  Class CmdGenCompSigInstSetNetSignal
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The CmdSchematicNetPointAdd class
+ * @brief The CmdGenCompSigInstSetNetSignal class
  */
-class CmdSchematicNetPointAdd final : public UndoCommand
+class CmdGenCompSigInstSetNetSignal final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdSchematicNetPointAdd(Schematic& schematic, const QUuid& netsignal,
-                                         const Point& position, UndoCommand* parent = 0) throw (Exception);
-        explicit CmdSchematicNetPointAdd(Schematic& schematic, const QUuid& symbol,
-                                         const QUuid& pin, UndoCommand* parent = 0) throw (Exception);
-        ~CmdSchematicNetPointAdd() noexcept;
-
-        // Getters
-        SchematicNetPoint* getNetPoint() const noexcept {return mNetPoint;}
+        explicit CmdGenCompSigInstSetNetSignal(GenCompSignalInstance& genCompSigInstance,
+                                               NetSignal* netsignal,
+                                               UndoCommand* parent = 0) throw (Exception);
+        ~CmdGenCompSigInstSetNetSignal() noexcept;
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;
@@ -67,15 +62,14 @@ class CmdSchematicNetPointAdd final : public UndoCommand
 
     private:
 
-        Schematic& mSchematic;
-        QUuid mNetSignal;
-        bool mAttachedToSymbol;
-        Point mPosition;
-        QUuid mSymbol;
-        QUuid mPin;
-        SchematicNetPoint* mNetPoint;
+        // Attributes from the constructor
+        GenCompSignalInstance& mGenCompSigInstance;
+        NetSignal* mNetSignal;
+
+        // General Attributes
+        NetSignal* mOldNetSignal;
 };
 
 } // namespace project
 
-#endif // PROJECT_CMDSCHEMATICNETPOINTADD_H
+#endif // PROJECT_CMDGENCOMPSIGINSTSETNETSIGNAL_H

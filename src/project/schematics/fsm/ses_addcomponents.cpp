@@ -238,7 +238,7 @@ SchematicEditorState::State SES_AddComponents::processSubStateAddingSceneEvent(S
 {
     SchematicEditorState::State nextState = State_AddComponent;
     QEvent* qevent = dynamic_cast<SEE_RedirectedQEvent*>(event)->getQEvent();
-    Q_CHECK_PTR(qevent);
+    Q_ASSERT(qevent);
 
     // Always accept graphics scene events, even if we do not react on some of the events!
     // This will give us the full control over the graphics scene. Otherwise, the graphics
@@ -340,6 +340,21 @@ SchematicEditorState::State SES_AddComponents::processSubStateAddingSceneEvent(S
                 default:
                     break;
             }
+            break;
+        }
+
+        case QEvent::KeyPress:
+        {
+            QKeyEvent* keyEvent = dynamic_cast<QKeyEvent*>(qevent);
+            switch (keyEvent->key())
+            {
+                case Qt::Key_R:
+                    mCurrentSymboleMoveCommand->rotate90degreesCCW();
+                    break;
+                default:
+                    break;
+            }
+
             break;
         }
 

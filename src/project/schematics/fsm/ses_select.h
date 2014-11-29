@@ -36,6 +36,7 @@ class UndoCommand;
 
 namespace project {
 class CmdSymbolInstanceMove;
+class CmdSchematicNetPointMove;
 }
 
 /*****************************************************************************************
@@ -46,7 +47,7 @@ namespace project {
 
 
 /**
- * @brief The SES_Select class
+ * @brief The SES_Select class (default state of the schematic editor FSM)
  */
 class SES_Select final : public SchematicEditorState
 {
@@ -63,6 +64,7 @@ class SES_Select final : public SchematicEditorState
         void entry(State previousState) noexcept;
         void exit(State nextState) noexcept;
 
+
     private:
 
         // Private Methods
@@ -70,21 +72,29 @@ class SES_Select final : public SchematicEditorState
         State processSubStateIdleSceneEvent(SchematicEditorEvent* event) noexcept;
         State processSubStateMoving(SchematicEditorEvent* event) noexcept;
         State processSubStateMovingSceneEvent(SchematicEditorEvent* event) noexcept;
+        State proccessIdleSceneLeftClick(SchematicEditorEvent* event,
+                                         QGraphicsSceneMouseEvent* mouseEvent,
+                                         Schematic* schematic) noexcept;
 
 
-        State mPreviousState;
-
-        // Substates
+        // Types
+        /// enum for all possible substates
         enum SubState {
-            SubState_Idle,
-            SubState_Moving
+            SubState_Idle,      ///< left mouse button is not pressed (default state)
+            SubState_Moving     ///< left mouse button is pressed
         };
-        SubState mSubState;
 
-        Point mMoveStartPos; // not mapped to grid!
-        Point mLastMouseMoveDeltaPos; // mapped to grid
-        UndoCommand* mParentCommand;
-        QList<CmdSymbolInstanceMove*> mSymbolInstanceMoveCommands;
+
+        // Attributes
+        State mPreviousState;   ///< the state before entering this state (from #entry())
+        SubState mSubState;     ///< the current substate
+        Point mMoveStartPos;    ///< the scene position where the left mouse button was
+                                ///< pressed (not mapped to grid!)
+        Point mLastMouseMoveDeltaPos;   ///< used in the moving substate (mapped to grid)
+        UndoCommand* mParentCommand;    ///< the parent command for all moving commands
+                                        ///< (nullptr if no command is active)
+        QList<CmdSymbolInstanceMove*> mSymbolMoveCmds; ///< all symbol move commands
+        QList<CmdSchematicNetPointMove*> mNetPointMoveCmds; ///< all netpoint move commands
 };
 
 } // namespace project

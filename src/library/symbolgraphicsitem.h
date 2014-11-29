@@ -62,7 +62,7 @@ class SymbolGraphicsItem final : public QGraphicsItem
         // Types
 
         /// to make  qgraphicsitem_cast() working
-        enum {Type = CADScene::Type_SchematicSymbolInstance};
+        enum {Type = CADScene::Type_Symbol};
 
         // Constructors / Destructor
         explicit SymbolGraphicsItem(const Symbol& symbol,

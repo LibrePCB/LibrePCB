@@ -66,7 +66,7 @@ class GenCompSignalInstance final : public QObject
 
         // Getters
         const library::GenCompSignal& getCompSignal() const noexcept {return *mGenCompSignal;}
-        const NetSignal* getNetSignal() const noexcept {return mNetSignal;}
+        NetSignal* getNetSignal() const noexcept {return mNetSignal;}
 
 
         // Setters

@@ -116,6 +116,21 @@ class SEE_RedirectedQEvent : public SchematicEditorEvent
             SchematicEditorEvent::setAccepted(accepted);
         }
 
+        // Static Methods
+
+        /**
+         * @brief Helper method to get the QEvent from a pointer to SchematicEditorEvent
+         * @param see   A SchematicEditorEvent pointer to a SEE_RedirectedQEvent object
+         * @return @li the pointer to the QEvent (if "see" was a pointer to a
+         *             SEE_RedirectedQEvent object)
+         *         @li nullptr otherwise
+         */
+        static QEvent* getQEventFromSEE(const SchematicEditorEvent* see) noexcept
+        {
+            const SEE_RedirectedQEvent* r = dynamic_cast<const SEE_RedirectedQEvent*>(see);
+            return (r ? r->getQEvent() : nullptr);
+        }
+
     private:
 
         QEvent* mQEvent;

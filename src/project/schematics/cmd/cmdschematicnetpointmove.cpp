@@ -22,8 +22,8 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "cmdsymbolinstancemove.h"
-#include "../symbolinstance.h"
+#include "cmdschematicnetpointmove.h"
+#include "../schematicnetpoint.h"
 
 namespace project {
 
@@ -31,68 +31,54 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSymbolInstanceMove::CmdSymbolInstanceMove(SymbolInstance& symbol, UndoCommand* parent) throw (Exception) :
-    UndoCommand(QCoreApplication::translate("CmdSymbolInstanceMove", "Move symbol"), parent),
-    mSymbolInstance(symbol), mStartPos(symbol.getPosition()), mDeltaPos(0, 0),
-    mEndPos(symbol.getPosition()), mStartAngle(symbol.getAngle()), mDeltaAngle(0),
-    mEndAngle(symbol.getAngle()), mRedoOrUndoCalled(false)
+CmdSchematicNetPointMove::CmdSchematicNetPointMove(SchematicNetPoint& point, UndoCommand* parent) throw (Exception) :
+    UndoCommand(QCoreApplication::translate("CmdSchematicNetPointMove", "Move netpoint"), parent),
+    mNetPoint(point), mStartPos(point.getPosition()), mDeltaPos(0, 0),
+    mEndPos(point.getPosition()), mRedoOrUndoCalled(false)
 {
 }
 
-CmdSymbolInstanceMove::~CmdSymbolInstanceMove() noexcept
+CmdSchematicNetPointMove::~CmdSchematicNetPointMove() noexcept
 {
     if ((!mRedoOrUndoCalled) && (!mDeltaPos.isOrigin()))
-    {
-        mSymbolInstance.setPosition(mStartPos, false);
-        mSymbolInstance.setAngle(mStartAngle, false);
-    }
+        mNetPoint.setPosition(mStartPos);
 }
 
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
-void CmdSymbolInstanceMove::setAbsolutePosTemporary(Point& absPos) noexcept
+void CmdSchematicNetPointMove::setAbsolutePosTemporary(Point& absPos) noexcept
 {
     Q_ASSERT(mRedoOrUndoCalled == false);
     mDeltaPos = absPos - mStartPos;
-    mSymbolInstance.setPosition(absPos, false);
+    mNetPoint.setPosition(absPos);
 }
 
-void CmdSymbolInstanceMove::setDeltaToStartPosTemporary(Point& deltaPos) noexcept
+void CmdSchematicNetPointMove::setDeltaToStartPosTemporary(Point& deltaPos) noexcept
 {
     Q_ASSERT(mRedoOrUndoCalled == false);
     mDeltaPos = deltaPos;
-    mSymbolInstance.setPosition(mStartPos + mDeltaPos, false);
-}
-
-void CmdSymbolInstanceMove::rotate90degreesCCW() noexcept
-{
-    Q_ASSERT(mRedoOrUndoCalled == false);
-    mDeltaAngle -= Angle(90000000L);
-    mSymbolInstance.setAngle(mStartAngle + mDeltaAngle, false);
+    mNetPoint.setPosition(mStartPos + mDeltaPos);
 }
 
 /*****************************************************************************************
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdSymbolInstanceMove::redo() throw (Exception)
+void CmdSchematicNetPointMove::redo() throw (Exception)
 {
     mRedoOrUndoCalled = true;
     UndoCommand::redo(); // throws an exception on error
     mEndPos = mStartPos + mDeltaPos;
-    mEndAngle = mStartAngle + mDeltaAngle;
-    mSymbolInstance.setPosition(mEndPos);
-    mSymbolInstance.setAngle(mEndAngle);
+    mNetPoint.setPosition(mEndPos);
 }
 
-void CmdSymbolInstanceMove::undo() throw (Exception)
+void CmdSchematicNetPointMove::undo() throw (Exception)
 {
     mRedoOrUndoCalled = true;
     UndoCommand::undo();
-    mSymbolInstance.setPosition(mStartPos);
-    mSymbolInstance.setAngle(mStartAngle);
+    mNetPoint.setPosition(mStartPos);
 }
 
 /*****************************************************************************************

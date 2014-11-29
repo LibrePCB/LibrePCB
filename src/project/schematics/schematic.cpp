@@ -210,10 +210,9 @@ SchematicNetPoint* Schematic::createNetPoint(const QUuid& netsignal, const Point
     return SchematicNetPoint::create(*this, mXmlFile->getDocument(), netsignal, position);
 }
 
-SchematicNetPoint* Schematic::createNetPoint(const QUuid& netsignal, const QUuid& symbol,
-                                             const QUuid& pin) throw (Exception)
+SchematicNetPoint* Schematic::createNetPoint(const QUuid& symbol, const QUuid& pin) throw (Exception)
 {
-    return SchematicNetPoint::create(*this, mXmlFile->getDocument(), netsignal, symbol, pin);
+    return SchematicNetPoint::create(*this, mXmlFile->getDocument(), symbol, pin);
 }
 
 void Schematic::addNetPoint(SchematicNetPoint* netpoint, bool toDomTree) throw (Exception)

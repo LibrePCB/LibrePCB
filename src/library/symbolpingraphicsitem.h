@@ -28,6 +28,7 @@
 #include <QGraphicsItem>
 #include "../common/exceptions.h"
 #include "../common/units.h"
+#include "../common/cadscene.h"
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -58,15 +59,23 @@ class SymbolPinGraphicsItem final : public QGraphicsItem
 {
     public:
 
+        // Types
+
+        /// to make  qgraphicsitem_cast() working
+        enum {Type = CADScene::Type_SymbolPin};
+
         // Constructors / Destructor
         explicit SymbolPinGraphicsItem(SymbolGraphicsItem& symbol, const SymbolPin& pin,
                                        project::SymbolPinInstance* instance = 0) throw (Exception);
         ~SymbolPinGraphicsItem() noexcept;
 
+        // Getters
+        project::SymbolPinInstance* getPinInstance() const noexcept {return mPinInstance;}
 
         // Inherited from QGraphicsItem
         QRectF boundingRect() const noexcept {return mBoundingRect;}
         QPainterPath shape() const noexcept {return mShape;}
+        int type() const {return Type;} ///< to make  qgraphicsitem_cast() working
         void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
         QVariant itemChange(GraphicsItemChange change, const QVariant& value);
 

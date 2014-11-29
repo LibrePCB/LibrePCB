@@ -77,7 +77,7 @@ class SchematicNetPointGraphicsItem final : public QGraphicsItem
         int type() const {return Type;} ///< to make  qgraphicsitem_cast() working
         QRectF boundingRect() const;
         void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
-        QVariant itemChange(GraphicsItemChange change, const QVariant& value);
+
 
     private:
 
@@ -116,7 +116,8 @@ class SchematicNetPoint final : public QObject
 
         // Getters
         const QUuid& getUuid() const noexcept {return mUuid;}
-        NetSignal* getNetSignal() const noexcept {return mNetSignal;}
+        NetSignal* getNetSignal() const noexcept;
+        bool isAttached() const noexcept {return mAttached;}
         const Point& getPosition() const noexcept {return mPosition;}
         int getLinesCount() const noexcept {return mLines.count();}
 
@@ -136,8 +137,8 @@ class SchematicNetPoint final : public QObject
                                          const QUuid& netsignal, const Point& position)
                                          throw (Exception);
         static SchematicNetPoint* create(Schematic& schematic, QDomDocument& doc,
-                                         const QUuid& netsignal, const QUuid& symbol,
-                                         const QUuid& pin) throw (Exception);
+                                         const QUuid& symbol, const QUuid& pin)
+                                         throw (Exception);
 
     private:
 

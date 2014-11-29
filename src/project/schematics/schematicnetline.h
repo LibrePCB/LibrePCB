@@ -25,7 +25,9 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <QtWidgets>
 #include <QDomElement>
+#include "../../common/cadscene.h"
 #include "../../common/units.h"
 #include "../../common/exceptions.h"
 
@@ -33,13 +35,60 @@
  *  Forward Declarations
  ****************************************************************************************/
 
-class QGraphicsLineItem;
 class SchematicLayer;
 
 namespace project {
 class Schematic;
 class SchematicNetPoint;
+class SchematicNetLine;
 }
+
+/*****************************************************************************************
+ *  Class SchematicNetLineGraphicsItem
+ ****************************************************************************************/
+
+namespace project {
+
+/**
+ * @brief The SchematicNetLineGraphicsItem class
+ */
+class SchematicNetLineGraphicsItem final : public QGraphicsLineItem
+{
+    public:
+
+        // Types
+
+        /// to make  qgraphicsitem_cast() working
+        enum {Type = CADScene::Type_SchematicNetLine};
+
+        // Constructors / Destructor
+        explicit SchematicNetLineGraphicsItem(Schematic& schematic,
+                                              SchematicNetLine& line) throw (Exception);
+
+        ~SchematicNetLineGraphicsItem() noexcept;
+
+        // Getters
+        SchematicNetLine& getNetLine() const {return mLine;}
+
+        // Inherited from QGraphicsItem
+        int type() const {return Type;} ///< to make  qgraphicsitem_cast() working
+        QPainterPath shape() const;
+        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
+
+    private:
+
+        // make some methods inaccessible...
+        SchematicNetLineGraphicsItem();
+        SchematicNetLineGraphicsItem(const SchematicNetLineGraphicsItem& other);
+        SchematicNetLineGraphicsItem& operator=(const SchematicNetLineGraphicsItem& rhs);
+
+        // Attributes
+        Schematic& mSchematic;
+        SchematicNetLine& mLine;
+        SchematicLayer* mLayer;
+};
+
+} // namespace project
 
 /*****************************************************************************************
  *  Class SchematicNetLine
@@ -63,6 +112,9 @@ class SchematicNetLine final : public QObject
 
         // Getters
         const QUuid& getUuid() const noexcept {return mUuid;}
+        SchematicNetPoint& getStartPoint() const noexcept {return *mStartPoint;}
+        SchematicNetPoint& getEndPoint() const noexcept {return *mEndPoint;}
+        bool isAttachedToSymbol() const noexcept;
 
         // General Methods
         void updateLine() noexcept;
@@ -85,8 +137,7 @@ class SchematicNetLine final : public QObject
         // General
         Schematic& mSchematic;
         QDomElement mDomElement;
-        QGraphicsLineItem* mItem;
-        SchematicLayer* mLayer;
+        SchematicNetLineGraphicsItem* mGraphicsItem;
 
         // Attributes
         QUuid mUuid;

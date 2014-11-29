@@ -32,12 +32,58 @@
 namespace project {
 
 /*****************************************************************************************
+ *  Class SchematicNetLineGraphicsItem
+ ****************************************************************************************/
+
+// Constructors / Destructor
+SchematicNetLineGraphicsItem::SchematicNetLineGraphicsItem(Schematic& schematic,
+                                                           SchematicNetLine& line) throw (Exception) :
+    QGraphicsLineItem(), mSchematic(schematic), mLine(line), mLayer(0)
+{
+    mLayer = mSchematic.getProject().getSchematicLayer(SchematicLayer::Nets);
+    if (!mLayer)
+    {
+        throw LogicError(__FILE__, __LINE__, QString(),
+            QCoreApplication::translate("SchematicNetLineGraphicsItem",
+                                        "No Nets Layer found!"));
+    }
+
+    setFlags(QGraphicsItem::ItemIsSelectable);
+    setZValue(Schematic::ZValue_NetLines);
+}
+
+SchematicNetLineGraphicsItem::~SchematicNetLineGraphicsItem() noexcept
+{
+}
+
+QPainterPath SchematicNetLineGraphicsItem::shape() const
+{
+    QPainterPath path;
+    path.moveTo(line().p1());
+    path.lineTo(line().p2());
+    QPainterPathStroker ps;
+    ps.setCapStyle(Qt::RoundCap);
+    ps.setWidth(Length(5 * 254000).toPx()); // 5 x line width
+    return ps.createStroke(path);
+}
+
+void SchematicNetLineGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+{
+    Q_UNUSED(widget);
+
+    bool highlight = option->state & QStyle::State_Selected;
+    painter->setPen(QPen(mLayer->getColor(highlight), Length(254000).toPx(),
+                         Qt::SolidLine, Qt::RoundCap));
+    painter->drawLine(line());
+}
+
+/*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
 SchematicNetLine::SchematicNetLine(Schematic& schematic, const QDomElement& domElement)
                                    throw (Exception) :
-    QObject(0), mSchematic(schematic), mDomElement(domElement), mItem(0), mLayer(0),
+    QObject(0), mSchematic(schematic), mDomElement(domElement), mGraphicsItem(0),
     mStartPoint(0), mEndPoint(0)
 {
     mUuid = mDomElement.attribute("uuid");
@@ -64,18 +110,21 @@ SchematicNetLine::SchematicNetLine(Schematic& schematic, const QDomElement& domE
             .arg(mDomElement.attribute("end_point")));
     }
 
-    mLayer = mSchematic.getProject().getSchematicLayer(SchematicLayer::Nets);
-    if (!mLayer)
-        throw LogicError(__FILE__, __LINE__, QString(), tr("No Nets Layer found!"));
-
-    mItem = new QGraphicsLineItem();
-    mItem->setPen(QPen(mLayer->getColor(), 1, Qt::SolidLine, Qt::RoundCap));
-    mItem->setZValue(Schematic::ZValue_NetLines);
+    mGraphicsItem = new SchematicNetLineGraphicsItem(mSchematic, *this);
 }
 
 SchematicNetLine::~SchematicNetLine() noexcept
 {
-    delete mItem;       mItem = 0;
+    delete mGraphicsItem;       mGraphicsItem = 0;
+}
+
+/*****************************************************************************************
+ *  Getters
+ ****************************************************************************************/
+
+bool SchematicNetLine::isAttachedToSymbol() const noexcept
+{
+    return (mStartPoint->isAttached() || mEndPoint->isAttached());
 }
 
 /*****************************************************************************************
@@ -86,7 +135,7 @@ void SchematicNetLine::updateLine() noexcept
 {
     QLineF line(mStartPoint->getPosition().toPxQPointF(),
                 mEndPoint->getPosition().toPxQPointF());
-    mItem->setLine(line);
+    mGraphicsItem->setLine(line);
 }
 
 void SchematicNetLine::addToSchematic(Schematic& schematic, bool addNode,
@@ -101,7 +150,7 @@ void SchematicNetLine::addToSchematic(Schematic& schematic, bool addNode,
             throw LogicError(__FILE__, __LINE__, QString(), tr("Could not append DOM node!"));
     }
 
-    schematic.addItem(mItem);
+    schematic.addItem(mGraphicsItem);
     mStartPoint->registerNetLine(this);
     mEndPoint->registerNetLine(this);
 }
@@ -120,7 +169,7 @@ void SchematicNetLine::removeFromSchematic(Schematic& schematic, bool removeNode
 
     mStartPoint->unregisterNetLine(this);
     mEndPoint->unregisterNetLine(this);
-    schematic.removeItem(mItem);
+    schematic.removeItem(mGraphicsItem);
 }
 
 /*****************************************************************************************

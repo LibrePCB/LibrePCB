@@ -22,9 +22,8 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "cmdschematicnetpointadd.h"
-#include "../schematic.h"
-#include "../schematicnetpoint.h"
+#include "cmdgencompsiginstsetnetsignal.h"
+#include "../gencompsignalinstance.h"
 
 namespace project {
 
@@ -32,43 +31,26 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSchematicNetPointAdd::CmdSchematicNetPointAdd(Schematic& schematic, const QUuid& netsignal,
-                                                 const Point& position, UndoCommand* parent) throw (Exception) :
-    UndoCommand(QCoreApplication::translate("CmdSchematicNetPointAdd", "Add netpoint"), parent),
-    mSchematic(schematic), mNetSignal(netsignal), mAttachedToSymbol(false),
-    mPosition(position), mSymbol(), mPin(), mNetPoint(0)
+CmdGenCompSigInstSetNetSignal::CmdGenCompSigInstSetNetSignal(GenCompSignalInstance& genCompSigInstance,
+                                             NetSignal* netsignal,
+                                             UndoCommand* parent) throw (Exception) :
+    UndoCommand(QCoreApplication::translate("CmdGenCompSigInstSetNetSignal", "Change component signal net"), parent),
+    mGenCompSigInstance(genCompSigInstance), mNetSignal(netsignal),
+    mOldNetSignal(genCompSigInstance.getNetSignal())
 {
 }
 
-CmdSchematicNetPointAdd::CmdSchematicNetPointAdd(Schematic& schematic, const QUuid& symbol,
-                                                 const QUuid& pin, UndoCommand* parent) throw (Exception) :
-    UndoCommand(QCoreApplication::translate("CmdSchematicNetPointAdd", "Add netpoint"), parent),
-    mSchematic(schematic), mNetSignal(), mAttachedToSymbol(true),
-    mPosition(), mSymbol(symbol), mPin(pin), mNetPoint(0)
+CmdGenCompSigInstSetNetSignal::~CmdGenCompSigInstSetNetSignal() noexcept
 {
-}
-
-CmdSchematicNetPointAdd::~CmdSchematicNetPointAdd() noexcept
-{
-    if ((mNetPoint) && (!mIsExecuted))
-        delete mNetPoint;
 }
 
 /*****************************************************************************************
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdSchematicNetPointAdd::redo() throw (Exception)
+void CmdGenCompSigInstSetNetSignal::redo() throw (Exception)
 {
-    if (!mNetPoint) // only the first time
-    {
-        if (mAttachedToSymbol)
-            mNetPoint = mSchematic.createNetPoint(mSymbol, mPin); // throws an exception on error
-        else
-            mNetPoint = mSchematic.createNetPoint(mNetSignal, mPosition); // throws an exception on error
-    }
-
-    mSchematic.addNetPoint(mNetPoint); // throws an exception on error
+    mGenCompSigInstance.setNetSignal(mNetSignal); // throws an exception on error
 
     try
     {
@@ -76,14 +58,14 @@ void CmdSchematicNetPointAdd::redo() throw (Exception)
     }
     catch (Exception &e)
     {
-        mSchematic.removeNetPoint(mNetPoint);
+        mGenCompSigInstance.setNetSignal(mOldNetSignal);
         throw;
     }
 }
 
-void CmdSchematicNetPointAdd::undo() throw (Exception)
+void CmdGenCompSigInstSetNetSignal::undo() throw (Exception)
 {
-    mSchematic.removeNetPoint(mNetPoint); // throws an exception on error
+    mGenCompSigInstance.setNetSignal(mOldNetSignal); // throws an exception on error
 
     try
     {
@@ -91,7 +73,7 @@ void CmdSchematicNetPointAdd::undo() throw (Exception)
     }
     catch (Exception& e)
     {
-        mSchematic.addNetPoint(mNetPoint);
+        mGenCompSigInstance.setNetSignal(mNetSignal);
         throw;
     }
 }

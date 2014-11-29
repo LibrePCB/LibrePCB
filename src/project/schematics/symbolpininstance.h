@@ -65,7 +65,7 @@ class SymbolPinInstance final : public QObject
         SchematicNetPoint* getSchematicNetPoint() const noexcept {return mRegisteredSchematicNetPoint;}
         const library::SymbolPin& getSymbolPin() const noexcept {return *mSymbolPin;}
         const library::GenCompSignal* getGenCompSignal() const noexcept {return mGenCompSignal;}
-        const GenCompSignalInstance* getGenCompSignalInstance() const noexcept {return mGenCompSignalInstance;}
+        GenCompSignalInstance* getGenCompSignalInstance() const noexcept {return mGenCompSignalInstance;}
 
         // General Methods
         void registerNetPoint(SchematicNetPoint* netpoint);
