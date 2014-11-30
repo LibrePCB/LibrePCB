@@ -355,6 +355,38 @@ QDebug operator<<(QDebug stream, const Length& length)
  *  Class Angle
  ****************************************************************************************/
 
+// General Methods
+
+Angle Angle::mappedTo0_360deg() const noexcept
+{
+    Angle a(*this);
+    a.mapTo0_360deg();
+    return a;
+}
+
+Angle& Angle::mapTo0_360deg() noexcept
+{
+    if (mMicrodegrees < 0)
+        mMicrodegrees += 360000000;
+    return *this;
+}
+
+Angle Angle::mappedTo180deg() const noexcept
+{
+    Angle a(*this);
+    a.mapTo180deg();
+    return a;
+}
+
+Angle& Angle::mapTo180deg() noexcept
+{
+    if (mMicrodegrees < -180000000)
+        mMicrodegrees += 360000000;
+    else if (mMicrodegrees >= 180000000)
+        mMicrodegrees -= 360000000;
+    return *this;
+}
+
 // Static Methods
 
 Angle Angle::fromDeg(qreal degrees) noexcept
@@ -423,6 +455,47 @@ Point& Point::mapToGrid(const Length& gridInterval) noexcept
 {
     mX.mapToGrid(gridInterval);
     mY.mapToGrid(gridInterval);
+    return *this;
+}
+
+Point Point::rotated(const Angle& angle, const Point& center) const noexcept
+{
+    Point p(*this);
+    p.rotate(angle, center);
+    return p;
+}
+
+Point& Point::rotate(const Angle& angle, const Point& center) noexcept
+{
+    Length dx = mX - center.getX();
+    Length dy = mY - center.getY();
+    Angle angle0_360 = angle.mappedTo0_360deg();
+
+    // if angle is a multiple of 90 degrees, rotating can be done without loosing accuracy
+    if (angle0_360 == Angle::deg90())
+    {
+        setX(center.getX() + dy);
+        setY(center.getY() - dx);
+    }
+    else if (angle0_360 == Angle::deg180())
+    {
+        setX(center.getX() - dx);
+        setY(center.getY() - dy);
+    }
+    else if (angle0_360 == Angle::deg270())
+    {
+        setX(center.getX() - dy);
+        setY(center.getY() + dx);
+    }
+    else if (angle != Angle::deg0())
+    {
+        // angle is not a multiple of 90 degrees --> we must use floating point arithmetic
+        qreal sin = qSin(angle.toRad());
+        qreal cos = qCos(angle.toRad());
+        setX(Length(center.getX().toNm() + cos * dx.toNm() + sin * dy.toNm()));
+        setY(Length(center.getY().toNm() - sin * dx.toNm() + cos * dy.toNm()));
+    } // else: angle == 0°, nothing to do...
+
     return *this;
 }
 

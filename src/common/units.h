@@ -669,6 +669,12 @@ class Length
 
         // Operators
         Length& operator=(const Length& rhs)        {mNanometers = rhs.mNanometers; return *this;}
+        Length& operator+=(const Length& rhs)       {mNanometers += rhs.mNanometers; return *this;}
+        Length& operator-=(const Length& rhs)       {mNanometers -= rhs.mNanometers; return *this;}
+        Length& operator*=(const Length& rhs)       {mNanometers *= rhs.mNanometers; return *this;}
+        Length& operator*=(LengthBase_t rhs)        {mNanometers *= rhs; return *this;}
+        Length& operator/=(const Length& rhs)       {mNanometers /= rhs.mNanometers; return *this;}
+        Length& operator/=(LengthBase_t rhs)        {mNanometers /= rhs; return *this;}
         Length  operator+(const Length& rhs) const  {return Length(mNanometers + rhs.mNanometers);}
         Length  operator-(const Length& rhs) const  {return Length(mNanometers - rhs.mNanometers);}
         Length  operator*(const Length& rhs) const  {return Length(mNanometers * rhs.mNanometers);}
@@ -772,9 +778,16 @@ QDebug operator<<(QDebug stream, const Length& length);
  *
  * All angles are stored in the integer base type int32_t. The internal unit is always
  * microdegrees, but this class provides also some converting methods to other units. The
- * range of the angle is -360°...+360°. So each angle can be represented in two different
- * ways (for example +270° is equal to -90°). Angles outside this range are mapped to this
- * range (modulo), the sign will be the same as before.
+ * range of the angle is ]-360°...+360°[. So each angle (except 0 degrees) can be
+ * represented in two different ways (for example +270° is equal to -90°). Angles outside
+ * this range are mapped to this range (modulo), the sign will be the same as before.
+ *
+ * If you don't want an (ambiguous) angle in the range ]-360..+360[ degrees but [0..360[
+ * or [-180..+180[ degrees, there are converter methods available: #mappedTo0_360deg(),
+ * #mapTo0_360deg(), #mappedTo180deg(), #mapTo180deg().
+ *
+ * There are also some static method available to build some often used angles:
+ * #deg0(), #deg45(), #deg90() and so on...
  *
  * @author ubruhin
  * @date 2014-06-21
@@ -822,6 +835,7 @@ class Angle
          * @warning If you want to set the angle exactly to common values like 0/45/90/...
          * degrees, you should not use this method. Please use setAngleMicroDeg()
          * instead, because it is more accurate (no use of floating point numbers).
+         * Or you can also use the static methods #deg0(), #deg45() and so on.
          *
          * @todo fmod is only for double, so not good for ARM!
          */
@@ -846,6 +860,7 @@ class Angle
          * @warning If you want to set the angle exactly to common values like 0/45/90/...
          * degrees, you should not use this method. Please use setAngleMicroDeg()
          * instead, because it is more accurate (no use of floating point numbers).
+         * Or you can also use the static methods #deg0(), #deg45() and so on.
          *
          * @todo fmod is only for double, so not good for ARM!
          */
@@ -887,7 +902,46 @@ class Angle
         qreal toRad() const noexcept {return (qreal)mMicrodegrees * (qreal)M_PI / 180e6;}
 
 
-        // Static Functions
+        // General Methods
+
+        /**
+         * @brief Get an Angle object which is mapped to [0..360[ degrees
+         *
+         * @return A new Angle object which is mapped to [0..360[ degrees
+         *
+         * @see Angle#mapTo0_360deg()
+         */
+        Angle mappedTo0_360deg() const noexcept;
+
+        /**
+         * @brief Map this Angle object to [0..360[ degrees
+         *
+         * @return A reference to the modified object
+         *
+         * @see Angle#mappedTo0_360deg()
+         */
+        Angle& mapTo0_360deg() noexcept;
+
+        /**
+         * @brief Get an Angle object which is mapped to [-180..+180[ degrees
+         *
+         * @return A new Angle object which is mapped to [-180..+180[ degrees
+         *
+         * @see Angle#mapTo180deg()
+         */
+        Angle mappedTo180deg() const noexcept;
+
+        /**
+         * @brief Map this Angle object to [-180..+180[ degrees
+         *
+         * @return A reference to the modified object
+         *
+         * @see Angle#mappedTo180deg()
+         */
+        Angle& mapTo180deg() noexcept;
+
+
+        // Static Methods
 
         /**
          * @brief Get an Angle object with a specific angle
@@ -926,6 +980,17 @@ class Angle
         static Angle fromRad(qreal radians) noexcept;
 
 
+        // Static Methods to create often used angles
+        static Angle deg0()   noexcept {return Angle(        0);}   ///<   0 degrees
+        static Angle deg45()  noexcept {return Angle( 45000000);}   ///<  45 degrees
+        static Angle deg90()  noexcept {return Angle( 90000000);}   ///<  90 degrees
+        static Angle deg135() noexcept {return Angle(135000000);}   ///< 135 degrees
+        static Angle deg180() noexcept {return Angle(180000000);}   ///< 180 degrees
+        static Angle deg225() noexcept {return Angle(225000000);}   ///< 225 degrees
+        static Angle deg270() noexcept {return Angle(270000000);}   ///< 270 degrees
+        static Angle deg315() noexcept {return Angle(315000000);}   ///< 315 degrees
+
+
         // Operators
         Angle&  operator=(const Angle& rhs)         {mMicrodegrees = rhs.mMicrodegrees; return *this;}
         Angle&  operator+=(const Angle& rhs)        {mMicrodegrees = (mMicrodegrees + rhs.mMicrodegrees) % 360000000; return *this;}
@@ -949,6 +1014,7 @@ class Angle
         bool    operator==(qint32 rhs) const        {return mMicrodegrees == rhs;}
         bool    operator!=(const Angle& rhs) const  {return mMicrodegrees != rhs.mMicrodegrees;}
         bool    operator!=(qint32 rhs) const        {return mMicrodegrees != rhs;}
+        operator bool() const {return mMicrodegrees != 0;}
 
     private:
 
@@ -1190,7 +1256,7 @@ class Point
         QPointF toPxQPointF() const noexcept {return QPointF(mX.toPx(), -mY.toPx());} // invert Y!
 
 
-        // General
+        // General Methods
 
         /**
          * @brief Get a Point object which is mapped to a specific grid interval
@@ -1199,7 +1265,7 @@ class Point
          *
          * @return A new Point object which is mapped to the grid
          *
-         * @see Length::mappedToGrid()
+         * @see Length#mappedToGrid(), Point#mapToGrid()
          */
         Point mappedToGrid(const Length& gridInterval) const noexcept;
 
@@ -1210,9 +1276,41 @@ class Point
          *
          * @return A reference to the modified object
          *
-         * @see Length::mapToGrid()
+         * @see Length#mapToGrid(), Point#mappedToGrid()
          */
         Point& mapToGrid(const Length& gridInterval) noexcept;
+
+        /**
+         * @brief Get the point rotated by a specific angle with respect to a specific center
+         *
+         * @note If the angle is a multiple of (exactly!) 90 degrees, this method will
+         *       work without loosing accuracy (only integer operations). Otherwise, the
+         *       result may be not very accurate.
+         *
+         * @param angle     The angle to rotate (CW)
+         * @param center    The center of the rotation
+         *
+         * @return A new Point object which is rotated
+         *
+         * @see Point#rotate()
+         */
+        Point rotated(const Angle& angle, const Point& center = Point(0, 0)) const noexcept;
+
+        /**
+         * @brief Rotate the point by a specific angle with respect to a specific center
+         *
+         * @note If the angle is a multiple of (exactly!) 90 degrees, this method will
+         *       work without loosing accuracy (only integer operations). Otherwise, the
+         *       result may be not very accurate.
+         *
+         * @param angle     The angle to rotate (CW)
+         * @param center    The center of the rotation
+         *
+         * @return A reference to the modified object
+         *
+         * @see Point#rotated()
+         */
+        Point& rotate(const Angle& angle, const Point& center = Point(0, 0)) noexcept;
 
 
         // Static Functions
@@ -1236,7 +1334,13 @@ class Point
         static Point fromPx(const QPointF& pixels,                  const Length& gridInterval = Length(0)) throw (RangeError);
 
         // Operators
-        Point&  operator=(const Point& rhs)        {mX = rhs.mX; mY = rhs.mY; return *this;}
+        Point&  operator=(const Point& rhs)        {mX = rhs.mX;  mY = rhs.mY;  return *this;}
+        Point&  operator+=(const Point& rhs)       {mX += rhs.mX; mY += rhs.mY; return *this;}
+        Point&  operator-=(const Point& rhs)       {mX -= rhs.mX; mY -= rhs.mY; return *this;}
+        Point&  operator*=(const Point& rhs)       {mX *= rhs.mX; mY *= rhs.mY; return *this;}
+        Point&  operator*=(LengthBase_t rhs)       {mX *= rhs;    mY *= rhs;    return *this;}
+        Point&  operator/=(const Point& rhs)       {mX /= rhs.mX; mY /= rhs.mY; return *this;}
+        Point&  operator/=(LengthBase_t rhs)       {mX /= rhs;    mY /= rhs;    return *this;}
         Point   operator+(const Point& rhs) const  {return Point(mX + rhs.mX, mY + rhs.mY);}
         Point   operator-(const Point& rhs) const  {return Point(mX - rhs.mX, mY - rhs.mY);}
         Point   operator*(const Length& rhs) const {return Point(mX * rhs, mY * rhs);}
