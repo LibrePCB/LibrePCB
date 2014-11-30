@@ -83,7 +83,7 @@ class Schematic final : public CADScene
 
         // Constructors / Destructor
         explicit Schematic(Project& project, const FilePath& filepath, bool restore,
-                           bool isNew = false) throw (Exception);
+                           bool readOnly, bool isNew = false) throw (Exception);
         ~Schematic() noexcept;
 
         // Getters: Attributes

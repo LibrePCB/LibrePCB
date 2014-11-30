@@ -47,8 +47,8 @@ namespace project {
 
 Project::Project(const FilePath& filepath, bool create) throw (Exception) :
     QObject(0), mPath(filepath.getParentDir()), mFilepath(filepath), mXmlFile(0),
-    mFileLock(filepath), mIsRestored(false), mSchematicsIniFile(0), mUndoStack(0),
-    mProjectLibrary(0), mCircuit(0), mSchematicEditor(0)
+    mFileLock(filepath), mIsRestored(false), mIsReadOnly(false), mSchematicsIniFile(0),
+    mUndoStack(0), mProjectLibrary(0), mCircuit(0), mSchematicEditor(0)
 {
     qDebug() << (create ? "create project..." : "open project...");
 
@@ -93,10 +93,20 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
 
         case FileLock::Locked:
         {
-            // the project is locked by another application instance
-            throw RuntimeError(__FILE__, __LINE__, QString(), tr("The project is already "
-                               "opened by another application instance or user!"));
-            break; // just to be on the safe side...
+            // the project is locked by another application instance! open read only?
+            QMessageBox::StandardButton btn = QMessageBox::question(0, tr("Open Read-Only?"),
+                tr("The project is already opened by another application instance or user. "
+                "Do you want to open the project in read-only mode?"), QMessageBox::Yes |
+                QMessageBox::Cancel, QMessageBox::Cancel);
+            switch (btn)
+            {
+                case QMessageBox::Yes: // open the project in read-only mode
+                    mIsReadOnly = true;
+                    break;
+                default: // abort opening the project
+                    throw UserCanceled(__FILE__, __LINE__);
+            }
+            break;
         }
 
         case FileLock::StaleLock:
@@ -114,10 +124,8 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
                 case QMessageBox::No: // open the project without restoring the last backup
                     mIsRestored = false;
                     break;
-                case QMessageBox::Cancel: // abort opening the project
-                default:
-                    throw UserCanceled(__FILE__, __LINE__, "canceled by the user");
-                    break; // just to be on the safe side...
+                default: // abort opening the project
+                    throw UserCanceled(__FILE__, __LINE__);
             }
             break;
         }
@@ -127,20 +135,25 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
         {
             throw RuntimeError(__FILE__, __LINE__, QString(),
                                tr("Could not read the project lock file!"));
-            break; // just to be on the safe side...
         }
     }
 
     // the project can be opened by this application, so we will lock the whole project
-    if (!mFileLock.lock())
+    if (!mIsReadOnly)
     {
-        throw RuntimeError(__FILE__, __LINE__, mFileLock.getLockFilepath().toStr(),
-            QString(tr("Error while locking the project!\nDo you have write permissions "
-            "to the file \"%1\"?")).arg(mFileLock.getLockFilepath().toNative()));
+        if (!mFileLock.lock())
+        {
+            throw RuntimeError(__FILE__, __LINE__, mFileLock.getLockFilepath().toStr(),
+                QString(tr("Error while locking the project!\nDo you have write permissions "
+                "to the file \"%1\"?")).arg(mFileLock.getLockFilepath().toNative()));
+        }
     }
 
+    // check if the combination of "create", "mIsRestored" and "mIsReadOnly" is valid
+    Q_ASSERT(!(create && (mIsRestored || mIsReadOnly)));
 
-    // OK - the project is locked and can be opened!
+
+    // OK - the project is locked (or read-only) and can be opened!
     // Until this line, there was no memory allocated on the heap. But in the rest of the
     // constructor, a lot of object will be created on the heap. If an exception is
     // thrown somewhere, we must ensure that all the allocated memory gets freed.
@@ -153,13 +166,13 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
         if (create)
             mXmlFile = XmlFile::create(mFilepath, QStringLiteral("project"), 0);
         else
-            mXmlFile = new XmlFile(mFilepath, mIsRestored, false, QStringLiteral("project"));
+            mXmlFile = new XmlFile(mFilepath, mIsRestored, mIsReadOnly, QStringLiteral("project"));
 
         // the project seems to be ready to open, so we will create all needed objects
 
         mUndoStack = new UndoStack();
-        mProjectLibrary = new ProjectLibrary(*this, mIsRestored);
-        mCircuit = new Circuit(*this, mIsRestored, create);
+        mProjectLibrary = new ProjectLibrary(*this, mIsRestored, mIsReadOnly);
+        mCircuit = new Circuit(*this, mIsRestored, mIsReadOnly, create);
 
         // Load all schematic layers
         foreach (unsigned int id, SchematicLayer::getAllLayerIDs())
@@ -169,7 +182,7 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
         if (create)
             mSchematicsIniFile = IniFile::create(mPath.getPathTo("schematics/schematics.ini"), 0);
         else
-            mSchematicsIniFile = new IniFile(mPath.getPathTo("schematics/schematics.ini"), mIsRestored, false);
+            mSchematicsIniFile = new IniFile(mPath.getPathTo("schematics/schematics.ini"), mIsRestored, mIsReadOnly);
         QSettings* schematicsSettings = mSchematicsIniFile->createQSettings();
         int schematicsCount = schematicsSettings->beginReadArray("pages");
         for (int i = 0; i < schematicsCount; i++)
@@ -177,14 +190,14 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
             schematicsSettings->setArrayIndex(i);
             FilePath filepath = FilePath::fromRelative(mPath.getPathTo("schematics"),
                                     schematicsSettings->value("page").toString());
-            Schematic* schematic = new Schematic(*this, filepath, mIsRestored);
+            Schematic* schematic = new Schematic(*this, filepath, mIsRestored, mIsReadOnly);
             addSchematic(schematic, -1, false);
         }
         schematicsSettings->endArray();
         mSchematicsIniFile->releaseQSettings(schematicsSettings);
         qDebug() << mSchematics.count() << "schematics successfully loaded!";
 
-        mSchematicEditor = new SchematicEditor(*this);
+        mSchematicEditor = new SchematicEditor(*this, mIsReadOnly);
 
         if (create) save(); // write all files to harddisc
     }
@@ -207,7 +220,7 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
 
     // setup the timer for automatic backups, if enabled in the settings
     int intervalSecs =  Workspace::instance().getSettings().getProjectAutosaveInterval()->getInterval();
-    if (intervalSecs > 0)
+    if ((intervalSecs > 0) && (!mIsReadOnly))
     {
         // autosaving is enabled --> start the timer
         connect(&mAutoSaveTimer, SIGNAL(timeout()), this, SLOT(autosave()));
@@ -523,6 +536,12 @@ void Project::updateSchematicsList() throw (Exception)
 bool Project::save(bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
+
+    if (mIsReadOnly)
+    {
+        errors.append(tr("The project was opened in read-only mode."));
+        return false;
+    }
 
     if (mUndoStack->isCommandActive())
     {

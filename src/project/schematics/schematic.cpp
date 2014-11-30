@@ -36,14 +36,15 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Schematic::Schematic(Project& project, const FilePath& filepath, bool restore, bool isNew)
+Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
+                     bool readOnly, bool isNew)
                      throw (Exception):
     CADScene(), mProject(project), mFilePath(filepath), mXmlFile(0)
 {
     try
     {
         // try to open the XML schematic file
-        mXmlFile = new XmlFile(mFilePath, restore, false, QStringLiteral("schematic"));
+        mXmlFile = new XmlFile(mFilePath, restore, readOnly, QStringLiteral("schematic"));
 
         // the schematic seems to be ready to open, so we will create all needed objects
 
@@ -375,7 +376,7 @@ Schematic* Schematic::create(Project& project, const FilePath& filepath,
     try
     {
         file->save(false); // write new (temporary) XML file to filesystem
-        Schematic* schematic = new Schematic(project, filepath, true, true); // create new Schematic
+        Schematic* schematic = new Schematic(project, filepath, true, false, true); // create new Schematic
         delete file; // this will remove the temporary file, so don't do this earlier!
         return schematic;
     }

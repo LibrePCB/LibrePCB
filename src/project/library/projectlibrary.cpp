@@ -42,14 +42,14 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ProjectLibrary::ProjectLibrary(Project& project, bool restore) throw (Exception) :
+ProjectLibrary::ProjectLibrary(Project& project, bool restore, bool readOnly) throw (Exception) :
     QObject(0), mProject(project), mLibraryPath(project.getPath().getPathTo("lib"))
 {
     qDebug() << "load project library...";
 
     Q_UNUSED(restore)
 
-    if (!mLibraryPath.isExistingDir())
+    if ((!mLibraryPath.isExistingDir()) && (!readOnly))
     {
         if (!mLibraryPath.mkPath())
         {

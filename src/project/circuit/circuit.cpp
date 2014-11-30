@@ -39,11 +39,12 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Circuit::Circuit(Project& project, bool restore, bool create) throw (Exception) :
+Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create) throw (Exception) :
     QObject(0), mProject(project),
     mXmlFilepath(project.getPath().getPathTo("core/circuit.xml")), mXmlFile(0)
 {
     qDebug() << "load circuit...";
+    Q_ASSERT(!(create && (restore || readOnly)));
 
     try
     {
@@ -51,7 +52,7 @@ Circuit::Circuit(Project& project, bool restore, bool create) throw (Exception) 
         if (create)
             mXmlFile = XmlFile::create(mXmlFilepath, "circuit", 0);
         else
-            mXmlFile = new XmlFile(mXmlFilepath, restore, false, "circuit");
+            mXmlFile = new XmlFile(mXmlFilepath, restore, readOnly, "circuit");
 
         // OK - XML file is open --> now load the whole circuit stuff
 

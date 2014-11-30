@@ -345,6 +345,7 @@ class Project final : public QObject
         XmlFile* mXmlFile; ///< the *.e4u project file
         FileLock mFileLock; ///< See @ref doc_project_lock
         bool mIsRestored; ///< the constructor will set this to true if the project was restored
+        bool mIsReadOnly; ///< the constructor will set this to true if the project was opened in read only mode
 
         // Other Files
         IniFile* mSchematicsIniFile; ///< schematics/schematics.ini

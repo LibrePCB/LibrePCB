@@ -62,7 +62,7 @@ class ProjectLibrary final : public QObject
     public:
 
         // Constructors / Destructor
-        explicit ProjectLibrary(Project& project, bool restore) throw (Exception);
+        explicit ProjectLibrary(Project& project, bool restore, bool readOnly) throw (Exception);
         ~ProjectLibrary() noexcept;
 
         // Getters: Library Elements

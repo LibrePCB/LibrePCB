@@ -42,13 +42,18 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SchematicEditor::SchematicEditor(Project& project) :
+SchematicEditor::SchematicEditor(Project& project, bool readOnly) :
     QMainWindow(0), mProject(project), mUi(new Ui::SchematicEditor),
     mActiveSchematicIndex(-1), mPagesDock(0), mUnplacedSymbolsDock(0), mFsm(0)
 {
     mUi->setupUi(this);
-    setWindowTitle(QString("%1 - Schematic Editor - EDA4U %2.%3").arg(mProject.getFilepath().getFilename())
-                   .arg(APP_VERSION_MAJOR).arg(APP_VERSION_MINOR));
+    mUi->actionSave_Project->setEnabled(!readOnly);
+
+    // set window title
+    QString filenameStr = mProject.getFilepath().getFilename();
+    if (readOnly) filenameStr.append(QStringLiteral(" [Read-Only]"));
+    setWindowTitle(QString("%1 - Schematic Editor - EDA4U %2.%3")
+                   .arg(filenameStr).arg(APP_VERSION_MAJOR).arg(APP_VERSION_MINOR));
 
     // Add Dock Widgets
     mPagesDock = new SchematicPagesDock(mProject, *this);

@@ -60,7 +60,7 @@ class SchematicEditor : public QMainWindow, public IF_CADSceneEventHandler
     public:
 
         // Constructors / Destructor
-        explicit SchematicEditor(Project& project);
+        explicit SchematicEditor(Project& project, bool readOnly);
         ~SchematicEditor();
 
         // Getters

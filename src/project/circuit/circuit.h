@@ -65,7 +65,7 @@ class Circuit final : public QObject
     public:
 
         // Constructors / Destructor
-        explicit Circuit(Project& project, bool restore, bool create) throw (Exception);
+        explicit Circuit(Project& project, bool restore, bool readOnly, bool create) throw (Exception);
         ~Circuit() noexcept;
 
         // Getters
