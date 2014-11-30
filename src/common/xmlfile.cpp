@@ -32,9 +32,10 @@
  *  Constructors / Destructor
  ****************************************************************************************/
 
-XmlFile::XmlFile(const FilePath& filepath, bool restore,
+XmlFile::XmlFile(const FilePath& filepath, bool restore, bool readOnly,
                  const QString& rootName) throw (Exception) :
-    QObject(0), mFilepath(filepath), mDomDocument(), mDomRoot(), mFileVersion(-1)
+    QObject(0), mFilepath(filepath), mIsReadOnly(readOnly), mDomDocument(), mDomRoot(),
+    mFileVersion(-1)
 {
     mDomDocument.implementation().setInvalidDataPolicy(QDomImplementation::ReturnNullNode);
 
@@ -96,8 +97,11 @@ XmlFile::XmlFile(const FilePath& filepath, bool restore,
 
 XmlFile::~XmlFile() noexcept
 {
-    // remove temporary file
-    QFile::remove(mFilepath.toStr() % "~");
+    if (!mIsReadOnly)
+    {
+        // remove temporary file
+        QFile::remove(mFilepath.toStr() % "~");
+    }
 }
 
 /*****************************************************************************************
@@ -120,6 +124,9 @@ void XmlFile::remove() const throw (Exception)
 {
     bool success = true;
 
+    if (mIsReadOnly)
+        throw LogicError(__FILE__, __LINE__, QString(), tr("Cannot remove read-only file!"));
+
     if (QFile::exists(mFilepath.toStr()))
     {
         if (!QFile::remove(mFilepath.toStr()))
@@ -141,6 +148,9 @@ void XmlFile::remove() const throw (Exception)
 
 void XmlFile::save(bool toOriginal) throw (Exception)
 {
+    if (mIsReadOnly)
+        throw LogicError(__FILE__, __LINE__, QString(), tr("Cannot save read-only file!"));
+
     QString filepath = toOriginal ? mFilepath.toStr() : mFilepath.toStr() % '~';
     saveDomDocument(mDomDocument, FilePath(filepath));
 }
@@ -177,7 +187,7 @@ XmlFile* XmlFile::create(const FilePath& filepath, const QString& rootName, int 
 
     saveDomDocument(dom, FilePath(filepath.toStr() % '~'));
 
-    return new XmlFile(filepath, true, rootName);
+    return new XmlFile(filepath, true, false, rootName);
 }
 
 /*****************************************************************************************

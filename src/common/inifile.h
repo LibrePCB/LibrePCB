@@ -67,11 +67,12 @@ class IniFile final : public QObject
          *                  the backup will be opened instead of the original file. If no
          *                  backup exists or this parameter is false, the original file
          *                  will be opened.
+         * @param readOnly  If true, the file will be opened read-only (see #mIsReadOnly)
          *
          * @throw Exception If the specified INI file could not be opened successful, an
          *                  exception will be thrown.
          */
-        IniFile(const FilePath& filepath, bool restore) throw (Exception);
+        IniFile(const FilePath& filepath, bool restore = false, bool readOnly = false) throw (Exception);
 
         /**
          * @brief The destructor
@@ -191,6 +192,14 @@ class IniFile final : public QObject
          * @brief The filepath to the file in the temporary directory
          */
         FilePath mTmpFilepath;
+
+        /**
+         * @brief If true, the INI file is opened as read-only
+         *
+         * @li No temporary files will be created
+         * @li It's not possible to save the INI file (exception will be thrown instead)
+         */
+        bool mIsReadOnly;
 
         /**
          * @brief QSettings objects to access the INI file

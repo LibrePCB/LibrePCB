@@ -151,9 +151,9 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
     {
         // try to create/open the XML project file
         if (create)
-            mXmlFile = XmlFile::create(mFilepath, "project", 0);
+            mXmlFile = XmlFile::create(mFilepath, QStringLiteral("project"), 0);
         else
-            mXmlFile = new XmlFile(mFilepath, mIsRestored, "project");
+            mXmlFile = new XmlFile(mFilepath, mIsRestored, false, QStringLiteral("project"));
 
         // the project seems to be ready to open, so we will create all needed objects
 
@@ -169,7 +169,7 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
         if (create)
             mSchematicsIniFile = IniFile::create(mPath.getPathTo("schematics/schematics.ini"), 0);
         else
-            mSchematicsIniFile = new IniFile(mPath.getPathTo("schematics/schematics.ini"), mIsRestored);
+            mSchematicsIniFile = new IniFile(mPath.getPathTo("schematics/schematics.ini"), mIsRestored, false);
         QSettings* schematicsSettings = mSchematicsIniFile->createQSettings();
         int schematicsCount = schematicsSettings->beginReadArray("pages");
         for (int i = 0; i < schematicsCount; i++)

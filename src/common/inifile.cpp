@@ -30,8 +30,9 @@
  *  Constructors / Destructor
  ****************************************************************************************/
 
-IniFile::IniFile(const FilePath& filepath, bool restore) throw (Exception) :
-    QObject(0), mFilepath(filepath), mFileVersion(-1)
+IniFile::IniFile(const FilePath& filepath, bool restore, bool readOnly) throw (Exception) :
+    QObject(0), mFilepath(filepath), mTmpFilepath(), mIsReadOnly(readOnly), mSettings(),
+    mFileVersion(-1)
 {
     // decide if we open the original file (*.ini) or the backup (*.ini~)
     FilePath iniFilepath(mFilepath.toStr() % '~');
@@ -81,11 +82,16 @@ IniFile::IniFile(const FilePath& filepath, bool restore) throw (Exception) :
 
 IniFile::~IniFile() noexcept
 {
-    qDeleteAll(mSettings);      mSettings.clear();
+    if (!mSettings.isEmpty())
+    {
+        qWarning() << "mSettings still contains" << mSettings.count() << "elements!";
+        qDeleteAll(mSettings);      mSettings.clear();
+    }
 
     // remove temporary files
     QFile::remove(mTmpFilepath.toStr());
-    QFile::remove(mFilepath.toStr() % "~");
+    if (!mIsReadOnly)
+        QFile::remove(mFilepath.toStr() % "~");
 }
 
 /*****************************************************************************************
@@ -132,16 +138,27 @@ QSettings* IniFile::createQSettings() throw (Exception)
 
 void IniFile::releaseQSettings(QSettings* settings) noexcept
 {
-    Q_CHECK_PTR(settings);
+    Q_ASSERT(settings);
     Q_ASSERT(mSettings.contains(settings));
 
-    mSettings.removeOne(settings);
-    delete settings;
+    settings->sync();
+    if (settings->status() == QSettings::NoError)
+    {
+        mSettings.removeOne(settings);
+        delete settings;
+    }
+
+    // if sync() was not successful, we let the QSettings object alive and hold the
+    // pointer in the mSettings list. This way, the method save() can also detect the error
+    // and then throws an exception. The destructor then will delete the QSettings object.
 }
 
 void IniFile::remove() const throw (Exception)
 {
     bool success = true;
+
+    if (mIsReadOnly)
+        throw LogicError(__FILE__, __LINE__, QString(), tr("Cannot remove read-only file!"));
 
     if (QFile::exists(mFilepath.toStr()))
     {
@@ -175,6 +192,9 @@ void IniFile::remove() const throw (Exception)
 
 void IniFile::save(bool toOriginal) throw (Exception)
 {
+    if (mIsReadOnly)
+        throw LogicError(__FILE__, __LINE__, QString(), tr("Cannot save read-only file!"));
+
     FilePath filepath(toOriginal ? mFilepath.toStr() : mFilepath.toStr() % '~');
 
     foreach (QSettings* settings, mSettings)
@@ -248,7 +268,7 @@ IniFile* IniFile::create(const FilePath& filepath, int version) throw (Exception
     file.close();
 
     // open and return the new INI file object
-    IniFile* obj = new IniFile(filepath, true);
+    IniFile* obj = new IniFile(filepath, true, false);
     if (version > -1)
     {
         try

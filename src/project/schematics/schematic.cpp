@@ -43,7 +43,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore, b
     try
     {
         // try to open the XML schematic file
-        mXmlFile = new XmlFile(mFilePath, restore, "schematic");
+        mXmlFile = new XmlFile(mFilePath, restore, false, QStringLiteral("schematic"));
 
         // the schematic seems to be ready to open, so we will create all needed objects
 

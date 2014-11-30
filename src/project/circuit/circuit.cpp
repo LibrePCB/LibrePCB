@@ -51,7 +51,7 @@ Circuit::Circuit(Project& project, bool restore, bool create) throw (Exception) 
         if (create)
             mXmlFile = XmlFile::create(mXmlFilepath, "circuit", 0);
         else
-            mXmlFile = new XmlFile(mXmlFilepath, restore, "circuit");
+            mXmlFile = new XmlFile(mXmlFilepath, restore, false, "circuit");
 
         // OK - XML file is open --> now load the whole circuit stuff
 

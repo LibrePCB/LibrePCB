@@ -72,6 +72,7 @@ class XmlFile final : public QObject
          *                  the backup will be opened instead of the original file. If no
          *                  backup exists or this parameter is false, the original file
          *                  will be opened.
+         * @param readOnly  If true, the file will be opened read-only (see #mIsReadOnly)
          * @param rootName  If this is not an empty string, the constructor compares the
          *                  XML root node name with this value. If they are not identical,
          *                  the constructor throws an exception. This is useful to check
@@ -83,7 +84,7 @@ class XmlFile final : public QObject
          * @throw Exception If the specified XML file could not be opened successful, an
          *                  exception will be thrown.
          */
-        XmlFile(const FilePath& filepath, bool restore,
+        XmlFile(const FilePath& filepath, bool restore = false, bool readOnly = false,
                 const QString& rootName = QString()) throw (Exception);
 
         /**
@@ -215,6 +216,14 @@ class XmlFile final : public QObject
          * @brief The filepath which was passed to the constructor
          */
         FilePath mFilepath;
+
+        /**
+         * @brief If true, the XML file is opened as read-only
+         *
+         * @li No temporary files will be created
+         * @li It's not possible to save the XML file (exception will be thrown instead)
+         */
+        bool mIsReadOnly;
 
         /**
          * @brief The whole XML DOM tree
