@@ -119,12 +119,14 @@ class SchematicNetPoint final : public QObject
         NetSignal* getNetSignal() const noexcept;
         bool isAttached() const noexcept {return mAttached;}
         const Point& getPosition() const noexcept {return mPosition;}
+        QPointF getScenePosition() const noexcept {return mGraphicsItem->scenePos();}
         int getLinesCount() const noexcept {return mLines.count();}
 
         // Setters
         void setPosition(const Point& position) noexcept;
 
         // General Methods
+        void updateLines() const noexcept;
         void registerNetLine(SchematicNetLine* netline) noexcept;
         void unregisterNetLine(SchematicNetLine* netline) noexcept;
         void addToSchematic(Schematic& schematic, bool addNode,

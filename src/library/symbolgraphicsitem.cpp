@@ -103,11 +103,12 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
         layer = getSchematicLayer(SchematicLayer::OriginCrosses);
         if (layer)
         {
-            QPen pen(layer->getColor(selected), 2);
+            qreal width = Length(700000).toPx();
+            QPen pen(layer->getColor(selected), width);
             pen.setCosmetic(true);
             painter->setPen(pen);
-            painter->drawLine(-4, 0, 4, 0);
-            painter->drawLine(0, -4, 0, 4);
+            painter->drawLine(-2*width, 0, 2*width, 0);
+            painter->drawLine(0, -2*width, 0, 2*width);
         }
     }
 
@@ -194,7 +195,7 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
             unsigned int maxCount = mSymbolInstance->getGenCompInstance().getSymbolVariant().getItems().count();
             QFont font;
             font.setFamily("Monospace");
-            font.setPixelSize(3);
+            font.setPixelSize(Length(1000000).toPx());
             font.setStyleHint(QFont::TypeWriter);
             font.setStyleStrategy(QFont::ForceOutline);
             painter->setFont(font);
@@ -203,22 +204,6 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
                               QString("[%1/%2]").arg(count).arg(maxCount));
         }
     }
-}
-
-QVariant SymbolGraphicsItem::itemChange(GraphicsItemChange change, const QVariant& value)
-{
-    /*if (scene())
-    {
-        switch (change)
-        {
-            case ItemPositionHasChanged:
-                break;
-            default:
-                break;
-        }
-    }*/
-
-    return QGraphicsItem::itemChange(change, value);
 }
 
 /*****************************************************************************************

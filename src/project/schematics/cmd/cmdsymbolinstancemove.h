@@ -58,6 +58,7 @@ class CmdSymbolInstanceMove final : public UndoCommand
         void setAbsolutePosTemporary(Point& absPos) noexcept;
         void setDeltaToStartPosTemporary(Point& deltaPos) noexcept;
         void rotate90degreesCCW() noexcept;
+        void rotate(const Angle& angle, const Point& center = Point(0, 0)) noexcept;
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;

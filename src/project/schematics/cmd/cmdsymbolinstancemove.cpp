@@ -43,8 +43,8 @@ CmdSymbolInstanceMove::~CmdSymbolInstanceMove() noexcept
 {
     if ((!mRedoOrUndoCalled) && (!mDeltaPos.isOrigin()))
     {
-        mSymbolInstance.setPosition(mStartPos, false);
-        mSymbolInstance.setAngle(mStartAngle, false);
+        mSymbolInstance.setPosition(mStartPos);
+        mSymbolInstance.setAngle(mStartAngle);
     }
 }
 
@@ -56,21 +56,30 @@ void CmdSymbolInstanceMove::setAbsolutePosTemporary(Point& absPos) noexcept
 {
     Q_ASSERT(mRedoOrUndoCalled == false);
     mDeltaPos = absPos - mStartPos;
-    mSymbolInstance.setPosition(absPos, false);
+    mSymbolInstance.setPosition(absPos);
 }
 
 void CmdSymbolInstanceMove::setDeltaToStartPosTemporary(Point& deltaPos) noexcept
 {
     Q_ASSERT(mRedoOrUndoCalled == false);
     mDeltaPos = deltaPos;
-    mSymbolInstance.setPosition(mStartPos + mDeltaPos, false);
+    mSymbolInstance.setPosition(mStartPos + mDeltaPos);
 }
 
 void CmdSymbolInstanceMove::rotate90degreesCCW() noexcept
 {
     Q_ASSERT(mRedoOrUndoCalled == false);
     mDeltaAngle -= Angle(90000000L);
-    mSymbolInstance.setAngle(mStartAngle + mDeltaAngle, false);
+    mSymbolInstance.setAngle(mStartAngle + mDeltaAngle);
+}
+
+void CmdSymbolInstanceMove::rotate(const Angle& angle, const Point& center) noexcept
+{
+    Q_ASSERT(mRedoOrUndoCalled == false);
+    mDeltaPos = Point(mStartPos + mDeltaPos).rotated(angle, center) - mStartPos;
+    mDeltaAngle += angle;
+    mSymbolInstance.setPosition(mStartPos + mDeltaPos);
+    mSymbolInstance.setAngle(mStartAngle + mDeltaAngle);
 }
 
 /*****************************************************************************************

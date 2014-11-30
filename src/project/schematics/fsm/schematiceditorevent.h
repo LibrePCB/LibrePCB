@@ -56,21 +56,27 @@ class SchematicEditorEvent
         // FSM event types
         enum EventType {
             // Triggered Actions (SchematicEditorEvent objects, no additional parameters)
-            AbortCommand,
-            StartSelect,
-            StartMove,
-            StartDrawText,
-            StartDrawRect,
-            StartDrawPolygon,
-            StartDrawCircle,
-            StartDrawEllipse,
-            StartDrawWire,
-            StartAddComponent,
+            AbortCommand,       ///< abort the currently active command (esc)
+            StartSelect,        ///< start command: select elements
+            StartMove,          ///< start command: move elements
+            StartDrawText,      ///< start command: draw text
+            StartDrawRect,      ///< start command: draw rect
+            StartDrawPolygon,   ///< start command: draw polygon
+            StartDrawCircle,    ///< start command: draw circle
+            StartDrawEllipse,   ///< start command: draw ellipse
+            StartDrawWire,      ///< start command: draw wire
+            StartAddComponent,  ///< start command: add component
+            Edit_Copy,          ///< copy the selected elements to clipboard (ctrl+c)
+            Edit_Cut,           ///< cut the selected elements (ctrl+x)
+            Edit_Paste,         ///< paste the elements from the clipboard (ctrl+v)
+            Edit_RotateCW,      ///< rotate the selected elements 90° CW
+            Edit_RotateCCW,     ///< rotate the selected elements 90° CCW
+            Edit_Remove,        ///< remove the selected elements
             // Redirected QEvent's (SEE_RedirectedQEvent objects, with pointer to a QEvent)
-            SchematicSceneEvent,
+            SchematicSceneEvent,    ///< event from CADScene @see project#SEE_RedirectedQEvent
             // Special Events (with some additional parameters)
-            SetAddComponentParams, ///< @see project#SEE_SetAddComponentParams
-            SwitchToSchematicPage, ///< @see project#SEE_SwitchToSchematicPage
+            SetAddComponentParams,  ///< @see project#SEE_SetAddComponentParams
+            SwitchToSchematicPage,  ///< @see project#SEE_SwitchToSchematicPage
         };
 
         // Constructors / Destructor

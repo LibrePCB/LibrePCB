@@ -34,11 +34,13 @@ namespace project {
 class SymbolInstance;
 class GenCompSignalInstance;
 class SchematicNetPoint;
+class SchematicNetPointGraphicsItem;
 }
 
 namespace library {
 class SymbolPin;
 class GenCompSignal;
+class SymbolPinGraphicsItem;
 }
 
 /*****************************************************************************************
@@ -68,8 +70,11 @@ class SymbolPinInstance final : public QObject
         GenCompSignalInstance* getGenCompSignalInstance() const noexcept {return mGenCompSignalInstance;}
 
         // General Methods
-        void registerNetPoint(SchematicNetPoint* netpoint);
-        void unregisterNetPoint(SchematicNetPoint* netpoint);
+        void updateLines() noexcept;
+        void registerNetPoint(SchematicNetPoint* netpoint, SchematicNetPointGraphicsItem* item);
+        void unregisterNetPoint(SchematicNetPoint* netpoint, SchematicNetPointGraphicsItem* item);
+        void registerPinGraphicsItem(library::SymbolPinGraphicsItem* item);
+        void unregisterPinGraphicsItem(library::SymbolPinGraphicsItem* item);
         void addToSchematic() noexcept;
         void removeFromSchematic() noexcept;
 
@@ -88,6 +93,7 @@ class SymbolPinInstance final : public QObject
         const library::GenCompSignal* mGenCompSignal;
         GenCompSignalInstance* mGenCompSignalInstance;
         SchematicNetPoint* mRegisteredSchematicNetPoint;
+        library::SymbolPinGraphicsItem* mRegisteredPinGraphicsItem;
 };
 
 } // namespace project

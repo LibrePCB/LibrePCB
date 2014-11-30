@@ -77,7 +77,7 @@ class SymbolGraphicsItem final : public QGraphicsItem
         QPainterPath shape() const noexcept {return mShape;}
         int type() const {return Type;} ///< to make  qgraphicsitem_cast() working
         void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
-        QVariant itemChange(GraphicsItemChange change, const QVariant& value);
+
 
     private:
 

@@ -49,8 +49,6 @@ SymbolPinGraphicsItem::SymbolPinGraphicsItem(SymbolGraphicsItem& symbol, const S
     QGraphicsItem(&symbol), mSymbolGraphicsItem(symbol), mPin(pin), mPinInstance(instance)
 {
     setZValue(project::Schematic::ZValue_Symbols);
-    if (mPinInstance)
-        setFlags(QGraphicsItem::ItemSendsScenePositionChanges);
     setPos(pin.getPosition().toPxQPointF());
     setToolTip(mPin.getName() % ": " % mPin.getDescription());
 
@@ -59,10 +57,15 @@ SymbolPinGraphicsItem::SymbolPinGraphicsItem(SymbolGraphicsItem& symbol, const S
         throw RuntimeError(__FILE__, __LINE__, QString(),
             QApplication::translate("SymbolPinGraphicsItem", "Invalid Symbol Pin"));
     }
+
+    if (mPinInstance)
+        mPinInstance->registerPinGraphicsItem(this);
 }
 
 SymbolPinGraphicsItem::~SymbolPinGraphicsItem() noexcept
 {
+    if (mPinInstance)
+        mPinInstance->unregisterPinGraphicsItem(this);
 }
 
 /*****************************************************************************************
@@ -134,27 +137,6 @@ void SymbolPinGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsI
                             0), QSizeF(0, 0));
         painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine | Qt::TextDontClip, text);
     }
-}
-
-QVariant SymbolPinGraphicsItem::itemChange(GraphicsItemChange change, const QVariant& value)
-{
-    if (scene())
-    {
-        switch (change)
-        {
-            case ItemScenePositionHasChanged:
-                if (mPinInstance)
-                {
-                    project::SchematicNetPoint* p = mPinInstance->getSchematicNetPoint();
-                    if (p) p->setPosition(Point::fromPx(value.toPointF()));
-                }
-                break;
-            default:
-                break;
-        }
-    }
-
-    return QGraphicsItem::itemChange(change, value);
 }
 
 /*****************************************************************************************

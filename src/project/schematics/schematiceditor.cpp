@@ -119,6 +119,20 @@ SchematicEditor::SchematicEditor(Project& project, bool readOnly) :
     connect(mUi->actionCommandAbort, &QAction::triggered,
             [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::AbortCommand), true);});
 
+    // connect the "edit" toolbar with the state machine
+    connect(mUi->actionCopy, &QAction::triggered,
+            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::Edit_Copy), true);});
+    connect(mUi->actionCut, &QAction::triggered,
+            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::Edit_Cut), true);});
+    connect(mUi->actionPaste, &QAction::triggered,
+            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::Edit_Paste), true);});
+    connect(mUi->actionRotate_CW, &QAction::triggered,
+            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::Edit_RotateCW), true);});
+    connect(mUi->actionRotate_CCW, &QAction::triggered,
+            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::Edit_RotateCCW), true);});
+    connect(mUi->actionRemove, &QAction::triggered,
+            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::Edit_Remove), true);});
+
     // Restore Window Geometry
     QSettings clientSettings;
     restoreGeometry(clientSettings.value("schematic_editor/window_geometry").toByteArray());

@@ -110,6 +110,13 @@ SchematicNetLine::SchematicNetLine(Schematic& schematic, const QDomElement& domE
             .arg(mDomElement.attribute("end_point")));
     }
 
+    // check if both netpoints have the same netsignal
+    if (mStartPoint->getNetSignal() != mEndPoint->getNetSignal())
+    {
+        throw LogicError(__FILE__, __LINE__, QString(),
+            tr("SchematicNetLine: endpoints netsignal mismatch"));
+    }
+
     mGraphicsItem = new SchematicNetLineGraphicsItem(mSchematic, *this);
 }
 
@@ -133,8 +140,7 @@ bool SchematicNetLine::isAttachedToSymbol() const noexcept
 
 void SchematicNetLine::updateLine() noexcept
 {
-    QLineF line(mStartPoint->getPosition().toPxQPointF(),
-                mEndPoint->getPosition().toPxQPointF());
+    QLineF line(mStartPoint->getScenePosition(), mEndPoint->getScenePosition());
     mGraphicsItem->setLine(line);
 }
 

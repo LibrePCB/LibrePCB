@@ -82,8 +82,8 @@ class SymbolInstance final : public QObject
         const library::GenCompSymbVarItem& getGenCompSymbVarItem() const noexcept {return *mSymbVarItem;}
 
         // Setters
-        void setPosition(const Point& newPos, bool permanent = true) throw (Exception);
-        void setAngle(const Angle& newAngle, bool permanent = true) throw (Exception);
+        void setPosition(const Point& newPos) throw (Exception);
+        void setAngle(const Angle& newAngle) throw (Exception);
 
         // General Methods
         void addToSchematic(Schematic& schematic, bool addNode,

@@ -30,6 +30,7 @@
 #include "../../library/genericcomponent.h"
 #include "schematicnetpoint.h"
 #include "../circuit/gencompsignalinstance.h"
+#include "../../library/symbolpingraphicsitem.h"
 
 namespace project {
 
@@ -39,7 +40,7 @@ namespace project {
 
 SymbolPinInstance::SymbolPinInstance(SymbolInstance& symbolInstance, const QUuid& pinUuid) :
     QObject(0), mSymbolInstance(symbolInstance), mSymbolPin(0), mGenCompSignal(0),
-    mGenCompSignalInstance(0), mRegisteredSchematicNetPoint(0)
+    mGenCompSignalInstance(0), mRegisteredSchematicNetPoint(0), mRegisteredPinGraphicsItem(0)
 {
     mSymbolPin = mSymbolInstance.getSymbol().getPinByUuid(pinUuid);
     if (!mSymbolPin)
@@ -61,18 +62,43 @@ SymbolPinInstance::~SymbolPinInstance()
  *  General Methods
  ****************************************************************************************/
 
-void SymbolPinInstance::registerNetPoint(SchematicNetPoint* netpoint)
+void SymbolPinInstance::updateLines() noexcept
+{
+    if (mRegisteredSchematicNetPoint)
+        mRegisteredSchematicNetPoint->updateLines();
+}
+
+void SymbolPinInstance::registerNetPoint(SchematicNetPoint* netpoint,
+                                         SchematicNetPointGraphicsItem* item)
 {
     Q_ASSERT(mRegisteredSchematicNetPoint == 0);
     mRegisteredSchematicNetPoint = netpoint;
-    mRegisteredSchematicNetPoint->setPosition(mSymbolInstance.getPosition() + mSymbolPin->getPosition());
+    Q_ASSERT(mRegisteredPinGraphicsItem);
+    item->setParentItem(mRegisteredPinGraphicsItem);
+    item->setPos(0, 0);
 }
 
-void SymbolPinInstance::unregisterNetPoint(SchematicNetPoint* netpoint)
+void SymbolPinInstance::unregisterNetPoint(SchematicNetPoint* netpoint,
+                                           SchematicNetPointGraphicsItem* item)
 {
     Q_UNUSED(netpoint); // to avoid compiler warning in release mode
     Q_ASSERT(mRegisteredSchematicNetPoint == netpoint);
     mRegisteredSchematicNetPoint = 0;
+    item->setParentItem(0);
+    item->setPos(0, 0);
+}
+
+void SymbolPinInstance::registerPinGraphicsItem(library::SymbolPinGraphicsItem* item)
+{
+    Q_ASSERT(mRegisteredPinGraphicsItem == 0);
+    mRegisteredPinGraphicsItem = item;
+}
+
+void SymbolPinInstance::unregisterPinGraphicsItem(library::SymbolPinGraphicsItem* item)
+{
+    Q_UNUSED(item); // to avoid compiler warning in release mode
+    Q_ASSERT(mRegisteredPinGraphicsItem == item);
+    mRegisteredPinGraphicsItem = 0;
 }
 
 void SymbolPinInstance::addToSchematic() noexcept

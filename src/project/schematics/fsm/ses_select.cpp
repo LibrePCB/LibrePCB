@@ -33,6 +33,7 @@
 #include "../../../common/undostack.h"
 #include "../cmd/cmdschematicnetpointmove.h"
 #include "../schematicnetline.h"
+#include "../symbolinstance.h"
 
 namespace project {
 
@@ -125,6 +126,14 @@ SchematicEditorState::State SES_Select::processSubStateIdle(SchematicEditorEvent
         case SchematicEditorEvent::StartAddComponent:
             event->setAccepted(true);
             return State_AddComponent;
+        case SchematicEditorEvent::Edit_RotateCW:
+            if (rotateSelectedItems(Angle(90000000), Point(), true))
+                event->setAccepted(true);
+            return State_Select;
+        case SchematicEditorEvent::Edit_RotateCCW:
+            if (rotateSelectedItems(Angle(-90000000), Point(), true))
+                event->setAccepted(true);
+            return State_Select;
         case SchematicEditorEvent::SwitchToSchematicPage:
             event->setAccepted(true);
             return State_Select;
@@ -176,67 +185,28 @@ SchematicEditorState::State SES_Select::proccessIdleSceneLeftClick(SchematicEdit
     if (items.isEmpty()) return State_Select; // no items under mouse --> abort
     if (!items.first()->isSelected())
     {
-        // select only the top most item under the mouse
-        schematic->clearSelection();
+        if (!(mouseEvent->modifiers() & Qt::ControlModifier)) // CTRL pressed
+            schematic->clearSelection(); // select only the top most item under the mouse
         items.first()->setSelected(true);
     }
     event->setAccepted(true);
 
     // get all selected items
-    QList<SymbolInstance*> selectedSymbolInstances;
-    QList<SchematicNetPoint*> selectedNetPoints;
-    foreach (QGraphicsItem* item, schematic->selectedItems())
-    {
-        switch (item->type())
-        {
-            case CADScene::Type_Symbol:
-            {
-                library::SymbolGraphicsItem* i = qgraphicsitem_cast<library::SymbolGraphicsItem*>(item);
-                Q_ASSERT(i); if (!i) break;
-                SymbolInstance* s = i->getSymbolInstance();
-                Q_ASSERT(s); if (!s) break;
-                selectedSymbolInstances.append(s);
-                break;
-            }
-            case CADScene::Type_SchematicNetPoint:
-            {
-                SchematicNetPointGraphicsItem* i = qgraphicsitem_cast<SchematicNetPointGraphicsItem*>(item);
-                Q_ASSERT(i); if (!i) break;
-                if (!selectedNetPoints.contains(&i->getNetPoint()))
-                    selectedNetPoints.append(&i->getNetPoint());
-                break;
-            }
-            case CADScene::Type_SchematicNetLine:
-            {
-                SchematicNetLineGraphicsItem* i = qgraphicsitem_cast<SchematicNetLineGraphicsItem*>(item);
-                Q_ASSERT(i); if (!i) break;
-                if (!i->getNetLine().isAttachedToSymbol())
-                {
-                    // add start & end points to list
-                    if (!selectedNetPoints.contains(&i->getNetLine().getStartPoint()))
-                        selectedNetPoints.append(&i->getNetLine().getStartPoint());
-                    if (!selectedNetPoints.contains(&i->getNetLine().getEndPoint()))
-                        selectedNetPoints.append(&i->getNetLine().getEndPoint());
-                }
-                break;
-            }
-            default:
-                break;
-        }
-    }
+    QList<SymbolInstance*> symbols;
+    QList<SchematicNetPoint*> netpoints;
+    uint count = extractGraphicsItems(schematic->selectedItems(), symbols, netpoints);
 
     // abort if no items are selected
-    if (selectedSymbolInstances.isEmpty() && selectedNetPoints.isEmpty())
-        return State_Select;
+    if (count == 0) return State_Select;
 
     // create move commands for all selected items
     Q_ASSERT(!mParentCommand);
     Q_ASSERT(mSymbolMoveCmds.isEmpty());
     Q_ASSERT(mNetPointMoveCmds.isEmpty());
     mParentCommand = new UndoCommand(tr("Move Schematic Items"));
-    foreach (SymbolInstance* instance, selectedSymbolInstances)
+    foreach (SymbolInstance* instance, symbols)
         mSymbolMoveCmds.append(new CmdSymbolInstanceMove(*instance, mParentCommand));
-    foreach (SchematicNetPoint* point, selectedNetPoints)
+    foreach (SchematicNetPoint* point, netpoints)
         mNetPointMoveCmds.append(new CmdSchematicNetPointMove(*point, mParentCommand));
 
     // switch to substate SubState_Moving
@@ -349,6 +319,115 @@ SchematicEditorState::State SES_Select::processSubStateMovingSceneEvent(Schemati
             break;
     } // switch (qevent->type())
     return State_Select;
+}
+
+bool SES_Select::rotateSelectedItems(const Angle& angle, Point center, bool centerOfElements) noexcept
+{
+    Schematic* schematic = mEditor.getActiveSchematic();
+    Q_ASSERT(schematic); if (!schematic) return false;
+
+    // get all selected symbols and netpoints
+    QList<SymbolInstance*> symbols;
+    QList<SchematicNetPoint*> netpoints;
+    uint count = extractGraphicsItems(schematic->selectedItems(), symbols, netpoints);
+    if (count == 0) return false;
+
+    // find the center of all elements
+    if (centerOfElements)
+    {
+        center = Point(0, 0);
+        foreach (SymbolInstance* symbol, symbols)
+            center += symbol->getPosition();
+        foreach (SchematicNetPoint* point, netpoints)
+            center += point->getPosition();
+        center /= count;
+        center.mapToGrid(mEditorUi.graphicsView->getGridInterval());
+    }
+
+    bool commandActive = false;
+    try
+    {
+        mEditor.getProject().getUndoStack().beginCommand(tr("Rotate Schematic Elements"));
+        commandActive = true;
+
+        // rotate all symbols
+        foreach (SymbolInstance* symbol, symbols)
+        {
+            CmdSymbolInstanceMove* cmd = new CmdSymbolInstanceMove(*symbol);
+            cmd->rotate(angle, center);
+            mEditor.getProject().getUndoStack().appendToCommand(cmd);
+        }
+
+        // rotate all netpoints
+        foreach (SchematicNetPoint* point, netpoints)
+        {
+            // TODO: use undo command
+            point->setPosition(point->getPosition().rotated(angle, center));
+        }
+
+        mEditor.getProject().getUndoStack().endCommand();
+        commandActive = false;
+    }
+    catch (Exception& e)
+    {
+        QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+        if (commandActive)
+            try {mEditor.getProject().getUndoStack().abortCommand();} catch (...) {}
+        return false;
+    }
+
+    return true;
+}
+
+/*****************************************************************************************
+ *  Static Methods
+ ****************************************************************************************/
+
+uint SES_Select::extractGraphicsItems(const QList<QGraphicsItem*>& graphicsItems,
+                                      QList<SymbolInstance*>& symbolInstances,
+                                      QList<SchematicNetPoint*>& netpoints) noexcept
+{
+    foreach (QGraphicsItem* item, graphicsItems)
+    {
+        switch (item->type())
+        {
+            case CADScene::Type_Symbol:
+            {
+                library::SymbolGraphicsItem* i = qgraphicsitem_cast<library::SymbolGraphicsItem*>(item);
+                Q_ASSERT(i); if (!i) break;
+                SymbolInstance* s = i->getSymbolInstance();
+                Q_ASSERT(s); if (!s) break;
+                symbolInstances.append(s);
+                break;
+            }
+            case CADScene::Type_SchematicNetPoint:
+            {
+                SchematicNetPointGraphicsItem* i = qgraphicsitem_cast<SchematicNetPointGraphicsItem*>(item);
+                Q_ASSERT(i); if (!i) break;
+                if (i->getNetPoint().isAttached()) break;
+                if (netpoints.contains(&i->getNetPoint())) break;
+                netpoints.append(&i->getNetPoint());
+                break;
+            }
+            case CADScene::Type_SchematicNetLine:
+            {
+                SchematicNetLineGraphicsItem* i = qgraphicsitem_cast<SchematicNetLineGraphicsItem*>(item);
+                Q_ASSERT(i); if (!i) break;
+                if (!i->getNetLine().isAttachedToSymbol())
+                {
+                    // add start & end points to list
+                    if (!netpoints.contains(&i->getNetLine().getStartPoint()))
+                        netpoints.append(&i->getNetLine().getStartPoint());
+                    if (!netpoints.contains(&i->getNetLine().getEndPoint()))
+                        netpoints.append(&i->getNetLine().getEndPoint());
+                }
+                break;
+            }
+            default:
+                break;
+        }
+    }
+    return (symbolInstances.count() + netpoints.count());
 }
 
 /*****************************************************************************************

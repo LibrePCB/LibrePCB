@@ -82,6 +82,7 @@ class Circuit final : public QObject
         void execEditNetClassesDialog(QWidget* parent = 0) noexcept;
 
         // NetSignal Methods
+        const QHash<QUuid, NetSignal*>& getNetSignals() const noexcept {return mNetSignals;}
         NetSignal* getNetSignalByUuid(const QUuid& uuid) const noexcept;
         NetSignal* getNetSignalByName(const QString& name) const noexcept;
         NetSignal* createNetSignal(const QUuid& netclass) throw (Exception);

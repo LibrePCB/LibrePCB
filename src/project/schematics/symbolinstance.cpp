@@ -122,27 +122,23 @@ SymbolInstance::~SymbolInstance() noexcept
  *  Setters
  ****************************************************************************************/
 
-void SymbolInstance::setPosition(const Point& newPos, bool permanent) throw (Exception)
+void SymbolInstance::setPosition(const Point& newPos) throw (Exception)
 {
-    if (permanent)
-    {
-        mPosition = newPos;
-        mDomElement.firstChildElement("position").setAttribute("x", mPosition.getX().toMmString());
-        mDomElement.firstChildElement("position").setAttribute("y", mPosition.getY().toMmString());
-    }
-
+    mPosition = newPos;
+    mDomElement.firstChildElement("position").setAttribute("x", mPosition.getX().toMmString());
+    mDomElement.firstChildElement("position").setAttribute("y", mPosition.getY().toMmString());
     mGraphicsItem->setPos(newPos.toPxQPointF());
+    foreach (SymbolPinInstance* pin, mPinInstances)
+        pin->updateLines();
 }
 
-void SymbolInstance::setAngle(const Angle& newAngle, bool permanent) throw (Exception)
+void SymbolInstance::setAngle(const Angle& newAngle) throw (Exception)
 {
-    if (permanent)
-    {
-        mAngle = newAngle;
-        mDomElement.firstChildElement("position").setAttribute("angle", mAngle.toDegString());
-    }
-
+    mAngle = newAngle;
+    mDomElement.firstChildElement("position").setAttribute("angle", mAngle.toDegString());
     mGraphicsItem->setRotation(newAngle.toDeg());
+    foreach (SymbolPinInstance* pin, mPinInstances)
+        pin->updateLines();
 }
 
 /*****************************************************************************************
