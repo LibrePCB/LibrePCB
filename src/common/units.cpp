@@ -259,6 +259,7 @@ Length Length::abs() const noexcept
 Length& Length::makeAbs() noexcept
 {
     mNanometers = qAbs(mNanometers);
+    return *this;
 }
 
 Length Length::mappedToGrid(const Length& gridInterval) const noexcept
@@ -467,6 +468,7 @@ Point& Point::makeAbs() noexcept
 {
     mX.makeAbs();
     mY.makeAbs();
+    return *this;
 }
 
 Point Point::mappedToGrid(const Length& gridInterval) const noexcept
