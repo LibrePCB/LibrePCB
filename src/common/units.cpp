@@ -249,6 +249,18 @@ QDebug operator<<(QDebug stream, const LengthUnit& unit)
 
 // General Methods
 
+Length Length::abs() const noexcept
+{
+    Length l(*this);
+    l.makeAbs();
+    return l;
+}
+
+Length& Length::makeAbs() noexcept
+{
+    mNanometers = qAbs(mNanometers);
+}
+
 Length Length::mappedToGrid(const Length& gridInterval) const noexcept
 {
     Length length(*this);
@@ -443,6 +455,19 @@ QDebug operator<<(QDebug stream, const Angle& angle)
  ****************************************************************************************/
 
 // General Methods
+
+Point Point::abs() const noexcept
+{
+    Point p(*this);
+    p.makeAbs();
+    return p;
+}
+
+Point& Point::makeAbs() noexcept
+{
+    mX.makeAbs();
+    mY.makeAbs();
+}
 
 Point Point::mappedToGrid(const Length& gridInterval) const noexcept
 {

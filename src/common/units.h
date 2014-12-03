@@ -547,6 +547,24 @@ class Length
         // General Methods
 
         /**
+         * @brief Get a Length object with absolute value (mNanometers >= 0)
+         *
+         * @return A new Length object with absolute value
+         *
+         * @see Length#makeAbs()
+         */
+        Length abs() const noexcept;
+
+        /**
+         * @brief Make the length absolute (mNanometers >= 0)
+         *
+         * @return A reference to the modified object
+         *
+         * @see Length#abs()
+         */
+        Length& makeAbs() noexcept;
+
+        /**
          * @brief Get a Length object which is mapped to a specific grid interval
          *
          * @param gridInterval  The grid interval in nanometers (e.g. 2540000 for 2.54mm).
@@ -1257,6 +1275,24 @@ class Point
 
 
         // General Methods
+
+        /**
+         * @brief Get a Point object with both coordinates in absolute values (X,Y >= 0)
+         *
+         * @return A new Point object with absolute coordinates
+         *
+         * @see Length#abs(), Point#makeAbs()
+         */
+        Point abs() const noexcept;
+
+        /**
+         * @brief Make both coordinates absolute (X,Y >= 0)
+         *
+         * @return A reference to the modified object
+         *
+         * @see Length#makeAbs(), Point#abs()
+         */
+        Point& makeAbs() noexcept;
 
         /**
          * @brief Get a Point object which is mapped to a specific grid interval
