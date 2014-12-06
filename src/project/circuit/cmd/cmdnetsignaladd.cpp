@@ -33,9 +33,9 @@ namespace project {
  ****************************************************************************************/
 
 CmdNetSignalAdd::CmdNetSignalAdd(Circuit& circuit, const QUuid& netclass,
-                                 UndoCommand* parent) throw (Exception) :
+                                 const QString& name, UndoCommand* parent) throw (Exception) :
     UndoCommand(QCoreApplication::translate("CmdNetSignalAdd", "Add netsignal"), parent),
-    mCircuit(circuit), mNetClass(netclass), mNetSignal(0)
+    mCircuit(circuit), mNetClass(netclass), mName(name), mNetSignal(0)
 {
 }
 
@@ -52,7 +52,7 @@ CmdNetSignalAdd::~CmdNetSignalAdd() noexcept
 void CmdNetSignalAdd::redo() throw (Exception)
 {
     if (!mNetSignal) // only the first time
-        mNetSignal = mCircuit.createNetSignal(mNetClass); // throws an exception on error
+        mNetSignal = mCircuit.createNetSignal(mNetClass, mName); // throws an exception on error
 
     mCircuit.addNetSignal(mNetSignal); // throws an exception on error
 

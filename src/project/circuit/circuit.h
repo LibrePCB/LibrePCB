@@ -85,7 +85,7 @@ class Circuit final : public QObject
         const QHash<QUuid, NetSignal*>& getNetSignals() const noexcept {return mNetSignals;}
         NetSignal* getNetSignalByUuid(const QUuid& uuid) const noexcept;
         NetSignal* getNetSignalByName(const QString& name) const noexcept;
-        NetSignal* createNetSignal(const QUuid& netclass) throw (Exception);
+        NetSignal* createNetSignal(const QUuid& netclass, QString name = QString()) throw (Exception);
         void addNetSignal(NetSignal* netsignal, bool toDomTree = true) throw (Exception);
         void removeNetSignal(NetSignal* netsignal, bool fromDomTree = true,
                              bool deleteNetSignal = false) throw (Exception);
@@ -102,6 +102,16 @@ class Circuit final : public QObject
 
         // General Methods
         bool save(bool toOriginal, QStringList& errors) noexcept;
+
+
+    signals:
+
+        void netClassAdded(NetClass* netclass);
+        void netClassRemoved(NetClass* netclass);
+        void netSignalAdded(NetSignal* netsignal);
+        void netSignalRemoved(NetSignal* netsignal);
+        void genCompAdded(GenericComponentInstance* genComp);
+        void genCompRemoved(GenericComponentInstance* genComp);
 
 
     private:

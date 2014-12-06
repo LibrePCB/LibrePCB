@@ -52,6 +52,7 @@ class CmdNetSignalAdd final : public UndoCommand
 
         // Constructors / Destructor
         explicit CmdNetSignalAdd(Circuit& circuit, const QUuid& netclass,
+                                 const QString& name = QString(),
                                  UndoCommand* parent = 0) throw (Exception);
         ~CmdNetSignalAdd() noexcept;
 
@@ -66,6 +67,7 @@ class CmdNetSignalAdd final : public UndoCommand
 
         Circuit& mCircuit;
         QUuid mNetClass;
+        QString mName;
         NetSignal* mNetSignal;
 };
 

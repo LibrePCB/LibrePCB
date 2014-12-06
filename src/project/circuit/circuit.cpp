@@ -178,6 +178,7 @@ void Circuit::addNetClass(NetClass* netclass, bool toDomTree) throw (Exception)
     netclass->addToCircuit(toDomTree, parent); // can throw an exception
 
     mNetClasses.insert(netclass->getUuid(), netclass);
+    emit netClassAdded(netclass);
 }
 
 void Circuit::removeNetClass(NetClass* netclass, bool fromDomTree, bool deleteNetClass) throw (Exception)
@@ -198,6 +199,7 @@ void Circuit::removeNetClass(NetClass* netclass, bool fromDomTree, bool deleteNe
     netclass->removeFromCircuit(fromDomTree, parent); // can throw an exception
 
     mNetClasses.remove(netclass->getUuid());
+    emit netClassRemoved(netclass);
 
     if (deleteNetClass)
         delete netclass;
@@ -235,15 +237,24 @@ NetSignal* Circuit::getNetSignalByName(const QString& name) const noexcept
     return 0;
 }
 
-NetSignal* Circuit::createNetSignal(const QUuid& netclass) throw (Exception)
+NetSignal* Circuit::createNetSignal(const QUuid& netclass, QString name) throw (Exception)
 {
-    unsigned int i = 1;
-    QString name;
-    do
+    if (name.isEmpty())
     {
-        name = QString("N#%1").arg(i++); // find a new unique signal name
-    } while (getNetSignalByName(name));
-
+        unsigned int i = 1;
+        do
+        {
+            name = QString("N#%1").arg(i++); // find a new unique signal name
+        } while (getNetSignalByName(name));
+    }
+    else
+    {
+        if (getNetSignalByName(name))
+        {
+            throw RuntimeError(__FILE__, __LINE__, name, QString(tr("The net signal "
+                "name \"%1\" does already exist in the circuit.")).arg(name));
+        }
+    }
     return NetSignal::create(*this, mXmlFile->getDocument(), netclass, name, true);
 }
 
@@ -271,6 +282,7 @@ void Circuit::addNetSignal(NetSignal* netsignal, bool toDomTree) throw (Exceptio
     netsignal->addToCircuit(toDomTree, parent); // can throw an exception
 
     mNetSignals.insert(netsignal->getUuid(), netsignal);
+    emit netSignalAdded(netsignal);
 }
 
 void Circuit::removeNetSignal(NetSignal* netsignal, bool fromDomTree, bool deleteNetSignal) throw (Exception)
@@ -292,6 +304,7 @@ void Circuit::removeNetSignal(NetSignal* netsignal, bool fromDomTree, bool delet
     netsignal->removeFromCircuit(fromDomTree, parent); // can throw an exception
 
     mNetSignals.remove(netsignal->getUuid());
+    emit netSignalRemoved(netsignal);
 
     if (deleteNetSignal)
         delete netsignal;
@@ -348,6 +361,7 @@ void Circuit::addGenCompInstance(GenericComponentInstance* genCompInstance,
     genCompInstance->addToCircuit(toDomTree, parent); // can throw an exception
 
     mGenCompInstances.insert(genCompInstance->getUuid(), genCompInstance);
+    emit genCompAdded(genCompInstance);
 }
 
 void Circuit::removeGenCompInstance(GenericComponentInstance* genCompInstance,
@@ -364,6 +378,7 @@ void Circuit::removeGenCompInstance(GenericComponentInstance* genCompInstance,
     genCompInstance->removeFromCircuit(fromDomTree, parent); // can throw an exception
 
     mGenCompInstances.remove(genCompInstance->getUuid());
+    emit genCompRemoved(genCompInstance);
 
     if (deleteGenCompInstance)
         delete genCompInstance;

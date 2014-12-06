@@ -34,6 +34,7 @@
 
 namespace project {
 class SchematicNetPoint;
+class SchematicNetLine;
 }
 
 /*****************************************************************************************
@@ -63,23 +64,63 @@ class SES_DrawWire final : public SchematicEditorState
 
     private:
 
+        // Private Types
+
+        /// Internal FSM States (substates)
+        enum SubState {
+            SubState_Idle,                  ///< idle state [initial state]
+            SubState_PositioningNetPoint    ///< in this state, an undo command is active!
+        };
+
+        /**
+         * @brief The WireMode enum contains all available wire modes
+         *
+         * @note The first item must have the value 0!
+         */
+        enum WireMode {
+            WireMode_HV = 0,    ///< horizontal - vertical [default]
+            WireMode_VH,        ///< vertical - horizontal
+            WireMode_9045,      ///< 90° - 45°
+            WireMode_4590,      ///< 45° - 90°
+            WireMode_Straight,  ///< straight
+            WireMode_COUNT      ///< count of wire modes
+        };
+
+
         // Private Methods
         State processSubStateIdle(SchematicEditorEvent* event) noexcept;
         State processSubStatePositioning(SchematicEditorEvent* event) noexcept;
         State processIdleSceneEvent(SchematicEditorEvent* event) noexcept;
         State processPositioningSceneEvent(SchematicEditorEvent* event) noexcept;
+        bool startPositioning(Schematic& schematic, const Point& pos,
+                              SchematicNetPoint* fixedPoint = nullptr) noexcept;
+        bool addNextNetPoint(Schematic& schematic, const Point& pos) noexcept;
+        bool abortPositioning(bool showErrMsgBox) noexcept;
+        void updateNetpointPositions(const Point& cursorPos) noexcept;
+        void updateWireModeActionsCheckedState() noexcept;
+        Point calcMiddlePointPos(const Point& p1, const Point p2, WireMode mode) const noexcept;
 
-        // Internal FSM States (substates)
-        enum SubState {
-            SubState_Idle, // initial substate
-            SubState_PositioningNetPoint
-        };
-        SubState mSubState;
-        SchematicNetPoint* mPositioningNetPoint;
+
+        // General Attributes
+        SubState mSubState; ///< the current substate
+        WireMode mWireMode; ///< the current wire mode
+        SchematicNetPoint* mFixedNetPoint; ///< the fixed netpoint (start point of the line)
+        SchematicNetLine* mPositioningNetLine1; ///< line between fixed point and p1
+        SchematicNetPoint* mPositioningNetPoint1; ///< the first netpoint to place
+        SchematicNetLine* mPositioningNetLine2; ///< line between p1 and p2
+        SchematicNetPoint* mPositioningNetPoint2; ///< the second netpoint to place
 
         // Widgets for the command toolbar
+        QHash<WireMode, QAction*> mWireModeActions;
+        QList<QAction*> mActionSeparators;
         QLabel* mNetClassLabel;
         QComboBox* mNetClassComboBox;
+        QMetaObject::Connection mNetClassAddCon;
+        QMetaObject::Connection mNetClassRemoveCon;
+        QLabel* mNetSignalLabel;
+        QComboBox* mNetSignalComboBox;
+        QMetaObject::Connection mNetSignalAddCon;
+        QMetaObject::Connection mNetSignalRemoveCon;
         QLabel* mWidthLabel;
         QComboBox* mWidthComboBox;
 };
