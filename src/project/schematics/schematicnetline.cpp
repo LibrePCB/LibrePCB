@@ -22,12 +22,14 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <QPrinter>
 #include <QGraphicsLineItem>
 #include "schematicnetline.h"
 #include "schematic.h"
 #include "schematicnetpoint.h"
 #include "../project.h"
 #include "../../common/schematiclayer.h"
+#include "../circuit/netsignal.h"
 
 namespace project {
 
@@ -72,9 +74,25 @@ void SchematicNetLineGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
     Q_UNUSED(widget);
 
     bool highlight = option->state & QStyle::State_Selected;
+    bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
+
+    // draw line
     painter->setPen(QPen(mLayer->getColor(highlight), Length(254000).toPx(),
                          Qt::SolidLine, Qt::RoundCap));
     painter->drawLine(line());
+
+    // draw net signal name (only for debugging purposes)
+    if (!deviceIsPrinter)
+    {
+        painter->setPen(QPen(mLayer->getColor(highlight), 0));
+        QFont font;
+        font.setFamily("Monospace");
+        font.setPixelSize(3);
+        font.setStyleHint(QFont::TypeWriter);
+        font.setStyleStrategy(QFont::ForceOutline);
+        painter->setFont(font);
+        painter->drawText(line().pointAt((qreal)0.5), mLine.getNetSignal()->getName());
+    }
 }
 
 /*****************************************************************************************
@@ -129,6 +147,12 @@ SchematicNetLine::~SchematicNetLine() noexcept
  *  Getters
  ****************************************************************************************/
 
+NetSignal* SchematicNetLine::getNetSignal() const noexcept
+{
+    Q_ASSERT(mStartPoint->getNetSignal() == mEndPoint->getNetSignal());
+    return mStartPoint->getNetSignal();
+}
+
 bool SchematicNetLine::isAttachedToSymbol() const noexcept
 {
     return (mStartPoint->isAttached() || mEndPoint->isAttached());
@@ -140,7 +164,7 @@ bool SchematicNetLine::isAttachedToSymbol() const noexcept
 
 void SchematicNetLine::updateLine() noexcept
 {
-    QLineF line(mStartPoint->getScenePosition(), mEndPoint->getScenePosition());
+    QLineF line(mStartPoint->getPosition().toPxQPointF(), mEndPoint->getPosition().toPxQPointF());
     mGraphicsItem->setLine(line);
 }
 

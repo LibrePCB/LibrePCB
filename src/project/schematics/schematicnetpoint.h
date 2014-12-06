@@ -119,8 +119,7 @@ class SchematicNetPoint final : public QObject
         NetSignal* getNetSignal() const noexcept;
         bool isAttached() const noexcept {return mAttached;}
         const Point& getPosition() const noexcept {return mPosition;}
-        QPointF getScenePosition() const noexcept {return mGraphicsItem->scenePos();}
-        int getLinesCount() const noexcept {return mLines.count();}
+        const QList<SchematicNetLine*>& getLines() const noexcept {return mLines;}
 
         // Setters
         void setPosition(const Point& position) noexcept;
@@ -135,6 +134,7 @@ class SchematicNetPoint final : public QObject
                                  QDomElement& parent) throw (Exception);
 
         // Static Methods
+        static const Length& getCircleRadius() noexcept {return sCircleRadius;}
         static SchematicNetPoint* create(Schematic& schematic, QDomDocument& doc,
                                          const QUuid& netsignal, const Point& position)
                                          throw (Exception);
@@ -163,6 +163,9 @@ class SchematicNetPoint final : public QObject
         SymbolPinInstance* mPinInstance;
 
         QList<SchematicNetLine*> mLines;
+
+        // Static Members
+        static const Length sCircleRadius;
 };
 
 } // namespace project

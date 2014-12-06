@@ -25,6 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include "../../common/units.h"
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -63,6 +64,7 @@ class SymbolPinInstance final : public QObject
         ~SymbolPinInstance();
 
         // Getters
+        Point getPosition() const noexcept;
         SymbolInstance& getSymbolInstance() const noexcept {return mSymbolInstance;}
         SchematicNetPoint* getSchematicNetPoint() const noexcept {return mRegisteredSchematicNetPoint;}
         const library::SymbolPin& getSymbolPin() const noexcept {return *mSymbolPin;}
@@ -70,9 +72,9 @@ class SymbolPinInstance final : public QObject
         GenCompSignalInstance* getGenCompSignalInstance() const noexcept {return mGenCompSignalInstance;}
 
         // General Methods
-        void updateLines() noexcept;
-        void registerNetPoint(SchematicNetPoint* netpoint, SchematicNetPointGraphicsItem* item);
-        void unregisterNetPoint(SchematicNetPoint* netpoint, SchematicNetPointGraphicsItem* item);
+        void updateNetPointPosition() noexcept;
+        void registerNetPoint(SchematicNetPoint* netpoint);
+        void unregisterNetPoint(SchematicNetPoint* netpoint);
         void registerPinGraphicsItem(library::SymbolPinGraphicsItem* item);
         void unregisterPinGraphicsItem(library::SymbolPinGraphicsItem* item);
         void addToSchematic() noexcept;

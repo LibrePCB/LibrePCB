@@ -39,6 +39,7 @@ class XmlFile;
 namespace project {
 class Project;
 class SymbolInstance;
+class SymbolPinInstance;
 class SchematicNetPoint;
 class SchematicNetLine;
 }
@@ -92,6 +93,11 @@ class Schematic final : public CADScene
         const QUuid& getUuid() const noexcept {return mUuid;}
         const QString& getName() const noexcept {return mName;}
         const QIcon& getIcon() const noexcept {return mIcon;}
+
+        // Getters: General
+        uint getNetPointsAtScenePos(QList<SchematicNetPoint*>& list, const Point& pos) const noexcept;
+        uint getNetLinesAtScenePos(QList<SchematicNetLine*>& list, const Point& pos) const noexcept;
+        uint getPinsAtScenePos(QList<SymbolPinInstance*>& list, const Point& pos) const noexcept;
 
         // SymbolInstance Methods
         SymbolInstance* getSymbolByUuid(const QUuid& uuid) const noexcept;

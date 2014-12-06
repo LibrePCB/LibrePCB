@@ -63,7 +63,7 @@ SchematicNetPointGraphicsItem::~SchematicNetPointGraphicsItem() noexcept
 
 QRectF SchematicNetPointGraphicsItem::boundingRect() const
 {
-    qreal radius = Length(700000).toPx();
+    qreal radius = SchematicNetPoint::getCircleRadius().toPx();
     return QRectF(-radius, -radius, 2*radius, 2*radius);
 }
 
@@ -72,7 +72,7 @@ void SchematicNetPointGraphicsItem::paint(QPainter* painter, const QStyleOptionG
     Q_UNUSED(widget);
 
     bool highlight = option->state & QStyle::State_Selected;
-    bool fill = mPoint.getLinesCount() > 2;
+    bool fill = mPoint.getLines().count() > 2;
     painter->setPen(QPen(mLayer->getColor(highlight), 0));
     if (fill)
     {
@@ -80,6 +80,12 @@ void SchematicNetPointGraphicsItem::paint(QPainter* painter, const QStyleOptionG
         painter->drawEllipse(boundingRect());
     }
 }
+
+/*****************************************************************************************
+ *  Static Members
+ ****************************************************************************************/
+
+const Length SchematicNetPoint::sCircleRadius = Length(600000);
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -128,6 +134,7 @@ SchematicNetPoint::SchematicNetPoint(Schematic& schematic, const QDomElement& do
             throw RuntimeError(__FILE__, __LINE__, pinUuid, QString(tr("The pin of the "
                 "netpoint \"%1\" has no netsignal.")).arg(mUuid.toString()));
         }
+        mPosition = mPinInstance->getPosition();
     }
     else
     {
@@ -145,7 +152,7 @@ SchematicNetPoint::SchematicNetPoint(Schematic& schematic, const QDomElement& do
 
     // create the graphics item
     mGraphicsItem = new SchematicNetPointGraphicsItem(mSchematic, *this);
-    if (!mAttached) mGraphicsItem->setPos(mPosition.toPxQPointF());
+    mGraphicsItem->setPos(mPosition.toPxQPointF());
 }
 
 SchematicNetPoint::~SchematicNetPoint() noexcept
@@ -177,8 +184,11 @@ NetSignal* SchematicNetPoint::getNetSignal() const noexcept
 void SchematicNetPoint::setPosition(const Point& position) noexcept
 {
     mPosition = position;
-    mDomElement.firstChildElement("position").setAttribute("x", mPosition.getX().toMmString());
-    mDomElement.firstChildElement("position").setAttribute("y", mPosition.getY().toMmString());
+    if (!mAttached)
+    {
+        mDomElement.firstChildElement("position").setAttribute("x", mPosition.getX().toMmString());
+        mDomElement.firstChildElement("position").setAttribute("y", mPosition.getY().toMmString());
+    }
     mGraphicsItem->setPos(mPosition.toPxQPointF());
     updateLines();
 }
@@ -223,7 +233,7 @@ void SchematicNetPoint::addToSchematic(Schematic& schematic, bool addNode,
 
     getNetSignal()->registerSchematicNetPoint(this);
     if (mAttached)
-        mPinInstance->registerNetPoint(this, mGraphicsItem);
+        mPinInstance->registerNetPoint(this);
     else
         schematic.addItem(mGraphicsItem);
 }
@@ -242,7 +252,7 @@ void SchematicNetPoint::removeFromSchematic(Schematic& schematic, bool removeNod
 
     getNetSignal()->unregisterSchematicNetPoint(this);
     if (mAttached)
-        mPinInstance->unregisterNetPoint(this, mGraphicsItem);
+        mPinInstance->unregisterNetPoint(this);
     else
         schematic.removeItem(mGraphicsItem);
 }

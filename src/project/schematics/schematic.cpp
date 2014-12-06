@@ -29,6 +29,8 @@
 #include "symbolinstance.h"
 #include "schematicnetpoint.h"
 #include "schematicnetline.h"
+#include "../../library/symbolpingraphicsitem.h"
+#include "../../library/symbolpin.h"
 
 namespace project {
 
@@ -139,6 +141,46 @@ Schematic::~Schematic()
 }
 
 /*****************************************************************************************
+ *  Getters: General
+ ****************************************************************************************/
+
+uint Schematic::getNetPointsAtScenePos(QList<SchematicNetPoint*>& list, const Point& pos) const noexcept
+{
+    foreach (QGraphicsItem* i, items(pos.toPxQPointF()))
+    {
+        if (i->type() != CADScene::Type_SchematicNetPoint) continue;
+        SchematicNetPointGraphicsItem* p = qgraphicsitem_cast<SchematicNetPointGraphicsItem*>(i);
+        if (!p) continue;
+        list.append(&p->getNetPoint());
+    }
+    return list.count();
+}
+
+uint Schematic::getNetLinesAtScenePos(QList<SchematicNetLine*>& list, const Point& pos) const noexcept
+{
+    foreach (QGraphicsItem* i, items(pos.toPxQPointF()))
+    {
+        if (i->type() != CADScene::Type_SchematicNetLine) continue;
+        SchematicNetLineGraphicsItem* l = qgraphicsitem_cast<SchematicNetLineGraphicsItem*>(i);
+        if (!l) continue;
+        list.append(&l->getNetLine());
+    }
+    return list.count();
+}
+
+uint Schematic::getPinsAtScenePos(QList<SymbolPinInstance*>& list, const Point& pos) const noexcept
+{
+    foreach (QGraphicsItem* i, items(pos.toPxQPointF()))
+    {
+        if (i->type() != CADScene::Type_SymbolPin) continue;
+        library::SymbolPinGraphicsItem* p = qgraphicsitem_cast<library::SymbolPinGraphicsItem*>(i);
+        if (!p) continue;
+        list.append(p->getPinInstance());
+    }
+    return list.count();
+}
+
+/*****************************************************************************************
  *  SymbolInstance Methods
  ****************************************************************************************/
 
@@ -241,10 +283,10 @@ void Schematic::removeNetPoint(SchematicNetPoint* netpoint, bool fromDomTree,
     Q_ASSERT(mNetPoints.contains(netpoint->getUuid()));
 
     // the netpoint cannot be removed if there are already netlines connected to it!
-    if (netpoint->getLinesCount() > 0)
+    if (netpoint->getLines().count() > 0)
     {
         throw RuntimeError(__FILE__, __LINE__, QString("%1:%2")
-            .arg(netpoint->getUuid().toString()).arg(netpoint->getLinesCount()),
+            .arg(netpoint->getUuid().toString()).arg(netpoint->getLines().count()),
             QString(tr("There are already netlines connected to the netpoint \"%1\"!"))
             .arg(netpoint->getUuid().toString()));
     }

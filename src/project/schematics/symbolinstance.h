@@ -91,6 +91,9 @@ class SymbolInstance final : public QObject
         void removeFromSchematic(Schematic& schematic, bool removeNode,
                                  QDomElement& parent) throw (Exception);
 
+        // Helper Methods
+        Point mapToScene(const Point& relativePos) const noexcept;
+
         // Static Methods
         static SymbolInstance* create(Schematic& schematic, QDomDocument& doc,
                                       const QUuid& genCompInstance, const QUuid& symbolItem,

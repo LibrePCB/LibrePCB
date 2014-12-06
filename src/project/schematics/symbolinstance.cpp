@@ -129,7 +129,7 @@ void SymbolInstance::setPosition(const Point& newPos) throw (Exception)
     mDomElement.firstChildElement("position").setAttribute("y", mPosition.getY().toMmString());
     mGraphicsItem->setPos(newPos.toPxQPointF());
     foreach (SymbolPinInstance* pin, mPinInstances)
-        pin->updateLines();
+        pin->updateNetPointPosition();
 }
 
 void SymbolInstance::setAngle(const Angle& newAngle) throw (Exception)
@@ -138,7 +138,7 @@ void SymbolInstance::setAngle(const Angle& newAngle) throw (Exception)
     mDomElement.firstChildElement("position").setAttribute("angle", mAngle.toDegString());
     mGraphicsItem->setRotation(newAngle.toDeg());
     foreach (SymbolPinInstance* pin, mPinInstances)
-        pin->updateLines();
+        pin->updateNetPointPosition();
 }
 
 /*****************************************************************************************
@@ -177,6 +177,15 @@ void SymbolInstance::removeFromSchematic(Schematic& schematic, bool removeNode,
     }
 
     schematic.removeItem(mGraphicsItem);
+}
+
+/*****************************************************************************************
+ *  Helper Methods
+ ****************************************************************************************/
+
+Point SymbolInstance::mapToScene(const Point& relativePos) const noexcept
+{
+    return (mPosition + relativePos).rotated(mAngle, mPosition);
 }
 
 /*****************************************************************************************

@@ -148,13 +148,17 @@ bool SymbolPinGraphicsItem::updateBoundingRectAndShape() noexcept
     QRectF boundingRect;
     QPainterPath shape;
     shape.setFillRule(Qt::WindingFill);
+    qreal radius = project::SchematicNetPoint::getCircleRadius().toPx();
 
-    // line + circle
+    // circle
+    shape.addEllipse(-radius, -radius, 2*radius, 2*radius);
+    boundingRect = shape.boundingRect();
+
+    // line
     Point p2(mPin.getLength() * qSin(mPin.getAngle().toRad()),
              mPin.getLength() * qCos(mPin.getAngle().toRad()));
-    QRectF rect = QRectF(QPointF(0, 0), p2.toPxQPointF()).normalized().adjusted(-3, -3, 3, 3);
-    boundingRect = boundingRect.united(rect);
-    shape.addEllipse(-2, -2, 4, 4);
+    boundingRect = boundingRect.united(QRectF(QPointF(0, 0), p2.toPxQPointF()).normalized());
+    boundingRect.adjust(-3, -3, 3, 3);
 
     mBoundingRect = boundingRect;
     mShape = shape;

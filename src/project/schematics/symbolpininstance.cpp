@@ -59,33 +59,36 @@ SymbolPinInstance::~SymbolPinInstance()
 }
 
 /*****************************************************************************************
+ *  Getters
+ ****************************************************************************************/
+
+Point SymbolPinInstance::getPosition() const noexcept
+{
+    return mSymbolInstance.mapToScene(mSymbolPin->getPosition());
+}
+
+/*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
-void SymbolPinInstance::updateLines() noexcept
+void SymbolPinInstance::updateNetPointPosition() noexcept
 {
     if (mRegisteredSchematicNetPoint)
-        mRegisteredSchematicNetPoint->updateLines();
+        mRegisteredSchematicNetPoint->setPosition(getPosition());
 }
 
-void SymbolPinInstance::registerNetPoint(SchematicNetPoint* netpoint,
-                                         SchematicNetPointGraphicsItem* item)
+void SymbolPinInstance::registerNetPoint(SchematicNetPoint* netpoint)
 {
     Q_ASSERT(mRegisteredSchematicNetPoint == 0);
     mRegisteredSchematicNetPoint = netpoint;
     Q_ASSERT(mRegisteredPinGraphicsItem);
-    item->setParentItem(mRegisteredPinGraphicsItem);
-    item->setPos(0, 0);
 }
 
-void SymbolPinInstance::unregisterNetPoint(SchematicNetPoint* netpoint,
-                                           SchematicNetPointGraphicsItem* item)
+void SymbolPinInstance::unregisterNetPoint(SchematicNetPoint* netpoint)
 {
     Q_UNUSED(netpoint); // to avoid compiler warning in release mode
     Q_ASSERT(mRegisteredSchematicNetPoint == netpoint);
     mRegisteredSchematicNetPoint = 0;
-    item->setParentItem(0);
-    item->setPos(0, 0);
 }
 
 void SymbolPinInstance::registerPinGraphicsItem(library::SymbolPinGraphicsItem* item)

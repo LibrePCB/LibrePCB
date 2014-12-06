@@ -38,6 +38,7 @@
 class SchematicLayer;
 
 namespace project {
+class NetSignal;
 class Schematic;
 class SchematicNetPoint;
 class SchematicNetLine;
@@ -114,6 +115,7 @@ class SchematicNetLine final : public QObject
         const QUuid& getUuid() const noexcept {return mUuid;}
         SchematicNetPoint& getStartPoint() const noexcept {return *mStartPoint;}
         SchematicNetPoint& getEndPoint() const noexcept {return *mEndPoint;}
+        NetSignal* getNetSignal() const noexcept;
         bool isAttachedToSymbol() const noexcept;
 
         // General Methods
