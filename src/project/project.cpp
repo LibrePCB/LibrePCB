@@ -487,9 +487,14 @@ bool Project::close(QWidget* msgBoxParent)
         return true;
     }
 
+    QString msg1 = tr("You have unsaved changes in the project.\n"
+                      "Do you want to save them bevore closing the project?");
+    QString msg2 = tr("Attention: The project was restored from a backup, so if you "
+                      "don't save the project now the current state of the project (and "
+                      "the backup) will be lost forever!");
+
     QMessageBox::StandardButton choice = QMessageBox::question(msgBoxParent,
-         tr("Save Project?"), tr("You have unsaved changes in the project.\n"
-         "Do you want to save them bevore closing the project?"),
+         tr("Save Project?"), (mIsRestored ? msg1 % QStringLiteral("\n\n") % msg2 : msg1),
          QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
 
     switch (choice)
@@ -581,6 +586,11 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
         success = false;
         errors.append(e.getUserMsg());
     }
+
+    // if the project was restored from a backup, reset the mIsRestored flag as the current
+    // state of the project is no longer a restored backup but a properly saved project
+    if (mIsRestored && success && toOriginal)
+        mIsRestored = false;
 
     return success;
 }
