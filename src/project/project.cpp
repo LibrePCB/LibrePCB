@@ -610,7 +610,8 @@ void Project::printSchematicPages(QPrinter& printer, QList<unsigned int>& pages)
             throw RuntimeError(__FILE__, __LINE__, QString(),
                 QString(tr("No schematic page with the index %1 found.")).arg(pages[i]));
         }
-        schematic->render(&painter);
+        schematic->clearSelection();
+        schematic->render(&painter, QRectF(), schematic->itemsBoundingRect(), Qt::KeepAspectRatio);
 
         if (i != pages.count() - 1)
         {

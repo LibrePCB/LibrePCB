@@ -117,7 +117,10 @@ void SymbolPinGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsI
             painter->drawText(QRectF(), Qt::AlignHCenter | Qt::AlignBottom | Qt::TextSingleLine | Qt::TextDontClip, netsignal->getName());
         }
         else
-            painter->drawEllipse(-2, -2, 4, 4);
+        {
+            qreal radius = project::SchematicNetPoint::getCircleRadius().toPx();
+            painter->drawEllipse(QPointF(0, 0), radius, radius);
+        }
     }
 
     // text
@@ -158,9 +161,8 @@ bool SymbolPinGraphicsItem::updateBoundingRectAndShape() noexcept
     Point p2(mPin.getLength() * qSin(mPin.getAngle().toRad()),
              mPin.getLength() * qCos(mPin.getAngle().toRad()));
     boundingRect = boundingRect.united(QRectF(QPointF(0, 0), p2.toPxQPointF()).normalized());
-    boundingRect.adjust(-3, -3, 3, 3);
 
-    mBoundingRect = boundingRect;
+    mBoundingRect = boundingRect.adjusted(-3, -3, 3, 3);
     mShape = shape;
     return true;
 }

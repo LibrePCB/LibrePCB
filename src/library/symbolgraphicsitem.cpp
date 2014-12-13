@@ -76,6 +76,7 @@ SymbolGraphicsItem::SymbolGraphicsItem(const Symbol& symbol,
     catch (Exception& e)
     {
         qDeleteAll(mPinItems);      mPinItems.clear();
+        throw;
     }
 }
 
@@ -186,7 +187,7 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
     }
 
     // only for debugging: show symbols count of the generic component
-    if (mSymbolInstance)
+    if ((mSymbolInstance) && (!deviceIsPrinter))
     {
         layer = getSchematicLayer(SchematicLayer::Busses);
         if (layer)
