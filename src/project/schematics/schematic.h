@@ -118,7 +118,8 @@ class Schematic final : public CADScene
 
         // SchematicNetLine Methods
         SchematicNetLine* getNetLineByUuid(const QUuid& uuid) const noexcept;
-        SchematicNetLine* createNetLine(const QUuid& startPoint, const QUuid& endPoint) throw (Exception);
+        SchematicNetLine* createNetLine(const QUuid& startPoint, const QUuid& endPoint,
+                                        const Length& width) throw (Exception);
         void addNetLine(SchematicNetLine* netline, bool toDomTree = true) throw (Exception);
         void removeNetLine(SchematicNetLine* netline, bool fromDomTree = true,
                            bool deleteNetLine = false) throw (Exception);

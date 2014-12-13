@@ -309,9 +309,11 @@ SchematicNetLine* Schematic::getNetLineByUuid(const QUuid& uuid) const noexcept
     return mNetLines.value(uuid, 0);
 }
 
-SchematicNetLine* Schematic::createNetLine(const QUuid& startPoint, const QUuid& endPoint) throw (Exception)
+SchematicNetLine* Schematic::createNetLine(const QUuid& startPoint, const QUuid& endPoint,
+                                           const Length& width) throw (Exception)
 {
-    return SchematicNetLine::create(*this, mXmlFile->getDocument(), startPoint, endPoint);
+    return SchematicNetLine::create(*this, mXmlFile->getDocument(), startPoint, endPoint,
+                                    width);
 }
 
 void Schematic::addNetLine(SchematicNetLine* netline, bool toDomTree) throw (Exception)

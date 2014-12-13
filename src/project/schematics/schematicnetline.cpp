@@ -65,7 +65,8 @@ QPainterPath SchematicNetLineGraphicsItem::shape() const
     path.lineTo(line().p2());
     QPainterPathStroker ps;
     ps.setCapStyle(Qt::RoundCap);
-    ps.setWidth(Length(5 * 254000).toPx()); // 5 x line width
+    Length width = (mLine.getWidth() > Length(1270000) ? mLine.getWidth() : Length(1270000));
+    ps.setWidth(width.toPx());
     return ps.createStroke(path);
 }
 
@@ -77,7 +78,7 @@ void SchematicNetLineGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
     bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
 
     // draw line
-    painter->setPen(QPen(mLayer->getColor(highlight), Length(254000).toPx(),
+    painter->setPen(QPen(mLayer->getColor(highlight), mLine.getWidth().toPx(),
                          Qt::SolidLine, Qt::RoundCap));
     painter->drawLine(line());
 
@@ -110,6 +111,14 @@ SchematicNetLine::SchematicNetLine(Schematic& schematic, const QDomElement& domE
         throw RuntimeError(__FILE__, __LINE__, mDomElement.attribute("uuid"),
             QString(tr("Invalid net line UUID: \"%1\""))
             .arg(mDomElement.attribute("uuid")));
+    }
+
+    QString width = mDomElement.attribute(QStringLiteral("width"));
+    mWidth.setLengthMm(width);
+    if(mWidth < 0)
+    {
+        throw RuntimeError(__FILE__, __LINE__, width,
+            QString(tr("Invalid net line width: \"%1\"")).arg(width));
     }
 
     mStartPoint = mSchematic.getNetPointByUuid(mDomElement.attribute("start_point"));
@@ -156,6 +165,16 @@ NetSignal* SchematicNetLine::getNetSignal() const noexcept
 bool SchematicNetLine::isAttachedToSymbol() const noexcept
 {
     return (mStartPoint->isAttached() || mEndPoint->isAttached());
+}
+
+/*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
+
+void SchematicNetLine::setWidth(const Length& width) noexcept
+{
+    Q_ASSERT(width >= 0);
+    mWidth = width;
 }
 
 /*****************************************************************************************
@@ -206,6 +225,7 @@ bool SchematicNetLine::save(bool toOriginal, QStringList& errors) noexcept
 {
     Q_UNUSED(toOriginal);
     Q_UNUSED(errors);
+    mDomElement.setAttribute(QStringLiteral("width"), mWidth.toMmString());
     return true;
 }
 
@@ -214,7 +234,8 @@ bool SchematicNetLine::save(bool toOriginal, QStringList& errors) noexcept
  ****************************************************************************************/
 
 SchematicNetLine* SchematicNetLine::create(Schematic& schematic, QDomDocument& doc,
-                                           const QUuid& startPoint, const QUuid& endPoint) throw (Exception)
+                                           const QUuid& startPoint, const QUuid& endPoint,
+                                           const Length& width) throw (Exception)
 {
     QDomElement node = doc.createElement("netline");
     if (node.isNull())
@@ -224,6 +245,7 @@ SchematicNetLine* SchematicNetLine::create(Schematic& schematic, QDomDocument& d
     node.setAttribute("uuid", QUuid::createUuid().toString()); // generate random UUID
     node.setAttribute("start_point", startPoint.toString());
     node.setAttribute("end_point", endPoint.toString());
+    node.setAttribute("width", width.toMmString());
 
     // create and return the new SchematicNetLine object
     return new SchematicNetLine(schematic, node);

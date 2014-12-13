@@ -113,10 +113,14 @@ class SchematicNetLine final : public QObject
 
         // Getters
         const QUuid& getUuid() const noexcept {return mUuid;}
+        const Length& getWidth() const noexcept {return mWidth;}
         SchematicNetPoint& getStartPoint() const noexcept {return *mStartPoint;}
         SchematicNetPoint& getEndPoint() const noexcept {return *mEndPoint;}
         NetSignal* getNetSignal() const noexcept;
         bool isAttachedToSymbol() const noexcept;
+
+        // Setters
+        void setWidth(const Length& width) noexcept;
 
         // General Methods
         void updateLine() noexcept;
@@ -128,7 +132,8 @@ class SchematicNetLine final : public QObject
 
         // Static Methods
         static SchematicNetLine* create(Schematic& schematic, QDomDocument& doc,
-                                        const QUuid& startPoint, const QUuid& endPoint) throw (Exception);
+                                        const QUuid& startPoint, const QUuid& endPoint,
+                                        const Length& width) throw (Exception);
 
     private:
 
@@ -146,6 +151,7 @@ class SchematicNetLine final : public QObject
         QUuid mUuid;
         SchematicNetPoint* mStartPoint;
         SchematicNetPoint* mEndPoint;
+        Length mWidth;
 };
 
 } // namespace project

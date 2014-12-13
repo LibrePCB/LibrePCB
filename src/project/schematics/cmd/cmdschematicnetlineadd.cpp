@@ -52,7 +52,7 @@ CmdSchematicNetLineAdd::~CmdSchematicNetLineAdd() noexcept
 void CmdSchematicNetLineAdd::redo() throw (Exception)
 {
     if (!mNetLine) // only the first time
-        mNetLine = mSchematic.createNetLine(mStartPoint, mEndPoint); // throws an exception on error
+        mNetLine = mSchematic.createNetLine(mStartPoint, mEndPoint, Length(254000)); // throws an exception on error
 
     mSchematic.addNetLine(mNetLine); // throws an exception on error
 
