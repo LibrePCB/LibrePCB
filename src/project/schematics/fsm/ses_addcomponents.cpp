@@ -43,9 +43,8 @@ namespace project {
  ****************************************************************************************/
 
 SES_AddComponents::SES_AddComponents(SchematicEditor& editor, Ui::SchematicEditor& editorUi) :
-    SchematicEditorState(editor, editorUi), mSubState(SubState_Idle), mPreviousState(State_Select),
-    mUndoCommandActive(false), mGenComp(0), mGenCompSymbVar(0), mCurrentSymbVarItem(0),
-    mCurrentSymbolToPlace(0), mCurrentSymboleMoveCommand(0)
+    SES_Base(editor, editorUi), mIsUndoCmdActive(false), mGenComp(0), mGenCompSymbVar(0),
+    mCurrentSymbVarItem(0), mCurrentSymbolToPlace(0), mCurrentSymboleMoveCommand(0)
 {
 }
 
@@ -57,208 +56,127 @@ SES_AddComponents::~SES_AddComponents()
  *  General Methods
  ****************************************************************************************/
 
-SchematicEditorState::State SES_AddComponents::process(SchematicEditorEvent* event) noexcept
+SES_Base::ProcRetVal SES_AddComponents::process(SEE_Base* event) noexcept
 {
-    switch (mSubState)
+    switch (event->getType())
     {
-        case SubState_Idle:
-            return processSubStateIdle(event);
-        case SubState_Adding:
-            return processSubStateAdding(event);
+        case SEE_Base::SchematicSceneEvent:
+            return processSceneEvent(event);
         default:
-            Q_ASSERT(false);
-            return State_AddComponent;
+            return PassToParentState;
     }
 }
 
-void SES_AddComponents::entry(State previousState) noexcept
+bool SES_AddComponents::entry(SEE_Base* event) noexcept
 {
-    Q_ASSERT(previousState != State_AddComponent); // avoid staying in this state forever
-    mPreviousState = previousState;
+    // only accept events of type SEE_StartAddComponent
+    if (!event) return false;
+    if (event->getType() != SEE_Base::StartAddComponent) return false;
+    SEE_StartAddComponent* e = dynamic_cast<SEE_StartAddComponent*>(event);
+    Q_ASSERT(e); if (!e) return false;
+    Schematic* schematic = mEditor.getActiveSchematic();
+    if (!schematic) return false;
+    Q_ASSERT(mIsUndoCmdActive == false);
 
+    // start adding the specified component
+    try
+    {
+        // get the scene position where the new symbol should be placed
+        QPoint cursorPos = mEditorUi.graphicsView->mapFromGlobal(QCursor::pos());
+        QPoint boundedCursorPos = QPoint(qBound(0, cursorPos.x(), mEditorUi.graphicsView->width()),
+                                         qBound(0, cursorPos.y(), mEditorUi.graphicsView->height()));
+        Point pos = Point::fromPx(mEditorUi.graphicsView->mapToScene(boundedCursorPos),
+                                  mEditorUi.graphicsView->getGridInterval());
+
+        // search the generic component in the library
+        Q_ASSERT(!e->getGenCompUuid().isNull());
+        mGenComp = mProject.getLibrary().getGenComp(e->getGenCompUuid());
+        if (!mGenComp)
+        {
+            throw LogicError(__FILE__, __LINE__, QString(),
+                QString(tr("The generic component \"%1\" was not found in the "
+                "project's library.")).arg(e->getGenCompUuid().toString()));
+        }
+
+        // get the symbol variant of the generic component
+        Q_ASSERT(!e->getSymbVarUuid().isNull());
+        mGenCompSymbVar = mGenComp->getSymbolVariantByUuid(e->getSymbVarUuid());
+        if (!mGenCompSymbVar)
+        {
+            throw LogicError(__FILE__, __LINE__, QString(), QString(
+                tr("Invalid symbol variant: \"%1\"")).arg(e->getSymbVarUuid().toString()));
+        }
+
+        // start a new command
+        mProject.getUndoStack().beginCommand(tr("Add Generic Component to Schematic"));
+        mIsUndoCmdActive = true;
+
+        // create a new generic component instance and add it to the circuit
+        CmdGenCompInstanceAdd* cmd = new CmdGenCompInstanceAdd(mCircuit, *mGenComp,
+                                                               *mGenCompSymbVar);
+        mProject.getUndoStack().appendToCommand(cmd);
+
+        // create the first symbol instance and add it to the schematic
+        mCurrentSymbVarItem = mGenCompSymbVar->getItemByAddOrderIndex(0);
+        if (!mCurrentSymbVarItem)
+        {
+            throw RuntimeError(__FILE__, __LINE__, e->getSymbVarUuid().toString(),
+                QString(tr("The generic component with the UUID \"%1\" does not have "
+                           "any symbol.")).arg(e->getGenCompUuid().toString()));
+        }
+        CmdSymbolInstanceAdd* cmd2 = new CmdSymbolInstanceAdd(*schematic,
+            *(cmd->getGenCompInstance()), mCurrentSymbVarItem->getUuid(), pos);
+        mProject.getUndoStack().appendToCommand(cmd2);
+        mCurrentSymbolToPlace = cmd2->getSymbolInstance();
+        Q_ASSERT(mCurrentSymbolToPlace);
+
+        // add command to move the current symbol
+        mCurrentSymboleMoveCommand = new CmdSymbolInstanceMove(*mCurrentSymbolToPlace);
+    }
+    catch (Exception& exc)
+    {
+        QMessageBox::critical(0, tr("Error"), QString(tr("Could not add component:\n\n%1")).arg(exc.getUserMsg()));
+        if (mIsUndoCmdActive) abortCommand(false);
+        return false;
+    }
+
+    // update the command toolbar action
     mEditorUi.actionToolAddComponent->setCheckable(true);
     mEditorUi.actionToolAddComponent->setChecked(true);
+    return true;
 }
 
-void SES_AddComponents::exit(State nextState) noexcept
+bool SES_AddComponents::exit(SEE_Base* event) noexcept
 {
-    Q_UNUSED(nextState);
-
+    Q_UNUSED(event);
+    if (!abortCommand(true)) return false;
+    Q_ASSERT(mIsUndoCmdActive == false);
     mEditorUi.actionToolAddComponent->setCheckable(false);
     mEditorUi.actionToolAddComponent->setChecked(false);
+    return true;
 }
 
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
-SchematicEditorState::State SES_AddComponents::processSubStateIdle(SchematicEditorEvent* event) noexcept
+SES_Base::ProcRetVal SES_AddComponents::processSceneEvent(SEE_Base* event) noexcept
 {
-    SchematicEditorState::State nextState = State_AddComponent;
-
-    switch (event->getType())
-    {
-        case SchematicEditorEvent::SetAddComponentParams:
-        {
-            try
-            {
-                // start adding the specified component
-
-                Q_ASSERT(!mUndoCommandActive);
-                SEE_SetAddComponentParams* e = dynamic_cast<SEE_SetAddComponentParams*>(event);
-                Schematic* schematic = mEditor.getActiveSchematic();
-                Q_CHECK_PTR(e);
-                Q_CHECK_PTR(schematic);
-
-                // get the scene position where the new symbol should be placed
-                QPoint cursorPos = mEditorUi.graphicsView->mapFromGlobal(QCursor::pos());
-                QPoint boundedCursorPos = QPoint(qBound(0, cursorPos.x(), mEditorUi.graphicsView->width()),
-                                                 qBound(0, cursorPos.y(), mEditorUi.graphicsView->height()));
-                Point p = Point::fromPx(mEditorUi.graphicsView->mapToScene(boundedCursorPos)); // TODO
-
-                // search the generic component in the library
-                Q_ASSERT(!e->getGenCompUuid().isNull());
-                mGenComp = mProject.getLibrary().getGenComp(e->getGenCompUuid());
-                if (!mGenComp)
-                {
-                    throw Exception(__FILE__, __LINE__, QString(),
-                        QString(tr("The generic component \"%1\" was not found in the "
-                        "project's library.")).arg(e->getGenCompUuid().toString()));
-                }
-
-                // get the symbol variant of the generic component
-                Q_ASSERT(!e->getSymbVarUuid().isNull());
-                mGenCompSymbVar = mGenComp->getSymbolVariantByUuid(e->getSymbVarUuid());
-                if (!mGenCompSymbVar)
-                {
-                    throw Exception(__FILE__, __LINE__, QString(), QString(
-                        tr("Invalid symbol variant: %1")).arg(e->getSymbVarUuid().toString()));
-                }
-
-                // start a new command
-                mProject.getUndoStack().beginCommand(tr("Add Generic Component to Schematic"));
-                mUndoCommandActive = true;
-
-                // create a new generic component instance and add it to the circuit
-                CmdGenCompInstanceAdd* cmd = new CmdGenCompInstanceAdd(mCircuit, *mGenComp,
-                                                                       *mGenCompSymbVar);
-                mProject.getUndoStack().appendToCommand(cmd);
-
-                // create the first symbol instance and add it to the schematic
-                mCurrentSymbVarItem = mGenCompSymbVar->getItemByAddOrderIndex(0);
-                if (!mCurrentSymbVarItem)
-                {
-                    throw RuntimeError(__FILE__, __LINE__, e->getSymbVarUuid().toString(),
-                        QString(tr("The generic component with the UUID \"%1\" does not have "
-                                   "symbols.")).arg(e->getGenCompUuid().toString()));
-                }
-                CmdSymbolInstanceAdd* cmd2 = new CmdSymbolInstanceAdd(*schematic,
-                    *(cmd->getGenCompInstance()), mCurrentSymbVarItem->getUuid(), p);
-                mProject.getUndoStack().appendToCommand(cmd2);
-                mCurrentSymbolToPlace = cmd2->getSymbolInstance();
-                Q_CHECK_PTR(mCurrentSymbolToPlace);
-
-                // add command to move the current symbol
-                mCurrentSymboleMoveCommand = new CmdSymbolInstanceMove(*mCurrentSymbolToPlace);
-
-                // switch to adding substate
-                mSubState = SubState_Adding;
-            }
-            catch (Exception& exc)
-            {
-                QMessageBox::critical(0, tr("Error"), QString(tr("Could not add component:\n\n%1")).arg(exc.getUserMsg()));
-                if (mUndoCommandActive)
-                {
-                    try {mProject.getUndoStack().abortCommand();} catch (...) {}
-                    mUndoCommandActive = false;
-                }
-                return mPreviousState; // go back to last state
-            }
-            break;
-        }
-
-        case SchematicEditorEvent::AbortCommand:
-            qWarning() << "it should never be possible to leave this state before "
-                          "starting to add a new component!";
-            nextState = mPreviousState;
-            break;
-
-        default:
-            break;
-    }
-
-    return nextState;
-}
-
-SchematicEditorState::State SES_AddComponents::processSubStateAdding(SchematicEditorEvent* event) noexcept
-{
-    SchematicEditorState::State nextState = State_AddComponent;
-
-    switch (event->getType())
-    {
-        case SchematicEditorEvent::SchematicSceneEvent:
-            nextState = processSubStateAddingSceneEvent(event);
-            break;
-
-        case SchematicEditorEvent::AbortCommand:
-        {
-            try
-            {
-                // delete the current move command
-                Q_CHECK_PTR(mCurrentSymboleMoveCommand);
-                delete mCurrentSymboleMoveCommand;
-                mCurrentSymboleMoveCommand = 0;
-
-                // abort the whole command
-                mProject.getUndoStack().abortCommand();
-                mUndoCommandActive = false;
-
-                // reset attributes, go back to idle state
-                mGenComp = 0;
-                mGenCompSymbVar = 0;
-                mCurrentSymbVarItem = 0;
-                mCurrentSymbolToPlace = 0;
-                mSubState = SubState_Idle;
-                nextState = mPreviousState;
-            }
-            catch (Exception& e)
-            {
-                QMessageBox::warning(&mEditor, tr("Error"), e.getUserMsg());
-            }
-        }
-
-        default:
-            break;
-    }
-
-    return nextState;
-}
-
-SchematicEditorState::State SES_AddComponents::processSubStateAddingSceneEvent(SchematicEditorEvent* event) noexcept
-{
-    SchematicEditorState::State nextState = State_AddComponent;
-    QEvent* qevent = dynamic_cast<SEE_RedirectedQEvent*>(event)->getQEvent();
-    Q_ASSERT(qevent);
-
-    // Always accept graphics scene events, even if we do not react on some of the events!
-    // This will give us the full control over the graphics scene. Otherwise, the graphics
-    // scene can react on some events and disturb our state machine. Only the wheel event
-    // is ignored because otherwise the view will not allow to zoom with the mouse wheel.
-    if (qevent->type() != QEvent::GraphicsSceneWheel) event->setAccepted(true);
+    QEvent* qevent = SEE_RedirectedQEvent::getQEventFromSEE(event);
+    Q_ASSERT(qevent); if (!qevent) return PassToParentState;
+    Schematic* schematic = mEditor.getActiveSchematic();
+    Q_ASSERT(schematic); if (!schematic) return PassToParentState;
 
     switch (qevent->type())
     {
         case QEvent::GraphicsSceneMouseMove:
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-            Schematic* schematic = mEditor.getActiveSchematic();
-            Q_CHECK_PTR(sceneEvent); if (!sceneEvent) break;
-            Q_CHECK_PTR(schematic); if (!schematic) break;
-            Point p = Point::fromPx(sceneEvent->scenePos(), Length(2540000)); // TODO
-
+            Q_ASSERT(sceneEvent);
+            Point pos = Point::fromPx(sceneEvent->scenePos(), mEditorUi.graphicsView->getGridInterval());
             // set temporary position of the current symbol
-            Q_CHECK_PTR(mCurrentSymboleMoveCommand);
-            mCurrentSymboleMoveCommand->setAbsolutePosTemporary(p);
+            Q_ASSERT(mCurrentSymboleMoveCommand);
+            mCurrentSymboleMoveCommand->setAbsolutePosTemporary(pos);
             break;
         }
 
@@ -266,11 +184,8 @@ SchematicEditorState::State SES_AddComponents::processSubStateAddingSceneEvent(S
         case QEvent::GraphicsSceneMousePress:
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-            Schematic* schematic = mEditor.getActiveSchematic();
-            Q_CHECK_PTR(sceneEvent); if (!sceneEvent) break;
-            Q_CHECK_PTR(schematic); if (!schematic) break;
-            Point p = Point::fromPx(sceneEvent->scenePos(), Length(2540000)); // TODO
-
+            Q_ASSERT(sceneEvent);
+            Point pos = Point::fromPx(sceneEvent->scenePos(), mEditorUi.graphicsView->getGridInterval());
             switch (sceneEvent->button())
             {
                 case Qt::LeftButton:
@@ -278,9 +193,9 @@ SchematicEditorState::State SES_AddComponents::processSubStateAddingSceneEvent(S
                     try
                     {
                         // place the current symbol finally
-                        mCurrentSymboleMoveCommand->setAbsolutePosTemporary(p);
+                        mCurrentSymboleMoveCommand->setAbsolutePosTemporary(pos);
                         mProject.getUndoStack().appendToCommand(mCurrentSymboleMoveCommand);
-                        mCurrentSymboleMoveCommand = 0;
+                        mCurrentSymboleMoveCommand = nullptr;
 
                         // check if there is a next symbol to add
                         mCurrentSymbVarItem = mGenCompSymbVar->getItemByAddOrderIndex(
@@ -291,51 +206,37 @@ SchematicEditorState::State SES_AddComponents::processSubStateAddingSceneEvent(S
                             // create the next symbol instance and add it to the schematic
                             CmdSymbolInstanceAdd* cmd = new CmdSymbolInstanceAdd(*schematic,
                                 mCurrentSymbolToPlace->getGenCompInstance(),
-                                mCurrentSymbVarItem->getUuid(), p);
+                                mCurrentSymbVarItem->getUuid(), pos);
                             mProject.getUndoStack().appendToCommand(cmd);
                             mCurrentSymbolToPlace = cmd->getSymbolInstance();
-                            Q_CHECK_PTR(mCurrentSymbolToPlace);
+                            Q_ASSERT(mCurrentSymbolToPlace);
 
                             // add command to move the current symbol
                             mCurrentSymboleMoveCommand = new CmdSymbolInstanceMove(*mCurrentSymbolToPlace);
+                            return ForceStayInState;
                         }
                         else
                         {
                             // all symbols placed, finish the whole command
                             mProject.getUndoStack().endCommand();
-                            mUndoCommandActive = false;
-
-                            // reset attributes, go back to idle state
-                            mGenComp = 0;
-                            mGenCompSymbVar = 0;
-                            mCurrentSymbVarItem = 0;
-                            mCurrentSymbolToPlace = 0;
-                            mCurrentSymboleMoveCommand = 0;
-                            mSubState = SubState_Idle;
-                            nextState = mPreviousState;
+                            mIsUndoCmdActive = false;
+                            abortCommand(false); // reset attributes
+                            return ForceLeaveState;
                         }
                     }
                     catch (Exception& e)
                     {
-                        QMessageBox::warning(0, "", e.getUserMsg());
+                        QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+                        abortCommand(false);
+                        return ForceLeaveState;
                     }
                     break;
                 }
 
                 case Qt::RightButton:
-                {
-                    try
-                    {
-                        // rotate symbol
-                        mCurrentSymboleMoveCommand->rotate90degreesCCW();
-                    }
-                    catch (Exception& e)
-                    {
-                        // TODO
-                    }
-
-                    break;
-                }
+                    // rotate symbol
+                    mCurrentSymboleMoveCommand->rotate90degreesCCW();
+                    return ForceStayInState;
 
                 default:
                     break;
@@ -346,23 +247,61 @@ SchematicEditorState::State SES_AddComponents::processSubStateAddingSceneEvent(S
         case QEvent::KeyPress:
         {
             QKeyEvent* keyEvent = dynamic_cast<QKeyEvent*>(qevent);
+            Q_ASSERT(keyEvent);
             switch (keyEvent->key())
             {
                 case Qt::Key_R:
                     mCurrentSymboleMoveCommand->rotate90degreesCCW();
-                    break;
+                    return ForceStayInState;
                 default:
                     break;
             }
-
             break;
         }
 
         default:
-            break;
+        {
+            // Always accept graphics scene events, even if we do not react on some of the events!
+            // This will give us the full control over the graphics scene. Otherwise, the graphics
+            // scene can react on some events and disturb our state machine. Only the wheel event
+            // is ignored because otherwise the view will not allow to zoom with the mouse wheel.
+            if (qevent->type() != QEvent::GraphicsSceneWheel)
+                return ForceStayInState;
+            else
+                return PassToParentState;
+        }
     }
 
-    return nextState;
+    return PassToParentState;
+}
+
+bool SES_AddComponents::abortCommand(bool showErrMsgBox) noexcept
+{
+    try
+    {
+        // delete the current move command
+        delete mCurrentSymboleMoveCommand;
+        mCurrentSymboleMoveCommand = 0;
+
+        // abort the undo command
+        if (mIsUndoCmdActive)
+        {
+            mProject.getUndoStack().abortCommand();
+            mIsUndoCmdActive = false;
+        }
+
+        // reset attributes, go back to idle state
+        mGenComp = nullptr;
+        mGenCompSymbVar = nullptr;
+        mCurrentSymbVarItem = nullptr;
+        mCurrentSymbolToPlace = nullptr;
+        return true;
+    }
+    catch (Exception& e)
+    {
+        if (showErrMsgBox) QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+        return false;
+    }
 }
 
 /*****************************************************************************************

@@ -54,7 +54,7 @@ namespace project {
  ****************************************************************************************/
 
 SES_DrawWire::SES_DrawWire(SchematicEditor& editor, Ui::SchematicEditor& editorUi) :
-    SchematicEditorState(editor, editorUi),
+    SES_Base(editor, editorUi),
     mSubState(SubState_Idle), mWireMode(WireMode_HV), mFixedNetPoint(nullptr),
     mPositioningNetLine1(nullptr), mPositioningNetPoint1(nullptr),
     mPositioningNetLine2(nullptr), mPositioningNetPoint2(nullptr),
@@ -73,7 +73,7 @@ SES_DrawWire::~SES_DrawWire()
  *  General Methods
  ****************************************************************************************/
 
-SchematicEditorState::State SES_DrawWire::process(SchematicEditorEvent* event) noexcept
+SES_Base::ProcRetVal SES_DrawWire::process(SEE_Base* event) noexcept
 {
     switch (mSubState)
     {
@@ -83,13 +83,13 @@ SchematicEditorState::State SES_DrawWire::process(SchematicEditorEvent* event) n
             return processSubStatePositioning(event);
         default:
             Q_ASSERT(false);
-            return State_DrawWire;
+            return PassToParentState;
     }
 }
 
-void SES_DrawWire::entry(State previousState) noexcept
+bool SES_DrawWire::entry(SEE_Base* event) noexcept
 {
-    Q_UNUSED(previousState);
+    Q_UNUSED(event);
     Q_ASSERT(mSubState == SubState_Idle);
 
     // Check this state in the "tools" toolbar
@@ -173,11 +173,13 @@ void SES_DrawWire::entry(State previousState) noexcept
     mWidthComboBox->setCurrentIndex(0);
     mWidthComboBox->setEnabled(false); // this feature is not yet available --> disable
     mEditorUi.commandToolbar->addWidget(mWidthComboBox);
+
+    return true;
 }
 
-void SES_DrawWire::exit(State nextState) noexcept
+bool SES_DrawWire::exit(SEE_Base* event) noexcept
 {
-    Q_UNUSED(nextState);
+    Q_UNUSED(event);
 
     // abort the currently active command
     if (mSubState != SubState_Idle)
@@ -198,59 +200,31 @@ void SES_DrawWire::exit(State nextState) noexcept
     // Uncheck this state in the "tools" toolbar
     mEditorUi.actionToolDrawWire->setCheckable(false);
     mEditorUi.actionToolDrawWire->setChecked(false);
+
+    return true;
 }
 
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
-SchematicEditorState::State SES_DrawWire::processSubStateIdle(SchematicEditorEvent* event) noexcept
+SES_Base::ProcRetVal SES_DrawWire::processSubStateIdle(SEE_Base* event) noexcept
 {
     switch (event->getType())
     {
-        case SchematicEditorEvent::AbortCommand:
-            event->setAccepted(true);
-            return State_Select;
-        case SchematicEditorEvent::StartSelect:
-            event->setAccepted(true);
-            return State_Select;
-        case SchematicEditorEvent::StartMove:
-            event->setAccepted(true);
-            return State_Move;
-        case SchematicEditorEvent::StartDrawText:
-            event->setAccepted(true);
-            return State_DrawText;
-        case SchematicEditorEvent::StartDrawRect:
-            event->setAccepted(true);
-            return State_DrawRect;
-        case SchematicEditorEvent::StartDrawPolygon:
-            event->setAccepted(true);
-            return State_DrawPolygon;
-        case SchematicEditorEvent::StartDrawCircle:
-            event->setAccepted(true);
-            return State_DrawCircle;
-        case SchematicEditorEvent::StartDrawEllipse:
-            event->setAccepted(true);
-            return State_DrawEllipse;
-        case SchematicEditorEvent::StartAddComponent:
-            event->setAccepted(true);
-            return State_AddComponent;
-        case SchematicEditorEvent::SwitchToSchematicPage:
-            event->setAccepted(true);
-            return State_DrawWire;
-        case SchematicEditorEvent::SchematicSceneEvent:
+        case SEE_Base::SchematicSceneEvent:
             return processIdleSceneEvent(event);
         default:
-            return State_DrawWire;
+            return PassToParentState;
     }
 }
 
-SchematicEditorState::State SES_DrawWire::processIdleSceneEvent(SchematicEditorEvent* event) noexcept
+SES_Base::ProcRetVal SES_DrawWire::processIdleSceneEvent(SEE_Base* event) noexcept
 {
     QEvent* qevent = SEE_RedirectedQEvent::getQEventFromSEE(event);
-    Q_ASSERT(qevent); if (!qevent) return State_DrawWire;
+    Q_ASSERT(qevent); if (!qevent) return PassToParentState;
     Schematic* schematic = mEditor.getActiveSchematic();
-    Q_ASSERT(schematic); if (!schematic) return State_DrawWire;
+    Q_ASSERT(schematic); if (!schematic) return PassToParentState;
 
     switch (qevent->type())
     {
@@ -265,50 +239,39 @@ SchematicEditorState::State SES_DrawWire::processIdleSceneEvent(SchematicEditorE
                 case Qt::LeftButton:
                     // start adding netpoints/netlines
                     startPositioning(schematic, pos);
-                    event->setAccepted(true);
-                    return State_DrawWire;
-
-                case Qt::RightButton:
-                    // switch back to last command
-                    event->setAccepted(true);
-                    return State_Select;
-
+                    return ForceStayInState;
                 default:
                     break;
             }
             break;
         }
-
         default:
             break;
     }
-    return State_DrawWire;
+
+    return PassToParentState;
 }
 
-SchematicEditorState::State SES_DrawWire::processSubStatePositioning(SchematicEditorEvent* event) noexcept
+SES_Base::ProcRetVal SES_DrawWire::processSubStatePositioning(SEE_Base* event) noexcept
 {
     switch (event->getType())
     {
-        case SchematicEditorEvent::AbortCommand:
+        case SEE_Base::AbortCommand:
             abortPositioning(true);
-            event->setAccepted(true);
-            break;
-
-        case SchematicEditorEvent::SchematicSceneEvent:
+            return ForceStayInState;
+        case SEE_Base::SchematicSceneEvent:
             return processPositioningSceneEvent(event);
-
         default:
-            break;
+            return PassToParentState;
     }
-    return State_DrawWire;
 }
 
-SchematicEditorState::State SES_DrawWire::processPositioningSceneEvent(SchematicEditorEvent* event) noexcept
+SES_Base::ProcRetVal SES_DrawWire::processPositioningSceneEvent(SEE_Base* event) noexcept
 {
     QEvent* qevent = SEE_RedirectedQEvent::getQEventFromSEE(event);
-    Q_ASSERT(qevent); if (!qevent) return State_DrawWire;
+    Q_ASSERT(qevent); if (!qevent) return PassToParentState;
     Schematic* schematic = mEditor.getActiveSchematic();
-    Q_ASSERT(schematic); if (!schematic) return State_DrawWire;
+    Q_ASSERT(schematic); if (!schematic) return PassToParentState;
 
     switch (qevent->type())
     {
@@ -322,16 +285,14 @@ SchematicEditorState::State SES_DrawWire::processPositioningSceneEvent(Schematic
                 case Qt::LeftButton:
                     // fix the current point and add a new point + line
                     addNextNetPoint(*schematic, pos);
-                    event->setAccepted(true);
-                    break;
+                    return ForceStayInState;
                 case Qt::RightButton:
                     // switch to next wire mode
                     mWireMode = static_cast<WireMode>(mWireMode+1);
                     if (mWireMode == WireMode_COUNT) mWireMode = static_cast<WireMode>(0);
                     updateWireModeActionsCheckedState();
                     updateNetpointPositions(pos);
-                    event->setAccepted(true);
-                    break;
+                    return ForceStayInState;
                 default:
                     break;
             }
@@ -344,14 +305,14 @@ SchematicEditorState::State SES_DrawWire::processPositioningSceneEvent(Schematic
             Q_ASSERT(sceneEvent);
             Point pos = Point::fromPx(sceneEvent->scenePos(), mEditorUi.graphicsView->getGridInterval());
             updateNetpointPositions(pos);
-            event->setAccepted(true);
-            break;
+            return ForceStayInState;
         }
 
         default:
             break;
     }
-    return State_DrawWire;
+
+    return PassToParentState;
 }
 
 bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,

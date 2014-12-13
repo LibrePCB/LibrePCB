@@ -34,12 +34,12 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SchematicEditorEvent::SchematicEditorEvent(EventType type) :
+SEE_Base::SEE_Base(EventType type) :
     mType(type), mAccepted(false)
 {
 }
 
-SchematicEditorEvent::~SchematicEditorEvent()
+SEE_Base::~SEE_Base()
 {
 }
 

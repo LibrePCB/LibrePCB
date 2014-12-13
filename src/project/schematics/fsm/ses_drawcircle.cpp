@@ -33,7 +33,7 @@ namespace project {
  ****************************************************************************************/
 
 SES_DrawCircle::SES_DrawCircle(SchematicEditor& editor, Ui::SchematicEditor& editorUi) :
-    SchematicEditorState(editor, editorUi)
+    SES_Base(editor, editorUi)
 {
 }
 
@@ -45,74 +45,26 @@ SES_DrawCircle::~SES_DrawCircle()
  *  General Methods
  ****************************************************************************************/
 
-SchematicEditorState::State SES_DrawCircle::process(SchematicEditorEvent* event) noexcept
+SES_Base::ProcRetVal SES_DrawCircle::process(SEE_Base* event) noexcept
 {
-    SchematicEditorState::State nextState = State_DrawCircle;
-
-    switch (event->getType())
-    {
-        case SchematicEditorEvent::AbortCommand:
-        case SchematicEditorEvent::StartSelect:
-            nextState = State_Select;
-            break;
-
-        case SchematicEditorEvent::StartMove:
-            nextState = State_Move;
-            break;
-
-        case SchematicEditorEvent::StartDrawText:
-            nextState = State_DrawText;
-            break;
-
-        case SchematicEditorEvent::StartDrawRect:
-            nextState = State_DrawRect;
-            break;
-
-        case SchematicEditorEvent::StartDrawPolygon:
-            nextState = State_DrawPolygon;
-            break;
-
-        case SchematicEditorEvent::StartDrawEllipse:
-            nextState = State_DrawEllipse;
-            break;
-
-        case SchematicEditorEvent::StartDrawWire:
-            nextState = State_DrawWire;
-            break;
-
-        case SchematicEditorEvent::StartAddComponent:
-            nextState = State_AddComponent;
-            break;
-
-        case SchematicEditorEvent::SwitchToSchematicPage:
-        {
-            SEE_SwitchToSchematicPage* e = dynamic_cast<SEE_SwitchToSchematicPage*>(event);
-            Q_CHECK_PTR(e); Q_UNUSED(e);
-            e->setAccepted(true);
-            break;
-        }
-
-        default:
-            break;
-    }
-
-    return nextState;
+    Q_UNUSED(event);
+    return PassToParentState;
 }
 
-void SES_DrawCircle::entry(State previousState) noexcept
+bool SES_DrawCircle::entry(SEE_Base* event) noexcept
 {
-    Q_UNUSED(previousState);
-
+    Q_UNUSED(event);
     mEditorUi.actionToolDrawCircle->setCheckable(true);
     mEditorUi.actionToolDrawCircle->setChecked(true);
+    return true;
 }
 
-void SES_DrawCircle::exit(State nextState) noexcept
+bool SES_DrawCircle::exit(SEE_Base* event) noexcept
 {
-    Q_UNUSED(nextState);
-
+    Q_UNUSED(event);
     mEditorUi.actionToolDrawCircle->setCheckable(false);
     mEditorUi.actionToolDrawCircle->setChecked(false);
+    return true;
 }
 
 /*****************************************************************************************

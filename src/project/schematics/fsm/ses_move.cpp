@@ -33,7 +33,7 @@ namespace project {
  ****************************************************************************************/
 
 SES_Move::SES_Move(SchematicEditor& editor, Ui::SchematicEditor& editorUi) :
-    SchematicEditorState(editor, editorUi)
+    SES_Base(editor, editorUi)
 {
 }
 
@@ -45,74 +45,26 @@ SES_Move::~SES_Move()
  *  General Methods
  ****************************************************************************************/
 
-SchematicEditorState::State SES_Move::process(SchematicEditorEvent* event) noexcept
+SES_Base::ProcRetVal SES_Move::process(SEE_Base* event) noexcept
 {
-    SchematicEditorState::State nextState = State_Move;
-
-    switch (event->getType())
-    {
-        case SchematicEditorEvent::AbortCommand:
-        case SchematicEditorEvent::StartSelect:
-            nextState = State_Select;
-            break;
-
-        case SchematicEditorEvent::StartDrawText:
-            nextState = State_DrawText;
-            break;
-
-        case SchematicEditorEvent::StartDrawRect:
-            nextState = State_DrawRect;
-            break;
-
-        case SchematicEditorEvent::StartDrawPolygon:
-            nextState = State_DrawPolygon;
-            break;
-
-        case SchematicEditorEvent::StartDrawCircle:
-            nextState = State_DrawCircle;
-            break;
-
-        case SchematicEditorEvent::StartDrawEllipse:
-            nextState = State_DrawEllipse;
-            break;
-
-        case SchematicEditorEvent::StartDrawWire:
-            nextState = State_DrawWire;
-            break;
-
-        case SchematicEditorEvent::StartAddComponent:
-            nextState = State_AddComponent;
-            break;
-
-        case SchematicEditorEvent::SwitchToSchematicPage:
-        {
-            SEE_SwitchToSchematicPage* e = dynamic_cast<SEE_SwitchToSchematicPage*>(event);
-            Q_CHECK_PTR(e); Q_UNUSED(e);
-            e->setAccepted(true);
-            break;
-        }
-
-        default:
-            break;
-    }
-
-    return nextState;
+    Q_UNUSED(event);
+    return PassToParentState;
 }
 
-void SES_Move::entry(State previousState) noexcept
+bool SES_Move::entry(SEE_Base* event) noexcept
 {
-    Q_UNUSED(previousState);
-
+    Q_UNUSED(event);
     mEditorUi.actionToolMove->setCheckable(true);
     mEditorUi.actionToolMove->setChecked(true);
+    return true;
 }
 
-void SES_Move::exit(State nextState) noexcept
+bool SES_Move::exit(SEE_Base* event) noexcept
 {
-    Q_UNUSED(nextState);
-
+    Q_UNUSED(event);
     mEditorUi.actionToolMove->setCheckable(false);
     mEditorUi.actionToolMove->setChecked(false);
+    return true;
 }
 
 /*****************************************************************************************

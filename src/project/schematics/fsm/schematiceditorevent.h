@@ -43,19 +43,19 @@ class SchematicEditor;
 namespace project {
 
 /*****************************************************************************************
- *  Class SchematicEditorEvent
+ *  Class SEE_Base
  ****************************************************************************************/
 
 /**
- * @brief The SchematicEditorEvent class
+ * @brief The SEE_Base (Schematic Editor Event Base) class
  */
-class SchematicEditorEvent
+class SEE_Base
 {
     public:
 
-        // FSM event types
+        /// FSM event types
         enum EventType {
-            // Triggered Actions (SchematicEditorEvent objects, no additional parameters)
+            // Triggered Actions (SEE_Base objects, no additional parameters)
             AbortCommand,       ///< abort the currently active command (esc)
             StartSelect,        ///< start command: select elements
             StartMove,          ///< start command: move elements
@@ -65,7 +65,6 @@ class SchematicEditorEvent
             StartDrawCircle,    ///< start command: draw circle
             StartDrawEllipse,   ///< start command: draw ellipse
             StartDrawWire,      ///< start command: draw wire
-            StartAddComponent,  ///< start command: add component
             Edit_Copy,          ///< copy the selected elements to clipboard (ctrl+c)
             Edit_Cut,           ///< cut the selected elements (ctrl+x)
             Edit_Paste,         ///< paste the elements from the clipboard (ctrl+v)
@@ -75,13 +74,13 @@ class SchematicEditorEvent
             // Redirected QEvent's (SEE_RedirectedQEvent objects, with pointer to a QEvent)
             SchematicSceneEvent,    ///< event from CADScene @see project#SEE_RedirectedQEvent
             // Special Events (with some additional parameters)
-            SetAddComponentParams,  ///< @see project#SEE_SetAddComponentParams
+            StartAddComponent,      ///< @see project#SEE_StartAddComponent
             SwitchToSchematicPage,  ///< @see project#SEE_SwitchToSchematicPage
         };
 
         // Constructors / Destructor
-        SchematicEditorEvent(EventType type);
-        virtual ~SchematicEditorEvent();
+        SEE_Base(EventType type);
+        virtual ~SEE_Base();
 
         // Getters
         EventType getType() const noexcept {return mType;}
@@ -103,13 +102,13 @@ class SchematicEditorEvent
 /**
  * @brief The SEE_RedirectedQEvent class
  */
-class SEE_RedirectedQEvent : public SchematicEditorEvent
+class SEE_RedirectedQEvent final : public SEE_Base
 {
     public:
 
         // Constructors / Destructor
         SEE_RedirectedQEvent(EventType type, QEvent* event) :
-            SchematicEditorEvent(type), mQEvent(event) {}
+            SEE_Base(type), mQEvent(event) {}
         virtual ~SEE_RedirectedQEvent() {}
 
         // Getters
@@ -119,19 +118,19 @@ class SEE_RedirectedQEvent : public SchematicEditorEvent
         void setAccepted(bool accepted) noexcept
         {
             mQEvent->setAccepted(accepted);
-            SchematicEditorEvent::setAccepted(accepted);
+            SEE_Base::setAccepted(accepted);
         }
 
         // Static Methods
 
         /**
-         * @brief Helper method to get the QEvent from a pointer to SchematicEditorEvent
-         * @param see   A SchematicEditorEvent pointer to a SEE_RedirectedQEvent object
+         * @brief Helper method to get the QEvent from a pointer to SEE_Base
+         * @param see  A SEE_Base pointer to a SEE_RedirectedQEvent object
          * @return @li the pointer to the QEvent (if "see" was a pointer to a
          *             SEE_RedirectedQEvent object)
          *         @li nullptr otherwise
          */
-        static QEvent* getQEventFromSEE(const SchematicEditorEvent* see) noexcept
+        static QEvent* getQEventFromSEE(const SEE_Base* see) noexcept
         {
             const SEE_RedirectedQEvent* r = dynamic_cast<const SEE_RedirectedQEvent*>(see);
             return (r ? r->getQEvent() : nullptr);
@@ -147,23 +146,19 @@ class SEE_RedirectedQEvent : public SchematicEditorEvent
  ****************************************************************************************/
 
 /**
- * @brief The SEE_SetAddComponentParams class
- *
- * An event of this type must be created and passed to the FSM after entering the state
- * project#SES_AddComponents to specify which component should be added to the
- * circuit. The symbols of that component will then be added to the active schematic.
+ * @brief The SEE_StartAddComponent class
  *
  * @see project#SES_AddComponents
  */
-class SEE_SetAddComponentParams : public SchematicEditorEvent
+class SEE_StartAddComponent final : public SEE_Base
 {
     public:
 
         // Constructors / Destructor
-        SEE_SetAddComponentParams(const QUuid& genComp, const QUuid& symbVar) :
-            SchematicEditorEvent(SetAddComponentParams),
+        SEE_StartAddComponent(const QUuid& genComp, const QUuid& symbVar) :
+            SEE_Base(StartAddComponent),
             mGenCompUuid(genComp), mSymbVarUuid(symbVar) {}
-        virtual ~SEE_SetAddComponentParams() {}
+        virtual ~SEE_StartAddComponent() {}
 
         // Getters
         const QUuid& getGenCompUuid() const noexcept {return mGenCompUuid;}
@@ -191,13 +186,13 @@ class SEE_SetAddComponentParams : public SchematicEditorEvent
  *
  * @see project#SchematicEditor#setActiveSchematicIndex()
  */
-class SEE_SwitchToSchematicPage : public SchematicEditorEvent
+class SEE_SwitchToSchematicPage final : public SEE_Base
 {
     public:
 
         // Constructors / Destructor
         SEE_SwitchToSchematicPage(unsigned int schematicIndex) :
-            SchematicEditorEvent(SwitchToSchematicPage),
+            SEE_Base(SwitchToSchematicPage),
             mSchematicIndex(schematicIndex) {}
         virtual ~SEE_SwitchToSchematicPage() {}
 

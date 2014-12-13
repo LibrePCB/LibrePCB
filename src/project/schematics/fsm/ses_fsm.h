@@ -17,44 +17,67 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SCHEMATICEDITORFSM_H
-#define PROJECT_SCHEMATICEDITORFSM_H
+#ifndef PROJECT_SES_FSM_H
+#define PROJECT_SES_FSM_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include "schematiceditorstate.h"
+#include "ses_base.h"
 
 /*****************************************************************************************
- *  Class SchematicEditorFsm
+ *  Class SES_FSM
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The SchematicEditorFsm class
+ * @brief The SES_FSM (Schematic Editor Finite State Machine) class
  */
-class SchematicEditorFsm final : public SchematicEditorState
+class SES_FSM final : public SES_Base
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit SchematicEditorFsm(SchematicEditor& editor, Ui::SchematicEditor& editorUi) noexcept;
-        ~SchematicEditorFsm() noexcept;
+        explicit SES_FSM(SchematicEditor& editor, Ui::SchematicEditor& editorUi) noexcept;
+        ~SES_FSM() noexcept;
 
         // General Methods
-        bool processEvent(SchematicEditorEvent* event, bool deleteEvent = false) noexcept;
+        bool processEvent(SEE_Base* event, bool deleteEvent = false) noexcept;
+
 
     private:
 
+        /// FSM States
+        enum State {
+            State_NoState,      ///< no state active
+            State_Select,       ///< @see project#SES_Select
+            State_Move,         ///< @see project#SES_Move
+            State_DrawText,     ///< @see project#SES_DrawText
+            State_DrawRect,     ///< @see project#SES_DrawRect
+            State_DrawPolygon,  ///< @see project#SES_DrawPolygon
+            State_DrawCircle,   ///< @see project#SES_DrawCircle
+            State_DrawEllipse,  ///< @see project#SES_DrawEllipse
+            State_DrawWire,     ///< @see project#SES_DrawWire
+            State_AddComponent  ///< @see project#SES_AddComponents
+        };
+
+
         // General Methods
-        State process(SchematicEditorEvent* event) noexcept;
+        ProcRetVal process(SEE_Base* event) noexcept;
+        State processEventFromChild(SEE_Base* event) noexcept; ///< returns the next state
+
+
+        // Attributes
+        State mCurrentState;
+        State mPreviousState;
+        QHash<State, SES_Base*> mSubStates;
 };
 
 } // namespace project
 
-#endif // PROJECT_SCHEMATICEDITORFSM_H
+#endif // PROJECT_SES_FSM_H

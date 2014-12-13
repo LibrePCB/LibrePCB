@@ -26,7 +26,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include "schematiceditorstate.h"
+#include "ses_base.h"
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -47,7 +47,7 @@ namespace project {
 /**
  * @brief The SES_DrawWire class
  */
-class SES_DrawWire final : public SchematicEditorState
+class SES_DrawWire final : public SES_Base
 {
         Q_OBJECT
 
@@ -58,9 +58,9 @@ class SES_DrawWire final : public SchematicEditorState
         ~SES_DrawWire();
 
         // General Methods
-        State process(SchematicEditorEvent* event) noexcept;
-        void entry(State previousState) noexcept;
-        void exit(State nextState) noexcept;
+        ProcRetVal process(SEE_Base* event) noexcept override;
+        bool entry(SEE_Base* event) noexcept override;
+        bool exit(SEE_Base* event) noexcept override;
 
     private:
 
@@ -88,10 +88,10 @@ class SES_DrawWire final : public SchematicEditorState
 
 
         // Private Methods
-        State processSubStateIdle(SchematicEditorEvent* event) noexcept;
-        State processSubStatePositioning(SchematicEditorEvent* event) noexcept;
-        State processIdleSceneEvent(SchematicEditorEvent* event) noexcept;
-        State processPositioningSceneEvent(SchematicEditorEvent* event) noexcept;
+        ProcRetVal processSubStateIdle(SEE_Base* event) noexcept;
+        ProcRetVal processSubStatePositioning(SEE_Base* event) noexcept;
+        ProcRetVal processIdleSceneEvent(SEE_Base* event) noexcept;
+        ProcRetVal processPositioningSceneEvent(SEE_Base* event) noexcept;
         bool startPositioning(Schematic& schematic, const Point& pos,
                               SchematicNetPoint* fixedPoint = nullptr) noexcept;
         bool addNextNetPoint(Schematic& schematic, const Point& pos) noexcept;

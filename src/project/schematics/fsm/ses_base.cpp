@@ -22,7 +22,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "schematiceditorstate.h"
+#include "ses_base.h"
 #include "../schematiceditor.h"
 #include "../../project.h"
 
@@ -32,36 +32,14 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SchematicEditorState::SchematicEditorState(SchematicEditor& editor, Ui::SchematicEditor& editorUi) :
+SES_Base::SES_Base(SchematicEditor& editor, Ui::SchematicEditor& editorUi) :
     QObject(0), mProject(editor.getProject()), mCircuit(editor.getProject().getCircuit()),
-    mEditor(editor), mEditorUi(editorUi), mCurrentState(State_Initial)
+    mEditor(editor), mEditorUi(editorUi)
 {
 }
 
-SchematicEditorState::~SchematicEditorState()
+SES_Base::~SES_Base()
 {
-    // exit the current substate
-    if (mSubStates.contains(mCurrentState))
-        mSubStates[mCurrentState]->exit(State_Initial);
-
-    mCurrentState = State_Initial; // switch to an invalid state
-
-    // delete all substates
-    qDeleteAll(mSubStates);     mSubStates.clear();
-}
-
-/*****************************************************************************************
- *  General Methods
- ****************************************************************************************/
-
-void SchematicEditorState::entry(State previousState) noexcept
-{
-    Q_UNUSED(previousState);
-}
-
-void SchematicEditorState::exit(State nextState) noexcept
-{
-    Q_UNUSED(nextState);
 }
 
 /*****************************************************************************************

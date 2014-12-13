@@ -41,7 +41,7 @@ class Project;
 class Schematic;
 class SchematicPagesDock;
 class UnplacedSymbolsDock;
-class SchematicEditorFsm;
+class SES_FSM;
 }
 
 /*****************************************************************************************
@@ -110,7 +110,7 @@ class SchematicEditor : public QMainWindow, public IF_CADSceneEventHandler
         UnplacedSymbolsDock* mUnplacedSymbolsDock;
 
         // Finite State Machine
-        SchematicEditorFsm* mFsm;
+        SES_FSM* mFsm;
 };
 
 } // namespace project

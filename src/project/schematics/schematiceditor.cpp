@@ -32,7 +32,7 @@
 #include "schematic.h"
 #include "schematicpagesdock.h"
 #include "unplacedsymbolsdock.h"
-#include "fsm/schematiceditorfsm.h"
+#include "fsm/ses_fsm.h"
 #include "../circuit/circuit.h"
 #include "../../common/dialogs/gridsettingsdialog.h"
 
@@ -85,53 +85,53 @@ SchematicEditor::SchematicEditor(Project& project, bool readOnly) :
             mUi->actionRedo, SLOT(setEnabled(bool)));
     mUi->actionRedo->setEnabled(mProject.getUndoStack().canRedo());
 
-    // build the whole editor state machine with all its state objects
-    mFsm = new SchematicEditorFsm(*this, *mUi);
+    // build the whole schematic editor finite state machine with all its substate objects
+    mFsm = new SES_FSM(*this, *mUi);
 
     // connect the "tools" toolbar with the state machine (the second line of the lambda
     // functions is a workaround to set the checked attribute of the QActions properly)
     connect(mUi->actionToolSelect, &QAction::triggered,
-            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::StartSelect), true);
+            [this](){mFsm->processEvent(new SEE_Base(SEE_Base::StartSelect), true);
                      mUi->actionToolSelect->setChecked(mUi->actionToolSelect->isCheckable());});
     connect(mUi->actionToolMove, &QAction::triggered,
-            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::StartMove), true);
+            [this](){mFsm->processEvent(new SEE_Base(SEE_Base::StartMove), true);
                      mUi->actionToolMove->setChecked(mUi->actionToolMove->isCheckable());});
     connect(mUi->actionToolDrawText, &QAction::triggered,
-            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::StartDrawText), true);
+            [this](){mFsm->processEvent(new SEE_Base(SEE_Base::StartDrawText), true);
                      mUi->actionToolDrawText->setChecked(mUi->actionToolDrawText->isCheckable());});
     connect(mUi->actionToolDrawRectangle, &QAction::triggered,
-            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::StartDrawRect), true);
+            [this](){mFsm->processEvent(new SEE_Base(SEE_Base::StartDrawRect), true);
                      mUi->actionToolDrawRectangle->setChecked(mUi->actionToolDrawRectangle->isCheckable());});
     connect(mUi->actionToolDrawPolygon, &QAction::triggered,
-            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::StartDrawPolygon), true);
+            [this](){mFsm->processEvent(new SEE_Base(SEE_Base::StartDrawPolygon), true);
                      mUi->actionToolDrawPolygon->setChecked(mUi->actionToolDrawPolygon->isCheckable());});
     connect(mUi->actionToolDrawCircle, &QAction::triggered,
-            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::StartDrawCircle), true);
+            [this](){mFsm->processEvent(new SEE_Base(SEE_Base::StartDrawCircle), true);
                      mUi->actionToolDrawCircle->setChecked(mUi->actionToolDrawCircle->isCheckable());});
     connect(mUi->actionToolDrawEllipse, &QAction::triggered,
-            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::StartDrawEllipse), true);
+            [this](){mFsm->processEvent(new SEE_Base(SEE_Base::StartDrawEllipse), true);
                      mUi->actionToolDrawEllipse->setChecked(mUi->actionToolDrawEllipse->isCheckable());});
     connect(mUi->actionToolDrawWire, &QAction::triggered,
-            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::StartDrawWire), true);
+            [this](){mFsm->processEvent(new SEE_Base(SEE_Base::StartDrawWire), true);
                      mUi->actionToolDrawWire->setChecked(mUi->actionToolDrawWire->isCheckable());});
 
     // connect the "command" toolbar with the state machine
     connect(mUi->actionCommandAbort, &QAction::triggered,
-            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::AbortCommand), true);});
+            [this](){mFsm->processEvent(new SEE_Base(SEE_Base::AbortCommand), true);});
 
     // connect the "edit" toolbar with the state machine
     connect(mUi->actionCopy, &QAction::triggered,
-            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::Edit_Copy), true);});
+            [this](){mFsm->processEvent(new SEE_Base(SEE_Base::Edit_Copy), true);});
     connect(mUi->actionCut, &QAction::triggered,
-            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::Edit_Cut), true);});
+            [this](){mFsm->processEvent(new SEE_Base(SEE_Base::Edit_Cut), true);});
     connect(mUi->actionPaste, &QAction::triggered,
-            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::Edit_Paste), true);});
+            [this](){mFsm->processEvent(new SEE_Base(SEE_Base::Edit_Paste), true);});
     connect(mUi->actionRotate_CW, &QAction::triggered,
-            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::Edit_RotateCW), true);});
+            [this](){mFsm->processEvent(new SEE_Base(SEE_Base::Edit_RotateCW), true);});
     connect(mUi->actionRotate_CCW, &QAction::triggered,
-            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::Edit_RotateCCW), true);});
+            [this](){mFsm->processEvent(new SEE_Base(SEE_Base::Edit_RotateCCW), true);});
     connect(mUi->actionRemove, &QAction::triggered,
-            [this](){mFsm->processEvent(new SchematicEditorEvent(SchematicEditorEvent::Edit_Remove), true);});
+            [this](){mFsm->processEvent(new SEE_Base(SEE_Base::Edit_Remove), true);});
 
     // Restore Window Geometry
     QSettings clientSettings;
@@ -292,10 +292,10 @@ void SchematicEditor::on_actionPDF_Export_triggered()
 void SchematicEditor::on_actionToolAddComponent_triggered()
 {
     // start adding components
-    SchematicEditorEvent* addEvent = new SchematicEditorEvent(SchematicEditorEvent::StartAddComponent);
-    bool accepted = mFsm->processEvent(addEvent, true);
-    mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
-    if (!accepted) return;
+    //SEE_Base* addEvent = new SEE_Base(SEE_Base::StartAddComponent);
+    //bool accepted = mFsm->processEvent(addEvent, true);
+    //mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
+    //if (!accepted) return;
 
     // pass all required parameters to the FSM
     QUuid genCompUuid = "{60000002-3c94-4689-be29-92235ba993c5}";
@@ -305,9 +305,8 @@ void SchematicEditor::on_actionToolAddComponent_triggered()
     //requiredSymbols.insert("{20000002-9873-41f2-9ab1-bff6be4e5ea1}", FilePath("/media/Daten/Eigene_Dateien/Programmieren/QT_Creator/EDA4U/EDA4U/dev/workspace/lib/{ad523ae0-9493-48bc-86b7-049a13cb35e2}/sym/{20000002-9873-41f2-9ab1-bff6be4e5ea1}/v0.xml"));
     //requiredSymbols.insert("{20000003-9873-41f2-9ab1-bff6be4e5ea1}", FilePath("/media/Daten/Eigene_Dateien/Programmieren/QT_Creator/EDA4U/EDA4U/dev/workspace/lib/{ad523ae0-9493-48bc-86b7-049a13cb35e2}/sym/{20000003-9873-41f2-9ab1-bff6be4e5ea1}/v0.xml"));
     //requiredSymbols.insert("{20000004-9873-41f2-9ab1-bff6be4e5ea1}", FilePath("/media/Daten/Eigene_Dateien/Programmieren/QT_Creator/EDA4U/EDA4U/dev/workspace/lib/{ad523ae0-9493-48bc-86b7-049a13cb35e2}/sym/{20000004-9873-41f2-9ab1-bff6be4e5ea1}/v0.xml"));
-    SEE_SetAddComponentParams* paramsEvent = new SEE_SetAddComponentParams(genCompUuid,
-                                                                           symbVarUuid);
-    accepted = mFsm->processEvent(paramsEvent, true);
+    SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(genCompUuid, symbVarUuid);
+    bool accepted = mFsm->processEvent(addEvent, true);
     mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
     if (!accepted) return;
 }
@@ -318,7 +317,7 @@ void SchematicEditor::on_actionToolAddComponent_triggered()
 
 bool SchematicEditor::cadSceneEventHandler(QEvent* event)
 {
-    SEE_RedirectedQEvent* e = new SEE_RedirectedQEvent(SchematicEditorEvent::SchematicSceneEvent, event);
+    SEE_RedirectedQEvent* e = new SEE_RedirectedQEvent(SEE_Base::SchematicSceneEvent, event);
     return mFsm->processEvent(e, true);
 }
 

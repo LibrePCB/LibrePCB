@@ -25,7 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "schematiceditorstate.h"
+#include "ses_base.h"
 
 /*****************************************************************************************
  *  Class SES_DrawEllipse
@@ -37,7 +37,7 @@ namespace project {
 /**
  * @brief The SES_DrawEllipse class
  */
-class SES_DrawEllipse final : public SchematicEditorState
+class SES_DrawEllipse final : public SES_Base
 {
         Q_OBJECT
 
@@ -48,9 +48,9 @@ class SES_DrawEllipse final : public SchematicEditorState
         ~SES_DrawEllipse();
 
         // General Methods
-        State process(SchematicEditorEvent* event) noexcept;
-        void entry(State previousState) noexcept;
-        void exit(State nextState) noexcept;
+        ProcRetVal process(SEE_Base* event) noexcept override;
+        bool entry(SEE_Base* event) noexcept override;
+        bool exit(SEE_Base* event) noexcept override;
 };
 
 } // namespace project

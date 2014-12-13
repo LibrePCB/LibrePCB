@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SCHEMATICEDITORSTATE_H
-#define PROJECT_SCHEMATICEDITORSTATE_H
+#ifndef PROJECT_SES_BASE_H
+#define PROJECT_SES_BASE_H
 
 /*****************************************************************************************
  *  Includes
@@ -39,42 +39,35 @@ class Circuit;
 }
 
 /*****************************************************************************************
- *  Class SchematicEditorState
+ *  Class SES_Base
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The SchematicEditorState class
+ * @brief The SES_Base (SchematicEditorState Base) class
  */
-class SchematicEditorState : public QObject
+class SES_Base : public QObject
 {
         Q_OBJECT
 
     public:
 
-        // FSM States
-        enum State {
-            State_Initial,      ///< only for initialization and destruction
-            State_Select,       ///< @see project#SES_Select
-            State_Move,         ///< @see project#SES_Move
-            State_DrawText,     ///< @see project#SES_DrawText
-            State_DrawRect,     ///< @see project#SES_DrawRect
-            State_DrawPolygon,  ///< @see project#SES_DrawPolygon
-            State_DrawCircle,   ///< @see project#SES_DrawCircle
-            State_DrawEllipse,  ///< @see project#SES_DrawEllipse
-            State_DrawWire,     ///< @see project#SES_DrawWire
-            State_AddComponent  ///< @see project#SES_AddComponents
+        /// process() return values
+        enum ProcRetVal {
+            ForceStayInState,   ///< event handled, stay in the current state
+            ForceLeaveState,    ///< event handled, leave the current state
+            PassToParentState,  ///< event unhandled, pass it to the parent
         };
 
         // Constructors / Destructor
-        explicit SchematicEditorState(SchematicEditor& editor, Ui::SchematicEditor& editorUi);
-        virtual ~SchematicEditorState();
+        explicit SES_Base(SchematicEditor& editor, Ui::SchematicEditor& editorUi);
+        virtual ~SES_Base();
 
         // General Methods
-        virtual State process(SchematicEditorEvent* event) noexcept = 0; // returns the next state
-        virtual void entry(State previousState) noexcept;
-        virtual void exit(State nextState) noexcept;
+        virtual ProcRetVal process(SEE_Base* event) noexcept = 0;
+        virtual bool entry(SEE_Base* event) noexcept {Q_UNUSED(event); return true;}
+        virtual bool exit(SEE_Base* event) noexcept {Q_UNUSED(event); return true;}
 
     protected:
 
@@ -83,10 +76,8 @@ class SchematicEditorState : public QObject
         Circuit& mCircuit;
         SchematicEditor& mEditor;
         Ui::SchematicEditor& mEditorUi; ///< allows access to SchematicEditor UI
-        State mCurrentState;
-        QHash<State, SchematicEditorState*> mSubStates;
 };
 
 } // namespace project
 
-#endif // PROJECT_SCHEMATICEDITORSTATE_H
+#endif // PROJECT_SES_BASE_H

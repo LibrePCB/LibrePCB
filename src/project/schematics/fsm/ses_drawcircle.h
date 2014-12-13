@@ -25,7 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "schematiceditorstate.h"
+#include "ses_base.h"
 
 /*****************************************************************************************
  *  Class SES_DrawCircle
@@ -37,7 +37,7 @@ namespace project {
 /**
  * @brief The SES_DrawCircle class
  */
-class SES_DrawCircle final : public SchematicEditorState
+class SES_DrawCircle final : public SES_Base
 {
         Q_OBJECT
 
@@ -48,9 +48,9 @@ class SES_DrawCircle final : public SchematicEditorState
         ~SES_DrawCircle();
 
         // General Methods
-        State process(SchematicEditorEvent* event) noexcept;
-        void entry(State previousState) noexcept;
-        void exit(State nextState) noexcept;
+        ProcRetVal process(SEE_Base* event) noexcept override;
+        bool entry(SEE_Base* event) noexcept override;
+        bool exit(SEE_Base* event) noexcept override;
 };
 
 } // namespace project

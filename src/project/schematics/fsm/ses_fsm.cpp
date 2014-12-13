@@ -24,7 +24,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include <QtEvents>
-#include "schematiceditorfsm.h"
+#include "ses_fsm.h"
 #include "schematiceditorevent.h"
 #include "../schematiceditor.h"
 #include "ui_schematiceditor.h"
@@ -44,8 +44,9 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SchematicEditorFsm::SchematicEditorFsm(SchematicEditor& editor, Ui::SchematicEditor& editorUi) noexcept :
-    SchematicEditorState(editor, editorUi)
+SES_FSM::SES_FSM(SchematicEditor& editor, Ui::SchematicEditor& editorUi) noexcept :
+    SES_Base(editor, editorUi),
+    mCurrentState(State_NoState), mPreviousState(State_NoState)
 {
     // create all substates
     mSubStates.insert(State_Select, new SES_Select(mEditor, mEditorUi));
@@ -59,42 +60,135 @@ SchematicEditorFsm::SchematicEditorFsm(SchematicEditor& editor, Ui::SchematicEdi
     mSubStates.insert(State_AddComponent, new SES_AddComponents(mEditor, mEditorUi));
 
     // go to state "Select"
-    mCurrentState = State_Select;
-    mSubStates[mCurrentState]->entry(State_Initial);
+    if (mSubStates[State_Select]->entry(nullptr))
+        mCurrentState = State_Select;
 }
 
-SchematicEditorFsm::~SchematicEditorFsm() noexcept
+SES_FSM::~SES_FSM() noexcept
 {
+    // exit the current substate
+    if (mCurrentState != State_NoState)
+        mSubStates[mCurrentState]->exit(nullptr);
+    // delete all substates
+    qDeleteAll(mSubStates);     mSubStates.clear();
 }
 
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
-bool SchematicEditorFsm::processEvent(SchematicEditorEvent* event, bool deleteEvent) noexcept
+bool SES_FSM::processEvent(SEE_Base* event, bool deleteEvent) noexcept
 {
+    Q_ASSERT(event->isAccepted() == false);
     process(event); // the "isAccepted" flag is set here if the event was accepted
     bool accepted = event->isAccepted();
-    if (deleteEvent)
-        delete event;
+    if (deleteEvent) delete event;
     return accepted;
 }
 
-SchematicEditorState::State SchematicEditorFsm::process(SchematicEditorEvent* event) noexcept
+SES_Base::ProcRetVal SES_FSM::process(SEE_Base* event) noexcept
 {
-    State next = mSubStates[mCurrentState]->process(event);
+    State nextState = mCurrentState;
+    ProcRetVal retval = PassToParentState;
 
-    if (next != mCurrentState)
+    // let the current state process the event
+    if (mCurrentState != State_NoState)
+        retval = mSubStates[mCurrentState]->process(event);
+
+    switch (retval)
     {
-        Q_ASSERT(mSubStates.contains(next));
-
-        // switch to the next state
-        mSubStates[mCurrentState]->exit(next);
-        mSubStates[next]->entry(mCurrentState);
-        mCurrentState = next;
+        case ForceStayInState:
+            nextState = mCurrentState;
+            event->setAccepted(true);
+            break;
+        case ForceLeaveState:
+            nextState = (mPreviousState != State_NoState) ? mPreviousState : State_Select;
+            event->setAccepted(true);
+            break;
+        case PassToParentState:
+            nextState = processEventFromChild(event);
+            break;
+        default:
+            Q_ASSERT(false);
+            break;
     }
 
-    return mCurrentState; // this is not really used...
+    // switch to the next state, if needed
+    if (nextState != mCurrentState)
+    {
+        if (mCurrentState != State_NoState)
+        {
+            // leave the current state
+            if (mSubStates[mCurrentState]->exit(event))
+            {
+                mPreviousState = mCurrentState;
+                mCurrentState = State_NoState;
+            }
+        }
+        if ((mCurrentState == State_NoState) && (nextState != State_NoState))
+        {
+            // entry the next state
+            if (mSubStates[nextState]->entry(event))
+                mCurrentState = nextState;
+        }
+    }
+
+    return ForceStayInState; // this is not used...
+}
+
+SES_FSM::State SES_FSM::processEventFromChild(SEE_Base* event) noexcept
+{
+    switch (event->getType())
+    {
+        case SEE_Base::AbortCommand:
+        case SEE_Base::StartSelect:
+            event->setAccepted(true);
+            return State_Select;
+        case SEE_Base::StartMove:
+            event->setAccepted(true);
+            return State_Move;
+        case SEE_Base::StartDrawText:
+            event->setAccepted(true);
+            return State_DrawText;
+        case SEE_Base::StartDrawRect:
+            event->setAccepted(true);
+            return State_DrawRect;
+        case SEE_Base::StartDrawPolygon:
+            event->setAccepted(true);
+            return State_DrawPolygon;
+        case SEE_Base::StartDrawCircle:
+            event->setAccepted(true);
+            return State_DrawCircle;
+        case SEE_Base::StartDrawEllipse:
+            event->setAccepted(true);
+            return State_DrawEllipse;
+        case SEE_Base::StartDrawWire:
+            event->setAccepted(true);
+            return State_DrawWire;;
+        case SEE_Base::StartAddComponent:
+            event->setAccepted(true);
+            return State_AddComponent;
+        case SEE_Base::SwitchToSchematicPage:
+            event->setAccepted(true);
+            return mCurrentState;
+        case SEE_Base::SchematicSceneEvent:
+        {
+            QEvent* e = SEE_RedirectedQEvent::getQEventFromSEE(event);
+            Q_ASSERT(e); if (!e) return mCurrentState;
+            if ((e->type() == QEvent::GraphicsSceneMousePress) ||
+                (e->type() == QEvent::GraphicsSceneMouseDoubleClick))
+            {
+                QGraphicsSceneMouseEvent* e2 = dynamic_cast<QGraphicsSceneMouseEvent*>(e);
+                Q_ASSERT(e2); if (!e2) return mCurrentState;
+                if (e2->buttons() == Qt::RightButton)
+                    return (mPreviousState != State_NoState) ? mPreviousState : State_Select;
+                else
+                    return mCurrentState;
+            }
+        }
+        default:
+            return mCurrentState;
+    }
 }
 
 /*****************************************************************************************

@@ -25,7 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "schematiceditorstate.h"
+#include "ses_base.h"
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -53,7 +53,7 @@ namespace project {
 /**
  * @brief The SES_AddComponents class
  */
-class SES_AddComponents final : public SchematicEditorState
+class SES_AddComponents final : public SES_Base
 {
         Q_OBJECT
 
@@ -64,29 +64,20 @@ class SES_AddComponents final : public SchematicEditorState
         ~SES_AddComponents();
 
         // General Methods
-        State process(SchematicEditorEvent* event) noexcept;
-        void entry(State previousState) noexcept;
-        void exit(State nextState) noexcept;
+        ProcRetVal process(SEE_Base* event) noexcept override;
+        bool entry(SEE_Base* event) noexcept override;
+        bool exit(SEE_Base* event) noexcept override;
 
 
     private:
 
         // Private Methods
-        State processSubStateIdle(SchematicEditorEvent* event) noexcept;
-        State processSubStateAdding(SchematicEditorEvent* event) noexcept;
-        State processSubStateAddingSceneEvent(SchematicEditorEvent* event) noexcept;
+        ProcRetVal processSceneEvent(SEE_Base* event) noexcept;
+        bool abortCommand(bool showErrMsgBox) noexcept;
 
 
         // Attributes
-
-        enum SubState_t {
-            SubState_Idle,
-            SubState_Adding
-        };
-
-        SubState_t mSubState;
-        State mPreviousState;
-        bool mUndoCommandActive;
+        bool mIsUndoCmdActive;
 
         // information about the current symbol to place
         const library::GenericComponent* mGenComp;

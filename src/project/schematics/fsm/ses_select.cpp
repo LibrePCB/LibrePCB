@@ -42,8 +42,8 @@ namespace project {
  ****************************************************************************************/
 
 SES_Select::SES_Select(SchematicEditor& editor, Ui::SchematicEditor& editorUi) :
-    SchematicEditorState(editor, editorUi), mPreviousState(State_Initial),
-    mSubState(SubState_Idle), mParentCommand(nullptr)
+    SES_Base(editor, editorUi), mSubState(SubState_Idle),
+    mParentCommand(nullptr)
 {
 }
 
@@ -65,7 +65,7 @@ SES_Select::~SES_Select()
  *  General Methods
  ****************************************************************************************/
 
-SchematicEditorState::State SES_Select::process(SchematicEditorEvent* event) noexcept
+SES_Base::ProcRetVal SES_Select::process(SEE_Base* event) noexcept
 {
     switch (mSubState)
     {
@@ -74,82 +74,53 @@ SchematicEditorState::State SES_Select::process(SchematicEditorEvent* event) noe
         case SubState_Moving:
             return processSubStateMoving(event);
         default:
-            return State_Select;
+            return PassToParentState;
     }
 }
 
-void SES_Select::entry(State previousState) noexcept
+bool SES_Select::entry(SEE_Base* event) noexcept
 {
-    mPreviousState = (previousState != State_Initial) ? previousState : State_Select;
-
+    Q_UNUSED(event);
     mEditorUi.actionToolSelect->setCheckable(true);
     mEditorUi.actionToolSelect->setChecked(true);
+    return true;
 }
 
-void SES_Select::exit(State nextState) noexcept
+bool SES_Select::exit(SEE_Base* event) noexcept
 {
-    Q_UNUSED(nextState);
-
+    Q_UNUSED(event);
     mEditorUi.actionToolSelect->setCheckable(false);
     mEditorUi.actionToolSelect->setChecked(false);
+    return true;
 }
 
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
-SchematicEditorState::State SES_Select::processSubStateIdle(SchematicEditorEvent* event) noexcept
+SES_Base::ProcRetVal SES_Select::processSubStateIdle(SEE_Base* event) noexcept
 {
     switch (event->getType())
     {
-        case SchematicEditorEvent::StartMove:
-            event->setAccepted(true);
-            return State_Move;
-        case SchematicEditorEvent::StartDrawText:
-            event->setAccepted(true);
-            return State_DrawText;
-        case SchematicEditorEvent::StartDrawRect:
-            event->setAccepted(true);
-            return State_DrawRect;
-        case SchematicEditorEvent::StartDrawPolygon:
-            event->setAccepted(true);
-            return State_DrawPolygon;
-        case SchematicEditorEvent::StartDrawCircle:
-            event->setAccepted(true);
-            return State_DrawCircle;
-        case SchematicEditorEvent::StartDrawEllipse:
-            event->setAccepted(true);
-            return State_DrawEllipse;
-        case SchematicEditorEvent::StartDrawWire:
-            event->setAccepted(true);
-            return State_DrawWire;
-        case SchematicEditorEvent::StartAddComponent:
-            event->setAccepted(true);
-            return State_AddComponent;
-        case SchematicEditorEvent::Edit_RotateCW:
-            if (rotateSelectedItems(Angle(90000000), Point(), true))
-                event->setAccepted(true);
-            return State_Select;
-        case SchematicEditorEvent::Edit_RotateCCW:
-            if (rotateSelectedItems(Angle(-90000000), Point(), true))
-                event->setAccepted(true);
-            return State_Select;
-        case SchematicEditorEvent::SwitchToSchematicPage:
-            event->setAccepted(true);
-            return State_Select;
-        case SchematicEditorEvent::SchematicSceneEvent:
+        case SEE_Base::Edit_RotateCW:
+            rotateSelectedItems(Angle(90000000), Point(), true);
+            return ForceStayInState;
+        case SEE_Base::Edit_RotateCCW:
+            rotateSelectedItems(Angle(-90000000), Point(), true);
+            return ForceStayInState;
+        case SEE_Base::SchematicSceneEvent:
             return processSubStateIdleSceneEvent(event);
         default:
-            return State_Select;
+            return PassToParentState;
     }
 }
 
-SchematicEditorState::State SES_Select::processSubStateIdleSceneEvent(SchematicEditorEvent* event) noexcept
+SES_Base::ProcRetVal SES_Select::processSubStateIdleSceneEvent(SEE_Base* event) noexcept
 {
     QEvent* qevent = SEE_RedirectedQEvent::getQEventFromSEE(event);
-    Q_ASSERT(qevent); if (!qevent) return State_Select;
+    Q_ASSERT(qevent); if (!qevent) return PassToParentState;
     Schematic* schematic = mEditor.getActiveSchematic();
-    Q_ASSERT(schematic); if (!schematic) return State_Select;
+    Q_ASSERT(schematic); if (!schematic) return PassToParentState;
 
     switch (qevent->type())
     {
@@ -160,11 +131,10 @@ SchematicEditorState::State SES_Select::processSubStateIdleSceneEvent(SchematicE
             switch (mouseEvent->button())
             {
                 case Qt::LeftButton:
-                    return proccessIdleSceneLeftClick(event, mouseEvent, schematic);
-                case Qt::RightButton:
-                    // switch back to the last command (previous state)
-                    event->setAccepted(true);
-                    return mPreviousState;
+                    return proccessIdleSceneLeftClick(mouseEvent, schematic);
+                //case Qt::RightButton:
+                //    // switch back to the last command (previous state)
+                //    return PassToParentState;
                 default:
                     break;
             }
@@ -173,23 +143,21 @@ SchematicEditorState::State SES_Select::processSubStateIdleSceneEvent(SchematicE
         default:
             break;
     }
-    return State_Select;
+    return PassToParentState;
 }
 
-SchematicEditorState::State SES_Select::proccessIdleSceneLeftClick(SchematicEditorEvent* event,
-                                                                   QGraphicsSceneMouseEvent* mouseEvent,
-                                                                   Schematic* schematic) noexcept
+SES_Base::ProcRetVal SES_Select::proccessIdleSceneLeftClick(QGraphicsSceneMouseEvent* mouseEvent,
+                                                            Schematic* schematic) noexcept
 {
     // handle items selection
     QList<QGraphicsItem*> items = schematic->items(mouseEvent->scenePos());
-    if (items.isEmpty()) return State_Select; // no items under mouse --> abort
+    if (items.isEmpty()) return PassToParentState; // no items under mouse --> abort
     if (!items.first()->isSelected())
     {
         if (!(mouseEvent->modifiers() & Qt::ControlModifier)) // CTRL pressed
             schematic->clearSelection(); // select only the top most item under the mouse
         items.first()->setSelected(true);
     }
-    event->setAccepted(true);
 
     // get all selected items
     QList<SymbolInstance*> symbols;
@@ -197,7 +165,7 @@ SchematicEditorState::State SES_Select::proccessIdleSceneLeftClick(SchematicEdit
     uint count = extractGraphicsItems(schematic->selectedItems(), symbols, netpoints);
 
     // abort if no items are selected
-    if (count == 0) return State_Select;
+    if (count == 0) return ForceStayInState;
 
     // create move commands for all selected items
     Q_ASSERT(!mParentCommand);
@@ -212,31 +180,24 @@ SchematicEditorState::State SES_Select::proccessIdleSceneLeftClick(SchematicEdit
     // switch to substate SubState_Moving
     mSubState = SubState_Moving;
     mMoveStartPos = Point::fromPx(mouseEvent->scenePos()); // not mapped to grid!
-    return State_Select;
+    return ForceStayInState;
 }
 
-SchematicEditorState::State SES_Select::processSubStateMoving(SchematicEditorEvent* event) noexcept
+SES_Base::ProcRetVal SES_Select::processSubStateMoving(SEE_Base* event) noexcept
 {
     switch (event->getType())
     {
-        case SchematicEditorEvent::SchematicSceneEvent:
+        case SEE_Base::SchematicSceneEvent:
             return processSubStateMovingSceneEvent(event);
         default:
-            break;
+            return PassToParentState;
     }
-    return State_Select;
 }
 
-SchematicEditorState::State SES_Select::processSubStateMovingSceneEvent(SchematicEditorEvent* event) noexcept
+SES_Base::ProcRetVal SES_Select::processSubStateMovingSceneEvent(SEE_Base* event) noexcept
 {
     QEvent* qevent = SEE_RedirectedQEvent::getQEventFromSEE(event);
-    Q_ASSERT(qevent); if (!qevent) return State_Select;
-
-    // Always accept graphics scene events, even if we do not react on some of the events!
-    // This will give us the full control over the graphics scene. Otherwise, the graphics
-    // scene can react on some events and disturb our state machine. Only the wheel event
-    // is ignored because otherwise the view will not allow to zoom with the mouse wheel.
-    if (qevent->type() != QEvent::GraphicsSceneWheel) event->setAccepted(true);
+    Q_ASSERT(qevent); if (!qevent) return PassToParentState;
 
     switch (qevent->type())
     {
@@ -316,9 +277,18 @@ SchematicEditorState::State SES_Select::processSubStateMovingSceneEvent(Schemati
         } // case QEvent::GraphicsSceneMouseMove
 
         default:
-            break;
+        {
+            // Always accept graphics scene events, even if we do not react on some of the events!
+            // This will give us the full control over the graphics scene. Otherwise, the graphics
+            // scene can react on some events and disturb our state machine. Only the wheel event
+            // is ignored because otherwise the view will not allow to zoom with the mouse wheel.
+            if (qevent->type() != QEvent::GraphicsSceneWheel)
+                return ForceStayInState;
+            else
+                return PassToParentState;
+        }
     } // switch (qevent->type())
-    return State_Select;
+    return PassToParentState;
 }
 
 bool SES_Select::rotateSelectedItems(const Angle& angle, Point center, bool centerOfElements) noexcept

@@ -25,7 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "schematiceditorstate.h"
+#include "ses_base.h"
 #include "../../../common/units.h"
 
 /*****************************************************************************************
@@ -51,7 +51,7 @@ namespace project {
 /**
  * @brief The SES_Select class (default state of the schematic editor FSM)
  */
-class SES_Select final : public SchematicEditorState
+class SES_Select final : public SES_Base
 {
         Q_OBJECT
 
@@ -62,21 +62,20 @@ class SES_Select final : public SchematicEditorState
         ~SES_Select();
 
         // General Methods
-        State process(SchematicEditorEvent* event) noexcept;
-        void entry(State previousState) noexcept;
-        void exit(State nextState) noexcept;
+        ProcRetVal process(SEE_Base* event) noexcept override;
+        bool entry(SEE_Base* event) noexcept override;
+        bool exit(SEE_Base* event) noexcept override;
 
 
     private:
 
         // Private Methods
-        State processSubStateIdle(SchematicEditorEvent* event) noexcept;
-        State processSubStateIdleSceneEvent(SchematicEditorEvent* event) noexcept;
-        State processSubStateMoving(SchematicEditorEvent* event) noexcept;
-        State processSubStateMovingSceneEvent(SchematicEditorEvent* event) noexcept;
-        State proccessIdleSceneLeftClick(SchematicEditorEvent* event,
-                                         QGraphicsSceneMouseEvent* mouseEvent,
-                                         Schematic* schematic) noexcept;
+        ProcRetVal processSubStateIdle(SEE_Base* event) noexcept;
+        ProcRetVal processSubStateIdleSceneEvent(SEE_Base* event) noexcept;
+        ProcRetVal processSubStateMoving(SEE_Base* event) noexcept;
+        ProcRetVal processSubStateMovingSceneEvent(SEE_Base* event) noexcept;
+        ProcRetVal proccessIdleSceneLeftClick(QGraphicsSceneMouseEvent* mouseEvent,
+                                              Schematic* schematic) noexcept;
         bool rotateSelectedItems(const Angle& angle, Point center = Point(0, 0),
                                  bool centerOfElements = false) noexcept;
 
@@ -95,7 +94,6 @@ class SES_Select final : public SchematicEditorState
 
 
         // Attributes
-        State mPreviousState;   ///< the state before entering this state (from #entry())
         SubState mSubState;     ///< the current substate
         Point mMoveStartPos;    ///< the scene position where the left mouse button was
                                 ///< pressed (not mapped to grid!)

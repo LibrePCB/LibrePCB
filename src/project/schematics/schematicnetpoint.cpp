@@ -22,7 +22,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QGraphicsEllipseItem>
+#include <QPrinter>
 #include "schematicnetpoint.h"
 #include "schematic.h"
 #include "schematicnetline.h"
@@ -63,7 +63,7 @@ SchematicNetPointGraphicsItem::~SchematicNetPointGraphicsItem() noexcept
 
 QRectF SchematicNetPointGraphicsItem::boundingRect() const
 {
-    qreal radius = SchematicNetPoint::getCircleRadius().toPx();
+    qreal radius = SchematicNetPoint::getCircleRadius().toPx() * 1.5f;
     return QRectF(-radius, -radius, 2*radius, 2*radius);
 }
 
@@ -71,13 +71,22 @@ void SchematicNetPointGraphicsItem::paint(QPainter* painter, const QStyleOptionG
 {
     Q_UNUSED(widget);
 
+    qreal radius = SchematicNetPoint::getCircleRadius().toPx();
     bool highlight = option->state & QStyle::State_Selected;
-    bool fill = mPoint.getLines().count() > 2;
-    painter->setPen(QPen(mLayer->getColor(highlight), 0));
-    if (fill)
+    bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
+
+    if ((  (mPoint.getLines().count() > 1) && (mPoint.isAttached()))
+        || (mPoint.getLines().count() > 2))
     {
+        painter->setPen(QPen(mLayer->getColor(highlight), 0));
         painter->setBrush(QBrush(mLayer->getColor(highlight), Qt::SolidPattern));
-        painter->drawEllipse(boundingRect());
+        painter->drawEllipse(QPointF(0, 0), radius, radius);
+    }
+    else if (!deviceIsPrinter)
+    {
+        // only for debugging
+        painter->setPen(QPen(Qt::red, 0));
+        painter->drawEllipse(QPointF(0, 0), radius, radius);
     }
 }
 
@@ -234,8 +243,7 @@ void SchematicNetPoint::addToSchematic(Schematic& schematic, bool addNode,
     getNetSignal()->registerSchematicNetPoint(this);
     if (mAttached)
         mPinInstance->registerNetPoint(this);
-    else
-        schematic.addItem(mGraphicsItem);
+    schematic.addItem(mGraphicsItem);
 }
 
 void SchematicNetPoint::removeFromSchematic(Schematic& schematic, bool removeNode,
@@ -253,8 +261,7 @@ void SchematicNetPoint::removeFromSchematic(Schematic& schematic, bool removeNod
     getNetSignal()->unregisterSchematicNetPoint(this);
     if (mAttached)
         mPinInstance->unregisterNetPoint(this);
-    else
-        schematic.removeItem(mGraphicsItem);
+    schematic.removeItem(mGraphicsItem);
 }
 
 /*****************************************************************************************
