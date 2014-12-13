@@ -110,9 +110,7 @@ SOURCES += \
     project/schematics/cmd/cmdschematicadd.cpp \
     project/schematics/cmd/cmdschematicremove.cpp \
     project/schematics/unplacedsymbolsdock.cpp \
-    project/schematics/fsm/schematiceditorfsm.cpp \
     project/schematics/fsm/schematiceditorevent.cpp \
-    project/schematics/fsm/schematiceditorstate.cpp \
     project/schematics/fsm/ses_select.cpp \
     project/schematics/fsm/ses_move.cpp \
     project/schematics/fsm/ses_drawtext.cpp \
@@ -152,7 +150,9 @@ SOURCES += \
     project/circuit/cmd/cmdgencompinstanceadd.cpp \
     project/schematics/cmd/cmdsymbolinstanceadd.cpp \
     project/schematics/cmd/cmdschematicnetpointmove.cpp \
-    project/circuit/cmd/cmdgencompsiginstsetnetsignal.cpp
+    project/circuit/cmd/cmdgencompsiginstsetnetsignal.cpp \
+    project/schematics/fsm/ses_base.cpp \
+    project/schematics/fsm/ses_fsm.cpp
 
 HEADERS += \
     common/units.h \
@@ -208,9 +208,7 @@ HEADERS += \
     project/schematics/cmd/cmdschematicadd.h \
     project/schematics/cmd/cmdschematicremove.h \
     project/schematics/unplacedsymbolsdock.h \
-    project/schematics/fsm/schematiceditorfsm.h \
     project/schematics/fsm/schematiceditorevent.h \
-    project/schematics/fsm/schematiceditorstate.h \
     project/schematics/fsm/ses_select.h \
     project/schematics/fsm/ses_move.h \
     project/schematics/fsm/ses_drawtext.h \
@@ -250,7 +248,9 @@ HEADERS += \
     project/circuit/cmd/cmdgencompinstanceadd.h \
     project/schematics/cmd/cmdsymbolinstanceadd.h \
     project/schematics/cmd/cmdschematicnetpointmove.h \
-    project/circuit/cmd/cmdgencompsiginstsetnetsignal.h
+    project/circuit/cmd/cmdgencompsiginstsetnetsignal.h \
+    project/schematics/fsm/ses_base.h \
+    project/schematics/fsm/ses_fsm.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \
