@@ -132,6 +132,7 @@ class SchematicNetPoint final : public QObject
                             QDomElement& parent) throw (Exception);
         void removeFromSchematic(Schematic& schematic, bool removeNode,
                                  QDomElement& parent) throw (Exception);
+        bool save(bool toOriginal, QStringList& errors) noexcept;
 
         // Static Methods
         static const Length& getCircleRadius() noexcept {return sCircleRadius;}

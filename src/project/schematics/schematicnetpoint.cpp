@@ -193,11 +193,6 @@ NetSignal* SchematicNetPoint::getNetSignal() const noexcept
 void SchematicNetPoint::setPosition(const Point& position) noexcept
 {
     mPosition = position;
-    if (!mAttached)
-    {
-        mDomElement.firstChildElement("position").setAttribute("x", mPosition.getX().toMmString());
-        mDomElement.firstChildElement("position").setAttribute("y", mPosition.getY().toMmString());
-    }
     mGraphicsItem->setPos(mPosition.toPxQPointF());
     updateLines();
 }
@@ -262,6 +257,20 @@ void SchematicNetPoint::removeFromSchematic(Schematic& schematic, bool removeNod
     if (mAttached)
         mPinInstance->unregisterNetPoint(this);
     schematic.removeItem(mGraphicsItem);
+}
+
+bool SchematicNetPoint::save(bool toOriginal, QStringList& errors) noexcept
+{
+    Q_UNUSED(toOriginal);
+    Q_UNUSED(errors);
+    if (!mAttached)
+    {
+        QDomText netsignal = mDomElement.ownerDocument().createTextNode(mNetSignal->getUuid().toString());
+        mDomElement.ownerDocument().replaceChild(netsignal, mDomElement.firstChildElement("netsignal").firstChildElement());
+        mDomElement.firstChildElement("position").setAttribute("x", mPosition.getX().toMmString());
+        mDomElement.firstChildElement("position").setAttribute("y", mPosition.getY().toMmString());
+    }
+    return true;
 }
 
 /*****************************************************************************************

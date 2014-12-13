@@ -114,6 +114,13 @@ void SymbolPinInstance::removeFromSchematic() noexcept
     mGenCompSignalInstance->unregisterSymbolPinInstance(this);
 }
 
+bool SymbolPinInstance::save(bool toOriginal, QStringList& errors) noexcept
+{
+    Q_UNUSED(toOriginal);
+    Q_UNUSED(errors);
+    return true;
+}
+
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/

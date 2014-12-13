@@ -360,6 +360,28 @@ bool Schematic::save(bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
 
+    // save symbol instances
+    foreach (SymbolInstance* symbol, mSymbols)
+    {
+        if (!symbol->save(toOriginal, errors))
+            success = false;
+    }
+
+    // save netpoints
+    foreach (SchematicNetPoint* point, mNetPoints)
+    {
+        if (!point->save(toOriginal, errors))
+            success = false;
+    }
+
+    // save netlines
+    foreach (SchematicNetLine* line, mNetLines)
+    {
+        if (!line->save(toOriginal, errors))
+            success = false;
+    }
+
+    // save schematic XML file
     try
     {
         mXmlFile->save(toOriginal);

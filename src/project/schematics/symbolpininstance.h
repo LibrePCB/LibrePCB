@@ -79,6 +79,7 @@ class SymbolPinInstance final : public QObject
         void unregisterPinGraphicsItem(library::SymbolPinGraphicsItem* item);
         void addToSchematic() noexcept;
         void removeFromSchematic() noexcept;
+        bool save(bool toOriginal, QStringList& errors) noexcept;
 
 
     private:

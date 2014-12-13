@@ -125,8 +125,6 @@ SymbolInstance::~SymbolInstance() noexcept
 void SymbolInstance::setPosition(const Point& newPos) throw (Exception)
 {
     mPosition = newPos;
-    mDomElement.firstChildElement("position").setAttribute("x", mPosition.getX().toMmString());
-    mDomElement.firstChildElement("position").setAttribute("y", mPosition.getY().toMmString());
     mGraphicsItem->setPos(newPos.toPxQPointF());
     foreach (SymbolPinInstance* pin, mPinInstances)
         pin->updateNetPointPosition();
@@ -135,7 +133,6 @@ void SymbolInstance::setPosition(const Point& newPos) throw (Exception)
 void SymbolInstance::setAngle(const Angle& newAngle) throw (Exception)
 {
     mAngle = newAngle;
-    mDomElement.firstChildElement("position").setAttribute("angle", mAngle.toDegString());
     mGraphicsItem->setRotation(newAngle.toDeg());
     foreach (SymbolPinInstance* pin, mPinInstances)
         pin->updateNetPointPosition();
@@ -177,6 +174,24 @@ void SymbolInstance::removeFromSchematic(Schematic& schematic, bool removeNode,
     }
 
     schematic.removeItem(mGraphicsItem);
+}
+
+bool SymbolInstance::save(bool toOriginal, QStringList& errors) noexcept
+{
+    // save symbol attributes
+    mDomElement.firstChildElement("position").setAttribute("x", mPosition.getX().toMmString());
+    mDomElement.firstChildElement("position").setAttribute("y", mPosition.getY().toMmString());
+    mDomElement.firstChildElement("position").setAttribute("angle", mAngle.toDegString());
+
+    // save pin attributes
+    bool success = true;
+    foreach (SymbolPinInstance* pin, mPinInstances)
+    {
+        if (!pin->save(toOriginal, errors))
+            success = false;
+    }
+
+    return success;
 }
 
 /*****************************************************************************************

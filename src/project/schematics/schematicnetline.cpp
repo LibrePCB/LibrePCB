@@ -202,6 +202,13 @@ void SchematicNetLine::removeFromSchematic(Schematic& schematic, bool removeNode
     schematic.removeItem(mGraphicsItem);
 }
 
+bool SchematicNetLine::save(bool toOriginal, QStringList& errors) noexcept
+{
+    Q_UNUSED(toOriginal);
+    Q_UNUSED(errors);
+    return true;
+}
+
 /*****************************************************************************************
  *  Static Methods
  ****************************************************************************************/
