@@ -62,6 +62,11 @@ SymbolPinInstance::~SymbolPinInstance()
  *  Getters
  ****************************************************************************************/
 
+const QUuid& SymbolPinInstance::getLibPinUuid() const noexcept
+{
+    return mSymbolPin->getUuid();
+}
+
 Point SymbolPinInstance::getPosition() const noexcept
 {
     return mSymbolInstance.mapToScene(mSymbolPin->getPosition());
@@ -106,11 +111,13 @@ void SymbolPinInstance::unregisterPinGraphicsItem(library::SymbolPinGraphicsItem
 
 void SymbolPinInstance::addToSchematic() noexcept
 {
+    Q_ASSERT(mRegisteredSchematicNetPoint == nullptr);
     mGenCompSignalInstance->registerSymbolPinInstance(this);
 }
 
 void SymbolPinInstance::removeFromSchematic() noexcept
 {
+    Q_ASSERT(mRegisteredSchematicNetPoint == nullptr);
     mGenCompSignalInstance->unregisterSymbolPinInstance(this);
 }
 

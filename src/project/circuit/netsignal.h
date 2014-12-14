@@ -63,8 +63,8 @@ class NetSignal final : public QObject
         const QString& getName() const noexcept {return mName;}
         bool hasAutoName() const noexcept {return mAutoName;}
         NetClass& getNetClass() const noexcept {return *mNetClass;}
-        int getGenCompSignalCount() const noexcept {return mGenCompSignals.count();}
-        int getNetPointCount() const noexcept {return mSchematicNetPoints.count();}
+        const QList<GenCompSignalInstance*>& getGenCompSignals() const noexcept {return mGenCompSignals;}
+        const QList<SchematicNetPoint*>& getNetPoints() const noexcept {return mSchematicNetPoints;}
 
         // Setters
         void setName(const QString& name) throw (Exception);

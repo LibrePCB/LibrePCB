@@ -33,7 +33,7 @@
  *  Forward Declarations
  ****************************************************************************************/
 
-class QGraphicsRectItem;
+class QGraphicsItem;
 class SchematicLayer;
 
 namespace project {
@@ -77,6 +77,7 @@ class SymbolInstance final : public QObject
         const Point& getPosition() const noexcept {return mPosition;}
         const Angle& getAngle() const noexcept {return mAngle;}
         SymbolPinInstance* getPinInstance(const QUuid& pinUuid) const noexcept {return mPinInstances.value(pinUuid);}
+        const QHash<QUuid, SymbolPinInstance*>& getPinInstances() const noexcept {return mPinInstances;}
         GenericComponentInstance& getGenCompInstance() const noexcept {return *mGenCompInstance;}
         const library::Symbol& getSymbol() const noexcept {return *mSymbol;}
         const library::GenCompSymbVarItem& getGenCompSymbVarItem() const noexcept {return *mSymbVarItem;}

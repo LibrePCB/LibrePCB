@@ -64,6 +64,7 @@ class SymbolPinInstance final : public QObject
         ~SymbolPinInstance();
 
         // Getters
+        const QUuid& getLibPinUuid() const noexcept;
         Point getPosition() const noexcept;
         SymbolInstance& getSymbolInstance() const noexcept {return mSymbolInstance;}
         SchematicNetPoint* getSchematicNetPoint() const noexcept {return mRegisteredSchematicNetPoint;}

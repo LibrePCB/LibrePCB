@@ -157,6 +157,9 @@ void SymbolInstance::addToSchematic(Schematic& schematic, bool addNode,
     }
 
     schematic.addItem(mGraphicsItem);
+
+    foreach (SymbolPinInstance* pin, mPinInstances)
+        pin->addToSchematic();
 }
 
 void SymbolInstance::removeFromSchematic(Schematic& schematic, bool removeNode,
@@ -174,6 +177,9 @@ void SymbolInstance::removeFromSchematic(Schematic& schematic, bool removeNode,
     }
 
     schematic.removeItem(mGraphicsItem);
+
+    foreach (SymbolPinInstance* pin, mPinInstances)
+        pin->removeFromSchematic();
 }
 
 bool SymbolInstance::save(bool toOriginal, QStringList& errors) noexcept

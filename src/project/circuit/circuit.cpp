@@ -239,6 +239,7 @@ NetSignal* Circuit::getNetSignalByName(const QString& name) const noexcept
 
 NetSignal* Circuit::createNetSignal(const QUuid& netclass, QString name) throw (Exception)
 {
+    bool autoName = false;
     if (name.isEmpty())
     {
         unsigned int i = 1;
@@ -246,6 +247,7 @@ NetSignal* Circuit::createNetSignal(const QUuid& netclass, QString name) throw (
         {
             name = QString("N#%1").arg(i++); // find a new unique signal name
         } while (getNetSignalByName(name));
+        autoName = true;
     }
     else
     {
@@ -255,7 +257,7 @@ NetSignal* Circuit::createNetSignal(const QUuid& netclass, QString name) throw (
                 "name \"%1\" does already exist in the circuit.")).arg(name));
         }
     }
-    return NetSignal::create(*this, mXmlFile->getDocument(), netclass, name, true);
+    return NetSignal::create(*this, mXmlFile->getDocument(), netclass, name, autoName);
 }
 
 void Circuit::addNetSignal(NetSignal* netsignal, bool toDomTree) throw (Exception)
@@ -291,11 +293,13 @@ void Circuit::removeNetSignal(NetSignal* netsignal, bool fromDomTree, bool delet
     Q_ASSERT(mNetSignals.contains(netsignal->getUuid()));
 
     // the netsignal cannot be removed if there are already elements with that netsignal!
-    if ((netsignal->getGenCompSignalCount() > 0) || (netsignal->getNetPointCount() > 0))
+    if ((netsignal->getGenCompSignals().count() > 0) || (netsignal->getNetPoints().count() > 0))
     {
-        throw LogicError(__FILE__, __LINE__, QString("%1:%2/%3")
-            .arg(netsignal->getUuid().toString()).arg(netsignal->getGenCompSignalCount())
-            .arg(netsignal->getNetPointCount()),
+        throw LogicError(__FILE__, __LINE__,
+            QString("%1:%2/%3")
+            .arg(netsignal->getUuid().toString())
+            .arg(netsignal->getGenCompSignals().count())
+            .arg(netsignal->getNetPoints().count()),
             QString(tr("There are already elements in the netsignal \"%1\"!"))
             .arg(netsignal->getName()));
     }

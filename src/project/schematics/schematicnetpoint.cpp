@@ -143,8 +143,8 @@ SchematicNetPoint::SchematicNetPoint(Schematic& schematic, const QDomElement& do
             throw RuntimeError(__FILE__, __LINE__, pinUuid,
                 QString(tr("The symbol pin instance \"%1\" has no signal.")).arg(pinUuid));
         }
-        const NetSignal* netsignal = compSignal->getNetSignal();
-        if (!netsignal)
+        mNetSignal = compSignal->getNetSignal();
+        if (!mNetSignal)
         {
             throw RuntimeError(__FILE__, __LINE__, pinUuid, QString(tr("The pin of the "
                 "netpoint \"%1\" has no netsignal.")).arg(mUuid.toString()));
@@ -173,23 +173,6 @@ SchematicNetPoint::SchematicNetPoint(Schematic& schematic, const QDomElement& do
 SchematicNetPoint::~SchematicNetPoint() noexcept
 {
     delete mGraphicsItem;           mGraphicsItem = 0;
-}
-
-/*****************************************************************************************
- *  Getters
- ****************************************************************************************/
-
-NetSignal* SchematicNetPoint::getNetSignal() const noexcept
-{
-    if (mAttached)
-    {
-        Q_ASSERT(mPinInstance);
-        Q_ASSERT(mPinInstance->getGenCompSignalInstance());
-        Q_ASSERT(mPinInstance->getGenCompSignalInstance()->getNetSignal());
-        return mPinInstance->getGenCompSignalInstance()->getNetSignal();
-    }
-    else
-        return mNetSignal;
 }
 
 /*****************************************************************************************
@@ -232,6 +215,13 @@ void SchematicNetPoint::unregisterNetLine(SchematicNetLine* netline) noexcept
 void SchematicNetPoint::addToSchematic(Schematic& schematic, bool addNode,
                                        QDomElement& parent) throw (Exception)
 {
+    if (mAttached)
+    {
+        // check if mNetSignal is correct (would be a bug if not)
+        if (mNetSignal != mPinInstance->getGenCompSignalInstance()->getNetSignal())
+            throw LogicError(__FILE__, __LINE__);
+    }
+
     if (addNode)
     {
         if (parent.nodeName() != "netpoints")
@@ -241,7 +231,7 @@ void SchematicNetPoint::addToSchematic(Schematic& schematic, bool addNode,
             throw LogicError(__FILE__, __LINE__, QString(), tr("Could not append DOM node!"));
     }
 
-    getNetSignal()->registerSchematicNetPoint(this);
+    mNetSignal->registerSchematicNetPoint(this);
     if (mAttached)
         mPinInstance->registerNetPoint(this);
     schematic.addItem(mGraphicsItem);
@@ -250,6 +240,13 @@ void SchematicNetPoint::addToSchematic(Schematic& schematic, bool addNode,
 void SchematicNetPoint::removeFromSchematic(Schematic& schematic, bool removeNode,
                                             QDomElement& parent) throw (Exception)
 {
+    if (mAttached)
+    {
+        // check if mNetSignal is correct (would be a bug if not)
+        if (mNetSignal != mPinInstance->getGenCompSignalInstance()->getNetSignal())
+            throw LogicError(__FILE__, __LINE__);
+    }
+
     if (removeNode)
     {
         if (parent.nodeName() != "netpoints")
@@ -259,7 +256,7 @@ void SchematicNetPoint::removeFromSchematic(Schematic& schematic, bool removeNod
             throw LogicError(__FILE__, __LINE__, QString(), tr("Could not remove node from DOM tree!"));
     }
 
-    getNetSignal()->unregisterSchematicNetPoint(this);
+    mNetSignal->unregisterSchematicNetPoint(this);
     if (mAttached)
         mPinInstance->unregisterNetPoint(this);
     schematic.removeItem(mGraphicsItem);
@@ -267,14 +264,42 @@ void SchematicNetPoint::removeFromSchematic(Schematic& schematic, bool removeNod
 
 bool SchematicNetPoint::save(bool toOriginal, QStringList& errors) noexcept
 {
-    Q_UNUSED(toOriginal);
-    Q_UNUSED(errors);
-    if (!mAttached)
+    Q_UNUSED(toOriginal); Q_UNUSED(errors);
+    mDomElement.removeChild(mDomElement.firstChildElement("attached"));
+    mDomElement.removeChild(mDomElement.firstChildElement("netsignal"));
+    mDomElement.removeChild(mDomElement.firstChildElement("position"));
+    mDomElement.removeChild(mDomElement.firstChildElement("symbol"));
+    mDomElement.removeChild(mDomElement.firstChildElement("pin"));
+    if (mAttached)
     {
-        QDomText netsignal = mDomElement.ownerDocument().createTextNode(mNetSignal->getUuid().toString());
-        mDomElement.ownerDocument().replaceChild(netsignal, mDomElement.firstChildElement("netsignal").firstChildElement());
+        QDomElement attachedNode = mDomElement.ownerDocument().createElement("attached");
+        QDomText attachedText = mDomElement.ownerDocument().createTextNode("true");
+        attachedNode.appendChild(attachedText);
+        mDomElement.appendChild(attachedNode);
+        QDomElement symbolNode = mDomElement.ownerDocument().createElement("symbol");
+        QDomText symbolText = mDomElement.ownerDocument().createTextNode(mSymbolInstance->getUuid().toString());
+        symbolNode.appendChild(symbolText);
+        mDomElement.appendChild(symbolNode);
+        QDomElement pinNode = mDomElement.ownerDocument().createElement("pin");
+        QDomText pinText = mDomElement.ownerDocument().createTextNode(mPinInstance->getLibPinUuid().toString());
+        pinNode.appendChild(pinText);
+        mDomElement.appendChild(pinNode);
+    }
+    else
+    {
+        QDomElement attachedNode = mDomElement.ownerDocument().createElement("attached");
+        QDomText attachedText = mDomElement.ownerDocument().createTextNode("false");
+        attachedNode.appendChild(attachedText);
+        mDomElement.appendChild(attachedNode);
+        QDomElement netsignalNode = mDomElement.ownerDocument().createElement("netsignal");
+        QDomText netsignalText = mDomElement.ownerDocument().createTextNode(mNetSignal->getUuid().toString());
+        netsignalNode.appendChild(netsignalText);
+        mDomElement.appendChild(netsignalNode);
+        QDomElement posNode = mDomElement.ownerDocument().createElement("position");
+        posNode.setAttribute("x", mPosition.getX().toMmString());
         mDomElement.firstChildElement("position").setAttribute("x", mPosition.getX().toMmString());
-        mDomElement.firstChildElement("position").setAttribute("y", mPosition.getY().toMmString());
+        posNode.setAttribute("y", mPosition.getY().toMmString());
+        mDomElement.appendChild(posNode);
     }
     return true;
 }
@@ -292,14 +317,14 @@ SchematicNetPoint* SchematicNetPoint::create(Schematic& schematic, QDomDocument&
 
     // fill the new QDomElement with all the needed content
     node.setAttribute("uuid", QUuid::createUuid().toString()); // generate random UUID
-    QDomElement netsignalNode = doc.createElement("netsignal");
-    QDomText netsignalText = doc.createTextNode(netsignal.toString());
-    netsignalNode.appendChild(netsignalText);
-    node.appendChild(netsignalNode);
     QDomElement attachedNode = doc.createElement("attached");
     QDomText attachedText = doc.createTextNode("false");
     attachedNode.appendChild(attachedText);
     node.appendChild(attachedNode);
+    QDomElement netsignalNode = doc.createElement("netsignal");
+    QDomText netsignalText = doc.createTextNode(netsignal.toString());
+    netsignalNode.appendChild(netsignalText);
+    node.appendChild(netsignalNode);
     QDomElement posNode = doc.createElement("position");
     posNode.setAttribute("x", position.getX().toMmString());
     posNode.setAttribute("y", position.getY().toMmString());

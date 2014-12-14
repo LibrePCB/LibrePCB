@@ -116,9 +116,11 @@ class SchematicNetPoint final : public QObject
 
         // Getters
         const QUuid& getUuid() const noexcept {return mUuid;}
-        NetSignal* getNetSignal() const noexcept;
         bool isAttached() const noexcept {return mAttached;}
         const Point& getPosition() const noexcept {return mPosition;}
+        NetSignal* getNetSignal() const noexcept {return mNetSignal;}
+        SymbolInstance* getSymbolInstance() const noexcept {return mSymbolInstance;}
+        SymbolPinInstance* getPinInstance() const noexcept {return mPinInstance;}
         const QList<SchematicNetLine*>& getLines() const noexcept {return mLines;}
 
         // Setters
@@ -143,6 +145,7 @@ class SchematicNetPoint final : public QObject
                                          const QUuid& symbol, const QUuid& pin)
                                          throw (Exception);
 
+
     private:
 
         // make some methods inaccessible...
@@ -157,11 +160,11 @@ class SchematicNetPoint final : public QObject
 
         // Attributes
         QUuid mUuid;
-        NetSignal* mNetSignal;
         bool mAttached;
         Point mPosition;
-        SymbolInstance* mSymbolInstance;
-        SymbolPinInstance* mPinInstance;
+        NetSignal* mNetSignal;
+        SymbolInstance* mSymbolInstance;    ///< only needed if mAttached == true
+        SymbolPinInstance* mPinInstance;    ///< only needed if mAttached == true
 
         QList<SchematicNetLine*> mLines;
 
