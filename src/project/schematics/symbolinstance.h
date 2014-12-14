@@ -97,6 +97,8 @@ class SymbolInstance final : public QObject
         Point mapToScene(const Point& relativePos) const noexcept;
 
         // Static Methods
+        static uint extractFromGraphicsItems(const QList<QGraphicsItem*>& items,
+                                             QList<SymbolInstance*>& symbols) noexcept;
         static SymbolInstance* create(Schematic& schematic, QDomDocument& doc,
                                       const QUuid& genCompInstance, const QUuid& symbolItem,
                                       const Point& position = Point(), const Angle& angle = Angle(),

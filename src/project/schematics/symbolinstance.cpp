@@ -213,6 +213,25 @@ Point SymbolInstance::mapToScene(const Point& relativePos) const noexcept
  *  Static Methods
  ****************************************************************************************/
 
+uint SymbolInstance::extractFromGraphicsItems(const QList<QGraphicsItem*>& items,
+                                              QList<SymbolInstance*>& symbols) noexcept
+{
+    foreach (QGraphicsItem* item, items)
+    {
+        Q_ASSERT(item); if (!item) continue;
+        if (item->type() == CADScene::Type_Symbol)
+        {
+            library::SymbolGraphicsItem* i = qgraphicsitem_cast<library::SymbolGraphicsItem*>(item);
+            Q_ASSERT(i); if (!i) continue;
+            SymbolInstance* s = i->getSymbolInstance();
+            Q_ASSERT(s); if (!s) continue;
+            if (!symbols.contains(s))
+                symbols.append(s);
+        }
+    }
+    return symbols.count();
+}
+
 SymbolInstance* SymbolInstance::create(Schematic& schematic, QDomDocument& doc,
                                        const QUuid& genCompInstance, const QUuid& symbolItem,
                                        const Point& position, const Angle& angle,

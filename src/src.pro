@@ -153,6 +153,9 @@ SOURCES += \
     project/circuit/cmd/cmdgencompsiginstsetnetsignal.cpp \
     project/schematics/fsm/ses_base.cpp \
     project/schematics/fsm/ses_fsm.cpp \
+    project/schematics/cmd/cmdsymbolinstanceremove.cpp \
+    project/schematics/cmd/cmdschematicnetpointdetach.cpp \
+    project/schematics/cmd/cmdschematicnetpointsetnetsignal.cpp \
     workspace/settings/items/wsi_debugtools.cpp
 
 HEADERS += \
@@ -252,6 +255,9 @@ HEADERS += \
     project/circuit/cmd/cmdgencompsiginstsetnetsignal.h \
     project/schematics/fsm/ses_base.h \
     project/schematics/fsm/ses_fsm.h \
+    project/schematics/cmd/cmdsymbolinstanceremove.h \
+    project/schematics/cmd/cmdschematicnetpointdetach.h \
+    project/schematics/cmd/cmdschematicnetpointsetnetsignal.h \
     workspace/settings/items/wsi_debugtools.h
 
 FORMS += \

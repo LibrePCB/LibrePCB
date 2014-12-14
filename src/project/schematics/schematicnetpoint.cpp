@@ -33,6 +33,7 @@
 #include "symbolinstance.h"
 #include "symbolpininstance.h"
 #include "../circuit/gencompsignalinstance.h"
+#include "../../library/symbolgraphicsitem.h"
 #include "../../workspace/workspace.h"
 #include "../../workspace/settings/workspacesettings.h"
 
@@ -179,6 +180,13 @@ SchematicNetPoint::~SchematicNetPoint() noexcept
  *  Setters
  ****************************************************************************************/
 
+void SchematicNetPoint::setNetSignal(NetSignal& netsignal) throw (Exception)
+{
+    mNetSignal->unregisterSchematicNetPoint(this);
+    mNetSignal = &netsignal;
+    mNetSignal->registerSchematicNetPoint(this);
+}
+
 void SchematicNetPoint::setPosition(const Point& position) noexcept
 {
     mPosition = position;
@@ -189,6 +197,30 @@ void SchematicNetPoint::setPosition(const Point& position) noexcept
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
+
+void SchematicNetPoint::detachFromPin() throw (Exception)
+{
+    if (!mAttached) throw LogicError(__FILE__, __LINE__);
+    mPinInstance->unregisterNetPoint(this);
+    mSymbolInstance = nullptr;
+    mPinInstance = nullptr;
+    mAttached = false;
+}
+
+void SchematicNetPoint::attachToPin(SymbolInstance* symbol, SymbolPinInstance* pin) throw (Exception)
+{
+    Q_ASSERT(symbol); Q_ASSERT(pin);
+    if (mAttached) throw LogicError(__FILE__, __LINE__);
+    const GenCompSignalInstance* compSignal = pin->getGenCompSignalInstance();
+    if (!compSignal) throw LogicError(__FILE__, __LINE__);
+    const NetSignal* netsignal = compSignal->getNetSignal();
+    if (netsignal != mNetSignal) throw LogicError(__FILE__, __LINE__);
+    mSymbolInstance = symbol;
+    mPinInstance = pin;
+    mPinInstance->registerNetPoint(this);
+    mPosition = mPinInstance->getPosition();
+    mAttached = true;
+}
 
 void SchematicNetPoint::updateLines() const noexcept
 {
@@ -297,7 +329,6 @@ bool SchematicNetPoint::save(bool toOriginal, QStringList& errors) noexcept
         mDomElement.appendChild(netsignalNode);
         QDomElement posNode = mDomElement.ownerDocument().createElement("position");
         posNode.setAttribute("x", mPosition.getX().toMmString());
-        mDomElement.firstChildElement("position").setAttribute("x", mPosition.getX().toMmString());
         posNode.setAttribute("y", mPosition.getY().toMmString());
         mDomElement.appendChild(posNode);
     }
@@ -307,6 +338,90 @@ bool SchematicNetPoint::save(bool toOriginal, QStringList& errors) noexcept
 /*****************************************************************************************
  *  Static Methods
  ****************************************************************************************/
+
+uint SchematicNetPoint::extractFromGraphicsItems(const QList<QGraphicsItem*>& items,
+                                                 QList<SchematicNetPoint*>& netpoints,
+                                                 bool floatingPoints,
+                                                 bool attachedPoints,
+                                                 bool floatingPointsFromFloatingLines,
+                                                 bool attachedPointsFromFloatingLines,
+                                                 bool floatingPointsFromAttachedLines,
+                                                 bool attachedPointsFromAttachedLines,
+                                                 bool attachedPointsFromSymbols) noexcept
+{
+    foreach (QGraphicsItem* item, items)
+    {
+        Q_ASSERT(item); if (!item) continue;
+        switch (item->type())
+        {
+            case CADScene::Type_SchematicNetPoint:
+            {
+                if (floatingPoints || attachedPoints)
+                {
+                    SchematicNetPointGraphicsItem* i = qgraphicsitem_cast<SchematicNetPointGraphicsItem*>(item);
+                    Q_ASSERT(i); if (!i) break;
+                    SchematicNetPoint* p = &i->getNetPoint();
+                    if (((!p->isAttached()) && floatingPoints)
+                       || (p->isAttached() && attachedPoints))
+                    {
+                        if (!netpoints.contains(p))
+                            netpoints.append(p);
+                    }
+                }
+                break;
+            }
+            case CADScene::Type_SchematicNetLine:
+            {
+                if (floatingPointsFromFloatingLines || attachedPointsFromFloatingLines
+                 || floatingPointsFromAttachedLines || attachedPointsFromAttachedLines)
+                {
+                    SchematicNetLineGraphicsItem* i = qgraphicsitem_cast<SchematicNetLineGraphicsItem*>(item);
+                    Q_ASSERT(i); if (!i) break;
+                    SchematicNetLine* l = &i->getNetLine();
+                    SchematicNetPoint* p1 = &i->getNetLine().getStartPoint();
+                    SchematicNetPoint* p2 = &i->getNetLine().getEndPoint();
+                    if ( ((!l->isAttachedToSymbol()) && (!p1->isAttached()) && floatingPointsFromFloatingLines)
+                      || ((!l->isAttachedToSymbol()) && ( p1->isAttached()) && attachedPointsFromFloatingLines)
+                      || (( l->isAttachedToSymbol()) && (!p1->isAttached()) && floatingPointsFromAttachedLines)
+                      || (( l->isAttachedToSymbol()) && ( p1->isAttached()) && attachedPointsFromAttachedLines))
+                    {
+                        if (!netpoints.contains(p1))
+                            netpoints.append(p1);
+                    }
+                    if ( ((!l->isAttachedToSymbol()) && (!p2->isAttached()) && floatingPointsFromFloatingLines)
+                      || ((!l->isAttachedToSymbol()) && ( p2->isAttached()) && attachedPointsFromFloatingLines)
+                      || (( l->isAttachedToSymbol()) && (!p2->isAttached()) && floatingPointsFromAttachedLines)
+                      || (( l->isAttachedToSymbol()) && ( p2->isAttached()) && attachedPointsFromAttachedLines))
+                    {
+                        if (!netpoints.contains(p2))
+                            netpoints.append(p2);
+                    }
+                }
+                break;
+            }
+            case CADScene::Type_Symbol:
+            {
+                if (attachedPointsFromSymbols)
+                {
+                    library::SymbolGraphicsItem* i = qgraphicsitem_cast<library::SymbolGraphicsItem*>(item);
+                    Q_ASSERT(i); if (!i) break;
+                    SymbolInstance* s = i->getSymbolInstance();
+                    Q_ASSERT(s); if (!s) break;
+                    foreach (const SymbolPinInstance* pin, s->getPinInstances())
+                    {
+                        SchematicNetPoint* p = pin->getSchematicNetPoint();
+                        if ((p) && (!netpoints.contains(p)))
+                            netpoints.append(p);
+                    }
+                }
+                break;
+            }
+            default:
+                break;
+        }
+    }
+    return netpoints.count();
+}
 
 SchematicNetPoint* SchematicNetPoint::create(Schematic& schematic, QDomDocument& doc,
                                              const QUuid& netsignal, const Point& position) throw (Exception)

@@ -30,6 +30,9 @@
 #include "../project.h"
 #include "../../common/schematiclayer.h"
 #include "../circuit/netsignal.h"
+#include "../../library/symbolgraphicsitem.h"
+#include "symbolinstance.h"
+#include "symbolpininstance.h"
 #include "../../workspace/workspace.h"
 #include "../../workspace/settings/workspacesettings.h"
 
@@ -236,6 +239,58 @@ bool SchematicNetLine::save(bool toOriginal, QStringList& errors) noexcept
 /*****************************************************************************************
  *  Static Methods
  ****************************************************************************************/
+
+uint SchematicNetLine::extractFromGraphicsItems(const QList<QGraphicsItem*>& items,
+                                                QList<SchematicNetLine*>& netlines,
+                                                bool floatingLines,
+                                                bool attachedLines,
+                                                bool attachedLinesFromSymbols) noexcept
+{
+    foreach (QGraphicsItem* item, items)
+    {
+        Q_ASSERT(item); if (!item) continue;
+        switch (item->type())
+        {
+            case CADScene::Type_SchematicNetLine:
+            {
+                SchematicNetLineGraphicsItem* i = qgraphicsitem_cast<SchematicNetLineGraphicsItem*>(item);
+                Q_ASSERT(i); if (!i) break;
+                SchematicNetLine* l = &i->getNetLine();
+                if (((!l->isAttachedToSymbol()) && floatingLines)
+                   || (l->isAttachedToSymbol() && attachedLines))
+                {
+                    if (!netlines.contains(l))
+                        netlines.append(l);
+                }
+                break;
+            }
+            case CADScene::Type_Symbol:
+            {
+                if (attachedLinesFromSymbols)
+                {
+                    library::SymbolGraphicsItem* i = qgraphicsitem_cast<library::SymbolGraphicsItem*>(item);
+                    Q_ASSERT(i); if (!i) break;
+                    SymbolInstance* s = i->getSymbolInstance();
+                    Q_ASSERT(s); if (!s) break;
+                    foreach (const SymbolPinInstance* pin, s->getPinInstances())
+                    {
+                        SchematicNetPoint* p = pin->getSchematicNetPoint();
+                        if (p)
+                        {
+                            foreach (SchematicNetLine* l, p->getLines())
+                            {
+                                if (!netlines.contains(l))
+                                    netlines.append(l);
+                            }
+                        }
+                    }
+                }
+                break;
+            }
+        }
+    }
+    return netlines.count();
+}
 
 SchematicNetLine* SchematicNetLine::create(Schematic& schematic, QDomDocument& doc,
                                            const QUuid& startPoint, const QUuid& endPoint,

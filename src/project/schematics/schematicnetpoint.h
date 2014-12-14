@@ -124,9 +124,23 @@ class SchematicNetPoint final : public QObject
         const QList<SchematicNetLine*>& getLines() const noexcept {return mLines;}
 
         // Setters
+
+        /**
+         * @brief Change the netsignal of this netpoint
+         *
+         * @warning - This method must always be called from inside an UndoCommand!
+         *          - This method must be called also on attached netpoints
+         *
+         * @param netsignal     A reference to the new netsignal
+         *
+         * @throw Exception     This method throws an exception in case of an error
+         */
+        void setNetSignal(NetSignal& netsignal) throw (Exception);
         void setPosition(const Point& position) noexcept;
 
         // General Methods
+        void detachFromPin() throw (Exception);
+        void attachToPin(SymbolInstance* symbol, SymbolPinInstance* pin) throw (Exception);
         void updateLines() const noexcept;
         void registerNetLine(SchematicNetLine* netline) noexcept;
         void unregisterNetLine(SchematicNetLine* netline) noexcept;
@@ -138,6 +152,15 @@ class SchematicNetPoint final : public QObject
 
         // Static Methods
         static const Length& getCircleRadius() noexcept {return sCircleRadius;}
+        static uint extractFromGraphicsItems(const QList<QGraphicsItem*>& items,
+                                             QList<SchematicNetPoint*>& netpoints,
+                                             bool floatingPoints = true,
+                                             bool attachedPoints = true,
+                                             bool floatingPointsFromFloatingLines = false,
+                                             bool attachedPointsFromFloatingLines = false,
+                                             bool floatingPointsFromAttachedLines = false,
+                                             bool attachedPointsFromAttachedLines = false,
+                                             bool attachedPointsFromSymbols = false) noexcept;
         static SchematicNetPoint* create(Schematic& schematic, QDomDocument& doc,
                                          const QUuid& netsignal, const Point& position)
                                          throw (Exception);

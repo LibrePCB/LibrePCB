@@ -34,6 +34,12 @@
 #include "../cmd/cmdschematicnetpointmove.h"
 #include "../schematicnetline.h"
 #include "../symbolinstance.h"
+#include "../cmd/cmdsymbolinstanceremove.h"
+#include "../cmd/cmdschematicnetlineremove.h"
+#include "../cmd/cmdschematicnetpointremove.h"
+#include "../cmd/cmdschematicnetpointdetach.h"
+#include "../../circuit/cmd/cmdgencompsiginstsetnetsignal.h"
+#include "../symbolpininstance.h"
 
 namespace project {
 
@@ -108,6 +114,9 @@ SES_Base::ProcRetVal SES_Select::processSubStateIdle(SEE_Base* event) noexcept
         case SEE_Base::Edit_RotateCCW:
             rotateSelectedItems(Angle(-90000000), Point(), true);
             return ForceStayInState;
+        case SEE_Base::Edit_Remove:
+            removeSelectedItems();
+            return ForceStayInState;
         case SEE_Base::SchematicSceneEvent:
             return processSubStateIdleSceneEvent(event);
         default:
@@ -160,9 +169,13 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneLeftClick(QGraphicsSceneMouseE
     }
 
     // get all selected items
+    items = schematic->selectedItems();
+    uint count = 0;
     QList<SymbolInstance*> symbols;
     QList<SchematicNetPoint*> netpoints;
-    uint count = extractGraphicsItems(schematic->selectedItems(), symbols, netpoints);
+    count += SymbolInstance::extractFromGraphicsItems(items, symbols);
+    count += SchematicNetPoint::extractFromGraphicsItems(items, netpoints, true, false,
+                                                         true, false, false, false);
 
     // abort if no items are selected
     if (count == 0) return ForceStayInState;
@@ -296,11 +309,17 @@ bool SES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
     Schematic* schematic = mEditor.getActiveSchematic();
     Q_ASSERT(schematic); if (!schematic) return false;
 
-    // get all selected symbols and netpoints
+    // get all selected items
+    QList<QGraphicsItem*> items = schematic->selectedItems();
+    uint count = 0;
     QList<SymbolInstance*> symbols;
     QList<SchematicNetPoint*> netpoints;
-    uint count = extractGraphicsItems(schematic->selectedItems(), symbols, netpoints);
-    if (count == 0) return false;
+    count += SymbolInstance::extractFromGraphicsItems(items, symbols);
+    count += SchematicNetPoint::extractFromGraphicsItems(items, netpoints, true, false,
+                                                         true, false, false, false);
+
+    // abort if no items are selected
+    if (count == 0) return ForceStayInState;
 
     // find the center of all elements
     if (centerOfElements)
@@ -349,55 +368,84 @@ bool SES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
     return true;
 }
 
-/*****************************************************************************************
- *  Static Methods
- ****************************************************************************************/
-
-uint SES_Select::extractGraphicsItems(const QList<QGraphicsItem*>& graphicsItems,
-                                      QList<SymbolInstance*>& symbolInstances,
-                                      QList<SchematicNetPoint*>& netpoints) noexcept
+bool SES_Select::removeSelectedItems() noexcept
 {
-    foreach (QGraphicsItem* item, graphicsItems)
+    Schematic* schematic = mEditor.getActiveSchematic();
+    Q_ASSERT(schematic); if (!schematic) return false;
+
+    // get all selected items
+    QList<QGraphicsItem*> items = schematic->selectedItems();
+    uint count = 0;
+    QList<SymbolInstance*> symbols;
+    QList<SchematicNetPoint*> netpoints;
+    QList<SchematicNetLine*> netlines;
+    count += SymbolInstance::extractFromGraphicsItems(items, symbols);
+    count += SchematicNetPoint::extractFromGraphicsItems(items, netpoints, true, true,
+                                                         true, true, true, true, true);
+    count += SchematicNetLine::extractFromGraphicsItems(items, netlines, true, true, false);
+
+    // abort if no items are selected
+    if (count == 0) return false;
+
+    bool commandActive = false;
+    try
     {
-        switch (item->type())
+        mEditor.getProject().getUndoStack().beginCommand(tr("Remove Schematic Elements"));
+        commandActive = true;
+        schematic->clearSelection();
+
+        // remove all netlines
+        foreach (SchematicNetLine* line, netlines)
         {
-            case CADScene::Type_Symbol:
-            {
-                library::SymbolGraphicsItem* i = qgraphicsitem_cast<library::SymbolGraphicsItem*>(item);
-                Q_ASSERT(i); if (!i) break;
-                SymbolInstance* s = i->getSymbolInstance();
-                Q_ASSERT(s); if (!s) break;
-                symbolInstances.append(s);
-                break;
-            }
-            case CADScene::Type_SchematicNetPoint:
-            {
-                SchematicNetPointGraphicsItem* i = qgraphicsitem_cast<SchematicNetPointGraphicsItem*>(item);
-                Q_ASSERT(i); if (!i) break;
-                if (i->getNetPoint().isAttached()) break;
-                if (netpoints.contains(&i->getNetPoint())) break;
-                netpoints.append(&i->getNetPoint());
-                break;
-            }
-            case CADScene::Type_SchematicNetLine:
-            {
-                SchematicNetLineGraphicsItem* i = qgraphicsitem_cast<SchematicNetLineGraphicsItem*>(item);
-                Q_ASSERT(i); if (!i) break;
-                if (!i->getNetLine().isAttachedToSymbol())
-                {
-                    // add start & end points to list
-                    if (!netpoints.contains(&i->getNetLine().getStartPoint()))
-                        netpoints.append(&i->getNetLine().getStartPoint());
-                    if (!netpoints.contains(&i->getNetLine().getEndPoint()))
-                        netpoints.append(&i->getNetLine().getEndPoint());
-                }
-                break;
-            }
-            default:
-                break;
+            CmdSchematicNetLineRemove* cmd = new CmdSchematicNetLineRemove(*schematic, line);
+            mEditor.getProject().getUndoStack().appendToCommand(cmd);
         }
+
+        // remove all netpoints
+        foreach (SchematicNetPoint* point, netpoints)
+        {
+            // TODO: this code does not work correctly in all possible cases
+            if (point->getLines().count() == 0)
+            {
+                CmdSchematicNetPointRemove* cmd = new CmdSchematicNetPointRemove(*schematic, point);
+                mEditor.getProject().getUndoStack().appendToCommand(cmd);
+                if (point->isAttached())
+                {
+                    GenCompSignalInstance* signal = point->getPinInstance()->getGenCompSignalInstance();
+                    Q_ASSERT(signal); if (!signal) throw LogicError(__FILE__, __LINE__);
+                    CmdGenCompSigInstSetNetSignal* cmd = new CmdGenCompSigInstSetNetSignal(*signal, nullptr);
+                    mEditor.getProject().getUndoStack().appendToCommand(cmd);
+                }
+            }
+            else if (point->isAttached())
+            {
+                GenCompSignalInstance* signal = point->getPinInstance()->getGenCompSignalInstance();
+                Q_ASSERT(signal); if (!signal) throw LogicError(__FILE__, __LINE__);
+                CmdSchematicNetPointDetach* cmd1 = new CmdSchematicNetPointDetach(*point);
+                mEditor.getProject().getUndoStack().appendToCommand(cmd1);
+                CmdGenCompSigInstSetNetSignal* cmd2 = new CmdGenCompSigInstSetNetSignal(*signal, nullptr);
+                mEditor.getProject().getUndoStack().appendToCommand(cmd2);
+            }
+        }
+
+        // remove all symbols
+        foreach (SymbolInstance* symbol, symbols)
+        {
+            CmdSymbolInstanceRemove* cmd = new CmdSymbolInstanceRemove(*schematic, symbol);
+            mEditor.getProject().getUndoStack().appendToCommand(cmd);
+        }
+
+        mEditor.getProject().getUndoStack().endCommand();
+        commandActive = false;
+        return true;
     }
-    return (symbolInstances.count() + netpoints.count());
+    catch (Exception& e)
+    {
+        QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+        if (commandActive)
+            try {mEditor.getProject().getUndoStack().abortCommand();} catch (...) {}
+        return false;
+    }
 }
 
 /*****************************************************************************************

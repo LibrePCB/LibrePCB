@@ -46,6 +46,8 @@
 #include "../cmd/cmdschematicnetlineremove.h"
 #include "../cmd/cmdschematicnetpointremove.h"
 #include "../schematicnetline.h"
+#include "../cmd/cmdschematicnetpointsetnetsignal.h"
+#include "../../circuit/cmd/cmdnetsignalremove.h"
 
 namespace project {
 
@@ -91,6 +93,9 @@ bool SES_DrawWire::entry(SEE_Base* event) noexcept
 {
     Q_UNUSED(event);
     Q_ASSERT(mSubState == SubState_Idle);
+
+    // clear schematic selection because selection does not make sense in this state
+    if (mEditor.getActiveSchematic()) mEditor.getActiveSchematic()->clearSelection();
 
     // Check this state in the "tools" toolbar
     mEditorUi.actionToolDrawWire->setCheckable(true);
@@ -520,22 +525,61 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
         {
             SchematicNetPoint* pointUnderCursor = pointsUnderCursor.first();
             Q_ASSERT(mPositioningNetPoint2->getNetSignal() != pointUnderCursor->getNetSignal());
-            // choose the resulting netsignal with a context menu
-            QMenu menu;
-            menu.addSection(tr("Resulting Signal:"));
-            auto a1 = menu.addAction(mPositioningNetPoint2->getNetSignal()->getName());
-            auto a2 = menu.addAction(pointUnderCursor->getNetSignal()->getName());
-            menu.addSeparator();
-            menu.addAction(QIcon(":/img/actions/cancel.png"), tr("Abort"))->setShortcut(Qt::Key_Escape);
-            auto a = menu.exec(QCursor::pos(), a1);
-            if (a == a1)
-                QMessageBox::information(0, "", mPositioningNetPoint2->getNetSignal()->getName());
-            else if (a == a2)
-                QMessageBox::information(0, "", pointUnderCursor->getNetSignal()->getName());
+            // determine the resulting netsignal
+            NetSignal* originalSignal = nullptr;
+            NetSignal* combinedSignal = nullptr;
+            if (mPositioningNetPoint2->getNetSignal()->hasAutoName())
+            {
+                originalSignal = mPositioningNetPoint2->getNetSignal();
+                combinedSignal = pointUnderCursor->getNetSignal();
+            }
+            else if (pointUnderCursor->getNetSignal()->hasAutoName())
+            {
+                originalSignal = pointUnderCursor->getNetSignal();
+                combinedSignal = mPositioningNetPoint2->getNetSignal();
+            }
             else
-                return false; // context menu aborted
+            {
+                // choose the resulting netsignal with a context menu
+                QMenu menu;
+                menu.addSection(tr("Resulting Signal:"));
+                auto a1 = menu.addAction(mPositioningNetPoint2->getNetSignal()->getName());
+                auto a2 = menu.addAction(pointUnderCursor->getNetSignal()->getName());
+                menu.addSeparator();
+                menu.addAction(QIcon(":/img/actions/cancel.png"), tr("Abort"))->setShortcut(Qt::Key_Escape);
+                auto a = menu.exec(QCursor::pos(), a1);
+                if (a == a1)
+                {
+                    originalSignal = pointUnderCursor->getNetSignal();
+                    combinedSignal = mPositioningNetPoint2->getNetSignal();
+                }
+                else if (a == a2)
+                {
+                    originalSignal = mPositioningNetPoint2->getNetSignal();
+                    combinedSignal = pointUnderCursor->getNetSignal();
+                }
+                else
+                    return false; // context menu aborted
+            }
+
+            // combine both netsignals
+            foreach (GenCompSignalInstance* signal, originalSignal->getGenCompSignals())
+            {
+                auto cmd = new CmdGenCompSigInstSetNetSignal(*signal, combinedSignal);
+                mProject.getUndoStack().appendToCommand(cmd);
+            }
+            foreach (SchematicNetPoint* point, originalSignal->getNetPoints())
+            {
+                auto cmd = new CmdSchematicNetPointSetNetSignal(*point, *combinedSignal);
+                mProject.getUndoStack().appendToCommand(cmd);
+            }
+
+            // remove the original netsignal
+            auto cmd = new CmdNetSignalRemove(mProject.getCircuit(), originalSignal);
+            mProject.getUndoStack().appendToCommand(cmd);
+
             // remove the last netline and netpoint
-            /*auto cmd1 = new CmdSchematicNetLineRemove(schematic, mPositioningNetLine2);
+            auto cmd1 = new CmdSchematicNetLineRemove(schematic, mPositioningNetLine2);
             mProject.getUndoStack().appendToCommand(cmd1);
             auto cmd2 = new CmdSchematicNetPointRemove(schematic, mPositioningNetPoint2);
             mProject.getUndoStack().appendToCommand(cmd2);
@@ -543,7 +587,9 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
             // add a new netline to the netpoint under the cursor
             auto cmd3 = new CmdSchematicNetLineAdd(schematic,
                 mPositioningNetPoint1->getUuid(), mPositioningNetPoint2->getUuid());
-            mProject.getUndoStack().appendToCommand(cmd3);*/
+            mProject.getUndoStack().appendToCommand(cmd3);
+            // finish the current command
+            finishCommand = true;
 
         }
         else if (pointsUnderCursor.count() > 1)

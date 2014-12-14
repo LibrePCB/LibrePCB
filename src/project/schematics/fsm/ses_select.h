@@ -78,11 +78,7 @@ class SES_Select final : public SES_Base
                                               Schematic* schematic) noexcept;
         bool rotateSelectedItems(const Angle& angle, Point center = Point(0, 0),
                                  bool centerOfElements = false) noexcept;
-
-        // Static Methods
-        static uint extractGraphicsItems(const QList<QGraphicsItem*>& graphicsItems,
-                                         QList<SymbolInstance*>& symbolInstances,
-                                         QList<SchematicNetPoint*>& netpoints) noexcept;
+        bool removeSelectedItems() noexcept;
 
 
         // Types

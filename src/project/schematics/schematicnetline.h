@@ -131,6 +131,11 @@ class SchematicNetLine final : public QObject
         bool save(bool toOriginal, QStringList& errors) noexcept;
 
         // Static Methods
+        static uint extractFromGraphicsItems(const QList<QGraphicsItem*>& items,
+                                             QList<SchematicNetLine*>& netlines,
+                                             bool floatingLines,
+                                             bool attachedLines,
+                                             bool attachedLinesFromSymbols = false) noexcept;
         static SchematicNetLine* create(Schematic& schematic, QDomDocument& doc,
                                         const QUuid& startPoint, const QUuid& endPoint,
                                         const Length& width) throw (Exception);
