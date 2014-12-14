@@ -53,6 +53,9 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(WorkspaceSettings& settings) :
     mUi->libraryLayout->addRow(mSettings.getLibNormOrder()->getLabelText(),
                                mSettings.getLibNormOrder()->getWidget());
 
+    // tab: debug tools
+    mUi->tabWidget->addTab(mSettings.getDebugTools()->getWidget(), tr("Debug Tools"));
+
     // load the window geometry
     QSettings clientSettings;
     restoreGeometry(clientSettings.value("workspace_settings_dialog/window_geometry").toByteArray());
@@ -74,6 +77,10 @@ WorkspaceSettingsDialog::~WorkspaceSettingsDialog()
     // tab: library
     mSettings.getLibLocaleOrder()->getWidget()->setParent(0);
     mSettings.getLibNormOrder()->getWidget()->setParent(0);
+
+    // tab: debug tools
+    mUi->tabWidget->removeTab(mUi->tabWidget->indexOf(mSettings.getDebugTools()->getWidget()));
+    mSettings.getDebugTools()->getWidget()->setParent(0);
 
     // delete private member objects
     delete mUi;         mUi = 0;

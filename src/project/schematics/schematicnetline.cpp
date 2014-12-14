@@ -30,6 +30,8 @@
 #include "../project.h"
 #include "../../common/schematiclayer.h"
 #include "../circuit/netsignal.h"
+#include "../../workspace/workspace.h"
+#include "../../workspace/settings/workspacesettings.h"
 
 namespace project {
 
@@ -82,9 +84,10 @@ void SchematicNetLineGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
                          Qt::SolidLine, Qt::RoundCap));
     painter->drawLine(line());
 
-    // draw net signal name (only for debugging purposes)
-    if (!deviceIsPrinter)
+#ifdef QT_DEBUG
+    if ((!deviceIsPrinter) && (Workspace::instance().getSettings().getDebugTools()->getShowSchematicNetlinesNetsignals()))
     {
+        // draw net signal name
         painter->setPen(QPen(mLayer->getColor(highlight), 0));
         QFont font;
         font.setFamily("Monospace");
@@ -94,6 +97,7 @@ void SchematicNetLineGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
         painter->setFont(font);
         painter->drawText(line().pointAt((qreal)0.5), mLine.getNetSignal()->getName());
     }
+#endif
 }
 
 /*****************************************************************************************

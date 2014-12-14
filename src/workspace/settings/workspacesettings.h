@@ -34,6 +34,7 @@
 #include "items/wsi_projectautosaveinterval.h"
 #include "items/wsi_librarylocaleorder.h"
 #include "items/wsi_librarynormorder.h"
+#include "items/wsi_debugtools.h"
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -93,6 +94,7 @@ class WorkspaceSettings final : public QObject
         WSI_ProjectAutosaveInterval* getProjectAutosaveInterval() const noexcept {return mProjectAutosaveInterval;}
         WSI_LibraryLocaleOrder* getLibLocaleOrder() const noexcept {return mLibraryLocaleOrder;}
         WSI_LibraryNormOrder* getLibNormOrder() const noexcept {return mLibraryNormOrder;}
+        WSI_DebugTools* getDebugTools() const noexcept {return mDebugTools;}
 
 
         // General Methods
@@ -131,6 +133,7 @@ class WorkspaceSettings final : public QObject
         WSI_ProjectAutosaveInterval* mProjectAutosaveInterval;
         WSI_LibraryLocaleOrder* mLibraryLocaleOrder;
         WSI_LibraryNormOrder* mLibraryNormOrder;
+        WSI_DebugTools* mDebugTools;
 };
 
 #endif // WORKSPACESETTINGS_H

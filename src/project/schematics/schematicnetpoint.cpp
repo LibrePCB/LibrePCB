@@ -33,6 +33,8 @@
 #include "symbolinstance.h"
 #include "symbolpininstance.h"
 #include "../circuit/gencompsignalinstance.h"
+#include "../../workspace/workspace.h"
+#include "../../workspace/settings/workspacesettings.h"
 
 namespace project {
 
@@ -84,9 +86,13 @@ void SchematicNetPointGraphicsItem::paint(QPainter* painter, const QStyleOptionG
     }
     else if (!deviceIsPrinter)
     {
-        // only for debugging
-        painter->setPen(QPen(Qt::red, 0));
-        painter->drawEllipse(QPointF(0, 0), radius, radius);
+#ifdef QT_DEBUG
+        if (Workspace::instance().getSettings().getDebugTools()->getShowAllSchematicNetpoints())
+        {
+            painter->setPen(QPen(Qt::red, 0));
+            painter->drawEllipse(QPointF(0, 0), radius, radius);
+        }
+#endif
     }
 }
 
@@ -102,8 +108,8 @@ const Length SchematicNetPoint::sCircleRadius = Length(600000);
 
 SchematicNetPoint::SchematicNetPoint(Schematic& schematic, const QDomElement& domElement)
                                      throw (Exception) :
-    QObject(0), mSchematic(schematic), mDomElement(domElement), mGraphicsItem(0),
-    mNetSignal(0), mSymbolInstance(0), mPinInstance(0)
+    QObject(0), mSchematic(schematic), mDomElement(domElement), mGraphicsItem(nullptr),
+    mNetSignal(nullptr), mSymbolInstance(nullptr), mPinInstance(nullptr)
 {
     mUuid = mDomElement.attribute("uuid");
     if(mUuid.isNull())

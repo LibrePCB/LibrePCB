@@ -152,7 +152,8 @@ SOURCES += \
     project/schematics/cmd/cmdschematicnetpointmove.cpp \
     project/circuit/cmd/cmdgencompsiginstsetnetsignal.cpp \
     project/schematics/fsm/ses_base.cpp \
-    project/schematics/fsm/ses_fsm.cpp
+    project/schematics/fsm/ses_fsm.cpp \
+    workspace/settings/items/wsi_debugtools.cpp
 
 HEADERS += \
     common/units.h \
@@ -250,7 +251,8 @@ HEADERS += \
     project/schematics/cmd/cmdschematicnetpointmove.h \
     project/circuit/cmd/cmdgencompsiginstsetnetsignal.h \
     project/schematics/fsm/ses_base.h \
-    project/schematics/fsm/ses_fsm.h
+    project/schematics/fsm/ses_fsm.h \
+    workspace/settings/items/wsi_debugtools.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \
