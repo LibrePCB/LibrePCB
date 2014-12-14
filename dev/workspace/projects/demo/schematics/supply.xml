@@ -5,134 +5,402 @@
         <name>Seite 1</name>
     </meta>
     <attributes>
-        <attribute name="NAME" type="text">Seite 1</attribute>
-        <attribute name="DESCRIPTION" type="text">sdfg...</attribute>
-        <attribute name="AUTHOR" type="text">Irgend Jemand</attribute>
-        <attribute name="VERSION" type="text">0.1</attribute>
+        <attribute type="text" name="NAME">Seite 1</attribute>
+        <attribute type="text" name="DESCRIPTION">sdfg...</attribute>
+        <attribute type="text" name="AUTHOR">Irgend Jemand</attribute>
+        <attribute type="text" name="VERSION">0.1</attribute>
     </attributes>
     <symbols>
-        <symbol uuid="{8a1f9e05-c711-4af4-9a7b-b1a585d6e4ed}" gen_comp_instance="{7fe07dd4-aaee-4a28-ae35-d22c2904a462}" symbol_item="{6bd99bbf-7d36-457f-ae93-8b06b869ee4b}">
-            <position x="0" y="0" angle="0" mirror="false"/>
+        <symbol symbol_item="{6bd99bbf-7d36-457f-ae93-8b06b869ee4b}" uuid="{8a1f9e05-c711-4af4-9a7b-b1a585d6e4ed}" gen_comp_instance="{7fe07dd4-aaee-4a28-ae35-d22c2904a462}">
+            <position mirror="false" x="0.000000" y="0.000000" angle="0.000000"/>
         </symbol>
-        <symbol uuid="{b52fac3b-5d3f-47df-88af-4aa87b9b2f39}" gen_comp_instance="{6fe07dd4-aaee-4a28-ae35-d22c2904a461}" symbol_item="{adae210d-c505-487b-9fe8-834a24f14638}">
-            <position x="165.1" y="172.72" angle="0" mirror="false"/>
+        <symbol symbol_item="{adae210d-c505-487b-9fe8-834a24f14638}" uuid="{b52fac3b-5d3f-47df-88af-4aa87b9b2f39}" gen_comp_instance="{6fe07dd4-aaee-4a28-ae35-d22c2904a461}">
+            <position mirror="false" x="144.780000" y="170.180000" angle="0.000000"/>
         </symbol>
-        <symbol uuid="{d2c6c292-2a7e-44a7-ac59-9187649876a1}" gen_comp_instance="{1b6ffb10-1c00-47a1-a66a-b60afc6a8da9}" symbol_item="{adae210d-c505-487b-9fe8-834a24f14638}">
-            <position x="48.26" y="132.08" angle="0" mirror="false"/>
+        <symbol symbol_item="{adae210d-c505-487b-9fe8-834a24f14638}" uuid="{1b23712a-cab7-4056-9596-22cd700045d0}" gen_comp_instance="{2a27ab8f-6845-46e7-8670-51c4c253ced9}">
+            <position mirror="false" x="99.060000" y="127.000000" angle="0.000000"/>
         </symbol>
-        <symbol uuid="{1912350b-8b0b-431d-8df5-3d81d1da41d9}" gen_comp_instance="{1b6ffb10-1c00-47a1-a66a-b60afc6a8da9}" symbol_item="{bdae210d-c505-487b-9fe8-834a24f14638}">
-            <position x="48.26" y="83.82" angle="0" mirror="false"/>
+        <symbol symbol_item="{bdae210d-c505-487b-9fe8-834a24f14638}" uuid="{3636465f-0e63-4e33-a29c-36fee2ccc3bc}" gen_comp_instance="{2a27ab8f-6845-46e7-8670-51c4c253ced9}">
+            <position mirror="false" x="99.060000" y="93.980000" angle="0.000000"/>
         </symbol>
-        <symbol uuid="{6d3b3642-094d-4106-8f36-238911f2ba18}" gen_comp_instance="{1b6ffb10-1c00-47a1-a66a-b60afc6a8da9}" symbol_item="{cdae210d-c505-487b-9fe8-834a24f14638}">
-            <position x="48.26" y="40.64" angle="0" mirror="false"/>
+        <symbol symbol_item="{cdae210d-c505-487b-9fe8-834a24f14638}" uuid="{ce4dcaf4-cea1-484e-90b9-ffcd9f896480}" gen_comp_instance="{2a27ab8f-6845-46e7-8670-51c4c253ced9}">
+            <position mirror="false" x="144.780000" y="60.960000" angle="90.000000"/>
         </symbol>
-        <symbol uuid="{d9a3902d-2071-4abd-9496-f7df0b42f738}" gen_comp_instance="{aaaadfba-ffb2-4d96-ae4a-d26329006d79}" symbol_item="{adae210d-c505-487b-9fe8-834a24f14638}">
-            <position x="193.04" y="111.76" angle="0" mirror="false"/>
+        <symbol symbol_item="{adae210d-c505-487b-9fe8-834a24f14638}" uuid="{18c5a382-4590-4da3-8a54-c0ca6e20074e}" gen_comp_instance="{ec9a9255-270e-4c8f-a3b0-74dc67882345}">
+            <position mirror="false" x="215.900000" y="127.000000" angle="-180.000000"/>
         </symbol>
-        <symbol uuid="{071f99a2-1c4f-4c49-9e39-e434b5b8281c}" gen_comp_instance="{f0e33b45-c3ac-49dc-8bd0-512d75ad014b}" symbol_item="{adae210d-c505-487b-9fe8-834a24f14638}">
-            <position x="236.22" y="66.04" angle="0" mirror="false"/>
+        <symbol symbol_item="{bdae210d-c505-487b-9fe8-834a24f14638}" uuid="{b04405a2-4874-442e-bb76-a7725bd2139e}" gen_comp_instance="{ec9a9255-270e-4c8f-a3b0-74dc67882345}">
+            <position mirror="false" x="215.900000" y="93.980000" angle="-180.000000"/>
         </symbol>
-        <symbol uuid="{0a8065fa-d575-4c5b-81c4-c1b4002a9059}" gen_comp_instance="{f0e33b45-c3ac-49dc-8bd0-512d75ad014b}" symbol_item="{bdae210d-c505-487b-9fe8-834a24f14638}">
-            <position x="254" y="101.6" angle="0" mirror="false"/>
-        </symbol>
-        <symbol uuid="{8fdea235-cc60-494f-907e-81450934cb49}" gen_comp_instance="{f0e33b45-c3ac-49dc-8bd0-512d75ad014b}" symbol_item="{cdae210d-c505-487b-9fe8-834a24f14638}">
-            <position x="266.7" y="127" angle="0" mirror="false"/>
+        <symbol symbol_item="{cdae210d-c505-487b-9fe8-834a24f14638}" uuid="{560e9517-024d-4b68-b02c-4b1a01e2a4c0}" gen_comp_instance="{ec9a9255-270e-4c8f-a3b0-74dc67882345}">
+            <position mirror="false" x="172.720000" y="60.960000" angle="-90.000000"/>
         </symbol>
     </symbols>
     <netpoints>
-        <netpoint uuid="{129871b0-54c4-473e-b4bc-7414a07c2159}">
+        <netpoint uuid="{3f701b3a-fa8b-4277-bf68-14c1d40b7f05}">
             <attached>true</attached>
             <symbol>{b52fac3b-5d3f-47df-88af-4aa87b9b2f39}</symbol>
             <pin>{702df32a-635f-46e9-85d2-5b7e2c20aa87}</pin>
         </netpoint>
-        <netpoint uuid="{bba3a2c9-e6b2-4d8b-b2d3-8c9304d1785a}">
+        <netpoint uuid="{635f2417-4f41-4cf1-9b5d-3132965ec25d}">
             <attached>false</attached>
-            <netsignal>{5ae568aa-906e-48d2-9620-26803d99e256}</netsignal>
-            <position x="127" y="170.18"/>
+            <netsignal>{508561e3-321a-47be-8b5e-b80f3e3fc1a4}</netsignal>
+            <position x="73.660000" y="172.720000"/>
         </netpoint>
-        <netpoint uuid="{a64bb3b6-40a7-4563-b9e8-d21a66483e8c}">
+        <netpoint uuid="{0b11ed42-cb92-4f39-bf1c-c60af71c98a5}">
             <attached>false</attached>
-            <netsignal>{5ae568aa-906e-48d2-9620-26803d99e256}</netsignal>
-            <position x="116.84" y="139.7"/>
+            <netsignal>{508561e3-321a-47be-8b5e-b80f3e3fc1a4}</netsignal>
+            <position x="43.180000" y="142.240000"/>
         </netpoint>
-        <netpoint uuid="{92a4e38d-59a7-4fdc-83e4-227f258b8de2}">
+        <netpoint uuid="{56d1ddd8-77dd-447f-bd1d-4d433b564c24}">
             <attached>false</attached>
-            <netsignal>{5ae568aa-906e-48d2-9620-26803d99e256}</netsignal>
-            <position x="147.32" y="81.28"/>
+            <netsignal>{508561e3-321a-47be-8b5e-b80f3e3fc1a4}</netsignal>
+            <position x="43.180000" y="71.120000"/>
         </netpoint>
-        <netpoint uuid="{72f23b29-c6dd-43f6-a161-5e7ecb1ece4e}">
+        <netpoint uuid="{b26e4675-5d9c-475c-aeea-55fb94aff7f5}">
             <attached>false</attached>
-            <netsignal>{5ae568aa-906e-48d2-9620-26803d99e256}</netsignal>
-            <position x="231.14" y="134.62"/>
+            <netsignal>{508561e3-321a-47be-8b5e-b80f3e3fc1a4}</netsignal>
+            <position x="78.740000" y="35.560000"/>
         </netpoint>
-        <netpoint uuid="{8ac55d32-01b1-4cdf-ae4c-addb310e822b}">
+        <netpoint uuid="{6b020430-af8b-4409-8310-a4ae655dddbd}">
             <attached>false</attached>
-            <netsignal>{b910765e-0d17-4a2d-80a0-af4af14ced69}</netsignal>
-            <position x="60.96" y="162.56"/>
+            <netsignal>{508561e3-321a-47be-8b5e-b80f3e3fc1a4}</netsignal>
+            <position x="144.780000" y="35.560000"/>
         </netpoint>
-        <netpoint uuid="{89aaf2ad-c6d4-4e7e-a05b-5d29bc0d131f}">
-            <attached>false</attached>
-            <netsignal>{b910765e-0d17-4a2d-80a0-af4af14ced69}</netsignal>
-            <position x="78.74" y="182.88"/>
+        <netpoint uuid="{e0c1a065-af60-42d4-bba1-e5d7c2cc127e}">
+            <attached>true</attached>
+            <symbol>{ce4dcaf4-cea1-484e-90b9-ffcd9f896480}</symbol>
+            <pin>{1339ffc8-afb2-4137-9d37-d9801ac2bfd0}</pin>
         </netpoint>
-        <netpoint uuid="{7358dfc9-8bbe-4a2d-94c3-4dba9b4092f5}">
+        <netpoint uuid="{a9add319-8054-48ad-b1e1-0ddda061fe56}">
             <attached>false</attached>
-            <netsignal>{b910765e-0d17-4a2d-80a0-af4af14ced69}</netsignal>
-            <position x="101.6" y="157.48"/>
+            <netsignal>{508561e3-321a-47be-8b5e-b80f3e3fc1a4}</netsignal>
+            <position x="170.180000" y="35.560000"/>
         </netpoint>
-        <netpoint uuid="{645a9c94-1d1d-4ee2-9b9b-97d05d97e086}">
+        <netpoint uuid="{32894f64-0868-4bef-af81-53627675959c}">
             <attached>false</attached>
-            <netsignal>{b910765e-0d17-4a2d-80a0-af4af14ced69}</netsignal>
-            <position x="76.2" y="132.08"/>
+            <netsignal>{508561e3-321a-47be-8b5e-b80f3e3fc1a4}</netsignal>
+            <position x="172.720000" y="38.100000"/>
         </netpoint>
-        <netpoint uuid="{1696d706-e74f-4739-bce0-f537ef69b30d}">
-            <attached>false</attached>
-            <netsignal>{b910765e-0d17-4a2d-80a0-af4af14ced69}</netsignal>
-            <position x="78.74" y="165.1"/>
+        <netpoint uuid="{7380786e-7e48-4f4b-ba2d-3f89b43ce3bc}">
+            <attached>true</attached>
+            <symbol>{560e9517-024d-4b68-b02c-4b1a01e2a4c0}</symbol>
+            <pin>{702df32a-635f-46e9-85d2-5b7e2c20aa87}</pin>
         </netpoint>
-        <netpoint uuid="{148059c8-568d-4e2d-9592-06427b084ea1}">
-            <attached>false</attached>
-            <netsignal>{9e89f09d-7887-481b-b964-4811d0be545e}</netsignal>
-            <position x="241.3" y="190.5"/>
+        <netpoint uuid="{9992732b-0133-42fd-95e6-b7697f30f605}">
+            <attached>true</attached>
+            <symbol>{b52fac3b-5d3f-47df-88af-4aa87b9b2f39}</symbol>
+            <pin>{db2223ee-84ce-42ef-93b9-ac6a50b07805}</pin>
         </netpoint>
-        <netpoint uuid="{4bec1194-949d-498c-aa7c-a17a9b72e714}">
+        <netpoint uuid="{2df5a910-b076-4c84-bbe5-3fdf54a3940b}">
             <attached>false</attached>
-            <netsignal>{9e89f09d-7887-481b-b964-4811d0be545e}</netsignal>
-            <position x="248.92" y="167.64"/>
+            <netsignal>{3e4ad946-2f80-498d-a1fd-095391883c7f}</netsignal>
+            <position x="226.060000" y="172.720000"/>
         </netpoint>
-        <netpoint uuid="{bd1e71e6-aef5-457d-97a4-867c08296993}">
+        <netpoint uuid="{a16d8d27-4a32-46dc-a657-48782fb04f1a}">
             <attached>false</attached>
-            <netsignal>{9e89f09d-7887-481b-b964-4811d0be545e}</netsignal>
-            <position x="231.14" y="180.34"/>
+            <netsignal>{3e4ad946-2f80-498d-a1fd-095391883c7f}</netsignal>
+            <position x="264.160000" y="134.620000"/>
         </netpoint>
-        <netpoint uuid="{9f2689d4-a241-43ab-b4a4-f18f2cc15264}">
+        <netpoint uuid="{d2f4277d-173a-4f33-98ca-ecae88726124}">
             <attached>false</attached>
-            <netsignal>{9e89f09d-7887-481b-b964-4811d0be545e}</netsignal>
-            <position x="231.14" y="154.94"/>
+            <netsignal>{3e4ad946-2f80-498d-a1fd-095391883c7f}</netsignal>
+            <position x="264.160000" y="99.060000"/>
+        </netpoint>
+        <netpoint uuid="{8a14fe54-7f6c-4be4-8b63-f843bb9bea79}">
+            <attached>false</attached>
+            <netsignal>{3e4ad946-2f80-498d-a1fd-095391883c7f}</netsignal>
+            <position x="246.380000" y="81.280000"/>
+        </netpoint>
+        <netpoint uuid="{1dc38ef8-c48f-4a9c-a233-c8fe9b0f56f0}">
+            <attached>false</attached>
+            <netsignal>{3e4ad946-2f80-498d-a1fd-095391883c7f}</netsignal>
+            <position x="172.720000" y="81.280000"/>
+        </netpoint>
+        <netpoint uuid="{b4b2a227-2f07-4207-b2e6-221e9a3a01a7}">
+            <attached>true</attached>
+            <symbol>{560e9517-024d-4b68-b02c-4b1a01e2a4c0}</symbol>
+            <pin>{1339ffc8-afb2-4137-9d37-d9801ac2bfd0}</pin>
+        </netpoint>
+        <netpoint uuid="{21eda86a-7df5-4d0d-992b-d6e4e04cc57c}">
+            <attached>false</attached>
+            <netsignal>{3e4ad946-2f80-498d-a1fd-095391883c7f}</netsignal>
+            <position x="147.320000" y="81.280000"/>
+        </netpoint>
+        <netpoint uuid="{95be7eaa-e9d6-4f76-b409-38d2c05b1ee5}">
+            <attached>false</attached>
+            <netsignal>{3e4ad946-2f80-498d-a1fd-095391883c7f}</netsignal>
+            <position x="144.780000" y="78.740000"/>
+        </netpoint>
+        <netpoint uuid="{ec242792-8346-4990-9673-7425dbd06b30}">
+            <attached>true</attached>
+            <symbol>{ce4dcaf4-cea1-484e-90b9-ffcd9f896480}</symbol>
+            <pin>{702df32a-635f-46e9-85d2-5b7e2c20aa87}</pin>
+        </netpoint>
+        <netpoint uuid="{ebc1df37-64da-4b0f-85f4-f4e8893e2bfc}">
+            <attached>true</attached>
+            <symbol>{1b23712a-cab7-4056-9596-22cd700045d0}</symbol>
+            <pin>{8207ee9b-89e5-41bc-a633-078952a6c370}</pin>
+        </netpoint>
+        <netpoint uuid="{69714155-fd4a-48b5-a368-e353d725dbc1}">
+            <attached>false</attached>
+            <netsignal>{b76b558f-b2ac-45f5-a568-9c2266cd992b}</netsignal>
+            <position x="139.700000" y="127.000000"/>
+        </netpoint>
+        <netpoint uuid="{fac35e58-3d1a-4158-9235-fd8b9ba0106e}">
+            <attached>false</attached>
+            <netsignal>{b76b558f-b2ac-45f5-a568-9c2266cd992b}</netsignal>
+            <position x="172.720000" y="93.980000"/>
+        </netpoint>
+        <netpoint uuid="{9252dc7c-dd2d-4024-a4e2-bee63ac87af1}">
+            <attached>true</attached>
+            <symbol>{b04405a2-4874-442e-bb76-a7725bd2139e}</symbol>
+            <pin>{8207ee9b-89e5-41bc-a633-078952a6c370}</pin>
+        </netpoint>
+        <netpoint uuid="{d66ff550-dcb6-457b-9b99-9b399f25ccf1}">
+            <attached>true</attached>
+            <symbol>{18c5a382-4590-4da3-8a54-c0ca6e20074e}</symbol>
+            <pin>{8207ee9b-89e5-41bc-a633-078952a6c370}</pin>
+        </netpoint>
+        <netpoint uuid="{a65ec140-11c1-4de3-b447-78ea4b94b638}">
+            <attached>false</attached>
+            <netsignal>{61fd695d-000b-41d4-8b9f-4757642a0692}</netsignal>
+            <position x="170.180000" y="127.000000"/>
+        </netpoint>
+        <netpoint uuid="{5fe25fc7-1fbc-4c80-8c72-1c42b443b43a}">
+            <attached>false</attached>
+            <netsignal>{61fd695d-000b-41d4-8b9f-4757642a0692}</netsignal>
+            <position x="137.160000" y="93.980000"/>
+        </netpoint>
+        <netpoint uuid="{ea40a685-ebec-4a74-9a31-bb17c7e7349b}">
+            <attached>true</attached>
+            <symbol>{3636465f-0e63-4e33-a29c-36fee2ccc3bc}</symbol>
+            <pin>{8207ee9b-89e5-41bc-a633-078952a6c370}</pin>
+        </netpoint>
+        <netpoint uuid="{4d8a3611-aae5-41ba-8dad-6e514cb49080}">
+            <attached>true</attached>
+            <symbol>{b52fac3b-5d3f-47df-88af-4aa87b9b2f39}</symbol>
+            <pin>{8207ee9b-89e5-41bc-a633-078952a6c370}</pin>
+        </netpoint>
+        <netpoint uuid="{462521bb-9e9e-4b1c-9655-85455a488d63}">
+            <attached>false</attached>
+            <netsignal>{63cd3916-d2e2-4cf4-83f8-84bcd86cd005}</netsignal>
+            <position x="83.820000" y="167.640000"/>
+        </netpoint>
+        <netpoint uuid="{6f673abe-8ba9-47a4-9642-3fe5d8af1c68}">
+            <attached>false</attached>
+            <netsignal>{63cd3916-d2e2-4cf4-83f8-84bcd86cd005}</netsignal>
+            <position x="73.660000" y="157.480000"/>
+        </netpoint>
+        <netpoint uuid="{8fee073b-47cb-4c04-816e-c15f30eb474b}">
+            <attached>false</attached>
+            <netsignal>{63cd3916-d2e2-4cf4-83f8-84bcd86cd005}</netsignal>
+            <position x="73.660000" y="134.620000"/>
+        </netpoint>
+        <netpoint uuid="{a1373686-4457-4eda-9104-43a8936dc06f}">
+            <attached>false</attached>
+            <netsignal>{63cd3916-d2e2-4cf4-83f8-84bcd86cd005}</netsignal>
+            <position x="78.740000" y="129.540000"/>
+        </netpoint>
+        <netpoint uuid="{bd47c91c-0428-4698-930e-24c887bbcaa0}">
+            <attached>true</attached>
+            <symbol>{1b23712a-cab7-4056-9596-22cd700045d0}</symbol>
+            <pin>{702df32a-635f-46e9-85d2-5b7e2c20aa87}</pin>
+        </netpoint>
+        <netpoint uuid="{9983dd74-015d-4859-b6cd-0008a142ccc4}">
+            <attached>true</attached>
+            <symbol>{b52fac3b-5d3f-47df-88af-4aa87b9b2f39}</symbol>
+            <pin>{b5ec7a0f-0f26-482e-a68e-e9a8f108cb80}</pin>
+        </netpoint>
+        <netpoint uuid="{15fcd49f-fd01-41fb-b519-2f6e7998402e}">
+            <attached>false</attached>
+            <netsignal>{655ffec0-4797-4896-87cb-84096e075deb}</netsignal>
+            <position x="119.380000" y="165.100000"/>
+        </netpoint>
+        <netpoint uuid="{fd51a950-4d8c-4543-b21b-5e7f822ef0d4}">
+            <attached>false</attached>
+            <netsignal>{655ffec0-4797-4896-87cb-84096e075deb}</netsignal>
+            <position x="111.760000" y="157.480000"/>
+        </netpoint>
+        <netpoint uuid="{598e4d32-5f55-4db2-8707-8ae4d358a55e}">
+            <attached>false</attached>
+            <netsignal>{655ffec0-4797-4896-87cb-84096e075deb}</netsignal>
+            <position x="111.760000" y="149.860000"/>
+        </netpoint>
+        <netpoint uuid="{451e8e1d-6d97-4e54-bbc0-f56bd9dfd88b}">
+            <attached>false</attached>
+            <netsignal>{655ffec0-4797-4896-87cb-84096e075deb}</netsignal>
+            <position x="119.380000" y="142.240000"/>
+        </netpoint>
+        <netpoint uuid="{56bdb47a-9a4a-4922-b735-2abffd1383cd}">
+            <attached>false</attached>
+            <netsignal>{655ffec0-4797-4896-87cb-84096e075deb}</netsignal>
+            <position x="233.680000" y="142.240000"/>
+        </netpoint>
+        <netpoint uuid="{ad7b67bf-85d2-43f4-8039-cdedd42ab7f9}">
+            <attached>false</attached>
+            <netsignal>{655ffec0-4797-4896-87cb-84096e075deb}</netsignal>
+            <position x="236.220000" y="139.700000"/>
+        </netpoint>
+        <netpoint uuid="{512ba33f-b28c-47b0-b478-c88e6e4d6e70}">
+            <attached>false</attached>
+            <netsignal>{655ffec0-4797-4896-87cb-84096e075deb}</netsignal>
+            <position x="236.220000" y="134.620000"/>
+        </netpoint>
+        <netpoint uuid="{dbb50205-aa6c-4054-b68b-12354da94a45}">
+            <attached>false</attached>
+            <netsignal>{655ffec0-4797-4896-87cb-84096e075deb}</netsignal>
+            <position x="233.680000" y="132.080000"/>
+        </netpoint>
+        <netpoint uuid="{bddfbb0c-6ace-463e-ac87-70ff55203f71}">
+            <attached>true</attached>
+            <symbol>{18c5a382-4590-4da3-8a54-c0ca6e20074e}</symbol>
+            <pin>{1339ffc8-afb2-4137-9d37-d9801ac2bfd0}</pin>
+        </netpoint>
+        <netpoint uuid="{7c3ac753-6954-45cd-bae9-0c4a80d43a1a}">
+            <attached>true</attached>
+            <symbol>{b52fac3b-5d3f-47df-88af-4aa87b9b2f39}</symbol>
+            <pin>{b8aa2aa5-9b1b-4d9a-90c5-b584fe48f5a4}</pin>
+        </netpoint>
+        <netpoint uuid="{9517b835-40a7-4314-b9db-6b15c4dac323}">
+            <attached>false</attached>
+            <netsignal>{6def778b-4966-42c0-9fa9-036928ea63e6}</netsignal>
+            <position x="223.520000" y="170.180000"/>
+        </netpoint>
+        <netpoint uuid="{b9bba648-b196-4949-b319-3a48371b4016}">
+            <attached>false</attached>
+            <netsignal>{6def778b-4966-42c0-9fa9-036928ea63e6}</netsignal>
+            <position x="248.920000" y="144.780000"/>
+        </netpoint>
+        <netpoint uuid="{74a7e194-c95a-4e2b-8d01-aefb6bc71e02}">
+            <attached>false</attached>
+            <netsignal>{6def778b-4966-42c0-9fa9-036928ea63e6}</netsignal>
+            <position x="248.920000" y="99.060000"/>
+        </netpoint>
+        <netpoint uuid="{c333935d-ba3a-4eb1-896f-cc10257b7e58}">
+            <attached>false</attached>
+            <netsignal>{6def778b-4966-42c0-9fa9-036928ea63e6}</netsignal>
+            <position x="238.760000" y="88.900000"/>
+        </netpoint>
+        <netpoint uuid="{8263a140-4811-4478-84df-2a373fd10948}">
+            <attached>true</attached>
+            <symbol>{b04405a2-4874-442e-bb76-a7725bd2139e}</symbol>
+            <pin>{702df32a-635f-46e9-85d2-5b7e2c20aa87}</pin>
+        </netpoint>
+        <netpoint uuid="{d5a14e56-1f13-4f2f-b5af-a844c402726f}">
+            <attached>true</attached>
+            <symbol>{b04405a2-4874-442e-bb76-a7725bd2139e}</symbol>
+            <pin>{1339ffc8-afb2-4137-9d37-d9801ac2bfd0}</pin>
+        </netpoint>
+        <netpoint uuid="{f45cac5c-4bbd-44cc-8abb-a896555c7948}">
+            <attached>false</attached>
+            <netsignal>{5fb5a1c9-249b-4f60-b20f-a0d1b4479420}</netsignal>
+            <position x="236.220000" y="99.060000"/>
+        </netpoint>
+        <netpoint uuid="{30360b98-eb00-44f2-a7ae-121d47223b85}">
+            <attached>false</attached>
+            <netsignal>{5fb5a1c9-249b-4f60-b20f-a0d1b4479420}</netsignal>
+            <position x="238.760000" y="101.600000"/>
+        </netpoint>
+        <netpoint uuid="{6b2f8ca6-1b5c-4d54-81f3-8cd277fe6932}">
+            <attached>false</attached>
+            <netsignal>{5fb5a1c9-249b-4f60-b20f-a0d1b4479420}</netsignal>
+            <position x="238.760000" y="121.920000"/>
+        </netpoint>
+        <netpoint uuid="{90785dde-3a30-4607-9e45-86330e5b0998}">
+            <attached>false</attached>
+            <netsignal>{5fb5a1c9-249b-4f60-b20f-a0d1b4479420}</netsignal>
+            <position x="236.220000" y="124.460000"/>
+        </netpoint>
+        <netpoint uuid="{5fa40c66-b6dd-49f7-a8ea-3a9a1df368b3}">
+            <attached>true</attached>
+            <symbol>{18c5a382-4590-4da3-8a54-c0ca6e20074e}</symbol>
+            <pin>{702df32a-635f-46e9-85d2-5b7e2c20aa87}</pin>
+        </netpoint>
+        <netpoint uuid="{6309b0dc-f0b6-4638-bd18-fb313f2aaab8}">
+            <attached>true</attached>
+            <symbol>{3636465f-0e63-4e33-a29c-36fee2ccc3bc}</symbol>
+            <pin>{1339ffc8-afb2-4137-9d37-d9801ac2bfd0}</pin>
+        </netpoint>
+        <netpoint uuid="{22a189d0-7f2f-48ce-8192-19368eab20d4}">
+            <attached>false</attached>
+            <netsignal>{2baa4f93-f706-4c9d-944c-33fc131ee2df}</netsignal>
+            <position x="73.660000" y="88.900000"/>
+        </netpoint>
+        <netpoint uuid="{ce186603-3745-473f-9183-4d6846f4f79d}">
+            <attached>false</attached>
+            <netsignal>{2baa4f93-f706-4c9d-944c-33fc131ee2df}</netsignal>
+            <position x="73.660000" y="99.060000"/>
+        </netpoint>
+        <netpoint uuid="{79a477df-699e-4455-9575-409a59339f9e}">
+            <attached>true</attached>
+            <symbol>{3636465f-0e63-4e33-a29c-36fee2ccc3bc}</symbol>
+            <pin>{702df32a-635f-46e9-85d2-5b7e2c20aa87}</pin>
+        </netpoint>
+        <netpoint uuid="{07c634e6-96fc-417f-84e2-e80c15678729}">
+            <attached>true</attached>
+            <symbol>{1b23712a-cab7-4056-9596-22cd700045d0}</symbol>
+            <pin>{1339ffc8-afb2-4137-9d37-d9801ac2bfd0}</pin>
+        </netpoint>
+        <netpoint uuid="{5e930c6a-e5c5-48f1-8c6d-fc3848b7b6da}">
+            <attached>false</attached>
+            <netsignal>{2baa4f93-f706-4c9d-944c-33fc131ee2df}</netsignal>
+            <position x="73.660000" y="121.920000"/>
         </netpoint>
     </netpoints>
     <netlines>
-        <netline uuid="{1820f200-96f1-4023-9d5c-f46aeeadf225}" start_point="{bba3a2c9-e6b2-4d8b-b2d3-8c9304d1785a}" end_point="{129871b0-54c4-473e-b4bc-7414a07c2159}" width="0.254">
-        </netline>
-        <netline uuid="{80705ab7-d112-4f64-8ed2-629d056bb4f0}" start_point="{a64bb3b6-40a7-4563-b9e8-d21a66483e8c}" end_point="{92a4e38d-59a7-4fdc-83e4-227f258b8de2}" width="0.254">
-        </netline>
-        <netline uuid="{78de5c7d-42fb-4e6a-b2fc-126eeedef9f1}" start_point="{72f23b29-c6dd-43f6-a161-5e7ecb1ece4e}" end_point="{a64bb3b6-40a7-4563-b9e8-d21a66483e8c}" width="0.254">
-        </netline>
-        <netline uuid="{da2623d9-423a-4783-9003-d768633d4931}" start_point="{8ac55d32-01b1-4cdf-ae4c-addb310e822b}" end_point="{89aaf2ad-c6d4-4e7e-a05b-5d29bc0d131f}" width="0.254">
-        </netline>
-        <netline uuid="{5462bc19-6195-4fb7-82de-b24173f34ac4}" start_point="{89aaf2ad-c6d4-4e7e-a05b-5d29bc0d131f}" end_point="{7358dfc9-8bbe-4a2d-94c3-4dba9b4092f5}" width="0.254">
-        </netline>
-        <netline uuid="{46f4d15a-5775-4efd-b9c9-cd0b878f33c3}" start_point="{7358dfc9-8bbe-4a2d-94c3-4dba9b4092f5}" end_point="{645a9c94-1d1d-4ee2-9b9b-97d05d97e086}" width="0.254">
-        </netline>
-        <netline uuid="{0cbd5ec0-a217-4405-bfe7-acedbebca2db}" start_point="{645a9c94-1d1d-4ee2-9b9b-97d05d97e086}" end_point="{1696d706-e74f-4739-bce0-f537ef69b30d}" width="0.254">
-        </netline>
-        <netline uuid="{486d4bb7-22d0-472c-803f-9029129f3a20}" start_point="{148059c8-568d-4e2d-9592-06427b084ea1}" end_point="{4bec1194-949d-498c-aa7c-a17a9b72e714}" width="0.254">
-        </netline>
-        <netline uuid="{af066a13-0de7-41d6-a480-6530023eae5b}" start_point="{4bec1194-949d-498c-aa7c-a17a9b72e714}" end_point="{bd1e71e6-aef5-457d-97a4-867c08296993}" width="0.254">
-        </netline>
-        <netline uuid="{1024ee97-3543-4daf-8d45-3f6ce3234a4a}" start_point="{bd1e71e6-aef5-457d-97a4-867c08296993}" end_point="{148059c8-568d-4e2d-9592-06427b084ea1}" width="0.254">
-        </netline>
-        <netline uuid="{6ad1ab3d-77ae-489c-a5af-faea566e7a7f}" start_point="{4bec1194-949d-498c-aa7c-a17a9b72e714}" end_point="{9f2689d4-a241-43ab-b4a4-f18f2cc15264}" width="0.254">
-        </netline>
+        <netline start_point="{3f701b3a-fa8b-4277-bf68-14c1d40b7f05}" end_point="{635f2417-4f41-4cf1-9b5d-3132965ec25d}" uuid="{d0eacc17-2351-4d37-8c8e-aa867c92dbe4}" width="0.254000"/>
+        <netline start_point="{635f2417-4f41-4cf1-9b5d-3132965ec25d}" end_point="{0b11ed42-cb92-4f39-bf1c-c60af71c98a5}" uuid="{d3af95d3-f691-4195-bf9e-f21b2a797540}" width="0.254000"/>
+        <netline start_point="{0b11ed42-cb92-4f39-bf1c-c60af71c98a5}" end_point="{56d1ddd8-77dd-447f-bd1d-4d433b564c24}" uuid="{fa4d0d07-c236-49d1-b5dc-6bde06f5f090}" width="0.254000"/>
+        <netline start_point="{56d1ddd8-77dd-447f-bd1d-4d433b564c24}" end_point="{b26e4675-5d9c-475c-aeea-55fb94aff7f5}" uuid="{7c2fe108-a151-4bbe-893d-d6d354dfccd8}" width="0.254000"/>
+        <netline start_point="{b26e4675-5d9c-475c-aeea-55fb94aff7f5}" end_point="{6b020430-af8b-4409-8310-a4ae655dddbd}" uuid="{79e02d90-db97-435e-8546-8d07aa408ba6}" width="0.254000"/>
+        <netline start_point="{6b020430-af8b-4409-8310-a4ae655dddbd}" end_point="{e0c1a065-af60-42d4-bba1-e5d7c2cc127e}" uuid="{df947b59-c0e3-441d-ae23-c7a58a701055}" width="0.254000"/>
+        <netline start_point="{6b020430-af8b-4409-8310-a4ae655dddbd}" end_point="{a9add319-8054-48ad-b1e1-0ddda061fe56}" uuid="{1d281c2f-06db-4001-aa0c-0b6590fdb224}" width="0.254000"/>
+        <netline start_point="{a9add319-8054-48ad-b1e1-0ddda061fe56}" end_point="{32894f64-0868-4bef-af81-53627675959c}" uuid="{a826803f-f3ad-4d9c-8892-a6518dcbaa17}" width="0.254000"/>
+        <netline start_point="{32894f64-0868-4bef-af81-53627675959c}" end_point="{7380786e-7e48-4f4b-ba2d-3f89b43ce3bc}" uuid="{597dbd51-1325-40ad-a494-55ad272822f2}" width="0.254000"/>
+        <netline start_point="{9992732b-0133-42fd-95e6-b7697f30f605}" end_point="{2df5a910-b076-4c84-bbe5-3fdf54a3940b}" uuid="{a24fbe1e-52fe-453e-99a0-cee4a695b0d1}" width="0.254000"/>
+        <netline start_point="{2df5a910-b076-4c84-bbe5-3fdf54a3940b}" end_point="{a16d8d27-4a32-46dc-a657-48782fb04f1a}" uuid="{6a1eaf33-de8c-4b6e-a242-f7d44444270f}" width="0.254000"/>
+        <netline start_point="{a16d8d27-4a32-46dc-a657-48782fb04f1a}" end_point="{d2f4277d-173a-4f33-98ca-ecae88726124}" uuid="{83c32f1a-458f-4f6d-9b64-d6a3f81bebb7}" width="0.254000"/>
+        <netline start_point="{d2f4277d-173a-4f33-98ca-ecae88726124}" end_point="{8a14fe54-7f6c-4be4-8b63-f843bb9bea79}" uuid="{995e6990-ee43-47e5-af37-f4aa25f92952}" width="0.254000"/>
+        <netline start_point="{8a14fe54-7f6c-4be4-8b63-f843bb9bea79}" end_point="{1dc38ef8-c48f-4a9c-a233-c8fe9b0f56f0}" uuid="{4d083a48-2fd0-4350-890e-b0ba1ecc47f7}" width="0.254000"/>
+        <netline start_point="{1dc38ef8-c48f-4a9c-a233-c8fe9b0f56f0}" end_point="{b4b2a227-2f07-4207-b2e6-221e9a3a01a7}" uuid="{5b51951d-53a1-4158-a0c8-a70d1549fff4}" width="0.254000"/>
+        <netline start_point="{1dc38ef8-c48f-4a9c-a233-c8fe9b0f56f0}" end_point="{21eda86a-7df5-4d0d-992b-d6e4e04cc57c}" uuid="{b819a221-24cd-42c3-b76c-e2c372680d0d}" width="0.254000"/>
+        <netline start_point="{21eda86a-7df5-4d0d-992b-d6e4e04cc57c}" end_point="{95be7eaa-e9d6-4f76-b409-38d2c05b1ee5}" uuid="{f76ad09e-5cb2-49a0-96ec-9a84300ad3d6}" width="0.254000"/>
+        <netline start_point="{95be7eaa-e9d6-4f76-b409-38d2c05b1ee5}" end_point="{ec242792-8346-4990-9673-7425dbd06b30}" uuid="{07b63618-a6b2-4a95-bc4d-3ced23905e2c}" width="0.254000"/>
+        <netline start_point="{ebc1df37-64da-4b0f-85f4-f4e8893e2bfc}" end_point="{69714155-fd4a-48b5-a368-e353d725dbc1}" uuid="{0e37a11f-2d8e-4b73-8ee8-8f8eff1acd8f}" width="0.254000"/>
+        <netline start_point="{69714155-fd4a-48b5-a368-e353d725dbc1}" end_point="{fac35e58-3d1a-4158-9235-fd8b9ba0106e}" uuid="{5a8ecbe7-fd42-434b-8315-046d359ca8ed}" width="0.254000"/>
+        <netline start_point="{fac35e58-3d1a-4158-9235-fd8b9ba0106e}" end_point="{9252dc7c-dd2d-4024-a4e2-bee63ac87af1}" uuid="{8abbd4a0-7591-44dd-9fa5-b1860c9694ba}" width="0.254000"/>
+        <netline start_point="{d66ff550-dcb6-457b-9b99-9b399f25ccf1}" end_point="{a65ec140-11c1-4de3-b447-78ea4b94b638}" uuid="{8659b568-2460-40d4-90c4-88fc28f57ed8}" width="0.254000"/>
+        <netline start_point="{a65ec140-11c1-4de3-b447-78ea4b94b638}" end_point="{5fe25fc7-1fbc-4c80-8c72-1c42b443b43a}" uuid="{cfadca22-db13-46ef-acc8-d011f97aec87}" width="0.254000"/>
+        <netline start_point="{5fe25fc7-1fbc-4c80-8c72-1c42b443b43a}" end_point="{ea40a685-ebec-4a74-9a31-bb17c7e7349b}" uuid="{8252297a-2d6b-442c-b24b-a2224ab58338}" width="0.254000"/>
+        <netline start_point="{4d8a3611-aae5-41ba-8dad-6e514cb49080}" end_point="{462521bb-9e9e-4b1c-9655-85455a488d63}" uuid="{3c1202b4-974b-4d6d-8fee-8c2f4b7e37db}" width="0.254000"/>
+        <netline start_point="{462521bb-9e9e-4b1c-9655-85455a488d63}" end_point="{6f673abe-8ba9-47a4-9642-3fe5d8af1c68}" uuid="{bfc01e43-590f-43d0-99c6-e3ad9e4477ee}" width="0.254000"/>
+        <netline start_point="{6f673abe-8ba9-47a4-9642-3fe5d8af1c68}" end_point="{8fee073b-47cb-4c04-816e-c15f30eb474b}" uuid="{d05b1def-6ecd-4757-9422-729a0316765e}" width="0.254000"/>
+        <netline start_point="{8fee073b-47cb-4c04-816e-c15f30eb474b}" end_point="{a1373686-4457-4eda-9104-43a8936dc06f}" uuid="{00c60901-f796-4ac0-8b51-f7d1956f55ce}" width="0.254000"/>
+        <netline start_point="{a1373686-4457-4eda-9104-43a8936dc06f}" end_point="{bd47c91c-0428-4698-930e-24c887bbcaa0}" uuid="{e799be49-b04d-4588-9bb6-1db060d1a3ec}" width="0.254000"/>
+        <netline start_point="{9983dd74-015d-4859-b6cd-0008a142ccc4}" end_point="{15fcd49f-fd01-41fb-b519-2f6e7998402e}" uuid="{75835a18-3db4-4774-8437-dc9d0afc229e}" width="0.254000"/>
+        <netline start_point="{15fcd49f-fd01-41fb-b519-2f6e7998402e}" end_point="{fd51a950-4d8c-4543-b21b-5e7f822ef0d4}" uuid="{87fda473-a1ff-4d56-b2fb-01849b05f99c}" width="0.254000"/>
+        <netline start_point="{fd51a950-4d8c-4543-b21b-5e7f822ef0d4}" end_point="{598e4d32-5f55-4db2-8707-8ae4d358a55e}" uuid="{c319f295-79e0-4c84-925d-33cc7d7f5b77}" width="0.254000"/>
+        <netline start_point="{598e4d32-5f55-4db2-8707-8ae4d358a55e}" end_point="{451e8e1d-6d97-4e54-bbc0-f56bd9dfd88b}" uuid="{41b632fd-8b11-4061-b2e7-7168639d114d}" width="0.254000"/>
+        <netline start_point="{451e8e1d-6d97-4e54-bbc0-f56bd9dfd88b}" end_point="{56bdb47a-9a4a-4922-b735-2abffd1383cd}" uuid="{d7911fac-21f1-47b0-b617-682eeac0a811}" width="0.254000"/>
+        <netline start_point="{56bdb47a-9a4a-4922-b735-2abffd1383cd}" end_point="{ad7b67bf-85d2-43f4-8039-cdedd42ab7f9}" uuid="{9c2aeac6-5ccf-45a2-9bd0-42289488f8d7}" width="0.254000"/>
+        <netline start_point="{ad7b67bf-85d2-43f4-8039-cdedd42ab7f9}" end_point="{512ba33f-b28c-47b0-b478-c88e6e4d6e70}" uuid="{10568d21-8eb5-4550-acad-e4cb3b540528}" width="0.254000"/>
+        <netline start_point="{512ba33f-b28c-47b0-b478-c88e6e4d6e70}" end_point="{dbb50205-aa6c-4054-b68b-12354da94a45}" uuid="{58ad7216-5802-4e3d-bda2-6faf4623884f}" width="0.254000"/>
+        <netline start_point="{dbb50205-aa6c-4054-b68b-12354da94a45}" end_point="{bddfbb0c-6ace-463e-ac87-70ff55203f71}" uuid="{992d5e51-039a-4c13-9b15-ffad240837bb}" width="0.254000"/>
+        <netline start_point="{7c3ac753-6954-45cd-bae9-0c4a80d43a1a}" end_point="{9517b835-40a7-4314-b9db-6b15c4dac323}" uuid="{7c8ca5e4-3622-4098-b39d-09d0c142a4c5}" width="0.254000"/>
+        <netline start_point="{9517b835-40a7-4314-b9db-6b15c4dac323}" end_point="{b9bba648-b196-4949-b319-3a48371b4016}" uuid="{8d917d21-50c4-40cd-9348-94a4497a47b1}" width="0.254000"/>
+        <netline start_point="{b9bba648-b196-4949-b319-3a48371b4016}" end_point="{74a7e194-c95a-4e2b-8d01-aefb6bc71e02}" uuid="{c9886e33-c87f-4019-86cf-3c2803f6c0da}" width="0.254000"/>
+        <netline start_point="{74a7e194-c95a-4e2b-8d01-aefb6bc71e02}" end_point="{c333935d-ba3a-4eb1-896f-cc10257b7e58}" uuid="{df716c45-eb9f-41f7-9eb5-153f962f414a}" width="0.254000"/>
+        <netline start_point="{c333935d-ba3a-4eb1-896f-cc10257b7e58}" end_point="{8263a140-4811-4478-84df-2a373fd10948}" uuid="{a1f892fa-3d80-4182-b696-509512c721e0}" width="0.254000"/>
+        <netline start_point="{d5a14e56-1f13-4f2f-b5af-a844c402726f}" end_point="{f45cac5c-4bbd-44cc-8abb-a896555c7948}" uuid="{a1d6e9a8-c2c6-4573-a149-abacb4521076}" width="0.254000"/>
+        <netline start_point="{f45cac5c-4bbd-44cc-8abb-a896555c7948}" end_point="{30360b98-eb00-44f2-a7ae-121d47223b85}" uuid="{9fc08ce5-5a37-461e-8815-ec451164dc86}" width="0.254000"/>
+        <netline start_point="{30360b98-eb00-44f2-a7ae-121d47223b85}" end_point="{6b2f8ca6-1b5c-4d54-81f3-8cd277fe6932}" uuid="{3379adc0-297d-46fc-9ed2-439aa724d26f}" width="0.254000"/>
+        <netline start_point="{6b2f8ca6-1b5c-4d54-81f3-8cd277fe6932}" end_point="{90785dde-3a30-4607-9e45-86330e5b0998}" uuid="{cbf46c48-70bf-4777-bf74-3d74fdf5a3d3}" width="0.254000"/>
+        <netline start_point="{90785dde-3a30-4607-9e45-86330e5b0998}" end_point="{5fa40c66-b6dd-49f7-a8ea-3a9a1df368b3}" uuid="{f831bbae-1fed-4b9a-886e-24edb5b4de11}" width="0.254000"/>
+        <netline start_point="{6309b0dc-f0b6-4638-bd18-fb313f2aaab8}" end_point="{22a189d0-7f2f-48ce-8192-19368eab20d4}" uuid="{c474b86e-9759-4738-8d91-cee9f27f1897}" width="0.254000"/>
+        <netline start_point="{22a189d0-7f2f-48ce-8192-19368eab20d4}" end_point="{ce186603-3745-473f-9183-4d6846f4f79d}" uuid="{6426b059-894d-4680-98da-9ee6aeeac042}" width="0.254000"/>
+        <netline start_point="{ce186603-3745-473f-9183-4d6846f4f79d}" end_point="{79a477df-699e-4455-9575-409a59339f9e}" uuid="{1adc7af2-0720-4db8-9725-e64f60e8c780}" width="0.254000"/>
+        <netline start_point="{07c634e6-96fc-417f-84e2-e80c15678729}" end_point="{5e930c6a-e5c5-48f1-8c6d-fc3848b7b6da}" uuid="{94b7ba52-6fdd-4014-8b82-52c99a51c4b6}" width="0.254000"/>
+        <netline start_point="{5e930c6a-e5c5-48f1-8c6d-fc3848b7b6da}" end_point="{ce186603-3745-473f-9183-4d6846f4f79d}" uuid="{efbae932-c161-4fa1-ad48-2e5388c31016}" width="0.254000"/>
     </netlines>
 </schematic>
