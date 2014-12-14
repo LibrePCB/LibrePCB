@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 
-#include "../workspacesettingsitem.h"
+#include "wsi_base.h"
 #include "../../../common/units.h"
 
 /*****************************************************************************************
@@ -38,7 +38,7 @@
  * @author ubruhin
  * @date 2014-10-04
  */
-class WSI_AppDefaultMeasurementUnits final : public WorkspaceSettingsItem
+class WSI_AppDefaultMeasurementUnits final : public WSI_Base
 {
         Q_OBJECT
 

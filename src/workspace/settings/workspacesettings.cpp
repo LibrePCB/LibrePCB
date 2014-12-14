@@ -76,19 +76,19 @@ WorkspaceSettings::~WorkspaceSettings()
 
 void WorkspaceSettings::restoreDefaults() noexcept
 {
-    foreach (WorkspaceSettingsItem* item, mItems)
+    foreach (WSI_Base* item, mItems)
         item->restoreDefault();
 }
 
 void WorkspaceSettings::applyAll() noexcept
 {
-    foreach (WorkspaceSettingsItem* item, mItems)
+    foreach (WSI_Base* item, mItems)
         item->apply();
 }
 
 void WorkspaceSettings::revertAll() noexcept
 {
-    foreach (WorkspaceSettingsItem* item, mItems)
+    foreach (WSI_Base* item, mItems)
         item->revert();
 }
 

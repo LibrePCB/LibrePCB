@@ -30,7 +30,7 @@
  ****************************************************************************************/
 
 WSI_LibraryNormOrder::WSI_LibraryNormOrder(WorkspaceSettings& settings) :
-    WorkspaceSettingsItem(settings), mWidget(0), mListWidget(0), mComboBox(0), mBtnUp(0),
+    WSI_Base(settings), mWidget(0), mListWidget(0), mComboBox(0), mBtnUp(0),
     mBtnDown(0), mBtnAdd(0), mBtnRemove(0)
 {
     mList = loadValue("lib_norm_order").toStringList();

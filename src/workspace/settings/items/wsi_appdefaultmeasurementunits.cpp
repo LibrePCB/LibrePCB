@@ -30,7 +30,7 @@
  ****************************************************************************************/
 
 WSI_AppDefaultMeasurementUnits::WSI_AppDefaultMeasurementUnits(WorkspaceSettings& settings) :
-    WorkspaceSettingsItem(settings), mLengthUnit(LengthUnit::millimeters()),
+    WSI_Base(settings), mLengthUnit(LengthUnit::millimeters()),
     mLengthUnitTmp(LengthUnit::millimeters()), mLengthUnitComboBox(0)
 {
     // load default length unit

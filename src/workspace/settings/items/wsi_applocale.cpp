@@ -30,7 +30,7 @@
  ****************************************************************************************/
 
 WSI_AppLocale::WSI_AppLocale(WorkspaceSettings& settings) :
-    WorkspaceSettingsItem(settings), mWidget(0), mComboBox(0)
+    WSI_Base(settings), mWidget(0), mComboBox(0)
 {
     mAppLocale = loadValue("app_locale_name", QString()).toString();
     mAppLocaleTmp = mAppLocale;

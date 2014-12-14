@@ -23,20 +23,20 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include "workspacesettingsitem.h"
-#include "workspacesettings.h"
-#include "../workspace.h"
+#include "wsi_base.h"
+#include "../workspacesettings.h"
+#include "../../workspace.h"
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WorkspaceSettingsItem::WorkspaceSettingsItem(WorkspaceSettings& settings) :
+WSI_Base::WSI_Base(WorkspaceSettings& settings) :
     QObject(0), mSettings(settings)
 {
 }
 
-WorkspaceSettingsItem::~WorkspaceSettingsItem()
+WSI_Base::~WSI_Base()
 {
 }
 
@@ -44,14 +44,14 @@ WorkspaceSettingsItem::~WorkspaceSettingsItem()
  *  Helper Methods
  ****************************************************************************************/
 
-void WorkspaceSettingsItem::saveValue(const QString& key, const QVariant& value)
+void WSI_Base::saveValue(const QString& key, const QVariant& value)
 {
     QSettings s(mSettings.getMetadataPath().getPathTo("settings.ini").toStr(),
                 QSettings::IniFormat);
     s.setValue("settings/" % key, value);
 }
 
-QVariant WorkspaceSettingsItem::loadValue(const QString& key, const QVariant& defaultValue) const
+QVariant WSI_Base::loadValue(const QString& key, const QVariant& defaultValue) const
 {
     QSettings s(mSettings.getMetadataPath().getPathTo("settings.ini").toStr(),
                 QSettings::IniFormat);

@@ -126,7 +126,7 @@ SOURCES += \
     project/schematics/cmd/cmdschematicnetpointremove.cpp \
     project/schematics/cmd/cmdschematicnetlineadd.cpp \
     project/schematics/cmd/cmdschematicnetlineremove.cpp \
-    workspace/settings/workspacesettingsitem.cpp \
+    workspace/settings/items/wsi_base.cpp \
     workspace/settings/items/wsi_applocale.cpp \
     workspace/settings/items/wsi_projectautosaveinterval.cpp \
     workspace/settings/items/wsi_librarylocaleorder.cpp \
@@ -224,7 +224,7 @@ HEADERS += \
     project/schematics/cmd/cmdschematicnetpointremove.h \
     project/schematics/cmd/cmdschematicnetlineadd.h \
     project/schematics/cmd/cmdschematicnetlineremove.h \
-    workspace/settings/workspacesettingsitem.h \
+    workspace/settings/items/wsi_base.h \
     workspace/settings/items/wsi_applocale.h \
     workspace/settings/items/wsi_projectautosaveinterval.h \
     workspace/settings/items/wsi_librarylocaleorder.h \

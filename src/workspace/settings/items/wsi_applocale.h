@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 
-#include "../workspacesettingsitem.h"
+#include "wsi_base.h"
 
 /*****************************************************************************************
  *  Class WSI_AppLocale
@@ -37,7 +37,7 @@
  * @author ubruhin
  * @date 2014-10-04
  */
-class WSI_AppLocale final : public WorkspaceSettingsItem
+class WSI_AppLocale final : public WSI_Base
 {
         Q_OBJECT
 

@@ -125,7 +125,7 @@ class WorkspaceSettings final : public QObject
 
 
         // Settings Items
-        QList<WorkspaceSettingsItem*> mItems; ///< contains all settings items
+        QList<WSI_Base*> mItems; ///< contains all settings items
         WSI_AppLocale* mAppLocale;
         WSI_AppDefaultMeasurementUnits* mAppDefMeasUnits;
         WSI_ProjectAutosaveInterval* mProjectAutosaveInterval;

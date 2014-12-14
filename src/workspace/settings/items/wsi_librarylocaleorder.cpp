@@ -30,7 +30,7 @@
  ****************************************************************************************/
 
 WSI_LibraryLocaleOrder::WSI_LibraryLocaleOrder(WorkspaceSettings& settings) :
-    WorkspaceSettingsItem(settings), mWidget(0), mListWidget(0), mComboBox(0), mBtnUp(0),
+    WSI_Base(settings), mWidget(0), mListWidget(0), mComboBox(0), mBtnUp(0),
     mBtnDown(0), mBtnAdd(0), mBtnRemove(0)
 {
     QStringList list = loadValue("lib_locale_order", QLocale::system().uiLanguages()).toStringList();

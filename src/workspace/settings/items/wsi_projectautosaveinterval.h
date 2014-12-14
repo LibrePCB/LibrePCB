@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 
-#include "../workspacesettingsitem.h"
+#include "wsi_base.h"
 
 /*****************************************************************************************
  *  Class WSI_ProjectAutosaveInterval
@@ -40,7 +40,7 @@
  * @author ubruhin
  * @date 2014-10-04
  */
-class WSI_ProjectAutosaveInterval final : public WorkspaceSettingsItem
+class WSI_ProjectAutosaveInterval final : public WSI_Base
 {
         Q_OBJECT
 

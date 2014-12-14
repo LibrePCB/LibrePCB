@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 
-#include "../workspacesettingsitem.h"
+#include "wsi_base.h"
 
 /*****************************************************************************************
  *  Class WSI_LibraryNormOrder
@@ -37,7 +37,7 @@
  * @author ubruhin
  * @date 2014-11-01
  */
-class WSI_LibraryNormOrder final : public WorkspaceSettingsItem
+class WSI_LibraryNormOrder final : public WSI_Base
 {
         Q_OBJECT
 

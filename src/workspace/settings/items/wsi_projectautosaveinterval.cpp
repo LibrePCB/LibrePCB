@@ -30,7 +30,7 @@
  ****************************************************************************************/
 
 WSI_ProjectAutosaveInterval::WSI_ProjectAutosaveInterval(WorkspaceSettings& settings) :
-    WorkspaceSettingsItem(settings), mWidget(0), mSpinBox(0)
+    WSI_Base(settings), mWidget(0), mSpinBox(0)
 {
     bool ok;
     mInterval = loadValue("project_autosave_interval", 600).toUInt(&ok);

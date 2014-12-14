@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WORKSPACESETTINGSITEM_H
-#define WORKSPACESETTINGSITEM_H
+#ifndef WSI_BASE_H
+#define WSI_BASE_H
 
 /*****************************************************************************************
  *  Includes
@@ -34,28 +34,28 @@
 class WorkspaceSettings;
 
 /*****************************************************************************************
- *  Class WorkspaceSettingsItem
+ *  Class WSI_Base
  ****************************************************************************************/
 
 /**
- * @brief The WorkspaceSettingsItem class is the base class of all workspace settings items
+ * @brief The WSI_Base class is the base class of all workspace settings items
  *
  * Every workspace setting is represented by a seperate object. All of these objects have
- * this class as base class. The name of all subclasses of WorkspaceSettingsItem begin
- * with the prefix "WSI_" to easily recognize them.
+ * this class as base class. The name of all Workspace Settings Items begin with the
+ * prefix "WSI_" to easily recognize them.
  *
  * @author ubruhin
  * @date 2014-10-04
  */
-class WorkspaceSettingsItem : public QObject
+class WSI_Base : public QObject
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit WorkspaceSettingsItem(WorkspaceSettings& settings);
-        virtual ~WorkspaceSettingsItem();
+        explicit WSI_Base(WorkspaceSettings& settings);
+        virtual ~WSI_Base();
 
         // General Methods
         virtual void restoreDefault() = 0;
@@ -75,9 +75,9 @@ class WorkspaceSettingsItem : public QObject
     private:
 
         // make some methods inaccessible...
-        WorkspaceSettingsItem();
-        WorkspaceSettingsItem(const WorkspaceSettingsItem& other);
-        WorkspaceSettingsItem& operator=(const WorkspaceSettingsItem& rhs);
+        WSI_Base();
+        WSI_Base(const WSI_Base& other);
+        WSI_Base& operator=(const WSI_Base& rhs);
 };
 
-#endif // WORKSPACESETTINGSITEM_H
+#endif // WSI_BASE_H
