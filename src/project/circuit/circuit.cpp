@@ -32,6 +32,7 @@
 #include "netsignal.h"
 #include "genericcomponentinstance.h"
 #include "editnetclassesdialog.h"
+#include "../../library/genericcomponent.h"
 
 namespace project {
 
@@ -335,8 +336,26 @@ GenericComponentInstance* Circuit::getGenCompInstanceByName(const QString& name)
 
 GenericComponentInstance* Circuit::createGenCompInstance(const library::GenericComponent& genComp,
                                                          const library::GenCompSymbVar& symbVar,
-                                                         const QString& name) throw (Exception)
+                                                         QString name) throw (Exception)
 {
+    if (name.isEmpty())
+    {
+        QString prefix = genComp.getPrefix();
+        if (prefix.isEmpty()) prefix = "?";
+        unsigned int i = 1;
+        do
+        {
+            name = QString("%1%2").arg(prefix).arg(i++); // find a new unique component name
+        } while (getGenCompInstanceByName(name));
+    }
+    else
+    {
+        if (getGenCompInstanceByName(name))
+        {
+            throw RuntimeError(__FILE__, __LINE__, name, QString(tr("The component "
+                "name \"%1\" does already exist in the circuit.")).arg(name));
+        }
+    }
     return GenericComponentInstance::create(*this, mXmlFile->getDocument(), genComp, symbVar, name);
 }
 

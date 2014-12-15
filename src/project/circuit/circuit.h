@@ -95,7 +95,7 @@ class Circuit final : public QObject
         GenericComponentInstance* getGenCompInstanceByName(const QString& name) const noexcept;
         GenericComponentInstance* createGenCompInstance(const library::GenericComponent& genComp,
                                                         const library::GenCompSymbVar& symbVar,
-                                                        const QString& name) throw (Exception);
+                                                        QString name = QString()) throw (Exception);
         void addGenCompInstance(GenericComponentInstance* genCompInstance, bool toDomTree = true) throw (Exception);
         void removeGenCompInstance(GenericComponentInstance* genCompInstance, bool fromDomTree = true,
                              bool deleteGenCompInstance = false) throw (Exception);

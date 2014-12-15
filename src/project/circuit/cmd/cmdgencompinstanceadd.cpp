@@ -55,8 +55,7 @@ void CmdGenCompInstanceAdd::redo() throw (Exception)
 {
     if (!mGenCompInstance) // only the first time
     {
-        mGenCompInstance = mCircuit.createGenCompInstance(mGenComp, mSymbVar,
-                           QString("TODO_%1").arg(qrand())); // throws an exception on error
+        mGenCompInstance = mCircuit.createGenCompInstance(mGenComp, mSymbVar); // throws an exception on error
     }
 
     mCircuit.addGenCompInstance(mGenCompInstance); // throws an exception on error
