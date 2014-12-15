@@ -109,10 +109,10 @@ SES_Base::ProcRetVal SES_Select::processSubStateIdle(SEE_Base* event) noexcept
     switch (event->getType())
     {
         case SEE_Base::Edit_RotateCW:
-            rotateSelectedItems(Angle(90000000), Point(), true);
+            rotateSelectedItems(Angle::deg90(), Point(), true);
             return ForceStayInState;
         case SEE_Base::Edit_RotateCCW:
-            rotateSelectedItems(Angle(-90000000), Point(), true);
+            rotateSelectedItems(-Angle::deg90(), Point(), true);
             return ForceStayInState;
         case SEE_Base::Edit_Remove:
             removeSelectedItems();

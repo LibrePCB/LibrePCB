@@ -386,6 +386,9 @@
    <property name="text">
     <string>Rotate counterclockwise</string>
    </property>
+   <property name="shortcut">
+    <string>Shift+R</string>
+   </property>
   </action>
   <action name="actionRotate_CW">
    <property name="icon">
@@ -394,6 +397,9 @@
    </property>
    <property name="text">
     <string>Rotate clockwise</string>
+   </property>
+   <property name="shortcut">
+    <string>R</string>
    </property>
   </action>
   <action name="actionCopy">

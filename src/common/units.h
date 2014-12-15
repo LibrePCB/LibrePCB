@@ -694,6 +694,7 @@ class Length
         Length& operator/=(const Length& rhs)       {mNanometers /= rhs.mNanometers; return *this;}
         Length& operator/=(LengthBase_t rhs)        {mNanometers /= rhs; return *this;}
         Length  operator+(const Length& rhs) const  {return Length(mNanometers + rhs.mNanometers);}
+        Length  operator-() const                   {return Length(-mNanometers);}
         Length  operator-(const Length& rhs) const  {return Length(mNanometers - rhs.mNanometers);}
         Length  operator*(const Length& rhs) const  {return Length(mNanometers * rhs.mNanometers);}
         Length  operator*(LengthBase_t rhs) const   {return Length(mNanometers * rhs);}
@@ -1014,6 +1015,7 @@ class Angle
         Angle&  operator+=(const Angle& rhs)        {mMicrodegrees = (mMicrodegrees + rhs.mMicrodegrees) % 360000000; return *this;}
         Angle&  operator-=(const Angle& rhs)        {mMicrodegrees = (mMicrodegrees - rhs.mMicrodegrees) % 360000000; return *this;}
         Angle   operator+(const Angle& rhs) const   {return Angle(mMicrodegrees + rhs.mMicrodegrees);}
+        Angle   operator-() const                   {return Angle(-mMicrodegrees);}
         Angle   operator-(const Angle& rhs) const   {return Angle(mMicrodegrees - rhs.mMicrodegrees);}
         Angle   operator*(const Angle& rhs) const   {return Angle(mMicrodegrees * rhs.mMicrodegrees);}
         Angle   operator*(qint32 rhs) const         {return Angle(mMicrodegrees * rhs);}
@@ -1378,6 +1380,7 @@ class Point
         Point&  operator/=(const Point& rhs)       {mX /= rhs.mX; mY /= rhs.mY; return *this;}
         Point&  operator/=(LengthBase_t rhs)       {mX /= rhs;    mY /= rhs;    return *this;}
         Point   operator+(const Point& rhs) const  {return Point(mX + rhs.mX, mY + rhs.mY);}
+        Point   operator-() const                  {return Point(-mX, -mY);}
         Point   operator-(const Point& rhs) const  {return Point(mX - rhs.mX, mY - rhs.mY);}
         Point   operator*(const Length& rhs) const {return Point(mX * rhs, mY * rhs);}
         Point   operator*(LengthBase_t rhs) const  {return Point(mX * rhs, mY * rhs);}

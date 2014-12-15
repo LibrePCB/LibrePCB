@@ -60,6 +60,12 @@ SES_Base::ProcRetVal SES_AddComponents::process(SEE_Base* event) noexcept
 {
     switch (event->getType())
     {
+        case SEE_Base::Edit_RotateCW:
+            mCurrentSymboleMoveCommand->rotate(Angle::deg90());
+            return ForceStayInState;
+        case SEE_Base::Edit_RotateCCW:
+            mCurrentSymboleMoveCommand->rotate(-Angle::deg90());
+            return ForceStayInState;
         case SEE_Base::SchematicSceneEvent:
             return processSceneEvent(event);
         default:
@@ -235,24 +241,9 @@ SES_Base::ProcRetVal SES_AddComponents::processSceneEvent(SEE_Base* event) noexc
 
                 case Qt::RightButton:
                     // rotate symbol
-                    mCurrentSymboleMoveCommand->rotate90degreesCCW();
+                    mCurrentSymboleMoveCommand->rotate(Angle::deg90());
                     return ForceStayInState;
 
-                default:
-                    break;
-            }
-            break;
-        }
-
-        case QEvent::KeyPress:
-        {
-            QKeyEvent* keyEvent = dynamic_cast<QKeyEvent*>(qevent);
-            Q_ASSERT(keyEvent);
-            switch (keyEvent->key())
-            {
-                case Qt::Key_R:
-                    mCurrentSymboleMoveCommand->rotate90degreesCCW();
-                    return ForceStayInState;
                 default:
                     break;
             }
