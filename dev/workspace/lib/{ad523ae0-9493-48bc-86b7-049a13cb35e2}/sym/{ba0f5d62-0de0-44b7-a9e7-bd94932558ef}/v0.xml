@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<symbol file_version="0">
+    <meta>
+        <uuid>{ba0f5d62-0de0-44b7-a9e7-bd94932558ef}</uuid>
+        <version>0.1</version>
+        <author>EagleImport</author>
+        <created>2014-12-17T19:48:00Z</created>
+        <last_modified>2014-12-17T19:48:00Z</last_modified>
+        <categories>
+            <category>{00000000-e485-4af1-9679-bd66e8055f07}</category>
+        </categories>
+        <name locale="en_US">Resistor IEC 60617</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US">resistor,resistance</keywords>
+    </meta>
+    <geometry>
+        <polygon fill_layer="11" start_y="-3.08" line_width="0.254" line_layer="10" start_x="-1.016" grab_area="true">
+            <segment type="line" end_x="1.016" end_y="-3.08"/>
+            <segment type="line" end_x="1.016" end_y="3.08"/>
+            <segment type="line" end_x="-1.016" end_y="3.08"/>
+            <segment type="line" end_x="-1.016" end_y="-3.08"/>
+        </polygon>
+        <text layer="20" text="${NAME}"  x="2.5" y="0"      angle="0" height="3.175" v_align="bottom" h_align="left"/>
+        <text layer="21" text="${VALUE}" x="2.5" y="-3.175" angle="0" height="3.175" v_align="bottom" h_align="left"/>
+    </geometry>
+    <pins>
+        <pin x="0" length="2" angle="180" y="5.08" uuid="{a8d042bd-cfd0-4231-a1b9-92bf1e0b892d}">
+            <name locale="en_US">1</name>
+            <description locale="en_US">Pin 1</description>
+        </pin>
+        <pin x="0" length="2" angle="0" y="-5.08" uuid="{869d7642-09d2-4fb4-8f9d-fa55224b02d7}">
+            <name locale="en_US">2</name>
+            <description locale="en_US">Pin 2</description>
+        </pin>
+    </pins>
+</symbol>

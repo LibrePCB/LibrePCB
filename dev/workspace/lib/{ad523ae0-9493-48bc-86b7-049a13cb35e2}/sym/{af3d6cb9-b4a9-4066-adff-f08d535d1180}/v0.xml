@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<symbol file_version="0">
+    <meta>
+        <uuid>{af3d6cb9-b4a9-4066-adff-f08d535d1180}</uuid>
+        <version>0.1</version>
+        <author>EagleImport</author>
+        <created>2014-12-17T19:48:00Z</created>
+        <last_modified>2014-12-17T19:48:00Z</last_modified>
+        <categories>
+            <category>{00000000-e485-4af1-9679-bd66e8055f07}</category>
+        </categories>
+        <name locale="en_US">Inductor IEC 60617</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US">inductor,inductance</keywords>
+    </meta>
+    <geometry>
+        <polygon fill_layer="10" start_y="-3.08" line_width="0.254" line_layer="10" start_x="-1.016" grab_area="true">
+            <segment type="line" end_x="1.016" end_y="-3.08"/>
+            <segment type="line" end_x="1.016" end_y="3.08"/>
+            <segment type="line" end_x="-1.016" end_y="3.08"/>
+            <segment type="line" end_x="-1.016" end_y="-3.08"/>
+        </polygon>
+        <text layer="20" text="${NAME}"  x="2.5" y="0"      angle="0" height="3.175" v_align="bottom" h_align="left"/>
+        <text layer="21" text="${VALUE}" x="2.5" y="-3.175" angle="0" height="3.175" v_align="bottom" h_align="left"/>
+    </geometry>
+    <pins>
+        <pin x="0" length="2" angle="180" y="5.08" uuid="{8aae73e8-cda2-4cce-ac18-03652d621f57}">
+            <name locale="en_US">1</name>
+            <description locale="en_US">Pin 1</description>
+        </pin>
+        <pin x="0" length="2" angle="0" y="-5.08" uuid="{434a03a9-e6b5-40da-87b7-d78e6abc4c99}">
+            <name locale="en_US">2</name>
+            <description locale="en_US">Pin 2</description>
+        </pin>
+    </pins>
+</symbol>
