@@ -84,6 +84,11 @@ class SchematicEditor : public QMainWindow, public IF_CADSceneEventHandler
         void on_actionGrid_triggered();
         void on_actionPDF_Export_triggered();
         void on_actionToolAddComponent_triggered();
+        void on_actionAddGenCmp_Resistor_triggered();
+        void on_actionAddGenCmp_Capacitor_triggered();
+        void on_actionAddGenCmp_Inductor_triggered();
+        void on_actionAddGenCmp_gnd_triggered();
+        void on_actionAddGenCmp_vcc_triggered();
 
     signals:
 

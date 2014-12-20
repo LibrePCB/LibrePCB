@@ -291,24 +291,57 @@ void SchematicEditor::on_actionPDF_Export_triggered()
 
 void SchematicEditor::on_actionToolAddComponent_triggered()
 {
-    // start adding components
-    //SEE_Base* addEvent = new SEE_Base(SEE_Base::StartAddComponent);
-    //bool accepted = mFsm->processEvent(addEvent, true);
-    //mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
-    //if (!accepted) return;
-
-    // pass all required parameters to the FSM
+    // TODO: use the component chooser dialog
     QUuid genCompUuid = "{60000002-3c94-4689-be29-92235ba993c5}";
     QUuid symbVarUuid = "{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}";
-    //FilePath genCompFilepath("/media/Daten/Eigene_Dateien/Programmieren/QT_Creator/EDA4U/EDA4U/dev/workspace/lib/{ad523ae0-9493-48bc-86b7-049a13cb35e2}/gencmp/{60000002-3c94-4689-be29-92235ba993c5}/v0.xml");
-    //QHash<QUuid, FilePath> requiredSymbols;
-    //requiredSymbols.insert("{20000002-9873-41f2-9ab1-bff6be4e5ea1}", FilePath("/media/Daten/Eigene_Dateien/Programmieren/QT_Creator/EDA4U/EDA4U/dev/workspace/lib/{ad523ae0-9493-48bc-86b7-049a13cb35e2}/sym/{20000002-9873-41f2-9ab1-bff6be4e5ea1}/v0.xml"));
-    //requiredSymbols.insert("{20000003-9873-41f2-9ab1-bff6be4e5ea1}", FilePath("/media/Daten/Eigene_Dateien/Programmieren/QT_Creator/EDA4U/EDA4U/dev/workspace/lib/{ad523ae0-9493-48bc-86b7-049a13cb35e2}/sym/{20000003-9873-41f2-9ab1-bff6be4e5ea1}/v0.xml"));
-    //requiredSymbols.insert("{20000004-9873-41f2-9ab1-bff6be4e5ea1}", FilePath("/media/Daten/Eigene_Dateien/Programmieren/QT_Creator/EDA4U/EDA4U/dev/workspace/lib/{ad523ae0-9493-48bc-86b7-049a13cb35e2}/sym/{20000004-9873-41f2-9ab1-bff6be4e5ea1}/v0.xml"));
     SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(genCompUuid, symbVarUuid);
-    bool accepted = mFsm->processEvent(addEvent, true);
+    mFsm->processEvent(addEvent, true);
     mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
-    if (!accepted) return;
+}
+
+void SchematicEditor::on_actionAddGenCmp_Resistor_triggered()
+{
+    QUuid genCompUuid = "{2262ba69-33b0-414d-b03b-e1924a3fb3c8}";
+    QUuid symbVarUuid = "{e8e00b88-f086-4edc-b3e1-742f2dcd2058}";
+    SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(genCompUuid, symbVarUuid);
+    mFsm->processEvent(addEvent, true);
+    mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
+}
+
+void SchematicEditor::on_actionAddGenCmp_Capacitor_triggered()
+{
+    QUuid genCompUuid = "{e139c1ba-9d18-4f64-8a43-9a008ada7118}";
+    QUuid symbVarUuid = "{94df66a0-a1f5-4b7d-9c57-22531a38e1f1}";
+    SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(genCompUuid, symbVarUuid);
+    mFsm->processEvent(addEvent, true);
+    mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
+}
+
+void SchematicEditor::on_actionAddGenCmp_Inductor_triggered()
+{
+    QUuid genCompUuid = "{b39b86e1-2bcc-44fa-ae41-39d2f4b9f71f}";
+    QUuid symbVarUuid = "{f9c64190-8dc9-4e3a-ab93-9437b0b3aae8}";
+    SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(genCompUuid, symbVarUuid);
+    mFsm->processEvent(addEvent, true);
+    mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
+}
+
+void SchematicEditor::on_actionAddGenCmp_gnd_triggered()
+{
+    //QUuid genCompUuid = "{60000002-3c94-4689-be29-92235ba993c5}";
+    //QUuid symbVarUuid = "{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}";
+    //SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(genCompUuid, symbVarUuid);
+    //mFsm->processEvent(addEvent, true);
+    //mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
+}
+
+void SchematicEditor::on_actionAddGenCmp_vcc_triggered()
+{
+    //QUuid genCompUuid = "{60000002-3c94-4689-be29-92235ba993c5}";
+    //QUuid symbVarUuid = "{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}";
+    //SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(genCompUuid, symbVarUuid);
+    //mFsm->processEvent(addEvent, true);
+    //mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
 }
 
 /*****************************************************************************************

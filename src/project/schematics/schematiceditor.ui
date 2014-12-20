@@ -229,6 +229,22 @@
    <addaction name="actionLayers"/>
    <addaction name="actionGrid"/>
   </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>true</bool>
+   </attribute>
+   <addaction name="actionAddGenCmp_Resistor"/>
+   <addaction name="actionAddGenCmp_Capacitor"/>
+   <addaction name="actionAddGenCmp_Inductor"/>
+   <addaction name="actionAddGenCmp_gnd"/>
+   <addaction name="actionAddGenCmp_vcc"/>
+  </widget>
   <action name="actionQuit">
    <property name="icon">
     <iconset resource="../../../img/images.qrc">
@@ -576,6 +592,51 @@
   <action name="actionEditNetclasses">
    <property name="text">
     <string>Net Classes</string>
+   </property>
+  </action>
+  <action name="actionAddGenCmp_Resistor">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/library/resistor_eu.png</normaloff>:/img/library/resistor_eu.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Resistor</string>
+   </property>
+  </action>
+  <action name="actionAddGenCmp_Capacitor">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/library/capacitor_eu.png</normaloff>:/img/library/capacitor_eu.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Capacitor</string>
+   </property>
+  </action>
+  <action name="actionAddGenCmp_Inductor">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/library/inductor_eu.png</normaloff>:/img/library/inductor_eu.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Inductor</string>
+   </property>
+  </action>
+  <action name="actionAddGenCmp_gnd">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/library/gnd.png</normaloff>:/img/library/gnd.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add GND</string>
+   </property>
+  </action>
+  <action name="actionAddGenCmp_vcc">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/library/vcc.png</normaloff>:/img/library/vcc.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add VCC</string>
    </property>
   </action>
  </widget>
