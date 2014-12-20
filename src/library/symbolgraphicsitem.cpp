@@ -37,6 +37,7 @@
 #include "symbolpingraphicsitem.h"
 #include "../workspace/workspace.h"
 #include "../project/circuit/genericcomponentinstance.h"
+#include "../workspace/settings/workspacesettings.h"
 
 namespace library {
 
@@ -187,7 +188,8 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
     }
 
     // only for debugging: show symbols count of the generic component
-    if ((mSymbolInstance) && (!deviceIsPrinter))
+    if ((mSymbolInstance) && (!deviceIsPrinter) &&
+        (Workspace::instance().getSettings().getDebugTools()->getShowGenCompSymbolCount()))
     {
         layer = getSchematicLayer(SchematicLayer::Busses);
         if (layer)

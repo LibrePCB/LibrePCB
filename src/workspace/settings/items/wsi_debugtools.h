@@ -46,6 +46,8 @@ class WSI_DebugTools final : public WSI_Base
         // Getters
         bool getShowAllSchematicNetpoints() const noexcept {return mCbxShowAllSchematicNetpoints->isChecked();}
         bool getShowSchematicNetlinesNetsignals() const noexcept {return mCbxShowSchematicNetlinesNetsignals->isChecked();}
+        bool getShowSymbolPinNetsignals() const noexcept {return mCbxShowSymbolPinNetsignals->isChecked();}
+        bool getShowGenCompSymbolCount() const noexcept {return mCbxShowGenCompSymbolCount->isChecked();}
 
         // Getters: Widgets
         QWidget* getWidget() const {return mWidget;}
@@ -68,6 +70,8 @@ class WSI_DebugTools final : public WSI_Base
         QWidget* mWidget;
         QCheckBox* mCbxShowAllSchematicNetpoints;
         QCheckBox* mCbxShowSchematicNetlinesNetsignals;
+        QCheckBox* mCbxShowSymbolPinNetsignals;
+        QCheckBox* mCbxShowGenCompSymbolCount;
 };
 
 #endif // WSI_DEBUGTOOLS_H

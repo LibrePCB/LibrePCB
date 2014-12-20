@@ -37,6 +37,7 @@
 #include "genericcomponent.h"
 #include "../workspace/workspace.h"
 #include "../project/schematics/schematicnetpoint.h"
+#include "../workspace/settings/workspacesettings.h"
 
 namespace library {
 
@@ -108,13 +109,16 @@ void SymbolPinGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsI
         painter->setBrush(Qt::NoBrush);
         if (netsignal)
         {
-            QFont font;
-            font.setFamily("Monospace");
-            font.setPixelSize(3);
-            font.setStyleHint(QFont::TypeWriter);
-            font.setStyleStrategy(QFont::ForceOutline);
-            painter->setFont(font);
-            painter->drawText(QRectF(), Qt::AlignHCenter | Qt::AlignBottom | Qt::TextSingleLine | Qt::TextDontClip, netsignal->getName());
+            if (Workspace::instance().getSettings().getDebugTools()->getShowSymbolPinNetsignals())
+            {
+                QFont font;
+                font.setFamily("Monospace");
+                font.setPixelSize(3);
+                font.setStyleHint(QFont::TypeWriter);
+                font.setStyleStrategy(QFont::ForceOutline);
+                painter->setFont(font);
+                painter->drawText(QRectF(), Qt::AlignHCenter | Qt::AlignBottom | Qt::TextSingleLine | Qt::TextDontClip, netsignal->getName());
+            }
         }
         else
         {

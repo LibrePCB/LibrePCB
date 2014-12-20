@@ -45,6 +45,10 @@ WSI_DebugTools::WSI_DebugTools(WorkspaceSettings& settings) :
     layout->addWidget(mCbxShowAllSchematicNetpoints, layout->rowCount(), 0);
     mCbxShowSchematicNetlinesNetsignals = new QCheckBox(tr("Show Netsignals of Schematic Netlines"));
     layout->addWidget(mCbxShowSchematicNetlinesNetsignals, layout->rowCount(), 0);
+    mCbxShowSymbolPinNetsignals = new QCheckBox(tr("Show Netsignal of Symbol Pins"));
+    layout->addWidget(mCbxShowSymbolPinNetsignals, layout->rowCount(), 0);
+    mCbxShowGenCompSymbolCount = new QCheckBox(tr("Show Count of Placed Symbols"));
+    layout->addWidget(mCbxShowGenCompSymbolCount, layout->rowCount(), 0);
 
     // stretch the last row
     layout->setRowStretch(layout->rowCount(), 1);
@@ -66,18 +70,24 @@ void WSI_DebugTools::restoreDefault()
 {
     mCbxShowAllSchematicNetpoints->setChecked(false);
     mCbxShowSchematicNetlinesNetsignals->setChecked(false);
+    mCbxShowSymbolPinNetsignals->setChecked(false);
+    mCbxShowGenCompSymbolCount->setChecked(false);
 }
 
 void WSI_DebugTools::apply()
 {
     saveValue("dbg_show_all_schematic_netpoints", mCbxShowAllSchematicNetpoints->isChecked());
     saveValue("dbg_show_schematic_netlines_netsignals", mCbxShowSchematicNetlinesNetsignals->isChecked());
+    saveValue("dbg_show_symbol_pin_netsignals", mCbxShowSymbolPinNetsignals->isChecked());
+    saveValue("dbg_show_gen_comp_symbol_count", mCbxShowGenCompSymbolCount->isChecked());
 }
 
 void WSI_DebugTools::revert()
 {
     mCbxShowAllSchematicNetpoints->setChecked(loadValue("dbg_show_all_schematic_netpoints", false).toBool());
     mCbxShowSchematicNetlinesNetsignals->setChecked(loadValue("dbg_show_schematic_netlines_netsignals", false).toBool());
+    mCbxShowSymbolPinNetsignals->setChecked(loadValue("dbg_show_symbol_pin_netsignals", false).toBool());
+    mCbxShowGenCompSymbolCount->setChecked(loadValue("dbg_show_gen_comp_symbol_count", false).toBool());
 }
 
 /*****************************************************************************************
