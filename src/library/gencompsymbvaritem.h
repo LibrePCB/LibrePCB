@@ -52,6 +52,21 @@ class GenCompSymbVarItem final : public QObject
 
     public:
 
+        /// Pin Display Type Enum
+        enum PinDisplayType_t {
+            DisplayType_None,
+            DisplayType_PinName,
+            DisplayType_GenCompSignal,
+            DisplayType_NetSignal
+        };
+
+        /// Pin-Signal-Map item struct
+        struct PinSignalMapItem_t {
+            QUuid pin;                      ///< must be valid
+            QUuid signal;                   ///< NULL if not connected to a signal
+            PinDisplayType_t displayType;
+        };
+
         // Constructors / Destructor
         explicit GenCompSymbVarItem(GenericComponent& genComp, GenCompSymbVar& symbVar,
                                     const QDomElement& domElement) throw (Exception);
@@ -65,8 +80,9 @@ class GenCompSymbVarItem final : public QObject
         const QString& getSuffix() const noexcept {return mSuffix;}
 
         // Getters: Pin-Signal-Map
-        const QHash<QUuid, QUuid>& getPinSignalMap() const noexcept {return mPinSignalMap;}
-        QUuid getSignalOfPin(const QUuid& pinUuid) const noexcept {return mPinSignalMap.value(pinUuid);}
+        const QHash<QUuid, PinSignalMapItem_t>& getPinSignalMap() const noexcept {return mPinSignalMap;}
+        QUuid getSignalOfPin(const QUuid& pinUuid) const noexcept;
+        PinDisplayType_t getDisplayTypeOfPin(const QUuid& pinUuid) const noexcept;
 
 
     private:
@@ -88,7 +104,7 @@ class GenCompSymbVarItem final : public QObject
         int mAddOrderIndex;
         bool mIsRequired;
         QString mSuffix;
-        QHash<QUuid, QUuid> mPinSignalMap; ///< All pins required! Signal UUIDs can be NULL.
+        QHash<QUuid, PinSignalMapItem_t> mPinSignalMap; ///< All pins required!
 };
 
 } // namespace library

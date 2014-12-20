@@ -89,15 +89,25 @@
                 -->
                 <item uuid="{adae210d-c505-487b-9fe8-834a24f14638}" symbol="{20000001-9873-41f2-9ab1-bff6be4e5ea1}" add_order_index="0" required="true" suffix="A">
                     <pin_signal_map>
-                        <!-- This list must contain every pin of the specified symbol! Each pin can be connected to 0 or 1 generic component signal (empty signal uuid = not connected) -->
-                        <map pin="{702df32a-635f-46e9-85d2-5b7e2c20aa87}" signal="{71a44db9-5e42-405f-b6e4-b4725ae37af3}"/>
-                        <map pin="{1339ffc8-afb2-4137-9d37-d9801ac2bfd0}" signal="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}"/>
-                        <map pin="{8207ee9b-89e5-41bc-a633-078952a6c370}" signal="{a9d3d159-fca9-417e-8bba-13829caa6ae5}"/>
-                        <map pin="{b5ec7a0f-0f26-482e-a68e-e9a8f108cb80}" signal="{da30b112-9ab0-4715-8a6a-9e5414169fd4}"/>
-                        <map pin="{10f7c99e-9751-409e-aace-d4fa0f21375f}" signal="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}"/>
-                        <map pin="{255e12e0-00b7-4563-b82c-42a4899fddf1}" signal="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}"/>
-                        <map pin="{b8aa2aa5-9b1b-4d9a-90c5-b584fe48f5a4}" signal="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}"/>
-                        <map pin="{db2223ee-84ce-42ef-93b9-ac6a50b07805}" signal="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}"/>
+                        <!--
+                            This list must contain every pin of the specified symbol!
+                            Attributes:
+                                - pin:      The UUID of the symbol's pin
+                                - signal:   The UUID of the generic component's signal which should be connected to the specified pin (empty string = not connected)
+                                - display:  Specifies which text should be displayed next to the pin
+                                                - none:             No text
+                                                - pin_name:         The name of the symbol's pin
+                                                - gen_comp_signal:  The name of the connected generic component's signal (only allowed when the pin is connected to a signal)
+                                                - net_signal:       The name of the connected net signal in the circuit (only allowed when the pin is connected to a signal)
+                        -->
+                        <map pin="{702df32a-635f-46e9-85d2-5b7e2c20aa87}" signal="{71a44db9-5e42-405f-b6e4-b4725ae37af3}" display="gen_comp_signal"/>
+                        <map pin="{1339ffc8-afb2-4137-9d37-d9801ac2bfd0}" signal="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}" display="gen_comp_signal"/>
+                        <map pin="{8207ee9b-89e5-41bc-a633-078952a6c370}" signal="{a9d3d159-fca9-417e-8bba-13829caa6ae5}" display="gen_comp_signal"/>
+                        <map pin="{b5ec7a0f-0f26-482e-a68e-e9a8f108cb80}" signal="{da30b112-9ab0-4715-8a6a-9e5414169fd4}" display="gen_comp_signal"/>
+                        <map pin="{10f7c99e-9751-409e-aace-d4fa0f21375f}" signal="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}" display="gen_comp_signal"/>
+                        <map pin="{255e12e0-00b7-4563-b82c-42a4899fddf1}" signal="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}" display="gen_comp_signal"/>
+                        <map pin="{b8aa2aa5-9b1b-4d9a-90c5-b584fe48f5a4}" signal="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}" display="gen_comp_signal"/>
+                        <map pin="{db2223ee-84ce-42ef-93b9-ac6a50b07805}" signal="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}" display="gen_comp_signal"/>
                     </pin_signal_map>
                 </item>
             </symbol_items>

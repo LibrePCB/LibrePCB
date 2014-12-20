@@ -73,33 +73,68 @@ GenCompSymbVarItem::GenCompSymbVarItem(GenericComponent& genComp, GenCompSymbVar
     tmpNode = mDomElement.firstChildElement("pin_signal_map").firstChildElement("map");
     while (!tmpNode.isNull())
     {
-        QUuid pin(tmpNode.attribute("pin"));
-        QUuid signal(tmpNode.attribute("signal"));
-        if (pin.isNull())
+        PinSignalMapItem_t item;
+        item.pin = tmpNode.attribute("pin");
+        item.signal = tmpNode.attribute("signal");
+        if (item.pin.isNull())
         {
             throw RuntimeError(__FILE__, __LINE__, tmpNode.attribute("pin"),
                 QString(tr("Invalid pin UUID \"%1\" found in \"%2\"."))
                 .arg(tmpNode.attribute("pin"), mGenericComponent.getXmlFilepath().toNative()));
         }
-        if ((signal.isNull()) && (!tmpNode.attribute("signal").isEmpty()))
+        if ((item.signal.isNull()) && (!tmpNode.attribute("signal").isEmpty()))
         {
             throw RuntimeError(__FILE__, __LINE__, tmpNode.attribute("signal"),
                 QString(tr("Invalid signal UUID \"%1\" found in \"%2\"."))
                 .arg(tmpNode.attribute("signal"), mGenericComponent.getXmlFilepath().toNative()));
         }
-        if (mPinSignalMap.contains(pin))
+        if (mPinSignalMap.contains(item.pin))
         {
-            throw RuntimeError(__FILE__, __LINE__, pin.toString(),
+            throw RuntimeError(__FILE__, __LINE__, item.pin.toString(),
                 QString(tr("The pin \"%1\" is assigned to multiple signals in \"%2\"."))
-                .arg(pin.toString(), mGenericComponent.getXmlFilepath().toNative()));
+                .arg(item.pin.toString(), mGenericComponent.getXmlFilepath().toNative()));
         }
-        mPinSignalMap.insert(pin, signal);
+        if (tmpNode.attribute("display") == "none")
+            item.displayType = DisplayType_None;
+        else if (tmpNode.attribute("display") == "pin_name")
+            item.displayType = DisplayType_PinName;
+        else if (tmpNode.attribute("display") == "gen_comp_signal")
+            item.displayType = DisplayType_GenCompSignal;
+        else if (tmpNode.attribute("display") == "net_signal")
+            item.displayType = DisplayType_NetSignal;
+        else
+        {
+            throw RuntimeError(__FILE__, __LINE__, tmpNode.attribute("display"),
+                QString(tr("Invalid pin display type \"%1\" found in \"%2\"."))
+                .arg(tmpNode.attribute("display"), mGenericComponent.getXmlFilepath().toNative()));
+        }
+        mPinSignalMap.insert(item.pin, item);
         tmpNode = tmpNode.nextSiblingElement("map");
     }
 }
 
 GenCompSymbVarItem::~GenCompSymbVarItem() noexcept
 {
+}
+
+/*****************************************************************************************
+ *  Getters
+ ****************************************************************************************/
+
+QUuid GenCompSymbVarItem::getSignalOfPin(const QUuid& pinUuid) const noexcept
+{
+    if (mPinSignalMap.contains(pinUuid))
+        return mPinSignalMap.value(pinUuid).signal;
+    else
+        return QUuid();
+}
+
+GenCompSymbVarItem::PinDisplayType_t GenCompSymbVarItem::getDisplayTypeOfPin(const QUuid& pinUuid) const noexcept
+{
+    if (mPinSignalMap.contains(pinUuid))
+        return mPinSignalMap.value(pinUuid).displayType;
+    else
+        return DisplayType_None;
 }
 
 /*****************************************************************************************

@@ -81,15 +81,28 @@ void SymbolPinGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsI
     bool selected = (option->state & QStyle::State_Selected) || mSymbolGraphicsItem.isSelected();
     bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
 
+    QString text;
     SchematicLayer* layer = 0;
     const GenCompSignal* genCompSignal = 0;
     const project::NetSignal* netsignal = 0;
     if (mPinInstance)
     {
+        const GenCompSymbVarItem& item = mPinInstance->getSymbolInstance().getGenCompSymbVarItem();
         genCompSignal = mPinInstance->getGenCompSignal();
         netsignal = genCompSignal ? mPinInstance->getGenCompSignalInstance()->getNetSignal() : 0;
+        switch (item.getDisplayTypeOfPin(mPin.getUuid()))
+        {
+            case GenCompSymbVarItem::DisplayType_PinName:
+                text = mPin.getName(); break;
+            case GenCompSymbVarItem::DisplayType_GenCompSignal:
+                if (genCompSignal) text = genCompSignal->getName(); break;
+            case GenCompSymbVarItem::DisplayType_NetSignal:
+                if (netsignal) text = netsignal->getName(); break;
+            default: break;
+        }
     }
-    QString text = (genCompSignal) ? genCompSignal->getName() : mPin.getName();
+    else
+        text = mPin.getName();
 
     // line
     layer = getSchematicLayer(SchematicLayer::SymbolOutlines);
@@ -129,7 +142,7 @@ void SymbolPinGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsI
 
     // text
     layer = getSchematicLayer(SchematicLayer::SymbolPinNames);
-    if (layer)
+    if ((layer) && (!text.isEmpty()))
     {
         painter->setPen(QPen(layer->getColor(selected), 0));
         QFont font;
