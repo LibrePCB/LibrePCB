@@ -16,7 +16,7 @@
     <changelog/>
     <attachements/>
     <geometry>
-        <polygon layer="10" width="0.254" fill="true" start_x="-10.16" start_y="-7.62">
+        <polygon line_layer="10" line_width="0.254" fill_layer="11" start_x="-10.16" start_y="-7.62" grab_area="true">
             <segment type="line" end_x="10.16" end_y="-7.62"/>
             <segment type="line" end_x="10.16" end_y="5.08"/>
             <segment type="line" end_x="-10.16" end_y="5.08"/>

@@ -19,23 +19,23 @@
     <changelog/>
     <attachements/>
     <geometry>
-        <polygon layer="10" width="0.6" fill="false" start_x="0" start_y="0">
+        <polygon line_layer="10" line_width="0.6" fill_layer="0" start_x="0" start_y="0" grab_area="false">
             <segment type="line" end_x="0" end_y="210"/>
             <segment type="line" end_x="297" end_y="210"/>
             <segment type="line" end_x="297" end_y="0"/>
             <segment type="line" end_x="0" end_y="0"/>
         </polygon>
-        <polygon layer="10" width="0.6" fill="false" start_x="150" start_y="0">
+        <polygon line_layer="10" line_width="0.6" fill_layer="0" start_x="150" start_y="0" grab_area="false">
             <segment type="line" end_x="150" end_y="30"/>
             <segment type="line" end_x="297" end_y="30"/>
         </polygon>
-        <polygon layer="10" width="0.6" fill="false" start_x="250" start_y="0">
+        <polygon line_layer="10" line_width="0.6" fill_layer="0" start_x="250" start_y="0" grab_area="false">
             <segment type="line" end_x="250" end_y="30"/>
         </polygon>
-        <polygon layer="10" width="0.6" fill="false" start_x="150" start_y="12">
+        <polygon line_layer="10" line_width="0.6" fill_layer="0" start_x="150" start_y="12" grab_area="false">
             <segment type="line" end_x="297" end_y="12"/>
         </polygon>
-        <polygon layer="10" width="0.6" fill="false" start_x="250" start_y="21">
+        <polygon line_layer="10" line_width="0.6" fill_layer="0" start_x="250" start_y="21" grab_area="false">
             <segment type="line" end_x="297" end_y="21"/>
         </polygon>
         <text layer="10" text="${PROJECT::NAME}"       x="153" y="0"   angle="0" height="12" v_align="bottom" h_align="left"/>

@@ -64,9 +64,10 @@ class SymbolPolygon final : public QObject
         ~SymbolPolygon() noexcept;
 
         // Getters
-        unsigned int getLayerId() const noexcept {return mLayerId;}
-        const Length& getWidth() const noexcept {return mWidth;}
-        bool getFill() const noexcept {return mFill;}
+        uint getLineLayerId() const noexcept {return mLineLayerId;}
+        uint getFillLayerId() const noexcept {return mFillLayerId;}
+        const Length& getLineWidth() const noexcept {return mLineWidth;}
+        bool isGrabArea() const noexcept {return mIsGrabArea;}
         const Point& getStartPos() const noexcept {return mStartPos;}
         const QList<const PolygonSegment_t*>& getSegments() const noexcept {return mSegments;}
 
@@ -84,9 +85,10 @@ class SymbolPolygon final : public QObject
         QDomElement mDomElement;
 
         // Polygon Attributes
-        unsigned int mLayerId;
-        Length mWidth;
-        bool mFill;
+        uint mLineLayerId;
+        uint mFillLayerId;
+        Length mLineWidth;
+        bool mIsGrabArea;
         Point mStartPos;
         QList<const PolygonSegment_t*> mSegments;
 };

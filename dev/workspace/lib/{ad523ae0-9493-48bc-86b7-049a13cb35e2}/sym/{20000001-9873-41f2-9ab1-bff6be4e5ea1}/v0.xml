@@ -22,11 +22,12 @@
             At the moment, there are only two types of geometry elements:
             
             polygon: This is used to draw lines, rectangles, arcs and polygons with lines and arcs. Attributes:
-                - layer:    The ID of the layer (see class SchematicLayer)
-                - width:    Line width in millimeters
-                - fill:     If true, this polygon will be filled with the fill color of the specified layer (may be transparent). This should be true for symbol outlines.
-                - start_x:  X coordinate of the first point of the polygon (in millimeters)
-                - start_y:  Y coordinate of the first point of the polygon (in millimeters)
+                - line_layer:   The ID of the layer to draw the polygon outline (see class SchematicLayer)
+                - line_width:   Line width in millimeters
+                - fill_layer:   The ID of the layer to fill the polygon (see class SchematicLayer). 0 for non-filled polygons. Often used for symbol outline polygons.
+                - start_x:      X coordinate of the first point of the polygon (in millimeters)
+                - start_y:      Y coordinate of the first point of the polygon (in millimeters)
+                - grab_area:    If true, the whole area defined by the polygon allows the user to grab the symbol with the cursor (to select, move, ...)
                 
                 Segments: Each polygon must contain at least one segment. The order of them is important! Attributes:
                     - type:     The type of this polygon segment: "line" or "arc"
@@ -44,7 +45,7 @@
                 - h_align:  Horizontal alignment (left, center, right)
                 - v_align:  Vertical alignment (top, center, bottom)
         -->
-        <polygon layer="10" width="0.254" fill="true" start_x="-10.16" start_y="-7.62">
+        <polygon line_layer="10" line_width="0.254" fill_layer="11" start_x="-10.16" start_y="-7.62" grab_area="true">
             <segment type="line" end_x="-10.16" end_y="5.08"/>
             <segment type="line" end_x="10.16" end_y="5.08"/>
             <segment type="line" end_x="10.16" end_y="-7.62"/>

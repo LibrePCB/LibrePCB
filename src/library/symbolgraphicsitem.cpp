@@ -99,30 +99,16 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
     bool selected = option->state & QStyle::State_Selected;
     bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
 
-    // draw origin cross
-    if (!deviceIsPrinter)
-    {
-        layer = getSchematicLayer(SchematicLayer::OriginCrosses);
-        if (layer)
-        {
-            qreal width = Length(700000).toPx();
-            QPen pen(layer->getColor(selected), width);
-            pen.setCosmetic(true);
-            painter->setPen(pen);
-            painter->drawLine(-2*width, 0, 2*width, 0);
-            painter->drawLine(0, -2*width, 0, 2*width);
-        }
-    }
-
     // draw all polygons
     foreach (const SymbolPolygon* polygon, mSymbol.getPolygons())
     {
         // set colors
-        layer = getSchematicLayer(polygon->getLayerId());
+        layer = getSchematicLayer(polygon->getLineLayerId());
         if (!layer) continue;
-        painter->setPen(QPen(layer->getColor(selected), polygon->getWidth().toPx(), Qt::SolidLine, Qt::RoundCap));
-        if (polygon->getFill())
-            painter->setBrush(QBrush(layer->getFillColor(selected), Qt::SolidPattern));
+        painter->setPen(QPen(layer->getColor(selected), polygon->getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap));
+        layer = getSchematicLayer(polygon->getFillLayerId());
+        if (layer)
+            painter->setBrush(QBrush(layer->getColor(selected), Qt::SolidPattern));
         else
             painter->setBrush(Qt::NoBrush);
 
@@ -207,6 +193,21 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
                               QString("[%1/%2]").arg(count).arg(maxCount));
         }
     }
+
+    // draw origin cross
+    if (!deviceIsPrinter)
+    {
+        layer = getSchematicLayer(SchematicLayer::OriginCrosses);
+        if (layer)
+        {
+            qreal width = Length(700000).toPx();
+            QPen pen(layer->getColor(selected), width);
+            pen.setCosmetic(true);
+            painter->setPen(pen);
+            painter->drawLine(-2*width, 0, 2*width, 0);
+            painter->drawLine(0, -2*width, 0, 2*width);
+        }
+    }
 }
 
 /*****************************************************************************************
@@ -246,9 +247,9 @@ bool SymbolGraphicsItem::updateBoundingRectAndShape() noexcept
                     return false;
             }
         }
-        qreal w = polygon->getWidth().toPx() / 2;
+        qreal w = polygon->getLineWidth().toPx() / 2;
         boundingRect = boundingRect.united(polygonPath.boundingRect().adjusted(-w, -w, w, w));
-        if (polygon->getFill())
+        if (polygon->isGrabArea())
             shape = shape.united(polygonPath);
     }
 

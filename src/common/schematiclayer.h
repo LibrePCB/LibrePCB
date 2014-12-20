@@ -50,8 +50,9 @@ class SchematicLayer final : public QObject
 
             // Symbols
             SymbolOutlines      = 10,
-            SymbolPinCircles    = 11,
-            SymbolPinNames      = 12,
+            SymbolGrabAreas     = 11,
+            SymbolPinCircles    = 12,
+            SymbolPinNames      = 13,
 
             // Symbols in a Schematic
             ComponentNames      = 20,
@@ -73,7 +74,6 @@ class SchematicLayer final : public QObject
         unsigned int getId() const {return mId;}
         const QString& getName() const {return mName;}
         const QColor& getColor(bool highlighted = false) const;
-        const QColor& getFillColor(bool highlighted = false) const;
 
         // Static Methods
         static QList<LayerID> getAllLayerIDs() noexcept;
@@ -91,8 +91,6 @@ class SchematicLayer final : public QObject
         QString mName;
         QColor mColor;
         QColor mColorHighlighted;
-        QColor mFillColor;
-        QColor mFillColorHighlighted;
 };
 
 /*****************************************************************************************
@@ -112,16 +110,15 @@ class SchematicLayer final : public QObject
             - ID:   An unsigned integer which identifies the layer (must be unique)
             - Name: The name of the layer (translated into the user's language)
             - Color:    The color which is used to draw elements of that layer
-            - Fill Color:   The color which is used to fill elements of that layer
             - Color (highlighted): The color for highlighted (selected) elements
-            - Fill Color (highlighted): The fill color for highlighted (selected) elements
 
     @section doc_schematic_layer_ids Layer IDs
         The following layers exist:
             - 1:    Origin Crosses
             - 10:   Symbol Outlines
-            - 11:   Symbol Pin Circles
-            - 12:   Symbol Pin Names (Text)
+            - 11:   Symbol Grab Areas
+            - 12:   Symbol Pin Circles
+            - 13:   Symbol Pin Names (Text)
             - 20:   Component Names (Text)
             - 21:   Component Values (Text)
             - 30:   Nets (in Schematics, see project#SchematicNetPoint and project#SchematicNetLine)

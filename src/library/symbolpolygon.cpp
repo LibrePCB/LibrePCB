@@ -35,19 +35,27 @@ SymbolPolygon::SymbolPolygon(Symbol& symbol, const QDomElement& domElement) thro
     QObject(0), mSymbol(symbol), mDomElement(domElement)
 {
     QDomElement tmpNode;
+    bool ok;
 
-    bool ok = false;
-    mLayerId = mDomElement.attribute("layer").toUInt(&ok);
+    // load layers
+    mLineLayerId = mDomElement.attribute("line_layer").toUInt(&ok);
     if (!ok)
     {
-        throw RuntimeError(__FILE__, __LINE__, mDomElement.attribute("layer"),
-            QString(tr("Invalid layer ID \"%1\" in file \"%2\"."))
-            .arg(mDomElement.attribute("layer"), mSymbol.getXmlFilepath().toNative()));
+        throw RuntimeError(__FILE__, __LINE__, mDomElement.attribute("line_layer"),
+            QString(tr("Invalid line layer ID \"%1\" in file \"%2\"."))
+            .arg(mDomElement.attribute("line_layer"), mSymbol.getXmlFilepath().toNative()));
+    }
+    mFillLayerId = mDomElement.attribute("fill_layer").toUInt(&ok);
+    if (!ok)
+    {
+        throw RuntimeError(__FILE__, __LINE__, mDomElement.attribute("fill_layer"),
+            QString(tr("Invalid fill layer ID \"%1\" in file \"%2\"."))
+            .arg(mDomElement.attribute("fill_layer"), mSymbol.getXmlFilepath().toNative()));
     }
 
     // load geometry attributes
-    mWidth.setLengthMm(mDomElement.attribute("width"));
-    mFill = (mDomElement.attribute("fill") == "true");
+    mLineWidth.setLengthMm(mDomElement.attribute("line_width"));
+    mIsGrabArea = (mDomElement.attribute("grab_area") == "true");
     mStartPos.setXmm(mDomElement.attribute("start_x"));
     mStartPos.setYmm(mDomElement.attribute("start_y"));
 
