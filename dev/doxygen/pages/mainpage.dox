@@ -6,8 +6,9 @@
     
     
     @section documentation_pages Documentation
+        - @subpage doc_code_style_guide
         - @subpage doc_schematic_layers
-        - @subpage library_documentation
+        - @subpage doc_lib
         - @subpage doc_project
     
     @section related_pages Related Pages

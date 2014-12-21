@@ -1,0 +1,50 @@
+/**
+
+    @page doc_code_style_guide Code Style Guide
+
+    @tableofcontents
+
+    This page describes the code style guide for EDA4U developers.
+
+
+    @section doc_code_style_guide_general General
+    
+        - Qt >= 5.0
+        - C++11
+    
+    
+    @section doc_code_style_guide_header_files Header Files
+    
+        - Use nearly always forward declarations when possible. Includes in header files are allowed:
+            - for all Qt header files (like QtCore, QtWidgets,...)
+            - when the header file uses other types by value (by reference/pointer --> use forward declaration)
+            - when the header file highly depends on other types, even if only by reference/pointer
+        
+    
+    @section doc_code_style_guide_naming Naming
+    
+        - File Names: Excatly same naming as classes, but all characters lowercase. Example: ses_select.cpp, ses_select.h
+        - Include guards: Use the namespace as prefix before the class name. Example: #ifndef NAMESPACE_CLASSNAME_H
+        - Namespaces: lowercase (with underline as separator if needed)
+        - Classes: UpperCamelCase (for common prefixes, use the underline as separator. Example: project#SES_Select)
+        - Interfaces: Like Classes, but with prefix "IF_". Example: IF_CADSceneEventHandler)
+        - Typedefs (POD, structs, enums): UpperCamelCase, with "_t" suffix. Examples: #LengthBase_t, LengthUnit#LengthUnit_t
+        - Functions/Methods: lowerCamelCase
+        - Member Variables: lowerCamelCase, beginning with a 'm'. Example: LengthUnit#mUnit
+        - Static Variables: lowerCamelCase, beginning with a 's'. Example: LengthUnit#sDefaultUnit
+        - Function Parameters: lowerCamelCase
+        - Local Variables: lowerCamelCase
+        - Macros: uppercase, with underline as separator
+        
+    
+    @section doc_code_style_guide_comments Comments
+    
+        - Use doxygen comments with '@' (not '\') as command character
+        - Methods documentation only in header files, not in source files
+        
+    
+    @section doc_code_style_guide_qt_macros Qt Macros
+    
+        - Do not use Q_CHECK_PTR() because it throws a std::bad_alloc exception which we will never catch (we only catch our own exception types)! Use Q_ASSERT() instead!
+
+*/
