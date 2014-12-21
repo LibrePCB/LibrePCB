@@ -50,7 +50,8 @@ SymbolPinGraphicsItem::SymbolPinGraphicsItem(SymbolGraphicsItem& symbol, const S
     QGraphicsItem(&symbol), mSymbolGraphicsItem(symbol), mPin(pin), mPinInstance(instance)
 {
     setZValue(project::Schematic::ZValue_Symbols);
-    setPos(pin.getPosition().toPxQPointF());
+    setPos(mPin.getPosition().toPxQPointF());
+    setRotation(mPin.getAngle().toDeg());
     setToolTip(mPin.getName() % ": " % mPin.getDescription());
 
     if (!updateBoundingRectAndShape())
@@ -109,9 +110,7 @@ void SymbolPinGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsI
     if (layer)
     {
         painter->setPen(QPen(layer->getColor(selected), Length(254000).toPx(), Qt::SolidLine, Qt::RoundCap)); // TODO width
-        Point p2(mPin.getLength() * qSin(mPin.getAngle().toRad()),
-                 mPin.getLength() * qCos(mPin.getAngle().toRad()));
-        painter->drawLine(QPointF(0, 0), p2.toPxQPointF());
+        painter->drawLine(QPointF(0, 0), Point(0, mPin.getLength()).toPxQPointF());
     }
 
     // net signal name or circle
@@ -144,6 +143,11 @@ void SymbolPinGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsI
     layer = getSchematicLayer(SchematicLayer::SymbolPinNames);
     if ((layer) && (!text.isEmpty()))
     {
+        Angle absAngle = mPin.getAngle();
+        if (mPinInstance) absAngle += mPinInstance->getSymbolInstance().getAngle();
+        absAngle.mapTo180deg();
+        bool rotate180 = (absAngle <= -Angle::deg90() || absAngle > Angle::deg90());
+        painter->rotate(rotate180 ? (qreal)90 : (qreal)-90);
         painter->setPen(QPen(layer->getColor(selected), 0));
         QFont font;
         font.setFamily("Monospace");
@@ -152,10 +156,10 @@ void SymbolPinGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsI
         font.setStyleStrategy(QFont::ForceOutline);
         QFontMetrics metrics(font);
         painter->setFont(font);
-        QRectF rect(QPointF((mPin.getLength().toPx() + (metrics.width(text)/2) + 4)
-                            * qSin(mPin.getAngle().toRad()) - metrics.width(text)/2,
-                            0), QSizeF(0, 0));
-        painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine | Qt::TextDontClip, text);
+        qreal x = (mPin.getLength().toPx() + (metrics.width(text)/2) + 4) - metrics.width(text)/2;
+        int flags = Qt::AlignVCenter | Qt::TextSingleLine | Qt::TextDontClip;
+        if (rotate180) flags |= Qt::AlignRight; else flags |= Qt::AlignLeft;
+        painter->drawText(QRectF(rotate180 ? -x : x, 0, 0, 0), flags, text);
     }
 }
 

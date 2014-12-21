@@ -150,12 +150,34 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
         QFontMetricsF metrics(font);
         qreal factor = 0.8*text->getHeight().toPx() / metrics.height();
 
+        // check rotation
+        Angle absAngle = text->getAngle();
+        if (mSymbolInstance) absAngle += mSymbolInstance->getAngle();
+        absAngle.mapTo180deg();
+        bool rotate180 = (absAngle < -Angle::deg90() || absAngle >= Angle::deg90());
+
         // calculate text rect
-        QRectF textRect(text->getPosition().toPxQPointF().x()/factor, text->getPosition().toPxQPointF().y()/factor, 0, 0);
+        qreal x, y;
         if (text->getAlign() & Qt::AlignTop)
-            textRect = QRectF(text->getPosition().toPxQPointF().x()/factor, text->getPosition().toPxQPointF().y()/factor+0.1*text->getHeight().toPx()/factor, 0, 0);
+        {
+            x = text->getPosition().toPxQPointF().x()/factor;
+            y = text->getPosition().toPxQPointF().y()/factor+0.1*text->getHeight().toPx()/factor;
+        }
         else if (text->getAlign() & Qt::AlignBottom)
-            textRect = QRectF(text->getPosition().toPxQPointF().x()/factor, text->getPosition().toPxQPointF().y()/factor-0.1*text->getHeight().toPx()/factor, 0, 0);
+        {
+            x = text->getPosition().toPxQPointF().x()/factor;
+            y = text->getPosition().toPxQPointF().y()/factor-0.1*text->getHeight().toPx()/factor;
+        }
+        else
+        {
+            x = text->getPosition().toPxQPointF().x()/factor;
+            y = text->getPosition().toPxQPointF().y()/factor;
+        }
+        if (rotate180)
+        {
+            x = -x;
+            y = -y;
+        }
 
         QString textStr = text->getText();
         if (mSymbolInstance)
@@ -167,9 +189,17 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
         // draw text
         painter->save();
         painter->scale(factor, factor);
+        if (rotate180) painter->rotate((qreal)180);
         painter->setFont(font);
-        painter->drawText(textRect, text->getAlign() | Qt::TextSingleLine | Qt::TextDontClip,
-                          textStr, &textRect);
+        int flags = text->getAlign() | Qt::TextSingleLine | Qt::TextDontClip;
+        if (rotate180)
+        {
+            if (flags & Qt::AlignLeft) {flags &= ~Qt::AlignLeft; flags |= Qt::AlignRight;}
+            else if (flags & Qt::AlignRight) {flags &= ~Qt::AlignRight; flags |= Qt::AlignLeft;}
+            if (flags & Qt::AlignBottom) {flags &= ~Qt::AlignBottom; flags |= Qt::AlignTop;}
+            else if (flags & Qt::AlignTop) {flags &= ~Qt::AlignTop; flags |= Qt::AlignBottom;}
+        }
+        painter->drawText(QRectF(x, y, 0, 0), flags, textStr);
         painter->restore();
     }
 
