@@ -370,6 +370,19 @@ QDebug operator<<(QDebug stream, const Length& length)
 
 // General Methods
 
+Angle Angle::abs() const noexcept
+{
+    Angle a(*this);
+    a.makeAbs();
+    return a;
+}
+
+Angle& Angle::makeAbs() noexcept
+{
+    mMicrodegrees = qAbs(mMicrodegrees);
+    return *this;
+}
+
 Angle Angle::mappedTo0_360deg() const noexcept
 {
     Angle a(*this);

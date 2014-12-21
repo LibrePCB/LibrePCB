@@ -924,6 +924,24 @@ class Angle
         // General Methods
 
         /**
+         * @brief Get an Angle object with absolute value (mMicrodegrees >= 0)
+         *
+         * @return A new Angle object with absolute value
+         *
+         * @see Angle#makeAbs()
+         */
+        Angle abs() const noexcept;
+
+        /**
+         * @brief Make the angle absolute (mMicrodegrees >= 0)
+         *
+         * @return A reference to the modified object
+         *
+         * @see Angle#abs()
+         */
+        Angle& makeAbs() noexcept;
+
+        /**
          * @brief Get an Angle object which is mapped to [0..360[ degrees
          *
          * @return A new Angle object which is mapped to [0..360[ degrees
