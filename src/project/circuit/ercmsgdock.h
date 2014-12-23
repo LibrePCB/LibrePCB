@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_UNPLACEDSYMBOLSDOCK_H
-#define PROJECT_UNPLACEDSYMBOLSDOCK_H
+#ifndef PROJECT_ERCMSGDOCK_H
+#define PROJECT_ERCMSGDOCK_H
 
 /*****************************************************************************************
  *  Includes
@@ -36,40 +36,40 @@ class Project;
 }
 
 namespace Ui {
-class UnplacedSymbolsDock;
+class ErcMsgDock;
 }
 
 /*****************************************************************************************
- *  Class UnplacedSymbolsDock
+ *  Class ErcMsgDock
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The UnplacedSymbolsDock class
+ * @brief The ErcMsgDock class
  */
-class UnplacedSymbolsDock final : public QDockWidget
+class ErcMsgDock final : public QDockWidget
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit UnplacedSymbolsDock(Project& project);
-        ~UnplacedSymbolsDock();
+        explicit ErcMsgDock(Project& project);
+        ~ErcMsgDock();
 
     private:
 
         // make some methods inaccessible...
-        UnplacedSymbolsDock();
-        UnplacedSymbolsDock(const UnplacedSymbolsDock& other);
-        UnplacedSymbolsDock& operator=(const UnplacedSymbolsDock& rhs);
+        ErcMsgDock();
+        ErcMsgDock(const ErcMsgDock& other);
+        ErcMsgDock& operator=(const ErcMsgDock& rhs);
 
         // General
         Project& mProject;
-        Ui::UnplacedSymbolsDock* mUi;
+        Ui::ErcMsgDock* mUi;
 };
 
 } // namespace project
 
-#endif // PROJECT_UNPLACEDSYMBOLSDOCK_H
+#endif // PROJECT_ERCMSGDOCK_H

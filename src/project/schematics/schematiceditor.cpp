@@ -31,7 +31,7 @@
 #include "../../common/undostack.h"
 #include "schematic.h"
 #include "schematicpagesdock.h"
-#include "unplacedsymbolsdock.h"
+#include "../circuit/ercmsgdock.h"
 #include "fsm/ses_fsm.h"
 #include "../circuit/circuit.h"
 #include "../../common/dialogs/gridsettingsdialog.h"
@@ -44,7 +44,7 @@ namespace project {
 
 SchematicEditor::SchematicEditor(Project& project, bool readOnly) :
     QMainWindow(0), mProject(project), mUi(new Ui::SchematicEditor),
-    mActiveSchematicIndex(-1), mPagesDock(0), mUnplacedSymbolsDock(0), mFsm(0)
+    mActiveSchematicIndex(-1), mPagesDock(0), mErcMsgDock(0), mFsm(0)
 {
     mUi->setupUi(this);
     mUi->actionSave_Project->setEnabled(!readOnly);
@@ -58,8 +58,8 @@ SchematicEditor::SchematicEditor(Project& project, bool readOnly) :
     // Add Dock Widgets
     mPagesDock = new SchematicPagesDock(mProject, *this);
     addDockWidget(Qt::LeftDockWidgetArea, mPagesDock, Qt::Vertical);
-    mUnplacedSymbolsDock = new UnplacedSymbolsDock(mProject);
-    addDockWidget(Qt::RightDockWidgetArea, mUnplacedSymbolsDock, Qt::Vertical);
+    mErcMsgDock = new ErcMsgDock(mProject);
+    addDockWidget(Qt::RightDockWidgetArea, mErcMsgDock, Qt::Vertical);
 
     // connect some actions which are created with the Qt Designer
     connect(mUi->actionSave_Project, SIGNAL(triggered()), &mProject, SLOT(save()));
@@ -155,7 +155,7 @@ SchematicEditor::~SchematicEditor()
     clientSettings.setValue("schematic_editor/window_state", saveState());
 
     delete mFsm;                    mFsm = 0;
-    delete mUnplacedSymbolsDock;    mUnplacedSymbolsDock = 0;
+    delete mErcMsgDock;             mErcMsgDock = 0;
     delete mPagesDock;              mPagesDock = 0;
     delete mUi;                     mUi = 0;
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>UnplacedSymbolsDock</class>
- <widget class="QDockWidget" name="UnplacedSymbolsDock">
+ <class>ErcMsgDock</class>
+ <widget class="QDockWidget" name="ErcMsgDock">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -17,7 +17,7 @@
    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
   </property>
   <property name="windowTitle">
-   <string>Unplaced Symbols</string>
+   <string>ERC</string>
   </property>
   <widget class="QWidget" name="dockWidgetContents">
    <layout class="QVBoxLayout" name="verticalLayout">

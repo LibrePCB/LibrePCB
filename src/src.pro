@@ -109,7 +109,7 @@ SOURCES += \
     common/inifile.cpp \
     project/schematics/cmd/cmdschematicadd.cpp \
     project/schematics/cmd/cmdschematicremove.cpp \
-    project/schematics/unplacedsymbolsdock.cpp \
+    project/circuit/ercmsgdock.cpp \
     project/schematics/fsm/schematiceditorevent.cpp \
     project/schematics/fsm/ses_select.cpp \
     project/schematics/fsm/ses_move.cpp \
@@ -211,7 +211,7 @@ HEADERS += \
     common/inifile.h \
     project/schematics/cmd/cmdschematicadd.h \
     project/schematics/cmd/cmdschematicremove.h \
-    project/schematics/unplacedsymbolsdock.h \
+    project/circuit/ercmsgdock.h \
     project/schematics/fsm/schematiceditorevent.h \
     project/schematics/fsm/ses_select.h \
     project/schematics/fsm/ses_move.h \
@@ -267,7 +267,7 @@ FORMS += \
     project/schematics/schematiceditor.ui \
     workspace/settings/workspacesettingsdialog.ui \
     project/schematics/schematicpagesdock.ui \
-    project/schematics/unplacedsymbolsdock.ui \
+    project/circuit/ercmsgdock.ui \
     project/circuit/editnetclassesdialog.ui \
     common/dialogs/gridsettingsdialog.ui
 

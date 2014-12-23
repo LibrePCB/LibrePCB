@@ -40,7 +40,7 @@ namespace project {
 class Project;
 class Schematic;
 class SchematicPagesDock;
-class UnplacedSymbolsDock;
+class ErcMsgDock;
 class SES_FSM;
 }
 
@@ -112,7 +112,7 @@ class SchematicEditor : public QMainWindow, public IF_CADSceneEventHandler
 
         // Docks
         SchematicPagesDock* mPagesDock;
-        UnplacedSymbolsDock* mUnplacedSymbolsDock;
+        ErcMsgDock* mErcMsgDock;
 
         // Finite State Machine
         SES_FSM* mFsm;

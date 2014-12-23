@@ -23,8 +23,8 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include "unplacedsymbolsdock.h"
-#include "ui_unplacedsymbolsdock.h"
+#include "ercmsgdock.h"
+#include "ui_ercmsgdock.h"
 #include "../project.h"
 
 namespace project {
@@ -33,13 +33,13 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-UnplacedSymbolsDock::UnplacedSymbolsDock(Project& project) :
-    QDockWidget(0), mProject(project), mUi(new Ui::UnplacedSymbolsDock)
+ErcMsgDock::ErcMsgDock(Project& project) :
+    QDockWidget(0), mProject(project), mUi(new Ui::ErcMsgDock)
 {
     mUi->setupUi(this);
 }
 
-UnplacedSymbolsDock::~UnplacedSymbolsDock()
+ErcMsgDock::~ErcMsgDock()
 {
     delete mUi;         mUi = 0;
 }
