@@ -85,13 +85,13 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
     // project should be opened, the lock file will be created/updated here.
     switch (mFileLock.getStatus())
     {
-        case FileLock::Unlocked:
+        case FileLock::LockStatus_t::Unlocked:
         {
             // nothing to do here (the project will be locked later)
             break;
         }
 
-        case FileLock::Locked:
+        case FileLock::LockStatus_t::Locked:
         {
             // the project is locked by another application instance! open read only?
             QMessageBox::StandardButton btn = QMessageBox::question(0, tr("Open Read-Only?"),
@@ -109,7 +109,7 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
             break;
         }
 
-        case FileLock::StaleLock:
+        case FileLock::LockStatus_t::StaleLock:
         {
             // the application crashed while this project was open! ask the user what to do
             QMessageBox::StandardButton btn = QMessageBox::question(0, tr("Restore Project?"),
@@ -130,7 +130,7 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
             break;
         }
 
-        case FileLock::Error:
+        case FileLock::LockStatus_t::Error:
         default:
         {
             throw RuntimeError(__FILE__, __LINE__, QString(),

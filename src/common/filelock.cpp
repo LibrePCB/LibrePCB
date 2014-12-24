@@ -85,12 +85,12 @@ const FilePath& FileLock::getLockFilepath() const noexcept
     return mLockFilepath;
 }
 
-FileLock::LockStatus FileLock::getStatus() const noexcept
+FileLock::LockStatus_t FileLock::getStatus() const noexcept
 {
     if (!mLockFilepath.isValid())
     {
         qCritical() << "getStatus() was called before setFileToLock()!";
-        return Error;
+        return LockStatus_t::Error;
     }
 
     QFile file(mLockFilepath.toStr());
@@ -98,13 +98,13 @@ FileLock::LockStatus FileLock::getStatus() const noexcept
     if (!file.exists())
     {
         // there is no lock file
-        return Unlocked;
+        return LockStatus_t::Unlocked;
     }
 
     if (!file.open(QIODevice::ReadOnly))
     {
         qWarning() << "Could not open the lock file:" << mLockFilepath.toStr();
-        return Error;
+        return LockStatus_t::Error;
     }
 
     // read the content of the lock file
@@ -114,7 +114,7 @@ FileLock::LockStatus FileLock::getStatus() const noexcept
     if (entries.count() < 5)
     {
         qWarning() << "Invalid lock file content:" << entries;
-        return Error;
+        return LockStatus_t::Error;
     }
 
     // check who has created the lock file
@@ -126,12 +126,12 @@ FileLock::LockStatus FileLock::getStatus() const noexcept
         // the lock file was created by the current user and host computer
         // TODO: check the PID in the lock file to determine whether that application
         // instance was crashed or is still running!
-        return StaleLock;
+        return LockStatus_t::StaleLock;
     }
     else
     {
         // the lock file was created by another application instance
-        return Locked;
+        return LockStatus_t::Locked;
     }
 }
 

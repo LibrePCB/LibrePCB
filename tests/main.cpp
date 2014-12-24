@@ -38,8 +38,8 @@ int main(int argc, char *argv[])
 
     // suppress messages from the application (we need only messages from the test framework)
     qInstallMessageHandler(0); // remove the message handler from the Debug class
-    Debug::instance()->setDebugLevelLogFile(Debug::Nothing);
-    Debug::instance()->setDebugLevelStderr(Debug::Nothing);
+    Debug::instance()->setDebugLevelLogFile(Debug::DebugLevel_t::Nothing);
+    Debug::instance()->setDebugLevelStderr(Debug::DebugLevel_t::Nothing);
     
     // TODO
 

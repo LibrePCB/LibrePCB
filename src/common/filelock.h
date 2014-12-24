@@ -144,7 +144,7 @@ class FileLock final
         /**
          * @brief The return type of #getStatus()
          */
-        enum LockStatus {
+        enum class LockStatus_t {
             Unlocked,   ///< the file is not locked (lock file does not exist)
             Locked,     ///< the file is locked by another application instance
             StaleLock,  ///< the file is locked by a crashed application instance
@@ -213,7 +213,7 @@ class FileLock final
          *          should't be a problem. Otherwise, the PID in the lock file must
          *          be considered (and check if such a process exists).
          */
-        LockStatus getStatus() const noexcept;
+        LockStatus_t getStatus() const noexcept;
 
 
         // General Methods

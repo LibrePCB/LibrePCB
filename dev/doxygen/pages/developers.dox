@@ -10,6 +10,7 @@
     @section doc_developers_git Git
     
         - The "master" branch must always be compilable and executable! Bugs and non-finished features are allowed in this very early development phase.
+        - Do not pack lot of changes in one commit. Make one commit per bugfix resp. one commit per new feature.
         
     
     @section doc_developers_internationalization Internationalization (i18n)

@@ -52,7 +52,7 @@ class CADView : public QGraphicsView
     public:
 
         // Enums
-        enum GridType {noGrid, gridLines, gridDots};
+        enum class GridType_t {Off, Lines, Dots};
 
         // Constructors / Destructor
         explicit CADView(QWidget* parent = 0);
@@ -61,7 +61,7 @@ class CADView : public QGraphicsView
         // Getters
         CADScene*           getCadScene()           const;
         QRectF              getVisibleSceneRect()   const;
-        GridType            getGridType()           const {return mGridType;}
+        GridType_t            getGridType()           const {return mGridType;}
         const QColor&       getGridColor()          const {return mGridColor;}
         const Length&       getGridInterval()       const {return mGridInterval;}
         const LengthUnit&   getGridIntervalUnit()   const {return mGridIntervalUnit;}
@@ -69,7 +69,7 @@ class CADView : public QGraphicsView
         // Setters
         void setCadScene(CADScene* scene); ///< Use always this method instead of QGraphicsView::setScene()!
         void setVisibleSceneRect(const QRectF& rect);
-        void setGridType(GridType type);
+        void setGridType(GridType_t type);
         void setGridColor(const QColor& color);
         void setGridInterval(const Length& newInterval);
         void setGridIntervalUnit(const LengthUnit& newUnit);
@@ -104,7 +104,7 @@ class CADView : public QGraphicsView
         void updatePositionLabelText(const QPointF pos = QPointF(0, 0));
 
 
-        GridType mGridType;
+        GridType_t mGridType;
         QColor mGridColor;
         QColor mOriginCrossColor;
         Length mGridInterval;

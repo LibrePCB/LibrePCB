@@ -58,7 +58,7 @@ class Debug final
         /**
          * Enum for debug levels. Only messages of the current or a higher level are printed.
          */
-        enum DebugLevel {
+        enum class DebugLevel_t {
             Nothing = 0,    ///< 0: nothing
             Fatal,          ///< 1: fatal errors [qFatal()] --> this will quit the application!
             Critical,       ///< 2: errors [qCritical()]
@@ -78,7 +78,7 @@ class Debug final
          *
          * @param level     A value from Debug::DebugLevel (inclusive Nothing and All)
          */
-        void setDebugLevelStderr(DebugLevel level);
+        void setDebugLevelStderr(DebugLevel_t level);
 
         /**
          * @brief Set the debug level for the log file.
@@ -87,21 +87,21 @@ class Debug final
          *
          * @param level     A value from Debug::DebugLevel (inclusive Nothing and All)
          */
-        void setDebugLevelLogFile(DebugLevel level);
+        void setDebugLevelLogFile(DebugLevel_t level);
 
         /**
          * @brief Get the current debug level for the stderr output.
          *
          * @return The current debug level
          */
-        DebugLevel getDebugLevelStderr() const;
+        DebugLevel_t getDebugLevelStderr() const;
 
         /**
          * @brief Get the current debug level for the log file.
          *
          * @return The current debug level
          */
-        DebugLevel getDebugLevelLogFile() const;
+        DebugLevel_t getDebugLevelLogFile() const;
 
         /**
          * @brief Get the filename of the log file (even if file logging is disabled)
@@ -122,7 +122,7 @@ class Debug final
          * @param file      The source file (use the macro __FILE__)
          * @param line      The line number (use the macro __LINE__)
          */
-        void print(DebugLevel level, const QString& msg, const char* file, int line);
+        void print(DebugLevel_t level, const QString& msg, const char* file, int line);
 
 
         // Static methods
@@ -159,8 +159,8 @@ class Debug final
 
 
         // General Attributes
-        DebugLevel mDebugLevelStderr;   ///< the current debug level for the stderr output
-        DebugLevel mDebugLevelLogFile;  ///< the current debug level for the log file
+        DebugLevel_t mDebugLevelStderr;   ///< the current debug level for the stderr output
+        DebugLevel_t mDebugLevelLogFile;  ///< the current debug level for the log file
         QTextStream* mStderrStream;     ///< the stream to stderr
         FilePath mLogFilepath;          ///< the filepath for the log file
         QFile* mLogFile;                ///< NULL if file logging is disabled

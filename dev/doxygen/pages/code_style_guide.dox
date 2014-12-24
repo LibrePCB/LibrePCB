@@ -9,8 +9,10 @@
 
     @section doc_code_style_guide_general General
     
-        - Qt >= 5.0
+        - Qt >= 5.2
         - C++11
+        - Use strongly typed enums ("enum class", C++11) whenever reasonable
+        - Use "nullptr" instead of "NULL" or "0"
     
     
     @section doc_code_style_guide_header_files Header Files

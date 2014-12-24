@@ -39,7 +39,7 @@ qreal CADView::sZoomFactor = 1.15;
 
 CADView::CADView(QWidget* parent) :
     QGraphicsView(parent),
-    mGridType(noGrid), mGridColor(Qt::lightGray), mOriginCrossColor(Qt::black),
+    mGridType(GridType_t::Off), mGridColor(Qt::lightGray), mOriginCrossColor(Qt::black),
     mGridInterval(2540000), mGridIntervalUnit(LengthUnit::millimeters()),
     mPositionLabel(0)
 {
@@ -92,7 +92,7 @@ void CADView::setVisibleSceneRect(const QRectF& rect)
     fitInView(rect, Qt::KeepAspectRatio);
 }
 
-void CADView::setGridType(GridType type)
+void CADView::setGridType(GridType_t type)
 {
     mGridType = type;
     QGraphicsView::setBackgroundBrush(QBrush(Qt::NoBrush)); // this will repaint the background
@@ -151,7 +151,7 @@ void CADView::drawBackground(QPainter* painter, const QRectF& rect)
 
     QPen gridPen(mGridColor);
     gridPen.setCapStyle(Qt::RoundCap);
-    gridPen.setWidth((mGridType == gridDots) ? 2 : 1);
+    gridPen.setWidth((mGridType == GridType_t::Dots) ? 2 : 1);
     gridPen.setCosmetic(true);
 
     painter->setPen(gridPen);
@@ -166,7 +166,7 @@ void CADView::drawBackground(QPainter* painter, const QRectF& rect)
     {
         switch (mGridType)
         {
-            case gridLines:
+            case GridType_t::Lines:
             {
                 QVarLengthArray<QLineF, 500> lines;
 
@@ -181,7 +181,7 @@ void CADView::drawBackground(QPainter* painter, const QRectF& rect)
                 break;
             }
 
-            case gridDots:
+            case GridType_t::Dots:
             {
                 QVarLengthArray<QPointF, 2000> dots;
 

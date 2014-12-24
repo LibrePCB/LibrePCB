@@ -54,12 +54,12 @@ class GridSettingsDialog final : public QDialog
     public:
 
         // Constructors / Destructor
-        explicit GridSettingsDialog(CADView::GridType type, const Length& interval,
+        explicit GridSettingsDialog(CADView::GridType_t type, const Length& interval,
                                     const LengthUnit& unit, QWidget* parent = 0);
         ~GridSettingsDialog();
 
         // Getters
-        CADView::GridType getGridType() const noexcept {return mType;}
+        CADView::GridType_t getGridType() const noexcept {return mType;}
         const Length& getGridInterval() const noexcept {return mInterval;}
         const LengthUnit& getUnit() const noexcept {return mUnit;}
 
@@ -77,7 +77,7 @@ class GridSettingsDialog final : public QDialog
 
     signals:
 
-        void gridTypeChanged(CADView::GridType type);
+        void gridTypeChanged(CADView::GridType_t type);
         void gridIntervalChanged(const Length& interval);
         void gridIntervalUnitChanged(const LengthUnit& unit);
 
@@ -94,10 +94,10 @@ class GridSettingsDialog final : public QDialog
 
         // General Attributes
         Ui::GridSettingsDialog* mUi;
-        CADView::GridType mInitialType;
+        CADView::GridType_t mInitialType;
         Length mInitialInterval;
         LengthUnit mInitialUnit;
-        CADView::GridType mType;
+        CADView::GridType_t mType;
         Length mInterval;
         LengthUnit mUnit;
 };

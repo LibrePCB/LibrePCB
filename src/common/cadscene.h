@@ -65,8 +65,10 @@ class CADScene : public QGraphicsScene
          * @brief All custom QGraphicsItem types which are used in CADScene
          *
          * See QGraphicsItem::Type for more information.
+         *
+         * @note We do not use "enum class" because it must be easily compareable with int.
          */
-        enum ItemType {
+        enum ItemType_t {
             Type_UserType = QGraphicsItem::UserType, ///< the base number for user types
             // Types which are used in library elements
             Type_Symbol,                    ///< library#Symbol

@@ -139,7 +139,7 @@ SchematicEditor::SchematicEditor(Project& project, bool readOnly) :
     restoreState(clientSettings.value("schematic_editor/window_state").toByteArray());
 
     // Load first schematic page
-    mUi->graphicsView->setGridType(CADView::gridLines);
+    mUi->graphicsView->setGridType(CADView::GridType_t::Lines);
     if (mProject.getSchematicCount() > 0)
         setActiveSchematicIndex(0);
 
@@ -263,7 +263,7 @@ void SchematicEditor::on_actionGrid_triggered()
                               mUi->graphicsView->getGridIntervalUnit(), this);
 
     connect(&dialog, &GridSettingsDialog::gridTypeChanged,
-            [this](CADView::GridType type){mUi->graphicsView->setGridType(type);});
+            [this](CADView::GridType_t type){mUi->graphicsView->setGridType(type);});
     connect(&dialog, &GridSettingsDialog::gridIntervalChanged,
             [this](const Length& interval){mUi->graphicsView->setGridInterval(interval);});
     connect(&dialog, &GridSettingsDialog::gridIntervalUnitChanged,

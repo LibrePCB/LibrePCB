@@ -32,7 +32,7 @@
  *  Constructors / Destructor
  ****************************************************************************************/
 
-GridSettingsDialog::GridSettingsDialog(CADView::GridType type,
+GridSettingsDialog::GridSettingsDialog(CADView::GridType_t type,
                                        const Length& interval, const LengthUnit& unit,
                                        QWidget* parent) :
     QDialog(parent), mUi(new Ui::GridSettingsDialog), mInitialType(type),
@@ -42,12 +42,12 @@ GridSettingsDialog::GridSettingsDialog(CADView::GridType type,
     mUi->setupUi(this);
 
     // set radiobutton id's
-    mUi->rbtnGroup->setId(mUi->rbtnNoGrid, CADView::noGrid);
-    mUi->rbtnGroup->setId(mUi->rbtnDots, CADView::gridDots);
-    mUi->rbtnGroup->setId(mUi->rbtnLines, CADView::gridLines);
+    mUi->rbtnGroup->setId(mUi->rbtnNoGrid, static_cast<int>(CADView::GridType_t::Off));
+    mUi->rbtnGroup->setId(mUi->rbtnDots, static_cast<int>(CADView::GridType_t::Dots));
+    mUi->rbtnGroup->setId(mUi->rbtnLines, static_cast<int>(CADView::GridType_t::Lines));
 
     // select the grid type
-    mUi->rbtnGroup->button(mType)->setChecked(true);
+    mUi->rbtnGroup->button(static_cast<int>(mType))->setChecked(true);
 
     // fill the combobox with all available units
     foreach (const LengthUnit& itemUnit, LengthUnit::getAllUnits())
@@ -80,7 +80,7 @@ GridSettingsDialog::~GridSettingsDialog()
 void GridSettingsDialog::rbtnGroupClicked(int id)
 {
     if (id < 0) return;
-    mType = static_cast<CADView::GridType>(id);
+    mType = static_cast<CADView::GridType_t>(id);
     emit gridTypeChanged(mType);
 }
 
@@ -120,7 +120,7 @@ void GridSettingsDialog::buttonBoxClicked(QAbstractButton *button)
 
         case QDialogButtonBox::ResetRole:
         {
-            mType = CADView::gridLines;
+            mType = CADView::GridType_t::Lines;
             mInterval.setLengthNm(2540000); // 2.54mm is the default grid interval
             mUnit = Workspace::instance().getSettings().getAppDefMeasUnits()->getLengthUnit();
 
@@ -128,7 +128,7 @@ void GridSettingsDialog::buttonBoxClicked(QAbstractButton *button)
             mUi->rbtnGroup->blockSignals(true);
             mUi->cbxUnits->blockSignals(true);
             mUi->spbxInterval->blockSignals(true);
-            mUi->rbtnGroup->button(mType)->setChecked(true);
+            mUi->rbtnGroup->button(static_cast<int>(mType))->setChecked(true);
             mUi->cbxUnits->setCurrentIndex(mUnit.getIndex());
             mUi->spbxInterval->setValue(mUnit.convertToUnit(mInterval));
             mUi->rbtnGroup->blockSignals(false);

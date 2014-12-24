@@ -34,7 +34,7 @@ Exception::Exception(const char* file, int line, const QString& debugMsg,
     mDebugMsg(debugMsg), mUserMsg(userMsg), mFile(file), mLine(line)
 {
     // the filename and line number will be added in the Debug class, not here!
-    Debug::instance()->print(Debug::Exception, mDebugMsg, file, line);
+    Debug::instance()->print(Debug::DebugLevel_t::Exception, mDebugMsg, file, line);
 }
 
 Exception::Exception(const Exception& other) :
