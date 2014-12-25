@@ -82,6 +82,11 @@ void SymbolPinGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsI
     bool selected = (option->state & QStyle::State_Selected) || mSymbolGraphicsItem.isSelected();
     bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
 
+    Angle absAngle = mPin.getAngle();
+    if (mPinInstance) absAngle += mPinInstance->getSymbolInstance().getAngle();
+    absAngle.mapTo180deg();
+    bool rotate180 = (absAngle <= -Angle::deg90() || absAngle > Angle::deg90());
+
     QString text;
     SchematicLayer* layer = 0;
     const GenCompSignal* genCompSignal = 0;
@@ -117,6 +122,8 @@ void SymbolPinGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsI
     layer = getSchematicLayer(SchematicLayer::SymbolPinCircles);
     if ((layer) && (!deviceIsPrinter))
     {
+        painter->save();
+        painter->rotate(rotate180 ? (qreal)90 : (qreal)-90);
         painter->setPen(QPen(layer->getColor(selected), 0));
         painter->setBrush(Qt::NoBrush);
         if (netsignal)
@@ -137,16 +144,14 @@ void SymbolPinGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsI
             qreal radius = project::SchematicNetPoint::getCircleRadius().toPx();
             painter->drawEllipse(QPointF(0, 0), radius, radius);
         }
+        painter->restore();
     }
 
     // text
     layer = getSchematicLayer(SchematicLayer::SymbolPinNames);
     if ((layer) && (!text.isEmpty()))
     {
-        Angle absAngle = mPin.getAngle();
-        if (mPinInstance) absAngle += mPinInstance->getSymbolInstance().getAngle();
-        absAngle.mapTo180deg();
-        bool rotate180 = (absAngle <= -Angle::deg90() || absAngle > Angle::deg90());
+        painter->save();
         painter->rotate(rotate180 ? (qreal)90 : (qreal)-90);
         painter->setPen(QPen(layer->getColor(selected), 0));
         QFont font;
@@ -160,6 +165,7 @@ void SymbolPinGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsI
         int flags = Qt::AlignVCenter | Qt::TextSingleLine | Qt::TextDontClip;
         if (rotate180) flags |= Qt::AlignRight; else flags |= Qt::AlignLeft;
         painter->drawText(QRectF(rotate180 ? -x : x, 0, 0, 0), flags, text);
+        painter->restore();
     }
 }
 
