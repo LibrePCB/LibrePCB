@@ -31,6 +31,8 @@
 #include "schematicnetpoint.h"
 #include "../circuit/gencompsignalinstance.h"
 #include "../../library/symbolpingraphicsitem.h"
+#include "../../library/gencompsymbvaritem.h"
+#include "../circuit/netsignal.h"
 
 namespace project {
 
@@ -70,6 +72,20 @@ const QUuid& SymbolPinInstance::getLibPinUuid() const noexcept
 Point SymbolPinInstance::getPosition() const noexcept
 {
     return mSymbolInstance.mapToScene(mSymbolPin->getPosition());
+}
+
+QString SymbolPinInstance::getDisplayText() const noexcept
+{
+    switch (mSymbolInstance.getGenCompSymbVarItem().getDisplayTypeOfPin(mSymbolPin->getUuid()))
+    {
+        case library::GenCompSymbVarItem::PinDisplayType_t::PinName:
+            return mSymbolPin->getName();
+        case library::GenCompSymbVarItem::PinDisplayType_t::GenCompSignal:
+            return (mGenCompSignal ? mGenCompSignal->getName() : QString());
+        case library::GenCompSymbVarItem::PinDisplayType_t::NetSignal:
+            return (mGenCompSignalInstance->getNetSignal() ? mGenCompSignalInstance->getNetSignal()->getName() : QString());
+        default: return QString();
+    }
 }
 
 /*****************************************************************************************

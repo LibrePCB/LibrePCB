@@ -53,11 +53,11 @@ class GenCompSymbVarItem final : public QObject
     public:
 
         /// Pin Display Type Enum
-        enum PinDisplayType_t {
-            DisplayType_None,
-            DisplayType_PinName,
-            DisplayType_GenCompSignal,
-            DisplayType_NetSignal
+        enum class PinDisplayType_t {
+            None,
+            PinName,
+            GenCompSignal,
+            NetSignal
         };
 
         /// Pin-Signal-Map item struct

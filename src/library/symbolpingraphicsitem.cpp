@@ -87,28 +87,10 @@ void SymbolPinGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsI
     absAngle.mapTo180deg();
     bool rotate180 = (absAngle <= -Angle::deg90() || absAngle > Angle::deg90());
 
-    QString text;
     SchematicLayer* layer = 0;
-    const GenCompSignal* genCompSignal = 0;
-    const project::NetSignal* netsignal = 0;
-    if (mPinInstance)
-    {
-        const GenCompSymbVarItem& item = mPinInstance->getSymbolInstance().getGenCompSymbVarItem();
-        genCompSignal = mPinInstance->getGenCompSignal();
-        netsignal = genCompSignal ? mPinInstance->getGenCompSignalInstance()->getNetSignal() : 0;
-        switch (item.getDisplayTypeOfPin(mPin.getUuid()))
-        {
-            case GenCompSymbVarItem::DisplayType_PinName:
-                text = mPin.getName(); break;
-            case GenCompSymbVarItem::DisplayType_GenCompSignal:
-                if (genCompSignal) text = genCompSignal->getName(); break;
-            case GenCompSymbVarItem::DisplayType_NetSignal:
-                if (netsignal) text = netsignal->getName(); break;
-            default: break;
-        }
-    }
-    else
-        text = mPin.getName();
+    const GenCompSignal* genCompSignal = (mPinInstance ? mPinInstance->getGenCompSignal() : 0);
+    const project::NetSignal* netsignal = (genCompSignal ? mPinInstance->getGenCompSignalInstance()->getNetSignal() : 0);
+    QString text = (mPinInstance ? mPinInstance->getDisplayText() : mPin.getName());
 
     // line
     layer = getSchematicLayer(SchematicLayer::SymbolOutlines);

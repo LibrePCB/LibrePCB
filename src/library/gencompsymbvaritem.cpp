@@ -95,13 +95,13 @@ GenCompSymbVarItem::GenCompSymbVarItem(GenericComponent& genComp, GenCompSymbVar
                 .arg(item.pin.toString(), mGenericComponent.getXmlFilepath().toNative()));
         }
         if (tmpNode.attribute("display") == "none")
-            item.displayType = DisplayType_None;
+            item.displayType = PinDisplayType_t::None;
         else if (tmpNode.attribute("display") == "pin_name")
-            item.displayType = DisplayType_PinName;
+            item.displayType = PinDisplayType_t::PinName;
         else if (tmpNode.attribute("display") == "gen_comp_signal")
-            item.displayType = DisplayType_GenCompSignal;
+            item.displayType = PinDisplayType_t::GenCompSignal;
         else if (tmpNode.attribute("display") == "net_signal")
-            item.displayType = DisplayType_NetSignal;
+            item.displayType = PinDisplayType_t::NetSignal;
         else
         {
             throw RuntimeError(__FILE__, __LINE__, tmpNode.attribute("display"),
@@ -134,7 +134,7 @@ GenCompSymbVarItem::PinDisplayType_t GenCompSymbVarItem::getDisplayTypeOfPin(con
     if (mPinSignalMap.contains(pinUuid))
         return mPinSignalMap.value(pinUuid).displayType;
     else
-        return DisplayType_None;
+        return PinDisplayType_t::None;
 }
 
 /*****************************************************************************************
