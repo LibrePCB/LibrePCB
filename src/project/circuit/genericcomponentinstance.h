@@ -66,7 +66,10 @@ class GenericComponentInstance : public QObject
         // Getters
         const QUuid& getUuid() const noexcept {return mUuid;}
         const QString& getName() const noexcept {return mName;}
-        unsigned int getUsedSymbolsCount() const noexcept {return mSymbolInstances.count();}
+        uint getPlacedSymbolsCount() const noexcept {return mSymbolInstances.count();}
+        uint getUnplacedSymbolsCount() const noexcept;
+        uint getUnplacedRequiredSymbolsCount() const noexcept;
+        uint getUnplacedOptionalSymbolsCount() const noexcept;
         GenCompSignalInstance* getSignalInstance(const QUuid& signalUuid) const noexcept {return mSignals.value(signalUuid);}
         const library::GenericComponent& getGenComp() const noexcept {return *mGenComp;}
         const library::GenCompSymbVar& getSymbolVariant() const noexcept {return *mGenCompSymbVar;}

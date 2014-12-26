@@ -247,6 +247,8 @@ void SchematicNetPoint::unregisterNetLine(SchematicNetLine* netline) noexcept
 void SchematicNetPoint::addToSchematic(Schematic& schematic, bool addNode,
                                        QDomElement& parent) throw (Exception)
 {
+    Q_ASSERT(mLines.isEmpty());
+
     if (mAttached)
     {
         // check if mNetSignal is correct (would be a bug if not)
@@ -272,6 +274,8 @@ void SchematicNetPoint::addToSchematic(Schematic& schematic, bool addNode,
 void SchematicNetPoint::removeFromSchematic(Schematic& schematic, bool removeNode,
                                             QDomElement& parent) throw (Exception)
 {
+    Q_ASSERT(mLines.isEmpty());
+
     if (mAttached)
     {
         // check if mNetSignal is correct (would be a bug if not)

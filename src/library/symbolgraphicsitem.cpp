@@ -210,7 +210,7 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
         layer = getSchematicLayer(SchematicLayer::Busses);
         if (layer)
         {
-            unsigned int count = mSymbolInstance->getGenCompInstance().getUsedSymbolsCount();
+            unsigned int count = mSymbolInstance->getGenCompInstance().getPlacedSymbolsCount();
             unsigned int maxCount = mSymbolInstance->getGenCompInstance().getSymbolVariant().getItems().count();
             QFont font;
             font.setFamily("Monospace");

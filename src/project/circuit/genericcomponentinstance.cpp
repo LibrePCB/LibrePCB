@@ -111,6 +111,37 @@ GenericComponentInstance::~GenericComponentInstance() noexcept
 }
 
 /*****************************************************************************************
+ *  Getters
+ ****************************************************************************************/
+
+uint GenericComponentInstance::getUnplacedSymbolsCount() const noexcept
+{
+    return (mGenCompSymbVar->getItems().count() - mSymbolInstances.count());
+}
+
+uint GenericComponentInstance::getUnplacedRequiredSymbolsCount() const noexcept
+{
+    uint count = 0;
+    foreach (const library::GenCompSymbVarItem* item, mGenCompSymbVar->getItems())
+    {
+        if ((item->isRequired()) && (!mSymbolInstances.contains(item->getUuid())))
+            count++;
+    }
+    return count;
+}
+
+uint GenericComponentInstance::getUnplacedOptionalSymbolsCount() const noexcept
+{
+    uint count = 0;
+    foreach (const library::GenCompSymbVarItem* item, mGenCompSymbVar->getItems())
+    {
+        if ((!item->isRequired()) && (!mSymbolInstances.contains(item->getUuid())))
+            count++;
+    }
+    return count;
+}
+
+/*****************************************************************************************
  *  Setters
  ****************************************************************************************/
 
@@ -215,6 +246,13 @@ void GenericComponentInstance::unregisterSymbolInstance(const QUuid& itemUuid,
         throw LogicError(__FILE__, __LINE__, itemUuid.toString());
     if (symbol != mSymbolInstances.value(itemUuid))
         throw LogicError(__FILE__, __LINE__, itemUuid.toString());
+
+    const library::GenCompSymbVarItem* item = mGenCompSymbVar->getItemByUuid(itemUuid);
+    if (!item)
+    {
+        throw RuntimeError(__FILE__, __LINE__, itemUuid.toString(), QString(tr(
+            "Invalid symbol item UUID in circuit: \"%1\".")).arg(itemUuid.toString()));
+    }
 
     mSymbolInstances.remove(itemUuid);
 }
