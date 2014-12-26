@@ -33,7 +33,6 @@
         <file>actions/zoom_in.png</file>
         <file>actions/zoom_out.png</file>
         <file>actions/pdf.png</file>
-        <file>actions/warning.png</file>
         <file>actions/working.png</file>
         <file>actions/move.png</file>
         <file>actions/refresh.png</file>
@@ -84,6 +83,8 @@
         <file>library/capacitor_eu.png</file>
         <file>library/gnd.png</file>
         <file>library/vcc.png</file>
+        <file>status/dialog-error.png</file>
+        <file>status/dialog-warning.png</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>
