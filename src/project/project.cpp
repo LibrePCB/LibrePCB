@@ -480,9 +480,9 @@ bool Project::autosave() noexcept
 
 bool Project::close(QWidget* msgBoxParent)
 {
-    if ((!mIsRestored) && (mUndoStack->isClean()))
+    if (((!mIsRestored) && (mUndoStack->isClean())) || (mIsReadOnly))
     {
-        // no unsaved changes --> the project can be closed
+        // no unsaved changes or opened in read-only mode --> the project can be closed
         deleteLater();  // this project object will be deleted later in the event loop
         return true;
     }
