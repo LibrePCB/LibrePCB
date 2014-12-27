@@ -48,7 +48,8 @@ namespace project {
 Project::Project(const FilePath& filepath, bool create) throw (Exception) :
     QObject(0), mPath(filepath.getParentDir()), mFilepath(filepath), mXmlFile(0),
     mFileLock(filepath), mIsRestored(false), mIsReadOnly(false), mSchematicsIniFile(0),
-    mUndoStack(0), mProjectLibrary(0), mCircuit(0), mSchematicEditor(0)
+    mProjectIsModified(false), mUndoStack(0), mProjectLibrary(0), mCircuit(0),
+    mSchematicEditor(0)
 {
     qDebug() << (create ? "create project..." : "open project...");
 
@@ -445,16 +446,17 @@ bool Project::save() noexcept
         return false;
     }
 
-    // saving to the original files was successful --> clean the undo stack
+    // saving to the original files was successful --> clean the undo stack and clear the "modified" flag
     mUndoStack->setClean();
+    mProjectIsModified = false;
     qDebug() << "Project successfully saved";
     return true;
 }
 
 bool Project::autosave() noexcept
 {
-    if ((!mIsRestored) && (mUndoStack->isClean())) // do not save if there are no changes
-        return false;
+    if ((!mIsRestored) && (mUndoStack->isClean()) && (!mProjectIsModified))
+        return false; // do not save if there are no changes
 
     if (mUndoStack->isCommandActive())
     {
@@ -480,7 +482,7 @@ bool Project::autosave() noexcept
 
 bool Project::close(QWidget* msgBoxParent)
 {
-    if (((!mIsRestored) && (mUndoStack->isClean())) || (mIsReadOnly))
+    if (((!mIsRestored) && (mUndoStack->isClean()) && (!mProjectIsModified)) || (mIsReadOnly))
     {
         // no unsaved changes or opened in read-only mode --> the project can be closed
         deleteLater();  // this project object will be deleted later in the event loop

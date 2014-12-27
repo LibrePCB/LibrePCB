@@ -269,7 +269,8 @@ void SchematicEditor::on_actionGrid_triggered()
     connect(&dialog, &GridSettingsDialog::gridIntervalUnitChanged,
             [this](const LengthUnit& unit){mUi->graphicsView->setGridIntervalUnit(unit);});
 
-    dialog.exec();
+    if (dialog.exec())
+        mProject.setModifiedFlag();
 }
 
 void SchematicEditor::on_actionPDF_Export_triggered()

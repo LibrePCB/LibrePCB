@@ -282,6 +282,18 @@ class Project final : public QObject
         void showSchematicEditor();
 
         /**
+         * @brief Set the "modified" flag of this project
+         *
+         * This slot can be used to indicate that the project has been modified WITHOUT
+         * executing an #UndoCommand. So, this slot sets a flag which will be checked
+         * when closing the project to decide whether the project contains unsaved changes
+         * or not.
+         *
+         * @see #mProjectIsModified
+         */
+        void setModifiedFlag() noexcept {mProjectIsModified = true;}
+
+        /**
          * @brief Save the whole project to the harddisc
          *
          * @note The whole save procedere is described in @ref doc_project_save.
@@ -351,6 +363,7 @@ class Project final : public QObject
         IniFile* mSchematicsIniFile; ///< schematics/schematics.ini
 
         // General
+        bool mProjectIsModified; ///< this flag indicates whether the project contains unsaved changed or not (changes using #UndoCommand will NOT set this flag!)
         QTimer mAutoSaveTimer; ///< the timer for the periodically automatic saving functionality (see also @ref doc_project_save)
         UndoStack* mUndoStack; ///< See @ref doc_project_undostack
         ProjectLibrary* mProjectLibrary;
