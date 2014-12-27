@@ -38,6 +38,7 @@
 #include "../common/undostack.h"
 #include "schematics/schematic.h"
 #include "../common/schematiclayer.h"
+#include "erc/ercmsglist.h"
 
 namespace project {
 
@@ -48,8 +49,8 @@ namespace project {
 Project::Project(const FilePath& filepath, bool create) throw (Exception) :
     QObject(0), mPath(filepath.getParentDir()), mFilepath(filepath), mXmlFile(0),
     mFileLock(filepath), mIsRestored(false), mIsReadOnly(false), mSchematicsIniFile(0),
-    mProjectIsModified(false), mUndoStack(0), mProjectLibrary(0), mCircuit(0),
-    mSchematicEditor(0)
+    mProjectIsModified(false), mUndoStack(0), mProjectLibrary(0), mErcMsgList(0),
+    mCircuit(0), mSchematicEditor(0)
 {
     qDebug() << (create ? "create project..." : "open project...");
 
@@ -173,6 +174,7 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
 
         mUndoStack = new UndoStack();
         mProjectLibrary = new ProjectLibrary(*this, mIsRestored, mIsReadOnly);
+        mErcMsgList = new ErcMsgList(*this, mIsRestored, mIsReadOnly);
         mCircuit = new Circuit(*this, mIsRestored, mIsReadOnly, create);
 
         // Load all schematic layers
@@ -198,6 +200,12 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
         mSchematicsIniFile->releaseQSettings(schematicsSettings);
         qDebug() << mSchematics.count() << "schematics successfully loaded!";
 
+        // at this point, the whole circuit with all schematics and board is successfully
+        // loaded, so the ERC list now contains all the correct ERC messages.
+        // So we can now restore the ignore state of each ERC message from the XML file.
+        mErcMsgList->restoreIgnoreState();
+
+        // create the whole schematic editor GUI inclusive FSM and so on
         mSchematicEditor = new SchematicEditor(*this, mIsReadOnly);
 
         if (create) save(); // write all files to harddisc
@@ -211,6 +219,7 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
         delete mSchematicsIniFile;      mSchematicsIniFile = 0;
         qDeleteAll(mSchematicLayers);   mSchematicLayers.clear();
         delete mCircuit;                mCircuit = 0;
+        delete mErcMsgList;             mErcMsgList = 0;
         delete mProjectLibrary;         mProjectLibrary = 0;
         delete mUndoStack;              mUndoStack = 0;
         delete mXmlFile;                mXmlFile = 0;
@@ -254,6 +263,7 @@ Project::~Project() noexcept
     delete mSchematicsIniFile;      mSchematicsIniFile = 0;
     qDeleteAll(mSchematicLayers);   mSchematicLayers.clear();
     delete mCircuit;                mCircuit = 0;
+    delete mErcMsgList;             mErcMsgList = 0;
     delete mProjectLibrary;         mProjectLibrary = 0;
     delete mUndoStack;              mUndoStack = 0;
     delete mXmlFile;                mXmlFile = 0;
@@ -588,6 +598,10 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
         success = false;
         errors.append(e.getUserMsg());
     }
+
+    // Save ERC messages list
+    if (!mErcMsgList->save(toOriginal, errors))
+        success = false;
 
     // if the project was restored from a backup, reset the mIsRestored flag as the current
     // state of the project is no longer a restored backup but a properly saved project

@@ -45,6 +45,7 @@ class ProjectLibrary;
 class Circuit;
 class SchematicEditor;
 class Schematic;
+class ErcMsgList;
 }
 
 /*****************************************************************************************
@@ -132,19 +133,26 @@ class Project final : public QObject
         UndoStack& getUndoStack() const noexcept {return *mUndoStack;}
 
         /**
-         * @brief Get the Circuit object
-         *
-         * @return A reference to the Circuit object
-         */
-        Circuit& getCircuit() const noexcept {return *mCircuit;}
-
-        /**
          * @brief Get the ProjectLibrary object which contains all library elements used
          *        in this project
          *
          * @return A reference to the ProjectLibrary object
          */
         ProjectLibrary& getLibrary() const noexcept {return *mProjectLibrary;}
+
+        /**
+         * @brief Get the ERC messages list
+         *
+         * @return A reference to the ErcMsgList object
+         */
+        ErcMsgList& getErcMsgList() const noexcept {return *mErcMsgList;}
+
+        /**
+         * @brief Get the Circuit object
+         *
+         * @return A reference to the Circuit object
+         */
+        Circuit& getCircuit() const noexcept {return *mCircuit;}
 
         /**
          * @brief Get all Schematic Layers
@@ -367,6 +375,7 @@ class Project final : public QObject
         QTimer mAutoSaveTimer; ///< the timer for the periodically automatic saving functionality (see also @ref doc_project_save)
         UndoStack* mUndoStack; ///< See @ref doc_project_undostack
         ProjectLibrary* mProjectLibrary;
+        ErcMsgList* mErcMsgList;
         Circuit* mCircuit;
         QList<Schematic*> mSchematics;
         SchematicEditor* mSchematicEditor;

@@ -109,7 +109,7 @@ SOURCES += \
     common/inifile.cpp \
     project/schematics/cmd/cmdschematicadd.cpp \
     project/schematics/cmd/cmdschematicremove.cpp \
-    project/circuit/ercmsgdock.cpp \
+    project/erc/ercmsgdock.cpp \
     project/schematics/fsm/schematiceditorevent.cpp \
     project/schematics/fsm/ses_select.cpp \
     project/schematics/fsm/ses_move.cpp \
@@ -156,7 +156,9 @@ SOURCES += \
     project/schematics/cmd/cmdsymbolinstanceremove.cpp \
     project/schematics/cmd/cmdschematicnetpointdetach.cpp \
     project/schematics/cmd/cmdschematicnetpointsetnetsignal.cpp \
-    workspace/settings/items/wsi_debugtools.cpp
+    workspace/settings/items/wsi_debugtools.cpp \
+    project/erc/ercmsg.cpp \
+    project/erc/ercmsglist.cpp
 
 HEADERS += \
     common/units.h \
@@ -211,7 +213,7 @@ HEADERS += \
     common/inifile.h \
     project/schematics/cmd/cmdschematicadd.h \
     project/schematics/cmd/cmdschematicremove.h \
-    project/circuit/ercmsgdock.h \
+    project/erc/ercmsgdock.h \
     project/schematics/fsm/schematiceditorevent.h \
     project/schematics/fsm/ses_select.h \
     project/schematics/fsm/ses_move.h \
@@ -258,7 +260,9 @@ HEADERS += \
     project/schematics/cmd/cmdsymbolinstanceremove.h \
     project/schematics/cmd/cmdschematicnetpointdetach.h \
     project/schematics/cmd/cmdschematicnetpointsetnetsignal.h \
-    workspace/settings/items/wsi_debugtools.h
+    workspace/settings/items/wsi_debugtools.h \
+    project/erc/ercmsg.h \
+    project/erc/ercmsglist.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \
@@ -267,7 +271,7 @@ FORMS += \
     project/schematics/schematiceditor.ui \
     workspace/settings/workspacesettingsdialog.ui \
     project/schematics/schematicpagesdock.ui \
-    project/circuit/ercmsgdock.ui \
+    project/erc/ercmsgdock.ui \
     project/circuit/editnetclassesdialog.ui \
     common/dialogs/gridsettingsdialog.ui
 

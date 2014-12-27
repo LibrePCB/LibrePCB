@@ -17,59 +17,83 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_ERCMSGDOCK_H
-#define PROJECT_ERCMSGDOCK_H
+#ifndef PROJECT_ERCMSGLIST_H
+#define PROJECT_ERCMSGLIST_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QtWidgets>
+#include "../../common/exceptions.h"
+#include "../../common/filepath.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
+class XmlFile;
+
 namespace project {
 class Project;
-}
-
-namespace Ui {
-class ErcMsgDock;
+class ErcMsg;
 }
 
 /*****************************************************************************************
- *  Class ErcMsgDock
+ *  Class ErcMsgList
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The ErcMsgDock class
+ * @brief The ErcMsgList class contains a list of ERC messages which are visible for the user
  */
-class ErcMsgDock final : public QDockWidget
+class ErcMsgList final : public QObject
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit ErcMsgDock(Project& project);
-        ~ErcMsgDock();
+        explicit ErcMsgList(Project& project, bool restore, bool readOnly) throw (Exception);
+        ~ErcMsgList() noexcept;
+
+        // Getters
+        const QList<ErcMsg*>& getItems() const noexcept {return mItems;}
+
+        // General Methods
+        void add(ErcMsg* ercMsg) noexcept;
+        void remove(ErcMsg* ercMsg) noexcept;
+        void update(ErcMsg* ercMsg) noexcept;
+        void restoreIgnoreState() noexcept;
+        bool save(bool toOriginal, QStringList& errors) noexcept;
+
+    signals:
+
+        void ercMsgAdded(ErcMsg* ercMsg);
+        void ercMsgRemoved(ErcMsg* ercMsg);
+        void ercMsgChanged(ErcMsg* ercMsg);
+
 
     private:
 
         // make some methods inaccessible...
-        ErcMsgDock();
-        ErcMsgDock(const ErcMsgDock& other);
-        ErcMsgDock& operator=(const ErcMsgDock& rhs);
+        ErcMsgList();
+        ErcMsgList(const ErcMsgList& other);
+        ErcMsgList& operator=(const ErcMsgList& rhs);
+
 
         // General
         Project& mProject;
-        Ui::ErcMsgDock* mUi;
+
+        // File "core/erc.xml"
+        FilePath mXmlFilepath;
+        XmlFile* mXmlFile;
+
+        // Misc
+        QList<ErcMsg*> mItems; ///< contains all visible ERC messages
 };
 
 } // namespace project
 
-#endif // PROJECT_ERCMSGDOCK_H
+#endif // PROJECT_ERCMSGLIST_H

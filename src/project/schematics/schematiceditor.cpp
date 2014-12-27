@@ -31,7 +31,7 @@
 #include "../../common/undostack.h"
 #include "schematic.h"
 #include "schematicpagesdock.h"
-#include "../circuit/ercmsgdock.h"
+#include "../erc/ercmsgdock.h"
 #include "fsm/ses_fsm.h"
 #include "../circuit/circuit.h"
 #include "../../common/dialogs/gridsettingsdialog.h"
