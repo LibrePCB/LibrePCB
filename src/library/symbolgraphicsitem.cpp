@@ -36,7 +36,7 @@
 #include "../project/circuit/netsignal.h"
 #include "symbolpingraphicsitem.h"
 #include "../workspace/workspace.h"
-#include "../project/circuit/genericcomponentinstance.h"
+#include "../project/circuit/gencompinstance.h"
 #include "../workspace/settings/workspacesettings.h"
 
 namespace library {

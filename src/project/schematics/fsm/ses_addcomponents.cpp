@@ -31,7 +31,7 @@
 #include "../../circuit/cmd/cmdgencompinstanceadd.h"
 #include "../../../common/undostack.h"
 #include "../cmd/cmdsymbolinstanceadd.h"
-#include "../../circuit/genericcomponentinstance.h"
+#include "../../circuit/gencompinstance.h"
 #include "../cmd/cmdsymbolinstancemove.h"
 #include "../symbolinstance.h"
 #include "../schematic.h"

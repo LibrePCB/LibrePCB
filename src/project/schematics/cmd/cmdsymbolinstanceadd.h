@@ -35,7 +35,7 @@
 
 namespace project {
 class Schematic;
-class GenericComponentInstance;
+class GenCompInstance;
 class SymbolInstance;
 }
 
@@ -53,7 +53,7 @@ class CmdSymbolInstanceAdd final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit CmdSymbolInstanceAdd(Schematic& schematic, GenericComponentInstance& genComp,
+        explicit CmdSymbolInstanceAdd(Schematic& schematic, GenCompInstance& genComp,
                                       const QUuid& symbolItem, const Point& position = Point(),
                                       const Angle& angle = Angle(), bool mirror = false,
                                       UndoCommand* parent = 0) throw (Exception);
@@ -70,7 +70,7 @@ class CmdSymbolInstanceAdd final : public UndoCommand
 
         // Attributes from the constructor
         Schematic& mSchematic;
-        GenericComponentInstance& mGenCompInstance;
+        GenCompInstance& mGenCompInstance;
         QUuid mSymbolItemUuid;
         Point mPosition;
         Angle mAngle;

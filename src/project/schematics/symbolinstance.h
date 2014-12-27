@@ -38,7 +38,7 @@ class SchematicLayer;
 
 namespace project {
 class Schematic;
-class GenericComponentInstance;
+class GenCompInstance;
 class SymbolPinInstance;
 }
 
@@ -78,7 +78,7 @@ class SymbolInstance final : public QObject
         const Angle& getAngle() const noexcept {return mAngle;}
         SymbolPinInstance* getPinInstance(const QUuid& pinUuid) const noexcept {return mPinInstances.value(pinUuid);}
         const QHash<QUuid, SymbolPinInstance*>& getPinInstances() const noexcept {return mPinInstances;}
-        GenericComponentInstance& getGenCompInstance() const noexcept {return *mGenCompInstance;}
+        GenCompInstance& getGenCompInstance() const noexcept {return *mGenCompInstance;}
         const library::Symbol& getSymbol() const noexcept {return *mSymbol;}
         const library::GenCompSymbVarItem& getGenCompSymbVarItem() const noexcept {return *mSymbVarItem;}
 
@@ -121,7 +121,7 @@ class SymbolInstance final : public QObject
 
         // Attributes
         QUuid mUuid;
-        GenericComponentInstance* mGenCompInstance;
+        GenCompInstance* mGenCompInstance;
         Point mPosition;
         Angle mAngle;
 };

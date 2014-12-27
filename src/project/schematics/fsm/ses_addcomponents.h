@@ -38,7 +38,7 @@ class GenCompSymbVarItem;
 }
 
 namespace project {
-class GenericComponentInstance;
+class GenCompInstance;
 class SymbolInstance;
 class CmdSymbolInstanceMove;
 }

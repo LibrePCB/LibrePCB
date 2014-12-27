@@ -24,7 +24,7 @@
 #include <QtCore>
 #include "cmdgencompinstanceadd.h"
 #include "../circuit.h"
-#include "../genericcomponentinstance.h"
+#include "../gencompinstance.h"
 
 namespace project {
 

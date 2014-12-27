@@ -21,7 +21,7 @@
 #include <QDomElement>
 #include "../../common/exceptions.h"
 #include "gencompsignalinstance.h"
-#include "genericcomponentinstance.h"
+#include "gencompinstance.h"
 #include "circuit.h"
 #include "netsignal.h"
 #include "../../library/genericcomponent.h"
@@ -33,8 +33,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-GenCompSignalInstance::GenCompSignalInstance(Circuit& circuit,
-                                             GenericComponentInstance& genCompInstance,
+GenCompSignalInstance::GenCompSignalInstance(Circuit& circuit, GenCompInstance& genCompInstance,
                                              const QDomElement& domElement) throw (Exception) :
     QObject(0), mCircuit(circuit), mGenCompInstance(genCompInstance), mDomElement(domElement),
     mGenCompSignal(nullptr), mNetSignal(nullptr), mAddedToCircuit(false)

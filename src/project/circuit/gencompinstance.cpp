@@ -23,7 +23,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include "genericcomponentinstance.h"
+#include "gencompinstance.h"
 #include "../../common/exceptions.h"
 #include "circuit.h"
 #include "../project.h"
@@ -38,9 +38,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-GenericComponentInstance::GenericComponentInstance(Circuit& circuit,
-                                                   const QDomElement& domElement)
-                                                   throw (Exception) :
+GenCompInstance::GenCompInstance(Circuit& circuit, const QDomElement& domElement) throw (Exception) :
     QObject(0), mCircuit(circuit), mDomElement(domElement), mAddedToCircuit(false),
     mGenComp(nullptr), mGenCompSymbVar(nullptr)
 {
@@ -105,7 +103,7 @@ GenericComponentInstance::GenericComponentInstance(Circuit& circuit,
     updateErcMessages();
 }
 
-GenericComponentInstance::~GenericComponentInstance() noexcept
+GenCompInstance::~GenCompInstance() noexcept
 {
     Q_ASSERT(!mAddedToCircuit);
     Q_ASSERT(mSymbolInstances.isEmpty());
@@ -117,12 +115,12 @@ GenericComponentInstance::~GenericComponentInstance() noexcept
  *  Getters
  ****************************************************************************************/
 
-uint GenericComponentInstance::getUnplacedSymbolsCount() const noexcept
+uint GenCompInstance::getUnplacedSymbolsCount() const noexcept
 {
     return (mGenCompSymbVar->getItems().count() - mSymbolInstances.count());
 }
 
-uint GenericComponentInstance::getUnplacedRequiredSymbolsCount() const noexcept
+uint GenCompInstance::getUnplacedRequiredSymbolsCount() const noexcept
 {
     uint count = 0;
     foreach (const library::GenCompSymbVarItem* item, mGenCompSymbVar->getItems())
@@ -133,7 +131,7 @@ uint GenericComponentInstance::getUnplacedRequiredSymbolsCount() const noexcept
     return count;
 }
 
-uint GenericComponentInstance::getUnplacedOptionalSymbolsCount() const noexcept
+uint GenCompInstance::getUnplacedOptionalSymbolsCount() const noexcept
 {
     uint count = 0;
     foreach (const library::GenCompSymbVarItem* item, mGenCompSymbVar->getItems())
@@ -148,7 +146,7 @@ uint GenericComponentInstance::getUnplacedOptionalSymbolsCount() const noexcept
  *  Setters
  ****************************************************************************************/
 
-void GenericComponentInstance::setName(const QString& name) throw (Exception)
+void GenCompInstance::setName(const QString& name) throw (Exception)
 {
     if(name.isEmpty())
     {
@@ -165,7 +163,7 @@ void GenericComponentInstance::setName(const QString& name) throw (Exception)
  *  General Methods
  ****************************************************************************************/
 
-void GenericComponentInstance::addToCircuit(bool addNode, QDomElement& parent) throw (Exception)
+void GenCompInstance::addToCircuit(bool addNode, QDomElement& parent) throw (Exception)
 {
     if (mAddedToCircuit) throw LogicError(__FILE__, __LINE__);
 
@@ -185,7 +183,7 @@ void GenericComponentInstance::addToCircuit(bool addNode, QDomElement& parent) t
     updateErcMessages();
 }
 
-void GenericComponentInstance::removeFromCircuit(bool removeNode, QDomElement& parent) throw (Exception)
+void GenCompInstance::removeFromCircuit(bool removeNode, QDomElement& parent) throw (Exception)
 {
     if (!mAddedToCircuit) throw LogicError(__FILE__, __LINE__);
 
@@ -212,9 +210,8 @@ void GenericComponentInstance::removeFromCircuit(bool removeNode, QDomElement& p
     updateErcMessages();
 }
 
-void GenericComponentInstance::registerSymbolInstance(const QUuid& itemUuid,
-                                                      const QUuid& symbolUuid,
-                                                      const SymbolInstance* instance) throw (Exception)
+void GenCompInstance::registerSymbolInstance(const QUuid& itemUuid, const QUuid& symbolUuid,
+                                             const SymbolInstance* instance) throw (Exception)
 {
     if (!mAddedToCircuit)
         throw LogicError(__FILE__, __LINE__, itemUuid.toString());
@@ -242,8 +239,8 @@ void GenericComponentInstance::registerSymbolInstance(const QUuid& itemUuid,
     updateErcMessages();
 }
 
-void GenericComponentInstance::unregisterSymbolInstance(const QUuid& itemUuid,
-                                                        const SymbolInstance* symbol) throw (Exception)
+void GenCompInstance::unregisterSymbolInstance(const QUuid& itemUuid,
+                                               const SymbolInstance* symbol) throw (Exception)
 {
     if (!mAddedToCircuit)
         throw LogicError(__FILE__, __LINE__, itemUuid.toString());
@@ -267,7 +264,7 @@ void GenericComponentInstance::unregisterSymbolInstance(const QUuid& itemUuid,
  *  Private Methods
  ****************************************************************************************/
 
-void GenericComponentInstance::updateErcMessages() noexcept
+void GenCompInstance::updateErcMessages() noexcept
 {
     uint required = getUnplacedRequiredSymbolsCount();
     uint optional = getUnplacedOptionalSymbolsCount();
@@ -285,10 +282,10 @@ void GenericComponentInstance::updateErcMessages() noexcept
  *  Static Methods
  ****************************************************************************************/
 
-GenericComponentInstance* GenericComponentInstance::create(Circuit& circuit, QDomDocument& doc,
-                                                           const library::GenericComponent& genComp,
-                                                           const library::GenCompSymbVar& symbVar,
-                                                           const QString& name) throw (Exception)
+GenCompInstance* GenCompInstance::create(Circuit& circuit, QDomDocument& doc,
+                                         const library::GenericComponent& genComp,
+                                         const library::GenCompSymbVar& symbVar,
+                                         const QString& name) throw (Exception)
 {
     QDomElement node = doc.createElement("instance");
     if (node.isNull())
@@ -311,8 +308,8 @@ GenericComponentInstance* GenericComponentInstance::create(Circuit& circuit, QDo
     }
     node.appendChild(signalMapNode);
 
-    // create and return the new GenericComponentInstance object
-    return new GenericComponentInstance(circuit, node);
+    // create and return the new GenCompInstance object
+    return new GenCompInstance(circuit, node);
 }
 
 /*****************************************************************************************

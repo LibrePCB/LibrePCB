@@ -26,7 +26,7 @@
 #include "symbolinstance.h"
 #include "../../library/symbol.h"
 #include "../../library/symbolpin.h"
-#include "../circuit/genericcomponentinstance.h"
+#include "../circuit/gencompinstance.h"
 #include "../../library/genericcomponent.h"
 #include "schematicnetpoint.h"
 #include "../circuit/gencompsignalinstance.h"

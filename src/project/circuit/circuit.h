@@ -38,7 +38,7 @@ namespace project {
 class Project;
 class NetClass;
 class NetSignal;
-class GenericComponentInstance;
+class GenCompInstance;
 }
 
 namespace library {
@@ -90,14 +90,14 @@ class Circuit final : public QObject
         void removeNetSignal(NetSignal* netsignal, bool fromDomTree = true,
                              bool deleteNetSignal = false) throw (Exception);
 
-        // GenericComponentInstance Methods
-        GenericComponentInstance* getGenCompInstanceByUuid(const QUuid& uuid) const noexcept;
-        GenericComponentInstance* getGenCompInstanceByName(const QString& name) const noexcept;
-        GenericComponentInstance* createGenCompInstance(const library::GenericComponent& genComp,
+        // GenCompInstance Methods
+        GenCompInstance* getGenCompInstanceByUuid(const QUuid& uuid) const noexcept;
+        GenCompInstance* getGenCompInstanceByName(const QString& name) const noexcept;
+        GenCompInstance* createGenCompInstance(const library::GenericComponent& genComp,
                                                         const library::GenCompSymbVar& symbVar,
                                                         QString name = QString()) throw (Exception);
-        void addGenCompInstance(GenericComponentInstance* genCompInstance, bool toDomTree = true) throw (Exception);
-        void removeGenCompInstance(GenericComponentInstance* genCompInstance, bool fromDomTree = true,
+        void addGenCompInstance(GenCompInstance* genCompInstance, bool toDomTree = true) throw (Exception);
+        void removeGenCompInstance(GenCompInstance* genCompInstance, bool fromDomTree = true,
                              bool deleteGenCompInstance = false) throw (Exception);
 
         // General Methods
@@ -110,8 +110,8 @@ class Circuit final : public QObject
         void netClassRemoved(NetClass* netclass);
         void netSignalAdded(NetSignal* netsignal);
         void netSignalRemoved(NetSignal* netsignal);
-        void genCompAdded(GenericComponentInstance* genComp);
-        void genCompRemoved(GenericComponentInstance* genComp);
+        void genCompAdded(GenCompInstance* genComp);
+        void genCompRemoved(GenCompInstance* genComp);
 
 
     private:
@@ -130,7 +130,7 @@ class Circuit final : public QObject
 
         QHash<QUuid, NetClass*> mNetClasses;
         QHash<QUuid, NetSignal*> mNetSignals;
-        QHash<QUuid, GenericComponentInstance*> mGenCompInstances;
+        QHash<QUuid, GenCompInstance*> mGenCompInstances;
 };
 
 } // namespace project

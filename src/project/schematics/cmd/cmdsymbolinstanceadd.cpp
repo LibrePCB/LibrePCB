@@ -26,7 +26,7 @@
 #include "../symbolinstance.h"
 #include "../schematic.h"
 #include "../../circuit/circuit.h"
-#include "../../circuit/genericcomponentinstance.h"
+#include "../../circuit/gencompinstance.h"
 
 namespace project {
 
@@ -35,7 +35,7 @@ namespace project {
  ****************************************************************************************/
 
 CmdSymbolInstanceAdd::CmdSymbolInstanceAdd(Schematic& schematic,
-                                           GenericComponentInstance& genComp,
+                                           GenCompInstance& genComp,
                                            const QUuid& symbolItem, const Point& position,
                                            const Angle& angle, bool mirror,
                                            UndoCommand* parent) throw (Exception) :

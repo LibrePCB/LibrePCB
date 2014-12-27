@@ -89,7 +89,6 @@ SOURCES += \
     project/library/projectlibrary.cpp \
     project/circuit/netclass.cpp \
     project/circuit/netsignal.cpp \
-    project/circuit/genericcomponentinstance.cpp \
     project/circuit/gencompsignalinstance.cpp \
     common/systeminfo.cpp \
     common/debug.cpp \
@@ -158,7 +157,8 @@ SOURCES += \
     project/schematics/cmd/cmdschematicnetpointsetnetsignal.cpp \
     workspace/settings/items/wsi_debugtools.cpp \
     project/erc/ercmsg.cpp \
-    project/erc/ercmsglist.cpp
+    project/erc/ercmsglist.cpp \
+    project/circuit/gencompinstance.cpp
 
 HEADERS += \
     common/units.h \
@@ -193,7 +193,6 @@ HEADERS += \
     project/library/projectlibrary.h \
     project/circuit/netclass.h \
     project/circuit/netsignal.h \
-    project/circuit/genericcomponentinstance.h \
     project/circuit/gencompsignalinstance.h \
     common/systeminfo.h \
     common/debug.h \
@@ -262,7 +261,8 @@ HEADERS += \
     project/schematics/cmd/cmdschematicnetpointsetnetsignal.h \
     workspace/settings/items/wsi_debugtools.h \
     project/erc/ercmsg.h \
-    project/erc/ercmsglist.h
+    project/erc/ercmsglist.h \
+    project/circuit/gencompinstance.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \

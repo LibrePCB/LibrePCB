@@ -29,7 +29,7 @@
 #include "../../common/schematiclayer.h"
 #include "../../library/symbolgraphicsitem.h"
 #include "../library/projectlibrary.h"
-#include "../circuit/genericcomponentinstance.h"
+#include "../circuit/gencompinstance.h"
 #include "../../library/genericcomponent.h"
 #include "../../library/symbol.h"
 #include "symbolpininstance.h"

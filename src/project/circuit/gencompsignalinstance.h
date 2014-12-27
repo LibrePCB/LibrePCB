@@ -33,7 +33,7 @@
  ****************************************************************************************/
 
 namespace project {
-class GenericComponentInstance;
+class GenCompInstance;
 class SymbolPinInstance;
 class NetSignal;
 class Circuit;
@@ -60,8 +60,7 @@ class GenCompSignalInstance final : public QObject
     public:
 
         // Constructors / Destructor
-        explicit GenCompSignalInstance(Circuit& circuit,
-                                       GenericComponentInstance& genCompInstance,
+        explicit GenCompSignalInstance(Circuit& circuit, GenCompInstance& genCompInstance,
                                        const QDomElement& domElement) throw (Exception);
         ~GenCompSignalInstance() noexcept;
 
@@ -101,7 +100,7 @@ class GenCompSignalInstance final : public QObject
 
         // General
         Circuit& mCircuit;
-        GenericComponentInstance& mGenCompInstance;
+        GenCompInstance& mGenCompInstance;
         QDomElement mDomElement;
 
         // Attributes

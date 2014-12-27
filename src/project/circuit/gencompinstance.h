@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_GENERICCOMPONENTINSTANCE_H
-#define PROJECT_GENERICCOMPONENTINSTANCE_H
+#ifndef PROJECT_GENCOMPINSTANCE_H
+#define PROJECT_GENCOMPINSTANCE_H
 
 /*****************************************************************************************
  *  Includes
@@ -45,24 +45,23 @@ class GenCompSymbVar;
 }
 
 /*****************************************************************************************
- *  Class GenericComponentInstance
+ *  Class GenCompInstance
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The GenericComponentInstance class
+ * @brief The GenCompInstance class
  */
-class GenericComponentInstance : public QObject
+class GenCompInstance : public QObject
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit GenericComponentInstance(Circuit& circuit, const QDomElement& domElement)
-                                          throw (Exception);
-        ~GenericComponentInstance() noexcept;
+        explicit GenCompInstance(Circuit& circuit, const QDomElement& domElement) throw (Exception);
+        ~GenCompInstance() noexcept;
 
         // Getters
         const QUuid& getUuid() const noexcept {return mUuid;}
@@ -101,18 +100,18 @@ class GenericComponentInstance : public QObject
                                       throw (Exception);
 
         // Static Methods
-        static GenericComponentInstance* create(Circuit& circuit, QDomDocument& doc,
-                                                const library::GenericComponent& genComp,
-                                                const library::GenCompSymbVar& symbVar,
-                                                const QString& name) throw (Exception);
+        static GenCompInstance* create(Circuit& circuit, QDomDocument& doc,
+                                       const library::GenericComponent& genComp,
+                                       const library::GenCompSymbVar& symbVar,
+                                       const QString& name) throw (Exception);
 
 
     private:
 
         // make some methods inaccessible...
-        GenericComponentInstance();
-        GenericComponentInstance(const GenericComponentInstance& other);
-        GenericComponentInstance& operator=(const GenericComponentInstance& rhs);
+        GenCompInstance();
+        GenCompInstance(const GenCompInstance& other);
+        GenCompInstance& operator=(const GenCompInstance& rhs);
 
         // Private Methods
         void updateErcMessages() noexcept;
@@ -164,4 +163,4 @@ class GenericComponentInstance : public QObject
 
 } // namespace project
 
-#endif // PROJECT_GENERICCOMPONENTINSTANCE_H
+#endif // PROJECT_GENCOMPINSTANCE_H

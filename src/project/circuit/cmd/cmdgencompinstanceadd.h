@@ -34,7 +34,7 @@
 
 namespace project {
 class Circuit;
-class GenericComponentInstance;
+class GenCompInstance;
 }
 
 namespace library {
@@ -63,7 +63,7 @@ class CmdGenCompInstanceAdd final : public UndoCommand
         ~CmdGenCompInstanceAdd() noexcept;
 
         // Getters
-        GenericComponentInstance* getGenCompInstance() const noexcept {return mGenCompInstance;}
+        GenCompInstance* getGenCompInstance() const noexcept {return mGenCompInstance;}
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;
@@ -77,7 +77,7 @@ class CmdGenCompInstanceAdd final : public UndoCommand
         const library::GenCompSymbVar& mSymbVar;
 
         /// @brief The created generic component instance
-        GenericComponentInstance* mGenCompInstance;
+        GenCompInstance* mGenCompInstance;
 };
 
 } // namespace project

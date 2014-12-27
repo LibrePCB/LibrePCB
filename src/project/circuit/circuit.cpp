@@ -30,7 +30,7 @@
 #include "../project.h"
 #include "netclass.h"
 #include "netsignal.h"
-#include "genericcomponentinstance.h"
+#include "gencompinstance.h"
 #include "editnetclassesdialog.h"
 #include "../../library/genericcomponent.h"
 
@@ -92,7 +92,7 @@ Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create) thr
         tmpNode = root.firstChildElement("generic_component_instances").firstChildElement("instance");
         while (!tmpNode.isNull())
         {
-            GenericComponentInstance* genComp = new GenericComponentInstance(*this, tmpNode);
+            GenCompInstance* genComp = new GenCompInstance(*this, tmpNode);
             addGenCompInstance(genComp, false);
             tmpNode = tmpNode.nextSiblingElement("instance");
         }
@@ -101,7 +101,7 @@ Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create) thr
     catch (...)
     {
         // free allocated memory (see comments in the destructor) and rethrow the exception
-        foreach (GenericComponentInstance* genCompInstance, mGenCompInstances)
+        foreach (GenCompInstance* genCompInstance, mGenCompInstances)
             try { removeGenCompInstance(genCompInstance, false, true); } catch (...) {}
         foreach (NetSignal* netsignal, mNetSignals)
             try { removeNetSignal(netsignal, false, true); } catch (...) {}
@@ -117,7 +117,7 @@ Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create) thr
 Circuit::~Circuit() noexcept
 {
     // delete all generic component instances (and catch all throwed exceptions)
-    foreach (GenericComponentInstance* genCompInstance, mGenCompInstances)
+    foreach (GenCompInstance* genCompInstance, mGenCompInstances)
         try { removeGenCompInstance(genCompInstance, false, true); } catch (...) {}
 
     // delete all netsignals (and catch all throwed exceptions)
@@ -316,17 +316,17 @@ void Circuit::removeNetSignal(NetSignal* netsignal, bool fromDomTree, bool delet
 }
 
 /*****************************************************************************************
- *  GenericComponentInstance Methods
+ *  GenCompInstance Methods
  ****************************************************************************************/
 
-GenericComponentInstance* Circuit::getGenCompInstanceByUuid(const QUuid& uuid) const noexcept
+GenCompInstance* Circuit::getGenCompInstanceByUuid(const QUuid& uuid) const noexcept
 {
     return mGenCompInstances.value(uuid, 0);
 }
 
-GenericComponentInstance* Circuit::getGenCompInstanceByName(const QString& name) const noexcept
+GenCompInstance* Circuit::getGenCompInstanceByName(const QString& name) const noexcept
 {
-    foreach (GenericComponentInstance* genCompInstance, mGenCompInstances)
+    foreach (GenCompInstance* genCompInstance, mGenCompInstances)
     {
         if (genCompInstance->getName() == name)
             return genCompInstance;
@@ -334,7 +334,7 @@ GenericComponentInstance* Circuit::getGenCompInstanceByName(const QString& name)
     return 0;
 }
 
-GenericComponentInstance* Circuit::createGenCompInstance(const library::GenericComponent& genComp,
+GenCompInstance* Circuit::createGenCompInstance(const library::GenericComponent& genComp,
                                                          const library::GenCompSymbVar& symbVar,
                                                          QString name) throw (Exception)
 {
@@ -356,10 +356,10 @@ GenericComponentInstance* Circuit::createGenCompInstance(const library::GenericC
                 "name \"%1\" does already exist in the circuit.")).arg(name));
         }
     }
-    return GenericComponentInstance::create(*this, mXmlFile->getDocument(), genComp, symbVar, name);
+    return GenCompInstance::create(*this, mXmlFile->getDocument(), genComp, symbVar, name);
 }
 
-void Circuit::addGenCompInstance(GenericComponentInstance* genCompInstance,
+void Circuit::addGenCompInstance(GenCompInstance* genCompInstance,
                                  bool toDomTree) throw (Exception)
 {
     Q_CHECK_PTR(genCompInstance);
@@ -387,7 +387,7 @@ void Circuit::addGenCompInstance(GenericComponentInstance* genCompInstance,
     emit genCompAdded(genCompInstance);
 }
 
-void Circuit::removeGenCompInstance(GenericComponentInstance* genCompInstance,
+void Circuit::removeGenCompInstance(GenCompInstance* genCompInstance,
                                     bool fromDomTree, bool deleteGenCompInstance)
                                     throw (Exception)
 {
