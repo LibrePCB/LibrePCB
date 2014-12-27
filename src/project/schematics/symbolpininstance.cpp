@@ -74,18 +74,25 @@ Point SymbolPinInstance::getPosition() const noexcept
     return mSymbolInstance.mapToScene(mSymbolPin->getPosition());
 }
 
-QString SymbolPinInstance::getDisplayText() const noexcept
+QString SymbolPinInstance::getDisplayText(bool returnGenCompSignalNameIfEmpty,
+                                          bool returnPinNameIfEmpty) const noexcept
 {
+    QString text;
     switch (mSymbolInstance.getGenCompSymbVarItem().getDisplayTypeOfPin(mSymbolPin->getUuid()))
     {
         case library::GenCompSymbVarItem::PinDisplayType_t::PinName:
-            return mSymbolPin->getName();
+            text = mSymbolPin->getName(); break;
         case library::GenCompSymbVarItem::PinDisplayType_t::GenCompSignal:
-            return (mGenCompSignal ? mGenCompSignal->getName() : QString());
+            if (mGenCompSignal) text = mGenCompSignal->getName(); break;
         case library::GenCompSymbVarItem::PinDisplayType_t::NetSignal:
-            return (mGenCompSignalInstance->getNetSignal() ? mGenCompSignalInstance->getNetSignal()->getName() : QString());
-        default: return QString();
+            if (mGenCompSignalInstance->getNetSignal()) text = mGenCompSignalInstance->getNetSignal()->getName(); break;
+        default: break;
     }
+    if (text.isEmpty() && returnGenCompSignalNameIfEmpty && mGenCompSignal)
+        text = mGenCompSignal->getName();
+    if (text.isEmpty() && returnPinNameIfEmpty)
+        text = mSymbolPin->getName();
+    return text;
 }
 
 /*****************************************************************************************
