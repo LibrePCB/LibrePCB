@@ -26,6 +26,8 @@
 #include "netclass.h"
 #include "../../common/exceptions.h"
 #include "netsignal.h"
+#include "circuit.h"
+#include "../erc/ercmsg.h"
 
 namespace project {
 
@@ -33,27 +35,32 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-NetClass::NetClass(const QDomElement& domElement) throw (Exception) :
-    QObject(0), mDomElement(domElement)
+NetClass::NetClass(Circuit& circuit, const QDomElement& domElement) throw (Exception) :
+    QObject(0), mCircuit(circuit), mDomElement(domElement)
 {
+    // read attributes
     mUuid = mDomElement.attribute("uuid");
     if(mUuid.isNull())
     {
         throw RuntimeError(__FILE__, __LINE__, mDomElement.attribute("uuid"),
             QString(tr("Invalid netclass UUID: \"%1\"")).arg(mDomElement.attribute("uuid")));
     }
-
     mName = mDomElement.attribute("name");
     if(mName.isEmpty())
     {
         throw RuntimeError(__FILE__, __LINE__, mUuid.toString(),
             QString(tr("Name of netclass \"%1\" is empty!")).arg(mUuid.toString()));
     }
+
+    // create ERC messages
+    mErcMsgUnusedNetClass.reset(new ErcMsg(mCircuit.getProject(), *this,
+        mUuid.toString(), "Unused", ErcMsg::ErcMsgType_t::CircuitWarning,
+        QString(tr("Unused net class: \"%1\"")).arg(mName)));
 }
 
 NetClass::~NetClass() noexcept
 {
-    Q_ASSERT(mNetSignals.count() == 0);
+    Q_ASSERT(mNetSignals.isEmpty());
 }
 
 /*****************************************************************************************
@@ -68,6 +75,7 @@ void NetClass::setName(const QString& name) throw (Exception)
             tr("The new netclass name must not be empty!"));
     }
 
+    mErcMsgUnusedNetClass->setMsg(QString(tr("Unused net class: \"%1\"")).arg(name));
     mDomElement.setAttribute("name", name);
     mName = name;
 }
@@ -82,6 +90,7 @@ void NetClass::registerNetSignal(NetSignal* signal) noexcept
     Q_ASSERT(!mNetSignals.contains(signal->getUuid()));
 
     mNetSignals.insert(signal->getUuid(), signal);
+    mErcMsgUnusedNetClass->setVisible(mNetSignals.isEmpty());
 }
 
 void NetClass::unregisterNetSignal(NetSignal* signal) noexcept
@@ -90,6 +99,7 @@ void NetClass::unregisterNetSignal(NetSignal* signal) noexcept
     Q_ASSERT(mNetSignals.contains(signal->getUuid()));
 
     mNetSignals.remove(signal->getUuid());
+    mErcMsgUnusedNetClass->setVisible(mNetSignals.isEmpty());
 }
 
 /*****************************************************************************************
@@ -108,6 +118,8 @@ void NetClass::addToCircuit(bool addNode, QDomElement& parent) throw (Exception)
         if (parent.appendChild(mDomElement).isNull())
             throw LogicError(__FILE__, __LINE__, QString(), tr("Could not append DOM node!"));
     }
+
+    mErcMsgUnusedNetClass->setVisible(true);
 }
 
 void NetClass::removeFromCircuit(bool removeNode, QDomElement& parent) throw (Exception)
@@ -122,13 +134,15 @@ void NetClass::removeFromCircuit(bool removeNode, QDomElement& parent) throw (Ex
         if (parent.removeChild(mDomElement).isNull())
             throw LogicError(__FILE__, __LINE__, QString(), tr("Could not remove node from DOM tree!"));
     }
+
+    mErcMsgUnusedNetClass->setVisible(false);
 }
 
 /*****************************************************************************************
  *  Static Methods
  ****************************************************************************************/
 
-NetClass* NetClass::create(QDomDocument& doc, const QString& name) throw (Exception)
+NetClass* NetClass::create(Circuit& circuit, QDomDocument& doc, const QString& name) throw (Exception)
 {
     QDomElement node = doc.createElement("netclass");
     if (node.isNull())
@@ -139,7 +153,7 @@ NetClass* NetClass::create(QDomDocument& doc, const QString& name) throw (Except
     node.setAttribute("name", name);
 
     // create and return the new NetClass object
-    return new NetClass(node);
+    return new NetClass(circuit, node);
 }
 
 /*****************************************************************************************

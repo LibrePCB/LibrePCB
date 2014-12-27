@@ -25,6 +25,7 @@
 #include "circuit.h"
 #include "netsignal.h"
 #include "../../library/genericcomponent.h"
+#include "../erc/ercmsg.h"
 
 namespace project {
 
@@ -36,8 +37,9 @@ GenCompSignalInstance::GenCompSignalInstance(Circuit& circuit,
                                              GenericComponentInstance& genCompInstance,
                                              const QDomElement& domElement) throw (Exception) :
     QObject(0), mCircuit(circuit), mGenCompInstance(genCompInstance), mDomElement(domElement),
-    mGenCompSignal(0), mNetSignal(0), mAddedToCircuit(false)
+    mGenCompSignal(nullptr), mNetSignal(nullptr), mAddedToCircuit(false)
 {
+    // read attributes
     QString genCompSignalUuid = mDomElement.attribute("comp_signal");
     mGenCompSignal = mGenCompInstance.getGenComp().getSignalByUuid(genCompSignalUuid);
     if(!mGenCompSignal)
@@ -45,7 +47,6 @@ GenCompSignalInstance::GenCompSignalInstance(Circuit& circuit,
         throw RuntimeError(__FILE__, __LINE__, genCompSignalUuid, QString(
             tr("Invalid component signal UUID: \"%1\"")).arg(genCompSignalUuid));
     }
-
     QString netsignalUuid = mDomElement.attribute("netsignal");
     if (!netsignalUuid.isEmpty())
     {
@@ -56,6 +57,13 @@ GenCompSignalInstance::GenCompSignalInstance(Circuit& circuit,
                 QString(tr("Invalid netsignal UUID: \"%1\"")).arg(netsignalUuid));
         }
     }
+
+    // create ERC messages
+    mErcMsgUnconnectedRequiredSignal.reset(new ErcMsg(mCircuit.getProject(), *this,
+        QString("%1/%2").arg(mGenCompInstance.getUuid().toString()).arg(mGenCompSignal->getUuid().toString()),
+        "UnconnectedRequiredSignal", ErcMsg::ErcMsgType_t::CircuitError,
+        QString(tr("Unconnected component signal: \"%1\" from \"%2\""))
+        .arg(mGenCompSignal->getName()).arg(mGenCompInstance.getName())));
 }
 
 GenCompSignalInstance::~GenCompSignalInstance() noexcept
@@ -85,6 +93,7 @@ void GenCompSignalInstance::setNetSignal(NetSignal* netsignal) throw (Exception)
         mDomElement.setAttribute("netsignal", "");
 
     mNetSignal = netsignal;
+    mErcMsgUnconnectedRequiredSignal->setVisible((!mNetSignal) && (mGenCompSignal->isRequired()));
 }
 
 /*****************************************************************************************
@@ -124,6 +133,7 @@ void GenCompSignalInstance::addToCircuit() throw (Exception)
         mNetSignal->registerGenCompSignal(this);
 
     mAddedToCircuit = true;
+    mErcMsgUnconnectedRequiredSignal->setVisible((!mNetSignal) && (mGenCompSignal->isRequired()));
 }
 
 void GenCompSignalInstance::removeFromCircuit() throw (Exception)
@@ -135,6 +145,7 @@ void GenCompSignalInstance::removeFromCircuit() throw (Exception)
         mNetSignal->unregisterGenCompSignal(this);
 
     mAddedToCircuit = false;
+    mErcMsgUnconnectedRequiredSignal->setVisible(false);
 }
 
 /*****************************************************************************************

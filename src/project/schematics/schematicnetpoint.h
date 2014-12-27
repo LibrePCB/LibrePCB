@@ -38,12 +38,14 @@
 class SchematicLayer;
 
 namespace project {
+class Circuit;
 class Schematic;
 class NetSignal;
 class SchematicNetLine;
 class SchematicNetPoint;
 class SymbolInstance;
 class SymbolPinInstance;
+class ErcMsg;
 }
 
 /*****************************************************************************************
@@ -177,6 +179,7 @@ class SchematicNetPoint final : public QObject
         SchematicNetPoint& operator=(const SchematicNetPoint& rhs);
 
         // General
+        Circuit& mCircuit;
         Schematic& mSchematic;
         QDomElement mDomElement;
         SchematicNetPointGraphicsItem* mGraphicsItem;
@@ -189,7 +192,12 @@ class SchematicNetPoint final : public QObject
         SymbolInstance* mSymbolInstance;    ///< only needed if mAttached == true
         SymbolPinInstance* mPinInstance;    ///< only needed if mAttached == true
 
-        QList<SchematicNetLine*> mLines;
+        // Misc
+        QList<SchematicNetLine*> mLines;    ///< all registered netlines
+
+        /// @brief The ERC message for dead netpoints
+        QScopedPointer<ErcMsg> mErcMsgDeadNetPoint;
+
 
         // Static Members
         static const Length sCircleRadius;

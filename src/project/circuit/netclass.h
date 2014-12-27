@@ -33,7 +33,9 @@
  ****************************************************************************************/
 
 namespace project {
+class Circuit;
 class NetSignal;
+class ErcMsg;
 }
 
 /*****************************************************************************************
@@ -52,7 +54,7 @@ class NetClass final : public QObject
     public:
 
         // Constructors / Destructor
-        explicit NetClass(const QDomElement& domElement) throw (Exception);
+        explicit NetClass(Circuit& circuit, const QDomElement& domElement) throw (Exception);
         ~NetClass() noexcept;
 
         // Getters
@@ -72,7 +74,8 @@ class NetClass final : public QObject
         void removeFromCircuit(bool removeNode, QDomElement& parent) throw (Exception);
 
         // Static Methods
-        static NetClass* create(QDomDocument& doc, const QString& name) throw (Exception);
+        static NetClass* create(Circuit& circuit, QDomDocument& doc,
+                                const QString& name) throw (Exception);
 
     private:
 
@@ -82,12 +85,17 @@ class NetClass final : public QObject
         NetClass& operator=(const NetClass& rhs);
 
         // General
+        Circuit& mCircuit;
         QDomElement mDomElement;
 
         // Attributes
         QUuid mUuid;
         QString mName;
 
+        // Misc
+        /// @brief the ERC message for unused netclasses
+        QScopedPointer<ErcMsg> mErcMsgUnusedNetClass;
+        /// @brief all registered netsignals
         QHash<QUuid, NetSignal*> mNetSignals;
 };
 

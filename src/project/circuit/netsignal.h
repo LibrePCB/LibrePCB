@@ -37,6 +37,7 @@ class Circuit;
 class NetClass;
 class GenCompSignalInstance;
 class SchematicNetPoint;
+class ErcMsg;
 }
 
 /*****************************************************************************************
@@ -89,15 +90,26 @@ class NetSignal final : public QObject
         NetSignal(const NetSignal& other);
         NetSignal& operator=(const NetSignal& rhs);
 
+        // Private Methods
+        void updateErcMessages() noexcept;
+
         // General
         Circuit& mCircuit;
         QDomElement mDomElement;
+        bool mAddedToCircuit;
 
         // Attributes
         QUuid mUuid;
         QString mName;
         bool mAutoName;
         NetClass* mNetClass;
+
+        // Misc
+
+        /// @brief the ERC message for unused netsignals
+        QScopedPointer<ErcMsg> mErcMsgUnusedNetSignal;
+        /// @brief the ERC messages for netsignals with less than two generic component signals
+        QScopedPointer<ErcMsg> mErcMsgConnectedToLessThanTwoPins;
 
         // Registered Elements of this Netclass
         QList<GenCompSignalInstance*> mGenCompSignals;

@@ -32,10 +32,12 @@
  ****************************************************************************************/
 
 namespace project {
+class Circuit;
 class SymbolInstance;
 class GenCompSignalInstance;
 class SchematicNetPoint;
 class SchematicNetPointGraphicsItem;
+class ErcMsg;
 }
 
 namespace library {
@@ -94,12 +96,18 @@ class SymbolPinInstance final : public QObject
 
 
         // General
+        Circuit& mCircuit;
         SymbolInstance& mSymbolInstance;
         const library::SymbolPin* mSymbolPin;
         const library::GenCompSignal* mGenCompSignal;
         GenCompSignalInstance* mGenCompSignalInstance;
+
+        // Misc
         SchematicNetPoint* mRegisteredSchematicNetPoint;
         library::SymbolPinGraphicsItem* mRegisteredPinGraphicsItem;
+
+        /// @brief The ERC message for unconnected required pins
+        QScopedPointer<ErcMsg> mErcMsgUnconnectedRequiredPin;
 };
 
 } // namespace project

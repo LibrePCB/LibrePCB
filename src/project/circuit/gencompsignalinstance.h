@@ -37,6 +37,7 @@ class GenericComponentInstance;
 class SymbolPinInstance;
 class NetSignal;
 class Circuit;
+class ErcMsg;
 }
 
 namespace library {
@@ -108,6 +109,11 @@ class GenCompSignalInstance final : public QObject
         QList<SymbolPinInstance*> mSymbolPinInstances;
         NetSignal* mNetSignal;
         bool mAddedToCircuit;
+
+        // Misc
+
+        /// @brief The ERC message for an unconnected required generic component signal
+        QScopedPointer<ErcMsg> mErcMsgUnconnectedRequiredSignal;
 };
 
 } // namespace project

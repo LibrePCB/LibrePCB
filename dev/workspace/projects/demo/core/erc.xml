@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<erc version="0">
+    <ignore>
+        <item owner_class="project::GenCompSignalInstance" owner_key="{6fe07dd4-aaee-4a28-ae35-d22c2904a461}/{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}" msg_key="UnconnectedRequiredSignal"/>
+        <item owner_class="project::SymbolPinInstance" owner_key="{b52fac3b-5d3f-47df-88af-4aa87b9b2f39}/{1339ffc8-afb2-4137-9d37-d9801ac2bfd0}" msg_key="UnconnectedRequiredPin"/>
+    </ignore>
+</erc>

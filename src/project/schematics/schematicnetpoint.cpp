@@ -36,6 +36,7 @@
 #include "../../library/symbolgraphicsitem.h"
 #include "../../workspace/workspace.h"
 #include "../../workspace/settings/workspacesettings.h"
+#include "../erc/ercmsg.h"
 
 namespace project {
 
@@ -109,9 +110,11 @@ const Length SchematicNetPoint::sCircleRadius = Length(600000);
 
 SchematicNetPoint::SchematicNetPoint(Schematic& schematic, const QDomElement& domElement)
                                      throw (Exception) :
-    QObject(0), mSchematic(schematic), mDomElement(domElement), mGraphicsItem(nullptr),
-    mNetSignal(nullptr), mSymbolInstance(nullptr), mPinInstance(nullptr)
+    QObject(0), mCircuit(schematic.getProject().getCircuit()), mSchematic(schematic),
+    mDomElement(domElement), mGraphicsItem(nullptr), mNetSignal(nullptr),
+    mSymbolInstance(nullptr), mPinInstance(nullptr)
 {
+    // read attributes
     mUuid = mDomElement.attribute("uuid");
     if(mUuid.isNull())
     {
@@ -119,9 +122,7 @@ SchematicNetPoint::SchematicNetPoint(Schematic& schematic, const QDomElement& do
             QString(tr("Invalid net point UUID: \"%1\""))
             .arg(mDomElement.attribute("uuid")));
     }
-
     mAttached = (mDomElement.firstChildElement("attached").text() == "true");
-
     if (mAttached)
     {
         QString symbolInstanceUuid = mDomElement.firstChildElement("symbol").text();
@@ -169,11 +170,17 @@ SchematicNetPoint::SchematicNetPoint(Schematic& schematic, const QDomElement& do
     // create the graphics item
     mGraphicsItem = new SchematicNetPointGraphicsItem(mSchematic, *this);
     mGraphicsItem->setPos(mPosition.toPxQPointF());
+
+    // create ERC messages
+    mErcMsgDeadNetPoint.reset(new ErcMsg(mCircuit.getProject(), *this,
+        mUuid.toString(), "Dead", ErcMsg::ErcMsgType_t::SchematicError,
+        QString(tr("Dead net point in schematic page \"%1\": %2"))
+        .arg(mSchematic.getName()).arg(mUuid.toString())));
 }
 
 SchematicNetPoint::~SchematicNetPoint() noexcept
 {
-    delete mGraphicsItem;           mGraphicsItem = 0;
+    delete mGraphicsItem;           mGraphicsItem = nullptr;
 }
 
 /*****************************************************************************************
@@ -234,6 +241,7 @@ void SchematicNetPoint::registerNetLine(SchematicNetLine* netline) noexcept
     Q_ASSERT(!mLines.contains(netline));
     mLines.append(netline);
     netline->updateLine();
+    mErcMsgDeadNetPoint->setVisible(mLines.isEmpty());
 }
 
 void SchematicNetPoint::unregisterNetLine(SchematicNetLine* netline) noexcept
@@ -242,6 +250,7 @@ void SchematicNetPoint::unregisterNetLine(SchematicNetLine* netline) noexcept
     Q_ASSERT(mLines.contains(netline));
     mLines.removeOne(netline);
     netline->updateLine();
+    mErcMsgDeadNetPoint->setVisible(mLines.isEmpty());
 }
 
 void SchematicNetPoint::addToSchematic(Schematic& schematic, bool addNode,
@@ -269,6 +278,7 @@ void SchematicNetPoint::addToSchematic(Schematic& schematic, bool addNode,
     if (mAttached)
         mPinInstance->registerNetPoint(this);
     schematic.addItem(mGraphicsItem);
+    mErcMsgDeadNetPoint->setVisible(true);
 }
 
 void SchematicNetPoint::removeFromSchematic(Schematic& schematic, bool removeNode,
@@ -296,6 +306,7 @@ void SchematicNetPoint::removeFromSchematic(Schematic& schematic, bool removeNod
     if (mAttached)
         mPinInstance->unregisterNetPoint(this);
     schematic.removeItem(mGraphicsItem);
+    mErcMsgDeadNetPoint->setVisible(false);
 }
 
 bool SchematicNetPoint::save(bool toOriginal, QStringList& errors) noexcept

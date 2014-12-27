@@ -66,7 +66,7 @@ Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create) thr
         tmpNode = root.firstChildElement("netclasses").firstChildElement("netclass");
         while (!tmpNode.isNull())
         {
-            NetClass* netclass = new NetClass(tmpNode);
+            NetClass* netclass = new NetClass(*this, tmpNode);
             addNetClass(netclass, false);
             tmpNode = tmpNode.nextSiblingElement("netclass");
         }
@@ -152,7 +152,7 @@ NetClass* Circuit::getNetClassByName(const QString& name) const noexcept
 
 NetClass* Circuit::createNetClass(const QString& name) throw (Exception)
 {
-    return NetClass::create(mXmlFile->getDocument(), name);
+    return NetClass::create(*this, mXmlFile->getDocument(), name);
 }
 
 void Circuit::addNetClass(NetClass* netclass, bool toDomTree) throw (Exception)

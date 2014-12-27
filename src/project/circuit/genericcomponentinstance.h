@@ -36,6 +36,7 @@ namespace project {
 class Circuit;
 class GenCompSignalInstance;
 class SymbolInstance;
+class ErcMsg;
 }
 
 namespace library {
@@ -113,6 +114,9 @@ class GenericComponentInstance : public QObject
         GenericComponentInstance(const GenericComponentInstance& other);
         GenericComponentInstance& operator=(const GenericComponentInstance& rhs);
 
+        // Private Methods
+        void updateErcMessages() noexcept;
+
 
         // General
         Circuit& mCircuit;
@@ -137,6 +141,9 @@ class GenericComponentInstance : public QObject
         /// @brief All signal instances (Key: generic component signal UUID)
         QHash<QUuid, GenCompSignalInstance*> mSignals;
 
+
+        // Misc
+
         /**
          * @brief All registered symbol instances (must be empty if this generic component
          *        instance is not added to circuit)
@@ -147,6 +154,12 @@ class GenericComponentInstance : public QObject
          * @see #registerSymbolInstance(), #unregisterSymbolInstance()
          */
         QHash<QUuid, const SymbolInstance*> mSymbolInstances;
+
+        /// @brief The ERC message for unplaced required symbols of this generic component
+        QScopedPointer<ErcMsg> mErcMsgUnplacedRequiredSymbols;
+
+        /// @brief The ERC message for unplaced optional symbols of this generic component
+        QScopedPointer<ErcMsg> mErcMsgUnplacedOptionalSymbols;
 };
 
 } // namespace project

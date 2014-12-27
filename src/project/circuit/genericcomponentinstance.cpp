@@ -30,6 +30,7 @@
 #include "../library/projectlibrary.h"
 #include "gencompsignalinstance.h"
 #include "../../library/genericcomponent.h"
+#include "../erc/ercmsg.h"
 
 namespace project {
 
@@ -41,8 +42,9 @@ GenericComponentInstance::GenericComponentInstance(Circuit& circuit,
                                                    const QDomElement& domElement)
                                                    throw (Exception) :
     QObject(0), mCircuit(circuit), mDomElement(domElement), mAddedToCircuit(false),
-    mGenComp(0), mGenCompSymbVar(0)
+    mGenComp(nullptr), mGenCompSymbVar(nullptr)
 {
+    // read attributes
     mUuid = mDomElement.attribute("uuid");
     if(mUuid.isNull())
     {
@@ -50,7 +52,6 @@ GenericComponentInstance::GenericComponentInstance(Circuit& circuit,
             QString(tr("Invalid generic component instance UUID: \"%1\""))
             .arg(mDomElement.attribute("uuid")));
     }
-
     mName = mDomElement.attribute("name");
     if(mName.isEmpty())
     {
@@ -58,16 +59,13 @@ GenericComponentInstance::GenericComponentInstance(Circuit& circuit,
             QString(tr("Name of generic component instance \"%1\" is empty!"))
             .arg(mUuid.toString()));
     }
-
-    mGenComp = mCircuit.getProject().getLibrary().getGenComp(
-                   mDomElement.attribute("generic_component"));
+    mGenComp = mCircuit.getProject().getLibrary().getGenComp(mDomElement.attribute("generic_component"));
     if (!mGenComp)
     {
         throw RuntimeError(__FILE__, __LINE__, mDomElement.attribute("generic_component"),
             QString(tr("The generic component with the UUID \"%1\" does not exist in the "
             "project's library!")).arg(mDomElement.attribute("generic_component")));
     }
-
     mGenCompSymbVar = mGenComp->getSymbolVariantByUuid(mDomElement.attribute("symbol_variant"));
     if (!mGenCompSymbVar)
     {
@@ -76,10 +74,8 @@ GenericComponentInstance::GenericComponentInstance(Circuit& circuit,
             .arg(mDomElement.attribute("symbol_variant")));
     }
 
-    QDomElement tmpNode; // for temporary use...
-
     // load all signal instances
-    tmpNode = mDomElement.firstChildElement("signal_mapping").firstChildElement("map");
+    QDomElement tmpNode = mDomElement.firstChildElement("signal_mapping").firstChildElement("map");
     while (!tmpNode.isNull())
     {
         GenCompSignalInstance* signal = new GenCompSignalInstance(mCircuit, *this, tmpNode);
@@ -100,6 +96,13 @@ GenericComponentInstance::GenericComponentInstance(Circuit& circuit,
             "not match with the signal count of the generic component \"%2\"."))
             .arg(mUuid.toString()).arg(mGenComp->getUuid().toString()));
     }
+
+    // create ERC messages
+    mErcMsgUnplacedRequiredSymbols.reset(new ErcMsg(mCircuit.getProject(), *this, mUuid.toString(),
+        "UnplacedRequiredSymbols", ErcMsg::ErcMsgType_t::SchematicError, QString()));
+    mErcMsgUnplacedOptionalSymbols.reset(new ErcMsg(mCircuit.getProject(), *this, mUuid.toString(),
+        "UnplacedOptionalSymbols", ErcMsg::ErcMsgType_t::SchematicWarning, QString()));
+    updateErcMessages();
 }
 
 GenericComponentInstance::~GenericComponentInstance() noexcept
@@ -155,6 +158,7 @@ void GenericComponentInstance::setName(const QString& name) throw (Exception)
 
     mDomElement.setAttribute("name", name);
     mName = name;
+    updateErcMessages();
 }
 
 /*****************************************************************************************
@@ -163,8 +167,7 @@ void GenericComponentInstance::setName(const QString& name) throw (Exception)
 
 void GenericComponentInstance::addToCircuit(bool addNode, QDomElement& parent) throw (Exception)
 {
-    if (mAddedToCircuit)
-        throw LogicError(__FILE__, __LINE__);
+    if (mAddedToCircuit) throw LogicError(__FILE__, __LINE__);
 
     if (addNode)
     {
@@ -179,12 +182,12 @@ void GenericComponentInstance::addToCircuit(bool addNode, QDomElement& parent) t
         signal->addToCircuit();
 
     mAddedToCircuit = true;
+    updateErcMessages();
 }
 
 void GenericComponentInstance::removeFromCircuit(bool removeNode, QDomElement& parent) throw (Exception)
 {
-    if (!mAddedToCircuit)
-        throw LogicError(__FILE__, __LINE__);
+    if (!mAddedToCircuit) throw LogicError(__FILE__, __LINE__);
 
     if (removeNode)
     {
@@ -206,6 +209,7 @@ void GenericComponentInstance::removeFromCircuit(bool removeNode, QDomElement& p
         signal->removeFromCircuit();
 
     mAddedToCircuit = false;
+    updateErcMessages();
 }
 
 void GenericComponentInstance::registerSymbolInstance(const QUuid& itemUuid,
@@ -235,6 +239,7 @@ void GenericComponentInstance::registerSymbolInstance(const QUuid& itemUuid,
     }
 
     mSymbolInstances.insert(itemUuid, instance);
+    updateErcMessages();
 }
 
 void GenericComponentInstance::unregisterSymbolInstance(const QUuid& itemUuid,
@@ -255,6 +260,25 @@ void GenericComponentInstance::unregisterSymbolInstance(const QUuid& itemUuid,
     }
 
     mSymbolInstances.remove(itemUuid);
+    updateErcMessages();
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+void GenericComponentInstance::updateErcMessages() noexcept
+{
+    uint required = getUnplacedRequiredSymbolsCount();
+    uint optional = getUnplacedOptionalSymbolsCount();
+    mErcMsgUnplacedRequiredSymbols->setMsg(
+        QString(tr("Unplaced required symbols of component \"%1\": %2"))
+        .arg(mName).arg(required));
+    mErcMsgUnplacedOptionalSymbols->setMsg(
+        QString(tr("Unplaced optional symbols of component \"%1\": %2"))
+        .arg(mName).arg(optional));
+    mErcMsgUnplacedRequiredSymbols->setVisible((mAddedToCircuit) && (required > 0));
+    mErcMsgUnplacedOptionalSymbols->setVisible((mAddedToCircuit) && (optional > 0));
 }
 
 /*****************************************************************************************
