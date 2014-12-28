@@ -57,7 +57,11 @@ QString SystemInfo::getFullUsername() noexcept
     process.waitForFinished(500);
     username = QString(process.readAllStandardOutput()).remove("\n").remove("\r").trimmed();
 #elif defined(Q_OS_MACX) // For Mac OS X
-    // TODO
+    QString command("finger `whoami` | awk -F: '{ print $3 }' | head -n1 | sed 's/^ //'");
+    QProcess process;
+    process.start("sh", QStringList() << "-c" << command);
+    process.waitForFinished(500);
+    username = QString(process.readAllStandardOutput()).remove("\n").remove("\r").trimmed();
 #elif defined(Q_OS_WIN) // For Windows
     // TODO
 #else
