@@ -117,7 +117,7 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
         mRecentProjectsModel = new RecentProjectsModel();
         mFavoriteProjectsModel = new FavoriteProjectsModel();
         mProjectTreeModel = new ProjectTreeModel();
-        mLibrary = new Library();
+        mLibrary = new Library(mLibraryPath);
         mControlPanel = new ControlPanel(mProjectTreeModel, mRecentProjectsModel,
                                          mFavoriteProjectsModel);
         showControlPanel();

@@ -13,7 +13,7 @@ GENERATED_DIR = ../generated
 # Use common project definitions
 include(../common.pri)
 
-QT += core widgets opengl webkitwidgets xml printsupport
+QT += core widgets opengl webkitwidgets xml printsupport sql
 
 # Define the application version here
 DEFINES += APP_VERSION_MAJOR=0
