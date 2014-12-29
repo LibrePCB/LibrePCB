@@ -85,7 +85,7 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
     // Check if the project is locked (already open or application was crashed). In case
     // of a crash, the user can decide if the last backup should be restored. If the
     // project should be opened, the lock file will be created/updated here.
-    switch (mFileLock.getStatus())
+    switch (mFileLock.getStatus()) // throws an exception on error
     {
         case FileLock::LockStatus_t::Unlocked:
         {
@@ -132,24 +132,11 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
             break;
         }
 
-        case FileLock::LockStatus_t::Error:
-        default:
-        {
-            throw RuntimeError(__FILE__, __LINE__, QString(),
-                               tr("Could not read the project lock file!"));
-        }
+        default: Q_ASSERT(false); throw LogicError(__FILE__, __LINE__);
     }
 
     // the project can be opened by this application, so we will lock the whole project
-    if (!mIsReadOnly)
-    {
-        if (!mFileLock.lock())
-        {
-            throw RuntimeError(__FILE__, __LINE__, mFileLock.getLockFilepath().toStr(),
-                QString(tr("Error while locking the project!\nDo you have write permissions "
-                "to the file \"%1\"?")).arg(mFileLock.getLockFilepath().toNative()));
-        }
-    }
+    if (!mIsReadOnly) mFileLock.lock(); // throws an exception on error
 
     // check if the combination of "create", "mIsRestored" and "mIsReadOnly" is valid
     Q_ASSERT(!(create && (mIsRestored || mIsReadOnly)));

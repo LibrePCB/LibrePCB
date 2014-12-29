@@ -26,6 +26,7 @@
 
 #include <QtCore>
 #include "filepath.h"
+#include "exceptions.h"
 
 /*****************************************************************************************
  *  Class FileLock
@@ -96,10 +97,11 @@
  *              : myLock(FilePath("C:/myFile.txt")) // variant 1 to set the filepath
  *          {
  *              myLock.setFileToLock(FilePath("C:/myFile.txt")); // variant 2
- *              switch (myLock.getStatus())
+ *              switch (myLock.getStatus()) // Note: this line can throw an exception!
  *              {
  *                  case Unlocked:
- *                      myLock.lock(); // lock the file now
+ *                      // No lock exists --> lock the file now
+ *                      myLock.lock(); // Note: this line can throw an exception!
  *                      break;
  *                  case Locked:
  *                      // The file is locked by another instance. You cannot open the file.
@@ -109,7 +111,7 @@
  *                      // Ask the user whether a backup should be restored or not.
  *                      break;
  *                  default:
- *                      // There was an error with the file lock
+ *                      // Should not happen...
  *                      break;
  *              }
  *
@@ -135,8 +137,10 @@
  * @author ubruhin
  * @date 2014-07-29
  */
-class FileLock final
+class FileLock final : public QObject
 {
+        Q_OBJECT
+
     public:
 
         // Types
@@ -147,8 +151,7 @@ class FileLock final
         enum class LockStatus_t {
             Unlocked,   ///< the file is not locked (lock file does not exist)
             Locked,     ///< the file is locked by another application instance
-            StaleLock,  ///< the file is locked by a crashed application instance
-            Error       ///< an error is occured while determining the lock status
+            StaleLock   ///< the file is locked by a crashed application instance
         };
 
 
@@ -159,7 +162,6 @@ class FileLock final
          *
          * @warning     If you use this constructor, you need to call #setFileToLock()
          *              afterwards (before calling any other method of this class)!
-         *              Never call another method before the filepath was set!
          */
         explicit FileLock() noexcept;
 
@@ -187,25 +189,32 @@ class FileLock final
          * @brief Specify the file for which you need the lock (NOT the lock file itself!)
          *
          * @param filepath      The filepath to the file to lock (it do not need to exist)
-         *
-         * @return true if success, false if not
          */
-        bool setFileToLock(const FilePath& filepath) noexcept;
+        void setFileToLock(const FilePath& filepath) noexcept;
 
 
         // Getters
+
+        /**
+         * @brief Get the filepath of the file to lock (passed by #setFileToLock())
+         *
+         * @return The filepath to the file to lock (invalid if no valid filepath was set)
+         */
+        const FilePath& getFileToLock() const noexcept {return mFileToLock;}
 
         /**
          * @brief Get the filepath of the lock file (NOT the file passed by setFileToLock()!)
          *
          * @return The filepath to the lock file (invalid if no valid filepath was set)
          */
-        const FilePath& getLockFilepath() const noexcept;
+        const FilePath& getLockFilepath() const noexcept {return mLockFilepath;}
 
         /**
          * @brief Get the lock status of the specified file
          *
-         * @return The current lock status (see #LockStatus)
+         * @return  The current lock status (see #LockStatus_t)
+         *
+         * @throw   Exception on error (e.g. invalid filepath, no access rights, ...)
          *
          * @todo    This method cannot detect if a lock file was created by another
          *          application instance on the same computer with the same user.
@@ -213,7 +222,7 @@ class FileLock final
          *          should't be a problem. Otherwise, the PID in the lock file must
          *          be considered (and check if such a process exists).
          */
-        LockStatus_t getStatus() const noexcept;
+        LockStatus_t getStatus() const throw (Exception);
 
 
         // General Methods
@@ -225,9 +234,9 @@ class FileLock final
          *          even if that lock file was created by another application instance!
          *          So: Always check first the lock status with #getStatus()!
          *
-         * @return  True on success, false on failure
+         * @throw   Exception on error (e.g. invalid filepath, no access rights, ...)
          */
-        bool lock() noexcept;
+        void lock() throw (Exception);
 
         /**
          * @brief Unlock the specified file (remove the lock file)
@@ -236,16 +245,22 @@ class FileLock final
          *          even if that lock file was created by another application instance!
          *          So: Always check first the lock status with #getStatus()!
          *
-         * @return  True on success, false on failure
+         * @throw   Exception on error (e.g. invalid filepath, no access rights, ...)
          */
-        bool unlock() noexcept;
+        void unlock() throw (Exception);
 
 
     private:
 
         // make some methods inaccessible...
-        FileLock(const FileLock& other);
-        FileLock& operator=(const FileLock& rhs);
+        FileLock(const FileLock& other);            ///< inaccessible
+        FileLock& operator=(const FileLock& rhs);   ///< inaccessible
+
+
+        /**
+         * @brief The filepath to the file to lock (passed by #setFileToLock())
+         */
+        FilePath mFileToLock;
 
         /**
          * @brief The filepath to the lock file

@@ -67,7 +67,7 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
         }
 
         // Check if the workspace is locked (already open or application was crashed).
-        switch (mLock.getStatus())
+        switch (mLock.getStatus()) // throws an exception on error
         {
             case FileLock::LockStatus_t::Unlocked:
                 break; // nothing to do here (the workspace will be locked later)
@@ -86,21 +86,11 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
                 break;
             }
 
-            case FileLock::LockStatus_t::Error:
-            default:
-            {
-                throw RuntimeError(__FILE__, __LINE__, QString(),
-                                   tr("Could not read the workspace lock file!"));
-            }
+            default: Q_ASSERT(false); throw LogicError(__FILE__, __LINE__);
         }
 
         // the workspace can be opened by this application, so we will lock it
-        if (!mLock.lock())
-        {
-            throw RuntimeError(__FILE__, __LINE__, mLock.getLockFilepath().toStr(),
-                QString(tr("Error while locking the workspace!\nDo you have write "
-                "permissions to the file \"%1\"?")).arg(mLock.getLockFilepath().toNative()));
-        }
+        mLock.lock(); // throws an exception on error
 
         if (!mProjectsPath.mkPath())
             qWarning() << "could not make path" << mProjectsPath;
