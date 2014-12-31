@@ -96,17 +96,17 @@ class LengthUnit final
          * enum order will also define the order of these units in comboboxes and other
          * lists/widgets.
          *
-         * @warning The enum must begin with value 0 and end with LengthUnit_COUNT.
+         * @warning The enum must begin with value 0 and end with _COUNT.
          *          Between these values the enum must not contain unused indexes!
          *          This is neccessary for #getIndex() and #fromIndex().
          */
-        enum LengthUnit_t {
-            LengthUnit_millimeters = 0,
-            LengthUnit_micrometers,
-            LengthUnit_nanometers,
-            LengthUnit_inches,
-            LengthUnit_mils,
-            LengthUnit_COUNT ///< count of units, must be the last entry of the enum
+        enum class LengthUnit_t {
+            Millimeters = 0,
+            Micrometers,
+            Nanometers,
+            Inches,
+            Mils,
+            _COUNT ///< count of units, must be the last entry of the enum
         };
 
 
@@ -308,11 +308,11 @@ class LengthUnit final
 
 
         // Static Methods to get all available length units
-        static LengthUnit millimeters() noexcept {return LengthUnit(LengthUnit_millimeters);}
-        static LengthUnit micrometers() noexcept {return LengthUnit(LengthUnit_micrometers);}
-        static LengthUnit nanometers() noexcept {return LengthUnit(LengthUnit_nanometers);}
-        static LengthUnit inches() noexcept {return LengthUnit(LengthUnit_inches);}
-        static LengthUnit mils() noexcept {return LengthUnit(LengthUnit_mils);}
+        static LengthUnit millimeters() noexcept {return LengthUnit(LengthUnit_t::Millimeters);}
+        static LengthUnit micrometers() noexcept {return LengthUnit(LengthUnit_t::Micrometers);}
+        static LengthUnit nanometers() noexcept {return LengthUnit(LengthUnit_t::Nanometers);}
+        static LengthUnit inches() noexcept {return LengthUnit(LengthUnit_t::Inches);}
+        static LengthUnit mils() noexcept {return LengthUnit(LengthUnit_t::Mils);}
 
         // Operators
         LengthUnit& operator=(const LengthUnit& rhs) noexcept {mUnit = rhs.mUnit; return *this;}
@@ -378,7 +378,7 @@ class Length
 {
     public:
 
-        //  Constructors
+        //  Constructors / Destructor
 
         /**
          * @brief Default Constructor
@@ -400,6 +400,11 @@ class Length
          * @param nanometers    The length in nanometers
          */
         Length(LengthBase_t nanometers) noexcept : mNanometers(nanometers) {}
+
+        /**
+         * @brief Destructor
+         */
+        ~Length() noexcept {}
 
 
         // Setters
@@ -815,7 +820,7 @@ class Angle
 {
     public:
 
-        // Constructors
+        // Constructors / Destructor
 
         /**
          * @brief Default Constructor
@@ -835,6 +840,11 @@ class Angle
          * @param microdegrees  The angle in microdegrees
          */
         explicit Angle(qint32 microdegrees) noexcept : mMicrodegrees(microdegrees % 360000000) {}
+
+        /**
+         * @brief Destructor
+         */
+        ~Angle() noexcept {}
 
 
         // Setters
@@ -1125,7 +1135,7 @@ class Point
 {
     public:
 
-        // Constructors
+        // Constructors / Destructor
 
         /**
          * @brief Default Constructor
@@ -1148,6 +1158,11 @@ class Point
          * @param y     The Y coordinate as a Length object
          */
         explicit Point(const Length& x, const Length& y) noexcept : mX(x), mY(y) {}
+
+        /**
+         * @brief Destructor
+         */
+        ~Point() noexcept {}
 
 
         // Setters

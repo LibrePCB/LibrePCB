@@ -32,7 +32,7 @@
 
 // Static Variables
 
-LengthUnit::LengthUnit_t LengthUnit::sDefaultUnit = LengthUnit::LengthUnit_millimeters;
+LengthUnit::LengthUnit_t LengthUnit::sDefaultUnit = LengthUnit::LengthUnit_t::Millimeters;
 
 // General Methods
 
@@ -40,18 +40,18 @@ QString LengthUnit::toString() const noexcept
 {
     switch (mUnit)
     {
-        case LengthUnit_millimeters:
+        case LengthUnit_t::Millimeters:
             return QString("millimeters");
-        case LengthUnit_micrometers:
+        case LengthUnit_t::Micrometers:
             return QString("micrometers");
-        case LengthUnit_nanometers:
+        case LengthUnit_t::Nanometers:
             return QString("nanometers");
-        case LengthUnit_inches:
+        case LengthUnit_t::Inches:
             return QString("inches");
-        case LengthUnit_mils:
+        case LengthUnit_t::Mils:
             return QString("mils");
         default:
-            qCritical() << "invalid length unit:" << mUnit;
+            qCritical() << "invalid length unit:" << static_cast<int>(mUnit);
             Q_ASSERT(false);
             return QString();
     }
@@ -61,18 +61,18 @@ QString LengthUnit::toStringTr() const noexcept
 {
     switch (mUnit)
     {
-        case LengthUnit_millimeters:
+        case LengthUnit_t::Millimeters:
             return QCoreApplication::translate("LengthUnit", "Millimeters");
-        case LengthUnit_micrometers:
+        case LengthUnit_t::Micrometers:
             return QCoreApplication::translate("LengthUnit", "Micrometers");
-        case LengthUnit_nanometers:
+        case LengthUnit_t::Nanometers:
             return QCoreApplication::translate("LengthUnit", "Nanometers");
-        case LengthUnit_inches:
+        case LengthUnit_t::Inches:
             return QCoreApplication::translate("LengthUnit", "Inches");
-        case LengthUnit_mils:
+        case LengthUnit_t::Mils:
             return QCoreApplication::translate("LengthUnit", "Mils");
         default:
-            qCritical() << "invalid length unit:" << mUnit;
+            qCritical() << "invalid length unit:" << static_cast<int>(mUnit);
             Q_ASSERT(false);
             return QString();
     }
@@ -82,18 +82,18 @@ QString LengthUnit::toShortStringTr() const noexcept
 {
     switch (mUnit)
     {
-        case LengthUnit_millimeters:
+        case LengthUnit_t::Millimeters:
             return QCoreApplication::translate("LengthUnit", "mm");
-        case LengthUnit_micrometers:
+        case LengthUnit_t::Micrometers:
             return QCoreApplication::translate("LengthUnit", "μm");
-        case LengthUnit_nanometers:
+        case LengthUnit_t::Nanometers:
             return QCoreApplication::translate("LengthUnit", "nm");
-        case LengthUnit_inches:
+        case LengthUnit_t::Inches:
             return QCoreApplication::translate("LengthUnit", "″");
-        case LengthUnit_mils:
+        case LengthUnit_t::Mils:
             return QCoreApplication::translate("LengthUnit", "mils");
         default:
-            qCritical() << "invalid length unit:" << mUnit;
+            qCritical() << "invalid length unit:" << static_cast<int>(mUnit);
             Q_ASSERT(false);
             return QString();
     }
@@ -103,18 +103,18 @@ qreal LengthUnit::convertToUnit(const Length& length) const noexcept
 {
     switch (mUnit)
     {
-        case LengthUnit_millimeters:
+        case LengthUnit_t::Millimeters:
             return length.toMm();
-        case LengthUnit_micrometers:
+        case LengthUnit_t::Micrometers:
             return length.toMm() * (qreal)1000;
-        case LengthUnit_nanometers:
+        case LengthUnit_t::Nanometers:
             return (qreal)length.toNm();
-        case LengthUnit_inches:
+        case LengthUnit_t::Inches:
             return length.toInch();
-        case LengthUnit_mils:
+        case LengthUnit_t::Mils:
             return length.toMil();
         default:
-            qCritical() << "invalid length unit:" << mUnit;
+            qCritical() << "invalid length unit:" << static_cast<int>(mUnit);
             Q_ASSERT(false);
             return 0;
     }
@@ -124,18 +124,18 @@ QPointF LengthUnit::convertToUnit(const Point& point) const noexcept
 {
     switch (mUnit)
     {
-        case LengthUnit_millimeters:
+        case LengthUnit_t::Millimeters:
             return point.toMmQPointF();
-        case LengthUnit_micrometers:
+        case LengthUnit_t::Micrometers:
             return point.toMmQPointF() * (qreal)1000;
-        case LengthUnit_nanometers:
+        case LengthUnit_t::Nanometers:
             return point.toMmQPointF() * (qreal)1000000;
-        case LengthUnit_inches:
+        case LengthUnit_t::Inches:
             return point.toInchQPointF();
-        case LengthUnit_mils:
+        case LengthUnit_t::Mils:
             return point.toMilQPointF();
         default:
-            qCritical() << "invalid length unit:" << mUnit;
+            qCritical() << "invalid length unit:" << static_cast<int>(mUnit);
             Q_ASSERT(false);
             return QPointF();
     }
@@ -145,18 +145,18 @@ Length LengthUnit::convertFromUnit(qreal length) const noexcept
 {
     switch (mUnit)
     {
-        case LengthUnit_millimeters:
+        case LengthUnit_t::Millimeters:
             return Length::fromMm(length);
-        case LengthUnit_micrometers:
+        case LengthUnit_t::Micrometers:
             return Length::fromMm(length / (qreal)1000);
-        case LengthUnit_nanometers:
+        case LengthUnit_t::Nanometers:
             return Length::fromMm(length / (qreal)1000000);
-        case LengthUnit_inches:
+        case LengthUnit_t::Inches:
             return Length::fromInch(length);
-        case LengthUnit_mils:
+        case LengthUnit_t::Mils:
             return Length::fromMil(length);
         default:
-            qCritical() << "invalid length unit:" << mUnit;
+            qCritical() << "invalid length unit:" << static_cast<int>(mUnit);
             Q_ASSERT(false);
             return Length(0);
     }
@@ -166,18 +166,18 @@ Point LengthUnit::convertFromUnit(const QPointF& point) const noexcept
 {
     switch (mUnit)
     {
-        case LengthUnit_millimeters:
+        case LengthUnit_t::Millimeters:
             return Point::fromMm(point);
-        case LengthUnit_micrometers:
+        case LengthUnit_t::Micrometers:
             return Point::fromMm(point / (qreal)1000);
-        case LengthUnit_nanometers:
+        case LengthUnit_t::Nanometers:
             return Point::fromMm(point / (qreal)1000000);
-        case LengthUnit_inches:
+        case LengthUnit_t::Inches:
             return Point::fromInch(point);
-        case LengthUnit_mils:
+        case LengthUnit_t::Mils:
             return Point::fromMil(point);
         default:
-            qCritical() << "invalid length unit:" << mUnit;
+            qCritical() << "invalid length unit:" << static_cast<int>(mUnit);
             Q_ASSERT(false);
             return Point(Length(0), Length(0));
     }
@@ -187,7 +187,7 @@ Point LengthUnit::convertFromUnit(const QPointF& point) const noexcept
 
 LengthUnit LengthUnit::fromIndex(int index, const LengthUnit& defaultUnit, bool* ok) noexcept
 {
-    if ((index >= 0) && (index < LengthUnit_COUNT))
+    if ((index >= 0) && (index < static_cast<int>(LengthUnit_t::_COUNT)))
     {
         if (ok) *ok = true;
         return LengthUnit(static_cast<LengthUnit_t>(index));
@@ -205,15 +205,15 @@ LengthUnit LengthUnit::fromString(const QString& unitString,
     if (ok) *ok = true;
 
     if (unitString == "millimeters")
-        return LengthUnit(LengthUnit_millimeters);
+        return LengthUnit(LengthUnit_t::Millimeters);
     else if (unitString == "micrometers")
-        return LengthUnit(LengthUnit_micrometers);
+        return LengthUnit(LengthUnit_t::Micrometers);
     else if (unitString == "nanometers")
-        return LengthUnit(LengthUnit_nanometers);
+        return LengthUnit(LengthUnit_t::Nanometers);
     else if (unitString == "inches")
-        return LengthUnit(LengthUnit_inches);
+        return LengthUnit(LengthUnit_t::Inches);
     else if (unitString == "mils")
-        return LengthUnit(LengthUnit_mils);
+        return LengthUnit(LengthUnit_t::Mils);
     else
     {
         if (ok) *ok = false;
@@ -224,7 +224,7 @@ LengthUnit LengthUnit::fromString(const QString& unitString,
 QList<LengthUnit> LengthUnit::getAllUnits() noexcept
 {
     QList<LengthUnit> list;
-    for (int i = 0; i < LengthUnit_COUNT; i++)
+    for (int i = 0; i < static_cast<int>(LengthUnit_t::_COUNT); i++)
         list.append(LengthUnit(static_cast<LengthUnit_t>(i)));
     return list;
 }
