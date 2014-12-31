@@ -34,8 +34,15 @@ WSI_AppDefaultMeasurementUnits::WSI_AppDefaultMeasurementUnits(WorkspaceSettings
     mLengthUnitTmp(LengthUnit::millimeters()), mLengthUnitComboBox(0)
 {
     // load default length unit
-    QString lengthUnitStr = loadValue("app_default_length_unit").toString();
-    mLengthUnit = LengthUnit::fromString(lengthUnitStr, LengthUnit::millimeters());
+    try
+    {
+        QString lengthUnitStr = loadValue("app_default_length_unit").toString();
+        mLengthUnit = LengthUnit::fromString(lengthUnitStr);
+    }
+    catch (Exception&)
+    {
+        mLengthUnit = LengthUnit::millimeters();
+    }
     mLengthUnitTmp = mLengthUnit;
     LengthUnit::setDefaultUnit(mLengthUnit); // set the default length unit application-wide
 
@@ -79,9 +86,20 @@ void WSI_AppDefaultMeasurementUnits::revert()
     updateLengthUnitComboBoxIndex();
 }
 
+/*****************************************************************************************
+ *  Public Slots
+ ****************************************************************************************/
+
 void WSI_AppDefaultMeasurementUnits::lengthUnitComboBoxIndexChanged(int index)
 {
-    mLengthUnitTmp = LengthUnit::fromIndex(index, LengthUnit::millimeters());
+    try
+    {
+        mLengthUnitTmp = LengthUnit::fromIndex(index);
+    }
+    catch (Exception& e)
+    {
+        QMessageBox::critical(mLengthUnitComboBox, tr("Error"), e.getUserMsg());
+    }
 }
 
 /*****************************************************************************************

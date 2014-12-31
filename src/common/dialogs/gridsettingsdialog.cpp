@@ -93,11 +93,18 @@ void GridSettingsDialog::spbxIntervalChanged(double arg1)
 
 void GridSettingsDialog::cbxUnitsChanged(int index)
 {
-    mUnit = LengthUnit::fromIndex(index, LengthUnit::millimeters());
-    mUi->spbxInterval->setValue(mUnit.convertToUnit(mInterval));
-    updateInternalRepresentation();
-    emit gridIntervalChanged(mInterval);
-    emit gridIntervalUnitChanged(mUnit);
+    try
+    {
+        mUnit = LengthUnit::fromIndex(index);
+        mUi->spbxInterval->setValue(mUnit.convertToUnit(mInterval));
+        updateInternalRepresentation();
+        emit gridIntervalChanged(mInterval);
+        emit gridIntervalUnitChanged(mUnit);
+    }
+    catch (Exception& e)
+    {
+        QMessageBox::critical(this, tr("Error"), e.getUserMsg());
+    }
 }
 
 void GridSettingsDialog::btnMul2Clicked()

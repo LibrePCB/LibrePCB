@@ -143,7 +143,7 @@ class LengthUnit final
         // Getters
 
         /**
-         * @brief Get the index of the length unit of this object
+         * @brief Get the Index of the length unit of this object
          *
          * This method is useful in combination with #getAllUnits() to create lists of
          * all available length units (QListWidget, QComboBox, ...). With this method
@@ -154,11 +154,11 @@ class LengthUnit final
          *          So you must never save/load such an index to/from files.
          *          Use #toString() and #fromString() instead for this purpose.
          *
-         * @return The index (0..*)
+         * @return The index
          *
          * @see #fromIndex(), #getAllUnits()
          */
-        int getIndex() const noexcept {return static_cast<int>(mUnit);}
+        uint getIndex() const noexcept {return static_cast<uint>(mUnit);}
 
         /**
          * @brief Convert the length unit to a string (for example to save it in files)
@@ -258,15 +258,14 @@ class LengthUnit final
          *
          * @param index         The index of the unit in the list of #getAllUnits().
          *                      This number equals to the number returned by #getIndex().
-         * @param defaultUnit   If the index is invalid, this unit will be returned instead
-         * @param ok            This variable will hold whether the conversion was
-         *                      successful or not. Use the nullpointer if you don't need it.
          *
          * @return The LengthUnit object with the specified index
          *
+         * @throw Exception     If index was invalid
+         *
          * @see #getIndex(), #getAllUnits()
          */
-        static LengthUnit fromIndex(int index, const LengthUnit& defaultUnit, bool* ok = 0) noexcept;
+        static LengthUnit fromIndex(uint index) throw (Exception);
 
         /**
          * @brief Convert a string to a LengthUnit object (for example to load from files)
@@ -274,14 +273,12 @@ class LengthUnit final
          * This method is useful to load a length unit from text files (like ini or xml).
          *
          * @param unitString    The unit as a string (must be generated with #toString()!)
-         * @param defaultUnit   The unit which will be returned if the conversion fails
-         * @param ok            This variable will hold whether the conversion was
-         *                      successful or not. Use the nullpointer if you don't need it.
          *
          * @return The converted LengthUnit value
+         *
+         * @throw Exception     If unitString was invalid
          */
-        static LengthUnit fromString(const QString& unitString,
-                                     const LengthUnit& defaultUnit, bool* ok = 0) noexcept;
+        static LengthUnit fromString(const QString& unitString) throw (Exception);
 
         /**
          * @brief Sets the application-wide default measurement unit

@@ -185,25 +185,16 @@ Point LengthUnit::convertFromUnit(const QPointF& point) const noexcept
 
 // Static Methods
 
-LengthUnit LengthUnit::fromIndex(int index, const LengthUnit& defaultUnit, bool* ok) noexcept
+LengthUnit LengthUnit::fromIndex(uint index) throw (Exception)
 {
-    if ((index >= 0) && (index < static_cast<int>(LengthUnit_t::_COUNT)))
-    {
-        if (ok) *ok = true;
-        return LengthUnit(static_cast<LengthUnit_t>(index));
-    }
-    else
-    {
-        if (ok) *ok = false;
-        return defaultUnit;
-    }
+    if (index >= static_cast<uint>(LengthUnit_t::_COUNT))
+        throw LogicError(__FILE__, __LINE__, QString::number(index));
+
+    return LengthUnit(static_cast<LengthUnit_t>(index));
 }
 
-LengthUnit LengthUnit::fromString(const QString& unitString,
-                                  const LengthUnit& defaultUnit, bool* ok) noexcept
+LengthUnit LengthUnit::fromString(const QString& unitString) throw (Exception)
 {
-    if (ok) *ok = true;
-
     if (unitString == "millimeters")
         return LengthUnit(LengthUnit_t::Millimeters);
     else if (unitString == "micrometers")
@@ -216,8 +207,8 @@ LengthUnit LengthUnit::fromString(const QString& unitString,
         return LengthUnit(LengthUnit_t::Mils);
     else
     {
-        if (ok) *ok = false;
-        return defaultUnit;
+        throw RuntimeError(__FILE__, __LINE__, unitString, QString(QCoreApplication::
+            translate("LengthUnit", "Invalid length unit: \"%1\"")).arg(unitString));
     }
 }
 
