@@ -26,7 +26,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include "units.h"
+#include "units/all_length_units.h"
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -61,7 +61,7 @@ class CADView : public QGraphicsView
         // Getters
         CADScene*           getCadScene()           const;
         QRectF              getVisibleSceneRect()   const;
-        GridType_t            getGridType()           const {return mGridType;}
+        GridType_t          getGridType()           const {return mGridType;}
         const QColor&       getGridColor()          const {return mGridColor;}
         const Length&       getGridInterval()       const {return mGridInterval;}
         const LengthUnit&   getGridIntervalUnit()   const {return mGridIntervalUnit;}

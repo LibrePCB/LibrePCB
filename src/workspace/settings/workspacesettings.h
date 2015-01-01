@@ -25,7 +25,6 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../../common/units.h"
 #include "../../common/filepath.h"
 
 // All Settings Classes

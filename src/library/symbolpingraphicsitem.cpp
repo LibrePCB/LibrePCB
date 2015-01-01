@@ -32,6 +32,7 @@
 #include "../project/project.h"
 #include "../project/schematics/schematic.h"
 #include "../common/schematiclayer.h"
+#include "../common/units/all_length_units.h"
 #include "../project/circuit/netsignal.h"
 #include "../project/circuit/gencompsignalinstance.h"
 #include "genericcomponent.h"

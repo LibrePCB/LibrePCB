@@ -26,7 +26,8 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include "../units.h"
+#include "../units/length.h"
+#include "../units/lengthunit.h"
 #include "../cadview.h"
 
 /*****************************************************************************************

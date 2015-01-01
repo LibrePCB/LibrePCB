@@ -23,7 +23,6 @@
 
 #include <QtCore>
 #include "schematic.h"
-#include "../../common/units.h"
 #include "../../common/xmlfile.h"
 #include "../project.h"
 #include "symbolinstance.h"

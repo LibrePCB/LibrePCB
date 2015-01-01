@@ -27,7 +27,6 @@
 #include <QtCore>
 #include <QGraphicsItem>
 #include "../common/exceptions.h"
-#include "../common/units.h"
 #include "../common/cadscene.h"
 
 /*****************************************************************************************

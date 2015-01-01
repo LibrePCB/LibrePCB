@@ -25,7 +25,7 @@
 #include "ses_drawwire.h"
 #include "../schematiceditor.h"
 #include "ui_schematiceditor.h"
-#include "../../../common/units.h"
+#include "../../../common/units/all_length_units.h"
 #include "../../../common/undostack.h"
 #include "../../project.h"
 #include "../../circuit/circuit.h"

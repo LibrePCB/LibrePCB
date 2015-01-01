@@ -20,7 +20,7 @@ DEFINES += APP_VERSION_MAJOR=0
 DEFINES += APP_VERSION_MINOR=1
 
 exists(../.git):DEFINES += GIT_BRANCH=\\\"master\\\"
-#DEFINES += USE_32BIT_LENGTH_UNITS          # see units.h
+#DEFINES += USE_32BIT_LENGTH_UNITS          # see common/units/length.h
 
 win32 {
     # Windows-specific configurations
@@ -57,7 +57,10 @@ RESOURCES += \
 
 SOURCES += \
     main.cpp \
-    common/units.cpp \
+    common/units/length.cpp \
+    common/units/lengthunit.cpp \
+    common/units/angle.cpp \
+    common/units/point.cpp \
     common/cadscene.cpp \
     common/cadview.cpp \
     workspace/workspace.cpp \
@@ -161,7 +164,11 @@ SOURCES += \
     project/circuit/gencompinstance.cpp
 
 HEADERS += \
-    common/units.h \
+    common/units/all_length_units.h \
+    common/units/length.h \
+    common/units/lengthunit.h \
+    common/units/angle.h \
+    common/units/point.h \
     common/cadscene.h \
     common/cadview.h \
     workspace/workspace.h \

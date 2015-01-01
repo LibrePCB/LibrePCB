@@ -24,7 +24,6 @@
 #include <QtCore>
 #include "gridsettingsdialog.h"
 #include "ui_gridsettingsdialog.h"
-#include "../units.h"
 #include "../../workspace/workspace.h"
 #include "../../workspace/settings/workspacesettings.h"
 
