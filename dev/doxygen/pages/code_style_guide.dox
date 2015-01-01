@@ -26,7 +26,7 @@
     @section doc_code_style_guide_naming Naming
     
         - File Names: Excatly same naming as classes, but all characters lowercase. Example: ses_select.cpp, ses_select.h
-        - Include guards: Use the namespace as prefix before the class name. Example: #ifndef NAMESPACE_CLASSNAME_H
+        - Include guards: Use the namespace as prefix before the class name. Example: @code #ifndef NAMESPACE_CLASSNAME_H @endcode
         - Namespaces: lowercase (with underline as separator if needed)
         - Classes: UpperCamelCase (for common prefixes, use the underline as separator. Example: project#SES_Select)
         - Interfaces: Like Classes, but with prefix "IF_". Example: IF_CADSceneEventHandler)
@@ -43,6 +43,11 @@
     
         - Use doxygen comments with '@' (not '\') as command character
         - Methods documentation only in header files, not in source files
+        
+    @section doc_code_style_guide_types Types
+    
+        - If you need integer types with fixed width, us Qt's typedefs (for example "qint32") instead of the types from <stdint.h> (for example "int32_t").
+        - For floating point numbers, use Qt's typedef "qreal" instead of "float" or "double" whenever possible. This way, the application will work also on ARM platforms with single precision FPU quite well.
         
     
     @section doc_code_style_guide_qt_macros Qt Macros

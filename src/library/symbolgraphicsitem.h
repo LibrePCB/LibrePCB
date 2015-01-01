@@ -53,7 +53,8 @@ namespace library {
 /**
  * @brief The SymbolGraphicsItem class
  *
- * @todo The methods #paint() and #updateBoundingRectAndShape() are not yet finished.
+ * @todo The methods SymbolGraphicsItem#paint() and
+ *       SymbolGraphicsItem#updateBoundingRectAndShape() are not yet finished.
  */
 class SymbolGraphicsItem final : public QGraphicsItem
 {

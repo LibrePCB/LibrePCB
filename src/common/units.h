@@ -430,13 +430,15 @@ class Length
         /**
          * @brief Set the length in millimeters, represented in a QString
          *
-         * @param millimeters   See #fromMm(const QString&, const Length&)
+         * @param millimeters   The length in millimeters in a QString with locale "C"
          *
          * @note This method is useful to read lengths from XML files! The problem with
          * decreased precision does NOT exist by using this method!
          *
          * @throw Exception     If the string is not valid or the number is out of range,
          *                      an Exception will be thrown
+         *
+         * @see #toMmString(), #fromMm(const QString&, const Length&)
          */
         void setLengthMm(const QString& millimeters) throw (Exception) {mNanometers = mmStringToNm(millimeters);}
 
@@ -507,12 +509,13 @@ class Length
          * @brief Get the length in millimeters as a QString
          *
          * @return The length in millimeters as a QString. The used locale is always "C".
-         * See also Length(const QString&)
          *
          * @note This method is useful to store lengths in XML files. The problem with
          * decreased precision does NOT exist by using this method!
          *
          * @todo don't use double for this purpose!
+         *
+         * @see #setLengthMm(const QString&), #fromMm(const QString&, const Length&)
          */
         QString toMmString() const noexcept {return QLocale::c().toString(toMm(), 'f', 6);}
 
@@ -630,6 +633,8 @@ class Length
          *
          * @throw Exception     If the argument is invalid or out of range, an Exception
          *                      will be thrown
+         *
+         * @see #setLengthMm(const QString&), #toMmString()
          */
         static Length fromMm(const QString& millimeters, const Length& gridInterval = Length(0)) throw (Exception);
 
