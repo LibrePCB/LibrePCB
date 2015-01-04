@@ -161,7 +161,8 @@ SOURCES += \
     workspace/settings/items/wsi_debugtools.cpp \
     project/erc/ercmsg.cpp \
     project/erc/ercmsglist.cpp \
-    project/circuit/gencompinstance.cpp
+    project/circuit/gencompinstance.cpp \
+    library/attribute.cpp
 
 HEADERS += \
     common/units/all_length_units.h \
@@ -269,7 +270,8 @@ HEADERS += \
     workspace/settings/items/wsi_debugtools.h \
     project/erc/ercmsg.h \
     project/erc/ercmsglist.h \
-    project/circuit/gencompinstance.h
+    project/circuit/gencompinstance.h \
+    library/attribute.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \

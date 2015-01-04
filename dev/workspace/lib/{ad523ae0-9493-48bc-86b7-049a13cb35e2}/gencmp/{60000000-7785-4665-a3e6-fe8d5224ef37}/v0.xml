@@ -15,9 +15,15 @@
     </meta>
     <changelog/>
     <attachements/>
-    <prefixes>
-        <prefix norm="" default="true">U</prefix>
-    </prefixes>
+    <attributes/>
+    <properties>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">U</prefix>
+        </prefixes>
+    </properties>
     <signals/>
     <symbol_variants>
         <variant uuid="{5de93550-f32b-4663-89d8-2ade0c5982a8}" norm="" default="true">

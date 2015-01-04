@@ -28,6 +28,7 @@
 #include "libraryelement.h"
 #include "gencompsignal.h"
 #include "gencompsymbvar.h"
+#include "attribute.h"
 
 /*****************************************************************************************
  *  Class GenericComponent
@@ -47,6 +48,14 @@ class GenericComponent final : public LibraryElement
         // Constructors / Destructor
         explicit GenericComponent(const FilePath& xmlFilePath) throw (Exception);
         ~GenericComponent() noexcept;
+
+        // Getters: Attributes
+        const QHash<QString, Attribute*>& getAttributes() const noexcept {return mAttributes;}
+        const Attribute* getAttributeByKey(const QString& key) const noexcept {return mAttributes.value(key, nullptr);}
+
+        // Getters: Default Values
+        const QHash<QString, QString>& getDefaultValues() const noexcept {return mDefaultValues;}
+        QString getDefaultValue(const QString& locale = QString()) const noexcept;
 
         // Getters: Prefixes
         const QHash<QString, QString>& getPrefixes() const noexcept {return mPrefixes;}
@@ -74,6 +83,8 @@ class GenericComponent final : public LibraryElement
 
 
         // Generic Conponent Attributes
+        QHash<QString, Attribute*> mAttributes; ///< key: attribute key, value: pointer to attribute
+        QHash<QString, QString> mDefaultValues; ///< key: locale (like "en_US"), value: default value
         QHash<QString, QString> mPrefixes; ///< key: norm, value: prefix
         QString mDefaultPrefixNorm; ///< must be an existing key of #mPrefixes
         QHash<QUuid, const GenCompSignal*> mSignals; ///< empty if the component has no signals

@@ -15,9 +15,15 @@
     </meta>
     <changelog/>
     <attachements/>
-    <prefixes>
-        <prefix norm="" default="true">U</prefix>
-    </prefixes>
+    <attributes/>
+    <properties>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">U</prefix>
+        </prefixes>
+    </properties>
     <signals>
         <signal uuid="{71a44db9-5e42-405f-b6e4-b4725ae37af3}" role="power" required="true" negated="false" clock="false">
             <name locale="en_US">V+</name>

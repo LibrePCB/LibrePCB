@@ -39,8 +39,28 @@ GenericComponent::GenericComponent(const FilePath& xmlFilePath) throw (Exception
 
     try
     {
+        // Load all attributes
+        tmpNode = mDomRoot.firstChildElement("attributes").firstChildElement("attribute");
+        while (!tmpNode.isNull())
+        {
+            Attribute* attribute = new Attribute(*this, tmpNode); // throws an exception on error
+            if (mAttributes.contains(attribute->getKey()))
+            {
+                throw RuntimeError(__FILE__, __LINE__, attribute->getKey(),
+                    QString(tr("The attribute \"%1\" exists multiple times in \"%2\"."))
+                    .arg(attribute->getKey(), mXmlFilepath.toNative()));
+            }
+            mAttributes.insert(attribute->getKey(), attribute);
+            tmpNode = tmpNode.nextSiblingElement("attribute");
+        }
+
+        // Load default values in all available languages
+        QDomElement properties = mDomRoot.firstChildElement("properties");
+        readLocaleDomNodes(mXmlFilepath, properties.firstChildElement("default_values"),
+                           "value", mDefaultValues);
+
         // Load all prefixes
-        tmpNode = mDomRoot.firstChildElement("prefixes").firstChildElement("prefix");
+        tmpNode = properties.firstChildElement("prefixes").firstChildElement("prefix");
         while (!tmpNode.isNull())
         {
             if (mPrefixes.contains(tmpNode.attribute("norm")))
@@ -133,6 +153,7 @@ GenericComponent::GenericComponent(const FilePath& xmlFilePath) throw (Exception
     {
         qDeleteAll(mSymbolVariants);    mSymbolVariants.clear();
         qDeleteAll(mSignals);           mSignals.clear();
+        qDeleteAll(mAttributes);        mAttributes.clear();
         throw;
     }
 }
@@ -141,11 +162,17 @@ GenericComponent::~GenericComponent() noexcept
 {
     qDeleteAll(mSymbolVariants);    mSymbolVariants.clear();
     qDeleteAll(mSignals);           mSignals.clear();
+    qDeleteAll(mAttributes);        mAttributes.clear();
 }
 
 /*****************************************************************************************
  *  Getters
  ****************************************************************************************/
+
+QString GenericComponent::getDefaultValue(const QString& locale) const noexcept
+{
+    return LibraryBaseElement::localeStringFromList(mDefaultValues, locale);
+}
 
 QString GenericComponent::getPrefix(const QString& norm) const noexcept
 {

@@ -15,9 +15,21 @@
     </meta>
     <changelog/>
     <attachements/>
-    <prefixes>
-        <prefix norm="" default="true">C</prefix>
-    </prefixes>
+    <attributes>
+        <attribute key="CAPACITANCE" type="capacitance">
+            <name locale="en_US">Capacitance</name>
+            <description locale="en_US">The nominal capacitance of the capacitor.</description>
+            <default_value locale="en_US"></default_value>
+        </attribute>
+    </attributes>
+    <properties>
+        <default_values>
+            <value locale="en_US">${CAPACITANCE}</value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">C</prefix>
+        </prefixes>
+    </properties>
     <signals>
         <signal uuid="{5ebbbe7c-e0b5-4c71-ad13-6d2d921f85c7}" role="passive" required="true" negated="false" clock="false">
             <name locale="en_US">1</name>
