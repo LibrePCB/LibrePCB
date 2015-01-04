@@ -34,6 +34,7 @@
 
 namespace project {
 class Circuit;
+class GenCompAttributeInstance;
 class GenCompSignalInstance;
 class SymbolInstance;
 class ErcMsg;
@@ -140,6 +141,9 @@ class GenCompInstance : public QObject
 
         /// @brief Pointer to the used symbol variant of #mGenComp
         const library::GenCompSymbVar* mGenCompSymbVar;
+
+        /// @brief All attributes of this generic component (key: attribute key)
+        QHash<QString, GenCompAttributeInstance*> mAttributes;
 
         /// @brief All signal instances (Key: generic component signal UUID)
         QHash<QUuid, GenCompSignalInstance*> mSignals;

@@ -79,16 +79,16 @@ class Attribute final : public QObject
         const QHash<QString, QString>& getDefaultValues() const noexcept {return mDefaultValues;}
 
 
+        // Static Methods
+        static Type_t stringToType(const QString& type) throw (Exception);
+        static QString typeToString(Type_t type) noexcept;
+
     private:
 
         // make some methods inaccessible...
         Attribute();
         Attribute(const Attribute& other);
         Attribute& operator=(const Attribute& rhs);
-
-        // Private Static Methods
-        static Type_t stringToType(const QString& type) throw (Exception);
-        static QString typeToString(Type_t type) noexcept;
 
 
         // General Attributes

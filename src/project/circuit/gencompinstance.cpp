@@ -31,6 +31,7 @@
 #include "gencompsignalinstance.h"
 #include "../../library/genericcomponent.h"
 #include "../erc/ercmsg.h"
+#include "gencompattributeinstance.h"
 
 namespace project {
 
@@ -42,7 +43,7 @@ GenCompInstance::GenCompInstance(Circuit& circuit, const QDomElement& domElement
     QObject(0), mCircuit(circuit), mDomElement(domElement), mAddedToCircuit(false),
     mGenComp(nullptr), mGenCompSymbVar(nullptr)
 {
-    // read attributes
+    // read general attributes
     mUuid = mDomElement.attribute("uuid");
     if(mUuid.isNull())
     {
@@ -79,8 +80,23 @@ GenCompInstance::GenCompInstance(Circuit& circuit, const QDomElement& domElement
             .arg(mDomElement.attribute("symbol_variant")));
     }
 
+    // load all generic component attributes
+    QDomElement tmpNode = mDomElement.firstChildElement("attributes").firstChildElement("attribute");
+    while (!tmpNode.isNull())
+    {
+        GenCompAttributeInstance* attribute = new GenCompAttributeInstance(mCircuit, *this, tmpNode);
+        if (mAttributes.contains(attribute->getKey()))
+        {
+            throw RuntimeError(__FILE__, __LINE__, attribute->getKey(),
+                QString(tr("The component attribute \"%1\" is defined multiple times."))
+                .arg(attribute->getKey()));
+        }
+        mAttributes.insert(attribute->getKey(), attribute);
+        tmpNode = tmpNode.nextSiblingElement("attribute");
+    }
+
     // load all signal instances
-    QDomElement tmpNode = mDomElement.firstChildElement("signal_mapping").firstChildElement("map");
+    tmpNode = mDomElement.firstChildElement("signal_mapping").firstChildElement("map");
     while (!tmpNode.isNull())
     {
         GenCompSignalInstance* signal = new GenCompSignalInstance(mCircuit, *this, tmpNode);
@@ -116,6 +132,7 @@ GenCompInstance::~GenCompInstance() noexcept
     Q_ASSERT(mSymbolInstances.isEmpty());
 
     qDeleteAll(mSignals);       mSignals.clear();
+    qDeleteAll(mAttributes);    mAttributes.clear();
 }
 
 /*****************************************************************************************
@@ -319,6 +336,27 @@ GenCompInstance* GenCompInstance::create(Circuit& circuit, QDomDocument& doc,
     QDomText valueText = doc.createTextNode(genComp.getDefaultValue());
     valueNode.appendChild(valueText);
     node.appendChild(valueNode);
+
+    // add attributes
+    QDomElement attributesNode = doc.createElement("attributes");
+    foreach (const library::Attribute* attribute, genComp.getAttributes())
+    {
+        QDomElement subnode = doc.createElement("attribute");
+        subnode.setAttribute("key", attribute->getKey());
+        // type
+        QDomElement typeNode = doc.createElement("type");
+        QDomText typeText = doc.createTextNode(library::Attribute::typeToString(attribute->getType()));
+        typeNode.appendChild(typeText);
+        subnode.appendChild(typeNode);
+        // value
+        QDomElement valueNode = doc.createElement("value");
+        QDomText valueText = doc.createTextNode(attribute->getDefaultValue());
+        valueNode.appendChild(valueText);
+        subnode.appendChild(valueNode);
+        // add to parent
+        attributesNode.appendChild(subnode);
+    }
+    node.appendChild(attributesNode);
 
     // add signal map
     QDomElement signalMapNode = doc.createElement("signal_mapping");

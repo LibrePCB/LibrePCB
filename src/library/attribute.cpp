@@ -78,7 +78,7 @@ QString Attribute::getDefaultValue(const QString& locale ) const noexcept
 }
 
 /*****************************************************************************************
- *  Private Static Methods
+ *  Static Methods
  ****************************************************************************************/
 
 Attribute::Type_t Attribute::stringToType(const QString& type) throw (Exception)
