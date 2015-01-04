@@ -57,6 +57,13 @@ GenCompInstance::GenCompInstance(Circuit& circuit, const QDomElement& domElement
             QString(tr("Name of generic component instance \"%1\" is empty!"))
             .arg(mUuid.toString()));
     }
+    mValue = mDomElement.firstChildElement("value").text();
+    if (mDomElement.firstChildElement("value").isNull())
+    {
+        throw RuntimeError(__FILE__, __LINE__, mUuid.toString(),
+            QString(tr("Generic component instance \"%1\" has no value!"))
+            .arg(mUuid.toString()));
+    }
     mGenComp = mCircuit.getProject().getLibrary().getGenComp(mDomElement.attribute("generic_component"));
     if (!mGenComp)
     {
@@ -296,6 +303,12 @@ GenCompInstance* GenCompInstance::create(Circuit& circuit, QDomDocument& doc,
     node.setAttribute("name", name);
     node.setAttribute("generic_component", genComp.getUuid().toString());
     node.setAttribute("symbol_variant", symbVar.getUuid().toString());
+
+    // add value
+    QDomElement valueNode = doc.createElement("value");
+    QDomText valueText = doc.createTextNode(genComp.getDefaultValue());
+    valueNode.appendChild(valueText);
+    node.appendChild(valueNode);
 
     // add signal map
     QDomElement signalMapNode = doc.createElement("signal_mapping");

@@ -66,6 +66,7 @@ class GenCompInstance : public QObject
         // Getters
         const QUuid& getUuid() const noexcept {return mUuid;}
         const QString& getName() const noexcept {return mName;}
+        const QString& getValue() const noexcept {return mValue;}
         uint getPlacedSymbolsCount() const noexcept {return mSymbolInstances.count();}
         uint getUnplacedSymbolsCount() const noexcept;
         uint getUnplacedRequiredSymbolsCount() const noexcept;
@@ -130,6 +131,9 @@ class GenCompInstance : public QObject
 
         /// @brief The unique name of this component instance in the circuit (e.g. "R42")
         QString mName;
+
+        /// @brief The value of this component instance in the circuit (e.g. the resistance of a resistor)
+        QString mValue;
 
         /// @brief Pointer to the generic component in the project's library
         const library::GenericComponent* mGenComp;

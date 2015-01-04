@@ -182,8 +182,11 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
         QString textStr = text->getText();
         if (mSymbolInstance)
         {
-            if (textStr == "${NAME}") // TODO: this is only a test...
+            // TODO: this is only a test...
+            if (textStr == "${NAME}")
                 textStr = mSymbolInstance->getGenCompInstance().getName();
+            else if (textStr == "${VALUE}")
+                textStr = mSymbolInstance->getGenCompInstance().getValue();
         }
 
         // draw text
