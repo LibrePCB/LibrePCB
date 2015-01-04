@@ -50,7 +50,7 @@ GenCompInstance::GenCompInstance(Circuit& circuit, const QDomElement& domElement
             QString(tr("Invalid generic component instance UUID: \"%1\""))
             .arg(mDomElement.attribute("uuid")));
     }
-    mName = mDomElement.attribute("name");
+    mName = mDomElement.firstChildElement("name").text();
     if(mName.isEmpty())
     {
         throw RuntimeError(__FILE__, __LINE__, mUuid.toString(),
@@ -161,7 +161,12 @@ void GenCompInstance::setName(const QString& name) throw (Exception)
             tr("The new component name must not be empty!"));
     }
 
-    mDomElement.setAttribute("name", name);
+    // update DOM element
+    QDomElement nameNode = mDomElement.ownerDocument().createElement("name");
+    QDomText nameText = mDomElement.ownerDocument().createTextNode(name);
+    nameNode.appendChild(nameText);
+    mDomElement.replaceChild(nameNode, mDomElement.firstChildElement("name"));
+
     mName = name;
     updateErcMessages();
 }
@@ -300,9 +305,14 @@ GenCompInstance* GenCompInstance::create(Circuit& circuit, QDomDocument& doc,
 
     // fill the new QDomElement with all the needed content
     node.setAttribute("uuid", QUuid::createUuid().toString()); // generate random UUID
-    node.setAttribute("name", name);
     node.setAttribute("generic_component", genComp.getUuid().toString());
     node.setAttribute("symbol_variant", symbVar.getUuid().toString());
+
+    // add name
+    QDomElement nameNode = doc.createElement("name");
+    QDomText nameText = doc.createTextNode(name);
+    nameNode.appendChild(nameText);
+    node.appendChild(nameNode);
 
     // add value
     QDomElement valueNode = doc.createElement("value");
