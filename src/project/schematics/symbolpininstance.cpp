@@ -65,8 +65,8 @@ SymbolPinInstance::SymbolPinInstance(SymbolInstance& symbolInstance, const QUuid
     mErcMsgUnconnectedRequiredPin.reset(new ErcMsg(mCircuit.getProject(), *this,
         QString("%1/%2").arg(mSymbolInstance.getUuid().toString()).arg(mSymbolPin->getUuid().toString()),
         "UnconnectedRequiredPin", ErcMsg::ErcMsgType_t::SchematicError,
-        QString(tr("Unconnected pin: \"%1\" of component \"%2\""))
-        .arg(getDisplayText(true, true)).arg(mSymbolInstance.getGenCompInstance().getName())));
+        QString(tr("Unconnected pin: \"%1\" of symbol \"%2\""))
+        .arg(getDisplayText(true, true)).arg(mSymbolInstance.getName())));
 }
 
 SymbolPinInstance::~SymbolPinInstance()

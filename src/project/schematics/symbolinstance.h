@@ -76,6 +76,7 @@ class SymbolInstance final : public QObject
         const QUuid& getUuid() const noexcept {return mUuid;}
         const Point& getPosition() const noexcept {return mPosition;}
         const Angle& getAngle() const noexcept {return mAngle;}
+        QString getName() const noexcept;
         SymbolPinInstance* getPinInstance(const QUuid& pinUuid) const noexcept {return mPinInstances.value(pinUuid);}
         const QHash<QUuid, SymbolPinInstance*>& getPinInstances() const noexcept {return mPinInstances;}
         GenCompInstance& getGenCompInstance() const noexcept {return *mGenCompInstance;}
