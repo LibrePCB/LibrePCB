@@ -260,9 +260,9 @@ Project::~Project() noexcept
  *  Getters
  ****************************************************************************************/
 
-int Project::getSchematicIndex(Schematic* schematic) const noexcept
+int Project::getSchematicIndex(const Schematic* schematic) const noexcept
 {
-    return mSchematics.indexOf(schematic);
+    return mSchematics.indexOf(const_cast<Schematic*>(schematic));
 }
 
 Schematic* Project::getSchematicByUuid(const QUuid& uuid) const noexcept

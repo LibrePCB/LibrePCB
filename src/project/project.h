@@ -176,7 +176,7 @@ class Project final : public QObject
          *
          * @return the schematic index (-1 if the schematic does not exist)
          */
-        int getSchematicIndex(Schematic* schematic) const noexcept;
+        int getSchematicIndex(const Schematic* schematic) const noexcept;
 
         /**
          * @brief Get the count of schematic pages
