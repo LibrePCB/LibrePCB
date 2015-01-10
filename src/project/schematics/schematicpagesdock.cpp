@@ -89,14 +89,10 @@ void SchematicPagesDock::activeSchematicChanged(int oldIndex, int newIndex)
 void SchematicPagesDock::schematicAdded(int newIndex)
 {
     Schematic* schematic = mProject.getSchematicByIndex(newIndex);
-    if (!schematic)
-    {
-        qCritical() << "schematic is NULL!";
-        return;
-    }
+    Q_ASSERT(schematic); if (!schematic) return;
 
     QListWidgetItem* item = new QListWidgetItem();
-    item->setText(schematic->getName());
+    item->setText(QString("%1: %2").arg(newIndex+1).arg(schematic->getName()));
     item->setIcon(schematic->getIcon());
     mUi->listWidget->insertItem(newIndex, item);
 }
