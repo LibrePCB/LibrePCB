@@ -26,8 +26,8 @@
             <segment type="line" end_x="-2.032" end_y="-0.4"/>
             <segment type="line" end_x="-2.032" end_y="-1.016"/>
         </polygon>
-        <text layer="20" text="${NAME}"  x="3.2" y="0"      angle="0" height="3.175" v_align="bottom" h_align="left"/>
-        <text layer="21" text="${VALUE}" x="3.2" y="-3.175" angle="0" height="3.175" v_align="bottom" h_align="left"/>
+        <text layer="20" text="${SYM::NAME}"  x="3.2" y="0"      angle="0" height="3.175" v_align="bottom" h_align="left"/>
+        <text layer="21" text="${CMP::VALUE}" x="3.2" y="-3.175" angle="0" height="3.175" v_align="bottom" h_align="left"/>
     </geometry>
     <pins>
         <pin x="0" length="1.524" angle="180" y="2.54" uuid="{b40f75a5-732a-485f-a534-d1321184628b}">

@@ -183,9 +183,9 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
         if (mSymbolInstance)
         {
             // TODO: this is only a test...
-            if (textStr == "${NAME}")
+            if (textStr == "${SYM::NAME}")
                 textStr = mSymbolInstance->getGenCompInstance().getName();
-            else if (textStr == "${VALUE}")
+            else if (textStr == "${CMP::VALUE}")
                 textStr = mSymbolInstance->getGenCompInstance().getValue();
         }
 

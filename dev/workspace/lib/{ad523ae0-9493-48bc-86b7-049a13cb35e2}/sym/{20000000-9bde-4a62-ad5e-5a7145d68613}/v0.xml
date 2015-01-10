@@ -20,29 +20,29 @@
     <attachements/>
     <geometry>
         <polygon line_layer="10" line_width="0.6" fill_layer="0" start_x="0" start_y="0" grab_area="false">
-            <segment type="line" end_x="0" end_y="210"/>
-            <segment type="line" end_x="297" end_y="210"/>
-            <segment type="line" end_x="297" end_y="0"/>
+            <segment type="line" end_x="0" end_y="190"/>
+            <segment type="line" end_x="277" end_y="190"/>
+            <segment type="line" end_x="277" end_y="0"/>
             <segment type="line" end_x="0" end_y="0"/>
         </polygon>
-        <polygon line_layer="10" line_width="0.6" fill_layer="0" start_x="150" start_y="0" grab_area="false">
-            <segment type="line" end_x="150" end_y="30"/>
-            <segment type="line" end_x="297" end_y="30"/>
+        <polygon line_layer="10" line_width="0.6" fill_layer="0" start_x="160" start_y="0" grab_area="false">
+            <segment type="line" end_x="160" end_y="20"/>
+            <segment type="line" end_x="277" end_y="20"/>
         </polygon>
-        <polygon line_layer="10" line_width="0.6" fill_layer="0" start_x="250" start_y="0" grab_area="false">
-            <segment type="line" end_x="250" end_y="30"/>
+        <polygon line_layer="10" line_width="0.6" fill_layer="0" start_x="230" start_y="0" grab_area="false">
+            <segment type="line" end_x="230" end_y="20"/>
         </polygon>
-        <polygon line_layer="10" line_width="0.6" fill_layer="0" start_x="150" start_y="12" grab_area="false">
-            <segment type="line" end_x="297" end_y="12"/>
+        <polygon line_layer="10" line_width="0.6" fill_layer="0" start_x="160" start_y="8" grab_area="false">
+            <segment type="line" end_x="277" end_y="8"/>
         </polygon>
-        <polygon line_layer="10" line_width="0.6" fill_layer="0" start_x="250" start_y="21" grab_area="false">
-            <segment type="line" end_x="297" end_y="21"/>
+        <polygon line_layer="10" line_width="0.6" fill_layer="0" start_x="230" start_y="14" grab_area="false">
+            <segment type="line" end_x="277" end_y="14"/>
         </polygon>
-        <text layer="10" text="${PROJECT::NAME}"       x="153" y="0"   angle="0" height="12" v_align="bottom" h_align="left"/>
-        <text layer="10" text="${PAGE::LAST_MODIFIED}" x="253" y="22"  angle="0" height="7"  v_align="bottom" h_align="left"/>
-        <text layer="10" text="${PAGE::NAME}"          x="153" y="12"  angle="0" height="18" v_align="bottom" h_align="left"/>
-        <text layer="10" text="${PROJECT::AUTHOR}"     x="253" y="13"  angle="0" height="7"  v_align="bottom" h_align="left"/>
-        <text layer="10" text="${PAGE::PAGE_X_OF_Y}"   x="253" y="2.5" angle="0" height="7"  v_align="bottom" h_align="left"/>
+        <text layer="10" text="${PAGE::NAME}"                  x="163" y="8"  angle="0" height="12" v_align="bottom" h_align="left"/>
+        <text layer="10" text="${PRJ::NAME}"                   x="163" y="0"  angle="0" height="8"  v_align="bottom" h_align="left"/>
+        <text layer="10" text="${PAGE::LAST_MODIFIED}"         x="233" y="14" angle="0" height="6"  v_align="bottom" h_align="left"/>
+        <text layer="10" text="${PAGE::AUTHOR}"                x="233" y="8"  angle="0" height="6"  v_align="bottom" h_align="left"/>
+        <text layer="10" text="Page ${PAGE::NBR}/${PAGE::CNT}" x="233" y="0"  angle="0" height="8"  v_align="bottom" h_align="left"/>
     </geometry>
     <pins/>
 </symbol>
