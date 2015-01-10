@@ -69,6 +69,9 @@ GenCompSymbVarItem::GenCompSymbVarItem(GenericComponent& genComp, GenCompSymbVar
     // read is required
     mIsRequired = (mDomElement.attribute("required") == "true");
 
+    // read name suffix
+    mSuffix = mDomElement.attribute("suffix");
+
     // read pin signal map
     tmpNode = mDomElement.firstChildElement("pin_signal_map").firstChildElement("map");
     while (!tmpNode.isNull())
