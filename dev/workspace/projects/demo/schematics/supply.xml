@@ -2,14 +2,9 @@
 <schematic file_version="0">
     <meta>
         <uuid>{cb6501aa-f8c3-42ac-a9a0-8a9df0da3f05}</uuid>
-        <name>Seite 1</name>
+        <name>Supply</name>
     </meta>
-    <attributes>
-        <attribute type="text" name="NAME">Seite 1</attribute>
-        <attribute type="text" name="DESCRIPTION">sdfg...</attribute>
-        <attribute type="text" name="AUTHOR">Irgend Jemand</attribute>
-        <attribute type="text" name="VERSION">0.1</attribute>
-    </attributes>
+    <attributes/>
     <symbols>
         <symbol symbol_item="{6bd99bbf-7d36-457f-ae93-8b06b869ee4b}" uuid="{8a1f9e05-c711-4af4-9a7b-b1a585d6e4ed}" gen_comp_instance="{7fe07dd4-aaee-4a28-ae35-d22c2904a462}">
             <position mirror="false" x="0.000000" y="0.000000" angle="0.000000"/>
