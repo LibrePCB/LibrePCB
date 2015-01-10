@@ -192,9 +192,12 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
         // draw text
         painter->save();
         painter->scale(factor, factor);
-        if (rotate180) painter->rotate((qreal)180);
+        if (rotate180)
+            painter->rotate(text->getAngle().toDeg() + (qreal)180);
+        else
+            painter->rotate(text->getAngle().toDeg());
         painter->setFont(font);
-        int flags = text->getAlign() | Qt::TextSingleLine | Qt::TextDontClip;
+        int flags = text->getAlign() | Qt::TextDontClip;
         if (rotate180)
         {
             if (flags & Qt::AlignLeft) {flags &= ~Qt::AlignLeft; flags |= Qt::AlignRight;}
