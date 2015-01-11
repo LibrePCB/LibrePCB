@@ -109,7 +109,7 @@ class Project final : public QObject
         ~Project() noexcept;
 
 
-        // Getters
+        // Getters: General
 
         /**
          * @brief Get the filepath of the project file (*.e4u)
@@ -211,6 +211,37 @@ class Project final : public QObject
          * @return A pointer to the specified schematic, or NULL if name is invalid
          */
         Schematic* getSchematicByName(const QString& name) const noexcept;
+
+
+        // Getters: Attributes
+
+        /**
+         * @brief Get the name of the project
+         *
+         * @return The name of the project
+         */
+        const QString& getName() const noexcept {return mName;}
+
+        /**
+         * @brief Get the author of the project
+         *
+         * @return The author of the project
+         */
+        const QString& getAuthor() const noexcept {return mAuthor;}
+
+        /**
+         * @brief Get the date and time when the project was created
+         *
+         * @return The local date and time of creation
+         */
+        const QDateTime& getCreated() const noexcept {return mCreated;}
+
+        /**
+         * @brief Get the date and time when the project was last modified
+         *
+         * @return The local date and time of last modification
+         */
+        const QDateTime& getLastModified() const noexcept {return mLastModified;}
 
 
         // General Methods
@@ -369,6 +400,12 @@ class Project final : public QObject
 
         // Other Files
         IniFile* mSchematicsIniFile; ///< schematics/schematics.ini
+
+        // Attributes
+        QString mName;              ///< the name of the project
+        QString mAuthor;            ///< the author of the project
+        QDateTime mCreated;         ///< the datetime of the project creation
+        QDateTime mLastModified;    ///< the datetime of the last project modification
 
         // General
         bool mProjectIsModified; ///< this flag indicates whether the project contains unsaved changed or not (changes using #UndoCommand will NOT set this flag!)

@@ -157,8 +157,14 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
         else
             mXmlFile = new XmlFile(mFilepath, mIsRestored, mIsReadOnly, QStringLiteral("project"));
 
-        // the project seems to be ready to open, so we will create all needed objects
+        // The project seems to be ready to open! Load all attributes...
+        QDomElement metaElement = mXmlFile->getRoot().firstChildElement("meta");
+        mName = metaElement.firstChildElement("name").text();
+        mAuthor = metaElement.firstChildElement("author").text();
+        mCreated = QDateTime::fromString(metaElement.firstChildElement("created").text(), Qt::ISODate).toLocalTime();
+        mLastModified = QDateTime::fromString(metaElement.firstChildElement("last_modified").text(), Qt::ISODate).toLocalTime();
 
+        // Create all needed objects
         mUndoStack = new UndoStack();
         mProjectLibrary = new ProjectLibrary(*this, mIsRestored, mIsReadOnly);
         mErcMsgList = new ErcMsgList(*this, mIsRestored, mIsReadOnly);

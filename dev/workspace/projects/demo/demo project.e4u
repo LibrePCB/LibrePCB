@@ -1,36 +1,10 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes'?>
 <project file_version="0">
-    <meta/>
-    <attributes>
-        <!-- TODO -->
-        <attribute type="text" name="NAME">EDA4U Beispielprojekt</attribute>
-        <attribute type="text" name="DESCRIPTION">Das ist eine Beschreibung des Projektes</attribute>
-        <attribute type="text" name="AUTHOR">Irgend Jemand</attribute>
-        <attribute type="text" name="VERSION">0.1</attribute>
-        <!-- Examples: -->
-        <attribute type="text" name="TEXT">text!</attribute>
-        <!-- []                                 -->
-        <attribute unit="mm" type="length" positive_only="false" name="LENGTH">12.34</attribute>
-        <!-- [nm, µm, mm, cm, dm, m]            -->
-        <attribute unit="kg" type="weigth" name="WEIGTH">12.34</attribute>
-        <!-- [mg,  g, kg]                       -->
-        <attribute unit="ns" type="time" positive_only="false" name="TIME">12.34</attribute>
-        <!-- [ps, ns, µs, ms,  s, m,  h,  d]    -->
-        <attribute unit="mA" type="current" positive_only="false" name="CURRENT">12.34</attribute>
-        <!-- [fA, pA, nA, µA, mA, A, kA, MA]    -->
-        <attribute unit="V" type="voltage" positive_only="false" name="VOLTAGE">12.34</attribute>
-        <!-- [fV, pV, nV, µV, mV, V, kV, MV]    -->
-        <attribute unit="W" type="power" positive_only="true" name="POWER">12.34</attribute>
-        <!-- [fW, pW, nW, µW, mW, W, kW, MW]    -->
-        <attribute unit="Ω" type="resistance" name="RESISTANCE">12.34</attribute>
-        <!-- [mΩ,  Ω, kΩ, MΩ, GΩ]               -->
-        <attribute unit="nF" type="capacity" name="CAPACITY">12.34</attribute>
-        <!-- [pF, nF, µF, mF, F]                -->
-        <attribute unit="mH" type="inductance" name="INDUCTANCE">12.34</attribute>
-        <!-- [pH, nH, µH, mH, H]                -->
-        <attribute unit="°C" type="temperature" name="TEMPERATURE">12.34</attribute>
-        <!-- [K,  °C, °F]                       -->
-        <attribute unit="cd" type="luminosity" name="LUMINOSITY">12.34</attribute>
-        <!-- [cd]                               -->
-    </attributes>
+    <meta>
+        <name>Demo Project</name>
+        <author>Homer Simpson</author>
+        <created>2013-04-13T12:43:52Z</created>
+        <last_modified>2013-04-20T18:01:33Z</last_modified>
+    </meta>
+    <attributes/>
 </project>
