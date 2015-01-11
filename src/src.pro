@@ -163,7 +163,8 @@ SOURCES += \
     project/erc/ercmsglist.cpp \
     project/circuit/gencompinstance.cpp \
     library/attribute.cpp \
-    project/circuit/gencompattributeinstance.cpp
+    project/circuit/gencompattributeinstance.cpp \
+    common/if_attributeprovider.cpp
 
 HEADERS += \
     common/units/all_length_units.h \
@@ -273,7 +274,8 @@ HEADERS += \
     project/erc/ercmsglist.h \
     project/circuit/gencompinstance.h \
     library/attribute.h \
-    project/circuit/gencompattributeinstance.h
+    project/circuit/gencompattributeinstance.h \
+    common/if_attributeprovider.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \

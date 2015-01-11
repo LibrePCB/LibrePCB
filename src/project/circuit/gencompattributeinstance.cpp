@@ -44,10 +44,20 @@ GenCompAttributeInstance::GenCompAttributeInstance(Circuit& circuit,
             .arg(mGenCompInstance.getUuid().toString()));
     }
     mType = library::Attribute::stringToType(mDomElement.firstChildElement("type").text());
+    mValue = mDomElement.firstChildElement("value").text();
 }
 
 GenCompAttributeInstance::~GenCompAttributeInstance() noexcept
 {
+}
+
+/*****************************************************************************************
+ *  Getters
+ ****************************************************************************************/
+
+QString GenCompAttributeInstance::getValueToDisplay() const noexcept
+{
+    return mValue; // TODO
 }
 
 /*****************************************************************************************

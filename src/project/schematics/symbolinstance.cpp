@@ -42,8 +42,8 @@ namespace project {
 
 SymbolInstance::SymbolInstance(Schematic& schematic, const QDomElement& domElement)
                                throw (Exception) :
-    QObject(0), mSchematic(schematic), mDomElement(domElement), mSymbVarItem(0),
-    mSymbol(0), mGraphicsItem(0), mGenCompInstance(0)
+    QObject(0), IF_AttributeProvider(), mSchematic(schematic), mDomElement(domElement),
+    mSymbVarItem(0), mSymbol(0), mGraphicsItem(0), mGenCompInstance(0)
 {
     mUuid = mDomElement.attribute("uuid");
     if(mUuid.isNull())
@@ -216,6 +216,26 @@ bool SymbolInstance::save(bool toOriginal, QStringList& errors) noexcept
 Point SymbolInstance::mapToScene(const Point& relativePos) const noexcept
 {
     return (mPosition + relativePos).rotated(mAngle, mPosition);
+}
+
+bool SymbolInstance::getAttributeValue(const QString& attrNS, const QString& attrKey,
+                                       bool passToParents, QString& value) const noexcept
+{
+    if ((attrNS == QLatin1String("SYM")) || (attrNS.isEmpty()))
+    {
+        if (attrKey == QLatin1String("NAME"))
+            return value = getName(), true;
+    }
+
+    if ((attrNS != QLatin1String("SYM")) && (passToParents))
+    {
+        if (mGenCompInstance->getAttributeValue(attrNS, attrKey, false, value))
+            return true;
+        if (mSchematic.getAttributeValue(attrNS, attrKey, true, value))
+            return true;
+    }
+
+    return false;
 }
 
 /*****************************************************************************************

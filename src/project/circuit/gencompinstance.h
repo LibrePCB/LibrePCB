@@ -26,6 +26,7 @@
 
 #include <QtCore>
 #include <QDomElement>
+#include "../../common/if_attributeprovider.h"
 #include "../../common/exceptions.h"
 
 /*****************************************************************************************
@@ -54,7 +55,7 @@ namespace project {
 /**
  * @brief The GenCompInstance class
  */
-class GenCompInstance : public QObject
+class GenCompInstance : public QObject, public IF_AttributeProvider
 {
         Q_OBJECT
 
@@ -100,6 +101,11 @@ class GenCompInstance : public QObject
                                     const SymbolInstance* instance) throw (Exception);
         void unregisterSymbolInstance(const QUuid& itemUuid, const SymbolInstance* symbol)
                                       throw (Exception);
+
+        // Helper Methods
+        bool getAttributeValue(const QString& attrNS, const QString& attrKey,
+                                  bool passToParents, QString& value) const noexcept;
+
 
         // Static Methods
         static GenCompInstance* create(Circuit& circuit, QDomDocument& doc,

@@ -179,15 +179,10 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
             y = -y;
         }
 
+        // get the text to display
         QString textStr = text->getText();
         if (mSymbolInstance)
-        {
-            // TODO: this is only a test...
-            if (textStr == "${SYM::NAME}")
-                textStr = mSymbolInstance->getGenCompInstance().getName();
-            else if (textStr == "${CMP::VALUE}")
-                textStr = mSymbolInstance->getGenCompInstance().getValue();
-        }
+            mSymbolInstance->replaceVariablesWithAttributes(textStr, true);
 
         // draw text
         painter->save();

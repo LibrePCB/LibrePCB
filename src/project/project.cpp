@@ -47,10 +47,10 @@ namespace project {
  ****************************************************************************************/
 
 Project::Project(const FilePath& filepath, bool create) throw (Exception) :
-    QObject(0), mPath(filepath.getParentDir()), mFilepath(filepath), mXmlFile(0),
-    mFileLock(filepath), mIsRestored(false), mIsReadOnly(false), mSchematicsIniFile(0),
-    mProjectIsModified(false), mUndoStack(0), mProjectLibrary(0), mErcMsgList(0),
-    mCircuit(0), mSchematicEditor(0)
+    QObject(0), IF_AttributeProvider(), mPath(filepath.getParentDir()),
+    mFilepath(filepath), mXmlFile(0), mFileLock(filepath), mIsRestored(false),
+    mIsReadOnly(false), mSchematicsIniFile(0), mProjectIsModified(false), mUndoStack(0),
+    mProjectLibrary(0), mErcMsgList(0), mCircuit(0), mSchematicEditor(0)
 {
     qDebug() << (create ? "create project..." : "open project...");
 
@@ -401,6 +401,30 @@ bool Project::windowIsAboutToClose(QMainWindow* window)
     }
 
     return true; // this is not the last open window, so no problem to close it...
+}
+
+/*****************************************************************************************
+ *  Helper Methods
+ ****************************************************************************************/
+
+bool Project::getAttributeValue(const QString& attrNS, const QString& attrKey,
+                                   bool passToParents, QString& value) const noexcept
+{
+    Q_UNUSED(passToParents); // TODO: pass to workspace?!
+
+    if ((attrNS == QLatin1String("PRJ")) || (attrNS.isEmpty()))
+    {
+        if (attrKey == QLatin1String("NAME"))
+            return value = mName, true;
+        else if (attrKey == QLatin1String("AUTHOR"))
+            return value = mAuthor, true;
+        else if (attrKey == QLatin1String("CREATED"))
+            return value = mCreated.toString(Qt::SystemLocaleShortDate), true;
+        else if (attrKey == QLatin1String("LAST_MODIFIED"))
+            return value = mLastModified.toString(Qt::SystemLocaleShortDate), true;
+    }
+
+    return false;
 }
 
 /*****************************************************************************************

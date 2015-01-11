@@ -40,8 +40,8 @@ namespace project {
  ****************************************************************************************/
 
 GenCompInstance::GenCompInstance(Circuit& circuit, const QDomElement& domElement) throw (Exception) :
-    QObject(0), mCircuit(circuit), mDomElement(domElement), mAddedToCircuit(false),
-    mGenComp(nullptr), mGenCompSymbVar(nullptr)
+    QObject(0), IF_AttributeProvider(), mCircuit(circuit), mDomElement(domElement),
+    mAddedToCircuit(false), mGenComp(nullptr), mGenCompSymbVar(nullptr)
 {
     // read general attributes
     mUuid = mDomElement.attribute("uuid");
@@ -287,6 +287,29 @@ void GenCompInstance::unregisterSymbolInstance(const QUuid& itemUuid,
 
     mSymbolInstances.remove(itemUuid);
     updateErcMessages();
+}
+
+/*****************************************************************************************
+ *  Helper Methods
+ ****************************************************************************************/
+
+bool GenCompInstance::getAttributeValue(const QString& attrNS, const QString& attrKey,
+                                        bool passToParents, QString& value) const noexcept
+{
+    if ((attrNS == QLatin1String("CMP")) || (attrNS.isEmpty()))
+    {
+        if (attrKey == QLatin1String("NAME"))
+            return value = mName, true;
+        else if (attrKey == QLatin1String("VALUE"))
+            return value = mValue, true;
+        else if (mAttributes.contains(attrKey))
+            return value = mAttributes.value(attrKey)->getValueToDisplay(), true;
+    }
+
+    if ((attrNS != QLatin1String("CMP")) && (passToParents))
+        return mCircuit.getProject().getAttributeValue(attrNS, attrKey, passToParents, value);
+    else
+        return false;
 }
 
 /*****************************************************************************************

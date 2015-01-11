@@ -61,6 +61,7 @@ class GenCompAttributeInstance final : public QObject
         // Getters
         const QString& getKey() const noexcept {return mKey;}
         library::Attribute::Type_t getType() const noexcept {return mType;}
+        QString getValueToDisplay() const noexcept;
 
 
     private:
@@ -79,6 +80,7 @@ class GenCompAttributeInstance final : public QObject
         // Attributes
         QString mKey;
         library::Attribute::Type_t mType;
+        QString mValue;
 };
 
 } // namespace project

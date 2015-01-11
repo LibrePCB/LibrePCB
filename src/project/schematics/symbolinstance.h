@@ -26,6 +26,7 @@
 
 #include <QtCore>
 #include <QDomElement>
+#include "../../common/if_attributeprovider.h"
 #include "../../common/units/all_length_units.h"
 #include "../../common/exceptions.h"
 
@@ -60,7 +61,7 @@ namespace project {
  * @author ubruhin
  * @date 2014-08-23
  */
-class SymbolInstance final : public QObject
+class SymbolInstance final : public QObject, public IF_AttributeProvider
 {
         Q_OBJECT
 
@@ -96,6 +97,8 @@ class SymbolInstance final : public QObject
 
         // Helper Methods
         Point mapToScene(const Point& relativePos) const noexcept;
+        bool getAttributeValue(const QString& attrNS, const QString& attrKey,
+                               bool passToParents, QString& value) const noexcept;
 
         // Static Methods
         static uint extractFromGraphicsItems(const QList<QGraphicsItem*>& items,

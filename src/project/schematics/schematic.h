@@ -25,6 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include "../../common/if_attributeprovider.h"
 #include "../../common/units/all_length_units.h"
 #include "../../common/filepath.h"
 #include "../../common/exceptions.h"
@@ -57,7 +58,7 @@ namespace project {
  * This class inherits from QGraphicsScene (through CADScene). This way, a schematic page
  * can be shown directly in a QGraphicsView (resp. CADView).
  */
-class Schematic final : public CADScene
+class Schematic final : public CADScene, public IF_AttributeProvider
 {
         Q_OBJECT
 
@@ -129,6 +130,10 @@ class Schematic final : public CADScene
         bool save(bool toOriginal, QStringList& errors) noexcept;
         void saveViewSceneRect(const QRectF& rect) noexcept {mViewRect = rect;}
         const QRectF& restoreViewSceneRect() const noexcept {return mViewRect;}
+
+        // Helper Methods
+        bool getAttributeValue(const QString& attrNS, const QString& attrKey,
+                               bool passToParents, QString& value) const noexcept;
 
         // Static Methods
         static Schematic* create(Project& project, const FilePath& filepath,

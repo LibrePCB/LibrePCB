@@ -26,6 +26,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
+#include "../common/if_attributeprovider.h"
 #include "../common/exceptions.h"
 #include "../common/filelock.h"
 #include "../common/filepath.h"
@@ -74,7 +75,7 @@ namespace project {
  * @author ubruhin
  * @date 2014-06-24
  */
-class Project final : public QObject
+class Project final : public QObject, public IF_AttributeProvider
 {
         Q_OBJECT
 
@@ -311,6 +312,11 @@ class Project final : public QObject
          * @return true if the window can be closed, false if closing the window is denied
          */
         bool windowIsAboutToClose(QMainWindow* window);
+
+
+        // Helper Methods
+        bool getAttributeValue(const QString& attrNS, const QString& attrKey,
+                               bool passToParents, QString& value) const noexcept;
 
 
     public slots:
