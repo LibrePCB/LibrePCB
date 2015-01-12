@@ -236,16 +236,23 @@ void CADView::wheelEvent(QWheelEvent* event)
         if (event->isAccepted()) return; // the scene (or an FSM) has accepted the event
     }
 
-    // Zoom
-    const QPointF p0scene = mapToScene(event->pos());
-    qreal scaleFactor = (event->delta() > 0) ? sZoomFactor : (qreal)1 / sZoomFactor;
-    scale(scaleFactor, scaleFactor);
-
-    // Pan
-    const QPointF p1mouse = mapFromScene(p0scene);
-    const QPointF diff = p1mouse - event->pos();
-    horizontalScrollBar()->setValue(diff.x() + horizontalScrollBar()->value());
-    verticalScrollBar()->setValue(diff.y() + verticalScrollBar()->value());
+    if(event->modifiers().testFlag(Qt::ShiftModifier))
+    {
+        // horizontal scrolling
+        horizontalScrollBar()->setValue(horizontalScrollBar()->value() - event->delta());
+    }
+    else if(event->modifiers().testFlag(Qt::ControlModifier))
+    {
+        // vertical scrolling
+        verticalScrollBar()->setValue(verticalScrollBar()->value() - event->delta());
+    }
+    else
+    {
+        // Zoom to mouse
+        setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+        qreal scaleFactor = (event->delta() > 0) ? sZoomFactor : (qreal)1 / sZoomFactor;
+        scale(scaleFactor, scaleFactor);
+    }
 
     /// @todo the variant above works also with non-interactive views,
     /// but does it also work with multitouch gestures / pinch to zoom?
