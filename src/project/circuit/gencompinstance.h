@@ -73,6 +73,7 @@ class GenCompInstance : public QObject, public IF_AttributeProvider
         uint getUnplacedSymbolsCount() const noexcept;
         uint getUnplacedRequiredSymbolsCount() const noexcept;
         uint getUnplacedOptionalSymbolsCount() const noexcept;
+        const QHash<QString, GenCompAttributeInstance*>& getAttributes() const noexcept {return mAttributes;}
         GenCompSignalInstance* getSignalInstance(const QUuid& signalUuid) const noexcept {return mSignals.value(signalUuid);}
         const library::GenericComponent& getGenComp() const noexcept {return *mGenComp;}
         const library::GenCompSymbVar& getSymbolVariant() const noexcept {return *mGenCompSymbVar;}

@@ -39,7 +39,13 @@ uint IF_AttributeProvider::replaceVariablesWithAttributes(QString& rawText, bool
     while (searchVariableInText(rawText, startPos, startPos, length, varNS, varName))
     {
         if (getAttributeValue(varNS, varName, passToParents, varValue))
+        {
+            // avoid endless recursion
+            QString complete = rawText.mid(startPos, length);
+            varValue.replace(complete, QCoreApplication::translate("IF_AttributeProvider",
+                                                                   "[RECURSION REMOVED]"));
             rawText.replace(startPos, length, varValue);
+        }
         else
             rawText.remove(startPos, length);
         count++;
