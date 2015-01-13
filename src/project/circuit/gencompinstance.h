@@ -85,11 +85,13 @@ class GenCompInstance : public QObject, public IF_AttributeProvider
          *
          * @warning You have to check if there is no other component with the same name in
          *          the whole circuit! This method will not check if the name is unique.
-         * @warning This method must always be called from inside an UndoCommand!
+         *          The best way to do this is to call Circuit#setGenCompInstanceName().
          *
          * @param name  The new name of this component in the circuit (must not be empty)
          *
          * @throw Exception If the new name is invalid, an exception will be thrown
+         *
+         * @undocmd{project#CmdGenCompInstSetName}
          */
         void setName(const QString& name) throw (Exception);
 
