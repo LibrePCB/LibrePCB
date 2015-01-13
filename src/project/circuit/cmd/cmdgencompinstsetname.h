@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDSYMBOLINSTANCEMOVE_H
-#define PROJECT_CMDSYMBOLINSTANCEMOVE_H
+#ifndef PROJECT_CMDGENCOMPINSTSETNAME_H
+#define PROJECT_CMDGENCOMPINSTSETNAME_H
 
 /*****************************************************************************************
  *  Includes
@@ -27,56 +27,54 @@
 #include <QtCore>
 #include "../../../common/undocommand.h"
 #include "../../../common/exceptions.h"
-#include "../../../common/units/all_length_units.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
 namespace project {
-class SymbolInstance;
+class Circuit;
+class GenCompInstance;
+}
+
+namespace library {
+class GenericComponent;
+class GenCompSymbVar;
 }
 
 /*****************************************************************************************
- *  Class CmdSymbolInstanceMove
+ *  Class CmdGenCompInstSetName
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The CmdSymbolInstanceMove class
+ * @brief The CmdGenCompInstSetName class
  */
-class CmdSymbolInstanceMove final : public UndoCommand
+class CmdGenCompInstSetName final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdSymbolInstanceMove(SymbolInstance& symbol, UndoCommand* parent = 0) throw (Exception);
-        ~CmdSymbolInstanceMove() noexcept;
-
-        // General Methods
-        void setAbsolutePosTemporary(Point& absPos) noexcept;
-        void setDeltaToStartPosTemporary(Point& deltaPos) noexcept;
-        void setAngleTemporary(const Angle& angle) noexcept;
-        void rotate(const Angle& angle, const Point& center) noexcept;
+        explicit CmdGenCompInstSetName(Circuit& circuit, GenCompInstance& genComp,
+                                       const QString& newName, UndoCommand* parent = 0) throw (Exception);
+        ~CmdGenCompInstSetName() noexcept;
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;
         void undo() throw (Exception) override;
 
-
     private:
 
-        SymbolInstance& mSymbolInstance;
-        Point mStartPos;
-        Point mDeltaPos;
-        Point mEndPos;
-        Angle mStartAngle;
-        Angle mDeltaAngle;
-        Angle mEndAngle;
-        bool mRedoOrUndoCalled;
+        // Attributes from the constructor
+        Circuit& mCircuit;
+        GenCompInstance& mGenCompInstance;
+
+        // Misc
+        QString mOldName;
+        QString mNewName;
 };
 
 } // namespace project
 
-#endif // PROJECT_CMDSYMBOLINSTANCEMOVE_H
+#endif // PROJECT_CMDGENCOMPINSTSETNAME_H

@@ -66,6 +66,13 @@ void CmdSymbolInstanceMove::setDeltaToStartPosTemporary(Point& deltaPos) noexcep
     mSymbolInstance.setPosition(mStartPos + mDeltaPos);
 }
 
+void CmdSymbolInstanceMove::setAngleTemporary(const Angle& angle) noexcept
+{
+    Q_ASSERT(mRedoOrUndoCalled == false);
+    mDeltaAngle = angle - mStartAngle;
+    mSymbolInstance.setAngle(angle);
+}
+
 void CmdSymbolInstanceMove::rotate(const Angle& angle, const Point& center) noexcept
 {
     Q_ASSERT(mRedoOrUndoCalled == false);

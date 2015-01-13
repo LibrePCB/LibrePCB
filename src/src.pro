@@ -164,7 +164,9 @@ SOURCES += \
     project/circuit/gencompinstance.cpp \
     library/attribute.cpp \
     project/circuit/gencompattributeinstance.cpp \
-    common/if_attributeprovider.cpp
+    common/if_attributeprovider.cpp \
+    project/circuit/cmd/cmdgencompinstsetname.cpp \
+    project/circuit/cmd/cmdgencompinstsetvalue.cpp
 
 HEADERS += \
     common/units/all_length_units.h \
@@ -275,7 +277,9 @@ HEADERS += \
     project/circuit/gencompinstance.h \
     library/attribute.h \
     project/circuit/gencompattributeinstance.h \
-    common/if_attributeprovider.h
+    common/if_attributeprovider.h \
+    project/circuit/cmd/cmdgencompinstsetname.h \
+    project/circuit/cmd/cmdgencompinstsetvalue.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \
