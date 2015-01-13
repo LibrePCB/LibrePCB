@@ -108,6 +108,12 @@ class SymbolInstance final : public QObject, public IF_AttributeProvider
                                       const Point& position = Point(), const Angle& angle = Angle(),
                                       bool mirror = false) throw (Exception);
 
+
+    private slots:
+
+        void genCompAttributesChanged();
+
+
     private:
 
         // make some methods inaccessible...

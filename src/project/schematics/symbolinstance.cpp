@@ -61,6 +61,7 @@ SymbolInstance::SymbolInstance(Schematic& schematic, const QDomElement& domEleme
             QString(tr("No generic component with the UUID \"%1\" found in the circuit!"))
                            .arg(gcUuid));
     }
+    connect(mGenCompInstance, SIGNAL(attributesChanged()), this, SLOT(genCompAttributesChanged()));
 
     mPosition.setXmm(mDomElement.firstChildElement("position").attribute("x"));
     mPosition.setYmm(mDomElement.firstChildElement("position").attribute("y"));
@@ -236,6 +237,16 @@ bool SymbolInstance::getAttributeValue(const QString& attrNS, const QString& att
     }
 
     return false;
+}
+
+/*****************************************************************************************
+ *  Private Slots
+ ****************************************************************************************/
+
+void SymbolInstance::genCompAttributesChanged()
+{
+    if (mGraphicsItem)
+        mGraphicsItem->update();
 }
 
 /*****************************************************************************************

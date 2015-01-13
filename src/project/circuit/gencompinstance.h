@@ -96,6 +96,15 @@ class GenCompInstance : public QObject, public IF_AttributeProvider
          */
         void setName(const QString& name) throw (Exception);
 
+        /**
+         * @brief Set the value of this generic component instance in the circuit
+         *
+         * @param value  The new value
+         *
+         * @undocmd{project#CmdGenCompInstSetValue}
+         */
+        void setValue(const QString& value) noexcept;
+
 
         // General Methods
         void addToCircuit(bool addNode, QDomElement& parent) throw (Exception);
@@ -115,6 +124,11 @@ class GenCompInstance : public QObject, public IF_AttributeProvider
                                        const library::GenericComponent& genComp,
                                        const library::GenCompSymbVar& symbVar,
                                        const QString& name) throw (Exception);
+
+
+    signals:
+
+        void attributesChanged();
 
 
     private:

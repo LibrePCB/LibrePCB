@@ -186,6 +186,19 @@ void GenCompInstance::setName(const QString& name) throw (Exception)
 
     mName = name;
     updateErcMessages();
+    emit attributesChanged();
+}
+
+void GenCompInstance::setValue(const QString& value) noexcept
+{
+    // update DOM element
+    QDomElement valueNode = mDomElement.ownerDocument().createElement("value");
+    QDomText valueText = mDomElement.ownerDocument().createTextNode(value);
+    valueNode.appendChild(valueText);
+    mDomElement.replaceChild(valueNode, mDomElement.firstChildElement("value"));
+
+    mValue = value;
+    emit attributesChanged();
 }
 
 /*****************************************************************************************

@@ -99,6 +99,7 @@ class Circuit final : public QObject
         void addGenCompInstance(GenCompInstance* genCompInstance, bool toDomTree = true) throw (Exception);
         void removeGenCompInstance(GenCompInstance* genCompInstance, bool fromDomTree = true,
                              bool deleteGenCompInstance = false) throw (Exception);
+        void setGenCompInstanceName(GenCompInstance& genComp, const QString& newName) throw (Exception);
 
         // General Methods
         bool save(bool toOriginal, QStringList& errors) noexcept;

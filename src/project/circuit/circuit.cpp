@@ -407,6 +407,26 @@ void Circuit::removeGenCompInstance(GenCompInstance* genCompInstance,
         delete genCompInstance;
 }
 
+void Circuit::setGenCompInstanceName(GenCompInstance& genComp, const QString& newName) throw (Exception)
+{
+    // check the validity of the new name
+    if (newName.isEmpty())
+    {
+        throw RuntimeError(__FILE__, __LINE__, genComp.getUuid().toString(),
+            QString(tr("The new generic component name must not be empty!")));
+    }
+
+    // check if there is no generic component with the same name in the list
+    if (getGenCompInstanceByName(newName))
+    {
+        throw RuntimeError(__FILE__, __LINE__, genComp.getUuid().toString(),
+            QString(tr("There is already a component with the name \"%1\"!")).arg(newName));
+    }
+
+    // apply the new name
+    genComp.setName(newName);
+}
+
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
