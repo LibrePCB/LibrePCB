@@ -165,6 +165,7 @@ SOURCES += \
     library/attribute.cpp \
     project/circuit/gencompattributeinstance.cpp \
     common/if_attributeprovider.cpp \
+    project/schematics/symbolinstancepropertiesdialog.cpp \
     project/circuit/cmd/cmdgencompinstsetname.cpp \
     project/circuit/cmd/cmdgencompinstsetvalue.cpp
 
@@ -278,6 +279,7 @@ HEADERS += \
     library/attribute.h \
     project/circuit/gencompattributeinstance.h \
     common/if_attributeprovider.h \
+    project/schematics/symbolinstancepropertiesdialog.h \
     project/circuit/cmd/cmdgencompinstsetname.h \
     project/circuit/cmd/cmdgencompinstsetvalue.h
 
@@ -290,7 +292,8 @@ FORMS += \
     project/schematics/schematicpagesdock.ui \
     project/erc/ercmsgdock.ui \
     project/circuit/editnetclassesdialog.ui \
-    common/dialogs/gridsettingsdialog.ui
+    common/dialogs/gridsettingsdialog.ui \
+    project/schematics/symbolinstancepropertiesdialog.ui
 
 
 # Custom compiler "lrelease" for qm generation

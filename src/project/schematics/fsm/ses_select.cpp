@@ -40,6 +40,8 @@
 #include "../cmd/cmdschematicnetpointdetach.h"
 #include "../../circuit/cmd/cmdgencompsiginstsetnetsignal.h"
 #include "../symbolpininstance.h"
+#include "../symbolinstancepropertiesdialog.h"
+#include "../../circuit/gencompinstance.h"
 
 namespace project {
 
@@ -141,13 +143,18 @@ SES_Base::ProcRetVal SES_Select::processSubStateIdleSceneEvent(SEE_Base* event) 
             {
                 case Qt::LeftButton:
                     return proccessIdleSceneLeftClick(mouseEvent, schematic);
-                //case Qt::RightButton:
-                //    // switch back to the last command (previous state)
-                //    return PassToParentState;
+                case Qt::RightButton:
+                    return proccessIdleSceneRightClick(mouseEvent, schematic);
                 default:
                     break;
             }
             break;
+        } 
+        case QEvent::GraphicsSceneMouseDoubleClick:
+        {
+            QGraphicsSceneMouseEvent* mouseEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
+            Q_ASSERT(mouseEvent); if (!mouseEvent) break;
+            return proccessIdleSceneDoubleClick(mouseEvent, schematic);
         }
         default:
             break;
@@ -194,6 +201,110 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneLeftClick(QGraphicsSceneMouseE
     mSubState = SubState_Moving;
     mMoveStartPos = Point::fromPx(mouseEvent->scenePos()); // not mapped to grid!
     return ForceStayInState;
+}
+
+SES_Base::ProcRetVal SES_Select::proccessIdleSceneRightClick(QGraphicsSceneMouseEvent* mouseEvent,
+                                                             Schematic* schematic) noexcept
+{
+    // handle item selection
+    QList<QGraphicsItem*> items = schematic->items(mouseEvent->scenePos());
+    if (items.isEmpty()) return PassToParentState;
+    schematic->clearSelection();
+    items.first()->setSelected(true);
+
+    // build and execute the context menu
+    QMenu menu;
+    switch (items.first()->type())
+    {
+        case CADScene::Type_Symbol:
+        {
+            // get symbol and component instances
+            library::SymbolGraphicsItem* i = qgraphicsitem_cast<library::SymbolGraphicsItem*>(items.first());
+            Q_ASSERT(i); if (!i) return PassToParentState;
+            SymbolInstance* symbol = i->getSymbolInstance();
+            Q_ASSERT(symbol); if (!symbol) return PassToParentState;
+            GenCompInstance& genComp = symbol->getGenCompInstance();
+
+            // build the context menu
+            QAction* aCopy = menu.addAction(QIcon(":/img/actions/copy.png"), tr("Copy"));
+            QAction* aRotate = menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("Rotate"));
+            QAction* aMirror = menu.addAction(QIcon(":/img/actions/flip_horizontal.png"), tr("Mirror"));
+            menu.addSeparator();
+            QAction* aPlaceUnplacedSymbols = menu.addAction(QString(tr("Place unplaced symbols of %1 (%2)")).arg(genComp.getName()).arg(genComp.getUnplacedSymbolsCount()));
+            aPlaceUnplacedSymbols->setEnabled(genComp.getUnplacedSymbolsCount() > 0);
+            QAction* aRemoveSymbol = menu.addAction(QIcon(":/img/actions/delete.png"), QString(tr("Remove Symbol %1")).arg(symbol->getName()));
+            aRemoveSymbol->setEnabled(genComp.getPlacedSymbolsCount() > 1);
+            QAction* aRemoveGenComp = menu.addAction(QIcon(":/img/actions/cancel.png"), QString(tr("Remove Component %1")).arg(genComp.getName()));
+            menu.addSeparator();
+            QAction* aProperties = menu.addAction(tr("Properties"));
+
+            // execute the context menu
+            QAction* action = menu.exec(mouseEvent->screenPos());
+            if (action == aCopy)
+            {
+                // TODO
+            }
+            else if (action == aRotate)
+            {
+                rotateSelectedItems(-Angle::deg90(), symbol->getPosition());
+            }
+            else if (action == aMirror)
+            {
+                // TODO
+            }
+            else if (action == aPlaceUnplacedSymbols)
+            {
+                // TODO
+            }
+            else if (action == aRemoveSymbol)
+            {
+                // TODO
+            }
+            else if (action == aRemoveGenComp)
+            {
+                // TODO
+            }
+            else if (action == aProperties)
+            {
+                // open the properties editor dialog of the selected item
+                SymbolInstancePropertiesDialog dialog(mProject, genComp, *symbol, &mEditor);
+                dialog.exec();
+            }
+            return ForceStayInState;
+        }
+        default:
+            break;
+    }
+    return PassToParentState;
+}
+
+SES_Base::ProcRetVal SES_Select::proccessIdleSceneDoubleClick(QGraphicsSceneMouseEvent* mouseEvent,
+                                                              Schematic* schematic) noexcept
+{
+    if (mouseEvent->buttons() == Qt::LeftButton)
+    {
+        // check if there is an element under the mouse
+        QList<QGraphicsItem*> items = schematic->items(mouseEvent->scenePos());
+        if (items.isEmpty()) return PassToParentState;
+        // open the properties editor dialog of the top most item
+        switch (items.first()->type())
+        {
+            case CADScene::Type_Symbol:
+            {
+                library::SymbolGraphicsItem* i = qgraphicsitem_cast<library::SymbolGraphicsItem*>(items.first());
+                Q_ASSERT(i); if (!i) return PassToParentState;
+                SymbolInstance* symbol = i->getSymbolInstance();
+                Q_ASSERT(symbol); if (!symbol) return PassToParentState;
+                GenCompInstance& genComp = symbol->getGenCompInstance();
+                SymbolInstancePropertiesDialog dialog(mProject, genComp, *symbol, &mEditor);
+                dialog.exec();
+                return ForceStayInState;
+            }
+            default:
+                break;
+        }
+    }
+    return PassToParentState;
 }
 
 SES_Base::ProcRetVal SES_Select::processSubStateMoving(SEE_Base* event) noexcept

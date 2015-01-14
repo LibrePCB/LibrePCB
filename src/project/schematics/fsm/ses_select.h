@@ -76,6 +76,10 @@ class SES_Select final : public SES_Base
         ProcRetVal processSubStateMovingSceneEvent(SEE_Base* event) noexcept;
         ProcRetVal proccessIdleSceneLeftClick(QGraphicsSceneMouseEvent* mouseEvent,
                                               Schematic* schematic) noexcept;
+        ProcRetVal proccessIdleSceneRightClick(QGraphicsSceneMouseEvent* mouseEvent,
+                                               Schematic* schematic) noexcept;
+        ProcRetVal proccessIdleSceneDoubleClick(QGraphicsSceneMouseEvent* mouseEvent,
+                                                Schematic* schematic) noexcept;
         bool rotateSelectedItems(const Angle& angle, Point center = Point(0, 0),
                                  bool centerOfElements = false) noexcept;
         bool removeSelectedItems() noexcept;
