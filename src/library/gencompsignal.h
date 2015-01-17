@@ -52,14 +52,13 @@ class GenCompSignal final : public QObject
     public:
 
         // Types
-        enum SignalRole_t {
-            Role_Power,     ///< Power Pins (GND, VCC, VSS,... of Devices)
-            Role_Input,     ///< Input Pins
-            Role_Output,    ///< Output Pins
-            Role_InOut,     ///< Input/Output Pins
-            Role_OpenDrain, ///< Open Collector / Open Drain Pins
-            Role_Passive,   ///< Passive Pins (R, C, L)
-            Role_Supply,    ///< all supply signals with the same name are automatically connected together (circuit-wide)!
+        enum class SignalRole_t {
+            Power,     ///< Power Pins (GND, VCC, VSS,... of Devices)
+            Input,     ///< Input Pins
+            Output,    ///< Output Pins
+            InOut,     ///< Input/Output Pins
+            OpenDrain, ///< Open Collector / Open Drain Pins
+            Passive,   ///< Passive Pins (R, C, L)
         };
 
 

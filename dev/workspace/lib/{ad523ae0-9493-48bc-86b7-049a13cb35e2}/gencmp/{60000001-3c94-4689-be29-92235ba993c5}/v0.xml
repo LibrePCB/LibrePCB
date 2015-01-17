@@ -66,13 +66,19 @@
     <signals>
         <!--
             All signals of this generic component (they can be connected to pads and pins). Attributes:
-                - uuid:         The uuid of the signal. Must be unique in this generic component.
-                - role:         The signal role (used for the ERC)
-                - required:     If true, this signal must be always connected to the netlist of a project. Otherwise an ERC error will occur.
-                - negated:      Defines if the signal has an inverted logic (low active). This will automatically mark the connected symbol pin as inverted.
-                - clock:        Defines if the signal is a clock signal. This will automatically mark the connected symbol pin as a clock signal.
-                - name:         The signal name in different languages. WARNING: Do not change names to identify another signal (like change from "RST" to "GND") as the application uses the uuid (not the name!) to identify signals!
-                - description:  A short description of the signal (in different languages). This is optional.
+                - uuid:             The uuid of the signal. Must be unique in this generic component.
+                - role:             The signal role (used for the ERC)
+                                        - power:        Power pins of the component (e.g. VCC and GND)
+                                        - input:        Input pins (high impedance)
+                                        - output:       Output pins
+                                        - inout:        Input/Output pins
+                                        - opendrain:    Open Collector / Open Drain Output Pins
+                                        - passive:      Passive pins (e.g. R/C/L pins)
+                - required:         If true, this signal must be always connected to the netlist of a project. Otherwise an ERC error will occur.
+                - negated:          Defines if the signal has an inverted logic (low active). This will automatically mark the connected symbol pin as inverted.
+                - clock:            Defines if the signal is a clock signal. This will automatically mark the connected symbol pin as a clock signal.
+                - name:             The signal name in different languages. WARNING: Do not change names to identify another signal (like change from "RST" to "GND") as the application uses the uuid (not the name!) to identify signals!
+                - description:      A short description of the signal (in different languages). This is optional.
         -->
         <signal uuid="{71a44db9-5e42-405f-b6e4-b4725ae37af3}" role="power" required="true" negated="false" clock="false">
             <name locale="en_US">GND</name>
@@ -136,7 +142,7 @@
                                                 - none:             No text
                                                 - pin_name:         The name of the symbol's pin
                                                 - gen_comp_signal:  The name of the connected generic component's signal (only allowed when the pin is connected to a signal)
-                                                - net_signal:       The name of the connected net signal in the circuit (only allowed when the pin is connected to a signal)
+                                                - net_signal:       The name of the connected net signal in the circuit (only allowed when the pin is connected to a signal). The text is empty if no net signal is connected.
                         -->
                         <map pin="{702df32a-635f-46e9-85d2-5b7e2c20aa87}" signal="{71a44db9-5e42-405f-b6e4-b4725ae37af3}" display="gen_comp_signal"/>
                         <map pin="{1339ffc8-afb2-4137-9d37-d9801ac2bfd0}" signal="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}" display="gen_comp_signal"/>

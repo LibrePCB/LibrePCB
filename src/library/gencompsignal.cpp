@@ -79,13 +79,12 @@ QString GenCompSignal::getDescription(const QString& locale) const noexcept
 
 GenCompSignal::SignalRole_t GenCompSignal::stringToSignalRole(const QString& role) throw (Exception)
 {
-    if (role == "power") return Role_Power;
-    else if (role == "input") return Role_Input;
-    else if (role == "output") return Role_Output;
-    else if (role == "inout") return Role_InOut;
-    else if (role == "opendrain") return Role_OpenDrain;
-    else if (role == "passive") return Role_Passive;
-    else if (role == "supply") return Role_Supply;
+    if (role == "power")            return SignalRole_t::Power;
+    else if (role == "input")       return SignalRole_t::Input;
+    else if (role == "output")      return SignalRole_t::Output;
+    else if (role == "inout")       return SignalRole_t::InOut;
+    else if (role == "opendrain")   return SignalRole_t::OpenDrain;
+    else if (role == "passive")     return SignalRole_t::Passive;
     else
     {
         throw RuntimeError(__FILE__, __LINE__, role,
@@ -97,16 +96,16 @@ QString GenCompSignal::signalRoleToString(SignalRole_t role) noexcept
 {
     switch (role)
     {
-        case Role_Power:        return "power";
-        case Role_Input:        return "input";
-        case Role_Output:       return "output";
-        case Role_InOut:        return "inout";
-        case Role_OpenDrain:    return "opendrain";
-        case Role_Passive:      return "passive";
-        case Role_Supply:       return "supply";
+        case SignalRole_t::Power:        return "power";
+        case SignalRole_t::Input:        return "input";
+        case SignalRole_t::Output:       return "output";
+        case SignalRole_t::InOut:        return "inout";
+        case SignalRole_t::OpenDrain:    return "opendrain";
+        case SignalRole_t::Passive:      return "passive";
         default:
-            qCritical() << "unknown signal role:" << role;
-            return "passive";
+            Q_ASSERT(false);
+            qCritical() << "unknown signal role:" << static_cast<int>(role);
+            return "unknown";
     }
 }
 
