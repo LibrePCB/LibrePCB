@@ -97,8 +97,24 @@ SymbolInstancePropertiesDialog::~SymbolInstancePropertiesDialog() noexcept
 }
 
 /*****************************************************************************************
- *  Public Slots
+ *  Private Methods
  ****************************************************************************************/
+
+void SymbolInstancePropertiesDialog::keyPressEvent(QKeyEvent* e)
+{
+    switch (e->key())
+    {
+        case Qt::Key_Return:
+            accept();
+            break;
+        case Qt::Key_Escape:
+            reject();
+            break;
+        default:
+            QDialog::keyPressEvent(e);
+            break;
+    }
+}
 
 void SymbolInstancePropertiesDialog::accept()
 {

@@ -72,6 +72,7 @@ class SymbolInstancePropertiesDialog final : public QDialog
         SymbolInstancePropertiesDialog& operator=(const SymbolInstancePropertiesDialog& rhs);
 
         // Private Methods
+        void keyPressEvent(QKeyEvent* e);
         void accept();
         bool applyChanges() noexcept;
         void execCmd(UndoCommand* cmd);
