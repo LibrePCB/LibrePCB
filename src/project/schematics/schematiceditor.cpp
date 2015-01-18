@@ -329,20 +329,20 @@ void SchematicEditor::on_actionAddGenCmp_Inductor_triggered()
 
 void SchematicEditor::on_actionAddGenCmp_gnd_triggered()
 {
-    //QUuid genCompUuid = "{60000002-3c94-4689-be29-92235ba993c5}";
-    //QUuid symbVarUuid = "{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}";
-    //SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(genCompUuid, symbVarUuid);
-    //mFsm->processEvent(addEvent, true);
-    //mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
+    QUuid genCompUuid = "{eb5070a5-f11e-4442-be70-ecf17fe04602}";
+    QUuid symbVarUuid = "{f8c471b1-1069-413e-9ac9-b94ecd893293}";
+    SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(genCompUuid, symbVarUuid);
+    mFsm->processEvent(addEvent, true);
+    mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
 }
 
 void SchematicEditor::on_actionAddGenCmp_vcc_triggered()
 {
-    //QUuid genCompUuid = "{60000002-3c94-4689-be29-92235ba993c5}";
-    //QUuid symbVarUuid = "{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}";
-    //SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(genCompUuid, symbVarUuid);
-    //mFsm->processEvent(addEvent, true);
-    //mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
+    QUuid genCompUuid = "{758c0792-7686-4d0a-8566-491a2676e496}";
+    QUuid symbVarUuid = "{bc4a996e-5b6f-4e67-9964-75d51e4962ec}";
+    SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(genCompUuid, symbVarUuid);
+    mFsm->processEvent(addEvent, true);
+    mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
 }
 
 /*****************************************************************************************

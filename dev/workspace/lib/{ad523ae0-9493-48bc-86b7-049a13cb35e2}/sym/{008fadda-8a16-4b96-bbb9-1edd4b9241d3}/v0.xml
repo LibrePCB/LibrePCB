@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<symbol file_version="0">
+    <meta>
+        <uuid>{008fadda-8a16-4b96-bbb9-1edd4b9241d3}</uuid>
+        <version>0.1</version>
+        <author>EagleImport</author>
+        <created>2014-12-17T19:48:00Z</created>
+        <last_modified>2014-12-17T19:48:00Z</last_modified>
+        <categories>
+            <category>{00000000-e485-4af1-9679-bd66e8055f07}</category>
+        </categories>
+        <name locale="en_US">GND</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US">gnd,ground</keywords>
+    </meta>
+    <geometry>
+        <polygon fill_layer="0" start_y="0" line_width="0.254" line_layer="10" start_x="-1.905" grab_area="false">
+            <segment type="line" end_x="1.905" end_y="0"/>
+        </polygon>
+        <text layer="21" text="${CMP::VALUE}" x="0" y="-3" angle="0" height="3.175" v_align="bottom" h_align="center"/>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="180" y="2.54" uuid="{9810354c-d4f6-470d-8124-2660d591aaad}">
+            <name locale="en_US">1</name>
+            <description locale="en_US">Pin 1</description>
+        </pin>
+    </pins>
+</symbol>

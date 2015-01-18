@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<generic_component file_version="0">
+    <meta>
+        <uuid>{758c0792-7686-4d0a-8566-491a2676e496}</uuid>
+        <version>1</version>
+        <author>EDA4U</author>
+        <created>2013-04-13T12:43:52Z</created>
+        <last_modified>2013-04-20T18:01:33Z</last_modified>
+        <categories>
+            <category>{00000000-e485-4af1-9679-bd66e8055f07}</category>
+        </categories>
+        <name locale="en_US">VCC Supply</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US">vcc,supply</keywords>
+    </meta>
+    <changelog/>
+    <attachements/>
+    <attributes/>
+    <properties>
+        <default_values>
+            <value locale="en_US">VCC</value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">SUPPLY</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{c2268dc8-cd1b-49c1-ae9d-b12e48686d2f}" role="power" required="true" negated="false" clock="false" forced_net_name="${CMP::VALUE}">
+            <name locale="en_US">Net</name>
+            <description locale="en_US"></description>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant uuid="{bc4a996e-5b6f-4e67-9964-75d51e4962ec}" norm="" default="true">
+            <name locale="en_US">Default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{3b67ab6c-537e-4b59-9c78-065c6daff037}" symbol="{44e96989-e794-4d8a-964e-bc662d1f65a6}" add_order_index="0" required="true" suffix="">
+                    <pin_signal_map>
+                        <map pin="{ca63afcd-a459-4e2a-a5ea-353204aa8b5b}" signal="{c2268dc8-cd1b-49c1-ae9d-b12e48686d2f}" display="none"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models>
+    </spice_models>
+</generic_component>
