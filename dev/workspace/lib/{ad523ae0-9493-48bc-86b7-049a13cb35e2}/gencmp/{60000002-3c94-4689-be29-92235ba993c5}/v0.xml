@@ -25,35 +25,35 @@
         </prefixes>
     </properties>
     <signals>
-        <signal uuid="{71a44db9-5e42-405f-b6e4-b4725ae37af3}" role="power" required="true" negated="false" clock="false">
+        <signal uuid="{71a44db9-5e42-405f-b6e4-b4725ae37af3}" role="power" required="true" negated="false" clock="false" forced_net_name="">
             <name locale="en_US">V+</name>
             <description locale="en_US"></description>
         </signal>
-        <signal uuid="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}" role="power" required="true" negated="false" clock="false">
+        <signal uuid="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}" role="power" required="true" negated="false" clock="false" forced_net_name="">
             <name locale="en_US">V-</name>
             <description locale="en_US"></description>
         </signal>
-        <signal uuid="{a9d3d159-fca9-417e-8bba-13829caa6ae5}" role="input" required="true" negated="false" clock="false">
+        <signal uuid="{a9d3d159-fca9-417e-8bba-13829caa6ae5}" role="input" required="true" negated="false" clock="false" forced_net_name="">
             <name locale="en_US">A+</name>
             <description locale="en_US"></description>
         </signal>
-        <signal uuid="{da30b112-9ab0-4715-8a6a-9e5414169fd4}" role="input" required="true" negated="true" clock="false">
+        <signal uuid="{da30b112-9ab0-4715-8a6a-9e5414169fd4}" role="input" required="true" negated="true" clock="false" forced_net_name="">
             <name locale="en_US">A-</name>
             <description locale="en_US"></description>
         </signal>
-        <signal uuid="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}" role="output" required="true" negated="false" clock="false">
+        <signal uuid="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}" role="output" required="true" negated="false" clock="false" forced_net_name="">
             <name locale="en_US">Aout</name>
             <description locale="en_US"></description>
         </signal>
-        <signal uuid="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}" role="input" required="true" negated="false" clock="false">
+        <signal uuid="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}" role="input" required="true" negated="false" clock="false" forced_net_name="">
             <name locale="en_US">B+</name>
             <description locale="en_US"></description>
         </signal>
-        <signal uuid="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}" role="input" required="true" negated="false" clock="false">
+        <signal uuid="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}" role="input" required="true" negated="false" clock="false" forced_net_name="">
             <name locale="en_US">B-</name>
             <description locale="en_US"></description>
         </signal>
-        <signal uuid="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}" role="output" required="true" negated="false" clock="false">
+        <signal uuid="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}" role="output" required="true" negated="false" clock="false" forced_net_name="">
             <name locale="en_US">Bout</name>
             <description locale="en_US"></description>
         </signal>

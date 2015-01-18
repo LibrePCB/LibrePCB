@@ -48,6 +48,7 @@
 #include "../schematicnetline.h"
 #include "../cmd/cmdschematicnetpointsetnetsignal.h"
 #include "../../circuit/cmd/cmdnetsignalremove.h"
+#include "../../circuit/cmd/cmdnetsignalsetname.h"
 
 namespace project {
 
@@ -358,33 +359,53 @@ bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,
         }
         else
         {
-            // get selected netclass or create a new netclass
-            QString netclassName = mNetClassComboBox->currentText().trimmed();
-            netclass = mProject.getCircuit().getNetClassByName(netclassName);
-            if (!netclass)
-            {
-                // add new netclass
-                CmdNetClassAdd* cmdClassAdd = new CmdNetClassAdd(mProject.getCircuit(), netclassName);
-                mProject.getUndoStack().appendToCommand(cmdClassAdd);
-                netclass = cmdClassAdd->getNetClass();
-                Q_ASSERT(netclass);
-            }
-
-            // add new netsignal
-            QString netsignalName = mNetSignalComboBox->currentText().trimmed();
-            netsignal = mProject.getCircuit().getNetSignalByName(netsignalName);
-            if (!netsignal)
-            {
-                CmdNetSignalAdd* cmdSignalAdd = new CmdNetSignalAdd(mCircuit,
-                    netclass->getUuid(), netsignalName);
-                mProject.getUndoStack().appendToCommand(cmdSignalAdd);
-                netsignal = cmdSignalAdd->getNetSignal();
-                Q_ASSERT(netsignal);
-            }
-
             // look whether there is a symbol pin under the cursor
             QList<SymbolPinInstance*> pinsUnderCursor;
             schematic.getPinsAtScenePos(pinsUnderCursor, pos);
+
+            // check if the pin's signal forces a net name
+            QString forcedNetSignalName;
+            if (!pinsUnderCursor.isEmpty())
+            {
+                if (pinsUnderCursor.first()->getGenCompSignalInstance()->isNetSignalNameForced())
+                {
+                    forcedNetSignalName = pinsUnderCursor.first()->getGenCompSignalInstance()->getForcedNetSignalName();
+                    netsignal = mProject.getCircuit().getNetSignalByName(forcedNetSignalName);
+                    if (netsignal)
+                        netclass = &netsignal->getNetClass();
+                }
+            }
+
+            // get selected netclass or create a new netclass
+            if (!netclass)
+            {
+                QString netclassName = mNetClassComboBox->currentText().trimmed();
+                netclass = mProject.getCircuit().getNetClassByName(netclassName);
+                if (!netclass)
+                {
+                    // add new netclass
+                    CmdNetClassAdd* cmdClassAdd = new CmdNetClassAdd(mProject.getCircuit(), netclassName);
+                    mProject.getUndoStack().appendToCommand(cmdClassAdd);
+                    netclass = cmdClassAdd->getNetClass();
+                    Q_ASSERT(netclass);
+                }
+            }
+
+            // add new netsignal if needed
+            if (!netsignal)
+            {
+                if (forcedNetSignalName.isEmpty())
+                    forcedNetSignalName = mNetSignalComboBox->currentText().trimmed();
+                netsignal = mProject.getCircuit().getNetSignalByName(forcedNetSignalName);
+                if (!netsignal)
+                {
+                    CmdNetSignalAdd* cmdSignalAdd = new CmdNetSignalAdd(mCircuit,
+                        netclass->getUuid(), forcedNetSignalName);
+                    mProject.getUndoStack().appendToCommand(cmdSignalAdd);
+                    netsignal = cmdSignalAdd->getNetSignal();
+                    Q_ASSERT(netsignal);
+                }
+            }
 
             // add first netpoint
             CmdSchematicNetPointAdd* cmdNetPointAdd1 = nullptr;
@@ -611,6 +632,36 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
             if (pinsUnderCursor.count() == 1)
             {
                 SymbolPinInstance* pin = pinsUnderCursor.first();
+
+                // rename the net signal if required
+                NetSignal* netsignal = mPositioningNetPoint2->getNetSignal();
+                QString forcedName = pin->getGenCompSignalInstance()->getForcedNetSignalName();
+                if ((pin->getGenCompSignalInstance()->isNetSignalNameForced()) && (netsignal->getName() != forcedName))
+                {
+                    NetSignal* newNetsignal = mCircuit.getNetSignalByName(forcedName);
+                    if (newNetsignal)
+                    {
+                        // replace the netsignal
+                        foreach (GenCompSignalInstance* signal, netsignal->getGenCompSignals())
+                        {
+                            auto cmd = new CmdGenCompSigInstSetNetSignal(*signal, newNetsignal);
+                            mProject.getUndoStack().appendToCommand(cmd);
+                        }
+                        foreach (SchematicNetPoint* point, netsignal->getNetPoints())
+                        {
+                            auto cmd = new CmdSchematicNetPointSetNetSignal(*point, *newNetsignal);
+                            mProject.getUndoStack().appendToCommand(cmd);
+                        }
+                        auto cmd = new CmdNetSignalRemove(mProject.getCircuit(), netsignal);
+                        mProject.getUndoStack().appendToCommand(cmd);
+                    }
+                    else
+                    {
+                        // rename the netsignal
+                        auto cmd = new CmdNetSignalSetName(mCircuit, *netsignal, forcedName, false);
+                        mProject.getUndoStack().appendToCommand(cmd);
+                    }
+                }
                 // add the pin's component signal to the current netsignal
                 auto cmd1 = new CmdGenCompSigInstSetNetSignal(
                     *pin->getGenCompSignalInstance(), mPositioningNetPoint2->getNetSignal());

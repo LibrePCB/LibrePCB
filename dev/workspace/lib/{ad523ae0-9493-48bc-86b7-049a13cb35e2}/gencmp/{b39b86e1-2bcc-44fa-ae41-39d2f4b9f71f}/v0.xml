@@ -31,11 +31,11 @@
         </prefixes>
     </properties>
     <signals>
-        <signal uuid="{d3cfa92a-d929-404f-ad9d-3c8a535b4eff}" role="passive" required="true" negated="false" clock="false">
+        <signal uuid="{d3cfa92a-d929-404f-ad9d-3c8a535b4eff}" role="passive" required="true" negated="false" clock="false" forced_net_name="">
             <name locale="en_US">1</name>
             <description locale="en_US"></description>
         </signal>
-        <signal uuid="{63e0eb4a-c764-4a7b-a9ab-2fedf4c776e1}" role="passive" required="true" negated="false" clock="false">
+        <signal uuid="{63e0eb4a-c764-4a7b-a9ab-2fedf4c776e1}" role="passive" required="true" negated="false" clock="false" forced_net_name="">
             <name locale="en_US">2</name>
             <description locale="en_US"></description>
         </signal>

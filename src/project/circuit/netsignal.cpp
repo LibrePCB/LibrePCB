@@ -28,6 +28,7 @@
 #include "../../common/exceptions.h"
 #include "circuit.h"
 #include "../erc/ercmsg.h"
+#include "gencompsignalinstance.h"
 
 namespace project {
 
@@ -36,7 +37,8 @@ namespace project {
  ****************************************************************************************/
 
 NetSignal::NetSignal(Circuit& circuit, const QDomElement& domElement) throw (Exception) :
-    QObject(0), mCircuit(circuit), mDomElement(domElement), mAddedToCircuit(false)
+    QObject(0), mCircuit(circuit), mDomElement(domElement), mAddedToCircuit(false),
+    mGenCompSignalWithForcedNameCount(0)
 {
     // read attributes
     mUuid = mDomElement.attribute("uuid");
@@ -72,6 +74,7 @@ NetSignal::~NetSignal() noexcept
 {
     Q_ASSERT(mGenCompSignals.isEmpty());
     Q_ASSERT(mSchematicNetPoints.isEmpty());
+    Q_ASSERT(mGenCompSignalWithForcedNameCount == 0);
 }
 
 /*****************************************************************************************
@@ -103,6 +106,8 @@ void NetSignal::registerGenCompSignal(GenCompSignalInstance* signal) noexcept
     Q_CHECK_PTR(signal);
     Q_ASSERT(!mGenCompSignals.contains(signal));
     mGenCompSignals.append(signal);
+    if (signal->isNetSignalNameForced())
+        mGenCompSignalWithForcedNameCount++;
     updateErcMessages();
 }
 
@@ -111,6 +116,11 @@ void NetSignal::unregisterGenCompSignal(GenCompSignalInstance* signal) noexcept
     Q_CHECK_PTR(signal);
     Q_ASSERT(mGenCompSignals.contains(signal));
     mGenCompSignals.removeOne(signal);
+    if (signal->isNetSignalNameForced())
+    {
+        Q_ASSERT(mGenCompSignalWithForcedNameCount > 0);
+        mGenCompSignalWithForcedNameCount--;
+    }
     updateErcMessages();
 }
 

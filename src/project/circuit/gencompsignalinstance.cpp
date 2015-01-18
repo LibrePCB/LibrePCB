@@ -60,15 +60,37 @@ GenCompSignalInstance::GenCompSignalInstance(Circuit& circuit, GenCompInstance& 
     // create ERC messages
     mErcMsgUnconnectedRequiredSignal.reset(new ErcMsg(mCircuit.getProject(), *this,
         QString("%1/%2").arg(mGenCompInstance.getUuid().toString()).arg(mGenCompSignal->getUuid().toString()),
-        "UnconnectedRequiredSignal", ErcMsg::ErcMsgType_t::CircuitError,
-        QString(tr("Unconnected component signal: \"%1\" from \"%2\""))
-        .arg(mGenCompSignal->getName()).arg(mGenCompInstance.getName())));
+        "UnconnectedRequiredSignal", ErcMsg::ErcMsgType_t::CircuitError, QString()));
+    mErcMsgForcedNetSignalNameConflict.reset(new ErcMsg(mCircuit.getProject(), *this,
+        QString("%1/%2").arg(mGenCompInstance.getUuid().toString()).arg(mGenCompSignal->getUuid().toString()),
+        "ForcedNetSignalNameConflict", ErcMsg::ErcMsgType_t::SchematicError, QString()));
+    updateErcMessages();
+
+    // register to generic component attributes changed
+    connect(&mGenCompInstance, &GenCompInstance::attributesChanged,
+            this, &GenCompSignalInstance::updateErcMessages);
 }
 
 GenCompSignalInstance::~GenCompSignalInstance() noexcept
 {
     Q_ASSERT(!mAddedToCircuit);
     Q_ASSERT(mSymbolPinInstances.isEmpty());
+}
+
+/*****************************************************************************************
+ *  Getters
+ ****************************************************************************************/
+
+bool GenCompSignalInstance::isNetSignalNameForced() const noexcept
+{
+    return mGenCompSignal->isNetSignalNameForced();
+}
+
+QString GenCompSignalInstance::getForcedNetSignalName() const noexcept
+{
+    QString name = mGenCompSignal->getForcedNetName();
+    mGenCompInstance.replaceVariablesWithAttributes(name, false);
+    return name;
 }
 
 /*****************************************************************************************
@@ -92,7 +114,7 @@ void GenCompSignalInstance::setNetSignal(NetSignal* netsignal) throw (Exception)
         mDomElement.setAttribute("netsignal", "");
 
     mNetSignal = netsignal;
-    mErcMsgUnconnectedRequiredSignal->setVisible((!mNetSignal) && (mGenCompSignal->isRequired()));
+    updateErcMessages();
 }
 
 /*****************************************************************************************
@@ -132,7 +154,7 @@ void GenCompSignalInstance::addToCircuit() throw (Exception)
         mNetSignal->registerGenCompSignal(this);
 
     mAddedToCircuit = true;
-    mErcMsgUnconnectedRequiredSignal->setVisible((!mNetSignal) && (mGenCompSignal->isRequired()));
+    updateErcMessages();
 }
 
 void GenCompSignalInstance::removeFromCircuit() throw (Exception)
@@ -144,7 +166,27 @@ void GenCompSignalInstance::removeFromCircuit() throw (Exception)
         mNetSignal->unregisterGenCompSignal(this);
 
     mAddedToCircuit = false;
-    mErcMsgUnconnectedRequiredSignal->setVisible(false);
+    updateErcMessages();
+}
+
+/*****************************************************************************************
+ *  Private Slots
+ ****************************************************************************************/
+
+void GenCompSignalInstance::updateErcMessages() noexcept
+{
+    mErcMsgUnconnectedRequiredSignal->setMsg(
+        QString(tr("Unconnected component signal: \"%1\" from \"%2\""))
+        .arg(mGenCompSignal->getName()).arg(mGenCompInstance.getName()));
+    mErcMsgForcedNetSignalNameConflict->setMsg(
+        QString(tr("Signal name conflict: \"%1\" != \"%2\" (\"%3\" from \"%4\")"))
+        .arg((mNetSignal ? mNetSignal->getName() : QString()), getForcedNetSignalName(),
+        mGenCompSignal->getName(), mGenCompInstance.getName()));
+
+    mErcMsgUnconnectedRequiredSignal->setVisible((mAddedToCircuit) && (!mNetSignal)
+        && (mGenCompSignal->isRequired()));
+    mErcMsgForcedNetSignalNameConflict->setVisible((mAddedToCircuit) && (isNetSignalNameForced())
+        && (mNetSignal ? (getForcedNetSignalName() != mNetSignal->getName()) : false));
 }
 
 /*****************************************************************************************

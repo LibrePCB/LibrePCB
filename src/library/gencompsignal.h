@@ -70,9 +70,11 @@ class GenCompSignal final : public QObject
         // Getters
         const QUuid& getUuid() const noexcept {return mUuid;}
         SignalRole_t getRole() const noexcept {return mRole;}
+        const QString& getForcedNetName() const noexcept {return mForcedNetName;}
         bool isRequired() const noexcept {return mIsRequired;}
         bool isNegated() const noexcept {return mIsNegated;}
         bool isClock() const noexcept {return mIsClock;}
+        bool isNetSignalNameForced() const noexcept {return !mForcedNetName.isEmpty();}
         QString getName(const QString& locale = QString()) const noexcept;
         QString getDescription(const QString& locale = QString()) const noexcept;
         const QHash<QString, QString>& getNames() const noexcept {return mNames;}
@@ -97,6 +99,7 @@ class GenCompSignal final : public QObject
         // Signal Attributes
         QUuid mUuid;
         SignalRole_t mRole;
+        QString mForcedNetName;
         bool mIsRequired;
         bool mIsNegated;
         bool mIsClock;

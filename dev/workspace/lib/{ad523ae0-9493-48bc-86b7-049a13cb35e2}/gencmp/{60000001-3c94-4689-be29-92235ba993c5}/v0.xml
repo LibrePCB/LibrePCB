@@ -77,38 +77,39 @@
                 - required:         If true, this signal must be always connected to the netlist of a project. Otherwise an ERC error will occur.
                 - negated:          Defines if the signal has an inverted logic (low active). This will automatically mark the connected symbol pin as inverted.
                 - clock:            Defines if the signal is a clock signal. This will automatically mark the connected symbol pin as a clock signal.
+                - forced_net_name:  If this is a non-empty string, the name of the net signal which is connected to this generic component signal will be forced to this string. This should be used only for supply symbols (GND, VCC, ...). The string can contain variables like ${CMP::VALUE}.
                 - name:             The signal name in different languages. WARNING: Do not change names to identify another signal (like change from "RST" to "GND") as the application uses the uuid (not the name!) to identify signals!
                 - description:      A short description of the signal (in different languages). This is optional.
         -->
-        <signal uuid="{71a44db9-5e42-405f-b6e4-b4725ae37af3}" role="power" required="true" negated="false" clock="false">
+        <signal uuid="{71a44db9-5e42-405f-b6e4-b4725ae37af3}" role="power" required="true" negated="false" clock="false" forced_net_name="">
             <name locale="en_US">GND</name>
             <description locale="en_US"></description>
         </signal>
-        <signal uuid="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}" role="input" required="true" negated="false" clock="false">
+        <signal uuid="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}" role="input" required="true" negated="false" clock="false" forced_net_name="">
             <name locale="en_US">TRIGGER</name>
             <description locale="en_US"></description>
         </signal>
-        <signal uuid="{a9d3d159-fca9-417e-8bba-13829caa6ae5}" role="output" required="true" negated="false" clock="false">
+        <signal uuid="{a9d3d159-fca9-417e-8bba-13829caa6ae5}" role="output" required="true" negated="false" clock="false" forced_net_name="">
             <name locale="en_US">OUTPUT</name>
             <description locale="en_US"></description>
         </signal>
-        <signal uuid="{da30b112-9ab0-4715-8a6a-9e5414169fd4}" role="input" required="true" negated="true" clock="false">
+        <signal uuid="{da30b112-9ab0-4715-8a6a-9e5414169fd4}" role="input" required="true" negated="true" clock="false" forced_net_name="">
             <name locale="en_US">/RESET</name>
             <description locale="en_US"></description>
         </signal>
-        <signal uuid="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}" role="input" required="true" negated="false" clock="false">
+        <signal uuid="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}" role="input" required="true" negated="false" clock="false" forced_net_name="">
             <name locale="en_US">CONTROL</name>
             <description locale="en_US"></description>
         </signal>
-        <signal uuid="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}" role="input" required="true" negated="false" clock="false">
+        <signal uuid="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}" role="input" required="true" negated="false" clock="false" forced_net_name="">
             <name locale="en_US">THRESHOLD</name>
             <description locale="en_US"></description>
         </signal>
-        <signal uuid="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}" role="inout" required="true" negated="false" clock="false">
+        <signal uuid="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}" role="inout" required="true" negated="false" clock="false" forced_net_name="">
             <name locale="en_US">DISCHARGE</name>
             <description locale="en_US"></description>
         </signal>
-        <signal uuid="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}" role="power" required="true" negated="false" clock="false">
+        <signal uuid="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}" role="power" required="true" negated="false" clock="false" forced_net_name="">
             <name locale="en_US">VCC</name>
             <description locale="en_US"></description>
         </signal>

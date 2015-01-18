@@ -64,6 +64,7 @@ class NetSignal final : public QObject
         const QString& getName() const noexcept {return mName;}
         bool hasAutoName() const noexcept {return mAutoName;}
         NetClass& getNetClass() const noexcept {return *mNetClass;}
+        bool isNameForced() const noexcept {return (mGenCompSignalWithForcedNameCount > 0);}
         const QList<GenCompSignalInstance*>& getGenCompSignals() const noexcept {return mGenCompSignals;}
         const QList<SchematicNetPoint*>& getNetPoints() const noexcept {return mSchematicNetPoints;}
 
@@ -114,6 +115,7 @@ class NetSignal final : public QObject
         // Registered Elements of this Netclass
         QList<GenCompSignalInstance*> mGenCompSignals;
         QList<SchematicNetPoint*> mSchematicNetPoints;
+        uint mGenCompSignalWithForcedNameCount;
 };
 
 } // namespace project

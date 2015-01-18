@@ -67,6 +67,8 @@ class GenCompSignalInstance final : public QObject
         // Getters
         const library::GenCompSignal& getCompSignal() const noexcept {return *mGenCompSignal;}
         NetSignal* getNetSignal() const noexcept {return mNetSignal;}
+        bool isNetSignalNameForced() const noexcept;
+        QString getForcedNetSignalName() const noexcept;
 
 
         // Setters
@@ -91,6 +93,11 @@ class GenCompSignalInstance final : public QObject
         void removeFromCircuit() throw (Exception);
 
 
+    private slots:
+
+        void updateErcMessages() noexcept;
+
+
     private:
 
         // make some methods inaccessible...
@@ -113,6 +120,8 @@ class GenCompSignalInstance final : public QObject
 
         /// @brief The ERC message for an unconnected required generic component signal
         QScopedPointer<ErcMsg> mErcMsgUnconnectedRequiredSignal;
+        /// @brief The ERC message for a global net signal name mismatch
+        QScopedPointer<ErcMsg> mErcMsgForcedNetSignalNameConflict;
 };
 
 } // namespace project

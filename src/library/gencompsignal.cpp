@@ -46,6 +46,7 @@ GenCompSignal::GenCompSignal(GenericComponent& genComp,
 
     // read signal attributes
     mRole = stringToSignalRole(mDomElement.attribute("role"));
+    mForcedNetName = mDomElement.attribute("forced_net_name");
     mIsRequired = (mDomElement.attribute("required") == "true");
     mIsNegated = (mDomElement.attribute("negated") == "true");
     mIsClock = (mDomElement.attribute("clock") == "true");
