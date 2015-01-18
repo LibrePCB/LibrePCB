@@ -47,8 +47,8 @@ namespace project {
 SymbolPinInstance::SymbolPinInstance(SymbolInstance& symbolInstance, const QUuid& pinUuid) :
     QObject(0), mCircuit(symbolInstance.getSchematic().getProject().getCircuit()),
     mSymbolInstance(symbolInstance), mSymbolPin(nullptr), mGenCompSignal(nullptr),
-    mGenCompSignalInstance(nullptr), mRegisteredSchematicNetPoint(nullptr),
-    mRegisteredPinGraphicsItem(nullptr)
+    mGenCompSignalInstance(nullptr), mAddedToSchematic(false),
+    mRegisteredSchematicNetPoint(nullptr), mRegisteredPinGraphicsItem(nullptr)
 {
     // read attributes
     mSymbolPin = mSymbolInstance.getSymbol().getPinByUuid(pinUuid);
@@ -64,9 +64,8 @@ SymbolPinInstance::SymbolPinInstance(SymbolInstance& symbolInstance, const QUuid
     // create ERC messages
     mErcMsgUnconnectedRequiredPin.reset(new ErcMsg(mCircuit.getProject(), *this,
         QString("%1/%2").arg(mSymbolInstance.getUuid().toString()).arg(mSymbolPin->getUuid().toString()),
-        "UnconnectedRequiredPin", ErcMsg::ErcMsgType_t::SchematicError,
-        QString(tr("Unconnected pin: \"%1\" of symbol \"%2\""))
-        .arg(getDisplayText(true, true)).arg(mSymbolInstance.getName())));
+        "UnconnectedRequiredPin", ErcMsg::ErcMsgType_t::SchematicError, QString()));
+    updateErcMessages();
 }
 
 SymbolPinInstance::~SymbolPinInstance()
@@ -124,7 +123,7 @@ void SymbolPinInstance::registerNetPoint(SchematicNetPoint* netpoint)
 {
     Q_ASSERT(mRegisteredSchematicNetPoint == nullptr);
     mRegisteredSchematicNetPoint = netpoint;
-    mErcMsgUnconnectedRequiredPin->setVisible((mGenCompSignal->isRequired()) && (!mRegisteredSchematicNetPoint));
+    updateErcMessages();
 }
 
 void SymbolPinInstance::unregisterNetPoint(SchematicNetPoint* netpoint)
@@ -132,7 +131,7 @@ void SymbolPinInstance::unregisterNetPoint(SchematicNetPoint* netpoint)
     Q_UNUSED(netpoint); // to avoid compiler warning in release mode
     Q_ASSERT(mRegisteredSchematicNetPoint == netpoint);
     mRegisteredSchematicNetPoint = nullptr;
-    mErcMsgUnconnectedRequiredPin->setVisible((mGenCompSignal->isRequired()) && (!mRegisteredSchematicNetPoint));
+    updateErcMessages();
 }
 
 void SymbolPinInstance::registerPinGraphicsItem(library::SymbolPinGraphicsItem* item)
@@ -150,16 +149,20 @@ void SymbolPinInstance::unregisterPinGraphicsItem(library::SymbolPinGraphicsItem
 
 void SymbolPinInstance::addToSchematic() noexcept
 {
+    Q_ASSERT(mAddedToSchematic == false);
     Q_ASSERT(mRegisteredSchematicNetPoint == nullptr);
     mGenCompSignalInstance->registerSymbolPinInstance(this);
-    mErcMsgUnconnectedRequiredPin->setVisible((mGenCompSignal->isRequired()) && (!mRegisteredSchematicNetPoint));
+    mAddedToSchematic = true;
+    updateErcMessages();
 }
 
 void SymbolPinInstance::removeFromSchematic() noexcept
 {
+    Q_ASSERT(mAddedToSchematic == true);
     Q_ASSERT(mRegisteredSchematicNetPoint == nullptr);
     mGenCompSignalInstance->unregisterSymbolPinInstance(this);
-    mErcMsgUnconnectedRequiredPin->setVisible(false);
+    mAddedToSchematic = false;
+    updateErcMessages();
 }
 
 bool SymbolPinInstance::save(bool toOriginal, QStringList& errors) noexcept
@@ -167,6 +170,20 @@ bool SymbolPinInstance::save(bool toOriginal, QStringList& errors) noexcept
     Q_UNUSED(toOriginal);
     Q_UNUSED(errors);
     return true;
+}
+
+/*****************************************************************************************
+ *  Private Slots
+ ****************************************************************************************/
+
+void SymbolPinInstance::updateErcMessages() noexcept
+{
+    mErcMsgUnconnectedRequiredPin->setMsg(
+        QString(tr("Unconnected pin: \"%1\" of symbol \"%2\""))
+        .arg(getDisplayText(true, true)).arg(mSymbolInstance.getName()));
+
+    mErcMsgUnconnectedRequiredPin->setVisible((mAddedToSchematic)
+        && (mGenCompSignal->isRequired()) && (!mRegisteredSchematicNetPoint));
 }
 
 /*****************************************************************************************

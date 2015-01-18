@@ -87,6 +87,11 @@ class SymbolPinInstance final : public QObject
         bool save(bool toOriginal, QStringList& errors) noexcept;
 
 
+    private slots:
+
+        void updateErcMessages() noexcept;
+
+
     private:
 
         // make some methods inaccessible...
@@ -103,6 +108,7 @@ class SymbolPinInstance final : public QObject
         GenCompSignalInstance* mGenCompSignalInstance;
 
         // Misc
+        bool mAddedToSchematic;
         SchematicNetPoint* mRegisteredSchematicNetPoint;
         library::SymbolPinGraphicsItem* mRegisteredPinGraphicsItem;
 
