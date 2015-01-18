@@ -68,7 +68,7 @@ class NetSignal final : public QObject
         const QList<SchematicNetPoint*>& getNetPoints() const noexcept {return mSchematicNetPoints;}
 
         // Setters
-        void setName(const QString& name) throw (Exception);
+        void setName(const QString& name, bool isAutoName) throw (Exception);
 
         // General Methods
         void registerGenCompSignal(GenCompSignalInstance* signal) noexcept;

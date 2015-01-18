@@ -89,6 +89,7 @@ class Circuit final : public QObject
         void addNetSignal(NetSignal* netsignal, bool toDomTree = true) throw (Exception);
         void removeNetSignal(NetSignal* netsignal, bool fromDomTree = true,
                              bool deleteNetSignal = false) throw (Exception);
+        void setNetSignalName(NetSignal& netsignal, const QString& newName, bool isAutoName) throw (Exception);
 
         // GenCompInstance Methods
         GenCompInstance* getGenCompInstanceByUuid(const QUuid& uuid) const noexcept;

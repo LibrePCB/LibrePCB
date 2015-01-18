@@ -315,6 +315,26 @@ void Circuit::removeNetSignal(NetSignal* netsignal, bool fromDomTree, bool delet
         delete netsignal;
 }
 
+void Circuit::setNetSignalName(NetSignal& netsignal, const QString& newName, bool isAutoName) throw (Exception)
+{
+    // check the validity of the new name
+    if (newName.isEmpty())
+    {
+        throw RuntimeError(__FILE__, __LINE__, netsignal.getUuid().toString(),
+            QString(tr("The new net signal name must not be empty!")));
+    }
+
+    // check if there is no net signal with the same name in the list
+    if (getNetSignalByName(newName))
+    {
+        throw RuntimeError(__FILE__, __LINE__, netsignal.getUuid().toString(),
+            QString(tr("There is already a net signal with the name \"%1\"!")).arg(newName));
+    }
+
+    // apply the new name
+    netsignal.setName(newName, isAutoName);
+}
+
 /*****************************************************************************************
  *  GenCompInstance Methods
  ****************************************************************************************/

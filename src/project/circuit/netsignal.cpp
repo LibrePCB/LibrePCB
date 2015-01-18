@@ -78,8 +78,9 @@ NetSignal::~NetSignal() noexcept
  *  Setters
  ****************************************************************************************/
 
-void NetSignal::setName(const QString& name) throw (Exception)
+void NetSignal::setName(const QString& name, bool isAutoName) throw (Exception)
 {
+    // the name must not be empty!
     if(name.isEmpty())
     {
         throw RuntimeError(__FILE__, __LINE__, QString(),
@@ -88,8 +89,8 @@ void NetSignal::setName(const QString& name) throw (Exception)
 
     mDomElement.setAttribute("name", name);
     mName = name;
-    mDomElement.setAttribute("auto_name", "false");
-    mAutoName = false;
+    mDomElement.setAttribute("auto_name", isAutoName ? "true" : "false");
+    mAutoName = isAutoName;
     updateErcMessages();
 }
 
