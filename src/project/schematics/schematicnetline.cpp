@@ -80,7 +80,6 @@ void SchematicNetLineGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
     Q_UNUSED(widget);
 
     bool highlight = option->state & QStyle::State_Selected;
-    bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
 
     // draw line
     painter->setPen(QPen(mLayer->getColor(highlight), mLine.getWidth().toPx(),
@@ -88,6 +87,7 @@ void SchematicNetLineGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
     painter->drawLine(line());
 
 #ifdef QT_DEBUG
+    bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
     if ((!deviceIsPrinter) && (Workspace::instance().getSettings().getDebugTools()->getShowSchematicNetlinesNetsignals()))
     {
         // draw net signal name
