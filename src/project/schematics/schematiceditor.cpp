@@ -35,6 +35,7 @@
 #include "fsm/ses_fsm.h"
 #include "../circuit/circuit.h"
 #include "../../common/dialogs/gridsettingsdialog.h"
+#include "../dialogs/projectpropertieseditordialog.h"
 
 namespace project {
 
@@ -343,6 +344,12 @@ void SchematicEditor::on_actionAddGenCmp_vcc_triggered()
     SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(genCompUuid, symbVarUuid);
     mFsm->processEvent(addEvent, true);
     mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
+}
+
+void SchematicEditor::on_actionProjectProperties_triggered()
+{
+    ProjectPropertiesEditorDialog dialog(mProject, this);
+    dialog.exec();
 }
 
 /*****************************************************************************************

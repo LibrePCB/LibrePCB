@@ -169,6 +169,7 @@ SOURCES += \
     project/circuit/cmd/cmdgencompinstsetname.cpp \
     project/circuit/cmd/cmdgencompinstsetvalue.cpp \
     project/circuit/cmd/cmdnetsignalsetname.cpp \
+    project/dialogs/projectpropertieseditordialog.cpp \
     project/cmd/cmdprojectsetmetadata.cpp \
     common/textfile.cpp
 
@@ -286,6 +287,7 @@ HEADERS += \
     project/circuit/cmd/cmdgencompinstsetname.h \
     project/circuit/cmd/cmdgencompinstsetvalue.h \
     project/circuit/cmd/cmdnetsignalsetname.h \
+    project/dialogs/projectpropertieseditordialog.h \
     project/cmd/cmdprojectsetmetadata.h \
     common/textfile.h
 
@@ -299,7 +301,8 @@ FORMS += \
     project/erc/ercmsgdock.ui \
     project/circuit/editnetclassesdialog.ui \
     common/dialogs/gridsettingsdialog.ui \
-    project/schematics/symbolinstancepropertiesdialog.ui
+    project/schematics/symbolinstancepropertiesdialog.ui \
+    project/dialogs/projectpropertieseditordialog.ui
 
 
 # Custom compiler "lrelease" for qm generation

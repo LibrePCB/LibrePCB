@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>920</width>
-    <height>562</height>
+    <height>565</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -105,9 +105,17 @@
     <addaction name="actionToolDrawWire"/>
     <addaction name="actionToolAddComponent"/>
    </widget>
+   <widget class="QMenu" name="menuProject">
+    <property name="title">
+     <string>Project</string>
+    </property>
+    <addaction name="actionProjectProperties"/>
+    <addaction name="actionProjectSettings"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
+   <addaction name="menuProject"/>
    <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -175,6 +183,19 @@
    <addaction name="actionPaste"/>
    <addaction name="actionRemove"/>
   </widget>
+  <widget class="QToolBar" name="view2toolbar">
+   <property name="windowTitle">
+    <string>View Tools</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>LeftToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionLayers"/>
+   <addaction name="actionGrid"/>
+  </widget>
   <widget class="QToolBar" name="toolsToolbar">
    <property name="windowTitle">
     <string>Tools</string>
@@ -216,25 +237,12 @@
    <addaction name="actionCommandAbort"/>
    <addaction name="separator"/>
   </widget>
-  <widget class="QToolBar" name="view2toolbar">
-   <property name="windowTitle">
-    <string>View Tools</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>LeftToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionLayers"/>
-   <addaction name="actionGrid"/>
-  </widget>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
    <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
+    <enum>LeftToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
     <bool>true</bool>
@@ -637,6 +645,20 @@
    </property>
    <property name="text">
     <string>Add VCC</string>
+   </property>
+  </action>
+  <action name="actionProjectProperties">
+   <property name="text">
+    <string>Properties</string>
+   </property>
+  </action>
+  <action name="actionProjectSettings">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/settings.png</normaloff>:/img/actions/settings.png</iconset>
+   </property>
+   <property name="text">
+    <string>Settings</string>
    </property>
   </action>
  </widget>
