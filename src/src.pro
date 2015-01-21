@@ -168,7 +168,8 @@ SOURCES += \
     project/schematics/symbolinstancepropertiesdialog.cpp \
     project/circuit/cmd/cmdgencompinstsetname.cpp \
     project/circuit/cmd/cmdgencompinstsetvalue.cpp \
-    project/circuit/cmd/cmdnetsignalsetname.cpp
+    project/circuit/cmd/cmdnetsignalsetname.cpp \
+    common/textfile.cpp
 
 HEADERS += \
     common/units/all_length_units.h \
@@ -283,7 +284,8 @@ HEADERS += \
     project/schematics/symbolinstancepropertiesdialog.h \
     project/circuit/cmd/cmdgencompinstsetname.h \
     project/circuit/cmd/cmdgencompinstsetvalue.h \
-    project/circuit/cmd/cmdnetsignalsetname.h
+    project/circuit/cmd/cmdnetsignalsetname.h \
+    common/textfile.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \

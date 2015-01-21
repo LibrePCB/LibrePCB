@@ -27,8 +27,7 @@
 #include <QtCore>
 #include <QDomDocument>
 #include <QDomElement>
-#include "exceptions.h"
-#include "filepath.h"
+#include "textfile.h"
 
 /*****************************************************************************************
  *  Class XmlFile
@@ -52,7 +51,7 @@
  * @author ubruhin
  * @date 2014-08-13
  */
-class XmlFile final : public QObject
+class XmlFile final : public TextFile
 {
         Q_OBJECT
 
@@ -98,13 +97,6 @@ class XmlFile final : public QObject
         // Getters
 
         /**
-         * @brief Get the filepath to the XML file which was passed to the constructor
-         *
-         * @return The filepath to the XML file
-         */
-        const FilePath& getFilepath() const noexcept {return mFilepath;}
-
-        /**
          * @brief Get the DOM document of the XML file
          *
          * @return A reference to the QDomDocument of the XML file
@@ -144,16 +136,6 @@ class XmlFile final : public QObject
 
 
         // General Methods
-
-        /**
-         * @brief Remove the XML file (and its backup file) from the filesystem
-         *
-         * @throw Exception If the files could not be removed successfully
-         *
-         * @warning You must not call #save() after calling this method, as this would
-         *          re-create the removed files!
-         */
-        void remove() const throw (Exception);
 
         /**
          * @brief Save the whole XML DOM tree back to the XML file
@@ -196,34 +178,8 @@ class XmlFile final : public QObject
         XmlFile(const XmlFile& other);
         XmlFile& operator=(const XmlFile& rhs);
 
-        // Private Methods
-
-        /**
-         * @brief Save a QDomDocument to a XML file
-         *
-         * @param domDocument   The QDomDocument to save
-         * @param filepath      The filepath to the XML file
-         *
-         * @throw Exception     If an error occurs, this method throws an exception.
-         */
-        static void saveDomDocument(const QDomDocument& domDocument,
-                                    const FilePath& filepath) throw (Exception);
-
 
         // General Attributes
-
-        /**
-         * @brief The filepath which was passed to the constructor
-         */
-        FilePath mFilepath;
-
-        /**
-         * @brief If true, the XML file is opened as read-only
-         *
-         * @li No temporary files will be created
-         * @li It's not possible to save the XML file (exception will be thrown instead)
-         */
-        bool mIsReadOnly;
 
         /**
          * @brief The whole XML DOM tree

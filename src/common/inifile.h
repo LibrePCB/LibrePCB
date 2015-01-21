@@ -46,6 +46,10 @@
  *
  * @author ubruhin
  * @date 2014-08-23
+ *
+ * @todo    the handling with QSettings objects is a dirty hack...
+ *          make this better...anytime ;-)
+ *          and maybe use #TextFile as base class.
  */
 class IniFile final : public QObject
 {
@@ -192,6 +196,16 @@ class IniFile final : public QObject
          * @brief The filepath to the file in the temporary directory
          */
         FilePath mTmpFilepath;
+
+        /**
+         * @brief This variable determines whether the file was restored or not
+         *
+         * This file is set to true when the constructor was called with the parameter
+         * "restore == true". After calling #save() with parameter "toOriginal == true",
+         * this flag will be reset to false. The destructor needs this flag to decide
+         * whether the temporary file should be removed or not.
+         */
+        bool mIsRestored;
 
         /**
          * @brief If true, the INI file is opened as read-only

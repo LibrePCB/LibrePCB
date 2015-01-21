@@ -31,12 +31,12 @@
  ****************************************************************************************/
 
 IniFile::IniFile(const FilePath& filepath, bool restore, bool readOnly) throw (Exception) :
-    QObject(0), mFilepath(filepath), mTmpFilepath(), mIsReadOnly(readOnly), mSettings(),
-    mFileVersion(-1)
+    QObject(0), mFilepath(filepath), mTmpFilepath(), mIsRestored(restore),
+    mIsReadOnly(readOnly), mSettings(), mFileVersion(-1)
 {
     // decide if we open the original file (*.ini) or the backup (*.ini~)
     FilePath iniFilepath(mFilepath.toStr() % '~');
-    if ((!restore) || (!iniFilepath.isExistingFile()))
+    if ((!mIsRestored) || (!iniFilepath.isExistingFile()))
         iniFilepath = mFilepath;
 
     // check if the file exists
@@ -90,7 +90,7 @@ IniFile::~IniFile() noexcept
 
     // remove temporary files
     QFile::remove(mTmpFilepath.toStr());
-    if (!mIsReadOnly)
+    if ((!mIsRestored) && (!mIsReadOnly))
         QFile::remove(mFilepath.toStr() % "~");
 }
 
@@ -233,6 +233,9 @@ void IniFile::save(bool toOriginal) throw (Exception)
         throw RuntimeError(__FILE__, __LINE__, filepath.toStr(),
             QString(tr("Error while writing to file \"%1\"!")).arg(filepath.toNative()));
     }
+
+    if (toOriginal && mIsRestored)
+        mIsRestored = false;
 }
 
 /*****************************************************************************************
