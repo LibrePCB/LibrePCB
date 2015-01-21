@@ -169,6 +169,7 @@ SOURCES += \
     project/circuit/cmd/cmdgencompinstsetname.cpp \
     project/circuit/cmd/cmdgencompinstsetvalue.cpp \
     project/circuit/cmd/cmdnetsignalsetname.cpp \
+    project/cmd/cmdprojectsetmetadata.cpp \
     common/textfile.cpp
 
 HEADERS += \
@@ -285,6 +286,7 @@ HEADERS += \
     project/circuit/cmd/cmdgencompinstsetname.h \
     project/circuit/cmd/cmdgencompinstsetvalue.h \
     project/circuit/cmd/cmdnetsignalsetname.h \
+    project/cmd/cmdprojectsetmetadata.h \
     common/textfile.h
 
 FORMS += \

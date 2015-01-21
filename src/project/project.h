@@ -36,6 +36,7 @@
  ****************************************************************************************/
 
 class QPrinter;
+class TextFile;
 class XmlFile;
 class IniFile;
 class UndoStack;
@@ -224,6 +225,13 @@ class Project final : public QObject, public IF_AttributeProvider
         const QString& getName() const noexcept {return mName;}
 
         /**
+         * @brief Get the description (in HTML) of the project
+         *
+         * @return The description of the project (HTML)
+         */
+        QString getDescription() const noexcept;
+
+        /**
          * @brief Get the author of the project
          *
          * @return The author of the project
@@ -243,6 +251,44 @@ class Project final : public QObject, public IF_AttributeProvider
          * @return The local date and time of last modification
          */
         const QDateTime& getLastModified() const noexcept {return mLastModified;}
+
+
+        // Setters: Attributes
+
+        /**
+         * @brief Set the name of the project
+         *
+         * @param newName           The new name (should not be empty!)
+         */
+        void setName(const QString& newName) noexcept;
+
+        /**
+         * @brief Set the description (in HTML) of the project
+         *
+         * @param newDescription    The new description (HTML)
+         */
+        void setDescription(const QString& newDescription) noexcept;
+
+        /**
+         * @brief Set the author of the project
+         *
+         * @param newAuthor         The new author
+         */
+        void setAuthor(const QString& newAuthor) noexcept;
+
+        /**
+         * @brief Set the date and time when the project was created
+         *
+         * @param newCreated        The new created datetime
+         */
+        void setCreated(const QDateTime& newCreated) noexcept;
+
+        /**
+         * @brief Set the date and time when the project was last modified
+         *
+         * @param newLastModified   The new last modified datetime
+         */
+        void setLastModified(const QDateTime& newLastModified) noexcept;
 
 
         // General Methods
@@ -405,7 +451,8 @@ class Project final : public QObject, public IF_AttributeProvider
         bool mIsReadOnly; ///< the constructor will set this to true if the project was opened in read only mode
 
         // Other Files
-        IniFile* mSchematicsIniFile; ///< schematics/schematics.ini
+        IniFile* mSchematicsIniFile;    ///< schematics/schematics.ini
+        TextFile* mDescriptionHtmlFile; ///< description/index.html
 
         // Attributes
         QString mName;              ///< the name of the project

@@ -25,6 +25,7 @@
 #include <QPrinter>
 #include "project.h"
 #include "../common/exceptions.h"
+#include "../common/textfile.h"
 #include "../common/xmlfile.h"
 #include "../common/inifile.h"
 #include "../workspace/workspace.h"
@@ -49,8 +50,9 @@ namespace project {
 Project::Project(const FilePath& filepath, bool create) throw (Exception) :
     QObject(0), IF_AttributeProvider(), mPath(filepath.getParentDir()),
     mFilepath(filepath), mXmlFile(0), mFileLock(filepath), mIsRestored(false),
-    mIsReadOnly(false), mSchematicsIniFile(0), mProjectIsModified(false), mUndoStack(0),
-    mProjectLibrary(0), mErcMsgList(0), mCircuit(0), mSchematicEditor(0)
+    mIsReadOnly(false), mSchematicsIniFile(0), mDescriptionHtmlFile(0),
+    mProjectIsModified(false), mUndoStack(0), mProjectLibrary(0), mErcMsgList(0),
+    mCircuit(0), mSchematicEditor(0)
 {
     qDebug() << (create ? "create project..." : "open project...");
 
@@ -164,6 +166,12 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
         mCreated = QDateTime::fromString(metaElement.firstChildElement("created").text(), Qt::ISODate).toLocalTime();
         mLastModified = QDateTime::fromString(metaElement.firstChildElement("last_modified").text(), Qt::ISODate).toLocalTime();
 
+        // Load description HTML file
+        if (create)
+            mDescriptionHtmlFile = TextFile::create(mPath.getPathTo("description/index.html"));
+        else
+            mDescriptionHtmlFile = new TextFile(mPath.getPathTo("description/index.html"), mIsRestored, mIsReadOnly);
+
         // Create all needed objects
         mUndoStack = new UndoStack();
         mProjectLibrary = new ProjectLibrary(*this, mIsRestored, mIsReadOnly);
@@ -215,6 +223,7 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
         delete mErcMsgList;             mErcMsgList = 0;
         delete mProjectLibrary;         mProjectLibrary = 0;
         delete mUndoStack;              mUndoStack = 0;
+        delete mDescriptionHtmlFile;    mDescriptionHtmlFile = 0;
         delete mXmlFile;                mXmlFile = 0;
         throw; // ...and rethrow the exception
     }
@@ -259,6 +268,7 @@ Project::~Project() noexcept
     delete mErcMsgList;             mErcMsgList = 0;
     delete mProjectLibrary;         mProjectLibrary = 0;
     delete mUndoStack;              mUndoStack = 0;
+    delete mDescriptionHtmlFile;    mDescriptionHtmlFile = 0;
     delete mXmlFile;                mXmlFile = 0;
 }
 
@@ -291,6 +301,68 @@ Schematic* Project::getSchematicByName(const QString& name) const noexcept
     }
 
     return 0;
+}
+
+QString Project::getDescription() const noexcept
+{
+    return mDescriptionHtmlFile->getContent();
+}
+
+/*****************************************************************************************
+ *  Setters: Attributes
+ ****************************************************************************************/
+
+void Project::setName(const QString& newName) noexcept
+{
+    // update DOM element
+    QDomElement node = mXmlFile->getDocument().createElement("name");
+    QDomText text = mXmlFile->getDocument().createTextNode(newName);
+    node.appendChild(text);
+    mXmlFile->getRoot().firstChildElement("meta").replaceChild(node,
+        mXmlFile->getRoot().firstChildElement("meta").firstChildElement("name"));
+
+    mName = newName;
+}
+
+void Project::setDescription(const QString& newDescription) noexcept
+{
+    mDescriptionHtmlFile->setContent(newDescription.toUtf8());
+}
+
+void Project::setAuthor(const QString& newAuthor) noexcept
+{
+    // update DOM element
+    QDomElement node = mXmlFile->getDocument().createElement("author");
+    QDomText text = mXmlFile->getDocument().createTextNode(newAuthor);
+    node.appendChild(text);
+    mXmlFile->getRoot().firstChildElement("meta").replaceChild(node,
+        mXmlFile->getRoot().firstChildElement("meta").firstChildElement("author"));
+
+    mAuthor = newAuthor;
+}
+
+void Project::setCreated(const QDateTime& newCreated) noexcept
+{
+    // update DOM element
+    QDomElement node = mXmlFile->getDocument().createElement("created");
+    QDomText text = mXmlFile->getDocument().createTextNode(newCreated.toUTC().toString(Qt::ISODate));
+    node.appendChild(text);
+    mXmlFile->getRoot().firstChildElement("meta").replaceChild(node,
+        mXmlFile->getRoot().firstChildElement("meta").firstChildElement("created"));
+
+    mCreated = newCreated;
+}
+
+void Project::setLastModified(const QDateTime& newLastModified) noexcept
+{
+    // update DOM element
+    QDomElement node = mXmlFile->getDocument().createElement("last_modified");
+    QDomText text = mXmlFile->getDocument().createTextNode(newLastModified.toUTC().toString(Qt::ISODate));
+    node.appendChild(text);
+    mXmlFile->getRoot().firstChildElement("meta").replaceChild(node,
+        mXmlFile->getRoot().firstChildElement("meta").firstChildElement("last_modified"));
+
+    mLastModified = newLastModified;
 }
 
 /*****************************************************************************************
@@ -587,6 +659,17 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     try
     {
         mXmlFile->save(toOriginal);
+    }
+    catch (Exception& e)
+    {
+        success = false;
+        errors.append(e.getUserMsg());
+    }
+
+    // Save "description/index.html"
+    try
+    {
+        mDescriptionHtmlFile->save(toOriginal);
     }
     catch (Exception& e)
     {
