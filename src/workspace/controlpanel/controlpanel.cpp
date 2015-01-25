@@ -171,6 +171,8 @@ void ControlPanel::on_actionNew_Project_triggered()
 
     FilePath filepath(QFileDialog::getSaveFileName(this, tr("New Project"), lastNewFile.toStr(),
                                     tr("EDA4U project files (%1)").arg("*.e4u")));
+    if (filepath.getSuffix() != "e4u")
+        filepath.setPath(filepath.toStr() % ".e4u");
 
     if (!filepath.isValid())
         return;
