@@ -139,6 +139,7 @@ class Debug final
          */
         static Debug* instance() {static Debug dbg; return &dbg;}
 
+
     private:
 
         // make some methods inaccessible...

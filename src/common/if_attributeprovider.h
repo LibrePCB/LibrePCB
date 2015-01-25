@@ -44,10 +44,10 @@
  * attributes, the pure virtual method #getAttributeValue() have to be implemented in all
  * classes which inherit from #IF_AttributeProvider.
  *
- * To resolve a variable like "${CMP::NAME}", the class #GenCompInstance must inherit from
- * this interface class. The method #getAttributeValue() must be implemented and should
- * return the name of the generic component instance (like "U123") when the attribute
- * "${CMP::NAME}" was requested.
+ * To resolve a variable like "${CMP::NAME}", the class project#GenCompInstance must
+ * inherit from this interface class. The method #getAttributeValue() must be implemented
+ * and should return the name of the generic component instance (like "U123") when the
+ * attribute "${CMP::NAME}" was requested.
  *
  * @author ubruhin
  * @date 2015-01-10
@@ -82,7 +82,8 @@ class IF_AttributeProvider
          * @param passToParents     If true, the method #getAttributeValue() may also
          *                          call the same method of a "parent attribute provider"
          *                          class to fetch the requested attribute value (for
-         *                          example #Project is a "parent" class of #GenCompInstance).
+         *                          example project#Project is a "parent" class of
+         *                          project#GenCompInstance).
          *
          * @return The count of replaced variables in the text
          */

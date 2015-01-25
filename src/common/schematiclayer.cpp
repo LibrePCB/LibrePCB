@@ -29,7 +29,7 @@
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SchematicLayer::SchematicLayer(unsigned int id) :
+SchematicLayer::SchematicLayer(uint id) :
     QObject(0), mId(id)
 {
     switch (mId)

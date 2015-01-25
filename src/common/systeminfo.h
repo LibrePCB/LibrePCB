@@ -59,8 +59,7 @@ class SystemInfo final
          *
          * @return The full user name (in case of an error, this string can be empty!)
          *
-         * @todo complete this method for mac and windows systems!
-         * @todo maybe there is a better solution for UNIX/Linux?
+         * @todo complete this method for windows systems!
          */
         static QString getFullUsername() noexcept;
 

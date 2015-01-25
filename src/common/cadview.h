@@ -78,12 +78,14 @@ class CADView : public QGraphicsView
         static qreal getZoomFactor() {return sZoomFactor;}
         static void setZoomFactor(qreal factor) {sZoomFactor = factor;}
 
+
     public slots:
 
         // Zoom Functions
         void zoomIn();
         void zoomOut();
         void zoomAll();
+
 
     protected:
 
@@ -92,6 +94,7 @@ class CADView : public QGraphicsView
         virtual void drawForeground(QPainter* painter, const QRectF& rect);
         virtual void wheelEvent(QWheelEvent* event);
         virtual void mouseMoveEvent(QMouseEvent* event);
+
 
     private:
 
@@ -104,6 +107,7 @@ class CADView : public QGraphicsView
         void updatePositionLabelText(const QPointF pos = QPointF(0, 0));
 
 
+        // Attributes
         GridType_t mGridType;
         QColor mGridColor;
         QColor mOriginCrossColor;
@@ -112,6 +116,7 @@ class CADView : public QGraphicsView
 
         Point mLastMouseMoveEventPos;
         QLabel* mPositionLabel;
+
 
         // Static Variables
         static qreal sZoomFactor;

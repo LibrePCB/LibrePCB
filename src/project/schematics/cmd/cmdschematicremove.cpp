@@ -41,8 +41,6 @@ CmdSchematicRemove::CmdSchematicRemove(Project& project, Schematic* schematic,
 
 CmdSchematicRemove::~CmdSchematicRemove() noexcept
 {
-    if (mIsExecuted)
-        delete mSchematic;
 }
 
 /*****************************************************************************************

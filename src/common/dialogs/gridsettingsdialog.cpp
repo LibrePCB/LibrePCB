@@ -83,9 +83,9 @@ void GridSettingsDialog::rbtnGroupClicked(int id)
     emit gridTypeChanged(mType);
 }
 
-void GridSettingsDialog::spbxIntervalChanged(double arg1)
+void GridSettingsDialog::spbxIntervalChanged(double value)
 {
-    mInterval = mUnit.convertFromUnit(arg1);
+    mInterval = mUnit.convertFromUnit(value);
     updateInternalRepresentation();
     emit gridIntervalChanged(mInterval);
 }
@@ -116,7 +116,7 @@ void GridSettingsDialog::btnDiv2Clicked()
     mUi->spbxInterval->setValue(mUi->spbxInterval->value() / 2);
 }
 
-void GridSettingsDialog::buttonBoxClicked(QAbstractButton *button)
+void GridSettingsDialog::buttonBoxClicked(QAbstractButton* button)
 {
     switch (mUi->buttonBox->buttonRole(button))
     {

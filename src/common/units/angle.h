@@ -104,7 +104,7 @@ class Angle
          * instead, because it is more accurate (no use of floating point numbers).
          * Or you can also use the static methods #deg0(), #deg45() and so on.
          *
-         * @todo fmod is only for double, so not good for ARM!
+         * @todo fmod is only for double, so not good for processors with single precision FPU...
          */
         void setAngleDeg(qreal degrees) noexcept {mMicrodegrees = fmod(degrees * 1e6, 360e6);}
 
@@ -129,7 +129,7 @@ class Angle
          * instead, because it is more accurate (no use of floating point numbers).
          * Or you can also use the static methods #deg0(), #deg45() and so on.
          *
-         * @todo fmod is only for double, so not good for ARM!
+         * @todo fmod is only for double, so not good for processors with single precision FPU...
          */
         void setAngleRad(qreal radians) noexcept {mMicrodegrees = fmod(radians * 180e6 / (qreal)M_PI, 360e6);}
 

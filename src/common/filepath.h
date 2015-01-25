@@ -109,7 +109,6 @@
  *          platform independent.
  *
  * @author ubruhin
- *
  * @date 2014-07-31
  */
 class FilePath final

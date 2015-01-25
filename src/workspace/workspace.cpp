@@ -159,7 +159,7 @@ Project* Workspace::createProject(const FilePath& filepath) noexcept
     catch (Exception& e)
     {
         QMessageBox::critical(mControlPanel, tr("Cannot create the project!"), e.getUserMsg());
-        return 0;
+        return nullptr;
     }
 
     // project successfully created and opened!
@@ -178,7 +178,7 @@ Project* Workspace::openProject(const FilePath& filepath) noexcept
     {
         QMessageBox::critical(0, tr("Invalid filename"), QString(
             tr("The project filename is not valid: \"%1\"")).arg(filepath.toNative()));
-        return 0;
+        return nullptr;
     }
 
     Project* openProject = getOpenProject(filepath);
@@ -197,7 +197,7 @@ Project* Workspace::openProject(const FilePath& filepath) noexcept
         {
             // the user has canceled opening the project, so we ignore this exception...
             qDebug() << "Aborted opening the project!";
-            return 0;
+            return nullptr;
         }
         catch (Exception& e)
         {
@@ -205,7 +205,7 @@ Project* Workspace::openProject(const FilePath& filepath) noexcept
             qDebug() << "Aborted opening the project!";
             QMessageBox::critical(mControlPanel, tr("Cannot open the project!"),
                                   e.getUserMsg());
-            return 0;
+            return nullptr;
         }
 
         // project successfully opened!
@@ -218,12 +218,7 @@ Project* Workspace::openProject(const FilePath& filepath) noexcept
     return openProject;
 }
 
-bool Workspace::closeProject(const FilePath& filepath, bool askForSave)
-{
-    return closeProject(getOpenProject(filepath), askForSave);
-}
-
-bool Workspace::closeProject(Project* project, bool askForSave)
+bool Workspace::closeProject(Project* project, bool askForSave) noexcept
 {
     if (!project)
         return true;
@@ -239,7 +234,12 @@ bool Workspace::closeProject(Project* project, bool askForSave)
     return success;
 }
 
-bool Workspace::closeAllProjects(bool askForSave)
+bool Workspace::closeProject(const FilePath& filepath, bool askForSave) noexcept
+{
+    return closeProject(getOpenProject(filepath), askForSave);
+}
+
+bool Workspace::closeAllProjects(bool askForSave) noexcept
 {
     bool success = true;
     foreach (Project* project, mOpenProjects)
@@ -250,30 +250,30 @@ bool Workspace::closeAllProjects(bool askForSave)
     return success;
 }
 
-void Workspace::unregisterOpenProject(Project* project)
+void Workspace::unregisterOpenProject(Project* project) noexcept
 {
     mOpenProjects.remove(project->getFilepath().toUnique().toStr());
 }
 
-Project* Workspace::getOpenProject(const FilePath& filepath)
+Project* Workspace::getOpenProject(const FilePath& filepath) const noexcept
 {
     if (mOpenProjects.contains(filepath.toUnique().toStr()))
         return mOpenProjects.value(filepath.toUnique().toStr());
     else
-        return 0;
+        return nullptr;
 }
 
-bool Workspace::isFavoriteProject(const FilePath& filepath) const
+bool Workspace::isFavoriteProject(const FilePath& filepath) const noexcept
 {
     return mFavoriteProjectsModel->isFavoriteProject(filepath);
 }
 
-void Workspace::addFavoriteProject(const FilePath& filepath)
+void Workspace::addFavoriteProject(const FilePath& filepath) noexcept
 {
     mFavoriteProjectsModel->addFavoriteProject(filepath);
 }
 
-void Workspace::removeFavoriteProject(const FilePath& filepath)
+void Workspace::removeFavoriteProject(const FilePath& filepath) noexcept
 {
     mFavoriteProjectsModel->removeFavoriteProject(filepath);
 }
@@ -282,13 +282,13 @@ void Workspace::removeFavoriteProject(const FilePath& filepath)
  *  Public Slots
  ****************************************************************************************/
 
-void Workspace::showControlPanel() const
+void Workspace::showControlPanel() const noexcept
 {
     mControlPanel->show();
     mControlPanel->raise();
 }
 
-void Workspace::openLibraryEditor()
+void Workspace::openLibraryEditor() noexcept
 {
     try
     {
@@ -309,7 +309,7 @@ void Workspace::openLibraryEditor()
  *  Static Methods
  ****************************************************************************************/
 
-bool Workspace::isValidWorkspacePath(const FilePath& path)
+bool Workspace::isValidWorkspacePath(const FilePath& path) noexcept
 {
     if (!path.isExistingDir())
         return false;
@@ -319,7 +319,7 @@ bool Workspace::isValidWorkspacePath(const FilePath& path)
     return true;
 }
 
-bool Workspace::createNewWorkspace(const FilePath& path)
+bool Workspace::createNewWorkspace(const FilePath& path) noexcept
 {
     if (isValidWorkspacePath(path))
         return true;
@@ -328,19 +328,19 @@ bool Workspace::createNewWorkspace(const FilePath& path)
     return path.getPathTo(".metadata").mkPath();
 }
 
-FilePath Workspace::getMostRecentlyUsedWorkspacePath()
+FilePath Workspace::getMostRecentlyUsedWorkspacePath() noexcept
 {
     QSettings clientSettings;
     return FilePath(clientSettings.value("workspaces/most_recently_used").toString());
 }
 
-void Workspace::setMostRecentlyUsedWorkspacePath(const FilePath& path)
+void Workspace::setMostRecentlyUsedWorkspacePath(const FilePath& path) noexcept
 {
     QSettings clientSettings;
     clientSettings.setValue("workspaces/most_recently_used", path.toNative());
 }
 
-FilePath Workspace::chooseWorkspacePath()
+FilePath Workspace::chooseWorkspacePath() noexcept
 {
     FilePath path(QFileDialog::getExistingDirectory(0, tr("Select Workspace Path")));
 

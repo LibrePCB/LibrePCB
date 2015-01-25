@@ -42,7 +42,7 @@ namespace project {
 
 Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create) throw (Exception) :
     QObject(0), mProject(project),
-    mXmlFilepath(project.getPath().getPathTo("core/circuit.xml")), mXmlFile(0)
+    mXmlFilepath(project.getPath().getPathTo("core/circuit.xml")), mXmlFile(nullptr)
 {
     qDebug() << "load circuit...";
     Q_ASSERT(!(create && (restore || readOnly)));
@@ -107,7 +107,7 @@ Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create) thr
             try { removeNetSignal(netsignal, false, true); } catch (...) {}
         foreach (NetClass* netclass, mNetClasses)
             try { removeNetClass(netclass, false, true); } catch (...) {}
-        delete mXmlFile;            mXmlFile = 0;
+        delete mXmlFile;            mXmlFile = nullptr;
         throw;
     }
 
@@ -128,7 +128,7 @@ Circuit::~Circuit() noexcept
     foreach (NetClass* netclass, mNetClasses)
         try { removeNetClass(netclass, false, true); } catch (...) {}
 
-    delete mXmlFile;            mXmlFile = 0;
+    delete mXmlFile;            mXmlFile = nullptr;
 }
 
 /*****************************************************************************************
@@ -137,7 +137,7 @@ Circuit::~Circuit() noexcept
 
 NetClass* Circuit::getNetClassByUuid(const QUuid& uuid) const noexcept
 {
-    return mNetClasses.value(uuid, 0);
+    return mNetClasses.value(uuid, nullptr);
 }
 
 NetClass* Circuit::getNetClassByName(const QString& name) const noexcept
@@ -147,7 +147,7 @@ NetClass* Circuit::getNetClassByName(const QString& name) const noexcept
         if (netclass->getName() == name)
             return netclass;
     }
-    return 0;
+    return nullptr;
 }
 
 NetClass* Circuit::createNetClass(const QString& name) throw (Exception)
@@ -225,7 +225,7 @@ void Circuit::execEditNetClassesDialog(QWidget* parent) noexcept
 
 NetSignal* Circuit::getNetSignalByUuid(const QUuid& uuid) const noexcept
 {
-    return mNetSignals.value(uuid, 0);
+    return mNetSignals.value(uuid, nullptr);
 }
 
 NetSignal* Circuit::getNetSignalByName(const QString& name) const noexcept
@@ -235,7 +235,7 @@ NetSignal* Circuit::getNetSignalByName(const QString& name) const noexcept
         if (netsignal->getName() == name)
             return netsignal;
     }
-    return 0;
+    return nullptr;
 }
 
 NetSignal* Circuit::createNetSignal(const QUuid& netclass, QString name) throw (Exception)
@@ -341,7 +341,7 @@ void Circuit::setNetSignalName(NetSignal& netsignal, const QString& newName, boo
 
 GenCompInstance* Circuit::getGenCompInstanceByUuid(const QUuid& uuid) const noexcept
 {
-    return mGenCompInstances.value(uuid, 0);
+    return mGenCompInstances.value(uuid, nullptr);
 }
 
 GenCompInstance* Circuit::getGenCompInstanceByName(const QString& name) const noexcept
@@ -351,12 +351,12 @@ GenCompInstance* Circuit::getGenCompInstanceByName(const QString& name) const no
         if (genCompInstance->getName() == name)
             return genCompInstance;
     }
-    return 0;
+    return nullptr;
 }
 
 GenCompInstance* Circuit::createGenCompInstance(const library::GenericComponent& genComp,
-                                                         const library::GenCompSymbVar& symbVar,
-                                                         QString name) throw (Exception)
+                                                const library::GenCompSymbVar& symbVar,
+                                                QString name) throw (Exception)
 {
     if (name.isEmpty())
     {

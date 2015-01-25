@@ -31,8 +31,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Board::Board(Project& project, Circuit& circuit) :
-    CADScene(), mProject(project), mCircuit(circuit)
+Board::Board(Project& project) :
+    CADScene(), mProject(project)
 {
 }
 

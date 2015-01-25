@@ -63,12 +63,14 @@ SchematicEditor::SchematicEditor(Project& project, bool readOnly) :
     addDockWidget(Qt::RightDockWidgetArea, mErcMsgDock, Qt::Vertical);
 
     // connect some actions which are created with the Qt Designer
-    connect(mUi->actionSave_Project, SIGNAL(triggered()), &mProject, SLOT(save()));
-    connect(mUi->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
-    connect(mUi->actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
-    connect(mUi->actionZoom_In, SIGNAL(triggered()), mUi->graphicsView, SLOT(zoomIn()));
-    connect(mUi->actionZoom_Out, SIGNAL(triggered()), mUi->graphicsView, SLOT(zoomOut()));
-    connect(mUi->actionZoom_All, SIGNAL(triggered()), mUi->graphicsView, SLOT(zoomAll()));
+    connect(mUi->actionSave_Project, &QAction::triggered, &mProject, &Project::saveProject);
+    connect(mUi->actionQuit, &QAction::triggered, this, &SchematicEditor::close);
+    connect(mUi->actionAbout_Qt, &QAction::triggered, qApp, &QApplication::aboutQt);
+    connect(mUi->actionZoom_In, &QAction::triggered, mUi->graphicsView, &CADView::zoomIn);
+    connect(mUi->actionZoom_Out, &QAction::triggered, mUi->graphicsView, &CADView::zoomOut);
+    connect(mUi->actionZoom_All, &QAction::triggered, mUi->graphicsView, &CADView::zoomAll);
+    connect(mUi->actionShow_Control_Panel, &QAction::triggered,
+            &Workspace::instance(), &Workspace::showControlPanel);
     connect(mUi->actionEditNetclasses, &QAction::triggered,
             [this](){mProject.getCircuit().execEditNetClassesDialog(this);});
 

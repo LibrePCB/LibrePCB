@@ -48,20 +48,25 @@ ControlPanel::ControlPanel(QAbstractItemModel* projectTreeModel,
     setWindowTitle(QString(tr("Control Panel - EDA4U %1 - %2"))
         .arg(QCoreApplication::applicationVersion()).arg(Workspace::instance().getPath().toNative()));
     mUi->statusBar->addWidget(new QLabel(QString(tr("Workspace: %1"))
-                                         .arg(Workspace::instance().getPath().toNative())));
+        .arg(Workspace::instance().getPath().toNative())));
 
     // connect some actions which are created with the Qt Designer
-    connect(mUi->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
-    connect(mUi->actionOpen_Library_Editor, SIGNAL(triggered()), &Workspace::instance(), SLOT(openLibraryEditor()));
-    connect(mUi->actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
-    connect(mUi->actionWorkspace_Settings, SIGNAL(triggered()), &Workspace::instance().getSettings(), SLOT(showSettingsDialog()));
+    connect(mUi->actionQuit, &QAction::triggered,
+            this, &ControlPanel::close);
+    connect(mUi->actionOpen_Library_Editor, &QAction::triggered,
+            &Workspace::instance(), &Workspace::openLibraryEditor);
+    connect(mUi->actionAbout_Qt, &QAction::triggered,
+            qApp, &QApplication::aboutQt);
+    connect(mUi->actionWorkspace_Settings, &QAction::triggered,
+            &Workspace::instance().getSettings(), &WorkspaceSettings::showSettingsDialog);
 
     mUi->projectTreeView->setModel(projectTreeModel);
     mUi->recentProjectsListView->setModel(recentProjectsModel);
     mUi->favoriteProjectsListView->setModel(favoriteProjectsModel);
 
     mUi->webView->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
-    connect(mUi->webView, &QWebView::linkClicked, [](const QUrl& url){QDesktopServices::openUrl(url);});
+    connect(mUi->webView, &QWebView::linkClicked,
+            [](const QUrl& url){QDesktopServices::openUrl(url);});
 
     loadSettings();
 }

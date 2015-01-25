@@ -48,14 +48,14 @@ CmdSchematicNetPointMove::~CmdSchematicNetPointMove() noexcept
  *  General Methods
  ****************************************************************************************/
 
-void CmdSchematicNetPointMove::setAbsolutePosTemporary(Point& absPos) noexcept
+void CmdSchematicNetPointMove::setAbsolutePosTemporary(const Point& absPos) noexcept
 {
     Q_ASSERT(mRedoOrUndoCalled == false);
     mDeltaPos = absPos - mStartPos;
     mNetPoint.setPosition(absPos);
 }
 
-void CmdSchematicNetPointMove::setDeltaToStartPosTemporary(Point& deltaPos) noexcept
+void CmdSchematicNetPointMove::setDeltaToStartPosTemporary(const Point& deltaPos) noexcept
 {
     Q_ASSERT(mRedoOrUndoCalled == false);
     mDeltaPos = deltaPos;

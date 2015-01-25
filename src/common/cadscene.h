@@ -98,12 +98,15 @@ class CADScene : public QGraphicsScene
         virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent);
         virtual void wheelEvent(QGraphicsSceneWheelEvent* event);
 
+
     private:
 
         // make some methods inaccessible...
         CADScene(const CADScene& other);
         CADScene& operator=(const CADScene& rhs);
 
+
+        // Attributes
         IF_CADSceneEventHandler* mEventHandlerObject;
 };
 

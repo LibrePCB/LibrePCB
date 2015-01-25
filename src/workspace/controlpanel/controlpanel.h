@@ -43,10 +43,9 @@ class ControlPanel;
  * @brief The ControlPanel class
  *
  * @author ubruhin
- *
  * @date 2014-06-23
  */
-class ControlPanel : public QMainWindow
+class ControlPanel final : public QMainWindow
 {
         Q_OBJECT
 
@@ -58,10 +57,12 @@ class ControlPanel : public QMainWindow
                               QAbstractItemModel* favoriteProjectsModel);
         ~ControlPanel();
 
+
     protected:
 
         // Inherited Methods
         virtual void closeEvent(QCloseEvent* event);
+
 
     private slots:
 
@@ -81,6 +82,7 @@ class ControlPanel : public QMainWindow
         void on_recentProjectsListView_customContextMenuRequested(const QPoint &pos);
         void on_favoriteProjectsListView_customContextMenuRequested(const QPoint &pos);
 
+
     private:
 
         // make some methods inaccessible...
@@ -88,9 +90,11 @@ class ControlPanel : public QMainWindow
         ControlPanel(const ControlPanel& other);
         ControlPanel& operator=(const ControlPanel& rhs);
 
+
         // General private methods
         void saveSettings();
         void loadSettings();
+
 
         // Attributes
         Ui::ControlPanel* mUi;

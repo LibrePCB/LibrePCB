@@ -55,8 +55,8 @@ class CmdSchematicNetPointMove final : public UndoCommand
         ~CmdSchematicNetPointMove() noexcept;
 
         // General Methods
-        void setAbsolutePosTemporary(Point& absPos) noexcept;
-        void setDeltaToStartPosTemporary(Point& deltaPos) noexcept;
+        void setAbsolutePosTemporary(const Point& absPos) noexcept;
+        void setDeltaToStartPosTemporary(const Point& deltaPos) noexcept;
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;

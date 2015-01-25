@@ -43,7 +43,7 @@ class GridSettingsDialog;
  ****************************************************************************************/
 
 /**
- * @brief The GridSettingsDialog class
+ * @brief This class provides a Dialog (GUI) to change the grid settings of a #CADView
  *
  * @author ubruhin
  * @date 2014-10-13
@@ -69,11 +69,11 @@ class GridSettingsDialog final : public QDialog
 
         // Private Slots
         void rbtnGroupClicked(int id);
-        void spbxIntervalChanged(double arg1);
+        void spbxIntervalChanged(double value);
         void cbxUnitsChanged(int index);
         void btnMul2Clicked();
         void btnDiv2Clicked();
-        void buttonBoxClicked(QAbstractButton *button);
+        void buttonBoxClicked(QAbstractButton* button);
 
 
     signals:
@@ -92,6 +92,7 @@ class GridSettingsDialog final : public QDialog
 
         // Private Methods
         void updateInternalRepresentation() noexcept;
+
 
         // General Attributes
         Ui::GridSettingsDialog* mUi;

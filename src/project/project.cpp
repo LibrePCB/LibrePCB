@@ -155,16 +155,24 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
     {
         // try to create/open the XML project file
         if (create)
+        {
             mXmlFile = SmartXmlFile::create(mFilepath, "project", 0);
+            // Create attributes
+            setName(mFilepath.getCompleteBasename());
+            setAuthor(SystemInfo::getFullUsername());
+            setCreated(QDateTime::currentDateTime());
+            setLastModified(QDateTime::currentDateTime());
+        }
         else
+        {
             mXmlFile = new SmartXmlFile(mFilepath, mIsRestored, mIsReadOnly, "project", 0);
-
-        // The project seems to be ready to open! Load all attributes...
-        QDomElement metaElement = mXmlFile->getRoot().firstChildElement("meta");
-        mName = metaElement.firstChildElement("name").text();
-        mAuthor = metaElement.firstChildElement("author").text();
-        mCreated = QDateTime::fromString(metaElement.firstChildElement("created").text(), Qt::ISODate).toLocalTime();
-        mLastModified = QDateTime::fromString(metaElement.firstChildElement("last_modified").text(), Qt::ISODate).toLocalTime();
+            // Load all attributes
+            QDomElement metaElement = mXmlFile->getRoot().firstChildElement("meta");
+            mName = metaElement.firstChildElement("name").text();
+            mAuthor = metaElement.firstChildElement("author").text();
+            mCreated = QDateTime::fromString(metaElement.firstChildElement("created").text(), Qt::ISODate).toLocalTime();
+            mLastModified = QDateTime::fromString(metaElement.firstChildElement("last_modified").text(), Qt::ISODate).toLocalTime();
+        }
 
         // Load description HTML file
         if (create)
@@ -180,15 +188,17 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
         mCircuit = new Circuit(*this, mIsRestored, mIsReadOnly, create);
 
         // Load all schematic layers
-        foreach (unsigned int id, SchematicLayer::getAllLayerIDs())
+        foreach (uint id, SchematicLayer::getAllLayerIDs())
             mSchematicLayers.insert(id, new SchematicLayer(id));
 
-        // Load all schematics
+        // Load schematic list file "schematics/schematics.ini"
         if (create)
             mSchematicsIniFile = SmartIniFile::create(mPath.getPathTo("schematics/schematics.ini"), 0);
         else
             mSchematicsIniFile = new SmartIniFile(mPath.getPathTo("schematics/schematics.ini"),
                                                   mIsRestored, mIsReadOnly, 0);
+
+        // Load all schematics
         QSettings* schematicsSettings = mSchematicsIniFile->createQSettings();
         int schematicsCount = schematicsSettings->beginReadArray("pages");
         for (int i = 0; i < schematicsCount; i++)
@@ -197,13 +207,13 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
             FilePath filepath = FilePath::fromRelative(mPath.getPathTo("schematics"),
                                     schematicsSettings->value("page").toString());
             Schematic* schematic = new Schematic(*this, filepath, mIsRestored, mIsReadOnly);
-            addSchematic(schematic, -1, false);
+            addSchematic(schematic, i);
         }
         schematicsSettings->endArray();
         mSchematicsIniFile->releaseQSettings(schematicsSettings);
         qDebug() << mSchematics.count() << "schematics successfully loaded!";
 
-        // at this point, the whole circuit with all schematics and board is successfully
+        // at this point, the whole circuit with all schematics and boards is successfully
         // loaded, so the ERC list now contains all the correct ERC messages.
         // So we can now restore the ignore state of each ERC message from the XML file.
         mErcMsgList->restoreIgnoreState();
@@ -211,14 +221,14 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
         // create the whole schematic editor GUI inclusive FSM and so on
         mSchematicEditor = new SchematicEditor(*this, mIsReadOnly);
 
-        if (create) save(); // write all files to harddisc
+        if (create) saveProject(); // write all files to harddisc
     }
     catch (...)
     {
         // free the allocated memory in the reverse order of their allocation...
         delete mSchematicEditor;        mSchematicEditor = 0;
         foreach (Schematic* schematic, mSchematics)
-            try { removeSchematic(schematic, false, true); } catch (...) {}
+            try { removeSchematic(schematic, true); } catch (...) {}
         delete mSchematicsIniFile;      mSchematicsIniFile = 0;
         qDeleteAll(mSchematicLayers);   mSchematicLayers.clear();
         delete mCircuit;                mCircuit = 0;
@@ -237,7 +247,7 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
     if ((intervalSecs > 0) && (!mIsReadOnly))
     {
         // autosaving is enabled --> start the timer
-        connect(&mAutoSaveTimer, SIGNAL(timeout()), this, SLOT(autosave()));
+        connect(&mAutoSaveTimer, &QTimer::timeout, this, &Project::autosaveProject);
         mAutoSaveTimer.start(1000 * intervalSecs);
     }
 
@@ -262,7 +272,8 @@ Project::~Project() noexcept
 
     // delete all schematics (and catch all throwed exceptions)
     foreach (Schematic* schematic, mSchematics)
-        try { removeSchematic(schematic, false, true); } catch (...) {}
+        try { removeSchematic(schematic, true); } catch (...) {}
+    qDeleteAll(mRemovedSchematics); mRemovedSchematics.clear();
 
     delete mSchematicsIniFile;      mSchematicsIniFile = 0;
     qDeleteAll(mSchematicLayers);   mSchematicLayers.clear();
@@ -291,7 +302,7 @@ Schematic* Project::getSchematicByUuid(const QUuid& uuid) const noexcept
             return schematic;
     }
 
-    return 0;
+    return nullptr;
 }
 
 Schematic* Project::getSchematicByName(const QString& name) const noexcept
@@ -302,7 +313,7 @@ Schematic* Project::getSchematicByName(const QString& name) const noexcept
             return schematic;
     }
 
-    return 0;
+    return nullptr;
 }
 
 QString Project::getDescription() const noexcept
@@ -378,9 +389,9 @@ Schematic* Project::createSchematic(const QString& name) throw (Exception)
     return Schematic::create(*this, filepath, name);
 }
 
-void Project::addSchematic(Schematic* schematic, int newIndex, bool toList) throw (Exception)
+void Project::addSchematic(Schematic* schematic, int newIndex) throw (Exception)
 {
-    Q_CHECK_PTR(schematic);
+    Q_ASSERT(schematic);
 
     if ((newIndex < 0) || (newIndex > mSchematics.count()))
         newIndex = mSchematics.count();
@@ -399,51 +410,38 @@ void Project::addSchematic(Schematic* schematic, int newIndex, bool toList) thro
             .arg(schematic->getName()));
     }
 
+    schematic->addToProject(); // can throw an exception
     mSchematics.insert(newIndex, schematic);
 
-    if (toList)
-    {
-        // add schematic to "schematics/schematics.ini"
-        try
-        {
-            updateSchematicsList(); // can throw an exception
-        }
-        catch (Exception& e)
-        {
-            mSchematics.removeAt(newIndex); // revert insert()
-            throw;
-        }
-    }
+    if (mRemovedSchematics.contains(schematic))
+        mRemovedSchematics.removeOne(schematic);
 
     emit schematicAdded(newIndex);
 }
 
-void Project::removeSchematic(Schematic* schematic, bool fromList, bool deleteSchematic) throw (Exception)
+void Project::removeSchematic(Schematic* schematic, bool deleteSchematic) throw (Exception)
 {
-    Q_CHECK_PTR(schematic);
-
+    Q_ASSERT(schematic);
     int index = mSchematics.indexOf(schematic);
     Q_ASSERT(index >= 0);
-    mSchematics.removeAt(index);
+    Q_ASSERT(!mRemovedSchematics.contains(schematic));
 
-    if (fromList)
+    if ((!deleteSchematic) && (!schematic->isEmpty()))
     {
-        // remove schematic from "schematics/schematics.ini"
-        try
-        {
-            updateSchematicsList(); // can throw an exception
-        }
-        catch (Exception& e)
-        {
-            mSchematics.insert(index, schematic); // revert removeAt()
-            throw;
-        }
+        throw RuntimeError(__FILE__, __LINE__, QString(),
+            QString(tr("There are still elements in the schematic \"%1\"!"))
+            .arg(schematic->getName()));
     }
+
+    schematic->removeFromProject(); // can throw an exception
+    mSchematics.removeAt(index);
 
     emit schematicRemoved(index);
 
     if (deleteSchematic)
         delete schematic;
+    else
+        mRemovedSchematics.append(schematic);
 }
 
 void Project::exportSchematicsAsPdf(const FilePath& filepath) throw (Exception)
@@ -455,14 +453,14 @@ void Project::exportSchematicsAsPdf(const FilePath& filepath) throw (Exception)
     printer.setCreator(QString("EDA4U %1.%2").arg(APP_VERSION_MAJOR).arg(APP_VERSION_MINOR));
     printer.setOutputFileName(filepath.toStr());
 
-    QList<unsigned int> pages;
+    QList<uint> pages;
     for (int i = 0; i < mSchematics.count(); i++)
         pages.append(i);
 
     printSchematicPages(printer, pages);
 }
 
-bool Project::windowIsAboutToClose(QMainWindow* window)
+bool Project::windowIsAboutToClose(QMainWindow* window) noexcept
 {
     int countOfOpenWindows = 0;
     if (mSchematicEditor->isVisible())  {countOfOpenWindows++;}
@@ -505,14 +503,14 @@ bool Project::getAttributeValue(const QString& attrNS, const QString& attrKey,
  *  Public Slots
  ****************************************************************************************/
 
-void Project::showSchematicEditor()
+void Project::showSchematicEditor() noexcept
 {
     mSchematicEditor->show();
     mSchematicEditor->raise();
     mSchematicEditor->activateWindow();
 }
 
-bool Project::save() noexcept
+bool Project::saveProject() noexcept
 {
     QStringList errors;
 
@@ -554,7 +552,7 @@ bool Project::save() noexcept
     return true;
 }
 
-bool Project::autosave() noexcept
+bool Project::autosaveProject() noexcept
 {
     if ((!mIsRestored) && (mUndoStack->isClean()) && (!mProjectIsModified))
         return false; // do not save if there are no changes
@@ -581,7 +579,7 @@ bool Project::autosave() noexcept
     return true;
 }
 
-bool Project::close(QWidget* msgBoxParent)
+bool Project::close(QWidget* msgBoxParent) noexcept
 {
     if (((!mIsRestored) && (mUndoStack->isClean()) && (!mProjectIsModified)) || (mIsReadOnly))
     {
@@ -603,7 +601,7 @@ bool Project::close(QWidget* msgBoxParent)
     switch (choice)
     {
         case QMessageBox::Yes: // save and close project
-            if (save())
+            if (saveProject())
             {
                 deleteLater(); // this project object will be deleted later in the event loop
                 return true;
@@ -660,6 +658,7 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     // Save *.e4u project file
     try
     {
+        setLastModified(QDateTime::currentDateTime());
         mXmlFile->save(toOriginal);
     }
     catch (Exception& e)
@@ -683,8 +682,14 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     if (!mCircuit->save(toOriginal, errors))
         success = false;
 
-    // Save all schematics (*.xml files)
+    // Save all added schematics (*.xml files)
     foreach (Schematic* schematic, mSchematics)
+    {
+        if (!schematic->save(toOriginal, errors))
+            success = false;
+    }
+    // Save all removed schematics (*.xml files)
+    foreach (Schematic* schematic, mRemovedSchematics)
     {
         if (!schematic->save(toOriginal, errors))
             success = false;
@@ -693,6 +698,7 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     // Save "schematics/schematics.ini"
     try
     {
+        updateSchematicsList();
         mSchematicsIniFile->save(toOriginal);
     }
     catch (Exception& e)
@@ -713,7 +719,7 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     return success;
 }
 
-void Project::printSchematicPages(QPrinter& printer, QList<unsigned int>& pages) throw (Exception)
+void Project::printSchematicPages(QPrinter& printer, QList<uint>& pages) throw (Exception)
 {
     if (pages.isEmpty())
         throw RuntimeError(__FILE__, __LINE__, QString(), tr("No schematic pages selected."));

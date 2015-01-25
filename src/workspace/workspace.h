@@ -66,7 +66,6 @@ class Project;
  * To access the settings of the workspace, use the method #getSettings().
  *
  * @author ubruhin
- *
  * @date 2014-06-23
  */
 class Workspace final : public QObject
@@ -144,23 +143,148 @@ class Workspace final : public QObject
 
 
         // Project Management
+
+        /**
+         * @brief Create a new project and open it
+         *
+         * @param filepath  The filepath to the *.e4u project file of the project to create
+         *
+         * @return  The pointer to the new project. If an error occurs, this method shows
+         *          the error message box and returns nullptr afterwards.
+         */
         project::Project* createProject(const FilePath& filepath) noexcept;
+
+        /**
+         * @brief Open an existing project (or bring an already opened project to front)
+         *
+         * @param filepath  The filepath to the *.e4u project file to open
+         *
+         * @return  The pointer to the opened project. If an error occurs, this method
+         *          shows the error message box and returns nullptr afterwards.
+         */
         project::Project* openProject(const FilePath& filepath) noexcept;
-        bool closeProject(const FilePath& filepath, bool askForSave);
-        bool closeProject(project::Project* project, bool askForSave);
-        bool closeAllProjects(bool askForSave = false);
-        void unregisterOpenProject(project::Project* project);
-        project::Project* getOpenProject(const FilePath& filepath);
-        bool isFavoriteProject(const FilePath& filepath) const;
-        void addFavoriteProject(const FilePath& filepath);
-        void removeFavoriteProject(const FilePath& filepath);
+
+        /**
+         * @brief Close an open project
+         *
+         * @param project       The pointer to the open project
+         * @param askForSave    If true and the specified project has unsaved changes,
+         *                      a message box appears to ask whether the project should
+         *                      be saved or not.
+         *                      If false, the project will be closed without saving it.
+         *
+         * @return  False if the user has canceled the "save project?" dialog (if appeared).
+         *          True in all other cases (also if the specified project was not open).
+         */
+        bool closeProject(project::Project* project, bool askForSave) noexcept;
+
+        /**
+         * @overload
+         * @brief Close an open project
+         *
+         * @param filepath      The filepath to the open project
+         * @param askForSave    See #closeProject(project::Project*, bool)
+         *
+         * @return See #closeProject(project::Project*, bool)
+         */
+        bool closeProject(const FilePath& filepath, bool askForSave) noexcept;
+
+        /**
+         * @brief Close all open projects
+         *
+         * @param askForSave    See #closeProject(project::Project*, bool)
+         *
+         * @return  False if the user has canceled at least one "save project?" dialog (so
+         *          at least one project is still open after calling this method).
+         *          True in all other cases.
+         */
+        bool closeAllProjects(bool askForSave = false) noexcept;
+
+        /**
+         * @brief Method to unregister an open project
+         *
+         * @warning This method must be called only from the destructor project#Project#~Project()!
+         *
+         * @param project   The pointer to the project which will be closed
+         */
+        void unregisterOpenProject(project::Project* project) noexcept;
+
+        /**
+         * @brief Get the pointer to an already open project by its filepath
+         *
+         * This method can also be used to check whether a project (by its filepath) is
+         * already open or not.
+         *
+         * @param filepath  The filepath to a *.e4u project file
+         *
+         * @return The pointer to the open project, or nullptr if the project is not open
+         */
+        project::Project* getOpenProject(const FilePath& filepath) const noexcept;
+
+        /**
+         * @brief Check whether a project is in the favorite project list or not
+         *
+         * @param filepath  The filepath to a *.e4u project file
+         *
+         * @return True if the specified project is in the favorites list, false otherwise
+         */
+        bool isFavoriteProject(const FilePath& filepath) const noexcept;
+
+        /**
+         * @brief Add a project to the favorite projects list
+         *
+         * @param filepath  The filepath to a *.e4u project file
+         */
+        void addFavoriteProject(const FilePath& filepath) noexcept;
+
+        /**
+         * @brief Remove a project from the favorite projects list
+         *
+         * @param filepath  The filepath to a *.e4u project file
+         */
+        void removeFavoriteProject(const FilePath& filepath) noexcept;
+
 
         // Static Methods
-        static bool isValidWorkspacePath(const FilePath& path);
-        static bool createNewWorkspace(const FilePath& path);
-        static FilePath getMostRecentlyUsedWorkspacePath();
-        static void setMostRecentlyUsedWorkspacePath(const FilePath& path);
-        static FilePath chooseWorkspacePath();
+
+        /**
+         * @brief Check whether a filepath points to a valid workspace directory or not
+         *
+         * @param path  A path to a directory
+         *
+         * @return True if the path is a valid workspace directory, false otherwise
+         */
+        static bool isValidWorkspacePath(const FilePath& path) noexcept;
+
+        /**
+         * @brief Create a new workspace
+         *
+         * @param path  A path to a directory where to create the new workspace
+         *
+         * @return True if success, false otherwise
+         */
+        static bool createNewWorkspace(const FilePath& path) noexcept;
+
+        /**
+         * @brief Get the most recently used workspace path
+         *
+         * @return The filepath to the last recently used workspace (may be invalid)
+         */
+        static FilePath getMostRecentlyUsedWorkspacePath() noexcept;
+
+        /**
+         * @brief Set the most recently used workspace path
+         *
+         * @param path  The filepath to the workspace directory
+         */
+        static void setMostRecentlyUsedWorkspacePath(const FilePath& path) noexcept;
+
+        /**
+         * @brief Let the user choose a workspace path (with a directory chooser dialog)
+         *
+         * @return The choosen filepath (is invalid on error or user cancel)
+         */
+        static FilePath chooseWorkspacePath() noexcept;
 
         /**
          * @brief Get the Workspace singleton instance
@@ -174,10 +298,21 @@ class Workspace final : public QObject
          */
         static Workspace& instance() noexcept {Q_ASSERT(sInstance); return *sInstance;}
 
+
     public slots:
 
-        void showControlPanel() const;
-        void openLibraryEditor();
+        // Public Slots
+
+        /**
+         * @brief Show the control panel (bring it to front if already open)
+         */
+        void showControlPanel() const noexcept;
+
+        /**
+         * @brief Open the library editor (bring it to front if already open)
+         */
+        void openLibraryEditor() noexcept;
+
 
     private:
 
@@ -186,6 +321,8 @@ class Workspace final : public QObject
         Workspace(const Workspace& other);
         Workspace& operator=(const Workspace& rhs);
 
+
+        // Attributes
         FilePath mPath; ///< a FilePath object which represents the workspace directory
         FileLock mLock; ///< to lock the whole workspace (allow only one app instance)
         FilePath mMetadataPath; ///< the directory ".metadata"
@@ -200,6 +337,7 @@ class Workspace final : public QObject
         RecentProjectsModel* mRecentProjectsModel; ///< a list model of all recent projects
         FavoriteProjectsModel* mFavoriteProjectsModel; ///< a list model of all favorite projects
         QHash<unsigned int, SchematicLayer*> mSchematicLayers; ///< all workspace schematic layers
+
 
         // static variables
         static Workspace* sInstance;

@@ -257,6 +257,8 @@ class FileLock final : public QObject
         FileLock& operator=(const FileLock& rhs);   ///< inaccessible
 
 
+        // Attributes
+
         /**
          * @brief The filepath to the file to lock (passed by #setFileToLock())
          */

@@ -39,7 +39,8 @@ namespace project {
 
 Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
                      bool readOnly, bool create, const QString& newName) throw (Exception):
-    CADScene(), IF_AttributeProvider(), mProject(project), mFilePath(filepath), mXmlFile(0)
+    CADScene(), IF_AttributeProvider(), mProject(project), mFilePath(filepath),
+    mXmlFile(nullptr), mAddedToProject(false)
 {
     try
     {
@@ -151,6 +152,11 @@ Schematic::~Schematic()
 /*****************************************************************************************
  *  Getters: General
  ****************************************************************************************/
+
+bool Schematic::isEmpty() const noexcept
+{
+    return (mSymbols.isEmpty() && mNetPoints.isEmpty() && mNetLines.isEmpty());
+}
 
 uint Schematic::getNetPointsAtScenePos(QList<SchematicNetPoint*>& list, const Point& pos) const noexcept
 {
@@ -361,6 +367,18 @@ void Schematic::removeNetLine(SchematicNetLine* netline, bool fromDomTree,
  *  General Methods
  ****************************************************************************************/
 
+void Schematic::addToProject() throw (Exception)
+{
+    Q_ASSERT(mAddedToProject == false);
+    mAddedToProject = true;
+}
+
+void Schematic::removeFromProject() throw (Exception)
+{
+    Q_ASSERT(mAddedToProject == true);
+    mAddedToProject = false;
+}
+
 bool Schematic::save(bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
@@ -389,6 +407,7 @@ bool Schematic::save(bool toOriginal, QStringList& errors) noexcept
     // save schematic XML file
     try
     {
+        mXmlFile->setRemoveFlag(!mAddedToProject);
         mXmlFile->save(toOriginal);
     }
     catch (Exception& e)

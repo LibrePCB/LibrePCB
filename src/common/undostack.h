@@ -64,7 +64,8 @@ class UndoCommand;
  * @author ubruhin
  * @date 2014-08-20
  *
- * @todo this class is not yet tested
+ * @todo This class is not yet tested very well. Does it work correctly when destroying
+ *       an #UndoStack object while the current index is not the index of the last command?
  */
 class UndoStack final : public QObject
 {

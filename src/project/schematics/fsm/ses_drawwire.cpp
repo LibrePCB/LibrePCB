@@ -186,6 +186,9 @@ bool SES_DrawWire::entry(SEE_Base* event) noexcept
     mWidthComboBox->setEnabled(false); // this feature is not yet available --> disable
     mEditorUi.commandToolbar->addWidget(mWidthComboBox);
 
+    // change the cursor
+    mEditorUi.graphicsView->setCursor(Qt::CrossCursor);
+
     return true;
 }
 
@@ -212,6 +215,9 @@ bool SES_DrawWire::exit(SEE_Base* event) noexcept
     // Uncheck this state in the "tools" toolbar
     mEditorUi.actionToolDrawWire->setCheckable(false);
     mEditorUi.actionToolDrawWire->setChecked(false);
+
+    // change the cursor
+    mEditorUi.graphicsView->setCursor(Qt::ArrowCursor);
 
     return true;
 }

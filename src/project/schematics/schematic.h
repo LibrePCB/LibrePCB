@@ -96,6 +96,7 @@ class Schematic final : public CADScene, public IF_AttributeProvider
         const QIcon& getIcon() const noexcept {return mIcon;}
 
         // Getters: General
+        bool isEmpty() const noexcept;
         uint getNetPointsAtScenePos(QList<SchematicNetPoint*>& list, const Point& pos) const noexcept;
         uint getNetLinesAtScenePos(QList<SchematicNetLine*>& list, const Point& pos) const noexcept;
         uint getPinsAtScenePos(QList<SymbolPinInstance*>& list, const Point& pos) const noexcept;
@@ -126,6 +127,8 @@ class Schematic final : public CADScene, public IF_AttributeProvider
                            bool deleteNetLine = false) throw (Exception);
 
         // General Methods
+        void addToProject() throw (Exception);
+        void removeFromProject() throw (Exception);
         bool save(bool toOriginal, QStringList& errors) noexcept;
         void saveViewSceneRect(const QRectF& rect) noexcept {mViewRect = rect;}
         const QRectF& restoreViewSceneRect() const noexcept {return mViewRect;}
@@ -154,6 +157,7 @@ class Schematic final : public CADScene, public IF_AttributeProvider
         Project& mProject; ///< A reference to the Project object (from the ctor)
         FilePath mFilePath; ///< the filepath of the schematic *.xml file (from the ctor)
         SmartXmlFile* mXmlFile;
+        bool mAddedToProject;
 
         QRectF mViewRect;
 

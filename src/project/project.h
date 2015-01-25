@@ -161,17 +161,17 @@ class Project final : public QObject, public IF_AttributeProvider
          *
          * @return A reference to the QHash with all schematic layers
          */
-        const QHash<unsigned int, SchematicLayer*>& getSchematicLayers() const noexcept {return mSchematicLayers;}
+        const QHash<uint, SchematicLayer*>& getSchematicLayers() const noexcept {return mSchematicLayers;}
 
         /**
          * @brief Get a Schematic Layer with a specific ID
          *
          * @param id    The ID of the layer
          *
-         * @return  A pointer to the SchematicLayer object, or NULL if there is no layer
+         * @return  A pointer to the SchematicLayer object, or nullptr if there is no layer
          *          with the specified ID
          */
-        SchematicLayer* getSchematicLayer(unsigned int id) const noexcept {return mSchematicLayers.value(id, 0);}
+        SchematicLayer* getSchematicLayer(uint id) const noexcept {return mSchematicLayers.value(id, nullptr);}
 
         /**
          * @brief Get the page index of a specific schematic
@@ -192,16 +192,16 @@ class Project final : public QObject, public IF_AttributeProvider
          *
          * @param index     The page index (zero is the first)
          *
-         * @return A pointer to the specified schematic, or NULL if index is invalid
+         * @return A pointer to the specified schematic, or nullptr if index is invalid
          */
-        Schematic* getSchematicByIndex(int index) const noexcept {return mSchematics.value(index);}
+        Schematic* getSchematicByIndex(int index) const noexcept {return mSchematics.value(index, nullptr);}
 
         /**
          * @brief Get the schematic page with a specific UUID
          *
          * @param uuid      The schematic UUID
          *
-         * @return A pointer to the specified schematic, or NULL if uuid is invalid
+         * @return A pointer to the specified schematic, or nullptr if uuid is invalid
          */
         Schematic* getSchematicByUuid(const QUuid& uuid) const noexcept;
 
@@ -210,7 +210,7 @@ class Project final : public QObject, public IF_AttributeProvider
          *
          * @param name      The schematic name
          *
-         * @return A pointer to the specified schematic, or NULL if name is invalid
+         * @return A pointer to the specified schematic, or nullptr if name is invalid
          */
         Schematic* getSchematicByName(const QString& name) const noexcept;
 
@@ -259,6 +259,8 @@ class Project final : public QObject, public IF_AttributeProvider
          * @brief Set the name of the project
          *
          * @param newName           The new name (should not be empty!)
+         *
+         * @undocmd{project#CmdProjectSetMetadata}
          */
         void setName(const QString& newName) noexcept;
 
@@ -266,6 +268,8 @@ class Project final : public QObject, public IF_AttributeProvider
          * @brief Set the description (in HTML) of the project
          *
          * @param newDescription    The new description (HTML)
+         *
+         * @undocmd{project#CmdProjectSetMetadata}
          */
         void setDescription(const QString& newDescription) noexcept;
 
@@ -273,6 +277,8 @@ class Project final : public QObject, public IF_AttributeProvider
          * @brief Set the author of the project
          *
          * @param newAuthor         The new author
+         *
+         * @undocmd{project#CmdProjectSetMetadata}
          */
         void setAuthor(const QString& newAuthor) noexcept;
 
@@ -280,6 +286,8 @@ class Project final : public QObject, public IF_AttributeProvider
          * @brief Set the date and time when the project was created
          *
          * @param newCreated        The new created datetime
+         *
+         * @undocmd{project#CmdProjectSetMetadata}
          */
         void setCreated(const QDateTime& newCreated) noexcept;
 
@@ -287,6 +295,8 @@ class Project final : public QObject, public IF_AttributeProvider
          * @brief Set the date and time when the project was last modified
          *
          * @param newLastModified   The new last modified datetime
+         *
+         * @note This method is automatically called before saving the project.
          */
         void setLastModified(const QDateTime& newLastModified) noexcept;
 
@@ -309,25 +319,25 @@ class Project final : public QObject, public IF_AttributeProvider
          *
          * @param schematic     The schematic to add
          * @param newIndex      The desired index in the list (after inserting it)
-         * @param toList        If true, the schematic will be added to the schematics
-         *                      list in "schematics/schematics.ini"
          *
          * @throw Exception     On error
+         *
+         * @undocmd{project#CmdSchematicAdd}
          */
-        void addSchematic(Schematic* schematic, int newIndex = -1, bool toList = true) throw (Exception);
+        void addSchematic(Schematic* schematic, int newIndex = -1) throw (Exception);
 
         /**
          * @brief Remove a schematic from this project
          *
          * @param schematic         The schematic to remove
-         * @param fromList          If true, the schematic will be removed from the
-         *                          schematics list in "schematics/schematics.ini"
          * @param deleteSchematic   If true, the schematic object will be deleted
+         *                          (Set this to true only when called from ctor or dtor!!)
          *
          * @throw Exception     On error
+         *
+         * @undocmd{project#CmdSchematicRemove}
          */
-        void removeSchematic(Schematic* schematic, bool fromList = true,
-                             bool deleteSchematic = false) throw (Exception);
+        void removeSchematic(Schematic* schematic, bool deleteSchematic = false) throw (Exception);
 
         /**
          * @brief Export the schematic pages as a PDF
@@ -357,10 +367,14 @@ class Project final : public QObject, public IF_AttributeProvider
          *
          * @return true if the window can be closed, false if closing the window is denied
          */
-        bool windowIsAboutToClose(QMainWindow* window);
+        bool windowIsAboutToClose(QMainWindow* window) noexcept;
 
 
         // Helper Methods
+
+        /**
+         * @copydoc IF_AttributeProvider#getAttributeValue()
+         */
         bool getAttributeValue(const QString& attrNS, const QString& attrKey,
                                bool passToParents, QString& value) const noexcept;
 
@@ -370,7 +384,7 @@ class Project final : public QObject, public IF_AttributeProvider
         /**
          * @brief Open the schematic editor window and bring it to the front
          */
-        void showSchematicEditor();
+        void showSchematicEditor() noexcept;
 
         /**
          * @brief Set the "modified" flag of this project
@@ -391,7 +405,7 @@ class Project final : public QObject, public IF_AttributeProvider
          *
          * @return true on success, false on failure
          */
-        bool save() noexcept;
+        bool saveProject() noexcept;
 
         /**
          * @brief Make a automatic backup of the project (save to temporary files)
@@ -400,7 +414,7 @@ class Project final : public QObject, public IF_AttributeProvider
          *
          * @return true on success, false on failure
          */
-        bool autosave() noexcept;
+        bool autosaveProject() noexcept;
 
         /**
          * @brief Close the project (this will destroy this object!)
@@ -421,13 +435,25 @@ class Project final : public QObject, public IF_AttributeProvider
          *
          * @return true on success, false on failure (= project stays open)
          */
-        bool close(QWidget* msgBoxParent = 0);
+        bool close(QWidget* msgBoxParent = 0) noexcept;
 
 
     signals:
 
+        /**
+         * @brief This signal is emitted after a schematic was added to the project
+         *
+         * @param newIndex  The index of the added schematic
+         */
         void schematicAdded(int newIndex);
+
+        /**
+         * @brief This signal is emitted after a schematic was removed from the project
+         *
+         * @param oldIndex  The index of the removed schematic
+         */
         void schematicRemoved(int oldIndex);
+
 
     private:
 
@@ -436,11 +462,38 @@ class Project final : public QObject, public IF_AttributeProvider
         Project(const Project& other);
         Project& operator=(const Project& rhs);
 
-        // Private Methods
-        void updateSchematicsList() throw (Exception);
-        bool save(bool toOriginal, QStringList& errors) noexcept;
-        void printSchematicPages(QPrinter& printer, QList<unsigned int>& pages) throw (Exception);
 
+        // Private Methods
+
+        /**
+         * @brief Update the content of the file #mSchematicsIniFile
+         *
+         * @throw Exception     On error
+         */
+        void updateSchematicsList() throw (Exception);
+
+        /**
+         * @brief Save the project to the harddisc (to temporary or original files)
+         *
+         * @param toOriginal    True: save to original files; False: save to temporary files
+         * @param errors        All errors will be added to this string list (translated)
+         *
+         * @return True on success (then the error list should be empty), false otherwise
+         */
+        bool save(bool toOriginal, QStringList& errors) noexcept;
+
+        /**
+         * @brief Print some schematics to a QPrinter (printer or file)
+         *
+         * @param printer   The QPrinter where to print the schematic pages
+         * @param pages     A list with all schematic page indexes which should be printed
+         *
+         * @throw Exception     On error
+         */
+        void printSchematicPages(QPrinter& printer, QList<uint>& pages) throw (Exception);
+
+
+        // Attributes
 
         // Project File (*.e4u)
         FilePath mPath; ///< the path to the project directory
@@ -464,12 +517,13 @@ class Project final : public QObject, public IF_AttributeProvider
         bool mProjectIsModified; ///< this flag indicates whether the project contains unsaved changed or not (changes using #UndoCommand will NOT set this flag!)
         QTimer mAutoSaveTimer; ///< the timer for the periodically automatic saving functionality (see also @ref doc_project_save)
         UndoStack* mUndoStack; ///< See @ref doc_project_undostack
-        ProjectLibrary* mProjectLibrary;
-        ErcMsgList* mErcMsgList;
-        Circuit* mCircuit;
-        QList<Schematic*> mSchematics;
-        SchematicEditor* mSchematicEditor;
-        QHash<unsigned int, SchematicLayer*> mSchematicLayers;
+        ProjectLibrary* mProjectLibrary; ///< the library which contains all elements needed in this project
+        ErcMsgList* mErcMsgList; ///< A list which contains all electrical rule check (ERC) messages
+        Circuit* mCircuit; ///< The whole circuit of this project (contains all netclasses, netsignals, generic component instances, ...)
+        QList<Schematic*> mSchematics; ///< All schematics of this project
+        QList<Schematic*> mRemovedSchematics; ///< All removed schematics of this project
+        SchematicEditor* mSchematicEditor; ///< The schematic editor (GUI)
+        QHash<uint, SchematicLayer*> mSchematicLayers; ///< All schematic layers of this project
 };
 
 } // namespace project

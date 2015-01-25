@@ -34,7 +34,6 @@
 
 namespace project {
 class Project;
-class Circuit;
 }
 
 /*****************************************************************************************
@@ -55,7 +54,7 @@ class Board final : public CADScene
 
     public:
 
-        explicit Board(Project& project, Circuit& circuit);
+        explicit Board(Project& project);
         ~Board();
 
     private:
@@ -67,7 +66,6 @@ class Board final : public CADScene
 
         // General
         Project& mProject; ///< A reference to the Project object (from the ctor)
-        Circuit& mCircuit; ///< A reference to the Circuit object (from the ctor)
 
 };
 

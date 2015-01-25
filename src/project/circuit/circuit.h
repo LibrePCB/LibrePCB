@@ -53,7 +53,18 @@ class GenCompSymbVar;
 namespace project {
 
 /**
- * @brief The Circuit class
+ * @brief   The Circuit class represents all electrical connections in a project (drawed
+ *          in the schematics)
+ *
+ * Each project#Project object contains exactly one #Circuit object which contains the
+ * whole electrical components and connections. They are created with the schematic editor
+ * and used by the board editor. The whole circuit is saved in the file "circuit.xml" in
+ * the project's "core" directory.
+ *
+ * Each #Circuit object contains:
+ *  - All net classes (project#NetClass objects)
+ *  - All net signals (project#NetSignal objects)
+ *  - All generic component instances (project#GenCompInstance objects)
  *
  * @author ubruhin
  * @date 2014-07-03
@@ -95,11 +106,11 @@ class Circuit final : public QObject
         GenCompInstance* getGenCompInstanceByUuid(const QUuid& uuid) const noexcept;
         GenCompInstance* getGenCompInstanceByName(const QString& name) const noexcept;
         GenCompInstance* createGenCompInstance(const library::GenericComponent& genComp,
-                                                        const library::GenCompSymbVar& symbVar,
-                                                        QString name = QString()) throw (Exception);
+                                               const library::GenCompSymbVar& symbVar,
+                                               QString name = QString()) throw (Exception);
         void addGenCompInstance(GenCompInstance* genCompInstance, bool toDomTree = true) throw (Exception);
         void removeGenCompInstance(GenCompInstance* genCompInstance, bool fromDomTree = true,
-                             bool deleteGenCompInstance = false) throw (Exception);
+                                   bool deleteGenCompInstance = false) throw (Exception);
         void setGenCompInstanceName(GenCompInstance& genComp, const QString& newName) throw (Exception);
 
         // General Methods

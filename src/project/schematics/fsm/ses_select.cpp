@@ -461,8 +461,9 @@ bool SES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
         // rotate all netpoints
         foreach (SchematicNetPoint* point, netpoints)
         {
-            // TODO: use undo command
-            point->setPosition(point->getPosition().rotated(angle, center));
+            CmdSchematicNetPointMove* cmd = new CmdSchematicNetPointMove(*point);
+            cmd->setAbsolutePosTemporary(point->getPosition().rotated(angle, center));
+            mEditor.getProject().getUndoStack().appendToCommand(cmd);
         }
 
         mEditor.getProject().getUndoStack().endCommand();

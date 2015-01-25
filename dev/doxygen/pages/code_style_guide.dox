@@ -13,6 +13,12 @@
         - C++11
         - Use strongly typed enums ("enum class", C++11) whenever reasonable
         - Use "nullptr" instead of "NULL" or "0"
+        - Use keywords like "const", "constexpr", "final", ... whenever possible
+        - Use exception specifier in method declarations:
+            @code
+            void foo() noexcept;            // this method never throws exceptions
+            void bar() throw (Exception);   // this method can throw exceptions of type "Exception" (or any subclass of it)
+            @endcode
     
     
     @section doc_code_style_guide_header_files Header Files
@@ -48,6 +54,18 @@
     
         - If you need integer types with fixed width, us Qt's typedefs (for example "qint32") instead of the types from <stdint.h> (for example "int32_t").
         - For floating point numbers, use Qt's typedef "qreal" instead of "float" or "double" whenever possible. This way, the application will work also on ARM platforms with single precision FPU quite well.
+        
+        
+    @section doc_code_style_guide_qt_qobject QObject
+    
+        - Inherit from QObject only when needed (for example if you only need QObject::tr() a few times, you can also use QApplication::translate() instead)
+        - Try to avoid using QObject::connect() with Qt's SIGNAL() and SLOT() macros! Use function addresses instead (whenever possible). This way, signals and slots are checked on compile-time instead of runtime.
+            @code
+            connect(&myTimer, SIGNAL(timeout()), this, SLOT(mySlot()));     // uses runtime check --> avoid this!
+            connect(&myTimer, &QTimer::timeout, this, &MyClass::anyMethod); // uses compile-time check (and any method can be used as slots!) --> much better!
+            connect(&mAutoSaveTimer, &QTimer::timeout, [this](){doSomething();});   // Using C++11 lambda functions as slots is also possible 
+                                                                                    // --> can be very useful, but use it carefully (dangling pointers, ...)
+            @endcode
         
     
     @section doc_code_style_guide_qt_macros Qt Macros
