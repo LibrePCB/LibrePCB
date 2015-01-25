@@ -41,11 +41,8 @@ CmdSchematicAdd::CmdSchematicAdd(Project& project, const QString& name,
 
 CmdSchematicAdd::~CmdSchematicAdd() noexcept
 {
-    if ((mSchematic) && (!mIsExecuted))
-    {
-        try { mSchematic->removeFiles(); } catch (...) {}
+    if (!mIsExecuted)
         delete mSchematic;
-    }
 }
 
 /*****************************************************************************************

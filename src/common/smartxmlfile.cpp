@@ -24,27 +24,39 @@
 #include <QtCore>
 #include <QDomDocument>
 #include <QDomElement>
-#include "xmlfile.h"
-#include "exceptions.h"
-#include "filepath.h"
+#include "smartxmlfile.h"
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-XmlFile::XmlFile(const FilePath& filepath, bool restore, bool readOnly,
-                 const QString& rootName) throw (Exception) :
-    TextFile(filepath, restore, readOnly), mDomDocument(), mDomRoot(), mFileVersion(-1)
+SmartXmlFile::SmartXmlFile(const FilePath& filepath, bool restore, bool readOnly, bool create,
+                 const QString& rootName, int expectedVersion, int createVersion) throw (Exception) :
+    SmartFile(filepath, restore, readOnly, create), mDomDocument(), mDomRoot(),
+    mFileVersion(-1)
 {
     mDomDocument.implementation().setInvalidDataPolicy(QDomImplementation::ReturnNullNode);
 
-    // load XML into mDomDocument
+    QString fileContent;
+
+    if (mIsCreated)
+    {
+        QString xmlTmpl("<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n<%1 file_version=\"%2\"/>");
+        fileContent = xmlTmpl.arg(rootName).arg(createVersion).toUtf8();
+    }
+    else
+    {
+        // read the content of the file
+        fileContent = readContentFromFile(mOpenedFilePath);
+    }
+
+    // load XML from mContent into mDomDocument
     QString errMsg;
     int errLine;
     int errColumn;
-    if (!mDomDocument.setContent(mContent, &errMsg, &errLine, &errColumn))
+    if (!mDomDocument.setContent(fileContent, &errMsg, &errLine, &errColumn))
     {
-        QString line = mContent.split('\n').at(errLine-1);
+        QString line = fileContent.split('\n').at(errLine-1);
         throw RuntimeError(__FILE__, __LINE__, QString("%1: %2 [%3:%4] LINE:%5")
             .arg(mOpenedFilePath.toStr(), errMsg).arg(errLine).arg(errColumn).arg(line),
             QString(tr("Error while parsing XML in file \"%1\": %2 [%3:%4]"))
@@ -69,11 +81,19 @@ XmlFile::XmlFile(const FilePath& filepath, bool restore, bool readOnly,
 
     // read the file version
     bool ok;
-    int version = mDomRoot.attribute("file_version").toInt(&ok);
-    mFileVersion = ok ? version : -1;
+    mFileVersion = mDomRoot.attribute("file_version").toInt(&ok);
+    if (!ok) mFileVersion = -1;
+
+    // check the file version number
+    if ((expectedVersion > -1) && (mFileVersion != expectedVersion))
+    {
+        throw RuntimeError(__FILE__, __LINE__, QString(),
+            QString(tr("Invalid file version in \"%1\": %2 (expected: %3)"))
+            .arg(mOpenedFilePath.toNative()).arg(mFileVersion).arg(expectedVersion));
+    }
 }
 
-XmlFile::~XmlFile() noexcept
+SmartXmlFile::~SmartXmlFile() noexcept
 {
 }
 
@@ -81,7 +101,7 @@ XmlFile::~XmlFile() noexcept
  *  Setters
  ****************************************************************************************/
 
-void XmlFile::setFileVersion(int version) noexcept
+void SmartXmlFile::setFileVersion(int version) noexcept
 {
     // Do NOT use QDomElement::setAttribute(QString, int) as it will use the user's locale!
     // Use the locale-independent QString::number(int) instead to convert the version number!
@@ -90,41 +110,22 @@ void XmlFile::setFileVersion(int version) noexcept
 }
 
 /*****************************************************************************************
- *  General Methods
- ****************************************************************************************/
-
-void XmlFile::save(bool toOriginal) throw (Exception)
-{
-    if (mIsReadOnly)
-        throw LogicError(__FILE__, __LINE__, QString(), tr("Cannot save read-only file!"));
-
-    mContent = mDomDocument.toByteArray(4);
-    TextFile::save(toOriginal);
-}
-
-/*****************************************************************************************
  *  Static Methods
  ****************************************************************************************/
 
-XmlFile* XmlFile::create(const FilePath& filepath, const QString& rootName, int version) throw (Exception)
+SmartXmlFile* SmartXmlFile::create(const FilePath &filepath, const QString& rootName,
+                                   int version) throw (Exception)
 {
-    QString xmlTmpl("<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n<%1/>");
+    return new SmartXmlFile(filepath, false, false, true, rootName, version, version);
+}
 
-    // create DOM document
-    QDomDocument dom;
-    QString errMsg;
-    if (!dom.setContent(xmlTmpl.arg(rootName), &errMsg))
-        throw LogicError(__FILE__, __LINE__, errMsg, tr("Could not set XML DOM content!"));
-    QDomElement root = dom.documentElement();
-    if ((root.isNull()) || (root.tagName() != rootName))
-        throw LogicError(__FILE__, __LINE__, rootName, tr("No DOM root found!"));
-    if (version > -1)
-        root.setAttribute("version", QString::number(version)); // see comment in #setFileVersion()
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
 
-    // save DOM document to temporary file
-    saveContentToFile(FilePath(filepath.toStr() % '~'), dom.toByteArray(4));
-
-    return new XmlFile(filepath, true, false, rootName);
+void SmartXmlFile::saveToFile(const FilePath& filepath) throw (Exception)
+{
+    saveContentToFile(filepath, mDomDocument.toByteArray(4));
 }
 
 /*****************************************************************************************

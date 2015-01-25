@@ -35,7 +35,7 @@
  *  Forward Declarations
  ****************************************************************************************/
 
-class XmlFile;
+class SmartXmlFile;
 
 namespace project {
 class Project;
@@ -84,8 +84,8 @@ class Schematic final : public CADScene, public IF_AttributeProvider
 
 
         // Constructors / Destructor
-        explicit Schematic(Project& project, const FilePath& filepath, bool restore,
-                           bool readOnly, bool isNew = false) throw (Exception);
+        explicit Schematic(Project& project, const FilePath& filepath, bool restore, bool readOnly) throw (Exception) :
+            Schematic(project, filepath, restore, readOnly, false, QString()) {}
         ~Schematic() noexcept;
 
         // Getters: Attributes
@@ -126,7 +126,6 @@ class Schematic final : public CADScene, public IF_AttributeProvider
                            bool deleteNetLine = false) throw (Exception);
 
         // General Methods
-        void removeFiles() const throw (Exception);
         bool save(bool toOriginal, QStringList& errors) noexcept;
         void saveViewSceneRect(const QRectF& rect) noexcept {mViewRect = rect;}
         const QRectF& restoreViewSceneRect() const noexcept {return mViewRect;}
@@ -147,12 +146,14 @@ class Schematic final : public CADScene, public IF_AttributeProvider
         Schematic& operator=(const Schematic& rhs);
 
         // Private Methods
+        explicit Schematic(Project& project, const FilePath& filepath, bool restore,
+                           bool readOnly, bool create, const QString& newName) throw (Exception);
         void updateIcon() noexcept;
 
         // General
         Project& mProject; ///< A reference to the Project object (from the ctor)
         FilePath mFilePath; ///< the filepath of the schematic *.xml file (from the ctor)
-        XmlFile* mXmlFile;
+        SmartXmlFile* mXmlFile;
 
         QRectF mViewRect;
 

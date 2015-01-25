@@ -25,7 +25,7 @@
 #include "ercmsglist.h"
 #include "ercmsg.h"
 #include "../project.h"
-#include "../../common/xmlfile.h"
+#include "../../common/smartxmlfile.h"
 
 namespace project {
 
@@ -33,19 +33,17 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ErcMsgList::ErcMsgList(Project& project, bool restore, bool readOnly) throw (Exception) :
+ErcMsgList::ErcMsgList(Project& project, bool restore, bool readOnly, bool create) throw (Exception) :
     QObject(0), mProject(project),
     mXmlFilepath(project.getPath().getPathTo("core/erc.xml")), mXmlFile(nullptr)
 {
     try
     {
         // try to create/open the XML file "erc.xml"
-        if (mXmlFilepath.isExistingFile())
-            mXmlFile = new XmlFile(mXmlFilepath, restore, readOnly, "erc");
-        else if (!readOnly)
-            mXmlFile = XmlFile::create(mXmlFilepath, "erc", 0);
+        if (create)
+            mXmlFile = SmartXmlFile::create(mXmlFilepath, "erc", 0);
         else
-            mXmlFile = nullptr; // list opened in read-only mode and XML file does not exist!
+            mXmlFile = new SmartXmlFile(mXmlFilepath, restore, readOnly, "erc", 0);
     }
     catch (...)
     {
@@ -93,8 +91,6 @@ void ErcMsgList::update(ErcMsg* ercMsg) noexcept
 
 void ErcMsgList::restoreIgnoreState() noexcept
 {
-    if (!mXmlFile) return;
-
     QDomElement child = mXmlFile->getRoot().firstChildElement("ignore");
     if (child.isNull()) return; // XML file is empty
 
@@ -121,8 +117,6 @@ void ErcMsgList::restoreIgnoreState() noexcept
 
 bool ErcMsgList::save(bool toOriginal, QStringList& errors) noexcept
 {
-    Q_ASSERT(mXmlFile);
-    if (!mXmlFile) return false;
     bool success = true;
 
     // Save "core/erc.xml"

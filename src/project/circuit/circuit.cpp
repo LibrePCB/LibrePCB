@@ -25,7 +25,7 @@
 #include <QtWidgets>
 #include <QDomDocument>
 #include "../../common/exceptions.h"
-#include "../../common/xmlfile.h"
+#include "../../common/smartxmlfile.h"
 #include "circuit.h"
 #include "../project.h"
 #include "netclass.h"
@@ -51,9 +51,9 @@ Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create) thr
     {
         // try to create/open the XML file "circuit.xml"
         if (create)
-            mXmlFile = XmlFile::create(mXmlFilepath, "circuit", 0);
+            mXmlFile = SmartXmlFile::create(mXmlFilepath, "circuit", 0);
         else
-            mXmlFile = new XmlFile(mXmlFilepath, restore, readOnly, "circuit");
+            mXmlFile = new SmartXmlFile(mXmlFilepath, restore, readOnly, "circuit", 0);
 
         // OK - XML file is open --> now load the whole circuit stuff
 

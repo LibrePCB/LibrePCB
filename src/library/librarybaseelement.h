@@ -26,7 +26,7 @@
 
 #include <QObject>
 #include <QDomElement>
-#include "../common/xmlfile.h"
+#include "../common/smartxmlfile.h"
 #include "../common/filepath.h"
 #include "../common/version.h"
 
@@ -150,7 +150,7 @@ class LibraryBaseElement : public QObject
 
         // General Attributes
         FilePath mXmlFilepath;
-        XmlFile* mXmlFile;
+        SmartXmlFile* mXmlFile;
         QDomElement mDomRoot;
 
         // General Library Element Attributes

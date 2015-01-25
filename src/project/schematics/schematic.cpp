@@ -23,7 +23,7 @@
 
 #include <QtCore>
 #include "schematic.h"
-#include "../../common/xmlfile.h"
+#include "../../common/smartxmlfile.h"
 #include "../project.h"
 #include "symbolinstance.h"
 #include "schematicnetpoint.h"
@@ -38,14 +38,37 @@ namespace project {
  ****************************************************************************************/
 
 Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
-                     bool readOnly, bool isNew)
-                     throw (Exception):
+                     bool readOnly, bool create, const QString& newName) throw (Exception):
     CADScene(), IF_AttributeProvider(), mProject(project), mFilePath(filepath), mXmlFile(0)
 {
     try
     {
-        // try to open the XML schematic file
-        mXmlFile = new XmlFile(mFilePath, restore, readOnly, QStringLiteral("schematic"));
+        // try to open/create the XML schematic file
+        if (create)
+        {
+            mXmlFile = SmartXmlFile::create(mFilePath, "schematic", 0);
+
+            // create node "meta" with schematic UUID and name
+            QDomElement metaNode = mXmlFile->getDocument().createElement("meta");
+            QDomElement uuidNode = mXmlFile->getDocument().createElement("uuid");
+            QDomElement nameNode = mXmlFile->getDocument().createElement("name");
+            QDomText uuidText = mXmlFile->getDocument().createTextNode(QUuid::createUuid().toString());
+            QDomText nameText = mXmlFile->getDocument().createTextNode(newName);
+            uuidNode.appendChild(uuidText);
+            nameNode.appendChild(nameText);
+            metaNode.appendChild(uuidNode);
+            metaNode.appendChild(nameNode);
+            mXmlFile->getRoot().appendChild(metaNode);
+
+            // create nodes "symbols", "netpoints", and "netlines" (empty)
+            mXmlFile->getRoot().appendChild(mXmlFile->getDocument().createElement("symbols"));
+            mXmlFile->getRoot().appendChild(mXmlFile->getDocument().createElement("netpoints"));
+            mXmlFile->getRoot().appendChild(mXmlFile->getDocument().createElement("netlines"));
+        }
+        else
+        {
+            mXmlFile = new SmartXmlFile(mFilePath, restore, readOnly, "schematic", 0);
+        }
 
         // the schematic seems to be ready to open, so we will create all needed objects
 
@@ -77,35 +100,21 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
         }
 
         // Load all netpoints
-        if (isNew)
+        tmpNode = mXmlFile->getRoot().firstChildElement("netpoints").firstChildElement("netpoint");
+        while (!tmpNode.isNull())
         {
-            mXmlFile->getRoot().appendChild(mXmlFile->getDocument().createElement("netpoints"));
-        }
-        else
-        {
-            tmpNode = mXmlFile->getRoot().firstChildElement("netpoints").firstChildElement("netpoint");
-            while (!tmpNode.isNull())
-            {
-                SchematicNetPoint* netpoint = new SchematicNetPoint(*this, tmpNode);
-                addNetPoint(netpoint, false);
-                tmpNode = tmpNode.nextSiblingElement("netpoint");
-            }
+            SchematicNetPoint* netpoint = new SchematicNetPoint(*this, tmpNode);
+            addNetPoint(netpoint, false);
+            tmpNode = tmpNode.nextSiblingElement("netpoint");
         }
 
         // Load all netlines
-        if (isNew)
+        tmpNode = mXmlFile->getRoot().firstChildElement("netlines").firstChildElement("netline");
+        while (!tmpNode.isNull())
         {
-            mXmlFile->getRoot().appendChild(mXmlFile->getDocument().createElement("netlines"));
-        }
-        else
-        {
-            tmpNode = mXmlFile->getRoot().firstChildElement("netlines").firstChildElement("netline");
-            while (!tmpNode.isNull())
-            {
-                SchematicNetLine* netline = new SchematicNetLine(*this, tmpNode);
-                addNetLine(netline, false);
-                tmpNode = tmpNode.nextSiblingElement("netline");
-            }
+            SchematicNetLine* netline = new SchematicNetLine(*this, tmpNode);
+            addNetLine(netline, false);
+            tmpNode = tmpNode.nextSiblingElement("netline");
         }
 
         updateIcon();
@@ -352,11 +361,6 @@ void Schematic::removeNetLine(SchematicNetLine* netline, bool fromDomTree,
  *  General Methods
  ****************************************************************************************/
 
-void Schematic::removeFiles() const throw (Exception)
-{
-    mXmlFile->remove();
-}
-
 bool Schematic::save(bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
@@ -448,37 +452,7 @@ void Schematic::updateIcon() noexcept
 Schematic* Schematic::create(Project& project, const FilePath& filepath,
                              const QString& name) throw (Exception)
 {
-    // create XML file with root node
-    XmlFile* file = XmlFile::create(filepath, "schematic", 0);
-
-    // create node "meta" with schematic UUID and name
-    QDomElement metaNode = file->getDocument().createElement("meta");
-    QDomElement uuidNode = file->getDocument().createElement("uuid");
-    QDomElement nameNode = file->getDocument().createElement("name");
-    QDomText uuidText = file->getDocument().createTextNode(QUuid::createUuid().toString());
-    QDomText nameText = file->getDocument().createTextNode(name);
-    uuidNode.appendChild(uuidText);
-    nameNode.appendChild(nameText);
-    metaNode.appendChild(uuidNode);
-    metaNode.appendChild(nameNode);
-    file->getRoot().appendChild(metaNode);
-
-    // create node "symbols" (empty)
-    QDomElement symbolsNode = file->getDocument().createElement("symbols");
-    file->getRoot().appendChild(symbolsNode);
-
-    try
-    {
-        file->save(false); // write new (temporary) XML file to filesystem
-        Schematic* schematic = new Schematic(project, filepath, true, false, true); // create new Schematic
-        delete file; // this will remove the temporary file, so don't do this earlier!
-        return schematic;
-    }
-    catch (Exception& e)
-    {
-        delete file;
-        throw;
-    }
+    return new Schematic(project, filepath, false, false, true, name);
 }
 
 /*****************************************************************************************

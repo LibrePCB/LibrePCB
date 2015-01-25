@@ -25,9 +25,9 @@
 #include <QPrinter>
 #include "project.h"
 #include "../common/exceptions.h"
-#include "../common/textfile.h"
-#include "../common/xmlfile.h"
-#include "../common/inifile.h"
+#include "../common/smarttextfile.h"
+#include "../common/smartxmlfile.h"
+#include "../common/smartinifile.h"
 #include "../workspace/workspace.h"
 #include "../workspace/settings/workspacesettings.h"
 #include "library/projectlibrary.h"
@@ -155,9 +155,9 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
     {
         // try to create/open the XML project file
         if (create)
-            mXmlFile = XmlFile::create(mFilepath, QStringLiteral("project"), 0);
+            mXmlFile = SmartXmlFile::create(mFilepath, "project", 0);
         else
-            mXmlFile = new XmlFile(mFilepath, mIsRestored, mIsReadOnly, QStringLiteral("project"));
+            mXmlFile = new SmartXmlFile(mFilepath, mIsRestored, mIsReadOnly, "project", 0);
 
         // The project seems to be ready to open! Load all attributes...
         QDomElement metaElement = mXmlFile->getRoot().firstChildElement("meta");
@@ -168,14 +168,15 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
 
         // Load description HTML file
         if (create)
-            mDescriptionHtmlFile = TextFile::create(mPath.getPathTo("description/index.html"));
+            mDescriptionHtmlFile = SmartTextFile::create(mPath.getPathTo("description/index.html"));
         else
-            mDescriptionHtmlFile = new TextFile(mPath.getPathTo("description/index.html"), mIsRestored, mIsReadOnly);
+            mDescriptionHtmlFile = new SmartTextFile(mPath.getPathTo("description/index.html"),
+                                                     mIsRestored, mIsReadOnly);
 
         // Create all needed objects
         mUndoStack = new UndoStack();
         mProjectLibrary = new ProjectLibrary(*this, mIsRestored, mIsReadOnly);
-        mErcMsgList = new ErcMsgList(*this, mIsRestored, mIsReadOnly);
+        mErcMsgList = new ErcMsgList(*this, mIsRestored, mIsReadOnly, create);
         mCircuit = new Circuit(*this, mIsRestored, mIsReadOnly, create);
 
         // Load all schematic layers
@@ -184,9 +185,10 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
 
         // Load all schematics
         if (create)
-            mSchematicsIniFile = IniFile::create(mPath.getPathTo("schematics/schematics.ini"), 0);
+            mSchematicsIniFile = SmartIniFile::create(mPath.getPathTo("schematics/schematics.ini"), 0);
         else
-            mSchematicsIniFile = new IniFile(mPath.getPathTo("schematics/schematics.ini"), mIsRestored, mIsReadOnly);
+            mSchematicsIniFile = new SmartIniFile(mPath.getPathTo("schematics/schematics.ini"),
+                                                  mIsRestored, mIsReadOnly, 0);
         QSettings* schematicsSettings = mSchematicsIniFile->createQSettings();
         int schematicsCount = schematicsSettings->beginReadArray("pages");
         for (int i = 0; i < schematicsCount; i++)

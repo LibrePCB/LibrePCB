@@ -22,66 +22,48 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "cmdschematicremove.h"
-#include "../schematic.h"
-#include "../../project.h"
-
-namespace project {
+#include "smarttextfile.h"
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSchematicRemove::CmdSchematicRemove(Project& project, Schematic* schematic,
-                                       UndoCommand* parent) throw (Exception) :
-    UndoCommand(QCoreApplication::translate("CmdSchematicRemove", "Remove schematic"), parent),
-    mProject(project), mSchematic(schematic), mPageIndex(-1)
+SmartTextFile::SmartTextFile(const FilePath& filepath, bool restore, bool readOnly, bool create) throw (Exception) :
+    SmartFile(filepath, restore, readOnly, create)
 {
+    if (mIsCreated)
+    {
+        // nothing to do, leave "mContent" empty
+    }
+    else
+    {
+        // read the content of the file
+        mContent = readContentFromFile(mOpenedFilePath);
+    }
 }
 
-CmdSchematicRemove::~CmdSchematicRemove() noexcept
+SmartTextFile::~SmartTextFile()
 {
-    if (mIsExecuted)
-        delete mSchematic;
 }
 
 /*****************************************************************************************
- *  Inherited from UndoCommand
+ *  Protected Methods
  ****************************************************************************************/
 
-void CmdSchematicRemove::redo() throw (Exception)
+void SmartTextFile::saveToFile(const FilePath& filepath) throw (Exception)
 {
-    mPageIndex = mProject.getSchematicIndex(mSchematic);
-    mProject.removeSchematic(mSchematic); // throws an exception on error
-
-    try
-    {
-        UndoCommand::redo(); // throws an exception on error
-    }
-    catch (Exception& e)
-    {
-        mProject.addSchematic(mSchematic, mPageIndex);
-        throw;
-    }
+    saveContentToFile(filepath, mContent);
 }
 
-void CmdSchematicRemove::undo() throw (Exception)
-{
-    mProject.addSchematic(mSchematic, mPageIndex); // throws an exception on error
+/*****************************************************************************************
+ *  Static Methods
+ ****************************************************************************************/
 
-    try
-    {
-        UndoCommand::undo(); // throws an exception on error
-    }
-    catch (Exception& e)
-    {
-        mProject.removeSchematic(mSchematic);
-        throw;
-    }
+SmartTextFile* SmartTextFile::create(const FilePath& filepath) throw (Exception)
+{
+    return new SmartTextFile(filepath, false, false, true);
 }
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
-
-} // namespace project

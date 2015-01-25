@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef XMLFILE_H
-#define XMLFILE_H
+#ifndef SMARTXMLFILE_H
+#define SMARTXMLFILE_H
 
 /*****************************************************************************************
  *  Includes
@@ -27,31 +27,30 @@
 #include <QtCore>
 #include <QDomDocument>
 #include <QDomElement>
-#include "textfile.h"
+#include "smartfile.h"
 
 /*****************************************************************************************
- *  Class XmlFile
+ *  Class SmartXmlFile
  ****************************************************************************************/
 
 /**
- * @brief The XmlFile class represents a XML file and provides access over a QDomElement
+ * @brief The SmartXmlFile class represents a XML file and provides access over a QDomElement
  *
- * The constructor will try to open a XML file. Then the whole XML DOM tree is stored in
- * the private attribute #mDomDocument. With #getRoot() you can work with the XML root
- * node (read/write/add/remove nodes). With #save() the whole DOM tree can be written back
- * to the XML file. The destructor will close the file and delete the QDomDocument. With
- * the static method #create() you can create new, empty XML files.
+ * The constructor will try to open or create a XML file. Then the whole XML DOM tree is
+ * stored in the private attribute #mDomDocument. With #getRoot() you can work with the
+ * XML root node (read/write/add/remove nodes). With SmartFile#save() the whole DOM tree
+ * can be written back to the XML file. The destructor will close the file and delete the
+ * QDomDocument.
  *
- * @note    This class is also able to load from and save to backup files ("~" at the end
- *          of the filename). See @ref doc_project_save for more details.
+ * @note See class #SmartFile for more information.
  *
- * @warning Do not use QDomElement objects from #getRoot() after the #XmlFile object is
- *          destroyed! Dostroying the XmlFile object will also destroy the whole DOM tree!
+ * @warning Do not use QDomElement objects from #getRoot() after the #SmartXmlFile object is
+ *          destroyed! Dostroying the SmartXmlFile object will also destroy the whole DOM tree!
  *
  * @author ubruhin
  * @date 2014-08-13
  */
-class XmlFile final : public TextFile
+class SmartXmlFile final : public SmartFile
 {
         Q_OBJECT
 
@@ -60,18 +59,14 @@ class XmlFile final : public TextFile
         // Constructors / Destructor
 
         /**
-         * @brief The constructor to open a XML file
+         * @brief The constructor to open an existing XML file
          *
-         * This constructor tries to open an existing XML file and throws an exception
-         * if an error occurs.
+         * This constructor tries to open an existing file and throws an exception if an
+         * error occurs.
          *
-         * @param filepath  The filepath to the XML file (always to a original file, not
-         *                  to a backup file with "~" at the end of the filename!)
-         * @param restore   If true and a backup (*~) of the specified XML file exists,
-         *                  the backup will be opened instead of the original file. If no
-         *                  backup exists or this parameter is false, the original file
-         *                  will be opened.
-         * @param readOnly  If true, the file will be opened read-only (see #mIsReadOnly)
+         * @param filepath  See SmartFile#SmartFile()
+         * @param restore   See SmartFile#SmartFile()
+         * @param readOnly  See SmartFile#SmartFile()
          * @param rootName  If this is not an empty string, the constructor compares the
          *                  XML root node name with this value. If they are not identical,
          *                  the constructor throws an exception. This is useful to check
@@ -79,19 +74,21 @@ class XmlFile final : public TextFile
          *                  want to open a XML file with unknown content, use an empty
          *                  QString for this parameter and check the root node name with
          *                  <tt>getRoot().nodeName()</tt> afterwards.
+         * @param version   If you pass a number greater than -1, the constructor will
+         *                  check if the file version of the opened file equals to that
+         *                  number and throws an exception if not.
          *
-         * @throw Exception If the specified XML file could not be opened successful, an
+         * @throw Exception If the specified text file could not be opened successful, an
          *                  exception will be thrown.
          */
-        XmlFile(const FilePath& filepath, bool restore = false, bool readOnly = false,
-                const QString& rootName = QString()) throw (Exception);
+        SmartXmlFile(const FilePath& filepath, bool restore, bool readOnly,
+                     const QString& rootName = QString(), int version = -1) throw (Exception) :
+            SmartXmlFile(filepath, restore, readOnly, false, rootName, version, -1) {}
 
         /**
-         * @brief The destructor
-         *
-         * Removes the temporary file
+         * @copydoc SmartFile#~SmartFile()
          */
-        ~XmlFile() noexcept;
+        ~SmartXmlFile() noexcept;
 
 
         // Getters
@@ -135,48 +132,58 @@ class XmlFile final : public TextFile
         void setFileVersion(int version) noexcept;
 
 
-        // General Methods
-
-        /**
-         * @brief Save the whole XML DOM tree back to the XML file
-         *
-         * @param toOriginal    If true, the XML will be written to the original file. If
-         *                      false, the XML will be written to the backup file (*~).
-         *
-         * @throw Exception     If an error occurs, this method throws an exception.
-         */
-        void save(bool toOriginal) throw (Exception);
-
-
         // Static Methods
 
         /**
-         * @brief Create a new XML file with the XML header and a root node
+         * @brief Create a new text file
          *
-         * If the file does already exist, it will be overwritten.
+         * @note    This method will NOT immediately create the file! The file will be
+         *          created after calling SmartFile#save().
          *
-         * @note This method will NOT create the original file specified with "filepath"!
-         *       Instead it will only create it's backup file (*.xml~). You need to call
-         *       #save() afterwards if you also want to create the original file.
+         * @param filepath  The filepath to the file to create (always to the original file,
+         *                  not to the backup file with "~" at the end of the filename!)
+         * @param rootName  The name of the new root node (must not be empty)
+         * @param version   The file version of the created file (-1 if not needed)
          *
-         * @param filepath  The filepath of the new XML file
-         * @param rootName  The name of the XML root node (no special characters!!)
-         * @param version   The file version, or -1 if no version number should be added
+         * @return The #SmartXmlFile object of the created file
          *
-         * @return A pointer to the new XmlFile object
-         *
-         * @throw Exception If an error occurs, this method throws an exception.
+         * @throw Exception If an error occurs
          */
-        static XmlFile* create(const FilePath& filepath, const QString& rootName,
-                               int version = -1) throw (Exception);
+        static SmartXmlFile* create(const FilePath &filepath, const QString& rootName,
+                                    int version = -1) throw (Exception);
 
 
     private:
 
         // make some methods inaccessible...
-        XmlFile();
-        XmlFile(const XmlFile& other);
-        XmlFile& operator=(const XmlFile& rhs);
+        SmartXmlFile();
+        SmartXmlFile(const SmartXmlFile& other);
+        SmartXmlFile& operator=(const SmartXmlFile& rhs);
+
+
+        // Private Methods
+
+        /**
+         * @brief Constructor to create or open a XML file
+         *
+         * @param filepath          See SmartFile#SmartFile()
+         * @param restore           See SmartFile#SmartFile()
+         * @param readOnly          See SmartFile#SmartFile()
+         * @param create            See SmartFile#SmartFile()
+         * @param rootName          The name of the new root node (must not be empty)
+         * @param expectedVersion   The expected file version of the opened file
+         *                          (-1 if not needed)
+         * @param createVersion     The file version of the created file (-1 if not needed)
+         *
+         * @throw Exception See SmartFile#SmartFile()
+         */
+        SmartXmlFile(const FilePath& filepath, bool restore, bool readOnly, bool create,
+                     const QString& rootName, int expectedVersion, int createVersion) throw (Exception);
+
+        /**
+         * @copydoc SmartFile#saveToFile()
+         */
+        void saveToFile(const FilePath& filepath) throw (Exception);
 
 
         // General Attributes
@@ -197,7 +204,6 @@ class XmlFile final : public TextFile
          * If the file does not contain the version number, this attribute is -1.
          */
         int mFileVersion;
-
 };
 
-#endif // XMLFILE_H
+#endif // SMARTXMLFILE_H

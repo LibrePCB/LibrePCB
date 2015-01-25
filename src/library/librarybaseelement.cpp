@@ -41,7 +41,7 @@ LibraryBaseElement::LibraryBaseElement(const FilePath& xmlFilePath,
     try
     {
         // open XML file
-        mXmlFile = new XmlFile(mXmlFilepath, false, false, xmlRootNodeName);
+        mXmlFile = new SmartXmlFile(mXmlFilepath, false, false, xmlRootNodeName);
         mDomRoot = mXmlFile->getRoot();
 
         // read UUID

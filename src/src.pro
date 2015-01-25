@@ -98,7 +98,7 @@ SOURCES += \
     common/filelock.cpp \
     common/filepath.cpp \
     common/schematiclayer.cpp \
-    common/xmlfile.cpp \
+    common/smartxmlfile.cpp \
     library/librarybaseelement.cpp \
     project/circuit/cmd/cmdnetclassadd.cpp \
     project/circuit/cmd/cmdnetclassremove.cpp \
@@ -108,7 +108,7 @@ SOURCES += \
     common/undostack.cpp \
     project/schematics/symbolinstance.cpp \
     project/schematics/schematicpagesdock.cpp \
-    common/inifile.cpp \
+    common/smartinifile.cpp \
     project/schematics/cmd/cmdschematicadd.cpp \
     project/schematics/cmd/cmdschematicremove.cpp \
     project/erc/ercmsgdock.cpp \
@@ -171,7 +171,8 @@ SOURCES += \
     project/circuit/cmd/cmdnetsignalsetname.cpp \
     project/dialogs/projectpropertieseditordialog.cpp \
     project/cmd/cmdprojectsetmetadata.cpp \
-    common/textfile.cpp
+    common/smarttextfile.cpp \
+    common/smartfile.cpp
 
 HEADERS += \
     common/units/all_length_units.h \
@@ -216,7 +217,7 @@ HEADERS += \
     common/filelock.h \
     common/filepath.h \
     common/schematiclayer.h \
-    common/xmlfile.h \
+    common/smartxmlfile.h \
     library/librarybaseelement.h \
     project/circuit/cmd/cmdnetclassadd.h \
     project/circuit/cmd/cmdnetclassremove.h \
@@ -226,7 +227,7 @@ HEADERS += \
     common/undostack.h \
     project/schematics/symbolinstance.h \
     project/schematics/schematicpagesdock.h \
-    common/inifile.h \
+    common/smartinifile.h \
     project/schematics/cmd/cmdschematicadd.h \
     project/schematics/cmd/cmdschematicremove.h \
     project/erc/ercmsgdock.h \
@@ -289,7 +290,8 @@ HEADERS += \
     project/circuit/cmd/cmdnetsignalsetname.h \
     project/dialogs/projectpropertieseditordialog.h \
     project/cmd/cmdprojectsetmetadata.h \
-    common/textfile.h
+    common/smarttextfile.h \
+    common/smartfile.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \

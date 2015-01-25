@@ -32,7 +32,7 @@
  *  Forward Declarations
  ****************************************************************************************/
 
-class XmlFile;
+class SmartXmlFile;
 
 namespace project {
 class Project;
@@ -55,7 +55,7 @@ class ErcMsgList final : public QObject
     public:
 
         // Constructors / Destructor
-        explicit ErcMsgList(Project& project, bool restore, bool readOnly) throw (Exception);
+        explicit ErcMsgList(Project& project, bool restore, bool readOnly, bool create) throw (Exception);
         ~ErcMsgList() noexcept;
 
         // Getters
@@ -88,7 +88,7 @@ class ErcMsgList final : public QObject
 
         // File "core/erc.xml"
         FilePath mXmlFilepath;
-        XmlFile* mXmlFile;
+        SmartXmlFile* mXmlFile;
 
         // Misc
         QList<ErcMsg*> mItems; ///< contains all visible ERC messages

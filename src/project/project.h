@@ -36,9 +36,9 @@
  ****************************************************************************************/
 
 class QPrinter;
-class TextFile;
-class XmlFile;
-class IniFile;
+class SmartTextFile;
+class SmartXmlFile;
+class SmartIniFile;
 class UndoStack;
 class SchematicLayer;
 
@@ -445,14 +445,14 @@ class Project final : public QObject, public IF_AttributeProvider
         // Project File (*.e4u)
         FilePath mPath; ///< the path to the project directory
         FilePath mFilepath; ///< the filepath of the *.e4u project file
-        XmlFile* mXmlFile; ///< the *.e4u project file
+        SmartXmlFile* mXmlFile; ///< the *.e4u project file
         FileLock mFileLock; ///< See @ref doc_project_lock
         bool mIsRestored; ///< the constructor will set this to true if the project was restored
         bool mIsReadOnly; ///< the constructor will set this to true if the project was opened in read only mode
 
         // Other Files
-        IniFile* mSchematicsIniFile;    ///< schematics/schematics.ini
-        TextFile* mDescriptionHtmlFile; ///< description/index.html
+        SmartIniFile* mSchematicsIniFile;    ///< schematics/schematics.ini
+        SmartTextFile* mDescriptionHtmlFile; ///< description/index.html
 
         // Attributes
         QString mName;              ///< the name of the project

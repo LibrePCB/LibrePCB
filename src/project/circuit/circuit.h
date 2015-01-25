@@ -32,7 +32,7 @@
  *  Forward Declarations
  ****************************************************************************************/
 
-class XmlFile;
+class SmartXmlFile;
 
 namespace project {
 class Project;
@@ -128,7 +128,7 @@ class Circuit final : public QObject
 
         // File "core/circuit.xml"
         FilePath mXmlFilepath;
-        XmlFile* mXmlFile;
+        SmartXmlFile* mXmlFile;
 
         QHash<QUuid, NetClass*> mNetClasses;
         QHash<QUuid, NetSignal*> mNetSignals;
