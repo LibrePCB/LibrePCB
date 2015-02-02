@@ -60,10 +60,10 @@ GenCompSignalInstance::GenCompSignalInstance(Circuit& circuit, GenCompInstance& 
     // create ERC messages
     mErcMsgUnconnectedRequiredSignal.reset(new ErcMsg(mCircuit.getProject(), *this,
         QString("%1/%2").arg(mGenCompInstance.getUuid().toString()).arg(mGenCompSignal->getUuid().toString()),
-        "UnconnectedRequiredSignal", ErcMsg::ErcMsgType_t::CircuitError, QString()));
+        "UnconnectedRequiredSignal", ErcMsg::ErcMsgType_t::CircuitError));
     mErcMsgForcedNetSignalNameConflict.reset(new ErcMsg(mCircuit.getProject(), *this,
         QString("%1/%2").arg(mGenCompInstance.getUuid().toString()).arg(mGenCompSignal->getUuid().toString()),
-        "ForcedNetSignalNameConflict", ErcMsg::ErcMsgType_t::SchematicError, QString()));
+        "ForcedNetSignalNameConflict", ErcMsg::ErcMsgType_t::SchematicError));
     updateErcMessages();
 
     // register to generic component attributes changed

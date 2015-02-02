@@ -31,6 +31,7 @@
  ****************************************************************************************/
 
 namespace project {
+class IF_ErcMsgProvider;
 class ErcMsgList;
 class Project;
 }
@@ -60,12 +61,13 @@ class ErcMsg
         };
 
         // Constructors / Destructor
-        explicit ErcMsg(Project& project, const QObject& owner, const QString& ownerKey,
-                        const QString& msgKey, ErcMsg::ErcMsgType_t msgType, const QString& msg);
+        explicit ErcMsg(Project& project, const IF_ErcMsgProvider& owner,
+                        const QString& ownerKey, const QString& msgKey,
+                        ErcMsg::ErcMsgType_t msgType, const QString& msg = QString());
         virtual ~ErcMsg() noexcept;
 
         // Getters
-        const QObject& getOwner() const noexcept {return mOwner;}
+        const IF_ErcMsgProvider& getOwner() const noexcept {return mOwner;}
         const QString& getOwnerKey() const noexcept {return mOwnerKey;}
         const QString& getMsgKey() const noexcept {return mMsgKey;}
         ErcMsgType_t getMsgType() const noexcept {return mMsgType;}
@@ -92,7 +94,7 @@ class ErcMsg
         ErcMsgList& mErcMsgList;
 
         // Attributes
-        const QObject& mOwner;
+        const IF_ErcMsgProvider& mOwner;
         QString mOwnerKey;
         QString mMsgKey;
         ErcMsgType_t mMsgType;

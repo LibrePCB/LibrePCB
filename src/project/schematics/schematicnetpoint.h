@@ -27,6 +27,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include <QDomElement>
+#include "../erc/if_ercmsgprovider.h"
 #include "../../common/cadscene.h"
 #include "../../common/units/all_length_units.h"
 #include "../../common/exceptions.h"
@@ -107,9 +108,10 @@ namespace project {
 /**
  * @brief The SchematicNetPoint class
  */
-class SchematicNetPoint final : public QObject
+class SchematicNetPoint final : public QObject, public IF_ErcMsgProvider
 {
         Q_OBJECT
+        DECLARE_ERC_MSG_CLASS_NAME(SchematicNetPoint)
 
     public:
 

@@ -25,6 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include "../erc/if_ercmsgprovider.h"
 #include "../../common/units/all_length_units.h"
 
 /*****************************************************************************************
@@ -55,9 +56,10 @@ namespace project {
 /**
  * @brief The SymbolPinInstance class
  */
-class SymbolPinInstance final : public QObject
+class SymbolPinInstance final : public QObject, public IF_ErcMsgProvider
 {
         Q_OBJECT
+        DECLARE_ERC_MSG_CLASS_NAME(SymbolPinInstance)
 
     public:
 

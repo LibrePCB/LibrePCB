@@ -64,9 +64,9 @@ NetSignal::NetSignal(Circuit& circuit, const QDomElement& domElement) throw (Exc
 
     // create ERC messages
     mErcMsgUnusedNetSignal.reset(new ErcMsg(mCircuit.getProject(), *this,
-        mUuid.toString(), "Unused", ErcMsg::ErcMsgType_t::CircuitError, QString()));
+        mUuid.toString(), "Unused", ErcMsg::ErcMsgType_t::CircuitError));
     mErcMsgConnectedToLessThanTwoPins.reset(new ErcMsg(mCircuit.getProject(), *this,
-        mUuid.toString(), "ConnectedToLessThanTwoPins", ErcMsg::ErcMsgType_t::CircuitWarning, QString()));
+        mUuid.toString(), "ConnectedToLessThanTwoPins", ErcMsg::ErcMsgType_t::CircuitWarning));
     updateErcMessages();
 }
 

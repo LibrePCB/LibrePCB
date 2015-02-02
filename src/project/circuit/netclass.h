@@ -26,6 +26,7 @@
 
 #include <QtCore>
 #include <QDomElement>
+#include "../erc/if_ercmsgprovider.h"
 #include "../../common/exceptions.h"
 
 /*****************************************************************************************
@@ -47,9 +48,10 @@ namespace project {
 /**
  * @brief The NetClass class
  */
-class NetClass final : public QObject
+class NetClass final : public QObject, public IF_ErcMsgProvider
 {
         Q_OBJECT
+        DECLARE_ERC_MSG_CLASS_NAME(NetClass)
 
     public:
 

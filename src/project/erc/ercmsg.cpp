@@ -32,7 +32,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ErcMsg::ErcMsg(Project& project, const QObject& owner, const QString& ownerKey,
+ErcMsg::ErcMsg(Project& project, const IF_ErcMsgProvider& owner, const QString& ownerKey,
                const QString& msgKey, ErcMsgType_t msgType, const QString& msg) :
     mProject(project), mErcMsgList(project.getErcMsgList()), mOwner(owner),
     mOwnerKey(ownerKey), mMsgKey(msgKey), mMsgType(msgType), mMsg(msg),

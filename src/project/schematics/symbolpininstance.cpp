@@ -64,7 +64,7 @@ SymbolPinInstance::SymbolPinInstance(SymbolInstance& symbolInstance, const QUuid
     // create ERC messages
     mErcMsgUnconnectedRequiredPin.reset(new ErcMsg(mCircuit.getProject(), *this,
         QString("%1/%2").arg(mSymbolInstance.getUuid().toString()).arg(mSymbolPin->getUuid().toString()),
-        "UnconnectedRequiredPin", ErcMsg::ErcMsgType_t::SchematicError, QString()));
+        "UnconnectedRequiredPin", ErcMsg::ErcMsgType_t::SchematicError));
     updateErcMessages();
 }
 

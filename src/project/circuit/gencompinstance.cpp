@@ -120,9 +120,9 @@ GenCompInstance::GenCompInstance(Circuit& circuit, const QDomElement& domElement
 
     // create ERC messages
     mErcMsgUnplacedRequiredSymbols.reset(new ErcMsg(mCircuit.getProject(), *this, mUuid.toString(),
-        "UnplacedRequiredSymbols", ErcMsg::ErcMsgType_t::SchematicError, QString()));
+        "UnplacedRequiredSymbols", ErcMsg::ErcMsgType_t::SchematicError));
     mErcMsgUnplacedOptionalSymbols.reset(new ErcMsg(mCircuit.getProject(), *this, mUuid.toString(),
-        "UnplacedOptionalSymbols", ErcMsg::ErcMsgType_t::SchematicWarning, QString()));
+        "UnplacedOptionalSymbols", ErcMsg::ErcMsgType_t::SchematicWarning));
     updateErcMessages();
 }
 

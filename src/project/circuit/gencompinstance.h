@@ -27,6 +27,7 @@
 #include <QtCore>
 #include <QDomElement>
 #include "../../common/if_attributeprovider.h"
+#include "../erc/if_ercmsgprovider.h"
 #include "../../common/exceptions.h"
 
 /*****************************************************************************************
@@ -55,9 +56,10 @@ namespace project {
 /**
  * @brief The GenCompInstance class
  */
-class GenCompInstance : public QObject, public IF_AttributeProvider
+class GenCompInstance : public QObject, public IF_AttributeProvider, public IF_ErcMsgProvider
 {
         Q_OBJECT
+        DECLARE_ERC_MSG_CLASS_NAME(GenCompInstance)
 
     public:
 

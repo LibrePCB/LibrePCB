@@ -291,7 +291,8 @@ HEADERS += \
     project/dialogs/projectpropertieseditordialog.h \
     project/cmd/cmdprojectsetmetadata.h \
     common/smarttextfile.h \
-    common/smartfile.h
+    common/smartfile.h \
+    project/erc/if_ercmsgprovider.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \

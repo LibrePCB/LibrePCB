@@ -24,6 +24,7 @@
 #include <QtCore>
 #include "ercmsglist.h"
 #include "ercmsg.h"
+#include "if_ercmsgprovider.h"
 #include "../project.h"
 #include "../../common/smartxmlfile.h"
 
@@ -104,7 +105,7 @@ void ErcMsgList::restoreIgnoreState() noexcept
     {
         foreach (ErcMsg* ercMsg, mItems)
         {
-            if ((ercMsg->getOwner().metaObject()->className() == item.attribute("owner_class"))
+            if ((ercMsg->getOwner().getErcMsgOwnerClassName() == item.attribute("owner_class"))
              && (ercMsg->getOwnerKey() == item.attribute("owner_key"))
              && (ercMsg->getMsgKey() == item.attribute("msg_key")))
             {
@@ -140,7 +141,7 @@ bool ErcMsgList::save(bool toOriginal, QStringList& errors) noexcept
                 QDomElement node = mXmlFile->getDocument().createElement("item");
                 if (node.isNull())
                     throw RuntimeError(__FILE__, __LINE__, QString(), tr("XML DOM Error"));
-                node.setAttribute("owner_class", ercMsg->getOwner().metaObject()->className());
+                node.setAttribute("owner_class", ercMsg->getOwner().getErcMsgOwnerClassName());
                 node.setAttribute("owner_key", ercMsg->getOwnerKey());
                 node.setAttribute("msg_key", ercMsg->getMsgKey());
                 if (child.appendChild(node).isNull())

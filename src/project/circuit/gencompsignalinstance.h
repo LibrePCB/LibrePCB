@@ -26,6 +26,7 @@
 
 #include <QtCore>
 #include <QDomElement>
+#include "../erc/if_ercmsgprovider.h"
 #include "../../common/exceptions.h"
 
 /*****************************************************************************************
@@ -53,9 +54,10 @@ namespace project {
 /**
  * @brief The GenCompSignalInstance class
  */
-class GenCompSignalInstance final : public QObject
+class GenCompSignalInstance final : public QObject, public IF_ErcMsgProvider
 {
         Q_OBJECT
+        DECLARE_ERC_MSG_CLASS_NAME(GenCompSignalInstance)
 
     public:
 
