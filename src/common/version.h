@@ -60,6 +60,13 @@ class Version final
         explicit Version(const QString& version) noexcept;
 
         /**
+         * @brief Copy constructor
+         *
+         * @param other     Another #Version object
+         */
+        Version(const Version& other) noexcept;
+
+        /**
          * Destructor
          */
         ~Version() noexcept;
@@ -115,6 +122,7 @@ class Version final
          *
          * @return If at least one of both objects is invalid, false will be returned!
          */
+        Version& operator=(const Version& rhs) noexcept;
         bool operator>(const Version& rhs) const noexcept;
         bool operator<(const Version& rhs) const  noexcept;
         bool operator>=(const Version& rhs) const noexcept;
@@ -125,11 +133,6 @@ class Version final
 
 
     private:
-
-        // make some methods inaccessible...
-        Version(const Version& other);
-        Version& operator=(const Version& rhs);
-
 
         // Private Methods
 

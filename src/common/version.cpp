@@ -37,6 +37,12 @@ Version::Version(const QString& version) noexcept
     setVersion(version);
 }
 
+Version::Version(const Version& other) noexcept :
+    mVersionStr(other.mVersionStr), mNumbers(other.mNumbers)
+{
+
+}
+
 Version::~Version() noexcept
 {
 }
@@ -67,6 +73,13 @@ bool Version::setVersion(const QString& version) noexcept
 /*****************************************************************************************
  *  Operators
  ****************************************************************************************/
+
+Version& Version::operator=(const Version& rhs) noexcept
+{
+    mVersionStr = rhs.mVersionStr;
+    mNumbers = rhs.mNumbers;
+    return *this;
+}
 
 bool Version::operator>(const Version& rhs) const noexcept
 {
