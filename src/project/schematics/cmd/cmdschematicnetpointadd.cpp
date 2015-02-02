@@ -34,7 +34,7 @@ namespace project {
 
 CmdSchematicNetPointAdd::CmdSchematicNetPointAdd(Schematic& schematic, const QUuid& netsignal,
                                                  const Point& position, UndoCommand* parent) throw (Exception) :
-    UndoCommand(QCoreApplication::translate("CmdSchematicNetPointAdd", "Add netpoint"), parent),
+    UndoCommand(tr("Add netpoint"), parent),
     mSchematic(schematic), mNetSignal(netsignal), mAttachedToSymbol(false),
     mPosition(position), mSymbol(), mPin(), mNetPoint(0)
 {
@@ -42,7 +42,7 @@ CmdSchematicNetPointAdd::CmdSchematicNetPointAdd(Schematic& schematic, const QUu
 
 CmdSchematicNetPointAdd::CmdSchematicNetPointAdd(Schematic& schematic, const QUuid& symbol,
                                                  const QUuid& pin, UndoCommand* parent) throw (Exception) :
-    UndoCommand(QCoreApplication::translate("CmdSchematicNetPointAdd", "Add netpoint"), parent),
+    UndoCommand(tr("Add netpoint"), parent),
     mSchematic(schematic), mNetSignal(), mAttachedToSymbol(true),
     mPosition(), mSymbol(symbol), mPin(pin), mNetPoint(0)
 {

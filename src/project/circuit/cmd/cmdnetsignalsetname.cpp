@@ -35,7 +35,7 @@ namespace project {
 CmdNetSignalSetName::CmdNetSignalSetName(Circuit& circuit, NetSignal& netsignal,
                                          const QString& newName, bool isAutoName,
                                          UndoCommand* parent) throw (Exception) :
-    UndoCommand(QCoreApplication::translate("CmdNetSignalSetName", "Change netsignal name"), parent),
+    UndoCommand(tr("Change netsignal name"), parent),
     mCircuit(circuit), mNetSignal(netsignal), mOldName(netsignal.getName()),
     mNewName(newName), mOldIsAutoName(netsignal.hasAutoName()), mNewIsAutoName(isAutoName)
 {

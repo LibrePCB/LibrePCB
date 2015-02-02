@@ -32,7 +32,7 @@ namespace project {
  ****************************************************************************************/
 
 CmdProjectSetMetadata::CmdProjectSetMetadata(Project& project, UndoCommand* parent) throw (Exception) :
-    UndoCommand(QCoreApplication::translate("CmdProjectSetMetadata", "Change Project Metadata"), parent),
+    UndoCommand(tr("Change Project Metadata"), parent),
     mProject(project), mRedoOrUndoCalled(false),
     mOldName(mProject.getName()),               mNewName(mProject.getName()),
     mOldDescription(mProject.getDescription()), mNewDescription(mProject.getDescription()),

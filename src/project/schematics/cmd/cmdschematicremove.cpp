@@ -34,7 +34,7 @@ namespace project {
 
 CmdSchematicRemove::CmdSchematicRemove(Project& project, Schematic* schematic,
                                        UndoCommand* parent) throw (Exception) :
-    UndoCommand(QCoreApplication::translate("CmdSchematicRemove", "Remove schematic"), parent),
+    UndoCommand(tr("Remove schematic"), parent),
     mProject(project), mSchematic(schematic), mPageIndex(-1)
 {
 }

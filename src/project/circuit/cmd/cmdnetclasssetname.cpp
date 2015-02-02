@@ -33,7 +33,7 @@ namespace project {
 
 CmdNetClassSetName::CmdNetClassSetName(NetClass& netclass, const QString& newName,
                                UndoCommand* parent) throw (Exception) :
-    UndoCommand(QCoreApplication::translate("CmdNetClassSetName", "Rename netclass"), parent),
+    UndoCommand(tr("Rename netclass"), parent),
     mNetClass(netclass), mOldName(netclass.getName()), mNewName(newName)
 {
 }

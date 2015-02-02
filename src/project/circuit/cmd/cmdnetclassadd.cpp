@@ -34,7 +34,7 @@ namespace project {
 
 CmdNetClassAdd::CmdNetClassAdd(Circuit& circuit, const QString& name,
                                UndoCommand* parent) throw (Exception) :
-    UndoCommand(QCoreApplication::translate("CmdNetClassAdd", "Add netclass"), parent),
+    UndoCommand(tr("Add netclass"), parent),
     mCircuit(circuit), mName(name), mNetClass(0)
 {
 }

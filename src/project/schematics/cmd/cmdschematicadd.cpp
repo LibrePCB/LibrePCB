@@ -34,7 +34,7 @@ namespace project {
 
 CmdSchematicAdd::CmdSchematicAdd(Project& project, const QString& name,
                                  UndoCommand* parent) throw (Exception) :
-    UndoCommand(QCoreApplication::translate("CmdSchematicAdd", "Add schematic"), parent),
+    UndoCommand(tr("Add schematic"), parent),
     mProject(project), mName(name), mSchematic(nullptr), mPageIndex(-1)
 {
 }

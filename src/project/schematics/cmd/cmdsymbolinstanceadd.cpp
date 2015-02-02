@@ -39,7 +39,7 @@ CmdSymbolInstanceAdd::CmdSymbolInstanceAdd(Schematic& schematic,
                                            const QUuid& symbolItem, const Point& position,
                                            const Angle& angle, bool mirror,
                                            UndoCommand* parent) throw (Exception) :
-    UndoCommand(QCoreApplication::translate("CmdSymbolInstanceAdd", "Add symbol instance"), parent),
+    UndoCommand(tr("Add symbol instance"), parent),
     mSchematic(schematic), mGenCompInstance(genComp), mSymbolItemUuid(symbolItem),
     mPosition(position), mAngle(angle), mMirror(mirror), mSymbolInstance(0)
 {

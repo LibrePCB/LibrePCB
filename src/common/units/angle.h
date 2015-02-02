@@ -56,6 +56,8 @@
  */
 class Angle
 {
+        Q_DECLARE_TR_FUNCTIONS(Angle)
+
     public:
 
         // Constructors / Destructor

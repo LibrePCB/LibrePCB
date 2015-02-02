@@ -35,7 +35,7 @@ namespace project {
 CmdSchematicNetPointRemove::CmdSchematicNetPointRemove(Schematic& schematic,
                                                        SchematicNetPoint* netpoint,
                                                        UndoCommand* parent) throw (Exception) :
-    UndoCommand(QCoreApplication::translate("CmdSchematicNetPointRemove", "Remove netpoint"), parent),
+    UndoCommand(tr("Remove netpoint"), parent),
     mSchematic(schematic), mNetPoint(netpoint)
 {
 }

@@ -34,7 +34,7 @@ namespace project {
 
 CmdSchematicNetLineAdd::CmdSchematicNetLineAdd(Schematic& schematic, const QUuid& startPoint,
                                                const QUuid& endPoint, UndoCommand* parent) throw (Exception) :
-    UndoCommand(QCoreApplication::translate("CmdSchematicNetLineAdd", "Add netline"), parent),
+    UndoCommand(tr("Add netline"), parent),
     mSchematic(schematic), mStartPoint(startPoint), mEndPoint(endPoint), mNetLine(0)
 {
 }

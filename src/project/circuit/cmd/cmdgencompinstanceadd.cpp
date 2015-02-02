@@ -36,7 +36,7 @@ CmdGenCompInstanceAdd::CmdGenCompInstanceAdd(Circuit& circuit,
                                              const library::GenericComponent& genComp,
                                              const library::GenCompSymbVar& symbVar,
                                              UndoCommand* parent) throw (Exception) :
-    UndoCommand(QCoreApplication::translate("CmdGenCompInstanceAdd", "Add generic component"), parent),
+    UndoCommand(tr("Add generic component"), parent),
     mCircuit(circuit), mGenComp(genComp), mSymbVar(symbVar), mGenCompInstance(0)
 {
 }

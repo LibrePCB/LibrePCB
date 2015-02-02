@@ -32,7 +32,7 @@ namespace project {
  ****************************************************************************************/
 
 CmdSchematicNetPointMove::CmdSchematicNetPointMove(SchematicNetPoint& point, UndoCommand* parent) throw (Exception) :
-    UndoCommand(QCoreApplication::translate("CmdSchematicNetPointMove", "Move netpoint"), parent),
+    UndoCommand(tr("Move netpoint"), parent),
     mNetPoint(point), mStartPos(point.getPosition()), mDeltaPos(0, 0),
     mEndPos(point.getPosition()), mRedoOrUndoCalled(false)
 {

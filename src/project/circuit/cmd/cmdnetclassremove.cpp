@@ -34,7 +34,7 @@ namespace project {
 
 CmdNetClassRemove::CmdNetClassRemove(Circuit& circuit, NetClass* netclass,
                                      UndoCommand* parent) throw (Exception) :
-    UndoCommand(QCoreApplication::translate("CmdNetClassRemove", "Remove netclass"), parent),
+    UndoCommand(tr("Remove netclass"), parent),
     mCircuit(circuit), mNetClass(netclass)
 {
 }

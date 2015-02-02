@@ -58,8 +58,8 @@
         
     @section doc_code_style_guide_qt_qobject QObject
     
-        - Inherit from QObject only when needed (for example if you only need QObject::tr() a few times, you can also use QApplication::translate() instead)
-        - Try to avoid using QObject::connect() with Qt's SIGNAL() and SLOT() macros! Use function addresses instead (whenever possible). This way, signals and slots are checked on compile-time instead of runtime.
+        - Inherit from QObject only when needed (for example if you only need QObject::tr(), see note to @c Q_DECLARE_TR_FUNCTIONS() in @ref doc_code_style_guide_qt_macros)
+        - Try to avoid using QObject::connect() with Qt's @c SIGNAL() and @c SLOT() macros! Use function addresses instead (whenever possible). This way, signals and slots are checked on compile-time instead of runtime.
             @code
             connect(&myTimer, SIGNAL(timeout()), this, SLOT(mySlot()));     // uses runtime check --> avoid this!
             connect(&myTimer, &QTimer::timeout, this, &MyClass::anyMethod); // uses compile-time check (and any method can be used as slots!) --> much better!
@@ -70,6 +70,7 @@
     
     @section doc_code_style_guide_qt_macros Qt Macros
     
-        - Do not use Q_CHECK_PTR() because it throws a std::bad_alloc exception which we will never catch (we only catch our own exception types)! Use Q_ASSERT() instead!
+        - Do not use @c Q_CHECK_PTR() because it throws a std::bad_alloc exception which we will never catch (we only catch our own exception types)! Use @c Q_ASSERT() instead!
+        - The macro @c Q_DECLARE_TR_FUNCTIONS() is very useful to use the translation method QObject::tr() (resp. tr()) also in classes which do not inherit from QObject (but do NOT use this macro in interface classes because of possible multiple inheritance --> use QCoreApplication::translate() instead in this case)! See http://doc.qt.io/qt-5/qcoreapplication.html#Q_DECLARE_TR_FUNCTIONS
 
 */

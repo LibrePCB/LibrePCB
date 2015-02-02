@@ -61,6 +61,8 @@ class Point;
  */
 class LengthUnit final
 {
+        Q_DECLARE_TR_FUNCTIONS(LengthUnit)
+
     private:
 
         // Private Types

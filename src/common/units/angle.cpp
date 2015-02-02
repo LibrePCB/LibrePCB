@@ -104,8 +104,8 @@ qint32 Angle::degStringToMicrodeg(const QString& degrees) throw (Exception)
     qreal angle = qRound(QLocale::c().toDouble(degrees, &ok) * 1e6);
     if (!ok)
     {
-        throw Exception(__FILE__, __LINE__, degrees, QString(QCoreApplication::
-            translate("Angle", "Invalid angle string: \"%1\"")).arg(degrees));
+        throw Exception(__FILE__, __LINE__, degrees,
+            QString(tr("Invalid angle string: \"%1\"")).arg(degrees));
     }
     return angle;
 }

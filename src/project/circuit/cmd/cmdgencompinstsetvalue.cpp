@@ -33,7 +33,7 @@ namespace project {
 
 CmdGenCompInstSetValue::CmdGenCompInstSetValue(GenCompInstance& genComp, const QString& newValue,
                                                UndoCommand* parent) throw (Exception) :
-    UndoCommand(QCoreApplication::translate("CmdGenCompInstSetValue", "Change Component Value"), parent),
+    UndoCommand(tr("Change Component Value"), parent),
     mGenCompInstance(genComp), mOldValue(genComp.getValue()), mNewValue(newValue)
 {
 }

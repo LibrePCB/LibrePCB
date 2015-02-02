@@ -34,7 +34,7 @@ namespace project {
 
 CmdGenCompInstSetName::CmdGenCompInstSetName(Circuit& circuit, GenCompInstance& genComp,
                                              const QString& newName, UndoCommand* parent) throw (Exception) :
-    UndoCommand(QCoreApplication::translate("CmdGenCompInstSetName", "Change Component Name"), parent),
+    UndoCommand(tr("Change Component Name"), parent),
     mCircuit(circuit), mGenCompInstance(genComp), mOldName(genComp.getName()), mNewName(newName)
 {
 }

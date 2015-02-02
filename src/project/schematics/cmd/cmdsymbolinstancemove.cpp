@@ -32,7 +32,7 @@ namespace project {
  ****************************************************************************************/
 
 CmdSymbolInstanceMove::CmdSymbolInstanceMove(SymbolInstance& symbol, UndoCommand* parent) throw (Exception) :
-    UndoCommand(QCoreApplication::translate("CmdSymbolInstanceMove", "Move symbol"), parent),
+    UndoCommand(tr("Move symbol"), parent),
     mSymbolInstance(symbol), mStartPos(symbol.getPosition()), mDeltaPos(0, 0),
     mEndPos(symbol.getPosition()), mStartAngle(symbol.getAngle()), mDeltaAngle(0),
     mEndAngle(symbol.getAngle()), mRedoOrUndoCalled(false)

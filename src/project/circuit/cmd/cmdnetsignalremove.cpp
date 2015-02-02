@@ -34,7 +34,7 @@ namespace project {
 
 CmdNetSignalRemove::CmdNetSignalRemove(Circuit& circuit, NetSignal* netsignal,
                                      UndoCommand* parent) throw (Exception) :
-    UndoCommand(QCoreApplication::translate("CmdNetSignalRemove", "Remove netsignal"), parent),
+    UndoCommand(tr("Remove netsignal"), parent),
     mCircuit(circuit), mNetSignal(netsignal)
 {
 }

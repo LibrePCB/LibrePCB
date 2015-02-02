@@ -45,6 +45,8 @@
  */
 class UndoCommand
 {
+        Q_DECLARE_TR_FUNCTIONS(UndoCommand)
+
     public:
 
         // Constructors / Destructor

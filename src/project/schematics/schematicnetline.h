@@ -55,6 +55,8 @@ namespace project {
  */
 class SchematicNetLineGraphicsItem final : public QGraphicsLineItem
 {
+        Q_DECLARE_TR_FUNCTIONS(SchematicNetLineGraphicsItem)
+
     public:
 
         // Types

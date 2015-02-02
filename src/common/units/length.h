@@ -72,6 +72,8 @@ typedef qint64 LengthBase_t;
  */
 class Length
 {
+        Q_DECLARE_TR_FUNCTIONS(Length)
+
     public:
 
         //  Constructors / Destructor

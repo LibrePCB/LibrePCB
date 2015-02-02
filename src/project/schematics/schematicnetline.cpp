@@ -49,11 +49,7 @@ SchematicNetLineGraphicsItem::SchematicNetLineGraphicsItem(Schematic& schematic,
 {
     mLayer = mSchematic.getProject().getSchematicLayer(SchematicLayer::Nets);
     if (!mLayer)
-    {
-        throw LogicError(__FILE__, __LINE__, QString(),
-            QCoreApplication::translate("SchematicNetLineGraphicsItem",
-                                        "No Nets Layer found!"));
-    }
+        throw LogicError(__FILE__, __LINE__, QString(), tr("No Nets Layer found!"));
 
     setFlags(QGraphicsItem::ItemIsSelectable);
     setZValue(Schematic::ZValue_NetLines);

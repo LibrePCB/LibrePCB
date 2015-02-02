@@ -62,15 +62,15 @@ QString LengthUnit::toStringTr() const noexcept
     switch (mUnit)
     {
         case LengthUnit_t::Millimeters:
-            return QCoreApplication::translate("LengthUnit", "Millimeters");
+            return tr("Millimeters");
         case LengthUnit_t::Micrometers:
-            return QCoreApplication::translate("LengthUnit", "Micrometers");
+            return tr("Micrometers");
         case LengthUnit_t::Nanometers:
-            return QCoreApplication::translate("LengthUnit", "Nanometers");
+            return tr("Nanometers");
         case LengthUnit_t::Inches:
-            return QCoreApplication::translate("LengthUnit", "Inches");
+            return tr("Inches");
         case LengthUnit_t::Mils:
-            return QCoreApplication::translate("LengthUnit", "Mils");
+            return tr("Mils");
         default:
             qCritical() << "invalid length unit:" << static_cast<int>(mUnit);
             Q_ASSERT(false);
@@ -83,15 +83,15 @@ QString LengthUnit::toShortStringTr() const noexcept
     switch (mUnit)
     {
         case LengthUnit_t::Millimeters:
-            return QCoreApplication::translate("LengthUnit", "mm");
+            return tr("mm");
         case LengthUnit_t::Micrometers:
-            return QCoreApplication::translate("LengthUnit", "μm");
+            return tr("μm");
         case LengthUnit_t::Nanometers:
-            return QCoreApplication::translate("LengthUnit", "nm");
+            return tr("nm");
         case LengthUnit_t::Inches:
-            return QCoreApplication::translate("LengthUnit", "″");
+            return tr("″");
         case LengthUnit_t::Mils:
-            return QCoreApplication::translate("LengthUnit", "mils");
+            return tr("mils");
         default:
             qCritical() << "invalid length unit:" << static_cast<int>(mUnit);
             Q_ASSERT(false);
@@ -207,8 +207,8 @@ LengthUnit LengthUnit::fromString(const QString& unitString) throw (Exception)
         return LengthUnit(LengthUnit_t::Mils);
     else
     {
-        throw RuntimeError(__FILE__, __LINE__, unitString, QString(QCoreApplication::
-            translate("LengthUnit", "Invalid length unit: \"%1\"")).arg(unitString));
+        throw RuntimeError(__FILE__, __LINE__, unitString,
+            QString(tr("Invalid length unit: \"%1\"")).arg(unitString));
     }
 }
 

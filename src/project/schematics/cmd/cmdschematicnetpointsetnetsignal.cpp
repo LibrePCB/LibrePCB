@@ -32,7 +32,7 @@ namespace project {
  ****************************************************************************************/
 
 CmdSchematicNetPointSetNetSignal::CmdSchematicNetPointSetNetSignal(SchematicNetPoint& point, NetSignal& netsignal, UndoCommand* parent) throw (Exception) :
-    UndoCommand(QCoreApplication::translate("CmdSchematicNetPointSetNetSignal", "Change netpoint netsignal"), parent),
+    UndoCommand(tr("Change netpoint netsignal"), parent),
     mNetPoint(point), mNetSignal(netsignal), mOldNetSignal(*point.getNetSignal())
 {
 }

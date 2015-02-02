@@ -34,7 +34,7 @@ namespace project {
 CmdGenCompSigInstSetNetSignal::CmdGenCompSigInstSetNetSignal(GenCompSignalInstance& genCompSigInstance,
                                              NetSignal* netsignal,
                                              UndoCommand* parent) throw (Exception) :
-    UndoCommand(QCoreApplication::translate("CmdGenCompSigInstSetNetSignal", "Change component signal net"), parent),
+    UndoCommand(tr("Change component signal net"), parent),
     mGenCompSigInstance(genCompSigInstance), mNetSignal(netsignal),
     mOldNetSignal(genCompSigInstance.getNetSignal())
 {

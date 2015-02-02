@@ -32,7 +32,7 @@ namespace project {
  ****************************************************************************************/
 
 CmdSchematicNetPointDetach::CmdSchematicNetPointDetach(SchematicNetPoint& point, UndoCommand* parent) throw (Exception) :
-    UndoCommand(QCoreApplication::translate("CmdSchematicNetPointDetach", "Detach netpoint"), parent),
+    UndoCommand(tr("Detach netpoint"), parent),
     mNetPoint(point), mSymbolInstance(point.getSymbolInstance()),
     mPinInstance(point.getPinInstance())
 {

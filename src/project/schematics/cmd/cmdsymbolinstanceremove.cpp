@@ -34,7 +34,7 @@ namespace project {
 
 CmdSymbolInstanceRemove::CmdSymbolInstanceRemove(Schematic& schematic, SymbolInstance* symbol,
                                                  UndoCommand* parent) throw (Exception) :
-    UndoCommand(QCoreApplication::translate("CmdSymbolInstanceRemove", "Remove symbol"), parent),
+    UndoCommand(tr("Remove symbol"), parent),
     mSchematic(schematic), mSymbolInstance(symbol)
 {
 }
