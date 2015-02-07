@@ -27,6 +27,12 @@
 #include <QtCore>
 
 /*****************************************************************************************
+ *  Forward Declarations
+ ****************************************************************************************/
+
+class FilePath;
+
+/*****************************************************************************************
  *  Class Exception
  ****************************************************************************************/
 
@@ -251,7 +257,7 @@ class RuntimeError : public Exception
  *
  * @see Exception
  */
-class RangeError : public Exception
+class RangeError : public RuntimeError
 {
     public:
 
@@ -266,7 +272,7 @@ class RangeError : public Exception
          */
         RangeError(const RangeError& other);
 
-        // Inherited from Exception
+        // Inherited from RuntimeError
         virtual void raise() const {throw *this;}
         virtual RangeError* clone() const {return new RangeError(*this);}
 
@@ -274,6 +280,53 @@ class RangeError : public Exception
 
         /// @brief make the default constructor inaccessible
         RangeError();
+};
+
+/*****************************************************************************************
+ *  Class FileParseError
+ ****************************************************************************************/
+
+/**
+ * @brief The FileParseError class
+ *
+ * This exception class is used for errors while parsing files due to invalid file content
+ * (for example invalid XML syntax, invalid content of XML attributes and so on).
+ *
+ * @see Exception
+ */
+class FileParseError : public RuntimeError
+{
+    public:
+
+        /**
+         * @brief The constructor which is used to throw an exception
+         *
+         * @param file                  See Exception#Exception()
+         * @param line                  See Exception#Exception()
+         * @param filePath              The path to the parsed file (optional)
+         * @param fileLine              The line number of the parse error (-1 if unknown)
+         * @param fileColumn            The column of the parse error (-1 if unknown)
+         * @param invalidFileContent    The parsed string which is invalid (optional)
+         * @param userMsg               See Exception#Exception()
+         */
+        FileParseError(const char* file, int line, const FilePath& filePath,
+                       int fileLine = -1, int fileColumn = -1,
+                       const QString& invalidFileContent = QString(),
+                       const QString& userMsg = QString("File Parse Error"));
+
+        /**
+         * @brief The copy constructor (needed for #clone())
+         */
+        FileParseError(const FileParseError& other);
+
+        // Inherited from RuntimeError
+        virtual void raise() const {throw *this;}
+        virtual FileParseError* clone() const {return new FileParseError(*this);}
+
+    private:
+
+        /// @brief make the default constructor inaccessible
+        FileParseError();
 };
 
 /*****************************************************************************************

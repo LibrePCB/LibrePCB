@@ -24,6 +24,7 @@
 #include <QtCore>
 #include "exceptions.h"
 #include "debug.h"
+#include "filepath.h"
 
 /*****************************************************************************************
  *  Class Exception
@@ -86,12 +87,30 @@ RuntimeError::RuntimeError(const RuntimeError& other) :
 
 RangeError::RangeError(const char* file, int line, const QString& debugMsg,
                        const QString& userMsg) :
-    Exception(file, line, debugMsg, userMsg)
+    RuntimeError(file, line, debugMsg, userMsg)
 {
 }
 
 RangeError::RangeError(const RangeError& other) :
-    Exception(other)
+    RuntimeError(other)
+{
+}
+
+/*****************************************************************************************
+ *  Class FileParseError
+ ****************************************************************************************/
+
+FileParseError::FileParseError(const char* file, int line, const FilePath& filePath,
+                               int fileLine, int fileColumn,
+                               const QString& invalidFileContent, const QString& userMsg) :
+    RuntimeError(file, line, invalidFileContent,
+        QString("File parse error: %1\n\nFile: %2\nLine,Column: %3,%4\nInvalid Content: \"%5\"")
+        .arg(userMsg).arg(filePath.toNative()).arg(fileLine).arg(fileColumn).arg(invalidFileContent))
+{
+}
+
+FileParseError::FileParseError(const FileParseError& other) :
+    RuntimeError(other)
 {
 }
 
