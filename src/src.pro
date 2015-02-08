@@ -172,7 +172,9 @@ SOURCES += \
     project/dialogs/projectpropertieseditordialog.cpp \
     project/cmd/cmdprojectsetmetadata.cpp \
     common/smarttextfile.cpp \
-    common/smartfile.cpp
+    common/smartfile.cpp \
+    common/file_io/xmldomdocument.cpp \
+    common/file_io/xmldomelement.cpp
 
 HEADERS += \
     common/units/all_length_units.h \
@@ -292,7 +294,10 @@ HEADERS += \
     project/cmd/cmdprojectsetmetadata.h \
     common/smarttextfile.h \
     common/smartfile.h \
-    project/erc/if_ercmsgprovider.h
+    common/file_io/xmldomdocument.h \
+    common/file_io/xmldomelement.h \
+    project/erc/if_ercmsgprovider.h \
+    common/file_io/if_xmlserializableobject.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \
