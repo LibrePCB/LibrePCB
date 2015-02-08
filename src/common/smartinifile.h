@@ -109,6 +109,16 @@ class SmartIniFile final : public SmartFile
          */
         void releaseQSettings(QSettings* settings) noexcept;
 
+        /**
+         * @brief Write all changes to the file system
+         *
+         * @param toOriginal    Specifies whether the original or the backup file should
+         *                      be overwritten/created.
+         *
+         * @throw Exception If an error occurs
+         */
+        void save(bool toOriginal) throw (Exception);
+
 
         // Static Methods
 
@@ -142,11 +152,6 @@ class SmartIniFile final : public SmartFile
          */
         SmartIniFile(const FilePath& filepath, bool restore, bool readOnly, bool create,
                      int expectedVersion, int createVersion) throw (Exception);
-
-        /**
-         * @copydoc SmartFile#saveToFile()
-         */
-        virtual void saveToFile(const FilePath& filepath) throw (Exception);
 
 
         // General Attributes

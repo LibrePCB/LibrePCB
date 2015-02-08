@@ -36,15 +36,12 @@
  * @brief   The abstract SmartFile class represents a file and provides some useful
  *          methods to work with that file
  *
- * The constructor will try to open or create the file. The destructor will close the file.
- *
  * Features:
  *  - Open files in read-only mode (this class then guarantees that no write operations
  *    are possible to that file)
  *  - Creation of backup files ('~' at the end of the filename)
  *  - Restoring backup files
- *  - Write all changes (including creation and deletion) to the file system with the
- *    single method #save() (like "commit" in database systems)
+ *  - Helper methods for subclasses to load/save files
  *
  * @note See @ref doc_project_save for more details about the backup/restore feature.
  *
@@ -62,26 +59,21 @@ class SmartFile : public QObject
         // Constructors / Destructor
 
         /**
-         * @brief The constructor to open or create a file
+         * @brief The constructor
          *
-         * This constructor tries to open an existing or create a new file and throws an
-         * exception if an error occurs.
-         *
-         * @param filepath  The filepath to the (always to a original file, not to a
+         * @param filepath  The filepath to the file (always to a original file, not to a
          *                  backup file with "~" at the end of the filename!)
          * @param restore   If true and a backup (*~) of the specified file exists, the
          *                  backup will be opened instead of the original file. If no
          *                  backup exists or this parameter is false, the original file
          *                  will be opened.
          * @param readOnly  If true, the file will be opened read-only (see #mIsReadOnly)
-         * @param create    If true, the file will be created/overwritten after calling
-         *                  #save() the first time.
+         * @param create    If true, the file will be created/overwritten after saving
+         *                  it the first time.
          *
-         * @throw Exception If the specified text file could not be opened successful, an
-         *                  exception will be thrown.
+         * @throw Exception If the specified file does not exist, an exception will be thrown.
          */
-        SmartFile(const FilePath& filepath, bool restore = false, bool readOnly = false,
-                  bool create = false) throw (Exception);
+        SmartFile(const FilePath& filepath, bool restore, bool readOnly, bool create) throw (Exception);
 
         /**
          * @brief The destructor
@@ -100,35 +92,17 @@ class SmartFile : public QObject
          */
         const FilePath& getFilepath() const noexcept {return mFilePath;}
 
-        /**
-         * @brief Get the "remove flag" (if true, the file will be removed after calling #save())
-         *
-         * @return The remove flag
-         */
-        bool getRemoveFlag() const noexcept {return mRemoveFlag;}
-
-
-        // Setters
-
-        /**
-         * @brief Set the "remove flag" (if true, the file will be removed after calling #save())
-         *
-         * @param removeFlag    if true, the file will be removed after calling #save()
-         */
-        void setRemoveFlag(bool removeFlag) noexcept {mRemoveFlag = removeFlag;}
-
 
         // General Methods
 
         /**
-         * @brief Save the content to the file
+         * @brief Remove the file from the file system
          *
-         * @param toOriginal    If true, the content will be written to the original file.
-         *                      If false, the content will be written to the backup file (*~).
+         * @param original  Specifies whether the original or the backup file should be removed.
          *
-         * @throw Exception     If an error occurs, this method throws an exception.
+         * @throw Exception If an error occurs, an exception will be thrown
          */
-        void save(bool toOriginal) throw (Exception);
+        void removeFile(bool original) throw (Exception);
 
 
     private:
@@ -144,22 +118,34 @@ class SmartFile : public QObject
         // Protected Methods
 
         /**
-         * @brief Pure virtual method which must be implemented in subclasses of #SmartFile
+         * @brief Prepare to save the file and return the filepath to the file
          *
-         * This method is called automatically from SmartFile#save() when the content of
-         * the file should be saved to the file. So all derived classes must write their
-         * content to the file specified by the parameter "filepath". No other actions or
-         * checks are needed, simply write the content to this file and throw an exception
-         * if writing to the file has failed.
+         * This method:
+         *  - throws an exception if the file was opened in read-only mode
+         *  - tries to create all parent directories of the file to save
          *
-         * @param filepath  The filepath to either the original or the temporary file
+         * @note This method must be called from all subclasses BEFORE saving the changes
+         *       to the file!
          *
-         * @throw Exception If writing to the file has failed, an exception will be thrown.
+         * @param toOriginal    Specifies whether the original or the backup file should
+         *                      be overwritten/created. The path to that file will be
+         *                      returned afterwards.
+         *
+         * @return The filepath to the file to save (either original or backup file)
+         *
+         * @throw Exception If an error occurs
          */
-        virtual void saveToFile(const FilePath& filepath) throw (Exception) = 0;
+        const FilePath& prepareSaveAndReturnFilePath(bool toOriginal) throw (Exception);
 
-
-        // Static Protected Methods
+        /**
+         * @brief Update the member variables #mIsRestored and #mIsCreated after saving
+         *
+         * @note This method must be called from all subclasses AFTER saving the changes
+         *       to the file!
+         *
+         * @param toOriginal    Specifies whether the original or the backup file was saved.
+         */
+        void updateMembersAfterSaving(bool toOriginal) noexcept;
 
         /**
          * @brief Helper method to read the content from a file into a QByteArray
@@ -176,8 +162,7 @@ class SmartFile : public QObject
          * @brief Helper method to save the content of a QByteArray to a file
          *
          * This method can be used in derived classes of #SmartFile to simply write a
-         * QByteArray to a file. Especially to implement the pure virtual method
-         * #saveToFile() this may be useful.
+         * QByteArray to a file.
          *
          * @param filepath      The path to the file
          * @param content       The content which will be written to the file
@@ -211,9 +196,9 @@ class SmartFile : public QObject
          * @brief This variable determines whether the file was restored or not
          *
          * This file is set to true when the constructor was called with the parameter
-         * "restore == true". After calling #save() with parameter "toOriginal == true",
-         * this flag will be reset to false. The destructor needs this flag to decide
-         * whether the temporary file should be removed or not.
+         * "restore == true". After calling #updateMembersAfterSaving() with parameter
+         * "toOriginal == true", this flag will be reset to false. The destructor needs
+         * this flag to decide whether the temporary file should be removed or not.
          */
         bool mIsRestored;
 
@@ -221,7 +206,7 @@ class SmartFile : public QObject
          * @brief If true, the file is opened as read-only
          *
          * @li No temporary files will be created/removed
-         * @li It's not possible to #save() the file (exception will be thrown instead)
+         * @li #prepareSaveAndReturnFilePath() will always throw an exception
          */
         bool mIsReadOnly;
 
@@ -231,10 +216,6 @@ class SmartFile : public QObject
          */
         bool mIsCreated;
 
-        /**
-         * @brief If true, the file will be removed after calling #save()
-         */
-        bool mRemoveFlag;
 };
 
 #endif // SMARTFILE_H

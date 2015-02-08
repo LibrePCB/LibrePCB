@@ -47,12 +47,14 @@ SmartTextFile::~SmartTextFile()
 }
 
 /*****************************************************************************************
- *  Protected Methods
+ *  General Methods
  ****************************************************************************************/
 
-void SmartTextFile::saveToFile(const FilePath& filepath) throw (Exception)
+void SmartTextFile::save(bool toOriginal) throw (Exception)
 {
+    const FilePath& filepath = prepareSaveAndReturnFilePath(toOriginal);
     saveContentToFile(filepath, mContent);
+    updateMembersAfterSaving(toOriginal);
 }
 
 /*****************************************************************************************

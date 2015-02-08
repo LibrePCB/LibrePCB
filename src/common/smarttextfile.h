@@ -39,7 +39,7 @@
  * @author ubruhin
  * @date 2015-01-19
  */
-class SmartTextFile : public SmartFile
+class SmartTextFile final : public SmartFile
 {
         Q_OBJECT
 
@@ -65,7 +65,7 @@ class SmartTextFile : public SmartFile
         /**
          * @copydoc SmartFile#~SmartFile()
          */
-        virtual ~SmartTextFile() noexcept;
+        ~SmartTextFile() noexcept;
 
 
         // Getters
@@ -90,13 +90,26 @@ class SmartTextFile : public SmartFile
         void setContent(const QByteArray& content) noexcept {mContent = content;}
 
 
+        // General Methods
+
+        /**
+         * @brief Write all changes to the file system
+         *
+         * @param toOriginal    Specifies whether the original or the backup file should
+         *                      be overwritten/created.
+         *
+         * @throw Exception If an error occurs
+         */
+        void save(bool toOriginal) throw (Exception);
+
+
         // Static Methods
 
         /**
          * @brief Create a new text file
          *
          * @note    This method will NOT immediately create the file! The file will be
-         *          created after calling SmartFile#save().
+         *          created after calling #save().
          *
          * @param filepath  The filepath to the file to create (always to the original file,
          *                  not to the backup file with "~" at the end of the filename!)
@@ -131,11 +144,6 @@ class SmartTextFile : public SmartFile
          * @throw Exception See SmartFile#SmartFile()
          */
         SmartTextFile(const FilePath& filepath, bool restore, bool readOnly, bool create) throw (Exception);
-
-        /**
-         * @copydoc SmartFile#saveToFile()
-         */
-        virtual void saveToFile(const FilePath& filepath) throw (Exception);
 
 
         // General Attributes

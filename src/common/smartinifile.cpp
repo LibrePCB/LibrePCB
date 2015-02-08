@@ -159,12 +159,10 @@ void SmartIniFile::releaseQSettings(QSettings* settings) noexcept
     // and then throws an exception. The destructor then will delete the QSettings object.
 }
 
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-void SmartIniFile::saveToFile(const FilePath& filepath) throw (Exception)
+void SmartIniFile::save(bool toOriginal) throw (Exception)
 {
+    const FilePath& filepath = prepareSaveAndReturnFilePath(toOriginal);
+
     foreach (QSettings* settings, mSettings)
     {
         settings->sync(); // write all changes to the temp file in temp directory
@@ -201,6 +199,8 @@ void SmartIniFile::saveToFile(const FilePath& filepath) throw (Exception)
         throw RuntimeError(__FILE__, __LINE__, filepath.toStr(),
             QString(tr("Error while writing to file \"%1\"!")).arg(filepath.toNative()));
     }
+
+    updateMembersAfterSaving(toOriginal);
 }
 
 /*****************************************************************************************

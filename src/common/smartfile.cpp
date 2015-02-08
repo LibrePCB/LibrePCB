@@ -31,7 +31,7 @@
 SmartFile::SmartFile(const FilePath& filepath, bool restore, bool readOnly, bool create) throw (Exception) :
     QObject(nullptr), mFilePath(filepath), mTmpFilePath(filepath.toStr() % '~'),
     mOpenedFilePath(filepath), mIsRestored(restore), mIsReadOnly(readOnly),
-    mIsCreated(create), mRemoveFlag(false)
+    mIsCreated(create)
 {
     if (create)
     {
@@ -84,46 +84,52 @@ SmartFile::~SmartFile()
  *  General Methods
  ****************************************************************************************/
 
-void SmartFile::save(bool toOriginal) throw (Exception)
+void SmartFile::removeFile(bool original) throw (Exception)
+{
+    if (mIsReadOnly)
+        throw LogicError(__FILE__, __LINE__, QString(), tr("Cannot remove read-only file!"));
+
+    FilePath filepath(original ? mFilePath : mTmpFilePath);
+
+    if (filepath.isExistingFile())
+    {
+        if (!QFile::remove(filepath.toStr()))
+        {
+            throw RuntimeError(__FILE__, __LINE__, filepath.toStr(),
+                QString(tr("Cannot remove file \"%1\"")).arg(filepath.toNative()));
+        }
+    }
+}
+
+/*****************************************************************************************
+ *  Protected Methods
+ ****************************************************************************************/
+
+const FilePath& SmartFile::prepareSaveAndReturnFilePath(bool toOriginal) throw (Exception)
 {
     if (mIsReadOnly)
         throw LogicError(__FILE__, __LINE__, QString(), tr("Cannot save read-only file!"));
 
-    FilePath filepath(toOriginal ? mFilePath : mTmpFilePath);
+    const FilePath& filepath(toOriginal ? mFilePath : mTmpFilePath);
 
-    if (mRemoveFlag)
+    if (!filepath.getParentDir().isExistingDir())
     {
-        if (filepath.isExistingFile())
-        {
-            if (!QFile::remove(filepath.toStr()))
-            {
-                throw RuntimeError(__FILE__, __LINE__, filepath.toStr(),
-                    QString(tr("Cannot remove file \"%1\"")).arg(filepath.toNative()));
-            }
-        }
-    }
-    else
-    {
-        if (!filepath.getParentDir().isExistingDir())
-        {
-            // try to create parent directories
-            if (!filepath.getParentDir().mkPath())
-                qWarning() << "could not make path for file" << filepath.toNative();
-        }
-
-        saveToFile(filepath);
+        // try to create parent directories
+        if (!filepath.getParentDir().mkPath())
+            qWarning() << "could not make path for file" << filepath.toNative();
     }
 
+    return filepath;
+}
+
+void SmartFile::updateMembersAfterSaving(bool toOriginal) noexcept
+{
     if (toOriginal && mIsRestored)
         mIsRestored = false;
 
     if (toOriginal && mIsCreated)
         mIsCreated = false;
 }
-
-/*****************************************************************************************
- *  Static Protected Methods
- ****************************************************************************************/
 
 QByteArray SmartFile::readContentFromFile(const FilePath& filepath) throw (Exception)
 {
