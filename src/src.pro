@@ -174,7 +174,8 @@ SOURCES += \
     common/smarttextfile.cpp \
     common/smartfile.cpp \
     common/file_io/xmldomdocument.cpp \
-    common/file_io/xmldomelement.cpp
+    common/file_io/xmldomelement.cpp \
+    workspace/settings/items/wsi_appearance.cpp
 
 HEADERS += \
     common/units/all_length_units.h \
@@ -297,7 +298,8 @@ HEADERS += \
     common/file_io/xmldomdocument.h \
     common/file_io/xmldomelement.h \
     project/erc/if_ercmsgprovider.h \
-    common/file_io/if_xmlserializableobject.h
+    common/file_io/if_xmlserializableobject.h \
+    workspace/settings/items/wsi_appearance.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \

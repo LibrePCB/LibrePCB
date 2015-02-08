@@ -34,6 +34,7 @@
 #include "items/wsi_librarylocaleorder.h"
 #include "items/wsi_librarynormorder.h"
 #include "items/wsi_debugtools.h"
+#include "items/wsi_appearance.h"
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -94,6 +95,7 @@ class WorkspaceSettings final : public QObject
         WSI_LibraryLocaleOrder* getLibLocaleOrder() const noexcept {return mLibraryLocaleOrder;}
         WSI_LibraryNormOrder* getLibNormOrder() const noexcept {return mLibraryNormOrder;}
         WSI_DebugTools* getDebugTools() const noexcept {return mDebugTools;}
+        WSI_Appearance* getAppearance() const noexcept {return mAppearance;}
 
 
         // General Methods
@@ -133,6 +135,7 @@ class WorkspaceSettings final : public QObject
         WSI_LibraryLocaleOrder* mLibraryLocaleOrder;
         WSI_LibraryNormOrder* mLibraryNormOrder;
         WSI_DebugTools* mDebugTools;
+        WSI_Appearance* mAppearance;
 };
 
 #endif // WORKSPACESETTINGS_H

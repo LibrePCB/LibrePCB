@@ -47,6 +47,10 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(WorkspaceSettings& settings) :
     mUi->generalLayout->addRow(mSettings.getProjectAutosaveInterval()->getLabelText(),
                                mSettings.getProjectAutosaveInterval()->getWidget());
 
+    // tab: appearance
+    mUi->appearanceLayout->addRow(mSettings.getAppearance()->getUseOpenGlLabelText(),
+                                 mSettings.getAppearance()->getUseOpenGlWidget());
+
     // tab: library
     mUi->libraryLayout->addRow(mSettings.getLibLocaleOrder()->getLabelText(),
                                mSettings.getLibLocaleOrder()->getWidget());
@@ -73,6 +77,9 @@ WorkspaceSettingsDialog::~WorkspaceSettingsDialog()
     mSettings.getAppLocale()->getWidget()->setParent(0);
     mSettings.getAppDefMeasUnits()->getLengthUnitComboBox()->setParent(0);
     mSettings.getProjectAutosaveInterval()->getWidget()->setParent(0);
+
+    // tab: appearance
+    mSettings.getAppearance()->getUseOpenGlWidget()->setParent(0);
 
     // tab: library
     mSettings.getLibLocaleOrder()->getWidget()->setParent(0);

@@ -34,7 +34,7 @@
 WorkspaceSettings::WorkspaceSettings() :
     QObject(0), mMetadataPath(Workspace::instance().getMetadataPath()), mDialog(0),
     mAppLocale(0), mProjectAutosaveInterval(0), mLibraryLocaleOrder(0),
-    mLibraryNormOrder(0), mDebugTools(0)
+    mLibraryNormOrder(0), mDebugTools(0), mAppearance(0)
 {
     // check if the metadata directory exists
     if (!mMetadataPath.isExistingDir())
@@ -59,6 +59,7 @@ WorkspaceSettings::WorkspaceSettings() :
     mItems.append(mLibraryLocaleOrder       = new WSI_LibraryLocaleOrder(*this));
     mItems.append(mLibraryNormOrder         = new WSI_LibraryNormOrder(*this));
     mItems.append(mDebugTools               = new WSI_DebugTools(*this));
+    mItems.append(mAppearance               = new WSI_Appearance(*this));
 
     // load the settings dialog
     mDialog = new WorkspaceSettingsDialog(*this);

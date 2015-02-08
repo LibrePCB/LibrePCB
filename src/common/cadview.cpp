@@ -26,6 +26,8 @@
 #include <QtOpenGL>
 #include "cadview.h"
 #include "cadscene.h"
+#include "../workspace/workspace.h"
+#include "../workspace/settings/workspacesettings.h"
 
 /*****************************************************************************************
  *  Static Variables
@@ -49,13 +51,14 @@ CADView::CADView(QWidget* parent) :
     updatePositionLabelText();
 
     setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing| QPainter::SmoothPixmapTransform);
-    //setViewport(new QGLWidget(QGLFormat(QGL::DoubleBuffer | QGL::AlphaChannel | QGL::SampleBuffers)));
+    if (Workspace::instance().getSettings().getAppearance()->getUseOpenGl())
+        setViewport(new QGLWidget(QGLFormat(QGL::DoubleBuffer | QGL::AlphaChannel | QGL::SampleBuffers)));
     setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
     setDragMode(QGraphicsView::RubberBandDrag);
-    setSceneRect(-10000, -10000, 20000, 20000); ///< @todo is there a better solution?
+    setSceneRect(-2000, -2000, 4000, 4000); ///< @todo is there a better solution?
 }
 
 CADView::~CADView()
@@ -162,7 +165,7 @@ void CADView::drawBackground(QPainter* painter, const QRectF& rect)
     painter->fillRect(rect, backgroundBrush());
 
     // draw background grid lines
-    if (gridIntervalPixels * scaleFactor >= (qreal)3)
+    if (gridIntervalPixels * scaleFactor >= (qreal)5)
     {
         switch (mGridType)
         {
