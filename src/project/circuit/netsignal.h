@@ -25,13 +25,15 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QDomElement>
 #include "../erc/if_ercmsgprovider.h"
+#include "../../common/file_io/if_xmlserializableobject.h"
 #include "../../common/exceptions.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
+
+class XmlDomElement;
 
 namespace project {
 class Circuit;
@@ -50,21 +52,24 @@ namespace project {
 /**
  * @brief The NetSignal class
  */
-class NetSignal final : public QObject, public IF_ErcMsgProvider
+class NetSignal final : public IF_ErcMsgProvider, public IF_XmlSerializableObject
 {
-        Q_OBJECT
+        Q_DECLARE_TR_FUNCTIONS(NetSignal)
         DECLARE_ERC_MSG_CLASS_NAME(NetSignal)
 
     public:
 
         // Constructors / Destructor
-        explicit NetSignal(Circuit& circuit, const QDomElement& domElement) throw (Exception);
+        explicit NetSignal(const Circuit& circuit,
+                           const XmlDomElement& domElement) throw (Exception);
+        explicit NetSignal(const Circuit& circuit, NetClass& netclass,
+                           const QString& name, bool autoName) throw (Exception);
         ~NetSignal() noexcept;
 
         // Getters
         const QUuid& getUuid() const noexcept {return mUuid;}
         const QString& getName() const noexcept {return mName;}
-        bool hasAutoName() const noexcept {return mAutoName;}
+        bool hasAutoName() const noexcept {return mHasAutoName;}
         NetClass& getNetClass() const noexcept {return *mNetClass;}
         bool isNameForced() const noexcept {return (mGenCompSignalWithForcedNameCount > 0);}
         const QList<GenCompSignalInstance*>& getGenCompSignals() const noexcept {return mGenCompSignals;}
@@ -74,17 +79,14 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider
         void setName(const QString& name, bool isAutoName) throw (Exception);
 
         // General Methods
-        void registerGenCompSignal(GenCompSignalInstance* signal) noexcept;
-        void unregisterGenCompSignal(GenCompSignalInstance* signal) noexcept;
-        void registerSchematicNetPoint(SchematicNetPoint* netpoint) noexcept;
-        void unregisterSchematicNetPoint(SchematicNetPoint* netpoint) noexcept;
-        void addToCircuit(bool addNode, QDomElement& parent) throw (Exception);
-        void removeFromCircuit(bool removeNode, QDomElement& parent) throw (Exception);
+        void registerGenCompSignal(GenCompSignalInstance& signal) noexcept;
+        void unregisterGenCompSignal(GenCompSignalInstance& signal) noexcept;
+        void registerSchematicNetPoint(SchematicNetPoint& netpoint) noexcept;
+        void unregisterSchematicNetPoint(SchematicNetPoint& netpoint) noexcept;
+        void addToCircuit() noexcept;
+        void removeFromCircuit() noexcept;
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
 
-        // Static Methods
-        static NetSignal* create(Circuit& circuit, QDomDocument& doc,
-                                 const QUuid& netclass, const QString& name,
-                                 bool autoName) throw (Exception);
 
     private:
 
@@ -96,28 +98,28 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider
         // Private Methods
         void updateErcMessages() noexcept;
 
-        // General
-        Circuit& mCircuit;
-        QDomElement mDomElement;
-        bool mAddedToCircuit;
 
-        // Attributes
-        QUuid mUuid;
-        QString mName;
-        bool mAutoName;
-        NetClass* mNetClass;
+        // General
+        const Circuit& mCircuit;
+        bool mAddedToCircuit;
 
         // Misc
 
         /// @brief the ERC message for unused netsignals
-        QScopedPointer<ErcMsg> mErcMsgUnusedNetSignal;
+        ErcMsg* mErcMsgUnusedNetSignal;
         /// @brief the ERC messages for netsignals with less than two generic component signals
-        QScopedPointer<ErcMsg> mErcMsgConnectedToLessThanTwoPins;
+        ErcMsg* mErcMsgConnectedToLessThanTwoPins;
 
         // Registered Elements of this Netclass
         QList<GenCompSignalInstance*> mGenCompSignals;
         QList<SchematicNetPoint*> mSchematicNetPoints;
         uint mGenCompSignalWithForcedNameCount;
+
+        // Attributes
+        QUuid mUuid;
+        QString mName;
+        bool mHasAutoName;
+        NetClass* mNetClass;
 };
 
 } // namespace project

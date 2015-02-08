@@ -32,7 +32,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSymbolInstanceRemove::CmdSymbolInstanceRemove(Schematic& schematic, SymbolInstance* symbol,
+CmdSymbolInstanceRemove::CmdSymbolInstanceRemove(Schematic& schematic, SymbolInstance& symbol,
                                                  UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Remove symbol"), parent),
     mSchematic(schematic), mSymbolInstance(symbol)
@@ -42,7 +42,7 @@ CmdSymbolInstanceRemove::CmdSymbolInstanceRemove(Schematic& schematic, SymbolIns
 CmdSymbolInstanceRemove::~CmdSymbolInstanceRemove() noexcept
 {
     if (mIsExecuted)
-        delete mSymbolInstance;
+        delete &mSymbolInstance;
 }
 
 /*****************************************************************************************

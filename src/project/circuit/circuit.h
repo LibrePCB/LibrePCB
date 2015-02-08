@@ -25,6 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include "../../common/file_io/if_xmlserializableobject.h"
 #include "../../common/exceptions.h"
 #include "../../common/filepath.h"
 
@@ -69,7 +70,7 @@ namespace project {
  * @author ubruhin
  * @date 2014-07-03
  */
-class Circuit final : public QObject
+class Circuit final : public QObject, public IF_XmlSerializableObject
 {
         Q_OBJECT
 
@@ -86,20 +87,18 @@ class Circuit final : public QObject
         const QHash<QUuid, NetClass*>& getNetClasses() const noexcept {return mNetClasses;}
         NetClass* getNetClassByUuid(const QUuid& uuid) const noexcept;
         NetClass* getNetClassByName(const QString& name) const noexcept;
-        NetClass* createNetClass(const QString& name) throw (Exception);
-        void addNetClass(NetClass* netclass, bool toDomTree = true) throw (Exception);
-        void removeNetClass(NetClass* netclass, bool fromDomTree = true,
-                            bool deleteNetClass = false) throw (Exception);
+        void addNetClass(NetClass& netclass) throw (Exception);
+        void removeNetClass(NetClass& netclass) throw (Exception);
+        void setNetClassName(NetClass& netclass, const QString& newName) throw (Exception);
         void execEditNetClassesDialog(QWidget* parent = 0) noexcept;
 
         // NetSignal Methods
         const QHash<QUuid, NetSignal*>& getNetSignals() const noexcept {return mNetSignals;}
         NetSignal* getNetSignalByUuid(const QUuid& uuid) const noexcept;
         NetSignal* getNetSignalByName(const QString& name) const noexcept;
-        NetSignal* createNetSignal(const QUuid& netclass, QString name = QString()) throw (Exception);
-        void addNetSignal(NetSignal* netsignal, bool toDomTree = true) throw (Exception);
-        void removeNetSignal(NetSignal* netsignal, bool fromDomTree = true,
-                             bool deleteNetSignal = false) throw (Exception);
+        NetSignal* createNetSignal(NetClass& netclass, QString name = QString()) throw (Exception);
+        void addNetSignal(NetSignal& netsignal) throw (Exception);
+        void removeNetSignal(NetSignal& netsignal) throw (Exception);
         void setNetSignalName(NetSignal& netsignal, const QString& newName, bool isAutoName) throw (Exception);
 
         // GenCompInstance Methods
@@ -108,9 +107,8 @@ class Circuit final : public QObject
         GenCompInstance* createGenCompInstance(const library::GenericComponent& genComp,
                                                const library::GenCompSymbVar& symbVar,
                                                QString name = QString()) throw (Exception);
-        void addGenCompInstance(GenCompInstance* genCompInstance, bool toDomTree = true) throw (Exception);
-        void removeGenCompInstance(GenCompInstance* genCompInstance, bool fromDomTree = true,
-                                   bool deleteGenCompInstance = false) throw (Exception);
+        void addGenCompInstance(GenCompInstance& genCompInstance) throw (Exception);
+        void removeGenCompInstance(GenCompInstance& genCompInstance) throw (Exception);
         void setGenCompInstanceName(GenCompInstance& genComp, const QString& newName) throw (Exception);
 
         // General Methods
@@ -119,12 +117,12 @@ class Circuit final : public QObject
 
     signals:
 
-        void netClassAdded(NetClass* netclass);
-        void netClassRemoved(NetClass* netclass);
-        void netSignalAdded(NetSignal* netsignal);
-        void netSignalRemoved(NetSignal* netsignal);
-        void genCompAdded(GenCompInstance* genComp);
-        void genCompRemoved(GenCompInstance* genComp);
+        void netClassAdded(NetClass& netclass);
+        void netClassRemoved(NetClass& netclass);
+        void netSignalAdded(NetSignal& netsignal);
+        void netSignalRemoved(NetSignal& netsignal);
+        void genCompAdded(GenCompInstance& genComp);
+        void genCompRemoved(GenCompInstance& genComp);
 
 
     private:
@@ -133,6 +131,14 @@ class Circuit final : public QObject
         Circuit();
         Circuit(const Circuit& other);
         Circuit& operator=(const Circuit& rhs);
+
+        // Private Methods
+
+        /**
+         * @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+         */
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+
 
         // General
         Project& mProject; ///< A reference to the Project object (from the ctor)

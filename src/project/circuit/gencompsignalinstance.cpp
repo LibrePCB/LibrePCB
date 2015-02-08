@@ -18,7 +18,6 @@
  */
 
 #include <QtCore>
-#include <QDomElement>
 #include "../../common/exceptions.h"
 #include "gencompsignalinstance.h"
 #include "gencompinstance.h"
@@ -26,6 +25,7 @@
 #include "netsignal.h"
 #include "../../library/genericcomponent.h"
 #include "../erc/ercmsg.h"
+#include "../../common/file_io/xmldomelement.h"
 
 namespace project {
 
@@ -34,36 +34,50 @@ namespace project {
  ****************************************************************************************/
 
 GenCompSignalInstance::GenCompSignalInstance(Circuit& circuit, GenCompInstance& genCompInstance,
-                                             const QDomElement& domElement) throw (Exception) :
-    QObject(0), mCircuit(circuit), mGenCompInstance(genCompInstance), mDomElement(domElement),
+                                             const XmlDomElement& domElement) throw (Exception) :
+    QObject(nullptr), mCircuit(circuit), mGenCompInstance(genCompInstance),
     mGenCompSignal(nullptr), mNetSignal(nullptr), mAddedToCircuit(false)
 {
     // read attributes
-    QString genCompSignalUuid = mDomElement.attribute("comp_signal");
+    QUuid genCompSignalUuid = domElement.getAttribute<QUuid>("comp_signal");
     mGenCompSignal = mGenCompInstance.getGenComp().getSignalByUuid(genCompSignalUuid);
     if(!mGenCompSignal)
     {
-        throw RuntimeError(__FILE__, __LINE__, genCompSignalUuid, QString(
-            tr("Invalid component signal UUID: \"%1\"")).arg(genCompSignalUuid));
+        throw RuntimeError(__FILE__, __LINE__, genCompSignalUuid.toString(), QString(
+            tr("Invalid component signal UUID: \"%1\"")).arg(genCompSignalUuid.toString()));
     }
-    QString netsignalUuid = mDomElement.attribute("netsignal");
-    if (!netsignalUuid.isEmpty())
+    QUuid netsignalUuid = domElement.getAttribute<QUuid>("netsignal", false, QUuid());
+    if (!netsignalUuid.isNull())
     {
         mNetSignal = mCircuit.getNetSignalByUuid(netsignalUuid);
         if(!mNetSignal)
         {
-            throw RuntimeError(__FILE__, __LINE__, netsignalUuid,
-                QString(tr("Invalid netsignal UUID: \"%1\"")).arg(netsignalUuid));
+            throw RuntimeError(__FILE__, __LINE__, netsignalUuid.toString(),
+                QString(tr("Invalid netsignal UUID: \"%1\"")).arg(netsignalUuid.toString()));
         }
     }
 
+    init();
+}
+
+GenCompSignalInstance::GenCompSignalInstance(Circuit& circuit, GenCompInstance& genCompInstance,
+                                             const library::GenCompSignal& genCompSignal,
+                                             NetSignal* netsignal) throw (Exception) :
+    QObject(nullptr), mCircuit(circuit), mGenCompInstance(genCompInstance),
+    mGenCompSignal(&genCompSignal), mNetSignal(netsignal), mAddedToCircuit(false)
+{
+    init();
+}
+
+void GenCompSignalInstance::init() throw (Exception)
+{
     // create ERC messages
     mErcMsgUnconnectedRequiredSignal.reset(new ErcMsg(mCircuit.getProject(), *this,
         QString("%1/%2").arg(mGenCompInstance.getUuid().toString()).arg(mGenCompSignal->getUuid().toString()),
-        "UnconnectedRequiredSignal", ErcMsg::ErcMsgType_t::CircuitError));
+        "UnconnectedRequiredSignal", ErcMsg::ErcMsgType_t::CircuitError, QString()));
     mErcMsgForcedNetSignalNameConflict.reset(new ErcMsg(mCircuit.getProject(), *this,
         QString("%1/%2").arg(mGenCompInstance.getUuid().toString()).arg(mGenCompSignal->getUuid().toString()),
-        "ForcedNetSignalNameConflict", ErcMsg::ErcMsgType_t::SchematicError));
+        "ForcedNetSignalNameConflict", ErcMsg::ErcMsgType_t::SchematicError, QString()));
     updateErcMessages();
 
     // register to generic component attributes changed
@@ -103,15 +117,10 @@ void GenCompSignalInstance::setNetSignal(NetSignal* netsignal) throw (Exception)
         throw LogicError(__FILE__, __LINE__);
 
     if (mNetSignal)
-        mNetSignal->unregisterGenCompSignal(this);
+        mNetSignal->unregisterGenCompSignal(*this);
 
     if (netsignal)
-        netsignal->registerGenCompSignal(this);
-
-    if (netsignal)
-        mDomElement.setAttribute("netsignal", netsignal->getUuid().toString());
-    else
-        mDomElement.setAttribute("netsignal", "");
+        netsignal->registerGenCompSignal(*this);
 
     mNetSignal = netsignal;
     updateErcMessages();
@@ -151,7 +160,7 @@ void GenCompSignalInstance::addToCircuit() throw (Exception)
         throw LogicError(__FILE__, __LINE__);
 
     if (mNetSignal)
-        mNetSignal->registerGenCompSignal(this);
+        mNetSignal->registerGenCompSignal(*this);
 
     mAddedToCircuit = true;
     updateErcMessages();
@@ -163,10 +172,18 @@ void GenCompSignalInstance::removeFromCircuit() throw (Exception)
         throw LogicError(__FILE__, __LINE__);
 
     if (mNetSignal)
-        mNetSignal->unregisterGenCompSignal(this);
+        mNetSignal->unregisterGenCompSignal(*this);
 
     mAddedToCircuit = false;
     updateErcMessages();
+}
+
+XmlDomElement* GenCompSignalInstance::serializeToXmlDomElement() const throw (Exception)
+{
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("map"));
+    root->setAttribute("comp_signal", mGenCompSignal->getUuid());
+    root->setAttribute("netsignal", mNetSignal ? mNetSignal->getUuid() : QString());
+    return root.take();
 }
 
 /*****************************************************************************************

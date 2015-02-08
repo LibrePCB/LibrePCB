@@ -25,6 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include "../../common/file_io/if_xmlserializableobject.h"
 #include "../../common/exceptions.h"
 #include "../../common/filepath.h"
 
@@ -48,7 +49,7 @@ namespace project {
 /**
  * @brief The ErcMsgList class contains a list of ERC messages which are visible for the user
  */
-class ErcMsgList final : public QObject
+class ErcMsgList final : public QObject, public IF_XmlSerializableObject
 {
         Q_OBJECT
 
@@ -81,6 +82,13 @@ class ErcMsgList final : public QObject
         ErcMsgList();
         ErcMsgList(const ErcMsgList& other);
         ErcMsgList& operator=(const ErcMsgList& rhs);
+
+        // Private Methods
+
+        /**
+         * @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+         */
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
 
 
         // General

@@ -32,8 +32,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSchematicNetLineAdd::CmdSchematicNetLineAdd(Schematic& schematic, const QUuid& startPoint,
-                                               const QUuid& endPoint, UndoCommand* parent) throw (Exception) :
+CmdSchematicNetLineAdd::CmdSchematicNetLineAdd(Schematic& schematic, SchematicNetPoint& startPoint,
+                                               SchematicNetPoint& endPoint, UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Add netline"), parent),
     mSchematic(schematic), mStartPoint(startPoint), mEndPoint(endPoint), mNetLine(0)
 {
@@ -54,7 +54,7 @@ void CmdSchematicNetLineAdd::redo() throw (Exception)
     if (!mNetLine) // only the first time
         mNetLine = mSchematic.createNetLine(mStartPoint, mEndPoint, Length(254000)); // throws an exception on error
 
-    mSchematic.addNetLine(mNetLine); // throws an exception on error
+    mSchematic.addNetLine(*mNetLine); // throws an exception on error
 
     try
     {
@@ -62,14 +62,14 @@ void CmdSchematicNetLineAdd::redo() throw (Exception)
     }
     catch (Exception &e)
     {
-        mSchematic.removeNetLine(mNetLine);
+        mSchematic.removeNetLine(*mNetLine);
         throw;
     }
 }
 
 void CmdSchematicNetLineAdd::undo() throw (Exception)
 {
-    mSchematic.removeNetLine(mNetLine); // throws an exception on error
+    mSchematic.removeNetLine(*mNetLine); // throws an exception on error
 
     try
     {
@@ -77,7 +77,7 @@ void CmdSchematicNetLineAdd::undo() throw (Exception)
     }
     catch (Exception& e)
     {
-        mSchematic.addNetLine(mNetLine);
+        mSchematic.addNetLine(*mNetLine);
         throw;
     }
 }

@@ -32,19 +32,19 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSchematicNetPointAdd::CmdSchematicNetPointAdd(Schematic& schematic, const QUuid& netsignal,
+CmdSchematicNetPointAdd::CmdSchematicNetPointAdd(Schematic& schematic, NetSignal& netsignal,
                                                  const Point& position, UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Add netpoint"), parent),
-    mSchematic(schematic), mNetSignal(netsignal), mAttachedToSymbol(false),
-    mPosition(position), mSymbol(), mPin(), mNetPoint(0)
+    mSchematic(schematic), mNetSignal(&netsignal), mAttachedToSymbol(false),
+    mPosition(position), mSymbol(nullptr), mPin(), mNetPoint(nullptr)
 {
 }
 
-CmdSchematicNetPointAdd::CmdSchematicNetPointAdd(Schematic& schematic, const QUuid& symbol,
+CmdSchematicNetPointAdd::CmdSchematicNetPointAdd(Schematic& schematic, SymbolInstance& symbol,
                                                  const QUuid& pin, UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Add netpoint"), parent),
-    mSchematic(schematic), mNetSignal(), mAttachedToSymbol(true),
-    mPosition(), mSymbol(symbol), mPin(pin), mNetPoint(0)
+    mSchematic(schematic), mNetSignal(nullptr), mAttachedToSymbol(true),
+    mPosition(), mSymbol(&symbol), mPin(pin), mNetPoint(nullptr)
 {
 }
 
@@ -63,12 +63,12 @@ void CmdSchematicNetPointAdd::redo() throw (Exception)
     if (!mNetPoint) // only the first time
     {
         if (mAttachedToSymbol)
-            mNetPoint = mSchematic.createNetPoint(mSymbol, mPin); // throws an exception on error
+            mNetPoint = mSchematic.createNetPoint(*mSymbol, mPin); // throws an exception on error
         else
-            mNetPoint = mSchematic.createNetPoint(mNetSignal, mPosition); // throws an exception on error
+            mNetPoint = mSchematic.createNetPoint(*mNetSignal, mPosition); // throws an exception on error
     }
 
-    mSchematic.addNetPoint(mNetPoint); // throws an exception on error
+    mSchematic.addNetPoint(*mNetPoint); // throws an exception on error
 
     try
     {
@@ -76,14 +76,14 @@ void CmdSchematicNetPointAdd::redo() throw (Exception)
     }
     catch (Exception &e)
     {
-        mSchematic.removeNetPoint(mNetPoint);
+        mSchematic.removeNetPoint(*mNetPoint);
         throw;
     }
 }
 
 void CmdSchematicNetPointAdd::undo() throw (Exception)
 {
-    mSchematic.removeNetPoint(mNetPoint); // throws an exception on error
+    mSchematic.removeNetPoint(*mNetPoint); // throws an exception on error
 
     try
     {
@@ -91,7 +91,7 @@ void CmdSchematicNetPointAdd::undo() throw (Exception)
     }
     catch (Exception& e)
     {
-        mSchematic.addNetPoint(mNetPoint);
+        mSchematic.addNetPoint(*mNetPoint);
         throw;
     }
 }

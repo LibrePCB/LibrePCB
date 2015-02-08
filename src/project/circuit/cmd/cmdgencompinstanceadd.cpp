@@ -37,7 +37,7 @@ CmdGenCompInstanceAdd::CmdGenCompInstanceAdd(Circuit& circuit,
                                              const library::GenCompSymbVar& symbVar,
                                              UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Add generic component"), parent),
-    mCircuit(circuit), mGenComp(genComp), mSymbVar(symbVar), mGenCompInstance(0)
+    mCircuit(circuit), mGenComp(genComp), mSymbVar(symbVar), mGenCompInstance(nullptr)
 {
 }
 
@@ -58,7 +58,7 @@ void CmdGenCompInstanceAdd::redo() throw (Exception)
         mGenCompInstance = mCircuit.createGenCompInstance(mGenComp, mSymbVar); // throws an exception on error
     }
 
-    mCircuit.addGenCompInstance(mGenCompInstance); // throws an exception on error
+    mCircuit.addGenCompInstance(*mGenCompInstance); // throws an exception on error
 
     try
     {
@@ -66,14 +66,14 @@ void CmdGenCompInstanceAdd::redo() throw (Exception)
     }
     catch (Exception &e)
     {
-        mCircuit.removeGenCompInstance(mGenCompInstance);
+        mCircuit.removeGenCompInstance(*mGenCompInstance);
         throw;
     }
 }
 
 void CmdGenCompInstanceAdd::undo() throw (Exception)
 {
-    mCircuit.removeGenCompInstance(mGenCompInstance); // throws an exception on error
+    mCircuit.removeGenCompInstance(*mGenCompInstance); // throws an exception on error
 
     try
     {
@@ -81,7 +81,7 @@ void CmdGenCompInstanceAdd::undo() throw (Exception)
     }
     catch (Exception& e)
     {
-        mCircuit.addGenCompInstance(mGenCompInstance);
+        mCircuit.addGenCompInstance(*mGenCompInstance);
         throw;
     }
 }

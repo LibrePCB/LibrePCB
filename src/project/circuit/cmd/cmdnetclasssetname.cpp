@@ -24,6 +24,7 @@
 #include <QtCore>
 #include "cmdnetclasssetname.h"
 #include "../netclass.h"
+#include "../circuit.h"
 
 namespace project {
 
@@ -31,10 +32,10 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdNetClassSetName::CmdNetClassSetName(NetClass& netclass, const QString& newName,
+CmdNetClassSetName::CmdNetClassSetName(Circuit& circuit, NetClass& netclass, const QString& newName,
                                UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Rename netclass"), parent),
-    mNetClass(netclass), mOldName(netclass.getName()), mNewName(newName)
+    mCircuit(circuit), mNetClass(netclass), mOldName(netclass.getName()), mNewName(newName)
 {
 }
 
@@ -48,7 +49,7 @@ CmdNetClassSetName::~CmdNetClassSetName() noexcept
 
 void CmdNetClassSetName::redo() throw (Exception)
 {
-    mNetClass.setName(mNewName); // throws an exception on error
+    mCircuit.setNetClassName(mNetClass, mNewName); // throws an exception on error
 
     try
     {
@@ -56,14 +57,14 @@ void CmdNetClassSetName::redo() throw (Exception)
     }
     catch (Exception &e)
     {
-        mNetClass.setName(mOldName);
+        mCircuit.setNetClassName(mNetClass, mOldName);
         throw;
     }
 }
 
 void CmdNetClassSetName::undo() throw (Exception)
 {
-    mNetClass.setName(mOldName); // throws an exception on error
+    mCircuit.setNetClassName(mNetClass, mOldName); // throws an exception on error
 
     try
     {
@@ -71,7 +72,7 @@ void CmdNetClassSetName::undo() throw (Exception)
     }
     catch (Exception& e)
     {
-        mNetClass.setName(mNewName);
+        mCircuit.setNetClassName(mNetClass, mNewName);
         throw;
     }
 }

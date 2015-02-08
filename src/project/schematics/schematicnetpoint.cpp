@@ -37,6 +37,7 @@
 #include "../../workspace/workspace.h"
 #include "../../workspace/settings/workspacesettings.h"
 #include "../erc/ercmsg.h"
+#include "../../common/file_io/xmldomelement.h"
 
 namespace project {
 
@@ -104,65 +105,106 @@ const Length SchematicNetPoint::sCircleRadius = Length(600000);
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SchematicNetPoint::SchematicNetPoint(Schematic& schematic, const QDomElement& domElement)
-                                     throw (Exception) :
-    QObject(0), mCircuit(schematic.getProject().getCircuit()), mSchematic(schematic),
-    mDomElement(domElement), mGraphicsItem(nullptr), mNetSignal(nullptr),
-    mSymbolInstance(nullptr), mPinInstance(nullptr)
+SchematicNetPoint::SchematicNetPoint(Schematic& schematic, const XmlDomElement& domElement) throw (Exception) :
+    QObject(nullptr), mCircuit(schematic.getProject().getCircuit()), mSchematic(schematic),
+    mGraphicsItem(nullptr), mNetSignal(nullptr), mSymbolInstance(nullptr),
+    mPinInstance(nullptr)
 {
     // read attributes
-    mUuid = mDomElement.attribute("uuid");
-    if(mUuid.isNull())
-    {
-        throw RuntimeError(__FILE__, __LINE__, mDomElement.attribute("uuid"),
-            QString(tr("Invalid net point UUID: \"%1\""))
-            .arg(mDomElement.attribute("uuid")));
-    }
-    mAttached = (mDomElement.firstChildElement("attached").text() == "true");
+    mUuid = domElement.getAttribute<QUuid>("uuid");
+    mAttached = domElement.getFirstChild("attached", true)->getText<bool>();
     if (mAttached)
     {
-        QString symbolInstanceUuid = mDomElement.firstChildElement("symbol").text();
+        QUuid symbolInstanceUuid = domElement.getFirstChild("symbol", true)->getText<QUuid>();
         mSymbolInstance = mSchematic.getSymbolByUuid(symbolInstanceUuid);
         if (!mSymbolInstance)
         {
-            throw RuntimeError(__FILE__, __LINE__, symbolInstanceUuid,
-                QString(tr("Invalid symbol instance UUID: \"%1\"")).arg(symbolInstanceUuid));
+            throw RuntimeError(__FILE__, __LINE__, symbolInstanceUuid.toString(),
+                QString(tr("Invalid symbol instance UUID: \"%1\"")).arg(symbolInstanceUuid.toString()));
         }
-        QString pinUuid = mDomElement.firstChildElement("pin").text();
+        QUuid pinUuid = domElement.getFirstChild("pin", true)->getText<QUuid>();
         mPinInstance = mSymbolInstance->getPinInstance(pinUuid);
         if (!mPinInstance)
         {
-            throw RuntimeError(__FILE__, __LINE__, pinUuid,
-                QString(tr("Invalid symbol pin instance UUID: \"%1\"")).arg(pinUuid));
+            throw RuntimeError(__FILE__, __LINE__, pinUuid.toString(),
+                QString(tr("Invalid symbol pin instance UUID: \"%1\"")).arg(pinUuid.toString()));
         }
         const GenCompSignalInstance* compSignal = mPinInstance->getGenCompSignalInstance();
         if (!compSignal)
         {
-            throw RuntimeError(__FILE__, __LINE__, pinUuid,
-                QString(tr("The symbol pin instance \"%1\" has no signal.")).arg(pinUuid));
+            throw RuntimeError(__FILE__, __LINE__, pinUuid.toString(),
+                QString(tr("The symbol pin instance \"%1\" has no signal.")).arg(pinUuid.toString()));
         }
         mNetSignal = compSignal->getNetSignal();
         if (!mNetSignal)
         {
-            throw RuntimeError(__FILE__, __LINE__, pinUuid, QString(tr("The pin of the "
+            throw RuntimeError(__FILE__, __LINE__, pinUuid.toString(), QString(tr("The pin of the "
                 "netpoint \"%1\" has no netsignal.")).arg(mUuid.toString()));
         }
         mPosition = mPinInstance->getPosition();
     }
     else
     {
-        QString netSignalUuid = mDomElement.firstChildElement("netsignal").text();
+        QUuid netSignalUuid = domElement.getFirstChild("netsignal", true)->getText<QUuid>();
         mNetSignal = mSchematic.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
         if(!mNetSignal)
         {
-            throw RuntimeError(__FILE__, __LINE__, netSignalUuid,
-                QString(tr("Invalid net signal UUID: \"%1\"")).arg(netSignalUuid));
+            throw RuntimeError(__FILE__, __LINE__, netSignalUuid.toString(),
+                QString(tr("Invalid net signal UUID: \"%1\"")).arg(netSignalUuid.toString()));
         }
 
-        mPosition.setX(Length::fromMm(mDomElement.firstChildElement("position").attribute("x")));
-        mPosition.setY(Length::fromMm(mDomElement.firstChildElement("position").attribute("y")));
+        mPosition.setX(domElement.getFirstChild("position", true)->getAttribute<Length>("x"));
+        mPosition.setY(domElement.getFirstChild("position", true)->getAttribute<Length>("y"));
     }
 
+    init();
+}
+
+SchematicNetPoint::SchematicNetPoint(Schematic& schematic, NetSignal& netsignal, const Point& position) throw (Exception) :
+    QObject(nullptr), mCircuit(schematic.getProject().getCircuit()), mSchematic(schematic),
+    mGraphicsItem(nullptr), mNetSignal(nullptr), mSymbolInstance(nullptr),
+    mPinInstance(nullptr)
+{
+    mUuid = QUuid::createUuid(); // generate random UUID
+    mAttached = false;
+    mNetSignal = &netsignal;
+    mPosition = position;
+    init();
+}
+
+SchematicNetPoint::SchematicNetPoint(Schematic& schematic, SymbolInstance& symbol,
+                                     const QUuid& pin) throw (Exception) :
+    QObject(nullptr), mCircuit(schematic.getProject().getCircuit()), mSchematic(schematic),
+    mGraphicsItem(nullptr), mNetSignal(nullptr), mSymbolInstance(nullptr),
+    mPinInstance(nullptr)
+{
+    mUuid = QUuid::createUuid(); // generate random UUID
+    mAttached = true;
+    mSymbolInstance = &symbol;
+    mPinInstance = mSymbolInstance->getPinInstance(pin);
+    if (!mPinInstance)
+    {
+        throw RuntimeError(__FILE__, __LINE__, pin.toString(),
+            QString(tr("Invalid symbol pin instance UUID: \"%1\"")).arg(pin.toString()));
+    }
+    const GenCompSignalInstance* compSignal = mPinInstance->getGenCompSignalInstance();
+    if (!compSignal)
+    {
+        throw RuntimeError(__FILE__, __LINE__, pin.toString(),
+            QString(tr("The symbol pin instance \"%1\" has no signal.")).arg(pin.toString()));
+    }
+    mNetSignal = compSignal->getNetSignal();
+    if (!mNetSignal)
+    {
+        throw RuntimeError(__FILE__, __LINE__, pin.toString(), QString(tr("The pin of the "
+            "netpoint \"%1\" has no netsignal.")).arg(mUuid.toString()));
+    }
+    mPosition = mPinInstance->getPosition();
+    init();
+}
+
+void SchematicNetPoint::init() throw (Exception)
+{
     // create the graphics item
     mGraphicsItem = new SchematicNetPointGraphicsItem(mSchematic, *this);
     mGraphicsItem->setPos(mPosition.toPxQPointF());
@@ -185,9 +227,9 @@ SchematicNetPoint::~SchematicNetPoint() noexcept
 
 void SchematicNetPoint::setNetSignal(NetSignal& netsignal) throw (Exception)
 {
-    mNetSignal->unregisterSchematicNetPoint(this);
+    mNetSignal->unregisterSchematicNetPoint(*this);
     mNetSignal = &netsignal;
-    mNetSignal->registerSchematicNetPoint(this);
+    mNetSignal->registerSchematicNetPoint(*this);
 }
 
 void SchematicNetPoint::setPosition(const Point& position) noexcept
@@ -249,8 +291,7 @@ void SchematicNetPoint::unregisterNetLine(SchematicNetLine* netline) noexcept
     mErcMsgDeadNetPoint->setVisible(mLines.isEmpty());
 }
 
-void SchematicNetPoint::addToSchematic(Schematic& schematic, bool addNode,
-                                       QDomElement& parent) throw (Exception)
+void SchematicNetPoint::addToSchematic() throw (Exception)
 {
     Q_ASSERT(mLines.isEmpty());
 
@@ -261,24 +302,14 @@ void SchematicNetPoint::addToSchematic(Schematic& schematic, bool addNode,
             throw LogicError(__FILE__, __LINE__);
     }
 
-    if (addNode)
-    {
-        if (parent.nodeName() != "netpoints")
-            throw LogicError(__FILE__, __LINE__, parent.nodeName(), tr("Invalid node name!"));
-
-        if (parent.appendChild(mDomElement).isNull())
-            throw LogicError(__FILE__, __LINE__, QString(), tr("Could not append DOM node!"));
-    }
-
-    mNetSignal->registerSchematicNetPoint(this);
+    mNetSignal->registerSchematicNetPoint(*this);
     if (mAttached)
         mPinInstance->registerNetPoint(this);
-    schematic.addItem(mGraphicsItem);
+    mSchematic.addItem(mGraphicsItem);
     mErcMsgDeadNetPoint->setVisible(true);
 }
 
-void SchematicNetPoint::removeFromSchematic(Schematic& schematic, bool removeNode,
-                                            QDomElement& parent) throw (Exception)
+void SchematicNetPoint::removeFromSchematic() throw (Exception)
 {
     Q_ASSERT(mLines.isEmpty());
 
@@ -289,61 +320,31 @@ void SchematicNetPoint::removeFromSchematic(Schematic& schematic, bool removeNod
             throw LogicError(__FILE__, __LINE__);
     }
 
-    if (removeNode)
-    {
-        if (parent.nodeName() != "netpoints")
-            throw LogicError(__FILE__, __LINE__, parent.nodeName(), tr("Invalid node name!"));
-
-        if (parent.removeChild(mDomElement).isNull())
-            throw LogicError(__FILE__, __LINE__, QString(), tr("Could not remove node from DOM tree!"));
-    }
-
-    mNetSignal->unregisterSchematicNetPoint(this);
+    mNetSignal->unregisterSchematicNetPoint(*this);
     if (mAttached)
         mPinInstance->unregisterNetPoint(this);
-    schematic.removeItem(mGraphicsItem);
+    mSchematic.removeItem(mGraphicsItem);
     mErcMsgDeadNetPoint->setVisible(false);
 }
 
-bool SchematicNetPoint::save(bool toOriginal, QStringList& errors) noexcept
+XmlDomElement* SchematicNetPoint::serializeToXmlDomElement() const throw (Exception)
 {
-    Q_UNUSED(toOriginal); Q_UNUSED(errors);
-    mDomElement.removeChild(mDomElement.firstChildElement("attached"));
-    mDomElement.removeChild(mDomElement.firstChildElement("netsignal"));
-    mDomElement.removeChild(mDomElement.firstChildElement("position"));
-    mDomElement.removeChild(mDomElement.firstChildElement("symbol"));
-    mDomElement.removeChild(mDomElement.firstChildElement("pin"));
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("netpoint"));
+    root->setAttribute("uuid", mUuid);
+    root->appendTextChild("attached", mAttached);
     if (mAttached)
     {
-        QDomElement attachedNode = mDomElement.ownerDocument().createElement("attached");
-        QDomText attachedText = mDomElement.ownerDocument().createTextNode("true");
-        attachedNode.appendChild(attachedText);
-        mDomElement.appendChild(attachedNode);
-        QDomElement symbolNode = mDomElement.ownerDocument().createElement("symbol");
-        QDomText symbolText = mDomElement.ownerDocument().createTextNode(mSymbolInstance->getUuid().toString());
-        symbolNode.appendChild(symbolText);
-        mDomElement.appendChild(symbolNode);
-        QDomElement pinNode = mDomElement.ownerDocument().createElement("pin");
-        QDomText pinText = mDomElement.ownerDocument().createTextNode(mPinInstance->getLibPinUuid().toString());
-        pinNode.appendChild(pinText);
-        mDomElement.appendChild(pinNode);
+        root->appendTextChild("symbol", mSymbolInstance->getUuid());
+        root->appendTextChild("pin", mPinInstance->getLibPinUuid());
     }
     else
     {
-        QDomElement attachedNode = mDomElement.ownerDocument().createElement("attached");
-        QDomText attachedText = mDomElement.ownerDocument().createTextNode("false");
-        attachedNode.appendChild(attachedText);
-        mDomElement.appendChild(attachedNode);
-        QDomElement netsignalNode = mDomElement.ownerDocument().createElement("netsignal");
-        QDomText netsignalText = mDomElement.ownerDocument().createTextNode(mNetSignal->getUuid().toString());
-        netsignalNode.appendChild(netsignalText);
-        mDomElement.appendChild(netsignalNode);
-        QDomElement posNode = mDomElement.ownerDocument().createElement("position");
-        posNode.setAttribute("x", mPosition.getX().toMmString());
-        posNode.setAttribute("y", mPosition.getY().toMmString());
-        mDomElement.appendChild(posNode);
+        root->appendTextChild("netsignal", mNetSignal->getUuid());
+        XmlDomElement* position = root->appendChild("position");
+        position->setAttribute("x", mPosition.getX());
+        position->setAttribute("y", mPosition.getY());
     }
-    return true;
+    return root.take();
 }
 
 /*****************************************************************************************
@@ -432,58 +433,6 @@ uint SchematicNetPoint::extractFromGraphicsItems(const QList<QGraphicsItem*>& it
         }
     }
     return netpoints.count();
-}
-
-SchematicNetPoint* SchematicNetPoint::create(Schematic& schematic, QDomDocument& doc,
-                                             const QUuid& netsignal, const Point& position) throw (Exception)
-{
-    QDomElement node = doc.createElement("netpoint");
-    if (node.isNull())
-        throw LogicError(__FILE__, __LINE__, QString(), tr("Could not create DOM node!"));
-
-    // fill the new QDomElement with all the needed content
-    node.setAttribute("uuid", QUuid::createUuid().toString()); // generate random UUID
-    QDomElement attachedNode = doc.createElement("attached");
-    QDomText attachedText = doc.createTextNode("false");
-    attachedNode.appendChild(attachedText);
-    node.appendChild(attachedNode);
-    QDomElement netsignalNode = doc.createElement("netsignal");
-    QDomText netsignalText = doc.createTextNode(netsignal.toString());
-    netsignalNode.appendChild(netsignalText);
-    node.appendChild(netsignalNode);
-    QDomElement posNode = doc.createElement("position");
-    posNode.setAttribute("x", position.getX().toMmString());
-    posNode.setAttribute("y", position.getY().toMmString());
-    node.appendChild(posNode);
-
-    // create and return the new SchematicNetPoint object
-    return new SchematicNetPoint(schematic, node);
-}
-
-SchematicNetPoint* SchematicNetPoint::create(Schematic& schematic, QDomDocument& doc,
-                                             const QUuid& symbol, const QUuid& pin) throw (Exception)
-{
-    QDomElement node = doc.createElement("netpoint");
-    if (node.isNull())
-        throw LogicError(__FILE__, __LINE__, QString(), tr("Could not create DOM node!"));
-
-    // fill the new QDomElement with all the needed content
-    node.setAttribute("uuid", QUuid::createUuid().toString()); // generate random UUID
-    QDomElement attachedNode = doc.createElement("attached");
-    QDomText attachedText = doc.createTextNode("true");
-    attachedNode.appendChild(attachedText);
-    node.appendChild(attachedNode);
-    QDomElement symbolNode = doc.createElement("symbol");
-    QDomText symbolText = doc.createTextNode(symbol.toString());
-    symbolNode.appendChild(symbolText);
-    node.appendChild(symbolNode);
-    QDomElement pinNode = doc.createElement("pin");
-    QDomText pinText = doc.createTextNode(pin.toString());
-    pinNode.appendChild(pinText);
-    node.appendChild(pinNode);
-
-    // create and return the new SchematicNetPoint object
-    return new SchematicNetPoint(schematic, node);
 }
 
 /*****************************************************************************************

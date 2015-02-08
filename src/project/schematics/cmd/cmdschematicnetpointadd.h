@@ -34,7 +34,9 @@
  ****************************************************************************************/
 
 namespace project {
+class NetSignal;
 class Schematic;
+class SymbolInstance;
 class SchematicNetPoint;
 }
 
@@ -52,9 +54,9 @@ class CmdSchematicNetPointAdd final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit CmdSchematicNetPointAdd(Schematic& schematic, const QUuid& netsignal,
+        explicit CmdSchematicNetPointAdd(Schematic& schematic, NetSignal& netsignal,
                                          const Point& position, UndoCommand* parent = 0) throw (Exception);
-        explicit CmdSchematicNetPointAdd(Schematic& schematic, const QUuid& symbol,
+        explicit CmdSchematicNetPointAdd(Schematic& schematic, SymbolInstance& symbol,
                                          const QUuid& pin, UndoCommand* parent = 0) throw (Exception);
         ~CmdSchematicNetPointAdd() noexcept;
 
@@ -68,10 +70,10 @@ class CmdSchematicNetPointAdd final : public UndoCommand
     private:
 
         Schematic& mSchematic;
-        QUuid mNetSignal;
+        NetSignal* mNetSignal;
         bool mAttachedToSymbol;
         Point mPosition;
-        QUuid mSymbol;
+        SymbolInstance* mSymbol;
         QUuid mPin;
         SchematicNetPoint* mNetPoint;
 };

@@ -27,6 +27,8 @@
 #include "if_ercmsgprovider.h"
 #include "../project.h"
 #include "../../common/smartxmlfile.h"
+#include "../../common/file_io/xmldomdocument.h"
+#include "../../common/file_io/xmldomelement.h"
 
 namespace project {
 
@@ -42,9 +44,9 @@ ErcMsgList::ErcMsgList(Project& project, bool restore, bool readOnly, bool creat
     {
         // try to create/open the XML file "erc.xml"
         if (create)
-            mXmlFile = SmartXmlFile::create(mXmlFilepath, "erc", 0);
+            mXmlFile = SmartXmlFile::create(mXmlFilepath);
         else
-            mXmlFile = new SmartXmlFile(mXmlFilepath, restore, readOnly, "erc", 0);
+            mXmlFile = new SmartXmlFile(mXmlFilepath, restore, readOnly);
     }
     catch (...)
     {
@@ -92,27 +94,26 @@ void ErcMsgList::update(ErcMsg* ercMsg) noexcept
 
 void ErcMsgList::restoreIgnoreState() noexcept
 {
-    QDomElement child = mXmlFile->getRoot().firstChildElement("ignore");
-    if (child.isNull()) return; // XML file is empty
+    QSharedPointer<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
+    XmlDomElement& root = doc->getRoot();
 
     // reset all ignore attributes
     foreach (ErcMsg* ercMsg, mItems)
         ercMsg->setIgnored(false, false);
 
     // scan ignored items and set ignore attributes
-    QDomElement item = child.firstChildElement("item");
-    while (!item.isNull())
+    for (XmlDomElement* node = root.getFirstChild("ignore/item", true, false);
+         node; node = node->getNextSibling("item"))
     {
         foreach (ErcMsg* ercMsg, mItems)
         {
-            if ((ercMsg->getOwner().getErcMsgOwnerClassName() == item.attribute("owner_class"))
-             && (ercMsg->getOwnerKey() == item.attribute("owner_key"))
-             && (ercMsg->getMsgKey() == item.attribute("msg_key")))
+            if ((ercMsg->getOwner().getErcMsgOwnerClassName() == node->getAttribute("owner_class"))
+             && (ercMsg->getOwnerKey() == node->getAttribute("owner_key"))
+             && (ercMsg->getMsgKey() == node->getAttribute("msg_key")))
             {
                 ercMsg->setIgnored(true, false);
             }
         }
-        item = item.nextSiblingElement("item");
     }
 }
 
@@ -123,33 +124,9 @@ bool ErcMsgList::save(bool toOriginal, QStringList& errors) noexcept
     // Save "core/erc.xml"
     try
     {
-        QDomElement root = mXmlFile->getRoot();
-
-        // clear the file and create a new child
-        root.removeChild(root.firstChildElement("ignore"));
-        QDomElement child = mXmlFile->getDocument().createElement("ignore");
-        if (child.isNull())
-            throw RuntimeError(__FILE__, __LINE__, QString(), tr("XML DOM Error"));
-        if (root.appendChild(child).isNull())
-            throw RuntimeError(__FILE__, __LINE__, QString(), tr("XML DOM Error"));
-
-        // add new entries
-        foreach (ErcMsg* ercMsg, mItems)
-        {
-            if (ercMsg->isIgnored())
-            {
-                QDomElement node = mXmlFile->getDocument().createElement("item");
-                if (node.isNull())
-                    throw RuntimeError(__FILE__, __LINE__, QString(), tr("XML DOM Error"));
-                node.setAttribute("owner_class", ercMsg->getOwner().getErcMsgOwnerClassName());
-                node.setAttribute("owner_key", ercMsg->getOwnerKey());
-                node.setAttribute("msg_key", ercMsg->getMsgKey());
-                if (child.appendChild(node).isNull())
-                    throw RuntimeError(__FILE__, __LINE__, QString(), tr("XML DOM Error"));
-            }
-        }
-
-        mXmlFile->save(toOriginal);
+        XmlDomElement* root = serializeToXmlDomElement();
+        XmlDomDocument doc(*root);
+        mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)
     {
@@ -158,6 +135,27 @@ bool ErcMsgList::save(bool toOriginal, QStringList& errors) noexcept
     }
 
     return success;
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+XmlDomElement* ErcMsgList::serializeToXmlDomElement() const throw (Exception)
+{
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("erc"));
+    XmlDomElement* ignoreNode = root->appendChild("ignore");
+    foreach (ErcMsg* ercMsg, mItems)
+    {
+        if (ercMsg->isIgnored())
+        {
+            XmlDomElement* itemNode = ignoreNode->appendChild("item");
+            itemNode->setAttribute("owner_class", ercMsg->getOwner().getErcMsgOwnerClassName());
+            itemNode->setAttribute("owner_key", ercMsg->getOwnerKey());
+            itemNode->setAttribute("msg_key", ercMsg->getMsgKey());
+        }
+    }
+    return root.take();
 }
 
 /*****************************************************************************************

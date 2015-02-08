@@ -32,7 +32,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdNetClassRemove::CmdNetClassRemove(Circuit& circuit, NetClass* netclass,
+CmdNetClassRemove::CmdNetClassRemove(Circuit& circuit, NetClass& netclass,
                                      UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Remove netclass"), parent),
     mCircuit(circuit), mNetClass(netclass)
@@ -42,7 +42,7 @@ CmdNetClassRemove::CmdNetClassRemove(Circuit& circuit, NetClass* netclass,
 CmdNetClassRemove::~CmdNetClassRemove() noexcept
 {
     if (mIsExecuted)
-        delete mNetClass;
+        delete &mNetClass;
 }
 
 /*****************************************************************************************

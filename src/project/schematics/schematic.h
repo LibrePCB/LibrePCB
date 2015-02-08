@@ -26,6 +26,7 @@
 
 #include <QtCore>
 #include "../../common/if_attributeprovider.h"
+#include "../../common/file_io/if_xmlserializableobject.h"
 #include "../../common/units/all_length_units.h"
 #include "../../common/filepath.h"
 #include "../../common/exceptions.h"
@@ -39,10 +40,16 @@ class SmartXmlFile;
 
 namespace project {
 class Project;
+class NetSignal;
+class GenCompInstance;
 class SymbolInstance;
 class SymbolPinInstance;
 class SchematicNetPoint;
 class SchematicNetLine;
+}
+
+namespace library {
+class SymbolPin;
 }
 
 /*****************************************************************************************
@@ -58,7 +65,8 @@ namespace project {
  * This class inherits from QGraphicsScene (through CADScene). This way, a schematic page
  * can be shown directly in a QGraphicsView (resp. CADView).
  */
-class Schematic final : public CADScene, public IF_AttributeProvider
+class Schematic final : public CADScene, public IF_AttributeProvider,
+                        public IF_XmlSerializableObject
 {
         Q_OBJECT
 
@@ -103,28 +111,26 @@ class Schematic final : public CADScene, public IF_AttributeProvider
 
         // SymbolInstance Methods
         SymbolInstance* getSymbolByUuid(const QUuid& uuid) const noexcept;
-        SymbolInstance* createSymbol(const QUuid& genCompInstance, const QUuid& symbolItem,
-                                     const Point& position = Point(), const Angle& angle = Angle(),
-                                     bool mirror = false) throw (Exception);
-        void addSymbol(SymbolInstance* symbol, bool toDomTree = true) throw (Exception);
-        void removeSymbol(SymbolInstance* symbol, bool fromDomTree = true,
-                          bool deleteSymbol = false) throw (Exception);
+        SymbolInstance* createSymbol(GenCompInstance& genCompInstance,
+                                     const QUuid& symbolItem, const Point& position = Point(),
+                                     const Angle& angle = Angle()) throw (Exception);
+        void addSymbol(SymbolInstance& symbol) throw (Exception);
+        void removeSymbol(SymbolInstance& symbol) throw (Exception);
 
         // SchematicNetPoint Methods
         SchematicNetPoint* getNetPointByUuid(const QUuid& uuid) const noexcept;
-        SchematicNetPoint* createNetPoint(const QUuid& netsignal, const Point& position) throw (Exception);
-        SchematicNetPoint* createNetPoint(const QUuid& symbol, const QUuid& pin) throw (Exception);
-        void addNetPoint(SchematicNetPoint* netpoint, bool toDomTree = true) throw (Exception);
-        void removeNetPoint(SchematicNetPoint* netpoint, bool fromDomTree = true,
-                            bool deleteNetPoint = false) throw (Exception);
+        SchematicNetPoint* createNetPoint(NetSignal& netsignal, const Point& position) throw (Exception);
+        SchematicNetPoint* createNetPoint(SymbolInstance& symbol, const QUuid& pin) throw (Exception);
+        void addNetPoint(SchematicNetPoint& netpoint) throw (Exception);
+        void removeNetPoint(SchematicNetPoint& netpoint) throw (Exception);
 
         // SchematicNetLine Methods
         SchematicNetLine* getNetLineByUuid(const QUuid& uuid) const noexcept;
-        SchematicNetLine* createNetLine(const QUuid& startPoint, const QUuid& endPoint,
+        SchematicNetLine* createNetLine(SchematicNetPoint& startPoint,
+                                        SchematicNetPoint& endPoint,
                                         const Length& width) throw (Exception);
-        void addNetLine(SchematicNetLine* netline, bool toDomTree = true) throw (Exception);
-        void removeNetLine(SchematicNetLine* netline, bool fromDomTree = true,
-                           bool deleteNetLine = false) throw (Exception);
+        void addNetLine(SchematicNetLine& netline) throw (Exception);
+        void removeNetLine(SchematicNetLine& netline) throw (Exception);
 
         // General Methods
         void addToProject() throw (Exception);
@@ -152,6 +158,12 @@ class Schematic final : public CADScene, public IF_AttributeProvider
         explicit Schematic(Project& project, const FilePath& filepath, bool restore,
                            bool readOnly, bool create, const QString& newName) throw (Exception);
         void updateIcon() noexcept;
+
+        /**
+         * @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+         */
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+
 
         // General
         Project& mProject; ///< A reference to the Project object (from the ctor)

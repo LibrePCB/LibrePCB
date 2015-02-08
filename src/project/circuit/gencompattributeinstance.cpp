@@ -24,6 +24,7 @@
 #include <QtCore>
 #include "gencompattributeinstance.h"
 #include "gencompinstance.h"
+#include "../../common/file_io/xmldomelement.h"
 
 namespace project {
 
@@ -33,18 +34,21 @@ namespace project {
 
 GenCompAttributeInstance::GenCompAttributeInstance(Circuit& circuit,
                                                    GenCompInstance& genCompInstance,
-                                                   const QDomElement& domElement) throw (Exception):
-    QObject(0), mCircuit(circuit), mGenCompInstance(genCompInstance), mDomElement(domElement)
+                                                   const XmlDomElement& domElement) throw (Exception):
+    mCircuit(circuit), mGenCompInstance(genCompInstance)
 {
-    mKey = mDomElement.attribute("key");
-    if (mKey.isEmpty())
-    {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
-            QString(tr("The generic component \"%1\" contains attributes with an empty name."))
-            .arg(mGenCompInstance.getUuid().toString()));
-    }
-    mType = library::Attribute::stringToType(mDomElement.firstChildElement("type").text());
-    mValue = mDomElement.firstChildElement("value").text();
+    mKey = domElement.getAttribute("key", true);
+    mType = library::Attribute::stringToType(domElement.getFirstChild("type", true)->getText(true));
+    mValue = domElement.getFirstChild("value", true)->getText();
+}
+
+GenCompAttributeInstance::GenCompAttributeInstance(Circuit& circuit,
+                                                   GenCompInstance& genCompInstance,
+                                                   const QString& key,
+                                                   library::Attribute::Type_t type,
+                                                   const QString& value) throw (Exception):
+    mCircuit(circuit), mGenCompInstance(genCompInstance), mKey(key), mType(type), mValue(value)
+{
 }
 
 GenCompAttributeInstance::~GenCompAttributeInstance() noexcept
@@ -58,6 +62,19 @@ GenCompAttributeInstance::~GenCompAttributeInstance() noexcept
 QString GenCompAttributeInstance::getValueToDisplay() const noexcept
 {
     return mValue; // TODO
+}
+
+/*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+XmlDomElement* GenCompAttributeInstance::serializeToXmlDomElement() const throw (Exception)
+{
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("attribute"));
+    root->setAttribute("key", mKey);
+    root->appendTextChild("type", library::Attribute::typeToString(mType));
+    root->appendTextChild("value", mValue);
+    return root.take();
 }
 
 /*****************************************************************************************

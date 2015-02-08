@@ -55,8 +55,7 @@ class CmdSymbolInstanceAdd final : public UndoCommand
         // Constructors / Destructor
         explicit CmdSymbolInstanceAdd(Schematic& schematic, GenCompInstance& genComp,
                                       const QUuid& symbolItem, const Point& position = Point(),
-                                      const Angle& angle = Angle(), bool mirror = false,
-                                      UndoCommand* parent = 0) throw (Exception);
+                                      const Angle& angle = Angle(), UndoCommand* parent = 0) throw (Exception);
         ~CmdSymbolInstanceAdd() noexcept;
 
         // Getters
@@ -74,7 +73,6 @@ class CmdSymbolInstanceAdd final : public UndoCommand
         QUuid mSymbolItemUuid;
         Point mPosition;
         Angle mAngle;
-        bool mMirror;
 
         /// @brief The created symbol instance
         SymbolInstance* mSymbolInstance;

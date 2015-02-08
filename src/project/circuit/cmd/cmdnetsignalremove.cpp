@@ -32,7 +32,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdNetSignalRemove::CmdNetSignalRemove(Circuit& circuit, NetSignal* netsignal,
+CmdNetSignalRemove::CmdNetSignalRemove(Circuit& circuit, NetSignal& netsignal,
                                      UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Remove netsignal"), parent),
     mCircuit(circuit), mNetSignal(netsignal)
@@ -42,7 +42,7 @@ CmdNetSignalRemove::CmdNetSignalRemove(Circuit& circuit, NetSignal* netsignal,
 CmdNetSignalRemove::~CmdNetSignalRemove() noexcept
 {
     if (mIsExecuted)
-        delete mNetSignal;
+        delete &mNetSignal;
 }
 
 /*****************************************************************************************

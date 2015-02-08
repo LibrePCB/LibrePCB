@@ -25,13 +25,15 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QDomElement>
 #include "../erc/if_ercmsgprovider.h"
+#include "../../common/file_io/if_xmlserializableobject.h"
 #include "../../common/exceptions.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
+
+class XmlDomElement;
 
 namespace project {
 class GenCompInstance;
@@ -54,7 +56,8 @@ namespace project {
 /**
  * @brief The GenCompSignalInstance class
  */
-class GenCompSignalInstance final : public QObject, public IF_ErcMsgProvider
+class GenCompSignalInstance final : public QObject, public IF_ErcMsgProvider,
+                                    public IF_XmlSerializableObject
 {
         Q_OBJECT
         DECLARE_ERC_MSG_CLASS_NAME(GenCompSignalInstance)
@@ -63,7 +66,10 @@ class GenCompSignalInstance final : public QObject, public IF_ErcMsgProvider
 
         // Constructors / Destructor
         explicit GenCompSignalInstance(Circuit& circuit, GenCompInstance& genCompInstance,
-                                       const QDomElement& domElement) throw (Exception);
+                                       const XmlDomElement& domElement) throw (Exception);
+        explicit GenCompSignalInstance(Circuit& circuit, GenCompInstance& genCompInstance,
+                                       const library::GenCompSignal& genCompSignal,
+                                       NetSignal* netsignal = nullptr) throw (Exception);
         ~GenCompSignalInstance() noexcept;
 
         // Getters
@@ -93,6 +99,7 @@ class GenCompSignalInstance final : public QObject, public IF_ErcMsgProvider
         void unregisterSymbolPinInstance(SymbolPinInstance* pin) throw (Exception);
         void addToCircuit() throw (Exception);
         void removeFromCircuit() throw (Exception);
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
 
 
     private slots:
@@ -107,10 +114,13 @@ class GenCompSignalInstance final : public QObject, public IF_ErcMsgProvider
         GenCompSignalInstance(const GenCompSignalInstance& other);
         GenCompSignalInstance& operator=(const GenCompSignalInstance& rhs);
 
+        // Private Methods
+        void init() throw (Exception);
+
+
         // General
         Circuit& mCircuit;
         GenCompInstance& mGenCompInstance;
-        QDomElement mDomElement;
 
         // Attributes
         const library::GenCompSignal* mGenCompSignal;

@@ -51,7 +51,7 @@ class CmdNetClassRemove final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit CmdNetClassRemove(Circuit& circuit, NetClass* netclass,
+        explicit CmdNetClassRemove(Circuit& circuit, NetClass& netclass,
                                    UndoCommand* parent = 0) throw (Exception);
         ~CmdNetClassRemove() noexcept;
 
@@ -62,7 +62,7 @@ class CmdNetClassRemove final : public UndoCommand
     private:
 
         Circuit& mCircuit;
-        NetClass* mNetClass;
+        NetClass& mNetClass;
 };
 
 } // namespace project

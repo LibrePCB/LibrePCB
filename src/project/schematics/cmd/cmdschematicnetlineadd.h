@@ -52,8 +52,8 @@ class CmdSchematicNetLineAdd final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit CmdSchematicNetLineAdd(Schematic& schematic, const QUuid& startPoint,
-                                        const QUuid& endPoint, UndoCommand* parent = 0) throw (Exception);
+        explicit CmdSchematicNetLineAdd(Schematic& schematic, SchematicNetPoint& startPoint,
+                                        SchematicNetPoint& endPoint, UndoCommand* parent = 0) throw (Exception);
         ~CmdSchematicNetLineAdd() noexcept;
 
         // Getters
@@ -66,8 +66,8 @@ class CmdSchematicNetLineAdd final : public UndoCommand
     private:
 
         Schematic& mSchematic;
-        QUuid mStartPoint;
-        QUuid mEndPoint;
+        SchematicNetPoint& mStartPoint;
+        SchematicNetPoint& mEndPoint;
         SchematicNetLine* mNetLine;
 };
 

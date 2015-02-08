@@ -26,7 +26,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include <QDomElement>
+#include "../../common/file_io/if_xmlserializableobject.h"
 #include "../../common/cadscene.h"
 #include "../../common/units/all_length_units.h"
 #include "../../common/exceptions.h"
@@ -35,6 +35,7 @@
  *  Forward Declarations
  ****************************************************************************************/
 
+class XmlDomElement;
 class SchematicLayer;
 
 namespace project {
@@ -102,15 +103,16 @@ namespace project {
 /**
  * @brief The SchematicNetLine class
  */
-class SchematicNetLine final : public QObject
+class SchematicNetLine final : public QObject, public IF_XmlSerializableObject
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit SchematicNetLine(Schematic& schematic, const QDomElement& domElement)
-                                  throw (Exception);
+        explicit SchematicNetLine(Schematic& schematic, const XmlDomElement& domElement) throw (Exception);
+        explicit SchematicNetLine(Schematic& schematic, SchematicNetPoint& startPoint,
+                                  SchematicNetPoint& endPoint, const Length& width) throw (Exception);
         ~SchematicNetLine() noexcept;
 
         // Getters
@@ -126,11 +128,9 @@ class SchematicNetLine final : public QObject
 
         // General Methods
         void updateLine() noexcept;
-        void addToSchematic(Schematic& schematic, bool addNode,
-                            QDomElement& parent) throw (Exception);
-        void removeFromSchematic(Schematic& schematic, bool removeNode,
-                                 QDomElement& parent) throw (Exception);
-        bool save(bool toOriginal, QStringList& errors) noexcept;
+        void addToSchematic() throw (Exception);
+        void removeFromSchematic() throw (Exception);
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
 
         // Static Methods
         static uint extractFromGraphicsItems(const QList<QGraphicsItem*>& items,
@@ -138,9 +138,7 @@ class SchematicNetLine final : public QObject
                                              bool floatingLines,
                                              bool attachedLines,
                                              bool attachedLinesFromSymbols = false) noexcept;
-        static SchematicNetLine* create(Schematic& schematic, QDomDocument& doc,
-                                        const QUuid& startPoint, const QUuid& endPoint,
-                                        const Length& width) throw (Exception);
+
 
     private:
 
@@ -149,9 +147,11 @@ class SchematicNetLine final : public QObject
         SchematicNetLine(const SchematicNetLine& other);
         SchematicNetLine& operator=(const SchematicNetLine& rhs);
 
+        // Private Methods
+        void init() throw (Exception);
+
         // General
         Schematic& mSchematic;
-        QDomElement mDomElement;
         SchematicNetLineGraphicsItem* mGraphicsItem;
 
         // Attributes

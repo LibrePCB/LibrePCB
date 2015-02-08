@@ -33,6 +33,7 @@
  ****************************************************************************************/
 
 namespace project {
+class Circuit;
 class NetClass;
 }
 
@@ -50,8 +51,8 @@ class CmdNetClassSetName final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit CmdNetClassSetName(NetClass& netclass, const QString& newName,
-                                    UndoCommand* parent = 0) throw (Exception);
+        explicit CmdNetClassSetName(Circuit& circuit, NetClass& netclass,
+                                    const QString& newName, UndoCommand* parent = 0) throw (Exception);
         ~CmdNetClassSetName() noexcept;
 
         // Inherited from UndoCommand
@@ -60,6 +61,7 @@ class CmdNetClassSetName final : public UndoCommand
 
     private:
 
+        Circuit& mCircuit;
         NetClass& mNetClass;
         QString mOldName;
         QString mNewName;

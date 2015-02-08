@@ -25,13 +25,15 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QDomElement>
 #include "../erc/if_ercmsgprovider.h"
+#include "../../common/file_io/if_xmlserializableobject.h"
 #include "../../common/exceptions.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
+
+class XmlDomElement;
 
 namespace project {
 class Circuit;
@@ -48,15 +50,16 @@ namespace project {
 /**
  * @brief The NetClass class
  */
-class NetClass final : public QObject, public IF_ErcMsgProvider
+class NetClass final : public IF_ErcMsgProvider, public IF_XmlSerializableObject
 {
-        Q_OBJECT
+        Q_DECLARE_TR_FUNCTIONS(NetClass)
         DECLARE_ERC_MSG_CLASS_NAME(NetClass)
 
     public:
 
         // Constructors / Destructor
-        explicit NetClass(Circuit& circuit, const QDomElement& domElement) throw (Exception);
+        explicit NetClass(const Circuit& circuit, const XmlDomElement& domElement) throw (Exception);
+        explicit NetClass(const Circuit& circuit, const QString& name) throw (Exception);
         ~NetClass() noexcept;
 
         // Getters
@@ -68,16 +71,14 @@ class NetClass final : public QObject, public IF_ErcMsgProvider
         void setName(const QString& name) throw (Exception);
 
         // NetSignal Methods
-        void registerNetSignal(NetSignal* signal) noexcept;
-        void unregisterNetSignal(NetSignal* signal) noexcept;
+        void registerNetSignal(NetSignal& signal) noexcept;
+        void unregisterNetSignal(NetSignal& signal) noexcept;
 
         // General Methods
-        void addToCircuit(bool addNode, QDomElement& parent) throw (Exception);
-        void removeFromCircuit(bool removeNode, QDomElement& parent) throw (Exception);
+        void addToCircuit() noexcept;
+        void removeFromCircuit() noexcept;
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
 
-        // Static Methods
-        static NetClass* create(Circuit& circuit, QDomDocument& doc,
-                                const QString& name) throw (Exception);
 
     private:
 
@@ -86,19 +87,23 @@ class NetClass final : public QObject, public IF_ErcMsgProvider
         NetClass(const NetClass& other);
         NetClass& operator=(const NetClass& rhs);
 
+        // Private Methods
+        void updateErcMessages() noexcept;
+
+
         // General
-        Circuit& mCircuit;
-        QDomElement mDomElement;
+        const Circuit& mCircuit;
+        bool mAddedToCircuit;
+
+        // Misc
+        /// @brief the ERC message for unused netclasses
+        ErcMsg* mErcMsgUnusedNetClass;
+        /// @brief all registered netsignals
+        QHash<QUuid, NetSignal*> mNetSignals;
 
         // Attributes
         QUuid mUuid;
         QString mName;
-
-        // Misc
-        /// @brief the ERC message for unused netclasses
-        QScopedPointer<ErcMsg> mErcMsgUnusedNetClass;
-        /// @brief all registered netsignals
-        QHash<QUuid, NetSignal*> mNetSignals;
 };
 
 } // namespace project

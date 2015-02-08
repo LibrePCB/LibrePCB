@@ -22,13 +22,13 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QtWidgets>
 #include "netsignal.h"
 #include "netclass.h"
 #include "../../common/exceptions.h"
 #include "circuit.h"
 #include "../erc/ercmsg.h"
 #include "gencompsignalinstance.h"
+#include "../../common/file_io/xmldomelement.h"
 
 namespace project {
 
@@ -36,44 +36,43 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-NetSignal::NetSignal(Circuit& circuit, const QDomElement& domElement) throw (Exception) :
-    QObject(0), mCircuit(circuit), mDomElement(domElement), mAddedToCircuit(false),
-    mGenCompSignalWithForcedNameCount(0)
+NetSignal::NetSignal(const Circuit& circuit,
+                     const XmlDomElement& domElement) throw (Exception) :
+    mCircuit(circuit), mAddedToCircuit(false), mErcMsgUnusedNetSignal(nullptr),
+    mErcMsgConnectedToLessThanTwoPins(nullptr), mGenCompSignalWithForcedNameCount(0),
+    // load attributes
+    mUuid(domElement.getAttribute<QUuid>("uuid")),
+    mName(domElement.getAttribute("name", true)),
+    mHasAutoName(domElement.getAttribute<bool>("auto_name")),
+    mNetClass(circuit.getNetClassByUuid(domElement.getAttribute<QUuid>("netclass")))
 {
-    // read attributes
-    mUuid = mDomElement.attribute("uuid");
-    if(mUuid.isNull())
-    {
-        throw RuntimeError(__FILE__, __LINE__, mDomElement.attribute("uuid"),
-            QString(tr("Invalid netsignal UUID: \"%1\"")).arg(mDomElement.attribute("uuid")));
-    }
-    mName = mDomElement.attribute("name");
-    if(mName.isEmpty())
-    {
-        throw RuntimeError(__FILE__, __LINE__, mUuid.toString(),
-            QString(tr("Name of netsignal \"%1\" is empty!")).arg(mUuid.toString()));
-    }
-    mAutoName = (mDomElement.attribute("auto_name") == "true");
-    mNetClass = mCircuit.getNetClassByUuid(mDomElement.attribute("netclass"));
     if (!mNetClass)
     {
-        throw RuntimeError(__FILE__, __LINE__, mDomElement.attribute("netclass"),
+        throw RuntimeError(__FILE__, __LINE__, domElement.getAttribute("netclass"),
             QString(tr("Invalid netclass UUID: \"%1\""))
-            .arg(mDomElement.attribute("netclass")));
+            .arg(domElement.getAttribute("netclass")));
     }
+}
 
-    // create ERC messages
-    mErcMsgUnusedNetSignal.reset(new ErcMsg(mCircuit.getProject(), *this,
-        mUuid.toString(), "Unused", ErcMsg::ErcMsgType_t::CircuitError));
-    mErcMsgConnectedToLessThanTwoPins.reset(new ErcMsg(mCircuit.getProject(), *this,
-        mUuid.toString(), "ConnectedToLessThanTwoPins", ErcMsg::ErcMsgType_t::CircuitWarning));
-    updateErcMessages();
+NetSignal::NetSignal(const Circuit& circuit, NetClass& netclass,
+                     const QString& name, bool autoName) throw (Exception) :
+    mCircuit(circuit), mAddedToCircuit(false), mErcMsgUnusedNetSignal(nullptr),
+    mErcMsgConnectedToLessThanTwoPins(nullptr), mGenCompSignalWithForcedNameCount(0),
+    // load default attributes
+    mUuid(QUuid::createUuid()), // generate random UUID
+    mName(name),
+    mHasAutoName(autoName),
+    mNetClass(&netclass)
+{
 }
 
 NetSignal::~NetSignal() noexcept
 {
-    Q_ASSERT(mGenCompSignals.isEmpty());
-    Q_ASSERT(mSchematicNetPoints.isEmpty());
+    Q_ASSERT(mAddedToCircuit == false);
+    Q_ASSERT(mErcMsgUnusedNetSignal == nullptr);
+    Q_ASSERT(mErcMsgConnectedToLessThanTwoPins == nullptr);
+    Q_ASSERT(mGenCompSignals.isEmpty() == true);
+    Q_ASSERT(mSchematicNetPoints.isEmpty() == true);
     Q_ASSERT(mGenCompSignalWithForcedNameCount == 0);
 }
 
@@ -89,11 +88,8 @@ void NetSignal::setName(const QString& name, bool isAutoName) throw (Exception)
         throw RuntimeError(__FILE__, __LINE__, QString(),
             tr("The new netsignal name must not be empty!"));
     }
-
-    mDomElement.setAttribute("name", name);
     mName = name;
-    mDomElement.setAttribute("auto_name", isAutoName ? "true" : "false");
-    mAutoName = isAutoName;
+    mHasAutoName = isAutoName;
     updateErcMessages();
 }
 
@@ -101,22 +97,22 @@ void NetSignal::setName(const QString& name, bool isAutoName) throw (Exception)
  *  General Methods
  ****************************************************************************************/
 
-void NetSignal::registerGenCompSignal(GenCompSignalInstance* signal) noexcept
+void NetSignal::registerGenCompSignal(GenCompSignalInstance& signal) noexcept
 {
-    Q_CHECK_PTR(signal);
-    Q_ASSERT(!mGenCompSignals.contains(signal));
-    mGenCompSignals.append(signal);
-    if (signal->isNetSignalNameForced())
+    Q_ASSERT(mAddedToCircuit == true);
+    Q_ASSERT(mGenCompSignals.contains(&signal) == false);
+    mGenCompSignals.append(&signal);
+    if (signal.isNetSignalNameForced())
         mGenCompSignalWithForcedNameCount++;
     updateErcMessages();
 }
 
-void NetSignal::unregisterGenCompSignal(GenCompSignalInstance* signal) noexcept
+void NetSignal::unregisterGenCompSignal(GenCompSignalInstance& signal) noexcept
 {
-    Q_CHECK_PTR(signal);
-    Q_ASSERT(mGenCompSignals.contains(signal));
-    mGenCompSignals.removeOne(signal);
-    if (signal->isNetSignalNameForced())
+    Q_ASSERT(mAddedToCircuit == true);
+    Q_ASSERT(mGenCompSignals.contains(&signal) == true);
+    mGenCompSignals.removeOne(&signal);
+    if (signal.isNetSignalNameForced())
     {
         Q_ASSERT(mGenCompSignalWithForcedNameCount > 0);
         mGenCompSignalWithForcedNameCount--;
@@ -124,58 +120,50 @@ void NetSignal::unregisterGenCompSignal(GenCompSignalInstance* signal) noexcept
     updateErcMessages();
 }
 
-void NetSignal::registerSchematicNetPoint(SchematicNetPoint* netpoint) noexcept
+void NetSignal::registerSchematicNetPoint(SchematicNetPoint& netpoint) noexcept
 {
-    Q_CHECK_PTR(netpoint);
-    Q_ASSERT(!mSchematicNetPoints.contains(netpoint));
-    mSchematicNetPoints.append(netpoint);
+    Q_ASSERT(mAddedToCircuit == true);
+    Q_ASSERT(mSchematicNetPoints.contains(&netpoint) == false);
+    mSchematicNetPoints.append(&netpoint);
     updateErcMessages();
 }
 
-void NetSignal::unregisterSchematicNetPoint(SchematicNetPoint* netpoint) noexcept
+void NetSignal::unregisterSchematicNetPoint(SchematicNetPoint& netpoint) noexcept
 {
-    Q_CHECK_PTR(netpoint);
-    Q_ASSERT(mSchematicNetPoints.contains(netpoint));
-    mSchematicNetPoints.removeOne(netpoint);
+    Q_ASSERT(mAddedToCircuit == true);
+    Q_ASSERT(mSchematicNetPoints.contains(&netpoint) == true);
+    mSchematicNetPoints.removeOne(&netpoint);
     updateErcMessages();
 }
 
-void NetSignal::addToCircuit(bool addNode, QDomElement& parent) throw (Exception)
+void NetSignal::addToCircuit() noexcept
 {
-    Q_ASSERT(mSchematicNetPoints.isEmpty());
-    if (mAddedToCircuit) throw LogicError(__FILE__, __LINE__);
-
-    if (addNode)
-    {
-        if (parent.nodeName() != "netsignals")
-            throw LogicError(__FILE__, __LINE__, parent.nodeName(), tr("Invalid node name!"));
-
-        if (parent.appendChild(mDomElement).isNull())
-            throw LogicError(__FILE__, __LINE__, QString(), tr("Could not append DOM node!"));
-    }
-
-    mNetClass->registerNetSignal(this);
+    Q_ASSERT(mAddedToCircuit == false);
+    Q_ASSERT(mGenCompSignals.isEmpty() == true);
+    Q_ASSERT(mSchematicNetPoints.isEmpty() == true);
     mAddedToCircuit = true;
+    mNetClass->registerNetSignal(*this);
     updateErcMessages();
 }
 
-void NetSignal::removeFromCircuit(bool removeNode, QDomElement& parent) throw (Exception)
+void NetSignal::removeFromCircuit() noexcept
 {
-    Q_ASSERT(mSchematicNetPoints.isEmpty());
-    if (!mAddedToCircuit) throw LogicError(__FILE__, __LINE__);
-
-    if (removeNode)
-    {
-        if (parent.nodeName() != "netsignals")
-            throw LogicError(__FILE__, __LINE__, parent.nodeName(), tr("Invalid node name!"));
-
-        if (parent.removeChild(mDomElement).isNull())
-            throw LogicError(__FILE__, __LINE__, QString(), tr("Could not remove node from DOM tree!"));
-    }
-
-    mNetClass->unregisterNetSignal(this);
+    Q_ASSERT(mAddedToCircuit == true);
+    Q_ASSERT(mGenCompSignals.isEmpty() == true);
+    Q_ASSERT(mSchematicNetPoints.isEmpty() == true);
     mAddedToCircuit = false;
+    mNetClass->unregisterNetSignal(*this);
     updateErcMessages();
+}
+
+XmlDomElement* NetSignal::serializeToXmlDomElement() const throw (Exception)
+{
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("netsignal"));
+    root->setAttribute("uuid", mUuid);
+    root->setAttribute("name", mName);
+    root->setAttribute("auto_name", mHasAutoName);
+    root->setAttribute("netclass", mNetClass->getUuid());
+    return root.take();
 }
 
 /*****************************************************************************************
@@ -184,31 +172,38 @@ void NetSignal::removeFromCircuit(bool removeNode, QDomElement& parent) throw (E
 
 void NetSignal::updateErcMessages() noexcept
 {
-    mErcMsgUnusedNetSignal->setMsg(QString(tr("Unused net signal: \"%1\"")).arg(mName));
-    mErcMsgConnectedToLessThanTwoPins->setMsg(QString(tr("Net signal connected to less than two pins: \"%1\"")).arg(mName));
-    mErcMsgUnusedNetSignal->setVisible(mAddedToCircuit && mGenCompSignals.isEmpty() && mSchematicNetPoints.isEmpty());
-    mErcMsgConnectedToLessThanTwoPins->setVisible((mAddedToCircuit) && (mGenCompSignals.count() < 2));
-}
+    if (mAddedToCircuit && mGenCompSignals.isEmpty() && mSchematicNetPoints.isEmpty())
+    {
+        if (!mErcMsgUnusedNetSignal)
+        {
+            mErcMsgUnusedNetSignal = new ErcMsg(mCircuit.getProject(), *this,
+                mUuid.toString(), "Unused", ErcMsg::ErcMsgType_t::CircuitError, QString());
+        }
+        mErcMsgUnusedNetSignal->setMsg(QString(tr("Unused net signal: \"%1\"")).arg(mName));
+        mErcMsgUnusedNetSignal->setVisible(true);
+    }
+    else if (mErcMsgUnusedNetSignal)
+    {
+        delete mErcMsgUnusedNetSignal;
+        mErcMsgUnusedNetSignal = nullptr;
+    }
 
-/*****************************************************************************************
- *  Static Methods
- ****************************************************************************************/
-
-NetSignal* NetSignal::create(Circuit& circuit, QDomDocument& doc, const QUuid& netclass,
-                             const QString& name, bool autoName) throw (Exception)
-{
-    QDomElement node = doc.createElement("netsignal");
-    if (node.isNull())
-        throw LogicError(__FILE__, __LINE__, QString(), tr("Could not create DOM node!"));
-
-    // fill the new QDomElement with all the needed content
-    node.setAttribute("uuid", QUuid::createUuid().toString()); // generate random UUID
-    node.setAttribute("name", name);
-    node.setAttribute("auto_name", autoName ? "true" : "false");
-    node.setAttribute("netclass", netclass.toString());
-
-    // create and return the new NetSignal object
-    return new NetSignal(circuit, node);
+    if (mAddedToCircuit && (mGenCompSignals.count() < 2))
+    {
+        if (!mErcMsgConnectedToLessThanTwoPins)
+        {
+            mErcMsgConnectedToLessThanTwoPins = new ErcMsg(mCircuit.getProject(), *this,
+                mUuid.toString(), "ConnectedToLessThanTwoPins", ErcMsg::ErcMsgType_t::CircuitWarning);
+        }
+        mErcMsgConnectedToLessThanTwoPins->setMsg(
+            QString(tr("Net signal connected to less than two pins: \"%1\"")).arg(mName));
+        mErcMsgConnectedToLessThanTwoPins->setVisible(true);
+    }
+    else if (mErcMsgConnectedToLessThanTwoPins)
+    {
+        delete mErcMsgConnectedToLessThanTwoPins;
+        mErcMsgConnectedToLessThanTwoPins = nullptr;
+    }
 }
 
 /*****************************************************************************************

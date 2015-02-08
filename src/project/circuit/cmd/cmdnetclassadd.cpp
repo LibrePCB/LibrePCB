@@ -35,7 +35,7 @@ namespace project {
 CmdNetClassAdd::CmdNetClassAdd(Circuit& circuit, const QString& name,
                                UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Add netclass"), parent),
-    mCircuit(circuit), mName(name), mNetClass(0)
+    mCircuit(circuit), mName(name), mNetClass(nullptr)
 {
 }
 
@@ -52,9 +52,9 @@ CmdNetClassAdd::~CmdNetClassAdd() noexcept
 void CmdNetClassAdd::redo() throw (Exception)
 {
     if (!mNetClass) // only the first time
-        mNetClass = mCircuit.createNetClass(mName); // throws an exception on error
+        mNetClass = new NetClass(mCircuit, mName); // throws an exception on error
 
-    mCircuit.addNetClass(mNetClass); // throws an exception on error
+    mCircuit.addNetClass(*mNetClass); // throws an exception on error
 
     try
     {
@@ -62,14 +62,14 @@ void CmdNetClassAdd::redo() throw (Exception)
     }
     catch (Exception &e)
     {
-        mCircuit.removeNetClass(mNetClass);
+        mCircuit.removeNetClass(*mNetClass);
         throw;
     }
 }
 
 void CmdNetClassAdd::undo() throw (Exception)
 {
-    mCircuit.removeNetClass(mNetClass); // throws an exception on error
+    mCircuit.removeNetClass(*mNetClass); // throws an exception on error
 
     try
     {
@@ -77,7 +77,7 @@ void CmdNetClassAdd::undo() throw (Exception)
     }
     catch (Exception& e)
     {
-        mCircuit.addNetClass(mNetClass);
+        mCircuit.addNetClass(*mNetClass);
         throw;
     }
 }

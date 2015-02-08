@@ -51,7 +51,7 @@ class CmdSymbolInstanceRemove final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit CmdSymbolInstanceRemove(Schematic& schematic, SymbolInstance* symbol,
+        explicit CmdSymbolInstanceRemove(Schematic& schematic, SymbolInstance& symbol,
                                          UndoCommand* parent = 0) throw (Exception);
         ~CmdSymbolInstanceRemove() noexcept;
 
@@ -63,7 +63,7 @@ class CmdSymbolInstanceRemove final : public UndoCommand
     private:
 
         Schematic& mSchematic;
-        SymbolInstance* mSymbolInstance;
+        SymbolInstance& mSymbolInstance;
 };
 
 } // namespace project

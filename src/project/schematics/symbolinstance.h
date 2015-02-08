@@ -25,8 +25,8 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QDomElement>
 #include "../../common/if_attributeprovider.h"
+#include "../../common/file_io/if_xmlserializableobject.h"
 #include "../../common/units/all_length_units.h"
 #include "../../common/exceptions.h"
 
@@ -34,6 +34,7 @@
  *  Forward Declarations
  ****************************************************************************************/
 
+class XmlDomElement;
 class QGraphicsItem;
 class SchematicLayer;
 
@@ -61,15 +62,18 @@ namespace project {
  * @author ubruhin
  * @date 2014-08-23
  */
-class SymbolInstance final : public QObject, public IF_AttributeProvider
+class SymbolInstance final : public QObject, public IF_AttributeProvider,
+                             public IF_XmlSerializableObject
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit SymbolInstance(Schematic& schematic, const QDomElement& domElement)
-                                throw (Exception);
+        explicit SymbolInstance(Schematic& schematic, const XmlDomElement& domElement) throw (Exception);
+        explicit SymbolInstance(Schematic& schematic, GenCompInstance& genCompInstance,
+                                const QUuid& symbolItem, const Point& position = Point(),
+                                const Angle& angle = Angle()) throw (Exception);
         ~SymbolInstance() noexcept;
 
         // Getters
@@ -89,11 +93,9 @@ class SymbolInstance final : public QObject, public IF_AttributeProvider
         void setAngle(const Angle& newAngle) throw (Exception);
 
         // General Methods
-        void addToSchematic(Schematic& schematic, bool addNode,
-                            QDomElement& parent) throw (Exception);
-        void removeFromSchematic(Schematic& schematic, bool removeNode,
-                                 QDomElement& parent) throw (Exception);
-        bool save(bool toOriginal, QStringList& errors) noexcept;
+        void addToSchematic() throw (Exception);
+        void removeFromSchematic() throw (Exception);
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
 
         // Helper Methods
         Point mapToScene(const Point& relativePos) const noexcept;
@@ -103,10 +105,6 @@ class SymbolInstance final : public QObject, public IF_AttributeProvider
         // Static Methods
         static uint extractFromGraphicsItems(const QList<QGraphicsItem*>& items,
                                              QList<SymbolInstance*>& symbols) noexcept;
-        static SymbolInstance* create(Schematic& schematic, QDomDocument& doc,
-                                      const QUuid& genCompInstance, const QUuid& symbolItem,
-                                      const Point& position = Point(), const Angle& angle = Angle(),
-                                      bool mirror = false) throw (Exception);
 
 
     private slots:
@@ -121,9 +119,12 @@ class SymbolInstance final : public QObject, public IF_AttributeProvider
         SymbolInstance(const SymbolInstance& other);
         SymbolInstance& operator=(const SymbolInstance& rhs);
 
+        // Private Methods
+        void init(const QUuid& symbVarItemUuid) throw (Exception);
+
+
         // General
         Schematic& mSchematic;
-        QDomElement mDomElement;
         const library::GenCompSymbVarItem* mSymbVarItem;
         const library::Symbol* mSymbol;
         QHash<QUuid, SymbolPinInstance*> mPinInstances; ///< key: symbol pin UUID

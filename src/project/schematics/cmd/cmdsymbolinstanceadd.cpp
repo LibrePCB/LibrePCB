@@ -37,11 +37,11 @@ namespace project {
 CmdSymbolInstanceAdd::CmdSymbolInstanceAdd(Schematic& schematic,
                                            GenCompInstance& genComp,
                                            const QUuid& symbolItem, const Point& position,
-                                           const Angle& angle, bool mirror,
+                                           const Angle& angle,
                                            UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Add symbol instance"), parent),
     mSchematic(schematic), mGenCompInstance(genComp), mSymbolItemUuid(symbolItem),
-    mPosition(position), mAngle(angle), mMirror(mirror), mSymbolInstance(0)
+    mPosition(position), mAngle(angle), mSymbolInstance(nullptr)
 {
 }
 
@@ -59,11 +59,11 @@ void CmdSymbolInstanceAdd::redo() throw (Exception)
 {
     if (!mSymbolInstance) // only the first time
     {
-        mSymbolInstance = mSchematic.createSymbol(mGenCompInstance.getUuid(), mSymbolItemUuid,
-                                                  mPosition, mAngle, mMirror); // throws an exception on error
+        mSymbolInstance = mSchematic.createSymbol(mGenCompInstance, mSymbolItemUuid,
+                                                  mPosition, mAngle); // throws an exception on error
     }
 
-    mSchematic.addSymbol(mSymbolInstance); // throws an exception on error
+    mSchematic.addSymbol(*mSymbolInstance); // throws an exception on error
 
     try
     {
@@ -71,14 +71,14 @@ void CmdSymbolInstanceAdd::redo() throw (Exception)
     }
     catch (Exception &e)
     {
-        mSchematic.removeSymbol(mSymbolInstance);
+        mSchematic.removeSymbol(*mSymbolInstance);
         throw;
     }
 }
 
 void CmdSymbolInstanceAdd::undo() throw (Exception)
 {
-    mSchematic.removeSymbol(mSymbolInstance);  // throws an exception on error
+    mSchematic.removeSymbol(*mSymbolInstance);  // throws an exception on error
 
     try
     {
@@ -86,7 +86,7 @@ void CmdSymbolInstanceAdd::undo() throw (Exception)
     }
     catch (Exception& e)
     {
-        mSchematic.addSymbol(mSymbolInstance);
+        mSchematic.addSymbol(*mSymbolInstance);
         throw;
     }
 }

@@ -25,13 +25,15 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QDomElement>
+#include "../../common/file_io/if_xmlserializableobject.h"
 #include "../../common/exceptions.h"
 #include "../../library/attribute.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
+
+class XmlDomElement;
 
 namespace project {
 class Circuit;
@@ -47,21 +49,27 @@ namespace project {
 /**
  * @brief The GenCompAttributeInstance class
  */
-class GenCompAttributeInstance final : public QObject
+class GenCompAttributeInstance final : public IF_XmlSerializableObject
 {
-        Q_OBJECT
+        Q_DECLARE_TR_FUNCTIONS(GenCompAttributeInstance)
 
     public:
 
         // Constructors / Destructor
         explicit GenCompAttributeInstance(Circuit& circuit, GenCompInstance& genCompInstance,
-                                          const QDomElement& domElement) throw (Exception);
+                                          const XmlDomElement& domElement) throw (Exception);
+        explicit GenCompAttributeInstance(Circuit& circuit, GenCompInstance& genCompInstance,
+                                          const QString& key, library::Attribute::Type_t type,
+                                          const QString& value) throw (Exception);
         ~GenCompAttributeInstance() noexcept;
 
         // Getters
         const QString& getKey() const noexcept {return mKey;}
         library::Attribute::Type_t getType() const noexcept {return mType;}
         QString getValueToDisplay() const noexcept;
+
+        // General Methods
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
 
 
     private:
@@ -75,7 +83,6 @@ class GenCompAttributeInstance final : public QObject
         // General
         Circuit& mCircuit;
         GenCompInstance& mGenCompInstance;
-        QDomElement mDomElement;
 
         // Attributes
         QString mKey;

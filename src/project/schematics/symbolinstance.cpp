@@ -33,6 +33,7 @@
 #include "../../library/genericcomponent.h"
 #include "../../library/symbol.h"
 #include "symbolpininstance.h"
+#include "../../common/file_io/xmldomelement.h"
 
 namespace project {
 
@@ -40,39 +41,52 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SymbolInstance::SymbolInstance(Schematic& schematic, const QDomElement& domElement)
-                               throw (Exception) :
-    QObject(0), IF_AttributeProvider(), mSchematic(schematic), mDomElement(domElement),
-    mSymbVarItem(0), mSymbol(0), mGraphicsItem(0), mGenCompInstance(0)
+SymbolInstance::SymbolInstance(Schematic& schematic, const XmlDomElement& domElement) throw (Exception) :
+    QObject(nullptr), IF_AttributeProvider(), mSchematic(schematic), mSymbVarItem(nullptr),
+    mSymbol(nullptr), mGraphicsItem(nullptr), mGenCompInstance(nullptr)
 {
-    mUuid = mDomElement.attribute("uuid");
-    if(mUuid.isNull())
-    {
-        throw RuntimeError(__FILE__, __LINE__, mDomElement.attribute("uuid"),
-            QString(tr("Invalid symbol instance UUID: \"%1\""))
-            .arg(mDomElement.attribute("uuid")));
-    }
+    mUuid = domElement.getAttribute<QUuid>("uuid");
 
-    QString gcUuid = mDomElement.attribute("gen_comp_instance");
+    QUuid gcUuid = domElement.getAttribute<QUuid>("gen_comp_instance");
     mGenCompInstance = schematic.getProject().getCircuit().getGenCompInstanceByUuid(gcUuid);
     if (!mGenCompInstance)
     {
-        throw RuntimeError(__FILE__, __LINE__, gcUuid,
+        throw RuntimeError(__FILE__, __LINE__, gcUuid.toString(),
             QString(tr("No generic component with the UUID \"%1\" found in the circuit!"))
-                           .arg(gcUuid));
+            .arg(gcUuid.toString()));
     }
     connect(mGenCompInstance, SIGNAL(attributesChanged()), this, SLOT(genCompAttributesChanged()));
 
-    mPosition.setXmm(mDomElement.firstChildElement("position").attribute("x"));
-    mPosition.setYmm(mDomElement.firstChildElement("position").attribute("y"));
-    mAngle.setAngleDeg(mDomElement.firstChildElement("position").attribute("angle"));
+    mPosition.setX(domElement.getFirstChild("position", true)->getAttribute<Length>("x"));
+    mPosition.setY(domElement.getFirstChild("position", true)->getAttribute<Length>("y"));
+    mAngle = domElement.getFirstChild("position", true)->getAttribute<Angle>("angle");
 
-    QString symbVarItemUuid = mDomElement.attribute("symbol_item");
+    QUuid symbVarItemUuid = domElement.getAttribute<QUuid>("symbol_item");
+    init(symbVarItemUuid);
+}
+
+SymbolInstance::SymbolInstance(Schematic& schematic, GenCompInstance& genCompInstance,
+                               const QUuid& symbolItem, const Point& position,
+                               const Angle& angle) throw (Exception) :
+    QObject(nullptr), IF_AttributeProvider(), mSchematic(schematic), mSymbVarItem(nullptr),
+    mSymbol(nullptr), mGraphicsItem(nullptr), mGenCompInstance(&genCompInstance),
+    mPosition(position), mAngle(angle)
+{
+    mUuid = QUuid::createUuid().toString(); // generate random UUID
+
+    connect(mGenCompInstance, SIGNAL(attributesChanged()), this, SLOT(genCompAttributesChanged()));
+
+    init(symbolItem);
+}
+
+void SymbolInstance::init(const QUuid& symbVarItemUuid) throw (Exception)
+{
     mSymbVarItem = mGenCompInstance->getSymbolVariant().getItemByUuid(symbVarItemUuid);
     if (!mSymbVarItem)
     {
-        throw RuntimeError(__FILE__, __LINE__, symbVarItemUuid,
-            QString(tr("The symbol variant item UUID \"%1\" is invalid.")).arg(symbVarItemUuid));
+        throw RuntimeError(__FILE__, __LINE__, symbVarItemUuid.toString(),
+            QString(tr("The symbol variant item UUID \"%1\" is invalid."))
+            .arg(symbVarItemUuid.toString()));
     }
 
     mSymbol = mSchematic.getProject().getLibrary().getSymbol(mSymbVarItem->getSymbolUuid());
@@ -152,62 +166,33 @@ void SymbolInstance::setAngle(const Angle& newAngle) throw (Exception)
  *  General Methods
  ****************************************************************************************/
 
-void SymbolInstance::addToSchematic(Schematic& schematic, bool addNode,
-                                       QDomElement& parent) throw (Exception)
+void SymbolInstance::addToSchematic() throw (Exception)
 {
     mGenCompInstance->registerSymbolInstance(mSymbVarItem->getUuid(), mSymbol->getUuid(), this);
-
-    if (addNode)
-    {
-        if (parent.nodeName() != "symbols")
-            throw LogicError(__FILE__, __LINE__, parent.nodeName(), tr("Invalid node name!"));
-
-        if (parent.appendChild(mDomElement).isNull())
-            throw LogicError(__FILE__, __LINE__, QString(), tr("Could not append DOM node!"));
-    }
-
-    schematic.addItem(mGraphicsItem);
-
+    mSchematic.addItem(mGraphicsItem);
     foreach (SymbolPinInstance* pin, mPinInstances)
         pin->addToSchematic();
 }
 
-void SymbolInstance::removeFromSchematic(Schematic& schematic, bool removeNode,
-                                            QDomElement& parent) throw (Exception)
+void SymbolInstance::removeFromSchematic() throw (Exception)
 {
     mGenCompInstance->unregisterSymbolInstance(mSymbVarItem->getUuid(), this);
-
-    if (removeNode)
-    {
-        if (parent.nodeName() != "symbols")
-            throw LogicError(__FILE__, __LINE__, parent.nodeName(), tr("Invalid node name!"));
-
-        if (parent.removeChild(mDomElement).isNull())
-            throw LogicError(__FILE__, __LINE__, QString(), tr("Could not remove node from DOM tree!"));
-    }
-
-    schematic.removeItem(mGraphicsItem);
-
+    mSchematic.removeItem(mGraphicsItem);
     foreach (SymbolPinInstance* pin, mPinInstances)
         pin->removeFromSchematic();
 }
 
-bool SymbolInstance::save(bool toOriginal, QStringList& errors) noexcept
+XmlDomElement* SymbolInstance::serializeToXmlDomElement() const throw (Exception)
 {
-    // save symbol attributes
-    mDomElement.firstChildElement("position").setAttribute("x", mPosition.getX().toMmString());
-    mDomElement.firstChildElement("position").setAttribute("y", mPosition.getY().toMmString());
-    mDomElement.firstChildElement("position").setAttribute("angle", mAngle.toDegString());
-
-    // save pin attributes
-    bool success = true;
-    foreach (SymbolPinInstance* pin, mPinInstances)
-    {
-        if (!pin->save(toOriginal, errors))
-            success = false;
-    }
-
-    return success;
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("symbol"));
+    root->setAttribute("uuid", mUuid);
+    root->setAttribute("gen_comp_instance", mGenCompInstance->getUuid());
+    root->setAttribute("symbol_item", mSymbVarItem->getUuid());
+    XmlDomElement* position = root->appendChild("position");
+    position->setAttribute("x", mPosition.getX());
+    position->setAttribute("y", mPosition.getY());
+    position->setAttribute("angle", mAngle);
+    return root.take();
 }
 
 /*****************************************************************************************
@@ -270,30 +255,6 @@ uint SymbolInstance::extractFromGraphicsItems(const QList<QGraphicsItem*>& items
         }
     }
     return symbols.count();
-}
-
-SymbolInstance* SymbolInstance::create(Schematic& schematic, QDomDocument& doc,
-                                       const QUuid& genCompInstance, const QUuid& symbolItem,
-                                       const Point& position, const Angle& angle,
-                                       bool mirror) throw (Exception)
-{
-    QDomElement node = doc.createElement("symbol");
-    if (node.isNull())
-        throw LogicError(__FILE__, __LINE__, QString(), tr("Could not create DOM node!"));
-
-    // fill the new QDomElement with all the needed content
-    node.setAttribute("uuid", QUuid::createUuid().toString()); // generate random UUID
-    node.setAttribute("gen_comp_instance", genCompInstance.toString());
-    node.setAttribute("symbol_item", symbolItem.toString());
-    QDomElement posNode = doc.createElement("position");
-    posNode.setAttribute("x", position.getX().toMmString());
-    posNode.setAttribute("y", position.getY().toMmString());
-    posNode.setAttribute("angle", angle.toDegString());
-    posNode.setAttribute("mirror", mirror ? "true" : "false");
-    node.appendChild(posNode);
-
-    // create and return the new SymbolInstance object
-    return new SymbolInstance(schematic, node);
 }
 
 /*****************************************************************************************

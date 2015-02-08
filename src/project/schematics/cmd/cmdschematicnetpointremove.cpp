@@ -33,7 +33,7 @@ namespace project {
  ****************************************************************************************/
 
 CmdSchematicNetPointRemove::CmdSchematicNetPointRemove(Schematic& schematic,
-                                                       SchematicNetPoint* netpoint,
+                                                       SchematicNetPoint& netpoint,
                                                        UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Remove netpoint"), parent),
     mSchematic(schematic), mNetPoint(netpoint)
@@ -43,7 +43,7 @@ CmdSchematicNetPointRemove::CmdSchematicNetPointRemove(Schematic& schematic,
 CmdSchematicNetPointRemove::~CmdSchematicNetPointRemove() noexcept
 {
     if (mIsExecuted)
-        delete mNetPoint;
+        delete &mNetPoint;
 }
 
 /*****************************************************************************************

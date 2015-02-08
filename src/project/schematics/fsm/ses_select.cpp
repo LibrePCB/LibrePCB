@@ -509,7 +509,7 @@ bool SES_Select::removeSelectedItems() noexcept
         // remove all netlines
         foreach (SchematicNetLine* line, netlines)
         {
-            CmdSchematicNetLineRemove* cmd = new CmdSchematicNetLineRemove(*schematic, line);
+            CmdSchematicNetLineRemove* cmd = new CmdSchematicNetLineRemove(*schematic, *line);
             mEditor.getProject().getUndoStack().appendToCommand(cmd);
         }
 
@@ -519,7 +519,7 @@ bool SES_Select::removeSelectedItems() noexcept
             // TODO: this code does not work correctly in all possible cases
             if (point->getLines().count() == 0)
             {
-                CmdSchematicNetPointRemove* cmd = new CmdSchematicNetPointRemove(*schematic, point);
+                CmdSchematicNetPointRemove* cmd = new CmdSchematicNetPointRemove(*schematic, *point);
                 mEditor.getProject().getUndoStack().appendToCommand(cmd);
                 if (point->isAttached())
                 {
@@ -543,7 +543,7 @@ bool SES_Select::removeSelectedItems() noexcept
         // remove all symbols
         foreach (SymbolInstance* symbol, symbols)
         {
-            CmdSymbolInstanceRemove* cmd = new CmdSymbolInstanceRemove(*schematic, symbol);
+            CmdSymbolInstanceRemove* cmd = new CmdSymbolInstanceRemove(*schematic, *symbol);
             mEditor.getProject().getUndoStack().appendToCommand(cmd);
         }
 

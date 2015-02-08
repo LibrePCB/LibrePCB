@@ -33,7 +33,7 @@ namespace project {
  ****************************************************************************************/
 
 CmdSchematicNetLineRemove::CmdSchematicNetLineRemove(Schematic& schematic,
-                                                     SchematicNetLine* netline,
+                                                     SchematicNetLine& netline,
                                                      UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Remove netline"), parent),
     mSchematic(schematic), mNetLine(netline)
@@ -43,7 +43,7 @@ CmdSchematicNetLineRemove::CmdSchematicNetLineRemove(Schematic& schematic,
 CmdSchematicNetLineRemove::~CmdSchematicNetLineRemove() noexcept
 {
     if (mIsExecuted)
-        delete mNetLine;
+        delete &mNetLine;
 }
 
 /*****************************************************************************************

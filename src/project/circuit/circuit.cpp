@@ -22,10 +22,10 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QtWidgets>
-#include <QDomDocument>
 #include "../../common/exceptions.h"
 #include "../../common/smartxmlfile.h"
+#include "../../common/file_io/xmldomdocument.h"
+#include "../../common/file_io/xmldomelement.h"
 #include "circuit.h"
 #include "../project.h"
 #include "netclass.h"
@@ -51,62 +51,53 @@ Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create) thr
     {
         // try to create/open the XML file "circuit.xml"
         if (create)
-            mXmlFile = SmartXmlFile::create(mXmlFilepath, "circuit", 0);
+        {
+            mXmlFile = SmartXmlFile::create(mXmlFilepath);
+            NetClass* netclass = new NetClass(*this, "default");
+            addNetClass(*netclass); // add a netclass with name "default"
+        }
         else
-            mXmlFile = new SmartXmlFile(mXmlFilepath, restore, readOnly, "circuit", 0);
-
-        // OK - XML file is open --> now load the whole circuit stuff
-
-        QDomElement tmpNode; // for temporary use...
-        QDomElement root = mXmlFile->getRoot();
-
-        // Load all netclasses
-        if (root.firstChildElement("netclasses").isNull())
-            root.appendChild(mXmlFile->getDocument().createElement("netclasses"));
-        tmpNode = root.firstChildElement("netclasses").firstChildElement("netclass");
-        while (!tmpNode.isNull())
         {
-            NetClass* netclass = new NetClass(*this, tmpNode);
-            addNetClass(netclass, false);
-            tmpNode = tmpNode.nextSiblingElement("netclass");
-        }
-        if (mNetClasses.isEmpty())
-            addNetClass(createNetClass("default")); // add a netclass with name "default"
-        qDebug() << mNetClasses.count() << "netclasses successfully loaded!";
+            mXmlFile = new SmartXmlFile(mXmlFilepath, restore, readOnly);
+            QSharedPointer<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
+            XmlDomElement& root = doc->getRoot();
 
-        // Load all netsignals
-        if (root.firstChildElement("netsignals").isNull())
-            root.appendChild(mXmlFile->getDocument().createElement("netsignals"));
-        tmpNode = root.firstChildElement("netsignals").firstChildElement("netsignal");
-        while (!tmpNode.isNull())
-        {
-            NetSignal* netsignal = new NetSignal(*this, tmpNode);
-            addNetSignal(netsignal, false);
-            tmpNode = tmpNode.nextSiblingElement("netsignal");
-        }
-        qDebug() << mNetSignals.count() << "netsignals successfully loaded!";
+            // OK - XML file is open --> now load the whole circuit stuff
 
-        // Load all generic component instances
-        if (root.firstChildElement("generic_component_instances").isNull())
-            root.appendChild(mXmlFile->getDocument().createElement("generic_component_instances"));
-        tmpNode = root.firstChildElement("generic_component_instances").firstChildElement("instance");
-        while (!tmpNode.isNull())
-        {
-            GenCompInstance* genComp = new GenCompInstance(*this, tmpNode);
-            addGenCompInstance(genComp, false);
-            tmpNode = tmpNode.nextSiblingElement("instance");
+            // Load all netclasses
+            for (XmlDomElement* node = root.getFirstChild("netclasses/netclass", true, false);
+                 node; node = node->getNextSibling("netclass"))
+            {
+                NetClass* netclass = new NetClass(*this, *node);
+                addNetClass(*netclass);
+            }
+
+            // Load all netsignals
+            for (XmlDomElement* node = root.getFirstChild("netsignals/netsignal", true, false);
+                 node; node = node->getNextSibling("netsignal"))
+            {
+                NetSignal* netsignal = new NetSignal(*this, *node);
+                addNetSignal(*netsignal);
+            }
+
+            // Load all generic component instances
+            for (XmlDomElement* node = root.getFirstChild("generic_component_instances/instance", true, false);
+                 node; node = node->getNextSibling("instance"))
+            {
+                GenCompInstance* genComp = new GenCompInstance(*this, *node);
+                addGenCompInstance(*genComp);
+            }
         }
-        qDebug() << mGenCompInstances.count() << "generic component instances successfully loaded!";
     }
     catch (...)
     {
         // free allocated memory (see comments in the destructor) and rethrow the exception
         foreach (GenCompInstance* genCompInstance, mGenCompInstances)
-            try { removeGenCompInstance(genCompInstance, false, true); } catch (...) {}
+            try { removeGenCompInstance(*genCompInstance); delete genCompInstance; } catch (...) {}
         foreach (NetSignal* netsignal, mNetSignals)
-            try { removeNetSignal(netsignal, false, true); } catch (...) {}
+            try { removeNetSignal(*netsignal); delete netsignal; } catch (...) {}
         foreach (NetClass* netclass, mNetClasses)
-            try { removeNetClass(netclass, false, true); } catch (...) {}
+            try { removeNetClass(*netclass); delete netclass; } catch (...) {}
         delete mXmlFile;            mXmlFile = nullptr;
         throw;
     }
@@ -118,15 +109,15 @@ Circuit::~Circuit() noexcept
 {
     // delete all generic component instances (and catch all throwed exceptions)
     foreach (GenCompInstance* genCompInstance, mGenCompInstances)
-        try { removeGenCompInstance(genCompInstance, false, true); } catch (...) {}
+        try { removeGenCompInstance(*genCompInstance); delete genCompInstance; } catch (...) {}
 
     // delete all netsignals (and catch all throwed exceptions)
     foreach (NetSignal* netsignal, mNetSignals)
-        try { removeNetSignal(netsignal, false, true); } catch (...) {}
+        try { removeNetSignal(*netsignal); delete netsignal; } catch (...) {}
 
     // delete all netclasses (and catch all throwed exceptions)
     foreach (NetClass* netclass, mNetClasses)
-        try { removeNetClass(netclass, false, true); } catch (...) {}
+        try { removeNetClass(*netclass); delete netclass; } catch (...) {}
 
     delete mXmlFile;            mXmlFile = nullptr;
 }
@@ -150,60 +141,69 @@ NetClass* Circuit::getNetClassByName(const QString& name) const noexcept
     return nullptr;
 }
 
-NetClass* Circuit::createNetClass(const QString& name) throw (Exception)
+void Circuit::addNetClass(NetClass& netclass) throw (Exception)
 {
-    return NetClass::create(*this, mXmlFile->getDocument(), name);
-}
-
-void Circuit::addNetClass(NetClass* netclass, bool toDomTree) throw (Exception)
-{
-    Q_CHECK_PTR(netclass);
-
     // check if there is no netclass with the same uuid in the list
-    if (getNetClassByUuid(netclass->getUuid()))
+    if (getNetClassByUuid(netclass.getUuid()))
     {
-        throw RuntimeError(__FILE__, __LINE__, netclass->getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, netclass.getUuid().toString(),
             QString(tr("There is already a netclass with the UUID \"%1\"!"))
-            .arg(netclass->getUuid().toString()));
+            .arg(netclass.getUuid().toString()));
     }
 
     // check if there is no netclass with the same name in the list
-    if (getNetClassByName(netclass->getName()))
+    if (getNetClassByName(netclass.getName()))
     {
-        throw RuntimeError(__FILE__, __LINE__, netclass->getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, netclass.getUuid().toString(),
             QString(tr("There is already a netclass with the name \"%1\"!"))
-            .arg(netclass->getName()));
+            .arg(netclass.getName()));
     }
 
-    QDomElement parent = mXmlFile->getRoot().firstChildElement("netclasses");
-    netclass->addToCircuit(toDomTree, parent); // can throw an exception
-
-    mNetClasses.insert(netclass->getUuid(), netclass);
+    // add netclass to circuit
+    netclass.addToCircuit();
+    mNetClasses.insert(netclass.getUuid(), &netclass);
     emit netClassAdded(netclass);
 }
 
-void Circuit::removeNetClass(NetClass* netclass, bool fromDomTree, bool deleteNetClass) throw (Exception)
+void Circuit::removeNetClass(NetClass& netclass) throw (Exception)
 {
-    Q_CHECK_PTR(netclass);
-    Q_ASSERT(mNetClasses.contains(netclass->getUuid()));
+    Q_ASSERT(mNetClasses.contains(netclass.getUuid()) == true);
 
     // the netclass cannot be removed if there are already netsignals with that netclass!
-    if (netclass->getNetSignalCount() > 0)
+    if (netclass.getNetSignalCount() > 0)
     {
         throw RuntimeError(__FILE__, __LINE__, QString("%1:%2")
-            .arg(netclass->getUuid().toString()).arg(netclass->getNetSignalCount()),
+            .arg(netclass.getUuid().toString()).arg(netclass.getNetSignalCount()),
             QString(tr("There are already signals in the netclass \"%1\"!"))
-            .arg(netclass->getName()));
+            .arg(netclass.getName()));
     }
 
-    QDomElement parent = mXmlFile->getRoot().firstChildElement("netclasses");
-    netclass->removeFromCircuit(fromDomTree, parent); // can throw an exception
-
-    mNetClasses.remove(netclass->getUuid());
+    // remove netclass from project
+    netclass.removeFromCircuit();
+    mNetClasses.remove(netclass.getUuid());
     emit netClassRemoved(netclass);
+}
 
-    if (deleteNetClass)
-        delete netclass;
+void Circuit::setNetClassName(NetClass& netclass, const QString& newName) throw (Exception)
+{
+    Q_ASSERT(mNetClasses.contains(netclass.getUuid()) == true);
+
+    // check the validity of the new name
+    if (newName.isEmpty())
+    {
+        throw RuntimeError(__FILE__, __LINE__, netclass.getUuid().toString(),
+            QString(tr("The new netclass name must not be empty!")));
+    }
+
+    // check if there is no netclass with the same name in the list
+    if (getNetClassByName(newName))
+    {
+        throw RuntimeError(__FILE__, __LINE__, netclass.getUuid().toString(),
+            QString(tr("There is already a netclass with the name \"%1\"!")).arg(newName));
+    }
+
+    // apply the new name
+    netclass.setName(newName);
 }
 
 void Circuit::execEditNetClassesDialog(QWidget* parent) noexcept
@@ -238,7 +238,7 @@ NetSignal* Circuit::getNetSignalByName(const QString& name) const noexcept
     return nullptr;
 }
 
-NetSignal* Circuit::createNetSignal(const QUuid& netclass, QString name) throw (Exception)
+NetSignal* Circuit::createNetSignal(NetClass& netclass, QString name) throw (Exception)
 {
     bool autoName = false;
     if (name.isEmpty())
@@ -258,65 +258,59 @@ NetSignal* Circuit::createNetSignal(const QUuid& netclass, QString name) throw (
                 "name \"%1\" does already exist in the circuit.")).arg(name));
         }
     }
-    return NetSignal::create(*this, mXmlFile->getDocument(), netclass, name, autoName);
+    return new NetSignal(*this, netclass, name, autoName);
 }
 
-void Circuit::addNetSignal(NetSignal* netsignal, bool toDomTree) throw (Exception)
+void Circuit::addNetSignal(NetSignal& netsignal) throw (Exception)
 {
-    Q_CHECK_PTR(netsignal);
-
     // check if there is no netsignal with the same uuid in the list
-    if (getNetSignalByUuid(netsignal->getUuid()))
+    if (getNetSignalByUuid(netsignal.getUuid()))
     {
-        throw RuntimeError(__FILE__, __LINE__, netsignal->getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, netsignal.getUuid().toString(),
             QString(tr("There is already a netsignal with the UUID \"%1\"!"))
-            .arg(netsignal->getUuid().toString()));
+            .arg(netsignal.getUuid().toString()));
     }
 
     // check if there is no netsignal with the same name in the list
-    if (getNetSignalByName(netsignal->getName()))
+    if (getNetSignalByName(netsignal.getName()))
     {
-        throw RuntimeError(__FILE__, __LINE__, netsignal->getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, netsignal.getUuid().toString(),
             QString(tr("There is already a netsignal with the name \"%1\"!"))
-            .arg(netsignal->getName()));
+            .arg(netsignal.getName()));
     }
 
-    QDomElement parent = mXmlFile->getRoot().firstChildElement("netsignals");
-    netsignal->addToCircuit(toDomTree, parent); // can throw an exception
-
-    mNetSignals.insert(netsignal->getUuid(), netsignal);
+    // add netsignal to circuit
+    netsignal.addToCircuit();
+    mNetSignals.insert(netsignal.getUuid(), &netsignal);
     emit netSignalAdded(netsignal);
 }
 
-void Circuit::removeNetSignal(NetSignal* netsignal, bool fromDomTree, bool deleteNetSignal) throw (Exception)
+void Circuit::removeNetSignal(NetSignal& netsignal) throw (Exception)
 {
-    Q_CHECK_PTR(netsignal);
-    Q_ASSERT(mNetSignals.contains(netsignal->getUuid()));
+    Q_ASSERT(mNetSignals.contains(netsignal.getUuid()) == true);
 
     // the netsignal cannot be removed if there are already elements with that netsignal!
-    if ((netsignal->getGenCompSignals().count() > 0) || (netsignal->getNetPoints().count() > 0))
+    if ((netsignal.getGenCompSignals().count() > 0) || (netsignal.getNetPoints().count() > 0))
     {
         throw LogicError(__FILE__, __LINE__,
             QString("%1:%2/%3")
-            .arg(netsignal->getUuid().toString())
-            .arg(netsignal->getGenCompSignals().count())
-            .arg(netsignal->getNetPoints().count()),
+            .arg(netsignal.getUuid().toString())
+            .arg(netsignal.getGenCompSignals().count())
+            .arg(netsignal.getNetPoints().count()),
             QString(tr("There are already elements in the netsignal \"%1\"!"))
-            .arg(netsignal->getName()));
+            .arg(netsignal.getName()));
     }
 
-    QDomElement parent = mXmlFile->getRoot().firstChildElement("netsignals");
-    netsignal->removeFromCircuit(fromDomTree, parent); // can throw an exception
-
-    mNetSignals.remove(netsignal->getUuid());
+    // remove netsignal from circuit
+    netsignal.removeFromCircuit();
+    mNetSignals.remove(netsignal.getUuid());
     emit netSignalRemoved(netsignal);
-
-    if (deleteNetSignal)
-        delete netsignal;
 }
 
 void Circuit::setNetSignalName(NetSignal& netsignal, const QString& newName, bool isAutoName) throw (Exception)
 {
+    Q_ASSERT(mNetSignals.contains(netsignal.getUuid()) == true);
+
     // check the validity of the new name
     if (newName.isEmpty())
     {
@@ -376,59 +370,54 @@ GenCompInstance* Circuit::createGenCompInstance(const library::GenericComponent&
                 "name \"%1\" does already exist in the circuit.")).arg(name));
         }
     }
-    return GenCompInstance::create(*this, mXmlFile->getDocument(), genComp, symbVar, name);
+    return new GenCompInstance(*this, genComp, symbVar, name);
 }
 
-void Circuit::addGenCompInstance(GenCompInstance* genCompInstance,
-                                 bool toDomTree) throw (Exception)
+void Circuit::addGenCompInstance(GenCompInstance& genCompInstance) throw (Exception)
 {
-    Q_CHECK_PTR(genCompInstance);
-
     // check if there is no generic component with the same uuid in the list
-    if (getGenCompInstanceByUuid(genCompInstance->getUuid()))
+    if (getGenCompInstanceByUuid(genCompInstance.getUuid()))
     {
-        throw RuntimeError(__FILE__, __LINE__, genCompInstance->getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, genCompInstance.getUuid().toString(),
             QString(tr("There is already a component with the UUID \"%1\"!"))
-            .arg(genCompInstance->getUuid().toString()));
+            .arg(genCompInstance.getUuid().toString()));
     }
 
     // check if there is no generic component with the same name in the list
-    if (getGenCompInstanceByName(genCompInstance->getName()))
+    if (getGenCompInstanceByName(genCompInstance.getName()))
     {
-        throw RuntimeError(__FILE__, __LINE__, genCompInstance->getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, genCompInstance.getUuid().toString(),
             QString(tr("There is already a component with the name \"%1\"!"))
-            .arg(genCompInstance->getName()));
+            .arg(genCompInstance.getName()));
     }
 
-    QDomElement parent = mXmlFile->getRoot().firstChildElement("generic_component_instances");
-    genCompInstance->addToCircuit(toDomTree, parent); // can throw an exception
-
-    mGenCompInstances.insert(genCompInstance->getUuid(), genCompInstance);
+    // add to circuit
+    genCompInstance.addToCircuit();
+    mGenCompInstances.insert(genCompInstance.getUuid(), &genCompInstance);
     emit genCompAdded(genCompInstance);
 }
 
-void Circuit::removeGenCompInstance(GenCompInstance* genCompInstance,
-                                    bool fromDomTree, bool deleteGenCompInstance)
-                                    throw (Exception)
+void Circuit::removeGenCompInstance(GenCompInstance& genCompInstance) throw (Exception)
 {
-    Q_CHECK_PTR(genCompInstance);
-    Q_ASSERT(mGenCompInstances.contains(genCompInstance->getUuid()));
+    Q_ASSERT(mGenCompInstances.contains(genCompInstance.getUuid()) == true);
 
-    // TODO: check if there are still objects like symbols or footprints which use this
-    // generic component
+    // check if the generic component instance is not used by symbols/footprints
+    if (genCompInstance.getPlacedSymbolsCount() > 0)
+    {
+        throw LogicError(__FILE__, __LINE__, genCompInstance.getUuid().toString(),
+            QString(tr("The component \"%1\" is still used!")).arg(genCompInstance.getName()));
+    }
 
-    QDomElement parent = mXmlFile->getRoot().firstChildElement("generic_component_instances");
-    genCompInstance->removeFromCircuit(fromDomTree, parent); // can throw an exception
-
-    mGenCompInstances.remove(genCompInstance->getUuid());
+    // remove from circuit
+    genCompInstance.removeFromCircuit();
+    mGenCompInstances.remove(genCompInstance.getUuid());
     emit genCompRemoved(genCompInstance);
-
-    if (deleteGenCompInstance)
-        delete genCompInstance;
 }
 
 void Circuit::setGenCompInstanceName(GenCompInstance& genComp, const QString& newName) throw (Exception)
 {
+    Q_ASSERT(mGenCompInstances.contains(genComp.getUuid()) == true);
+
     // check the validity of the new name
     if (newName.isEmpty())
     {
@@ -458,7 +447,9 @@ bool Circuit::save(bool toOriginal, QStringList& errors) noexcept
     // Save "core/circuit.xml"
     try
     {
-        mXmlFile->save(toOriginal);
+        XmlDomElement* root = serializeToXmlDomElement();
+        XmlDomDocument doc(*root);
+        mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)
     {
@@ -467,6 +458,26 @@ bool Circuit::save(bool toOriginal, QStringList& errors) noexcept
     }
 
     return success;
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+XmlDomElement* Circuit::serializeToXmlDomElement() const throw (Exception)
+{
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("circuit"));
+    //XmlDomElement* meta = root->appendChild("meta");
+    XmlDomElement* netclasses = root->appendChild("netclasses");
+    foreach (NetClass* netclass, mNetClasses)
+        netclasses->appendChild(netclass->serializeToXmlDomElement());
+    XmlDomElement* netsignals = root->appendChild("netsignals");
+    foreach (NetSignal* netsignal, mNetSignals)
+        netsignals->appendChild(netsignal->serializeToXmlDomElement());
+    XmlDomElement* genericComponents = root->appendChild("generic_component_instances");
+    foreach (GenCompInstance* instance, mGenCompInstances)
+        genericComponents->appendChild(instance->serializeToXmlDomElement());
+    return root.take();
 }
 
 /*****************************************************************************************

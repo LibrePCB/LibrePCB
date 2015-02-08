@@ -51,7 +51,7 @@ class CmdSchematicNetLineRemove final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit CmdSchematicNetLineRemove(Schematic& schematic, SchematicNetLine* netline,
+        explicit CmdSchematicNetLineRemove(Schematic& schematic, SchematicNetLine& netline,
                                             UndoCommand* parent = 0) throw (Exception);
         ~CmdSchematicNetLineRemove() noexcept;
 
@@ -62,7 +62,7 @@ class CmdSchematicNetLineRemove final : public UndoCommand
     private:
 
         Schematic& mSchematic;
-        SchematicNetLine* mNetLine;
+        SchematicNetLine& mNetLine;
 };
 
 } // namespace project

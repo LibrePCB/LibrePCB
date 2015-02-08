@@ -32,10 +32,10 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdNetSignalAdd::CmdNetSignalAdd(Circuit& circuit, const QUuid& netclass,
+CmdNetSignalAdd::CmdNetSignalAdd(Circuit& circuit, NetClass& netclass,
                                  const QString& name, UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Add netsignal"), parent),
-    mCircuit(circuit), mNetClass(netclass), mName(name), mNetSignal(0)
+    mCircuit(circuit), mNetClass(netclass), mName(name), mNetSignal(nullptr)
 {
 }
 
@@ -54,7 +54,7 @@ void CmdNetSignalAdd::redo() throw (Exception)
     if (!mNetSignal) // only the first time
         mNetSignal = mCircuit.createNetSignal(mNetClass, mName); // throws an exception on error
 
-    mCircuit.addNetSignal(mNetSignal); // throws an exception on error
+    mCircuit.addNetSignal(*mNetSignal); // throws an exception on error
 
     try
     {
@@ -62,14 +62,14 @@ void CmdNetSignalAdd::redo() throw (Exception)
     }
     catch (Exception& e)
     {
-        mCircuit.removeNetSignal(mNetSignal);
+        mCircuit.removeNetSignal(*mNetSignal);
         throw;
     }
 }
 
 void CmdNetSignalAdd::undo() throw (Exception)
 {
-    mCircuit.removeNetSignal(mNetSignal); // throws an exception on error
+    mCircuit.removeNetSignal(*mNetSignal); // throws an exception on error
 
     try
     {
@@ -77,7 +77,7 @@ void CmdNetSignalAdd::undo() throw (Exception)
     }
     catch (Exception& e)
     {
-        mCircuit.addNetSignal(mNetSignal);
+        mCircuit.addNetSignal(*mNetSignal);
         throw;
     }
 }

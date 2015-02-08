@@ -25,7 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QtWidgets>
+#include "../common/file_io/if_xmlserializableobject.h"
 #include "../common/if_attributeprovider.h"
 #include "../common/exceptions.h"
 #include "../common/filelock.h"
@@ -35,6 +35,7 @@
  *  Forward Declarations
  ****************************************************************************************/
 
+class QMainWindow;
 class QPrinter;
 class SmartTextFile;
 class SmartXmlFile;
@@ -76,7 +77,8 @@ namespace project {
  * @author ubruhin
  * @date 2014-06-24
  */
-class Project final : public QObject, public IF_AttributeProvider
+class Project final : public QObject, public IF_AttributeProvider,
+                      public IF_XmlSerializableObject
 {
         Q_OBJECT
 
@@ -262,7 +264,7 @@ class Project final : public QObject, public IF_AttributeProvider
          *
          * @undocmd{project#CmdProjectSetMetadata}
          */
-        void setName(const QString& newName) noexcept;
+        void setName(const QString& newName) noexcept {mName = newName;}
 
         /**
          * @brief Set the description (in HTML) of the project
@@ -280,7 +282,7 @@ class Project final : public QObject, public IF_AttributeProvider
          *
          * @undocmd{project#CmdProjectSetMetadata}
          */
-        void setAuthor(const QString& newAuthor) noexcept;
+        void setAuthor(const QString& newAuthor) noexcept {mAuthor = newAuthor;}
 
         /**
          * @brief Set the date and time when the project was created
@@ -289,7 +291,7 @@ class Project final : public QObject, public IF_AttributeProvider
          *
          * @undocmd{project#CmdProjectSetMetadata}
          */
-        void setCreated(const QDateTime& newCreated) noexcept;
+        void setCreated(const QDateTime& newCreated) noexcept {mCreated = newCreated;}
 
         /**
          * @brief Set the date and time when the project was last modified
@@ -298,7 +300,7 @@ class Project final : public QObject, public IF_AttributeProvider
          *
          * @note This method is automatically called before saving the project.
          */
-        void setLastModified(const QDateTime& newLastModified) noexcept;
+        void setLastModified(const QDateTime& newLastModified) noexcept {mLastModified = newLastModified;}
 
 
         // General Methods
@@ -471,6 +473,11 @@ class Project final : public QObject, public IF_AttributeProvider
          * @throw Exception     On error
          */
         void updateSchematicsList() throw (Exception);
+
+        /**
+         * @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+         */
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
 
         /**
          * @brief Save the project to the harddisc (to temporary or original files)

@@ -49,6 +49,8 @@ namespace project {
 /**
  * @brief The EditNetClassesDialog class
  *
+ * @todo This class contains very ugly code (static casts) and is not really finished...
+ *
  * @author ubruhin
  * @date 2014-10-05
  */

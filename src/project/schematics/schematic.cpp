@@ -24,6 +24,8 @@
 #include <QtCore>
 #include "schematic.h"
 #include "../../common/smartxmlfile.h"
+#include "../../common/file_io/xmldomdocument.h"
+#include "../../common/file_io/xmldomelement.h"
 #include "../project.h"
 #include "symbolinstance.h"
 #include "schematicnetpoint.h"
@@ -47,75 +49,46 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
         // try to open/create the XML schematic file
         if (create)
         {
-            mXmlFile = SmartXmlFile::create(mFilePath, "schematic", 0);
+            mXmlFile = SmartXmlFile::create(mFilePath);
 
-            // create node "meta" with schematic UUID and name
-            QDomElement metaNode = mXmlFile->getDocument().createElement("meta");
-            QDomElement uuidNode = mXmlFile->getDocument().createElement("uuid");
-            QDomElement nameNode = mXmlFile->getDocument().createElement("name");
-            QDomText uuidText = mXmlFile->getDocument().createTextNode(QUuid::createUuid().toString());
-            QDomText nameText = mXmlFile->getDocument().createTextNode(newName);
-            uuidNode.appendChild(uuidText);
-            nameNode.appendChild(nameText);
-            metaNode.appendChild(uuidNode);
-            metaNode.appendChild(nameNode);
-            mXmlFile->getRoot().appendChild(metaNode);
-
-            // create nodes "symbols", "netpoints", and "netlines" (empty)
-            mXmlFile->getRoot().appendChild(mXmlFile->getDocument().createElement("symbols"));
-            mXmlFile->getRoot().appendChild(mXmlFile->getDocument().createElement("netpoints"));
-            mXmlFile->getRoot().appendChild(mXmlFile->getDocument().createElement("netlines"));
+            // set attributes
+            mUuid = QUuid::createUuid();
+            mName = newName;
         }
         else
         {
-            mXmlFile = new SmartXmlFile(mFilePath, restore, readOnly, "schematic", 0);
-        }
+            mXmlFile = new SmartXmlFile(mFilePath, restore, readOnly);
+            QSharedPointer<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
+            XmlDomElement& root = doc->getRoot();
 
-        // the schematic seems to be ready to open, so we will create all needed objects
+            // the schematic seems to be ready to open, so we will create all needed objects
 
-        QDomElement tmpNode; // for temporary use
+            mUuid = root.getFirstChild("meta/uuid", true, true)->getText<QUuid>();
+            mName = root.getFirstChild("meta/name", true, true)->getText(true);
 
-        tmpNode = mXmlFile->getRoot().firstChildElement("meta");
-        mUuid = tmpNode.firstChildElement("uuid").text();
-        if(mUuid.isNull())
-        {
-            throw RuntimeError(__FILE__, __LINE__, tmpNode.firstChildElement("uuid").text(),
-                QString(tr("Invalid schematic UUID: \"%1\""))
-                .arg(tmpNode.firstChildElement("uuid").text()));
-        }
+            // Load all symbol instances
+            for (XmlDomElement* node = root.getFirstChild("symbols/symbol", true, false);
+                 node; node = node->getNextSibling("symbol"))
+            {
+                SymbolInstance* symbol = new SymbolInstance(*this, *node);
+                addSymbol(*symbol);
+            }
 
-        mName = tmpNode.firstChildElement("name").text();
-        if(mName.isEmpty())
-        {
-            throw RuntimeError(__FILE__, __LINE__, mUuid.toString(),
-                QString(tr("Name of schematic \"%1\" is empty!")).arg(mUuid.toString()));
-        }
+            // Load all netpoints
+            for (XmlDomElement* node = root.getFirstChild("netpoints/netpoint", true, false);
+                 node; node = node->getNextSibling("netpoint"))
+            {
+                SchematicNetPoint* netpoint = new SchematicNetPoint(*this, *node);
+                addNetPoint(*netpoint);
+            }
 
-        // Load all symbol instances
-        tmpNode = mXmlFile->getRoot().firstChildElement("symbols").firstChildElement("symbol");
-        while (!tmpNode.isNull())
-        {
-            SymbolInstance* symbol = new SymbolInstance(*this, tmpNode);
-            addSymbol(symbol, false);
-            tmpNode = tmpNode.nextSiblingElement("symbol");
-        }
-
-        // Load all netpoints
-        tmpNode = mXmlFile->getRoot().firstChildElement("netpoints").firstChildElement("netpoint");
-        while (!tmpNode.isNull())
-        {
-            SchematicNetPoint* netpoint = new SchematicNetPoint(*this, tmpNode);
-            addNetPoint(netpoint, false);
-            tmpNode = tmpNode.nextSiblingElement("netpoint");
-        }
-
-        // Load all netlines
-        tmpNode = mXmlFile->getRoot().firstChildElement("netlines").firstChildElement("netline");
-        while (!tmpNode.isNull())
-        {
-            SchematicNetLine* netline = new SchematicNetLine(*this, tmpNode);
-            addNetLine(netline, false);
-            tmpNode = tmpNode.nextSiblingElement("netline");
+            // Load all netlines
+            for (XmlDomElement* node = root.getFirstChild("netlines/netline", true, false);
+                 node; node = node->getNextSibling("netline"))
+            {
+                SchematicNetLine* netline = new SchematicNetLine(*this, *node);
+                addNetLine(*netline);
+            }
         }
 
         updateIcon();
@@ -124,11 +97,11 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
     {
         // free the allocated memory in the reverse order of their allocation...
         foreach (SchematicNetLine* netline, mNetLines)
-            try { removeNetLine(netline, false, true); } catch (...) {}
+            try { removeNetLine(*netline); delete netline; } catch (...) {}
         foreach (SchematicNetPoint* netpoint, mNetPoints)
-            try { removeNetPoint(netpoint, false, true); } catch (...) {}
+            try { removeNetPoint(*netpoint); delete netpoint; } catch (...) {}
         foreach (SymbolInstance* symbol, mSymbols)
-            try { removeSymbol(symbol, false, true); } catch (...) {}
+            try { removeSymbol(*symbol); delete symbol; } catch (...) {}
         delete mXmlFile;                mXmlFile = 0;
         throw; // ...and rethrow the exception
     }
@@ -138,13 +111,13 @@ Schematic::~Schematic()
 {
     // delete all netlines (and catch all throwed exceptions)
     foreach (SchematicNetLine* netline, mNetLines)
-        try { removeNetLine(netline, false, true); } catch (...) {}
+        try { removeNetLine(*netline); delete netline; } catch (...) {}
     // delete all netpoints (and catch all throwed exceptions)
     foreach (SchematicNetPoint* netpoint, mNetPoints)
-        try { removeNetPoint(netpoint, false, true); } catch (...) {}
+        try { removeNetPoint(*netpoint); delete netpoint; } catch (...) {}
     // delete all symbols (and catch all throwed exceptions)
     foreach (SymbolInstance* symbol, mSymbols)
-        try { removeSymbol(symbol, false, true); } catch (...) {}
+        try { removeSymbol(*symbol); delete symbol; } catch (...) {}
 
     delete mXmlFile;                mXmlFile = 0;
 }
@@ -203,37 +176,30 @@ SymbolInstance* Schematic::getSymbolByUuid(const QUuid& uuid) const noexcept
     return mSymbols.value(uuid, 0);
 }
 
-SymbolInstance* Schematic::createSymbol(const QUuid& genCompInstance, const QUuid& symbolItem,
-                                        const Point& position, const Angle& angle,
-                                        bool mirror) throw (Exception)
+SymbolInstance* Schematic::createSymbol(GenCompInstance& genCompInstance, const QUuid& symbolItem,
+                                        const Point& position, const Angle& angle) throw (Exception)
 {
-    return SymbolInstance::create(*this, mXmlFile->getDocument(), genCompInstance,
-                                  symbolItem, position, angle, mirror);
+    return new SymbolInstance(*this, genCompInstance, symbolItem, position, angle);
 }
 
-void Schematic::addSymbol(SymbolInstance* symbol, bool toDomTree) throw (Exception)
+void Schematic::addSymbol(SymbolInstance& symbol) throw (Exception)
 {
-    Q_CHECK_PTR(symbol);
-
     // check if there is no symbol with the same uuid in the list
-    if (getSymbolByUuid(symbol->getUuid()))
+    if (getSymbolByUuid(symbol.getUuid()))
     {
-        throw RuntimeError(__FILE__, __LINE__, symbol->getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, symbol.getUuid().toString(),
             QString(tr("There is already a symbol with the UUID \"%1\"!"))
-            .arg(symbol->getUuid().toString()));
+            .arg(symbol.getUuid().toString()));
     }
 
-    QDomElement parent = mXmlFile->getRoot().firstChildElement("symbols");
-    symbol->addToSchematic(*this, toDomTree, parent); // can throw an exception
-
-    mSymbols.insert(symbol->getUuid(), symbol);
+    // add to schematic
+    symbol.addToSchematic(); // can throw an exception
+    mSymbols.insert(symbol.getUuid(), &symbol);
 }
 
-void Schematic::removeSymbol(SymbolInstance* symbol, bool fromDomTree,
-                             bool deleteSymbol) throw (Exception)
+void Schematic::removeSymbol(SymbolInstance& symbol) throw (Exception)
 {
-    Q_CHECK_PTR(symbol);
-    Q_ASSERT(mSymbols.contains(symbol->getUuid()));
+    Q_ASSERT(mSymbols.contains(symbol.getUuid()) == true);
 
     // the symbol cannot be removed if there are already netpoints connected to it!
     /*if (symbol->getNetPointCount() > 0)
@@ -244,13 +210,9 @@ void Schematic::removeSymbol(SymbolInstance* symbol, bool fromDomTree,
             .arg(symbol->getUuid().toString()));
     }*/
 
-    QDomElement parent = mXmlFile->getRoot().firstChildElement("symbols");
-    symbol->removeFromSchematic(*this, fromDomTree, parent); // can throw an exception
-
-    mSymbols.remove(symbol->getUuid());
-
-    if (deleteSymbol)
-        delete symbol;
+    // remove from schematic
+    symbol.removeFromSchematic(); // can throw an exception
+    mSymbols.remove(symbol.getUuid());
 }
 
 /*****************************************************************************************
@@ -262,56 +224,47 @@ SchematicNetPoint* Schematic::getNetPointByUuid(const QUuid& uuid) const noexcep
     return mNetPoints.value(uuid, 0);
 }
 
-SchematicNetPoint* Schematic::createNetPoint(const QUuid& netsignal, const Point& position) throw (Exception)
+SchematicNetPoint* Schematic::createNetPoint(NetSignal& netsignal, const Point& position) throw (Exception)
 {
-    return SchematicNetPoint::create(*this, mXmlFile->getDocument(), netsignal, position);
+    return new SchematicNetPoint(*this, netsignal, position);
 }
 
-SchematicNetPoint* Schematic::createNetPoint(const QUuid& symbol, const QUuid& pin) throw (Exception)
+SchematicNetPoint* Schematic::createNetPoint(SymbolInstance& symbol, const QUuid& pin) throw (Exception)
 {
-    return SchematicNetPoint::create(*this, mXmlFile->getDocument(), symbol, pin);
+    return new SchematicNetPoint(*this, symbol, pin);
 }
 
-void Schematic::addNetPoint(SchematicNetPoint* netpoint, bool toDomTree) throw (Exception)
+void Schematic::addNetPoint(SchematicNetPoint& netpoint) throw (Exception)
 {
-    Q_CHECK_PTR(netpoint);
-
     // check if there is no netpoint with the same uuid in the list
-    if (getNetPointByUuid(netpoint->getUuid()))
+    if (getNetPointByUuid(netpoint.getUuid()))
     {
-        throw RuntimeError(__FILE__, __LINE__, netpoint->getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, netpoint.getUuid().toString(),
             QString(tr("There is already a netpoint with the UUID \"%1\"!"))
-            .arg(netpoint->getUuid().toString()));
+            .arg(netpoint.getUuid().toString()));
     }
 
-    QDomElement parent = mXmlFile->getRoot().firstChildElement("netpoints");
-    netpoint->addToSchematic(*this, toDomTree, parent); // can throw an exception
-
-    mNetPoints.insert(netpoint->getUuid(), netpoint);
+    // add to schematic
+    netpoint.addToSchematic(); // can throw an exception
+    mNetPoints.insert(netpoint.getUuid(), &netpoint);
 }
 
-void Schematic::removeNetPoint(SchematicNetPoint* netpoint, bool fromDomTree,
-                               bool deleteNetPoint) throw (Exception)
+void Schematic::removeNetPoint(SchematicNetPoint& netpoint) throw (Exception)
 {
-    Q_CHECK_PTR(netpoint);
-    Q_ASSERT(mNetPoints.contains(netpoint->getUuid()));
+    Q_ASSERT(mNetPoints.contains(netpoint.getUuid()) == true);
 
     // the netpoint cannot be removed if there are already netlines connected to it!
-    if (netpoint->getLines().count() > 0)
+    if (netpoint.getLines().count() > 0)
     {
         throw RuntimeError(__FILE__, __LINE__, QString("%1:%2")
-            .arg(netpoint->getUuid().toString()).arg(netpoint->getLines().count()),
+            .arg(netpoint.getUuid().toString()).arg(netpoint.getLines().count()),
             QString(tr("There are already netlines connected to the netpoint \"%1\"!"))
-            .arg(netpoint->getUuid().toString()));
+            .arg(netpoint.getUuid().toString()));
     }
 
-    QDomElement parent = mXmlFile->getRoot().firstChildElement("netpoints");
-    netpoint->removeFromSchematic(*this, fromDomTree, parent); // can throw an exception
-
-    mNetPoints.remove(netpoint->getUuid());
-
-    if (deleteNetPoint)
-        delete netpoint;
+    // remove from schematic
+    netpoint.removeFromSchematic(); // can throw an exception
+    mNetPoints.remove(netpoint.getUuid());
 }
 
 /*****************************************************************************************
@@ -323,44 +276,35 @@ SchematicNetLine* Schematic::getNetLineByUuid(const QUuid& uuid) const noexcept
     return mNetLines.value(uuid, 0);
 }
 
-SchematicNetLine* Schematic::createNetLine(const QUuid& startPoint, const QUuid& endPoint,
+SchematicNetLine* Schematic::createNetLine(SchematicNetPoint& startPoint,
+                                           SchematicNetPoint& endPoint,
                                            const Length& width) throw (Exception)
 {
-    return SchematicNetLine::create(*this, mXmlFile->getDocument(), startPoint, endPoint,
-                                    width);
+    return new SchematicNetLine(*this, startPoint, endPoint, width);
 }
 
-void Schematic::addNetLine(SchematicNetLine* netline, bool toDomTree) throw (Exception)
+void Schematic::addNetLine(SchematicNetLine& netline) throw (Exception)
 {
-    Q_CHECK_PTR(netline);
-
     // check if there is no netline with the same uuid in the list
-    if (getNetLineByUuid(netline->getUuid()))
+    if (getNetLineByUuid(netline.getUuid()))
     {
-        throw RuntimeError(__FILE__, __LINE__, netline->getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, netline.getUuid().toString(),
             QString(tr("There is already a netline with the UUID \"%1\"!"))
-            .arg(netline->getUuid().toString()));
+            .arg(netline.getUuid().toString()));
     }
 
-    QDomElement parent = mXmlFile->getRoot().firstChildElement("netlines");
-    netline->addToSchematic(*this, toDomTree, parent); // can throw an exception
-
-    mNetLines.insert(netline->getUuid(), netline);
+    // add to schematic
+    netline.addToSchematic(); // can throw an exception
+    mNetLines.insert(netline.getUuid(), &netline);
 }
 
-void Schematic::removeNetLine(SchematicNetLine* netline, bool fromDomTree,
-                              bool deleteNetLine) throw (Exception)
+void Schematic::removeNetLine(SchematicNetLine& netline) throw (Exception)
 {
-    Q_CHECK_PTR(netline);
-    Q_ASSERT(mNetLines.contains(netline->getUuid()));
+    Q_ASSERT(mNetLines.contains(netline.getUuid()) == true);
 
-    QDomElement parent = mXmlFile->getRoot().firstChildElement("netlines");
-    netline->removeFromSchematic(*this, fromDomTree, parent); // can throw an exception
-
-    mNetLines.remove(netline->getUuid());
-
-    if (deleteNetLine)
-        delete netline;
+    // remove from schematic
+    netline.removeFromSchematic(); // can throw an exception
+    mNetLines.remove(netline.getUuid());
 }
 
 /*****************************************************************************************
@@ -383,32 +327,19 @@ bool Schematic::save(bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
 
-    // save symbol instances
-    foreach (SymbolInstance* symbol, mSymbols)
-    {
-        if (!symbol->save(toOriginal, errors))
-            success = false;
-    }
-
-    // save netpoints
-    foreach (SchematicNetPoint* point, mNetPoints)
-    {
-        if (!point->save(toOriginal, errors))
-            success = false;
-    }
-
-    // save netlines
-    foreach (SchematicNetLine* line, mNetLines)
-    {
-        if (!line->save(toOriginal, errors))
-            success = false;
-    }
-
     // save schematic XML file
     try
     {
-        mXmlFile->setRemoveFlag(!mAddedToProject);
-        mXmlFile->save(toOriginal);
+        if (mAddedToProject)
+        {
+            XmlDomElement* root = serializeToXmlDomElement();
+            XmlDomDocument doc(*root);
+            mXmlFile->save(doc, toOriginal);
+        }
+        else
+        {
+            mXmlFile->removeFile(toOriginal);
+        }
     }
     catch (Exception& e)
     {
@@ -462,6 +393,24 @@ void Schematic::updateIcon() noexcept
     QPainter painter(&pixmap);
     render(&painter, target, source);
     mIcon = QIcon(pixmap);
+}
+
+XmlDomElement* Schematic::serializeToXmlDomElement() const throw (Exception)
+{
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("schematic"));
+    XmlDomElement* meta = root->appendChild("meta");
+    meta->appendTextChild("uuid", mUuid);
+    meta->appendTextChild("name", mName);
+    XmlDomElement* symbols = root->appendChild("symbols");
+    foreach (SymbolInstance* symbolInstance, mSymbols)
+        symbols->appendChild(symbolInstance->serializeToXmlDomElement());
+    XmlDomElement* netpoints = root->appendChild("netpoints");
+    foreach (SchematicNetPoint* netpoint, mNetPoints)
+        netpoints->appendChild(netpoint->serializeToXmlDomElement());
+    XmlDomElement* netlines = root->appendChild("netlines");
+    foreach (SchematicNetLine* netline, mNetLines)
+        netlines->appendChild(netline->serializeToXmlDomElement());
+    return root.take();
 }
 
 /*****************************************************************************************

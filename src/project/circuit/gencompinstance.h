@@ -25,14 +25,16 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QDomElement>
 #include "../../common/if_attributeprovider.h"
 #include "../erc/if_ercmsgprovider.h"
+#include "../../common/file_io/if_xmlserializableobject.h"
 #include "../../common/exceptions.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
+
+class XmlDomElement;
 
 namespace project {
 class Circuit;
@@ -56,7 +58,8 @@ namespace project {
 /**
  * @brief The GenCompInstance class
  */
-class GenCompInstance : public QObject, public IF_AttributeProvider, public IF_ErcMsgProvider
+class GenCompInstance : public QObject, public IF_AttributeProvider,
+                        public IF_ErcMsgProvider, public IF_XmlSerializableObject
 {
         Q_OBJECT
         DECLARE_ERC_MSG_CLASS_NAME(GenCompInstance)
@@ -64,7 +67,9 @@ class GenCompInstance : public QObject, public IF_AttributeProvider, public IF_E
     public:
 
         // Constructors / Destructor
-        explicit GenCompInstance(Circuit& circuit, const QDomElement& domElement) throw (Exception);
+        explicit GenCompInstance(Circuit& circuit, const XmlDomElement& domElement) throw (Exception);
+        explicit GenCompInstance(Circuit& circuit, const library::GenericComponent& genComp,
+                                 const library::GenCompSymbVar& symbVar, const QString& name) throw (Exception);
         ~GenCompInstance() noexcept;
 
         // Getters
@@ -109,23 +114,17 @@ class GenCompInstance : public QObject, public IF_AttributeProvider, public IF_E
 
 
         // General Methods
-        void addToCircuit(bool addNode, QDomElement& parent) throw (Exception);
-        void removeFromCircuit(bool removeNode, QDomElement& parent) throw (Exception);
+        void addToCircuit() throw (Exception);
+        void removeFromCircuit() throw (Exception);
         void registerSymbolInstance(const QUuid& itemUuid, const QUuid& symbolUuid,
                                     const SymbolInstance* instance) throw (Exception);
         void unregisterSymbolInstance(const QUuid& itemUuid, const SymbolInstance* symbol)
                                       throw (Exception);
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
 
         // Helper Methods
         bool getAttributeValue(const QString& attrNS, const QString& attrKey,
                                   bool passToParents, QString& value) const noexcept;
-
-
-        // Static Methods
-        static GenCompInstance* create(Circuit& circuit, QDomDocument& doc,
-                                       const library::GenericComponent& genComp,
-                                       const library::GenCompSymbVar& symbVar,
-                                       const QString& name) throw (Exception);
 
 
     signals:
@@ -141,12 +140,12 @@ class GenCompInstance : public QObject, public IF_AttributeProvider, public IF_E
         GenCompInstance& operator=(const GenCompInstance& rhs);
 
         // Private Methods
+        void init() throw (Exception);
         void updateErcMessages() noexcept;
 
 
         // General
         Circuit& mCircuit;
-        QDomElement mDomElement;
         bool mAddedToCircuit;
 
 

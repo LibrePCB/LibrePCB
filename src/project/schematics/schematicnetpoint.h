@@ -26,8 +26,8 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include <QDomElement>
 #include "../erc/if_ercmsgprovider.h"
+#include "../../common/file_io/if_xmlserializableobject.h"
 #include "../../common/cadscene.h"
 #include "../../common/units/all_length_units.h"
 #include "../../common/exceptions.h"
@@ -36,6 +36,7 @@
  *  Forward Declarations
  ****************************************************************************************/
 
+class XmlDomElement;
 class SchematicLayer;
 
 namespace project {
@@ -108,7 +109,8 @@ namespace project {
 /**
  * @brief The SchematicNetPoint class
  */
-class SchematicNetPoint final : public QObject, public IF_ErcMsgProvider
+class SchematicNetPoint final : public QObject, public IF_ErcMsgProvider,
+                                public IF_XmlSerializableObject
 {
         Q_OBJECT
         DECLARE_ERC_MSG_CLASS_NAME(SchematicNetPoint)
@@ -116,8 +118,9 @@ class SchematicNetPoint final : public QObject, public IF_ErcMsgProvider
     public:
 
         // Constructors / Destructor
-        explicit SchematicNetPoint(Schematic& schematic, const QDomElement& domElement)
-                                   throw (Exception);
+        explicit SchematicNetPoint(Schematic& schematic, const XmlDomElement& domElement) throw (Exception);
+        explicit SchematicNetPoint(Schematic& schematic, NetSignal& netsignal, const Point& position) throw (Exception);
+        explicit SchematicNetPoint(Schematic& schematic, SymbolInstance& symbol, const QUuid& pin) throw (Exception);
         ~SchematicNetPoint() noexcept;
 
         // Getters
@@ -150,11 +153,9 @@ class SchematicNetPoint final : public QObject, public IF_ErcMsgProvider
         void updateLines() const noexcept;
         void registerNetLine(SchematicNetLine* netline) noexcept;
         void unregisterNetLine(SchematicNetLine* netline) noexcept;
-        void addToSchematic(Schematic& schematic, bool addNode,
-                            QDomElement& parent) throw (Exception);
-        void removeFromSchematic(Schematic& schematic, bool removeNode,
-                                 QDomElement& parent) throw (Exception);
-        bool save(bool toOriginal, QStringList& errors) noexcept;
+        void addToSchematic() throw (Exception);
+        void removeFromSchematic() throw (Exception);
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
 
         // Static Methods
         static const Length& getCircleRadius() noexcept {return sCircleRadius;}
@@ -167,12 +168,6 @@ class SchematicNetPoint final : public QObject, public IF_ErcMsgProvider
                                              bool floatingPointsFromAttachedLines = false,
                                              bool attachedPointsFromAttachedLines = false,
                                              bool attachedPointsFromSymbols = false) noexcept;
-        static SchematicNetPoint* create(Schematic& schematic, QDomDocument& doc,
-                                         const QUuid& netsignal, const Point& position)
-                                         throw (Exception);
-        static SchematicNetPoint* create(Schematic& schematic, QDomDocument& doc,
-                                         const QUuid& symbol, const QUuid& pin)
-                                         throw (Exception);
 
 
     private:
@@ -182,10 +177,13 @@ class SchematicNetPoint final : public QObject, public IF_ErcMsgProvider
         SchematicNetPoint(const SchematicNetPoint& other);
         SchematicNetPoint& operator=(const SchematicNetPoint& rhs);
 
+        // Private Methods
+        void init() throw (Exception);
+
+
         // General
         Circuit& mCircuit;
         Schematic& mSchematic;
-        QDomElement mDomElement;
         SchematicNetPointGraphicsItem* mGraphicsItem;
 
         // Attributes

@@ -55,8 +55,8 @@ EditNetClassesDialog::EditNetClassesDialog(Circuit& circuit, QWidget* parent) th
     {
         QTableWidgetItem* uuid = new QTableWidgetItem(netclass->getUuid().toString());
         QTableWidgetItem* name = new QTableWidgetItem(netclass->getName());
-        uuid->setData(Qt::UserRole, qVariantFromValue(netclass));
-        name->setData(Qt::UserRole, qVariantFromValue(netclass));
+        uuid->setData(Qt::UserRole, qVariantFromValue(static_cast<void*>(netclass)));
+        name->setData(Qt::UserRole, qVariantFromValue(static_cast<void*>(netclass)));
         mUi->tableWidget->setVerticalHeaderItem(row, uuid);
         mUi->tableWidget->setItem(row, 0, name);
         row++;
@@ -92,12 +92,12 @@ void EditNetClassesDialog::on_tableWidget_itemChanged(QTableWidgetItem *item)
     {
         case 0: // name changed
         {
-            NetClass* netclass = (item->data(Qt::UserRole).value<NetClass*>());
+            NetClass* netclass = static_cast<NetClass*>(item->data(Qt::UserRole).value<void*>());
             if (!netclass) break;
             if (item->text() == netclass->getName()) break;
             try
             {
-                CmdNetClassSetName* cmd = new CmdNetClassSetName(*netclass, item->text());
+                CmdNetClassSetName* cmd = new CmdNetClassSetName(mCircuit, *netclass, item->text());
                 mCircuit.getProject().getUndoStack().appendToCommand(cmd);
             }
             catch (Exception& e)
@@ -125,7 +125,7 @@ void EditNetClassesDialog::on_btnAdd_clicked()
         mUi->tableWidget->insertRow(row);
         QTableWidgetItem* uuid = new QTableWidgetItem(cmd->getNetClass()->getUuid().toString());
         QTableWidgetItem* name = new QTableWidgetItem(cmd->getNetClass()->getName());
-        name->setData(Qt::UserRole, qVariantFromValue(cmd->getNetClass()));
+        name->setData(Qt::UserRole, qVariantFromValue(static_cast<void*>(cmd->getNetClass())));
         mUi->tableWidget->setVerticalHeaderItem(row, uuid);
         mUi->tableWidget->setItem(row, 0, name);
     }
@@ -139,12 +139,12 @@ void EditNetClassesDialog::on_btnRemove_clicked()
 {
     int row = mUi->tableWidget->currentRow();
     if (row < 0) return;
-    NetClass* netclass = mUi->tableWidget->verticalHeaderItem(row)->data(Qt::UserRole).value<NetClass*>();
+    NetClass* netclass = static_cast<NetClass*>(mUi->tableWidget->verticalHeaderItem(row)->data(Qt::UserRole).value<void*>());
     if (!netclass) return;
 
     try
     {
-        CmdNetClassRemove* cmd = new CmdNetClassRemove(mCircuit, netclass);
+        CmdNetClassRemove* cmd = new CmdNetClassRemove(mCircuit, *netclass);
         mCircuit.getProject().getUndoStack().appendToCommand(cmd);
 
         mUi->tableWidget->removeRow(row);

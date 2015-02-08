@@ -40,6 +40,8 @@
 #include "schematics/schematic.h"
 #include "../common/schematiclayer.h"
 #include "erc/ercmsglist.h"
+#include "../common/file_io/xmldomdocument.h"
+#include "../common/file_io/xmldomelement.h"
 
 namespace project {
 
@@ -156,22 +158,25 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
         // try to create/open the XML project file
         if (create)
         {
-            mXmlFile = SmartXmlFile::create(mFilepath, "project", 0);
-            // Create attributes
-            setName(mFilepath.getCompleteBasename());
-            setAuthor(SystemInfo::getFullUsername());
-            setCreated(QDateTime::currentDateTime());
-            setLastModified(QDateTime::currentDateTime());
+            mXmlFile = SmartXmlFile::create(mFilepath);
+
+            // Load default attribute values
+            mName = mFilepath.getCompleteBasename();
+            mAuthor = SystemInfo::getFullUsername();
+            mCreated = QDateTime::currentDateTime();
+            mLastModified = QDateTime::currentDateTime();
         }
         else
         {
-            mXmlFile = new SmartXmlFile(mFilepath, mIsRestored, mIsReadOnly, "project", 0);
+            mXmlFile = new SmartXmlFile(mFilepath, mIsRestored, mIsReadOnly);
+            QSharedPointer<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
+            XmlDomElement& root = doc->getRoot();
+
             // Load all attributes
-            QDomElement metaElement = mXmlFile->getRoot().firstChildElement("meta");
-            mName = metaElement.firstChildElement("name").text();
-            mAuthor = metaElement.firstChildElement("author").text();
-            mCreated = QDateTime::fromString(metaElement.firstChildElement("created").text(), Qt::ISODate).toLocalTime();
-            mLastModified = QDateTime::fromString(metaElement.firstChildElement("last_modified").text(), Qt::ISODate).toLocalTime();
+            mName = root.getFirstChild("meta/name", true, true)->getText();
+            mAuthor = root.getFirstChild("meta/author", true, true)->getText();
+            mCreated = root.getFirstChild("meta/created", true, true)->getText<QDateTime>();
+            mLastModified = root.getFirstChild("meta/last_modified", true, true)->getText<QDateTime>();
         }
 
         // Load description HTML file
@@ -325,57 +330,9 @@ QString Project::getDescription() const noexcept
  *  Setters: Attributes
  ****************************************************************************************/
 
-void Project::setName(const QString& newName) noexcept
-{
-    // update DOM element
-    QDomElement node = mXmlFile->getDocument().createElement("name");
-    QDomText text = mXmlFile->getDocument().createTextNode(newName);
-    node.appendChild(text);
-    mXmlFile->getRoot().firstChildElement("meta").replaceChild(node,
-        mXmlFile->getRoot().firstChildElement("meta").firstChildElement("name"));
-
-    mName = newName;
-}
-
 void Project::setDescription(const QString& newDescription) noexcept
 {
     mDescriptionHtmlFile->setContent(newDescription.toUtf8());
-}
-
-void Project::setAuthor(const QString& newAuthor) noexcept
-{
-    // update DOM element
-    QDomElement node = mXmlFile->getDocument().createElement("author");
-    QDomText text = mXmlFile->getDocument().createTextNode(newAuthor);
-    node.appendChild(text);
-    mXmlFile->getRoot().firstChildElement("meta").replaceChild(node,
-        mXmlFile->getRoot().firstChildElement("meta").firstChildElement("author"));
-
-    mAuthor = newAuthor;
-}
-
-void Project::setCreated(const QDateTime& newCreated) noexcept
-{
-    // update DOM element
-    QDomElement node = mXmlFile->getDocument().createElement("created");
-    QDomText text = mXmlFile->getDocument().createTextNode(newCreated.toUTC().toString(Qt::ISODate));
-    node.appendChild(text);
-    mXmlFile->getRoot().firstChildElement("meta").replaceChild(node,
-        mXmlFile->getRoot().firstChildElement("meta").firstChildElement("created"));
-
-    mCreated = newCreated;
-}
-
-void Project::setLastModified(const QDateTime& newLastModified) noexcept
-{
-    // update DOM element
-    QDomElement node = mXmlFile->getDocument().createElement("last_modified");
-    QDomText text = mXmlFile->getDocument().createTextNode(newLastModified.toUTC().toString(Qt::ISODate));
-    node.appendChild(text);
-    mXmlFile->getRoot().firstChildElement("meta").replaceChild(node,
-        mXmlFile->getRoot().firstChildElement("meta").firstChildElement("last_modified"));
-
-    mLastModified = newLastModified;
 }
 
 /*****************************************************************************************
@@ -639,6 +596,18 @@ void Project::updateSchematicsList() throw (Exception)
     mSchematicsIniFile->releaseQSettings(s);
 }
 
+XmlDomElement* Project::serializeToXmlDomElement() const throw (Exception)
+{
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("project"));
+    XmlDomElement* meta = root->appendChild("meta");
+    meta->appendTextChild("name", mName);
+    meta->appendTextChild("author", mAuthor);
+    meta->appendTextChild("created", mCreated);
+    meta->appendTextChild("last_modified", mLastModified);
+    //XmlDomElement* attributes = root->appendChild("attributes");
+    return root.take();
+}
+
 bool Project::save(bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
@@ -659,7 +628,9 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     try
     {
         setLastModified(QDateTime::currentDateTime());
-        mXmlFile->save(toOriginal);
+        XmlDomElement* root = serializeToXmlDomElement();
+        XmlDomDocument doc(*root);
+        mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)
     {

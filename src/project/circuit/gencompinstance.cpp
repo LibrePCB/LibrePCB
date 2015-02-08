@@ -22,7 +22,6 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QtWidgets>
 #include "gencompinstance.h"
 #include "../../common/exceptions.h"
 #include "circuit.h"
@@ -32,6 +31,7 @@
 #include "../../library/genericcomponent.h"
 #include "../erc/ercmsg.h"
 #include "gencompattributeinstance.h"
+#include "../../common/file_io/xmldomelement.h"
 
 namespace project {
 
@@ -39,52 +39,36 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-GenCompInstance::GenCompInstance(Circuit& circuit, const QDomElement& domElement) throw (Exception) :
-    QObject(0), IF_AttributeProvider(), mCircuit(circuit), mDomElement(domElement),
-    mAddedToCircuit(false), mGenComp(nullptr), mGenCompSymbVar(nullptr)
+GenCompInstance::GenCompInstance(Circuit& circuit, const XmlDomElement& domElement) throw (Exception) :
+    QObject(nullptr), mCircuit(circuit), mAddedToCircuit(false),
+    mGenComp(nullptr), mGenCompSymbVar(nullptr)
 {
     // read general attributes
-    mUuid = mDomElement.attribute("uuid");
-    if(mUuid.isNull())
-    {
-        throw RuntimeError(__FILE__, __LINE__, mDomElement.attribute("uuid"),
-            QString(tr("Invalid generic component instance UUID: \"%1\""))
-            .arg(mDomElement.attribute("uuid")));
-    }
-    mName = mDomElement.firstChildElement("name").text();
-    if(mName.isEmpty())
-    {
-        throw RuntimeError(__FILE__, __LINE__, mUuid.toString(),
-            QString(tr("Name of generic component instance \"%1\" is empty!"))
-            .arg(mUuid.toString()));
-    }
-    mValue = mDomElement.firstChildElement("value").text();
-    if (mDomElement.firstChildElement("value").isNull())
-    {
-        throw RuntimeError(__FILE__, __LINE__, mUuid.toString(),
-            QString(tr("Generic component instance \"%1\" has no value!"))
-            .arg(mUuid.toString()));
-    }
-    mGenComp = mCircuit.getProject().getLibrary().getGenComp(mDomElement.attribute("generic_component"));
+    mUuid = domElement.getAttribute<QUuid>("uuid");
+    mName = domElement.getFirstChild("name", true)->getText(true);
+    mValue = domElement.getFirstChild("value", true)->getText();
+    QUuid gcUuid = domElement.getAttribute<QUuid>("generic_component");
+    mGenComp = mCircuit.getProject().getLibrary().getGenComp(gcUuid);
     if (!mGenComp)
     {
-        throw RuntimeError(__FILE__, __LINE__, mDomElement.attribute("generic_component"),
+        throw RuntimeError(__FILE__, __LINE__, gcUuid.toString(),
             QString(tr("The generic component with the UUID \"%1\" does not exist in the "
-            "project's library!")).arg(mDomElement.attribute("generic_component")));
+            "project's library!")).arg(gcUuid.toString()));
     }
-    mGenCompSymbVar = mGenComp->getSymbolVariantByUuid(mDomElement.attribute("symbol_variant"));
+    QUuid symbVarUuid = domElement.getAttribute<QUuid>("symbol_variant");
+    mGenCompSymbVar = mGenComp->getSymbolVariantByUuid(symbVarUuid);
     if (!mGenCompSymbVar)
     {
-        throw RuntimeError(__FILE__, __LINE__, mDomElement.attribute("symbol_variant"),
+        throw RuntimeError(__FILE__, __LINE__, symbVarUuid.toString(),
             QString(tr("No symbol variant with the UUID \"%1\" found."))
-            .arg(mDomElement.attribute("symbol_variant")));
+            .arg(symbVarUuid.toString()));
     }
 
     // load all generic component attributes
-    QDomElement tmpNode = mDomElement.firstChildElement("attributes").firstChildElement("attribute");
-    while (!tmpNode.isNull())
+    for (XmlDomElement* node = domElement.getFirstChild("attributes/attribute", true, false);
+         node; node = node->getNextSibling("attribute"))
     {
-        GenCompAttributeInstance* attribute = new GenCompAttributeInstance(mCircuit, *this, tmpNode);
+        GenCompAttributeInstance* attribute = new GenCompAttributeInstance(mCircuit, *this, *node);
         if (mAttributes.contains(attribute->getKey()))
         {
             throw RuntimeError(__FILE__, __LINE__, attribute->getKey(),
@@ -92,14 +76,13 @@ GenCompInstance::GenCompInstance(Circuit& circuit, const QDomElement& domElement
                 .arg(attribute->getKey()));
         }
         mAttributes.insert(attribute->getKey(), attribute);
-        tmpNode = tmpNode.nextSiblingElement("attribute");
     }
 
     // load all signal instances
-    tmpNode = mDomElement.firstChildElement("signal_mapping").firstChildElement("map");
-    while (!tmpNode.isNull())
+    for (XmlDomElement* node = domElement.getFirstChild("signal_mapping/map", true, false);
+         node; node = node->getNextSibling("map"))
     {
-        GenCompSignalInstance* signal = new GenCompSignalInstance(mCircuit, *this, tmpNode);
+        GenCompSignalInstance* signal = new GenCompSignalInstance(mCircuit, *this, *node);
         if (mSignals.contains(signal->getCompSignal().getUuid()))
         {
             throw RuntimeError(__FILE__, __LINE__, signal->getCompSignal().getUuid().toString(),
@@ -107,7 +90,6 @@ GenCompInstance::GenCompInstance(Circuit& circuit, const QDomElement& domElement
                 .arg(signal->getCompSignal().getUuid().toString()));
         }
         mSignals.insert(signal->getCompSignal().getUuid(), signal);
-        tmpNode = tmpNode.nextSiblingElement("map");
     }
     if (mSignals.count() != mGenComp->getSignals().count())
     {
@@ -118,6 +100,44 @@ GenCompInstance::GenCompInstance(Circuit& circuit, const QDomElement& domElement
             .arg(mUuid.toString()).arg(mGenComp->getUuid().toString()));
     }
 
+    init();
+}
+
+GenCompInstance::GenCompInstance(Circuit& circuit, const library::GenericComponent& genComp,
+                                 const library::GenCompSymbVar& symbVar, const QString& name) throw (Exception) :
+    QObject(nullptr), mCircuit(circuit), mAddedToCircuit(false),
+    mGenComp(&genComp), mGenCompSymbVar(&symbVar)
+{
+    mUuid = QUuid::createUuid().toString(); // generate random UUID
+    mName = name;
+    if (mName.isEmpty())
+    {
+        throw RuntimeError(__FILE__, __LINE__, QString(),
+            tr("The name of the generic component must not be empty."));
+    }
+    mValue = genComp.getDefaultValue();
+
+    // add attributes
+    foreach (const library::Attribute* attribute, genComp.getAttributes())
+    {
+        GenCompAttributeInstance* attributeInstance = new GenCompAttributeInstance(mCircuit,
+            *this, attribute->getKey(), attribute->getType(), attribute->getDefaultValue());
+        mAttributes.insert(attributeInstance->getKey(), attributeInstance);
+    }
+
+    // add signal map
+    foreach (const library::GenCompSignal* signal, genComp.getSignals())
+    {
+        GenCompSignalInstance* signalInstance = new GenCompSignalInstance(
+            mCircuit, *this, *signal, nullptr);
+        mSignals.insert(signalInstance->getCompSignal().getUuid(), signalInstance);
+    }
+
+    init();
+}
+
+void GenCompInstance::init() throw (Exception)
+{
     // create ERC messages
     mErcMsgUnplacedRequiredSymbols.reset(new ErcMsg(mCircuit.getProject(), *this, mUuid.toString(),
         "UnplacedRequiredSymbols", ErcMsg::ErcMsgType_t::SchematicError));
@@ -178,12 +198,6 @@ void GenCompInstance::setName(const QString& name) throw (Exception)
             tr("The new component name must not be empty!"));
     }
 
-    // update DOM element
-    QDomElement nameNode = mDomElement.ownerDocument().createElement("name");
-    QDomText nameText = mDomElement.ownerDocument().createTextNode(name);
-    nameNode.appendChild(nameText);
-    mDomElement.replaceChild(nameNode, mDomElement.firstChildElement("name"));
-
     mName = name;
     updateErcMessages();
     emit attributesChanged();
@@ -191,12 +205,6 @@ void GenCompInstance::setName(const QString& name) throw (Exception)
 
 void GenCompInstance::setValue(const QString& value) noexcept
 {
-    // update DOM element
-    QDomElement valueNode = mDomElement.ownerDocument().createElement("value");
-    QDomText valueText = mDomElement.ownerDocument().createTextNode(value);
-    valueNode.appendChild(valueText);
-    mDomElement.replaceChild(valueNode, mDomElement.firstChildElement("value"));
-
     mValue = value;
     emit attributesChanged();
 }
@@ -205,31 +213,20 @@ void GenCompInstance::setValue(const QString& value) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void GenCompInstance::addToCircuit(bool addNode, QDomElement& parent) throw (Exception)
+void GenCompInstance::addToCircuit() throw (Exception)
 {
     if (mAddedToCircuit) throw LogicError(__FILE__, __LINE__);
-
-    if (addNode)
-    {
-        if (parent.nodeName() != "generic_component_instances")
-            throw LogicError(__FILE__, __LINE__, parent.nodeName(), tr("Invalid node name!"));
-
-        if (parent.appendChild(mDomElement).isNull())
-            throw LogicError(__FILE__, __LINE__, QString(), tr("Could not append DOM node!"));
-    }
-
     foreach (GenCompSignalInstance* signal, mSignals)
         signal->addToCircuit();
-
     mAddedToCircuit = true;
     updateErcMessages();
 }
 
-void GenCompInstance::removeFromCircuit(bool removeNode, QDomElement& parent) throw (Exception)
+void GenCompInstance::removeFromCircuit() throw (Exception)
 {
     if (!mAddedToCircuit) throw LogicError(__FILE__, __LINE__);
 
-    if (removeNode)
+    /*if (removeNode)
     {
         // check if all generic component signals are disconnected from circuit net signals
         foreach (GenCompSignalInstance* signal, mSignals)
@@ -243,7 +240,7 @@ void GenCompInstance::removeFromCircuit(bool removeNode, QDomElement& parent) th
 
         if (parent.removeChild(mDomElement).isNull())
             throw LogicError(__FILE__, __LINE__, QString(), tr("Could not remove node from DOM tree!"));
-    }
+    }*/
 
     foreach (GenCompSignalInstance* signal, mSignals)
         signal->removeFromCircuit();
@@ -302,6 +299,23 @@ void GenCompInstance::unregisterSymbolInstance(const QUuid& itemUuid,
     updateErcMessages();
 }
 
+XmlDomElement* GenCompInstance::serializeToXmlDomElement() const throw (Exception)
+{
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("instance"));
+    root->setAttribute("uuid", mUuid);
+    root->setAttribute("generic_component", mGenComp->getUuid());
+    root->setAttribute("symbol_variant", mGenCompSymbVar->getUuid());
+    root->appendTextChild("name", mName);
+    root->appendTextChild("value", mValue);
+    XmlDomElement* attributes = root->appendChild("attributes");
+    foreach (GenCompAttributeInstance* attributeInstance, mAttributes)
+        attributes->appendChild(attributeInstance->serializeToXmlDomElement());
+    XmlDomElement* signalMapping = root->appendChild("signal_mapping");
+    foreach (GenCompSignalInstance* signalInstance, mSignals)
+        signalMapping->appendChild(signalInstance->serializeToXmlDomElement());
+    return root.take();
+}
+
 /*****************************************************************************************
  *  Helper Methods
  ****************************************************************************************/
@@ -341,72 +355,6 @@ void GenCompInstance::updateErcMessages() noexcept
         .arg(mName).arg(optional));
     mErcMsgUnplacedRequiredSymbols->setVisible((mAddedToCircuit) && (required > 0));
     mErcMsgUnplacedOptionalSymbols->setVisible((mAddedToCircuit) && (optional > 0));
-}
-
-/*****************************************************************************************
- *  Static Methods
- ****************************************************************************************/
-
-GenCompInstance* GenCompInstance::create(Circuit& circuit, QDomDocument& doc,
-                                         const library::GenericComponent& genComp,
-                                         const library::GenCompSymbVar& symbVar,
-                                         const QString& name) throw (Exception)
-{
-    QDomElement node = doc.createElement("instance");
-    if (node.isNull())
-        throw LogicError(__FILE__, __LINE__, QString(), tr("Could not create DOM node!"));
-
-    // fill the new QDomElement with all the needed content
-    node.setAttribute("uuid", QUuid::createUuid().toString()); // generate random UUID
-    node.setAttribute("generic_component", genComp.getUuid().toString());
-    node.setAttribute("symbol_variant", symbVar.getUuid().toString());
-
-    // add name
-    QDomElement nameNode = doc.createElement("name");
-    QDomText nameText = doc.createTextNode(name);
-    nameNode.appendChild(nameText);
-    node.appendChild(nameNode);
-
-    // add value
-    QDomElement valueNode = doc.createElement("value");
-    QDomText valueText = doc.createTextNode(genComp.getDefaultValue());
-    valueNode.appendChild(valueText);
-    node.appendChild(valueNode);
-
-    // add attributes
-    QDomElement attributesNode = doc.createElement("attributes");
-    foreach (const library::Attribute* attribute, genComp.getAttributes())
-    {
-        QDomElement subnode = doc.createElement("attribute");
-        subnode.setAttribute("key", attribute->getKey());
-        // type
-        QDomElement typeNode = doc.createElement("type");
-        QDomText typeText = doc.createTextNode(library::Attribute::typeToString(attribute->getType()));
-        typeNode.appendChild(typeText);
-        subnode.appendChild(typeNode);
-        // value
-        QDomElement valueNode = doc.createElement("value");
-        QDomText valueText = doc.createTextNode(attribute->getDefaultValue());
-        valueNode.appendChild(valueText);
-        subnode.appendChild(valueNode);
-        // add to parent
-        attributesNode.appendChild(subnode);
-    }
-    node.appendChild(attributesNode);
-
-    // add signal map
-    QDomElement signalMapNode = doc.createElement("signal_mapping");
-    foreach (const library::GenCompSignal* signal, genComp.getSignals())
-    {
-        QDomElement subnode = doc.createElement("map");
-        subnode.setAttribute("comp_signal", signal->getUuid().toString());
-        subnode.setAttribute("netsignal", ""); // signal is not connected to any netsignal
-        signalMapNode.appendChild(subnode);
-    }
-    node.appendChild(signalMapNode);
-
-    // create and return the new GenCompInstance object
-    return new GenCompInstance(circuit, node);
 }
 
 /*****************************************************************************************

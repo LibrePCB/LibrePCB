@@ -34,6 +34,7 @@
 
 namespace project {
 class Circuit;
+class NetClass;
 class NetSignal;
 }
 
@@ -51,7 +52,7 @@ class CmdNetSignalAdd final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit CmdNetSignalAdd(Circuit& circuit, const QUuid& netclass,
+        explicit CmdNetSignalAdd(Circuit& circuit, NetClass& netclass,
                                  const QString& name = QString(),
                                  UndoCommand* parent = 0) throw (Exception);
         ~CmdNetSignalAdd() noexcept;
@@ -66,7 +67,7 @@ class CmdNetSignalAdd final : public UndoCommand
     private:
 
         Circuit& mCircuit;
-        QUuid mNetClass;
+        NetClass& mNetClass;
         QString mName;
         NetSignal* mNetSignal;
 };
