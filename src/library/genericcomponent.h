@@ -82,6 +82,10 @@ class GenericComponent final : public LibraryElement
         GenericComponent& operator=(const GenericComponent& rhs);
 
 
+        // Private Methods
+        void parseDomTree(const XmlDomElement& root) throw (Exception);
+
+
         // Generic Conponent Attributes
         QHash<QString, Attribute*> mAttributes; ///< key: attribute key, value: pointer to attribute
         QHash<QString, QString> mDefaultValues; ///< key: locale (like "en_US"), value: default value

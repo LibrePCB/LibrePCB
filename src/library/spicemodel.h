@@ -36,7 +36,7 @@ namespace library {
 /**
  * @brief The SpiceModel class
  */
-class SpiceModel : public LibraryElement
+class SpiceModel final : public LibraryElement
 {
         Q_OBJECT
 
@@ -51,6 +51,10 @@ class SpiceModel : public LibraryElement
         SpiceModel();
         SpiceModel(const SpiceModel& other);
         SpiceModel& operator=(const SpiceModel& rhs);
+
+
+        // Private Methods
+        void parseDomTree(const XmlDomElement& root) throw (Exception);
 
 };
 

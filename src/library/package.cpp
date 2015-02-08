@@ -33,10 +33,20 @@ namespace library {
 Package::Package(const FilePath& xmlFilePath) :
     LibraryElement(xmlFilePath, "package")
 {
+    readFromFile();
 }
 
 Package::~Package()
 {
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+void Package::parseDomTree(const XmlDomElement& root) throw (Exception)
+{
+    LibraryElement::parseDomTree(root);
 }
 
 /*****************************************************************************************

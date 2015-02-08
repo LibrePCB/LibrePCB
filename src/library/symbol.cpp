@@ -23,6 +23,7 @@
 
 #include <QtCore>
 #include "symbol.h"
+#include "../common/file_io/xmldomelement.h"
 
 namespace library {
 
@@ -33,49 +34,9 @@ namespace library {
 Symbol::Symbol(const FilePath& xmlFilePath) throw (Exception) :
     LibraryElement(xmlFilePath, "symbol")
 {
-    QDomElement tmpNode;
-
     try
     {
-        // Load all pins
-        if (mDomRoot.firstChildElement("pins").isNull())
-            mDomRoot.appendChild(mXmlFile->getDocument().createElement("pins"));
-        tmpNode = mDomRoot.firstChildElement("pins").firstChildElement("pin");
-        while (!tmpNode.isNull())
-        {
-            SymbolPin* pin = new SymbolPin(*this, tmpNode);
-            if (mPins.contains(pin->getUuid()))
-            {
-                throw RuntimeError(__FILE__, __LINE__, pin->getUuid().toString(),
-                    QString(tr("The pin \"%1\" exists multiple times in \"%2\"."))
-                    .arg(pin->getUuid().toString(), mXmlFilepath.toNative()));
-            }
-            mPins.insert(pin->getUuid(), pin);
-            tmpNode = tmpNode.nextSiblingElement("pin");
-        }
-
-        // Load all geometry elements
-        if (mDomRoot.firstChildElement("geometry").isNull())
-            mDomRoot.appendChild(mXmlFile->getDocument().createElement("geometry"));
-        tmpNode = mDomRoot.firstChildElement("geometry").firstChildElement();
-        while (!tmpNode.isNull())
-        {
-            if (tmpNode.nodeName() == "polygon")
-            {
-                mPolygons.append(new SymbolPolygon(*this, tmpNode));
-            }
-            else if (tmpNode.nodeName() == "text")
-            {
-                mTexts.append(new SymbolText(*this, tmpNode));
-            }
-            else
-            {
-                throw RuntimeError(__FILE__, __LINE__, tmpNode.nodeName(),
-                    QString(tr("Unknown geometry element \"%1\" in \"%2\"."))
-                    .arg(tmpNode.nodeName(), mXmlFilepath.toNative()));
-            }
-            tmpNode = tmpNode.nextSiblingElement();
-        }
+        readFromFile();
     }
     catch (Exception& e)
     {
@@ -91,6 +52,49 @@ Symbol::~Symbol() noexcept
     qDeleteAll(mTexts);         mTexts.clear();
     qDeleteAll(mPolygons);      mPolygons.clear();
     qDeleteAll(mPins);          mPins.clear();
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+void Symbol::parseDomTree(const XmlDomElement& root) throw (Exception)
+{
+    LibraryElement::parseDomTree(root);
+
+    // Load all pins
+    for (XmlDomElement* node = root.getFirstChild("pins/pin", true, false);
+         node; node = node->getNextSibling("pin"))
+    {
+        SymbolPin* pin = new SymbolPin(*this, *node);
+        if (mPins.contains(pin->getUuid()))
+        {
+            throw RuntimeError(__FILE__, __LINE__, pin->getUuid().toString(),
+                QString(tr("The pin \"%1\" exists multiple times in \"%2\"."))
+                .arg(pin->getUuid().toString(), mXmlFilepath.toNative()));
+        }
+        mPins.insert(pin->getUuid(), pin);
+    }
+
+    // Load all geometry elements
+    for (XmlDomElement* node = root.getFirstChild("geometry/*", true, false);
+         node; node = node->getNextSibling())
+    {
+        if (node->getName() == "polygon")
+        {
+            mPolygons.append(new SymbolPolygon(*this, *node));
+        }
+        else if (node->getName() == "text")
+        {
+            mTexts.append(new SymbolText(*this, *node));
+        }
+        else
+        {
+            throw RuntimeError(__FILE__, __LINE__, node->getName(),
+                QString(tr("Unknown geometry element \"%1\" in \"%2\"."))
+                .arg(node->getName(), mXmlFilepath.toNative()));
+        }
+    }
 }
 
 /*****************************************************************************************

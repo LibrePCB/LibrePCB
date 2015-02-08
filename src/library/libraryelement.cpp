@@ -22,9 +22,8 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QDomDocument>
-#include <QDomElement>
 #include "libraryelement.h"
+#include "../common/file_io/xmldomelement.h"
 
 namespace library {
 
@@ -36,27 +35,26 @@ LibraryElement::LibraryElement(const FilePath& xmlFilePath,
                                const QString& xmlRootNodeName) throw (Exception) :
     LibraryBaseElement(xmlFilePath, xmlRootNodeName)
 {
-    QDomElement tmpNode;
-
-    // read category UUIDs
-    if (mDomRoot.firstChildElement("meta").firstChildElement("categories").isNull())
-        mDomRoot.firstChildElement("meta").appendChild(mXmlFile->getDocument().createElement("categories"));
-    tmpNode = mDomRoot.firstChildElement("meta").firstChildElement("categories").firstChildElement("category");
-    while (!tmpNode.isNull())
-    {
-        QUuid uuid(tmpNode.text());
-        if (uuid.isNull())
-        {
-            throw RuntimeError(__FILE__, __LINE__, mXmlFilepath.toStr(), QString(
-                tr("Invalid category UUID in file \"%1\".")).arg(mXmlFilepath.toNative()));
-        }
-        mCategories.append(uuid);
-        tmpNode = tmpNode.nextSiblingElement("category");
-    }
 }
 
 LibraryElement::~LibraryElement() noexcept
 {
+}
+
+/*****************************************************************************************
+ *  Protected Methods
+ ****************************************************************************************/
+
+void LibraryElement::parseDomTree(const XmlDomElement& root) throw (Exception)
+{
+    LibraryBaseElement::parseDomTree(root);
+
+    // read category UUIDs
+    for (XmlDomElement* node = root.getFirstChild("meta/categories/category", true, false);
+         node; node = node->getNextSibling("category"))
+    {
+        mCategories.append(node->getText<QUuid>());
+    }
 }
 
 /*****************************************************************************************

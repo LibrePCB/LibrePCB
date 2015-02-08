@@ -36,7 +36,7 @@ namespace library {
 /**
  * @brief The Model class
  */
-class Model : public LibraryElement
+class Model final : public LibraryElement
 {
         Q_OBJECT
 
@@ -51,6 +51,10 @@ class Model : public LibraryElement
         Model();
         Model(const Model& other);
         Model& operator=(const Model& rhs);
+
+
+        // Private Methods
+        void parseDomTree(const XmlDomElement& root) throw (Exception);
 
 };
 

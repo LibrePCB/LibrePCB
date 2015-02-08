@@ -25,13 +25,14 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QDomElement>
 #include "../common/exceptions.h"
 #include "../common/units/all_length_units.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
+
+class XmlDomElement;
 
 namespace library {
 class Symbol;
@@ -53,7 +54,7 @@ class SymbolPin final : public QObject
     public:
 
         // Constructors / Destructor
-        explicit SymbolPin(Symbol& symbol, const QDomElement& domElement) throw (Exception);
+        explicit SymbolPin(Symbol& symbol, const XmlDomElement& domElement) throw (Exception);
         ~SymbolPin() noexcept;
 
         // Getters
@@ -77,7 +78,6 @@ class SymbolPin final : public QObject
 
         // General Attributes
         Symbol& mSymbol;
-        QDomElement mDomElement;
 
         // Pin Attributes
         QUuid mUuid;

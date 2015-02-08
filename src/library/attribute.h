@@ -25,12 +25,13 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QDomElement>
 #include "../common/exceptions.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
+
+class XmlDomElement;
 
 namespace library {
 class GenericComponent;
@@ -64,7 +65,7 @@ class Attribute final : public QObject
 
         // Constructors / Destructor
         explicit Attribute(GenericComponent& genComp,
-                           const QDomElement& domElement) throw (Exception);
+                           const XmlDomElement& domElement) throw (Exception);
         ~Attribute() noexcept;
 
 
@@ -83,6 +84,7 @@ class Attribute final : public QObject
         static Type_t stringToType(const QString& type) throw (Exception);
         static QString typeToString(Type_t type) noexcept;
 
+
     private:
 
         // make some methods inaccessible...
@@ -93,7 +95,6 @@ class Attribute final : public QObject
 
         // General Attributes
         GenericComponent& mGenericComponent;
-        QDomElement mDomElement;
 
         // Attributes
         QString mKey;

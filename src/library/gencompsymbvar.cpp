@@ -24,6 +24,7 @@
 #include <QtCore>
 #include "gencompsymbvar.h"
 #include "genericcomponent.h"
+#include "../common/file_io/xmldomelement.h"
 
 namespace library {
 
@@ -32,36 +33,26 @@ namespace library {
  ****************************************************************************************/
 
 GenCompSymbVar::GenCompSymbVar(GenericComponent& genComp,
-                               const QDomElement& domElement) throw (Exception) :
-    QObject(0), mGenericComponent(genComp), mDomElement(domElement)
+                               const XmlDomElement& domElement) throw (Exception) :
+    QObject(0), mGenericComponent(genComp)
 {
-    QDomElement tmpNode;
-
     try
     {
-        // read UUID
-        mUuid = mDomElement.attribute("uuid");
-        if (mUuid.isNull())
-        {
-            throw RuntimeError(__FILE__, __LINE__, mGenericComponent.getXmlFilepath().toStr(),
-                QString(tr("Invalid symbol variant UUID in file \"%1\"."))
-                .arg(mGenericComponent.getXmlFilepath().toNative()));
-        }
-
-        // read symbol variant attributes
-        mNorm = mDomElement.attribute("norm");
-        mIsDefault = (mDomElement.attribute("default") == "true");
+        // read attributes
+        mUuid = domElement.getAttribute<QUuid>("uuid");
+        mNorm = domElement.getAttribute("norm");
+        mIsDefault = domElement.getAttribute<bool>("default");
 
         // read names and descriptions in all available languages
-        LibraryBaseElement::readLocaleDomNodes(mGenericComponent.getXmlFilepath(), mDomElement, "name", mNames);
-        LibraryBaseElement::readLocaleDomNodes(mGenericComponent.getXmlFilepath(), mDomElement, "description", mDescriptions);
+        LibraryBaseElement::readLocaleDomNodes(mGenericComponent.getXmlFilepath(), domElement, "name", mNames);
+        LibraryBaseElement::readLocaleDomNodes(mGenericComponent.getXmlFilepath(), domElement, "description", mDescriptions);
 
         // Load all symbol variant items
         QList<int> addOrderIndexes; // contains all add order indexes except -1
-        tmpNode = mDomElement.firstChildElement("symbol_items").firstChildElement("item");
-        while (!tmpNode.isNull())
+        for (XmlDomElement* node = domElement.getFirstChild("symbol_items/item", true, false);
+             node; node = node->getNextSibling("item"))
         {
-            GenCompSymbVarItem* item = new GenCompSymbVarItem(mGenericComponent, *this, tmpNode);
+            GenCompSymbVarItem* item = new GenCompSymbVarItem(mGenericComponent, *this, *node);
             if (mSymbolItems.contains(item->getUuid()))
             {
                 throw RuntimeError(__FILE__, __LINE__, item->getUuid().toString(),
@@ -81,7 +72,6 @@ GenCompSymbVar::GenCompSymbVar(GenericComponent& genComp,
                     addOrderIndexes.append(item->getAddOrderIndex());
             }
             mSymbolItems.insert(item->getUuid(), item);
-            tmpNode = tmpNode.nextSiblingElement("item");
         }
         // check if there are symbol items with an add order index >= 0
         if (addOrderIndexes.isEmpty())

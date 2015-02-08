@@ -64,6 +64,10 @@ class Symbol final : public LibraryElement
         Symbol& operator=(const Symbol& rhs);
 
 
+        // Private Methods
+        void parseDomTree(const XmlDomElement& root) throw (Exception);
+
+
         // Symbol Attributes
         QHash<QUuid, const SymbolPin*> mPins;
         QList<const SymbolPolygon*> mPolygons;

@@ -36,7 +36,7 @@ namespace library {
 /**
  * @brief The Footprint class
  */
-class Footprint : public LibraryElement
+class Footprint final : public LibraryElement
 {
         Q_OBJECT
 
@@ -51,6 +51,10 @@ class Footprint : public LibraryElement
         Footprint();
         Footprint(const Footprint& other);
         Footprint& operator=(const Footprint& rhs);
+
+
+        // Private Methods
+        void parseDomTree(const XmlDomElement& root) throw (Exception);
 
 };
 

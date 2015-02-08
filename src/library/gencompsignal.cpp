@@ -24,6 +24,7 @@
 #include <QtCore>
 #include "gencompsignal.h"
 #include "genericcomponent.h"
+#include "../common/file_io/xmldomelement.h"
 
 namespace library {
 
@@ -32,28 +33,20 @@ namespace library {
  ****************************************************************************************/
 
 GenCompSignal::GenCompSignal(GenericComponent& genComp,
-                             const QDomElement& domElement) throw (Exception) :
-    QObject(0), mGenericComponent(genComp), mDomElement(domElement)
+                             const XmlDomElement& domElement) throw (Exception) :
+    QObject(0), mGenericComponent(genComp)
 {
-    // read UUID
-    mUuid = mDomElement.attribute("uuid");
-    if (mUuid.isNull())
-    {
-        throw RuntimeError(__FILE__, __LINE__, mGenericComponent.getXmlFilepath().toStr(),
-            QString(tr("Invalid signal UUID in file \"%1\"."))
-            .arg(mGenericComponent.getXmlFilepath().toNative()));
-    }
-
-    // read signal attributes
-    mRole = stringToSignalRole(mDomElement.attribute("role"));
-    mForcedNetName = mDomElement.attribute("forced_net_name");
-    mIsRequired = (mDomElement.attribute("required") == "true");
-    mIsNegated = (mDomElement.attribute("negated") == "true");
-    mIsClock = (mDomElement.attribute("clock") == "true");
+    // read attributes
+    mUuid = domElement.getAttribute<QUuid>("uuid");
+    mRole = stringToSignalRole(domElement.getAttribute("role"));
+    mForcedNetName = domElement.getAttribute("forced_net_name");
+    mIsRequired = domElement.getAttribute<bool>("required");
+    mIsNegated = domElement.getAttribute<bool>("negated");
+    mIsClock = domElement.getAttribute<bool>("clock");
 
     // read names and descriptions in all available languages
-    LibraryBaseElement::readLocaleDomNodes(mGenericComponent.getXmlFilepath(), mDomElement, "name", mNames);
-    LibraryBaseElement::readLocaleDomNodes(mGenericComponent.getXmlFilepath(), mDomElement, "description", mDescriptions);
+    LibraryBaseElement::readLocaleDomNodes(mGenericComponent.getXmlFilepath(), domElement, "name", mNames);
+    LibraryBaseElement::readLocaleDomNodes(mGenericComponent.getXmlFilepath(), domElement, "description", mDescriptions);
 }
 
 GenCompSignal::~GenCompSignal() noexcept

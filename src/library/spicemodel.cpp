@@ -33,10 +33,20 @@ namespace library {
 SpiceModel::SpiceModel(const FilePath& xmlFilePath) :
     LibraryElement(xmlFilePath, "spice_model")
 {
+    readFromFile();
 }
 
 SpiceModel::~SpiceModel()
 {
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+void SpiceModel::parseDomTree(const XmlDomElement& root) throw (Exception)
+{
+    LibraryElement::parseDomTree(root);
 }
 
 /*****************************************************************************************

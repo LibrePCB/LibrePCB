@@ -36,7 +36,7 @@ namespace library {
 /**
  * @brief The ComponentCategory class
  */
-class ComponentCategory : public LibraryElement
+class ComponentCategory final : public LibraryElement
 {
         Q_OBJECT
 
@@ -51,6 +51,10 @@ class ComponentCategory : public LibraryElement
         ComponentCategory();
         ComponentCategory(const ComponentCategory& other);
         ComponentCategory& operator=(const ComponentCategory& rhs);
+
+
+        // Private Methods
+        void parseDomTree(const XmlDomElement& root) throw (Exception);
 
 };
 

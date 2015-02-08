@@ -25,13 +25,14 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QDomElement>
 #include "../common/exceptions.h"
 #include "../common/units/all_length_units.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
+
+class XmlDomElement;
 
 namespace library {
 class Symbol;
@@ -53,7 +54,7 @@ class SymbolText final : public QObject
     public:
 
         // Constructors / Destructor
-        explicit SymbolText(Symbol& symbol, const QDomElement& domElement) throw (Exception);
+        explicit SymbolText(Symbol& symbol, const XmlDomElement& domElement) throw (Exception);
         ~SymbolText() noexcept;
 
         // Getters
@@ -75,7 +76,6 @@ class SymbolText final : public QObject
 
         // General Attributes
         Symbol& mSymbol;
-        QDomElement mDomElement;
 
         // Text Attributes
         unsigned int mLayerId;

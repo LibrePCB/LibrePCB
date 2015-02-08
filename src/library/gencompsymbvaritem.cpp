@@ -25,6 +25,7 @@
 #include "gencompsymbvaritem.h"
 #include "genericcomponent.h"
 #include "gencompsymbvar.h"
+#include "../common/file_io/xmldomelement.h"
 
 namespace library {
 
@@ -33,86 +34,45 @@ namespace library {
  ****************************************************************************************/
 
 GenCompSymbVarItem::GenCompSymbVarItem(GenericComponent& genComp, GenCompSymbVar& symbVar,
-                                       const QDomElement& domElement) throw (Exception) :
-    QObject(0), mGenericComponent(genComp), mSymbolVariant(symbVar), mDomElement(domElement)
+                                       const XmlDomElement& domElement) throw (Exception) :
+    QObject(0), mGenericComponent(genComp), mSymbolVariant(symbVar)
 {
-    QDomElement tmpNode;
-
-    // read UUID
-    mUuid = mDomElement.attribute("uuid");
-    if (mUuid.isNull())
-    {
-        throw RuntimeError(__FILE__, __LINE__, mGenericComponent.getXmlFilepath().toStr(),
-            QString(tr("Invalid symbol variant item UUID in file \"%1\"."))
-            .arg(mGenericComponent.getXmlFilepath().toNative()));
-    }
-
-    // read symbol UUID
-    mSymbolUuid = mDomElement.attribute("symbol");
-    if (mSymbolUuid.isNull())
-    {
-        throw RuntimeError(__FILE__, __LINE__, mGenericComponent.getXmlFilepath().toStr(),
-            QString(tr("Invalid symbol UUID in file \"%1\"."))
-            .arg(mGenericComponent.getXmlFilepath().toNative()));
-    }
-
-    // read add order index
-    bool ok = false;
-    mAddOrderIndex = mDomElement.attribute("add_order_index").toInt(&ok);
-    if ((!ok) || (mAddOrderIndex < -1))
-    {
-        throw RuntimeError(__FILE__, __LINE__, mDomElement.attribute("add_order_index"),
-            QString(tr("Invalid symbol add order index in file \"%1\"."))
-            .arg(mGenericComponent.getXmlFilepath().toNative()));
-    }
-
-    // read is required
-    mIsRequired = (mDomElement.attribute("required") == "true");
-
-    // read name suffix
-    mSuffix = mDomElement.attribute("suffix");
+    // read attributes
+    mUuid = domElement.getAttribute<QUuid>("uuid");
+    mSymbolUuid = domElement.getAttribute<QUuid>("symbol");
+    mAddOrderIndex = domElement.getAttribute<int>("add_order_index");
+    if (mAddOrderIndex < -1) mAddOrderIndex = -1;
+    mIsRequired = domElement.getAttribute<bool>("required");
+    mSuffix = domElement.getAttribute("suffix");
 
     // read pin signal map
-    tmpNode = mDomElement.firstChildElement("pin_signal_map").firstChildElement("map");
-    while (!tmpNode.isNull())
+    for (XmlDomElement* node = domElement.getFirstChild("pin_signal_map/map", true, false);
+         node; node = node->getNextSibling("map"))
     {
         PinSignalMapItem_t item;
-        item.pin = tmpNode.attribute("pin");
-        item.signal = tmpNode.attribute("signal");
-        if (item.pin.isNull())
-        {
-            throw RuntimeError(__FILE__, __LINE__, tmpNode.attribute("pin"),
-                QString(tr("Invalid pin UUID \"%1\" found in \"%2\"."))
-                .arg(tmpNode.attribute("pin"), mGenericComponent.getXmlFilepath().toNative()));
-        }
-        if ((item.signal.isNull()) && (!tmpNode.attribute("signal").isEmpty()))
-        {
-            throw RuntimeError(__FILE__, __LINE__, tmpNode.attribute("signal"),
-                QString(tr("Invalid signal UUID \"%1\" found in \"%2\"."))
-                .arg(tmpNode.attribute("signal"), mGenericComponent.getXmlFilepath().toNative()));
-        }
+        item.pin = node->getAttribute<QUuid>("pin");
+        item.signal = node->getAttribute<QUuid>("signal", false, QUuid());
         if (mPinSignalMap.contains(item.pin))
         {
             throw RuntimeError(__FILE__, __LINE__, item.pin.toString(),
                 QString(tr("The pin \"%1\" is assigned to multiple signals in \"%2\"."))
                 .arg(item.pin.toString(), mGenericComponent.getXmlFilepath().toNative()));
         }
-        if (tmpNode.attribute("display") == "none")
+        if (node->getAttribute("display") == "none")
             item.displayType = PinDisplayType_t::None;
-        else if (tmpNode.attribute("display") == "pin_name")
+        else if (node->getAttribute("display") == "pin_name")
             item.displayType = PinDisplayType_t::PinName;
-        else if (tmpNode.attribute("display") == "gen_comp_signal")
+        else if (node->getAttribute("display") == "gen_comp_signal")
             item.displayType = PinDisplayType_t::GenCompSignal;
-        else if (tmpNode.attribute("display") == "net_signal")
+        else if (node->getAttribute("display") == "net_signal")
             item.displayType = PinDisplayType_t::NetSignal;
         else
         {
-            throw RuntimeError(__FILE__, __LINE__, tmpNode.attribute("display"),
+            throw RuntimeError(__FILE__, __LINE__, node->getAttribute("display"),
                 QString(tr("Invalid pin display type \"%1\" found in \"%2\"."))
-                .arg(tmpNode.attribute("display"), mGenericComponent.getXmlFilepath().toNative()));
+                .arg(node->getAttribute("display"), mGenericComponent.getXmlFilepath().toNative()));
         }
         mPinSignalMap.insert(item.pin, item);
-        tmpNode = tmpNode.nextSiblingElement("map");
     }
 }
 

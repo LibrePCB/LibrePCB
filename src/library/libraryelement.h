@@ -25,8 +25,6 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QDomDocument>
-#include "../common/exceptions.h"
 #include "librarybaseelement.h"
 
 /*****************************************************************************************
@@ -63,6 +61,9 @@ class LibraryElement : public LibraryBaseElement
 
 
     protected:
+
+        // Protected Methods
+        virtual void parseDomTree(const XmlDomElement& root) throw (Exception);
 
         // General Library Element Attributes
         QList<QUuid> mCategories;

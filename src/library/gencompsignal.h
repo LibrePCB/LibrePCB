@@ -25,12 +25,13 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QDomElement>
 #include "../common/exceptions.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
+
+class XmlDomElement;
 
 namespace library {
 class GenericComponent;
@@ -64,7 +65,7 @@ class GenCompSignal final : public QObject
 
         // Constructors / Destructor
         explicit GenCompSignal(GenericComponent& genComp,
-                               const QDomElement& domElement) throw (Exception);
+                               const XmlDomElement& domElement) throw (Exception);
         ~GenCompSignal() noexcept;
 
         // Getters
@@ -94,7 +95,6 @@ class GenCompSignal final : public QObject
 
         // General Attributes
         GenericComponent& mGenericComponent;
-        QDomElement mDomElement;
 
         // Signal Attributes
         QUuid mUuid;

@@ -25,13 +25,14 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QDomElement>
 #include "../common/exceptions.h"
 #include "gencompsymbvaritem.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
+
+class XmlDomElement;
 
 namespace library {
 class GenericComponent;
@@ -54,7 +55,7 @@ class GenCompSymbVar final : public QObject
 
         // Constructors / Destructor
         explicit GenCompSymbVar(GenericComponent& genComp,
-                                const QDomElement& domElement) throw (Exception);
+                                const XmlDomElement& domElement) throw (Exception);
         ~GenCompSymbVar() noexcept;
 
         // Getters: Attributes
@@ -81,7 +82,6 @@ class GenCompSymbVar final : public QObject
 
         // General Attributes
         GenericComponent& mGenericComponent;
-        QDomElement mDomElement;
 
         // Symbol Variant Attributes
         QUuid mUuid;

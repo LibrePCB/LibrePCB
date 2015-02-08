@@ -22,9 +22,9 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QDomElement>
 #include "attribute.h"
 #include "genericcomponent.h"
+#include "../common/file_io/xmldomelement.h"
 
 namespace library {
 
@@ -33,25 +33,17 @@ namespace library {
  ****************************************************************************************/
 
 Attribute::Attribute(GenericComponent& genComp,
-                     const QDomElement& domElement) throw (Exception) :
-    QObject(0), mGenericComponent(genComp), mDomElement(domElement)
+                     const XmlDomElement& domElement) throw (Exception) :
+    QObject(nullptr), mGenericComponent(genComp)
 {
-    // read key
-    mKey = mDomElement.attribute("key");
-    if (mKey.isEmpty())
-    {
-        throw RuntimeError(__FILE__, __LINE__, mKey,
-            QString(tr("Invalid attribute key in file \"%1\"."))
-            .arg(mGenericComponent.getXmlFilepath().toNative()));
-    }
-
-    // read type
-    mType = stringToType(mDomElement.attribute("type"));
+    // read attributes
+    mKey = domElement.getAttribute("key", true);
+    mType = stringToType(domElement.getAttribute("type", true));
 
     // read names, descriptions and default values in all available languages
-    LibraryBaseElement::readLocaleDomNodes(mGenericComponent.getXmlFilepath(), mDomElement, "name", mNames);
-    LibraryBaseElement::readLocaleDomNodes(mGenericComponent.getXmlFilepath(), mDomElement, "description", mDescriptions);
-    LibraryBaseElement::readLocaleDomNodes(mGenericComponent.getXmlFilepath(), mDomElement, "default_value", mDefaultValues);
+    LibraryBaseElement::readLocaleDomNodes(mGenericComponent.getXmlFilepath(), domElement, "name", mNames);
+    LibraryBaseElement::readLocaleDomNodes(mGenericComponent.getXmlFilepath(), domElement, "description", mDescriptions);
+    LibraryBaseElement::readLocaleDomNodes(mGenericComponent.getXmlFilepath(), domElement, "default_value", mDefaultValues);
 }
 
 Attribute::~Attribute() noexcept

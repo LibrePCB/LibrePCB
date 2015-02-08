@@ -24,6 +24,7 @@
 #include <QtCore>
 #include "symbolpolygon.h"
 #include "symbol.h"
+#include "../common/file_io/xmldomelement.h"
 
 namespace library {
 
@@ -31,53 +32,37 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SymbolPolygon::SymbolPolygon(Symbol& symbol, const QDomElement& domElement) throw (Exception) :
-    QObject(0), mSymbol(symbol), mDomElement(domElement)
+SymbolPolygon::SymbolPolygon(Symbol& symbol, const XmlDomElement& domElement) throw (Exception) :
+    QObject(0), mSymbol(symbol)
 {
-    QDomElement tmpNode;
-    bool ok;
-
     // load layers
-    mLineLayerId = mDomElement.attribute("line_layer").toUInt(&ok);
-    if (!ok)
-    {
-        throw RuntimeError(__FILE__, __LINE__, mDomElement.attribute("line_layer"),
-            QString(tr("Invalid line layer ID \"%1\" in file \"%2\"."))
-            .arg(mDomElement.attribute("line_layer"), mSymbol.getXmlFilepath().toNative()));
-    }
-    mFillLayerId = mDomElement.attribute("fill_layer").toUInt(&ok);
-    if (!ok)
-    {
-        throw RuntimeError(__FILE__, __LINE__, mDomElement.attribute("fill_layer"),
-            QString(tr("Invalid fill layer ID \"%1\" in file \"%2\"."))
-            .arg(mDomElement.attribute("fill_layer"), mSymbol.getXmlFilepath().toNative()));
-    }
+    mLineLayerId = domElement.getAttribute<uint>("line_layer");
+    mFillLayerId = domElement.getAttribute<uint>("fill_layer");
 
     // load geometry attributes
-    mLineWidth.setLengthMm(mDomElement.attribute("line_width"));
-    mIsGrabArea = (mDomElement.attribute("grab_area") == "true");
-    mStartPos.setXmm(mDomElement.attribute("start_x"));
-    mStartPos.setYmm(mDomElement.attribute("start_y"));
+    mLineWidth = domElement.getAttribute<Length>("line_width");
+    mIsGrabArea = domElement.getAttribute<bool>("grab_area");
+    mStartPos.setX(domElement.getAttribute<Length>("start_x"));
+    mStartPos.setY(domElement.getAttribute<Length>("start_y"));
 
     // load all segments
-    tmpNode = mDomElement.firstChildElement("segment");
-    while (!tmpNode.isNull())
+    for (XmlDomElement* node = domElement.getFirstChild("segment", true);
+         node; node = node->getNextSibling("segment"))
     {
         PolygonSegment_t* segment = new PolygonSegment_t;
-        if (tmpNode.attribute("type") == "line")
+        if (node->getAttribute("type") == "line")
             segment->type = PolygonSegment_t::Line;
-        else if (tmpNode.attribute("type") == "arc")
+        else if (node->getAttribute("type") == "arc")
             segment->type = PolygonSegment_t::Arc;
         else
         {
-            throw RuntimeError(__FILE__, __LINE__, tmpNode.attribute("type"),
+            throw RuntimeError(__FILE__, __LINE__, node->getAttribute("type"),
                 QString(tr("Invalid polygon segment type \"%1\" in file \"%2\"."))
-                .arg(tmpNode.attribute("type"), mSymbol.getXmlFilepath().toNative()));
+                .arg(node->getAttribute("type"), mSymbol.getXmlFilepath().toNative()));
         }
-        segment->endPos.setXmm(tmpNode.attribute("end_x"));
-        segment->endPos.setYmm(tmpNode.attribute("end_y"));
+        segment->endPos.setX(node->getAttribute<Length>("end_x"));
+        segment->endPos.setY(node->getAttribute<Length>("end_y"));
         mSegments.append(segment);
-        tmpNode = tmpNode.nextSiblingElement("segment");
     }
 }
 

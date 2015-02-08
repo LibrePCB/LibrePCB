@@ -33,10 +33,20 @@ namespace library {
 Model::Model(const FilePath& xmlFilePath) :
     LibraryElement(xmlFilePath, "model")
 {
+    readFromFile();
 }
 
 Model::~Model()
 {
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+void Model::parseDomTree(const XmlDomElement& root) throw (Exception)
+{
+    LibraryElement::parseDomTree(root);
 }
 
 /*****************************************************************************************

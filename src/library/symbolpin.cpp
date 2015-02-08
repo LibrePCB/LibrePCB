@@ -24,6 +24,7 @@
 #include <QtCore>
 #include "symbolpin.h"
 #include "symbol.h"
+#include "../common/file_io/xmldomelement.h"
 
 namespace library {
 
@@ -31,26 +32,19 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SymbolPin::SymbolPin(Symbol& symbol, const QDomElement& domElement) throw (Exception) :
-    QObject(0), mSymbol(symbol), mDomElement(domElement)
+SymbolPin::SymbolPin(Symbol& symbol, const XmlDomElement& domElement) throw (Exception) :
+    QObject(0), mSymbol(symbol)
 {
-    mUuid = mDomElement.attribute("uuid");
-    if (mUuid.isNull())
-    {
-        throw RuntimeError(__FILE__, __LINE__, mSymbol.getXmlFilepath().toStr(),
-            QString(tr("Invalid symbol pin UUID in file \"%1\"."))
-            .arg(mSymbol.getXmlFilepath().toNative()));
-    }
-
-    // read geometry attributes
-    mPosition.setXmm(mDomElement.attribute("x"));
-    mPosition.setYmm(mDomElement.attribute("y"));
-    mLength.setLengthMm(mDomElement.attribute("length"));
-    mAngle.setAngleDeg(mDomElement.attribute("angle"));
+    // read attributes
+    mUuid = domElement.getAttribute<QUuid>("uuid");
+    mPosition.setX(domElement.getAttribute<Length>("x"));
+    mPosition.setY(domElement.getAttribute<Length>("y"));
+    mLength = domElement.getAttribute<Length>("length");
+    mAngle = domElement.getAttribute<Angle>("angle");
 
     // read names and descriptions in all available languages
-    LibraryBaseElement::readLocaleDomNodes(mSymbol.getXmlFilepath(), mDomElement, "name", mNames);
-    LibraryBaseElement::readLocaleDomNodes(mSymbol.getXmlFilepath(), mDomElement, "description", mDescriptions);
+    LibraryBaseElement::readLocaleDomNodes(mSymbol.getXmlFilepath(), domElement, "name", mNames);
+    LibraryBaseElement::readLocaleDomNodes(mSymbol.getXmlFilepath(), domElement, "description", mDescriptions);
 }
 
 SymbolPin::~SymbolPin() noexcept

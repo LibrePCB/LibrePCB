@@ -33,10 +33,20 @@ namespace library {
 ComponentCategory::ComponentCategory(const FilePath& xmlFilePath) :
     LibraryElement(xmlFilePath, "component_category")
 {
+    readFromFile();
 }
 
 ComponentCategory::~ComponentCategory()
 {
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+void ComponentCategory::parseDomTree(const XmlDomElement& root) throw (Exception)
+{
+    LibraryElement::parseDomTree(root);
 }
 
 /*****************************************************************************************

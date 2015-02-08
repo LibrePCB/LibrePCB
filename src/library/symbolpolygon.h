@@ -25,13 +25,14 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QDomElement>
 #include "../common/exceptions.h"
 #include "../common/units/all_length_units.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
+
+class XmlDomElement;
 
 namespace library {
 class Symbol;
@@ -60,7 +61,7 @@ class SymbolPolygon final : public QObject
 
 
         // Constructors / Destructor
-        explicit SymbolPolygon(Symbol& symbol, const QDomElement& domElement) throw (Exception);
+        explicit SymbolPolygon(Symbol& symbol, const XmlDomElement& domElement) throw (Exception);
         ~SymbolPolygon() noexcept;
 
         // Getters
@@ -82,7 +83,6 @@ class SymbolPolygon final : public QObject
 
         // General Attributes
         Symbol& mSymbol;
-        QDomElement mDomElement;
 
         // Polygon Attributes
         uint mLineLayerId;

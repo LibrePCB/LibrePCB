@@ -24,6 +24,7 @@
 #include <QtCore>
 #include "symboltext.h"
 #include "symbol.h"
+#include "../common/file_io/xmldomelement.h"
 
 namespace library {
 
@@ -31,51 +32,44 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SymbolText::SymbolText(Symbol& symbol, const QDomElement& domElement) throw (Exception) :
-    QObject(0), mSymbol(symbol), mDomElement(domElement), mAlign(0)
+SymbolText::SymbolText(Symbol& symbol, const XmlDomElement& domElement) throw (Exception) :
+    QObject(0), mSymbol(symbol), mAlign(0)
 {
-    bool ok = false;
-    mLayerId = mDomElement.attribute("layer").toUInt(&ok);
-    if (!ok)
-    {
-        throw RuntimeError(__FILE__, __LINE__, mDomElement.attribute("layer"),
-            QString(tr("Invalid layer ID \"%1\" in file \"%2\"."))
-            .arg(mDomElement.attribute("layer"), mSymbol.getXmlFilepath().toNative()));
-    }
+    mLayerId = domElement.getAttribute<uint>("layer");
 
     // load geometry attributes
-    mPosition.setXmm(mDomElement.attribute("x"));
-    mPosition.setYmm(mDomElement.attribute("y"));
-    mAngle.setAngleDeg(mDomElement.attribute("angle"));
-    mHeight.setLengthMm(mDomElement.attribute("height"));
+    mPosition.setX(domElement.getAttribute<Length>("x"));
+    mPosition.setY(domElement.getAttribute<Length>("y"));
+    mAngle = domElement.getAttribute<Angle>("angle");
+    mHeight = domElement.getAttribute<Length>("height");
 
     // text alignment
-    if (mDomElement.attributeNode("v_align").value() == "bottom")
+    if (domElement.getAttribute("v_align") == "bottom")
         mAlign |= Qt::AlignBottom;
-    else if (mDomElement.attributeNode("v_align").value() == "center")
+    else if (domElement.getAttribute("v_align") == "center")
         mAlign |= Qt::AlignVCenter;
-    else if (mDomElement.attributeNode("v_align").value() == "top")
+    else if (domElement.getAttribute("v_align") == "top")
         mAlign |= Qt::AlignTop;
     else
     {
-        throw RuntimeError(__FILE__, __LINE__, mDomElement.attribute("v_align"),
+        throw RuntimeError(__FILE__, __LINE__, domElement.getAttribute("v_align"),
             QString(tr("Invalid vertical alignment \"%1\" in file \"%2\"."))
-            .arg(mDomElement.attribute("v_align"), mSymbol.getXmlFilepath().toNative()));
+            .arg(domElement.getAttribute("v_align"), mSymbol.getXmlFilepath().toNative()));
     }
-    if (mDomElement.attributeNode("h_align").value() == "left")
+    if (domElement.getAttribute("h_align") == "left")
         mAlign |= Qt::AlignLeft;
-    else if (mDomElement.attributeNode("h_align").value() == "center")
+    else if (domElement.getAttribute("h_align") == "center")
         mAlign |= Qt::AlignHCenter;
-    else if (mDomElement.attributeNode("h_align").value() == "right")
+    else if (domElement.getAttribute("h_align") == "right")
         mAlign |= Qt::AlignRight;
     else
     {
-        throw RuntimeError(__FILE__, __LINE__, mDomElement.attribute("h_align"),
+        throw RuntimeError(__FILE__, __LINE__, domElement.getAttribute("h_align"),
             QString(tr("Invalid horizontal alignment \"%1\" in file \"%2\"."))
-            .arg(mDomElement.attribute("h_align"), mSymbol.getXmlFilepath().toNative()));
+            .arg(domElement.getAttribute("h_align"), mSymbol.getXmlFilepath().toNative()));
     }
 
-    mText = mDomElement.attribute("text");
+    mText = domElement.getAttribute("text", true);
 }
 
 SymbolText::~SymbolText() noexcept

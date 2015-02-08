@@ -33,10 +33,20 @@ namespace library {
 Footprint::Footprint(const FilePath& xmlFilePath) :
     LibraryElement(xmlFilePath, "footprint")
 {
+    readFromFile();
 }
 
 Footprint::~Footprint()
 {
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+void Footprint::parseDomTree(const XmlDomElement& root) throw (Exception)
+{
+    LibraryElement::parseDomTree(root);
 }
 
 /*****************************************************************************************

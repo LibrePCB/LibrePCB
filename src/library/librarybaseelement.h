@@ -25,10 +25,15 @@
  ****************************************************************************************/
 
 #include <QObject>
-#include <QDomElement>
-#include "../common/smartxmlfile.h"
+#include "../common/exceptions.h"
 #include "../common/filepath.h"
 #include "../common/version.h"
+
+/*****************************************************************************************
+ *  Forward Declarations
+ ****************************************************************************************/
+
+class XmlDomElement;
 
 /*****************************************************************************************
  *  Class LibraryBaseElement
@@ -52,7 +57,6 @@ class LibraryBaseElement : public QObject
 
         // Getters: General
         const FilePath& getXmlFilepath() const noexcept {return mXmlFilepath;}
-        int getXmlFileVersion() const noexcept {return mXmlFile->getFileVersion();}
 
         // Getters: Attributes
         const QUuid& getUuid() const noexcept {return mUuid;}
@@ -108,7 +112,8 @@ class LibraryBaseElement : public QObject
          *
          * @see #localeStringFromList()
          */
-        static void readLocaleDomNodes(const FilePath& xmlFilepath, QDomElement parentNode,
+        static void readLocaleDomNodes(const FilePath& xmlFilepath,
+                                       const XmlDomElement& parentNode,
                                        const QString& childNodesName,
                                        QHash<QString, QString>& list) throw (Exception);
 
@@ -148,10 +153,15 @@ class LibraryBaseElement : public QObject
 
     protected:
 
+        // Protected Methods
+        void readFromFile() throw (Exception);
+        virtual void parseDomTree(const XmlDomElement& root) throw (Exception);
+
+
         // General Attributes
         FilePath mXmlFilepath;
-        SmartXmlFile* mXmlFile;
-        QDomElement mDomRoot;
+        QString mXmlRootNodeName;
+        bool mDomTreeParsed;
 
         // General Library Element Attributes
         QUuid mUuid;

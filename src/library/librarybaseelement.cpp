@@ -22,11 +22,12 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QDomDocument>
-#include <QDomElement>
 #include "librarybaseelement.h"
 #include "../workspace/workspace.h"
 #include "../workspace/settings/workspacesettings.h"
+#include "../common/smartxmlfile.h"
+#include "../common/file_io/xmldomdocument.h"
+#include "../common/file_io/xmldomelement.h"
 
 namespace library {
 
@@ -36,45 +37,13 @@ namespace library {
 
 LibraryBaseElement::LibraryBaseElement(const FilePath& xmlFilePath,
                                        const QString& xmlRootNodeName) throw (Exception) :
-    QObject(0), mXmlFilepath(xmlFilePath), mXmlFile(0)
+    QObject(0), mXmlFilepath(xmlFilePath), mXmlRootNodeName(xmlRootNodeName),
+    mDomTreeParsed(false)
 {
-    try
-    {
-        // open XML file
-        mXmlFile = new SmartXmlFile(mXmlFilepath, false, false, xmlRootNodeName);
-        mDomRoot = mXmlFile->getRoot();
-
-        // read UUID
-        mUuid = mDomRoot.firstChildElement("meta").firstChildElement("uuid").text();
-        if (mUuid.isNull())
-        {
-            throw RuntimeError(__FILE__, __LINE__, mXmlFilepath.toStr(),
-                QString(tr("Invalid UUID in file \"%1\".")).arg(mXmlFilepath.toNative()));
-        }
-
-        // read version
-        QString version = mDomRoot.firstChildElement("meta").firstChildElement("version").text();
-        if (!mVersion.setVersion(version))
-        {
-            throw RuntimeError(__FILE__, __LINE__, version,
-                QString(tr("Invalid version in file \"%1\".")).arg(mXmlFilepath.toNative()));
-        }
-
-        // read names, descriptions and keywords in all available languages
-        readLocaleDomNodes(mXmlFilepath, mDomRoot.firstChildElement("meta"), "name", mNames);
-        readLocaleDomNodes(mXmlFilepath, mDomRoot.firstChildElement("meta"), "description", mDescriptions);
-        readLocaleDomNodes(mXmlFilepath, mDomRoot.firstChildElement("meta"), "keywords", mKeywords);
-    }
-    catch (Exception& e)
-    {
-        delete mXmlFile;        mXmlFile = 0;
-        throw;
-    }
 }
 
 LibraryBaseElement::~LibraryBaseElement() noexcept
 {
-    delete mXmlFile;        mXmlFile = 0;
 }
 
 /*****************************************************************************************
@@ -97,17 +66,50 @@ QString LibraryBaseElement::getKeywords(const QString& locale) const noexcept
 }
 
 /*****************************************************************************************
+ *  Protected Methods
+ ****************************************************************************************/
+
+void LibraryBaseElement::readFromFile() throw (Exception)
+{
+    Q_ASSERT(mDomTreeParsed == false);
+
+    // open XML file
+    SmartXmlFile file(mXmlFilepath, false, false);
+    QSharedPointer<XmlDomDocument> doc = file.parseFileAndBuildDomTree();
+    parseDomTree(doc->getRoot());
+
+    Q_ASSERT(mDomTreeParsed == true);
+}
+
+void LibraryBaseElement::parseDomTree(const XmlDomElement& root) throw (Exception)
+{
+    Q_ASSERT(mDomTreeParsed == false);
+
+    // read attributes
+    mUuid = root.getFirstChild("meta/uuid", true, true)->getText<QUuid>();
+    mVersion = root.getFirstChild("meta/version", true, true)->getText<Version>();
+
+    // read names, descriptions and keywords in all available languages
+    readLocaleDomNodes(mXmlFilepath, *root.getFirstChild("meta", true), "name", mNames);
+    readLocaleDomNodes(mXmlFilepath, *root.getFirstChild("meta", true), "description", mDescriptions);
+    readLocaleDomNodes(mXmlFilepath, *root.getFirstChild("meta", true), "keywords", mKeywords);
+
+    mDomTreeParsed = true;
+}
+
+/*****************************************************************************************
  *  Static Methods
  ****************************************************************************************/
 
-void LibraryBaseElement::readLocaleDomNodes(const FilePath& xmlFilepath, QDomElement parentNode,
+void LibraryBaseElement::readLocaleDomNodes(const FilePath& xmlFilepath,
+                                            const XmlDomElement& parentNode,
                                             const QString& childNodesName,
                                             QHash<QString, QString>& list) throw (Exception)
 {
-    parentNode = parentNode.firstChildElement(childNodesName);
-    while (!parentNode.isNull())
+    for (XmlDomElement* node = parentNode.getFirstChild(childNodesName, false); node;
+         node = node->getNextSibling(childNodesName))
     {
-        QString locale = parentNode.attribute("locale");
+        QString locale = node->getAttribute("locale", true);
         if (locale.isEmpty())
         {
             throw RuntimeError(__FILE__, __LINE__, xmlFilepath.toStr(),
@@ -120,9 +122,9 @@ void LibraryBaseElement::readLocaleDomNodes(const FilePath& xmlFilepath, QDomEle
                 QString(tr("Locale \"%1\" defined multiple times in \"%2\"."))
                 .arg(locale, xmlFilepath.toNative()));
         }
-        list.insert(locale, parentNode.text());
-        parentNode = parentNode.nextSiblingElement(childNodesName);
+        list.insert(locale, node->getText());
     }
+
     if (!list.contains("en_US"))
     {
         throw RuntimeError(__FILE__, __LINE__, xmlFilepath.toStr(), QString(
