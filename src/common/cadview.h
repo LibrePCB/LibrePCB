@@ -87,6 +87,12 @@ class CADView : public QGraphicsView
         void zoomAll();
 
 
+    private slots:
+
+        // Private Slots
+        void zoomAnimationValueChanged(const QVariant& value) noexcept;
+
+
     protected:
 
         // Inherited Methods
@@ -116,6 +122,7 @@ class CADView : public QGraphicsView
 
         Point mLastMouseMoveEventPos;
         QLabel* mPositionLabel;
+        QVariantAnimation* mZoomAnimation;
 
 
         // Static Variables

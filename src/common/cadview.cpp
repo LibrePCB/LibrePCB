@@ -43,12 +43,16 @@ CADView::CADView(QWidget* parent) :
     QGraphicsView(parent),
     mGridType(GridType_t::Off), mGridColor(Qt::lightGray), mOriginCrossColor(Qt::black),
     mGridInterval(2540000), mGridIntervalUnit(LengthUnit::millimeters()),
-    mPositionLabel(0)
+    mPositionLabel(nullptr), mZoomAnimation(nullptr)
 {
     mPositionLabel = new QLabel(this);
     mPositionLabel->move(5, 5);
     mPositionLabel->show();
     updatePositionLabelText();
+
+    mZoomAnimation = new QVariantAnimation();
+    connect(mZoomAnimation, &QVariantAnimation::valueChanged,
+            this, &CADView::zoomAnimationValueChanged);
 
     setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing| QPainter::SmoothPixmapTransform);
     if (Workspace::instance().getSettings().getAppearance()->getUseOpenGl())
@@ -63,7 +67,8 @@ CADView::CADView(QWidget* parent) :
 
 CADView::~CADView()
 {
-    delete mPositionLabel;      mPositionLabel = 0;
+    delete mZoomAnimation;      mZoomAnimation = nullptr;
+    delete mPositionLabel;      mPositionLabel = nullptr;
 }
 
 /*****************************************************************************************
@@ -135,7 +140,24 @@ void CADView::zoomOut()
 void CADView::zoomAll()
 {
     if (scene())
-        fitInView(scene()->itemsBoundingRect(), Qt::KeepAspectRatio);
+    {
+        mZoomAnimation->setDuration(500);
+        mZoomAnimation->setEasingCurve(QEasingCurve::InOutCubic);
+        mZoomAnimation->setStartValue(getVisibleSceneRect());
+        mZoomAnimation->setEndValue(scene()->itemsBoundingRect());
+        mZoomAnimation->start();
+    }
+}
+
+
+/*****************************************************************************************
+ *  Private Slots
+ ****************************************************************************************/
+
+void CADView::zoomAnimationValueChanged(const QVariant& value) noexcept
+{
+    if (value.canConvert(QMetaType::QRectF))
+        fitInView(value.toRectF(), Qt::KeepAspectRatio); // zoom all smoothly
 }
 
 /*****************************************************************************************
