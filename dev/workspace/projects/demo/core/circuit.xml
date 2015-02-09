@@ -1,117 +1,741 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes'?>
-<circuit file_version="0">
-    <meta/>
+<circuit>
     <netclasses>
         <netclass name="default" uuid="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
     </netclasses>
     <netsignals>
-        <netsignal netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" name="GND" auto_name="false" uuid="{508561e3-321a-47be-8b5e-b80f3e3fc1a4}"/>
-        <netsignal netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" name="VCC" auto_name="false" uuid="{3e4ad946-2f80-498d-a1fd-095391883c7f}"/>
-        <netsignal netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" name="N#1" auto_name="true" uuid="{b76b558f-b2ac-45f5-a568-9c2266cd992b}"/>
-        <netsignal netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" name="N#2" auto_name="true" uuid="{61fd695d-000b-41d4-8b9f-4757642a0692}"/>
-        <netsignal netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" name="N#3" auto_name="true" uuid="{63cd3916-d2e2-4cf4-83f8-84bcd86cd005}"/>
-        <netsignal netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" name="N#4" auto_name="true" uuid="{655ffec0-4797-4896-87cb-84096e075deb}"/>
-        <netsignal netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" name="N#5" auto_name="true" uuid="{6def778b-4966-42c0-9fa9-036928ea63e6}"/>
-        <netsignal netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" name="N#6" auto_name="true" uuid="{5fb5a1c9-249b-4f60-b20f-a0d1b4479420}"/>
-        <netsignal netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" name="N#7" auto_name="true" uuid="{2baa4f93-f706-4c9d-944c-33fc131ee2df}"/>
-        <netsignal netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" name="N#8" auto_name="true" uuid="{e27ec30a-18f9-425b-97fc-10e75b02d3aa}"/>
-        <netsignal netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" name="N#9" auto_name="true" uuid="{56d131bb-fd15-4c97-a0a7-464b721a04b0}"/>
-        <netsignal netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" name="N#10" auto_name="true" uuid="{9e463c5b-6a85-48ff-acf2-7d9699f89d02}"/>
-        <netsignal netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" name="N#11" auto_name="true" uuid="{dcf0ff7d-c2d8-4f55-be08-4a33004eba1f}"/>
-        <netsignal netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" name="N#12" auto_name="true" uuid="{9bfdff1f-f964-4323-b3e7-66ba7e629b7c}"/>
-        <netsignal netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" name="N#13" auto_name="true" uuid="{5818eabc-1778-4747-bf2d-43ae0e23a8ed}"/>
+        <netsignal name="N#80" uuid="{1b80211d-2f28-40a0-bfed-7bae5d5ea941}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#50" uuid="{bff6f54d-6e28-4501-8000-0c14b51173f9}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#32" uuid="{10b2e63a-50cc-48cd-a45c-3b33ea8b7e60}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#7" uuid="{2baa4f93-f706-4c9d-944c-33fc131ee2df}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#52" uuid="{e2066711-bfdb-47c4-8124-d86e2be75663}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#57" uuid="{7466d7b2-9dfd-45e8-b2e0-f1363deada25}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#10" uuid="{9e463c5b-6a85-48ff-acf2-7d9699f89d02}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#41" uuid="{64cd46da-fb9e-4193-a450-44cc16398d41}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#25" uuid="{8d9a21c3-ec4b-4260-b6ff-4e74de6f11dd}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#72" uuid="{84650db5-0504-493d-859e-8efed332cd21}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#8" uuid="{e27ec30a-18f9-425b-97fc-10e75b02d3aa}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#69" uuid="{3b151512-7977-4cd3-921c-a7f9f196842a}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#15" uuid="{7c5efb8e-33d8-406b-afa2-d6c6260baf15}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#84" uuid="{c03ebf11-0bec-4186-a681-23a16fb1d691}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#22" uuid="{eacd4d76-8b16-46fc-a977-64317aa23c18}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#46" uuid="{2f158fa5-221e-4218-8730-dde2cfb0bd16}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#85" uuid="{2bcb36fe-2627-423e-8f50-7a5ed92ca63e}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#59" uuid="{2872922f-2754-4d22-b6ab-594855cddd4e}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#49" uuid="{7cca6ac9-82ce-4c8d-8136-b33dc466fb2a}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#61" uuid="{8f04a4db-4aa7-41aa-9fb7-bacb40cad630}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#88" uuid="{7ac2a177-72bb-4dbc-910e-585b97d5d127}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#64" uuid="{b64a9f04-99a1-4efc-8bdb-792198a2ea7a}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#30" uuid="{b69dedcd-80ea-465f-94df-d82f77fc75ae}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#6" uuid="{5fb5a1c9-249b-4f60-b20f-a0d1b4479420}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#54" uuid="{09bcc15f-157c-426c-b5be-a7ac53b44f28}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#86" uuid="{13509606-754f-4595-b21d-aebd0b4d7dd7}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#77" uuid="{3c971f93-3c41-4b63-a57c-719f6a81d4d9}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#26" uuid="{1127510e-fbdb-424a-8c4b-cc1480d741c5}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#1" uuid="{b76b558f-b2ac-45f5-a568-9c2266cd992b}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#35" uuid="{c8433724-217f-4501-b631-676d2eab8303}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="VCC" uuid="{8665ab8b-1430-4765-92f4-804fac1a28b4}" auto_name="false" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#62" uuid="{4301cc5e-0517-4d41-a0ec-4806b6413ddc}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#27" uuid="{79e88419-ada7-415b-959d-bc105aac63ec}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#55" uuid="{6ae6493c-c054-46a5-a039-7909ae42ada0}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#18" uuid="{7d64ab78-3a61-4385-9ca9-7661eabcbdbe}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#51" uuid="{29be68bb-afa6-40b0-a8a4-678724f71f98}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#39" uuid="{201f465e-dabb-40e1-8bff-0c20ebbbbe3d}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#3" uuid="{63cd3916-d2e2-4cf4-83f8-84bcd86cd005}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#65" uuid="{6e6b8fff-4866-4943-822c-472bd0210894}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#28" uuid="{e1f7b07d-b549-4af6-aac1-dc73dc30b1f9}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#31" uuid="{799f3696-5b0c-4320-bf91-83196b08c4f0}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#5" uuid="{6def778b-4966-42c0-9fa9-036928ea63e6}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#14" uuid="{118a0977-be86-419e-aba8-801a81074e8f}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#19" uuid="{c96a90c6-e6de-4c2f-8797-2ca7f62cbf5a}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#2" uuid="{61fd695d-000b-41d4-8b9f-4757642a0692}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#56" uuid="{0daffb85-2c12-418a-8649-6f6ec5d8dfdb}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#76" uuid="{51b377a0-f4ee-4535-ba86-6a8f38f192d0}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#33" uuid="{bc3c25de-a50a-45bc-a9ae-2bd46c299d64}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#20" uuid="{e41ef2d5-ff0e-4fff-9c6f-445bb22c4278}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#17" uuid="{5d0e1fb9-60f8-49e0-adb8-cec05853d540}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#24" uuid="{2aa9dcb1-0737-475a-a303-1f8043375e1e}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#34" uuid="{42c9bf85-8f6d-4eaf-8bf3-56bdc9c7d7b1}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#53" uuid="{435808a6-4493-4155-8b5b-6f0751bbfe06}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#21" uuid="{bd861459-dfa2-4984-9f98-f2f248030e1c}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#82" uuid="{60a031c8-f651-4414-84c1-9ea9a6896107}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#74" uuid="{775bea44-d177-454c-b09f-26f5451a8e60}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#71" uuid="{be076fa5-a59e-4b0c-9b53-5ef73e06fb1e}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#12" uuid="{9bfdff1f-f964-4323-b3e7-66ba7e629b7c}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#73" uuid="{65b500e7-6a4e-4c08-aa30-d614a60626ee}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#58" uuid="{12b47455-264e-4e6c-8fa1-3cc753ae1fee}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#44" uuid="{6c43f8c6-072c-4959-83de-b6332b262c9e}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#9" uuid="{56d131bb-fd15-4c97-a0a7-464b721a04b0}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#79" uuid="{309ec55f-ecfc-4882-9b6c-9fa1e3b7b47a}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#68" uuid="{beaea496-53b3-4b3f-940c-d8abd2a64de8}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#23" uuid="{fe6e33e2-85cc-45ef-b678-b00fd5478592}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#60" uuid="{a821ba7d-4cac-47ca-9a25-1ccda7355ede}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#13" uuid="{5818eabc-1778-4747-bf2d-43ae0e23a8ed}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#66" uuid="{994b8122-d61b-487b-8355-bababb1df7df}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#45" uuid="{8094c756-bacc-425e-ba64-15f9f947abcc}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#43" uuid="{9d9cc318-707c-4007-b069-e53adc9ec937}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#4" uuid="{655ffec0-4797-4896-87cb-84096e075deb}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#63" uuid="{bc2f525b-f3b8-408e-bc74-8a6fc8df6c58}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#42" uuid="{39985c4c-5f6a-41c0-b8c0-a99307427b04}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#70" uuid="{db27969d-359b-425b-8022-528eaf86f276}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#75" uuid="{01783a6a-af8f-44dd-88a3-d4f661e462ab}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#78" uuid="{b370dd47-5493-419b-927b-e6e23f30c8cf}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#47" uuid="{2db7b9dc-dea3-446c-b04a-c90f2e4b4582}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#29" uuid="{75c7b35f-5333-4263-8575-ba353122a87c}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#67" uuid="{6a9c7f0b-b1ca-4724-8eda-12c86a0d8b36}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#81" uuid="{4a2bf5a5-dbda-493c-89c3-1bda64f516ce}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#38" uuid="{c8691a6b-1533-4b64-8292-5a28495a93c9}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#37" uuid="{60a3553c-f607-485e-b157-50de18109c90}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#16" uuid="{6563b6d8-0e9f-4741-820b-78b7ac90e530}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#36" uuid="{278fab89-84d9-485c-bb3e-200edacc5b0a}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#40" uuid="{011f59b2-1b91-497a-86ca-648e6b5d14cc}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#87" uuid="{bbf15fbc-74b5-4ed7-b83a-31fca21fc731}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#11" uuid="{dcf0ff7d-c2d8-4f55-be08-4a33004eba1f}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#83" uuid="{560abf99-d472-4209-a4ac-a6604adfb69d}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
+        <netsignal name="N#48" uuid="{2b3c6e2a-970b-4769-83cf-cd741758125a}" auto_name="true" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}"/>
     </netsignals>
-    <assembly_variants>
-        <variant name="default" uuid="{6fe07dd4-aaee-4a28-ae35-d22c2904a461}"/>
-    </assembly_variants>
     <generic_component_instances>
-        <instance symbol_variant="{5de93550-f32b-4663-89d8-2ade0c5982a8}" uuid="{7fe07dd4-aaee-4a28-ae35-d22c2904a462}" generic_component="{60000000-7785-4665-a3e6-fe8d5224ef37}">
-            <name>U1</name>
-            <value/>
-            <attributes/>
-            <signal_mapping/>
-        </instance>
-        <instance symbol_variant="{5de93550-f32b-4663-89d8-2ade0c5982a8}" uuid="{8fe07dd4-aaee-4a28-ae35-d22c2904a462}" generic_component="{60000000-7785-4665-a3e6-fe8d5224ef37}">
-            <name>U2</name>
-            <value/>
-            <attributes/>
-            <signal_mapping/>
-        </instance>
-        <instance symbol_variant="{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}" uuid="{6fe07dd4-aaee-4a28-ae35-d22c2904a461}" generic_component="{60000001-3c94-4689-be29-92235ba993c5}">
-            <name>U3</name>
-            <value>NE555</value>
+        <instance generic_component="{60000002-3c94-4689-be29-92235ba993c5}" uuid="{b9217cc2-23a2-4087-88ca-9f363820edea}" symbol_variant="{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}">
+            <name>U15</name>
+            <value></value>
             <attributes/>
             <signal_mapping>
-                <map comp_signal="{71a44db9-5e42-405f-b6e4-b4725ae37af3}" netsignal="{508561e3-321a-47be-8b5e-b80f3e3fc1a4}"/>
-                <map comp_signal="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}" netsignal=""/>
-                <map comp_signal="{a9d3d159-fca9-417e-8bba-13829caa6ae5}" netsignal="{63cd3916-d2e2-4cf4-83f8-84bcd86cd005}"/>
-                <map comp_signal="{da30b112-9ab0-4715-8a6a-9e5414169fd4}" netsignal="{655ffec0-4797-4896-87cb-84096e075deb}"/>
-                <map comp_signal="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}" netsignal=""/>
-                <map comp_signal="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}" netsignal=""/>
-                <map comp_signal="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}" netsignal="{6def778b-4966-42c0-9fa9-036928ea63e6}"/>
-                <map comp_signal="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}" netsignal="{3e4ad946-2f80-498d-a1fd-095391883c7f}"/>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{71a44db9-5e42-405f-b6e4-b4725ae37af3}"/>
+                <map netsignal="{201f465e-dabb-40e1-8bff-0c20ebbbbe3d}" comp_signal="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}"/>
+                <map netsignal="" comp_signal="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}"/>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}"/>
+                <map netsignal="{c8433724-217f-4501-b631-676d2eab8303}" comp_signal="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}"/>
+                <map netsignal="{2f158fa5-221e-4218-8730-dde2cfb0bd16}" comp_signal="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}"/>
+                <map netsignal="" comp_signal="{da30b112-9ab0-4715-8a6a-9e5414169fd4}"/>
+                <map netsignal="" comp_signal="{a9d3d159-fca9-417e-8bba-13829caa6ae5}"/>
             </signal_mapping>
         </instance>
-        <instance symbol_variant="{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}" uuid="{2a27ab8f-6845-46e7-8670-51c4c253ced9}" generic_component="{60000002-3c94-4689-be29-92235ba993c5}">
-            <name>U4</name>
-            <value>LM358</value>
+        <instance generic_component="{b39b86e1-2bcc-44fa-ae41-39d2f4b9f71f}" uuid="{c5c455c3-dcd5-41ad-8d4a-fbdadab508a9}" symbol_variant="{f9c64190-8dc9-4e3a-ab93-9437b0b3aae8}">
+            <name>L18</name>
+            <value>${INDUCTANCE}</value>
+            <attributes>
+                <attribute key="INDUCTANCE">
+                    <type>inductance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{51b377a0-f4ee-4535-ba86-6a8f38f192d0}" comp_signal="{d3cfa92a-d929-404f-ad9d-3c8a535b4eff}"/>
+                <map netsignal="{775bea44-d177-454c-b09f-26f5451a8e60}" comp_signal="{63e0eb4a-c764-4a7b-a9ab-2fedf4c776e1}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{e139c1ba-9d18-4f64-8a43-9a008ada7118}" uuid="{c0acb560-a4ea-46a4-952a-9b6d78519c48}" symbol_variant="{94df66a0-a1f5-4b7d-9c57-22531a38e1f1}">
+            <name>C7</name>
+            <value>${CAPACITANCE}</value>
+            <attributes>
+                <attribute key="CAPACITANCE">
+                    <type>capacitance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="" comp_signal="{5ebbbe7c-e0b5-4c71-ad13-6d2d921f85c7}"/>
+                <map netsignal="{64cd46da-fb9e-4193-a450-44cc16398d41}" comp_signal="{5a04c238-0325-4406-bf7d-c0876027c4b7}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{758c0792-7686-4d0a-8566-491a2676e496}" uuid="{698b23de-e4bb-4837-a503-2ee9c4b82a08}" symbol_variant="{bc4a996e-5b6f-4e67-9964-75d51e4962ec}">
+            <name>SUPPLY14</name>
+            <value>VCC</value>
             <attributes/>
             <signal_mapping>
-                <map comp_signal="{da30b112-9ab0-4715-8a6a-9e5414169fd4}" netsignal="{2baa4f93-f706-4c9d-944c-33fc131ee2df}"/>
-                <map comp_signal="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}" netsignal="{61fd695d-000b-41d4-8b9f-4757642a0692}"/>
-                <map comp_signal="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}" netsignal="{b76b558f-b2ac-45f5-a568-9c2266cd992b}"/>
-                <map comp_signal="{71a44db9-5e42-405f-b6e4-b4725ae37af3}" netsignal="{3e4ad946-2f80-498d-a1fd-095391883c7f}"/>
-                <map comp_signal="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}" netsignal="{508561e3-321a-47be-8b5e-b80f3e3fc1a4}"/>
-                <map comp_signal="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}" netsignal="{2baa4f93-f706-4c9d-944c-33fc131ee2df}"/>
-                <map comp_signal="{a9d3d159-fca9-417e-8bba-13829caa6ae5}" netsignal="{63cd3916-d2e2-4cf4-83f8-84bcd86cd005}"/>
-                <map comp_signal="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}" netsignal="{2baa4f93-f706-4c9d-944c-33fc131ee2df}"/>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{c2268dc8-cd1b-49c1-ae9d-b12e48686d2f}"/>
             </signal_mapping>
         </instance>
-        <instance symbol_variant="{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}" uuid="{ec9a9255-270e-4c8f-a3b0-74dc67882345}" generic_component="{60000002-3c94-4689-be29-92235ba993c5}">
-            <name>U5</name>
-            <value>LM358</value>
+        <instance generic_component="{e139c1ba-9d18-4f64-8a43-9a008ada7118}" uuid="{0133a21d-d3ee-4493-adc2-c3ef4364aa87}" symbol_variant="{94df66a0-a1f5-4b7d-9c57-22531a38e1f1}">
+            <name>C11</name>
+            <value>${CAPACITANCE}</value>
+            <attributes>
+                <attribute key="CAPACITANCE">
+                    <type>capacitance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{994b8122-d61b-487b-8355-bababb1df7df}" comp_signal="{5ebbbe7c-e0b5-4c71-ad13-6d2d921f85c7}"/>
+                <map netsignal="{6e6b8fff-4866-4943-822c-472bd0210894}" comp_signal="{5a04c238-0325-4406-bf7d-c0876027c4b7}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{758c0792-7686-4d0a-8566-491a2676e496}" uuid="{4df774df-f6f0-4eda-b1e2-7041474dd5d7}" symbol_variant="{bc4a996e-5b6f-4e67-9964-75d51e4962ec}">
+            <name>SUPPLY1</name>
+            <value>VCC</value>
             <attributes/>
             <signal_mapping>
-                <map comp_signal="{da30b112-9ab0-4715-8a6a-9e5414169fd4}" netsignal="{655ffec0-4797-4896-87cb-84096e075deb}"/>
-                <map comp_signal="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}" netsignal="{b76b558f-b2ac-45f5-a568-9c2266cd992b}"/>
-                <map comp_signal="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}" netsignal="{61fd695d-000b-41d4-8b9f-4757642a0692}"/>
-                <map comp_signal="{71a44db9-5e42-405f-b6e4-b4725ae37af3}" netsignal="{508561e3-321a-47be-8b5e-b80f3e3fc1a4}"/>
-                <map comp_signal="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}" netsignal="{3e4ad946-2f80-498d-a1fd-095391883c7f}"/>
-                <map comp_signal="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}" netsignal="{6def778b-4966-42c0-9fa9-036928ea63e6}"/>
-                <map comp_signal="{a9d3d159-fca9-417e-8bba-13829caa6ae5}" netsignal="{5fb5a1c9-249b-4f60-b20f-a0d1b4479420}"/>
-                <map comp_signal="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}" netsignal="{5fb5a1c9-249b-4f60-b20f-a0d1b4479420}"/>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{c2268dc8-cd1b-49c1-ae9d-b12e48686d2f}"/>
             </signal_mapping>
         </instance>
-        <instance symbol_variant="{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}" uuid="{e20729f1-72e3-40f0-907a-feca472fdee0}" generic_component="{60000002-3c94-4689-be29-92235ba993c5}">
-            <name>U6</name>
-            <value>LM358</value>
-            <attributes/>
-            <signal_mapping>
-                <map comp_signal="{da30b112-9ab0-4715-8a6a-9e5414169fd4}" netsignal="{e27ec30a-18f9-425b-97fc-10e75b02d3aa}"/>
-                <map comp_signal="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}" netsignal="{9e463c5b-6a85-48ff-acf2-7d9699f89d02}"/>
-                <map comp_signal="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}" netsignal="{56d131bb-fd15-4c97-a0a7-464b721a04b0}"/>
-                <map comp_signal="{71a44db9-5e42-405f-b6e4-b4725ae37af3}" netsignal="{dcf0ff7d-c2d8-4f55-be08-4a33004eba1f}"/>
-                <map comp_signal="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}" netsignal="{9e463c5b-6a85-48ff-acf2-7d9699f89d02}"/>
-                <map comp_signal="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}" netsignal="{56d131bb-fd15-4c97-a0a7-464b721a04b0}"/>
-                <map comp_signal="{a9d3d159-fca9-417e-8bba-13829caa6ae5}" netsignal="{e27ec30a-18f9-425b-97fc-10e75b02d3aa}"/>
-                <map comp_signal="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}" netsignal="{56d131bb-fd15-4c97-a0a7-464b721a04b0}"/>
-            </signal_mapping>
-        </instance>
-        <instance symbol_variant="{e8e00b88-f086-4edc-b3e1-742f2dcd2058}" uuid="{4a0664d1-3902-43d7-941c-f8c394f6d4aa}" generic_component="{2262ba69-33b0-414d-b03b-e1924a3fb3c8}">
-            <name>R1</name>
+        <instance generic_component="{2262ba69-33b0-414d-b03b-e1924a3fb3c8}" uuid="{51813f4c-9a0e-4930-897d-a0c7ed4be85c}" symbol_variant="{e8e00b88-f086-4edc-b3e1-742f2dcd2058}">
+            <name>R8</name>
             <value>${RESISTANCE}</value>
             <attributes>
                 <attribute key="RESISTANCE">
                     <type>resistance</type>
-                    <value>10kΩ</value>
+                    <value></value>
                 </attribute>
             </attributes>
             <signal_mapping>
-                <map comp_signal="{0aad1265-8261-4bde-8fc7-846e2ea7aa92}" netsignal="{9bfdff1f-f964-4323-b3e7-66ba7e629b7c}"/>
-                <map comp_signal="{debf3b4e-86cc-4af0-943f-5c1662a274db}" netsignal="{5818eabc-1778-4747-bf2d-43ae0e23a8ed}"/>
+                <map netsignal="" comp_signal="{debf3b4e-86cc-4af0-943f-5c1662a274db}"/>
+                <map netsignal="" comp_signal="{0aad1265-8261-4bde-8fc7-846e2ea7aa92}"/>
             </signal_mapping>
         </instance>
-        <instance symbol_variant="{94df66a0-a1f5-4b7d-9c57-22531a38e1f1}" uuid="{93616f8e-a7f7-4527-b0b4-c0f43f15cd20}" generic_component="{e139c1ba-9d18-4f64-8a43-9a008ada7118}">
+        <instance generic_component="{60000002-3c94-4689-be29-92235ba993c5}" uuid="{2932c868-7765-4386-a234-98d52a81eda3}" symbol_variant="{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}">
+            <name>U16</name>
+            <value></value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{278fab89-84d9-485c-bb3e-200edacc5b0a}" comp_signal="{71a44db9-5e42-405f-b6e4-b4725ae37af3}"/>
+                <map netsignal="{60a3553c-f607-485e-b157-50de18109c90}" comp_signal="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}"/>
+                <map netsignal="" comp_signal="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}"/>
+                <map netsignal="{e2066711-bfdb-47c4-8124-d86e2be75663}" comp_signal="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}"/>
+                <map netsignal="{2aa9dcb1-0737-475a-a303-1f8043375e1e}" comp_signal="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}"/>
+                <map netsignal="{29be68bb-afa6-40b0-a8a4-678724f71f98}" comp_signal="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}"/>
+                <map netsignal="{fe6e33e2-85cc-45ef-b678-b00fd5478592}" comp_signal="{da30b112-9ab0-4715-8a6a-9e5414169fd4}"/>
+                <map netsignal="{eacd4d76-8b16-46fc-a977-64317aa23c18}" comp_signal="{a9d3d159-fca9-417e-8bba-13829caa6ae5}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{60000000-7785-4665-a3e6-fe8d5224ef37}" uuid="{7fe07dd4-aaee-4a28-ae35-d22c2904a462}" symbol_variant="{5de93550-f32b-4663-89d8-2ade0c5982a8}">
+            <name>U1</name>
+            <value></value>
+            <attributes/>
+            <signal_mapping/>
+        </instance>
+        <instance generic_component="{eb5070a5-f11e-4442-be70-ecf17fe04602}" uuid="{3f864194-d225-40bc-be9c-52b2d8f9fea5}" symbol_variant="{f8c471b1-1069-413e-9ac9-b94ecd893293}">
+            <name>SUPPLY10</name>
+            <value>GND</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{6d408310-977c-4d62-aeaa-4d7e5b9324ac}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{60000002-3c94-4689-be29-92235ba993c5}" uuid="{682a725f-82ce-4014-a9b8-2fa0dcc1e4ee}" symbol_variant="{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}">
+            <name>U9</name>
+            <value></value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{e2066711-bfdb-47c4-8124-d86e2be75663}" comp_signal="{71a44db9-5e42-405f-b6e4-b4725ae37af3}"/>
+                <map netsignal="{bff6f54d-6e28-4501-8000-0c14b51173f9}" comp_signal="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}"/>
+                <map netsignal="" comp_signal="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}"/>
+                <map netsignal="" comp_signal="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}"/>
+                <map netsignal="{bd861459-dfa2-4984-9f98-f2f248030e1c}" comp_signal="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}"/>
+                <map netsignal="" comp_signal="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}"/>
+                <map netsignal="" comp_signal="{da30b112-9ab0-4715-8a6a-9e5414169fd4}"/>
+                <map netsignal="" comp_signal="{a9d3d159-fca9-417e-8bba-13829caa6ae5}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{b39b86e1-2bcc-44fa-ae41-39d2f4b9f71f}" uuid="{769598b3-4bdd-44c4-bedc-8bdb793b3aa4}" symbol_variant="{f9c64190-8dc9-4e3a-ab93-9437b0b3aae8}">
+            <name>L5</name>
+            <value>${INDUCTANCE}</value>
+            <attributes>
+                <attribute key="INDUCTANCE">
+                    <type>inductance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{d3cfa92a-d929-404f-ad9d-3c8a535b4eff}"/>
+                <map netsignal="" comp_signal="{63e0eb4a-c764-4a7b-a9ab-2fedf4c776e1}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{b39b86e1-2bcc-44fa-ae41-39d2f4b9f71f}" uuid="{5d388d9a-0338-48c7-bcf2-57bc07c73f26}" symbol_variant="{f9c64190-8dc9-4e3a-ab93-9437b0b3aae8}">
+            <name>L9</name>
+            <value>${INDUCTANCE}</value>
+            <attributes>
+                <attribute key="INDUCTANCE">
+                    <type>inductance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{4301cc5e-0517-4d41-a0ec-4806b6413ddc}" comp_signal="{d3cfa92a-d929-404f-ad9d-3c8a535b4eff}"/>
+                <map netsignal="{8f04a4db-4aa7-41aa-9fb7-bacb40cad630}" comp_signal="{63e0eb4a-c764-4a7b-a9ab-2fedf4c776e1}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{2262ba69-33b0-414d-b03b-e1924a3fb3c8}" uuid="{348dd952-2fe8-4892-a7e4-6607c3f87058}" symbol_variant="{e8e00b88-f086-4edc-b3e1-742f2dcd2058}">
+            <name>R20</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{01783a6a-af8f-44dd-88a3-d4f661e462ab}" comp_signal="{debf3b4e-86cc-4af0-943f-5c1662a274db}"/>
+                <map netsignal="{65b500e7-6a4e-4c08-aa30-d614a60626ee}" comp_signal="{0aad1265-8261-4bde-8fc7-846e2ea7aa92}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{2262ba69-33b0-414d-b03b-e1924a3fb3c8}" uuid="{a7bebbed-7116-4847-8f31-3ebc67fe6e00}" symbol_variant="{e8e00b88-f086-4edc-b3e1-742f2dcd2058}">
+            <name>R17</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{01783a6a-af8f-44dd-88a3-d4f661e462ab}" comp_signal="{debf3b4e-86cc-4af0-943f-5c1662a274db}"/>
+                <map netsignal="{be076fa5-a59e-4b0c-9b53-5ef73e06fb1e}" comp_signal="{0aad1265-8261-4bde-8fc7-846e2ea7aa92}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{eb5070a5-f11e-4442-be70-ecf17fe04602}" uuid="{140c68ac-d3e9-49df-9886-e89d2d702b92}" symbol_variant="{f8c471b1-1069-413e-9ac9-b94ecd893293}">
+            <name>SUPPLY2</name>
+            <value>GND</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{6d408310-977c-4d62-aeaa-4d7e5b9324ac}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{2262ba69-33b0-414d-b03b-e1924a3fb3c8}" uuid="{acbd1c04-e230-427e-8833-523c04cc1ae8}" symbol_variant="{e8e00b88-f086-4edc-b3e1-742f2dcd2058}">
+            <name>R4</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="" comp_signal="{debf3b4e-86cc-4af0-943f-5c1662a274db}"/>
+                <map netsignal="{2b3c6e2a-970b-4769-83cf-cd741758125a}" comp_signal="{0aad1265-8261-4bde-8fc7-846e2ea7aa92}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{b39b86e1-2bcc-44fa-ae41-39d2f4b9f71f}" uuid="{b1dce039-3767-457c-ba6c-d7816b32ba5c}" symbol_variant="{f9c64190-8dc9-4e3a-ab93-9437b0b3aae8}">
+            <name>L17</name>
+            <value>${INDUCTANCE}</value>
+            <attributes>
+                <attribute key="INDUCTANCE">
+                    <type>inductance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{51b377a0-f4ee-4535-ba86-6a8f38f192d0}" comp_signal="{d3cfa92a-d929-404f-ad9d-3c8a535b4eff}"/>
+                <map netsignal="{65b500e7-6a4e-4c08-aa30-d614a60626ee}" comp_signal="{63e0eb4a-c764-4a7b-a9ab-2fedf4c776e1}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{e139c1ba-9d18-4f64-8a43-9a008ada7118}" uuid="{f36b6750-b3fd-49e0-bf78-206a7496e944}" symbol_variant="{94df66a0-a1f5-4b7d-9c57-22531a38e1f1}">
+            <name>C4</name>
+            <value>${CAPACITANCE}</value>
+            <attributes>
+                <attribute key="CAPACITANCE">
+                    <type>capacitance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{c8691a6b-1533-4b64-8292-5a28495a93c9}" comp_signal="{5ebbbe7c-e0b5-4c71-ad13-6d2d921f85c7}"/>
+                <map netsignal="{c8433724-217f-4501-b631-676d2eab8303}" comp_signal="{5a04c238-0325-4406-bf7d-c0876027c4b7}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{e139c1ba-9d18-4f64-8a43-9a008ada7118}" uuid="{11416fe6-82ec-4ae5-8e81-9fb383b809a6}" symbol_variant="{94df66a0-a1f5-4b7d-9c57-22531a38e1f1}">
+            <name>C5</name>
+            <value>${CAPACITANCE}</value>
+            <attributes>
+                <attribute key="CAPACITANCE">
+                    <type>capacitance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{2aa9dcb1-0737-475a-a303-1f8043375e1e}" comp_signal="{5ebbbe7c-e0b5-4c71-ad13-6d2d921f85c7}"/>
+                <map netsignal="{8d9a21c3-ec4b-4260-b6ff-4e74de6f11dd}" comp_signal="{5a04c238-0325-4406-bf7d-c0876027c4b7}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{60000002-3c94-4689-be29-92235ba993c5}" uuid="{e20729f1-72e3-40f0-907a-feca472fdee0}" symbol_variant="{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}">
+            <name>U6</name>
+            <value>LM358</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{dcf0ff7d-c2d8-4f55-be08-4a33004eba1f}" comp_signal="{71a44db9-5e42-405f-b6e4-b4725ae37af3}"/>
+                <map netsignal="{9e463c5b-6a85-48ff-acf2-7d9699f89d02}" comp_signal="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}"/>
+                <map netsignal="{56d131bb-fd15-4c97-a0a7-464b721a04b0}" comp_signal="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}"/>
+                <map netsignal="{56d131bb-fd15-4c97-a0a7-464b721a04b0}" comp_signal="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}"/>
+                <map netsignal="{56d131bb-fd15-4c97-a0a7-464b721a04b0}" comp_signal="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}"/>
+                <map netsignal="{9e463c5b-6a85-48ff-acf2-7d9699f89d02}" comp_signal="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}"/>
+                <map netsignal="{e27ec30a-18f9-425b-97fc-10e75b02d3aa}" comp_signal="{da30b112-9ab0-4715-8a6a-9e5414169fd4}"/>
+                <map netsignal="{e27ec30a-18f9-425b-97fc-10e75b02d3aa}" comp_signal="{a9d3d159-fca9-417e-8bba-13829caa6ae5}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{60000000-7785-4665-a3e6-fe8d5224ef37}" uuid="{8fe07dd4-aaee-4a28-ae35-d22c2904a462}" symbol_variant="{5de93550-f32b-4663-89d8-2ade0c5982a8}">
+            <name>U2</name>
+            <value></value>
+            <attributes/>
+            <signal_mapping/>
+        </instance>
+        <instance generic_component="{758c0792-7686-4d0a-8566-491a2676e496}" uuid="{7aa35cee-06d6-4230-acb1-0af44bde48e1}" symbol_variant="{bc4a996e-5b6f-4e67-9964-75d51e4962ec}">
+            <name>SUPPLY8</name>
+            <value>VCC</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{c2268dc8-cd1b-49c1-ae9d-b12e48686d2f}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{2262ba69-33b0-414d-b03b-e1924a3fb3c8}" uuid="{402847d6-87c3-4242-8438-bdc2bd90fd17}" symbol_variant="{e8e00b88-f086-4edc-b3e1-742f2dcd2058}">
+            <name>R7</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{01783a6a-af8f-44dd-88a3-d4f661e462ab}" comp_signal="{debf3b4e-86cc-4af0-943f-5c1662a274db}"/>
+                <map netsignal="{beaea496-53b3-4b3f-940c-d8abd2a64de8}" comp_signal="{0aad1265-8261-4bde-8fc7-846e2ea7aa92}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{e139c1ba-9d18-4f64-8a43-9a008ada7118}" uuid="{65f82249-6f8f-4765-bc5b-f38607dbdf3c}" symbol_variant="{94df66a0-a1f5-4b7d-9c57-22531a38e1f1}">
+            <name>C9</name>
+            <value>${CAPACITANCE}</value>
+            <attributes>
+                <attribute key="CAPACITANCE">
+                    <type>capacitance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="" comp_signal="{5ebbbe7c-e0b5-4c71-ad13-6d2d921f85c7}"/>
+                <map netsignal="{79e88419-ada7-415b-959d-bc105aac63ec}" comp_signal="{5a04c238-0325-4406-bf7d-c0876027c4b7}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{b39b86e1-2bcc-44fa-ae41-39d2f4b9f71f}" uuid="{1eb14a14-2160-4111-9784-c18dabf68177}" symbol_variant="{f9c64190-8dc9-4e3a-ab93-9437b0b3aae8}">
+            <name>L10</name>
+            <value>${INDUCTANCE}</value>
+            <attributes>
+                <attribute key="INDUCTANCE">
+                    <type>inductance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{6e6b8fff-4866-4943-822c-472bd0210894}" comp_signal="{d3cfa92a-d929-404f-ad9d-3c8a535b4eff}"/>
+                <map netsignal="{b64a9f04-99a1-4efc-8bdb-792198a2ea7a}" comp_signal="{63e0eb4a-c764-4a7b-a9ab-2fedf4c776e1}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{eb5070a5-f11e-4442-be70-ecf17fe04602}" uuid="{32f18d6d-68a2-499f-840e-bb5ab1492db5}" symbol_variant="{f8c471b1-1069-413e-9ac9-b94ecd893293}">
+            <name>SUPPLY6</name>
+            <value>GND</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{6d408310-977c-4d62-aeaa-4d7e5b9324ac}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{758c0792-7686-4d0a-8566-491a2676e496}" uuid="{102b4d43-683e-4615-a923-296852357cec}" symbol_variant="{bc4a996e-5b6f-4e67-9964-75d51e4962ec}">
+            <name>SUPPLY16</name>
+            <value>VCC</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{c2268dc8-cd1b-49c1-ae9d-b12e48686d2f}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{b39b86e1-2bcc-44fa-ae41-39d2f4b9f71f}" uuid="{90ad2afd-1291-49cc-b7e9-43d96b0033f2}" symbol_variant="{f9c64190-8dc9-4e3a-ab93-9437b0b3aae8}">
+            <name>L7</name>
+            <value>${INDUCTANCE}</value>
+            <attributes>
+                <attribute key="INDUCTANCE">
+                    <type>inductance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{8094c756-bacc-425e-ba64-15f9f947abcc}" comp_signal="{d3cfa92a-d929-404f-ad9d-3c8a535b4eff}"/>
+                <map netsignal="{6c43f8c6-072c-4959-83de-b6332b262c9e}" comp_signal="{63e0eb4a-c764-4a7b-a9ab-2fedf4c776e1}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{758c0792-7686-4d0a-8566-491a2676e496}" uuid="{751d7054-f358-46fe-ad78-54c2947bc8cb}" symbol_variant="{bc4a996e-5b6f-4e67-9964-75d51e4962ec}">
+            <name>SUPPLY17</name>
+            <value>VCC</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{c2268dc8-cd1b-49c1-ae9d-b12e48686d2f}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{2262ba69-33b0-414d-b03b-e1924a3fb3c8}" uuid="{2e213d5a-90d6-44a7-8e07-7c20993e7f26}" symbol_variant="{e8e00b88-f086-4edc-b3e1-742f2dcd2058}">
+            <name>R6</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{5d0e1fb9-60f8-49e0-adb8-cec05853d540}" comp_signal="{debf3b4e-86cc-4af0-943f-5c1662a274db}"/>
+                <map netsignal="{7d64ab78-3a61-4385-9ca9-7661eabcbdbe}" comp_signal="{0aad1265-8261-4bde-8fc7-846e2ea7aa92}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{2262ba69-33b0-414d-b03b-e1924a3fb3c8}" uuid="{f6bce718-06ae-40d8-b7fa-bac33324bee4}" symbol_variant="{e8e00b88-f086-4edc-b3e1-742f2dcd2058}">
+            <name>R5</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{2b3c6e2a-970b-4769-83cf-cd741758125a}" comp_signal="{debf3b4e-86cc-4af0-943f-5c1662a274db}"/>
+                <map netsignal="{7cca6ac9-82ce-4c8d-8136-b33dc466fb2a}" comp_signal="{0aad1265-8261-4bde-8fc7-846e2ea7aa92}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{b39b86e1-2bcc-44fa-ae41-39d2f4b9f71f}" uuid="{7c672478-1935-414f-8ff3-8ec57b0e6f8e}" symbol_variant="{f9c64190-8dc9-4e3a-ab93-9437b0b3aae8}">
+            <name>L16</name>
+            <value>${INDUCTANCE}</value>
+            <attributes>
+                <attribute key="INDUCTANCE">
+                    <type>inductance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{51b377a0-f4ee-4535-ba86-6a8f38f192d0}" comp_signal="{d3cfa92a-d929-404f-ad9d-3c8a535b4eff}"/>
+                <map netsignal="{84650db5-0504-493d-859e-8efed332cd21}" comp_signal="{63e0eb4a-c764-4a7b-a9ab-2fedf4c776e1}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{b39b86e1-2bcc-44fa-ae41-39d2f4b9f71f}" uuid="{8357b041-46c8-4efd-83b7-4ad58fdaf98d}" symbol_variant="{f9c64190-8dc9-4e3a-ab93-9437b0b3aae8}">
+            <name>L11</name>
+            <value>${INDUCTANCE}</value>
+            <attributes>
+                <attribute key="INDUCTANCE">
+                    <type>inductance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{51b377a0-f4ee-4535-ba86-6a8f38f192d0}" comp_signal="{d3cfa92a-d929-404f-ad9d-3c8a535b4eff}"/>
+                <map netsignal="{6a9c7f0b-b1ca-4724-8eda-12c86a0d8b36}" comp_signal="{63e0eb4a-c764-4a7b-a9ab-2fedf4c776e1}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{b39b86e1-2bcc-44fa-ae41-39d2f4b9f71f}" uuid="{4863cff8-3ced-4a08-9feb-3f5171473683}" symbol_variant="{f9c64190-8dc9-4e3a-ab93-9437b0b3aae8}">
+            <name>L13</name>
+            <value>${INDUCTANCE}</value>
+            <attributes>
+                <attribute key="INDUCTANCE">
+                    <type>inductance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{51b377a0-f4ee-4535-ba86-6a8f38f192d0}" comp_signal="{d3cfa92a-d929-404f-ad9d-3c8a535b4eff}"/>
+                <map netsignal="{3b151512-7977-4cd3-921c-a7f9f196842a}" comp_signal="{63e0eb4a-c764-4a7b-a9ab-2fedf4c776e1}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{eb5070a5-f11e-4442-be70-ecf17fe04602}" uuid="{a289c85d-b970-4dea-87b2-71c4c42b7595}" symbol_variant="{f8c471b1-1069-413e-9ac9-b94ecd893293}">
+            <name>SUPPLY7</name>
+            <value>GND</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{6d408310-977c-4d62-aeaa-4d7e5b9324ac}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{eb5070a5-f11e-4442-be70-ecf17fe04602}" uuid="{3f5df79c-990a-4f3f-8c3e-2626269b1eaf}" symbol_variant="{f8c471b1-1069-413e-9ac9-b94ecd893293}">
+            <name>SUPPLY5</name>
+            <value>GND</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{6d408310-977c-4d62-aeaa-4d7e5b9324ac}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{2262ba69-33b0-414d-b03b-e1924a3fb3c8}" uuid="{515ed99f-f2cd-411b-8a36-bba28a457df4}" symbol_variant="{e8e00b88-f086-4edc-b3e1-742f2dcd2058}">
+            <name>R19</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{01783a6a-af8f-44dd-88a3-d4f661e462ab}" comp_signal="{debf3b4e-86cc-4af0-943f-5c1662a274db}"/>
+                <map netsignal="{6a9c7f0b-b1ca-4724-8eda-12c86a0d8b36}" comp_signal="{0aad1265-8261-4bde-8fc7-846e2ea7aa92}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{2262ba69-33b0-414d-b03b-e1924a3fb3c8}" uuid="{928bea61-fceb-4a20-946c-97c9aa4e2e56}" symbol_variant="{e8e00b88-f086-4edc-b3e1-742f2dcd2058}">
+            <name>R21</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{01783a6a-af8f-44dd-88a3-d4f661e462ab}" comp_signal="{debf3b4e-86cc-4af0-943f-5c1662a274db}"/>
+                <map netsignal="{775bea44-d177-454c-b09f-26f5451a8e60}" comp_signal="{0aad1265-8261-4bde-8fc7-846e2ea7aa92}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{2262ba69-33b0-414d-b03b-e1924a3fb3c8}" uuid="{8f75f014-07e7-437c-97ab-0a0ff5d850b3}" symbol_variant="{e8e00b88-f086-4edc-b3e1-742f2dcd2058}">
+            <name>R11</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{118a0977-be86-419e-aba8-801a81074e8f}" comp_signal="{debf3b4e-86cc-4af0-943f-5c1662a274db}"/>
+                <map netsignal="{7c5efb8e-33d8-406b-afa2-d6c6260baf15}" comp_signal="{0aad1265-8261-4bde-8fc7-846e2ea7aa92}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{b39b86e1-2bcc-44fa-ae41-39d2f4b9f71f}" uuid="{295b7fc5-b330-4c3a-b372-2bae8771da71}" symbol_variant="{f9c64190-8dc9-4e3a-ab93-9437b0b3aae8}">
+            <name>L6</name>
+            <value>${INDUCTANCE}</value>
+            <attributes>
+                <attribute key="INDUCTANCE">
+                    <type>inductance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{e1f7b07d-b549-4af6-aac1-dc73dc30b1f9}" comp_signal="{d3cfa92a-d929-404f-ad9d-3c8a535b4eff}"/>
+                <map netsignal="{b69dedcd-80ea-465f-94df-d82f77fc75ae}" comp_signal="{63e0eb4a-c764-4a7b-a9ab-2fedf4c776e1}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{60000001-3c94-4689-be29-92235ba993c5}" uuid="{6fe07dd4-aaee-4a28-ae35-d22c2904a461}" symbol_variant="{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}">
+            <name>U3</name>
+            <value>NE555</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{71a44db9-5e42-405f-b6e4-b4725ae37af3}"/>
+                <map netsignal="" comp_signal="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}"/>
+                <map netsignal="{6def778b-4966-42c0-9fa9-036928ea63e6}" comp_signal="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}"/>
+                <map netsignal="" comp_signal="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}"/>
+                <map netsignal="" comp_signal="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}"/>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}"/>
+                <map netsignal="{655ffec0-4797-4896-87cb-84096e075deb}" comp_signal="{da30b112-9ab0-4715-8a6a-9e5414169fd4}"/>
+                <map netsignal="{63cd3916-d2e2-4cf4-83f8-84bcd86cd005}" comp_signal="{a9d3d159-fca9-417e-8bba-13829caa6ae5}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{e139c1ba-9d18-4f64-8a43-9a008ada7118}" uuid="{efb89ae5-03c7-4752-a0fc-b48a11c3e6c7}" symbol_variant="{94df66a0-a1f5-4b7d-9c57-22531a38e1f1}">
+            <name>C6</name>
+            <value>${CAPACITANCE}</value>
+            <attributes>
+                <attribute key="CAPACITANCE">
+                    <type>capacitance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{799f3696-5b0c-4320-bf91-83196b08c4f0}" comp_signal="{5ebbbe7c-e0b5-4c71-ad13-6d2d921f85c7}"/>
+                <map netsignal="{10b2e63a-50cc-48cd-a45c-3b33ea8b7e60}" comp_signal="{5a04c238-0325-4406-bf7d-c0876027c4b7}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{2262ba69-33b0-414d-b03b-e1924a3fb3c8}" uuid="{76ab1d5e-cfcc-4ab1-8761-1a4ef3a45177}" symbol_variant="{e8e00b88-f086-4edc-b3e1-742f2dcd2058}">
+            <name>R3</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{c96a90c6-e6de-4c2f-8797-2ca7f62cbf5a}" comp_signal="{debf3b4e-86cc-4af0-943f-5c1662a274db}"/>
+                <map netsignal="{fe6e33e2-85cc-45ef-b678-b00fd5478592}" comp_signal="{0aad1265-8261-4bde-8fc7-846e2ea7aa92}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{60000002-3c94-4689-be29-92235ba993c5}" uuid="{c57799a9-f3a1-4eb8-99b8-5560c4c417c7}" symbol_variant="{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}">
+            <name>U8</name>
+            <value></value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{e41ef2d5-ff0e-4fff-9c6f-445bb22c4278}" comp_signal="{71a44db9-5e42-405f-b6e4-b4725ae37af3}"/>
+                <map netsignal="{eacd4d76-8b16-46fc-a977-64317aa23c18}" comp_signal="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}"/>
+                <map netsignal="{7d64ab78-3a61-4385-9ca9-7661eabcbdbe}" comp_signal="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}"/>
+                <map netsignal="{5d0e1fb9-60f8-49e0-adb8-cec05853d540}" comp_signal="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}"/>
+                <map netsignal="{5d0e1fb9-60f8-49e0-adb8-cec05853d540}" comp_signal="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}"/>
+                <map netsignal="{e41ef2d5-ff0e-4fff-9c6f-445bb22c4278}" comp_signal="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}"/>
+                <map netsignal="{6563b6d8-0e9f-4741-820b-78b7ac90e530}" comp_signal="{da30b112-9ab0-4715-8a6a-9e5414169fd4}"/>
+                <map netsignal="{118a0977-be86-419e-aba8-801a81074e8f}" comp_signal="{a9d3d159-fca9-417e-8bba-13829caa6ae5}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{2262ba69-33b0-414d-b03b-e1924a3fb3c8}" uuid="{24a776e2-1227-4d73-a5ef-09c57be0f290}" symbol_variant="{e8e00b88-f086-4edc-b3e1-742f2dcd2058}">
+            <name>R2</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{7c5efb8e-33d8-406b-afa2-d6c6260baf15}" comp_signal="{debf3b4e-86cc-4af0-943f-5c1662a274db}"/>
+                <map netsignal="{6563b6d8-0e9f-4741-820b-78b7ac90e530}" comp_signal="{0aad1265-8261-4bde-8fc7-846e2ea7aa92}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{2262ba69-33b0-414d-b03b-e1924a3fb3c8}" uuid="{f75e0324-64d7-4fac-87f3-f65c4a0b2ecd}" symbol_variant="{e8e00b88-f086-4edc-b3e1-742f2dcd2058}">
+            <name>R18</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{01783a6a-af8f-44dd-88a3-d4f661e462ab}" comp_signal="{debf3b4e-86cc-4af0-943f-5c1662a274db}"/>
+                <map netsignal="{84650db5-0504-493d-859e-8efed332cd21}" comp_signal="{0aad1265-8261-4bde-8fc7-846e2ea7aa92}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{60000002-3c94-4689-be29-92235ba993c5}" uuid="{9265a6ff-3769-4a3b-a14f-13d88e1f1fa8}" symbol_variant="{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}">
+            <name>U13</name>
+            <value></value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{c8433724-217f-4501-b631-676d2eab8303}" comp_signal="{71a44db9-5e42-405f-b6e4-b4725ae37af3}"/>
+                <map netsignal="{278fab89-84d9-485c-bb3e-200edacc5b0a}" comp_signal="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}"/>
+                <map netsignal="{011f59b2-1b91-497a-86ca-648e6b5d14cc}" comp_signal="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}"/>
+                <map netsignal="{c8433724-217f-4501-b631-676d2eab8303}" comp_signal="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}"/>
+                <map netsignal="{39985c4c-5f6a-41c0-b8c0-a99307427b04}" comp_signal="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}"/>
+                <map netsignal="{c8691a6b-1533-4b64-8292-5a28495a93c9}" comp_signal="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}"/>
+                <map netsignal="{6c43f8c6-072c-4959-83de-b6332b262c9e}" comp_signal="{da30b112-9ab0-4715-8a6a-9e5414169fd4}"/>
+                <map netsignal="{9d9cc318-707c-4007-b069-e53adc9ec937}" comp_signal="{a9d3d159-fca9-417e-8bba-13829caa6ae5}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{e139c1ba-9d18-4f64-8a43-9a008ada7118}" uuid="{44b8a403-422c-4e6a-9bdd-d6e26864ceb6}" symbol_variant="{94df66a0-a1f5-4b7d-9c57-22531a38e1f1}">
+            <name>C8</name>
+            <value>${CAPACITANCE}</value>
+            <attributes>
+                <attribute key="CAPACITANCE">
+                    <type>capacitance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{bff6f54d-6e28-4501-8000-0c14b51173f9}" comp_signal="{5ebbbe7c-e0b5-4c71-ad13-6d2d921f85c7}"/>
+                <map netsignal="{7cca6ac9-82ce-4c8d-8136-b33dc466fb2a}" comp_signal="{5a04c238-0325-4406-bf7d-c0876027c4b7}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{eb5070a5-f11e-4442-be70-ecf17fe04602}" uuid="{cbe7a084-4eab-41d4-bf76-ce74298c460c}" symbol_variant="{f8c471b1-1069-413e-9ac9-b94ecd893293}">
+            <name>SUPPLY11</name>
+            <value>GND</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{6d408310-977c-4d62-aeaa-4d7e5b9324ac}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{60000002-3c94-4689-be29-92235ba993c5}" uuid="{7f6cb9ab-320d-4587-9e83-b7fbfba51ee0}" symbol_variant="{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}">
+            <name>U11</name>
+            <value></value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{71a44db9-5e42-405f-b6e4-b4725ae37af3}"/>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}"/>
+                <map netsignal="" comp_signal="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}"/>
+                <map netsignal="" comp_signal="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}"/>
+                <map netsignal="{79e88419-ada7-415b-959d-bc105aac63ec}" comp_signal="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}"/>
+                <map netsignal="" comp_signal="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}"/>
+                <map netsignal="{e1f7b07d-b549-4af6-aac1-dc73dc30b1f9}" comp_signal="{da30b112-9ab0-4715-8a6a-9e5414169fd4}"/>
+                <map netsignal="{1127510e-fbdb-424a-8c4b-cc1480d741c5}" comp_signal="{a9d3d159-fca9-417e-8bba-13829caa6ae5}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{e139c1ba-9d18-4f64-8a43-9a008ada7118}" uuid="{93616f8e-a7f7-4527-b0b4-c0f43f15cd20}" symbol_variant="{94df66a0-a1f5-4b7d-9c57-22531a38e1f1}">
             <name>C1</name>
             <value>${CAPACITANCE}</value>
             <attributes>
@@ -121,11 +745,294 @@
                 </attribute>
             </attributes>
             <signal_mapping>
-                <map comp_signal="{5ebbbe7c-e0b5-4c71-ad13-6d2d921f85c7}" netsignal="{9bfdff1f-f964-4323-b3e7-66ba7e629b7c}"/>
-                <map comp_signal="{5a04c238-0325-4406-bf7d-c0876027c4b7}" netsignal="{5818eabc-1778-4747-bf2d-43ae0e23a8ed}"/>
+                <map netsignal="{9bfdff1f-f964-4323-b3e7-66ba7e629b7c}" comp_signal="{5ebbbe7c-e0b5-4c71-ad13-6d2d921f85c7}"/>
+                <map netsignal="{5818eabc-1778-4747-bf2d-43ae0e23a8ed}" comp_signal="{5a04c238-0325-4406-bf7d-c0876027c4b7}"/>
             </signal_mapping>
         </instance>
-        <instance symbol_variant="{f9c64190-8dc9-4e3a-ab93-9437b0b3aae8}" uuid="{7cabe836-d99c-40fd-976f-ed32315fbab2}" generic_component="{b39b86e1-2bcc-44fa-ae41-39d2f4b9f71f}">
+        <instance generic_component="{b39b86e1-2bcc-44fa-ae41-39d2f4b9f71f}" uuid="{f8475a76-9a66-4d5f-ae22-2fa64ea1e58e}" symbol_variant="{f9c64190-8dc9-4e3a-ab93-9437b0b3aae8}">
+            <name>L3</name>
+            <value>${INDUCTANCE}</value>
+            <attributes>
+                <attribute key="INDUCTANCE">
+                    <type>inductance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="" comp_signal="{d3cfa92a-d929-404f-ad9d-3c8a535b4eff}"/>
+                <map netsignal="{2aa9dcb1-0737-475a-a303-1f8043375e1e}" comp_signal="{63e0eb4a-c764-4a7b-a9ab-2fedf4c776e1}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{2262ba69-33b0-414d-b03b-e1924a3fb3c8}" uuid="{74b00339-9ad9-48c5-b8ad-4fd0f025d1ac}" symbol_variant="{e8e00b88-f086-4edc-b3e1-742f2dcd2058}">
+            <name>R13</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="" comp_signal="{debf3b4e-86cc-4af0-943f-5c1662a274db}"/>
+                <map netsignal="" comp_signal="{0aad1265-8261-4bde-8fc7-846e2ea7aa92}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{2262ba69-33b0-414d-b03b-e1924a3fb3c8}" uuid="{3c878f62-2ffd-4ad5-9cbd-e4f7be99132d}" symbol_variant="{e8e00b88-f086-4edc-b3e1-742f2dcd2058}">
+            <name>R12</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{201f465e-dabb-40e1-8bff-0c20ebbbbe3d}" comp_signal="{debf3b4e-86cc-4af0-943f-5c1662a274db}"/>
+                <map netsignal="{60a3553c-f607-485e-b157-50de18109c90}" comp_signal="{0aad1265-8261-4bde-8fc7-846e2ea7aa92}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{60000002-3c94-4689-be29-92235ba993c5}" uuid="{2a27ab8f-6845-46e7-8670-51c4c253ced9}" symbol_variant="{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}">
+            <name>U4</name>
+            <value>LM358</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{71a44db9-5e42-405f-b6e4-b4725ae37af3}"/>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}"/>
+                <map netsignal="{2baa4f93-f706-4c9d-944c-33fc131ee2df}" comp_signal="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}"/>
+                <map netsignal="{2baa4f93-f706-4c9d-944c-33fc131ee2df}" comp_signal="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}"/>
+                <map netsignal="{b76b558f-b2ac-45f5-a568-9c2266cd992b}" comp_signal="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}"/>
+                <map netsignal="{61fd695d-000b-41d4-8b9f-4757642a0692}" comp_signal="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}"/>
+                <map netsignal="{2baa4f93-f706-4c9d-944c-33fc131ee2df}" comp_signal="{da30b112-9ab0-4715-8a6a-9e5414169fd4}"/>
+                <map netsignal="{63cd3916-d2e2-4cf4-83f8-84bcd86cd005}" comp_signal="{a9d3d159-fca9-417e-8bba-13829caa6ae5}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{b39b86e1-2bcc-44fa-ae41-39d2f4b9f71f}" uuid="{c8be74f0-a840-4df2-b7df-f4c5877dff06}" symbol_variant="{f9c64190-8dc9-4e3a-ab93-9437b0b3aae8}">
+            <name>L12</name>
+            <value>${INDUCTANCE}</value>
+            <attributes>
+                <attribute key="INDUCTANCE">
+                    <type>inductance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{51b377a0-f4ee-4535-ba86-6a8f38f192d0}" comp_signal="{d3cfa92a-d929-404f-ad9d-3c8a535b4eff}"/>
+                <map netsignal="{beaea496-53b3-4b3f-940c-d8abd2a64de8}" comp_signal="{63e0eb4a-c764-4a7b-a9ab-2fedf4c776e1}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{2262ba69-33b0-414d-b03b-e1924a3fb3c8}" uuid="{069e121a-ee6f-4044-ad70-214563473742}" symbol_variant="{e8e00b88-f086-4edc-b3e1-742f2dcd2058}">
+            <name>R9</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="" comp_signal="{debf3b4e-86cc-4af0-943f-5c1662a274db}"/>
+                <map netsignal="{29be68bb-afa6-40b0-a8a4-678724f71f98}" comp_signal="{0aad1265-8261-4bde-8fc7-846e2ea7aa92}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{60000002-3c94-4689-be29-92235ba993c5}" uuid="{7a669225-5f7b-4718-9939-b1531a133623}" symbol_variant="{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}">
+            <name>U18</name>
+            <value></value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8094c756-bacc-425e-ba64-15f9f947abcc}" comp_signal="{71a44db9-5e42-405f-b6e4-b4725ae37af3}"/>
+                <map netsignal="{39985c4c-5f6a-41c0-b8c0-a99307427b04}" comp_signal="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}"/>
+                <map netsignal="" comp_signal="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}"/>
+                <map netsignal="{2db7b9dc-dea3-446c-b04a-c90f2e4b4582}" comp_signal="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}"/>
+                <map netsignal="{9d9cc318-707c-4007-b069-e53adc9ec937}" comp_signal="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}"/>
+                <map netsignal="{2f158fa5-221e-4218-8730-dde2cfb0bd16}" comp_signal="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}"/>
+                <map netsignal="" comp_signal="{da30b112-9ab0-4715-8a6a-9e5414169fd4}"/>
+                <map netsignal="" comp_signal="{a9d3d159-fca9-417e-8bba-13829caa6ae5}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{b39b86e1-2bcc-44fa-ae41-39d2f4b9f71f}" uuid="{ff38e886-e4ef-4544-8b8b-14a29c1ab6bc}" symbol_variant="{f9c64190-8dc9-4e3a-ab93-9437b0b3aae8}">
+            <name>L14</name>
+            <value>${INDUCTANCE}</value>
+            <attributes>
+                <attribute key="INDUCTANCE">
+                    <type>inductance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{51b377a0-f4ee-4535-ba86-6a8f38f192d0}" comp_signal="{d3cfa92a-d929-404f-ad9d-3c8a535b4eff}"/>
+                <map netsignal="{db27969d-359b-425b-8022-528eaf86f276}" comp_signal="{63e0eb4a-c764-4a7b-a9ab-2fedf4c776e1}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{eb5070a5-f11e-4442-be70-ecf17fe04602}" uuid="{5387b961-3d1c-46c7-8d28-df3e889f0076}" symbol_variant="{f8c471b1-1069-413e-9ac9-b94ecd893293}">
+            <name>SUPPLY12</name>
+            <value>GND</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{6d408310-977c-4d62-aeaa-4d7e5b9324ac}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{2262ba69-33b0-414d-b03b-e1924a3fb3c8}" uuid="{90212f86-b257-4f4b-9c29-c16c7278aede}" symbol_variant="{e8e00b88-f086-4edc-b3e1-742f2dcd2058}">
+            <name>R16</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{01783a6a-af8f-44dd-88a3-d4f661e462ab}" comp_signal="{debf3b4e-86cc-4af0-943f-5c1662a274db}"/>
+                <map netsignal="{db27969d-359b-425b-8022-528eaf86f276}" comp_signal="{0aad1265-8261-4bde-8fc7-846e2ea7aa92}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{eb5070a5-f11e-4442-be70-ecf17fe04602}" uuid="{5d9b73b7-b8af-43f5-a5dd-a58431832dc8}" symbol_variant="{f8c471b1-1069-413e-9ac9-b94ecd893293}">
+            <name>SUPPLY3</name>
+            <value>GND</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{6d408310-977c-4d62-aeaa-4d7e5b9324ac}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{60000002-3c94-4689-be29-92235ba993c5}" uuid="{938c8724-70d1-48ba-ae31-2565cd96a7eb}" symbol_variant="{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}">
+            <name>U10</name>
+            <value></value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="" comp_signal="{71a44db9-5e42-405f-b6e4-b4725ae37af3}"/>
+                <map netsignal="{7cca6ac9-82ce-4c8d-8136-b33dc466fb2a}" comp_signal="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}"/>
+                <map netsignal="{7d64ab78-3a61-4385-9ca9-7661eabcbdbe}" comp_signal="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}"/>
+                <map netsignal="{c96a90c6-e6de-4c2f-8797-2ca7f62cbf5a}" comp_signal="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}"/>
+                <map netsignal="{7d64ab78-3a61-4385-9ca9-7661eabcbdbe}" comp_signal="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}"/>
+                <map netsignal="{8d9a21c3-ec4b-4260-b6ff-4e74de6f11dd}" comp_signal="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}"/>
+                <map netsignal="{75c7b35f-5333-4263-8575-ba353122a87c}" comp_signal="{da30b112-9ab0-4715-8a6a-9e5414169fd4}"/>
+                <map netsignal="{7c5efb8e-33d8-406b-afa2-d6c6260baf15}" comp_signal="{a9d3d159-fca9-417e-8bba-13829caa6ae5}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{b39b86e1-2bcc-44fa-ae41-39d2f4b9f71f}" uuid="{4ea17aa3-1e1f-40cc-ad05-f5a22235ad9d}" symbol_variant="{f9c64190-8dc9-4e3a-ab93-9437b0b3aae8}">
+            <name>L15</name>
+            <value>${INDUCTANCE}</value>
+            <attributes>
+                <attribute key="INDUCTANCE">
+                    <type>inductance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{51b377a0-f4ee-4535-ba86-6a8f38f192d0}" comp_signal="{d3cfa92a-d929-404f-ad9d-3c8a535b4eff}"/>
+                <map netsignal="{be076fa5-a59e-4b0c-9b53-5ef73e06fb1e}" comp_signal="{63e0eb4a-c764-4a7b-a9ab-2fedf4c776e1}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{b39b86e1-2bcc-44fa-ae41-39d2f4b9f71f}" uuid="{dcd9faa2-6dcb-4def-b619-749648ca988e}" symbol_variant="{f9c64190-8dc9-4e3a-ab93-9437b0b3aae8}">
+            <name>L8</name>
+            <value>${INDUCTANCE}</value>
+            <attributes>
+                <attribute key="INDUCTANCE">
+                    <type>inductance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="" comp_signal="{d3cfa92a-d929-404f-ad9d-3c8a535b4eff}"/>
+                <map netsignal="{64cd46da-fb9e-4193-a450-44cc16398d41}" comp_signal="{63e0eb4a-c764-4a7b-a9ab-2fedf4c776e1}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{60000002-3c94-4689-be29-92235ba993c5}" uuid="{d051f85e-1d23-4d19-b8de-52b84228813c}" symbol_variant="{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}">
+            <name>U14</name>
+            <value></value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{799f3696-5b0c-4320-bf91-83196b08c4f0}" comp_signal="{71a44db9-5e42-405f-b6e4-b4725ae37af3}"/>
+                <map netsignal="{2db7b9dc-dea3-446c-b04a-c90f2e4b4582}" comp_signal="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}"/>
+                <map netsignal="{09bcc15f-157c-426c-b5be-a7ac53b44f28}" comp_signal="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}"/>
+                <map netsignal="{435808a6-4493-4155-8b5b-6f0751bbfe06}" comp_signal="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}"/>
+                <map netsignal="" comp_signal="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}"/>
+                <map netsignal="{6ae6493c-c054-46a5-a039-7909ae42ada0}" comp_signal="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}"/>
+                <map netsignal="{435808a6-4493-4155-8b5b-6f0751bbfe06}" comp_signal="{da30b112-9ab0-4715-8a6a-9e5414169fd4}"/>
+                <map netsignal="{09bcc15f-157c-426c-b5be-a7ac53b44f28}" comp_signal="{a9d3d159-fca9-417e-8bba-13829caa6ae5}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{60000002-3c94-4689-be29-92235ba993c5}" uuid="{ec9a9255-270e-4c8f-a3b0-74dc67882345}" symbol_variant="{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}">
+            <name>U5</name>
+            <value>LM358</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{71a44db9-5e42-405f-b6e4-b4725ae37af3}"/>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}"/>
+                <map netsignal="{5fb5a1c9-249b-4f60-b20f-a0d1b4479420}" comp_signal="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}"/>
+                <map netsignal="{6def778b-4966-42c0-9fa9-036928ea63e6}" comp_signal="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}"/>
+                <map netsignal="{61fd695d-000b-41d4-8b9f-4757642a0692}" comp_signal="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}"/>
+                <map netsignal="{b76b558f-b2ac-45f5-a568-9c2266cd992b}" comp_signal="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}"/>
+                <map netsignal="{655ffec0-4797-4896-87cb-84096e075deb}" comp_signal="{da30b112-9ab0-4715-8a6a-9e5414169fd4}"/>
+                <map netsignal="{5fb5a1c9-249b-4f60-b20f-a0d1b4479420}" comp_signal="{a9d3d159-fca9-417e-8bba-13829caa6ae5}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{2262ba69-33b0-414d-b03b-e1924a3fb3c8}" uuid="{4a0664d1-3902-43d7-941c-f8c394f6d4aa}" symbol_variant="{e8e00b88-f086-4edc-b3e1-742f2dcd2058}">
+            <name>R1</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value>10kΩ</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{5818eabc-1778-4747-bf2d-43ae0e23a8ed}" comp_signal="{debf3b4e-86cc-4af0-943f-5c1662a274db}"/>
+                <map netsignal="{9bfdff1f-f964-4323-b3e7-66ba7e629b7c}" comp_signal="{0aad1265-8261-4bde-8fc7-846e2ea7aa92}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{758c0792-7686-4d0a-8566-491a2676e496}" uuid="{822be00c-baa9-477c-bac7-18754c7d13f4}" symbol_variant="{bc4a996e-5b6f-4e67-9964-75d51e4962ec}">
+            <name>SUPPLY4</name>
+            <value>VCC</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{c2268dc8-cd1b-49c1-ae9d-b12e48686d2f}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{eb5070a5-f11e-4442-be70-ecf17fe04602}" uuid="{f4942430-c3ef-410b-b956-a5894d79c970}" symbol_variant="{f8c471b1-1069-413e-9ac9-b94ecd893293}">
+            <name>SUPPLY9</name>
+            <value>GND</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{6d408310-977c-4d62-aeaa-4d7e5b9324ac}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{b39b86e1-2bcc-44fa-ae41-39d2f4b9f71f}" uuid="{e0927526-7143-4265-99bc-d4450e9a5e8a}" symbol_variant="{f9c64190-8dc9-4e3a-ab93-9437b0b3aae8}">
+            <name>L2</name>
+            <value>${INDUCTANCE}</value>
+            <attributes>
+                <attribute key="INDUCTANCE">
+                    <type>inductance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{7d64ab78-3a61-4385-9ca9-7661eabcbdbe}" comp_signal="{d3cfa92a-d929-404f-ad9d-3c8a535b4eff}"/>
+                <map netsignal="{1127510e-fbdb-424a-8c4b-cc1480d741c5}" comp_signal="{63e0eb4a-c764-4a7b-a9ab-2fedf4c776e1}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{eb5070a5-f11e-4442-be70-ecf17fe04602}" uuid="{4f85a747-84a7-437b-9fdf-b8d0da95e612}" symbol_variant="{f8c471b1-1069-413e-9ac9-b94ecd893293}">
+            <name>SUPPLY13</name>
+            <value>GND</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{6d408310-977c-4d62-aeaa-4d7e5b9324ac}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{758c0792-7686-4d0a-8566-491a2676e496}" uuid="{aa144a8e-6e86-4b34-a5eb-5ad2e024f0f2}" symbol_variant="{bc4a996e-5b6f-4e67-9964-75d51e4962ec}">
+            <name>SUPPLY18</name>
+            <value>VCC</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{c2268dc8-cd1b-49c1-ae9d-b12e48686d2f}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{60000000-7785-4665-a3e6-fe8d5224ef37}" uuid="{9fe07dd4-aaee-4a28-ae35-d22c2904a462}" symbol_variant="{5de93550-f32b-4663-89d8-2ade0c5982a8}">
+            <name>U7</name>
+            <value></value>
+            <attributes/>
+            <signal_mapping/>
+        </instance>
+        <instance generic_component="{b39b86e1-2bcc-44fa-ae41-39d2f4b9f71f}" uuid="{7cabe836-d99c-40fd-976f-ed32315fbab2}" symbol_variant="{f9c64190-8dc9-4e3a-ab93-9437b0b3aae8}">
             <name>L1</name>
             <value>${INDUCTANCE}</value>
             <attributes>
@@ -135,8 +1042,144 @@
                 </attribute>
             </attributes>
             <signal_mapping>
-                <map comp_signal="{d3cfa92a-d929-404f-ad9d-3c8a535b4eff}" netsignal="{9bfdff1f-f964-4323-b3e7-66ba7e629b7c}"/>
-                <map comp_signal="{63e0eb4a-c764-4a7b-a9ab-2fedf4c776e1}" netsignal="{5818eabc-1778-4747-bf2d-43ae0e23a8ed}"/>
+                <map netsignal="{9bfdff1f-f964-4323-b3e7-66ba7e629b7c}" comp_signal="{d3cfa92a-d929-404f-ad9d-3c8a535b4eff}"/>
+                <map netsignal="{5818eabc-1778-4747-bf2d-43ae0e23a8ed}" comp_signal="{63e0eb4a-c764-4a7b-a9ab-2fedf4c776e1}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{e139c1ba-9d18-4f64-8a43-9a008ada7118}" uuid="{d87a1beb-da26-421c-8b0a-ec28453e5c9f}" symbol_variant="{94df66a0-a1f5-4b7d-9c57-22531a38e1f1}">
+            <name>C10</name>
+            <value>${CAPACITANCE}</value>
+            <attributes>
+                <attribute key="CAPACITANCE">
+                    <type>capacitance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{bc2f525b-f3b8-408e-bc74-8a6fc8df6c58}" comp_signal="{5ebbbe7c-e0b5-4c71-ad13-6d2d921f85c7}"/>
+                <map netsignal="{4301cc5e-0517-4d41-a0ec-4806b6413ddc}" comp_signal="{5a04c238-0325-4406-bf7d-c0876027c4b7}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{758c0792-7686-4d0a-8566-491a2676e496}" uuid="{9324439a-49d2-4362-b62f-80a43452dd68}" symbol_variant="{bc4a996e-5b6f-4e67-9964-75d51e4962ec}">
+            <name>SUPPLY15</name>
+            <value>VCC</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{c2268dc8-cd1b-49c1-ae9d-b12e48686d2f}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{60000002-3c94-4689-be29-92235ba993c5}" uuid="{27eb6c23-17d1-4b5e-bd3c-8b9acac29a3c}" symbol_variant="{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}">
+            <name>U12</name>
+            <value></value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{10b2e63a-50cc-48cd-a45c-3b33ea8b7e60}" comp_signal="{71a44db9-5e42-405f-b6e4-b4725ae37af3}"/>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}"/>
+                <map netsignal="{42c9bf85-8f6d-4eaf-8bf3-56bdc9c7d7b1}" comp_signal="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}"/>
+                <map netsignal="{42c9bf85-8f6d-4eaf-8bf3-56bdc9c7d7b1}" comp_signal="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}"/>
+                <map netsignal="{42c9bf85-8f6d-4eaf-8bf3-56bdc9c7d7b1}" comp_signal="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}"/>
+                <map netsignal="{bc3c25de-a50a-45bc-a9ae-2bd46c299d64}" comp_signal="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}"/>
+                <map netsignal="{7466d7b2-9dfd-45e8-b2e0-f1363deada25}" comp_signal="{da30b112-9ab0-4715-8a6a-9e5414169fd4}"/>
+                <map netsignal="{0daffb85-2c12-418a-8649-6f6ec5d8dfdb}" comp_signal="{a9d3d159-fca9-417e-8bba-13829caa6ae5}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{2262ba69-33b0-414d-b03b-e1924a3fb3c8}" uuid="{b2972c8d-49ae-4cc1-b90c-0e804601ef0f}" symbol_variant="{e8e00b88-f086-4edc-b3e1-742f2dcd2058}">
+            <name>R15</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{01783a6a-af8f-44dd-88a3-d4f661e462ab}" comp_signal="{debf3b4e-86cc-4af0-943f-5c1662a274db}"/>
+                <map netsignal="{3b151512-7977-4cd3-921c-a7f9f196842a}" comp_signal="{0aad1265-8261-4bde-8fc7-846e2ea7aa92}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{2262ba69-33b0-414d-b03b-e1924a3fb3c8}" uuid="{31f7e02b-96c9-40e5-a25d-173b0d882158}" symbol_variant="{e8e00b88-f086-4edc-b3e1-742f2dcd2058}">
+            <name>R10</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{e41ef2d5-ff0e-4fff-9c6f-445bb22c4278}" comp_signal="{debf3b4e-86cc-4af0-943f-5c1662a274db}"/>
+                <map netsignal="{bd861459-dfa2-4984-9f98-f2f248030e1c}" comp_signal="{0aad1265-8261-4bde-8fc7-846e2ea7aa92}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{e139c1ba-9d18-4f64-8a43-9a008ada7118}" uuid="{238444ff-3762-4832-80a4-d89d7a2b62a6}" symbol_variant="{94df66a0-a1f5-4b7d-9c57-22531a38e1f1}">
+            <name>C2</name>
+            <value>${CAPACITANCE}</value>
+            <attributes>
+                <attribute key="CAPACITANCE">
+                    <type>capacitance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{011f59b2-1b91-497a-86ca-648e6b5d14cc}" comp_signal="{5ebbbe7c-e0b5-4c71-ad13-6d2d921f85c7}"/>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{5a04c238-0325-4406-bf7d-c0876027c4b7}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{60000002-3c94-4689-be29-92235ba993c5}" uuid="{0b091d7d-c1bd-47c8-ab3f-bcfa2b877c4d}" symbol_variant="{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}">
+            <name>U17</name>
+            <value></value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8d9a21c3-ec4b-4260-b6ff-4e74de6f11dd}" comp_signal="{71a44db9-5e42-405f-b6e4-b4725ae37af3}"/>
+                <map netsignal="" comp_signal="{4e391ba5-949a-4f6e-83f4-ea382eed7e3a}"/>
+                <map netsignal="{6ae6493c-c054-46a5-a039-7909ae42ada0}" comp_signal="{af5ff768-2a2b-4f34-bae1-c3b6f02a82f4}"/>
+                <map netsignal="{0daffb85-2c12-418a-8649-6f6ec5d8dfdb}" comp_signal="{dc7b9d6e-d32e-4521-8a75-71003d2c2f56}"/>
+                <map netsignal="{b69dedcd-80ea-465f-94df-d82f77fc75ae}" comp_signal="{0077fd4c-4ff5-49c7-ac69-02fb7452f7e0}"/>
+                <map netsignal="{7466d7b2-9dfd-45e8-b2e0-f1363deada25}" comp_signal="{21ac13f7-ebbd-494b-8a56-024c5b2ee95f}"/>
+                <map netsignal="{75c7b35f-5333-4263-8575-ba353122a87c}" comp_signal="{da30b112-9ab0-4715-8a6a-9e5414169fd4}"/>
+                <map netsignal="" comp_signal="{a9d3d159-fca9-417e-8bba-13829caa6ae5}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{e139c1ba-9d18-4f64-8a43-9a008ada7118}" uuid="{6607d4c0-79ae-42fb-9a01-1caf7a19e2cb}" symbol_variant="{94df66a0-a1f5-4b7d-9c57-22531a38e1f1}">
+            <name>C3</name>
+            <value>${CAPACITANCE}</value>
+            <attributes>
+                <attribute key="CAPACITANCE">
+                    <type>capacitance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="" comp_signal="{5ebbbe7c-e0b5-4c71-ad13-6d2d921f85c7}"/>
+                <map netsignal="" comp_signal="{5a04c238-0325-4406-bf7d-c0876027c4b7}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{2262ba69-33b0-414d-b03b-e1924a3fb3c8}" uuid="{8ee9bb1a-26c3-4ec2-9f2c-e639765e486c}" symbol_variant="{e8e00b88-f086-4edc-b3e1-742f2dcd2058}">
+            <name>R14</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{bc2f525b-f3b8-408e-bc74-8a6fc8df6c58}" comp_signal="{debf3b4e-86cc-4af0-943f-5c1662a274db}"/>
+                <map netsignal="{b64a9f04-99a1-4efc-8bdb-792198a2ea7a}" comp_signal="{0aad1265-8261-4bde-8fc7-846e2ea7aa92}"/>
+            </signal_mapping>
+        </instance>
+        <instance generic_component="{b39b86e1-2bcc-44fa-ae41-39d2f4b9f71f}" uuid="{cafe0692-a20e-4414-b22e-a0ae79f79562}" symbol_variant="{f9c64190-8dc9-4e3a-ab93-9437b0b3aae8}">
+            <name>L4</name>
+            <value>${INDUCTANCE}</value>
+            <attributes>
+                <attribute key="INDUCTANCE">
+                    <type>inductance</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{8665ab8b-1430-4765-92f4-804fac1a28b4}" comp_signal="{d3cfa92a-d929-404f-ad9d-3c8a535b4eff}"/>
+                <map netsignal="{bc3c25de-a50a-45bc-a9ae-2bd46c299d64}" comp_signal="{63e0eb4a-c764-4a7b-a9ab-2fedf4c776e1}"/>
             </signal_mapping>
         </instance>
     </generic_component_instances>
