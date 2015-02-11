@@ -152,21 +152,38 @@ void ErcMsgDock::ercMsgChanged(ErcMsg* ercMsg) noexcept
  *  GUI Actions
  ****************************************************************************************/
 
-void ErcMsgDock::on_treeWidget_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous)
+void ErcMsgDock::on_treeWidget_itemSelectionChanged()
 {
-    Q_UNUSED(previous);
-    ErcMsg* ercMsg = mErcMsgItems.key(current, nullptr);
-    mUi->btnIgnore->setEnabled(ercMsg ? true : false);
-    mUi->btnIgnore->setChecked(ercMsg ? ercMsg->isIgnored() : false);
+    bool allDisplayed = true;
+    bool allIgnored = true;
+
+    foreach (QTreeWidgetItem* item, mUi->treeWidget->selectedItems())
+    {
+        ErcMsg* ercMsg = mErcMsgItems.key(item, nullptr);
+        if (!ercMsg)
+        {
+            allDisplayed = false;
+            allIgnored = false;
+            break;
+        }
+        if (ercMsg->isIgnored())
+            allDisplayed = false;
+        else
+            allIgnored = false;
+    }
+
+    mUi->btnIgnore->setEnabled(allDisplayed != allIgnored);
+    mUi->btnIgnore->setChecked(allIgnored);
 }
 
 void ErcMsgDock::on_btnIgnore_clicked(bool checked)
 {
-    QTreeWidgetItem* item = mUi->treeWidget->currentItem();
-    if (!item) return;
-    ErcMsg* ercMsg = mErcMsgItems.key(item, nullptr);
-    if (!ercMsg) return;
-    ercMsg->setIgnored(checked, true);
+    foreach (QTreeWidgetItem* item, mUi->treeWidget->selectedItems())
+    {
+        ErcMsg* ercMsg = mErcMsgItems.key(item, nullptr);
+        if (!ercMsg) continue;
+        ercMsg->setIgnored(checked, true);
+    }
 }
 
 /*****************************************************************************************

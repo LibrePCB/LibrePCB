@@ -71,7 +71,7 @@ class ErcMsgDock final : public QDockWidget
     private slots:
 
         // GUI Actions
-        void on_treeWidget_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
+        void on_treeWidget_itemSelectionChanged();
         void on_btnIgnore_clicked(bool checked);
 
 
