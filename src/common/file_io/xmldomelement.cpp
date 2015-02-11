@@ -211,6 +211,18 @@ void XmlDomElement::setAttribute(const QString& name, const char* const& value) 
 }
 
 template <>
+void XmlDomElement::setAttribute(const QString& name, const int& value) noexcept
+{
+    setAttribute<QString>(name, QString::number(value));
+}
+
+template <>
+void XmlDomElement::setAttribute(const QString& name, const uint& value) noexcept
+{
+    setAttribute<QString>(name, QString::number(value));
+}
+
+template <>
 void XmlDomElement::setAttribute(const QString& name, const QUuid& value) noexcept
 {
     setAttribute<QString>(name, value.isNull() ? "" : value.toString());

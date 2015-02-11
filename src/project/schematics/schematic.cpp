@@ -333,7 +333,7 @@ bool Schematic::save(bool toOriginal, QStringList& errors) noexcept
         if (mAddedToProject)
         {
             XmlDomElement* root = serializeToXmlDomElement();
-            XmlDomDocument doc(*root);
+            XmlDomDocument doc(*root, true);
             mXmlFile->save(doc, toOriginal);
         }
         else

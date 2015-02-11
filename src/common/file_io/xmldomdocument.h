@@ -60,10 +60,15 @@ class XmlDomDocument final
         /**
          * @brief Constructor to create a new DOM document with a root element
          *
-         * @param root  The root element which will be added to the document.
-         *              The document will take the ownership over the root element object!
+         * @param root              The root element which will be added to the document.
+         *                          The document will take the ownership over the root
+         *                          element object!
+         * @param setAppVersion     If true, this constructor will automatically add the
+         *                          applications major version number to the root element
+         *                          as attribute "version". You can also use
+         *                          #setFileVersion() instead.
          */
-        explicit XmlDomDocument(XmlDomElement& root) noexcept;
+        explicit XmlDomDocument(XmlDomElement& root, bool setAppVersion) noexcept;
 
         /**
          * @brief Constructor to create the whole DOM tree from the content of a XML file
@@ -96,6 +101,27 @@ class XmlDomDocument final
          * @return The root element of the document
          */
         XmlDomElement& getRoot() const noexcept {Q_ASSERT(mRootElement); return *mRootElement;}
+
+        /**
+         * @brief Get the file version number of the document (attribute "version" of the
+         *        root element)
+         *
+         * @return  The file version number
+         *
+         * @throw   If the attribute "version" of the root node is invalid or does not exist
+         */
+        uint getFileVersion() const throw (Exception);
+
+
+        // Setters
+
+        /**
+         * @brief Set the file version number of the document (attribute "version" of the
+         *        root element)
+         *
+         * @param version   The file version
+         */
+        void setFileVersion(uint version) noexcept;
 
 
         // General Methods

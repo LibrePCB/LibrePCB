@@ -125,7 +125,7 @@ bool ErcMsgList::save(bool toOriginal, QStringList& errors) noexcept
     try
     {
         XmlDomElement* root = serializeToXmlDomElement();
-        XmlDomDocument doc(*root);
+        XmlDomDocument doc(*root, true);
         mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)
