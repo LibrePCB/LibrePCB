@@ -41,6 +41,7 @@ namespace project {
 class GenCompInstance;
 class SymbolInstance;
 class CmdSymbolInstanceMove;
+class AddGenCompDialog;
 }
 
 /*****************************************************************************************
@@ -73,11 +74,14 @@ class SES_AddComponents final : public SES_Base
 
         // Private Methods
         ProcRetVal processSceneEvent(SEE_Base* event) noexcept;
+        void startAddingComponent(const QUuid& genComp = QUuid(), const QUuid& symbVar = QUuid()) throw (Exception);
         bool abortCommand(bool showErrMsgBox) noexcept;
 
 
         // Attributes
         bool mIsUndoCmdActive;
+        AddGenCompDialog* mAddGenCompDialog;
+        Angle mLastAngle;
 
         // information about the current symbol to place
         const library::GenericComponent* mGenComp;

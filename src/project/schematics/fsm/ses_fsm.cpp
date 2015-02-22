@@ -130,6 +130,8 @@ SES_Base::ProcRetVal SES_FSM::process(SEE_Base* event) noexcept
             // entry the next state
             if (mSubStates[nextState]->entry(event))
                 mCurrentState = nextState;
+            else // use the select state as fallback
+                processEvent(new SEE_Base(SEE_Base::StartSelect), true);
         }
     }
 
