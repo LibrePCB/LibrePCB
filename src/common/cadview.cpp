@@ -41,9 +41,9 @@ qreal CADView::sZoomFactor = 1.15;
 
 CADView::CADView(QWidget* parent) :
     QGraphicsView(parent),
-    mGridType(GridType_t::Off), mGridColor(Qt::lightGray), mOriginCrossColor(Qt::black),
-    mGridInterval(2540000), mGridIntervalUnit(LengthUnit::millimeters()),
-    mPositionLabel(nullptr), mZoomAnimation(nullptr)
+    mGridType(GridType_t::Off), mGridColor(Qt::lightGray), mGridInterval(2540000),
+    mGridIntervalUnit(LengthUnit::millimeters()), mOriginCrossVisible(true),
+    mOriginCrossColor(Qt::black), mPositionLabel(nullptr), mZoomAnimation(nullptr)
 {
     mPositionLabel = new QLabel(this);
     mPositionLabel->move(5, 5);
@@ -121,6 +121,16 @@ void CADView::setGridInterval(const Length& newInterval)
 void CADView::setGridIntervalUnit(const LengthUnit& newUnit)
 {
     mGridIntervalUnit = newUnit;
+}
+
+void CADView::setOriginCrossVisible(bool visible) noexcept
+{
+    mOriginCrossVisible = visible;
+}
+
+void CADView::setPositionLabelVisible(bool visible) noexcept
+{
+    mPositionLabel->setVisible(visible);
 }
 
 /*****************************************************************************************
@@ -228,8 +238,8 @@ void CADView::drawForeground(QPainter* painter, const QRectF& rect)
 {
     Q_UNUSED(rect);
 
-    if (!getCadScene())
-        return;
+    if (!mOriginCrossVisible) return;
+    if (!getCadScene()) return;
 
     // draw origin cross
     QPen originPen(mOriginCrossColor);

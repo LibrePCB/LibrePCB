@@ -73,6 +73,8 @@ class CADView : public QGraphicsView
         void setGridColor(const QColor& color);
         void setGridInterval(const Length& newInterval);
         void setGridIntervalUnit(const LengthUnit& newUnit);
+        void setOriginCrossVisible(bool visible) noexcept;
+        void setPositionLabelVisible(bool visible) noexcept;
 
         // Static Functions
         static qreal getZoomFactor() {return sZoomFactor;}
@@ -116,9 +118,10 @@ class CADView : public QGraphicsView
         // Attributes
         GridType_t mGridType;
         QColor mGridColor;
-        QColor mOriginCrossColor;
         Length mGridInterval;
         LengthUnit mGridIntervalUnit;
+        bool mOriginCrossVisible;
+        QColor mOriginCrossColor;
 
         Point mLastMouseMoveEventPos;
         QLabel* mPositionLabel;
