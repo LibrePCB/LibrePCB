@@ -175,7 +175,8 @@ SOURCES += \
     common/smartfile.cpp \
     common/file_io/xmldomdocument.cpp \
     common/file_io/xmldomelement.cpp \
-    workspace/settings/items/wsi_appearance.cpp
+    workspace/settings/items/wsi_appearance.cpp \
+    project/dialogs/addgencompdialog.cpp
 
 HEADERS += \
     common/units/all_length_units.h \
@@ -299,7 +300,8 @@ HEADERS += \
     common/file_io/xmldomelement.h \
     project/erc/if_ercmsgprovider.h \
     common/file_io/if_xmlserializableobject.h \
-    workspace/settings/items/wsi_appearance.h
+    workspace/settings/items/wsi_appearance.h \
+    project/dialogs/addgencompdialog.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \
@@ -312,7 +314,8 @@ FORMS += \
     project/circuit/editnetclassesdialog.ui \
     common/dialogs/gridsettingsdialog.ui \
     project/schematics/symbolinstancepropertiesdialog.ui \
-    project/dialogs/projectpropertieseditordialog.ui
+    project/dialogs/projectpropertieseditordialog.ui \
+    project/dialogs/addgencompdialog.ui
 
 
 # Custom compiler "lrelease" for qm generation

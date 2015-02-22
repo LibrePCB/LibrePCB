@@ -155,10 +155,9 @@ class SEE_StartAddComponent final : public SEE_Base
     public:
 
         // Constructors / Destructor
-        SEE_StartAddComponent(const QUuid& genComp, const QUuid& symbVar) :
-            SEE_Base(StartAddComponent),
-            mGenCompUuid(genComp), mSymbVarUuid(symbVar) {}
-        virtual ~SEE_StartAddComponent() {}
+        SEE_StartAddComponent();
+        SEE_StartAddComponent(const QUuid& genComp, const QUuid& symbVar);
+        ~SEE_StartAddComponent();
 
         // Getters
         const QUuid& getGenCompUuid() const noexcept {return mGenCompUuid;}

@@ -307,10 +307,7 @@ void SchematicEditor::on_actionPDF_Export_triggered()
 
 void SchematicEditor::on_actionToolAddComponent_triggered()
 {
-    // TODO: use the component chooser dialog
-    QUuid genCompUuid = "{60000002-3c94-4689-be29-92235ba993c5}";
-    QUuid symbVarUuid = "{a3a3db3e-c03e-4b3a-b916-638f75e11d9a}";
-    SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(genCompUuid, symbVarUuid);
+    SEE_StartAddComponent* addEvent = new SEE_StartAddComponent();
     mFsm->processEvent(addEvent, true);
     mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
 }

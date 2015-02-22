@@ -31,7 +31,7 @@
 namespace project {
 
 /*****************************************************************************************
- *  Constructors / Destructor
+ *  Class SEE_Base
  ****************************************************************************************/
 
 SEE_Base::SEE_Base(EventType type) :
@@ -40,6 +40,24 @@ SEE_Base::SEE_Base(EventType type) :
 }
 
 SEE_Base::~SEE_Base()
+{
+}
+
+/*****************************************************************************************
+ *  Class SEE_SetAddComponentParams
+ ****************************************************************************************/
+
+SEE_StartAddComponent::SEE_StartAddComponent() :
+    SEE_Base(StartAddComponent), mGenCompUuid(), mSymbVarUuid()
+{
+}
+
+SEE_StartAddComponent::SEE_StartAddComponent(const QUuid& genComp, const QUuid& symbVar) :
+    SEE_Base(StartAddComponent), mGenCompUuid(genComp), mSymbVarUuid(symbVar)
+{
+}
+
+SEE_StartAddComponent::~SEE_StartAddComponent()
 {
 }
 
