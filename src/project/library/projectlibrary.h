@@ -66,6 +66,13 @@ class ProjectLibrary final : public QObject
         ~ProjectLibrary() noexcept;
 
         // Getters: Library Elements
+        const QHash<QUuid, const library::Symbol*>&             getSymbols()            const noexcept {return mSymbols;}
+        const QHash<QUuid, const library::Footprint*>&          getFootprints()         const noexcept {return mFootprints;}
+        const QHash<QUuid, const library::Model*>&              getModels()             const noexcept {return mModels;}
+        const QHash<QUuid, const library::SpiceModel*>&         getSpiceModels()        const noexcept {return mSpiceModels;}
+        const QHash<QUuid, const library::Package*>&            getPackages()           const noexcept {return mPackages;}
+        const QHash<QUuid, const library::GenericComponent*>&   getGenericComponents()  const noexcept {return mGenericComponents;}
+        const QHash<QUuid, const library::Component*>&          getComponents()         const noexcept {return mComponents;}
         const library::Symbol*           getSymbol(     const QUuid& uuid) const noexcept;
         const library::Footprint*        getFootprint(  const QUuid& uuid) const noexcept;
         const library::Model*            getModel(      const QUuid& uuid) const noexcept;
