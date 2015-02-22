@@ -71,6 +71,9 @@ class SchematicEditor : public QMainWindow, public IF_CADSceneEventHandler
         // Setters
         bool setActiveSchematicIndex(int index) noexcept;
 
+        // General Methods
+        void abortAllCommands() noexcept;
+
     protected:
 
         void closeEvent(QCloseEvent* event);

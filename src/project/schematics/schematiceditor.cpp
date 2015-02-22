@@ -215,6 +215,18 @@ bool SchematicEditor::setActiveSchematicIndex(int index) noexcept
 }
 
 /*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+void SchematicEditor::abortAllCommands() noexcept
+{
+    // ugly... ;-)
+    mFsm->processEvent(new SEE_Base(SEE_Base::AbortCommand), true);
+    mFsm->processEvent(new SEE_Base(SEE_Base::AbortCommand), true);
+    mFsm->processEvent(new SEE_Base(SEE_Base::AbortCommand), true);
+}
+
+/*****************************************************************************************
  *  Inherited Methods
  ****************************************************************************************/
 

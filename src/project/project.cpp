@@ -187,8 +187,8 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
                                                      mIsRestored, mIsReadOnly);
 
         // Create all needed objects
-        mUndoStack = new UndoStack();
         mProjectLibrary = new ProjectLibrary(*this, mIsRestored, mIsReadOnly);
+        mUndoStack = new UndoStack();
         mErcMsgList = new ErcMsgList(*this, mIsRestored, mIsReadOnly, create);
         mCircuit = new Circuit(*this, mIsRestored, mIsReadOnly, create);
 
@@ -238,8 +238,8 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
         qDeleteAll(mSchematicLayers);   mSchematicLayers.clear();
         delete mCircuit;                mCircuit = 0;
         delete mErcMsgList;             mErcMsgList = 0;
-        delete mProjectLibrary;         mProjectLibrary = 0;
         delete mUndoStack;              mUndoStack = 0;
+        delete mProjectLibrary;         mProjectLibrary = 0;
         delete mDescriptionHtmlFile;    mDescriptionHtmlFile = 0;
         delete mXmlFile;                mXmlFile = 0;
         throw; // ...and rethrow the exception
@@ -267,6 +267,10 @@ Project::~Project() noexcept
     // stop the autosave timer
     mAutoSaveTimer.stop();
 
+    // abort all active commands!
+    mSchematicEditor->abortAllCommands();
+    Q_ASSERT(mUndoStack->isCommandActive() == false);
+
     // delete all command objects in the undo stack (must be done before other important
     // objects are deleted, as undo command objects can hold pointers/references to them!)
     mUndoStack->clear();
@@ -284,8 +288,8 @@ Project::~Project() noexcept
     qDeleteAll(mSchematicLayers);   mSchematicLayers.clear();
     delete mCircuit;                mCircuit = 0;
     delete mErcMsgList;             mErcMsgList = 0;
-    delete mProjectLibrary;         mProjectLibrary = 0;
     delete mUndoStack;              mUndoStack = 0;
+    delete mProjectLibrary;         mProjectLibrary = 0;
     delete mDescriptionHtmlFile;    mDescriptionHtmlFile = 0;
     delete mXmlFile;                mXmlFile = 0;
 }
