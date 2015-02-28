@@ -419,6 +419,8 @@ void Project::exportSchematicsAsPdf(const FilePath& filepath) throw (Exception)
         pages.append(i);
 
     printSchematicPages(printer, pages);
+
+    QDesktopServices::openUrl(QUrl::fromLocalFile(filepath.toStr()));
 }
 
 bool Project::windowIsAboutToClose(QMainWindow* window) noexcept
