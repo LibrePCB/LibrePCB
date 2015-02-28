@@ -60,8 +60,8 @@ SchematicLayer::SchematicLayer(uint id) :
 
         case SymbolPinNames:
             mName = tr("Symbol Pin Names");
-            mColor = Qt::gray;
-            mColorHighlighted = Qt::lightGray;
+            mColor = Qt::darkGray;
+            mColorHighlighted = Qt::gray;
             break;
 
         case ComponentNames:

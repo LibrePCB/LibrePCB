@@ -134,17 +134,18 @@ void SymbolPinGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsI
     layer = getSchematicLayer(SchematicLayer::SymbolPinNames);
     if ((layer) && (!text.isEmpty()))
     {
+        qreal scaleFactor = 20; // avoid blurred font when using OpenGL
         painter->save();
+        painter->scale(1/scaleFactor, 1/scaleFactor);
         painter->rotate(rotate180 ? (qreal)90 : (qreal)-90);
         painter->setPen(QPen(layer->getColor(selected), 0));
-        QFont font;
-        font.setFamily("Monospace");
-        font.setPixelSize(4);
-        font.setStyleHint(QFont::TypeWriter);
-        font.setStyleStrategy(QFont::ForceOutline);
-        QFontMetrics metrics(font);
+        painter->setBrush(Qt::NoBrush);
+        QFont font("Nimbus Sans L");
+        font.setStyleHint(QFont::SansSerif);
+        font.setStyleStrategy(QFont::StyleStrategy(QFont::PreferOutline | QFont::PreferQuality));
+        font.setPixelSize(5*scaleFactor);
         painter->setFont(font);
-        qreal x = (mPin.getLength().toPx() + (metrics.width(text)/2) + 4) - metrics.width(text)/2;
+        qreal x = (mPin.getLength().toPx() + 4) * scaleFactor;
         int flags = Qt::AlignVCenter | Qt::TextSingleLine | Qt::TextDontClip;
         if (rotate180) flags |= Qt::AlignRight; else flags |= Qt::AlignLeft;
         painter->drawText(QRectF(rotate180 ? -x : x, 0, 0, 0), flags, text);

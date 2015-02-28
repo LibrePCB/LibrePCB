@@ -143,10 +143,10 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
         painter->setPen(QPen(layer->getColor(selected), 0, Qt::SolidLine, Qt::RoundCap));
 
         // calculate font metrics
-        QFont font;
+        QFont font("Nimbus Sans L");
         font.setStyleHint(QFont::SansSerif);
-        font.setStyleStrategy(QFont::StyleStrategy(QFont::ForceOutline | QFont::PreferMatch));
-        font.setPixelSize(text->getHeight().toPx());
+        font.setStyleStrategy(QFont::StyleStrategy(QFont::PreferOutline | QFont::PreferQuality));
+        font.setPixelSize(50);
         QFontMetricsF metrics(font);
         qreal factor = 0.8*text->getHeight().toPx() / metrics.height();
 
@@ -213,11 +213,10 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
         {
             unsigned int count = mSymbolInstance->getGenCompInstance().getPlacedSymbolsCount();
             unsigned int maxCount = mSymbolInstance->getGenCompInstance().getSymbolVariant().getItems().count();
-            QFont font;
-            font.setFamily("Monospace");
+            QFont font("Nimbus Sans L");
+            font.setStyleHint(QFont::SansSerif);
+            font.setStyleStrategy(QFont::StyleStrategy(QFont::PreferOutline | QFont::PreferQuality));
             font.setPixelSize(Length(1000000).toPx());
-            font.setStyleHint(QFont::TypeWriter);
-            font.setStyleStrategy(QFont::ForceOutline);
             painter->setFont(font);
             painter->setPen(QPen(layer->getColor(selected), 0, Qt::SolidLine, Qt::RoundCap));
             painter->drawText(QRectF(), Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextSingleLine | Qt::TextDontClip,
