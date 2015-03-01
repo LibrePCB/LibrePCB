@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 TEMPLATE = app
-TARGET = UuidGenerator
+TARGET = uuid-generator
 
 # Set the path for the generated binary
 GENERATED_DIR = ../../generated
@@ -13,10 +13,7 @@ GENERATED_DIR = ../../generated
 # Use common project definitions
 include(../../common.pri)
 
-QT += core gui widgets
-
-CONFIG += console
-CONFIG -= app_bundle
+QT += core widgets
 
 SOURCES += main.cpp \
         mainwindow.cpp
