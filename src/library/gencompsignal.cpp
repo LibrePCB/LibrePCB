@@ -32,9 +32,17 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-GenCompSignal::GenCompSignal(GenericComponent& genComp,
-                             const XmlDomElement& domElement) throw (Exception) :
-    QObject(0), mGenericComponent(genComp)
+GenCompSignal::GenCompSignal(const QUuid& uuid, const QString& name_en_US,
+                             const QString& description_en_US) noexcept :
+    mUuid(uuid), mRole(SignalRole_t::Passive), mForcedNetName(), mIsRequired(false),
+    mIsNegated(false), mIsClock(false)
+{
+    Q_ASSERT(mUuid.isNull() == false);
+    mNames.insert("en_US", name_en_US);
+    mDescriptions.insert("en_US", description_en_US);
+}
+
+GenCompSignal::GenCompSignal(const XmlDomElement& domElement) throw (Exception)
 {
     // read attributes
     mUuid = domElement.getAttribute<QUuid>("uuid");
@@ -45,8 +53,10 @@ GenCompSignal::GenCompSignal(GenericComponent& genComp,
     mIsClock = domElement.getAttribute<bool>("clock");
 
     // read names and descriptions in all available languages
-    LibraryBaseElement::readLocaleDomNodes(mGenericComponent.getXmlFilepath(), domElement, "name", mNames);
-    LibraryBaseElement::readLocaleDomNodes(mGenericComponent.getXmlFilepath(), domElement, "description", mDescriptions);
+    LibraryBaseElement::readLocaleDomNodes(domElement, "name", mNames);
+    LibraryBaseElement::readLocaleDomNodes(domElement, "description", mDescriptions);
+
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 GenCompSignal::~GenCompSignal() noexcept
@@ -65,6 +75,40 @@ QString GenCompSignal::getName(const QString& locale) const noexcept
 QString GenCompSignal::getDescription(const QString& locale) const noexcept
 {
     return LibraryBaseElement::localeStringFromList(mDescriptions, locale);
+}
+
+/*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+XmlDomElement* GenCompSignal::serializeToXmlDomElement() const throw (Exception)
+{
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("signal"));
+    root->setAttribute("uuid", mUuid);
+    root->setAttribute("role", signalRoleToString(mRole));
+    root->setAttribute("forced_net_name", mForcedNetName);
+    root->setAttribute("required", mIsRequired);
+    root->setAttribute("negated", mIsNegated);
+    root->setAttribute("clock", mIsClock);
+    foreach (const QString& locale, mNames.keys())
+        root->appendTextChild("name", mNames.value(locale))->setAttribute("locale", locale);
+    foreach (const QString& locale, mDescriptions.keys())
+        root->appendTextChild("description", mDescriptions.value(locale))->setAttribute("locale", locale);
+    return root.take();
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+bool GenCompSignal::checkAttributesValidity() const noexcept
+{
+    if (mUuid.isNull())                     return false;
+    if (mNames.value("en_US").isEmpty())    return false;
+    if (!mDescriptions.contains("en_US"))   return false;
+    return true;
 }
 
 /*****************************************************************************************

@@ -88,6 +88,8 @@ Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create) thr
                 addGenCompInstance(*genComp);
             }
         }
+
+        if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
     }
     catch (...)
     {
@@ -464,8 +466,15 @@ bool Circuit::save(bool toOriginal, QStringList& errors) noexcept
  *  Private Methods
  ****************************************************************************************/
 
+bool Circuit::checkAttributesValidity() const noexcept
+{
+    return true;
+}
+
 XmlDomElement* Circuit::serializeToXmlDomElement() const throw (Exception)
 {
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+
     QScopedPointer<XmlDomElement> root(new XmlDomElement("circuit"));
     //XmlDomElement* meta = root->appendChild("meta");
     XmlDomElement* netclasses = root->appendChild("netclasses");

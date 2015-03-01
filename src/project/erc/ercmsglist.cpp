@@ -47,6 +47,8 @@ ErcMsgList::ErcMsgList(Project& project, bool restore, bool readOnly, bool creat
             mXmlFile = SmartXmlFile::create(mXmlFilepath);
         else
             mXmlFile = new SmartXmlFile(mXmlFilepath, restore, readOnly);
+
+        if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
     }
     catch (...)
     {
@@ -141,8 +143,15 @@ bool ErcMsgList::save(bool toOriginal, QStringList& errors) noexcept
  *  Private Methods
  ****************************************************************************************/
 
+bool ErcMsgList::checkAttributesValidity() const noexcept
+{
+    return true;
+}
+
 XmlDomElement* ErcMsgList::serializeToXmlDomElement() const throw (Exception)
 {
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+
     QScopedPointer<XmlDomElement> root(new XmlDomElement("erc"));
     XmlDomElement* ignoreNode = root->appendChild("ignore");
     foreach (ErcMsg* ercMsg, mItems)

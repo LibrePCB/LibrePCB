@@ -25,18 +25,8 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../common/exceptions.h"
+#include "../common/file_io/if_xmlserializableobject.h"
 #include "gencompsymbvaritem.h"
-
-/*****************************************************************************************
- *  Forward Declarations
- ****************************************************************************************/
-
-class XmlDomElement;
-
-namespace library {
-class GenericComponent;
-}
 
 /*****************************************************************************************
  *  Class GenCompSymbVar
@@ -47,15 +37,16 @@ namespace library {
 /**
  * @brief The GenCompSymbVar class
  */
-class GenCompSymbVar final : public QObject
+class GenCompSymbVar final : public IF_XmlSerializableObject
 {
-        Q_OBJECT
+        Q_DECLARE_TR_FUNCTIONS(GenCompSymbVar)
 
     public:
 
         // Constructors / Destructor
-        explicit GenCompSymbVar(GenericComponent& genComp,
-                                const XmlDomElement& domElement) throw (Exception);
+        explicit GenCompSymbVar(const QUuid& uuid = QUuid::createUuid(),
+                                const QString& norm = QString(), bool isDefault = false) noexcept;
+        explicit GenCompSymbVar(const XmlDomElement& domElement) throw (Exception);
         ~GenCompSymbVar() noexcept;
 
         // Getters: Attributes
@@ -72,16 +63,27 @@ class GenCompSymbVar final : public QObject
         const GenCompSymbVarItem* getItemByUuid(const QUuid& uuid) const noexcept {return mSymbolItems.value(uuid, 0);}
         const GenCompSymbVarItem* getItemByAddOrderIndex(unsigned int index) const noexcept;
 
+        // Setters
+        void setNorm(const QString& norm) noexcept;
+        void setIsDefault(bool isDefault) noexcept;
+        void setName(const QString& locale, const QString& name) noexcept;
+        void setDescription(const QString& locale, const QString& desc) noexcept;
+
+        // General Methods
+        void clearItems() noexcept;
+        void addItem(const GenCompSymbVarItem* item) noexcept;
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+
+
     private:
 
         // make some methods inaccessible...
-        GenCompSymbVar();
         GenCompSymbVar(const GenCompSymbVar& other);
         GenCompSymbVar& operator=(const GenCompSymbVar& rhs);
 
+        // Private Methods
+        bool checkAttributesValidity() const noexcept;
 
-        // General Attributes
-        GenericComponent& mGenericComponent;
 
         // Symbol Variant Attributes
         QUuid mUuid;

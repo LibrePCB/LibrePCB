@@ -35,7 +35,6 @@
  *  Forward Declarations
  ****************************************************************************************/
 
-class XmlDomElement;
 class SchematicLayer;
 
 namespace project {
@@ -149,6 +148,8 @@ class SchematicNetLine final : public QObject, public IF_XmlSerializableObject
 
         // Private Methods
         void init() throw (Exception);
+        bool checkAttributesValidity() const noexcept;
+
 
         // General
         Schematic& mSchematic;

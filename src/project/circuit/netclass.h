@@ -33,8 +33,6 @@
  *  Forward Declarations
  ****************************************************************************************/
 
-class XmlDomElement;
-
 namespace project {
 class Circuit;
 class NetSignal;
@@ -88,6 +86,7 @@ class NetClass final : public IF_ErcMsgProvider, public IF_XmlSerializableObject
         NetClass& operator=(const NetClass& rhs);
 
         // Private Methods
+        bool checkAttributesValidity() const noexcept;
         void updateErcMessages() noexcept;
 
 

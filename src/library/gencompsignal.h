@@ -25,17 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../common/exceptions.h"
-
-/*****************************************************************************************
- *  Forward Declarations
- ****************************************************************************************/
-
-class XmlDomElement;
-
-namespace library {
-class GenericComponent;
-}
+#include "../common/file_io/if_xmlserializableobject.h"
 
 /*****************************************************************************************
  *  Class GenCompSignal
@@ -46,9 +36,9 @@ namespace library {
 /**
  * @brief The GenCompSignal class
  */
-class GenCompSignal final : public QObject
+class GenCompSignal final : public IF_XmlSerializableObject
 {
-        Q_OBJECT
+        Q_DECLARE_TR_FUNCTIONS(GenCompSignal)
 
     public:
 
@@ -64,8 +54,10 @@ class GenCompSignal final : public QObject
 
 
         // Constructors / Destructor
-        explicit GenCompSignal(GenericComponent& genComp,
-                               const XmlDomElement& domElement) throw (Exception);
+        explicit GenCompSignal(const QUuid& uuid = QUuid::createUuid(),
+                               const QString& name_en_US = QString(),
+                               const QString& description_en_US = QString()) noexcept;
+        explicit GenCompSignal(const XmlDomElement& domElement) throw (Exception);
         ~GenCompSignal() noexcept;
 
         // Getters
@@ -81,20 +73,32 @@ class GenCompSignal final : public QObject
         const QHash<QString, QString>& getNames() const noexcept {return mNames;}
         const QHash<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
 
+        // Setters
+        void setRole(SignalRole_t role) noexcept {mRole = role;}
+        void setForcedNetName(const QString& name) noexcept {mForcedNetName = name;}
+        void setIsRequired(bool required) noexcept {mIsRequired = required;}
+        void setIsNegated(bool negated) noexcept {mIsNegated = negated;}
+        void setIsClock(bool clock) noexcept {mIsClock = clock;}
+        void setName(const QString& locale, const QString& name) noexcept {mNames[locale] = name;}
+        void setDescription(const QString& locale, const QString& desc) noexcept {mDescriptions[locale] = desc;}
+
+        // General Methods
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+
 
     private:
 
         // make some methods inaccessible...
-        GenCompSignal();
         GenCompSignal(const GenCompSignal& other);
         GenCompSignal& operator=(const GenCompSignal& rhs);
+
+        // Private Methods
+        bool checkAttributesValidity() const noexcept;
 
         // Private Static Methods
         static SignalRole_t stringToSignalRole(const QString& role) throw (Exception);
         static QString signalRoleToString(SignalRole_t role) noexcept;
 
-        // General Attributes
-        GenericComponent& mGenericComponent;
 
         // Signal Attributes
         QUuid mUuid;

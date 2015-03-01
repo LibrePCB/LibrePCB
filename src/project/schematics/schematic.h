@@ -159,6 +159,8 @@ class Schematic final : public CADScene, public IF_AttributeProvider,
                            bool readOnly, bool create, const QString& newName) throw (Exception);
         void updateIcon() noexcept;
 
+        bool checkAttributesValidity() const noexcept;
+
         /**
          * @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
          */

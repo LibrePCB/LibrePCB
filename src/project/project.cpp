@@ -226,6 +226,8 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
         // create the whole schematic editor GUI inclusive FSM and so on
         mSchematicEditor = new SchematicEditor(*this, mIsReadOnly);
 
+        if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+
         if (create) saveProject(); // write all files to harddisc
     }
     catch (...)
@@ -602,8 +604,16 @@ void Project::updateSchematicsList() throw (Exception)
     mSchematicsIniFile->releaseQSettings(s);
 }
 
+bool Project::checkAttributesValidity() const noexcept
+{
+    if (mName.isEmpty())    return false;
+    return true;
+}
+
 XmlDomElement* Project::serializeToXmlDomElement() const throw (Exception)
 {
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+
     QScopedPointer<XmlDomElement> root(new XmlDomElement("project"));
     XmlDomElement* meta = root->appendChild("meta");
     meta->appendTextChild("name", mName);

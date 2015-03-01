@@ -116,6 +116,7 @@ class GenCompSignalInstance final : public QObject, public IF_ErcMsgProvider,
 
         // Private Methods
         void init() throw (Exception);
+        bool checkAttributesValidity() const noexcept;
 
 
         // General

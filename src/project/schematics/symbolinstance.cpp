@@ -125,6 +125,8 @@ void SymbolInstance::init(const QUuid& symbVarItemUuid) throw (Exception)
     mGraphicsItem = new library::SymbolGraphicsItem(*mSymbol, this);
     mGraphicsItem->setPos(mPosition.toPxQPointF());
     mGraphicsItem->setRotation(mAngle.toDeg());
+
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 SymbolInstance::~SymbolInstance() noexcept
@@ -184,6 +186,8 @@ void SymbolInstance::removeFromSchematic() throw (Exception)
 
 XmlDomElement* SymbolInstance::serializeToXmlDomElement() const throw (Exception)
 {
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+
     QScopedPointer<XmlDomElement> root(new XmlDomElement("symbol"));
     root->setAttribute("uuid", mUuid);
     root->setAttribute("gen_comp_instance", mGenCompInstance->getUuid());
@@ -232,6 +236,19 @@ void SymbolInstance::genCompAttributesChanged()
 {
     if (mGraphicsItem)
         mGraphicsItem->update();
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+bool SymbolInstance::checkAttributesValidity() const noexcept
+{
+    if (mSymbVarItem == nullptr)        return false;
+    if (mSymbol == nullptr)             return false;
+    if (mUuid.isNull())                 return false;
+    if (mGenCompInstance == nullptr)    return false;
+    return true;
 }
 
 /*****************************************************************************************

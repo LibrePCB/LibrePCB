@@ -475,6 +475,11 @@ class Project final : public QObject, public IF_AttributeProvider,
         void updateSchematicsList() throw (Exception);
 
         /**
+         * @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+         */
+        bool checkAttributesValidity() const noexcept;
+
+        /**
          * @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
          */
         XmlDomElement* serializeToXmlDomElement() const throw (Exception);

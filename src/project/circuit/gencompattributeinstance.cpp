@@ -40,6 +40,8 @@ GenCompAttributeInstance::GenCompAttributeInstance(Circuit& circuit,
     mKey = domElement.getAttribute("key", true);
     mType = library::Attribute::stringToType(domElement.getFirstChild("type", true)->getText(true));
     mValue = domElement.getFirstChild("value", true)->getText();
+
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 GenCompAttributeInstance::GenCompAttributeInstance(Circuit& circuit,
@@ -49,6 +51,7 @@ GenCompAttributeInstance::GenCompAttributeInstance(Circuit& circuit,
                                                    const QString& value) throw (Exception):
     mCircuit(circuit), mGenCompInstance(genCompInstance), mKey(key), mType(type), mValue(value)
 {
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 GenCompAttributeInstance::~GenCompAttributeInstance() noexcept
@@ -70,11 +73,23 @@ QString GenCompAttributeInstance::getValueToDisplay() const noexcept
 
 XmlDomElement* GenCompAttributeInstance::serializeToXmlDomElement() const throw (Exception)
 {
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+
     QScopedPointer<XmlDomElement> root(new XmlDomElement("attribute"));
     root->setAttribute("key", mKey);
     root->appendTextChild("type", library::Attribute::typeToString(mType));
     root->appendTextChild("value", mValue);
     return root.take();
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+bool GenCompAttributeInstance::checkAttributesValidity() const noexcept
+{
+    if (mKey.isEmpty()) return false;
+    return true;
 }
 
 /*****************************************************************************************

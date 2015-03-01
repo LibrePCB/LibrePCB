@@ -144,6 +144,8 @@ void GenCompInstance::init() throw (Exception)
     mErcMsgUnplacedOptionalSymbols.reset(new ErcMsg(mCircuit.getProject(), *this, mUuid.toString(),
         "UnplacedOptionalSymbols", ErcMsg::ErcMsgType_t::SchematicWarning));
     updateErcMessages();
+
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 GenCompInstance::~GenCompInstance() noexcept
@@ -301,6 +303,8 @@ void GenCompInstance::unregisterSymbolInstance(const QUuid& itemUuid,
 
 XmlDomElement* GenCompInstance::serializeToXmlDomElement() const throw (Exception)
 {
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+
     QScopedPointer<XmlDomElement> root(new XmlDomElement("instance"));
     root->setAttribute("uuid", mUuid);
     root->setAttribute("generic_component", mGenComp->getUuid());
@@ -342,6 +346,15 @@ bool GenCompInstance::getAttributeValue(const QString& attrNS, const QString& at
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
+
+bool GenCompInstance::checkAttributesValidity() const noexcept
+{
+    if (mUuid.isNull())             return false;
+    if (mName.isEmpty())            return false;
+    if (mGenComp == nullptr)        return false;
+    if (mGenCompSymbVar == nullptr) return false;
+    return true;
+}
 
 void GenCompInstance::updateErcMessages() noexcept
 {

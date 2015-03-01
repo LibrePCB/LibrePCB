@@ -25,18 +25,61 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../common/exceptions.h"
 #include "../common/units/all_length_units.h"
+#include "../common/file_io/if_xmlserializableobject.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Class SymbolPolygonSegment
  ****************************************************************************************/
 
-class XmlDomElement;
-
 namespace library {
-class Symbol;
-}
+
+/**
+ * @brief The SymbolPolygonSegment class
+ */
+class SymbolPolygonSegment final : public IF_XmlSerializableObject
+{
+        Q_DECLARE_TR_FUNCTIONS(SymbolPolygonSegment)
+
+    public:
+
+        // Types
+        enum class Type_t {Line, Arc};
+
+        // Constructors / Destructor
+        explicit SymbolPolygonSegment(Type_t type, const Point& endPos) noexcept : mType(type), mEndPos(endPos) {}
+        explicit SymbolPolygonSegment(const XmlDomElement& domElement) throw (Exception);
+        ~SymbolPolygonSegment() noexcept {}
+
+        // Getters
+        Type_t getType() const noexcept {return mType;}
+        const Point& getEndPos() const noexcept {return mEndPos;}
+
+        // Setters
+        void setType(Type_t type) noexcept {mType = type;}
+        void setEndPos(const Point& pos) noexcept {mEndPos = pos;}
+
+        // General Methods
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+
+
+    private:
+
+        // make some methods inaccessible...
+        SymbolPolygonSegment();
+        SymbolPolygonSegment(const SymbolPolygonSegment& other);
+        SymbolPolygonSegment& operator=(const SymbolPolygonSegment& rhs);
+
+        // Private Methods
+        bool checkAttributesValidity() const noexcept;
+
+
+        // Attributes
+        Type_t mType;
+        Point mEndPos;
+};
+
+} // namespace library
 
 /*****************************************************************************************
  *  Class SymbolPolygon
@@ -47,21 +90,15 @@ namespace library {
 /**
  * @brief The SymbolPolygon class
  */
-class SymbolPolygon final : public QObject
+class SymbolPolygon final : public IF_XmlSerializableObject
 {
-        Q_OBJECT
+        Q_DECLARE_TR_FUNCTIONS(SymbolPolygon)
 
     public:
 
-        // Types
-        struct PolygonSegment_t {
-            enum {Line, Arc} type;
-            Point endPos;
-        };
-
-
         // Constructors / Destructor
-        explicit SymbolPolygon(Symbol& symbol, const XmlDomElement& domElement) throw (Exception);
+        explicit SymbolPolygon() noexcept;
+        explicit SymbolPolygon(const XmlDomElement& domElement) throw (Exception);
         ~SymbolPolygon() noexcept;
 
         // Getters
@@ -70,19 +107,30 @@ class SymbolPolygon final : public QObject
         const Length& getLineWidth() const noexcept {return mLineWidth;}
         bool isGrabArea() const noexcept {return mIsGrabArea;}
         const Point& getStartPos() const noexcept {return mStartPos;}
-        const QList<const PolygonSegment_t*>& getSegments() const noexcept {return mSegments;}
+        const QList<const SymbolPolygonSegment*>& getSegments() const noexcept {return mSegments;}
+
+        // Setters
+        void setLineLayerId(uint id) noexcept {mLineLayerId = id;}
+        void setFillLayerId(uint id) noexcept {mFillLayerId = id;}
+        void setLineWidth(const Length& width) noexcept {mLineWidth = width;}
+        void setIsGrabArea(bool isGrabArea) noexcept {mIsGrabArea = isGrabArea;}
+        void setStartPos(const Point& pos) noexcept {mStartPos = pos;}
+
+        // General Methods
+        void clearSegments() noexcept {qDeleteAll(mSegments); mSegments.clear();}
+        void appendSegment(const SymbolPolygonSegment* segment) noexcept {mSegments.append(segment);}
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
 
 
     private:
 
         // make some methods inaccessible...
-        SymbolPolygon();
         SymbolPolygon(const SymbolPolygon& other);
         SymbolPolygon& operator=(const SymbolPolygon& rhs);
 
+        // Private Methods
+        bool checkAttributesValidity() const noexcept;
 
-        // General Attributes
-        Symbol& mSymbol;
 
         // Polygon Attributes
         uint mLineLayerId;
@@ -90,7 +138,7 @@ class SymbolPolygon final : public QObject
         Length mLineWidth;
         bool mIsGrabArea;
         Point mStartPos;
-        QList<const PolygonSegment_t*> mSegments;
+        QList<const SymbolPolygonSegment*> mSegments;
 };
 
 } // namespace library

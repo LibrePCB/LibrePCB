@@ -214,6 +214,8 @@ void SchematicNetPoint::init() throw (Exception)
         mUuid.toString(), "Dead", ErcMsg::ErcMsgType_t::SchematicError,
         QString(tr("Dead net point in schematic page \"%1\": %2"))
         .arg(mSchematic.getName()).arg(mUuid.toString())));
+
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 SchematicNetPoint::~SchematicNetPoint() noexcept
@@ -329,6 +331,8 @@ void SchematicNetPoint::removeFromSchematic() throw (Exception)
 
 XmlDomElement* SchematicNetPoint::serializeToXmlDomElement() const throw (Exception)
 {
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+
     QScopedPointer<XmlDomElement> root(new XmlDomElement("netpoint"));
     root->setAttribute("uuid", mUuid);
     root->appendTextChild("attached", mAttached);
@@ -345,6 +349,19 @@ XmlDomElement* SchematicNetPoint::serializeToXmlDomElement() const throw (Except
         position->setAttribute("y", mPosition.getY());
     }
     return root.take();
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+bool SchematicNetPoint::checkAttributesValidity() const noexcept
+{
+    if (mUuid.isNull())                             return false;
+    if (mNetSignal == nullptr)                      return false;
+    if (mAttached && (mSymbolInstance == nullptr))  return false;
+    if (mAttached && (mPinInstance == nullptr))     return false;
+    return true;
 }
 
 /*****************************************************************************************

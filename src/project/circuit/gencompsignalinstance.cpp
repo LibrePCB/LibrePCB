@@ -83,6 +83,8 @@ void GenCompSignalInstance::init() throw (Exception)
     // register to generic component attributes changed
     connect(&mGenCompInstance, &GenCompInstance::attributesChanged,
             this, &GenCompSignalInstance::updateErcMessages);
+
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 GenCompSignalInstance::~GenCompSignalInstance() noexcept
@@ -180,10 +182,22 @@ void GenCompSignalInstance::removeFromCircuit() throw (Exception)
 
 XmlDomElement* GenCompSignalInstance::serializeToXmlDomElement() const throw (Exception)
 {
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+
     QScopedPointer<XmlDomElement> root(new XmlDomElement("map"));
     root->setAttribute("comp_signal", mGenCompSignal->getUuid());
     root->setAttribute("netsignal", mNetSignal ? mNetSignal->getUuid() : QString());
     return root.take();
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+bool GenCompSignalInstance::checkAttributesValidity() const noexcept
+{
+    if (mGenCompSignal == nullptr)  return false;
+    return true;
 }
 
 /*****************************************************************************************

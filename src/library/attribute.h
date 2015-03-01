@@ -26,12 +26,11 @@
 
 #include <QtCore>
 #include "../common/exceptions.h"
+#include "../common/file_io/if_xmlserializableobject.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
-
-class XmlDomElement;
 
 namespace library {
 class GenericComponent;
@@ -46,9 +45,9 @@ namespace library {
 /**
  * @brief The Attribute class represents an attribute of a library element
  */
-class Attribute final : public QObject
+class Attribute final : public IF_XmlSerializableObject
 {
-        Q_OBJECT
+        Q_DECLARE_TR_FUNCTIONS(Attribute)
 
     public:
 
@@ -64,8 +63,7 @@ class Attribute final : public QObject
 
 
         // Constructors / Destructor
-        explicit Attribute(GenericComponent& genComp,
-                           const XmlDomElement& domElement) throw (Exception);
+        explicit Attribute(const XmlDomElement& domElement) throw (Exception);
         ~Attribute() noexcept;
 
 
@@ -79,6 +77,8 @@ class Attribute final : public QObject
         const QHash<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
         const QHash<QString, QString>& getDefaultValues() const noexcept {return mDefaultValues;}
 
+        // General Methods
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
 
         // Static Methods
         static Type_t stringToType(const QString& type) throw (Exception);
@@ -92,9 +92,9 @@ class Attribute final : public QObject
         Attribute(const Attribute& other);
         Attribute& operator=(const Attribute& rhs);
 
+        // Private Methods
+        bool checkAttributesValidity() const noexcept;
 
-        // General Attributes
-        GenericComponent& mGenericComponent;
 
         // Attributes
         QString mKey;

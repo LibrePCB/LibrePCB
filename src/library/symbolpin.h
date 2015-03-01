@@ -25,18 +25,8 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../common/exceptions.h"
 #include "../common/units/all_length_units.h"
-
-/*****************************************************************************************
- *  Forward Declarations
- ****************************************************************************************/
-
-class XmlDomElement;
-
-namespace library {
-class Symbol;
-}
+#include "../common/file_io/if_xmlserializableobject.h"
 
 /*****************************************************************************************
  *  Class SymbolPin
@@ -47,14 +37,17 @@ namespace library {
 /**
  * @brief The SymbolPin class
  */
-class SymbolPin final : public QObject
+class SymbolPin final : public IF_XmlSerializableObject
 {
-        Q_OBJECT
+        Q_DECLARE_TR_FUNCTIONS(SymbolPin)
 
     public:
 
         // Constructors / Destructor
-        explicit SymbolPin(Symbol& symbol, const XmlDomElement& domElement) throw (Exception);
+        explicit SymbolPin(const QUuid& uuid = QUuid::createUuid(),
+                           const QString& name_en_US = QString(),
+                           const QString& description_en_US = QString()) noexcept;
+        explicit SymbolPin(const XmlDomElement& domElement) throw (Exception);
         ~SymbolPin() noexcept;
 
         // Getters
@@ -67,17 +60,25 @@ class SymbolPin final : public QObject
         const QHash<QString, QString>& getNames() const noexcept {return mNames;}
         const QHash<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
 
+        // Setters
+        void setPosition(const Point& pos) noexcept;
+        void setLength(const Length& length) noexcept;
+        void setAngle(const Angle& angle) noexcept;
+        void setName(const QString& locale, const QString& name) noexcept;
+        void setDescription(const QString& locale, const QString& description) noexcept;
+
+        // General Methods
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
 
     private:
 
         // make some methods inaccessible...
-        SymbolPin();
         SymbolPin(const SymbolPin& other);
         SymbolPin& operator=(const SymbolPin& rhs);
 
+        // Private Methods
+        bool checkAttributesValidity() const noexcept;
 
-        // General Attributes
-        Symbol& mSymbol;
 
         // Pin Attributes
         QUuid mUuid;

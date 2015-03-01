@@ -25,18 +25,9 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../common/exceptions.h"
+#include "../common/file_io/if_xmlserializableobject.h"
 #include "../common/units/all_length_units.h"
-
-/*****************************************************************************************
- *  Forward Declarations
- ****************************************************************************************/
-
-class XmlDomElement;
-
-namespace library {
-class Symbol;
-}
+#include "../common/alignment.h"
 
 /*****************************************************************************************
  *  Class SymbolText
@@ -47,43 +38,54 @@ namespace library {
 /**
  * @brief The SymbolText class
  */
-class SymbolText final : public QObject
+class SymbolText final : public IF_XmlSerializableObject
 {
-        Q_OBJECT
+        Q_DECLARE_TR_FUNCTIONS(SymbolText)
 
     public:
 
         // Constructors / Destructor
-        explicit SymbolText(Symbol& symbol, const XmlDomElement& domElement) throw (Exception);
+        explicit SymbolText() noexcept;
+        explicit SymbolText(const XmlDomElement& domElement) throw (Exception);
         ~SymbolText() noexcept;
 
         // Getters
-        unsigned int getLayerId() const noexcept {return mLayerId;}
+        uint getLayerId() const noexcept {return mLayerId;}
         const Point& getPosition() const noexcept {return mPosition;}
         const Angle& getAngle() const noexcept {return mAngle;}
         const Length& getHeight() const noexcept {return mHeight;}
-        const Qt::Alignment& getAlign() const noexcept {return mAlign;}
+        const Alignment& getAlign() const noexcept {return mAlign;}
         const QString& getText() const noexcept {return mText;}
+
+        // Setters
+        void setLayerId(uint layerId) noexcept {mLayerId = layerId;}
+        void setText(const QString& text) noexcept {mText = text;}
+        void setPosition(const Point& pos) noexcept {mPosition = pos;}
+        void setAngle(const Angle& angle) noexcept {mAngle = angle;}
+        void setHeight(const Length& height) noexcept {mHeight = height;}
+        void setAlign(const Alignment& align) noexcept {mAlign = align;}
+
+        // General Methods
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
 
 
     private:
 
         // make some methods inaccessible...
-        SymbolText();
         SymbolText(const SymbolText& other);
         SymbolText& operator=(const SymbolText& rhs);
 
+        // Private Methods
+        bool checkAttributesValidity() const noexcept;
 
-        // General Attributes
-        Symbol& mSymbol;
 
         // Text Attributes
-        unsigned int mLayerId;
+        uint mLayerId;
+        QString mText;
         Point mPosition;
         Angle mAngle;
         Length mHeight;
-        Qt::Alignment mAlign;
-        QString mText;
+        Alignment mAlign;
 };
 
 } // namespace library

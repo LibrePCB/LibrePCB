@@ -46,44 +46,59 @@ class GenericComponent final : public LibraryElement
     public:
 
         // Constructors / Destructor
+        explicit GenericComponent(const QUuid& uuid = QUuid::createUuid(),
+                                  const Version& version = Version(),
+                                  const QString& author = QString(),
+                                  const QString& name_en_US = QString(),
+                                  const QString& description_en_US = QString(),
+                                  const QString& keywords_en_US = QString()) throw (Exception);
         explicit GenericComponent(const FilePath& xmlFilePath) throw (Exception);
         ~GenericComponent() noexcept;
 
-        // Getters: Attributes
-        const QHash<QString, Attribute*>& getAttributes() const noexcept {return mAttributes;}
-        const Attribute* getAttributeByKey(const QString& key) const noexcept {return mAttributes.value(key, nullptr);}
+        // Attributes
+        const QHash<QString, Attribute*>& getAttributes() const noexcept;
+        const Attribute* getAttributeByKey(const QString& key) const noexcept;
 
-        // Getters: Default Values
-        const QHash<QString, QString>& getDefaultValues() const noexcept {return mDefaultValues;}
+        // Default Values
+        const QHash<QString, QString>& getDefaultValues() const noexcept;
         QString getDefaultValue(const QString& locale = QString()) const noexcept;
+        void clearDefaultValues() noexcept;
+        void addDefaultValue(const QString& locale, const QString& value) noexcept;
 
-        // Getters: Prefixes
-        const QHash<QString, QString>& getPrefixes() const noexcept {return mPrefixes;}
+        // Prefixes
+        const QHash<QString, QString>& getPrefixes() const noexcept;
         QString getPrefix(const QString& norm = QString()) const noexcept;
-        const QString& getDefaultPrefixNorm() const noexcept {return mDefaultPrefixNorm;}
-        QString getDefaultPrefix() const noexcept {return mPrefixes.value(mDefaultPrefixNorm);}
+        const QString& getDefaultPrefixNorm() const noexcept;
+        QString getDefaultPrefix() const noexcept;
+        void clearPrefixes() noexcept;
+        void addPrefix(const QString& norm, const QString& prefix, bool isDefault) noexcept;
 
-        // Getters: Signals
-        const QHash<QUuid, const GenCompSignal*>& getSignals() const noexcept {return mSignals;}
-        const GenCompSignal* getSignalByUuid(const QUuid& uuid) const noexcept {return mSignals.value(uuid, 0);}
+        // Signals
+        const QHash<QUuid, const GenCompSignal*>& getSignals() const noexcept;
+        const GenCompSignal* getSignalByUuid(const QUuid& uuid) const noexcept;
+        void clearSignals() noexcept;
+        void addSignal(const GenCompSignal* signal) noexcept;
 
-        // Getters: Symbol Variants
-        const QHash<QUuid, const GenCompSymbVar*>& getSymbolVariants() const noexcept {return mSymbolVariants;}
-        const GenCompSymbVar* getSymbolVariantByUuid(const QUuid& uuid) const noexcept {return mSymbolVariants.value(uuid, 0);}
-        const QUuid& getDefaultSymbolVariantUuid() const noexcept {return mDefaultSymbolVariantUuid;}
-        const GenCompSymbVar* getDefaultSymbolVariant() const noexcept {return mSymbolVariants.value(mDefaultSymbolVariantUuid);}
+        // Symbol Variants
+        const QHash<QUuid, const GenCompSymbVar*>& getSymbolVariants() const noexcept;
+        const GenCompSymbVar* getSymbolVariantByUuid(const QUuid& uuid) const noexcept;
+        const QUuid& getDefaultSymbolVariantUuid() const noexcept;
+        const GenCompSymbVar* getDefaultSymbolVariant() const noexcept;
+        void clearSymbolVariants() noexcept;
+        void addSymbolVariant(const GenCompSymbVar* symbolVariant) noexcept;
 
 
     private:
 
         // make some methods inaccessible...
-        GenericComponent();
         GenericComponent(const GenericComponent& other);
         GenericComponent& operator=(const GenericComponent& rhs);
 
 
         // Private Methods
         void parseDomTree(const XmlDomElement& root) throw (Exception);
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+        bool checkAttributesValidity() const noexcept;
 
 
         // Generic Conponent Attributes

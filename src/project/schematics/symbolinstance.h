@@ -121,6 +121,7 @@ class SymbolInstance final : public QObject, public IF_AttributeProvider,
 
         // Private Methods
         void init(const QUuid& symbVarItemUuid) throw (Exception);
+        bool checkAttributesValidity() const noexcept;
 
 
         // General

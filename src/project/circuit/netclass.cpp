@@ -40,6 +40,7 @@ NetClass::NetClass(const Circuit& circuit, const XmlDomElement& domElement) thro
     mUuid(domElement.getAttribute<QUuid>("uuid")),
     mName(domElement.getAttribute("name", true))
 {
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 NetClass::NetClass(const Circuit& circuit, const QString& name) throw (Exception) :
@@ -51,6 +52,8 @@ NetClass::NetClass(const Circuit& circuit, const QString& name) throw (Exception
         throw RuntimeError(__FILE__, __LINE__, QString(),
             tr("The new netclass name must not be empty!"));
     }
+
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 NetClass::~NetClass() noexcept
@@ -117,6 +120,8 @@ void NetClass::removeFromCircuit() noexcept
 
 XmlDomElement* NetClass::serializeToXmlDomElement() const throw (Exception)
 {
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+
     QScopedPointer<XmlDomElement> root(new XmlDomElement("netclass"));
     root->setAttribute("uuid", mUuid);
     root->setAttribute("name", mName);
@@ -126,6 +131,13 @@ XmlDomElement* NetClass::serializeToXmlDomElement() const throw (Exception)
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
+
+bool NetClass::checkAttributesValidity() const noexcept
+{
+    if (mUuid.isNull())     return false;
+    if (mName.isEmpty())    return false;
+    return true;
+}
 
 void NetClass::updateErcMessages() noexcept
 {

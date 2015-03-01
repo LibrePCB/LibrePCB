@@ -116,14 +116,14 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
         QPainterPath polygonPath;
         polygonPath.setFillRule(Qt::WindingFill);
         polygonPath.moveTo(polygon->getStartPos().toPxQPointF());
-        foreach (const SymbolPolygon::PolygonSegment_t* segment, polygon->getSegments())
+        foreach (const SymbolPolygonSegment* segment, polygon->getSegments())
         {
-            switch (segment->type)
+            switch (segment->getType())
             {
-                case SymbolPolygon::PolygonSegment_t::Line:
-                    polygonPath.lineTo(segment->endPos.toPxQPointF());
+                case SymbolPolygonSegment::Type_t::Line:
+                    polygonPath.lineTo(segment->getEndPos().toPxQPointF());
                     break;
-                case SymbolPolygon::PolygonSegment_t::Arc:
+                case SymbolPolygonSegment::Type_t::Arc:
                     //polygonPath.arcTo(item->getArcRectF(), item->getArcStartAngle().deg(),
                     //                                      item->getArcSpanAngle().deg());
                     break;
@@ -158,12 +158,12 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
 
         // calculate text rect
         qreal x, y;
-        if (text->getAlign() & Qt::AlignTop)
+        if (text->getAlign().getV() == VAlign::top())
         {
             x = text->getPosition().toPxQPointF().x()/factor;
             y = text->getPosition().toPxQPointF().y()/factor+0.1*text->getHeight().toPx()/factor;
         }
-        else if (text->getAlign() & Qt::AlignBottom)
+        else if (text->getAlign().getV() == VAlign::bottom())
         {
             x = text->getPosition().toPxQPointF().x()/factor;
             y = text->getPosition().toPxQPointF().y()/factor-0.1*text->getHeight().toPx()/factor;
@@ -192,7 +192,7 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
         else
             painter->rotate(text->getAngle().toDeg());
         painter->setFont(font);
-        int flags = text->getAlign() | Qt::TextDontClip;
+        int flags = text->getAlign().toQtAlign() | Qt::TextDontClip;
         if (rotate180)
         {
             if (flags & Qt::AlignLeft) {flags &= ~Qt::AlignLeft; flags |= Qt::AlignRight;}
@@ -261,19 +261,19 @@ bool SymbolGraphicsItem::updateBoundingRectAndShape() noexcept
         QPainterPath polygonPath;
         polygonPath.setFillRule(Qt::WindingFill);
         polygonPath.moveTo(polygon->getStartPos().toPxQPointF());
-        foreach (const SymbolPolygon::PolygonSegment_t* segment, polygon->getSegments())
+        foreach (const SymbolPolygonSegment* segment, polygon->getSegments())
         {
-            switch (segment->type)
+            switch (segment->getType())
             {
-                case SymbolPolygon::PolygonSegment_t::Line:
-                    polygonPath.lineTo(segment->endPos.toPxQPointF());
+                case SymbolPolygonSegment::Type_t::Line:
+                    polygonPath.lineTo(segment->getEndPos().toPxQPointF());
                     break;
-                case SymbolPolygon::PolygonSegment_t::Arc:
+                case SymbolPolygonSegment::Type_t::Arc:
                     //polygonPath.arcTo(item->getArcRectF(), item->getArcStartAngle().deg(),
                     //                                      item->getArcSpanAngle().deg());
                     break;
                 default:
-                    qWarning() << "Unknown polygon segment type:" << segment->type;
+                    qWarning() << "Unknown polygon segment type";
                     return false;
             }
         }

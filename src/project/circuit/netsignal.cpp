@@ -52,6 +52,8 @@ NetSignal::NetSignal(const Circuit& circuit,
             QString(tr("Invalid netclass UUID: \"%1\""))
             .arg(domElement.getAttribute("netclass")));
     }
+
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 NetSignal::NetSignal(const Circuit& circuit, NetClass& netclass,
@@ -64,6 +66,7 @@ NetSignal::NetSignal(const Circuit& circuit, NetClass& netclass,
     mHasAutoName(autoName),
     mNetClass(&netclass)
 {
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 NetSignal::~NetSignal() noexcept
@@ -158,6 +161,8 @@ void NetSignal::removeFromCircuit() noexcept
 
 XmlDomElement* NetSignal::serializeToXmlDomElement() const throw (Exception)
 {
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+
     QScopedPointer<XmlDomElement> root(new XmlDomElement("netsignal"));
     root->setAttribute("uuid", mUuid);
     root->setAttribute("name", mName);
@@ -169,6 +174,14 @@ XmlDomElement* NetSignal::serializeToXmlDomElement() const throw (Exception)
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
+
+bool NetSignal::checkAttributesValidity() const noexcept
+{
+    if (mUuid.isNull())         return false;
+    if (mName.isEmpty())        return false;
+    if (mNetClass == nullptr)   return false;
+    return true;
+}
 
 void NetSignal::updateErcMessages() noexcept
 {

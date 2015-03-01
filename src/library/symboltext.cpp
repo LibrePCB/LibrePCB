@@ -32,10 +32,15 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SymbolText::SymbolText(Symbol& symbol, const XmlDomElement& domElement) throw (Exception) :
-    QObject(0), mSymbol(symbol), mAlign(0)
+SymbolText::SymbolText() noexcept :
+    mLayerId(0), mText(), mPosition(0, 0), mAngle(0), mHeight(0), mAlign()
+{
+}
+
+SymbolText::SymbolText(const XmlDomElement& domElement) throw (Exception)
 {
     mLayerId = domElement.getAttribute<uint>("layer");
+    mText = domElement.getAttribute("text", true);
 
     // load geometry attributes
     mPosition.setX(domElement.getAttribute<Length>("x"));
@@ -44,36 +49,45 @@ SymbolText::SymbolText(Symbol& symbol, const XmlDomElement& domElement) throw (E
     mHeight = domElement.getAttribute<Length>("height");
 
     // text alignment
-    if (domElement.getAttribute("v_align") == "bottom")
-        mAlign |= Qt::AlignBottom;
-    else if (domElement.getAttribute("v_align") == "center")
-        mAlign |= Qt::AlignVCenter;
-    else if (domElement.getAttribute("v_align") == "top")
-        mAlign |= Qt::AlignTop;
-    else
-    {
-        throw RuntimeError(__FILE__, __LINE__, domElement.getAttribute("v_align"),
-            QString(tr("Invalid vertical alignment \"%1\" in file \"%2\"."))
-            .arg(domElement.getAttribute("v_align"), mSymbol.getXmlFilepath().toNative()));
-    }
-    if (domElement.getAttribute("h_align") == "left")
-        mAlign |= Qt::AlignLeft;
-    else if (domElement.getAttribute("h_align") == "center")
-        mAlign |= Qt::AlignHCenter;
-    else if (domElement.getAttribute("h_align") == "right")
-        mAlign |= Qt::AlignRight;
-    else
-    {
-        throw RuntimeError(__FILE__, __LINE__, domElement.getAttribute("h_align"),
-            QString(tr("Invalid horizontal alignment \"%1\" in file \"%2\"."))
-            .arg(domElement.getAttribute("h_align"), mSymbol.getXmlFilepath().toNative()));
-    }
+    mAlign.setH(domElement.getAttribute<HAlign>("h_align"));
+    mAlign.setV(domElement.getAttribute<VAlign>("v_align"));
 
-    mText = domElement.getAttribute("text", true);
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 SymbolText::~SymbolText() noexcept
 {
+}
+
+/*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+XmlDomElement* SymbolText::serializeToXmlDomElement() const throw (Exception)
+{
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("text"));
+    root->setAttribute("layer", mLayerId);
+    root->setAttribute("text", mText);
+    root->setAttribute("x", mPosition.getX().toMmString());
+    root->setAttribute("y", mPosition.getY().toMmString());
+    root->setAttribute("angle", mAngle.toDegString());
+    root->setAttribute("height", mHeight.toMmString());
+    root->setAttribute("h_align", mAlign.getH());
+    root->setAttribute("v_align", mAlign.getV());
+    return root.take();
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+bool SymbolText::checkAttributesValidity() const noexcept
+{
+    if (mText.isEmpty())    return false;
+    if (mHeight <= 0)       return false;
+    return true;
 }
 
 /*****************************************************************************************

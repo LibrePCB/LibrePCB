@@ -32,18 +32,18 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Attribute::Attribute(GenericComponent& genComp,
-                     const XmlDomElement& domElement) throw (Exception) :
-    QObject(nullptr), mGenericComponent(genComp)
+Attribute::Attribute(const XmlDomElement& domElement) throw (Exception)
 {
     // read attributes
     mKey = domElement.getAttribute("key", true);
     mType = stringToType(domElement.getAttribute("type", true));
 
     // read names, descriptions and default values in all available languages
-    LibraryBaseElement::readLocaleDomNodes(mGenericComponent.getXmlFilepath(), domElement, "name", mNames);
-    LibraryBaseElement::readLocaleDomNodes(mGenericComponent.getXmlFilepath(), domElement, "description", mDescriptions);
-    LibraryBaseElement::readLocaleDomNodes(mGenericComponent.getXmlFilepath(), domElement, "default_value", mDefaultValues);
+    LibraryBaseElement::readLocaleDomNodes(domElement, "name", mNames);
+    LibraryBaseElement::readLocaleDomNodes(domElement, "description", mDescriptions);
+    LibraryBaseElement::readLocaleDomNodes(domElement, "default_value", mDefaultValues);
+
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 Attribute::~Attribute() noexcept
@@ -67,6 +67,39 @@ QString Attribute::getDescription(const QString& locale) const noexcept
 QString Attribute::getDefaultValue(const QString& locale ) const noexcept
 {
     return LibraryBaseElement::localeStringFromList(mDefaultValues, locale);
+}
+
+/*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+XmlDomElement* Attribute::serializeToXmlDomElement() const throw (Exception)
+{
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("attribute"));
+    root->setAttribute("key", mKey);
+    root->setAttribute("type", typeToString(mType));
+    foreach (const QString& locale, mNames.keys())
+        root->appendTextChild("name", mNames.value(locale))->setAttribute("locale", locale);
+    foreach (const QString& locale, mDescriptions.keys())
+        root->appendTextChild("description", mDescriptions.value(locale))->setAttribute("locale", locale);
+    foreach (const QString& locale, mDefaultValues.keys())
+        root->appendTextChild("default_value", mDefaultValues.value(locale))->setAttribute("locale", locale);
+    return root.take();
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+bool Attribute::checkAttributesValidity() const noexcept
+{
+    if (mKey.isEmpty())                     return false;
+    if (mNames.value("en_US").isEmpty())    return false;
+    if (!mDescriptions.contains("en_US"))   return false;
+    if (!mDefaultValues.contains("en_US"))  return false;
+    return true;
 }
 
 /*****************************************************************************************

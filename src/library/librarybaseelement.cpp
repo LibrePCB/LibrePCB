@@ -35,6 +35,20 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
+LibraryBaseElement::LibraryBaseElement(const QString& xmlRootNodeName, const QUuid& uuid,
+                                       const Version& version, const QString& author,
+                                       const QString& name_en_US,
+                                       const QString& description_en_US,
+                                       const QString& keywords_en_US) throw (Exception) :
+    QObject(nullptr), mXmlFilepath(), mXmlRootNodeName(xmlRootNodeName), mDomTreeParsed(false),
+    mUuid(uuid), mVersion(version), mAuthor(author),
+    mCreated(QDateTime::currentDateTime()), mLastModified(QDateTime::currentDateTime())
+{
+    mNames.insert("en_US", name_en_US);
+    mDescriptions.insert("en_US", description_en_US);
+    mKeywords.insert("en_US", keywords_en_US);
+}
+
 LibraryBaseElement::LibraryBaseElement(const FilePath& xmlFilePath,
                                        const QString& xmlRootNodeName) throw (Exception) :
     QObject(0), mXmlFilepath(xmlFilePath), mXmlRootNodeName(xmlRootNodeName),
@@ -66,6 +80,17 @@ QString LibraryBaseElement::getKeywords(const QString& locale) const noexcept
 }
 
 /*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+void LibraryBaseElement::saveToFile(const FilePath& filepath) const throw (Exception)
+{
+    XmlDomDocument doc(*serializeToXmlDomElement(), true);
+    QScopedPointer<SmartXmlFile> file(SmartXmlFile::create(filepath));
+    file->save(doc, true);
+}
+
+/*****************************************************************************************
  *  Protected Methods
  ****************************************************************************************/
 
@@ -77,6 +102,7 @@ void LibraryBaseElement::readFromFile() throw (Exception)
     SmartXmlFile file(mXmlFilepath, false, false);
     QSharedPointer<XmlDomDocument> doc = file.parseFileAndBuildDomTree();
     parseDomTree(doc->getRoot());
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     Q_ASSERT(mDomTreeParsed == true);
 }
@@ -90,19 +116,48 @@ void LibraryBaseElement::parseDomTree(const XmlDomElement& root) throw (Exceptio
     mVersion = root.getFirstChild("meta/version", true, true)->getText<Version>();
 
     // read names, descriptions and keywords in all available languages
-    readLocaleDomNodes(mXmlFilepath, *root.getFirstChild("meta", true), "name", mNames);
-    readLocaleDomNodes(mXmlFilepath, *root.getFirstChild("meta", true), "description", mDescriptions);
-    readLocaleDomNodes(mXmlFilepath, *root.getFirstChild("meta", true), "keywords", mKeywords);
+    readLocaleDomNodes(*root.getFirstChild("meta", true), "name", mNames);
+    readLocaleDomNodes(*root.getFirstChild("meta", true), "description", mDescriptions);
+    readLocaleDomNodes(*root.getFirstChild("meta", true), "keywords", mKeywords);
 
     mDomTreeParsed = true;
+}
+
+XmlDomElement* LibraryBaseElement::serializeToXmlDomElement() const throw (Exception)
+{
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+
+    QScopedPointer<XmlDomElement> root(new XmlDomElement(mXmlRootNodeName));
+    XmlDomElement* meta = root->appendChild("meta");
+    meta->appendTextChild("uuid", mUuid.toString());
+    meta->appendTextChild("version", mVersion.toStr());
+    meta->appendTextChild("author", mAuthor);
+    meta->appendTextChild("created", mCreated.toUTC().toString(Qt::ISODate));
+    meta->appendTextChild("last_modified", mLastModified.toUTC().toString(Qt::ISODate));
+    foreach (const QString& locale, mNames.keys())
+        meta->appendTextChild("name", mNames.value(locale))->setAttribute("locale", locale);
+    foreach (const QString& locale, mDescriptions.keys())
+        meta->appendTextChild("description", mDescriptions.value(locale))->setAttribute("locale", locale);
+    foreach (const QString& locale, mKeywords.keys())
+        meta->appendTextChild("keywords", mKeywords.value(locale))->setAttribute("locale", locale);
+    return root.take();
+}
+
+bool LibraryBaseElement::checkAttributesValidity() const noexcept
+{
+    if (mUuid.isNull())                     return false;
+    if (!mVersion.isValid())                return false;
+    if (mNames.value("en_US").isEmpty())    return false;
+    if (!mDescriptions.contains("en_US"))   return false;
+    if (!mKeywords.contains("en_US"))       return false;
+    return true;
 }
 
 /*****************************************************************************************
  *  Static Methods
  ****************************************************************************************/
 
-void LibraryBaseElement::readLocaleDomNodes(const FilePath& xmlFilepath,
-                                            const XmlDomElement& parentNode,
+void LibraryBaseElement::readLocaleDomNodes(const XmlDomElement& parentNode,
                                             const QString& childNodesName,
                                             QHash<QString, QString>& list) throw (Exception)
 {
@@ -112,24 +167,24 @@ void LibraryBaseElement::readLocaleDomNodes(const FilePath& xmlFilepath,
         QString locale = node->getAttribute("locale", true);
         if (locale.isEmpty())
         {
-            throw RuntimeError(__FILE__, __LINE__, xmlFilepath.toStr(),
+            throw RuntimeError(__FILE__, __LINE__, parentNode.getDocFilePath().toStr(),
                 QString(tr("Entry without locale found in \"%1\"."))
-                .arg(xmlFilepath.toNative()));
+                .arg(parentNode.getDocFilePath().toNative()));
         }
         if (list.contains(locale))
         {
-            throw RuntimeError(__FILE__, __LINE__, xmlFilepath.toStr(),
+            throw RuntimeError(__FILE__, __LINE__, parentNode.getDocFilePath().toStr(),
                 QString(tr("Locale \"%1\" defined multiple times in \"%2\"."))
-                .arg(locale, xmlFilepath.toNative()));
+                .arg(locale, parentNode.getDocFilePath().toNative()));
         }
         list.insert(locale, node->getText());
     }
 
     if (!list.contains("en_US"))
     {
-        throw RuntimeError(__FILE__, __LINE__, xmlFilepath.toStr(), QString(
+        throw RuntimeError(__FILE__, __LINE__, parentNode.getDocFilePath().toStr(), QString(
             tr("At least one entry in \"%1\" has no translation for locale \"en_US\"."))
-            .arg(xmlFilepath.toNative()));
+            .arg(parentNode.getDocFilePath().toNative()));
     }
 }
 

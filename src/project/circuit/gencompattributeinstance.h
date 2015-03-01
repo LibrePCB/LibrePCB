@@ -79,6 +79,9 @@ class GenCompAttributeInstance final : public IF_XmlSerializableObject
         GenCompAttributeInstance(const GenCompAttributeInstance& other);
         GenCompAttributeInstance& operator=(const GenCompAttributeInstance& rhs);
 
+        // Private Methods
+        bool checkAttributesValidity() const noexcept;
+
 
         // General
         Circuit& mCircuit;

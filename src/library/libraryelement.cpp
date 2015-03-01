@@ -31,6 +31,14 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
+LibraryElement::LibraryElement(const QString& xmlRootNodeName, const QUuid& uuid,
+                               const Version& version, const QString& author,
+                               const QString& name_en_US, const QString& description_en_US,
+                               const QString& keywords_en_US) throw (Exception) :
+    LibraryBaseElement(xmlRootNodeName, uuid, version, author, name_en_US, description_en_US, keywords_en_US)
+{
+}
+
 LibraryElement::LibraryElement(const FilePath& xmlFilePath,
                                const QString& xmlRootNodeName) throw (Exception) :
     LibraryBaseElement(xmlFilePath, xmlRootNodeName)
@@ -55,6 +63,21 @@ void LibraryElement::parseDomTree(const XmlDomElement& root) throw (Exception)
     {
         mCategories.append(node->getText<QUuid>());
     }
+}
+
+XmlDomElement* LibraryElement::serializeToXmlDomElement() const throw (Exception)
+{
+    QScopedPointer<XmlDomElement> root(LibraryBaseElement::serializeToXmlDomElement());
+    XmlDomElement* categories = root->appendChild("categories");
+    foreach (const QUuid& uuid, mCategories)
+        categories->appendTextChild("category", uuid.toString());
+    return root.take();
+}
+
+bool LibraryElement::checkAttributesValidity() const noexcept
+{
+    if (!LibraryBaseElement::checkAttributesValidity()) return false;
+    return true;
 }
 
 /*****************************************************************************************

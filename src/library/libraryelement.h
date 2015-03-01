@@ -44,6 +44,13 @@ class LibraryElement : public LibraryBaseElement
     public:
 
         // Constructors / Destructor
+        explicit LibraryElement(const QString& xmlRootNodeName,
+                                const QUuid& uuid = QUuid::createUuid(),
+                                const Version& version = Version(),
+                                const QString& author = QString(),
+                                const QString& name_en_US = QString(),
+                                const QString& description_en_US = QString(),
+                                const QString& keywords_en_US = QString()) throw (Exception);
         explicit LibraryElement(const FilePath& xmlFilePath,
                                 const QString& xmlRootNodeName) throw (Exception);
         virtual ~LibraryElement() noexcept;
@@ -55,7 +62,6 @@ class LibraryElement : public LibraryBaseElement
     private:
 
         // make some methods inaccessible...
-        LibraryElement();
         LibraryElement(const LibraryElement& other);
         LibraryElement& operator=(const LibraryElement& rhs);
 
@@ -64,6 +70,8 @@ class LibraryElement : public LibraryBaseElement
 
         // Protected Methods
         virtual void parseDomTree(const XmlDomElement& root) throw (Exception);
+        virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+        virtual bool checkAttributesValidity() const noexcept;
 
         // General Library Element Attributes
         QList<QUuid> mCategories;

@@ -25,15 +25,10 @@
  ****************************************************************************************/
 
 #include <QObject>
+#include "../common/file_io/if_xmlserializableobject.h"
 #include "../common/exceptions.h"
 #include "../common/filepath.h"
 #include "../common/version.h"
-
-/*****************************************************************************************
- *  Forward Declarations
- ****************************************************************************************/
-
-class XmlDomElement;
 
 /*****************************************************************************************
  *  Class LibraryBaseElement
@@ -44,13 +39,20 @@ namespace library {
 /**
  * @brief The LibraryBaseElement class
  */
-class LibraryBaseElement : public QObject
+class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
+        explicit LibraryBaseElement(const QString& xmlRootNodeName,
+                                    const QUuid& uuid = QUuid::createUuid(),
+                                    const Version& version = Version(),
+                                    const QString& author = QString(),
+                                    const QString& name_en_US = QString(),
+                                    const QString& description_en_US = QString(),
+                                    const QString& keywords_en_US = QString()) throw (Exception);
         explicit LibraryBaseElement(const FilePath& xmlFilePath,
                                     const QString& xmlRootNodeName) throw (Exception);
         virtual ~LibraryBaseElement() noexcept;
@@ -71,6 +73,16 @@ class LibraryBaseElement : public QObject
         const QHash<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
         const QHash<QString, QString>& getKeywords() const noexcept {return mKeywords;}
 
+        // Setters
+        void setUuid(const QUuid& uuid) noexcept {mUuid = uuid;}
+        void setName(const QString& locale, const QString& name) noexcept {mNames[locale] = name;}
+        void setDescription(const QString& locale, const QString& desc) noexcept {mDescriptions[locale] = desc;}
+        void setKeywords(const QString& locale, const QString& keywords) noexcept {mKeywords[locale] = keywords;}
+        void setVersion(const Version& version) noexcept {mVersion = version;}
+        void setAuthor(const QString& author) noexcept {mAuthor = author;}
+
+        // General Methods
+        void saveToFile(const FilePath& filepath) const throw (Exception);
 
         // Static Methods
 
@@ -96,8 +108,6 @@ class LibraryBaseElement : public QObject
          *  - The subnode must contain at least the attribute which is called "locale"
          *  - At least one entry with the locale "en_US" must exist!
          *
-         * @param xmlFilepath       The filepath to the XML file of the specified DOM node.
-         *                          This path is only used for exception messages.
          * @param parentNode        The parent node ("my_parent_node" in the example)
          * @param childNodesName    The name of the subnodes to read ("my_subnode" in the example)
          * @param list              The QHash where the new locale/text pair will be
@@ -112,8 +122,7 @@ class LibraryBaseElement : public QObject
          *
          * @see #localeStringFromList()
          */
-        static void readLocaleDomNodes(const FilePath& xmlFilepath,
-                                       const XmlDomElement& parentNode,
+        static void readLocaleDomNodes(const XmlDomElement& parentNode,
                                        const QString& childNodesName,
                                        QHash<QString, QString>& list) throw (Exception);
 
@@ -146,7 +155,6 @@ class LibraryBaseElement : public QObject
     private:
 
         // make some methods inaccessible...
-        LibraryBaseElement();
         LibraryBaseElement(const LibraryBaseElement& other);
         LibraryBaseElement& operator=(const LibraryBaseElement& rhs);
 
@@ -156,6 +164,8 @@ class LibraryBaseElement : public QObject
         // Protected Methods
         void readFromFile() throw (Exception);
         virtual void parseDomTree(const XmlDomElement& root) throw (Exception);
+        virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+        virtual bool checkAttributesValidity() const noexcept;
 
 
         // General Attributes

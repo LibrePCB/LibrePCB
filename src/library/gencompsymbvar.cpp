@@ -32,9 +32,13 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-GenCompSymbVar::GenCompSymbVar(GenericComponent& genComp,
-                               const XmlDomElement& domElement) throw (Exception) :
-    QObject(0), mGenericComponent(genComp)
+GenCompSymbVar::GenCompSymbVar(const QUuid& uuid, const QString& norm, bool isDefault) noexcept :
+    mUuid(uuid), mNorm(norm), mIsDefault(isDefault)
+{
+    Q_ASSERT(mUuid.isNull() == false);
+}
+
+GenCompSymbVar::GenCompSymbVar(const XmlDomElement& domElement) throw (Exception)
 {
     try
     {
@@ -44,20 +48,20 @@ GenCompSymbVar::GenCompSymbVar(GenericComponent& genComp,
         mIsDefault = domElement.getAttribute<bool>("default");
 
         // read names and descriptions in all available languages
-        LibraryBaseElement::readLocaleDomNodes(mGenericComponent.getXmlFilepath(), domElement, "name", mNames);
-        LibraryBaseElement::readLocaleDomNodes(mGenericComponent.getXmlFilepath(), domElement, "description", mDescriptions);
+        LibraryBaseElement::readLocaleDomNodes(domElement, "name", mNames);
+        LibraryBaseElement::readLocaleDomNodes(domElement, "description", mDescriptions);
 
         // Load all symbol variant items
         QList<int> addOrderIndexes; // contains all add order indexes except -1
         for (XmlDomElement* node = domElement.getFirstChild("symbol_items/item", true, false);
              node; node = node->getNextSibling("item"))
         {
-            GenCompSymbVarItem* item = new GenCompSymbVarItem(mGenericComponent, *this, *node);
+            GenCompSymbVarItem* item = new GenCompSymbVarItem(*node);
             if (mSymbolItems.contains(item->getUuid()))
             {
                 throw RuntimeError(__FILE__, __LINE__, item->getUuid().toString(),
                     QString(tr("The symbol variant item \"%1\" exists multiple times in \"%2\"."))
-                    .arg(item->getUuid().toString(), mGenericComponent.getXmlFilepath().toNative()));
+                    .arg(item->getUuid().toString(), domElement.getDocFilePath().toNative()));
             }
             if (item->getAddOrderIndex() != -1)
             {
@@ -66,7 +70,7 @@ GenCompSymbVar::GenCompSymbVar(GenericComponent& genComp,
                     throw RuntimeError(__FILE__, __LINE__, item->getUuid().toString(),
                         QString(tr("The symbol variant \"%1\" in \"%2\" has add order "
                         "index duplicates.")).arg(mUuid.toString(),
-                        mGenericComponent.getXmlFilepath().toNative()));
+                        domElement.getDocFilePath().toNative()));
                 }
                 else
                     addOrderIndexes.append(item->getAddOrderIndex());
@@ -76,10 +80,10 @@ GenCompSymbVar::GenCompSymbVar(GenericComponent& genComp,
         // check if there are symbol items with an add order index >= 0
         if (addOrderIndexes.isEmpty())
         {
-            throw RuntimeError(__FILE__, __LINE__, mGenericComponent.getXmlFilepath().toStr(),
+            throw RuntimeError(__FILE__, __LINE__, domElement.getDocFilePath().toStr(),
                 QString(tr("The symbol variant \"%1\" in \"%2\" has no symbol items with "
                 "an add order index >= 0 defined.")).arg(mUuid.toString(),
-                mGenericComponent.getXmlFilepath().toNative()));
+                domElement.getDocFilePath().toNative()));
         }
         // check if there are no unused add order indexes in between all indexes
         qSort(addOrderIndexes);
@@ -89,9 +93,11 @@ GenCompSymbVar::GenCompSymbVar(GenericComponent& genComp,
             {
                 throw RuntimeError(__FILE__, __LINE__, mUuid.toString(), QString(tr(
                     "The symbol variant \"%1\" in \"%2\" has invalid add order indexes."))
-                    .arg(mUuid.toString(), mGenericComponent.getXmlFilepath().toNative()));
+                    .arg(mUuid.toString(), domElement.getDocFilePath().toNative()));
             }
         }
+
+        if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
     }
     catch (Exception& e)
     {
@@ -127,6 +133,76 @@ const GenCompSymbVarItem* GenCompSymbVar::getItemByAddOrderIndex(unsigned int in
             return item;
     }
     return 0;
+}
+
+/*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
+
+void GenCompSymbVar::setNorm(const QString& norm) noexcept
+{
+    mNorm = norm;
+}
+
+void GenCompSymbVar::setIsDefault(bool isDefault) noexcept
+{
+    mIsDefault = isDefault;
+}
+
+void GenCompSymbVar::setName(const QString& locale, const QString& name) noexcept
+{
+    mNames.insert(locale, name);
+}
+
+void GenCompSymbVar::setDescription(const QString& locale, const QString& desc) noexcept
+{
+    mDescriptions.insert(locale, desc);
+}
+
+/*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+void GenCompSymbVar::clearItems() noexcept
+{
+    qDeleteAll(mSymbolItems);
+    mSymbolItems.clear();
+}
+
+void GenCompSymbVar::addItem(const GenCompSymbVarItem* item) noexcept
+{
+    mSymbolItems.insert(item->getUuid(), item);
+}
+
+XmlDomElement* GenCompSymbVar::serializeToXmlDomElement() const throw (Exception)
+{
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("variant"));
+    root->setAttribute("uuid", mUuid);
+    root->setAttribute("norm", mNorm);
+    root->setAttribute("default", mIsDefault);
+    foreach (const QString& locale, mNames.keys())
+        root->appendTextChild("name", mNames.value(locale))->setAttribute("locale", locale);
+    foreach (const QString& locale, mDescriptions.keys())
+        root->appendTextChild("description", mDescriptions.value(locale))->setAttribute("locale", locale);
+    XmlDomElement* symbol_items = root->appendChild("symbol_items");
+    foreach (const GenCompSymbVarItem* item, mSymbolItems)
+        symbol_items->appendChild(item->serializeToXmlDomElement());
+    return root.take();
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+bool GenCompSymbVar::checkAttributesValidity() const noexcept
+{
+    if (mUuid.isNull())                     return false;
+    if (mNames.value("en_US").isEmpty())    return false;
+    if (!mDescriptions.contains("en_US"))   return false;
+    if (mSymbolItems.isEmpty())             return false;
+    return true;
 }
 
 /*****************************************************************************************

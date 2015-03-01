@@ -158,6 +158,8 @@ void SchematicNetLine::init() throw (Exception)
     }
 
     mGraphicsItem = new SchematicNetLineGraphicsItem(mSchematic, *this);
+
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 SchematicNetLine::~SchematicNetLine() noexcept
@@ -216,12 +218,27 @@ void SchematicNetLine::removeFromSchematic() throw (Exception)
 
 XmlDomElement* SchematicNetLine::serializeToXmlDomElement() const throw (Exception)
 {
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+
     QScopedPointer<XmlDomElement> root(new XmlDomElement("netline"));
     root->setAttribute("uuid", mUuid);
     root->setAttribute("start_point", mStartPoint->getUuid());
     root->setAttribute("end_point", mEndPoint->getUuid());
     root->setAttribute("width", mWidth);
     return root.take();
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+bool SchematicNetLine::checkAttributesValidity() const noexcept
+{
+    if (mUuid.isNull())         return false;
+    if (mStartPoint == nullptr) return false;
+    if (mEndPoint == nullptr)   return false;
+    if (mWidth < 0)             return false;
+    return true;
 }
 
 /*****************************************************************************************

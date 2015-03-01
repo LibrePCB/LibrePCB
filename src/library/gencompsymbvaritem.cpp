@@ -33,9 +33,16 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-GenCompSymbVarItem::GenCompSymbVarItem(GenericComponent& genComp, GenCompSymbVar& symbVar,
-                                       const XmlDomElement& domElement) throw (Exception) :
-    QObject(0), mGenericComponent(genComp), mSymbolVariant(symbVar)
+GenCompSymbVarItem::GenCompSymbVarItem(const QUuid& uuid, const QUuid& symbolUuid,
+                                       int addOrderIndex, bool isRequired,
+                                       const QString& suffix) noexcept :
+    mUuid(uuid), mSymbolUuid(symbolUuid), mAddOrderIndex(addOrderIndex),
+    mIsRequired(isRequired), mSuffix(suffix)
+{
+    Q_ASSERT(mUuid.isNull() == false);
+}
+
+GenCompSymbVarItem::GenCompSymbVarItem(const XmlDomElement& domElement) throw (Exception)
 {
     // read attributes
     mUuid = domElement.getAttribute<QUuid>("uuid");
@@ -56,7 +63,7 @@ GenCompSymbVarItem::GenCompSymbVarItem(GenericComponent& genComp, GenCompSymbVar
         {
             throw RuntimeError(__FILE__, __LINE__, item.pin.toString(),
                 QString(tr("The pin \"%1\" is assigned to multiple signals in \"%2\"."))
-                .arg(item.pin.toString(), mGenericComponent.getXmlFilepath().toNative()));
+                .arg(item.pin.toString(), domElement.getDocFilePath().toNative()));
         }
         if (node->getAttribute("display") == "none")
             item.displayType = PinDisplayType_t::None;
@@ -70,10 +77,12 @@ GenCompSymbVarItem::GenCompSymbVarItem(GenericComponent& genComp, GenCompSymbVar
         {
             throw RuntimeError(__FILE__, __LINE__, node->getAttribute("display"),
                 QString(tr("Invalid pin display type \"%1\" found in \"%2\"."))
-                .arg(node->getAttribute("display"), mGenericComponent.getXmlFilepath().toNative()));
+                .arg(node->getAttribute("display"), domElement.getDocFilePath().toNative()));
         }
         mPinSignalMap.insert(item.pin, item);
     }
+
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 GenCompSymbVarItem::~GenCompSymbVarItem() noexcept
@@ -98,6 +107,55 @@ GenCompSymbVarItem::PinDisplayType_t GenCompSymbVarItem::getDisplayTypeOfPin(con
         return mPinSignalMap.value(pinUuid).displayType;
     else
         return PinDisplayType_t::None;
+}
+
+/*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+void GenCompSymbVarItem::addPinSignalMapping(const QUuid& pin, const QUuid& signal, PinDisplayType_t display) noexcept
+{
+    mPinSignalMap.insert(pin, PinSignalMapItem_t{pin, signal, display});
+}
+
+XmlDomElement* GenCompSymbVarItem::serializeToXmlDomElement() const throw (Exception)
+{
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("item"));
+    root->setAttribute("uuid", mUuid);
+    root->setAttribute("symbol", mSymbolUuid);
+    root->setAttribute("add_order_index", mAddOrderIndex);
+    root->setAttribute("required", mIsRequired);
+    root->setAttribute("suffix", mSuffix);
+    XmlDomElement* pin_signal_map = root->appendChild("pin_signal_map");
+    foreach (const PinSignalMapItem_t& item, mPinSignalMap)
+    {
+        XmlDomElement* child = pin_signal_map->appendChild("map");
+        child->setAttribute("pin", item.pin);
+        child->setAttribute("signal", item.signal);
+        switch (item.displayType)
+        {
+            case PinDisplayType_t::None:            child->setAttribute<QString>("display", "none"); break;
+            case PinDisplayType_t::PinName:         child->setAttribute<QString>("display", "pin_name"); break;
+            case PinDisplayType_t::GenCompSignal:   child->setAttribute<QString>("display", "gen_comp_signal"); break;
+            case PinDisplayType_t::NetSignal:       child->setAttribute<QString>("display", "net_signal"); break;
+            default: throw LogicError(__FILE__, __LINE__);
+        }
+    }
+    return root.take();
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+bool GenCompSymbVarItem::checkAttributesValidity() const noexcept
+{
+    if (mUuid.isNull())                     return false;
+    if (mSymbolUuid.isNull())               return false;
+    if (mAddOrderIndex < -1)                return false;
+    return true;
 }
 
 /*****************************************************************************************

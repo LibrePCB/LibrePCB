@@ -46,6 +46,12 @@ class Symbol final : public LibraryElement
     public:
 
         // Constructors / Destructor
+        explicit Symbol(const QUuid& uuid = QUuid::createUuid(),
+                        const Version& version = Version(),
+                        const QString& author = QString(),
+                        const QString& name_en_US = QString(),
+                        const QString& description_en_US = QString(),
+                        const QString& keywords_en_US = QString()) throw (Exception);
         explicit Symbol(const FilePath& xmlFilePath) throw (Exception);
         ~Symbol() noexcept;
 
@@ -55,17 +61,29 @@ class Symbol final : public LibraryElement
         const QList<const SymbolPolygon*>& getPolygons() const noexcept {return mPolygons;}
         const QList<const SymbolText*>& getTexts() const noexcept {return mTexts;}
 
+        // General Methods
+        void addPin(const SymbolPin* pin) noexcept {mPins.insert(pin->getUuid(), pin);}
+        void addPolygon(const SymbolPolygon* polygon) noexcept {mPolygons.append(polygon);}
+        void addText(const SymbolText* text) noexcept {mTexts.append(text);}
+        void convertLineRectsToPolygonRects(bool fill, bool makeGrabArea) noexcept;
+
 
     private:
 
         // make some methods inaccessible...
-        Symbol();
         Symbol(const Symbol& other);
         Symbol& operator=(const Symbol& rhs);
 
 
         // Private Methods
         void parseDomTree(const XmlDomElement& root) throw (Exception);
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+        bool checkAttributesValidity() const noexcept;
+        bool findLineRectangle(QList<const SymbolPolygon*>& lines) noexcept;
+        bool findHLine(const QList<const SymbolPolygon*>& lines, Point& p, Length* width,
+                       const SymbolPolygon** line) noexcept;
+        bool findVLine(const QList<const SymbolPolygon*>& lines, Point& p, Length* width,
+                       const SymbolPolygon** line) noexcept;
 
 
         // Symbol Attributes

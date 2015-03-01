@@ -36,7 +36,6 @@
  *  Forward Declarations
  ****************************************************************************************/
 
-class XmlDomElement;
 class SchematicLayer;
 
 namespace project {
@@ -179,6 +178,7 @@ class SchematicNetPoint final : public QObject, public IF_ErcMsgProvider,
 
         // Private Methods
         void init() throw (Exception);
+        bool checkAttributesValidity() const noexcept;
 
 
         // General

@@ -92,6 +92,8 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
         }
 
         updateIcon();
+
+        if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
     }
     catch (...)
     {
@@ -395,8 +397,17 @@ void Schematic::updateIcon() noexcept
     mIcon = QIcon(pixmap);
 }
 
+bool Schematic::checkAttributesValidity() const noexcept
+{
+    if (mUuid.isNull())     return false;
+    if (mName.isEmpty())    return false;
+    return true;
+}
+
 XmlDomElement* Schematic::serializeToXmlDomElement() const throw (Exception)
 {
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+
     QScopedPointer<XmlDomElement> root(new XmlDomElement("schematic"));
     XmlDomElement* meta = root->appendChild("meta");
     meta->appendTextChild("uuid", mUuid);

@@ -47,8 +47,6 @@ class IF_XmlSerializableObject
 {
     public:
 
-        // Constructors / Destructor
-
         /**
          * @brief Default Constructor
          */
@@ -59,8 +57,6 @@ class IF_XmlSerializableObject
          */
         virtual ~IF_XmlSerializableObject() noexcept {}
 
-
-        // General Methods
 
         /**
          * @brief Serialize the object to a XML DOM element
@@ -74,6 +70,20 @@ class IF_XmlSerializableObject
          */
         virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception) = 0;
 
+
+    protected:
+
+        /**
+         * @brief Check the validity of all attributes of the object
+         *
+         * This method is useful to check the validity of all object attributes after
+         * deserialization and before serialization to avoid loading or creating invalid
+         * XML files.
+         *
+         * @retval true     If all attributes are valid
+         * @retval false    If at least one attribute is invalid
+         */
+        virtual bool checkAttributesValidity() const noexcept = 0;
 };
 
 #endif // IF_XMLSERIALIZABLEOBJECT_H

@@ -141,6 +141,7 @@ class GenCompInstance : public QObject, public IF_AttributeProvider,
 
         // Private Methods
         void init() throw (Exception);
+        bool checkAttributesValidity() const noexcept;
         void updateErcMessages() noexcept;
 
 

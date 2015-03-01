@@ -25,18 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../common/exceptions.h"
-
-/*****************************************************************************************
- *  Forward Declarations
- ****************************************************************************************/
-
-class XmlDomElement;
-
-namespace library {
-class GenericComponent;
-class GenCompSymbVar;
-}
+#include "../common/file_io/if_xmlserializableobject.h"
 
 /*****************************************************************************************
  *  Class GenCompSymbVarItem
@@ -47,9 +36,9 @@ namespace library {
 /**
  * @brief The GenCompSymbVarItem class
  */
-class GenCompSymbVarItem final : public QObject
+class GenCompSymbVarItem final : public IF_XmlSerializableObject
 {
-        Q_OBJECT
+        Q_DECLARE_TR_FUNCTIONS(GenCompSymbVarItem)
 
     public:
 
@@ -69,8 +58,11 @@ class GenCompSymbVarItem final : public QObject
         };
 
         // Constructors / Destructor
-        explicit GenCompSymbVarItem(GenericComponent& genComp, GenCompSymbVar& symbVar,
-                                    const XmlDomElement& domElement) throw (Exception);
+        explicit GenCompSymbVarItem(const QUuid& uuid = QUuid::createUuid(),
+                                    const QUuid& symbolUuid = QUuid(),
+                                    int addOrderIndex = -1, bool isRequired = false,
+                                    const QString& suffix = QString()) noexcept;
+        explicit GenCompSymbVarItem(const XmlDomElement& domElement) throw (Exception);
         ~GenCompSymbVarItem() noexcept;
 
         // Getters: Attributes
@@ -85,18 +77,20 @@ class GenCompSymbVarItem final : public QObject
         QUuid getSignalOfPin(const QUuid& pinUuid) const noexcept;
         PinDisplayType_t getDisplayTypeOfPin(const QUuid& pinUuid) const noexcept;
 
+        // General Methods
+        void addPinSignalMapping(const QUuid& pin, const QUuid& signal, PinDisplayType_t display) noexcept;
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+
 
     private:
 
         // make some methods inaccessible...
-        GenCompSymbVarItem();
         GenCompSymbVarItem(const GenCompSymbVarItem& other);
         GenCompSymbVarItem& operator=(const GenCompSymbVarItem& rhs);
 
+        // Private Methods
+        bool checkAttributesValidity() const noexcept;
 
-        // General Attributes
-        GenericComponent& mGenericComponent;
-        GenCompSymbVar& mSymbolVariant;
 
         // Symbol Variant Item Attributes
         QUuid mUuid;

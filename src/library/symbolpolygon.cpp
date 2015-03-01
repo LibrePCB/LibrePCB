@@ -29,11 +29,59 @@
 namespace library {
 
 /*****************************************************************************************
+ *  Class SymbolPolygonSegment
+ ****************************************************************************************/
+
+SymbolPolygonSegment::SymbolPolygonSegment(const XmlDomElement& domElement) throw (Exception)
+{
+    QString type = domElement.getAttribute("type");
+    if (type == "line")
+        mType = Type_t::Line;
+    else if (type == "arc")
+        mType = Type_t::Arc;
+    else
+    {
+        throw RuntimeError(__FILE__, __LINE__, type,
+            QString(tr("Invalid polygon segment type \"%1\" in file \"%2\"."))
+            .arg(type, domElement.getDocFilePath().toNative()));
+    }
+    mEndPos.setX(domElement.getAttribute<Length>("end_x"));
+    mEndPos.setY(domElement.getAttribute<Length>("end_y"));
+
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+}
+
+XmlDomElement* SymbolPolygonSegment::serializeToXmlDomElement() const throw (Exception)
+{
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("segment"));
+    switch (mType)
+    {
+        case Type_t::Line:  root->setAttribute<QString>("type", "line"); break;
+        case Type_t::Arc:   root->setAttribute<QString>("type", "arc"); break;
+        default:            Q_ASSERT(false); throw LogicError(__FILE__, __LINE__);
+    }
+    root->setAttribute("end_x", mEndPos.getX().toMmString());
+    root->setAttribute("end_y", mEndPos.getY().toMmString());
+    return root.take();
+}
+
+bool SymbolPolygonSegment::checkAttributesValidity() const noexcept
+{
+    return true;
+}
+
+/*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SymbolPolygon::SymbolPolygon(Symbol& symbol, const XmlDomElement& domElement) throw (Exception) :
-    QObject(0), mSymbol(symbol)
+SymbolPolygon::SymbolPolygon() noexcept :
+    mLineLayerId(0), mFillLayerId(0), mLineWidth(0), mIsGrabArea(false), mStartPos(0, 0)
+{
+}
+
+SymbolPolygon::SymbolPolygon(const XmlDomElement& domElement) throw (Exception)
 {
     // load layers
     mLineLayerId = domElement.getAttribute<uint>("line_layer");
@@ -46,29 +94,49 @@ SymbolPolygon::SymbolPolygon(Symbol& symbol, const XmlDomElement& domElement) th
     mStartPos.setY(domElement.getAttribute<Length>("start_y"));
 
     // load all segments
-    for (XmlDomElement* node = domElement.getFirstChild("segment", true);
+    for (const XmlDomElement* node = domElement.getFirstChild("segment", true);
          node; node = node->getNextSibling("segment"))
     {
-        PolygonSegment_t* segment = new PolygonSegment_t;
-        if (node->getAttribute("type") == "line")
-            segment->type = PolygonSegment_t::Line;
-        else if (node->getAttribute("type") == "arc")
-            segment->type = PolygonSegment_t::Arc;
-        else
-        {
-            throw RuntimeError(__FILE__, __LINE__, node->getAttribute("type"),
-                QString(tr("Invalid polygon segment type \"%1\" in file \"%2\"."))
-                .arg(node->getAttribute("type"), mSymbol.getXmlFilepath().toNative()));
-        }
-        segment->endPos.setX(node->getAttribute<Length>("end_x"));
-        segment->endPos.setY(node->getAttribute<Length>("end_y"));
-        mSegments.append(segment);
+        mSegments.append(new SymbolPolygonSegment(*node));
     }
+
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 SymbolPolygon::~SymbolPolygon() noexcept
 {
     qDeleteAll(mSegments);      mSegments.clear();
+}
+
+/*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+XmlDomElement* SymbolPolygon::serializeToXmlDomElement() const throw (Exception)
+{
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("polygon"));
+    root->setAttribute("line_layer", mLineLayerId);
+    root->setAttribute("line_width", mLineWidth.toMmString());
+    root->setAttribute("fill_layer", mFillLayerId);
+    root->setAttribute("start_x", mStartPos.getX().toMmString());
+    root->setAttribute("start_y", mStartPos.getY().toMmString());
+    root->setAttribute("grab_area", mIsGrabArea);
+    foreach (const SymbolPolygonSegment* segment, mSegments)
+        root->appendChild(segment->serializeToXmlDomElement());
+    return root.take();
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+bool SymbolPolygon::checkAttributesValidity() const noexcept
+{
+    if (mLineWidth < 0)         return false;
+    if (mSegments.isEmpty())    return false;
+    return true;
 }
 
 /*****************************************************************************************

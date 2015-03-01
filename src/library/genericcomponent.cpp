@@ -33,6 +33,14 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
+GenericComponent::GenericComponent(const QUuid& uuid, const Version& version,
+                                   const QString& author, const QString& name_en_US,
+                                   const QString& description_en_US,
+                                   const QString& keywords_en_US) throw (Exception) :
+    LibraryElement("generic_component", uuid, version, author, name_en_US, description_en_US, keywords_en_US)
+{
+}
+
 GenericComponent::GenericComponent(const FilePath& xmlFilePath) throw (Exception) :
     LibraryElement(xmlFilePath, "generic_component")
 {
@@ -57,12 +65,50 @@ GenericComponent::~GenericComponent() noexcept
 }
 
 /*****************************************************************************************
- *  Getters
+ *  Attributes
  ****************************************************************************************/
+
+const QHash<QString, Attribute*>& GenericComponent::getAttributes() const noexcept
+{
+    return mAttributes;
+}
+
+const Attribute* GenericComponent::getAttributeByKey(const QString& key) const noexcept
+{
+    return mAttributes.value(key, nullptr);
+}
+
+/*****************************************************************************************
+ *  Default Values
+ ****************************************************************************************/
+
+const QHash<QString, QString>& GenericComponent::getDefaultValues() const noexcept
+{
+    return mDefaultValues;
+}
 
 QString GenericComponent::getDefaultValue(const QString& locale) const noexcept
 {
     return LibraryBaseElement::localeStringFromList(mDefaultValues, locale);
+}
+
+void GenericComponent::clearDefaultValues() noexcept
+{
+    mDefaultValues.clear();
+}
+
+void GenericComponent::addDefaultValue(const QString& locale, const QString& value) noexcept
+{
+    mDefaultValues.insert(locale, value);
+}
+
+/*****************************************************************************************
+ *  Prefixes
+ ****************************************************************************************/
+
+const QHash<QString, QString>& GenericComponent::getPrefixes() const noexcept
+{
+    return mPrefixes;
 }
 
 QString GenericComponent::getPrefix(const QString& norm) const noexcept
@@ -82,6 +128,90 @@ QString GenericComponent::getPrefix(const QString& norm) const noexcept
     return mPrefixes.value(mDefaultPrefixNorm);
 }
 
+const QString& GenericComponent::getDefaultPrefixNorm() const noexcept
+{
+    return mDefaultPrefixNorm;
+}
+
+QString GenericComponent::getDefaultPrefix() const noexcept
+{
+    return mPrefixes.value(mDefaultPrefixNorm);
+}
+
+void GenericComponent::clearPrefixes() noexcept
+{
+    mPrefixes.clear();
+    mDefaultPrefixNorm = QString();
+}
+
+void GenericComponent::addPrefix(const QString& norm, const QString& prefix, bool isDefault) noexcept
+{
+    mPrefixes.insert(norm, prefix);
+    if (isDefault) mDefaultPrefixNorm = norm;
+}
+
+/*****************************************************************************************
+ *  Signals
+ ****************************************************************************************/
+
+const QHash<QUuid, const GenCompSignal*>& GenericComponent::getSignals() const noexcept
+{
+    return mSignals;
+}
+
+const GenCompSignal* GenericComponent::getSignalByUuid(const QUuid& uuid) const noexcept
+{
+    return mSignals.value(uuid, nullptr);
+}
+
+void GenericComponent::clearSignals() noexcept
+{
+    qDeleteAll(mSymbolVariants);
+    mSignals.clear();
+}
+
+void GenericComponent::addSignal(const GenCompSignal* signal) noexcept
+{
+    mSignals.insert(signal->getUuid(), signal);
+}
+
+/*****************************************************************************************
+ *  Symbol Variants
+ ****************************************************************************************/
+
+const QHash<QUuid, const GenCompSymbVar*>& GenericComponent::getSymbolVariants() const noexcept
+{
+    return mSymbolVariants;
+}
+
+const GenCompSymbVar* GenericComponent::getSymbolVariantByUuid(const QUuid& uuid) const noexcept
+{
+    return mSymbolVariants.value(uuid, nullptr);
+}
+
+const QUuid& GenericComponent::getDefaultSymbolVariantUuid() const noexcept
+{
+    return mDefaultSymbolVariantUuid;
+}
+
+const GenCompSymbVar* GenericComponent::getDefaultSymbolVariant() const noexcept
+{
+    return mSymbolVariants.value(mDefaultSymbolVariantUuid);
+}
+
+void GenericComponent::clearSymbolVariants() noexcept
+{
+    qDeleteAll(mSymbolVariants);
+    mSymbolVariants.clear();
+    mDefaultSymbolVariantUuid = QUuid();
+}
+
+void GenericComponent::addSymbolVariant(const GenCompSymbVar* symbolVariant) noexcept
+{
+    mSymbolVariants.insert(symbolVariant->getUuid(), symbolVariant);
+    if (symbolVariant->isDefault()) mDefaultSymbolVariantUuid = symbolVariant->getUuid();
+}
+
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
@@ -94,7 +224,7 @@ void GenericComponent::parseDomTree(const XmlDomElement& root) throw (Exception)
     for (XmlDomElement* node = root.getFirstChild("attributes/attribute", true, false);
          node; node = node->getNextSibling("attribute"))
     {
-        Attribute* attribute = new Attribute(*this, *node); // throws an exception on error
+        Attribute* attribute = new Attribute(*node); // throws an exception on error
         if (mAttributes.contains(attribute->getKey()))
         {
             throw RuntimeError(__FILE__, __LINE__, attribute->getKey(),
@@ -105,7 +235,7 @@ void GenericComponent::parseDomTree(const XmlDomElement& root) throw (Exception)
     }
 
     // Load default values in all available languages
-    readLocaleDomNodes(mXmlFilepath, *root.getFirstChild("properties/default_values", true, true),
+    readLocaleDomNodes(*root.getFirstChild("properties/default_values", true, true),
                        "value", mDefaultValues);
 
     // Load all prefixes
@@ -147,7 +277,7 @@ void GenericComponent::parseDomTree(const XmlDomElement& root) throw (Exception)
     for (XmlDomElement* node = root.getFirstChild("signals/signal", true, false);
          node; node = node->getNextSibling("signal"))
     {
-        GenCompSignal* signal = new GenCompSignal(*this, *node);
+        GenCompSignal* signal = new GenCompSignal(*node);
         if (mSignals.contains(signal->getUuid()))
         {
             throw RuntimeError(__FILE__, __LINE__, signal->getUuid().toString(),
@@ -161,7 +291,7 @@ void GenericComponent::parseDomTree(const XmlDomElement& root) throw (Exception)
     for (XmlDomElement* node = root.getFirstChild("symbol_variants/variant", true, false);
          node; node = node->getNextSibling("variant"))
     {
-        GenCompSymbVar* variant = new GenCompSymbVar(*this, *node);
+        GenCompSymbVar* variant = new GenCompSymbVar(*node);
         if (mSymbolVariants.contains(variant->getUuid()))
         {
             throw RuntimeError(__FILE__, __LINE__, variant->getUuid().toString(),
@@ -192,6 +322,53 @@ void GenericComponent::parseDomTree(const XmlDomElement& root) throw (Exception)
             QString(tr("The file \"%1\" has no default symbol variant defined."))
             .arg(mXmlFilepath.toNative()));
     }
+}
+
+XmlDomElement* GenericComponent::serializeToXmlDomElement() const throw (Exception)
+{
+    QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement());
+    XmlDomElement* attributes = root->appendChild("attributes");
+    foreach (const Attribute* attribute, mAttributes)
+        attributes->appendChild(attribute->serializeToXmlDomElement());
+    XmlDomElement* properties = root->appendChild("properties");
+    XmlDomElement* default_values = properties->appendChild("default_values");
+    foreach (const QString& locale, mDefaultValues.keys())
+    {
+        XmlDomElement* child = default_values->appendTextChild("value", mDefaultValues.value(locale));
+        child->setAttribute("locale", locale);
+    }
+    XmlDomElement* prefixes = properties->appendChild("prefixes");
+    foreach (const QString& norm, mPrefixes.keys())
+    {
+        XmlDomElement* child = prefixes->appendTextChild("prefix", mPrefixes.value(norm));
+        child->setAttribute("norm", norm);
+        child->setAttribute("default", norm == mDefaultPrefixNorm);
+    }
+    XmlDomElement* signalsNode = root->appendChild("signals");
+    foreach (const GenCompSignal* signal, mSignals)
+        signalsNode->appendChild(signal->serializeToXmlDomElement());
+    XmlDomElement* symbol_variants = root->appendChild("symbol_variants");
+    foreach (const GenCompSymbVar* variant, mSymbolVariants)
+        symbol_variants->appendChild(variant->serializeToXmlDomElement());
+    XmlDomElement* spice_models = root->appendChild("spice_models");
+    Q_UNUSED(spice_models);
+    return root.take();
+}
+
+bool GenericComponent::checkAttributesValidity() const noexcept
+{
+    if (!LibraryElement::checkAttributesValidity())             return false;
+    if (!mDefaultValues.contains("en_US"))                      return false;
+    if (mPrefixes.isEmpty())                                    return false;
+    if (!mPrefixes.contains(mDefaultPrefixNorm))                return false;
+    if (mSymbolVariants.isEmpty())                              return false;
+    if (!mSymbolVariants.contains(mDefaultSymbolVariantUuid))   return false;
+    foreach (const GenCompSymbVar* var, mSymbolVariants)
+    {
+        if (var->isDefault() != (var->getUuid() == mDefaultSymbolVariantUuid))
+            return false;
+    }
+    return true;
 }
 
 /*****************************************************************************************
