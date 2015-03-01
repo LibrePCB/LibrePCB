@@ -26,6 +26,7 @@
 #include "xmldomdocument.h"
 #include "../units/all_length_units.h"
 #include "../version.h"
+#include "../alignment.h"
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -240,6 +241,18 @@ void XmlDomElement::setAttribute(const QString& name, const Angle& value) noexce
     setAttribute<QString>(name, value.toDegString());
 }
 
+template <>
+void XmlDomElement::setAttribute(const QString& name, const HAlign& value) noexcept
+{
+    setAttribute<QString>(name, value.toString());
+}
+
+template <>
+void XmlDomElement::setAttribute(const QString& name, const VAlign& value) noexcept
+{
+    setAttribute<QString>(name, value.toString());
+}
+
 /// @endcond
 
 bool XmlDomElement::hasAttribute(const QString& name) const noexcept
@@ -369,6 +382,48 @@ Angle XmlDomElement::getAttribute<Angle>(const QString& name, bool throwIfEmpty,
         {
             throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, attr,
                 QString(tr("Invalid angle attribute \"%1\" in node \"%2\".")).arg(name, mName));
+        }
+    }
+}
+
+template <>
+HAlign XmlDomElement::getAttribute<HAlign>(const QString& name, bool throwIfEmpty, const HAlign& defaultValue) const throw (Exception)
+{
+    QString attr = getAttribute(name, throwIfEmpty);
+    try
+    {
+        HAlign obj = HAlign::fromString(attr);
+        return obj;
+    }
+    catch (Exception& exc)
+    {
+        if ((attr.isEmpty()) && (!throwIfEmpty))
+            return defaultValue;
+        else
+        {
+            throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, attr,
+                QString(tr("Invalid horizontal align attribute \"%1\" in node \"%2\".")).arg(name, mName));
+        }
+    }
+}
+
+template <>
+VAlign XmlDomElement::getAttribute<VAlign>(const QString& name, bool throwIfEmpty, const VAlign& defaultValue) const throw (Exception)
+{
+    QString attr = getAttribute(name, throwIfEmpty);
+    try
+    {
+        VAlign obj = VAlign::fromString(attr);
+        return obj;
+    }
+    catch (Exception& exc)
+    {
+        if ((attr.isEmpty()) && (!throwIfEmpty))
+            return defaultValue;
+        else
+        {
+            throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, attr,
+                QString(tr("Invalid vertical align attribute \"%1\" in node \"%2\".")).arg(name, mName));
         }
     }
 }

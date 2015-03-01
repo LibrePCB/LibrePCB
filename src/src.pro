@@ -176,7 +176,8 @@ SOURCES += \
     common/file_io/xmldomdocument.cpp \
     common/file_io/xmldomelement.cpp \
     workspace/settings/items/wsi_appearance.cpp \
-    project/dialogs/addgencompdialog.cpp
+    project/dialogs/addgencompdialog.cpp \
+    common/alignment.cpp
 
 HEADERS += \
     common/units/all_length_units.h \
@@ -301,7 +302,8 @@ HEADERS += \
     project/erc/if_ercmsgprovider.h \
     common/file_io/if_xmlserializableobject.h \
     workspace/settings/items/wsi_appearance.h \
-    project/dialogs/addgencompdialog.h
+    project/dialogs/addgencompdialog.h \
+    common/alignment.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \

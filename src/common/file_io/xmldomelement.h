@@ -184,7 +184,8 @@ class XmlDomElement final
          * @brief Set or add an attribute to this element
          *
          * @tparam T        The text will be converted in this type. Available types:
-         *                  bool, const char*, QString, QUuid, #Length, #Angle (tbc)
+         *                  bool, const char*, QString, QUuid, #Length, #Angle, #HAlign,
+         *                  #VAlign (tbc)
          *
          * @param name      The tag name (see #isValidXmlTagName() for allowed characters)
          * @param value     The attribute value
@@ -219,7 +220,7 @@ class XmlDomElement final
          * @brief Get the value of a specific attribute in the specified type
          *
          * @tparam T            The value will be converted in this type. Available types:
-         *                      bool, uint, int, QUuid, #Length, #Angle (tbc)
+         *                      bool, uint, int, QUuid, #Length, #Angle, #HAlign, #VAlign (tbc)
          *
          * @param name          The tag name (see #isValidXmlTagName() for allowed characters)
          * @param throwIfEmpty  If true and the value is empty, an exception will be thrown
@@ -245,6 +246,13 @@ class XmlDomElement final
          * @retval false    If this element has no child elements
          */
         bool hasChilds() const noexcept {return !mChilds.isEmpty();}
+
+        /**
+         * @brief Get the child count of this element
+         *
+         * @return  The count of child elements
+         */
+        int getChildCount() const noexcept {return mChilds.count();}
 
         /**
          * @brief Remove a child element from the DOM tree
