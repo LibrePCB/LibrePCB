@@ -7,14 +7,14 @@
         <author>EDA4U</author>
         <created>2013-04-13T12:43:52Z</created>
         <last_modified>2013-04-20T18:01:33Z</last_modified>
-        <categories>
-            <!-- All Package Categories of this Footprint -->
-            <category>{10000000-bf7f-4980-85cd-c73fcb164158}</category>
-        </categories>
         <name locale="en_US">DIP08</name>
         <description locale="en_US">description...</description>
         <keywords locale="en_US">DIP DIP8 DIP08</keywords>
     </meta>
+    <categories>
+        <!-- All Package Categories of this Footprint -->
+        <category>{10000000-bf7f-4980-85cd-c73fcb164158}</category>
+    </categories>
     <changelog/>
     <attachements/>
     <geometry>
