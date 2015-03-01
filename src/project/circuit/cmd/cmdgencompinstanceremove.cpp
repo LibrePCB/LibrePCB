@@ -22,9 +22,9 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "cmdschematicnetlineadd.h"
-#include "../schematic.h"
-#include "../schematicnetline.h"
+#include "cmdgencompinstanceremove.h"
+#include "../circuit.h"
+#include "../gencompinstance.h"
 
 namespace project {
 
@@ -32,29 +32,27 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSchematicNetLineAdd::CmdSchematicNetLineAdd(Schematic& schematic, SchematicNetPoint& startPoint,
-                                               SchematicNetPoint& endPoint, UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Add netline"), parent),
-    mSchematic(schematic), mStartPoint(startPoint), mEndPoint(endPoint), mNetLine(0)
+CmdGenCompInstanceRemove::CmdGenCompInstanceRemove(Circuit& circuit,
+                                                   GenCompInstance& genCompInstance,
+                                                   UndoCommand* parent) throw (Exception) :
+    UndoCommand(tr("Remove generic component"), parent),
+    mCircuit(circuit), mGenCompInstance(genCompInstance)
 {
 }
 
-CmdSchematicNetLineAdd::~CmdSchematicNetLineAdd() noexcept
+CmdGenCompInstanceRemove::~CmdGenCompInstanceRemove() noexcept
 {
-    if ((mNetLine) && (!mIsExecuted))
-        delete mNetLine;
+    if (mIsExecuted)
+        delete &mGenCompInstance;
 }
 
 /*****************************************************************************************
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdSchematicNetLineAdd::redo() throw (Exception)
+void CmdGenCompInstanceRemove::redo() throw (Exception)
 {
-    if (!mNetLine) // only the first time
-        mNetLine = mSchematic.createNetLine(mStartPoint, mEndPoint, Length(158750)); // throws an exception on error
-
-    mSchematic.addNetLine(*mNetLine); // throws an exception on error
+    mCircuit.removeGenCompInstance(mGenCompInstance); // throws an exception on error
 
     try
     {
@@ -62,14 +60,14 @@ void CmdSchematicNetLineAdd::redo() throw (Exception)
     }
     catch (Exception &e)
     {
-        mSchematic.removeNetLine(*mNetLine);
+        mCircuit.addGenCompInstance(mGenCompInstance);
         throw;
     }
 }
 
-void CmdSchematicNetLineAdd::undo() throw (Exception)
+void CmdGenCompInstanceRemove::undo() throw (Exception)
 {
-    mSchematic.removeNetLine(*mNetLine); // throws an exception on error
+    mCircuit.addGenCompInstance(mGenCompInstance); // throws an exception on error
 
     try
     {
@@ -77,7 +75,7 @@ void CmdSchematicNetLineAdd::undo() throw (Exception)
     }
     catch (Exception& e)
     {
-        mSchematic.addNetLine(*mNetLine);
+        mCircuit.removeGenCompInstance(mGenCompInstance);
         throw;
     }
 }
