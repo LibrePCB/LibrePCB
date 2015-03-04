@@ -519,7 +519,7 @@ XmlDomElement* XmlDomElement::getFirstChild(const QString& name, bool throwIfNot
     else
     {
         throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, QString(),
-            QString(tr("Child \%1\" in node \"%2\" not found.")).arg(name, mName));
+            QString(tr("Child \"%1\" in node \"%2\" not found.")).arg(name, mName));
     }
 }
 

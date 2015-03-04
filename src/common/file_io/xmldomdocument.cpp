@@ -50,9 +50,9 @@ XmlDomDocument::XmlDomDocument(const QByteArray& xmlFileContent, const FilePath&
     {
         QString line = xmlFileContent.split('\n').at(errLine-1);
         throw RuntimeError(__FILE__, __LINE__, QString("%1: %2 [%3:%4] LINE:%5")
-            .arg(/*xmlFilePath.toStr()*/QString(), errMsg).arg(errLine).arg(errColumn).arg(line),
+            .arg(filepath.toStr(), errMsg).arg(errLine).arg(errColumn).arg(line),
             QString(tr("Error while parsing XML in file \"%1\": %2 [%3:%4]"))
-            .arg(/*xmlFilePath.toNative()*/QString(), errMsg).arg(errLine).arg(errColumn));
+            .arg(filepath.toNative(), errMsg).arg(errLine).arg(errColumn));
     }
 
     // check if the root node exists
