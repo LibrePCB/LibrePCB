@@ -47,6 +47,13 @@
      <widget class="QLineEdit" name="lineEdit"/>
     </item>
     <item>
+     <widget class="QCheckBox" name="checkBox">
+      <property name="text">
+       <string>Auto-Generate every Second</string>
+      </property>
+     </widget>
+    </item>
+    <item>
      <widget class="QPushButton" name="pushButton_2">
       <property name="text">
        <string>Close</string>

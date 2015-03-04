@@ -124,9 +124,11 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
                     polygonPath.lineTo(segment->getEndPos().toPxQPointF());
                     break;
                 case SymbolPolygonSegment::Type_t::Arc:
-                    //polygonPath.arcTo(item->getArcRectF(), item->getArcStartAngle().deg(),
-                    //                                      item->getArcSpanAngle().deg());
+                {
+                    Length radius = segment->getEndPos().getY() - segment->getCenter().getY();
+                    polygonPath.addEllipse(segment->getCenter().toPxQPointF(), radius.toPx(), radius.toPx());
                     break;
+                }
                 default:
                     break;
             }

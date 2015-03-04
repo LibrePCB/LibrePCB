@@ -42,6 +42,7 @@
 #include "../symbolpininstance.h"
 #include "../symbolinstancepropertiesdialog.h"
 #include "../../circuit/gencompinstance.h"
+#include "../../circuit/cmd/cmdgencompinstanceremove.h"
 
 namespace project {
 
@@ -499,6 +500,14 @@ bool SES_Select::removeSelectedItems() noexcept
     // abort if no items are selected
     if (count == 0) return false;
 
+    // get all involved generic component instances
+    QList<GenCompInstance*> genCompInstances;
+    foreach (SymbolInstance* symbol, symbols)
+    {
+        if (!genCompInstances.contains(&symbol->getGenCompInstance()))
+            genCompInstances.append(&symbol->getGenCompInstance());
+    }
+
     bool commandActive = false;
     try
     {
@@ -545,6 +554,16 @@ bool SES_Select::removeSelectedItems() noexcept
         {
             CmdSymbolInstanceRemove* cmd = new CmdSymbolInstanceRemove(*schematic, *symbol);
             mEditor.getProject().getUndoStack().appendToCommand(cmd);
+        }
+
+        // remove generic components
+        foreach (GenCompInstance* genComp, genCompInstances)
+        {
+            if (genComp->getPlacedSymbolsCount() == 0)
+            {
+                CmdGenCompInstanceRemove* cmd = new CmdGenCompInstanceRemove(mCircuit, *genComp);
+                mEditor.getProject().getUndoStack().appendToCommand(cmd);
+            }
         }
 
         mEditor.getProject().getUndoStack().endCommand();

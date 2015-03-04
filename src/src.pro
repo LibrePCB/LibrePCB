@@ -177,7 +177,8 @@ SOURCES += \
     common/file_io/xmldomelement.cpp \
     workspace/settings/items/wsi_appearance.cpp \
     project/dialogs/addgencompdialog.cpp \
-    common/alignment.cpp
+    common/alignment.cpp \
+    project/circuit/cmd/cmdgencompinstanceremove.cpp
 
 HEADERS += \
     common/units/all_length_units.h \
@@ -303,7 +304,8 @@ HEADERS += \
     common/file_io/if_xmlserializableobject.h \
     workspace/settings/items/wsi_appearance.h \
     project/dialogs/addgencompdialog.h \
-    common/alignment.h
+    common/alignment.h \
+    project/circuit/cmd/cmdgencompinstanceremove.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \

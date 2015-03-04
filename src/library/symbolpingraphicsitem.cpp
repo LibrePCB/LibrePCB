@@ -97,7 +97,7 @@ void SymbolPinGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsI
     layer = getSchematicLayer(SchematicLayer::SymbolOutlines);
     if (layer)
     {
-        painter->setPen(QPen(layer->getColor(selected), Length(254000).toPx(), Qt::SolidLine, Qt::RoundCap)); // TODO width
+        painter->setPen(QPen(layer->getColor(selected), Length(158750).toPx(), Qt::SolidLine, Qt::RoundCap)); // TODO width
         painter->drawLine(QPointF(0, 0), Point(0, mPin.getLength()).toPxQPointF());
     }
 
