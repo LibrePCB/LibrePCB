@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<generic_component file_version="0">
+    <meta>
+        <uuid>{ef80cd5e-2689-47ee-8888-31d04fc99174}</uuid>
+        <version>0.1</version>
+        <author>EDA4U</author>
+        <created>2015-03-01T20:00:00Z</created>
+        <last_modified>2015-03-01T20:00:00Z</last_modified>
+        <name locale="en_US">Resistor</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US">resistor,resistance</keywords>
+    </meta>
+    <categories>
+        <category>{00000000-0000-4001-8000-000000000000}</category>
+    </categories>
+    <changelog/>
+    <attachements/>
+    <attributes>
+        <attribute key="RESISTANCE" type="resistance">
+            <name locale="en_US">Resistance</name>
+            <description locale="en_US">The nominal resistance of the resistor.</description>
+            <default_value locale="en_US"></default_value>
+        </attribute>
+    </attributes>
+    <properties>
+        <default_values>
+            <value locale="en_US">${RESISTANCE}</value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">R</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}" role="passive" required="true" negated="false" clock="false" forced_net_name="">
+            <name locale="en_US">1</name>
+            <description locale="en_US"></description>
+        </signal>
+        <signal uuid="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}" role="passive" required="true" negated="false" clock="false" forced_net_name="">
+            <name locale="en_US">2</name>
+            <description locale="en_US"></description>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant uuid="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}" norm="IEC 60617" default="true">
+            <name locale="en_US">European Variant</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{5988c66a-f507-487e-9b40-486502e8c9bd}" symbol="{75372c18-3ba4-42e8-b3b2-2eb5039d441e}" add_order_index="0" required="true" suffix="">
+                    <pin_signal_map>
+                        <map pin="{2e4f8b10-ad5a-443e-b408-e183efaa4758}" signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}" display="none"/>
+                        <map pin="{2731f213-ee20-4eb0-a18b-ad97d9fea7a0}" signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}" display="none"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models>
+    </spice_models>
+</generic_component>

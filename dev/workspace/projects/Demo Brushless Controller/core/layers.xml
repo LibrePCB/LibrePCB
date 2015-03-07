@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<project_layers file_version="0">
+    <layers>
+        <layer id="900" name="i am a layer" default_color="#FFFFFF" default_brush="solid" default_visibility="true" />
+    </layers>
+    
+    <layer_groups>
+        <group type="schematic" index="0" name="Top side, without captions">
+            <layer_id>1</layer_id>
+            <layer_id>2</layer_id>
+            <layer_id>900</layer_id>
+        </group>
+    </layer_groups>
+
+</project_layers>

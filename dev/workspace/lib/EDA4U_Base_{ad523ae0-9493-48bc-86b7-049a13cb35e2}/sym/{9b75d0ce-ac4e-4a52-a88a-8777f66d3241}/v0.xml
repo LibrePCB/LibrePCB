@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<symbol version="0">
+    <meta>
+        <uuid>{9b75d0ce-ac4e-4a52-a88a-8777f66d3241}</uuid>
+        <version>0.1</version>
+        <author>EDA4U</author>
+        <created>2015-03-04T21:24:46Z</created>
+        <last_modified>2015-03-04T21:24:46Z</last_modified>
+        <name locale="en_US">Standard Diode</name>
+        <description locale="en_US"/>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon line_layer="10" line_width="0.254000" grab_area="true" fill_layer="0" start_x="-1.270000" start_y="-1.270000">
+            <segment type="line" end_x="1.270000" end_y="0.000000"/>
+        </polygon>
+        <polygon line_layer="10" line_width="0.254000" grab_area="true" fill_layer="0" start_x="1.270000" start_y="0.000000">
+            <segment type="line" end_x="-1.270000" end_y="1.270000"/>
+        </polygon>
+        <polygon line_layer="10" line_width="0.254000" grab_area="true" fill_layer="0" start_x="1.270000" start_y="1.270000">
+            <segment type="line" end_x="1.270000" end_y="0.000000"/>
+        </polygon>
+        <polygon line_layer="10" line_width="0.254000" grab_area="true" fill_layer="0" start_x="-1.270000" start_y="1.270000">
+            <segment type="line" end_x="-1.270000" end_y="-1.270000"/>
+        </polygon>
+        <polygon line_layer="10" line_width="0.254000" grab_area="true" fill_layer="0" start_x="1.270000" start_y="0.000000">
+            <segment type="line" end_x="1.270000" end_y="-1.270000"/>
+        </polygon>
+        <text h_align="left" layer="20" text="${SYM::NAME}" v_align="bottom" angle="0.000000" x="-1.270000" y="1.270000" height="3.556000"/>
+        <text h_align="left" layer="21" text="${CMP::VALUE}" v_align="top" angle="0.000000" x="-1.270000" y="-1.270000" height="2.5"/>
+    </geometry>
+    <pins>
+        <pin angle="-90.000000" x="2.540000" y="0.000000" uuid="{48dad2d5-4392-4d8f-870e-9e69d9727b83}" length="2.540000">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin angle="90.000000" x="-2.540000" y="0.000000" uuid="{cd50cc1e-a0d2-460e-818b-c9a4cc03ec42}" length="2.540000">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </pin>
+    </pins>
+</symbol>

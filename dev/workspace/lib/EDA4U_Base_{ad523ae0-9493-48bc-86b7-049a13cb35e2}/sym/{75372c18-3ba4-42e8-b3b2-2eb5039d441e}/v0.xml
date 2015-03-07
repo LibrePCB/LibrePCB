@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<symbol file_version="0">
+    <meta>
+        <uuid>{75372c18-3ba4-42e8-b3b2-2eb5039d441e}</uuid>
+        <version>0.1</version>
+        <author>EDA4U</author>
+        <created>2015-03-01T20:00:00Z</created>
+        <last_modified>2015-03-01T20:00:00Z</last_modified>
+        <name locale="en_US">Resistor (IEC 60617)</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US">resistor,resistance</keywords>
+    </meta>
+    <categories>
+        <category>{00000000-0000-4001-8000-000000000000}</category>
+    </categories>
+    <geometry>
+        <polygon fill_layer="11" start_y="-1.016" line_width="0.254" line_layer="10" start_x="-3.08" grab_area="true">
+            <segment type="line" end_x="-3.08" end_y="1.016"/>
+            <segment type="line" end_x="3.08" end_y="1.016"/>
+            <segment type="line" end_x="3.08" end_y="-1.016"/>
+            <segment type="line" end_x="-3.08" end_y="-1.016"/>
+        </polygon>
+        <text layer="20" text="${SYM::NAME}" x="-3.08" y="1.016" angle="0" height="3.175" v_align="bottom" h_align="left"/>
+        <text layer="21" text="${CMP::VALUE}" x="-3.08" y="-1.016" angle="0" height="2.5" v_align="top" h_align="left"/>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2" angle="90" y="0" uuid="{2e4f8b10-ad5a-443e-b408-e183efaa4758}">
+            <name locale="en_US">1</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin x="5.08" length="2" angle="270" y="0" uuid="{2731f213-ee20-4eb0-a18b-ad97d9fea7a0}">
+            <name locale="en_US">2</name>
+            <description locale="en_US"></description>
+        </pin>
+    </pins>
+</symbol>

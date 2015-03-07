@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<symbol file_version="0">
+    <meta>
+        <uuid>{11e1f693-0777-48e4-b3bd-b451f3c929b3}</uuid>
+        <version>0.1</version>
+        <author>EDA4U</author>
+        <created>2015-03-01T20:00:00Z</created>
+        <last_modified>2015-03-01T20:00:00Z</last_modified>
+        <name locale="en_US">Inductor (IEC 60617)</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US">inductor,inductance</keywords>
+    </meta>
+    <categories>
+        <category>{00000000-0000-4001-8000-000000000000}</category>
+    </categories>
+    <geometry>
+        <polygon fill_layer="10" start_y="-1.016" line_width="0.254" line_layer="10" start_x="-3.08" grab_area="true">
+            <segment type="line" end_x="-3.08" end_y="1.016"/>
+            <segment type="line" end_x="3.08" end_y="1.016"/>
+            <segment type="line" end_x="3.08" end_y="-1.016"/>
+            <segment type="line" end_x="-3.08" end_y="-1.016"/>
+        </polygon>
+        <text layer="20" text="${SYM::NAME}" x="-3.08" y="1.016" angle="0" height="3.175" v_align="bottom" h_align="left"/>
+        <text layer="21" text="${CMP::VALUE}" x="-3.08" y="-1.016" angle="0" height="2.5" v_align="top" h_align="left"/>
+    </geometry>
+    <pins>
+        <pin x="-5.08" length="2" angle="90" y="0" uuid="{06d55f94-1316-48cb-a20f-0d4231eced31}">
+            <name locale="en_US">1</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin x="5.08" length="2" angle="270" y="0" uuid="{1b2d8b3c-b531-48ec-a0f9-07e91687c214}">
+            <name locale="en_US">2</name>
+            <description locale="en_US"></description>
+        </pin>
+    </pins>
+</symbol>

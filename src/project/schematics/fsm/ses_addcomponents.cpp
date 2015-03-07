@@ -174,6 +174,7 @@ SES_Base::ProcRetVal SES_AddComponents::processSceneEvent(SEE_Base* event) noexc
     Q_ASSERT(qevent); if (!qevent) return PassToParentState;
     Schematic* schematic = mEditor.getActiveSchematic();
     Q_ASSERT(schematic); if (!schematic) return PassToParentState;
+    if (!mIsUndoCmdActive) return PassToParentState; // temporary
 
     switch (qevent->type())
     {
