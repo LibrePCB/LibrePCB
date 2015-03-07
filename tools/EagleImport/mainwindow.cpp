@@ -257,8 +257,10 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                     case 96: text->setLayerId(21); break;
                     default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
                 }
-
-                text->setText(child->getText(true));
+                QString textStr = child->getText(true);
+                if (textStr == ">NAME") textStr = "${SYM::NAME}";
+                if (textStr == ">VALUE") textStr = "${CMP::VALUE}";
+                text->setText(textStr);
                 text->setPosition(Point(child->getAttribute<Length>("x"),
                                         child->getAttribute<Length>("y")));
                 text->setAngle(Angle(0));
