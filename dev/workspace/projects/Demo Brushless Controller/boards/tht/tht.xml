@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<board file_version="0">
+    <meta>
+        <uuid>{fbe1ce1b-9612-4db8-9898-ccab719ec21d}</uuid>
+        <circuit_uuid>{8a1f9e05-c711-4af4-9a7b-b1a585d6e4ed}</circuit_uuid>
+        <name>THT Board 2</name>
+        <page_index>1</page_index>
+    </meta>
+    <attributes/>
+    <packages/>
+    <netpoints/>
+    <netlines/>
+</board>

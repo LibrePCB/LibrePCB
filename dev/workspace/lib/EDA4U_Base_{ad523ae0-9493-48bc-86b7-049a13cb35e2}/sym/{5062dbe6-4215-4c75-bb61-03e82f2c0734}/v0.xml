@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<symbol version="0">
+    <meta>
+        <uuid>{5062dbe6-4215-4c75-bb61-03e82f2c0734}</uuid>
+        <version>0.1</version>
+        <author>EDA4U</author>
+        <created>2015-03-03T20:19:25Z</created>
+        <last_modified>2015-03-03T20:19:25Z</last_modified>
+        <name locale="en_US">Voltage Regulator</name>
+        <description locale="en_US">Simple 3-pin voltage regulator</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" fill_layer="11" line_layer="10" start_x="-7.620000" start_y="-5.080000" line_width="0.254000">
+            <segment end_x="-7.620000" end_y="2.540000" type="line"/>
+            <segment end_x="7.620000" end_y="2.540000" type="line"/>
+            <segment end_x="7.620000" end_y="-5.080000" type="line"/>
+            <segment end_x="-7.620000" end_y="-5.080000" type="line"/>
+        </polygon>
+        <text text="${SYM::NAME}" x="-7.620000" angle="0.000000" y="3.175000" height="3.556000" h_align="left" layer="20" v_align="bottom"/>
+        <text text="${CMP::VALUE}" x="7.620000" angle="0.000000" y="3.175000" height="2.5" h_align="right" layer="21" v_align="bottom"/>
+        <text text="GND" x="0" angle="0.000000" y="-4.318000" height="2.9" h_align="center" layer="20" v_align="bottom"/>
+    </geometry>
+    <pins>
+        <pin x="10.160000" angle="-90.000000" y="0.000000" uuid="{114de26b-3fe5-4a03-89ae-769ab7136879}" length="2.540000">
+            <name locale="en_US">OUT</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin x="-10.160000" angle="90.000000" y="0.000000" uuid="{7ad364d0-7508-4dc4-92a3-cf996aa3d5f1}" length="2.540000">
+            <name locale="en_US">IN</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin x="0.000000" angle="0.000000" y="-7.620000" uuid="{61bd9691-1775-4001-b8e3-e44cd98e685a}" length="2.540000">
+            <name locale="en_US">GND</name>
+            <description locale="en_US"/>
+        </pin>
+    </pins>
+</symbol>

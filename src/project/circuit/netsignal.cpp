@@ -29,6 +29,7 @@
 #include "../erc/ercmsg.h"
 #include "gencompsignalinstance.h"
 #include "../../common/file_io/xmldomelement.h"
+#include "../schematics/schematicnetlabel.h"
 
 namespace project {
 
@@ -76,6 +77,7 @@ NetSignal::~NetSignal() noexcept
     Q_ASSERT(mErcMsgConnectedToLessThanTwoPins == nullptr);
     Q_ASSERT(mGenCompSignals.isEmpty() == true);
     Q_ASSERT(mSchematicNetPoints.isEmpty() == true);
+    Q_ASSERT(mSchematicNetLabels.isEmpty() == true);
     Q_ASSERT(mGenCompSignalWithForcedNameCount == 0);
 }
 
@@ -94,6 +96,9 @@ void NetSignal::setName(const QString& name, bool isAutoName) throw (Exception)
     mName = name;
     mHasAutoName = isAutoName;
     updateErcMessages();
+
+    foreach (SchematicNetLabel* label, mSchematicNetLabels)
+        label->updateText();
 }
 
 /*****************************************************************************************
@@ -137,6 +142,20 @@ void NetSignal::unregisterSchematicNetPoint(SchematicNetPoint& netpoint) noexcep
     Q_ASSERT(mSchematicNetPoints.contains(&netpoint) == true);
     mSchematicNetPoints.removeOne(&netpoint);
     updateErcMessages();
+}
+
+void NetSignal::registerSchematicNetLabel(SchematicNetLabel& netlabel) noexcept
+{
+    Q_ASSERT(mAddedToCircuit == true);
+    Q_ASSERT(mSchematicNetLabels.contains(&netlabel) == false);
+    mSchematicNetLabels.append(&netlabel);
+}
+
+void NetSignal::unregisterSchematicNetLabel(SchematicNetLabel& netlabel) noexcept
+{
+    Q_ASSERT(mAddedToCircuit == true);
+    Q_ASSERT(mSchematicNetLabels.contains(&netlabel) == true);
+    mSchematicNetLabels.removeOne(&netlabel);
 }
 
 void NetSignal::addToCircuit() noexcept

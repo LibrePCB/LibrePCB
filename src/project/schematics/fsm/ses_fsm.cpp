@@ -36,6 +36,7 @@
 #include "ses_drawcircle.h"
 #include "ses_drawellipse.h"
 #include "ses_drawwire.h"
+#include "ses_addnetlabel.h"
 #include "ses_addcomponents.h"
 
 namespace project {
@@ -57,6 +58,7 @@ SES_FSM::SES_FSM(SchematicEditor& editor, Ui::SchematicEditor& editorUi) noexcep
     mSubStates.insert(State_DrawCircle, new SES_DrawCircle(mEditor, mEditorUi));
     mSubStates.insert(State_DrawEllipse, new SES_DrawEllipse(mEditor, mEditorUi));
     mSubStates.insert(State_DrawWire, new SES_DrawWire(mEditor, mEditorUi));
+    mSubStates.insert(State_AddNetLabel, new SES_AddNetLabel(mEditor, mEditorUi));
     mSubStates.insert(State_AddComponent, new SES_AddComponents(mEditor, mEditorUi));
 
     // go to state "Select"
@@ -166,7 +168,10 @@ SES_FSM::State SES_FSM::processEventFromChild(SEE_Base* event) noexcept
             return State_DrawEllipse;
         case SEE_Base::StartDrawWire:
             event->setAccepted(true);
-            return State_DrawWire;;
+            return State_DrawWire;
+        case SEE_Base::StartAddNetLabel:
+            event->setAccepted(true);
+            return State_AddNetLabel;
         case SEE_Base::StartAddComponent:
             event->setAccepted(true);
             return State_AddComponent;

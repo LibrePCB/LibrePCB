@@ -117,6 +117,9 @@ SchematicEditor::SchematicEditor(Project& project, bool readOnly) :
     connect(mUi->actionToolDrawWire, &QAction::triggered,
             [this](){mFsm->processEvent(new SEE_Base(SEE_Base::StartDrawWire), true);
                      mUi->actionToolDrawWire->setChecked(mUi->actionToolDrawWire->isCheckable());});
+    connect(mUi->actionToolAddNetLabel, &QAction::triggered,
+            [this](){mFsm->processEvent(new SEE_Base(SEE_Base::StartAddNetLabel), true);
+                     mUi->actionToolAddNetLabel->setChecked(mUi->actionToolAddNetLabel->isCheckable());});
 
     // connect the "command" toolbar with the state machine
     connect(mUi->actionCommandAbort, &QAction::triggered,
@@ -314,8 +317,8 @@ void SchematicEditor::on_actionToolAddComponent_triggered()
 
 void SchematicEditor::on_actionAddGenCmp_Resistor_triggered()
 {
-    QUuid genCompUuid = "{2262ba69-33b0-414d-b03b-e1924a3fb3c8}";
-    QUuid symbVarUuid = "{e8e00b88-f086-4edc-b3e1-742f2dcd2058}";
+    QUuid genCompUuid = "{ef80cd5e-2689-47ee-8888-31d04fc99174}";
+    QUuid symbVarUuid = "{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}";
     SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(genCompUuid, symbVarUuid);
     mFsm->processEvent(addEvent, true);
     mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
@@ -323,8 +326,8 @@ void SchematicEditor::on_actionAddGenCmp_Resistor_triggered()
 
 void SchematicEditor::on_actionAddGenCmp_Capacitor_triggered()
 {
-    QUuid genCompUuid = "{e139c1ba-9d18-4f64-8a43-9a008ada7118}";
-    QUuid symbVarUuid = "{94df66a0-a1f5-4b7d-9c57-22531a38e1f1}";
+    QUuid genCompUuid = "{d167e0e3-6a92-4b76-b013-77b9c230e5f1}";
+    QUuid symbVarUuid = "{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}";
     SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(genCompUuid, symbVarUuid);
     mFsm->processEvent(addEvent, true);
     mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
@@ -332,8 +335,8 @@ void SchematicEditor::on_actionAddGenCmp_Capacitor_triggered()
 
 void SchematicEditor::on_actionAddGenCmp_Inductor_triggered()
 {
-    QUuid genCompUuid = "{b39b86e1-2bcc-44fa-ae41-39d2f4b9f71f}";
-    QUuid symbVarUuid = "{f9c64190-8dc9-4e3a-ab93-9437b0b3aae8}";
+    QUuid genCompUuid = "{506bd124-6062-400e-9078-b38bd7e1aaee}";
+    QUuid symbVarUuid = "{62a7598c-17fe-41cf-8fa1-4ed274c3adc2}";
     SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(genCompUuid, symbVarUuid);
     mFsm->processEvent(addEvent, true);
     mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
@@ -341,8 +344,8 @@ void SchematicEditor::on_actionAddGenCmp_Inductor_triggered()
 
 void SchematicEditor::on_actionAddGenCmp_gnd_triggered()
 {
-    QUuid genCompUuid = "{eb5070a5-f11e-4442-be70-ecf17fe04602}";
-    QUuid symbVarUuid = "{f8c471b1-1069-413e-9ac9-b94ecd893293}";
+    QUuid genCompUuid = "{8076f6be-bfab-4fc1-9772-5d54465dd7e1}";
+    QUuid symbVarUuid = "{f09ad258-595b-4ee9-a1fc-910804a203ae}";
     SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(genCompUuid, symbVarUuid);
     mFsm->processEvent(addEvent, true);
     mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
@@ -350,8 +353,8 @@ void SchematicEditor::on_actionAddGenCmp_gnd_triggered()
 
 void SchematicEditor::on_actionAddGenCmp_vcc_triggered()
 {
-    QUuid genCompUuid = "{758c0792-7686-4d0a-8566-491a2676e496}";
-    QUuid symbVarUuid = "{bc4a996e-5b6f-4e67-9964-75d51e4962ec}";
+    QUuid genCompUuid = "{58c3c6cd-11eb-4557-aa3f-d3e05874afde}";
+    QUuid symbVarUuid = "{afb86b45-68ec-47b6-8d96-153d73567228}";
     SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(genCompUuid, symbVarUuid);
     mFsm->processEvent(addEvent, true);
     mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());

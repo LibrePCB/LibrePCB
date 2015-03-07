@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{6f959627-00d2-4652-bfd9-f6ea0162ccdd}</uuid>
+        <version>0.1</version>
+        <author>EDA4U</author>
+        <created>2015-03-04T21:27:41Z</created>
+        <last_modified>2015-03-04T21:27:41Z</last_modified>
+        <name locale="en_US">Suppressor Diode</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">D</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal negated="false" required="false" clock="false" uuid="{0b345c41-0429-47f3-917a-5140944c7755}" forced_net_name="" role="passive">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal negated="false" required="false" clock="false" uuid="{78fc7eeb-dca2-40c7-9543-9444e527056e}" forced_net_name="" role="passive">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{c864d663-a22e-4814-bc03-017d5bc7d6c6}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item add_order_index="0" suffix="" symbol="{c2c427a9-17c6-4400-981c-6ece1c9735c3}" required="true" uuid="{fade976e-1f99-41a4-bcfc-b29524c37768}">
+                    <pin_signal_map>
+                        <map signal="{0b345c41-0429-47f3-917a-5140944c7755}" display="none" pin="{b03c23a6-4890-42b5-ad6a-4b4fe1f77fbd}"/>
+                        <map signal="{78fc7eeb-dca2-40c7-9543-9444e527056e}" display="none" pin="{e433fe3f-c104-4bc8-9e93-312bea6dd368}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

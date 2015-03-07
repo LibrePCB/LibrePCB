@@ -60,19 +60,25 @@ SchematicLayer::SchematicLayer(uint id) :
 
         case SymbolPinNames:
             mName = tr("Symbol Pin Names");
-            mColor = Qt::darkGray;
+            mColor = QColor(64, 64, 64, 255);
             mColorHighlighted = Qt::gray;
             break;
 
         case ComponentNames:
             mName = tr("Component Names");
-            mColor = Qt::darkGray;
+            mColor = QColor(64, 64, 64, 255);
             mColorHighlighted = Qt::gray;
             break;
 
         case ComponentValues:
             mName = tr("Component Values");
-            mColor = Qt::darkGray;
+            mColor = QColor(64, 64, 64, 255);
+            mColorHighlighted = Qt::gray;
+            break;
+
+        case NetLabels:
+            mName = tr("Net Labels");
+            mColor = QColor(64, 64, 64, 255);
             mColorHighlighted = Qt::gray;
             break;
 
@@ -125,7 +131,7 @@ QList<SchematicLayer::LayerID> SchematicLayer::getAllLayerIDs() noexcept
         << SchematicLayer::SymbolPinCircles << SchematicLayer::SymbolPinNames
         << SchematicLayer::ComponentNames   << SchematicLayer::ComponentValues
         << SchematicLayer::Nets             << SchematicLayer::Busses
-        << SchematicLayer::SymbolGrabAreas;
+        << SchematicLayer::SymbolGrabAreas  << SchematicLayer::NetLabels;
     return IDs;
 }
 

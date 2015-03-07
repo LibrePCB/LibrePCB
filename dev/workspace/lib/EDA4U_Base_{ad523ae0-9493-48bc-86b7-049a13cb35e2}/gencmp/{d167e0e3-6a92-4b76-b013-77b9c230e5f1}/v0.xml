@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<generic_component file_version="0">
+    <meta>
+        <uuid>{d167e0e3-6a92-4b76-b013-77b9c230e5f1}</uuid>
+        <version>0.1</version>
+        <author>EDA4U</author>
+        <created>2015-03-01T20:00:00Z</created>
+        <last_modified>2015-03-01T20:00:00Z</last_modified>
+        <name locale="en_US">Bipolar Capacitor</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US">capacitor,capacitance,bipolar</keywords>
+    </meta>
+    <categories>
+        <category>{00000000-0000-4001-8000-000000000000}</category>
+    </categories>
+    <changelog/>
+    <attachements/>
+    <attributes>
+        <attribute key="CAPACITANCE" type="capacitance">
+            <name locale="en_US">Capacitance</name>
+            <description locale="en_US">The nominal capacitance of the capacitor.</description>
+            <default_value locale="en_US"></default_value>
+        </attribute>
+    </attributes>
+    <properties>
+        <default_values>
+            <value locale="en_US">${CAPACITANCE}</value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">C</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{1c1c7abc-7b40-4f92-b533-f65604644db7}" role="passive" required="true" negated="false" clock="false" forced_net_name="">
+            <name locale="en_US">1</name>
+            <description locale="en_US"></description>
+        </signal>
+        <signal uuid="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}" role="passive" required="true" negated="false" clock="false" forced_net_name="">
+            <name locale="en_US">2</name>
+            <description locale="en_US"></description>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant uuid="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}" norm="IEC 60617" default="true">
+            <name locale="en_US">European Variant</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{42989503-2795-4892-9d83-b919cd7dad76}" symbol="{eaa5837a-a451-40ae-8620-d21e9af42151}" add_order_index="0" required="true" suffix="">
+                    <pin_signal_map>
+                        <map pin="{fba2100c-f69f-40e1-b6be-8b2f2758ad52}" signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}" display="none"/>
+                        <map pin="{99ba7020-af70-432f-9584-c452397065c5}" signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}" display="none"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models>
+    </spice_models>
+</generic_component>

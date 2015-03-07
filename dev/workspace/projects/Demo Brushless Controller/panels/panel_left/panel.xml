@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<panel file_version="0">
+    <meta>
+        <uuid>{cb6501aa-f8c3-42ac-a9a0-8a9df0da3f05}</uuid>
+        <board_uuid>{ebe1ce1b-9612-4db8-9898-ccab719ec21d}</board_uuid>
+        <name>Frontpanel 1</name>
+    </meta>
+    <geometry>
+        <!--<rect layer="1" x0="0" y0="0" x1="100" y2="100" width="0.1" start_depth="0" end_depth="$THICKNESS" />
+        <package uuid="{cb6501aa-f8c3-42ac-a9a0-8a9df0da3f05}" />
+        <circle layer="1" reference="{cb6501aa-f8c3-42ac-a9a0-8a9df0da3f05}" x="0" y="y" diameter="10" width="1"/>-->
+    </geometry>
+</panel>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

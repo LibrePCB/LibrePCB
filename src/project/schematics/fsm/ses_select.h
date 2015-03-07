@@ -39,6 +39,7 @@ class SymbolInstance;
 class SchematicNetPoint;
 class CmdSymbolInstanceMove;
 class CmdSchematicNetPointMove;
+class CmdSchematicNetLabelMove;
 }
 
 /*****************************************************************************************
@@ -102,6 +103,7 @@ class SES_Select final : public SES_Base
                                         ///< (nullptr if no command is active)
         QList<CmdSymbolInstanceMove*> mSymbolMoveCmds; ///< all symbol move commands
         QList<CmdSchematicNetPointMove*> mNetPointMoveCmds; ///< all netpoint move commands
+        QList<CmdSchematicNetLabelMove*> mNetLabelMoveCmds;
 };
 
 } // namespace project

@@ -76,6 +76,7 @@
         <file>actions/draw_ellipse.png</file>
         <file>actions/draw_polygon.png</file>
         <file>actions/draw_rectangle.png</file>
+        <file>actions/draw_netlabel.png</file>
         <file>actions/grid.png</file>
         <file>actions/layers.png</file>
         <file>library/resistor_eu.png</file>

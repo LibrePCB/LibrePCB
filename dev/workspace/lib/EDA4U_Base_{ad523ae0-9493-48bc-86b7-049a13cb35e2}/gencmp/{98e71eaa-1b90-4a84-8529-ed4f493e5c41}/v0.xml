@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<generic_component file_version="0">
+    <meta>
+        <uuid>{98e71eaa-1b90-4a84-8529-ed4f493e5c41}</uuid>
+        <version>0.1</version>
+        <author>EDA4U</author>
+        <created>2015-03-01T20:00:00Z</created>
+        <last_modified>2015-03-01T20:00:00Z</last_modified>
+        <name locale="en_US">Schematic Frame</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US">frame</keywords>
+    </meta>
+    <categories>
+        <category>{00000000-0000-4001-8000-000000000000}</category>
+    </categories>
+    <changelog/>
+    <attachements/>
+    <attributes/>
+    <properties>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">_</prefix>
+        </prefixes>
+    </properties>
+    <signals/>
+    <symbol_variants>
+        <variant uuid="{352cccd5-0c3c-4c66-88e0-6ee7c6a3cbf9}" norm="" default="true">
+            <name locale="en_US">A4 Landscape</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{6ca391c0-1c6d-4176-9607-31bf40d1b406}" symbol="{f00ab942-6980-442b-86a8-51b92de5704d}" add_order_index="0" required="true" suffix="">
+                    <pin_signal_map/>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

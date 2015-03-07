@@ -178,7 +178,13 @@ SOURCES += \
     workspace/settings/items/wsi_appearance.cpp \
     project/dialogs/addgencompdialog.cpp \
     common/alignment.cpp \
-    project/circuit/cmd/cmdgencompinstanceremove.cpp
+    project/circuit/cmd/cmdgencompinstanceremove.cpp \
+    project/schematics/fsm/ses_addnetlabel.cpp \
+    project/schematics/schematicnetlabel.cpp \
+    project/schematics/cmd/cmdschematicnetlabeladd.cpp \
+    project/schematics/cmd/cmdschematicnetlabelremove.cpp \
+    project/schematics/cmd/cmdschematicnetlabelmove.cpp \
+    project/schematics/cmd/cmdschematicnetlabeledit.cpp
 
 HEADERS += \
     common/units/all_length_units.h \
@@ -305,7 +311,13 @@ HEADERS += \
     workspace/settings/items/wsi_appearance.h \
     project/dialogs/addgencompdialog.h \
     common/alignment.h \
-    project/circuit/cmd/cmdgencompinstanceremove.h
+    project/circuit/cmd/cmdgencompinstanceremove.h \
+    project/schematics/fsm/ses_addnetlabel.h \
+    project/schematics/schematicnetlabel.h \
+    project/schematics/cmd/cmdschematicnetlabeladd.h \
+    project/schematics/cmd/cmdschematicnetlabelremove.h \
+    project/schematics/cmd/cmdschematicnetlabelmove.h \
+    project/schematics/cmd/cmdschematicnetlabeledit.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \

@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<symbol file_version="0">
+    <meta>
+        <uuid>{b95d0aca-7344-41ec-90ed-022f365ad765}</uuid>
+        <version>0.1</version>
+        <author>EDA4U</author>
+        <created>2015-03-01T20:00:00Z</created>
+        <last_modified>2015-03-01T20:00:00Z</last_modified>
+        <name locale="en_US">VCC</name>
+        <description locale="en_US">Supply</description>
+        <keywords locale="en_US">vcc,supply</keywords>
+    </meta>
+    <categories>
+        <category>{00000000-0000-4001-8000-000000000000}</category>
+    </categories>
+    <geometry>
+        <polygon fill_layer="0" start_y="-1.905" line_width="0.254" line_layer="10" start_x="1.27" grab_area="false">
+            <segment type="line" end_x="0" end_y="0"/>
+            <segment type="line" end_x="-1.27" end_y="-1.905"/>
+        </polygon>
+        <text layer="21" text="${CMP::VALUE}" x="0" y="0" angle="0" height="3.175" v_align="bottom" h_align="center"/>
+    </geometry>
+    <pins>
+        <pin x="0" length="2.54" angle="0" y="-2.54" uuid="{771c2d8b-e4ad-487b-bcb1-fe2bc10c8a03}">
+            <name locale="en_US">VCC</name>
+            <description locale="en_US"></description>
+        </pin>
+    </pins>
+</symbol>
