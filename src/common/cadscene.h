@@ -76,6 +76,7 @@ class CADScene : public QGraphicsScene
             // Types which are used in schematic scenes
             Type_SchematicNetPoint,         ///< project#SchematicNetPoint
             Type_SchematicNetLine,          ///< project#SchematicNetLine
+            Type_SchematicNetLabel,         ///< project#SchematicNetLabel
         };
 
 

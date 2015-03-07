@@ -17,52 +17,54 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef PROJECT_CMDSCHEMATICNETLABELREMOVE_H
+#define PROJECT_CMDSCHEMATICNETLABELREMOVE_H
+
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include "schematiceditorevent.h"
-#include "../../project.h"
-#include "../schematiceditor.h"
-#include "ui_schematiceditor.h"
-#include "../schematic.h"
+#include "../../../common/undocommand.h"
+#include "../../../common/exceptions.h"
+
+/*****************************************************************************************
+ *  Forward Declarations
+ ****************************************************************************************/
+
+namespace project {
+class Schematic;
+class SchematicNetLabel;
+}
+
+/*****************************************************************************************
+ *  Class CmdSchematicNetLabelRemove
+ ****************************************************************************************/
 
 namespace project {
 
-/*****************************************************************************************
- *  Class SEE_Base
- ****************************************************************************************/
-
-SEE_Base::SEE_Base(EventType_t type) :
-    mType(type), mAccepted(false)
+/**
+ * @brief The CmdSchematicNetLabelRemove class
+ */
+class CmdSchematicNetLabelRemove final : public UndoCommand
 {
-}
+    public:
 
-SEE_Base::~SEE_Base()
-{
-}
+        // Constructors / Destructor
+        explicit CmdSchematicNetLabelRemove(Schematic& schematic, SchematicNetLabel& netlabel,
+                                            UndoCommand* parent = 0) throw (Exception);
+        ~CmdSchematicNetLabelRemove() noexcept;
 
-/*****************************************************************************************
- *  Class SEE_SetAddComponentParams
- ****************************************************************************************/
+        // Inherited from UndoCommand
+        void redo() throw (Exception) override;
+        void undo() throw (Exception) override;
 
-SEE_StartAddComponent::SEE_StartAddComponent() :
-    SEE_Base(EventType_t::StartAddComponent), mGenCompUuid(), mSymbVarUuid()
-{
-}
+    private:
 
-SEE_StartAddComponent::SEE_StartAddComponent(const QUuid& genComp, const QUuid& symbVar) :
-    SEE_Base(EventType_t::StartAddComponent), mGenCompUuid(genComp), mSymbVarUuid(symbVar)
-{
-}
-
-SEE_StartAddComponent::~SEE_StartAddComponent()
-{
-}
-
-/*****************************************************************************************
- *  End of File
- ****************************************************************************************/
+        Schematic& mSchematic;
+        SchematicNetLabel& mNetLabel;
+};
 
 } // namespace project
+
+#endif // PROJECT_CMDSCHEMATICNETLABELREMOVE_H

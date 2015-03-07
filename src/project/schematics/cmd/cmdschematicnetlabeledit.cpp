@@ -22,43 +22,57 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "schematiceditorevent.h"
-#include "../../project.h"
-#include "../schematiceditor.h"
-#include "ui_schematiceditor.h"
-#include "../schematic.h"
+#include "cmdschematicnetlabeledit.h"
+#include "../schematicnetlabel.h"
 
 namespace project {
 
 /*****************************************************************************************
- *  Class SEE_Base
+ *  Constructors / Destructor
  ****************************************************************************************/
 
-SEE_Base::SEE_Base(EventType_t type) :
-    mType(type), mAccepted(false)
+CmdSchematicNetLabelEdit::CmdSchematicNetLabelEdit(SchematicNetLabel& netlabel, UndoCommand* parent) throw (Exception) :
+    UndoCommand(tr("Edit netlabel"), parent),
+    mNetLabel(netlabel), mRedoOrUndoCalled(false),
+    mNetSignalOld(&netlabel.getNetSignal()), mNetSignalNew(&netlabel.getNetSignal())
 {
 }
 
-SEE_Base::~SEE_Base()
+CmdSchematicNetLabelEdit::~CmdSchematicNetLabelEdit() noexcept
 {
+    if (!mRedoOrUndoCalled)
+    {
+        mNetLabel.setNetSignal(*mNetSignalOld);
+    }
 }
 
 /*****************************************************************************************
- *  Class SEE_SetAddComponentParams
+ *  General Methods
  ****************************************************************************************/
 
-SEE_StartAddComponent::SEE_StartAddComponent() :
-    SEE_Base(EventType_t::StartAddComponent), mGenCompUuid(), mSymbVarUuid()
+void CmdSchematicNetLabelEdit::setNetSignal(NetSignal& netsignal) noexcept
 {
+    Q_ASSERT(mRedoOrUndoCalled == false);
+    mNetSignalNew = &netsignal;
+    mNetLabel.setNetSignal(*mNetSignalNew);
 }
 
-SEE_StartAddComponent::SEE_StartAddComponent(const QUuid& genComp, const QUuid& symbVar) :
-    SEE_Base(EventType_t::StartAddComponent), mGenCompUuid(genComp), mSymbVarUuid(symbVar)
+/*****************************************************************************************
+ *  Inherited from UndoCommand
+ ****************************************************************************************/
+
+void CmdSchematicNetLabelEdit::redo() throw (Exception)
 {
+    mRedoOrUndoCalled = true;
+    UndoCommand::redo(); // throws an exception on error
+    mNetLabel.setNetSignal(*mNetSignalNew);
 }
 
-SEE_StartAddComponent::~SEE_StartAddComponent()
+void CmdSchematicNetLabelEdit::undo() throw (Exception)
 {
+    mRedoOrUndoCalled = true;
+    UndoCommand::undo();
+    mNetLabel.setNetSignal(*mNetSignalOld);
 }
 
 /*****************************************************************************************

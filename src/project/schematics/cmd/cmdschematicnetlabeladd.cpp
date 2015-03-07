@@ -22,43 +22,66 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "schematiceditorevent.h"
-#include "../../project.h"
-#include "../schematiceditor.h"
-#include "ui_schematiceditor.h"
+#include "cmdschematicnetlabeladd.h"
 #include "../schematic.h"
+#include "../schematicnetlabel.h"
 
 namespace project {
 
 /*****************************************************************************************
- *  Class SEE_Base
+ *  Constructors / Destructor
  ****************************************************************************************/
 
-SEE_Base::SEE_Base(EventType_t type) :
-    mType(type), mAccepted(false)
+CmdSchematicNetLabelAdd::CmdSchematicNetLabelAdd(Schematic& schematic, NetSignal& netsignal,
+                                                 const Point& position, UndoCommand* parent) throw (Exception) :
+    UndoCommand(tr("Add netlabel"), parent),
+    mSchematic(schematic), mNetSignal(&netsignal), mPosition(position), mNetLabel(nullptr)
 {
 }
 
-SEE_Base::~SEE_Base()
+CmdSchematicNetLabelAdd::~CmdSchematicNetLabelAdd() noexcept
 {
+    if ((mNetLabel) && (!mIsExecuted))
+        delete mNetLabel;
 }
 
 /*****************************************************************************************
- *  Class SEE_SetAddComponentParams
+ *  Inherited from UndoCommand
  ****************************************************************************************/
 
-SEE_StartAddComponent::SEE_StartAddComponent() :
-    SEE_Base(EventType_t::StartAddComponent), mGenCompUuid(), mSymbVarUuid()
+void CmdSchematicNetLabelAdd::redo() throw (Exception)
 {
+    if (!mNetLabel) // only the first time
+    {
+        mNetLabel = mSchematic.createNetLabel(*mNetSignal, mPosition); // throws an exception on error
+    }
+
+    mSchematic.addNetLabel(*mNetLabel); // throws an exception on error
+
+    try
+    {
+        UndoCommand::redo(); // throws an exception on error
+    }
+    catch (Exception &e)
+    {
+        mSchematic.removeNetLabel(*mNetLabel);
+        throw;
+    }
 }
 
-SEE_StartAddComponent::SEE_StartAddComponent(const QUuid& genComp, const QUuid& symbVar) :
-    SEE_Base(EventType_t::StartAddComponent), mGenCompUuid(genComp), mSymbVarUuid(symbVar)
+void CmdSchematicNetLabelAdd::undo() throw (Exception)
 {
-}
+    mSchematic.removeNetLabel(*mNetLabel); // throws an exception on error
 
-SEE_StartAddComponent::~SEE_StartAddComponent()
-{
+    try
+    {
+        UndoCommand::undo();
+    }
+    catch (Exception& e)
+    {
+        mSchematic.addNetLabel(*mNetLabel);
+        throw;
+    }
 }
 
 /*****************************************************************************************

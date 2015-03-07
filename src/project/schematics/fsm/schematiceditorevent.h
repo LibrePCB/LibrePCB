@@ -54,7 +54,7 @@ class SEE_Base
     public:
 
         /// FSM event types
-        enum EventType {
+        enum EventType_t {
             // Triggered Actions (SEE_Base objects, no additional parameters)
             AbortCommand,       ///< abort the currently active command (esc)
             StartSelect,        ///< start command: select elements
@@ -65,6 +65,7 @@ class SEE_Base
             StartDrawCircle,    ///< start command: draw circle
             StartDrawEllipse,   ///< start command: draw ellipse
             StartDrawWire,      ///< start command: draw wire
+            StartAddNetLabel,   ///< start command: add netlabel
             Edit_Copy,          ///< copy the selected elements to clipboard (ctrl+c)
             Edit_Cut,           ///< cut the selected elements (ctrl+x)
             Edit_Paste,         ///< paste the elements from the clipboard (ctrl+v)
@@ -79,11 +80,11 @@ class SEE_Base
         };
 
         // Constructors / Destructor
-        SEE_Base(EventType type);
+        SEE_Base(EventType_t type);
         virtual ~SEE_Base();
 
         // Getters
-        EventType getType() const noexcept {return mType;}
+        EventType_t getType() const noexcept {return mType;}
         bool isAccepted() const noexcept {return mAccepted;}
 
         // Setters
@@ -91,7 +92,7 @@ class SEE_Base
 
     protected:
 
-        EventType mType;
+        EventType_t mType;
         bool mAccepted;
 };
 
@@ -107,7 +108,7 @@ class SEE_RedirectedQEvent final : public SEE_Base
     public:
 
         // Constructors / Destructor
-        SEE_RedirectedQEvent(EventType type, QEvent* event) :
+        SEE_RedirectedQEvent(EventType_t type, QEvent* event) :
             SEE_Base(type), mQEvent(event) {}
         virtual ~SEE_RedirectedQEvent() {}
 
@@ -191,7 +192,7 @@ class SEE_SwitchToSchematicPage final : public SEE_Base
 
         // Constructors / Destructor
         SEE_SwitchToSchematicPage(unsigned int schematicIndex) :
-            SEE_Base(SwitchToSchematicPage),
+            SEE_Base(EventType_t::SwitchToSchematicPage),
             mSchematicIndex(schematicIndex) {}
         virtual ~SEE_SwitchToSchematicPage() {}
 

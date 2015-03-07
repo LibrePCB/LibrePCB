@@ -57,6 +57,7 @@ class SchematicLayer final : public QObject
             // Symbols in a Schematic
             ComponentNames      = 20,
             ComponentValues     = 21,
+            NetLabels           = 22,
 
             // Circuit Stuff in a Schematic
             Nets                = 30,

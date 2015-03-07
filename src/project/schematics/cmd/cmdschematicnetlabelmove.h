@@ -17,52 +17,66 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef PROJECT_CMDSCHEMATICNETLABELMOVE_H
+#define PROJECT_CMDSCHEMATICNETLABELMOVE_H
+
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include "schematiceditorevent.h"
-#include "../../project.h"
-#include "../schematiceditor.h"
-#include "ui_schematiceditor.h"
-#include "../schematic.h"
+#include "../../../common/undocommand.h"
+#include "../../../common/exceptions.h"
+#include "../../../common/units/all_length_units.h"
+
+/*****************************************************************************************
+ *  Forward Declarations
+ ****************************************************************************************/
+
+namespace project {
+class SchematicNetLabel;
+}
+
+/*****************************************************************************************
+ *  Class CmdSchematicNetLabelMove
+ ****************************************************************************************/
 
 namespace project {
 
-/*****************************************************************************************
- *  Class SEE_Base
- ****************************************************************************************/
-
-SEE_Base::SEE_Base(EventType_t type) :
-    mType(type), mAccepted(false)
+/**
+ * @brief The CmdSchematicNetLabelMove class
+ */
+class CmdSchematicNetLabelMove final : public UndoCommand
 {
-}
+    public:
 
-SEE_Base::~SEE_Base()
-{
-}
+        // Constructors / Destructor
+        explicit CmdSchematicNetLabelMove(SchematicNetLabel& netlabel, UndoCommand* parent = 0) throw (Exception);
+        ~CmdSchematicNetLabelMove() noexcept;
 
-/*****************************************************************************************
- *  Class SEE_SetAddComponentParams
- ****************************************************************************************/
+        // General Methods
+        void setAbsolutePos(const Point& absPos) noexcept;
+        void setDeltaToStartPos(const Point& deltaPos) noexcept;
+        void setAngle(const Angle& angle) noexcept;
+        void rotate(const Angle& angle, const Point& center) noexcept;
 
-SEE_StartAddComponent::SEE_StartAddComponent() :
-    SEE_Base(EventType_t::StartAddComponent), mGenCompUuid(), mSymbVarUuid()
-{
-}
+        // Inherited from UndoCommand
+        void redo() throw (Exception) override;
+        void undo() throw (Exception) override;
 
-SEE_StartAddComponent::SEE_StartAddComponent(const QUuid& genComp, const QUuid& symbVar) :
-    SEE_Base(EventType_t::StartAddComponent), mGenCompUuid(genComp), mSymbVarUuid(symbVar)
-{
-}
 
-SEE_StartAddComponent::~SEE_StartAddComponent()
-{
-}
+    private:
 
-/*****************************************************************************************
- *  End of File
- ****************************************************************************************/
+        SchematicNetLabel& mNetLabel;
+        Point mStartPos;
+        Point mDeltaPos;
+        Point mEndPos;
+        Angle mStartAngle;
+        Angle mDeltaAngle;
+        Angle mEndAngle;
+        bool mRedoOrUndoCalled;
+};
 
 } // namespace project
+
+#endif // PROJECT_CMDSCHEMATICNETLABELMOVE_H

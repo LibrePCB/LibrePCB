@@ -32,6 +32,7 @@
 #include "schematicnetline.h"
 #include "../../library/symbolpingraphicsitem.h"
 #include "../../library/symbolpin.h"
+#include "schematicnetlabel.h"
 
 namespace project {
 
@@ -89,6 +90,14 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
                 SchematicNetLine* netline = new SchematicNetLine(*this, *node);
                 addNetLine(*netline);
             }
+
+            // Load all netlabels
+            for (XmlDomElement* node = root.getFirstChild("netlabels/netlabel", true, false);
+                 node; node = node->getNextSibling("netlabel"))
+            {
+                SchematicNetLabel* netlabel = new SchematicNetLabel(*this, *node);
+                addNetLabel(*netlabel);
+            }
         }
 
         updateIcon();
@@ -98,6 +107,8 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
     catch (...)
     {
         // free the allocated memory in the reverse order of their allocation...
+        foreach (SchematicNetLabel* netlabel, mNetLabels)
+            try { removeNetLabel(*netlabel); delete netlabel; } catch (...) {}
         foreach (SchematicNetLine* netline, mNetLines)
             try { removeNetLine(*netline); delete netline; } catch (...) {}
         foreach (SchematicNetPoint* netpoint, mNetPoints)
@@ -111,6 +122,9 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
 
 Schematic::~Schematic()
 {
+    // delete all netlabels (and catch all throwed exceptions)
+    foreach (SchematicNetLabel* netlabel, mNetLabels)
+        try { removeNetLabel(*netlabel); delete netlabel; } catch (...) {}
     // delete all netlines (and catch all throwed exceptions)
     foreach (SchematicNetLine* netline, mNetLines)
         try { removeNetLine(*netline); delete netline; } catch (...) {}
@@ -310,6 +324,44 @@ void Schematic::removeNetLine(SchematicNetLine& netline) throw (Exception)
 }
 
 /*****************************************************************************************
+ *  SchematicNetLabel Methods
+ ****************************************************************************************/
+
+SchematicNetLabel* Schematic::getNetLabelByUuid(const QUuid& uuid) const noexcept
+{
+    return mNetLabels.value(uuid, nullptr);
+}
+
+SchematicNetLabel* Schematic::createNetLabel(NetSignal& netsignal, const Point& position) throw (Exception)
+{
+    return new SchematicNetLabel(*this, netsignal, position);
+}
+
+void Schematic::addNetLabel(SchematicNetLabel& netlabel) throw (Exception)
+{
+    // check if there is no netlabel with the same uuid in the list
+    if (getNetLabelByUuid(netlabel.getUuid()))
+    {
+        throw RuntimeError(__FILE__, __LINE__, netlabel.getUuid().toString(),
+            QString(tr("There is already a netlabel with the UUID \"%1\"!"))
+            .arg(netlabel.getUuid().toString()));
+    }
+
+    // add to schematic
+    netlabel.addToSchematic(); // can throw an exception
+    mNetLabels.insert(netlabel.getUuid(), &netlabel);
+}
+
+void Schematic::removeNetLabel(SchematicNetLabel& netlabel) throw (Exception)
+{
+    Q_ASSERT(mNetLabels.contains(netlabel.getUuid()) == true);
+
+    // remove from schematic
+    netlabel.removeFromSchematic(); // can throw an exception
+    mNetLabels.remove(netlabel.getUuid());
+}
+
+/*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
@@ -421,6 +473,9 @@ XmlDomElement* Schematic::serializeToXmlDomElement() const throw (Exception)
     XmlDomElement* netlines = root->appendChild("netlines");
     foreach (SchematicNetLine* netline, mNetLines)
         netlines->appendChild(netline->serializeToXmlDomElement());
+    XmlDomElement* netlabels = root->appendChild("netlabels");
+    foreach (SchematicNetLabel* netlabel, mNetLabels)
+        netlabels->appendChild(netlabel->serializeToXmlDomElement());
     return root.take();
 }
 

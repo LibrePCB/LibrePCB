@@ -46,6 +46,7 @@ class SymbolInstance;
 class SymbolPinInstance;
 class SchematicNetPoint;
 class SchematicNetLine;
+class SchematicNetLabel;
 }
 
 namespace library {
@@ -85,9 +86,10 @@ class Schematic final : public CADScene, public IF_AttributeProvider,
          */
         enum ItemZValue {
             ZValue_Default = 0, ///< this is the default value (behind all other items)
-            ZValue_Symbols,     ///< Z Value for SymbolInstance items
-            ZValue_NetLines,    ///< Z value for SchematicNetLine items
-            ZValue_NetPoints    ///< Z value for SchematicNetPoint items
+            ZValue_Symbols,     ///< Z value for project#SymbolInstance items
+            ZValue_NetLabels,   ///< Z value for project#SchematicNetLabel items
+            ZValue_NetLines,    ///< Z value for project#SchematicNetLine items
+            ZValue_NetPoints    ///< Z value for project#SchematicNetPoint items
         };
 
 
@@ -131,6 +133,12 @@ class Schematic final : public CADScene, public IF_AttributeProvider,
                                         const Length& width) throw (Exception);
         void addNetLine(SchematicNetLine& netline) throw (Exception);
         void removeNetLine(SchematicNetLine& netline) throw (Exception);
+
+        // SchematicNetLabel Methods
+        SchematicNetLabel* getNetLabelByUuid(const QUuid& uuid) const noexcept;
+        SchematicNetLabel* createNetLabel(NetSignal& netsignal, const Point& position) throw (Exception);
+        void addNetLabel(SchematicNetLabel& netlabel) throw (Exception);
+        void removeNetLabel(SchematicNetLabel& netlabel) throw (Exception);
 
         // General Methods
         void addToProject() throw (Exception);
@@ -183,6 +191,7 @@ class Schematic final : public CADScene, public IF_AttributeProvider,
         QHash<QUuid, SymbolInstance*> mSymbols;
         QHash<QUuid, SchematicNetPoint*> mNetPoints;
         QHash<QUuid, SchematicNetLine*> mNetLines;
+        QHash<QUuid, SchematicNetLabel*> mNetLabels;
 };
 
 } // namespace project

@@ -63,6 +63,7 @@ class SES_FSM final : public SES_Base
             State_DrawCircle,   ///< @see project#SES_DrawCircle
             State_DrawEllipse,  ///< @see project#SES_DrawEllipse
             State_DrawWire,     ///< @see project#SES_DrawWire
+            State_AddNetLabel,  ///< @see project#SES_AddNetLabel
             State_AddComponent  ///< @see project#SES_AddComponents
         };
 

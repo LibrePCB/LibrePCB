@@ -117,6 +117,9 @@ SchematicEditor::SchematicEditor(Project& project, bool readOnly) :
     connect(mUi->actionToolDrawWire, &QAction::triggered,
             [this](){mFsm->processEvent(new SEE_Base(SEE_Base::StartDrawWire), true);
                      mUi->actionToolDrawWire->setChecked(mUi->actionToolDrawWire->isCheckable());});
+    connect(mUi->actionToolAddNetLabel, &QAction::triggered,
+            [this](){mFsm->processEvent(new SEE_Base(SEE_Base::StartAddNetLabel), true);
+                     mUi->actionToolAddNetLabel->setChecked(mUi->actionToolAddNetLabel->isCheckable());});
 
     // connect the "command" toolbar with the state machine
     connect(mUi->actionCommandAbort, &QAction::triggered,

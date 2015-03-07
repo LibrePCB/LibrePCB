@@ -17,52 +17,68 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef PROJECT_SES_ADDNETLABEL_H
+#define PROJECT_SES_ADDNETLABEL_H
+
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include "schematiceditorevent.h"
-#include "../../project.h"
-#include "../schematiceditor.h"
-#include "ui_schematiceditor.h"
-#include "../schematic.h"
+#include "ses_base.h"
+
+/*****************************************************************************************
+ *  Forward Declarations
+ ****************************************************************************************/
+
+namespace project {
+class Schematic;
+class SchematicNetLabel;
+class CmdSchematicNetLabelMove;
+class CmdSchematicNetLabelEdit;
+}
+
+/*****************************************************************************************
+ *  Class SES_AddNetLabel
+ ****************************************************************************************/
 
 namespace project {
 
-/*****************************************************************************************
- *  Class SEE_Base
- ****************************************************************************************/
-
-SEE_Base::SEE_Base(EventType_t type) :
-    mType(type), mAccepted(false)
+/**
+ * @brief The SES_AddNetLabel class
+ */
+class SES_AddNetLabel final : public SES_Base
 {
-}
+        Q_OBJECT
 
-SEE_Base::~SEE_Base()
-{
-}
+    public:
 
-/*****************************************************************************************
- *  Class SEE_SetAddComponentParams
- ****************************************************************************************/
+        // Constructors / Destructor
+        explicit SES_AddNetLabel(SchematicEditor& editor, Ui::SchematicEditor& editorUi);
+        ~SES_AddNetLabel();
 
-SEE_StartAddComponent::SEE_StartAddComponent() :
-    SEE_Base(EventType_t::StartAddComponent), mGenCompUuid(), mSymbVarUuid()
-{
-}
+        // General Methods
+        ProcRetVal process(SEE_Base* event) noexcept override;
+        bool entry(SEE_Base* event) noexcept override;
+        bool exit(SEE_Base* event) noexcept override;
 
-SEE_StartAddComponent::SEE_StartAddComponent(const QUuid& genComp, const QUuid& symbVar) :
-    SEE_Base(EventType_t::StartAddComponent), mGenCompUuid(genComp), mSymbVarUuid(symbVar)
-{
-}
 
-SEE_StartAddComponent::~SEE_StartAddComponent()
-{
-}
+    private:
 
-/*****************************************************************************************
- *  End of File
- ****************************************************************************************/
+        // Private Methods
+        ProcRetVal processSceneEvent(SEE_Base* event) noexcept;
+        bool addLabel(Schematic& schematic) noexcept;
+        bool updateLabel(Schematic& schematic, const Point& pos) noexcept;
+        bool fixLabel(const Point& pos) noexcept;
+
+
+        // General Attributes
+        bool mUndoCmdActive;
+        SchematicNetLabel* mCurrentNetLabel;
+        CmdSchematicNetLabelEdit* mEditCmd;
+        CmdSchematicNetLabelMove* mMoveCmd;
+};
 
 } // namespace project
+
+#endif // PROJECT_SES_ADDNETLABEL_H

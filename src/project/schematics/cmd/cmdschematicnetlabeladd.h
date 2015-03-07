@@ -17,52 +17,61 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef PROJECT_CMDSCHEMATICNETLABELADD_H
+#define PROJECT_CMDSCHEMATICNETLABELADD_H
+
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include "schematiceditorevent.h"
-#include "../../project.h"
-#include "../schematiceditor.h"
-#include "ui_schematiceditor.h"
-#include "../schematic.h"
+#include "../../../common/undocommand.h"
+#include "../../../common/units/point.h"
+#include "../../../common/exceptions.h"
+
+/*****************************************************************************************
+ *  Forward Declarations
+ ****************************************************************************************/
+
+namespace project {
+class NetSignal;
+class Schematic;
+class SchematicNetLabel;
+}
+
+/*****************************************************************************************
+ *  Class CmdSchematicNetLabelAdd
+ ****************************************************************************************/
 
 namespace project {
 
-/*****************************************************************************************
- *  Class SEE_Base
- ****************************************************************************************/
-
-SEE_Base::SEE_Base(EventType_t type) :
-    mType(type), mAccepted(false)
+/**
+ * @brief The CmdSchematicNetLabelAdd class
+ */
+class CmdSchematicNetLabelAdd final : public UndoCommand
 {
-}
+    public:
 
-SEE_Base::~SEE_Base()
-{
-}
+        // Constructors / Destructor
+        explicit CmdSchematicNetLabelAdd(Schematic& schematic, NetSignal& netsignal,
+                                         const Point& position, UndoCommand* parent = 0) throw (Exception);
+        ~CmdSchematicNetLabelAdd() noexcept;
 
-/*****************************************************************************************
- *  Class SEE_SetAddComponentParams
- ****************************************************************************************/
+        // Getters
+        SchematicNetLabel* getNetLabel() const noexcept {return mNetLabel;}
 
-SEE_StartAddComponent::SEE_StartAddComponent() :
-    SEE_Base(EventType_t::StartAddComponent), mGenCompUuid(), mSymbVarUuid()
-{
-}
+        // Inherited from UndoCommand
+        void redo() throw (Exception) override;
+        void undo() throw (Exception) override;
 
-SEE_StartAddComponent::SEE_StartAddComponent(const QUuid& genComp, const QUuid& symbVar) :
-    SEE_Base(EventType_t::StartAddComponent), mGenCompUuid(genComp), mSymbVarUuid(symbVar)
-{
-}
+    private:
 
-SEE_StartAddComponent::~SEE_StartAddComponent()
-{
-}
-
-/*****************************************************************************************
- *  End of File
- ****************************************************************************************/
+        Schematic& mSchematic;
+        NetSignal* mNetSignal;
+        Point mPosition;
+        SchematicNetLabel* mNetLabel;
+};
 
 } // namespace project
+
+#endif // PROJECT_CMDSCHEMATICNETLABELADD_H

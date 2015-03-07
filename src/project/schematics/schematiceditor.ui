@@ -103,6 +103,8 @@
     <addaction name="actionToolDrawEllipse"/>
     <addaction name="separator"/>
     <addaction name="actionToolDrawWire"/>
+    <addaction name="actionToolAddNetLabel"/>
+    <addaction name="separator"/>
     <addaction name="actionToolAddComponent"/>
    </widget>
    <widget class="QMenu" name="menuProject">
@@ -219,6 +221,8 @@
    <addaction name="actionToolDrawEllipse"/>
    <addaction name="separator"/>
    <addaction name="actionToolDrawWire"/>
+   <addaction name="actionToolAddNetLabel"/>
+   <addaction name="separator"/>
    <addaction name="actionToolAddComponent"/>
   </widget>
   <widget class="QToolBar" name="commandToolbar">
@@ -659,6 +663,15 @@
    </property>
    <property name="text">
     <string>Settings</string>
+   </property>
+  </action>
+  <action name="actionToolAddNetLabel">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/draw_netlabel.png</normaloff>:/img/actions/draw_netlabel.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Netlabel</string>
    </property>
   </action>
  </widget>

@@ -43,6 +43,16 @@
 #include "../symbolinstancepropertiesdialog.h"
 #include "../../circuit/gencompinstance.h"
 #include "../../circuit/cmd/cmdgencompinstanceremove.h"
+#include "../schematicnetlabel.h"
+#include "../../circuit/netsignal.h"
+#include "../../circuit/circuit.h"
+#include "../../circuit/cmd/cmdnetsignalsetname.h"
+#include "../../circuit/cmd/cmdnetsignaladd.h"
+#include "../../circuit/cmd/cmdgencompsiginstsetnetsignal.h"
+#include "../cmd/cmdschematicnetpointsetnetsignal.h"
+#include "../../circuit/cmd/cmdnetsignalremove.h"
+#include "../cmd/cmdschematicnetlabelmove.h"
+#include "../cmd/cmdschematicnetlabeledit.h"
 
 namespace project {
 
@@ -181,9 +191,11 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneLeftClick(QGraphicsSceneMouseE
     uint count = 0;
     QList<SymbolInstance*> symbols;
     QList<SchematicNetPoint*> netpoints;
+    QList<SchematicNetLabel*> netlabels;
     count += SymbolInstance::extractFromGraphicsItems(items, symbols);
     count += SchematicNetPoint::extractFromGraphicsItems(items, netpoints, true, false,
                                                          true, false, false, false);
+    count += SchematicNetLabel::extractFromGraphicsItems(items, netlabels);
 
     // abort if no items are selected
     if (count == 0) return ForceStayInState;
@@ -192,11 +204,14 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneLeftClick(QGraphicsSceneMouseE
     Q_ASSERT(!mParentCommand);
     Q_ASSERT(mSymbolMoveCmds.isEmpty());
     Q_ASSERT(mNetPointMoveCmds.isEmpty());
+    Q_ASSERT(mNetLabelMoveCmds.isEmpty());
     mParentCommand = new UndoCommand(tr("Move Schematic Items"));
     foreach (SymbolInstance* instance, symbols)
         mSymbolMoveCmds.append(new CmdSymbolInstanceMove(*instance, mParentCommand));
     foreach (SchematicNetPoint* point, netpoints)
         mNetPointMoveCmds.append(new CmdSchematicNetPointMove(*point, mParentCommand));
+    foreach (SchematicNetLabel* label, netlabels)
+        mNetLabelMoveCmds.append(new CmdSchematicNetLabelMove(*label, mParentCommand));
 
     // switch to substate SubState_Moving
     mSubState = SubState_Moving;
@@ -301,6 +316,58 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneDoubleClick(QGraphicsSceneMous
                 dialog.exec();
                 return ForceStayInState;
             }
+            case CADScene::Type_SchematicNetLabel:
+            {
+                SchematicNetLabelGraphicsItem* i = qgraphicsitem_cast<SchematicNetLabelGraphicsItem*>(items.first());
+                Q_ASSERT(i); if (!i) return PassToParentState;
+                SchematicNetLabel& label = i->getNetLabel();
+                NetSignal& netsignal = label.getNetSignal();
+                QString name = QInputDialog::getText(&mEditor, tr("Change Net Name"),
+                                                     tr("New Net Name:"),QLineEdit::Normal,
+                                                     netsignal.getName());
+                if (!name.isNull())
+                {
+                    try
+                    {
+                        // change name
+                        NetSignal* newSignal = mCircuit.getNetSignalByName(name);
+                        if (newSignal)
+                        {
+                            mProject.getUndoStack().beginCommand(tr("Combine Net Signals"));
+                            foreach (GenCompSignalInstance* signal, netsignal.getGenCompSignals())
+                            {
+                                auto cmd = new CmdGenCompSigInstSetNetSignal(*signal, newSignal);
+                                mProject.getUndoStack().appendToCommand(cmd);
+                            }
+                            foreach (SchematicNetPoint* point, netsignal.getNetPoints())
+                            {
+                                auto cmd = new CmdSchematicNetPointSetNetSignal(*point, *newSignal);
+                                mProject.getUndoStack().appendToCommand(cmd);
+                            }
+                            foreach (SchematicNetLabel* label, netsignal.getNetLabels())
+                            {
+                                auto cmd = new CmdSchematicNetLabelEdit(*label);
+                                cmd->setNetSignal(*newSignal);
+                                mProject.getUndoStack().appendToCommand(cmd);
+                            }
+                            auto cmd = new CmdNetSignalRemove(mProject.getCircuit(), netsignal);
+                            mProject.getUndoStack().appendToCommand(cmd);
+
+                            mProject.getUndoStack().endCommand();
+                        }
+                        else
+                        {
+                            CmdNetSignalSetName* cmd = new CmdNetSignalSetName(mCircuit, netsignal, name, false);
+                            mProject.getUndoStack().execCmd(cmd);
+                        }
+                    }
+                    catch (Exception& e)
+                    {
+                        QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+                    }
+                }
+                break;
+            }
             default:
                 break;
         }
@@ -346,6 +413,8 @@ SES_Base::ProcRetVal SES_Select::processSubStateMovingSceneEvent(SEE_Base* event
                         cmd->setDeltaToStartPosTemporary(delta);
                     foreach (CmdSchematicNetPointMove* cmd, mNetPointMoveCmds)
                         cmd->setDeltaToStartPosTemporary(delta);
+                    foreach (CmdSchematicNetLabelMove* cmd, mNetLabelMoveCmds)
+                        cmd->setDeltaToStartPos(delta);
 
                     // set position of all selected elements permanent
                     try
@@ -367,6 +436,7 @@ SES_Base::ProcRetVal SES_Select::processSubStateMovingSceneEvent(SEE_Base* event
                     }
                     mSymbolMoveCmds.clear();
                     mNetPointMoveCmds.clear();
+                    mNetLabelMoveCmds.clear();
                     mParentCommand = nullptr;
                     mSubState = SubState_Idle;
                     break;
@@ -396,6 +466,8 @@ SES_Base::ProcRetVal SES_Select::processSubStateMovingSceneEvent(SEE_Base* event
                 cmd->setDeltaToStartPosTemporary(delta);
             foreach (CmdSchematicNetPointMove* cmd, mNetPointMoveCmds)
                 cmd->setDeltaToStartPosTemporary(delta);
+            foreach (CmdSchematicNetLabelMove* cmd, mNetLabelMoveCmds)
+                cmd->setDeltaToStartPos(delta);
 
             mLastMouseMoveDeltaPos = delta;
             break;

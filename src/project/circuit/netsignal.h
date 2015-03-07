@@ -38,6 +38,7 @@ class Circuit;
 class NetClass;
 class GenCompSignalInstance;
 class SchematicNetPoint;
+class SchematicNetLabel;
 class ErcMsg;
 }
 
@@ -72,6 +73,7 @@ class NetSignal final : public IF_ErcMsgProvider, public IF_XmlSerializableObjec
         bool isNameForced() const noexcept {return (mGenCompSignalWithForcedNameCount > 0);}
         const QList<GenCompSignalInstance*>& getGenCompSignals() const noexcept {return mGenCompSignals;}
         const QList<SchematicNetPoint*>& getNetPoints() const noexcept {return mSchematicNetPoints;}
+        const QList<SchematicNetLabel*>& getNetLabels() const noexcept {return mSchematicNetLabels;}
 
         // Setters
         void setName(const QString& name, bool isAutoName) throw (Exception);
@@ -81,6 +83,8 @@ class NetSignal final : public IF_ErcMsgProvider, public IF_XmlSerializableObjec
         void unregisterGenCompSignal(GenCompSignalInstance& signal) noexcept;
         void registerSchematicNetPoint(SchematicNetPoint& netpoint) noexcept;
         void unregisterSchematicNetPoint(SchematicNetPoint& netpoint) noexcept;
+        void registerSchematicNetLabel(SchematicNetLabel& netlabel) noexcept;
+        void unregisterSchematicNetLabel(SchematicNetLabel& netlabel) noexcept;
         void addToCircuit() noexcept;
         void removeFromCircuit() noexcept;
         XmlDomElement* serializeToXmlDomElement() const throw (Exception);
@@ -112,6 +116,7 @@ class NetSignal final : public IF_ErcMsgProvider, public IF_XmlSerializableObjec
         // Registered Elements of this Netclass
         QList<GenCompSignalInstance*> mGenCompSignals;
         QList<SchematicNetPoint*> mSchematicNetPoints;
+        QList<SchematicNetLabel*> mSchematicNetLabels;
         uint mGenCompSignalWithForcedNameCount;
 
         // Attributes
