@@ -252,8 +252,9 @@
     <bool>true</bool>
    </attribute>
    <addaction name="actionAddGenCmp_Resistor"/>
-   <addaction name="actionAddGenCmp_Capacitor"/>
    <addaction name="actionAddGenCmp_Inductor"/>
+   <addaction name="actionAddGenCmp_BipolarCapacitor"/>
+   <addaction name="actionAddGenCmp_UnipolarCapacitor"/>
    <addaction name="actionAddGenCmp_gnd"/>
    <addaction name="actionAddGenCmp_vcc"/>
   </widget>
@@ -615,13 +616,16 @@
     <string>Add Resistor</string>
    </property>
   </action>
-  <action name="actionAddGenCmp_Capacitor">
+  <action name="actionAddGenCmp_BipolarCapacitor">
    <property name="icon">
     <iconset resource="../../../img/images.qrc">
-     <normaloff>:/img/library/capacitor_eu.png</normaloff>:/img/library/capacitor_eu.png</iconset>
+     <normaloff>:/img/library/bipolar_capacitor_eu.png</normaloff>:/img/library/bipolar_capacitor_eu.png</iconset>
    </property>
    <property name="text">
-    <string>Add Capacitor</string>
+    <string>Add Bipolar Capacitor</string>
+   </property>
+   <property name="toolTip">
+    <string>Add Bipolar Capacitor</string>
    </property>
   </action>
   <action name="actionAddGenCmp_Inductor">
@@ -672,6 +676,15 @@
    </property>
    <property name="text">
     <string>Add Netlabel</string>
+   </property>
+  </action>
+  <action name="actionAddGenCmp_UnipolarCapacitor">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/library/unipolar_capacitor_eu.png</normaloff>:/img/library/unipolar_capacitor_eu.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Unipolar Capacitor</string>
    </property>
   </action>
  </widget>

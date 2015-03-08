@@ -324,10 +324,19 @@ void SchematicEditor::on_actionAddGenCmp_Resistor_triggered()
     mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
 }
 
-void SchematicEditor::on_actionAddGenCmp_Capacitor_triggered()
+void SchematicEditor::on_actionAddGenCmp_BipolarCapacitor_triggered()
 {
     QUuid genCompUuid = "{d167e0e3-6a92-4b76-b013-77b9c230e5f1}";
     QUuid symbVarUuid = "{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}";
+    SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(genCompUuid, symbVarUuid);
+    mFsm->processEvent(addEvent, true);
+    mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
+}
+
+void SchematicEditor::on_actionAddGenCmp_UnipolarCapacitor_triggered()
+{
+    QUuid genCompUuid = "{c54375c5-7149-4ded-95c5-7462f7301ee7}";
+    QUuid symbVarUuid = "{5412add2-af9c-44b8-876d-a0fb7c201897}";
     SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(genCompUuid, symbVarUuid);
     mFsm->processEvent(addEvent, true);
     mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
