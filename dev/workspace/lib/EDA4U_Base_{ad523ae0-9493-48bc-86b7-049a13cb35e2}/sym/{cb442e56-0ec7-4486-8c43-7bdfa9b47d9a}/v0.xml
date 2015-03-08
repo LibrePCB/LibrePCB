@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<symbol version="0">
+    <meta>
+        <uuid>{cb442e56-0ec7-4486-8c43-7bdfa9b47d9a}</uuid>
+        <version>0.1</version>
+        <author>EDA4U</author>
+        <created>2015-03-08T16:21:12Z</created>
+        <last_modified>2015-03-08T16:21:12Z</last_modified>
+        <name locale="en_US">LED</name>
+        <description locale="en_US"/>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon line_width="0.254000" start_x="1.270000" start_y="1.27" grab_area="true" fill_layer="0" line_layer="10">
+            <segment type="line" end_x="0.000000" end_y="-1.27"/>
+            <segment type="line" end_x="-1.270000" end_y="1.27"/>
+            <segment type="line" end_x="1.27" end_y="1.27"/>
+        </polygon>
+        <polygon line_width="0.254000" start_x="-1.270000" start_y="-1.27" grab_area="true" fill_layer="0" line_layer="10">
+            <segment type="line" end_x="1.27" end_y="-1.27"/>
+        </polygon>
+        <polygon line_width="0.152400" start_x="0.000000" start_y="1.27" grab_area="true" fill_layer="0" line_layer="10">
+            <segment type="line" end_x="0.000000" end_y="-1.27"/>
+        </polygon>
+        <polygon line_width="0.152400" start_x="-2.032000" start_y="0.508" grab_area="true" fill_layer="0" line_layer="10">
+            <segment type="line" end_x="-3.429000" end_y="−0.889"/>
+        </polygon>
+        <polygon line_width="0.152400" start_x="-1.905000" start_y="−0.635" grab_area="true" fill_layer="0" line_layer="10">
+            <segment type="line" end_x="-3.302000" end_y="−2.032"/>
+        </polygon>
+        <polygon line_width="0.152400" start_x="-3.429000" start_y="−0.889" grab_area="true" fill_layer="10" line_layer="10">
+            <segment type="line" end_x="-3.048000" end_y="0"/>
+            <segment type="line" end_x="-2.540000" end_y="−0.508"/>
+            <segment type="line" end_x="-3.429000" end_y="−0.889"/>
+        </polygon>
+        <polygon line_width="0.152400" start_x="-3.302000" start_y="−2.032" grab_area="true" fill_layer="10" line_layer="10">
+            <segment type="line" end_x="-2.921000" end_y="−1.143"/>
+            <segment type="line" end_x="-2.413000" end_y="−1.651"/>
+            <segment type="line" end_x="-3.302000" end_y="−2.032"/>
+        </polygon>
+        <text height="3.175" text="${SYM::NAME}" layer="20" h_align="left" x="1.5" y="0" angle="0.000000" v_align="bottom"/>
+        <text height="2.5" text="${CMP::VALUE}" layer="21" h_align="left" x="1.5" y="0" angle="0.000000" v_align="top"/>
+    </geometry>
+    <pins>
+        <pin length="1.27" uuid="{18de942d-8b47-4daf-9e07-d089204e09d0}" x="0.000000" y="-2.54" angle="0.000000">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="1.27" uuid="{2a64f851-340a-43f2-b1cf-06a1d4b54560}" x="0.000000" y="2.540000" angle="180.000000">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </pin>
+    </pins>
+</symbol>
