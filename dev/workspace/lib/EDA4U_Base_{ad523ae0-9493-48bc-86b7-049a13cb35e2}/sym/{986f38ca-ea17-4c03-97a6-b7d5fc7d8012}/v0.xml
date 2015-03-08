@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<symbol version="0">
+    <meta>
+        <uuid>{986f38ca-ea17-4c03-97a6-b7d5fc7d8012}</uuid>
+        <version>0.1</version>
+        <author>EDA4U</author>
+        <created>2015-03-08T15:39:53Z</created>
+        <last_modified>2015-03-08T15:39:53Z</last_modified>
+        <name locale="en_US">Crystal</name>
+        <description locale="en_US"/>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon start_x="1.778000" line_layer="10" start_y="1.016000" grab_area="true" line_width="0.254000" fill_layer="0">
+            <segment type="line" end_x="-1.778000" end_y="1.016000"/>
+        </polygon>
+        <polygon start_x="1.778000" line_layer="10" start_y="-1.016000" grab_area="true" line_width="0.254000" fill_layer="0">
+            <segment type="line" end_x="-1.778000" end_y="-1.016000"/>
+        </polygon>
+        <polygon start_x="-1.524000" line_layer="10" start_y="0.381000" grab_area="true" line_width="0.254000" fill_layer="11">
+            <segment type="line" end_x="1.524000" end_y="0.381000"/>
+            <segment type="line" end_x="1.524000" end_y="-0.381000"/>
+            <segment type="line" end_x="-1.524000" end_y="-0.381000"/>
+            <segment type="line" end_x="-1.524000" end_y="0.381000"/>
+        </polygon>
+        <text text="${SYM::NAME}" x="2.540000" y="0" height="3.175" layer="20" h_align="left" v_align="bottom" angle="0.000000"/>
+        <text text="${CMP::VALUE}" x="2.540000" y="0" height="2.5" layer="21" h_align="left" v_align="top" angle="0.000000"/>
+    </geometry>
+    <pins>
+        <pin x="0" y="2.54" length="1.524" uuid="{ac7d1cc8-4a9e-4936-ab7c-ed70c7347195}" angle="180">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin x="0" y="-2.54" length="1.524" uuid="{2fa806c9-af1c-457c-a92f-3459e6131fbc}" angle="0">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pin>
+    </pins>
+</symbol>

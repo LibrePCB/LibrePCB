@@ -81,7 +81,8 @@
         <file>actions/layers.png</file>
         <file>library/resistor_eu.png</file>
         <file>library/inductor_eu.png</file>
-        <file>library/capacitor_eu.png</file>
+        <file>library/bipolar_capacitor_eu.png</file>
+        <file>library/unipolar_capacitor_eu.png</file>
         <file>library/gnd.png</file>
         <file>library/vcc.png</file>
         <file>status/dialog-error.png</file>

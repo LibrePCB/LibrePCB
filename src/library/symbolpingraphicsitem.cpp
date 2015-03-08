@@ -105,9 +105,10 @@ void SymbolPinGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsI
     layer = getSchematicLayer(SchematicLayer::SymbolPinCircles);
     if ((layer) && (!deviceIsPrinter))
     {
+        bool required = (mPinInstance) ? mPinInstance->getGenCompSignal()->isRequired() : false;
         painter->save();
         painter->rotate(rotate180 ? (qreal)90 : (qreal)-90);
-        painter->setPen(QPen(layer->getColor(selected), 0));
+        painter->setPen(QPen(layer->getColor(required), 0));
         painter->setBrush(Qt::NoBrush);
         if (netsignal)
         {
