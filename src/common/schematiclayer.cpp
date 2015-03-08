@@ -54,8 +54,8 @@ SchematicLayer::SchematicLayer(uint id) :
 
         case SymbolPinCircles:
             mName = tr("Symbol Pin Circles");
-            mColor = Qt::green;
-            mColorHighlighted = Qt::green;
+            mColor = Qt::green;             // optional pin
+            mColorHighlighted = Qt::red;    // required pin
             break;
 
         case SymbolPinNames:
