@@ -53,6 +53,8 @@
 #include "../../circuit/cmd/cmdnetsignalremove.h"
 #include "../cmd/cmdschematicnetlabelmove.h"
 #include "../cmd/cmdschematicnetlabeledit.h"
+#include "../schematicclipboard.h"
+#include "../cmd/cmdsymbolinstanceadd.h"
 
 namespace project {
 
@@ -121,6 +123,15 @@ SES_Base::ProcRetVal SES_Select::processSubStateIdle(SEE_Base* event) noexcept
 {
     switch (event->getType())
     {
+        case SEE_Base::Edit_Cut:
+            cutSelectedItems();
+            return ForceStayInState;
+        case SEE_Base::Edit_Copy:
+            copySelectedItems();
+            return ForceStayInState;
+        case SEE_Base::Edit_Paste:
+            pasteItems();
+            return ForceStayInState;
         case SEE_Base::Edit_RotateCW:
             rotateSelectedItems(Angle::deg90(), Point(), true);
             return ForceStayInState;
@@ -186,37 +197,10 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneLeftClick(QGraphicsSceneMouseE
         items.first()->setSelected(true);
     }
 
-    // get all selected items
-    items = schematic->selectedItems();
-    uint count = 0;
-    QList<SymbolInstance*> symbols;
-    QList<SchematicNetPoint*> netpoints;
-    QList<SchematicNetLabel*> netlabels;
-    count += SymbolInstance::extractFromGraphicsItems(items, symbols);
-    count += SchematicNetPoint::extractFromGraphicsItems(items, netpoints, true, false,
-                                                         true, false, false, false);
-    count += SchematicNetLabel::extractFromGraphicsItems(items, netlabels);
-
-    // abort if no items are selected
-    if (count == 0) return ForceStayInState;
-
-    // create move commands for all selected items
-    Q_ASSERT(!mParentCommand);
-    Q_ASSERT(mSymbolMoveCmds.isEmpty());
-    Q_ASSERT(mNetPointMoveCmds.isEmpty());
-    Q_ASSERT(mNetLabelMoveCmds.isEmpty());
-    mParentCommand = new UndoCommand(tr("Move Schematic Items"));
-    foreach (SymbolInstance* instance, symbols)
-        mSymbolMoveCmds.append(new CmdSymbolInstanceMove(*instance, mParentCommand));
-    foreach (SchematicNetPoint* point, netpoints)
-        mNetPointMoveCmds.append(new CmdSchematicNetPointMove(*point, mParentCommand));
-    foreach (SchematicNetLabel* label, netlabels)
-        mNetLabelMoveCmds.append(new CmdSchematicNetLabelMove(*label, mParentCommand));
-
-    // switch to substate SubState_Moving
-    mSubState = SubState_Moving;
-    mMoveStartPos = Point::fromPx(mouseEvent->scenePos()); // not mapped to grid!
-    return ForceStayInState;
+    if (startMovingSelectedItems(schematic))
+        return ForceStayInState;
+    else
+        return PassToParentState;
 }
 
 SES_Base::ProcRetVal SES_Select::proccessIdleSceneRightClick(QGraphicsSceneMouseEvent* mouseEvent,
@@ -488,6 +472,42 @@ SES_Base::ProcRetVal SES_Select::processSubStateMovingSceneEvent(SEE_Base* event
     return PassToParentState;
 }
 
+bool SES_Select::startMovingSelectedItems(Schematic* schematic) noexcept
+{
+    // get all selected items
+    QList<QGraphicsItem*> items = schematic->selectedItems();
+    uint count = 0;
+    QList<SymbolInstance*> symbols;
+    QList<SchematicNetPoint*> netpoints;
+    QList<SchematicNetLabel*> netlabels;
+    count += SymbolInstance::extractFromGraphicsItems(items, symbols);
+    count += SchematicNetPoint::extractFromGraphicsItems(items, netpoints, true, false,
+                                                         true, false, false, false);
+    count += SchematicNetLabel::extractFromGraphicsItems(items, netlabels);
+
+    // abort if no items are selected
+    if (count == 0) return false;
+
+    // create move commands for all selected items
+    Q_ASSERT(!mParentCommand);
+    Q_ASSERT(mSymbolMoveCmds.isEmpty());
+    Q_ASSERT(mNetPointMoveCmds.isEmpty());
+    Q_ASSERT(mNetLabelMoveCmds.isEmpty());
+    mParentCommand = new UndoCommand(tr("Move Schematic Items"));
+    foreach (SymbolInstance* instance, symbols)
+        mSymbolMoveCmds.append(new CmdSymbolInstanceMove(*instance, mParentCommand));
+    foreach (SchematicNetPoint* point, netpoints)
+        mNetPointMoveCmds.append(new CmdSchematicNetPointMove(*point, mParentCommand));
+    foreach (SchematicNetLabel* label, netlabels)
+        mNetLabelMoveCmds.append(new CmdSchematicNetLabelMove(*label, mParentCommand));
+
+    // switch to substate SubState_Moving
+    mSubState = SubState_Moving;
+    mMoveStartPos = Point::fromPx(mEditorUi.graphicsView->mapToScene(
+        mEditorUi.graphicsView->mapFromGlobal(QCursor::pos()))); // not mapped to grid!
+    return true;
+}
+
 bool SES_Select::rotateSelectedItems(const Angle& angle, Point center, bool centerOfElements) noexcept
 {
     Schematic* schematic = mEditor.getActiveSchematic();
@@ -640,6 +660,168 @@ bool SES_Select::removeSelectedItems() noexcept
 
         mEditor.getProject().getUndoStack().endCommand();
         commandActive = false;
+        return true;
+    }
+    catch (Exception& e)
+    {
+        QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+        if (commandActive)
+            try {mEditor.getProject().getUndoStack().abortCommand();} catch (...) {}
+        return false;
+    }
+}
+
+bool SES_Select::cutSelectedItems() noexcept
+{
+    Schematic* schematic = mEditor.getActiveSchematic();
+    Q_ASSERT(schematic); if (!schematic) return false;
+
+    // get all selected items
+    QList<QGraphicsItem*> items = schematic->selectedItems();
+    uint count = 0;
+    QList<SymbolInstance*> symbols;
+    QList<SchematicNetPoint*> netpoints;
+    QList<SchematicNetLine*> netlines;
+    count += SymbolInstance::extractFromGraphicsItems(items, symbols);
+    count += SchematicNetPoint::extractFromGraphicsItems(items, netpoints, true, true,
+                                                         true, true, true, true, true);
+    count += SchematicNetLine::extractFromGraphicsItems(items, netlines, true, true, false);
+
+    // abort if no items are selected
+    if (count == 0) return false;
+
+    // get all involved generic component instances
+    QList<GenCompInstance*> genCompInstances;
+    foreach (SymbolInstance* symbol, symbols)
+    {
+        if (!genCompInstances.contains(&symbol->getGenCompInstance()))
+            genCompInstances.append(&symbol->getGenCompInstance());
+    }
+
+    bool commandActive = false;
+    try
+    {
+        mEditor.getProject().getUndoStack().beginCommand(tr("Cut Schematic Elements"));
+        commandActive = true;
+        schematic->clearSelection();
+
+        // remove all netlines
+        /*foreach (SchematicNetLine* line, netlines)
+        {
+            CmdSchematicNetLineRemove* cmd = new CmdSchematicNetLineRemove(*schematic, *line);
+            mEditor.getProject().getUndoStack().appendToCommand(cmd);
+        }*/
+
+        // remove all netpoints
+        /*foreach (SchematicNetPoint* point, netpoints)
+        {
+            // TODO: this code does not work correctly in all possible cases
+            if (point->getLines().count() == 0)
+            {
+                CmdSchematicNetPointRemove* cmd = new CmdSchematicNetPointRemove(*schematic, *point);
+                mEditor.getProject().getUndoStack().appendToCommand(cmd);
+                if (point->isAttached())
+                {
+                    GenCompSignalInstance* signal = point->getPinInstance()->getGenCompSignalInstance();
+                    Q_ASSERT(signal); if (!signal) throw LogicError(__FILE__, __LINE__);
+                    CmdGenCompSigInstSetNetSignal* cmd = new CmdGenCompSigInstSetNetSignal(*signal, nullptr);
+                    mEditor.getProject().getUndoStack().appendToCommand(cmd);
+                }
+            }
+            else if (point->isAttached())
+            {
+                GenCompSignalInstance* signal = point->getPinInstance()->getGenCompSignalInstance();
+                Q_ASSERT(signal); if (!signal) throw LogicError(__FILE__, __LINE__);
+                CmdSchematicNetPointDetach* cmd1 = new CmdSchematicNetPointDetach(*point);
+                mEditor.getProject().getUndoStack().appendToCommand(cmd1);
+                CmdGenCompSigInstSetNetSignal* cmd2 = new CmdGenCompSigInstSetNetSignal(*signal, nullptr);
+                mEditor.getProject().getUndoStack().appendToCommand(cmd2);
+            }
+        }*/
+
+        // remove all symbols
+        foreach (SymbolInstance* symbol, symbols)
+        {
+            CmdSymbolInstanceRemove* cmd = new CmdSymbolInstanceRemove(*schematic, *symbol);
+            mEditor.getProject().getUndoStack().appendToCommand(cmd);
+        }
+
+        // remove generic components
+        /*foreach (GenCompInstance* genComp, genCompInstances)
+        {
+            if (genComp->getPlacedSymbolsCount() == 0)
+            {
+                CmdGenCompInstanceRemove* cmd = new CmdGenCompInstanceRemove(mCircuit, *genComp);
+                mEditor.getProject().getUndoStack().appendToCommand(cmd);
+            }
+        }*/
+
+        mEditor.getProject().getUndoStack().endCommand();
+        commandActive = false;
+
+        // copy elements to clipboard
+        SchematicClipboard::instance().cut(symbols);
+
+        return true;
+    }
+    catch (Exception& e)
+    {
+        QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+        if (commandActive)
+            try {mEditor.getProject().getUndoStack().abortCommand();} catch (...) {}
+        return false;
+    }
+}
+
+bool SES_Select::copySelectedItems() noexcept
+{
+    return false; // TODO
+}
+
+bool SES_Select::pasteItems() noexcept
+{
+    Schematic* schematic = mEditor.getActiveSchematic();
+    Q_ASSERT(schematic); if (!schematic) return false;
+
+    bool commandActive = false;
+    try
+    {
+        // get clipboard content
+        QList<SymbolInstance*> symbols;
+        SchematicClipboard::instance().paste(*schematic, symbols);
+        uint countOfElements = symbols.count();
+        Point centerOfElements;
+
+        if (countOfElements == 0) return false;
+
+        schematic->clearSelection();
+        mEditor.getProject().getUndoStack().beginCommand(tr("Paste Schematic Elements"));
+        commandActive = true;
+
+        // add all symbols
+        foreach (SymbolInstance* symbol, symbols)
+        {
+            CmdSymbolInstanceAdd* cmd = new CmdSymbolInstanceAdd(*symbol);
+            mEditor.getProject().getUndoStack().appendToCommand(cmd);
+            symbol->setSelected(true);
+            centerOfElements += symbol->getPosition();
+        }
+
+        mEditor.getProject().getUndoStack().endCommand();
+        commandActive = false;
+
+        // move elements to cursor
+        centerOfElements /= countOfElements;
+        Point cursorPos = Point::fromPx(mEditorUi.graphicsView->mapToScene(
+            mEditorUi.graphicsView->mapFromGlobal(QCursor::pos())),
+            mEditorUi.graphicsView->getGridInterval());
+        Point deltaPos = cursorPos - centerOfElements;
+        foreach (SymbolInstance* symbol, symbols)
+            symbol->setPosition(symbol->getPosition() + deltaPos);
+
+        // start moving the items
+        startMovingSelectedItems(schematic);
+
         return true;
     }
     catch (Exception& e)

@@ -40,8 +40,14 @@ CmdSymbolInstanceAdd::CmdSymbolInstanceAdd(Schematic& schematic,
                                            const Angle& angle,
                                            UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Add symbol instance"), parent),
-    mSchematic(schematic), mGenCompInstance(genComp), mSymbolItemUuid(symbolItem),
-    mPosition(position), mAngle(angle), mSymbolInstance(nullptr)
+    mSchematic(schematic), mSymbolInstance(nullptr)
+{
+    mSymbolInstance = mSchematic.createSymbol(genComp, symbolItem, position, angle); // throws an exception on error
+}
+
+CmdSymbolInstanceAdd::CmdSymbolInstanceAdd(SymbolInstance& symbol, UndoCommand* parent) throw (Exception) :
+    UndoCommand(tr("Add symbol instance"), parent),
+    mSchematic(symbol.getSchematic()), mSymbolInstance(&symbol)
 {
 }
 
@@ -57,12 +63,6 @@ CmdSymbolInstanceAdd::~CmdSymbolInstanceAdd() noexcept
 
 void CmdSymbolInstanceAdd::redo() throw (Exception)
 {
-    if (!mSymbolInstance) // only the first time
-    {
-        mSymbolInstance = mSchematic.createSymbol(mGenCompInstance, mSymbolItemUuid,
-                                                  mPosition, mAngle); // throws an exception on error
-    }
-
     mSchematic.addSymbol(*mSymbolInstance); // throws an exception on error
 
     try

@@ -148,6 +148,11 @@ QString SymbolInstance::getName() const noexcept
  *  Setters
  ****************************************************************************************/
 
+void SymbolInstance::setSelected(bool selected) noexcept
+{
+    mGraphicsItem->setSelected(selected);
+}
+
 void SymbolInstance::setPosition(const Point& newPos) throw (Exception)
 {
     mPosition = newPos;

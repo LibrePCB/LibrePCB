@@ -34,7 +34,6 @@
  *  Forward Declarations
  ****************************************************************************************/
 
-class XmlDomElement;
 class QGraphicsItem;
 class SchematicLayer;
 
@@ -89,6 +88,7 @@ class SymbolInstance final : public QObject, public IF_AttributeProvider,
         const library::GenCompSymbVarItem& getGenCompSymbVarItem() const noexcept {return *mSymbVarItem;}
 
         // Setters
+        void setSelected(bool selected) noexcept;
         void setPosition(const Point& newPos) throw (Exception);
         void setAngle(const Angle& newAngle) throw (Exception);
 

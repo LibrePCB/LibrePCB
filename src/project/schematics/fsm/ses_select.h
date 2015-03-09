@@ -81,9 +81,13 @@ class SES_Select final : public SES_Base
                                                Schematic* schematic) noexcept;
         ProcRetVal proccessIdleSceneDoubleClick(QGraphicsSceneMouseEvent* mouseEvent,
                                                 Schematic* schematic) noexcept;
+        bool startMovingSelectedItems(Schematic* schematic) noexcept;
         bool rotateSelectedItems(const Angle& angle, Point center = Point(0, 0),
                                  bool centerOfElements = false) noexcept;
         bool removeSelectedItems() noexcept;
+        bool cutSelectedItems() noexcept;
+        bool copySelectedItems() noexcept;
+        bool pasteItems() noexcept;
 
 
         // Types
