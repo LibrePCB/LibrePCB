@@ -184,7 +184,8 @@ SOURCES += \
     project/schematics/cmd/cmdschematicnetlabeladd.cpp \
     project/schematics/cmd/cmdschematicnetlabelremove.cpp \
     project/schematics/cmd/cmdschematicnetlabelmove.cpp \
-    project/schematics/cmd/cmdschematicnetlabeledit.cpp
+    project/schematics/cmd/cmdschematicnetlabeledit.cpp \
+    project/schematics/schematicclipboard.cpp
 
 HEADERS += \
     common/units/all_length_units.h \
@@ -317,7 +318,8 @@ HEADERS += \
     project/schematics/cmd/cmdschematicnetlabeladd.h \
     project/schematics/cmd/cmdschematicnetlabelremove.h \
     project/schematics/cmd/cmdschematicnetlabelmove.h \
-    project/schematics/cmd/cmdschematicnetlabeledit.h
+    project/schematics/cmd/cmdschematicnetlabeledit.h \
+    project/schematics/schematicclipboard.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \

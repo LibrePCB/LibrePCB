@@ -105,7 +105,8 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
         // set colors
         layer = getSchematicLayer(polygon->getLineLayerId());
         if (!layer) continue;
-        painter->setPen(QPen(layer->getColor(selected), polygon->getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap));
+        painter->setPen(QPen(layer->getColor(selected), polygon->getLineWidth().toPx(),
+                             Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
         layer = getSchematicLayer(polygon->getFillLayerId());
         if (layer)
             painter->setBrush(QBrush(layer->getColor(selected), Qt::SolidPattern));
@@ -115,7 +116,8 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
         // draw polygon
         QPainterPath polygonPath;
         polygonPath.setFillRule(Qt::WindingFill);
-        polygonPath.moveTo(polygon->getStartPos().toPxQPointF());
+        Point lastPos = polygon->getStartPos();
+        polygonPath.moveTo(lastPos.toPxQPointF());
         foreach (const SymbolPolygonSegment* segment, polygon->getSegments())
         {
             switch (segment->getType())
@@ -125,13 +127,22 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
                     break;
                 case SymbolPolygonSegment::Type_t::Arc:
                 {
-                    Length radius = segment->getEndPos().getY() - segment->getCenter().getY();
-                    polygonPath.addEllipse(segment->getCenter().toPxQPointF(), radius.toPx(), radius.toPx());
+                    // TODO: this is very provisional and may contain bugs...
+                    QPointF centerPx = segment->getCenter().toPxQPointF();
+                    QVector2D diffPx(segment->getEndPos().toPxQPointF().x() - lastPos.toPxQPointF().x(),
+                                     segment->getEndPos().toPxQPointF().y() - lastPos.toPxQPointF().y());
+                    qreal radiusPx = Point(segment->getEndPos() - segment->getCenter()).getLength().toPx();
+                    QRectF rectPx = QRectF(centerPx.x()-radiusPx, centerPx.y()-radiusPx, 2*radiusPx, 2*radiusPx);
+                    qreal startAngleDeg = qRadiansToDegrees(qAsin((diffPx.length()/2)/radiusPx));
+                    qreal arcAngleDeg = qRadiansToDegrees(-2*qAsin(diffPx.length()/(2*radiusPx)));
+                    if (diffPx.length() == 0) arcAngleDeg = 360;
+                    polygonPath.arcTo(rectPx, startAngleDeg, arcAngleDeg);
                     break;
                 }
                 default:
                     break;
             }
+            lastPos = segment->getEndPos();
         }
         painter->drawPath(polygonPath);
     }

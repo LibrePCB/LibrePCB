@@ -17,64 +17,69 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDSYMBOLINSTANCEADD_H
-#define PROJECT_CMDSYMBOLINSTANCEADD_H
+#ifndef PROJECT_SCHEMATICCLIPBOARD_H
+#define PROJECT_SCHEMATICCLIPBOARD_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../../../common/units/all_length_units.h"
-#include "../../../common/undocommand.h"
-#include "../../../common/exceptions.h"
+#include "../../common/exceptions.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
+class XmlDomElement;
+
 namespace project {
 class Schematic;
-class GenCompInstance;
 class SymbolInstance;
 }
 
 /*****************************************************************************************
- *  Class CmdSymbolInstanceAdd
+ *  Class SchematicClipboard
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The CmdSymbolInstanceAdd class
+ * @brief The SchematicClipboard class
+ *
+ * @author ubruhin
+ * @author 2015-03-07
  */
-class CmdSymbolInstanceAdd final : public UndoCommand
+class SchematicClipboard final : public QObject
 {
+        Q_OBJECT
+
     public:
 
-        // Constructors / Destructor
-        explicit CmdSymbolInstanceAdd(Schematic& schematic, GenCompInstance& genComp,
-                                      const QUuid& symbolItem, const Point& position = Point(),
-                                      const Angle& angle = Angle(), UndoCommand* parent = 0) throw (Exception);
-        explicit CmdSymbolInstanceAdd(SymbolInstance& symbol, UndoCommand* parent = 0) throw (Exception);
-        ~CmdSymbolInstanceAdd() noexcept;
+        // General Methods
+        void clear() noexcept;
+        void cut(const QList<SymbolInstance*>& symbols) throw (Exception);
+        void copy(const QList<SymbolInstance*>& symbols) throw (Exception);
+        void paste(Schematic& schematic, QList<SymbolInstance*>& symbols) throw (Exception);
 
-        // Getters
-        SymbolInstance* getSymbolInstance() const noexcept {return mSymbolInstance;}
 
-        // Inherited from UndoCommand
-        void redo() throw (Exception) override;
-        void undo() throw (Exception) override;
+        // Static Methods
+        static SchematicClipboard& instance() noexcept {static SchematicClipboard i; return i;}
 
     private:
 
-        // Attributes from the constructor
-        Schematic& mSchematic;
+        // Private Methods
+        SchematicClipboard() noexcept;
+        ~SchematicClipboard() noexcept;
+        void setElements(const QList<SymbolInstance*>& symbols) throw (Exception);
 
-        /// @brief The created symbol instance
-        SymbolInstance* mSymbolInstance;
+
+        // Attributes
+        bool mCutActive;
+        QList<XmlDomElement*> mSymbolInstances;
+
 };
 
 } // namespace project
 
-#endif // PROJECT_CMDSYMBOLINSTANCEADD_H
+#endif // PROJECT_SCHEMATICCLIPBOARD_H

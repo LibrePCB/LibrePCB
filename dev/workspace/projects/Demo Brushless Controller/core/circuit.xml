@@ -4,54 +4,160 @@
         <netclass uuid="{4b10268a-fec5-4230-8054-2dc966d625cd}" name="default"/>
     </netclasses>
     <netsignals>
-        <netsignal uuid="{56654caf-7ecf-4ad7-9cb9-2ef0035654a8}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#26"/>
-        <netsignal uuid="{7b38ebc6-0c34-4287-a3f2-192de454a1ff}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#24"/>
-        <netsignal uuid="{2b3761fd-f01a-452c-b370-827dc2459a21}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="V_PHASE_A"/>
-        <netsignal uuid="{765c49cf-ed87-472a-ba8f-a65052275c31}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="V_PHASE_C"/>
-        <netsignal uuid="{82bfa55d-323c-4444-8cd3-8c35e1bd0fec}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="CAN_RX"/>
-        <netsignal uuid="{6fa069ec-4228-4d50-9683-9a5716368dce}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#14"/>
-        <netsignal uuid="{60988db1-1e27-407d-b08d-929239787003}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#2"/>
-        <netsignal uuid="{0d51bec0-4d64-43d5-abab-d24d656bea17}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#21"/>
-        <netsignal uuid="{2c9064ac-a99a-425b-a78d-d6ae9675553a}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#13"/>
-        <netsignal uuid="{75696982-c10d-4ce6-955b-bdc868f7192d}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="V_PHASE_B"/>
-        <netsignal uuid="{7d176095-7be9-4377-8d35-235672017d95}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="PWM_BH"/>
-        <netsignal uuid="{86122564-ffb0-4792-a7f8-81de3061f197}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#23"/>
-        <netsignal uuid="{97138543-14fc-4432-bf03-d42f4c8f1b31}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#33"/>
-        <netsignal uuid="{0a6b8cee-5598-45ac-a56a-acf3bb7db32f}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#12"/>
-        <netsignal uuid="{44b998b7-65e0-410f-b361-b2770278cd9a}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="CANH"/>
-        <netsignal uuid="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="GND"/>
-        <netsignal uuid="{b85d51dc-bb39-4227-b2c6-5e1f52cd1a11}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="LED_RD"/>
-        <netsignal uuid="{d25ac99a-f158-4ceb-b46e-87df899b8b19}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#15"/>
-        <netsignal uuid="{4024f8b2-6969-4f9b-ac41-9338b7319424}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#1"/>
-        <netsignal uuid="{e632ec48-46dd-49ae-bafe-1dcd191973bf}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="PWM_AH"/>
-        <netsignal uuid="{3f49a685-229f-4a34-bff6-4673cd8b3781}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#11"/>
-        <netsignal uuid="{e54d4e93-3f38-4980-8839-7249a758a3ad}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#16"/>
-        <netsignal uuid="{ecbfd5f5-0d80-4573-aeea-5d8fbaada4eb}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="PWM_CL"/>
-        <netsignal uuid="{066db5ac-3232-4824-be9e-fa65aa35c95b}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="3V3"/>
-        <netsignal uuid="{6805d3ea-58c5-4e83-9646-348ba7fd8b94}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="V_BATTERY"/>
-        <netsignal uuid="{7e125e0a-cf13-418a-847c-f832c0d78db6}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#17"/>
-        <netsignal uuid="{f7df2b18-9f30-449a-8afd-c4a6a16cc7d2}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="CANL"/>
-        <netsignal uuid="{8867be40-a3b7-4d6f-9f87-bca92b51d043}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="PWM_BL"/>
-        <netsignal uuid="{befa5cad-9aa3-4fbd-8c61-81636ccabd6e}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="RESET"/>
-        <netsignal uuid="{58c55893-1e3e-4437-9daf-350c3bef76fe}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="PWM_CH"/>
-        <netsignal uuid="{a87c6342-c3ac-40a2-b688-df06d98233d7}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="PHASE_A"/>
-        <netsignal uuid="{fd065cfa-b24b-448f-9be4-72b6e7e1a4c2}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#6"/>
-        <netsignal uuid="{f862e2a9-2596-4607-88b6-68f3696d3a8e}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#19"/>
+        <netsignal uuid="{609d1730-f335-4c39-90a6-acc934ab2273}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#20"/>
         <netsignal uuid="{161b9ccd-49cc-453b-944a-9c0f4aa804ad}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#3"/>
-        <netsignal uuid="{20a04b28-28f0-458b-a57e-86f64e522b36}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#18"/>
+        <netsignal uuid="{2b3761fd-f01a-452c-b370-827dc2459a21}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="V_PHASE_A"/>
+        <netsignal uuid="{7d176095-7be9-4377-8d35-235672017d95}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="PWM_BH"/>
         <netsignal uuid="{a2d66e09-1611-4237-8912-4890d72d6bd0}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="CAN_TX"/>
+        <netsignal uuid="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="GND"/>
+        <netsignal uuid="{a87c6342-c3ac-40a2-b688-df06d98233d7}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="PHASE_A"/>
+        <netsignal uuid="{56654caf-7ecf-4ad7-9cb9-2ef0035654a8}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#26"/>
+        <netsignal uuid="{e54d4e93-3f38-4980-8839-7249a758a3ad}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#16"/>
+        <netsignal uuid="{f7df2b18-9f30-449a-8afd-c4a6a16cc7d2}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="CANL"/>
+        <netsignal uuid="{765c49cf-ed87-472a-ba8f-a65052275c31}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="V_PHASE_C"/>
+        <netsignal uuid="{e632ec48-46dd-49ae-bafe-1dcd191973bf}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="PWM_AH"/>
+        <netsignal uuid="{7e125e0a-cf13-418a-847c-f832c0d78db6}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#17"/>
+        <netsignal uuid="{7103431c-5ae4-4a1d-be25-dd9f52e0cd52}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#25"/>
+        <netsignal uuid="{0a6b8cee-5598-45ac-a56a-acf3bb7db32f}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#12"/>
+        <netsignal uuid="{b85d51dc-bb39-4227-b2c6-5e1f52cd1a11}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="LED_RD"/>
         <netsignal uuid="{1ebc4991-e356-4ec4-9394-5448780cedee}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="LED_GN"/>
         <netsignal uuid="{09750fe3-8f0b-4239-91ae-ec78221f6b60}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="PHASE_C"/>
-        <netsignal uuid="{7103431c-5ae4-4a1d-be25-dd9f52e0cd52}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#25"/>
-        <netsignal uuid="{a246f040-6793-47fa-8c26-f1d41163dba3}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="PWM_AL"/>
-        <netsignal uuid="{4085a1b3-be8d-4b79-9078-a75234c647c7}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="VSS"/>
-        <netsignal uuid="{e5fdb792-6bf4-421b-8078-b205693dfe1a}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="PHASE_B"/>
-        <netsignal uuid="{609d1730-f335-4c39-90a6-acc934ab2273}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#20"/>
+        <netsignal uuid="{8867be40-a3b7-4d6f-9f87-bca92b51d043}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="PWM_BL"/>
         <netsignal uuid="{f346a129-4fa9-467d-bde0-34a6b66bdd67}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="V_CURRENT"/>
+        <netsignal uuid="{58c55893-1e3e-4437-9daf-350c3bef76fe}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="PWM_CH"/>
+        <netsignal uuid="{75696982-c10d-4ce6-955b-bdc868f7192d}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="V_PHASE_B"/>
+        <netsignal uuid="{86122564-ffb0-4792-a7f8-81de3061f197}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#23"/>
+        <netsignal uuid="{4085a1b3-be8d-4b79-9078-a75234c647c7}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="VSS"/>
+        <netsignal uuid="{a246f040-6793-47fa-8c26-f1d41163dba3}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="PWM_AL"/>
+        <netsignal uuid="{6805d3ea-58c5-4e83-9646-348ba7fd8b94}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="V_BATTERY"/>
+        <netsignal uuid="{82bfa55d-323c-4444-8cd3-8c35e1bd0fec}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="CAN_RX"/>
+        <netsignal uuid="{befa5cad-9aa3-4fbd-8c61-81636ccabd6e}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="RESET"/>
+        <netsignal uuid="{44b998b7-65e0-410f-b361-b2770278cd9a}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="CANH"/>
+        <netsignal uuid="{3f49a685-229f-4a34-bff6-4673cd8b3781}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#11"/>
+        <netsignal uuid="{6fa069ec-4228-4d50-9683-9a5716368dce}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#14"/>
+        <netsignal uuid="{fd065cfa-b24b-448f-9be4-72b6e7e1a4c2}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#6"/>
+        <netsignal uuid="{0d51bec0-4d64-43d5-abab-d24d656bea17}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#21"/>
+        <netsignal uuid="{4024f8b2-6969-4f9b-ac41-9338b7319424}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#1"/>
+        <netsignal uuid="{ecbfd5f5-0d80-4573-aeea-5d8fbaada4eb}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="PWM_CL"/>
         <netsignal uuid="{446c379c-7ca7-4a3c-bcb4-4b4803e5bf6a}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#10"/>
+        <netsignal uuid="{d25ac99a-f158-4ceb-b46e-87df899b8b19}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#15"/>
         <netsignal uuid="{666c87f9-9bf6-45be-bc8c-5ba8600ab269}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#22"/>
+        <netsignal uuid="{60988db1-1e27-407d-b08d-929239787003}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#2"/>
+        <netsignal uuid="{97138543-14fc-4432-bf03-d42f4c8f1b31}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#33"/>
+        <netsignal uuid="{066db5ac-3232-4824-be9e-fa65aa35c95b}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="3V3"/>
+        <netsignal uuid="{e5fdb792-6bf4-421b-8078-b205693dfe1a}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="false" name="PHASE_B"/>
+        <netsignal uuid="{2c9064ac-a99a-425b-a78d-d6ae9675553a}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#13"/>
+        <netsignal uuid="{20a04b28-28f0-458b-a57e-86f64e522b36}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#18"/>
+        <netsignal uuid="{f862e2a9-2596-4607-88b6-68f3696d3a8e}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#19"/>
+        <netsignal uuid="{7b38ebc6-0c34-4287-a3f2-192de454a1ff}" netclass="{4b10268a-fec5-4230-8054-2dc966d625cd}" auto_name="true" name="N#24"/>
     </netsignals>
     <generic_component_instances>
+        <instance uuid="{f900538b-090d-482f-9c4c-b0da46d087a8}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
+            <name>R15</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value>47kΩ</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{a87c6342-c3ac-40a2-b688-df06d98233d7}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
+                <map netsignal="{2b3761fd-f01a-452c-b370-827dc2459a21}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{3499d4eb-40bd-44df-8ef1-9544fae56a75}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
+            <name>R3</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value>56Ω</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{6fa069ec-4228-4d50-9683-9a5716368dce}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
+                <map netsignal="{d25ac99a-f158-4ceb-b46e-87df899b8b19}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{b9859056-bbef-4848-9b60-978594cce1d4}" generic_component="{01fe9dd4-229f-4083-8c1a-4e1fe7a1fe72}" symbol_variant="{e82fe1cc-0178-4949-ab27-16c8975ffd1d}">
+            <name>IC5</name>
+            <value>SN65HVD230DR</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{82bfa55d-323c-4444-8cd3-8c35e1bd0fec}" comp_signal="{35c7b2e1-e2b6-4d8b-b65e-0bca0316f6d1}"/>
+                <map netsignal="{44b998b7-65e0-410f-b361-b2770278cd9a}" comp_signal="{a9d53e7f-94cd-4f11-a6ca-fcc6aa02ff07}"/>
+                <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{61c63013-6455-417c-b88b-734de7aa7146}"/>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{d3e74d5b-a662-4d3d-aff3-8da209cdb66f}"/>
+                <map netsignal="" comp_signal="{589f8b34-815e-4890-bc88-0d2565ac06ca}"/>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{f233a935-431c-4e10-9e97-7ddcf8fedfb2}"/>
+                <map netsignal="{a2d66e09-1611-4237-8912-4890d72d6bd0}" comp_signal="{bbefed63-7beb-44ba-841e-63231c01cd64}"/>
+                <map netsignal="{f7df2b18-9f30-449a-8afd-c4a6a16cc7d2}" comp_signal="{004bde4f-0412-48a8-b986-bed973ab3b92}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{ddba5f4c-cacf-45da-91d6-bac636da3a6e}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
+            <name>R4</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value>56Ω</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{e54d4e93-3f38-4980-8839-7249a758a3ad}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
+                <map netsignal="{7e125e0a-cf13-418a-847c-f832c0d78db6}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{14d30f5e-339e-4eee-9df4-6d6c8b10a97f}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
+            <name>SUP16</name>
+            <value>GND</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{46601a79-4b4e-401c-826b-6c04056b4080}" generic_component="{27bf51af-a016-45b4-87cb-844c72a38d66}" symbol_variant="{df7447ce-127b-4827-abe2-767791c96981}">
+            <name>Q4</name>
+            <value>PSMN5R8</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{7103431c-5ae4-4a1d-be25-dd9f52e0cd52}" comp_signal="{d7eb84bb-7f47-4e0b-99d1-1ee30019c40e}"/>
+                <map netsignal="{7e125e0a-cf13-418a-847c-f832c0d78db6}" comp_signal="{4c7edd50-32d2-4098-a286-3536b882967b}"/>
+                <map netsignal="{e5fdb792-6bf4-421b-8078-b205693dfe1a}" comp_signal="{3982c030-dbdf-4cb9-8d75-0e471e12fabb}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{aaec816a-e94e-4d00-8ac6-dd105da862e3}" generic_component="{cc20c58e-93b5-49cd-b6e1-48c5e5e76ed3}" symbol_variant="{4bfd5089-9ea7-4019-a507-583509a32d75}">
+            <name>IC2</name>
+            <value>IR25606</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{1076d030-d216-467b-8a2d-40338779ad94}"/>
+                <map netsignal="{a246f040-6793-47fa-8c26-f1d41163dba3}" comp_signal="{0c2b7df1-57c7-47a7-944f-4aece84b05ca}"/>
+                <map netsignal="{3f49a685-229f-4a34-bff6-4673cd8b3781}" comp_signal="{a1b2b926-d1f1-40be-9f2c-e8c4a1e9a883}"/>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{7c1df97a-34a0-470c-9d96-ebbd5f281aaa}"/>
+                <map netsignal="{446c379c-7ca7-4a3c-bcb4-4b4803e5bf6a}" comp_signal="{922cf4f3-4ced-4ffc-91b2-483129005356}"/>
+                <map netsignal="{a87c6342-c3ac-40a2-b688-df06d98233d7}" comp_signal="{ff96d3fb-e43d-4391-b30f-ec72cbefb149}"/>
+                <map netsignal="{666c87f9-9bf6-45be-bc8c-5ba8600ab269}" comp_signal="{5f74c850-c401-4600-b6c8-58bb87764a59}"/>
+                <map netsignal="{e632ec48-46dd-49ae-bafe-1dcd191973bf}" comp_signal="{de468cc9-06de-415f-b1d7-ec82bb8b355a}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{334d7856-01f5-46e3-85b9-28445e6371ce}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
+            <name>SUP1</name>
+            <value>GND</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{40f0240d-6c33-452d-845f-29471c1eced5}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
+            <name>SUP22</name>
+            <value>GND</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
+            </signal_mapping>
+        </instance>
         <instance uuid="{43bc94dc-6ab0-4bb2-bf66-c034b9f1cfd0}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
             <name>C20</name>
             <value>${CAPACITANCE}</value>
@@ -62,12 +168,151 @@
                 </attribute>
             </attributes>
             <signal_mapping>
-                <map netsignal="{97138543-14fc-4432-bf03-d42f4c8f1b31}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
                 <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
+                <map netsignal="{97138543-14fc-4432-bf03-d42f4c8f1b31}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
             </signal_mapping>
         </instance>
-        <instance uuid="{3079e423-f0e6-42fc-8c93-4cd82690bdc1}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
-            <name>C15</name>
+        <instance uuid="{98757eea-e6bf-4fe5-adaa-a7f407373243}" generic_component="{6f959627-00d2-4652-bfd9-f6ea0162ccdd}" symbol_variant="{c864d663-a22e-4814-bc03-017d5bc7d6c6}">
+            <name>D1</name>
+            <value>24V</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{0b345c41-0429-47f3-917a-5140944c7755}"/>
+                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{78fc7eeb-dca2-40c7-9543-9444e527056e}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{694e8ab2-0367-49b7-b548-8314e2a84c77}" generic_component="{58c3c6cd-11eb-4557-aa3f-d3e05874afde}" symbol_variant="{afb86b45-68ec-47b6-8d96-153d73567228}">
+            <name>SUP8</name>
+            <value>VSS</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{1d893320-f811-4a79-b64e-cc23d749d394}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{3110f961-42bd-4e24-bba7-47930f1b2c03}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
+            <name>R19</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value>6.8kΩ</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
+                <map netsignal="{75696982-c10d-4ce6-955b-bdc868f7192d}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{c3a404c4-3e04-44d0-a495-d8d7750fa1a1}" generic_component="{58c3c6cd-11eb-4557-aa3f-d3e05874afde}" symbol_variant="{afb86b45-68ec-47b6-8d96-153d73567228}">
+            <name>SUP9</name>
+            <value>VSS</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{1d893320-f811-4a79-b64e-cc23d749d394}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{8417e1db-8764-46a7-b5ef-2c606ecab6e1}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
+            <name>R2</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value>56Ω</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{3f49a685-229f-4a34-bff6-4673cd8b3781}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
+                <map netsignal="{2c9064ac-a99a-425b-a78d-d6ae9675553a}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{7b566985-46f7-47e1-af33-2ba64918db44}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
+            <name>SUP27</name>
+            <value>GND</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{716ccdc2-fb79-492b-b76a-7f73c0833e5f}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
+            <name>SUP6</name>
+            <value>GND</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{ace8d3f2-1db8-41a8-87ff-66ef95e2807c}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
+            <name>SUP5</name>
+            <value>GND</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{0035f2f4-c0fe-4b64-8830-f4e8fd34d204}" generic_component="{197dacc7-3785-4054-a538-ced0d6271faa}" symbol_variant="{0f0439a1-c258-40e7-b407-029f084c372f}">
+            <name>PAD1</name>
+            <value>VSS</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{ad6ae81a-7914-49b7-a87b-a0e8574b7398}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{15e33177-fef9-4030-93f7-b7cf8b9ad9e7}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
+            <name>C2</name>
+            <value>${CAPACITANCE}
+${VOLTAGE}</value>
+            <attributes>
+                <attribute key="CAPACITANCE">
+                    <type>capacitance</type>
+                    <value>100nF</value>
+                </attribute>
+                <attribute key="VOLTAGE">
+                    <type>string</type>
+                    <value>50V</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
+                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{18cf34f6-95e4-48a0-bf4b-6a2d13523f0f}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
+            <name>C11</name>
+            <value>${CAPACITANCE}
+${VOLTAGE}</value>
+            <attributes>
+                <attribute key="CAPACITANCE">
+                    <type>capacitance</type>
+                    <value>100nF</value>
+                </attribute>
+                <attribute key="VOLTAGE">
+                    <type>string</type>
+                    <value>50V</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
+                <map netsignal="{f346a129-4fa9-467d-bde0-34a6b66bdd67}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{ebb49bc4-00fb-47bf-af63-db38d4a8f502}" generic_component="{58c3c6cd-11eb-4557-aa3f-d3e05874afde}" symbol_variant="{afb86b45-68ec-47b6-8d96-153d73567228}">
+            <name>SUP2</name>
+            <value>VSS</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{1d893320-f811-4a79-b64e-cc23d749d394}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{f2ecbcd7-492d-4d2c-a28f-0af5ecf85215}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
+            <name>SUP21</name>
+            <value>GND</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{8092d8bb-f5df-4a43-b5d4-751cdfb474e9}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
+            <name>C12</name>
             <value>${CAPACITANCE}</value>
             <attributes>
                 <attribute key="CAPACITANCE">
@@ -76,8 +321,191 @@
                 </attribute>
             </attributes>
             <signal_mapping>
-                <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
                 <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
+                <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{596d6d2e-97a9-47cf-9005-7a4a1e850f1e}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
+            <name>SUP32</name>
+            <value>GND</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{893b43c4-ef31-4853-bfa2-bd7f919ba5e3}" generic_component="{27bf51af-a016-45b4-87cb-844c72a38d66}" symbol_variant="{df7447ce-127b-4827-abe2-767791c96981}">
+            <name>Q5</name>
+            <value>PSMN5R8</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{09750fe3-8f0b-4239-91ae-ec78221f6b60}" comp_signal="{d7eb84bb-7f47-4e0b-99d1-1ee30019c40e}"/>
+                <map netsignal="{f862e2a9-2596-4607-88b6-68f3696d3a8e}" comp_signal="{4c7edd50-32d2-4098-a286-3536b882967b}"/>
+                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{3982c030-dbdf-4cb9-8d75-0e471e12fabb}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{3437d160-1c40-458f-9867-f30c7706e0c3}" generic_component="{ce31c203-9bec-4345-8906-04fb7997ef5b}" symbol_variant="{80db57cd-d3fa-4fec-80f1-3543456340ec}">
+            <name>IC1</name>
+            <value>LM1117</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{8e074b73-9015-4c28-969f-d2d929af889d}"/>
+                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{a78ae9aa-1c78-4d1f-98e8-9bd253555a6d}"/>
+                <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{bdd7ce7c-4bfc-4215-9431-3ea24f340e8a}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{f1121620-c541-46a5-90cc-92578e822b8f}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
+            <name>C13</name>
+            <value>${CAPACITANCE}</value>
+            <attributes>
+                <attribute key="CAPACITANCE">
+                    <type>capacitance</type>
+                    <value>220nF</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
+                <map netsignal="{6805d3ea-58c5-4e83-9646-348ba7fd8b94}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{feb77f2b-7f69-49e0-84e9-6684aeee2afe}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
+            <name>SUP19</name>
+            <value>GND</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{e69f768b-412d-4fe5-aeb3-c743351a6544}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
+            <name>C22</name>
+            <value>${CAPACITANCE}</value>
+            <attributes>
+                <attribute key="CAPACITANCE">
+                    <type>capacitance</type>
+                    <value>20pF</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{161b9ccd-49cc-453b-944a-9c0f4aa804ad}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{5ce9b3be-1fa3-471e-b498-77bfbf6c415a}" generic_component="{197dacc7-3785-4054-a538-ced0d6271faa}" symbol_variant="{0f0439a1-c258-40e7-b407-029f084c372f}">
+            <name>PAD2</name>
+            <value>GND</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ad6ae81a-7914-49b7-a87b-a0e8574b7398}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{68c6b6ce-0bad-4965-aa85-c972ab3f16c6}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
+            <name>C3</name>
+            <value>${CAPACITANCE}
+${VOLTAGE}</value>
+            <attributes>
+                <attribute key="CAPACITANCE">
+                    <type>capacitance</type>
+                    <value>100nF</value>
+                </attribute>
+                <attribute key="VOLTAGE">
+                    <type>string</type>
+                    <value>10V</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
+                <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{2632a8d7-e836-4fb2-8d00-0b6ea3483ad7}" generic_component="{58c3c6cd-11eb-4557-aa3f-d3e05874afde}" symbol_variant="{afb86b45-68ec-47b6-8d96-153d73567228}">
+            <name>SUP23</name>
+            <value>3V3</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{1d893320-f811-4a79-b64e-cc23d749d394}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{0c451a9f-1e21-4533-8d52-e2aacef8a883}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
+            <name>R12</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value>220Ω</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{161b9ccd-49cc-453b-944a-9c0f4aa804ad}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
+                <map netsignal="{60988db1-1e27-407d-b08d-929239787003}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{e8ab7388-1846-4ca4-912d-d533fae37f01}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
+            <name>C6</name>
+            <value>${CAPACITANCE}
+${VOLTAGE}</value>
+            <attributes>
+                <attribute key="CAPACITANCE">
+                    <type>capacitance</type>
+                    <value>220nF</value>
+                </attribute>
+                <attribute key="VOLTAGE">
+                    <type>string</type>
+                    <value>50V</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
+                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{0c46076b-7882-4e44-942f-2592d2a21879}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
+            <name>R17</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value>47kΩ</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{09750fe3-8f0b-4239-91ae-ec78221f6b60}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
+                <map netsignal="{765c49cf-ed87-472a-ba8f-a65052275c31}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{ab96ca5d-43e6-4ecb-8981-1fa3117c1c7d}" generic_component="{cc20c58e-93b5-49cd-b6e1-48c5e5e76ed3}" symbol_variant="{4bfd5089-9ea7-4019-a507-583509a32d75}">
+            <name>IC4</name>
+            <value>IR25606</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{1076d030-d216-467b-8a2d-40338779ad94}"/>
+                <map netsignal="{ecbfd5f5-0d80-4573-aeea-5d8fbaada4eb}" comp_signal="{0c2b7df1-57c7-47a7-944f-4aece84b05ca}"/>
+                <map netsignal="{609d1730-f335-4c39-90a6-acc934ab2273}" comp_signal="{a1b2b926-d1f1-40be-9f2c-e8c4a1e9a883}"/>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{7c1df97a-34a0-470c-9d96-ebbd5f281aaa}"/>
+                <map netsignal="{20a04b28-28f0-458b-a57e-86f64e522b36}" comp_signal="{922cf4f3-4ced-4ffc-91b2-483129005356}"/>
+                <map netsignal="{09750fe3-8f0b-4239-91ae-ec78221f6b60}" comp_signal="{ff96d3fb-e43d-4391-b30f-ec72cbefb149}"/>
+                <map netsignal="{7b38ebc6-0c34-4287-a3f2-192de454a1ff}" comp_signal="{5f74c850-c401-4600-b6c8-58bb87764a59}"/>
+                <map netsignal="{58c55893-1e3e-4437-9daf-350c3bef76fe}" comp_signal="{de468cc9-06de-415f-b1d7-ec82bb8b355a}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{2c8af4fb-cc24-4676-b77e-8d2b64dd73d0}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
+            <name>R9</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value>120Ω</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{f7df2b18-9f30-449a-8afd-c4a6a16cc7d2}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
+                <map netsignal="{44b998b7-65e0-410f-b361-b2770278cd9a}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{1b517f7e-cd6e-43ca-ba7f-cf6be1812b3d}" generic_component="{58c3c6cd-11eb-4557-aa3f-d3e05874afde}" symbol_variant="{afb86b45-68ec-47b6-8d96-153d73567228}">
+            <name>SUP25</name>
+            <value>3V3</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{1d893320-f811-4a79-b64e-cc23d749d394}"/>
             </signal_mapping>
         </instance>
         <instance uuid="{d98d04c5-74c7-4b7d-8f09-611ed955dd57}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
@@ -95,104 +523,31 @@ ${POWER}</value>
                 </attribute>
             </attributes>
             <signal_mapping>
-                <map netsignal="{7103431c-5ae4-4a1d-be25-dd9f52e0cd52}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
                 <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
+                <map netsignal="{7103431c-5ae4-4a1d-be25-dd9f52e0cd52}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
             </signal_mapping>
         </instance>
-        <instance uuid="{bfdf81af-9505-4e77-97e4-d68e4a90ba0f}" generic_component="{2b24b18d-bd95-4fb4-8fe6-bce1d020ead4}" symbol_variant="{ed0f0ca2-43ff-4a10-94c2-2958bc336586}">
-            <name>LED1</name>
-            <value>${COLOR}</value>
-            <attributes>
-                <attribute key="FORWARD_VOLTAGE">
-                    <type>string</type>
-                    <value></value>
-                </attribute>
-                <attribute key="COLOR">
-                    <type>string</type>
-                    <value>Green</value>
-                </attribute>
-                <attribute key="FORWARD_CURRENT">
-                    <type>string</type>
-                    <value></value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{7b023430-b68f-403a-80b8-c7deb12e7a0c}"/>
-                <map netsignal="{fd065cfa-b24b-448f-9be4-72b6e7e1a4c2}" comp_signal="{f1467b5c-cc7d-44b4-8076-d729f35b3a6a}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{46601a79-4b4e-401c-826b-6c04056b4080}" generic_component="{27bf51af-a016-45b4-87cb-844c72a38d66}" symbol_variant="{df7447ce-127b-4827-abe2-767791c96981}">
-            <name>Q4</name>
-            <value>PSMN5R8</value>
+        <instance uuid="{00df6fcc-ebae-4597-8398-a2d3864d3b43}" generic_component="{82207562-d317-4911-96fa-ceb0f45fd806}" symbol_variant="{b9de4767-8626-4d02-8895-6fbce03105e9}">
+            <name>D2</name>
+            <value>BAS21</value>
             <attributes/>
             <signal_mapping>
-                <map netsignal="{7e125e0a-cf13-418a-847c-f832c0d78db6}" comp_signal="{4c7edd50-32d2-4098-a286-3536b882967b}"/>
-                <map netsignal="{7103431c-5ae4-4a1d-be25-dd9f52e0cd52}" comp_signal="{d7eb84bb-7f47-4e0b-99d1-1ee30019c40e}"/>
-                <map netsignal="{e5fdb792-6bf4-421b-8078-b205693dfe1a}" comp_signal="{3982c030-dbdf-4cb9-8d75-0e471e12fabb}"/>
+                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{69e22be3-d2fb-4b8f-ab4f-7fba3cff0aff}"/>
+                <map netsignal="{666c87f9-9bf6-45be-bc8c-5ba8600ab269}" comp_signal="{6dd65f7f-8f6b-4b29-ade1-40bc4f84f4b8}"/>
             </signal_mapping>
         </instance>
-        <instance uuid="{06d050d5-cea1-4a9b-b92d-9c5114bdb3d1}" generic_component="{2b24b18d-bd95-4fb4-8fe6-bce1d020ead4}" symbol_variant="{ed0f0ca2-43ff-4a10-94c2-2958bc336586}">
-            <name>LED2</name>
-            <value>${COLOR}</value>
-            <attributes>
-                <attribute key="FORWARD_VOLTAGE">
-                    <type>string</type>
-                    <value></value>
-                </attribute>
-                <attribute key="COLOR">
-                    <type>string</type>
-                    <value>Red</value>
-                </attribute>
-                <attribute key="FORWARD_CURRENT">
-                    <type>string</type>
-                    <value></value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{7b023430-b68f-403a-80b8-c7deb12e7a0c}"/>
-                <map netsignal="{56654caf-7ecf-4ad7-9cb9-2ef0035654a8}" comp_signal="{f1467b5c-cc7d-44b4-8076-d729f35b3a6a}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{709a326c-b6ad-4dcb-95cf-7ce8962bb16c}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
-            <name>R5</name>
+        <instance uuid="{4ea5b830-f231-4ded-9d0d-3d69b6a938df}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
+            <name>R13</name>
             <value>${RESISTANCE}</value>
             <attributes>
                 <attribute key="RESISTANCE">
                     <type>resistance</type>
-                    <value>56Ω</value>
+                    <value>130Ω</value>
                 </attribute>
             </attributes>
             <signal_mapping>
-                <map netsignal="{f862e2a9-2596-4607-88b6-68f3696d3a8e}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
-                <map netsignal="{20a04b28-28f0-458b-a57e-86f64e522b36}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{0184602f-8b64-4bc2-ae5a-624b5f6d8907}" generic_component="{197dacc7-3785-4054-a538-ced0d6271faa}" symbol_variant="{0f0439a1-c258-40e7-b407-029f084c372f}">
-            <name>PAD6</name>
-            <value>CANH</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{44b998b7-65e0-410f-b361-b2770278cd9a}" comp_signal="{ad6ae81a-7914-49b7-a87b-a0e8574b7398}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{4a5d04a5-2091-48ec-8957-300d4dbec0c6}" generic_component="{98e71eaa-1b90-4a84-8529-ed4f493e5c41}" symbol_variant="{352cccd5-0c3c-4c66-88e0-6ee7c6a3cbf9}">
-            <name>_3</name>
-            <value></value>
-            <attributes/>
-            <signal_mapping/>
-        </instance>
-        <instance uuid="{f1121620-c541-46a5-90cc-92578e822b8f}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
-            <name>C13</name>
-            <value>${CAPACITANCE}</value>
-            <attributes>
-                <attribute key="CAPACITANCE">
-                    <type>capacitance</type>
-                    <value>220nF</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{6805d3ea-58c5-4e83-9646-348ba7fd8b94}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
+                <map netsignal="{1ebc4991-e356-4ec4-9394-5448780cedee}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
+                <map netsignal="{fd065cfa-b24b-448f-9be4-72b6e7e1a4c2}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
             </signal_mapping>
         </instance>
         <instance uuid="{afd4e910-3c79-46cd-8d71-2ad6c33768d5}" generic_component="{82207562-d317-4911-96fa-ceb0f45fd806}" symbol_variant="{b9de4767-8626-4d02-8895-6fbce03105e9}">
@@ -202,546 +557,6 @@ ${POWER}</value>
             <signal_mapping>
                 <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{69e22be3-d2fb-4b8f-ab4f-7fba3cff0aff}"/>
                 <map netsignal="{7b38ebc6-0c34-4287-a3f2-192de454a1ff}" comp_signal="{6dd65f7f-8f6b-4b29-ade1-40bc4f84f4b8}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{2632a8d7-e836-4fb2-8d00-0b6ea3483ad7}" generic_component="{58c3c6cd-11eb-4557-aa3f-d3e05874afde}" symbol_variant="{afb86b45-68ec-47b6-8d96-153d73567228}">
-            <name>SUP23</name>
-            <value>3V3</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{1d893320-f811-4a79-b64e-cc23d749d394}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{3499d4eb-40bd-44df-8ef1-9544fae56a75}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
-            <name>R3</name>
-            <value>${RESISTANCE}</value>
-            <attributes>
-                <attribute key="RESISTANCE">
-                    <type>resistance</type>
-                    <value>56Ω</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{d25ac99a-f158-4ceb-b46e-87df899b8b19}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
-                <map netsignal="{6fa069ec-4228-4d50-9683-9a5716368dce}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{e69f768b-412d-4fe5-aeb3-c743351a6544}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
-            <name>C22</name>
-            <value>${CAPACITANCE}</value>
-            <attributes>
-                <attribute key="CAPACITANCE">
-                    <type>capacitance</type>
-                    <value>20pF</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
-                <map netsignal="{161b9ccd-49cc-453b-944a-9c0f4aa804ad}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{69f3d0cf-ca3d-4323-b0c3-67c4fce8b501}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
-            <name>C7</name>
-            <value>${CAPACITANCE}
-${VOLTAGE}</value>
-            <attributes>
-                <attribute key="VOLTAGE">
-                    <type>string</type>
-                    <value>50V</value>
-                </attribute>
-                <attribute key="CAPACITANCE">
-                    <type>capacitance</type>
-                    <value>220nF</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{0c451a9f-1e21-4533-8d52-e2aacef8a883}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
-            <name>R12</name>
-            <value>${RESISTANCE}</value>
-            <attributes>
-                <attribute key="RESISTANCE">
-                    <type>resistance</type>
-                    <value>220Ω</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{60988db1-1e27-407d-b08d-929239787003}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
-                <map netsignal="{161b9ccd-49cc-453b-944a-9c0f4aa804ad}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{76c1f0be-1e24-4b1d-beed-edc08bd44118}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
-            <name>R14</name>
-            <value>${RESISTANCE}</value>
-            <attributes>
-                <attribute key="RESISTANCE">
-                    <type>resistance</type>
-                    <value>130Ω</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{56654caf-7ecf-4ad7-9cb9-2ef0035654a8}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
-                <map netsignal="{b85d51dc-bb39-4227-b2c6-5e1f52cd1a11}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{78bd925b-ee02-4142-80c3-59153a60d658}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
-            <name>SUP29</name>
-            <value>GND</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{7b566985-46f7-47e1-af33-2ba64918db44}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
-            <name>SUP27</name>
-            <value>GND</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{694e8ab2-0367-49b7-b548-8314e2a84c77}" generic_component="{58c3c6cd-11eb-4557-aa3f-d3e05874afde}" symbol_variant="{afb86b45-68ec-47b6-8d96-153d73567228}">
-            <name>SUP8</name>
-            <value>VSS</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{1d893320-f811-4a79-b64e-cc23d749d394}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{7d9771c2-7a04-4ab3-866a-cbc12bb590b4}" generic_component="{58c3c6cd-11eb-4557-aa3f-d3e05874afde}" symbol_variant="{afb86b45-68ec-47b6-8d96-153d73567228}">
-            <name>SUP13</name>
-            <value>VSS</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{1d893320-f811-4a79-b64e-cc23d749d394}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{df40333d-b0ea-4b4f-8a7a-a59ae2de610f}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
-            <name>R11</name>
-            <value>${RESISTANCE}</value>
-            <attributes>
-                <attribute key="RESISTANCE">
-                    <type>resistance</type>
-                    <value>6.8kΩ</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{6805d3ea-58c5-4e83-9646-348ba7fd8b94}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{1b517f7e-cd6e-43ca-ba7f-cf6be1812b3d}" generic_component="{58c3c6cd-11eb-4557-aa3f-d3e05874afde}" symbol_variant="{afb86b45-68ec-47b6-8d96-153d73567228}">
-            <name>SUP25</name>
-            <value>3V3</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{1d893320-f811-4a79-b64e-cc23d749d394}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{2a1bc471-eacc-4730-83cb-6acf7f3b5c55}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
-            <name>SUP26</name>
-            <value>GND</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{d880210c-1868-4964-8dff-db2517af8024}" generic_component="{58c3c6cd-11eb-4557-aa3f-d3e05874afde}" symbol_variant="{afb86b45-68ec-47b6-8d96-153d73567228}">
-            <name>SUP11</name>
-            <value>VSS</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{1d893320-f811-4a79-b64e-cc23d749d394}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{0c46076b-7882-4e44-942f-2592d2a21879}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
-            <name>R17</name>
-            <value>${RESISTANCE}</value>
-            <attributes>
-                <attribute key="RESISTANCE">
-                    <type>resistance</type>
-                    <value>47kΩ</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{765c49cf-ed87-472a-ba8f-a65052275c31}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
-                <map netsignal="{09750fe3-8f0b-4239-91ae-ec78221f6b60}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{e4a5cdce-be42-4597-a045-6135ecd25ab8}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
-            <name>C19</name>
-            <value>${CAPACITANCE}</value>
-            <attributes>
-                <attribute key="CAPACITANCE">
-                    <type>capacitance</type>
-                    <value>10nF</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{97138543-14fc-4432-bf03-d42f4c8f1b31}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{04eff528-df9e-4969-bc7e-5633d8011087}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
-            <name>C14</name>
-            <value>${CAPACITANCE}</value>
-            <attributes>
-                <attribute key="CAPACITANCE">
-                    <type>capacitance</type>
-                    <value>100nF</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{befa5cad-9aa3-4fbd-8c61-81636ccabd6e}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{b179313a-5fcb-4fb6-8e56-55865ed6ea4b}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
-            <name>C17</name>
-            <value>${CAPACITANCE}</value>
-            <attributes>
-                <attribute key="CAPACITANCE">
-                    <type>capacitance</type>
-                    <value>100nF</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{9c26d63b-991b-46aa-b229-fa92d44ced4e}" generic_component="{58c3c6cd-11eb-4557-aa3f-d3e05874afde}" symbol_variant="{afb86b45-68ec-47b6-8d96-153d73567228}">
-            <name>SUP3</name>
-            <value>3V3</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{1d893320-f811-4a79-b64e-cc23d749d394}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{98757eea-e6bf-4fe5-adaa-a7f407373243}" generic_component="{6f959627-00d2-4652-bfd9-f6ea0162ccdd}" symbol_variant="{c864d663-a22e-4814-bc03-017d5bc7d6c6}">
-            <name>D1</name>
-            <value>24V</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{0b345c41-0429-47f3-917a-5140944c7755}"/>
-                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{78fc7eeb-dca2-40c7-9543-9444e527056e}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{5ce9b3be-1fa3-471e-b498-77bfbf6c415a}" generic_component="{197dacc7-3785-4054-a538-ced0d6271faa}" symbol_variant="{0f0439a1-c258-40e7-b407-029f084c372f}">
-            <name>PAD2</name>
-            <value>GND</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ad6ae81a-7914-49b7-a87b-a0e8574b7398}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{8092d8bb-f5df-4a43-b5d4-751cdfb474e9}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
-            <name>C12</name>
-            <value>${CAPACITANCE}</value>
-            <attributes>
-                <attribute key="CAPACITANCE">
-                    <type>capacitance</type>
-                    <value>100nF</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{422bed02-7435-4aae-a71a-b5c7fecd3056}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
-            <name>SUP24</name>
-            <value>GND</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{a2df92fe-89d7-4c67-9d33-c4041c0e8f40}" generic_component="{27bf51af-a016-45b4-87cb-844c72a38d66}" symbol_variant="{df7447ce-127b-4827-abe2-767791c96981}">
-            <name>Q6</name>
-            <value>PSMN5R8</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{0d51bec0-4d64-43d5-abab-d24d656bea17}" comp_signal="{4c7edd50-32d2-4098-a286-3536b882967b}"/>
-                <map netsignal="{7103431c-5ae4-4a1d-be25-dd9f52e0cd52}" comp_signal="{d7eb84bb-7f47-4e0b-99d1-1ee30019c40e}"/>
-                <map netsignal="{09750fe3-8f0b-4239-91ae-ec78221f6b60}" comp_signal="{3982c030-dbdf-4cb9-8d75-0e471e12fabb}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{0035f2f4-c0fe-4b64-8830-f4e8fd34d204}" generic_component="{197dacc7-3785-4054-a538-ced0d6271faa}" symbol_variant="{0f0439a1-c258-40e7-b407-029f084c372f}">
-            <name>PAD1</name>
-            <value>VSS</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{ad6ae81a-7914-49b7-a87b-a0e8574b7398}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{aaec816a-e94e-4d00-8ac6-dd105da862e3}" generic_component="{cc20c58e-93b5-49cd-b6e1-48c5e5e76ed3}" symbol_variant="{4bfd5089-9ea7-4019-a507-583509a32d75}">
-            <name>IC2</name>
-            <value>IR25606</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{7c1df97a-34a0-470c-9d96-ebbd5f281aaa}"/>
-                <map netsignal="{3f49a685-229f-4a34-bff6-4673cd8b3781}" comp_signal="{a1b2b926-d1f1-40be-9f2c-e8c4a1e9a883}"/>
-                <map netsignal="{a246f040-6793-47fa-8c26-f1d41163dba3}" comp_signal="{0c2b7df1-57c7-47a7-944f-4aece84b05ca}"/>
-                <map netsignal="{e632ec48-46dd-49ae-bafe-1dcd191973bf}" comp_signal="{de468cc9-06de-415f-b1d7-ec82bb8b355a}"/>
-                <map netsignal="{446c379c-7ca7-4a3c-bcb4-4b4803e5bf6a}" comp_signal="{922cf4f3-4ced-4ffc-91b2-483129005356}"/>
-                <map netsignal="{a87c6342-c3ac-40a2-b688-df06d98233d7}" comp_signal="{ff96d3fb-e43d-4391-b30f-ec72cbefb149}"/>
-                <map netsignal="{666c87f9-9bf6-45be-bc8c-5ba8600ab269}" comp_signal="{5f74c850-c401-4600-b6c8-58bb87764a59}"/>
-                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{1076d030-d216-467b-8a2d-40338779ad94}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{ebb49bc4-00fb-47bf-af63-db38d4a8f502}" generic_component="{58c3c6cd-11eb-4557-aa3f-d3e05874afde}" symbol_variant="{afb86b45-68ec-47b6-8d96-153d73567228}">
-            <name>SUP2</name>
-            <value>VSS</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{1d893320-f811-4a79-b64e-cc23d749d394}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{1fe7624e-269b-4fba-880d-abef3d0efa2e}" generic_component="{27bf51af-a016-45b4-87cb-844c72a38d66}" symbol_variant="{df7447ce-127b-4827-abe2-767791c96981}">
-            <name>Q2</name>
-            <value>PSMN5R8</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{2c9064ac-a99a-425b-a78d-d6ae9675553a}" comp_signal="{4c7edd50-32d2-4098-a286-3536b882967b}"/>
-                <map netsignal="{7103431c-5ae4-4a1d-be25-dd9f52e0cd52}" comp_signal="{d7eb84bb-7f47-4e0b-99d1-1ee30019c40e}"/>
-                <map netsignal="{a87c6342-c3ac-40a2-b688-df06d98233d7}" comp_signal="{3982c030-dbdf-4cb9-8d75-0e471e12fabb}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{b2643695-14fd-4eea-8d66-a4f2c2c2196f}" generic_component="{98e71eaa-1b90-4a84-8529-ed4f493e5c41}" symbol_variant="{352cccd5-0c3c-4c66-88e0-6ee7c6a3cbf9}">
-            <name>_1</name>
-            <value></value>
-            <attributes/>
-            <signal_mapping/>
-        </instance>
-        <instance uuid="{3437d160-1c40-458f-9867-f30c7706e0c3}" generic_component="{ce31c203-9bec-4345-8906-04fb7997ef5b}" symbol_variant="{80db57cd-d3fa-4fec-80f1-3543456340ec}">
-            <name>IC1</name>
-            <value>LM1117</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{8e074b73-9015-4c28-969f-d2d929af889d}"/>
-                <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{bdd7ce7c-4bfc-4215-9431-3ea24f340e8a}"/>
-                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{a78ae9aa-1c78-4d1f-98e8-9bd253555a6d}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{893b43c4-ef31-4853-bfa2-bd7f919ba5e3}" generic_component="{27bf51af-a016-45b4-87cb-844c72a38d66}" symbol_variant="{df7447ce-127b-4827-abe2-767791c96981}">
-            <name>Q5</name>
-            <value>PSMN5R8</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{f862e2a9-2596-4607-88b6-68f3696d3a8e}" comp_signal="{4c7edd50-32d2-4098-a286-3536b882967b}"/>
-                <map netsignal="{09750fe3-8f0b-4239-91ae-ec78221f6b60}" comp_signal="{d7eb84bb-7f47-4e0b-99d1-1ee30019c40e}"/>
-                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{3982c030-dbdf-4cb9-8d75-0e471e12fabb}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{f900538b-090d-482f-9c4c-b0da46d087a8}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
-            <name>R15</name>
-            <value>${RESISTANCE}</value>
-            <attributes>
-                <attribute key="RESISTANCE">
-                    <type>resistance</type>
-                    <value>47kΩ</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{2b3761fd-f01a-452c-b370-827dc2459a21}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
-                <map netsignal="{a87c6342-c3ac-40a2-b688-df06d98233d7}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{9fdd6c44-c091-4ddd-af76-5c7c70909007}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
-            <name>SUP14</name>
-            <value>GND</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{ace8d3f2-1db8-41a8-87ff-66ef95e2807c}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
-            <name>SUP5</name>
-            <value>GND</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{51f2b297-88ec-4703-b2ed-bab50489cba8}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
-            <name>SUP31</name>
-            <value>GND</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{9843ce9e-8e17-4baa-9980-6826fc257abf}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
-            <name>C21</name>
-            <value>${CAPACITANCE}</value>
-            <attributes>
-                <attribute key="CAPACITANCE">
-                    <type>capacitance</type>
-                    <value>20pF</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
-                <map netsignal="{4024f8b2-6969-4f9b-ac41-9338b7319424}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{2e61020a-4346-4277-8f6b-42d8ec60fe49}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
-            <name>C10</name>
-            <value>${CAPACITANCE}
-${VOLTAGE}</value>
-            <attributes>
-                <attribute key="VOLTAGE">
-                    <type>string</type>
-                    <value>50V</value>
-                </attribute>
-                <attribute key="CAPACITANCE">
-                    <type>capacitance</type>
-                    <value>220nF</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{7b38ebc6-0c34-4287-a3f2-192de454a1ff}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
-                <map netsignal="{09750fe3-8f0b-4239-91ae-ec78221f6b60}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{feb77f2b-7f69-49e0-84e9-6684aeee2afe}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
-            <name>SUP19</name>
-            <value>GND</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{5e0bdeff-3d85-4b74-b94d-097fb1de25ac}" generic_component="{27bf51af-a016-45b4-87cb-844c72a38d66}" symbol_variant="{df7447ce-127b-4827-abe2-767791c96981}">
-            <name>Q3</name>
-            <value>PSMN5R8</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{d25ac99a-f158-4ceb-b46e-87df899b8b19}" comp_signal="{4c7edd50-32d2-4098-a286-3536b882967b}"/>
-                <map netsignal="{e5fdb792-6bf4-421b-8078-b205693dfe1a}" comp_signal="{d7eb84bb-7f47-4e0b-99d1-1ee30019c40e}"/>
-                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{3982c030-dbdf-4cb9-8d75-0e471e12fabb}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{1d8a93b9-7ac2-40a0-b1b7-79e987600197}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
-            <name>C16</name>
-            <value>${CAPACITANCE}</value>
-            <attributes>
-                <attribute key="CAPACITANCE">
-                    <type>capacitance</type>
-                    <value>100nF</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{e8ab7388-1846-4ca4-912d-d533fae37f01}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
-            <name>C6</name>
-            <value>${CAPACITANCE}
-${VOLTAGE}</value>
-            <attributes>
-                <attribute key="VOLTAGE">
-                    <type>string</type>
-                    <value>50V</value>
-                </attribute>
-                <attribute key="CAPACITANCE">
-                    <type>capacitance</type>
-                    <value>220nF</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{c3a404c4-3e04-44d0-a495-d8d7750fa1a1}" generic_component="{58c3c6cd-11eb-4557-aa3f-d3e05874afde}" symbol_variant="{afb86b45-68ec-47b6-8d96-153d73567228}">
-            <name>SUP9</name>
-            <value>VSS</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{1d893320-f811-4a79-b64e-cc23d749d394}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{98064fbf-64b1-4958-a0b0-825005d7a6a1}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
-            <name>R8</name>
-            <value>${RESISTANCE}</value>
-            <attributes>
-                <attribute key="RESISTANCE">
-                    <type>resistance</type>
-                    <value>47kΩ</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{7103431c-5ae4-4a1d-be25-dd9f52e0cd52}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
-                <map netsignal="{f346a129-4fa9-467d-bde0-34a6b66bdd67}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{228ff0bc-94bd-4218-84a7-f8ab51ad6f69}" generic_component="{58c3c6cd-11eb-4557-aa3f-d3e05874afde}" symbol_variant="{afb86b45-68ec-47b6-8d96-153d73567228}">
-            <name>SUP20</name>
-            <value>VSS</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{1d893320-f811-4a79-b64e-cc23d749d394}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{8a1420be-e7d4-4a7f-a88d-4dcfa99f67ed}" generic_component="{82207562-d317-4911-96fa-ceb0f45fd806}" symbol_variant="{b9de4767-8626-4d02-8895-6fbce03105e9}">
-            <name>D3</name>
-            <value>BAS21</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{69e22be3-d2fb-4b8f-ab4f-7fba3cff0aff}"/>
-                <map netsignal="{86122564-ffb0-4792-a7f8-81de3061f197}" comp_signal="{6dd65f7f-8f6b-4b29-ade1-40bc4f84f4b8}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{8a4d3468-24cf-47ee-ac46-b65e47ced1ec}" generic_component="{58c3c6cd-11eb-4557-aa3f-d3e05874afde}" symbol_variant="{afb86b45-68ec-47b6-8d96-153d73567228}">
-            <name>SUP10</name>
-            <value>VSS</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{1d893320-f811-4a79-b64e-cc23d749d394}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{6318899d-5a8e-4089-89ee-2d2b54fe8d42}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
-            <name>SUP28</name>
-            <value>GND</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{334d7856-01f5-46e3-85b9-28445e6371ce}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
-            <name>SUP1</name>
-            <value>GND</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{91f8c3d3-c497-4d3f-b7a0-4088b442647b}" generic_component="{b847a54b-a83e-47ff-a976-7704bf05bbf4}" symbol_variant="{1b3fc3ac-2d19-4f11-809a-5c662b3111b8}">
-            <name>Q7</name>
-            <value>${FREQUENCY}</value>
-            <attributes>
-                <attribute key="FREQUENCY">
-                    <type>string</type>
-                    <value>16MHz</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{4024f8b2-6969-4f9b-ac41-9338b7319424}" comp_signal="{878301c2-bacc-4ffa-923c-ef5b1f06e5fe}"/>
-                <map netsignal="{161b9ccd-49cc-453b-944a-9c0f4aa804ad}" comp_signal="{fd760be8-09ce-411f-a869-fdc1e74229a9}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{14d30f5e-339e-4eee-9df4-6d6c8b10a97f}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
-            <name>SUP16</name>
-            <value>GND</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
             </signal_mapping>
         </instance>
         <instance uuid="{ad7d2b6e-21cc-4540-8ec8-bb24a61980ea}" generic_component="{506bd124-6062-400e-9078-b38bd7e1aaee}" symbol_variant="{62a7598c-17fe-41cf-8fa1-4ed274c3adc2}">
@@ -758,165 +573,6 @@ ${VOLTAGE}</value>
                 <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{777f11cd-9d4e-4b2b-aafa-7e7a836ff56e}"/>
             </signal_mapping>
         </instance>
-        <instance uuid="{ddba5f4c-cacf-45da-91d6-bac636da3a6e}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
-            <name>R4</name>
-            <value>${RESISTANCE}</value>
-            <attributes>
-                <attribute key="RESISTANCE">
-                    <type>resistance</type>
-                    <value>56Ω</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{7e125e0a-cf13-418a-847c-f832c0d78db6}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
-                <map netsignal="{e54d4e93-3f38-4980-8839-7249a758a3ad}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{41ee6094-1f47-4775-8f19-663f8b1efdde}" generic_component="{58c3c6cd-11eb-4557-aa3f-d3e05874afde}" symbol_variant="{afb86b45-68ec-47b6-8d96-153d73567228}">
-            <name>SUP17</name>
-            <value>3V3</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{1d893320-f811-4a79-b64e-cc23d749d394}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{ef27ad46-be54-4b1c-ba51-0446a0853203}" generic_component="{c54375c5-7149-4ded-95c5-7462f7301ee7}" symbol_variant="{5412add2-af9c-44b8-876d-a0fb7c201897}">
-            <name>C4</name>
-            <value>${CAPACITANCE}
-${VOLTAGE}</value>
-            <attributes>
-                <attribute key="VOLTAGE">
-                    <type>string</type>
-                    <value>10V</value>
-                </attribute>
-                <attribute key="CAPACITANCE">
-                    <type>capacitance</type>
-                    <value>47μF</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{e010ecbb-6210-4da3-9270-ebd58656dbf0}"/>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{af3ffca8-0085-4edb-a775-fcb759f63411}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{820e8fe1-b1a9-488d-9610-0a97204391b4}" generic_component="{197dacc7-3785-4054-a538-ced0d6271faa}" symbol_variant="{0f0439a1-c258-40e7-b407-029f084c372f}">
-            <name>PAD4</name>
-            <value>PHASE B</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{e5fdb792-6bf4-421b-8078-b205693dfe1a}" comp_signal="{ad6ae81a-7914-49b7-a87b-a0e8574b7398}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{3110f961-42bd-4e24-bba7-47930f1b2c03}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
-            <name>R19</name>
-            <value>${RESISTANCE}</value>
-            <attributes>
-                <attribute key="RESISTANCE">
-                    <type>resistance</type>
-                    <value>6.8kΩ</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{75696982-c10d-4ce6-955b-bdc868f7192d}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{5295af36-44e2-4a2e-a988-87c9e1026ae9}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
-            <name>C5</name>
-            <value>${CAPACITANCE}
-${VOLTAGE}</value>
-            <attributes>
-                <attribute key="VOLTAGE">
-                    <type>string</type>
-                    <value>50V</value>
-                </attribute>
-                <attribute key="CAPACITANCE">
-                    <type>capacitance</type>
-                    <value>220nF</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{716ccdc2-fb79-492b-b76a-7f73c0833e5f}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
-            <name>SUP6</name>
-            <value>GND</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{40f0240d-6c33-452d-845f-29471c1eced5}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
-            <name>SUP22</name>
-            <value>GND</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{5ef7639d-db84-4bfa-8356-83fc28a1a9f7}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
-            <name>R20</name>
-            <value>${RESISTANCE}</value>
-            <attributes>
-                <attribute key="RESISTANCE">
-                    <type>resistance</type>
-                    <value>6.8kΩ</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{2b3761fd-f01a-452c-b370-827dc2459a21}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{00df6fcc-ebae-4597-8398-a2d3864d3b43}" generic_component="{82207562-d317-4911-96fa-ceb0f45fd806}" symbol_variant="{b9de4767-8626-4d02-8895-6fbce03105e9}">
-            <name>D2</name>
-            <value>BAS21</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{69e22be3-d2fb-4b8f-ab4f-7fba3cff0aff}"/>
-                <map netsignal="{666c87f9-9bf6-45be-bc8c-5ba8600ab269}" comp_signal="{6dd65f7f-8f6b-4b29-ade1-40bc4f84f4b8}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{15e33177-fef9-4030-93f7-b7cf8b9ad9e7}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
-            <name>C2</name>
-            <value>${CAPACITANCE}
-${VOLTAGE}</value>
-            <attributes>
-                <attribute key="VOLTAGE">
-                    <type>string</type>
-                    <value>50V</value>
-                </attribute>
-                <attribute key="CAPACITANCE">
-                    <type>capacitance</type>
-                    <value>100nF</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{90c89ce4-fb19-458d-912b-cf9818efd764}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
-            <name>C9</name>
-            <value>${CAPACITANCE}
-${VOLTAGE}</value>
-            <attributes>
-                <attribute key="VOLTAGE">
-                    <type>string</type>
-                    <value>50V</value>
-                </attribute>
-                <attribute key="CAPACITANCE">
-                    <type>capacitance</type>
-                    <value>220nF</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{86122564-ffb0-4792-a7f8-81de3061f197}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
-                <map netsignal="{e5fdb792-6bf4-421b-8078-b205693dfe1a}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
-            </signal_mapping>
-        </instance>
         <instance uuid="{013aa324-6581-4a59-ba01-cce4dfa14c1c}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
             <name>R10</name>
             <value>${RESISTANCE}</value>
@@ -927,8 +583,8 @@ ${VOLTAGE}</value>
                 </attribute>
             </attributes>
             <signal_mapping>
-                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
                 <map netsignal="{6805d3ea-58c5-4e83-9646-348ba7fd8b94}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
+                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
             </signal_mapping>
         </instance>
         <instance uuid="{2de80edd-99e3-4d89-830e-cbf4a858b4cd}" generic_component="{58c3c6cd-11eb-4557-aa3f-d3e05874afde}" symbol_variant="{afb86b45-68ec-47b6-8d96-153d73567228}">
@@ -937,109 +593,6 @@ ${VOLTAGE}</value>
             <attributes/>
             <signal_mapping>
                 <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{1d893320-f811-4a79-b64e-cc23d749d394}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{d00cf83f-e2de-4e12-b176-1c45eb6fcf6c}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
-            <name>R16</name>
-            <value>${RESISTANCE}</value>
-            <attributes>
-                <attribute key="RESISTANCE">
-                    <type>resistance</type>
-                    <value>47kΩ</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{75696982-c10d-4ce6-955b-bdc868f7192d}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
-                <map netsignal="{e5fdb792-6bf4-421b-8078-b205693dfe1a}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{e7c69946-ec6b-4fa8-a6f9-b32d65cbef69}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
-            <name>SUP30</name>
-            <value>GND</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{a56f0beb-d2f3-4a3a-8ede-c5f5e4b69487}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
-            <name>SUP7</name>
-            <value>GND</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{82709ca3-4d60-4b8c-9bbb-4c2669acf146}" generic_component="{197dacc7-3785-4054-a538-ced0d6271faa}" symbol_variant="{0f0439a1-c258-40e7-b407-029f084c372f}">
-            <name>PAD5</name>
-            <value>PHASE C</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{09750fe3-8f0b-4239-91ae-ec78221f6b60}" comp_signal="{ad6ae81a-7914-49b7-a87b-a0e8574b7398}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{1b1ac6e2-3309-4447-8fcf-e95221f19090}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
-            <name>R6</name>
-            <value>${RESISTANCE}</value>
-            <attributes>
-                <attribute key="RESISTANCE">
-                    <type>resistance</type>
-                    <value>56Ω</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{0d51bec0-4d64-43d5-abab-d24d656bea17}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
-                <map netsignal="{609d1730-f335-4c39-90a6-acc934ab2273}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{6c9b623e-6231-4e9c-bf97-944df7a5d3d5}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
-            <name>C8</name>
-            <value>${CAPACITANCE}
-${VOLTAGE}</value>
-            <attributes>
-                <attribute key="VOLTAGE">
-                    <type>string</type>
-                    <value>50V</value>
-                </attribute>
-                <attribute key="CAPACITANCE">
-                    <type>capacitance</type>
-                    <value>220nF</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{666c87f9-9bf6-45be-bc8c-5ba8600ab269}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
-                <map netsignal="{a87c6342-c3ac-40a2-b688-df06d98233d7}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{2ebbad7c-7050-4575-a1aa-4f3966506d83}" generic_component="{27bf51af-a016-45b4-87cb-844c72a38d66}" symbol_variant="{df7447ce-127b-4827-abe2-767791c96981}">
-            <name>Q1</name>
-            <value>PSMN5R8</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{0a6b8cee-5598-45ac-a56a-acf3bb7db32f}" comp_signal="{4c7edd50-32d2-4098-a286-3536b882967b}"/>
-                <map netsignal="{a87c6342-c3ac-40a2-b688-df06d98233d7}" comp_signal="{d7eb84bb-7f47-4e0b-99d1-1ee30019c40e}"/>
-                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{3982c030-dbdf-4cb9-8d75-0e471e12fabb}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{8417e1db-8764-46a7-b5ef-2c606ecab6e1}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
-            <name>R2</name>
-            <value>${RESISTANCE}</value>
-            <attributes>
-                <attribute key="RESISTANCE">
-                    <type>resistance</type>
-                    <value>56Ω</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{2c9064ac-a99a-425b-a78d-d6ae9675553a}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
-                <map netsignal="{3f49a685-229f-4a34-bff6-4673cd8b3781}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{596d6d2e-97a9-47cf-9005-7a4a1e850f1e}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
-            <name>SUP32</name>
-            <value>GND</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
             </signal_mapping>
         </instance>
         <instance uuid="{5a493e46-5b95-4d98-ba08-8bf6a741a817}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
@@ -1052,172 +605,43 @@ ${VOLTAGE}</value>
                 </attribute>
             </attributes>
             <signal_mapping>
-                <map netsignal="{765c49cf-ed87-472a-ba8f-a65052275c31}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
                 <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
+                <map netsignal="{765c49cf-ed87-472a-ba8f-a65052275c31}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
             </signal_mapping>
         </instance>
-        <instance uuid="{f2ecbcd7-492d-4d2c-a28f-0af5ecf85215}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
-            <name>SUP21</name>
+        <instance uuid="{51f2b297-88ec-4703-b2ed-bab50489cba8}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
+            <name>SUP31</name>
             <value>GND</value>
             <attributes/>
             <signal_mapping>
                 <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
             </signal_mapping>
         </instance>
-        <instance uuid="{0cd12bfe-4971-4905-8354-c2b2c47bfcde}" generic_component="{c54375c5-7149-4ded-95c5-7462f7301ee7}" symbol_variant="{5412add2-af9c-44b8-876d-a0fb7c201897}">
-            <name>C1</name>
-            <value>${CAPACITANCE}
-${VOLTAGE}</value>
-            <attributes>
-                <attribute key="VOLTAGE">
-                    <type>string</type>
-                    <value>35V</value>
-                </attribute>
-                <attribute key="CAPACITANCE">
-                    <type>capacitance</type>
-                    <value>680μF</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{e010ecbb-6210-4da3-9270-ebd58656dbf0}"/>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{af3ffca8-0085-4edb-a775-fcb759f63411}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{84e890a4-2a41-4721-8737-a71f79f7d101}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
-            <name>C18</name>
-            <value>${CAPACITANCE}</value>
-            <attributes>
-                <attribute key="CAPACITANCE">
-                    <type>capacitance</type>
-                    <value>4.7μF</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{c330f5a3-9bd5-4189-a86d-a7020235db20}" generic_component="{197dacc7-3785-4054-a538-ced0d6271faa}" symbol_variant="{0f0439a1-c258-40e7-b407-029f084c372f}">
-            <name>PAD3</name>
-            <value>PHASE A</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{a87c6342-c3ac-40a2-b688-df06d98233d7}" comp_signal="{ad6ae81a-7914-49b7-a87b-a0e8574b7398}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{b44652fd-99b6-459a-914b-41e0137146f1}" generic_component="{197dacc7-3785-4054-a538-ced0d6271faa}" symbol_variant="{0f0439a1-c258-40e7-b407-029f084c372f}">
-            <name>PAD7</name>
-            <value>CANL</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{f7df2b18-9f30-449a-8afd-c4a6a16cc7d2}" comp_signal="{ad6ae81a-7914-49b7-a87b-a0e8574b7398}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{ab96ca5d-43e6-4ecb-8981-1fa3117c1c7d}" generic_component="{cc20c58e-93b5-49cd-b6e1-48c5e5e76ed3}" symbol_variant="{4bfd5089-9ea7-4019-a507-583509a32d75}">
-            <name>IC4</name>
-            <value>IR25606</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{7c1df97a-34a0-470c-9d96-ebbd5f281aaa}"/>
-                <map netsignal="{609d1730-f335-4c39-90a6-acc934ab2273}" comp_signal="{a1b2b926-d1f1-40be-9f2c-e8c4a1e9a883}"/>
-                <map netsignal="{ecbfd5f5-0d80-4573-aeea-5d8fbaada4eb}" comp_signal="{0c2b7df1-57c7-47a7-944f-4aece84b05ca}"/>
-                <map netsignal="{58c55893-1e3e-4437-9daf-350c3bef76fe}" comp_signal="{de468cc9-06de-415f-b1d7-ec82bb8b355a}"/>
-                <map netsignal="{20a04b28-28f0-458b-a57e-86f64e522b36}" comp_signal="{922cf4f3-4ced-4ffc-91b2-483129005356}"/>
-                <map netsignal="{09750fe3-8f0b-4239-91ae-ec78221f6b60}" comp_signal="{ff96d3fb-e43d-4391-b30f-ec72cbefb149}"/>
-                <map netsignal="{7b38ebc6-0c34-4287-a3f2-192de454a1ff}" comp_signal="{5f74c850-c401-4600-b6c8-58bb87764a59}"/>
-                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{1076d030-d216-467b-8a2d-40338779ad94}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{7ce8e5bf-571d-4b03-a9e7-4e81130dc613}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
-            <name>SUP4</name>
+        <instance uuid="{2a1bc471-eacc-4730-83cb-6acf7f3b5c55}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
+            <name>SUP26</name>
             <value>GND</value>
             <attributes/>
             <signal_mapping>
                 <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
             </signal_mapping>
         </instance>
-        <instance uuid="{2c8af4fb-cc24-4676-b77e-8d2b64dd73d0}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
-            <name>R9</name>
-            <value>${RESISTANCE}</value>
-            <attributes>
-                <attribute key="RESISTANCE">
-                    <type>resistance</type>
-                    <value>120Ω</value>
-                </attribute>
-            </attributes>
-            <signal_mapping>
-                <map netsignal="{44b998b7-65e0-410f-b361-b2770278cd9a}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
-                <map netsignal="{f7df2b18-9f30-449a-8afd-c4a6a16cc7d2}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{06d30802-ba7f-431d-843d-42f276aaed22}" generic_component="{e995a552-12c4-413a-8258-1d6ec9a8471d}" symbol_variant="{f73e9091-7c9c-420b-a2a5-d028e0a5fbc0}">
-            <name>U1</name>
-            <value>STM32F103C</value>
-            <attributes/>
-            <signal_mapping>
-                <map netsignal="{6805d3ea-58c5-4e83-9646-348ba7fd8b94}" comp_signal="{f07dc258-46ac-4678-93dd-4a2c68fbed48}"/>
-                <map netsignal="{a2d66e09-1611-4237-8912-4890d72d6bd0}" comp_signal="{1c19712a-913a-4cb6-961e-5771921ee17a}"/>
-                <map netsignal="" comp_signal="{672a563a-25f2-4da3-906e-4ef6cdebe81a}"/>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{d32129a9-ef01-4f00-b988-edd609ce6554}"/>
-                <map netsignal="" comp_signal="{3e3a9564-326d-4aa1-ac2c-34ef9790f120}"/>
-                <map netsignal="{2b3761fd-f01a-452c-b370-827dc2459a21}" comp_signal="{b9dbd1bc-f06b-4cd3-add7-337a433e5e7c}"/>
-                <map netsignal="" comp_signal="{a4c94126-79cd-4604-baa1-8928c8874041}"/>
-                <map netsignal="{e632ec48-46dd-49ae-bafe-1dcd191973bf}" comp_signal="{e6ddddf0-62d2-424c-8304-7f6f228b364c}"/>
-                <map netsignal="{b85d51dc-bb39-4227-b2c6-5e1f52cd1a11}" comp_signal="{b58d445e-ebf3-4f42-a36d-1e1fe65f95ec}"/>
-                <map netsignal="{765c49cf-ed87-472a-ba8f-a65052275c31}" comp_signal="{7f69276e-125a-4647-8b99-8b649c07fff5}"/>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{81670f99-9484-41c5-a47b-42ead41fedcf}"/>
-                <map netsignal="{a246f040-6793-47fa-8c26-f1d41163dba3}" comp_signal="{32301765-2d0f-42df-b1e2-c54b822932f6}"/>
-                <map netsignal="" comp_signal="{ebd30e4b-ee1a-45a7-b2f7-f40c9fd22934}"/>
-                <map netsignal="{60988db1-1e27-407d-b08d-929239787003}" comp_signal="{96ee4b5e-7fa2-4d58-86f1-ab1b45ba6cbf}"/>
-                <map netsignal="" comp_signal="{ac7e4a7c-7f79-492e-8f45-18b958d00700}"/>
-                <map netsignal="{765c49cf-ed87-472a-ba8f-a65052275c31}" comp_signal="{44aa9471-5937-48a3-af00-5139614df2c0}"/>
-                <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{52adb7a7-a72d-4bbc-b654-df5b6de5c4c7}"/>
-                <map netsignal="" comp_signal="{a3a0f9fe-a227-41cf-a29b-4ec77316bd51}"/>
-                <map netsignal="" comp_signal="{8e4cf797-937c-40a8-aefc-40632ad1898d}"/>
-                <map netsignal="" comp_signal="{d6c16b38-935b-4b6e-bb2b-2a83235c7545}"/>
-                <map netsignal="" comp_signal="{c32df108-8152-411c-acc3-be6953f0fc48}"/>
-                <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{a72b0741-cf96-4ad3-a60b-78f5d4354727}"/>
-                <map netsignal="" comp_signal="{ff517c96-5cc2-493b-b026-890dea87af94}"/>
-                <map netsignal="" comp_signal="{cbe0ca63-a44d-45ac-99f2-69a9ab8ed9ed}"/>
-                <map netsignal="" comp_signal="{97b14d16-4118-43d5-9ca9-1dfe2b2c96c5}"/>
-                <map netsignal="{75696982-c10d-4ce6-955b-bdc868f7192d}" comp_signal="{e3f2c4b2-b70b-4fe8-af0e-79a84406932c}"/>
-                <map netsignal="" comp_signal="{f3008697-c083-444b-9474-4a31e377d634}"/>
-                <map netsignal="{7d176095-7be9-4377-8d35-235672017d95}" comp_signal="{b4d8635d-d50f-4b96-a681-e933962ebbac}"/>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{8e3ea603-935e-4343-bcd2-06f42a05625a}"/>
-                <map netsignal="" comp_signal="{414203ac-828c-4457-a413-e416f49ae848}"/>
-                <map netsignal="" comp_signal="{7dcab181-0695-49c2-9084-8ba8f5922743}"/>
-                <map netsignal="{ecbfd5f5-0d80-4573-aeea-5d8fbaada4eb}" comp_signal="{d1ee2eed-76fa-4520-b7f5-7de90dd99b37}"/>
-                <map netsignal="" comp_signal="{e0bbaf81-7f48-42da-9be2-693e3b6b09e9}"/>
-                <map netsignal="" comp_signal="{576f8414-a935-43ed-af09-79b8925071df}"/>
-                <map netsignal="{befa5cad-9aa3-4fbd-8c61-81636ccabd6e}" comp_signal="{71e08985-a91f-49c3-9f28-7a6ff2e6f0c5}"/>
-                <map netsignal="" comp_signal="{1de1534c-fcc8-4916-a1ac-97c00c9f2d3e}"/>
-                <map netsignal="{58c55893-1e3e-4437-9daf-350c3bef76fe}" comp_signal="{28732e7f-0887-4194-9d49-f5984ffaa276}"/>
-                <map netsignal="{1ebc4991-e356-4ec4-9394-5448780cedee}" comp_signal="{4c104892-b04b-42e9-9e41-d97aa692e54c}"/>
-                <map netsignal="" comp_signal="{3e58fc69-6195-4b4d-a87c-ae498173d3da}"/>
-                <map netsignal="{97138543-14fc-4432-bf03-d42f4c8f1b31}" comp_signal="{b982ac69-f6f7-4f6e-b302-3b7d8d6efade}"/>
-                <map netsignal="{8867be40-a3b7-4d6f-9f87-bca92b51d043}" comp_signal="{5ac4d07c-b6e2-47fb-b127-cea058204dce}"/>
-                <map netsignal="{f346a129-4fa9-467d-bde0-34a6b66bdd67}" comp_signal="{17176110-d838-455c-93bc-83275de74c98}"/>
-                <map netsignal="{4024f8b2-6969-4f9b-ac41-9338b7319424}" comp_signal="{64aadb1f-7937-432b-a898-41f98457da8c}"/>
-                <map netsignal="{82bfa55d-323c-4444-8cd3-8c35e1bd0fec}" comp_signal="{97a14398-be65-4d64-a654-832d5f74e96a}"/>
-            </signal_mapping>
-        </instance>
-        <instance uuid="{68c6b6ce-0bad-4965-aa85-c972ab3f16c6}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
-            <name>C3</name>
+        <instance uuid="{90c89ce4-fb19-458d-912b-cf9818efd764}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
+            <name>C9</name>
             <value>${CAPACITANCE}
 ${VOLTAGE}</value>
             <attributes>
-                <attribute key="VOLTAGE">
-                    <type>string</type>
-                    <value>10V</value>
-                </attribute>
                 <attribute key="CAPACITANCE">
                     <type>capacitance</type>
-                    <value>100nF</value>
+                    <value>220nF</value>
+                </attribute>
+                <attribute key="VOLTAGE">
+                    <type>string</type>
+                    <value>50V</value>
                 </attribute>
             </attributes>
             <signal_mapping>
-                <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
+                <map netsignal="{e5fdb792-6bf4-421b-8078-b205693dfe1a}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
+                <map netsignal="{86122564-ffb0-4792-a7f8-81de3061f197}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
             </signal_mapping>
         </instance>
         <instance uuid="{26965a1b-09e1-41ee-b463-2684e7a87818}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
@@ -1230,60 +654,74 @@ ${VOLTAGE}</value>
                 </attribute>
             </attributes>
             <signal_mapping>
-                <map netsignal="{0a6b8cee-5598-45ac-a56a-acf3bb7db32f}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
                 <map netsignal="{446c379c-7ca7-4a3c-bcb4-4b4803e5bf6a}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
+                <map netsignal="{0a6b8cee-5598-45ac-a56a-acf3bb7db32f}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
             </signal_mapping>
         </instance>
-        <instance uuid="{4ea5b830-f231-4ded-9d0d-3d69b6a938df}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
-            <name>R13</name>
-            <value>${RESISTANCE}</value>
-            <attributes>
-                <attribute key="RESISTANCE">
-                    <type>resistance</type>
-                    <value>130Ω</value>
-                </attribute>
-            </attributes>
+        <instance uuid="{4a5d04a5-2091-48ec-8957-300d4dbec0c6}" generic_component="{98e71eaa-1b90-4a84-8529-ed4f493e5c41}" symbol_variant="{352cccd5-0c3c-4c66-88e0-6ee7c6a3cbf9}">
+            <name>_3</name>
+            <value></value>
+            <attributes/>
+            <signal_mapping/>
+        </instance>
+        <instance uuid="{8a1420be-e7d4-4a7f-a88d-4dcfa99f67ed}" generic_component="{82207562-d317-4911-96fa-ceb0f45fd806}" symbol_variant="{b9de4767-8626-4d02-8895-6fbce03105e9}">
+            <name>D3</name>
+            <value>BAS21</value>
+            <attributes/>
             <signal_mapping>
-                <map netsignal="{fd065cfa-b24b-448f-9be4-72b6e7e1a4c2}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
-                <map netsignal="{1ebc4991-e356-4ec4-9394-5448780cedee}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
+                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{69e22be3-d2fb-4b8f-ab4f-7fba3cff0aff}"/>
+                <map netsignal="{86122564-ffb0-4792-a7f8-81de3061f197}" comp_signal="{6dd65f7f-8f6b-4b29-ade1-40bc4f84f4b8}"/>
             </signal_mapping>
         </instance>
-        <instance uuid="{149a7a8c-e3be-446e-aee2-53ba02a79384}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
-            <name>SUP15</name>
+        <instance uuid="{7ce8e5bf-571d-4b03-a9e7-4e81130dc613}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
+            <name>SUP4</name>
             <value>GND</value>
             <attributes/>
             <signal_mapping>
                 <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
             </signal_mapping>
         </instance>
-        <instance uuid="{b9859056-bbef-4848-9b60-978594cce1d4}" generic_component="{01fe9dd4-229f-4083-8c1a-4e1fe7a1fe72}" symbol_variant="{e82fe1cc-0178-4949-ab27-16c8975ffd1d}">
-            <name>IC5</name>
-            <value>SN65HVD230DR</value>
+        <instance uuid="{7d9771c2-7a04-4ab3-866a-cbc12bb590b4}" generic_component="{58c3c6cd-11eb-4557-aa3f-d3e05874afde}" symbol_variant="{afb86b45-68ec-47b6-8d96-153d73567228}">
+            <name>SUP13</name>
+            <value>VSS</value>
             <attributes/>
             <signal_mapping>
-                <map netsignal="{44b998b7-65e0-410f-b361-b2770278cd9a}" comp_signal="{a9d53e7f-94cd-4f11-a6ca-fcc6aa02ff07}"/>
-                <map netsignal="" comp_signal="{589f8b34-815e-4890-bc88-0d2565ac06ca}"/>
-                <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{61c63013-6455-417c-b88b-734de7aa7146}"/>
-                <map netsignal="{82bfa55d-323c-4444-8cd3-8c35e1bd0fec}" comp_signal="{35c7b2e1-e2b6-4d8b-b65e-0bca0316f6d1}"/>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{d3e74d5b-a662-4d3d-aff3-8da209cdb66f}"/>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{f233a935-431c-4e10-9e97-7ddcf8fedfb2}"/>
-                <map netsignal="{f7df2b18-9f30-449a-8afd-c4a6a16cc7d2}" comp_signal="{004bde4f-0412-48a8-b986-bed973ab3b92}"/>
-                <map netsignal="{a2d66e09-1611-4237-8912-4890d72d6bd0}" comp_signal="{bbefed63-7beb-44ba-841e-63231c01cd64}"/>
+                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{1d893320-f811-4a79-b64e-cc23d749d394}"/>
             </signal_mapping>
         </instance>
-        <instance uuid="{81c6addc-9f55-40ef-9b5a-08816ca0a661}" generic_component="{cc20c58e-93b5-49cd-b6e1-48c5e5e76ed3}" symbol_variant="{4bfd5089-9ea7-4019-a507-583509a32d75}">
-            <name>IC3</name>
-            <value>IR25606</value>
+        <instance uuid="{9c26d63b-991b-46aa-b229-fa92d44ced4e}" generic_component="{58c3c6cd-11eb-4557-aa3f-d3e05874afde}" symbol_variant="{afb86b45-68ec-47b6-8d96-153d73567228}">
+            <name>SUP3</name>
+            <value>3V3</value>
             <attributes/>
             <signal_mapping>
-                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{7c1df97a-34a0-470c-9d96-ebbd5f281aaa}"/>
-                <map netsignal="{e54d4e93-3f38-4980-8839-7249a758a3ad}" comp_signal="{a1b2b926-d1f1-40be-9f2c-e8c4a1e9a883}"/>
-                <map netsignal="{8867be40-a3b7-4d6f-9f87-bca92b51d043}" comp_signal="{0c2b7df1-57c7-47a7-944f-4aece84b05ca}"/>
-                <map netsignal="{7d176095-7be9-4377-8d35-235672017d95}" comp_signal="{de468cc9-06de-415f-b1d7-ec82bb8b355a}"/>
-                <map netsignal="{6fa069ec-4228-4d50-9683-9a5716368dce}" comp_signal="{922cf4f3-4ced-4ffc-91b2-483129005356}"/>
-                <map netsignal="{e5fdb792-6bf4-421b-8078-b205693dfe1a}" comp_signal="{ff96d3fb-e43d-4391-b30f-ec72cbefb149}"/>
-                <map netsignal="{86122564-ffb0-4792-a7f8-81de3061f197}" comp_signal="{5f74c850-c401-4600-b6c8-58bb87764a59}"/>
-                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{1076d030-d216-467b-8a2d-40338779ad94}"/>
+                <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{1d893320-f811-4a79-b64e-cc23d749d394}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{8a4d3468-24cf-47ee-ac46-b65e47ced1ec}" generic_component="{58c3c6cd-11eb-4557-aa3f-d3e05874afde}" symbol_variant="{afb86b45-68ec-47b6-8d96-153d73567228}">
+            <name>SUP10</name>
+            <value>VSS</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{1d893320-f811-4a79-b64e-cc23d749d394}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{5295af36-44e2-4a2e-a988-87c9e1026ae9}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
+            <name>C5</name>
+            <value>${CAPACITANCE}
+${VOLTAGE}</value>
+            <attributes>
+                <attribute key="CAPACITANCE">
+                    <type>capacitance</type>
+                    <value>220nF</value>
+                </attribute>
+                <attribute key="VOLTAGE">
+                    <type>string</type>
+                    <value>50V</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
+                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
             </signal_mapping>
         </instance>
         <instance uuid="{291e62f2-5792-44e3-8532-4b85031b4314}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
@@ -1294,23 +732,585 @@ ${VOLTAGE}</value>
                 <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
             </signal_mapping>
         </instance>
-        <instance uuid="{18cf34f6-95e4-48a0-bf4b-6a2d13523f0f}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
-            <name>C11</name>
+        <instance uuid="{84e890a4-2a41-4721-8737-a71f79f7d101}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
+            <name>C18</name>
+            <value>${CAPACITANCE}</value>
+            <attributes>
+                <attribute key="CAPACITANCE">
+                    <type>capacitance</type>
+                    <value>4.7μF</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
+                <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{76c1f0be-1e24-4b1d-beed-edc08bd44118}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
+            <name>R14</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value>130Ω</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{b85d51dc-bb39-4227-b2c6-5e1f52cd1a11}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
+                <map netsignal="{56654caf-7ecf-4ad7-9cb9-2ef0035654a8}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{2ebbad7c-7050-4575-a1aa-4f3966506d83}" generic_component="{27bf51af-a016-45b4-87cb-844c72a38d66}" symbol_variant="{df7447ce-127b-4827-abe2-767791c96981}">
+            <name>Q1</name>
+            <value>PSMN5R8</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{a87c6342-c3ac-40a2-b688-df06d98233d7}" comp_signal="{d7eb84bb-7f47-4e0b-99d1-1ee30019c40e}"/>
+                <map netsignal="{0a6b8cee-5598-45ac-a56a-acf3bb7db32f}" comp_signal="{4c7edd50-32d2-4098-a286-3536b882967b}"/>
+                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{3982c030-dbdf-4cb9-8d75-0e471e12fabb}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{41ee6094-1f47-4775-8f19-663f8b1efdde}" generic_component="{58c3c6cd-11eb-4557-aa3f-d3e05874afde}" symbol_variant="{afb86b45-68ec-47b6-8d96-153d73567228}">
+            <name>SUP17</name>
+            <value>3V3</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{1d893320-f811-4a79-b64e-cc23d749d394}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{149a7a8c-e3be-446e-aee2-53ba02a79384}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
+            <name>SUP15</name>
+            <value>GND</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{81c6addc-9f55-40ef-9b5a-08816ca0a661}" generic_component="{cc20c58e-93b5-49cd-b6e1-48c5e5e76ed3}" symbol_variant="{4bfd5089-9ea7-4019-a507-583509a32d75}">
+            <name>IC3</name>
+            <value>IR25606</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{1076d030-d216-467b-8a2d-40338779ad94}"/>
+                <map netsignal="{8867be40-a3b7-4d6f-9f87-bca92b51d043}" comp_signal="{0c2b7df1-57c7-47a7-944f-4aece84b05ca}"/>
+                <map netsignal="{e54d4e93-3f38-4980-8839-7249a758a3ad}" comp_signal="{a1b2b926-d1f1-40be-9f2c-e8c4a1e9a883}"/>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{7c1df97a-34a0-470c-9d96-ebbd5f281aaa}"/>
+                <map netsignal="{6fa069ec-4228-4d50-9683-9a5716368dce}" comp_signal="{922cf4f3-4ced-4ffc-91b2-483129005356}"/>
+                <map netsignal="{e5fdb792-6bf4-421b-8078-b205693dfe1a}" comp_signal="{ff96d3fb-e43d-4391-b30f-ec72cbefb149}"/>
+                <map netsignal="{86122564-ffb0-4792-a7f8-81de3061f197}" comp_signal="{5f74c850-c401-4600-b6c8-58bb87764a59}"/>
+                <map netsignal="{7d176095-7be9-4377-8d35-235672017d95}" comp_signal="{de468cc9-06de-415f-b1d7-ec82bb8b355a}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{a2df92fe-89d7-4c67-9d33-c4041c0e8f40}" generic_component="{27bf51af-a016-45b4-87cb-844c72a38d66}" symbol_variant="{df7447ce-127b-4827-abe2-767791c96981}">
+            <name>Q6</name>
+            <value>PSMN5R8</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{7103431c-5ae4-4a1d-be25-dd9f52e0cd52}" comp_signal="{d7eb84bb-7f47-4e0b-99d1-1ee30019c40e}"/>
+                <map netsignal="{0d51bec0-4d64-43d5-abab-d24d656bea17}" comp_signal="{4c7edd50-32d2-4098-a286-3536b882967b}"/>
+                <map netsignal="{09750fe3-8f0b-4239-91ae-ec78221f6b60}" comp_signal="{3982c030-dbdf-4cb9-8d75-0e471e12fabb}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{d00cf83f-e2de-4e12-b176-1c45eb6fcf6c}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
+            <name>R16</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value>47kΩ</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{e5fdb792-6bf4-421b-8078-b205693dfe1a}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
+                <map netsignal="{75696982-c10d-4ce6-955b-bdc868f7192d}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{ef27ad46-be54-4b1c-ba51-0446a0853203}" generic_component="{c54375c5-7149-4ded-95c5-7462f7301ee7}" symbol_variant="{5412add2-af9c-44b8-876d-a0fb7c201897}">
+            <name>C4</name>
             <value>${CAPACITANCE}
 ${VOLTAGE}</value>
             <attributes>
+                <attribute key="CAPACITANCE">
+                    <type>capacitance</type>
+                    <value>47μF</value>
+                </attribute>
+                <attribute key="VOLTAGE">
+                    <type>string</type>
+                    <value>10V</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{af3ffca8-0085-4edb-a775-fcb759f63411}"/>
+                <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{e010ecbb-6210-4da3-9270-ebd58656dbf0}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{1fe7624e-269b-4fba-880d-abef3d0efa2e}" generic_component="{27bf51af-a016-45b4-87cb-844c72a38d66}" symbol_variant="{df7447ce-127b-4827-abe2-767791c96981}">
+            <name>Q2</name>
+            <value>PSMN5R8</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{7103431c-5ae4-4a1d-be25-dd9f52e0cd52}" comp_signal="{d7eb84bb-7f47-4e0b-99d1-1ee30019c40e}"/>
+                <map netsignal="{2c9064ac-a99a-425b-a78d-d6ae9675553a}" comp_signal="{4c7edd50-32d2-4098-a286-3536b882967b}"/>
+                <map netsignal="{a87c6342-c3ac-40a2-b688-df06d98233d7}" comp_signal="{3982c030-dbdf-4cb9-8d75-0e471e12fabb}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{2e61020a-4346-4277-8f6b-42d8ec60fe49}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
+            <name>C10</name>
+            <value>${CAPACITANCE}
+${VOLTAGE}</value>
+            <attributes>
+                <attribute key="CAPACITANCE">
+                    <type>capacitance</type>
+                    <value>220nF</value>
+                </attribute>
                 <attribute key="VOLTAGE">
                     <type>string</type>
                     <value>50V</value>
                 </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{09750fe3-8f0b-4239-91ae-ec78221f6b60}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
+                <map netsignal="{7b38ebc6-0c34-4287-a3f2-192de454a1ff}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{e7c69946-ec6b-4fa8-a6f9-b32d65cbef69}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
+            <name>SUP30</name>
+            <value>GND</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{6c9b623e-6231-4e9c-bf97-944df7a5d3d5}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
+            <name>C8</name>
+            <value>${CAPACITANCE}
+${VOLTAGE}</value>
+            <attributes>
+                <attribute key="CAPACITANCE">
+                    <type>capacitance</type>
+                    <value>220nF</value>
+                </attribute>
+                <attribute key="VOLTAGE">
+                    <type>string</type>
+                    <value>50V</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{a87c6342-c3ac-40a2-b688-df06d98233d7}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
+                <map netsignal="{666c87f9-9bf6-45be-bc8c-5ba8600ab269}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{06d30802-ba7f-431d-843d-42f276aaed22}" generic_component="{e995a552-12c4-413a-8258-1d6ec9a8471d}" symbol_variant="{f73e9091-7c9c-420b-a2a5-d028e0a5fbc0}">
+            <name>U1</name>
+            <value>STM32F103C</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{a72b0741-cf96-4ad3-a60b-78f5d4354727}"/>
+                <map netsignal="{97138543-14fc-4432-bf03-d42f4c8f1b31}" comp_signal="{b982ac69-f6f7-4f6e-b302-3b7d8d6efade}"/>
+                <map netsignal="" comp_signal="{672a563a-25f2-4da3-906e-4ef6cdebe81a}"/>
+                <map netsignal="{ecbfd5f5-0d80-4573-aeea-5d8fbaada4eb}" comp_signal="{d1ee2eed-76fa-4520-b7f5-7de90dd99b37}"/>
+                <map netsignal="" comp_signal="{7dcab181-0695-49c2-9084-8ba8f5922743}"/>
+                <map netsignal="" comp_signal="{3e3a9564-326d-4aa1-ac2c-34ef9790f120}"/>
+                <map netsignal="" comp_signal="{ebd30e4b-ee1a-45a7-b2f7-f40c9fd22934}"/>
+                <map netsignal="{58c55893-1e3e-4437-9daf-350c3bef76fe}" comp_signal="{28732e7f-0887-4194-9d49-f5984ffaa276}"/>
+                <map netsignal="{7d176095-7be9-4377-8d35-235672017d95}" comp_signal="{b4d8635d-d50f-4b96-a681-e933962ebbac}"/>
+                <map netsignal="" comp_signal="{ac7e4a7c-7f79-492e-8f45-18b958d00700}"/>
+                <map netsignal="" comp_signal="{8e4cf797-937c-40a8-aefc-40632ad1898d}"/>
+                <map netsignal="" comp_signal="{ff517c96-5cc2-493b-b026-890dea87af94}"/>
+                <map netsignal="{2b3761fd-f01a-452c-b370-827dc2459a21}" comp_signal="{b9dbd1bc-f06b-4cd3-add7-337a433e5e7c}"/>
+                <map netsignal="" comp_signal="{a3a0f9fe-a227-41cf-a29b-4ec77316bd51}"/>
+                <map netsignal="{a2d66e09-1611-4237-8912-4890d72d6bd0}" comp_signal="{1c19712a-913a-4cb6-961e-5771921ee17a}"/>
+                <map netsignal="{6805d3ea-58c5-4e83-9646-348ba7fd8b94}" comp_signal="{f07dc258-46ac-4678-93dd-4a2c68fbed48}"/>
+                <map netsignal="{1ebc4991-e356-4ec4-9394-5448780cedee}" comp_signal="{4c104892-b04b-42e9-9e41-d97aa692e54c}"/>
+                <map netsignal="" comp_signal="{e0bbaf81-7f48-42da-9be2-693e3b6b09e9}"/>
+                <map netsignal="" comp_signal="{576f8414-a935-43ed-af09-79b8925071df}"/>
+                <map netsignal="" comp_signal="{1de1534c-fcc8-4916-a1ac-97c00c9f2d3e}"/>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{8e3ea603-935e-4343-bcd2-06f42a05625a}"/>
+                <map netsignal="{75696982-c10d-4ce6-955b-bdc868f7192d}" comp_signal="{e3f2c4b2-b70b-4fe8-af0e-79a84406932c}"/>
+                <map netsignal="" comp_signal="{f3008697-c083-444b-9474-4a31e377d634}"/>
+                <map netsignal="" comp_signal="{a4c94126-79cd-4604-baa1-8928c8874041}"/>
+                <map netsignal="" comp_signal="{d6c16b38-935b-4b6e-bb2b-2a83235c7545}"/>
+                <map netsignal="{befa5cad-9aa3-4fbd-8c61-81636ccabd6e}" comp_signal="{71e08985-a91f-49c3-9f28-7a6ff2e6f0c5}"/>
+                <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{52adb7a7-a72d-4bbc-b654-df5b6de5c4c7}"/>
+                <map netsignal="{e632ec48-46dd-49ae-bafe-1dcd191973bf}" comp_signal="{e6ddddf0-62d2-424c-8304-7f6f228b364c}"/>
+                <map netsignal="" comp_signal="{97b14d16-4118-43d5-9ca9-1dfe2b2c96c5}"/>
+                <map netsignal="" comp_signal="{cbe0ca63-a44d-45ac-99f2-69a9ab8ed9ed}"/>
+                <map netsignal="{765c49cf-ed87-472a-ba8f-a65052275c31}" comp_signal="{44aa9471-5937-48a3-af00-5139614df2c0}"/>
+                <map netsignal="{60988db1-1e27-407d-b08d-929239787003}" comp_signal="{96ee4b5e-7fa2-4d58-86f1-ab1b45ba6cbf}"/>
+                <map netsignal="{b85d51dc-bb39-4227-b2c6-5e1f52cd1a11}" comp_signal="{b58d445e-ebf3-4f42-a36d-1e1fe65f95ec}"/>
+                <map netsignal="{765c49cf-ed87-472a-ba8f-a65052275c31}" comp_signal="{7f69276e-125a-4647-8b99-8b649c07fff5}"/>
+                <map netsignal="{a246f040-6793-47fa-8c26-f1d41163dba3}" comp_signal="{32301765-2d0f-42df-b1e2-c54b822932f6}"/>
+                <map netsignal="{f346a129-4fa9-467d-bde0-34a6b66bdd67}" comp_signal="{17176110-d838-455c-93bc-83275de74c98}"/>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{d32129a9-ef01-4f00-b988-edd609ce6554}"/>
+                <map netsignal="{82bfa55d-323c-4444-8cd3-8c35e1bd0fec}" comp_signal="{97a14398-be65-4d64-a654-832d5f74e96a}"/>
+                <map netsignal="" comp_signal="{414203ac-828c-4457-a413-e416f49ae848}"/>
+                <map netsignal="" comp_signal="{3e58fc69-6195-4b4d-a87c-ae498173d3da}"/>
+                <map netsignal="{8867be40-a3b7-4d6f-9f87-bca92b51d043}" comp_signal="{5ac4d07c-b6e2-47fb-b127-cea058204dce}"/>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{81670f99-9484-41c5-a47b-42ead41fedcf}"/>
+                <map netsignal="" comp_signal="{c32df108-8152-411c-acc3-be6953f0fc48}"/>
+                <map netsignal="{4024f8b2-6969-4f9b-ac41-9338b7319424}" comp_signal="{64aadb1f-7937-432b-a898-41f98457da8c}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{91f8c3d3-c497-4d3f-b7a0-4088b442647b}" generic_component="{b847a54b-a83e-47ff-a976-7704bf05bbf4}" symbol_variant="{1b3fc3ac-2d19-4f11-809a-5c662b3111b8}">
+            <name>Q7</name>
+            <value>${FREQUENCY}</value>
+            <attributes>
+                <attribute key="FREQUENCY">
+                    <type>string</type>
+                    <value>16MHz</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{4024f8b2-6969-4f9b-ac41-9338b7319424}" comp_signal="{878301c2-bacc-4ffa-923c-ef5b1f06e5fe}"/>
+                <map netsignal="{161b9ccd-49cc-453b-944a-9c0f4aa804ad}" comp_signal="{fd760be8-09ce-411f-a869-fdc1e74229a9}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{9fdd6c44-c091-4ddd-af76-5c7c70909007}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
+            <name>SUP14</name>
+            <value>GND</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{b44652fd-99b6-459a-914b-41e0137146f1}" generic_component="{197dacc7-3785-4054-a538-ced0d6271faa}" symbol_variant="{0f0439a1-c258-40e7-b407-029f084c372f}">
+            <name>PAD7</name>
+            <value>CANL</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{f7df2b18-9f30-449a-8afd-c4a6a16cc7d2}" comp_signal="{ad6ae81a-7914-49b7-a87b-a0e8574b7398}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{820e8fe1-b1a9-488d-9610-0a97204391b4}" generic_component="{197dacc7-3785-4054-a538-ced0d6271faa}" symbol_variant="{0f0439a1-c258-40e7-b407-029f084c372f}">
+            <name>PAD4</name>
+            <value>PHASE B</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{e5fdb792-6bf4-421b-8078-b205693dfe1a}" comp_signal="{ad6ae81a-7914-49b7-a87b-a0e8574b7398}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{98064fbf-64b1-4958-a0b0-825005d7a6a1}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
+            <name>R8</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value>47kΩ</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{f346a129-4fa9-467d-bde0-34a6b66bdd67}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
+                <map netsignal="{7103431c-5ae4-4a1d-be25-dd9f52e0cd52}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{df40333d-b0ea-4b4f-8a7a-a59ae2de610f}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
+            <name>R11</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value>6.8kΩ</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
+                <map netsignal="{6805d3ea-58c5-4e83-9646-348ba7fd8b94}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{5ef7639d-db84-4bfa-8356-83fc28a1a9f7}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
+            <name>R20</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value>6.8kΩ</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
+                <map netsignal="{2b3761fd-f01a-452c-b370-827dc2459a21}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{3079e423-f0e6-42fc-8c93-4cd82690bdc1}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
+            <name>C15</name>
+            <value>${CAPACITANCE}</value>
+            <attributes>
                 <attribute key="CAPACITANCE">
                     <type>capacitance</type>
                     <value>100nF</value>
                 </attribute>
             </attributes>
             <signal_mapping>
-                <map netsignal="{f346a129-4fa9-467d-bde0-34a6b66bdd67}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
                 <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
+                <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{69f3d0cf-ca3d-4323-b0c3-67c4fce8b501}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
+            <name>C7</name>
+            <value>${CAPACITANCE}
+${VOLTAGE}</value>
+            <attributes>
+                <attribute key="CAPACITANCE">
+                    <type>capacitance</type>
+                    <value>220nF</value>
+                </attribute>
+                <attribute key="VOLTAGE">
+                    <type>string</type>
+                    <value>50V</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
+                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{a56f0beb-d2f3-4a3a-8ede-c5f5e4b69487}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
+            <name>SUP7</name>
+            <value>GND</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{04eff528-df9e-4969-bc7e-5633d8011087}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
+            <name>C14</name>
+            <value>${CAPACITANCE}</value>
+            <attributes>
+                <attribute key="CAPACITANCE">
+                    <type>capacitance</type>
+                    <value>100nF</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
+                <map netsignal="{befa5cad-9aa3-4fbd-8c61-81636ccabd6e}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{9843ce9e-8e17-4baa-9980-6826fc257abf}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
+            <name>C21</name>
+            <value>${CAPACITANCE}</value>
+            <attributes>
+                <attribute key="CAPACITANCE">
+                    <type>capacitance</type>
+                    <value>20pF</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{4024f8b2-6969-4f9b-ac41-9338b7319424}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{1b1ac6e2-3309-4447-8fcf-e95221f19090}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
+            <name>R6</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value>56Ω</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{609d1730-f335-4c39-90a6-acc934ab2273}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
+                <map netsignal="{0d51bec0-4d64-43d5-abab-d24d656bea17}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{228ff0bc-94bd-4218-84a7-f8ab51ad6f69}" generic_component="{58c3c6cd-11eb-4557-aa3f-d3e05874afde}" symbol_variant="{afb86b45-68ec-47b6-8d96-153d73567228}">
+            <name>SUP20</name>
+            <value>VSS</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{1d893320-f811-4a79-b64e-cc23d749d394}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{1d8a93b9-7ac2-40a0-b1b7-79e987600197}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
+            <name>C16</name>
+            <value>${CAPACITANCE}</value>
+            <attributes>
+                <attribute key="CAPACITANCE">
+                    <type>capacitance</type>
+                    <value>100nF</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
+                <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{5e0bdeff-3d85-4b74-b94d-097fb1de25ac}" generic_component="{27bf51af-a016-45b4-87cb-844c72a38d66}" symbol_variant="{df7447ce-127b-4827-abe2-767791c96981}">
+            <name>Q3</name>
+            <value>PSMN5R8</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{e5fdb792-6bf4-421b-8078-b205693dfe1a}" comp_signal="{d7eb84bb-7f47-4e0b-99d1-1ee30019c40e}"/>
+                <map netsignal="{d25ac99a-f158-4ceb-b46e-87df899b8b19}" comp_signal="{4c7edd50-32d2-4098-a286-3536b882967b}"/>
+                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{3982c030-dbdf-4cb9-8d75-0e471e12fabb}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{0184602f-8b64-4bc2-ae5a-624b5f6d8907}" generic_component="{197dacc7-3785-4054-a538-ced0d6271faa}" symbol_variant="{0f0439a1-c258-40e7-b407-029f084c372f}">
+            <name>PAD6</name>
+            <value>CANH</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{44b998b7-65e0-410f-b361-b2770278cd9a}" comp_signal="{ad6ae81a-7914-49b7-a87b-a0e8574b7398}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{b179313a-5fcb-4fb6-8e56-55865ed6ea4b}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
+            <name>C17</name>
+            <value>${CAPACITANCE}</value>
+            <attributes>
+                <attribute key="CAPACITANCE">
+                    <type>capacitance</type>
+                    <value>100nF</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
+                <map netsignal="{066db5ac-3232-4824-be9e-fa65aa35c95b}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{e4a5cdce-be42-4597-a045-6135ecd25ab8}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}" symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}">
+            <name>C19</name>
+            <value>${CAPACITANCE}</value>
+            <attributes>
+                <attribute key="CAPACITANCE">
+                    <type>capacitance</type>
+                    <value>10nF</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
+                <map netsignal="{97138543-14fc-4432-bf03-d42f4c8f1b31}" comp_signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{bfdf81af-9505-4e77-97e4-d68e4a90ba0f}" generic_component="{2b24b18d-bd95-4fb4-8fe6-bce1d020ead4}" symbol_variant="{ed0f0ca2-43ff-4a10-94c2-2958bc336586}">
+            <name>LED1</name>
+            <value>${COLOR}</value>
+            <attributes>
+                <attribute key="FORWARD_CURRENT">
+                    <type>string</type>
+                    <value></value>
+                </attribute>
+                <attribute key="COLOR">
+                    <type>string</type>
+                    <value>Green</value>
+                </attribute>
+                <attribute key="FORWARD_VOLTAGE">
+                    <type>string</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{fd065cfa-b24b-448f-9be4-72b6e7e1a4c2}" comp_signal="{f1467b5c-cc7d-44b4-8076-d729f35b3a6a}"/>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{7b023430-b68f-403a-80b8-c7deb12e7a0c}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{422bed02-7435-4aae-a71a-b5c7fecd3056}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
+            <name>SUP24</name>
+            <value>GND</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{d880210c-1868-4964-8dff-db2517af8024}" generic_component="{58c3c6cd-11eb-4557-aa3f-d3e05874afde}" symbol_variant="{afb86b45-68ec-47b6-8d96-153d73567228}">
+            <name>SUP11</name>
+            <value>VSS</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{1d893320-f811-4a79-b64e-cc23d749d394}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{709a326c-b6ad-4dcb-95cf-7ce8962bb16c}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}" symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}">
+            <name>R5</name>
+            <value>${RESISTANCE}</value>
+            <attributes>
+                <attribute key="RESISTANCE">
+                    <type>resistance</type>
+                    <value>56Ω</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{20a04b28-28f0-458b-a57e-86f64e522b36}" comp_signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
+                <map netsignal="{f862e2a9-2596-4607-88b6-68f3696d3a8e}" comp_signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{0cd12bfe-4971-4905-8354-c2b2c47bfcde}" generic_component="{c54375c5-7149-4ded-95c5-7462f7301ee7}" symbol_variant="{5412add2-af9c-44b8-876d-a0fb7c201897}">
+            <name>C1</name>
+            <value>${CAPACITANCE}
+${VOLTAGE}</value>
+            <attributes>
+                <attribute key="CAPACITANCE">
+                    <type>capacitance</type>
+                    <value>680μF</value>
+                </attribute>
+                <attribute key="VOLTAGE">
+                    <type>string</type>
+                    <value>35V</value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{af3ffca8-0085-4edb-a775-fcb759f63411}"/>
+                <map netsignal="{4085a1b3-be8d-4b79-9078-a75234c647c7}" comp_signal="{e010ecbb-6210-4da3-9270-ebd58656dbf0}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{6318899d-5a8e-4089-89ee-2d2b54fe8d42}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
+            <name>SUP28</name>
+            <value>GND</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{78bd925b-ee02-4142-80c3-59153a60d658}" generic_component="{8076f6be-bfab-4fc1-9772-5d54465dd7e1}" symbol_variant="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
+            <name>SUP29</name>
+            <value>GND</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{06d050d5-cea1-4a9b-b92d-9c5114bdb3d1}" generic_component="{2b24b18d-bd95-4fb4-8fe6-bce1d020ead4}" symbol_variant="{ed0f0ca2-43ff-4a10-94c2-2958bc336586}">
+            <name>LED2</name>
+            <value>${COLOR}</value>
+            <attributes>
+                <attribute key="FORWARD_CURRENT">
+                    <type>string</type>
+                    <value></value>
+                </attribute>
+                <attribute key="COLOR">
+                    <type>string</type>
+                    <value>Red</value>
+                </attribute>
+                <attribute key="FORWARD_VOLTAGE">
+                    <type>string</type>
+                    <value></value>
+                </attribute>
+            </attributes>
+            <signal_mapping>
+                <map netsignal="{56654caf-7ecf-4ad7-9cb9-2ef0035654a8}" comp_signal="{f1467b5c-cc7d-44b4-8076-d729f35b3a6a}"/>
+                <map netsignal="{8dbcc2b0-79cc-4750-8462-e9b7a00477e3}" comp_signal="{7b023430-b68f-403a-80b8-c7deb12e7a0c}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{82709ca3-4d60-4b8c-9bbb-4c2669acf146}" generic_component="{197dacc7-3785-4054-a538-ced0d6271faa}" symbol_variant="{0f0439a1-c258-40e7-b407-029f084c372f}">
+            <name>PAD5</name>
+            <value>PHASE C</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{09750fe3-8f0b-4239-91ae-ec78221f6b60}" comp_signal="{ad6ae81a-7914-49b7-a87b-a0e8574b7398}"/>
+            </signal_mapping>
+        </instance>
+        <instance uuid="{b2643695-14fd-4eea-8d66-a4f2c2c2196f}" generic_component="{98e71eaa-1b90-4a84-8529-ed4f493e5c41}" symbol_variant="{352cccd5-0c3c-4c66-88e0-6ee7c6a3cbf9}">
+            <name>_1</name>
+            <value></value>
+            <attributes/>
+            <signal_mapping/>
+        </instance>
+        <instance uuid="{c330f5a3-9bd5-4189-a86d-a7020235db20}" generic_component="{197dacc7-3785-4054-a538-ced0d6271faa}" symbol_variant="{0f0439a1-c258-40e7-b407-029f084c372f}">
+            <name>PAD3</name>
+            <value>PHASE A</value>
+            <attributes/>
+            <signal_mapping>
+                <map netsignal="{a87c6342-c3ac-40a2-b688-df06d98233d7}" comp_signal="{ad6ae81a-7914-49b7-a87b-a0e8574b7398}"/>
             </signal_mapping>
         </instance>
     </generic_component_instances>
