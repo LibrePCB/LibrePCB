@@ -48,8 +48,8 @@ SchematicLayer::SchematicLayer(uint id) :
 
         case SymbolGrabAreas:
             mName = tr("Symbol Grab Areas");
-            mColor = QColor(255, 255, 0, 50);
-            mColorHighlighted = QColor(255, 255, 0, 80);
+            mColor = QColor(255, 255, 0, 30);
+            mColorHighlighted = QColor(255, 255, 0, 50);
             break;
 
         case SymbolPinCircles:
@@ -66,20 +66,20 @@ SchematicLayer::SchematicLayer(uint id) :
 
         case ComponentNames:
             mName = tr("Component Names");
-            mColor = QColor(64, 64, 64, 255);
-            mColorHighlighted = Qt::gray;
+            mColor = QColor(32, 32, 32, 255);
+            mColorHighlighted = Qt::darkGray;
             break;
 
         case ComponentValues:
             mName = tr("Component Values");
-            mColor = QColor(64, 64, 64, 255);
+            mColor = QColor(80, 80, 80, 255);
             mColorHighlighted = Qt::gray;
             break;
 
         case NetLabels:
             mName = tr("Net Labels");
-            mColor = QColor(64, 64, 64, 255);
-            mColorHighlighted = Qt::gray;
+            mColor = QColor(0, 150, 150, 255);
+            mColorHighlighted = Qt::cyan;
             break;
 
         case Nets:
