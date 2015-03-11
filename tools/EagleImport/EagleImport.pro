@@ -126,6 +126,7 @@ SOURCES += \
     ../../src/library/gencompsymbvaritem.cpp \
     ../../src/library/symbolpin.cpp \
     ../../src/library/symbolpolygon.cpp \
+    ../../src/library/symbolellipse.cpp \
     ../../src/library/symboltext.cpp \
 #    ../../src/library/symbolgraphicsitem.cpp \
 #    ../../src/project/schematics/symbolpininstance.cpp \
@@ -250,6 +251,7 @@ HEADERS += \
     ../../src/library/gencompsymbvaritem.h \
     ../../src/library/symbolpin.h \
     ../../src/library/symbolpolygon.h \
+    ../../src/library/symbolellipse.h \
     ../../src/library/symboltext.h \
 #    ../../src/library/symbolgraphicsitem.h \
 #    ../../src/project/schematics/symbolpininstance.h \

@@ -179,25 +179,7 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                 polygon->setStartPos(startpos);
                 Point endpos = Point(child->getAttribute<Length>("x2"), child->getAttribute<Length>("y2"));
                 Angle angle = child->hasAttribute("curve") ? Angle::fromDeg(child->getAttribute<int>("curve")) : Angle(0);
-                if (angle == 0)
-                {
-                    polygon->appendSegment(new SymbolPolygonSegment(SymbolPolygonSegment::Type_t::Line, endpos));
-                }
-                else
-                {
-                    Length length = Point(endpos-startpos).getLength();
-                    Length radius = length / Length::fromMm(2 * qSin(angle.toRad() / 2));
-
-                    qreal angleSgn = angle >= 0 ? 1 : -1;
-                    QVector2D diff_2((endpos.toMmQPointF()/2) - (startpos.toMmQPointF()/2));
-                    QVector2D normale(angleSgn*diff_2.y(), (-1)*angleSgn*diff_2.x());
-                    normale = normale.normalized() * radius.toMm() * qCos(angle.toRad() / 2);
-                    Point center = startpos + Point::fromMm(diff_2.toPointF()) + Point::fromMm(normale.toPointF());
-
-                    SymbolPolygonSegment* segment = new SymbolPolygonSegment(SymbolPolygonSegment::Type_t::Arc, endpos);
-                    segment->setCenter(center);
-                    polygon->appendSegment(segment);
-                }
+                polygon->appendSegment(new SymbolPolygonSegment(endpos, -angle));
                 symbol->addPolygon(polygon);
             }
             else if (child->getName() == "rectangle")
@@ -213,14 +195,10 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                     polygon->setLineWidth(child->getAttribute<Length>("width"));
                 polygon->setIsGrabArea(true);
                 polygon->setStartPos(Point(child->getAttribute<Length>("x1"), child->getAttribute<Length>("y1")));
-                polygon->appendSegment(new SymbolPolygonSegment(SymbolPolygonSegment::Type_t::Line,
-                                       Point(child->getAttribute<Length>("x2"), child->getAttribute<Length>("y1"))));
-                polygon->appendSegment(new SymbolPolygonSegment(SymbolPolygonSegment::Type_t::Line,
-                                       Point(child->getAttribute<Length>("x2"), child->getAttribute<Length>("y2"))));
-                polygon->appendSegment(new SymbolPolygonSegment(SymbolPolygonSegment::Type_t::Line,
-                                       Point(child->getAttribute<Length>("x1"), child->getAttribute<Length>("y2"))));
-                polygon->appendSegment(new SymbolPolygonSegment(SymbolPolygonSegment::Type_t::Line,
-                                       Point(child->getAttribute<Length>("x1"), child->getAttribute<Length>("y1"))));
+                polygon->appendSegment(new SymbolPolygonSegment(Point(child->getAttribute<Length>("x2"), child->getAttribute<Length>("y1"))));
+                polygon->appendSegment(new SymbolPolygonSegment(Point(child->getAttribute<Length>("x2"), child->getAttribute<Length>("y2"))));
+                polygon->appendSegment(new SymbolPolygonSegment(Point(child->getAttribute<Length>("x1"), child->getAttribute<Length>("y2"))));
+                polygon->appendSegment(new SymbolPolygonSegment(Point(child->getAttribute<Length>("x1"), child->getAttribute<Length>("y1"))));
                 symbol->addPolygon(polygon);
             }
             else if (child->getName() == "polygon")
@@ -241,30 +219,28 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                     if (vertex == child->getFirstChild())
                         polygon->setStartPos(p);
                     else
-                        polygon->appendSegment(new SymbolPolygonSegment(SymbolPolygonSegment::Type_t::Line, p));
+                        polygon->appendSegment(new SymbolPolygonSegment(p));
                 }
-                polygon->appendSegment(new SymbolPolygonSegment(SymbolPolygonSegment::Type_t::Line, polygon->getStartPos()));
+                polygon->appendSegment(new SymbolPolygonSegment(polygon->getStartPos()));
                 symbol->addPolygon(polygon);
             }
             else if (child->getName() == "circle")
             {
-                SymbolPolygon* polygon = new SymbolPolygon();
-                switch (child->getAttribute<uint>("layer"))
-                {
-                    case 94: polygon->setLineLayerId(10); break;
-                    default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
-                }
-                polygon->setLineWidth(child->getAttribute<Length>("width"));
-                polygon->setFillLayerId(polygon->getLineWidth() == 0 ? 10 : 0);
-                polygon->setIsGrabArea(true);
                 Length radius(child->getAttribute<Length>("radius"));
                 Point center(child->getAttribute<Length>("x"), child->getAttribute<Length>("y"));
-                Point startEndPos(center.getX(), center.getY() + radius);
-                polygon->setStartPos(startEndPos);
-                SymbolPolygonSegment* segment = new SymbolPolygonSegment(SymbolPolygonSegment::Type_t::Arc, startEndPos);
-                segment->setCenter(center);
-                polygon->appendSegment(segment);
-                symbol->addPolygon(polygon);
+                SymbolEllipse* ellipse = new SymbolEllipse();
+                switch (child->getAttribute<uint>("layer"))
+                {
+                    case 94: ellipse->setLineLayerId(10); break;
+                    default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
+                }
+                ellipse->setLineWidth(child->getAttribute<Length>("width"));
+                ellipse->setFillLayerId(ellipse->getLineWidth() == 0 ? 10 : 0);
+                ellipse->setIsGrabArea(true);
+                ellipse->setCenter(center);
+                ellipse->setRadiusX(radius);
+                ellipse->setRadiusY(radius);
+                symbol->addEllipse(ellipse);
             }
             else if (child->getName() == "text")
             {
@@ -278,13 +254,22 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                     default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
                 }
                 QString textStr = child->getText(true);
-                if (textStr == ">NAME") textStr = "${SYM::NAME}";
-                if (textStr == ">VALUE") textStr = "${CMP::VALUE}";
+                if (textStr == ">NAME")
+                {
+                    textStr = "${SYM::NAME}";
+                    text->setHeight(Length::fromMm(3.175));
+                }
+                else if (textStr == ">VALUE")
+                {
+                    textStr = "${CMP::VALUE}";
+                    text->setHeight(Length::fromMm(2.5));
+                }
+                else
+                    text->setHeight(child->getAttribute<Length>("size")*2);
                 text->setText(textStr);
                 text->setPosition(Point(child->getAttribute<Length>("x"),
                                         child->getAttribute<Length>("y")));
                 text->setAngle(Angle(0));
-                text->setHeight(child->getAttribute<Length>("size")*2);
                 text->setAlign(Alignment(HAlign::left(), VAlign::bottom()));
                 symbol->addText(text);
             }
@@ -384,7 +369,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
 
             // create symbol variant item
             QUuid symbVarItemUuid = getOrCreateUuid(outputSettings, filepath, "symbvaritem", uuid.toString(), gateName);
-            GenCompSymbVarItem* item = new GenCompSymbVarItem(symbVarItemUuid, symbolUuid, index, true, gateName);
+            GenCompSymbVarItem* item = new GenCompSymbVarItem(symbVarItemUuid, symbolUuid, index, true, (gateName == "G$1") ? "" : gateName);
 
             // connect pins
             for (XmlDomElement* connect = connects->getFirstChild("connect", false);
