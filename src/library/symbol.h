@@ -29,6 +29,7 @@
 #include "symbolpin.h"
 #include "symbolpolygon.h"
 #include "symboltext.h"
+#include "symbolellipse.h"
 
 /*****************************************************************************************
  *  Class Symbol
@@ -60,11 +61,13 @@ class Symbol final : public LibraryElement
         const QHash<QUuid, const SymbolPin*>& getPins() const noexcept {return mPins;}
         const QList<const SymbolPolygon*>& getPolygons() const noexcept {return mPolygons;}
         const QList<const SymbolText*>& getTexts() const noexcept {return mTexts;}
+        const QList<const SymbolEllipse*>& getEllipses() const noexcept {return mEllipses;}
 
         // General Methods
         void addPin(const SymbolPin* pin) noexcept {mPins.insert(pin->getUuid(), pin);}
         void addPolygon(const SymbolPolygon* polygon) noexcept {mPolygons.append(polygon);}
         void addText(const SymbolText* text) noexcept {mTexts.append(text);}
+        void addEllipse(const SymbolEllipse* ellipse) noexcept {mEllipses.append(ellipse);}
         void convertLineRectsToPolygonRects(bool fill, bool makeGrabArea) noexcept;
 
 
@@ -90,6 +93,7 @@ class Symbol final : public LibraryElement
         QHash<QUuid, const SymbolPin*> mPins;
         QList<const SymbolPolygon*> mPolygons;
         QList<const SymbolText*> mTexts;
+        QList<const SymbolEllipse*> mEllipses;
 };
 
 } // namespace library

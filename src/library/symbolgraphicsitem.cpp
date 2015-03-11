@@ -147,6 +147,25 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
         painter->drawPath(polygonPath);
     }
 
+    // draw all ellipses
+    foreach (const SymbolEllipse* ellipse, mSymbol.getEllipses())
+    {
+        // set colors
+        layer = getSchematicLayer(ellipse->getLineLayerId());
+        if (!layer) continue;
+        painter->setPen(QPen(layer->getColor(selected), ellipse->getLineWidth().toPx(), Qt::SolidLine));
+        layer = getSchematicLayer(ellipse->getFillLayerId());
+        if (layer)
+            painter->setBrush(QBrush(layer->getColor(selected), Qt::SolidPattern));
+        else
+            painter->setBrush(Qt::NoBrush);
+
+        // draw ellipse
+        painter->drawEllipse(ellipse->getCenter().toPxQPointF(), ellipse->getRadiusX().toPx(),
+                             ellipse->getRadiusY().toPx());
+        // TODO: rotation
+    }
+
     // draw all texts
     foreach (const SymbolText* text, mSymbol.getTexts())
     {
