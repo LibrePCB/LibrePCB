@@ -157,6 +157,9 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
     {
         QUuid uuid = getOrCreateUuid(outputSettings, filepath, "symbols", node->getAttribute("name", true));
         QString name = node->getAttribute("name", true);
+        bool rotate180 = false;
+        if (filepath.getFilename() == "con-lsta.lbr" && name.startsWith("FE")) rotate180 = true;
+        if (filepath.getFilename() == "con-lstb.lbr" && name.startsWith("MA")) rotate180 = true;
 
         // create symbol
         Symbol* symbol = new Symbol(uuid, Version("0.1"), "EDA4U", name);
@@ -176,9 +179,14 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                 polygon->setLineWidth(child->getAttribute<Length>("width"));
                 polygon->setIsGrabArea(true);
                 Point startpos = Point(child->getAttribute<Length>("x1"), child->getAttribute<Length>("y1"));
-                polygon->setStartPos(startpos);
                 Point endpos = Point(child->getAttribute<Length>("x2"), child->getAttribute<Length>("y2"));
                 Angle angle = child->hasAttribute("curve") ? Angle::fromDeg(child->getAttribute<int>("curve")) : Angle(0);
+                if (rotate180)
+                {
+                    startpos = Point(-startpos.getX(), -startpos.getY());
+                    endpos = Point(-endpos.getX(), -endpos.getY());
+                }
+                polygon->setStartPos(startpos);
                 polygon->appendSegment(new SymbolPolygonSegment(endpos, -angle));
                 symbol->addPolygon(polygon);
             }
@@ -277,28 +285,31 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
             {
                 QUuid pinUuid = getOrCreateUuid(outputSettings, filepath, "pins", uuid.toString(), child->getAttribute("name"));
                 SymbolPin* pin = new SymbolPin(pinUuid, child->getAttribute("name"));
-
-                pin->setPosition(Point(child->getAttribute<Length>("x"),
-                                       child->getAttribute<Length>("y")));
-
-                if (!child->hasAttribute("length"))
-                    pin->setLength(Length(7620000));
-                else if (child->getAttribute("length") == "point")
-                    pin->setLength(Length(0));
-                else if (child->getAttribute("length") == "short")
-                    pin->setLength(Length(2540000));
-                else if (child->getAttribute("length") == "middle")
-                    pin->setLength(Length(5080000));
-                else if (child->getAttribute("length") == "long")
-                    pin->setLength(Length(7620000));
-                else
-                    throw Exception(__FILE__, __LINE__, "Invalid symbol pin length: " % child->getAttribute("length"));
-
+                Point pos = Point(child->getAttribute<Length>("x"), child->getAttribute<Length>("y"));
+                Length len(7620000);
+                if (child->hasAttribute("length"))
+                {
+                    if (child->getAttribute("length") == "point")
+                        len.setLengthNm(0);
+                    else if (child->getAttribute("length") == "short")
+                        len.setLengthNm(2540000);
+                    else if (child->getAttribute("length") == "middle")
+                        len.setLengthNm(5080000);
+                    else if (child->getAttribute("length") == "long")
+                        len.setLengthNm(7620000);
+                    else
+                        throw Exception(__FILE__, __LINE__, "Invalid symbol pin length: " % child->getAttribute("length"));
+                }
                 int angleDeg = 0;
-                if (child->hasAttribute("rot"))
-                    angleDeg = -child->getAttribute("rot").remove("R").toInt();
+                if (child->hasAttribute("rot")) angleDeg = -child->getAttribute("rot").remove("R").toInt();
+                if (rotate180)
+                {
+                    pos = Point(-pos.getX(), -pos.getY());
+                    angleDeg += 180;
+                }
+                pin->setPosition(pos);
+                pin->setLength(len);
                 pin->setAngle(Angle::fromDeg(angleDeg) + Angle::deg90());
-
                 symbol->addPin(pin);
             }
             else
