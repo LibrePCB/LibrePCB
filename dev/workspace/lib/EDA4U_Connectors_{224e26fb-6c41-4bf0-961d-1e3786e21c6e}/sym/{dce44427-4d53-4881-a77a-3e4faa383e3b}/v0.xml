@@ -13,10 +13,10 @@
     <categories/>
     <geometry>
         <polygon fill_layer="0" grab_area="true" line_layer="10" start_x="-1.016000" start_y="1.016000" line_width="0.254000">
-            <segment end_x="1.016000" end_y="-1.016000" type="line"/>
+            <segment end_x="1.016000" end_y="-1.016000" angle="0"/>
         </polygon>
         <polygon fill_layer="0" grab_area="true" line_layer="10" start_x="-1.016000" start_y="-1.016000" line_width="0.254000">
-            <segment end_x="1.016000" end_y="1.016000" type="line"/>
+            <segment end_x="1.016000" end_y="1.016000" angle="0"/>
         </polygon>
         <text height="2.5" v_align="bottom" angle="0.000000" text="${SYM::NAME}" x="-1.1" y="1.016000" h_align="left" layer="20"/>
         <text height="3.175" v_align="center" angle="0.000000" text="${CMP::VALUE}" x="-1.2" y="0" h_align="right" layer="21"/>

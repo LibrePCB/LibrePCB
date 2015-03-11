@@ -15,8 +15,8 @@
     </categories>
     <geometry>
         <polygon fill_layer="0" start_y="-1.905" line_width="0.254" line_layer="10" start_x="1.27" grab_area="false">
-            <segment type="line" end_x="0" end_y="0"/>
-            <segment type="line" end_x="-1.27" end_y="-1.905"/>
+            <segment angle="0" end_x="0" end_y="0"/>
+            <segment angle="0" end_x="-1.27" end_y="-1.905"/>
         </polygon>
         <text layer="21" text="${CMP::VALUE}" x="0" y="0" angle="0" height="3.175" v_align="bottom" h_align="center"/>
     </geometry>

@@ -22,51 +22,23 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "symbolpolygon.h"
+#include "symbolellipse.h"
 #include "symbol.h"
 #include "../common/file_io/xmldomelement.h"
 
 namespace library {
 
 /*****************************************************************************************
- *  Class SymbolPolygonSegment
- ****************************************************************************************/
-
-SymbolPolygonSegment::SymbolPolygonSegment(const XmlDomElement& domElement) throw (Exception)
-{
-    mEndPos.setX(domElement.getAttribute<Length>("end_x"));
-    mEndPos.setY(domElement.getAttribute<Length>("end_y"));
-    mAngle = domElement.getAttribute<Angle>("angle");
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-}
-
-XmlDomElement* SymbolPolygonSegment::serializeToXmlDomElement() const throw (Exception)
-{
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("segment"));
-    root->setAttribute("end_x", mEndPos.getX().toMmString());
-    root->setAttribute("end_y", mEndPos.getY().toMmString());
-    root->setAttribute("angle", mAngle.toDegString());
-    return root.take();
-}
-
-bool SymbolPolygonSegment::checkAttributesValidity() const noexcept
-{
-    return true;
-}
-
-/*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SymbolPolygon::SymbolPolygon() noexcept :
-    mLineLayerId(0), mFillLayerId(0), mLineWidth(0), mIsGrabArea(false), mStartPos(0, 0)
+SymbolEllipse::SymbolEllipse() noexcept :
+    mLineLayerId(0), mFillLayerId(0), mLineWidth(0), mIsGrabArea(false), mCenter(0, 0),
+    mRadiusX(0), mRadiusY(0), mRotation(0)
 {
 }
 
-SymbolPolygon::SymbolPolygon(const XmlDomElement& domElement) throw (Exception)
+SymbolEllipse::SymbolEllipse(const XmlDomElement& domElement) throw (Exception)
 {
     // load layers
     mLineLayerId = domElement.getAttribute<uint>("line_layer");
@@ -75,41 +47,37 @@ SymbolPolygon::SymbolPolygon(const XmlDomElement& domElement) throw (Exception)
     // load geometry attributes
     mLineWidth = domElement.getAttribute<Length>("line_width");
     mIsGrabArea = domElement.getAttribute<bool>("grab_area");
-    mStartPos.setX(domElement.getAttribute<Length>("start_x"));
-    mStartPos.setY(domElement.getAttribute<Length>("start_y"));
-
-    // load all segments
-    for (const XmlDomElement* node = domElement.getFirstChild("segment", true);
-         node; node = node->getNextSibling("segment"))
-    {
-        mSegments.append(new SymbolPolygonSegment(*node));
-    }
+    mCenter.setX(domElement.getAttribute<Length>("x"));
+    mCenter.setY(domElement.getAttribute<Length>("y"));
+    mRadiusX = domElement.getAttribute<Length>("radius_x");
+    mRadiusY = domElement.getAttribute<Length>("radius_y");
+    mRotation = domElement.getAttribute<Angle>("rotation");
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-SymbolPolygon::~SymbolPolygon() noexcept
+SymbolEllipse::~SymbolEllipse() noexcept
 {
-    qDeleteAll(mSegments);      mSegments.clear();
 }
 
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* SymbolPolygon::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* SymbolEllipse::serializeToXmlDomElement() const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("polygon"));
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("ellipse"));
     root->setAttribute("line_layer", mLineLayerId);
-    root->setAttribute("line_width", mLineWidth.toMmString());
     root->setAttribute("fill_layer", mFillLayerId);
-    root->setAttribute("start_x", mStartPos.getX().toMmString());
-    root->setAttribute("start_y", mStartPos.getY().toMmString());
+    root->setAttribute("line_width", mLineWidth.toMmString());
     root->setAttribute("grab_area", mIsGrabArea);
-    foreach (const SymbolPolygonSegment* segment, mSegments)
-        root->appendChild(segment->serializeToXmlDomElement());
+    root->setAttribute("x", mCenter.getX().toMmString());
+    root->setAttribute("y", mCenter.getY().toMmString());
+    root->setAttribute("radius_x", mRadiusX.toMmString());
+    root->setAttribute("radius_y", mRadiusY.toMmString());
+    root->setAttribute("rotation", mRotation.toDegString());
     return root.take();
 }
 
@@ -117,10 +85,11 @@ XmlDomElement* SymbolPolygon::serializeToXmlDomElement() const throw (Exception)
  *  Private Methods
  ****************************************************************************************/
 
-bool SymbolPolygon::checkAttributesValidity() const noexcept
+bool SymbolEllipse::checkAttributesValidity() const noexcept
 {
     if (mLineWidth < 0)         return false;
-    if (mSegments.isEmpty())    return false;
+    if (mRadiusX <= 0)          return false;
+    if (mRadiusY <= 0)          return false;
     return true;
 }
 
