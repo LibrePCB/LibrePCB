@@ -94,10 +94,10 @@ void Symbol::convertLineRectsToPolygonRects(bool fill, bool makeGrabArea) noexce
         rect->setLineWidth(lines.first()->getLineWidth());
         rect->setIsGrabArea(makeGrabArea);
         rect->setStartPos(p1);
-        rect->appendSegment(new SymbolPolygonSegment(SymbolPolygonSegment::Type_t::Line, p2));
-        rect->appendSegment(new SymbolPolygonSegment(SymbolPolygonSegment::Type_t::Line, p3));
-        rect->appendSegment(new SymbolPolygonSegment(SymbolPolygonSegment::Type_t::Line, p4));
-        rect->appendSegment(new SymbolPolygonSegment(SymbolPolygonSegment::Type_t::Line, p1));
+        rect->appendSegment(new SymbolPolygonSegment(p2));
+        rect->appendSegment(new SymbolPolygonSegment(p3));
+        rect->appendSegment(new SymbolPolygonSegment(p4));
+        rect->appendSegment(new SymbolPolygonSegment(p1));
         mPolygons.append(rect);
 
         // remove all lines

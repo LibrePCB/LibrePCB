@@ -36,9 +36,6 @@ namespace library {
 
 /**
  * @brief The SymbolPolygonSegment class
- *
- * @todo The implementation of arcs/circles is only a quick hack
- *       and should be improved later...
  */
 class SymbolPolygonSegment final : public IF_XmlSerializableObject
 {
@@ -46,25 +43,19 @@ class SymbolPolygonSegment final : public IF_XmlSerializableObject
 
     public:
 
-        // Types
-        enum class Type_t {Line, Arc};
-
         // Constructors / Destructor
-        explicit SymbolPolygonSegment(Type_t type, const Point& endPos,
-                                      const Point& center = Point()) noexcept :
-            mType(type), mEndPos(endPos), mCenter(center) {}
+        explicit SymbolPolygonSegment(const Point& endPos, const Angle& angle = Angle(0)) noexcept :
+            mEndPos(endPos), mAngle(angle) {}
         explicit SymbolPolygonSegment(const XmlDomElement& domElement) throw (Exception);
         ~SymbolPolygonSegment() noexcept {}
 
         // Getters
-        Type_t getType() const noexcept {return mType;}
         const Point& getEndPos() const noexcept {return mEndPos;}
-        const Point& getCenter() const noexcept {return mCenter;}
+        const Angle& getAngle() const noexcept {return mAngle;}
 
         // Setters
-        void setType(Type_t type) noexcept {mType = type;}
         void setEndPos(const Point& pos) noexcept {mEndPos = pos;}
-        void setCenter(const Point& center) noexcept {mCenter = center;}
+        void setAngle(const Angle& angle) noexcept {mAngle = angle;}
 
         // General Methods
         XmlDomElement* serializeToXmlDomElement() const throw (Exception);
@@ -82,9 +73,8 @@ class SymbolPolygonSegment final : public IF_XmlSerializableObject
 
 
         // Attributes
-        Type_t mType;
         Point mEndPos;
-        Point mCenter;
+        Angle mAngle;
 };
 
 } // namespace library

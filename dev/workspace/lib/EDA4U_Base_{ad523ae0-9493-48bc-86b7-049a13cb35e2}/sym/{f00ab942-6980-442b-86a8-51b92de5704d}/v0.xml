@@ -17,23 +17,23 @@
     <attachements/>
     <geometry>
         <polygon line_layer="10" line_width="0.6" fill_layer="0" start_x="0" start_y="0" grab_area="false">
-            <segment type="line" end_x="0" end_y="190"/>
-            <segment type="line" end_x="277" end_y="190"/>
-            <segment type="line" end_x="277" end_y="0"/>
-            <segment type="line" end_x="0" end_y="0"/>
+            <segment angle="0" end_x="0" end_y="190"/>
+            <segment angle="0" end_x="277" end_y="190"/>
+            <segment angle="0" end_x="277" end_y="0"/>
+            <segment angle="0" end_x="0" end_y="0"/>
         </polygon>
         <polygon line_layer="10" line_width="0.6" fill_layer="0" start_x="170" start_y="0" grab_area="false">
-            <segment type="line" end_x="170" end_y="15"/>
-            <segment type="line" end_x="277" end_y="15"/>
+            <segment angle="0" end_x="170" end_y="15"/>
+            <segment angle="0" end_x="277" end_y="15"/>
         </polygon>
         <polygon line_layer="10" line_width="0.6" fill_layer="0" start_x="240" start_y="0" grab_area="false">
-            <segment type="line" end_x="240" end_y="15"/>
+            <segment angle="0" end_x="240" end_y="15"/>
         </polygon>
         <polygon line_layer="10" line_width="0.6" fill_layer="0" start_x="170" start_y="5" grab_area="false">
-            <segment type="line" end_x="277" end_y="5"/>
+            <segment angle="0" end_x="277" end_y="5"/>
         </polygon>
         <polygon line_layer="10" line_width="0.6" fill_layer="0" start_x="240" start_y="10" grab_area="false">
-            <segment type="line" end_x="277" end_y="10"/>
+            <segment angle="0" end_x="277" end_y="10"/>
         </polygon>
         <text layer="10" text="${PAGE::NAME}"                  x="173" y="5"  angle="0" height="10" v_align="bottom" h_align="left"/>
         <text layer="10" text="${PRJ::NAME}"                   x="173" y="0"  angle="0" height="5"  v_align="bottom" h_align="left"/>

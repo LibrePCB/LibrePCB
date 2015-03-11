@@ -34,25 +34,9 @@ namespace library {
 
 SymbolPolygonSegment::SymbolPolygonSegment(const XmlDomElement& domElement) throw (Exception)
 {
-    QString type = domElement.getAttribute("type");
-    if (type == "line")
-    {
-        mType = Type_t::Line;
-    }
-    else if (type == "arc")
-    {
-        mType = Type_t::Arc;
-        mCenter.setX(domElement.getAttribute<Length>("center_x"));
-        mCenter.setY(domElement.getAttribute<Length>("center_y"));
-    }
-    else
-    {
-        throw RuntimeError(__FILE__, __LINE__, type,
-            QString(tr("Invalid polygon segment type \"%1\" in file \"%2\"."))
-            .arg(type, domElement.getDocFilePath().toNative()));
-    }
     mEndPos.setX(domElement.getAttribute<Length>("end_x"));
     mEndPos.setY(domElement.getAttribute<Length>("end_y"));
+    mAngle = domElement.getAttribute<Angle>("angle");
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -62,24 +46,9 @@ XmlDomElement* SymbolPolygonSegment::serializeToXmlDomElement() const throw (Exc
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("segment"));
-    switch (mType)
-    {
-        case Type_t::Line:
-        {
-            root->setAttribute<QString>("type", "line");
-            break;
-        }
-        case Type_t::Arc:
-        {
-            root->setAttribute<QString>("type", "arc");
-            root->setAttribute<Length>("center_x", mCenter.getX());
-            root->setAttribute<Length>("center_y", mCenter.getY());
-            break;
-        }
-        default:            Q_ASSERT(false); throw LogicError(__FILE__, __LINE__);
-    }
     root->setAttribute("end_x", mEndPos.getX().toMmString());
     root->setAttribute("end_y", mEndPos.getY().toMmString());
+    root->setAttribute("angle", mAngle.toDegString());
     return root.take();
 }
 

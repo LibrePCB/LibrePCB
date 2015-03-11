@@ -120,27 +120,28 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
         polygonPath.moveTo(lastPos.toPxQPointF());
         foreach (const SymbolPolygonSegment* segment, polygon->getSegments())
         {
-            switch (segment->getType())
+            if (segment->getAngle() == 0)
             {
-                case SymbolPolygonSegment::Type_t::Line:
-                    polygonPath.lineTo(segment->getEndPos().toPxQPointF());
-                    break;
-                case SymbolPolygonSegment::Type_t::Arc:
-                {
-                    // TODO: this is very provisional and may contain bugs...
-                    QPointF centerPx = segment->getCenter().toPxQPointF();
-                    QVector2D diffPx(segment->getEndPos().toPxQPointF().x() - lastPos.toPxQPointF().x(),
-                                     segment->getEndPos().toPxQPointF().y() - lastPos.toPxQPointF().y());
-                    qreal radiusPx = Point(segment->getEndPos() - segment->getCenter()).getLength().toPx();
-                    QRectF rectPx = QRectF(centerPx.x()-radiusPx, centerPx.y()-radiusPx, 2*radiusPx, 2*radiusPx);
-                    qreal startAngleDeg = qRadiansToDegrees(qAsin((diffPx.length()/2)/radiusPx));
-                    qreal arcAngleDeg = qRadiansToDegrees(-2*qAsin(diffPx.length()/(2*radiusPx)));
-                    if (diffPx.length() == 0) arcAngleDeg = 360;
-                    polygonPath.arcTo(rectPx, startAngleDeg, arcAngleDeg);
-                    break;
-                }
-                default:
-                    break;
+                polygonPath.lineTo(segment->getEndPos().toPxQPointF());
+            }
+            else
+            {
+                // TODO: this is very provisional and may contain bugs...
+                // all lengths in pixels
+                qreal s = Point(segment->getEndPos() - lastPos).getLength().toPx();
+                qreal r = s / (2 * qSin(segment->getAngle().toRad()/2));
+                qreal x1 = lastPos.toPxQPointF().x();
+                qreal y1 = lastPos.toPxQPointF().y();
+                qreal x2 = segment->getEndPos().toPxQPointF().x();
+                qreal y2 = segment->getEndPos().toPxQPointF().y();
+                qreal x3 = (x1+x2)/2;
+                qreal y3 = (y1+y2)/2;
+                qreal q = qSqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
+                qreal cx = x3+ qSqrt(r*r-q*q/4)*(y1-y2)/q;
+                qreal cy = y3 + qSqrt(r*r-q*q/4)*(x2-x1)/q;
+                QRectF rect(cx-r, cy-r, 2*r, 2*r);
+                qreal startAngleDeg = qRadiansToDegrees(qAtan2(cy-y1, cx-x1));
+                polygonPath.arcTo(rect, startAngleDeg, -segment->getAngle().toDeg());
             }
             lastPos = segment->getEndPos();
         }
@@ -290,24 +291,21 @@ bool SymbolGraphicsItem::updateBoundingRectAndShape() noexcept
     // polygons
     foreach (const SymbolPolygon* polygon, mSymbol.getPolygons())
     {
+        Point lastPos = polygon->getStartPos();
         QPainterPath polygonPath;
         polygonPath.setFillRule(Qt::WindingFill);
-        polygonPath.moveTo(polygon->getStartPos().toPxQPointF());
+        polygonPath.moveTo(lastPos.toPxQPointF());
         foreach (const SymbolPolygonSegment* segment, polygon->getSegments())
         {
-            switch (segment->getType())
+            if (segment->getAngle() == 0)
             {
-                case SymbolPolygonSegment::Type_t::Line:
-                    polygonPath.lineTo(segment->getEndPos().toPxQPointF());
-                    break;
-                case SymbolPolygonSegment::Type_t::Arc:
-                    //polygonPath.arcTo(item->getArcRectF(), item->getArcStartAngle().deg(),
-                    //                                      item->getArcSpanAngle().deg());
-                    break;
-                default:
-                    qWarning() << "Unknown polygon segment type";
-                    return false;
+                polygonPath.lineTo(segment->getEndPos().toPxQPointF());
             }
+            else
+            {
+                //TODO
+            }
+            lastPos = segment->getEndPos();
         }
         qreal w = polygon->getLineWidth().toPx() / 2;
         boundingRect = boundingRect.united(polygonPath.boundingRect().adjusted(-w, -w, w, w));
