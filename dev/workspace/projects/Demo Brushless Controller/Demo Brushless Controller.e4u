@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes'?>
 <project version="0">
     <meta>
-        <name>Demo Brushless Controller</name>
-        <author>Homer Simpson</author>
+        <name>Demo Brushless Controller Project</name>
+        <author>U. Bruhin</author>
         <created>2013-04-13T12:43:52Z</created>
-        <last_modified>2015-03-08T22:49:34Z</last_modified>
+        <last_modified>2015-03-11T21:42:08Z</last_modified>
     </meta>
 </project>
