@@ -47,6 +47,7 @@ Symbol::Symbol(const FilePath& xmlFilePath) throw (Exception) :
     }
     catch (Exception& e)
     {
+        qDeleteAll(mEllipses);      mEllipses.clear();
         qDeleteAll(mTexts);         mTexts.clear();
         qDeleteAll(mPolygons);      mPolygons.clear();
         qDeleteAll(mPins);          mPins.clear();
@@ -56,6 +57,7 @@ Symbol::Symbol(const FilePath& xmlFilePath) throw (Exception) :
 
 Symbol::~Symbol() noexcept
 {
+    qDeleteAll(mEllipses);      mEllipses.clear();
     qDeleteAll(mTexts);         mTexts.clear();
     qDeleteAll(mPolygons);      mPolygons.clear();
     qDeleteAll(mPins);          mPins.clear();
@@ -141,6 +143,10 @@ void Symbol::parseDomTree(const XmlDomElement& root) throw (Exception)
         {
             mTexts.append(new SymbolText(*node));
         }
+        else if (node->getName() == "ellipse")
+        {
+            mEllipses.append(new SymbolEllipse(*node));
+        }
         else
         {
             throw RuntimeError(__FILE__, __LINE__, node->getName(),
@@ -158,6 +164,8 @@ XmlDomElement* Symbol::serializeToXmlDomElement() const throw (Exception)
         geometry->appendChild(polygon->serializeToXmlDomElement());
     foreach (const SymbolText* text, mTexts)
         geometry->appendChild(text->serializeToXmlDomElement());
+    foreach (const SymbolEllipse* ellipse, mEllipses)
+        geometry->appendChild(ellipse->serializeToXmlDomElement());
     XmlDomElement* pins = root->appendChild("pins");
     foreach (const SymbolPin* pin, mPins)
         pins->appendChild(pin->serializeToXmlDomElement());
@@ -167,7 +175,8 @@ XmlDomElement* Symbol::serializeToXmlDomElement() const throw (Exception)
 bool Symbol::checkAttributesValidity() const noexcept
 {
     if (!LibraryElement::checkAttributesValidity())                 return false;
-    if (mPins.isEmpty() && mTexts.isEmpty() && mPolygons.isEmpty()) return false;
+    if (mPins.isEmpty() && mTexts.isEmpty() &&
+        mPolygons.isEmpty() && mEllipses.isEmpty())                 return false;
     return true;
 }
 
