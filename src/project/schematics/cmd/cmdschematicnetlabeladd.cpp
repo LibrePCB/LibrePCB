@@ -41,7 +41,7 @@ CmdSchematicNetLabelAdd::CmdSchematicNetLabelAdd(Schematic& schematic, NetSignal
 
 CmdSchematicNetLabelAdd::~CmdSchematicNetLabelAdd() noexcept
 {
-    if ((mNetLabel) && (!mIsExecuted))
+    if ((mNetLabel) && (!isExecuted()))
         delete mNetLabel;
 }
 

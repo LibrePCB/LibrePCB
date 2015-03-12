@@ -41,7 +41,7 @@ CmdNetSignalAdd::CmdNetSignalAdd(Circuit& circuit, NetClass& netclass,
 
 CmdNetSignalAdd::~CmdNetSignalAdd() noexcept
 {
-    if (!mIsExecuted)
+    if (!isExecuted())
         delete mNetSignal;
 }
 

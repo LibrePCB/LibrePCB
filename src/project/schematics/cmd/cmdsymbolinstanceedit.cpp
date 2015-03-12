@@ -22,8 +22,8 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "cmdschematicnetlabeledit.h"
-#include "../schematicnetlabel.h"
+#include "cmdsymbolinstanceedit.h"
+#include "../symbolinstance.h"
 
 namespace project {
 
@@ -31,67 +31,56 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSchematicNetLabelEdit::CmdSchematicNetLabelEdit(SchematicNetLabel& netlabel,
-                                                   UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Edit netlabel"), parent), mNetLabel(netlabel),
-    mOldNetSignal(&netlabel.getNetSignal()), mNewNetSignal(mOldNetSignal),
-    mOldPos(netlabel.getPosition()), mNewPos(mOldPos),
-    mOldRotation(netlabel.getAngle()), mNewRotation(mOldRotation)
+CmdSymbolInstanceEdit::CmdSymbolInstanceEdit(SymbolInstance& symbol, UndoCommand* parent) throw (Exception) :
+    UndoCommand(tr("Edit symbol instance"), parent), mSymbolInstance(symbol),
+    mOldPos(symbol.getPosition()), mNewPos(mOldPos),
+    mOldRotation(symbol.getAngle()), mNewRotation(mOldRotation)
 {
 }
 
-CmdSchematicNetLabelEdit::~CmdSchematicNetLabelEdit() noexcept
+CmdSymbolInstanceEdit::~CmdSymbolInstanceEdit() noexcept
 {
     if ((mRedoCount == 0) && (mUndoCount == 0))
     {
-        // revert temporary changes
-        mNetLabel.setNetSignal(*mOldNetSignal);
-        mNetLabel.setPosition(mOldPos);
-        mNetLabel.setAngle(mOldRotation);
+        mSymbolInstance.setPosition(mOldPos);
+        mSymbolInstance.setAngle(mOldRotation);
     }
 }
 
 /*****************************************************************************************
- *  Setters
+ *  General Methods
  ****************************************************************************************/
 
-void CmdSchematicNetLabelEdit::setNetSignal(NetSignal& netsignal, bool immediate) noexcept
+void CmdSymbolInstanceEdit::setPosition(Point& pos, bool immediate) noexcept
 {
     Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
-    mNewNetSignal = &netsignal;
-    if (immediate) mNetLabel.setNetSignal(*mNewNetSignal);
+    mNewPos = pos;
+    if (immediate) mSymbolInstance.setPosition(mNewPos);
 }
 
-void CmdSchematicNetLabelEdit::setPosition(const Point& position, bool immediate) noexcept
-{
-    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
-    mNewPos = position;
-    if (immediate) mNetLabel.setPosition(mNewPos);
-}
-
-void CmdSchematicNetLabelEdit::setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept
+void CmdSymbolInstanceEdit::setDeltaToStartPos(Point& deltaPos, bool immediate) noexcept
 {
     Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
     mNewPos = mOldPos + deltaPos;
-    if (immediate) mNetLabel.setPosition(mNewPos);
+    if (immediate) mSymbolInstance.setPosition(mNewPos);
 }
 
-void CmdSchematicNetLabelEdit::setRotation(const Angle& angle, bool immediate) noexcept
+void CmdSymbolInstanceEdit::setRotation(const Angle& angle, bool immediate) noexcept
 {
     Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
     mNewRotation = angle;
-    if (immediate) mNetLabel.setAngle(mNewRotation);
+    if (immediate) mSymbolInstance.setAngle(mNewRotation);
 }
 
-void CmdSchematicNetLabelEdit::rotate(const Angle& angle, const Point& center, bool immediate) noexcept
+void CmdSymbolInstanceEdit::rotate(const Angle& angle, const Point& center, bool immediate) noexcept
 {
     Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
     mNewPos.rotate(angle, center);
     mNewRotation += angle;
     if (immediate)
     {
-        mNetLabel.setPosition(mNewPos);
-        mNetLabel.setAngle(mNewRotation);
+        mSymbolInstance.setPosition(mNewPos);
+        mSymbolInstance.setAngle(mNewRotation);
     }
 }
 
@@ -99,38 +88,34 @@ void CmdSchematicNetLabelEdit::rotate(const Angle& angle, const Point& center, b
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdSchematicNetLabelEdit::redo() throw (Exception)
+void CmdSymbolInstanceEdit::redo() throw (Exception)
 {
     try
     {
-        mNetLabel.setNetSignal(*mNewNetSignal);
-        mNetLabel.setPosition(mNewPos);
-        mNetLabel.setAngle(mNewRotation);
+        mSymbolInstance.setPosition(mNewPos);
+        mSymbolInstance.setAngle(mNewRotation);
         UndoCommand::redo();
     }
-    catch (Exception& e)
+    catch (Exception &e)
     {
-        mNetLabel.setNetSignal(*mOldNetSignal);
-        mNetLabel.setPosition(mOldPos);
-        mNetLabel.setAngle(mOldRotation);
+        mSymbolInstance.setPosition(mOldPos);
+        mSymbolInstance.setAngle(mOldRotation);
         throw;
     }
 }
 
-void CmdSchematicNetLabelEdit::undo() throw (Exception)
+void CmdSymbolInstanceEdit::undo() throw (Exception)
 {
     try
     {
-        mNetLabel.setNetSignal(*mOldNetSignal);
-        mNetLabel.setPosition(mOldPos);
-        mNetLabel.setAngle(mOldRotation);
+        mSymbolInstance.setPosition(mOldPos);
+        mSymbolInstance.setAngle(mOldRotation);
         UndoCommand::undo();
     }
-    catch (Exception& e)
+    catch (Exception &e)
     {
-        mNetLabel.setNetSignal(*mNewNetSignal);
-        mNetLabel.setPosition(mNewPos);
-        mNetLabel.setAngle(mNewRotation);
+        mSymbolInstance.setPosition(mNewPos);
+        mSymbolInstance.setAngle(mNewRotation);
         throw;
     }
 }

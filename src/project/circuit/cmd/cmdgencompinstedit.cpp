@@ -22,9 +22,9 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "cmdnetclasssetname.h"
-#include "../netclass.h"
+#include "cmdgencompinstedit.h"
 #include "../circuit.h"
+#include "../gencompinstance.h"
 
 namespace project {
 
@@ -32,47 +32,66 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdNetClassSetName::CmdNetClassSetName(Circuit& circuit, NetClass& netclass, const QString& newName,
-                               UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Rename netclass"), parent),
-    mCircuit(circuit), mNetClass(netclass), mOldName(netclass.getName()), mNewName(newName)
+CmdGenCompInstEdit::CmdGenCompInstEdit(Circuit& circuit, GenCompInstance& genComp,
+                                       UndoCommand* parent) throw (Exception) :
+    UndoCommand(tr("Edit Component"), parent), mCircuit(circuit), mGenCompInstance(genComp),
+    mOldName(genComp.getName()), mNewName(mOldName),
+    mOldValue(genComp.getValue()), mNewValue(mOldValue)
 {
 }
 
-CmdNetClassSetName::~CmdNetClassSetName() noexcept
+CmdGenCompInstEdit::~CmdGenCompInstEdit() noexcept
 {
+}
+
+/*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
+
+void CmdGenCompInstEdit::setName(const QString& name) noexcept
+{
+    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    mNewName = name;
+}
+
+void CmdGenCompInstEdit::setValue(const QString& value) noexcept
+{
+    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    mNewValue = value;
 }
 
 /*****************************************************************************************
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdNetClassSetName::redo() throw (Exception)
+void CmdGenCompInstEdit::redo() throw (Exception)
 {
-    mCircuit.setNetClassName(mNetClass, mNewName); // throws an exception on error
-
     try
     {
-        UndoCommand::redo(); // throws an exception on error
+        mCircuit.setGenCompInstanceName(mGenCompInstance, mNewName);
+        mGenCompInstance.setValue(mNewValue);
+        UndoCommand::redo();
     }
     catch (Exception &e)
     {
-        mCircuit.setNetClassName(mNetClass, mOldName);
+        mCircuit.setGenCompInstanceName(mGenCompInstance, mOldName);
+        mGenCompInstance.setValue(mOldValue);
         throw;
     }
 }
 
-void CmdNetClassSetName::undo() throw (Exception)
+void CmdGenCompInstEdit::undo() throw (Exception)
 {
-    mCircuit.setNetClassName(mNetClass, mOldName); // throws an exception on error
-
     try
     {
+        mCircuit.setGenCompInstanceName(mGenCompInstance, mOldName);
+        mGenCompInstance.setValue(mOldValue);
         UndoCommand::undo();
     }
     catch (Exception& e)
     {
-        mCircuit.setNetClassName(mNetClass, mNewName);
+        mCircuit.setGenCompInstanceName(mGenCompInstance, mNewName);
+        mGenCompInstance.setValue(mNewValue);
         throw;
     }
 }

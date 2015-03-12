@@ -32,9 +32,8 @@
 #include "../project.h"
 #include "../../common/undostack.h"
 #include "../../common/undocommand.h"
-#include "../circuit/cmd/cmdgencompinstsetname.h"
-#include "cmd/cmdsymbolinstancemove.h"
-#include "../circuit/cmd/cmdgencompinstsetvalue.h"
+#include "../circuit/cmd/cmdgencompinstedit.h"
+#include "cmd/cmdsymbolinstanceedit.h"
 #include "../circuit/gencompattributeinstance.h"
 
 namespace project {
@@ -131,14 +130,15 @@ bool SymbolInstancePropertiesDialog::applyChanges() noexcept
         QString name = mUi->edtGenCompInstName->text();
         if (name != mGenCompInstance.getName())
         {
-            CmdGenCompInstSetName* cmd = new CmdGenCompInstSetName(mProject.getCircuit(),
-                                                                   mGenCompInstance, name);
+            auto cmd = new CmdGenCompInstEdit(mProject.getCircuit(), mGenCompInstance);
+            cmd->setName(name);
             execCmd(cmd);
         }
         QString value = mUi->edtGenCompInstValue->toPlainText();
         if (value != mGenCompInstance.getValue())
         {
-            CmdGenCompInstSetValue* cmd = new CmdGenCompInstSetValue(mGenCompInstance, value);
+            auto cmd = new CmdGenCompInstEdit(mProject.getCircuit(), mGenCompInstance);
+            cmd->setValue(value);
             execCmd(cmd);
         }
 
@@ -149,15 +149,15 @@ bool SymbolInstancePropertiesDialog::applyChanges() noexcept
         Point pos(x, y);
         if (pos != mSymbolInstance.getPosition())
         {
-            CmdSymbolInstanceMove* cmd = new CmdSymbolInstanceMove(mSymbolInstance);
-            cmd->setAbsolutePosTemporary(pos);
+            CmdSymbolInstanceEdit* cmd = new CmdSymbolInstanceEdit(mSymbolInstance);
+            cmd->setPosition(pos, false);
             execCmd(cmd);
         }
         Angle angle = Angle::fromDeg(mUi->spbxSymbInstAngle->value());
         if (angle != mSymbolInstance.getAngle())
         {
-            CmdSymbolInstanceMove* cmd = new CmdSymbolInstanceMove(mSymbolInstance);
-            cmd->setAngleTemporary(angle);
+            CmdSymbolInstanceEdit* cmd = new CmdSymbolInstanceEdit(mSymbolInstance);
+            cmd->setRotation(angle, false);
             execCmd(cmd);
         }
 

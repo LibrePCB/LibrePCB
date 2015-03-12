@@ -17,8 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDSCHEMATICNETLABELMOVE_H
-#define PROJECT_CMDSCHEMATICNETLABELMOVE_H
+#ifndef PROJECT_CMDGENCOMPINSTEDIT_H
+#define PROJECT_CMDGENCOMPINSTEDIT_H
+
 
 /*****************************************************************************************
  *  Includes
@@ -27,56 +28,60 @@
 #include <QtCore>
 #include "../../../common/undocommand.h"
 #include "../../../common/exceptions.h"
-#include "../../../common/units/all_length_units.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
 namespace project {
-class SchematicNetLabel;
+class Circuit;
+class GenCompInstance;
+}
+
+namespace library {
+class GenericComponent;
+class GenCompSymbVar;
 }
 
 /*****************************************************************************************
- *  Class CmdSchematicNetLabelMove
+ *  Class CmdGenCompInstEdit
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The CmdSchematicNetLabelMove class
+ * @brief The CmdGenCompInstEdit class
  */
-class CmdSchematicNetLabelMove final : public UndoCommand
+class CmdGenCompInstEdit final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdSchematicNetLabelMove(SchematicNetLabel& netlabel, UndoCommand* parent = 0) throw (Exception);
-        ~CmdSchematicNetLabelMove() noexcept;
+        explicit CmdGenCompInstEdit(Circuit& circuit, GenCompInstance& genComp,
+                                    UndoCommand* parent = 0) throw (Exception);
+        ~CmdGenCompInstEdit() noexcept;
 
-        // General Methods
-        void setAbsolutePos(const Point& absPos) noexcept;
-        void setDeltaToStartPos(const Point& deltaPos) noexcept;
-        void setAngle(const Angle& angle) noexcept;
-        void rotate(const Angle& angle, const Point& center) noexcept;
+        // Setters
+        void setName(const QString& name) noexcept;
+        void setValue(const QString& value) noexcept;
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;
         void undo() throw (Exception) override;
 
-
     private:
 
-        SchematicNetLabel& mNetLabel;
-        Point mStartPos;
-        Point mDeltaPos;
-        Point mEndPos;
-        Angle mStartAngle;
-        Angle mDeltaAngle;
-        Angle mEndAngle;
-        bool mRedoOrUndoCalled;
+        // Attributes from the constructor
+        Circuit& mCircuit;
+        GenCompInstance& mGenCompInstance;
+
+        // Misc
+        QString mOldName;
+        QString mNewName;
+        QString mOldValue;
+        QString mNewValue;
 };
 
 } // namespace project
 
-#endif // PROJECT_CMDSCHEMATICNETLABELMOVE_H
+#endif // PROJECT_CMDGENCOMPINSTEDIT_H

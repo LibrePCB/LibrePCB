@@ -29,9 +29,8 @@
 #include "../schematicnetpoint.h"
 #include "../schematic.h"
 #include "../../../library/symbolgraphicsitem.h"
-#include "../cmd/cmdsymbolinstancemove.h"
+#include "../cmd/cmdsymbolinstanceedit.h"
 #include "../../../common/undostack.h"
-#include "../cmd/cmdschematicnetpointmove.h"
 #include "../schematicnetline.h"
 #include "../symbolinstance.h"
 #include "../cmd/cmdsymbolinstanceremove.h"
@@ -46,12 +45,11 @@
 #include "../schematicnetlabel.h"
 #include "../../circuit/netsignal.h"
 #include "../../circuit/circuit.h"
-#include "../../circuit/cmd/cmdnetsignalsetname.h"
+#include "../../circuit/cmd/cmdnetsignaledit.h"
 #include "../../circuit/cmd/cmdnetsignaladd.h"
 #include "../../circuit/cmd/cmdgencompsiginstsetnetsignal.h"
-#include "../cmd/cmdschematicnetpointsetnetsignal.h"
+#include "../cmd/cmdschematicnetpointedit.h"
 #include "../../circuit/cmd/cmdnetsignalremove.h"
-#include "../cmd/cmdschematicnetlabelmove.h"
 #include "../cmd/cmdschematicnetlabeledit.h"
 #include "../schematicclipboard.h"
 #include "../cmd/cmdsymbolinstanceadd.h"
@@ -72,8 +70,8 @@ SES_Select::~SES_Select()
 {
     try
     {
-        qDeleteAll(mSymbolMoveCmds);    mSymbolMoveCmds.clear();
-        qDeleteAll(mNetPointMoveCmds);  mNetPointMoveCmds.clear();
+        qDeleteAll(mSymbolEditCmds);    mSymbolEditCmds.clear();
+        qDeleteAll(mNetPointEditCmds);  mNetPointEditCmds.clear();
         delete mParentCommand;          mParentCommand = nullptr;
     }
     catch (Exception& e)
@@ -325,13 +323,14 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneDoubleClick(QGraphicsSceneMous
                             }
                             foreach (SchematicNetPoint* point, netsignal.getNetPoints())
                             {
-                                auto cmd = new CmdSchematicNetPointSetNetSignal(*point, *newSignal);
+                                auto cmd = new CmdSchematicNetPointEdit(*point);
+                                cmd->setNetSignal(*newSignal);
                                 mProject.getUndoStack().appendToCommand(cmd);
                             }
                             foreach (SchematicNetLabel* label, netsignal.getNetLabels())
                             {
                                 auto cmd = new CmdSchematicNetLabelEdit(*label);
-                                cmd->setNetSignal(*newSignal);
+                                cmd->setNetSignal(*newSignal, false);
                                 mProject.getUndoStack().appendToCommand(cmd);
                             }
                             auto cmd = new CmdNetSignalRemove(mProject.getCircuit(), netsignal);
@@ -341,7 +340,8 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneDoubleClick(QGraphicsSceneMous
                         }
                         else
                         {
-                            CmdNetSignalSetName* cmd = new CmdNetSignalSetName(mCircuit, netsignal, name, false);
+                            auto cmd = new CmdNetSignalEdit(mCircuit, netsignal);
+                            cmd->setName(name, false);
                             mProject.getUndoStack().execCmd(cmd);
                         }
                     }
@@ -393,12 +393,12 @@ SES_Base::ProcRetVal SES_Select::processSubStateMovingSceneEvent(SEE_Base* event
                     Q_CHECK_PTR(mParentCommand);
 
                     // move selected elements
-                    foreach (CmdSymbolInstanceMove* cmd, mSymbolMoveCmds)
-                        cmd->setDeltaToStartPosTemporary(delta);
-                    foreach (CmdSchematicNetPointMove* cmd, mNetPointMoveCmds)
-                        cmd->setDeltaToStartPosTemporary(delta);
-                    foreach (CmdSchematicNetLabelMove* cmd, mNetLabelMoveCmds)
-                        cmd->setDeltaToStartPos(delta);
+                    foreach (CmdSymbolInstanceEdit* cmd, mSymbolEditCmds)
+                        cmd->setDeltaToStartPos(delta, false);
+                    foreach (CmdSchematicNetPointEdit* cmd, mNetPointEditCmds)
+                        cmd->setDeltaToStartPos(delta, false);
+                    foreach (CmdSchematicNetLabelEdit* cmd, mNetLabelEditCmds)
+                        cmd->setDeltaToStartPos(delta, false);
 
                     // set position of all selected elements permanent
                     try
@@ -418,9 +418,9 @@ SES_Base::ProcRetVal SES_Select::processSubStateMovingSceneEvent(SEE_Base* event
                     {
                         QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
                     }
-                    mSymbolMoveCmds.clear();
-                    mNetPointMoveCmds.clear();
-                    mNetLabelMoveCmds.clear();
+                    mSymbolEditCmds.clear();
+                    mNetPointEditCmds.clear();
+                    mNetLabelEditCmds.clear();
                     mParentCommand = nullptr;
                     mSubState = SubState_Idle;
                     break;
@@ -446,12 +446,12 @@ SES_Base::ProcRetVal SES_Select::processSubStateMovingSceneEvent(SEE_Base* event
             if (delta == mLastMouseMoveDeltaPos) break; // do not move any items
 
             // move selected elements
-            foreach (CmdSymbolInstanceMove* cmd, mSymbolMoveCmds)
-                cmd->setDeltaToStartPosTemporary(delta);
-            foreach (CmdSchematicNetPointMove* cmd, mNetPointMoveCmds)
-                cmd->setDeltaToStartPosTemporary(delta);
-            foreach (CmdSchematicNetLabelMove* cmd, mNetLabelMoveCmds)
-                cmd->setDeltaToStartPos(delta);
+            foreach (CmdSymbolInstanceEdit* cmd, mSymbolEditCmds)
+                cmd->setDeltaToStartPos(delta, true);
+            foreach (CmdSchematicNetPointEdit* cmd, mNetPointEditCmds)
+                cmd->setDeltaToStartPos(delta, true);
+            foreach (CmdSchematicNetLabelEdit* cmd, mNetLabelEditCmds)
+                cmd->setDeltaToStartPos(delta, true);
 
             mLastMouseMoveDeltaPos = delta;
             break;
@@ -490,16 +490,16 @@ bool SES_Select::startMovingSelectedItems(Schematic* schematic) noexcept
 
     // create move commands for all selected items
     Q_ASSERT(!mParentCommand);
-    Q_ASSERT(mSymbolMoveCmds.isEmpty());
-    Q_ASSERT(mNetPointMoveCmds.isEmpty());
-    Q_ASSERT(mNetLabelMoveCmds.isEmpty());
+    Q_ASSERT(mSymbolEditCmds.isEmpty());
+    Q_ASSERT(mNetPointEditCmds.isEmpty());
+    Q_ASSERT(mNetLabelEditCmds.isEmpty());
     mParentCommand = new UndoCommand(tr("Move Schematic Items"));
     foreach (SymbolInstance* instance, symbols)
-        mSymbolMoveCmds.append(new CmdSymbolInstanceMove(*instance, mParentCommand));
+        mSymbolEditCmds.append(new CmdSymbolInstanceEdit(*instance, mParentCommand));
     foreach (SchematicNetPoint* point, netpoints)
-        mNetPointMoveCmds.append(new CmdSchematicNetPointMove(*point, mParentCommand));
+        mNetPointEditCmds.append(new CmdSchematicNetPointEdit(*point, mParentCommand));
     foreach (SchematicNetLabel* label, netlabels)
-        mNetLabelMoveCmds.append(new CmdSchematicNetLabelMove(*label, mParentCommand));
+        mNetLabelEditCmds.append(new CmdSchematicNetLabelEdit(*label, mParentCommand));
 
     // switch to substate SubState_Moving
     mSubState = SubState_Moving;
@@ -546,16 +546,16 @@ bool SES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
         // rotate all symbols
         foreach (SymbolInstance* symbol, symbols)
         {
-            CmdSymbolInstanceMove* cmd = new CmdSymbolInstanceMove(*symbol);
-            cmd->rotate(angle, center);
+            CmdSymbolInstanceEdit* cmd = new CmdSymbolInstanceEdit(*symbol);
+            cmd->rotate(angle, center, false);
             mEditor.getProject().getUndoStack().appendToCommand(cmd);
         }
 
         // rotate all netpoints
         foreach (SchematicNetPoint* point, netpoints)
         {
-            CmdSchematicNetPointMove* cmd = new CmdSchematicNetPointMove(*point);
-            cmd->setAbsolutePosTemporary(point->getPosition().rotated(angle, center));
+            CmdSchematicNetPointEdit* cmd = new CmdSchematicNetPointEdit(*point);
+            cmd->setPosition(point->getPosition().rotated(angle, center), false);
             mEditor.getProject().getUndoStack().appendToCommand(cmd);
         }
 

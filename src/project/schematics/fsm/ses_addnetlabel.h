@@ -34,7 +34,6 @@
 namespace project {
 class Schematic;
 class SchematicNetLabel;
-class CmdSchematicNetLabelMove;
 class CmdSchematicNetLabelEdit;
 }
 
@@ -76,7 +75,6 @@ class SES_AddNetLabel final : public SES_Base
         bool mUndoCmdActive;
         SchematicNetLabel* mCurrentNetLabel;
         CmdSchematicNetLabelEdit* mEditCmd;
-        CmdSchematicNetLabelMove* mMoveCmd;
 };
 
 } // namespace project

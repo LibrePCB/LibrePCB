@@ -87,6 +87,7 @@ NetSignal::~NetSignal() noexcept
 
 void NetSignal::setName(const QString& name, bool isAutoName) throw (Exception)
 {
+    if ((name == mName) && (isAutoName == mHasAutoName)) return;
     // the name must not be empty!
     if(name.isEmpty())
     {

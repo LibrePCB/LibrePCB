@@ -27,6 +27,7 @@
 #include <QtCore>
 #include "../../../common/undocommand.h"
 #include "../../../common/exceptions.h"
+#include "../../../common/units/all_length_units.h"
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -54,8 +55,12 @@ class CmdSchematicNetLabelEdit final : public UndoCommand
         explicit CmdSchematicNetLabelEdit(SchematicNetLabel& netlabel, UndoCommand* parent = 0) throw (Exception);
         ~CmdSchematicNetLabelEdit() noexcept;
 
-        // General Methods
-        void setNetSignal(NetSignal& netsignal) noexcept;
+        // Setters
+        void setNetSignal(NetSignal& netsignal, bool immediate) noexcept;
+        void setPosition(const Point& position, bool immediate) noexcept;
+        void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
+        void setRotation(const Angle& angle, bool immediate) noexcept;
+        void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;
@@ -64,11 +69,16 @@ class CmdSchematicNetLabelEdit final : public UndoCommand
 
     private:
 
+        // Attributes from the constructor
         SchematicNetLabel& mNetLabel;
-        bool mRedoOrUndoCalled;
 
-        NetSignal* mNetSignalOld;
-        NetSignal* mNetSignalNew;
+        // Misc
+        NetSignal* mOldNetSignal;
+        NetSignal* mNewNetSignal;
+        Point mOldPos;
+        Point mNewPos;
+        Angle mOldRotation;
+        Angle mNewRotation;
 };
 
 } // namespace project

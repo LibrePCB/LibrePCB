@@ -69,6 +69,7 @@ NetClass::~NetClass() noexcept
 
 void NetClass::setName(const QString& name) throw (Exception)
 {
+    if (name == mName) return;
     if (name.isEmpty())
     {
         throw RuntimeError(__FILE__, __LINE__, QString(),

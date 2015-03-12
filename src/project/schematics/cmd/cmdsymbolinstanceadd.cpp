@@ -53,7 +53,7 @@ CmdSymbolInstanceAdd::CmdSymbolInstanceAdd(SymbolInstance& symbol, UndoCommand* 
 
 CmdSymbolInstanceAdd::~CmdSymbolInstanceAdd() noexcept
 {
-    if (!mIsExecuted)
+    if (!isExecuted())
         delete mSymbolInstance;
 }
 

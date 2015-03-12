@@ -17,66 +17,66 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef PROJECT_CMDSCHEMATICNETPOINTEDIT_H
+#define PROJECT_CMDSCHEMATICNETPOINTEDIT_H
+
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include "cmdschematicnetpointsetnetsignal.h"
-#include "../schematicnetpoint.h"
+#include "../../../common/undocommand.h"
+#include "../../../common/exceptions.h"
+#include "../../../common/units/point.h"
+
+/*****************************************************************************************
+ *  Forward Declarations
+ ****************************************************************************************/
+
+namespace project {
+class SchematicNetPoint;
+class NetSignal;
+}
+
+/*****************************************************************************************
+ *  Class CmdSchematicNetPointEdit
+ ****************************************************************************************/
 
 namespace project {
 
-/*****************************************************************************************
- *  Constructors / Destructor
- ****************************************************************************************/
-
-CmdSchematicNetPointSetNetSignal::CmdSchematicNetPointSetNetSignal(SchematicNetPoint& point, NetSignal& netsignal, UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Change netpoint netsignal"), parent),
-    mNetPoint(point), mNetSignal(netsignal), mOldNetSignal(*point.getNetSignal())
+/**
+ * @brief The CmdSchematicNetPointEdit class
+ */
+class CmdSchematicNetPointEdit final : public UndoCommand
 {
-}
+    public:
 
-CmdSchematicNetPointSetNetSignal::~CmdSchematicNetPointSetNetSignal() noexcept
-{
-}
+        // Constructors / Destructor
+        explicit CmdSchematicNetPointEdit(SchematicNetPoint& point, UndoCommand* parent = 0) throw (Exception);
+        ~CmdSchematicNetPointEdit() noexcept;
 
-/*****************************************************************************************
- *  Inherited from UndoCommand
- ****************************************************************************************/
+        // Setters
+        void setNetSignal(NetSignal& netsignal) noexcept;
+        void setPosition(const Point& pos, bool immediate) noexcept;
+        void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
 
-void CmdSchematicNetPointSetNetSignal::redo() throw (Exception)
-{
-    mNetPoint.setNetSignal(mNetSignal); // throws an exception on error
+        // Inherited from UndoCommand
+        void redo() throw (Exception) override;
+        void undo() throw (Exception) override;
 
-    try
-    {
-        UndoCommand::redo(); // throws an exception on error
-    }
-    catch (Exception &e)
-    {
-        mNetPoint.setNetSignal(mOldNetSignal);
-        throw;
-    }
-}
 
-void CmdSchematicNetPointSetNetSignal::undo() throw (Exception)
-{
-    mNetPoint.setNetSignal(mOldNetSignal); // throws an exception on error
+    private:
 
-    try
-    {
-        UndoCommand::undo();
-    }
-    catch (Exception& e)
-    {
-        mNetPoint.setNetSignal(mNetSignal);
-        throw;
-    }
-}
+        // Attributes from the constructor
+        SchematicNetPoint& mNetPoint;
 
-/*****************************************************************************************
- *  End of File
- ****************************************************************************************/
+        // General Attributes
+        NetSignal* mOldNetSignal;
+        NetSignal* mNewNetSignal;
+        Point mOldPos;
+        Point mNewPos;
+};
 
 } // namespace project
+
+#endif // PROJECT_CMDSCHEMATICNETPOINTEDIT_H

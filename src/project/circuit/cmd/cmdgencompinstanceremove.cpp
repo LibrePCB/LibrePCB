@@ -42,7 +42,7 @@ CmdGenCompInstanceRemove::CmdGenCompInstanceRemove(Circuit& circuit,
 
 CmdGenCompInstanceRemove::~CmdGenCompInstanceRemove() noexcept
 {
-    if (mIsExecuted)
+    if (isExecuted())
         delete &mGenCompInstance;
 }
 

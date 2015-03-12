@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDGENCOMPINSTSETVALUE_H
-#define PROJECT_CMDGENCOMPINSTSETVALUE_H
+#ifndef PROJECT_CMDSYMBOLINSTANCEEDIT_H
+#define PROJECT_CMDSYMBOLINSTANCEEDIT_H
 
 /*****************************************************************************************
  *  Includes
@@ -27,53 +27,56 @@
 #include <QtCore>
 #include "../../../common/undocommand.h"
 #include "../../../common/exceptions.h"
+#include "../../../common/units/all_length_units.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
 namespace project {
-class Circuit;
-class GenCompInstance;
-}
-
-namespace library {
-class GenericComponent;
-class GenCompSymbVar;
+class SymbolInstance;
 }
 
 /*****************************************************************************************
- *  Class CmdGenCompInstSetValue
+ *  Class CmdSymbolInstanceEdit
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The CmdGenCompInstSetValue class
+ * @brief The CmdSymbolInstanceEdit class
  */
-class CmdGenCompInstSetValue final : public UndoCommand
+class CmdSymbolInstanceEdit final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdGenCompInstSetValue(GenCompInstance& genComp, const QString& newValue,
-                                        UndoCommand* parent = 0) throw (Exception);
-        ~CmdGenCompInstSetValue() noexcept;
+        explicit CmdSymbolInstanceEdit(SymbolInstance& symbol, UndoCommand* parent = 0) throw (Exception);
+        ~CmdSymbolInstanceEdit() noexcept;
+
+        // General Methods
+        void setPosition(Point& pos, bool immediate) noexcept;
+        void setDeltaToStartPos(Point& deltaPos, bool immediate) noexcept;
+        void setRotation(const Angle& angle, bool immediate) noexcept;
+        void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;
         void undo() throw (Exception) override;
 
+
     private:
 
         // Attributes from the constructor
-        GenCompInstance& mGenCompInstance;
+        SymbolInstance& mSymbolInstance;
 
-        // Misc
-        QString mOldValue;
-        QString mNewValue;
+        // General Attributes
+        Point mOldPos;
+        Point mNewPos;
+        Angle mOldRotation;
+        Angle mNewRotation;
 };
 
 } // namespace project
 
-#endif // PROJECT_CMDGENCOMPINSTSETVALUE_H
+#endif // PROJECT_CMDSYMBOLINSTANCEEDIT_H

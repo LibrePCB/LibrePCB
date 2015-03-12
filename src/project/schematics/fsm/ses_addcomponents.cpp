@@ -32,7 +32,7 @@
 #include "../../../common/undostack.h"
 #include "../cmd/cmdsymbolinstanceadd.h"
 #include "../../circuit/gencompinstance.h"
-#include "../cmd/cmdsymbolinstancemove.h"
+#include "../cmd/cmdsymbolinstanceedit.h"
 #include "../symbolinstance.h"
 #include "../schematic.h"
 #include "../../dialogs/addgencompdialog.h"
@@ -47,7 +47,7 @@ SES_AddComponents::SES_AddComponents(SchematicEditor& editor, Ui::SchematicEdito
     SES_Base(editor, editorUi),
     mIsUndoCmdActive(false), mAddGenCompDialog(nullptr), mLastAngle(0),
     mGenComp(nullptr), mGenCompSymbVar(nullptr), mCurrentSymbVarItem(nullptr),
-    mCurrentSymbolToPlace(nullptr), mCurrentSymboleMoveCommand(nullptr)
+    mCurrentSymbolToPlace(nullptr), mCurrentSymbolEditCommand(nullptr)
 {
 }
 
@@ -106,10 +106,10 @@ SES_Base::ProcRetVal SES_AddComponents::process(SEE_Base* event) noexcept
             return PassToParentState;
         }
         case SEE_Base::Edit_RotateCW:
-            mCurrentSymboleMoveCommand->rotate(Angle::deg90(), mCurrentSymbolToPlace->getPosition());
+            mCurrentSymbolEditCommand->rotate(Angle::deg90(), mCurrentSymbolToPlace->getPosition(), true);
             return ForceStayInState;
         case SEE_Base::Edit_RotateCCW:
-            mCurrentSymboleMoveCommand->rotate(-Angle::deg90(), mCurrentSymbolToPlace->getPosition());
+            mCurrentSymbolEditCommand->rotate(-Angle::deg90(), mCurrentSymbolToPlace->getPosition(), true);
             return ForceStayInState;
         case SEE_Base::SchematicSceneEvent:
             return processSceneEvent(event);
@@ -184,8 +184,8 @@ SES_Base::ProcRetVal SES_AddComponents::processSceneEvent(SEE_Base* event) noexc
             Q_ASSERT(sceneEvent);
             Point pos = Point::fromPx(sceneEvent->scenePos(), mEditorUi.graphicsView->getGridInterval());
             // set temporary position of the current symbol
-            Q_ASSERT(mCurrentSymboleMoveCommand);
-            mCurrentSymboleMoveCommand->setAbsolutePosTemporary(pos);
+            Q_ASSERT(mCurrentSymbolEditCommand);
+            mCurrentSymbolEditCommand->setPosition(pos, true);
             break;
         }
 
@@ -202,9 +202,9 @@ SES_Base::ProcRetVal SES_AddComponents::processSceneEvent(SEE_Base* event) noexc
                     try
                     {
                         // place the current symbol finally
-                        mCurrentSymboleMoveCommand->setAbsolutePosTemporary(pos);
-                        mProject.getUndoStack().appendToCommand(mCurrentSymboleMoveCommand);
-                        mCurrentSymboleMoveCommand = nullptr;
+                        mCurrentSymbolEditCommand->setPosition(pos, false);
+                        mProject.getUndoStack().appendToCommand(mCurrentSymbolEditCommand);
+                        mCurrentSymbolEditCommand = nullptr;
                         mProject.getUndoStack().endCommand();
                         mIsUndoCmdActive = false;
                         mProject.getUndoStack().beginCommand(tr("Add Symbol to Schematic"));
@@ -225,9 +225,9 @@ SES_Base::ProcRetVal SES_AddComponents::processSceneEvent(SEE_Base* event) noexc
                             Q_ASSERT(mCurrentSymbolToPlace);
 
                             // add command to move the current symbol
-                            Q_ASSERT(mCurrentSymboleMoveCommand == nullptr);
-                            mCurrentSymboleMoveCommand = new CmdSymbolInstanceMove(*mCurrentSymbolToPlace);
-                            mCurrentSymboleMoveCommand->setAngleTemporary(mLastAngle);
+                            Q_ASSERT(mCurrentSymbolEditCommand == nullptr);
+                            mCurrentSymbolEditCommand = new CmdSymbolInstanceEdit(*mCurrentSymbolToPlace);
+                            mCurrentSymbolEditCommand->setRotation(mLastAngle, true);
                             return ForceStayInState;
                         }
                         else
@@ -254,7 +254,7 @@ SES_Base::ProcRetVal SES_AddComponents::processSceneEvent(SEE_Base* event) noexc
                 case Qt::RightButton:
                     // rotate symbol
                     mLastAngle -= Angle::deg90();
-                    mCurrentSymboleMoveCommand->setAngleTemporary(mLastAngle);
+                    mCurrentSymbolEditCommand->setRotation(mLastAngle, true);
                     return ForceStayInState;
 
                 default:
@@ -370,9 +370,9 @@ void SES_AddComponents::startAddingComponent(const QUuid& genComp,
     Q_ASSERT(mCurrentSymbolToPlace);
 
     // add command to move the current symbol
-    Q_ASSERT(mCurrentSymboleMoveCommand == nullptr);
-    mCurrentSymboleMoveCommand = new CmdSymbolInstanceMove(*mCurrentSymbolToPlace);
-    mCurrentSymboleMoveCommand->setAngleTemporary(mLastAngle);
+    Q_ASSERT(mCurrentSymbolEditCommand == nullptr);
+    mCurrentSymbolEditCommand = new CmdSymbolInstanceEdit(*mCurrentSymbolToPlace);
+    mCurrentSymbolEditCommand->setRotation(mLastAngle, true);
 }
 
 bool SES_AddComponents::abortCommand(bool showErrMsgBox) noexcept
@@ -380,8 +380,8 @@ bool SES_AddComponents::abortCommand(bool showErrMsgBox) noexcept
     try
     {
         // delete the current move command
-        delete mCurrentSymboleMoveCommand;
-        mCurrentSymboleMoveCommand = nullptr;
+        delete mCurrentSymbolEditCommand;
+        mCurrentSymbolEditCommand = nullptr;
 
         // abort the undo command
         if (mIsUndoCmdActive)

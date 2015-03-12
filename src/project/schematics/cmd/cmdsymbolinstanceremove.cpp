@@ -41,7 +41,7 @@ CmdSymbolInstanceRemove::CmdSymbolInstanceRemove(Schematic& schematic, SymbolIns
 
 CmdSymbolInstanceRemove::~CmdSymbolInstanceRemove() noexcept
 {
-    if (mIsExecuted)
+    if (isExecuted())
         delete &mSymbolInstance;
 }
 

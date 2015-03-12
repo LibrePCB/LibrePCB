@@ -194,12 +194,12 @@ uint GenCompInstance::getUnplacedOptionalSymbolsCount() const noexcept
 
 void GenCompInstance::setName(const QString& name) throw (Exception)
 {
+    if (name == mName) return;
     if(name.isEmpty())
     {
         throw RuntimeError(__FILE__, __LINE__, name,
             tr("The new component name must not be empty!"));
     }
-
     mName = name;
     updateErcMessages();
     emit attributesChanged();
@@ -207,6 +207,7 @@ void GenCompInstance::setName(const QString& name) throw (Exception)
 
 void GenCompInstance::setValue(const QString& value) noexcept
 {
+    if (value == mValue) return;
     mValue = value;
     emit attributesChanged();
 }

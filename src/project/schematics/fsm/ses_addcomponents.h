@@ -40,7 +40,7 @@ class GenCompSymbVarItem;
 namespace project {
 class GenCompInstance;
 class SymbolInstance;
-class CmdSymbolInstanceMove;
+class CmdSymbolInstanceEdit;
 class AddGenCompDialog;
 }
 
@@ -88,7 +88,7 @@ class SES_AddComponents final : public SES_Base
         const library::GenCompSymbVar* mGenCompSymbVar;
         const library::GenCompSymbVarItem* mCurrentSymbVarItem;
         SymbolInstance* mCurrentSymbolToPlace;
-        CmdSymbolInstanceMove* mCurrentSymboleMoveCommand;
+        CmdSymbolInstanceEdit* mCurrentSymbolEditCommand;
 };
 
 } // namespace project

@@ -133,7 +133,6 @@ SOURCES += \
     workspace/settings/items/wsi_projectautosaveinterval.cpp \
     workspace/settings/items/wsi_librarylocaleorder.cpp \
     project/circuit/editnetclassesdialog.cpp \
-    project/circuit/cmd/cmdnetclasssetname.cpp \
     common/dialogs/gridsettingsdialog.cpp \
     workspace/settings/items/wsi_appdefaultmeasurementunits.cpp \
     common/application.cpp \
@@ -148,16 +147,13 @@ SOURCES += \
     library/symbolpingraphicsitem.cpp \
     common/version.cpp \
     workspace/settings/items/wsi_librarynormorder.cpp \
-    project/schematics/cmd/cmdsymbolinstancemove.cpp \
     project/circuit/cmd/cmdgencompinstanceadd.cpp \
     project/schematics/cmd/cmdsymbolinstanceadd.cpp \
-    project/schematics/cmd/cmdschematicnetpointmove.cpp \
     project/circuit/cmd/cmdgencompsiginstsetnetsignal.cpp \
     project/schematics/fsm/ses_base.cpp \
     project/schematics/fsm/ses_fsm.cpp \
     project/schematics/cmd/cmdsymbolinstanceremove.cpp \
     project/schematics/cmd/cmdschematicnetpointdetach.cpp \
-    project/schematics/cmd/cmdschematicnetpointsetnetsignal.cpp \
     workspace/settings/items/wsi_debugtools.cpp \
     project/erc/ercmsg.cpp \
     project/erc/ercmsglist.cpp \
@@ -166,9 +162,6 @@ SOURCES += \
     project/circuit/gencompattributeinstance.cpp \
     common/if_attributeprovider.cpp \
     project/schematics/symbolinstancepropertiesdialog.cpp \
-    project/circuit/cmd/cmdgencompinstsetname.cpp \
-    project/circuit/cmd/cmdgencompinstsetvalue.cpp \
-    project/circuit/cmd/cmdnetsignalsetname.cpp \
     project/dialogs/projectpropertieseditordialog.cpp \
     project/cmd/cmdprojectsetmetadata.cpp \
     common/smarttextfile.cpp \
@@ -183,10 +176,14 @@ SOURCES += \
     project/schematics/schematicnetlabel.cpp \
     project/schematics/cmd/cmdschematicnetlabeladd.cpp \
     project/schematics/cmd/cmdschematicnetlabelremove.cpp \
-    project/schematics/cmd/cmdschematicnetlabelmove.cpp \
     project/schematics/cmd/cmdschematicnetlabeledit.cpp \
     project/schematics/schematicclipboard.cpp \
-    library/symbolellipse.cpp
+    library/symbolellipse.cpp \
+    project/circuit/cmd/cmdgencompinstedit.cpp \
+    project/circuit/cmd/cmdnetclassedit.cpp \
+    project/circuit/cmd/cmdnetsignaledit.cpp \
+    project/schematics/cmd/cmdschematicnetpointedit.cpp \
+    project/schematics/cmd/cmdsymbolinstanceedit.cpp
 
 HEADERS += \
     common/units/all_length_units.h \
@@ -266,7 +263,6 @@ HEADERS += \
     workspace/settings/items/wsi_projectautosaveinterval.h \
     workspace/settings/items/wsi_librarylocaleorder.h \
     project/circuit/editnetclassesdialog.h \
-    project/circuit/cmd/cmdnetclasssetname.h \
     common/dialogs/gridsettingsdialog.h \
     workspace/settings/items/wsi_appdefaultmeasurementunits.h \
     common/application.h \
@@ -281,16 +277,13 @@ HEADERS += \
     library/symbolpingraphicsitem.h \
     common/version.h \
     workspace/settings/items/wsi_librarynormorder.h \
-    project/schematics/cmd/cmdsymbolinstancemove.h \
     project/circuit/cmd/cmdgencompinstanceadd.h \
     project/schematics/cmd/cmdsymbolinstanceadd.h \
-    project/schematics/cmd/cmdschematicnetpointmove.h \
     project/circuit/cmd/cmdgencompsiginstsetnetsignal.h \
     project/schematics/fsm/ses_base.h \
     project/schematics/fsm/ses_fsm.h \
     project/schematics/cmd/cmdsymbolinstanceremove.h \
     project/schematics/cmd/cmdschematicnetpointdetach.h \
-    project/schematics/cmd/cmdschematicnetpointsetnetsignal.h \
     workspace/settings/items/wsi_debugtools.h \
     project/erc/ercmsg.h \
     project/erc/ercmsglist.h \
@@ -299,9 +292,6 @@ HEADERS += \
     project/circuit/gencompattributeinstance.h \
     common/if_attributeprovider.h \
     project/schematics/symbolinstancepropertiesdialog.h \
-    project/circuit/cmd/cmdgencompinstsetname.h \
-    project/circuit/cmd/cmdgencompinstsetvalue.h \
-    project/circuit/cmd/cmdnetsignalsetname.h \
     project/dialogs/projectpropertieseditordialog.h \
     project/cmd/cmdprojectsetmetadata.h \
     common/smarttextfile.h \
@@ -318,10 +308,14 @@ HEADERS += \
     project/schematics/schematicnetlabel.h \
     project/schematics/cmd/cmdschematicnetlabeladd.h \
     project/schematics/cmd/cmdschematicnetlabelremove.h \
-    project/schematics/cmd/cmdschematicnetlabelmove.h \
     project/schematics/cmd/cmdschematicnetlabeledit.h \
     project/schematics/schematicclipboard.h \
-    library/symbolellipse.h
+    library/symbolellipse.h \
+    project/circuit/cmd/cmdgencompinstedit.h \
+    project/circuit/cmd/cmdnetclassedit.h \
+    project/circuit/cmd/cmdnetsignaledit.h \
+    project/schematics/cmd/cmdschematicnetpointedit.h \
+    project/schematics/cmd/cmdsymbolinstanceedit.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \

@@ -189,6 +189,7 @@ void Circuit::removeNetClass(NetClass& netclass) throw (Exception)
 void Circuit::setNetClassName(NetClass& netclass, const QString& newName) throw (Exception)
 {
     Q_ASSERT(mNetClasses.contains(netclass.getUuid()) == true);
+    if (newName == netclass.getName()) return;
 
     // check the validity of the new name
     if (newName.isEmpty())
@@ -312,6 +313,7 @@ void Circuit::removeNetSignal(NetSignal& netsignal) throw (Exception)
 void Circuit::setNetSignalName(NetSignal& netsignal, const QString& newName, bool isAutoName) throw (Exception)
 {
     Q_ASSERT(mNetSignals.contains(netsignal.getUuid()) == true);
+    if ((newName == netsignal.getName()) && (isAutoName == netsignal.hasAutoName())) return;
 
     // check the validity of the new name
     if (newName.isEmpty())
@@ -419,6 +421,7 @@ void Circuit::removeGenCompInstance(GenCompInstance& genCompInstance) throw (Exc
 void Circuit::setGenCompInstanceName(GenCompInstance& genComp, const QString& newName) throw (Exception)
 {
     Q_ASSERT(mGenCompInstances.contains(genComp.getUuid()) == true);
+    if (newName == genComp.getName()) return;
 
     // check the validity of the new name
     if (newName.isEmpty())

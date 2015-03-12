@@ -22,7 +22,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "cmdschematicnetpointmove.h"
+#include "cmdschematicnetpointedit.h"
 #include "../schematicnetpoint.h"
 
 namespace project {
@@ -31,54 +31,80 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSchematicNetPointMove::CmdSchematicNetPointMove(SchematicNetPoint& point, UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Move netpoint"), parent),
-    mNetPoint(point), mStartPos(point.getPosition()), mDeltaPos(0, 0),
-    mEndPos(point.getPosition()), mRedoOrUndoCalled(false)
+CmdSchematicNetPointEdit::CmdSchematicNetPointEdit(SchematicNetPoint& point,
+                                                   UndoCommand* parent) throw (Exception) :
+    UndoCommand(tr("Edit netpoint"), parent), mNetPoint(point),
+    mOldNetSignal(point.getNetSignal()), mNewNetSignal(mOldNetSignal),
+    mOldPos(point.getPosition()), mNewPos(mOldPos)
 {
 }
 
-CmdSchematicNetPointMove::~CmdSchematicNetPointMove() noexcept
+CmdSchematicNetPointEdit::~CmdSchematicNetPointEdit() noexcept
 {
-    if ((!mRedoOrUndoCalled) && (!mDeltaPos.isOrigin()))
-        mNetPoint.setPosition(mStartPos);
+    if ((mRedoCount == 0) && (mUndoCount == 0))
+    {
+        mNetPoint.setPosition(mOldPos);
+    }
 }
 
 /*****************************************************************************************
- *  General Methods
+ *  Setters
  ****************************************************************************************/
 
-void CmdSchematicNetPointMove::setAbsolutePosTemporary(const Point& absPos) noexcept
+void CmdSchematicNetPointEdit::setNetSignal(NetSignal& netsignal) noexcept
 {
-    Q_ASSERT(mRedoOrUndoCalled == false);
-    mDeltaPos = absPos - mStartPos;
-    mNetPoint.setPosition(absPos);
+    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    mNewNetSignal = &netsignal;
 }
 
-void CmdSchematicNetPointMove::setDeltaToStartPosTemporary(const Point& deltaPos) noexcept
+void CmdSchematicNetPointEdit::setPosition(const Point& pos, bool immediate) noexcept
 {
-    Q_ASSERT(mRedoOrUndoCalled == false);
-    mDeltaPos = deltaPos;
-    mNetPoint.setPosition(mStartPos + mDeltaPos);
+    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    mNewPos = pos;
+    if (immediate) mNetPoint.setPosition(mNewPos);
+}
+
+void CmdSchematicNetPointEdit::setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept
+{
+    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    mNewPos = mOldPos + deltaPos;
+    if (immediate) mNetPoint.setPosition(mNewPos);
 }
 
 /*****************************************************************************************
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdSchematicNetPointMove::redo() throw (Exception)
+void CmdSchematicNetPointEdit::redo() throw (Exception)
 {
-    mRedoOrUndoCalled = true;
-    UndoCommand::redo(); // throws an exception on error
-    mEndPos = mStartPos + mDeltaPos;
-    mNetPoint.setPosition(mEndPos);
+    try
+    {
+        mNetPoint.setNetSignal(*mNewNetSignal);
+        mNetPoint.setPosition(mNewPos);
+        UndoCommand::redo();
+    }
+    catch (Exception &e)
+    {
+        mNetPoint.setNetSignal(*mOldNetSignal);
+        mNetPoint.setPosition(mOldPos);
+        throw;
+    }
 }
 
-void CmdSchematicNetPointMove::undo() throw (Exception)
+void CmdSchematicNetPointEdit::undo() throw (Exception)
 {
-    mRedoOrUndoCalled = true;
-    UndoCommand::undo();
-    mNetPoint.setPosition(mStartPos);
+    try
+    {
+        mNetPoint.setNetSignal(*mOldNetSignal);
+        mNetPoint.setPosition(mOldPos);
+        UndoCommand::undo();
+    }
+    catch (Exception& e)
+    {
+        mNetPoint.setNetSignal(*mNewNetSignal);
+        mNetPoint.setPosition(mNewPos);
+        throw;
+    }
 }
 
 /*****************************************************************************************

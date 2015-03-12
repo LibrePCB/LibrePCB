@@ -43,7 +43,7 @@ CmdGenCompInstanceAdd::CmdGenCompInstanceAdd(Circuit& circuit,
 
 CmdGenCompInstanceAdd::~CmdGenCompInstanceAdd() noexcept
 {
-    if (!mIsExecuted)
+    if (!isExecuted())
         delete mGenCompInstance;
 }
 

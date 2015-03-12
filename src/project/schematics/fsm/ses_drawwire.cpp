@@ -46,9 +46,9 @@
 #include "../cmd/cmdschematicnetlineremove.h"
 #include "../cmd/cmdschematicnetpointremove.h"
 #include "../schematicnetline.h"
-#include "../cmd/cmdschematicnetpointsetnetsignal.h"
+#include "../cmd/cmdschematicnetpointedit.h"
 #include "../../circuit/cmd/cmdnetsignalremove.h"
-#include "../../circuit/cmd/cmdnetsignalsetname.h"
+#include "../../circuit/cmd/cmdnetsignaledit.h"
 
 namespace project {
 
@@ -599,7 +599,8 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
             }
             foreach (SchematicNetPoint* point, originalSignal->getNetPoints())
             {
-                auto cmd = new CmdSchematicNetPointSetNetSignal(*point, *combinedSignal);
+                auto cmd = new CmdSchematicNetPointEdit(*point);
+                cmd->setNetSignal(*combinedSignal);
                 mProject.getUndoStack().appendToCommand(cmd);
             }
 
@@ -651,7 +652,8 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
                         }
                         foreach (SchematicNetPoint* point, netsignal->getNetPoints())
                         {
-                            auto cmd = new CmdSchematicNetPointSetNetSignal(*point, *newNetsignal);
+                            auto cmd = new CmdSchematicNetPointEdit(*point);
+                            cmd->setNetSignal(*newNetsignal);
                             mProject.getUndoStack().appendToCommand(cmd);
                         }
                         auto cmd = new CmdNetSignalRemove(mProject.getCircuit(), *netsignal);
@@ -660,7 +662,8 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
                     else
                     {
                         // rename the netsignal
-                        auto cmd = new CmdNetSignalSetName(mCircuit, *netsignal, forcedName, false);
+                        auto cmd = new CmdNetSignalEdit(mCircuit, *netsignal);
+                        cmd->setName(forcedName, false);
                         mProject.getUndoStack().appendToCommand(cmd);
                     }
                 }

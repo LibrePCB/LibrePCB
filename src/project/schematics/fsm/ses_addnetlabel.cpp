@@ -30,7 +30,6 @@
 #include "../../circuit/circuit.h"
 #include "../schematicnetlabel.h"
 #include "../cmd/cmdschematicnetlabeladd.h"
-#include "../cmd/cmdschematicnetlabelmove.h"
 #include "../cmd/cmdschematicnetlabeledit.h"
 #include "../schematic.h"
 #include "../schematicnetline.h"
@@ -43,7 +42,7 @@ namespace project {
 
 SES_AddNetLabel::SES_AddNetLabel(SchematicEditor& editor, Ui::SchematicEditor& editorUi) :
     SES_Base(editor, editorUi), mUndoCmdActive(false), mCurrentNetLabel(nullptr),
-    mEditCmd(nullptr), mMoveCmd(nullptr)
+    mEditCmd(nullptr)
 {
 }
 
@@ -134,7 +133,7 @@ SES_Base::ProcRetVal SES_AddNetLabel::processSceneEvent(SEE_Base* event) noexcep
                 }
                 case Qt::RightButton:
                 {
-                    mMoveCmd->rotate(-Angle::deg90(), pos);
+                    mEditCmd->rotate(-Angle::deg90(), pos, true);
                     return ForceStayInState;
                 }
                 default:
@@ -175,7 +174,6 @@ bool SES_AddNetLabel::addLabel(Schematic& schematic) noexcept
         mProject.getUndoStack().appendToCommand(cmdAdd);
         mCurrentNetLabel = cmdAdd->getNetLabel();
         mEditCmd = new CmdSchematicNetLabelEdit(*mCurrentNetLabel);
-        mMoveCmd = new CmdSchematicNetLabelMove(*mCurrentNetLabel);
         return true;
     }
     catch (Exception& e)
@@ -199,10 +197,8 @@ bool SES_AddNetLabel::updateLabel(Schematic& schematic, const Point& pos) noexce
         // get netline under cursor
         QList<SchematicNetLine*> lines;
         uint count = schematic.getNetLinesAtScenePos(lines, pos);
-        if (count > 0)
-            mEditCmd->setNetSignal(*lines.first()->getNetSignal());
-
-        mMoveCmd->setAbsolutePos(pos);
+        if (count > 0) mEditCmd->setNetSignal(*lines.first()->getNetSignal(), true);
+        mEditCmd->setPosition(pos, true);
         return true;
     }
     catch (Exception& e)
@@ -218,10 +214,8 @@ bool SES_AddNetLabel::fixLabel(const Point& pos) noexcept
 
     try
     {
-        mMoveCmd->setAbsolutePos(pos);
+        mEditCmd->setPosition(pos, false);
         mProject.getUndoStack().appendToCommand(mEditCmd);
-        mProject.getUndoStack().appendToCommand(mMoveCmd);
-
         mProject.getUndoStack().endCommand();
         mUndoCmdActive = false;
         return true;

@@ -41,7 +41,7 @@ CmdNetClassAdd::CmdNetClassAdd(Circuit& circuit, const QString& name,
 
 CmdNetClassAdd::~CmdNetClassAdd() noexcept
 {
-    if (!mIsExecuted)
+    if (!isExecuted())
         delete mNetClass;
 }
 

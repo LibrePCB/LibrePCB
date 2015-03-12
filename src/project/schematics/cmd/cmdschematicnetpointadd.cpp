@@ -50,7 +50,7 @@ CmdSchematicNetPointAdd::CmdSchematicNetPointAdd(Schematic& schematic, SymbolIns
 
 CmdSchematicNetPointAdd::~CmdSchematicNetPointAdd() noexcept
 {
-    if ((mNetPoint) && (!mIsExecuted))
+    if ((mNetPoint) && (!isExecuted()))
         delete mNetPoint;
 }
 

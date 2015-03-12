@@ -113,7 +113,7 @@ class SchematicNetLabel final : public QObject, public IF_XmlSerializableObject
         NetSignal& getNetSignal() const noexcept {return *mNetSignal;}
 
         // Setters
-        void setNetSignal(NetSignal& netsignal) throw (Exception);
+        void setNetSignal(NetSignal& netsignal) noexcept;
         void setPosition(const Point& position) noexcept;
         void setAngle(const Angle& angle) noexcept;
 

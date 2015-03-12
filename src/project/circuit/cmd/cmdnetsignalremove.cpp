@@ -41,7 +41,7 @@ CmdNetSignalRemove::CmdNetSignalRemove(Circuit& circuit, NetSignal& netsignal,
 
 CmdNetSignalRemove::~CmdNetSignalRemove() noexcept
 {
-    if (mIsExecuted)
+    if (isExecuted())
         delete &mNetSignal;
 }
 

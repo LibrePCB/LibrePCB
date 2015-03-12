@@ -41,7 +41,7 @@ CmdNetClassRemove::CmdNetClassRemove(Circuit& circuit, NetClass& netclass,
 
 CmdNetClassRemove::~CmdNetClassRemove() noexcept
 {
-    if (mIsExecuted)
+    if (isExecuted())
         delete &mNetClass;
 }
 

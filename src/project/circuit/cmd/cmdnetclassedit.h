@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDGENCOMPINSTSETNAME_H
-#define PROJECT_CMDGENCOMPINSTSETNAME_H
+#ifndef PROJECT_CMDNETCLASSEDIT_H
+#define PROJECT_CMDNETCLASSEDIT_H
 
 /*****************************************************************************************
  *  Includes
@@ -34,31 +34,29 @@
 
 namespace project {
 class Circuit;
-class GenCompInstance;
-}
-
-namespace library {
-class GenericComponent;
-class GenCompSymbVar;
+class NetClass;
 }
 
 /*****************************************************************************************
- *  Class CmdGenCompInstSetName
+ *  Class CmdNetClassEdit
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The CmdGenCompInstSetName class
+ * @brief The CmdNetClassEdit class
  */
-class CmdGenCompInstSetName final : public UndoCommand
+class CmdNetClassEdit final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdGenCompInstSetName(Circuit& circuit, GenCompInstance& genComp,
-                                       const QString& newName, UndoCommand* parent = 0) throw (Exception);
-        ~CmdGenCompInstSetName() noexcept;
+        explicit CmdNetClassEdit(Circuit& circuit, NetClass& netclass,
+                                 UndoCommand* parent = 0) throw (Exception);
+        ~CmdNetClassEdit() noexcept;
+
+        // Setters
+        void setName(const QString& name) noexcept;
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;
@@ -68,13 +66,13 @@ class CmdGenCompInstSetName final : public UndoCommand
 
         // Attributes from the constructor
         Circuit& mCircuit;
-        GenCompInstance& mGenCompInstance;
+        NetClass& mNetClass;
 
-        // Misc
+        // General Attributes
         QString mOldName;
         QString mNewName;
 };
 
 } // namespace project
 
-#endif // PROJECT_CMDGENCOMPINSTSETNAME_H
+#endif // PROJECT_CMDNETCLASSEDIT_H

@@ -41,7 +41,7 @@ CmdSchematicNetLineAdd::CmdSchematicNetLineAdd(Schematic& schematic, SchematicNe
 
 CmdSchematicNetLineAdd::~CmdSchematicNetLineAdd() noexcept
 {
-    if ((mNetLine) && (!mIsExecuted))
+    if ((mNetLine) && (!isExecuted()))
         delete mNetLine;
 }
 

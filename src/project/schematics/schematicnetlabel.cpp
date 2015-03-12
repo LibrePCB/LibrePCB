@@ -98,8 +98,8 @@ void SchematicNetLabel::init() throw (Exception)
     // create the graphics item
     mGraphicsItem = new SchematicNetLabelGraphicsItem(mSchematic, *this);
     mGraphicsItem->setText(mNetSignal->getName());
-    setPosition(mPosition);
-    setAngle(mAngle);
+    mGraphicsItem->setPos(mPosition.toPxQPointF() - QPointF(0, mGraphicsItem->boundingRect().height()/10));
+    mGraphicsItem->setRotation(mAngle.toDeg());
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -113,8 +113,9 @@ SchematicNetLabel::~SchematicNetLabel() noexcept
  *  Setters
  ****************************************************************************************/
 
-void SchematicNetLabel::setNetSignal(NetSignal& netsignal) throw (Exception)
+void SchematicNetLabel::setNetSignal(NetSignal& netsignal) noexcept
 {
+    if (&netsignal == mNetSignal) return;
     mNetSignal->unregisterSchematicNetLabel(*this);
     mNetSignal = &netsignal;
     mGraphicsItem->setText(mNetSignal->getName());
@@ -123,12 +124,14 @@ void SchematicNetLabel::setNetSignal(NetSignal& netsignal) throw (Exception)
 
 void SchematicNetLabel::setPosition(const Point& position) noexcept
 {
+    if (position == mPosition) return;
     mPosition = position;
     mGraphicsItem->setPos(mPosition.toPxQPointF() - QPointF(0, mGraphicsItem->boundingRect().height()/10));
 }
 
 void SchematicNetLabel::setAngle(const Angle& angle) noexcept
 {
+    if (angle == mAngle) return;
     mAngle = angle;
     mGraphicsItem->setRotation(mAngle.toDeg());
 }

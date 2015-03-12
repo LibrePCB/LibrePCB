@@ -99,7 +99,7 @@ class GenCompInstance : public QObject, public IF_AttributeProvider,
          *
          * @throw Exception If the new name is invalid, an exception will be thrown
          *
-         * @undocmd{project#CmdGenCompInstSetName}
+         * @undocmd{project#CmdGenCompInstEdit}
          */
         void setName(const QString& name) throw (Exception);
 
@@ -108,7 +108,7 @@ class GenCompInstance : public QObject, public IF_AttributeProvider,
          *
          * @param value  The new value
          *
-         * @undocmd{project#CmdGenCompInstSetValue}
+         * @undocmd{project#CmdGenCompInstEdit}
          */
         void setValue(const QString& value) noexcept;
 

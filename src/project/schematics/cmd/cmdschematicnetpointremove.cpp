@@ -42,7 +42,7 @@ CmdSchematicNetPointRemove::CmdSchematicNetPointRemove(Schematic& schematic,
 
 CmdSchematicNetPointRemove::~CmdSchematicNetPointRemove() noexcept
 {
-    if (mIsExecuted)
+    if (isExecuted())
         delete &mNetPoint;
 }
 

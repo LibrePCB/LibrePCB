@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDSCHEMATICNETPOINTMOVE_H
-#define PROJECT_CMDSCHEMATICNETPOINTMOVE_H
+#ifndef PROJECT_CMDNETSIGNALEDIT_H
+#define PROJECT_CMDNETSIGNALEDIT_H
 
 /*****************************************************************************************
  *  Includes
@@ -27,51 +27,54 @@
 #include <QtCore>
 #include "../../../common/undocommand.h"
 #include "../../../common/exceptions.h"
-#include "../../../common/units/point.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
 namespace project {
-class SchematicNetPoint;
+class Circuit;
+class NetSignal;
 }
 
 /*****************************************************************************************
- *  Class CmdSchematicNetPointMove
+ *  Class CmdNetSignalSetName
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The CmdSchematicNetPointMove class
+ * @brief The CmdNetSignalSetName class
  */
-class CmdSchematicNetPointMove final : public UndoCommand
+class CmdNetSignalEdit final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdSchematicNetPointMove(SchematicNetPoint& point, UndoCommand* parent = 0) throw (Exception);
-        ~CmdSchematicNetPointMove() noexcept;
+        explicit CmdNetSignalEdit(Circuit& circuit, NetSignal& netsignal,
+                                  UndoCommand* parent = 0) throw (Exception);
+        ~CmdNetSignalEdit() noexcept;
 
-        // General Methods
-        void setAbsolutePosTemporary(const Point& absPos) noexcept;
-        void setDeltaToStartPosTemporary(const Point& deltaPos) noexcept;
+        // Setters
+        void setName(const QString& name, bool isAutoName) noexcept;
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;
         void undo() throw (Exception) override;
 
-
     private:
 
-        SchematicNetPoint& mNetPoint;
-        Point mStartPos;
-        Point mDeltaPos;
-        Point mEndPos;
-        bool mRedoOrUndoCalled;
+        // Attributes from the constructor
+        Circuit& mCircuit;
+        NetSignal& mNetSignal;
+
+        // General Attributes
+        QString mOldName;
+        QString mNewName;
+        bool mOldIsAutoName;
+        bool mNewIsAutoName;
 };
 
 } // namespace project
 
-#endif // PROJECT_CMDSCHEMATICNETPOINTMOVE_H
+#endif // PROJECT_CMDNETSIGNALEDIT_H
