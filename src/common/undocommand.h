@@ -58,7 +58,14 @@ class UndoCommand
         virtual int getId() const {return -1;}
         const QString& getText() const noexcept {return mText;}
         int getChildCount() const noexcept {return mChilds.count();}
-        bool isExecuted() const noexcept {return mIsExecuted;}
+
+        /**
+         * @brief This method shows whether that command is executed (#redo() called one
+         *        time more than #undo())
+         *
+         * @warning This method works only if the derived class overrides #redo() and #undo()!
+         */
+        bool isExecuted() const noexcept;
 
 
         // General Methods
@@ -66,7 +73,7 @@ class UndoCommand
         /**
          * @brief Undo the command (and all child commands in reverse order)
          *
-         * @note If you need the attribute #mIsExecuted or want support for child commands,
+         * @note If you need the method #isExecuted() or want support for child commands,
          *       you must call this method from the base class in all your derived classes!
          *       It's recommended to make this call AFTER executing any other code as
          *       this makes the exception handling more reliable.
@@ -76,7 +83,7 @@ class UndoCommand
         /**
          * @brief Redo/execute the command (and all child commands in normal order)
          *
-         * @note If you need the attribute #mIsExecuted or want support for child commands,
+         * @note If you need the method #isExecuted() or want support for child commands,
          *       you must call this method from the base class in all your derived classes!
          *       It's recommended to make this call AFTER executing any other code as
          *       this makes the exception handling more reliable.
@@ -94,22 +101,30 @@ class UndoCommand
     protected:
 
         /**
-         * @brief This attribute shows if that command was executed (#redo() called one
-         *        time more than #undo())
+         * @brief Counter of how often #redo() was called
          *
-         * You can read this attribute from a derived class, but you should not write to
-         * it. To make this attribute work properly, you must call #undo() and #redo()
-         * from this class in your derived class!
+         * You can read this attribute from a derived class, but you must not write to
+         * it. To make this attribute work properly, you must call #redo() of this class
+         * from your derived class!
          */
-        bool mIsExecuted;
+        uint mRedoCount;
+
+        /**
+         * @brief Counter of how often #undo() was called
+         *
+         * You can read this attribute from a derived class, but you must not write to
+         * it. To make this attribute work properly, you must call #undo() of this class
+         * from your derived class!
+         */
+        uint mUndoCount;
 
 
     private:
 
         // make some methods inaccessible...
-        UndoCommand();
-        UndoCommand(const UndoCommand& other);
-        UndoCommand& operator=(const UndoCommand& rhs);
+        UndoCommand() = delete;
+        UndoCommand(const UndoCommand& other) = delete;
+        UndoCommand& operator=(const UndoCommand& rhs) = delete;
 
 
         // Attributes

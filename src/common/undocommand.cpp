@@ -30,7 +30,7 @@
  ****************************************************************************************/
 
 UndoCommand::UndoCommand(const QString &text, UndoCommand* parent) throw (Exception) :
-    mIsExecuted(false), mParent(parent), mText(text)
+    mRedoCount(0), mUndoCount(0), mParent(parent), mText(text)
 {
     if (mParent)
         mParent->appendChild(this);
@@ -46,12 +46,23 @@ UndoCommand::~UndoCommand()
 }
 
 /*****************************************************************************************
- *  Internal Methods
+ *  Getters
+ ****************************************************************************************/
+
+bool UndoCommand::isExecuted() const noexcept
+{
+    Q_ASSERT(mRedoCount >= mUndoCount);
+    Q_ASSERT(mRedoCount <= mUndoCount+1);
+    return mRedoCount > mUndoCount;
+}
+
+/*****************************************************************************************
+ *  General Methods
  ****************************************************************************************/
 
 void UndoCommand::undo() throw (Exception)
 {
-    Q_ASSERT(mIsExecuted);
+    Q_ASSERT(isExecuted());
 
     int i;
 
@@ -60,7 +71,7 @@ void UndoCommand::undo() throw (Exception)
         for (i = mChilds.count()-1; i >= 0; i--) // from top to bottom
             mChilds[i]->undo();
 
-        mIsExecuted = false;
+        mUndoCount++;
     }
     catch (Exception& e)
     {
@@ -75,7 +86,7 @@ void UndoCommand::undo() throw (Exception)
 
 void UndoCommand::redo() throw (Exception)
 {
-    Q_ASSERT(!mIsExecuted);
+    Q_ASSERT(!isExecuted());
 
     int i;
 
@@ -84,7 +95,7 @@ void UndoCommand::redo() throw (Exception)
         for (i = 0; i < mChilds.count(); i++) // from bottom to top
             mChilds[i]->redo();
 
-        mIsExecuted = true;
+        mRedoCount++;
     }
     catch (Exception& e)
     {
