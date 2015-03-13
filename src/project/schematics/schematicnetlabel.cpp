@@ -40,25 +40,77 @@ namespace project {
 // Constructors / Destructor
 SchematicNetLabelGraphicsItem::SchematicNetLabelGraphicsItem(Schematic& schematic,
                                                              SchematicNetLabel& label) throw (Exception) :
-    QGraphicsSimpleTextItem(), mSchematic(schematic), mLabel(label)
+    QGraphicsItem(), mSchematic(schematic), mLabel(label)
 {
-    SchematicLayer* layer = mSchematic.getProject().getSchematicLayer(SchematicLayer::NetLabels);
-    Q_ASSERT(layer);
-
-    QFont font;
-    font.setFamily("Monospace");
-    font.setPixelSize(50);
-    font.setStyleHint(QFont::TypeWriter);
-    font.setStyleStrategy(QFont::ForceOutline);
-    setFont(font);
-    setBrush(layer->getColor(false));
-    setScale((qreal)0.1);
+    mFont.setFamily("Monospace");
+    mFont.setPixelSize(80);
+    mFont.setStyleHint(QFont::TypeWriter);
+    mFont.setStyleStrategy(QFont::ForceOutline);
     setFlags(QGraphicsItem::ItemIsSelectable);
     setZValue(Schematic::ZValue_NetPoints);
 }
 
 SchematicNetLabelGraphicsItem::~SchematicNetLabelGraphicsItem() noexcept
 {
+}
+
+QRectF SchematicNetLabelGraphicsItem::boundingRect() const
+{
+    QFontMetricsF metrics(mFont);
+    bool rotate180 = (mLabel.getAngle() <= -Angle::deg90() || mLabel.getAngle() > Angle::deg90());
+    int flags = Qt::AlignBottom | Qt::TextSingleLine | Qt::TextDontClip;
+    if (rotate180) flags |= Qt::AlignRight; else flags |= Qt::AlignLeft;
+    QRectF rect = metrics.boundingRect(QRectF(0, -10, 0, 0), flags, mLabel.getNetSignal().getName());
+    return QRectF(rect.left()/20, rect.top()/20, rect.width()/20, rect.height()/20);
+}
+
+QPainterPath SchematicNetLabelGraphicsItem::shape() const noexcept
+{
+    QPainterPath p;
+    p.addRect(boundingRect());
+    return p;
+}
+
+void SchematicNetLabelGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+{
+    Q_UNUSED(widget);
+
+    SchematicLayer* layer = 0;
+    bool selected = option->state & QStyle::State_Selected;
+    bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
+    bool rotate180 = (mLabel.getAngle() < -Angle::deg90() || mLabel.getAngle() >= Angle::deg90());
+
+    // draw origin cross
+    if (!deviceIsPrinter)
+    {
+        layer = mSchematic.getProject().getSchematicLayer(SchematicLayer::OriginCrosses);
+        if (layer)
+        {
+            qreal width = Length(200000).toPx();
+            QPen pen(layer->getColor(selected), 2);
+            pen.setCosmetic(true);
+            painter->setPen(pen);
+            painter->drawLine(-2*width, 0, 2*width, 0);
+            painter->drawLine(0, -2*width, 0, 2*width);
+        }
+    }
+
+    // draw text
+    layer = mSchematic.getProject().getSchematicLayer(SchematicLayer::NetLabels);
+    if (layer)
+    {
+        qreal scaleFactor = 20; // avoid blurred font when using OpenGL
+        painter->save();
+        painter->scale(1/scaleFactor, 1/scaleFactor);
+        painter->rotate(rotate180 ? 180 : 0);
+        painter->setPen(QPen(layer->getColor(selected), 0));
+        painter->setBrush(Qt::NoBrush);
+        painter->setFont(mFont);
+        int flags = Qt::AlignBottom | Qt::TextSingleLine | Qt::TextDontClip;
+        if (rotate180) flags |= Qt::AlignRight; else flags |= Qt::AlignLeft;
+        painter->drawText(QRectF(0, -10, 0, 0), flags, mLabel.getNetSignal().getName());
+        painter->restore();
+    }
 }
 
 /*****************************************************************************************
@@ -97,8 +149,7 @@ void SchematicNetLabel::init() throw (Exception)
 {
     // create the graphics item
     mGraphicsItem = new SchematicNetLabelGraphicsItem(mSchematic, *this);
-    mGraphicsItem->setText(mNetSignal->getName());
-    mGraphicsItem->setPos(mPosition.toPxQPointF() - QPointF(0, mGraphicsItem->boundingRect().height()/10));
+    mGraphicsItem->setPos(mPosition.toPxQPointF());
     mGraphicsItem->setRotation(mAngle.toDeg());
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
@@ -118,15 +169,15 @@ void SchematicNetLabel::setNetSignal(NetSignal& netsignal) noexcept
     if (&netsignal == mNetSignal) return;
     mNetSignal->unregisterSchematicNetLabel(*this);
     mNetSignal = &netsignal;
-    mGraphicsItem->setText(mNetSignal->getName());
     mNetSignal->registerSchematicNetLabel(*this);
+    mGraphicsItem->update();
 }
 
 void SchematicNetLabel::setPosition(const Point& position) noexcept
 {
     if (position == mPosition) return;
     mPosition = position;
-    mGraphicsItem->setPos(mPosition.toPxQPointF() - QPointF(0, mGraphicsItem->boundingRect().height()/10));
+    mGraphicsItem->setPos(mPosition.toPxQPointF());
 }
 
 void SchematicNetLabel::setAngle(const Angle& angle) noexcept
@@ -142,7 +193,7 @@ void SchematicNetLabel::setAngle(const Angle& angle) noexcept
 
 void SchematicNetLabel::updateText() noexcept
 {
-    mGraphicsItem->setText(mNetSignal->getName());
+    mGraphicsItem->update();
 }
 
 void SchematicNetLabel::addToSchematic() throw (Exception)

@@ -264,7 +264,7 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
         if (layer)
         {
             qreal width = Length(700000).toPx();
-            QPen pen(layer->getColor(selected), width);
+            QPen pen(layer->getColor(selected), 2);
             pen.setCosmetic(true);
             painter->setPen(pen);
             painter->drawLine(-2*width, 0, 2*width, 0);

@@ -53,6 +53,7 @@
 #include "../cmd/cmdschematicnetlabeledit.h"
 #include "../schematicclipboard.h"
 #include "../cmd/cmdsymbolinstanceadd.h"
+#include "../cmd/cmdschematicnetlabelremove.h"
 
 namespace project {
 
@@ -518,9 +519,11 @@ bool SES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
     uint count = 0;
     QList<SymbolInstance*> symbols;
     QList<SchematicNetPoint*> netpoints;
+    QList<SchematicNetLabel*> netlabels;
     count += SymbolInstance::extractFromGraphicsItems(items, symbols);
     count += SchematicNetPoint::extractFromGraphicsItems(items, netpoints, true, false,
                                                          true, false, false, false);
+    count += SchematicNetLabel::extractFromGraphicsItems(items, netlabels);
 
     // abort if no items are selected
     if (count == 0) return ForceStayInState;
@@ -533,6 +536,8 @@ bool SES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
             center += symbol->getPosition();
         foreach (SchematicNetPoint* point, netpoints)
             center += point->getPosition();
+        foreach (SchematicNetLabel* label, netlabels)
+            center += label->getPosition();
         center /= count;
         center.mapToGrid(mEditorUi.graphicsView->getGridInterval());
     }
@@ -556,6 +561,14 @@ bool SES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
         {
             CmdSchematicNetPointEdit* cmd = new CmdSchematicNetPointEdit(*point);
             cmd->setPosition(point->getPosition().rotated(angle, center), false);
+            mEditor.getProject().getUndoStack().appendToCommand(cmd);
+        }
+
+        // rotate all netlabels
+        foreach (SchematicNetLabel* label, netlabels)
+        {
+            CmdSchematicNetLabelEdit* cmd = new CmdSchematicNetLabelEdit(*label);
+            cmd->rotate(angle, center, false);
             mEditor.getProject().getUndoStack().appendToCommand(cmd);
         }
 
@@ -584,10 +597,12 @@ bool SES_Select::removeSelectedItems() noexcept
     QList<SymbolInstance*> symbols;
     QList<SchematicNetPoint*> netpoints;
     QList<SchematicNetLine*> netlines;
+    QList<SchematicNetLabel*> netlabels;
     count += SymbolInstance::extractFromGraphicsItems(items, symbols);
     count += SchematicNetPoint::extractFromGraphicsItems(items, netpoints, true, true,
                                                          true, true, true, true, true);
     count += SchematicNetLine::extractFromGraphicsItems(items, netlines, true, true, false);
+    count += SchematicNetLabel::extractFromGraphicsItems(items, netlabels);
 
     // abort if no items are selected
     if (count == 0) return false;
@@ -606,6 +621,13 @@ bool SES_Select::removeSelectedItems() noexcept
         mEditor.getProject().getUndoStack().beginCommand(tr("Remove Schematic Elements"));
         commandActive = true;
         schematic->clearSelection();
+
+        // remove all netlabels
+        foreach (SchematicNetLabel* label, netlabels)
+        {
+            auto cmd = new CmdSchematicNetLabelRemove(*schematic, *label);
+            mEditor.getProject().getUndoStack().appendToCommand(cmd);
+        }
 
         // remove all netlines
         foreach (SchematicNetLine* line, netlines)
@@ -682,10 +704,12 @@ bool SES_Select::cutSelectedItems() noexcept
     QList<SymbolInstance*> symbols;
     QList<SchematicNetPoint*> netpoints;
     QList<SchematicNetLine*> netlines;
+    QList<SchematicNetLabel*> netlabels;
     count += SymbolInstance::extractFromGraphicsItems(items, symbols);
     count += SchematicNetPoint::extractFromGraphicsItems(items, netpoints, true, true,
                                                          true, true, true, true, true);
     count += SchematicNetLine::extractFromGraphicsItems(items, netlines, true, true, false);
+    count += SchematicNetLabel::extractFromGraphicsItems(items, netlabels);
 
     // abort if no items are selected
     if (count == 0) return false;

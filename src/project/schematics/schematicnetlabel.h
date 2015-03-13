@@ -50,7 +50,7 @@ namespace project {
 /**
  * @brief The SchematicNetLabelGraphicsItem class
  */
-class SchematicNetLabelGraphicsItem final : public QGraphicsSimpleTextItem
+class SchematicNetLabelGraphicsItem final : public QGraphicsItem
 {
         Q_DECLARE_TR_FUNCTIONS(SchematicNetLabelGraphicsItem)
 
@@ -70,6 +70,9 @@ class SchematicNetLabelGraphicsItem final : public QGraphicsSimpleTextItem
 
         // Inherited from QGraphicsItem
         int type() const {return Type;} ///< to make  qgraphicsitem_cast() working
+        QRectF boundingRect() const;
+        QPainterPath shape() const noexcept;
+        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
 
 
     private:
@@ -82,6 +85,7 @@ class SchematicNetLabelGraphicsItem final : public QGraphicsSimpleTextItem
         // Attributes
         Schematic& mSchematic;
         SchematicNetLabel& mLabel;
+        QFont mFont;
 };
 
 } // namespace project
