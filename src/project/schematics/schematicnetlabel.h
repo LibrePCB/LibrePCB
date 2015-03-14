@@ -85,6 +85,7 @@ class SchematicNetLabelGraphicsItem final : public QGraphicsItem
         // Attributes
         Schematic& mSchematic;
         SchematicNetLabel& mLabel;
+        qreal mCrossSizePx;
         QFont mFont;
 };
 

@@ -40,14 +40,14 @@ namespace project {
 // Constructors / Destructor
 SchematicNetLabelGraphicsItem::SchematicNetLabelGraphicsItem(Schematic& schematic,
                                                              SchematicNetLabel& label) throw (Exception) :
-    QGraphicsItem(), mSchematic(schematic), mLabel(label)
+    QGraphicsItem(), mSchematic(schematic), mLabel(label), mCrossSizePx(Length(400000).toPx())
 {
     mFont.setFamily("Monospace");
     mFont.setPixelSize(80);
     mFont.setStyleHint(QFont::TypeWriter);
     mFont.setStyleStrategy(QFont::ForceOutline);
     setFlags(QGraphicsItem::ItemIsSelectable);
-    setZValue(Schematic::ZValue_NetPoints);
+    setZValue(Schematic::ZValue_NetLabels);
 }
 
 SchematicNetLabelGraphicsItem::~SchematicNetLabelGraphicsItem() noexcept
@@ -56,18 +56,23 @@ SchematicNetLabelGraphicsItem::~SchematicNetLabelGraphicsItem() noexcept
 
 QRectF SchematicNetLabelGraphicsItem::boundingRect() const
 {
-    QFontMetricsF metrics(mFont);
-    bool rotate180 = (mLabel.getAngle() <= -Angle::deg90() || mLabel.getAngle() > Angle::deg90());
-    int flags = Qt::AlignBottom | Qt::TextSingleLine | Qt::TextDontClip;
-    if (rotate180) flags |= Qt::AlignRight; else flags |= Qt::AlignLeft;
-    QRectF rect = metrics.boundingRect(QRectF(0, -10, 0, 0), flags, mLabel.getNetSignal().getName());
-    return QRectF(rect.left()/20, rect.top()/20, rect.width()/20, rect.height()/20);
+    return shape().boundingRect();
 }
 
 QPainterPath SchematicNetLabelGraphicsItem::shape() const noexcept
 {
+    QFontMetricsF metrics(mFont);
+    bool rotate180 = (mLabel.getAngle() < -Angle::deg90() || mLabel.getAngle() >= Angle::deg90());
+    int flags = Qt::AlignBottom | Qt::TextSingleLine | Qt::TextDontClip;
+    if (rotate180) flags |= Qt::AlignRight; else flags |= Qt::AlignLeft;
+    QRectF rect = metrics.boundingRect(QRectF(0, -10, 0, 0), flags, mLabel.getNetSignal().getName());
+    if (rotate180)
+        rect = QRectF(-rect.left()/20, -rect.top()/20, -rect.width()/20, -rect.height()/20);
+    else
+        rect = QRectF(rect.left()/20, rect.top()/20, rect.width()/20, rect.height()/20);
     QPainterPath p;
-    p.addRect(boundingRect());
+    p.addRect(rect.normalized());
+    p.addRect(-mCrossSizePx, -mCrossSizePx, 2*mCrossSizePx, 2*mCrossSizePx);
     return p;
 }
 
@@ -86,12 +91,11 @@ void SchematicNetLabelGraphicsItem::paint(QPainter* painter, const QStyleOptionG
         layer = mSchematic.getProject().getSchematicLayer(SchematicLayer::OriginCrosses);
         if (layer)
         {
-            qreal width = Length(200000).toPx();
             QPen pen(layer->getColor(selected), 2);
             pen.setCosmetic(true);
             painter->setPen(pen);
-            painter->drawLine(-2*width, 0, 2*width, 0);
-            painter->drawLine(0, -2*width, 0, 2*width);
+            painter->drawLine(-mCrossSizePx, 0, mCrossSizePx, 0);
+            painter->drawLine(0, -mCrossSizePx, 0, mCrossSizePx);
         }
     }
 
