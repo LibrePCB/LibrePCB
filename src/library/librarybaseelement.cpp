@@ -25,7 +25,7 @@
 #include "librarybaseelement.h"
 #include "../workspace/workspace.h"
 #include "../workspace/settings/workspacesettings.h"
-#include "../common/smartxmlfile.h"
+#include "../common/file_io/smartxmlfile.h"
 #include "../common/file_io/xmldomdocument.h"
 #include "../common/file_io/xmldomelement.h"
 

@@ -28,8 +28,7 @@
 #include "../common/file_io/if_xmlserializableobject.h"
 #include "../common/if_attributeprovider.h"
 #include "../common/exceptions.h"
-#include "../common/filelock.h"
-#include "../common/filepath.h"
+#include "../common/file_io/filelock.h"
 
 /*****************************************************************************************
  *  Forward Declarations

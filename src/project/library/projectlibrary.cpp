@@ -24,7 +24,7 @@
 #include <QtCore>
 #include "../../common/exceptions.h"
 #include "projectlibrary.h"
-#include "../../common/filepath.h"
+#include "../../common/file_io/filepath.h"
 #include "../project.h"
 #include "../../library/symbol.h"
 #include "../../library/footprint.h"

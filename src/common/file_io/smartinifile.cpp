@@ -23,7 +23,7 @@
 
 #include <QtCore>
 #include "smartinifile.h"
-#include "exceptions.h"
+#include "../exceptions.h"
 #include "filepath.h"
 
 /*****************************************************************************************

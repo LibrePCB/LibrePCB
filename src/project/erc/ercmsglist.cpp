@@ -26,7 +26,7 @@
 #include "ercmsg.h"
 #include "if_ercmsgprovider.h"
 #include "../project.h"
-#include "../../common/smartxmlfile.h"
+#include "../../common/file_io/smartxmlfile.h"
 #include "../../common/file_io/xmldomdocument.h"
 #include "../../common/file_io/xmldomelement.h"
 

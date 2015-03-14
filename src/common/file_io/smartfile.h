@@ -25,7 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "exceptions.h"
+#include "../exceptions.h"
 #include "filepath.h"
 
 /*****************************************************************************************
@@ -50,9 +50,9 @@
  *
  * @todo Test the class #SmartFile and all of its subclasses!
  */
-class SmartFile : public QObject
+class SmartFile
 {
-        Q_OBJECT
+        Q_DECLARE_TR_FUNCTIONS(SmartFile)
 
     public:
 

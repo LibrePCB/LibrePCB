@@ -26,7 +26,7 @@
 
 #include <QtCore>
 #include "filepath.h"
-#include "exceptions.h"
+#include "../exceptions.h"
 
 /*****************************************************************************************
  *  Class FileLock
@@ -137,9 +137,9 @@
  * @author ubruhin
  * @date 2014-07-29
  */
-class FileLock final : public QObject
+class FileLock final
 {
-        Q_OBJECT
+        Q_DECLARE_TR_FUNCTIONS(FileLock)
 
     public:
 

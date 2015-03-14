@@ -27,7 +27,6 @@
 #include "common/application.h"
 #include "common/debug.h"
 #include "common/exceptions.h"
-#include "common/filepath.h"
 #include "workspace/workspace.h"
 
 /*****************************************************************************************

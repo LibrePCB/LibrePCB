@@ -23,7 +23,7 @@
 
 #include <QtCore>
 #include "../../common/exceptions.h"
-#include "../../common/smartxmlfile.h"
+#include "../../common/file_io/smartxmlfile.h"
 #include "../../common/file_io/xmldomdocument.h"
 #include "../../common/file_io/xmldomelement.h"
 #include "circuit.h"

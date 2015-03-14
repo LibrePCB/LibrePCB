@@ -25,9 +25,8 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../common/filelock.h"
+#include "../common/file_io/filelock.h"
 #include "../common/exceptions.h"
-#include "../common/filepath.h"
 
 /*****************************************************************************************
  *  Forward Declarations

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDGENCOMPINSTANCEADD_H
-#define PROJECT_CMDGENCOMPINSTANCEADD_H
+#ifndef PROJECT_CMDGENCOMPINSTADD_H
+#define PROJECT_CMDGENCOMPINSTADD_H
 
 /*****************************************************************************************
  *  Includes
@@ -43,24 +43,24 @@ class GenCompSymbVar;
 }
 
 /*****************************************************************************************
- *  Class CmdGenCompInstanceAdd
+ *  Class CmdGenCompInstAdd
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The CmdGenCompInstanceAdd class
+ * @brief The CmdGenCompInstAdd class
  */
-class CmdGenCompInstanceAdd final : public UndoCommand
+class CmdGenCompInstAdd final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdGenCompInstanceAdd(Circuit& circuit,
-                                       const library::GenericComponent& genComp,
-                                       const library::GenCompSymbVar& symbVar,
-                                       UndoCommand* parent = 0) throw (Exception);
-        ~CmdGenCompInstanceAdd() noexcept;
+        explicit CmdGenCompInstAdd(Circuit& circuit,
+                                   const library::GenericComponent& genComp,
+                                   const library::GenCompSymbVar& symbVar,
+                                   UndoCommand* parent = 0) throw (Exception);
+        ~CmdGenCompInstAdd() noexcept;
 
         // Getters
         GenCompInstance* getGenCompInstance() const noexcept {return mGenCompInstance;}
@@ -82,4 +82,4 @@ class CmdGenCompInstanceAdd final : public UndoCommand
 
 } // namespace project
 
-#endif // PROJECT_CMDGENCOMPINSTANCEADD_H
+#endif // PROJECT_CMDGENCOMPINSTADD_H

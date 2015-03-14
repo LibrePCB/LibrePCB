@@ -27,7 +27,7 @@
 #include <QtCore>
 #include <QDomElement>
 #include "../exceptions.h"
-#include "../filepath.h"
+#include "filepath.h"
 
 /*****************************************************************************************
  *  Forward Declarations

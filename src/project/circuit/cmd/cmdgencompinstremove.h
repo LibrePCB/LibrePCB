@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDGENCOMPINSTANCEREMOVE_H
-#define PROJECT_CMDGENCOMPINSTANCEREMOVE_H
+#ifndef PROJECT_CMDGENCOMPINSTREMOVE_H
+#define PROJECT_CMDGENCOMPINSTREMOVE_H
 
 /*****************************************************************************************
  *  Includes
@@ -38,22 +38,22 @@ class GenCompInstance;
 }
 
 /*****************************************************************************************
- *  Class CmdGenCompInstanceRemove
+ *  Class CmdGenCompInstRemove
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The CmdGenCompInstanceRemove class
+ * @brief The CmdGenCompInstRemove class
  */
-class CmdGenCompInstanceRemove final : public UndoCommand
+class CmdGenCompInstRemove final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdGenCompInstanceRemove(Circuit& circuit, GenCompInstance& genCompInstance,
-                                          UndoCommand* parent = 0) throw (Exception);
-        ~CmdGenCompInstanceRemove() noexcept;
+        explicit CmdGenCompInstRemove(Circuit& circuit, GenCompInstance& genCompInstance,
+                                      UndoCommand* parent = 0) throw (Exception);
+        ~CmdGenCompInstRemove() noexcept;
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;
@@ -68,4 +68,4 @@ class CmdGenCompInstanceRemove final : public UndoCommand
 
 } // namespace project
 
-#endif // PROJECT_CMDGENCOMPINSTANCEREMOVE_H
+#endif // PROJECT_CMDGENCOMPINSTREMOVE_H

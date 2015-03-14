@@ -51,7 +51,7 @@ class XmlDomDocument;
  */
 class SmartXmlFile final : public SmartFile
 {
-        Q_OBJECT
+        Q_DECLARE_TR_FUNCTIONS(SmartXmlFile)
 
     public:
 

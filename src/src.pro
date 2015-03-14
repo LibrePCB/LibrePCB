@@ -95,10 +95,10 @@ SOURCES += \
     project/circuit/gencompsignalinstance.cpp \
     common/systeminfo.cpp \
     common/debug.cpp \
-    common/filelock.cpp \
-    common/filepath.cpp \
+    common/file_io/filelock.cpp \
+    common/file_io/filepath.cpp \
     common/schematiclayer.cpp \
-    common/smartxmlfile.cpp \
+    common/file_io/smartxmlfile.cpp \
     library/librarybaseelement.cpp \
     project/circuit/cmd/cmdnetclassadd.cpp \
     project/circuit/cmd/cmdnetclassremove.cpp \
@@ -108,7 +108,7 @@ SOURCES += \
     common/undostack.cpp \
     project/schematics/symbolinstance.cpp \
     project/schematics/schematicpagesdock.cpp \
-    common/smartinifile.cpp \
+    common/file_io/smartinifile.cpp \
     project/schematics/cmd/cmdschematicadd.cpp \
     project/schematics/cmd/cmdschematicremove.cpp \
     project/erc/ercmsgdock.cpp \
@@ -147,7 +147,6 @@ SOURCES += \
     library/symbolpingraphicsitem.cpp \
     common/version.cpp \
     workspace/settings/items/wsi_librarynormorder.cpp \
-    project/circuit/cmd/cmdgencompinstanceadd.cpp \
     project/schematics/cmd/cmdsymbolinstanceadd.cpp \
     project/circuit/cmd/cmdgencompsiginstsetnetsignal.cpp \
     project/schematics/fsm/ses_base.cpp \
@@ -164,14 +163,13 @@ SOURCES += \
     project/schematics/symbolinstancepropertiesdialog.cpp \
     project/dialogs/projectpropertieseditordialog.cpp \
     project/cmd/cmdprojectsetmetadata.cpp \
-    common/smarttextfile.cpp \
-    common/smartfile.cpp \
+    common/file_io/smarttextfile.cpp \
+    common/file_io/smartfile.cpp \
     common/file_io/xmldomdocument.cpp \
     common/file_io/xmldomelement.cpp \
     workspace/settings/items/wsi_appearance.cpp \
     project/dialogs/addgencompdialog.cpp \
     common/alignment.cpp \
-    project/circuit/cmd/cmdgencompinstanceremove.cpp \
     project/schematics/fsm/ses_addnetlabel.cpp \
     project/schematics/schematicnetlabel.cpp \
     project/schematics/cmd/cmdschematicnetlabeladd.cpp \
@@ -183,7 +181,9 @@ SOURCES += \
     project/circuit/cmd/cmdnetclassedit.cpp \
     project/circuit/cmd/cmdnetsignaledit.cpp \
     project/schematics/cmd/cmdschematicnetpointedit.cpp \
-    project/schematics/cmd/cmdsymbolinstanceedit.cpp
+    project/schematics/cmd/cmdsymbolinstanceedit.cpp \
+    project/circuit/cmd/cmdgencompinstadd.cpp \
+    project/circuit/cmd/cmdgencompinstremove.cpp
 
 HEADERS += \
     common/units/all_length_units.h \
@@ -225,10 +225,10 @@ HEADERS += \
     project/circuit/gencompsignalinstance.h \
     common/systeminfo.h \
     common/debug.h \
-    common/filelock.h \
-    common/filepath.h \
+    common/file_io/filelock.h \
+    common/file_io/filepath.h \
     common/schematiclayer.h \
-    common/smartxmlfile.h \
+    common/file_io/smartxmlfile.h \
     library/librarybaseelement.h \
     project/circuit/cmd/cmdnetclassadd.h \
     project/circuit/cmd/cmdnetclassremove.h \
@@ -238,7 +238,7 @@ HEADERS += \
     common/undostack.h \
     project/schematics/symbolinstance.h \
     project/schematics/schematicpagesdock.h \
-    common/smartinifile.h \
+    common/file_io/smartinifile.h \
     project/schematics/cmd/cmdschematicadd.h \
     project/schematics/cmd/cmdschematicremove.h \
     project/erc/ercmsgdock.h \
@@ -277,7 +277,6 @@ HEADERS += \
     library/symbolpingraphicsitem.h \
     common/version.h \
     workspace/settings/items/wsi_librarynormorder.h \
-    project/circuit/cmd/cmdgencompinstanceadd.h \
     project/schematics/cmd/cmdsymbolinstanceadd.h \
     project/circuit/cmd/cmdgencompsiginstsetnetsignal.h \
     project/schematics/fsm/ses_base.h \
@@ -294,8 +293,8 @@ HEADERS += \
     project/schematics/symbolinstancepropertiesdialog.h \
     project/dialogs/projectpropertieseditordialog.h \
     project/cmd/cmdprojectsetmetadata.h \
-    common/smarttextfile.h \
-    common/smartfile.h \
+    common/file_io/smarttextfile.h \
+    common/file_io/smartfile.h \
     common/file_io/xmldomdocument.h \
     common/file_io/xmldomelement.h \
     project/erc/if_ercmsgprovider.h \
@@ -303,7 +302,6 @@ HEADERS += \
     workspace/settings/items/wsi_appearance.h \
     project/dialogs/addgencompdialog.h \
     common/alignment.h \
-    project/circuit/cmd/cmdgencompinstanceremove.h \
     project/schematics/fsm/ses_addnetlabel.h \
     project/schematics/schematicnetlabel.h \
     project/schematics/cmd/cmdschematicnetlabeladd.h \
@@ -315,7 +313,9 @@ HEADERS += \
     project/circuit/cmd/cmdnetclassedit.h \
     project/circuit/cmd/cmdnetsignaledit.h \
     project/schematics/cmd/cmdschematicnetpointedit.h \
-    project/schematics/cmd/cmdsymbolinstanceedit.h
+    project/schematics/cmd/cmdsymbolinstanceedit.h \
+    project/circuit/cmd/cmdgencompinstadd.h \
+    project/circuit/cmd/cmdgencompinstremove.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \

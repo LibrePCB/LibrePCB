@@ -25,7 +25,7 @@
 #include <QFileDialog>
 #include "workspace.h"
 #include "../common/exceptions.h"
-#include "../common/filepath.h"
+#include "../common/file_io/filepath.h"
 #include "../library/library.h"
 #include "../library_editor/libraryeditor.h"
 #include "../project/project.h"

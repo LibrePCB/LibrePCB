@@ -23,20 +23,20 @@
 
 #include <QtCore>
 #include "filelock.h"
-#include "systeminfo.h"
+#include "../systeminfo.h"
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
 FileLock::FileLock() noexcept :
-    QObject(0), mFileToLock(), mLockFilepath(), mLockedByThisObject(false)
+    mFileToLock(), mLockFilepath(), mLockedByThisObject(false)
 {
     // nothing to do...
 }
 
 FileLock::FileLock(const FilePath& filepath) noexcept :
-    QObject(0), mFileToLock(), mLockFilepath(), mLockedByThisObject(false)
+    mFileToLock(), mLockFilepath(), mLockedByThisObject(false)
 {
     setFileToLock(filepath);
 }

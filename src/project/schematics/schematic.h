@@ -28,7 +28,7 @@
 #include "../../common/if_attributeprovider.h"
 #include "../../common/file_io/if_xmlserializableobject.h"
 #include "../../common/units/all_length_units.h"
-#include "../../common/filepath.h"
+#include "../../common/file_io/filepath.h"
 #include "../../common/exceptions.h"
 #include "../../common/cadscene.h"
 

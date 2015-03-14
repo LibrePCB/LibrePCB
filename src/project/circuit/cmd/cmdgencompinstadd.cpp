@@ -22,50 +22,70 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "smartxmlfile.h"
-#include "file_io/xmldomdocument.h"
-#include "file_io/xmldomelement.h"
+#include "cmdgencompinstadd.h"
+#include "../circuit.h"
+#include "../gencompinstance.h"
+
+namespace project {
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SmartXmlFile::SmartXmlFile(const FilePath& filepath, bool restore, bool readOnly, bool create) throw (Exception) :
-    SmartFile(filepath, restore, readOnly, create)
+CmdGenCompInstAdd::CmdGenCompInstAdd(Circuit& circuit, const library::GenericComponent& genComp,
+                                     const library::GenCompSymbVar& symbVar, UndoCommand* parent) throw (Exception) :
+    UndoCommand(tr("Add generic component"), parent),
+    mCircuit(circuit), mGenComp(genComp), mSymbVar(symbVar), mGenCompInstance(nullptr)
 {
 }
 
-SmartXmlFile::~SmartXmlFile() noexcept
+CmdGenCompInstAdd::~CmdGenCompInstAdd() noexcept
 {
-}
-
-/*****************************************************************************************
- *  General Methods
- ****************************************************************************************/
-
-QSharedPointer<XmlDomDocument> SmartXmlFile::parseFileAndBuildDomTree() const throw (Exception)
-{
-    QSharedPointer<XmlDomDocument> doc(
-        new XmlDomDocument(readContentFromFile(mOpenedFilePath), mOpenedFilePath));
-    return doc;
-}
-
-void SmartXmlFile::save(const XmlDomDocument& domDocument, bool toOriginal) throw (Exception)
-{
-    const FilePath& filepath = prepareSaveAndReturnFilePath(toOriginal);
-    saveContentToFile(filepath, domDocument.toByteArray());
-    updateMembersAfterSaving(toOriginal);
+    if (!isExecuted())
+        delete mGenCompInstance;
 }
 
 /*****************************************************************************************
- *  Static Methods
+ *  Inherited from UndoCommand
  ****************************************************************************************/
 
-SmartXmlFile* SmartXmlFile::create(const FilePath &filepath) throw (Exception)
+void CmdGenCompInstAdd::redo() throw (Exception)
 {
-    return new SmartXmlFile(filepath, false, false, true);
+    if (!mGenCompInstance) // only the first time
+    {
+        mGenCompInstance = mCircuit.createGenCompInstance(mGenComp, mSymbVar); // throws an exception on error
+    }
+
+    mCircuit.addGenCompInstance(*mGenCompInstance); // throws an exception on error
+
+    try
+    {
+        UndoCommand::redo(); // throws an exception on error
+    }
+    catch (Exception &e)
+    {
+        mCircuit.removeGenCompInstance(*mGenCompInstance);
+        throw;
+    }
+}
+
+void CmdGenCompInstAdd::undo() throw (Exception)
+{
+    mCircuit.removeGenCompInstance(*mGenCompInstance); // throws an exception on error
+
+    try
+    {
+        UndoCommand::undo();
+    }
+    catch (Exception& e)
+    {
+        mCircuit.addGenCompInstance(*mGenCompInstance);
+        throw;
+    }
 }
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
+
+} // namespace project

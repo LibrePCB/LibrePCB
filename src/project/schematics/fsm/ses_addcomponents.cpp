@@ -28,7 +28,7 @@
 #include "../../project.h"
 #include "../../library/projectlibrary.h"
 #include "../../../library/genericcomponent.h"
-#include "../../circuit/cmd/cmdgencompinstanceadd.h"
+#include "../../circuit/cmd/cmdgencompinstadd.h"
 #include "../../../common/undostack.h"
 #include "../cmd/cmdsymbolinstanceadd.h"
 #include "../../circuit/gencompinstance.h"
@@ -351,7 +351,7 @@ void SES_AddComponents::startAddingComponent(const QUuid& genComp,
     mIsUndoCmdActive = true;
 
     // create a new generic component instance and add it to the circuit
-    CmdGenCompInstanceAdd* cmd = new CmdGenCompInstanceAdd(mCircuit, *mGenComp,
+    CmdGenCompInstAdd* cmd = new CmdGenCompInstAdd(mCircuit, *mGenComp,
                                                            *mGenCompSymbVar);
     mProject.getUndoStack().appendToCommand(cmd);
 

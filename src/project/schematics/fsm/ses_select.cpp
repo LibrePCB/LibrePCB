@@ -41,7 +41,7 @@
 #include "../symbolpininstance.h"
 #include "../symbolinstancepropertiesdialog.h"
 #include "../../circuit/gencompinstance.h"
-#include "../../circuit/cmd/cmdgencompinstanceremove.h"
+#include "../../circuit/cmd/cmdgencompinstremove.h"
 #include "../schematicnetlabel.h"
 #include "../../circuit/netsignal.h"
 #include "../../circuit/circuit.h"
@@ -675,7 +675,7 @@ bool SES_Select::removeSelectedItems() noexcept
         {
             if (genComp->getPlacedSymbolsCount() == 0)
             {
-                CmdGenCompInstanceRemove* cmd = new CmdGenCompInstanceRemove(mCircuit, *genComp);
+                CmdGenCompInstRemove* cmd = new CmdGenCompInstRemove(mCircuit, *genComp);
                 mEditor.getProject().getUndoStack().appendToCommand(cmd);
             }
         }

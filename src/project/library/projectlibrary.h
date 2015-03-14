@@ -26,7 +26,7 @@
 
 #include <QtCore>
 #include "../../common/exceptions.h"
-#include "../../common/filepath.h"
+#include "../../common/file_io/filepath.h"
 
 /*****************************************************************************************
  *  Forward Declarations

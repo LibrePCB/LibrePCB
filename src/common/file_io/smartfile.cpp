@@ -29,7 +29,7 @@
  ****************************************************************************************/
 
 SmartFile::SmartFile(const FilePath& filepath, bool restore, bool readOnly, bool create) throw (Exception) :
-    QObject(nullptr), mFilePath(filepath), mTmpFilePath(filepath.toStr() % '~'),
+    mFilePath(filepath), mTmpFilePath(filepath.toStr() % '~'),
     mOpenedFilePath(filepath), mIsRestored(restore), mIsReadOnly(readOnly),
     mIsCreated(create)
 {
