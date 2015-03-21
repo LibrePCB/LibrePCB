@@ -22,9 +22,11 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "attribute.h"
+#include "libraryelementattribute.h"
 #include "genericcomponent.h"
 #include "../common/file_io/xmldomelement.h"
+#include "../common/attributes/attributetype.h"
+#include "../common/attributes/attributeunit.h"
 
 namespace library {
 
@@ -32,11 +34,13 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Attribute::Attribute(const XmlDomElement& domElement) throw (Exception)
+LibraryElementAttribute::LibraryElementAttribute(const XmlDomElement& domElement) throw (Exception) :
+    mKey(), mType(nullptr), mDefaultUnit(nullptr)
 {
     // read attributes
     mKey = domElement.getAttribute("key", true);
-    mType = stringToType(domElement.getAttribute("type", true));
+    mType = &AttributeType::fromString(domElement.getAttribute("type", true));
+    mDefaultUnit = mType->getUnitFromString(domElement.getAttribute("unit", false));
 
     // read names, descriptions and default values in all available languages
     LibraryBaseElement::readLocaleDomNodes(domElement, "name", mNames);
@@ -46,7 +50,7 @@ Attribute::Attribute(const XmlDomElement& domElement) throw (Exception)
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-Attribute::~Attribute() noexcept
+LibraryElementAttribute::~LibraryElementAttribute() noexcept
 {
 }
 
@@ -54,17 +58,17 @@ Attribute::~Attribute() noexcept
  *  Getters
  ****************************************************************************************/
 
-QString Attribute::getName(const QString& locale ) const noexcept
+QString LibraryElementAttribute::getName(const QString& locale ) const noexcept
 {
     return LibraryBaseElement::localeStringFromList(mNames, locale);
 }
 
-QString Attribute::getDescription(const QString& locale) const noexcept
+QString LibraryElementAttribute::getDescription(const QString& locale) const noexcept
 {
     return LibraryBaseElement::localeStringFromList(mDescriptions, locale);
 }
 
-QString Attribute::getDefaultValue(const QString& locale ) const noexcept
+QString LibraryElementAttribute::getDefaultValue(const QString& locale ) const noexcept
 {
     return LibraryBaseElement::localeStringFromList(mDefaultValues, locale);
 }
@@ -73,13 +77,14 @@ QString Attribute::getDefaultValue(const QString& locale ) const noexcept
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* Attribute::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* LibraryElementAttribute::serializeToXmlDomElement() const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("attribute"));
     root->setAttribute("key", mKey);
-    root->setAttribute("type", typeToString(mType));
+    root->setAttribute("type", mType->getName());
+    root->setAttribute("unit", mDefaultUnit ? mDefaultUnit->getName() : "");
     foreach (const QString& locale, mNames.keys())
         root->appendTextChild("name", mNames.value(locale))->setAttribute("locale", locale);
     foreach (const QString& locale, mDescriptions.keys())
@@ -93,47 +98,17 @@ XmlDomElement* Attribute::serializeToXmlDomElement() const throw (Exception)
  *  Private Methods
  ****************************************************************************************/
 
-bool Attribute::checkAttributesValidity() const noexcept
+bool LibraryElementAttribute::checkAttributesValidity() const noexcept
 {
     if (mKey.isEmpty())                     return false;
     if (mNames.value("en_US").isEmpty())    return false;
     if (!mDescriptions.contains("en_US"))   return false;
     if (!mDefaultValues.contains("en_US"))  return false;
+    if ((mType->getAvailableUnits().isEmpty()) && (mDefaultUnit != nullptr))    return false;
+    if ((mDefaultUnit) && (!mType->getAvailableUnits().contains(mDefaultUnit))) return false;
+    foreach (const QString& value, mDefaultValues)
+        if (!mType->isValueValid(value))                                        return false;
     return true;
-}
-
-/*****************************************************************************************
- *  Static Methods
- ****************************************************************************************/
-
-Attribute::Type_t Attribute::stringToType(const QString& type) throw (Exception)
-{
-         if (type == "string")      return Type_t::String;
-    else if (type == "length")      return Type_t::Length;
-    else if (type == "resistance")  return Type_t::Resistance;
-    else if (type == "capacitance") return Type_t::Capacitance;
-    else if (type == "inductance")  return Type_t::Inductance;
-    else
-    {
-        throw RuntimeError(__FILE__, __LINE__, type,
-            QString(tr("Invalid attribute type: \"%1\"")).arg(type));
-    }
-}
-
-QString Attribute::typeToString(Type_t type) noexcept
-{
-    switch (type)
-    {
-        case Type_t::String:        return QStringLiteral("string");
-        case Type_t::Length:        return QStringLiteral("length");
-        case Type_t::Resistance:    return QStringLiteral("resistance");
-        case Type_t::Capacitance:   return QStringLiteral("capacitance");
-        case Type_t::Inductance:    return QStringLiteral("inductance");
-        default:
-            Q_ASSERT(false);
-            qCritical() << "unknown attribute type:" << static_cast<int>(type);
-            return QString();
-    }
 }
 
 /*****************************************************************************************

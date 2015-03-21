@@ -28,7 +28,7 @@
 #include "libraryelement.h"
 #include "gencompsignal.h"
 #include "gencompsymbvar.h"
-#include "attribute.h"
+#include "libraryelementattribute.h"
 
 /*****************************************************************************************
  *  Class GenericComponent
@@ -56,8 +56,8 @@ class GenericComponent final : public LibraryElement
         ~GenericComponent() noexcept;
 
         // Attributes
-        const QHash<QString, Attribute*>& getAttributes() const noexcept;
-        const Attribute* getAttributeByKey(const QString& key) const noexcept;
+        const QHash<QString, LibraryElementAttribute*>& getAttributes() const noexcept;
+        const LibraryElementAttribute* getAttributeByKey(const QString& key) const noexcept;
 
         // Default Values
         const QHash<QString, QString>& getDefaultValues() const noexcept;
@@ -102,7 +102,7 @@ class GenericComponent final : public LibraryElement
 
 
         // Generic Conponent Attributes
-        QHash<QString, Attribute*> mAttributes; ///< key: attribute key, value: pointer to attribute
+        QHash<QString, LibraryElementAttribute*> mAttributes; ///< key: attribute key, value: pointer to attribute
         QHash<QString, QString> mDefaultValues; ///< key: locale (like "en_US"), value: default value
         QHash<QString, QString> mPrefixes; ///< key: norm, value: prefix
         QString mDefaultPrefixNorm; ///< must be an existing key of #mPrefixes

@@ -26,19 +26,13 @@
 
 #include <QtCore>
 #include "../../common/file_io/if_xmlserializableobject.h"
-#include "../../common/exceptions.h"
-#include "../../library/attribute.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
-class XmlDomElement;
-
-namespace project {
-class Circuit;
-class GenCompInstance;
-}
+class AttributeType;
+class AttributeUnit;
 
 /*****************************************************************************************
  *  Class GenCompAttributeInstance
@@ -56,17 +50,21 @@ class GenCompAttributeInstance final : public IF_XmlSerializableObject
     public:
 
         // Constructors / Destructor
-        explicit GenCompAttributeInstance(Circuit& circuit, GenCompInstance& genCompInstance,
-                                          const XmlDomElement& domElement) throw (Exception);
-        explicit GenCompAttributeInstance(Circuit& circuit, GenCompInstance& genCompInstance,
-                                          const QString& key, library::Attribute::Type_t type,
-                                          const QString& value) throw (Exception);
+        explicit GenCompAttributeInstance(const XmlDomElement& domElement) throw (Exception);
+        explicit GenCompAttributeInstance(const QString& key, const AttributeType& type,
+                                          const QString& value, const AttributeUnit* unit) throw (Exception);
         ~GenCompAttributeInstance() noexcept;
 
         // Getters
         const QString& getKey() const noexcept {return mKey;}
-        library::Attribute::Type_t getType() const noexcept {return mType;}
-        QString getValueToDisplay() const noexcept;
+        const AttributeType& getType() const noexcept {return *mType;}
+        const AttributeUnit* getUnit() const noexcept {return mUnit;}
+        const QString& getValue() const noexcept {return mValue;}
+        QString getValueTr(bool showUnit) const noexcept;
+
+        // Setters
+        void setTypeValueUnit(const AttributeType& type, const QString& value,
+                              const AttributeUnit* unit) throw (Exception);
 
         // General Methods
         XmlDomElement* serializeToXmlDomElement() const throw (Exception);
@@ -83,14 +81,11 @@ class GenCompAttributeInstance final : public IF_XmlSerializableObject
         bool checkAttributesValidity() const noexcept;
 
 
-        // General
-        Circuit& mCircuit;
-        GenCompInstance& mGenCompInstance;
-
         // Attributes
         QString mKey;
-        library::Attribute::Type_t mType;
+        const AttributeType* mType;
         QString mValue;
+        const AttributeUnit* mUnit;
 };
 
 } // namespace project

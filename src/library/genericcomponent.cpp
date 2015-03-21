@@ -68,12 +68,12 @@ GenericComponent::~GenericComponent() noexcept
  *  Attributes
  ****************************************************************************************/
 
-const QHash<QString, Attribute*>& GenericComponent::getAttributes() const noexcept
+const QHash<QString, LibraryElementAttribute*>& GenericComponent::getAttributes() const noexcept
 {
     return mAttributes;
 }
 
-const Attribute* GenericComponent::getAttributeByKey(const QString& key) const noexcept
+const LibraryElementAttribute* GenericComponent::getAttributeByKey(const QString& key) const noexcept
 {
     return mAttributes.value(key, nullptr);
 }
@@ -224,7 +224,7 @@ void GenericComponent::parseDomTree(const XmlDomElement& root) throw (Exception)
     for (XmlDomElement* node = root.getFirstChild("attributes/attribute", true, false);
          node; node = node->getNextSibling("attribute"))
     {
-        Attribute* attribute = new Attribute(*node); // throws an exception on error
+        LibraryElementAttribute* attribute = new LibraryElementAttribute(*node); // throws an exception on error
         if (mAttributes.contains(attribute->getKey()))
         {
             throw RuntimeError(__FILE__, __LINE__, attribute->getKey(),
@@ -328,7 +328,7 @@ XmlDomElement* GenericComponent::serializeToXmlDomElement() const throw (Excepti
 {
     QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement());
     XmlDomElement* attributes = root->appendChild("attributes");
-    foreach (const Attribute* attribute, mAttributes)
+    foreach (const LibraryElementAttribute* attribute, mAttributes)
         attributes->appendChild(attribute->serializeToXmlDomElement());
     XmlDomElement* properties = root->appendChild("properties");
     XmlDomElement* default_values = properties->appendChild("default_values");

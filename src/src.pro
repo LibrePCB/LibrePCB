@@ -157,7 +157,7 @@ SOURCES += \
     project/erc/ercmsg.cpp \
     project/erc/ercmsglist.cpp \
     project/circuit/gencompinstance.cpp \
-    library/attribute.cpp \
+    library/libraryelementattribute.cpp \
     project/circuit/gencompattributeinstance.cpp \
     common/if_attributeprovider.cpp \
     project/schematics/symbolinstancepropertiesdialog.cpp \
@@ -191,7 +191,10 @@ SOURCES += \
     common/attributes/attrtypeinductance.cpp \
     common/attributes/attrtypecapacitance.cpp \
     common/attributes/attrtypefrequency.cpp \
-    common/attributes/attrtypevoltage.cpp
+    common/attributes/attrtypevoltage.cpp \
+    project/circuit/cmd/cmdgencompattrinstadd.cpp \
+    project/circuit/cmd/cmdgencompattrinstremove.cpp \
+    project/circuit/cmd/cmdgencompattrinstedit.cpp
 
 HEADERS += \
     common/units/all_length_units.h \
@@ -295,7 +298,7 @@ HEADERS += \
     project/erc/ercmsg.h \
     project/erc/ercmsglist.h \
     project/circuit/gencompinstance.h \
-    library/attribute.h \
+    library/libraryelementattribute.h \
     project/circuit/gencompattributeinstance.h \
     common/if_attributeprovider.h \
     project/schematics/symbolinstancepropertiesdialog.h \
@@ -331,7 +334,10 @@ HEADERS += \
     common/attributes/attrtypeinductance.h \
     common/attributes/attrtypecapacitance.h \
     common/attributes/attrtypefrequency.h \
-    common/attributes/attrtypevoltage.h
+    common/attributes/attrtypevoltage.h \
+    project/circuit/cmd/cmdgencompattrinstadd.h \
+    project/circuit/cmd/cmdgencompattrinstremove.h \
+    project/circuit/cmd/cmdgencompattrinstedit.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \

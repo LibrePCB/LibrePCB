@@ -68,14 +68,14 @@ GenCompInstance::GenCompInstance(Circuit& circuit, const XmlDomElement& domEleme
     for (XmlDomElement* node = domElement.getFirstChild("attributes/attribute", true, false);
          node; node = node->getNextSibling("attribute"))
     {
-        GenCompAttributeInstance* attribute = new GenCompAttributeInstance(mCircuit, *this, *node);
-        if (mAttributes.contains(attribute->getKey()))
+        GenCompAttributeInstance* attribute = new GenCompAttributeInstance(*node);
+        if (getAttributeByKey(attribute->getKey()))
         {
             throw RuntimeError(__FILE__, __LINE__, attribute->getKey(),
                 QString(tr("The component attribute \"%1\" is defined multiple times."))
                 .arg(attribute->getKey()));
         }
-        mAttributes.insert(attribute->getKey(), attribute);
+        mAttributes.append(attribute);
     }
 
     // load all signal instances
@@ -118,11 +118,11 @@ GenCompInstance::GenCompInstance(Circuit& circuit, const library::GenericCompone
     mValue = genComp.getDefaultValue();
 
     // add attributes
-    foreach (const library::Attribute* attribute, genComp.getAttributes())
+    foreach (const library::LibraryElementAttribute* attr, genComp.getAttributes())
     {
-        GenCompAttributeInstance* attributeInstance = new GenCompAttributeInstance(mCircuit,
-            *this, attribute->getKey(), attribute->getType(), attribute->getDefaultValue());
-        mAttributes.insert(attributeInstance->getKey(), attributeInstance);
+        GenCompAttributeInstance* attributeInstance = new GenCompAttributeInstance(
+            attr->getKey(), attr->getType(), attr->getDefaultValue(), attr->getDefaultUnit());
+        mAttributes.append(attributeInstance);
     }
 
     // add signal map
@@ -209,6 +209,40 @@ void GenCompInstance::setValue(const QString& value) noexcept
 {
     if (value == mValue) return;
     mValue = value;
+    emit attributesChanged();
+}
+
+/*****************************************************************************************
+ *  Attribute Handling Methods
+ ****************************************************************************************/
+
+GenCompAttributeInstance* GenCompInstance::getAttributeByKey(const QString& key) const noexcept
+{
+    foreach (GenCompAttributeInstance* attr, mAttributes)
+    {
+        if (attr->getKey() == key)
+            return attr;
+    }
+    return nullptr;
+}
+
+void GenCompInstance::addAttribute(GenCompAttributeInstance& attr) throw (Exception)
+{
+    Q_ASSERT(mAttributes.contains(&attr) == false);
+    if (getAttributeByKey(attr.getKey()))
+    {
+        throw RuntimeError(__FILE__, __LINE__, attr.getKey(),
+            QString(tr("The component \"%1\" has already an attribute with the "
+            "key \"%2\".")).arg(mName, attr.getKey()));
+    }
+    mAttributes.append(&attr);
+    emit attributesChanged();
+}
+
+void GenCompInstance::removeAttribute(GenCompAttributeInstance& attr) throw (Exception)
+{
+    Q_ASSERT(mAttributes.contains(&attr) == true);
+    mAttributes.removeOne(&attr);
     emit attributesChanged();
 }
 
@@ -334,8 +368,8 @@ bool GenCompInstance::getAttributeValue(const QString& attrNS, const QString& at
             return value = mName, true;
         else if (attrKey == QLatin1String("VALUE"))
             return value = mValue, true;
-        else if (mAttributes.contains(attrKey))
-            return value = mAttributes.value(attrKey)->getValueToDisplay(), true;
+        else if (getAttributeByKey(attrKey))
+            return value = getAttributeByKey(attrKey)->getValueTr(true), true;
     }
 
     if ((attrNS != QLatin1String("CMP")) && (passToParents))

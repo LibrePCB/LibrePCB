@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_ATTRIBUTE_H
-#define LIBRARY_ATTRIBUTE_H
+#ifndef LIBRARY_LIBRARYELEMENTATTRIBUTE_H
+#define LIBRARY_LIBRARYELEMENTATTRIBUTE_H
 
 /*****************************************************************************************
  *  Includes
@@ -32,44 +32,37 @@
  *  Forward Declarations
  ****************************************************************************************/
 
+class AttributeType;
+class AttributeUnit;
+
 namespace library {
 class GenericComponent;
 }
 
 /*****************************************************************************************
- *  Class Attribute
+ *  Class LibraryElementAttribute
  ****************************************************************************************/
 
 namespace library {
 
 /**
- * @brief The Attribute class represents an attribute of a library element
+ * @brief The LibraryElementAttribute class represents an attribute of a library element
  */
-class Attribute final : public IF_XmlSerializableObject
+class LibraryElementAttribute final : public IF_XmlSerializableObject
 {
         Q_DECLARE_TR_FUNCTIONS(Attribute)
 
     public:
 
-        /// @brief Available Attribute Types
-        enum class Type_t {
-            String = 0,
-            Length,
-            Resistance,
-            Capacitance,
-            Inductance,
-            _COUNT
-        };
-
-
         // Constructors / Destructor
-        explicit Attribute(const XmlDomElement& domElement) throw (Exception);
-        ~Attribute() noexcept;
+        explicit LibraryElementAttribute(const XmlDomElement& domElement) throw (Exception);
+        ~LibraryElementAttribute() noexcept;
 
 
         // Getters
         const QString& getKey() const noexcept {return mKey;}
-        Type_t getType() const noexcept {return mType;}
+        const AttributeType& getType() const noexcept {return *mType;}
+        const AttributeUnit* getDefaultUnit() const noexcept {return mDefaultUnit;}
         QString getName(const QString& locale = QString()) const noexcept;
         QString getDescription(const QString& locale = QString()) const noexcept;
         QString getDefaultValue(const QString& locale = QString()) const noexcept;
@@ -80,17 +73,13 @@ class Attribute final : public IF_XmlSerializableObject
         // General Methods
         XmlDomElement* serializeToXmlDomElement() const throw (Exception);
 
-        // Static Methods
-        static Type_t stringToType(const QString& type) throw (Exception);
-        static QString typeToString(Type_t type) noexcept;
-
 
     private:
 
         // make some methods inaccessible...
-        Attribute();
-        Attribute(const Attribute& other);
-        Attribute& operator=(const Attribute& rhs);
+        LibraryElementAttribute();
+        LibraryElementAttribute(const LibraryElementAttribute& other);
+        LibraryElementAttribute& operator=(const LibraryElementAttribute& rhs);
 
         // Private Methods
         bool checkAttributesValidity() const noexcept;
@@ -98,7 +87,8 @@ class Attribute final : public IF_XmlSerializableObject
 
         // Attributes
         QString mKey;
-        Type_t mType;
+        const AttributeType* mType;
+        const AttributeUnit* mDefaultUnit;
         QHash<QString, QString> mNames;
         QHash<QString, QString> mDescriptions;
         QHash<QString, QString> mDefaultValues;
@@ -106,4 +96,4 @@ class Attribute final : public IF_XmlSerializableObject
 
 } // namespace library
 
-#endif // LIBRARY_ATTRIBUTE_H
+#endif // LIBRARY_LIBRARYELEMENTATTRIBUTE_H
