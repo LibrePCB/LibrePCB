@@ -12,7 +12,7 @@
     </meta>
     <categories/>
     <attributes>
-        <attribute key="FREQUENCY" type="string">
+        <attribute key="FREQUENCY" type="frequency" unit="megahertz">
             <name locale="en_US">Frequency</name>
             <description locale="en_US">The nominal frequency of the crystal.</description>
             <default_value locale="en_US"></default_value>

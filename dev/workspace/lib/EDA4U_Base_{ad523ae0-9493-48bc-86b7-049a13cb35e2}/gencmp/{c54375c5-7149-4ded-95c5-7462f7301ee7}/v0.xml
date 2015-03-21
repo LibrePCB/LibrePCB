@@ -12,7 +12,7 @@
     </meta>
     <categories/>
     <attributes>
-        <attribute key="CAPACITANCE" type="capacitance">
+        <attribute key="CAPACITANCE" type="capacitance" unit="microfarad">
             <name locale="en_US">Capacitance</name>
             <description locale="en_US">The nominal capacitance of the capacitor.</description>
             <default_value locale="en_US"></default_value>

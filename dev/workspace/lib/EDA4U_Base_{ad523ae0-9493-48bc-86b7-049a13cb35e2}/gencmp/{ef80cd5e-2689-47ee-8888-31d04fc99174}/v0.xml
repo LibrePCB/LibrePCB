@@ -16,7 +16,7 @@
     <changelog/>
     <attachements/>
     <attributes>
-        <attribute key="RESISTANCE" type="resistance">
+        <attribute key="RESISTANCE" type="resistance" unit="ohm">
             <name locale="en_US">Resistance</name>
             <description locale="en_US">The nominal resistance of the resistor.</description>
             <default_value locale="en_US"></default_value>

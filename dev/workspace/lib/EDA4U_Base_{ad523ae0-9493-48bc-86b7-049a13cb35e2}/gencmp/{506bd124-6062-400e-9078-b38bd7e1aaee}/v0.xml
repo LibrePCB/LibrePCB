@@ -16,7 +16,7 @@
     <changelog/>
     <attachements/>
     <attributes>
-        <attribute key="INDUCTANCE" type="inductance">
+        <attribute key="INDUCTANCE" type="inductance" unit="millihenry">
             <name locale="en_US">Inductance</name>
             <description locale="en_US">The nominal inductance of the inductor.</description>
             <default_value locale="en_US"></default_value>

@@ -12,19 +12,9 @@
     </meta>
     <categories/>
     <attributes>
-        <attribute key="COLOR" type="string">
+        <attribute key="COLOR" type="string" unit="">
             <name locale="en_US">Color</name>
             <description locale="en_US"></description>
-            <default_value locale="en_US"></default_value>
-        </attribute>
-        <attribute key="FORWARD_VOLTAGE" type="string">
-            <name locale="en_US">Uf</name>
-            <description locale="en_US">Forward Voltage</description>
-            <default_value locale="en_US"></default_value>
-        </attribute>
-        <attribute key="FORWARD_CURRENT" type="string">
-            <name locale="en_US">If</name>
-            <description locale="en_US">Forward Current</description>
             <default_value locale="en_US"></default_value>
         </attribute>
     </attributes>
