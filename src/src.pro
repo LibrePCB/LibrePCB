@@ -183,7 +183,15 @@ SOURCES += \
     project/schematics/cmd/cmdschematicnetpointedit.cpp \
     project/schematics/cmd/cmdsymbolinstanceedit.cpp \
     project/circuit/cmd/cmdgencompinstadd.cpp \
-    project/circuit/cmd/cmdgencompinstremove.cpp
+    project/circuit/cmd/cmdgencompinstremove.cpp \
+    common/attributes/attributetype.cpp \
+    common/attributes/attributeunit.cpp \
+    common/attributes/attrtyperesistance.cpp \
+    common/attributes/attrtypestring.cpp \
+    common/attributes/attrtypeinductance.cpp \
+    common/attributes/attrtypecapacitance.cpp \
+    common/attributes/attrtypefrequency.cpp \
+    common/attributes/attrtypevoltage.cpp
 
 HEADERS += \
     common/units/all_length_units.h \
@@ -315,7 +323,15 @@ HEADERS += \
     project/schematics/cmd/cmdschematicnetpointedit.h \
     project/schematics/cmd/cmdsymbolinstanceedit.h \
     project/circuit/cmd/cmdgencompinstadd.h \
-    project/circuit/cmd/cmdgencompinstremove.h
+    project/circuit/cmd/cmdgencompinstremove.h \
+    common/attributes/attributetype.h \
+    common/attributes/attributeunit.h \
+    common/attributes/attrtyperesistance.h \
+    common/attributes/attrtypestring.h \
+    common/attributes/attrtypeinductance.h \
+    common/attributes/attrtypecapacitance.h \
+    common/attributes/attrtypefrequency.h \
+    common/attributes/attrtypevoltage.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \
