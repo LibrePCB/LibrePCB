@@ -126,6 +126,14 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
         sInstance = 0;
         throw;
     }
+
+    // parse command line arguments and open all project files
+    foreach (const QString& arg, qApp->arguments())
+    {
+        FilePath filepath(arg);
+        if ((filepath.isExistingFile()) && (filepath.getSuffix() == "e4u"))
+            openProject(filepath);
+    }
 }
 
 Workspace::~Workspace()
