@@ -74,6 +74,7 @@ class CADView : public QGraphicsView
         void setGridInterval(const Length& newInterval);
         void setGridIntervalUnit(const LengthUnit& newUnit);
         void setOriginCrossVisible(bool visible) noexcept;
+        void setPaperSize(const Point& size) noexcept;
         void setPositionLabelVisible(bool visible) noexcept;
 
         // Static Functions
@@ -120,8 +121,10 @@ class CADView : public QGraphicsView
         QColor mGridColor;
         Length mGridInterval;
         LengthUnit mGridIntervalUnit;
+        bool mGridBoundedToPageBorders;
         bool mOriginCrossVisible;
         QColor mOriginCrossColor;
+        QSizeF mPageSizePx;
 
         Point mLastMouseMoveEventPos;
         QLabel* mPositionLabel;

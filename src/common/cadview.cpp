@@ -42,8 +42,9 @@ qreal CADView::sZoomFactor = 1.15;
 CADView::CADView(QWidget* parent) :
     QGraphicsView(parent),
     mGridType(GridType_t::Off), mGridColor(Qt::lightGray), mGridInterval(2540000),
-    mGridIntervalUnit(LengthUnit::millimeters()), mOriginCrossVisible(true),
-    mOriginCrossColor(Qt::black), mPositionLabel(nullptr), mZoomAnimation(nullptr)
+    mGridIntervalUnit(LengthUnit::millimeters()), mGridBoundedToPageBorders(false),
+    mOriginCrossVisible(true), mOriginCrossColor(Qt::black), mPageSizePx(),
+    mPositionLabel(nullptr), mZoomAnimation(nullptr)
 {
     mPositionLabel = new QLabel(this);
     mPositionLabel->move(5, 5);
@@ -103,19 +104,19 @@ void CADView::setVisibleSceneRect(const QRectF& rect)
 void CADView::setGridType(GridType_t type)
 {
     mGridType = type;
-    QGraphicsView::setBackgroundBrush(QBrush(Qt::NoBrush)); // this will repaint the background
+    QGraphicsView::setBackgroundBrush(backgroundBrush()); // this will repaint the background
 }
 
 void CADView::setGridColor(const QColor& color)
 {
     mGridColor = color;
-    QGraphicsView::setBackgroundBrush(QBrush(Qt::NoBrush)); // this will repaint the background
+    QGraphicsView::setBackgroundBrush(backgroundBrush()); // this will repaint the background
 }
 
 void CADView::setGridInterval(const Length& newInterval)
 {
     mGridInterval = newInterval;
-    QGraphicsView::setBackgroundBrush(QBrush(Qt::NoBrush)); // this will repaint the background
+    QGraphicsView::setBackgroundBrush(backgroundBrush()); // this will repaint the background
 }
 
 void CADView::setGridIntervalUnit(const LengthUnit& newUnit)
@@ -126,6 +127,15 @@ void CADView::setGridIntervalUnit(const LengthUnit& newUnit)
 void CADView::setOriginCrossVisible(bool visible) noexcept
 {
     mOriginCrossVisible = visible;
+}
+
+void CADView::setPaperSize(const Point& size) noexcept
+{
+    if (size.isOrigin())
+        mPageSizePx = QSizeF();
+    else
+        mPageSizePx = QSizeF(size.getX().toPx(), size.getY().toPx());
+    QGraphicsView::setBackgroundBrush(backgroundBrush()); // this will repaint the background
 }
 
 void CADView::setPositionLabelVisible(bool visible) noexcept
@@ -179,38 +189,55 @@ void CADView::drawBackground(QPainter* painter, const QRectF& rect)
     if (!getCadScene())
         return;
 
-    qreal gridIntervalPixels = mGridInterval.toPx();
-    qreal scaleFactor = width() / rect.width();
-    qreal left = qFloor(rect.left() / gridIntervalPixels) * gridIntervalPixels;
-    qreal top = qFloor(rect.top() / gridIntervalPixels) * gridIntervalPixels;
-
     QPen gridPen(mGridColor);
-    gridPen.setCapStyle(Qt::RoundCap);
-    gridPen.setWidth((mGridType == GridType_t::Dots) ? 2 : 1);
     gridPen.setCosmetic(true);
 
-    painter->setPen(gridPen);
-    painter->setBrush(backgroundBrush());
-    painter->setWorldMatrixEnabled(true);
-
     // draw background color
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(backgroundBrush());
     painter->fillRect(rect, backgroundBrush());
 
+    if (!mPageSizePx.isEmpty())
+    {
+        // draw page size
+        gridPen.setWidth(2);
+        painter->setPen(gridPen);
+        painter->setBrush(Qt::NoBrush);
+        painter->drawRect(0, 0, mPageSizePx.width(), -mPageSizePx.height());
+    }
+
     // draw background grid lines
+    gridPen.setWidth((mGridType == GridType_t::Dots) ? 2 : 1);
+    painter->setPen(gridPen);
+    painter->setBrush(Qt::NoBrush);
+    qreal gridIntervalPixels = mGridInterval.toPx();
+    qreal scaleFactor = width() / rect.width();
     if (gridIntervalPixels * scaleFactor >= (qreal)5)
     {
+        qreal left, right, top, bottom;
+        if ((mGridBoundedToPageBorders) && (!mPageSizePx.isEmpty()))
+        {
+            left = 0;
+            right = mPageSizePx.width();
+            top = mPageSizePx.height();
+            bottom = 0;
+        }
+        else
+        {
+            left = qFloor(rect.left() / gridIntervalPixels) * gridIntervalPixels;
+            right = rect.right();
+            top = rect.top();
+            bottom = qFloor(rect.bottom() / gridIntervalPixels) * gridIntervalPixels;
+        }
         switch (mGridType)
         {
             case GridType_t::Lines:
             {
                 QVarLengthArray<QLineF, 500> lines;
-
-                for (qreal x = left; x < rect.right(); x += gridIntervalPixels)
-                    lines.append(QLineF(x, rect.top(), x, rect.bottom()));
-
-                for (qreal y = top; y < rect.bottom(); y += gridIntervalPixels)
-                    lines.append(QLineF(rect.left(), y, rect.right(), y));
-
+                for (qreal x = left; x < right; x += gridIntervalPixels)
+                    lines.append(QLineF(x, top, x, bottom));
+                for (qreal y = bottom; y > top; y -= gridIntervalPixels)
+                    lines.append(QLineF(left, y, right, y));
                 painter->setOpacity(0.5);
                 painter->drawLines(lines.data(), lines.size());
                 break;
@@ -219,11 +246,9 @@ void CADView::drawBackground(QPainter* painter, const QRectF& rect)
             case GridType_t::Dots:
             {
                 QVarLengthArray<QPointF, 2000> dots;
-
-                for (qreal x = left; x < rect.right(); x += gridIntervalPixels)
-                    for (qreal y = top; y < rect.bottom(); y += gridIntervalPixels)
+                for (qreal x = left; x < right; x += gridIntervalPixels)
+                    for (qreal y = bottom; y > top; y -= gridIntervalPixels)
                         dots.append(QPointF(x, y));
-
                 painter->drawPoints(dots.data(), dots.size());
                 break;
             }
