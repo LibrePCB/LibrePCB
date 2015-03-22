@@ -51,9 +51,8 @@ namespace project {
 Project::Project(const FilePath& filepath, bool create) throw (Exception) :
     QObject(0), IF_AttributeProvider(), mPath(filepath.getParentDir()),
     mFilepath(filepath), mXmlFile(0), mFileLock(filepath), mIsRestored(false),
-    mIsReadOnly(false), mSchematicsIniFile(0), mDescriptionHtmlFile(0),
-    mProjectIsModified(false), mUndoStack(0), mProjectLibrary(0), mErcMsgList(0),
-    mCircuit(0), mSchematicEditor(0)
+    mIsReadOnly(false), mDescriptionHtmlFile(0), mProjectIsModified(false), mUndoStack(0),
+    mProjectLibrary(0), mErcMsgList(0), mCircuit(0), mSchematicEditor(0)
 {
     qDebug() << (create ? "create project..." : "open project...");
 
@@ -155,11 +154,23 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
     try
     {
         // try to create/open the XML project file
+        QSharedPointer<XmlDomDocument> doc;
+        XmlDomElement* root = nullptr;
         if (create)
         {
             mXmlFile = SmartXmlFile::create(mFilepath);
+        }
+        else
+        {
+            mXmlFile = new SmartXmlFile(mFilepath, mIsRestored, mIsReadOnly);
+            doc = mXmlFile->parseFileAndBuildDomTree();
+            root = &doc->getRoot();
+        }
 
-            // Load default attribute values
+
+        // load project attributes
+        if (create)
+        {
             mName = mFilepath.getCompleteBasename();
             mAuthor = SystemInfo::getFullUsername();
             mCreated = QDateTime::currentDateTime();
@@ -167,15 +178,10 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
         }
         else
         {
-            mXmlFile = new SmartXmlFile(mFilepath, mIsRestored, mIsReadOnly);
-            QSharedPointer<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
-            XmlDomElement& root = doc->getRoot();
-
-            // Load all attributes
-            mName = root.getFirstChild("meta/name", true, true)->getText();
-            mAuthor = root.getFirstChild("meta/author", true, true)->getText();
-            mCreated = root.getFirstChild("meta/created", true, true)->getText<QDateTime>();
-            mLastModified = root.getFirstChild("meta/last_modified", true, true)->getText<QDateTime>();
+            mName = root->getFirstChild("meta/name", true, true)->getText();
+            mAuthor = root->getFirstChild("meta/author", true, true)->getText();
+            mCreated = root->getFirstChild("meta/created", true, true)->getText<QDateTime>();
+            mLastModified = root->getFirstChild("meta/last_modified", true, true)->getText<QDateTime>();
         }
 
         // Load description HTML file
@@ -195,27 +201,24 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
         foreach (uint id, SchematicLayer::getAllLayerIDs())
             mSchematicLayers.insert(id, new SchematicLayer(id));
 
-        // Load schematic list file "schematics/schematics.ini"
-        if (create)
-            mSchematicsIniFile = SmartIniFile::create(mPath.getPathTo("schematics/schematics.ini"), 0);
-        else
-            mSchematicsIniFile = new SmartIniFile(mPath.getPathTo("schematics/schematics.ini"),
-                                                  mIsRestored, mIsReadOnly, 0);
-
         // Load all schematics
-        QSettings* schematicsSettings = mSchematicsIniFile->createQSettings();
-        int schematicsCount = schematicsSettings->beginReadArray("pages");
-        for (int i = 0; i < schematicsCount; i++)
+        if (create)
         {
-            schematicsSettings->setArrayIndex(i);
-            FilePath filepath = FilePath::fromRelative(mPath.getPathTo("schematics"),
-                                    schematicsSettings->value("page").toString());
-            Schematic* schematic = new Schematic(*this, filepath, mIsRestored, mIsReadOnly);
-            addSchematic(schematic, i);
+            FilePath fp = FilePath::fromRelative(mPath.getPathTo("schematics"), "main.xml");
+            Schematic* schematic = Schematic::create(*this, fp, "Main Page");
+            addSchematic(schematic);
         }
-        schematicsSettings->endArray();
-        mSchematicsIniFile->releaseQSettings(schematicsSettings);
-        qDebug() << mSchematics.count() << "schematics successfully loaded!";
+        else
+        {
+            for (XmlDomElement* node = root->getFirstChild("schematics/schematic", true, false);
+                 node; node = node->getNextSibling("schematic"))
+            {
+                FilePath fp = FilePath::fromRelative(mPath.getPathTo("schematics"), node->getText(true));
+                Schematic* schematic = new Schematic(*this, fp, mIsRestored, mIsReadOnly);
+                addSchematic(schematic);
+            }
+            qDebug() << mSchematics.count() << "schematics successfully loaded!";
+        }
 
         // at this point, the whole circuit with all schematics and boards is successfully
         // loaded, so the ERC list now contains all the correct ERC messages.
@@ -235,7 +238,6 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
         delete mSchematicEditor;        mSchematicEditor = 0;
         foreach (Schematic* schematic, mSchematics)
             try { removeSchematic(schematic, true); } catch (...) {}
-        delete mSchematicsIniFile;      mSchematicsIniFile = 0;
         qDeleteAll(mSchematicLayers);   mSchematicLayers.clear();
         delete mCircuit;                mCircuit = 0;
         delete mErcMsgList;             mErcMsgList = 0;
@@ -285,7 +287,6 @@ Project::~Project() noexcept
         try { removeSchematic(schematic, true); } catch (...) {}
     qDeleteAll(mRemovedSchematics); mRemovedSchematics.clear();
 
-    delete mSchematicsIniFile;      mSchematicsIniFile = 0;
     qDeleteAll(mSchematicLayers);   mSchematicLayers.clear();
     delete mCircuit;                mCircuit = 0;
     delete mErcMsgList;             mErcMsgList = 0;
@@ -586,23 +587,6 @@ bool Project::close(QWidget* msgBoxParent) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void Project::updateSchematicsList() throw (Exception)
-{
-    QSettings* s = mSchematicsIniFile->createQSettings(); // can throw an exception
-
-    FilePath schematicsPath(mPath.getPathTo("schematics"));
-    s->remove("pages");
-    s->beginWriteArray("pages");
-    for (int i = 0; i < mSchematics.count(); i++)
-    {
-        s->setArrayIndex(i);
-        s->setValue("page", mSchematics.at(i)->getFilePath().toRelative(schematicsPath));
-    }
-    s->endArray();
-
-    mSchematicsIniFile->releaseQSettings(s);
-}
-
 bool Project::checkAttributesValidity() const noexcept
 {
     if (mName.isEmpty())    return false;
@@ -614,12 +598,20 @@ XmlDomElement* Project::serializeToXmlDomElement() const throw (Exception)
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("project"));
+
+    // meta
     XmlDomElement* meta = root->appendChild("meta");
     meta->appendTextChild("name", mName);
     meta->appendTextChild("author", mAuthor);
     meta->appendTextChild("created", mCreated);
     meta->appendTextChild("last_modified", mLastModified);
-    //XmlDomElement* attributes = root->appendChild("attributes");
+
+    // schematics
+    FilePath schematicsPath(mPath.getPathTo("schematics"));
+    XmlDomElement* schematics = root->appendChild("schematics");
+    foreach (Schematic* schematic, mSchematics)
+        schematics->appendTextChild("schematic", schematic->getFilePath().toRelative(schematicsPath));
+
     return root.take();
 }
 
@@ -679,18 +671,6 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     {
         if (!schematic->save(toOriginal, errors))
             success = false;
-    }
-
-    // Save "schematics/schematics.ini"
-    try
-    {
-        updateSchematicsList();
-        mSchematicsIniFile->save(toOriginal);
-    }
-    catch (Exception& e)
-    {
-        success = false;
-        errors.append(e.getUserMsg());
     }
 
     // Save ERC messages list

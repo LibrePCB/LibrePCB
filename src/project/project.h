@@ -467,13 +467,6 @@ class Project final : public QObject, public IF_AttributeProvider,
         // Private Methods
 
         /**
-         * @brief Update the content of the file #mSchematicsIniFile
-         *
-         * @throw Exception     On error
-         */
-        void updateSchematicsList() throw (Exception);
-
-        /**
          * @copydoc IF_XmlSerializableObject#checkAttributesValidity()
          */
         bool checkAttributesValidity() const noexcept;
@@ -515,7 +508,6 @@ class Project final : public QObject, public IF_AttributeProvider,
         bool mIsReadOnly; ///< the constructor will set this to true if the project was opened in read only mode
 
         // Other Files
-        SmartIniFile* mSchematicsIniFile;    ///< schematics/schematics.ini
         SmartTextFile* mDescriptionHtmlFile; ///< description/index.html
 
         // Attributes
