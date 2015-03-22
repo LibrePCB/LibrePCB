@@ -161,10 +161,12 @@ void CADView::zoomAll()
 {
     if (scene())
     {
+        QRectF rect = scene()->itemsBoundingRect();
+        if (rect.isEmpty()) rect = QRectF(0, -500, 800, 500);
         mZoomAnimation->setDuration(500);
         mZoomAnimation->setEasingCurve(QEasingCurve::InOutCubic);
         mZoomAnimation->setStartValue(getVisibleSceneRect());
-        mZoomAnimation->setEndValue(scene()->itemsBoundingRect());
+        mZoomAnimation->setEndValue(rect);
         mZoomAnimation->start();
     }
 }

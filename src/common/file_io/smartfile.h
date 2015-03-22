@@ -92,6 +92,33 @@ class SmartFile
          */
         const FilePath& getFilepath() const noexcept {return mFilePath;}
 
+        /**
+         * @brief Check if this file was restored from a backup
+         *
+         * @return true if restored, false if not
+         *
+         * @see #mIsRestored
+         */
+        bool isRestored() const noexcept {return mIsRestored;}
+
+        /**
+         * @brief Check if this file was opened in read-only mode
+         *
+         * @return true if opened read-only, false if not
+         *
+         * @see #mIsReadOnly
+         */
+        bool isReadOnly() const noexcept {return mIsReadOnly;}
+
+        /**
+         * @brief Check if this file is created and not yet saved to the harddisc
+         *
+         * @return true if the file was not yet written the the harddisc, false otherwise
+         *
+         * @see #mIsCreated
+         */
+        bool isCreated() const noexcept {return mIsCreated;}
+
 
         // General Methods
 
