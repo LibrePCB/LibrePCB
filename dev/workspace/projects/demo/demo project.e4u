@@ -4,6 +4,10 @@
         <name>Demo Project</name>
         <author>Homer Simpson</author>
         <created>2013-04-13T12:43:52Z</created>
-        <last_modified>2015-03-21T23:06:24Z</last_modified>
+        <last_modified>2015-03-22T19:47:42Z</last_modified>
     </meta>
+    <schematics>
+        <schematic>supply.xml</schematic>
+        <schematic>ManySymbols.xml</schematic>
+    </schematics>
 </project>
