@@ -125,14 +125,15 @@
             <description locale="en_US">European Variant</description>
             <symbol_items>
                 <!--
+                    All symbol items of this symbol variant in the same order as they should be added to schematic when adding such a generic component.
+                    
                     Attributes:
                         - uuid:     The uuid of the symbol variant item (must be unique in its symbol variant)
                         - symbol:   The uuid of the library symbol
-                        - add_order_index:  If the user adds this generic component with this symbol variant to the schematic, this attribute describes the order of adding all symbols to the schematic. Zero is the index of the first symbol to add. Use the index -1 for symbols which should not be added (this is normally not used!)
                         - required: If this is true and this symbol is not places in the schematic, the ERC will give an error.
                         - suffix:   The component name suffix of this symbol (e.g. "A", "B", "C" to produce component names like "IC1A", "IC1B", "IC1C"). Must be unique in the symbol variant!
                 -->
-                <item uuid="{adae210d-c505-487b-9fe8-834a24f14638}" symbol="{00000000-0000-4001-8000-000000000000}" add_order_index="0" required="true" suffix="A">
+                <item uuid="{adae210d-c505-487b-9fe8-834a24f14638}" symbol="{00000000-0000-4001-8000-000000000000}" required="true" suffix="A">
                     <pin_signal_map>
                         <!--
                             This list must contain every pin of the specified symbol!

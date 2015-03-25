@@ -45,7 +45,7 @@
             <name locale="en_US">European Variant</name>
             <description locale="en_US"></description>
             <symbol_items>
-                <item uuid="{42989503-2795-4892-9d83-b919cd7dad76}" symbol="{eaa5837a-a451-40ae-8620-d21e9af42151}" add_order_index="0" required="true" suffix="">
+                <item uuid="{42989503-2795-4892-9d83-b919cd7dad76}" symbol="{eaa5837a-a451-40ae-8620-d21e9af42151}" required="true" suffix="">
                     <pin_signal_map>
                         <map pin="{fba2100c-f69f-40e1-b6be-8b2f2758ad52}" signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}" display="none"/>
                         <map pin="{99ba7020-af70-432f-9584-c452397065c5}" signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}" display="none"/>

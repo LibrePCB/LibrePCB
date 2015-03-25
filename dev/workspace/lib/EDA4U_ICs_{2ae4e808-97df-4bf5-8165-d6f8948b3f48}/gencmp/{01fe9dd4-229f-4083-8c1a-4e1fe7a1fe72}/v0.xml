@@ -59,7 +59,7 @@
             <name locale="en_US">default</name>
             <description locale="en_US"></description>
             <symbol_items>
-                <item suffix="" symbol="{8f089c97-5f9b-4437-94a6-3d2f958583c7}" uuid="{42e8f509-3f37-4b36-9ef6-98ecd19e8ca4}" add_order_index="0" required="true">
+                <item suffix="" symbol="{8f089c97-5f9b-4437-94a6-3d2f958583c7}" uuid="{42e8f509-3f37-4b36-9ef6-98ecd19e8ca4}" required="true">
                     <pin_signal_map>
                         <map display="gen_comp_signal" signal="{589f8b34-815e-4890-bc88-0d2565ac06ca}" pin="{8217d867-da05-4630-a4d7-1926324fe9a5}"/>
                         <map display="gen_comp_signal" signal="{f233a935-431c-4e10-9e97-7ddcf8fedfb2}" pin="{64b1cf6f-dc2c-4ea1-9f4b-fac229b2df07}"/>
