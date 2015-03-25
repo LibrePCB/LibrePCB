@@ -58,19 +58,19 @@ LibraryElementAttribute::~LibraryElementAttribute() noexcept
  *  Getters
  ****************************************************************************************/
 
-QString LibraryElementAttribute::getName(const QString& locale ) const noexcept
+QString LibraryElementAttribute::getName(const QStringList& localeOrder ) const noexcept
 {
-    return LibraryBaseElement::localeStringFromList(mNames, locale);
+    return LibraryBaseElement::localeStringFromList(mNames, localeOrder);
 }
 
-QString LibraryElementAttribute::getDescription(const QString& locale) const noexcept
+QString LibraryElementAttribute::getDescription(const QStringList& localeOrder) const noexcept
 {
-    return LibraryBaseElement::localeStringFromList(mDescriptions, locale);
+    return LibraryBaseElement::localeStringFromList(mDescriptions, localeOrder);
 }
 
-QString LibraryElementAttribute::getDefaultValue(const QString& locale ) const noexcept
+QString LibraryElementAttribute::getDefaultValue(const QStringList& localeOrder ) const noexcept
 {
-    return LibraryBaseElement::localeStringFromList(mDefaultValues, locale);
+    return LibraryBaseElement::localeStringFromList(mDefaultValues, localeOrder);
 }
 
 /*****************************************************************************************

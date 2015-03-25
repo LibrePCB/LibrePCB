@@ -52,49 +52,17 @@ GenCompSymbVar::GenCompSymbVar(const XmlDomElement& domElement) throw (Exception
         LibraryBaseElement::readLocaleDomNodes(domElement, "description", mDescriptions);
 
         // Load all symbol variant items
-        QList<int> addOrderIndexes; // contains all add order indexes except -1
         for (XmlDomElement* node = domElement.getFirstChild("symbol_items/item", true, false);
              node; node = node->getNextSibling("item"))
         {
             GenCompSymbVarItem* item = new GenCompSymbVarItem(*node);
-            if (mSymbolItems.contains(item->getUuid()))
+            if (getItemByUuid(item->getUuid()))
             {
                 throw RuntimeError(__FILE__, __LINE__, item->getUuid().toString(),
                     QString(tr("The symbol variant item \"%1\" exists multiple times in \"%2\"."))
                     .arg(item->getUuid().toString(), domElement.getDocFilePath().toNative()));
             }
-            if (item->getAddOrderIndex() != -1)
-            {
-                if (addOrderIndexes.contains(item->getAddOrderIndex()))
-                {
-                    throw RuntimeError(__FILE__, __LINE__, item->getUuid().toString(),
-                        QString(tr("The symbol variant \"%1\" in \"%2\" has add order "
-                        "index duplicates.")).arg(mUuid.toString(),
-                        domElement.getDocFilePath().toNative()));
-                }
-                else
-                    addOrderIndexes.append(item->getAddOrderIndex());
-            }
-            mSymbolItems.insert(item->getUuid(), item);
-        }
-        // check if there are symbol items with an add order index >= 0
-        if (addOrderIndexes.isEmpty())
-        {
-            throw RuntimeError(__FILE__, __LINE__, domElement.getDocFilePath().toStr(),
-                QString(tr("The symbol variant \"%1\" in \"%2\" has no symbol items with "
-                "an add order index >= 0 defined.")).arg(mUuid.toString(),
-                domElement.getDocFilePath().toNative()));
-        }
-        // check if there are no unused add order indexes in between all indexes
-        qSort(addOrderIndexes);
-        for (int i = 0; i < addOrderIndexes.count(); i++)
-        {
-            if (addOrderIndexes[i] != i)
-            {
-                throw RuntimeError(__FILE__, __LINE__, mUuid.toString(), QString(tr(
-                    "The symbol variant \"%1\" in \"%2\" has invalid add order indexes."))
-                    .arg(mUuid.toString(), domElement.getDocFilePath().toNative()));
-            }
+            mSymbolItems.append(item);
         }
 
         if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
@@ -115,24 +83,35 @@ GenCompSymbVar::~GenCompSymbVar() noexcept
  *  Getters
  ****************************************************************************************/
 
-QString GenCompSymbVar::getName(const QString& locale) const noexcept
+QString GenCompSymbVar::getName(const QStringList& localeOrder) const noexcept
 {
-    return LibraryBaseElement::localeStringFromList(mNames, locale);
+    return LibraryBaseElement::localeStringFromList(mNames, localeOrder);
 }
 
-QString GenCompSymbVar::getDescription(const QString& locale) const noexcept
+QString GenCompSymbVar::getDescription(const QStringList& localeOrder) const noexcept
 {
-    return LibraryBaseElement::localeStringFromList(mDescriptions, locale);
+    return LibraryBaseElement::localeStringFromList(mDescriptions, localeOrder);
 }
 
-const GenCompSymbVarItem* GenCompSymbVar::getItemByAddOrderIndex(unsigned int index) const noexcept
+const GenCompSymbVarItem* GenCompSymbVar::getItemByUuid(const QUuid& uuid) const noexcept
 {
     foreach (const GenCompSymbVarItem* item, mSymbolItems)
     {
-        if (item->getAddOrderIndex() == static_cast<int>(index))
+        if (item->getUuid() == uuid)
             return item;
     }
-    return 0;
+    return nullptr;
+}
+
+const GenCompSymbVarItem* GenCompSymbVar::getNextItem(const GenCompSymbVarItem* item) const noexcept
+{
+    int index = mSymbolItems.indexOf(item);
+    Q_ASSERT(index >= 0);
+
+    if (index+1 < mSymbolItems.count())
+        return mSymbolItems.at(index+1);
+    else
+        return nullptr;
 }
 
 /*****************************************************************************************
@@ -169,9 +148,10 @@ void GenCompSymbVar::clearItems() noexcept
     mSymbolItems.clear();
 }
 
-void GenCompSymbVar::addItem(const GenCompSymbVarItem* item) noexcept
+void GenCompSymbVar::addItem(const GenCompSymbVarItem& item) noexcept
 {
-    mSymbolItems.insert(item->getUuid(), item);
+    Q_ASSERT(getItemByUuid(item.getUuid()) == nullptr);
+    mSymbolItems.append(&item);
 }
 
 XmlDomElement* GenCompSymbVar::serializeToXmlDomElement() const throw (Exception)

@@ -53,15 +53,15 @@ class GenCompSymbVar final : public IF_XmlSerializableObject
         const QUuid& getUuid() const noexcept {return mUuid;}
         const QString& getNorm() const noexcept {return mNorm;}
         bool isDefault() const noexcept {return mIsDefault;}
-        QString getName(const QString& locale = QString()) const noexcept;
-        QString getDescription(const QString& locale = QString()) const noexcept;
-        const QHash<QString, QString>& getNames() const noexcept {return mNames;}
-        const QHash<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
+        QString getName(const QStringList& localeOrder = QStringList()) const noexcept;
+        QString getDescription(const QStringList& localeOrder = QStringList()) const noexcept;
+        const QMap<QString, QString>& getNames() const noexcept {return mNames;}
+        const QMap<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
 
         // Getters: Symbol Items
-        const QHash<QUuid, const GenCompSymbVarItem*>& getItems() const noexcept {return mSymbolItems;}
-        const GenCompSymbVarItem* getItemByUuid(const QUuid& uuid) const noexcept {return mSymbolItems.value(uuid, 0);}
-        const GenCompSymbVarItem* getItemByAddOrderIndex(unsigned int index) const noexcept;
+        const QList<const GenCompSymbVarItem*>& getItems() const noexcept {return mSymbolItems;}
+        const GenCompSymbVarItem* getItemByUuid(const QUuid& uuid) const noexcept;
+        const GenCompSymbVarItem* getNextItem(const GenCompSymbVarItem* item) const noexcept;
 
         // Setters
         void setNorm(const QString& norm) noexcept;
@@ -71,7 +71,7 @@ class GenCompSymbVar final : public IF_XmlSerializableObject
 
         // General Methods
         void clearItems() noexcept;
-        void addItem(const GenCompSymbVarItem* item) noexcept;
+        void addItem(const GenCompSymbVarItem& item) noexcept;
         XmlDomElement* serializeToXmlDomElement() const throw (Exception);
 
 
@@ -89,9 +89,9 @@ class GenCompSymbVar final : public IF_XmlSerializableObject
         QUuid mUuid;
         QString mNorm;
         bool mIsDefault;
-        QHash<QString, QString> mNames;
-        QHash<QString, QString> mDescriptions;
-        QHash<QUuid, const GenCompSymbVarItem*> mSymbolItems; ///< minimum one item
+        QMap<QString, QString> mNames;
+        QMap<QString, QString> mDescriptions;
+        QList<const GenCompSymbVarItem*> mSymbolItems; ///< minimum one item
 };
 
 } // namespace library

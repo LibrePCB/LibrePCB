@@ -63,12 +63,12 @@ class LibraryElementAttribute final : public IF_XmlSerializableObject
         const QString& getKey() const noexcept {return mKey;}
         const AttributeType& getType() const noexcept {return *mType;}
         const AttributeUnit* getDefaultUnit() const noexcept {return mDefaultUnit;}
-        QString getName(const QString& locale = QString()) const noexcept;
-        QString getDescription(const QString& locale = QString()) const noexcept;
-        QString getDefaultValue(const QString& locale = QString()) const noexcept;
-        const QHash<QString, QString>& getNames() const noexcept {return mNames;}
-        const QHash<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
-        const QHash<QString, QString>& getDefaultValues() const noexcept {return mDefaultValues;}
+        QString getName(const QStringList& localeOrder = QStringList()) const noexcept;
+        QString getDescription(const QStringList& localeOrder = QStringList()) const noexcept;
+        QString getDefaultValue(const QStringList& localeOrder = QStringList()) const noexcept;
+        const QMap<QString, QString>& getNames() const noexcept {return mNames;}
+        const QMap<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
+        const QMap<QString, QString>& getDefaultValues() const noexcept {return mDefaultValues;}
 
         // General Methods
         XmlDomElement* serializeToXmlDomElement() const throw (Exception);
@@ -89,9 +89,9 @@ class LibraryElementAttribute final : public IF_XmlSerializableObject
         QString mKey;
         const AttributeType* mType;
         const AttributeUnit* mDefaultUnit;
-        QHash<QString, QString> mNames;
-        QHash<QString, QString> mDescriptions;
-        QHash<QString, QString> mDefaultValues;
+        QMap<QString, QString> mNames;
+        QMap<QString, QString> mDescriptions;
+        QMap<QString, QString> mDefaultValues;
 };
 
 } // namespace library

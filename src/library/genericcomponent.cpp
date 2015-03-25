@@ -68,28 +68,33 @@ GenericComponent::~GenericComponent() noexcept
  *  Attributes
  ****************************************************************************************/
 
-const QHash<QString, LibraryElementAttribute*>& GenericComponent::getAttributes() const noexcept
+const QList<LibraryElementAttribute*>& GenericComponent::getAttributes() const noexcept
 {
     return mAttributes;
 }
 
 const LibraryElementAttribute* GenericComponent::getAttributeByKey(const QString& key) const noexcept
 {
-    return mAttributes.value(key, nullptr);
+    foreach (const LibraryElementAttribute* attr, mAttributes)
+    {
+        if (attr->getKey() == key)
+            return attr;
+    }
+    return nullptr;
 }
 
 /*****************************************************************************************
  *  Default Values
  ****************************************************************************************/
 
-const QHash<QString, QString>& GenericComponent::getDefaultValues() const noexcept
+const QMap<QString, QString>& GenericComponent::getDefaultValues() const noexcept
 {
     return mDefaultValues;
 }
 
-QString GenericComponent::getDefaultValue(const QString& locale) const noexcept
+QString GenericComponent::getDefaultValue(const QStringList& localeOrder) const noexcept
 {
-    return LibraryBaseElement::localeStringFromList(mDefaultValues, locale);
+    return LibraryBaseElement::localeStringFromList(mDefaultValues, localeOrder);
 }
 
 void GenericComponent::clearDefaultValues() noexcept
@@ -106,22 +111,26 @@ void GenericComponent::addDefaultValue(const QString& locale, const QString& val
  *  Prefixes
  ****************************************************************************************/
 
-const QHash<QString, QString>& GenericComponent::getPrefixes() const noexcept
+const QMap<QString, QString>& GenericComponent::getPrefixes() const noexcept
 {
     return mPrefixes;
 }
 
-QString GenericComponent::getPrefix(const QString& norm) const noexcept
+QString GenericComponent::getPrefix(const QStringList& normOrder) const noexcept
 {
-    // if the specified norm exists, return its prefix
-    if ((!norm.isNull()) && mPrefixes.contains(norm))
-        return mPrefixes.value(norm);
-
-    // if a norm from the workspace settings exists, return its prefix
-    foreach (const QString& libNorm, Workspace::instance().getSettings().getLibNormOrder()->getNormOrder())
+    // search in the specified norm order
+    foreach (const QString& norm, normOrder)
     {
-        if (mPrefixes.contains(libNorm))
-            return mPrefixes.value(libNorm);
+        if (mPrefixes.contains(norm))
+            return mPrefixes.value(norm);
+    }
+
+    // search in the norm order from the workspace settings
+    const QStringList& wsNormOrder = Workspace::instance().getSettings().getLibNormOrder()->getNormOrder();
+    foreach (const QString& norm, wsNormOrder)
+    {
+        if (mPrefixes.contains(norm))
+            return mPrefixes.value(norm);
     }
 
     // return the prefix of the default norm
@@ -154,14 +163,19 @@ void GenericComponent::addPrefix(const QString& norm, const QString& prefix, boo
  *  Signals
  ****************************************************************************************/
 
-const QHash<QUuid, const GenCompSignal*>& GenericComponent::getSignals() const noexcept
+const QList<const GenCompSignal*>& GenericComponent::getSignals() const noexcept
 {
     return mSignals;
 }
 
 const GenCompSignal* GenericComponent::getSignalByUuid(const QUuid& uuid) const noexcept
 {
-    return mSignals.value(uuid, nullptr);
+    foreach (const GenCompSignal* signal, mSignals)
+    {
+        if (signal->getUuid() == uuid)
+            return signal;
+    }
+    return nullptr;
 }
 
 void GenericComponent::clearSignals() noexcept
@@ -170,23 +184,29 @@ void GenericComponent::clearSignals() noexcept
     mSignals.clear();
 }
 
-void GenericComponent::addSignal(const GenCompSignal* signal) noexcept
+void GenericComponent::addSignal(const GenCompSignal& signal) noexcept
 {
-    mSignals.insert(signal->getUuid(), signal);
+    Q_ASSERT(getSignalByUuid(signal.getUuid()) == nullptr);
+    mSignals.append(&signal);
 }
 
 /*****************************************************************************************
  *  Symbol Variants
  ****************************************************************************************/
 
-const QHash<QUuid, const GenCompSymbVar*>& GenericComponent::getSymbolVariants() const noexcept
+const QList<const GenCompSymbVar*>& GenericComponent::getSymbolVariants() const noexcept
 {
     return mSymbolVariants;
 }
 
 const GenCompSymbVar* GenericComponent::getSymbolVariantByUuid(const QUuid& uuid) const noexcept
 {
-    return mSymbolVariants.value(uuid, nullptr);
+    foreach (const GenCompSymbVar* var, mSymbolVariants)
+    {
+        if (var->getUuid() == uuid)
+            return var;
+    }
+    return nullptr;
 }
 
 const QUuid& GenericComponent::getDefaultSymbolVariantUuid() const noexcept
@@ -196,7 +216,7 @@ const QUuid& GenericComponent::getDefaultSymbolVariantUuid() const noexcept
 
 const GenCompSymbVar* GenericComponent::getDefaultSymbolVariant() const noexcept
 {
-    return mSymbolVariants.value(mDefaultSymbolVariantUuid);
+    return getSymbolVariantByUuid(mDefaultSymbolVariantUuid);
 }
 
 void GenericComponent::clearSymbolVariants() noexcept
@@ -206,10 +226,12 @@ void GenericComponent::clearSymbolVariants() noexcept
     mDefaultSymbolVariantUuid = QUuid();
 }
 
-void GenericComponent::addSymbolVariant(const GenCompSymbVar* symbolVariant) noexcept
+void GenericComponent::addSymbolVariant(const GenCompSymbVar& symbolVariant) noexcept
 {
-    mSymbolVariants.insert(symbolVariant->getUuid(), symbolVariant);
-    if (symbolVariant->isDefault()) mDefaultSymbolVariantUuid = symbolVariant->getUuid();
+    // TODO: changing the default symbol variant is implemented very ugly and buggy!
+    Q_ASSERT(getSymbolVariantByUuid(symbolVariant.getUuid()) == nullptr);
+    mSymbolVariants.append(&symbolVariant);
+    if (symbolVariant.isDefault()) mDefaultSymbolVariantUuid = symbolVariant.getUuid();
 }
 
 /*****************************************************************************************
@@ -225,13 +247,13 @@ void GenericComponent::parseDomTree(const XmlDomElement& root) throw (Exception)
          node; node = node->getNextSibling("attribute"))
     {
         LibraryElementAttribute* attribute = new LibraryElementAttribute(*node); // throws an exception on error
-        if (mAttributes.contains(attribute->getKey()))
+        if (getAttributeByKey(attribute->getKey()))
         {
             throw RuntimeError(__FILE__, __LINE__, attribute->getKey(),
                 QString(tr("The attribute \"%1\" exists multiple times in \"%2\"."))
                 .arg(attribute->getKey(), mXmlFilepath.toNative()));
         }
-        mAttributes.insert(attribute->getKey(), attribute);
+        mAttributes.append(attribute);
     }
 
     // Load default values in all available languages
@@ -278,13 +300,13 @@ void GenericComponent::parseDomTree(const XmlDomElement& root) throw (Exception)
          node; node = node->getNextSibling("signal"))
     {
         GenCompSignal* signal = new GenCompSignal(*node);
-        if (mSignals.contains(signal->getUuid()))
+        if (getSignalByUuid(signal->getUuid()))
         {
             throw RuntimeError(__FILE__, __LINE__, signal->getUuid().toString(),
                 QString(tr("The signal \"%1\" exists multiple times in \"%2\"."))
                 .arg(signal->getUuid().toString(), mXmlFilepath.toNative()));
         }
-        mSignals.insert(signal->getUuid(), signal);
+        mSignals.append(signal);
     }
 
     // Load all symbol variants
@@ -292,7 +314,7 @@ void GenericComponent::parseDomTree(const XmlDomElement& root) throw (Exception)
          node; node = node->getNextSibling("variant"))
     {
         GenCompSymbVar* variant = new GenCompSymbVar(*node);
-        if (mSymbolVariants.contains(variant->getUuid()))
+        if (getSymbolVariantByUuid(variant->getUuid()))
         {
             throw RuntimeError(__FILE__, __LINE__, variant->getUuid().toString(),
                 QString(tr("The symbol variant \"%1\" exists multiple times in \"%2\"."))
@@ -308,7 +330,7 @@ void GenericComponent::parseDomTree(const XmlDomElement& root) throw (Exception)
             }
             mDefaultSymbolVariantUuid = variant->getUuid();
         }
-        mSymbolVariants.insert(variant->getUuid(), variant);
+        mSymbolVariants.append(variant);
     }
     if (mSymbolVariants.isEmpty())
     {
@@ -362,7 +384,7 @@ bool GenericComponent::checkAttributesValidity() const noexcept
     if (mPrefixes.isEmpty())                                    return false;
     if (!mPrefixes.contains(mDefaultPrefixNorm))                return false;
     if (mSymbolVariants.isEmpty())                              return false;
-    if (!mSymbolVariants.contains(mDefaultSymbolVariantUuid))   return false;
+    if (!getSymbolVariantByUuid(mDefaultSymbolVariantUuid))     return false;
     foreach (const GenCompSymbVar* var, mSymbolVariants)
     {
         if (var->isDefault() != (var->getUuid() == mDefaultSymbolVariantUuid))

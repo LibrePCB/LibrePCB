@@ -55,10 +55,10 @@ class SymbolPin final : public IF_XmlSerializableObject
         const Point& getPosition() const noexcept {return mPosition;}
         const Length& getLength() const noexcept {return mLength;}
         const Angle& getAngle() const noexcept {return mAngle;}
-        QString getName(const QString& locale = QString()) const noexcept;
-        QString getDescription(const QString& locale = QString()) const noexcept;
-        const QHash<QString, QString>& getNames() const noexcept {return mNames;}
-        const QHash<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
+        QString getName(const QStringList& localeOrder = QStringList()) const noexcept;
+        QString getDescription(const QStringList& localeOrder = QStringList()) const noexcept;
+        const QMap<QString, QString>& getNames() const noexcept {return mNames;}
+        const QMap<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
 
         // Setters
         void setPosition(const Point& pos) noexcept;
@@ -85,8 +85,8 @@ class SymbolPin final : public IF_XmlSerializableObject
         Point mPosition;
         Length mLength;
         Angle mAngle;
-        QHash<QString, QString> mNames;
-        QHash<QString, QString> mDescriptions;
+        QMap<QString, QString> mNames;
+        QMap<QString, QString> mDescriptions;
 };
 
 } // namespace library

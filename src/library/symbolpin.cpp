@@ -66,14 +66,14 @@ SymbolPin::~SymbolPin() noexcept
  *  Getters
  ****************************************************************************************/
 
-QString SymbolPin::getName(const QString& locale) const noexcept
+QString SymbolPin::getName(const QStringList& localeOrder) const noexcept
 {
-    return LibraryBaseElement::localeStringFromList(mNames, locale);
+    return LibraryBaseElement::localeStringFromList(mNames, localeOrder);
 }
 
-QString SymbolPin::getDescription(const QString& locale) const noexcept
+QString SymbolPin::getDescription(const QStringList& localeOrder) const noexcept
 {
-    return LibraryBaseElement::localeStringFromList(mDescriptions, locale);
+    return LibraryBaseElement::localeStringFromList(mDescriptions, localeOrder);
 }
 
 /*****************************************************************************************

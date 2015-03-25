@@ -34,10 +34,8 @@ namespace library {
  ****************************************************************************************/
 
 GenCompSymbVarItem::GenCompSymbVarItem(const QUuid& uuid, const QUuid& symbolUuid,
-                                       int addOrderIndex, bool isRequired,
-                                       const QString& suffix) noexcept :
-    mUuid(uuid), mSymbolUuid(symbolUuid), mAddOrderIndex(addOrderIndex),
-    mIsRequired(isRequired), mSuffix(suffix)
+                                       bool isRequired, const QString& suffix) noexcept :
+    mUuid(uuid), mSymbolUuid(symbolUuid), mIsRequired(isRequired), mSuffix(suffix)
 {
     Q_ASSERT(mUuid.isNull() == false);
 }
@@ -47,8 +45,6 @@ GenCompSymbVarItem::GenCompSymbVarItem(const XmlDomElement& domElement) throw (E
     // read attributes
     mUuid = domElement.getAttribute<QUuid>("uuid");
     mSymbolUuid = domElement.getAttribute<QUuid>("symbol");
-    mAddOrderIndex = domElement.getAttribute<int>("add_order_index");
-    if (mAddOrderIndex < -1) mAddOrderIndex = -1;
     mIsRequired = domElement.getAttribute<bool>("required");
     mSuffix = domElement.getAttribute("suffix");
 
@@ -125,7 +121,6 @@ XmlDomElement* GenCompSymbVarItem::serializeToXmlDomElement() const throw (Excep
     QScopedPointer<XmlDomElement> root(new XmlDomElement("item"));
     root->setAttribute("uuid", mUuid);
     root->setAttribute("symbol", mSymbolUuid);
-    root->setAttribute("add_order_index", mAddOrderIndex);
     root->setAttribute("required", mIsRequired);
     root->setAttribute("suffix", mSuffix);
     XmlDomElement* pin_signal_map = root->appendChild("pin_signal_map");
@@ -154,7 +149,6 @@ bool GenCompSymbVarItem::checkAttributesValidity() const noexcept
 {
     if (mUuid.isNull())                     return false;
     if (mSymbolUuid.isNull())               return false;
-    if (mAddOrderIndex < -1)                return false;
     return true;
 }
 

@@ -67,14 +67,14 @@ GenCompSignal::~GenCompSignal() noexcept
  *  Getters
  ****************************************************************************************/
 
-QString GenCompSignal::getName(const QString& locale) const noexcept
+QString GenCompSignal::getName(const QStringList& localeOrder) const noexcept
 {
-    return LibraryBaseElement::localeStringFromList(mNames, locale);
+    return LibraryBaseElement::localeStringFromList(mNames, localeOrder);
 }
 
-QString GenCompSignal::getDescription(const QString& locale) const noexcept
+QString GenCompSignal::getDescription(const QStringList& localeOrder) const noexcept
 {
-    return LibraryBaseElement::localeStringFromList(mDescriptions, locale);
+    return LibraryBaseElement::localeStringFromList(mDescriptions, localeOrder);
 }
 
 /*****************************************************************************************

@@ -68,10 +68,10 @@ class GenCompSignal final : public IF_XmlSerializableObject
         bool isNegated() const noexcept {return mIsNegated;}
         bool isClock() const noexcept {return mIsClock;}
         bool isNetSignalNameForced() const noexcept {return !mForcedNetName.isEmpty();}
-        QString getName(const QString& locale = QString()) const noexcept;
-        QString getDescription(const QString& locale = QString()) const noexcept;
-        const QHash<QString, QString>& getNames() const noexcept {return mNames;}
-        const QHash<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
+        QString getName(const QStringList& localeOrder = QStringList()) const noexcept;
+        QString getDescription(const QStringList& localeOrder = QStringList()) const noexcept;
+        const QMap<QString, QString>& getNames() const noexcept {return mNames;}
+        const QMap<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
 
         // Setters
         void setRole(SignalRole_t role) noexcept {mRole = role;}
@@ -107,8 +107,8 @@ class GenCompSignal final : public IF_XmlSerializableObject
         bool mIsRequired;
         bool mIsNegated;
         bool mIsClock;
-        QHash<QString, QString> mNames;
-        QHash<QString, QString> mDescriptions;
+        QMap<QString, QString> mNames;
+        QMap<QString, QString> mDescriptions;
 };
 
 } // namespace library

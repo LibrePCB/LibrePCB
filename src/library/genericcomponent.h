@@ -56,36 +56,36 @@ class GenericComponent final : public LibraryElement
         ~GenericComponent() noexcept;
 
         // Attributes
-        const QHash<QString, LibraryElementAttribute*>& getAttributes() const noexcept;
+        const QList<LibraryElementAttribute*>& getAttributes() const noexcept;
         const LibraryElementAttribute* getAttributeByKey(const QString& key) const noexcept;
 
         // Default Values
-        const QHash<QString, QString>& getDefaultValues() const noexcept;
-        QString getDefaultValue(const QString& locale = QString()) const noexcept;
+        const QMap<QString, QString>& getDefaultValues() const noexcept;
+        QString getDefaultValue(const QStringList& localeOrder = QStringList()) const noexcept;
         void clearDefaultValues() noexcept;
         void addDefaultValue(const QString& locale, const QString& value) noexcept;
 
         // Prefixes
-        const QHash<QString, QString>& getPrefixes() const noexcept;
-        QString getPrefix(const QString& norm = QString()) const noexcept;
+        const QMap<QString, QString>& getPrefixes() const noexcept;
+        QString getPrefix(const QStringList& normOrder = QStringList()) const noexcept;
         const QString& getDefaultPrefixNorm() const noexcept;
         QString getDefaultPrefix() const noexcept;
         void clearPrefixes() noexcept;
         void addPrefix(const QString& norm, const QString& prefix, bool isDefault) noexcept;
 
         // Signals
-        const QHash<QUuid, const GenCompSignal*>& getSignals() const noexcept;
+        const QList<const GenCompSignal*>& getSignals() const noexcept;
         const GenCompSignal* getSignalByUuid(const QUuid& uuid) const noexcept;
         void clearSignals() noexcept;
-        void addSignal(const GenCompSignal* signal) noexcept;
+        void addSignal(const GenCompSignal& signal) noexcept;
 
         // Symbol Variants
-        const QHash<QUuid, const GenCompSymbVar*>& getSymbolVariants() const noexcept;
+        const QList<const GenCompSymbVar*>& getSymbolVariants() const noexcept;
         const GenCompSymbVar* getSymbolVariantByUuid(const QUuid& uuid) const noexcept;
         const QUuid& getDefaultSymbolVariantUuid() const noexcept;
         const GenCompSymbVar* getDefaultSymbolVariant() const noexcept;
         void clearSymbolVariants() noexcept;
-        void addSymbolVariant(const GenCompSymbVar* symbolVariant) noexcept;
+        void addSymbolVariant(const GenCompSymbVar& symbolVariant) noexcept;
 
 
     private:
@@ -102,12 +102,12 @@ class GenericComponent final : public LibraryElement
 
 
         // Generic Conponent Attributes
-        QHash<QString, LibraryElementAttribute*> mAttributes; ///< key: attribute key, value: pointer to attribute
-        QHash<QString, QString> mDefaultValues; ///< key: locale (like "en_US"), value: default value
-        QHash<QString, QString> mPrefixes; ///< key: norm, value: prefix
+        QList<LibraryElementAttribute*> mAttributes; ///< all attributes in a specific order
+        QMap<QString, QString> mDefaultValues; ///< key: locale (like "en_US"), value: default value
+        QMap<QString, QString> mPrefixes; ///< key: norm, value: prefix
         QString mDefaultPrefixNorm; ///< must be an existing key of #mPrefixes
-        QHash<QUuid, const GenCompSignal*> mSignals; ///< empty if the component has no signals
-        QHash<QUuid, const GenCompSymbVar*> mSymbolVariants; ///< minimum one entry
+        QList<const GenCompSignal*> mSignals; ///< empty if the component has no signals
+        QList<const GenCompSymbVar*> mSymbolVariants; ///< minimum one entry
         QUuid mDefaultSymbolVariantUuid; ///< must be an existing key of #mSymbolVariants
 };
 

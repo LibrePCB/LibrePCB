@@ -66,12 +66,12 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
         const QString& getAuthor() const noexcept {return mAuthor;}
         const QDateTime& getCreated() const noexcept {return mCreated;}
         const QDateTime& getLastModified() const noexcept {return mLastModified;}
-        QString getName(const QString& locale = QString()) const noexcept;
-        QString getDescription(const QString& locale = QString()) const noexcept;
-        QString getKeywords(const QString& locale = QString()) const noexcept;
-        const QHash<QString, QString>& getNames() const noexcept {return mNames;}
-        const QHash<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
-        const QHash<QString, QString>& getKeywords() const noexcept {return mKeywords;}
+        QString getName(const QStringList& localeOrder = QStringList()) const noexcept;
+        QString getDescription(const QStringList& localeOrder = QStringList()) const noexcept;
+        QString getKeywords(const QStringList& localeOrder = QStringList()) const noexcept;
+        const QMap<QString, QString>& getNames() const noexcept {return mNames;}
+        const QMap<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
+        const QMap<QString, QString>& getKeywords() const noexcept {return mKeywords;}
 
         // Setters
         void setUuid(const QUuid& uuid) noexcept {mUuid = uuid;}
@@ -87,10 +87,10 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
         // Static Methods
 
         /**
-         * @brief Read locale-dependent strings from a DOM node and insert them in a QHash
+         * @brief Read locale-dependent strings from a DOM node and insert them in a QMap
          *
          * If you have DOM nodes with strings in different languages, this method helps
-         * you to read these strings and create a QHash with all entries. This method will
+         * you to read these strings and create a QMap with all entries. This method will
          * also check if an entry with the language "en_US" exists in the DOM node.
          *
          * Example of a valid DOM node:
@@ -110,7 +110,7 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
          *
          * @param parentNode        The parent node ("my_parent_node" in the example)
          * @param childNodesName    The name of the subnodes to read ("my_subnode" in the example)
-         * @param list              The QHash where the new locale/text pair will be
+         * @param list              The QMap where the new locale/text pair will be
          *                          inserted. The locales (values of "locale" attributes)
          *                          are the keys of the list, the node texts ("the value"
          *                          in the example) are the values of the list.
@@ -124,32 +124,36 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
          */
         static void readLocaleDomNodes(const XmlDomElement& parentNode,
                                        const QString& childNodesName,
-                                       QHash<QString, QString>& list) throw (Exception);
+                                       QMap<QString, QString>& list) throw (Exception);
 
         /**
-         * @brief Get the string of a specific locale from a QHash
+         * @brief Get the string of a specific locale from a QMap
          *
-         * This method can be used to extract a text in a specific language from a QHash
+         * This method can be used to extract a text in a specific language from a QMap
          * which was generated with #readLocaleDomNodes(). If the list doesn't contain a
          * translation for the selected language, the "nearest" other language will be
-         * used instead (the language order is defined in the workspace settings, see
-         * #WSI_LibraryLocaleOrder for details). If all these languages are not available
-         * in the list, the language "en_US" is used instead.
+         * used instead. Therefore you can to pass a QStringList with the locales to use.
+         * If all these languages are not available in the QMap, the locale order from
+         * the workspace settings will be used as fallback. If the these languages are
+         * also not available in the QMap, always the language "en_US" is used instead
+         * (if available, otherwise an exception will be thrown).
          *
          * @param list          The list which contains all locales and their translations
          *                      (created with #readLocaleDomNodes())
-         * @param locale        The locale you want to read (for example "de_CH"). Pass an
-         *                      empty QString to use the locales from the workspace settings.
+         * @param locales       The locale you want to read (for example "de_CH") must be
+         *                      on top (index 0) of this list. To use fallback locales,
+         *                      the list can have more than one item (order is important!).
          * @param usedLocale    The locale which was really used (locale of the returned string)
+         *
          * @return              The string from the list in the specified language
          *
-         * @throw Exception     If no translation is found in the list (not even "en_US"),
-         *                      an exception will be thrown
+         * @throw Exception     If no translation is found in the list (not even "en_US")
          *
          * @see #readLocaleDomNodes(), #WSI_LibraryLocaleOrder
          */
-        static QString localeStringFromList(const QHash<QString, QString>& list,
-                                            const QString& locale, QString* usedLocale = 0) throw (Exception);
+        static QString localeStringFromList(const QMap<QString, QString>& list,
+                                            const QStringList& localeOrder,
+                                            QString* usedLocale = nullptr) throw (Exception);
 
 
     private:
@@ -179,9 +183,9 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
         QString mAuthor;
         QDateTime mCreated;
         QDateTime mLastModified;
-        QHash<QString, QString> mNames;        ///< key: locale (like "en_US"), value: name
-        QHash<QString, QString> mDescriptions; ///< key: locale (like "en_US"), value: description
-        QHash<QString, QString> mKeywords;     ///< key: locale (like "en_US"), value: keywords
+        QMap<QString, QString> mNames;        ///< key: locale (like "en_US"), value: name
+        QMap<QString, QString> mDescriptions; ///< key: locale (like "en_US"), value: description
+        QMap<QString, QString> mKeywords;     ///< key: locale (like "en_US"), value: keywords
 };
 
 } // namespace library

@@ -211,8 +211,7 @@ SES_Base::ProcRetVal SES_AddComponents::processSceneEvent(SEE_Base* event) noexc
                         mIsUndoCmdActive = true;
 
                         // check if there is a next symbol to add
-                        mCurrentSymbVarItem = mGenCompSymbVar->getItemByAddOrderIndex(
-                                              mCurrentSymbVarItem->getAddOrderIndex() + 1);
+                        mCurrentSymbVarItem = mGenCompSymbVar->getNextItem(mCurrentSymbVarItem);
 
                         if (mCurrentSymbVarItem)
                         {
@@ -356,7 +355,7 @@ void SES_AddComponents::startAddingComponent(const QUuid& genComp,
     mProject.getUndoStack().appendToCommand(cmd);
 
     // create the first symbol instance and add it to the schematic
-    mCurrentSymbVarItem = mGenCompSymbVar->getItemByAddOrderIndex(0);
+    mCurrentSymbVarItem = mGenCompSymbVar->getItems().first();
     if (!mCurrentSymbVarItem)
     {
         throw RuntimeError(__FILE__, __LINE__, symbVar.toString(),

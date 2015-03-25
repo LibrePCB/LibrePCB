@@ -60,7 +60,7 @@ class GenCompSymbVarItem final : public IF_XmlSerializableObject
         // Constructors / Destructor
         explicit GenCompSymbVarItem(const QUuid& uuid = QUuid::createUuid(),
                                     const QUuid& symbolUuid = QUuid(),
-                                    int addOrderIndex = -1, bool isRequired = false,
+                                    bool isRequired = false,
                                     const QString& suffix = QString()) noexcept;
         explicit GenCompSymbVarItem(const XmlDomElement& domElement) throw (Exception);
         ~GenCompSymbVarItem() noexcept;
@@ -68,7 +68,6 @@ class GenCompSymbVarItem final : public IF_XmlSerializableObject
         // Getters: Attributes
         const QUuid& getUuid() const noexcept {return mUuid;}
         const QUuid& getSymbolUuid() const noexcept {return mSymbolUuid;}
-        int getAddOrderIndex() const noexcept {return mAddOrderIndex;}
         bool isRequired() const noexcept {return mIsRequired;}
         const QString& getSuffix() const noexcept {return mSuffix;}
 
@@ -95,7 +94,6 @@ class GenCompSymbVarItem final : public IF_XmlSerializableObject
         // Symbol Variant Item Attributes
         QUuid mUuid;
         QUuid mSymbolUuid;
-        int mAddOrderIndex;
         bool mIsRequired;
         QString mSuffix;
         QHash<QUuid, PinSignalMapItem_t> mPinSignalMap; ///< All pins required!

@@ -64,19 +64,19 @@ LibraryBaseElement::~LibraryBaseElement() noexcept
  *  Getters
  ****************************************************************************************/
 
-QString LibraryBaseElement::getName(const QString& locale) const noexcept
+QString LibraryBaseElement::getName(const QStringList& localeOrder) const noexcept
 {
-    return LibraryBaseElement::localeStringFromList(mNames, locale);
+    return LibraryBaseElement::localeStringFromList(mNames, localeOrder);
 }
 
-QString LibraryBaseElement::getDescription(const QString& locale) const noexcept
+QString LibraryBaseElement::getDescription(const QStringList& localeOrder) const noexcept
 {
-    return LibraryBaseElement::localeStringFromList(mDescriptions, locale);
+    return LibraryBaseElement::localeStringFromList(mDescriptions, localeOrder);
 }
 
-QString LibraryBaseElement::getKeywords(const QString& locale) const noexcept
+QString LibraryBaseElement::getKeywords(const QStringList& localeOrder) const noexcept
 {
-    return LibraryBaseElement::localeStringFromList(mKeywords, locale);
+    return LibraryBaseElement::localeStringFromList(mKeywords, localeOrder);
 }
 
 /*****************************************************************************************
@@ -159,7 +159,7 @@ bool LibraryBaseElement::checkAttributesValidity() const noexcept
 
 void LibraryBaseElement::readLocaleDomNodes(const XmlDomElement& parentNode,
                                             const QString& childNodesName,
-                                            QHash<QString, QString>& list) throw (Exception)
+                                            QMap<QString, QString>& list) throw (Exception)
 {
     for (XmlDomElement* node = parentNode.getFirstChild(childNodesName, false); node;
          node = node->getNextSibling(childNodesName))
@@ -188,32 +188,39 @@ void LibraryBaseElement::readLocaleDomNodes(const XmlDomElement& parentNode,
     }
 }
 
-QString LibraryBaseElement::localeStringFromList(const QHash<QString, QString>& list,
-                                                 const QString& locale, QString* usedLocale) throw (Exception)
+QString LibraryBaseElement::localeStringFromList(const QMap<QString, QString>& list,
+                                                 const QStringList& localeOrder,
+                                                 QString* usedLocale) throw (Exception)
 {
-    if ((!locale.isEmpty()) && (list.contains(locale)))
+    // search in the specified locale order
+    foreach (const QString& locale, localeOrder)
     {
-        if (usedLocale) *usedLocale = locale;
-        return list.value(locale);
-    }
-
-    foreach (const QString& l, Workspace::instance().getSettings().getLibLocaleOrder()->getLocaleOrder())
-    {
-        if (list.contains(l))
+        if (list.contains(locale))
         {
-            if (usedLocale) *usedLocale = l;
-            return list.value(l);
+            if (usedLocale) *usedLocale = locale;
+            return list.value(locale);
         }
     }
 
+    // search in the locale order from the workspace settings
+    const QStringList& wsLocaleOrder = Workspace::instance().getSettings().getLibLocaleOrder()->getLocaleOrder();
+    foreach (const QString& locale, wsLocaleOrder)
+    {
+        if (list.contains(locale))
+        {
+            if (usedLocale) *usedLocale = locale;
+                return list.value(locale);
+        }
+    }
+
+    // try the fallback locale "en_US"
     if (list.contains("en_US"))
     {
         if (usedLocale) *usedLocale = "en_US";
         return list.value("en_US");
     }
 
-    throw RuntimeError(__FILE__, __LINE__, locale,
-        QString(tr("No translation for locale \"%1\" found.")).arg(locale));
+    throw RuntimeError(__FILE__, __LINE__, QString(), tr("No translation found."));
 }
 
 /*****************************************************************************************
