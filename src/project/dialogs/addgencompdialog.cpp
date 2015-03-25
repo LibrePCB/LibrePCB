@@ -33,6 +33,7 @@
 #include "../../library/gencompsymbvar.h"
 #include "../../library/symbol.h"
 #include "../../library/symbolgraphicsitem.h"
+#include "../settings/projectsettings.h"
 
 namespace project {
 
@@ -50,10 +51,12 @@ AddGenCompDialog::AddGenCompDialog(Project& project) :
     mPreviewScene = new CADScene();
     mUi->graphicsView->setCadScene(mPreviewScene);
 
+    const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
+
     // list generic components from project (TODO: for temporary use only...)
     foreach (const library::GenericComponent* genComp, mProject.getLibrary().getGenericComponents())
     {
-        QListWidgetItem* item = new QListWidgetItem(genComp->getName());
+        QListWidgetItem* item = new QListWidgetItem(genComp->getName(localeOrder));
         item->setData(Qt::UserRole, genComp->getXmlFilepath().toStr());
         mUi->listGenericComponents->addItem(item);
     }
@@ -135,9 +138,11 @@ void AddGenCompDialog::setSelectedGenComp(const library::GenericComponent* genCo
 
     if (genComp)
     {
+        const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
+
         mUi->lblGenCompUuid->setText(genComp->getUuid().toString());
-        mUi->lblGenCompName->setText(genComp->getName());
-        mUi->lblGenCompDescription->setText(genComp->getDescription());
+        mUi->lblGenCompName->setText(genComp->getName(localeOrder));
+        mUi->lblGenCompDescription->setText(genComp->getDescription(localeOrder));
 
         mUi->gbxGenComp->setEnabled(true);
         mUi->gbxSymbVar->setEnabled(true);
@@ -146,7 +151,7 @@ void AddGenCompDialog::setSelectedGenComp(const library::GenericComponent* genCo
         mUi->cbxSymbVar->clear();
         foreach (const library::GenCompSymbVar* symbVar, genComp->getSymbolVariants())
         {
-            QString text = symbVar->getName();
+            QString text = symbVar->getName(localeOrder);
             if (symbVar->isDefault()) text.append(tr(" [default]"));
             mUi->cbxSymbVar->addItem(text, symbVar->getUuid());
         }
@@ -173,9 +178,11 @@ void AddGenCompDialog::setSelectedSymbVar(const library::GenCompSymbVar* symbVar
 
     if (symbVar)
     {
+        const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
+
         mUi->lblSymbVarUuid->setText(symbVar->getUuid().toString());
         mUi->lblSymbVarNorm->setText(symbVar->getNorm());
-        mUi->lblSymbVarDescription->setText(symbVar->getDescription());
+        mUi->lblSymbVarDescription->setText(symbVar->getDescription(localeOrder));
 
         foreach (const library::GenCompSymbVarItem* item, symbVar->getItems())
         {

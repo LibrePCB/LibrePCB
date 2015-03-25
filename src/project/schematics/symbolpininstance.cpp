@@ -37,6 +37,7 @@
 #include "../circuit/circuit.h"
 #include "../../library/gencompsymbvaritem.h"
 #include "../circuit/netsignal.h"
+#include "../settings/projectsettings.h"
 
 namespace project {
 
@@ -91,21 +92,23 @@ Point SymbolPinInstance::getPosition() const noexcept
 QString SymbolPinInstance::getDisplayText(bool returnGenCompSignalNameIfEmpty,
                                           bool returnPinNameIfEmpty) const noexcept
 {
+    const QStringList& localeOrder = mCircuit.getProject().getSettings().getLocaleOrder();
+
     QString text;
     switch (mSymbolInstance.getGenCompSymbVarItem().getDisplayTypeOfPin(mSymbolPin->getUuid()))
     {
         case library::GenCompSymbVarItem::PinDisplayType_t::PinName:
-            text = mSymbolPin->getName(); break;
+            text = mSymbolPin->getName(localeOrder); break;
         case library::GenCompSymbVarItem::PinDisplayType_t::GenCompSignal:
-            if (mGenCompSignal) text = mGenCompSignal->getName(); break;
+            if (mGenCompSignal) text = mGenCompSignal->getName(localeOrder); break;
         case library::GenCompSymbVarItem::PinDisplayType_t::NetSignal:
             if (mGenCompSignalInstance->getNetSignal()) text = mGenCompSignalInstance->getNetSignal()->getName(); break;
         default: break;
     }
     if (text.isEmpty() && returnGenCompSignalNameIfEmpty && mGenCompSignal)
-        text = mGenCompSignal->getName();
+        text = mGenCompSignal->getName(localeOrder);
     if (text.isEmpty() && returnPinNameIfEmpty)
-        text = mSymbolPin->getName();
+        text = mSymbolPin->getName(localeOrder);
     return text;
 }
 

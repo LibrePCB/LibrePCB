@@ -32,6 +32,7 @@
 #include "../erc/ercmsg.h"
 #include "gencompattributeinstance.h"
 #include "../../common/file_io/xmldomelement.h"
+#include "../settings/projectsettings.h"
 
 namespace project {
 
@@ -108,6 +109,8 @@ GenCompInstance::GenCompInstance(Circuit& circuit, const library::GenericCompone
     QObject(nullptr), mCircuit(circuit), mAddedToCircuit(false),
     mGenComp(&genComp), mGenCompSymbVar(&symbVar)
 {
+    const QStringList& localeOrder = mCircuit.getProject().getSettings().getLocaleOrder();
+
     mUuid = QUuid::createUuid().toString(); // generate random UUID
     mName = name;
     if (mName.isEmpty())
@@ -115,13 +118,14 @@ GenCompInstance::GenCompInstance(Circuit& circuit, const library::GenericCompone
         throw RuntimeError(__FILE__, __LINE__, QString(),
             tr("The name of the generic component must not be empty."));
     }
-    mValue = genComp.getDefaultValue();
+    mValue = genComp.getDefaultValue(localeOrder);
 
     // add attributes
     foreach (const library::LibraryElementAttribute* attr, genComp.getAttributes())
     {
         GenCompAttributeInstance* attributeInstance = new GenCompAttributeInstance(
-            attr->getKey(), attr->getType(), attr->getDefaultValue(), attr->getDefaultUnit());
+            attr->getKey(), attr->getType(), attr->getDefaultValue(localeOrder),
+            attr->getDefaultUnit());
         mAttributes.append(attributeInstance);
     }
 
@@ -262,22 +266,6 @@ void GenCompInstance::addToCircuit() throw (Exception)
 void GenCompInstance::removeFromCircuit() throw (Exception)
 {
     if (!mAddedToCircuit) throw LogicError(__FILE__, __LINE__);
-
-    /*if (removeNode)
-    {
-        // check if all generic component signals are disconnected from circuit net signals
-        foreach (GenCompSignalInstance* signal, mSignals)
-        {
-            if (signal->getNetSignal())
-                throw LogicError(__FILE__, __LINE__);
-        }
-
-        if (parent.nodeName() != "generic_component_instances")
-            throw LogicError(__FILE__, __LINE__, parent.nodeName(), tr("Invalid node name!"));
-
-        if (parent.removeChild(mDomElement).isNull())
-            throw LogicError(__FILE__, __LINE__, QString(), tr("Could not remove node from DOM tree!"));
-    }*/
 
     foreach (GenCompSignalInstance* signal, mSignals)
         signal->removeFromCircuit();

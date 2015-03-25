@@ -43,6 +43,7 @@ class UndoStack;
 class SchematicLayer;
 
 namespace project {
+class ProjectSettings;
 class ProjectLibrary;
 class Circuit;
 class SchematicEditor;
@@ -134,6 +135,13 @@ class Project final : public QObject, public IF_AttributeProvider,
          * @return A reference to the UndoStack object
          */
         UndoStack& getUndoStack() const noexcept {return *mUndoStack;}
+
+        /**
+         * @brief Get the ProjectSettings object which contains all project settings
+         *
+         * @return A reference to the ProjectSettings object
+         */
+        ProjectSettings& getSettings() const noexcept {return *mProjectSettings;}
 
         /**
          * @brief Get the ProjectLibrary object which contains all library elements used
@@ -520,6 +528,7 @@ class Project final : public QObject, public IF_AttributeProvider,
         bool mProjectIsModified; ///< this flag indicates whether the project contains unsaved changed or not (changes using #UndoCommand will NOT set this flag!)
         QTimer mAutoSaveTimer; ///< the timer for the periodically automatic saving functionality (see also @ref doc_project_save)
         UndoStack* mUndoStack; ///< See @ref doc_project_undostack
+        ProjectSettings* mProjectSettings; ///< all project specific settings
         ProjectLibrary* mProjectLibrary; ///< the library which contains all elements needed in this project
         ErcMsgList* mErcMsgList; ///< A list which contains all electrical rule check (ERC) messages
         Circuit* mCircuit; ///< The whole circuit of this project (contains all netclasses, netsignals, generic component instances, ...)

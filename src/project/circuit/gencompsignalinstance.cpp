@@ -26,6 +26,8 @@
 #include "../../library/genericcomponent.h"
 #include "../erc/ercmsg.h"
 #include "../../common/file_io/xmldomelement.h"
+#include "../project.h"
+#include "../settings/projectsettings.h"
 
 namespace project {
 
@@ -206,13 +208,15 @@ bool GenCompSignalInstance::checkAttributesValidity() const noexcept
 
 void GenCompSignalInstance::updateErcMessages() noexcept
 {
+    const QStringList& localeOrder = mCircuit.getProject().getSettings().getLocaleOrder();
+
     mErcMsgUnconnectedRequiredSignal->setMsg(
         QString(tr("Unconnected component signal: \"%1\" from \"%2\""))
-        .arg(mGenCompSignal->getName()).arg(mGenCompInstance.getName()));
+        .arg(mGenCompSignal->getName(localeOrder)).arg(mGenCompInstance.getName()));
     mErcMsgForcedNetSignalNameConflict->setMsg(
         QString(tr("Signal name conflict: \"%1\" != \"%2\" (\"%3\" from \"%4\")"))
         .arg((mNetSignal ? mNetSignal->getName() : QString()), getForcedNetSignalName(),
-        mGenCompSignal->getName(), mGenCompInstance.getName()));
+        mGenCompSignal->getName(localeOrder), mGenCompInstance.getName()));
 
     mErcMsgUnconnectedRequiredSignal->setVisible((mAddedToCircuit) && (!mNetSignal)
         && (mGenCompSignal->isRequired()));

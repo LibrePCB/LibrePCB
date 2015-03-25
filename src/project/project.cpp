@@ -41,6 +41,7 @@
 #include "erc/ercmsglist.h"
 #include "../common/file_io/xmldomdocument.h"
 #include "../common/file_io/xmldomelement.h"
+#include "settings/projectsettings.h"
 
 namespace project {
 
@@ -49,10 +50,11 @@ namespace project {
  ****************************************************************************************/
 
 Project::Project(const FilePath& filepath, bool create) throw (Exception) :
-    QObject(0), IF_AttributeProvider(), mPath(filepath.getParentDir()),
-    mFilepath(filepath), mXmlFile(0), mFileLock(filepath), mIsRestored(false),
-    mIsReadOnly(false), mDescriptionHtmlFile(0), mProjectIsModified(false), mUndoStack(0),
-    mProjectLibrary(0), mErcMsgList(0), mCircuit(0), mSchematicEditor(0)
+    QObject(nullptr), IF_AttributeProvider(), mPath(filepath.getParentDir()),
+    mFilepath(filepath), mXmlFile(nullptr), mFileLock(filepath), mIsRestored(false),
+    mIsReadOnly(false), mDescriptionHtmlFile(nullptr), mProjectIsModified(false),
+    mUndoStack(nullptr), mProjectSettings(nullptr), mProjectLibrary(nullptr),
+    mErcMsgList(nullptr), mCircuit(nullptr), mSchematicEditor(nullptr)
 {
     qDebug() << (create ? "create project..." : "open project...");
 
@@ -192,6 +194,7 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
                                                      mIsRestored, mIsReadOnly);
 
         // Create all needed objects
+        mProjectSettings = new ProjectSettings(*this, mIsRestored, mIsReadOnly, create);
         mProjectLibrary = new ProjectLibrary(*this, mIsRestored, mIsReadOnly);
         mUndoStack = new UndoStack();
         mErcMsgList = new ErcMsgList(*this, mIsRestored, mIsReadOnly, create);
@@ -243,6 +246,7 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
         delete mErcMsgList;             mErcMsgList = 0;
         delete mUndoStack;              mUndoStack = 0;
         delete mProjectLibrary;         mProjectLibrary = 0;
+        delete mProjectSettings;        mProjectSettings = 0;
         delete mDescriptionHtmlFile;    mDescriptionHtmlFile = 0;
         delete mXmlFile;                mXmlFile = 0;
         throw; // ...and rethrow the exception
@@ -292,6 +296,7 @@ Project::~Project() noexcept
     delete mErcMsgList;             mErcMsgList = 0;
     delete mUndoStack;              mUndoStack = 0;
     delete mProjectLibrary;         mProjectLibrary = 0;
+    delete mProjectSettings;        mProjectSettings = 0;
     delete mDescriptionHtmlFile;    mDescriptionHtmlFile = 0;
     delete mXmlFile;                mXmlFile = 0;
 }
@@ -672,6 +677,10 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
         if (!schematic->save(toOriginal, errors))
             success = false;
     }
+
+    // Save settings
+    if (!mProjectSettings->save(toOriginal, errors))
+        success = false;
 
     // Save ERC messages list
     if (!mErcMsgList->save(toOriginal, errors))

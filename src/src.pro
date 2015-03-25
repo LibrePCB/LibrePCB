@@ -194,7 +194,10 @@ SOURCES += \
     common/attributes/attrtypevoltage.cpp \
     project/circuit/cmd/cmdgencompattrinstadd.cpp \
     project/circuit/cmd/cmdgencompattrinstremove.cpp \
-    project/circuit/cmd/cmdgencompattrinstedit.cpp
+    project/circuit/cmd/cmdgencompattrinstedit.cpp \
+    project/settings/projectsettings.cpp \
+    project/settings/projectsettingsdialog.cpp \
+    project/settings/cmd/cmdprojectsettingschange.cpp
 
 HEADERS += \
     common/units/all_length_units.h \
@@ -337,7 +340,10 @@ HEADERS += \
     common/attributes/attrtypevoltage.h \
     project/circuit/cmd/cmdgencompattrinstadd.h \
     project/circuit/cmd/cmdgencompattrinstremove.h \
-    project/circuit/cmd/cmdgencompattrinstedit.h
+    project/circuit/cmd/cmdgencompattrinstedit.h \
+    project/settings/projectsettings.h \
+    project/settings/projectsettingsdialog.h \
+    project/settings/cmd/cmdprojectsettingschange.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \
@@ -351,7 +357,8 @@ FORMS += \
     common/dialogs/gridsettingsdialog.ui \
     project/schematics/symbolinstancepropertiesdialog.ui \
     project/dialogs/projectpropertieseditordialog.ui \
-    project/dialogs/addgencompdialog.ui
+    project/dialogs/addgencompdialog.ui \
+    project/settings/projectsettingsdialog.ui
 
 
 # Custom compiler "lrelease" for qm generation

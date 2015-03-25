@@ -72,6 +72,8 @@ class WorkspaceSettingsDialog;
  *
  * @author ubruhin
  * @date 2014-07-12
+ *
+ * @todo Maybe use XML files instead of INI to save all workspace settings...
  */
 class WorkspaceSettings final : public QObject
 {

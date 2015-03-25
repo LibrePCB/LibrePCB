@@ -36,6 +36,7 @@
 #include "../circuit/circuit.h"
 #include "../../common/dialogs/gridsettingsdialog.h"
 #include "../dialogs/projectpropertieseditordialog.h"
+#include "../settings/projectsettings.h"
 
 namespace project {
 
@@ -73,6 +74,8 @@ SchematicEditor::SchematicEditor(Project& project, bool readOnly) :
             &Workspace::instance(), &Workspace::showControlPanel);
     connect(mUi->actionEditNetclasses, &QAction::triggered,
             [this](){mProject.getCircuit().execEditNetClassesDialog(this);});
+    connect(mUi->actionProjectSettings, &QAction::triggered,
+            [this](){mProject.getSettings().showSettingsDialog(this);});
 
     // connect the undo/redo actions with the UndoStack of the project
     connect(&mProject.getUndoStack(), &UndoStack::undoTextChanged,

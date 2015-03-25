@@ -40,6 +40,7 @@
 #include "../circuit/cmd/cmdgencompattrinstedit.h"
 #include "../../common/attributes/attributetype.h"
 #include "../../common/attributes/attributeunit.h"
+#include "../settings/projectsettings.h"
 
 namespace project {
 
@@ -77,13 +78,15 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(Project& project,
     }
     updateAttrTable();
 
+    const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
+
     // Generic Component Library Element Attributes
     mUi->lblGenCompLibUuid->setText(mGenCompInstance.getGenComp().getUuid().toString());
-    mUi->lblGenCompLibName->setText(mGenCompInstance.getGenComp().getName());
-    mUi->lblGenCompLibName->setToolTip(mGenCompInstance.getGenComp().getDescription());
+    mUi->lblGenCompLibName->setText(mGenCompInstance.getGenComp().getName(localeOrder));
+    mUi->lblGenCompLibName->setToolTip(mGenCompInstance.getGenComp().getDescription(localeOrder));
     mUi->lblSymbVarUuid->setText(mGenCompInstance.getSymbolVariant().getUuid().toString());
-    mUi->lblSymbVarName->setText(mGenCompInstance.getSymbolVariant().getName());
-    mUi->lblSymbVarName->setToolTip(mGenCompInstance.getSymbolVariant().getDescription());
+    mUi->lblSymbVarName->setText(mGenCompInstance.getSymbolVariant().getName(localeOrder));
+    mUi->lblSymbVarName->setToolTip(mGenCompInstance.getSymbolVariant().getDescription(localeOrder));
 
     // Symbol Instance Attributes
     mUi->lblSymbInstUuid->setText(mSymbolInstance.getUuid().toString());
@@ -94,8 +97,8 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(Project& project,
 
     // Symbol Library Element Attributes
     mUi->lblSymbLibUuid->setText(mSymbolInstance.getSymbol().getUuid().toString());
-    mUi->lblSymbLibName->setText(mSymbolInstance.getSymbol().getName());
-    mUi->lblSymbLibName->setToolTip(mSymbolInstance.getSymbol().getDescription());
+    mUi->lblSymbLibName->setText(mSymbolInstance.getSymbol().getName(localeOrder));
+    mUi->lblSymbLibName->setToolTip(mSymbolInstance.getSymbol().getDescription(localeOrder));
 
     // set focus to component instance name
     mUi->edtGenCompInstName->selectAll();
