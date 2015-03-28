@@ -70,7 +70,7 @@ class AddGenCompDialog final : public QDialog
     public:
 
         // Constructors / Destructor
-        explicit AddGenCompDialog(Project& project);
+        explicit AddGenCompDialog(Project& project, QWidget* parent = nullptr);
         ~AddGenCompDialog() noexcept;
 
         // Getters

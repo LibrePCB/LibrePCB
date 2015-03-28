@@ -41,8 +41,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-AddGenCompDialog::AddGenCompDialog(Project& project) :
-    QDialog(nullptr), mProject(project), mUi(new Ui::AddGenCompDialog),
+AddGenCompDialog::AddGenCompDialog(Project& project, QWidget* parent) :
+    QDialog(parent), mProject(project), mUi(new Ui::AddGenCompDialog),
     mPreviewScene(nullptr), mSelectedGenComp(nullptr), mSelectedSymbVar(nullptr)
 {
     mUi->setupUi(this);
