@@ -50,17 +50,15 @@ SymbolGraphicsItem::SymbolGraphicsItem(const Symbol& symbol,
     QGraphicsItem(0), mSymbol(symbol), mSymbolInstance(instance)
 {
     setZValue(project::Schematic::ZValue_Symbols);
-    if (mSymbolInstance)
-        setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemSendsScenePositionChanges);
+    if (mSymbolInstance) setFlags(QGraphicsItem::ItemIsSelectable);
+    setCacheMode(QGraphicsItem::DeviceCoordinateCache);
+
+    mFont.setStyleStrategy(QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
+    mFont.setStyleHint(QFont::SansSerif);
+    mFont.setFamily("Nimbus Sans L");
 
     try
     {
-        if (!updateBoundingRectAndShape())
-        {
-            throw RuntimeError(__FILE__, __LINE__, QString(),
-                QApplication::translate("SymbolGraphicsItem", "Invalid Symbol"));
-        }
-
         // add pins
         foreach (const SymbolPin* pin, mSymbol.getPins())
         {
@@ -79,6 +77,8 @@ SymbolGraphicsItem::SymbolGraphicsItem(const Symbol& symbol,
         qDeleteAll(mPinItems);      mPinItems.clear();
         throw;
     }
+
+    updateCacheAndRepaint();
 }
 
 SymbolGraphicsItem::~SymbolGraphicsItem() noexcept
@@ -95,23 +95,27 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
 {
     Q_UNUSED(widget);
 
-    SchematicLayer* layer = 0;
-    bool selected = option->state & QStyle::State_Selected;
-    bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
+    QPen pen;
+    const SchematicLayer* layer = 0;
+    const bool selected = option->state & QStyle::State_Selected;
+    const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
+    const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
 
     // draw all polygons
     foreach (const SymbolPolygon* polygon, mSymbol.getPolygons())
     {
         // set colors
         layer = getSchematicLayer(polygon->getLineLayerId());
-        if (!layer) continue;
-        painter->setPen(QPen(layer->getColor(selected), polygon->getLineWidth().toPx(),
-                             Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-        layer = getSchematicLayer(polygon->getFillLayerId());
         if (layer)
-            painter->setBrush(QBrush(layer->getColor(selected), Qt::SolidPattern));
+        {
+            pen = QPen(layer->getColor(selected), polygon->getLineWidth().toPx() * lod, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+            pen.setCosmetic(true);
+            painter->setPen(pen);
+        }
         else
-            painter->setBrush(Qt::NoBrush);
+            painter->setPen(Qt::NoPen);
+        layer = getSchematicLayer(polygon->getFillLayerId());
+        painter->setBrush(layer ? QBrush(layer->getColor(selected), Qt::SolidPattern) : Qt::NoBrush);
 
         // draw polygon
         QPainterPath polygonPath;
@@ -152,14 +156,17 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
     foreach (const SymbolEllipse* ellipse, mSymbol.getEllipses())
     {
         // set colors
-        layer = getSchematicLayer(ellipse->getLineLayerId());
-        if (!layer) continue;
-        painter->setPen(QPen(layer->getColor(selected), ellipse->getLineWidth().toPx(), Qt::SolidLine));
-        layer = getSchematicLayer(ellipse->getFillLayerId());
+        layer = getSchematicLayer(ellipse->getLineLayerId()); if (!layer) continue;
         if (layer)
-            painter->setBrush(QBrush(layer->getColor(selected), Qt::SolidPattern));
+        {
+            pen = QPen(layer->getColor(selected), ellipse->getLineWidth().toPx() * lod, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+            pen.setCosmetic(true);
+            painter->setPen(pen);
+        }
         else
-            painter->setBrush(Qt::NoBrush);
+            painter->setPen(Qt::NoPen);
+        layer = getSchematicLayer(ellipse->getFillLayerId());
+        painter->setBrush(layer ? QBrush(layer->getColor(selected), Qt::SolidPattern) : Qt::NoBrush);
 
         // draw ellipse
         painter->drawEllipse(ellipse->getCenter().toPxQPointF(), ellipse->getRadiusX().toPx(),
@@ -170,17 +177,12 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
     // draw all texts
     foreach (const SymbolText* text, mSymbol.getTexts())
     {
-        // set colors
-        layer = getSchematicLayer(text->getLayerId());
-        if (!layer) continue;
-        painter->setPen(QPen(layer->getColor(selected), 0, Qt::SolidLine, Qt::RoundCap));
+        // get layer
+        layer = getSchematicLayer(text->getLayerId()); if (!layer) continue;
 
         // calculate font metrics
-        QFont font("Nimbus Sans L");
-        font.setStyleHint(QFont::SansSerif);
-        font.setStyleStrategy(QFont::StyleStrategy(QFont::PreferOutline | QFont::PreferQuality));
-        font.setPixelSize(50);
-        QFontMetricsF metrics(font);
+        mFont.setPixelSize(50);
+        QFontMetricsF metrics(mFont);
         qreal factor = 0.8*text->getHeight().toPx() / metrics.height();
 
         // check rotation
@@ -212,19 +214,7 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
             y = -y;
         }
 
-        // get the text to display
-        QString textStr = text->getText();
-        if (mSymbolInstance)
-            mSymbolInstance->replaceVariablesWithAttributes(textStr, true);
-
-        // draw text
-        painter->save();
-        painter->scale(factor, factor);
-        if (rotate180)
-            painter->rotate(text->getAngle().toDeg() + (qreal)180);
-        else
-            painter->rotate(text->getAngle().toDeg());
-        painter->setFont(font);
+        // get flags
         int flags = text->getAlign().toQtAlign() | Qt::TextDontClip;
         if (rotate180)
         {
@@ -233,28 +223,33 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
             if (flags & Qt::AlignBottom) {flags &= ~Qt::AlignBottom; flags |= Qt::AlignTop;}
             else if (flags & Qt::AlignTop) {flags &= ~Qt::AlignTop; flags |= Qt::AlignBottom;}
         }
-        painter->drawText(QRectF(x, y, 0, 0), flags, textStr);
-        painter->restore();
-    }
 
-    // only for debugging: show symbols count of the generic component
-    if ((mSymbolInstance) && (!deviceIsPrinter) &&
-        (Workspace::instance().getSettings().getDebugTools()->getShowGenCompSymbolCount()))
-    {
-        layer = getSchematicLayer(SchematicLayer::Busses);
-        if (layer)
+        // get the text to display
+        QString textStr = text->getText();
+        if (mSymbolInstance)
+            mSymbolInstance->replaceVariablesWithAttributes(textStr, true);
+
+        // draw text or rect
+        painter->save();
+        painter->scale(factor, factor);
+        if (rotate180)
+            painter->rotate(text->getAngle().toDeg() + (qreal)180);
+        else
+            painter->rotate(text->getAngle().toDeg());
+        if ((deviceIsPrinter) || (lod * text->getHeight().toPx() > 10))
         {
-            unsigned int count = mSymbolInstance->getGenCompInstance().getPlacedSymbolsCount();
-            unsigned int maxCount = mSymbolInstance->getGenCompInstance().getSymbolVariant().getItems().count();
-            QFont font("Nimbus Sans L");
-            font.setStyleHint(QFont::SansSerif);
-            font.setStyleStrategy(QFont::StyleStrategy(QFont::PreferOutline | QFont::PreferQuality));
-            font.setPixelSize(Length(1000000).toPx());
-            painter->setFont(font);
-            painter->setPen(QPen(layer->getColor(selected), 0, Qt::SolidLine, Qt::RoundCap));
-            painter->drawText(QRectF(), Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextSingleLine | Qt::TextDontClip,
-                              QString("[%1/%2]").arg(count).arg(maxCount));
+            // draw text
+            painter->setPen(QPen(layer->getColor(selected), 0));
+            painter->setFont(mFont);
+            painter->drawText(QRectF(x, y, 0, 0), flags, textStr);
         }
+        else
+        {
+            // fill rect
+            QRectF textRect = metrics.boundingRect(QRectF(x, y, 0, 0), flags, textStr);
+            painter->fillRect(textRect, QBrush(layer->getColor(selected), Qt::Dense5Pattern));
+        }
+        painter->restore();
     }
 
     // draw origin cross
@@ -264,29 +259,54 @@ void SymbolGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
         if (layer)
         {
             qreal width = Length(700000).toPx();
-            QPen pen(layer->getColor(selected), 2);
-            pen.setCosmetic(true);
+            pen = QPen(layer->getColor(selected), 0);
             painter->setPen(pen);
             painter->drawLine(-2*width, 0, 2*width, 0);
             painter->drawLine(0, -2*width, 0, 2*width);
         }
     }
+
+#ifdef QT_DEBUG
+    if ((mSymbolInstance) && (!deviceIsPrinter) &&
+        (Workspace::instance().getSettings().getDebugTools()->getShowGenCompSymbolCount()))
+    {
+        // show symbols count of the generic component
+        layer = getSchematicLayer(SchematicLayer::Busses);
+        if (layer)
+        {
+            unsigned int count = mSymbolInstance->getGenCompInstance().getPlacedSymbolsCount();
+            unsigned int maxCount = mSymbolInstance->getGenCompInstance().getSymbolVariant().getItems().count();
+            mFont.setPixelSize(Length(1000000).toPx());
+            painter->setFont(mFont);
+            painter->setPen(QPen(layer->getColor(selected), 0, Qt::SolidLine, Qt::RoundCap));
+            painter->drawText(QRectF(), Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextSingleLine | Qt::TextDontClip,
+                              QString("[%1/%2]").arg(count).arg(maxCount));
+        }
+    }
+    if ((!deviceIsPrinter) && (Workspace::instance().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect()))
+    {
+        // draw bounding rect
+        painter->setPen(QPen(Qt::red, 0));
+        painter->setBrush(Qt::NoBrush);
+        painter->drawRect(mBoundingRect);
+    }
+#endif
 }
 
 /*****************************************************************************************
- *  Private Methods
+ *  General Methods
  ****************************************************************************************/
 
-bool SymbolGraphicsItem::updateBoundingRectAndShape() noexcept
+void SymbolGraphicsItem::updateCacheAndRepaint() noexcept
 {
-    QRectF boundingRect;
-    QPainterPath shape;
-    shape.setFillRule(Qt::WindingFill);
+    mBoundingRect = QRectF();
+    mShape = QPainterPath();
+    mShape.setFillRule(Qt::WindingFill);
 
     // cross rect
     QRectF crossRect(-4, -4, 8, 8);
-    boundingRect = boundingRect.united(crossRect);
-    shape.addRect(crossRect);
+    mBoundingRect = mBoundingRect.united(crossRect);
+    mShape.addRect(crossRect);
 
     // polygons
     foreach (const SymbolPolygon* polygon, mSymbol.getPolygons())
@@ -308,21 +328,77 @@ bool SymbolGraphicsItem::updateBoundingRectAndShape() noexcept
             lastPos = segment->getEndPos();
         }
         qreal w = polygon->getLineWidth().toPx() / 2;
-        boundingRect = boundingRect.united(polygonPath.boundingRect().adjusted(-w, -w, w, w));
+        mBoundingRect = mBoundingRect.united(polygonPath.boundingRect().adjusted(-w, -w, w, w));
         if (polygon->isGrabArea())
-            shape = shape.united(polygonPath);
+            mShape = mShape.united(polygonPath);
     }
 
     // texts
-    /*foreach (const SymbolText* text, mSymbol.getTexts())
+    foreach (const SymbolText* text, mSymbol.getTexts())
     {
+        // calculate font metrics
+        mFont.setPixelSize(50);
+        QFontMetricsF metrics(mFont);
+        qreal factor = 0.8*text->getHeight().toPx() / metrics.height();
 
-    }*/
+        // check rotation
+        Angle absAngle = text->getAngle();
+        if (mSymbolInstance) absAngle += mSymbolInstance->getAngle();
+        absAngle.mapTo180deg();
+        bool rotate180 = (absAngle < -Angle::deg90() || absAngle >= Angle::deg90());
 
-    mBoundingRect = boundingRect;
-    mShape = shape;
-    return true;
+        // calculate text rect
+        qreal x, y;
+        if (text->getAlign().getV() == VAlign::top())
+        {
+            x = text->getPosition().toPxQPointF().x()/factor;
+            y = text->getPosition().toPxQPointF().y()/factor+0.1*text->getHeight().toPx()/factor;
+        }
+        else if (text->getAlign().getV() == VAlign::bottom())
+        {
+            x = text->getPosition().toPxQPointF().x()/factor;
+            y = text->getPosition().toPxQPointF().y()/factor-0.1*text->getHeight().toPx()/factor;
+        }
+        else
+        {
+            x = text->getPosition().toPxQPointF().x()/factor;
+            y = text->getPosition().toPxQPointF().y()/factor;
+        }
+        if (rotate180)
+        {
+            x = -x;
+            y = -y;
+        }
+
+        // get flags
+        int flags = text->getAlign().toQtAlign() | Qt::TextDontClip;
+        if (rotate180)
+        {
+            if (flags & Qt::AlignLeft) {flags &= ~Qt::AlignLeft; flags |= Qt::AlignRight;}
+            else if (flags & Qt::AlignRight) {flags &= ~Qt::AlignRight; flags |= Qt::AlignLeft;}
+            if (flags & Qt::AlignBottom) {flags &= ~Qt::AlignBottom; flags |= Qt::AlignTop;}
+            else if (flags & Qt::AlignTop) {flags &= ~Qt::AlignTop; flags |= Qt::AlignBottom;}
+        }
+
+        // get the text to display
+        QString textStr = text->getText();
+        if (mSymbolInstance)
+            mSymbolInstance->replaceVariablesWithAttributes(textStr, true);
+
+        QRectF textRect = metrics.boundingRect(QRectF(x, y, 0, 0), flags, textStr).normalized();
+        if (rotate180)
+            textRect = QRectF(-textRect.left() * factor, -textRect.top() * factor, -textRect.width() * factor, -textRect.height() * factor).normalized();
+        else
+            textRect = QRectF(textRect.left() * factor, textRect.top() * factor, textRect.width() * factor, textRect.height() * factor).normalized();
+        mBoundingRect = mBoundingRect.united(textRect);
+    }
+
+    update();
 }
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
 
 SchematicLayer* SymbolGraphicsItem::getSchematicLayer(unsigned int id) const noexcept
 {

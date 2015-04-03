@@ -34,6 +34,8 @@
  *  Forward Declarations
  ****************************************************************************************/
 
+class SchematicLayer;
+
 namespace project {
 class Circuit;
 class Schematic;
@@ -52,8 +54,6 @@ namespace project {
  */
 class SchematicNetLabelGraphicsItem final : public QGraphicsItem
 {
-        Q_DECLARE_TR_FUNCTIONS(SchematicNetLabelGraphicsItem)
-
     public:
 
         // Types
@@ -62,7 +62,7 @@ class SchematicNetLabelGraphicsItem final : public QGraphicsItem
         enum {Type = CADScene::Type_SchematicNetLabel};
 
         // Constructors / Destructor
-        explicit SchematicNetLabelGraphicsItem(Schematic& schematic, SchematicNetLabel& label) throw (Exception);
+        explicit SchematicNetLabelGraphicsItem(Schematic& schematic, SchematicNetLabel& label) noexcept;
         ~SchematicNetLabelGraphicsItem() noexcept;
 
         // Getters
@@ -70,23 +70,33 @@ class SchematicNetLabelGraphicsItem final : public QGraphicsItem
 
         // Inherited from QGraphicsItem
         int type() const {return Type;} ///< to make  qgraphicsitem_cast() working
-        QRectF boundingRect() const;
-        QPainterPath shape() const noexcept;
+        QRectF boundingRect() const {return mBoundingRect;}
         void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
 
+        // General Methods
+        void updateCacheAndRepaint() noexcept;
 
     private:
 
         // make some methods inaccessible...
-        SchematicNetLabelGraphicsItem();
-        SchematicNetLabelGraphicsItem(const SchematicNetLabelGraphicsItem& other);
-        SchematicNetLabelGraphicsItem& operator=(const SchematicNetLabelGraphicsItem& rhs);
+        SchematicNetLabelGraphicsItem() = delete;
+        SchematicNetLabelGraphicsItem(const SchematicNetLabelGraphicsItem& other) = delete;
+        SchematicNetLabelGraphicsItem& operator=(const SchematicNetLabelGraphicsItem& rhs) = delete;
 
         // Attributes
         Schematic& mSchematic;
         SchematicNetLabel& mLabel;
-        qreal mCrossSizePx;
+        SchematicLayer* mOriginCrossLayer;
+        SchematicLayer* mTextLayer;
+
+        // Cached Attributes
         QFont mFont;
+        bool mRotate180;
+        int mFlags;
+        QRectF mBoundingRect;
+
+        // Static Stuff
+        static QVector<QLineF> sOriginCrossLines;
 };
 
 } // namespace project

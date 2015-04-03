@@ -53,10 +53,8 @@ namespace project {
 /**
  * @brief The SchematicNetLineGraphicsItem class
  */
-class SchematicNetLineGraphicsItem final : public QGraphicsLineItem
+class SchematicNetLineGraphicsItem final : public QGraphicsItem
 {
-        Q_DECLARE_TR_FUNCTIONS(SchematicNetLineGraphicsItem)
-
     public:
 
         // Types
@@ -66,7 +64,7 @@ class SchematicNetLineGraphicsItem final : public QGraphicsLineItem
 
         // Constructors / Destructor
         explicit SchematicNetLineGraphicsItem(Schematic& schematic,
-                                              SchematicNetLine& line) throw (Exception);
+                                              SchematicNetLine& line) noexcept;
 
         ~SchematicNetLineGraphicsItem() noexcept;
 
@@ -75,20 +73,27 @@ class SchematicNetLineGraphicsItem final : public QGraphicsLineItem
 
         // Inherited from QGraphicsItem
         int type() const {return Type;} ///< to make  qgraphicsitem_cast() working
-        QPainterPath shape() const;
+        QRectF boundingRect() const {return mBoundingRect;}
         void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
+
+        // General Methods
+        void updateCacheAndRepaint() noexcept;
 
     private:
 
         // make some methods inaccessible...
-        SchematicNetLineGraphicsItem();
-        SchematicNetLineGraphicsItem(const SchematicNetLineGraphicsItem& other);
-        SchematicNetLineGraphicsItem& operator=(const SchematicNetLineGraphicsItem& rhs);
+        SchematicNetLineGraphicsItem() = delete;
+        SchematicNetLineGraphicsItem(const SchematicNetLineGraphicsItem& other) = delete;
+        SchematicNetLineGraphicsItem& operator=(const SchematicNetLineGraphicsItem& rhs) = delete;
 
         // Attributes
         Schematic& mSchematic;
         SchematicNetLine& mLine;
         SchematicLayer* mLayer;
+
+        // Cached Attributes
+        QLineF mLineF;
+        QRectF mBoundingRect;
 };
 
 } // namespace project

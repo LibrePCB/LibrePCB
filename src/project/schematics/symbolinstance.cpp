@@ -157,6 +157,7 @@ void SymbolInstance::setPosition(const Point& newPos) throw (Exception)
 {
     mPosition = newPos;
     mGraphicsItem->setPos(newPos.toPxQPointF());
+    mGraphicsItem->updateCacheAndRepaint();
     foreach (SymbolPinInstance* pin, mPinInstances)
         pin->updateNetPointPosition();
 }
@@ -165,6 +166,7 @@ void SymbolInstance::setAngle(const Angle& newAngle) throw (Exception)
 {
     mAngle = newAngle;
     mGraphicsItem->setRotation(newAngle.toDeg());
+    mGraphicsItem->updateCacheAndRepaint();
     foreach (SymbolPinInstance* pin, mPinInstances)
         pin->updateNetPointPosition();
 }

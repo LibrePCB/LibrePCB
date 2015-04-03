@@ -78,6 +78,8 @@ class SymbolPinGraphicsItem final : public QGraphicsItem
         int type() const {return Type;} ///< to make  qgraphicsitem_cast() working
         void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
 
+        // General Methods
+        void updateCacheAndRepaint() noexcept;
 
     private:
 
@@ -87,7 +89,6 @@ class SymbolPinGraphicsItem final : public QGraphicsItem
         SymbolPinGraphicsItem& operator=(const SymbolPinGraphicsItem& rhs);
 
         // Private Methods
-        bool updateBoundingRectAndShape() noexcept;
         SchematicLayer* getSchematicLayer(unsigned int id) const noexcept;
 
 
@@ -95,9 +96,17 @@ class SymbolPinGraphicsItem final : public QGraphicsItem
         SymbolGraphicsItem& mSymbolGraphicsItem;
         const SymbolPin& mPin;
         project::SymbolPinInstance* mPinInstance;
+        SchematicLayer* mCircleLayer;
+        SchematicLayer* mLineLayer;
+        SchematicLayer* mTextLayer;
 
-        // Symbol Pin Graphics Item Attributes
+        // Cached Attributes
+        QString mText;
+        QFont mFont;
+        bool mRotate180;
+        int mFlags;
         QRectF mBoundingRect;
+        QRectF mTextBoundingRect;
         QPainterPath mShape;
 };
 

@@ -45,59 +45,68 @@ namespace project {
 
 // Constructors / Destructor
 SchematicNetLineGraphicsItem::SchematicNetLineGraphicsItem(Schematic& schematic,
-                                                           SchematicNetLine& line) throw (Exception) :
-    QGraphicsLineItem(), mSchematic(schematic), mLine(line), mLayer(0)
+                                                           SchematicNetLine& line) noexcept :
+    QGraphicsItem(), mSchematic(schematic), mLine(line), mLayer(nullptr)
 {
-    mLayer = mSchematic.getProject().getSchematicLayer(SchematicLayer::Nets);
-    if (!mLayer)
-        throw LogicError(__FILE__, __LINE__, QString(), tr("No Nets Layer found!"));
-
     setFlags(QGraphicsItem::ItemIsSelectable);
     setZValue(Schematic::ZValue_NetLines);
+    setCacheMode(QGraphicsItem::DeviceCoordinateCache);
+
+    mLayer = mSchematic.getProject().getSchematicLayer(SchematicLayer::Nets);
+    Q_ASSERT(mLayer);
+
+    updateCacheAndRepaint();
 }
 
 SchematicNetLineGraphicsItem::~SchematicNetLineGraphicsItem() noexcept
 {
 }
 
-QPainterPath SchematicNetLineGraphicsItem::shape() const
-{
-    QPainterPath path;
-    path.moveTo(line().p1());
-    path.lineTo(line().p2());
-    QPainterPathStroker ps;
-    ps.setCapStyle(Qt::RoundCap);
-    Length width = (mLine.getWidth() > Length(1270000) ? mLine.getWidth() : Length(1270000));
-    ps.setWidth(width.toPx());
-    return ps.createStroke(path);
-}
-
 void SchematicNetLineGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
     Q_UNUSED(widget);
 
-    bool highlight = option->state & QStyle::State_Selected;
+    const bool selected = option->state & QStyle::State_Selected;
+    const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
 
     // draw line
-    painter->setPen(QPen(mLayer->getColor(highlight), mLine.getWidth().toPx(),
-                         Qt::SolidLine, Qt::RoundCap));
-    painter->drawLine(line());
+    QPen pen(mLayer->getColor(selected), mLine.getWidth().toPx() * lod, Qt::SolidLine, Qt::RoundCap);
+    pen.setCosmetic(true);
+    painter->setPen(pen);
+    painter->drawLine(mLineF);
 
 #ifdef QT_DEBUG
     bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
     if ((!deviceIsPrinter) && (Workspace::instance().getSettings().getDebugTools()->getShowSchematicNetlinesNetsignals()))
     {
         // draw net signal name
-        painter->setPen(QPen(mLayer->getColor(highlight), 0));
         QFont font;
+        font.setStyleStrategy(QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
+        font.setStyleHint(QFont::TypeWriter);
         font.setFamily("Monospace");
         font.setPixelSize(3);
-        font.setStyleHint(QFont::TypeWriter);
-        font.setStyleStrategy(QFont::ForceOutline);
         painter->setFont(font);
-        painter->drawText(line().pointAt((qreal)0.5), mLine.getNetSignal()->getName());
+        painter->setPen(QPen(mLayer->getColor(selected), 0));
+        painter->drawText(mLineF.pointAt((qreal)0.5), mLine.getNetSignal()->getName());
+    }
+    if ((!deviceIsPrinter) && (Workspace::instance().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect()))
+    {
+        // draw bounding rect
+        painter->setPen(QPen(Qt::red, 0));
+        painter->setBrush(Qt::NoBrush);
+        painter->drawRect(mBoundingRect);
     }
 #endif
+}
+
+void SchematicNetLineGraphicsItem::updateCacheAndRepaint() noexcept
+{
+    mLineF.setP1(mLine.getStartPoint().getPosition().toPxQPointF());
+    mLineF.setP2(mLine.getEndPoint().getPosition().toPxQPointF());
+    mBoundingRect = QRectF(mLineF.p1(), mLineF.p2()).normalized();
+    mBoundingRect.adjust(-mLine.getWidth().toPx()/2, -mLine.getWidth().toPx()/2,
+                         mLine.getWidth().toPx()/2, mLine.getWidth().toPx()/2);
+    update();
 }
 
 /*****************************************************************************************
@@ -190,6 +199,7 @@ void SchematicNetLine::setWidth(const Length& width) noexcept
 {
     Q_ASSERT(width >= 0);
     mWidth = width;
+    mGraphicsItem->updateCacheAndRepaint();
 }
 
 /*****************************************************************************************
@@ -198,8 +208,7 @@ void SchematicNetLine::setWidth(const Length& width) noexcept
 
 void SchematicNetLine::updateLine() noexcept
 {
-    QLineF line(mStartPoint->getPosition().toPxQPointF(), mEndPoint->getPosition().toPxQPointF());
-    mGraphicsItem->setLine(line);
+    mGraphicsItem->updateCacheAndRepaint();
 }
 
 void SchematicNetLine::addToSchematic() throw (Exception)

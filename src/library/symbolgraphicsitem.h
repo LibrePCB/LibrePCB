@@ -78,6 +78,8 @@ class SymbolGraphicsItem final : public QGraphicsItem
         int type() const {return Type;} ///< to make  qgraphicsitem_cast() working
         void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
 
+        // General Methods
+        void updateCacheAndRepaint() noexcept;
 
     private:
 
@@ -87,18 +89,19 @@ class SymbolGraphicsItem final : public QGraphicsItem
         SymbolGraphicsItem& operator=(const SymbolGraphicsItem& rhs);
 
         // Private Methods
-        bool updateBoundingRectAndShape() noexcept;
         SchematicLayer* getSchematicLayer(unsigned int id) const noexcept;
 
 
         // General Attributes
         const Symbol& mSymbol;
         project::SymbolInstance* mSymbolInstance;
+        QHash<QUuid, SymbolPinGraphicsItem*> mPinItems;
+        QFont mFont;
 
-        // Symbol Graphics Item Attributes
+        // Cached Attributes
         QRectF mBoundingRect;
         QPainterPath mShape;
-        QHash<QUuid, SymbolPinGraphicsItem*> mPinItems;
+
 };
 
 } // namespace library

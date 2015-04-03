@@ -60,8 +60,6 @@ namespace project {
  */
 class SchematicNetPointGraphicsItem final : public QGraphicsItem
 {
-        Q_DECLARE_TR_FUNCTIONS(SchematicNetPointGraphicsItem)
-
     public:
 
         // Types
@@ -71,7 +69,7 @@ class SchematicNetPointGraphicsItem final : public QGraphicsItem
 
         // Constructors / Destructor
         explicit SchematicNetPointGraphicsItem(Schematic& schematic,
-                                               SchematicNetPoint& point) throw (Exception);
+                                               SchematicNetPoint& point) noexcept;
 
         ~SchematicNetPointGraphicsItem() noexcept;
 
@@ -80,21 +78,29 @@ class SchematicNetPointGraphicsItem final : public QGraphicsItem
 
         // Inherited from QGraphicsItem
         int type() const {return Type;} ///< to make  qgraphicsitem_cast() working
-        QRectF boundingRect() const;
+        QRectF boundingRect() const {return sBoundingRect;}
         void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
 
+        // General Methods
+        void updateCacheAndRepaint() noexcept;
 
     private:
 
         // make some methods inaccessible...
-        SchematicNetPointGraphicsItem();
-        SchematicNetPointGraphicsItem(const SchematicNetPointGraphicsItem& other);
-        SchematicNetPointGraphicsItem& operator=(const SchematicNetPointGraphicsItem& rhs);
+        SchematicNetPointGraphicsItem() = delete;
+        SchematicNetPointGraphicsItem(const SchematicNetPointGraphicsItem& other) = delete;
+        SchematicNetPointGraphicsItem& operator=(const SchematicNetPointGraphicsItem& rhs) = delete;
 
         // Attributes
         Schematic& mSchematic;
         SchematicNetPoint& mPoint;
         SchematicLayer* mLayer;
+
+        // Cached Attributes
+        bool mPointVisible;
+
+        // Static Stuff
+        static QRectF sBoundingRect;
 };
 
 } // namespace project

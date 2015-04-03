@@ -45,54 +45,69 @@ namespace project {
  *  Class SchematicNetPointGraphicsItem
  ****************************************************************************************/
 
+QRectF SchematicNetPointGraphicsItem::sBoundingRect;
+
 // Constructors / Destructor
 SchematicNetPointGraphicsItem::SchematicNetPointGraphicsItem(Schematic& schematic,
-                                                             SchematicNetPoint& point) throw (Exception) :
-    QGraphicsItem(), mSchematic(schematic), mPoint(point), mLayer(0)
+                                                             SchematicNetPoint& point) noexcept :
+    QGraphicsItem(), mSchematic(schematic), mPoint(point), mLayer(nullptr)
 {
-    mLayer = mSchematic.getProject().getSchematicLayer(SchematicLayer::Nets);
-    if (!mLayer)
-        throw LogicError(__FILE__, __LINE__, QString(), tr("No Nets Layer found!"));
-
     setFlags(QGraphicsItem::ItemIsSelectable);
     setZValue(Schematic::ZValue_NetPoints);
+    setCacheMode(QGraphicsItem::DeviceCoordinateCache);
+
+    mLayer = mSchematic.getProject().getSchematicLayer(SchematicLayer::Nets);
+    Q_ASSERT(mLayer);
+
+    if (sBoundingRect.isNull())
+    {
+        qreal radius = SchematicNetPoint::getCircleRadius().toPx();
+        sBoundingRect = QRectF(-radius, -radius, 2*radius, 2*radius);
+    }
+
+    updateCacheAndRepaint();
 }
 
 SchematicNetPointGraphicsItem::~SchematicNetPointGraphicsItem() noexcept
 {
 }
 
-QRectF SchematicNetPointGraphicsItem::boundingRect() const
-{
-    qreal radius = SchematicNetPoint::getCircleRadius().toPx() * 1.5f;
-    return QRectF(-radius, -radius, 2*radius, 2*radius);
-}
-
 void SchematicNetPointGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
     Q_UNUSED(widget);
 
-    qreal radius = SchematicNetPoint::getCircleRadius().toPx();
-    bool highlight = option->state & QStyle::State_Selected;
-    bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
+    const bool highlight = option->state & QStyle::State_Selected;
 
-    if ((  (mPoint.getLines().count() > 1) && (mPoint.isAttached()))
-        || (mPoint.getLines().count() > 2))
+    if (mPointVisible)
     {
-        painter->setPen(QPen(mLayer->getColor(highlight), 0));
+        painter->setPen(Qt::NoPen);
         painter->setBrush(QBrush(mLayer->getColor(highlight), Qt::SolidPattern));
-        painter->drawEllipse(QPointF(0, 0), radius, radius);
+        painter->drawEllipse(sBoundingRect);
     }
-    else if (!deviceIsPrinter)
-    {
+
 #ifdef QT_DEBUG
-        if (Workspace::instance().getSettings().getDebugTools()->getShowAllSchematicNetpoints())
-        {
-            painter->setPen(QPen(Qt::red, 0));
-            painter->drawEllipse(QPointF(0, 0), radius, radius);
-        }
-#endif
+    bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
+    if ((!mPointVisible) && (!deviceIsPrinter) && Workspace::instance().getSettings().getDebugTools()->getShowAllSchematicNetpoints())
+    {
+        // draw circle
+        painter->setPen(QPen(Qt::red, 0));
+        painter->setBrush(Qt::NoBrush);
+        painter->drawEllipse(sBoundingRect);
     }
+    if ((!deviceIsPrinter) && (Workspace::instance().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect()))
+    {
+        // draw bounding rect
+        painter->setPen(QPen(Qt::red, 0));
+        painter->setBrush(Qt::NoBrush);
+        painter->drawRect(sBoundingRect);
+    }
+#endif
+}
+
+void SchematicNetPointGraphicsItem::updateCacheAndRepaint() noexcept
+{
+    mPointVisible = (((mPoint.getLines().count() > 1) && (mPoint.isAttached())) || (mPoint.getLines().count() > 2));
+    update();
 }
 
 /*****************************************************************************************
@@ -252,6 +267,7 @@ void SchematicNetPoint::detachFromPin() throw (Exception)
     mSymbolInstance = nullptr;
     mPinInstance = nullptr;
     mAttached = false;
+    mGraphicsItem->updateCacheAndRepaint();
 }
 
 void SchematicNetPoint::attachToPin(SymbolInstance* symbol, SymbolPinInstance* pin) throw (Exception)
@@ -267,6 +283,7 @@ void SchematicNetPoint::attachToPin(SymbolInstance* symbol, SymbolPinInstance* p
     mPinInstance->registerNetPoint(this);
     mPosition = mPinInstance->getPosition();
     mAttached = true;
+    mGraphicsItem->updateCacheAndRepaint();
 }
 
 void SchematicNetPoint::updateLines() const noexcept
@@ -281,6 +298,7 @@ void SchematicNetPoint::registerNetLine(SchematicNetLine* netline) noexcept
     Q_ASSERT(!mLines.contains(netline));
     mLines.append(netline);
     netline->updateLine();
+    mGraphicsItem->updateCacheAndRepaint();
     mErcMsgDeadNetPoint->setVisible(mLines.isEmpty());
 }
 
@@ -290,6 +308,7 @@ void SchematicNetPoint::unregisterNetLine(SchematicNetLine* netline) noexcept
     Q_ASSERT(mLines.contains(netline));
     mLines.removeOne(netline);
     netline->updateLine();
+    mGraphicsItem->updateCacheAndRepaint();
     mErcMsgDeadNetPoint->setVisible(mLines.isEmpty());
 }
 

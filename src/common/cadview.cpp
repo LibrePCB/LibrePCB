@@ -55,10 +55,11 @@ CADView::CADView(QWidget* parent) :
     connect(mZoomAnimation, &QVariantAnimation::valueChanged,
             this, &CADView::zoomAnimationValueChanged);
 
-    setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing| QPainter::SmoothPixmapTransform);
+    setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
     if (Workspace::instance().getSettings().getAppearance()->getUseOpenGl())
         setViewport(new QGLWidget(QGLFormat(QGL::DoubleBuffer | QGL::AlphaChannel | QGL::SampleBuffers)));
     setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+    setOptimizationFlags(QGraphicsView::DontSavePainterState);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
