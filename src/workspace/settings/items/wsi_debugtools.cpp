@@ -31,7 +31,7 @@
 
 WSI_DebugTools::WSI_DebugTools(WorkspaceSettings& settings) :
     WSI_Base(settings), mWidget(nullptr), mCbxShowAllSchematicNetpoints(nullptr),
-    mCbxShowSchematicNetlinesNetsignals(nullptr)
+    mCbxShowSchematicNetlinesNetsignals(nullptr), mCbxShowGraphicsItemsBoundingRect(nullptr)
 {
     // create a QWidget
     mWidget = new QWidget();
@@ -49,6 +49,8 @@ WSI_DebugTools::WSI_DebugTools(WorkspaceSettings& settings) :
     layout->addWidget(mCbxShowSymbolPinNetsignals, layout->rowCount(), 0);
     mCbxShowGenCompSymbolCount = new QCheckBox(tr("Show Count of Placed Symbols"));
     layout->addWidget(mCbxShowGenCompSymbolCount, layout->rowCount(), 0);
+    mCbxShowGraphicsItemsBoundingRect = new QCheckBox(tr("Show Bounding Rect of QGraphicsItems"));
+    layout->addWidget(mCbxShowGraphicsItemsBoundingRect, layout->rowCount(), 0);
 
     // stretch the last row
     layout->setRowStretch(layout->rowCount(), 1);
@@ -72,6 +74,7 @@ void WSI_DebugTools::restoreDefault()
     mCbxShowSchematicNetlinesNetsignals->setChecked(false);
     mCbxShowSymbolPinNetsignals->setChecked(false);
     mCbxShowGenCompSymbolCount->setChecked(false);
+    mCbxShowGraphicsItemsBoundingRect->setChecked(false);
 }
 
 void WSI_DebugTools::apply()
@@ -80,6 +83,7 @@ void WSI_DebugTools::apply()
     saveValue("dbg_show_schematic_netlines_netsignals", mCbxShowSchematicNetlinesNetsignals->isChecked());
     saveValue("dbg_show_symbol_pin_netsignals", mCbxShowSymbolPinNetsignals->isChecked());
     saveValue("dbg_show_gen_comp_symbol_count", mCbxShowGenCompSymbolCount->isChecked());
+    saveValue("dbg_show_graphicsitems_boundingrect", mCbxShowGraphicsItemsBoundingRect->isChecked());
 }
 
 void WSI_DebugTools::revert()
@@ -88,6 +92,7 @@ void WSI_DebugTools::revert()
     mCbxShowSchematicNetlinesNetsignals->setChecked(loadValue("dbg_show_schematic_netlines_netsignals", false).toBool());
     mCbxShowSymbolPinNetsignals->setChecked(loadValue("dbg_show_symbol_pin_netsignals", false).toBool());
     mCbxShowGenCompSymbolCount->setChecked(loadValue("dbg_show_gen_comp_symbol_count", false).toBool());
+    mCbxShowGraphicsItemsBoundingRect->setChecked(loadValue("dbg_show_graphicsitems_boundingrect", false).toBool());
 }
 
 /*****************************************************************************************
