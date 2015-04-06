@@ -25,6 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <QtWidgets>
 #include "../common/units/all_length_units.h"
 #include "../common/file_io/if_xmlserializableobject.h"
 
@@ -106,17 +107,18 @@ class SymbolPolygon final : public IF_XmlSerializableObject
         bool isGrabArea() const noexcept {return mIsGrabArea;}
         const Point& getStartPos() const noexcept {return mStartPos;}
         const QList<const SymbolPolygonSegment*>& getSegments() const noexcept {return mSegments;}
+        const QPainterPath& toQPainterPathPx() const noexcept;
 
         // Setters
         void setLineLayerId(uint id) noexcept {mLineLayerId = id;}
         void setFillLayerId(uint id) noexcept {mFillLayerId = id;}
         void setLineWidth(const Length& width) noexcept {mLineWidth = width;}
         void setIsGrabArea(bool isGrabArea) noexcept {mIsGrabArea = isGrabArea;}
-        void setStartPos(const Point& pos) noexcept {mStartPos = pos;}
+        void setStartPos(const Point& pos) noexcept {mStartPos = pos; mPainterPathPx = QPainterPath();}
 
         // General Methods
-        void clearSegments() noexcept {qDeleteAll(mSegments); mSegments.clear();}
-        void appendSegment(const SymbolPolygonSegment* segment) noexcept {mSegments.append(segment);}
+        void clearSegments() noexcept;
+        void appendSegment(const SymbolPolygonSegment* segment) noexcept;
         XmlDomElement* serializeToXmlDomElement() const throw (Exception);
 
 
@@ -137,6 +139,9 @@ class SymbolPolygon final : public IF_XmlSerializableObject
         bool mIsGrabArea;
         Point mStartPos;
         QList<const SymbolPolygonSegment*> mSegments;
+
+        // Cached Attributes
+        mutable QPainterPath mPainterPathPx;
 };
 
 } // namespace library

@@ -93,9 +93,60 @@ SymbolPolygon::~SymbolPolygon() noexcept
     qDeleteAll(mSegments);      mSegments.clear();
 }
 
+const QPainterPath& SymbolPolygon::toQPainterPathPx() const noexcept
+{
+    if (mPainterPathPx.isEmpty())
+    {
+        mPainterPathPx.setFillRule(Qt::WindingFill);
+        Point lastPos = mStartPos;
+        mPainterPathPx.moveTo(lastPos.toPxQPointF());
+        foreach (const library::SymbolPolygonSegment* segment, mSegments)
+        {
+            if (segment->getAngle() == 0)
+            {
+                mPainterPathPx.lineTo(segment->getEndPos().toPxQPointF());
+            }
+            else
+            {
+                // TODO: this is very provisional and may contain bugs...
+                // all lengths in pixels
+                qreal s = Point(segment->getEndPos() - lastPos).getLength().toPx();
+                qreal r = s / (2 * qSin(segment->getAngle().toRad()/2));
+                qreal x1 = lastPos.toPxQPointF().x();
+                qreal y1 = lastPos.toPxQPointF().y();
+                qreal x2 = segment->getEndPos().toPxQPointF().x();
+                qreal y2 = segment->getEndPos().toPxQPointF().y();
+                qreal x3 = (x1+x2)/2;
+                qreal y3 = (y1+y2)/2;
+                qreal q = qSqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
+                qreal cx = x3+ qSqrt(r*r-q*q/4)*(y1-y2)/q;
+                qreal cy = y3 + qSqrt(r*r-q*q/4)*(x2-x1)/q;
+                QRectF rect(cx-r, cy-r, 2*r, 2*r);
+                qreal startAngleDeg = qRadiansToDegrees(qAtan2(cy-y1, cx-x1));
+                mPainterPathPx.arcTo(rect, startAngleDeg, -segment->getAngle().toDeg());
+            }
+            lastPos = segment->getEndPos();
+        }
+    }
+    return mPainterPathPx;
+}
+
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
+
+void SymbolPolygon::clearSegments() noexcept
+{
+    qDeleteAll(mSegments);
+    mSegments.clear();
+    mPainterPathPx = QPainterPath(); // invalidate painter path
+}
+
+void SymbolPolygon::appendSegment(const SymbolPolygonSegment* segment) noexcept
+{
+    mSegments.append(segment);
+    mPainterPathPx = QPainterPath(); // invalidate painter path
+}
 
 XmlDomElement* SymbolPolygon::serializeToXmlDomElement() const throw (Exception)
 {
