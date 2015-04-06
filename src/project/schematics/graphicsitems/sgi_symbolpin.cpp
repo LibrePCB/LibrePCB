@@ -22,39 +22,36 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <QtWidgets>
 #include <QPrinter>
-#include "symbolpingraphicsitem.h"
-#include "../project/schematics/schematic.h"
-#include "symbolgraphicsitem.h"
-#include "symbolpin.h"
-#include "../project/schematics/symbolinstance.h"
-#include "../project/schematics/symbolpininstance.h"
-#include "../project/project.h"
-#include "../project/schematics/schematic.h"
-#include "../common/schematiclayer.h"
-#include "../common/units/all_length_units.h"
-#include "../project/circuit/netsignal.h"
-#include "../project/circuit/gencompsignalinstance.h"
-#include "genericcomponent.h"
-#include "../workspace/workspace.h"
-#include "../project/schematics/schematicnetpoint.h"
-#include "../workspace/settings/workspacesettings.h"
+#include "sgi_symbolpin.h"
+#include "../items/si_symbolpin.h"
+#include "../items/si_symbol.h"
+#include "../schematic.h"
+#include "../../project.h"
+#include "../../circuit/netsignal.h"
+#include "../../circuit/gencompinstance.h"
+#include "../../circuit/gencompsignalinstance.h"
+#include "../../../common/schematiclayer.h"
+#include "../../../workspace/workspace.h"
+#include "../../../workspace/settings/workspacesettings.h"
+#include "../../../library/symbolpin.h"
+#include "../../../library/genericcomponent.h"
 
-namespace library {
+namespace project {
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SymbolPinGraphicsItem::SymbolPinGraphicsItem(SymbolGraphicsItem& symbol, const SymbolPin& pin,
-                                             project::SymbolPinInstance* instance) throw (Exception) :
-    QGraphicsItem(&symbol), mSymbolGraphicsItem(symbol), mPin(pin), mPinInstance(instance)
+SGI_SymbolPin::SGI_SymbolPin(SI_SymbolPin& pin) noexcept :
+    SGI_Base(), mPin(pin), mLibPin(pin.getLibPin())
 {
-    setZValue(project::Schematic::ZValue_Symbols);
-    //if (mPinInstance) setFlags(QGraphicsItem::ItemIsSelectable);
-    setPos(mPin.getPosition().toPxQPointF());
-    setRotation(mPin.getAngle().toDeg());
-    setToolTip(mPin.getName() % ": " % mPin.getDescription());
+    setZValue(Schematic::ZValue_Symbols);
+    setFlags(QGraphicsItem::ItemIsSelectable);
+    setPos(mLibPin.getPosition().toPxQPointF());
+    setRotation(mLibPin.getAngle().toDeg());
+    setToolTip(mLibPin.getName() % ": " % mLibPin.getDescription());
 
     mCircleLayer = getSchematicLayer(SchematicLayer::SymbolPinCircles);
     Q_ASSERT(mCircleLayer);
@@ -68,53 +65,86 @@ SymbolPinGraphicsItem::SymbolPinGraphicsItem(SymbolGraphicsItem& symbol, const S
     mFont.setFamily("Nimbus Sans L");
     mFont.setPixelSize(5);
 
-    updateCacheAndRepaint();
+    mRadiusPx = Length(600000).toPx();
 
-    if (mPinInstance)
-        mPinInstance->registerPinGraphicsItem(this);
+    updateCacheAndRepaint();
 }
 
-SymbolPinGraphicsItem::~SymbolPinGraphicsItem() noexcept
+SGI_SymbolPin::~SGI_SymbolPin() noexcept
 {
-    if (mPinInstance)
-        mPinInstance->unregisterPinGraphicsItem(this);
+}
+
+/*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+void SGI_SymbolPin::updateCacheAndRepaint() noexcept
+{
+    mText = mPin.getDisplayText();
+
+    Angle absAngle = mLibPin.getAngle() + mPin.getSymbol().getAngle();
+    absAngle.mapTo180deg();
+    mRotate180 = (absAngle <= -Angle::deg90() || absAngle > Angle::deg90());
+
+    mFlags = Qt::AlignVCenter | Qt::TextSingleLine | Qt::TextDontClip;
+    if (mRotate180) mFlags |= Qt::AlignRight; else mFlags |= Qt::AlignLeft;
+
+    mShape = QPainterPath();
+    mShape.setFillRule(Qt::WindingFill);
+    mBoundingRect = QRectF();
+
+    // circle
+    mShape.addEllipse(-mRadiusPx, -mRadiusPx, 2*mRadiusPx, 2*mRadiusPx);
+    mBoundingRect = mBoundingRect.united(mShape.boundingRect());
+
+    // line
+    QRectF lineRect = QRectF(QPointF(0, 0), Point(0, mLibPin.getLength()).toPxQPointF()).normalized();
+    lineRect.adjust(-Length(79375).toPx(), -Length(79375).toPx(), Length(79375).toPx(), Length(79375).toPx());
+    mBoundingRect = mBoundingRect.united(lineRect).normalized();
+
+    // text
+    qreal x = mLibPin.getLength().toPx() + 4;
+    QFontMetricsF metrics(mFont);
+    QRectF textRect = metrics.boundingRect(QRectF(mRotate180 ? -x : x, 0, 0, 0), mFlags, mText).normalized();
+    if (mRotate180)
+        textRect = QRectF(textRect.top(), textRect.left(), textRect.height(), textRect.width());
+    else
+        textRect = QRectF(-textRect.top(), -textRect.left(), -textRect.height(), -textRect.width());
+    mTextBoundingRect = textRect.normalized();
+    mBoundingRect = mBoundingRect.united(mTextBoundingRect).normalized();
+
+    update();
 }
 
 /*****************************************************************************************
  *  Inherited from QGraphicsItem
  ****************************************************************************************/
 
-void SymbolPinGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-                                  QWidget* widget)
+void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
     Q_UNUSED(widget);
 
-    const bool selected = (option->state & QStyle::State_Selected) || mSymbolGraphicsItem.isSelected();
+    const bool selected = (option->state & QStyle::State_Selected);// || mSymbolGraphicsItem.isSelected();
     const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
     const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
 
-    const GenCompSignal* genCompSignal = (mPinInstance ? mPinInstance->getGenCompSignal() : 0);
-    const project::NetSignal* netsignal = (genCompSignal ? mPinInstance->getGenCompSignalInstance()->getNetSignal() : 0);
-    bool requiredPin = (mPinInstance) ? mPinInstance->getGenCompSignal()->isRequired() : false;
+    const library::GenCompSignal* genCompSignal = mPin.getGenCompSignal();
+    const NetSignal* netsignal = (genCompSignal ? mPin.getGenCompSignalInstance()->getNetSignal() : nullptr);
+    bool requiredPin = mPin.getGenCompSignal()->isRequired();
 
     // draw line
     QPen pen(mLineLayer->getColor(selected), Length(158750).toPx()*lod, Qt::SolidLine, Qt::RoundCap);
     pen.setCosmetic(true);
     painter->setPen(pen);
-    painter->drawLine(QPointF(0, 0), Point(0, mPin.getLength()).toPxQPointF());
+    painter->drawLine(QPointF(0, 0), Point(0, mLibPin.getLength()).toPxQPointF());
 
     // draw circle
     if ((!deviceIsPrinter) && (!netsignal))
     {
-        qreal radius = project::SchematicNetPoint::getCircleRadius().toPx();
         painter->setPen(QPen(mCircleLayer->getColor(requiredPin), 0));
         painter->setBrush(Qt::NoBrush);
-        painter->drawEllipse(QPointF(0, 0), radius, radius);
+        painter->drawEllipse(QPointF(0, 0), mRadiusPx, mRadiusPx);
     }
-
-    Angle absAngle = mPin.getAngle();
-    if (mPinInstance) absAngle += mPinInstance->getSymbolInstance().getAngle();
-    absAngle.mapTo180deg();
 
     // draw text or filled rect
     if (!mText.isEmpty())
@@ -126,7 +156,7 @@ void SymbolPinGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsI
             painter->rotate(mRotate180 ? 90 : -90);
             painter->setPen(QPen(mTextLayer->getColor(selected), 0));
             painter->setFont(mFont);
-            qreal x = mPin.getLength().toPx() + 4;
+            qreal x = mLibPin.getLength().toPx() + 4;
             painter->drawText(QRectF(mRotate180 ? -x : x, 0, 0, 0), mFlags, mText);
             painter->restore();
         }
@@ -166,63 +196,16 @@ void SymbolPinGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsI
 }
 
 /*****************************************************************************************
- *  General Methods
- ****************************************************************************************/
-
-void SymbolPinGraphicsItem::updateCacheAndRepaint() noexcept
-{
-    mText = (mPinInstance ? mPinInstance->getDisplayText() : mPin.getName());
-
-    Angle absAngle = mPin.getAngle();
-    if (mPinInstance) absAngle += mPinInstance->getSymbolInstance().getAngle();
-    absAngle.mapTo180deg();
-    mRotate180 = (absAngle <= -Angle::deg90() || absAngle > Angle::deg90());
-
-    mFlags = Qt::AlignVCenter | Qt::TextSingleLine | Qt::TextDontClip;
-    if (mRotate180) mFlags |= Qt::AlignRight; else mFlags |= Qt::AlignLeft;
-
-    mShape = QPainterPath();
-    mShape.setFillRule(Qt::WindingFill);
-    mBoundingRect = QRectF();
-
-    // circle
-    qreal radius = project::SchematicNetPoint::getCircleRadius().toPx();
-    mShape.addEllipse(-radius, -radius, 2*radius, 2*radius);
-    mBoundingRect = mBoundingRect.united(mShape.boundingRect());
-
-    // line
-    QRectF lineRect = QRectF(QPointF(0, 0), Point(0, mPin.getLength()).toPxQPointF()).normalized();
-    lineRect.adjust(-Length(79375).toPx(), -Length(79375).toPx(), Length(79375).toPx(), Length(79375).toPx());
-    mBoundingRect = mBoundingRect.united(lineRect).normalized();
-
-    // text
-    qreal x = mPin.getLength().toPx() + 4;
-    QFontMetricsF metrics(mFont);
-    QRectF textRect = metrics.boundingRect(QRectF(mRotate180 ? -x : x, 0, 0, 0), mFlags, mText).normalized();
-    if (mRotate180)
-        textRect = QRectF(textRect.top(), textRect.left(), textRect.height(), textRect.width());
-    else
-        textRect = QRectF(-textRect.top(), -textRect.left(), -textRect.height(), -textRect.width());
-    mTextBoundingRect = textRect.normalized();
-    mBoundingRect = mBoundingRect.united(mTextBoundingRect).normalized();
-
-    update();
-}
-
-/*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
-SchematicLayer* SymbolPinGraphicsItem::getSchematicLayer(unsigned int id) const noexcept
+SchematicLayer* SGI_SymbolPin::getSchematicLayer(uint id) const noexcept
 {
-    if (mPinInstance)
-        return mPinInstance->getSymbolInstance().getSchematic().getProject().getSchematicLayer(id);
-    else
-        return Workspace::instance().getSchematicLayer(id);
+    return mPin.getSymbol().getSchematic().getProject().getSchematicLayer(id);
 }
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace library
+} // namespace project

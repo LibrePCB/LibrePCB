@@ -33,9 +33,8 @@
  ****************************************************************************************/
 
 namespace project {
-class SchematicNetPoint;
-class SymbolInstance;
-class SymbolPinInstance;
+class SI_NetPoint;
+class SI_SymbolPin;
 }
 
 /*****************************************************************************************
@@ -52,7 +51,7 @@ class CmdSchematicNetPointDetach final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit CmdSchematicNetPointDetach(SchematicNetPoint& point, UndoCommand* parent = 0) throw (Exception);
+        explicit CmdSchematicNetPointDetach(SI_NetPoint& point, UndoCommand* parent = 0) throw (Exception);
         ~CmdSchematicNetPointDetach() noexcept;
 
         // Inherited from UndoCommand
@@ -62,9 +61,8 @@ class CmdSchematicNetPointDetach final : public UndoCommand
 
     private:
 
-        SchematicNetPoint& mNetPoint;
-        SymbolInstance* mSymbolInstance;
-        SymbolPinInstance* mPinInstance;
+        SI_NetPoint& mNetPoint;
+        SI_SymbolPin* mSymbolPin;
 };
 
 } // namespace project

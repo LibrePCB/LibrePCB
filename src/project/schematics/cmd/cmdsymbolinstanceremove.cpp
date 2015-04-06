@@ -24,7 +24,7 @@
 #include <QtCore>
 #include "cmdsymbolinstanceremove.h"
 #include "../schematic.h"
-#include "../symbolinstance.h"
+#include "../items/si_symbol.h"
 
 namespace project {
 
@@ -32,17 +32,17 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSymbolInstanceRemove::CmdSymbolInstanceRemove(Schematic& schematic, SymbolInstance& symbol,
+CmdSymbolInstanceRemove::CmdSymbolInstanceRemove(Schematic& schematic, SI_Symbol& symbol,
                                                  UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Remove symbol"), parent),
-    mSchematic(schematic), mSymbolInstance(symbol)
+    mSchematic(schematic), mSymbol(symbol)
 {
 }
 
 CmdSymbolInstanceRemove::~CmdSymbolInstanceRemove() noexcept
 {
     if (isExecuted())
-        delete &mSymbolInstance;
+        delete &mSymbol;
 }
 
 /*****************************************************************************************
@@ -51,7 +51,7 @@ CmdSymbolInstanceRemove::~CmdSymbolInstanceRemove() noexcept
 
 void CmdSymbolInstanceRemove::redo() throw (Exception)
 {
-    mSchematic.removeSymbol(mSymbolInstance); // throws an exception on error
+    mSchematic.removeSymbol(mSymbol); // throws an exception on error
 
     try
     {
@@ -59,14 +59,14 @@ void CmdSymbolInstanceRemove::redo() throw (Exception)
     }
     catch (Exception& e)
     {
-        mSchematic.addSymbol(mSymbolInstance);
+        mSchematic.addSymbol(mSymbol);
         throw;
     }
 }
 
 void CmdSymbolInstanceRemove::undo() throw (Exception)
 {
-    mSchematic.addSymbol(mSymbolInstance); // throws an exception on error
+    mSchematic.addSymbol(mSymbol); // throws an exception on error
 
     try
     {
@@ -74,7 +74,7 @@ void CmdSymbolInstanceRemove::undo() throw (Exception)
     }
     catch (Exception& e)
     {
-        mSchematic.removeSymbol(mSymbolInstance);
+        mSchematic.removeSymbol(mSymbol);
         throw;
     }
 }

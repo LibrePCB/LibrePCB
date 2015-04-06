@@ -1,0 +1,179 @@
+/*
+ * EDA4U - Professional EDA for everyone!
+ * Copyright (C) 2013 Urban Bruhin
+ * http://eda4u.ubruhin.ch/
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*****************************************************************************************
+ *  Includes
+ ****************************************************************************************/
+
+#include <QtCore>
+#include "si_netlabel.h"
+#include "../schematic.h"
+#include "../../circuit/netsignal.h"
+#include "../../circuit/circuit.h"
+#include "../../project.h"
+#include "../../../common/file_io/xmldomelement.h"
+
+namespace project {
+
+/*****************************************************************************************
+ *  Constructors / Destructor
+ ****************************************************************************************/
+
+SI_NetLabel::SI_NetLabel(Schematic& schematic, const XmlDomElement& domElement) throw (Exception) :
+    SI_Base(), mSchematic(schematic), mGraphicsItem(nullptr), mNetSignal(nullptr)
+{
+    // read attributes
+    mUuid = domElement.getAttribute<QUuid>("uuid");
+    QUuid netSignalUuid = domElement.getAttribute<QUuid>("netsignal", true);
+    mNetSignal = mSchematic.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
+    if(!mNetSignal)
+    {
+        throw RuntimeError(__FILE__, __LINE__, netSignalUuid.toString(),
+            QString(tr("Invalid net signal UUID: \"%1\"")).arg(netSignalUuid.toString()));
+    }
+    mPosition.setX(domElement.getAttribute<Length>("x"));
+    mPosition.setY(domElement.getAttribute<Length>("y"));
+    mAngle = domElement.getAttribute<Angle>("angle");
+
+    init();
+}
+
+SI_NetLabel::SI_NetLabel(Schematic& schematic, NetSignal& netsignal, const Point& position) throw (Exception) :
+    SI_Base(), mSchematic(schematic), mGraphicsItem(nullptr), mPosition(position),
+    mAngle(0), mNetSignal(&netsignal)
+{
+    mUuid = QUuid::createUuid(); // generate random UUID
+    init();
+}
+
+void SI_NetLabel::init() throw (Exception)
+{
+    // create the graphics item
+    mGraphicsItem = new SGI_NetLabel(*this);
+    mGraphicsItem->setPos(mPosition.toPxQPointF());
+    mGraphicsItem->setRotation(mAngle.toDeg());
+
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+}
+
+SI_NetLabel::~SI_NetLabel() noexcept
+{
+    delete mGraphicsItem;           mGraphicsItem = nullptr;
+}
+
+/*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
+
+void SI_NetLabel::setNetSignal(NetSignal& netsignal) noexcept
+{
+    if (&netsignal == mNetSignal) return;
+    mNetSignal->unregisterSchematicNetLabel(*this);
+    mNetSignal = &netsignal;
+    mNetSignal->registerSchematicNetLabel(*this);
+    mGraphicsItem->updateCacheAndRepaint();
+}
+
+void SI_NetLabel::setPosition(const Point& position) noexcept
+{
+    if (position == mPosition) return;
+    mPosition = position;
+    mGraphicsItem->setPos(mPosition.toPxQPointF());
+}
+
+void SI_NetLabel::setAngle(const Angle& angle) noexcept
+{
+    if (angle == mAngle) return;
+    mAngle = angle;
+    mGraphicsItem->setRotation(mAngle.toDeg());
+    mGraphicsItem->updateCacheAndRepaint();
+}
+
+/*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+void SI_NetLabel::updateText() noexcept
+{
+    mGraphicsItem->updateCacheAndRepaint();
+}
+
+void SI_NetLabel::addToSchematic() throw (Exception)
+{
+    mNetSignal->registerSchematicNetLabel(*this);
+    mSchematic.addItem(mGraphicsItem);
+}
+
+void SI_NetLabel::removeFromSchematic() throw (Exception)
+{
+    mNetSignal->unregisterSchematicNetLabel(*this);
+    mSchematic.removeItem(mGraphicsItem);
+}
+
+XmlDomElement* SI_NetLabel::serializeToXmlDomElement() const throw (Exception)
+{
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("netlabel"));
+    root->setAttribute("uuid", mUuid);
+    root->setAttribute("x", mPosition.getX());
+    root->setAttribute("y", mPosition.getY());
+    root->setAttribute("angle", mAngle);
+    root->setAttribute("netsignal", mNetSignal->getUuid());
+    return root.take();
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+bool SI_NetLabel::checkAttributesValidity() const noexcept
+{
+    if (mUuid.isNull())                             return false;
+    if (mNetSignal == nullptr)                      return false;
+    return true;
+}
+
+/*****************************************************************************************
+ *  Static Methods
+ ****************************************************************************************/
+
+uint SI_NetLabel::extractFromGraphicsItems(const QList<QGraphicsItem*>& items,
+                                                 QList<SI_NetLabel*>& netlabels) noexcept
+{
+    foreach (QGraphicsItem* item, items)
+    {
+        Q_ASSERT(item); if (!item) continue;
+        if (item->type() == Schematic::Type_NetLabel)
+        {
+            SGI_NetLabel* i = qgraphicsitem_cast<SGI_NetLabel*>(item);
+            Q_ASSERT(i); if (!i) break;
+            SI_NetLabel* l = &i->getNetLabel();
+            if (!netlabels.contains(l))
+                netlabels.append(l);
+        }
+    }
+    return netlabels.count();
+}
+
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace project

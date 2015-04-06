@@ -24,7 +24,7 @@
 #include <QtCore>
 #include "cmdschematicnetlineremove.h"
 #include "../schematic.h"
-#include "../schematicnetline.h"
+#include "../items/si_netline.h"
 
 namespace project {
 
@@ -33,7 +33,7 @@ namespace project {
  ****************************************************************************************/
 
 CmdSchematicNetLineRemove::CmdSchematicNetLineRemove(Schematic& schematic,
-                                                     SchematicNetLine& netline,
+                                                     SI_NetLine& netline,
                                                      UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Remove netline"), parent),
     mSchematic(schematic), mNetLine(netline)

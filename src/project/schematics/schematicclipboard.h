@@ -35,7 +35,6 @@ class XmlDomElement;
 
 namespace project {
 class Schematic;
-class SymbolInstance;
 }
 
 /*****************************************************************************************
@@ -57,10 +56,10 @@ class SchematicClipboard final : public QObject
     public:
 
         // General Methods
-        void clear() noexcept;
-        void cut(const QList<SymbolInstance*>& symbols) throw (Exception);
-        void copy(const QList<SymbolInstance*>& symbols) throw (Exception);
-        void paste(Schematic& schematic, QList<SymbolInstance*>& symbols) throw (Exception);
+        //void clear() noexcept;
+        //void cut(const QList<SymbolInstance*>& symbols) throw (Exception);
+        //void copy(const QList<SymbolInstance*>& symbols) throw (Exception);
+        //void paste(Schematic& schematic, QList<SymbolInstance*>& symbols) throw (Exception);
 
 
         // Static Methods
@@ -71,12 +70,12 @@ class SchematicClipboard final : public QObject
         // Private Methods
         SchematicClipboard() noexcept;
         ~SchematicClipboard() noexcept;
-        void setElements(const QList<SymbolInstance*>& symbols) throw (Exception);
+        //void setElements(const QList<SymbolInstance*>& symbols) throw (Exception);
 
 
         // Attributes
         bool mCutActive;
-        QList<XmlDomElement*> mSymbolInstances;
+        //QList<XmlDomElement*> mSymbolInstances;
 
 };
 

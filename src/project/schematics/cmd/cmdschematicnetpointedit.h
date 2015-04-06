@@ -34,7 +34,7 @@
  ****************************************************************************************/
 
 namespace project {
-class SchematicNetPoint;
+class SI_NetPoint;
 class NetSignal;
 }
 
@@ -52,7 +52,7 @@ class CmdSchematicNetPointEdit final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit CmdSchematicNetPointEdit(SchematicNetPoint& point, UndoCommand* parent = 0) throw (Exception);
+        explicit CmdSchematicNetPointEdit(SI_NetPoint& point, UndoCommand* parent = 0) throw (Exception);
         ~CmdSchematicNetPointEdit() noexcept;
 
         // Setters
@@ -68,7 +68,7 @@ class CmdSchematicNetPointEdit final : public UndoCommand
     private:
 
         // Attributes from the constructor
-        SchematicNetPoint& mNetPoint;
+        SI_NetPoint& mNetPoint;
 
         // General Attributes
         NetSignal* mOldNetSignal;

@@ -22,8 +22,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "cmdschematicnetpointdetach.h"
-#include "../items/si_netpoint.h"
+#include "si_base.h"
 
 namespace project {
 
@@ -31,49 +30,13 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSchematicNetPointDetach::CmdSchematicNetPointDetach(SI_NetPoint& point, UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Detach netpoint"), parent),
-    mNetPoint(point), mSymbolPin(point.getSymbolPin())
-{
-    Q_ASSERT(mSymbolPin);
-}
-
-CmdSchematicNetPointDetach::~CmdSchematicNetPointDetach() noexcept
+SI_Base::SI_Base() noexcept :
+    QObject(nullptr)
 {
 }
 
-/*****************************************************************************************
- *  Inherited from UndoCommand
- ****************************************************************************************/
-
-void CmdSchematicNetPointDetach::redo() throw (Exception)
+SI_Base::~SI_Base() noexcept
 {
-    mNetPoint.detachFromPin(); // throws an exception on error
-
-    try
-    {
-        UndoCommand::redo(); // throws an exception on error
-    }
-    catch (Exception &e)
-    {
-        mNetPoint.attachToPin(*mSymbolPin);
-        throw;
-    }
-}
-
-void CmdSchematicNetPointDetach::undo() throw (Exception)
-{
-    mNetPoint.attachToPin(*mSymbolPin); // throws an exception on error
-
-    try
-    {
-        UndoCommand::undo();
-    }
-    catch (Exception& e)
-    {
-        mNetPoint.detachFromPin();
-        throw;
-    }
 }
 
 /*****************************************************************************************

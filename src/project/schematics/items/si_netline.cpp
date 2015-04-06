@@ -22,101 +22,24 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QPrinter>
-#include <QGraphicsLineItem>
-#include "schematicnetline.h"
-#include "schematic.h"
-#include "schematicnetpoint.h"
-#include "../project.h"
-#include "../../common/schematiclayer.h"
-#include "../circuit/netsignal.h"
-#include "../../library/symbolgraphicsitem.h"
-#include "symbolinstance.h"
-#include "symbolpininstance.h"
-#include "../../workspace/workspace.h"
-#include "../../workspace/settings/workspacesettings.h"
-#include "../../common/file_io/xmldomelement.h"
+#include "si_netline.h"
+#include "../schematic.h"
+#include "si_netpoint.h"
+#include "../../project.h"
+#include "../../circuit/netsignal.h"
+#include "si_symbol.h"
+#include "si_symbolpin.h"
+#include "../../../common/file_io/xmldomelement.h"
 
 namespace project {
-
-/*****************************************************************************************
- *  Class SchematicNetLineGraphicsItem
- ****************************************************************************************/
-
-// Constructors / Destructor
-SchematicNetLineGraphicsItem::SchematicNetLineGraphicsItem(Schematic& schematic,
-                                                           SchematicNetLine& line) noexcept :
-    QGraphicsItem(), mSchematic(schematic), mLine(line), mLayer(nullptr)
-{
-    setFlags(QGraphicsItem::ItemIsSelectable);
-    setZValue(Schematic::ZValue_NetLines);
-    setCacheMode(QGraphicsItem::DeviceCoordinateCache);
-
-    mLayer = mSchematic.getProject().getSchematicLayer(SchematicLayer::Nets);
-    Q_ASSERT(mLayer);
-
-    updateCacheAndRepaint();
-}
-
-SchematicNetLineGraphicsItem::~SchematicNetLineGraphicsItem() noexcept
-{
-}
-
-void SchematicNetLineGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
-{
-    Q_UNUSED(widget);
-
-    const bool selected = option->state & QStyle::State_Selected;
-    const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
-
-    // draw line
-    QPen pen(mLayer->getColor(selected), mLine.getWidth().toPx() * lod, Qt::SolidLine, Qt::RoundCap);
-    pen.setCosmetic(true);
-    painter->setPen(pen);
-    painter->drawLine(mLineF);
-
-#ifdef QT_DEBUG
-    bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
-    if ((!deviceIsPrinter) && (Workspace::instance().getSettings().getDebugTools()->getShowSchematicNetlinesNetsignals()))
-    {
-        // draw net signal name
-        QFont font;
-        font.setStyleStrategy(QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
-        font.setStyleHint(QFont::TypeWriter);
-        font.setFamily("Monospace");
-        font.setPixelSize(3);
-        painter->setFont(font);
-        painter->setPen(QPen(mLayer->getColor(selected), 0));
-        painter->drawText(mLineF.pointAt((qreal)0.5), mLine.getNetSignal()->getName());
-    }
-    if ((!deviceIsPrinter) && (Workspace::instance().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect()))
-    {
-        // draw bounding rect
-        painter->setPen(QPen(Qt::red, 0));
-        painter->setBrush(Qt::NoBrush);
-        painter->drawRect(mBoundingRect);
-    }
-#endif
-}
-
-void SchematicNetLineGraphicsItem::updateCacheAndRepaint() noexcept
-{
-    mLineF.setP1(mLine.getStartPoint().getPosition().toPxQPointF());
-    mLineF.setP2(mLine.getEndPoint().getPosition().toPxQPointF());
-    mBoundingRect = QRectF(mLineF.p1(), mLineF.p2()).normalized();
-    mBoundingRect.adjust(-mLine.getWidth().toPx()/2, -mLine.getWidth().toPx()/2,
-                         mLine.getWidth().toPx()/2, mLine.getWidth().toPx()/2);
-    update();
-}
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SchematicNetLine::SchematicNetLine(Schematic& schematic, const XmlDomElement& domElement)
-                                   throw (Exception) :
-    QObject(nullptr), mSchematic(schematic), mGraphicsItem(nullptr),
-    mStartPoint(nullptr), mEndPoint(nullptr)
+SI_NetLine::SI_NetLine(Schematic& schematic, const XmlDomElement& domElement) throw (Exception) :
+    SI_Base(), mSchematic(schematic), mGraphicsItem(nullptr), mStartPoint(nullptr),
+    mEndPoint(nullptr)
 {
     mUuid = domElement.getAttribute<QUuid>("uuid");
     mWidth = domElement.getAttribute<Length>("width");
@@ -142,16 +65,16 @@ SchematicNetLine::SchematicNetLine(Schematic& schematic, const XmlDomElement& do
     init();
 }
 
-SchematicNetLine::SchematicNetLine(Schematic& schematic, SchematicNetPoint& startPoint,
-                                   SchematicNetPoint& endPoint, const Length& width) throw (Exception) :
-    QObject(nullptr), mSchematic(schematic), mGraphicsItem(nullptr),
+SI_NetLine::SI_NetLine(Schematic& schematic, SI_NetPoint& startPoint,
+                                   SI_NetPoint& endPoint, const Length& width) throw (Exception) :
+    SI_Base(), mSchematic(schematic), mGraphicsItem(nullptr),
     mStartPoint(&startPoint), mEndPoint(&endPoint), mWidth(width)
 {
     mUuid = QUuid::createUuid().toString(); // generate random UUID
     init();
 }
 
-void SchematicNetLine::init() throw (Exception)
+void SI_NetLine::init() throw (Exception)
 {
     if(mWidth < 0)
     {
@@ -166,12 +89,12 @@ void SchematicNetLine::init() throw (Exception)
             tr("SchematicNetLine: endpoints netsignal mismatch"));
     }
 
-    mGraphicsItem = new SchematicNetLineGraphicsItem(mSchematic, *this);
+    mGraphicsItem = new SGI_NetLine(*this);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-SchematicNetLine::~SchematicNetLine() noexcept
+SI_NetLine::~SI_NetLine() noexcept
 {
     delete mGraphicsItem;       mGraphicsItem = 0;
 }
@@ -180,13 +103,13 @@ SchematicNetLine::~SchematicNetLine() noexcept
  *  Getters
  ****************************************************************************************/
 
-NetSignal* SchematicNetLine::getNetSignal() const noexcept
+NetSignal* SI_NetLine::getNetSignal() const noexcept
 {
     Q_ASSERT(mStartPoint->getNetSignal() == mEndPoint->getNetSignal());
     return mStartPoint->getNetSignal();
 }
 
-bool SchematicNetLine::isAttachedToSymbol() const noexcept
+bool SI_NetLine::isAttachedToSymbol() const noexcept
 {
     return (mStartPoint->isAttached() || mEndPoint->isAttached());
 }
@@ -195,7 +118,7 @@ bool SchematicNetLine::isAttachedToSymbol() const noexcept
  *  Setters
  ****************************************************************************************/
 
-void SchematicNetLine::setWidth(const Length& width) noexcept
+void SI_NetLine::setWidth(const Length& width) noexcept
 {
     Q_ASSERT(width >= 0);
     mWidth = width;
@@ -206,26 +129,26 @@ void SchematicNetLine::setWidth(const Length& width) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void SchematicNetLine::updateLine() noexcept
+void SI_NetLine::updateLine() noexcept
 {
     mGraphicsItem->updateCacheAndRepaint();
 }
 
-void SchematicNetLine::addToSchematic() throw (Exception)
+void SI_NetLine::addToSchematic() throw (Exception)
 {
+    mStartPoint->registerNetLine(*this);
+    mEndPoint->registerNetLine(*this);
     mSchematic.addItem(mGraphicsItem);
-    mStartPoint->registerNetLine(this);
-    mEndPoint->registerNetLine(this);
 }
 
-void SchematicNetLine::removeFromSchematic() throw (Exception)
+void SI_NetLine::removeFromSchematic() throw (Exception)
 {
-    mStartPoint->unregisterNetLine(this);
-    mEndPoint->unregisterNetLine(this);
     mSchematic.removeItem(mGraphicsItem);
+    mStartPoint->unregisterNetLine(*this);
+    mEndPoint->unregisterNetLine(*this);
 }
 
-XmlDomElement* SchematicNetLine::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* SI_NetLine::serializeToXmlDomElement() const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -241,7 +164,7 @@ XmlDomElement* SchematicNetLine::serializeToXmlDomElement() const throw (Excepti
  *  Private Methods
  ****************************************************************************************/
 
-bool SchematicNetLine::checkAttributesValidity() const noexcept
+bool SI_NetLine::checkAttributesValidity() const noexcept
 {
     if (mUuid.isNull())         return false;
     if (mStartPoint == nullptr) return false;
@@ -254,8 +177,8 @@ bool SchematicNetLine::checkAttributesValidity() const noexcept
  *  Static Methods
  ****************************************************************************************/
 
-uint SchematicNetLine::extractFromGraphicsItems(const QList<QGraphicsItem*>& items,
-                                                QList<SchematicNetLine*>& netlines,
+uint SI_NetLine::extractFromGraphicsItems(const QList<QGraphicsItem*>& items,
+                                                QList<SI_NetLine*>& netlines,
                                                 bool floatingLines,
                                                 bool attachedLines,
                                                 bool attachedLinesFromSymbols) noexcept
@@ -265,11 +188,11 @@ uint SchematicNetLine::extractFromGraphicsItems(const QList<QGraphicsItem*>& ite
         Q_ASSERT(item); if (!item) continue;
         switch (item->type())
         {
-            case CADScene::Type_SchematicNetLine:
+            case Schematic::Type_NetLine:
             {
-                SchematicNetLineGraphicsItem* i = qgraphicsitem_cast<SchematicNetLineGraphicsItem*>(item);
+                SGI_NetLine* i = qgraphicsitem_cast<SGI_NetLine*>(item);
                 Q_ASSERT(i); if (!i) break;
-                SchematicNetLine* l = &i->getNetLine();
+                SI_NetLine* l = &i->getNetLine();
                 if (((!l->isAttachedToSymbol()) && floatingLines)
                    || (l->isAttachedToSymbol() && attachedLines))
                 {
@@ -278,20 +201,18 @@ uint SchematicNetLine::extractFromGraphicsItems(const QList<QGraphicsItem*>& ite
                 }
                 break;
             }
-            case CADScene::Type_Symbol:
+            case Schematic::Type_Symbol:
             {
                 if (attachedLinesFromSymbols)
                 {
-                    library::SymbolGraphicsItem* i = qgraphicsitem_cast<library::SymbolGraphicsItem*>(item);
+                    SGI_Symbol* i = qgraphicsitem_cast<SGI_Symbol*>(item);
                     Q_ASSERT(i); if (!i) break;
-                    SymbolInstance* s = i->getSymbolInstance();
-                    Q_ASSERT(s); if (!s) break;
-                    foreach (const SymbolPinInstance* pin, s->getPinInstances())
+                    foreach (const SI_SymbolPin* pin, i->getSymbol().getPins())
                     {
-                        SchematicNetPoint* p = pin->getSchematicNetPoint();
+                        SI_NetPoint* p = pin->getNetPoint();
                         if (p)
                         {
-                            foreach (SchematicNetLine* l, p->getLines())
+                            foreach (SI_NetLine* l, p->getLines())
                             {
                                 if (!netlines.contains(l))
                                     netlines.append(l);

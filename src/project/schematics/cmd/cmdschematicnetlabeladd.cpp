@@ -24,7 +24,7 @@
 #include <QtCore>
 #include "cmdschematicnetlabeladd.h"
 #include "../schematic.h"
-#include "../schematicnetlabel.h"
+#include "../items/si_netlabel.h"
 
 namespace project {
 

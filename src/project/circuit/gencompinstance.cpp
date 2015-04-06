@@ -33,6 +33,7 @@
 #include "gencompattributeinstance.h"
 #include "../../common/file_io/xmldomelement.h"
 #include "../settings/projectsettings.h"
+#include "../schematics/items/si_symbol.h"
 
 namespace project {
 
@@ -155,7 +156,7 @@ void GenCompInstance::init() throw (Exception)
 GenCompInstance::~GenCompInstance() noexcept
 {
     Q_ASSERT(!mAddedToCircuit);
-    Q_ASSERT(mSymbolInstances.isEmpty());
+    Q_ASSERT(mSymbols.isEmpty());
 
     qDeleteAll(mSignals);       mSignals.clear();
     qDeleteAll(mAttributes);    mAttributes.clear();
@@ -167,7 +168,7 @@ GenCompInstance::~GenCompInstance() noexcept
 
 uint GenCompInstance::getUnplacedSymbolsCount() const noexcept
 {
-    return (mGenCompSymbVar->getItems().count() - mSymbolInstances.count());
+    return (mGenCompSymbVar->getItems().count() - mSymbols.count());
 }
 
 uint GenCompInstance::getUnplacedRequiredSymbolsCount() const noexcept
@@ -175,7 +176,7 @@ uint GenCompInstance::getUnplacedRequiredSymbolsCount() const noexcept
     uint count = 0;
     foreach (const library::GenCompSymbVarItem* item, mGenCompSymbVar->getItems())
     {
-        if ((item->isRequired()) && (!mSymbolInstances.contains(item->getUuid())))
+        if ((item->isRequired()) && (!mSymbols.contains(item->getUuid())))
             count++;
     }
     return count;
@@ -186,7 +187,7 @@ uint GenCompInstance::getUnplacedOptionalSymbolsCount() const noexcept
     uint count = 0;
     foreach (const library::GenCompSymbVarItem* item, mGenCompSymbVar->getItems())
     {
-        if ((!item->isRequired()) && (!mSymbolInstances.contains(item->getUuid())))
+        if ((!item->isRequired()) && (!mSymbols.contains(item->getUuid())))
             count++;
     }
     return count;
@@ -274,53 +275,39 @@ void GenCompInstance::removeFromCircuit() throw (Exception)
     updateErcMessages();
 }
 
-void GenCompInstance::registerSymbolInstance(const QUuid& itemUuid, const QUuid& symbolUuid,
-                                             const SymbolInstance* instance) throw (Exception)
+void GenCompInstance::registerSymbol(const SI_Symbol& symbol) throw (Exception)
 {
+    const library::GenCompSymbVarItem* item = &symbol.getGenCompSymbVarItem();
+
     if (!mAddedToCircuit)
-        throw LogicError(__FILE__, __LINE__, itemUuid.toString());
-
-    const library::GenCompSymbVarItem* item = mGenCompSymbVar->getItemByUuid(itemUuid);
-    if (!item)
+        throw LogicError(__FILE__, __LINE__, item->getUuid().toString());
+    if (!mGenCompSymbVar->getItems().contains(item))
     {
-        throw RuntimeError(__FILE__, __LINE__, itemUuid.toString(), QString(tr(
-            "Invalid symbol item UUID in circuit: \"%1\".")).arg(itemUuid.toString()));
+        throw RuntimeError(__FILE__, __LINE__, item->getUuid().toString(), QString(tr(
+            "Invalid symbol item in circuit: \"%1\".")).arg(item->getUuid().toString()));
     }
-
-    if (symbolUuid != item->getSymbolUuid())
-    {
-        throw RuntimeError(__FILE__, __LINE__, symbolUuid.toString(), QString(tr(
-            "Invalid symbol UUID in circuit: \"%1\".")).arg(symbolUuid.toString()));
-    }
-
-    if (mSymbolInstances.contains(item->getUuid()))
+    if (mSymbols.contains(item->getUuid()))
     {
         throw RuntimeError(__FILE__, __LINE__, item->getUuid().toString(), QString(tr(
             "Symbol item UUID already exists in circuit: \"%1\".")).arg(item->getUuid().toString()));
     }
 
-    mSymbolInstances.insert(itemUuid, instance);
+    mSymbols.insert(item->getUuid(), &symbol);
     updateErcMessages();
 }
 
-void GenCompInstance::unregisterSymbolInstance(const QUuid& itemUuid,
-                                               const SymbolInstance* symbol) throw (Exception)
+void GenCompInstance::unregisterSymbol(const SI_Symbol& symbol) throw (Exception)
 {
+    const library::GenCompSymbVarItem* item = &symbol.getGenCompSymbVarItem();
+
     if (!mAddedToCircuit)
-        throw LogicError(__FILE__, __LINE__, itemUuid.toString());
-    if (!mSymbolInstances.contains(itemUuid))
-        throw LogicError(__FILE__, __LINE__, itemUuid.toString());
-    if (symbol != mSymbolInstances.value(itemUuid))
-        throw LogicError(__FILE__, __LINE__, itemUuid.toString());
+        throw LogicError(__FILE__, __LINE__, item->getUuid().toString());
+    if (!mSymbols.contains(item->getUuid()))
+        throw LogicError(__FILE__, __LINE__, item->getUuid().toString());
+    if (&symbol != mSymbols.value(item->getUuid()))
+        throw LogicError(__FILE__, __LINE__, item->getUuid().toString());
 
-    const library::GenCompSymbVarItem* item = mGenCompSymbVar->getItemByUuid(itemUuid);
-    if (!item)
-    {
-        throw RuntimeError(__FILE__, __LINE__, itemUuid.toString(), QString(tr(
-            "Invalid symbol item UUID in circuit: \"%1\".")).arg(itemUuid.toString()));
-    }
-
-    mSymbolInstances.remove(itemUuid);
+    mSymbols.remove(item->getUuid());
     updateErcMessages();
 }
 

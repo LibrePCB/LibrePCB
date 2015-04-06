@@ -24,7 +24,7 @@
 #include <QtCore>
 #include "cmdschematicnetlabelremove.h"
 #include "../schematic.h"
-#include "../schematicnetlabel.h"
+#include "../items/si_netlabel.h"
 
 namespace project {
 
@@ -33,7 +33,7 @@ namespace project {
  ****************************************************************************************/
 
 CmdSchematicNetLabelRemove::CmdSchematicNetLabelRemove(Schematic& schematic,
-                                                       SchematicNetLabel& netlabel,
+                                                       SI_NetLabel& netlabel,
                                                        UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Remove netlabel"), parent),
     mSchematic(schematic), mNetLabel(netlabel)

@@ -34,7 +34,7 @@
  ****************************************************************************************/
 
 namespace project {
-class SymbolInstance;
+class SI_Symbol;
 }
 
 /*****************************************************************************************
@@ -51,7 +51,7 @@ class CmdSymbolInstanceEdit final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit CmdSymbolInstanceEdit(SymbolInstance& symbol, UndoCommand* parent = 0) throw (Exception);
+        explicit CmdSymbolInstanceEdit(SI_Symbol& symbol, UndoCommand* parent = 0) throw (Exception);
         ~CmdSymbolInstanceEdit() noexcept;
 
         // General Methods
@@ -68,7 +68,7 @@ class CmdSymbolInstanceEdit final : public UndoCommand
     private:
 
         // Attributes from the constructor
-        SymbolInstance& mSymbolInstance;
+        SI_Symbol& mSymbol;
 
         // General Attributes
         Point mOldPos;

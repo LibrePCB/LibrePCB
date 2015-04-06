@@ -42,7 +42,6 @@ namespace library {
 class GenericComponent;
 class GenCompSymbVar;
 class Symbol;
-class SymbolGraphicsItem;
 }
 
 namespace Ui {
@@ -100,7 +99,6 @@ class AddGenCompDialog final : public QDialog
         // Attributes
         const library::GenericComponent* mSelectedGenComp;
         const library::GenCompSymbVar* mSelectedSymbVar;
-        QList<library::SymbolGraphicsItem*> mSymbolGraphicsItems;
 };
 
 } // namespace project

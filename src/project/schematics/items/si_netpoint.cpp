@@ -22,129 +22,48 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QPrinter>
-#include "schematicnetpoint.h"
-#include "schematic.h"
-#include "schematicnetline.h"
-#include "../project.h"
-#include "../circuit/circuit.h"
-#include "../circuit/netsignal.h"
-#include "../../common/schematiclayer.h"
-#include "symbolinstance.h"
-#include "symbolpininstance.h"
-#include "../circuit/gencompsignalinstance.h"
-#include "../../library/symbolgraphicsitem.h"
-#include "../../workspace/workspace.h"
-#include "../../workspace/settings/workspacesettings.h"
-#include "../erc/ercmsg.h"
-#include "../../common/file_io/xmldomelement.h"
+#include "si_netpoint.h"
+#include "si_netline.h"
+#include "si_symbol.h"
+#include "si_symbolpin.h"
+#include "../schematic.h"
+#include "../../project.h"
+#include "../../circuit/circuit.h"
+#include "../../circuit/netsignal.h"
+#include "../../circuit/gencompsignalinstance.h"
+#include "../../erc/ercmsg.h"
+#include "../../../common/file_io/xmldomelement.h"
 
 namespace project {
-
-/*****************************************************************************************
- *  Class SchematicNetPointGraphicsItem
- ****************************************************************************************/
-
-QRectF SchematicNetPointGraphicsItem::sBoundingRect;
-
-// Constructors / Destructor
-SchematicNetPointGraphicsItem::SchematicNetPointGraphicsItem(Schematic& schematic,
-                                                             SchematicNetPoint& point) noexcept :
-    QGraphicsItem(), mSchematic(schematic), mPoint(point), mLayer(nullptr)
-{
-    setFlags(QGraphicsItem::ItemIsSelectable);
-    setZValue(Schematic::ZValue_NetPoints);
-    setCacheMode(QGraphicsItem::DeviceCoordinateCache);
-
-    mLayer = mSchematic.getProject().getSchematicLayer(SchematicLayer::Nets);
-    Q_ASSERT(mLayer);
-
-    if (sBoundingRect.isNull())
-    {
-        qreal radius = SchematicNetPoint::getCircleRadius().toPx();
-        sBoundingRect = QRectF(-radius, -radius, 2*radius, 2*radius);
-    }
-
-    updateCacheAndRepaint();
-}
-
-SchematicNetPointGraphicsItem::~SchematicNetPointGraphicsItem() noexcept
-{
-}
-
-void SchematicNetPointGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
-{
-    Q_UNUSED(widget);
-
-    const bool highlight = option->state & QStyle::State_Selected;
-
-    if (mPointVisible)
-    {
-        painter->setPen(Qt::NoPen);
-        painter->setBrush(QBrush(mLayer->getColor(highlight), Qt::SolidPattern));
-        painter->drawEllipse(sBoundingRect);
-    }
-
-#ifdef QT_DEBUG
-    bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
-    if ((!mPointVisible) && (!deviceIsPrinter) && Workspace::instance().getSettings().getDebugTools()->getShowAllSchematicNetpoints())
-    {
-        // draw circle
-        painter->setPen(QPen(Qt::red, 0));
-        painter->setBrush(Qt::NoBrush);
-        painter->drawEllipse(sBoundingRect);
-    }
-    if ((!deviceIsPrinter) && (Workspace::instance().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect()))
-    {
-        // draw bounding rect
-        painter->setPen(QPen(Qt::red, 0));
-        painter->setBrush(Qt::NoBrush);
-        painter->drawRect(sBoundingRect);
-    }
-#endif
-}
-
-void SchematicNetPointGraphicsItem::updateCacheAndRepaint() noexcept
-{
-    mPointVisible = (((mPoint.getLines().count() > 1) && (mPoint.isAttached())) || (mPoint.getLines().count() > 2));
-    update();
-}
-
-/*****************************************************************************************
- *  Static Members
- ****************************************************************************************/
-
-const Length SchematicNetPoint::sCircleRadius = Length(600000);
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SchematicNetPoint::SchematicNetPoint(Schematic& schematic, const XmlDomElement& domElement) throw (Exception) :
-    QObject(nullptr), mCircuit(schematic.getProject().getCircuit()), mSchematic(schematic),
-    mGraphicsItem(nullptr), mNetSignal(nullptr), mSymbolInstance(nullptr),
-    mPinInstance(nullptr)
+SI_NetPoint::SI_NetPoint(Schematic& schematic, const XmlDomElement& domElement) throw (Exception) :
+    SI_Base(), mCircuit(schematic.getProject().getCircuit()), mSchematic(schematic),
+    mGraphicsItem(nullptr), mNetSignal(nullptr), mSymbolPin(nullptr)
 {
     // read attributes
     mUuid = domElement.getAttribute<QUuid>("uuid");
     mAttached = domElement.getFirstChild("attached", true)->getText<bool>();
     if (mAttached)
     {
-        QUuid symbolInstanceUuid = domElement.getFirstChild("symbol", true)->getText<QUuid>();
-        mSymbolInstance = mSchematic.getSymbolByUuid(symbolInstanceUuid);
-        if (!mSymbolInstance)
+        QUuid symbolUuid = domElement.getFirstChild("symbol", true)->getText<QUuid>();
+        SI_Symbol* symbol = mSchematic.getSymbolByUuid(symbolUuid);
+        if (!symbol)
         {
-            throw RuntimeError(__FILE__, __LINE__, symbolInstanceUuid.toString(),
-                QString(tr("Invalid symbol instance UUID: \"%1\"")).arg(symbolInstanceUuid.toString()));
+            throw RuntimeError(__FILE__, __LINE__, symbolUuid.toString(),
+                QString(tr("Invalid symbol UUID: \"%1\"")).arg(symbolUuid.toString()));
         }
         QUuid pinUuid = domElement.getFirstChild("pin", true)->getText<QUuid>();
-        mPinInstance = mSymbolInstance->getPinInstance(pinUuid);
-        if (!mPinInstance)
+        mSymbolPin = symbol->getPin(pinUuid);
+        if (!mSymbolPin)
         {
             throw RuntimeError(__FILE__, __LINE__, pinUuid.toString(),
-                QString(tr("Invalid symbol pin instance UUID: \"%1\"")).arg(pinUuid.toString()));
+                QString(tr("Invalid symbol pin UUID: \"%1\"")).arg(pinUuid.toString()));
         }
-        const GenCompSignalInstance* compSignal = mPinInstance->getGenCompSignalInstance();
+        const GenCompSignalInstance* compSignal = mSymbolPin->getGenCompSignalInstance();
         if (!compSignal)
         {
             throw RuntimeError(__FILE__, __LINE__, pinUuid.toString(),
@@ -156,7 +75,7 @@ SchematicNetPoint::SchematicNetPoint(Schematic& schematic, const XmlDomElement& 
             throw RuntimeError(__FILE__, __LINE__, pinUuid.toString(), QString(tr("The pin of the "
                 "netpoint \"%1\" has no netsignal.")).arg(mUuid.toString()));
         }
-        mPosition = mPinInstance->getPosition();
+        mPosition = mSymbolPin->getPosition();
     }
     else
     {
@@ -175,10 +94,9 @@ SchematicNetPoint::SchematicNetPoint(Schematic& schematic, const XmlDomElement& 
     init();
 }
 
-SchematicNetPoint::SchematicNetPoint(Schematic& schematic, NetSignal& netsignal, const Point& position) throw (Exception) :
-    QObject(nullptr), mCircuit(schematic.getProject().getCircuit()), mSchematic(schematic),
-    mGraphicsItem(nullptr), mNetSignal(nullptr), mSymbolInstance(nullptr),
-    mPinInstance(nullptr)
+SI_NetPoint::SI_NetPoint(Schematic& schematic, NetSignal& netsignal, const Point& position) throw (Exception) :
+    SI_Base(), mCircuit(schematic.getProject().getCircuit()), mSchematic(schematic),
+    mGraphicsItem(nullptr), mNetSignal(nullptr), mSymbolPin(nullptr)
 {
     mUuid = QUuid::createUuid(); // generate random UUID
     mAttached = false;
@@ -187,41 +105,33 @@ SchematicNetPoint::SchematicNetPoint(Schematic& schematic, NetSignal& netsignal,
     init();
 }
 
-SchematicNetPoint::SchematicNetPoint(Schematic& schematic, SymbolInstance& symbol,
-                                     const QUuid& pin) throw (Exception) :
-    QObject(nullptr), mCircuit(schematic.getProject().getCircuit()), mSchematic(schematic),
-    mGraphicsItem(nullptr), mNetSignal(nullptr), mSymbolInstance(nullptr),
-    mPinInstance(nullptr)
+SI_NetPoint::SI_NetPoint(Schematic& schematic, SI_SymbolPin& pin) throw (Exception) :
+    SI_Base(), mCircuit(schematic.getProject().getCircuit()), mSchematic(schematic),
+    mGraphicsItem(nullptr), mNetSignal(nullptr), mSymbolPin(&pin)
 {
     mUuid = QUuid::createUuid(); // generate random UUID
     mAttached = true;
-    mSymbolInstance = &symbol;
-    mPinInstance = mSymbolInstance->getPinInstance(pin);
-    if (!mPinInstance)
-    {
-        throw RuntimeError(__FILE__, __LINE__, pin.toString(),
-            QString(tr("Invalid symbol pin instance UUID: \"%1\"")).arg(pin.toString()));
-    }
-    const GenCompSignalInstance* compSignal = mPinInstance->getGenCompSignalInstance();
+    const GenCompSignalInstance* compSignal = mSymbolPin->getGenCompSignalInstance();
     if (!compSignal)
     {
-        throw RuntimeError(__FILE__, __LINE__, pin.toString(),
-            QString(tr("The symbol pin instance \"%1\" has no signal.")).arg(pin.toString()));
+        throw RuntimeError(__FILE__, __LINE__, mSymbolPin->getLibPinUuid().toString(),
+            QString(tr("The symbol pin instance \"%1\" has no signal."))
+            .arg(mSymbolPin->getLibPinUuid().toString()));
     }
     mNetSignal = compSignal->getNetSignal();
     if (!mNetSignal)
     {
-        throw RuntimeError(__FILE__, __LINE__, pin.toString(), QString(tr("The pin of the "
-            "netpoint \"%1\" has no netsignal.")).arg(mUuid.toString()));
+        throw RuntimeError(__FILE__, __LINE__, mSymbolPin->getLibPinUuid().toString(),
+            QString(tr("The pin of the netpoint \"%1\" has no netsignal.")).arg(mUuid.toString()));
     }
-    mPosition = mPinInstance->getPosition();
+    mPosition = mSymbolPin->getPosition();
     init();
 }
 
-void SchematicNetPoint::init() throw (Exception)
+void SI_NetPoint::init() throw (Exception)
 {
     // create the graphics item
-    mGraphicsItem = new SchematicNetPointGraphicsItem(mSchematic, *this);
+    mGraphicsItem = new SGI_NetPoint(*this);
     mGraphicsItem->setPos(mPosition.toPxQPointF());
 
     // create ERC messages
@@ -233,7 +143,7 @@ void SchematicNetPoint::init() throw (Exception)
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-SchematicNetPoint::~SchematicNetPoint() noexcept
+SI_NetPoint::~SI_NetPoint() noexcept
 {
     delete mGraphicsItem;           mGraphicsItem = nullptr;
 }
@@ -242,14 +152,14 @@ SchematicNetPoint::~SchematicNetPoint() noexcept
  *  Setters
  ****************************************************************************************/
 
-void SchematicNetPoint::setNetSignal(NetSignal& netsignal) throw (Exception)
+void SI_NetPoint::setNetSignal(NetSignal& netsignal) throw (Exception)
 {
     mNetSignal->unregisterSchematicNetPoint(*this);
     mNetSignal = &netsignal;
     mNetSignal->registerSchematicNetPoint(*this);
 }
 
-void SchematicNetPoint::setPosition(const Point& position) noexcept
+void SI_NetPoint::setPosition(const Point& position) noexcept
 {
     mPosition = position;
     mGraphicsItem->setPos(mPosition.toPxQPointF());
@@ -260,95 +170,90 @@ void SchematicNetPoint::setPosition(const Point& position) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void SchematicNetPoint::detachFromPin() throw (Exception)
+void SI_NetPoint::detachFromPin() throw (Exception)
 {
     if (!mAttached) throw LogicError(__FILE__, __LINE__);
-    mPinInstance->unregisterNetPoint(this);
-    mSymbolInstance = nullptr;
-    mPinInstance = nullptr;
+    mSymbolPin->unregisterNetPoint(*this);
+    mSymbolPin = nullptr;
     mAttached = false;
     mGraphicsItem->updateCacheAndRepaint();
 }
 
-void SchematicNetPoint::attachToPin(SymbolInstance* symbol, SymbolPinInstance* pin) throw (Exception)
+void SI_NetPoint::attachToPin(SI_SymbolPin& pin) throw (Exception)
 {
-    Q_ASSERT(symbol); Q_ASSERT(pin);
     if (mAttached) throw LogicError(__FILE__, __LINE__);
-    const GenCompSignalInstance* compSignal = pin->getGenCompSignalInstance();
+    const GenCompSignalInstance* compSignal = pin.getGenCompSignalInstance();
     if (!compSignal) throw LogicError(__FILE__, __LINE__);
     const NetSignal* netsignal = compSignal->getNetSignal();
     if (netsignal != mNetSignal) throw LogicError(__FILE__, __LINE__);
-    mSymbolInstance = symbol;
-    mPinInstance = pin;
-    mPinInstance->registerNetPoint(this);
-    mPosition = mPinInstance->getPosition();
+    mSymbolPin = &pin;
+    mSymbolPin->registerNetPoint(*this);
+    mPosition = mSymbolPin->getPosition();
     mAttached = true;
     mGraphicsItem->updateCacheAndRepaint();
 }
 
-void SchematicNetPoint::updateLines() const noexcept
+void SI_NetPoint::updateLines() const noexcept
 {
-    foreach (SchematicNetLine* line, mLines)
+    foreach (SI_NetLine* line, mLines)
         line->updateLine();
 }
 
-void SchematicNetPoint::registerNetLine(SchematicNetLine* netline) noexcept
+void SI_NetPoint::registerNetLine(SI_NetLine& netline) noexcept
 {
-    Q_CHECK_PTR(netline);
-    Q_ASSERT(!mLines.contains(netline));
-    mLines.append(netline);
-    netline->updateLine();
+    Q_ASSERT(!mLines.contains(&netline));
+    mLines.append(&netline);
+    netline.updateLine();
     mGraphicsItem->updateCacheAndRepaint();
     mErcMsgDeadNetPoint->setVisible(mLines.isEmpty());
 }
 
-void SchematicNetPoint::unregisterNetLine(SchematicNetLine* netline) noexcept
+void SI_NetPoint::unregisterNetLine(SI_NetLine& netline) noexcept
 {
-    Q_CHECK_PTR(netline);
-    Q_ASSERT(mLines.contains(netline));
-    mLines.removeOne(netline);
-    netline->updateLine();
+    Q_ASSERT(mLines.contains(&netline));
+    mLines.removeAll(&netline);
+    netline.updateLine();
     mGraphicsItem->updateCacheAndRepaint();
     mErcMsgDeadNetPoint->setVisible(mLines.isEmpty());
 }
 
-void SchematicNetPoint::addToSchematic() throw (Exception)
+void SI_NetPoint::addToSchematic() throw (Exception)
 {
     Q_ASSERT(mLines.isEmpty());
 
     if (mAttached)
     {
         // check if mNetSignal is correct (would be a bug if not)
-        if (mNetSignal != mPinInstance->getGenCompSignalInstance()->getNetSignal())
+        if (mNetSignal != mSymbolPin->getGenCompSignalInstance()->getNetSignal())
             throw LogicError(__FILE__, __LINE__);
     }
 
     mNetSignal->registerSchematicNetPoint(*this);
     if (mAttached)
-        mPinInstance->registerNetPoint(this);
+        mSymbolPin->registerNetPoint(*this);
     mSchematic.addItem(mGraphicsItem);
     mErcMsgDeadNetPoint->setVisible(true);
 }
 
-void SchematicNetPoint::removeFromSchematic() throw (Exception)
+void SI_NetPoint::removeFromSchematic() throw (Exception)
 {
     Q_ASSERT(mLines.isEmpty());
 
     if (mAttached)
     {
         // check if mNetSignal is correct (would be a bug if not)
-        if (mNetSignal != mPinInstance->getGenCompSignalInstance()->getNetSignal())
+        if (mNetSignal != mSymbolPin->getGenCompSignalInstance()->getNetSignal())
             throw LogicError(__FILE__, __LINE__);
     }
 
     mNetSignal->unregisterSchematicNetPoint(*this);
     if (mAttached)
-        mPinInstance->unregisterNetPoint(this);
+        mSymbolPin->unregisterNetPoint(*this);
     mSchematic.removeItem(mGraphicsItem);
     mErcMsgDeadNetPoint->setVisible(false);
 }
 
-XmlDomElement* SchematicNetPoint::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* SI_NetPoint::serializeToXmlDomElement() const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -357,8 +262,8 @@ XmlDomElement* SchematicNetPoint::serializeToXmlDomElement() const throw (Except
     root->appendTextChild("attached", mAttached);
     if (mAttached)
     {
-        root->appendTextChild("symbol", mSymbolInstance->getUuid());
-        root->appendTextChild("pin", mPinInstance->getLibPinUuid());
+        root->appendTextChild("symbol", mSymbolPin->getSymbol().getUuid());
+        root->appendTextChild("pin", mSymbolPin->getLibPinUuid());
     }
     else
     {
@@ -374,12 +279,11 @@ XmlDomElement* SchematicNetPoint::serializeToXmlDomElement() const throw (Except
  *  Private Methods
  ****************************************************************************************/
 
-bool SchematicNetPoint::checkAttributesValidity() const noexcept
+bool SI_NetPoint::checkAttributesValidity() const noexcept
 {
     if (mUuid.isNull())                             return false;
     if (mNetSignal == nullptr)                      return false;
-    if (mAttached && (mSymbolInstance == nullptr))  return false;
-    if (mAttached && (mPinInstance == nullptr))     return false;
+    if (mAttached && (mSymbolPin == nullptr))       return false;
     return true;
 }
 
@@ -387,8 +291,8 @@ bool SchematicNetPoint::checkAttributesValidity() const noexcept
  *  Static Methods
  ****************************************************************************************/
 
-uint SchematicNetPoint::extractFromGraphicsItems(const QList<QGraphicsItem*>& items,
-                                                 QList<SchematicNetPoint*>& netpoints,
+uint SI_NetPoint::extractFromGraphicsItems(const QList<QGraphicsItem*>& items,
+                                                 QList<SI_NetPoint*>& netpoints,
                                                  bool floatingPoints,
                                                  bool attachedPoints,
                                                  bool floatingPointsFromFloatingLines,
@@ -402,13 +306,13 @@ uint SchematicNetPoint::extractFromGraphicsItems(const QList<QGraphicsItem*>& it
         Q_ASSERT(item); if (!item) continue;
         switch (item->type())
         {
-            case CADScene::Type_SchematicNetPoint:
+            case Schematic::Type_NetPoint:
             {
                 if (floatingPoints || attachedPoints)
                 {
-                    SchematicNetPointGraphicsItem* i = qgraphicsitem_cast<SchematicNetPointGraphicsItem*>(item);
+                    SGI_NetPoint* i = qgraphicsitem_cast<SGI_NetPoint*>(item);
                     Q_ASSERT(i); if (!i) break;
-                    SchematicNetPoint* p = &i->getNetPoint();
+                    SI_NetPoint* p = &i->getNetPoint();
                     if (((!p->isAttached()) && floatingPoints)
                        || (p->isAttached() && attachedPoints))
                     {
@@ -418,16 +322,16 @@ uint SchematicNetPoint::extractFromGraphicsItems(const QList<QGraphicsItem*>& it
                 }
                 break;
             }
-            case CADScene::Type_SchematicNetLine:
+            case Schematic::Type_NetLine:
             {
                 if (floatingPointsFromFloatingLines || attachedPointsFromFloatingLines
                  || floatingPointsFromAttachedLines || attachedPointsFromAttachedLines)
                 {
-                    SchematicNetLineGraphicsItem* i = qgraphicsitem_cast<SchematicNetLineGraphicsItem*>(item);
+                    SGI_NetLine* i = qgraphicsitem_cast<SGI_NetLine*>(item);
                     Q_ASSERT(i); if (!i) break;
-                    SchematicNetLine* l = &i->getNetLine();
-                    SchematicNetPoint* p1 = &i->getNetLine().getStartPoint();
-                    SchematicNetPoint* p2 = &i->getNetLine().getEndPoint();
+                    SI_NetLine* l = &i->getNetLine();
+                    SI_NetPoint* p1 = &i->getNetLine().getStartPoint();
+                    SI_NetPoint* p2 = &i->getNetLine().getEndPoint();
                     if ( ((!l->isAttachedToSymbol()) && (!p1->isAttached()) && floatingPointsFromFloatingLines)
                       || ((!l->isAttachedToSymbol()) && ( p1->isAttached()) && attachedPointsFromFloatingLines)
                       || (( l->isAttachedToSymbol()) && (!p1->isAttached()) && floatingPointsFromAttachedLines)
@@ -447,17 +351,15 @@ uint SchematicNetPoint::extractFromGraphicsItems(const QList<QGraphicsItem*>& it
                 }
                 break;
             }
-            case CADScene::Type_Symbol:
+            case Schematic::Type_Symbol:
             {
                 if (attachedPointsFromSymbols)
                 {
-                    library::SymbolGraphicsItem* i = qgraphicsitem_cast<library::SymbolGraphicsItem*>(item);
+                    SGI_Symbol* i = qgraphicsitem_cast<SGI_Symbol*>(item);
                     Q_ASSERT(i); if (!i) break;
-                    SymbolInstance* s = i->getSymbolInstance();
-                    Q_ASSERT(s); if (!s) break;
-                    foreach (const SymbolPinInstance* pin, s->getPinInstances())
+                    foreach (const SI_SymbolPin* pin, i->getSymbol().getPins())
                     {
-                        SchematicNetPoint* p = pin->getSchematicNetPoint();
+                        SI_NetPoint* p = pin->getNetPoint();
                         if ((p) && (!netpoints.contains(p)))
                             netpoints.append(p);
                     }

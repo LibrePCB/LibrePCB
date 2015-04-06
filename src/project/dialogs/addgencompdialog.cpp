@@ -32,7 +32,6 @@
 #include "../../library/genericcomponent.h"
 #include "../../library/gencompsymbvar.h"
 #include "../../library/symbol.h"
-#include "../../library/symbolgraphicsitem.h"
 #include "../settings/projectsettings.h"
 
 namespace project {
@@ -66,7 +65,6 @@ AddGenCompDialog::AddGenCompDialog(Project& project, QWidget* parent) :
 
 AddGenCompDialog::~AddGenCompDialog()
 {
-    qDeleteAll(mSymbolGraphicsItems);   mSymbolGraphicsItems.clear();
     mSelectedSymbVar = nullptr;
     delete mSelectedGenComp;            mSelectedGenComp = nullptr;
     delete mPreviewScene;               mPreviewScene = nullptr;
@@ -173,8 +171,6 @@ void AddGenCompDialog::setSelectedGenComp(const library::GenericComponent* genCo
 void AddGenCompDialog::setSelectedSymbVar(const library::GenCompSymbVar* symbVar)
 {
     mSelectedSymbVar = symbVar;
-    qDeleteAll(mSymbolGraphicsItems);
-    mSymbolGraphicsItems.clear();
 
     if (symbVar)
     {
@@ -188,17 +184,6 @@ void AddGenCompDialog::setSelectedSymbVar(const library::GenCompSymbVar* symbVar
         {
             const library::Symbol* symbol = mProject.getLibrary().getSymbol(item->getSymbolUuid());
             if (!symbol) continue;
-            library::SymbolGraphicsItem* graphicsItem = new library::SymbolGraphicsItem(*symbol);
-            mSymbolGraphicsItems.append(graphicsItem);
-
-            // add item to graphics scene
-            Point pos(0, 0);
-            if (mSymbolGraphicsItems.count() > 1)
-                pos.setY(Length::fromPx(- mPreviewScene->itemsBoundingRect().bottom()
-                                        - graphicsItem->boundingRect().height()));
-            graphicsItem->setPos(pos.toPxQPointF());
-            mPreviewScene->addItem(graphicsItem);
-            mUi->graphicsView->zoomAll();
         }
     }
     else

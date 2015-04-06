@@ -22,18 +22,16 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "symbolinstance.h"
-#include "schematic.h"
-#include "../project.h"
-#include "../circuit/circuit.h"
-#include "../../common/schematiclayer.h"
-#include "../../library/symbolgraphicsitem.h"
-#include "../library/projectlibrary.h"
-#include "../circuit/gencompinstance.h"
-#include "../../library/genericcomponent.h"
-#include "../../library/symbol.h"
-#include "symbolpininstance.h"
-#include "../../common/file_io/xmldomelement.h"
+#include "si_symbol.h"
+#include "si_symbolpin.h"
+#include "../schematic.h"
+#include "../../project.h"
+#include "../../circuit/circuit.h"
+#include "../../library/projectlibrary.h"
+#include "../../circuit/gencompinstance.h"
+#include "../../../library/genericcomponent.h"
+#include "../../../library/symbol.h"
+#include "../../../common/file_io/xmldomelement.h"
 
 namespace project {
 
@@ -41,9 +39,9 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SymbolInstance::SymbolInstance(Schematic& schematic, const XmlDomElement& domElement) throw (Exception) :
-    QObject(nullptr), IF_AttributeProvider(), mSchematic(schematic), mSymbVarItem(nullptr),
-    mSymbol(nullptr), mGraphicsItem(nullptr), mGenCompInstance(nullptr)
+SI_Symbol::SI_Symbol(Schematic& schematic, const XmlDomElement& domElement) throw (Exception) :
+    SI_Base(), mSchematic(schematic), mGenCompInstance(nullptr),
+    mSymbVarItem(nullptr), mSymbol(nullptr), mGraphicsItem(nullptr)
 {
     mUuid = domElement.getAttribute<QUuid>("uuid");
 
@@ -55,7 +53,6 @@ SymbolInstance::SymbolInstance(Schematic& schematic, const XmlDomElement& domEle
             QString(tr("No generic component with the UUID \"%1\" found in the circuit!"))
             .arg(gcUuid.toString()));
     }
-    connect(mGenCompInstance, SIGNAL(attributesChanged()), this, SLOT(genCompAttributesChanged()));
 
     mPosition.setX(domElement.getFirstChild("position", true)->getAttribute<Length>("x"));
     mPosition.setY(domElement.getFirstChild("position", true)->getAttribute<Length>("y"));
@@ -65,21 +62,17 @@ SymbolInstance::SymbolInstance(Schematic& schematic, const XmlDomElement& domEle
     init(symbVarItemUuid);
 }
 
-SymbolInstance::SymbolInstance(Schematic& schematic, GenCompInstance& genCompInstance,
-                               const QUuid& symbolItem, const Point& position,
-                               const Angle& angle) throw (Exception) :
-    QObject(nullptr), IF_AttributeProvider(), mSchematic(schematic), mSymbVarItem(nullptr),
-    mSymbol(nullptr), mGraphicsItem(nullptr), mGenCompInstance(&genCompInstance),
-    mPosition(position), mAngle(angle)
+SI_Symbol::SI_Symbol(Schematic& schematic, GenCompInstance& genCompInstance,
+                     const QUuid& symbolItem, const Point& position, const Angle& angle) throw (Exception) :
+    SI_Base(), mSchematic(schematic), mGenCompInstance(&genCompInstance),
+    mSymbVarItem(nullptr), mSymbol(nullptr), mGraphicsItem(nullptr), mPosition(position),
+    mAngle(angle)
 {
     mUuid = QUuid::createUuid().toString(); // generate random UUID
-
-    connect(mGenCompInstance, SIGNAL(attributesChanged()), this, SLOT(genCompAttributesChanged()));
-
     init(symbolItem);
 }
 
-void SymbolInstance::init(const QUuid& symbVarItemUuid) throw (Exception)
+void SI_Symbol::init(const QUuid& symbVarItemUuid) throw (Exception)
 {
     mSymbVarItem = mGenCompInstance->getSymbolVariant().getItemByUuid(symbVarItemUuid);
     if (!mSymbVarItem)
@@ -97,49 +90,51 @@ void SymbolInstance::init(const QUuid& symbVarItemUuid) throw (Exception)
             .arg(mSymbVarItem->getSymbolUuid().toString()));
     }
 
-    foreach (const library::SymbolPin* pin, mSymbol->getPins())
+    mGraphicsItem = new SGI_Symbol(*this);
+    mGraphicsItem->setPos(mPosition.toPxQPointF());
+    mGraphicsItem->setRotation(mAngle.toDeg());
+
+    foreach (const library::SymbolPin* libPin, mSymbol->getPins())
     {
-        SymbolPinInstance* pinInstance = new SymbolPinInstance(*this, pin->getUuid());
-        if (mPinInstances.contains(pin->getUuid()))
+        SI_SymbolPin* pin = new SI_SymbolPin(*this, libPin->getUuid(), *mGraphicsItem);
+        if (mPins.contains(libPin->getUuid()))
         {
-            throw RuntimeError(__FILE__, __LINE__, pin->getUuid().toString(),
-                QString(tr("The symbol pin UUID \"%1\" is defined multiple times."))
-                .arg(pin->getUuid().toString()));
+            throw RuntimeError(__FILE__, __LINE__, libPin->getUuid().toString(),
+                QString(tr("The symbol pin UUID \"%1\" is defined mulibPinple times."))
+                .arg(libPin->getUuid().toString()));
         }
-        if (!mSymbVarItem->getPinSignalMap().contains(pin->getUuid()))
+        if (!mSymbVarItem->getPinSignalMap().contains(libPin->getUuid()))
         {
-            throw RuntimeError(__FILE__, __LINE__, pin->getUuid().toString(),
-                QString(tr("Symbol pin UUID \"%1\" not found in pin-signal-map."))
-                .arg(pin->getUuid().toString()));
+            throw RuntimeError(__FILE__, __LINE__, libPin->getUuid().toString(),
+                QString(tr("Symbol pin UUID \"%1\" not found in pin-slibPinal-map."))
+                .arg(libPin->getUuid().toString()));
         }
-        mPinInstances.insert(pin->getUuid(), pinInstance);
+        mPins.insert(libPin->getUuid(), pin);
     }
-    if (mPinInstances.count() != mSymbVarItem->getPinSignalMap().count())
+    if (mPins.count() != mSymbVarItem->getPinSignalMap().count())
     {
         throw RuntimeError(__FILE__, __LINE__,
-            QString("%1!=%2").arg(mPinInstances.count()).arg(mSymbVarItem->getPinSignalMap().count()),
+            QString("%1!=%2").arg(mPins.count()).arg(mSymbVarItem->getPinSignalMap().count()),
             QString(tr("The pin count of the symbol instance \"%1\" does not match with "
             "the pin-signal-map")).arg(mUuid.toString()));
     }
 
-    mGraphicsItem = new library::SymbolGraphicsItem(*mSymbol, this);
-    mGraphicsItem->setPos(mPosition.toPxQPointF());
-    mGraphicsItem->setRotation(mAngle.toDeg());
+    connect(mGenCompInstance, SIGNAL(attributesChanged()), this, SLOT(genCompAttributesChanged()));
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-SymbolInstance::~SymbolInstance() noexcept
+SI_Symbol::~SI_Symbol() noexcept
 {
+    qDeleteAll(mPins);              mPins.clear();
     delete mGraphicsItem;           mGraphicsItem = 0;
-    qDeleteAll(mPinInstances);      mPinInstances.clear();
 }
 
 /*****************************************************************************************
  *  Getters
  ****************************************************************************************/
 
-QString SymbolInstance::getName() const noexcept
+QString SI_Symbol::getName() const noexcept
 {
     return mGenCompInstance->getName() % mSymbVarItem->getSuffix();
 }
@@ -148,26 +143,24 @@ QString SymbolInstance::getName() const noexcept
  *  Setters
  ****************************************************************************************/
 
-void SymbolInstance::setSelected(bool selected) noexcept
+void SI_Symbol::setSelected(bool selected) noexcept
 {
     mGraphicsItem->setSelected(selected);
 }
 
-void SymbolInstance::setPosition(const Point& newPos) throw (Exception)
+void SI_Symbol::setPosition(const Point& newPos) throw (Exception)
 {
     mPosition = newPos;
     mGraphicsItem->setPos(newPos.toPxQPointF());
-    mGraphicsItem->updateCacheAndRepaint();
-    foreach (SymbolPinInstance* pin, mPinInstances)
+    foreach (SI_SymbolPin* pin, mPins)
         pin->updateNetPointPosition();
 }
 
-void SymbolInstance::setAngle(const Angle& newAngle) throw (Exception)
+void SI_Symbol::setAngle(const Angle& newAngle) throw (Exception)
 {
     mAngle = newAngle;
     mGraphicsItem->setRotation(newAngle.toDeg());
-    mGraphicsItem->updateCacheAndRepaint();
-    foreach (SymbolPinInstance* pin, mPinInstances)
+    foreach (SI_SymbolPin* pin, mPins)
         pin->updateNetPointPosition();
 }
 
@@ -175,23 +168,23 @@ void SymbolInstance::setAngle(const Angle& newAngle) throw (Exception)
  *  General Methods
  ****************************************************************************************/
 
-void SymbolInstance::addToSchematic() throw (Exception)
+void SI_Symbol::addToSchematic() throw (Exception)
 {
-    mGenCompInstance->registerSymbolInstance(mSymbVarItem->getUuid(), mSymbol->getUuid(), this);
+    mGenCompInstance->registerSymbol(*this);
     mSchematic.addItem(mGraphicsItem);
-    foreach (SymbolPinInstance* pin, mPinInstances)
+    foreach (SI_SymbolPin* pin, mPins)
         pin->addToSchematic();
 }
 
-void SymbolInstance::removeFromSchematic() throw (Exception)
+void SI_Symbol::removeFromSchematic() throw (Exception)
 {
-    mGenCompInstance->unregisterSymbolInstance(mSymbVarItem->getUuid(), this);
+    mGenCompInstance->unregisterSymbol(*this);
     mSchematic.removeItem(mGraphicsItem);
-    foreach (SymbolPinInstance* pin, mPinInstances)
+    foreach (SI_SymbolPin* pin, mPins)
         pin->removeFromSchematic();
 }
 
-XmlDomElement* SymbolInstance::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* SI_Symbol::serializeToXmlDomElement() const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -210,12 +203,12 @@ XmlDomElement* SymbolInstance::serializeToXmlDomElement() const throw (Exception
  *  Helper Methods
  ****************************************************************************************/
 
-Point SymbolInstance::mapToScene(const Point& relativePos) const noexcept
+Point SI_Symbol::mapToScene(const Point& relativePos) const noexcept
 {
     return (mPosition + relativePos).rotated(mAngle, mPosition);
 }
 
-bool SymbolInstance::getAttributeValue(const QString& attrNS, const QString& attrKey,
+bool SI_Symbol::getAttributeValue(const QString& attrNS, const QString& attrKey,
                                        bool passToParents, QString& value) const noexcept
 {
     if ((attrNS == QLatin1String("SYM")) || (attrNS.isEmpty()))
@@ -239,17 +232,16 @@ bool SymbolInstance::getAttributeValue(const QString& attrNS, const QString& att
  *  Private Slots
  ****************************************************************************************/
 
-void SymbolInstance::genCompAttributesChanged()
+void SI_Symbol::genCompAttributesChanged()
 {
-    if (mGraphicsItem)
-        mGraphicsItem->update();
+    mGraphicsItem->updateCacheAndRepaint();
 }
 
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
-bool SymbolInstance::checkAttributesValidity() const noexcept
+bool SI_Symbol::checkAttributesValidity() const noexcept
 {
     if (mSymbVarItem == nullptr)        return false;
     if (mSymbol == nullptr)             return false;
@@ -262,18 +254,17 @@ bool SymbolInstance::checkAttributesValidity() const noexcept
  *  Static Methods
  ****************************************************************************************/
 
-uint SymbolInstance::extractFromGraphicsItems(const QList<QGraphicsItem*>& items,
-                                              QList<SymbolInstance*>& symbols) noexcept
+uint SI_Symbol::extractFromGraphicsItems(const QList<QGraphicsItem*>& items,
+                                         QList<SI_Symbol*>& symbols) noexcept
 {
     foreach (QGraphicsItem* item, items)
     {
         Q_ASSERT(item); if (!item) continue;
-        if (item->type() == CADScene::Type_Symbol)
+        if (item->type() == Schematic::Type_Symbol)
         {
-            library::SymbolGraphicsItem* i = qgraphicsitem_cast<library::SymbolGraphicsItem*>(item);
+            SGI_Symbol* i = qgraphicsitem_cast<SGI_Symbol*>(item);
             Q_ASSERT(i); if (!i) continue;
-            SymbolInstance* s = i->getSymbolInstance();
-            Q_ASSERT(s); if (!s) continue;
+            SI_Symbol* s = &i->getSymbol();
             if (!symbols.contains(s))
                 symbols.append(s);
         }

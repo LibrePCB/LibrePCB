@@ -36,7 +36,7 @@
 namespace project {
 class NetSignal;
 class Schematic;
-class SchematicNetLabel;
+class SI_NetLabel;
 }
 
 /*****************************************************************************************
@@ -58,7 +58,7 @@ class CmdSchematicNetLabelAdd final : public UndoCommand
         ~CmdSchematicNetLabelAdd() noexcept;
 
         // Getters
-        SchematicNetLabel* getNetLabel() const noexcept {return mNetLabel;}
+        SI_NetLabel* getNetLabel() const noexcept {return mNetLabel;}
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;
@@ -69,7 +69,7 @@ class CmdSchematicNetLabelAdd final : public UndoCommand
         Schematic& mSchematic;
         NetSignal* mNetSignal;
         Point mPosition;
-        SchematicNetLabel* mNetLabel;
+        SI_NetLabel* mNetLabel;
 };
 
 } // namespace project

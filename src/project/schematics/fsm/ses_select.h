@@ -35,8 +35,6 @@
 class UndoCommand;
 
 namespace project {
-class SymbolInstance;
-class SchematicNetPoint;
 class CmdSymbolInstanceEdit;
 class CmdSchematicNetPointEdit;
 class CmdSchematicNetLabelEdit;

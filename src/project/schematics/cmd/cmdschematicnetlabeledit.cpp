@@ -23,7 +23,7 @@
 
 #include <QtCore>
 #include "cmdschematicnetlabeledit.h"
-#include "../schematicnetlabel.h"
+#include "../items/si_netlabel.h"
 
 namespace project {
 
@@ -31,7 +31,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSchematicNetLabelEdit::CmdSchematicNetLabelEdit(SchematicNetLabel& netlabel,
+CmdSchematicNetLabelEdit::CmdSchematicNetLabelEdit(SI_NetLabel& netlabel,
                                                    UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Edit netlabel"), parent), mNetLabel(netlabel),
     mOldNetSignal(&netlabel.getNetSignal()), mNewNetSignal(mOldNetSignal),

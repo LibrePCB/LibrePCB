@@ -33,7 +33,7 @@
 
 namespace project {
 class Schematic;
-class SchematicNetLabel;
+class SI_NetLabel;
 class CmdSchematicNetLabelEdit;
 }
 
@@ -73,7 +73,7 @@ class SES_AddNetLabel final : public SES_Base
 
         // General Attributes
         bool mUndoCmdActive;
-        SchematicNetLabel* mCurrentNetLabel;
+        SI_NetLabel* mCurrentNetLabel;
         CmdSchematicNetLabelEdit* mEditCmd;
 };
 

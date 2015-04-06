@@ -26,7 +26,7 @@
 #include "symbolinstancepropertiesdialog.h"
 #include "ui_symbolinstancepropertiesdialog.h"
 #include "../circuit/gencompinstance.h"
-#include "symbolinstance.h"
+#include "items/si_symbol.h"
 #include "../../library/genericcomponent.h"
 #include "../../library/symbol.h"
 #include "../project.h"
@@ -50,15 +50,15 @@ namespace project {
 
 SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(Project& project,
                                                                GenCompInstance& genComp,
-                                                               SymbolInstance& symbol,
+                                                               SI_Symbol& symbol,
                                                                QWidget* parent) noexcept :
-    QDialog(parent), mProject(project), mGenCompInstance(genComp), mSymbolInstance(symbol),
+    QDialog(parent), mProject(project), mGenCompInstance(genComp), mSymbol(symbol),
     mUi(new Ui::SymbolInstancePropertiesDialog), mCommandActive(false),
     mAttributesEdited(false), mSelectedAttrItem(nullptr), mSelectedAttrType(nullptr),
     mSelectedAttrUnit(nullptr)
 {
     mUi->setupUi(this);
-    setWindowTitle(QString(tr("Properties of %1")).arg(mSymbolInstance.getName()));
+    setWindowTitle(QString(tr("Properties of %1")).arg(mSymbol.getName()));
     mUi->tblGenCompInstAttributes->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     foreach (const AttributeType* type, AttributeType::getAllTypes())
         mUi->cbxAttrType->addItem(type->getNameTr(), type->getName());
@@ -89,16 +89,16 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(Project& project,
     mUi->lblSymbVarName->setToolTip(mGenCompInstance.getSymbolVariant().getDescription(localeOrder));
 
     // Symbol Instance Attributes
-    mUi->lblSymbInstUuid->setText(mSymbolInstance.getUuid().toString());
-    mUi->lblSymbInstName->setText(mSymbolInstance.getName());
-    mUi->spbxSymbInstPosX->setValue(mSymbolInstance.getPosition().getX().toMm());
-    mUi->spbxSymbInstPosY->setValue(mSymbolInstance.getPosition().getY().toMm());
-    mUi->spbxSymbInstAngle->setValue(mSymbolInstance.getAngle().toDeg());
+    mUi->lblSymbInstUuid->setText(mSymbol.getUuid().toString());
+    mUi->lblSymbInstName->setText(mSymbol.getName());
+    mUi->spbxSymbInstPosX->setValue(mSymbol.getPosition().getX().toMm());
+    mUi->spbxSymbInstPosY->setValue(mSymbol.getPosition().getY().toMm());
+    mUi->spbxSymbInstAngle->setValue(mSymbol.getAngle().toDeg());
 
     // Symbol Library Element Attributes
-    mUi->lblSymbLibUuid->setText(mSymbolInstance.getSymbol().getUuid().toString());
-    mUi->lblSymbLibName->setText(mSymbolInstance.getSymbol().getName(localeOrder));
-    mUi->lblSymbLibName->setToolTip(mSymbolInstance.getSymbol().getDescription(localeOrder));
+    mUi->lblSymbLibUuid->setText(mSymbol.getLibSymbol().getUuid().toString());
+    mUi->lblSymbLibName->setText(mSymbol.getLibSymbol().getName(localeOrder));
+    mUi->lblSymbLibName->setToolTip(mSymbol.getLibSymbol().getDescription(localeOrder));
 
     // set focus to component instance name
     mUi->edtGenCompInstName->selectAll();
@@ -364,9 +364,9 @@ bool SymbolInstancePropertiesDialog::applyChanges() noexcept
         Point pos(Length::fromMm(mUi->spbxSymbInstPosX->value()),
                   Length::fromMm(mUi->spbxSymbInstPosY->value()));
         Angle rotation = Angle::fromDeg(mUi->spbxSymbInstAngle->value());
-        if ((pos != mSymbolInstance.getPosition()) || (rotation != mSymbolInstance.getAngle()))
+        if ((pos != mSymbol.getPosition()) || (rotation != mSymbol.getAngle()))
         {
-            CmdSymbolInstanceEdit* cmd = new CmdSymbolInstanceEdit(mSymbolInstance);
+            CmdSymbolInstanceEdit* cmd = new CmdSymbolInstanceEdit(mSymbol);
             cmd->setPosition(pos, false);
             cmd->setRotation(rotation, false);
             execCmd(cmd);
@@ -389,7 +389,7 @@ void SymbolInstancePropertiesDialog::execCmd(UndoCommand* cmd)
     if (!mCommandActive)
     {
         mProject.getUndoStack().beginCommand(QString(tr("Change properties of %1"))
-                                             .arg(mSymbolInstance.getName()));
+                                             .arg(mSymbol.getName()));
         mCommandActive = true;
     }
 

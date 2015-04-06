@@ -58,7 +58,7 @@ CADView::CADView(QWidget* parent) :
     setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
     if (Workspace::instance().getSettings().getAppearance()->getUseOpenGl())
         setViewport(new QGLWidget(QGLFormat(QGL::DoubleBuffer | QGL::AlphaChannel | QGL::SampleBuffers)));
-    setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+    setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
     setOptimizationFlags(QGraphicsView::DontSavePainterState);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);

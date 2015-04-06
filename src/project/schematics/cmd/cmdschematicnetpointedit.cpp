@@ -23,7 +23,7 @@
 
 #include <QtCore>
 #include "cmdschematicnetpointedit.h"
-#include "../schematicnetpoint.h"
+#include "../items/si_netpoint.h"
 
 namespace project {
 
@@ -31,7 +31,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSchematicNetPointEdit::CmdSchematicNetPointEdit(SchematicNetPoint& point,
+CmdSchematicNetPointEdit::CmdSchematicNetPointEdit(SI_NetPoint& point,
                                                    UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Edit netpoint"), parent), mNetPoint(point),
     mOldNetSignal(point.getNetSignal()), mNewNetSignal(mOldNetSignal),

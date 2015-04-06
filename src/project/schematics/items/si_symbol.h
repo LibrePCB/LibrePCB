@@ -17,63 +17,62 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SYMBOLINSTANCE_H
-#define PROJECT_SYMBOLINSTANCE_H
+#ifndef PROJECT_SI_SYMBOL_H
+#define PROJECT_SI_SYMBOL_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../../common/if_attributeprovider.h"
-#include "../../common/file_io/if_xmlserializableobject.h"
-#include "../../common/units/all_length_units.h"
-#include "../../common/exceptions.h"
+#include "si_base.h"
+#include "../../../common/file_io/if_xmlserializableobject.h"
+#include "../../../common/if_attributeprovider.h"
+#include "../../../common/units/all_length_units.h"
+#include "../graphicsitems/sgi_symbol.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
 class QGraphicsItem;
-class SchematicLayer;
 
 namespace project {
 class Schematic;
 class GenCompInstance;
-class SymbolPinInstance;
+class SI_SymbolPin;
 }
 
 namespace library {
 class Symbol;
 class GenCompSymbVarItem;
-class SymbolGraphicsItem;
 }
 
 /*****************************************************************************************
- *  Class SymbolInstance
+ *  Class SI_Symbol
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The SymbolInstance class
+ * @brief The SI_Symbol class
  *
  * @author ubruhin
  * @date 2014-08-23
  */
-class SymbolInstance final : public QObject, public IF_AttributeProvider,
-                             public IF_XmlSerializableObject
+class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
+                        public IF_AttributeProvider
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit SymbolInstance(Schematic& schematic, const XmlDomElement& domElement) throw (Exception);
-        explicit SymbolInstance(Schematic& schematic, GenCompInstance& genCompInstance,
-                                const QUuid& symbolItem, const Point& position = Point(),
-                                const Angle& angle = Angle()) throw (Exception);
-        ~SymbolInstance() noexcept;
+        explicit SI_Symbol(Schematic& schematic, const XmlDomElement& domElement) throw (Exception);
+        explicit SI_Symbol(Schematic& schematic, GenCompInstance& genCompInstance,
+                           const QUuid& symbolItem, const Point& position = Point(),
+                           const Angle& angle = Angle()) throw (Exception);
+        ~SI_Symbol() noexcept;
 
         // Getters
         Schematic& getSchematic() const noexcept {return mSchematic;}
@@ -81,10 +80,10 @@ class SymbolInstance final : public QObject, public IF_AttributeProvider,
         const Point& getPosition() const noexcept {return mPosition;}
         const Angle& getAngle() const noexcept {return mAngle;}
         QString getName() const noexcept;
-        SymbolPinInstance* getPinInstance(const QUuid& pinUuid) const noexcept {return mPinInstances.value(pinUuid);}
-        const QHash<QUuid, SymbolPinInstance*>& getPinInstances() const noexcept {return mPinInstances;}
+        SI_SymbolPin* getPin(const QUuid& pinUuid) const noexcept {return mPins.value(pinUuid);}
+        const QHash<QUuid, SI_SymbolPin*>& getPins() const noexcept {return mPins;}
         GenCompInstance& getGenCompInstance() const noexcept {return *mGenCompInstance;}
-        const library::Symbol& getSymbol() const noexcept {return *mSymbol;}
+        const library::Symbol& getLibSymbol() const noexcept {return *mSymbol;}
         const library::GenCompSymbVarItem& getGenCompSymbVarItem() const noexcept {return *mSymbVarItem;}
 
         // Setters
@@ -104,7 +103,7 @@ class SymbolInstance final : public QObject, public IF_AttributeProvider,
 
         // Static Methods
         static uint extractFromGraphicsItems(const QList<QGraphicsItem*>& items,
-                                             QList<SymbolInstance*>& symbols) noexcept;
+                                             QList<SI_Symbol*>& symbols) noexcept;
 
 
     private slots:
@@ -115,9 +114,9 @@ class SymbolInstance final : public QObject, public IF_AttributeProvider,
     private:
 
         // make some methods inaccessible...
-        SymbolInstance();
-        SymbolInstance(const SymbolInstance& other);
-        SymbolInstance& operator=(const SymbolInstance& rhs);
+        SI_Symbol();
+        SI_Symbol(const SI_Symbol& other);
+        SI_Symbol& operator=(const SI_Symbol& rhs);
 
         // Private Methods
         void init(const QUuid& symbVarItemUuid) throw (Exception);
@@ -126,18 +125,18 @@ class SymbolInstance final : public QObject, public IF_AttributeProvider,
 
         // General
         Schematic& mSchematic;
+        GenCompInstance* mGenCompInstance;
         const library::GenCompSymbVarItem* mSymbVarItem;
         const library::Symbol* mSymbol;
-        QHash<QUuid, SymbolPinInstance*> mPinInstances; ///< key: symbol pin UUID
-        library::SymbolGraphicsItem* mGraphicsItem;
+        QHash<QUuid, SI_SymbolPin*> mPins; ///< key: symbol pin UUID
+        SGI_Symbol* mGraphicsItem;
 
         // Attributes
         QUuid mUuid;
-        GenCompInstance* mGenCompInstance;
         Point mPosition;
         Angle mAngle;
 };
 
 } // namespace project
 
-#endif // PROJECT_SYMBOLINSTANCE_H
+#endif // PROJECT_SI_SYMBOL_H

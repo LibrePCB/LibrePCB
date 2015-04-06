@@ -37,8 +37,8 @@ namespace project {
 class Circuit;
 class NetClass;
 class GenCompSignalInstance;
-class SchematicNetPoint;
-class SchematicNetLabel;
+class SI_NetPoint;
+class SI_NetLabel;
 class ErcMsg;
 }
 
@@ -72,8 +72,8 @@ class NetSignal final : public IF_ErcMsgProvider, public IF_XmlSerializableObjec
         NetClass& getNetClass() const noexcept {return *mNetClass;}
         bool isNameForced() const noexcept {return (mGenCompSignalWithForcedNameCount > 0);}
         const QList<GenCompSignalInstance*>& getGenCompSignals() const noexcept {return mGenCompSignals;}
-        const QList<SchematicNetPoint*>& getNetPoints() const noexcept {return mSchematicNetPoints;}
-        const QList<SchematicNetLabel*>& getNetLabels() const noexcept {return mSchematicNetLabels;}
+        const QList<SI_NetPoint*>& getNetPoints() const noexcept {return mSchematicNetPoints;}
+        const QList<SI_NetLabel*>& getNetLabels() const noexcept {return mSchematicNetLabels;}
 
         // Setters
         void setName(const QString& name, bool isAutoName) throw (Exception);
@@ -81,10 +81,10 @@ class NetSignal final : public IF_ErcMsgProvider, public IF_XmlSerializableObjec
         // General Methods
         void registerGenCompSignal(GenCompSignalInstance& signal) noexcept;
         void unregisterGenCompSignal(GenCompSignalInstance& signal) noexcept;
-        void registerSchematicNetPoint(SchematicNetPoint& netpoint) noexcept;
-        void unregisterSchematicNetPoint(SchematicNetPoint& netpoint) noexcept;
-        void registerSchematicNetLabel(SchematicNetLabel& netlabel) noexcept;
-        void unregisterSchematicNetLabel(SchematicNetLabel& netlabel) noexcept;
+        void registerSchematicNetPoint(SI_NetPoint& netpoint) noexcept;
+        void unregisterSchematicNetPoint(SI_NetPoint& netpoint) noexcept;
+        void registerSchematicNetLabel(SI_NetLabel& netlabel) noexcept;
+        void unregisterSchematicNetLabel(SI_NetLabel& netlabel) noexcept;
         void addToCircuit() noexcept;
         void removeFromCircuit() noexcept;
         XmlDomElement* serializeToXmlDomElement() const throw (Exception);
@@ -115,8 +115,8 @@ class NetSignal final : public IF_ErcMsgProvider, public IF_XmlSerializableObjec
 
         // Registered Elements of this Netclass
         QList<GenCompSignalInstance*> mGenCompSignals;
-        QList<SchematicNetPoint*> mSchematicNetPoints;
-        QList<SchematicNetLabel*> mSchematicNetLabels;
+        QList<SI_NetPoint*> mSchematicNetPoints;
+        QList<SI_NetLabel*> mSchematicNetLabels;
         uint mGenCompSignalWithForcedNameCount;
 
         // Attributes

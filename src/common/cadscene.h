@@ -62,21 +62,16 @@ class CADScene : public QGraphicsScene
         // Types
 
         /**
-         * @brief All custom QGraphicsItem types which are used in CADScene
+         * @brief All custom QGraphicsItem types which are used in a CADScene
          *
          * See QGraphicsItem::Type for more information.
          *
          * @note We do not use "enum class" because it must be easily compareable with int.
          */
         enum ItemType_t {
-            Type_UserType = QGraphicsItem::UserType, ///< the base number for user types
-            // Types which are used in library elements
-            Type_Symbol,                    ///< library#Symbol
-            Type_SymbolPin,                 ///< library#SymbolPin
-            // Types which are used in schematic scenes
-            Type_SchematicNetPoint,         ///< project#SchematicNetPoint
-            Type_SchematicNetLine,          ///< project#SchematicNetLine
-            Type_SchematicNetLabel,         ///< project#SchematicNetLabel
+            Type_UserType       = QGraphicsItem::UserType,      ///< the base number for user types
+            Type_SchematicBase  = Type_UserType + 1000,         ///< project#Schematic#ItemType_t
+            Type_BoardBase      = Type_SchematicBase + 1000,    ///< project#Board#ItemType_t
         };
 
 

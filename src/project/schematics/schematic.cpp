@@ -27,12 +27,12 @@
 #include "../../common/file_io/xmldomdocument.h"
 #include "../../common/file_io/xmldomelement.h"
 #include "../project.h"
-#include "symbolinstance.h"
-#include "schematicnetpoint.h"
-#include "schematicnetline.h"
-#include "../../library/symbolpingraphicsitem.h"
 #include "../../library/symbolpin.h"
-#include "schematicnetlabel.h"
+#include "items/si_symbol.h"
+#include "items/si_symbolpin.h"
+#include "items/si_netpoint.h"
+#include "items/si_netline.h"
+#include "items/si_netlabel.h"
 
 namespace project {
 
@@ -67,11 +67,11 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             mUuid = root.getFirstChild("meta/uuid", true, true)->getText<QUuid>();
             mName = root.getFirstChild("meta/name", true, true)->getText(true);
 
-            // Load all symbol instances
+            // Load all symbols
             for (XmlDomElement* node = root.getFirstChild("symbols/symbol", true, false);
                  node; node = node->getNextSibling("symbol"))
             {
-                SymbolInstance* symbol = new SymbolInstance(*this, *node);
+                SI_Symbol* symbol = new SI_Symbol(*this, *node);
                 addSymbol(*symbol);
             }
 
@@ -79,7 +79,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             for (XmlDomElement* node = root.getFirstChild("netpoints/netpoint", true, false);
                  node; node = node->getNextSibling("netpoint"))
             {
-                SchematicNetPoint* netpoint = new SchematicNetPoint(*this, *node);
+                SI_NetPoint* netpoint = new SI_NetPoint(*this, *node);
                 addNetPoint(*netpoint);
             }
 
@@ -87,7 +87,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             for (XmlDomElement* node = root.getFirstChild("netlines/netline", true, false);
                  node; node = node->getNextSibling("netline"))
             {
-                SchematicNetLine* netline = new SchematicNetLine(*this, *node);
+                SI_NetLine* netline = new SI_NetLine(*this, *node);
                 addNetLine(*netline);
             }
 
@@ -95,7 +95,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             for (XmlDomElement* node = root.getFirstChild("netlabels/netlabel", true, false);
                  node; node = node->getNextSibling("netlabel"))
             {
-                SchematicNetLabel* netlabel = new SchematicNetLabel(*this, *node);
+                SI_NetLabel* netlabel = new SI_NetLabel(*this, *node);
                 addNetLabel(*netlabel);
             }
         }
@@ -107,13 +107,13 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
     catch (...)
     {
         // free the allocated memory in the reverse order of their allocation...
-        foreach (SchematicNetLabel* netlabel, mNetLabels)
+        foreach (SI_NetLabel* netlabel, mNetLabels)
             try { removeNetLabel(*netlabel); delete netlabel; } catch (...) {}
-        foreach (SchematicNetLine* netline, mNetLines)
+        foreach (SI_NetLine* netline, mNetLines)
             try { removeNetLine(*netline); delete netline; } catch (...) {}
-        foreach (SchematicNetPoint* netpoint, mNetPoints)
+        foreach (SI_NetPoint* netpoint, mNetPoints)
             try { removeNetPoint(*netpoint); delete netpoint; } catch (...) {}
-        foreach (SymbolInstance* symbol, mSymbols)
+        foreach (SI_Symbol* symbol, mSymbols)
             try { removeSymbol(*symbol); delete symbol; } catch (...) {}
         delete mXmlFile;                mXmlFile = 0;
         throw; // ...and rethrow the exception
@@ -123,16 +123,16 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
 Schematic::~Schematic()
 {
     // delete all netlabels (and catch all throwed exceptions)
-    foreach (SchematicNetLabel* netlabel, mNetLabels)
+    foreach (SI_NetLabel* netlabel, mNetLabels)
         try { removeNetLabel(*netlabel); delete netlabel; } catch (...) {}
     // delete all netlines (and catch all throwed exceptions)
-    foreach (SchematicNetLine* netline, mNetLines)
+    foreach (SI_NetLine* netline, mNetLines)
         try { removeNetLine(*netline); delete netline; } catch (...) {}
     // delete all netpoints (and catch all throwed exceptions)
-    foreach (SchematicNetPoint* netpoint, mNetPoints)
+    foreach (SI_NetPoint* netpoint, mNetPoints)
         try { removeNetPoint(*netpoint); delete netpoint; } catch (...) {}
     // delete all symbols (and catch all throwed exceptions)
-    foreach (SymbolInstance* symbol, mSymbols)
+    foreach (SI_Symbol* symbol, mSymbols)
         try { removeSymbol(*symbol); delete symbol; } catch (...) {}
 
     delete mXmlFile;                mXmlFile = 0;
@@ -147,58 +147,63 @@ bool Schematic::isEmpty() const noexcept
     return (mSymbols.isEmpty() && mNetPoints.isEmpty() && mNetLines.isEmpty());
 }
 
-uint Schematic::getNetPointsAtScenePos(QList<SchematicNetPoint*>& list, const Point& pos) const noexcept
+uint Schematic::getNetPointsAtScenePos(QList<SI_NetPoint*>& list, const Point& pos) const noexcept
 {
     foreach (QGraphicsItem* i, items(pos.toPxQPointF()))
     {
-        if (i->type() != CADScene::Type_SchematicNetPoint) continue;
-        SchematicNetPointGraphicsItem* p = qgraphicsitem_cast<SchematicNetPointGraphicsItem*>(i);
+        if (i->type() != Type_NetPoint) continue;
+        SGI_NetPoint* p = qgraphicsitem_cast<SGI_NetPoint*>(i);
         if (!p) continue;
         list.append(&p->getNetPoint());
     }
     return list.count();
 }
 
-uint Schematic::getNetLinesAtScenePos(QList<SchematicNetLine*>& list, const Point& pos) const noexcept
+uint Schematic::getNetLinesAtScenePos(QList<SI_NetLine*>& list, const Point& pos) const noexcept
 {
     foreach (QGraphicsItem* i, items(pos.toPxQPointF()))
     {
-        if (i->type() != CADScene::Type_SchematicNetLine) continue;
-        SchematicNetLineGraphicsItem* l = qgraphicsitem_cast<SchematicNetLineGraphicsItem*>(i);
+        if (i->type() != Type_NetLine) continue;
+        SGI_NetLine* l = qgraphicsitem_cast<SGI_NetLine*>(i);
         if (!l) continue;
         list.append(&l->getNetLine());
     }
     return list.count();
 }
 
-uint Schematic::getPinsAtScenePos(QList<SymbolPinInstance*>& list, const Point& pos) const noexcept
+uint Schematic::getPinsAtScenePos(QList<SI_SymbolPin*>& list, const Point& pos) const noexcept
 {
     foreach (QGraphicsItem* i, items(pos.toPxQPointF()))
     {
-        if (i->type() != CADScene::Type_SymbolPin) continue;
-        library::SymbolPinGraphicsItem* p = qgraphicsitem_cast<library::SymbolPinGraphicsItem*>(i);
+        if (i->type() != Type_SymbolPin) continue;
+        SGI_SymbolPin* p = qgraphicsitem_cast<SGI_SymbolPin*>(i);
         if (!p) continue;
-        list.append(p->getPinInstance());
+        list.append(&p->getPin());
     }
     return list.count();
 }
 
 /*****************************************************************************************
- *  SymbolInstance Methods
+ *  Symbol Methods
  ****************************************************************************************/
 
-SymbolInstance* Schematic::getSymbolByUuid(const QUuid& uuid) const noexcept
+SI_Symbol* Schematic::getSymbolByUuid(const QUuid& uuid) const noexcept
 {
-    return mSymbols.value(uuid, 0);
+    foreach (SI_Symbol* symbol, mSymbols)
+    {
+        if (symbol->getUuid() == uuid)
+            return symbol;
+    }
+    return nullptr;
 }
 
-SymbolInstance* Schematic::createSymbol(GenCompInstance& genCompInstance, const QUuid& symbolItem,
-                                        const Point& position, const Angle& angle) throw (Exception)
+SI_Symbol* Schematic::createSymbol(GenCompInstance& genCompInstance, const QUuid& symbolItem,
+                                   const Point& position, const Angle& angle) throw (Exception)
 {
-    return new SymbolInstance(*this, genCompInstance, symbolItem, position, angle);
+    return new SI_Symbol(*this, genCompInstance, symbolItem, position, angle);
 }
 
-void Schematic::addSymbol(SymbolInstance& symbol) throw (Exception)
+void Schematic::addSymbol(SI_Symbol& symbol) throw (Exception)
 {
     // check if there is no symbol with the same uuid in the list
     if (getSymbolByUuid(symbol.getUuid()))
@@ -210,47 +215,43 @@ void Schematic::addSymbol(SymbolInstance& symbol) throw (Exception)
 
     // add to schematic
     symbol.addToSchematic(); // can throw an exception
-    mSymbols.insert(symbol.getUuid(), &symbol);
+    mSymbols.append(&symbol);
 }
 
-void Schematic::removeSymbol(SymbolInstance& symbol) throw (Exception)
+void Schematic::removeSymbol(SI_Symbol& symbol) throw (Exception)
 {
-    Q_ASSERT(mSymbols.contains(symbol.getUuid()) == true);
-
-    // the symbol cannot be removed if there are already netpoints connected to it!
-    /*if (symbol->getNetPointCount() > 0)
-    {
-        throw RuntimeError(__FILE__, __LINE__, QString("%1:%2")
-            .arg(symbol->getUuid().toString()).arg(symbol->getNetPointCount()),
-            QString(tr("There are already netpoints connected to the symbol \"%1\"!"))
-            .arg(symbol->getUuid().toString()));
-    }*/
+    Q_ASSERT(mSymbols.contains(&symbol) == true);
 
     // remove from schematic
     symbol.removeFromSchematic(); // can throw an exception
-    mSymbols.remove(symbol.getUuid());
+    mSymbols.removeAll(&symbol);
 }
 
 /*****************************************************************************************
- *  SchematicNetPoint Methods
+ *  NetPoint Methods
  ****************************************************************************************/
 
-SchematicNetPoint* Schematic::getNetPointByUuid(const QUuid& uuid) const noexcept
+SI_NetPoint* Schematic::getNetPointByUuid(const QUuid& uuid) const noexcept
 {
-    return mNetPoints.value(uuid, 0);
+    foreach (SI_NetPoint* netpoint, mNetPoints)
+    {
+        if (netpoint->getUuid() == uuid)
+            return netpoint;
+    }
+    return nullptr;
 }
 
-SchematicNetPoint* Schematic::createNetPoint(NetSignal& netsignal, const Point& position) throw (Exception)
+SI_NetPoint* Schematic::createNetPoint(NetSignal& netsignal, const Point& position) throw (Exception)
 {
-    return new SchematicNetPoint(*this, netsignal, position);
+    return new SI_NetPoint(*this, netsignal, position);
 }
 
-SchematicNetPoint* Schematic::createNetPoint(SymbolInstance& symbol, const QUuid& pin) throw (Exception)
+SI_NetPoint* Schematic::createNetPoint(SI_SymbolPin& pin) throw (Exception)
 {
-    return new SchematicNetPoint(*this, symbol, pin);
+    return new SI_NetPoint(*this, pin);
 }
 
-void Schematic::addNetPoint(SchematicNetPoint& netpoint) throw (Exception)
+void Schematic::addNetPoint(SI_NetPoint& netpoint) throw (Exception)
 {
     // check if there is no netpoint with the same uuid in the list
     if (getNetPointByUuid(netpoint.getUuid()))
@@ -262,12 +263,12 @@ void Schematic::addNetPoint(SchematicNetPoint& netpoint) throw (Exception)
 
     // add to schematic
     netpoint.addToSchematic(); // can throw an exception
-    mNetPoints.insert(netpoint.getUuid(), &netpoint);
+    mNetPoints.append(&netpoint);
 }
 
-void Schematic::removeNetPoint(SchematicNetPoint& netpoint) throw (Exception)
+void Schematic::removeNetPoint(SI_NetPoint& netpoint) throw (Exception)
 {
-    Q_ASSERT(mNetPoints.contains(netpoint.getUuid()) == true);
+    Q_ASSERT(mNetPoints.contains(&netpoint) == true);
 
     // the netpoint cannot be removed if there are already netlines connected to it!
     if (netpoint.getLines().count() > 0)
@@ -280,26 +281,30 @@ void Schematic::removeNetPoint(SchematicNetPoint& netpoint) throw (Exception)
 
     // remove from schematic
     netpoint.removeFromSchematic(); // can throw an exception
-    mNetPoints.remove(netpoint.getUuid());
+    mNetPoints.removeAll(&netpoint);
 }
 
 /*****************************************************************************************
- *  SchematicNetLine Methods
+ *  NetLine Methods
  ****************************************************************************************/
 
-SchematicNetLine* Schematic::getNetLineByUuid(const QUuid& uuid) const noexcept
+SI_NetLine* Schematic::getNetLineByUuid(const QUuid& uuid) const noexcept
 {
-    return mNetLines.value(uuid, 0);
+    foreach (SI_NetLine* netline, mNetLines)
+    {
+        if (netline->getUuid() == uuid)
+            return netline;
+    }
+    return nullptr;
 }
 
-SchematicNetLine* Schematic::createNetLine(SchematicNetPoint& startPoint,
-                                           SchematicNetPoint& endPoint,
-                                           const Length& width) throw (Exception)
+SI_NetLine* Schematic::createNetLine(SI_NetPoint& startPoint, SI_NetPoint& endPoint,
+                                     const Length& width) throw (Exception)
 {
-    return new SchematicNetLine(*this, startPoint, endPoint, width);
+    return new SI_NetLine(*this, startPoint, endPoint, width);
 }
 
-void Schematic::addNetLine(SchematicNetLine& netline) throw (Exception)
+void Schematic::addNetLine(SI_NetLine& netline) throw (Exception)
 {
     // check if there is no netline with the same uuid in the list
     if (getNetLineByUuid(netline.getUuid()))
@@ -311,33 +316,38 @@ void Schematic::addNetLine(SchematicNetLine& netline) throw (Exception)
 
     // add to schematic
     netline.addToSchematic(); // can throw an exception
-    mNetLines.insert(netline.getUuid(), &netline);
+    mNetLines.append(&netline);
 }
 
-void Schematic::removeNetLine(SchematicNetLine& netline) throw (Exception)
+void Schematic::removeNetLine(SI_NetLine& netline) throw (Exception)
 {
-    Q_ASSERT(mNetLines.contains(netline.getUuid()) == true);
+    Q_ASSERT(mNetLines.contains(&netline) == true);
 
     // remove from schematic
     netline.removeFromSchematic(); // can throw an exception
-    mNetLines.remove(netline.getUuid());
+    mNetLines.removeAll(&netline);
 }
 
 /*****************************************************************************************
- *  SchematicNetLabel Methods
+ *  NetLabel Methods
  ****************************************************************************************/
 
-SchematicNetLabel* Schematic::getNetLabelByUuid(const QUuid& uuid) const noexcept
+SI_NetLabel* Schematic::getNetLabelByUuid(const QUuid& uuid) const noexcept
 {
-    return mNetLabels.value(uuid, nullptr);
+    foreach (SI_NetLabel* netlabel, mNetLabels)
+    {
+        if (netlabel->getUuid() == uuid)
+            return netlabel;
+    }
+    return nullptr;
 }
 
-SchematicNetLabel* Schematic::createNetLabel(NetSignal& netsignal, const Point& position) throw (Exception)
+SI_NetLabel* Schematic::createNetLabel(NetSignal& netsignal, const Point& position) throw (Exception)
 {
-    return new SchematicNetLabel(*this, netsignal, position);
+    return new SI_NetLabel(*this, netsignal, position);
 }
 
-void Schematic::addNetLabel(SchematicNetLabel& netlabel) throw (Exception)
+void Schematic::addNetLabel(SI_NetLabel& netlabel) throw (Exception)
 {
     // check if there is no netlabel with the same uuid in the list
     if (getNetLabelByUuid(netlabel.getUuid()))
@@ -349,16 +359,16 @@ void Schematic::addNetLabel(SchematicNetLabel& netlabel) throw (Exception)
 
     // add to schematic
     netlabel.addToSchematic(); // can throw an exception
-    mNetLabels.insert(netlabel.getUuid(), &netlabel);
+    mNetLabels.append(&netlabel);
 }
 
-void Schematic::removeNetLabel(SchematicNetLabel& netlabel) throw (Exception)
+void Schematic::removeNetLabel(SI_NetLabel& netlabel) throw (Exception)
 {
-    Q_ASSERT(mNetLabels.contains(netlabel.getUuid()) == true);
+    Q_ASSERT(mNetLabels.contains(&netlabel) == true);
 
     // remove from schematic
     netlabel.removeFromSchematic(); // can throw an exception
-    mNetLabels.remove(netlabel.getUuid());
+    mNetLabels.removeAll(&netlabel);
 }
 
 /*****************************************************************************************
@@ -465,16 +475,16 @@ XmlDomElement* Schematic::serializeToXmlDomElement() const throw (Exception)
     meta->appendTextChild("uuid", mUuid);
     meta->appendTextChild("name", mName);
     XmlDomElement* symbols = root->appendChild("symbols");
-    foreach (SymbolInstance* symbolInstance, mSymbols)
+    foreach (SI_Symbol* symbolInstance, mSymbols)
         symbols->appendChild(symbolInstance->serializeToXmlDomElement());
     XmlDomElement* netpoints = root->appendChild("netpoints");
-    foreach (SchematicNetPoint* netpoint, mNetPoints)
+    foreach (SI_NetPoint* netpoint, mNetPoints)
         netpoints->appendChild(netpoint->serializeToXmlDomElement());
     XmlDomElement* netlines = root->appendChild("netlines");
-    foreach (SchematicNetLine* netline, mNetLines)
+    foreach (SI_NetLine* netline, mNetLines)
         netlines->appendChild(netline->serializeToXmlDomElement());
     XmlDomElement* netlabels = root->appendChild("netlabels");
-    foreach (SchematicNetLabel* netlabel, mNetLabels)
+    foreach (SI_NetLabel* netlabel, mNetLabels)
         netlabels->appendChild(netlabel->serializeToXmlDomElement());
     return root.take();
 }

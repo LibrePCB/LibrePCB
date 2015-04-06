@@ -17,60 +17,77 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDSCHEMATICNETLINEADD_H
-#define PROJECT_CMDSCHEMATICNETLINEADD_H
+#ifndef PROJECT_SGI_NETLINE_H
+#define PROJECT_SGI_NETLINE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../../../common/undocommand.h"
-#include "../../../common/exceptions.h"
+#include <QtWidgets>
+#include "sgi_base.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
+class SchematicLayer;
+
 namespace project {
-class Schematic;
-class SI_NetPoint;
 class SI_NetLine;
 }
 
 /*****************************************************************************************
- *  Class CmdSchematicNetLineAdd
+ *  Class SGI_NetLine
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The CmdSchematicNetLineAdd class
+ * @brief The SGI_NetLine class
  */
-class CmdSchematicNetLineAdd final : public UndoCommand
+class SGI_NetLine final : public SGI_Base
 {
     public:
 
+        // Types
+
+        /// to make  qgraphicsitem_cast() working
+        enum {Type = Schematic::Type_NetLine};
+
         // Constructors / Destructor
-        explicit CmdSchematicNetLineAdd(Schematic& schematic, SI_NetPoint& startPoint,
-                                        SI_NetPoint& endPoint, UndoCommand* parent = 0) throw (Exception);
-        ~CmdSchematicNetLineAdd() noexcept;
+        explicit SGI_NetLine(SI_NetLine& netline) noexcept;
+        ~SGI_NetLine() noexcept;
 
         // Getters
-        SI_NetLine* getNetLine() const noexcept {return mNetLine;}
+        SI_NetLine& getNetLine() const {return mNetLine;}
 
-        // Inherited from UndoCommand
-        void redo() throw (Exception) override;
-        void undo() throw (Exception) override;
+        // General Methods
+        void updateCacheAndRepaint() noexcept;
+
+        // Inherited from QGraphicsItem
+        int type() const {return Type;} ///< to make  qgraphicsitem_cast() working
+        QRectF boundingRect() const {return mBoundingRect;}
+        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
+
 
     private:
 
-        Schematic& mSchematic;
-        SI_NetPoint& mStartPoint;
-        SI_NetPoint& mEndPoint;
-        SI_NetLine* mNetLine;
+        // make some methods inaccessible...
+        SGI_NetLine() = delete;
+        SGI_NetLine(const SGI_NetLine& other) = delete;
+        SGI_NetLine& operator=(const SGI_NetLine& rhs) = delete;
+
+        // Attributes
+        SI_NetLine& mNetLine;
+        SchematicLayer* mLayer;
+
+        // Cached Attributes
+        QLineF mLineF;
+        QRectF mBoundingRect;
 };
 
 } // namespace project
 
-#endif // PROJECT_CMDSCHEMATICNETLINEADD_H
+#endif // PROJECT_SGI_NETLINE_H

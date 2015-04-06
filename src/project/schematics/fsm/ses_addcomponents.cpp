@@ -33,7 +33,7 @@
 #include "../cmd/cmdsymbolinstanceadd.h"
 #include "../../circuit/gencompinstance.h"
 #include "../cmd/cmdsymbolinstanceedit.h"
-#include "../symbolinstance.h"
+#include "../items/si_symbol.h"
 #include "../schematic.h"
 #include "../../dialogs/addgencompdialog.h"
 
@@ -220,7 +220,7 @@ SES_Base::ProcRetVal SES_AddComponents::processSceneEvent(SEE_Base* event) noexc
                                 mCurrentSymbolToPlace->getGenCompInstance(),
                                 mCurrentSymbVarItem->getUuid(), pos);
                             mProject.getUndoStack().appendToCommand(cmd);
-                            mCurrentSymbolToPlace = cmd->getSymbolInstance();
+                            mCurrentSymbolToPlace = cmd->getSymbol();
                             Q_ASSERT(mCurrentSymbolToPlace);
 
                             // add command to move the current symbol
@@ -274,7 +274,6 @@ SES_Base::ProcRetVal SES_AddComponents::processSceneEvent(SEE_Base* event) noexc
                 return PassToParentState;
         }
     }
-
     return PassToParentState;
 }
 
@@ -365,7 +364,7 @@ void SES_AddComponents::startAddingComponent(const QUuid& genComp,
     CmdSymbolInstanceAdd* cmd2 = new CmdSymbolInstanceAdd(*schematic,
         *(cmd->getGenCompInstance()), mCurrentSymbVarItem->getUuid(), pos);
     mProject.getUndoStack().appendToCommand(cmd2);
-    mCurrentSymbolToPlace = cmd2->getSymbolInstance();
+    mCurrentSymbolToPlace = cmd2->getSymbol();
     Q_ASSERT(mCurrentSymbolToPlace);
 
     // add command to move the current symbol

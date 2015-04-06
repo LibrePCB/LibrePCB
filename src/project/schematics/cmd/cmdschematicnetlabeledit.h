@@ -34,7 +34,7 @@
  ****************************************************************************************/
 
 namespace project {
-class SchematicNetLabel;
+class SI_NetLabel;
 class NetSignal;
 }
 
@@ -52,7 +52,7 @@ class CmdSchematicNetLabelEdit final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit CmdSchematicNetLabelEdit(SchematicNetLabel& netlabel, UndoCommand* parent = 0) throw (Exception);
+        explicit CmdSchematicNetLabelEdit(SI_NetLabel& netlabel, UndoCommand* parent = 0) throw (Exception);
         ~CmdSchematicNetLabelEdit() noexcept;
 
         // Setters
@@ -70,7 +70,7 @@ class CmdSchematicNetLabelEdit final : public UndoCommand
     private:
 
         // Attributes from the constructor
-        SchematicNetLabel& mNetLabel;
+        SI_NetLabel& mNetLabel;
 
         // Misc
         NetSignal* mOldNetSignal;

@@ -140,7 +140,7 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
          *
          * @param list          The list which contains all locales and their translations
          *                      (created with #readLocaleDomNodes())
-         * @param locales       The locale you want to read (for example "de_CH") must be
+         * @param localeOrder   The locale you want to read (for example "de_CH") must be
          *                      on top (index 0) of this list. To use fallback locales,
          *                      the list can have more than one item (order is important!).
          * @param usedLocale    The locale which was really used (locale of the returned string)

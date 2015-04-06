@@ -106,7 +106,6 @@ SOURCES += \
     project/circuit/cmd/cmdnetsignalremove.cpp \
     common/undocommand.cpp \
     common/undostack.cpp \
-    project/schematics/symbolinstance.cpp \
     project/schematics/schematicpagesdock.cpp \
     common/file_io/smartinifile.cpp \
     project/schematics/cmd/cmdschematicadd.cpp \
@@ -122,8 +121,6 @@ SOURCES += \
     project/schematics/fsm/ses_drawellipse.cpp \
     project/schematics/fsm/ses_drawwire.cpp \
     project/schematics/fsm/ses_addcomponents.cpp \
-    project/schematics/schematicnetpoint.cpp \
-    project/schematics/schematicnetline.cpp \
     project/schematics/cmd/cmdschematicnetpointadd.cpp \
     project/schematics/cmd/cmdschematicnetpointremove.cpp \
     project/schematics/cmd/cmdschematicnetlineadd.cpp \
@@ -142,9 +139,6 @@ SOURCES += \
     library/symbolpin.cpp \
     library/symbolpolygon.cpp \
     library/symboltext.cpp \
-    library/symbolgraphicsitem.cpp \
-    project/schematics/symbolpininstance.cpp \
-    library/symbolpingraphicsitem.cpp \
     common/version.cpp \
     workspace/settings/items/wsi_librarynormorder.cpp \
     project/schematics/cmd/cmdsymbolinstanceadd.cpp \
@@ -171,7 +165,6 @@ SOURCES += \
     project/dialogs/addgencompdialog.cpp \
     common/alignment.cpp \
     project/schematics/fsm/ses_addnetlabel.cpp \
-    project/schematics/schematicnetlabel.cpp \
     project/schematics/cmd/cmdschematicnetlabeladd.cpp \
     project/schematics/cmd/cmdschematicnetlabelremove.cpp \
     project/schematics/cmd/cmdschematicnetlabeledit.cpp \
@@ -197,7 +190,19 @@ SOURCES += \
     project/circuit/cmd/cmdgencompattrinstedit.cpp \
     project/settings/projectsettings.cpp \
     project/settings/projectsettingsdialog.cpp \
-    project/settings/cmd/cmdprojectsettingschange.cpp
+    project/settings/cmd/cmdprojectsettingschange.cpp \
+    project/schematics/items/si_base.cpp \
+    project/schematics/items/si_netlabel.cpp \
+    project/schematics/items/si_netline.cpp \
+    project/schematics/items/si_netpoint.cpp \
+    project/schematics/items/si_symbol.cpp \
+    project/schematics/items/si_symbolpin.cpp \
+    project/schematics/graphicsitems/sgi_base.cpp \
+    project/schematics/graphicsitems/sgi_netlabel.cpp \
+    project/schematics/graphicsitems/sgi_netline.cpp \
+    project/schematics/graphicsitems/sgi_netpoint.cpp \
+    project/schematics/graphicsitems/sgi_symbol.cpp \
+    project/schematics/graphicsitems/sgi_symbolpin.cpp
 
 HEADERS += \
     common/units/all_length_units.h \
@@ -250,7 +255,6 @@ HEADERS += \
     project/circuit/cmd/cmdnetsignalremove.h \
     common/undocommand.h \
     common/undostack.h \
-    project/schematics/symbolinstance.h \
     project/schematics/schematicpagesdock.h \
     common/file_io/smartinifile.h \
     project/schematics/cmd/cmdschematicadd.h \
@@ -266,8 +270,6 @@ HEADERS += \
     project/schematics/fsm/ses_drawellipse.h \
     project/schematics/fsm/ses_drawwire.h \
     project/schematics/fsm/ses_addcomponents.h \
-    project/schematics/schematicnetpoint.h \
-    project/schematics/schematicnetline.h \
     project/schematics/cmd/cmdschematicnetpointadd.h \
     project/schematics/cmd/cmdschematicnetpointremove.h \
     project/schematics/cmd/cmdschematicnetlineadd.h \
@@ -286,9 +288,6 @@ HEADERS += \
     library/symbolpin.h \
     library/symbolpolygon.h \
     library/symboltext.h \
-    library/symbolgraphicsitem.h \
-    project/schematics/symbolpininstance.h \
-    library/symbolpingraphicsitem.h \
     common/version.h \
     workspace/settings/items/wsi_librarynormorder.h \
     project/schematics/cmd/cmdsymbolinstanceadd.h \
@@ -317,7 +316,6 @@ HEADERS += \
     project/dialogs/addgencompdialog.h \
     common/alignment.h \
     project/schematics/fsm/ses_addnetlabel.h \
-    project/schematics/schematicnetlabel.h \
     project/schematics/cmd/cmdschematicnetlabeladd.h \
     project/schematics/cmd/cmdschematicnetlabelremove.h \
     project/schematics/cmd/cmdschematicnetlabeledit.h \
@@ -343,7 +341,19 @@ HEADERS += \
     project/circuit/cmd/cmdgencompattrinstedit.h \
     project/settings/projectsettings.h \
     project/settings/projectsettingsdialog.h \
-    project/settings/cmd/cmdprojectsettingschange.h
+    project/settings/cmd/cmdprojectsettingschange.h \
+    project/schematics/items/si_base.h \
+    project/schematics/items/si_netlabel.h \
+    project/schematics/items/si_netline.h \
+    project/schematics/items/si_netpoint.h \
+    project/schematics/items/si_symbol.h \
+    project/schematics/items/si_symbolpin.h \
+    project/schematics/graphicsitems/sgi_base.h \
+    project/schematics/graphicsitems/sgi_netlabel.h \
+    project/schematics/graphicsitems/sgi_netline.h \
+    project/schematics/graphicsitems/sgi_netpoint.h \
+    project/schematics/graphicsitems/sgi_symbol.h \
+    project/schematics/graphicsitems/sgi_symbolpin.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \

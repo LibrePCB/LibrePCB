@@ -23,7 +23,7 @@
 
 #include <QtCore>
 #include "cmdsymbolinstanceedit.h"
-#include "../symbolinstance.h"
+#include "../items/si_symbol.h"
 
 namespace project {
 
@@ -31,8 +31,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSymbolInstanceEdit::CmdSymbolInstanceEdit(SymbolInstance& symbol, UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Edit symbol instance"), parent), mSymbolInstance(symbol),
+CmdSymbolInstanceEdit::CmdSymbolInstanceEdit(SI_Symbol& symbol, UndoCommand* parent) throw (Exception) :
+    UndoCommand(tr("Edit symbol instance"), parent), mSymbol(symbol),
     mOldPos(symbol.getPosition()), mNewPos(mOldPos),
     mOldRotation(symbol.getAngle()), mNewRotation(mOldRotation)
 {
@@ -42,8 +42,8 @@ CmdSymbolInstanceEdit::~CmdSymbolInstanceEdit() noexcept
 {
     if ((mRedoCount == 0) && (mUndoCount == 0))
     {
-        mSymbolInstance.setPosition(mOldPos);
-        mSymbolInstance.setAngle(mOldRotation);
+        mSymbol.setPosition(mOldPos);
+        mSymbol.setAngle(mOldRotation);
     }
 }
 
@@ -55,21 +55,21 @@ void CmdSymbolInstanceEdit::setPosition(Point& pos, bool immediate) noexcept
 {
     Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
     mNewPos = pos;
-    if (immediate) mSymbolInstance.setPosition(mNewPos);
+    if (immediate) mSymbol.setPosition(mNewPos);
 }
 
 void CmdSymbolInstanceEdit::setDeltaToStartPos(Point& deltaPos, bool immediate) noexcept
 {
     Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
     mNewPos = mOldPos + deltaPos;
-    if (immediate) mSymbolInstance.setPosition(mNewPos);
+    if (immediate) mSymbol.setPosition(mNewPos);
 }
 
 void CmdSymbolInstanceEdit::setRotation(const Angle& angle, bool immediate) noexcept
 {
     Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
     mNewRotation = angle;
-    if (immediate) mSymbolInstance.setAngle(mNewRotation);
+    if (immediate) mSymbol.setAngle(mNewRotation);
 }
 
 void CmdSymbolInstanceEdit::rotate(const Angle& angle, const Point& center, bool immediate) noexcept
@@ -79,8 +79,8 @@ void CmdSymbolInstanceEdit::rotate(const Angle& angle, const Point& center, bool
     mNewRotation += angle;
     if (immediate)
     {
-        mSymbolInstance.setPosition(mNewPos);
-        mSymbolInstance.setAngle(mNewRotation);
+        mSymbol.setPosition(mNewPos);
+        mSymbol.setAngle(mNewRotation);
     }
 }
 
@@ -92,14 +92,14 @@ void CmdSymbolInstanceEdit::redo() throw (Exception)
 {
     try
     {
-        mSymbolInstance.setPosition(mNewPos);
-        mSymbolInstance.setAngle(mNewRotation);
+        mSymbol.setPosition(mNewPos);
+        mSymbol.setAngle(mNewRotation);
         UndoCommand::redo();
     }
     catch (Exception &e)
     {
-        mSymbolInstance.setPosition(mOldPos);
-        mSymbolInstance.setAngle(mOldRotation);
+        mSymbol.setPosition(mOldPos);
+        mSymbol.setAngle(mOldRotation);
         throw;
     }
 }
@@ -108,14 +108,14 @@ void CmdSymbolInstanceEdit::undo() throw (Exception)
 {
     try
     {
-        mSymbolInstance.setPosition(mOldPos);
-        mSymbolInstance.setAngle(mOldRotation);
+        mSymbol.setPosition(mOldPos);
+        mSymbol.setAngle(mOldRotation);
         UndoCommand::undo();
     }
     catch (Exception &e)
     {
-        mSymbolInstance.setPosition(mNewPos);
-        mSymbolInstance.setAngle(mNewRotation);
+        mSymbol.setPosition(mNewPos);
+        mSymbol.setAngle(mNewRotation);
         throw;
     }
 }

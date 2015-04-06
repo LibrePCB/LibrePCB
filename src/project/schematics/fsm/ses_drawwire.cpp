@@ -32,20 +32,19 @@
 #include "../../circuit/netclass.h"
 #include "../../circuit/netsignal.h"
 #include "../../circuit/cmd/cmdnetsignaladd.h"
-#include "../schematicnetpoint.h"
+#include "../items/si_netpoint.h"
 #include "../cmd/cmdschematicnetpointadd.h"
 #include "../cmd/cmdschematicnetlineadd.h"
 #include "../schematic.h"
-#include "../../../library/symbolpingraphicsitem.h"
 #include "../../../library/symbolpin.h"
-#include "../symbolinstance.h"
-#include "../symbolpininstance.h"
+#include "../items/si_symbol.h"
+#include "../items/si_symbolpin.h"
 #include "../../circuit/gencompsignalinstance.h"
 #include "../../circuit/cmd/cmdgencompsiginstsetnetsignal.h"
 #include "../../circuit/cmd/cmdnetclassadd.h"
 #include "../cmd/cmdschematicnetlineremove.h"
 #include "../cmd/cmdschematicnetpointremove.h"
-#include "../schematicnetline.h"
+#include "../items/si_netline.h"
 #include "../cmd/cmdschematicnetpointedit.h"
 #include "../../circuit/cmd/cmdnetsignalremove.h"
 #include "../../circuit/cmd/cmdnetsignaledit.h"
@@ -334,7 +333,7 @@ SES_Base::ProcRetVal SES_DrawWire::processPositioningSceneEvent(SEE_Base* event)
 }
 
 bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,
-                                    SchematicNetPoint* fixedPoint) noexcept
+                                    SI_NetPoint* fixedPoint) noexcept
 {
     try
     {
@@ -349,7 +348,7 @@ bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,
         // check if the fixed netpoint does already exist in the schematic
         if (!fixedPoint)
         {
-            QList<SchematicNetPoint*> pointsUnderCursor;
+            QList<SI_NetPoint*> pointsUnderCursor;
             schematic.getNetPointsAtScenePos(pointsUnderCursor, pos);
             if (!pointsUnderCursor.isEmpty()) mFixedNetPoint = pointsUnderCursor.first();
         }
@@ -366,7 +365,7 @@ bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,
         else
         {
             // look whether there is a symbol pin under the cursor
-            QList<SymbolPinInstance*> pinsUnderCursor;
+            QList<SI_SymbolPin*> pinsUnderCursor;
             schematic.getPinsAtScenePos(pinsUnderCursor, pos);
 
             // check if the pin's signal forces a net name
@@ -422,9 +421,7 @@ bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,
                 Q_ASSERT(!i->getNetSignal()); if (i->getNetSignal()) throw LogicError(__FILE__, __LINE__);
                 CmdGenCompSigInstSetNetSignal* cmdSetSignal = new CmdGenCompSigInstSetNetSignal(*i, netsignal);
                 mProject.getUndoStack().appendToCommand(cmdSetSignal);
-                cmdNetPointAdd1 = new CmdSchematicNetPointAdd(schematic,
-                    pinsUnderCursor.first()->getSymbolInstance(),
-                    pinsUnderCursor.first()->getSymbolPin().getUuid());
+                cmdNetPointAdd1 = new CmdSchematicNetPointAdd(schematic, *pinsUnderCursor.first());
             }
             else
             {
@@ -513,14 +510,14 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
         }
 
         // combine all netpoints of the same type at cursor position (result: mPositioningNetPoint2)
-        QList<SchematicNetPoint*> pointsUnderCursor;
+        QList<SI_NetPoint*> pointsUnderCursor;
         schematic.getNetPointsAtScenePos(pointsUnderCursor, pos);
-        foreach (SchematicNetPoint* netpoint, pointsUnderCursor)
+        foreach (SI_NetPoint* netpoint, pointsUnderCursor)
         {
             if (netpoint == mFixedNetPoint) continue;
             if (netpoint == mPositioningNetPoint2) continue;
             if (netpoint->getNetSignal() != mPositioningNetPoint2->getNetSignal()) continue;
-            foreach (SchematicNetLine* netline, netpoint->getLines())
+            foreach (SI_NetLine* netline, netpoint->getLines())
             {
                 auto start = (&netline->getStartPoint() == netpoint) ? mPositioningNetPoint2 : &netline->getStartPoint();
                 auto end = (&netline->getEndPoint() == netpoint) ? mPositioningNetPoint2 : &netline->getEndPoint();
@@ -552,7 +549,7 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
         pointsUnderCursor.removeOne(mPositioningNetPoint2);
         if (pointsUnderCursor.count() == 1)
         {
-            SchematicNetPoint* pointUnderCursor = pointsUnderCursor.first();
+            SI_NetPoint* pointUnderCursor = pointsUnderCursor.first();
             Q_ASSERT(mPositioningNetPoint2->getNetSignal() != pointUnderCursor->getNetSignal());
             // determine the resulting netsignal
             NetSignal* originalSignal = nullptr;
@@ -597,7 +594,7 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
                 auto cmd = new CmdGenCompSigInstSetNetSignal(*signal, combinedSignal);
                 mProject.getUndoStack().appendToCommand(cmd);
             }
-            foreach (SchematicNetPoint* point, originalSignal->getNetPoints())
+            foreach (SI_NetPoint* point, originalSignal->getNetPoints())
             {
                 auto cmd = new CmdSchematicNetPointEdit(*point);
                 cmd->setNetSignal(*combinedSignal);
@@ -630,11 +627,11 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
         else if (pointsUnderCursor.count() == 0)
         {
             // check if a pin is under the cursor
-            QList<SymbolPinInstance*> pinsUnderCursor;
+            QList<SI_SymbolPin*> pinsUnderCursor;
             schematic.getPinsAtScenePos(pinsUnderCursor, pos);
             if (pinsUnderCursor.count() == 1)
             {
-                SymbolPinInstance* pin = pinsUnderCursor.first();
+                SI_SymbolPin* pin = pinsUnderCursor.first();
 
                 // rename the net signal if required
                 NetSignal* netsignal = mPositioningNetPoint2->getNetSignal();
@@ -650,7 +647,7 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
                             auto cmd = new CmdGenCompSigInstSetNetSignal(*signal, newNetsignal);
                             mProject.getUndoStack().appendToCommand(cmd);
                         }
-                        foreach (SchematicNetPoint* point, netsignal->getNetPoints())
+                        foreach (SI_NetPoint* point, netsignal->getNetPoints())
                         {
                             auto cmd = new CmdSchematicNetPointEdit(*point);
                             cmd->setNetSignal(*newNetsignal);
@@ -677,8 +674,7 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
                 auto cmd3 = new CmdSchematicNetPointRemove(schematic, *mPositioningNetPoint2);
                 mProject.getUndoStack().appendToCommand(cmd3);
                 // add a new netpoint and netline to the pin
-                auto cmd4 = new CmdSchematicNetPointAdd(schematic,
-                    pin->getSymbolInstance(), pin->getSymbolPin().getUuid());
+                auto cmd4 = new CmdSchematicNetPointAdd(schematic, *pin);
                 mProject.getUndoStack().appendToCommand(cmd4);
                 mPositioningNetPoint2 = cmd4->getNetPoint();
                 auto cmd5 = new CmdSchematicNetLineAdd(schematic,

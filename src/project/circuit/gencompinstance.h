@@ -40,7 +40,7 @@ namespace project {
 class Circuit;
 class GenCompAttributeInstance;
 class GenCompSignalInstance;
-class SymbolInstance;
+class SI_Symbol;
 class ErcMsg;
 }
 
@@ -76,7 +76,7 @@ class GenCompInstance : public QObject, public IF_AttributeProvider,
         const QUuid& getUuid() const noexcept {return mUuid;}
         const QString& getName() const noexcept {return mName;}
         const QString& getValue() const noexcept {return mValue;}
-        uint getPlacedSymbolsCount() const noexcept {return mSymbolInstances.count();}
+        uint getPlacedSymbolsCount() const noexcept {return mSymbols.count();}
         uint getUnplacedSymbolsCount() const noexcept;
         uint getUnplacedRequiredSymbolsCount() const noexcept;
         uint getUnplacedOptionalSymbolsCount() const noexcept;
@@ -122,10 +122,8 @@ class GenCompInstance : public QObject, public IF_AttributeProvider,
         // General Methods
         void addToCircuit() throw (Exception);
         void removeFromCircuit() throw (Exception);
-        void registerSymbolInstance(const QUuid& itemUuid, const QUuid& symbolUuid,
-                                    const SymbolInstance* instance) throw (Exception);
-        void unregisterSymbolInstance(const QUuid& itemUuid, const SymbolInstance* symbol)
-                                      throw (Exception);
+        void registerSymbol(const SI_Symbol& symbol) throw (Exception);
+        void unregisterSymbol(const SI_Symbol& symbol) throw (Exception);
         XmlDomElement* serializeToXmlDomElement() const throw (Exception);
 
         // Helper Methods
@@ -183,15 +181,14 @@ class GenCompInstance : public QObject, public IF_AttributeProvider,
         // Misc
 
         /**
-         * @brief All registered symbol instances (must be empty if this generic component
-         *        instance is not added to circuit)
+         * @brief All registered symbols
          *
          * - Key:   UUID of the symbol variant item (library#GenCompSymbVarItem)
-         * - Value: Pointer to the registered symbol instance
+         * - Value: Pointer to the registered symbol
          *
-         * @see #registerSymbolInstance(), #unregisterSymbolInstance()
+         * @see #registerSymbol(), #unregisterSymbol()
          */
-        QHash<QUuid, const SymbolInstance*> mSymbolInstances;
+        QHash<QUuid, const SI_Symbol*> mSymbols;
 
         /// @brief The ERC message for unplaced required symbols of this generic component
         QScopedPointer<ErcMsg> mErcMsgUnplacedRequiredSymbols;

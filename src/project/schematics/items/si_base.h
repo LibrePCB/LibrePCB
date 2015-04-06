@@ -17,60 +17,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDSCHEMATICNETLINEADD_H
-#define PROJECT_CMDSCHEMATICNETLINEADD_H
+#ifndef PROJECT_SI_BASE_H
+#define PROJECT_SI_BASE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../../../common/undocommand.h"
-#include "../../../common/exceptions.h"
 
 /*****************************************************************************************
- *  Forward Declarations
- ****************************************************************************************/
-
-namespace project {
-class Schematic;
-class SI_NetPoint;
-class SI_NetLine;
-}
-
-/*****************************************************************************************
- *  Class CmdSchematicNetLineAdd
+ *  Class SI_Base
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The CmdSchematicNetLineAdd class
+ * @brief The Schematic Item Base (SI_Base) class
  */
-class CmdSchematicNetLineAdd final : public UndoCommand
+class SI_Base : public QObject
 {
+        Q_OBJECT
+
     public:
 
         // Constructors / Destructor
-        explicit CmdSchematicNetLineAdd(Schematic& schematic, SI_NetPoint& startPoint,
-                                        SI_NetPoint& endPoint, UndoCommand* parent = 0) throw (Exception);
-        ~CmdSchematicNetLineAdd() noexcept;
+        explicit SI_Base() noexcept;
+        virtual ~SI_Base() noexcept;
 
-        // Getters
-        SI_NetLine* getNetLine() const noexcept {return mNetLine;}
-
-        // Inherited from UndoCommand
-        void redo() throw (Exception) override;
-        void undo() throw (Exception) override;
 
     private:
 
-        Schematic& mSchematic;
-        SI_NetPoint& mStartPoint;
-        SI_NetPoint& mEndPoint;
-        SI_NetLine* mNetLine;
+        // make some methods inaccessible...
+        //SI_Base() = delete;
+        SI_Base(const SI_Base& other) = delete;
+        SI_Base& operator=(const SI_Base& rhs) = delete;
 };
 
 } // namespace project
 
-#endif // PROJECT_CMDSCHEMATICNETLINEADD_H
+#endif // PROJECT_SI_BASE_H

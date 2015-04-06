@@ -17,17 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_SYMBOLPINGRAPHICSITEM_H
-#define LIBRARY_SYMBOLPINGRAPHICSITEM_H
+#ifndef PROJECT_SGI_SYMBOL_H
+#define PROJECT_SGI_SYMBOL_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QGraphicsItem>
-#include "../common/exceptions.h"
-#include "../common/cadscene.h"
+#include <QtWidgets>
+#include "sgi_base.h"
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -35,42 +34,44 @@
 
 class SchematicLayer;
 
-namespace library {
-class SymbolPin;
-class SymbolGraphicsItem;
-}
 namespace project {
-class SymbolPinInstance;
+class SI_Symbol;
+}
+
+namespace library {
+class Symbol;
 }
 
 /*****************************************************************************************
- *  Class SymbolPinGraphicsItem
+ *  Class SGI_Symbol
  ****************************************************************************************/
 
-namespace library {
+namespace project {
 
 /**
- * @brief The SymbolPinGraphicsItem class
+ * @brief The SGI_Symbol class
  *
- * @todo The methods SymbolPinGraphicsItem#paint() and
- *       SymbolPinGraphicsItem#updateBoundingRectAndShape() are not yet finished.
+ * @author ubruhin
+ * @date 2014-08-23
  */
-class SymbolPinGraphicsItem final : public QGraphicsItem
+class SGI_Symbol final : public SGI_Base
 {
     public:
 
         // Types
 
         /// to make  qgraphicsitem_cast() working
-        enum {Type = CADScene::Type_SymbolPin};
+        enum {Type = Schematic::Type_Symbol};
 
         // Constructors / Destructor
-        explicit SymbolPinGraphicsItem(SymbolGraphicsItem& symbol, const SymbolPin& pin,
-                                       project::SymbolPinInstance* instance = 0) throw (Exception);
-        ~SymbolPinGraphicsItem() noexcept;
+        explicit SGI_Symbol(SI_Symbol& symbol) noexcept;
+        ~SGI_Symbol() noexcept;
 
         // Getters
-        project::SymbolPinInstance* getPinInstance() const noexcept {return mPinInstance;}
+        SI_Symbol& getSymbol() const noexcept {return mSymbol;}
+
+        // General Methods
+        void updateCacheAndRepaint() noexcept;
 
         // Inherited from QGraphicsItem
         QRectF boundingRect() const noexcept {return mBoundingRect;}
@@ -78,38 +79,28 @@ class SymbolPinGraphicsItem final : public QGraphicsItem
         int type() const {return Type;} ///< to make  qgraphicsitem_cast() working
         void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
 
-        // General Methods
-        void updateCacheAndRepaint() noexcept;
 
     private:
 
         // make some methods inaccessible...
-        SymbolPinGraphicsItem();
-        SymbolPinGraphicsItem(const SymbolPinGraphicsItem& other);
-        SymbolPinGraphicsItem& operator=(const SymbolPinGraphicsItem& rhs);
+        SGI_Symbol() = delete;
+        SGI_Symbol(const SGI_Symbol& other) = delete;
+        SGI_Symbol& operator=(const SGI_Symbol& rhs) = delete;
 
         // Private Methods
-        SchematicLayer* getSchematicLayer(unsigned int id) const noexcept;
+        SchematicLayer* getSchematicLayer(uint id) const noexcept;
 
 
         // General Attributes
-        SymbolGraphicsItem& mSymbolGraphicsItem;
-        const SymbolPin& mPin;
-        project::SymbolPinInstance* mPinInstance;
-        SchematicLayer* mCircleLayer;
-        SchematicLayer* mLineLayer;
-        SchematicLayer* mTextLayer;
+        SI_Symbol& mSymbol;
+        const library::Symbol& mLibSymbol;
+        QFont mFont;
 
         // Cached Attributes
-        QString mText;
-        QFont mFont;
-        bool mRotate180;
-        int mFlags;
         QRectF mBoundingRect;
-        QRectF mTextBoundingRect;
         QPainterPath mShape;
 };
 
-} // namespace library
+} // namespace project
 
-#endif // LIBRARY_SYMBOLPINGRAPHICSITEM_H
+#endif // PROJECT_SGI_SYMBOL_H

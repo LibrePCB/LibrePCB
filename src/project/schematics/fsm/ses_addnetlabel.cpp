@@ -28,11 +28,11 @@
 #include "../../../common/undostack.h"
 #include "../../project.h"
 #include "../../circuit/circuit.h"
-#include "../schematicnetlabel.h"
+#include "../items/si_netlabel.h"
 #include "../cmd/cmdschematicnetlabeladd.h"
 #include "../cmd/cmdschematicnetlabeledit.h"
 #include "../schematic.h"
-#include "../schematicnetline.h"
+#include "../items/si_netline.h"
 
 namespace project {
 
@@ -154,7 +154,6 @@ SES_Base::ProcRetVal SES_AddNetLabel::processSceneEvent(SEE_Base* event) noexcep
         default:
             break;
     }
-
     return PassToParentState;
 }
 
@@ -195,7 +194,7 @@ bool SES_AddNetLabel::updateLabel(Schematic& schematic, const Point& pos) noexce
     try
     {
         // get netline under cursor
-        QList<SchematicNetLine*> lines;
+        QList<SI_NetLine*> lines;
         uint count = schematic.getNetLinesAtScenePos(lines, pos);
         if (count > 0) mEditCmd->setNetSignal(*lines.first()->getNetSignal(), true);
         mEditCmd->setPosition(pos, true);
