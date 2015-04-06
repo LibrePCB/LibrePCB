@@ -40,6 +40,7 @@ class SI_Symbol;
 
 namespace library {
 class Symbol;
+class SymbolText;
 }
 
 /*****************************************************************************************
@@ -91,6 +92,17 @@ class SGI_Symbol final : public SGI_Base
         SchematicLayer* getSchematicLayer(uint id) const noexcept;
 
 
+        // Types
+
+        struct StaticTextProperties_t {
+            QStaticText text;
+            QPointF origin;
+            qreal fontSize;
+            bool rotate180;
+            QRectF textRect;
+        };
+
+
         // General Attributes
         SI_Symbol& mSymbol;
         const library::Symbol& mLibSymbol;
@@ -99,6 +111,7 @@ class SGI_Symbol final : public SGI_Base
         // Cached Attributes
         QRectF mBoundingRect;
         QPainterPath mShape;
+        QHash<const library::SymbolText*, StaticTextProperties_t> mStaticTextProperties;
 };
 
 } // namespace project

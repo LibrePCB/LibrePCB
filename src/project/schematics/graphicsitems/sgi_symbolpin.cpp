@@ -60,6 +60,9 @@ SGI_SymbolPin::SGI_SymbolPin(SI_SymbolPin& pin) noexcept :
     mTextLayer = getSchematicLayer(SchematicLayer::SymbolPinNames);
     Q_ASSERT(mTextLayer);
 
+    mStaticText.setTextFormat(Qt::PlainText);
+    mStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
+
     mFont.setStyleStrategy(QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
     mFont.setStyleHint(QFont::SansSerif);
     mFont.setFamily("Nimbus Sans L");
@@ -80,18 +83,13 @@ SGI_SymbolPin::~SGI_SymbolPin() noexcept
 
 void SGI_SymbolPin::updateCacheAndRepaint() noexcept
 {
-    mText = mPin.getDisplayText();
-
-    Angle absAngle = mLibPin.getAngle() + mPin.getSymbol().getAngle();
-    absAngle.mapTo180deg();
-    mRotate180 = (absAngle <= -Angle::deg90() || absAngle > Angle::deg90());
-
-    mFlags = Qt::AlignVCenter | Qt::TextSingleLine | Qt::TextDontClip;
-    if (mRotate180) mFlags |= Qt::AlignRight; else mFlags |= Qt::AlignLeft;
-
     mShape = QPainterPath();
     mShape.setFillRule(Qt::WindingFill);
     mBoundingRect = QRectF();
+
+    // rotation
+    Angle absAngle = mLibPin.getAngle() + mPin.getSymbol().getAngle();
+    mRotate180 = (absAngle <= -Angle::deg90() || absAngle > Angle::deg90());
 
     // circle
     mShape.addEllipse(-mRadiusPx, -mRadiusPx, 2*mRadiusPx, 2*mRadiusPx);
@@ -104,13 +102,16 @@ void SGI_SymbolPin::updateCacheAndRepaint() noexcept
 
     // text
     qreal x = mLibPin.getLength().toPx() + 4;
-    QFontMetricsF metrics(mFont);
-    QRectF textRect = metrics.boundingRect(QRectF(mRotate180 ? -x : x, 0, 0, 0), mFlags, mText).normalized();
+    mStaticText.setText(mPin.getDisplayText());
+    mStaticText.prepare(QTransform(), mFont);
+    mTextOrigin.setX(mRotate180 ? -x-mStaticText.size().width() : x);
+    mTextOrigin.setY(-mStaticText.size().height()/2);
+    mStaticText.prepare(QTransform().rotate(mRotate180 ? 90 : -90)
+                                    .translate(mTextOrigin.x(), mTextOrigin.y()), mFont);
     if (mRotate180)
-        textRect = QRectF(textRect.top(), textRect.left(), textRect.height(), textRect.width());
+        mTextBoundingRect = QRectF(mTextOrigin.y(), mTextOrigin.x(), mStaticText.size().height(), mStaticText.size().width()).normalized();
     else
-        textRect = QRectF(-textRect.top(), -textRect.left(), -textRect.height(), -textRect.width());
-    mTextBoundingRect = textRect.normalized();
+        mTextBoundingRect = QRectF(mTextOrigin.y(), -mTextOrigin.x()-mStaticText.size().width(), mStaticText.size().height(), mStaticText.size().width()).normalized();
     mBoundingRect = mBoundingRect.united(mTextBoundingRect).normalized();
 
     update();
@@ -147,7 +148,7 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     }
 
     // draw text or filled rect
-    if (!mText.isEmpty())
+    if (!mStaticText.text().isEmpty())
     {
         if ((deviceIsPrinter) || (lod > 1))
         {
@@ -156,8 +157,7 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
             painter->rotate(mRotate180 ? 90 : -90);
             painter->setPen(QPen(mTextLayer->getColor(selected), 0));
             painter->setFont(mFont);
-            qreal x = mLibPin.getLength().toPx() + 4;
-            painter->drawText(QRectF(mRotate180 ? -x : x, 0, 0, 0), mFlags, mText);
+            painter->drawStaticText(mTextOrigin, mStaticText);
             painter->restore();
         }
         else

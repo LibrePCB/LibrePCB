@@ -85,61 +85,52 @@ void SGI_Symbol::updateCacheAndRepaint() noexcept
     }
 
     // texts
+    mStaticTextProperties.clear();
     foreach (const library::SymbolText* text, mLibSymbol.getTexts())
     {
-        // calculate font metrics
-        mFont.setPixelSize(50);
-        QFontMetricsF metrics(mFont);
-        qreal factor = 0.8*text->getHeight().toPx() / metrics.height();
-
-        // check rotation
-        Angle absAngle = text->getAngle() + mSymbol.getAngle();
-        absAngle.mapTo180deg();
-        bool rotate180 = (absAngle < -Angle::deg90() || absAngle >= Angle::deg90());
-
-        // calculate text rect
-        qreal x, y;
-        if (text->getAlign().getV() == VAlign::top())
-        {
-            x = text->getPosition().toPxQPointF().x()/factor;
-            y = text->getPosition().toPxQPointF().y()/factor+0.1*text->getHeight().toPx()/factor;
-        }
-        else if (text->getAlign().getV() == VAlign::bottom())
-        {
-            x = text->getPosition().toPxQPointF().x()/factor;
-            y = text->getPosition().toPxQPointF().y()/factor-0.1*text->getHeight().toPx()/factor;
-        }
-        else
-        {
-            x = text->getPosition().toPxQPointF().x()/factor;
-            y = text->getPosition().toPxQPointF().y()/factor;
-        }
-        if (rotate180)
-        {
-            x = -x;
-            y = -y;
-        }
-
-        // get flags
-        int flags = text->getAlign().toQtAlign() | Qt::TextDontClip;
-        if (rotate180)
-        {
-            if (flags & Qt::AlignLeft) {flags &= ~Qt::AlignLeft; flags |= Qt::AlignRight;}
-            else if (flags & Qt::AlignRight) {flags &= ~Qt::AlignRight; flags |= Qt::AlignLeft;}
-            if (flags & Qt::AlignBottom) {flags &= ~Qt::AlignBottom; flags |= Qt::AlignTop;}
-            else if (flags & Qt::AlignTop) {flags &= ~Qt::AlignTop; flags |= Qt::AlignBottom;}
-        }
-
         // get the text to display
         QString textStr = text->getText();
         mSymbol.replaceVariablesWithAttributes(textStr, true);
 
-        QRectF textRect = metrics.boundingRect(QRectF(x, y, 0, 0), flags, textStr).normalized();
-        if (rotate180)
-            textRect = QRectF(-textRect.left() * factor, -textRect.top() * factor, -textRect.width() * factor, -textRect.height() * factor).normalized();
+        // create static text properties
+        StaticTextProperties_t props;
+        props.text.setPerformanceHint(QStaticText::AggressiveCaching);
+        props.text.setText(textStr.replace("\n", "<br>"));
+
+        // calculate font metrics
+        mFont.setPointSizeF(text->getHeight().toPx());
+        props.text.prepare(QTransform(), mFont);
+        props.fontSize = text->getHeight().toPx()*0.8*text->getHeight().toPx()/props.text.size().height();
+        mFont.setPointSizeF(props.fontSize);
+        props.text.prepare(QTransform(), mFont);
+
+        // check rotation
+        Angle absAngle = text->getAngle() + mSymbol.getAngle();
+        absAngle.mapTo180deg();
+        props.rotate180 = (absAngle < -Angle::deg90() || absAngle >= Angle::deg90());
+
+        // calculate text position
+        if (text->getAlign().getV() == VAlign::top())
+            props.origin.setY(text->getPosition().toPxQPointF().y());
+        else if (text->getAlign().getV() == VAlign::bottom())
+            props.origin.setY(text->getPosition().toPxQPointF().y()-props.text.size().height());
         else
-            textRect = QRectF(textRect.left() * factor, textRect.top() * factor, textRect.width() * factor, textRect.height() * factor).normalized();
-        mBoundingRect = mBoundingRect.united(textRect);
+            props.origin.setY(text->getPosition().toPxQPointF().y()-props.text.size().height()/2);
+        if (text->getAlign().getH() == HAlign::left())
+            props.origin.setX(text->getPosition().toPxQPointF().x());
+        else if (text->getAlign().getH() == HAlign::right())
+            props.origin.setX(text->getPosition().toPxQPointF().x()-props.text.size().width());
+        else
+            props.origin.setX(text->getPosition().toPxQPointF().x()-props.text.size().width()/2);
+        props.textRect = QRectF(props.origin.x(), props.origin.y(), props.text.size().width(), props.text.size().height());
+        if (props.rotate180)
+        {
+            props.origin.setX(-props.origin.x()-props.text.size().width());
+            props.origin.setY(-props.origin.y()-props.text.size().height());
+        }
+
+        mStaticTextProperties.insert(text, props);
+        mBoundingRect = mBoundingRect.united(props.textRect);
     }
 
     update();
@@ -207,74 +198,29 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
         // get layer
         layer = getSchematicLayer(text->getLayerId()); if (!layer) continue;
 
-        // calculate font metrics
-        mFont.setPixelSize(50);
-        QFontMetricsF metrics(mFont);
-        qreal factor = 0.8*text->getHeight().toPx() / metrics.height();
-
-        // check rotation
-        Angle absAngle = text->getAngle() + mSymbol.getAngle();
-        absAngle.mapTo180deg();
-        bool rotate180 = (absAngle < -Angle::deg90() || absAngle >= Angle::deg90());
-
-        // calculate text rect
-        qreal x, y;
-        if (text->getAlign().getV() == VAlign::top())
-        {
-            x = text->getPosition().toPxQPointF().x()/factor;
-            y = text->getPosition().toPxQPointF().y()/factor+0.1*text->getHeight().toPx()/factor;
-        }
-        else if (text->getAlign().getV() == VAlign::bottom())
-        {
-            x = text->getPosition().toPxQPointF().x()/factor;
-            y = text->getPosition().toPxQPointF().y()/factor-0.1*text->getHeight().toPx()/factor;
-        }
-        else
-        {
-            x = text->getPosition().toPxQPointF().x()/factor;
-            y = text->getPosition().toPxQPointF().y()/factor;
-        }
-        if (rotate180)
-        {
-            x = -x;
-            y = -y;
-        }
-
-        // get flags
-        int flags = text->getAlign().toQtAlign() | Qt::TextDontClip;
-        if (rotate180)
-        {
-            if (flags & Qt::AlignLeft) {flags &= ~Qt::AlignLeft; flags |= Qt::AlignRight;}
-            else if (flags & Qt::AlignRight) {flags &= ~Qt::AlignRight; flags |= Qt::AlignLeft;}
-            if (flags & Qt::AlignBottom) {flags &= ~Qt::AlignBottom; flags |= Qt::AlignTop;}
-            else if (flags & Qt::AlignTop) {flags &= ~Qt::AlignTop; flags |= Qt::AlignBottom;}
-        }
-
-        // get the text to display
-        QString textStr = text->getText();
-        mSymbol.replaceVariablesWithAttributes(textStr, true);
+        // get static text properties
+        const StaticTextProperties_t& props = mStaticTextProperties.value(text);
+        mFont.setPointSizeF(props.fontSize);
 
         // draw text or rect
-        painter->save();
-        painter->scale(factor, factor);
-        if (rotate180)
-            painter->rotate(text->getAngle().toDeg() + (qreal)180);
-        else
-            painter->rotate(text->getAngle().toDeg());
         if ((deviceIsPrinter) || (lod * text->getHeight().toPx() > 10))
         {
             // draw text
+            painter->save();
+            if (props.rotate180)
+                painter->rotate(text->getAngle().toDeg() + 180);
+            else
+                painter->rotate(text->getAngle().toDeg());
             painter->setPen(QPen(layer->getColor(selected), 0));
             painter->setFont(mFont);
-            painter->drawText(QRectF(x, y, 0, 0), flags, textStr);
+            painter->drawStaticText(props.origin, props.text);
+            painter->restore();
         }
         else
         {
             // fill rect
-            QRectF textRect = metrics.boundingRect(QRectF(x, y, 0, 0), flags, textStr);
-            painter->fillRect(textRect, QBrush(layer->getColor(selected), Qt::Dense5Pattern));
+            painter->fillRect(props.textRect, QBrush(layer->getColor(selected), Qt::Dense5Pattern));
         }
-        painter->restore();
     }
 
     // draw origin cross

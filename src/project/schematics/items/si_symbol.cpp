@@ -152,6 +152,7 @@ void SI_Symbol::setPosition(const Point& newPos) throw (Exception)
 {
     mPosition = newPos;
     mGraphicsItem->setPos(newPos.toPxQPointF());
+    mGraphicsItem->updateCacheAndRepaint();
     foreach (SI_SymbolPin* pin, mPins)
         pin->updateNetPointPosition();
 }
@@ -160,6 +161,7 @@ void SI_Symbol::setAngle(const Angle& newAngle) throw (Exception)
 {
     mAngle = newAngle;
     mGraphicsItem->setRotation(newAngle.toDeg());
+    mGraphicsItem->updateCacheAndRepaint();
     foreach (SI_SymbolPin* pin, mPins)
         pin->updateNetPointPosition();
 }

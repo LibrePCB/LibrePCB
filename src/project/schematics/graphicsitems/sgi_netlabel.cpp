@@ -52,6 +52,9 @@ SGI_NetLabel::SGI_NetLabel(SI_NetLabel& netlabel) noexcept :
     mTextLayer = mNetLabel.getSchematic().getProject().getSchematicLayer(SchematicLayer::NetLabels);
     Q_ASSERT(mTextLayer);
 
+    mStaticText.setTextFormat(Qt::PlainText);
+    mStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
+
     mFont.setStyleStrategy(QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
     mFont.setStyleHint(QFont::TypeWriter);
     mFont.setFamily("Monospace");
@@ -71,6 +74,34 @@ SGI_NetLabel::~SGI_NetLabel() noexcept
 {
 }
 
+/*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+void SGI_NetLabel::updateCacheAndRepaint() noexcept
+{
+    prepareGeometryChange();
+
+    mRotate180 = (mNetLabel.getAngle() < -Angle::deg90() || mNetLabel.getAngle() >= Angle::deg90());
+
+    mStaticText.setText(mNetLabel.getNetSignal().getName());
+    mStaticText.prepare(QTransform(), mFont);
+    mTextOrigin.setX(mRotate180 ? -mStaticText.size().width() : 0);
+    mTextOrigin.setY(mRotate180 ? 0 : -0.5-mStaticText.size().height());
+    mStaticText.prepare(QTransform().rotate(mRotate180 ? 180 : 0)
+                              .translate(mTextOrigin.x(), mTextOrigin.y()), mFont);
+
+    QRectF rect = QRectF(0, 0, mStaticText.size().width(), -mStaticText.size().height()).normalized();
+    qreal len = sOriginCrossLines[0].length();
+    mBoundingRect = rect.united(QRectF(-len/2, -len/2, len, len)).normalized();
+
+    update();
+}
+
+/*****************************************************************************************
+ *  Inherited from QGraphicsItem
+ ****************************************************************************************/
+
 void SGI_NetLabel::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
     Q_UNUSED(widget);
@@ -89,16 +120,17 @@ void SGI_NetLabel::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     if ((deviceIsPrinter) || (lod > 1))
     {
         // draw text
+        painter->setPen(QPen(mTextLayer->getColor(selected), 0));
+        painter->setFont(mFont);
         if (mRotate180)
         {
             painter->save();
             painter->rotate(180);
-        }
-        painter->setPen(QPen(mTextLayer->getColor(selected), 0));
-        painter->setFont(mFont);
-        painter->drawText(QRectF(0, -0.5, 0, 0), mFlags, mNetLabel.getNetSignal().getName());
-        if (mRotate180)
+            painter->drawStaticText(mTextOrigin, mStaticText);
             painter->restore();
+        }
+        else
+            painter->drawStaticText(mTextOrigin, mStaticText);
     }
     else
     {
@@ -117,27 +149,6 @@ void SGI_NetLabel::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
         painter->drawRect(mBoundingRect);
     }
 #endif
-}
-
-void SGI_NetLabel::updateCacheAndRepaint() noexcept
-{
-    prepareGeometryChange();
-
-    mRotate180 = (mNetLabel.getAngle() < -Angle::deg90() || mNetLabel.getAngle() >= Angle::deg90());
-
-    mFlags = Qt::AlignBottom | Qt::TextSingleLine | Qt::TextDontClip;
-    if (mRotate180) mFlags |= Qt::AlignRight; else mFlags |= Qt::AlignLeft;
-
-    QFontMetricsF metrics(mFont);
-    QRectF rect = metrics.boundingRect(QRectF(0, -0.5, 0, 0), mFlags, mNetLabel.getNetSignal().getName());
-    if (mRotate180)
-        rect = QRectF(-rect.left(), -rect.top(), -rect.width(), -rect.height());
-    else
-        rect = QRectF(rect.left(), rect.top(), rect.width(), rect.height());
-    qreal len = sOriginCrossLines[0].length();
-    mBoundingRect = rect.united(QRectF(-len/2, -len/2, len, len)).normalized();
-
-    update();
 }
 
 /*****************************************************************************************

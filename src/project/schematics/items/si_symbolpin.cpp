@@ -120,6 +120,7 @@ QString SI_SymbolPin::getDisplayText(bool returnGenCompSignalNameIfEmpty,
 
 void SI_SymbolPin::updateNetPointPosition() noexcept
 {
+    mGraphicsItem->updateCacheAndRepaint();
     if (mRegisteredNetPoint)
         mRegisteredNetPoint->setPosition(getPosition());
 }

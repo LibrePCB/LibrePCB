@@ -101,10 +101,11 @@ class SGI_SymbolPin final : public SGI_Base
         qreal mRadiusPx;
 
         // Cached Attributes
-        QString mText;
+        QStaticText mStaticText;
         bool mRotate180;
         int mFlags;
         QRectF mBoundingRect;
+        QPointF mTextOrigin;
         QRectF mTextBoundingRect;
         QPainterPath mShape;
 };

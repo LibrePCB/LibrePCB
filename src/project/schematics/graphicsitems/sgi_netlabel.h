@@ -85,9 +85,10 @@ class SGI_NetLabel final : public SGI_Base
         SchematicLayer* mTextLayer;
 
         // Cached Attributes
+        QStaticText mStaticText;
         QFont mFont;
         bool mRotate180;
-        int mFlags;
+        QPointF mTextOrigin;
         QRectF mBoundingRect;
 
         // Static Stuff
