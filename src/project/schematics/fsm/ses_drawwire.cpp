@@ -48,6 +48,7 @@
 #include "../cmd/cmdschematicnetpointedit.h"
 #include "../../circuit/cmd/cmdnetsignalremove.h"
 #include "../../circuit/cmd/cmdnetsignaledit.h"
+#include "../../../common/gridproperties.h"
 
 namespace project {
 
@@ -248,7 +249,7 @@ SES_Base::ProcRetVal SES_DrawWire::processIdleSceneEvent(SEE_Base* event) noexce
         case QEvent::GraphicsSceneMousePress:
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), mEditorUi.graphicsView->getGridInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos(), mEditor.getGridProperties().getInterval());
             Schematic& schematic = *mEditor.getActiveSchematic();
 
             switch (sceneEvent->button())
@@ -296,7 +297,7 @@ SES_Base::ProcRetVal SES_DrawWire::processPositioningSceneEvent(SEE_Base* event)
         case QEvent::GraphicsSceneMousePress:
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), mEditorUi.graphicsView->getGridInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos(), mEditor.getGridProperties().getInterval());
             switch (sceneEvent->button())
             {
                 case Qt::LeftButton:
@@ -320,7 +321,7 @@ SES_Base::ProcRetVal SES_DrawWire::processPositioningSceneEvent(SEE_Base* event)
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
             Q_ASSERT(sceneEvent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), mEditorUi.graphicsView->getGridInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos(), mEditor.getGridProperties().getInterval());
             updateNetpointPositions(pos);
             return ForceStayInState;
         }

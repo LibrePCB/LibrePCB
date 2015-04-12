@@ -26,9 +26,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include "../units/length.h"
-#include "../units/lengthunit.h"
-#include "../cadview.h"
+#include "../../common/gridproperties.h"
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -55,14 +53,11 @@ class GridSettingsDialog final : public QDialog
     public:
 
         // Constructors / Destructor
-        explicit GridSettingsDialog(CADView::GridType_t type, const Length& interval,
-                                    const LengthUnit& unit, QWidget* parent = 0);
+        explicit GridSettingsDialog(const GridProperties& grid, QWidget* parent = 0);
         ~GridSettingsDialog();
 
         // Getters
-        CADView::GridType_t getGridType() const noexcept {return mType;}
-        const Length& getGridInterval() const noexcept {return mInterval;}
-        const LengthUnit& getUnit() const noexcept {return mUnit;}
+        const GridProperties& getGrid() const noexcept {return mCurrentGrid;}
 
 
     private slots:
@@ -78,9 +73,7 @@ class GridSettingsDialog final : public QDialog
 
     signals:
 
-        void gridTypeChanged(CADView::GridType_t type);
-        void gridIntervalChanged(const Length& interval);
-        void gridIntervalUnitChanged(const LengthUnit& unit);
+        void gridPropertiesChanged(const GridProperties& grid);
 
 
     private:
@@ -96,12 +89,8 @@ class GridSettingsDialog final : public QDialog
 
         // General Attributes
         Ui::GridSettingsDialog* mUi;
-        CADView::GridType_t mInitialType;
-        Length mInitialInterval;
-        LengthUnit mInitialUnit;
-        CADView::GridType_t mType;
-        Length mInterval;
-        LengthUnit mUnit;
+        GridProperties mOriginalGrid;
+        GridProperties mCurrentGrid;
 };
 
 #endif // GRIDSETTINGSDIALOG_H

@@ -28,6 +28,7 @@
 #include "schematiceditorevent.h"
 #include "../schematiceditor.h"
 #include "ui_schematiceditor.h"
+#include "../../../common/units/all_length_units.h"
 
 /*****************************************************************************************
  *  Forward Declarations

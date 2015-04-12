@@ -37,6 +37,7 @@
 #include "../../common/dialogs/gridsettingsdialog.h"
 #include "../dialogs/projectpropertieseditordialog.h"
 #include "../settings/projectsettings.h"
+#include "../../common/gridproperties.h"
 
 namespace project {
 
@@ -46,7 +47,8 @@ namespace project {
 
 SchematicEditor::SchematicEditor(Project& project, bool readOnly) :
     QMainWindow(0), mProject(project), mUi(new Ui::SchematicEditor),
-    mActiveSchematicIndex(-1), mPagesDock(0), mErcMsgDock(0), mFsm(0)
+    mGridProperties(nullptr), mActiveSchematicIndex(-1),
+    mPagesDock(nullptr), mErcMsgDock(nullptr), mFsm(nullptr)
 {
     mUi->setupUi(this);
     mUi->actionSave_Project->setEnabled(!readOnly);
@@ -62,6 +64,10 @@ SchematicEditor::SchematicEditor(Project& project, bool readOnly) :
     addDockWidget(Qt::LeftDockWidgetArea, mPagesDock, Qt::Vertical);
     mErcMsgDock = new ErcMsgDock(mProject);
     addDockWidget(Qt::RightDockWidgetArea, mErcMsgDock, Qt::Vertical);
+
+    // create default grid properties
+    mGridProperties = new GridProperties();
+    mUi->graphicsView->setGridProperties(*mGridProperties);
 
     // connect some actions which are created with the Qt Designer
     connect(mUi->actionSave_Project, &QAction::triggered, &mProject, &Project::saveProject);
@@ -148,7 +154,6 @@ SchematicEditor::SchematicEditor(Project& project, bool readOnly) :
     restoreState(clientSettings.value("schematic_editor/window_state").toByteArray());
 
     // Load first schematic page
-    mUi->graphicsView->setGridType(CADView::GridType_t::Lines);
     if (mProject.getSchematicCount() > 0)
         setActiveSchematicIndex(0);
 
@@ -163,10 +168,11 @@ SchematicEditor::~SchematicEditor()
     clientSettings.setValue("schematic_editor/window_geometry", saveGeometry());
     clientSettings.setValue("schematic_editor/window_state", saveState());
 
-    delete mFsm;                    mFsm = 0;
-    delete mErcMsgDock;             mErcMsgDock = 0;
-    delete mPagesDock;              mPagesDock = 0;
-    delete mUi;                     mUi = 0;
+    delete mFsm;                    mFsm = nullptr;
+    delete mErcMsgDock;             mErcMsgDock = nullptr;
+    delete mPagesDock;              mPagesDock = nullptr;
+    delete mGridProperties;         mGridProperties = nullptr;
+    delete mUi;                     mUi = nullptr;
 }
 
 /*****************************************************************************************
@@ -279,17 +285,12 @@ void SchematicEditor::on_actionRedo_triggered()
 
 void SchematicEditor::on_actionGrid_triggered()
 {
-    GridSettingsDialog dialog(mUi->graphicsView->getGridType(),
-                              mUi->graphicsView->getGridInterval(),
-                              mUi->graphicsView->getGridIntervalUnit(), this);
-
-    connect(&dialog, &GridSettingsDialog::gridTypeChanged,
-            [this](CADView::GridType_t type){mUi->graphicsView->setGridType(type);});
-    connect(&dialog, &GridSettingsDialog::gridIntervalChanged,
-            [this](const Length& interval){mUi->graphicsView->setGridInterval(interval);});
-    connect(&dialog, &GridSettingsDialog::gridIntervalUnitChanged,
-            [this](const LengthUnit& unit){mUi->graphicsView->setGridIntervalUnit(unit);});
-
+    GridSettingsDialog dialog(*mGridProperties, this);
+    connect(&dialog, &GridSettingsDialog::gridPropertiesChanged,
+            [this](const GridProperties& grid)
+            {   *mGridProperties = grid;
+                mUi->graphicsView->setGridProperties(grid);
+            });
     if (dialog.exec())
         mProject.setModifiedFlag();
 }

@@ -202,7 +202,8 @@ SOURCES += \
     project/schematics/graphicsitems/sgi_netline.cpp \
     project/schematics/graphicsitems/sgi_netpoint.cpp \
     project/schematics/graphicsitems/sgi_symbol.cpp \
-    project/schematics/graphicsitems/sgi_symbolpin.cpp
+    project/schematics/graphicsitems/sgi_symbolpin.cpp \
+    common/gridproperties.cpp
 
 HEADERS += \
     common/units/all_length_units.h \
@@ -353,7 +354,8 @@ HEADERS += \
     project/schematics/graphicsitems/sgi_netline.h \
     project/schematics/graphicsitems/sgi_netpoint.h \
     project/schematics/graphicsitems/sgi_symbol.h \
-    project/schematics/graphicsitems/sgi_symbolpin.h
+    project/schematics/graphicsitems/sgi_symbolpin.h \
+    common/gridproperties.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \

@@ -33,6 +33,7 @@
  ****************************************************************************************/
 
 class CADScene;
+class GridProperties;
 
 /*****************************************************************************************
  *  Class CADView
@@ -49,10 +50,7 @@ class CADView : public QGraphicsView
 {
         Q_OBJECT
 
-    public:
-
-        // Enums
-        enum class GridType_t {Off, Lines, Dots};
+    public:;
 
         // Constructors / Destructor
         explicit CADView(QWidget* parent = 0);
@@ -61,18 +59,11 @@ class CADView : public QGraphicsView
         // Getters
         CADScene*           getCadScene()           const;
         QRectF              getVisibleSceneRect()   const;
-        GridType_t          getGridType()           const {return mGridType;}
-        const QColor&       getGridColor()          const {return mGridColor;}
-        const Length&       getGridInterval()       const {return mGridInterval;}
-        const LengthUnit&   getGridIntervalUnit()   const {return mGridIntervalUnit;}
 
         // Setters
         void setCadScene(CADScene* scene); ///< Use always this method instead of QGraphicsView::setScene()!
         void setVisibleSceneRect(const QRectF& rect);
-        void setGridType(GridType_t type);
-        void setGridColor(const QColor& color);
-        void setGridInterval(const Length& newInterval);
-        void setGridIntervalUnit(const LengthUnit& newUnit);
+        void setGridProperties(const GridProperties& properties) noexcept;
         void setOriginCrossVisible(bool visible) noexcept;
         void setPaperSize(const Point& size) noexcept;
         void setPositionLabelVisible(bool visible) noexcept;
@@ -117,10 +108,8 @@ class CADView : public QGraphicsView
 
 
         // Attributes
-        GridType_t mGridType;
+        GridProperties* mGridProperties;
         QColor mGridColor;
-        Length mGridInterval;
-        LengthUnit mGridIntervalUnit;
         bool mGridBoundedToPageBorders;
         bool mOriginCrossVisible;
         QColor mOriginCrossColor;

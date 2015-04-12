@@ -36,6 +36,7 @@
 #include "../items/si_symbol.h"
 #include "../schematic.h"
 #include "../../dialogs/addgencompdialog.h"
+#include "../../../common/gridproperties.h"
 
 namespace project {
 
@@ -182,7 +183,7 @@ SES_Base::ProcRetVal SES_AddComponents::processSceneEvent(SEE_Base* event) noexc
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
             Q_ASSERT(sceneEvent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), mEditorUi.graphicsView->getGridInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos(), mEditor.getGridProperties().getInterval());
             // set temporary position of the current symbol
             Q_ASSERT(mCurrentSymbolEditCommand);
             mCurrentSymbolEditCommand->setPosition(pos, true);
@@ -194,7 +195,7 @@ SES_Base::ProcRetVal SES_AddComponents::processSceneEvent(SEE_Base* event) noexc
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
             Q_ASSERT(sceneEvent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), mEditorUi.graphicsView->getGridInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos(), mEditor.getGridProperties().getInterval());
             switch (sceneEvent->button())
             {
                 case Qt::LeftButton:
@@ -288,7 +289,7 @@ void SES_AddComponents::startAddingComponent(const QUuid& genComp,
     QPoint boundedCursorPos = QPoint(qBound(0, cursorPos.x(), mEditorUi.graphicsView->width()),
                                      qBound(0, cursorPos.y(), mEditorUi.graphicsView->height()));
     Point pos = Point::fromPx(mEditorUi.graphicsView->mapToScene(boundedCursorPos),
-                              mEditorUi.graphicsView->getGridInterval());
+                              mEditor.getGridProperties().getInterval());
 
     if (genComp.isNull() || symbVar.isNull())
     {

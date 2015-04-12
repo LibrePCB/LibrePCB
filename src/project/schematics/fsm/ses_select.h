@@ -26,7 +26,6 @@
 
 #include <QtCore>
 #include "ses_base.h"
-#include "../../../common/units/all_length_units.h"
 
 /*****************************************************************************************
  *  Forward Declarations

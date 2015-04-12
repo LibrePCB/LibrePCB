@@ -53,6 +53,7 @@
 #include "../schematicclipboard.h"
 #include "../cmd/cmdsymbolinstanceadd.h"
 #include "../cmd/cmdschematicnetlabelremove.h"
+#include "../../../common/gridproperties.h"
 
 namespace project {
 
@@ -382,7 +383,7 @@ SES_Base::ProcRetVal SES_Select::processSubStateMovingSceneEvent(SEE_Base* event
             Q_CHECK_PTR(sceneEvent); if (!sceneEvent) break;
             Q_CHECK_PTR(schematic); if (!schematic) break;
             Point delta = Point::fromPx(sceneEvent->scenePos()) - mMoveStartPos;
-            delta.mapToGrid(mEditorUi.graphicsView->getGridInterval());
+            delta.mapToGrid(mEditor.getGridProperties().getInterval());
 
             switch (sceneEvent->button())
             {
@@ -440,7 +441,7 @@ SES_Base::ProcRetVal SES_Select::processSubStateMovingSceneEvent(SEE_Base* event
 
             // get delta position
             Point delta = Point::fromPx(sceneEvent->scenePos()) - mMoveStartPos;
-            delta.mapToGrid(mEditorUi.graphicsView->getGridInterval());
+            delta.mapToGrid(mEditor.getGridProperties().getInterval());
             if (delta == mLastMouseMoveDeltaPos) break; // do not move any items
 
             // move selected elements
@@ -536,7 +537,7 @@ bool SES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
         foreach (SI_NetLabel* label, netlabels)
             center += label->getPosition();
         center /= count;
-        center.mapToGrid(mEditorUi.graphicsView->getGridInterval());
+        center.mapToGrid(mEditor.getGridProperties().getInterval());
     }
 
     bool commandActive = false;

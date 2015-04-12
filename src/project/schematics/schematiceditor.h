@@ -32,9 +32,7 @@
  *  Forward Declarations
  ****************************************************************************************/
 
-namespace Ui {
-class SchematicEditor;
-}
+class GridProperties;
 
 namespace project {
 class Project;
@@ -42,6 +40,10 @@ class Schematic;
 class SchematicPagesDock;
 class ErcMsgDock;
 class SES_FSM;
+}
+
+namespace Ui {
+class SchematicEditor;
 }
 
 /*****************************************************************************************
@@ -67,6 +69,7 @@ class SchematicEditor : public QMainWindow, public IF_CADSceneEventHandler
         Project& getProject() const noexcept {return mProject;}
         int getActiveSchematicIndex() const noexcept {return mActiveSchematicIndex;}
         Schematic* getActiveSchematic() const noexcept;
+        const GridProperties& getGridProperties() const noexcept {return *mGridProperties;}
 
         // Setters
         bool setActiveSchematicIndex(int index) noexcept;
@@ -112,6 +115,7 @@ class SchematicEditor : public QMainWindow, public IF_CADSceneEventHandler
         // General Attributes
         Project& mProject;
         Ui::SchematicEditor* mUi;
+        GridProperties* mGridProperties;
 
         int mActiveSchematicIndex;
 

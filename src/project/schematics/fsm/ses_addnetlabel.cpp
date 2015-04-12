@@ -33,6 +33,7 @@
 #include "../cmd/cmdschematicnetlabeledit.h"
 #include "../schematic.h"
 #include "../items/si_netline.h"
+#include "../../../common/gridproperties.h"
 
 namespace project {
 
@@ -121,7 +122,7 @@ SES_Base::ProcRetVal SES_AddNetLabel::processSceneEvent(SEE_Base* event) noexcep
         case QEvent::GraphicsSceneMousePress:
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), mEditorUi.graphicsView->getGridInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos(), mEditor.getGridProperties().getInterval());
             switch (sceneEvent->button())
             {
                 case Qt::LeftButton:
@@ -146,7 +147,7 @@ SES_Base::ProcRetVal SES_AddNetLabel::processSceneEvent(SEE_Base* event) noexcep
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
             Q_ASSERT(sceneEvent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), mEditorUi.graphicsView->getGridInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos(), mEditor.getGridProperties().getInterval());
             updateLabel(*schematic, pos);
             return ForceStayInState;
         }
