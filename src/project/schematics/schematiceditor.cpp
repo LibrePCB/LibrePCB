@@ -154,7 +154,7 @@ SchematicEditor::SchematicEditor(Project& project, bool readOnly) :
     restoreState(clientSettings.value("schematic_editor/window_state").toByteArray());
 
     // Load first schematic page
-    if (mProject.getSchematicCount() > 0)
+    if (mProject.getSchematics().count() > 0)
         setActiveSchematicIndex(0);
 
     // mUi->graphicsView->zoomAll(); does not work properly here, should be executed later...
@@ -292,7 +292,11 @@ void SchematicEditor::on_actionGrid_triggered()
                 mUi->graphicsView->setGridProperties(grid);
             });
     if (dialog.exec())
+    {
+        foreach (Schematic* schematic, mProject.getSchematics())
+            schematic->setGridProperties(*mGridProperties);
         mProject.setModifiedFlag();
+    }
 }
 
 void SchematicEditor::on_actionPDF_Export_triggered()

@@ -4,326 +4,329 @@
         <uuid>{5acb574c-ba33-47e1-b837-dae2222e69ef}</uuid>
         <name>Brushless Controller</name>
     </meta>
+    <properties>
+        <grid_properties interval="2.540000" unit="millimeters" type="lines"/>
+    </properties>
     <symbols>
-        <symbol gen_comp_instance="{1fe7624e-269b-4fba-880d-abef3d0efa2e}" uuid="{8941c1cd-6aad-4f0d-b493-5156e220fe0f}" symbol_item="{abb0fd2d-e3d8-492e-8c53-95575916028b}">
+        <symbol uuid="{8941c1cd-6aad-4f0d-b493-5156e220fe0f}" gen_comp_instance="{1fe7624e-269b-4fba-880d-abef3d0efa2e}" symbol_item="{abb0fd2d-e3d8-492e-8c53-95575916028b}">
             <position x="243.840000" y="154.940000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{43bc94dc-6ab0-4bb2-bf66-c034b9f1cfd0}" uuid="{9f7dcce0-8734-483c-8de3-f2c266eba123}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
+        <symbol uuid="{9f7dcce0-8734-483c-8de3-f2c266eba123}" gen_comp_instance="{43bc94dc-6ab0-4bb2-bf66-c034b9f1cfd0}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
             <position x="35.560000" y="104.140000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{2e61020a-4346-4277-8f6b-42d8ec60fe49}" uuid="{89b11cca-872a-4735-a459-3b12d488334d}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
+        <symbol uuid="{89b11cca-872a-4735-a459-3b12d488334d}" gen_comp_instance="{2e61020a-4346-4277-8f6b-42d8ec60fe49}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
             <position x="210.820000" y="81.280000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{8092d8bb-f5df-4a43-b5d4-751cdfb474e9}" uuid="{e5538132-a567-494b-897f-e1f00546ea96}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
+        <symbol uuid="{e5538132-a567-494b-897f-e1f00546ea96}" gen_comp_instance="{8092d8bb-f5df-4a43-b5d4-751cdfb474e9}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
             <position x="111.760000" y="30.480000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{e4a5cdce-be42-4597-a045-6135ecd25ab8}" uuid="{16ec21bd-5bd6-49a4-a781-4f2397e899c8}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
+        <symbol uuid="{16ec21bd-5bd6-49a4-a781-4f2397e899c8}" gen_comp_instance="{e4a5cdce-be42-4597-a045-6135ecd25ab8}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
             <position x="45.720000" y="104.140000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{2632a8d7-e836-4fb2-8d00-0b6ea3483ad7}" uuid="{68173de5-f6cd-4a83-86c9-d68466fa2e51}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
+        <symbol uuid="{68173de5-f6cd-4a83-86c9-d68466fa2e51}" gen_comp_instance="{2632a8d7-e836-4fb2-8d00-0b6ea3483ad7}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
             <position x="10.160000" y="127.000000" angle="-90.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{afd4e910-3c79-46cd-8d71-2ad6c33768d5}" uuid="{8b2049f6-1519-44e4-914e-47f45e473e0f}" symbol_item="{c8239abb-cb41-4c06-ae9c-c2568a7cdcb8}">
+        <symbol uuid="{8b2049f6-1519-44e4-914e-47f45e473e0f}" gen_comp_instance="{afd4e910-3c79-46cd-8d71-2ad6c33768d5}" symbol_item="{c8239abb-cb41-4c06-ae9c-c2568a7cdcb8}">
             <position x="195.580000" y="93.980000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{dcceb66c-f08e-4191-a47e-b24a53b41f8f}" uuid="{adb1b879-a814-4b72-9bbc-bbbf013c8ee5}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
+        <symbol uuid="{adb1b879-a814-4b72-9bbc-bbbf013c8ee5}" gen_comp_instance="{dcceb66c-f08e-4191-a47e-b24a53b41f8f}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
             <position x="12.700000" y="25.400000" angle="90.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{8417e1db-8764-46a7-b5ef-2c606ecab6e1}" uuid="{425f3d38-1553-451d-a6b4-79045d0e4065}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
+        <symbol uuid="{425f3d38-1553-451d-a6b4-79045d0e4065}" gen_comp_instance="{8417e1db-8764-46a7-b5ef-2c606ecab6e1}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
             <position x="223.520000" y="152.400000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{5ce9b3be-1fa3-471e-b498-77bfbf6c415a}" uuid="{8ccd2cfc-d2eb-4b89-a9c9-4649cf1428e6}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
+        <symbol uuid="{8ccd2cfc-d2eb-4b89-a9c9-4649cf1428e6}" gen_comp_instance="{5ce9b3be-1fa3-471e-b498-77bfbf6c415a}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
             <position x="15.240000" y="167.640000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{26965a1b-09e1-41ee-b463-2684e7a87818}" uuid="{e24db6c6-f456-41dd-b99f-0bf16201f2b7}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
+        <symbol uuid="{e24db6c6-f456-41dd-b99f-0bf16201f2b7}" gen_comp_instance="{26965a1b-09e1-41ee-b463-2684e7a87818}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
             <position x="223.520000" y="162.560000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{00df6fcc-ebae-4597-8398-a2d3864d3b43}" uuid="{2ecc75fd-6a9e-427b-b937-b08671d6c50d}" symbol_item="{c8239abb-cb41-4c06-ae9c-c2568a7cdcb8}">
+        <symbol uuid="{2ecc75fd-6a9e-427b-b937-b08671d6c50d}" gen_comp_instance="{00df6fcc-ebae-4597-8398-a2d3864d3b43}" symbol_item="{c8239abb-cb41-4c06-ae9c-c2568a7cdcb8}">
             <position x="195.580000" y="175.260000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{e459b9d0-21aa-40b0-b704-ae0af7de4d37}" uuid="{e8fb8b3e-5853-4040-971a-00c6419d9262}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
+        <symbol uuid="{e8fb8b3e-5853-4040-971a-00c6419d9262}" gen_comp_instance="{e459b9d0-21aa-40b0-b704-ae0af7de4d37}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
             <position x="12.700000" y="55.880000" angle="90.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{2de80edd-99e3-4d89-830e-cbf4a858b4cd}" uuid="{0f029b1a-e7cd-4e8b-aa6e-71b9ae324f1f}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
+        <symbol uuid="{0f029b1a-e7cd-4e8b-aa6e-71b9ae324f1f}" gen_comp_instance="{2de80edd-99e3-4d89-830e-cbf4a858b4cd}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
             <position x="246.380000" y="134.620000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{98064fbf-64b1-4958-a0b0-825005d7a6a1}" uuid="{09a3b312-bc51-4ae8-b795-2a79a5ab7491}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
+        <symbol uuid="{09a3b312-bc51-4ae8-b795-2a79a5ab7491}" gen_comp_instance="{98064fbf-64b1-4958-a0b0-825005d7a6a1}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
             <position x="259.080000" y="45.720000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{9843ce9e-8e17-4baa-9980-6826fc257abf}" uuid="{f4e23d6d-7315-4892-946a-839f49a3f4e8}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
+        <symbol uuid="{f4e23d6d-7315-4892-946a-839f49a3f4e8}" gen_comp_instance="{9843ce9e-8e17-4baa-9980-6826fc257abf}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
             <position x="20.320000" y="91.440000" angle="-90.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{90c89ce4-fb19-458d-912b-cf9818efd764}" uuid="{1a5a379b-ac30-421b-a6c7-f1e2098065ca}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
+        <symbol uuid="{1a5a379b-ac30-421b-a6c7-f1e2098065ca}" gen_comp_instance="{90c89ce4-fb19-458d-912b-cf9818efd764}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
             <position x="210.820000" y="121.920000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{0035f2f4-c0fe-4b64-8830-f4e8fd34d204}" uuid="{9e2ad471-26de-49cf-a1cd-04f2508927d5}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
+        <symbol uuid="{9e2ad471-26de-49cf-a1cd-04f2508927d5}" gen_comp_instance="{0035f2f4-c0fe-4b64-8830-f4e8fd34d204}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
             <position x="15.240000" y="177.800000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{6318899d-5a8e-4089-89ee-2d2b54fe8d42}" uuid="{ba278eb7-26df-4367-a979-9b9665f0a6f4}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
+        <symbol uuid="{ba278eb7-26df-4367-a979-9b9665f0a6f4}" gen_comp_instance="{6318899d-5a8e-4089-89ee-2d2b54fe8d42}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
             <position x="137.160000" y="124.460000" angle="-90.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{4ea5b830-f231-4ded-9d0d-3d69b6a938df}" uuid="{e59667a6-d14f-4639-a7c0-8752f9e412fa}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
+        <symbol uuid="{e59667a6-d14f-4639-a7c0-8752f9e412fa}" gen_comp_instance="{4ea5b830-f231-4ded-9d0d-3d69b6a938df}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
             <position x="119.380000" y="124.460000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{1b1ac6e2-3309-4447-8fcf-e95221f19090}" uuid="{fd4f8b89-6bbe-49a0-8ee1-e9aa359d15ad}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
+        <symbol uuid="{fd4f8b89-6bbe-49a0-8ee1-e9aa359d15ad}" gen_comp_instance="{1b1ac6e2-3309-4447-8fcf-e95221f19090}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
             <position x="223.520000" y="71.120000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{aaec816a-e94e-4d00-8ac6-dd105da862e3}" uuid="{b61a593a-1849-49cb-88ee-2a4e800e404b}" symbol_item="{dcf1ad9b-0242-450e-bb79-9ad9a1b82bf8}">
+        <symbol uuid="{b61a593a-1849-49cb-88ee-2a4e800e404b}" gen_comp_instance="{aaec816a-e94e-4d00-8ac6-dd105da862e3}" symbol_item="{dcf1ad9b-0242-450e-bb79-9ad9a1b82bf8}">
             <position x="195.580000" y="160.020000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{2c8af4fb-cc24-4676-b77e-8d2b64dd73d0}" uuid="{71987faa-94c2-4027-b0cf-253062f8c118}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
+        <symbol uuid="{71987faa-94c2-4027-b0cf-253062f8c118}" gen_comp_instance="{2c8af4fb-cc24-4676-b77e-8d2b64dd73d0}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
             <position x="124.460000" y="30.480000" angle="-90.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{ded098d8-0251-473e-9602-b6638aad261f}" uuid="{1833bc75-b019-40e7-b2e2-bda54b9cc9f6}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
+        <symbol uuid="{1833bc75-b019-40e7-b2e2-bda54b9cc9f6}" gen_comp_instance="{ded098d8-0251-473e-9602-b6638aad261f}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
             <position x="12.700000" y="17.780000" angle="270.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{0c46076b-7882-4e44-942f-2592d2a21879}" uuid="{a830eb2e-c9f0-42bb-9150-d3d283834b47}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
+        <symbol uuid="{a830eb2e-c9f0-42bb-9150-d3d283834b47}" gen_comp_instance="{0c46076b-7882-4e44-942f-2592d2a21879}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
             <position x="175.260000" y="40.640000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{c330f5a3-9bd5-4189-a86d-a7020235db20}" uuid="{ad81572b-c271-4724-9a77-0773663c4c8c}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
+        <symbol uuid="{ad81572b-c271-4724-9a77-0773663c4c8c}" gen_comp_instance="{c330f5a3-9bd5-4189-a86d-a7020235db20}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
             <position x="254.000000" y="160.020000" angle="-180.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{1d8a93b9-7ac2-40a0-b1b7-79e987600197}" uuid="{a60b474f-6fc5-4dae-aa35-8eb6a47a3a32}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
+        <symbol uuid="{a60b474f-6fc5-4dae-aa35-8eb6a47a3a32}" gen_comp_instance="{1d8a93b9-7ac2-40a0-b1b7-79e987600197}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
             <position x="35.560000" y="121.920000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{ad7d2b6e-21cc-4540-8ec8-bb24a61980ea}" uuid="{bf0f2f2c-25b4-4447-aff8-639fc26ace3f}" symbol_item="{60cec411-a717-4893-b12f-7b698925e15b}">
+        <symbol uuid="{bf0f2f2c-25b4-4447-aff8-639fc26ace3f}" gen_comp_instance="{ad7d2b6e-21cc-4540-8ec8-bb24a61980ea}" symbol_item="{60cec411-a717-4893-b12f-7b698925e15b}">
             <position x="25.400000" y="109.220000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{82709ca3-4d60-4b8c-9bbb-4c2669acf146}" uuid="{655f587a-c3f6-4ddd-96d8-178649aaadef}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
+        <symbol uuid="{655f587a-c3f6-4ddd-96d8-178649aaadef}" gen_comp_instance="{82709ca3-4d60-4b8c-9bbb-4c2669acf146}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
             <position x="254.000000" y="78.740000" angle="-180.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{0c451a9f-1e21-4533-8d52-e2aacef8a883}" uuid="{8f6891a3-0e82-4a24-ada3-b532709251de}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
+        <symbol uuid="{8f6891a3-0e82-4a24-ada3-b532709251de}" gen_comp_instance="{0c451a9f-1e21-4533-8d52-e2aacef8a883}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
             <position x="40.640000" y="81.280000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{3437d160-1c40-458f-9867-f30c7706e0c3}" uuid="{d0788f96-5644-4a16-982a-97409ca1e831}" symbol_item="{52ef2b10-c149-4dfc-a2d8-2805efff2e13}">
+        <symbol uuid="{d0788f96-5644-4a16-982a-97409ca1e831}" gen_comp_instance="{3437d160-1c40-458f-9867-f30c7706e0c3}" symbol_item="{52ef2b10-c149-4dfc-a2d8-2805efff2e13}">
             <position x="66.040000" y="177.800000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{716ccdc2-fb79-492b-b76a-7f73c0833e5f}" uuid="{33b93784-0c40-4715-a4c7-2dd6bf9bd1ba}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
+        <symbol uuid="{33b93784-0c40-4715-a4c7-2dd6bf9bd1ba}" gen_comp_instance="{716ccdc2-fb79-492b-b76a-7f73c0833e5f}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
             <position x="165.100000" y="106.680000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{709a326c-b6ad-4dcb-95cf-7ce8962bb16c}" uuid="{200b2004-c4c2-4635-a816-43620cd7f1e1}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
+        <symbol uuid="{200b2004-c4c2-4635-a816-43620cd7f1e1}" gen_comp_instance="{709a326c-b6ad-4dcb-95cf-7ce8962bb16c}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
             <position x="223.520000" y="81.280000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{9c26d63b-991b-46aa-b229-fa92d44ced4e}" uuid="{dc683d36-a239-42a3-8b79-4a8d4d3e58ad}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
+        <symbol uuid="{dc683d36-a239-42a3-8b79-4a8d4d3e58ad}" gen_comp_instance="{9c26d63b-991b-46aa-b229-fa92d44ced4e}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
             <position x="101.600000" y="177.800000" angle="90.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{334d7856-01f5-46e3-85b9-28445e6371ce}" uuid="{d41fd1cb-65e9-4788-bde7-88bff20d29f5}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
+        <symbol uuid="{d41fd1cb-65e9-4788-bde7-88bff20d29f5}" gen_comp_instance="{334d7856-01f5-46e3-85b9-28445e6371ce}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
             <position x="101.600000" y="167.640000" angle="-90.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{5295af36-44e2-4a2e-a988-87c9e1026ae9}" uuid="{f0e8672a-0eef-4208-a962-178b1f5f4ca4}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
+        <symbol uuid="{f0e8672a-0eef-4208-a962-178b1f5f4ca4}" gen_comp_instance="{5295af36-44e2-4a2e-a988-87c9e1026ae9}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
             <position x="165.100000" y="160.020000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{f2ecbcd7-492d-4d2c-a28f-0af5ecf85215}" uuid="{209c0b69-3dce-40ca-8b95-12826ce6ea6b}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
+        <symbol uuid="{209c0b69-3dce-40ca-8b95-12826ce6ea6b}" gen_comp_instance="{f2ecbcd7-492d-4d2c-a28f-0af5ecf85215}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
             <position x="43.180000" y="137.160000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{5e0bdeff-3d85-4b74-b94d-097fb1de25ac}" uuid="{493198ad-5a7c-4479-b852-9d1e4cd9066f}" symbol_item="{abb0fd2d-e3d8-492e-8c53-95575916028b}">
+        <symbol uuid="{493198ad-5a7c-4479-b852-9d1e4cd9066f}" gen_comp_instance="{5e0bdeff-3d85-4b74-b94d-097fb1de25ac}" symbol_item="{abb0fd2d-e3d8-492e-8c53-95575916028b}">
             <position x="243.840000" y="124.460000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{820e8fe1-b1a9-488d-9610-0a97204391b4}" uuid="{307ca944-18cb-497c-8b75-ad2a74a86c83}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
+        <symbol uuid="{307ca944-18cb-497c-8b75-ad2a74a86c83}" gen_comp_instance="{820e8fe1-b1a9-488d-9610-0a97204391b4}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
             <position x="254.000000" y="119.380000" angle="-180.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{7b566985-46f7-47e1-af33-2ba64918db44}" uuid="{e032f951-407f-47eb-bf3c-908fbf3810e8}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
+        <symbol uuid="{e032f951-407f-47eb-bf3c-908fbf3810e8}" gen_comp_instance="{7b566985-46f7-47e1-af33-2ba64918db44}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
             <position x="12.700000" y="81.280000" angle="-270.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{8a4d3468-24cf-47ee-ac46-b65e47ced1ec}" uuid="{aa5aaa59-2d1e-4555-b838-f397f799e55e}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
+        <symbol uuid="{aa5aaa59-2d1e-4555-b838-f397f799e55e}" gen_comp_instance="{8a4d3468-24cf-47ee-ac46-b65e47ced1ec}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
             <position x="165.100000" y="99.060000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{feb77f2b-7f69-49e0-84e9-6684aeee2afe}" uuid="{2ae40d7c-1fd1-4ff7-a76b-d028646c98c6}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
+        <symbol uuid="{2ae40d7c-1fd1-4ff7-a76b-d028646c98c6}" gen_comp_instance="{feb77f2b-7f69-49e0-84e9-6684aeee2afe}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
             <position x="132.080000" y="154.940000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{18cf34f6-95e4-48a0-bf4b-6a2d13523f0f}" uuid="{fa5b89d9-d194-4279-834c-aaa9d31f3a9d}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
+        <symbol uuid="{fa5b89d9-d194-4279-834c-aaa9d31f3a9d}" gen_comp_instance="{18cf34f6-95e4-48a0-bf4b-6a2d13523f0f}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
             <position x="251.460000" y="38.100000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{68c6b6ce-0bad-4965-aa85-c972ab3f16c6}" uuid="{b02414aa-ddd6-4dee-b90f-947deeabac6b}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
+        <symbol uuid="{b02414aa-ddd6-4dee-b90f-947deeabac6b}" gen_comp_instance="{68c6b6ce-0bad-4965-aa85-c972ab3f16c6}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
             <position x="78.740000" y="172.720000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{b9859056-bbef-4848-9b60-978594cce1d4}" uuid="{47027762-bc49-413b-8572-4aa997d00360}" symbol_item="{42e8f509-3f37-4b36-9ef6-98ecd19e8ca4}">
+        <symbol uuid="{47027762-bc49-413b-8572-4aa997d00360}" gen_comp_instance="{b9859056-bbef-4848-9b60-978594cce1d4}" symbol_item="{42e8f509-3f37-4b36-9ef6-98ecd19e8ca4}">
             <position x="93.980000" y="30.480000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{98757eea-e6bf-4fe5-adaa-a7f407373243}" uuid="{8c290d30-4cd9-4154-a9a1-6efb8c2bae6d}" symbol_item="{fade976e-1f99-41a4-bcfc-b29524c37768}">
+        <symbol uuid="{8c290d30-4cd9-4154-a9a1-6efb8c2bae6d}" gen_comp_instance="{98757eea-e6bf-4fe5-adaa-a7f407373243}" symbol_item="{fade976e-1f99-41a4-bcfc-b29524c37768}">
             <position x="25.400000" y="172.720000" angle="-90.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{291e62f2-5792-44e3-8532-4b85031b4314}" uuid="{23922b9e-8fda-4883-9cf7-bb988afb06b9}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
+        <symbol uuid="{23922b9e-8fda-4883-9cf7-bb988afb06b9}" gen_comp_instance="{291e62f2-5792-44e3-8532-4b85031b4314}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
             <position x="144.780000" y="154.940000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{76c1f0be-1e24-4b1d-beed-edc08bd44118}" uuid="{1800799b-2b44-4258-9ac2-a9b1cc9fa26f}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
+        <symbol uuid="{1800799b-2b44-4258-9ac2-a9b1cc9fa26f}" gen_comp_instance="{76c1f0be-1e24-4b1d-beed-edc08bd44118}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
             <position x="119.380000" y="111.760000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{596d6d2e-97a9-47cf-9005-7a4a1e850f1e}" uuid="{1a734a9d-52ed-4b02-9ce3-498de6399857}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
+        <symbol uuid="{1a734a9d-52ed-4b02-9ce3-498de6399857}" gen_comp_instance="{596d6d2e-97a9-47cf-9005-7a4a1e850f1e}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
             <position x="198.120000" y="22.860000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{84e890a4-2a41-4721-8737-a71f79f7d101}" uuid="{0b4d1224-73a8-4729-a649-dca53dd830da}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
+        <symbol uuid="{0b4d1224-73a8-4729-a649-dca53dd830da}" gen_comp_instance="{84e890a4-2a41-4721-8737-a71f79f7d101}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
             <position x="15.240000" y="121.920000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{f1121620-c541-46a5-90cc-92578e822b8f}" uuid="{353ab581-c43e-4bcc-9bfd-4801b0d9ed50}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
+        <symbol uuid="{353ab581-c43e-4bcc-9bfd-4801b0d9ed50}" gen_comp_instance="{f1121620-c541-46a5-90cc-92578e822b8f}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
             <position x="132.080000" y="162.560000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{46601a79-4b4e-401c-826b-6c04056b4080}" uuid="{dbccb830-2f80-458c-98fd-6ff921fee707}" symbol_item="{abb0fd2d-e3d8-492e-8c53-95575916028b}">
+        <symbol uuid="{dbccb830-2f80-458c-98fd-6ff921fee707}" gen_comp_instance="{46601a79-4b4e-401c-826b-6c04056b4080}" symbol_item="{abb0fd2d-e3d8-492e-8c53-95575916028b}">
             <position x="243.840000" y="114.300000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{06d30802-ba7f-431d-843d-42f276aaed22}" uuid="{0ff02a7d-9445-42c3-9b1b-5488498c648d}" symbol_item="{0428743a-191b-40d1-82b6-a943bff79846}">
+        <symbol uuid="{0ff02a7d-9445-42c3-9b1b-5488498c648d}" gen_comp_instance="{06d30802-ba7f-431d-843d-42f276aaed22}" symbol_item="{0428743a-191b-40d1-82b6-a943bff79846}">
             <position x="71.120000" y="109.220000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{b44652fd-99b6-459a-914b-41e0137146f1}" uuid="{847b4495-ab1a-42e5-b725-c23353873314}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
+        <symbol uuid="{847b4495-ab1a-42e5-b725-c23353873314}" gen_comp_instance="{b44652fd-99b6-459a-914b-41e0137146f1}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
             <position x="132.080000" y="25.400000" angle="-180.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{6c9b623e-6231-4e9c-bf97-944df7a5d3d5}" uuid="{e3860d5d-54f9-4e3b-b609-042050818480}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
+        <symbol uuid="{e3860d5d-54f9-4e3b-b609-042050818480}" gen_comp_instance="{6c9b623e-6231-4e9c-bf97-944df7a5d3d5}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
             <position x="210.820000" y="162.560000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{d880210c-1868-4964-8dff-db2517af8024}" uuid="{06597010-5c54-4fbe-bba4-48acc8e1cf84}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
+        <symbol uuid="{06597010-5c54-4fbe-bba4-48acc8e1cf84}" gen_comp_instance="{d880210c-1868-4964-8dff-db2517af8024}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
             <position x="246.380000" y="175.260000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{422bed02-7435-4aae-a71a-b5c7fecd3056}" uuid="{10144e11-b8af-4cfe-8a0f-9771ec4d7462}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
+        <symbol uuid="{10144e11-b8af-4cfe-8a0f-9771ec4d7462}" gen_comp_instance="{422bed02-7435-4aae-a71a-b5c7fecd3056}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
             <position x="30.480000" y="99.060000" angle="-270.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{ef27ad46-be54-4b1c-ba51-0446a0853203}" uuid="{8bc50533-0869-4718-b63d-eba6913af270}" symbol_item="{f7aa65f2-55b5-45d7-a3e1-782e9f3266a8}">
+        <symbol uuid="{8bc50533-0869-4718-b63d-eba6913af270}" gen_comp_instance="{ef27ad46-be54-4b1c-ba51-0446a0853203}" symbol_item="{f7aa65f2-55b5-45d7-a3e1-782e9f3266a8}">
             <position x="91.440000" y="172.720000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{3079e423-f0e6-42fc-8c93-4cd82690bdc1}" uuid="{5d92d706-3dac-441e-895e-704824c1bdcd}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
+        <symbol uuid="{5d92d706-3dac-441e-895e-704824c1bdcd}" gen_comp_instance="{3079e423-f0e6-42fc-8c93-4cd82690bdc1}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
             <position x="45.720000" y="121.920000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{7ce8e5bf-571d-4b03-a9e7-4e81130dc613}" uuid="{2116b49e-dfeb-42f0-934c-07159986e937}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
+        <symbol uuid="{2116b49e-dfeb-42f0-934c-07159986e937}" gen_comp_instance="{7ce8e5bf-571d-4b03-a9e7-4e81130dc613}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
             <position x="266.700000" y="27.940000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{81c6addc-9f55-40ef-9b5a-08816ca0a661}" uuid="{7963a40c-25a0-4f7b-8306-9d1e5a4935ff}" symbol_item="{dcf1ad9b-0242-450e-bb79-9ad9a1b82bf8}">
+        <symbol uuid="{7963a40c-25a0-4f7b-8306-9d1e5a4935ff}" gen_comp_instance="{81c6addc-9f55-40ef-9b5a-08816ca0a661}" symbol_item="{dcf1ad9b-0242-450e-bb79-9ad9a1b82bf8}">
             <position x="195.580000" y="119.380000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{ab96ca5d-43e6-4ecb-8981-1fa3117c1c7d}" uuid="{3c66a26a-05b6-4400-8952-099e42564321}" symbol_item="{dcf1ad9b-0242-450e-bb79-9ad9a1b82bf8}">
+        <symbol uuid="{3c66a26a-05b6-4400-8952-099e42564321}" gen_comp_instance="{ab96ca5d-43e6-4ecb-8981-1fa3117c1c7d}" symbol_item="{dcf1ad9b-0242-450e-bb79-9ad9a1b82bf8}">
             <position x="195.580000" y="78.740000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{d00cf83f-e2de-4e12-b176-1c45eb6fcf6c}" uuid="{d502b2cf-d0c3-498f-9a9c-fff14448b950}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
+        <symbol uuid="{d502b2cf-d0c3-498f-9a9c-fff14448b950}" gen_comp_instance="{d00cf83f-e2de-4e12-b176-1c45eb6fcf6c}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
             <position x="175.260000" y="48.260000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{14d30f5e-339e-4eee-9df4-6d6c8b10a97f}" uuid="{554849ec-de15-430d-bf6d-02c7f87a9b74}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
+        <symbol uuid="{554849ec-de15-430d-bf6d-02c7f87a9b74}" gen_comp_instance="{14d30f5e-339e-4eee-9df4-6d6c8b10a97f}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
             <position x="111.760000" y="15.240000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{bfdf81af-9505-4e77-97e4-d68e4a90ba0f}" uuid="{9c775c81-e2a4-46f4-ab45-5ce3e62078f2}" symbol_item="{80e56299-8f8c-4613-a559-1fba31f01411}">
+        <symbol uuid="{9c775c81-e2a4-46f4-ab45-5ce3e62078f2}" gen_comp_instance="{bfdf81af-9505-4e77-97e4-d68e4a90ba0f}" symbol_item="{80e56299-8f8c-4613-a559-1fba31f01411}">
             <position x="129.540000" y="124.460000" angle="-90.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{51f2b297-88ec-4703-b2ed-bab50489cba8}" uuid="{bfaf083e-3306-4035-a959-f1bb300e3e53}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
+        <symbol uuid="{bfaf083e-3306-4035-a959-f1bb300e3e53}" gen_comp_instance="{51f2b297-88ec-4703-b2ed-bab50489cba8}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
             <position x="190.500000" y="22.860000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{013aa324-6581-4a59-ba01-cce4dfa14c1c}" uuid="{9f53a249-5287-4f6d-a7b8-dad525bd78c5}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
+        <symbol uuid="{9f53a249-5287-4f6d-a7b8-dad525bd78c5}" gen_comp_instance="{013aa324-6581-4a59-ba01-cce4dfa14c1c}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
             <position x="144.780000" y="172.720000" angle="-90.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{b2643695-14fd-4eea-8d66-a4f2c2c2196f}" uuid="{3180b6fe-a1d3-4a0c-b7fd-d3cae33a010f}" symbol_item="{6ca391c0-1c6d-4176-9607-31bf40d1b406}">
+        <symbol uuid="{3180b6fe-a1d3-4a0c-b7fd-d3cae33a010f}" gen_comp_instance="{b2643695-14fd-4eea-8d66-a4f2c2c2196f}" symbol_item="{6ca391c0-1c6d-4176-9607-31bf40d1b406}">
             <position x="0.000000" y="0.000000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{15e33177-fef9-4030-93f7-b7cf8b9ad9e7}" uuid="{1ffa87f0-97f9-4b15-a80f-6e8f27dda10c}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
+        <symbol uuid="{1ffa87f0-97f9-4b15-a80f-6e8f27dda10c}" gen_comp_instance="{15e33177-fef9-4030-93f7-b7cf8b9ad9e7}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
             <position x="48.260000" y="172.720000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{c2030b99-62f8-4440-81de-fe7c31583926}" uuid="{ef70c46f-1093-44b7-a637-6c56d0890e19}" symbol_item="{cc7febf5-14a9-43fc-a63d-5f31626c202b}">
+        <symbol uuid="{ef70c46f-1093-44b7-a637-6c56d0890e19}" gen_comp_instance="{c2030b99-62f8-4440-81de-fe7c31583926}" symbol_item="{cc7febf5-14a9-43fc-a63d-5f31626c202b}">
             <position x="27.940000" y="50.800000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{228ff0bc-94bd-4218-84a7-f8ab51ad6f69}" uuid="{a6e098ad-e66d-45d8-8d64-92ae71b16aad}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
+        <symbol uuid="{a6e098ad-e66d-45d8-8d64-92ae71b16aad}" gen_comp_instance="{228ff0bc-94bd-4218-84a7-f8ab51ad6f69}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
             <position x="144.780000" y="180.340000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{91f8c3d3-c497-4d3f-b7a0-4088b442647b}" uuid="{541c7075-1623-4a7e-8f18-bc36dac943ec}" symbol_item="{2408ccc8-11f8-461c-9752-32f4383c2ff6}">
+        <symbol uuid="{541c7075-1623-4a7e-8f18-bc36dac943ec}" gen_comp_instance="{91f8c3d3-c497-4d3f-b7a0-4088b442647b}" symbol_item="{2408ccc8-11f8-461c-9752-32f4383c2ff6}">
             <position x="27.940000" y="86.360000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{d98d04c5-74c7-4b7d-8f09-611ed955dd57}" uuid="{6faf1629-04cf-4f21-b0d7-2da4170c0735}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
+        <symbol uuid="{6faf1629-04cf-4f21-b0d7-2da4170c0735}" gen_comp_instance="{d98d04c5-74c7-4b7d-8f09-611ed955dd57}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
             <position x="266.700000" y="38.100000" angle="-90.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{9fdd6c44-c091-4ddd-af76-5c7c70909007}" uuid="{0307db83-2d9a-4029-8c83-9996deb38d72}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
+        <symbol uuid="{0307db83-2d9a-4029-8c83-9996deb38d72}" gen_comp_instance="{9fdd6c44-c091-4ddd-af76-5c7c70909007}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
             <position x="251.460000" y="27.940000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{e7c69946-ec6b-4fa8-a6f9-b32d65cbef69}" uuid="{cb5a0b43-a5ae-48b1-a4e1-465646a12df6}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
+        <symbol uuid="{cb5a0b43-a5ae-48b1-a4e1-465646a12df6}" gen_comp_instance="{e7c69946-ec6b-4fa8-a6f9-b32d65cbef69}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
             <position x="182.880000" y="22.860000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{3110f961-42bd-4e24-bba7-47930f1b2c03}" uuid="{8e5d68ec-1668-4539-a3a3-8c8811a74c59}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
+        <symbol uuid="{8e5d68ec-1668-4539-a3a3-8c8811a74c59}" gen_comp_instance="{3110f961-42bd-4e24-bba7-47930f1b2c03}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
             <position x="190.500000" y="33.020000" angle="-90.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{06d050d5-cea1-4a9b-b92d-9c5114bdb3d1}" uuid="{71885fd0-4d2f-4658-b078-056c2c0154b4}" symbol_item="{80e56299-8f8c-4613-a559-1fba31f01411}">
+        <symbol uuid="{71885fd0-4d2f-4658-b078-056c2c0154b4}" gen_comp_instance="{06d050d5-cea1-4a9b-b92d-9c5114bdb3d1}" symbol_item="{80e56299-8f8c-4613-a559-1fba31f01411}">
             <position x="129.540000" y="111.760000" angle="-90.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{893b43c4-ef31-4853-bfa2-bd7f919ba5e3}" uuid="{c4b04960-963d-4930-8d8a-148170d0e97e}" symbol_item="{abb0fd2d-e3d8-492e-8c53-95575916028b}">
+        <symbol uuid="{c4b04960-963d-4930-8d8a-148170d0e97e}" gen_comp_instance="{893b43c4-ef31-4853-bfa2-bd7f919ba5e3}" symbol_item="{abb0fd2d-e3d8-492e-8c53-95575916028b}">
             <position x="243.840000" y="83.820000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{694e8ab2-0367-49b7-b548-8314e2a84c77}" uuid="{9a73e2a5-4190-4ed9-9157-6fd20d37977f}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
+        <symbol uuid="{9a73e2a5-4190-4ed9-9157-6fd20d37977f}" gen_comp_instance="{694e8ab2-0367-49b7-b548-8314e2a84c77}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
             <position x="165.100000" y="180.340000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{69f3d0cf-ca3d-4323-b0c3-67c4fce8b501}" uuid="{bb558893-6d9e-4447-b98c-7303a934866d}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
+        <symbol uuid="{bb558893-6d9e-4447-b98c-7303a934866d}" gen_comp_instance="{69f3d0cf-ca3d-4323-b0c3-67c4fce8b501}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
             <position x="165.100000" y="78.740000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{5ef7639d-db84-4bfa-8356-83fc28a1a9f7}" uuid="{ebe468dd-5af6-4d68-b989-2cc1fe31e4dc}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
+        <symbol uuid="{ebe468dd-5af6-4d68-b989-2cc1fe31e4dc}" gen_comp_instance="{5ef7639d-db84-4bfa-8356-83fc28a1a9f7}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
             <position x="198.120000" y="33.020000" angle="-90.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{c3a404c4-3e04-44d0-a495-d8d7750fa1a1}" uuid="{41d8bcca-d5d8-48d4-b10f-6f7879f6662f}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
+        <symbol uuid="{41d8bcca-d5d8-48d4-b10f-6f7879f6662f}" gen_comp_instance="{c3a404c4-3e04-44d0-a495-d8d7750fa1a1}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
             <position x="165.100000" y="139.700000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{5a493e46-5b95-4d98-ba08-8bf6a741a817}" uuid="{89fe9cbb-1a65-4099-8587-98f814258745}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
+        <symbol uuid="{89fe9cbb-1a65-4099-8587-98f814258745}" gen_comp_instance="{5a493e46-5b95-4d98-ba08-8bf6a741a817}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
             <position x="182.880000" y="33.020000" angle="-90.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{ddba5f4c-cacf-45da-91d6-bac636da3a6e}" uuid="{2db9aa5a-49c6-4b7d-b960-0ff7e1603e5d}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
+        <symbol uuid="{2db9aa5a-49c6-4b7d-b960-0ff7e1603e5d}" gen_comp_instance="{ddba5f4c-cacf-45da-91d6-bac636da3a6e}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
             <position x="223.520000" y="111.760000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{b179313a-5fcb-4fb6-8e56-55865ed6ea4b}" uuid="{6ed2245a-bdbe-41ef-b4b1-4035728a962e}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
+        <symbol uuid="{6ed2245a-bdbe-41ef-b4b1-4035728a962e}" gen_comp_instance="{b179313a-5fcb-4fb6-8e56-55865ed6ea4b}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
             <position x="25.400000" y="121.920000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{8a1420be-e7d4-4a7f-a88d-4dcfa99f67ed}" uuid="{2ad06c06-96c7-4ca4-afc5-98b9002b45b1}" symbol_item="{c8239abb-cb41-4c06-ae9c-c2568a7cdcb8}">
+        <symbol uuid="{2ad06c06-96c7-4ca4-afc5-98b9002b45b1}" gen_comp_instance="{8a1420be-e7d4-4a7f-a88d-4dcfa99f67ed}" symbol_item="{c8239abb-cb41-4c06-ae9c-c2568a7cdcb8}">
             <position x="195.580000" y="134.620000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{7d9771c2-7a04-4ab3-866a-cbc12bb590b4}" uuid="{a50faaae-100d-4ab3-b5e3-21f08d753b0e}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
+        <symbol uuid="{a50faaae-100d-4ab3-b5e3-21f08d753b0e}" gen_comp_instance="{7d9771c2-7a04-4ab3-866a-cbc12bb590b4}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
             <position x="246.380000" y="93.980000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{41ee6094-1f47-4775-8f19-663f8b1efdde}" uuid="{4d10b6c8-3fda-41ea-9506-a06eb378580b}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
+        <symbol uuid="{4d10b6c8-3fda-41ea-9506-a06eb378580b}" gen_comp_instance="{41ee6094-1f47-4775-8f19-663f8b1efdde}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
             <position x="111.760000" y="45.720000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{3499d4eb-40bd-44df-8ef1-9544fae56a75}" uuid="{af753a02-8c80-46a4-8148-4517ccc8a64c}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
+        <symbol uuid="{af753a02-8c80-46a4-8148-4517ccc8a64c}" gen_comp_instance="{3499d4eb-40bd-44df-8ef1-9544fae56a75}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
             <position x="223.520000" y="121.920000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{78bd925b-ee02-4142-80c3-59153a60d658}" uuid="{eea3acb2-393c-463e-a36e-2ac5d51ba805}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
+        <symbol uuid="{eea3acb2-393c-463e-a36e-2ac5d51ba805}" gen_comp_instance="{78bd925b-ee02-4142-80c3-59153a60d658}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
             <position x="137.160000" y="111.760000" angle="-90.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{a2df92fe-89d7-4c67-9d33-c4041c0e8f40}" uuid="{fb9fe9ba-fccb-45d8-80b2-d607beee8521}" symbol_item="{abb0fd2d-e3d8-492e-8c53-95575916028b}">
+        <symbol uuid="{fb9fe9ba-fccb-45d8-80b2-d607beee8521}" gen_comp_instance="{a2df92fe-89d7-4c67-9d33-c4041c0e8f40}" symbol_item="{abb0fd2d-e3d8-492e-8c53-95575916028b}">
             <position x="243.840000" y="73.660000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{2a1bc471-eacc-4730-83cb-6acf7f3b5c55}" uuid="{de744911-c3c1-400a-9bc9-60635619c2f6}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
+        <symbol uuid="{de744911-c3c1-400a-9bc9-60635619c2f6}" gen_comp_instance="{2a1bc471-eacc-4730-83cb-6acf7f3b5c55}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
             <position x="12.700000" y="91.440000" angle="-270.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{40f0240d-6c33-452d-845f-29471c1eced5}" uuid="{be52309e-e6b3-4318-a0a7-c673df48611c}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
+        <symbol uuid="{be52309e-e6b3-4318-a0a7-c673df48611c}" gen_comp_instance="{40f0240d-6c33-452d-845f-29471c1eced5}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
             <position x="10.160000" y="116.840000" angle="-270.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{04eff528-df9e-4969-bc7e-5633d8011087}" uuid="{0b6a59c8-53a8-42b0-9ce9-d089ff678e22}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
+        <symbol uuid="{0b6a59c8-53a8-42b0-9ce9-d089ff678e22}" gen_comp_instance="{04eff528-df9e-4969-bc7e-5633d8011087}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
             <position x="43.180000" y="144.780000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{df40333d-b0ea-4b4f-8a7a-a59ae2de610f}" uuid="{a06e465f-4850-439e-a95d-7e9cf490efa0}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
+        <symbol uuid="{a06e465f-4850-439e-a95d-7e9cf490efa0}" gen_comp_instance="{df40333d-b0ea-4b4f-8a7a-a59ae2de610f}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
             <position x="144.780000" y="162.560000" angle="-90.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{1b517f7e-cd6e-43ca-ba7f-cf6be1812b3d}" uuid="{469d8c7c-eda1-4377-8c0d-5dca857e65e4}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
+        <symbol uuid="{469d8c7c-eda1-4377-8c0d-5dca857e65e4}" gen_comp_instance="{1b517f7e-cd6e-43ca-ba7f-cf6be1812b3d}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
             <position x="15.240000" y="109.220000" angle="-90.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{0cd12bfe-4971-4905-8354-c2b2c47bfcde}" uuid="{21a814f3-4de3-4635-8c41-b3e8fd5e8531}" symbol_item="{f7aa65f2-55b5-45d7-a3e1-782e9f3266a8}">
+        <symbol uuid="{21a814f3-4de3-4635-8c41-b3e8fd5e8531}" gen_comp_instance="{0cd12bfe-4971-4905-8354-c2b2c47bfcde}" symbol_item="{f7aa65f2-55b5-45d7-a3e1-782e9f3266a8}">
             <position x="35.560000" y="172.720000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{2ebbad7c-7050-4575-a1aa-4f3966506d83}" uuid="{d1bd2e6d-c69a-4c30-ad4d-ccd3fee98d34}" symbol_item="{abb0fd2d-e3d8-492e-8c53-95575916028b}">
+        <symbol uuid="{d1bd2e6d-c69a-4c30-ad4d-ccd3fee98d34}" gen_comp_instance="{2ebbad7c-7050-4575-a1aa-4f3966506d83}" symbol_item="{abb0fd2d-e3d8-492e-8c53-95575916028b}">
             <position x="243.840000" y="165.100000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{e69f768b-412d-4fe5-aeb3-c743351a6544}" uuid="{043e6d84-d02b-4b13-a94c-2d954009901d}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
+        <symbol uuid="{043e6d84-d02b-4b13-a94c-2d954009901d}" gen_comp_instance="{e69f768b-412d-4fe5-aeb3-c743351a6544}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
             <position x="20.320000" y="81.280000" angle="-90.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{a56f0beb-d2f3-4a3a-8ede-c5f5e4b69487}" uuid="{52b5bf4c-1edd-46cc-852a-0010f3e91b91}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
+        <symbol uuid="{52b5bf4c-1edd-46cc-852a-0010f3e91b91}" gen_comp_instance="{a56f0beb-d2f3-4a3a-8ede-c5f5e4b69487}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
             <position x="165.100000" y="66.040000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{149a7a8c-e3be-446e-aee2-53ba02a79384}" uuid="{9ae0afd7-e0dd-41ab-8606-af244ebc3c11}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
+        <symbol uuid="{9ae0afd7-e0dd-41ab-8606-af244ebc3c11}" gen_comp_instance="{149a7a8c-e3be-446e-aee2-53ba02a79384}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
             <position x="76.200000" y="38.100000" angle="-270.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{217de8c7-c834-4900-b3b2-7c5b277a5737}" uuid="{0e5b62f6-0639-4457-8df6-d422dba01f14}" symbol_item="{8f9c7cdb-93c5-401f-9f64-857bf1b52f51}">
+        <symbol uuid="{0e5b62f6-0639-4457-8df6-d422dba01f14}" gen_comp_instance="{217de8c7-c834-4900-b3b2-7c5b277a5737}" symbol_item="{8f9c7cdb-93c5-401f-9f64-857bf1b52f51}">
             <position x="27.940000" y="22.860000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{ebb49bc4-00fb-47bf-af63-db38d4a8f502}" uuid="{d213b037-c110-4d19-93d9-79fbdfadca0d}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
+        <symbol uuid="{d213b037-c110-4d19-93d9-79fbdfadca0d}" gen_comp_instance="{ebb49bc4-00fb-47bf-af63-db38d4a8f502}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
             <position x="48.260000" y="182.880000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{e8ab7388-1846-4ca4-912d-d533fae37f01}" uuid="{e7e90ae6-0f5e-4117-8a97-dd347256bc73}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
+        <symbol uuid="{e7e90ae6-0f5e-4117-8a97-dd347256bc73}" gen_comp_instance="{e8ab7388-1846-4ca4-912d-d533fae37f01}" symbol_item="{42989503-2795-4892-9d83-b919cd7dad76}">
             <position x="165.100000" y="119.380000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{ace8d3f2-1db8-41a8-87ff-66ef95e2807c}" uuid="{c4645da6-925f-41ff-8cfe-cbbfbadbe36e}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
+        <symbol uuid="{c4645da6-925f-41ff-8cfe-cbbfbadbe36e}" gen_comp_instance="{ace8d3f2-1db8-41a8-87ff-66ef95e2807c}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
             <position x="165.100000" y="147.320000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{f900538b-090d-482f-9c4c-b0da46d087a8}" uuid="{484c58b7-2004-40f4-b4ed-8bf8bc920cb3}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
+        <symbol uuid="{484c58b7-2004-40f4-b4ed-8bf8bc920cb3}" gen_comp_instance="{f900538b-090d-482f-9c4c-b0da46d087a8}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
             <position x="175.260000" y="55.880000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{0184602f-8b64-4bc2-ae5a-624b5f6d8907}" uuid="{6ac534eb-2b11-41f6-a45c-8ea1598a9685}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
+        <symbol uuid="{6ac534eb-2b11-41f6-a45c-8ea1598a9685}" gen_comp_instance="{0184602f-8b64-4bc2-ae5a-624b5f6d8907}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
             <position x="132.080000" y="35.560000" angle="-180.000000"/>
         </symbol>
     </symbols>
@@ -2373,52 +2376,52 @@
         <netline end_point="{926f514d-82fd-405a-b305-375ea175bd28}" uuid="{fe8a835a-63e1-4384-be37-8495c8431bf7}" start_point="{3d868268-35d6-4160-be0d-010de4bf4344}" width="0.158750"/>
     </netlines>
     <netlabels>
-        <netlabel uuid="{296bef92-37fe-4124-8063-1babddb35225}" x="96.520000" y="83.820000" netsignal="{e632ec48-46dd-49ae-bafe-1dcd191973bf}" angle="0.000000"/>
-        <netlabel uuid="{c03e91f5-96c6-491e-9988-2d15f188a0ed}" x="96.520000" y="137.160000" netsignal="{75696982-c10d-4ce6-955b-bdc868f7192d}" angle="0.000000"/>
-        <netlabel uuid="{f4c1e383-8186-4fb5-97f8-1a4517527f10}" x="200.660000" y="48.260000" netsignal="{75696982-c10d-4ce6-955b-bdc868f7192d}" angle="0.000000"/>
-        <netlabel uuid="{51220cd9-226b-42f6-9c84-96bc8e40add0}" x="175.260000" y="116.840000" netsignal="{8867be40-a3b7-4d6f-9f87-bca92b51d043}" angle="0.000000"/>
-        <netlabel uuid="{606ead94-c6b3-4803-ac2e-7d8869347f80}" x="162.560000" y="48.260000" netsignal="{e5fdb792-6bf4-421b-8078-b205693dfe1a}" angle="0.000000"/>
-        <netlabel uuid="{f5e93c1b-7d69-4ea9-a4e5-84270987f759}" x="15.240000" y="43.180000" netsignal="{befa5cad-9aa3-4fbd-8c61-81636ccabd6e}" angle="0.000000"/>
-        <netlabel uuid="{43416ffa-da3d-4d25-a04d-e903176faa9e}" x="175.260000" y="81.280000" netsignal="{58c55893-1e3e-4437-9daf-350c3bef76fe}" angle="0.000000"/>
-        <netlabel uuid="{f8b1afe9-8f9c-40ae-b22b-8e24fdb9574d}" x="96.520000" y="101.600000" netsignal="{99316d45-507c-4bbe-8210-e8d8f90e1d61}" angle="0.000000"/>
-        <netlabel uuid="{3bd46a79-8a8d-41e8-999d-40e86a872eb1}" x="96.520000" y="93.980000" netsignal="{a2d66e09-1611-4237-8912-4890d72d6bd0}" angle="0.000000"/>
-        <netlabel uuid="{04eef0a6-1d35-4615-ae69-40c158f41d1a}" x="162.560000" y="40.640000" netsignal="{09750fe3-8f0b-4239-91ae-ec78221f6b60}" angle="0.000000"/>
-        <netlabel uuid="{b691ff4e-c1a3-4cb2-8615-d26215d6960d}" x="175.260000" y="157.480000" netsignal="{a246f040-6793-47fa-8c26-f1d41163dba3}" angle="0.000000"/>
-        <netlabel uuid="{ad7e5b24-bdd8-4bfe-a53f-861b4864c0e6}" x="96.520000" y="124.460000" netsignal="{8867be40-a3b7-4d6f-9f87-bca92b51d043}" angle="0.000000"/>
-        <netlabel uuid="{6d76c64d-f564-4d64-8bdf-5f344fb5a184}" x="15.240000" y="53.340000" netsignal="{d9ded6c6-fee5-4ee9-a694-c51ba89c754c}" angle="0.000000"/>
-        <netlabel uuid="{421ecaf6-aef4-4291-b5e7-442d7e242e0b}" x="116.840000" y="35.560000" netsignal="{44b998b7-65e0-410f-b361-b2770278cd9a}" angle="0.000000"/>
-        <netlabel uuid="{2b0de364-f5fa-4843-b2f5-d240009e6d40}" x="45.720000" y="68.580000" netsignal="{2fb1d98c-cba3-4ab6-a29f-4be70e93a4c7}" angle="0.000000"/>
-        <netlabel uuid="{de059ef9-8927-489b-bdc9-b3845925c2a9}" x="96.520000" y="134.620000" netsignal="{f346a129-4fa9-467d-bde0-34a6b66bdd67}" angle="0.000000"/>
-        <netlabel uuid="{56c3cdc7-d054-4961-b430-e88d50630df4}" x="15.240000" y="48.260000" netsignal="{edacb44e-d9aa-4273-9dc7-983e15306a1b}" angle="0.000000"/>
-        <netlabel uuid="{3be5c082-1df4-4c3a-ba79-993e4ba6f958}" x="238.760000" y="45.720000" netsignal="{f346a129-4fa9-467d-bde0-34a6b66bdd67}" angle="0.000000"/>
-        <netlabel uuid="{6e1ef839-b835-4dd2-9e49-a5b3ce56e675}" x="96.520000" y="78.740000" netsignal="{58c55893-1e3e-4437-9daf-350c3bef76fe}" angle="0.000000"/>
-        <netlabel uuid="{3910be51-fe54-4ae5-854d-3ece9758924f}" x="96.520000" y="81.280000" netsignal="{7d176095-7be9-4377-8d35-235672017d95}" angle="0.000000"/>
-        <netlabel uuid="{6bfd8fe5-4cd6-4920-b563-39be55f2b740}" x="45.720000" y="71.120000" netsignal="{edacb44e-d9aa-4273-9dc7-983e15306a1b}" angle="0.000000"/>
-        <netlabel uuid="{d8cfe5c4-05cb-4e3f-af13-9d62ba3f489d}" x="96.520000" y="129.540000" netsignal="{2b3761fd-f01a-452c-b370-827dc2459a21}" angle="0.000000"/>
-        <netlabel uuid="{c2d8ba93-adb3-4fe1-b1d4-af0e85516601}" x="96.520000" y="99.060000" netsignal="{5954f837-4f15-4597-a389-d1d635423e15}" angle="0.000000"/>
-        <netlabel uuid="{277bd197-f9db-48b5-a620-8cd362271294}" x="119.380000" y="167.640000" netsignal="{6805d3ea-58c5-4e83-9646-348ba7fd8b94}" angle="0.000000"/>
-        <netlabel uuid="{5922ddeb-602a-4250-9f6c-4981b253af98}" x="15.240000" y="20.320000" netsignal="{99316d45-507c-4bbe-8210-e8d8f90e1d61}" angle="0.000000"/>
-        <netlabel uuid="{e8f62545-a350-47fb-8abe-7dcc575f7226}" x="162.560000" y="55.880000" netsignal="{a87c6342-c3ac-40a2-b688-df06d98233d7}" angle="0.000000"/>
-        <netlabel uuid="{7b77949b-1bfe-48d2-9846-1d12cc09e09a}" x="96.520000" y="106.680000" netsignal="{6805d3ea-58c5-4e83-9646-348ba7fd8b94}" angle="0.000000"/>
-        <netlabel uuid="{43e5e1ef-0f6c-4d31-8847-e86e79b3060a}" x="15.240000" y="22.860000" netsignal="{5954f837-4f15-4597-a389-d1d635423e15}" angle="0.000000"/>
-        <netlabel uuid="{05594d13-e88d-495a-84e1-f6722fd647c2}" x="96.520000" y="119.380000" netsignal="{1ebc4991-e356-4ec4-9394-5448780cedee}" angle="0.000000"/>
-        <netlabel uuid="{c546b442-dc02-4e23-881b-7b35e74fca54}" x="45.720000" y="73.660000" netsignal="{3497d782-62cf-4c69-a2ef-b84b9857f70a}" angle="0.000000"/>
-        <netlabel uuid="{a8078133-a42b-423b-9d51-2dc7ff7db79f}" x="200.660000" y="40.640000" netsignal="{765c49cf-ed87-472a-ba8f-a65052275c31}" angle="0.000000"/>
-        <netlabel uuid="{15577a11-4006-409c-a2c5-dfe7670a1769}" x="96.520000" y="96.520000" netsignal="{82bfa55d-323c-4444-8cd3-8c35e1bd0fec}" angle="0.000000"/>
-        <netlabel uuid="{c2fcf4ea-d02a-43b8-8443-e8c44d2b60bc}" x="66.040000" y="33.020000" netsignal="{a2d66e09-1611-4237-8912-4890d72d6bd0}" angle="0.000000"/>
-        <netlabel uuid="{0c616cdb-c55a-452c-8bc0-fbdf6b27c2c6}" x="116.840000" y="22.860000" netsignal="{f7df2b18-9f30-449a-8afd-c4a6a16cc7d2}" angle="0.000000"/>
-        <netlabel uuid="{e498c549-fc82-4b32-9391-a17110b4a633}" x="96.520000" y="121.920000" netsignal="{ecbfd5f5-0d80-4573-aeea-5d8fbaada4eb}" angle="0.000000"/>
-        <netlabel uuid="{443c1aad-13e2-4a15-b707-3a5fa3d4c92a}" x="33.020000" y="147.320000" netsignal="{befa5cad-9aa3-4fbd-8c61-81636ccabd6e}" angle="0.000000"/>
-        <netlabel uuid="{68a24a8d-be3e-40c2-bef3-2820261a12a8}" x="66.040000" y="27.940000" netsignal="{82bfa55d-323c-4444-8cd3-8c35e1bd0fec}" angle="0.000000"/>
-        <netlabel uuid="{b6de8004-7cec-4378-aabd-bb00e36fd19f}" x="15.240000" y="45.720000" netsignal="{2fb1d98c-cba3-4ab6-a29f-4be70e93a4c7}" angle="0.000000"/>
-        <netlabel uuid="{43f72d15-2dc5-4f14-b433-1dea2cef5ff5}" x="175.260000" y="76.200000" netsignal="{ecbfd5f5-0d80-4573-aeea-5d8fbaada4eb}" angle="0.000000"/>
-        <netlabel uuid="{8c71b4fb-1fbf-44cd-a7a3-bc1a85c69171}" x="200.660000" y="55.880000" netsignal="{2b3761fd-f01a-452c-b370-827dc2459a21}" angle="0.000000"/>
-        <netlabel uuid="{1474c6ee-6b4c-44b6-97ed-7510dcbc468d}" x="96.520000" y="116.840000" netsignal="{b85d51dc-bb39-4227-b2c6-5e1f52cd1a11}" angle="0.000000"/>
-        <netlabel uuid="{03836726-f240-4171-aabc-9227b48b4cf3}" x="45.720000" y="76.200000" netsignal="{d9ded6c6-fee5-4ee9-a694-c51ba89c754c}" angle="0.000000"/>
-        <netlabel uuid="{83c722ab-6198-49e9-b3eb-7aa6dc0dd5c3}" x="175.260000" y="162.560000" netsignal="{e632ec48-46dd-49ae-bafe-1dcd191973bf}" angle="0.000000"/>
-        <netlabel uuid="{ee0da400-1cef-4bc4-bbb9-af06c084d94f}" x="96.520000" y="139.700000" netsignal="{765c49cf-ed87-472a-ba8f-a65052275c31}" angle="0.000000"/>
-        <netlabel uuid="{2ba5697f-34eb-4f61-ba30-1d1628e0b009}" x="15.240000" y="50.800000" netsignal="{3497d782-62cf-4c69-a2ef-b84b9857f70a}" angle="0.000000"/>
-        <netlabel uuid="{dd60f088-d6bb-4715-9346-3c865e354ad0}" x="175.260000" y="121.920000" netsignal="{7d176095-7be9-4377-8d35-235672017d95}" angle="0.000000"/>
-        <netlabel uuid="{61559161-0788-4b0b-9be1-ff8367c48897}" x="96.520000" y="127.000000" netsignal="{a246f040-6793-47fa-8c26-f1d41163dba3}" angle="0.000000"/>
+        <netlabel uuid="{296bef92-37fe-4124-8063-1babddb35225}" netsignal="{e632ec48-46dd-49ae-bafe-1dcd191973bf}" x="96.520000" y="83.820000" angle="0.000000"/>
+        <netlabel uuid="{c03e91f5-96c6-491e-9988-2d15f188a0ed}" netsignal="{75696982-c10d-4ce6-955b-bdc868f7192d}" x="96.520000" y="137.160000" angle="0.000000"/>
+        <netlabel uuid="{f4c1e383-8186-4fb5-97f8-1a4517527f10}" netsignal="{75696982-c10d-4ce6-955b-bdc868f7192d}" x="200.660000" y="48.260000" angle="0.000000"/>
+        <netlabel uuid="{51220cd9-226b-42f6-9c84-96bc8e40add0}" netsignal="{8867be40-a3b7-4d6f-9f87-bca92b51d043}" x="175.260000" y="116.840000" angle="0.000000"/>
+        <netlabel uuid="{606ead94-c6b3-4803-ac2e-7d8869347f80}" netsignal="{e5fdb792-6bf4-421b-8078-b205693dfe1a}" x="162.560000" y="48.260000" angle="0.000000"/>
+        <netlabel uuid="{f5e93c1b-7d69-4ea9-a4e5-84270987f759}" netsignal="{befa5cad-9aa3-4fbd-8c61-81636ccabd6e}" x="15.240000" y="43.180000" angle="0.000000"/>
+        <netlabel uuid="{43416ffa-da3d-4d25-a04d-e903176faa9e}" netsignal="{58c55893-1e3e-4437-9daf-350c3bef76fe}" x="175.260000" y="81.280000" angle="0.000000"/>
+        <netlabel uuid="{f8b1afe9-8f9c-40ae-b22b-8e24fdb9574d}" netsignal="{99316d45-507c-4bbe-8210-e8d8f90e1d61}" x="96.520000" y="101.600000" angle="0.000000"/>
+        <netlabel uuid="{3bd46a79-8a8d-41e8-999d-40e86a872eb1}" netsignal="{a2d66e09-1611-4237-8912-4890d72d6bd0}" x="96.520000" y="93.980000" angle="0.000000"/>
+        <netlabel uuid="{04eef0a6-1d35-4615-ae69-40c158f41d1a}" netsignal="{09750fe3-8f0b-4239-91ae-ec78221f6b60}" x="162.560000" y="40.640000" angle="0.000000"/>
+        <netlabel uuid="{b691ff4e-c1a3-4cb2-8615-d26215d6960d}" netsignal="{a246f040-6793-47fa-8c26-f1d41163dba3}" x="175.260000" y="157.480000" angle="0.000000"/>
+        <netlabel uuid="{ad7e5b24-bdd8-4bfe-a53f-861b4864c0e6}" netsignal="{8867be40-a3b7-4d6f-9f87-bca92b51d043}" x="96.520000" y="124.460000" angle="0.000000"/>
+        <netlabel uuid="{6d76c64d-f564-4d64-8bdf-5f344fb5a184}" netsignal="{d9ded6c6-fee5-4ee9-a694-c51ba89c754c}" x="15.240000" y="53.340000" angle="0.000000"/>
+        <netlabel uuid="{421ecaf6-aef4-4291-b5e7-442d7e242e0b}" netsignal="{44b998b7-65e0-410f-b361-b2770278cd9a}" x="116.840000" y="35.560000" angle="0.000000"/>
+        <netlabel uuid="{2b0de364-f5fa-4843-b2f5-d240009e6d40}" netsignal="{2fb1d98c-cba3-4ab6-a29f-4be70e93a4c7}" x="45.720000" y="68.580000" angle="0.000000"/>
+        <netlabel uuid="{de059ef9-8927-489b-bdc9-b3845925c2a9}" netsignal="{f346a129-4fa9-467d-bde0-34a6b66bdd67}" x="96.520000" y="134.620000" angle="0.000000"/>
+        <netlabel uuid="{56c3cdc7-d054-4961-b430-e88d50630df4}" netsignal="{edacb44e-d9aa-4273-9dc7-983e15306a1b}" x="15.240000" y="48.260000" angle="0.000000"/>
+        <netlabel uuid="{3be5c082-1df4-4c3a-ba79-993e4ba6f958}" netsignal="{f346a129-4fa9-467d-bde0-34a6b66bdd67}" x="238.760000" y="45.720000" angle="0.000000"/>
+        <netlabel uuid="{6e1ef839-b835-4dd2-9e49-a5b3ce56e675}" netsignal="{58c55893-1e3e-4437-9daf-350c3bef76fe}" x="96.520000" y="78.740000" angle="0.000000"/>
+        <netlabel uuid="{3910be51-fe54-4ae5-854d-3ece9758924f}" netsignal="{7d176095-7be9-4377-8d35-235672017d95}" x="96.520000" y="81.280000" angle="0.000000"/>
+        <netlabel uuid="{6bfd8fe5-4cd6-4920-b563-39be55f2b740}" netsignal="{edacb44e-d9aa-4273-9dc7-983e15306a1b}" x="45.720000" y="71.120000" angle="0.000000"/>
+        <netlabel uuid="{d8cfe5c4-05cb-4e3f-af13-9d62ba3f489d}" netsignal="{2b3761fd-f01a-452c-b370-827dc2459a21}" x="96.520000" y="129.540000" angle="0.000000"/>
+        <netlabel uuid="{c2d8ba93-adb3-4fe1-b1d4-af0e85516601}" netsignal="{5954f837-4f15-4597-a389-d1d635423e15}" x="96.520000" y="99.060000" angle="0.000000"/>
+        <netlabel uuid="{277bd197-f9db-48b5-a620-8cd362271294}" netsignal="{6805d3ea-58c5-4e83-9646-348ba7fd8b94}" x="119.380000" y="167.640000" angle="0.000000"/>
+        <netlabel uuid="{5922ddeb-602a-4250-9f6c-4981b253af98}" netsignal="{99316d45-507c-4bbe-8210-e8d8f90e1d61}" x="15.240000" y="20.320000" angle="0.000000"/>
+        <netlabel uuid="{e8f62545-a350-47fb-8abe-7dcc575f7226}" netsignal="{a87c6342-c3ac-40a2-b688-df06d98233d7}" x="162.560000" y="55.880000" angle="0.000000"/>
+        <netlabel uuid="{7b77949b-1bfe-48d2-9846-1d12cc09e09a}" netsignal="{6805d3ea-58c5-4e83-9646-348ba7fd8b94}" x="96.520000" y="106.680000" angle="0.000000"/>
+        <netlabel uuid="{43e5e1ef-0f6c-4d31-8847-e86e79b3060a}" netsignal="{5954f837-4f15-4597-a389-d1d635423e15}" x="15.240000" y="22.860000" angle="0.000000"/>
+        <netlabel uuid="{05594d13-e88d-495a-84e1-f6722fd647c2}" netsignal="{1ebc4991-e356-4ec4-9394-5448780cedee}" x="96.520000" y="119.380000" angle="0.000000"/>
+        <netlabel uuid="{c546b442-dc02-4e23-881b-7b35e74fca54}" netsignal="{3497d782-62cf-4c69-a2ef-b84b9857f70a}" x="45.720000" y="73.660000" angle="0.000000"/>
+        <netlabel uuid="{a8078133-a42b-423b-9d51-2dc7ff7db79f}" netsignal="{765c49cf-ed87-472a-ba8f-a65052275c31}" x="200.660000" y="40.640000" angle="0.000000"/>
+        <netlabel uuid="{15577a11-4006-409c-a2c5-dfe7670a1769}" netsignal="{82bfa55d-323c-4444-8cd3-8c35e1bd0fec}" x="96.520000" y="96.520000" angle="0.000000"/>
+        <netlabel uuid="{c2fcf4ea-d02a-43b8-8443-e8c44d2b60bc}" netsignal="{a2d66e09-1611-4237-8912-4890d72d6bd0}" x="66.040000" y="33.020000" angle="0.000000"/>
+        <netlabel uuid="{0c616cdb-c55a-452c-8bc0-fbdf6b27c2c6}" netsignal="{f7df2b18-9f30-449a-8afd-c4a6a16cc7d2}" x="116.840000" y="22.860000" angle="0.000000"/>
+        <netlabel uuid="{e498c549-fc82-4b32-9391-a17110b4a633}" netsignal="{ecbfd5f5-0d80-4573-aeea-5d8fbaada4eb}" x="96.520000" y="121.920000" angle="0.000000"/>
+        <netlabel uuid="{443c1aad-13e2-4a15-b707-3a5fa3d4c92a}" netsignal="{befa5cad-9aa3-4fbd-8c61-81636ccabd6e}" x="33.020000" y="147.320000" angle="0.000000"/>
+        <netlabel uuid="{68a24a8d-be3e-40c2-bef3-2820261a12a8}" netsignal="{82bfa55d-323c-4444-8cd3-8c35e1bd0fec}" x="66.040000" y="27.940000" angle="0.000000"/>
+        <netlabel uuid="{b6de8004-7cec-4378-aabd-bb00e36fd19f}" netsignal="{2fb1d98c-cba3-4ab6-a29f-4be70e93a4c7}" x="15.240000" y="45.720000" angle="0.000000"/>
+        <netlabel uuid="{43f72d15-2dc5-4f14-b433-1dea2cef5ff5}" netsignal="{ecbfd5f5-0d80-4573-aeea-5d8fbaada4eb}" x="175.260000" y="76.200000" angle="0.000000"/>
+        <netlabel uuid="{8c71b4fb-1fbf-44cd-a7a3-bc1a85c69171}" netsignal="{2b3761fd-f01a-452c-b370-827dc2459a21}" x="200.660000" y="55.880000" angle="0.000000"/>
+        <netlabel uuid="{1474c6ee-6b4c-44b6-97ed-7510dcbc468d}" netsignal="{b85d51dc-bb39-4227-b2c6-5e1f52cd1a11}" x="96.520000" y="116.840000" angle="0.000000"/>
+        <netlabel uuid="{03836726-f240-4171-aabc-9227b48b4cf3}" netsignal="{d9ded6c6-fee5-4ee9-a694-c51ba89c754c}" x="45.720000" y="76.200000" angle="0.000000"/>
+        <netlabel uuid="{83c722ab-6198-49e9-b3eb-7aa6dc0dd5c3}" netsignal="{e632ec48-46dd-49ae-bafe-1dcd191973bf}" x="175.260000" y="162.560000" angle="0.000000"/>
+        <netlabel uuid="{ee0da400-1cef-4bc4-bbb9-af06c084d94f}" netsignal="{765c49cf-ed87-472a-ba8f-a65052275c31}" x="96.520000" y="139.700000" angle="0.000000"/>
+        <netlabel uuid="{2ba5697f-34eb-4f61-ba30-1d1628e0b009}" netsignal="{3497d782-62cf-4c69-a2ef-b84b9857f70a}" x="15.240000" y="50.800000" angle="0.000000"/>
+        <netlabel uuid="{dd60f088-d6bb-4715-9346-3c865e354ad0}" netsignal="{7d176095-7be9-4377-8d35-235672017d95}" x="175.260000" y="121.920000" angle="0.000000"/>
+        <netlabel uuid="{61559161-0788-4b0b-9be1-ff8367c48897}" netsignal="{a246f040-6793-47fa-8c26-f1d41163dba3}" x="96.520000" y="127.000000" angle="0.000000"/>
     </netlabels>
 </schematic>

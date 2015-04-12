@@ -4,7 +4,7 @@
         <name>Demo Project</name>
         <author>Homer Simpson</author>
         <created>2013-04-13T12:43:52Z</created>
-        <last_modified>2015-03-25T21:13:50Z</last_modified>
+        <last_modified>2015-04-11T21:19:48Z</last_modified>
     </meta>
     <schematics>
         <schematic>supply.xml</schematic>

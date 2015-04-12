@@ -36,6 +36,7 @@
  *  Forward Declarations
  ****************************************************************************************/
 
+class GridProperties;
 class SmartXmlFile;
 
 namespace project {
@@ -121,18 +122,22 @@ class Schematic final : public CADScene, public IF_AttributeProvider,
             Schematic(project, filepath, restore, readOnly, false, QString()) {}
         ~Schematic() noexcept;
 
-        // Getters: Attributes
-        const FilePath& getFilePath() const noexcept {return mFilePath;}
-        Project& getProject() const noexcept {return mProject;}
-        const QUuid& getUuid() const noexcept {return mUuid;}
-        const QString& getName() const noexcept {return mName;}
-        const QIcon& getIcon() const noexcept {return mIcon;}
-
         // Getters: General
+        Project& getProject() const noexcept {return mProject;}
+        const FilePath& getFilePath() const noexcept {return mFilePath;}
+        const GridProperties& getGridProperties() const noexcept {return *mGridProperties;}
         bool isEmpty() const noexcept;
         uint getNetPointsAtScenePos(QList<SI_NetPoint*>& list, const Point& pos) const noexcept;
         uint getNetLinesAtScenePos(QList<SI_NetLine*>& list, const Point& pos) const noexcept;
         uint getPinsAtScenePos(QList<SI_SymbolPin*>& list, const Point& pos) const noexcept;
+
+        // Setters: General
+        void setGridProperties(const GridProperties& grid) noexcept;
+
+        // Getters: Attributes
+        const QUuid& getUuid() const noexcept {return mUuid;}
+        const QString& getName() const noexcept {return mName;}
+        const QIcon& getIcon() const noexcept {return mIcon;}
 
         // Symbol Methods
         SI_Symbol* getSymbolByUuid(const QUuid& uuid) const noexcept;
@@ -203,6 +208,7 @@ class Schematic final : public CADScene, public IF_AttributeProvider,
         bool mAddedToProject;
 
         QRectF mViewRect;
+        GridProperties* mGridProperties;
 
         // Attributes
         QUuid mUuid;

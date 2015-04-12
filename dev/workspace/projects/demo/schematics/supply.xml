@@ -4,71 +4,74 @@
         <uuid>{cb6501aa-f8c3-42ac-a9a0-8a9df0da3f05}</uuid>
         <name>Supply</name>
     </meta>
+    <properties>
+        <grid_properties interval="2.540000" unit="millimeters" type="lines"/>
+    </properties>
     <symbols>
-        <symbol gen_comp_instance="{5251a927-c93c-44e9-a567-addad26f04f5}" uuid="{d1f729a1-2658-4c5a-af1a-979fc5d89222}" symbol_item="{52ef2b10-c149-4dfc-a2d8-2805efff2e13}">
+        <symbol uuid="{d1f729a1-2658-4c5a-af1a-979fc5d89222}" gen_comp_instance="{5251a927-c93c-44e9-a567-addad26f04f5}" symbol_item="{52ef2b10-c149-4dfc-a2d8-2805efff2e13}">
             <position x="27.940000" y="27.940000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{8f1bb1cb-4f49-40e0-8982-1b4166859e8a}" uuid="{4f752e93-e1c0-42d8-805f-520e3df3d52c}" symbol_item="{dcf1ad9b-0242-450e-bb79-9ad9a1b82bf8}">
+        <symbol uuid="{4f752e93-e1c0-42d8-805f-520e3df3d52c}" gen_comp_instance="{8f1bb1cb-4f49-40e0-8982-1b4166859e8a}" symbol_item="{dcf1ad9b-0242-450e-bb79-9ad9a1b82bf8}">
             <position x="83.820000" y="73.660000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{988f04d0-8926-4e0e-9cc5-634f30da91c5}" uuid="{481affc5-cfa8-4aac-8622-7ef393822dce}" symbol_item="{0428743a-191b-40d1-82b6-a943bff79846}">
+        <symbol uuid="{481affc5-cfa8-4aac-8622-7ef393822dce}" gen_comp_instance="{988f04d0-8926-4e0e-9cc5-634f30da91c5}" symbol_item="{0428743a-191b-40d1-82b6-a943bff79846}">
             <position x="27.940000" y="142.240000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{e8fb26fb-57e0-4b33-a7bd-2b0e36f27ccf}" uuid="{65278949-c69a-46c9-a0f0-19411cc84a84}" symbol_item="{dcf1ad9b-0242-450e-bb79-9ad9a1b82bf8}">
+        <symbol uuid="{65278949-c69a-46c9-a0f0-19411cc84a84}" gen_comp_instance="{e8fb26fb-57e0-4b33-a7bd-2b0e36f27ccf}" symbol_item="{dcf1ad9b-0242-450e-bb79-9ad9a1b82bf8}">
             <position x="142.240000" y="73.660000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{42895e86-aaf0-480f-904a-bc63f2cbd47c}" uuid="{e122e657-ce9b-4003-919c-b1e799d30633}" symbol_item="{0428743a-191b-40d1-82b6-a943bff79846}">
+        <symbol uuid="{e122e657-ce9b-4003-919c-b1e799d30633}" gen_comp_instance="{42895e86-aaf0-480f-904a-bc63f2cbd47c}" symbol_item="{0428743a-191b-40d1-82b6-a943bff79846}">
             <position x="83.820000" y="142.240000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{878ec825-b07b-4a96-bcf2-9616d0134324}" uuid="{88235bf7-d10f-4a11-acb8-7b719f571fe9}" symbol_item="{52ef2b10-c149-4dfc-a2d8-2805efff2e13}">
+        <symbol uuid="{88235bf7-d10f-4a11-acb8-7b719f571fe9}" gen_comp_instance="{878ec825-b07b-4a96-bcf2-9616d0134324}" symbol_item="{52ef2b10-c149-4dfc-a2d8-2805efff2e13}">
             <position x="142.240000" y="12.700000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{e0f97191-9d23-4044-b412-2f697c9e030f}" uuid="{8483fc36-cddb-4462-beda-ab8be115ec88}" symbol_item="{dcf1ad9b-0242-450e-bb79-9ad9a1b82bf8}">
+        <symbol uuid="{8483fc36-cddb-4462-beda-ab8be115ec88}" gen_comp_instance="{e0f97191-9d23-4044-b412-2f697c9e030f}" symbol_item="{dcf1ad9b-0242-450e-bb79-9ad9a1b82bf8}">
             <position x="27.940000" y="76.200000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{13fd2b34-2a21-4f39-8113-a262acf1619d}" uuid="{f3ab6860-efb2-4e00-8e87-e725e841fe19}" symbol_item="{52ef2b10-c149-4dfc-a2d8-2805efff2e13}">
+        <symbol uuid="{f3ab6860-efb2-4e00-8e87-e725e841fe19}" gen_comp_instance="{13fd2b34-2a21-4f39-8113-a262acf1619d}" symbol_item="{52ef2b10-c149-4dfc-a2d8-2805efff2e13}">
             <position x="27.940000" y="10.160000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{0086b039-a454-469b-aa57-deeafba4a7ff}" uuid="{0120c23b-c83b-40ad-9efa-92f2d5968b66}" symbol_item="{52ef2b10-c149-4dfc-a2d8-2805efff2e13}">
+        <symbol uuid="{0120c23b-c83b-40ad-9efa-92f2d5968b66}" gen_comp_instance="{0086b039-a454-469b-aa57-deeafba4a7ff}" symbol_item="{52ef2b10-c149-4dfc-a2d8-2805efff2e13}">
             <position x="139.700000" y="30.480000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{c1827770-eb39-4803-bb61-bfd7fd5c045d}" uuid="{084f6ae4-7127-4a4b-9705-58acf082be3a}" symbol_item="{0428743a-191b-40d1-82b6-a943bff79846}">
+        <symbol uuid="{084f6ae4-7127-4a4b-9705-58acf082be3a}" gen_comp_instance="{c1827770-eb39-4803-bb61-bfd7fd5c045d}" symbol_item="{0428743a-191b-40d1-82b6-a943bff79846}">
             <position x="248.920000" y="142.240000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{467e8f20-beba-4829-905b-61d7ef0a65b2}" uuid="{ef27fc43-862f-482c-84f2-8ac357563639}" symbol_item="{0428743a-191b-40d1-82b6-a943bff79846}">
+        <symbol uuid="{ef27fc43-862f-482c-84f2-8ac357563639}" gen_comp_instance="{467e8f20-beba-4829-905b-61d7ef0a65b2}" symbol_item="{0428743a-191b-40d1-82b6-a943bff79846}">
             <position x="142.240000" y="142.240000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{b40e0d55-2ec8-44a2-9949-2d1a8140d23f}" uuid="{8ce00667-f240-417b-849e-2616f470f04c}" symbol_item="{0428743a-191b-40d1-82b6-a943bff79846}">
+        <symbol uuid="{8ce00667-f240-417b-849e-2616f470f04c}" gen_comp_instance="{b40e0d55-2ec8-44a2-9949-2d1a8140d23f}" symbol_item="{0428743a-191b-40d1-82b6-a943bff79846}">
             <position x="200.660000" y="142.240000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{743df118-3497-4dd7-83ac-86cbdb3dbfc7}" uuid="{8368a1b8-a0db-40e8-a6e6-0fc9ea681396}" symbol_item="{dcf1ad9b-0242-450e-bb79-9ad9a1b82bf8}">
+        <symbol uuid="{8368a1b8-a0db-40e8-a6e6-0fc9ea681396}" gen_comp_instance="{743df118-3497-4dd7-83ac-86cbdb3dbfc7}" symbol_item="{dcf1ad9b-0242-450e-bb79-9ad9a1b82bf8}">
             <position x="251.460000" y="71.120000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{35fdba6d-dff0-432b-8bc4-89b21575959f}" uuid="{b12fb167-0913-4f28-9b83-7407009aee6c}" symbol_item="{52ef2b10-c149-4dfc-a2d8-2805efff2e13}">
+        <symbol uuid="{b12fb167-0913-4f28-9b83-7407009aee6c}" gen_comp_instance="{35fdba6d-dff0-432b-8bc4-89b21575959f}" symbol_item="{52ef2b10-c149-4dfc-a2d8-2805efff2e13}">
             <position x="78.740000" y="15.240000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{266d4fb3-490e-4f6a-abdf-6ac31f380bc8}" uuid="{bc8cf0e1-80de-4ad5-a9c3-385006b54b3b}" symbol_item="{42e8f509-3f37-4b36-9ef6-98ecd19e8ca4}">
+        <symbol uuid="{bc8cf0e1-80de-4ad5-a9c3-385006b54b3b}" gen_comp_instance="{266d4fb3-490e-4f6a-abdf-6ac31f380bc8}" symbol_item="{42e8f509-3f37-4b36-9ef6-98ecd19e8ca4}">
             <position x="83.820000" y="48.260000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{b605b1c9-0c37-4b5f-a22c-8a9038cab203}" uuid="{7f59cd99-dc88-4d80-b4d2-f338f7271d9e}" symbol_item="{52ef2b10-c149-4dfc-a2d8-2805efff2e13}">
+        <symbol uuid="{7f59cd99-dc88-4d80-b4d2-f338f7271d9e}" gen_comp_instance="{b605b1c9-0c37-4b5f-a22c-8a9038cab203}" symbol_item="{52ef2b10-c149-4dfc-a2d8-2805efff2e13}">
             <position x="81.280000" y="27.940000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{fa7a4068-6027-4d09-8bef-0292fee07d35}" uuid="{0a0d1da8-0fef-4c4f-80db-92d5dabd354c}" symbol_item="{6ca391c0-1c6d-4176-9607-31bf40d1b406}">
+        <symbol uuid="{0a0d1da8-0fef-4c4f-80db-92d5dabd354c}" gen_comp_instance="{fa7a4068-6027-4d09-8bef-0292fee07d35}" symbol_item="{6ca391c0-1c6d-4176-9607-31bf40d1b406}">
             <position x="0.000000" y="0.000000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{3f9b6040-9d8d-40f8-b37f-bfc9828d5e04}" uuid="{0506fc16-2ea8-464f-ad34-b724e4af0d69}" symbol_item="{42e8f509-3f37-4b36-9ef6-98ecd19e8ca4}">
+        <symbol uuid="{0506fc16-2ea8-464f-ad34-b724e4af0d69}" gen_comp_instance="{3f9b6040-9d8d-40f8-b37f-bfc9828d5e04}" symbol_item="{42e8f509-3f37-4b36-9ef6-98ecd19e8ca4}">
             <position x="27.940000" y="50.800000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{241403c5-97fe-485b-bd80-17a1ab95cdce}" uuid="{303018a3-37ca-4caa-a9b7-80e7f85eea5b}" symbol_item="{42e8f509-3f37-4b36-9ef6-98ecd19e8ca4}">
+        <symbol uuid="{303018a3-37ca-4caa-a9b7-80e7f85eea5b}" gen_comp_instance="{241403c5-97fe-485b-bd80-17a1ab95cdce}" symbol_item="{42e8f509-3f37-4b36-9ef6-98ecd19e8ca4}">
             <position x="142.240000" y="48.260000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{9eb0ee80-1fb5-4451-8f8d-0acb76f0f0d5}" uuid="{173e5ccb-f3c9-4984-acbf-040b77bc7c45}" symbol_item="{42e8f509-3f37-4b36-9ef6-98ecd19e8ca4}">
+        <symbol uuid="{173e5ccb-f3c9-4984-acbf-040b77bc7c45}" gen_comp_instance="{9eb0ee80-1fb5-4451-8f8d-0acb76f0f0d5}" symbol_item="{42e8f509-3f37-4b36-9ef6-98ecd19e8ca4}">
             <position x="200.660000" y="43.180000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{c1b2eb22-020d-4cac-ab4c-573039868439}" uuid="{b19772b7-9b28-4f2e-ad7b-a3787d255ed1}" symbol_item="{dcf1ad9b-0242-450e-bb79-9ad9a1b82bf8}">
+        <symbol uuid="{b19772b7-9b28-4f2e-ad7b-a3787d255ed1}" gen_comp_instance="{c1b2eb22-020d-4cac-ab4c-573039868439}" symbol_item="{dcf1ad9b-0242-450e-bb79-9ad9a1b82bf8}">
             <position x="203.200000" y="71.120000" angle="0.000000"/>
         </symbol>
-        <symbol gen_comp_instance="{aca7ddb0-83b2-4064-8cbc-6730b89a0318}" uuid="{be8f181b-90fa-4272-bdf6-6d6dd9f6009b}" symbol_item="{42e8f509-3f37-4b36-9ef6-98ecd19e8ca4}">
+        <symbol uuid="{be8f181b-90fa-4272-bdf6-6d6dd9f6009b}" gen_comp_instance="{aca7ddb0-83b2-4064-8cbc-6730b89a0318}" symbol_item="{42e8f509-3f37-4b36-9ef6-98ecd19e8ca4}">
             <position x="251.460000" y="43.180000" angle="0.000000"/>
         </symbol>
     </symbols>

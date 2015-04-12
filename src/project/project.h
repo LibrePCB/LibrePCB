@@ -190,11 +190,11 @@ class Project final : public QObject, public IF_AttributeProvider,
         int getSchematicIndex(const Schematic* schematic) const noexcept;
 
         /**
-         * @brief Get the count of schematic pages
+         * @brief Get all schematics
          *
-         * @return Count of schematics
+         * @return A QList with all schematics
          */
-        int getSchematicCount() const noexcept {return mSchematics.count();}
+        const QList<Schematic*>& getSchematics() const noexcept {return mSchematics;}
 
         /**
          * @brief Get the schematic page at a specific index

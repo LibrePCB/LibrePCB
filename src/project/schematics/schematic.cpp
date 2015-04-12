@@ -33,6 +33,7 @@
 #include "items/si_netpoint.h"
 #include "items/si_netline.h"
 #include "items/si_netlabel.h"
+#include "../../common/gridproperties.h"
 
 namespace project {
 
@@ -43,7 +44,7 @@ namespace project {
 Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
                      bool readOnly, bool create, const QString& newName) throw (Exception):
     CADScene(), IF_AttributeProvider(), mProject(project), mFilePath(filepath),
-    mXmlFile(nullptr), mAddedToProject(false)
+    mXmlFile(nullptr), mAddedToProject(false), mGridProperties(nullptr)
 {
     try
     {
@@ -55,6 +56,9 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             // set attributes
             mUuid = QUuid::createUuid();
             mName = newName;
+
+            // load default grid properties
+            mGridProperties = new GridProperties();
         }
         else
         {
@@ -66,6 +70,9 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
 
             mUuid = root.getFirstChild("meta/uuid", true, true)->getText<QUuid>();
             mName = root.getFirstChild("meta/name", true, true)->getText(true);
+
+            // Load grid properties
+            mGridProperties = new GridProperties(*root.getFirstChild("properties/grid_properties", true, true));
 
             // Load all symbols
             for (XmlDomElement* node = root.getFirstChild("symbols/symbol", true, false);
@@ -115,7 +122,8 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             try { removeNetPoint(*netpoint); delete netpoint; } catch (...) {}
         foreach (SI_Symbol* symbol, mSymbols)
             try { removeSymbol(*symbol); delete symbol; } catch (...) {}
-        delete mXmlFile;                mXmlFile = 0;
+        delete mGridProperties;         mGridProperties = nullptr;
+        delete mXmlFile;                mXmlFile = nullptr;
         throw; // ...and rethrow the exception
     }
 }
@@ -135,7 +143,8 @@ Schematic::~Schematic()
     foreach (SI_Symbol* symbol, mSymbols)
         try { removeSymbol(*symbol); delete symbol; } catch (...) {}
 
-    delete mXmlFile;                mXmlFile = 0;
+    delete mGridProperties;         mGridProperties = nullptr;
+    delete mXmlFile;                mXmlFile = nullptr;
 }
 
 /*****************************************************************************************
@@ -181,6 +190,15 @@ uint Schematic::getPinsAtScenePos(QList<SI_SymbolPin*>& list, const Point& pos) 
         list.append(&p->getPin());
     }
     return list.count();
+}
+
+/*****************************************************************************************
+ *  Setters: General
+ ****************************************************************************************/
+
+void Schematic::setGridProperties(const GridProperties& grid) noexcept
+{
+    *mGridProperties = grid;
 }
 
 /*****************************************************************************************
@@ -434,7 +452,7 @@ bool Schematic::getAttributeValue(const QString& attrNS, const QString& attrKey,
         else if (attrKey == QLatin1String("NBR"))
             return value = QString::number(mProject.getSchematicIndex(this) + 1), true;
         else if (attrKey == QLatin1String("CNT"))
-            return value = QString::number(mProject.getSchematicCount()), true;
+            return value = QString::number(mProject.getSchematics().count()), true;
     }
 
     if ((attrNS != QLatin1String("PAGE")) && (passToParents))
@@ -474,6 +492,8 @@ XmlDomElement* Schematic::serializeToXmlDomElement() const throw (Exception)
     XmlDomElement* meta = root->appendChild("meta");
     meta->appendTextChild("uuid", mUuid);
     meta->appendTextChild("name", mName);
+    XmlDomElement* properties = root->appendChild("properties");
+    properties->appendChild(mGridProperties->serializeToXmlDomElement());
     XmlDomElement* symbols = root->appendChild("symbols");
     foreach (SI_Symbol* symbolInstance, mSymbols)
         symbols->appendChild(symbolInstance->serializeToXmlDomElement());
