@@ -34,6 +34,12 @@ SchematicLayer::SchematicLayer(uint id) :
 {
     switch (mId)
     {
+        case Grid:
+            mName = tr("Grid");
+            mColor = Qt::white;                 // background
+            mColorHighlighted = Qt::lightGray;  // lines
+            break;
+
         case OriginCrosses:
             mName = tr("Origin Crosses");
             mColor = QColor(0, 0, 0, 50);
@@ -127,7 +133,8 @@ const QColor& SchematicLayer::getColor(bool highlighted) const
 QList<SchematicLayer::LayerID> SchematicLayer::getAllLayerIDs() noexcept
 {
     QList<LayerID> IDs;
-    IDs << SchematicLayer::OriginCrosses    << SchematicLayer::SymbolOutlines
+    IDs << SchematicLayer::Grid
+        << SchematicLayer::OriginCrosses    << SchematicLayer::SymbolOutlines
         << SchematicLayer::SymbolPinCircles << SchematicLayer::SymbolPinNames
         << SchematicLayer::ComponentNames   << SchematicLayer::ComponentValues
         << SchematicLayer::Nets             << SchematicLayer::Busses
