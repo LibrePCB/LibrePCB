@@ -43,7 +43,6 @@ QRectF SGI_NetPoint::sBoundingRect;
 SGI_NetPoint::SGI_NetPoint(SI_NetPoint& netpoint) noexcept :
     SGI_Base(), mNetPoint(netpoint), mLayer(nullptr)
 {
-    setFlags(QGraphicsItem::ItemIsSelectable);
     setZValue(Schematic::ZValue_VisibleNetPoints);
 
     mLayer = mNetPoint.getSchematic().getProject().getSchematicLayer(SchematicLayer::Nets);
@@ -80,14 +79,13 @@ void SGI_NetPoint::updateCacheAndRepaint() noexcept
 
 void SGI_NetPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
+    Q_UNUSED(option);
     Q_UNUSED(widget);
-
-    const bool highlight = option->state & QStyle::State_Selected;
 
     if (mPointVisible)
     {
         painter->setPen(Qt::NoPen);
-        painter->setBrush(QBrush(mLayer->getColor(highlight), Qt::SolidPattern));
+        painter->setBrush(QBrush(mLayer->getColor(mNetPoint.isSelected()), Qt::SolidPattern));
         painter->drawEllipse(sBoundingRect);
     }
 

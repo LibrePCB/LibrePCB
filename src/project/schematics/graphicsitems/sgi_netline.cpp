@@ -43,7 +43,6 @@ namespace project {
 SGI_NetLine::SGI_NetLine(SI_NetLine& netline) noexcept :
     SGI_Base(), mNetLine(netline), mLayer(nullptr)
 {
-    setFlags(QGraphicsItem::ItemIsSelectable);
     setZValue(Schematic::ZValue_NetLines);
 
     mLayer = mNetLine.getSchematic().getProject().getSchematicLayer(SchematicLayer::Nets);
@@ -86,12 +85,10 @@ void SGI_NetLine::updateCacheAndRepaint() noexcept
 void SGI_NetLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
     Q_UNUSED(widget);
-
-    const bool selected = option->state & QStyle::State_Selected;
     const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
 
     // draw line
-    QPen pen(mLayer->getColor(selected), mNetLine.getWidth().toPx() * lod, Qt::SolidLine, Qt::RoundCap);
+    QPen pen(mLayer->getColor(mNetLine.isSelected()), mNetLine.getWidth().toPx() * lod, Qt::SolidLine, Qt::RoundCap);
     pen.setCosmetic(true);
     painter->setPen(pen);
     painter->drawLine(mLineF);
@@ -107,7 +104,7 @@ void SGI_NetLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* optio
         font.setFamily("Monospace");
         font.setPixelSize(3);
         painter->setFont(font);
-        painter->setPen(QPen(mLayer->getColor(selected), 0));
+        painter->setPen(QPen(mLayer->getColor(mNetLine.isSelected()), 0));
         painter->drawText(mLineF.pointAt((qreal)0.5), mNetLine.getNetSignal()->getName());
     }
     if ((!deviceIsPrinter) && (Workspace::instance().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect()))

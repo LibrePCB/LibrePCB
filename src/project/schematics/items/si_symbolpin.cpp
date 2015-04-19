@@ -171,8 +171,8 @@ QPainterPath SI_SymbolPin::getGrabAreaScenePx() const noexcept
 
 void SI_SymbolPin::setSelected(bool selected) noexcept
 {
-    mGraphicsItem->setSelected(selected);
     SI_Base::setSelected(selected);
+    mGraphicsItem->update();
 }
 
 /*****************************************************************************************

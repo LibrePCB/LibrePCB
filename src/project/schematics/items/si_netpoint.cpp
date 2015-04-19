@@ -287,8 +287,8 @@ QPainterPath SI_NetPoint::getGrabAreaScenePx() const noexcept
 
 void SI_NetPoint::setSelected(bool selected) noexcept
 {
-    mGraphicsItem->setSelected(selected);
     SI_Base::setSelected(selected);
+    mGraphicsItem->update();
 }
 
 /*****************************************************************************************

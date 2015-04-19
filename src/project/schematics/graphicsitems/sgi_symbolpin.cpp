@@ -48,9 +48,6 @@ SGI_SymbolPin::SGI_SymbolPin(SI_SymbolPin& pin) noexcept :
     SGI_Base(), mPin(pin), mLibPin(pin.getLibPin())
 {
     setZValue(Schematic::ZValue_Symbols);
-    setFlags(QGraphicsItem::ItemIsSelectable);
-    setPos(mLibPin.getPosition().toPxQPointF());
-    setRotation(mLibPin.getAngle().toDeg());
     setToolTip(mLibPin.getName() % ": " % mLibPin.getDescription());
 
     mCircleLayer = getSchematicLayer(SchematicLayer::SymbolPinCircles);
@@ -124,8 +121,6 @@ void SGI_SymbolPin::updateCacheAndRepaint() noexcept
 void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
     Q_UNUSED(widget);
-
-    const bool selected = (option->state & QStyle::State_Selected);// || mSymbolGraphicsItem.isSelected();
     const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
     const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
 
@@ -134,7 +129,7 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     bool requiredPin = mPin.getGenCompSignal()->isRequired();
 
     // draw line
-    QPen pen(mLineLayer->getColor(selected), Length(158750).toPx()*lod, Qt::SolidLine, Qt::RoundCap);
+    QPen pen(mLineLayer->getColor(mPin.isSelected()), Length(158750).toPx() * lod, Qt::SolidLine, Qt::RoundCap);
     pen.setCosmetic(true);
     painter->setPen(pen);
     painter->drawLine(QPointF(0, 0), Point(0, mLibPin.getLength()).toPxQPointF());
@@ -155,7 +150,7 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
             // draw text
             painter->save();
             painter->rotate(mRotate180 ? 90 : -90);
-            painter->setPen(QPen(mTextLayer->getColor(selected), 0));
+            painter->setPen(QPen(mTextLayer->getColor(mPin.isSelected()), 0));
             painter->setFont(mFont);
             painter->drawStaticText(mTextOrigin, mStaticText);
             painter->restore();
@@ -164,7 +159,7 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
         {
             // draw filled rect
             painter->setPen(Qt::NoPen);
-            painter->setBrush(QBrush(mTextLayer->getColor(selected), Qt::Dense5Pattern));
+            painter->setBrush(QBrush(mTextLayer->getColor(mPin.isSelected()), Qt::Dense5Pattern));
             painter->drawRect(mTextBoundingRect);
         }
     }

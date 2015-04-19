@@ -151,8 +151,8 @@ QPainterPath SI_NetLabel::getGrabAreaScenePx() const noexcept
 
 void SI_NetLabel::setSelected(bool selected) noexcept
 {
-    mGraphicsItem->setSelected(selected);
     SI_Base::setSelected(selected);
+    mGraphicsItem->update();
 }
 
 /*****************************************************************************************

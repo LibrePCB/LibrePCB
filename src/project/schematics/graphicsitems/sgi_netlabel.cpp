@@ -44,7 +44,6 @@ QVector<QLineF> SGI_NetLabel::sOriginCrossLines;
 SGI_NetLabel::SGI_NetLabel(SI_NetLabel& netlabel) noexcept :
     SGI_Base(), mNetLabel(netlabel), mOriginCrossLayer(nullptr), mTextLayer(nullptr)
 {
-    setFlags(QGraphicsItem::ItemIsSelectable);
     setZValue(Schematic::ZValue_NetLabels);
 
     mOriginCrossLayer = mNetLabel.getSchematic().getProject().getSchematicLayer(SchematicLayer::OriginCrosses);
@@ -105,22 +104,20 @@ void SGI_NetLabel::updateCacheAndRepaint() noexcept
 void SGI_NetLabel::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
     Q_UNUSED(widget);
-
-    const bool selected = option->state & QStyle::State_Selected;
-    const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
+    bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
     const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
 
     if ((lod > 2) && (!deviceIsPrinter))
     {
         // draw origin cross
-        painter->setPen(QPen(mOriginCrossLayer->getColor(selected), 0));
+        painter->setPen(QPen(mOriginCrossLayer->getColor(mNetLabel.isSelected()), 0));
         painter->drawLines(sOriginCrossLines);
     }
 
     if ((deviceIsPrinter) || (lod > 1))
     {
         // draw text
-        painter->setPen(QPen(mTextLayer->getColor(selected), 0));
+        painter->setPen(QPen(mTextLayer->getColor(mNetLabel.isSelected()), 0));
         painter->setFont(mFont);
         if (mRotate180)
         {
@@ -136,7 +133,7 @@ void SGI_NetLabel::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     {
         // draw filled rect
         painter->setPen(Qt::NoPen);
-        painter->setBrush(QBrush(mTextLayer->getColor(selected), Qt::Dense5Pattern));
+        painter->setBrush(QBrush(mTextLayer->getColor(mNetLabel.isSelected()), Qt::Dense5Pattern));
         painter->drawRect(mBoundingRect);
     }
 

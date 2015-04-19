@@ -45,7 +45,6 @@ SGI_Symbol::SGI_Symbol(SI_Symbol& symbol) noexcept :
     SGI_Base(), mSymbol(symbol), mLibSymbol(symbol.getLibSymbol())
 {
     setZValue(Schematic::ZValue_Symbols);
-    setFlags(QGraphicsItem::ItemIsSelectable);
 
     mFont.setStyleStrategy(QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
     mFont.setStyleHint(QFont::SansSerif);
@@ -164,7 +163,7 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
 
     QPen pen;
     const SchematicLayer* layer = 0;
-    const bool selected = option->state & QStyle::State_Selected;
+    const bool selected = mSymbol.isSelected();
     const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
     const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
 
