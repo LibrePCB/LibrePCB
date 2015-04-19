@@ -17,7 +17,7 @@
         <polygon fill_layer="0" start_y="0" line_width="0.254" line_layer="10" start_x="-1.905" grab_area="false">
             <segment angle="0" end_x="1.905" end_y="0"/>
         </polygon>
-        <text layer="21" text="${CMP::VALUE}" x="0" y="-3" angle="0" height="3.175" v_align="bottom" h_align="center"/>
+        <text layer="21" text="${CMP::VALUE}" x="0" y="0" angle="0" height="3.175" v_align="top" h_align="center"/>
     </geometry>
     <pins>
         <pin x="0" length="2.54" angle="180" y="2.54" uuid="{abcc319b-d09f-437b-a624-3dcf3eff5792}">
