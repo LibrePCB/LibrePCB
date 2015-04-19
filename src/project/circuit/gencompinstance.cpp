@@ -150,6 +150,9 @@ void GenCompInstance::init() throw (Exception)
         "UnplacedOptionalSymbols", ErcMsg::ErcMsgType_t::SchematicWarning));
     updateErcMessages();
 
+    // emit the "attributesChanged" signal when the project has emited it
+    connect(&mCircuit.getProject(), &Project::attributesChanged, this, &GenCompInstance::attributesChanged);
+
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 

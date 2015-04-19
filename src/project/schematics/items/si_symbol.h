@@ -107,7 +107,13 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
 
     private slots:
 
-        void genCompAttributesChanged();
+        void schematicOrGenCompAttributesChanged();
+
+
+    signals:
+
+        /// @copydoc IF_AttributeProvider#attributesChanged()
+        void attributesChanged();
 
 
     private:

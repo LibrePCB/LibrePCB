@@ -120,7 +120,9 @@ void SI_Symbol::init(const QUuid& symbVarItemUuid) throw (Exception)
             "the pin-signal-map")).arg(mUuid.toString()));
     }
 
-    connect(mGenCompInstance, SIGNAL(attributesChanged()), this, SLOT(genCompAttributesChanged()));
+    // connect to the "attributes changes" signal of schematic and generic component
+    connect(mGenCompInstance, &GenCompInstance::attributesChanged,
+            this, &SI_Symbol::schematicOrGenCompAttributesChanged);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -247,7 +249,7 @@ void SI_Symbol::setSelected(bool selected) noexcept
  *  Private Slots
  ****************************************************************************************/
 
-void SI_Symbol::genCompAttributesChanged()
+void SI_Symbol::schematicOrGenCompAttributesChanged()
 {
     mGraphicsItem->updateCacheAndRepaint();
 }

@@ -114,6 +114,9 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
 
         updateIcon();
 
+        // emit the "attributesChanged" signal when the project has emited it
+        connect(&mProject, &Project::attributesChanged, this, &Schematic::attributesChanged);
+
         if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
     }
     catch (...)

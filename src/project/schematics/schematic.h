@@ -180,6 +180,13 @@ class Schematic final : public QObject, public IF_AttributeProvider,
         static Schematic* create(Project& project, const FilePath& filepath,
                                  const QString& name) throw (Exception);
 
+
+    signals:
+
+        /// @copydoc IF_AttributeProvider#attributesChanged()
+        void attributesChanged();
+
+
     private:
 
         // make some methods inaccessible...

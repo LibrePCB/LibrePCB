@@ -133,6 +133,7 @@ class GenCompInstance : public QObject, public IF_AttributeProvider,
 
     signals:
 
+        /// @copydoc IF_AttributeProvider#attributesChanged()
         void attributesChanged();
 
 

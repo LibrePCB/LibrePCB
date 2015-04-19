@@ -341,9 +341,34 @@ QString Project::getDescription() const noexcept
  *  Setters: Attributes
  ****************************************************************************************/
 
+void Project::setName(const QString& newName) noexcept
+{
+    mName = newName;
+    emit attributesChanged();
+}
+
 void Project::setDescription(const QString& newDescription) noexcept
 {
     mDescriptionHtmlFile->setContent(newDescription.toUtf8());
+    emit attributesChanged();
+}
+
+void Project::setAuthor(const QString& newAuthor) noexcept
+{
+    mAuthor = newAuthor;
+    emit attributesChanged();
+}
+
+void Project::setCreated(const QDateTime& newCreated) noexcept
+{
+    mCreated = newCreated;
+    emit attributesChanged();
+}
+
+void Project::setLastModified(const QDateTime& newLastModified) noexcept
+{
+    mLastModified = newLastModified;
+    emit attributesChanged();
 }
 
 /*****************************************************************************************
@@ -385,6 +410,7 @@ void Project::addSchematic(Schematic* schematic, int newIndex) throw (Exception)
         mRemovedSchematics.removeOne(schematic);
 
     emit schematicAdded(newIndex);
+    emit attributesChanged();
 }
 
 void Project::removeSchematic(Schematic* schematic, bool deleteSchematic) throw (Exception)
@@ -405,6 +431,7 @@ void Project::removeSchematic(Schematic* schematic, bool deleteSchematic) throw 
     mSchematics.removeAt(index);
 
     emit schematicRemoved(index);
+    emit attributesChanged();
 
     if (deleteSchematic)
         delete schematic;

@@ -271,7 +271,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *
          * @undocmd{project#CmdProjectSetMetadata}
          */
-        void setName(const QString& newName) noexcept {mName = newName;}
+        void setName(const QString& newName) noexcept;
 
         /**
          * @brief Set the description (in HTML) of the project
@@ -289,7 +289,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *
          * @undocmd{project#CmdProjectSetMetadata}
          */
-        void setAuthor(const QString& newAuthor) noexcept {mAuthor = newAuthor;}
+        void setAuthor(const QString& newAuthor) noexcept;
 
         /**
          * @brief Set the date and time when the project was created
@@ -298,7 +298,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *
          * @undocmd{project#CmdProjectSetMetadata}
          */
-        void setCreated(const QDateTime& newCreated) noexcept {mCreated = newCreated;}
+        void setCreated(const QDateTime& newCreated) noexcept;
 
         /**
          * @brief Set the date and time when the project was last modified
@@ -307,7 +307,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *
          * @note This method is automatically called before saving the project.
          */
-        void setLastModified(const QDateTime& newLastModified) noexcept {mLastModified = newLastModified;}
+        void setLastModified(const QDateTime& newLastModified) noexcept;
 
 
         // General Methods
@@ -448,6 +448,9 @@ class Project final : public QObject, public IF_AttributeProvider,
 
 
     signals:
+
+        /// @copydoc IF_AttributeProvider#attributesChanged()
+        void attributesChanged();
 
         /**
          * @brief This signal is emitted after a schematic was added to the project
