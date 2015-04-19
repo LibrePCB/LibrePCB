@@ -28,7 +28,6 @@
 #include "si_base.h"
 #include "../../../common/file_io/if_xmlserializableobject.h"
 #include "../../erc/if_ercmsgprovider.h"
-#include "../../../common/units/all_length_units.h"
 #include "../graphicsitems/sgi_netpoint.h"
 
 /*****************************************************************************************
@@ -74,7 +73,7 @@ class SI_NetPoint final : public SI_Base, public IF_XmlSerializableObject,
         Schematic& getSchematic() const noexcept {return mSchematic;}
         const QUuid& getUuid() const noexcept {return mUuid;}
         bool isAttached() const noexcept {return mAttached;}
-        const Point& getPosition() const noexcept {return mPosition;}
+        bool isVisible() const noexcept {return ((mLines.count() > 1) && mAttached) || (mLines.count() > 2);}
         NetSignal* getNetSignal() const noexcept {return mNetSignal;}
         SI_SymbolPin* getSymbolPin() const noexcept {return mSymbolPin;}
         const QList<SI_NetLine*>& getLines() const noexcept {return mLines;}
@@ -100,20 +99,15 @@ class SI_NetPoint final : public SI_Base, public IF_XmlSerializableObject,
         void updateLines() const noexcept;
         void registerNetLine(SI_NetLine& netline) noexcept;
         void unregisterNetLine(SI_NetLine& netline) noexcept;
-        void addToSchematic() throw (Exception);
-        void removeFromSchematic() throw (Exception);
+        void addToSchematic(GraphicsScene& scene) throw (Exception);
+        void removeFromSchematic(GraphicsScene& scene) throw (Exception);
         XmlDomElement* serializeToXmlDomElement() const throw (Exception);
 
-        // Static Methods
-        static uint extractFromGraphicsItems(const QList<QGraphicsItem*>& items,
-                                             QList<SI_NetPoint*>& netpoints,
-                                             bool floatingPoints = true,
-                                             bool attachedPoints = true,
-                                             bool floatingPointsFromFloatingLines = false,
-                                             bool attachedPointsFromFloatingLines = false,
-                                             bool floatingPointsFromAttachedLines = false,
-                                             bool attachedPointsFromAttachedLines = false,
-                                             bool attachedPointsFromSymbols = false) noexcept;
+        // Inherited from SI_Base
+        Type_t getType() const noexcept override {return SI_Base::Type_t::NetPoint;}
+        const Point& getPosition() const noexcept override {return mPosition;}
+        QPainterPath getGrabAreaScenePx() const noexcept override;
+        void setSelected(bool selected) noexcept override;
 
 
     private:

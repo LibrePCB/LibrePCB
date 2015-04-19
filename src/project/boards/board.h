@@ -25,7 +25,6 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../../common/cadscene.h"
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -43,11 +42,8 @@ namespace project {
 
 /**
  * @brief The Board class represents a PCB of a project and is always part of a circuit
- *
- * This class inherits from QGraphicsScene (through CADScene). This way, a Board can be
- * shown directly in a QGraphicsView (resp. CADView).
  */
-class Board final : public CADScene
+class Board final : public QObject
 {
         Q_OBJECT
 

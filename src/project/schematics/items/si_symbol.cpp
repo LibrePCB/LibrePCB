@@ -32,6 +32,7 @@
 #include "../../../library/genericcomponent.h"
 #include "../../../library/symbol.h"
 #include "../../../common/file_io/xmldomelement.h"
+#include "../../../common/graphics/graphicsscene.h"
 
 namespace project {
 
@@ -96,7 +97,7 @@ void SI_Symbol::init(const QUuid& symbVarItemUuid) throw (Exception)
 
     foreach (const library::SymbolPin* libPin, mSymbol->getPins())
     {
-        SI_SymbolPin* pin = new SI_SymbolPin(*this, libPin->getUuid(), *mGraphicsItem);
+        SI_SymbolPin* pin = new SI_SymbolPin(*this, libPin->getUuid());
         if (mPins.contains(libPin->getUuid()))
         {
             throw RuntimeError(__FILE__, __LINE__, libPin->getUuid().toString(),
@@ -143,18 +144,13 @@ QString SI_Symbol::getName() const noexcept
  *  Setters
  ****************************************************************************************/
 
-void SI_Symbol::setSelected(bool selected) noexcept
-{
-    mGraphicsItem->setSelected(selected);
-}
-
 void SI_Symbol::setPosition(const Point& newPos) throw (Exception)
 {
     mPosition = newPos;
     mGraphicsItem->setPos(newPos.toPxQPointF());
     mGraphicsItem->updateCacheAndRepaint();
     foreach (SI_SymbolPin* pin, mPins)
-        pin->updateNetPointPosition();
+        pin->updatePosition();
 }
 
 void SI_Symbol::setAngle(const Angle& newAngle) throw (Exception)
@@ -163,27 +159,27 @@ void SI_Symbol::setAngle(const Angle& newAngle) throw (Exception)
     mGraphicsItem->setRotation(newAngle.toDeg());
     mGraphicsItem->updateCacheAndRepaint();
     foreach (SI_SymbolPin* pin, mPins)
-        pin->updateNetPointPosition();
+        pin->updatePosition();
 }
 
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
-void SI_Symbol::addToSchematic() throw (Exception)
+void SI_Symbol::addToSchematic(GraphicsScene& scene) throw (Exception)
 {
     mGenCompInstance->registerSymbol(*this);
-    mSchematic.addItem(mGraphicsItem);
+    scene.addItem(*mGraphicsItem);
     foreach (SI_SymbolPin* pin, mPins)
-        pin->addToSchematic();
+        pin->addToSchematic(scene);
 }
 
-void SI_Symbol::removeFromSchematic() throw (Exception)
+void SI_Symbol::removeFromSchematic(GraphicsScene& scene) throw (Exception)
 {
     mGenCompInstance->unregisterSymbol(*this);
-    mSchematic.removeItem(mGraphicsItem);
+    scene.removeItem(*mGraphicsItem);
     foreach (SI_SymbolPin* pin, mPins)
-        pin->removeFromSchematic();
+        pin->removeFromSchematic(scene);
 }
 
 XmlDomElement* SI_Symbol::serializeToXmlDomElement() const throw (Exception)
@@ -231,6 +227,23 @@ bool SI_Symbol::getAttributeValue(const QString& attrNS, const QString& attrKey,
 }
 
 /*****************************************************************************************
+ *  Inherited from SI_Base
+ ****************************************************************************************/
+
+QPainterPath SI_Symbol::getGrabAreaScenePx() const noexcept
+{
+    return mGraphicsItem->shape().translated(mPosition.toPxQPointF());
+}
+
+void SI_Symbol::setSelected(bool selected) noexcept
+{
+    foreach (SI_SymbolPin* pin, mPins)
+        pin->setSelected(selected);
+    mGraphicsItem->setSelected(selected);
+    SI_Base::setSelected(selected);
+}
+
+/*****************************************************************************************
  *  Private Slots
  ****************************************************************************************/
 
@@ -250,28 +263,6 @@ bool SI_Symbol::checkAttributesValidity() const noexcept
     if (mUuid.isNull())                 return false;
     if (mGenCompInstance == nullptr)    return false;
     return true;
-}
-
-/*****************************************************************************************
- *  Static Methods
- ****************************************************************************************/
-
-uint SI_Symbol::extractFromGraphicsItems(const QList<QGraphicsItem*>& items,
-                                         QList<SI_Symbol*>& symbols) noexcept
-{
-    foreach (QGraphicsItem* item, items)
-    {
-        Q_ASSERT(item); if (!item) continue;
-        if (item->type() == Schematic::Type_Symbol)
-        {
-            SGI_Symbol* i = qgraphicsitem_cast<SGI_Symbol*>(item);
-            Q_ASSERT(i); if (!i) continue;
-            SI_Symbol* s = &i->getSymbol();
-            if (!symbols.contains(s))
-                symbols.append(s);
-        }
-    }
-    return symbols.count();
 }
 
 /*****************************************************************************************

@@ -25,24 +25,27 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <QtWidgets>
 #include "../../common/if_attributeprovider.h"
 #include "../../common/file_io/if_xmlserializableobject.h"
 #include "../../common/units/all_length_units.h"
 #include "../../common/file_io/filepath.h"
 #include "../../common/exceptions.h"
-#include "../../common/cadscene.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
 class GridProperties;
+class GraphicsView;
+class GraphicsScene;
 class SmartXmlFile;
 
 namespace project {
 class Project;
 class NetSignal;
 class GenCompInstance;
+class SI_Base;
 class SI_Symbol;
 class SI_SymbolPin;
 class SI_NetPoint;
@@ -60,20 +63,17 @@ namespace project {
  * @brief The Schematic class represents one schematic page of a project and is always
  * part of a circuit
  *
- * This class inherits from QGraphicsScene (through CADScene). This way, a schematic page
- * can be shown directly in a QGraphicsView (resp. CADView).
- *
  * A schematic can contain following items (see project#SI_Base and project#SGI_Base):
  *  - netpoint:         project#SI_NetPoint    + project#SGI_NetPoint
  *  - netline:          project#SI_NetLine     + project#SGI_NetLine
  *  - netlabel:         project#SI_NetLabel    + project#SGI_NetLabel
  *  - symbol:           project#SI_Symbol      + project#SGI_Symbol
- *      - symbol pin:   project#SI_SymbolPin   + project#SGI_SymbolPin
- *  - polygon:      TODO
- *  - ellipse:      TODO
- *  - text:         TODO
+ *  - symbol pin:       project#SI_SymbolPin   + project#SGI_SymbolPin
+ *  - polygon:          TODO
+ *  - ellipse:          TODO
+ *  - text:             TODO
  */
-class Schematic final : public CADScene, public IF_AttributeProvider,
+class Schematic final : public QObject, public IF_AttributeProvider,
                         public IF_XmlSerializableObject
 {
         Q_OBJECT
@@ -81,22 +81,6 @@ class Schematic final : public CADScene, public IF_AttributeProvider,
     public:
 
         // Types
-
-        /**
-         * @brief All custom QGraphicsItem types which are used in a schematic
-         *
-         * See QGraphicsItem::Type for more information.
-         *
-         * @note We do not use "enum class" because it must be easily compareable with int.
-         */
-        enum ItemType_t {
-            Type_SchematicBase = CADScene::Type_SchematicBase, ///< the base number for schematic items
-            Type_NetPoint,      ///< project#SGI_NetPoint
-            Type_NetLine,       ///< project#SGI_NetLine
-            Type_NetLabel,      ///< project#SGI_NetLabel
-            Type_Symbol,        ///< project#SGI_Symbol
-            Type_SymbolPin,     ///< project#SGI_SymbolPin
-        };
 
         /**
          * @brief Z Values of all items in a schematic scene (to define the stacking order)
@@ -127,9 +111,20 @@ class Schematic final : public CADScene, public IF_AttributeProvider,
         const FilePath& getFilePath() const noexcept {return mFilePath;}
         const GridProperties& getGridProperties() const noexcept {return *mGridProperties;}
         bool isEmpty() const noexcept;
-        uint getNetPointsAtScenePos(QList<SI_NetPoint*>& list, const Point& pos) const noexcept;
-        uint getNetLinesAtScenePos(QList<SI_NetLine*>& list, const Point& pos) const noexcept;
-        uint getPinsAtScenePos(QList<SI_SymbolPin*>& list, const Point& pos) const noexcept;
+        QList<SI_Base*> getSelectedItems(bool floatingPoints,
+                                         bool attachedPoints,
+                                         bool floatingPointsFromFloatingLines,
+                                         bool attachedPointsFromFloatingLines,
+                                         bool floatingPointsFromAttachedLines,
+                                         bool attachedPointsFromAttachedLines,
+                                         bool attachedPointsFromSymbols,
+                                         bool floatingLines,
+                                         bool attachedLines,
+                                         bool attachedLinesFromSymbols) const noexcept;
+        QList<SI_Base*> getItemsAtScenePos(const Point& pos) const noexcept;
+        QList<SI_NetPoint*> getNetPointsAtScenePos(const Point& pos) const noexcept;
+        QList<SI_NetLine*> getNetLinesAtScenePos(const Point& pos) const noexcept;
+        QList<SI_SymbolPin*> getPinsAtScenePos(const Point& pos) const noexcept;
 
         // Setters: General
         void setGridProperties(const GridProperties& grid) noexcept;
@@ -170,8 +165,12 @@ class Schematic final : public CADScene, public IF_AttributeProvider,
         void addToProject() throw (Exception);
         void removeFromProject() throw (Exception);
         bool save(bool toOriginal, QStringList& errors) noexcept;
+        void showInView(GraphicsView& view) noexcept;
         void saveViewSceneRect(const QRectF& rect) noexcept {mViewRect = rect;}
         const QRectF& restoreViewSceneRect() const noexcept {return mViewRect;}
+        void setSelectionRect(const Point& p1, const Point& p2, bool updateItems) noexcept;
+        void clearSelection() const noexcept;
+        void renderToQPainter(QPainter& painter) const noexcept;
 
         // Helper Methods
         bool getAttributeValue(const QString& attrNS, const QString& attrKey,
@@ -207,6 +206,7 @@ class Schematic final : public CADScene, public IF_AttributeProvider,
         SmartXmlFile* mXmlFile;
         bool mAddedToProject;
 
+        GraphicsScene* mGraphicsScene;
         QRectF mViewRect;
         GridProperties* mGridProperties;
 

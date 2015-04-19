@@ -171,12 +171,38 @@ SES_Base::ProcRetVal SES_Select::processSubStateIdleSceneEvent(SEE_Base* event) 
                     break;
             }
             break;
-        } 
+        }
+        case QEvent::GraphicsSceneMouseRelease:
+        {
+            QGraphicsSceneMouseEvent* mouseEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
+            Q_ASSERT(mouseEvent); if (!mouseEvent) break;
+            if (mouseEvent->button() == Qt::LeftButton)
+            {
+                // remove selection rectangle and keep the selection state of all items
+                schematic->setSelectionRect(Point(), Point(), false);
+                return ForceStayInState;
+            }
+            break;
+        }
         case QEvent::GraphicsSceneMouseDoubleClick:
         {
             QGraphicsSceneMouseEvent* mouseEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
             Q_ASSERT(mouseEvent); if (!mouseEvent) break;
             return proccessIdleSceneDoubleClick(mouseEvent, schematic);
+        }
+        case QEvent::GraphicsSceneMouseMove:
+        {
+            QGraphicsSceneMouseEvent* mouseEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
+            Q_ASSERT(mouseEvent); if (!mouseEvent) break;
+            if (mouseEvent->buttons().testFlag(Qt::LeftButton))
+            {
+                // draw selection rectangle
+                Point p1 = Point::fromPx(mouseEvent->buttonDownScenePos(Qt::LeftButton));
+                Point p2 = Point::fromPx(mouseEvent->scenePos());
+                schematic->setSelectionRect(p1, p2, true);
+                return ForceStayInState;
+            }
+            break;
         }
         default:
             break;
@@ -188,8 +214,13 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneLeftClick(QGraphicsSceneMouseE
                                                             Schematic* schematic) noexcept
 {
     // handle items selection
-    QList<QGraphicsItem*> items = schematic->items(mouseEvent->scenePos());
-    if (items.isEmpty()) return PassToParentState; // no items under mouse --> abort
+    QList<SI_Base*> items = schematic->getItemsAtScenePos(Point::fromPx(mouseEvent->scenePos()));
+    if (items.isEmpty())
+    {
+        // no items under mouse --> start drawing a selection rectangle
+        schematic->clearSelection();
+        return ForceStayInState;
+    }
     if (!items.first()->isSelected())
     {
         if (!(mouseEvent->modifiers() & Qt::ControlModifier)) // CTRL pressed
@@ -207,22 +238,19 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneRightClick(QGraphicsSceneMouse
                                                              Schematic* schematic) noexcept
 {
     // handle item selection
-    QList<QGraphicsItem*> items = schematic->items(mouseEvent->scenePos());
+    QList<SI_Base*> items = schematic->getItemsAtScenePos(Point::fromPx(mouseEvent->scenePos()));
     if (items.isEmpty()) return PassToParentState;
     schematic->clearSelection();
     items.first()->setSelected(true);
 
     // build and execute the context menu
     QMenu menu;
-    switch (items.first()->type())
+    switch (items.first()->getType())
     {
-        case Schematic::Type_Symbol:
+        case SI_Base::Type_t::Symbol:
         {
-            // get symbol and component instances
-            SGI_Symbol* i = qgraphicsitem_cast<SGI_Symbol*>(items.first());
-            Q_ASSERT(i); if (!i) return PassToParentState;
-            SI_Symbol& symbol = i->getSymbol();
-            GenCompInstance& genComp = symbol.getGenCompInstance();
+            SI_Symbol* symbol = dynamic_cast<SI_Symbol*>(items.first()); Q_ASSERT(symbol);
+            GenCompInstance& genComp = symbol->getGenCompInstance();
 
             // build the context menu
             QAction* aCopy = menu.addAction(QIcon(":/img/actions/copy.png"), tr("Copy"));
@@ -231,7 +259,7 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneRightClick(QGraphicsSceneMouse
             menu.addSeparator();
             QAction* aPlaceUnplacedSymbols = menu.addAction(QString(tr("Place unplaced symbols of %1 (%2)")).arg(genComp.getName()).arg(genComp.getUnplacedSymbolsCount()));
             aPlaceUnplacedSymbols->setEnabled(genComp.getUnplacedSymbolsCount() > 0);
-            QAction* aRemoveSymbol = menu.addAction(QIcon(":/img/actions/delete.png"), QString(tr("Remove Symbol %1")).arg(symbol.getName()));
+            QAction* aRemoveSymbol = menu.addAction(QIcon(":/img/actions/delete.png"), QString(tr("Remove Symbol %1")).arg(symbol->getName()));
             aRemoveSymbol->setEnabled(genComp.getPlacedSymbolsCount() > 1);
             QAction* aRemoveGenComp = menu.addAction(QIcon(":/img/actions/cancel.png"), QString(tr("Remove Component %1")).arg(genComp.getName()));
             menu.addSeparator();
@@ -245,7 +273,7 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneRightClick(QGraphicsSceneMouse
             }
             else if (action == aRotate)
             {
-                rotateSelectedItems(-Angle::deg90(), symbol.getPosition());
+                rotateSelectedItems(-Angle::deg90(), symbol->getPosition());
             }
             else if (action == aMirror)
             {
@@ -266,7 +294,7 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneRightClick(QGraphicsSceneMouse
             else if (action == aProperties)
             {
                 // open the properties editor dialog of the selected item
-                SymbolInstancePropertiesDialog dialog(mProject, genComp, symbol, &mEditor);
+                SymbolInstancePropertiesDialog dialog(mProject, genComp, *symbol, &mEditor);
                 dialog.exec();
             }
             return ForceStayInState;
@@ -283,27 +311,23 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneDoubleClick(QGraphicsSceneMous
     if (mouseEvent->buttons() == Qt::LeftButton)
     {
         // check if there is an element under the mouse
-        QList<QGraphicsItem*> items = schematic->items(mouseEvent->scenePos());
+        QList<SI_Base*> items = schematic->getItemsAtScenePos(Point::fromPx(mouseEvent->scenePos()));
         if (items.isEmpty()) return PassToParentState;
         // open the properties editor dialog of the top most item
-        switch (items.first()->type())
+        switch (items.first()->getType())
         {
-            case Schematic::Type_Symbol:
+            case SI_Base::Type_t::Symbol:
             {
-                SGI_Symbol* i = qgraphicsitem_cast<SGI_Symbol*>(items.first());
-                Q_ASSERT(i); if (!i) return PassToParentState;
-                SI_Symbol& symbol = i->getSymbol();
-                GenCompInstance& genComp = symbol.getGenCompInstance();
-                SymbolInstancePropertiesDialog dialog(mProject, genComp, symbol, &mEditor);
+                SI_Symbol* symbol = dynamic_cast<SI_Symbol*>(items.first()); Q_ASSERT(symbol);
+                GenCompInstance& genComp = symbol->getGenCompInstance();
+                SymbolInstancePropertiesDialog dialog(mProject, genComp, *symbol, &mEditor);
                 dialog.exec();
                 return ForceStayInState;
             }
-            case Schematic::Type_NetLabel:
+            case SI_Base::Type_t::NetLabel:
             {
-                SGI_NetLabel* i = qgraphicsitem_cast<SGI_NetLabel*>(items.first());
-                Q_ASSERT(i); if (!i) return PassToParentState;
-                SI_NetLabel& label = i->getNetLabel();
-                NetSignal& netsignal = label.getNetSignal();
+                SI_NetLabel* label = dynamic_cast<SI_NetLabel*>(items.first()); Q_ASSERT(label);
+                NetSignal& netsignal = label->getNetSignal();
                 QString name = QInputDialog::getText(&mEditor, tr("Change Net Name"),
                                                      tr("New Net Name:"),QLineEdit::Normal,
                                                      netsignal.getName());
@@ -383,7 +407,7 @@ SES_Base::ProcRetVal SES_Select::processSubStateMovingSceneEvent(SEE_Base* event
             Schematic* schematic = mEditor.getActiveSchematic();
             Q_CHECK_PTR(sceneEvent); if (!sceneEvent) break;
             Q_CHECK_PTR(schematic); if (!schematic) break;
-            Point delta = Point::fromPx(sceneEvent->scenePos()) - mMoveStartPos;
+            Point delta = Point::fromPx(sceneEvent->scenePos() - sceneEvent->buttonDownScenePos(Qt::LeftButton));
             delta.mapToGrid(mEditor.getGridProperties().getInterval());
 
             switch (sceneEvent->button())
@@ -441,7 +465,7 @@ SES_Base::ProcRetVal SES_Select::processSubStateMovingSceneEvent(SEE_Base* event
             Q_CHECK_PTR(mParentCommand);
 
             // get delta position
-            Point delta = Point::fromPx(sceneEvent->scenePos()) - mMoveStartPos;
+            Point delta = Point::fromPx(sceneEvent->scenePos() - sceneEvent->buttonDownScenePos(Qt::LeftButton));
             delta.mapToGrid(mEditor.getGridProperties().getInterval());
             if (delta == mLastMouseMoveDeltaPos) break; // do not move any items
 
@@ -475,18 +499,11 @@ SES_Base::ProcRetVal SES_Select::processSubStateMovingSceneEvent(SEE_Base* event
 bool SES_Select::startMovingSelectedItems(Schematic* schematic) noexcept
 {
     // get all selected items
-    QList<QGraphicsItem*> items = schematic->selectedItems();
-    uint count = 0;
-    QList<SI_Symbol*> symbols;
-    QList<SI_NetPoint*> netpoints;
-    QList<SI_NetLabel*> netlabels;
-    count += SI_Symbol::extractFromGraphicsItems(items, symbols);
-    count += SI_NetPoint::extractFromGraphicsItems(items, netpoints, true, false,
-                                                   true, false, false, false);
-    count += SI_NetLabel::extractFromGraphicsItems(items, netlabels);
+    QList<SI_Base*> items = schematic->getSelectedItems(true, false, true, false, false,
+                                                        false, false, false, false, false);
 
     // abort if no items are selected
-    if (count == 0) return false;
+    if (items.isEmpty()) return false;
 
     // create move commands for all selected items
     Q_ASSERT(!mParentCommand);
@@ -494,17 +511,35 @@ bool SES_Select::startMovingSelectedItems(Schematic* schematic) noexcept
     Q_ASSERT(mNetPointEditCmds.isEmpty());
     Q_ASSERT(mNetLabelEditCmds.isEmpty());
     mParentCommand = new UndoCommand(tr("Move Schematic Items"));
-    foreach (auto instance, symbols)
-        mSymbolEditCmds.append(new CmdSymbolInstanceEdit(*instance, mParentCommand));
-    foreach (auto point, netpoints)
-        mNetPointEditCmds.append(new CmdSchematicNetPointEdit(*point, mParentCommand));
-    foreach (auto label, netlabels)
-        mNetLabelEditCmds.append(new CmdSchematicNetLabelEdit(*label, mParentCommand));
+    foreach (SI_Base* item, items)
+    {
+        switch (item->getType())
+        {
+            case SI_Base::Type_t::Symbol:
+            {
+                SI_Symbol* symbol = dynamic_cast<SI_Symbol*>(item); Q_ASSERT(symbol);
+                mSymbolEditCmds.append(new CmdSymbolInstanceEdit(*symbol, mParentCommand));
+                break;
+            }
+            case SI_Base::Type_t::NetPoint:
+            {
+                SI_NetPoint* point = dynamic_cast<SI_NetPoint*>(item); Q_ASSERT(point);
+                mNetPointEditCmds.append(new CmdSchematicNetPointEdit(*point, mParentCommand));
+                break;
+            }
+            case SI_Base::Type_t::NetLabel:
+            {
+                SI_NetLabel* label = dynamic_cast<SI_NetLabel*>(item); Q_ASSERT(label);
+                mNetLabelEditCmds.append(new CmdSchematicNetLabelEdit(*label, mParentCommand));
+                break;
+            }
+            default:
+                break;
+        }
+    }
 
     // switch to substate SubState_Moving
     mSubState = SubState_Moving;
-    mMoveStartPos = Point::fromPx(mEditorUi.graphicsView->mapToScene(
-        mEditorUi.graphicsView->mapFromGlobal(QCursor::pos()))); // not mapped to grid!
     return true;
 }
 
@@ -514,30 +549,19 @@ bool SES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
     Q_ASSERT(schematic); if (!schematic) return false;
 
     // get all selected items
-    QList<QGraphicsItem*> items = schematic->selectedItems();
-    uint count = 0;
-    QList<SI_Symbol*> symbols;
-    QList<SI_NetPoint*> netpoints;
-    QList<SI_NetLabel*> netlabels;
-    count += SI_Symbol::extractFromGraphicsItems(items, symbols);
-    count += SI_NetPoint::extractFromGraphicsItems(items, netpoints, true, false,
-                                                   true, false, false, false);
-    count += SI_NetLabel::extractFromGraphicsItems(items, netlabels);
+    QList<SI_Base*> items = schematic->getSelectedItems(true, false, true, false, false,
+                                                        false, false, false, false, false);
 
     // abort if no items are selected
-    if (count == 0) return ForceStayInState;
+    if (items.isEmpty()) return false;
 
     // find the center of all elements
     if (centerOfElements)
     {
         center = Point(0, 0);
-        foreach (SI_Symbol* symbol, symbols)
-            center += symbol->getPosition();
-        foreach (SI_NetPoint* point, netpoints)
-            center += point->getPosition();
-        foreach (SI_NetLabel* label, netlabels)
-            center += label->getPosition();
-        center /= count;
+        foreach (SI_Base* item, items)
+            center += item->getPosition();
+        center /= items.count();
         center.mapToGrid(mEditor.getGridProperties().getInterval());
     }
 
@@ -547,28 +571,38 @@ bool SES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
         mEditor.getProject().getUndoStack().beginCommand(tr("Rotate Schematic Elements"));
         commandActive = true;
 
-        // rotate all symbols
-        foreach (auto symbol, symbols)
+        // rotate all elements
+        foreach (SI_Base* item, items)
         {
-            CmdSymbolInstanceEdit* cmd = new CmdSymbolInstanceEdit(*symbol);
-            cmd->rotate(angle, center, false);
-            mEditor.getProject().getUndoStack().appendToCommand(cmd);
-        }
-
-        // rotate all netpoints
-        foreach (auto point, netpoints)
-        {
-            CmdSchematicNetPointEdit* cmd = new CmdSchematicNetPointEdit(*point);
-            cmd->setPosition(point->getPosition().rotated(angle, center), false);
-            mEditor.getProject().getUndoStack().appendToCommand(cmd);
-        }
-
-        // rotate all netlabels
-        foreach (auto label, netlabels)
-        {
-            CmdSchematicNetLabelEdit* cmd = new CmdSchematicNetLabelEdit(*label);
-            cmd->rotate(angle, center, false);
-            mEditor.getProject().getUndoStack().appendToCommand(cmd);
+            switch (item->getType())
+            {
+                case SI_Base::Type_t::Symbol:
+                {
+                    SI_Symbol* symbol = dynamic_cast<SI_Symbol*>(item); Q_ASSERT(symbol);
+                    CmdSymbolInstanceEdit* cmd = new CmdSymbolInstanceEdit(*symbol);
+                    cmd->rotate(angle, center, false);
+                    mEditor.getProject().getUndoStack().appendToCommand(cmd);
+                    break;
+                }
+                case SI_Base::Type_t::NetPoint:
+                {
+                    SI_NetPoint* netpoint = dynamic_cast<SI_NetPoint*>(item); Q_ASSERT(netpoint);
+                    CmdSchematicNetPointEdit* cmd = new CmdSchematicNetPointEdit(*netpoint);
+                    cmd->setPosition(netpoint->getPosition().rotated(angle, center), false);
+                    mEditor.getProject().getUndoStack().appendToCommand(cmd);
+                    break;
+                }
+                case SI_Base::Type_t::NetLabel:
+                {
+                    SI_NetLabel* netlabel = dynamic_cast<SI_NetLabel*>(item); Q_ASSERT(netlabel);
+                    CmdSchematicNetLabelEdit* cmd = new CmdSchematicNetLabelEdit(*netlabel);
+                    cmd->rotate(angle, center, false);
+                    mEditor.getProject().getUndoStack().appendToCommand(cmd);
+                    break;
+                }
+                default:
+                    break;
+            }
         }
 
         mEditor.getProject().getUndoStack().endCommand();
@@ -591,27 +625,22 @@ bool SES_Select::removeSelectedItems() noexcept
     Q_ASSERT(schematic); if (!schematic) return false;
 
     // get all selected items
-    QList<QGraphicsItem*> items = schematic->selectedItems();
-    uint count = 0;
-    QList<SI_Symbol*> symbols;
-    QList<SI_NetPoint*> netpoints;
-    QList<SI_NetLine*> netlines;
-    QList<SI_NetLabel*> netlabels;
-    count += SI_Symbol::extractFromGraphicsItems(items, symbols);
-    count += SI_NetPoint::extractFromGraphicsItems(items, netpoints, true, true,
-                                                   true, true, true, true, true);
-    count += SI_NetLine::extractFromGraphicsItems(items, netlines, true, true, false);
-    count += SI_NetLabel::extractFromGraphicsItems(items, netlabels);
+    QList<SI_Base*> items = schematic->getSelectedItems(true, true, true, true, true, true,
+                                                        true, true, true, false);
 
     // abort if no items are selected
-    if (count == 0) return false;
+    if (items.isEmpty()) return false;
 
     // get all involved generic component instances
     QList<GenCompInstance*> genCompInstances;
-    foreach (auto symbol, symbols)
+    foreach (SI_Base* item, items)
     {
-        if (!genCompInstances.contains(&symbol->getGenCompInstance()))
-            genCompInstances.append(&symbol->getGenCompInstance());
+        if (item->getType() == SI_Base::Type_t::Symbol)
+        {
+            SI_Symbol* symbol = dynamic_cast<SI_Symbol*>(item); Q_ASSERT(symbol);
+            if (!genCompInstances.contains(&symbol->getGenCompInstance()))
+                genCompInstances.append(&symbol->getGenCompInstance());
+        }
     }
 
     bool commandActive = false;
@@ -622,51 +651,67 @@ bool SES_Select::removeSelectedItems() noexcept
         schematic->clearSelection();
 
         // remove all netlabels
-        foreach (auto label, netlabels)
+        foreach (SI_Base* item, items)
         {
-            auto cmd = new CmdSchematicNetLabelRemove(*schematic, *label);
-            mEditor.getProject().getUndoStack().appendToCommand(cmd);
+            if (item->getType() == SI_Base::Type_t::NetLabel)
+            {
+                SI_NetLabel* netlabel = dynamic_cast<SI_NetLabel*>(item); Q_ASSERT(netlabel);
+                auto cmd = new CmdSchematicNetLabelRemove(*schematic, *netlabel);
+                mEditor.getProject().getUndoStack().appendToCommand(cmd);
+            }
         }
 
         // remove all netlines
-        foreach (auto line, netlines)
+        foreach (SI_Base* item, items)
         {
-            CmdSchematicNetLineRemove* cmd = new CmdSchematicNetLineRemove(*schematic, *line);
-            mEditor.getProject().getUndoStack().appendToCommand(cmd);
+            if (item->getType() == SI_Base::Type_t::NetLine)
+            {
+                SI_NetLine* netline = dynamic_cast<SI_NetLine*>(item); Q_ASSERT(netline);
+                auto cmd = new CmdSchematicNetLineRemove(*schematic, *netline);
+                mEditor.getProject().getUndoStack().appendToCommand(cmd);
+            }
         }
 
         // remove all netpoints
-        foreach (SI_NetPoint* point, netpoints)
+        foreach (SI_Base* item, items)
         {
-            // TODO: this code does not work correctly in all possible cases
-            if (point->getLines().count() == 0)
+            if (item->getType() == SI_Base::Type_t::NetPoint)
             {
-                CmdSchematicNetPointRemove* cmd = new CmdSchematicNetPointRemove(*schematic, *point);
-                mEditor.getProject().getUndoStack().appendToCommand(cmd);
-                if (point->isAttached())
+                SI_NetPoint* netpoint = dynamic_cast<SI_NetPoint*>(item); Q_ASSERT(netpoint);
+                // TODO: this code does not work correctly in all possible cases
+                if (netpoint->getLines().count() == 0)
                 {
-                    GenCompSignalInstance* signal = point->getSymbolPin()->getGenCompSignalInstance();
-                    Q_ASSERT(signal); if (!signal) throw LogicError(__FILE__, __LINE__);
-                    CmdGenCompSigInstSetNetSignal* cmd = new CmdGenCompSigInstSetNetSignal(*signal, nullptr);
+                    CmdSchematicNetPointRemove* cmd = new CmdSchematicNetPointRemove(*schematic, *netpoint);
                     mEditor.getProject().getUndoStack().appendToCommand(cmd);
+                    if (netpoint->isAttached())
+                    {
+                        GenCompSignalInstance* signal = netpoint->getSymbolPin()->getGenCompSignalInstance();
+                        Q_ASSERT(signal); if (!signal) throw LogicError(__FILE__, __LINE__);
+                        CmdGenCompSigInstSetNetSignal* cmd = new CmdGenCompSigInstSetNetSignal(*signal, nullptr);
+                        mEditor.getProject().getUndoStack().appendToCommand(cmd);
+                    }
                 }
-            }
-            else if (point->isAttached())
-            {
-                GenCompSignalInstance* signal = point->getSymbolPin()->getGenCompSignalInstance();
-                Q_ASSERT(signal); if (!signal) throw LogicError(__FILE__, __LINE__);
-                CmdSchematicNetPointDetach* cmd1 = new CmdSchematicNetPointDetach(*point);
-                mEditor.getProject().getUndoStack().appendToCommand(cmd1);
-                CmdGenCompSigInstSetNetSignal* cmd2 = new CmdGenCompSigInstSetNetSignal(*signal, nullptr);
-                mEditor.getProject().getUndoStack().appendToCommand(cmd2);
+                else if (netpoint->isAttached())
+                {
+                    GenCompSignalInstance* signal = netpoint->getSymbolPin()->getGenCompSignalInstance();
+                    Q_ASSERT(signal); if (!signal) throw LogicError(__FILE__, __LINE__);
+                    CmdSchematicNetPointDetach* cmd1 = new CmdSchematicNetPointDetach(*netpoint);
+                    mEditor.getProject().getUndoStack().appendToCommand(cmd1);
+                    CmdGenCompSigInstSetNetSignal* cmd2 = new CmdGenCompSigInstSetNetSignal(*signal, nullptr);
+                    mEditor.getProject().getUndoStack().appendToCommand(cmd2);
+                }
             }
         }
 
         // remove all symbols
-        foreach (auto symbol, symbols)
+        foreach (SI_Base* item, items)
         {
-            CmdSymbolInstanceRemove* cmd = new CmdSymbolInstanceRemove(*schematic, *symbol);
-            mEditor.getProject().getUndoStack().appendToCommand(cmd);
+            if (item->getType() == SI_Base::Type_t::Symbol)
+            {
+                SI_Symbol* symbol = dynamic_cast<SI_Symbol*>(item); Q_ASSERT(symbol);
+                auto cmd = new CmdSymbolInstanceRemove(*schematic, *symbol);
+                mEditor.getProject().getUndoStack().appendToCommand(cmd);
+            }
         }
 
         // remove generic components

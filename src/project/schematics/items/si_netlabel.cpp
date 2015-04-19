@@ -28,6 +28,7 @@
 #include "../../circuit/circuit.h"
 #include "../../project.h"
 #include "../../../common/file_io/xmldomelement.h"
+#include "../../../common/graphics/graphicsscene.h"
 
 namespace project {
 
@@ -114,16 +115,16 @@ void SI_NetLabel::updateText() noexcept
     mGraphicsItem->updateCacheAndRepaint();
 }
 
-void SI_NetLabel::addToSchematic() throw (Exception)
+void SI_NetLabel::addToSchematic(GraphicsScene& scene) throw (Exception)
 {
     mNetSignal->registerSchematicNetLabel(*this);
-    mSchematic.addItem(mGraphicsItem);
+    scene.addItem(*mGraphicsItem);
 }
 
-void SI_NetLabel::removeFromSchematic() throw (Exception)
+void SI_NetLabel::removeFromSchematic(GraphicsScene& scene) throw (Exception)
 {
     mNetSignal->unregisterSchematicNetLabel(*this);
-    mSchematic.removeItem(mGraphicsItem);
+    scene.removeItem(*mGraphicsItem);
 }
 
 XmlDomElement* SI_NetLabel::serializeToXmlDomElement() const throw (Exception)
@@ -140,6 +141,21 @@ XmlDomElement* SI_NetLabel::serializeToXmlDomElement() const throw (Exception)
 }
 
 /*****************************************************************************************
+ *  Inherited from SI_Base
+ ****************************************************************************************/
+
+QPainterPath SI_NetLabel::getGrabAreaScenePx() const noexcept
+{
+    return mGraphicsItem->shape().translated(mPosition.toPxQPointF());
+}
+
+void SI_NetLabel::setSelected(bool selected) noexcept
+{
+    mGraphicsItem->setSelected(selected);
+    SI_Base::setSelected(selected);
+}
+
+/*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
@@ -148,28 +164,6 @@ bool SI_NetLabel::checkAttributesValidity() const noexcept
     if (mUuid.isNull())                             return false;
     if (mNetSignal == nullptr)                      return false;
     return true;
-}
-
-/*****************************************************************************************
- *  Static Methods
- ****************************************************************************************/
-
-uint SI_NetLabel::extractFromGraphicsItems(const QList<QGraphicsItem*>& items,
-                                                 QList<SI_NetLabel*>& netlabels) noexcept
-{
-    foreach (QGraphicsItem* item, items)
-    {
-        Q_ASSERT(item); if (!item) continue;
-        if (item->type() == Schematic::Type_NetLabel)
-        {
-            SGI_NetLabel* i = qgraphicsitem_cast<SGI_NetLabel*>(item);
-            Q_ASSERT(i); if (!i) break;
-            SI_NetLabel* l = &i->getNetLabel();
-            if (!netlabels.contains(l))
-                netlabels.append(l);
-        }
-    }
-    return netlabels.count();
 }
 
 /*****************************************************************************************

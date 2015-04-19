@@ -27,14 +27,11 @@
 #include <QtCore>
 #include "si_base.h"
 #include "../../erc/if_ercmsgprovider.h"
-#include "../../../common/units/all_length_units.h"
 #include "../graphicsitems/sgi_symbolpin.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
-
-class QGraphicsItem;
 
 namespace project {
 class Circuit;
@@ -66,12 +63,11 @@ class SI_SymbolPin final : public SI_Base, public IF_ErcMsgProvider
     public:
 
         // Constructors / Destructor
-        explicit SI_SymbolPin(SI_Symbol& symbol, const QUuid& pinUuid, QGraphicsItem& parentItem);
+        explicit SI_SymbolPin(SI_Symbol& symbol, const QUuid& pinUuid);
         ~SI_SymbolPin();
 
         // Getters
         const QUuid& getLibPinUuid() const noexcept;
-        Point getPosition() const noexcept;
         QString getDisplayText(bool returnGenCompSignalNameIfEmpty = false,
                                bool returnPinNameIfEmpty = false) const noexcept;
         SI_Symbol& getSymbol() const noexcept {return mSymbol;}
@@ -81,12 +77,17 @@ class SI_SymbolPin final : public SI_Base, public IF_ErcMsgProvider
         GenCompSignalInstance* getGenCompSignalInstance() const noexcept {return mGenCompSignalInstance;}
 
         // General Methods
-        void updateNetPointPosition() noexcept;
+        void updatePosition() noexcept;
         void registerNetPoint(SI_NetPoint& netpoint);
         void unregisterNetPoint(SI_NetPoint& netpoint);
-        void addToSchematic() noexcept;
-        void removeFromSchematic() noexcept;
-        bool save(bool toOriginal, QStringList& errors) noexcept;
+        void addToSchematic(GraphicsScene& scene) noexcept;
+        void removeFromSchematic(GraphicsScene& scene) noexcept;
+
+        // Inherited from SI_Base
+        Type_t getType() const noexcept override {return SI_Base::Type_t::SymbolPin;}
+        const Point& getPosition() const noexcept override {return mPosition;}
+        QPainterPath getGrabAreaScenePx() const noexcept override;
+        void setSelected(bool selected) noexcept override;
 
 
     private slots:
@@ -108,6 +109,8 @@ class SI_SymbolPin final : public SI_Base, public IF_ErcMsgProvider
         const library::SymbolPin* mSymbolPin;
         const library::GenCompSignal* mGenCompSignal;
         GenCompSignalInstance* mGenCompSignalInstance;
+        Point mPosition;
+        Angle mAngle;
 
         // Misc
         bool mAddedToSchematic;

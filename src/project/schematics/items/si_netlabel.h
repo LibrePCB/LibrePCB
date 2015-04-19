@@ -27,14 +27,11 @@
 #include <QtCore>
 #include "si_base.h"
 #include "../../../common/file_io/if_xmlserializableobject.h"
-#include "../../../common/units/all_length_units.h"
 #include "../graphicsitems/sgi_netlabel.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
-
-class QGraphicsItem;
 
 namespace project {
 class Circuit;
@@ -65,7 +62,6 @@ class SI_NetLabel final : public SI_Base, public IF_XmlSerializableObject
         // Getters
         Schematic& getSchematic() const noexcept {return mSchematic;}
         const QUuid& getUuid() const noexcept {return mUuid;}
-        const Point& getPosition() const noexcept {return mPosition;}
         const Angle& getAngle() const noexcept {return mAngle;}
         NetSignal& getNetSignal() const noexcept {return *mNetSignal;}
 
@@ -76,13 +72,15 @@ class SI_NetLabel final : public SI_Base, public IF_XmlSerializableObject
 
         // General Methods
         void updateText() noexcept;
-        void addToSchematic() throw (Exception);
-        void removeFromSchematic() throw (Exception);
+        void addToSchematic(GraphicsScene& scene) throw (Exception);
+        void removeFromSchematic(GraphicsScene& scene) throw (Exception);
         XmlDomElement* serializeToXmlDomElement() const throw (Exception);
 
-        // Static Methods
-        static uint extractFromGraphicsItems(const QList<QGraphicsItem*>& items,
-                                             QList<SI_NetLabel*>& netlabels) noexcept;
+        // Inherited from SI_Base
+        Type_t getType() const noexcept override {return SI_Base::Type_t::NetLabel;}
+        const Point& getPosition() const noexcept override {return mPosition;}
+        QPainterPath getGrabAreaScenePx() const noexcept override;
+        void setSelected(bool selected) noexcept override;
 
 
     private:

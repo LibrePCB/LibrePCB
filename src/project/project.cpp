@@ -710,7 +710,7 @@ void Project::printSchematicPages(QPrinter& printer, QList<uint>& pages) throw (
                 QString(tr("No schematic page with the index %1 found.")).arg(pages[i]));
         }
         schematic->clearSelection();
-        schematic->render(&painter, QRectF(), schematic->itemsBoundingRect(), Qt::KeepAspectRatio);
+        schematic->renderToQPainter(painter);
 
         if (i != pages.count() - 1)
         {

@@ -196,9 +196,8 @@ bool SES_AddNetLabel::updateLabel(Schematic& schematic, const Point& pos) noexce
     try
     {
         // get netline under cursor
-        QList<SI_NetLine*> lines;
-        uint count = schematic.getNetLinesAtScenePos(lines, pos);
-        if (count > 0) mEditCmd->setNetSignal(*lines.first()->getNetSignal(), true);
+        QList<SI_NetLine*> lines = schematic.getNetLinesAtScenePos(pos);
+        if (!lines.isEmpty()) mEditCmd->setNetSignal(*lines.first()->getNetSignal(), true);
         mEditCmd->setPosition(pos, true);
         return true;
     }

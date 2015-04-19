@@ -33,6 +33,7 @@
 #include "../../circuit/gencompsignalinstance.h"
 #include "../../erc/ercmsg.h"
 #include "../../../common/file_io/xmldomelement.h"
+#include "../../../common/graphics/graphicsscene.h"
 
 namespace project {
 
@@ -217,7 +218,7 @@ void SI_NetPoint::unregisterNetLine(SI_NetLine& netline) noexcept
     mErcMsgDeadNetPoint->setVisible(mLines.isEmpty());
 }
 
-void SI_NetPoint::addToSchematic() throw (Exception)
+void SI_NetPoint::addToSchematic(GraphicsScene& scene) throw (Exception)
 {
     Q_ASSERT(mLines.isEmpty());
 
@@ -231,11 +232,11 @@ void SI_NetPoint::addToSchematic() throw (Exception)
     mNetSignal->registerSchematicNetPoint(*this);
     if (mAttached)
         mSymbolPin->registerNetPoint(*this);
-    mSchematic.addItem(mGraphicsItem);
+    scene.addItem(*mGraphicsItem);
     mErcMsgDeadNetPoint->setVisible(true);
 }
 
-void SI_NetPoint::removeFromSchematic() throw (Exception)
+void SI_NetPoint::removeFromSchematic(GraphicsScene& scene) throw (Exception)
 {
     Q_ASSERT(mLines.isEmpty());
 
@@ -249,7 +250,7 @@ void SI_NetPoint::removeFromSchematic() throw (Exception)
     mNetSignal->unregisterSchematicNetPoint(*this);
     if (mAttached)
         mSymbolPin->unregisterNetPoint(*this);
-    mSchematic.removeItem(mGraphicsItem);
+    scene.removeItem(*mGraphicsItem);
     mErcMsgDeadNetPoint->setVisible(false);
 }
 
@@ -276,6 +277,21 @@ XmlDomElement* SI_NetPoint::serializeToXmlDomElement() const throw (Exception)
 }
 
 /*****************************************************************************************
+ *  Inherited from SI_Base
+ ****************************************************************************************/
+
+QPainterPath SI_NetPoint::getGrabAreaScenePx() const noexcept
+{
+    return mGraphicsItem->shape().translated(mPosition.toPxQPointF());
+}
+
+void SI_NetPoint::setSelected(bool selected) noexcept
+{
+    mGraphicsItem->setSelected(selected);
+    SI_Base::setSelected(selected);
+}
+
+/*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
@@ -285,92 +301,6 @@ bool SI_NetPoint::checkAttributesValidity() const noexcept
     if (mNetSignal == nullptr)                      return false;
     if (mAttached && (mSymbolPin == nullptr))       return false;
     return true;
-}
-
-/*****************************************************************************************
- *  Static Methods
- ****************************************************************************************/
-
-uint SI_NetPoint::extractFromGraphicsItems(const QList<QGraphicsItem*>& items,
-                                                 QList<SI_NetPoint*>& netpoints,
-                                                 bool floatingPoints,
-                                                 bool attachedPoints,
-                                                 bool floatingPointsFromFloatingLines,
-                                                 bool attachedPointsFromFloatingLines,
-                                                 bool floatingPointsFromAttachedLines,
-                                                 bool attachedPointsFromAttachedLines,
-                                                 bool attachedPointsFromSymbols) noexcept
-{
-    foreach (QGraphicsItem* item, items)
-    {
-        Q_ASSERT(item); if (!item) continue;
-        switch (item->type())
-        {
-            case Schematic::Type_NetPoint:
-            {
-                if (floatingPoints || attachedPoints)
-                {
-                    SGI_NetPoint* i = qgraphicsitem_cast<SGI_NetPoint*>(item);
-                    Q_ASSERT(i); if (!i) break;
-                    SI_NetPoint* p = &i->getNetPoint();
-                    if (((!p->isAttached()) && floatingPoints)
-                       || (p->isAttached() && attachedPoints))
-                    {
-                        if (!netpoints.contains(p))
-                            netpoints.append(p);
-                    }
-                }
-                break;
-            }
-            case Schematic::Type_NetLine:
-            {
-                if (floatingPointsFromFloatingLines || attachedPointsFromFloatingLines
-                 || floatingPointsFromAttachedLines || attachedPointsFromAttachedLines)
-                {
-                    SGI_NetLine* i = qgraphicsitem_cast<SGI_NetLine*>(item);
-                    Q_ASSERT(i); if (!i) break;
-                    SI_NetLine* l = &i->getNetLine();
-                    SI_NetPoint* p1 = &i->getNetLine().getStartPoint();
-                    SI_NetPoint* p2 = &i->getNetLine().getEndPoint();
-                    if ( ((!l->isAttachedToSymbol()) && (!p1->isAttached()) && floatingPointsFromFloatingLines)
-                      || ((!l->isAttachedToSymbol()) && ( p1->isAttached()) && attachedPointsFromFloatingLines)
-                      || (( l->isAttachedToSymbol()) && (!p1->isAttached()) && floatingPointsFromAttachedLines)
-                      || (( l->isAttachedToSymbol()) && ( p1->isAttached()) && attachedPointsFromAttachedLines))
-                    {
-                        if (!netpoints.contains(p1))
-                            netpoints.append(p1);
-                    }
-                    if ( ((!l->isAttachedToSymbol()) && (!p2->isAttached()) && floatingPointsFromFloatingLines)
-                      || ((!l->isAttachedToSymbol()) && ( p2->isAttached()) && attachedPointsFromFloatingLines)
-                      || (( l->isAttachedToSymbol()) && (!p2->isAttached()) && floatingPointsFromAttachedLines)
-                      || (( l->isAttachedToSymbol()) && ( p2->isAttached()) && attachedPointsFromAttachedLines))
-                    {
-                        if (!netpoints.contains(p2))
-                            netpoints.append(p2);
-                    }
-                }
-                break;
-            }
-            case Schematic::Type_Symbol:
-            {
-                if (attachedPointsFromSymbols)
-                {
-                    SGI_Symbol* i = qgraphicsitem_cast<SGI_Symbol*>(item);
-                    Q_ASSERT(i); if (!i) break;
-                    foreach (const SI_SymbolPin* pin, i->getSymbol().getPins())
-                    {
-                        SI_NetPoint* p = pin->getNetPoint();
-                        if ((p) && (!netpoints.contains(p)))
-                            netpoints.append(p);
-                    }
-                }
-                break;
-            }
-            default:
-                break;
-        }
-    }
-    return netpoints.count();
 }
 
 /*****************************************************************************************

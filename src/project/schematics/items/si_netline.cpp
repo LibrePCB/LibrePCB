@@ -30,6 +30,7 @@
 #include "si_symbol.h"
 #include "si_symbolpin.h"
 #include "../../../common/file_io/xmldomelement.h"
+#include "../../../common/graphics/graphicsscene.h"
 
 namespace project {
 
@@ -38,8 +39,8 @@ namespace project {
  ****************************************************************************************/
 
 SI_NetLine::SI_NetLine(Schematic& schematic, const XmlDomElement& domElement) throw (Exception) :
-    SI_Base(), mSchematic(schematic), mGraphicsItem(nullptr), mStartPoint(nullptr),
-    mEndPoint(nullptr)
+    SI_Base(), mSchematic(schematic), mGraphicsItem(nullptr), mPosition(0, 0),
+    mStartPoint(nullptr), mEndPoint(nullptr)
 {
     mUuid = domElement.getAttribute<QUuid>("uuid");
     mWidth = domElement.getAttribute<Length>("width");
@@ -90,6 +91,7 @@ void SI_NetLine::init() throw (Exception)
     }
 
     mGraphicsItem = new SGI_NetLine(*this);
+    updateLine();
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -131,19 +133,20 @@ void SI_NetLine::setWidth(const Length& width) noexcept
 
 void SI_NetLine::updateLine() noexcept
 {
+    mPosition = (mStartPoint->getPosition() + mEndPoint->getPosition()) / 2;
     mGraphicsItem->updateCacheAndRepaint();
 }
 
-void SI_NetLine::addToSchematic() throw (Exception)
+void SI_NetLine::addToSchematic(GraphicsScene& scene) throw (Exception)
 {
     mStartPoint->registerNetLine(*this);
     mEndPoint->registerNetLine(*this);
-    mSchematic.addItem(mGraphicsItem);
+    scene.addItem(*mGraphicsItem);
 }
 
-void SI_NetLine::removeFromSchematic() throw (Exception)
+void SI_NetLine::removeFromSchematic(GraphicsScene& scene) throw (Exception)
 {
-    mSchematic.removeItem(mGraphicsItem);
+    scene.removeItem(*mGraphicsItem);
     mStartPoint->unregisterNetLine(*this);
     mEndPoint->unregisterNetLine(*this);
 }
@@ -161,6 +164,21 @@ XmlDomElement* SI_NetLine::serializeToXmlDomElement() const throw (Exception)
 }
 
 /*****************************************************************************************
+ *  Inherited from SI_Base
+ ****************************************************************************************/
+
+QPainterPath SI_NetLine::getGrabAreaScenePx() const noexcept
+{
+    return mGraphicsItem->shape();
+}
+
+void SI_NetLine::setSelected(bool selected) noexcept
+{
+    mGraphicsItem->setSelected(selected);
+    SI_Base::setSelected(selected);
+}
+
+/*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
@@ -171,60 +189,6 @@ bool SI_NetLine::checkAttributesValidity() const noexcept
     if (mEndPoint == nullptr)   return false;
     if (mWidth < 0)             return false;
     return true;
-}
-
-/*****************************************************************************************
- *  Static Methods
- ****************************************************************************************/
-
-uint SI_NetLine::extractFromGraphicsItems(const QList<QGraphicsItem*>& items,
-                                                QList<SI_NetLine*>& netlines,
-                                                bool floatingLines,
-                                                bool attachedLines,
-                                                bool attachedLinesFromSymbols) noexcept
-{
-    foreach (QGraphicsItem* item, items)
-    {
-        Q_ASSERT(item); if (!item) continue;
-        switch (item->type())
-        {
-            case Schematic::Type_NetLine:
-            {
-                SGI_NetLine* i = qgraphicsitem_cast<SGI_NetLine*>(item);
-                Q_ASSERT(i); if (!i) break;
-                SI_NetLine* l = &i->getNetLine();
-                if (((!l->isAttachedToSymbol()) && floatingLines)
-                   || (l->isAttachedToSymbol() && attachedLines))
-                {
-                    if (!netlines.contains(l))
-                        netlines.append(l);
-                }
-                break;
-            }
-            case Schematic::Type_Symbol:
-            {
-                if (attachedLinesFromSymbols)
-                {
-                    SGI_Symbol* i = qgraphicsitem_cast<SGI_Symbol*>(item);
-                    Q_ASSERT(i); if (!i) break;
-                    foreach (const SI_SymbolPin* pin, i->getSymbol().getPins())
-                    {
-                        SI_NetPoint* p = pin->getNetPoint();
-                        if (p)
-                        {
-                            foreach (SI_NetLine* l, p->getLines())
-                            {
-                                if (!netlines.contains(l))
-                                    netlines.append(l);
-                            }
-                        }
-                    }
-                }
-                break;
-            }
-        }
-    }
-    return netlines.count();
 }
 
 /*****************************************************************************************

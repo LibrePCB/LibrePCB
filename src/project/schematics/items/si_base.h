@@ -25,6 +25,8 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <QtWidgets>
+#include "../../../common/units/all_length_units.h"
 
 /*****************************************************************************************
  *  Class SI_Base
@@ -41,9 +43,27 @@ class SI_Base : public QObject
 
     public:
 
+        // Types
+        enum class Type_t {
+            NetPoint,   ///< project#SI_NetPoint
+            NetLine,    ///< project#SI_NetLine
+            NetLabel,   ///< project#SI_NetLabel
+            Symbol,     ///< project#SI_Symbol
+            SymbolPin,  ///< project#SI_SymbolPin
+        };
+
         // Constructors / Destructor
         explicit SI_Base() noexcept;
         virtual ~SI_Base() noexcept;
+
+        // Getters
+        virtual Type_t getType() const noexcept = 0;
+        virtual const Point& getPosition() const noexcept = 0;
+        bool isSelected() const noexcept {return mIsSelected;}
+        virtual QPainterPath getGrabAreaScenePx() const noexcept = 0;
+
+        // Setters
+        virtual void setSelected(bool selected) noexcept;
 
 
     private:
@@ -52,6 +72,9 @@ class SI_Base : public QObject
         //SI_Base() = delete;
         SI_Base(const SI_Base& other) = delete;
         SI_Base& operator=(const SI_Base& rhs) = delete;
+
+        // General Attributes
+        bool mIsSelected;
 };
 
 } // namespace project

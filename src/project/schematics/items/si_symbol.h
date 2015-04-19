@@ -28,7 +28,6 @@
 #include "si_base.h"
 #include "../../../common/file_io/if_xmlserializableobject.h"
 #include "../../../common/if_attributeprovider.h"
-#include "../../../common/units/all_length_units.h"
 #include "../graphicsitems/sgi_symbol.h"
 
 /*****************************************************************************************
@@ -77,7 +76,6 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
         // Getters
         Schematic& getSchematic() const noexcept {return mSchematic;}
         const QUuid& getUuid() const noexcept {return mUuid;}
-        const Point& getPosition() const noexcept {return mPosition;}
         const Angle& getAngle() const noexcept {return mAngle;}
         QString getName() const noexcept;
         SI_SymbolPin* getPin(const QUuid& pinUuid) const noexcept {return mPins.value(pinUuid);}
@@ -87,13 +85,12 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
         const library::GenCompSymbVarItem& getGenCompSymbVarItem() const noexcept {return *mSymbVarItem;}
 
         // Setters
-        void setSelected(bool selected) noexcept;
         void setPosition(const Point& newPos) throw (Exception);
         void setAngle(const Angle& newAngle) throw (Exception);
 
         // General Methods
-        void addToSchematic() throw (Exception);
-        void removeFromSchematic() throw (Exception);
+        void addToSchematic(GraphicsScene& scene) throw (Exception);
+        void removeFromSchematic(GraphicsScene& scene) throw (Exception);
         XmlDomElement* serializeToXmlDomElement() const throw (Exception);
 
         // Helper Methods
@@ -101,9 +98,11 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
         bool getAttributeValue(const QString& attrNS, const QString& attrKey,
                                bool passToParents, QString& value) const noexcept;
 
-        // Static Methods
-        static uint extractFromGraphicsItems(const QList<QGraphicsItem*>& items,
-                                             QList<SI_Symbol*>& symbols) noexcept;
+        // Inherited from SI_Base
+        Type_t getType() const noexcept override {return SI_Base::Type_t::Symbol;}
+        const Point& getPosition() const noexcept override {return mPosition;}
+        QPainterPath getGrabAreaScenePx() const noexcept override;
+        void setSelected(bool selected) noexcept override;
 
 
     private slots:

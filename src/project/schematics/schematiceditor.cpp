@@ -215,11 +215,16 @@ bool SchematicEditor::setActiveSchematicIndex(int index) noexcept
         schematic->saveViewSceneRect(mGraphicsView->getVisibleSceneRect());
     }
     schematic = mProject.getSchematicByIndex(index);
-    mGraphicsView->setCadScene(schematic);
     if (schematic)
     {
-        // restore view scene rect
+        // show scene, restore view scene rect, set grid properties
+        schematic->showInView(*mGraphicsView);
         mGraphicsView->setVisibleSceneRect(schematic->restoreViewSceneRect());
+        mGraphicsView->setGridProperties(schematic->getGridProperties());
+    }
+    else
+    {
+        mGraphicsView->setScene(nullptr);
     }
 
     // schematic page has changed!

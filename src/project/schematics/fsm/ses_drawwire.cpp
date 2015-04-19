@@ -350,8 +350,7 @@ bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,
         // check if the fixed netpoint does already exist in the schematic
         if (!fixedPoint)
         {
-            QList<SI_NetPoint*> pointsUnderCursor;
-            schematic.getNetPointsAtScenePos(pointsUnderCursor, pos);
+            QList<SI_NetPoint*> pointsUnderCursor = schematic.getNetPointsAtScenePos(pos);
             if (!pointsUnderCursor.isEmpty()) mFixedNetPoint = pointsUnderCursor.first();
         }
         else
@@ -367,8 +366,7 @@ bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,
         else
         {
             // look whether there is a symbol pin under the cursor
-            QList<SI_SymbolPin*> pinsUnderCursor;
-            schematic.getPinsAtScenePos(pinsUnderCursor, pos);
+            QList<SI_SymbolPin*> pinsUnderCursor = schematic.getPinsAtScenePos(pos);
 
             // check if the pin's signal forces a net name
             QString forcedNetSignalName;
@@ -512,8 +510,7 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
         }
 
         // combine all netpoints of the same type at cursor position (result: mPositioningNetPoint2)
-        QList<SI_NetPoint*> pointsUnderCursor;
-        schematic.getNetPointsAtScenePos(pointsUnderCursor, pos);
+        QList<SI_NetPoint*> pointsUnderCursor = schematic.getNetPointsAtScenePos(pos);
         foreach (SI_NetPoint* netpoint, pointsUnderCursor)
         {
             if (netpoint == mFixedNetPoint) continue;
@@ -546,8 +543,7 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
         if (!mPositioningNetLine2) mPositioningNetLine2 = mPositioningNetLine1; // ugly!
 
         // check if there is a netpoint with different netsignal under the cursor
-        pointsUnderCursor.clear();
-        schematic.getNetPointsAtScenePos(pointsUnderCursor, pos);
+        pointsUnderCursor = schematic.getNetPointsAtScenePos(pos);
         pointsUnderCursor.removeOne(mPositioningNetPoint2);
         if (pointsUnderCursor.count() == 1)
         {
@@ -629,8 +625,7 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
         else if (pointsUnderCursor.count() == 0)
         {
             // check if a pin is under the cursor
-            QList<SI_SymbolPin*> pinsUnderCursor;
-            schematic.getPinsAtScenePos(pinsUnderCursor, pos);
+            QList<SI_SymbolPin*> pinsUnderCursor = schematic.getPinsAtScenePos(pos);
             if (pinsUnderCursor.count() == 1)
             {
                 SI_SymbolPin* pin = pinsUnderCursor.first();

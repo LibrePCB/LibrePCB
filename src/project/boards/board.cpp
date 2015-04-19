@@ -32,7 +32,7 @@ namespace project {
  ****************************************************************************************/
 
 Board::Board(Project& project) :
-    CADScene(), mProject(project)
+    QObject(nullptr), mProject(project)
 {
 }
 

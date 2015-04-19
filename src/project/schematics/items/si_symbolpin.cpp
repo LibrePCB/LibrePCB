@@ -37,6 +37,7 @@
 #include "../../../library/gencompsymbvaritem.h"
 #include "../../circuit/netsignal.h"
 #include "../../settings/projectsettings.h"
+#include "../../../common/graphics/graphicsscene.h"
 
 namespace project {
 
@@ -44,7 +45,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const QUuid& pinUuid, QGraphicsItem& parentItem) :
+SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const QUuid& pinUuid) :
     SI_Base(), mCircuit(symbol.getSchematic().getProject().getCircuit()),
     mSymbol(symbol), mSymbolPin(nullptr), mGenCompSignal(nullptr),
     mGenCompSignalInstance(nullptr), mAddedToSchematic(false),
@@ -62,7 +63,7 @@ SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const QUuid& pinUuid, QGraphicsIte
     mGenCompSignal = mSymbol.getGenCompInstance().getGenComp().getSignalByUuid(genCompSignalUuid);
 
     mGraphicsItem = new SGI_SymbolPin(*this);
-    mGraphicsItem->setParentItem(&parentItem);
+    updatePosition();
 
     // create ERC messages
     mErcMsgUnconnectedRequiredPin.reset(new ErcMsg(mCircuit.getProject(), *this,
@@ -84,11 +85,6 @@ SI_SymbolPin::~SI_SymbolPin()
 const QUuid& SI_SymbolPin::getLibPinUuid() const noexcept
 {
     return mSymbolPin->getUuid();
-}
-
-Point SI_SymbolPin::getPosition() const noexcept
-{
-    return mSymbol.mapToScene(mSymbolPin->getPosition());
 }
 
 QString SI_SymbolPin::getDisplayText(bool returnGenCompSignalNameIfEmpty,
@@ -118,11 +114,15 @@ QString SI_SymbolPin::getDisplayText(bool returnGenCompSignalNameIfEmpty,
  *  General Methods
  ****************************************************************************************/
 
-void SI_SymbolPin::updateNetPointPosition() noexcept
+void SI_SymbolPin::updatePosition() noexcept
 {
+    mPosition = mSymbol.mapToScene(mSymbolPin->getPosition());
+    mAngle = mSymbol.getAngle() + mSymbolPin->getAngle();
+    mGraphicsItem->setPos(mPosition.toPxQPointF());
+    mGraphicsItem->setRotation(mAngle.toDeg());
     mGraphicsItem->updateCacheAndRepaint();
     if (mRegisteredNetPoint)
-        mRegisteredNetPoint->setPosition(getPosition());
+        mRegisteredNetPoint->setPosition(mPosition);
 }
 
 void SI_SymbolPin::registerNetPoint(SI_NetPoint& netpoint)
@@ -140,29 +140,39 @@ void SI_SymbolPin::unregisterNetPoint(SI_NetPoint& netpoint)
     updateErcMessages();
 }
 
-void SI_SymbolPin::addToSchematic() noexcept
+void SI_SymbolPin::addToSchematic(GraphicsScene& scene) noexcept
 {
     Q_ASSERT(mAddedToSchematic == false);
     Q_ASSERT(mRegisteredNetPoint == nullptr);
     mGenCompSignalInstance->registerSymbolPin(*this);
+    scene.addItem(*mGraphicsItem);
     mAddedToSchematic = true;
     updateErcMessages();
 }
 
-void SI_SymbolPin::removeFromSchematic() noexcept
+void SI_SymbolPin::removeFromSchematic(GraphicsScene& scene) noexcept
 {
     Q_ASSERT(mAddedToSchematic == true);
     Q_ASSERT(mRegisteredNetPoint == nullptr);
     mGenCompSignalInstance->unregisterSymbolPin(*this);
+    scene.removeItem(*mGraphicsItem);
     mAddedToSchematic = false;
     updateErcMessages();
 }
 
-bool SI_SymbolPin::save(bool toOriginal, QStringList& errors) noexcept
+/*****************************************************************************************
+ *  Inherited from SI_Base
+ ****************************************************************************************/
+
+QPainterPath SI_SymbolPin::getGrabAreaScenePx() const noexcept
 {
-    Q_UNUSED(toOriginal);
-    Q_UNUSED(errors);
-    return true;
+    return mGraphicsItem->shape().translated(mPosition.toPxQPointF());
+}
+
+void SI_SymbolPin::setSelected(bool selected) noexcept
+{
+    mGraphicsItem->setSelected(selected);
+    SI_Base::setSelected(selected);
 }
 
 /*****************************************************************************************
