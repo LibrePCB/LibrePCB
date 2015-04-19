@@ -17,34 +17,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef IF_GRAPHICSVIEWEVENTHANDLER_H
+#define IF_GRAPHICSVIEWEVENTHANDLER_H
+
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include "ses_base.h"
-#include "../schematiceditor.h"
-#include "../../project.h"
-
-namespace project {
 
 /*****************************************************************************************
- *  Constructors / Destructor
+ *  Interface IF_GraphicsViewEventHandler
  ****************************************************************************************/
 
-SES_Base::SES_Base(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
-                   GraphicsView& editorGraphicsView) :
-    QObject(0), mProject(editor.getProject()), mCircuit(editor.getProject().getCircuit()),
-    mEditor(editor), mEditorUi(editorUi), mEditorGraphicsView(editorGraphicsView)
+/**
+ * @brief The IF_GraphicsViewEventHandler class
+ */
+class IF_GraphicsViewEventHandler
 {
-}
+    public:
 
-SES_Base::~SES_Base()
-{
-}
+        // Constructors / Destructor
+        explicit IF_GraphicsViewEventHandler() noexcept {}
+        virtual ~IF_GraphicsViewEventHandler() noexcept {}
 
-/*****************************************************************************************
- *  End of File
- ****************************************************************************************/
+        /// The event handler method
+        virtual bool graphicsViewEventHandler(QEvent* event) = 0;
+};
 
-} // namespace project
+#endif // IF_GRAPHICSVIEWEVENTHANDLER_H

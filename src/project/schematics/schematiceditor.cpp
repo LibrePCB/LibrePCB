@@ -37,6 +37,7 @@
 #include "../../common/dialogs/gridsettingsdialog.h"
 #include "../dialogs/projectpropertieseditordialog.h"
 #include "../settings/projectsettings.h"
+#include "../../common/graphics/graphicsview.h"
 #include "../../common/gridproperties.h"
 
 namespace project {
@@ -47,7 +48,7 @@ namespace project {
 
 SchematicEditor::SchematicEditor(Project& project, bool readOnly) :
     QMainWindow(0), mProject(project), mUi(new Ui::SchematicEditor),
-    mGridProperties(nullptr), mActiveSchematicIndex(-1),
+    mGraphicsView(nullptr), mGridProperties(nullptr), mActiveSchematicIndex(-1),
     mPagesDock(nullptr), mErcMsgDock(nullptr), mFsm(nullptr)
 {
     mUi->setupUi(this);
@@ -67,15 +68,19 @@ SchematicEditor::SchematicEditor(Project& project, bool readOnly) :
 
     // create default grid properties
     mGridProperties = new GridProperties();
-    mUi->graphicsView->setGridProperties(*mGridProperties);
+
+    // add graphics view as central widget
+    mGraphicsView = new GraphicsView(nullptr, this);
+    mGraphicsView->setGridProperties(*mGridProperties);
+    setCentralWidget(mGraphicsView);
 
     // connect some actions which are created with the Qt Designer
     connect(mUi->actionSave_Project, &QAction::triggered, &mProject, &Project::saveProject);
     connect(mUi->actionQuit, &QAction::triggered, this, &SchematicEditor::close);
     connect(mUi->actionAbout_Qt, &QAction::triggered, qApp, &QApplication::aboutQt);
-    connect(mUi->actionZoom_In, &QAction::triggered, mUi->graphicsView, &CADView::zoomIn);
-    connect(mUi->actionZoom_Out, &QAction::triggered, mUi->graphicsView, &CADView::zoomOut);
-    connect(mUi->actionZoom_All, &QAction::triggered, mUi->graphicsView, &CADView::zoomAll);
+    connect(mUi->actionZoom_In, &QAction::triggered, mGraphicsView, &GraphicsView::zoomIn);
+    connect(mUi->actionZoom_Out, &QAction::triggered, mGraphicsView, &GraphicsView::zoomOut);
+    connect(mUi->actionZoom_All, &QAction::triggered, mGraphicsView, &GraphicsView::zoomAll);
     connect(mUi->actionShow_Control_Panel, &QAction::triggered,
             &Workspace::instance(), &Workspace::showControlPanel);
     connect(mUi->actionEditNetclasses, &QAction::triggered,
@@ -98,7 +103,7 @@ SchematicEditor::SchematicEditor(Project& project, bool readOnly) :
     mUi->actionRedo->setEnabled(mProject.getUndoStack().canRedo());
 
     // build the whole schematic editor finite state machine with all its substate objects
-    mFsm = new SES_FSM(*this, *mUi);
+    mFsm = new SES_FSM(*this, *mUi, *mGraphicsView);
 
     // connect the "tools" toolbar with the state machine (the second line of the lambda
     // functions is a workaround to set the checked attribute of the QActions properly)
@@ -158,7 +163,7 @@ SchematicEditor::SchematicEditor(Project& project, bool readOnly) :
         setActiveSchematicIndex(0);
 
     // mUi->graphicsView->zoomAll(); does not work properly here, should be executed later...
-    QTimer::singleShot(200, mUi->graphicsView, SLOT(zoomAll())); // ...in the event loop
+    QTimer::singleShot(200, mGraphicsView, &GraphicsView::zoomAll); // ...in the event loop
 }
 
 SchematicEditor::~SchematicEditor()
@@ -171,6 +176,7 @@ SchematicEditor::~SchematicEditor()
     delete mFsm;                    mFsm = nullptr;
     delete mErcMsgDock;             mErcMsgDock = nullptr;
     delete mPagesDock;              mPagesDock = nullptr;
+    delete mGraphicsView;           mGraphicsView = nullptr;
     delete mGridProperties;         mGridProperties = nullptr;
     delete mUi;                     mUi = nullptr;
 }
@@ -181,7 +187,7 @@ SchematicEditor::~SchematicEditor()
 
 Schematic* SchematicEditor::getActiveSchematic() const noexcept
 {
-    return dynamic_cast<Schematic*>(mUi->graphicsView->scene());
+    return mProject.getSchematicByIndex(mActiveSchematicIndex);
 }
 
 /*****************************************************************************************
@@ -206,18 +212,14 @@ bool SchematicEditor::setActiveSchematicIndex(int index) noexcept
     if (schematic)
     {
         // save current view scene rect
-        schematic->saveViewSceneRect(mUi->graphicsView->getVisibleSceneRect());
-        // unregister event handler object
-        schematic->setEventHandlerObject(0);
+        schematic->saveViewSceneRect(mGraphicsView->getVisibleSceneRect());
     }
     schematic = mProject.getSchematicByIndex(index);
-    mUi->graphicsView->setCadScene(schematic);
+    mGraphicsView->setCadScene(schematic);
     if (schematic)
     {
-        // register event handler object
-        schematic->setEventHandlerObject(this);
         // restore view scene rect
-        mUi->graphicsView->setVisibleSceneRect(schematic->restoreViewSceneRect());
+        mGraphicsView->setVisibleSceneRect(schematic->restoreViewSceneRect());
     }
 
     // schematic page has changed!
@@ -289,7 +291,7 @@ void SchematicEditor::on_actionGrid_triggered()
     connect(&dialog, &GridSettingsDialog::gridPropertiesChanged,
             [this](const GridProperties& grid)
             {   *mGridProperties = grid;
-                mUi->graphicsView->setGridProperties(grid);
+                mGraphicsView->setGridProperties(grid);
             });
     if (dialog.exec())
     {
@@ -387,9 +389,9 @@ void SchematicEditor::on_actionProjectProperties_triggered()
  *  Private Methods
  ****************************************************************************************/
 
-bool SchematicEditor::cadSceneEventHandler(QEvent* event)
+bool SchematicEditor::graphicsViewEventHandler(QEvent* event)
 {
-    SEE_RedirectedQEvent* e = new SEE_RedirectedQEvent(SEE_Base::SchematicSceneEvent, event);
+    SEE_RedirectedQEvent* e = new SEE_RedirectedQEvent(SEE_Base::GraphicsViewEvent, event);
     return mFsm->processEvent(e, true);
 }
 

@@ -31,20 +31,9 @@
     <property name="bottomMargin">
      <number>0</number>
     </property>
-    <item>
-     <widget class="CADView" name="graphicsView"/>
-    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>920</width>
-     <height>20</height>
-    </rect>
-   </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>File</string>
@@ -688,13 +677,6 @@
    </property>
   </action>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>CADView</class>
-   <extends>QGraphicsView</extends>
-   <header location="global">common/cadview.h</header>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="../../../img/images.qrc"/>
  </resources>

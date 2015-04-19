@@ -26,12 +26,13 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include "../../common/cadscene.h"
+#include "../../common/graphics/if_graphicsvieweventhandler.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
+class GraphicsView;
 class GridProperties;
 
 namespace project {
@@ -55,7 +56,7 @@ namespace project {
 /**
  * @brief The SchematicEditor class
  */
-class SchematicEditor : public QMainWindow, public IF_CADSceneEventHandler
+class SchematicEditor : public QMainWindow, public IF_GraphicsViewEventHandler
 {
         Q_OBJECT
 
@@ -110,11 +111,12 @@ class SchematicEditor : public QMainWindow, public IF_CADSceneEventHandler
         SchematicEditor& operator=(const SchematicEditor& rhs);
 
         // Private Methods
-        bool cadSceneEventHandler(QEvent* event);
+        bool graphicsViewEventHandler(QEvent* event);
 
         // General Attributes
         Project& mProject;
         Ui::SchematicEditor* mUi;
+        GraphicsView* mGraphicsView;
         GridProperties* mGridProperties;
 
         int mActiveSchematicIndex;

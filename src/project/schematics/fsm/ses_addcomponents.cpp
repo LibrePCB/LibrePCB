@@ -44,8 +44,9 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SES_AddComponents::SES_AddComponents(SchematicEditor& editor, Ui::SchematicEditor& editorUi) :
-    SES_Base(editor, editorUi),
+SES_AddComponents::SES_AddComponents(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
+                                     GraphicsView& editorGraphicsView) :
+    SES_Base(editor, editorUi, editorGraphicsView),
     mIsUndoCmdActive(false), mAddGenCompDialog(nullptr), mLastAngle(0),
     mGenComp(nullptr), mGenCompSymbVar(nullptr), mCurrentSymbVarItem(nullptr),
     mCurrentSymbolToPlace(nullptr), mCurrentSymbolEditCommand(nullptr)
@@ -112,7 +113,7 @@ SES_Base::ProcRetVal SES_AddComponents::process(SEE_Base* event) noexcept
         case SEE_Base::Edit_RotateCCW:
             mCurrentSymbolEditCommand->rotate(-Angle::deg90(), mCurrentSymbolToPlace->getPosition(), true);
             return ForceStayInState;
-        case SEE_Base::SchematicSceneEvent:
+        case SEE_Base::GraphicsViewEvent:
             return processSceneEvent(event);
         default:
             return PassToParentState;
@@ -278,18 +279,10 @@ SES_Base::ProcRetVal SES_AddComponents::processSceneEvent(SEE_Base* event) noexc
     return PassToParentState;
 }
 
-void SES_AddComponents::startAddingComponent(const QUuid& genComp,
-                                             const QUuid& symbVar) throw (Exception)
+void SES_AddComponents::startAddingComponent(const QUuid& genComp, const QUuid& symbVar) throw (Exception)
 {
     Schematic* schematic = mEditor.getActiveSchematic();
     Q_ASSERT(schematic); if (!schematic) throw LogicError(__FILE__, __LINE__);
-
-    // get the scene position where the new symbol should be placed
-    QPoint cursorPos = mEditorUi.graphicsView->mapFromGlobal(QCursor::pos());
-    QPoint boundedCursorPos = QPoint(qBound(0, cursorPos.x(), mEditorUi.graphicsView->width()),
-                                     qBound(0, cursorPos.y(), mEditorUi.graphicsView->height()));
-    Point pos = Point::fromPx(mEditorUi.graphicsView->mapToScene(boundedCursorPos),
-                              mEditor.getGridProperties().getInterval());
 
     if (genComp.isNull() || symbVar.isNull())
     {
@@ -344,6 +337,13 @@ void SES_AddComponents::startAddingComponent(const QUuid& genComp,
         throw LogicError(__FILE__, __LINE__, QString(), QString(
             tr("Invalid symbol variant: \"%1\"")).arg(symbVar.toString()));
     }
+
+    // get the scene position where the new symbol should be placed
+    QPoint cursorPos = mEditorGraphicsView.mapFromGlobal(QCursor::pos());
+    QPoint boundedCursorPos = QPoint(qBound(0, cursorPos.x(), mEditorGraphicsView.width()),
+                                     qBound(0, cursorPos.y(), mEditorGraphicsView.height()));
+    Point pos = Point::fromPx(mEditorGraphicsView.mapToScene(boundedCursorPos),
+                              mEditor.getGridProperties().getInterval());
 
     // start a new command
     mProject.getUndoStack().beginCommand(tr("Add Generic Component to Schematic"));

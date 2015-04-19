@@ -61,7 +61,8 @@ class SES_AddComponents final : public SES_Base
     public:
 
         // Constructors / Destructor
-        explicit SES_AddComponents(SchematicEditor& editor, Ui::SchematicEditor& editorUi);
+        explicit SES_AddComponents(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
+                                   GraphicsView& editorGraphicsView);
         ~SES_AddComponents();
 
         // General Methods

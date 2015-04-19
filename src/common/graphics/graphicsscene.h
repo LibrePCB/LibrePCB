@@ -17,59 +17,49 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef GRAPHICSSCENE_H
+#define GRAPHICSSCENE_H
+
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include "ses_drawrect.h"
-#include "../schematiceditor.h"
-#include "ui_schematiceditor.h"
-
-namespace project {
+#include <QtWidgets>
+#include "../units/point.h"
 
 /*****************************************************************************************
- *  Constructors / Destructor
+ *  Forward Declarations
  ****************************************************************************************/
 
-SES_DrawRect::SES_DrawRect(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
-                           GraphicsView& editorGraphicsView) :
-    SES_Base(editor, editorUi, editorGraphicsView)
-{
-}
-
-SES_DrawRect::~SES_DrawRect()
-{
-}
+class GraphicsItem;
 
 /*****************************************************************************************
- *  General Methods
+ *  Class GraphicsScene
  ****************************************************************************************/
 
-SES_Base::ProcRetVal SES_DrawRect::process(SEE_Base* event) noexcept
+/**
+ * @brief The GraphicsScene class
+ */
+class GraphicsScene final : public QGraphicsScene
 {
-    Q_UNUSED(event);
-    return PassToParentState;
-}
+        Q_OBJECT
 
-bool SES_DrawRect::entry(SEE_Base* event) noexcept
-{
-    Q_UNUSED(event);
-    mEditorUi.actionToolDrawRectangle->setCheckable(true);
-    mEditorUi.actionToolDrawRectangle->setChecked(true);
-    return true;
-}
+    public:
 
-bool SES_DrawRect::exit(SEE_Base* event) noexcept
-{
-    Q_UNUSED(event);
-    mEditorUi.actionToolDrawRectangle->setCheckable(false);
-    mEditorUi.actionToolDrawRectangle->setChecked(false);
-    return true;
-}
+        // Constructors / Destructor
+        explicit GraphicsScene() noexcept;
+        ~GraphicsScene() noexcept;
 
-/*****************************************************************************************
- *  End of File
- ****************************************************************************************/
+        // General Methods
+        void addItem(GraphicsItem& item) noexcept;
+        void removeItem(GraphicsItem& item) noexcept;
+        void setSelectionRect(const Point& p1, const Point& p2) noexcept;
 
-} // namespace project
+
+    private:
+
+        QGraphicsRectItem* mSelectionRectItem;
+};
+
+#endif // GRAPHICSSCENE_H

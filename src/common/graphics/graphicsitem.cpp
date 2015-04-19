@@ -22,54 +22,22 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "ses_drawrect.h"
-#include "../schematiceditor.h"
-#include "ui_schematiceditor.h"
-
-namespace project {
+#include <QtWidgets>
+#include "graphicsitem.h"
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SES_DrawRect::SES_DrawRect(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
-                           GraphicsView& editorGraphicsView) :
-    SES_Base(editor, editorUi, editorGraphicsView)
+GraphicsItem::GraphicsItem() noexcept :
+    QGraphicsItem()
 {
 }
 
-SES_DrawRect::~SES_DrawRect()
+GraphicsItem::~GraphicsItem() noexcept
 {
-}
-
-/*****************************************************************************************
- *  General Methods
- ****************************************************************************************/
-
-SES_Base::ProcRetVal SES_DrawRect::process(SEE_Base* event) noexcept
-{
-    Q_UNUSED(event);
-    return PassToParentState;
-}
-
-bool SES_DrawRect::entry(SEE_Base* event) noexcept
-{
-    Q_UNUSED(event);
-    mEditorUi.actionToolDrawRectangle->setCheckable(true);
-    mEditorUi.actionToolDrawRectangle->setChecked(true);
-    return true;
-}
-
-bool SES_DrawRect::exit(SEE_Base* event) noexcept
-{
-    Q_UNUSED(event);
-    mEditorUi.actionToolDrawRectangle->setCheckable(false);
-    mEditorUi.actionToolDrawRectangle->setChecked(false);
-    return true;
 }
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
-
-} // namespace project

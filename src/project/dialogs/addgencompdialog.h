@@ -32,7 +32,7 @@
  *  Forward Declarations
  ****************************************************************************************/
 
-class CADScene;
+class GraphicsScene;
 
 namespace project {
 class Project;
@@ -93,7 +93,7 @@ class AddGenCompDialog final : public QDialog
         // General
         Project& mProject;
         Ui::AddGenCompDialog* mUi;
-        CADScene* mPreviewScene;
+        GraphicsScene* mPreviewScene;
 
 
         // Attributes

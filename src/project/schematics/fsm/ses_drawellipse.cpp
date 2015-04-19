@@ -32,8 +32,9 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SES_DrawEllipse::SES_DrawEllipse(SchematicEditor& editor, Ui::SchematicEditor& editorUi) :
-    SES_Base(editor, editorUi)
+SES_DrawEllipse::SES_DrawEllipse(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
+                                 GraphicsView& editorGraphicsView) :
+    SES_Base(editor, editorUi, editorGraphicsView)
 {
 }
 

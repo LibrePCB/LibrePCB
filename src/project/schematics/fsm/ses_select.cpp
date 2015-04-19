@@ -61,8 +61,9 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SES_Select::SES_Select(SchematicEditor& editor, Ui::SchematicEditor& editorUi) :
-    SES_Base(editor, editorUi), mSubState(SubState_Idle),
+SES_Select::SES_Select(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
+                       GraphicsView& editorGraphicsView) :
+    SES_Base(editor, editorUi, editorGraphicsView), mSubState(SubState_Idle),
     mParentCommand(nullptr)
 {
 }
@@ -140,7 +141,7 @@ SES_Base::ProcRetVal SES_Select::processSubStateIdle(SEE_Base* event) noexcept
         case SEE_Base::Edit_Remove:
             removeSelectedItems();
             return ForceStayInState;
-        case SEE_Base::SchematicSceneEvent:
+        case SEE_Base::GraphicsViewEvent:
             return processSubStateIdleSceneEvent(event);
         default:
             return PassToParentState;
@@ -362,7 +363,7 @@ SES_Base::ProcRetVal SES_Select::processSubStateMoving(SEE_Base* event) noexcept
 {
     switch (event->getType())
     {
-        case SEE_Base::SchematicSceneEvent:
+        case SEE_Base::GraphicsViewEvent:
             return processSubStateMovingSceneEvent(event);
         default:
             return PassToParentState;

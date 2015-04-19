@@ -22,54 +22,55 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "ses_drawrect.h"
-#include "../schematiceditor.h"
-#include "ui_schematiceditor.h"
-
-namespace project {
+#include <QtWidgets>
+#include "graphicsscene.h"
+#include "graphicsitem.h"
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SES_DrawRect::SES_DrawRect(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
-                           GraphicsView& editorGraphicsView) :
-    SES_Base(editor, editorUi, editorGraphicsView)
+GraphicsScene::GraphicsScene() noexcept :
+    QGraphicsScene(nullptr), mSelectionRectItem(nullptr)
 {
+    /*QBrush selectBrush = QGuiApplication::palette().highlight();
+    QColor selectColor = selectBrush.color();
+    selectColor.setAlpha(50);
+    selectBrush.setColor(selectColor);*/
+    QBrush selectBrush(QColor(150, 200, 255, 80), Qt::SolidPattern);
+    mSelectionRectItem = new QGraphicsRectItem();
+    mSelectionRectItem->setPen(QPen(QColor(120, 170, 255, 255), 0));
+    mSelectionRectItem->setBrush(selectBrush);
+    mSelectionRectItem->setZValue(1000);
+    QGraphicsScene::addItem(mSelectionRectItem);
 }
 
-SES_DrawRect::~SES_DrawRect()
+GraphicsScene::~GraphicsScene() noexcept
 {
+    QGraphicsScene::removeItem(mSelectionRectItem);
+    delete mSelectionRectItem;  mSelectionRectItem = nullptr;
 }
 
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
-SES_Base::ProcRetVal SES_DrawRect::process(SEE_Base* event) noexcept
+void GraphicsScene::addItem(GraphicsItem& item) noexcept
 {
-    Q_UNUSED(event);
-    return PassToParentState;
+    QGraphicsScene::addItem(&item);
 }
 
-bool SES_DrawRect::entry(SEE_Base* event) noexcept
+void GraphicsScene::removeItem(GraphicsItem& item) noexcept
 {
-    Q_UNUSED(event);
-    mEditorUi.actionToolDrawRectangle->setCheckable(true);
-    mEditorUi.actionToolDrawRectangle->setChecked(true);
-    return true;
+    QGraphicsScene::removeItem(&item);
 }
 
-bool SES_DrawRect::exit(SEE_Base* event) noexcept
+void GraphicsScene::setSelectionRect(const Point& p1, const Point& p2) noexcept
 {
-    Q_UNUSED(event);
-    mEditorUi.actionToolDrawRectangle->setCheckable(false);
-    mEditorUi.actionToolDrawRectangle->setChecked(false);
-    return true;
+    QRectF rectPx = QRectF(p1.toPxQPointF(), p2.toPxQPointF()).normalized();
+    mSelectionRectItem->setRect(rectPx);
 }
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
-
-} // namespace project

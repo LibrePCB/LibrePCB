@@ -54,7 +54,8 @@ class SES_DrawWire final : public SES_Base
     public:
 
         // Constructors / Destructor
-        explicit SES_DrawWire(SchematicEditor& editor, Ui::SchematicEditor& editorUi);
+        explicit SES_DrawWire(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
+                              GraphicsView& editorGraphicsView);
         ~SES_DrawWire();
 
         // General Methods

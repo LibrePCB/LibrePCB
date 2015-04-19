@@ -61,8 +61,6 @@ SOURCES += \
     common/units/lengthunit.cpp \
     common/units/angle.cpp \
     common/units/point.cpp \
-    common/cadscene.cpp \
-    common/cadview.cpp \
     workspace/workspace.cpp \
     library/library.cpp \
     project/project.cpp \
@@ -197,6 +195,10 @@ SOURCES += \
     project/schematics/items/si_netpoint.cpp \
     project/schematics/items/si_symbol.cpp \
     project/schematics/items/si_symbolpin.cpp \
+    common/graphics/graphicsview.cpp \
+    common/graphics/graphicsscene.cpp \
+    common/graphics/graphicsitem.cpp \
+    common/graphics/if_graphicsvieweventhandler.cpp \
     project/schematics/graphicsitems/sgi_base.cpp \
     project/schematics/graphicsitems/sgi_netlabel.cpp \
     project/schematics/graphicsitems/sgi_netline.cpp \
@@ -211,8 +213,6 @@ HEADERS += \
     common/units/lengthunit.h \
     common/units/angle.h \
     common/units/point.h \
-    common/cadscene.h \
-    common/cadview.h \
     workspace/workspace.h \
     library/library.h \
     project/project.h \
@@ -349,6 +349,10 @@ HEADERS += \
     project/schematics/items/si_netpoint.h \
     project/schematics/items/si_symbol.h \
     project/schematics/items/si_symbolpin.h \
+    common/graphics/graphicsview.h \
+    common/graphics/graphicsscene.h \
+    common/graphics/graphicsitem.h \
+    common/graphics/if_graphicsvieweventhandler.h \
     project/schematics/graphicsitems/sgi_base.h \
     project/schematics/graphicsitems/sgi_netlabel.h \
     project/schematics/graphicsitems/sgi_netline.h \

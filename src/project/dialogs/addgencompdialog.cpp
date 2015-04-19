@@ -25,8 +25,8 @@
 #include <QtWidgets>
 #include "addgencompdialog.h"
 #include "ui_addgencompdialog.h"
-#include "../../common/cadscene.h"
-#include "../../common/cadview.h"
+#include "../../common/graphics/graphicsscene.h"
+#include "../../common/graphics/graphicsview.h"
 #include "../project.h"
 #include "../library/projectlibrary.h"
 #include "../../library/genericcomponent.h"
@@ -45,10 +45,8 @@ AddGenCompDialog::AddGenCompDialog(Project& project, QWidget* parent) :
     mPreviewScene(nullptr), mSelectedGenComp(nullptr), mSelectedSymbVar(nullptr)
 {
     mUi->setupUi(this);
-    mUi->graphicsView->setOriginCrossVisible(false);
-    mUi->graphicsView->setPositionLabelVisible(false);
-    mPreviewScene = new CADScene();
-    mUi->graphicsView->setCadScene(mPreviewScene);
+    mPreviewScene = new GraphicsScene();
+    mUi->graphicsView->setScene(mPreviewScene);
 
     const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
 

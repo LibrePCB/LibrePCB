@@ -45,21 +45,22 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SES_FSM::SES_FSM(SchematicEditor& editor, Ui::SchematicEditor& editorUi) noexcept :
-    SES_Base(editor, editorUi),
+SES_FSM::SES_FSM(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
+                 GraphicsView& editorGraphicsView) noexcept :
+    SES_Base(editor, editorUi, editorGraphicsView),
     mCurrentState(State_NoState), mPreviousState(State_NoState)
 {
     // create all substates
-    mSubStates.insert(State_Select, new SES_Select(mEditor, mEditorUi));
-    mSubStates.insert(State_Move, new SES_Move(mEditor, mEditorUi));
-    mSubStates.insert(State_DrawText, new SES_DrawText(mEditor, mEditorUi));
-    mSubStates.insert(State_DrawRect, new SES_DrawRect(mEditor, mEditorUi));
-    mSubStates.insert(State_DrawPolygon, new SES_DrawPolygon(mEditor, mEditorUi));
-    mSubStates.insert(State_DrawCircle, new SES_DrawCircle(mEditor, mEditorUi));
-    mSubStates.insert(State_DrawEllipse, new SES_DrawEllipse(mEditor, mEditorUi));
-    mSubStates.insert(State_DrawWire, new SES_DrawWire(mEditor, mEditorUi));
-    mSubStates.insert(State_AddNetLabel, new SES_AddNetLabel(mEditor, mEditorUi));
-    mSubStates.insert(State_AddComponent, new SES_AddComponents(mEditor, mEditorUi));
+    mSubStates.insert(State_Select, new SES_Select(mEditor, mEditorUi, mEditorGraphicsView));
+    mSubStates.insert(State_Move, new SES_Move(mEditor, mEditorUi, mEditorGraphicsView));
+    mSubStates.insert(State_DrawText, new SES_DrawText(mEditor, mEditorUi, mEditorGraphicsView));
+    mSubStates.insert(State_DrawRect, new SES_DrawRect(mEditor, mEditorUi, mEditorGraphicsView));
+    mSubStates.insert(State_DrawPolygon, new SES_DrawPolygon(mEditor, mEditorUi, mEditorGraphicsView));
+    mSubStates.insert(State_DrawCircle, new SES_DrawCircle(mEditor, mEditorUi, mEditorGraphicsView));
+    mSubStates.insert(State_DrawEllipse, new SES_DrawEllipse(mEditor, mEditorUi, mEditorGraphicsView));
+    mSubStates.insert(State_DrawWire, new SES_DrawWire(mEditor, mEditorUi, mEditorGraphicsView));
+    mSubStates.insert(State_AddNetLabel, new SES_AddNetLabel(mEditor, mEditorUi, mEditorGraphicsView));
+    mSubStates.insert(State_AddComponent, new SES_AddComponents(mEditor, mEditorUi, mEditorGraphicsView));
 
     // go to state "Select"
     if (mSubStates[State_Select]->entry(nullptr))
@@ -178,7 +179,7 @@ SES_FSM::State SES_FSM::processEventFromChild(SEE_Base* event) noexcept
         case SEE_Base::SwitchToSchematicPage:
             event->setAccepted(true);
             return mCurrentState;
-        case SEE_Base::SchematicSceneEvent:
+        case SEE_Base::GraphicsViewEvent:
         {
             QEvent* e = SEE_RedirectedQEvent::getQEventFromSEE(event);
             Q_ASSERT(e); if (!e) return mCurrentState;

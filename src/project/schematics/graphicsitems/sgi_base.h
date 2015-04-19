@@ -26,6 +26,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
+#include "../../../common/graphics/graphicsitem.h"
 #include "../schematic.h"
 
 /*****************************************************************************************
@@ -37,7 +38,7 @@ namespace project {
 /**
  * @brief The Schematic Graphics Item Base (SGI_Base) class
  */
-class SGI_Base : public QGraphicsItem
+class SGI_Base : public GraphicsItem
 {
     public:
 

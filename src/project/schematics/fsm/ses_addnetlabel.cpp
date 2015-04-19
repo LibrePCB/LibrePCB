@@ -41,9 +41,10 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SES_AddNetLabel::SES_AddNetLabel(SchematicEditor& editor, Ui::SchematicEditor& editorUi) :
-    SES_Base(editor, editorUi), mUndoCmdActive(false), mCurrentNetLabel(nullptr),
-    mEditCmd(nullptr)
+SES_AddNetLabel::SES_AddNetLabel(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
+                                 GraphicsView& editorGraphicsView) :
+    SES_Base(editor, editorUi, editorGraphicsView),
+    mUndoCmdActive(false), mCurrentNetLabel(nullptr), mEditCmd(nullptr)
 {
 }
 
@@ -60,7 +61,7 @@ SES_Base::ProcRetVal SES_AddNetLabel::process(SEE_Base* event) noexcept
 {
     switch (event->getType())
     {
-        case SEE_Base::SchematicSceneEvent:
+        case SEE_Base::GraphicsViewEvent:
             return processSceneEvent(event);
         default:
             return PassToParentState;

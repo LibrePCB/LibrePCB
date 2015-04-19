@@ -56,8 +56,9 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SES_DrawWire::SES_DrawWire(SchematicEditor& editor, Ui::SchematicEditor& editorUi) :
-    SES_Base(editor, editorUi),
+SES_DrawWire::SES_DrawWire(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
+                           GraphicsView& editorGraphicsView) :
+    SES_Base(editor, editorUi, editorGraphicsView),
     mSubState(SubState_Idle), mWireMode(WireMode_HV), mFixedNetPoint(nullptr),
     mPositioningNetLine1(nullptr), mPositioningNetPoint1(nullptr),
     mPositioningNetLine2(nullptr), mPositioningNetPoint2(nullptr),
@@ -187,7 +188,7 @@ bool SES_DrawWire::entry(SEE_Base* event) noexcept
     mEditorUi.commandToolbar->addWidget(mWidthComboBox);
 
     // change the cursor
-    mEditorUi.graphicsView->setCursor(Qt::CrossCursor);
+    mEditorGraphicsView.setCursor(Qt::CrossCursor);
 
     return true;
 }
@@ -217,7 +218,7 @@ bool SES_DrawWire::exit(SEE_Base* event) noexcept
     mEditorUi.actionToolDrawWire->setChecked(false);
 
     // change the cursor
-    mEditorUi.graphicsView->setCursor(Qt::ArrowCursor);
+    mEditorGraphicsView.setCursor(Qt::ArrowCursor);
 
     return true;
 }
@@ -230,7 +231,7 @@ SES_Base::ProcRetVal SES_DrawWire::processSubStateIdle(SEE_Base* event) noexcept
 {
     switch (event->getType())
     {
-        case SEE_Base::SchematicSceneEvent:
+        case SEE_Base::GraphicsViewEvent:
             return processIdleSceneEvent(event);
         default:
             return PassToParentState;
@@ -277,7 +278,7 @@ SES_Base::ProcRetVal SES_DrawWire::processSubStatePositioning(SEE_Base* event) n
         case SEE_Base::AbortCommand:
             abortPositioning(true);
             return ForceStayInState;
-        case SEE_Base::SchematicSceneEvent:
+        case SEE_Base::GraphicsViewEvent:
             return processPositioningSceneEvent(event);
         default:
             return PassToParentState;
