@@ -239,6 +239,13 @@ class FilePath final
         QString toRelative(const FilePath& base) const noexcept;
 
         /**
+         * @brief Create and return a QUrl object with this filepath
+         *
+         * @return QUrl object which points to this local file (QUrl::fromLocalFile())
+         */
+        QUrl toQUrl() const noexcept {return QUrl::fromLocalFile(toStr());}
+
+        /**
          * @brief Get the basename of the file or directory
          *
          * @return The filename before the first '.' character
