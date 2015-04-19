@@ -51,23 +51,14 @@ class SGI_NetLabel final : public SGI_Base
 {
     public:
 
-        // Types
-
-        /// to make  qgraphicsitem_cast() working
-        enum {Type = Schematic::Type_NetLabel};
-
         // Constructors / Destructor
         explicit SGI_NetLabel(SI_NetLabel& netlabel) noexcept;
         ~SGI_NetLabel() noexcept;
-
-        // Getters
-        SI_NetLabel& getNetLabel() const {return mNetLabel;}
 
         // General Methods
         void updateCacheAndRepaint() noexcept;
 
         // Inherited from QGraphicsItem
-        int type() const {return Type;} ///< to make  qgraphicsitem_cast() working
         QRectF boundingRect() const {return mBoundingRect;}
         void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
 

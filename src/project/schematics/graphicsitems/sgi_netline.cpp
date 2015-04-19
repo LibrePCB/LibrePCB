@@ -68,6 +68,14 @@ void SGI_NetLine::updateCacheAndRepaint() noexcept
     mBoundingRect = QRectF(mLineF.p1(), mLineF.p2()).normalized();
     mBoundingRect.adjust(-mNetLine.getWidth().toPx()/2, -mNetLine.getWidth().toPx()/2,
                          mNetLine.getWidth().toPx()/2, mNetLine.getWidth().toPx()/2);
+    mShape = QPainterPath();
+    mShape.moveTo(mNetLine.getStartPoint().getPosition().toPxQPointF());
+    mShape.lineTo(mNetLine.getEndPoint().getPosition().toPxQPointF());
+    QPainterPathStroker ps;
+    ps.setCapStyle(Qt::RoundCap);
+    Length width = (mNetLine.getWidth() > Length(1270000) ? mNetLine.getWidth() : Length(1270000));
+    ps.setWidth(width.toPx());
+    mShape = ps.createStroke(mShape);
     update();
 }
 

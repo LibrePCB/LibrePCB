@@ -51,24 +51,16 @@ class SGI_NetLine final : public SGI_Base
 {
     public:
 
-        // Types
-
-        /// to make  qgraphicsitem_cast() working
-        enum {Type = Schematic::Type_NetLine};
-
         // Constructors / Destructor
         explicit SGI_NetLine(SI_NetLine& netline) noexcept;
         ~SGI_NetLine() noexcept;
-
-        // Getters
-        SI_NetLine& getNetLine() const {return mNetLine;}
 
         // General Methods
         void updateCacheAndRepaint() noexcept;
 
         // Inherited from QGraphicsItem
-        int type() const {return Type;} ///< to make  qgraphicsitem_cast() working
         QRectF boundingRect() const {return mBoundingRect;}
+        QPainterPath shape() const {return mShape;}
         void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
 
 
@@ -86,6 +78,7 @@ class SGI_NetLine final : public SGI_Base
         // Cached Attributes
         QLineF mLineF;
         QRectF mBoundingRect;
+        QPainterPath mShape;
 };
 
 } // namespace project

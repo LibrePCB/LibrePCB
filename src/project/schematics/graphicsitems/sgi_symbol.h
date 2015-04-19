@@ -59,17 +59,9 @@ class SGI_Symbol final : public SGI_Base
 {
     public:
 
-        // Types
-
-        /// to make  qgraphicsitem_cast() working
-        enum {Type = Schematic::Type_Symbol};
-
         // Constructors / Destructor
         explicit SGI_Symbol(SI_Symbol& symbol) noexcept;
         ~SGI_Symbol() noexcept;
-
-        // Getters
-        SI_Symbol& getSymbol() const noexcept {return mSymbol;}
 
         // General Methods
         void updateCacheAndRepaint() noexcept;
@@ -77,7 +69,6 @@ class SGI_Symbol final : public SGI_Base
         // Inherited from QGraphicsItem
         QRectF boundingRect() const noexcept {return mBoundingRect;}
         QPainterPath shape() const noexcept {return mShape;}
-        int type() const {return Type;} ///< to make  qgraphicsitem_cast() working
         void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
 
 
@@ -94,11 +85,11 @@ class SGI_Symbol final : public SGI_Base
 
         // Types
 
-        struct StaticTextProperties_t {
-            QStaticText text;
-            QPointF origin;
+        struct CachedTextProperties_t {
+            QString text;
             qreal fontSize;
             bool rotate180;
+            Qt::Alignment align;
             QRectF textRect;
         };
 
@@ -111,7 +102,7 @@ class SGI_Symbol final : public SGI_Base
         // Cached Attributes
         QRectF mBoundingRect;
         QPainterPath mShape;
-        QHash<const library::SymbolText*, StaticTextProperties_t> mStaticTextProperties;
+        QHash<const library::SymbolText*, CachedTextProperties_t> mCachedTextProperties;
 };
 
 } // namespace project

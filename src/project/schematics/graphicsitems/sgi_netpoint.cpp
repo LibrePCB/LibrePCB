@@ -69,8 +69,7 @@ SGI_NetPoint::~SGI_NetPoint() noexcept
 void SGI_NetPoint::updateCacheAndRepaint() noexcept
 {
     prepareGeometryChange();
-    mPointVisible = (((mNetPoint.getLines().count() > 1) && (mNetPoint.isAttached()))
-                     || (mNetPoint.getLines().count() > 2));
+    mPointVisible = mNetPoint.isVisible();
     setZValue(mPointVisible ? Schematic::ZValue_VisibleNetPoints : Schematic::ZValue_HiddenNetPoints);
     update();
 }

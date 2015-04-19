@@ -51,23 +51,14 @@ class SGI_NetPoint final : public SGI_Base
 {
     public:
 
-        // Types
-
-        /// to make  qgraphicsitem_cast() working
-        enum {Type = Schematic::Type_NetPoint};
-
         // Constructors / Destructor
         explicit SGI_NetPoint(SI_NetPoint& netpoint) noexcept;
         ~SGI_NetPoint() noexcept;
-
-        // Getters
-        SI_NetPoint& getNetPoint() const noexcept {return mNetPoint;}
 
         // General Methods
         void updateCacheAndRepaint() noexcept;
 
         // Inherited from QGraphicsItem
-        int type() const {return Type;} ///< to make  qgraphicsitem_cast() working
         QRectF boundingRect() const {return sBoundingRect;}
         void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
 

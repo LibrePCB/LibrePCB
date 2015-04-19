@@ -58,17 +58,9 @@ class SGI_SymbolPin final : public SGI_Base
 {
     public:
 
-        // Types
-
-        /// to make  qgraphicsitem_cast() working
-        enum {Type = Schematic::Type_SymbolPin};
-
         // Constructors / Destructor
         explicit SGI_SymbolPin(SI_SymbolPin& pin) noexcept;
         ~SGI_SymbolPin() noexcept;
-
-        // Getters
-        SI_SymbolPin& getPin() const noexcept {return mPin;}
 
         // General Methods
         void updateCacheAndRepaint() noexcept;
@@ -76,7 +68,6 @@ class SGI_SymbolPin final : public SGI_Base
         // Inherited from QGraphicsItem
         QRectF boundingRect() const noexcept {return mBoundingRect;}
         QPainterPath shape() const noexcept {return mShape;}
-        int type() const {return Type;} ///< to make  qgraphicsitem_cast() working
         void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
 
 
