@@ -293,7 +293,9 @@ void Circuit::removeNetSignal(NetSignal& netsignal) throw (Exception)
     Q_ASSERT(mNetSignals.contains(netsignal.getUuid()) == true);
 
     // the netsignal cannot be removed if there are already elements with that netsignal!
-    if ((netsignal.getGenCompSignals().count() > 0) || (netsignal.getNetPoints().count() > 0))
+    if (   (netsignal.getGenCompSignals().count() > 0)
+        || (netsignal.getNetPoints().count() > 0)
+        || (netsignal.getNetLabels().count() > 0))
     {
         throw LogicError(__FILE__, __LINE__,
             QString("%1:%2/%3")

@@ -164,6 +164,7 @@ void NetSignal::addToCircuit() noexcept
     Q_ASSERT(mAddedToCircuit == false);
     Q_ASSERT(mGenCompSignals.isEmpty() == true);
     Q_ASSERT(mSchematicNetPoints.isEmpty() == true);
+    Q_ASSERT(mSchematicNetLabels.isEmpty() == true);
     mAddedToCircuit = true;
     mNetClass->registerNetSignal(*this);
     updateErcMessages();
@@ -174,6 +175,7 @@ void NetSignal::removeFromCircuit() noexcept
     Q_ASSERT(mAddedToCircuit == true);
     Q_ASSERT(mGenCompSignals.isEmpty() == true);
     Q_ASSERT(mSchematicNetPoints.isEmpty() == true);
+    Q_ASSERT(mSchematicNetLabels.isEmpty() == true);
     mAddedToCircuit = false;
     mNetClass->unregisterNetSignal(*this);
     updateErcMessages();
