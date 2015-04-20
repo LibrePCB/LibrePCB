@@ -46,6 +46,8 @@ namespace project {
 
 /**
  * @brief The SES_DrawWire class
+ *
+ * @todo This class is incredible ugly and buggy :-D
  */
 class SES_DrawWire final : public SES_Base
 {
