@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
-<svg width="67cm" height="29cm" viewBox="139 19 1336 570" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="78cm" height="26cm" viewBox="139 19 1556 502" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <g>
     <rect style="fill: #ffffff" x="140" y="120" width="260" height="300"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="140" y="120" width="260" height="300"/>
@@ -16,21 +16,9 @@
     <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="422" y="114">units</text>
   </g>
   <g>
-    <rect style="fill: #ffff94" x="1280" y="320" width="148.6" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1280" y="320" width="148.6" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1354.3" y="336">&lt;&lt;QGraphicsScene&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1354.3" y="355">CADScene</text>
-  </g>
-  <g>
-    <rect style="fill: #ffff94" x="1280" y="260" width="140.9" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1280" y="260" width="140.9" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1350.45" y="276">&lt;&lt;QGraphicsView&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1350.45" y="295">CADView</text>
-  </g>
-  <g>
-    <rect style="fill: #ffffff" x="1280" y="120" width="68.45" height="28"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1280" y="120" width="68.45" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1314.23" y="139">Debug</text>
+    <rect style="fill: #ffffff" x="1500" y="100" width="68.45" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1500" y="100" width="68.45" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1534.23" y="119">Debug</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="440" y="180" width="72.95" height="28"/>
@@ -84,20 +72,20 @@
     <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="296.225" y="319">RangeError</text>
   </g>
   <g>
-    <rect style="fill: #ffffff" x="1280" y="160" width="111.9" height="28"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1280" y="160" width="111.9" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1335.95" y="179">SystemInfo</text>
+    <rect style="fill: #ffffff" x="1500" y="140" width="111.9" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1500" y="140" width="111.9" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1555.95" y="159">SystemInfo</text>
   </g>
   <g>
-    <rect style="fill: #ffbdbd" x="1280" y="420" width="106.95" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1280" y="420" width="106.95" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1333.47" y="436">&lt;&lt;QObject&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1333.47" y="455">UndoStack</text>
+    <rect style="fill: #ffbdbd" x="1500" y="280" width="106.95" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1500" y="280" width="106.95" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1553.47" y="296">&lt;&lt;QObject&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1553.47" y="315">UndoStack</text>
   </g>
   <g>
-    <rect style="fill: #ffffff" x="1280" y="380" width="146.55" height="28"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1280" y="380" width="146.55" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1353.27" y="399">UndoCommand</text>
+    <rect style="fill: #ffffff" x="1500" y="240" width="146.55" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1500" y="240" width="146.55" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1573.27" y="259">UndoCommand</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="240" y="380" width="133.35" height="28"/>
@@ -110,9 +98,9 @@
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="226.9,202.236 218.9,186.236 210.9,202.236 "/>
   </g>
   <g>
-    <rect style="fill: #ffffff" x="1280" y="520" width="153.05" height="28"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1280" y="520" width="153.05" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1356.53" y="539">SchematicLayer</text>
+    <rect style="fill: #ffffff" x="1500" y="380" width="153.05" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1500" y="380" width="153.05" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1576.53" y="399">SchematicLayer</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="440" y="140" width="110.5" height="28"/>
@@ -120,18 +108,18 @@
     <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="495.25" y="159">LengthUnit</text>
   </g>
   <g>
-    <rect style="fill: #ffbdbd" x="1280" y="200" width="133.2" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1280" y="200" width="133.2" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1346.6" y="216">&lt;&lt;QApplication&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1346.6" y="235">Application</text>
+    <rect style="fill: #ffbdbd" x="1500" y="180" width="133.2" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1500" y="180" width="133.2" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1566.6" y="196">&lt;&lt;QApplication&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1566.6" y="215">Application</text>
   </g>
   <g>
-    <rect style="fill: #ffffff" x="1280" y="480" width="77.7" height="28"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1280" y="480" width="77.7" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1318.85" y="499">Version</text>
+    <rect style="fill: #ffffff" x="1500" y="340" width="77.7" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1500" y="340" width="77.7" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1538.85" y="359">Version</text>
   </g>
-  <text font-size="22.5778" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:700" x="700" y="40">
-    <tspan x="700" y="40">Common classes</tspan>
+  <text font-size="22.5778" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:700" x="800" y="40">
+    <tspan x="800" y="40">Common classes</tspan>
   </text>
   <g>
     <rect style="fill: #ffffff" x="1040" y="120" width="216.348" height="76.3883"/>
@@ -246,8 +234,33 @@
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="836.65,386.236 828.65,370.236 820.65,386.236 "/>
   </g>
   <g>
-    <rect style="fill: #ffffff" x="1280" y="560" width="193.35" height="28"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1280" y="560" width="193.35" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:700" x="1376.67" y="579">IF_AttributeProvider</text>
+    <rect style="fill: #ffffff" x="1500" y="420" width="193.35" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1500" y="420" width="193.35" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:700" x="1596.67" y="439">IF_AttributeProvider</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="1280" y="120" width="180" height="200"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1280" y="120" width="180" height="200"/>
+    <rect style="fill: #ffffff" x="1280" y="100" width="65.6" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1280" y="100" width="65.6" height="20"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1282" y="114">graphics</text>
+  </g>
+  <g>
+    <rect style="fill: #ffff94" x="1300" y="140" width="140.9" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1300" y="140" width="140.9" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1370.45" y="156">&lt;&lt;QGraphicsView&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1370.45" y="175">GraphicsView</text>
+  </g>
+  <g>
+    <rect style="fill: #ffff94" x="1300" y="200" width="148.6" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1300" y="200" width="148.6" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1374.3" y="216">&lt;&lt;QGraphicsScene&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1374.3" y="235">GraphicsScene</text>
+  </g>
+  <g>
+    <rect style="fill: #ffff94" x="1300" y="260" width="140.9" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1300" y="260" width="140.9" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1370.45" y="276">&lt;&lt;QGraphicsItem&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1370.45" y="295">GraphicsItem</text>
   </g>
 </svg>
