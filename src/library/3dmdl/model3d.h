@@ -17,40 +17,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_COMPONENTCATEGORY_H
-#define LIBRARY_COMPONENTCATEGORY_H
+#ifndef LIBRARY_MODEL3D_H
+#define LIBRARY_MODEL3D_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include "libraryelement.h"
+#include "../libraryelement.h"
 
 /*****************************************************************************************
- *  Class ComponentCategory
+ *  Class Model3D
  ****************************************************************************************/
 
 namespace library {
 
 /**
- * @brief The ComponentCategory class
+ * @brief The Model3D class
  */
-class ComponentCategory final : public LibraryElement
+class Model3D final : public LibraryElement
 {
         Q_OBJECT
 
     public:
 
-        explicit ComponentCategory(const FilePath& xmlFilePath);
-        virtual ~ComponentCategory();
+        explicit Model3D(const FilePath& xmlFilePath);
+        virtual ~Model3D();
 
     private:
 
         // make some methods inaccessible...
-        ComponentCategory();
-        ComponentCategory(const ComponentCategory& other);
-        ComponentCategory& operator=(const ComponentCategory& rhs);
+        Model3D();
+        Model3D(const Model3D& other);
+        Model3D& operator=(const Model3D& rhs);
 
 
         // Private Methods
@@ -60,4 +60,4 @@ class ComponentCategory final : public LibraryElement
 
 } // namespace library
 
-#endif // LIBRARY_COMPONENTCATEGORY_H
+#endif // LIBRARY_MODEL3D_H

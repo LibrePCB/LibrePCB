@@ -23,7 +23,7 @@
 #include "gencompinstance.h"
 #include "circuit.h"
 #include "netsignal.h"
-#include "../../library/genericcomponent.h"
+#include "../../library/gencmp/genericcomponent.h"
 #include "../erc/ercmsg.h"
 #include "../../common/file_io/xmldomelement.h"
 #include "../project.h"

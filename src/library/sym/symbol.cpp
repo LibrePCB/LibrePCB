@@ -23,7 +23,7 @@
 
 #include <QtCore>
 #include "symbol.h"
-#include "../common/file_io/xmldomelement.h"
+#include "../../common/file_io/xmldomelement.h"
 
 namespace library {
 

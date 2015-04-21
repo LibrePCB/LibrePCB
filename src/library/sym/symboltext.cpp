@@ -22,9 +22,9 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "symbolellipse.h"
+#include "symboltext.h"
 #include "symbol.h"
-#include "../common/file_io/xmldomelement.h"
+#include "../../common/file_io/xmldomelement.h"
 
 namespace library {
 
@@ -32,31 +32,30 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SymbolEllipse::SymbolEllipse() noexcept :
-    mLineLayerId(0), mFillLayerId(0), mLineWidth(0), mIsGrabArea(false), mCenter(0, 0),
-    mRadiusX(0), mRadiusY(0), mRotation(0)
+SymbolText::SymbolText() noexcept :
+    mLayerId(0), mText(), mPosition(0, 0), mAngle(0), mHeight(0), mAlign()
 {
 }
 
-SymbolEllipse::SymbolEllipse(const XmlDomElement& domElement) throw (Exception)
+SymbolText::SymbolText(const XmlDomElement& domElement) throw (Exception)
 {
-    // load layers
-    mLineLayerId = domElement.getAttribute<uint>("line_layer");
-    mFillLayerId = domElement.getAttribute<uint>("fill_layer");
+    mLayerId = domElement.getAttribute<uint>("layer");
+    mText = domElement.getAttribute("text", true);
 
     // load geometry attributes
-    mLineWidth = domElement.getAttribute<Length>("line_width");
-    mIsGrabArea = domElement.getAttribute<bool>("grab_area");
-    mCenter.setX(domElement.getAttribute<Length>("x"));
-    mCenter.setY(domElement.getAttribute<Length>("y"));
-    mRadiusX = domElement.getAttribute<Length>("radius_x");
-    mRadiusY = domElement.getAttribute<Length>("radius_y");
-    mRotation = domElement.getAttribute<Angle>("rotation");
+    mPosition.setX(domElement.getAttribute<Length>("x"));
+    mPosition.setY(domElement.getAttribute<Length>("y"));
+    mAngle = domElement.getAttribute<Angle>("angle");
+    mHeight = domElement.getAttribute<Length>("height");
+
+    // text alignment
+    mAlign.setH(domElement.getAttribute<HAlign>("h_align"));
+    mAlign.setV(domElement.getAttribute<VAlign>("v_align"));
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-SymbolEllipse::~SymbolEllipse() noexcept
+SymbolText::~SymbolText() noexcept
 {
 }
 
@@ -64,20 +63,19 @@ SymbolEllipse::~SymbolEllipse() noexcept
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* SymbolEllipse::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* SymbolText::serializeToXmlDomElement() const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("ellipse"));
-    root->setAttribute("line_layer", mLineLayerId);
-    root->setAttribute("fill_layer", mFillLayerId);
-    root->setAttribute("line_width", mLineWidth.toMmString());
-    root->setAttribute("grab_area", mIsGrabArea);
-    root->setAttribute("x", mCenter.getX().toMmString());
-    root->setAttribute("y", mCenter.getY().toMmString());
-    root->setAttribute("radius_x", mRadiusX.toMmString());
-    root->setAttribute("radius_y", mRadiusY.toMmString());
-    root->setAttribute("rotation", mRotation.toDegString());
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("text"));
+    root->setAttribute("layer", mLayerId);
+    root->setAttribute("text", mText);
+    root->setAttribute("x", mPosition.getX().toMmString());
+    root->setAttribute("y", mPosition.getY().toMmString());
+    root->setAttribute("angle", mAngle.toDegString());
+    root->setAttribute("height", mHeight.toMmString());
+    root->setAttribute("h_align", mAlign.getH());
+    root->setAttribute("v_align", mAlign.getV());
     return root.take();
 }
 
@@ -85,11 +83,10 @@ XmlDomElement* SymbolEllipse::serializeToXmlDomElement() const throw (Exception)
  *  Private Methods
  ****************************************************************************************/
 
-bool SymbolEllipse::checkAttributesValidity() const noexcept
+bool SymbolText::checkAttributesValidity() const noexcept
 {
-    if (mLineWidth < 0)         return false;
-    if (mRadiusX <= 0)          return false;
-    if (mRadiusY <= 0)          return false;
+    if (mText.isEmpty())    return false;
+    if (mHeight <= 0)       return false;
     return true;
 }
 

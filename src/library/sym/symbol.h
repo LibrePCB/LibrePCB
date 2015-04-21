@@ -25,7 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "libraryelement.h"
+#include "../libraryelement.h"
 #include "symbolpin.h"
 #include "symbolpolygon.h"
 #include "symboltext.h"

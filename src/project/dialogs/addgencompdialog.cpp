@@ -29,9 +29,9 @@
 #include "../../common/graphics/graphicsview.h"
 #include "../project.h"
 #include "../library/projectlibrary.h"
-#include "../../library/genericcomponent.h"
-#include "../../library/gencompsymbvar.h"
-#include "../../library/symbol.h"
+#include "../../library/gencmp/genericcomponent.h"
+#include "../../library/gencmp/gencompsymbvar.h"
+#include "../../library/sym/symbol.h"
 #include "../settings/projectsettings.h"
 
 namespace project {

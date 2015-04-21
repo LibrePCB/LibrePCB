@@ -23,9 +23,9 @@
 
 #include <QtCore>
 #include "genericcomponent.h"
-#include "../workspace/workspace.h"
-#include "../workspace/settings/workspacesettings.h"
-#include "../common/file_io/xmldomelement.h"
+#include "../../workspace/workspace.h"
+#include "../../workspace/settings/workspacesettings.h"
+#include "../../common/file_io/xmldomelement.h"
 
 namespace library {
 

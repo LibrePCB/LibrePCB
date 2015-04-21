@@ -29,8 +29,8 @@
 #include "../../circuit/circuit.h"
 #include "../../library/projectlibrary.h"
 #include "../../circuit/gencompinstance.h"
-#include "../../../library/genericcomponent.h"
-#include "../../../library/symbol.h"
+#include "../../../library/gencmp/genericcomponent.h"
+#include "../../../library/sym/symbol.h"
 #include "../../../common/file_io/xmldomelement.h"
 #include "../../../common/graphics/graphicsscene.h"
 

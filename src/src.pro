@@ -69,15 +69,15 @@ SOURCES += \
     workspace/projecttreemodel.cpp \
     workspace/projecttreeitem.cpp \
     library/libraryelement.cpp \
-    library/symbol.cpp \
-    library/component.cpp \
-    library/footprint.cpp \
-    library/genericcomponent.cpp \
-    library/model.cpp \
-    library/package.cpp \
-    library/spicemodel.cpp \
-    library/componentcategory.cpp \
-    library/packagecategory.cpp \
+    library/sym/symbol.cpp \
+    library/cmp/component.cpp \
+    library/fpt/footprint.cpp \
+    library/gencmp/genericcomponent.cpp \
+    library/3dmdl/model3d.cpp \
+    library/pkg/package.cpp \
+    library/spcmdl/spicemodel.cpp \
+    library/cat/componentcategory.cpp \
+    library/cat/packagecategory.cpp \
     project/schematics/schematiceditor.cpp \
     project/circuit/circuit.cpp \
     workspace/recentprojectsmodel.cpp \
@@ -131,12 +131,12 @@ SOURCES += \
     common/dialogs/gridsettingsdialog.cpp \
     workspace/settings/items/wsi_appdefaultmeasurementunits.cpp \
     common/application.cpp \
-    library/gencompsignal.cpp \
-    library/gencompsymbvar.cpp \
-    library/gencompsymbvaritem.cpp \
-    library/symbolpin.cpp \
-    library/symbolpolygon.cpp \
-    library/symboltext.cpp \
+    library/gencmp/gencompsignal.cpp \
+    library/gencmp/gencompsymbvar.cpp \
+    library/gencmp/gencompsymbvaritem.cpp \
+    library/sym/symbolpin.cpp \
+    library/sym/symbolpolygon.cpp \
+    library/sym/symboltext.cpp \
     common/version.cpp \
     workspace/settings/items/wsi_librarynormorder.cpp \
     project/schematics/cmd/cmdsymbolinstanceadd.cpp \
@@ -167,7 +167,7 @@ SOURCES += \
     project/schematics/cmd/cmdschematicnetlabelremove.cpp \
     project/schematics/cmd/cmdschematicnetlabeledit.cpp \
     project/schematics/schematicclipboard.cpp \
-    library/symbolellipse.cpp \
+    library/sym/symbolellipse.cpp \
     project/circuit/cmd/cmdgencompinstedit.cpp \
     project/circuit/cmd/cmdnetclassedit.cpp \
     project/circuit/cmd/cmdnetsignaledit.cpp \
@@ -221,15 +221,15 @@ HEADERS += \
     workspace/projecttreemodel.h \
     workspace/projecttreeitem.h \
     library/libraryelement.h \
-    library/symbol.h \
-    library/component.h \
-    library/footprint.h \
-    library/genericcomponent.h \
-    library/model.h \
-    library/package.h \
-    library/spicemodel.h \
-    library/componentcategory.h \
-    library/packagecategory.h \
+    library/sym/symbol.h \
+    library/cmp/component.h \
+    library/fpt/footprint.h \
+    library/gencmp/genericcomponent.h \
+    library/3dmdl/model3d.h \
+    library/pkg/package.h \
+    library/spcmdl/spicemodel.h \
+    library/cat/componentcategory.h \
+    library/cat/packagecategory.h \
     project/schematics/schematiceditor.h \
     project/circuit/circuit.h \
     workspace/recentprojectsmodel.h \
@@ -283,12 +283,12 @@ HEADERS += \
     common/dialogs/gridsettingsdialog.h \
     workspace/settings/items/wsi_appdefaultmeasurementunits.h \
     common/application.h \
-    library/gencompsignal.h \
-    library/gencompsymbvar.h \
-    library/gencompsymbvaritem.h \
-    library/symbolpin.h \
-    library/symbolpolygon.h \
-    library/symboltext.h \
+    library/gencmp/gencompsignal.h \
+    library/gencmp/gencompsymbvar.h \
+    library/gencmp/gencompsymbvaritem.h \
+    library/sym/symbolpin.h \
+    library/sym/symbolpolygon.h \
+    library/sym/symboltext.h \
     common/version.h \
     workspace/settings/items/wsi_librarynormorder.h \
     project/schematics/cmd/cmdsymbolinstanceadd.h \
@@ -321,7 +321,7 @@ HEADERS += \
     project/schematics/cmd/cmdschematicnetlabelremove.h \
     project/schematics/cmd/cmdschematicnetlabeledit.h \
     project/schematics/schematicclipboard.h \
-    library/symbolellipse.h \
+    library/sym/symbolellipse.h \
     project/circuit/cmd/cmdgencompinstedit.h \
     project/circuit/cmd/cmdnetclassedit.h \
     project/circuit/cmd/cmdnetsignaledit.h \

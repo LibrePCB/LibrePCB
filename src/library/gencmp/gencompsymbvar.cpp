@@ -24,7 +24,7 @@
 #include <QtCore>
 #include "gencompsymbvar.h"
 #include "genericcomponent.h"
-#include "../common/file_io/xmldomelement.h"
+#include "../../common/file_io/xmldomelement.h"
 
 namespace library {
 

@@ -17,40 +17,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_SPICEMODEL_H
-#define LIBRARY_SPICEMODEL_H
+#ifndef LIBRARY_PACKAGE_H
+#define LIBRARY_PACKAGE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include "libraryelement.h"
+#include "../libraryelement.h"
 
 /*****************************************************************************************
- *  Class SpiceModel
+ *  Class Package
  ****************************************************************************************/
 
 namespace library {
 
 /**
- * @brief The SpiceModel class
+ * @brief The Package class
  */
-class SpiceModel final : public LibraryElement
+class Package final : public LibraryElement
 {
         Q_OBJECT
 
     public:
 
-        explicit SpiceModel(const FilePath& xmlFilePath);
-        virtual ~SpiceModel();
+        explicit Package(const FilePath& xmlFilePath);
+        virtual ~Package();
 
     private:
 
         // make some methods inaccessible...
-        SpiceModel();
-        SpiceModel(const SpiceModel& other);
-        SpiceModel& operator=(const SpiceModel& rhs);
+        Package();
+        Package(const Package& other);
+        Package& operator=(const Package& rhs);
 
 
         // Private Methods
@@ -60,4 +60,4 @@ class SpiceModel final : public LibraryElement
 
 } // namespace library
 
-#endif // LIBRARY_SPICEMODEL_H
+#endif // LIBRARY_PACKAGE_H

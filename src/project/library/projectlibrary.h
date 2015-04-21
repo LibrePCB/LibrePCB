@@ -39,7 +39,7 @@ class Project;
 namespace library {
 class Symbol;
 class Footprint;
-class Model;
+class Model3D;
 class SpiceModel;
 class Package;
 class GenericComponent;
@@ -68,14 +68,14 @@ class ProjectLibrary final : public QObject
         // Getters: Library Elements
         const QHash<QUuid, const library::Symbol*>&             getSymbols()            const noexcept {return mSymbols;}
         const QHash<QUuid, const library::Footprint*>&          getFootprints()         const noexcept {return mFootprints;}
-        const QHash<QUuid, const library::Model*>&              getModels()             const noexcept {return mModels;}
+        const QHash<QUuid, const library::Model3D*>&            getModels()             const noexcept {return mModels;}
         const QHash<QUuid, const library::SpiceModel*>&         getSpiceModels()        const noexcept {return mSpiceModels;}
         const QHash<QUuid, const library::Package*>&            getPackages()           const noexcept {return mPackages;}
         const QHash<QUuid, const library::GenericComponent*>&   getGenericComponents()  const noexcept {return mGenericComponents;}
         const QHash<QUuid, const library::Component*>&          getComponents()         const noexcept {return mComponents;}
         const library::Symbol*           getSymbol(     const QUuid& uuid) const noexcept;
         const library::Footprint*        getFootprint(  const QUuid& uuid) const noexcept;
-        const library::Model*            getModel(      const QUuid& uuid) const noexcept;
+        const library::Model3D*          getModel(      const QUuid& uuid) const noexcept;
         const library::SpiceModel*       getSpiceModel( const QUuid& uuid) const noexcept;
         const library::Package*          getPackage(    const QUuid& uuid) const noexcept;
         const library::GenericComponent* getGenComp(    const QUuid& uuid) const noexcept;
@@ -101,7 +101,7 @@ class ProjectLibrary final : public QObject
         // The Library Elements
         QHash<QUuid, const library::Symbol*> mSymbols;
         QHash<QUuid, const library::Footprint*> mFootprints;
-        QHash<QUuid, const library::Model*> mModels;
+        QHash<QUuid, const library::Model3D*> mModels;
         QHash<QUuid, const library::SpiceModel*> mSpiceModels;
         QHash<QUuid, const library::Package*> mPackages;
         QHash<QUuid, const library::GenericComponent*> mGenericComponents;

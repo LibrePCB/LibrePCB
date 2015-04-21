@@ -17,40 +17,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_PACKAGECATEGORY_H
-#define LIBRARY_PACKAGECATEGORY_H
+#ifndef LIBRARY_COMPONENT_H
+#define LIBRARY_COMPONENT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include "libraryelement.h"
+#include "../libraryelement.h"
 
 /*****************************************************************************************
- *  Class PackageCategory
+ *  Class Component
  ****************************************************************************************/
 
 namespace library {
 
 /**
- * @brief The PackageCategory class
+ * @brief The Component class
  */
-class PackageCategory final : public LibraryElement
+class Component final : public LibraryElement
 {
         Q_OBJECT
 
     public:
 
-        explicit PackageCategory(const FilePath& xmlFilePath);
-        virtual ~PackageCategory();
+        explicit Component(const FilePath& xmlFilePath);
+        virtual ~Component();
 
     private:
 
         // make some methods inaccessible...
-        PackageCategory();
-        PackageCategory(const PackageCategory& other);
-        PackageCategory& operator=(const PackageCategory& rhs);
+        Component();
+        Component(const Component& other);
+        Component& operator=(const Component& rhs);
 
 
         // Private Methods
@@ -60,4 +60,4 @@ class PackageCategory final : public LibraryElement
 
 } // namespace library
 
-#endif // LIBRARY_PACKAGECATEGORY_H
+#endif // LIBRARY_COMPONENT_H

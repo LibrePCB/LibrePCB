@@ -17,40 +17,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_MODEL_H
-#define LIBRARY_MODEL_H
+#ifndef LIBRARY_FOOTPRINT_H
+#define LIBRARY_FOOTPRINT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include "libraryelement.h"
+#include "../libraryelement.h"
 
 /*****************************************************************************************
- *  Class Model
+ *  Class Footprint
  ****************************************************************************************/
 
 namespace library {
 
 /**
- * @brief The Model class
+ * @brief The Footprint class
  */
-class Model final : public LibraryElement
+class Footprint final : public LibraryElement
 {
         Q_OBJECT
 
     public:
 
-        explicit Model(const FilePath& xmlFilePath);
-        virtual ~Model();
+        explicit Footprint(const FilePath& xmlFilePath);
+        virtual ~Footprint();
 
     private:
 
         // make some methods inaccessible...
-        Model();
-        Model(const Model& other);
-        Model& operator=(const Model& rhs);
+        Footprint();
+        Footprint(const Footprint& other);
+        Footprint& operator=(const Footprint& rhs);
 
 
         // Private Methods
@@ -60,4 +60,4 @@ class Model final : public LibraryElement
 
 } // namespace library
 
-#endif // LIBRARY_MODEL_H
+#endif // LIBRARY_FOOTPRINT_H

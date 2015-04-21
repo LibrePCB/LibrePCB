@@ -32,8 +32,8 @@
 #include "../../../common/schematiclayer.h"
 #include "../../../workspace/workspace.h"
 #include "../../../workspace/settings/workspacesettings.h"
-#include "../../../library/symbol.h"
-#include "../../../library/genericcomponent.h"
+#include "../../../library/sym/symbol.h"
+#include "../../../library/gencmp/genericcomponent.h"
 
 namespace project {
 

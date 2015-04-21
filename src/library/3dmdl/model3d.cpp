@@ -17,47 +17,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_FOOTPRINT_H
-#define LIBRARY_FOOTPRINT_H
-
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include "libraryelement.h"
-
-/*****************************************************************************************
- *  Class Footprint
- ****************************************************************************************/
+#include "model3d.h"
 
 namespace library {
 
-/**
- * @brief The Footprint class
- */
-class Footprint final : public LibraryElement
+/*****************************************************************************************
+ *  Constructors / Destructor
+ ****************************************************************************************/
+
+Model3D::Model3D(const FilePath& xmlFilePath) :
+    LibraryElement(xmlFilePath, "model")
 {
-        Q_OBJECT
+    readFromFile();
+}
 
-    public:
+Model3D::~Model3D()
+{
+}
 
-        explicit Footprint(const FilePath& xmlFilePath);
-        virtual ~Footprint();
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
 
-    private:
+void Model3D::parseDomTree(const XmlDomElement& root) throw (Exception)
+{
+    LibraryElement::parseDomTree(root);
+}
 
-        // make some methods inaccessible...
-        Footprint();
-        Footprint(const Footprint& other);
-        Footprint& operator=(const Footprint& rhs);
-
-
-        // Private Methods
-        void parseDomTree(const XmlDomElement& root) throw (Exception);
-
-};
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
 } // namespace library
-
-#endif // LIBRARY_FOOTPRINT_H

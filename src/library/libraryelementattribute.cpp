@@ -23,7 +23,7 @@
 
 #include <QtCore>
 #include "libraryelementattribute.h"
-#include "genericcomponent.h"
+#include "librarybaseelement.h"
 #include "../common/file_io/xmldomelement.h"
 #include "../common/attributes/attributetype.h"
 #include "../common/attributes/attributeunit.h"

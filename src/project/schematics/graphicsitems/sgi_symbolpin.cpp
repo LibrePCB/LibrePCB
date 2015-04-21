@@ -35,8 +35,8 @@
 #include "../../../common/schematiclayer.h"
 #include "../../../workspace/workspace.h"
 #include "../../../workspace/settings/workspacesettings.h"
-#include "../../../library/symbolpin.h"
-#include "../../../library/genericcomponent.h"
+#include "../../../library/sym/symbolpin.h"
+#include "../../../library/gencmp/genericcomponent.h"
 
 namespace project {
 

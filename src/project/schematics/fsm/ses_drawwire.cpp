@@ -36,7 +36,7 @@
 #include "../cmd/cmdschematicnetpointadd.h"
 #include "../cmd/cmdschematicnetlineadd.h"
 #include "../schematic.h"
-#include "../../../library/symbolpin.h"
+#include "../../../library/sym/symbolpin.h"
 #include "../items/si_symbol.h"
 #include "../items/si_symbolpin.h"
 #include "../../circuit/gencompsignalinstance.h"

@@ -17,40 +17,47 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBRARY_SPICEMODEL_H
+#define LIBRARY_SPICEMODEL_H
+
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include "model.h"
+#include "../libraryelement.h"
+
+/*****************************************************************************************
+ *  Class SpiceModel
+ ****************************************************************************************/
 
 namespace library {
 
-/*****************************************************************************************
- *  Constructors / Destructor
- ****************************************************************************************/
-
-Model::Model(const FilePath& xmlFilePath) :
-    LibraryElement(xmlFilePath, "model")
+/**
+ * @brief The SpiceModel class
+ */
+class SpiceModel final : public LibraryElement
 {
-    readFromFile();
-}
+        Q_OBJECT
 
-Model::~Model()
-{
-}
+    public:
 
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
+        explicit SpiceModel(const FilePath& xmlFilePath);
+        virtual ~SpiceModel();
 
-void Model::parseDomTree(const XmlDomElement& root) throw (Exception)
-{
-    LibraryElement::parseDomTree(root);
-}
+    private:
 
-/*****************************************************************************************
- *  End of File
- ****************************************************************************************/
+        // make some methods inaccessible...
+        SpiceModel();
+        SpiceModel(const SpiceModel& other);
+        SpiceModel& operator=(const SpiceModel& rhs);
+
+
+        // Private Methods
+        void parseDomTree(const XmlDomElement& root) throw (Exception);
+
+};
 
 } // namespace library
+
+#endif // LIBRARY_SPICEMODEL_H

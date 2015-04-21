@@ -25,8 +25,8 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../common/units/all_length_units.h"
-#include "../common/file_io/if_xmlserializableobject.h"
+#include "../../common/units/all_length_units.h"
+#include "../../common/file_io/if_xmlserializableobject.h"
 
 /*****************************************************************************************
  *  Class SymbolPin

@@ -24,7 +24,7 @@
 #include <QtCore>
 #include "gencompsignal.h"
 #include "genericcomponent.h"
-#include "../common/file_io/xmldomelement.h"
+#include "../../common/file_io/xmldomelement.h"
 
 namespace library {
 

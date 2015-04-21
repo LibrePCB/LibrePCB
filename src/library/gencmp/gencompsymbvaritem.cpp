@@ -25,7 +25,7 @@
 #include "gencompsymbvaritem.h"
 #include "genericcomponent.h"
 #include "gencompsymbvar.h"
-#include "../common/file_io/xmldomelement.h"
+#include "../../common/file_io/xmldomelement.h"
 
 namespace library {
 

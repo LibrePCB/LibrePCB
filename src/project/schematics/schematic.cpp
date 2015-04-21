@@ -27,7 +27,7 @@
 #include "../../common/file_io/xmldomdocument.h"
 #include "../../common/file_io/xmldomelement.h"
 #include "../project.h"
-#include "../../library/symbolpin.h"
+#include "../../library/sym/symbolpin.h"
 #include "items/si_symbol.h"
 #include "items/si_symbolpin.h"
 #include "items/si_netpoint.h"

@@ -25,10 +25,10 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "libraryelement.h"
+#include "../libraryelement.h"
 #include "gencompsignal.h"
 #include "gencompsymbvar.h"
-#include "libraryelementattribute.h"
+#include "../libraryelementattribute.h"
 
 /*****************************************************************************************
  *  Class GenericComponent

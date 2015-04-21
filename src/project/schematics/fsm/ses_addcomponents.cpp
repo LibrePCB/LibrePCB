@@ -27,7 +27,7 @@
 #include "ui_schematiceditor.h"
 #include "../../project.h"
 #include "../../library/projectlibrary.h"
-#include "../../../library/genericcomponent.h"
+#include "../../../library/gencmp/genericcomponent.h"
 #include "../../circuit/cmd/cmdgencompinstadd.h"
 #include "../../../common/undostack.h"
 #include "../cmd/cmdsymbolinstanceadd.h"
