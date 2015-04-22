@@ -37,7 +37,7 @@
 
 GraphicsView::GraphicsView(QWidget* parent, IF_GraphicsViewEventHandler* eventHandler) noexcept :
     QGraphicsView(parent), mEventHandlerObject(eventHandler), mScene(nullptr),
-    mZoomAnimation(nullptr), mGridProperties(new GridProperties())
+    mZoomAnimation(nullptr), mGridProperties(new GridProperties()), mOriginCrossVisible(true)
 {
     setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
     if (Workspace::instance().getSettings().getAppearance()->getUseOpenGl())
@@ -92,6 +92,12 @@ void GraphicsView::setVisibleSceneRect(const QRectF& rect) noexcept
     fitInView(rect, Qt::KeepAspectRatio);
 }
 
+void GraphicsView::setOriginCrossVisible(bool visible) noexcept
+{
+    mOriginCrossVisible = visible;
+    setForegroundBrush(foregroundBrush()); // this will repaint the foreground
+}
+
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
@@ -113,6 +119,9 @@ void GraphicsView::zoomAll() noexcept
     if (!mScene) return;
     QRectF rect = mScene->itemsBoundingRect();
     if (rect.isEmpty()) rect = QRectF(-100, -100, 200, 200);
+    qreal xMargins = rect.width() / 50;
+    qreal yMargins = rect.height() / 50;
+    rect += QMarginsF(xMargins, yMargins, xMargins, yMargins);
     mZoomAnimation->setDuration(500);
     mZoomAnimation->setEasingCurve(QEasingCurve::InOutCubic);
     mZoomAnimation->setStartValue(getVisibleSceneRect());
@@ -157,24 +166,35 @@ void GraphicsView::zoomAnimationValueChanged(const QVariant& value) noexcept
 
 bool GraphicsView::eventFilter(QObject* obj, QEvent* event)
 {
-    if (mEventHandlerObject)
+    switch (event->type())
     {
-        switch (event->type())
+        case QEvent::GraphicsSceneMouseDoubleClick:
+        case QEvent::GraphicsSceneMousePress:
+        case QEvent::GraphicsSceneMouseRelease:
+        case QEvent::GraphicsSceneMouseMove:
+        case QEvent::GraphicsSceneContextMenu:
         {
-            case QEvent::GraphicsSceneMouseDoubleClick:
-            case QEvent::GraphicsSceneMousePress:
-            case QEvent::GraphicsSceneMouseRelease:
-            case QEvent::GraphicsSceneMouseMove:
-            case QEvent::GraphicsSceneContextMenu:
+            if (!underMouse()) break;
+            if (mEventHandlerObject)
                 mEventHandlerObject->graphicsViewEventHandler(event);
-                return true;
-            case QEvent::GraphicsSceneWheel:
+            return true;
+        }
+        case QEvent::GraphicsSceneWheel:
+        {
+            if (!underMouse()) break;
+            if (mEventHandlerObject)
+            {
                 if (!mEventHandlerObject->graphicsViewEventHandler(event))
                     handleMouseWheelEvent(dynamic_cast<QGraphicsSceneWheelEvent*>(event));
-                return true;
-            default:
-                break;
+            }
+            else
+            {
+                handleMouseWheelEvent(dynamic_cast<QGraphicsSceneWheelEvent*>(event));
+            }
+            return true;
         }
+        default:
+            break;
     }
     return QWidget::eventFilter(obj, event);
 }
@@ -208,9 +228,9 @@ void GraphicsView::drawBackground(QPainter* painter, const QRectF& rect)
             {
                 QVarLengthArray<QLineF, 500> lines;
                 for (qreal x = left; x < right; x += gridIntervalPixels)
-                    lines.append(QLineF(x, top, x, bottom));
+                    lines.append(QLineF(x, rect.top(), x, rect.bottom()));
                 for (qreal y = bottom; y > top; y -= gridIntervalPixels)
-                    lines.append(QLineF(left, y, right, y));
+                    lines.append(QLineF(rect.left(), y, rect.right(), y));
                 painter->setOpacity(0.5);
                 painter->drawLines(lines.data(), lines.size());
                 break;
@@ -236,12 +256,15 @@ void GraphicsView::drawForeground(QPainter* painter, const QRectF& rect)
 {
     Q_UNUSED(rect);
 
-    // draw origin cross
-    QPen originPen(Qt::black);
-    originPen.setWidth(0);
-    painter->setPen(originPen);
-    painter->drawLine(-21.6, 0, 21.6, 0);
-    painter->drawLine(0, -21.6, 0, 21.6);
+    if (mOriginCrossVisible)
+    {
+        // draw origin cross
+        QPen originPen(Qt::black);
+        originPen.setWidth(0);
+        painter->setPen(originPen);
+        painter->drawLine(-21.6, 0, 21.6, 0);
+        painter->drawLine(0, -21.6, 0, 21.6);
+    }
 }
 
 /*****************************************************************************************

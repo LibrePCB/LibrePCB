@@ -61,6 +61,7 @@ class GraphicsView final : public QGraphicsView
         void setGridProperties(const GridProperties& properties) noexcept;
         void setScene(GraphicsScene* scene) noexcept;
         void setVisibleSceneRect(const QRectF& rect) noexcept;
+        void setOriginCrossVisible(bool visible) noexcept;
 
         // General Methods
         void zoomIn() noexcept;
@@ -77,6 +78,10 @@ class GraphicsView final : public QGraphicsView
 
     private:
 
+        // make some methods inaccessible...
+        GraphicsView(const GraphicsView& other) = delete;
+        GraphicsView& operator=(const GraphicsView& rhs) = delete;
+
         // Inherited Methods
         bool eventFilter(QObject* obj, QEvent* event);
         void drawBackground(QPainter* painter, const QRectF& rect);
@@ -88,6 +93,7 @@ class GraphicsView final : public QGraphicsView
         GraphicsScene* mScene;
         QVariantAnimation* mZoomAnimation;
         GridProperties* mGridProperties;
+        bool mOriginCrossVisible;
 
         // Static Variables
         static constexpr qreal sZoomStepFactor = 1.5;
