@@ -33,6 +33,7 @@
 #include "../../library/gencmp/gencompsymbvar.h"
 #include "../../library/sym/symbol.h"
 #include "../settings/projectsettings.h"
+#include "../../library/sym/symbolpreviewgraphicsitem.h"
 
 namespace project {
 
@@ -47,6 +48,7 @@ AddGenCompDialog::AddGenCompDialog(Project& project, QWidget* parent) :
     mUi->setupUi(this);
     mPreviewScene = new GraphicsScene();
     mUi->graphicsView->setScene(mPreviewScene);
+    mUi->graphicsView->setOriginCrossVisible(false);
 
     const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
 
@@ -63,10 +65,11 @@ AddGenCompDialog::AddGenCompDialog(Project& project, QWidget* parent) :
 
 AddGenCompDialog::~AddGenCompDialog()
 {
+    qDeleteAll(mPreviewSymbolGraphicsItems);    mPreviewSymbolGraphicsItems.clear();
     mSelectedSymbVar = nullptr;
-    delete mSelectedGenComp;            mSelectedGenComp = nullptr;
-    delete mPreviewScene;               mPreviewScene = nullptr;
-    delete mUi;                         mUi = nullptr;
+    delete mSelectedGenComp;                    mSelectedGenComp = nullptr;
+    delete mPreviewScene;                       mPreviewScene = nullptr;
+    delete mUi;                                 mUi = nullptr;
 }
 
 /*****************************************************************************************
@@ -130,7 +133,16 @@ void AddGenCompDialog::on_cbxSymbVar_currentIndexChanged(int index)
 
 void AddGenCompDialog::setSelectedGenComp(const library::GenericComponent* genComp)
 {
-    delete mSelectedGenComp;    mSelectedGenComp = nullptr;
+    if (genComp == mSelectedGenComp) return;
+
+    mUi->lblGenCompUuid->clear();
+    mUi->lblGenCompName->clear();
+    mUi->lblGenCompDescription->clear();
+    mUi->gbxGenComp->setEnabled(false);
+    mUi->gbxSymbVar->setEnabled(false);
+    setSelectedSymbVar(nullptr);
+    delete mSelectedGenComp;
+    mSelectedGenComp = nullptr;
 
     if (genComp)
     {
@@ -153,24 +165,19 @@ void AddGenCompDialog::setSelectedGenComp(const library::GenericComponent* genCo
         }
         mUi->cbxSymbVar->setCurrentIndex(mUi->cbxSymbVar->findData(genComp->getDefaultSymbolVariantUuid()));
     }
-    else
-    {
-        mUi->lblGenCompUuid->clear();
-        mUi->lblGenCompName->clear();
-        mUi->lblGenCompDescription->clear();
-
-        mUi->gbxGenComp->setEnabled(false);
-        mUi->gbxSymbVar->setEnabled(false);
-        setSelectedSymbVar(nullptr);
-        mSelectedGenComp = nullptr;
-    }
 }
 
 void AddGenCompDialog::setSelectedSymbVar(const library::GenCompSymbVar* symbVar)
 {
+    if (symbVar == mSelectedSymbVar) return;
+    qDeleteAll(mPreviewSymbolGraphicsItems);
+    mPreviewSymbolGraphicsItems.clear();
+    mUi->lblSymbVarUuid->clear();
+    mUi->lblSymbVarNorm->clear();
+    mUi->lblSymbVarDescription->clear();
     mSelectedSymbVar = symbVar;
 
-    if (symbVar)
+    if (mSelectedGenComp && symbVar)
     {
         const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
 
@@ -181,14 +188,15 @@ void AddGenCompDialog::setSelectedSymbVar(const library::GenCompSymbVar* symbVar
         foreach (const library::GenCompSymbVarItem* item, symbVar->getItems())
         {
             const library::Symbol* symbol = mProject.getLibrary().getSymbol(item->getSymbolUuid());
-            if (!symbol) continue;
+            if (!symbol) continue; // TODO: show warning
+            library::SymbolPreviewGraphicsItem* graphicsItem = new library::SymbolPreviewGraphicsItem(
+                *symbol, mSelectedGenComp, symbVar->getUuid(), item->getUuid());
+            mPreviewSymbolGraphicsItems.append(graphicsItem);
+            qreal y = mPreviewScene->itemsBoundingRect().bottom() + graphicsItem->boundingRect().height();
+            graphicsItem->setPos(QPointF(0, y));
+            mPreviewScene->addItem(*graphicsItem);
+            mUi->graphicsView->zoomAll();
         }
-    }
-    else
-    {
-        mUi->lblSymbVarUuid->clear();
-        mUi->lblSymbVarNorm->clear();
-        mUi->lblSymbVarDescription->clear();
     }
 }
 
