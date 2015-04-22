@@ -178,6 +178,17 @@ const GenCompSignal* GenericComponent::getSignalByUuid(const QUuid& uuid) const 
     return nullptr;
 }
 
+const GenCompSignal* GenericComponent::getSignalOfPin(const QUuid& symbVarUuid,
+                                                      const QUuid& itemUuid,
+                                                      const QUuid& pinUuid) const noexcept
+{
+    const GenCompSymbVarItem* item = getSymbVarItem(symbVarUuid, itemUuid);
+    if (!item) return nullptr;
+    QUuid signalUuid = item->getSignalOfPin(pinUuid);
+    if (signalUuid.isNull()) return nullptr;
+    return getSignalByUuid(signalUuid);
+}
+
 void GenericComponent::clearSignals() noexcept
 {
     qDeleteAll(mSymbolVariants);
@@ -232,6 +243,18 @@ void GenericComponent::addSymbolVariant(const GenCompSymbVar& symbolVariant) noe
     Q_ASSERT(getSymbolVariantByUuid(symbolVariant.getUuid()) == nullptr);
     mSymbolVariants.append(&symbolVariant);
     if (symbolVariant.isDefault()) mDefaultSymbolVariantUuid = symbolVariant.getUuid();
+}
+
+/*****************************************************************************************
+ *  Symbol Variant Items
+ ****************************************************************************************/
+
+const GenCompSymbVarItem* GenericComponent::getSymbVarItem(const QUuid& symbVarUuid,
+                                                           const QUuid& itemUuid) const noexcept
+{
+    const GenCompSymbVar* symbVar = getSymbolVariantByUuid(symbVarUuid);
+    if (!symbVar) return nullptr;
+    return symbVar->getItemByUuid(itemUuid);
 }
 
 /*****************************************************************************************

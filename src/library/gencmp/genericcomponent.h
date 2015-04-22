@@ -76,6 +76,8 @@ class GenericComponent final : public LibraryElement
         // Signals
         const QList<const GenCompSignal*>& getSignals() const noexcept;
         const GenCompSignal* getSignalByUuid(const QUuid& uuid) const noexcept;
+        const GenCompSignal* getSignalOfPin(const QUuid& symbVarUuid, const QUuid& itemUuid,
+                                            const QUuid& pinUuid) const noexcept;
         void clearSignals() noexcept;
         void addSignal(const GenCompSignal& signal) noexcept;
 
@@ -87,6 +89,9 @@ class GenericComponent final : public LibraryElement
         void clearSymbolVariants() noexcept;
         void addSymbolVariant(const GenCompSymbVar& symbolVariant) noexcept;
 
+        // Symbol Variant Items
+        const GenCompSymbVarItem* getSymbVarItem(const QUuid& symbVarUuid,
+                                                 const QUuid& itemUuid) const noexcept;
 
     private:
 
