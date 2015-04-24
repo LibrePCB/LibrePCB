@@ -146,7 +146,7 @@ XmlDomElement* SI_NetLabel::serializeToXmlDomElement() const throw (Exception)
 
 QPainterPath SI_NetLabel::getGrabAreaScenePx() const noexcept
 {
-    return mGraphicsItem->shape().translated(mPosition.toPxQPointF());
+    return mGraphicsItem->sceneTransform().map(mGraphicsItem->shape());
 }
 
 void SI_NetLabel::setSelected(bool selected) noexcept

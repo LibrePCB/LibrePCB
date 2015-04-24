@@ -234,7 +234,7 @@ bool SI_Symbol::getAttributeValue(const QString& attrNS, const QString& attrKey,
 
 QPainterPath SI_Symbol::getGrabAreaScenePx() const noexcept
 {
-    return mGraphicsItem->shape().translated(mPosition.toPxQPointF());
+    return mGraphicsItem->sceneTransform().map(mGraphicsItem->shape());
 }
 
 void SI_Symbol::setSelected(bool selected) noexcept

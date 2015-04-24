@@ -166,7 +166,7 @@ void SI_SymbolPin::removeFromSchematic(GraphicsScene& scene) noexcept
 
 QPainterPath SI_SymbolPin::getGrabAreaScenePx() const noexcept
 {
-    return mGraphicsItem->shape().translated(mPosition.toPxQPointF());
+    return mGraphicsItem->sceneTransform().map(mGraphicsItem->shape());
 }
 
 void SI_SymbolPin::setSelected(bool selected) noexcept
