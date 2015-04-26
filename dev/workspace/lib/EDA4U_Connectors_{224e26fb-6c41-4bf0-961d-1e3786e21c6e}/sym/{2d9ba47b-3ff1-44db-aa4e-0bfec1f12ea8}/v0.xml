@@ -30,8 +30,8 @@
             <segment end_x="2.54" end_y="-7.62" angle="0.000000"/>
             <segment end_x="-2.54" end_y="-7.62" angle="0.000000"/>
         </polygon>
-        <text text="${CMP::VALUE}" h_align="left" layer="21" v_align="top" x="-2.54" y="-7.62" angle="0.000000" height="2.500000"/>
-        <text text="${SYM::NAME}" h_align="left" layer="20" v_align="bottom" x="-2.54" y="5.08" angle="0.000000" height="3.175000"/>
+        <text text="${SYM::NAME}" h_align="left" layer="20" v_align="bottom" x="-2.54" y="5.08" angle="0.000000" height="2.54"/>
+        <text text="${CMP::VALUE}" h_align="left" layer="21" v_align="top" x="-2.54" y="-7.62" angle="0.000000" height="2.54"/>
     </geometry>
     <pins>
         <pin uuid="{869447cf-4ef1-4d05-b51d-1de77a6a26a9}" x="-5.08" y="-5.08" angle="90.000000" length="4.5">

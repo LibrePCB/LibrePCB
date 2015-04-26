@@ -20,8 +20,8 @@
             <segment angle="0" end_x="3.08" end_y="-1.016"/>
             <segment angle="0" end_x="-3.08" end_y="-1.016"/>
         </polygon>
-        <text layer="20" text="${SYM::NAME}" x="-3.08" y="1.016" angle="0" height="3.175" v_align="bottom" h_align="left"/>
-        <text layer="21" text="${CMP::VALUE}" x="-3.08" y="-1.016" angle="0" height="2.5" v_align="top" h_align="left"/>
+        <text layer="20" text="${SYM::NAME}" x="-3.08" y="1.016" angle="0" height="2.54" v_align="bottom" h_align="left"/>
+        <text layer="21" text="${CMP::VALUE}" x="-3.08" y="-1.016" angle="0" height="2.54" v_align="top" h_align="left"/>
     </geometry>
     <pins>
         <pin x="-5.08" length="2" angle="90" y="0" uuid="{06d55f94-1316-48cb-a20f-0d4231eced31}">

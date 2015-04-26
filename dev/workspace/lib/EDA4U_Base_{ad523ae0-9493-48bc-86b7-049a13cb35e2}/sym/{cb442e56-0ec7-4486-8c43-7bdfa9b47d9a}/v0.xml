@@ -39,8 +39,8 @@
             <segment angle="0" end_x="-2.413000" end_y="−1.651"/>
             <segment angle="0" end_x="-3.302000" end_y="−2.032"/>
         </polygon>
-        <text height="3.175" text="${SYM::NAME}" layer="20" h_align="left" x="1.5" y="0" angle="0.000000" v_align="bottom"/>
-        <text height="2.5" text="${CMP::VALUE}" layer="21" h_align="left" x="1.5" y="0" angle="0.000000" v_align="top"/>
+        <text height="2.54" text="${SYM::NAME}" layer="20" h_align="left" x="1.7" y="0" angle="0.000000" v_align="bottom"/>
+        <text height="2.54" text="${CMP::VALUE}" layer="21" h_align="left" x="1.7" y="0" angle="0.000000" v_align="top"/>
     </geometry>
     <pins>
         <pin length="1.27" uuid="{18de942d-8b47-4daf-9e07-d089204e09d0}" x="0.000000" y="-2.54" angle="0.000000">

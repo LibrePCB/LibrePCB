@@ -33,8 +33,8 @@
         <polygon line_layer="10" line_width="0.254000" grab_area="true" fill_layer="0" start_x="1.270000" start_y="-1.270000">
             <segment angle="0" end_x="1.905" end_y="-1.270000"/>
         </polygon>
-        <text h_align="left" layer="20" text="${SYM::NAME}" v_align="bottom" angle="0.000000" x="-1.270000" y="1.270000" height="3.556000"/>
-        <text h_align="left" layer="21" text="${CMP::VALUE}" v_align="top" angle="0.000000" x="-1.270000" y="-1.270000" height="2.5"/>
+        <text h_align="left" layer="20" text="${SYM::NAME}" v_align="bottom" angle="0.000000" x="-1.270000" y="1.270000" height="2.54"/>
+        <text h_align="left" layer="21" text="${CMP::VALUE}" v_align="top" angle="0.000000" x="-1.270000" y="-1.270000" height="2.54"/>
     </geometry>
     <pins>
         <pin angle="90.000000" x="-2.540000" y="0.000000" uuid="{b03c23a6-4890-42b5-ad6a-4b4fe1f77fbd}" length="2.540000">

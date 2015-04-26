@@ -18,9 +18,9 @@
             <segment end_x="7.620000" end_y="-5.080000" angle="0"/>
             <segment end_x="-7.620000" end_y="-5.080000" angle="0"/>
         </polygon>
-        <text text="${SYM::NAME}" x="-7.620000" angle="0.000000" y="3.175000" height="3.556000" h_align="left" layer="20" v_align="bottom"/>
-        <text text="${CMP::VALUE}" x="7.620000" angle="0.000000" y="3.175000" height="2.5" h_align="right" layer="21" v_align="bottom"/>
-        <text text="GND" x="0" angle="0.000000" y="-4.318000" height="2.9" h_align="center" layer="20" v_align="bottom"/>
+        <text text="${SYM::NAME}" x="-7.620000" angle="0.000000" y="3.175000" height="2.54" h_align="left" layer="20" v_align="bottom"/>
+        <text text="${CMP::VALUE}" x="7.620000" angle="0.000000" y="3.175000" height="2.54" h_align="right" layer="21" v_align="bottom"/>
+        <text text="GND" x="0" angle="0.000000" y="-4.318000" height="2.54" h_align="center" layer="20" v_align="bottom"/>
     </geometry>
     <pins>
         <pin x="10.160000" angle="-90.000000" y="0.000000" uuid="{114de26b-3fe5-4a03-89ae-769ab7136879}" length="2.540000">

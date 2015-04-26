@@ -18,8 +18,8 @@
             <segment end_x="7.620000" end_y="-10.160000" angle="0"/>
             <segment end_x="-7.620000" end_y="-10.160000" angle="0"/>
         </polygon>
-        <text text="${SYM::NAME}" x="-7.620000" angle="0.000000" y="10.160000" height="3.556000" h_align="left" layer="20" v_align="bottom"/>
-        <text text="${CMP::VALUE}" x="-7.620000" angle="0.000000" y="-10.16" height="2.5" h_align="left" layer="21" v_align="top"/>
+        <text text="${SYM::NAME}" x="-7.620000" angle="0.000000" y="10.160000" height="2.54" h_align="left" layer="20" v_align="bottom"/>
+        <text text="${CMP::VALUE}" x="-7.620000" angle="0.000000" y="-10.16" height="2.54" h_align="left" layer="21" v_align="top"/>
     </geometry>
     <pins>
         <pin x="12.700000" angle="-90.000000" y="-2.540000" uuid="{371eaace-87bd-4780-846c-1cf31e4f1b74}" length="5.080000">

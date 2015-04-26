@@ -55,8 +55,8 @@
             <segment angle="0" end_x="12.7" end_y="-7.62"/>
             <segment angle="0" end_x="-12.7" end_y="-7.62"/>
         </polygon>
-        <text layer="20" v_align="bottom" text="${SYM::NAME}"  height="3.175" angle="0" x="-12.7" y="5.08"  h_align="left"/>
-        <text layer="21" v_align="top"    text="${CMP::VALUE}" height="3.175" angle="0" x="-12.7" y="-7.62" h_align="left"/>
+        <text layer="20" v_align="bottom" text="${SYM::NAME}"  height="2.54" angle="0" x="-12.7" y="5.08"  h_align="left"/>
+        <text layer="21" v_align="top"    text="${CMP::VALUE}" height="2.54" angle="0" x="-12.7" y="-7.62" h_align="left"/>
     </geometry>
     <pins>
         <!--
