@@ -138,12 +138,19 @@ void SGI_NetLabel::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     }
 
 #ifdef QT_DEBUG
-    if ((!deviceIsPrinter) && (Workspace::instance().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect()))
+    if (Workspace::instance().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect())
     {
         // draw bounding rect
         painter->setPen(QPen(Qt::red, 0));
         painter->setBrush(Qt::NoBrush);
         painter->drawRect(mBoundingRect);
+    }
+    if (Workspace::instance().getSettings().getDebugTools()->getShowGraphicsItemsTextBoundingRect())
+    {
+        // draw text bounding rect
+        painter->setPen(QPen(Qt::magenta, 0));
+        painter->setBrush(Qt::NoBrush);
+        painter->drawRect(QRectF(mTextOrigin, mStaticText.size()));
     }
 #endif
 }

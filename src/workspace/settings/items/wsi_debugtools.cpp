@@ -51,6 +51,8 @@ WSI_DebugTools::WSI_DebugTools(WorkspaceSettings& settings) :
     layout->addWidget(mCbxShowGenCompSymbolCount, layout->rowCount(), 0);
     mCbxShowGraphicsItemsBoundingRect = new QCheckBox(tr("Show Bounding Rect of QGraphicsItems"));
     layout->addWidget(mCbxShowGraphicsItemsBoundingRect, layout->rowCount(), 0);
+    mCbxShowGraphicsItemsTextBoundingRect = new QCheckBox(tr("Show Bounding Rect of QGraphicsItem Texts"));
+    layout->addWidget(mCbxShowGraphicsItemsTextBoundingRect, layout->rowCount(), 0);
 
     // stretch the last row
     layout->setRowStretch(layout->rowCount(), 1);
@@ -75,6 +77,7 @@ void WSI_DebugTools::restoreDefault()
     mCbxShowSymbolPinNetsignals->setChecked(false);
     mCbxShowGenCompSymbolCount->setChecked(false);
     mCbxShowGraphicsItemsBoundingRect->setChecked(false);
+    mCbxShowGraphicsItemsTextBoundingRect->setChecked(false);
 }
 
 void WSI_DebugTools::apply()
@@ -84,6 +87,7 @@ void WSI_DebugTools::apply()
     saveValue("dbg_show_symbol_pin_netsignals", mCbxShowSymbolPinNetsignals->isChecked());
     saveValue("dbg_show_gen_comp_symbol_count", mCbxShowGenCompSymbolCount->isChecked());
     saveValue("dbg_show_graphicsitems_boundingrect", mCbxShowGraphicsItemsBoundingRect->isChecked());
+    saveValue("dbg_show_graphicsitems_text_boundingrect", mCbxShowGraphicsItemsTextBoundingRect->isChecked());
 }
 
 void WSI_DebugTools::revert()
@@ -93,6 +97,7 @@ void WSI_DebugTools::revert()
     mCbxShowSymbolPinNetsignals->setChecked(loadValue("dbg_show_symbol_pin_netsignals", false).toBool());
     mCbxShowGenCompSymbolCount->setChecked(loadValue("dbg_show_gen_comp_symbol_count", false).toBool());
     mCbxShowGraphicsItemsBoundingRect->setChecked(loadValue("dbg_show_graphicsitems_boundingrect", false).toBool());
+    mCbxShowGraphicsItemsTextBoundingRect->setChecked(loadValue("dbg_show_graphicsitems_text_boundingrect", false).toBool());
 }
 
 /*****************************************************************************************

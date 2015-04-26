@@ -90,15 +90,14 @@ void SGI_NetPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     }
 
 #ifdef QT_DEBUG
-    bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
-    if ((!mPointVisible) && (!deviceIsPrinter) && Workspace::instance().getSettings().getDebugTools()->getShowAllSchematicNetpoints())
+    if ((!mPointVisible) && Workspace::instance().getSettings().getDebugTools()->getShowAllSchematicNetpoints())
     {
         // draw circle
         painter->setPen(QPen(Qt::red, 0));
         painter->setBrush(Qt::NoBrush);
         painter->drawEllipse(sBoundingRect);
     }
-    if ((!deviceIsPrinter) && (Workspace::instance().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect()))
+    if (Workspace::instance().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect())
     {
         // draw bounding rect
         painter->setPen(QPen(Qt::red, 0));
