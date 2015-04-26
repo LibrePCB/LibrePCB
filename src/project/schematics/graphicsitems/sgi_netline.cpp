@@ -84,12 +84,11 @@ void SGI_NetLine::updateCacheAndRepaint() noexcept
 
 void SGI_NetLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
+    Q_UNUSED(option);
     Q_UNUSED(widget);
-    const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
 
     // draw line
-    QPen pen(mLayer->getColor(mNetLine.isSelected()), mNetLine.getWidth().toPx() * lod, Qt::SolidLine, Qt::RoundCap);
-    pen.setCosmetic(true);
+    QPen pen(mLayer->getColor(mNetLine.isSelected()), mNetLine.getWidth().toPx(), Qt::SolidLine, Qt::RoundCap);
     painter->setPen(pen);
     painter->drawLine(mLineF);
 

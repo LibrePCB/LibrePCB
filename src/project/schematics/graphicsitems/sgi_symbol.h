@@ -87,10 +87,11 @@ class SGI_Symbol final : public SGI_Base
 
         struct CachedTextProperties_t {
             QString text;
-            qreal fontSize;
+            int fontPixelSize;
+            qreal scaleFactor;
             bool rotate180;
-            Qt::Alignment align;
-            QRectF textRect;
+            int flags;
+            QRectF textRect;    // not scaled
         };
 
 

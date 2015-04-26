@@ -129,9 +129,7 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     bool requiredPin = mPin.getGenCompSignal()->isRequired();
 
     // draw line
-    QPen pen(mLineLayer->getColor(mPin.isSelected()), Length(158750).toPx() * lod, Qt::SolidLine, Qt::RoundCap);
-    pen.setCosmetic(true);
-    painter->setPen(pen);
+    painter->setPen(QPen(mLineLayer->getColor(mPin.isSelected()), Length(158750).toPx(), Qt::SolidLine, Qt::RoundCap));
     painter->drawLine(QPointF(0, 0), Point(0, mLibPin.getLength()).toPxQPointF());
 
     // draw circle
