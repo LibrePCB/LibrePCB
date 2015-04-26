@@ -84,8 +84,8 @@ SchematicLayer::SchematicLayer(uint id) :
 
         case NetLabels:
             mName = tr("Net Labels");
-            mColor = QColor(0, 150, 150, 255);
-            mColorHighlighted = Qt::cyan;
+            mColor = Qt::darkGreen;
+            mColorHighlighted = Qt::green;
             break;
 
         case Nets:
