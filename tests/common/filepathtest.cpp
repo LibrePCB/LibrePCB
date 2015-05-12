@@ -23,7 +23,7 @@
 
 #include <QtCore>
 #include <gtest/gtest.h>
-#include <common/filepath.h>
+#include <common/file_io/filepath.h>
 
 namespace tests {
 
@@ -52,110 +52,60 @@ class FilePathTest : public ::testing::TestWithParam<Data_t>
  *  Test Methods
  ****************************************************************************************/
 
+TEST_P(FilePathTest, testDefaultConstructor)
+{
+    FilePath p;
+    EXPECT_FALSE(p.isValid());
+    EXPECT_EQ(QString(""), p.toStr());
+}
+
 TEST_P(FilePathTest, testConstructor)
 {
     const Data_t& data = GetParam();
 
-    if (data.valid)
-    {
-        FilePath p(data.inputFilePath);
-        EXPECT_EQ(data.toStr, p.toStr());
-    }
-    else
-    {
-        EXPECT_THROW(FilePath(data.inputFilePath), Exception);
-    }
+    FilePath p(data.inputFilePath);
+    EXPECT_EQ(data.valid, p.isValid());
+    EXPECT_EQ(data.toStr, p.toStr());
 }
 
 TEST_P(FilePathTest, testCopyConstructor)
 {
     const Data_t& data = GetParam();
 
-    if (data.valid)
-    {
-        FilePath p1(data.inputFilePath);
-        FilePath p2(p1);
-        EXPECT_EQ(p1.toStr(), p2.toStr());
-    }
+    FilePath p1(data.inputFilePath);
+    FilePath p2(p1);
+    EXPECT_EQ(p1.isValid(), p2.isValid());
+    EXPECT_EQ(p1.toStr(), p2.toStr());
 }
 
 TEST_P(FilePathTest, testSetPath)
 {
     const Data_t& data = GetParam();
 
-    FilePath p("/valid/path");
+    FilePath p;
     EXPECT_EQ(data.valid, p.setPath(data.inputFilePath));
-    if (data.valid)
-        EXPECT_EQ(data.toStr, p.toStr());
-    else
-        EXPECT_EQ(QString("/valid/path"), p.toStr());
-}
-
-TEST_P(FilePathTest, testSetPathEx)
-{
-    const Data_t& data = GetParam();
-
-    FilePath p("/valid/path");
-
-    if (data.valid)
-    {
-        p.setPathEx(data.inputFilePath);
-        EXPECT_EQ(data.toStr, p.toStr());
-    }
-    else
-    {
-        EXPECT_THROW(p.setPathEx(data.inputFilePath), Exception);
-        EXPECT_EQ(QString("/valid/path"), p.toStr());
-    }
+    EXPECT_EQ(data.valid, p.isValid());
+    EXPECT_EQ(data.toStr, p.toStr());
 }
 
 TEST_P(FilePathTest, testToStr)
 {
     const Data_t& data = GetParam();
 
-    if (data.valid)
-    {
-        FilePath p(data.inputFilePath);
-        EXPECT_EQ(data.toStr, p.toStr());
-    }
+    FilePath p(data.inputFilePath);
+    EXPECT_EQ(data.toStr, p.toStr());
 }
 
 TEST_P(FilePathTest, testToNative)
 {
     const Data_t& data = GetParam();
 
-    if (data.valid)
-    {
-        FilePath p(data.inputFilePath);
+    FilePath p(data.inputFilePath);
 #ifdef Q_OS_WIN
-        EXPECT_EQ(data.toWindowsStyle, p.toNative());
+    EXPECT_EQ(data.toWindowsStyle, p.toNative());
 #else
-        EXPECT_EQ(data.toStr, p.toNative());
+    EXPECT_EQ(data.toStr, p.toNative());
 #endif
-    }
-}
-
-TEST_P(FilePathTest, testToUnique)
-{
-    const Data_t& data = GetParam();
-
-    if (data.valid)
-    {
-        FilePath p(data.inputFilePath);
-        QFileInfo i(p.toStr());
-        QString canonicalPath = i.canonicalFilePath();
-        if (!canonicalPath.isEmpty())
-        {
-            // it's a symbolic link
-            FilePath p2(canonicalPath);
-            EXPECT_EQ(p2.toStr(), p.toUnique());
-        }
-        else
-        {
-            // it's not a symbolic link
-            EXPECT_EQ(p.toStr(), p.toUnique());
-        }
-    }
 }
 
 TEST_P(FilePathTest, testToRelative)
@@ -186,13 +136,11 @@ TEST_P(FilePathTest, testOperatorAssign)
 {
     const Data_t& data = GetParam();
 
-    if (data.valid)
-    {
-        FilePath p1(data.inputFilePath);
-        FilePath p2("/valid/path");
-        p2 = p1;
-        EXPECT_EQ(p1.toStr(), p2.toStr());
-    }
+    FilePath p1(data.inputFilePath);
+    FilePath p2("/valid/path");
+    p2 = p1;
+    EXPECT_EQ(p1.isValid(), p2.isValid());
+    EXPECT_EQ(p1.toStr(), p2.toStr());
 }
 
 /*****************************************************************************************
