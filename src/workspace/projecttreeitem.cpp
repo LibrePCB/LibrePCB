@@ -30,20 +30,16 @@
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ProjectTreeItem::ProjectTreeItem(ProjectTreeItem* parent, const QString& filename) :
-    mFileInfo(filename), mParent(parent), mDepth(parent ? parent->getDepth() + 1 : 0)
+ProjectTreeItem::ProjectTreeItem(ProjectTreeItem* parent, const FilePath& filepath) :
+    mFilePath(filepath), mParent(parent), mDepth(parent ? parent->getDepth() + 1 : 0)
 {
-    if (!mFileInfo.exists())
-        throw RuntimeError(QString("file or folder does not exist: \"%1\"").arg(filename),
-                           __FILE__, __LINE__);
-
     QMimeDatabase db;
-    mMimeType = db.mimeTypeForFile(mFileInfo);
+    mMimeType = db.mimeTypeForFile(mFilePath.toStr());
 
-    if (mFileInfo.isDir())
+    if (mFilePath.isExistingDir())
     {
         // it's a directory
-        QDir dir(mFileInfo.filePath());
+        QDir dir(mFilePath.toStr());
 
         QStringList projectFiles = dir.entryList(QStringList("*.e4u"), QDir::Files);
         if (projectFiles.count() == 1)
@@ -64,13 +60,13 @@ ProjectTreeItem::ProjectTreeItem(ProjectTreeItem* parent, const QString& filenam
                                                     QDir::NoDotAndDotDot,
                                                     QDir::DirsFirst | QDir::Name);
             foreach (QFileInfo item, items)
-                mChilds.append(new ProjectTreeItem(this, item.absoluteFilePath()));
+                mChilds.append(new ProjectTreeItem(this, FilePath(item.absoluteFilePath())));
         }
     }
-    else if (mFileInfo.isFile())
+    else if (mFilePath.isExistingFile())
     {
         // it's a file
-        if (mFileInfo.suffix() == "e4u")
+        if (mFilePath.getSuffix() == "e4u")
             mType = ProjectFile;
         else
             mType = File;
@@ -99,7 +95,7 @@ QVariant ProjectTreeItem::data(int role) const
     switch (role)
     {
         case Qt::DisplayRole:
-            return mFileInfo.fileName();
+            return mFilePath.getFilename();
 
         case Qt::DecorationRole:
         {
@@ -121,10 +117,10 @@ QVariant ProjectTreeItem::data(int role) const
             break;
 
         case Qt::StatusTipRole:
-            return QDir::toNativeSeparators(mFileInfo.absoluteFilePath());
+            return mFilePath.toNative();
 
         case Qt::UserRole:
-            return QDir::toNativeSeparators(mFileInfo.absoluteFilePath());
+            return mFilePath.toStr();
 
         default:
             return QVariant();

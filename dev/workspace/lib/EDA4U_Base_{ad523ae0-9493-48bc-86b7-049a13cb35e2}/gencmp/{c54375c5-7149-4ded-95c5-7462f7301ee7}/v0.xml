@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{c54375c5-7149-4ded-95c5-7462f7301ee7}</uuid>
+        <version>0.1</version>
+        <author>EDA4U</author>
+        <created>2015-03-01T20:23:21Z</created>
+        <last_modified>2015-03-01T20:23:21Z</last_modified>
+        <name locale="en_US">Unipolar Capacitor</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US">capacitor,capacitance,unipolar</keywords>
+    </meta>
+    <categories/>
+    <attributes>
+        <attribute key="CAPACITANCE" type="capacitance" unit="microfarad">
+            <name locale="en_US">Capacitance</name>
+            <description locale="en_US">The nominal capacitance of the capacitor.</description>
+            <default_value locale="en_US"></default_value>
+        </attribute>
+    </attributes>
+    <properties>
+        <default_values>
+            <value locale="en_US">${CAPACITANCE}</value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">C</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal clock="false" forced_net_name="" uuid="{af3ffca8-0085-4edb-a775-fcb759f63411}" required="true" role="passive" negated="false">
+            <name locale="en_US">-</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal clock="false" forced_net_name="" uuid="{e010ecbb-6210-4da3-9270-ebd58656dbf0}" required="true" role="passive" negated="false">
+            <name locale="en_US">+</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="IEC 60617" uuid="{5412add2-af9c-44b8-876d-a0fb7c201897}" default="true">
+            <name locale="en_US">European Variant</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{f7aa65f2-55b5-45d7-a3e1-782e9f3266a8}" required="true" suffix="" symbol="{15a0eeed-4dc9-48ec-a431-7c1eec56c4c4}">
+                    <pin_signal_map>
+                        <map display="none" signal="{e010ecbb-6210-4da3-9270-ebd58656dbf0}" pin="{56ecc3a3-7957-43e8-a9e1-d0ce28118aed}"/>
+                        <map display="none" signal="{af3ffca8-0085-4edb-a775-fcb759f63411}" pin="{a2f807cc-5b33-46c5-b8aa-6d6daf8c0a6c}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

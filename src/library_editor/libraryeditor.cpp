@@ -32,8 +32,8 @@ namespace library_editor{
  *  Constructors / Destructor
  ****************************************************************************************/
 
-LibraryEditor::LibraryEditor(Workspace* workspace) :
-    QMainWindow(0), ui(new Ui::LibraryEditor), mWorkspace(workspace)
+LibraryEditor::LibraryEditor() :
+    QMainWindow(0), ui(new Ui::LibraryEditor)
 {
     ui->setupUi(this);
 }

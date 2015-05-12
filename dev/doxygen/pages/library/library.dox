@@ -1,137 +1,50 @@
 /**
 
-    @page library_documentation Library Documentation
+    @page doc_lib Library Documentation
 
     @tableofcontents
-    
-    @warning    Die hier beschriebenen Dinge sind keineswegs in Stein gemeisselt, es kann sich noch vieles verändern.
-                Teilweise handelt es sich auch mehr um spontane Ideen, die noch weiter verfolgt werden sollten.
-                Es ist gut möglich, dass einige dieser Ideen sich als nicht nützlich erweisen und dadurch wieder entfernt werden.
-                Sie sind vorläufig einfach hier in der Doku festgehalten, damit sie nicht vergessen gehen.
 
     This is the documentation of an EDA4U library and all their specifications.
     
     Die Bauteilebibliothek ist ein extrem wichtiger Bestandteil von EDA4U.
     Es wird sehr viel Wert auf eine gut strukturierte Bibliothek gelegt.
     Daher hier eine ausführliche Beschreibung zum Prinzip.
-
+    
+    @warning    Viele hier beschriebenen Ideen sind vorläufig einfach hier in der Doku festgehalten, damit sie nicht vergessen gehen. Ob und wie sie jemals umgesetzt werden, ist noch nicht klar.   
     
     
-    
-    @section library_misc General Information
+    @section doc_lib_general General Information
     
         - UUID: https://de.wikipedia.org/wiki/Universally_Unique_Identifier
-        - The whole library is stored in the EDA4U's "lib/" directory. 
-          There is always a local repository in the directory "lib/local/",
-          and in "lib/repositories/" are the libraries which are downloaded and will be updated automatically over the internet.
+        - The whole library is stored in the "lib" directory in the EDA4U workspace.
+        - There is always a local repository in the directory "lib/local/".
+        - In directories like "lib/{UUID}/" are the libraries which are downloaded and will be updated automatically over the internet.
         - Each library element (symbol, footprint, ...) ist stored in a separate directory. These directories can contain files and subdirectories.
-        - Each library element (symbol, footprint, ...) has a unique UUID. So a Symbol from repository A can be combined with a footprint from repository B, 
-          because their UUID will guarantee that only the right elements will be combined, and not the wrong ones.
-          @warning  The UUIDs of all elements must be unique, so a footprint mustn't have the same UUID as a symbol (for example)!
-                    This, because all library elements are in the same namespace.
-        - For better performance of the library (searching in filesystem can be quite slow...), we use a SQLite database for caching.
-          With a "read library"-function, the SQLite database will be filled with all important data of the library and their elements. This can take some time.
-          Searching for elements will now be done with a SELECT statement in the database, which is very fast. 
-          To load a searched element, there's the filepath of the elment stored in the database. So the elements themselves are not stored completely in the database!
-          With a MD5 checksum compare, it's possible to make the next "read library"-action faster, because we can detect if a file has changed or not.
+        - Each library element (symbol, footprint, ...) has a unique UUID. So a Symbol from repository A can be combined with a footprint from repository B, because their UUID will guarantee that only the right elements will be combined, and not the wrong ones.
+        - For better performance of the library (searching in filesystem can be quite slow...), we use a SQLite database for caching. With a "read library"-function, the SQLite database will be filled with all important data of the library and their elements. This can take some time. Searching for elements will now be done with a SELECT statement in the database, which is very fast. To load a searched element, there's the filepath of the elment stored in the database. The elements themselves are not stored completely in the database! With a MD5 checksum compare, it's possible to make the next "read library"-action faster, because we can detect if a file has changed or not.
 
 
-    @section file_structure File Structure
+    @section doc_lib_file_structure File Structure
     
-        Die gesamte Bibliothek befindet sich im Workspace im Unterordner "lib". Die Ordnerstruktur ist wie folgt:
-@code
-        +- lib
-            |
-            +- local
-            |   |
-            |   +- component_categories
-            |   +- package_categories
-            |   +- symbols
-            |   +- components
-            |   +- component_symbols
-            |   +- footprints
-            |   +- generic_components
-            |   +- models
-            |   +- packages
-            |
-            +- repositories
-                |
-                +- {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
-                    |
-                    +- component_categories
-                    |   |
-                    |   +- {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
-                    |       |
-                    |       +- component_category.xml
-                    |       +- image.png
-                    |
-                    +- package_categories
-                    |   |
-                    |   +- {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
-                    |       |
-                    |       +- package_category.xml
-                    |       +- image.png
-                    |
-                    +- symbols
-                    |   |
-                    |   +- {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
-                    |       |
-                    |       +- symbol.xml
-                    |       +- image.png
-                    |
-                    +- components
-                    |   |
-                    |   +- {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
-                    |       |
-                    |       +- component.xml
-                    |       +- image.png
-                    |
-                    +- component_symbols
-                    |   |
-                    |   +- {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
-                    |       |
-                    |       +- component_symbol.xml
-                    |       +- image.png
-                    |
-                    +- footprints
-                    |   |
-                    |   +- {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
-                    |       |
-                    |       +- footprint.xml
-                    |       +- image.png
-                    |
-                    +- generic_components
-                    |   |
-                    |   +- {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
-                    |       |
-                    |       +- generic_component.xml
-                    |       +- image.png
-                    |
-                    +- models
-                    |   |
-                    |   +- {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
-                    |       |
-                    |       +- model.xml
-                    |       +- image.png
-                    |
-                    +- packages
-                    |   |
-                    |   +- {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
-                    |       |
-                    |       +- package.xml
-                    |       +- image.png
-                    |
-                    +- image.png
-                    +- repository.xml
-@endcode
-
-        Erläurerungen:
-            - local/            Alle lokalen Elemente (vom Benutzer selbst angelegt oder importiert)
-            - repositories/     Alle Elemente, welche aus Repositories heruntergeladen wurden
+        The whole library is located in the workspace directory "lib". This folder contains the following subdirectories:
+            - local:    All local library elements (created by the user or imported)
+            - {UUID}:   For each repository a separate directory. These directories contain all library elements from the appropriate repository.
+            
+        All these directories contain the following subdirectories:
+            - 3dmdl:    3D Models
+            - cmp:      Components (library#Component)
+            - cmpcat:   Component Categories (library#ComponentCategory)
+            - fpt:      Footprints (library#Footprint)
+            - gencmp:   Generic Components (library#GenericComponent)
+            - pkg:      Packages (library#Package)
+            - pkgcat:   Package Categories (library#PackageCategory)
+            - sym:      Symbols (library#Symbol)
             
     
-    @section library_sec1 Anbindung an Lagerverwaltungssysteme
+    @section doc_lib_sec1 Anbindung an Lagerverwaltungssysteme
 
+        @warning Nur eine Idee...
+        
         Für eine Anbindung der Bauteile in der Bibliothek an ein Lagerverwaltungssystem kommt eine separate
         Datenbank zum Einsatz, in der Bauteilebibliothek werden keinerlei Bestellnummern oder Preise abgelegt.
         Es ist geplant, dass für jedes Lagerverwaltungssystem ein eigenes Plugin angeboten wird. Jedes dieser
@@ -139,7 +52,9 @@
         Lagerbestände usw. abzuspeichern.
 
 
-    @section library_sec2 Repositories & Updates
+    @section doc_lib_sec2 Repositories & Updates
+    
+        @warning Nur eine Idee...Der Einsatz von Repositories ist geplant, aber noch nicht festgelegt wie dies im Detail aussehen soll.
 
         Zum aktualisieren von Elementen (Symbole, Footprints, ...) werden Repositories verwendet. Es wird
         offizielle Repositories von EDA4U geben, aber auch Drittanbieter können eigene Repositories 
@@ -179,7 +94,9 @@
         ältere Versionen von Elementen erzwungen werden, falls es bei neueren Versionen zu Problemen kommt.
 
 
-    @section library_sec3 Feedbacksystem
+    @section doc_lib_sec3 Feedbacksystem
+    
+        @warning Nur eine Idee...
 
         Innerhalb eines Repositories wird es ein Feedbacksystem geben, um fehlerhafte Elemente melden
         zu können. So kann der Betreiber eines Repositories Fehler sehr schnell korrigieren.
@@ -190,7 +107,9 @@
         unbedingt verschwinden (nicht gelöscht werden, nur ausgeblendet).
 
 
-    @section library_sec4 Kennzeichnung von Elementen (UUID)
+    @section doc_lib_sec4 Kennzeichnung von Elementen (UUID)
+    
+        @warning Die UUIDs werden definitiv so umgesetzt, das mit den Versionsnummern ist aber noch nicht genau definiert.
 
         Alle Symbole, Footprints usw. bekommen beim Erstellen eine weltweit eindeutige Kennung, eine UUID.
         Diese UUID wird dann zum Referenzieren zwischen verschiedenen Elementen verwendet. Ein Bauteil A
@@ -211,7 +130,9 @@
         1 --> 2 --> 2.1 --> 2.1.1 --> 2.1.2 --> 2.1.2.999.6.70.1 --> 2.5 --> 3 --> 3.1 usw.
 
 
-    @section library_sec5 Digitale Signatur von Elementen
+    @section doc_lib_sec5 Digitale Signatur von Elementen
+    
+        @warning Nur eine Idee...
 
         Eventuell macht es Sinn, offizielle EDA4U Elemente mit einer digitalen Signatur zu versehen.
         Damit sind diese Elemente quasi als "vertrauenswürdig" gekennzeichnet und können gut von Elementen
@@ -225,18 +146,9 @@
         wieder entschlüsselt.
 
 
-    @section library_sec6 Struktur von Elementen
-
-        Für jeden Element-Typ (Symbole, Footprints, Komponenten, ...) wird eine separate Tabelle in der Datenbank
-        verwendet. Als Primärschlüssel wird nicht die UUID, sondern eine automatische, inkrementierende ID
-        benutzt. Die UUID ist aber auch als einzigartig definiert und darf daher in jeder Tabelle nur einmal 
-        vorkommen. Statische Eigenschaften (Eigenschaften, die für jedes Element in gleicher Anzahl benötigt 
-        werden), werden direkt in dafür vorgesehenen Spalten abgelegt. Dynamische Eigenschaften (z.B. die Pins
-        eines Symbols, die grafische Beschreibung von Symbolen und Footprints usw.) werden in separaten Tabellen 
-        (z.B. "symbol_blobs") in einer Blob-Spalte unkomprimiert als XML-Dateien abgelegt.
-
-
-    @section library_sec7 Kategorisierung von Elementen
+    @section doc_lib_sec6 Kategorisierung von Elementen
+    
+        @warning Eine Kategorisierung von Elementen wird definitiv umgesetzt. Wie dies genau gemacht wird, ist aber noch nicht definiert.
 
         Alle Elemente werden in Kategorien eingeteilt. Dabei gibt es zwei verschiedene Sortimente von Kategorien.
         Ein Sortiment wird für die Symbole und Komponenten verwendet (z.B. Widerstände, Kondensatoren, ...).
@@ -247,9 +159,13 @@
         Wie die Elemente, bekommen auch die Kategorien jeweils eine UUID. mit der sie identifiziert werden können.
         In Repositories können auch neue Kategorien vorhanden sein, die dann ebenfalls in der Datenbank des
         Benutzers installiert werden.
+        
+        Jedes Element soll unbeschränkt vielen Kategorien zugeordnet werden können!
 
 
-    @section library_sec8 Lokalisierung (Sprachen, Übersetzungen)
+    @section doc_lib_sec7 Lokalisierung (Sprachen, Übersetzungen)
+    
+        @warning Es wird definitiv eine Lokalisierung von Bibliotheks-Elementen geben! Noch nicht ganz klar ist, in welchem Umfang dies verfolgt werden soll. Siehe bereits vorhandene XML Dateien...
 
         Für alle Elemente und Kategorien müssen englische Namen und Beschreibungen verfügbar sein. Zusätzlich
         können (optional) weitere Sprachen (am besten unbeschränkt viele, also dynamisch) definiert werden können.
@@ -271,7 +187,9 @@
         angezeigt, und wenn diese auch fehlt wird die englische Bezeichnung verwendet.
 
 
-    @section library_sec9 Import / Export von Elementen
+    @section doc_lib_sec8 Import / Export von Elementen
+    
+        @warning Nur eine Idee...
 
         Für den einfachen (Bibliotheks-)Datenaustausch ohne Repositories wird es eine Import/Export-Funktion geben.
         Diese erlaubt es, Elemente aus der eigenen Bibliothek zu exportieren, damit man sie in einer anderen

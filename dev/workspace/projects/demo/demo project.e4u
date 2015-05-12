@@ -1,52 +1,13 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes'?>
-<project compatible_downto="1" file_version="1">
+<project version="0">
     <meta>
-        <uuid>{9e25a866-8877-4eca-be3e-2bc22f94a561}</uuid>
+        <name>Demo Project</name>
+        <author>Homer Simpson</author>
+        <created>2013-04-13T12:43:52Z</created>
+        <last_modified>2015-04-11T21:19:48Z</last_modified>
     </meta>
-    <attributes>
-        <attribute type="text" name="NAME">EDA4U Beispielprojekt</attribute>
-        <attribute type="text" name="DESCRIPTION">Das ist eine Beschreibung des Projektes</attribute>
-        <attribute type="text" name="AUTHOR">Irgend Jemand</attribute>
-        <attribute type="text" name="VERSION">0.1</attribute>
-        <!-- Examples: -->
-        <attribute type="text" name="TEXT">text!</attribute>
-        <!-- []                                 -->
-        <attribute positive_only="false" unit="mm" type="length" name="LENGTH">12.34</attribute>
-        <!-- [nm, µm, mm, cm, dm, m]            -->
-        <attribute unit="kg" type="weigth" name="WEIGTH">12.34</attribute>
-        <!-- [mg,  g, kg]                       -->
-        <attribute positive_only="false" unit="ns" type="time" name="TIME">12.34</attribute>
-        <!-- [ps, ns, µs, ms,  s, m,  h,  d]    -->
-        <attribute positive_only="false" unit="mA" type="current" name="CURRENT">12.34</attribute>
-        <!-- [fA, pA, nA, µA, mA, A, kA, MA]    -->
-        <attribute positive_only="false" unit="V" type="voltage" name="VOLTAGE">12.34</attribute>
-        <!-- [fV, pV, nV, µV, mV, V, kV, MV]    -->
-        <attribute positive_only="true" unit="W" type="power" name="POWER">12.34</attribute>
-        <!-- [fW, pW, nW, µW, mW, W, kW, MW]    -->
-        <attribute unit="Ω" type="resistance" name="RESISTANCE">12.34</attribute>
-        <!-- [mΩ,  Ω, kΩ, MΩ, GΩ]               -->
-        <attribute unit="nF" type="capacity" name="CAPACITY">12.34</attribute>
-        <!-- [pF, nF, µF, mF, F]                -->
-        <attribute unit="mH" type="inductance" name="INDUCTANCE">12.34</attribute>
-        <!-- [pH, nH, µH, mH, H]                -->
-        <attribute unit="°C" type="temperature" name="TEMPERATURE">12.34</attribute>
-        <!-- [K,  °C, °F]                       -->
-        <attribute unit="cd" type="luminosity" name="LUMINOSITY">12.34</attribute>
-        <!-- [cd]                               -->
-    </attributes>
-    <changelog enabled="true">
-        <items>
-            <item datetime="2013-07-01 00:00:00" author="Spongebob">Kleine Änderung...</item>
-        </items>
-    </changelog>
-    <issues enabled="true">
-        <items>
-            <item priority="2" author="gugus" labels="Spannungsversorgung, Wichtig">Spannungsversorgung überprüfen</item>
-        </items>
-    </issues>
-    <time_tracking enabled="true">
-        <items>
-            <item end="2013-07-01 00:00:00" start="2013-07-01 00:00:00" user="patrick@workstation99"/>
-        </items>
-    </time_tracking>
+    <schematics>
+        <schematic>supply.xml</schematic>
+        <schematic>ManySymbols.xml</schematic>
+    </schematics>
 </project>

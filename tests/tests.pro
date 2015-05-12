@@ -31,12 +31,14 @@ LIBS += \
     -lgmock
 
 SOURCES += main.cpp \
+    ../src/common/file_io/filepath.cpp \
     ../src/common/debug.cpp \
     ../src/common/exceptions.cpp \
     common/filepathtest.cpp \
     ../src/common/filepath.cpp
 
 HEADERS += \
+    ../src/common/file_io/filepath.h \
     ../src/common/debug.h \
     ../src/common/exceptions.h \
     ../src/common/filepath.h

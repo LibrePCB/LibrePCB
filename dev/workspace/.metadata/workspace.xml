@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<workspace>
-    <projects>
+<workspace file_version="0">
+    <!--<projects>
         <project type="local" absolute="false">projects</project>
     </projects>
     <layers>
@@ -15,5 +15,5 @@
             <id>1</id>
             <id>3</id>
         </group>
-    </layer_groups>
+    </layer_groups>-->
 </workspace>

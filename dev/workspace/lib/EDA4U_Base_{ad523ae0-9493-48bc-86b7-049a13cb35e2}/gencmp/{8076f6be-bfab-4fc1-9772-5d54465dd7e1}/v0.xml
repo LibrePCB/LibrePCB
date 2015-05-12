@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<generic_component file_version="0">
+    <meta>
+        <uuid>{8076f6be-bfab-4fc1-9772-5d54465dd7e1}</uuid>
+        <version>0.1</version>
+        <author>EDA4U</author>
+        <created>2015-03-01T20:00:00Z</created>
+        <last_modified>2015-03-01T20:00:00Z</last_modified>
+        <name locale="en_US">GND Supply</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US">gnd,supply</keywords>
+    </meta>
+    <categories>
+        <category>{00000000-0000-4001-8000-000000000000}</category>
+    </categories>
+    <changelog/>
+    <attachements/>
+    <attributes/>
+    <properties>
+        <default_values>
+            <value locale="en_US">GND</value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">SUP</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}" role="power" required="true" negated="false" clock="false" forced_net_name="${CMP::VALUE}">
+            <name locale="en_US">Net</name>
+            <description locale="en_US"></description>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant uuid="{f09ad258-595b-4ee9-a1fc-910804a203ae}" norm="" default="true">
+            <name locale="en_US">Default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{0539fd52-890f-48af-97a9-bacfb79c9475}" symbol="{80f8cd68-69d9-43c4-9ed2-da32ca714b10}" required="true" suffix="">
+                    <pin_signal_map>
+                        <map pin="{abcc319b-d09f-437b-a624-3dcf3eff5792}" signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}" display="none"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models>
+    </spice_models>
+</generic_component>

@@ -26,17 +26,31 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include "../../common/cadscene.h"
+#include "../../common/if_attributeprovider.h"
+#include "../../common/file_io/if_xmlserializableobject.h"
+#include "../../common/units/all_length_units.h"
+#include "../../common/file_io/filepath.h"
+#include "../../common/exceptions.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
-class Workspace;
+class GridProperties;
+class GraphicsView;
+class GraphicsScene;
+class SmartXmlFile;
 
 namespace project {
 class Project;
-class Circuit;
+class NetSignal;
+class GenCompInstance;
+class SI_Base;
+class SI_Symbol;
+class SI_SymbolPin;
+class SI_NetPoint;
+class SI_NetLine;
+class SI_NetLabel;
 }
 
 /*****************************************************************************************
@@ -49,17 +63,129 @@ namespace project {
  * @brief The Schematic class represents one schematic page of a project and is always
  * part of a circuit
  *
- * This class inherits from QGraphicsScene (through CADScene). This way, a schematic page
- * can be shown directly in a QGraphicsView (resp. CADView).
+ * A schematic can contain following items (see project#SI_Base and project#SGI_Base):
+ *  - netpoint:         project#SI_NetPoint    + project#SGI_NetPoint
+ *  - netline:          project#SI_NetLine     + project#SGI_NetLine
+ *  - netlabel:         project#SI_NetLabel    + project#SGI_NetLabel
+ *  - symbol:           project#SI_Symbol      + project#SGI_Symbol
+ *  - symbol pin:       project#SI_SymbolPin   + project#SGI_SymbolPin
+ *  - polygon:          TODO
+ *  - ellipse:          TODO
+ *  - text:             TODO
  */
-class Schematic final : public CADScene
+class Schematic final : public QObject, public IF_AttributeProvider,
+                        public IF_XmlSerializableObject
 {
         Q_OBJECT
 
     public:
 
-        explicit Schematic(Workspace* workspace, Project* project, Circuit* circuit);
-        ~Schematic();
+        // Types
+
+        /**
+         * @brief Z Values of all items in a schematic scene (to define the stacking order)
+         *
+         * These values are used for QGraphicsItem::setZValue() to define the stacking
+         * order of all items in a schematic QGraphicsScene. We use integer values, even
+         * if the z-value of QGraphicsItem is a qreal attribute...
+         *
+         * Low number = background, high number = foreground
+         */
+        enum ItemZValue {
+            ZValue_Default = 0,         ///< this is the default value (behind all other items)
+            ZValue_Symbols,             ///< Z value for project#SymbolInstance items
+            ZValue_NetLabels,           ///< Z value for project#SchematicNetLabel items
+            ZValue_NetLines,            ///< Z value for project#SchematicNetLine items
+            ZValue_HiddenNetPoints,     ///< Z value for hidden project#SchematicNetPoint items
+            ZValue_VisibleNetPoints,    ///< Z value for visible project#SchematicNetPoint items
+        };
+
+
+        // Constructors / Destructor
+        explicit Schematic(Project& project, const FilePath& filepath, bool restore, bool readOnly) throw (Exception) :
+            Schematic(project, filepath, restore, readOnly, false, QString()) {}
+        ~Schematic() noexcept;
+
+        // Getters: General
+        Project& getProject() const noexcept {return mProject;}
+        const FilePath& getFilePath() const noexcept {return mFilePath;}
+        const GridProperties& getGridProperties() const noexcept {return *mGridProperties;}
+        bool isEmpty() const noexcept;
+        QList<SI_Base*> getSelectedItems(bool floatingPoints,
+                                         bool attachedPoints,
+                                         bool floatingPointsFromFloatingLines,
+                                         bool attachedPointsFromFloatingLines,
+                                         bool floatingPointsFromAttachedLines,
+                                         bool attachedPointsFromAttachedLines,
+                                         bool attachedPointsFromSymbols,
+                                         bool floatingLines,
+                                         bool attachedLines,
+                                         bool attachedLinesFromSymbols) const noexcept;
+        QList<SI_Base*> getItemsAtScenePos(const Point& pos) const noexcept;
+        QList<SI_NetPoint*> getNetPointsAtScenePos(const Point& pos) const noexcept;
+        QList<SI_NetLine*> getNetLinesAtScenePos(const Point& pos) const noexcept;
+        QList<SI_SymbolPin*> getPinsAtScenePos(const Point& pos) const noexcept;
+
+        // Setters: General
+        void setGridProperties(const GridProperties& grid) noexcept;
+
+        // Getters: Attributes
+        const QUuid& getUuid() const noexcept {return mUuid;}
+        const QString& getName() const noexcept {return mName;}
+        const QIcon& getIcon() const noexcept {return mIcon;}
+
+        // Symbol Methods
+        SI_Symbol* getSymbolByUuid(const QUuid& uuid) const noexcept;
+        SI_Symbol* createSymbol(GenCompInstance& genCompInstance, const QUuid& symbolItem,
+                                const Point& position = Point(), const Angle& angle = Angle()) throw (Exception);
+        void addSymbol(SI_Symbol& symbol) throw (Exception);
+        void removeSymbol(SI_Symbol& symbol) throw (Exception);
+
+        // NetPoint Methods
+        SI_NetPoint* getNetPointByUuid(const QUuid& uuid) const noexcept;
+        SI_NetPoint* createNetPoint(NetSignal& netsignal, const Point& position) throw (Exception);
+        SI_NetPoint* createNetPoint(SI_SymbolPin& pin) throw (Exception);
+        void addNetPoint(SI_NetPoint& netpoint) throw (Exception);
+        void removeNetPoint(SI_NetPoint& netpoint) throw (Exception);
+
+        // NetLine Methods
+        SI_NetLine* getNetLineByUuid(const QUuid& uuid) const noexcept;
+        SI_NetLine* createNetLine(SI_NetPoint& startPoint, SI_NetPoint& endPoint,
+                                  const Length& width) throw (Exception);
+        void addNetLine(SI_NetLine& netline) throw (Exception);
+        void removeNetLine(SI_NetLine& netline) throw (Exception);
+
+        // NetLabel Methods
+        SI_NetLabel* getNetLabelByUuid(const QUuid& uuid) const noexcept;
+        SI_NetLabel* createNetLabel(NetSignal& netsignal, const Point& position) throw (Exception);
+        void addNetLabel(SI_NetLabel& netlabel) throw (Exception);
+        void removeNetLabel(SI_NetLabel& netlabel) throw (Exception);
+
+        // General Methods
+        void addToProject() throw (Exception);
+        void removeFromProject() throw (Exception);
+        bool save(bool toOriginal, QStringList& errors) noexcept;
+        void showInView(GraphicsView& view) noexcept;
+        void saveViewSceneRect(const QRectF& rect) noexcept {mViewRect = rect;}
+        const QRectF& restoreViewSceneRect() const noexcept {return mViewRect;}
+        void setSelectionRect(const Point& p1, const Point& p2, bool updateItems) noexcept;
+        void clearSelection() const noexcept;
+        void renderToQPainter(QPainter& painter) const noexcept;
+
+        // Helper Methods
+        bool getAttributeValue(const QString& attrNS, const QString& attrKey,
+                               bool passToParents, QString& value) const noexcept;
+
+        // Static Methods
+        static Schematic* create(Project& project, const FilePath& filepath,
+                                 const QString& name) throw (Exception);
+
+
+    signals:
+
+        /// @copydoc IF_AttributeProvider#attributesChanged()
+        void attributesChanged();
+
 
     private:
 
@@ -68,11 +194,38 @@ class Schematic final : public CADScene
         Schematic(const Schematic& other);
         Schematic& operator=(const Schematic& rhs);
 
-        // General
-        Workspace* mWorkspace; ///< A pointer to the Workspace object (from the constructor)
-        Project* mProject; ///< A pointer to the Project object (from the constructor)
-        Circuit* mCircuit; ///< A pointer to the Circuit object (from the constructor)
+        // Private Methods
+        explicit Schematic(Project& project, const FilePath& filepath, bool restore,
+                           bool readOnly, bool create, const QString& newName) throw (Exception);
+        void updateIcon() noexcept;
 
+        bool checkAttributesValidity() const noexcept;
+
+        /**
+         * @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+         */
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+
+
+        // General
+        Project& mProject; ///< A reference to the Project object (from the ctor)
+        FilePath mFilePath; ///< the filepath of the schematic *.xml file (from the ctor)
+        SmartXmlFile* mXmlFile;
+        bool mAddedToProject;
+
+        GraphicsScene* mGraphicsScene;
+        QRectF mViewRect;
+        GridProperties* mGridProperties;
+
+        // Attributes
+        QUuid mUuid;
+        QString mName;
+        QIcon mIcon;
+
+        QList<SI_Symbol*> mSymbols;
+        QList<SI_NetPoint*> mNetPoints;
+        QList<SI_NetLine*> mNetLines;
+        QList<SI_NetLabel*> mNetLabels;
 };
 
 } // namespace project

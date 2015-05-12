@@ -25,16 +25,21 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include "../erc/if_ercmsgprovider.h"
+#include "../../common/file_io/if_xmlserializableobject.h"
+#include "../../common/exceptions.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
-class Workspace;
-
 namespace project {
-class Project;
 class Circuit;
+class NetClass;
+class GenCompSignalInstance;
+class SI_NetPoint;
+class SI_NetLabel;
+class ErcMsg;
 }
 
 /*****************************************************************************************
@@ -46,15 +51,44 @@ namespace project {
 /**
  * @brief The NetSignal class
  */
-class NetSignal : public QObject
+class NetSignal final : public IF_ErcMsgProvider, public IF_XmlSerializableObject
 {
-        Q_OBJECT
+        Q_DECLARE_TR_FUNCTIONS(NetSignal)
+        DECLARE_ERC_MSG_CLASS_NAME(NetSignal)
 
     public:
 
         // Constructors / Destructor
-        explicit NetSignal(Workspace* workspace, Project* project, Circuit* circuit);
-        ~NetSignal();
+        explicit NetSignal(const Circuit& circuit,
+                           const XmlDomElement& domElement) throw (Exception);
+        explicit NetSignal(const Circuit& circuit, NetClass& netclass,
+                           const QString& name, bool autoName) throw (Exception);
+        ~NetSignal() noexcept;
+
+        // Getters
+        const QUuid& getUuid() const noexcept {return mUuid;}
+        const QString& getName() const noexcept {return mName;}
+        bool hasAutoName() const noexcept {return mHasAutoName;}
+        NetClass& getNetClass() const noexcept {return *mNetClass;}
+        bool isNameForced() const noexcept {return (mGenCompSignalWithForcedNameCount > 0);}
+        const QList<GenCompSignalInstance*>& getGenCompSignals() const noexcept {return mGenCompSignals;}
+        const QList<SI_NetPoint*>& getNetPoints() const noexcept {return mSchematicNetPoints;}
+        const QList<SI_NetLabel*>& getNetLabels() const noexcept {return mSchematicNetLabels;}
+
+        // Setters
+        void setName(const QString& name, bool isAutoName) throw (Exception);
+
+        // General Methods
+        void registerGenCompSignal(GenCompSignalInstance& signal) noexcept;
+        void unregisterGenCompSignal(GenCompSignalInstance& signal) noexcept;
+        void registerSchematicNetPoint(SI_NetPoint& netpoint) noexcept;
+        void unregisterSchematicNetPoint(SI_NetPoint& netpoint) noexcept;
+        void registerSchematicNetLabel(SI_NetLabel& netlabel) noexcept;
+        void unregisterSchematicNetLabel(SI_NetLabel& netlabel) noexcept;
+        void addToCircuit() noexcept;
+        void removeFromCircuit() noexcept;
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+
 
     private:
 
@@ -63,11 +97,33 @@ class NetSignal : public QObject
         NetSignal(const NetSignal& other);
         NetSignal& operator=(const NetSignal& rhs);
 
-        // General
-        Workspace* mWorkspace;
-        Project* mProject;
-        Circuit* mCircuit;
+        // Private Methods
+        bool checkAttributesValidity() const noexcept;
+        void updateErcMessages() noexcept;
 
+
+        // General
+        const Circuit& mCircuit;
+        bool mAddedToCircuit;
+
+        // Misc
+
+        /// @brief the ERC message for unused netsignals
+        ErcMsg* mErcMsgUnusedNetSignal;
+        /// @brief the ERC messages for netsignals with less than two generic component signals
+        ErcMsg* mErcMsgConnectedToLessThanTwoPins;
+
+        // Registered Elements of this Netclass
+        QList<GenCompSignalInstance*> mGenCompSignals;
+        QList<SI_NetPoint*> mSchematicNetPoints;
+        QList<SI_NetLabel*> mSchematicNetLabels;
+        uint mGenCompSignalWithForcedNameCount;
+
+        // Attributes
+        QUuid mUuid;
+        QString mName;
+        bool mHasAutoName;
+        NetClass* mNetClass;
 };
 
 } // namespace project

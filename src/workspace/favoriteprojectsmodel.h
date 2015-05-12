@@ -25,12 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
-
-/*****************************************************************************************
- *  Forward Declarations
- ****************************************************************************************/
-
-class Workspace;
+#include "../common/file_io/filepath.h"
 
 /*****************************************************************************************
  *  Class FavoriteProjectsModel
@@ -46,18 +41,17 @@ class FavoriteProjectsModel : public QAbstractListModel
     public:
 
         // Constructors / Destructor
-        explicit FavoriteProjectsModel(Workspace* workspace);
+        FavoriteProjectsModel();
         ~FavoriteProjectsModel();
 
         // General Methods
-        bool isFavoriteProject(const QString& filename) const;
-        void addFavoriteProject(const QString& filename);
-        void removeFavoriteProject(const QString& filename);
+        bool isFavoriteProject(const FilePath& filepath) const;
+        void addFavoriteProject(const FilePath& filepath);
+        void removeFavoriteProject(const FilePath& filepath);
 
     private:
 
         // make some methods inaccessible...
-        FavoriteProjectsModel();
         FavoriteProjectsModel(const FavoriteProjectsModel& other);
         FavoriteProjectsModel& operator=(const FavoriteProjectsModel& rhs);
 
@@ -68,9 +62,8 @@ class FavoriteProjectsModel : public QAbstractListModel
         int rowCount(const QModelIndex& parent = QModelIndex()) const;
         QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 
-        Workspace* mWorkspace; ///< a pointer to the Workspace object
-        QList<QFileInfo> mFavoriteProjects;
-
+        // Attributes
+        QList<FilePath> mFavoriteProjects;
 };
 
 #endif // FAVORITEPROJECTSMODEL_H

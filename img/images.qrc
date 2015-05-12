@@ -33,7 +33,6 @@
         <file>actions/zoom_in.png</file>
         <file>actions/zoom_out.png</file>
         <file>actions/pdf.png</file>
-        <file>actions/warning.png</file>
         <file>actions/working.png</file>
         <file>actions/move.png</file>
         <file>actions/refresh.png</file>
@@ -72,5 +71,22 @@
         <file>actions/new_folder.png</file>
         <file>places/file.png</file>
         <file>empty.png</file>
+        <file>actions/draw_text.png</file>
+        <file>actions/draw_circle.png</file>
+        <file>actions/draw_ellipse.png</file>
+        <file>actions/draw_polygon.png</file>
+        <file>actions/draw_rectangle.png</file>
+        <file>actions/draw_netlabel.png</file>
+        <file>actions/grid.png</file>
+        <file>actions/layers.png</file>
+        <file>library/resistor_eu.png</file>
+        <file>library/inductor_eu.png</file>
+        <file>library/bipolar_capacitor_eu.png</file>
+        <file>library/unipolar_capacitor_eu.png</file>
+        <file>library/gnd.png</file>
+        <file>library/vcc.png</file>
+        <file>status/dialog-error.png</file>
+        <file>status/dialog-warning.png</file>
     </qresource>
+    <qresource prefix="/"/>
 </RCC>

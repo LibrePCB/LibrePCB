@@ -31,8 +31,6 @@
  *  Forward Declarations
  ****************************************************************************************/
 
-class Workspace;
-
 namespace Ui {
 class LibraryEditor;
 }
@@ -55,20 +53,17 @@ class LibraryEditor : public QMainWindow
     public:
 
         // Constructors / Destructor
-        explicit LibraryEditor(Workspace* workspace);
+        LibraryEditor();
         ~LibraryEditor();
 
     private:
 
         // make some methods inaccessible...
-        LibraryEditor();
         LibraryEditor(const LibraryEditor& other);
         LibraryEditor& operator=(const LibraryEditor& rhs);
 
+        // Attributes
         Ui::LibraryEditor* ui;
-
-        Workspace* mWorkspace; ///< the pointer to the Workspace object (from the ctor)
-
 };
 
 } // namespace library_editor

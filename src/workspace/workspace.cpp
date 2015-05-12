@@ -25,6 +25,7 @@
 #include <QFileDialog>
 #include "workspace.h"
 #include "../common/exceptions.h"
+#include "../common/file_io/filepath.h"
 #include "../library/library.h"
 #include "../library_editor/libraryeditor.h"
 #include "../project/project.h"
@@ -32,35 +33,107 @@
 #include "recentprojectsmodel.h"
 #include "favoriteprojectsmodel.h"
 #include "controlpanel/controlpanel.h"
-#include "workspacesettings.h"
+#include "settings/workspacesettings.h"
+#include "../common/schematiclayer.h"
 
 using namespace library;
 using namespace project;
+
+Workspace* Workspace::sInstance = 0;
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Workspace::Workspace(const QDir& workspaceDir) :
-    QObject(0), mWorkspaceDir(workspaceDir),
+Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
+    QObject(0),
+    mPath(wsPath), mLock(wsPath.getPathTo("workspace")),
+    mMetadataPath(wsPath.getPathTo(".metadata")),
+    mProjectsPath(wsPath.getPathTo("projects")),
+    mLibraryPath(wsPath.getPathTo("lib")),
     mWorkspaceSettings(0), mControlPanel(0), mLibrary(0), mLibraryEditor(0),
     mProjectTreeModel(0), mRecentProjectsModel(0), mFavoriteProjectsModel(0)
 {
-    mWorkspaceDir.makeAbsolute();
+    if (sInstance != 0) throw LogicError(__FILE__, __LINE__); // should never happen...
+    sInstance = this;
 
-    if (!mWorkspaceDir.exists())
-        throw RuntimeError(QString("Invalid workspace path: \"%1\"").arg(workspaceDir.path()), __FILE__, __LINE__);
+    try
+    {
+        // check the workspace path
+        if ((!mPath.isExistingDir()) || (!mMetadataPath.isExistingDir()))
+        {
+            throw RuntimeError(__FILE__, __LINE__, mPath.toStr(),
+                QString(tr("Invalid workspace path: \"%1\"")).arg(mPath.toNative()));
+        }
 
-    mWorkspaceSettings = new WorkspaceSettings(this, mWorkspaceDir.absoluteFilePath(".metadata" % QDir::separator()));
+        // Check if the workspace is locked (already open or application was crashed).
+        switch (mLock.getStatus()) // throws an exception on error
+        {
+            case FileLock::LockStatus_t::Unlocked:
+                break; // nothing to do here (the workspace will be locked later)
 
-    // all OK, let's load the workspace stuff!
+            case FileLock::LockStatus_t::Locked:
+            {
+                // the workspace is locked by another application instance
+                throw RuntimeError(__FILE__, __LINE__, QString(), tr("The workspace is already "
+                                   "opened by another application instance or user!"));
+            }
 
-    mRecentProjectsModel = new RecentProjectsModel(this);
-    mFavoriteProjectsModel = new FavoriteProjectsModel(this);
-    mProjectTreeModel = new ProjectTreeModel(this);
-    mLibrary = new Library(this);
-    mControlPanel = new ControlPanel(this, mProjectTreeModel, mRecentProjectsModel,
-                                     mFavoriteProjectsModel);
+            case FileLock::LockStatus_t::StaleLock:
+            {
+                // ignore stale lock as there is nothing to restore
+                qWarning() << "There was a stale lock on the workspace:" << mPath;
+                break;
+            }
+
+            default: Q_ASSERT(false); throw LogicError(__FILE__, __LINE__);
+        }
+
+        // the workspace can be opened by this application, so we will lock it
+        mLock.lock(); // throws an exception on error
+
+        if (!mProjectsPath.mkPath())
+            qWarning() << "could not make path" << mProjectsPath;
+        if (!mLibraryPath.mkPath())
+            qWarning() << "could not make path" << mLibraryPath;
+
+        // all OK, let's load the workspace stuff!
+
+        // Load all schematic layers
+        foreach (unsigned int id, SchematicLayer::getAllLayerIDs())
+            mSchematicLayers.insert(id, new SchematicLayer(id));
+
+        mWorkspaceSettings = new WorkspaceSettings();
+        mRecentProjectsModel = new RecentProjectsModel();
+        mFavoriteProjectsModel = new FavoriteProjectsModel();
+        mProjectTreeModel = new ProjectTreeModel();
+        mLibrary = new Library(mLibraryPath);
+        mControlPanel = new ControlPanel(mProjectTreeModel, mRecentProjectsModel,
+                                         mFavoriteProjectsModel);
+        showControlPanel();
+    }
+    catch (Exception& e)
+    {
+        // free allocated memory and rethrow the exception
+        delete mControlPanel;           mControlPanel = 0;
+        delete mLibrary;                mLibrary = 0;
+        delete mProjectTreeModel;       mProjectTreeModel = 0;
+        delete mFavoriteProjectsModel;  mFavoriteProjectsModel = 0;
+        delete mRecentProjectsModel;    mRecentProjectsModel = 0;
+        delete mWorkspaceSettings;      mWorkspaceSettings = 0;
+        qDeleteAll(mSchematicLayers);   mSchematicLayers.clear();
+
+        sInstance = 0;
+        throw;
+    }
+
+    // parse command line arguments and open all project files
+    foreach (const QString& arg, qApp->arguments())
+    {
+        FilePath filepath(arg);
+        if ((filepath.isExistingFile()) && (filepath.getSuffix() == "e4u"))
+            openProject(filepath);
+    }
 }
 
 Workspace::~Workspace()
@@ -73,44 +146,87 @@ Workspace::~Workspace()
     delete mProjectTreeModel;       mProjectTreeModel = 0;
     delete mFavoriteProjectsModel;  mFavoriteProjectsModel = 0;
     delete mRecentProjectsModel;    mRecentProjectsModel = 0;
-
     delete mWorkspaceSettings;      mWorkspaceSettings = 0;
+    qDeleteAll(mSchematicLayers);   mSchematicLayers.clear();
+
+    sInstance = 0;
 }
 
 /*****************************************************************************************
  *  Project Management
  ****************************************************************************************/
 
-Project* Workspace::openProject(const QString& filename)
+Project* Workspace::createProject(const FilePath& filepath) noexcept
 {
-    Project* openProject = getOpenProject(filename);
+    Project* project = 0;
+
+    try
+    {
+        project = new Project(filepath, true);
+    }
+    catch (Exception& e)
+    {
+        QMessageBox::critical(mControlPanel, tr("Cannot create the project!"), e.getUserMsg());
+        return nullptr;
+    }
+
+    // project successfully created and opened!
+    mOpenProjects.insert(filepath.toUnique().toStr(), project);
+    mRecentProjectsModel->setLastRecentProject(filepath);
+
+    project->showSchematicEditor();
+
+    return project;
+}
+
+Project* Workspace::openProject(const FilePath& filepath) noexcept
+{
+    // Check if the filepath is an existing file
+    if (!filepath.isExistingFile())
+    {
+        QMessageBox::critical(0, tr("Invalid filename"), QString(
+            tr("The project filename is not valid: \"%1\"")).arg(filepath.toNative()));
+        return nullptr;
+    }
+
+    Project* openProject = getOpenProject(filepath);
 
     if (!openProject)
     {
         try
         {
-            openProject = new Project(this, filename);
-            mOpenProjects.insert(Project::uniqueProjectFilename(filename), openProject);
-            mRecentProjectsModel->setLastRecentProject(filename);
-            openProject->showSchematicEditor();
+            // If a fatal error occurs while opening the project, the project's
+            // constructor will throw an exception. We will catch that exception here and
+            // show a message box to print the error message to the monitor. Only
+            // exceptions of type "UserCanceled" are ignored.
+            openProject = new Project(filepath, false);
+        }
+        catch (UserCanceled& e)
+        {
+            // the user has canceled opening the project, so we ignore this exception...
+            qDebug() << "Aborted opening the project!";
+            return nullptr;
         }
         catch (Exception& e)
         {
-            QMessageBox::critical(mControlPanel, tr("Error while opening project"),
-                          QString(tr("The project \"%1\" could not be opened!\n\nError: %2"))
-                          .arg(filename, e.getMsg()));
+            // opening the project was interrupted by an exception!
+            qDebug() << "Aborted opening the project!";
+            QMessageBox::critical(mControlPanel, tr("Cannot open the project!"),
+                                  e.getUserMsg());
+            return nullptr;
         }
+
+        // project successfully opened!
+        mOpenProjects.insert(filepath.toUnique().toStr(), openProject);
+        mRecentProjectsModel->setLastRecentProject(filepath);
     }
+
+    openProject->showSchematicEditor();
 
     return openProject;
 }
 
-bool Workspace::closeProject(const QString& filename, bool askForSave)
-{
-    return closeProject(getOpenProject(filename), askForSave);
-}
-
-bool Workspace::closeProject(Project* project, bool askForSave)
+bool Workspace::closeProject(Project* project, bool askForSave) noexcept
 {
     if (!project)
         return true;
@@ -126,140 +242,138 @@ bool Workspace::closeProject(Project* project, bool askForSave)
     return success;
 }
 
-void Workspace::unregisterOpenProject(Project* project)
+bool Workspace::closeProject(const FilePath& filepath, bool askForSave) noexcept
 {
-    mOpenProjects.remove(project->getUniqueFilename());
+    return closeProject(getOpenProject(filepath), askForSave);
 }
 
-Project* Workspace::getOpenProject(const QString& filename)
+bool Workspace::closeAllProjects(bool askForSave) noexcept
 {
-    QString uniqueFilename = Project::uniqueProjectFilename(filename);
+    bool success = true;
+    foreach (Project* project, mOpenProjects)
+    {
+        if (!closeProject(project, askForSave))
+            success = false;
+    }
+    return success;
+}
 
-    if (mOpenProjects.contains(uniqueFilename))
-        return mOpenProjects.value(uniqueFilename);
+void Workspace::unregisterOpenProject(Project* project) noexcept
+{
+    mOpenProjects.remove(project->getFilepath().toUnique().toStr());
+}
+
+Project* Workspace::getOpenProject(const FilePath& filepath) const noexcept
+{
+    if (mOpenProjects.contains(filepath.toUnique().toStr()))
+        return mOpenProjects.value(filepath.toUnique().toStr());
     else
-        return 0;
+        return nullptr;
 }
 
-bool Workspace::isFavoriteProject(const QString& filename) const
+bool Workspace::isFavoriteProject(const FilePath& filepath) const noexcept
 {
-    return mFavoriteProjectsModel->isFavoriteProject(filename);
+    return mFavoriteProjectsModel->isFavoriteProject(filepath);
 }
 
-void Workspace::addFavoriteProject(const QString& filename)
+void Workspace::addFavoriteProject(const FilePath& filepath) noexcept
 {
-    mFavoriteProjectsModel->addFavoriteProject(filename);
+    mFavoriteProjectsModel->addFavoriteProject(filepath);
 }
 
-void Workspace::removeFavoriteProject(const QString& filename)
+void Workspace::removeFavoriteProject(const FilePath& filepath) noexcept
 {
-    mFavoriteProjectsModel->removeFavoriteProject(filename);
+    mFavoriteProjectsModel->removeFavoriteProject(filepath);
 }
 
 /*****************************************************************************************
  *  Public Slots
  ****************************************************************************************/
 
-void Workspace::showControlPanel() const
+void Workspace::showControlPanel() const noexcept
 {
     mControlPanel->show();
     mControlPanel->raise();
 }
 
-void Workspace::openLibraryEditor()
+void Workspace::openLibraryEditor() noexcept
 {
-    if (!mLibraryEditor)
-        mLibraryEditor = new library_editor::LibraryEditor(this);
+    try
+    {
+        if (!mLibraryEditor)
+            mLibraryEditor = new library_editor::LibraryEditor();
+    }
+    catch (...)
+    {
+        qWarning() << "Could not open the library editor!";
+        return;
+    }
 
     mLibraryEditor->show();
     mLibraryEditor->raise();
-}
-
-void Workspace::closeAllProjects(bool askForSave)
-{
-    QList<QString> openProjectsFilenames = mOpenProjects.keys();
-    foreach (QString filename, openProjectsFilenames)
-    {
-        closeProject(filename, askForSave);
-    }
 }
 
 /*****************************************************************************************
  *  Static Methods
  ****************************************************************************************/
 
-bool Workspace::isValidWorkspaceDir(const QDir& dir)
+bool Workspace::isValidWorkspacePath(const FilePath& path) noexcept
 {
-    QDir workspaceDir(dir);
-    QDir metadataDir(workspaceDir.absoluteFilePath(".metadata/"));
+    if (!path.isExistingDir())
+        return false;
+    if (!path.getPathTo(".metadata").isExistingDir())
+        return false;
 
-    workspaceDir.makeAbsolute();
-    metadataDir.makeAbsolute();
-
-    return ((workspaceDir.exists()) && (metadataDir.exists()));
+    return true;
 }
 
-void Workspace::createNewWorkspace(const QDir& dir)
+bool Workspace::createNewWorkspace(const FilePath& path) noexcept
 {
-    if (isValidWorkspaceDir(dir))
-        throw RuntimeError("There is already a workspace in the selected directory!",
-                           __FILE__, __LINE__);
+    if (isValidWorkspacePath(path))
+        return true;
 
-    if (!dir.exists())
-        throw RuntimeError("The selected directory does not exist!",
-                           __FILE__, __LINE__);
-
-    if (!dir.mkdir(".metadata"))
-        throw RuntimeError("The .metadata directory could not be created!",
-                           __FILE__, __LINE__);
+    // create directory ".metadata" (and all needed parent directories)
+    return path.getPathTo(".metadata").mkPath();
 }
 
-QString Workspace::getMostRecentlyUsedWorkspacePath()
+FilePath Workspace::getMostRecentlyUsedWorkspacePath() noexcept
 {
     QSettings clientSettings;
-    return clientSettings.value("workspaces/most_recently_used").toString();
+    return FilePath(clientSettings.value("workspaces/most_recently_used").toString());
 }
 
-void Workspace::setMostRecentlyUsedWorkspacePath(const QString& path)
+void Workspace::setMostRecentlyUsedWorkspacePath(const FilePath& path) noexcept
 {
     QSettings clientSettings;
-    clientSettings.setValue("workspaces/most_recently_used", path);
+    clientSettings.setValue("workspaces/most_recently_used", path.toNative());
 }
 
-QStringList Workspace::getAllWorkspacePaths()
+FilePath Workspace::chooseWorkspacePath() noexcept
 {
-    QStringList list;
-    QSettings clientSettings;
-    int count = clientSettings.beginReadArray("workspaces_list");
-    for (int i = 0; i < count; i++)
+    FilePath path(QFileDialog::getExistingDirectory(0, tr("Select Workspace Path")));
+
+    if (!path.isValid())
+        return FilePath();
+
+    if (!isValidWorkspacePath(path))
     {
-         clientSettings.setArrayIndex(i);
-         list.append(clientSettings.value("path").toString());
-    }
-    clientSettings.endArray();
-    return list;
-}
+        int answer = QMessageBox::question(0, tr("Create new workspace?"),
+                        tr("The speciefied workspace does not exist. "
+                           "Do you want to create a new workspace?"));
 
-void Workspace::setAllWorkspacePaths(const QStringList& paths)
-{
-    QSettings clientSettings;
-    clientSettings.remove("workspaces_list");
-    clientSettings.beginWriteArray("workspaces_list");
-    for (int i = 0; i < paths.count(); i++)
-    {
-         clientSettings.setArrayIndex(i);
-         clientSettings.setValue("path", paths[i]);
+        if (answer == QMessageBox::Yes)
+        {
+            if (!createNewWorkspace(path))
+            {
+                QMessageBox::critical(0, tr("Error"), tr("Could not create the workspace!"));
+                return FilePath();
+            }
+        }
+        else
+            return FilePath();
     }
-    clientSettings.endArray();
-}
 
-QString Workspace::uniqueWorkspacePath(const QString& path)
-{
-    QDir dir(path);
-    QString uniquePath = QDir::toNativeSeparators(dir.canonicalPath());
-    if (uniquePath.isEmpty())
-        throw RuntimeError(QString("Invalid path: \"%1\"").arg(path), __FILE__, __LINE__);
-    return uniquePath;
+    return path;
 }
 
 /*****************************************************************************************

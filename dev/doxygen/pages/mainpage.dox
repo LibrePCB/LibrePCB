@@ -6,10 +6,11 @@
     
     
     @section documentation_pages Documentation
-        - @subpage miscellaneous
-        - @subpage doc_layers
-        - @subpage library_documentation
-        - @subpage project_documentation
+        - @subpage doc_developers
+        - @subpage doc_code_style_guide
+        - @subpage doc_schematic_layers
+        - @subpage doc_lib
+        - @subpage doc_project
     
     @section related_pages Related Pages
         - @ref todo

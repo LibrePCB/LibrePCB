@@ -26,19 +26,25 @@
 
 #include <QtCore>
 #include <QtWidgets>
+#include "../../common/graphics/if_graphicsvieweventhandler.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
-class Workspace;
-
-namespace Ui {
-class SchematicEditor;
-}
+class GraphicsView;
+class GridProperties;
 
 namespace project {
 class Project;
+class Schematic;
+class SchematicPagesDock;
+class ErcMsgDock;
+class SES_FSM;
+}
+
+namespace Ui {
+class SchematicEditor;
 }
 
 /*****************************************************************************************
@@ -50,15 +56,27 @@ namespace project {
 /**
  * @brief The SchematicEditor class
  */
-class SchematicEditor : public QMainWindow
+class SchematicEditor : public QMainWindow, public IF_GraphicsViewEventHandler
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit SchematicEditor(Workspace* workspace, Project* project);
+        explicit SchematicEditor(Project& project, bool readOnly);
         ~SchematicEditor();
+
+        // Getters
+        Project& getProject() const noexcept {return mProject;}
+        int getActiveSchematicIndex() const noexcept {return mActiveSchematicIndex;}
+        Schematic* getActiveSchematic() const noexcept;
+        const GridProperties& getGridProperties() const noexcept {return *mGridProperties;}
+
+        // Setters
+        bool setActiveSchematicIndex(int index) noexcept;
+
+        // General Methods
+        void abortAllCommands() noexcept;
 
     protected:
 
@@ -68,6 +86,22 @@ class SchematicEditor : public QMainWindow
 
         // Actions
         void on_actionClose_Project_triggered();
+        void on_actionUndo_triggered();
+        void on_actionRedo_triggered();
+        void on_actionGrid_triggered();
+        void on_actionPDF_Export_triggered();
+        void on_actionToolAddComponent_triggered();
+        void on_actionAddGenCmp_Resistor_triggered();
+        void on_actionAddGenCmp_BipolarCapacitor_triggered();
+        void on_actionAddGenCmp_UnipolarCapacitor_triggered();
+        void on_actionAddGenCmp_Inductor_triggered();
+        void on_actionAddGenCmp_gnd_triggered();
+        void on_actionAddGenCmp_vcc_triggered();
+        void on_actionProjectProperties_triggered();
+
+    signals:
+
+        void activeSchematicChanged(int oldIndex, int newIndex);
 
     private:
 
@@ -76,10 +110,23 @@ class SchematicEditor : public QMainWindow
         SchematicEditor(const SchematicEditor& other);
         SchematicEditor& operator=(const SchematicEditor& rhs);
 
+        // Private Methods
+        bool graphicsViewEventHandler(QEvent* event);
+
         // General Attributes
-        Workspace* mWorkspace;
-        Project* mProject;
+        Project& mProject;
         Ui::SchematicEditor* mUi;
+        GraphicsView* mGraphicsView;
+        GridProperties* mGridProperties;
+
+        int mActiveSchematicIndex;
+
+        // Docks
+        SchematicPagesDock* mPagesDock;
+        ErcMsgDock* mErcMsgDock;
+
+        // Finite State Machine
+        SES_FSM* mFsm;
 };
 
 } // namespace project

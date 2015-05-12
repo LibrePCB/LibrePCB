@@ -22,12 +22,43 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QApplication>
+#include <QtWidgets>
 #include <QTranslator>
+#include "common/application.h"
 #include "common/debug.h"
 #include "common/exceptions.h"
 #include "workspace/workspace.h"
-#include "workspace/workspacechooserdialog.h"
+
+/*****************************************************************************************
+ *  app.exec()
+ ****************************************************************************************/
+
+static int appExec() noexcept
+{
+    // please note that we shouldn't show a dialog or message box in the catch() blocks!
+    // from http://qt-project.org/doc/qt-5/exceptionsafety.html:
+    //      "After an exception is thrown, the connection to the windowing server might
+    //      already be closed. It is not safe to call a GUI related function after
+    //      catching an exception."
+    try
+    {
+        return Application::exec();
+    }
+    catch (Exception& e)
+    {
+        qFatal("UNCAUGHT EXCEPTION: %s --- PROGRAM EXITED", qPrintable(e.getUserMsg()));
+    }
+    catch (std::exception& e)
+    {
+        qFatal("UNCAUGHT EXCEPTION: %s --- PROGRAM EXITED", e.what());
+    }
+    catch (...)
+    {
+        qFatal("UNCAUGHT EXCEPTION --- PROGRAM EXITED");
+    }
+
+    return -1;
+}
 
 /*****************************************************************************************
  *  main()
@@ -35,18 +66,18 @@
 
 int main(int argc, char* argv[])
 {
-    QApplication app(argc, argv);
+    Application app(argc, argv);
 
     // Set the organization / application names must be done very early because some other
     // classes will use these values (for example QSettings, Debug (for the file logging path))!
-    QCoreApplication::setOrganizationName("EDA4U");
+    Application::setOrganizationName("EDA4U");
     //QCoreApplication::setOrganizationDomain(""); ///< @todo
 #ifdef GIT_BRANCH
-    QCoreApplication::setApplicationName(QString("EDA4U_git-%1").arg(GIT_BRANCH));
+    Application::setApplicationName(QString("EDA4U_git-%1").arg(GIT_BRANCH));
 #else
-    QCoreApplication::setApplicationName("EDA4U");
+    Application::setApplicationName("EDA4U");
 #endif
-    QCoreApplication::setApplicationVersion("0.0.1");
+    Application::setApplicationVersion(QString("%1.%2").arg(APP_VERSION_MAJOR).arg(APP_VERSION_MINOR));
 
 
     Debug::instance(); // this creates the Debug object and installs the message handler.
@@ -73,7 +104,7 @@ int main(int argc, char* argv[])
     app.installTranslator(&appTranslator2);
 
 
-    QGuiApplication::setQuitOnLastWindowClosed(false);
+    Application::setQuitOnLastWindowClosed(false);
 
 
     // this is to remove the ugly frames around widgets in all status bars...
@@ -84,43 +115,48 @@ int main(int argc, char* argv[])
 
     // Initialization finished, open the workspace...
 
-    QDir workspaceDir;
-    workspaceDir.setPath(Workspace::getMostRecentlyUsedWorkspacePath());
+    bool chooseAnotherWorkspace = false;
+    FilePath wsPath(Workspace::getMostRecentlyUsedWorkspacePath());
 
-    if ((!workspaceDir.exists()) || (!Workspace::isValidWorkspaceDir(workspaceDir)))
+    do
     {
-        WorkspaceChooserDialog dialog;
+        if ((!Workspace::isValidWorkspacePath(wsPath)) || (chooseAnotherWorkspace))
+        {
+            wsPath = Workspace::chooseWorkspacePath();
+            if (!wsPath.isValid())
+                return 0;
 
-        if (!dialog.exec())
-            return 0; // no workspace was choosed
+            Workspace::setMostRecentlyUsedWorkspacePath(wsPath);
+        }
 
-        workspaceDir = dialog.getChoosedWorkspaceDir();
-    }
+        chooseAnotherWorkspace = false;
 
-    Workspace ws(workspaceDir);
-    ws.showControlPanel();
+        try
+        {
+            // The Workspace constructor can throw an exception. If the workspace was
+            // opened successfully, the control panel will be shown automatically.
+            Workspace ws(wsPath);
+            Q_UNUSED(ws);
+            return appExec();
+        }
+        catch (UserCanceled& e)
+        {
+            return 0; // quit the application
+        }
+        catch (Exception& e)
+        {
+            int btn = QMessageBox::question(0, Application::translate("Workspace",
+                        "Cannot open the workspace"), QString(Application::translate(
+                        "Workspace", "The workspace \"%1\" cannot be opened: %2\n\n"
+                        "Do you want to choose another workspace?"))
+                        .arg(wsPath.toNative(), e.getUserMsg()));
 
-    // please note that we shouldn't show a dialog or message box in the catch() blocks!
-    // from http://qt-project.org/doc/qt-5/exceptionsafety.html:
-    //      "After an exception is thrown, the connection to the windowing server might
-    //      already be closed. It is not safe to call a GUI related function after
-    //      catching an exception."
-    try
-    {
-        return app.exec();
-    }
-    catch (Exception& e)
-    {
-        qFatal("UNCAUGHT EXCEPTION: %s --- PROGRAM EXITED", e.getDebugString().toUtf8().constData());
-    }
-    catch (std::exception& e)
-    {
-        qFatal("UNCAUGHT EXCEPTION: %s --- PROGRAM EXITED", e.what());
-    }
-    catch (...)
-    {
-        qFatal("UNCAUGHT EXCEPTION --- PROGRAM EXITED");
-    }
+            if (btn == QMessageBox::Yes)
+                chooseAnotherWorkspace = true;
+            else
+                return 0; // quit the application
+        }
+    } while (chooseAnotherWorkspace);
 
-    return -1;
+    return 0;
 }

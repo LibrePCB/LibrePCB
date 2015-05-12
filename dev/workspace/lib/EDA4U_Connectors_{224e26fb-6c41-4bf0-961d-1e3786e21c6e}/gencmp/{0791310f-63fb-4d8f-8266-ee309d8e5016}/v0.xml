@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{0791310f-63fb-4d8f-8266-ee309d8e5016}</uuid>
+        <version>0.1</version>
+        <author>EDA4U</author>
+        <created>2015-03-11T20:58:56Z</created>
+        <last_modified>2015-03-11T20:58:56Z</last_modified>
+        <name locale="en_US">1x6P Male Connector</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix default="true" norm="">ST</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal forced_net_name="" negated="false" uuid="{6651a454-c542-48fc-9056-518546c904dd}" required="false" role="passive" clock="false">
+            <name locale="en_US">3</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal forced_net_name="" negated="false" uuid="{60a3f21c-4a89-4dad-b4bf-6c756c7df09d}" required="false" role="passive" clock="false">
+            <name locale="en_US">5</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal forced_net_name="" negated="false" uuid="{0b9eae8a-63ad-4582-94c9-fe30266c86d1}" required="false" role="passive" clock="false">
+            <name locale="en_US">6</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal forced_net_name="" negated="false" uuid="{79ad9275-7895-4708-8d6b-3b502a404269}" required="false" role="passive" clock="false">
+            <name locale="en_US">4</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal forced_net_name="" negated="false" uuid="{cb80ea12-5702-4ad3-b7bf-662544403995}" required="false" role="passive" clock="false">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal forced_net_name="" negated="false" uuid="{54aea1a2-260b-4cb1-a541-bac92a0457f2}" required="false" role="passive" clock="false">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant default="true" norm="" uuid="{bfb9d5a0-9074-49de-a073-69ca2ffa4596}">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item suffix="" symbol="{4deffb53-5b06-4f16-a787-37cb6da6de77}" uuid="{cc7febf5-14a9-43fc-a63d-5f31626c202b}" required="true">
+                    <pin_signal_map>
+                        <map pin="{b9af3f05-bc03-4ead-bb16-b4021d5a1326}" signal="{cb80ea12-5702-4ad3-b7bf-662544403995}" display="gen_comp_signal"/>
+                        <map pin="{97fbca8a-456c-4bad-8b8a-ab33132f6ffd}" signal="{60a3f21c-4a89-4dad-b4bf-6c756c7df09d}" display="gen_comp_signal"/>
+                        <map pin="{d69e8604-dc2f-42eb-ae01-63ede51e07a1}" signal="{0b9eae8a-63ad-4582-94c9-fe30266c86d1}" display="gen_comp_signal"/>
+                        <map pin="{ee7fd904-6f17-4b59-9d08-5a5bbded41cc}" signal="{54aea1a2-260b-4cb1-a541-bac92a0457f2}" display="gen_comp_signal"/>
+                        <map pin="{401259c8-2526-4d8f-ba53-856128bc4cd5}" signal="{79ad9275-7895-4708-8d6b-3b502a404269}" display="gen_comp_signal"/>
+                        <map pin="{12c2964d-e6b6-44d2-b9e9-671effe7e824}" signal="{6651a454-c542-48fc-9056-518546c904dd}" display="gen_comp_signal"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

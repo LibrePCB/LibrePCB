@@ -31,11 +31,10 @@
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ProjectTreeModel::ProjectTreeModel(Workspace* workspace) :
-    QAbstractItemModel(0), mWorkspace(workspace)
+ProjectTreeModel::ProjectTreeModel() :
+    QAbstractItemModel(0)
 {
-    QDir projectsDir(mWorkspace->getWorkspaceDir().absoluteFilePath("projects"));
-    mRootProjectDirectory = new ProjectTreeItem(0, projectsDir.absolutePath());
+    mRootProjectDirectory = new ProjectTreeItem(0, Workspace::instance().getProjectsPath());
 }
 
 ProjectTreeModel::~ProjectTreeModel()

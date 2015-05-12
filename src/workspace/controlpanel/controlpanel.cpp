@@ -27,7 +27,7 @@
 #include "controlpanel.h"
 #include "ui_controlpanel.h"
 #include "../workspace.h"
-#include "../workspacesettings.h"
+#include "../settings/workspacesettings.h"
 #include "../../project/project.h"
 #include "../projecttreemodel.h"
 #include "../projecttreeitem.h"
@@ -38,30 +38,35 @@ using namespace project;
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ControlPanel::ControlPanel(Workspace* workspace, QAbstractItemModel* projectTreeModel,
+ControlPanel::ControlPanel(QAbstractItemModel* projectTreeModel,
                            QAbstractItemModel* recentProjectsModel,
                            QAbstractItemModel* favoriteProjectsModel) :
-    QMainWindow(0), mUi(new Ui::ControlPanel), mWorkspace(workspace)
+    QMainWindow(0), mUi(new Ui::ControlPanel)
 {
     mUi->setupUi(this);
 
-    QString nativePath = QDir::toNativeSeparators(mWorkspace->getWorkspaceDir().absolutePath());
-
-    setWindowTitle(QString(tr("EDA4U Control Panel - %1")).arg(nativePath));
-    mUi->statusBar->addWidget(new QLabel(QString(tr("Workspace: %1")).arg(nativePath)));
+    setWindowTitle(QString(tr("Control Panel - EDA4U %1 - %2"))
+        .arg(QCoreApplication::applicationVersion()).arg(Workspace::instance().getPath().toNative()));
+    mUi->statusBar->addWidget(new QLabel(QString(tr("Workspace: %1"))
+        .arg(Workspace::instance().getPath().toNative())));
 
     // connect some actions which are created with the Qt Designer
-    connect(mUi->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
-    connect(mUi->actionOpen_Library_Editor, SIGNAL(triggered()), mWorkspace, SLOT(openLibraryEditor()));
-    connect(mUi->actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
-    connect(mUi->actionWorkspace_Settings, SIGNAL(triggered()), mWorkspace->getSettings(), SLOT(showSettingsDialog()));
+    connect(mUi->actionQuit, &QAction::triggered,
+            this, &ControlPanel::close);
+    connect(mUi->actionOpen_Library_Editor, &QAction::triggered,
+            &Workspace::instance(), &Workspace::openLibraryEditor);
+    connect(mUi->actionAbout_Qt, &QAction::triggered,
+            qApp, &QApplication::aboutQt);
+    connect(mUi->actionWorkspace_Settings, &QAction::triggered,
+            &Workspace::instance().getSettings(), &WorkspaceSettings::showSettingsDialog);
 
     mUi->projectTreeView->setModel(projectTreeModel);
     mUi->recentProjectsListView->setModel(recentProjectsModel);
     mUi->favoriteProjectsListView->setModel(favoriteProjectsModel);
 
     mUi->webView->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
-    connect(mUi->webView, &QWebView::linkClicked, [](const QUrl& url){QDesktopServices::openUrl(url);});
+    connect(mUi->webView, &QWebView::linkClicked,
+            [](const QUrl& url){QDesktopServices::openUrl(url);});
 
     loadSettings();
 }
@@ -73,12 +78,16 @@ ControlPanel::~ControlPanel()
 
 void ControlPanel::closeEvent(QCloseEvent *event)
 {
-    Q_UNUSED(event);
-
     saveSettings();
 
     // close all projects, unsaved projects will ask for saving
-    mWorkspace->closeAllProjects(true);
+    if (!Workspace::instance().closeAllProjects(true))
+    {
+        event->ignore();
+        return; // do NOT close the application, there are still open projects!
+    }
+
+    QMainWindow::closeEvent(event);
 
     // if the control panel is closed, we will quit the whole application
     QApplication::quit();
@@ -90,13 +99,14 @@ void ControlPanel::closeEvent(QCloseEvent *event)
 
 void ControlPanel::saveSettings()
 {
-    QSettings settings(mWorkspace->getSettings()->getFilepath(), QSettings::IniFormat);
+    QSettings clientSettings;
+    clientSettings.beginGroup("controlpanel");
 
     // main window
-    settings.setValue("controlpanel/window_geometry", saveGeometry());
-    settings.setValue("controlpanel/window_state", saveState());
-    settings.setValue("controlpanel/splitter_h_state", mUi->splitter_h->saveState());
-    settings.setValue("controlpanel/splitter_v_state", mUi->splitter_v->saveState());
+    clientSettings.setValue("window_geometry", saveGeometry());
+    clientSettings.setValue("window_state", saveState());
+    clientSettings.setValue("splitter_h_state", mUi->splitter_h->saveState());
+    clientSettings.setValue("splitter_v_state", mUi->splitter_v->saveState());
 
     // projects treeview (expanded items)
     ProjectTreeModel* model = dynamic_cast<ProjectTreeModel*>(mUi->projectTreeView->model());
@@ -106,34 +116,44 @@ void ControlPanel::saveSettings()
         foreach (QModelIndex index, model->getPersistentIndexList())
         {
             if (mUi->projectTreeView->isExpanded(index))
-                list.append(index.data(Qt::UserRole).toString());
+            {
+                list.append(FilePath(index.data(Qt::UserRole).toString())
+                            .toRelative(Workspace::instance().getPath()));
+            }
         }
-        settings.setValue("controlpanel/expanded_projecttreeview_items", QVariant::fromValue(list));
+        clientSettings.setValue("expanded_projecttreeview_items", QVariant::fromValue(list));
     }
+
+    clientSettings.endGroup();
 }
 
 void ControlPanel::loadSettings()
 {
-    QSettings settings(mWorkspace->getSettings()->getFilepath(), QSettings::IniFormat);
+    QSettings clientSettings;
+    clientSettings.beginGroup("controlpanel");
 
     // main window
-    restoreGeometry(settings.value("controlpanel/window_geometry").toByteArray());
-    restoreState(settings.value("controlpanel/window_state").toByteArray());
-    mUi->splitter_h->restoreState(settings.value("controlpanel/splitter_h_state").toByteArray());
-    mUi->splitter_v->restoreState(settings.value("controlpanel/splitter_v_state").toByteArray());
+    restoreGeometry(clientSettings.value("window_geometry").toByteArray());
+    restoreState(clientSettings.value("window_state").toByteArray());
+    mUi->splitter_h->restoreState(clientSettings.value("splitter_h_state").toByteArray());
+    mUi->splitter_v->restoreState(clientSettings.value("splitter_v_state").toByteArray());
 
     // projects treeview (expanded items)
     ProjectTreeModel* model = dynamic_cast<ProjectTreeModel*>(mUi->projectTreeView->model());
     if (model)
     {
-        QStringList list = settings.value("controlpanel/expanded_projecttreeview_items").toStringList();
+        QStringList list = clientSettings.value("expanded_projecttreeview_items").toStringList();
         foreach (QString item, list)
         {
-            QModelIndexList items = model->match(model->index(0, 0), Qt::UserRole, QVariant::fromValue(item), 1, Qt::MatchExactly | Qt::MatchWrap | Qt::MatchRecursive);
+            FilePath filepath = FilePath::fromRelative(Workspace::instance().getPath(), item);
+            QModelIndexList items = model->match(model->index(0, 0), Qt::UserRole,
+                QVariant::fromValue(filepath.toStr()), 1, Qt::MatchExactly | Qt::MatchWrap | Qt::MatchRecursive);
             if (!items.isEmpty())
                 mUi->projectTreeView->setExpanded(items.first(), true);
         }
     }
+
+    clientSettings.endGroup();
 }
 
 /*****************************************************************************************
@@ -146,25 +166,59 @@ void ControlPanel::on_actionAbout_triggered()
                        tr("EDA4U is a free & OpenSource Schematic/Layout-Editor"));
 }
 
-void ControlPanel::on_actionOpen_Project_triggered()
+void ControlPanel::on_actionNew_Project_triggered()
 {
-    QSettings settings(mWorkspace->getSettings()->getFilepath(), QSettings::IniFormat);
-    QString lastOpenedFile = settings.value("controlpanel/last_open_project",
-                             mWorkspace->getWorkspaceDir().absolutePath()).toString();
+    QSettings settings(Workspace::instance().getMetadataPath().getPathTo("settings.ini").toStr(),
+                       QSettings::IniFormat);
+    FilePath lastNewFile(settings.value("controlpanel/last_new_project").toString());
+    if (!lastNewFile.getParentDir().isExistingDir())
+        lastNewFile.setPath(Workspace::instance().getProjectsPath().toStr());
 
-    QString filename = QFileDialog::getOpenFileName(this, tr("Open Project"), lastOpenedFile,
-                                    tr("EDA4U project files (%1)").arg("*.e4u"));
+    FilePath filepath(QFileDialog::getSaveFileName(this, tr("New Project"), lastNewFile.toStr(),
+                                    tr("EDA4U project files (%1)").arg("*.e4u")));
+    if (filepath.getSuffix() != "e4u")
+        filepath.setPath(filepath.toStr() % ".e4u");
 
-    if (filename.isNull())
+    if (!filepath.isValid())
         return;
 
-    settings.setValue("controlpanel/last_open_project", filename);
-    mWorkspace->openProject(filename);
+    settings.setValue("controlpanel/last_new_project", filepath.toNative());
+
+    Workspace::instance().createProject(filepath);
+}
+
+void ControlPanel::on_actionOpen_Project_triggered()
+{
+    QSettings settings(Workspace::instance().getMetadataPath().getPathTo("settings.ini").toStr(),
+                       QSettings::IniFormat);
+    QString lastOpenedFile = settings.value("controlpanel/last_open_project",
+                             Workspace::instance().getPath().toStr()).toString();
+
+    FilePath filepath(QFileDialog::getOpenFileName(this, tr("Open Project"), lastOpenedFile,
+                                    tr("EDA4U project files (%1)").arg("*.e4u")));
+
+    if (!filepath.isValid())
+        return;
+
+    settings.setValue("controlpanel/last_open_project", filepath.toNative());
+
+    Workspace::instance().openProject(filepath);
 }
 
 void ControlPanel::on_actionClose_all_open_projects_triggered()
 {
-    mWorkspace->closeAllProjects(true);
+    Workspace::instance().closeAllProjects(true);
+}
+
+void ControlPanel::on_actionSwitch_Workspace_triggered()
+{
+    FilePath wsPath = Workspace::chooseWorkspacePath();
+    if (!wsPath.isValid())
+        return;
+
+    Workspace::setMostRecentlyUsedWorkspacePath(wsPath);
+    QMessageBox::information(this, tr("Workspace changed"),
+        tr("The chosen workspace will be used after restarting the application."));
 }
 
 void ControlPanel::on_projectTreeView_clicked(const QModelIndex& index)
@@ -173,12 +227,12 @@ void ControlPanel::on_projectTreeView_clicked(const QModelIndex& index)
     if (!item)
         return;
 
-    QString htmlFilename;
+    FilePath htmlFilepath;
 
     if ((item->getType() == ProjectTreeItem::ProjectFolder) || (item->getType() == ProjectTreeItem::ProjectFile))
-        htmlFilename = item->getFileInfo().dir().absoluteFilePath("description" % QDir::separator() % "index.html");
+        htmlFilepath = item->getFilePath().getParentDir().getPathTo("description/index.html");
 
-    mUi->webView->setUrl(QUrl::fromLocalFile(htmlFilename));
+    mUi->webView->setUrl(QUrl::fromLocalFile(htmlFilepath.toStr()));
 }
 
 void ControlPanel::on_projectTreeView_doubleClicked(const QModelIndex& index)
@@ -191,7 +245,7 @@ void ControlPanel::on_projectTreeView_doubleClicked(const QModelIndex& index)
     switch (item->getType())
     {
         case ProjectTreeItem::File:
-            QDesktopServices::openUrl(QUrl::fromLocalFile(item->getFileInfo().absoluteFilePath()));
+            QDesktopServices::openUrl(QUrl::fromLocalFile(item->getFilePath().toStr()));
             break;
 
         case ProjectTreeItem::Folder:
@@ -200,7 +254,7 @@ void ControlPanel::on_projectTreeView_doubleClicked(const QModelIndex& index)
             break;
 
         case ProjectTreeItem::ProjectFile:
-            mWorkspace->openProject(item->getFileInfo().filePath());
+            Workspace::instance().openProject(item->getFilePath());
             break;
 
         default:
@@ -223,7 +277,7 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(const QPoint& p
         {
             if (item->getType() == ProjectTreeItem::ProjectFile)
             {
-                if (!mWorkspace->getOpenProject(item->getFileInfo().absoluteFilePath()))
+                if (!Workspace::instance().getOpenProject(item->getFilePath()))
                 {
                     // this project is not open
                     actions.insert(1, menu.addAction(tr("Open Project")));
@@ -236,7 +290,7 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(const QPoint& p
                     actions.value(2)->setIcon(QIcon(":/img/actions/close.png"));
                 }
 
-                if (mWorkspace->isFavoriteProject(item->getFileInfo().filePath()))
+                if (Workspace::instance().isFavoriteProject(item->getFilePath()))
                 {
                     // this is a favorite project
                     actions.insert(3, menu.addAction(tr("Remove from favorites")));
@@ -274,19 +328,19 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(const QPoint& p
     switch (actions.key(menu.exec(QCursor::pos()), 0))
     {
         case 1: // open project
-            mWorkspace->openProject(item->getFileInfo().absoluteFilePath());
+            Workspace::instance().openProject(item->getFilePath());
             break;
 
         case 2: // close project
-            mWorkspace->closeProject(item->getFileInfo().absoluteFilePath(), true);
+            Workspace::instance().closeProject(item->getFilePath(), true);
             break;
 
         case 3: // remove project from favorites
-            mWorkspace->removeFavoriteProject(item->getFileInfo().filePath());
+            Workspace::instance().removeFavoriteProject(item->getFilePath());
             break;
 
         case 4: // add project to favorites
-            mWorkspace->addFavoriteProject(item->getFileInfo().filePath());
+            Workspace::instance().addFavoriteProject(item->getFilePath());
             break;
 
         case 10: // new project
@@ -296,7 +350,7 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(const QPoint& p
             break;
 
         case 21: // open project directory
-            QDesktopServices::openUrl(QUrl::fromLocalFile(item->getFileInfo().absoluteFilePath()));
+            QDesktopServices::openUrl(QUrl::fromLocalFile(item->getFilePath().toStr()));
             break;
 
         default:
@@ -308,38 +362,28 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(const QPoint& p
 
 void ControlPanel::on_recentProjectsListView_entered(const QModelIndex &index)
 {
-    QFileInfo fileInfo(index.data(Qt::UserRole).toString());
-    QString htmlFilename = fileInfo.dir().absoluteFilePath("description" %
-                                                           QDir::separator() %
-                                                           "index.html");
-    mUi->webView->setUrl(QUrl::fromLocalFile(htmlFilename));
+    FilePath filepath(index.data(Qt::UserRole).toString());
+    FilePath htmlFilepath = filepath.getParentDir().getPathTo("description/index.html");
+    mUi->webView->setUrl(QUrl::fromLocalFile(htmlFilepath.toStr()));
 }
 
 void ControlPanel::on_favoriteProjectsListView_entered(const QModelIndex &index)
 {
-    QFileInfo fileInfo(index.data(Qt::UserRole).toString());
-    QString htmlFilename = fileInfo.dir().absoluteFilePath("description" %
-                                                           QDir::separator() %
-                                                           "index.html");
-    mUi->webView->setUrl(QUrl::fromLocalFile(htmlFilename));
+    FilePath filepath(index.data(Qt::UserRole).toString());
+    FilePath htmlFilepath = filepath.getParentDir().getPathTo("description/index.html");
+    mUi->webView->setUrl(QUrl::fromLocalFile(htmlFilepath.toStr()));
 }
 
 void ControlPanel::on_recentProjectsListView_clicked(const QModelIndex &index)
 {
-    QFileInfo fileInfo(index.data(Qt::UserRole).toString());
-    if ((!fileInfo.isFile()) || (!fileInfo.exists()))
-        return;
-
-    mWorkspace->openProject(fileInfo.filePath());
+    FilePath filepath(index.data(Qt::UserRole).toString());
+    Workspace::instance().openProject(filepath);
 }
 
 void ControlPanel::on_favoriteProjectsListView_clicked(const QModelIndex &index)
 {
-    QFileInfo fileInfo(index.data(Qt::UserRole).toString());
-    if ((!fileInfo.isFile()) || (!fileInfo.exists()))
-        return;
-
-    mWorkspace->openProject(fileInfo.filePath());
+    FilePath filepath(index.data(Qt::UserRole).toString());
+    Workspace::instance().openProject(filepath);
 }
 
 void ControlPanel::on_recentProjectsListView_customContextMenuRequested(const QPoint &pos)
@@ -348,7 +392,7 @@ void ControlPanel::on_recentProjectsListView_customContextMenuRequested(const QP
     if (!index.isValid())
         return;
 
-    bool isFavorite = mWorkspace->isFavoriteProject(index.data(Qt::UserRole).toString());
+    bool isFavorite = Workspace::instance().isFavoriteProject(FilePath(index.data(Qt::UserRole).toString()));
 
     QMenu menu;
     QAction* action;
@@ -366,9 +410,9 @@ void ControlPanel::on_recentProjectsListView_customContextMenuRequested(const QP
     if (menu.exec(QCursor::pos()) == action)
     {
         if (isFavorite)
-            mWorkspace->removeFavoriteProject(index.data(Qt::UserRole).toString());
+            Workspace::instance().removeFavoriteProject(FilePath(index.data(Qt::UserRole).toString()));
         else
-            mWorkspace->addFavoriteProject(index.data(Qt::UserRole).toString());
+            Workspace::instance().addFavoriteProject(FilePath(index.data(Qt::UserRole).toString()));
     }
 }
 
@@ -383,7 +427,7 @@ void ControlPanel::on_favoriteProjectsListView_customContextMenuRequested(const 
                                            tr("Remove from favorites"));
 
     if (menu.exec(QCursor::pos()) == removeAction)
-        mWorkspace->removeFavoriteProject(index.data(Qt::UserRole).toString());
+        Workspace::instance().removeFavoriteProject(FilePath(index.data(Qt::UserRole).toString()));
 }
 
 /*****************************************************************************************

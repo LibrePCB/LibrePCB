@@ -25,18 +25,13 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QtWidgets>
-#include "../../common/cadscene.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
-class Workspace;
-
 namespace project {
 class Project;
-class Circuit;
 }
 
 /*****************************************************************************************
@@ -47,17 +42,14 @@ namespace project {
 
 /**
  * @brief The Board class represents a PCB of a project and is always part of a circuit
- *
- * This class inherits from QGraphicsScene (through CADScene). This way, a Board can be
- * shown directly in a QGraphicsView (resp. CADView).
  */
-class Board final : public CADScene
+class Board final : public QObject
 {
         Q_OBJECT
 
     public:
 
-        explicit Board(Workspace* workspace, Project* project, Circuit* circuit);
+        explicit Board(Project& project);
         ~Board();
 
     private:
@@ -68,9 +60,7 @@ class Board final : public CADScene
         Board& operator=(const Board& rhs);
 
         // General
-        Workspace* mWorkspace; ///< A pointer to the Workspace object (from the constructor)
-        Project* mProject; ///< A pointer to the Project object (from the constructor)
-        Circuit* mCircuit; ///< A pointer to the Circuit object (from the constructor)
+        Project& mProject; ///< A reference to the Project object (from the ctor)
 
 };
 

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<symbol file_version="0">
+    <meta>
+        <uuid>{f00ab942-6980-442b-86a8-51b92de5704d}</uuid>
+        <version>0.1</version>
+        <author>EDA4U</author>
+        <created>2015-03-01T20:00:00Z</created>
+        <last_modified>2015-03-01T20:00:00Z</last_modified>
+        <name locale="en_US">A4 Frame Landscape</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US">frame</keywords>
+    </meta>
+    <categories>
+        <category>{00000000-0000-4001-8000-000000000000}</category>
+    </categories>
+    <changelog/>
+    <attachements/>
+    <geometry>
+        <polygon line_layer="10" line_width="0.6" fill_layer="0" start_x="0" start_y="0" grab_area="false">
+            <segment angle="0" end_x="0" end_y="190"/>
+            <segment angle="0" end_x="277" end_y="190"/>
+            <segment angle="0" end_x="277" end_y="0"/>
+            <segment angle="0" end_x="0" end_y="0"/>
+        </polygon>
+        <polygon line_layer="10" line_width="0.6" fill_layer="0" start_x="170" start_y="0" grab_area="false">
+            <segment angle="0" end_x="170" end_y="15"/>
+            <segment angle="0" end_x="277" end_y="15"/>
+        </polygon>
+        <polygon line_layer="10" line_width="0.6" fill_layer="0" start_x="240" start_y="0" grab_area="false">
+            <segment angle="0" end_x="240" end_y="15"/>
+        </polygon>
+        <polygon line_layer="10" line_width="0.6" fill_layer="0" start_x="170" start_y="5" grab_area="false">
+            <segment angle="0" end_x="277" end_y="5"/>
+        </polygon>
+        <polygon line_layer="10" line_width="0.6" fill_layer="0" start_x="240" start_y="10" grab_area="false">
+            <segment angle="0" end_x="277" end_y="10"/>
+        </polygon>
+        <text layer="10" text="${PAGE::NAME}"                  x="172" y="10"   angle="0" height="8" v_align="center" h_align="left"/>
+        <text layer="10" text="${PRJ::NAME}"                   x="172" y="2.5"  angle="0" height="4" v_align="center" h_align="left"/>
+        <text layer="10" text="${PAGE::LAST_MODIFIED}"         x="242" y="12.5" angle="0" height="4" v_align="center" h_align="left"/>
+        <text layer="10" text="${PAGE::AUTHOR}"                x="242" y="7.5"  angle="0" height="4" v_align="center" h_align="left"/>
+        <text layer="10" text="Page ${PAGE::NBR}/${PAGE::CNT}" x="242" y="2.5"  angle="0" height="4" v_align="center" h_align="left"/>
+    </geometry>
+    <pins/>
+</symbol>

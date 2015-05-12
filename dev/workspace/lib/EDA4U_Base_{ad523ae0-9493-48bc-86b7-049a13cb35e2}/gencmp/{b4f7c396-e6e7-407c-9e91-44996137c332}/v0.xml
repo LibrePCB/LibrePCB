@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{b4f7c396-e6e7-407c-9e91-44996137c332}</uuid>
+        <version>0.1</version>
+        <author>EDA4U</author>
+        <created>2015-03-04T21:27:40Z</created>
+        <last_modified>2015-03-04T21:27:40Z</last_modified>
+        <name locale="en_US">Zener Diode</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">D</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal negated="false" required="false" clock="false" uuid="{e426246c-e943-4756-8039-ae424db9454a}" forced_net_name="" role="passive">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal negated="false" required="false" clock="false" uuid="{be312176-0bda-48f5-b2ca-eda262a7cdad}" forced_net_name="" role="passive">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{d039b47e-5575-4fe2-b42e-9431f103058b}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item suffix="" symbol="{d7a60962-0f8b-44e9-831b-dd7bca1649b0}" required="true" uuid="{343a59cd-7b10-4351-a0d3-5149afbc3c78}">
+                    <pin_signal_map>
+                        <map signal="{be312176-0bda-48f5-b2ca-eda262a7cdad}" display="none" pin="{bcc4ce5f-1594-4790-be6a-b42e9f0ddea3}"/>
+                        <map signal="{e426246c-e943-4756-8039-ae424db9454a}" display="none" pin="{e72b6a12-69fb-44b7-ba93-b164352f614f}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

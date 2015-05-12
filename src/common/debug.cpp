@@ -23,21 +23,21 @@
 
 #include <QtCore>
 #include "debug.h"
+#include "file_io/filepath.h"
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
 Debug::Debug() :
-    mDebugLevelStderr(All), mDebugLevelLogFile(Nothing),
-    mStderrStream(new QTextStream(stderr)), mLogFile(0)
+    mDebugLevelStderr(DebugLevel_t::All), mDebugLevelLogFile(DebugLevel_t::Nothing),
+    mStderrStream(new QTextStream(stderr)), mLogFilepath(), mLogFile(0)
 {
     // determine the filename of the log file which will be used if logging is enabled
-    QDir dataDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
-    QDir logDir(dataDir.absoluteFilePath("logs"));
-    logDir.mkpath(logDir.absolutePath());
-    mLogFilename = QDir::toNativeSeparators(logDir.absoluteFilePath(
-                        QDateTime::currentDateTime().toString(Qt::ISODate) % ".log"));
+    QString datetime = QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss");
+    QString dataDir = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+    if (!dataDir.isEmpty())
+        mLogFilepath.setPath(dataDir % "/logs/" % datetime % ".log");
 
     // install the message handler for Qt's debug functions (qDebug(), ...)
     qInstallMessageHandler(messageHandler);
@@ -60,31 +60,38 @@ Debug::~Debug()
  *  General Methods
  ****************************************************************************************/
 
-void Debug::setDebugLevelStderr(DebugLevel level)
+void Debug::setDebugLevelStderr(DebugLevel_t level)
 {
     mDebugLevelStderr = level;
 }
 
-void Debug::setDebugLevelLogFile(DebugLevel level)
+void Debug::setDebugLevelLogFile(DebugLevel_t level)
 {
     if (level == mDebugLevelLogFile)
         return;
 
-    if ((mDebugLevelLogFile == Nothing) && (level != Nothing))
+    if ((mDebugLevelLogFile == DebugLevel_t::Nothing) && (level != DebugLevel_t::Nothing))
     {
         // enable logging to file
-        mLogFile = new QFile(mLogFilename);
+        mLogFilepath.getParentDir().mkPath();
+        mLogFile = new QFile(mLogFilepath.toStr());
         bool success = mLogFile->open(QFile::WriteOnly);
         if (success)
-            qDebug() << "enabled logging to file" << mLogFilename;
+        {
+            mDebugLevelLogFile = level; // activate logging to file immediately!
+            qDebug() << "enabled logging to file" << mLogFilepath.toNative();
+            qDebug() << "Qt version:" << qVersion();
+        }
         else
         {
+            qWarning() << "cannot enable logging to file" << mLogFilepath.toNative();
+            qWarning() << "error message:" << mLogFile->errorString();
             delete mLogFile;
             mLogFile = 0;
-            qWarning() << "cannot enable logging to file" << mLogFilename;
         }
     }
-    else if ((mDebugLevelLogFile != Nothing) && (level == Nothing) && (mLogFile))
+    else if ((mDebugLevelLogFile != DebugLevel_t::Nothing)
+             && (level == DebugLevel_t::Nothing) && (mLogFile))
     {
         // disable logging to file
         mLogFile->close();
@@ -95,22 +102,22 @@ void Debug::setDebugLevelLogFile(DebugLevel level)
     mDebugLevelLogFile = level;
 }
 
-Debug::DebugLevel Debug::getDebugLevelStderr() const
+Debug::DebugLevel_t Debug::getDebugLevelStderr() const
 {
     return mDebugLevelStderr;
 }
 
-Debug::DebugLevel Debug::getDebugLevelLogFile() const
+Debug::DebugLevel_t Debug::getDebugLevelLogFile() const
 {
     return mDebugLevelLogFile;
 }
 
-const QString& Debug::getLogFilename() const
+const FilePath& Debug::getLogFilepath() const
 {
-    return mLogFilename;
+    return mLogFilepath;
 }
 
-void Debug::print(DebugLevel level, const QString& msg, const char* file, int line)
+void Debug::print(DebugLevel_t level, const QString& msg, const char* file, int line)
 {
     if ((mDebugLevelStderr < level) && ((mDebugLevelLogFile < level) || (!mLogFile)))
         return; // if there is nothing to print, we will return immediately from this function
@@ -118,39 +125,39 @@ void Debug::print(DebugLevel level, const QString& msg, const char* file, int li
     const char* levelStr = "---------"; // the debug level string has always 9 characters
     switch (level)
     {
-        case DebugMsg:
+        case DebugLevel_t::DebugMsg:
             levelStr = "DEBUG-MSG";
             break;
-        case Warning:
+        case DebugLevel_t::Warning:
             levelStr = " WARNING ";
             break;
-        case Exception:
+        case DebugLevel_t::Exception:
             levelStr = "EXCEPTION";
             break;
-        case Critical:
+        case DebugLevel_t::Critical:
             levelStr = "CRITICAL ";
             break;
-        case Fatal:
+        case DebugLevel_t::Fatal:
             levelStr = "  FATAL  ";
             break;
         default:
             break;
     }
 
-    QString logMsg = QString("[%1] %2 (%3:%4)\n").arg(levelStr, msg.toLocal8Bit().constData(), file).arg(line);
+    QString logMsg = QString("[%1] %2 (%3:%4)").arg(levelStr, msg.toLocal8Bit().constData(),
+                                                    file).arg(line);
 
     if (mDebugLevelStderr >= level)
     {
         // write to stderr
-        *mStderrStream << logMsg;
-        mStderrStream->flush();
+        *mStderrStream << logMsg << endl;
     }
 
     if ((mDebugLevelLogFile >= level) && (mLogFile))
     {
         // write to the log file
-        mLogFile->write(logMsg.toLocal8Bit());
-        mLogFile->flush();
+        QTextStream logFileStream(mLogFile);
+        logFileStream << logMsg << endl;
     }
 }
 
@@ -163,19 +170,19 @@ void Debug::messageHandler(QtMsgType type, const QMessageLogContext& context, co
     switch (type)
     {
         case QtDebugMsg:
-            instance()->print(DebugMsg, msg, context.file, context.line);
+            instance()->print(DebugLevel_t::DebugMsg, msg, context.file, context.line);
             break;
 
         case QtWarningMsg:
-            instance()->print(Warning, msg, context.file, context.line);
+            instance()->print(DebugLevel_t::Warning, msg, context.file, context.line);
             break;
 
         case QtCriticalMsg:
-            instance()->print(Critical, msg, context.file, context.line);
+            instance()->print(DebugLevel_t::Critical, msg, context.file, context.line);
             break;
 
         case QtFatalMsg:
-            instance()->print(Fatal, msg, context.file, context.line);
+            instance()->print(DebugLevel_t::Fatal, msg, context.file, context.line);
             abort(); // fatal error --> quit the whole application!
     }
 }

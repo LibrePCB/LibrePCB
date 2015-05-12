@@ -22,8 +22,13 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <QtSql>
+
 #include "library.h"
+#include "../common/exceptions.h"
+#include "../common/file_io/filepath.h"
 #include "../workspace/workspace.h"
+
 
 namespace library{
 
@@ -31,13 +36,34 @@ namespace library{
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Library::Library(Workspace* workspace) :
-    QObject(0), mWorkspace(workspace)
+Library::Library(const FilePath& libPath) throw (Exception):
+    QObject(0),
+    mLibPath(libPath),
+    mLibFilePath(libPath.getPathTo("lib.db"))
 {
+    //Select and open sqlite library 'lib.db'
+    mLibDatabase = QSqlDatabase::addDatabase("QSQLITE", mLibFilePath.toNative());
+    mLibDatabase.setDatabaseName(mLibFilePath.toNative());
+
+    //Check if database is valid
+    if ( ! mLibDatabase.isValid())
+    {
+        throw RuntimeError(__FILE__, __LINE__, mLibFilePath.toStr(),
+            QString(tr("Invalid library file: \"%1\"")).arg(mLibFilePath.toNative()));
+    }
+
+    if ( ! mLibDatabase.open())
+    {
+        throw RuntimeError(__FILE__, __LINE__, mLibFilePath.toStr(),
+            QString(tr("Could not open library file: \"%1\"")).arg(mLibFilePath.toNative()));
+    }
+
+
 }
 
 Library::~Library()
 {
+    mLibDatabase.close();
 }
 
 /*****************************************************************************************

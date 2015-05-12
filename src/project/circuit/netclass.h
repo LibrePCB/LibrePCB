@@ -25,16 +25,18 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include "../erc/if_ercmsgprovider.h"
+#include "../../common/file_io/if_xmlserializableobject.h"
+#include "../../common/exceptions.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
-class Workspace;
-
 namespace project {
-class Project;
 class Circuit;
+class NetSignal;
+class ErcMsg;
 }
 
 /*****************************************************************************************
@@ -46,15 +48,35 @@ namespace project {
 /**
  * @brief The NetClass class
  */
-class NetClass : public QObject
+class NetClass final : public IF_ErcMsgProvider, public IF_XmlSerializableObject
 {
-        Q_OBJECT
+        Q_DECLARE_TR_FUNCTIONS(NetClass)
+        DECLARE_ERC_MSG_CLASS_NAME(NetClass)
 
     public:
 
         // Constructors / Destructor
-        explicit NetClass(Workspace* workspace, Project* project, Circuit* circuit);
-        ~NetClass();
+        explicit NetClass(const Circuit& circuit, const XmlDomElement& domElement) throw (Exception);
+        explicit NetClass(const Circuit& circuit, const QString& name) throw (Exception);
+        ~NetClass() noexcept;
+
+        // Getters
+        const QUuid& getUuid() const noexcept {return mUuid;}
+        const QString& getName() const noexcept {return mName;}
+        int getNetSignalCount() const noexcept {return mNetSignals.count();}
+
+        // Setters
+        void setName(const QString& name) throw (Exception);
+
+        // NetSignal Methods
+        void registerNetSignal(NetSignal& signal) noexcept;
+        void unregisterNetSignal(NetSignal& signal) noexcept;
+
+        // General Methods
+        void addToCircuit() noexcept;
+        void removeFromCircuit() noexcept;
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+
 
     private:
 
@@ -63,11 +85,24 @@ class NetClass : public QObject
         NetClass(const NetClass& other);
         NetClass& operator=(const NetClass& rhs);
 
-        // General
-        Workspace* mWorkspace;
-        Project* mProject;
-        Circuit* mCircuit;
+        // Private Methods
+        bool checkAttributesValidity() const noexcept;
+        void updateErcMessages() noexcept;
 
+
+        // General
+        const Circuit& mCircuit;
+        bool mAddedToCircuit;
+
+        // Misc
+        /// @brief the ERC message for unused netclasses
+        ErcMsg* mErcMsgUnusedNetClass;
+        /// @brief all registered netsignals
+        QHash<QUuid, NetSignal*> mNetSignals;
+
+        // Attributes
+        QUuid mUuid;
+        QString mName;
 };
 
 } // namespace project

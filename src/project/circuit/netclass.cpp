@@ -22,8 +22,12 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QtWidgets>
 #include "netclass.h"
+#include "../../common/exceptions.h"
+#include "netsignal.h"
+#include "circuit.h"
+#include "../erc/ercmsg.h"
+#include "../../common/file_io/xmldomelement.h"
 
 namespace project {
 
@@ -31,13 +35,128 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-NetClass::NetClass(Workspace* workspace, Project* project, Circuit* circuit) :
-    QObject(0), mWorkspace(workspace), mProject(project), mCircuit(circuit)
+NetClass::NetClass(const Circuit& circuit, const XmlDomElement& domElement) throw (Exception) :
+    mCircuit(circuit), mAddedToCircuit(false), mErcMsgUnusedNetClass(nullptr),
+    mUuid(domElement.getAttribute<QUuid>("uuid")),
+    mName(domElement.getAttribute("name", true))
 {
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-NetClass::~NetClass()
+NetClass::NetClass(const Circuit& circuit, const QString& name) throw (Exception) :
+    mCircuit(circuit), mAddedToCircuit(false), mErcMsgUnusedNetClass(nullptr),
+    mUuid(QUuid::createUuid()), mName(name)
 {
+    if (mName.isEmpty())
+    {
+        throw RuntimeError(__FILE__, __LINE__, QString(),
+            tr("The new netclass name must not be empty!"));
+    }
+
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+}
+
+NetClass::~NetClass() noexcept
+{
+    Q_ASSERT(mAddedToCircuit == false);
+    Q_ASSERT(mNetSignals.isEmpty() == true);
+    Q_ASSERT(mErcMsgUnusedNetClass == nullptr);
+}
+
+/*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
+
+void NetClass::setName(const QString& name) throw (Exception)
+{
+    if (name == mName) return;
+    if (name.isEmpty())
+    {
+        throw RuntimeError(__FILE__, __LINE__, QString(),
+            tr("The new netclass name must not be empty!"));
+    }
+    mName = name;
+    updateErcMessages();
+}
+
+/*****************************************************************************************
+ *  NetSignal Methods
+ ****************************************************************************************/
+
+void NetClass::registerNetSignal(NetSignal& signal) noexcept
+{
+    Q_ASSERT(mAddedToCircuit == true);
+    Q_ASSERT(mNetSignals.contains(signal.getUuid()) == false);
+    mNetSignals.insert(signal.getUuid(), &signal);
+    updateErcMessages();
+}
+
+void NetClass::unregisterNetSignal(NetSignal& signal) noexcept
+{
+    Q_ASSERT(mAddedToCircuit == true);
+    Q_ASSERT(mNetSignals.contains(signal.getUuid()) == true);
+    mNetSignals.remove(signal.getUuid());
+    updateErcMessages();
+}
+
+/*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+void NetClass::addToCircuit() noexcept
+{
+    Q_ASSERT(mAddedToCircuit == false);
+    Q_ASSERT(mNetSignals.isEmpty() == true);
+    mAddedToCircuit = true;
+    updateErcMessages();
+}
+
+void NetClass::removeFromCircuit() noexcept
+{
+    Q_ASSERT(mAddedToCircuit == true);
+    Q_ASSERT(mNetSignals.isEmpty() == true);
+    mAddedToCircuit = false;
+    updateErcMessages();
+}
+
+XmlDomElement* NetClass::serializeToXmlDomElement() const throw (Exception)
+{
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("netclass"));
+    root->setAttribute("uuid", mUuid);
+    root->setAttribute("name", mName);
+    return root.take();
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+bool NetClass::checkAttributesValidity() const noexcept
+{
+    if (mUuid.isNull())     return false;
+    if (mName.isEmpty())    return false;
+    return true;
+}
+
+void NetClass::updateErcMessages() noexcept
+{
+    if (mAddedToCircuit && mNetSignals.isEmpty())
+    {
+        if (!mErcMsgUnusedNetClass)
+        {
+            mErcMsgUnusedNetClass = new ErcMsg(mCircuit.getProject(), *this,
+                mUuid.toString(), "Unused", ErcMsg::ErcMsgType_t::CircuitWarning);
+        }
+        mErcMsgUnusedNetClass->setMsg(QString(tr("Unused net class: \"%1\"")).arg(mName));
+        mErcMsgUnusedNetClass->setVisible(true);
+    }
+    else if (mErcMsgUnusedNetClass)
+    {
+        delete mErcMsgUnusedNetClass;
+        mErcMsgUnusedNetClass = nullptr;
+    }
 }
 
 /*****************************************************************************************

@@ -25,13 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QDomDocument>
-
-/*****************************************************************************************
- *  Forward Declarations
- ****************************************************************************************/
-
-class Workspace;
+#include "librarybaseelement.h"
 
 /*****************************************************************************************
  *  Class LibraryElement
@@ -40,31 +34,47 @@ class Workspace;
 namespace library {
 
 /**
- * @brief The LibraryElement class
+ * @brief The LibraryElement class extends the LibraryBaseElement class with some
+ *        attributes and methods which are used for all library classes except categories.
  */
-class LibraryElement : public QObject
+class LibraryElement : public LibraryBaseElement
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit LibraryElement(Workspace* workspace, const QString& xmlFilename,
-                                const QString& xmlRootNodeName);
-        virtual ~LibraryElement();
+        explicit LibraryElement(const QString& xmlRootNodeName,
+                                const QUuid& uuid = QUuid::createUuid(),
+                                const Version& version = Version(),
+                                const QString& author = QString(),
+                                const QString& name_en_US = QString(),
+                                const QString& description_en_US = QString(),
+                                const QString& keywords_en_US = QString()) throw (Exception);
+        explicit LibraryElement(const FilePath& xmlFilePath,
+                                const QString& xmlRootNodeName) throw (Exception);
+        virtual ~LibraryElement() noexcept;
 
-    protected:
+        // Getters: Attributes
+        const QList<QUuid>& getCategories() const noexcept {return mCategories;}
 
-        // General
-        Workspace* mWorkspace;
-        QString mXmlFilename;
 
     private:
 
         // make some methods inaccessible...
-        LibraryElement();
         LibraryElement(const LibraryElement& other);
         LibraryElement& operator=(const LibraryElement& rhs);
+
+
+    protected:
+
+        // Protected Methods
+        virtual void parseDomTree(const XmlDomElement& root) throw (Exception);
+        virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+        virtual bool checkAttributesValidity() const noexcept;
+
+        // General Library Element Attributes
+        QList<QUuid> mCategories;
 };
 
 } // namespace library

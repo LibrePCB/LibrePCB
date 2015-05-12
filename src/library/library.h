@@ -25,12 +25,10 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <QtSql>
 
-/*****************************************************************************************
- *  Forward Declarations
- ****************************************************************************************/
-
-class Workspace;
+#include "../common/exceptions.h"
+#include "../common/file_io/filepath.h"
 
 /*****************************************************************************************
  *  Class Library
@@ -50,7 +48,16 @@ class Library : public QObject
     public:
 
         // Constructors / Destructor
-        explicit Library(Workspace* workspace);
+
+        /**
+        * @brief Constructor to open the library in the existing workspace
+        *
+        * @param libPath    The filepath to the library directory
+        *
+        * @throw Exception If the library could not be opened, this constructor throws
+        *                  an exception.
+        */
+        explicit Library(const FilePath& libPath) throw (Exception);
         ~Library();
 
     private:
@@ -60,9 +67,9 @@ class Library : public QObject
         Library(const Library& other);
         Library& operator=(const Library& rhs);
 
-        // General
-        Workspace* mWorkspace; ///< the pointer to the Workspace object (from the ctor)
-
+        FilePath mLibPath; ///< a FilePath object which represents the library directory
+        FilePath mLibFilePath; ///<a FiltePath object which represents the lib.db-file
+        QSqlDatabase mLibDatabase; ///<a QSqlDatabase object which contents the lib.db-file
 };
 
 } // namespace library

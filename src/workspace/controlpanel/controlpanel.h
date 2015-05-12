@@ -31,8 +31,6 @@
  *  Forward Declarations
  ****************************************************************************************/
 
-class Workspace;
-
 namespace Ui {
 class ControlPanel;
 }
@@ -45,32 +43,35 @@ class ControlPanel;
  * @brief The ControlPanel class
  *
  * @author ubruhin
- *
  * @date 2014-06-23
  */
-class ControlPanel : public QMainWindow
+class ControlPanel final : public QMainWindow
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit ControlPanel(Workspace* workspace, QAbstractItemModel* projectTreeModel,
+        explicit ControlPanel(QAbstractItemModel* projectTreeModel,
                               QAbstractItemModel* recentProjectsModel,
                               QAbstractItemModel* favoriteProjectsModel);
         ~ControlPanel();
+
 
     protected:
 
         // Inherited Methods
         virtual void closeEvent(QCloseEvent* event);
 
+
     private slots:
 
         // Actions
         void on_actionAbout_triggered();
+        void on_actionNew_Project_triggered();
         void on_actionOpen_Project_triggered();
         void on_actionClose_all_open_projects_triggered();
+        void on_actionSwitch_Workspace_triggered();
         void on_projectTreeView_clicked(const QModelIndex& index);
         void on_projectTreeView_doubleClicked(const QModelIndex& index);
         void on_projectTreeView_customContextMenuRequested(const QPoint& pos);
@@ -81,6 +82,7 @@ class ControlPanel : public QMainWindow
         void on_recentProjectsListView_customContextMenuRequested(const QPoint &pos);
         void on_favoriteProjectsListView_customContextMenuRequested(const QPoint &pos);
 
+
     private:
 
         // make some methods inaccessible...
@@ -88,13 +90,14 @@ class ControlPanel : public QMainWindow
         ControlPanel(const ControlPanel& other);
         ControlPanel& operator=(const ControlPanel& rhs);
 
+
         // General private methods
         void saveSettings();
         void loadSettings();
 
-        Ui::ControlPanel* mUi;
 
-        Workspace* mWorkspace;
+        // Attributes
+        Ui::ControlPanel* mUi;
 };
 
 #endif // CONTROLPANEL_H

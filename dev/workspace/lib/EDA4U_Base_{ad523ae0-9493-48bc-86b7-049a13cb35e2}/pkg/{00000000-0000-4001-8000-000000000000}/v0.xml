@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- This file contains comments for documentation -->
+<package file_version="0">
+    <meta>
+        <uuid>{00000000-0000-4001-8000-000000000000}</uuid>
+        <version>1</version>
+        <author>EDA4U</author>
+        <created>2013-04-13T12:43:52Z</created>
+        <last_modified>2013-04-20T18:01:33Z</last_modified>
+        <footprint>{00000000-0000-4001-8000-000000000000}</footprint>
+        <model>{00000000-0000-4001-8000-000000000000}</model>
+        <name locale="en_US">test package 1</name>
+        <description locale="en_US">description...</description>
+        <keywords locale="en_US">word1 word2 word3...</keywords>
+    </meta>
+    <categories>
+        <!-- All Package Categories of this Package -->
+        <category>{00000000-0000-4001-8000-000000000000}</category>
+    </categories>
+    <changelog/>
+    <attachements/>
+    <properties>
+        <!-- TODO -->
+        <model_delta_pos x="0" y="0" z="0" />
+        <model_delta_angle x="0" y="180" z="0" />
+    </properties>
+</package>

@@ -22,9 +22,8 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QDomDocument>
-#include <QDomElement>
 #include "libraryelement.h"
+#include "../common/file_io/xmldomelement.h"
 
 namespace library {
 
@@ -32,15 +31,53 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-LibraryElement::LibraryElement(Workspace* workspace, const QString& xmlFilename,
-                               const QString& xmlRootNodeName) :
-    QObject(0), mWorkspace(workspace), mXmlFilename(xmlFilename)
+LibraryElement::LibraryElement(const QString& xmlRootNodeName, const QUuid& uuid,
+                               const Version& version, const QString& author,
+                               const QString& name_en_US, const QString& description_en_US,
+                               const QString& keywords_en_US) throw (Exception) :
+    LibraryBaseElement(xmlRootNodeName, uuid, version, author, name_en_US, description_en_US, keywords_en_US)
 {
-    Q_UNUSED(xmlRootNodeName);
 }
 
-LibraryElement::~LibraryElement()
+LibraryElement::LibraryElement(const FilePath& xmlFilePath,
+                               const QString& xmlRootNodeName) throw (Exception) :
+    LibraryBaseElement(xmlFilePath, xmlRootNodeName)
 {
+}
+
+LibraryElement::~LibraryElement() noexcept
+{
+}
+
+/*****************************************************************************************
+ *  Protected Methods
+ ****************************************************************************************/
+
+void LibraryElement::parseDomTree(const XmlDomElement& root) throw (Exception)
+{
+    LibraryBaseElement::parseDomTree(root);
+
+    // read category UUIDs
+    for (XmlDomElement* node = root.getFirstChild("categories/category", true, false);
+         node; node = node->getNextSibling("category"))
+    {
+        mCategories.append(node->getText<QUuid>());
+    }
+}
+
+XmlDomElement* LibraryElement::serializeToXmlDomElement() const throw (Exception)
+{
+    QScopedPointer<XmlDomElement> root(LibraryBaseElement::serializeToXmlDomElement());
+    XmlDomElement* categories = root->appendChild("categories");
+    foreach (const QUuid& uuid, mCategories)
+        categories->appendTextChild("category", uuid.toString());
+    return root.take();
+}
+
+bool LibraryElement::checkAttributesValidity() const noexcept
+{
+    if (!LibraryBaseElement::checkAttributesValidity()) return false;
+    return true;
 }
 
 /*****************************************************************************************
