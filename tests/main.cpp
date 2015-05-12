@@ -22,7 +22,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include <common/debug.h>
 #include <common/exceptions.h>
 
@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     Debug::instance()->setDebugLevelLogFile(Debug::Nothing);
     Debug::instance()->setDebugLevelStderr(Debug::Nothing);
 
-    ::testing::InitGoogleTest(&argc, argv);
+    ::testing::InitGoogleMock(&argc, argv);
 
     return RUN_ALL_TESTS();
 }

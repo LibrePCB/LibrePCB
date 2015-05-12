@@ -19,15 +19,16 @@ QT -= gui widgets
 CONFIG += console
 CONFIG -= app_bundle
 
-PRE_TARGETDEPS += $${DESTDIR}/libgtest.a
+PRE_TARGETDEPS += $${DESTDIR}/libgmock.a
 
 INCLUDEPATH += \
-    ../3rdparty/gtest/include \
+    ../3rdparty/gmock/gtest/include \
+    ../3rdparty/gmock/include \
     ../src
 
 LIBS += \
     -L$${DESTDIR} \
-    -lgtest
+    -lgmock
 
 SOURCES += main.cpp \
     ../src/common/debug.cpp \
