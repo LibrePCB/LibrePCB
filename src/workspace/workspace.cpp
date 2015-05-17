@@ -174,6 +174,7 @@ Project* Workspace::createProject(const FilePath& filepath) noexcept
     mOpenProjects.insert(filepath.toUnique().toStr(), project);
     mRecentProjectsModel->setLastRecentProject(filepath);
 
+    if (project->getBoards().count() > 0) project->showBoardEditor();
     project->showSchematicEditor();
 
     return project;
@@ -221,6 +222,7 @@ Project* Workspace::openProject(const FilePath& filepath) noexcept
         mRecentProjectsModel->setLastRecentProject(filepath);
     }
 
+    if (openProject->getBoards().count() > 0) openProject->showBoardEditor();
     openProject->showSchematicEditor();
 
     return openProject;

@@ -39,6 +39,7 @@
 #include "../settings/projectsettings.h"
 #include "../../common/graphics/graphicsview.h"
 #include "../../common/gridproperties.h"
+#include "cmd/cmdschematicadd.h"
 
 namespace project {
 
@@ -83,6 +84,8 @@ SchematicEditor::SchematicEditor(Project& project, bool readOnly) :
     connect(mUi->actionZoom_All, &QAction::triggered, mGraphicsView, &GraphicsView::zoomAll);
     connect(mUi->actionShow_Control_Panel, &QAction::triggered,
             &Workspace::instance(), &Workspace::showControlPanel);
+    connect(mUi->actionShow_Board_Editor, &QAction::triggered,
+            &mProject, &Project::showBoardEditor);
     connect(mUi->actionEditNetclasses, &QAction::triggered,
             [this](){mProject.getCircuit().execEditNetClassesDialog(this);});
     connect(mUi->actionProjectSettings, &QAction::triggered,
@@ -266,6 +269,24 @@ void SchematicEditor::on_actionClose_Project_triggered()
     mProject.close(this);
 }
 
+void SchematicEditor::on_actionNew_Schematic_Page_triggered()
+{
+    bool ok = false;
+    QString name = QInputDialog::getText(this, tr("Add schematic page"),
+                       tr("Choose a name:"), QLineEdit::Normal, tr("New Page"), &ok);
+    if (!ok) return;
+
+    try
+    {
+        CmdSchematicAdd* cmd = new CmdSchematicAdd(mProject, name);
+        mProject.getUndoStack().execCmd(cmd);
+    }
+    catch (Exception& e)
+    {
+        QMessageBox::critical(this, tr("Error"), e.getUserMsg());
+    }
+}
+
 void SchematicEditor::on_actionUndo_triggered()
 {
     try
@@ -405,3 +426,4 @@ bool SchematicEditor::graphicsViewEventHandler(QEvent* event)
  ****************************************************************************************/
 
 } // namespace project
+

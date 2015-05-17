@@ -49,6 +49,8 @@ class Circuit;
 class SchematicEditor;
 class Schematic;
 class ErcMsgList;
+class BoardEditor;
+class Board;
 }
 
 /*****************************************************************************************
@@ -165,64 +167,6 @@ class Project final : public QObject, public IF_AttributeProvider,
          */
         Circuit& getCircuit() const noexcept {return *mCircuit;}
 
-        /**
-         * @brief Get all Schematic Layers
-         *
-         * @return A reference to the QHash with all schematic layers
-         */
-        const QHash<uint, SchematicLayer*>& getSchematicLayers() const noexcept {return mSchematicLayers;}
-
-        /**
-         * @brief Get a Schematic Layer with a specific ID
-         *
-         * @param id    The ID of the layer
-         *
-         * @return  A pointer to the SchematicLayer object, or nullptr if there is no layer
-         *          with the specified ID
-         */
-        SchematicLayer* getSchematicLayer(uint id) const noexcept {return mSchematicLayers.value(id, nullptr);}
-
-        /**
-         * @brief Get the page index of a specific schematic
-         *
-         * @return the schematic index (-1 if the schematic does not exist)
-         */
-        int getSchematicIndex(const Schematic* schematic) const noexcept;
-
-        /**
-         * @brief Get all schematics
-         *
-         * @return A QList with all schematics
-         */
-        const QList<Schematic*>& getSchematics() const noexcept {return mSchematics;}
-
-        /**
-         * @brief Get the schematic page at a specific index
-         *
-         * @param index     The page index (zero is the first)
-         *
-         * @return A pointer to the specified schematic, or nullptr if index is invalid
-         */
-        Schematic* getSchematicByIndex(int index) const noexcept {return mSchematics.value(index, nullptr);}
-
-        /**
-         * @brief Get the schematic page with a specific UUID
-         *
-         * @param uuid      The schematic UUID
-         *
-         * @return A pointer to the specified schematic, or nullptr if uuid is invalid
-         */
-        Schematic* getSchematicByUuid(const QUuid& uuid) const noexcept;
-
-        /**
-         * @brief Get the schematic page with a specific name
-         *
-         * @param name      The schematic name
-         *
-         * @return A pointer to the specified schematic, or nullptr if name is invalid
-         */
-        Schematic* getSchematicByName(const QString& name) const noexcept;
-
 
         // Getters: Attributes
 
@@ -310,7 +254,65 @@ class Project final : public QObject, public IF_AttributeProvider,
         void setLastModified(const QDateTime& newLastModified) noexcept;
 
 
-        // General Methods
+        // Schematic Methods
+
+        /**
+         * @brief Get all Schematic Layers
+         *
+         * @return A reference to the QHash with all schematic layers
+         */
+        const QHash<uint, SchematicLayer*>& getSchematicLayers() const noexcept {return mSchematicLayers;}
+
+        /**
+         * @brief Get a Schematic Layer with a specific ID
+         *
+         * @param id    The ID of the layer
+         *
+         * @return  A pointer to the SchematicLayer object, or nullptr if there is no layer
+         *          with the specified ID
+         */
+        SchematicLayer* getSchematicLayer(uint id) const noexcept {return mSchematicLayers.value(id, nullptr);}
+
+        /**
+         * @brief Get the page index of a specific schematic
+         *
+         * @return the schematic index (-1 if the schematic does not exist)
+         */
+        int getSchematicIndex(const Schematic* schematic) const noexcept;
+
+        /**
+         * @brief Get all schematics
+         *
+         * @return A QList with all schematics
+         */
+        const QList<Schematic*>& getSchematics() const noexcept {return mSchematics;}
+
+        /**
+         * @brief Get the schematic page at a specific index
+         *
+         * @param index     The page index (zero is the first)
+         *
+         * @return A pointer to the specified schematic, or nullptr if index is invalid
+         */
+        Schematic* getSchematicByIndex(int index) const noexcept {return mSchematics.value(index, nullptr);}
+
+        /**
+         * @brief Get the schematic page with a specific UUID
+         *
+         * @param uuid      The schematic UUID
+         *
+         * @return A pointer to the specified schematic, or nullptr if uuid is invalid
+         */
+        Schematic* getSchematicByUuid(const QUuid& uuid) const noexcept;
+
+        /**
+         * @brief Get the schematic page with a specific name
+         *
+         * @param name      The schematic name
+         *
+         * @return A pointer to the specified schematic, or nullptr if name is invalid
+         */
+        Schematic* getSchematicByName(const QString& name) const noexcept;
 
         /**
          * @brief Create a new schematic (page)
@@ -360,6 +362,89 @@ class Project final : public QObject, public IF_AttributeProvider,
          */
         void exportSchematicsAsPdf(const FilePath& filepath) throw (Exception);
 
+
+        // Board Methods
+
+        /**
+         * @brief Get the index of a specific board
+         *
+         * @return the board index (-1 if the board does not exist)
+         */
+        int getBoardIndex(const Board* board) const noexcept;
+
+        /**
+         * @brief Get all boards
+         *
+         * @return A QList with all boards
+         */
+        const QList<Board*>& getBoards() const noexcept {return mBoards;}
+
+        /**
+         * @brief Get the board at a specific index
+         *
+         * @param index     The board index (zero is the first)
+         *
+         * @return A pointer to the specified board, or nullptr if index is invalid
+         */
+        Board* getBoardByIndex(int index) const noexcept {return mBoards.value(index, nullptr);}
+
+        /**
+         * @brief Get the board with a specific UUID
+         *
+         * @param uuid      The board UUID
+         *
+         * @return A pointer to the specified board, or nullptr if uuid is invalid
+         */
+        Board* getBoardByUuid(const QUuid& uuid) const noexcept;
+
+        /**
+         * @brief Get the board with a specific name
+         *
+         * @param name      The board name
+         *
+         * @return A pointer to the specified board, or nullptr if name is invalid
+         */
+        Board* getBoardByName(const QString& name) const noexcept;
+
+        /**
+         * @brief Create a new board
+         *
+         * @param name  The board name
+         *
+         * @return A pointer to the new board
+         *
+         * @throw Exception This method throws an exception on error.
+         */
+        Board* createBoard(const QString& name) throw (Exception);
+
+        /**
+         * @brief Add an existing board to this project
+         *
+         * @param board         The board to add
+         * @param newIndex      The desired index in the list (after inserting it)
+         *
+         * @throw Exception     On error
+         *
+         * @undocmd{project#CmdBoardAdd}
+         */
+        void addBoard(Board* board, int newIndex = -1) throw (Exception);
+
+        /**
+         * @brief Remove a board from this project
+         *
+         * @param board             The board to remove
+         * @param deleteBoard       If true, the board object will be deleted
+         *                          (Set this to true only when called from ctor or dtor!!)
+         *
+         * @throw Exception     On error
+         *
+         * @undocmd{project#CmdBoardRemove}
+         */
+        void removeBoard(Board* board, bool deleteBoard = false) throw (Exception);
+
+
+        // General Methods
+
         /**
          * @brief Inform the project that a project related window is about to close
          *
@@ -394,6 +479,11 @@ class Project final : public QObject, public IF_AttributeProvider,
          * @brief Open the schematic editor window and bring it to the front
          */
         void showSchematicEditor() noexcept;
+
+        /**
+         * @brief Open the board editor window and bring it to the front
+         */
+        void showBoardEditor() noexcept;
 
         /**
          * @brief Set the "modified" flag of this project
@@ -465,6 +555,20 @@ class Project final : public QObject, public IF_AttributeProvider,
          * @param oldIndex  The index of the removed schematic
          */
         void schematicRemoved(int oldIndex);
+
+        /**
+         * @brief This signal is emitted after a board was added to the project
+         *
+         * @param newIndex  The index of the added board
+         */
+        void boardAdded(int newIndex);
+
+        /**
+         * @brief This signal is emitted after a board was removed from the project
+         *
+         * @param oldIndex  The index of the removed board
+         */
+        void boardRemoved(int oldIndex);
 
 
     private:
@@ -539,6 +643,9 @@ class Project final : public QObject, public IF_AttributeProvider,
         QList<Schematic*> mRemovedSchematics; ///< All removed schematics of this project
         SchematicEditor* mSchematicEditor; ///< The schematic editor (GUI)
         QHash<uint, SchematicLayer*> mSchematicLayers; ///< All schematic layers of this project
+        QList<Board*> mBoards; ///< All boards of this project
+        QList<Board*> mRemovedBoards; ///< All removed boards of this project
+        BoardEditor* mBoardEditor; ///< The board editor (GUI)
 };
 
 } // namespace project

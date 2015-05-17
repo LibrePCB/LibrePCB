@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SCHEMATICEDITOR_H
-#define PROJECT_SCHEMATICEDITOR_H
+#ifndef PROJECT_BOARDEDITOR_H
+#define PROJECT_BOARDEDITOR_H
 
 /*****************************************************************************************
  *  Includes
@@ -37,99 +37,96 @@ class GridProperties;
 
 namespace project {
 class Project;
-class Schematic;
-class SchematicPagesDock;
-class ErcMsgDock;
-class SES_FSM;
+class Board;
 }
 
 namespace Ui {
-class SchematicEditor;
+class BoardEditor;
 }
 
 /*****************************************************************************************
- *  Class SchematicEditor
+ *  Class BoardEditor
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The SchematicEditor class
+ * @brief The BoardEditor class
  */
-class SchematicEditor final : public QMainWindow, public IF_GraphicsViewEventHandler
+class BoardEditor final : public QMainWindow, public IF_GraphicsViewEventHandler
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit SchematicEditor(Project& project, bool readOnly);
-        ~SchematicEditor();
+        explicit BoardEditor(Project& project, bool readOnly);
+        ~BoardEditor();
 
         // Getters
         Project& getProject() const noexcept {return mProject;}
-        int getActiveSchematicIndex() const noexcept {return mActiveSchematicIndex;}
-        Schematic* getActiveSchematic() const noexcept;
+        int getActiveBoardIndex() const noexcept {return mActiveBoardIndex;}
+        Board* getActiveBoard() const noexcept;
         const GridProperties& getGridProperties() const noexcept {return *mGridProperties;}
 
         // Setters
-        bool setActiveSchematicIndex(int index) noexcept;
+        bool setActiveBoardIndex(int index) noexcept;
 
         // General Methods
         void abortAllCommands() noexcept;
+
 
     protected:
 
         void closeEvent(QCloseEvent* event);
 
+
+    public slots:
+
+        void boardAdded(int newIndex);
+        void boardRemoved(int oldIndex);
+
+
     private slots:
 
         // Actions
-        void on_actionClose_Project_triggered();
-        void on_actionNew_Schematic_Page_triggered();
+        void on_actionProjectClose_triggered();
+        void on_actionNewBoard_triggered();
         void on_actionUndo_triggered();
         void on_actionRedo_triggered();
         void on_actionGrid_triggered();
-        void on_actionPDF_Export_triggered();
-        void on_actionToolAddComponent_triggered();
-        void on_actionAddGenCmp_Resistor_triggered();
-        void on_actionAddGenCmp_BipolarCapacitor_triggered();
-        void on_actionAddGenCmp_UnipolarCapacitor_triggered();
-        void on_actionAddGenCmp_Inductor_triggered();
-        void on_actionAddGenCmp_gnd_triggered();
-        void on_actionAddGenCmp_vcc_triggered();
+        void on_actionExportAsPdf_triggered();
         void on_actionProjectProperties_triggered();
+        void boardListActionGroupTriggered(QAction* action);
+
 
     signals:
 
-        void activeSchematicChanged(int oldIndex, int newIndex);
+        void activeBoardChanged(int oldIndex, int newIndex);
+
 
     private:
 
         // make some methods inaccessible...
-        SchematicEditor();
-        SchematicEditor(const SchematicEditor& other);
-        SchematicEditor& operator=(const SchematicEditor& rhs);
+        BoardEditor() = delete;
+        BoardEditor(const BoardEditor& other) = delete;
+        BoardEditor& operator=(const BoardEditor& rhs) = delete;
 
         // Private Methods
         bool graphicsViewEventHandler(QEvent* event);
 
         // General Attributes
         Project& mProject;
-        Ui::SchematicEditor* mUi;
+        Ui::BoardEditor* mUi;
         GraphicsView* mGraphicsView;
         GridProperties* mGridProperties;
 
-        int mActiveSchematicIndex;
-
-        // Docks
-        SchematicPagesDock* mPagesDock;
-        ErcMsgDock* mErcMsgDock;
-
-        // Finite State Machine
-        SES_FSM* mFsm;
+        // Misc
+        int mActiveBoardIndex;
+        QList<QAction*> mBoardListActions;
+        QActionGroup mBoardListActionGroup;
 };
 
 } // namespace project
 
-#endif // PROJECT_SCHEMATICEDITOR_H
+#endif // PROJECT_BOARDEDITOR_H

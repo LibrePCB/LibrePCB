@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<board version="0">
+    <meta>
+        <uuid>{ace706f3-b818-4ce9-86ab-e3185109c18f}</uuid>
+        <name>default</name>
+    </meta>
+    <properties>
+        <grid_properties interval="2.540000" type="lines" unit="millimeters"/>
+    </properties>
+</board>

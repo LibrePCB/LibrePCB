@@ -207,7 +207,9 @@ SOURCES += \
     project/schematics/graphicsitems/sgi_symbolpin.cpp \
     common/gridproperties.cpp \
     library/sym/symbolpreviewgraphicsitem.cpp \
-    library/sym/symbolpinpreviewgraphicsitem.cpp
+    library/sym/symbolpinpreviewgraphicsitem.cpp \
+    project/boards/boardeditor.cpp \
+    project/boards/cmd/cmdboardadd.cpp
 
 HEADERS += \
     common/units/all_length_units.h \
@@ -363,7 +365,9 @@ HEADERS += \
     project/schematics/graphicsitems/sgi_symbolpin.h \
     common/gridproperties.h \
     library/sym/symbolpreviewgraphicsitem.h \
-    library/sym/symbolpinpreviewgraphicsitem.h
+    library/sym/symbolpinpreviewgraphicsitem.h \
+    project/boards/boardeditor.h \
+    project/boards/cmd/cmdboardadd.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \
@@ -378,7 +382,8 @@ FORMS += \
     project/schematics/symbolinstancepropertiesdialog.ui \
     project/dialogs/projectpropertieseditordialog.ui \
     project/dialogs/addgencompdialog.ui \
-    project/settings/projectsettingsdialog.ui
+    project/settings/projectsettingsdialog.ui \
+    project/boards/boardeditor.ui
 
 
 # Custom compiler "lrelease" for qm generation

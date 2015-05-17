@@ -25,10 +25,21 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <QtWidgets>
+#include "../../common/if_attributeprovider.h"
+#include "../../common/file_io/if_xmlserializableobject.h"
+#include "../../common/units/all_length_units.h"
+#include "../../common/file_io/filepath.h"
+#include "../../common/exceptions.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
+
+class GridProperties;
+class GraphicsView;
+class GraphicsScene;
+class SmartXmlFile;
 
 namespace project {
 class Project;
@@ -43,24 +54,89 @@ namespace project {
 /**
  * @brief The Board class represents a PCB of a project and is always part of a circuit
  */
-class Board final : public QObject
+class Board final : public QObject, public IF_AttributeProvider,
+        public IF_XmlSerializableObject
 {
         Q_OBJECT
 
     public:
 
-        explicit Board(Project& project);
-        ~Board();
+        // Constructors / Destructor
+        explicit Board(Project& project, const FilePath& filepath, bool restore, bool readOnly) throw (Exception) :
+            Board(project, filepath, restore, readOnly, false, QString()) {}
+        ~Board() noexcept;
+
+        // Getters: General
+        Project& getProject() const noexcept {return mProject;}
+        const FilePath& getFilePath() const noexcept {return mFilePath;}
+        const GridProperties& getGridProperties() const noexcept {return *mGridProperties;}
+        bool isEmpty() const noexcept;
+
+        // Setters: General
+        void setGridProperties(const GridProperties& grid) noexcept;
+
+        // Getters: Attributes
+        const QUuid& getUuid() const noexcept {return mUuid;}
+        const QString& getName() const noexcept {return mName;}
+        const QIcon& getIcon() const noexcept {return mIcon;}
+
+        // General Methods
+        void addToProject() throw (Exception);
+        void removeFromProject() throw (Exception);
+        bool save(bool toOriginal, QStringList& errors) noexcept;
+        void showInView(GraphicsView& view) noexcept;
+        void saveViewSceneRect(const QRectF& rect) noexcept {mViewRect = rect;}
+        const QRectF& restoreViewSceneRect() const noexcept {return mViewRect;}
+
+        // Helper Methods
+        bool getAttributeValue(const QString& attrNS, const QString& attrKey,
+                               bool passToParents, QString& value) const noexcept;
+
+        // Static Methods
+        static Board* create(Project& project, const FilePath& filepath,
+                             const QString& name) throw (Exception);
+
+
+    signals:
+
+        /// @copydoc IF_AttributeProvider#attributesChanged()
+        void attributesChanged();
+
 
     private:
 
         // make some methods inaccessible...
-        Board();
-        Board(const Board& other);
-        Board& operator=(const Board& rhs);
+        Board() = delete;
+        Board(const Board& other) = delete;
+        Board& operator=(const Board& rhs) = delete;
+
+        // Private Methods
+        explicit Board(Project& project, const FilePath& filepath, bool restore,
+                       bool readOnly, bool create, const QString& newName) throw (Exception);
+        void updateIcon() noexcept;
+
+        bool checkAttributesValidity() const noexcept;
+
+        /**
+         * @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+         */
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+
 
         // General
         Project& mProject; ///< A reference to the Project object (from the ctor)
+        FilePath mFilePath; ///< the filepath of the schematic *.xml file (from the ctor)
+        SmartXmlFile* mXmlFile;
+        bool mAddedToProject;
+
+        GraphicsScene* mGraphicsScene;
+        QRectF mViewRect;
+        GridProperties* mGridProperties;
+
+        // Attributes
+        QUuid mUuid;
+        QString mName;
+        QIcon mIcon;
 
 };
 
