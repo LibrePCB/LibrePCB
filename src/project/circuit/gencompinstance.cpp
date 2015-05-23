@@ -318,7 +318,7 @@ XmlDomElement* GenCompInstance::serializeToXmlDomElement() const throw (Exceptio
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("instance"));
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("generic_component_instance"));
     root->setAttribute("uuid", mUuid);
     root->setAttribute("generic_component", mGenComp->getUuid());
     root->setAttribute("symbol_variant", mGenCompSymbVar->getUuid());
