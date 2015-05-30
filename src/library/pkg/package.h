@@ -42,20 +42,30 @@ class Package final : public LibraryElement
 
     public:
 
-        explicit Package(const FilePath& xmlFilePath);
-        virtual ~Package();
+        // Constructors / Destructor
+        explicit Package(const FilePath& xmlFilePath) throw (Exception);
+        virtual ~Package() noexcept;
+
+        // Getters
+        const QUuid& getFootprintUuid() const noexcept {return mFootprintUuid;}
+
 
     private:
 
         // make some methods inaccessible...
-        Package();
-        Package(const Package& other);
-        Package& operator=(const Package& rhs);
+        Package() = delete;
+        Package(const Package& other) = delete;
+        Package& operator=(const Package& rhs) = delete;
 
 
         // Private Methods
         void parseDomTree(const XmlDomElement& root) throw (Exception);
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+        bool checkAttributesValidity() const noexcept;
 
+
+        // Attributes
+        QUuid mFootprintUuid;
 };
 
 } // namespace library

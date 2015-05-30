@@ -42,8 +42,14 @@ class Component final : public LibraryElement
 
     public:
 
-        explicit Component(const FilePath& xmlFilePath);
-        virtual ~Component();
+        // Constructors / Destructor
+        explicit Component(const FilePath& xmlFilePath) throw (Exception);
+        ~Component() noexcept;
+
+        // Getters
+        const QUuid& getGenCompUuid() const noexcept {return mGenericComponentUuid;}
+        const QUuid& getPackageUuid() const noexcept {return mPackageUuid;}
+        const QHash<QUuid, QUuid>& getPadSignalMap() const noexcept {return mPadSignalMap;}
 
     private:
 
@@ -55,7 +61,14 @@ class Component final : public LibraryElement
 
         // Private Methods
         void parseDomTree(const XmlDomElement& root) throw (Exception);
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+        bool checkAttributesValidity() const noexcept;
 
+
+        // Attributes
+        QUuid mGenericComponentUuid;
+        QUuid mPackageUuid;
+        QHash<QUuid, QUuid> mPadSignalMap;
 };
 
 } // namespace library

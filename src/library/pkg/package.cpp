@@ -23,6 +23,7 @@
 
 #include <QtCore>
 #include "package.h"
+#include "../../common/file_io/xmldomelement.h"
 
 namespace library {
 
@@ -30,13 +31,13 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Package::Package(const FilePath& xmlFilePath) :
+Package::Package(const FilePath& xmlFilePath) throw (Exception) :
     LibraryElement(xmlFilePath, "package")
 {
     readFromFile();
 }
 
-Package::~Package()
+Package::~Package() noexcept
 {
 }
 
@@ -47,6 +48,22 @@ Package::~Package()
 void Package::parseDomTree(const XmlDomElement& root) throw (Exception)
 {
     LibraryElement::parseDomTree(root);
+
+    mFootprintUuid = root.getFirstChild("meta/footprint", true, true)->getText<QUuid>(true);
+}
+
+XmlDomElement* Package::serializeToXmlDomElement() const throw (Exception)
+{
+    QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement());
+    root->getFirstChild("meta", true)->appendTextChild("footprint", mFootprintUuid);
+    return root.take();
+}
+
+bool Package::checkAttributesValidity() const noexcept
+{
+    if (!LibraryElement::checkAttributesValidity())             return false;
+    if (mFootprintUuid.isNull())                                return false;
+    return true;
 }
 
 /*****************************************************************************************

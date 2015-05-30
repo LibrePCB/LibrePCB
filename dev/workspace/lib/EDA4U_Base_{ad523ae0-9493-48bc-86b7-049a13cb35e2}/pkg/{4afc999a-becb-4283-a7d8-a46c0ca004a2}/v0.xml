@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<package file_version="0">
+    <meta>
+        <uuid>{4afc999a-becb-4283-a7d8-a46c0ca004a2}</uuid>
+        <version>1</version>
+        <author>EDA4U</author>
+        <created>2013-04-13T12:43:52Z</created>
+        <last_modified>2013-04-20T18:01:33Z</last_modified>
+        <footprint>{094414be-cd2e-46c2-bf79-e0ed12c0209d}</footprint>
+        <model></model>
+        <name locale="en_US">0603 Resistor</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US"></keywords>
+    </meta>
+    <categories>
+        <category>{00000000-0000-4001-8000-000000000000}</category>
+    </categories>
+    <changelog/>
+    <attachements/>
+    <properties>
+        <model_delta_pos x="0" y="0" z="0" />
+        <model_delta_angle x="0" y="180" z="0" />
+    </properties>
+</package>
