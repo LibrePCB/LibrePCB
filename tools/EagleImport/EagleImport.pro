@@ -55,10 +55,10 @@ SOURCES += \
 #    ../../src/workspace/projecttreemodel.cpp \
 #    ../../src/workspace/projecttreeitem.cpp \
     ../../src/library/libraryelement.cpp \
-    ../../src/library/symbol.cpp \
+    ../../src/library/sym/symbol.cpp \
 #    ../../src/library/component.cpp \
 #    ../../src/library/footprint.cpp \
-    ../../src/library/genericcomponent.cpp \
+    ../../src/library/gencmp/genericcomponent.cpp \
 #    ../../src/library/model.cpp \
 #    ../../src/library/package.cpp \
 #    ../../src/library/spicemodel.cpp \
@@ -80,9 +80,9 @@ SOURCES += \
 #    ../../src/common/systeminfo.cpp \
     ../../src/common/debug.cpp \
 #    ../../src/common/filelock.cpp \
-    ../../src/common/filepath.cpp \
+    ../../src/common/file_io/filepath.cpp \
 #    ../../src/common/schematiclayer.cpp \
-    ../../src/common/smartxmlfile.cpp \
+    ../../src/common/file_io/smartxmlfile.cpp \
     ../../src/library/librarybaseelement.cpp \
 #    ../../src/project/circuit/cmd/cmdnetclassadd.cpp \
 #    ../../src/project/circuit/cmd/cmdnetclassremove.cpp \
@@ -121,13 +121,13 @@ SOURCES += \
 #    ../../src/common/dialogs/gridsettingsdialog.cpp \
 #    ../../src/workspace/settings/items/wsi_appdefaultmeasurementunits.cpp \
 #    ../../src/common/application.cpp \
-    ../../src/library/gencompsignal.cpp \
-    ../../src/library/gencompsymbvar.cpp \
-    ../../src/library/gencompsymbvaritem.cpp \
-    ../../src/library/symbolpin.cpp \
-    ../../src/library/symbolpolygon.cpp \
-    ../../src/library/symbolellipse.cpp \
-    ../../src/library/symboltext.cpp \
+    ../../src/library/gencmp/gencompsignal.cpp \
+    ../../src/library/gencmp/gencompsymbvar.cpp \
+    ../../src/library/gencmp/gencompsymbvaritem.cpp \
+    ../../src/library/sym/symbolpin.cpp \
+    ../../src/library/sym/symbolpolygon.cpp \
+    ../../src/library/sym/symbolellipse.cpp \
+    ../../src/library/sym/symboltext.cpp \
 #    ../../src/library/symbolgraphicsitem.cpp \
 #    ../../src/project/schematics/symbolpininstance.cpp \
 #    ../../src/library/symbolpingraphicsitem.cpp \
@@ -147,7 +147,7 @@ SOURCES += \
 #    ../../src/project/erc/ercmsg.cpp \
 #    ../../src/project/erc/ercmsglist.cpp \
 #    ../../src/project/circuit/gencompinstance.cpp \
-    ../../src/library/attribute.cpp \
+    ../../src/library/libraryelementattribute.cpp \
 #    ../../src/project/circuit/gencompattributeinstance.cpp \
 #    ../../src/common/if_attributeprovider.cpp \
 #    ../../src/project/schematics/symbolinstancepropertiesdialog.cpp \
@@ -157,12 +157,20 @@ SOURCES += \
 #    ../../src/project/dialogs/projectpropertieseditordialog.cpp \
 #    ../../src/project/cmd/cmdprojectsetmetadata.cpp \
 #    ../../src/common/smarttextfile.cpp \
-    ../../src/common/smartfile.cpp \
+    ../../src/common/file_io/smartfile.cpp \
     ../../src/common/file_io/xmldomdocument.cpp \
     ../../src/common/file_io/xmldomelement.cpp \
 #    ../../src/workspace/settings/items/wsi_appearance.cpp \
 #    ../../src/project/dialogs/addgencompdialog.cpp \
-    ../../src/common/alignment.cpp
+    ../../src/common/alignment.cpp \
+    ../../src/common/attributes/attributetype.cpp \
+    ../../src/common/attributes/attributeunit.cpp \
+    ../../src/common/attributes/attrtypecapacitance.cpp \
+    ../../src/common/attributes/attrtypefrequency.cpp \
+    ../../src/common/attributes/attrtypeinductance.cpp \
+    ../../src/common/attributes/attrtyperesistance.cpp \
+    ../../src/common/attributes/attrtypestring.cpp \
+    ../../src/common/attributes/attrtypevoltage.cpp
 
 HEADERS += \
     ../../src/common/units/all_length_units.h \
@@ -180,10 +188,10 @@ HEADERS += \
 #    ../../src/workspace/projecttreemodel.h \
 #    ../../src/workspace/projecttreeitem.h \
     ../../src/library/libraryelement.h \
-    ../../src/library/symbol.h \
+    ../../src/library/sym/symbol.h \
 #    ../../src/library/component.h \
 #    ../../src/library/footprint.h \
-    ../../src/library/genericcomponent.h \
+    ../../src/library/gencmp/genericcomponent.h \
 #    ../../src/library/model.h \
 #    ../../src/library/package.h \
 #    ../../src/library/spicemodel.h \
@@ -205,9 +213,9 @@ HEADERS += \
 #    ../../src/common/systeminfo.h \
     ../../src/common/debug.h \
 #    ../../src/common/filelock.h \
-    ../../src/common/filepath.h \
+    ../../src/common/file_io/filepath.h \
 #    ../../src/common/schematiclayer.h \
-    ../../src/common/smartxmlfile.h \
+    ../../src/common/file_io/smartxmlfile.h \
     ../../src/library/librarybaseelement.h \
 #    ../../src/project/circuit/cmd/cmdnetclassadd.h \
 #    ../../src/project/circuit/cmd/cmdnetclassremove.h \
@@ -246,13 +254,13 @@ HEADERS += \
 #    ../../src/common/dialogs/gridsettingsdialog.h \
 #    ../../src/workspace/settings/items/wsi_appdefaultmeasurementunits.h \
 #    ../../src/common/application.h \
-    ../../src/library/gencompsignal.h \
-    ../../src/library/gencompsymbvar.h \
-    ../../src/library/gencompsymbvaritem.h \
-    ../../src/library/symbolpin.h \
-    ../../src/library/symbolpolygon.h \
-    ../../src/library/symbolellipse.h \
-    ../../src/library/symboltext.h \
+    ../../src/library/gencmp/gencompsignal.h \
+    ../../src/library/gencmp/gencompsymbvar.h \
+    ../../src/library/gencmp/gencompsymbvaritem.h \
+    ../../src/library/sym/symbolpin.h \
+    ../../src/library/sym/symbolpolygon.h \
+    ../../src/library/sym/symbolellipse.h \
+    ../../src/library/sym/symboltext.h \
 #    ../../src/library/symbolgraphicsitem.h \
 #    ../../src/project/schematics/symbolpininstance.h \
 #    ../../src/library/symbolpingraphicsitem.h \
@@ -272,7 +280,7 @@ HEADERS += \
 #    ../../src/project/erc/ercmsg.h \
 #    ../../src/project/erc/ercmsglist.h \
 #    ../../src/project/circuit/gencompinstance.h \
-    ../../src/library/attribute.h \
+    ../../src/library/libraryelementattribute.h \
 #    ../../src/project/circuit/gencompattributeinstance.h \
 #    ../../src/common/if_attributeprovider.h \
 #    ../../src/project/schematics/symbolinstancepropertiesdialog.h \
@@ -282,11 +290,19 @@ HEADERS += \
 #    ../../src/project/dialogs/projectpropertieseditordialog.h \
 #    ../../src/project/cmd/cmdprojectsetmetadata.h \
 #    ../../src/common/smarttextfile.h \
-    ../../src/common/smartfile.h \
+    ../../src/common/file_io/smartfile.h \
     ../../src/common/file_io/xmldomdocument.h \
     ../../src/common/file_io/xmldomelement.h \
 #    ../../src/project/erc/if_ercmsgprovider.h \
 #    ../../src/common/file_io/if_xmlserializableobject.h \
 #    ../../src/workspace/settings/items/wsi_appearance.h \
 #    ../../src/project/dialogs/addgencompdialog.h \
-    ../../src/common/alignment.h
+    ../../src/common/alignment.h \
+    ../../src/common/attributes/attributetype.h \
+    ../../src/common/attributes/attributeunit.h \
+    ../../src/common/attributes/attrtypecapacitance.h \
+    ../../src/common/attributes/attrtypefrequency.h \
+    ../../src/common/attributes/attrtypeinductance.h \
+    ../../src/common/attributes/attrtyperesistance.h \
+    ../../src/common/attributes/attrtypestring.h \
+    ../../src/common/attributes/attrtypevoltage.h

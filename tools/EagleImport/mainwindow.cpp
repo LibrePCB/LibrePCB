@@ -2,11 +2,11 @@
 #include <QtWidgets>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <common/smartxmlfile.h>
+#include <common/file_io/smartxmlfile.h>
 #include <common/file_io/xmldomdocument.h>
 #include <common/file_io/xmldomelement.h>
-#include <library/symbol.h>
-#include <library/genericcomponent.h>
+#include <library/sym/symbol.h>
+#include <library/gencmp/genericcomponent.h>
 
 using namespace library;
 
@@ -354,7 +354,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
         GenCompSymbVar* symbvar = new GenCompSymbVar(QUuid::createUuid(), QString(), true);
         symbvar->setName("en_US", "default");
         symbvar->setDescription("en_US", "");
-        gencomp->addSymbolVariant(symbvar);
+        gencomp->addSymbolVariant(*symbvar);
 
         // signals
         XmlDomElement* connects = node->getFirstChild("devices/device/connects", true, true);
@@ -367,11 +367,10 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
 
             // create signal
             GenCompSignal* signal = new GenCompSignal(signalUuid, pinName);
-            gencomp->addSignal(signal);
+            gencomp->addSignal(*signal);
         }
 
         // symbol variant items
-        int index = 0;
         for (XmlDomElement* gate = node->getFirstChild("gates/*", true, true); gate; gate = gate->getNextSibling())
         {
             QString gateName = gate->getAttribute("name");
@@ -380,7 +379,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
 
             // create symbol variant item
             QUuid symbVarItemUuid = getOrCreateUuid(outputSettings, filepath, "symbvaritem", uuid.toString(), gateName);
-            GenCompSymbVarItem* item = new GenCompSymbVarItem(symbVarItemUuid, symbolUuid, index, true, (gateName == "G$1") ? "" : gateName);
+            GenCompSymbVarItem* item = new GenCompSymbVarItem(symbVarItemUuid, symbolUuid, true, (gateName == "G$1") ? "" : gateName);
 
             // connect pins
             for (XmlDomElement* connect = connects->getFirstChild("connect", false);
@@ -395,8 +394,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
                 }
             }
 
-            symbvar->addItem(item);
-            index++;
+            symbvar->addItem(*item);
         }
 
 
