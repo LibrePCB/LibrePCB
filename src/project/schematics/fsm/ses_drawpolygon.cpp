@@ -32,8 +32,9 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SES_DrawPolygon::SES_DrawPolygon(SchematicEditor& editor, Ui::SchematicEditor& editorUi) :
-    SES_Base(editor, editorUi)
+SES_DrawPolygon::SES_DrawPolygon(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
+                                 GraphicsView& editorGraphicsView) :
+    SES_Base(editor, editorUi, editorGraphicsView)
 {
 }
 

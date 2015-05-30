@@ -40,7 +40,8 @@ namespace project {
 class Circuit;
 class GenCompAttributeInstance;
 class GenCompSignalInstance;
-class SymbolInstance;
+class ComponentInstance;
+class SI_Symbol;
 class ErcMsg;
 }
 
@@ -76,11 +77,10 @@ class GenCompInstance : public QObject, public IF_AttributeProvider,
         const QUuid& getUuid() const noexcept {return mUuid;}
         const QString& getName() const noexcept {return mName;}
         const QString& getValue() const noexcept {return mValue;}
-        uint getPlacedSymbolsCount() const noexcept {return mSymbolInstances.count();}
+        uint getPlacedSymbolsCount() const noexcept {return mSymbols.count();}
         uint getUnplacedSymbolsCount() const noexcept;
         uint getUnplacedRequiredSymbolsCount() const noexcept;
         uint getUnplacedOptionalSymbolsCount() const noexcept;
-        const QHash<QString, GenCompAttributeInstance*>& getAttributes() const noexcept {return mAttributes;}
         GenCompSignalInstance* getSignalInstance(const QUuid& signalUuid) const noexcept {return mSignals.value(signalUuid);}
         const library::GenericComponent& getGenComp() const noexcept {return *mGenComp;}
         const library::GenCompSymbVar& getSymbolVariant() const noexcept {return *mGenCompSymbVar;}
@@ -99,7 +99,7 @@ class GenCompInstance : public QObject, public IF_AttributeProvider,
          *
          * @throw Exception If the new name is invalid, an exception will be thrown
          *
-         * @undocmd{project#CmdGenCompInstSetName}
+         * @undocmd{project#CmdGenCompInstEdit}
          */
         void setName(const QString& name) throw (Exception);
 
@@ -108,27 +108,35 @@ class GenCompInstance : public QObject, public IF_AttributeProvider,
          *
          * @param value  The new value
          *
-         * @undocmd{project#CmdGenCompInstSetValue}
+         * @undocmd{project#CmdGenCompInstEdit}
          */
         void setValue(const QString& value) noexcept;
+
+
+        // Attribute Handling Methods
+        const QList<GenCompAttributeInstance*>& getAttributes() const noexcept {return mAttributes;}
+        GenCompAttributeInstance* getAttributeByKey(const QString& key) const noexcept;
+        void addAttribute(GenCompAttributeInstance& attr) throw (Exception);
+        void removeAttribute(GenCompAttributeInstance& attr) throw (Exception);
 
 
         // General Methods
         void addToCircuit() throw (Exception);
         void removeFromCircuit() throw (Exception);
-        void registerSymbolInstance(const QUuid& itemUuid, const QUuid& symbolUuid,
-                                    const SymbolInstance* instance) throw (Exception);
-        void unregisterSymbolInstance(const QUuid& itemUuid, const SymbolInstance* symbol)
-                                      throw (Exception);
+        void registerSymbol(const SI_Symbol& symbol) throw (Exception);
+        void unregisterSymbol(const SI_Symbol& symbol) throw (Exception);
+        void registerComponent(const ComponentInstance& component) throw (Exception);
+        void unregisterComponent(const ComponentInstance& component) throw (Exception);
         XmlDomElement* serializeToXmlDomElement() const throw (Exception);
 
         // Helper Methods
         bool getAttributeValue(const QString& attrNS, const QString& attrKey,
-                                  bool passToParents, QString& value) const noexcept;
+                               bool passToParents, QString& value) const noexcept;
 
 
     signals:
 
+        /// @copydoc IF_AttributeProvider#attributesChanged()
         void attributesChanged();
 
 
@@ -167,8 +175,8 @@ class GenCompInstance : public QObject, public IF_AttributeProvider,
         /// @brief Pointer to the used symbol variant of #mGenComp
         const library::GenCompSymbVar* mGenCompSymbVar;
 
-        /// @brief All attributes of this generic component (key: attribute key)
-        QHash<QString, GenCompAttributeInstance*> mAttributes;
+        /// @brief All attributes of this generic component
+        QList<GenCompAttributeInstance*> mAttributes;
 
         /// @brief All signal instances (Key: generic component signal UUID)
         QHash<QUuid, GenCompSignalInstance*> mSignals;
@@ -177,15 +185,21 @@ class GenCompInstance : public QObject, public IF_AttributeProvider,
         // Misc
 
         /**
-         * @brief All registered symbol instances (must be empty if this generic component
-         *        instance is not added to circuit)
+         * @brief All registered symbols
          *
          * - Key:   UUID of the symbol variant item (library#GenCompSymbVarItem)
-         * - Value: Pointer to the registered symbol instance
+         * - Value: Pointer to the registered symbol
          *
-         * @see #registerSymbolInstance(), #unregisterSymbolInstance()
+         * @see #registerSymbol(), #unregisterSymbol()
          */
-        QHash<QUuid, const SymbolInstance*> mSymbolInstances;
+        QHash<QUuid, const SI_Symbol*> mSymbols;
+
+        /**
+         * @brief All registered component instances
+         *
+         * @see #registerComponent(), #unregisterComponent()
+         */
+        QList<const ComponentInstance*> mComponentInstances;
 
         /// @brief The ERC message for unplaced required symbols of this generic component
         QScopedPointer<ErcMsg> mErcMsgUnplacedRequiredSymbols;

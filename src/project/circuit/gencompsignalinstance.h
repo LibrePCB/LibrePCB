@@ -37,7 +37,7 @@ class XmlDomElement;
 
 namespace project {
 class GenCompInstance;
-class SymbolPinInstance;
+class SI_SymbolPin;
 class NetSignal;
 class Circuit;
 class ErcMsg;
@@ -95,8 +95,8 @@ class GenCompSignalInstance final : public QObject, public IF_ErcMsgProvider,
 
 
         // General Methods
-        void registerSymbolPinInstance(SymbolPinInstance* pin) throw (Exception);
-        void unregisterSymbolPinInstance(SymbolPinInstance* pin) throw (Exception);
+        void registerSymbolPin(SI_SymbolPin& pin) throw (Exception);
+        void unregisterSymbolPin(SI_SymbolPin& pin) throw (Exception);
         void addToCircuit() throw (Exception);
         void removeFromCircuit() throw (Exception);
         XmlDomElement* serializeToXmlDomElement() const throw (Exception);
@@ -125,7 +125,7 @@ class GenCompSignalInstance final : public QObject, public IF_ErcMsgProvider,
 
         // Attributes
         const library::GenCompSignal* mGenCompSignal;
-        QList<SymbolPinInstance*> mSymbolPinInstances;
+        QList<SI_SymbolPin*> mRegisteredSymbolPins;
         NetSignal* mNetSignal;
         bool mAddedToCircuit;
 

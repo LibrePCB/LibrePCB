@@ -33,8 +33,8 @@
  ****************************************************************************************/
 
 namespace project {
-class SchematicNetPoint;
-class SchematicNetLine;
+class SI_NetPoint;
+class SI_NetLine;
 }
 
 /*****************************************************************************************
@@ -46,6 +46,8 @@ namespace project {
 
 /**
  * @brief The SES_DrawWire class
+ *
+ * @todo This class is incredible ugly and buggy :-D
  */
 class SES_DrawWire final : public SES_Base
 {
@@ -54,7 +56,8 @@ class SES_DrawWire final : public SES_Base
     public:
 
         // Constructors / Destructor
-        explicit SES_DrawWire(SchematicEditor& editor, Ui::SchematicEditor& editorUi);
+        explicit SES_DrawWire(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
+                              GraphicsView& editorGraphicsView);
         ~SES_DrawWire();
 
         // General Methods
@@ -93,7 +96,7 @@ class SES_DrawWire final : public SES_Base
         ProcRetVal processIdleSceneEvent(SEE_Base* event) noexcept;
         ProcRetVal processPositioningSceneEvent(SEE_Base* event) noexcept;
         bool startPositioning(Schematic& schematic, const Point& pos,
-                              SchematicNetPoint* fixedPoint = nullptr) noexcept;
+                              SI_NetPoint* fixedPoint = nullptr) noexcept;
         bool addNextNetPoint(Schematic& schematic, const Point& pos) noexcept;
         bool abortPositioning(bool showErrMsgBox) noexcept;
         void updateNetpointPositions(const Point& cursorPos) noexcept;
@@ -104,11 +107,11 @@ class SES_DrawWire final : public SES_Base
         // General Attributes
         SubState mSubState; ///< the current substate
         WireMode mWireMode; ///< the current wire mode
-        SchematicNetPoint* mFixedNetPoint; ///< the fixed netpoint (start point of the line)
-        SchematicNetLine* mPositioningNetLine1; ///< line between fixed point and p1
-        SchematicNetPoint* mPositioningNetPoint1; ///< the first netpoint to place
-        SchematicNetLine* mPositioningNetLine2; ///< line between p1 and p2
-        SchematicNetPoint* mPositioningNetPoint2; ///< the second netpoint to place
+        SI_NetPoint* mFixedNetPoint; ///< the fixed netpoint (start point of the line)
+        SI_NetLine* mPositioningNetLine1; ///< line between fixed point and p1
+        SI_NetPoint* mPositioningNetPoint1; ///< the first netpoint to place
+        SI_NetLine* mPositioningNetLine2; ///< line between p1 and p2
+        SI_NetPoint* mPositioningNetPoint2; ///< the second netpoint to place
 
         // Widgets for the command toolbar
         QHash<WireMode, QAction*> mWireModeActions;

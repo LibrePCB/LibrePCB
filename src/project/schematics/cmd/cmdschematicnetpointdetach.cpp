@@ -23,7 +23,7 @@
 
 #include <QtCore>
 #include "cmdschematicnetpointdetach.h"
-#include "../schematicnetpoint.h"
+#include "../items/si_netpoint.h"
 
 namespace project {
 
@@ -31,11 +31,11 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSchematicNetPointDetach::CmdSchematicNetPointDetach(SchematicNetPoint& point, UndoCommand* parent) throw (Exception) :
+CmdSchematicNetPointDetach::CmdSchematicNetPointDetach(SI_NetPoint& point, UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Detach netpoint"), parent),
-    mNetPoint(point), mSymbolInstance(point.getSymbolInstance()),
-    mPinInstance(point.getPinInstance())
+    mNetPoint(point), mSymbolPin(point.getSymbolPin())
 {
+    Q_ASSERT(mSymbolPin);
 }
 
 CmdSchematicNetPointDetach::~CmdSchematicNetPointDetach() noexcept
@@ -56,14 +56,14 @@ void CmdSchematicNetPointDetach::redo() throw (Exception)
     }
     catch (Exception &e)
     {
-        mNetPoint.attachToPin(mSymbolInstance, mPinInstance);
+        mNetPoint.attachToPin(*mSymbolPin);
         throw;
     }
 }
 
 void CmdSchematicNetPointDetach::undo() throw (Exception)
 {
-    mNetPoint.attachToPin(mSymbolInstance, mPinInstance); // throws an exception on error
+    mNetPoint.attachToPin(*mSymbolPin); // throws an exception on error
 
     try
     {

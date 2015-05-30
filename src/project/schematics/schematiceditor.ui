@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>920</width>
-    <height>565</height>
+    <height>636</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,9 +31,6 @@
     <property name="bottomMargin">
      <number>0</number>
     </property>
-    <item>
-     <widget class="CADView" name="graphicsView"/>
-    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -42,15 +39,23 @@
      <x>0</x>
      <y>0</y>
      <width>920</width>
-     <height>20</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>File</string>
     </property>
+    <widget class="QMenu" name="menuExport">
+     <property name="title">
+      <string>Export</string>
+     </property>
+     <addaction name="actionPDF_Export"/>
+    </widget>
+    <addaction name="actionNew_Schematic_Page"/>
     <addaction name="actionSave_Project"/>
     <addaction name="actionPrint"/>
+    <addaction name="menuExport"/>
     <addaction name="separator"/>
     <addaction name="actionClose_Project"/>
     <addaction name="actionQuit"/>
@@ -136,6 +141,8 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionClose_Project"/>
+   <addaction name="separator"/>
+   <addaction name="actionNew_Schematic_Page"/>
    <addaction name="actionSave_Project"/>
    <addaction name="actionPrint"/>
    <addaction name="actionPDF_Export"/>
@@ -145,10 +152,8 @@
    <addaction name="separator"/>
    <addaction name="actionUndo"/>
    <addaction name="actionRedo"/>
-   <addaction name="separator"/>
-   <addaction name="actionHelp"/>
   </widget>
-  <widget class="QToolBar" name="viewToolbar">
+  <widget class="QToolBar" name="zoomToolbar">
    <property name="windowTitle">
     <string>View</string>
    </property>
@@ -185,12 +190,12 @@
    <addaction name="actionPaste"/>
    <addaction name="actionRemove"/>
   </widget>
-  <widget class="QToolBar" name="view2toolbar">
+  <widget class="QToolBar" name="viewToolbar">
    <property name="windowTitle">
     <string>View Tools</string>
    </property>
    <attribute name="toolBarArea">
-    <enum>LeftToolBarArea</enum>
+    <enum>TopToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
     <bool>false</bool>
@@ -413,7 +418,7 @@
      <normaloff>:/img/actions/rotate_left.png</normaloff>:/img/actions/rotate_left.png</iconset>
    </property>
    <property name="text">
-    <string>Rotate counterclockwise</string>
+    <string>Rotate Counterclockwise</string>
    </property>
    <property name="shortcut">
     <string>Shift+R</string>
@@ -425,7 +430,7 @@
      <normaloff>:/img/actions/rotate_right.png</normaloff>:/img/actions/rotate_right.png</iconset>
    </property>
    <property name="text">
-    <string>Rotate clockwise</string>
+    <string>Rotate Clockwise</string>
    </property>
    <property name="shortcut">
     <string>R</string>
@@ -687,14 +692,19 @@
     <string>Add Unipolar Capacitor</string>
    </property>
   </action>
+  <action name="actionNew_Schematic_Page">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/new_2.png</normaloff>:/img/actions/new_2.png</iconset>
+   </property>
+   <property name="text">
+    <string>New Schematic Page</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+  </action>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>CADView</class>
-   <extends>QGraphicsView</extends>
-   <header location="global">common/cadview.h</header>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="../../../img/images.qrc"/>
  </resources>

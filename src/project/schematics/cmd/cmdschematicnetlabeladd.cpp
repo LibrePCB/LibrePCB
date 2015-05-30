@@ -24,7 +24,7 @@
 #include <QtCore>
 #include "cmdschematicnetlabeladd.h"
 #include "../schematic.h"
-#include "../schematicnetlabel.h"
+#include "../items/si_netlabel.h"
 
 namespace project {
 
@@ -41,7 +41,7 @@ CmdSchematicNetLabelAdd::CmdSchematicNetLabelAdd(Schematic& schematic, NetSignal
 
 CmdSchematicNetLabelAdd::~CmdSchematicNetLabelAdd() noexcept
 {
-    if ((mNetLabel) && (!mIsExecuted))
+    if ((mNetLabel) && (!isExecuted()))
         delete mNetLabel;
 }
 

@@ -43,7 +43,8 @@ class SES_FSM final : public SES_Base
     public:
 
         // Constructors / Destructor
-        explicit SES_FSM(SchematicEditor& editor, Ui::SchematicEditor& editorUi) noexcept;
+        explicit SES_FSM(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
+                         GraphicsView& editorGraphicsView) noexcept;
         ~SES_FSM() noexcept;
 
         // General Methods

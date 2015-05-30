@@ -26,7 +26,7 @@
 
 #include "library.h"
 #include "../common/exceptions.h"
-#include "../common/filepath.h"
+#include "../common/file_io/filepath.h"
 #include "../workspace/workspace.h"
 
 

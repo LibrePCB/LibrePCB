@@ -12,21 +12,21 @@
     </meta>
     <categories/>
     <geometry>
-        <polygon fill_layer="11" start_y="1.016" line_width="0.15" line_layer="10" start_x="-1.9" grab_area="true">
+        <polygon fill_layer="11" start_y="1.016" line_width="0.175" line_layer="10" start_x="-1.9" grab_area="true">
             <segment angle="0" end_x="1.9" end_y="1.016"/>
             <segment angle="0" end_x="1.9" end_y="0.4"/>
             <segment angle="0" end_x="-1.9" end_y="0.4"/>
             <segment angle="0" end_x="-1.9" end_y="1.016"/>
         </polygon>
-        <polygon fill_layer="10" start_y="-1.016" line_width="0.15" line_layer="10" start_x="-1.9" grab_area="true">
+        <polygon fill_layer="10" start_y="-1.016" line_width="0.175" line_layer="10" start_x="-1.9" grab_area="true">
             <segment angle="0" end_x="1.9" end_y="-1.016"/>
             <segment angle="0" end_x="1.9" end_y="-0.4"/>
             <segment angle="0" end_x="-1.9" end_y="-0.4"/>
             <segment angle="0" end_x="-1.9" end_y="-1.016"/>
         </polygon>
-        <text layer="10" v_align="bottom" x="-1" y="0.5" angle="0" height="2.54" h_align="left" text="+"/>
-        <text layer="20" text="${SYM::NAME}" x="3.2" y="0" angle="0" height="3.175" v_align="bottom" h_align="left"/>
-        <text layer="21" text="${CMP::VALUE}" x="3.2" y="0" angle="0" height="2.5" v_align="top" h_align="left"/>
+        <text layer="10" v_align="bottom" x="-0.2" y="0.7" angle="0" height="2.54" h_align="right" text="+"/>
+        <text layer="20" text="${SYM::NAME}" x="3.2" y="0" angle="0" height="2.54" v_align="bottom" h_align="left"/>
+        <text layer="21" text="${CMP::VALUE}" x="3.2" y="0" angle="0" height="2.54" v_align="top" h_align="left"/>
     </geometry>
     <pins>
         <pin x="0" length="1.524" angle="180" y="2.54" uuid="{56ecc3a3-7957-43e8-a9e1-d0ce28118aed}">

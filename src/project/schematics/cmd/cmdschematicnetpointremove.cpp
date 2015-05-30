@@ -24,7 +24,7 @@
 #include <QtCore>
 #include "cmdschematicnetpointremove.h"
 #include "../schematic.h"
-#include "../schematicnetpoint.h"
+#include "../items/si_netpoint.h"
 
 namespace project {
 
@@ -33,7 +33,7 @@ namespace project {
  ****************************************************************************************/
 
 CmdSchematicNetPointRemove::CmdSchematicNetPointRemove(Schematic& schematic,
-                                                       SchematicNetPoint& netpoint,
+                                                       SI_NetPoint& netpoint,
                                                        UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Remove netpoint"), parent),
     mSchematic(schematic), mNetPoint(netpoint)
@@ -42,7 +42,7 @@ CmdSchematicNetPointRemove::CmdSchematicNetPointRemove(Schematic& schematic,
 
 CmdSchematicNetPointRemove::~CmdSchematicNetPointRemove() noexcept
 {
-    if (mIsExecuted)
+    if (isExecuted())
         delete &mNetPoint;
 }
 

@@ -26,7 +26,7 @@
 #include "ercmsg.h"
 #include "if_ercmsgprovider.h"
 #include "../project.h"
-#include "../../common/smartxmlfile.h"
+#include "../../common/file_io/smartxmlfile.h"
 #include "../../common/file_io/xmldomdocument.h"
 #include "../../common/file_io/xmldomelement.h"
 
@@ -96,6 +96,8 @@ void ErcMsgList::update(ErcMsg* ercMsg) noexcept
 
 void ErcMsgList::restoreIgnoreState() noexcept
 {
+    if (mXmlFile->isCreated()) return; // the XML file does not yet exist
+
     QSharedPointer<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
     XmlDomElement& root = doc->getRoot();
 

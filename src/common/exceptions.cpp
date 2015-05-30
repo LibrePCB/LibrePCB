@@ -24,7 +24,7 @@
 #include <QtCore>
 #include "exceptions.h"
 #include "debug.h"
-#include "filepath.h"
+#include "file_io/filepath.h"
 
 /*****************************************************************************************
  *  Class Exception

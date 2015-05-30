@@ -32,9 +32,10 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SES_Base::SES_Base(SchematicEditor& editor, Ui::SchematicEditor& editorUi) :
+SES_Base::SES_Base(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
+                   GraphicsView& editorGraphicsView) :
     QObject(0), mProject(editor.getProject()), mCircuit(editor.getProject().getCircuit()),
-    mEditor(editor), mEditorUi(editorUi)
+    mEditor(editor), mEditorUi(editorUi), mEditorGraphicsView(editorGraphicsView)
 {
 }
 

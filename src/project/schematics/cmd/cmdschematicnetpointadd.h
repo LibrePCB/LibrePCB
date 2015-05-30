@@ -36,8 +36,8 @@
 namespace project {
 class NetSignal;
 class Schematic;
-class SymbolInstance;
-class SchematicNetPoint;
+class SI_SymbolPin;
+class SI_NetPoint;
 }
 
 /*****************************************************************************************
@@ -56,12 +56,12 @@ class CmdSchematicNetPointAdd final : public UndoCommand
         // Constructors / Destructor
         explicit CmdSchematicNetPointAdd(Schematic& schematic, NetSignal& netsignal,
                                          const Point& position, UndoCommand* parent = 0) throw (Exception);
-        explicit CmdSchematicNetPointAdd(Schematic& schematic, SymbolInstance& symbol,
-                                         const QUuid& pin, UndoCommand* parent = 0) throw (Exception);
+        explicit CmdSchematicNetPointAdd(Schematic& schematic, SI_SymbolPin& pin,
+                                         UndoCommand* parent = 0) throw (Exception);
         ~CmdSchematicNetPointAdd() noexcept;
 
         // Getters
-        SchematicNetPoint* getNetPoint() const noexcept {return mNetPoint;}
+        SI_NetPoint* getNetPoint() const noexcept {return mNetPoint;}
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;
@@ -73,9 +73,8 @@ class CmdSchematicNetPointAdd final : public UndoCommand
         NetSignal* mNetSignal;
         bool mAttachedToSymbol;
         Point mPosition;
-        SymbolInstance* mSymbol;
-        QUuid mPin;
-        SchematicNetPoint* mNetPoint;
+        SI_SymbolPin* mSymbolPin;
+        SI_NetPoint* mNetPoint;
 };
 
 } // namespace project

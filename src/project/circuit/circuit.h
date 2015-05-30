@@ -27,7 +27,7 @@
 #include <QtCore>
 #include "../../common/file_io/if_xmlserializableobject.h"
 #include "../../common/exceptions.h"
-#include "../../common/filepath.h"
+#include "../../common/file_io/filepath.h"
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -102,6 +102,7 @@ class Circuit final : public QObject, public IF_XmlSerializableObject
         void setNetSignalName(NetSignal& netsignal, const QString& newName, bool isAutoName) throw (Exception);
 
         // GenCompInstance Methods
+        const QHash<QUuid, GenCompInstance*>& getGenCompInstances() const noexcept {return mGenCompInstances;}
         GenCompInstance* getGenCompInstanceByUuid(const QUuid& uuid) const noexcept;
         GenCompInstance* getGenCompInstanceByName(const QString& name) const noexcept;
         GenCompInstance* createGenCompInstance(const library::GenericComponent& genComp,

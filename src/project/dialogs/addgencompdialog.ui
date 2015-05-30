@@ -28,7 +28,7 @@
         <x>0</x>
         <y>0</y>
         <width>1104</width>
-        <height>543</height>
+        <height>539</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout">
@@ -83,6 +83,12 @@
               <property name="text">
                <string>TextLabel</string>
               </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+              <property name="textInteractionFlags">
+               <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+              </property>
              </widget>
             </item>
             <item row="1" column="0">
@@ -97,6 +103,9 @@
               <property name="text">
                <string>TextLabel</string>
               </property>
+              <property name="textInteractionFlags">
+               <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+              </property>
              </widget>
             </item>
             <item row="2" column="0">
@@ -110,6 +119,12 @@
              <widget class="QLabel" name="lblGenCompDescription">
               <property name="text">
                <string>TextLabel</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+              <property name="textInteractionFlags">
+               <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
               </property>
              </widget>
             </item>
@@ -149,6 +164,12 @@
                 <property name="text">
                  <string>TextLabel</string>
                 </property>
+                <property name="wordWrap">
+                 <bool>true</bool>
+                </property>
+                <property name="textInteractionFlags">
+                 <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+                </property>
                </widget>
               </item>
               <item row="3" column="0">
@@ -162,6 +183,12 @@
                <widget class="QLabel" name="lblSymbVarDescription">
                 <property name="text">
                  <string>TextLabel</string>
+                </property>
+                <property name="wordWrap">
+                 <bool>true</bool>
+                </property>
+                <property name="textInteractionFlags">
+                 <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
                 </property>
                </widget>
               </item>
@@ -177,12 +204,18 @@
                 <property name="text">
                  <string>TextLabel</string>
                 </property>
+                <property name="wordWrap">
+                 <bool>true</bool>
+                </property>
+                <property name="textInteractionFlags">
+                 <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+                </property>
                </widget>
               </item>
              </layout>
             </item>
             <item>
-             <widget class="CADView" name="graphicsView">
+             <widget class="GraphicsView" name="graphicsView">
               <property name="verticalScrollBarPolicy">
                <enum>Qt::ScrollBarAlwaysOff</enum>
               </property>
@@ -214,9 +247,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>CADView</class>
+   <class>GraphicsView</class>
    <extends>QGraphicsView</extends>
-   <header location="global">common/cadview.h</header>
+   <header location="global">common/graphics/graphicsview.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

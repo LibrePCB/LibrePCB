@@ -29,18 +29,18 @@
                 - key:  A unique key which identifies this attribute. Instead of a UUID we use a string as identifier because of the easier handling and more flexibility.
                         String style: english, uppercase, underscores instead of spaces, no special characters
                 - type: The datatype of the attribute. Available types (tbc):
-                            - string:       An UTF-8 string (class QString)
-                            - length:       A length (class Length)
-                            - resistance:   A resistance (class Resistance)
-                            - capacitance:  A capacitance (class Capacitance)
-                            - inductance:   An inductance (class Inductance)
+                            - string:       An UTF-8 string
+                            - resistance:   A resistance
+                            - capacitance:  A capacitance
+                            - inductance:   An inductance
+                - unit: The default unit (available units depends on the attribute type; empty string if the attribute type does not need a unit)
             XML Childs:
                 - name:             The name of the attribute (in different languages)
                 - description:      A short description of the attribute (in different languages)
                 - default_value:    The default value of this attribute (in different languages). This value (which can be empty) will be used when such a component is added to a schematic. Normally, this attribute does not need multilangual support, so the only needed locale is "en_US". But sometimes (especially when the attribute's type is "string") it may be useful to use different values for different languages.
         -->
         <!-- Example:
-        <attribute key="RESISTANCE" type="resistance">
+        <attribute key="RESISTANCE" type="resistance" unit="ohm">
             <name locale="en_US">Resistance</name>
             <description locale="en_US">The nominal resistance of the resistor.</description>
             <default_value locale="en_US"></default_value>
@@ -125,14 +125,15 @@
             <description locale="en_US">European Variant</description>
             <symbol_items>
                 <!--
+                    All symbol items of this symbol variant in the same order as they should be added to schematic when adding such a generic component.
+                    
                     Attributes:
                         - uuid:     The uuid of the symbol variant item (must be unique in its symbol variant)
                         - symbol:   The uuid of the library symbol
-                        - add_order_index:  If the user adds this generic component with this symbol variant to the schematic, this attribute describes the order of adding all symbols to the schematic. Zero is the index of the first symbol to add. Use the index -1 for symbols which should not be added (this is normally not used!)
                         - required: If this is true and this symbol is not places in the schematic, the ERC will give an error.
                         - suffix:   The component name suffix of this symbol (e.g. "A", "B", "C" to produce component names like "IC1A", "IC1B", "IC1C"). Must be unique in the symbol variant!
                 -->
-                <item uuid="{adae210d-c505-487b-9fe8-834a24f14638}" symbol="{00000000-0000-4001-8000-000000000000}" add_order_index="0" required="true" suffix="A">
+                <item uuid="{adae210d-c505-487b-9fe8-834a24f14638}" symbol="{00000000-0000-4001-8000-000000000000}" required="true" suffix="A">
                     <pin_signal_map>
                         <!--
                             This list must contain every pin of the specified symbol!

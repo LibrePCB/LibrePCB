@@ -25,7 +25,7 @@
 #include <QFileDialog>
 #include "workspace.h"
 #include "../common/exceptions.h"
-#include "../common/filepath.h"
+#include "../common/file_io/filepath.h"
 #include "../library/library.h"
 #include "../library_editor/libraryeditor.h"
 #include "../project/project.h"
@@ -126,6 +126,14 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
         sInstance = 0;
         throw;
     }
+
+    // parse command line arguments and open all project files
+    foreach (const QString& arg, qApp->arguments())
+    {
+        FilePath filepath(arg);
+        if ((filepath.isExistingFile()) && (filepath.getSuffix() == "e4u"))
+            openProject(filepath);
+    }
 }
 
 Workspace::~Workspace()
@@ -166,6 +174,7 @@ Project* Workspace::createProject(const FilePath& filepath) noexcept
     mOpenProjects.insert(filepath.toUnique().toStr(), project);
     mRecentProjectsModel->setLastRecentProject(filepath);
 
+    if (project->getBoards().count() > 0) project->showBoardEditor();
     project->showSchematicEditor();
 
     return project;
@@ -213,6 +222,7 @@ Project* Workspace::openProject(const FilePath& filepath) noexcept
         mRecentProjectsModel->setLastRecentProject(filepath);
     }
 
+    if (openProject->getBoards().count() > 0) openProject->showBoardEditor();
     openProject->showSchematicEditor();
 
     return openProject;

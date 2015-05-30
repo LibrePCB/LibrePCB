@@ -28,6 +28,8 @@
 #include "schematiceditorevent.h"
 #include "../schematiceditor.h"
 #include "ui_schematiceditor.h"
+#include "../../../common/units/all_length_units.h"
+#include "../../../common/graphics/graphicsview.h"
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -61,7 +63,8 @@ class SES_Base : public QObject
         };
 
         // Constructors / Destructor
-        explicit SES_Base(SchematicEditor& editor, Ui::SchematicEditor& editorUi);
+        explicit SES_Base(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
+                          GraphicsView& editorGraphicsView);
         virtual ~SES_Base();
 
         // General Methods
@@ -76,6 +79,8 @@ class SES_Base : public QObject
         Circuit& mCircuit;
         SchematicEditor& mEditor;
         Ui::SchematicEditor& mEditorUi; ///< allows access to SchematicEditor UI
+        GraphicsView& mEditorGraphicsView; ///< allows access to the schematic editor graphics view
+
 };
 
 } // namespace project

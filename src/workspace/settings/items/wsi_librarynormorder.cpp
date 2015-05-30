@@ -43,7 +43,7 @@ WSI_LibraryNormOrder::WSI_LibraryNormOrder(WorkspaceSettings& settings) :
     // create a QComboBox with all available norms
     mComboBox = new QComboBox();
     mComboBox->setEditable(true);
-    mComboBox->addItem("DIN EN 81346");
+    mComboBox->addItem("DIN EN 81346"); // TODO: add more norms (dynamically?)
 
     // create all buttons
     mBtnUp = new QToolButton();

@@ -39,8 +39,8 @@ class GenCompSymbVarItem;
 
 namespace project {
 class GenCompInstance;
-class SymbolInstance;
-class CmdSymbolInstanceMove;
+class SI_Symbol;
+class CmdSymbolInstanceEdit;
 class AddGenCompDialog;
 }
 
@@ -61,7 +61,8 @@ class SES_AddComponents final : public SES_Base
     public:
 
         // Constructors / Destructor
-        explicit SES_AddComponents(SchematicEditor& editor, Ui::SchematicEditor& editorUi);
+        explicit SES_AddComponents(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
+                                   GraphicsView& editorGraphicsView);
         ~SES_AddComponents();
 
         // General Methods
@@ -87,8 +88,8 @@ class SES_AddComponents final : public SES_Base
         const library::GenericComponent* mGenComp;
         const library::GenCompSymbVar* mGenCompSymbVar;
         const library::GenCompSymbVarItem* mCurrentSymbVarItem;
-        SymbolInstance* mCurrentSymbolToPlace;
-        CmdSymbolInstanceMove* mCurrentSymboleMoveCommand;
+        SI_Symbol* mCurrentSymbolToPlace;
+        CmdSymbolInstanceEdit* mCurrentSymbolEditCommand;
 };
 
 } // namespace project

@@ -105,6 +105,18 @@ class IF_AttributeProvider
                                        bool passToParents, QString& value) const noexcept = 0;
 
 
+    signals:
+
+        /**
+         * @brief This signal is emited when the value of attributes has changed
+         *
+         * All derived classes must emit this signal when some attributes have changed
+         * their values (only attributes which can be fetched with #getAttributeValue(),
+         * inclusive all attributes from all "parent" classes).
+         */
+        virtual void attributesChanged() = 0;
+
+
     private:
 
         // make some methods inaccessible...

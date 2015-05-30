@@ -73,7 +73,7 @@ class SEE_Base
             Edit_RotateCCW,     ///< rotate the selected elements 90° CCW
             Edit_Remove,        ///< remove the selected elements
             // Redirected QEvent's (SEE_RedirectedQEvent objects, with pointer to a QEvent)
-            SchematicSceneEvent,    ///< event from CADScene @see project#SEE_RedirectedQEvent
+            GraphicsViewEvent,  ///< event from #GraphicsView @see project#SEE_RedirectedQEvent
             // Special Events (with some additional parameters)
             StartAddComponent,      ///< @see project#SEE_StartAddComponent
             SwitchToSchematicPage,  ///< @see project#SEE_SwitchToSchematicPage

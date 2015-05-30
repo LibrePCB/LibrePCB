@@ -26,7 +26,6 @@
 
 #include <QtCore>
 #include "ses_base.h"
-#include "../../../common/units/all_length_units.h"
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -35,11 +34,9 @@
 class UndoCommand;
 
 namespace project {
-class SymbolInstance;
-class SchematicNetPoint;
-class CmdSymbolInstanceMove;
-class CmdSchematicNetPointMove;
-class CmdSchematicNetLabelMove;
+class CmdSymbolInstanceEdit;
+class CmdSchematicNetPointEdit;
+class CmdSchematicNetLabelEdit;
 }
 
 /*****************************************************************************************
@@ -59,7 +56,8 @@ class SES_Select final : public SES_Base
     public:
 
         // Constructors / Destructor
-        explicit SES_Select(SchematicEditor& editor, Ui::SchematicEditor& editorUi);
+        explicit SES_Select(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
+                            GraphicsView& editorGraphicsView);
         ~SES_Select();
 
         // General Methods
@@ -100,14 +98,12 @@ class SES_Select final : public SES_Base
 
         // Attributes
         SubState mSubState;     ///< the current substate
-        Point mMoveStartPos;    ///< the scene position where the left mouse button was
-                                ///< pressed (not mapped to grid!)
         Point mLastMouseMoveDeltaPos;   ///< used in the moving substate (mapped to grid)
         UndoCommand* mParentCommand;    ///< the parent command for all moving commands
                                         ///< (nullptr if no command is active)
-        QList<CmdSymbolInstanceMove*> mSymbolMoveCmds; ///< all symbol move commands
-        QList<CmdSchematicNetPointMove*> mNetPointMoveCmds; ///< all netpoint move commands
-        QList<CmdSchematicNetLabelMove*> mNetLabelMoveCmds;
+        QList<CmdSymbolInstanceEdit*> mSymbolEditCmds; ///< all symbol move commands
+        QList<CmdSchematicNetPointEdit*> mNetPointEditCmds; ///< all netpoint edit commands
+        QList<CmdSchematicNetLabelEdit*> mNetLabelEditCmds;
 };
 
 } // namespace project

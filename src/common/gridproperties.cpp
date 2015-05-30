@@ -1,0 +1,122 @@
+/*
+ * EDA4U - Professional EDA for everyone!
+ * Copyright (C) 2013 Urban Bruhin
+ * http://eda4u.ubruhin.ch/
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*****************************************************************************************
+ *  Includes
+ ****************************************************************************************/
+
+#include <QtCore>
+#include "gridproperties.h"
+#include "file_io/xmldomelement.h"
+#include "../workspace/workspace.h"
+#include "../workspace/settings/workspacesettings.h"
+
+/*****************************************************************************************
+ *  Constructors / Destructor
+ ****************************************************************************************/
+
+GridProperties::GridProperties() noexcept :
+    mType(Type_t::Lines), mInterval(2540000),
+    mUnit(Workspace::instance().getSettings().getAppDefMeasUnits()->getLengthUnit())
+{
+}
+
+GridProperties::GridProperties(const XmlDomElement& domElement) noexcept
+{
+    mType = stringToType(domElement.getAttribute("type", true));
+    mInterval = domElement.getAttribute<Length>("interval", true);
+    mUnit = LengthUnit::fromString(domElement.getAttribute("unit", true));
+}
+
+GridProperties::GridProperties(Type_t type, const Length& interval, const LengthUnit& unit) noexcept :
+    mType(type), mInterval(interval), mUnit(unit)
+{
+}
+
+GridProperties::GridProperties(const GridProperties& other) noexcept :
+    mType(other.mType), mInterval(other.mInterval), mUnit(other.mUnit)
+{
+}
+
+GridProperties::~GridProperties() noexcept
+{
+}
+
+/*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+XmlDomElement* GridProperties::serializeToXmlDomElement() const throw (Exception)
+{
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("grid_properties"));
+    root->setAttribute("type", typeToString(mType));
+    root->setAttribute("interval", mInterval.toMmString());
+    root->setAttribute("unit", mUnit.toString());
+    return root.take();
+}
+
+/*****************************************************************************************
+ *  Operators
+ ****************************************************************************************/
+
+GridProperties& GridProperties::operator=(const GridProperties& rhs) noexcept
+{
+    mType = rhs.mType;
+    mInterval = rhs.mInterval;
+    mUnit = rhs.mUnit;
+    return *this;
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+bool GridProperties::checkAttributesValidity() const noexcept
+{
+    return true;
+}
+
+/*****************************************************************************************
+ *  Private Static Methods
+ ****************************************************************************************/
+
+GridProperties::Type_t GridProperties::stringToType(const QString& type) throw (Exception)
+{
+    if (type == "off")          return Type_t::Off;
+    else if (type == "lines")   return Type_t::Lines;
+    else if (type == "dots")    return Type_t::Dots;
+    else throw RuntimeError(__FILE__, __LINE__, type, QString(tr("Unknown grid type: \"%1\"")).arg(type));
+}
+
+QString GridProperties::typeToString(Type_t type) throw (Exception)
+{
+    switch (type)
+    {
+        case Type_t::Off:   return "off";
+        case Type_t::Lines: return "lines";
+        case Type_t::Dots:  return "dots";
+        default: throw LogicError(__FILE__, __LINE__);
+    }
+}
+
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/

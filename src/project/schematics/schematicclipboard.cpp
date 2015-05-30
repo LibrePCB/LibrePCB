@@ -23,8 +23,6 @@
 
 #include <QtCore>
 #include "schematicclipboard.h"
-#include "../../common/file_io/xmldomelement.h"
-#include "symbolinstance.h"
 
 namespace project {
 
@@ -39,14 +37,14 @@ SchematicClipboard::SchematicClipboard() noexcept :
 
 SchematicClipboard::~SchematicClipboard() noexcept
 {
-    clear();
+    //clear();
 }
 
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
-void SchematicClipboard::clear() noexcept
+/*void SchematicClipboard::clear() noexcept
 {
     qDeleteAll(mSymbolInstances);       mSymbolInstances.clear();
 }
@@ -73,19 +71,19 @@ void SchematicClipboard::paste(Schematic& schematic, QList<SymbolInstance*>& sym
     }
 
     mCutActive = false;
-}
+}*/
 
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
-void SchematicClipboard::setElements(const QList<SymbolInstance*>& symbols) throw (Exception)
+/*void SchematicClipboard::setElements(const QList<SymbolInstance*>& symbols) throw (Exception)
 {
     clear();
 
     foreach (SymbolInstance* symbol, symbols)
         mSymbolInstances.append(symbol->serializeToXmlDomElement());
-}
+}*/
 
 /*****************************************************************************************
  *  End of File

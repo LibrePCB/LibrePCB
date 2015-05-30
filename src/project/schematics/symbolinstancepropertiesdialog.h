@@ -32,11 +32,13 @@
  ****************************************************************************************/
 
 class UndoCommand;
+class AttributeType;
+class AttributeUnit;
 
 namespace project {
 class Project;
 class GenCompInstance;
-class SymbolInstance;
+class SI_Symbol;
 }
 
 namespace Ui {
@@ -60,11 +62,31 @@ class SymbolInstancePropertiesDialog final : public QDialog
 
         // Constructors / Destructor
         explicit SymbolInstancePropertiesDialog(Project& project, GenCompInstance& genComp,
-                                                SymbolInstance& symbol, QWidget* parent) noexcept;
+                                                SI_Symbol& symbol, QWidget* parent) noexcept;
         ~SymbolInstancePropertiesDialog() noexcept;
 
 
+    private slots:
+
+        // GUI Events
+        void on_tblGenCompInstAttributes_currentCellChanged(int currentRow, int currentColumn,
+                                                            int previousRow, int previousColumn);
+        void on_cbxAttrType_currentIndexChanged(int index);
+        void on_cbxAttrUnit_currentIndexChanged(int index);
+        void on_btnAttrApply_clicked();
+        void on_btnAttrAdd_clicked();
+        void on_btnAttrRemove_clicked();
+
+
     private:
+
+        // Types
+        struct AttrItem_t {
+            QString key;
+            const AttributeType* type;
+            QString value;
+            const AttributeUnit* unit;
+        };
 
         // make some methods inaccessible...
         SymbolInstancePropertiesDialog();
@@ -72,6 +94,7 @@ class SymbolInstancePropertiesDialog final : public QDialog
         SymbolInstancePropertiesDialog& operator=(const SymbolInstancePropertiesDialog& rhs);
 
         // Private Methods
+        void updateAttrTable() noexcept;
         void keyPressEvent(QKeyEvent* e);
         void accept();
         bool applyChanges() noexcept;
@@ -83,9 +106,14 @@ class SymbolInstancePropertiesDialog final : public QDialog
         // General
         Project& mProject;
         GenCompInstance& mGenCompInstance;
-        SymbolInstance& mSymbolInstance;
+        SI_Symbol& mSymbol;
         Ui::SymbolInstancePropertiesDialog* mUi;
         bool mCommandActive;
+        bool mAttributesEdited;
+        QList<AttrItem_t*> mAttrItems;
+        AttrItem_t* mSelectedAttrItem;
+        const AttributeType* mSelectedAttrType;
+        const AttributeUnit* mSelectedAttrUnit;
 };
 
 } // namespace project

@@ -23,7 +23,7 @@
 
 #include <QtCore>
 #include "cmdschematicnetlabeledit.h"
-#include "../schematicnetlabel.h"
+#include "../items/si_netlabel.h"
 
 namespace project {
 
@@ -31,30 +31,68 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSchematicNetLabelEdit::CmdSchematicNetLabelEdit(SchematicNetLabel& netlabel, UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Edit netlabel"), parent),
-    mNetLabel(netlabel), mRedoOrUndoCalled(false),
-    mNetSignalOld(&netlabel.getNetSignal()), mNetSignalNew(&netlabel.getNetSignal())
+CmdSchematicNetLabelEdit::CmdSchematicNetLabelEdit(SI_NetLabel& netlabel,
+                                                   UndoCommand* parent) throw (Exception) :
+    UndoCommand(tr("Edit netlabel"), parent), mNetLabel(netlabel),
+    mOldNetSignal(&netlabel.getNetSignal()), mNewNetSignal(mOldNetSignal),
+    mOldPos(netlabel.getPosition()), mNewPos(mOldPos),
+    mOldRotation(netlabel.getAngle()), mNewRotation(mOldRotation)
 {
 }
 
 CmdSchematicNetLabelEdit::~CmdSchematicNetLabelEdit() noexcept
 {
-    if (!mRedoOrUndoCalled)
+    if ((mRedoCount == 0) && (mUndoCount == 0))
     {
-        mNetLabel.setNetSignal(*mNetSignalOld);
+        // revert temporary changes
+        mNetLabel.setNetSignal(*mOldNetSignal);
+        mNetLabel.setPosition(mOldPos);
+        mNetLabel.setAngle(mOldRotation);
     }
 }
 
 /*****************************************************************************************
- *  General Methods
+ *  Setters
  ****************************************************************************************/
 
-void CmdSchematicNetLabelEdit::setNetSignal(NetSignal& netsignal) noexcept
+void CmdSchematicNetLabelEdit::setNetSignal(NetSignal& netsignal, bool immediate) noexcept
 {
-    Q_ASSERT(mRedoOrUndoCalled == false);
-    mNetSignalNew = &netsignal;
-    mNetLabel.setNetSignal(*mNetSignalNew);
+    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    mNewNetSignal = &netsignal;
+    if (immediate) mNetLabel.setNetSignal(*mNewNetSignal);
+}
+
+void CmdSchematicNetLabelEdit::setPosition(const Point& position, bool immediate) noexcept
+{
+    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    mNewPos = position;
+    if (immediate) mNetLabel.setPosition(mNewPos);
+}
+
+void CmdSchematicNetLabelEdit::setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept
+{
+    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    mNewPos = mOldPos + deltaPos;
+    if (immediate) mNetLabel.setPosition(mNewPos);
+}
+
+void CmdSchematicNetLabelEdit::setRotation(const Angle& angle, bool immediate) noexcept
+{
+    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    mNewRotation = angle;
+    if (immediate) mNetLabel.setAngle(mNewRotation);
+}
+
+void CmdSchematicNetLabelEdit::rotate(const Angle& angle, const Point& center, bool immediate) noexcept
+{
+    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    mNewPos.rotate(angle, center);
+    mNewRotation += angle;
+    if (immediate)
+    {
+        mNetLabel.setPosition(mNewPos);
+        mNetLabel.setAngle(mNewRotation);
+    }
 }
 
 /*****************************************************************************************
@@ -63,16 +101,38 @@ void CmdSchematicNetLabelEdit::setNetSignal(NetSignal& netsignal) noexcept
 
 void CmdSchematicNetLabelEdit::redo() throw (Exception)
 {
-    mRedoOrUndoCalled = true;
-    UndoCommand::redo(); // throws an exception on error
-    mNetLabel.setNetSignal(*mNetSignalNew);
+    try
+    {
+        mNetLabel.setNetSignal(*mNewNetSignal);
+        mNetLabel.setPosition(mNewPos);
+        mNetLabel.setAngle(mNewRotation);
+        UndoCommand::redo();
+    }
+    catch (Exception& e)
+    {
+        mNetLabel.setNetSignal(*mOldNetSignal);
+        mNetLabel.setPosition(mOldPos);
+        mNetLabel.setAngle(mOldRotation);
+        throw;
+    }
 }
 
 void CmdSchematicNetLabelEdit::undo() throw (Exception)
 {
-    mRedoOrUndoCalled = true;
-    UndoCommand::undo();
-    mNetLabel.setNetSignal(*mNetSignalOld);
+    try
+    {
+        mNetLabel.setNetSignal(*mOldNetSignal);
+        mNetLabel.setPosition(mOldPos);
+        mNetLabel.setAngle(mOldRotation);
+        UndoCommand::undo();
+    }
+    catch (Exception& e)
+    {
+        mNetLabel.setNetSignal(*mNewNetSignal);
+        mNetLabel.setPosition(mNewPos);
+        mNetLabel.setAngle(mNewRotation);
+        throw;
+    }
 }
 
 /*****************************************************************************************

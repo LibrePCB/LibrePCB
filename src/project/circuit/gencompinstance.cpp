@@ -28,10 +28,12 @@
 #include "../project.h"
 #include "../library/projectlibrary.h"
 #include "gencompsignalinstance.h"
-#include "../../library/genericcomponent.h"
+#include "../../library/gencmp/genericcomponent.h"
 #include "../erc/ercmsg.h"
 #include "gencompattributeinstance.h"
 #include "../../common/file_io/xmldomelement.h"
+#include "../settings/projectsettings.h"
+#include "../schematics/items/si_symbol.h"
 
 namespace project {
 
@@ -68,14 +70,14 @@ GenCompInstance::GenCompInstance(Circuit& circuit, const XmlDomElement& domEleme
     for (XmlDomElement* node = domElement.getFirstChild("attributes/attribute", true, false);
          node; node = node->getNextSibling("attribute"))
     {
-        GenCompAttributeInstance* attribute = new GenCompAttributeInstance(mCircuit, *this, *node);
-        if (mAttributes.contains(attribute->getKey()))
+        GenCompAttributeInstance* attribute = new GenCompAttributeInstance(*node);
+        if (getAttributeByKey(attribute->getKey()))
         {
             throw RuntimeError(__FILE__, __LINE__, attribute->getKey(),
                 QString(tr("The component attribute \"%1\" is defined multiple times."))
                 .arg(attribute->getKey()));
         }
-        mAttributes.insert(attribute->getKey(), attribute);
+        mAttributes.append(attribute);
     }
 
     // load all signal instances
@@ -108,6 +110,8 @@ GenCompInstance::GenCompInstance(Circuit& circuit, const library::GenericCompone
     QObject(nullptr), mCircuit(circuit), mAddedToCircuit(false),
     mGenComp(&genComp), mGenCompSymbVar(&symbVar)
 {
+    const QStringList& localeOrder = mCircuit.getProject().getSettings().getLocaleOrder();
+
     mUuid = QUuid::createUuid().toString(); // generate random UUID
     mName = name;
     if (mName.isEmpty())
@@ -115,14 +119,15 @@ GenCompInstance::GenCompInstance(Circuit& circuit, const library::GenericCompone
         throw RuntimeError(__FILE__, __LINE__, QString(),
             tr("The name of the generic component must not be empty."));
     }
-    mValue = genComp.getDefaultValue();
+    mValue = genComp.getDefaultValue(localeOrder);
 
     // add attributes
-    foreach (const library::Attribute* attribute, genComp.getAttributes())
+    foreach (const library::LibraryElementAttribute* attr, genComp.getAttributes())
     {
-        GenCompAttributeInstance* attributeInstance = new GenCompAttributeInstance(mCircuit,
-            *this, attribute->getKey(), attribute->getType(), attribute->getDefaultValue());
-        mAttributes.insert(attributeInstance->getKey(), attributeInstance);
+        GenCompAttributeInstance* attributeInstance = new GenCompAttributeInstance(
+            attr->getKey(), attr->getType(), attr->getDefaultValue(localeOrder),
+            attr->getDefaultUnit());
+        mAttributes.append(attributeInstance);
     }
 
     // add signal map
@@ -145,13 +150,17 @@ void GenCompInstance::init() throw (Exception)
         "UnplacedOptionalSymbols", ErcMsg::ErcMsgType_t::SchematicWarning));
     updateErcMessages();
 
+    // emit the "attributesChanged" signal when the project has emited it
+    connect(&mCircuit.getProject(), &Project::attributesChanged, this, &GenCompInstance::attributesChanged);
+
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 GenCompInstance::~GenCompInstance() noexcept
 {
     Q_ASSERT(!mAddedToCircuit);
-    Q_ASSERT(mSymbolInstances.isEmpty());
+    Q_ASSERT(mSymbols.isEmpty());
+    Q_ASSERT(mComponentInstances.isEmpty());
 
     qDeleteAll(mSignals);       mSignals.clear();
     qDeleteAll(mAttributes);    mAttributes.clear();
@@ -163,7 +172,7 @@ GenCompInstance::~GenCompInstance() noexcept
 
 uint GenCompInstance::getUnplacedSymbolsCount() const noexcept
 {
-    return (mGenCompSymbVar->getItems().count() - mSymbolInstances.count());
+    return (mGenCompSymbVar->getItems().count() - mSymbols.count());
 }
 
 uint GenCompInstance::getUnplacedRequiredSymbolsCount() const noexcept
@@ -171,7 +180,7 @@ uint GenCompInstance::getUnplacedRequiredSymbolsCount() const noexcept
     uint count = 0;
     foreach (const library::GenCompSymbVarItem* item, mGenCompSymbVar->getItems())
     {
-        if ((item->isRequired()) && (!mSymbolInstances.contains(item->getUuid())))
+        if ((item->isRequired()) && (!mSymbols.contains(item->getUuid())))
             count++;
     }
     return count;
@@ -182,7 +191,7 @@ uint GenCompInstance::getUnplacedOptionalSymbolsCount() const noexcept
     uint count = 0;
     foreach (const library::GenCompSymbVarItem* item, mGenCompSymbVar->getItems())
     {
-        if ((!item->isRequired()) && (!mSymbolInstances.contains(item->getUuid())))
+        if ((!item->isRequired()) && (!mSymbols.contains(item->getUuid())))
             count++;
     }
     return count;
@@ -194,12 +203,12 @@ uint GenCompInstance::getUnplacedOptionalSymbolsCount() const noexcept
 
 void GenCompInstance::setName(const QString& name) throw (Exception)
 {
+    if (name == mName) return;
     if(name.isEmpty())
     {
         throw RuntimeError(__FILE__, __LINE__, name,
             tr("The new component name must not be empty!"));
     }
-
     mName = name;
     updateErcMessages();
     emit attributesChanged();
@@ -207,7 +216,42 @@ void GenCompInstance::setName(const QString& name) throw (Exception)
 
 void GenCompInstance::setValue(const QString& value) noexcept
 {
+    if (value == mValue) return;
     mValue = value;
+    emit attributesChanged();
+}
+
+/*****************************************************************************************
+ *  Attribute Handling Methods
+ ****************************************************************************************/
+
+GenCompAttributeInstance* GenCompInstance::getAttributeByKey(const QString& key) const noexcept
+{
+    foreach (GenCompAttributeInstance* attr, mAttributes)
+    {
+        if (attr->getKey() == key)
+            return attr;
+    }
+    return nullptr;
+}
+
+void GenCompInstance::addAttribute(GenCompAttributeInstance& attr) throw (Exception)
+{
+    Q_ASSERT(mAttributes.contains(&attr) == false);
+    if (getAttributeByKey(attr.getKey()))
+    {
+        throw RuntimeError(__FILE__, __LINE__, attr.getKey(),
+            QString(tr("The component \"%1\" has already an attribute with the "
+            "key \"%2\".")).arg(mName, attr.getKey()));
+    }
+    mAttributes.append(&attr);
+    emit attributesChanged();
+}
+
+void GenCompInstance::removeAttribute(GenCompAttributeInstance& attr) throw (Exception)
+{
+    Q_ASSERT(mAttributes.contains(&attr) == true);
+    mAttributes.removeOne(&attr);
     emit attributesChanged();
 }
 
@@ -228,22 +272,6 @@ void GenCompInstance::removeFromCircuit() throw (Exception)
 {
     if (!mAddedToCircuit) throw LogicError(__FILE__, __LINE__);
 
-    /*if (removeNode)
-    {
-        // check if all generic component signals are disconnected from circuit net signals
-        foreach (GenCompSignalInstance* signal, mSignals)
-        {
-            if (signal->getNetSignal())
-                throw LogicError(__FILE__, __LINE__);
-        }
-
-        if (parent.nodeName() != "generic_component_instances")
-            throw LogicError(__FILE__, __LINE__, parent.nodeName(), tr("Invalid node name!"));
-
-        if (parent.removeChild(mDomElement).isNull())
-            throw LogicError(__FILE__, __LINE__, QString(), tr("Could not remove node from DOM tree!"));
-    }*/
-
     foreach (GenCompSignalInstance* signal, mSignals)
         signal->removeFromCircuit();
 
@@ -251,53 +279,57 @@ void GenCompInstance::removeFromCircuit() throw (Exception)
     updateErcMessages();
 }
 
-void GenCompInstance::registerSymbolInstance(const QUuid& itemUuid, const QUuid& symbolUuid,
-                                             const SymbolInstance* instance) throw (Exception)
+void GenCompInstance::registerSymbol(const SI_Symbol& symbol) throw (Exception)
 {
+    const library::GenCompSymbVarItem* item = &symbol.getGenCompSymbVarItem();
+
     if (!mAddedToCircuit)
-        throw LogicError(__FILE__, __LINE__, itemUuid.toString());
-
-    const library::GenCompSymbVarItem* item = mGenCompSymbVar->getItemByUuid(itemUuid);
-    if (!item)
+        throw LogicError(__FILE__, __LINE__, item->getUuid().toString());
+    if (!mGenCompSymbVar->getItems().contains(item))
     {
-        throw RuntimeError(__FILE__, __LINE__, itemUuid.toString(), QString(tr(
-            "Invalid symbol item UUID in circuit: \"%1\".")).arg(itemUuid.toString()));
+        throw RuntimeError(__FILE__, __LINE__, item->getUuid().toString(), QString(tr(
+            "Invalid symbol item in circuit: \"%1\".")).arg(item->getUuid().toString()));
     }
-
-    if (symbolUuid != item->getSymbolUuid())
-    {
-        throw RuntimeError(__FILE__, __LINE__, symbolUuid.toString(), QString(tr(
-            "Invalid symbol UUID in circuit: \"%1\".")).arg(symbolUuid.toString()));
-    }
-
-    if (mSymbolInstances.contains(item->getUuid()))
+    if (mSymbols.contains(item->getUuid()))
     {
         throw RuntimeError(__FILE__, __LINE__, item->getUuid().toString(), QString(tr(
             "Symbol item UUID already exists in circuit: \"%1\".")).arg(item->getUuid().toString()));
     }
 
-    mSymbolInstances.insert(itemUuid, instance);
+    mSymbols.insert(item->getUuid(), &symbol);
     updateErcMessages();
 }
 
-void GenCompInstance::unregisterSymbolInstance(const QUuid& itemUuid,
-                                               const SymbolInstance* symbol) throw (Exception)
+void GenCompInstance::unregisterSymbol(const SI_Symbol& symbol) throw (Exception)
 {
+    const library::GenCompSymbVarItem* item = &symbol.getGenCompSymbVarItem();
+
     if (!mAddedToCircuit)
-        throw LogicError(__FILE__, __LINE__, itemUuid.toString());
-    if (!mSymbolInstances.contains(itemUuid))
-        throw LogicError(__FILE__, __LINE__, itemUuid.toString());
-    if (symbol != mSymbolInstances.value(itemUuid))
-        throw LogicError(__FILE__, __LINE__, itemUuid.toString());
+        throw LogicError(__FILE__, __LINE__, item->getUuid().toString());
+    if (!mSymbols.contains(item->getUuid()))
+        throw LogicError(__FILE__, __LINE__, item->getUuid().toString());
+    if (&symbol != mSymbols.value(item->getUuid()))
+        throw LogicError(__FILE__, __LINE__, item->getUuid().toString());
 
-    const library::GenCompSymbVarItem* item = mGenCompSymbVar->getItemByUuid(itemUuid);
-    if (!item)
-    {
-        throw RuntimeError(__FILE__, __LINE__, itemUuid.toString(), QString(tr(
-            "Invalid symbol item UUID in circuit: \"%1\".")).arg(itemUuid.toString()));
-    }
+    mSymbols.remove(item->getUuid());
+    updateErcMessages();
+}
 
-    mSymbolInstances.remove(itemUuid);
+void GenCompInstance::registerComponent(const ComponentInstance& component) throw (Exception)
+{
+    if (!mAddedToCircuit) throw LogicError(__FILE__, __LINE__);
+    if (mComponentInstances.contains(&component)) throw LogicError(__FILE__, __LINE__);
+
+    mComponentInstances.append(&component);
+    updateErcMessages();
+}
+
+void GenCompInstance::unregisterComponent(const ComponentInstance& component) throw (Exception)
+{
+    if (!mAddedToCircuit) throw LogicError(__FILE__, __LINE__);
+    if (!mComponentInstances.contains(&component)) throw LogicError(__FILE__, __LINE__);
+
+    mComponentInstances.removeOne(&component);
     updateErcMessages();
 }
 
@@ -305,7 +337,7 @@ XmlDomElement* GenCompInstance::serializeToXmlDomElement() const throw (Exceptio
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("instance"));
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("generic_component_instance"));
     root->setAttribute("uuid", mUuid);
     root->setAttribute("generic_component", mGenComp->getUuid());
     root->setAttribute("symbol_variant", mGenCompSymbVar->getUuid());
@@ -333,8 +365,8 @@ bool GenCompInstance::getAttributeValue(const QString& attrNS, const QString& at
             return value = mName, true;
         else if (attrKey == QLatin1String("VALUE"))
             return value = mValue, true;
-        else if (mAttributes.contains(attrKey))
-            return value = mAttributes.value(attrKey)->getValueToDisplay(), true;
+        else if (getAttributeByKey(attrKey))
+            return value = getAttributeByKey(attrKey)->getValueTr(true), true;
     }
 
     if ((attrNS != QLatin1String("CMP")) && (passToParents))

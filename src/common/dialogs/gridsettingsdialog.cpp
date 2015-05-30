@@ -24,37 +24,32 @@
 #include <QtCore>
 #include "gridsettingsdialog.h"
 #include "ui_gridsettingsdialog.h"
-#include "../../workspace/workspace.h"
-#include "../../workspace/settings/workspacesettings.h"
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-GridSettingsDialog::GridSettingsDialog(CADView::GridType_t type,
-                                       const Length& interval, const LengthUnit& unit,
-                                       QWidget* parent) :
-    QDialog(parent), mUi(new Ui::GridSettingsDialog), mInitialType(type),
-    mInitialInterval(interval), mInitialUnit(unit), mType(type), mInterval(interval),
-    mUnit(unit)
+GridSettingsDialog::GridSettingsDialog(const GridProperties& grid, QWidget* parent) :
+    QDialog(parent), mUi(new Ui::GridSettingsDialog),
+    mOriginalGrid(grid), mCurrentGrid(grid)
 {
     mUi->setupUi(this);
 
     // set radiobutton id's
-    mUi->rbtnGroup->setId(mUi->rbtnNoGrid, static_cast<int>(CADView::GridType_t::Off));
-    mUi->rbtnGroup->setId(mUi->rbtnDots, static_cast<int>(CADView::GridType_t::Dots));
-    mUi->rbtnGroup->setId(mUi->rbtnLines, static_cast<int>(CADView::GridType_t::Lines));
+    mUi->rbtnGroup->setId(mUi->rbtnNoGrid, static_cast<int>(GridProperties::Type_t::Off));
+    mUi->rbtnGroup->setId(mUi->rbtnDots, static_cast<int>(GridProperties::Type_t::Dots));
+    mUi->rbtnGroup->setId(mUi->rbtnLines, static_cast<int>(GridProperties::Type_t::Lines));
 
     // select the grid type
-    mUi->rbtnGroup->button(static_cast<int>(mType))->setChecked(true);
+    mUi->rbtnGroup->button(static_cast<int>(mCurrentGrid.getType()))->setChecked(true);
 
     // fill the combobox with all available units
     foreach (const LengthUnit& itemUnit, LengthUnit::getAllUnits())
         mUi->cbxUnits->addItem(itemUnit.toStringTr(), itemUnit.getIndex());
-    mUi->cbxUnits->setCurrentIndex(mUnit.getIndex());
+    mUi->cbxUnits->setCurrentIndex(mCurrentGrid.getUnit().getIndex());
 
     // update spinbox value
-    mUi->spbxInterval->setValue(mUnit.convertToUnit(mInterval));
+    mUi->spbxInterval->setValue(mCurrentGrid.getUnit().convertToUnit(mCurrentGrid.getInterval()));
 
     // connect UI signal with slots
     connect(mUi->rbtnGroup, SIGNAL(buttonClicked(int)), this, SLOT(rbtnGroupClicked(int)));
@@ -79,26 +74,25 @@ GridSettingsDialog::~GridSettingsDialog()
 void GridSettingsDialog::rbtnGroupClicked(int id)
 {
     if (id < 0) return;
-    mType = static_cast<CADView::GridType_t>(id);
-    emit gridTypeChanged(mType);
+    mCurrentGrid.setType(static_cast<GridProperties::Type_t>(id));
+    emit gridPropertiesChanged(mCurrentGrid);
 }
 
 void GridSettingsDialog::spbxIntervalChanged(double value)
 {
-    mInterval = mUnit.convertFromUnit(value);
+    mCurrentGrid.setInterval(mCurrentGrid.getUnit().convertFromUnit(value));
     updateInternalRepresentation();
-    emit gridIntervalChanged(mInterval);
+    emit gridPropertiesChanged(mCurrentGrid);
 }
 
 void GridSettingsDialog::cbxUnitsChanged(int index)
 {
     try
     {
-        mUnit = LengthUnit::fromIndex(index);
-        mUi->spbxInterval->setValue(mUnit.convertToUnit(mInterval));
+        mCurrentGrid.setUnit(LengthUnit::fromIndex(index));
+        mUi->spbxInterval->setValue(mCurrentGrid.getUnit().convertToUnit(mCurrentGrid.getInterval()));
         updateInternalRepresentation();
-        emit gridIntervalChanged(mInterval);
-        emit gridIntervalUnitChanged(mUnit);
+        emit gridPropertiesChanged(mCurrentGrid);
     }
     catch (Exception& e)
     {
@@ -126,17 +120,15 @@ void GridSettingsDialog::buttonBoxClicked(QAbstractButton* button)
 
         case QDialogButtonBox::ResetRole:
         {
-            mType = CADView::GridType_t::Lines;
-            mInterval.setLengthNm(2540000); // 2.54mm is the default grid interval
-            mUnit = Workspace::instance().getSettings().getAppDefMeasUnits()->getLengthUnit();
+            mCurrentGrid = GridProperties();
 
             // update widgets
             mUi->rbtnGroup->blockSignals(true);
             mUi->cbxUnits->blockSignals(true);
             mUi->spbxInterval->blockSignals(true);
-            mUi->rbtnGroup->button(static_cast<int>(mType))->setChecked(true);
-            mUi->cbxUnits->setCurrentIndex(mUnit.getIndex());
-            mUi->spbxInterval->setValue(mUnit.convertToUnit(mInterval));
+            mUi->rbtnGroup->button(static_cast<int>(mCurrentGrid.getType()))->setChecked(true);
+            mUi->cbxUnits->setCurrentIndex(mCurrentGrid.getUnit().getIndex());
+            mUi->spbxInterval->setValue(mCurrentGrid.getUnit().convertToUnit(mCurrentGrid.getInterval()));
             mUi->rbtnGroup->blockSignals(false);
             mUi->cbxUnits->blockSignals(false);
             mUi->spbxInterval->blockSignals(false);
@@ -146,15 +138,11 @@ void GridSettingsDialog::buttonBoxClicked(QAbstractButton* button)
 
         default:
             // restore initial settings
-            mType = mInitialType;
-            mInterval = mInitialInterval;
-            mUnit = mInitialUnit;
+            mCurrentGrid = mOriginalGrid;
             break;
     }
 
-    emit gridTypeChanged(mType);
-    emit gridIntervalChanged(mInterval);
-    emit gridIntervalUnitChanged(mUnit);
+    emit gridPropertiesChanged(mCurrentGrid);
 }
 
 /*****************************************************************************************
@@ -164,7 +152,7 @@ void GridSettingsDialog::buttonBoxClicked(QAbstractButton* button)
 void GridSettingsDialog::updateInternalRepresentation() noexcept
 {
     QLocale locale; // this loads the application's default locale (defined in WSI_AppLocale)
-    mUi->lblIntervalNm->setText(QString("%1 nm").arg(locale.toString(mInterval.toNm())));
+    mUi->lblIntervalNm->setText(QString("%1 nm").arg(locale.toString(mCurrentGrid.getInterval().toNm())));
 }
 
 /*****************************************************************************************

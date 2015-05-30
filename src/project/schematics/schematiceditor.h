@@ -26,15 +26,14 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include "../../common/cadscene.h"
+#include "../../common/graphics/if_graphicsvieweventhandler.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
-namespace Ui {
-class SchematicEditor;
-}
+class GraphicsView;
+class GridProperties;
 
 namespace project {
 class Project;
@@ -42,6 +41,10 @@ class Schematic;
 class SchematicPagesDock;
 class ErcMsgDock;
 class SES_FSM;
+}
+
+namespace Ui {
+class SchematicEditor;
 }
 
 /*****************************************************************************************
@@ -53,7 +56,7 @@ namespace project {
 /**
  * @brief The SchematicEditor class
  */
-class SchematicEditor : public QMainWindow, public IF_CADSceneEventHandler
+class SchematicEditor final : public QMainWindow, public IF_GraphicsViewEventHandler
 {
         Q_OBJECT
 
@@ -67,6 +70,7 @@ class SchematicEditor : public QMainWindow, public IF_CADSceneEventHandler
         Project& getProject() const noexcept {return mProject;}
         int getActiveSchematicIndex() const noexcept {return mActiveSchematicIndex;}
         Schematic* getActiveSchematic() const noexcept;
+        const GridProperties& getGridProperties() const noexcept {return *mGridProperties;}
 
         // Setters
         bool setActiveSchematicIndex(int index) noexcept;
@@ -82,6 +86,7 @@ class SchematicEditor : public QMainWindow, public IF_CADSceneEventHandler
 
         // Actions
         void on_actionClose_Project_triggered();
+        void on_actionNew_Schematic_Page_triggered();
         void on_actionUndo_triggered();
         void on_actionRedo_triggered();
         void on_actionGrid_triggered();
@@ -107,11 +112,13 @@ class SchematicEditor : public QMainWindow, public IF_CADSceneEventHandler
         SchematicEditor& operator=(const SchematicEditor& rhs);
 
         // Private Methods
-        bool cadSceneEventHandler(QEvent* event);
+        bool graphicsViewEventHandler(QEvent* event);
 
         // General Attributes
         Project& mProject;
         Ui::SchematicEditor* mUi;
+        GraphicsView* mGraphicsView;
+        GridProperties* mGridProperties;
 
         int mActiveSchematicIndex;
 

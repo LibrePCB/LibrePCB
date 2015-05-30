@@ -26,13 +26,13 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include "../../common/filepath.h"
+#include "../../common/file_io/filepath.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
-class CADScene;
+class GraphicsScene;
 
 namespace project {
 class Project;
@@ -42,7 +42,7 @@ namespace library {
 class GenericComponent;
 class GenCompSymbVar;
 class Symbol;
-class SymbolGraphicsItem;
+class SymbolPreviewGraphicsItem;
 }
 
 namespace Ui {
@@ -70,7 +70,7 @@ class AddGenCompDialog final : public QDialog
     public:
 
         // Constructors / Destructor
-        explicit AddGenCompDialog(Project& project);
+        explicit AddGenCompDialog(Project& project, QWidget* parent = nullptr);
         ~AddGenCompDialog() noexcept;
 
         // Getters
@@ -94,13 +94,13 @@ class AddGenCompDialog final : public QDialog
         // General
         Project& mProject;
         Ui::AddGenCompDialog* mUi;
-        CADScene* mPreviewScene;
+        GraphicsScene* mPreviewScene;
 
 
         // Attributes
         const library::GenericComponent* mSelectedGenComp;
         const library::GenCompSymbVar* mSelectedSymbVar;
-        QList<library::SymbolGraphicsItem*> mSymbolGraphicsItems;
+        QList<library::SymbolPreviewGraphicsItem*> mPreviewSymbolGraphicsItems;
 };
 
 } // namespace project

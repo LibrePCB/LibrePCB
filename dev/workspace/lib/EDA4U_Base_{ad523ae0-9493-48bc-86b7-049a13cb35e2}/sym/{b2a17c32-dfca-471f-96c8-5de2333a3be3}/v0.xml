@@ -78,8 +78,8 @@
         </polygon>
         <ellipse grab_area="true" fill_layer="10" line_layer="10" line_width="0.000000" x="2.540000" y="-2.540000" radius_x="0.36" radius_y="0.36" rotation="0"/>
         <ellipse grab_area="true" fill_layer="10" line_layer="10" line_width="0.000000" x="2.540000" y="2.540000" radius_x="0.36" radius_y="0.36" rotation="0"/>
-        <text text="${CMP::VALUE}" x="-1.27" angle="0.000000" y="-1.27" height="2.5" h_align="right" layer="21" v_align="bottom"/>
-        <text text="${SYM::NAME}" x="-1.27" angle="0.000000" y="1.27" height="3.556000" h_align="right" layer="20" v_align="bottom"/>
+        <text text="${SYM::NAME}" x="-1.27" angle="0.000000" y="1.27" height="2.54" h_align="right" layer="20" v_align="bottom"/>
+        <text text="${CMP::VALUE}" x="-1.27" angle="0.000000" y="-1.27" height="2.54" h_align="right" layer="21" v_align="bottom"/>
     </geometry>
     <pins>
         <pin x="-2.540000" angle="90.000000" y="-2.540000" uuid="{6b08ad4a-ea43-420c-af39-4b08609e9532}" length="2.540000">

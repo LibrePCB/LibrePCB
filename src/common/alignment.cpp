@@ -28,6 +28,18 @@
  *  Class HAlign
  ****************************************************************************************/
 
+HAlign& HAlign::mirror() noexcept
+{
+    switch (mAlign)
+    {
+        case Qt::AlignLeft:     mAlign = Qt::AlignRight;    break;
+        case Qt::AlignRight:    mAlign = Qt::AlignLeft;     break;
+        case Qt::AlignHCenter:  break;
+        default: Q_ASSERT(false); break;
+    }
+    return *this;
+}
+
 QString HAlign::toString() const noexcept
 {
     switch (mAlign)
@@ -59,6 +71,18 @@ HAlign HAlign::fromString(const QString& align) throw (Exception)
  *  Class VAlign
  ****************************************************************************************/
 
+VAlign& VAlign::mirror() noexcept
+{
+    switch (mAlign)
+    {
+        case Qt::AlignTop:      mAlign = Qt::AlignBottom;   break;
+        case Qt::AlignBottom:   mAlign = Qt::AlignTop;      break;
+        case Qt::AlignVCenter:  break;
+        default: Q_ASSERT(false); break;
+    }
+    return *this;
+}
+
 QString VAlign::toString() const noexcept
 {
     switch (mAlign)
@@ -83,6 +107,29 @@ VAlign VAlign::fromString(const QString& align) throw (Exception)
         throw RuntimeError(__FILE__, __LINE__, align,
             QString(tr("Invalid vertical alignment: \"%1\"")).arg(align));
     }
+}
+
+/*****************************************************************************************
+ *  Class VAlign
+ ****************************************************************************************/
+
+Alignment& Alignment::mirror() noexcept
+{
+    mH.mirror();
+    mV.mirror();
+    return *this;
+}
+
+Alignment& Alignment::mirrorH() noexcept
+{
+    mH.mirror();
+    return *this;
+}
+
+Alignment& Alignment::mirrorV() noexcept
+{
+    mV.mirror();
+    return *this;
 }
 
 /*****************************************************************************************

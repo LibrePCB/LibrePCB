@@ -34,7 +34,7 @@
 
 namespace project {
 class Schematic;
-class SchematicNetLabel;
+class SI_NetLabel;
 }
 
 /*****************************************************************************************
@@ -51,7 +51,7 @@ class CmdSchematicNetLabelRemove final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit CmdSchematicNetLabelRemove(Schematic& schematic, SchematicNetLabel& netlabel,
+        explicit CmdSchematicNetLabelRemove(Schematic& schematic, SI_NetLabel& netlabel,
                                             UndoCommand* parent = 0) throw (Exception);
         ~CmdSchematicNetLabelRemove() noexcept;
 
@@ -62,7 +62,7 @@ class CmdSchematicNetLabelRemove final : public UndoCommand
     private:
 
         Schematic& mSchematic;
-        SchematicNetLabel& mNetLabel;
+        SI_NetLabel& mNetLabel;
 };
 
 } // namespace project

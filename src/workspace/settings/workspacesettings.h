@@ -25,7 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../../common/filepath.h"
+#include "../../common/file_io/filepath.h"
 
 // All Settings Classes
 #include "items/wsi_applocale.h"
@@ -72,6 +72,8 @@ class WorkspaceSettingsDialog;
  *
  * @author ubruhin
  * @date 2014-07-12
+ *
+ * @todo Maybe use XML files instead of INI to save all workspace settings...
  */
 class WorkspaceSettings final : public QObject
 {

@@ -29,7 +29,7 @@
 #include "../erc/ercmsg.h"
 #include "gencompsignalinstance.h"
 #include "../../common/file_io/xmldomelement.h"
-#include "../schematics/schematicnetlabel.h"
+#include "../schematics/items/si_netlabel.h"
 
 namespace project {
 
@@ -87,6 +87,7 @@ NetSignal::~NetSignal() noexcept
 
 void NetSignal::setName(const QString& name, bool isAutoName) throw (Exception)
 {
+    if ((name == mName) && (isAutoName == mHasAutoName)) return;
     // the name must not be empty!
     if(name.isEmpty())
     {
@@ -97,7 +98,7 @@ void NetSignal::setName(const QString& name, bool isAutoName) throw (Exception)
     mHasAutoName = isAutoName;
     updateErcMessages();
 
-    foreach (SchematicNetLabel* label, mSchematicNetLabels)
+    foreach (SI_NetLabel* label, mSchematicNetLabels)
         label->updateText();
 }
 
@@ -128,7 +129,7 @@ void NetSignal::unregisterGenCompSignal(GenCompSignalInstance& signal) noexcept
     updateErcMessages();
 }
 
-void NetSignal::registerSchematicNetPoint(SchematicNetPoint& netpoint) noexcept
+void NetSignal::registerSchematicNetPoint(SI_NetPoint& netpoint) noexcept
 {
     Q_ASSERT(mAddedToCircuit == true);
     Q_ASSERT(mSchematicNetPoints.contains(&netpoint) == false);
@@ -136,7 +137,7 @@ void NetSignal::registerSchematicNetPoint(SchematicNetPoint& netpoint) noexcept
     updateErcMessages();
 }
 
-void NetSignal::unregisterSchematicNetPoint(SchematicNetPoint& netpoint) noexcept
+void NetSignal::unregisterSchematicNetPoint(SI_NetPoint& netpoint) noexcept
 {
     Q_ASSERT(mAddedToCircuit == true);
     Q_ASSERT(mSchematicNetPoints.contains(&netpoint) == true);
@@ -144,14 +145,14 @@ void NetSignal::unregisterSchematicNetPoint(SchematicNetPoint& netpoint) noexcep
     updateErcMessages();
 }
 
-void NetSignal::registerSchematicNetLabel(SchematicNetLabel& netlabel) noexcept
+void NetSignal::registerSchematicNetLabel(SI_NetLabel& netlabel) noexcept
 {
     Q_ASSERT(mAddedToCircuit == true);
     Q_ASSERT(mSchematicNetLabels.contains(&netlabel) == false);
     mSchematicNetLabels.append(&netlabel);
 }
 
-void NetSignal::unregisterSchematicNetLabel(SchematicNetLabel& netlabel) noexcept
+void NetSignal::unregisterSchematicNetLabel(SI_NetLabel& netlabel) noexcept
 {
     Q_ASSERT(mAddedToCircuit == true);
     Q_ASSERT(mSchematicNetLabels.contains(&netlabel) == true);
@@ -163,6 +164,7 @@ void NetSignal::addToCircuit() noexcept
     Q_ASSERT(mAddedToCircuit == false);
     Q_ASSERT(mGenCompSignals.isEmpty() == true);
     Q_ASSERT(mSchematicNetPoints.isEmpty() == true);
+    Q_ASSERT(mSchematicNetLabels.isEmpty() == true);
     mAddedToCircuit = true;
     mNetClass->registerNetSignal(*this);
     updateErcMessages();
@@ -173,6 +175,7 @@ void NetSignal::removeFromCircuit() noexcept
     Q_ASSERT(mAddedToCircuit == true);
     Q_ASSERT(mGenCompSignals.isEmpty() == true);
     Q_ASSERT(mSchematicNetPoints.isEmpty() == true);
+    Q_ASSERT(mSchematicNetLabels.isEmpty() == true);
     mAddedToCircuit = false;
     mNetClass->unregisterNetSignal(*this);
     updateErcMessages();

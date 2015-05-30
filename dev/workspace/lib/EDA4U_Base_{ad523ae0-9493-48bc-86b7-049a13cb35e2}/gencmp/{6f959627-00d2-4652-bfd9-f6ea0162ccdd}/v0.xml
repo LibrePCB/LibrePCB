@@ -35,7 +35,7 @@
             <name locale="en_US">default</name>
             <description locale="en_US"></description>
             <symbol_items>
-                <item add_order_index="0" suffix="" symbol="{c2c427a9-17c6-4400-981c-6ece1c9735c3}" required="true" uuid="{fade976e-1f99-41a4-bcfc-b29524c37768}">
+                <item suffix="" symbol="{c2c427a9-17c6-4400-981c-6ece1c9735c3}" required="true" uuid="{fade976e-1f99-41a4-bcfc-b29524c37768}">
                     <pin_signal_map>
                         <map signal="{0b345c41-0429-47f3-917a-5140944c7755}" display="none" pin="{b03c23a6-4890-42b5-ad6a-4b4fe1f77fbd}"/>
                         <map signal="{78fc7eeb-dca2-40c7-9543-9444e527056e}" display="none" pin="{e433fe3f-c104-4bc8-9e93-312bea6dd368}"/>

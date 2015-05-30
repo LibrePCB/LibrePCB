@@ -46,7 +46,8 @@ class SchematicLayer final : public QObject
         enum LayerID {
 
             // General
-            OriginCrosses       = 1,
+            Grid                = 1,
+            OriginCrosses       = 2,
 
             // Symbols
             SymbolOutlines      = 10,

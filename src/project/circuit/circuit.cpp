@@ -23,7 +23,7 @@
 
 #include <QtCore>
 #include "../../common/exceptions.h"
-#include "../../common/smartxmlfile.h"
+#include "../../common/file_io/smartxmlfile.h"
 #include "../../common/file_io/xmldomdocument.h"
 #include "../../common/file_io/xmldomelement.h"
 #include "circuit.h"
@@ -32,7 +32,7 @@
 #include "netsignal.h"
 #include "gencompinstance.h"
 #include "editnetclassesdialog.h"
-#include "../../library/genericcomponent.h"
+#include "../../library/gencmp/genericcomponent.h"
 
 namespace project {
 
@@ -81,8 +81,8 @@ Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create) thr
             }
 
             // Load all generic component instances
-            for (XmlDomElement* node = root.getFirstChild("generic_component_instances/instance", true, false);
-                 node; node = node->getNextSibling("instance"))
+            for (XmlDomElement* node = root.getFirstChild("generic_component_instances/generic_component_instance", true, false);
+                 node; node = node->getNextSibling("generic_component_instance"))
             {
                 GenCompInstance* genComp = new GenCompInstance(*this, *node);
                 addGenCompInstance(*genComp);
@@ -189,6 +189,7 @@ void Circuit::removeNetClass(NetClass& netclass) throw (Exception)
 void Circuit::setNetClassName(NetClass& netclass, const QString& newName) throw (Exception)
 {
     Q_ASSERT(mNetClasses.contains(netclass.getUuid()) == true);
+    if (newName == netclass.getName()) return;
 
     // check the validity of the new name
     if (newName.isEmpty())
@@ -292,7 +293,9 @@ void Circuit::removeNetSignal(NetSignal& netsignal) throw (Exception)
     Q_ASSERT(mNetSignals.contains(netsignal.getUuid()) == true);
 
     // the netsignal cannot be removed if there are already elements with that netsignal!
-    if ((netsignal.getGenCompSignals().count() > 0) || (netsignal.getNetPoints().count() > 0))
+    if (   (netsignal.getGenCompSignals().count() > 0)
+        || (netsignal.getNetPoints().count() > 0)
+        || (netsignal.getNetLabels().count() > 0))
     {
         throw LogicError(__FILE__, __LINE__,
             QString("%1:%2/%3")
@@ -312,6 +315,7 @@ void Circuit::removeNetSignal(NetSignal& netsignal) throw (Exception)
 void Circuit::setNetSignalName(NetSignal& netsignal, const QString& newName, bool isAutoName) throw (Exception)
 {
     Q_ASSERT(mNetSignals.contains(netsignal.getUuid()) == true);
+    if ((newName == netsignal.getName()) && (isAutoName == netsignal.hasAutoName())) return;
 
     // check the validity of the new name
     if (newName.isEmpty())
@@ -419,6 +423,7 @@ void Circuit::removeGenCompInstance(GenCompInstance& genCompInstance) throw (Exc
 void Circuit::setGenCompInstanceName(GenCompInstance& genComp, const QString& newName) throw (Exception)
 {
     Q_ASSERT(mGenCompInstances.contains(genComp.getUuid()) == true);
+    if (newName == genComp.getName()) return;
 
     // check the validity of the new name
     if (newName.isEmpty())

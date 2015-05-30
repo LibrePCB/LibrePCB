@@ -24,15 +24,15 @@
 #include <QtCore>
 #include "../../common/exceptions.h"
 #include "projectlibrary.h"
-#include "../../common/filepath.h"
+#include "../../common/file_io/filepath.h"
 #include "../project.h"
-#include "../../library/symbol.h"
-#include "../../library/footprint.h"
-#include "../../library/model.h"
-#include "../../library/spicemodel.h"
-#include "../../library/package.h"
-#include "../../library/genericcomponent.h"
-#include "../../library/component.h"
+#include "../../library/sym/symbol.h"
+#include "../../library/fpt/footprint.h"
+#include "../../library/3dmdl/model3d.h"
+#include "../../library/spcmdl/spicemodel.h"
+#include "../../library/pkg/package.h"
+#include "../../library/gencmp/genericcomponent.h"
+#include "../../library/cmp/component.h"
 #include "../../workspace/workspace.h"
 using namespace library;
 
@@ -70,7 +70,7 @@ ProjectLibrary::ProjectLibrary(Project& project, bool restore, bool readOnly) th
             // Load all library elements
             loadElements<Symbol>          (mLibraryPath.getPathTo("sym"),    "symbols",            mSymbols);
             loadElements<Footprint>       (mLibraryPath.getPathTo("fpt"),    "footprints",         mFootprints);
-            loadElements<Model>           (mLibraryPath.getPathTo("3dmdl"),  "3d models",          mModels);
+            loadElements<Model3D>           (mLibraryPath.getPathTo("3dmdl"),  "3d models",          mModels);
             loadElements<SpiceModel>      (mLibraryPath.getPathTo("spcmdl"), "spice models",       mSpiceModels);
             loadElements<Package>         (mLibraryPath.getPathTo("pkg"),    "packages",           mPackages);
             loadElements<GenericComponent>(mLibraryPath.getPathTo("gencmp"), "generic components", mGenericComponents);
@@ -119,7 +119,7 @@ const Footprint* ProjectLibrary::getFootprint(const QUuid& uuid) const noexcept
     return mFootprints.value(uuid, 0);
 }
 
-const Model* ProjectLibrary::getModel(const QUuid& uuid) const noexcept
+const Model3D* ProjectLibrary::getModel(const QUuid& uuid) const noexcept
 {
     return mModels.value(uuid, 0);
 }

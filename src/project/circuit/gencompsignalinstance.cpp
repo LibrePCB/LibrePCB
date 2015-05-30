@@ -23,9 +23,11 @@
 #include "gencompinstance.h"
 #include "circuit.h"
 #include "netsignal.h"
-#include "../../library/genericcomponent.h"
+#include "../../library/gencmp/genericcomponent.h"
 #include "../erc/ercmsg.h"
 #include "../../common/file_io/xmldomelement.h"
+#include "../project.h"
+#include "../settings/projectsettings.h"
 
 namespace project {
 
@@ -90,7 +92,7 @@ void GenCompSignalInstance::init() throw (Exception)
 GenCompSignalInstance::~GenCompSignalInstance() noexcept
 {
     Q_ASSERT(!mAddedToCircuit);
-    Q_ASSERT(mSymbolPinInstances.isEmpty());
+    Q_ASSERT(mRegisteredSymbolPins.isEmpty());
 }
 
 /*****************************************************************************************
@@ -132,33 +134,29 @@ void GenCompSignalInstance::setNetSignal(NetSignal* netsignal) throw (Exception)
  *  General Methods
  ****************************************************************************************/
 
-void GenCompSignalInstance::registerSymbolPinInstance(SymbolPinInstance* pin) throw (Exception)
+void GenCompSignalInstance::registerSymbolPin(SI_SymbolPin& pin) throw (Exception)
 {
-    Q_CHECK_PTR(pin);
-
     if (!mAddedToCircuit)
         throw LogicError(__FILE__, __LINE__);
-    if (mSymbolPinInstances.contains(pin))
+    if (mRegisteredSymbolPins.contains(&pin))
         throw LogicError(__FILE__, __LINE__);
 
-    mSymbolPinInstances.append(pin);
+    mRegisteredSymbolPins.append(&pin);
 }
 
-void GenCompSignalInstance::unregisterSymbolPinInstance(SymbolPinInstance* pin) throw (Exception)
+void GenCompSignalInstance::unregisterSymbolPin(SI_SymbolPin& pin) throw (Exception)
 {
-    Q_CHECK_PTR(pin);
-
     if (!mAddedToCircuit)
         throw LogicError(__FILE__, __LINE__);
-    if (!mSymbolPinInstances.contains(pin))
+    if (!mRegisteredSymbolPins.contains(&pin))
         throw LogicError(__FILE__, __LINE__);
 
-    mSymbolPinInstances.removeAll(pin);
+    mRegisteredSymbolPins.removeAll(&pin);
 }
 
 void GenCompSignalInstance::addToCircuit() throw (Exception)
 {
-    if (!mSymbolPinInstances.isEmpty())
+    if (!mRegisteredSymbolPins.isEmpty())
         throw LogicError(__FILE__, __LINE__);
 
     if (mNetSignal)
@@ -170,7 +168,7 @@ void GenCompSignalInstance::addToCircuit() throw (Exception)
 
 void GenCompSignalInstance::removeFromCircuit() throw (Exception)
 {
-    if (!mSymbolPinInstances.isEmpty())
+    if (!mRegisteredSymbolPins.isEmpty())
         throw LogicError(__FILE__, __LINE__);
 
     if (mNetSignal)
@@ -206,13 +204,15 @@ bool GenCompSignalInstance::checkAttributesValidity() const noexcept
 
 void GenCompSignalInstance::updateErcMessages() noexcept
 {
+    const QStringList& localeOrder = mCircuit.getProject().getSettings().getLocaleOrder();
+
     mErcMsgUnconnectedRequiredSignal->setMsg(
         QString(tr("Unconnected component signal: \"%1\" from \"%2\""))
-        .arg(mGenCompSignal->getName()).arg(mGenCompInstance.getName()));
+        .arg(mGenCompSignal->getName(localeOrder)).arg(mGenCompInstance.getName()));
     mErcMsgForcedNetSignalNameConflict->setMsg(
         QString(tr("Signal name conflict: \"%1\" != \"%2\" (\"%3\" from \"%4\")"))
         .arg((mNetSignal ? mNetSignal->getName() : QString()), getForcedNetSignalName(),
-        mGenCompSignal->getName(), mGenCompInstance.getName()));
+        mGenCompSignal->getName(localeOrder), mGenCompInstance.getName()));
 
     mErcMsgUnconnectedRequiredSignal->setVisible((mAddedToCircuit) && (!mNetSignal)
         && (mGenCompSignal->isRequired()));

@@ -36,7 +36,7 @@
 namespace project {
 class Schematic;
 class GenCompInstance;
-class SymbolInstance;
+class SI_Symbol;
 }
 
 /*****************************************************************************************
@@ -56,11 +56,11 @@ class CmdSymbolInstanceAdd final : public UndoCommand
         explicit CmdSymbolInstanceAdd(Schematic& schematic, GenCompInstance& genComp,
                                       const QUuid& symbolItem, const Point& position = Point(),
                                       const Angle& angle = Angle(), UndoCommand* parent = 0) throw (Exception);
-        explicit CmdSymbolInstanceAdd(SymbolInstance& symbol, UndoCommand* parent = 0) throw (Exception);
+        explicit CmdSymbolInstanceAdd(SI_Symbol& symbol, UndoCommand* parent = 0) throw (Exception);
         ~CmdSymbolInstanceAdd() noexcept;
 
         // Getters
-        SymbolInstance* getSymbolInstance() const noexcept {return mSymbolInstance;}
+        SI_Symbol* getSymbol() const noexcept {return mSymbol;}
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;
@@ -71,8 +71,8 @@ class CmdSymbolInstanceAdd final : public UndoCommand
         // Attributes from the constructor
         Schematic& mSchematic;
 
-        /// @brief The created symbol instance
-        SymbolInstance* mSymbolInstance;
+        /// @brief The created symbol
+        SI_Symbol* mSymbol;
 };
 
 } // namespace project

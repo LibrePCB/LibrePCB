@@ -24,7 +24,7 @@
 #include <QtCore>
 #include "cmdschematicnetlineadd.h"
 #include "../schematic.h"
-#include "../schematicnetline.h"
+#include "../items/si_netline.h"
 
 namespace project {
 
@@ -32,8 +32,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSchematicNetLineAdd::CmdSchematicNetLineAdd(Schematic& schematic, SchematicNetPoint& startPoint,
-                                               SchematicNetPoint& endPoint, UndoCommand* parent) throw (Exception) :
+CmdSchematicNetLineAdd::CmdSchematicNetLineAdd(Schematic& schematic, SI_NetPoint& startPoint,
+                                               SI_NetPoint& endPoint, UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Add netline"), parent),
     mSchematic(schematic), mStartPoint(startPoint), mEndPoint(endPoint), mNetLine(0)
 {
@@ -41,7 +41,7 @@ CmdSchematicNetLineAdd::CmdSchematicNetLineAdd(Schematic& schematic, SchematicNe
 
 CmdSchematicNetLineAdd::~CmdSchematicNetLineAdd() noexcept
 {
-    if ((mNetLine) && (!mIsExecuted))
+    if ((mNetLine) && (!isExecuted()))
         delete mNetLine;
 }
 

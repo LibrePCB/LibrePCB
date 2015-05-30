@@ -44,7 +44,7 @@ SchematicPagesDock::SchematicPagesDock(Project& project, SchematicEditor& editor
     mUi->setupUi(this);
 
     // add all schematics to list widget
-    for (int i = 0; i < mProject.getSchematicCount(); i++)
+    for (int i = 0; i < mProject.getSchematics().count(); i++)
         schematicAdded(i);
 
     // connect signals/slots

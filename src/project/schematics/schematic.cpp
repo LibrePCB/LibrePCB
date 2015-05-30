@@ -23,16 +23,19 @@
 
 #include <QtCore>
 #include "schematic.h"
-#include "../../common/smartxmlfile.h"
+#include "../../common/file_io/smartxmlfile.h"
 #include "../../common/file_io/xmldomdocument.h"
 #include "../../common/file_io/xmldomelement.h"
 #include "../project.h"
-#include "symbolinstance.h"
-#include "schematicnetpoint.h"
-#include "schematicnetline.h"
-#include "../../library/symbolpingraphicsitem.h"
-#include "../../library/symbolpin.h"
-#include "schematicnetlabel.h"
+#include "../../library/sym/symbolpin.h"
+#include "items/si_symbol.h"
+#include "items/si_symbolpin.h"
+#include "items/si_netpoint.h"
+#include "items/si_netline.h"
+#include "items/si_netlabel.h"
+#include "../../common/graphics/graphicsview.h"
+#include "../../common/graphics/graphicsscene.h"
+#include "../../common/gridproperties.h"
 
 namespace project {
 
@@ -42,11 +45,14 @@ namespace project {
 
 Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
                      bool readOnly, bool create, const QString& newName) throw (Exception):
-    CADScene(), IF_AttributeProvider(), mProject(project), mFilePath(filepath),
-    mXmlFile(nullptr), mAddedToProject(false)
+    QObject(nullptr), IF_AttributeProvider(), mProject(project), mFilePath(filepath),
+    mXmlFile(nullptr), mAddedToProject(false), mGraphicsScene(nullptr),
+    mGridProperties(nullptr)
 {
     try
     {
+        mGraphicsScene = new GraphicsScene();
+
         // try to open/create the XML schematic file
         if (create)
         {
@@ -55,6 +61,9 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             // set attributes
             mUuid = QUuid::createUuid();
             mName = newName;
+
+            // load default grid properties
+            mGridProperties = new GridProperties();
         }
         else
         {
@@ -67,11 +76,14 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             mUuid = root.getFirstChild("meta/uuid", true, true)->getText<QUuid>();
             mName = root.getFirstChild("meta/name", true, true)->getText(true);
 
-            // Load all symbol instances
+            // Load grid properties
+            mGridProperties = new GridProperties(*root.getFirstChild("properties/grid_properties", true, true));
+
+            // Load all symbols
             for (XmlDomElement* node = root.getFirstChild("symbols/symbol", true, false);
                  node; node = node->getNextSibling("symbol"))
             {
-                SymbolInstance* symbol = new SymbolInstance(*this, *node);
+                SI_Symbol* symbol = new SI_Symbol(*this, *node);
                 addSymbol(*symbol);
             }
 
@@ -79,7 +91,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             for (XmlDomElement* node = root.getFirstChild("netpoints/netpoint", true, false);
                  node; node = node->getNextSibling("netpoint"))
             {
-                SchematicNetPoint* netpoint = new SchematicNetPoint(*this, *node);
+                SI_NetPoint* netpoint = new SI_NetPoint(*this, *node);
                 addNetPoint(*netpoint);
             }
 
@@ -87,7 +99,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             for (XmlDomElement* node = root.getFirstChild("netlines/netline", true, false);
                  node; node = node->getNextSibling("netline"))
             {
-                SchematicNetLine* netline = new SchematicNetLine(*this, *node);
+                SI_NetLine* netline = new SI_NetLine(*this, *node);
                 addNetLine(*netline);
             }
 
@@ -95,27 +107,32 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             for (XmlDomElement* node = root.getFirstChild("netlabels/netlabel", true, false);
                  node; node = node->getNextSibling("netlabel"))
             {
-                SchematicNetLabel* netlabel = new SchematicNetLabel(*this, *node);
+                SI_NetLabel* netlabel = new SI_NetLabel(*this, *node);
                 addNetLabel(*netlabel);
             }
         }
 
         updateIcon();
 
+        // emit the "attributesChanged" signal when the project has emited it
+        connect(&mProject, &Project::attributesChanged, this, &Schematic::attributesChanged);
+
         if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
     }
     catch (...)
     {
         // free the allocated memory in the reverse order of their allocation...
-        foreach (SchematicNetLabel* netlabel, mNetLabels)
+        foreach (SI_NetLabel* netlabel, mNetLabels)
             try { removeNetLabel(*netlabel); delete netlabel; } catch (...) {}
-        foreach (SchematicNetLine* netline, mNetLines)
+        foreach (SI_NetLine* netline, mNetLines)
             try { removeNetLine(*netline); delete netline; } catch (...) {}
-        foreach (SchematicNetPoint* netpoint, mNetPoints)
+        foreach (SI_NetPoint* netpoint, mNetPoints)
             try { removeNetPoint(*netpoint); delete netpoint; } catch (...) {}
-        foreach (SymbolInstance* symbol, mSymbols)
+        foreach (SI_Symbol* symbol, mSymbols)
             try { removeSymbol(*symbol); delete symbol; } catch (...) {}
-        delete mXmlFile;                mXmlFile = 0;
+        delete mGridProperties;         mGridProperties = nullptr;
+        delete mXmlFile;                mXmlFile = nullptr;
+        delete mGraphicsScene;          mGraphicsScene = nullptr;
         throw; // ...and rethrow the exception
     }
 }
@@ -123,19 +140,21 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
 Schematic::~Schematic()
 {
     // delete all netlabels (and catch all throwed exceptions)
-    foreach (SchematicNetLabel* netlabel, mNetLabels)
+    foreach (SI_NetLabel* netlabel, mNetLabels)
         try { removeNetLabel(*netlabel); delete netlabel; } catch (...) {}
     // delete all netlines (and catch all throwed exceptions)
-    foreach (SchematicNetLine* netline, mNetLines)
+    foreach (SI_NetLine* netline, mNetLines)
         try { removeNetLine(*netline); delete netline; } catch (...) {}
     // delete all netpoints (and catch all throwed exceptions)
-    foreach (SchematicNetPoint* netpoint, mNetPoints)
+    foreach (SI_NetPoint* netpoint, mNetPoints)
         try { removeNetPoint(*netpoint); delete netpoint; } catch (...) {}
     // delete all symbols (and catch all throwed exceptions)
-    foreach (SymbolInstance* symbol, mSymbols)
+    foreach (SI_Symbol* symbol, mSymbols)
         try { removeSymbol(*symbol); delete symbol; } catch (...) {}
 
-    delete mXmlFile;                mXmlFile = 0;
+    delete mGridProperties;         mGridProperties = nullptr;
+    delete mXmlFile;                mXmlFile = nullptr;
+    delete mGraphicsScene;          mGraphicsScene = nullptr;
 }
 
 /*****************************************************************************************
@@ -147,58 +166,212 @@ bool Schematic::isEmpty() const noexcept
     return (mSymbols.isEmpty() && mNetPoints.isEmpty() && mNetLines.isEmpty());
 }
 
-uint Schematic::getNetPointsAtScenePos(QList<SchematicNetPoint*>& list, const Point& pos) const noexcept
+QList<SI_Base*> Schematic::getSelectedItems(bool floatingPoints,
+                                            bool attachedPoints,
+                                            bool floatingPointsFromFloatingLines,
+                                            bool attachedPointsFromFloatingLines,
+                                            bool floatingPointsFromAttachedLines,
+                                            bool attachedPointsFromAttachedLines,
+                                            bool attachedPointsFromSymbols,
+                                            bool floatingLines,
+                                            bool attachedLines,
+                                            bool attachedLinesFromSymbols) const noexcept
 {
-    foreach (QGraphicsItem* i, items(pos.toPxQPointF()))
+    QList<SI_Base*> list;
+    foreach (SI_Symbol* symbol, mSymbols)
     {
-        if (i->type() != CADScene::Type_SchematicNetPoint) continue;
-        SchematicNetPointGraphicsItem* p = qgraphicsitem_cast<SchematicNetPointGraphicsItem*>(i);
-        if (!p) continue;
-        list.append(&p->getNetPoint());
+        // symbol
+        if (symbol->isSelected())
+            list.append(symbol);
+
+        // pins
+        foreach (SI_SymbolPin* pin, symbol->getPins())
+        {
+            // pin
+            if (pin->isSelected())
+                list.append(pin);
+
+            // attached netpoints & netlines
+            SI_NetPoint* attachedNetPoint = pin->getNetPoint();
+            if (symbol->isSelected() && attachedPointsFromSymbols && attachedNetPoint)
+            {
+                if (!list.contains(attachedNetPoint))
+                    list.append(attachedNetPoint);
+            }
+            if (symbol->isSelected() && attachedLinesFromSymbols && attachedNetPoint)
+            {
+                foreach (SI_NetLine* attachedNetLine, attachedNetPoint->getLines())
+                {
+                    if (!list.contains(attachedNetLine))
+                        list.append(attachedNetLine);
+                }
+            }
+        }
     }
-    return list.count();
+    foreach (SI_NetPoint* netpoint, mNetPoints)
+    {
+        if (netpoint->isSelected())
+        {
+            if (((!netpoint->isAttached()) && floatingPoints)
+               || (netpoint->isAttached() && attachedPoints))
+            {
+                if (!list.contains(netpoint))
+                    list.append(netpoint);
+            }
+        }
+    }
+    foreach (SI_NetLine* netline, mNetLines)
+    {
+        if (netline->isSelected())
+        {
+            // netline
+            if (((!netline->isAttachedToSymbol()) && floatingLines)
+               || (netline->isAttachedToSymbol() && attachedLines))
+            {
+                if (!list.contains(netline))
+                    list.append(netline);
+            }
+            // netpoints from netlines
+            SI_NetPoint* p1 = &netline->getStartPoint();
+            SI_NetPoint* p2 = &netline->getEndPoint();
+            if ( ((!netline->isAttachedToSymbol()) && (!p1->isAttached()) && floatingPointsFromFloatingLines)
+              || ((!netline->isAttachedToSymbol()) && ( p1->isAttached()) && attachedPointsFromFloatingLines)
+              || (( netline->isAttachedToSymbol()) && (!p1->isAttached()) && floatingPointsFromAttachedLines)
+              || (( netline->isAttachedToSymbol()) && ( p1->isAttached()) && attachedPointsFromAttachedLines))
+            {
+                if (!list.contains(p1))
+                    list.append(p1);
+            }
+            if ( ((!netline->isAttachedToSymbol()) && (!p2->isAttached()) && floatingPointsFromFloatingLines)
+              || ((!netline->isAttachedToSymbol()) && ( p2->isAttached()) && attachedPointsFromFloatingLines)
+              || (( netline->isAttachedToSymbol()) && (!p2->isAttached()) && floatingPointsFromAttachedLines)
+              || (( netline->isAttachedToSymbol()) && ( p2->isAttached()) && attachedPointsFromAttachedLines))
+            {
+                if (!list.contains(p2))
+                    list.append(p2);
+            }
+        }
+    }
+    foreach (SI_NetLabel* netlabel, mNetLabels)
+    {
+        if (netlabel->isSelected())
+            list.append(netlabel);
+    }
+
+    return list;
 }
 
-uint Schematic::getNetLinesAtScenePos(QList<SchematicNetLine*>& list, const Point& pos) const noexcept
+QList<SI_Base*> Schematic::getItemsAtScenePos(const Point& pos) const noexcept
 {
-    foreach (QGraphicsItem* i, items(pos.toPxQPointF()))
+    QPointF scenePosPx = pos.toPxQPointF();
+    QList<SI_Base*> list;   // Note: The order of adding the items is very important (the
+                            // top most item must appear as the first item in the list)!
+    // visible netpoints
+    foreach (SI_NetPoint* netpoint, mNetPoints)
     {
-        if (i->type() != CADScene::Type_SchematicNetLine) continue;
-        SchematicNetLineGraphicsItem* l = qgraphicsitem_cast<SchematicNetLineGraphicsItem*>(i);
-        if (!l) continue;
-        list.append(&l->getNetLine());
+        if (!netpoint->isVisible()) continue;
+        if (netpoint->getGrabAreaScenePx().contains(scenePosPx))
+            list.append(netpoint);
     }
-    return list.count();
+    // hidden netpoints
+    foreach (SI_NetPoint* netpoint, mNetPoints)
+    {
+        if (netpoint->isVisible()) continue;
+        if (netpoint->getGrabAreaScenePx().contains(scenePosPx))
+            list.append(netpoint);
+    }
+    // netlines
+    foreach (SI_NetLine* netline, mNetLines)
+    {
+        if (netline->getGrabAreaScenePx().contains(scenePosPx))
+            list.append(netline);
+    }
+    // netlabels
+    foreach (SI_NetLabel* netlabel, mNetLabels)
+    {
+        if (netlabel->getGrabAreaScenePx().contains(scenePosPx))
+            list.append(netlabel);
+    }
+    // symbols & pins
+    foreach (SI_Symbol* symbol, mSymbols)
+    {
+        foreach (SI_SymbolPin* pin, symbol->getPins())
+        {
+            if (pin->getGrabAreaScenePx().contains(scenePosPx))
+                list.append(pin);
+        }
+        if (symbol->getGrabAreaScenePx().contains(scenePosPx))
+            list.append(symbol);
+    }
+    return list;
 }
 
-uint Schematic::getPinsAtScenePos(QList<SymbolPinInstance*>& list, const Point& pos) const noexcept
+QList<SI_NetPoint*> Schematic::getNetPointsAtScenePos(const Point& pos) const noexcept
 {
-    foreach (QGraphicsItem* i, items(pos.toPxQPointF()))
+    QList<SI_NetPoint*> list;
+    foreach (SI_NetPoint* netpoint, mNetPoints)
     {
-        if (i->type() != CADScene::Type_SymbolPin) continue;
-        library::SymbolPinGraphicsItem* p = qgraphicsitem_cast<library::SymbolPinGraphicsItem*>(i);
-        if (!p) continue;
-        list.append(p->getPinInstance());
+        if (netpoint->getGrabAreaScenePx().contains(pos.toPxQPointF()))
+            list.append(netpoint);
     }
-    return list.count();
+    return list;
+}
+
+QList<SI_NetLine*> Schematic::getNetLinesAtScenePos(const Point& pos) const noexcept
+{
+    QList<SI_NetLine*> list;
+    foreach (SI_NetLine* netline, mNetLines)
+    {
+        if (netline->getGrabAreaScenePx().contains(pos.toPxQPointF()))
+            list.append(netline);
+    }
+    return list;
+}
+
+QList<SI_SymbolPin*> Schematic::getPinsAtScenePos(const Point& pos) const noexcept
+{
+    QList<SI_SymbolPin*> list;
+    foreach (SI_Symbol* symbol, mSymbols)
+    {
+        foreach (SI_SymbolPin* pin, symbol->getPins())
+        {
+            if (pin->getGrabAreaScenePx().contains(pos.toPxQPointF()))
+                list.append(pin);
+        }
+    }
+    return list;
 }
 
 /*****************************************************************************************
- *  SymbolInstance Methods
+ *  Setters: General
  ****************************************************************************************/
 
-SymbolInstance* Schematic::getSymbolByUuid(const QUuid& uuid) const noexcept
+void Schematic::setGridProperties(const GridProperties& grid) noexcept
 {
-    return mSymbols.value(uuid, 0);
+    *mGridProperties = grid;
 }
 
-SymbolInstance* Schematic::createSymbol(GenCompInstance& genCompInstance, const QUuid& symbolItem,
-                                        const Point& position, const Angle& angle) throw (Exception)
+/*****************************************************************************************
+ *  Symbol Methods
+ ****************************************************************************************/
+
+SI_Symbol* Schematic::getSymbolByUuid(const QUuid& uuid) const noexcept
 {
-    return new SymbolInstance(*this, genCompInstance, symbolItem, position, angle);
+    foreach (SI_Symbol* symbol, mSymbols)
+    {
+        if (symbol->getUuid() == uuid)
+            return symbol;
+    }
+    return nullptr;
 }
 
-void Schematic::addSymbol(SymbolInstance& symbol) throw (Exception)
+SI_Symbol* Schematic::createSymbol(GenCompInstance& genCompInstance, const QUuid& symbolItem,
+                                   const Point& position, const Angle& angle) throw (Exception)
+{
+    return new SI_Symbol(*this, genCompInstance, symbolItem, position, angle);
+}
+
+void Schematic::addSymbol(SI_Symbol& symbol) throw (Exception)
 {
     // check if there is no symbol with the same uuid in the list
     if (getSymbolByUuid(symbol.getUuid()))
@@ -209,48 +382,44 @@ void Schematic::addSymbol(SymbolInstance& symbol) throw (Exception)
     }
 
     // add to schematic
-    symbol.addToSchematic(); // can throw an exception
-    mSymbols.insert(symbol.getUuid(), &symbol);
+    symbol.addToSchematic(*mGraphicsScene); // can throw an exception
+    mSymbols.append(&symbol);
 }
 
-void Schematic::removeSymbol(SymbolInstance& symbol) throw (Exception)
+void Schematic::removeSymbol(SI_Symbol& symbol) throw (Exception)
 {
-    Q_ASSERT(mSymbols.contains(symbol.getUuid()) == true);
-
-    // the symbol cannot be removed if there are already netpoints connected to it!
-    /*if (symbol->getNetPointCount() > 0)
-    {
-        throw RuntimeError(__FILE__, __LINE__, QString("%1:%2")
-            .arg(symbol->getUuid().toString()).arg(symbol->getNetPointCount()),
-            QString(tr("There are already netpoints connected to the symbol \"%1\"!"))
-            .arg(symbol->getUuid().toString()));
-    }*/
+    Q_ASSERT(mSymbols.contains(&symbol) == true);
 
     // remove from schematic
-    symbol.removeFromSchematic(); // can throw an exception
-    mSymbols.remove(symbol.getUuid());
+    symbol.removeFromSchematic(*mGraphicsScene); // can throw an exception
+    mSymbols.removeAll(&symbol);
 }
 
 /*****************************************************************************************
- *  SchematicNetPoint Methods
+ *  NetPoint Methods
  ****************************************************************************************/
 
-SchematicNetPoint* Schematic::getNetPointByUuid(const QUuid& uuid) const noexcept
+SI_NetPoint* Schematic::getNetPointByUuid(const QUuid& uuid) const noexcept
 {
-    return mNetPoints.value(uuid, 0);
+    foreach (SI_NetPoint* netpoint, mNetPoints)
+    {
+        if (netpoint->getUuid() == uuid)
+            return netpoint;
+    }
+    return nullptr;
 }
 
-SchematicNetPoint* Schematic::createNetPoint(NetSignal& netsignal, const Point& position) throw (Exception)
+SI_NetPoint* Schematic::createNetPoint(NetSignal& netsignal, const Point& position) throw (Exception)
 {
-    return new SchematicNetPoint(*this, netsignal, position);
+    return new SI_NetPoint(*this, netsignal, position);
 }
 
-SchematicNetPoint* Schematic::createNetPoint(SymbolInstance& symbol, const QUuid& pin) throw (Exception)
+SI_NetPoint* Schematic::createNetPoint(SI_SymbolPin& pin) throw (Exception)
 {
-    return new SchematicNetPoint(*this, symbol, pin);
+    return new SI_NetPoint(*this, pin);
 }
 
-void Schematic::addNetPoint(SchematicNetPoint& netpoint) throw (Exception)
+void Schematic::addNetPoint(SI_NetPoint& netpoint) throw (Exception)
 {
     // check if there is no netpoint with the same uuid in the list
     if (getNetPointByUuid(netpoint.getUuid()))
@@ -261,13 +430,13 @@ void Schematic::addNetPoint(SchematicNetPoint& netpoint) throw (Exception)
     }
 
     // add to schematic
-    netpoint.addToSchematic(); // can throw an exception
-    mNetPoints.insert(netpoint.getUuid(), &netpoint);
+    netpoint.addToSchematic(*mGraphicsScene); // can throw an exception
+    mNetPoints.append(&netpoint);
 }
 
-void Schematic::removeNetPoint(SchematicNetPoint& netpoint) throw (Exception)
+void Schematic::removeNetPoint(SI_NetPoint& netpoint) throw (Exception)
 {
-    Q_ASSERT(mNetPoints.contains(netpoint.getUuid()) == true);
+    Q_ASSERT(mNetPoints.contains(&netpoint) == true);
 
     // the netpoint cannot be removed if there are already netlines connected to it!
     if (netpoint.getLines().count() > 0)
@@ -279,27 +448,31 @@ void Schematic::removeNetPoint(SchematicNetPoint& netpoint) throw (Exception)
     }
 
     // remove from schematic
-    netpoint.removeFromSchematic(); // can throw an exception
-    mNetPoints.remove(netpoint.getUuid());
+    netpoint.removeFromSchematic(*mGraphicsScene); // can throw an exception
+    mNetPoints.removeAll(&netpoint);
 }
 
 /*****************************************************************************************
- *  SchematicNetLine Methods
+ *  NetLine Methods
  ****************************************************************************************/
 
-SchematicNetLine* Schematic::getNetLineByUuid(const QUuid& uuid) const noexcept
+SI_NetLine* Schematic::getNetLineByUuid(const QUuid& uuid) const noexcept
 {
-    return mNetLines.value(uuid, 0);
+    foreach (SI_NetLine* netline, mNetLines)
+    {
+        if (netline->getUuid() == uuid)
+            return netline;
+    }
+    return nullptr;
 }
 
-SchematicNetLine* Schematic::createNetLine(SchematicNetPoint& startPoint,
-                                           SchematicNetPoint& endPoint,
-                                           const Length& width) throw (Exception)
+SI_NetLine* Schematic::createNetLine(SI_NetPoint& startPoint, SI_NetPoint& endPoint,
+                                     const Length& width) throw (Exception)
 {
-    return new SchematicNetLine(*this, startPoint, endPoint, width);
+    return new SI_NetLine(*this, startPoint, endPoint, width);
 }
 
-void Schematic::addNetLine(SchematicNetLine& netline) throw (Exception)
+void Schematic::addNetLine(SI_NetLine& netline) throw (Exception)
 {
     // check if there is no netline with the same uuid in the list
     if (getNetLineByUuid(netline.getUuid()))
@@ -310,34 +483,39 @@ void Schematic::addNetLine(SchematicNetLine& netline) throw (Exception)
     }
 
     // add to schematic
-    netline.addToSchematic(); // can throw an exception
-    mNetLines.insert(netline.getUuid(), &netline);
+    netline.addToSchematic(*mGraphicsScene); // can throw an exception
+    mNetLines.append(&netline);
 }
 
-void Schematic::removeNetLine(SchematicNetLine& netline) throw (Exception)
+void Schematic::removeNetLine(SI_NetLine& netline) throw (Exception)
 {
-    Q_ASSERT(mNetLines.contains(netline.getUuid()) == true);
+    Q_ASSERT(mNetLines.contains(&netline) == true);
 
     // remove from schematic
-    netline.removeFromSchematic(); // can throw an exception
-    mNetLines.remove(netline.getUuid());
+    netline.removeFromSchematic(*mGraphicsScene); // can throw an exception
+    mNetLines.removeAll(&netline);
 }
 
 /*****************************************************************************************
- *  SchematicNetLabel Methods
+ *  NetLabel Methods
  ****************************************************************************************/
 
-SchematicNetLabel* Schematic::getNetLabelByUuid(const QUuid& uuid) const noexcept
+SI_NetLabel* Schematic::getNetLabelByUuid(const QUuid& uuid) const noexcept
 {
-    return mNetLabels.value(uuid, nullptr);
+    foreach (SI_NetLabel* netlabel, mNetLabels)
+    {
+        if (netlabel->getUuid() == uuid)
+            return netlabel;
+    }
+    return nullptr;
 }
 
-SchematicNetLabel* Schematic::createNetLabel(NetSignal& netsignal, const Point& position) throw (Exception)
+SI_NetLabel* Schematic::createNetLabel(NetSignal& netsignal, const Point& position) throw (Exception)
 {
-    return new SchematicNetLabel(*this, netsignal, position);
+    return new SI_NetLabel(*this, netsignal, position);
 }
 
-void Schematic::addNetLabel(SchematicNetLabel& netlabel) throw (Exception)
+void Schematic::addNetLabel(SI_NetLabel& netlabel) throw (Exception)
 {
     // check if there is no netlabel with the same uuid in the list
     if (getNetLabelByUuid(netlabel.getUuid()))
@@ -348,17 +526,17 @@ void Schematic::addNetLabel(SchematicNetLabel& netlabel) throw (Exception)
     }
 
     // add to schematic
-    netlabel.addToSchematic(); // can throw an exception
-    mNetLabels.insert(netlabel.getUuid(), &netlabel);
+    netlabel.addToSchematic(*mGraphicsScene); // can throw an exception
+    mNetLabels.append(&netlabel);
 }
 
-void Schematic::removeNetLabel(SchematicNetLabel& netlabel) throw (Exception)
+void Schematic::removeNetLabel(SI_NetLabel& netlabel) throw (Exception)
 {
-    Q_ASSERT(mNetLabels.contains(netlabel.getUuid()) == true);
+    Q_ASSERT(mNetLabels.contains(&netlabel) == true);
 
     // remove from schematic
-    netlabel.removeFromSchematic(); // can throw an exception
-    mNetLabels.remove(netlabel.getUuid());
+    netlabel.removeFromSchematic(*mGraphicsScene); // can throw an exception
+    mNetLabels.removeAll(&netlabel);
 }
 
 /*****************************************************************************************
@@ -404,6 +582,55 @@ bool Schematic::save(bool toOriginal, QStringList& errors) noexcept
     return success;
 }
 
+void Schematic::showInView(GraphicsView& view) noexcept
+{
+    view.setScene(mGraphicsScene);
+}
+
+void Schematic::setSelectionRect(const Point& p1, const Point& p2, bool updateItems) noexcept
+{
+    mGraphicsScene->setSelectionRect(p1, p2);
+    if (updateItems)
+    {
+        QRectF rectPx = QRectF(p1.toPxQPointF(), p2.toPxQPointF()).normalized();
+        foreach (SI_Symbol* symbol, mSymbols)
+        {
+            bool selectSymbol = symbol->getGrabAreaScenePx().intersects(rectPx);
+            symbol->setSelected(selectSymbol);
+            foreach (SI_SymbolPin* pin, symbol->getPins())
+            {
+                bool selectPin = pin->getGrabAreaScenePx().intersects(rectPx);
+                pin->setSelected(selectSymbol || selectPin);
+            }
+        }
+        foreach (SI_NetPoint* netpoint, mNetPoints)
+            netpoint->setSelected(netpoint->getGrabAreaScenePx().intersects(rectPx));
+        foreach (SI_NetLine* netline, mNetLines)
+            netline->setSelected(netline->getGrabAreaScenePx().intersects(rectPx));
+        foreach (SI_NetLabel* netlabel, mNetLabels)
+            netlabel->setSelected(netlabel->getGrabAreaScenePx().intersects(rectPx));
+    }
+}
+
+void Schematic::clearSelection() const noexcept
+{
+    foreach (SI_Symbol* symbol, mSymbols)
+        symbol->setSelected(false);
+    foreach (SI_NetPoint* netpoint, mNetPoints)
+        netpoint->setSelected(false);
+    foreach (SI_NetLine* netline, mNetLines)
+        netline->setSelected(false);
+    foreach (SI_NetLabel* netlabel, mNetLabels)
+        netlabel->setSelected(false);
+}
+
+void Schematic::renderToQPainter(QPainter& painter) const noexcept
+{
+    GraphicsScene* scene = dynamic_cast<GraphicsScene*>(mGraphicsScene);
+    Q_ASSERT(scene);
+    scene->render(&painter, QRectF(), scene->itemsBoundingRect(), Qt::KeepAspectRatio);
+}
+
 /*****************************************************************************************
  *  Helper Methods
  ****************************************************************************************/
@@ -424,7 +651,7 @@ bool Schematic::getAttributeValue(const QString& attrNS, const QString& attrKey,
         else if (attrKey == QLatin1String("NBR"))
             return value = QString::number(mProject.getSchematicIndex(this) + 1), true;
         else if (attrKey == QLatin1String("CNT"))
-            return value = QString::number(mProject.getSchematicCount()), true;
+            return value = QString::number(mProject.getSchematics().count()), true;
     }
 
     if ((attrNS != QLatin1String("PAGE")) && (passToParents))
@@ -439,13 +666,13 @@ bool Schematic::getAttributeValue(const QString& attrNS, const QString& attrKey,
 
 void Schematic::updateIcon() noexcept
 {
-    QRectF source = itemsBoundingRect().adjusted(-20, -20, 20, 20);
+    QRectF source = mGraphicsScene->itemsBoundingRect().adjusted(-20, -20, 20, 20);
     QRect target(0, 0, 297, 210); // DIN A4 format :-)
 
     QPixmap pixmap(target.size());
     pixmap.fill(Qt::white);
     QPainter painter(&pixmap);
-    render(&painter, target, source);
+    mGraphicsScene->render(&painter, target, source);
     mIcon = QIcon(pixmap);
 }
 
@@ -464,17 +691,19 @@ XmlDomElement* Schematic::serializeToXmlDomElement() const throw (Exception)
     XmlDomElement* meta = root->appendChild("meta");
     meta->appendTextChild("uuid", mUuid);
     meta->appendTextChild("name", mName);
+    XmlDomElement* properties = root->appendChild("properties");
+    properties->appendChild(mGridProperties->serializeToXmlDomElement());
     XmlDomElement* symbols = root->appendChild("symbols");
-    foreach (SymbolInstance* symbolInstance, mSymbols)
+    foreach (SI_Symbol* symbolInstance, mSymbols)
         symbols->appendChild(symbolInstance->serializeToXmlDomElement());
     XmlDomElement* netpoints = root->appendChild("netpoints");
-    foreach (SchematicNetPoint* netpoint, mNetPoints)
+    foreach (SI_NetPoint* netpoint, mNetPoints)
         netpoints->appendChild(netpoint->serializeToXmlDomElement());
     XmlDomElement* netlines = root->appendChild("netlines");
-    foreach (SchematicNetLine* netline, mNetLines)
+    foreach (SI_NetLine* netline, mNetLines)
         netlines->appendChild(netline->serializeToXmlDomElement());
     XmlDomElement* netlabels = root->appendChild("netlabels");
-    foreach (SchematicNetLabel* netlabel, mNetLabels)
+    foreach (SI_NetLabel* netlabel, mNetLabels)
         netlabels->appendChild(netlabel->serializeToXmlDomElement());
     return root.take();
 }

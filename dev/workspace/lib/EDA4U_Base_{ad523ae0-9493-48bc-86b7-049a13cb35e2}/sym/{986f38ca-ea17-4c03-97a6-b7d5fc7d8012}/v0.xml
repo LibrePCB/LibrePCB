@@ -24,8 +24,8 @@
             <segment angle="0" end_x="-1.524000" end_y="-0.381000"/>
             <segment angle="0" end_x="-1.524000" end_y="0.381000"/>
         </polygon>
-        <text text="${SYM::NAME}" x="2.540000" y="0" height="3.175" layer="20" h_align="left" v_align="bottom" angle="0.000000"/>
-        <text text="${CMP::VALUE}" x="2.540000" y="0" height="2.5" layer="21" h_align="left" v_align="top" angle="0.000000"/>
+        <text text="${SYM::NAME}" x="2.540000" y="0" height="2.54" layer="20" h_align="left" v_align="bottom" angle="0.000000"/>
+        <text text="${CMP::VALUE}" x="2.540000" y="0" height="2.54" layer="21" h_align="left" v_align="top" angle="0.000000"/>
     </geometry>
     <pins>
         <pin x="0" y="2.54" length="1.524" uuid="{ac7d1cc8-4a9e-4936-ab7c-ed70c7347195}" angle="180">

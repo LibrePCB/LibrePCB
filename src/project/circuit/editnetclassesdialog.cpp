@@ -29,7 +29,7 @@
 #include "../project.h"
 #include "../../common/undostack.h"
 #include "netclass.h"
-#include "cmd/cmdnetclasssetname.h"
+#include "cmd/cmdnetclassedit.h"
 #include "cmd/cmdnetclassadd.h"
 #include "cmd/cmdnetclassremove.h"
 
@@ -97,7 +97,8 @@ void EditNetClassesDialog::on_tableWidget_itemChanged(QTableWidgetItem *item)
             if (item->text() == netclass->getName()) break;
             try
             {
-                CmdNetClassSetName* cmd = new CmdNetClassSetName(mCircuit, *netclass, item->text());
+                auto cmd = new CmdNetClassEdit(mCircuit, *netclass);
+                cmd->setName(item->text());
                 mCircuit.getProject().getUndoStack().appendToCommand(cmd);
             }
             catch (Exception& e)

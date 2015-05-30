@@ -24,7 +24,7 @@
 #include <QtCore>
 #include "cmdschematicnetpointadd.h"
 #include "../schematic.h"
-#include "../schematicnetpoint.h"
+#include "../items/si_netpoint.h"
 
 namespace project {
 
@@ -36,21 +36,21 @@ CmdSchematicNetPointAdd::CmdSchematicNetPointAdd(Schematic& schematic, NetSignal
                                                  const Point& position, UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Add netpoint"), parent),
     mSchematic(schematic), mNetSignal(&netsignal), mAttachedToSymbol(false),
-    mPosition(position), mSymbol(nullptr), mPin(), mNetPoint(nullptr)
+    mPosition(position), mSymbolPin(nullptr), mNetPoint(nullptr)
 {
 }
 
-CmdSchematicNetPointAdd::CmdSchematicNetPointAdd(Schematic& schematic, SymbolInstance& symbol,
-                                                 const QUuid& pin, UndoCommand* parent) throw (Exception) :
+CmdSchematicNetPointAdd::CmdSchematicNetPointAdd(Schematic& schematic, SI_SymbolPin& pin,
+                                                 UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Add netpoint"), parent),
     mSchematic(schematic), mNetSignal(nullptr), mAttachedToSymbol(true),
-    mPosition(), mSymbol(&symbol), mPin(pin), mNetPoint(nullptr)
+    mPosition(), mSymbolPin(&pin), mNetPoint(nullptr)
 {
 }
 
 CmdSchematicNetPointAdd::~CmdSchematicNetPointAdd() noexcept
 {
-    if ((mNetPoint) && (!mIsExecuted))
+    if ((mNetPoint) && (!isExecuted()))
         delete mNetPoint;
 }
 
@@ -63,7 +63,7 @@ void CmdSchematicNetPointAdd::redo() throw (Exception)
     if (!mNetPoint) // only the first time
     {
         if (mAttachedToSymbol)
-            mNetPoint = mSchematic.createNetPoint(*mSymbol, mPin); // throws an exception on error
+            mNetPoint = mSchematic.createNetPoint(*mSymbolPin); // throws an exception on error
         else
             mNetPoint = mSchematic.createNetPoint(*mNetSignal, mPosition); // throws an exception on error
     }

@@ -34,8 +34,8 @@
 
 namespace project {
 class Schematic;
-class SchematicNetPoint;
-class SchematicNetLine;
+class SI_NetPoint;
+class SI_NetLine;
 }
 
 /*****************************************************************************************
@@ -52,12 +52,12 @@ class CmdSchematicNetLineAdd final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit CmdSchematicNetLineAdd(Schematic& schematic, SchematicNetPoint& startPoint,
-                                        SchematicNetPoint& endPoint, UndoCommand* parent = 0) throw (Exception);
+        explicit CmdSchematicNetLineAdd(Schematic& schematic, SI_NetPoint& startPoint,
+                                        SI_NetPoint& endPoint, UndoCommand* parent = 0) throw (Exception);
         ~CmdSchematicNetLineAdd() noexcept;
 
         // Getters
-        SchematicNetLine* getNetLine() const noexcept {return mNetLine;}
+        SI_NetLine* getNetLine() const noexcept {return mNetLine;}
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;
@@ -66,9 +66,9 @@ class CmdSchematicNetLineAdd final : public UndoCommand
     private:
 
         Schematic& mSchematic;
-        SchematicNetPoint& mStartPoint;
-        SchematicNetPoint& mEndPoint;
-        SchematicNetLine* mNetLine;
+        SI_NetPoint& mStartPoint;
+        SI_NetPoint& mEndPoint;
+        SI_NetLine* mNetLine;
 };
 
 } // namespace project

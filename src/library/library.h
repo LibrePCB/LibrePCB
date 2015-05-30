@@ -28,7 +28,7 @@
 #include <QtSql>
 
 #include "../common/exceptions.h"
-#include "../common/filepath.h"
+#include "../common/file_io/filepath.h"
 
 /*****************************************************************************************
  *  Class Library
