@@ -38,6 +38,7 @@ class GridProperties;
 namespace project {
 class Project;
 class Board;
+class ErcMsgDock;
 }
 
 namespace Ui {
@@ -125,6 +126,9 @@ class BoardEditor final : public QMainWindow, public IF_GraphicsViewEventHandler
         int mActiveBoardIndex;
         QList<QAction*> mBoardListActions;
         QActionGroup mBoardListActionGroup;
+
+        // Docks
+        ErcMsgDock* mErcMsgDock;
 };
 
 } // namespace project

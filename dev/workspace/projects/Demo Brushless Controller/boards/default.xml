@@ -7,4 +7,10 @@
     <properties>
         <grid_properties interval="2.540000" type="lines" unit="millimeters"/>
     </properties>
+    <component_instances>
+        <component_instance generic_component_instance="{8417e1db-8764-46a7-b5ef-2c606ecab6e1}" component="{ed1d3c03-d30b-47c1-94b7-fcff5db3290b}">
+            <footprint>
+            </footprint>
+        </component_instance>
+    </component_instances>
 </board>

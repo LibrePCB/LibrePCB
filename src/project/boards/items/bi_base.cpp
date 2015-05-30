@@ -17,56 +17,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_IF_ERCMSGPROVIDER_H
-#define PROJECT_IF_ERCMSGPROVIDER_H
-
 /*****************************************************************************************
- *  Forward Declarations
+ *  Includes
  ****************************************************************************************/
 
+#include <QtCore>
+#include "bi_base.h"
+
 namespace project {
-class ErcMsg; // all classes which implement IF_ErcMsgProvider will need this declaration
+
+/*****************************************************************************************
+ *  Constructors / Destructor
+ ****************************************************************************************/
+
+BI_Base::BI_Base() noexcept :
+    QObject(nullptr), mIsSelected(false)
+{
+}
+
+BI_Base::~BI_Base() noexcept
+{
 }
 
 /*****************************************************************************************
- *  Macros
+ *  Setters
  ****************************************************************************************/
 
-/**
- * @note    The specified class name should be unique only in the namespace #project,
- *          so we won't use the namespace as a prefix. Simple use the class name.
- *
- * @warning Do not change the name of an existing class if you don't know what you're doing!
- */
-#define DECLARE_ERC_MSG_CLASS_NAME(msgOwnerClassName) \
-public: \
-    virtual const char* getErcMsgOwnerClassName() const noexcept {return #msgOwnerClassName;} \
-private:
+void BI_Base::setSelected(bool selected) noexcept
+{
+    mIsSelected = selected;
+}
 
 /*****************************************************************************************
- *  Class IF_ErcMsgProvider
+ *  End of File
  ****************************************************************************************/
 
-namespace project {
-
-/**
- * @brief The IF_ErcMsgProvider class
- *
- * @author ubruhin
- * @date 2015-02-02
- */
-class IF_ErcMsgProvider
-{
-    public:
-
-        // Constructors / Destructor
-        IF_ErcMsgProvider() {}
-        virtual ~IF_ErcMsgProvider() {}
-
-        // Getters
-        virtual const char* getErcMsgOwnerClassName() const noexcept = 0;
-};
-
 } // namespace project
-
-#endif // PROJECT_IF_ERCMSGPROVIDER_H

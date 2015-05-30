@@ -34,8 +34,6 @@
  *  Forward Declarations
  ****************************************************************************************/
 
-class QGraphicsItem;
-
 namespace project {
 class Schematic;
 class GenCompInstance;

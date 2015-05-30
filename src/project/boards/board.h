@@ -31,6 +31,7 @@
 #include "../../common/units/all_length_units.h"
 #include "../../common/file_io/filepath.h"
 #include "../../common/exceptions.h"
+#include "../erc/if_ercmsgprovider.h"
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -43,6 +44,7 @@ class SmartXmlFile;
 
 namespace project {
 class Project;
+class ComponentInstance;
 }
 
 /*****************************************************************************************
@@ -55,11 +57,29 @@ namespace project {
  * @brief The Board class represents a PCB of a project and is always part of a circuit
  */
 class Board final : public QObject, public IF_AttributeProvider,
-        public IF_XmlSerializableObject
+                    public IF_ErcMsgProvider, public IF_XmlSerializableObject
 {
         Q_OBJECT
+        DECLARE_ERC_MSG_CLASS_NAME(Board)
 
     public:
+
+        // Types
+
+        /**
+         * @brief Z Values of all items in a board scene (to define the stacking order)
+         *
+         * These values are used for QGraphicsItem::setZValue() to define the stacking
+         * order of all items in a board QGraphicsScene. We use integer values, even
+         * if the z-value of QGraphicsItem is a qreal attribute...
+         *
+         * Low number = background, high number = foreground
+         */
+        enum ItemZValue {
+            ZValue_Default = 0,         ///< this is the default value (behind all other items)
+            ZValue_FootprintsBottom,    ///< Z value for project#BI_Footprint items
+            ZValue_FootprintsTop,       ///< Z value for project#BI_Footprint items
+        };
 
         // Constructors / Destructor
         explicit Board(Project& project, const FilePath& filepath, bool restore, bool readOnly) throw (Exception) :
@@ -79,6 +99,13 @@ class Board final : public QObject, public IF_AttributeProvider,
         const QUuid& getUuid() const noexcept {return mUuid;}
         const QString& getName() const noexcept {return mName;}
         const QIcon& getIcon() const noexcept {return mIcon;}
+
+        // ComponentInstance Methods
+        const QHash<QUuid, ComponentInstance*>& getComponentInstances() const noexcept {return mComponentInstances;}
+        ComponentInstance* getCompInstanceByGenCompUuid(const QUuid& uuid) const noexcept;
+        ComponentInstance* createComponentInstance() throw (Exception);
+        void addComponentInstance(ComponentInstance& componentInstance) throw (Exception);
+        void removeComponentInstance(ComponentInstance& componentInstance) throw (Exception);
 
         // General Methods
         void addToProject() throw (Exception);
@@ -116,6 +143,7 @@ class Board final : public QObject, public IF_AttributeProvider,
         void updateIcon() noexcept;
 
         bool checkAttributesValidity() const noexcept;
+        void updateErcMessages() noexcept;
 
         /**
          * @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
@@ -138,6 +166,11 @@ class Board final : public QObject, public IF_AttributeProvider,
         QString mName;
         QIcon mIcon;
 
+        // ERC messages
+        QHash<QUuid, ErcMsg*> mErcMsgListUnplacedGenCompInstances;
+
+        // items
+        QHash<QUuid, ComponentInstance*> mComponentInstances;
 };
 
 } // namespace project

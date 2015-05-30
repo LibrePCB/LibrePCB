@@ -31,6 +31,10 @@
 #include "../../common/graphics/graphicsview.h"
 #include "../../common/graphics/graphicsscene.h"
 #include "../../common/gridproperties.h"
+#include "../circuit/circuit.h"
+#include "../erc/ercmsg.h"
+#include "../circuit/gencompinstance.h"
+#include "componentinstance.h"
 
 namespace project {
 
@@ -73,8 +77,17 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
 
             // Load grid properties
             mGridProperties = new GridProperties(*root.getFirstChild("properties/grid_properties", true, true));
+
+            // Load all component instances
+            for (XmlDomElement* node = root.getFirstChild("component_instances/component_instance", true, false);
+                 node; node = node->getNextSibling("component_instance"))
+            {
+                ComponentInstance* comp = new ComponentInstance(*this, *node);
+                addComponentInstance(*comp);
+            }
         }
 
+        updateErcMessages();
         updateIcon();
 
         // emit the "attributesChanged" signal when the project has emited it
@@ -85,6 +98,8 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
     catch (...)
     {
         // free the allocated memory in the reverse order of their allocation...
+        foreach (ComponentInstance* compInstance, mComponentInstances)
+            try { removeComponentInstance(*compInstance); delete compInstance; } catch (...) {}
         delete mGridProperties;         mGridProperties = nullptr;
         delete mXmlFile;                mXmlFile = nullptr;
         delete mGraphicsScene;          mGraphicsScene = nullptr;
@@ -94,6 +109,11 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
 
 Board::~Board()
 {
+    // delete all component instances (and catch all throwed exceptions)
+    foreach (ComponentInstance* compInstance, mComponentInstances)
+        try { removeComponentInstance(*compInstance); delete compInstance; } catch (...) {}
+
+    qDeleteAll(mErcMsgListUnplacedGenCompInstances);    mErcMsgListUnplacedGenCompInstances.clear();
     delete mGridProperties;         mGridProperties = nullptr;
     delete mXmlFile;                mXmlFile = nullptr;
     delete mGraphicsScene;          mGraphicsScene = nullptr;
@@ -118,6 +138,52 @@ void Board::setGridProperties(const GridProperties& grid) noexcept
 }
 
 /*****************************************************************************************
+ *  ComponentInstance Methods
+ ****************************************************************************************/
+
+ComponentInstance* Board::getCompInstanceByGenCompUuid(const QUuid& uuid) const noexcept
+{
+    return mComponentInstances.value(uuid, nullptr);
+}
+
+ComponentInstance* Board::createComponentInstance() throw (Exception)
+{
+    /*if (getGenCompInstanceByName(name))
+    {
+        throw RuntimeError(__FILE__, __LINE__, name, QString(tr("The component "
+            "name \"%1\" does already exist in the circuit.")).arg(name));
+    }
+    return new ComponentInstance(*this, genComp, symbVar, name);*/
+    return nullptr; // TODO
+}
+
+void Board::addComponentInstance(ComponentInstance& componentInstance) throw (Exception)
+{
+    // check if there is no component with the same generic component instance in the list
+    if (getCompInstanceByGenCompUuid(componentInstance.getGenCompInstance().getUuid()))
+    {
+        throw RuntimeError(__FILE__, __LINE__, componentInstance.getGenCompInstance().getUuid().toString(),
+            QString(tr("There is already a component with the generic component instance \"%1\"!"))
+            .arg(componentInstance.getGenCompInstance().getUuid().toString()));
+    }
+
+    // add to circuit
+    componentInstance.addToBoard(*mGraphicsScene);
+    mComponentInstances.insert(componentInstance.getGenCompInstance().getUuid(), &componentInstance);
+    updateErcMessages();
+}
+
+void Board::removeComponentInstance(ComponentInstance& componentInstance) throw (Exception)
+{
+    Q_ASSERT(mComponentInstances.contains(componentInstance.getGenCompInstance().getUuid()) == true);
+
+    // remove from circuit
+    componentInstance.removeFromBoard(*mGraphicsScene);
+    mComponentInstances.remove(componentInstance.getGenCompInstance().getUuid());
+    updateErcMessages();
+}
+
+/*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
@@ -125,12 +191,14 @@ void Board::addToProject() throw (Exception)
 {
     Q_ASSERT(mAddedToProject == false);
     mAddedToProject = true;
+    updateErcMessages();
 }
 
 void Board::removeFromProject() throw (Exception)
 {
     Q_ASSERT(mAddedToProject == true);
     mAddedToProject = false;
+    updateErcMessages();
 }
 
 bool Board::save(bool toOriginal, QStringList& errors) noexcept
@@ -214,6 +282,36 @@ XmlDomElement* Board::serializeToXmlDomElement() const throw (Exception)
     XmlDomElement* properties = root->appendChild("properties");
     properties->appendChild(mGridProperties->serializeToXmlDomElement());
     return root.take();
+}
+
+void Board::updateErcMessages() noexcept
+{
+    // type: UnplacedGenericComponent (GenCompInstances without ComponentInstance)
+    if (mAddedToProject)
+    {
+        foreach (const GenCompInstance* genComp, mProject.getCircuit().getGenCompInstances())
+        {
+            ComponentInstance* comp = mComponentInstances.value(genComp->getUuid());
+            ErcMsg* ercMsg = mErcMsgListUnplacedGenCompInstances.value(genComp->getUuid());
+            if ((!comp) && (!ercMsg))
+            {
+                ErcMsg* ercMsg = new ErcMsg(mProject, *this, QString("%1/%2").arg(mUuid.toString(),
+                    genComp->getUuid().toString()), "UnplacedGenericComponent", ErcMsg::ErcMsgType_t::BoardError,
+                    QString("Unplaced Component: %1 (Board: %2)").arg(genComp->getName(), mName));
+                ercMsg->setVisible(true);
+                mErcMsgListUnplacedGenCompInstances.insert(genComp->getUuid(), ercMsg);
+            }
+            else if ((comp) && (ercMsg))
+            {
+                delete mErcMsgListUnplacedGenCompInstances.take(genComp->getUuid());
+            }
+        }
+    }
+    else
+    {
+        qDeleteAll(mErcMsgListUnplacedGenCompInstances);
+        mErcMsgListUnplacedGenCompInstances.clear();
+    }
 }
 
 /*****************************************************************************************

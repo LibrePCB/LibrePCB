@@ -17,56 +17,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_IF_ERCMSGPROVIDER_H
-#define PROJECT_IF_ERCMSGPROVIDER_H
+#ifndef PROJECT_BGI_BASE_H
+#define PROJECT_BGI_BASE_H
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Includes
  ****************************************************************************************/
 
-namespace project {
-class ErcMsg; // all classes which implement IF_ErcMsgProvider will need this declaration
-}
+#include <QtCore>
+#include <QtWidgets>
+#include "../../../common/graphics/graphicsitem.h"
+#include "../board.h"
 
 /*****************************************************************************************
- *  Macros
- ****************************************************************************************/
-
-/**
- * @note    The specified class name should be unique only in the namespace #project,
- *          so we won't use the namespace as a prefix. Simple use the class name.
- *
- * @warning Do not change the name of an existing class if you don't know what you're doing!
- */
-#define DECLARE_ERC_MSG_CLASS_NAME(msgOwnerClassName) \
-public: \
-    virtual const char* getErcMsgOwnerClassName() const noexcept {return #msgOwnerClassName;} \
-private:
-
-/*****************************************************************************************
- *  Class IF_ErcMsgProvider
+ *  Class BGI_Base
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The IF_ErcMsgProvider class
- *
- * @author ubruhin
- * @date 2015-02-02
+ * @brief The Board Graphics Item Base (BGI_Base) class
  */
-class IF_ErcMsgProvider
+class BGI_Base : public GraphicsItem
 {
     public:
 
         // Constructors / Destructor
-        IF_ErcMsgProvider() {}
-        virtual ~IF_ErcMsgProvider() {}
+        explicit BGI_Base() noexcept;
+        virtual ~BGI_Base() noexcept;
 
-        // Getters
-        virtual const char* getErcMsgOwnerClassName() const noexcept = 0;
+
+    private:
+
+        // make some methods inaccessible...
+        //BGI_Base() = delete;
+        BGI_Base(const BGI_Base& other) = delete;
+        BGI_Base& operator=(const BGI_Base& rhs) = delete;
 };
 
 } // namespace project
 
-#endif // PROJECT_IF_ERCMSGPROVIDER_H
+#endif // PROJECT_BGI_BASE_H

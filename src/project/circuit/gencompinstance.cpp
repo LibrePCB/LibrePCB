@@ -160,6 +160,7 @@ GenCompInstance::~GenCompInstance() noexcept
 {
     Q_ASSERT(!mAddedToCircuit);
     Q_ASSERT(mSymbols.isEmpty());
+    Q_ASSERT(mComponentInstances.isEmpty());
 
     qDeleteAll(mSignals);       mSignals.clear();
     qDeleteAll(mAttributes);    mAttributes.clear();
@@ -311,6 +312,24 @@ void GenCompInstance::unregisterSymbol(const SI_Symbol& symbol) throw (Exception
         throw LogicError(__FILE__, __LINE__, item->getUuid().toString());
 
     mSymbols.remove(item->getUuid());
+    updateErcMessages();
+}
+
+void GenCompInstance::registerComponent(const ComponentInstance& component) throw (Exception)
+{
+    if (!mAddedToCircuit) throw LogicError(__FILE__, __LINE__);
+    if (mComponentInstances.contains(&component)) throw LogicError(__FILE__, __LINE__);
+
+    mComponentInstances.append(&component);
+    updateErcMessages();
+}
+
+void GenCompInstance::unregisterComponent(const ComponentInstance& component) throw (Exception)
+{
+    if (!mAddedToCircuit) throw LogicError(__FILE__, __LINE__);
+    if (!mComponentInstances.contains(&component)) throw LogicError(__FILE__, __LINE__);
+
+    mComponentInstances.removeOne(&component);
     updateErcMessages();
 }
 

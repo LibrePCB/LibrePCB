@@ -17,56 +17,75 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_IF_ERCMSGPROVIDER_H
-#define PROJECT_IF_ERCMSGPROVIDER_H
+#ifndef PROJECT_BGI_FOOTPRINT_H
+#define PROJECT_BGI_FOOTPRINT_H
+
+/*****************************************************************************************
+ *  Includes
+ ****************************************************************************************/
+
+#include <QtCore>
+#include <QtWidgets>
+#include "bgi_base.h"
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
 namespace project {
-class ErcMsg; // all classes which implement IF_ErcMsgProvider will need this declaration
+class BI_Footprint;
+}
+
+namespace library {
+class Footprint;
 }
 
 /*****************************************************************************************
- *  Macros
- ****************************************************************************************/
-
-/**
- * @note    The specified class name should be unique only in the namespace #project,
- *          so we won't use the namespace as a prefix. Simple use the class name.
- *
- * @warning Do not change the name of an existing class if you don't know what you're doing!
- */
-#define DECLARE_ERC_MSG_CLASS_NAME(msgOwnerClassName) \
-public: \
-    virtual const char* getErcMsgOwnerClassName() const noexcept {return #msgOwnerClassName;} \
-private:
-
-/*****************************************************************************************
- *  Class IF_ErcMsgProvider
+ *  Class BGI_Footprint
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The IF_ErcMsgProvider class
+ * @brief The BGI_Footprint class
  *
  * @author ubruhin
- * @date 2015-02-02
+ * @date 2015-05-24
  */
-class IF_ErcMsgProvider
+class BGI_Footprint final : public BGI_Base
 {
     public:
 
         // Constructors / Destructor
-        IF_ErcMsgProvider() {}
-        virtual ~IF_ErcMsgProvider() {}
+        explicit BGI_Footprint(BI_Footprint& footprint) noexcept;
+        ~BGI_Footprint() noexcept;
 
-        // Getters
-        virtual const char* getErcMsgOwnerClassName() const noexcept = 0;
+        // General Methods
+        void updateCacheAndRepaint() noexcept;
+
+        // Inherited from QGraphicsItem
+        QRectF boundingRect() const noexcept {return mBoundingRect;}
+        QPainterPath shape() const noexcept {return mShape;}
+        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
+
+
+    private:
+
+        // make some methods inaccessible...
+        BGI_Footprint() = delete;
+        BGI_Footprint(const BGI_Footprint& other) = delete;
+        BGI_Footprint& operator=(const BGI_Footprint& rhs) = delete;
+
+
+        // General Attributes
+        BI_Footprint& mFootprint;
+        const library::Footprint& mLibFootprint;
+
+        // Cached Attributes
+        QRectF mBoundingRect;
+        QPainterPath mShape;
 };
 
 } // namespace project
 
-#endif // PROJECT_IF_ERCMSGPROVIDER_H
+#endif // PROJECT_BGI_FOOTPRINT_H

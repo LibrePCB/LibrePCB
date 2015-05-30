@@ -37,6 +37,7 @@
 #include "../../common/graphics/graphicsview.h"
 #include "../../common/gridproperties.h"
 #include "cmd/cmdboardadd.h"
+#include "../erc/ercmsgdock.h"
 
 namespace project {
 
@@ -47,7 +48,7 @@ namespace project {
 BoardEditor::BoardEditor(Project& project, bool readOnly) :
     QMainWindow(0), mProject(project), mUi(new Ui::BoardEditor),
     mGraphicsView(nullptr), mGridProperties(nullptr), mActiveBoardIndex(-1),
-    mBoardListActionGroup(this)
+    mBoardListActionGroup(this), mErcMsgDock(nullptr)
 {
     mUi->setupUi(this);
     mUi->actionProjectSave->setEnabled(!readOnly);
@@ -57,6 +58,10 @@ BoardEditor::BoardEditor(Project& project, bool readOnly) :
     if (readOnly) filenameStr.append(QStringLiteral(" [Read-Only]"));
     setWindowTitle(QString("%1 - Board Editor - EDA4U %2.%3")
                    .arg(filenameStr).arg(APP_VERSION_MAJOR).arg(APP_VERSION_MINOR));
+
+    // Add Dock Widgets
+    mErcMsgDock = new ErcMsgDock(mProject);
+    addDockWidget(Qt::RightDockWidgetArea, mErcMsgDock, Qt::Vertical);
 
     // create default grid properties
     mGridProperties = new GridProperties();
@@ -125,6 +130,7 @@ BoardEditor::~BoardEditor()
 
     qDeleteAll(mBoardListActions);  mBoardListActions.clear();
 
+    delete mErcMsgDock;             mErcMsgDock = nullptr;
     delete mGraphicsView;           mGraphicsView = nullptr;
     delete mGridProperties;         mGridProperties = nullptr;
     delete mUi;                     mUi = nullptr;
@@ -285,8 +291,8 @@ void BoardEditor::on_actionGrid_triggered()
             });
     if (dialog.exec())
     {
-        //foreach (Schematic* schematic, mProject.getSchematics())
-        //    schematic->setGridProperties(*mGridProperties);
+        foreach (Board* board, mProject.getBoards())
+            board->setGridProperties(*mGridProperties);
         mProject.setModifiedFlag();
     }
 }
