@@ -28,7 +28,7 @@
 #include "cmd/cmdprojectsettingschange.h"
 #include "projectsettings.h"
 #include "../project.h"
-#include "../../common/undostack.h"
+#include <eda4ucommon/undostack.h>
 
 namespace project {
 

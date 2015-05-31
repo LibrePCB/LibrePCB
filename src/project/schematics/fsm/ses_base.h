@@ -28,8 +28,8 @@
 #include "schematiceditorevent.h"
 #include "../schematiceditor.h"
 #include "ui_schematiceditor.h"
-#include "../../../common/units/all_length_units.h"
-#include "../../../common/graphics/graphicsview.h"
+#include <eda4ucommon/units/all_length_units.h>
+#include <eda4ucommon/graphics/graphicsview.h>
 
 /*****************************************************************************************
  *  Forward Declarations

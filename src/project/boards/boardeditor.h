@@ -26,7 +26,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include "../../common/graphics/if_graphicsvieweventhandler.h"
+#include <eda4ucommon/graphics/if_graphicsvieweventhandler.h>
 
 /*****************************************************************************************
  *  Forward Declarations

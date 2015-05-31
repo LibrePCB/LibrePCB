@@ -25,8 +25,8 @@
 #include <QtWidgets>
 #include "addgencompdialog.h"
 #include "ui_addgencompdialog.h"
-#include "../../common/graphics/graphicsscene.h"
-#include "../../common/graphics/graphicsview.h"
+#include <eda4ucommon/graphics/graphicsscene.h>
+#include <eda4ucommon/graphics/graphicsview.h>
 #include "../project.h"
 #include "../library/projectlibrary.h"
 #include "../../library/gencmp/genericcomponent.h"

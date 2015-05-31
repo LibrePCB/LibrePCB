@@ -25,10 +25,10 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../common/file_io/if_xmlserializableobject.h"
-#include "../common/if_attributeprovider.h"
-#include "../common/exceptions.h"
-#include "../common/file_io/filelock.h"
+#include <eda4ucommon/fileio/if_xmlserializableobject.h>
+#include <eda4ucommon/if_attributeprovider.h>
+#include <eda4ucommon/exceptions.h>
+#include <eda4ucommon/fileio/filelock.h>
 
 /*****************************************************************************************
  *  Forward Declarations

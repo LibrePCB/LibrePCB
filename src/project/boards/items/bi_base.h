@@ -26,7 +26,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include "../../../common/units/all_length_units.h"
+#include <eda4ucommon/units/all_length_units.h>
 
 /*****************************************************************************************
  *  Class BI_Base

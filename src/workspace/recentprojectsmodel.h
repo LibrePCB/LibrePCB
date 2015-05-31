@@ -25,7 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../common/file_io/filepath.h"
+#include <eda4ucommon/fileio/filepath.h>
 
 /*****************************************************************************************
  *  Class RecentProjectsModel

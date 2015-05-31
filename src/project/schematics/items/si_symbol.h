@@ -26,8 +26,8 @@
 
 #include <QtCore>
 #include "si_base.h"
-#include "../../../common/file_io/if_xmlserializableobject.h"
-#include "../../../common/if_attributeprovider.h"
+#include <eda4ucommon/fileio/if_xmlserializableobject.h>
+#include <eda4ucommon/if_attributeprovider.h>
 #include "../graphicsitems/sgi_symbol.h"
 
 /*****************************************************************************************

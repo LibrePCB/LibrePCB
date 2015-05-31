@@ -27,7 +27,7 @@
 #include "symbolpinpreviewgraphicsitem.h"
 #include "symbolpin.h"
 #include "../gencmp/genericcomponent.h"
-#include "../../common/schematiclayer.h"
+#include <eda4ucommon/schematiclayer.h>
 #include "../../workspace/workspace.h"
 #include "../../workspace/settings/workspacesettings.h"
 

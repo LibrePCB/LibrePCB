@@ -23,7 +23,7 @@
 
 #include <QtCore>
 #include "gencompinstance.h"
-#include "../../common/exceptions.h"
+#include <eda4ucommon/exceptions.h>
 #include "circuit.h"
 #include "../project.h"
 #include "../library/projectlibrary.h"
@@ -31,7 +31,7 @@
 #include "../../library/gencmp/genericcomponent.h"
 #include "../erc/ercmsg.h"
 #include "gencompattributeinstance.h"
-#include "../../common/file_io/xmldomelement.h"
+#include <eda4ucommon/fileio/xmldomelement.h>
 #include "../settings/projectsettings.h"
 #include "../schematics/items/si_symbol.h"
 

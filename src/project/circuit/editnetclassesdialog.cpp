@@ -27,7 +27,7 @@
 #include "ui_editnetclassesdialog.h"
 #include "circuit.h"
 #include "../project.h"
-#include "../../common/undostack.h"
+#include <eda4ucommon/undostack.h>
 #include "netclass.h"
 #include "cmd/cmdnetclassedit.h"
 #include "cmd/cmdnetclassadd.h"

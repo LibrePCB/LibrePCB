@@ -25,8 +25,8 @@
 #include "ses_drawwire.h"
 #include "../schematiceditor.h"
 #include "ui_schematiceditor.h"
-#include "../../../common/units/all_length_units.h"
-#include "../../../common/undostack.h"
+#include <eda4ucommon/units/all_length_units.h>
+#include <eda4ucommon/undostack.h>
 #include "../../project.h"
 #include "../../circuit/circuit.h"
 #include "../../circuit/netclass.h"
@@ -48,7 +48,7 @@
 #include "../cmd/cmdschematicnetpointedit.h"
 #include "../../circuit/cmd/cmdnetsignalremove.h"
 #include "../../circuit/cmd/cmdnetsignaledit.h"
-#include "../../../common/gridproperties.h"
+#include <eda4ucommon/gridproperties.h>
 
 namespace project {
 

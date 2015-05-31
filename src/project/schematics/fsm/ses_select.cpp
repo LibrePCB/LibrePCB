@@ -29,7 +29,7 @@
 #include "../items/si_netpoint.h"
 #include "../schematic.h"
 #include "../cmd/cmdsymbolinstanceedit.h"
-#include "../../../common/undostack.h"
+#include <eda4ucommon/undostack.h>
 #include "../items/si_netline.h"
 #include "../items/si_symbol.h"
 #include "../cmd/cmdsymbolinstanceremove.h"
@@ -53,7 +53,7 @@
 #include "../schematicclipboard.h"
 #include "../cmd/cmdsymbolinstanceadd.h"
 #include "../cmd/cmdschematicnetlabelremove.h"
-#include "../../../common/gridproperties.h"
+#include <eda4ucommon/gridproperties.h>
 
 namespace project {
 

@@ -23,9 +23,9 @@
 
 #include <QtCore>
 #include "schematic.h"
-#include "../../common/file_io/smartxmlfile.h"
-#include "../../common/file_io/xmldomdocument.h"
-#include "../../common/file_io/xmldomelement.h"
+#include <eda4ucommon/fileio/smartxmlfile.h>
+#include <eda4ucommon/fileio/xmldomdocument.h>
+#include <eda4ucommon/fileio/xmldomelement.h>
 #include "../project.h"
 #include "../../library/sym/symbolpin.h"
 #include "items/si_symbol.h"
@@ -33,9 +33,9 @@
 #include "items/si_netpoint.h"
 #include "items/si_netline.h"
 #include "items/si_netlabel.h"
-#include "../../common/graphics/graphicsview.h"
-#include "../../common/graphics/graphicsscene.h"
-#include "../../common/gridproperties.h"
+#include <eda4ucommon/graphics/graphicsview.h>
+#include <eda4ucommon/graphics/graphicsscene.h>
+#include <eda4ucommon/gridproperties.h>
 
 namespace project {
 

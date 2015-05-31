@@ -24,11 +24,11 @@
 #include <QtCore>
 #include "netsignal.h"
 #include "netclass.h"
-#include "../../common/exceptions.h"
+#include <eda4ucommon/exceptions.h>
 #include "circuit.h"
 #include "../erc/ercmsg.h"
 #include "gencompsignalinstance.h"
-#include "../../common/file_io/xmldomelement.h"
+#include <eda4ucommon/fileio/xmldomelement.h>
 #include "../schematics/items/si_netlabel.h"
 
 namespace project {

@@ -24,7 +24,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "projecttreeitem.h"
-#include "../common/exceptions.h"
+#include <eda4ucommon/exceptions.h>
 
 /*****************************************************************************************
  *  Constructors / Destructor

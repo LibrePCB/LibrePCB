@@ -24,8 +24,8 @@
 #include <QtCore>
 #include <QFileDialog>
 #include "workspace.h"
-#include "../common/exceptions.h"
-#include "../common/file_io/filepath.h"
+#include <eda4ucommon/exceptions.h>
+#include <eda4ucommon/fileio/filepath.h>
 #include "../library/library.h"
 #include "../library_editor/libraryeditor.h"
 #include "../project/project.h"
@@ -34,7 +34,7 @@
 #include "favoriteprojectsmodel.h"
 #include "controlpanel/controlpanel.h"
 #include "settings/workspacesettings.h"
-#include "../common/schematiclayer.h"
+#include <eda4ucommon/schematiclayer.h>
 
 using namespace library;
 using namespace project;

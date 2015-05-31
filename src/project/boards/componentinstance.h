@@ -25,10 +25,10 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../../common/units/all_length_units.h"
-//#include "../../common/if_attributeprovider.h"
+#include <eda4ucommon/units/all_length_units.h>
+//#include <eda4ucommon/if_attributeprovider.h>
 #include "../erc/if_ercmsgprovider.h"
-#include "../../common/file_io/if_xmlserializableobject.h"
+#include <eda4ucommon/fileio/if_xmlserializableobject.h>
 
 /*****************************************************************************************
  *  Forward Declarations

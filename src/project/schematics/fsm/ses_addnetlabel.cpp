@@ -25,7 +25,7 @@
 #include "ses_addnetlabel.h"
 #include "../schematiceditor.h"
 #include "ui_schematiceditor.h"
-#include "../../../common/undostack.h"
+#include <eda4ucommon/undostack.h>
 #include "../../project.h"
 #include "../../circuit/circuit.h"
 #include "../items/si_netlabel.h"
@@ -33,7 +33,7 @@
 #include "../cmd/cmdschematicnetlabeledit.h"
 #include "../schematic.h"
 #include "../items/si_netline.h"
-#include "../../../common/gridproperties.h"
+#include <eda4ucommon/gridproperties.h>
 
 namespace project {
 

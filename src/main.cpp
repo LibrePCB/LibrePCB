@@ -24,9 +24,9 @@
 #include <QtCore>
 #include <QtWidgets>
 #include <QTranslator>
-#include "common/application.h"
-#include "common/debug.h"
-#include "common/exceptions.h"
+#include <eda4ucommon/application.h>
+#include <eda4ucommon/debug.h>
+#include <eda4ucommon/exceptions.h>
 #include "workspace/workspace.h"
 
 /*****************************************************************************************

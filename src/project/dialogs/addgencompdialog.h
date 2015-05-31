@@ -26,7 +26,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include "../../common/file_io/filepath.h"
+#include <eda4ucommon/fileio/filepath.h>
 
 /*****************************************************************************************
  *  Forward Declarations

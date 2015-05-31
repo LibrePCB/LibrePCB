@@ -30,16 +30,16 @@
 #include "../../library/gencmp/genericcomponent.h"
 #include "../../library/sym/symbol.h"
 #include "../project.h"
-#include "../../common/undostack.h"
-#include "../../common/undocommand.h"
+#include <eda4ucommon/undostack.h>
+#include <eda4ucommon/undocommand.h>
 #include "../circuit/cmd/cmdgencompinstedit.h"
 #include "cmd/cmdsymbolinstanceedit.h"
 #include "../circuit/gencompattributeinstance.h"
 #include "../circuit/cmd/cmdgencompattrinstadd.h"
 #include "../circuit/cmd/cmdgencompattrinstremove.h"
 #include "../circuit/cmd/cmdgencompattrinstedit.h"
-#include "../../common/attributes/attributetype.h"
-#include "../../common/attributes/attributeunit.h"
+#include <eda4ucommon/attributes/attributetype.h>
+#include <eda4ucommon/attributes/attributeunit.h>
 #include "../settings/projectsettings.h"
 
 namespace project {

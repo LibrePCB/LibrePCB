@@ -26,7 +26,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include "../../common/exceptions.h"
+#include <eda4ucommon/exceptions.h>
 
 /*****************************************************************************************
  *  Forward Declarations

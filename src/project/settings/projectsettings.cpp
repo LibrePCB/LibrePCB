@@ -23,9 +23,9 @@
 
 #include <QtCore>
 #include "projectsettings.h"
-#include "../../common/file_io/smartxmlfile.h"
-#include "../../common/file_io/xmldomdocument.h"
-#include "../../common/file_io/xmldomelement.h"
+#include <eda4ucommon/fileio/smartxmlfile.h>
+#include <eda4ucommon/fileio/xmldomdocument.h>
+#include <eda4ucommon/fileio/xmldomelement.h>
 #include "../project.h"
 #include "projectsettingsdialog.h"
 #include "../../workspace/workspace.h"

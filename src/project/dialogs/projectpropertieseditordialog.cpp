@@ -26,7 +26,7 @@
 #include "projectpropertieseditordialog.h"
 #include "ui_projectpropertieseditordialog.h"
 #include "../project.h"
-#include "../../common/undostack.h"
+#include <eda4ucommon/undostack.h>
 #include "../cmd/cmdprojectsetmetadata.h"
 
 namespace project {

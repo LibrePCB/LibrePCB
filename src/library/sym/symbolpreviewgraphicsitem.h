@@ -26,8 +26,8 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include "../../common/graphics/graphicsitem.h"
-#include "../../common/if_attributeprovider.h"
+#include <eda4ucommon/graphics/graphicsitem.h>
+#include <eda4ucommon/if_attributeprovider.h>
 
 /*****************************************************************************************
  *  Forward Declarations

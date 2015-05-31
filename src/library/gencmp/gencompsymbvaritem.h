@@ -25,7 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../../common/file_io/if_xmlserializableobject.h"
+#include <eda4ucommon/fileio/if_xmlserializableobject.h>
 
 /*****************************************************************************************
  *  Class GenCompSymbVarItem

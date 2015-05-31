@@ -30,7 +30,7 @@
 #include "schematiceditor.h"
 #include "cmd/cmdschematicadd.h"
 #include "cmd/cmdschematicremove.h"
-#include "../../common/undostack.h"
+#include <eda4ucommon/undostack.h>
 
 namespace project {
 

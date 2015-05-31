@@ -25,9 +25,9 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../../../common/undocommand.h"
-#include "../../../common/units/point.h"
-#include "../../../common/exceptions.h"
+#include <eda4ucommon/undocommand.h>
+#include <eda4ucommon/units/point.h>
+#include <eda4ucommon/exceptions.h>
 
 /*****************************************************************************************
  *  Forward Declarations

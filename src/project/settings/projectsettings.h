@@ -25,8 +25,8 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../../common/file_io/if_xmlserializableobject.h"
-#include "../../common/file_io/filepath.h"
+#include <eda4ucommon/fileio/if_xmlserializableobject.h>
+#include <eda4ucommon/fileio/filepath.h>
 
 /*****************************************************************************************
  *  Forward Declarations

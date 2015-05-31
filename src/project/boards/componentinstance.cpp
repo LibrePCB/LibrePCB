@@ -29,7 +29,7 @@
 #include "../../library/cmp/component.h"
 #include "../../library/gencmp/genericcomponent.h"
 #include "../erc/ercmsg.h"
-#include "../../common/file_io/xmldomelement.h"
+#include <eda4ucommon/fileio/xmldomelement.h>
 #include "../circuit/circuit.h"
 #include "../circuit/gencompinstance.h"
 #include "items/bi_footprint.h"

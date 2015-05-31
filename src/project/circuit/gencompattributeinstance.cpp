@@ -24,9 +24,9 @@
 #include <QtCore>
 #include "gencompattributeinstance.h"
 #include "gencompinstance.h"
-#include "../../common/file_io/xmldomelement.h"
-#include "../../common/attributes/attributetype.h"
-#include "../../common/attributes/attributeunit.h"
+#include <eda4ucommon/fileio/xmldomelement.h>
+#include <eda4ucommon/attributes/attributetype.h>
+#include <eda4ucommon/attributes/attributeunit.h>
 
 namespace project {
 

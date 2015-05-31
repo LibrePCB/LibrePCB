@@ -23,11 +23,11 @@
 
 #include <QtCore>
 #include "netclass.h"
-#include "../../common/exceptions.h"
+#include <eda4ucommon/exceptions.h>
 #include "netsignal.h"
 #include "circuit.h"
 #include "../erc/ercmsg.h"
-#include "../../common/file_io/xmldomelement.h"
+#include <eda4ucommon/fileio/xmldomelement.h>
 
 namespace project {
 

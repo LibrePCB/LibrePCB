@@ -25,7 +25,7 @@
 #include "gencompsymbvaritem.h"
 #include "genericcomponent.h"
 #include "gencompsymbvar.h"
-#include "../../common/file_io/xmldomelement.h"
+#include <eda4ucommon/fileio/xmldomelement.h>
 
 namespace library {
 

@@ -28,14 +28,14 @@
 #include "../project.h"
 #include "../../workspace/workspace.h"
 #include "../../workspace/settings/workspacesettings.h"
-#include "../../common/undostack.h"
+#include <eda4ucommon/undostack.h>
 #include "board.h"
 #include "../circuit/circuit.h"
-#include "../../common/dialogs/gridsettingsdialog.h"
+#include <eda4ucommon/dialogs/gridsettingsdialog.h>
 #include "../dialogs/projectpropertieseditordialog.h"
 #include "../settings/projectsettings.h"
-#include "../../common/graphics/graphicsview.h"
-#include "../../common/gridproperties.h"
+#include <eda4ucommon/graphics/graphicsview.h>
+#include <eda4ucommon/gridproperties.h>
 #include "cmd/cmdboardadd.h"
 #include "../erc/ercmsgdock.h"
 

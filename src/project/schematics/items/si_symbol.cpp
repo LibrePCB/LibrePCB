@@ -31,8 +31,8 @@
 #include "../../circuit/gencompinstance.h"
 #include "../../../library/gencmp/genericcomponent.h"
 #include "../../../library/sym/symbol.h"
-#include "../../../common/file_io/xmldomelement.h"
-#include "../../../common/graphics/graphicsscene.h"
+#include <eda4ucommon/fileio/xmldomelement.h>
+#include <eda4ucommon/graphics/graphicsscene.h>
 
 namespace project {
 

@@ -26,9 +26,8 @@
 
 #include <QtCore>
 #include <QtSql>
-
-#include "../common/exceptions.h"
-#include "../common/file_io/filepath.h"
+#include <eda4ucommon/exceptions.h>
+#include <eda4ucommon/fileio/filepath.h>
 
 /*****************************************************************************************
  *  Class Library

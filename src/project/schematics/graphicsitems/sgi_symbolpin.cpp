@@ -32,7 +32,7 @@
 #include "../../circuit/netsignal.h"
 #include "../../circuit/gencompinstance.h"
 #include "../../circuit/gencompsignalinstance.h"
-#include "../../../common/schematiclayer.h"
+#include <eda4ucommon/schematiclayer.h>
 #include "../../../workspace/workspace.h"
 #include "../../../workspace/settings/workspacesettings.h"
 #include "../../../library/sym/symbolpin.h"

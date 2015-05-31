@@ -30,8 +30,8 @@
 #include "../../library/projectlibrary.h"
 #include "../../../library/fpt/footprint.h"
 #include "../../../library/pkg/package.h"
-#include "../../../common/file_io/xmldomelement.h"
-#include "../../../common/graphics/graphicsscene.h"
+#include <eda4ucommon/fileio/xmldomelement.h>
+#include <eda4ucommon/graphics/graphicsscene.h>
 #include "../componentinstance.h"
 
 namespace project {

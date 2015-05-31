@@ -25,9 +25,9 @@
 #include "librarybaseelement.h"
 #include "../workspace/workspace.h"
 #include "../workspace/settings/workspacesettings.h"
-#include "../common/file_io/smartxmlfile.h"
-#include "../common/file_io/xmldomdocument.h"
-#include "../common/file_io/xmldomelement.h"
+#include <eda4ucommon/fileio/smartxmlfile.h>
+#include <eda4ucommon/fileio/xmldomdocument.h>
+#include <eda4ucommon/fileio/xmldomelement.h>
 
 namespace library {
 

@@ -25,7 +25,7 @@
  ****************************************************************************************/
 
 #include "wsi_base.h"
-#include "../../../common/units/lengthunit.h"
+#include <eda4ucommon/units/lengthunit.h>
 
 /*****************************************************************************************
  *  Class WSI_AppDefaultMeasurementUnits

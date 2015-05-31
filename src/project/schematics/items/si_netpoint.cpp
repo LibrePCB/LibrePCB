@@ -32,8 +32,8 @@
 #include "../../circuit/netsignal.h"
 #include "../../circuit/gencompsignalinstance.h"
 #include "../../erc/ercmsg.h"
-#include "../../../common/file_io/xmldomelement.h"
-#include "../../../common/graphics/graphicsscene.h"
+#include <eda4ucommon/fileio/xmldomelement.h>
+#include <eda4ucommon/graphics/graphicsscene.h>
 
 namespace project {
 

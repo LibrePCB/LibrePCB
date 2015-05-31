@@ -22,7 +22,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../../common/exceptions.h"
+#include <eda4ucommon/exceptions.h>
 #include "workspacesettings.h"
 #include "../workspace.h"
 #include "workspacesettingsdialog.h"

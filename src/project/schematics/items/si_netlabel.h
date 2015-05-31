@@ -26,7 +26,7 @@
 
 #include <QtCore>
 #include "si_base.h"
-#include "../../../common/file_io/if_xmlserializableobject.h"
+#include <eda4ucommon/fileio/if_xmlserializableobject.h>
 #include "../graphicsitems/sgi_netlabel.h"
 
 /*****************************************************************************************

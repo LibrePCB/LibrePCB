@@ -22,9 +22,9 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../../common/exceptions.h"
+#include <eda4ucommon/exceptions.h>
 #include "projectlibrary.h"
-#include "../../common/file_io/filepath.h"
+#include <eda4ucommon/fileio/filepath.h>
 #include "../project.h"
 #include "../../library/sym/symbol.h"
 #include "../../library/fpt/footprint.h"

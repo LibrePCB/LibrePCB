@@ -37,7 +37,7 @@
 #include "../../../library/gencmp/gencompsymbvaritem.h"
 #include "../../circuit/netsignal.h"
 #include "../../settings/projectsettings.h"
-#include "../../../common/graphics/graphicsscene.h"
+#include <eda4ucommon/graphics/graphicsscene.h>
 
 namespace project {
 

@@ -29,14 +29,14 @@
 #include "../../library/projectlibrary.h"
 #include "../../../library/gencmp/genericcomponent.h"
 #include "../../circuit/cmd/cmdgencompinstadd.h"
-#include "../../../common/undostack.h"
+#include <eda4ucommon/undostack.h>
 #include "../cmd/cmdsymbolinstanceadd.h"
 #include "../../circuit/gencompinstance.h"
 #include "../cmd/cmdsymbolinstanceedit.h"
 #include "../items/si_symbol.h"
 #include "../schematic.h"
 #include "../../dialogs/addgencompdialog.h"
-#include "../../../common/gridproperties.h"
+#include <eda4ucommon/gridproperties.h>
 
 namespace project {
 

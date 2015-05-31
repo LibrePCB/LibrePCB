@@ -26,11 +26,11 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include "../../common/if_attributeprovider.h"
-#include "../../common/file_io/if_xmlserializableobject.h"
-#include "../../common/units/all_length_units.h"
-#include "../../common/file_io/filepath.h"
-#include "../../common/exceptions.h"
+#include <eda4ucommon/if_attributeprovider.h>
+#include <eda4ucommon/fileio/if_xmlserializableobject.h>
+#include <eda4ucommon/units/all_length_units.h>
+#include <eda4ucommon/fileio/filepath.h>
+#include <eda4ucommon/exceptions.h>
 
 /*****************************************************************************************
  *  Forward Declarations

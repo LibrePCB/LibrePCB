@@ -18,14 +18,14 @@
  */
 
 #include <QtCore>
-#include "../../common/exceptions.h"
+#include <eda4ucommon/exceptions.h>
 #include "gencompsignalinstance.h"
 #include "gencompinstance.h"
 #include "circuit.h"
 #include "netsignal.h"
 #include "../../library/gencmp/genericcomponent.h"
 #include "../erc/ercmsg.h"
-#include "../../common/file_io/xmldomelement.h"
+#include <eda4ucommon/fileio/xmldomelement.h>
 #include "../project.h"
 #include "../settings/projectsettings.h"
 

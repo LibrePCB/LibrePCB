@@ -23,17 +23,14 @@
 
 #include <QtCore>
 #include "gridproperties.h"
-#include "file_io/xmldomelement.h"
-#include "../workspace/workspace.h"
-#include "../workspace/settings/workspacesettings.h"
+#include "fileio/xmldomelement.h"
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
 GridProperties::GridProperties() noexcept :
-    mType(Type_t::Lines), mInterval(2540000),
-    mUnit(Workspace::instance().getSettings().getAppDefMeasUnits()->getLengthUnit())
+    mType(Type_t::Lines), mInterval(2540000), mUnit(LengthUnit::millimeters())
 {
 }
 

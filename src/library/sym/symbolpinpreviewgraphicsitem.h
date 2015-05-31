@@ -26,7 +26,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include "../../common/graphics/graphicsitem.h"
+#include <eda4ucommon/graphics/graphicsitem.h>
 #include "../gencmp/gencompsymbvaritem.h"
 
 /*****************************************************************************************

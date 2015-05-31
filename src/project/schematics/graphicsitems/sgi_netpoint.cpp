@@ -28,7 +28,7 @@
 #include "../items/si_netpoint.h"
 #include "../schematic.h"
 #include "../../project.h"
-#include "../../../common/schematiclayer.h"
+#include <eda4ucommon/schematiclayer.h>
 #include "../../../workspace/workspace.h"
 #include "../../../workspace/settings/workspacesettings.h"
 

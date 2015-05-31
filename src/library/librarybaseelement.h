@@ -25,10 +25,10 @@
  ****************************************************************************************/
 
 #include <QObject>
-#include "../common/file_io/if_xmlserializableobject.h"
-#include "../common/exceptions.h"
-#include "../common/file_io/filepath.h"
-#include "../common/version.h"
+#include <eda4ucommon/fileio/if_xmlserializableobject.h>
+#include <eda4ucommon/exceptions.h>
+#include <eda4ucommon/fileio/filepath.h>
+#include <eda4ucommon/version.h>
 
 /*****************************************************************************************
  *  Class LibraryBaseElement

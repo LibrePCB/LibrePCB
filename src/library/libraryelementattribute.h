@@ -25,8 +25,8 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../common/exceptions.h"
-#include "../common/file_io/if_xmlserializableobject.h"
+#include <eda4ucommon/exceptions.h>
+#include <eda4ucommon/fileio/if_xmlserializableobject.h>
 
 /*****************************************************************************************
  *  Forward Declarations
