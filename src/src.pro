@@ -73,22 +73,11 @@ RESOURCES += \
 SOURCES += \
     main.cpp \
     workspace/workspace.cpp \
-    library/library.cpp \
     project/project.cpp \
     workspace/controlpanel/controlpanel.cpp \
     library_editor/libraryeditor.cpp \
     workspace/projecttreemodel.cpp \
     workspace/projecttreeitem.cpp \
-    library/libraryelement.cpp \
-    library/sym/symbol.cpp \
-    library/cmp/component.cpp \
-    library/fpt/footprint.cpp \
-    library/gencmp/genericcomponent.cpp \
-    library/3dmdl/model3d.cpp \
-    library/pkg/package.cpp \
-    library/spcmdl/spicemodel.cpp \
-    library/cat/componentcategory.cpp \
-    library/cat/packagecategory.cpp \
     project/schematics/schematiceditor.cpp \
     project/circuit/circuit.cpp \
     workspace/recentprojectsmodel.cpp \
@@ -101,7 +90,6 @@ SOURCES += \
     project/circuit/netclass.cpp \
     project/circuit/netsignal.cpp \
     project/circuit/gencompsignalinstance.cpp \
-    library/librarybaseelement.cpp \
     project/circuit/cmd/cmdnetclassadd.cpp \
     project/circuit/cmd/cmdnetclassremove.cpp \
     project/circuit/cmd/cmdnetsignaladd.cpp \
@@ -130,12 +118,6 @@ SOURCES += \
     workspace/settings/items/wsi_librarylocaleorder.cpp \
     project/circuit/editnetclassesdialog.cpp \
     workspace/settings/items/wsi_appdefaultmeasurementunits.cpp \
-    library/gencmp/gencompsignal.cpp \
-    library/gencmp/gencompsymbvar.cpp \
-    library/gencmp/gencompsymbvaritem.cpp \
-    library/sym/symbolpin.cpp \
-    library/sym/symbolpolygon.cpp \
-    library/sym/symboltext.cpp \
     workspace/settings/items/wsi_librarynormorder.cpp \
     project/schematics/cmd/cmdsymbolinstanceadd.cpp \
     project/circuit/cmd/cmdgencompsiginstsetnetsignal.cpp \
@@ -147,7 +129,6 @@ SOURCES += \
     project/erc/ercmsg.cpp \
     project/erc/ercmsglist.cpp \
     project/circuit/gencompinstance.cpp \
-    library/libraryelementattribute.cpp \
     project/circuit/gencompattributeinstance.cpp \
     project/schematics/symbolinstancepropertiesdialog.cpp \
     project/dialogs/projectpropertieseditordialog.cpp \
@@ -159,7 +140,6 @@ SOURCES += \
     project/schematics/cmd/cmdschematicnetlabelremove.cpp \
     project/schematics/cmd/cmdschematicnetlabeledit.cpp \
     project/schematics/schematicclipboard.cpp \
-    library/sym/symbolellipse.cpp \
     project/circuit/cmd/cmdgencompinstedit.cpp \
     project/circuit/cmd/cmdnetclassedit.cpp \
     project/circuit/cmd/cmdnetsignaledit.cpp \
@@ -185,8 +165,6 @@ SOURCES += \
     project/schematics/graphicsitems/sgi_netpoint.cpp \
     project/schematics/graphicsitems/sgi_symbol.cpp \
     project/schematics/graphicsitems/sgi_symbolpin.cpp \
-    library/sym/symbolpreviewgraphicsitem.cpp \
-    library/sym/symbolpinpreviewgraphicsitem.cpp \
     project/boards/boardeditor.cpp \
     project/boards/cmd/cmdboardadd.cpp \
     project/boards/items/bi_base.cpp \
@@ -197,22 +175,11 @@ SOURCES += \
 
 HEADERS += \
     workspace/workspace.h \
-    library/library.h \
     project/project.h \
     workspace/controlpanel/controlpanel.h \
     library_editor/libraryeditor.h \
     workspace/projecttreemodel.h \
     workspace/projecttreeitem.h \
-    library/libraryelement.h \
-    library/sym/symbol.h \
-    library/cmp/component.h \
-    library/fpt/footprint.h \
-    library/gencmp/genericcomponent.h \
-    library/3dmdl/model3d.h \
-    library/pkg/package.h \
-    library/spcmdl/spicemodel.h \
-    library/cat/componentcategory.h \
-    library/cat/packagecategory.h \
     project/schematics/schematiceditor.h \
     project/circuit/circuit.h \
     workspace/recentprojectsmodel.h \
@@ -225,7 +192,6 @@ HEADERS += \
     project/circuit/netclass.h \
     project/circuit/netsignal.h \
     project/circuit/gencompsignalinstance.h \
-    library/librarybaseelement.h \
     project/circuit/cmd/cmdnetclassadd.h \
     project/circuit/cmd/cmdnetclassremove.h \
     project/circuit/cmd/cmdnetsignaladd.h \
@@ -254,12 +220,6 @@ HEADERS += \
     workspace/settings/items/wsi_librarylocaleorder.h \
     project/circuit/editnetclassesdialog.h \
     workspace/settings/items/wsi_appdefaultmeasurementunits.h \
-    library/gencmp/gencompsignal.h \
-    library/gencmp/gencompsymbvar.h \
-    library/gencmp/gencompsymbvaritem.h \
-    library/sym/symbolpin.h \
-    library/sym/symbolpolygon.h \
-    library/sym/symboltext.h \
     workspace/settings/items/wsi_librarynormorder.h \
     project/schematics/cmd/cmdsymbolinstanceadd.h \
     project/circuit/cmd/cmdgencompsiginstsetnetsignal.h \
@@ -271,7 +231,6 @@ HEADERS += \
     project/erc/ercmsg.h \
     project/erc/ercmsglist.h \
     project/circuit/gencompinstance.h \
-    library/libraryelementattribute.h \
     project/circuit/gencompattributeinstance.h \
     project/schematics/symbolinstancepropertiesdialog.h \
     project/dialogs/projectpropertieseditordialog.h \
@@ -284,7 +243,6 @@ HEADERS += \
     project/schematics/cmd/cmdschematicnetlabelremove.h \
     project/schematics/cmd/cmdschematicnetlabeledit.h \
     project/schematics/schematicclipboard.h \
-    library/sym/symbolellipse.h \
     project/circuit/cmd/cmdgencompinstedit.h \
     project/circuit/cmd/cmdnetclassedit.h \
     project/circuit/cmd/cmdnetsignaledit.h \
@@ -310,8 +268,6 @@ HEADERS += \
     project/schematics/graphicsitems/sgi_netpoint.h \
     project/schematics/graphicsitems/sgi_symbol.h \
     project/schematics/graphicsitems/sgi_symbolpin.h \
-    library/sym/symbolpreviewgraphicsitem.h \
-    library/sym/symbolpinpreviewgraphicsitem.h \
     project/boards/boardeditor.h \
     project/boards/cmd/cmdboardadd.h \
     project/boards/items/bi_base.h \
