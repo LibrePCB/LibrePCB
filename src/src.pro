@@ -20,7 +20,6 @@ DEFINES += APP_VERSION_MAJOR=0
 DEFINES += APP_VERSION_MINOR=1
 
 exists(../.git):DEFINES += GIT_BRANCH=\\\"master\\\"
-#DEFINES += USE_32BIT_LENGTH_UNITS          # see common/units/length.h
 
 win32 {
     # Windows-specific configurations
@@ -52,11 +51,11 @@ LIBS += \
     -leda4ulibrary
 
 INCLUDEPATH += \
-    ../lib/eda4ucommon \
-    ../lib/eda4ulibrary
+    ../lib
 
 DEPENDPATH += \
-    ../lib
+    ../lib/eda4ucommon \
+    ../lib/eda4ulibrary
 
 PRE_TARGETDEPS += \
     $${DESTDIR}/libeda4ucommon.a \
@@ -73,10 +72,6 @@ RESOURCES += \
 
 SOURCES += \
     main.cpp \
-    common/units/length.cpp \
-    common/units/lengthunit.cpp \
-    common/units/angle.cpp \
-    common/units/point.cpp \
     workspace/workspace.cpp \
     library/library.cpp \
     project/project.cpp \
@@ -98,7 +93,6 @@ SOURCES += \
     project/circuit/circuit.cpp \
     workspace/recentprojectsmodel.cpp \
     workspace/favoriteprojectsmodel.cpp \
-    common/exceptions.cpp \
     workspace/settings/workspacesettings.cpp \
     workspace/settings/workspacesettingsdialog.cpp \
     project/schematics/schematic.cpp \
@@ -107,21 +101,12 @@ SOURCES += \
     project/circuit/netclass.cpp \
     project/circuit/netsignal.cpp \
     project/circuit/gencompsignalinstance.cpp \
-    common/systeminfo.cpp \
-    common/debug.cpp \
-    common/file_io/filelock.cpp \
-    common/file_io/filepath.cpp \
-    common/schematiclayer.cpp \
-    common/file_io/smartxmlfile.cpp \
     library/librarybaseelement.cpp \
     project/circuit/cmd/cmdnetclassadd.cpp \
     project/circuit/cmd/cmdnetclassremove.cpp \
     project/circuit/cmd/cmdnetsignaladd.cpp \
     project/circuit/cmd/cmdnetsignalremove.cpp \
-    common/undocommand.cpp \
-    common/undostack.cpp \
     project/schematics/schematicpagesdock.cpp \
-    common/file_io/smartinifile.cpp \
     project/schematics/cmd/cmdschematicadd.cpp \
     project/schematics/cmd/cmdschematicremove.cpp \
     project/erc/ercmsgdock.cpp \
@@ -144,16 +129,13 @@ SOURCES += \
     workspace/settings/items/wsi_projectautosaveinterval.cpp \
     workspace/settings/items/wsi_librarylocaleorder.cpp \
     project/circuit/editnetclassesdialog.cpp \
-    common/dialogs/gridsettingsdialog.cpp \
     workspace/settings/items/wsi_appdefaultmeasurementunits.cpp \
-    common/application.cpp \
     library/gencmp/gencompsignal.cpp \
     library/gencmp/gencompsymbvar.cpp \
     library/gencmp/gencompsymbvaritem.cpp \
     library/sym/symbolpin.cpp \
     library/sym/symbolpolygon.cpp \
     library/sym/symboltext.cpp \
-    common/version.cpp \
     workspace/settings/items/wsi_librarynormorder.cpp \
     project/schematics/cmd/cmdsymbolinstanceadd.cpp \
     project/circuit/cmd/cmdgencompsiginstsetnetsignal.cpp \
@@ -167,17 +149,11 @@ SOURCES += \
     project/circuit/gencompinstance.cpp \
     library/libraryelementattribute.cpp \
     project/circuit/gencompattributeinstance.cpp \
-    common/if_attributeprovider.cpp \
     project/schematics/symbolinstancepropertiesdialog.cpp \
     project/dialogs/projectpropertieseditordialog.cpp \
     project/cmd/cmdprojectsetmetadata.cpp \
-    common/file_io/smarttextfile.cpp \
-    common/file_io/smartfile.cpp \
-    common/file_io/xmldomdocument.cpp \
-    common/file_io/xmldomelement.cpp \
     workspace/settings/items/wsi_appearance.cpp \
     project/dialogs/addgencompdialog.cpp \
-    common/alignment.cpp \
     project/schematics/fsm/ses_addnetlabel.cpp \
     project/schematics/cmd/cmdschematicnetlabeladd.cpp \
     project/schematics/cmd/cmdschematicnetlabelremove.cpp \
@@ -191,14 +167,6 @@ SOURCES += \
     project/schematics/cmd/cmdsymbolinstanceedit.cpp \
     project/circuit/cmd/cmdgencompinstadd.cpp \
     project/circuit/cmd/cmdgencompinstremove.cpp \
-    common/attributes/attributetype.cpp \
-    common/attributes/attributeunit.cpp \
-    common/attributes/attrtyperesistance.cpp \
-    common/attributes/attrtypestring.cpp \
-    common/attributes/attrtypeinductance.cpp \
-    common/attributes/attrtypecapacitance.cpp \
-    common/attributes/attrtypefrequency.cpp \
-    common/attributes/attrtypevoltage.cpp \
     project/circuit/cmd/cmdgencompattrinstadd.cpp \
     project/circuit/cmd/cmdgencompattrinstremove.cpp \
     project/circuit/cmd/cmdgencompattrinstedit.cpp \
@@ -211,17 +179,12 @@ SOURCES += \
     project/schematics/items/si_netpoint.cpp \
     project/schematics/items/si_symbol.cpp \
     project/schematics/items/si_symbolpin.cpp \
-    common/graphics/graphicsview.cpp \
-    common/graphics/graphicsscene.cpp \
-    common/graphics/graphicsitem.cpp \
-    common/graphics/if_graphicsvieweventhandler.cpp \
     project/schematics/graphicsitems/sgi_base.cpp \
     project/schematics/graphicsitems/sgi_netlabel.cpp \
     project/schematics/graphicsitems/sgi_netline.cpp \
     project/schematics/graphicsitems/sgi_netpoint.cpp \
     project/schematics/graphicsitems/sgi_symbol.cpp \
     project/schematics/graphicsitems/sgi_symbolpin.cpp \
-    common/gridproperties.cpp \
     library/sym/symbolpreviewgraphicsitem.cpp \
     library/sym/symbolpinpreviewgraphicsitem.cpp \
     project/boards/boardeditor.cpp \
@@ -233,11 +196,6 @@ SOURCES += \
     project/boards/graphicsitems/bgi_footprint.cpp
 
 HEADERS += \
-    common/units/all_length_units.h \
-    common/units/length.h \
-    common/units/lengthunit.h \
-    common/units/angle.h \
-    common/units/point.h \
     workspace/workspace.h \
     library/library.h \
     project/project.h \
@@ -259,7 +217,6 @@ HEADERS += \
     project/circuit/circuit.h \
     workspace/recentprojectsmodel.h \
     workspace/favoriteprojectsmodel.h \
-    common/exceptions.h \
     workspace/settings/workspacesettings.h \
     workspace/settings/workspacesettingsdialog.h \
     project/schematics/schematic.h \
@@ -268,21 +225,12 @@ HEADERS += \
     project/circuit/netclass.h \
     project/circuit/netsignal.h \
     project/circuit/gencompsignalinstance.h \
-    common/systeminfo.h \
-    common/debug.h \
-    common/file_io/filelock.h \
-    common/file_io/filepath.h \
-    common/schematiclayer.h \
-    common/file_io/smartxmlfile.h \
     library/librarybaseelement.h \
     project/circuit/cmd/cmdnetclassadd.h \
     project/circuit/cmd/cmdnetclassremove.h \
     project/circuit/cmd/cmdnetsignaladd.h \
     project/circuit/cmd/cmdnetsignalremove.h \
-    common/undocommand.h \
-    common/undostack.h \
     project/schematics/schematicpagesdock.h \
-    common/file_io/smartinifile.h \
     project/schematics/cmd/cmdschematicadd.h \
     project/schematics/cmd/cmdschematicremove.h \
     project/erc/ercmsgdock.h \
@@ -305,16 +253,13 @@ HEADERS += \
     workspace/settings/items/wsi_projectautosaveinterval.h \
     workspace/settings/items/wsi_librarylocaleorder.h \
     project/circuit/editnetclassesdialog.h \
-    common/dialogs/gridsettingsdialog.h \
     workspace/settings/items/wsi_appdefaultmeasurementunits.h \
-    common/application.h \
     library/gencmp/gencompsignal.h \
     library/gencmp/gencompsymbvar.h \
     library/gencmp/gencompsymbvaritem.h \
     library/sym/symbolpin.h \
     library/sym/symbolpolygon.h \
     library/sym/symboltext.h \
-    common/version.h \
     workspace/settings/items/wsi_librarynormorder.h \
     project/schematics/cmd/cmdsymbolinstanceadd.h \
     project/circuit/cmd/cmdgencompsiginstsetnetsignal.h \
@@ -328,19 +273,12 @@ HEADERS += \
     project/circuit/gencompinstance.h \
     library/libraryelementattribute.h \
     project/circuit/gencompattributeinstance.h \
-    common/if_attributeprovider.h \
     project/schematics/symbolinstancepropertiesdialog.h \
     project/dialogs/projectpropertieseditordialog.h \
     project/cmd/cmdprojectsetmetadata.h \
-    common/file_io/smarttextfile.h \
-    common/file_io/smartfile.h \
-    common/file_io/xmldomdocument.h \
-    common/file_io/xmldomelement.h \
     project/erc/if_ercmsgprovider.h \
-    common/file_io/if_xmlserializableobject.h \
     workspace/settings/items/wsi_appearance.h \
     project/dialogs/addgencompdialog.h \
-    common/alignment.h \
     project/schematics/fsm/ses_addnetlabel.h \
     project/schematics/cmd/cmdschematicnetlabeladd.h \
     project/schematics/cmd/cmdschematicnetlabelremove.h \
@@ -354,14 +292,6 @@ HEADERS += \
     project/schematics/cmd/cmdsymbolinstanceedit.h \
     project/circuit/cmd/cmdgencompinstadd.h \
     project/circuit/cmd/cmdgencompinstremove.h \
-    common/attributes/attributetype.h \
-    common/attributes/attributeunit.h \
-    common/attributes/attrtyperesistance.h \
-    common/attributes/attrtypestring.h \
-    common/attributes/attrtypeinductance.h \
-    common/attributes/attrtypecapacitance.h \
-    common/attributes/attrtypefrequency.h \
-    common/attributes/attrtypevoltage.h \
     project/circuit/cmd/cmdgencompattrinstadd.h \
     project/circuit/cmd/cmdgencompattrinstremove.h \
     project/circuit/cmd/cmdgencompattrinstedit.h \
@@ -374,17 +304,12 @@ HEADERS += \
     project/schematics/items/si_netpoint.h \
     project/schematics/items/si_symbol.h \
     project/schematics/items/si_symbolpin.h \
-    common/graphics/graphicsview.h \
-    common/graphics/graphicsscene.h \
-    common/graphics/graphicsitem.h \
-    common/graphics/if_graphicsvieweventhandler.h \
     project/schematics/graphicsitems/sgi_base.h \
     project/schematics/graphicsitems/sgi_netlabel.h \
     project/schematics/graphicsitems/sgi_netline.h \
     project/schematics/graphicsitems/sgi_netpoint.h \
     project/schematics/graphicsitems/sgi_symbol.h \
     project/schematics/graphicsitems/sgi_symbolpin.h \
-    common/gridproperties.h \
     library/sym/symbolpreviewgraphicsitem.h \
     library/sym/symbolpinpreviewgraphicsitem.h \
     project/boards/boardeditor.h \
@@ -404,7 +329,6 @@ FORMS += \
     project/schematics/schematicpagesdock.ui \
     project/erc/ercmsgdock.ui \
     project/circuit/editnetclassesdialog.ui \
-    common/dialogs/gridsettingsdialog.ui \
     project/schematics/symbolinstancepropertiesdialog.ui \
     project/dialogs/projectpropertieseditordialog.ui \
     project/dialogs/addgencompdialog.ui \

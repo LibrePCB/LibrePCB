@@ -26,7 +26,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include "../../common/gridproperties.h"
+#include "../gridproperties.h"
 
 /*****************************************************************************************
  *  Forward Declarations

@@ -34,7 +34,7 @@ XmlDomDocument::XmlDomDocument(XmlDomElement& root, bool setAppVersion) noexcept
 {
     mRootElement->setDocument(this);
     if (setAppVersion)
-        mRootElement->setAttribute<uint>("version", APP_VERSION_MAJOR);
+        mRootElement->setAttribute<uint>("version", /*APP_VERSION_MAJOR*/ 0);
 }
 
 XmlDomDocument::XmlDomDocument(const QByteArray& xmlFileContent, const FilePath& filepath) throw (Exception) :

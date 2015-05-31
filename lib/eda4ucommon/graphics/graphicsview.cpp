@@ -28,8 +28,6 @@
 #include "graphicsscene.h"
 #include "if_graphicsvieweventhandler.h"
 #include "../gridproperties.h"
-#include "../../workspace/workspace.h"
-#include "../../workspace/settings/workspacesettings.h"
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -40,8 +38,8 @@ GraphicsView::GraphicsView(QWidget* parent, IF_GraphicsViewEventHandler* eventHa
     mZoomAnimation(nullptr), mGridProperties(new GridProperties()), mOriginCrossVisible(true)
 {
     setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
-    if (Workspace::instance().getSettings().getAppearance()->getUseOpenGl())
-        setViewport(new QGLWidget(QGLFormat(QGL::DoubleBuffer | QGL::AlphaChannel | QGL::SampleBuffers)));
+    //if (Workspace::instance().getSettings().getAppearance()->getUseOpenGl())
+    //    setViewport(new QGLWidget(QGLFormat(QGL::DoubleBuffer | QGL::AlphaChannel | QGL::SampleBuffers)));
     setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     setOptimizationFlags(QGraphicsView::DontSavePainterState);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
