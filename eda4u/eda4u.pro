@@ -47,19 +47,19 @@ unix:!macx {
 
 LIBS += \
     -L$${DESTDIR} \
-    -leda4ucommon \
-    -leda4ulibrary
+    -leda4ulibrary \    # Note: The order of the libraries is very important for the linker!
+    -leda4ucommon       # Another order could end up in "undefined reference" errors!
 
 INCLUDEPATH += \
     ../lib
 
 DEPENDPATH += \
-    ../lib/eda4ucommon \
-    ../lib/eda4ulibrary
+    ../lib/eda4ulibrary \
+    ../lib/eda4ucommon
 
 PRE_TARGETDEPS += \
-    $${DESTDIR}/libeda4ucommon.a \
-    $${DESTDIR}/libeda4ulibrary.a
+    $${DESTDIR}/libeda4ulibrary.a \
+    $${DESTDIR}/libeda4ucommon.a
 
 TRANSLATIONS = \
     ../i18n/eda4u_de.ts \
