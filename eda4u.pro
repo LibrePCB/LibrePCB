@@ -2,6 +2,6 @@ TEMPLATE = subdirs
 CONFIG += ordered
 SUBDIRS = \
     lib \
-    src \
+    eda4u \
     tools \
     tests
