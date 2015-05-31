@@ -28,8 +28,6 @@
 #include "symbolpin.h"
 #include "../gencmp/genericcomponent.h"
 #include <eda4ucommon/schematiclayer.h>
-#include "../../workspace/workspace.h"
-#include "../../workspace/settings/workspacesettings.h"
 
 namespace library {
 
@@ -44,12 +42,12 @@ SymbolPinPreviewGraphicsItem::SymbolPinPreviewGraphicsItem(const SymbolPin& pin,
 {
     setToolTip(mPin.getName() % ": " % mPin.getDescription());
 
-    mCircleLayer = Workspace::instance().getSchematicLayer(SchematicLayer::SymbolPinCircles);
+    /*mCircleLayer = Workspace::instance().getSchematicLayer(SchematicLayer::SymbolPinCircles);
     Q_ASSERT(mCircleLayer);
     mLineLayer = Workspace::instance().getSchematicLayer(SchematicLayer::SymbolOutlines);
     Q_ASSERT(mLineLayer);
     mTextLayer = Workspace::instance().getSchematicLayer(SchematicLayer::SymbolPinNames);
-    Q_ASSERT(mTextLayer);
+    Q_ASSERT(mTextLayer);*/
 
     mStaticText.setTextFormat(Qt::PlainText);
     mStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
@@ -149,13 +147,13 @@ void SymbolPinPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
     painter->restore();
 
 #ifdef QT_DEBUG
-    if ((Workspace::instance().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect()))
+    /*if ((Workspace::instance().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect()))
     {
         // draw bounding rect
         painter->setPen(QPen(Qt::red, 0));
         painter->setBrush(Qt::NoBrush);
         painter->drawRect(mBoundingRect);
-    }
+    }*/
 #endif
 }
 

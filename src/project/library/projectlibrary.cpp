@@ -26,13 +26,13 @@
 #include "projectlibrary.h"
 #include <eda4ucommon/fileio/filepath.h>
 #include "../project.h"
-#include "../../library/sym/symbol.h"
-#include "../../library/fpt/footprint.h"
-#include "../../library/3dmdl/model3d.h"
-#include "../../library/spcmdl/spicemodel.h"
-#include "../../library/pkg/package.h"
-#include "../../library/gencmp/genericcomponent.h"
-#include "../../library/cmp/component.h"
+#include <eda4ulibrary/sym/symbol.h>
+#include <eda4ulibrary/fpt/footprint.h>
+#include <eda4ulibrary/3dmdl/model3d.h>
+#include <eda4ulibrary/spcmdl/spicemodel.h>
+#include <eda4ulibrary/pkg/package.h>
+#include <eda4ulibrary/gencmp/genericcomponent.h>
+#include <eda4ulibrary/cmp/component.h>
 #include "../../workspace/workspace.h"
 using namespace library;
 

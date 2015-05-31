@@ -29,11 +29,11 @@
 #include <eda4ucommon/graphics/graphicsview.h>
 #include "../project.h"
 #include "../library/projectlibrary.h"
-#include "../../library/gencmp/genericcomponent.h"
-#include "../../library/gencmp/gencompsymbvar.h"
-#include "../../library/sym/symbol.h"
+#include <eda4ulibrary/gencmp/genericcomponent.h>
+#include <eda4ulibrary/gencmp/gencompsymbvar.h>
+#include <eda4ulibrary/sym/symbol.h>
 #include "../settings/projectsettings.h"
-#include "../../library/sym/symbolpreviewgraphicsitem.h"
+#include <eda4ulibrary/sym/symbolpreviewgraphicsitem.h>
 
 namespace project {
 

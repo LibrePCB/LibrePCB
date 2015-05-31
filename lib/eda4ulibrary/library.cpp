@@ -23,12 +23,9 @@
 
 #include <QtCore>
 #include <QtSql>
-
-#include "library.h"
 #include <eda4ucommon/exceptions.h>
 #include <eda4ucommon/fileio/filepath.h>
-#include "../workspace/workspace.h"
-
+#include "library.h"
 
 namespace library{
 

@@ -27,8 +27,8 @@
 #include "ui_symbolinstancepropertiesdialog.h"
 #include "../circuit/gencompinstance.h"
 #include "items/si_symbol.h"
-#include "../../library/gencmp/genericcomponent.h"
-#include "../../library/sym/symbol.h"
+#include <eda4ulibrary/gencmp/genericcomponent.h>
+#include <eda4ulibrary/sym/symbol.h>
 #include "../project.h"
 #include <eda4ucommon/undostack.h>
 #include <eda4ucommon/undocommand.h>

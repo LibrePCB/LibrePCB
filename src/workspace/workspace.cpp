@@ -26,7 +26,7 @@
 #include "workspace.h"
 #include <eda4ucommon/exceptions.h>
 #include <eda4ucommon/fileio/filepath.h>
-#include "../library/library.h"
+#include <eda4ulibrary/library.h>
 #include "../library_editor/libraryeditor.h"
 #include "../project/project.h"
 #include "projecttreemodel.h"

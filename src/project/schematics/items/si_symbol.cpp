@@ -29,8 +29,8 @@
 #include "../../circuit/circuit.h"
 #include "../../library/projectlibrary.h"
 #include "../../circuit/gencompinstance.h"
-#include "../../../library/gencmp/genericcomponent.h"
-#include "../../../library/sym/symbol.h"
+#include <eda4ulibrary/gencmp/genericcomponent.h>
+#include <eda4ulibrary/sym/symbol.h>
 #include <eda4ucommon/fileio/xmldomelement.h>
 #include <eda4ucommon/graphics/graphicsscene.h>
 

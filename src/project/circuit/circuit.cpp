@@ -32,7 +32,7 @@
 #include "netsignal.h"
 #include "gencompinstance.h"
 #include "editnetclassesdialog.h"
-#include "../../library/gencmp/genericcomponent.h"
+#include <eda4ulibrary/gencmp/genericcomponent.h>
 
 namespace project {
 

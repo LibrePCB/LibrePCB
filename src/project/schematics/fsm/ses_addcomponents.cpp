@@ -27,7 +27,7 @@
 #include "ui_schematiceditor.h"
 #include "../../project.h"
 #include "../../library/projectlibrary.h"
-#include "../../../library/gencmp/genericcomponent.h"
+#include <eda4ulibrary/gencmp/genericcomponent.h>
 #include "../../circuit/cmd/cmdgencompinstadd.h"
 #include <eda4ucommon/undostack.h>
 #include "../cmd/cmdsymbolinstanceadd.h"

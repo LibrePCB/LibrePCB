@@ -27,7 +27,7 @@
 #include <eda4ucommon/fileio/xmldomdocument.h>
 #include <eda4ucommon/fileio/xmldomelement.h>
 #include "../project.h"
-#include "../../library/sym/symbolpin.h"
+#include <eda4ulibrary/sym/symbolpin.h>
 #include "items/si_symbol.h"
 #include "items/si_symbolpin.h"
 #include "items/si_netpoint.h"

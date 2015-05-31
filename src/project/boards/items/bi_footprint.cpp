@@ -28,8 +28,8 @@
 #include "../../project.h"
 #include "../../circuit/circuit.h"
 #include "../../library/projectlibrary.h"
-#include "../../../library/fpt/footprint.h"
-#include "../../../library/pkg/package.h"
+#include <eda4ulibrary/fpt/footprint.h>
+#include <eda4ulibrary/pkg/package.h>
 #include <eda4ucommon/fileio/xmldomelement.h>
 #include <eda4ucommon/graphics/graphicsscene.h>
 #include "../componentinstance.h"

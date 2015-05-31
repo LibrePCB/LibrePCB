@@ -23,8 +23,6 @@
 
 #include <QtCore>
 #include "librarybaseelement.h"
-#include "../workspace/workspace.h"
-#include "../workspace/settings/workspacesettings.h"
 #include <eda4ucommon/fileio/smartxmlfile.h>
 #include <eda4ucommon/fileio/xmldomdocument.h>
 #include <eda4ucommon/fileio/xmldomelement.h>
@@ -203,7 +201,7 @@ QString LibraryBaseElement::localeStringFromList(const QMap<QString, QString>& l
     }
 
     // search in the locale order from the workspace settings
-    const QStringList& wsLocaleOrder = Workspace::instance().getSettings().getLibLocaleOrder()->getLocaleOrder();
+    /*const QStringList& wsLocaleOrder = Workspace::instance().getSettings().getLibLocaleOrder()->getLocaleOrder();
     foreach (const QString& locale, wsLocaleOrder)
     {
         if (list.contains(locale))
@@ -211,7 +209,7 @@ QString LibraryBaseElement::localeStringFromList(const QMap<QString, QString>& l
             if (usedLocale) *usedLocale = locale;
                 return list.value(locale);
         }
-    }
+    }*/
 
     // try the fallback locale "en_US"
     if (list.contains("en_US"))

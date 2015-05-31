@@ -249,7 +249,7 @@
   <customwidget>
    <class>GraphicsView</class>
    <extends>QGraphicsView</extends>
-   <header location="global">common/graphics/graphicsview.h</header>
+   <header location="global">eda4ucommon/graphics/graphicsview.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

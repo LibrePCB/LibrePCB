@@ -30,7 +30,7 @@
 #include "../../project.h"
 #include "../../../workspace/workspace.h"
 #include "../../../workspace/settings/workspacesettings.h"
-#include "../../../library/fpt/footprint.h"
+#include <eda4ulibrary/fpt/footprint.h>
 
 namespace project {
 

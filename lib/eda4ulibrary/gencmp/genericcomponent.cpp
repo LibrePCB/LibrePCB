@@ -23,8 +23,6 @@
 
 #include <QtCore>
 #include "genericcomponent.h"
-#include "../../workspace/workspace.h"
-#include "../../workspace/settings/workspacesettings.h"
 #include <eda4ucommon/fileio/xmldomelement.h>
 
 namespace library {
@@ -126,12 +124,12 @@ QString GenericComponent::getPrefix(const QStringList& normOrder) const noexcept
     }
 
     // search in the norm order from the workspace settings
-    const QStringList& wsNormOrder = Workspace::instance().getSettings().getLibNormOrder()->getNormOrder();
+    /*const QStringList& wsNormOrder = Workspace::instance().getSettings().getLibNormOrder()->getNormOrder();
     foreach (const QString& norm, wsNormOrder)
     {
         if (mPrefixes.contains(norm))
             return mPrefixes.value(norm);
-    }
+    }*/
 
     // return the prefix of the default norm
     return mPrefixes.value(mDefaultPrefixNorm);

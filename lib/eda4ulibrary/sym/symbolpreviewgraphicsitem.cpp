@@ -27,8 +27,6 @@
 #include "symbolpreviewgraphicsitem.h"
 #include "symbol.h"
 #include <eda4ucommon/schematiclayer.h>
-#include "../../workspace/workspace.h"
-#include "../../workspace/settings/workspacesettings.h"
 #include "symbolpinpreviewgraphicsitem.h"
 #include "../gencmp/genericcomponent.h"
 
@@ -181,7 +179,7 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
     const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
 
     // draw all polygons
-    foreach (const SymbolPolygon* polygon, mSymbol.getPolygons())
+    /*foreach (const SymbolPolygon* polygon, mSymbol.getPolygons())
     {
         // set colors
         layer = Workspace::instance().getSchematicLayer(polygon->getLineLayerId());
@@ -264,7 +262,7 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
         painter->setBrush(Qt::NoBrush);
         painter->drawRect(mBoundingRect);
     }
-#endif
+#endif*/
 }
 
 /*****************************************************************************************

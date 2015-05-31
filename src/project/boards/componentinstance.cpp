@@ -26,8 +26,8 @@
 #include "board.h"
 #include "../project.h"
 #include "../library/projectlibrary.h"
-#include "../../library/cmp/component.h"
-#include "../../library/gencmp/genericcomponent.h"
+#include <eda4ulibrary/cmp/component.h>
+#include <eda4ulibrary/gencmp/genericcomponent.h>
 #include "../erc/ercmsg.h"
 #include <eda4ucommon/fileio/xmldomelement.h>
 #include "../circuit/circuit.h"

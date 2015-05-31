@@ -28,7 +28,7 @@
 #include "../project.h"
 #include "../library/projectlibrary.h"
 #include "gencompsignalinstance.h"
-#include "../../library/gencmp/genericcomponent.h"
+#include <eda4ulibrary/gencmp/genericcomponent.h>
 #include "../erc/ercmsg.h"
 #include "gencompattributeinstance.h"
 #include <eda4ucommon/fileio/xmldomelement.h>
