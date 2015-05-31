@@ -46,6 +46,22 @@ unix:!macx {
     INSTALLS += target icon desktop mimexml mimedesktop
 }
 
+LIBS += \
+    -L$${DESTDIR} \
+    -leda4ucommon \
+    -leda4ulibrary
+
+INCLUDEPATH += \
+    ../lib/eda4ucommon \
+    ../lib/eda4ulibrary
+
+DEPENDPATH += \
+    ../lib
+
+PRE_TARGETDEPS += \
+    $${DESTDIR}/libeda4ucommon.a \
+    $${DESTDIR}/libeda4ulibrary.a
+
 TRANSLATIONS = \
     ../i18n/eda4u_de.ts \
     ../i18n/eda4u_de_CH.ts \

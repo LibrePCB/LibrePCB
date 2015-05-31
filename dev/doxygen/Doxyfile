@@ -665,7 +665,8 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-INPUT                  = ../../src \
+INPUT                  = ../../lib \
+                         ../../src \
                          pages
 
 # This tag can be used to specify the character encoding of the source files
@@ -704,8 +705,7 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which doxygen is
 # run.
 
-EXCLUDE                = ../../src/3rdparty \
-                         ../../src/0_old
+EXCLUDE                = 
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
