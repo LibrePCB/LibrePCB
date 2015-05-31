@@ -63,9 +63,9 @@ class LibraryElementAttribute final : public IF_XmlSerializableObject
         const QString& getKey() const noexcept {return mKey;}
         const AttributeType& getType() const noexcept {return *mType;}
         const AttributeUnit* getDefaultUnit() const noexcept {return mDefaultUnit;}
-        QString getName(const QStringList& localeOrder = QStringList()) const noexcept;
-        QString getDescription(const QStringList& localeOrder = QStringList()) const noexcept;
-        QString getDefaultValue(const QStringList& localeOrder = QStringList()) const noexcept;
+        QString getName(const QStringList& localeOrder) const noexcept;
+        QString getDescription(const QStringList& localeOrder) const noexcept;
+        QString getDefaultValue(const QStringList& localeOrder) const noexcept;
         const QMap<QString, QString>& getNames() const noexcept {return mNames;}
         const QMap<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
         const QMap<QString, QString>& getDefaultValues() const noexcept {return mDefaultValues;}

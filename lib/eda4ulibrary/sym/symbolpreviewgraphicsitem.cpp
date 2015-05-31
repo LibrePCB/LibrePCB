@@ -27,6 +27,7 @@
 #include "symbolpreviewgraphicsitem.h"
 #include "symbol.h"
 #include <eda4ucommon/schematiclayer.h>
+#include <eda4ucommon/if_schematiclayerprovider.h>
 #include "symbolpinpreviewgraphicsitem.h"
 #include "../gencmp/genericcomponent.h"
 
@@ -36,11 +37,14 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SymbolPreviewGraphicsItem::SymbolPreviewGraphicsItem(const Symbol& symbol,
+SymbolPreviewGraphicsItem::SymbolPreviewGraphicsItem(const IF_SchematicLayerProvider& layerProvider,
+                                                     const QStringList& localeOrder,
+                                                     const Symbol& symbol,
                                                      const GenericComponent* genComp,
                                                      const QUuid& symbVarUuid,
                                                      const QUuid& symbVarItemUuid) noexcept :
-    GraphicsItem(), mSymbol(symbol), mGenComp(genComp), mSymbVarItem(nullptr)
+    GraphicsItem(), mLayerProvider(layerProvider), mSymbol(symbol), mGenComp(genComp),
+    mSymbVarItem(nullptr), mDrawBoundingRect(false), mLocaleOrder(localeOrder)
 {
     if (mGenComp)
         mSymbVarItem = mGenComp->getSymbVarItem(symbVarUuid, symbVarItemUuid);
@@ -57,7 +61,7 @@ SymbolPreviewGraphicsItem::SymbolPreviewGraphicsItem(const Symbol& symbol,
         GenCompSymbVarItem::PinDisplayType_t displayType = GenCompSymbVarItem::PinDisplayType_t::PinName;
         if (mGenComp) signal = mGenComp->getSignalOfPin(symbVarUuid, symbVarItemUuid, pin->getUuid());
         if (mSymbVarItem) displayType = mSymbVarItem->getDisplayTypeOfPin(pin->getUuid());
-        SymbolPinPreviewGraphicsItem* item = new SymbolPinPreviewGraphicsItem(*pin, signal, displayType);
+        SymbolPinPreviewGraphicsItem* item = new SymbolPinPreviewGraphicsItem(layerProvider, localeOrder, *pin, signal, displayType);
         item->setPos(pin->getPosition().toPxQPointF());
         item->setRotation(pin->getAngle().toDeg());
         item->setZValue(2);
@@ -67,6 +71,20 @@ SymbolPreviewGraphicsItem::SymbolPreviewGraphicsItem(const Symbol& symbol,
 
 SymbolPreviewGraphicsItem::~SymbolPreviewGraphicsItem() noexcept
 {
+}
+
+/*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
+
+void SymbolPreviewGraphicsItem::setDrawBoundingRect(bool enable) noexcept
+{
+    mDrawBoundingRect = enable;
+    foreach (QGraphicsItem* child, childItems())
+    {
+        SymbolPinPreviewGraphicsItem* pin = dynamic_cast<SymbolPinPreviewGraphicsItem*>(child);
+        if (pin) pin->setDrawBoundingRect(enable);
+    }
 }
 
 /*****************************************************************************************
@@ -179,10 +197,10 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
     const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
 
     // draw all polygons
-    /*foreach (const SymbolPolygon* polygon, mSymbol.getPolygons())
+    foreach (const SymbolPolygon* polygon, mSymbol.getPolygons())
     {
         // set colors
-        layer = Workspace::instance().getSchematicLayer(polygon->getLineLayerId());
+        layer = mLayerProvider.getSchematicLayer(polygon->getLineLayerId());
         if (layer)
         {
             pen = QPen(layer->getColor(selected), polygon->getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
@@ -190,7 +208,7 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
         }
         else
             painter->setPen(Qt::NoPen);
-        layer = Workspace::instance().getSchematicLayer(polygon->getFillLayerId());
+        layer = mLayerProvider.getSchematicLayer(polygon->getFillLayerId());
         painter->setBrush(layer ? QBrush(layer->getColor(selected), Qt::SolidPattern) : Qt::NoBrush);
 
         // draw polygon
@@ -201,7 +219,7 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
     foreach (const SymbolEllipse* ellipse, mSymbol.getEllipses())
     {
         // set colors
-        layer = Workspace::instance().getSchematicLayer(ellipse->getLineLayerId()); if (!layer) continue;
+        layer = mLayerProvider.getSchematicLayer(ellipse->getLineLayerId()); if (!layer) continue;
         if (layer)
         {
             pen = QPen(layer->getColor(selected), ellipse->getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
@@ -209,7 +227,7 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
         }
         else
             painter->setPen(Qt::NoPen);
-        layer = Workspace::instance().getSchematicLayer(ellipse->getFillLayerId());
+        layer = mLayerProvider.getSchematicLayer(ellipse->getFillLayerId());
         painter->setBrush(layer ? QBrush(layer->getColor(selected), Qt::SolidPattern) : Qt::NoBrush);
 
         // draw ellipse
@@ -222,7 +240,7 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
     foreach (const SymbolText* text, mSymbol.getTexts())
     {
         // get layer
-        layer = Workspace::instance().getSchematicLayer(text->getLayerId()); if (!layer) continue;
+        layer = mLayerProvider.getSchematicLayer(text->getLayerId()); if (!layer) continue;
 
         // get cached text properties
         const CachedTextProperties_t& props = mCachedTextProperties.value(text);
@@ -243,7 +261,7 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
     // draw origin cross
     if (!deviceIsPrinter)
     {
-        layer = Workspace::instance().getSchematicLayer(SchematicLayer::OriginCrosses);
+        layer = mLayerProvider.getSchematicLayer(SchematicLayer::OriginCrosses);
         if (layer)
         {
             qreal width = Length(700000).toPx();
@@ -255,14 +273,14 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
     }
 
 #ifdef QT_DEBUG
-    if ((!deviceIsPrinter) && (Workspace::instance().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect()))
+    if (mDrawBoundingRect)
     {
         // draw bounding rect
         painter->setPen(QPen(Qt::red, 0));
         painter->setBrush(Qt::NoBrush);
         painter->drawRect(mBoundingRect);
     }
-#endif*/
+#endif
 }
 
 /*****************************************************************************************
@@ -277,13 +295,13 @@ bool SymbolPreviewGraphicsItem::getAttributeValue(const QString& attrNS, const Q
     if ((attrNS == QLatin1String("SYM")) || (attrNS.isEmpty()))
     {
         if ((attrKey == QLatin1String("NAME")) && (mGenComp) && (mSymbVarItem))
-            return value = mGenComp->getPrefix() % "?" % mSymbVarItem->getSuffix(), true;
+            return value = mGenComp->getPrefix(mLocaleOrder) % "?" % mSymbVarItem->getSuffix(), true;
     }
 
     if (((attrNS == QLatin1String("CMP")) || (attrNS.isEmpty())) && (mGenComp))
     {
         if (attrKey == QLatin1String("NAME"))
-            return value = mGenComp->getPrefix() % "?", true;
+            return value = mGenComp->getPrefix(mLocaleOrder) % "?", true;
         if (attrKey == QLatin1String("VALUE"))
             return value = "VALUE", true;
         foreach (const LibraryElementAttribute* attr, mGenComp->getAttributes())

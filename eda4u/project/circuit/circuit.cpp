@@ -33,6 +33,7 @@
 #include "gencompinstance.h"
 #include "editnetclassesdialog.h"
 #include <eda4ulibrary/gencmp/genericcomponent.h>
+#include "../settings/projectsettings.h"
 
 namespace project {
 
@@ -360,7 +361,7 @@ GenCompInstance* Circuit::createGenCompInstance(const library::GenericComponent&
 {
     if (name.isEmpty())
     {
-        QString prefix = genComp.getPrefix();
+        QString prefix = genComp.getPrefix(mProject.getSettings().getLocaleOrder(true));
         if (prefix.isEmpty()) prefix = "?";
         unsigned int i = 1;
         do

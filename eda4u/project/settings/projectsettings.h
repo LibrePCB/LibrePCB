@@ -64,8 +64,8 @@ class ProjectSettings final : public QObject, public IF_XmlSerializableObject
         Project& getProject() const noexcept {return mProject;}
 
         // Getters: Settings
-        const QStringList& getLocaleOrder() const noexcept {return mLocaleOrder;}
-        const QStringList& getNormOrder() const noexcept {return mNormOrder;}
+        QStringList getLocaleOrder(bool useWorkspaceSettings) const noexcept;
+        QStringList getNormOrder(bool useWorkspaceSettings) const noexcept;
 
         // Setters: Settings
         void setLocaleOrder(const QStringList& locales) noexcept {mLocaleOrder = locales;}

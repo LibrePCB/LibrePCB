@@ -34,6 +34,8 @@
 #include <eda4ulibrary/sym/symbol.h>
 #include "../settings/projectsettings.h"
 #include <eda4ulibrary/sym/symbolpreviewgraphicsitem.h>
+#include "../../workspace/workspace.h"
+#include "../../workspace/settings/workspacesettings.h"
 
 namespace project {
 
@@ -50,7 +52,7 @@ AddGenCompDialog::AddGenCompDialog(Project& project, QWidget* parent) :
     mUi->graphicsView->setScene(mPreviewScene);
     mUi->graphicsView->setOriginCrossVisible(false);
 
-    const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
+    const QStringList& localeOrder = mProject.getSettings().getLocaleOrder(true);
 
     // list generic components from project (TODO: for temporary use only...)
     foreach (const library::GenericComponent* genComp, mProject.getLibrary().getGenericComponents())
@@ -146,7 +148,7 @@ void AddGenCompDialog::setSelectedGenComp(const library::GenericComponent* genCo
 
     if (genComp)
     {
-        const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
+        const QStringList& localeOrder = mProject.getSettings().getLocaleOrder(true);
 
         mUi->lblGenCompUuid->setText(genComp->getUuid().toString());
         mUi->lblGenCompName->setText(genComp->getName(localeOrder));
@@ -179,7 +181,7 @@ void AddGenCompDialog::setSelectedSymbVar(const library::GenCompSymbVar* symbVar
 
     if (mSelectedGenComp && symbVar)
     {
-        const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
+        const QStringList& localeOrder = mProject.getSettings().getLocaleOrder(true);
 
         mUi->lblSymbVarUuid->setText(symbVar->getUuid().toString());
         mUi->lblSymbVarNorm->setText(symbVar->getNorm());
@@ -190,7 +192,8 @@ void AddGenCompDialog::setSelectedSymbVar(const library::GenCompSymbVar* symbVar
             const library::Symbol* symbol = mProject.getLibrary().getSymbol(item->getSymbolUuid());
             if (!symbol) continue; // TODO: show warning
             library::SymbolPreviewGraphicsItem* graphicsItem = new library::SymbolPreviewGraphicsItem(
-                *symbol, mSelectedGenComp, symbVar->getUuid(), item->getUuid());
+                mProject, localeOrder, *symbol, mSelectedGenComp, symbVar->getUuid(), item->getUuid());
+            graphicsItem->setDrawBoundingRect(Workspace::instance().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect());
             mPreviewSymbolGraphicsItems.append(graphicsItem);
             qreal y = mPreviewScene->itemsBoundingRect().bottom() + graphicsItem->boundingRect().height();
             graphicsItem->setPos(QPointF(0, y));

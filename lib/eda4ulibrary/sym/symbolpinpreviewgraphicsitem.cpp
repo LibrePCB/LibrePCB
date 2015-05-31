@@ -28,6 +28,7 @@
 #include "symbolpin.h"
 #include "../gencmp/genericcomponent.h"
 #include <eda4ucommon/schematiclayer.h>
+#include <eda4ucommon/if_schematiclayerprovider.h>
 
 namespace library {
 
@@ -35,19 +36,22 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SymbolPinPreviewGraphicsItem::SymbolPinPreviewGraphicsItem(const SymbolPin& pin,
+SymbolPinPreviewGraphicsItem::SymbolPinPreviewGraphicsItem(const IF_SchematicLayerProvider& layerProvider,
+                                                           const QStringList& localeOrder,
+                                                           const SymbolPin& pin,
                                                            const GenCompSignal* genCompSignal,
                                                            GenCompSymbVarItem::PinDisplayType_t displayType) noexcept :
-    GraphicsItem(), mPin(pin), mGenCompSignal(genCompSignal), mDisplayType(displayType)
+    GraphicsItem(), mPin(pin), mGenCompSignal(genCompSignal), mDisplayType(displayType),
+    mDrawBoundingRect(false), mLocaleOrder(localeOrder)
 {
-    setToolTip(mPin.getName() % ": " % mPin.getDescription());
+    setToolTip(mPin.getName(mLocaleOrder) % ": " % mPin.getDescription(mLocaleOrder));
 
-    /*mCircleLayer = Workspace::instance().getSchematicLayer(SchematicLayer::SymbolPinCircles);
+    mCircleLayer = layerProvider.getSchematicLayer(SchematicLayer::SymbolPinCircles);
     Q_ASSERT(mCircleLayer);
-    mLineLayer = Workspace::instance().getSchematicLayer(SchematicLayer::SymbolOutlines);
+    mLineLayer = layerProvider.getSchematicLayer(SchematicLayer::SymbolOutlines);
     Q_ASSERT(mLineLayer);
-    mTextLayer = Workspace::instance().getSchematicLayer(SchematicLayer::SymbolPinNames);
-    Q_ASSERT(mTextLayer);*/
+    mTextLayer = layerProvider.getSchematicLayer(SchematicLayer::SymbolPinNames);
+    Q_ASSERT(mTextLayer);
 
     mStaticText.setTextFormat(Qt::PlainText);
     mStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
@@ -95,9 +99,9 @@ void SymbolPinPreviewGraphicsItem::updateCacheAndRepaint() noexcept
         case GenCompSymbVarItem::PinDisplayType_t::None:
             mStaticText.setText(""); break;
         case GenCompSymbVarItem::PinDisplayType_t::PinName:
-            mStaticText.setText(mPin.getName()); break;
+            mStaticText.setText(mPin.getName(mLocaleOrder)); break;
         case GenCompSymbVarItem::PinDisplayType_t::GenCompSignal:
-            mStaticText.setText(mGenCompSignal ? mGenCompSignal->getName() : ""); break;
+            mStaticText.setText(mGenCompSignal ? mGenCompSignal->getName(mLocaleOrder) : ""); break;
         case GenCompSymbVarItem::PinDisplayType_t::NetSignal:
             mStaticText.setText(mGenCompSignal ? mGenCompSignal->getForcedNetName() : ""); break;
         default: Q_ASSERT(false);
@@ -147,13 +151,13 @@ void SymbolPinPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
     painter->restore();
 
 #ifdef QT_DEBUG
-    /*if ((Workspace::instance().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect()))
+    if (mDrawBoundingRect)
     {
         // draw bounding rect
         painter->setPen(QPen(Qt::red, 0));
         painter->setBrush(Qt::NoBrush);
         painter->drawRect(mBoundingRect);
-    }*/
+    }
 #endif
 }
 

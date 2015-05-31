@@ -68,8 +68,8 @@ class GenCompSignal final : public IF_XmlSerializableObject
         bool isNegated() const noexcept {return mIsNegated;}
         bool isClock() const noexcept {return mIsClock;}
         bool isNetSignalNameForced() const noexcept {return !mForcedNetName.isEmpty();}
-        QString getName(const QStringList& localeOrder = QStringList()) const noexcept;
-        QString getDescription(const QStringList& localeOrder = QStringList()) const noexcept;
+        QString getName(const QStringList& localeOrder) const noexcept;
+        QString getDescription(const QStringList& localeOrder) const noexcept;
         const QMap<QString, QString>& getNames() const noexcept {return mNames;}
         const QMap<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
 

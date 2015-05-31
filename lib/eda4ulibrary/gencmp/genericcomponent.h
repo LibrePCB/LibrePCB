@@ -61,13 +61,13 @@ class GenericComponent final : public LibraryElement
 
         // Default Values
         const QMap<QString, QString>& getDefaultValues() const noexcept;
-        QString getDefaultValue(const QStringList& localeOrder = QStringList()) const noexcept;
+        QString getDefaultValue(const QStringList& localeOrder) const noexcept;
         void clearDefaultValues() noexcept;
         void addDefaultValue(const QString& locale, const QString& value) noexcept;
 
         // Prefixes
         const QMap<QString, QString>& getPrefixes() const noexcept;
-        QString getPrefix(const QStringList& normOrder = QStringList()) const noexcept;
+        QString getPrefix(const QStringList& normOrder) const noexcept;
         const QString& getDefaultPrefixNorm() const noexcept;
         QString getDefaultPrefix() const noexcept;
         void clearPrefixes() noexcept;

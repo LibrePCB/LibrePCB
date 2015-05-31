@@ -123,14 +123,6 @@ QString GenericComponent::getPrefix(const QStringList& normOrder) const noexcept
             return mPrefixes.value(norm);
     }
 
-    // search in the norm order from the workspace settings
-    /*const QStringList& wsNormOrder = Workspace::instance().getSettings().getLibNormOrder()->getNormOrder();
-    foreach (const QString& norm, wsNormOrder)
-    {
-        if (mPrefixes.contains(norm))
-            return mPrefixes.value(norm);
-    }*/
-
     // return the prefix of the default norm
     return mPrefixes.value(mDefaultPrefixNorm);
 }

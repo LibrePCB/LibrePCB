@@ -53,8 +53,8 @@ class GenCompSymbVar final : public IF_XmlSerializableObject
         const QUuid& getUuid() const noexcept {return mUuid;}
         const QString& getNorm() const noexcept {return mNorm;}
         bool isDefault() const noexcept {return mIsDefault;}
-        QString getName(const QStringList& localeOrder = QStringList()) const noexcept;
-        QString getDescription(const QStringList& localeOrder = QStringList()) const noexcept;
+        QString getName(const QStringList& localeOrder) const noexcept;
+        QString getDescription(const QStringList& localeOrder) const noexcept;
         const QMap<QString, QString>& getNames() const noexcept {return mNames;}
         const QMap<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
 

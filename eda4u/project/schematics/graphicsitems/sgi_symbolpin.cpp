@@ -37,6 +37,7 @@
 #include "../../../workspace/settings/workspacesettings.h"
 #include <eda4ulibrary/sym/symbolpin.h>
 #include <eda4ulibrary/gencmp/genericcomponent.h>
+#include "../../settings/projectsettings.h"
 
 namespace project {
 
@@ -48,7 +49,8 @@ SGI_SymbolPin::SGI_SymbolPin(SI_SymbolPin& pin) noexcept :
     SGI_Base(), mPin(pin), mLibPin(pin.getLibPin())
 {
     setZValue(Schematic::ZValue_Symbols);
-    setToolTip(mLibPin.getName() % ": " % mLibPin.getDescription());
+    QStringList localeOrder = mPin.getSymbol().getSchematic().getProject().getSettings().getLocaleOrder(true);
+    setToolTip(mLibPin.getName(localeOrder) % ": " % mLibPin.getDescription(localeOrder));
 
     mCircleLayer = getSchematicLayer(SchematicLayer::SymbolPinCircles);
     Q_ASSERT(mCircleLayer);

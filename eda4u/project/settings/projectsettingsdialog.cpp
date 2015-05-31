@@ -234,7 +234,7 @@ void ProjectSettingsDialog::updateGuiFromSettings() noexcept
 {
     // locales
     mUi->lstLocaleOrder->clear();
-    foreach (const QString& localeStr, mSettings.getLocaleOrder())
+    foreach (const QString& localeStr, mSettings.getLocaleOrder(false))
     {
         QLocale locale(localeStr);
         QString str = QString("[%1] %2 (%3)").arg(locale.name(), locale.nativeLanguageName(), locale.nativeCountryName());
@@ -244,7 +244,7 @@ void ProjectSettingsDialog::updateGuiFromSettings() noexcept
 
     // norms
     mUi->lstNormOrder->clear();
-    mUi->lstNormOrder->addItems(mSettings.getNormOrder());
+    mUi->lstNormOrder->addItems(mSettings.getNormOrder(false));
 }
 
 /*****************************************************************************************

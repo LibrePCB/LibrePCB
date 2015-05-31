@@ -78,7 +78,7 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(Project& project,
     }
     updateAttrTable();
 
-    const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
+    const QStringList& localeOrder = mProject.getSettings().getLocaleOrder(true);
 
     // Generic Component Library Element Attributes
     QString htmlLink("<a href=\"%1\">%2<a>");

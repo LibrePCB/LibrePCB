@@ -27,6 +27,7 @@
 #include <QtCore>
 #include <eda4ucommon/fileio/if_xmlserializableobject.h>
 #include <eda4ucommon/if_attributeprovider.h>
+#include <eda4ucommon/if_schematiclayerprovider.h>
 #include <eda4ucommon/exceptions.h>
 #include <eda4ucommon/fileio/filelock.h>
 
@@ -80,7 +81,7 @@ namespace project {
  * @date 2014-06-24
  */
 class Project final : public QObject, public IF_AttributeProvider,
-                      public IF_XmlSerializableObject
+                      public IF_SchematicLayerProvider, public IF_XmlSerializableObject
 {
         Q_OBJECT
 

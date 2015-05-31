@@ -97,6 +97,26 @@ ProjectSettings::~ProjectSettings() noexcept
 }
 
 /*****************************************************************************************
+ *  Getters
+ ****************************************************************************************/
+
+QStringList ProjectSettings::getLocaleOrder(bool useWorkspaceSettings) const noexcept
+{
+    if (useWorkspaceSettings)
+        return mLocaleOrder + Workspace::instance().getSettings().getLibLocaleOrder()->getLocaleOrder();
+    else
+        return mLocaleOrder;
+}
+
+QStringList ProjectSettings::getNormOrder(bool useWorkspaceSettings) const noexcept
+{
+    if (useWorkspaceSettings)
+        return mNormOrder + Workspace::instance().getSettings().getLibNormOrder()->getNormOrder();
+    else
+        return mNormOrder;
+}
+
+/*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 

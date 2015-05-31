@@ -34,6 +34,7 @@
  ****************************************************************************************/
 
 class SchematicLayer;
+class IF_SchematicLayerProvider;
 
 namespace library {
 class Symbol;
@@ -59,11 +60,16 @@ class SymbolPreviewGraphicsItem final : public GraphicsItem, public IF_Attribute
     public:
 
         // Constructors / Destructor
-        explicit SymbolPreviewGraphicsItem(const Symbol& symbol,
+        explicit SymbolPreviewGraphicsItem(const IF_SchematicLayerProvider& layerProvider,
+                                           const QStringList& localeOrder,
+                                           const Symbol& symbol,
                                            const GenericComponent* genComp = nullptr,
                                            const QUuid& symbVarUuid = QUuid(),
                                            const QUuid& symbVarItemUuid = QUuid()) noexcept;
         ~SymbolPreviewGraphicsItem() noexcept;
+
+        // Setters
+        void setDrawBoundingRect(bool enable) noexcept;
 
         // General Methods
         void updateCacheAndRepaint() noexcept;
@@ -105,10 +111,13 @@ class SymbolPreviewGraphicsItem final : public GraphicsItem, public IF_Attribute
 
 
         // General Attributes
+        const IF_SchematicLayerProvider& mLayerProvider;
         const Symbol& mSymbol;
         const GenericComponent* mGenComp;
         const GenCompSymbVarItem* mSymbVarItem;
         QFont mFont;
+        bool mDrawBoundingRect;
+        QStringList mLocaleOrder;
 
         // Cached Attributes
         QRectF mBoundingRect;

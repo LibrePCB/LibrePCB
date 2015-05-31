@@ -204,7 +204,7 @@ bool GenCompSignalInstance::checkAttributesValidity() const noexcept
 
 void GenCompSignalInstance::updateErcMessages() noexcept
 {
-    const QStringList& localeOrder = mCircuit.getProject().getSettings().getLocaleOrder();
+    const QStringList& localeOrder = mCircuit.getProject().getSettings().getLocaleOrder(true);
 
     mErcMsgUnconnectedRequiredSignal->setMsg(
         QString(tr("Unconnected component signal: \"%1\" from \"%2\""))

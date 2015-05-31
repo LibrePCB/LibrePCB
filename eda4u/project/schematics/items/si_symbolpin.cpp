@@ -90,7 +90,7 @@ const QUuid& SI_SymbolPin::getLibPinUuid() const noexcept
 QString SI_SymbolPin::getDisplayText(bool returnGenCompSignalNameIfEmpty,
                                      bool returnPinNameIfEmpty) const noexcept
 {
-    const QStringList& localeOrder = mCircuit.getProject().getSettings().getLocaleOrder();
+    const QStringList& localeOrder = mCircuit.getProject().getSettings().getLocaleOrder(true);
 
     QString text;
     switch (mSymbol.getGenCompSymbVarItem().getDisplayTypeOfPin(mSymbolPin->getUuid()))

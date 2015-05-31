@@ -55,8 +55,8 @@ class SymbolPin final : public IF_XmlSerializableObject
         const Point& getPosition() const noexcept {return mPosition;}
         const Length& getLength() const noexcept {return mLength;}
         const Angle& getAngle() const noexcept {return mAngle;}
-        QString getName(const QStringList& localeOrder = QStringList()) const noexcept;
-        QString getDescription(const QStringList& localeOrder = QStringList()) const noexcept;
+        QString getName(const QStringList& localeOrder) const noexcept;
+        QString getDescription(const QStringList& localeOrder) const noexcept;
         const QMap<QString, QString>& getNames() const noexcept {return mNames;}
         const QMap<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
 

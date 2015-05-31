@@ -35,8 +35,8 @@ CmdProjectSettingsChange::CmdProjectSettingsChange(ProjectSettings& settings,
                                                    UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Change Project Settings"), parent), mSettings(settings),
     mRestoreDefaults(false),
-    mLocaleOrderOld(settings.getLocaleOrder()), mLocaleOrderNew(mLocaleOrderOld),
-    mNormOrderOld(settings.getNormOrder()), mNormOrderNew(mNormOrderOld)
+    mLocaleOrderOld(settings.getLocaleOrder(false)), mLocaleOrderNew(mLocaleOrderOld),
+    mNormOrderOld(settings.getNormOrder(false)), mNormOrderNew(mNormOrderOld)
 {
 }
 

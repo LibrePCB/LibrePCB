@@ -66,9 +66,9 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
         const QString& getAuthor() const noexcept {return mAuthor;}
         const QDateTime& getCreated() const noexcept {return mCreated;}
         const QDateTime& getLastModified() const noexcept {return mLastModified;}
-        QString getName(const QStringList& localeOrder = QStringList()) const noexcept;
-        QString getDescription(const QStringList& localeOrder = QStringList()) const noexcept;
-        QString getKeywords(const QStringList& localeOrder = QStringList()) const noexcept;
+        QString getName(const QStringList& localeOrder) const noexcept;
+        QString getDescription(const QStringList& localeOrder) const noexcept;
+        QString getKeywords(const QStringList& localeOrder) const noexcept;
         const QMap<QString, QString>& getNames() const noexcept {return mNames;}
         const QMap<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
         const QMap<QString, QString>& getKeywords() const noexcept {return mKeywords;}
@@ -133,17 +133,16 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
          * which was generated with #readLocaleDomNodes(). If the list doesn't contain a
          * translation for the selected language, the "nearest" other language will be
          * used instead. Therefore you can to pass a QStringList with the locales to use.
-         * If all these languages are not available in the QMap, the locale order from
-         * the workspace settings will be used as fallback. If the these languages are
-         * also not available in the QMap, always the language "en_US" is used instead
-         * (if available, otherwise an exception will be thrown).
+         * If all these languages are not available in the QMap, always the language
+         * "en_US" is used instead (if available, otherwise an exception will be thrown).
          *
          * @param list          The list which contains all locales and their translations
          *                      (created with #readLocaleDomNodes())
          * @param localeOrder   The locale you want to read (for example "de_CH") must be
          *                      on top (index 0) of this list. To use fallback locales,
          *                      the list can have more than one item (order is important!).
-         * @param usedLocale    The locale which was really used (locale of the returned string)
+         * @param usedLocale    The locale which was really used (locale of the returned
+         *                      string). Pass nullptr if this return value is not needed.
          *
          * @return              The string from the list in the specified language
          *

@@ -200,17 +200,6 @@ QString LibraryBaseElement::localeStringFromList(const QMap<QString, QString>& l
         }
     }
 
-    // search in the locale order from the workspace settings
-    /*const QStringList& wsLocaleOrder = Workspace::instance().getSettings().getLibLocaleOrder()->getLocaleOrder();
-    foreach (const QString& locale, wsLocaleOrder)
-    {
-        if (list.contains(locale))
-        {
-            if (usedLocale) *usedLocale = locale;
-                return list.value(locale);
-        }
-    }*/
-
     // try the fallback locale "en_US"
     if (list.contains("en_US"))
     {

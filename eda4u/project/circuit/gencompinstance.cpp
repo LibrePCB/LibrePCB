@@ -110,7 +110,7 @@ GenCompInstance::GenCompInstance(Circuit& circuit, const library::GenericCompone
     QObject(nullptr), mCircuit(circuit), mAddedToCircuit(false),
     mGenComp(&genComp), mGenCompSymbVar(&symbVar)
 {
-    const QStringList& localeOrder = mCircuit.getProject().getSettings().getLocaleOrder();
+    const QStringList& localeOrder = mCircuit.getProject().getSettings().getLocaleOrder(true);
 
     mUuid = QUuid::createUuid().toString(); // generate random UUID
     mName = name;

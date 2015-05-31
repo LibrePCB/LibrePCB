@@ -34,6 +34,7 @@
  ****************************************************************************************/
 
 class SchematicLayer;
+class IF_SchematicLayerProvider;
 
 namespace library {
 class SymbolPin;
@@ -57,10 +58,15 @@ class SymbolPinPreviewGraphicsItem final : public GraphicsItem
     public:
 
         // Constructors / Destructor
-        explicit SymbolPinPreviewGraphicsItem(const SymbolPin& pin,
+        explicit SymbolPinPreviewGraphicsItem(const IF_SchematicLayerProvider& layerProvider,
+                                              const QStringList& localeOrder,
+                                              const SymbolPin& pin,
                                               const GenCompSignal* genCompSignal,
                                               GenCompSymbVarItem::PinDisplayType_t displayType) noexcept;
         ~SymbolPinPreviewGraphicsItem() noexcept;
+
+        // Setters
+        void setDrawBoundingRect(bool enable) noexcept {mDrawBoundingRect = enable;}
 
         // General Methods
         void updateCacheAndRepaint() noexcept;
@@ -88,6 +94,8 @@ class SymbolPinPreviewGraphicsItem final : public GraphicsItem
         SchematicLayer* mTextLayer;
         QFont mFont;
         qreal mRadiusPx;
+        bool mDrawBoundingRect;
+        QStringList mLocaleOrder;
 
         // Cached Attributes
         QStaticText mStaticText;

@@ -57,7 +57,8 @@ HEADERS += \
     systeminfo.h \
     undocommand.h \
     undostack.h \
-    version.h
+    version.h \
+    if_schematiclayerprovider.h
 
 SOURCES += \
     attributes/attributetype.cpp \
