@@ -28,17 +28,18 @@ LIBS += \
 INCLUDEPATH += \
     ../3rdparty/gmock/gtest/include \
     ../3rdparty/gmock/include \
-    ../../lib
+    ../lib
 
 DEPENDPATH += \
-    ../../lib/eda4ulibrary \
-    ../../lib/eda4ucommon
+    ../lib/eda4ulibrary \
+    ../lib/eda4ucommon
 
 PRE_TARGETDEPS += \
     $${DESTDIR}/libgmock.a \
     $${DESTDIR}/libeda4ulibrary.a \
     $${DESTDIR}/libeda4ucommon.a
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    common/filepathtest.cpp
 
 HEADERS +=

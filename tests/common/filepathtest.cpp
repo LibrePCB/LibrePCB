@@ -23,7 +23,7 @@
 
 #include <QtCore>
 #include <gtest/gtest.h>
-#include <common/file_io/filepath.h>
+#include <eda4ucommon/fileio/filepath.h>
 
 namespace tests {
 

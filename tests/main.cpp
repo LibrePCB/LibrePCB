@@ -23,6 +23,7 @@
 
 #include <QtCore>
 #include <gmock/gmock.h>
+#include <eda4ucommon/debug.h>
 
 /*****************************************************************************************
  *  The Unit Testing Program
@@ -30,8 +31,9 @@
 
 int main(int argc, char *argv[])
 {
-    // suppress messages from the application (we need only messages from the test framework)
-    qInstallMessageHandler(0); // remove the message handler from the Debug class
+    // disable the whole debug output (we want only the output from gtest)
+    Debug::instance()->setDebugLevelLogFile(Debug::DebugLevel_t::Nothing);
+    Debug::instance()->setDebugLevelStderr(Debug::DebugLevel_t::Nothing);
 
     // init gmock and run all tests
     ::testing::InitGoogleMock(&argc, argv);
