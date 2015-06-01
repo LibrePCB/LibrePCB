@@ -22,8 +22,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
-//#include <common/debug.h>
-//#include <common/exceptions.h>
+#include <gmock/gmock.h>
 
 /*****************************************************************************************
  *  The Unit Testing Program
@@ -31,17 +30,10 @@
 
 int main(int argc, char *argv[])
 {
-    Q_UNUSED(argc);
-    Q_UNUSED(argv);
-    
-    //Debug::instance(); // this creates the Debug object and installs the message handler.
-
     // suppress messages from the application (we need only messages from the test framework)
     qInstallMessageHandler(0); // remove the message handler from the Debug class
-    //Debug::instance()->setDebugLevelLogFile(Debug::DebugLevel_t::Nothing);
-    //Debug::instance()->setDebugLevelStderr(Debug::DebugLevel_t::Nothing);
-    
-    // TODO
 
-    return 0;
+    // init gmock and run all tests
+    ::testing::InitGoogleMock(&argc, argv);
+    return RUN_ALL_TESTS();
 }
