@@ -17,57 +17,59 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_PACKAGE_H
-#define LIBRARY_PACKAGE_H
+#ifndef PROJECT_CMDBOARDADD_H
+#define PROJECT_CMDBOARDADD_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../libraryelement.h"
+#include "../../../common/undocommand.h"
+#include "../../../common/exceptions.h"
 
 /*****************************************************************************************
- *  Class Package
+ *  Forward Declarations
  ****************************************************************************************/
 
-namespace library {
+namespace project {
+class Project;
+class Board;
+}
+
+/*****************************************************************************************
+ *  Class CmdBoardAdd
+ ****************************************************************************************/
+
+namespace project {
 
 /**
- * @brief The Package class
+ * @brief The CmdBoardAdd class
  */
-class Package final : public LibraryElement
+class CmdBoardAdd final : public UndoCommand
 {
-        Q_OBJECT
-
     public:
 
         // Constructors / Destructor
-        explicit Package(const FilePath& xmlFilePath) throw (Exception);
-        virtual ~Package() noexcept;
+        explicit CmdBoardAdd(Project& project, const QString& name,
+                             UndoCommand* parent = 0) throw (Exception);
+        ~CmdBoardAdd() noexcept;
 
         // Getters
-        const QUuid& getFootprintUuid() const noexcept {return mFootprintUuid;}
+        Board* getBoard() const noexcept {return mBoard;}
 
+        // Inherited from UndoCommand
+        void redo() throw (Exception) override;
+        void undo() throw (Exception) override;
 
     private:
 
-        // make some methods inaccessible...
-        Package() = delete;
-        Package(const Package& other) = delete;
-        Package& operator=(const Package& rhs) = delete;
-
-
-        // Private Methods
-        void parseDomTree(const XmlDomElement& root) throw (Exception);
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
-        bool checkAttributesValidity() const noexcept;
-
-
-        // Attributes
-        QUuid mFootprintUuid;
+        Project& mProject;
+        QString mName;
+        Board* mBoard;
+        int mPageIndex;
 };
 
-} // namespace library
+} // namespace project
 
-#endif // LIBRARY_PACKAGE_H
+#endif // PROJECT_CMDBOARDADD_H

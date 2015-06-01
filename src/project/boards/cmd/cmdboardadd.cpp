@@ -22,52 +22,66 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "package.h"
-#include "../../common/file_io/xmldomelement.h"
+#include "cmdboardadd.h"
+#include "../board.h"
+#include "../../project.h"
 
-namespace library {
+namespace project {
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Package::Package(const FilePath& xmlFilePath) throw (Exception) :
-    LibraryElement(xmlFilePath, "package")
+CmdBoardAdd::CmdBoardAdd(Project& project, const QString& name,
+                         UndoCommand* parent) throw (Exception) :
+    UndoCommand(tr("Add board"), parent),
+    mProject(project), mName(name), mBoard(nullptr), mPageIndex(-1)
 {
-    readFromFile();
 }
 
-Package::~Package() noexcept
+CmdBoardAdd::~CmdBoardAdd() noexcept
 {
 }
 
 /*****************************************************************************************
- *  Private Methods
+ *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void Package::parseDomTree(const XmlDomElement& root) throw (Exception)
+void CmdBoardAdd::redo() throw (Exception)
 {
-    LibraryElement::parseDomTree(root);
+    if (!mBoard) // only the first time
+        mBoard = mProject.createBoard(mName); // throws an exception on error
 
-    mFootprintUuid = root.getFirstChild("meta/footprint", true, true)->getText<QUuid>(true);
+    mProject.addBoard(mBoard, mPageIndex); // throws an exception on error
+
+    try
+    {
+        UndoCommand::redo(); // throws an exception on error
+    }
+    catch (Exception &e)
+    {
+        mProject.removeBoard(mBoard);
+        throw;
+    }
 }
 
-XmlDomElement* Package::serializeToXmlDomElement() const throw (Exception)
+void CmdBoardAdd::undo() throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement());
-    root->getFirstChild("meta", true)->appendTextChild("footprint", mFootprintUuid);
-    return root.take();
-}
+    mProject.removeBoard(mBoard); // throws an exception on error
 
-bool Package::checkAttributesValidity() const noexcept
-{
-    if (!LibraryElement::checkAttributesValidity())             return false;
-    if (mFootprintUuid.isNull())                                return false;
-    return true;
+    try
+    {
+        UndoCommand::undo();
+    }
+    catch (Exception& e)
+    {
+        mProject.addBoard(mBoard, mPageIndex);
+        throw;
+    }
 }
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace library
+} // namespace project

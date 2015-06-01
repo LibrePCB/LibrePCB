@@ -17,57 +17,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_PACKAGE_H
-#define LIBRARY_PACKAGE_H
+#ifndef PROJECT_BGI_BASE_H
+#define PROJECT_BGI_BASE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../libraryelement.h"
+#include <QtWidgets>
+#include "../../../common/graphics/graphicsitem.h"
+#include "../board.h"
 
 /*****************************************************************************************
- *  Class Package
+ *  Class BGI_Base
  ****************************************************************************************/
 
-namespace library {
+namespace project {
 
 /**
- * @brief The Package class
+ * @brief The Board Graphics Item Base (BGI_Base) class
  */
-class Package final : public LibraryElement
+class BGI_Base : public GraphicsItem
 {
-        Q_OBJECT
-
     public:
 
         // Constructors / Destructor
-        explicit Package(const FilePath& xmlFilePath) throw (Exception);
-        virtual ~Package() noexcept;
-
-        // Getters
-        const QUuid& getFootprintUuid() const noexcept {return mFootprintUuid;}
+        explicit BGI_Base() noexcept;
+        virtual ~BGI_Base() noexcept;
 
 
     private:
 
         // make some methods inaccessible...
-        Package() = delete;
-        Package(const Package& other) = delete;
-        Package& operator=(const Package& rhs) = delete;
-
-
-        // Private Methods
-        void parseDomTree(const XmlDomElement& root) throw (Exception);
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
-        bool checkAttributesValidity() const noexcept;
-
-
-        // Attributes
-        QUuid mFootprintUuid;
+        //BGI_Base() = delete;
+        BGI_Base(const BGI_Base& other) = delete;
+        BGI_Base& operator=(const BGI_Base& rhs) = delete;
 };
 
-} // namespace library
+} // namespace project
 
-#endif // LIBRARY_PACKAGE_H
+#endif // PROJECT_BGI_BASE_H

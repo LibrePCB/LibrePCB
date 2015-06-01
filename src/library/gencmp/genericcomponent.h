@@ -96,8 +96,9 @@ class GenericComponent final : public LibraryElement
     private:
 
         // make some methods inaccessible...
-        GenericComponent(const GenericComponent& other);
-        GenericComponent& operator=(const GenericComponent& rhs);
+        GenericComponent() = delete;
+        GenericComponent(const GenericComponent& other) = delete;
+        GenericComponent& operator=(const GenericComponent& rhs) = delete;
 
 
         // Private Methods

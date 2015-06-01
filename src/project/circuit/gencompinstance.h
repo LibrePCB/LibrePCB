@@ -40,6 +40,7 @@ namespace project {
 class Circuit;
 class GenCompAttributeInstance;
 class GenCompSignalInstance;
+class ComponentInstance;
 class SI_Symbol;
 class ErcMsg;
 }
@@ -124,6 +125,8 @@ class GenCompInstance : public QObject, public IF_AttributeProvider,
         void removeFromCircuit() throw (Exception);
         void registerSymbol(const SI_Symbol& symbol) throw (Exception);
         void unregisterSymbol(const SI_Symbol& symbol) throw (Exception);
+        void registerComponent(const ComponentInstance& component) throw (Exception);
+        void unregisterComponent(const ComponentInstance& component) throw (Exception);
         XmlDomElement* serializeToXmlDomElement() const throw (Exception);
 
         // Helper Methods
@@ -190,6 +193,13 @@ class GenCompInstance : public QObject, public IF_AttributeProvider,
          * @see #registerSymbol(), #unregisterSymbol()
          */
         QHash<QUuid, const SI_Symbol*> mSymbols;
+
+        /**
+         * @brief All registered component instances
+         *
+         * @see #registerComponent(), #unregisterComponent()
+         */
+        QList<const ComponentInstance*> mComponentInstances;
 
         /// @brief The ERC message for unplaced required symbols of this generic component
         QScopedPointer<ErcMsg> mErcMsgUnplacedRequiredSymbols;

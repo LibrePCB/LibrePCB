@@ -81,8 +81,8 @@ Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create) thr
             }
 
             // Load all generic component instances
-            for (XmlDomElement* node = root.getFirstChild("generic_component_instances/instance", true, false);
-                 node; node = node->getNextSibling("instance"))
+            for (XmlDomElement* node = root.getFirstChild("generic_component_instances/generic_component_instance", true, false);
+                 node; node = node->getNextSibling("generic_component_instance"))
             {
                 GenCompInstance* genComp = new GenCompInstance(*this, *node);
                 addGenCompInstance(*genComp);

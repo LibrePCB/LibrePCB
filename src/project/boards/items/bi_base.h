@@ -17,57 +17,66 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_PACKAGE_H
-#define LIBRARY_PACKAGE_H
+#ifndef PROJECT_BI_BASE_H
+#define PROJECT_BI_BASE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../libraryelement.h"
+#include <QtWidgets>
+#include "../../../common/units/all_length_units.h"
 
 /*****************************************************************************************
- *  Class Package
+ *  Class BI_Base
  ****************************************************************************************/
 
-namespace library {
+namespace project {
 
 /**
- * @brief The Package class
+ * @brief The Board Item Base (BI_Base) class
  */
-class Package final : public LibraryElement
+class BI_Base : public QObject
 {
         Q_OBJECT
 
     public:
 
+        // Types
+        enum class Type_t {
+            NetPoint,       ///< project#BI_NetPoint
+            NetLine,        ///< project#BI_NetLine
+            NetLabel,       ///< project#BI_NetLabel
+            Footprint,      ///< project#BI_Footprint
+            FootprintPad,   ///< project#BI_FootprintPad
+        };
+
         // Constructors / Destructor
-        explicit Package(const FilePath& xmlFilePath) throw (Exception);
-        virtual ~Package() noexcept;
+        explicit BI_Base() noexcept;
+        virtual ~BI_Base() noexcept;
 
         // Getters
-        const QUuid& getFootprintUuid() const noexcept {return mFootprintUuid;}
+        virtual Type_t getType() const noexcept = 0;
+        virtual const Point& getPosition() const noexcept = 0;
+        bool isSelected() const noexcept {return mIsSelected;}
+        virtual QPainterPath getGrabAreaScenePx() const noexcept = 0;
+
+        // Setters
+        virtual void setSelected(bool selected) noexcept;
 
 
     private:
 
         // make some methods inaccessible...
-        Package() = delete;
-        Package(const Package& other) = delete;
-        Package& operator=(const Package& rhs) = delete;
+        //BI_Base() = delete;
+        BI_Base(const BI_Base& other) = delete;
+        BI_Base& operator=(const BI_Base& rhs) = delete;
 
-
-        // Private Methods
-        void parseDomTree(const XmlDomElement& root) throw (Exception);
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
-        bool checkAttributesValidity() const noexcept;
-
-
-        // Attributes
-        QUuid mFootprintUuid;
+        // General Attributes
+        bool mIsSelected;
 };
 
-} // namespace library
+} // namespace project
 
-#endif // LIBRARY_PACKAGE_H
+#endif // PROJECT_BI_BASE_H

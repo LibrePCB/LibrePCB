@@ -17,57 +17,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_PACKAGE_H
-#define LIBRARY_PACKAGE_H
-
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../libraryelement.h"
+#include "bgi_base.h"
+
+namespace project {
 
 /*****************************************************************************************
- *  Class Package
+ *  Constructors / Destructor
  ****************************************************************************************/
 
-namespace library {
-
-/**
- * @brief The Package class
- */
-class Package final : public LibraryElement
+BGI_Base::BGI_Base() noexcept
 {
-        Q_OBJECT
 
-    public:
+}
 
-        // Constructors / Destructor
-        explicit Package(const FilePath& xmlFilePath) throw (Exception);
-        virtual ~Package() noexcept;
+BGI_Base::~BGI_Base() noexcept
+{
 
-        // Getters
-        const QUuid& getFootprintUuid() const noexcept {return mFootprintUuid;}
+}
 
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-    private:
-
-        // make some methods inaccessible...
-        Package() = delete;
-        Package(const Package& other) = delete;
-        Package& operator=(const Package& rhs) = delete;
-
-
-        // Private Methods
-        void parseDomTree(const XmlDomElement& root) throw (Exception);
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
-        bool checkAttributesValidity() const noexcept;
-
-
-        // Attributes
-        QUuid mFootprintUuid;
-};
-
-} // namespace library
-
-#endif // LIBRARY_PACKAGE_H
+} // namespace project

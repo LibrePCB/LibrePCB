@@ -42,6 +42,8 @@
 #include "../common/file_io/xmldomdocument.h"
 #include "../common/file_io/xmldomelement.h"
 #include "settings/projectsettings.h"
+#include "boards/board.h"
+#include "boards/boardeditor.h"
 
 namespace project {
 
@@ -54,7 +56,8 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
     mFilepath(filepath), mXmlFile(nullptr), mFileLock(filepath), mIsRestored(false),
     mIsReadOnly(false), mDescriptionHtmlFile(nullptr), mProjectIsModified(false),
     mUndoStack(nullptr), mProjectSettings(nullptr), mProjectLibrary(nullptr),
-    mErcMsgList(nullptr), mCircuit(nullptr), mSchematicEditor(nullptr)
+    mErcMsgList(nullptr), mCircuit(nullptr), mSchematicEditor(nullptr),
+    mBoardEditor(nullptr)
 {
     qDebug() << (create ? "create project..." : "open project...");
 
@@ -223,13 +226,33 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
             qDebug() << mSchematics.count() << "schematics successfully loaded!";
         }
 
+        // Load all boards
+        if (create)
+        {
+            FilePath fp = FilePath::fromRelative(mPath.getPathTo("boards"), "default.xml");
+            Board* board = Board::create(*this, fp, "Default");
+            addBoard(board);
+        }
+        else
+        {
+            for (XmlDomElement* node = root->getFirstChild("boards/board", true, false);
+                 node; node = node->getNextSibling("board"))
+            {
+                FilePath fp = FilePath::fromRelative(mPath.getPathTo("boards"), node->getText(true));
+                Board* board = new Board(*this, fp, mIsRestored, mIsReadOnly);
+                addBoard(board);
+            }
+            qDebug() << mBoards.count() << "boards successfully loaded!";
+        }
+
         // at this point, the whole circuit with all schematics and boards is successfully
         // loaded, so the ERC list now contains all the correct ERC messages.
         // So we can now restore the ignore state of each ERC message from the XML file.
         mErcMsgList->restoreIgnoreState();
 
-        // create the whole schematic editor GUI inclusive FSM and so on
+        // create the whole schematic/board editor GUI inclusive FSM and so on
         mSchematicEditor = new SchematicEditor(*this, mIsReadOnly);
+        mBoardEditor = new BoardEditor(*this, mIsReadOnly);
 
         if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -238,17 +261,20 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
     catch (...)
     {
         // free the allocated memory in the reverse order of their allocation...
-        delete mSchematicEditor;        mSchematicEditor = 0;
+        delete mBoardEditor;            mBoardEditor = nullptr;
+        delete mSchematicEditor;        mSchematicEditor = nullptr;
+        foreach (Board* board, mBoards)
+            try { removeBoard(board, true); } catch (...) {}
         foreach (Schematic* schematic, mSchematics)
             try { removeSchematic(schematic, true); } catch (...) {}
         qDeleteAll(mSchematicLayers);   mSchematicLayers.clear();
-        delete mCircuit;                mCircuit = 0;
-        delete mErcMsgList;             mErcMsgList = 0;
-        delete mUndoStack;              mUndoStack = 0;
-        delete mProjectLibrary;         mProjectLibrary = 0;
-        delete mProjectSettings;        mProjectSettings = 0;
-        delete mDescriptionHtmlFile;    mDescriptionHtmlFile = 0;
-        delete mXmlFile;                mXmlFile = 0;
+        delete mCircuit;                mCircuit = nullptr;
+        delete mErcMsgList;             mErcMsgList = nullptr;
+        delete mUndoStack;              mUndoStack = nullptr;
+        delete mProjectLibrary;         mProjectLibrary = nullptr;
+        delete mProjectSettings;        mProjectSettings = nullptr;
+        delete mDescriptionHtmlFile;    mDescriptionHtmlFile = nullptr;
+        delete mXmlFile;                mXmlFile = nullptr;
         throw; // ...and rethrow the exception
     }
 
@@ -276,6 +302,7 @@ Project::~Project() noexcept
 
     // abort all active commands!
     mSchematicEditor->abortAllCommands();
+    mBoardEditor->abortAllCommands();
     Q_ASSERT(mUndoStack->isCommandActive() == false);
 
     // delete all command objects in the undo stack (must be done before other important
@@ -284,53 +311,30 @@ Project::~Project() noexcept
 
     // free the allocated memory in the reverse order of their allocation
 
-    delete mSchematicEditor;        mSchematicEditor = 0;
+    delete mBoardEditor;            mBoardEditor = nullptr;
+    delete mSchematicEditor;        mSchematicEditor = nullptr;
 
-    // delete all schematics (and catch all throwed exceptions)
+    // delete all boards and schematics (and catch all throwed exceptions)
+    foreach (Board* board, mBoards)
+        try { removeBoard(board, true); } catch (...) {}
+    qDeleteAll(mRemovedBoards); mRemovedBoards.clear();
     foreach (Schematic* schematic, mSchematics)
         try { removeSchematic(schematic, true); } catch (...) {}
     qDeleteAll(mRemovedSchematics); mRemovedSchematics.clear();
 
     qDeleteAll(mSchematicLayers);   mSchematicLayers.clear();
-    delete mCircuit;                mCircuit = 0;
-    delete mErcMsgList;             mErcMsgList = 0;
-    delete mUndoStack;              mUndoStack = 0;
-    delete mProjectLibrary;         mProjectLibrary = 0;
-    delete mProjectSettings;        mProjectSettings = 0;
-    delete mDescriptionHtmlFile;    mDescriptionHtmlFile = 0;
-    delete mXmlFile;                mXmlFile = 0;
+    delete mCircuit;                mCircuit = nullptr;
+    delete mErcMsgList;             mErcMsgList = nullptr;
+    delete mUndoStack;              mUndoStack = nullptr;
+    delete mProjectLibrary;         mProjectLibrary = nullptr;
+    delete mProjectSettings;        mProjectSettings = nullptr;
+    delete mDescriptionHtmlFile;    mDescriptionHtmlFile = nullptr;
+    delete mXmlFile;                mXmlFile = nullptr;
 }
 
 /*****************************************************************************************
  *  Getters
  ****************************************************************************************/
-
-int Project::getSchematicIndex(const Schematic* schematic) const noexcept
-{
-    return mSchematics.indexOf(const_cast<Schematic*>(schematic));
-}
-
-Schematic* Project::getSchematicByUuid(const QUuid& uuid) const noexcept
-{
-    foreach (Schematic* schematic, mSchematics)
-    {
-        if (schematic->getUuid() == uuid)
-            return schematic;
-    }
-
-    return nullptr;
-}
-
-Schematic* Project::getSchematicByName(const QString& name) const noexcept
-{
-    foreach (Schematic* schematic, mSchematics)
-    {
-        if (schematic->getName() == name)
-            return schematic;
-    }
-
-    return nullptr;
-}
 
 QString Project::getDescription() const noexcept
 {
@@ -372,8 +376,33 @@ void Project::setLastModified(const QDateTime& newLastModified) noexcept
 }
 
 /*****************************************************************************************
- *  General Methods
+ *  Schematic Methods
  ****************************************************************************************/
+
+int Project::getSchematicIndex(const Schematic* schematic) const noexcept
+{
+    return mSchematics.indexOf(const_cast<Schematic*>(schematic));
+}
+
+Schematic* Project::getSchematicByUuid(const QUuid& uuid) const noexcept
+{
+    foreach (Schematic* schematic, mSchematics)
+    {
+        if (schematic->getUuid() == uuid)
+            return schematic;
+    }
+    return nullptr;
+}
+
+Schematic* Project::getSchematicByName(const QString& name) const noexcept
+{
+    foreach (Schematic* schematic, mSchematics)
+    {
+        if (schematic->getName() == name)
+            return schematic;
+    }
+    return nullptr;
+}
 
 Schematic* Project::createSchematic(const QString& name) throw (Exception)
 {
@@ -457,10 +486,108 @@ void Project::exportSchematicsAsPdf(const FilePath& filepath) throw (Exception)
     QDesktopServices::openUrl(QUrl::fromLocalFile(filepath.toStr()));
 }
 
+/*****************************************************************************************
+ *  Board Methods
+ ****************************************************************************************/
+
+int Project::getBoardIndex(const Board* board) const noexcept
+{
+    return mBoards.indexOf(const_cast<Board*>(board));
+}
+
+Board* Project::getBoardByUuid(const QUuid& uuid) const noexcept
+{
+    foreach (Board* board, mBoards)
+    {
+        if (board->getUuid() == uuid)
+            return board;
+    }
+    return nullptr;
+}
+
+Board* Project::getBoardByName(const QString& name) const noexcept
+{
+    foreach (Board* board, mBoards)
+    {
+        if (board->getName() == name)
+            return board;
+    }
+    return nullptr;
+}
+
+Board* Project::createBoard(const QString& name) throw (Exception)
+{
+    QString basename = name; /// @todo remove special characters to create a valid filename!
+    FilePath filepath = mPath.getPathTo("boards/" % basename % ".xml");
+    return Board::create(*this, filepath, name);
+}
+
+void Project::addBoard(Board* board, int newIndex) throw (Exception)
+{
+    Q_ASSERT(board);
+
+    if ((newIndex < 0) || (newIndex > mBoards.count()))
+        newIndex = mBoards.count();
+
+    if (getBoardByUuid(board->getUuid()))
+    {
+        throw RuntimeError(__FILE__, __LINE__, board->getUuid().toString(),
+            QString(tr("There is already a board with the UUID \"%1\"!"))
+            .arg(board->getUuid().toString()));
+    }
+
+    if (getBoardByName(board->getName()))
+    {
+        throw RuntimeError(__FILE__, __LINE__, board->getName(),
+            QString(tr("There is already a board with the name \"%1\"!"))
+            .arg(board->getName()));
+    }
+
+    board->addToProject(); // can throw an exception
+    mBoards.insert(newIndex, board);
+
+    if (mRemovedBoards.contains(board))
+        mRemovedBoards.removeOne(board);
+
+    emit boardAdded(newIndex);
+    emit attributesChanged();
+}
+
+void Project::removeBoard(Board* board, bool deleteBoard) throw (Exception)
+{
+    Q_ASSERT(board);
+    int index = mBoards.indexOf(board);
+    Q_ASSERT(index >= 0);
+    Q_ASSERT(!mRemovedBoards.contains(board));
+
+    if ((!deleteBoard) && (!board->isEmpty()))
+    {
+        throw RuntimeError(__FILE__, __LINE__, QString(),
+            QString(tr("There are still elements in the board \"%1\"!"))
+            .arg(board->getName()));
+    }
+
+    board->removeFromProject(); // can throw an exception
+    mBoards.removeAt(index);
+
+    emit boardRemoved(index);
+    emit attributesChanged();
+
+    if (deleteBoard)
+        delete board;
+    else
+        mRemovedBoards.append(board);
+}
+
+/*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
 bool Project::windowIsAboutToClose(QMainWindow* window) noexcept
 {
     int countOfOpenWindows = 0;
     if (mSchematicEditor->isVisible())  {countOfOpenWindows++;}
+    if (mBoardEditor->isVisible())      {countOfOpenWindows++;}
 
     if (countOfOpenWindows <= 1)
     {
@@ -505,6 +632,13 @@ void Project::showSchematicEditor() noexcept
     mSchematicEditor->show();
     mSchematicEditor->raise();
     mSchematicEditor->activateWindow();
+}
+
+void Project::showBoardEditor() noexcept
+{
+    mBoardEditor->show();
+    mBoardEditor->raise();
+    mBoardEditor->activateWindow();
 }
 
 bool Project::saveProject() noexcept
@@ -644,6 +778,12 @@ XmlDomElement* Project::serializeToXmlDomElement() const throw (Exception)
     foreach (Schematic* schematic, mSchematics)
         schematics->appendTextChild("schematic", schematic->getFilePath().toRelative(schematicsPath));
 
+    // boards
+    FilePath boardsPath(mPath.getPathTo("boards"));
+    XmlDomElement* boards = root->appendChild("boards");
+    foreach (Board* board, mBoards)
+        boards->appendTextChild("board", board->getFilePath().toRelative(boardsPath));
+
     return root.take();
 }
 
@@ -702,6 +842,19 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     foreach (Schematic* schematic, mRemovedSchematics)
     {
         if (!schematic->save(toOriginal, errors))
+            success = false;
+    }
+
+    // Save all added boards (*.xml files)
+    foreach (Board* board, mBoards)
+    {
+        if (!board->save(toOriginal, errors))
+            success = false;
+    }
+    // Save all removed boards (*.xml files)
+    foreach (Board* board, mRemovedBoards)
+    {
+        if (!board->save(toOriginal, errors))
             success = false;
     }
 

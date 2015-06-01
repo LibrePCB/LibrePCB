@@ -23,6 +23,7 @@
 
 #include <QtCore>
 #include "component.h"
+#include "../../common/file_io/xmldomelement.h"
 
 namespace library {
 
@@ -30,13 +31,13 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Component::Component(const FilePath& xmlFilePath) :
+Component::Component(const FilePath& xmlFilePath) throw (Exception) :
     LibraryElement(xmlFilePath, "component")
 {
     readFromFile();
 }
 
-Component::~Component()
+Component::~Component() noexcept
 {
 }
 
@@ -47,6 +48,42 @@ Component::~Component()
 void Component::parseDomTree(const XmlDomElement& root) throw (Exception)
 {
     LibraryElement::parseDomTree(root);
+
+    mGenericComponentUuid = root.getFirstChild("meta/generic_component", true, true)->getText<QUuid>(true);
+    mPackageUuid = root.getFirstChild("meta/package", true, true)->getText<QUuid>(true);
+    for (XmlDomElement* node = root.getFirstChild("pad_signal_map/map", true, false);
+         node; node = node->getNextSibling("map"))
+    {
+        mPadSignalMap.insert(node->getAttribute<QUuid>("pad", true),
+                             node->getAttribute<QUuid>("signal", false));
+    }
+}
+
+XmlDomElement* Component::serializeToXmlDomElement() const throw (Exception)
+{
+    QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement());
+    root->getFirstChild("meta", true)->appendTextChild("generic_component", mGenericComponentUuid);
+    root->getFirstChild("meta", true)->appendTextChild("package", mPackageUuid);
+    XmlDomElement* padSignalMap = root->appendChild("pad_signal_map");
+    foreach (const QUuid& padUuid, mPadSignalMap)
+    {
+        XmlDomElement* child = padSignalMap->appendChild("map");
+        child->setAttribute("pad", padUuid);
+        child->setAttribute("signal", mPadSignalMap.value(padUuid));
+    }
+    return root.take();
+}
+
+bool Component::checkAttributesValidity() const noexcept
+{
+    if (!LibraryElement::checkAttributesValidity())             return false;
+    if (mGenericComponentUuid.isNull())                         return false;
+    if (mPackageUuid.isNull())                                  return false;
+    foreach (const QUuid& padUuid, mPadSignalMap)
+    {
+        if (padUuid.isNull())                                   return false;
+    }
+    return true;
 }
 
 /*****************************************************************************************

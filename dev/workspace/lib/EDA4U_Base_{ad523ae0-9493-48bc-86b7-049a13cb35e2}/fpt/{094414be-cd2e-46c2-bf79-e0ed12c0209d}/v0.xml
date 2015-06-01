@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<footprint file_version="0">
+    <meta>
+        <uuid>{094414be-cd2e-46c2-bf79-e0ed12c0209d}</uuid>
+        <version>1</version>
+        <author>EDA4U</author>
+        <created>2013-04-13T12:43:52Z</created>
+        <last_modified>2013-04-20T18:01:33Z</last_modified>
+        <name locale="en_US">0603 Resistor</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US"></keywords>
+    </meta>
+    <categories>
+        <category>{00000000-0000-4001-8000-000000000000}</category>
+    </categories>
+    <changelog/>
+    <attachements/>
+    <geometry>
+        <polygon layer="94" width="0.1" shape="true" start_x="-2.9" start_y="-6.3">
+            <item index="0" type="line" end_x="2.9" end_y="-6.3" />
+            <item index="1" type="line" end_x="2.9" end_y="3.7" />
+            <item index="2" type="line" end_x="1" end_y="3.7" />
+            <item index="3" type="arc" end_x="-1" end_y="3.7" angle="-180" />
+            <item index="4" type="line" end_x="-2.9" end_y="3.7" />
+            <item index="5" type="line" end_x="-2.9" end_y="-6.3" />
+        </polygon>
+        <text layer="95" value="${NAME}" x="-2.9" y="3.7" angle="0" size="3" v_align="bottom" h_align="left" ratio="0.08" mirror="false" font="proportional" />
+        <text layer="96" value="${VALUE}" x="-2.9" y="-6.3" angle="0" size="3" v_align="top" h_align="left" ratio="0.08" mirror="false" font="proportional" />
+    </geometry>
+    <pads>
+        <pad uuid="{4ba1137d-96d9-44c2-80a1-87683d831f0a}" x="-3.81" y="2.54" angle="0" mirror="false" smd="false" drill="0.8" diameter="2.1" shape="round">
+            <name locale="en_US">1</name>
+            <description locale="en_US">Pad 1</description>
+        </pad>
+        <pad uuid="{2a241b4e-74ec-48ae-b1f7-d5a7de9bc916}" x="-3.81" y="0" angle="0" mirror="false" smd="false" drill="0.8" diameter="2.1" shape="round">
+            <name locale="en_US">2</name>
+            <description locale="en_US">Pad 2</description>
+        </pad>
+    </pads>
+</footprint>
