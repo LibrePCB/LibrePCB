@@ -12,25 +12,25 @@
     </meta>
     <categories/>
     <geometry>
-        <polygon line_width="0.609600" fill_layer="0" line_layer="10" grab_area="true" start_x="0" start_y="-2.54">
+        <polygon width="0.609600" fill="false" layer="10" grab_area="true" start_x="0" start_y="-2.54">
             <segment end_x="-1.27" end_y="-2.54" angle="0.000000"/>
         </polygon>
-        <polygon line_width="0.609600" fill_layer="0" line_layer="10" grab_area="true" start_x="0" start_y="0">
+        <polygon width="0.609600" fill="false" layer="10" grab_area="true" start_x="0" start_y="0">
             <segment end_x="-1.27" end_y="0" angle="0.000000"/>
         </polygon>
-        <polygon line_width="0.609600" fill_layer="0" line_layer="10" grab_area="true" start_x="0" start_y="2.54">
+        <polygon width="0.609600" fill="false" layer="10" grab_area="true" start_x="0" start_y="2.54">
             <segment end_x="-1.27" end_y="2.54" angle="0.000000"/>
         </polygon>
-        <polygon line_width="0.609600" fill_layer="0" line_layer="10" grab_area="true" start_x="0" start_y="-5.08">
+        <polygon width="0.609600" fill="false" layer="10" grab_area="true" start_x="0" start_y="-5.08">
             <segment end_x="-1.27" end_y="-5.08" angle="0.000000"/>
         </polygon>
-        <polygon line_width="0.609600" fill_layer="0" line_layer="10" grab_area="true" start_x="0" start_y="5.08">
+        <polygon width="0.609600" fill="false" layer="10" grab_area="true" start_x="0" start_y="5.08">
             <segment end_x="-1.27" end_y="5.08" angle="0.000000"/>
         </polygon>
-        <polygon line_width="0.609600" fill_layer="0" line_layer="10" grab_area="true" start_x="0" start_y="-7.62">
+        <polygon width="0.609600" fill="false" layer="10" grab_area="true" start_x="0" start_y="-7.62">
             <segment end_x="-1.27" end_y="-7.62" angle="0.000000"/>
         </polygon>
-        <polygon line_width="0.254" fill_layer="11" line_layer="10" grab_area="true" start_x="-2.54" start_y="-10.16">
+        <polygon width="0.254" fill="false" layer="10" grab_area="true" start_x="-2.54" start_y="-10.16">
             <segment end_x="-2.54" end_y="7.62" angle="0.000000"/>
             <segment end_x="2.54" end_y="7.62" angle="0.000000"/>
             <segment end_x="2.54" end_y="-10.16" angle="0.000000"/>

@@ -89,9 +89,9 @@ void Symbol::convertLineRectsToPolygonRects(bool fill, bool makeGrabArea) noexce
 
         // create the new polygon
         SymbolPolygon* rect = new SymbolPolygon();
-        rect->setLineLayerId(lines.first()->getLineLayerId());
-        rect->setFillLayerId(fill ? 11 : 0);
-        rect->setLineWidth(lines.first()->getLineWidth());
+        rect->setLayerId(lines.first()->getLayerId());
+        rect->setWidth(lines.first()->getWidth());
+        rect->setIsFilled(fill);
         rect->setIsGrabArea(makeGrabArea);
         rect->setStartPos(p1);
         rect->appendSegment(new SymbolPolygonSegment(p2));
@@ -200,7 +200,7 @@ bool Symbol::findLineRectangle(QList<const SymbolPolygon*>& lines) noexcept
         if (findHLine(linePolygons, p, nullptr, &line))
         {
             lines.append(line);
-            width = line->getLineWidth();
+            width = line->getWidth();
             if (findVLine(linePolygons, p, &width, &line))
             {
                 lines.append(line);
@@ -226,7 +226,7 @@ bool Symbol::findHLine(const QList<const SymbolPolygon*>& lines, Point& p, Lengt
 {
     foreach (const SymbolPolygon* polygon, lines)
     {
-        if (width) {if (polygon->getLineWidth() != *width) continue;}
+        if (width) {if (polygon->getWidth() != *width) continue;}
         Point p1 = polygon->getStartPos();
         Point p2 = polygon->getSegments().at(0)->getEndPos();
         if ((p1 == p) && (p2.getY() == p.getY()))
@@ -250,7 +250,7 @@ bool Symbol::findVLine(const QList<const SymbolPolygon*>& lines, Point& p, Lengt
 {
     foreach (const SymbolPolygon* polygon, lines)
     {
-        if (width) {if (polygon->getLineWidth() != *width) continue;}
+        if (width) {if (polygon->getWidth() != *width) continue;}
         Point p1 = polygon->getStartPos();
         Point p2 = polygon->getSegments().at(0)->getEndPos();
         if ((p1 == p) && (p2.getX() == p.getX()))

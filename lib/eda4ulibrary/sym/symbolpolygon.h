@@ -37,6 +37,9 @@ namespace library {
 
 /**
  * @brief The SymbolPolygonSegment class
+ *
+ * @note If you make changes in this class, please check if you also need to modify
+ *       the class library#FootprintPolygonSegment as these classes are very similar.
  */
 class SymbolPolygonSegment final : public IF_XmlSerializableObject
 {
@@ -88,6 +91,9 @@ namespace library {
 
 /**
  * @brief The SymbolPolygon class
+ *
+ * @note If you make changes in this class, please check if you also need to modify
+ *       the class library#FootprintPolygon as these classes are very similar.
  */
 class SymbolPolygon final : public IF_XmlSerializableObject
 {
@@ -101,18 +107,18 @@ class SymbolPolygon final : public IF_XmlSerializableObject
         ~SymbolPolygon() noexcept;
 
         // Getters
-        uint getLineLayerId() const noexcept {return mLineLayerId;}
-        uint getFillLayerId() const noexcept {return mFillLayerId;}
-        const Length& getLineWidth() const noexcept {return mLineWidth;}
+        uint getLayerId() const noexcept {return mLayerId;}
+        const Length& getWidth() const noexcept {return mWidth;}
+        bool isFilled() const noexcept {return mIsFilled;}
         bool isGrabArea() const noexcept {return mIsGrabArea;}
         const Point& getStartPos() const noexcept {return mStartPos;}
         const QList<const SymbolPolygonSegment*>& getSegments() const noexcept {return mSegments;}
         const QPainterPath& toQPainterPathPx() const noexcept;
 
         // Setters
-        void setLineLayerId(uint id) noexcept {mLineLayerId = id;}
-        void setFillLayerId(uint id) noexcept {mFillLayerId = id;}
-        void setLineWidth(const Length& width) noexcept {mLineWidth = width;}
+        void setLayerId(uint id) noexcept {mLayerId = id;}
+        void setWidth(const Length& width) noexcept {mWidth = width;}
+        void setIsFilled(bool isFilled) noexcept {mIsFilled = isFilled;}
         void setIsGrabArea(bool isGrabArea) noexcept {mIsGrabArea = isGrabArea;}
         void setStartPos(const Point& pos) noexcept {mStartPos = pos; mPainterPathPx = QPainterPath();}
 
@@ -133,9 +139,9 @@ class SymbolPolygon final : public IF_XmlSerializableObject
 
 
         // Polygon Attributes
-        uint mLineLayerId;
-        uint mFillLayerId;
-        Length mLineWidth;
+        uint mLayerId;
+        Length mWidth;
+        bool mIsFilled;
         bool mIsGrabArea;
         Point mStartPos;
         QList<const SymbolPolygonSegment*> mSegments;

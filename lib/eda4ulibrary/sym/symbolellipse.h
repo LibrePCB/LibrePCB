@@ -49,9 +49,9 @@ class SymbolEllipse final : public IF_XmlSerializableObject
         ~SymbolEllipse() noexcept;
 
         // Getters
-        uint getLineLayerId() const noexcept {return mLineLayerId;}
-        uint getFillLayerId() const noexcept {return mFillLayerId;}
+        uint getLayerId() const noexcept {return mLayerId;}
         const Length& getLineWidth() const noexcept {return mLineWidth;}
+        bool isFilled() const noexcept {return mIsFilled;}
         bool isGrabArea() const noexcept {return mIsGrabArea;}
         const Point& getCenter() const noexcept {return mCenter;}
         const Length& getRadiusX() const noexcept {return mRadiusX;}
@@ -59,9 +59,9 @@ class SymbolEllipse final : public IF_XmlSerializableObject
         const Angle& getRotation() const noexcept {return mRotation;}
 
         // Setters
-        void setLineLayerId(uint id) noexcept {mLineLayerId = id;}
-        void setFillLayerId(uint id) noexcept {mFillLayerId = id;}
+        void setLayerId(uint id) noexcept {mLayerId = id;}
         void setLineWidth(const Length& width) noexcept {mLineWidth = width;}
+        void setIsFilled(bool isFilled) noexcept {mIsFilled = isFilled;}
         void setIsGrabArea(bool isGrabArea) noexcept {mIsGrabArea = isGrabArea;}
         void setCenter(const Point& center) noexcept {mCenter = center;}
         void setRadiusX(const Length& radius) noexcept {mRadiusX = radius;}
@@ -83,9 +83,9 @@ class SymbolEllipse final : public IF_XmlSerializableObject
 
 
         // Polygon Attributes
-        uint mLineLayerId;
-        uint mFillLayerId;
+        uint mLayerId;
         Length mLineWidth;
+        bool mIsFilled;
         bool mIsGrabArea;
         Point mCenter;
         Length mRadiusX;

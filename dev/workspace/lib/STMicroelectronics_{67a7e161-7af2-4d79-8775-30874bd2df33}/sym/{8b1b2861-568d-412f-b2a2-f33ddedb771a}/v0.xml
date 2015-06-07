@@ -12,7 +12,7 @@
     </meta>
     <categories/>
     <geometry>
-        <polygon grab_area="true" fill_layer="11" line_layer="10" start_x="-15.240000" start_y="-45.720000" line_width="0.254000">
+        <polygon grab_area="true" fill="false" layer="10" start_x="-15.240000" start_y="-45.720000" width="0.254000">
             <segment end_x="-15.240000" end_y="40.640000" angle="0"/>
             <segment end_x="15.240000" end_y="40.640000" angle="0"/>
             <segment end_x="15.240000" end_y="-45.720000" angle="0"/>

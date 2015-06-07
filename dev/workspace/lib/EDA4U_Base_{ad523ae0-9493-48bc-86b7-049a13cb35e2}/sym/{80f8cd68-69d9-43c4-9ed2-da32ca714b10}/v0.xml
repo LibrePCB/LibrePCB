@@ -14,7 +14,7 @@
         <category>{00000000-0000-4001-8000-000000000000}</category>
     </categories>
     <geometry>
-        <polygon fill_layer="0" start_y="0" line_width="0.254" line_layer="10" start_x="-1.905" grab_area="false">
+        <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="-1.905" grab_area="false">
             <segment angle="0" end_x="1.905" end_y="0"/>
         </polygon>
         <text layer="21" text="${CMP::VALUE}" x="0" y="0" angle="0" height="2.54" v_align="top" h_align="center"/>

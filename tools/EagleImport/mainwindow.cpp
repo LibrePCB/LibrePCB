@@ -171,12 +171,12 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                 SymbolPolygon* polygon = new SymbolPolygon();
                 switch (child->getAttribute<uint>("layer"))
                 {
-                    case 94: polygon->setLineLayerId(10); break;
-                    case 95: polygon->setLineLayerId(20); break;
+                    case 94: polygon->setLayerId(10); break;
+                    case 95: polygon->setLayerId(20); break;
                     default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
                 }
-                polygon->setFillLayerId(0);
-                polygon->setLineWidth(child->getAttribute<Length>("width"));
+                polygon->setIsFilled(false);
+                polygon->setWidth(child->getAttribute<Length>("width"));
                 polygon->setIsGrabArea(true);
                 Point startpos = Point(child->getAttribute<Length>("x1"), child->getAttribute<Length>("y1"));
                 Point endpos = Point(child->getAttribute<Length>("x2"), child->getAttribute<Length>("y2"));
@@ -195,12 +195,12 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                 SymbolPolygon* polygon = new SymbolPolygon();
                 switch (child->getAttribute<uint>("layer"))
                 {
-                    case 94: polygon->setLineLayerId(10); break;
+                    case 94: polygon->setLayerId(10); break;
                     default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
                 }
-                polygon->setFillLayerId(10);
+                polygon->setIsFilled(true);
                 if (child->hasAttribute("width"))
-                    polygon->setLineWidth(child->getAttribute<Length>("width"));
+                    polygon->setWidth(child->getAttribute<Length>("width"));
                 polygon->setIsGrabArea(true);
                 polygon->setStartPos(Point(child->getAttribute<Length>("x1"), child->getAttribute<Length>("y1")));
                 polygon->appendSegment(new SymbolPolygonSegment(Point(child->getAttribute<Length>("x2"), child->getAttribute<Length>("y1"))));
@@ -214,12 +214,12 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                 SymbolPolygon* polygon = new SymbolPolygon();
                 switch (child->getAttribute<uint>("layer"))
                 {
-                    case 94: polygon->setLineLayerId(10); break;
+                    case 94: polygon->setLayerId(10); break;
                     default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
                 }
-                polygon->setFillLayerId(0);
+                polygon->setIsFilled(false);
                 if (child->hasAttribute("width"))
-                    polygon->setLineWidth(child->getAttribute<Length>("width"));
+                    polygon->setWidth(child->getAttribute<Length>("width"));
                 polygon->setIsGrabArea(true);
                 for (XmlDomElement* vertex = child->getFirstChild(); vertex; vertex = vertex->getNextSibling())
                 {
@@ -239,11 +239,11 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                 SymbolEllipse* ellipse = new SymbolEllipse();
                 switch (child->getAttribute<uint>("layer"))
                 {
-                    case 94: ellipse->setLineLayerId(10); break;
+                    case 94: ellipse->setLayerId(10); break;
                     default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
                 }
                 ellipse->setLineWidth(child->getAttribute<Length>("width"));
-                ellipse->setFillLayerId(ellipse->getLineWidth() == 0 ? 10 : 0);
+                ellipse->setIsFilled(ellipse->getLineWidth() == 0);
                 ellipse->setIsGrabArea(true);
                 ellipse->setCenter(center);
                 ellipse->setRadiusX(radius);

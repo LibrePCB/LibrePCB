@@ -33,19 +33,16 @@ namespace library {
  ****************************************************************************************/
 
 SymbolEllipse::SymbolEllipse() noexcept :
-    mLineLayerId(0), mFillLayerId(0), mLineWidth(0), mIsGrabArea(false), mCenter(0, 0),
+    mLayerId(0), mLineWidth(0), mIsGrabArea(false), mCenter(0, 0),
     mRadiusX(0), mRadiusY(0), mRotation(0)
 {
 }
 
 SymbolEllipse::SymbolEllipse(const XmlDomElement& domElement) throw (Exception)
 {
-    // load layers
-    mLineLayerId = domElement.getAttribute<uint>("line_layer");
-    mFillLayerId = domElement.getAttribute<uint>("fill_layer");
-
-    // load geometry attributes
-    mLineWidth = domElement.getAttribute<Length>("line_width");
+    mLayerId = domElement.getAttribute<uint>("layer");
+    mLineWidth = domElement.getAttribute<Length>("width");
+    mIsFilled = domElement.getAttribute<bool>("fill");
     mIsGrabArea = domElement.getAttribute<bool>("grab_area");
     mCenter.setX(domElement.getAttribute<Length>("x"));
     mCenter.setY(domElement.getAttribute<Length>("y"));
@@ -69,9 +66,9 @@ XmlDomElement* SymbolEllipse::serializeToXmlDomElement() const throw (Exception)
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("ellipse"));
-    root->setAttribute("line_layer", mLineLayerId);
-    root->setAttribute("fill_layer", mFillLayerId);
-    root->setAttribute("line_width", mLineWidth.toMmString());
+    root->setAttribute("layer", mLayerId);
+    root->setAttribute("width", mLineWidth.toMmString());
+    root->setAttribute("fill", mIsFilled);
     root->setAttribute("grab_area", mIsGrabArea);
     root->setAttribute("x", mCenter.getX().toMmString());
     root->setAttribute("y", mCenter.getY().toMmString());
@@ -87,6 +84,7 @@ XmlDomElement* SymbolEllipse::serializeToXmlDomElement() const throw (Exception)
 
 bool SymbolEllipse::checkAttributesValidity() const noexcept
 {
+    if (mLayerId <= 0)          return false;
     if (mLineWidth < 0)         return false;
     if (mRadiusX <= 0)          return false;
     if (mRadiusY <= 0)          return false;

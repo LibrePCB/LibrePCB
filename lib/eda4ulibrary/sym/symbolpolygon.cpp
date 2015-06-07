@@ -23,7 +23,6 @@
 
 #include <QtCore>
 #include "symbolpolygon.h"
-#include "symbol.h"
 #include <eda4ucommon/fileio/xmldomelement.h>
 
 namespace library {
@@ -62,18 +61,16 @@ bool SymbolPolygonSegment::checkAttributesValidity() const noexcept
  ****************************************************************************************/
 
 SymbolPolygon::SymbolPolygon() noexcept :
-    mLineLayerId(0), mFillLayerId(0), mLineWidth(0), mIsGrabArea(false), mStartPos(0, 0)
+    mLayerId(0), mWidth(0), mIsFilled(false), mIsGrabArea(false), mStartPos(0, 0)
 {
 }
 
 SymbolPolygon::SymbolPolygon(const XmlDomElement& domElement) throw (Exception)
 {
-    // load layers
-    mLineLayerId = domElement.getAttribute<uint>("line_layer");
-    mFillLayerId = domElement.getAttribute<uint>("fill_layer");
-
-    // load geometry attributes
-    mLineWidth = domElement.getAttribute<Length>("line_width");
+    // load general attributes
+    mLayerId = domElement.getAttribute<uint>("layer");
+    mWidth = domElement.getAttribute<Length>("width");
+    mIsFilled = domElement.getAttribute<bool>("fill");
     mIsGrabArea = domElement.getAttribute<bool>("grab_area");
     mStartPos.setX(domElement.getAttribute<Length>("start_x"));
     mStartPos.setY(domElement.getAttribute<Length>("start_y"));
@@ -100,7 +97,7 @@ const QPainterPath& SymbolPolygon::toQPainterPathPx() const noexcept
         mPainterPathPx.setFillRule(Qt::WindingFill);
         Point lastPos = mStartPos;
         mPainterPathPx.moveTo(lastPos.toPxQPointF());
-        foreach (const library::SymbolPolygonSegment* segment, mSegments)
+        foreach (const SymbolPolygonSegment* segment, mSegments)
         {
             if (segment->getAngle() == 0)
             {
@@ -153,12 +150,12 @@ XmlDomElement* SymbolPolygon::serializeToXmlDomElement() const throw (Exception)
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("polygon"));
-    root->setAttribute("line_layer", mLineLayerId);
-    root->setAttribute("line_width", mLineWidth.toMmString());
-    root->setAttribute("fill_layer", mFillLayerId);
+    root->setAttribute("layer", mLayerId);
+    root->setAttribute("width", mWidth.toMmString());
+    root->setAttribute("fill", mIsFilled);
+    root->setAttribute("grab_area", mIsGrabArea);
     root->setAttribute("start_x", mStartPos.getX().toMmString());
     root->setAttribute("start_y", mStartPos.getY().toMmString());
-    root->setAttribute("grab_area", mIsGrabArea);
     foreach (const SymbolPolygonSegment* segment, mSegments)
         root->appendChild(segment->serializeToXmlDomElement());
     return root.take();
@@ -170,7 +167,8 @@ XmlDomElement* SymbolPolygon::serializeToXmlDomElement() const throw (Exception)
 
 bool SymbolPolygon::checkAttributesValidity() const noexcept
 {
-    if (mLineWidth < 0)         return false;
+    if (mLayerId <= 0)          return false;
+    if (mWidth < 0)             return false;
     if (mSegments.isEmpty())    return false;
     return true;
 }

@@ -14,7 +14,7 @@
         <category>{00000000-0000-4001-8000-000000000000}</category>
     </categories>
     <geometry>
-        <polygon fill_layer="0" start_y="-1.905" line_width="0.254" line_layer="10" start_x="1.27" grab_area="false">
+        <polygon fill="false" start_y="-1.905" width="0.254" layer="10" start_x="1.27" grab_area="false">
             <segment angle="0" end_x="0" end_y="0"/>
             <segment angle="0" end_x="-1.27" end_y="-1.905"/>
         </polygon>

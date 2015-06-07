@@ -108,7 +108,7 @@ void SymbolPreviewGraphicsItem::updateCacheAndRepaint() noexcept
     foreach (const SymbolPolygon* polygon, mSymbol.getPolygons())
     {
         QPainterPath polygonPath = polygon->toQPainterPathPx();
-        qreal w = polygon->getLineWidth().toPx() / 2;
+        qreal w = polygon->getWidth().toPx() / 2;
         mBoundingRect = mBoundingRect.united(polygonPath.boundingRect().adjusted(-w, -w, w, w));
         if (polygon->isGrabArea()) mShape = mShape.united(polygonPath);
     }
@@ -200,15 +200,20 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
     foreach (const SymbolPolygon* polygon, mSymbol.getPolygons())
     {
         // set colors
-        layer = mLayerProvider.getSchematicLayer(polygon->getLineLayerId());
+        layer = mLayerProvider.getSchematicLayer(polygon->getLayerId());
         if (layer)
         {
-            pen = QPen(layer->getColor(selected), polygon->getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+            pen = QPen(layer->getColor(selected), polygon->getWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
             painter->setPen(pen);
         }
         else
             painter->setPen(Qt::NoPen);
-        layer = mLayerProvider.getSchematicLayer(polygon->getFillLayerId());
+        if (polygon->isFilled())
+            layer = mLayerProvider.getSchematicLayer(polygon->getLayerId());
+        else if (polygon->isGrabArea())
+            layer = mLayerProvider.getSchematicLayer(SchematicLayer::LayerID::SymbolGrabAreas);
+        else
+            layer = nullptr;
         painter->setBrush(layer ? QBrush(layer->getColor(selected), Qt::SolidPattern) : Qt::NoBrush);
 
         // draw polygon
@@ -219,7 +224,7 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
     foreach (const SymbolEllipse* ellipse, mSymbol.getEllipses())
     {
         // set colors
-        layer = mLayerProvider.getSchematicLayer(ellipse->getLineLayerId()); if (!layer) continue;
+        layer = mLayerProvider.getSchematicLayer(ellipse->getLayerId()); if (!layer) continue;
         if (layer)
         {
             pen = QPen(layer->getColor(selected), ellipse->getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
@@ -227,7 +232,12 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
         }
         else
             painter->setPen(Qt::NoPen);
-        layer = mLayerProvider.getSchematicLayer(ellipse->getFillLayerId());
+        if (ellipse->isFilled())
+            layer = mLayerProvider.getSchematicLayer(ellipse->getLayerId());
+        else if (ellipse->isGrabArea())
+            layer = mLayerProvider.getSchematicLayer(SchematicLayer::LayerID::SymbolGrabAreas);
+        else
+            layer = nullptr;
         painter->setBrush(layer ? QBrush(layer->getColor(selected), Qt::SolidPattern) : Qt::NoBrush);
 
         // draw ellipse

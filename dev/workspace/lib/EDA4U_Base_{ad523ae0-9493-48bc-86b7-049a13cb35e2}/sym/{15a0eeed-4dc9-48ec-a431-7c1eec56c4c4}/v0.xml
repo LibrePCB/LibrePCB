@@ -12,13 +12,13 @@
     </meta>
     <categories/>
     <geometry>
-        <polygon fill_layer="11" start_y="1.016" line_width="0.175" line_layer="10" start_x="-1.9" grab_area="true">
+        <polygon fill="false" start_y="1.016" width="0.175" layer="10" start_x="-1.9" grab_area="true">
             <segment angle="0" end_x="1.9" end_y="1.016"/>
             <segment angle="0" end_x="1.9" end_y="0.4"/>
             <segment angle="0" end_x="-1.9" end_y="0.4"/>
             <segment angle="0" end_x="-1.9" end_y="1.016"/>
         </polygon>
-        <polygon fill_layer="10" start_y="-1.016" line_width="0.175" line_layer="10" start_x="-1.9" grab_area="true">
+        <polygon fill="false" start_y="-1.016" width="0.175" layer="10" start_x="-1.9" grab_area="true">
             <segment angle="0" end_x="1.9" end_y="-1.016"/>
             <segment angle="0" end_x="1.9" end_y="-0.4"/>
             <segment angle="0" end_x="-1.9" end_y="-0.4"/>
