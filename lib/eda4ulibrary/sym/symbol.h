@@ -66,9 +66,9 @@ class Symbol final : public LibraryElement
         // General Methods
         void addPin(const SymbolPin* pin) noexcept {mPins.insert(pin->getUuid(), pin);}
         void addPolygon(const SymbolPolygon* polygon) noexcept {mPolygons.append(polygon);}
+        void removePolygon(const SymbolPolygon* polygon) noexcept {mPolygons.removeAll(polygon); delete polygon;}
         void addText(const SymbolText* text) noexcept {mTexts.append(text);}
         void addEllipse(const SymbolEllipse* ellipse) noexcept {mEllipses.append(ellipse);}
-        void convertLineRectsToPolygonRects(bool fill, bool makeGrabArea) noexcept;
 
 
     private:
@@ -82,11 +82,6 @@ class Symbol final : public LibraryElement
         void parseDomTree(const XmlDomElement& root) throw (Exception);
         XmlDomElement* serializeToXmlDomElement() const throw (Exception);
         bool checkAttributesValidity() const noexcept;
-        bool findLineRectangle(QList<const SymbolPolygon*>& lines) noexcept;
-        bool findHLine(const QList<const SymbolPolygon*>& lines, Point& p, Length* width,
-                       const SymbolPolygon** line) noexcept;
-        bool findVLine(const QList<const SymbolPolygon*>& lines, Point& p, Length* width,
-                       const SymbolPolygon** line) noexcept;
 
 
         // Symbol Attributes

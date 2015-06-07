@@ -7,6 +7,7 @@
 #include <eda4ucommon/fileio/xmldomelement.h>
 #include <eda4ulibrary/sym/symbol.h>
 #include <eda4ulibrary/gencmp/genericcomponent.h>
+#include "polygonsimplifier.h"
 
 using namespace library;
 
@@ -319,7 +320,9 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
             }
         }
 
-        symbol->convertLineRectsToPolygonRects(true, true);
+        // convert line rects to polygon rects
+        PolygonSimplifier<Symbol, SymbolPolygon, SymbolPolygonSegment> polygonSimplifier(*symbol);
+        polygonSimplifier.convertLineRectsToPolygonRects(false, true);
 
         // save symbol to file
         symbol->saveToFile(FilePath(QString("%1/sym/%2/v%3.xml").arg(ui->output->text())
