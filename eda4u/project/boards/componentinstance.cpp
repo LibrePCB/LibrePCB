@@ -167,24 +167,22 @@ XmlDomElement* ComponentInstance::serializeToXmlDomElement() const throw (Except
  *  Helper Methods
  ****************************************************************************************/
 
-/*bool ComponentInstance::getAttributeValue(const QString& attrNS, const QString& attrKey,
+bool ComponentInstance::getAttributeValue(const QString& attrNS, const QString& attrKey,
                                         bool passToParents, QString& value) const noexcept
 {
-    if ((attrNS == QLatin1String("CMP")) || (attrNS.isEmpty()))
+    // no local attributes available
+
+    if (((attrNS == QLatin1String("CMP")) || (attrNS.isEmpty())) && passToParents)
     {
-        if (attrKey == QLatin1String("NAME"))
-            return value = mName, true;
-        else if (attrKey == QLatin1String("VALUE"))
-            return value = mValue, true;
-        else if (getAttributeByKey(attrKey))
-            return value = getAttributeByKey(attrKey)->getValueTr(true), true;
+        if (mGenCompInstance->getAttributeValue(attrNS, attrKey, false, value))
+            return true;
     }
 
     if ((attrNS != QLatin1String("CMP")) && (passToParents))
-        return mCircuit.getProject().getAttributeValue(attrNS, attrKey, passToParents, value);
+        return mBoard.getAttributeValue(attrNS, attrKey, true, value);
     else
         return false;
-}*/
+}
 
 /*****************************************************************************************
  *  Private Methods

@@ -110,6 +110,7 @@ void BGI_FootprintPad::updateCacheAndRepaint() noexcept
 
 void BGI_FootprintPad::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
+    Q_UNUSED(option);
     Q_UNUSED(widget);
     //const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
     //const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());

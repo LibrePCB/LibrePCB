@@ -160,21 +160,11 @@ Point BI_Footprint::mapToScene(const Point& relativePos) const noexcept
 bool BI_Footprint::getAttributeValue(const QString& attrNS, const QString& attrKey,
                                      bool passToParents, QString& value) const noexcept
 {
-    /*if ((attrNS == QLatin1String("SYM")) || (attrNS.isEmpty()))
-    {
-        if (attrKey == QLatin1String("NAME"))
-            return value = getName(), true;
-    }
-
-    if ((attrNS != QLatin1String("SYM")) && (passToParents))
-    {
-        if (mGenCompInstance->getAttributeValue(attrNS, attrKey, false, value))
-            return true;
-        if (mSchematic.getAttributeValue(attrNS, attrKey, true, value))
-            return true;
-    }*/
-
-    return false;
+    // no local attributes available
+    if (passToParents)
+        return mComponentInstance.getAttributeValue(attrNS, attrKey, true, value);
+    else
+        return false;
 }
 
 /*****************************************************************************************

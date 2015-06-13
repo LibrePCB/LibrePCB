@@ -26,7 +26,7 @@
 
 #include <QtCore>
 #include <eda4ucommon/units/all_length_units.h>
-//#include <eda4ucommon/if_attributeprovider.h>
+#include <eda4ucommon/if_attributeprovider.h>
 #include "../erc/if_ercmsgprovider.h"
 #include <eda4ucommon/fileio/if_xmlserializableobject.h>
 
@@ -56,7 +56,7 @@ namespace project {
 /**
  * @brief The ComponentInstance class
  */
-class ComponentInstance final : public QObject, /*public IF_AttributeProvider,*/
+class ComponentInstance final : public QObject, public IF_AttributeProvider,
                                 public IF_ErcMsgProvider, public IF_XmlSerializableObject
 {
         Q_OBJECT
@@ -84,8 +84,8 @@ class ComponentInstance final : public QObject, /*public IF_AttributeProvider,*/
             XmlDomElement* serializeToXmlDomElement() const throw (Exception);
 
             // Helper Methods
-            //bool getAttributeValue(const QString& attrNS, const QString& attrKey,
-            //                       bool passToParents, QString& value) const noexcept;
+            bool getAttributeValue(const QString& attrNS, const QString& attrKey,
+                                   bool passToParents, QString& value) const noexcept;
 
 
         signals:
