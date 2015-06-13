@@ -58,7 +58,9 @@ HEADERS += \
     undocommand.h \
     undostack.h \
     version.h \
-    if_schematiclayerprovider.h
+    if_schematiclayerprovider.h \
+    boardlayer.h \
+    if_boardlayerprovider.h
 
 SOURCES += \
     attributes/attributetype.cpp \
@@ -96,7 +98,8 @@ SOURCES += \
     systeminfo.cpp \
     undocommand.cpp \
     undostack.cpp \
-    version.cpp
+    version.cpp \
+    boardlayer.cpp
 
 FORMS += \
     dialogs/gridsettingsdialog.ui
