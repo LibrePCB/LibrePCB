@@ -66,6 +66,10 @@ class ComponentInstance final : public QObject, /*public IF_AttributeProvider,*/
 
             // Constructors / Destructor
             explicit ComponentInstance(Board& board, const XmlDomElement& domElement) throw (Exception);
+            explicit ComponentInstance(Board& board, GenCompInstance& genCompInstance,
+                                       const QUuid& componentUuid,
+                                       const Point& position = Point(),
+                                       const Angle& rotation = Angle()) throw (Exception);
             ~ComponentInstance() noexcept;
 
             // Getters
@@ -98,6 +102,7 @@ class ComponentInstance final : public QObject, /*public IF_AttributeProvider,*/
             ComponentInstance& operator=(const ComponentInstance& rhs);
 
             // Private Methods
+            void initComponentAndPackage(const QUuid& componentUuid) throw (Exception);
             void init() throw (Exception);
             bool checkAttributesValidity() const noexcept;
             void updateErcMessages() noexcept;

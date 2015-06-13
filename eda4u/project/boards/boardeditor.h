@@ -39,6 +39,7 @@ namespace project {
 class Project;
 class Board;
 class ErcMsgDock;
+class UnplacedComponentsDock;
 }
 
 namespace Ui {
@@ -129,6 +130,7 @@ class BoardEditor final : public QMainWindow, public IF_GraphicsViewEventHandler
 
         // Docks
         ErcMsgDock* mErcMsgDock;
+        UnplacedComponentsDock* mUnplacedComponentsDock;
 };
 
 } // namespace project

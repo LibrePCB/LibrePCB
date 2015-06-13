@@ -281,6 +281,9 @@ XmlDomElement* Board::serializeToXmlDomElement() const throw (Exception)
     meta->appendTextChild("name", mName);
     XmlDomElement* properties = root->appendChild("properties");
     properties->appendChild(mGridProperties->serializeToXmlDomElement());
+    XmlDomElement* components = root->appendChild("component_instances");
+    foreach (ComponentInstance* component, mComponentInstances)
+        components->appendChild(component->serializeToXmlDomElement());
     return root.take();
 }
 

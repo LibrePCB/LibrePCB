@@ -41,8 +41,8 @@ namespace project {
  ****************************************************************************************/
 
 ComponentInstance::ComponentInstance(Board& board, const XmlDomElement& domElement) throw (Exception) :
-    QObject(nullptr), mBoard(board), mAddedToBoard(false), mComponent(nullptr),
-    mFootprint(nullptr)
+    QObject(nullptr), mBoard(board), mAddedToBoard(false), mGenCompInstance(nullptr),
+    mComponent(nullptr), mFootprint(nullptr)
 {
     // get generic component instance
     QUuid genCompInstUuid = domElement.getAttribute<QUuid>("generic_component_instance");
@@ -53,8 +53,33 @@ ComponentInstance::ComponentInstance(Board& board, const XmlDomElement& domEleme
             QString(tr("Could not found the generic component instance with UUID \"%1\"!"))
             .arg(genCompInstUuid.toString()));
     }
-    // get component from library
+    // get component
     QUuid componentUuid = domElement.getAttribute<QUuid>("component");
+    initComponentAndPackage(componentUuid);
+
+    // load footprint
+    mFootprint = new BI_Footprint(*this, *domElement.getFirstChild("footprint", true));
+
+    init();
+}
+
+ComponentInstance::ComponentInstance(Board& board, GenCompInstance& genCompInstance,
+                                     const QUuid& componentUuid, const Point& position,
+                                     const Angle& rotation) throw (Exception) :
+    QObject(nullptr), mBoard(board), mAddedToBoard(false), mGenCompInstance(&genCompInstance),
+    mComponent(nullptr), mFootprint(nullptr)
+{
+    initComponentAndPackage(componentUuid);
+
+    // create footprint
+    mFootprint = new BI_Footprint(*this, position, rotation);
+
+    init();
+}
+
+void ComponentInstance::initComponentAndPackage(const QUuid& componentUuid) throw (Exception)
+{
+    // get component from library
     mComponent = mBoard.getProject().getLibrary().getComponent(componentUuid);
     if (!mComponent)
     {
@@ -79,14 +104,21 @@ ComponentInstance::ComponentInstance(Board& board, const XmlDomElement& domEleme
             QString(tr("No package with the UUID \"%1\" found in the project's library."))
             .arg(packageUuid.toString()));
     }
-    // load footprint
-    mFootprint = new BI_Footprint(*this, *domElement.getFirstChild("footprint", true));
-
-    init();
 }
 
 void ComponentInstance::init() throw (Exception)
 {
+    // check pad-signal-map
+    foreach (const QUuid& signalUuid, mComponent->getPadSignalMap())
+    {
+        if (!mGenCompInstance->getSignalInstance(signalUuid))
+        {
+            throw RuntimeError(__FILE__, __LINE__, signalUuid.toString(),
+                QString(tr("Unknown signal \"%1\" found in component \"%2\""))
+                .arg(signalUuid.toString(), mComponent->getUuid().toString()));
+        }
+    }
+
     // emit the "attributesChanged" signal when the project has emited it
     //connect(&mCircuit.getProject(), &Project::attributesChanged, this, &ComponentInstance::attributesChanged);
 

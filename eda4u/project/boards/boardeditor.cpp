@@ -38,6 +38,7 @@
 #include <eda4ucommon/gridproperties.h>
 #include "cmd/cmdboardadd.h"
 #include "../erc/ercmsgdock.h"
+#include "unplacedcomponentsdock.h"
 
 namespace project {
 
@@ -48,7 +49,7 @@ namespace project {
 BoardEditor::BoardEditor(Project& project, bool readOnly) :
     QMainWindow(0), mProject(project), mUi(new Ui::BoardEditor),
     mGraphicsView(nullptr), mGridProperties(nullptr), mActiveBoardIndex(-1),
-    mBoardListActionGroup(this), mErcMsgDock(nullptr)
+    mBoardListActionGroup(this), mErcMsgDock(nullptr), mUnplacedComponentsDock(nullptr)
 {
     mUi->setupUi(this);
     mUi->actionProjectSave->setEnabled(!readOnly);
@@ -62,6 +63,8 @@ BoardEditor::BoardEditor(Project& project, bool readOnly) :
     // Add Dock Widgets
     mErcMsgDock = new ErcMsgDock(mProject);
     addDockWidget(Qt::RightDockWidgetArea, mErcMsgDock, Qt::Vertical);
+    mUnplacedComponentsDock = new UnplacedComponentsDock(mProject);
+    addDockWidget(Qt::RightDockWidgetArea, mUnplacedComponentsDock, Qt::Vertical);
 
     // create default grid properties
     mGridProperties = new GridProperties();
@@ -69,6 +72,8 @@ BoardEditor::BoardEditor(Project& project, bool readOnly) :
     // add graphics view as central widget
     mGraphicsView = new GraphicsView(nullptr, this);
     mGraphicsView->setGridProperties(*mGridProperties);
+    mGraphicsView->setBackgroundBrush(Qt::black);
+    mGraphicsView->setForegroundBrush(Qt::lightGray);
     //setCentralWidget(mGraphicsView);
     mUi->centralwidget->layout()->addWidget(mGraphicsView);
 
@@ -130,6 +135,7 @@ BoardEditor::~BoardEditor()
 
     qDeleteAll(mBoardListActions);  mBoardListActions.clear();
 
+    delete mUnplacedComponentsDock; mUnplacedComponentsDock = nullptr;
     delete mErcMsgDock;             mErcMsgDock = nullptr;
     delete mGraphicsView;           mGraphicsView = nullptr;
     delete mGridProperties;         mGridProperties = nullptr;
@@ -178,6 +184,7 @@ bool BoardEditor::setActiveBoardIndex(int index) noexcept
     {
         mGraphicsView->setScene(nullptr);
     }
+    mUnplacedComponentsDock->setBoard(board);
 
     // active board has changed!
     emit activeBoardChanged(mActiveBoardIndex, index);

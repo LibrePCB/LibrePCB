@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_BGI_FOOTPRINT_H
-#define PROJECT_BGI_FOOTPRINT_H
+#ifndef PROJECT_BGI_FOOTPRINTPAD_H
+#define PROJECT_BGI_FOOTPRINTPAD_H
 
 /*****************************************************************************************
  *  Includes
@@ -35,33 +35,32 @@
 class BoardLayer;
 
 namespace project {
-class BI_Footprint;
+class BI_FootprintPad;
 }
 
 namespace library {
-class Footprint;
-class FootprintText;
+class FootprintPad;
 }
 
 /*****************************************************************************************
- *  Class BGI_Footprint
+ *  Class BGI_FootprintPad
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The BGI_Footprint class
+ * @brief The BGI_FootprintPad class
  *
  * @author ubruhin
- * @date 2015-05-24
+ * @date 2015-06-07
  */
-class BGI_Footprint final : public BGI_Base
+class BGI_FootprintPad final : public BGI_Base
 {
     public:
 
         // Constructors / Destructor
-        explicit BGI_Footprint(BI_Footprint& footprint) noexcept;
-        ~BGI_Footprint() noexcept;
+        explicit BGI_FootprintPad(BI_FootprintPad& pad) noexcept;
+        ~BGI_FootprintPad() noexcept;
 
         // General Methods
         void updateCacheAndRepaint() noexcept;
@@ -75,37 +74,30 @@ class BGI_Footprint final : public BGI_Base
     private:
 
         // make some methods inaccessible...
-        BGI_Footprint() = delete;
-        BGI_Footprint(const BGI_Footprint& other) = delete;
-        BGI_Footprint& operator=(const BGI_Footprint& rhs) = delete;
+        BGI_FootprintPad() = delete;
+        BGI_FootprintPad(const BGI_FootprintPad& other) = delete;
+        BGI_FootprintPad& operator=(const BGI_FootprintPad& rhs) = delete;
 
         // Private Methods
         BoardLayer* getBoardLayer(uint id) const noexcept;
 
 
-        // Types
-
-        struct CachedTextProperties_t {
-            QString text;
-            int fontPixelSize;
-            qreal scaleFactor;
-            bool rotate180;
-            int flags;
-            QRectF textRect;    // not scaled
-        };
-
-
         // General Attributes
-        BI_Footprint& mFootprint;
-        const library::Footprint& mLibFootprint;
+        BI_FootprintPad& mPad;
+        const library::FootprintPad& mLibPad;
+        //BoardLayer* mTextLayer;
         QFont mFont;
 
         // Cached Attributes
+        QStaticText mStaticText;
+        bool mRotate180;
+        int mFlags;
         QRectF mBoundingRect;
+        QPointF mTextOrigin;
+        QRectF mTextBoundingRect;
         QPainterPath mShape;
-        QHash<const library::FootprintText*, CachedTextProperties_t> mCachedTextProperties;
 };
 
 } // namespace project
 
-#endif // PROJECT_BGI_FOOTPRINT_H
+#endif // PROJECT_BGI_FOOTPRINTPAD_H

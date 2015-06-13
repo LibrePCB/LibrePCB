@@ -56,8 +56,8 @@ namespace project {
  * @author ubruhin
  * @date 2015-05-24
  */
-class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject/*,
-                           public IF_AttributeProvider*/
+class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
+                           public IF_AttributeProvider
 {
         Q_OBJECT
 
@@ -65,11 +65,20 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject/*,
 
         // Constructors / Destructor
         explicit BI_Footprint(ComponentInstance& component, const XmlDomElement& domElement) throw (Exception);
+        explicit BI_Footprint(ComponentInstance& component, const Point& pos = Point(),
+                              const Angle& rotation = Angle()) throw (Exception);
         ~BI_Footprint() noexcept;
 
         // Getters
         ComponentInstance& getComponentInstance() const noexcept {return mComponentInstance;}
+        const Angle& getRotation() const noexcept {return mRotation;}
+        BI_FootprintPad* getPad(const QUuid& padUuid) const noexcept {return mPads.value(padUuid);}
+        const QHash<QUuid, BI_FootprintPad*>& getPads() const noexcept {return mPads;}
         const library::Footprint& getLibFootprint() const noexcept {return *mFootprint;}
+
+        // Setters
+        void setPosition(const Point& newPos) throw (Exception);
+        void setAngle(const Angle& newAngle) throw (Exception);
 
         // General Methods
         void addToBoard(GraphicsScene& scene) throw (Exception);
@@ -77,15 +86,26 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject/*,
         XmlDomElement* serializeToXmlDomElement() const throw (Exception);
 
         // Helper Methods
-        //Point mapToScene(const Point& relativePos) const noexcept;
-        //bool getAttributeValue(const QString& attrNS, const QString& attrKey,
-        //                       bool passToParents, QString& value) const noexcept;
+        Point mapToScene(const Point& relativePos) const noexcept;
+        bool getAttributeValue(const QString& attrNS, const QString& attrKey,
+                               bool passToParents, QString& value) const noexcept;
 
         // Inherited from BI_Base
         Type_t getType() const noexcept override {return BI_Base::Type_t::Footprint;}
         const Point& getPosition() const noexcept override {return mPosition;}
         QPainterPath getGrabAreaScenePx() const noexcept override;
         void setSelected(bool selected) noexcept override;
+
+
+    private slots:
+
+        void componentInstanceAttributesChanged();
+
+
+    signals:
+
+        /// @copydoc IF_AttributeProvider#attributesChanged()
+        void attributesChanged();
 
 
     private:
@@ -106,7 +126,9 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject/*,
         QHash<QUuid, BI_FootprintPad*> mPads; ///< key: footprint pad UUID
         BGI_Footprint* mGraphicsItem;
 
+        // Attributes
         Point mPosition;
+        Angle mRotation;
 };
 
 } // namespace project

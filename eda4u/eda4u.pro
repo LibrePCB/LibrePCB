@@ -171,7 +171,12 @@ SOURCES += \
     project/boards/componentinstance.cpp \
     project/boards/items/bi_footprint.cpp \
     project/boards/graphicsitems/bgi_base.cpp \
-    project/boards/graphicsitems/bgi_footprint.cpp
+    project/boards/graphicsitems/bgi_footprint.cpp \
+    project/boards/boardlayerprovider.cpp \
+    project/boards/items/bi_footprintpad.cpp \
+    project/boards/graphicsitems/bgi_footprintpad.cpp \
+    project/boards/unplacedcomponentsdock.cpp \
+    project/boards/cmd/cmdcomponentinstanceadd.cpp
 
 HEADERS += \
     workspace/workspace.h \
@@ -274,7 +279,12 @@ HEADERS += \
     project/boards/componentinstance.h \
     project/boards/items/bi_footprint.h \
     project/boards/graphicsitems/bgi_base.h \
-    project/boards/graphicsitems/bgi_footprint.h
+    project/boards/graphicsitems/bgi_footprint.h \
+    project/boards/boardlayerprovider.h \
+    project/boards/items/bi_footprintpad.h \
+    project/boards/graphicsitems/bgi_footprintpad.h \
+    project/boards/unplacedcomponentsdock.h \
+    project/boards/cmd/cmdcomponentinstanceadd.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \
@@ -289,7 +299,8 @@ FORMS += \
     project/dialogs/projectpropertieseditordialog.ui \
     project/dialogs/addgencompdialog.ui \
     project/settings/projectsettingsdialog.ui \
-    project/boards/boardeditor.ui
+    project/boards/boardeditor.ui \
+    project/boards/unplacedcomponentsdock.ui
 
 
 # Custom compiler "lrelease" for qm generation
