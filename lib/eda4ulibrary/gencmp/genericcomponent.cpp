@@ -37,6 +37,7 @@ GenericComponent::GenericComponent(const QUuid& uuid, const Version& version,
                                    const QString& keywords_en_US) throw (Exception) :
     LibraryElement("generic_component", uuid, version, author, name_en_US, description_en_US, keywords_en_US)
 {
+    Q_ASSERT(mUuid.isNull() == false);
 }
 
 GenericComponent::GenericComponent(const FilePath& xmlFilePath) throw (Exception) :
@@ -402,6 +403,14 @@ bool GenericComponent::checkAttributesValidity() const noexcept
     {
         if (var->isDefault() != (var->getUuid() == mDefaultSymbolVariantUuid))
             return false;
+        foreach (const GenCompSymbVarItem* item, var->getItems())
+        {
+            foreach (const GenCompSymbVarItem::PinSignalMapItem_t& map, item->getPinSignalMap())
+            {
+                if (!getSignalByUuid(map.signal))
+                    return false;
+            }
+        }
     }
     return true;
 }

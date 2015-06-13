@@ -23,7 +23,6 @@
 
 #include <QtCore>
 #include "symbolellipse.h"
-#include "symbol.h"
 #include <eda4ucommon/fileio/xmldomelement.h>
 
 namespace library {

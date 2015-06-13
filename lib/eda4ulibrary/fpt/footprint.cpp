@@ -22,6 +22,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <eda4ucommon/fileio/xmldomelement.h>
 #include "footprint.h"
 
 namespace library {
@@ -30,14 +31,36 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Footprint::Footprint(const FilePath& xmlFilePath) :
-    LibraryElement(xmlFilePath, "footprint")
+Footprint::Footprint(const QUuid& uuid, const Version& version, const QString& author,
+                     const QString& name_en_US, const QString& description_en_US,
+                     const QString& keywords_en_US) throw (Exception) :
+    LibraryElement("footprint", uuid, version, author, name_en_US, description_en_US, keywords_en_US)
 {
-    readFromFile();
 }
 
-Footprint::~Footprint()
+Footprint::Footprint(const FilePath& xmlFilePath) throw (Exception) :
+    LibraryElement(xmlFilePath, "footprint")
 {
+    try
+    {
+        readFromFile();
+    }
+    catch (Exception& e)
+    {
+        qDeleteAll(mEllipses);      mEllipses.clear();
+        qDeleteAll(mTexts);         mTexts.clear();
+        qDeleteAll(mPolygons);      mPolygons.clear();
+        qDeleteAll(mPads);          mPads.clear();
+        throw;
+    }
+}
+
+Footprint::~Footprint() noexcept
+{
+    qDeleteAll(mEllipses);      mEllipses.clear();
+    qDeleteAll(mTexts);         mTexts.clear();
+    qDeleteAll(mPolygons);      mPolygons.clear();
+    qDeleteAll(mPads);          mPads.clear();
 }
 
 /*****************************************************************************************
@@ -47,6 +70,68 @@ Footprint::~Footprint()
 void Footprint::parseDomTree(const XmlDomElement& root) throw (Exception)
 {
     LibraryElement::parseDomTree(root);
+
+    // Load all pads
+    for (XmlDomElement* node = root.getFirstChild("pads/pad", true, false);
+         node; node = node->getNextSibling("pad"))
+    {
+        FootprintPad* pad = new FootprintPad(*node);
+        if (mPads.contains(pad->getUuid()))
+        {
+            throw RuntimeError(__FILE__, __LINE__, pad->getUuid().toString(),
+                QString(tr("The pad \"%1\" exists multiple times in \"%2\"."))
+                .arg(pad->getUuid().toString(), mXmlFilepath.toNative()));
+        }
+        mPads.insert(pad->getUuid(), pad);
+    }
+
+    // Load all geometry elements
+    for (XmlDomElement* node = root.getFirstChild("geometry/*", true, false);
+         node; node = node->getNextSibling())
+    {
+        if (node->getName() == "polygon")
+        {
+            mPolygons.append(new FootprintPolygon(*node));
+        }
+        else if (node->getName() == "text")
+        {
+            mTexts.append(new FootprintText(*node));
+        }
+        else if (node->getName() == "ellipse")
+        {
+            mEllipses.append(new FootprintEllipse(*node));
+        }
+        else
+        {
+            throw RuntimeError(__FILE__, __LINE__, node->getName(),
+                QString(tr("Unknown geometry element \"%1\" in \"%2\"."))
+                .arg(node->getName(), mXmlFilepath.toNative()));
+        }
+    }
+}
+
+XmlDomElement* Footprint::serializeToXmlDomElement() const throw (Exception)
+{
+    QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement());
+    XmlDomElement* geometry = root->appendChild("geometry");
+    foreach (const FootprintPolygon* polygon, mPolygons)
+        geometry->appendChild(polygon->serializeToXmlDomElement());
+    foreach (const FootprintText* text, mTexts)
+        geometry->appendChild(text->serializeToXmlDomElement());
+    foreach (const FootprintEllipse* ellipse, mEllipses)
+        geometry->appendChild(ellipse->serializeToXmlDomElement());
+    XmlDomElement* pads = root->appendChild("pads");
+    foreach (const FootprintPad* pad, mPads)
+        pads->appendChild(pad->serializeToXmlDomElement());
+    return root.take();
+}
+
+bool Footprint::checkAttributesValidity() const noexcept
+{
+    if (!LibraryElement::checkAttributesValidity())                 return false;
+    if (mPads.isEmpty() && mTexts.isEmpty() &&
+        mPolygons.isEmpty() && mEllipses.isEmpty())                 return false;
+    return true;
 }
 
 /*****************************************************************************************

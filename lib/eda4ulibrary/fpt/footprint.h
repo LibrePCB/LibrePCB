@@ -26,6 +26,10 @@
 
 #include <QtCore>
 #include "../libraryelement.h"
+#include "footprintpad.h"
+#include "footprintpolygon.h"
+#include "footprintellipse.h"
+#include "footprinttext.h"
 
 /*****************************************************************************************
  *  Class Footprint
@@ -42,8 +46,30 @@ class Footprint final : public LibraryElement
 
     public:
 
-        explicit Footprint(const FilePath& xmlFilePath);
-        virtual ~Footprint();
+        // Constructors / Destructor
+        explicit Footprint(const QUuid& uuid = QUuid::createUuid(),
+                           const Version& version = Version(),
+                           const QString& author = QString(),
+                           const QString& name_en_US = QString(),
+                           const QString& description_en_US = QString(),
+                           const QString& keywords_en_US = QString()) throw (Exception);
+        explicit Footprint(const FilePath& xmlFilePath) throw (Exception);
+        ~Footprint() noexcept;
+
+        // Getters
+        const FootprintPad* getPadByUuid(const QUuid& uuid) const noexcept {return mPads.value(uuid);}
+        const QHash<QUuid, const FootprintPad*>& getPads() const noexcept {return mPads;}
+        const QList<const FootprintPolygon*>& getPolygons() const noexcept {return mPolygons;}
+        const QList<const FootprintText*>& getTexts() const noexcept {return mTexts;}
+        const QList<const FootprintEllipse*>& getEllipses() const noexcept {return mEllipses;}
+
+        // General Methods
+        void addPad(const FootprintPad* pad) noexcept {mPads.insert(pad->getUuid(), pad);}
+        void addPolygon(const FootprintPolygon* polygon) noexcept {mPolygons.append(polygon);}
+        void removePolygon(const FootprintPolygon* polygon) noexcept {mPolygons.removeAll(polygon); delete polygon;}
+        void addText(const FootprintText* text) noexcept {mTexts.append(text);}
+        void addEllipse(const FootprintEllipse* ellipse) noexcept {mEllipses.append(ellipse);}
+
 
     private:
 
@@ -55,7 +81,15 @@ class Footprint final : public LibraryElement
 
         // Private Methods
         void parseDomTree(const XmlDomElement& root) throw (Exception);
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+        bool checkAttributesValidity() const noexcept;
 
+
+        // Symbol Attributes
+        QHash<QUuid, const FootprintPad*> mPads;
+        QList<const FootprintPolygon*> mPolygons;
+        QList<const FootprintText*> mTexts;
+        QList<const FootprintEllipse*> mEllipses;
 };
 
 } // namespace library

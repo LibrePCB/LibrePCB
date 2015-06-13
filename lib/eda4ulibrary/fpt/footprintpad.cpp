@@ -23,7 +23,7 @@
 
 #include <QtCore>
 #include <eda4ucommon/fileio/xmldomelement.h>
-#include "symbolpin.h"
+#include "footprintpad.h"
 #include "../librarybaseelement.h"
 
 namespace library {
@@ -32,24 +32,29 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SymbolPin::SymbolPin(const QUuid& uuid, const QString& name_en_US,
-                     const QString& description_en_US) noexcept :
-    mUuid(uuid), mPosition(0, 0), mLength(0), mAngle(0)
+FootprintPad::FootprintPad(const QUuid& uuid, const QString& name_en_US,
+                           const QString& description_en_US) noexcept :
+    mUuid(uuid), mType(Type_t::ThtRect), mPosition(0, 0), mRotation(0), mWidth(0),
+    mHeight(0), mDrillDiameter(0), mLayerId(0)
 {
     Q_ASSERT(mUuid.isNull() == false);
     mNames.insert("en_US", name_en_US);
     mDescriptions.insert("en_US", description_en_US);
 }
 
-SymbolPin::SymbolPin(const XmlDomElement& domElement) throw (Exception) :
-    mUuid(), mPosition(), mLength(), mAngle()
+FootprintPad::FootprintPad(const XmlDomElement& domElement) throw (Exception) :
+    mUuid(), mPosition()
 {
     // read attributes
     mUuid = domElement.getAttribute<QUuid>("uuid");
+    mType = stringToType(domElement.getAttribute("type"));
     mPosition.setX(domElement.getAttribute<Length>("x"));
     mPosition.setY(domElement.getAttribute<Length>("y"));
-    mLength = domElement.getAttribute<Length>("length");
-    mAngle = domElement.getAttribute<Angle>("angle");
+    mRotation = domElement.getAttribute<Angle>("rotation");
+    mWidth = domElement.getAttribute<Length>("width");
+    mHeight = domElement.getAttribute<Length>("height");
+    mDrillDiameter = domElement.getAttribute<Length>("drill");
+    mLayerId = domElement.getAttribute<uint>("layer");
 
     // read names and descriptions in all available languages
     LibraryBaseElement::readLocaleDomNodes(domElement, "name", mNames);
@@ -58,7 +63,7 @@ SymbolPin::SymbolPin(const XmlDomElement& domElement) throw (Exception) :
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-SymbolPin::~SymbolPin() noexcept
+FootprintPad::~FootprintPad() noexcept
 {
 }
 
@@ -66,41 +71,35 @@ SymbolPin::~SymbolPin() noexcept
  *  Getters
  ****************************************************************************************/
 
-QString SymbolPin::getName(const QStringList& localeOrder) const noexcept
+QString FootprintPad::getName(const QStringList& localeOrder) const noexcept
 {
     return LibraryBaseElement::localeStringFromList(mNames, localeOrder);
 }
 
-QString SymbolPin::getDescription(const QStringList& localeOrder) const noexcept
+QString FootprintPad::getDescription(const QStringList& localeOrder) const noexcept
 {
     return LibraryBaseElement::localeStringFromList(mDescriptions, localeOrder);
+}
+
+QRectF FootprintPad::toPxQRectF() const noexcept
+{
+    QRectF rect;
+    rect.setWidth(mWidth.toPx());
+    rect.setHeight(mHeight.toPx());
+    rect.translate(mPosition.toPxQPointF());
+    return rect;
 }
 
 /*****************************************************************************************
  *  Setters
  ****************************************************************************************/
 
-void SymbolPin::setPosition(const Point& pos) noexcept
-{
-    mPosition = pos;
-}
-
-void SymbolPin::setLength(const Length& length) noexcept
-{
-    mLength = length;
-}
-
-void SymbolPin::setAngle(const Angle& angle) noexcept
-{
-    mAngle = angle;
-}
-
-void SymbolPin::setName(const QString& locale, const QString& name) noexcept
+void FootprintPad::setName(const QString& locale, const QString& name) noexcept
 {
     mNames.insert(locale, name);
 }
 
-void SymbolPin::setDescription(const QString& locale, const QString& description) noexcept
+void FootprintPad::setDescription(const QString& locale, const QString& description) noexcept
 {
     mDescriptions.insert(locale, description);
 }
@@ -109,16 +108,20 @@ void SymbolPin::setDescription(const QString& locale, const QString& description
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* SymbolPin::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* FootprintPad::serializeToXmlDomElement() const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("pin"));
     root->setAttribute("uuid", mUuid);
+    root->setAttribute("type", typeToString(mType));
     root->setAttribute("x", mPosition.getX().toMmString());
     root->setAttribute("y", mPosition.getY().toMmString());
-    root->setAttribute("length", mLength.toMmString());
-    root->setAttribute("angle", mAngle.toDegString());
+    root->setAttribute("rotation", mRotation);
+    root->setAttribute("width", mWidth);
+    root->setAttribute("height", mHeight);
+    root->setAttribute("drill", mDrillDiameter);
+    root->setAttribute("layer", mLayerId);
     foreach (const QString& locale, mNames.keys())
         root->appendTextChild("name", mNames.value(locale))->setAttribute("locale", locale);
     foreach (const QString& locale, mDescriptions.keys())
@@ -130,14 +133,43 @@ XmlDomElement* SymbolPin::serializeToXmlDomElement() const throw (Exception)
  *  Private Methods
  ****************************************************************************************/
 
-bool SymbolPin::checkAttributesValidity() const noexcept
+bool FootprintPad::checkAttributesValidity() const noexcept
 {
     if (mUuid.isNull())                     return false;
-    if (mLength < 0)                        return false;
+    if (typeToString(mType).isEmpty())      return false;
+    if (mWidth <= 0)                        return false;
+    if (mHeight <= 0)                       return false;
+    if (mDrillDiameter < 0)                 return false;
     if (mNames.value("en_US").isEmpty())    return false;
     if (!mDescriptions.contains("en_US"))   return false;
     return true;
 }
+
+/*****************************************************************************************
+ *  Static Methods
+ ****************************************************************************************/
+
+FootprintPad::Type_t FootprintPad::stringToType(const QString& type) throw (Exception)
+{
+    if      (type == QLatin1String("tht_rect"))     return Type_t::ThtRect;
+    else if (type == QLatin1String("tht_octagon"))  return Type_t::ThtOctagon;
+    else if (type == QLatin1String("tht_round"))    return Type_t::ThtRound;
+    else if (type == QLatin1String("smd_rect"))     return Type_t::SmdRect;
+    else throw RuntimeError(__FILE__, __LINE__, type, type);
+}
+
+QString FootprintPad::typeToString(Type_t type) noexcept
+{
+    switch (type)
+    {
+        case Type_t::ThtRect:       return QString("tht_rect");
+        case Type_t::ThtOctagon:    return QString("tht_octagon");
+        case Type_t::ThtRound:      return QString("tht_round");
+        case Type_t::SmdRect:       return QString("smd_rect");
+        default: Q_ASSERT(false); return QString();
+    }
+}
+
 
 /*****************************************************************************************
  *  End of File

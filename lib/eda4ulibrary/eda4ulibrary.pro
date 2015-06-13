@@ -42,7 +42,11 @@ HEADERS += \
     library.h \
     librarybaseelement.h \
     libraryelement.h \
-    libraryelementattribute.h
+    libraryelementattribute.h \
+    fpt/footprintpolygon.h \
+    fpt/footprintellipse.h \
+    fpt/footprinttext.h \
+    fpt/footprintpad.h
 
 SOURCES += \
     3dmdl/model3d.cpp \
@@ -66,5 +70,9 @@ SOURCES += \
     library.cpp \
     librarybaseelement.cpp \
     libraryelement.cpp \
-    libraryelementattribute.cpp
+    libraryelementattribute.cpp \
+    fpt/footprintpolygon.cpp \
+    fpt/footprintellipse.cpp \
+    fpt/footprinttext.cpp \
+    fpt/footprintpad.cpp
 

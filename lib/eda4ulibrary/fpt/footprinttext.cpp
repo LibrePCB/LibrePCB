@@ -22,8 +22,8 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "symboltext.h"
 #include <eda4ucommon/fileio/xmldomelement.h>
+#include "footprinttext.h"
 
 namespace library {
 
@@ -31,12 +31,12 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SymbolText::SymbolText() noexcept :
+FootprintText::FootprintText() noexcept :
     mLayerId(0), mText(), mPosition(0, 0), mAngle(0), mHeight(0), mAlign()
 {
 }
 
-SymbolText::SymbolText(const XmlDomElement& domElement) throw (Exception)
+FootprintText::FootprintText(const XmlDomElement& domElement) throw (Exception)
 {
     mLayerId = domElement.getAttribute<uint>("layer");
     mText = domElement.getAttribute("text", true);
@@ -54,7 +54,7 @@ SymbolText::SymbolText(const XmlDomElement& domElement) throw (Exception)
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-SymbolText::~SymbolText() noexcept
+FootprintText::~FootprintText() noexcept
 {
 }
 
@@ -62,7 +62,7 @@ SymbolText::~SymbolText() noexcept
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* SymbolText::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* FootprintText::serializeToXmlDomElement() const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -82,7 +82,7 @@ XmlDomElement* SymbolText::serializeToXmlDomElement() const throw (Exception)
  *  Private Methods
  ****************************************************************************************/
 
-bool SymbolText::checkAttributesValidity() const noexcept
+bool FootprintText::checkAttributesValidity() const noexcept
 {
     if (mText.isEmpty())    return false;
     if (mHeight <= 0)       return false;

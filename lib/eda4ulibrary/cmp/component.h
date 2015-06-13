@@ -43,6 +43,12 @@ class Component final : public LibraryElement
     public:
 
         // Constructors / Destructor
+        explicit Component(const QUuid& uuid = QUuid::createUuid(),
+                           const Version& version = Version(),
+                           const QString& author = QString(),
+                           const QString& name_en_US = QString(),
+                           const QString& description_en_US = QString(),
+                           const QString& keywords_en_US = QString()) throw (Exception);
         explicit Component(const FilePath& xmlFilePath) throw (Exception);
         ~Component() noexcept;
 
@@ -50,6 +56,16 @@ class Component final : public LibraryElement
         const QUuid& getGenCompUuid() const noexcept {return mGenericComponentUuid;}
         const QUuid& getPackageUuid() const noexcept {return mPackageUuid;}
         const QHash<QUuid, QUuid>& getPadSignalMap() const noexcept {return mPadSignalMap;}
+        QUuid getSignalOfPad(const QUuid& pad) const noexcept {return mPadSignalMap.value(pad);}
+
+        // Setters
+        void setGenCompUuid(const QUuid& uuid) noexcept {mGenericComponentUuid = uuid;}
+        void setPackageUuid(const QUuid& uuid) noexcept {mPackageUuid = uuid;}
+
+        // General Methods
+        void clearPadSignalMap() noexcept {mPadSignalMap.clear();}
+        void addPadSignalMapping(const QUuid& pad, const QUuid& signal) noexcept {mPadSignalMap.insert(pad, signal);}
+
 
     private:
 
@@ -68,7 +84,7 @@ class Component final : public LibraryElement
         // Attributes
         QUuid mGenericComponentUuid;
         QUuid mPackageUuid;
-        QHash<QUuid, QUuid> mPadSignalMap;
+        QHash<QUuid, QUuid> mPadSignalMap; ///< key: pad, value: signal
 };
 
 } // namespace library

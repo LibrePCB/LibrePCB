@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_SYMBOLTEXT_H
-#define LIBRARY_SYMBOLTEXT_H
+#ifndef LIBRARY_FOOTPRINTTEXT_H
+#define LIBRARY_FOOTPRINTTEXT_H
 
 /*****************************************************************************************
  *  Includes
@@ -30,27 +30,30 @@
 #include <eda4ucommon/alignment.h>
 
 /*****************************************************************************************
- *  Class SymbolText
+ *  Class FootprintText
  ****************************************************************************************/
 
 namespace library {
 
 /**
- * @brief The SymbolText class
+ * @brief The FootprintText class
  *
  * @note If you make changes in this class, please check if you also need to modify
- *       the class library#FootprintText as these classes are very similar.
+ *       the class library#SymbolText as these classes are very similar.
+ *
+ * @author ubruhin
+ * @date 2015-06-07
  */
-class SymbolText final : public IF_XmlSerializableObject
+class FootprintText final : public IF_XmlSerializableObject
 {
-        Q_DECLARE_TR_FUNCTIONS(SymbolText)
+        Q_DECLARE_TR_FUNCTIONS(FootprintText)
 
     public:
 
         // Constructors / Destructor
-        explicit SymbolText() noexcept;
-        explicit SymbolText(const XmlDomElement& domElement) throw (Exception);
-        ~SymbolText() noexcept;
+        explicit FootprintText() noexcept;
+        explicit FootprintText(const XmlDomElement& domElement) throw (Exception);
+        ~FootprintText() noexcept;
 
         // Getters
         uint getLayerId() const noexcept {return mLayerId;}
@@ -75,8 +78,8 @@ class SymbolText final : public IF_XmlSerializableObject
     private:
 
         // make some methods inaccessible...
-        SymbolText(const SymbolText& other);
-        SymbolText& operator=(const SymbolText& rhs);
+        FootprintText(const FootprintText& other);
+        FootprintText& operator=(const FootprintText& rhs);
 
         // Private Methods
         bool checkAttributesValidity() const noexcept;
@@ -93,4 +96,4 @@ class SymbolText final : public IF_XmlSerializableObject
 
 } // namespace library
 
-#endif // LIBRARY_SYMBOLTEXT_H
+#endif // LIBRARY_FOOTPRINTTEXT_H

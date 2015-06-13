@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_SYMBOLELLIPSE_H
-#define LIBRARY_SYMBOLELLIPSE_H
+#ifndef LIBRARY_FOOTPRINTELLIPSE_H
+#define LIBRARY_FOOTPRINTELLIPSE_H
 
 /*****************************************************************************************
  *  Includes
@@ -29,27 +29,30 @@
 #include <eda4ucommon/fileio/if_xmlserializableobject.h>
 
 /*****************************************************************************************
- *  Class SymbolEllipse
+ *  Class FootprintEllipse
  ****************************************************************************************/
 
 namespace library {
 
 /**
- * @brief The SymbolEllipse class
+ * @brief The FootprintEllipse class
  *
  * @note If you make changes in this class, please check if you also need to modify
- *       the class library#FootprintEllipse as these classes are very similar.
+ *       the class library#SymbolEllipse as these classes are very similar.
+ *
+ * @author ubruhin
+ * @date 2015-06-07
  */
-class SymbolEllipse final : public IF_XmlSerializableObject
+class FootprintEllipse final : public IF_XmlSerializableObject
 {
-        Q_DECLARE_TR_FUNCTIONS(SymbolEllipse)
+        Q_DECLARE_TR_FUNCTIONS(FootprintEllipse)
 
     public:
 
         // Constructors / Destructor
-        explicit SymbolEllipse() noexcept;
-        explicit SymbolEllipse(const XmlDomElement& domElement) throw (Exception);
-        ~SymbolEllipse() noexcept;
+        explicit FootprintEllipse() noexcept;
+        explicit FootprintEllipse(const XmlDomElement& domElement) throw (Exception);
+        ~FootprintEllipse() noexcept;
 
         // Getters
         uint getLayerId() const noexcept {return mLayerId;}
@@ -78,8 +81,8 @@ class SymbolEllipse final : public IF_XmlSerializableObject
     private:
 
         // make some methods inaccessible...
-        SymbolEllipse(const SymbolEllipse& other) = delete;
-        SymbolEllipse& operator=(const SymbolEllipse& rhs) = delete;
+        FootprintEllipse(const FootprintEllipse& other) = delete;
+        FootprintEllipse& operator=(const FootprintEllipse& rhs) = delete;
 
         // Private Methods
         bool checkAttributesValidity() const noexcept;
@@ -98,4 +101,4 @@ class SymbolEllipse final : public IF_XmlSerializableObject
 
 } // namespace library
 
-#endif // LIBRARY_SYMBOLELLIPSE_H
+#endif // LIBRARY_FOOTPRINTELLIPSE_H

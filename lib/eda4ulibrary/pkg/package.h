@@ -43,11 +43,20 @@ class Package final : public LibraryElement
     public:
 
         // Constructors / Destructor
+        explicit Package(const QUuid& uuid = QUuid::createUuid(),
+                         const Version& version = Version(),
+                         const QString& author = QString(),
+                         const QString& name_en_US = QString(),
+                         const QString& description_en_US = QString(),
+                         const QString& keywords_en_US = QString()) throw (Exception);
         explicit Package(const FilePath& xmlFilePath) throw (Exception);
-        virtual ~Package() noexcept;
+        ~Package() noexcept;
 
         // Getters
         const QUuid& getFootprintUuid() const noexcept {return mFootprintUuid;}
+
+        // Setters
+        void setFootprintUuid(const QUuid& uuid) noexcept {mFootprintUuid = uuid;}
 
 
     private:

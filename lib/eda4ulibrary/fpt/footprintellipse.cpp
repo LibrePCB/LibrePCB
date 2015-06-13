@@ -22,8 +22,8 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "symboltext.h"
 #include <eda4ucommon/fileio/xmldomelement.h>
+#include "footprintellipse.h"
 
 namespace library {
 
@@ -31,30 +31,28 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SymbolText::SymbolText() noexcept :
-    mLayerId(0), mText(), mPosition(0, 0), mAngle(0), mHeight(0), mAlign()
+FootprintEllipse::FootprintEllipse() noexcept :
+    mLayerId(0), mLineWidth(0), mIsGrabArea(false), mCenter(0, 0),
+    mRadiusX(0), mRadiusY(0), mRotation(0)
 {
 }
 
-SymbolText::SymbolText(const XmlDomElement& domElement) throw (Exception)
+FootprintEllipse::FootprintEllipse(const XmlDomElement& domElement) throw (Exception)
 {
     mLayerId = domElement.getAttribute<uint>("layer");
-    mText = domElement.getAttribute("text", true);
-
-    // load geometry attributes
-    mPosition.setX(domElement.getAttribute<Length>("x"));
-    mPosition.setY(domElement.getAttribute<Length>("y"));
-    mAngle = domElement.getAttribute<Angle>("angle");
-    mHeight = domElement.getAttribute<Length>("height");
-
-    // text alignment
-    mAlign.setH(domElement.getAttribute<HAlign>("h_align"));
-    mAlign.setV(domElement.getAttribute<VAlign>("v_align"));
+    mLineWidth = domElement.getAttribute<Length>("width");
+    mIsFilled = domElement.getAttribute<bool>("fill");
+    mIsGrabArea = domElement.getAttribute<bool>("grab_area");
+    mCenter.setX(domElement.getAttribute<Length>("x"));
+    mCenter.setY(domElement.getAttribute<Length>("y"));
+    mRadiusX = domElement.getAttribute<Length>("radius_x");
+    mRadiusY = domElement.getAttribute<Length>("radius_y");
+    mRotation = domElement.getAttribute<Angle>("rotation");
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-SymbolText::~SymbolText() noexcept
+FootprintEllipse::~FootprintEllipse() noexcept
 {
 }
 
@@ -62,19 +60,20 @@ SymbolText::~SymbolText() noexcept
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* SymbolText::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* FootprintEllipse::serializeToXmlDomElement() const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("text"));
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("ellipse"));
     root->setAttribute("layer", mLayerId);
-    root->setAttribute("text", mText);
-    root->setAttribute("x", mPosition.getX().toMmString());
-    root->setAttribute("y", mPosition.getY().toMmString());
-    root->setAttribute("angle", mAngle.toDegString());
-    root->setAttribute("height", mHeight.toMmString());
-    root->setAttribute("h_align", mAlign.getH());
-    root->setAttribute("v_align", mAlign.getV());
+    root->setAttribute("width", mLineWidth.toMmString());
+    root->setAttribute("fill", mIsFilled);
+    root->setAttribute("grab_area", mIsGrabArea);
+    root->setAttribute("x", mCenter.getX().toMmString());
+    root->setAttribute("y", mCenter.getY().toMmString());
+    root->setAttribute("radius_x", mRadiusX.toMmString());
+    root->setAttribute("radius_y", mRadiusY.toMmString());
+    root->setAttribute("rotation", mRotation.toDegString());
     return root.take();
 }
 
@@ -82,10 +81,12 @@ XmlDomElement* SymbolText::serializeToXmlDomElement() const throw (Exception)
  *  Private Methods
  ****************************************************************************************/
 
-bool SymbolText::checkAttributesValidity() const noexcept
+bool FootprintEllipse::checkAttributesValidity() const noexcept
 {
-    if (mText.isEmpty())    return false;
-    if (mHeight <= 0)       return false;
+    if (mLayerId <= 0)          return false;
+    if (mLineWidth < 0)         return false;
+    if (mRadiusX <= 0)          return false;
+    if (mRadiusY <= 0)          return false;
     return true;
 }
 
