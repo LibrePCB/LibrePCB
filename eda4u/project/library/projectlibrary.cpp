@@ -145,6 +145,21 @@ const Component* ProjectLibrary::getComponent(const QUuid& uuid) const noexcept
 }
 
 /*****************************************************************************************
+ *  Getters: Special Queries
+ ****************************************************************************************/
+
+QHash<QUuid, const library::Component*> ProjectLibrary::getComponentsOfGenComp(const QUuid& genCompUuid) const noexcept
+{
+    QHash<QUuid, const library::Component*> list;
+    foreach (const library::Component* component, mComponents)
+    {
+        if (component->getGenCompUuid() == genCompUuid)
+            list.insert(component->getUuid(), component);
+    }
+    return list;
+}
+
+/*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 

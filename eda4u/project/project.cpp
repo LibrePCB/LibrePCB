@@ -44,6 +44,7 @@
 #include "settings/projectsettings.h"
 #include "boards/board.h"
 #include "boards/boardeditor.h"
+#include "boards/boardlayerprovider.h"
 
 namespace project {
 
@@ -57,7 +58,7 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
     mIsReadOnly(false), mDescriptionHtmlFile(nullptr), mProjectIsModified(false),
     mUndoStack(nullptr), mProjectSettings(nullptr), mProjectLibrary(nullptr),
     mErcMsgList(nullptr), mCircuit(nullptr), mSchematicEditor(nullptr),
-    mBoardEditor(nullptr)
+    mBoardLayerProvider(nullptr), mBoardEditor(nullptr)
 {
     qDebug() << (create ? "create project..." : "open project...");
 
@@ -226,6 +227,9 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
             qDebug() << mSchematics.count() << "schematics successfully loaded!";
         }
 
+        // Load all board layers
+        mBoardLayerProvider = new BoardLayerProvider(*this);
+
         // Load all boards
         if (create)
         {
@@ -262,6 +266,7 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
     {
         // free the allocated memory in the reverse order of their allocation...
         delete mBoardEditor;            mBoardEditor = nullptr;
+        delete mBoardLayerProvider;     mBoardLayerProvider = nullptr;
         delete mSchematicEditor;        mSchematicEditor = nullptr;
         foreach (Board* board, mBoards)
             try { removeBoard(board, true); } catch (...) {}
@@ -312,6 +317,7 @@ Project::~Project() noexcept
     // free the allocated memory in the reverse order of their allocation
 
     delete mBoardEditor;            mBoardEditor = nullptr;
+    delete mBoardLayerProvider;     mBoardLayerProvider = nullptr;
     delete mSchematicEditor;        mSchematicEditor = nullptr;
 
     // delete all boards and schematics (and catch all throwed exceptions)
@@ -489,6 +495,11 @@ void Project::exportSchematicsAsPdf(const FilePath& filepath) throw (Exception)
 /*****************************************************************************************
  *  Board Methods
  ****************************************************************************************/
+
+BoardLayer* Project::getBoardLayer(uint id) const noexcept
+{
+    return mBoardLayerProvider->getBoardLayer(id);
+}
 
 int Project::getBoardIndex(const Board* board) const noexcept
 {

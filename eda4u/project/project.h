@@ -28,6 +28,7 @@
 #include <eda4ucommon/fileio/if_xmlserializableobject.h>
 #include <eda4ucommon/if_attributeprovider.h>
 #include <eda4ucommon/if_schematiclayerprovider.h>
+#include <eda4ucommon/if_boardlayerprovider.h>
 #include <eda4ucommon/exceptions.h>
 #include <eda4ucommon/fileio/filelock.h>
 
@@ -41,7 +42,6 @@ class SmartTextFile;
 class SmartXmlFile;
 class SmartIniFile;
 class UndoStack;
-class SchematicLayer;
 
 namespace project {
 class ProjectSettings;
@@ -52,6 +52,7 @@ class Schematic;
 class ErcMsgList;
 class BoardEditor;
 class Board;
+class BoardLayerProvider;
 }
 
 /*****************************************************************************************
@@ -81,7 +82,8 @@ namespace project {
  * @date 2014-06-24
  */
 class Project final : public QObject, public IF_AttributeProvider,
-                      public IF_SchematicLayerProvider, public IF_XmlSerializableObject
+                      public IF_SchematicLayerProvider, public IF_BoardLayerProvider,
+                      public IF_XmlSerializableObject
 {
         Q_OBJECT
 
@@ -367,6 +369,11 @@ class Project final : public QObject, public IF_AttributeProvider,
         // Board Methods
 
         /**
+         * @copydoc IF_BoardLayerProvider#getBoardLayer()
+         */
+        BoardLayer* getBoardLayer(uint id) const noexcept;
+
+        /**
          * @brief Get the index of a specific board
          *
          * @return the board index (-1 if the board does not exist)
@@ -644,6 +651,7 @@ class Project final : public QObject, public IF_AttributeProvider,
         QList<Schematic*> mRemovedSchematics; ///< All removed schematics of this project
         SchematicEditor* mSchematicEditor; ///< The schematic editor (GUI)
         QHash<uint, SchematicLayer*> mSchematicLayers; ///< All schematic layers of this project
+        BoardLayerProvider* mBoardLayerProvider; ///< All board layers of this project
         QList<Board*> mBoards; ///< All boards of this project
         QList<Board*> mRemovedBoards; ///< All removed boards of this project
         BoardEditor* mBoardEditor; ///< The board editor (GUI)

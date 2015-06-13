@@ -81,6 +81,9 @@ class ProjectLibrary final : public QObject
         const library::GenericComponent* getGenComp(    const QUuid& uuid) const noexcept;
         const library::Component*        getComponent(  const QUuid& uuid) const noexcept;
 
+        // Getters: Special Queries
+        QHash<QUuid, const library::Component*> getComponentsOfGenComp(const QUuid& genCompUuid) const noexcept;
+
 
     private:
 

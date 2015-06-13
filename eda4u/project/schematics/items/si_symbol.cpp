@@ -101,13 +101,13 @@ void SI_Symbol::init(const QUuid& symbVarItemUuid) throw (Exception)
         if (mPins.contains(libPin->getUuid()))
         {
             throw RuntimeError(__FILE__, __LINE__, libPin->getUuid().toString(),
-                QString(tr("The symbol pin UUID \"%1\" is defined mulibPinple times."))
+                QString(tr("The symbol pin UUID \"%1\" is defined multiple times."))
                 .arg(libPin->getUuid().toString()));
         }
         if (!mSymbVarItem->getPinSignalMap().contains(libPin->getUuid()))
         {
             throw RuntimeError(__FILE__, __LINE__, libPin->getUuid().toString(),
-                QString(tr("Symbol pin UUID \"%1\" not found in pin-slibPinal-map."))
+                QString(tr("Symbol pin UUID \"%1\" not found in pin-signal-map."))
                 .arg(libPin->getUuid().toString()));
         }
         mPins.insert(libPin->getUuid(), pin);

@@ -76,7 +76,7 @@ class GenCompInstance : public QObject, public IF_AttributeProvider,
         // Getters
         const QUuid& getUuid() const noexcept {return mUuid;}
         const QString& getName() const noexcept {return mName;}
-        const QString& getValue() const noexcept {return mValue;}
+        QString getValue(bool replaceAttributes = false) const noexcept;
         uint getPlacedSymbolsCount() const noexcept {return mSymbols.count();}
         uint getUnplacedSymbolsCount() const noexcept;
         uint getUnplacedRequiredSymbolsCount() const noexcept;

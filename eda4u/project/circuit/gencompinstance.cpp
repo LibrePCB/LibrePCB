@@ -170,6 +170,13 @@ GenCompInstance::~GenCompInstance() noexcept
  *  Getters
  ****************************************************************************************/
 
+QString GenCompInstance::getValue(bool replaceAttributes) const noexcept
+{
+    QString value = mValue;
+    if (replaceAttributes) replaceVariablesWithAttributes(value, false);
+    return value;
+}
+
 uint GenCompInstance::getUnplacedSymbolsCount() const noexcept
 {
     return (mGenCompSymbVar->getItems().count() - mSymbols.count());
