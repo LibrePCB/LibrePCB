@@ -28,10 +28,13 @@ class MainWindow : public QMainWindow
         void on_btnConvertSymbols_clicked();
         void on_btnConvertDevices_clicked();
 
+        void on_pushButton_2_clicked();
+
     private:
 
         enum class ConvertFileType_t {
             Symbols_to_Symbols,
+            Packages_to_FootprintsAndComponents,
             Devices_to_GenericComponents
         };
 
@@ -42,6 +45,7 @@ class MainWindow : public QMainWindow
         void convertAllFiles(ConvertFileType_t type);
         void convertFile(ConvertFileType_t type, QSettings& outputSettings, const FilePath& filepath);
         bool convertSymbol(QSettings& outputSettings, const FilePath& filepath, XmlDomElement* node);
+        bool convertPackage(QSettings& outputSettings, const FilePath& filepath, XmlDomElement* node);
         bool convertDevice(QSettings& outputSettings, const FilePath& filepath, XmlDomElement* node);
 
         // Attributes

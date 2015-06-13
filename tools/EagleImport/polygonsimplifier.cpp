@@ -190,6 +190,7 @@ bool PolygonSimplifier<LibElemType, PolygonType, SegmentType>::findVLine(
  ****************************************************************************************/
 
 template class PolygonSimplifier<library::Symbol, library::SymbolPolygon, library::SymbolPolygonSegment>;
+template class PolygonSimplifier<library::Footprint, library::FootprintPolygon, library::FootprintPolygonSegment>;
 
 /*****************************************************************************************
  *  End of File

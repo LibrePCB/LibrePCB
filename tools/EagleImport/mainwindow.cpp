@@ -6,7 +6,11 @@
 #include <eda4ucommon/fileio/xmldomdocument.h>
 #include <eda4ucommon/fileio/xmldomelement.h>
 #include <eda4ulibrary/sym/symbol.h>
+#include <eda4ulibrary/fpt/footprint.h>
+#include <eda4ulibrary/pkg/package.h>
+#include <eda4ulibrary/cmp/component.h>
 #include <eda4ulibrary/gencmp/genericcomponent.h>
+#include <eda4ucommon/boardlayer.h>
 #include "polygonsimplifier.h"
 
 using namespace library;
@@ -117,6 +121,9 @@ void MainWindow::convertFile(ConvertFileType_t type, QSettings& outputSettings, 
             case ConvertFileType_t::Symbols_to_Symbols:
                 node = node->getFirstChild("symbols", true);
                 break;
+            case ConvertFileType_t::Packages_to_FootprintsAndComponents:
+                node = node->getFirstChild("packages", true);
+                break;
             case ConvertFileType_t::Devices_to_GenericComponents:
                 node = node->getFirstChild("devicesets", true);
                 break;
@@ -133,6 +140,8 @@ void MainWindow::convertFile(ConvertFileType_t type, QSettings& outputSettings, 
             bool success;
             if (child->getName() == "symbol")
                 success = convertSymbol(outputSettings, filepath, child);
+            else if (child->getName() == "package")
+                success = convertPackage(outputSettings, filepath, child);
             else if (child->getName() == "deviceset")
                 success = convertDevice(outputSettings, filepath, child);
             else
@@ -156,8 +165,8 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
 {
     try
     {
-        QUuid uuid = getOrCreateUuid(outputSettings, filepath, "symbols", node->getAttribute("name", true));
         QString name = node->getAttribute("name", true);
+        QUuid uuid = getOrCreateUuid(outputSettings, filepath, "symbols", name);
         bool rotate180 = false;
         if (filepath.getFilename() == "con-lsta.lbr" && name.startsWith("FE")) rotate180 = true;
         if (filepath.getFilename() == "con-lstb.lbr" && name.startsWith("MA")) rotate180 = true;
@@ -284,7 +293,7 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
             }
             else if (child->getName() == "pin")
             {
-                QUuid pinUuid = getOrCreateUuid(outputSettings, filepath, "pins", uuid.toString(), child->getAttribute("name"));
+                QUuid pinUuid = getOrCreateUuid(outputSettings, filepath, "symbol_pins", uuid.toString(), child->getAttribute("name"));
                 SymbolPin* pin = new SymbolPin(pinUuid, child->getAttribute("name"));
                 Point pos = Point(child->getAttribute<Length>("x"), child->getAttribute<Length>("y"));
                 Length len(7620000);
@@ -338,12 +347,240 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
     return true;
 }
 
+bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filepath, XmlDomElement* node)
+{
+    try
+    {
+        QString name = node->getAttribute("name", true);
+        QUuid uuid = getOrCreateUuid(outputSettings, filepath, "packages_to_footprints", name);
+        QString desc = node->getFirstChild("description", false) ? node->getFirstChild("description", true)->getText() : "";
+        bool rotate180 = false;
+        //if (filepath.getFilename() == "con-lsta.lbr" && name.startsWith("FE")) rotate180 = true;
+        //if (filepath.getFilename() == "con-lstb.lbr" && name.startsWith("MA")) rotate180 = true;
+
+        // create footprint
+        Footprint* footprint = new Footprint(uuid, Version("0.1"), "EDA4U", name, desc);
+
+        for (XmlDomElement* child = node->getFirstChild(); child; child = child->getNextSibling())
+        {
+            if (child->getName() == "description")
+            {
+                // nothing to do
+            }
+            else if (child->getName() == "wire")
+            {
+                FootprintPolygon* polygon = new FootprintPolygon();
+                switch (child->getAttribute<uint>("layer"))
+                {
+                    case 21: polygon->setLayerId(BoardLayer::LayerID::TopOverlay); break;
+                    //case 39: polygon->setLayerId(BoardLayer::LayerID::TopKeepout); break;
+                    case 51: polygon->setLayerId(BoardLayer::LayerID::TopDeviceOutlines); break;
+                    default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
+                }
+                polygon->setIsFilled(false);
+                polygon->setWidth(child->getAttribute<Length>("width"));
+                polygon->setIsGrabArea(true);
+                Point startpos = Point(child->getAttribute<Length>("x1"), child->getAttribute<Length>("y1"));
+                Point endpos = Point(child->getAttribute<Length>("x2"), child->getAttribute<Length>("y2"));
+                Angle angle = child->hasAttribute("curve") ? Angle::fromDeg(child->getAttribute<Length>("curve").toMm()) : Angle(0);
+                if (rotate180)
+                {
+                    startpos = Point(-startpos.getX(), -startpos.getY());
+                    endpos = Point(-endpos.getX(), -endpos.getY());
+                }
+                polygon->setStartPos(startpos);
+                polygon->appendSegment(new FootprintPolygonSegment(endpos, -angle));
+                footprint->addPolygon(polygon);
+            }
+            else if (child->getName() == "rectangle")
+            {
+                FootprintPolygon* polygon = new FootprintPolygon();
+                switch (child->getAttribute<uint>("layer"))
+                {
+                    case 21: polygon->setLayerId(BoardLayer::LayerID::TopOverlay); break;
+                    case 51: polygon->setLayerId(BoardLayer::LayerID::TopDeviceOutlines); break;
+                    default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
+                }
+                polygon->setIsFilled(true);
+                if (child->hasAttribute("width"))
+                    polygon->setWidth(child->getAttribute<Length>("width"));
+                polygon->setIsGrabArea(true);
+                polygon->setStartPos(Point(child->getAttribute<Length>("x1"), child->getAttribute<Length>("y1")));
+                polygon->appendSegment(new FootprintPolygonSegment(Point(child->getAttribute<Length>("x2"), child->getAttribute<Length>("y1"))));
+                polygon->appendSegment(new FootprintPolygonSegment(Point(child->getAttribute<Length>("x2"), child->getAttribute<Length>("y2"))));
+                polygon->appendSegment(new FootprintPolygonSegment(Point(child->getAttribute<Length>("x1"), child->getAttribute<Length>("y2"))));
+                polygon->appendSegment(new FootprintPolygonSegment(Point(child->getAttribute<Length>("x1"), child->getAttribute<Length>("y1"))));
+                footprint->addPolygon(polygon);
+            }
+            else if (child->getName() == "polygon")
+            {
+                FootprintPolygon* polygon = new FootprintPolygon();
+                switch (child->getAttribute<uint>("layer"))
+                {
+                    case 21: polygon->setLayerId(BoardLayer::LayerID::TopOverlay); break;
+                    case 51: polygon->setLayerId(BoardLayer::LayerID::TopDeviceOutlines); break;
+                    default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
+                }
+                polygon->setIsFilled(false);
+                if (child->hasAttribute("width"))
+                    polygon->setWidth(child->getAttribute<Length>("width"));
+                polygon->setIsGrabArea(true);
+                for (XmlDomElement* vertex = child->getFirstChild(); vertex; vertex = vertex->getNextSibling())
+                {
+                    Point p(vertex->getAttribute<Length>("x"), vertex->getAttribute<Length>("y"));
+                    if (vertex == child->getFirstChild())
+                        polygon->setStartPos(p);
+                    else
+                        polygon->appendSegment(new FootprintPolygonSegment(p));
+                }
+                polygon->appendSegment(new FootprintPolygonSegment(polygon->getStartPos()));
+                footprint->addPolygon(polygon);
+            }
+            else if (child->getName() == "circle")
+            {
+                Length radius(child->getAttribute<Length>("radius"));
+                Point center(child->getAttribute<Length>("x"), child->getAttribute<Length>("y"));
+                FootprintEllipse* ellipse = new FootprintEllipse();
+                switch (child->getAttribute<uint>("layer"))
+                {
+                    case 21: ellipse->setLayerId(BoardLayer::LayerID::TopOverlay); break;
+                    case 27: ellipse->setLayerId(BoardLayer::LayerID::TopOverlayValues); break;
+                    case 51: ellipse->setLayerId(BoardLayer::LayerID::TopDeviceOutlines); break;
+                    case 52: ellipse->setLayerId(BoardLayer::LayerID::BottomDeviceOutlines); break;
+                    default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
+                }
+                ellipse->setLineWidth(child->getAttribute<Length>("width"));
+                ellipse->setIsFilled(ellipse->getLineWidth() == 0);
+                ellipse->setIsGrabArea(true);
+                ellipse->setCenter(center);
+                ellipse->setRadiusX(radius);
+                ellipse->setRadiusY(radius);
+                footprint->addEllipse(ellipse);
+            }
+            else if (child->getName() == "text")
+            {
+                FootprintText* text = new FootprintText();
+                switch (child->getAttribute<uint>("layer"))
+                {
+                    case 21: text->setLayerId(BoardLayer::LayerID::TopOverlay); break;
+                    case 25: text->setLayerId(BoardLayer::LayerID::TopOverlayNames); break;
+                    case 27: text->setLayerId(BoardLayer::LayerID::TopOverlayValues); break;
+                    case 51: text->setLayerId(BoardLayer::LayerID::TopDeviceOutlines); break;
+                    default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
+                }
+                QString textStr = child->getText(true);
+                if (textStr == ">NAME")
+                {
+                    textStr = "${CMP::NAME}";
+                    text->setHeight(Length::fromMm(3.175));
+                }
+                else if (textStr == ">VALUE")
+                {
+                    textStr = "${CMP::VALUE}";
+                    text->setHeight(Length::fromMm(2.5));
+                }
+                else
+                    text->setHeight(child->getAttribute<Length>("size")*2);
+                text->setText(textStr);
+                text->setPosition(Point(child->getAttribute<Length>("x"),
+                                        child->getAttribute<Length>("y")));
+                text->setAngle(Angle(0));
+                text->setAlign(Alignment(HAlign::left(), VAlign::bottom()));
+                footprint->addText(text);
+            }
+            else if (child->getName() == "pad")
+            {
+                QUuid padUuid = getOrCreateUuid(outputSettings, filepath, "footprint_pads", uuid.toString(), child->getAttribute("name"));
+                FootprintPad* pad = new FootprintPad(padUuid, child->getAttribute("name"));
+                Length drill = child->getAttribute<Length>("drill");
+                pad->setDrillDiameter(drill);
+                QString shape = child->hasAttribute("shape") ? child->getAttribute("shape") : "round";
+                if (shape == "octagon")
+                {
+                    pad->setType(FootprintPad::Type_t::ThtOctagon);
+                    pad->setWidth(drill * 2);
+                    pad->setHeight(drill * 2);
+                }
+                else if (shape == "round")
+                {
+                    pad->setType(FootprintPad::Type_t::ThtRound);
+                    pad->setWidth(drill * 2);
+                    pad->setHeight(drill * 2);
+                }
+                else if (shape == "long")
+                {
+                    pad->setType(FootprintPad::Type_t::ThtRound);
+                    pad->setWidth(drill * 4);
+                    pad->setHeight(drill * 2);
+                }
+                else
+                {
+                    throw Exception(__FILE__, __LINE__, "Invalid shape: " % shape);
+                }
+                Point pos = Point(child->getAttribute<Length>("x"), child->getAttribute<Length>("y"));
+                if (rotate180) pos = Point(-pos.getX(), -pos.getY());
+                pad->setPosition(pos);
+                footprint->addPad(pad);
+            }
+            else if (child->getName() == "smd")
+            {
+                QUuid padUuid = getOrCreateUuid(outputSettings, filepath, "pads", uuid.toString(), child->getAttribute("name"));
+                FootprintPad* pad = new FootprintPad(padUuid, child->getAttribute("name"));
+                Point pos = Point(child->getAttribute<Length>("x"), child->getAttribute<Length>("y"));
+                if (rotate180) pos = Point(-pos.getX(), -pos.getY());
+                pad->setPosition(pos);
+                pad->setWidth(child->getAttribute<Length>("dx"));
+                pad->setHeight(child->getAttribute<Length>("dy"));
+                switch (child->getAttribute<uint>("layer"))
+                {
+                    case 1: pad->setLayerId(BoardLayer::LayerID::TopCopper); break;
+                    case 16: pad->setLayerId(BoardLayer::LayerID::BottomCopper); break;
+                    default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
+                }
+
+                footprint->addPad(pad);
+            }
+            else
+            {
+                addError(QString("Unknown node name: %1/%2").arg(node->getName()).arg(child->getName()), filepath);
+                return false;
+            }
+        }
+
+        // convert line rects to polygon rects
+        PolygonSimplifier<Footprint, FootprintPolygon, FootprintPolygonSegment> polygonSimplifier(*footprint);
+        polygonSimplifier.convertLineRectsToPolygonRects(false, true);
+
+        // save footprint to file
+        footprint->saveToFile(FilePath(QString("%1/fpt/%2/v%3.xml").arg(ui->output->text())
+                                      .arg(uuid.toString()).arg(APP_VERSION_MAJOR)));
+
+        // create package
+        QUuid pkgUuid = getOrCreateUuid(outputSettings, filepath, "packages_to_packages", name);
+        Package* package = new Package(pkgUuid, Version("0.1"), "EDA4U", name, desc);
+        package->setFootprintUuid(footprint->getUuid());
+        package->saveToFile(FilePath(QString("%1/pkg/%2/v%3.xml").arg(ui->output->text())
+                                     .arg(pkgUuid.toString()).arg(APP_VERSION_MAJOR)));
+
+        // clean up
+        delete package;
+        delete footprint;
+    }
+    catch (Exception& e)
+    {
+        addError(e.getUserMsg() % " [" % e.getDebugMsg() % "]");
+        return false;
+    }
+
+    return true;
+}
+
 bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepath, XmlDomElement* node)
 {
     try
     {
-        QUuid uuid = getOrCreateUuid(outputSettings, filepath, "devices", node->getAttribute("name", true));
         QString name = node->getAttribute("name", true);
+        QUuid uuid = getOrCreateUuid(outputSettings, filepath, "devices_to_genericcomponents", name);
         QString desc = node->getFirstChild("description", false) ? node->getFirstChild("description", true)->getText() : "";
 
         // create generic component
@@ -366,7 +603,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
         {
             QString gateName = connect->getAttribute("gate");
             QString pinName = connect->getAttribute("pin");
-            QUuid signalUuid = getOrCreateUuid(outputSettings, filepath, "signals", uuid.toString(), gateName % pinName);
+            QUuid signalUuid = getOrCreateUuid(outputSettings, filepath, "gatepins_to_gencompsignals", uuid.toString(), gateName % pinName);
 
             // create signal
             GenCompSignal* signal = new GenCompSignal(signalUuid, pinName);
@@ -381,7 +618,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
             QUuid symbolUuid = getOrCreateUuid(outputSettings, filepath, "symbols", symbolName);
 
             // create symbol variant item
-            QUuid symbVarItemUuid = getOrCreateUuid(outputSettings, filepath, "symbvaritem", uuid.toString(), gateName);
+            QUuid symbVarItemUuid = getOrCreateUuid(outputSettings, filepath, "symbolgates_to_symbvaritems", uuid.toString(), gateName);
             GenCompSymbVarItem* item = new GenCompSymbVarItem(symbVarItemUuid, symbolUuid, true, (gateName == "G$1") ? "" : gateName);
 
             // connect pins
@@ -391,8 +628,8 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
                 if (connect->getAttribute("gate") == gateName)
                 {
                     QString pinName = connect->getAttribute("pin");
-                    QUuid pinUuid = getOrCreateUuid(outputSettings, filepath, "pins", symbolUuid.toString(), pinName);
-                    QUuid signalUuid = getOrCreateUuid(outputSettings, filepath, "signals", uuid.toString(), gateName % pinName);
+                    QUuid pinUuid = getOrCreateUuid(outputSettings, filepath, "symbol_pins", symbolUuid.toString(), pinName);
+                    QUuid signalUuid = getOrCreateUuid(outputSettings, filepath, "gatepins_to_gencompsignals", uuid.toString(), gateName % pinName);
                     item->addPinSignalMapping(pinUuid, signalUuid, GenCompSymbVarItem::PinDisplayType_t::GenCompSignal);
                 }
             }
@@ -405,6 +642,37 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
         gencomp->saveToFile(FilePath(QString("%1/gencmp/%2/v%3.xml").arg(ui->output->text())
                                      .arg(uuid.toString()).arg(APP_VERSION_MAJOR)));
         delete gencomp;
+
+
+        // create components
+        for (XmlDomElement* device = node->getFirstChild("devices/*", true, true); device; device = device->getNextSibling())
+        {
+            QString deviceName = device->getAttribute("name");
+            QString packageName = device->getAttribute("package");
+            QUuid pkgUuid = getOrCreateUuid(outputSettings, filepath, "packages_to_packages", packageName);
+
+            QUuid compUuid = getOrCreateUuid(outputSettings, filepath, "devices_to_components", name, deviceName);
+            Component* component = new Component(compUuid, Version("0.1"), "EDA4U", name, desc);
+            component->setGenCompUuid(gencomp->getUuid());
+            component->setPackageUuid(pkgUuid);
+
+            // connect pads
+            for (XmlDomElement* connect = device->getFirstChild("connects/*", true, false);
+                 connect; connect = connect->getNextSibling())
+            {
+                QString gateName = connect->getAttribute("gate");
+                QString pinName = connect->getAttribute("pin");
+                QString padName = connect->getAttribute("pad");
+                QUuid padUuid = getOrCreateUuid(outputSettings, filepath, "pads", pkgUuid.toString(), padName);
+                QUuid signalUuid = getOrCreateUuid(outputSettings, filepath, "gatepins_to_gencompsignals", uuid.toString(), gateName % pinName);
+                component->addPadSignalMapping(padUuid, signalUuid);
+            }
+
+            // save component
+            component->saveToFile(FilePath(QString("%1/cmp/%2/v%3.xml").arg(ui->output->text())
+                                           .arg(compUuid.toString()).arg(APP_VERSION_MAJOR)));
+            delete component;
+        }
     }
     catch (Exception& e)
     {
@@ -445,4 +713,9 @@ void MainWindow::on_btnConvertSymbols_clicked()
 void MainWindow::on_btnConvertDevices_clicked()
 {
     convertAllFiles(ConvertFileType_t::Devices_to_GenericComponents);
+}
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    convertAllFiles(ConvertFileType_t::Packages_to_FootprintsAndComponents);
 }

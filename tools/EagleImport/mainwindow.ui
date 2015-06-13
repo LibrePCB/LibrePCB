@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>805</width>
-    <height>627</height>
+    <width>916</width>
+    <height>710</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -156,9 +156,16 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="pushButton_2">
+        <property name="text">
+         <string>Packages --&gt; Footprints + Packages</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="btnConvertDevices">
         <property name="text">
-         <string>Devices --&gt; Generic Components</string>
+         <string>Devices --&gt; Generic Components + Components</string>
         </property>
        </widget>
       </item>
