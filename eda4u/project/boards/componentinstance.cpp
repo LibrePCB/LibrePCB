@@ -160,6 +160,7 @@ XmlDomElement* ComponentInstance::serializeToXmlDomElement() const throw (Except
     QScopedPointer<XmlDomElement> root(new XmlDomElement("component_instance"));
     root->setAttribute("generic_component_instance", mGenCompInstance->getUuid());
     root->setAttribute("component", mComponent->getUuid());
+    root->appendChild(mFootprint->serializeToXmlDomElement());
     return root.take();
 }
 

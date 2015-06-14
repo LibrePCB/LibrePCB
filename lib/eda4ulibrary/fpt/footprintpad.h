@@ -74,7 +74,6 @@ class FootprintPad final : public IF_XmlSerializableObject
         QString getDescription(const QStringList& localeOrder) const noexcept;
         const QMap<QString, QString>& getNames() const noexcept {return mNames;}
         const QMap<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
-        QRectF toPxQRectF() const noexcept;
 
         // Setters
         void setType(Type_t type) noexcept {mType = type;}

@@ -43,7 +43,7 @@ namespace project {
 BGI_Footprint::BGI_Footprint(BI_Footprint& footprint) noexcept :
     BGI_Base(), mFootprint(footprint), mLibFootprint(footprint.getLibFootprint())
 {
-    setZValue(Board::ZValue_FootprintsBottom);
+    setZValue(Board::ZValue_FootprintsTop);
 
     mFont.setStyleStrategy(QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
     mFont.setStyleHint(QFont::SansSerif);

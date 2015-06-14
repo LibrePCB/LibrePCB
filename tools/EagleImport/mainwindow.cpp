@@ -95,6 +95,14 @@ QUuid MainWindow::getOrCreateUuid(QSettings& outputSettings, const FilePath& fil
     return uuid;
 }
 
+QString MainWindow::createDescription(const FilePath& filepath, const QString& name)
+{
+    return QString("\n\nThis element was automatically imported from Eagle\n"
+                   "Filepath: %1\nName: %2\n"
+                   "NOTE: Remove this text after manual rework!")
+            .arg(filepath.getFilename(), name);
+}
+
 void MainWindow::convertAllFiles(ConvertFileType_t type)
 {
     reset();
@@ -181,13 +189,14 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
     try
     {
         QString name = node->getAttribute("name", true);
+        QString desc = createDescription(filepath, name);
         QUuid uuid = getOrCreateUuid(outputSettings, filepath, "symbols", name);
         bool rotate180 = false;
         if (filepath.getFilename() == "con-lsta.lbr" && name.startsWith("FE")) rotate180 = true;
         if (filepath.getFilename() == "con-lstb.lbr" && name.startsWith("MA")) rotate180 = true;
 
         // create symbol
-        Symbol* symbol = new Symbol(uuid, Version("0.1"), "EDA4U", name);
+        Symbol* symbol = new Symbol(uuid, Version("0.1"), "EDA4U", name, desc);
 
         for (XmlDomElement* child = node->getFirstChild(); child; child = child->getNextSibling())
         {
@@ -369,6 +378,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
         QString name = node->getAttribute("name", true);
         QUuid uuid = getOrCreateUuid(outputSettings, filepath, "packages_to_footprints", name);
         QString desc = node->getFirstChild("description", false) ? node->getFirstChild("description", true)->getText() : "";
+        desc.append(createDescription(filepath, name));
         bool rotate180 = false;
         //if (filepath.getFilename() == "con-lsta.lbr" && name.startsWith("FE")) rotate180 = true;
         //if (filepath.getFilename() == "con-lstb.lbr" && name.startsWith("MA")) rotate180 = true;
@@ -521,6 +531,8 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 FootprintPad* pad = new FootprintPad(padUuid, child->getAttribute("name"));
                 Length drill = child->getAttribute<Length>("drill");
                 pad->setDrillDiameter(drill);
+                int angleDeg = 0;
+                if (child->hasAttribute("rot")) angleDeg = -child->getAttribute("rot").remove("R").toInt();
                 QString shape = child->hasAttribute("shape") ? child->getAttribute("shape") : "round";
                 if (shape == "octagon")
                 {
@@ -539,14 +551,20 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                     pad->setType(FootprintPad::Type_t::ThtRound);
                     pad->setWidth(drill * 4);
                     pad->setHeight(drill * 2);
+                    angleDeg += 90;
                 }
                 else
                 {
                     throw Exception(__FILE__, __LINE__, "Invalid shape: " % shape);
                 }
                 Point pos = Point(child->getAttribute<Length>("x"), child->getAttribute<Length>("y"));
-                if (rotate180) pos = Point(-pos.getX(), -pos.getY());
+                if (rotate180)
+                {
+                    pos = Point(-pos.getX(), -pos.getY());
+                    angleDeg += 180;
+                }
                 pad->setPosition(pos);
+                pad->setRotation(Angle::fromDeg(angleDeg) + Angle::deg90());
                 footprint->addPad(pad);
             }
             else if (child->getName() == "smd")
@@ -554,8 +572,15 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 QUuid padUuid = getOrCreateUuid(outputSettings, filepath, "footprint_pads", uuid.toString(), child->getAttribute("name"));
                 FootprintPad* pad = new FootprintPad(padUuid, child->getAttribute("name"));
                 Point pos = Point(child->getAttribute<Length>("x"), child->getAttribute<Length>("y"));
-                if (rotate180) pos = Point(-pos.getX(), -pos.getY());
+                int angleDeg = 0;
+                if (child->hasAttribute("rot")) angleDeg = -child->getAttribute("rot").remove("R").toInt();
+                if (rotate180)
+                {
+                    pos = Point(-pos.getX(), -pos.getY());
+                    angleDeg += 180;
+                }
                 pad->setPosition(pos);
+                pad->setRotation(Angle::fromDeg(angleDeg) + Angle::deg90());
                 pad->setWidth(child->getAttribute<Length>("dx"));
                 pad->setHeight(child->getAttribute<Length>("dy"));
                 switch (child->getAttribute<uint>("layer"))
@@ -616,6 +641,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
         QString name = node->getAttribute("name", true);
         QUuid uuid = getOrCreateUuid(outputSettings, filepath, "devices_to_genericcomponents", name);
         QString desc = node->getFirstChild("description", false) ? node->getFirstChild("description", true)->getText() : "";
+        desc.append(createDescription(filepath, name));
 
         // create generic component
         GenericComponent* gencomp = new GenericComponent(uuid, Version("0.1"), "EDA4U", name, desc);
@@ -625,7 +651,8 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
         gencomp->addPrefix("", node->hasAttribute("prefix") ? node->getAttribute("prefix") : "", true);
 
         // symbol variant
-        GenCompSymbVar* symbvar = new GenCompSymbVar(QUuid::createUuid(), QString(), true);
+        QUuid symbVarUuid = getOrCreateUuid(outputSettings, filepath, "gencomp_symbolvariants", uuid.toString());
+        GenCompSymbVar* symbvar = new GenCompSymbVar(symbVarUuid, QString(), true);
         symbvar->setName("en_US", "default");
         symbvar->setDescription("en_US", "");
         gencomp->addSymbolVariant(*symbvar);
@@ -718,7 +745,6 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
 
 void MainWindow::on_inputBtn_clicked()
 {
-    ui->input->clear();
     ui->input->addItems(QFileDialog::getOpenFileNames(this, "Select Eagle Library Files",
                                                     mlastInputDirectory, "*.lbr"));
     ui->pbarFiles->setMaximum(ui->input->count());
@@ -751,4 +777,37 @@ void MainWindow::on_btnConvertDevices_clicked()
 void MainWindow::on_pushButton_2_clicked()
 {
     convertAllFiles(ConvertFileType_t::Packages_to_FootprintsAndComponents);
+}
+
+void MainWindow::on_btnPathsFromIni_clicked()
+{
+    FilePath inputDir(QFileDialog::getExistingDirectory(this, "Select Input Folder", mlastInputDirectory));
+    if (!inputDir.isExistingDir()) return;
+
+    QSettings outputSettings(UUID_LIST_FILEPATH, QSettings::IniFormat);
+
+    foreach (QString key, outputSettings.allKeys())
+    {
+        key.remove(0, key.indexOf("/")+1);
+        key.remove(key.indexOf(".lbr")+4, key.length() - key.indexOf(".lbr") - 4);
+        QString filepath = inputDir.getPathTo(key).toNative();
+
+        bool exists = false;
+        for (int i = 0; i < ui->input->count(); i++)
+        {
+            FilePath fp(ui->input->item(i)->text());
+            if (fp.toNative() == filepath) exists = true;
+        }
+        if (!exists) ui->input->addItem(filepath);
+    }
+}
+
+void MainWindow::on_toolButton_clicked()
+{
+    ui->input->clear();
+}
+
+void MainWindow::on_toolButton_2_clicked()
+{
+    qDeleteAll(ui->input->selectedItems());
 }

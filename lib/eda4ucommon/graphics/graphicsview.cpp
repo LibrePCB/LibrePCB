@@ -257,7 +257,7 @@ void GraphicsView::drawForeground(QPainter* painter, const QRectF& rect)
     if (mOriginCrossVisible)
     {
         // draw origin cross
-        QPen originPen(Qt::black);
+        QPen originPen(foregroundBrush().color());
         originPen.setWidth(0);
         painter->setPen(originPen);
         painter->drawLine(-21.6, 0, 21.6, 0);

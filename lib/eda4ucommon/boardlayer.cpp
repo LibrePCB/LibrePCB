@@ -52,10 +52,88 @@ BoardLayer::BoardLayer(uint id) :
             mColorHighlighted = Qt::yellow;
             break;
 
+        case FootprintGrabAreas:
+            mName = tr("Footprint Grab Areas");
+            mColor = QColor(255, 255, 0, 30);
+            mColorHighlighted = QColor(255, 255, 0, 50);
+            break;
+
         case BoardOutline:
             mName = tr("Board Outline");
             mColor = Qt::lightGray;
             mColorHighlighted = Qt::white;
+            break;
+
+        case Drills:
+            mName = tr("Drills");
+            mColor = Qt::lightGray;
+            mColorHighlighted = Qt::white;
+            break;
+
+        case Vias:
+            mName = tr("Vias");
+            mColor = Qt::darkGreen;
+            mColorHighlighted = Qt::green;
+            break;
+
+        case TopDeviceOutlines:
+            mName = tr("TopDeviceOutlines");
+            mColor = Qt::gray;
+            mColorHighlighted = Qt::lightGray;
+            break;
+
+        case TopOverlayNames:
+            mName = tr("TopOverlayNames");
+            mColor = Qt::gray;
+            mColorHighlighted = Qt::lightGray;
+            break;
+
+        case TopOverlayValues:
+            mName = tr("TopOverlayValues");
+            mColor = Qt::gray;
+            mColorHighlighted = Qt::lightGray;
+            break;
+
+        case TopOverlay:
+            mName = tr("TopOverlay");
+            mColor = Qt::gray;
+            mColorHighlighted = Qt::lightGray;
+            break;
+
+        case TopCopper:
+            mName = tr("TopCopper");
+            mColor = Qt::darkRed;
+            mColorHighlighted = Qt::red;
+            break;
+
+        case BottomDeviceOutlines:
+            mName = tr("BottomDeviceOutlines");
+            mColor = Qt::gray;
+            mColorHighlighted = Qt::lightGray;
+            break;
+
+        case BottomOverlayNames:
+            mName = tr("BottomOverlayNames");
+            mColor = Qt::gray;
+            mColorHighlighted = Qt::lightGray;
+            break;
+
+        case BottomOverlayValues:
+            mName = tr("BottomOverlayValues");
+            mColor = Qt::gray;
+            mColorHighlighted = Qt::lightGray;
+            break;
+
+        case BottomOverlay:
+            mName = tr("BottomOverlay");
+            mColor = Qt::gray;
+            mColorHighlighted = Qt::lightGray;
+            break;
+
+        case BottomCopper:
+            mName = tr("BottomCopper");
+            mColor = Qt::darkBlue;
+            mColorHighlighted = Qt::blue;
             break;
 
         default:

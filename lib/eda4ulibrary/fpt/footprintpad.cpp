@@ -81,15 +81,6 @@ QString FootprintPad::getDescription(const QStringList& localeOrder) const noexc
     return LibraryBaseElement::localeStringFromList(mDescriptions, localeOrder);
 }
 
-QRectF FootprintPad::toPxQRectF() const noexcept
-{
-    QRectF rect;
-    rect.setWidth(mWidth.toPx());
-    rect.setHeight(mHeight.toPx());
-    rect.translate(mPosition.toPxQPointF());
-    return rect;
-}
-
 /*****************************************************************************************
  *  Setters
  ****************************************************************************************/

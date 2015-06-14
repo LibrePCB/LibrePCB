@@ -73,7 +73,7 @@ BoardEditor::BoardEditor(Project& project, bool readOnly) :
     mGraphicsView = new GraphicsView(nullptr, this);
     mGraphicsView->setGridProperties(*mGridProperties);
     mGraphicsView->setBackgroundBrush(Qt::black);
-    mGraphicsView->setForegroundBrush(Qt::lightGray);
+    mGraphicsView->setForegroundBrush(Qt::white);
     //setCentralWidget(mGraphicsView);
     mUi->centralwidget->layout()->addWidget(mGraphicsView);
 

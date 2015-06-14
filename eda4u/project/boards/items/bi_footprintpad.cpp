@@ -102,7 +102,7 @@ const QUuid& BI_FootprintPad::getLibPadUuid() const noexcept
 void BI_FootprintPad::updatePosition() noexcept
 {
     mPosition = mFootprint.mapToScene(mFootprintPad->getPosition());
-    mRotation = mFootprint.getRotation();// + mFootprintPad->getRotation();
+    mRotation = mFootprint.getRotation() + mFootprintPad->getRotation();
     mGraphicsItem->setPos(mPosition.toPxQPointF());
     mGraphicsItem->setRotation(mRotation.toDeg());
     mGraphicsItem->updateCacheAndRepaint();
