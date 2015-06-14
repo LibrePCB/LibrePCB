@@ -46,6 +46,13 @@ class Footprint final : public LibraryElement
 
     public:
 
+        // Types
+        struct FootprintHole_t {
+            Point pos;
+            Length diameter;
+        };
+
+
         // Constructors / Destructor
         explicit Footprint(const QUuid& uuid = QUuid::createUuid(),
                            const Version& version = Version(),
@@ -69,7 +76,7 @@ class Footprint final : public LibraryElement
         void removePolygon(const FootprintPolygon* polygon) noexcept {mPolygons.removeAll(polygon); delete polygon;}
         void addText(const FootprintText* text) noexcept {mTexts.append(text);}
         void addEllipse(const FootprintEllipse* ellipse) noexcept {mEllipses.append(ellipse);}
-
+        void addHole(const FootprintHole_t* hole) noexcept {mHoles.append(hole);}
 
     private:
 
@@ -90,6 +97,7 @@ class Footprint final : public LibraryElement
         QList<const FootprintPolygon*> mPolygons;
         QList<const FootprintText*> mTexts;
         QList<const FootprintEllipse*> mEllipses;
+        QList<const FootprintHole_t*> mHoles;
 };
 
 } // namespace library

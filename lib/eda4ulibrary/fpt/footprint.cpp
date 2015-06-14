@@ -47,6 +47,7 @@ Footprint::Footprint(const FilePath& xmlFilePath) throw (Exception) :
     }
     catch (Exception& e)
     {
+        qDeleteAll(mHoles);         mHoles.clear();
         qDeleteAll(mEllipses);      mEllipses.clear();
         qDeleteAll(mTexts);         mTexts.clear();
         qDeleteAll(mPolygons);      mPolygons.clear();
@@ -57,6 +58,7 @@ Footprint::Footprint(const FilePath& xmlFilePath) throw (Exception) :
 
 Footprint::~Footprint() noexcept
 {
+    qDeleteAll(mHoles);         mHoles.clear();
     qDeleteAll(mEllipses);      mEllipses.clear();
     qDeleteAll(mTexts);         mTexts.clear();
     qDeleteAll(mPolygons);      mPolygons.clear();
@@ -101,6 +103,14 @@ void Footprint::parseDomTree(const XmlDomElement& root) throw (Exception)
         {
             mEllipses.append(new FootprintEllipse(*node));
         }
+        else if (node->getName() == "hole")
+        {
+            FootprintHole_t* hole = new FootprintHole_t();
+            hole->pos.setX(node->getAttribute<Length>("x", true));
+            hole->pos.setY(node->getAttribute<Length>("y", true));
+            hole->diameter = node->getAttribute<Length>("diameter", true);
+            mHoles.append(hole);
+        }
         else
         {
             throw RuntimeError(__FILE__, __LINE__, node->getName(),
@@ -120,6 +130,13 @@ XmlDomElement* Footprint::serializeToXmlDomElement() const throw (Exception)
         geometry->appendChild(text->serializeToXmlDomElement());
     foreach (const FootprintEllipse* ellipse, mEllipses)
         geometry->appendChild(ellipse->serializeToXmlDomElement());
+    foreach (const FootprintHole_t* hole, mHoles)
+    {
+        XmlDomElement* child = geometry->appendChild("hole");
+        child->setAttribute("x", hole->pos.getX());
+        child->setAttribute("y", hole->pos.getY());
+        child->setAttribute("diameter", hole->diameter);
+    }
     XmlDomElement* pads = root->appendChild("pads");
     foreach (const FootprintPad* pad, mPads)
         pads->appendChild(pad->serializeToXmlDomElement());
