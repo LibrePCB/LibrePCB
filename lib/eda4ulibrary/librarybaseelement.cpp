@@ -123,7 +123,9 @@ void LibraryBaseElement::parseDomTree(const XmlDomElement& root) throw (Exceptio
 
 XmlDomElement* LibraryBaseElement::serializeToXmlDomElement() const throw (Exception)
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+    bool valid = checkAttributesValidity();
+    Q_ASSERT(valid == true);
+    if (!valid) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement(mXmlRootNodeName));
     XmlDomElement* meta = root->appendChild("meta");

@@ -60,6 +60,7 @@ class BoardLayer final : public QObject
             Vias                    = 30,
 
             // Top Layers
+            TopKeepout              = 100,
             TopDeviceOutlines       = 110,
             TopTestPoint            = 120,
             TopGlue                 = 130,
@@ -180,6 +181,7 @@ class BoardLayer final : public QObject
             BottomGlue              = 360,
             BottomTestPoint         = 370,
             BottomDeviceOutlines    = 380,
+            BootomKeepout           = 390,
 
             // TODO: keepout, restrict, ...
 

@@ -69,8 +69,23 @@ void MainWindow::addError(const QString& msg, const FilePath& inputFile, int inp
 QUuid MainWindow::getOrCreateUuid(QSettings& outputSettings, const FilePath& filepath,
                                   const QString& cat, const QString& key1, const QString& key2)
 {
-    QString settingsKey = cat % '/' % filepath.getFilename() % '_' % key1 % '_' % key2;
-    QUuid uuid = outputSettings.value(settingsKey, QUuid::createUuid().toString()).toUuid();
+    QString allowedChars("_-.0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
+
+    QString settingsKey = filepath.getFilename() % '_' % key1 % '_' % key2;
+    settingsKey.replace("{", "");
+    settingsKey.replace("}", "");
+    settingsKey.replace(" ", "_");
+    for (int i=0; i<settingsKey.length(); i++)
+    {
+        if (!allowedChars.contains(settingsKey[i]))
+            settingsKey.replace(i, 1, QString("__U%1__").arg(QString::number(settingsKey[i].unicode(), 16).toUpper()));
+    }
+    settingsKey.prepend(cat % '/');
+
+    QUuid uuid = QUuid::createUuid();
+    QString value = outputSettings.value(settingsKey).toString();
+    if (!value.isEmpty()) uuid = QUuid(value); //QUuid(QString("{%1}").arg(value));
+
     if (uuid.isNull())
     {
         addError("Invalid UUID in *.ini file: " % settingsKey, filepath);
@@ -373,7 +388,9 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 switch (child->getAttribute<uint>("layer"))
                 {
                     case 21: polygon->setLayerId(BoardLayer::LayerID::TopOverlay); break;
-                    //case 39: polygon->setLayerId(BoardLayer::LayerID::TopKeepout); break;
+                    case 25: polygon->setLayerId(BoardLayer::LayerID::TopOverlayNames); break;
+                    case 39: polygon->setLayerId(BoardLayer::LayerID::TopKeepout); break;
+                    case 46: polygon->setLayerId(BoardLayer::LayerID::BoardOutline); break; // milling
                     case 51: polygon->setLayerId(BoardLayer::LayerID::TopDeviceOutlines); break;
                     default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
                 }
@@ -394,10 +411,15 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
             }
             else if (child->getName() == "rectangle")
             {
+                bool valid = true;
                 FootprintPolygon* polygon = new FootprintPolygon();
                 switch (child->getAttribute<uint>("layer"))
                 {
                     case 21: polygon->setLayerId(BoardLayer::LayerID::TopOverlay); break;
+                    case 29: polygon->setLayerId(BoardLayer::LayerID::TopStopMask); break;
+                    case 31: polygon->setLayerId(BoardLayer::LayerID::TopPaste); break;
+                    case 35: polygon->setLayerId(BoardLayer::LayerID::TopGlue); break;
+                    case 43: valid = false; break; // vRestrict
                     case 51: polygon->setLayerId(BoardLayer::LayerID::TopDeviceOutlines); break;
                     default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
                 }
@@ -410,7 +432,10 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 polygon->appendSegment(new FootprintPolygonSegment(Point(child->getAttribute<Length>("x2"), child->getAttribute<Length>("y2"))));
                 polygon->appendSegment(new FootprintPolygonSegment(Point(child->getAttribute<Length>("x1"), child->getAttribute<Length>("y2"))));
                 polygon->appendSegment(new FootprintPolygonSegment(Point(child->getAttribute<Length>("x1"), child->getAttribute<Length>("y1"))));
-                footprint->addPolygon(polygon);
+                if (valid)
+                    footprint->addPolygon(polygon);
+                else
+                    delete polygon;
             }
             else if (child->getName() == "polygon")
             {
@@ -418,6 +443,8 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 switch (child->getAttribute<uint>("layer"))
                 {
                     case 21: polygon->setLayerId(BoardLayer::LayerID::TopOverlay); break;
+                    case 29: polygon->setLayerId(BoardLayer::LayerID::TopStopMask); break;
+                    case 31: polygon->setLayerId(BoardLayer::LayerID::TopPaste); break;
                     case 51: polygon->setLayerId(BoardLayer::LayerID::TopDeviceOutlines); break;
                     default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
                 }
@@ -524,7 +551,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
             }
             else if (child->getName() == "smd")
             {
-                QUuid padUuid = getOrCreateUuid(outputSettings, filepath, "pads", uuid.toString(), child->getAttribute("name"));
+                QUuid padUuid = getOrCreateUuid(outputSettings, filepath, "footprint_pads", uuid.toString(), child->getAttribute("name"));
                 FootprintPad* pad = new FootprintPad(padUuid, child->getAttribute("name"));
                 Point pos = Point(child->getAttribute<Length>("x"), child->getAttribute<Length>("y"));
                 if (rotate180) pos = Point(-pos.getX(), -pos.getY());
@@ -539,6 +566,13 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 }
 
                 footprint->addPad(pad);
+            }
+            else if (child->getName() == "hole")
+            {
+                Footprint::FootprintHole_t* hole = new Footprint::FootprintHole_t();
+                hole->pos = Point(child->getAttribute<Length>("x"), child->getAttribute<Length>("y"));
+                hole->diameter = child->getAttribute<Length>("drill");
+                footprint->addHole(hole);
             }
             else
             {
@@ -637,19 +671,13 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
             symbvar->addItem(*item);
         }
 
-
-        // save generic component to file
-        gencomp->saveToFile(FilePath(QString("%1/gencmp/%2/v%3.xml").arg(ui->output->text())
-                                     .arg(uuid.toString()).arg(APP_VERSION_MAJOR)));
-        delete gencomp;
-
-
         // create components
         for (XmlDomElement* device = node->getFirstChild("devices/*", true, true); device; device = device->getNextSibling())
         {
             QString deviceName = device->getAttribute("name");
             QString packageName = device->getAttribute("package");
             QUuid pkgUuid = getOrCreateUuid(outputSettings, filepath, "packages_to_packages", packageName);
+            QUuid fptUuid = getOrCreateUuid(outputSettings, filepath, "packages_to_footprints", packageName);
 
             QUuid compUuid = getOrCreateUuid(outputSettings, filepath, "devices_to_components", name, deviceName);
             Component* component = new Component(compUuid, Version("0.1"), "EDA4U", name, desc);
@@ -663,7 +691,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
                 QString gateName = connect->getAttribute("gate");
                 QString pinName = connect->getAttribute("pin");
                 QString padName = connect->getAttribute("pad");
-                QUuid padUuid = getOrCreateUuid(outputSettings, filepath, "pads", pkgUuid.toString(), padName);
+                QUuid padUuid = getOrCreateUuid(outputSettings, filepath, "footprint_pads", fptUuid.toString(), padName);
                 QUuid signalUuid = getOrCreateUuid(outputSettings, filepath, "gatepins_to_gencompsignals", uuid.toString(), gateName % pinName);
                 component->addPadSignalMapping(padUuid, signalUuid);
             }
@@ -673,6 +701,11 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
                                            .arg(compUuid.toString()).arg(APP_VERSION_MAJOR)));
             delete component;
         }
+
+        // save generic component to file
+        gencomp->saveToFile(FilePath(QString("%1/gencmp/%2/v%3.xml").arg(ui->output->text())
+                                     .arg(uuid.toString()).arg(APP_VERSION_MAJOR)));
+        delete gencomp;
     }
     catch (Exception& e)
     {

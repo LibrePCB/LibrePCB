@@ -112,7 +112,7 @@ XmlDomElement* FootprintPad::serializeToXmlDomElement() const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("pin"));
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("pad"));
     root->setAttribute("uuid", mUuid);
     root->setAttribute("type", typeToString(mType));
     root->setAttribute("x", mPosition.getX().toMmString());

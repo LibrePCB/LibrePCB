@@ -73,7 +73,7 @@ XmlDomElement* Component::serializeToXmlDomElement() const throw (Exception)
     root->getFirstChild("meta", true)->appendTextChild("generic_component", mGenericComponentUuid);
     root->getFirstChild("meta", true)->appendTextChild("package", mPackageUuid);
     XmlDomElement* padSignalMap = root->appendChild("pad_signal_map");
-    foreach (const QUuid& padUuid, mPadSignalMap)
+    foreach (const QUuid& padUuid, mPadSignalMap.keys())
     {
         XmlDomElement* child = padSignalMap->appendChild("map");
         child->setAttribute("pad", padUuid);
