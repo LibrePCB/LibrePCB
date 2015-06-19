@@ -176,7 +176,12 @@ SOURCES += \
     project/boards/items/bi_footprintpad.cpp \
     project/boards/graphicsitems/bgi_footprintpad.cpp \
     project/boards/unplacedcomponentsdock.cpp \
-    project/boards/cmd/cmdcomponentinstanceadd.cpp
+    project/boards/cmd/cmdcomponentinstanceadd.cpp \
+    project/boards/fsm/bes_base.cpp \
+    project/boards/fsm/boardeditorevent.cpp \
+    project/boards/fsm/bes_fsm.cpp \
+    project/boards/fsm/bes_select.cpp \
+    project/boards/cmd/cmdcomponentinstanceedit.cpp
 
 HEADERS += \
     workspace/workspace.h \
@@ -284,7 +289,12 @@ HEADERS += \
     project/boards/items/bi_footprintpad.h \
     project/boards/graphicsitems/bgi_footprintpad.h \
     project/boards/unplacedcomponentsdock.h \
-    project/boards/cmd/cmdcomponentinstanceadd.h
+    project/boards/cmd/cmdcomponentinstanceadd.h \
+    project/boards/fsm/bes_base.h \
+    project/boards/fsm/boardeditorevent.h \
+    project/boards/fsm/bes_fsm.h \
+    project/boards/fsm/bes_select.h \
+    project/boards/cmd/cmdcomponentinstanceedit.h
 
 FORMS += \
     workspace/controlpanel/controlpanel.ui \

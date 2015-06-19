@@ -35,6 +35,8 @@
 #include "../erc/ercmsg.h"
 #include "../circuit/gencompinstance.h"
 #include "componentinstance.h"
+#include "items/bi_footprint.h"
+#include "items/bi_footprintpad.h"
 
 namespace project {
 
@@ -127,6 +129,93 @@ bool Board::isEmpty() const noexcept
 {
     return false;
 }
+
+QList<BI_Base*> Board::getSelectedItems(/*bool floatingPoints,
+                                        bool attachedPoints,
+                                        bool floatingPointsFromFloatingLines,
+                                        bool attachedPointsFromFloatingLines,
+                                        bool floatingPointsFromAttachedLines,
+                                        bool attachedPointsFromAttachedLines,
+                                        bool attachedPointsFromSymbols,
+                                        bool floatingLines,
+                                        bool attachedLines,
+                                        bool attachedLinesFromFootprints*/) const noexcept
+{
+    QList<BI_Base*> list;
+    foreach (ComponentInstance* component, mComponentInstances)
+    {
+        BI_Footprint& footprint = component->getFootprint();
+
+        // footprint
+        if (footprint.isSelected())
+            list.append(&footprint);
+
+        // pads
+        foreach (BI_FootprintPad* pad, footprint.getPads())
+        {
+            if (pad->isSelected())
+                list.append(pad);
+        }
+    }
+
+    return list;
+}
+
+QList<BI_Base*> Board::getItemsAtScenePos(const Point& pos) const noexcept
+{
+    QPointF scenePosPx = pos.toPxQPointF();
+    QList<BI_Base*> list;   // Note: The order of adding the items is very important (the
+                            // top most item must appear as the first item in the list)!
+    // footprints & pads
+    foreach (ComponentInstance* component, mComponentInstances)
+    {
+        BI_Footprint& footprint = component->getFootprint();
+        foreach (BI_FootprintPad* pad, footprint.getPads())
+        {
+            if (pad->getGrabAreaScenePx().contains(scenePosPx))
+                list.append(pad);
+        }
+        if (footprint.getGrabAreaScenePx().contains(scenePosPx))
+            list.append(&footprint);
+    }
+    return list;
+}
+
+/*QList<SI_NetPoint*> Board::getNetPointsAtScenePos(const Point& pos) const noexcept
+{
+    QList<SI_NetPoint*> list;
+    foreach (SI_NetPoint* netpoint, mNetPoints)
+    {
+        if (netpoint->getGrabAreaScenePx().contains(pos.toPxQPointF()))
+            list.append(netpoint);
+    }
+    return list;
+}
+
+QList<SI_NetLine*> Board::getNetLinesAtScenePos(const Point& pos) const noexcept
+{
+    QList<SI_NetLine*> list;
+    foreach (SI_NetLine* netline, mNetLines)
+    {
+        if (netline->getGrabAreaScenePx().contains(pos.toPxQPointF()))
+            list.append(netline);
+    }
+    return list;
+}
+
+QList<SI_SymbolPin*> Board::getPinsAtScenePos(const Point& pos) const noexcept
+{
+    QList<SI_SymbolPin*> list;
+    foreach (SI_Symbol* symbol, mSymbols)
+    {
+        foreach (SI_SymbolPin* pin, symbol->getPins())
+        {
+            if (pin->getGrabAreaScenePx().contains(pos.toPxQPointF()))
+                list.append(pin);
+        }
+    }
+    return list;
+}*/
 
 /*****************************************************************************************
  *  Setters: General
@@ -231,6 +320,32 @@ bool Board::save(bool toOriginal, QStringList& errors) noexcept
 void Board::showInView(GraphicsView& view) noexcept
 {
     view.setScene(mGraphicsScene);
+}
+
+void Board::setSelectionRect(const Point& p1, const Point& p2, bool updateItems) noexcept
+{
+    mGraphicsScene->setSelectionRect(p1, p2);
+    if (updateItems)
+    {
+        QRectF rectPx = QRectF(p1.toPxQPointF(), p2.toPxQPointF()).normalized();
+        foreach (ComponentInstance* component, mComponentInstances)
+        {
+            BI_Footprint& footprint = component->getFootprint();
+            bool selectFootprint = footprint.getGrabAreaScenePx().intersects(rectPx);
+            footprint.setSelected(selectFootprint);
+            foreach (BI_FootprintPad* pad, footprint.getPads())
+            {
+                bool selectPad = pad->getGrabAreaScenePx().intersects(rectPx);
+                pad->setSelected(selectFootprint || selectPad);
+            }
+        }
+    }
+}
+
+void Board::clearSelection() const noexcept
+{
+    foreach (ComponentInstance* component, mComponentInstances)
+        component->getFootprint().setSelected(false);
 }
 
 /*****************************************************************************************

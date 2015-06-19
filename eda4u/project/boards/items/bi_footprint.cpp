@@ -45,17 +45,13 @@ BI_Footprint::BI_Footprint(ComponentInstance& component, const XmlDomElement& do
     BI_Base(), mComponentInstance(component), mFootprint(nullptr),
     mGraphicsItem(nullptr)
 {
-    mPosition.setX(domElement.getFirstChild("position", true)->getAttribute<Length>("x"));
-    mPosition.setY(domElement.getFirstChild("position", true)->getAttribute<Length>("y"));
-    mRotation = domElement.getFirstChild("position", true)->getAttribute<Angle>("rotation");
-
+    Q_UNUSED(domElement);
     init();
 }
 
-BI_Footprint::BI_Footprint(ComponentInstance& component, const Point& pos,
-                           const Angle& rotation) throw (Exception) :
+BI_Footprint::BI_Footprint(ComponentInstance& component) throw (Exception) :
     BI_Base(), mComponentInstance(component), mFootprint(nullptr),
-    mGraphicsItem(nullptr), mPosition(pos), mRotation(rotation)
+    mGraphicsItem(nullptr)
 {
     init();
 }
@@ -72,8 +68,8 @@ void BI_Footprint::init() throw (Exception)
     }
 
     mGraphicsItem = new BGI_Footprint(*this);
-    mGraphicsItem->setPos(mPosition.toPxQPointF());
-    mGraphicsItem->setRotation(mRotation.toDeg());
+    mGraphicsItem->setPos(mComponentInstance.getPosition().toPxQPointF());
+    mGraphicsItem->setRotation(mComponentInstance.getRotation().toDeg());
 
     const library::Component& libComp = mComponentInstance.getLibComponent();
     foreach (const library::FootprintPad* libPad, mFootprint->getPads())
@@ -105,6 +101,10 @@ void BI_Footprint::init() throw (Exception)
     // connect to the "attributes changed" signal of component instance
     connect(&mComponentInstance, &ComponentInstance::attributesChanged,
             this, &BI_Footprint::componentInstanceAttributesChanged);
+    connect(&mComponentInstance, &ComponentInstance::moved,
+            this, &BI_Footprint::componentInstanceMoved);
+    connect(&mComponentInstance, &ComponentInstance::rotated,
+            this, &BI_Footprint::componentInstanceRotated);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -113,6 +113,15 @@ BI_Footprint::~BI_Footprint() noexcept
 {
     qDeleteAll(mPads);              mPads.clear();
     delete mGraphicsItem;           mGraphicsItem = 0;
+}
+
+/*****************************************************************************************
+ *  Getters
+ ****************************************************************************************/
+
+const Angle& BI_Footprint::getRotation() const noexcept
+{
+    return mComponentInstance.getRotation();
 }
 
 /*****************************************************************************************
@@ -141,10 +150,6 @@ XmlDomElement* BI_Footprint::serializeToXmlDomElement() const throw (Exception)
     //root->setAttribute("uuid", mUuid);
     //root->setAttribute("gen_comp_instance", mGenCompInstance->getUuid());
     //root->setAttribute("symbol_item", mSymbVarItem->getUuid());
-    XmlDomElement* position = root->appendChild("position");
-    position->setAttribute("x", mPosition.getX());
-    position->setAttribute("y", mPosition.getY());
-    position->setAttribute("rotation", mRotation);
     return root.take();
 }
 
@@ -154,7 +159,7 @@ XmlDomElement* BI_Footprint::serializeToXmlDomElement() const throw (Exception)
 
 Point BI_Footprint::mapToScene(const Point& relativePos) const noexcept
 {
-    return (mPosition + relativePos).rotated(mRotation, mPosition);
+    return (mComponentInstance.getPosition() + relativePos).rotated(mComponentInstance.getRotation(), mComponentInstance.getPosition());
 }
 
 bool BI_Footprint::getAttributeValue(const QString& attrNS, const QString& attrKey,
@@ -170,6 +175,11 @@ bool BI_Footprint::getAttributeValue(const QString& attrNS, const QString& attrK
 /*****************************************************************************************
  *  Inherited from SI_Base
  ****************************************************************************************/
+
+const Point& BI_Footprint::getPosition() const noexcept
+{
+    return mComponentInstance.getPosition();
+}
 
 QPainterPath BI_Footprint::getGrabAreaScenePx() const noexcept
 {
@@ -191,6 +201,20 @@ void BI_Footprint::setSelected(bool selected) noexcept
 void BI_Footprint::componentInstanceAttributesChanged()
 {
     mGraphicsItem->updateCacheAndRepaint();
+}
+
+void BI_Footprint::componentInstanceMoved(const Point& pos)
+{
+    mGraphicsItem->setPos(pos.toPxQPointF());
+    foreach (BI_FootprintPad* pad, mPads)
+        pad->updatePosition();
+}
+
+void BI_Footprint::componentInstanceRotated(const Angle& rot)
+{
+    mGraphicsItem->setRotation(rot.toDeg());
+    foreach (BI_FootprintPad* pad, mPads)
+        pad->updatePosition();
 }
 
 /*****************************************************************************************

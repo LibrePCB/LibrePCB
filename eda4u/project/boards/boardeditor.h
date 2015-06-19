@@ -40,6 +40,7 @@ class Project;
 class Board;
 class ErcMsgDock;
 class UnplacedComponentsDock;
+class BES_FSM;
 }
 
 namespace Ui {
@@ -131,6 +132,9 @@ class BoardEditor final : public QMainWindow, public IF_GraphicsViewEventHandler
         // Docks
         ErcMsgDock* mErcMsgDock;
         UnplacedComponentsDock* mUnplacedComponentsDock;
+
+        // Finite State Machine
+        BES_FSM* mFsm;
 };
 
 } // namespace project

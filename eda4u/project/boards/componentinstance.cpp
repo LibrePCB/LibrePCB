@@ -57,6 +57,11 @@ ComponentInstance::ComponentInstance(Board& board, const XmlDomElement& domEleme
     QUuid componentUuid = domElement.getAttribute<QUuid>("component");
     initComponentAndPackage(componentUuid);
 
+    // get position and rotation
+    mPosition.setX(domElement.getFirstChild("position", true)->getAttribute<Length>("x"));
+    mPosition.setY(domElement.getFirstChild("position", true)->getAttribute<Length>("y"));
+    mRotation = domElement.getFirstChild("position", true)->getAttribute<Angle>("rotation");
+
     // load footprint
     mFootprint = new BI_Footprint(*this, *domElement.getFirstChild("footprint", true));
 
@@ -67,12 +72,12 @@ ComponentInstance::ComponentInstance(Board& board, GenCompInstance& genCompInsta
                                      const QUuid& componentUuid, const Point& position,
                                      const Angle& rotation) throw (Exception) :
     QObject(nullptr), mBoard(board), mAddedToBoard(false), mGenCompInstance(&genCompInstance),
-    mComponent(nullptr), mFootprint(nullptr)
+    mComponent(nullptr), mFootprint(nullptr), mPosition(position), mRotation(rotation)
 {
     initComponentAndPackage(componentUuid);
 
     // create footprint
-    mFootprint = new BI_Footprint(*this, position, rotation);
+    mFootprint = new BI_Footprint(*this);
 
     init();
 }
@@ -135,6 +140,18 @@ ComponentInstance::~ComponentInstance() noexcept
  *  General Methods
  ****************************************************************************************/
 
+void ComponentInstance::setPosition(const Point& pos) noexcept
+{
+    mPosition = pos;
+    emit moved(mPosition);
+}
+
+void ComponentInstance::setRotation(const Angle& rot) noexcept
+{
+    mRotation = rot;
+    emit rotated(mRotation);
+}
+
 void ComponentInstance::addToBoard(GraphicsScene& scene) throw (Exception)
 {
     if (mAddedToBoard) throw LogicError(__FILE__, __LINE__);
@@ -161,6 +178,10 @@ XmlDomElement* ComponentInstance::serializeToXmlDomElement() const throw (Except
     root->setAttribute("generic_component_instance", mGenCompInstance->getUuid());
     root->setAttribute("component", mComponent->getUuid());
     root->appendChild(mFootprint->serializeToXmlDomElement());
+    XmlDomElement* position = root->appendChild("position");
+    position->setAttribute("x", mPosition.getX());
+    position->setAttribute("y", mPosition.getY());
+    position->setAttribute("rotation", mRotation);
     return root.take();
 }
 

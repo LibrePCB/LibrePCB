@@ -45,6 +45,7 @@ class SmartXmlFile;
 namespace project {
 class Project;
 class ComponentInstance;
+class BI_Base;
 }
 
 /*****************************************************************************************
@@ -91,6 +92,20 @@ class Board final : public QObject, public IF_AttributeProvider,
         const FilePath& getFilePath() const noexcept {return mFilePath;}
         const GridProperties& getGridProperties() const noexcept {return *mGridProperties;}
         bool isEmpty() const noexcept;
+        QList<BI_Base*> getSelectedItems(/*bool floatingPoints,
+                                         bool attachedPoints,
+                                         bool floatingPointsFromFloatingLines,
+                                         bool attachedPointsFromFloatingLines,
+                                         bool floatingPointsFromAttachedLines,
+                                         bool attachedPointsFromAttachedLines,
+                                         bool attachedPointsFromSymbols,
+                                         bool floatingLines,
+                                         bool attachedLines,
+                                         bool attachedLinesFromFootprints*/) const noexcept;
+        QList<BI_Base*> getItemsAtScenePos(const Point& pos) const noexcept;
+        //QList<SI_NetPoint*> getNetPointsAtScenePos(const Point& pos) const noexcept;
+        //QList<SI_NetLine*> getNetLinesAtScenePos(const Point& pos) const noexcept;
+        //QList<SI_SymbolPin*> getPinsAtScenePos(const Point& pos) const noexcept;
 
         // Setters: General
         void setGridProperties(const GridProperties& grid) noexcept;
@@ -114,6 +129,8 @@ class Board final : public QObject, public IF_AttributeProvider,
         void showInView(GraphicsView& view) noexcept;
         void saveViewSceneRect(const QRectF& rect) noexcept {mViewRect = rect;}
         const QRectF& restoreViewSceneRect() const noexcept {return mViewRect;}
+        void setSelectionRect(const Point& p1, const Point& p2, bool updateItems) noexcept;
+        void clearSelection() const noexcept;
 
         // Helper Methods
         bool getAttributeValue(const QString& attrNS, const QString& attrKey,

@@ -39,6 +39,7 @@
 #include "cmd/cmdboardadd.h"
 #include "../erc/ercmsgdock.h"
 #include "unplacedcomponentsdock.h"
+#include "fsm/bes_fsm.h"
 
 namespace project {
 
@@ -49,7 +50,8 @@ namespace project {
 BoardEditor::BoardEditor(Project& project, bool readOnly) :
     QMainWindow(0), mProject(project), mUi(new Ui::BoardEditor),
     mGraphicsView(nullptr), mGridProperties(nullptr), mActiveBoardIndex(-1),
-    mBoardListActionGroup(this), mErcMsgDock(nullptr), mUnplacedComponentsDock(nullptr)
+    mBoardListActionGroup(this), mErcMsgDock(nullptr), mUnplacedComponentsDock(nullptr),
+    mFsm(nullptr)
 {
     mUi->setupUi(this);
     mUi->actionProjectSave->setEnabled(!readOnly);
@@ -113,6 +115,57 @@ BoardEditor::BoardEditor(Project& project, bool readOnly) :
             mUi->actionRedo, SLOT(setEnabled(bool)));
     mUi->actionRedo->setEnabled(mProject.getUndoStack().canRedo());
 
+    // build the whole board editor finite state machine with all its substate objects
+    mFsm = new BES_FSM(*this, *mUi, *mGraphicsView);
+
+    // connect the "tools" toolbar with the state machine (the second line of the lambda
+    // functions is a workaround to set the checked attribute of the QActions properly)
+    connect(mUi->actionToolSelect, &QAction::triggered,
+            [this](){mFsm->processEvent(new BEE_Base(BEE_Base::StartSelect), true);
+                     mUi->actionToolSelect->setChecked(mUi->actionToolSelect->isCheckable());});
+    /*connect(mUi->actionToolMove, &QAction::triggered,
+            [this](){mFsm->processEvent(new BEE_Base(SEE_Base::StartMove), true);
+                     mUi->actionToolMove->setChecked(mUi->actionToolMove->isCheckable());});
+    connect(mUi->actionToolDrawText, &QAction::triggered,
+            [this](){mFsm->processEvent(new BEE_Base(SEE_Base::StartDrawText), true);
+                     mUi->actionToolDrawText->setChecked(mUi->actionToolDrawText->isCheckable());});
+    connect(mUi->actionToolDrawRectangle, &QAction::triggered,
+            [this](){mFsm->processEvent(new BEE_Base(SEE_Base::StartDrawRect), true);
+                     mUi->actionToolDrawRectangle->setChecked(mUi->actionToolDrawRectangle->isCheckable());});
+    connect(mUi->actionToolDrawPolygon, &QAction::triggered,
+            [this](){mFsm->processEvent(new BEE_Base(SEE_Base::StartDrawPolygon), true);
+                     mUi->actionToolDrawPolygon->setChecked(mUi->actionToolDrawPolygon->isCheckable());});
+    connect(mUi->actionToolDrawCircle, &QAction::triggered,
+            [this](){mFsm->processEvent(new BEE_Base(SEE_Base::StartDrawCircle), true);
+                     mUi->actionToolDrawCircle->setChecked(mUi->actionToolDrawCircle->isCheckable());});
+    connect(mUi->actionToolDrawEllipse, &QAction::triggered,
+            [this](){mFsm->processEvent(new BEE_Base(SEE_Base::StartDrawEllipse), true);
+                     mUi->actionToolDrawEllipse->setChecked(mUi->actionToolDrawEllipse->isCheckable());});
+    connect(mUi->actionToolDrawWire, &QAction::triggered,
+            [this](){mFsm->processEvent(new BEE_Base(SEE_Base::StartDrawWire), true);
+                     mUi->actionToolDrawWire->setChecked(mUi->actionToolDrawWire->isCheckable());});
+    connect(mUi->actionToolAddNetLabel, &QAction::triggered,
+            [this](){mFsm->processEvent(new BEE_Base(SEE_Base::StartAddNetLabel), true);
+                     mUi->actionToolAddNetLabel->setChecked(mUi->actionToolAddNetLabel->isCheckable());});*/
+
+    // connect the "command" toolbar with the state machine
+    connect(mUi->actionCommandAbort, &QAction::triggered,
+            [this](){mFsm->processEvent(new BEE_Base(BEE_Base::AbortCommand), true);});
+
+    // connect the "edit" toolbar with the state machine
+    connect(mUi->actionCopy, &QAction::triggered,
+            [this](){mFsm->processEvent(new BEE_Base(BEE_Base::Edit_Copy), true);});
+    connect(mUi->actionCut, &QAction::triggered,
+            [this](){mFsm->processEvent(new BEE_Base(BEE_Base::Edit_Cut), true);});
+    connect(mUi->actionPaste, &QAction::triggered,
+            [this](){mFsm->processEvent(new BEE_Base(BEE_Base::Edit_Paste), true);});
+    connect(mUi->actionRotate_CW, &QAction::triggered,
+            [this](){mFsm->processEvent(new BEE_Base(BEE_Base::Edit_RotateCW), true);});
+    connect(mUi->actionRotate_CCW, &QAction::triggered,
+            [this](){mFsm->processEvent(new BEE_Base(BEE_Base::Edit_RotateCCW), true);});
+    connect(mUi->actionRemove, &QAction::triggered,
+            [this](){mFsm->processEvent(new BEE_Base(BEE_Base::Edit_Remove), true);});
+
     // Restore Window Geometry
     QSettings clientSettings;
     restoreGeometry(clientSettings.value("board_editor/window_geometry").toByteArray());
@@ -133,8 +186,8 @@ BoardEditor::~BoardEditor()
     clientSettings.setValue("board_editor/window_geometry", saveGeometry());
     clientSettings.setValue("board_editor/window_state", saveState());
 
+    delete mFsm;                    mFsm = nullptr;
     qDeleteAll(mBoardListActions);  mBoardListActions.clear();
-
     delete mUnplacedComponentsDock; mUnplacedComponentsDock = nullptr;
     delete mErcMsgDock;             mErcMsgDock = nullptr;
     delete mGraphicsView;           mGraphicsView = nullptr;
@@ -198,6 +251,10 @@ bool BoardEditor::setActiveBoardIndex(int index) noexcept
 
 void BoardEditor::abortAllCommands() noexcept
 {
+    // ugly... ;-)
+    mFsm->processEvent(new BEE_Base(BEE_Base::AbortCommand), true);
+    mFsm->processEvent(new BEE_Base(BEE_Base::AbortCommand), true);
+    mFsm->processEvent(new BEE_Base(BEE_Base::AbortCommand), true);
 }
 
 /*****************************************************************************************
@@ -338,9 +395,8 @@ void BoardEditor::boardListActionGroupTriggered(QAction* action)
 
 bool BoardEditor::graphicsViewEventHandler(QEvent* event)
 {
-    // TODO
-    Q_UNUSED(event);
-    return false;
+    BEE_RedirectedQEvent* e = new BEE_RedirectedQEvent(BEE_Base::GraphicsViewEvent, event);
+    return mFsm->processEvent(e, true);
 }
 
 /*****************************************************************************************

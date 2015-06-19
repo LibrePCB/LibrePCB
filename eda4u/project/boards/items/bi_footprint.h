@@ -65,20 +65,15 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
 
         // Constructors / Destructor
         explicit BI_Footprint(ComponentInstance& component, const XmlDomElement& domElement) throw (Exception);
-        explicit BI_Footprint(ComponentInstance& component, const Point& pos = Point(),
-                              const Angle& rotation = Angle()) throw (Exception);
+        explicit BI_Footprint(ComponentInstance& component) throw (Exception);
         ~BI_Footprint() noexcept;
 
         // Getters
         ComponentInstance& getComponentInstance() const noexcept {return mComponentInstance;}
-        const Angle& getRotation() const noexcept {return mRotation;}
         BI_FootprintPad* getPad(const QUuid& padUuid) const noexcept {return mPads.value(padUuid);}
         const QHash<QUuid, BI_FootprintPad*>& getPads() const noexcept {return mPads;}
         const library::Footprint& getLibFootprint() const noexcept {return *mFootprint;}
-
-        // Setters
-        void setPosition(const Point& newPos) throw (Exception);
-        void setAngle(const Angle& newAngle) throw (Exception);
+        const Angle& getRotation() const noexcept;
 
         // General Methods
         void addToBoard(GraphicsScene& scene) throw (Exception);
@@ -92,7 +87,7 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
 
         // Inherited from BI_Base
         Type_t getType() const noexcept override {return BI_Base::Type_t::Footprint;}
-        const Point& getPosition() const noexcept override {return mPosition;}
+        const Point& getPosition() const noexcept override;
         QPainterPath getGrabAreaScenePx() const noexcept override;
         void setSelected(bool selected) noexcept override;
 
@@ -100,6 +95,8 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
     private slots:
 
         void componentInstanceAttributesChanged();
+        void componentInstanceMoved(const Point& pos);
+        void componentInstanceRotated(const Angle& rot);
 
 
     signals:
@@ -125,10 +122,6 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
         const library::Footprint* mFootprint;
         QHash<QUuid, BI_FootprintPad*> mPads; ///< key: footprint pad UUID
         BGI_Footprint* mGraphicsItem;
-
-        // Attributes
-        Point mPosition;
-        Angle mRotation;
 };
 
 } // namespace project

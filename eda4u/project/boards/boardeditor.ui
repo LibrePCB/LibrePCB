@@ -72,8 +72,8 @@
     <addaction name="actionUndo"/>
     <addaction name="actionRedo"/>
     <addaction name="separator"/>
-    <addaction name="actionRotateCounterclockwise"/>
-    <addaction name="actionRotateClockwise"/>
+    <addaction name="actionRotate_CCW"/>
+    <addaction name="actionRotate_CW"/>
     <addaction name="actionCopy"/>
     <addaction name="actionCut"/>
     <addaction name="actionPaste"/>
@@ -175,8 +175,8 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionRotateCounterclockwise"/>
-   <addaction name="actionRotateClockwise"/>
+   <addaction name="actionRotate_CCW"/>
+   <addaction name="actionRotate_CW"/>
    <addaction name="actionCut"/>
    <addaction name="actionCopy"/>
    <addaction name="actionPaste"/>
@@ -326,7 +326,7 @@
     <string>F1</string>
    </property>
   </action>
-  <action name="actionRotateCounterclockwise">
+  <action name="actionRotate_CCW">
    <property name="icon">
     <iconset resource="../../../img/images.qrc">
      <normaloff>:/img/actions/rotate_left.png</normaloff>:/img/actions/rotate_left.png</iconset>
@@ -338,7 +338,7 @@
     <string>Shift+R</string>
    </property>
   </action>
-  <action name="actionRotateClockwise">
+  <action name="actionRotate_CW">
    <property name="icon">
     <iconset resource="../../../img/images.qrc">
      <normaloff>:/img/actions/rotate_right.png</normaloff>:/img/actions/rotate_right.png</iconset>

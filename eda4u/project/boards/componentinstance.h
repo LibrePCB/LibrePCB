@@ -77,6 +77,13 @@ class ComponentInstance final : public QObject, public IF_AttributeProvider,
             GenCompInstance& getGenCompInstance() const noexcept {return *mGenCompInstance;}
             const library::Component& getLibComponent() const noexcept {return *mComponent;}
             const library::Package& getLibPackage() const noexcept {return *mPackage;}
+            BI_Footprint& getFootprint() const noexcept {return *mFootprint;}
+            const Angle& getRotation() const noexcept {return mRotation;}
+            const Point& getPosition() const noexcept {return mPosition;}
+
+            // Setters
+            void setPosition(const Point& pos) noexcept;
+            void setRotation(const Angle& rot) noexcept;
 
             // General Methods
             void addToBoard(GraphicsScene& scene) throw (Exception);
@@ -92,6 +99,9 @@ class ComponentInstance final : public QObject, public IF_AttributeProvider,
 
             /// @copydoc IF_AttributeProvider#attributesChanged()
             void attributesChanged();
+
+            void moved(const Point& newPos);
+            void rotated(const Angle& newRotation);
 
 
         private:
@@ -115,6 +125,10 @@ class ComponentInstance final : public QObject, public IF_AttributeProvider,
             const library::Component* mComponent;
             const library::Package* mPackage;
             BI_Footprint* mFootprint;
+
+            // Attributes
+            Point mPosition;
+            Angle mRotation;
 };
 
 } // namespace project
