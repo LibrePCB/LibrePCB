@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 TEMPLATE = lib
-TARGET = eda4ulibrary
+TARGET = librepcblibrary
 
 # Set the path for the generated binary
 GENERATED_DIR = ../../generated

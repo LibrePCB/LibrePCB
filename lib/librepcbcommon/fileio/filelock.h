@@ -1,7 +1,7 @@
 /*
- * EDA4U - Professional EDA for everyone!
+ * LibrePCB - Professional EDA for everyone!
  * Copyright (C) 2013 Urban Bruhin
- * http://eda4u.ubruhin.ch/
+ * http://librepcb.org/
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -130,7 +130,7 @@
  *
  * @note    You do not have to create a FileLock object for each file you want to protect.
  *          For example, to lock a whole project with all its (many!) files, one single
- *          lock file for the main project file (*.e4u) is enough. The class
+ *          lock file for the main project file (*.lpp) is enough. The class
  *          project::Project then will handle the file lock. If the project file is
  *          locked, the whole project will not be opened.
  *

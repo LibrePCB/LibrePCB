@@ -1,7 +1,7 @@
 /*
- * EDA4U - Professional EDA for everyone!
+ * LibrePCB - Professional EDA for everyone!
  * Copyright (C) 2013 Urban Bruhin
- * http://eda4u.ubruhin.ch/
+ * http://librepcb.org/
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,13 +42,13 @@ WSI_AppLocale::WSI_AppLocale(WorkspaceSettings& settings) :
 
         // Install language translations (like "de" for German)
         QTranslator* newTranslator = new QTranslator();
-        newTranslator->load("eda4u_" % selectedLocale.name().split("_").at(0), ":/i18n");
+        newTranslator->load("librepcb_" % selectedLocale.name().split("_").at(0), ":/i18n");
         qApp->installTranslator(newTranslator);
         mInstalledTranslators.append(newTranslator);
 
         // Install language/country translations (like "de_ch" for German/Switzerland)
         newTranslator = new QTranslator();
-        newTranslator->load("eda4u_" % selectedLocale.name(), ":/i18n");
+        newTranslator->load("librepcb_" % selectedLocale.name(), ":/i18n");
         qApp->installTranslator(newTranslator);
         mInstalledTranslators.append(newTranslator);
     }
@@ -59,7 +59,7 @@ WSI_AppLocale::WSI_AppLocale(WorkspaceSettings& settings) :
     QDir translations(":/i18n/");
     foreach (QString filename, translations.entryList(QDir::Files, QDir::Name))
     {
-        filename.remove("eda4u_");
+        filename.remove("librepcb_");
         QFileInfo fileInfo(filename);
         if (fileInfo.suffix() == "qm")
         {

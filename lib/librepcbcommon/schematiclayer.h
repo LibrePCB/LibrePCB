@@ -1,7 +1,7 @@
 /*
- * EDA4U - Professional EDA for everyone!
+ * LibrePCB - Professional EDA for everyone!
  * Copyright (C) 2013 Urban Bruhin
- * http://eda4u.ubruhin.ch/
+ * http://librepcb.org/
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -131,7 +131,7 @@ class SchematicLayer final : public QObject
             - Group Frames / Group Names
             - Custom Layers (user defined)
 
-    @todo Add more details. See https://github.com/ubruhin/EDA4U/issues/4
+    @todo Add more details. See https://github.com/ubruhin/LibrePCB/issues/4
 
 */
 

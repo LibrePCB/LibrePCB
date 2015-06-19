@@ -1,7 +1,7 @@
 /*
- * EDA4U - Professional EDA for everyone!
+ * LibrePCB - Professional EDA for everyone!
  * Copyright (C) 2013 Urban Bruhin
- * http://eda4u.ubruhin.ch/
+ * http://librepcb.org/
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,9 +24,9 @@
 #include <QtCore>
 #include <QtWidgets>
 #include <QTranslator>
-#include <eda4ucommon/application.h>
-#include <eda4ucommon/debug.h>
-#include <eda4ucommon/exceptions.h>
+#include <librepcbcommon/application.h>
+#include <librepcbcommon/debug.h>
+#include <librepcbcommon/exceptions.h>
 #include "workspace/workspace.h"
 
 /*****************************************************************************************
@@ -70,12 +70,12 @@ int main(int argc, char* argv[])
 
     // Set the organization / application names must be done very early because some other
     // classes will use these values (for example QSettings, Debug (for the file logging path))!
-    Application::setOrganizationName("EDA4U");
+    Application::setOrganizationName("LibrePCB");
     //QCoreApplication::setOrganizationDomain(""); ///< @todo
 #ifdef GIT_BRANCH
-    Application::setApplicationName(QString("EDA4U_git-%1").arg(GIT_BRANCH));
+    Application::setApplicationName(QString("LibrePCB_git-%1").arg(GIT_BRANCH));
 #else
-    Application::setApplicationName("EDA4U");
+    Application::setApplicationName("LibrePCB");
 #endif
     Application::setApplicationVersion(QString("%1.%2").arg(APP_VERSION_MAJOR).arg(APP_VERSION_MINOR));
 
@@ -90,17 +90,17 @@ int main(int argc, char* argv[])
 
     // Install system language translations (all system languages defined in the system settings, in the defined order)
     QTranslator systemTranslator;
-    systemTranslator.load(QLocale::system(), "eda4u", "_", ":/i18n/");
+    systemTranslator.load(QLocale::system(), "librepcb", "_", ":/i18n/");
     app.installTranslator(&systemTranslator);
 
     // Install language translations (like "de" for German)
     QTranslator appTranslator1;
-    appTranslator1.load("eda4u_" % QLocale::system().name().split("_").at(0), ":/i18n");
+    appTranslator1.load("librepcb_" % QLocale::system().name().split("_").at(0), ":/i18n");
     app.installTranslator(&appTranslator1);
 
     // Install language/country translations (like "de_ch" for German/Switzerland)
     QTranslator appTranslator2;
-    appTranslator2.load("eda4u_" % QLocale::system().name(), ":/i18n");
+    appTranslator2.load("librepcb_" % QLocale::system().name(), ":/i18n");
     app.installTranslator(&appTranslator2);
 
 

@@ -1,7 +1,7 @@
 /*
- * EDA4U - Professional EDA for everyone!
+ * LibrePCB - Professional EDA for everyone!
  * Copyright (C) 2013 Urban Bruhin
- * http://eda4u.ubruhin.ch/
+ * http://librepcb.org/
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,8 +32,8 @@
 #include "../../circuit/netsignal.h"
 #include "../../circuit/gencompsignalinstance.h"
 #include "../../erc/ercmsg.h"
-#include <eda4ucommon/fileio/xmldomelement.h>
-#include <eda4ucommon/graphics/graphicsscene.h>
+#include <librepcbcommon/fileio/xmldomelement.h>
+#include <librepcbcommon/graphics/graphicsscene.h>
 
 namespace project {
 

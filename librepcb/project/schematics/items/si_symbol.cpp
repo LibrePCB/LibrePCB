@@ -1,7 +1,7 @@
 /*
- * EDA4U - Professional EDA for everyone!
+ * LibrePCB - Professional EDA for everyone!
  * Copyright (C) 2013 Urban Bruhin
- * http://eda4u.ubruhin.ch/
+ * http://librepcb.org/
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,10 +29,10 @@
 #include "../../circuit/circuit.h"
 #include "../../library/projectlibrary.h"
 #include "../../circuit/gencompinstance.h"
-#include <eda4ulibrary/gencmp/genericcomponent.h>
-#include <eda4ulibrary/sym/symbol.h>
-#include <eda4ucommon/fileio/xmldomelement.h>
-#include <eda4ucommon/graphics/graphicsscene.h>
+#include <librepcblibrary/gencmp/genericcomponent.h>
+#include <librepcblibrary/sym/symbol.h>
+#include <librepcbcommon/fileio/xmldomelement.h>
+#include <librepcbcommon/graphics/graphicsscene.h>
 
 namespace project {
 

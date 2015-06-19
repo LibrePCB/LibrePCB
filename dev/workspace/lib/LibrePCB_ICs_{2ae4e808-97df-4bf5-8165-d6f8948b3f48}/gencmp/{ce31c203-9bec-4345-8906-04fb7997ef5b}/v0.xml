@@ -3,7 +3,7 @@
     <meta>
         <uuid>{ce31c203-9bec-4345-8906-04fb7997ef5b}</uuid>
         <version>0.1</version>
-        <author>EDA4U</author>
+        <author>LibrePCB</author>
         <created>2015-03-03T20:19:27Z</created>
         <last_modified>2015-03-03T20:19:27Z</last_modified>
         <name locale="en_US">Simple Voltage Regulator</name>

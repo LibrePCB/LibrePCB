@@ -4,9 +4,9 @@
 
     @tableofcontents
 
-    This is the documentation of an EDA4U library and all their specifications.
+    This is the documentation of an LibrePCB library and all their specifications.
     
-    Die Bauteilebibliothek ist ein extrem wichtiger Bestandteil von EDA4U.
+    Die Bauteilebibliothek ist ein extrem wichtiger Bestandteil von LibrePCB.
     Es wird sehr viel Wert auf eine gut strukturierte Bibliothek gelegt.
     Daher hier eine ausführliche Beschreibung zum Prinzip.
     
@@ -16,7 +16,7 @@
     @section doc_lib_general General Information
     
         - UUID: https://de.wikipedia.org/wiki/Universally_Unique_Identifier
-        - The whole library is stored in the "lib" directory in the EDA4U workspace.
+        - The whole library is stored in the "lib" directory in the LibrePCB workspace.
         - There is always a local repository in the directory "lib/local/".
         - In directories like "lib/{UUID}/" are the libraries which are downloaded and will be updated automatically over the internet.
         - Each library element (symbol, footprint, ...) ist stored in a separate directory. These directories can contain files and subdirectories.
@@ -57,7 +57,7 @@
         @warning Nur eine Idee...Der Einsatz von Repositories ist geplant, aber noch nicht festgelegt wie dies im Detail aussehen soll.
 
         Zum aktualisieren von Elementen (Symbole, Footprints, ...) werden Repositories verwendet. Es wird
-        offizielle Repositories von EDA4U geben, aber auch Drittanbieter können eigene Repositories 
+        offizielle Repositories von LibrePCB geben, aber auch Drittanbieter können eigene Repositories 
         erstellen. Wird der eigenen Bibliothek ein Repository hinzugefügt, so werden alle darin enthaltenen
         Elemente heruntergeladen und von diesem Zeitpunkt an automatisch mit Updates versorgt. Wenn der
         Anbieter neue Elemente in sein Repository lädt, werden diese beim nächsten Update automatisch
@@ -67,7 +67,7 @@
 
         Jedes Repository muss alle Elemente, die von den darin enthaltenen Elementen gebraucht werden, selbst
         enthalten. Es darf keine Verknüpfungen zu Elementen geben, die nicht im Repository enthalten sind.
-        Einzige Ausnahme stellen die offiziellen EDA4U Repositories für Basiselemente dar. Diese
+        Einzige Ausnahme stellen die offiziellen LibrePCB Repositories für Basiselemente dar. Diese
         dürfen vorausgesetzt werden, müssen aber auch dementsprechend deklariert sein, damit ein Deaktivieren
         eines Basis-Repositories verhindert wird wenn ein fremdes, aktives Repository dieses voraussetzt.
 
@@ -76,14 +76,14 @@
         Benutzer auch in den Genuss von aktuellen Elementen, auch wenn der Anbieter eines Repositories seine
         zur Verfügung gestellten Elemente nicht pflegt (aktualisiert).
 
-        Von EDA4U werden folgende Repositories offiziell zur Verfügung gestellt:
-            - EDA4U Base Symbols (nur Schaltplansymbole; R, C, L, LED, Zeichungsrahmen usw.)
-            - EDA4U Base Packages (Footprints und 3D-Modelle; R/C/L-Gehäuse, DIP, TQFP usw.)
-            - EDA4U Base Components (Nur Verknüpfungen zwischen Symbolen und Gehäusen; R, C, L, LED usw.)
-            - EDA4U Electronics (Mikrocontroller, Displays, Pegelwandler, Treiber, .......)
-                - Mit Abhängigkeiten zu allen dreien "EDA4U Base" Repositories
-            - EDA4U Automation (Für Stromlaufpläne [nur Symbole, keine Footprints]; SPS, Schütze, LS, FI usw.)
-                - Mit Abhängigkeit zu "EDA4U Base Symbols"
+        Von LibrePCB werden folgende Repositories offiziell zur Verfügung gestellt:
+            - LibrePCB Base Symbols (nur Schaltplansymbole; R, C, L, LED, Zeichungsrahmen usw.)
+            - LibrePCB Base Packages (Footprints und 3D-Modelle; R/C/L-Gehäuse, DIP, TQFP usw.)
+            - LibrePCB Base Components (Nur Verknüpfungen zwischen Symbolen und Gehäusen; R, C, L, LED usw.)
+            - LibrePCB Electronics (Mikrocontroller, Displays, Pegelwandler, Treiber, .......)
+                - Mit Abhängigkeiten zu allen dreien "LibrePCB Base" Repositories
+            - LibrePCB Automation (Für Stromlaufpläne [nur Symbole, keine Footprints]; SPS, Schütze, LS, FI usw.)
+                - Mit Abhängigkeit zu "LibrePCB Base Symbols"
 
         Editiert der Benutzer ein Element aus einem Repository, so wird automatisch eine Kopie des Elementes
         angelegt, das keinen Link mehr zum Repository hat. Das originale Element bleibt unangetastet.
@@ -134,7 +134,7 @@
     
         @warning Nur eine Idee...
 
-        Eventuell macht es Sinn, offizielle EDA4U Elemente mit einer digitalen Signatur zu versehen.
+        Eventuell macht es Sinn, offizielle LibrePCB Elemente mit einer digitalen Signatur zu versehen.
         Damit sind diese Elemente quasi als "vertrauenswürdig" gekennzeichnet und können gut von Elementen
         von Drittanbietern unterschieden werden. Signierte Elemente sollen dann im Bibliotheksbrowser auch
         besonders hervorgehoben werden.
@@ -142,7 +142,7 @@
         Dazu würde sich eine zusätzliche Spalte "signature" für jedes Element anbieten. Bei nicht signierten
         Elementen steht hier NULL drin. Bei signierten Elementen liegt die UUID mit angehängter Versionsnummer
         in verschlüsselter Form in diesem Feld. Die Verschlüsselung wird mit einem privaten Schlüssel (den nur
-        U.B. besitzt!) durchgeführt, und mit dem öffentlichen Schlüssel, der in EDA4U einkompiliert ist,
+        U.B. besitzt!) durchgeführt, und mit dem öffentlichen Schlüssel, der in LibrePCB einkompiliert ist,
         wieder entschlüsselt.
 
 

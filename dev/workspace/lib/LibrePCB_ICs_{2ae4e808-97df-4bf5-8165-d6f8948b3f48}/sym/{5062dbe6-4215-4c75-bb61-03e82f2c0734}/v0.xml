@@ -3,7 +3,7 @@
     <meta>
         <uuid>{5062dbe6-4215-4c75-bb61-03e82f2c0734}</uuid>
         <version>0.1</version>
-        <author>EDA4U</author>
+        <author>LibrePCB</author>
         <created>2015-03-03T20:19:25Z</created>
         <last_modified>2015-03-03T20:19:25Z</last_modified>
         <name locale="en_US">Voltage Regulator</name>

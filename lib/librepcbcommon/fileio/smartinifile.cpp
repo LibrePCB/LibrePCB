@@ -1,7 +1,7 @@
 /*
- * EDA4U - Professional EDA for everyone!
+ * LibrePCB - Professional EDA for everyone!
  * Copyright (C) 2013 Urban Bruhin
- * http://eda4u.ubruhin.ch/
+ * http://librepcb.org/
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ SmartIniFile::SmartIniFile(const FilePath& filepath, bool restore, bool readOnly
     QString tmpFilename = QCryptographicHash::hash(mOpenedFilePath.toStr().toLocal8Bit(),
                             QCryptographicHash::Sha256).toBase64(
                             QByteArray::Base64UrlEncoding | QByteArray::OmitTrailingEquals);
-    mTmpIniFilePath.setPath(QDir::temp().absoluteFilePath("EDA4U/" % tmpFilename));
+    mTmpIniFilePath.setPath(QDir::temp().absoluteFilePath("LibrePCB/" % tmpFilename));
     mTmpIniFilePath.getParentDir().mkPath();
 
     // Remove the temporary file if it exists already

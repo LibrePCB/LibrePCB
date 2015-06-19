@@ -1,7 +1,7 @@
 /*
- * EDA4U - Professional EDA for everyone!
+ * LibrePCB - Professional EDA for everyone!
  * Copyright (C) 2013 Urban Bruhin
- * http://eda4u.ubruhin.ch/
+ * http://librepcb.org/
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,20 +24,20 @@
 #include <QtCore>
 #include "si_symbolpin.h"
 #include "si_symbol.h"
-#include <eda4ulibrary/sym/symbol.h>
-#include <eda4ulibrary/sym/symbolpin.h>
+#include <librepcblibrary/sym/symbol.h>
+#include <librepcblibrary/sym/symbolpin.h>
 #include "../../circuit/gencompinstance.h"
-#include <eda4ulibrary/gencmp/genericcomponent.h>
+#include <librepcblibrary/gencmp/genericcomponent.h>
 #include "si_netpoint.h"
 #include "../../circuit/gencompsignalinstance.h"
 #include "../../erc/ercmsg.h"
 #include "../schematic.h"
 #include "../../project.h"
 #include "../../circuit/circuit.h"
-#include <eda4ulibrary/gencmp/gencompsymbvaritem.h>
+#include <librepcblibrary/gencmp/gencompsymbvaritem.h>
 #include "../../circuit/netsignal.h"
 #include "../../settings/projectsettings.h"
-#include <eda4ucommon/graphics/graphicsscene.h>
+#include <librepcbcommon/graphics/graphicsscene.h>
 
 namespace project {
 

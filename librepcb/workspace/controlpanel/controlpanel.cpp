@@ -1,7 +1,7 @@
 /*
- * EDA4U - Professional EDA for everyone!
+ * LibrePCB - Professional EDA for everyone!
  * Copyright (C) 2013 Urban Bruhin
- * http://eda4u.ubruhin.ch/
+ * http://librepcb.org/
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ ControlPanel::ControlPanel(QAbstractItemModel* projectTreeModel,
 {
     mUi->setupUi(this);
 
-    setWindowTitle(QString(tr("Control Panel - EDA4U %1 - %2"))
+    setWindowTitle(QString(tr("Control Panel - LibrePCB %1 - %2"))
         .arg(QCoreApplication::applicationVersion()).arg(Workspace::instance().getPath().toNative()));
     mUi->statusBar->addWidget(new QLabel(QString(tr("Workspace: %1"))
         .arg(Workspace::instance().getPath().toNative())));
@@ -163,7 +163,7 @@ void ControlPanel::loadSettings()
 void ControlPanel::on_actionAbout_triggered()
 {
     QMessageBox::about(this, tr("About"),
-                       tr("EDA4U is a free & OpenSource Schematic/Layout-Editor"));
+                       tr("LibrePCB is a free & OpenSource Schematic/Layout-Editor"));
 }
 
 void ControlPanel::on_actionNew_Project_triggered()
@@ -175,9 +175,9 @@ void ControlPanel::on_actionNew_Project_triggered()
         lastNewFile.setPath(Workspace::instance().getProjectsPath().toStr());
 
     FilePath filepath(QFileDialog::getSaveFileName(this, tr("New Project"), lastNewFile.toStr(),
-                                    tr("EDA4U project files (%1)").arg("*.e4u")));
-    if (filepath.getSuffix() != "e4u")
-        filepath.setPath(filepath.toStr() % ".e4u");
+                                    tr("LibrePCB project files (%1)").arg("*.lpp")));
+    if (filepath.getSuffix() != "lpp")
+        filepath.setPath(filepath.toStr() % ".lpp");
 
     if (!filepath.isValid())
         return;
@@ -195,7 +195,7 @@ void ControlPanel::on_actionOpen_Project_triggered()
                              Workspace::instance().getPath().toStr()).toString();
 
     FilePath filepath(QFileDialog::getOpenFileName(this, tr("Open Project"), lastOpenedFile,
-                                    tr("EDA4U project files (%1)").arg("*.e4u")));
+                                    tr("LibrePCB project files (%1)").arg("*.lpp")));
 
     if (!filepath.isValid())
         return;

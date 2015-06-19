@@ -3,7 +3,7 @@
     <meta>
         <uuid>{dce44427-4d53-4881-a77a-3e4faa383e3b}</uuid>
         <version>0.1</version>
-        <author>EDA4U</author>
+        <author>LibrePCB</author>
         <created>2015-03-08T15:14:17Z</created>
         <last_modified>2015-03-08T15:14:17Z</last_modified>
         <name locale="en_US">Solder Pad 1P</name>

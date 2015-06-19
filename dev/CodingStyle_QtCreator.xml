@@ -34,6 +34,6 @@
  </data>
  <data>
   <variable>DisplayName</variable>
-  <value type="QString">EDA4U_CodingStyle</value>
+  <value type="QString">LibrePCB_CodingStyle</value>
  </data>
 </qtcreator>

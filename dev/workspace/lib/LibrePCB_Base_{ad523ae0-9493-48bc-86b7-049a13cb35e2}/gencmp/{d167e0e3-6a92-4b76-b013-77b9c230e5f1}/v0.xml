@@ -3,7 +3,7 @@
     <meta>
         <uuid>{d167e0e3-6a92-4b76-b013-77b9c230e5f1}</uuid>
         <version>0.1</version>
-        <author>EDA4U</author>
+        <author>LibrePCB</author>
         <created>2015-03-01T20:00:00Z</created>
         <last_modified>2015-03-01T20:00:00Z</last_modified>
         <name locale="en_US">Bipolar Capacitor</name>

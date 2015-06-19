@@ -3,7 +3,7 @@
     <meta>
         <uuid>{b4019e5f-dead-4f11-9040-41fa27f7f4bd}</uuid>
         <version>0.1</version>
-        <author>EDA4U</author>
+        <author>LibrePCB</author>
         <created>2015-03-04T21:24:46Z</created>
         <last_modified>2015-03-04T21:24:46Z</last_modified>
         <name locale="en_US">Schottky Diode</name>

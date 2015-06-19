@@ -1,7 +1,7 @@
 /*
- * EDA4U - Professional EDA for everyone!
+ * LibrePCB - Professional EDA for everyone!
  * Copyright (C) 2013 Urban Bruhin
- * http://eda4u.ubruhin.ch/
+ * http://librepcb.org/
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,9 +24,9 @@
 #include <QtCore>
 #include <QFileDialog>
 #include "workspace.h"
-#include <eda4ucommon/exceptions.h>
-#include <eda4ucommon/fileio/filepath.h>
-#include <eda4ulibrary/library.h>
+#include <librepcbcommon/exceptions.h>
+#include <librepcbcommon/fileio/filepath.h>
+#include <librepcblibrary/library.h>
 #include "../library_editor/libraryeditor.h"
 #include "../project/project.h"
 #include "projecttreemodel.h"
@@ -34,7 +34,7 @@
 #include "favoriteprojectsmodel.h"
 #include "controlpanel/controlpanel.h"
 #include "settings/workspacesettings.h"
-#include <eda4ucommon/schematiclayer.h>
+#include <librepcbcommon/schematiclayer.h>
 
 using namespace library;
 using namespace project;
@@ -131,7 +131,7 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
     foreach (const QString& arg, qApp->arguments())
     {
         FilePath filepath(arg);
-        if ((filepath.isExistingFile()) && (filepath.getSuffix() == "e4u"))
+        if ((filepath.isExistingFile()) && (filepath.getSuffix() == "lpp"))
             openProject(filepath);
     }
 }

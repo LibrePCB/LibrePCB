@@ -3,7 +3,7 @@
     <meta>
         <uuid>{cc20c58e-93b5-49cd-b6e1-48c5e5e76ed3}</uuid>
         <version>0.1</version>
-        <author>EDA4U</author>
+        <author>LibrePCB</author>
         <created>2015-03-03T20:19:27Z</created>
         <last_modified>2015-03-03T20:19:27Z</last_modified>
         <name locale="en_US">Single Half-Bridge MOSFET Driver with "HIN" and "LIN" Input Pins</name>

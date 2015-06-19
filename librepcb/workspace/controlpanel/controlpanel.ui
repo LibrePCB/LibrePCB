@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>EDA4U ControlPanel</string>
+   <string>LibrePCB ControlPanel</string>
   </property>
   <property name="windowIcon">
    <iconset resource="../../../img/images.qrc">

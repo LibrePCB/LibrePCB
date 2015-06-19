@@ -3,7 +3,7 @@
     <meta>
         <uuid>{15a0eeed-4dc9-48ec-a431-7c1eec56c4c4}</uuid>
         <version>0.1</version>
-        <author>EDA4U</author>
+        <author>LibrePCB</author>
         <created>2015-03-01T20:23:15Z</created>
         <last_modified>2015-03-01T20:23:15Z</last_modified>
         <name locale="en_US">Unipolar Capacitor (IEC 60617)</name>

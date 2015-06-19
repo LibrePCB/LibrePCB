@@ -3,7 +3,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include <eda4ucommon/fileio/filepath.h>
+#include <librepcbcommon/fileio/filepath.h>
 
 namespace Ui {
 class MainWindow;

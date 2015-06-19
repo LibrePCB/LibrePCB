@@ -1,7 +1,7 @@
 /*
- * EDA4U - Professional EDA for everyone!
+ * LibrePCB - Professional EDA for everyone!
  * Copyright (C) 2013 Urban Bruhin
- * http://eda4u.ubruhin.ch/
+ * http://librepcb.org/
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "projecttreeitem.h"
-#include <eda4ucommon/exceptions.h>
+#include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -41,7 +41,7 @@ ProjectTreeItem::ProjectTreeItem(ProjectTreeItem* parent, const FilePath& filepa
         // it's a directory
         QDir dir(mFilePath.toStr());
 
-        QStringList projectFiles = dir.entryList(QStringList("*.e4u"), QDir::Files);
+        QStringList projectFiles = dir.entryList(QStringList("*.lpp"), QDir::Files);
         if (projectFiles.count() == 1)
         {
             // it's a project folder
@@ -66,7 +66,7 @@ ProjectTreeItem::ProjectTreeItem(ProjectTreeItem* parent, const FilePath& filepa
     else if (mFilePath.isExistingFile())
     {
         // it's a file
-        if (mFilePath.getSuffix() == "e4u")
+        if (mFilePath.getSuffix() == "lpp")
             mType = ProjectFile;
         else
             mType = File;

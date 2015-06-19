@@ -1,7 +1,7 @@
 /*
- * EDA4U - Professional EDA for everyone!
+ * LibrePCB - Professional EDA for everyone!
  * Copyright (C) 2013 Urban Bruhin
- * http://eda4u.ubruhin.ch/
+ * http://librepcb.org/
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,8 +26,8 @@
 #include <QPrinter>
 #include "symbolpreviewgraphicsitem.h"
 #include "symbol.h"
-#include <eda4ucommon/schematiclayer.h>
-#include <eda4ucommon/if_schematiclayerprovider.h>
+#include <librepcbcommon/schematiclayer.h>
+#include <librepcbcommon/if_schematiclayerprovider.h>
 #include "symbolpinpreviewgraphicsitem.h"
 #include "../gencmp/genericcomponent.h"
 

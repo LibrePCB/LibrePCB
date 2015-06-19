@@ -1,7 +1,7 @@
 /*
- * EDA4U - Professional EDA for everyone!
+ * LibrePCB - Professional EDA for everyone!
  * Copyright (C) 2013 Urban Bruhin
- * http://eda4u.ubruhin.ch/
+ * http://librepcb.org/
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,16 +23,16 @@
 
 #include <QtCore>
 #include <QPrinter>
-#include <eda4ucommon/exceptions.h>
-#include <eda4ucommon/fileio/filelock.h>
-#include <eda4ucommon/fileio/smarttextfile.h>
-#include <eda4ucommon/fileio/smartxmlfile.h>
-#include <eda4ucommon/fileio/smartinifile.h>
-#include <eda4ucommon/fileio/xmldomdocument.h>
-#include <eda4ucommon/fileio/xmldomelement.h>
-#include <eda4ucommon/systeminfo.h>
-#include <eda4ucommon/undostack.h>
-#include <eda4ucommon/schematiclayer.h>
+#include <librepcbcommon/exceptions.h>
+#include <librepcbcommon/fileio/filelock.h>
+#include <librepcbcommon/fileio/smarttextfile.h>
+#include <librepcbcommon/fileio/smartxmlfile.h>
+#include <librepcbcommon/fileio/smartinifile.h>
+#include <librepcbcommon/fileio/xmldomdocument.h>
+#include <librepcbcommon/fileio/xmldomelement.h>
+#include <librepcbcommon/systeminfo.h>
+#include <librepcbcommon/undostack.h>
+#include <librepcbcommon/schematiclayer.h>
 #include "project.h"
 #include "../workspace/workspace.h"
 #include "../workspace/settings/workspacesettings.h"
@@ -63,10 +63,10 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
     qDebug() << (create ? "create project..." : "open project...");
 
     // Check if the filepath is valid
-    if (mFilepath.getSuffix() != "e4u")
+    if (mFilepath.getSuffix() != "lpp")
     {
         throw RuntimeError(__FILE__, __LINE__, mFilepath.toStr(),
-            tr("The suffix of the project file must be \"e4u\"!"));
+            tr("The suffix of the project file must be \"lpp\"!"));
     }
     if (create)
     {
@@ -480,7 +480,7 @@ void Project::exportSchematicsAsPdf(const FilePath& filepath) throw (Exception)
     printer.setPaperSize(QPrinter::A4);
     printer.setOrientation(QPrinter::Landscape);
     printer.setOutputFormat(QPrinter::PdfFormat);
-    printer.setCreator(QString("EDA4U %1.%2").arg(APP_VERSION_MAJOR).arg(APP_VERSION_MINOR));
+    printer.setCreator(QString("LibrePCB %1.%2").arg(APP_VERSION_MAJOR).arg(APP_VERSION_MINOR));
     printer.setOutputFileName(filepath.toStr());
 
     QList<uint> pages;
@@ -814,7 +814,7 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
         return false;
     }
 
-    // Save *.e4u project file
+    // Save *.lpp project file
     try
     {
         setLastModified(QDateTime::currentDateTime());

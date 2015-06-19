@@ -3,7 +3,7 @@
     <meta>
         <uuid>{75372c18-3ba4-42e8-b3b2-2eb5039d441e}</uuid>
         <version>0.1</version>
-        <author>EDA4U</author>
+        <author>LibrePCB</author>
         <created>2015-03-01T20:00:00Z</created>
         <last_modified>2015-03-01T20:00:00Z</last_modified>
         <name locale="en_US">Resistor (IEC 60617)</name>

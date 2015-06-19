@@ -3,7 +3,7 @@
     <meta>
         <uuid>{9b75d0ce-ac4e-4a52-a88a-8777f66d3241}</uuid>
         <version>0.1</version>
-        <author>EDA4U</author>
+        <author>LibrePCB</author>
         <created>2015-03-04T21:24:46Z</created>
         <last_modified>2015-03-04T21:24:46Z</last_modified>
         <name locale="en_US">Standard Diode</name>

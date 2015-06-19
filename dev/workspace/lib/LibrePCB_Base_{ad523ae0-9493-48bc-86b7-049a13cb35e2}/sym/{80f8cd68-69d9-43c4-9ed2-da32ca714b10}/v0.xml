@@ -3,7 +3,7 @@
     <meta>
         <uuid>{80f8cd68-69d9-43c4-9ed2-da32ca714b10}</uuid>
         <version>0.1</version>
-        <author>EDA4U</author>
+        <author>LibrePCB</author>
         <created>2015-03-01T20:00:00Z</created>
         <last_modified>2015-03-01T20:00:00Z</last_modified>
         <name locale="en_US">GND</name>

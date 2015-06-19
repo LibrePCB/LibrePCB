@@ -1,7 +1,7 @@
 /*
- * EDA4U - Professional EDA for everyone!
+ * LibrePCB - Professional EDA for everyone!
  * Copyright (C) 2013 Urban Bruhin
- * http://eda4u.ubruhin.ch/
+ * http://librepcb.org/
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,8 +26,8 @@
 
 #include <QtCore>
 #include "si_base.h"
-#include <eda4ucommon/fileio/if_xmlserializableobject.h>
-#include <eda4ucommon/if_attributeprovider.h>
+#include <librepcbcommon/fileio/if_xmlserializableobject.h>
+#include <librepcbcommon/if_attributeprovider.h>
 #include "../graphicsitems/sgi_symbol.h"
 
 /*****************************************************************************************

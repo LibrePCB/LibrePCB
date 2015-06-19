@@ -4,7 +4,7 @@
         <uuid>{9e25a866-8877-4eca-be3e-2bc22f94a561}</uuid>
     </general>
     <attributes>
-        <attribute type="text" name="NAME">EDA4U Beispielprojekt</attribute>
+        <attribute type="text" name="NAME">LibrePCB Beispielprojekt</attribute>
         <attribute type="text" name="DESCRIPTION">Das ist eine Beschreibung des Projektes</attribute>
         <attribute type="text" name="AUTHOR">Irgend Jemand</attribute>
         <attribute type="text" name="VERSION">0.1</attribute>

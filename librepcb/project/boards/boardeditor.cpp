@@ -1,7 +1,7 @@
 /*
- * EDA4U - Professional EDA for everyone!
+ * LibrePCB - Professional EDA for everyone!
  * Copyright (C) 2013 Urban Bruhin
- * http://eda4u.ubruhin.ch/
+ * http://librepcb.org/
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,14 +28,14 @@
 #include "../project.h"
 #include "../../workspace/workspace.h"
 #include "../../workspace/settings/workspacesettings.h"
-#include <eda4ucommon/undostack.h>
+#include <librepcbcommon/undostack.h>
 #include "board.h"
 #include "../circuit/circuit.h"
-#include <eda4ucommon/dialogs/gridsettingsdialog.h>
+#include <librepcbcommon/dialogs/gridsettingsdialog.h>
 #include "../dialogs/projectpropertieseditordialog.h"
 #include "../settings/projectsettings.h"
-#include <eda4ucommon/graphics/graphicsview.h>
-#include <eda4ucommon/gridproperties.h>
+#include <librepcbcommon/graphics/graphicsview.h>
+#include <librepcbcommon/gridproperties.h>
 #include "cmd/cmdboardadd.h"
 #include "../erc/ercmsgdock.h"
 #include "unplacedcomponentsdock.h"
@@ -59,7 +59,7 @@ BoardEditor::BoardEditor(Project& project, bool readOnly) :
     // set window title
     QString filenameStr = mProject.getFilepath().getFilename();
     if (readOnly) filenameStr.append(QStringLiteral(" [Read-Only]"));
-    setWindowTitle(QString("%1 - Board Editor - EDA4U %2.%3")
+    setWindowTitle(QString("%1 - Board Editor - LibrePCB %2.%3")
                    .arg(filenameStr).arg(APP_VERSION_MAJOR).arg(APP_VERSION_MINOR));
 
     // Add Dock Widgets

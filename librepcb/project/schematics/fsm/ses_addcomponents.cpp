@@ -1,7 +1,7 @@
 /*
- * EDA4U - Professional EDA for everyone!
+ * LibrePCB - Professional EDA for everyone!
  * Copyright (C) 2013 Urban Bruhin
- * http://eda4u.ubruhin.ch/
+ * http://librepcb.org/
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,16 +27,16 @@
 #include "ui_schematiceditor.h"
 #include "../../project.h"
 #include "../../library/projectlibrary.h"
-#include <eda4ulibrary/gencmp/genericcomponent.h>
+#include <librepcblibrary/gencmp/genericcomponent.h>
 #include "../../circuit/cmd/cmdgencompinstadd.h"
-#include <eda4ucommon/undostack.h>
+#include <librepcbcommon/undostack.h>
 #include "../cmd/cmdsymbolinstanceadd.h"
 #include "../../circuit/gencompinstance.h"
 #include "../cmd/cmdsymbolinstanceedit.h"
 #include "../items/si_symbol.h"
 #include "../schematic.h"
 #include "../../dialogs/addgencompdialog.h"
-#include <eda4ucommon/gridproperties.h>
+#include <librepcbcommon/gridproperties.h>
 
 namespace project {
 

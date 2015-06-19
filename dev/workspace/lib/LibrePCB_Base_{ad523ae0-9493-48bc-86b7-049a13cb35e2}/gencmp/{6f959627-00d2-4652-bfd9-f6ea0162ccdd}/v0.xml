@@ -3,7 +3,7 @@
     <meta>
         <uuid>{6f959627-00d2-4652-bfd9-f6ea0162ccdd}</uuid>
         <version>0.1</version>
-        <author>EDA4U</author>
+        <author>LibrePCB</author>
         <created>2015-03-04T21:27:41Z</created>
         <last_modified>2015-03-04T21:27:41Z</last_modified>
         <name locale="en_US">Suppressor Diode</name>

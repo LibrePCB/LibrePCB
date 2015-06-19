@@ -3,7 +3,7 @@
     <meta>
         <uuid>{e995a552-12c4-413a-8258-1d6ec9a8471d}</uuid>
         <version>0.1</version>
-        <author>EDA4U</author>
+        <author>LibrePCB</author>
         <created>2015-03-03T20:19:27Z</created>
         <last_modified>2015-03-03T20:19:27Z</last_modified>
         <name locale="en_US">STM32F103C</name>

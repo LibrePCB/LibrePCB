@@ -3,7 +3,7 @@
     <meta>
         <uuid>{b2a17c32-dfca-471f-96c8-5de2333a3be3}</uuid>
         <version>0.1</version>
-        <author>EDA4U</author>
+        <author>LibrePCB</author>
         <created>2015-03-03T20:19:25Z</created>
         <last_modified>2015-03-03T20:19:25Z</last_modified>
         <name locale="en_US">N-Channel MOSFET</name>

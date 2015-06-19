@@ -3,7 +3,7 @@
     <meta>
         <uuid>{cb442e56-0ec7-4486-8c43-7bdfa9b47d9a}</uuid>
         <version>0.1</version>
-        <author>EDA4U</author>
+        <author>LibrePCB</author>
         <created>2015-03-08T16:21:12Z</created>
         <last_modified>2015-03-08T16:21:12Z</last_modified>
         <name locale="en_US">LED</name>

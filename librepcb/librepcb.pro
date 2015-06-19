@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 TEMPLATE = app
-TARGET = eda4u
+TARGET = librepcb
 
 # Set the path for the generated binary
 GENERATED_DIR = ../generated
@@ -23,48 +23,48 @@ exists(../.git):DEFINES += GIT_BRANCH=\\\"master\\\"
 
 win32 {
     # Windows-specific configurations
-    RC_ICONS = ../packaging/windows/img/eda4u.ico
+    RC_ICONS = ../packaging/windows/img/librepcb.ico
 }
 
 macx {
     # Mac-specific configurations
-    ICON = ../packaging/mac/img/eda4u.icns
+    ICON = ../packaging/mac/img/librepcb.icns
 }
 
 unix:!macx {
     # Linux/UNIX-specific configurations
     target.path = /usr/local/bin
     icon.path = /usr/share/pixmaps
-    icon.files = ../packaging/unix/img/eda4u.xpm
+    icon.files = ../packaging/unix/img/librepcb.xpm
     desktop.path = /usr/share/applications
-    desktop.files = ../packaging/unix/eda4u.desktop
+    desktop.files = ../packaging/unix/librepcb.desktop
     mimexml.path = /usr/share/mime/packages
-    mimexml.files = ../packaging/unix/mime/eda4u.xml
+    mimexml.files = ../packaging/unix/mime/librepcb.xml
     mimedesktop.path = /usr/share/mimelnk/application
-    mimedesktop.files = ../packaging/unix/mime/x-eda4u-project.desktop
+    mimedesktop.files = ../packaging/unix/mime/x-librepcb-project.desktop
     INSTALLS += target icon desktop mimexml mimedesktop
 }
 
 LIBS += \
     -L$${DESTDIR} \
-    -leda4ulibrary \    # Note: The order of the libraries is very important for the linker!
-    -leda4ucommon       # Another order could end up in "undefined reference" errors!
+    -llibrepcblibrary \    # Note: The order of the libraries is very important for the linker!
+    -llibrepcbcommon       # Another order could end up in "undefined reference" errors!
 
 INCLUDEPATH += \
     ../lib
 
 DEPENDPATH += \
-    ../lib/eda4ulibrary \
-    ../lib/eda4ucommon
+    ../lib/librepcblibrary \
+    ../lib/librepcbcommon
 
 PRE_TARGETDEPS += \
-    $${DESTDIR}/libeda4ulibrary.a \
-    $${DESTDIR}/libeda4ucommon.a
+    $${DESTDIR}/liblibrepcblibrary.a \
+    $${DESTDIR}/liblibrepcbcommon.a
 
 TRANSLATIONS = \
-    ../i18n/eda4u_de.ts \
-    ../i18n/eda4u_de_CH.ts \
-    ../i18n/eda4u_gsw_CH.ts
+    ../i18n/librepcb_de.ts \
+    ../i18n/librepcb_de_CH.ts \
+    ../i18n/librepcb_gsw_CH.ts
 
 RESOURCES += \
     ../img/images.qrc \

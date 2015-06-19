@@ -1,7 +1,7 @@
 /*
- * EDA4U - Professional EDA for everyone!
+ * LibrePCB - Professional EDA for everyone!
  * Copyright (C) 2013 Urban Bruhin
- * http://eda4u.ubruhin.ch/
+ * http://librepcb.org/
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,13 +24,13 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "board.h"
-#include <eda4ucommon/fileio/smartxmlfile.h>
-#include <eda4ucommon/fileio/xmldomdocument.h>
-#include <eda4ucommon/fileio/xmldomelement.h>
+#include <librepcbcommon/fileio/smartxmlfile.h>
+#include <librepcbcommon/fileio/xmldomdocument.h>
+#include <librepcbcommon/fileio/xmldomelement.h>
 #include "../project.h"
-#include <eda4ucommon/graphics/graphicsview.h>
-#include <eda4ucommon/graphics/graphicsscene.h>
-#include <eda4ucommon/gridproperties.h>
+#include <librepcbcommon/graphics/graphicsview.h>
+#include <librepcbcommon/graphics/graphicsscene.h>
+#include <librepcbcommon/gridproperties.h>
 #include "../circuit/circuit.h"
 #include "../erc/ercmsg.h"
 #include "../circuit/gencompinstance.h"

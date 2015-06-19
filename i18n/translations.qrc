@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/i18n">
-        <file>eda4u_de.qm</file>
-        <file>eda4u_de_CH.qm</file>
-        <file>eda4u_gsw_CH.qm</file>
+        <file>librepcb_de.qm</file>
+        <file>librepcb_de_CH.qm</file>
+        <file>librepcb_gsw_CH.qm</file>
     </qresource>
 </RCC>

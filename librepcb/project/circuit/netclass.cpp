@@ -1,7 +1,7 @@
 /*
- * EDA4U - Professional EDA for everyone!
+ * LibrePCB - Professional EDA for everyone!
  * Copyright (C) 2013 Urban Bruhin
- * http://eda4u.ubruhin.ch/
+ * http://librepcb.org/
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,11 +23,11 @@
 
 #include <QtCore>
 #include "netclass.h"
-#include <eda4ucommon/exceptions.h>
+#include <librepcbcommon/exceptions.h>
 #include "netsignal.h"
 #include "circuit.h"
 #include "../erc/ercmsg.h"
-#include <eda4ucommon/fileio/xmldomelement.h>
+#include <librepcbcommon/fileio/xmldomelement.h>
 
 namespace project {
 

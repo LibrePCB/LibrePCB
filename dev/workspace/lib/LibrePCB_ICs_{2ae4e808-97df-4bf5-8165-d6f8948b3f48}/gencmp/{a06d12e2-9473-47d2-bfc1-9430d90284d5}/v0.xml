@@ -3,7 +3,7 @@
     <meta>
         <uuid>{a06d12e2-9473-47d2-bfc1-9430d90284d5}</uuid>
         <version>0.1</version>
-        <author>EDA4U</author>
+        <author>LibrePCB</author>
         <created>2015-03-03T20:19:27Z</created>
         <last_modified>2015-03-03T20:19:27Z</last_modified>
         <name locale="en_US">Single Half-Bridge MOSFET Driver with "IN" and "/SD" Input Pins</name>

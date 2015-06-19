@@ -1,7 +1,7 @@
 /*
- * EDA4U - Professional EDA for everyone!
+ * LibrePCB - Professional EDA for everyone!
  * Copyright (C) 2013 Urban Bruhin
- * http://eda4u.ubruhin.ch/
+ * http://librepcb.org/
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,11 +32,11 @@
 #include "../../circuit/netsignal.h"
 #include "../../circuit/gencompinstance.h"
 #include "../../circuit/gencompsignalinstance.h"
-#include <eda4ucommon/schematiclayer.h>
+#include <librepcbcommon/schematiclayer.h>
 #include "../../../workspace/workspace.h"
 #include "../../../workspace/settings/workspacesettings.h"
-#include <eda4ulibrary/sym/symbolpin.h>
-#include <eda4ulibrary/gencmp/genericcomponent.h>
+#include <librepcblibrary/sym/symbolpin.h>
+#include <librepcblibrary/gencmp/genericcomponent.h>
 #include "../../settings/projectsettings.h"
 
 namespace project {

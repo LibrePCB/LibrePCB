@@ -4,7 +4,7 @@
     <meta>
         <uuid>{00000000-0000-4001-8000-000000000000}</uuid>
         <version>0.1</version>
-        <author>EDA4U</author>
+        <author>LibrePCB</author>
         <created>2015-03-01T20:00:00Z</created>
         <last_modified>2015-03-01T20:00:00Z</last_modified>
         <name locale="en_US">NE555</name>

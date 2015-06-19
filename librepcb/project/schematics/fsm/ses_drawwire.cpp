@@ -1,7 +1,7 @@
 /*
- * EDA4U - Professional EDA for everyone!
+ * LibrePCB - Professional EDA for everyone!
  * Copyright (C) 2013 Urban Bruhin
- * http://eda4u.ubruhin.ch/
+ * http://librepcb.org/
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,8 +25,8 @@
 #include "ses_drawwire.h"
 #include "../schematiceditor.h"
 #include "ui_schematiceditor.h"
-#include <eda4ucommon/units/all_length_units.h>
-#include <eda4ucommon/undostack.h>
+#include <librepcbcommon/units/all_length_units.h>
+#include <librepcbcommon/undostack.h>
 #include "../../project.h"
 #include "../../circuit/circuit.h"
 #include "../../circuit/netclass.h"
@@ -36,7 +36,7 @@
 #include "../cmd/cmdschematicnetpointadd.h"
 #include "../cmd/cmdschematicnetlineadd.h"
 #include "../schematic.h"
-#include <eda4ulibrary/sym/symbolpin.h>
+#include <librepcblibrary/sym/symbolpin.h>
 #include "../items/si_symbol.h"
 #include "../items/si_symbolpin.h"
 #include "../../circuit/gencompsignalinstance.h"
@@ -48,7 +48,7 @@
 #include "../cmd/cmdschematicnetpointedit.h"
 #include "../../circuit/cmd/cmdnetsignalremove.h"
 #include "../../circuit/cmd/cmdnetsignaledit.h"
-#include <eda4ucommon/gridproperties.h>
+#include <librepcbcommon/gridproperties.h>
 
 namespace project {
 

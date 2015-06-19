@@ -3,7 +3,7 @@
     <meta>
         <uuid>{b95d0aca-7344-41ec-90ed-022f365ad765}</uuid>
         <version>0.1</version>
-        <author>EDA4U</author>
+        <author>LibrePCB</author>
         <created>2015-03-01T20:00:00Z</created>
         <last_modified>2015-03-01T20:00:00Z</last_modified>
         <name locale="en_US">VCC</name>

@@ -128,7 +128,7 @@
     <name>ControlPanel</name>
     <message>
         <location filename="../src/workspace/controlpanel/controlpanel.ui" line="14"/>
-        <source>EDA4U ControlPanel</source>
+        <source>LibrePCB ControlPanel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -230,7 +230,7 @@
     </message>
     <message>
         <location filename="../src/workspace/controlpanel/controlpanel.cpp" line="48"/>
-        <source>Control Panel - EDA4U %1 - %2</source>
+        <source>Control Panel - LibrePCB %1 - %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -240,13 +240,13 @@
     </message>
     <message>
         <location filename="../src/workspace/controlpanel/controlpanel.cpp" line="162"/>
-        <source>EDA4U is a free &amp; OpenSource Schematic/Layout-Editor</source>
+        <source>LibrePCB is a free &amp; OpenSource Schematic/Layout-Editor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/workspace/controlpanel/controlpanel.cpp" line="173"/>
         <location filename="../src/workspace/controlpanel/controlpanel.cpp" line="191"/>
-        <source>EDA4U project files (%1)</source>
+        <source>LibrePCB project files (%1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -533,7 +533,7 @@ Do you want to save them bevore closing the project?</source>
     </message>
     <message>
         <location filename="../src/project/project.cpp" line="551"/>
-        <source>The suffix of the project file must be &quot;e4u&quot;!</source>
+        <source>The suffix of the project file must be &quot;lpp&quot;!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

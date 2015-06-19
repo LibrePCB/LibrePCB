@@ -1,7 +1,7 @@
 /*
- * EDA4U - Professional EDA for everyone!
+ * LibrePCB - Professional EDA for everyone!
  * Copyright (C) 2013 Urban Bruhin
- * http://eda4u.ubruhin.ch/
+ * http://librepcb.org/
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,8 +25,8 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <eda4ucommon/fileio/filelock.h>
-#include <eda4ucommon/exceptions.h>
+#include <librepcbcommon/fileio/filelock.h>
+#include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -146,7 +146,7 @@ class Workspace final : public QObject
         /**
          * @brief Create a new project and open it
          *
-         * @param filepath  The filepath to the *.e4u project file of the project to create
+         * @param filepath  The filepath to the *.lpp project file of the project to create
          *
          * @return  The pointer to the new project. If an error occurs, this method shows
          *          the error message box and returns nullptr afterwards.
@@ -156,7 +156,7 @@ class Workspace final : public QObject
         /**
          * @brief Open an existing project (or bring an already opened project to front)
          *
-         * @param filepath  The filepath to the *.e4u project file to open
+         * @param filepath  The filepath to the *.lpp project file to open
          *
          * @return  The pointer to the opened project. If an error occurs, this method
          *          shows the error message box and returns nullptr afterwards.
@@ -214,7 +214,7 @@ class Workspace final : public QObject
          * This method can also be used to check whether a project (by its filepath) is
          * already open or not.
          *
-         * @param filepath  The filepath to a *.e4u project file
+         * @param filepath  The filepath to a *.lpp project file
          *
          * @return The pointer to the open project, or nullptr if the project is not open
          */
@@ -223,7 +223,7 @@ class Workspace final : public QObject
         /**
          * @brief Check whether a project is in the favorite project list or not
          *
-         * @param filepath  The filepath to a *.e4u project file
+         * @param filepath  The filepath to a *.lpp project file
          *
          * @return True if the specified project is in the favorites list, false otherwise
          */
@@ -232,14 +232,14 @@ class Workspace final : public QObject
         /**
          * @brief Add a project to the favorite projects list
          *
-         * @param filepath  The filepath to a *.e4u project file
+         * @param filepath  The filepath to a *.lpp project file
          */
         void addFavoriteProject(const FilePath& filepath) noexcept;
 
         /**
          * @brief Remove a project from the favorite projects list
          *
-         * @param filepath  The filepath to a *.e4u project file
+         * @param filepath  The filepath to a *.lpp project file
          */
         void removeFavoriteProject(const FilePath& filepath) noexcept;
 

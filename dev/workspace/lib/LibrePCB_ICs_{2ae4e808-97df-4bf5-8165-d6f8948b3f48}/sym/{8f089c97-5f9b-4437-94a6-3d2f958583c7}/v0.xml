@@ -3,7 +3,7 @@
     <meta>
         <uuid>{8f089c97-5f9b-4437-94a6-3d2f958583c7}</uuid>
         <version>0.1</version>
-        <author>EDA4U</author>
+        <author>LibrePCB</author>
         <created>2015-03-03T20:19:25Z</created>
         <last_modified>2015-03-03T20:19:25Z</last_modified>
         <name locale="en_US">Simple IC with 8 Pins</name>

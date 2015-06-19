@@ -1,7 +1,7 @@
 /*
- * EDA4U - Professional EDA for everyone!
+ * LibrePCB - Professional EDA for everyone!
  * Copyright (C) 2013 Urban Bruhin
- * http://eda4u.ubruhin.ch/
+ * http://librepcb.org/
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +25,9 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <eda4ucommon/undocommand.h>
-#include <eda4ucommon/exceptions.h>
-#include <eda4ucommon/units/all_length_units.h>
+#include <librepcbcommon/undocommand.h>
+#include <librepcbcommon/exceptions.h>
+#include <librepcbcommon/units/all_length_units.h>
 
 /*****************************************************************************************
  *  Forward Declarations

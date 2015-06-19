@@ -1,7 +1,7 @@
 /*
- * EDA4U - Professional EDA for everyone!
+ * LibrePCB - Professional EDA for everyone!
  * Copyright (C) 2013 Urban Bruhin
- * http://eda4u.ubruhin.ch/
+ * http://librepcb.org/
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,12 +25,12 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <eda4ucommon/fileio/if_xmlserializableobject.h>
-#include <eda4ucommon/if_attributeprovider.h>
-#include <eda4ucommon/if_schematiclayerprovider.h>
-#include <eda4ucommon/if_boardlayerprovider.h>
-#include <eda4ucommon/exceptions.h>
-#include <eda4ucommon/fileio/filelock.h>
+#include <librepcbcommon/fileio/if_xmlserializableobject.h>
+#include <librepcbcommon/if_attributeprovider.h>
+#include <librepcbcommon/if_schematiclayerprovider.h>
+#include <librepcbcommon/if_boardlayerprovider.h>
+#include <librepcbcommon/exceptions.h>
+#include <librepcbcommon/fileio/filelock.h>
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -99,7 +99,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *          The destructor then will close the project. It's not possible to
          *          close a project without destroying the Project instance.
          *
-         * @param filepath      The filepath to the new or existing *.e4u project file
+         * @param filepath      The filepath to the new or existing *.lpp project file
          * @param create        True if the specified project does not exist already and
          *                      must be created.
          *
@@ -121,7 +121,7 @@ class Project final : public QObject, public IF_AttributeProvider,
         // Getters: General
 
         /**
-         * @brief Get the filepath of the project file (*.e4u)
+         * @brief Get the filepath of the project file (*.lpp)
          *
          * @return The absolute filepath
          */
@@ -622,10 +622,10 @@ class Project final : public QObject, public IF_AttributeProvider,
 
         // Attributes
 
-        // Project File (*.e4u)
+        // Project File (*.lpp)
         FilePath mPath; ///< the path to the project directory
-        FilePath mFilepath; ///< the filepath of the *.e4u project file
-        SmartXmlFile* mXmlFile; ///< the *.e4u project file
+        FilePath mFilepath; ///< the filepath of the *.lpp project file
+        SmartXmlFile* mXmlFile; ///< the *.lpp project file
         FileLock mFileLock; ///< See @ref doc_project_lock
         bool mIsRestored; ///< the constructor will set this to true if the project was restored
         bool mIsReadOnly; ///< the constructor will set this to true if the project was opened in read only mode
@@ -667,7 +667,7 @@ class Project final : public QObject, public IF_AttributeProvider,
     @page doc_project Project Documentation
     @tableofcontents
 
-    This is the documentation of an EDA4U project. Such a project is represented by an
+    This is the documentation of an LibrePCB project. Such a project is represented by an
     instance of the class project#Project.
 
 
@@ -684,7 +684,7 @@ class Project final : public QObject, public IF_AttributeProvider,
         computers at the same time (for example). This can demage the project files!
 
         To avoid such problems, the Project's constructor will try to lock the project
-        file (*.e4u) with a FileLock object (project#Project#mFileLock). If the project
+        file (*.lpp) with a FileLock object (project#Project#mFileLock). If the project
         file is already locked by another application instance, the project cannot be
         opened (the Project's constructor throws an exception). If the lock file exists
         because the application was crashed while the project was open, the user gets a
@@ -748,7 +748,7 @@ class Project final : public QObject, public IF_AttributeProvider,
         We need a system to ensure that a project with all its files can be loaded and
         saved with different application versions without corrupting the project.
 
-        For this purpose, the *.e4u XML file of each project has two attributes in the
+        For this purpose, the *.lpp XML file of each project has two attributes in the
         root XML element: "project_version" and "compatible_downto". Both are unsigned
         integer values, with a minimum value of "1". Zero is invalid.
 
@@ -863,8 +863,8 @@ class Project final : public QObject, public IF_AttributeProvider,
 
     @section project_file_hierarchy Project File Hierarchy
 
-        In the project directory, there are only files from EDA4U, the user mustn't save other files there!
-        There are the following directories and files in a EDA4U project directory:
+        In the project directory, there are only files from LibrePCB, the user mustn't save other files there!
+        There are the following directories and files in a LibrePCB project directory:
 
             - @ref project_dir_boards "boards/"
                 - board_name/
@@ -903,7 +903,7 @@ class Project final : public QObject, public IF_AttributeProvider,
 
             In this directory there are all library elements (footprints, components, symbols, ...) saved which are needed in the project.
             Each element is saved in his own directory which are named with the element's uuid.
-            These directories are 100 percent identical with the elements in the EDA4U library, these are 1:1 copies of them.
+            These directories are 100 percent identical with the elements in the LibrePCB library, these are 1:1 copies of them.
 
             If the user adds a new component to the project, this component and all its possible symbols, footprints and so on will be copied to this directory.
             If the user removes a component, that component and all its possible symbols, footprints and so on, which aren't needed by other components in the project,

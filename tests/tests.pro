@@ -22,8 +22,8 @@ CONFIG -= app_bundle
 LIBS += \
     -L$${DESTDIR} \
     -lgmock \
-    -leda4ulibrary \    # Note: The order of the libraries is very important for the linker!
-    -leda4ucommon       # Another order could end up in "undefined reference" errors!
+    -llibrepcblibrary \    # Note: The order of the libraries is very important for the linker!
+    -llibrepcbcommon       # Another order could end up in "undefined reference" errors!
 
 INCLUDEPATH += \
     ../3rdparty/gmock/gtest/include \
@@ -31,13 +31,13 @@ INCLUDEPATH += \
     ../lib
 
 DEPENDPATH += \
-    ../lib/eda4ulibrary \
-    ../lib/eda4ucommon
+    ../lib/librepcblibrary \
+    ../lib/librepcbcommon
 
 PRE_TARGETDEPS += \
     $${DESTDIR}/libgmock.a \
-    $${DESTDIR}/libeda4ulibrary.a \
-    $${DESTDIR}/libeda4ucommon.a
+    $${DESTDIR}/liblibrepcblibrary.a \
+    $${DESTDIR}/liblibrepcbcommon.a
 
 SOURCES += main.cpp \
     common/filepathtest.cpp

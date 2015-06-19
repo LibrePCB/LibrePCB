@@ -1,7 +1,7 @@
 /*
- * EDA4U - Professional EDA for everyone!
+ * LibrePCB - Professional EDA for everyone!
  * Copyright (C) 2013 Urban Bruhin
- * http://eda4u.ubruhin.ch/
+ * http://librepcb.org/
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 #include "cmd/cmdprojectsettingschange.h"
 #include "projectsettings.h"
 #include "../project.h"
-#include <eda4ucommon/undostack.h>
+#include <librepcbcommon/undostack.h>
 
 namespace project {
 

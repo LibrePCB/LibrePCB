@@ -2,15 +2,15 @@
 #include <QtWidgets>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <eda4ucommon/fileio/smartxmlfile.h>
-#include <eda4ucommon/fileio/xmldomdocument.h>
-#include <eda4ucommon/fileio/xmldomelement.h>
-#include <eda4ulibrary/sym/symbol.h>
-#include <eda4ulibrary/fpt/footprint.h>
-#include <eda4ulibrary/pkg/package.h>
-#include <eda4ulibrary/cmp/component.h>
-#include <eda4ulibrary/gencmp/genericcomponent.h>
-#include <eda4ucommon/boardlayer.h>
+#include <librepcbcommon/fileio/smartxmlfile.h>
+#include <librepcbcommon/fileio/xmldomdocument.h>
+#include <librepcbcommon/fileio/xmldomelement.h>
+#include <librepcblibrary/sym/symbol.h>
+#include <librepcblibrary/fpt/footprint.h>
+#include <librepcblibrary/pkg/package.h>
+#include <librepcblibrary/cmp/component.h>
+#include <librepcblibrary/gencmp/genericcomponent.h>
+#include <librepcbcommon/boardlayer.h>
 #include "polygonsimplifier.h"
 
 using namespace library;
@@ -196,7 +196,7 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
         if (filepath.getFilename() == "con-lstb.lbr" && name.startsWith("MA")) rotate180 = true;
 
         // create symbol
-        Symbol* symbol = new Symbol(uuid, Version("0.1"), "EDA4U", name, desc);
+        Symbol* symbol = new Symbol(uuid, Version("0.1"), "LibrePCB", name, desc);
 
         for (XmlDomElement* child = node->getFirstChild(); child; child = child->getNextSibling())
         {
@@ -384,7 +384,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
         //if (filepath.getFilename() == "con-lstb.lbr" && name.startsWith("MA")) rotate180 = true;
 
         // create footprint
-        Footprint* footprint = new Footprint(uuid, Version("0.1"), "EDA4U", name, desc);
+        Footprint* footprint = new Footprint(uuid, Version("0.1"), "LibrePCB", name, desc);
 
         for (XmlDomElement* child = node->getFirstChild(); child; child = child->getNextSibling())
         {
@@ -616,7 +616,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
 
         // create package
         QUuid pkgUuid = getOrCreateUuid(outputSettings, filepath, "packages_to_packages", name);
-        Package* package = new Package(pkgUuid, Version("0.1"), "EDA4U", name, desc);
+        Package* package = new Package(pkgUuid, Version("0.1"), "LibrePCB", name, desc);
         package->setFootprintUuid(footprint->getUuid());
         package->saveToFile(FilePath(QString("%1/pkg/%2/v%3.xml").arg(ui->output->text())
                                      .arg(pkgUuid.toString()).arg(APP_VERSION_MAJOR)));
@@ -644,7 +644,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
         desc.append(createDescription(filepath, name));
 
         // create generic component
-        GenericComponent* gencomp = new GenericComponent(uuid, Version("0.1"), "EDA4U", name, desc);
+        GenericComponent* gencomp = new GenericComponent(uuid, Version("0.1"), "LibrePCB", name, desc);
 
         // properties
         gencomp->addDefaultValue("en_US", "");
@@ -707,7 +707,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
             QUuid fptUuid = getOrCreateUuid(outputSettings, filepath, "packages_to_footprints", packageName);
 
             QUuid compUuid = getOrCreateUuid(outputSettings, filepath, "devices_to_components", name, deviceName);
-            Component* component = new Component(compUuid, Version("0.1"), "EDA4U", name, desc);
+            Component* component = new Component(compUuid, Version("0.1"), "LibrePCB", name, desc);
             component->setGenCompUuid(gencomp->getUuid());
             component->setPackageUuid(pkgUuid);
 

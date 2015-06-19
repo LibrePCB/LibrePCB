@@ -3,7 +3,7 @@
     <meta>
         <uuid>{506bd124-6062-400e-9078-b38bd7e1aaee}</uuid>
         <version>0.1</version>
-        <author>EDA4U</author>
+        <author>LibrePCB</author>
         <created>2015-03-01T20:00:00Z</created>
         <last_modified>2015-03-01T20:00:00Z</last_modified>
         <name locale="en_US">Inductor</name>

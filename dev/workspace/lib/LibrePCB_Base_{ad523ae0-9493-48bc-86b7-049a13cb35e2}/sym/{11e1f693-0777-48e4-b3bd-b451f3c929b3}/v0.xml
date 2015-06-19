@@ -3,7 +3,7 @@
     <meta>
         <uuid>{11e1f693-0777-48e4-b3bd-b451f3c929b3}</uuid>
         <version>0.1</version>
-        <author>EDA4U</author>
+        <author>LibrePCB</author>
         <created>2015-03-01T20:00:00Z</created>
         <last_modified>2015-03-01T20:00:00Z</last_modified>
         <name locale="en_US">Inductor (IEC 60617)</name>

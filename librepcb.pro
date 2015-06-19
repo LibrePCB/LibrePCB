@@ -3,6 +3,6 @@ CONFIG += ordered
 SUBDIRS = \
     3rdparty \
     lib \
-    eda4u \
+    librepcb \
     tools \
     tests

@@ -3,7 +3,7 @@
     <meta>
         <uuid>{98e71eaa-1b90-4a84-8529-ed4f493e5c41}</uuid>
         <version>0.1</version>
-        <author>EDA4U</author>
+        <author>LibrePCB</author>
         <created>2015-03-01T20:00:00Z</created>
         <last_modified>2015-03-01T20:00:00Z</last_modified>
         <name locale="en_US">Schematic Frame</name>

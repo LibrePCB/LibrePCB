@@ -1,7 +1,7 @@
 /*
- * EDA4U - Professional EDA for everyone!
+ * LibrePCB - Professional EDA for everyone!
  * Copyright (C) 2013 Urban Bruhin
- * http://eda4u.ubruhin.ch/
+ * http://librepcb.org/
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -226,7 +226,7 @@ class BoardLayer final : public QObject
         The class #BoardLayer is used to representate footprint/board layers. for
         each layer you need to create an object of that type.
 
-    @todo Add more details. See https://github.com/ubruhin/EDA4U/issues/4
+    @todo Add more details. See https://github.com/ubruhin/LibrePCB/issues/4
 
 */
 

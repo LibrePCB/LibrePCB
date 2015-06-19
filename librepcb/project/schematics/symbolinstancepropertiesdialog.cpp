@@ -1,7 +1,7 @@
 /*
- * EDA4U - Professional EDA for everyone!
+ * LibrePCB - Professional EDA for everyone!
  * Copyright (C) 2013 Urban Bruhin
- * http://eda4u.ubruhin.ch/
+ * http://librepcb.org/
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,19 +27,19 @@
 #include "ui_symbolinstancepropertiesdialog.h"
 #include "../circuit/gencompinstance.h"
 #include "items/si_symbol.h"
-#include <eda4ulibrary/gencmp/genericcomponent.h>
-#include <eda4ulibrary/sym/symbol.h>
+#include <librepcblibrary/gencmp/genericcomponent.h>
+#include <librepcblibrary/sym/symbol.h>
 #include "../project.h"
-#include <eda4ucommon/undostack.h>
-#include <eda4ucommon/undocommand.h>
+#include <librepcbcommon/undostack.h>
+#include <librepcbcommon/undocommand.h>
 #include "../circuit/cmd/cmdgencompinstedit.h"
 #include "cmd/cmdsymbolinstanceedit.h"
 #include "../circuit/gencompattributeinstance.h"
 #include "../circuit/cmd/cmdgencompattrinstadd.h"
 #include "../circuit/cmd/cmdgencompattrinstremove.h"
 #include "../circuit/cmd/cmdgencompattrinstedit.h"
-#include <eda4ucommon/attributes/attributetype.h>
-#include <eda4ucommon/attributes/attributeunit.h>
+#include <librepcbcommon/attributes/attributetype.h>
+#include <librepcbcommon/attributes/attributeunit.h>
 #include "../settings/projectsettings.h"
 
 namespace project {

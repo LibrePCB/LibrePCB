@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
-	<mime-type type="application/x-eda4u-project">
+	<mime-type type="application/x-librepcb-project">
 		<sub-class-of type="application/xml"/>
-		<comment>EDA4U Project</comment>
-		<glob pattern="*.e4u"/>
+		<comment>LibrePCB Project</comment>
+		<glob pattern="*.lpp"/>
 	</mime-type>
 </mime-info>

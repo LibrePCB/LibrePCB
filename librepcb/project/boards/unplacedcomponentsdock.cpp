@@ -1,7 +1,7 @@
 /*
- * EDA4U - Professional EDA for everyone!
+ * LibrePCB - Professional EDA for everyone!
  * Copyright (C) 2013 Urban Bruhin
- * http://eda4u.ubruhin.ch/
+ * http://librepcb.org/
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,14 +30,14 @@
 #include "../project.h"
 #include "../settings/projectsettings.h"
 #include "../circuit/gencompinstance.h"
-#include <eda4ulibrary/gencmp/genericcomponent.h>
-#include <eda4ulibrary/cmp/component.h>
-#include <eda4ulibrary/pkg/package.h>
+#include <librepcblibrary/gencmp/genericcomponent.h>
+#include <librepcblibrary/cmp/component.h>
+#include <librepcblibrary/pkg/package.h>
 #include "../library/projectlibrary.h"
-#include <eda4ucommon/graphics/graphicsview.h>
-#include <eda4ucommon/graphics/graphicsscene.h>
+#include <librepcbcommon/graphics/graphicsview.h>
+#include <librepcbcommon/graphics/graphicsscene.h>
 #include "cmd/cmdcomponentinstanceadd.h"
-#include <eda4ucommon/undostack.h>
+#include <librepcbcommon/undostack.h>
 
 namespace project {
 
