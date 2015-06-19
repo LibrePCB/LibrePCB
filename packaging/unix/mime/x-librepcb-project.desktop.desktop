@@ -4,3 +4,4 @@ MimeType=application/x-eda4u-project
 Icon=eda4u
 Patterns=*.e4u
 Comment=EDA4u Project
+Name[de_CH]=x-librepcb-project.desktop

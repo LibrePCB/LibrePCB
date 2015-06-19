@@ -10,3 +10,4 @@ Terminal=false
 Icon=eda4u
 Exec=eda4u %U
 MimeType=application/x-eda4u-project
+Name[de_CH]=librepcb.desktop
