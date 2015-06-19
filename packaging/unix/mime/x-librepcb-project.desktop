@@ -3,5 +3,4 @@ Type=MimeType
 MimeType=application/x-librepcb-project
 Icon=librepcb
 Patterns=*.lpp
-Comment=EDA4u Project
-Name[de_CH]=x-librepcb-project.desktop
+Comment=LibrePCB Project
