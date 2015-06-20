@@ -68,10 +68,10 @@ WSI_LibraryLocaleOrder::WSI_LibraryLocaleOrder(WorkspaceSettings& settings) :
     mBtnDown->setArrowType(Qt::DownArrow);
     mBtnAdd->setIcon(QIcon(":/img/actions/plus_2.png"));
     mBtnRemove->setIcon(QIcon(":/img/actions/minus.png"));
-    connect(mBtnUp, SIGNAL(clicked()), this, SLOT(btnUpClicked()));
-    connect(mBtnDown, SIGNAL(clicked()), this, SLOT(btnDownClicked()));
-    connect(mBtnAdd, SIGNAL(clicked()), this, SLOT(btnAddClicked()));
-    connect(mBtnRemove, SIGNAL(clicked()), this, SLOT(btnRemoveClicked()));
+    connect(mBtnUp, &QToolButton::clicked, this, &WSI_LibraryLocaleOrder::btnUpClicked);
+    connect(mBtnDown, &QToolButton::clicked, this, &WSI_LibraryLocaleOrder::btnDownClicked);
+    connect(mBtnAdd, &QToolButton::clicked, this, &WSI_LibraryLocaleOrder::btnAddClicked);
+    connect(mBtnRemove, &QToolButton::clicked, this, &WSI_LibraryLocaleOrder::btnRemoveClicked);
 
     // create the QWidget
     mWidget = new QWidget();

@@ -703,7 +703,7 @@ bool Project::autosaveProject() noexcept
     {
         // the user is executing a command at the moment, so we should not save now,
         // try it a few seconds later instead...
-        QTimer::singleShot(10000, this, SLOT(autosave()));
+        QTimer::singleShot(10000, this, &Project::autosaveProject);
         return false;
     }
 

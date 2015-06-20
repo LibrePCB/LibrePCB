@@ -105,14 +105,14 @@ BoardEditor::BoardEditor(Project& project, bool readOnly) :
     connect(&mProject.getUndoStack(), &UndoStack::undoTextChanged,
             [this](const QString& text){mUi->actionUndo->setText(text);});
     mUi->actionUndo->setText(mProject.getUndoStack().getUndoText());
-    connect(&mProject.getUndoStack(), SIGNAL(canUndoChanged(bool)),
-            mUi->actionUndo, SLOT(setEnabled(bool)));
+    connect(&mProject.getUndoStack(), &UndoStack::canUndoChanged,
+            mUi->actionUndo, &QAction::setEnabled);
     mUi->actionUndo->setEnabled(mProject.getUndoStack().canUndo());
     connect(&mProject.getUndoStack(), &UndoStack::redoTextChanged,
             [this](const QString& text){mUi->actionRedo->setText(text);});
     mUi->actionRedo->setText(mProject.getUndoStack().getRedoText());
-    connect(&mProject.getUndoStack(), SIGNAL(canRedoChanged(bool)),
-            mUi->actionRedo, SLOT(setEnabled(bool)));
+    connect(&mProject.getUndoStack(), &UndoStack::canRedoChanged,
+            mUi->actionRedo, &QAction::setEnabled);
     mUi->actionRedo->setEnabled(mProject.getUndoStack().canRedo());
 
     // build the whole board editor finite state machine with all its substate objects

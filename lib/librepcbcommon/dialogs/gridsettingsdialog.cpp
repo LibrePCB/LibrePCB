@@ -55,9 +55,9 @@ GridSettingsDialog::GridSettingsDialog(const GridProperties& grid, QWidget* pare
     connect(mUi->rbtnGroup, SIGNAL(buttonClicked(int)), this, SLOT(rbtnGroupClicked(int)));
     connect(mUi->spbxInterval, SIGNAL(valueChanged(double)), this, SLOT(spbxIntervalChanged(double)));
     connect(mUi->cbxUnits, SIGNAL(currentIndexChanged(int)), this, SLOT(cbxUnitsChanged(int)));
-    connect(mUi->btnMul2, SIGNAL(clicked()), this, SLOT(btnMul2Clicked()));
-    connect(mUi->btnDiv2, SIGNAL(clicked()), this, SLOT(btnDiv2Clicked()));
-    connect(mUi->buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(buttonBoxClicked(QAbstractButton*)));
+    connect(mUi->btnMul2, &QToolButton::clicked, this, &GridSettingsDialog::btnMul2Clicked);
+    connect(mUi->btnDiv2, &QToolButton::clicked, this, &GridSettingsDialog::btnDiv2Clicked);
+    connect(mUi->buttonBox, &QDialogButtonBox::clicked, this, &GridSettingsDialog::buttonBoxClicked);
 
     updateInternalRepresentation();
 }

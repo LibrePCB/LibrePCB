@@ -101,9 +101,9 @@ ErcMsgDock::ErcMsgDock(Project& project) :
     }
 
     // connect to ErcMsgList signals
-    connect(&mProject.getErcMsgList(), SIGNAL(ercMsgAdded(ErcMsg*)), this, SLOT(ercMsgAdded(ErcMsg*)));
-    connect(&mProject.getErcMsgList(), SIGNAL(ercMsgRemoved(ErcMsg*)), this, SLOT(ercMsgRemoved(ErcMsg*)));
-    connect(&mProject.getErcMsgList(), SIGNAL(ercMsgChanged(ErcMsg*)), this, SLOT(ercMsgChanged(ErcMsg*)));
+    connect(&mProject.getErcMsgList(), &ErcMsgList::ercMsgAdded,    this, &ErcMsgDock::ercMsgAdded);
+    connect(&mProject.getErcMsgList(), &ErcMsgList::ercMsgRemoved,  this, &ErcMsgDock::ercMsgRemoved);
+    connect(&mProject.getErcMsgList(), &ErcMsgList::ercMsgChanged,  this, &ErcMsgDock::ercMsgChanged);
 
     updateTopLevelItemTexts();
 }

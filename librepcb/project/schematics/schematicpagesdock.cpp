@@ -48,10 +48,10 @@ SchematicPagesDock::SchematicPagesDock(Project& project, SchematicEditor& editor
         schematicAdded(i);
 
     // connect signals/slots
-    connect(&mEditor, SIGNAL(activeSchematicChanged(int,int)),
-            this, SLOT(activeSchematicChanged(int,int)));
-    connect(&mProject, SIGNAL(schematicAdded(int)), this, SLOT(schematicAdded(int)));
-    connect(&mProject, SIGNAL(schematicRemoved(int)), this, SLOT(schematicRemoved(int)));
+    connect(&mEditor, &SchematicEditor::activeSchematicChanged,
+            this, &SchematicPagesDock::activeSchematicChanged);
+    connect(&mProject, &Project::schematicAdded, this, &SchematicPagesDock::schematicAdded);
+    connect(&mProject, &Project::schematicRemoved, this, &SchematicPagesDock::schematicRemoved);
 
     // select the current schematic page
     mUi->listWidget->setCurrentRow(mEditor.getActiveSchematicIndex());
