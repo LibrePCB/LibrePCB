@@ -326,6 +326,7 @@ void GenCompInstance::registerComponent(const ComponentInstance& component) thro
 {
     if (!mAddedToCircuit) throw LogicError(__FILE__, __LINE__);
     if (mComponentInstances.contains(&component)) throw LogicError(__FILE__, __LINE__);
+    if (mGenComp->isSchematicOnly()) throw LogicError(__FILE__, __LINE__);
 
     mComponentInstances.append(&component);
     updateErcMessages();

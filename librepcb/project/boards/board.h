@@ -146,6 +146,9 @@ class Board final : public QObject, public IF_AttributeProvider,
         /// @copydoc IF_AttributeProvider#attributesChanged()
         void attributesChanged();
 
+        void componentAdded(ComponentInstance& comp);
+        void componentRemoved(ComponentInstance& comp);
+
 
     private:
 

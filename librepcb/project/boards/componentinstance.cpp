@@ -116,7 +116,7 @@ void ComponentInstance::init() throw (Exception)
     // check pad-signal-map
     foreach (const QUuid& signalUuid, mComponent->getPadSignalMap())
     {
-        if (!mGenCompInstance->getSignalInstance(signalUuid))
+        if ((!signalUuid.isNull()) && (!mGenCompInstance->getSignalInstance(signalUuid)))
         {
             throw RuntimeError(__FILE__, __LINE__, signalUuid.toString(),
                 QString(tr("Unknown signal \"%1\" found in component \"%2\""))

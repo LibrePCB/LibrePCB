@@ -37,6 +37,7 @@
 #include "componentinstance.h"
 #include "items/bi_footprint.h"
 #include "items/bi_footprintpad.h"
+#include <librepcblibrary/gencmp/genericcomponent.h>
 
 namespace project {
 
@@ -260,6 +261,7 @@ void Board::addComponentInstance(ComponentInstance& componentInstance) throw (Ex
     componentInstance.addToBoard(*mGraphicsScene);
     mComponentInstances.insert(componentInstance.getGenCompInstance().getUuid(), &componentInstance);
     updateErcMessages();
+    emit componentAdded(componentInstance);
 }
 
 void Board::removeComponentInstance(ComponentInstance& componentInstance) throw (Exception)
@@ -270,6 +272,7 @@ void Board::removeComponentInstance(ComponentInstance& componentInstance) throw 
     componentInstance.removeFromBoard(*mGraphicsScene);
     mComponentInstances.remove(componentInstance.getGenCompInstance().getUuid());
     updateErcMessages();
+    emit componentRemoved(componentInstance);
 }
 
 /*****************************************************************************************
@@ -409,6 +412,7 @@ void Board::updateErcMessages() noexcept
     {
         foreach (const GenCompInstance* genComp, mProject.getCircuit().getGenCompInstances())
         {
+            if (genComp->getGenComp().isSchematicOnly()) continue;
             ComponentInstance* comp = mComponentInstances.value(genComp->getUuid());
             ErcMsg* ercMsg = mErcMsgListUnplacedGenCompInstances.value(genComp->getUuid());
             if ((!comp) && (!ercMsg))

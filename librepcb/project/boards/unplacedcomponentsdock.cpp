@@ -38,6 +38,7 @@
 #include <librepcbcommon/graphics/graphicsscene.h>
 #include "cmd/cmdcomponentinstanceadd.h"
 #include <librepcbcommon/undostack.h>
+#include <librepcbcommon/gridproperties.h>
 
 namespace project {
 
@@ -49,20 +50,26 @@ UnplacedComponentsDock::UnplacedComponentsDock(Project& project) :
     QDockWidget(0), mProject(project), mBoard(nullptr),
     mUi(new Ui::UnplacedComponentsDock),
     mFootprintPreviewGraphicsView(nullptr), mFootprintPreviewGraphicsScene(nullptr),
-    mSelectedGenComp(nullptr), mSelectedComponent(nullptr)
+    mSelectedGenComp(nullptr), mSelectedComponent(nullptr),
+    mBoardConnection1(), mBoardConnection2(), mDisableListUpdate(false)
 {
     mUi->setupUi(this);
     mFootprintPreviewGraphicsScene = new GraphicsScene();
     mFootprintPreviewGraphicsView = new GraphicsView();
     mFootprintPreviewGraphicsView->setScene(mFootprintPreviewGraphicsScene);
 
-    connect(&mProject.getCircuit(), &Circuit::genCompAdded, this, &UnplacedComponentsDock::genCompAddedToOrRemovedFromCircuit);
-    connect(&mProject.getCircuit(), &Circuit::genCompRemoved, this, &UnplacedComponentsDock::genCompAddedToOrRemovedFromCircuit);
+    connect(&mProject.getCircuit(), &Circuit::genCompAdded,
+            [this](GenCompInstance& gc){Q_UNUSED(gc); updateComponentsList();});
+    connect(&mProject.getCircuit(), &Circuit::genCompRemoved,
+            [this](GenCompInstance& gc){Q_UNUSED(gc); updateComponentsList();});
+
     updateComponentsList();
 }
 
 UnplacedComponentsDock::~UnplacedComponentsDock()
 {
+    setBoard(nullptr);
+    mDisableListUpdate = true;
     delete mFootprintPreviewGraphicsView;   mFootprintPreviewGraphicsView = nullptr;
     delete mFootprintPreviewGraphicsScene;  mFootprintPreviewGraphicsScene = nullptr;
     delete mUi;                             mUi = nullptr;
@@ -76,22 +83,24 @@ void UnplacedComponentsDock::setBoard(Board* board)
 {
     // clean up
     mBoard = nullptr;
+    disconnect(mBoardConnection1);  mBoardConnection1 = QMetaObject::Connection();
+    disconnect(mBoardConnection2);  mBoardConnection2 = QMetaObject::Connection();
     updateComponentsList();
 
     // load new board
     mBoard = board;
-    updateComponentsList();
+    if (board)
+    {
+        mBoardConnection1 = connect(board, &Board::componentAdded, [this](ComponentInstance& c){Q_UNUSED(c); updateComponentsList();});
+        mBoardConnection2 = connect(board, &Board::componentRemoved, [this](ComponentInstance& c){Q_UNUSED(c); updateComponentsList();});
+        mNextPosition = Point::fromMm(0, -20).mappedToGrid(board->getGridProperties().getInterval());
+        updateComponentsList();
+    }
 }
 
 /*****************************************************************************************
  *  Private Slots
  ****************************************************************************************/
-
-void UnplacedComponentsDock::genCompAddedToOrRemovedFromCircuit(GenCompInstance& genComp)
-{
-    Q_UNUSED(genComp);
-    updateComponentsList();
-}
 
 void UnplacedComponentsDock::on_lstUnplacedComponents_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous)
 {
@@ -121,10 +130,33 @@ void UnplacedComponentsDock::on_btnAdd_clicked()
     updateComponentsList();
 }
 
+void UnplacedComponentsDock::on_pushButton_clicked()
+{
+    if ((!mBoard) || (!mSelectedGenComp) || (!mSelectedComponent)) return;
+
+    QUuid genCompLibUuid = mSelectedGenComp->getGenComp().getUuid();
+    QUuid compLibUuid = mSelectedComponent->getUuid();
+
+    mDisableListUpdate = true;
+    for (int i = 0; i < mUi->lstUnplacedComponents->count(); i++)
+    {
+        QUuid genCompUuid = mUi->lstUnplacedComponents->item(i)->data(Qt::UserRole).toUuid();
+        Q_ASSERT(genCompUuid.isNull() == false);
+        GenCompInstance* genComp = mProject.getCircuit().getGenCompInstanceByUuid(genCompUuid);
+        if (!genComp) continue;
+        if (genComp->getGenComp().getUuid() != genCompLibUuid) continue;
+        addComponent(*genComp, compLibUuid);
+    }
+    mDisableListUpdate = false;
+
+    updateComponentsList();
+}
+
 void UnplacedComponentsDock::on_btnAddAll_clicked()
 {
     if (!mBoard) return;
 
+    mDisableListUpdate = true;
     for (int i = 0; i < mUi->lstUnplacedComponents->count(); i++)
     {
         QUuid genCompUuid = mUi->lstUnplacedComponents->item(i)->data(Qt::UserRole).toUuid();
@@ -139,6 +171,8 @@ void UnplacedComponentsDock::on_btnAddAll_clicked()
             }
         }
     }
+    mDisableListUpdate = false;
+
     updateComponentsList();
 }
 
@@ -148,6 +182,8 @@ void UnplacedComponentsDock::on_btnAddAll_clicked()
 
 void UnplacedComponentsDock::updateComponentsList() noexcept
 {
+    if (mDisableListUpdate) return;
+
     setSelectedGenCompInstance(nullptr);
     mUi->lstUnplacedComponents->clear();
 
@@ -158,6 +194,7 @@ void UnplacedComponentsDock::updateComponentsList() noexcept
         foreach (GenCompInstance* genComp, genCompList)
         {
             if (boardCompList.contains(genComp->getUuid())) continue;
+            if (genComp->getGenComp().isSchematicOnly()) continue;
 
             // add generic component to list
             uint compCount = mProject.getLibrary().getComponentsOfGenComp(genComp->getGenComp().getUuid()).count();
@@ -215,8 +252,13 @@ void UnplacedComponentsDock::addComponent(GenCompInstance& genComp, const QUuid&
 
     try
     {
-        CmdComponentInstanceAdd* cmd = new CmdComponentInstanceAdd(*mBoard, genComp, component);
+        CmdComponentInstanceAdd* cmd = new CmdComponentInstanceAdd(*mBoard, genComp, component, mNextPosition);
         mProject.getUndoStack().execCmd(cmd);
+        if (mNextPosition.getX() > Length::fromMm(200))
+            mNextPosition = Point::fromMm(0, mNextPosition.getY().toMm() - 10);
+        else
+            mNextPosition += Point::fromMm(10, 0);
+        mNextPosition.mapToGrid(mBoard->getGridProperties().getInterval());
     }
     catch (Exception& e)
     {

@@ -39,7 +39,14 @@
       <item>
        <widget class="QPushButton" name="btnAdd">
         <property name="text">
-         <string>Add to Board</string>
+         <string>Add</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton">
+        <property name="text">
+         <string>Add similar</string>
         </property>
        </widget>
       </item>

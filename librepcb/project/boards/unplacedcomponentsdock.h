@@ -26,6 +26,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
+#include <librepcbcommon/units/all_length_units.h>
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -73,10 +74,10 @@ class UnplacedComponentsDock final : public QDockWidget
 
     private slots:
 
-        void genCompAddedToOrRemovedFromCircuit(GenCompInstance& genComp);
         void on_lstUnplacedComponents_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
         void on_cbxSelectedComponent_currentIndexChanged(int index);
         void on_btnAdd_clicked();
+        void on_pushButton_clicked();
         void on_btnAddAll_clicked();
 
 
@@ -102,6 +103,10 @@ class UnplacedComponentsDock final : public QDockWidget
         GraphicsScene* mFootprintPreviewGraphicsScene;
         GenCompInstance* mSelectedGenComp;
         const library::Component* mSelectedComponent;
+        QMetaObject::Connection mBoardConnection1;
+        QMetaObject::Connection mBoardConnection2;
+        Point mNextPosition;
+        bool mDisableListUpdate;
 };
 
 } // namespace project
