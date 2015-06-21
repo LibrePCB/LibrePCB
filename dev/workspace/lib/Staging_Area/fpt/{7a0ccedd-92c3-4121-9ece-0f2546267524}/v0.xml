@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{7a0ccedd-92c3-4121-9ece-0f2546267524}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">SML0603</name>
+        <description locale="en_US">&lt;b>SML0603-XXX (HIGH INTENSITY) LED&lt;/b>&lt;p>
+&lt;table>
+&lt;tr>&lt;td>AG3K&lt;/td>&lt;td>AQUA GREEN&lt;/td>&lt;/tr>
+&lt;tr>&lt;td>B1K&lt;/td>&lt;td>SUPER BLUE&lt;/td>&lt;/tr>
+&lt;tr>&lt;td>R1K&lt;/td>&lt;td>SUPER RED&lt;/td>&lt;/tr>
+&lt;tr>&lt;td>R3K&lt;/td>&lt;td>ULTRA RED&lt;/td>&lt;/tr>
+&lt;tr>&lt;td>O3K&lt;/td>&lt;td>SUPER ORANGE&lt;/td>&lt;/tr>
+&lt;tr>&lt;td>O3KH&lt;/td>&lt;td>SOFT ORANGE&lt;/td>&lt;/tr>
+&lt;tr>&lt;td>Y3KH&lt;/td>&lt;td>SUPER YELLOW&lt;/td>&lt;/tr>
+&lt;tr>&lt;td>Y3K&lt;/td>&lt;td>SUPER YELLOW&lt;/td>&lt;/tr>
+&lt;tr>&lt;td>2CW&lt;/td>&lt;td>WHITE&lt;/td>&lt;/tr>
+&lt;/table>
+Source: http://www.ledtronics.com/ds/smd-0603/Dstr0092.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: SML0603
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="110" start_x="-0.450000" start_y="0.300000" fill="false" width="0.101600">
+            <segment end_x="-0.450000" end_y="-0.300000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="0.450000" start_y="0.300000" fill="false" width="0.101600">
+            <segment end_x="0.450000" end_y="-0.300000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-0.200000" start_y="0.350000" fill="false" width="0.101600">
+            <segment end_x="0.200000" end_y="0.350000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-0.200000" start_y="-0.350000" fill="false" width="0.101600">
+            <segment end_x="0.200000" end_y="-0.350000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-0.400000" start_y="0.175000" fill="true" width="0.000000">
+            <segment end_x="0.000000" end_y="0.175000" angle="0.000000"/>
+            <segment end_x="0.000000" end_y="0.400000" angle="0.000000"/>
+            <segment end_x="-0.400000" end_y="0.400000" angle="0.000000"/>
+            <segment end_x="-0.400000" end_y="0.175000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-0.250000" start_y="0.175000" fill="true" width="0.000000">
+            <segment end_x="0.000000" end_y="0.175000" angle="0.000000"/>
+            <segment end_x="0.000000" end_y="0.400000" angle="0.000000"/>
+            <segment end_x="-0.250000" end_y="0.400000" angle="0.000000"/>
+            <segment end_x="-0.250000" end_y="0.175000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="0.750000" start_y="0.350000" fill="false" width="0.101600">
+            <segment end_x="0.750000" end_y="-0.350000" angle="0.000000"/>
+            <segment end_x="-0.750000" end_y="-0.350000" angle="0.000000"/>
+            <segment end_x="-0.750000" end_y="0.350000" angle="0.000000"/>
+            <segment end_x="0.750000" end_y="0.350000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-1.000000" y="1.000000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-1.000000" y="-2.000000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="0.800000" x="0.750000" drill="0.000000" uuid="{93f2a652-e881-4af3-8f3f-c3898b931f88}" y="0.000000" rotation="0.000000" layer="200" width="0.800000" type="smd_rect">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="0.800000" x="-0.750000" drill="0.000000" uuid="{61b7853e-4236-47f4-9679-534346fcbbaf}" y="0.000000" rotation="0.000000" layer="200" width="0.800000" type="smd_rect">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

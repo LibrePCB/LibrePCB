@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{c297ba49-9534-40c6-b3ee-8a1a5aec744b}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">SANYO-OSCON_B'</name>
+        <description locale="en_US">&lt;b>SANYO OSCON Capacitor&lt;/b>&lt;p>
+Source: e_os_all.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: SANYO-OSCON_B'
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{3b3f7fc0-0f06-436a-a600-912921939fee}</footprint>
+    </meta>
+    <categories/>
+</package>

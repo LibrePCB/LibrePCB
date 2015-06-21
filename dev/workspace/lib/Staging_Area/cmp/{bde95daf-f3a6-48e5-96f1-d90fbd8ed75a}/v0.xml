@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{bde95daf-f3a6-48e5-96f1-d90fbd8ed75a}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">ZENER-DIODE</name>
+        <description locale="en_US">Z-Diode
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: ZENER-DIODE
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{5ea08765-9bbd-4c11-a475-698617200963}</generic_component>
+        <package>{7598b2cd-b3d6-48aa-8105-b99609654747}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{69ff349a-c3b8-4fdd-bfb8-f2088b5e933d}" signal="{798ebf9f-6adb-4998-a9be-8919af3d3c65}"/>
+        <map pad="{99ac51d6-05a7-4ce2-9c97-1bfaf8d74248}" signal="{a10e2dd7-c855-493d-bc27-dcc34a8be1d5}"/>
+    </pad_signal_map>
+</component>

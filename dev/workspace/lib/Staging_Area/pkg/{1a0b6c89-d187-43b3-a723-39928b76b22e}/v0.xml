@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{1a0b6c89-d187-43b3-a723-39928b76b22e}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:38Z</created>
+        <last_modified>2015-06-21T12:37:38Z</last_modified>
+        <name locale="en_US">C5102</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+diameter 2.8 mm, horizontal, grid 10.10 mm
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: C5102
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{add0e091-3a3b-41f7-a1df-49190ab57d84}</footprint>
+    </meta>
+    <categories/>
+</package>

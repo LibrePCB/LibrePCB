@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{20ed0d95-ba71-4d59-a12e-1062523781a5}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">P47F-BOTTOM</name>
+        <description locale="en_US">&lt;b>PointLED® Enhanced Thinfilm LED&lt;/b> BOTTOM mount&lt;p>
+Source: http://catalog.osram-os.com .. LA_LR_LS_LY_P47F_Pb_free.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: P47F-BOTTOM
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{7fa61bc8-1617-4b7e-9f10-150bafcee62e}</footprint>
+    </meta>
+    <categories/>
+</package>

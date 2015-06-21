@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{e04fe9fb-9d22-409f-9e38-cf11215346a4}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:44Z</created>
+        <last_modified>2015-06-21T12:37:44Z</last_modified>
+        <name locale="en_US">FE10-1</name>
+        <description locale="en_US">&lt;b>FEMALE HEADER&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: con-lsta.lbr
+Name: FE10-1
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{7702fb6a-9341-4a10-b889-280f840a9694}</generic_component>
+        <package>{d2ceaf42-fdf6-41ce-a941-a9b098d40c12}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{fed94f09-52e8-4497-8fe7-c1d1aeb95983}" signal="{d2074ac3-9fdc-4ecb-9892-9008f118aa1e}"/>
+        <map pad="{2df99a70-ba04-4a81-9f1f-156c0145b039}" signal="{9ad510b3-e89f-4f7f-a45a-54b8148cd1fe}"/>
+        <map pad="{443d4971-f5c7-472c-8db6-f47e3501671b}" signal="{4a7df3e8-0bb3-4109-86b6-9ec94068d739}"/>
+        <map pad="{4afab0d6-fc30-4353-a33f-9f284faf4dbb}" signal="{d08156ff-59b8-4278-92b6-17b0cb923c9c}"/>
+        <map pad="{460891dc-f253-49c1-9f62-8f10606fc980}" signal="{c6533f3c-f0a6-489b-be23-61d246aaa40f}"/>
+        <map pad="{2db2272f-d1c1-4098-8138-d3f60e9306d9}" signal="{11f69ea0-cf71-4b2b-81fc-c881f7591fd0}"/>
+        <map pad="{d878c5de-1ad8-4ae9-ab46-346fd07a4d45}" signal="{36726f52-4b81-403e-983b-f6de1d0639bd}"/>
+        <map pad="{41bc8a7a-8d7c-4ed1-a17f-36741e678769}" signal="{a1093f01-eae6-4635-9aa3-acede1212cd0}"/>
+        <map pad="{e0583883-ee4a-4220-8fdc-ff184dc85cad}" signal="{2268e389-f122-4b4f-88e2-c56bbb57171b}"/>
+        <map pad="{60121885-98dd-4937-8118-d91b29cb2141}" signal="{95556cf1-d306-4e97-8596-65789dc4b198}"/>
+    </pad_signal_map>
+</component>

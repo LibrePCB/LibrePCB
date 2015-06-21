@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{625f8d0a-00a6-43a0-b913-3fb8b7240c88}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:42Z</created>
+        <last_modified>2015-06-21T12:37:42Z</last_modified>
+        <name locale="en_US">L-EU</name>
+        <description locale="en_US">&lt;B>INDUCTOR&lt;/B>, European symbol
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: L-EU
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{506bd124-6062-400e-9078-b38bd7e1aaee}</generic_component>
+        <package>{e798f3ab-ede1-46fb-ba96-729c4790d690}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{4f54dc93-c6ee-49e3-83f8-480da8a60730}" signal="{777f11cd-9d4e-4b2b-aafa-7e7a836ff56e}"/>
+        <map pad="{ba24fb10-ed71-4d30-904c-7cdc4fb1c854}" signal="{5b36d330-6f19-4391-8f95-1c2f6a658286}"/>
+    </pad_signal_map>
+</component>

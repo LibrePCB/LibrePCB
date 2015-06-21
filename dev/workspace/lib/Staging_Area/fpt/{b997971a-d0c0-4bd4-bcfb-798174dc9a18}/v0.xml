@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{b997971a-d0c0-4bd4-bcfb-798174dc9a18}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">5-1,8</name>
+        <description locale="en_US">&lt;b>THROUGH-HOLE PAD&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: wirepad.lbr
+Name: 5-1,8
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="170" start_x="-1.168400" start_y="2.794000" fill="false" width="0.152400">
+            <segment end_x="-1.168400" end_y="-2.794000" angle="0.000000"/>
+            <segment end_x="1.168400" end_y="-2.794000" angle="0.000000"/>
+            <segment end_x="1.168400" end_y="2.794000" angle="0.000000"/>
+            <segment end_x="-1.168400" end_y="2.794000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-1.524000" y="-2.540000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-0.100000" y="2.800000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="5.080000" x="0.000000" drill="0.000000" uuid="{4925e33a-60dd-4aec-a796-31cfb44bcdd1}" y="0.000000" rotation="0.000000" layer="200" width="1.828800" type="smd_rect">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

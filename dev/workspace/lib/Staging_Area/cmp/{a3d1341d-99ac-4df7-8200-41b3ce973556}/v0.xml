@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{a3d1341d-99ac-4df7-8200-41b3ce973556}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">ACULED-RGB</name>
+        <description locale="en_US">&lt;b>ACULED&lt;/b>&lt;p>
+Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_ACULED.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: ACULED-RGB
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{2ac4eb0c-83dd-4981-9752-bf0a35cb1de9}</generic_component>
+        <package>{d0e3f75a-b750-4b4b-9fd0-394d122a47c3}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{08cc987f-16ca-44f2-83a1-81d8726ce26f}" signal="{40d2dc95-5d9c-4516-8b9c-7a437b87af58}"/>
+        <map pad="{190a1115-d09f-44bd-82ed-17c35a1bd7b7}" signal="{49bc6b0e-34a3-4f93-a54f-0132cd462725}"/>
+        <map pad="{c5760d37-c867-4db3-9898-4dbd65c5c3a0}" signal="{fae27c07-701a-4162-8869-3234d21bf0ae}"/>
+        <map pad="{b01bd49b-5a78-4673-a70d-e2697105264b}" signal="{58d7bc7a-1736-4026-813a-696fc432eaa3}"/>
+        <map pad="{7fa8b8d7-c1b4-4d2c-9afa-69c6b400a797}" signal="{b69d8fa1-7f50-4d8c-a664-5d38e97c64d9}"/>
+        <map pad="{eb2cf63b-d09e-4004-8f86-012c8fcf1cbe}" signal="{db2f32d0-661d-406e-b40a-6048ef6525b8}"/>
+    </pad_signal_map>
+</component>

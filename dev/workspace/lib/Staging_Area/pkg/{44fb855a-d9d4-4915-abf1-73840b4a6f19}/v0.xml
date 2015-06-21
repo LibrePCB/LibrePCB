@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{44fb855a-d9d4-4915-abf1-73840b4a6f19}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:32Z</created>
+        <last_modified>2015-06-21T12:37:32Z</last_modified>
+        <name locale="en_US">C375-192X418</name>
+        <description locale="en_US">&lt;b>CAPACITOR&lt;/b>&lt;p>
+grid 37.5 mm, outline 19.2 x 41.8 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: C375-192X418
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{df8d1ecd-bfb7-4e4f-aa09-cbc43f3dfdbc}</footprint>
+    </meta>
+    <categories/>
+</package>

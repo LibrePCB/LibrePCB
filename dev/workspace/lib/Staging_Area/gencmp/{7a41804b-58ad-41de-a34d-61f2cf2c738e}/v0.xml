@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{7a41804b-58ad-41de-a34d-61f2cf2c738e}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">TOPLED-2-</name>
+        <description locale="en_US">&lt;b>Multi TOPLED® (two color)&lt;/b>&lt;p>
+LG T672, LP T672&lt;br>
+LSY T67B&lt;br>
+LSW T67C&lt;br>
+LSY T675&lt;br>
+LSY T676&lt;br>
+LSG T677&lt;br>
+LSG T770&lt;br>
+
+Source: http://www.osram.convergy.de/
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: TOPLED-2-
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">LED</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{65713800-933a-42b5-90fe-78d38b3a6757}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{9c10d616-3df1-4b53-a36f-6a6f80b41bea}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{3e97ce01-0022-4a91-94b4-2e544a7d6bf4}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{ec08ccd9-24ab-4b0f-a234-7cca543cf40f}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{1ecdf369-62f5-4741-8217-dfee5338c5e3}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{9740a24b-1526-4a0a-9233-850f65a0bed1}" suffix="A" symbol="{6f5ba8ff-30a6-4706-8412-4d206b11ee27}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{99f4a168-de6f-4a88-ade2-5db8c1dff244}" signal="{65713800-933a-42b5-90fe-78d38b3a6757}"/>
+                        <map display="gen_comp_signal" pin="{d7ebfe48-b83c-4167-8618-d5c22229de99}" signal="{9c10d616-3df1-4b53-a36f-6a6f80b41bea}"/>
+                    </pin_signal_map>
+                </item>
+                <item uuid="{94c3ff4b-c155-443e-9d76-ee5b97928802}" suffix="B" symbol="{6f5ba8ff-30a6-4706-8412-4d206b11ee27}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{99f4a168-de6f-4a88-ade2-5db8c1dff244}" signal="{3e97ce01-0022-4a91-94b4-2e544a7d6bf4}"/>
+                        <map display="gen_comp_signal" pin="{d7ebfe48-b83c-4167-8618-d5c22229de99}" signal="{ec08ccd9-24ab-4b0f-a234-7cca543cf40f}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

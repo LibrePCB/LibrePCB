@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<symbol version="0">
+    <meta>
+        <uuid>{d39e05ab-cffc-498f-951c-41feae362b2a}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:28Z</created>
+        <last_modified>2015-06-21T12:37:28Z</last_modified>
+        <name locale="en_US">IR2104</name>
+        <description locale="en_US">
+
+This element was automatically imported from Eagle
+Filepath: 0_ICs.lbr
+Name: IR2104
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="10" start_x="-7.620000" start_y="10.160000" fill="false" width="0.254000">
+            <segment end_x="-7.620000" end_y="-10.160000" angle="0.000000"/>
+            <segment end_x="7.620000" end_y="-10.160000" angle="0.000000"/>
+            <segment end_x="7.620000" end_y="10.160000" angle="0.000000"/>
+            <segment end_x="-7.620000" end_y="10.160000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-7.620000" y="10.160000" layer="20" text="${SYM::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-7.620000" y="-12.700000" layer="21" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pins>
+        <pin length="5.080000" x="12.700000" uuid="{8774f021-1f16-4509-947b-a0e0153d52cf}" y="7.620000" angle="-90.000000">
+            <name locale="en_US">VB</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="12.700000" uuid="{96817a88-e53f-4ffc-9161-5f57da084ecd}" y="-7.620000" angle="-90.000000">
+            <name locale="en_US">LO</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="12.700000" uuid="{a85ad8f3-cc65-4f66-a32e-15f58eec5140}" y="2.540000" angle="-90.000000">
+            <name locale="en_US">HO</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="-12.700000" uuid="{5f057585-3889-4273-a634-933b71f15660}" y="-7.620000" angle="90.000000">
+            <name locale="en_US">COM</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="-12.700000" uuid="{68657171-5587-47a8-a5b9-c786d58f0143}" y="2.540000" angle="90.000000">
+            <name locale="en_US">IN</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="-12.700000" uuid="{a2318bd3-23fc-4fa0-a62e-1bbc04282fa4}" y="7.620000" angle="90.000000">
+            <name locale="en_US">VCC</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="-12.700000" uuid="{369617aa-33b1-4234-9378-fc01d2c5105b}" y="-2.540000" angle="90.000000">
+            <name locale="en_US">/SD</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="12.700000" uuid="{9fcb852f-250e-4dbc-a271-389159f105bb}" y="-2.540000" angle="-90.000000">
+            <name locale="en_US">VS</name>
+            <description locale="en_US"/>
+        </pin>
+    </pins>
+</symbol>

@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{ba6a5831-d225-4d53-b18a-ae101651e89a}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:43Z</created>
+        <last_modified>2015-06-21T12:37:43Z</last_modified>
+        <name locale="en_US">L-US</name>
+        <description locale="en_US">&lt;B>INDUCTOR&lt;/B>, American symbol
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: L-US
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{506bd124-6062-400e-9078-b38bd7e1aaee}</generic_component>
+        <package>{6b3a742d-8a88-4528-aaf1-c270664a1129}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{bd6af77d-0ac4-4cb7-90a6-34d8ee8534b4}" signal="{5b36d330-6f19-4391-8f95-1c2f6a658286}"/>
+        <map pad="{73d12c36-468e-4398-bcaa-cd5d49ecc8c6}" signal="{777f11cd-9d4e-4b2b-aafa-7e7a836ff56e}"/>
+    </pad_signal_map>
+</component>

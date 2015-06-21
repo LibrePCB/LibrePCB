@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{55f4eca7-1139-4010-b13c-06eec06a6750}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:32Z</created>
+        <last_modified>2015-06-21T12:37:32Z</last_modified>
+        <name locale="en_US">C150-072X183</name>
+        <description locale="en_US">&lt;b>CAPACITOR&lt;/b>&lt;p>
+grid 15 mm, outline 7.2 x 18.3 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: C150-072X183
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{e391484b-8db4-4903-adc7-715ac5092c34}</footprint>
+    </meta>
+    <categories/>
+</package>

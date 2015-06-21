@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{13ad25b7-a2bb-41b3-9456-a4b2f7a07fe4}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">LUXEON_REBEL</name>
+        <description locale="en_US">&lt;b>LUXEON Rebel&lt;/b>&lt;p>
+
+Display layer 93, Pins, and connect all contact points with a net.&lt;br>
+The thermal pads are defined in a separate gate with addlevel REQUEST.&lt;br>
+Draw a net named 'TH' and connect all thermal pads with it.&lt;br>
+Please read the Package's Description about DRC settings.&lt;p>
+Source: http://www.lumileds.com/pdfs/AB32.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: LUXEON_REBEL
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">LED</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{849359a7-cab8-4ec0-bad9-8a08431ce489}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{174e469e-9672-425e-b8d8-b0722c93aa59}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{4f5e4041-4029-4882-b46c-99a328300660}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">TH</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{f26b14aa-5e08-4068-8ea4-683b47b01f33}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{cb344c4d-54ba-4bb2-b3c5-1d2039b16e45}" suffix="" symbol="{cb442e56-0ec7-4486-8c43-7bdfa9b47d9a}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{18de942d-8b47-4daf-9e07-d089204e09d0}" signal="{174e469e-9672-425e-b8d8-b0722c93aa59}"/>
+                        <map display="gen_comp_signal" pin="{2a64f851-340a-43f2-b1cf-06a1d4b54560}" signal="{849359a7-cab8-4ec0-bad9-8a08431ce489}"/>
+                    </pin_signal_map>
+                </item>
+                <item uuid="{143067a6-00da-4581-a1d2-bfcab66c8d53}" suffix="TH" symbol="{a49024b3-de81-419e-a4cf-1841b255e637}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{d6cd1e3e-8404-47b3-b588-361810590a72}" signal="{4f5e4041-4029-4882-b46c-99a328300660}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

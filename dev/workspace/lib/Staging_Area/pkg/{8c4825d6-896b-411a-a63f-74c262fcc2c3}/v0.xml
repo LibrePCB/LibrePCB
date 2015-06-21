@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{8c4825d6-896b-411a-a63f-74c262fcc2c3}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:37Z</created>
+        <last_modified>2015-06-21T12:37:37Z</last_modified>
+        <name locale="en_US">HC18U-H</name>
+        <description locale="en_US">&lt;b>CRYSTAL&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: HC18U-H
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{57f4e751-ef9e-4cfd-a7d9-565c2f10932d}</footprint>
+    </meta>
+    <categories/>
+</package>

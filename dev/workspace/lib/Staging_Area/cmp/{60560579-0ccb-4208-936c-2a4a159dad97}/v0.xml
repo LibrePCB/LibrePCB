@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{60560579-0ccb-4208-936c-2a4a159dad97}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">F50360</name>
+        <description locale="en_US">&lt;b>Full color Z-Power LED RGB&lt;/b> P5-II Series&lt;p>
+Source: http://www.seoulsemicon.co.kr .. F50360.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: F50360
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{bbddd5c0-2e33-4b42-8d05-bc452a539e1c}</generic_component>
+        <package>{9f3ac882-2076-4fc5-a985-72eae4cbff94}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{6a01e6fd-ede1-4fde-90ce-2936fdaa1b83}" signal="{973c1d68-0fbd-4390-b3ab-61bae3e9169d}"/>
+        <map pad="{b533e65e-834d-426e-b367-320aa4a84c77}" signal="{21368df2-490e-42ba-9268-6a6716a077ad}"/>
+        <map pad="{3bb65547-1c92-4fe1-afcc-2a557f8dd6c7}" signal="{cd64c5df-d3fd-4c48-afc6-b09315f3b847}"/>
+        <map pad="{069784e8-e783-43c9-9a0e-57de1fa7688d}" signal="{dfcf97d5-c0d0-47b5-8108-b5d0d11d5bd3}"/>
+        <map pad="{6c22a7fa-e952-4e9b-b2fc-4ed83b81c62f}" signal="{be300d4a-9a9d-4f7d-9465-2a614993c168}"/>
+        <map pad="{e2ee3927-a989-44d5-9a12-c0ee90fdcee9}" signal="{fac733d6-80db-4e55-9c1e-1519e990b218}"/>
+    </pad_signal_map>
+</component>

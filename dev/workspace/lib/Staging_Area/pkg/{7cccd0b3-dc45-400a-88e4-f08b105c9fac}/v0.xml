@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{7cccd0b3-dc45-400a-88e4-f08b105c9fac}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:32Z</created>
+        <last_modified>2015-06-21T12:37:32Z</last_modified>
+        <name locale="en_US">TT5D11</name>
+        <description locale="en_US">&lt;b>ELECTROLYTIC CAPACITOR&lt;/b>&lt;p>
+diameter 11 mm, grid 5.08 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: TT5D11
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{bf9145fc-f91a-4963-85e0-d3e3dc3e9f3e}</footprint>
+    </meta>
+    <categories/>
+</package>

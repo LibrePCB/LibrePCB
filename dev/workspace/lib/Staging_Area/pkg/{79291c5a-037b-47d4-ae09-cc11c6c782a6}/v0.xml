@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{79291c5a-037b-47d4-ae09-cc11c6c782a6}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:32Z</created>
+        <last_modified>2015-06-21T12:37:32Z</last_modified>
+        <name locale="en_US">B45181C</name>
+        <description locale="en_US">&lt;b>ELECTROLYTIC CAPACITOR&lt;/b>&lt;p>
+body 12.7 x 7.6 mm, rectangle, grid 10.16 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: B45181C
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{4b9ea23c-1ea3-48c2-b79b-a4caf9d695a0}</footprint>
+    </meta>
+    <categories/>
+</package>

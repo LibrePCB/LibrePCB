@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{8dccab9f-af6e-44ed-aff6-1cc79274b8a8}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">BAT54</name>
+        <description locale="en_US">&lt;b>Schottky Diodes&lt;/b>&lt;p>
+Source: Fairchild .. BAT54.pdf
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BAT54
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">D</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{fca8dc0a-6201-4052-8de7-1ad6e438c873}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{e73d6e5a-bbcb-497c-9b13-b5037aec56bb}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{0b82a13a-f592-45e2-b891-591edfd92826}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{c639e835-b9fb-42ac-90aa-5e4c0696f985}" suffix="" symbol="{b4019e5f-dead-4f11-9040-41fa27f7f4bd}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{0c83d4fb-d2f9-4199-b82e-f65cdb357d55}" signal="{fca8dc0a-6201-4052-8de7-1ad6e438c873}"/>
+                        <map display="gen_comp_signal" pin="{d1121c89-3dea-4883-9bd1-3cba1d5b038d}" signal="{e73d6e5a-bbcb-497c-9b13-b5037aec56bb}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

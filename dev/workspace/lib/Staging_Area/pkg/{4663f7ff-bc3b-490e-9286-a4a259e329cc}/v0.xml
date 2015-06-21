@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{4663f7ff-bc3b-490e-9286-a4a259e329cc}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:38Z</created>
+        <last_modified>2015-06-21T12:37:38Z</last_modified>
+        <name locale="en_US">SGB-10</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+diameter 4.6 mm, vertical, grid 10.16 mm
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: SGB-10
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{e0d8889a-7d27-40e9-b3e1-475d04ba4253}</footprint>
+    </meta>
+    <categories/>
+</package>

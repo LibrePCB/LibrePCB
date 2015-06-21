@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{57cbc2cb-0b40-4dbe-8c97-19c690fc59bf}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">LZ4-00WW10</name>
+        <description locale="en_US">&lt;b>High Luminous Efficacy 10W LED&lt;/b>&lt;p>
+Source: http://www.ledengin.com/products/10wLZ/LZ4-00WW10.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: LZ4-00WW10
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{9b2468da-c638-4fb0-a605-6e0836713feb}</footprint>
+    </meta>
+    <categories/>
+</package>

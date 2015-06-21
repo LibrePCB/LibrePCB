@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{0f377525-23d9-4787-90c5-a740cb028e35}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:35Z</created>
+        <last_modified>2015-06-21T12:37:35Z</last_modified>
+        <name locale="en_US">L4035M</name>
+        <description locale="en_US">&lt;b>INDUCTOR&lt;/b>&lt;p>
+molded
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: L4035M
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="110" start_x="-2.083000" start_y="0.686000" fill="false" width="0.152400">
+            <segment end_x="-2.083000" end_y="-0.686000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="2.083000" start_y="0.686000" fill="false" width="0.152400">
+            <segment end_x="2.083000" end_y="-0.686000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="130" start_x="-0.300000" start_y="-0.700000" fill="true" width="0.000000">
+            <segment end_x="0.300000" end_y="-0.700000" angle="0.000000"/>
+            <segment end_x="0.300000" end_y="0.700000" angle="0.000000"/>
+            <segment end_x="-0.300000" end_y="0.700000" angle="0.000000"/>
+            <segment end_x="-0.300000" end_y="-0.700000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="100" start_x="-2.973000" start_y="1.983000" fill="false" width="0.050800">
+            <segment end_x="-2.973000" end_y="-1.983000" angle="0.000000"/>
+            <segment end_x="2.973000" end_y="-1.983000" angle="0.000000"/>
+            <segment end_x="2.973000" end_y="1.983000" angle="0.000000"/>
+            <segment end_x="-2.973000" end_y="1.983000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="1.981000" start_y="1.524000" fill="false" width="0.152400">
+            <segment end_x="1.981000" end_y="-1.524000" angle="0.000000"/>
+            <segment end_x="-1.981000" end_y="-1.524000" angle="0.000000"/>
+            <segment end_x="-1.981000" end_y="1.524000" angle="0.000000"/>
+            <segment end_x="1.981000" end_y="1.524000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-1.905000" y="2.540000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-1.905000" y="-3.810000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="1.400000" x="-1.600000" drill="0.000000" uuid="{b904d4f7-4fbf-4fb0-b0de-668bc7ddca2d}" y="0.000000" rotation="0.000000" layer="200" width="2.200000" type="smd_rect">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.400000" x="1.600000" drill="0.000000" uuid="{58a72172-6e07-4569-80a5-d89010be1372}" y="0.000000" rotation="0.000000" layer="200" width="2.200000" type="smd_rect">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{c33a61f6-3fea-4b10-b6c7-f902029b8712}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:38Z</created>
+        <last_modified>2015-06-21T12:37:38Z</last_modified>
+        <name locale="en_US">SOD61B</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+diameter 3.5 mm, vertical, grid 15.24 mm
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: SOD61B
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{3322bb71-105a-490e-9065-4d9608f90c00}</footprint>
+    </meta>
+    <categories/>
+</package>

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{d5f76210-14ba-4755-8a11-c5608f9f6151}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">LD266</name>
+        <description locale="en_US">&lt;B>LED BLOCK&lt;/B>&lt;p>
+6 LEDs, Siemens
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: LD266
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{c6ef1948-91a1-4f44-bcbe-62143fb57854}</footprint>
+    </meta>
+    <categories/>
+</package>

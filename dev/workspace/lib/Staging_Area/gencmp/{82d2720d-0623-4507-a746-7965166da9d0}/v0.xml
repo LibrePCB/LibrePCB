@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{82d2720d-0623-4507-a746-7965166da9d0}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">BAW75</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+silicon-epitaxial planar diode
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BAW75
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">D</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{ba97fdf9-3b5c-4f0d-9b5e-ea8b6c668685}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{095fa809-403a-498f-be0e-cf144cbdf710}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{04de9f0e-7baf-43f4-96aa-42266cb6dc11}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{a4d80507-1f30-4a7b-b917-09f6c2ee22a9}" suffix="D" symbol="{8eaf9d11-7442-4af8-9051-9e3662b36279}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{8ebf7e67-03d9-4666-8642-39a59899cb5d}" signal="{ba97fdf9-3b5c-4f0d-9b5e-ea8b6c668685}"/>
+                        <map display="gen_comp_signal" pin="{8aa8c919-7171-4594-ae73-dc0b76bf036f}" signal="{095fa809-403a-498f-be0e-cf144cbdf710}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

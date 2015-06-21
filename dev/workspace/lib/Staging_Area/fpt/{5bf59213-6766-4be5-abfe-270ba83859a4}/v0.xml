@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{5bf59213-6766-4be5-abfe-270ba83859a4}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">3,81/1,1</name>
+        <description locale="en_US">&lt;b>THROUGH-HOLE PAD&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: wirepad.lbr
+Name: 3,81/1,1
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="170" start_x="1.905000" start_y="-1.270000" fill="false" width="0.152400">
+            <segment end_x="1.905000" end_y="-1.905000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="1.905000" start_y="-1.905000" fill="false" width="0.152400">
+            <segment end_x="1.270000" end_y="-1.905000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-1.270000" start_y="-1.905000" fill="false" width="0.152400">
+            <segment end_x="-1.905000" end_y="-1.905000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-1.905000" start_y="-1.905000" fill="false" width="0.152400">
+            <segment end_x="-1.905000" end_y="-1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-1.905000" start_y="1.270000" fill="false" width="0.152400">
+            <segment end_x="-1.905000" end_y="1.905000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-1.905000" start_y="1.905000" fill="false" width="0.152400">
+            <segment end_x="-1.270000" end_y="1.905000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="1.270000" start_y="1.905000" fill="false" width="0.152400">
+            <segment end_x="1.905000" end_y="1.905000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="1.905000" start_y="1.905000" fill="false" width="0.152400">
+            <segment end_x="1.905000" end_y="1.270000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-1.905000" y="2.286000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="0.000000" y="1.200000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+        <ellipse radius_x="1.270000" x="0.000000" radius_y="1.270000" grab_area="true" y="0.000000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+    </geometry>
+    <pads>
+        <pad height="3.810000" x="0.000000" drill="1.117600" uuid="{c748ed08-988a-4511-9641-5dceea32c9b4}" y="0.000000" rotation="90.000000" layer="0" width="3.810000" type="tht_octagon">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

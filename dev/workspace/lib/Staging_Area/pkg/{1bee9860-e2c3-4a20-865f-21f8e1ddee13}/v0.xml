@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{1bee9860-e2c3-4a20-865f-21f8e1ddee13}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">P-LCC-2</name>
+        <description locale="en_US">&lt;b>TOPLED® High-optical Power LED (HOP)&lt;/b>&lt;p>
+Source: http://www.osram.convergy.de/ ... ls_t675.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: P-LCC-2
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{f2ac85fe-f88e-4a0b-833d-0fba6396e9b6}</footprint>
+    </meta>
+    <categories/>
+</package>

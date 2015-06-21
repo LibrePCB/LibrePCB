@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{9238d803-593c-4300-a7fb-9b17a9d63124}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:33Z</created>
+        <last_modified>2015-06-21T12:37:33Z</last_modified>
+        <name locale="en_US">E50-30</name>
+        <description locale="en_US">&lt;b>ELECTROLYTIC CAPACITOR&lt;/b>&lt;p>
+grid 50 mm, diameter 30 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: E50-30
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{9e11f40f-260c-4730-bdd3-c430a974e242}</footprint>
+    </meta>
+    <categories/>
+</package>

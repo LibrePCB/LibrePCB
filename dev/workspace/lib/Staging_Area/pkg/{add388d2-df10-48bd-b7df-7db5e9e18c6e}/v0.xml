@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{add388d2-df10-48bd-b7df-7db5e9e18c6e}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">2200-12.7</name>
+        <description locale="en_US">&lt;b>newport components&lt;/b> 2200 Serie RM 12.7 mm&lt;p>
+Miniatur Axial Lead Inductors&lt;br>
+Source: www.rsonline.de&lt;br>
+Order code 240-517
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: 2200-12.7
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{f714786a-c60b-442c-9805-65a9a718d61f}</footprint>
+    </meta>
+    <categories/>
+</package>

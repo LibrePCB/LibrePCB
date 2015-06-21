@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{3787a52f-3914-4429-a030-15e9ec7dece2}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">BYT08P</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+ultra fast
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BYT08P
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">D</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{26819a85-43ee-4380-8fc1-4587a3571a8d}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{31e17b62-6779-41b3-970a-07878d822750}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{20928290-2788-4a4a-9fe1-8ce7c4a6c2b0}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{f9216022-f2c5-42b5-bc7d-11df6a7b29aa}" suffix="1" symbol="{8eaf9d11-7442-4af8-9051-9e3662b36279}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{8ebf7e67-03d9-4666-8642-39a59899cb5d}" signal="{26819a85-43ee-4380-8fc1-4587a3571a8d}"/>
+                        <map display="gen_comp_signal" pin="{8aa8c919-7171-4594-ae73-dc0b76bf036f}" signal="{31e17b62-6779-41b3-970a-07878d822750}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{308fba43-f986-46cf-9ee4-38659124489e}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">BY229B</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+Fast Switching Rectifier, 8A (Vishay)
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BY229B
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">D</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{f9f876ad-0e81-4e13-8cb3-f46ab07fa7a2}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{61cd1e21-81c0-442c-babb-4365bd440d39}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{22d6ea6f-ff63-4401-853a-c290b43eb873}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">K</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{8f9011da-ac19-48a4-b588-31909b36438c}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{b99075db-4a3b-443b-a0f0-d11fc89e5e37}" suffix="" symbol="{701fb4fa-9326-47c5-9a28-8f2d22a5511c}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{f786f758-9a69-4e57-9480-cea07a90dc9a}" signal="{22d6ea6f-ff63-4401-853a-c290b43eb873}"/>
+                        <map display="gen_comp_signal" pin="{110f041c-00e0-46bf-a85a-59570e22a363}" signal="{61cd1e21-81c0-442c-babb-4365bd440d39}"/>
+                        <map display="gen_comp_signal" pin="{0a938b02-955b-4ab3-a371-517d26b0d40b}" signal="{f9f876ad-0e81-4e13-8cb3-f46ab07fa7a2}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

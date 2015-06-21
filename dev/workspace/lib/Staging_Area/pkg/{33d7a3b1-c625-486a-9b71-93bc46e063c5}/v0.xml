@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{33d7a3b1-c625-486a-9b71-93bc46e063c5}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:35Z</created>
+        <last_modified>2015-06-21T12:37:35Z</last_modified>
+        <name locale="en_US">PIS2816</name>
+        <description locale="en_US">&lt;b>PIS 2826&lt;/b> Inductor&lt;p>
+Source: http://www.stetco.com/products/inductors/pdf/PIS2816.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: PIS2816
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{6643e61a-a2c6-4544-9d02-d5b04f551722}</footprint>
+    </meta>
+    <categories/>
+</package>

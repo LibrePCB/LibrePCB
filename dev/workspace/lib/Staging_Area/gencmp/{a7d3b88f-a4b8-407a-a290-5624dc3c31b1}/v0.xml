@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{a7d3b88f-a4b8-407a-a290-5624dc3c31b1}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">3,17/1,3</name>
+        <description locale="en_US">&lt;b>THROUGH-HOLE PAD&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: wirepad.lbr
+Name: 3,17/1,3
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">PAD</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{8d5b148d-5450-4320-a418-bd078b7436cb}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">P</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{d5fe5b37-73ae-4447-9c85-fc32c46c45bb}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{d55bfeb8-23ce-4115-8f1d-113684a92410}" suffix="1" symbol="{dce44427-4d53-4881-a77a-3e4faa383e3b}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{01f564d5-9975-4613-bf90-153a031fe625}" signal="{8d5b148d-5450-4320-a418-bd078b7436cb}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

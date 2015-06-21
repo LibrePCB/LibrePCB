@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{82a43c87-acbd-4bd1-ae2f-529a096aa680}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:37Z</created>
+        <last_modified>2015-06-21T12:37:37Z</last_modified>
+        <name locale="en_US">TC26H</name>
+        <description locale="en_US">&lt;b>CRYSTAL&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: TC26H
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{da1d683c-1944-4753-866f-cd4cecd0e789}</footprint>
+    </meta>
+    <categories/>
+</package>

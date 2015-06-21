@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{12ddab89-5160-471b-a5cf-2ad41b27c3a9}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:45Z</created>
+        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <name locale="en_US">10</name>
+        <description locale="en_US">&lt;b>Monolithic Crystal Filters&lt;/b>&lt;p>
+Source: www.golledge.com
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: 10
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{6953d690-f8d4-48be-9184-ff3eb63af6b6}</generic_component>
+        <package>{b25c1aa0-cc78-4ed5-a231-37e1d6e2a88f}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{acf1e646-f338-46d2-8897-bfe03fcdee3b}" signal="{c84bc9d3-506c-446b-975c-89fd984cd2ab}"/>
+        <map pad="{064c45de-ae80-4290-8310-fdacaa8e9be5}" signal="{fe525a6b-013c-44e7-a605-7f940890486f}"/>
+        <map pad="{e8fa1b2e-2f87-4da1-9cd2-d7a87929824b}" signal="{3ec839da-05cf-4d7c-a861-b8f59c3adf38}"/>
+        <map pad="{4a7d3061-772e-4f52-9487-a7a933dfe938}" signal="{553ddf10-34fd-4430-b845-72fd9f212208}"/>
+        <map pad="{2f091581-97d4-4f08-ade5-6c3ae1e29118}" signal="{c84bc9d3-506c-446b-975c-89fd984cd2ab}"/>
+        <map pad="{94d2d9cb-3d50-44e0-bbed-e76f35730412}" signal="{e55ebd61-bd09-4c5b-8add-a7c938e3df9c}"/>
+    </pad_signal_map>
+</component>

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{1d1e3ac3-4bd6-488d-a0e7-656613115539}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">SANYO-OSCON_E9</name>
+        <description locale="en_US">&lt;b>SANYO OSCON Capacitor&lt;/b>&lt;p>
+Source: e_os_all.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: SANYO-OSCON_E9
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{5b65f0a0-74a1-439c-aa34-9a0d691cebf4}</footprint>
+    </meta>
+    <categories/>
+</package>

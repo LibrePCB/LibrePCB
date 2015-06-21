@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{23906a4b-67a5-4a0f-9c59-b15c964c1169}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">CGRM400*-G</name>
+        <description locale="en_US">&lt;b>Molded plasitc,JEDEC SOD-123/Mini SMA&lt;/b>&lt;p>
+Source: Comchip CGRM4001-G.pdf
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: CGRM400*-G
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{9fbba64e-9daa-4346-a7d4-b3d462421d0d}</generic_component>
+        <package>{80d47521-f849-487e-97e7-1fca7c276dfa}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{f74f608b-f6ad-4ac7-94a6-6c646d207011}" signal="{465e99e6-b790-413f-8f2a-77166dee257a}"/>
+        <map pad="{240a78c2-b051-4c87-938f-b479cf3443fc}" signal="{5f17a51a-612b-4b8c-ae81-4a7de518ce5b}"/>
+    </pad_signal_map>
+</component>

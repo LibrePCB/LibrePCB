@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{5372f11e-6df5-415d-bed9-5d3969fa03dc}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:33Z</created>
+        <last_modified>2015-06-21T12:37:33Z</last_modified>
+        <name locale="en_US">RTRIMTS63X</name>
+        <description locale="en_US">&lt;b>Trimm resistror&lt;/b> VISHAY&lt;p>
+seales container, solder immerson IP67
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: RTRIMTS63X
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{d7cbb80d-9e2b-4af2-97d5-17a93207d79b}</footprint>
+    </meta>
+    <categories/>
+</package>

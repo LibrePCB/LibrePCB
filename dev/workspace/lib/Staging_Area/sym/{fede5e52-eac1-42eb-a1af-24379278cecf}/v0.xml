@@ -1,0 +1,115 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<symbol version="0">
+    <meta>
+        <uuid>{fede5e52-eac1-42eb-a1af-24379278cecf}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:28Z</created>
+        <last_modified>2015-06-21T12:37:28Z</last_modified>
+        <name locale="en_US">L6506</name>
+        <description locale="en_US">
+
+This element was automatically imported from Eagle
+Filepath: 0_ICs.lbr
+Name: L6506
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="10" start_x="-5.080000" start_y="11.430000" fill="false" width="0.254000">
+            <segment end_x="-5.080000" end_y="-11.430000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-5.080000" start_y="-11.430000" fill="false" width="0.254000">
+            <segment end_x="20.320000" end_y="-11.430000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="20.320000" start_y="-11.430000" fill="false" width="0.254000">
+            <segment end_x="20.320000" end_y="11.430000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="20.320000" start_y="11.430000" fill="false" width="0.254000">
+            <segment end_x="10.160000" end_y="11.430000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-5.080000" start_y="11.430000" fill="false" width="0.254000">
+            <segment end_x="5.080000" end_y="11.430000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="5.080000" start_y="11.430000" fill="false" width="0.254000">
+            <segment end_x="10.160000" end_y="11.430000" angle="-180.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-4.445000" y="12.065000" layer="20" text="${SYM::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-4.445000" y="-13.970000" layer="21" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pins>
+        <pin length="2.540000" x="-7.620000" uuid="{61ca79cd-a9b0-4b3c-b3f1-7f74cfa0235d}" y="-2.540000" angle="90.000000">
+            <name locale="en_US">IN_2</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="2.540000" x="-7.620000" uuid="{8fd5d0ae-8740-4737-bd56-e8c48c8d01dd}" y="-10.160000" angle="90.000000">
+            <name locale="en_US">GND</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="2.540000" x="-7.620000" uuid="{f9fb5efd-b691-4475-abd0-6fd437efb4e7}" y="10.160000" angle="90.000000">
+            <name locale="en_US">R/C</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="2.540000" x="-7.620000" uuid="{ca29e49f-f3f9-4416-9aa5-71da90d25f0d}" y="5.080000" angle="90.000000">
+            <name locale="en_US">SYNC</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="2.540000" x="22.860000" uuid="{c0411e2c-b70d-4110-8cdc-8085b51fadee}" y="7.620000" angle="-90.000000">
+            <name locale="en_US">REF_2</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="2.540000" x="22.860000" uuid="{98c04714-1f35-445c-8be4-4573ec82f332}" y="10.160000" angle="-90.000000">
+            <name locale="en_US">VCC</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="2.540000" x="22.860000" uuid="{2ada79e2-2dca-460d-878b-6f7f77627e63}" y="-7.620000" angle="-90.000000">
+            <name locale="en_US">OUT_4</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="2.540000" x="22.860000" uuid="{4295caf9-be13-40a9-b044-a52b1a0947e8}" y="0.000000" angle="-90.000000">
+            <name locale="en_US">OUT_1</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="2.540000" x="22.860000" uuid="{cd243bf2-cb96-41d5-8df9-1456e7243379}" y="-5.080000" angle="-90.000000">
+            <name locale="en_US">OUT_3</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="2.540000" x="-7.620000" uuid="{59867fbf-c406-4c2b-9815-ae3898c366d8}" y="0.000000" angle="90.000000">
+            <name locale="en_US">IN_1</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="2.540000" x="22.860000" uuid="{f5431f79-34b1-4253-b870-c5ef11085244}" y="2.540000" angle="-90.000000">
+            <name locale="en_US">SENSE_2</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="2.540000" x="-7.620000" uuid="{ea9adb50-6703-457b-ab81-fdde40d281ab}" y="2.540000" angle="90.000000">
+            <name locale="en_US">ENABLE</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="2.540000" x="22.860000" uuid="{51d5c6e3-4fde-4de0-947c-12ec3a7d41a4}" y="5.080000" angle="-90.000000">
+            <name locale="en_US">REF_1</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="2.540000" x="22.860000" uuid="{0b1b99e1-3832-4f8b-ba66-8c6f6d2d22cb}" y="-10.160000" angle="-90.000000">
+            <name locale="en_US">SENSE_1</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="2.540000" x="-7.620000" uuid="{af7d65da-5dac-40ff-9f5f-489f73d6e19e}" y="-7.620000" angle="90.000000">
+            <name locale="en_US">IN_4</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="2.540000" x="22.860000" uuid="{14dc9070-5faa-43fc-aa18-45084ff4fec5}" y="-2.540000" angle="-90.000000">
+            <name locale="en_US">OUT_2</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="2.540000" x="-7.620000" uuid="{3a274945-5ec3-4395-88f4-a1af6cd44644}" y="-5.080000" angle="90.000000">
+            <name locale="en_US">IN_3</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="2.540000" x="-7.620000" uuid="{6238b17a-666e-4a90-a45b-bf308b8d8c10}" y="7.620000" angle="90.000000">
+            <name locale="en_US">OSC</name>
+            <description locale="en_US"/>
+        </pin>
+    </pins>
+</symbol>

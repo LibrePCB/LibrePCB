@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{2f41fbcb-885f-4f1f-b855-784eb4627f79}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">FEP30AP</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+dual ultra-fast recovery rectifier, common cathode
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: FEP30AP
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">D</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{2ef866ca-693e-4896-9aa1-c0f49769bdde}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A1</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{bc807be7-067d-49d2-8d43-fae240977ee3}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A2</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{97ee3357-26ac-416e-9374-601c14be2364}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{778a63a3-f1f9-40b3-b4dd-fa7b321f6a18}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{b71edc8b-30d1-4d26-8aa5-b73d298b69a9}" suffix="1" symbol="{bcb4e654-9c8a-4373-8024-4f823afd72b4}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{94b8db6f-6433-4010-9235-4fa2057a18ba}" signal="{2ef866ca-693e-4896-9aa1-c0f49769bdde}"/>
+                        <map display="gen_comp_signal" pin="{1c997823-be8b-4853-8997-1bdb649731fe}" signal="{bc807be7-067d-49d2-8d43-fae240977ee3}"/>
+                        <map display="gen_comp_signal" pin="{3fa1746f-f8b7-423e-b582-849abb746ea0}" signal="{97ee3357-26ac-416e-9374-601c14be2364}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

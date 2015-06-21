@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{c7c2e64e-1416-4cf9-b5af-83c41aacfb2e}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">DIAC-</name>
+        <description locale="en_US">&lt;b>DIAC&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: DIAC-
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{1a3f3e99-0126-4bed-b8a1-2eb8df46a9dc}</generic_component>
+        <package>{7c202069-4856-427d-a803-ae597c58b2fd}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{80b9a25b-c081-413a-9105-c5bea633044a}" signal="{b5933321-d574-4dba-be74-02ba467cd8f3}"/>
+        <map pad="{3ce580e3-24f7-4ebc-9ddf-648d22992d15}" signal="{97d4bb0b-844f-4d15-bea4-730e4815418a}"/>
+    </pad_signal_map>
+</component>

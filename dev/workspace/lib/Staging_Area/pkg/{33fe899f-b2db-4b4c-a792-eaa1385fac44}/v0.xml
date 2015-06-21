@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{33fe899f-b2db-4b4c-a792-eaa1385fac44}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:38Z</created>
+        <last_modified>2015-06-21T12:37:38Z</last_modified>
+        <name locale="en_US">DO13M</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+diameter 6.35 mm metall, horizontal, grid 20.32 mm
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: DO13M
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{059c11d2-6808-4504-9114-47e8deb2d438}</footprint>
+    </meta>
+    <categories/>
+</package>

@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{575b5a66-f271-4166-a2a6-78a0e38d9451}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:45Z</created>
+        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <name locale="en_US">54M10AUM5</name>
+        <description locale="en_US">&lt;b>Monolithic Crystal Filters&lt;/b>&lt;p>
+Source: www.vanlong.com
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: 54M10AUM5
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{696e70cf-2a13-4174-80d3-200cb3778c52}</generic_component>
+        <package>{a68aa489-0b6a-45e5-a7a4-880e43f63545}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{4f7d8962-be6a-402f-9829-5ff5f9af558c}" signal="{5ff08d30-32fb-423d-8a64-187961c9291f}"/>
+        <map pad="{19d42c73-6102-482e-bba7-50cfeda56f04}" signal="{01d54981-4824-40d5-8605-ce61d4d713f1}"/>
+        <map pad="{67c2f5d8-ff13-437e-a164-8b028726b47a}" signal="{34551c77-e587-43f4-b90c-3f098b075526}"/>
+    </pad_signal_map>
+</component>

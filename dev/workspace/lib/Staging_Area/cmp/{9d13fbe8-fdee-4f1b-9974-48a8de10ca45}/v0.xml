@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{9d13fbe8-fdee-4f1b-9974-48a8de10ca45}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:42Z</created>
+        <last_modified>2015-06-21T12:37:42Z</last_modified>
+        <name locale="en_US">R-EU_</name>
+        <description locale="en_US">&lt;B>RESISTOR&lt;/B>, European symbol
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: R-EU_
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{ef80cd5e-2689-47ee-8888-31d04fc99174}</generic_component>
+        <package>{89b43604-0c41-40c4-85e8-63709a8c787e}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{fe228405-e1ce-479a-b5d5-48ad7245a852}" signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
+        <map pad="{baa42d3d-e7dc-4d0c-b12e-2c473bd24ce5}" signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
+    </pad_signal_map>
+</component>

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{e167d906-66d1-4bd7-bbb4-cdc0f72dc578}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">DO41-7.6</name>
+        <description locale="en_US">&lt;b>DO41&lt;/b> 7.6mm x 2mm&lt;p>
+Source: http://www.diodes.com/datasheets/ds23001.pdf
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: DO41-7.6
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{b938ba99-8196-4a60-850b-3aba633ec7d0}</footprint>
+    </meta>
+    <categories/>
+</package>

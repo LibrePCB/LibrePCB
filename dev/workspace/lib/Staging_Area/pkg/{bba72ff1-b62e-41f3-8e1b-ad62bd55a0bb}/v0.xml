@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{bba72ff1-b62e-41f3-8e1b-ad62bd55a0bb}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">LED3MM</name>
+        <description locale="en_US">&lt;B>LED&lt;/B>&lt;p>
+3 mm, round
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: LED3MM
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{00b60b04-991d-4d1c-adaa-26f3c4b3c605}</footprint>
+    </meta>
+    <categories/>
+</package>

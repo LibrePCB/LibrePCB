@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{5a86f4e2-00c3-48d0-90a4-7280c1038f55}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">SMD1,27-2,54</name>
+        <description locale="en_US">&lt;b>SMD PAD&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: wirepad.lbr
+Name: SMD1,27-2,54
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <text v_align="bottom" height="2.500000" x="0.000000" y="0.000000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="3.175000" x="-0.800000" y="-2.400000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="2.540000" x="0.000000" drill="0.000000" uuid="{ca87adc4-b851-42df-b219-9dd316df70db}" y="0.000000" rotation="0.000000" layer="200" width="1.270000" type="smd_rect">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{aef0c02f-cad5-4fdf-88bb-74e9c24b3ca1}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">BYW80</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+high-efficiency fast recovery rectifier (ST)
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BYW80
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{c52f0fda-4514-4ed5-92cd-12e111ee3b36}</generic_component>
+        <package>{d209d33d-0fdd-4fde-ace9-d4ef1fe4e70c}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{22c59b75-9555-4663-b1ec-2cb2e628e643}" signal="{913ecc57-a1b8-42f6-9ea4-dba8a7868ea2}"/>
+        <map pad="{d3037401-716f-4079-8049-c4fafefac3ec}" signal="{e71ea7e6-b3e1-42f3-953d-d32780d1e3e8}"/>
+    </pad_signal_map>
+</component>

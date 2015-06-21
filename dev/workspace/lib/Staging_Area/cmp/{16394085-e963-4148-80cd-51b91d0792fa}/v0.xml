@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{16394085-e963-4148-80cd-51b91d0792fa}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">CLN6A</name>
+        <description locale="en_US">&lt;b>Cree® CLN6A-WKW/MKW LED&lt;/b>&lt;p>
+Source: &lt;a href="http://www.cree.com/products/pdf/LEDlamps/CLN6A%28979%29.pdf"> Data sheet&lt;/a>
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: CLN6A
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{8325a124-09bf-423a-b8a2-88861409f547}</generic_component>
+        <package>{e2c66a8d-9b8b-4f0d-9ab6-f4beabd9a2ea}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{d811fa74-31a8-4837-a8aa-5ea4deea79a5}" signal="{74c504b4-8a66-482b-a593-7bc44c729518}"/>
+        <map pad="{a7e57fa8-62b0-46ce-8608-55bb1fa05a4e}" signal="{74c504b4-8a66-482b-a593-7bc44c729518}"/>
+        <map pad="{edfe2da0-1098-4ec0-9c33-f71c59e90f90}" signal="{a2a08c10-486f-454c-8305-11d1fbd88aba}"/>
+        <map pad="{deda161a-5d39-4dd4-a15f-c6b50b4627b8}" signal="{a2a08c10-486f-454c-8305-11d1fbd88aba}"/>
+        <map pad="{76f82dde-ebb9-49f4-a7a9-c9a3c4213758}" signal="{a2a08c10-486f-454c-8305-11d1fbd88aba}"/>
+        <map pad="{21821a45-1b5c-4352-b43b-952736886858}" signal="{74c504b4-8a66-482b-a593-7bc44c729518}"/>
+        <map pad="{4f4fde6a-0058-42e0-9c47-28759ee70c76}" signal="{e5526cca-26ec-4d6e-8879-cc681fd389ae}"/>
+    </pad_signal_map>
+</component>

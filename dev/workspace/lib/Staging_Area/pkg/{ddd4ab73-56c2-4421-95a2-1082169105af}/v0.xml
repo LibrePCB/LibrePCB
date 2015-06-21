@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{ddd4ab73-56c2-4421-95a2-1082169105af}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">SOD106-W</name>
+        <description locale="en_US">&lt;b>SOD106 Wave soldering&lt;/b> Philips SC01_Mounting_1996.pdf
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: SOD106-W
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{0d1f8fb8-027d-43ba-93ae-5028d2ce2099}</footprint>
+    </meta>
+    <categories/>
+</package>

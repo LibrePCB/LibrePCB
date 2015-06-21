@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{9b741594-1095-470b-aed5-c0ab3edf7c88}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">BAS70-04</name>
+        <description locale="en_US">&lt;b>Silicon Schottky Diodes&lt;/b>&lt;p>
+General-purpose diode for high-speed switching
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BAS70-04
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{49654262-fa2e-4a2e-abc1-1013c9f89e8b}</generic_component>
+        <package>{5dee62bd-8765-43c3-bd15-3cdaa2af69f7}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{e084a5a2-054f-4b96-9d35-e5a4a69110c9}" signal="{8b1ab0d2-8bfa-4bac-a75c-3cc7c05859e7}"/>
+        <map pad="{5df1620d-1a12-409c-a6dc-4ac9c3ea2160}" signal="{376ac41c-c703-4232-8d34-66ce53333afa}"/>
+        <map pad="{0b7e3bae-fd35-4351-876f-73d31fc11e9a}" signal="{4f1c7d26-7e2d-416d-9255-88c4e780b882}"/>
+    </pad_signal_map>
+</component>

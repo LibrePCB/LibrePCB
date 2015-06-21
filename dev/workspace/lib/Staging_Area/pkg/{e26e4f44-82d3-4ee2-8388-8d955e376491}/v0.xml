@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{e26e4f44-82d3-4ee2-8388-8d955e376491}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">LED2X5</name>
+        <description locale="en_US">&lt;B>LED&lt;/B>&lt;p>
+2 x 5 mm, rectangle
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: LED2X5
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{a7e439c3-3f1d-424f-9837-993d437e3f92}</footprint>
+    </meta>
+    <categories/>
+</package>

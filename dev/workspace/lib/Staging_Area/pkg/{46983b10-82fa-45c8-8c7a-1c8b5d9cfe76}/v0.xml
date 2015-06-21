@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{46983b10-82fa-45c8-8c7a-1c8b5d9cfe76}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:38Z</created>
+        <last_modified>2015-06-21T12:37:38Z</last_modified>
+        <name locale="en_US">G4-12E</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+diameter 7.62 mm, horizontal, grid 12.7 mm
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: G4-12E
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{508d59e9-6953-4c55-97ff-c02feb50a8ea}</footprint>
+    </meta>
+    <categories/>
+</package>

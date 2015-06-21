@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{2891394c-42f9-43af-8390-81a57909e825}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">BYW55</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+silicon-mesa rectifier (Vishay Telefunken)
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BYW55
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{88291eb2-0bcb-4c55-9100-f7fb0a0d479f}</generic_component>
+        <package>{ec3d80fe-1077-4941-8a46-14032e57c463}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{fe092765-ab7b-4d76-8689-9c6f38cd0acd}" signal="{6d3da87d-9cf7-4941-9a2b-3af0d5359001}"/>
+        <map pad="{1db57d0b-3ea9-49d0-b119-93d01992b454}" signal="{93fa7507-7088-488d-8b94-5f060af98e9e}"/>
+    </pad_signal_map>
+</component>

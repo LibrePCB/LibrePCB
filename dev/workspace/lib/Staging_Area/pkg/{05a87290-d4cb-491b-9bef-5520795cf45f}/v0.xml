@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{05a87290-d4cb-491b-9bef-5520795cf45f}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:33Z</created>
+        <last_modified>2015-06-21T12:37:33Z</last_modified>
+        <name locale="en_US">EU43-14</name>
+        <description locale="en_US">&lt;b>BIPOLAR ELECTROLYTIC CAPACITOR&lt;/b>&lt;p>
+grid 43 mm, diameter 14 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: EU43-14
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{66558d0e-a1b2-471f-b084-53c84eef065b}</footprint>
+    </meta>
+    <categories/>
+</package>

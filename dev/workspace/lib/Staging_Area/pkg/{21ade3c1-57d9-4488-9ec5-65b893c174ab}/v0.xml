@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{21ade3c1-57d9-4488-9ec5-65b893c174ab}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">S7379-01</name>
+        <description locale="en_US">&lt;b>Si PIN Quadrant photodiode&lt;/b>&lt;p>
+Source: http://sales.hamamatsu.com/assets/pdf/parts_S/S7379-01_etc.pdf
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: S7379-01
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{9c68694b-9e30-493d-af93-c2cda0965668}</footprint>
+    </meta>
+    <categories/>
+</package>

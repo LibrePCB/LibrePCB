@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{ce9069be-5fa0-428a-90ac-3a96511b12f3}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">LRTB_G6SG</name>
+        <description locale="en_US">&lt;b>LRTB G6SG&lt;/b> 6-lead TOPLED®&lt;p>
+Source: OSRAM Opto Semiconductors ... LRTB_G6SG_Pb_free.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: LRTB_G6SG
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{c17f9489-7f99-4ead-986b-af76628b397f}</generic_component>
+        <package>{0e0977ef-e1e7-4d9c-96de-94e325aebb71}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{eb5e4dbf-3882-4a28-9e6b-53ab6ab271fc}" signal="{44179932-e449-4dfa-86fd-3dd79f302852}"/>
+        <map pad="{14972cf8-f062-4536-b94a-2a414a340a07}" signal="{ebdf69aa-6362-4963-89f9-786810d8f2f0}"/>
+        <map pad="{eae2c7e0-8f0d-401d-868c-13ec9d0d6c92}" signal="{4b1fa05a-2088-4d47-bf3a-c1e7aafe6a29}"/>
+        <map pad="{e962ea6a-a0ed-4cd6-8241-9a2477ec61fd}" signal="{33a5c11b-8f04-4523-9309-d9031adf5f11}"/>
+        <map pad="{64ed340e-4c45-4d92-bef3-991f7f8b364c}" signal="{73449ca6-85b0-45ae-af1c-a6dfb0007dcd}"/>
+        <map pad="{91d64654-fc56-45e9-b218-b4b356c2bbe3}" signal="{06ee3605-8327-4b94-9ebf-f3344a0643b1}"/>
+    </pad_signal_map>
+</component>

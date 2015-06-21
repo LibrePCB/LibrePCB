@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{2d148859-b572-4880-b530-fca7e250c6e1}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">PESD1CAN</name>
+        <description locale="en_US">&lt;b>CAN bus ESD protection diode&lt;/b>&lt;p>
+Source: http://www.nxp.com/documents/data_sheet/PESD1CAN.pdf
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: PESD1CAN
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">D</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{9c7581b0-1678-4352-b6dc-3c8753816781}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{1b12d7b1-9172-4073-b692-49c03af2f56f}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{daf08249-e6c6-443a-bc18-995a7d10888e}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">3</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{878d2427-5e17-484b-905e-f30167c7aa8c}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{e6cfd147-b9a2-415b-b451-756f38713f9f}" suffix="" symbol="{0d1f2678-9843-4bab-b911-a9caf6b0215d}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{9a5f12c9-f4ab-42da-a23e-3c45f0dbabe8}" signal="{1b12d7b1-9172-4073-b692-49c03af2f56f}"/>
+                        <map display="gen_comp_signal" pin="{945e7b01-0da4-40ce-aa3b-da12496fe1e4}" signal="{9c7581b0-1678-4352-b6dc-3c8753816781}"/>
+                        <map display="gen_comp_signal" pin="{b810f129-974c-41ab-876f-c1cbbddc1340}" signal="{daf08249-e6c6-443a-bc18-995a7d10888e}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

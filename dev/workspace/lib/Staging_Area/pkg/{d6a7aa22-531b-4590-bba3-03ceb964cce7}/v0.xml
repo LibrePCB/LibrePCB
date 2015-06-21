@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{d6a7aa22-531b-4590-bba3-03ceb964cce7}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">C2225K</name>
+        <description locale="en_US">&lt;b>Ceramic Chip Capacitor KEMET 2225 reflow solder&lt;/b>&lt;p>Metric Code Size 5664
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: C2225K
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{4adf44eb-c7e1-4481-ac4e-4f391b8b8d39}</footprint>
+    </meta>
+    <categories/>
+</package>

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{b32393f8-92c6-4b3c-9569-07bf1491386e}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:37Z</created>
+        <last_modified>2015-06-21T12:37:37Z</last_modified>
+        <name locale="en_US">MC-405</name>
+        <description locale="en_US">&lt;b>MC-405 CRYSTAL UNIT&lt;/b>&lt;p>
+Source: MC-306_405_406_E07X.PDF
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: MC-405
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{028a58c1-673e-413f-83d1-62322d48bc64}</footprint>
+    </meta>
+    <categories/>
+</package>

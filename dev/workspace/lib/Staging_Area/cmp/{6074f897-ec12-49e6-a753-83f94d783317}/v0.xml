@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{6074f897-ec12-49e6-a753-83f94d783317}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:43Z</created>
+        <last_modified>2015-06-21T12:37:43Z</last_modified>
+        <name locale="en_US">CX</name>
+        <description locale="en_US">&lt;B>X CAPACITOR&lt;/B>&lt;p>
+for power line
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: CX
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{f8dbb0a1-d558-4df9-82f1-86564304a768}</generic_component>
+        <package>{7ebe7816-a746-4352-8b3f-7e672e254e4a}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{ea913ed5-b368-4492-b242-88bbdfc22790}" signal="{7bdf360c-b2cf-437a-b1cc-b6788994cf8d}"/>
+        <map pad="{0427ff0c-fee9-40c5-bc12-20a0adad181d}" signal="{68690a33-db60-4d6e-864e-745c86d25bff}"/>
+    </pad_signal_map>
+</component>

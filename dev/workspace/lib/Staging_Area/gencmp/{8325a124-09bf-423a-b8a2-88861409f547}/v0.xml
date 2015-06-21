@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{8325a124-09bf-423a-b8a2-88861409f547}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">CLN6A</name>
+        <description locale="en_US">&lt;b>Cree® CLN6A-WKW/MKW LED&lt;/b>&lt;p>
+Source: &lt;a href="http://www.cree.com/products/pdf/LEDlamps/CLN6A%28979%29.pdf"> Data sheet&lt;/a>
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: CLN6A
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">LED</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{74c504b4-8a66-482b-a593-7bc44c729518}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{a2a08c10-486f-454c-8305-11d1fbd88aba}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{e5526cca-26ec-4d6e-8879-cc681fd389ae}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">TH</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{204c55e9-8818-4458-810d-8c66e6fcc2e5}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{e3cdb3d6-ac09-4d4c-9088-995ae83de0f4}" suffix="" symbol="{cb442e56-0ec7-4486-8c43-7bdfa9b47d9a}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{18de942d-8b47-4daf-9e07-d089204e09d0}" signal="{a2a08c10-486f-454c-8305-11d1fbd88aba}"/>
+                        <map display="gen_comp_signal" pin="{2a64f851-340a-43f2-b1cf-06a1d4b54560}" signal="{74c504b4-8a66-482b-a593-7bc44c729518}"/>
+                    </pin_signal_map>
+                </item>
+                <item uuid="{0ca940df-c242-4a89-9d40-ef6b9fb749f6}" suffix="TH" symbol="{a49024b3-de81-419e-a4cf-1841b255e637}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{d6cd1e3e-8404-47b3-b588-361810590a72}" signal="{e5526cca-26ec-4d6e-8879-cc681fd389ae}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{4746fd66-0512-491e-8294-1d050415e263}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">BY229B</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+Fast Switching Rectifier, 8A (Vishay)
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BY229B
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{308fba43-f986-46cf-9ee4-38659124489e}</generic_component>
+        <package>{a1a2ed8d-b733-462b-a050-890e6192c35b}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{26a19517-37dd-4b69-845d-ee84e152dded}" signal="{22d6ea6f-ff63-4401-853a-c290b43eb873}"/>
+        <map pad="{7ccc5c44-7939-4303-b861-5db42cb90adf}" signal="{f9f876ad-0e81-4e13-8cb3-f46ab07fa7a2}"/>
+        <map pad="{01600930-e255-4d95-990a-b149dab9d21a}" signal="{61cd1e21-81c0-442c-babb-4365bd440d39}"/>
+    </pad_signal_map>
+</component>

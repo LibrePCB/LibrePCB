@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{68239c28-6752-45d7-9779-4db57fabae60}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">SPHWHTHAD605S0W0U4</name>
+        <description locale="en_US">&lt;b>HV-AC HIGH POWER LED&lt;/b>&lt;p>
+Source: SAMSUNG SPHWHTHAD605S0W0U4.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: SPHWHTHAD605S0W0U4
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">LED</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{6e678969-f0d0-4945-8c6e-5b8f9bfa155d}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{787275e3-8ac0-4bc1-bb0d-1b30eb20a901}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{fd8c228b-fb9d-49dc-ade9-c23bfe3439b0}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">4</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{742de1a9-95ef-48fa-b7ca-73dc5436d078}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">5</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{8f2debd3-0f54-4600-af01-5a7b560f98cf}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">TH</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{5f6b1f51-d439-4e64-b73a-e9bea8ae8dc9}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{cacb2a37-dc67-4cf2-95c9-14a7f59b8cb2}" suffix="" symbol="{1c700993-5be5-4648-9e5c-03c0ebe4a060}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{97c31098-fe42-40d0-8841-cf106f87ca01}" signal="{787275e3-8ac0-4bc1-bb0d-1b30eb20a901}"/>
+                        <map display="gen_comp_signal" pin="{43398469-a6e2-4f12-b745-63ef8e700544}" signal="{fd8c228b-fb9d-49dc-ade9-c23bfe3439b0}"/>
+                        <map display="gen_comp_signal" pin="{ec569bd3-6c07-4bc6-857a-a3b00914800b}" signal="{6e678969-f0d0-4945-8c6e-5b8f9bfa155d}"/>
+                        <map display="gen_comp_signal" pin="{c31c5b96-b640-4d74-8e93-f1d1a7100b1c}" signal="{742de1a9-95ef-48fa-b7ca-73dc5436d078}"/>
+                    </pin_signal_map>
+                </item>
+                <item uuid="{622add06-99af-421b-9171-e69de2e21b8f}" suffix="TH" symbol="{a49024b3-de81-419e-a4cf-1841b255e637}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{d6cd1e3e-8404-47b3-b588-361810590a72}" signal="{8f2debd3-0f54-4600-af01-5a7b560f98cf}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

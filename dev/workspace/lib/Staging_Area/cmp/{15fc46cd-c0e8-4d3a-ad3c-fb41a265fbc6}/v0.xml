@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{15fc46cd-c0e8-4d3a-ad3c-fb41a265fbc6}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">DIODE_2SCHOTTKY-</name>
+        <description locale="en_US">Dual &lt;B>SCHOTTKY DIODE&lt;/B>&lt;p>
+common cathode
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: DIODE_2SCHOTTKY-
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{dd6f1ca8-7222-41d5-be2f-2ed4b4e17213}</generic_component>
+        <package>{f7a2023f-8f5a-4789-ad59-494299d4a48a}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{0d6f7409-a96e-4bd6-82c1-dc6496a53ae6}" signal="{dbaea8d9-cc6f-4679-a89c-6c74e12cec6a}"/>
+        <map pad="{ad311c4f-3d59-464f-8723-11b8df4e1e72}" signal="{7f593ae8-d0dc-4597-9671-4384b57dd1eb}"/>
+        <map pad="{ac567fe2-5cf9-4cef-b02d-c67c0bd06106}" signal="{c83a5965-2c3f-40a3-b921-9c9257105a0e}"/>
+    </pad_signal_map>
+</component>

@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{f4609eb1-0d86-4203-b0a3-1ee93a0f9290}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">SMD2</name>
+        <description locale="en_US">&lt;b>SMD PAD&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: wirepad.lbr
+Name: SMD2
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{ec7460e7-f221-4754-b6d6-73a0e584cb35}</generic_component>
+        <package>{443f421c-9dd5-462c-a775-658ed9d51d1e}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{ca87adc4-b851-42df-b219-9dd316df70db}" signal="{ca065998-338e-4ca7-b811-fdec77d4f55c}"/>
+    </pad_signal_map>
+</component>

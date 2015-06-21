@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{d9a54185-48cf-4d3e-832b-0f987391cc77}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">CREE-XLAMP-XM-L</name>
+        <description locale="en_US">&lt;b>Cree® XLamp® XM-L LEDs&lt;/b>&lt;p>
+Source: http://www.cree.com
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: CREE-XLAMP-XM-L
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{7c166d31-c830-4559-88de-bd3d87763dee}</footprint>
+    </meta>
+    <categories/>
+</package>

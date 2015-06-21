@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{2b482546-923f-4bc7-a7e6-65852d47aa64}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">WIREPAD</name>
+        <description locale="en_US">&lt;b>Wire PAD&lt;/b> connect wire on PCB
+
+This element was automatically imported from Eagle
+Filepath: wirepad.lbr
+Name: WIREPAD
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{197dacc7-3785-4054-a538-ced0d6271faa}</generic_component>
+        <package>{bf77778d-eee6-4b56-ad82-d24f9c668a63}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{56588e0b-e32c-4508-82a0-27c3f1429d33}" signal="{ad6ae81a-7914-49b7-a87b-a0e8574b7398}"/>
+    </pad_signal_map>
+</component>

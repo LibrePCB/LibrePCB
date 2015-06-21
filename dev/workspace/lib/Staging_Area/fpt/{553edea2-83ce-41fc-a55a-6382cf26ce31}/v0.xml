@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{553edea2-83ce-41fc-a55a-6382cf26ce31}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:35Z</created>
+        <last_modified>2015-06-21T12:37:35Z</last_modified>
+        <name locale="en_US">WSC4527</name>
+        <description locale="en_US">&lt;b>Wirewound Resistors, Precision Power&lt;/b>&lt;p>
+Source: VISHAY wscwsn.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: WSC4527
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="170" start_x="5.675000" start_y="-3.375000" fill="false" width="0.203200">
+            <segment end_x="5.675000" end_y="3.400000" angle="0.000000"/>
+            <segment end_x="-5.675000" end_y="3.400000" angle="0.000000"/>
+            <segment end_x="-5.675000" end_y="-3.375000" angle="0.000000"/>
+            <segment end_x="5.675000" end_y="-3.375000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-5.775000" y="3.925000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-5.775000" y="-5.150000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="5.840000" x="-4.575000" drill="0.000000" uuid="{a8eed70d-8f37-4e7b-834d-a37dd0da7bd3}" y="0.025000" rotation="0.000000" layer="200" width="3.940000" type="smd_rect">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="5.840000" x="4.575000" drill="0.000000" uuid="{bec34d47-eade-445a-a6e8-eee033eeb067}" y="0.000000" rotation="0.000000" layer="200" width="3.940000" type="smd_rect">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

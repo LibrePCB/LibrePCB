@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{e15099bc-9ca4-4604-bd19-c86d7a26f060}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:37Z</created>
+        <last_modified>2015-06-21T12:37:37Z</last_modified>
+        <name locale="en_US">F18/12P</name>
+        <description locale="en_US">&lt;b>Monolithic Crystal Filters&lt;/b>&lt;p>
+Source: www.golledge.com
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: F18/12P
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{47db2dd9-f477-4384-83f6-bb48137642d2}</footprint>
+    </meta>
+    <categories/>
+</package>

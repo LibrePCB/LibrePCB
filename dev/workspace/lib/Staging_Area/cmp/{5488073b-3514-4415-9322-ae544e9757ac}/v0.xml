@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{5488073b-3514-4415-9322-ae544e9757ac}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">DUOLED-RY-C</name>
+        <description locale="en_US">&lt;B>DUO LED&lt;/B>&lt;P>
+2 colors (red/yellow), 5 mm, round, common Cathode&lt;BR>
+&lt;I>www.ligitek.com&lt;/I> or other producers.
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: DUOLED-RY-C
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{101477a8-30bf-449a-a854-6dd583d34902}</generic_component>
+        <package>{d6ba7258-1021-43c6-9d17-7287f6d42770}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{96194ca8-9e4c-450c-a399-f4e452502dcc}" signal="{a3cb2639-7b65-437b-99e1-0b48220807d2}"/>
+        <map pad="{3debee99-8728-4462-b3ca-7b22f3faa006}" signal="{e91b0bf6-8004-4022-9ff8-86cf911a2ace}"/>
+        <map pad="{e319663b-b8cc-477d-9316-821b4063dec3}" signal="{b9a949a0-9f73-41cf-a738-40a9e8d2009a}"/>
+    </pad_signal_map>
+</component>

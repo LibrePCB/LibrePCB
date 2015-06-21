@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{1036050e-8453-476b-954e-fadc7defc39a}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">BA296</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BA296
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{c006f171-5a62-43ab-a625-c44121349cd1}</generic_component>
+        <package>{426c0938-fa62-44f4-bbaa-ef01f4c3a5aa}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{2b7cfc0e-b210-4548-9e87-1f1a37d5cb6c}" signal="{a4e17039-24b1-41a3-95aa-9e6f56aa1f65}"/>
+        <map pad="{49411533-71c4-4aef-94f5-b10c19df0b72}" signal="{4aee9c5c-5ba4-4f27-a720-8676f2d42b6f}"/>
+    </pad_signal_map>
+</component>

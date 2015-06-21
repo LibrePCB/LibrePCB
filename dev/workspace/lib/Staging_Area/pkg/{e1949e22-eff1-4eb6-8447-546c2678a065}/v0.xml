@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{e1949e22-eff1-4eb6-8447-546c2678a065}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">SFH480</name>
+        <description locale="en_US">&lt;B>IR LED&lt;/B>&lt;p>
+infrared emitting diode, Infineon
+TO-18, lead spacing 2.54 mm, cathode marking&lt;p>
+Inifineon
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: SFH480
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{50350313-5898-4166-b3d3-f4d67054411a}</footprint>
+    </meta>
+    <categories/>
+</package>

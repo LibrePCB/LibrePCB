@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{713bdc8c-ab3e-40bb-ac88-86e7e092ce13}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:38Z</created>
+        <last_modified>2015-06-21T12:37:38Z</last_modified>
+        <name locale="en_US">DO34-5</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+diameter 1.8 mm, horizontal, grid 5.08 mm
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: DO34-5
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{d7214cf9-0cfb-4a82-aacb-ae4ee90337bd}</footprint>
+    </meta>
+    <categories/>
+</package>

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{d562bc30-21dd-4604-9200-107bfced9fa3}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:38Z</created>
+        <last_modified>2015-06-21T12:37:38Z</last_modified>
+        <name locale="en_US">SIL08C</name>
+        <description locale="en_US">7 &lt;B>DIODES&lt;/B>&lt;p>
+single in line 7 diodes with common cathode
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: SIL08C
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{0b542c1f-4ba8-4063-af00-4f8e95f8a3a6}</footprint>
+    </meta>
+    <categories/>
+</package>

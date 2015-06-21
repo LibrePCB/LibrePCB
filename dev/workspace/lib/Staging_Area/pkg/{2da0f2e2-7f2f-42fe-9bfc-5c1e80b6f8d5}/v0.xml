@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{2da0f2e2-7f2f-42fe-9bfc-5c1e80b6f8d5}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:33Z</created>
+        <last_modified>2015-06-21T12:37:33Z</last_modified>
+        <name locale="en_US">RTRIM3224W</name>
+        <description locale="en_US">&lt;b>Trimm resistor&lt;/b> BOURNS&lt;p>
+Top Adjust
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: RTRIM3224W
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{0d64c570-a555-497a-a770-40d6c9449231}</footprint>
+    </meta>
+    <categories/>
+</package>

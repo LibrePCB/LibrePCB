@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{0b374366-9495-45de-a748-c4a15eee1805}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">DIODE-</name>
+        <description locale="en_US">&lt;b>DIODE&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: DIODE-
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{37afa3de-06dc-4dda-86d1-673099564e56}</generic_component>
+        <package>{7598b2cd-b3d6-48aa-8105-b99609654747}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{69ff349a-c3b8-4fdd-bfb8-f2088b5e933d}" signal="{2b1bc88a-66af-4d12-a243-011dcad5944e}"/>
+        <map pad="{99ac51d6-05a7-4ce2-9c97-1bfaf8d74248}" signal="{e9c960fd-ff27-4ec4-a801-43ce63e5fe33}"/>
+    </pad_signal_map>
+</component>

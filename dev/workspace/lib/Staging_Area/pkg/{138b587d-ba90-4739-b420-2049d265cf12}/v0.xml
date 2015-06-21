@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{138b587d-ba90-4739-b420-2049d265cf12}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">DO214AA</name>
+        <description locale="en_US">&lt;b>DIODE&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: DO214AA
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{e7fadbee-4bb1-43df-a89d-1c1fd6be9e9b}</footprint>
+    </meta>
+    <categories/>
+</package>

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{75bd166e-7ba9-4421-950c-fbadd6eb32df}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:33Z</created>
+        <last_modified>2015-06-21T12:37:33Z</last_modified>
+        <name locale="en_US">RTRIM3214W</name>
+        <description locale="en_US">&lt;b>Trimm resistor&lt;/b> BOURNS&lt;p>
+SMD Cermet trimmer
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: RTRIM3214W
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{3d9d4f29-d05d-4b94-a755-f5c57fdc74b6}</footprint>
+    </meta>
+    <categories/>
+</package>

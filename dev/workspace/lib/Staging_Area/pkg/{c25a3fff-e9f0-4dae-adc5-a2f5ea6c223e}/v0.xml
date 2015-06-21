@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{c25a3fff-e9f0-4dae-adc5-a2f5ea6c223e}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">Z-POWER-LED-PCB-TYPE</name>
+        <description locale="en_US">&lt;b>Z-Power LED&lt;/b>&lt;p>
+Source: http://www.seoulsemicon.co.kr .. X42182.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: Z-POWER-LED-PCB-TYPE
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{c5dfbce8-d344-4739-93b1-d05b5d025b51}</footprint>
+    </meta>
+    <categories/>
+</package>

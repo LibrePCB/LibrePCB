@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{1e2dc9fd-7268-4235-8f2f-110ddb810cb2}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">SOT666</name>
+        <description locale="en_US">&lt;b>SOT 666 Reflow soldering foorprint&lt;/b>&lt;p>
+Source: Philips - BAS70_1PS7XSB70_SER_8.pdf
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: SOT666
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{4f80e51e-dead-4a52-8584-7a6ef76fdb20}</footprint>
+    </meta>
+    <categories/>
+</package>

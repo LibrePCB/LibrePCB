@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<symbol version="0">
+    <meta>
+        <uuid>{8d46d459-3188-4959-aee5-a2113b5f325c}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:29Z</created>
+        <last_modified>2015-06-21T12:37:29Z</last_modified>
+        <name locale="en_US">KA2KA</name>
+        <description locale="en_US">
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: KA2KA
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="10" start_x="-1.270000" start_y="1.270000" fill="false" width="0.254000">
+            <segment end_x="-3.810000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-3.810000" start_y="0.000000" fill="false" width="0.254000">
+            <segment end_x="-1.270000" end_y="-1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-3.810000" start_y="-1.270000" fill="false" width="0.254000">
+            <segment end_x="-3.810000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-2.540000" start_y="0.000000" fill="false" width="0.152400">
+            <segment end_x="-3.810000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-1.270000" start_y="-1.270000" fill="false" width="0.254000">
+            <segment end_x="-1.270000" end_y="1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-3.810000" start_y="0.000000" fill="false" width="0.254000">
+            <segment end_x="-3.810000" end_y="1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="3.810000" start_y="1.270000" fill="false" width="0.254000">
+            <segment end_x="1.270000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="1.270000" start_y="0.000000" fill="false" width="0.254000">
+            <segment end_x="3.810000" end_y="-1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="1.270000" start_y="-1.270000" fill="false" width="0.254000">
+            <segment end_x="1.270000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-3.810000" start_y="0.000000" fill="false" width="0.152400">
+            <segment end_x="1.270000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="2.540000" start_y="0.000000" fill="false" width="0.152400">
+            <segment end_x="1.270000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="3.810000" start_y="-1.270000" fill="false" width="0.254000">
+            <segment end_x="3.810000" end_y="1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="1.270000" start_y="0.000000" fill="false" width="0.254000">
+            <segment end_x="1.270000" end_y="1.270000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="0.762000" y="2.006600" layer="20" text="${SYM::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-4.826000" y="-3.454400" layer="21" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+        <ellipse radius_x="0.127000" x="0.000000" radius_y="0.127000" grab_area="true" y="0.000000" layer="10" rotation="0.000000" fill="false" width="0.406400"/>
+    </geometry>
+    <pins>
+        <pin length="2.540000" x="5.080000" uuid="{13801da5-899f-40a5-9292-d2769514f0be}" y="0.000000" angle="-90.000000">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="2.540000" x="-5.080000" uuid="{cec6580a-8cfe-4f3f-a13b-9d02237143b4}" y="0.000000" angle="90.000000">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="2.540000" x="0.000000" uuid="{8a38a856-2aad-4d9e-9ab4-6a0f2a479a79}" y="2.540000" angle="-180.000000">
+            <name locale="en_US">AC</name>
+            <description locale="en_US"/>
+        </pin>
+    </pins>
+</symbol>

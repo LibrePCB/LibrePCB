@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{9e374c39-4ba3-4834-a6cb-fa4944e1ba9b}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:36Z</created>
+        <last_modified>2015-06-21T12:37:36Z</last_modified>
+        <name locale="en_US">FE08-2W</name>
+        <description locale="en_US">&lt;b>FEMALE HEADER&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: con-lsta.lbr
+Name: FE08-2W
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{7652ef63-002e-4229-9c37-bf42524d1f54}</footprint>
+    </meta>
+    <categories/>
+</package>

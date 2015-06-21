@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{ea6c94dd-9068-44b6-8821-915e78e26069}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:45Z</created>
+        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <name locale="en_US">CRYSTAL</name>
+        <description locale="en_US">&lt;b>CRYSTAL&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: CRYSTAL
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{b847a54b-a83e-47ff-a976-7704bf05bbf4}</generic_component>
+        <package>{f43dd882-151a-42dc-ab38-2656ecd6aad6}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{0985edda-cd24-4de1-841b-98a2ae476883}" signal="{878301c2-bacc-4ffa-923c-ef5b1f06e5fe}"/>
+        <map pad="{ccacf72c-6f14-4419-a34d-ce97e50ea557}" signal="{fd760be8-09ce-411f-a869-fdc1e74229a9}"/>
+    </pad_signal_map>
+</component>

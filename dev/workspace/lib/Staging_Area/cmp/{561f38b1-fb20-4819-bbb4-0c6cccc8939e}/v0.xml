@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{561f38b1-fb20-4819-bbb4-0c6cccc8939e}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">MUR620CT</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+dual rectifier, 6 A, 200 V, common cathode
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: MUR620CT
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{725d25e4-e112-48c2-93a4-8ef708ca82a5}</generic_component>
+        <package>{9053b774-f4c5-41da-9257-41ecac5d5502}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{a4ca285a-3378-4252-8665-87b2c38ad17d}" signal="{c40402bb-112b-48ac-9357-8c33c163ce97}"/>
+        <map pad="{4afbfd6e-11ad-440d-b903-d19b38a2fa31}" signal="{0daf2472-e1c3-4433-abc8-73364cc0b55c}"/>
+        <map pad="{952f8098-f882-4c54-94b6-28e9f9b52fad}" signal="{8864e37c-6aa7-4ace-909c-7f3987034cbb}"/>
+    </pad_signal_map>
+</component>

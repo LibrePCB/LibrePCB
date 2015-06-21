@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{bfb39b91-2fe7-4dda-a77b-1d6056916683}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:45Z</created>
+        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <name locale="en_US">MC-406</name>
+        <description locale="en_US">&lt;b>kHz RANGE CRYSTAL UNIT&lt;/b> SMD&lt;p>
+Source: MC-306_405_406_E07X.PDF &lt;a href="http://www.epsontoyocom.co.jp"> Homepage &lt;/a>
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: MC-406
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{f43ba3df-d00e-461b-ac8f-ad3680ad8795}</generic_component>
+        <package>{f9aba3d5-b4b5-4cb7-be96-188236bad159}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{2d9bc977-350c-4229-913c-df8a0fecb48c}" signal="{88ccf3fa-41ef-4661-be1a-54cecb70ea7b}"/>
+        <map pad="{f0fd4946-8f27-4ce8-b2aa-98dd4fda1560}" signal="{573c2fb4-8c0b-406a-a482-ae64d411b453}"/>
+    </pad_signal_map>
+</component>

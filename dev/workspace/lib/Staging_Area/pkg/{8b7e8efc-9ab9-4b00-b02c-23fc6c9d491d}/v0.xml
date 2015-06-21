@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{8b7e8efc-9ab9-4b00-b02c-23fc6c9d491d}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:38Z</created>
+        <last_modified>2015-06-21T12:37:38Z</last_modified>
+        <name locale="en_US">F126Z12</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+diameter 3 mm, horizontal, grid 12.7 mm
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: F126Z12
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{9932b26a-40bd-4636-9565-d4a0d77c8048}</footprint>
+    </meta>
+    <categories/>
+</package>

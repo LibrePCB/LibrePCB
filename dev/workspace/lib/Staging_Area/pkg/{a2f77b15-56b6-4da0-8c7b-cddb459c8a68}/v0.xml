@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{a2f77b15-56b6-4da0-8c7b-cddb459c8a68}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:33Z</created>
+        <last_modified>2015-06-21T12:37:33Z</last_modified>
+        <name locale="en_US">RTRIM3059Y</name>
+        <description locale="en_US">&lt;b>Trimm resistor&lt;/b> BOURNS&lt;p>
+waschfest MIL-R-22097
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: RTRIM3059Y
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{06b90e13-e3cf-4888-92e2-c6d80fc32bdd}</footprint>
+    </meta>
+    <categories/>
+</package>

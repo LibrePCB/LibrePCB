@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{d1d1acbc-e024-4753-ac72-4c05f9ee542a}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">C0805K</name>
+        <description locale="en_US">&lt;b>Ceramic Chip Capacitor KEMET 0805 reflow solder&lt;/b>&lt;p>
+Metric Code Size 2012
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: C0805K
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{c7a68879-21d0-45c1-815e-f05cdacf2b20}</footprint>
+    </meta>
+    <categories/>
+</package>

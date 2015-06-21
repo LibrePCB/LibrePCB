@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{7a36879d-6439-495a-99e4-30ab9a70154d}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">TLLY4400</name>
+        <description locale="en_US">&lt;b>Low Current (2mA) LED 3 mm Tinted Diffused Package&lt;/b> color&lt;b>&lt;font color="#909020"> YELLOW&lt;/font>&lt;/b>&lt;p>
+Source: &lt;a href="http://www.farnell.com/datasheets/391098.pdf"> Data sheet&lt;/a>
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: TLLY4400
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{e832008d-f84b-423e-9618-620a720d543f}</generic_component>
+        <package>{bba72ff1-b62e-41f3-8e1b-ad62bd55a0bb}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{52115f93-041e-43b9-aa19-71e4eb7186f8}" signal="{31771a37-d1ae-4078-8c03-d981fb89f14d}"/>
+        <map pad="{3c750b30-bcd8-4469-aa4d-fda7a636631e}" signal="{b2092cc0-38d7-4639-b4dc-757a30b2f2ef}"/>
+    </pad_signal_map>
+</component>

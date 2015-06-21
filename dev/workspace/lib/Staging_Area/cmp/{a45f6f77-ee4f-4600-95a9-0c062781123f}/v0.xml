@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{a45f6f77-ee4f-4600-95a9-0c062781123f}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">1N4148</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+high speed (Philips)
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: 1N4148
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{227ddba1-92ce-4315-a853-3756fd2ded10}</generic_component>
+        <package>{19303436-1f33-4cad-9f8d-fc3c8d360d0f}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{d23855a1-d4d6-4299-8d57-96790918c343}" signal="{c4552314-a842-4818-9975-0125f58c8d44}"/>
+        <map pad="{d8438c48-6c7c-4b47-80d6-871960b9d6ed}" signal="{f4576049-92df-4602-ada0-ff7417ba4982}"/>
+    </pad_signal_map>
+</component>

@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{0cd679e0-9b54-4e6c-aa6e-34c6302927ae}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:35Z</created>
+        <last_modified>2015-06-21T12:37:35Z</last_modified>
+        <name locale="en_US">RTRIM3314G</name>
+        <description locale="en_US">&lt;b>Trimm resistor&lt;/b> BOURNS&lt;p>
+0,25W, 20%&lt;br>
+Source: &lt;a href="http://www.bourns.com/pdfs/3314.pdf"> Data sheet&lt;/a>
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: RTRIM3314G
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="170" start_x="2.150000" start_y="-2.150000" fill="false" width="0.254000">
+            <segment end_x="2.150000" end_y="2.150000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="2.150000" start_y="2.150000" fill="false" width="0.254000">
+            <segment end_x="1.300000" end_y="2.150000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-1.300000" start_y="2.150000" fill="false" width="0.254000">
+            <segment end_x="-2.150000" end_y="2.150000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-2.150000" start_y="2.150000" fill="false" width="0.254000">
+            <segment end_x="-2.150000" end_y="-2.150000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="0.100000" start_y="-2.150000" fill="false" width="0.254000">
+            <segment end_x="-0.100000" end_y="-2.150000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-0.500000" start_y="-0.900000" fill="false" width="0.101600">
+            <segment end_x="0.900000" end_y="0.500000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-0.850000" start_y="-0.550000" fill="false" width="0.101600">
+            <segment end_x="0.550000" end_y="0.850000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="2.150000" start_y="2.150000" fill="false" width="0.254000">
+            <segment end_x="2.150000" end_y="-2.150000" angle="0.000000"/>
+            <segment end_x="-2.150000" end_y="-2.150000" angle="0.000000"/>
+            <segment end_x="-2.150000" end_y="2.150000" angle="0.000000"/>
+            <segment end_x="2.150000" end_y="2.150000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-2.640000" y="-2.990000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="4.010000" y="-2.990000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+        <ellipse radius_x="1.100000" x="0.000000" radius_y="1.100000" grab_area="true" y="0.000000" layer="170" rotation="0.000000" fill="false" width="0.101600"/>
+    </geometry>
+    <pads>
+        <pad height="1.300000" x="0.000000" drill="0.000000" uuid="{38c5d8e1-5646-425a-b1c4-4533b9741f9c}" y="2.750000" rotation="0.000000" layer="200" width="2.000000" type="smd_rect">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.300000" x="1.150000" drill="0.000000" uuid="{7a50574c-42d2-45da-87af-43367928888a}" y="-2.750000" rotation="-180.000000" layer="200" width="1.300000" type="smd_rect">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.300000" x="-1.150000" drill="0.000000" uuid="{ad228f1b-5025-4191-b296-fa94e8dd893b}" y="-2.750000" rotation="-180.000000" layer="200" width="1.300000" type="smd_rect">
+            <name locale="en_US">3</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

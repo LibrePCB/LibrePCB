@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{a6f1e4e6-6d2a-4191-93ff-f85c61d70ad8}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">TJ9-U2</name>
+        <description locale="en_US">&lt;b>Inductor&lt;/b>&lt;p>
+Source: TJ-Serie Vishay.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: TJ9-U2
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{7b8f000b-579c-4ee3-b111-a68ca5901077}</footprint>
+    </meta>
+    <categories/>
+</package>

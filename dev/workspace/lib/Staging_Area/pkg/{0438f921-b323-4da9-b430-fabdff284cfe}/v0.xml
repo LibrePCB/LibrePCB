@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{0438f921-b323-4da9-b430-fabdff284cfe}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:38Z</created>
+        <last_modified>2015-06-21T12:37:38Z</last_modified>
+        <name locale="en_US">SIL09A</name>
+        <description locale="en_US">8 &lt;B>DIODES&lt;/B>&lt;p>
+single in line 8 diodes with common anode
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: SIL09A
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{d8587052-3ce2-47d8-ac31-7eb4fb8e63e7}</footprint>
+    </meta>
+    <categories/>
+</package>

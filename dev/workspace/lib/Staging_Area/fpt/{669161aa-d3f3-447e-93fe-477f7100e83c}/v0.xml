@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{669161aa-d3f3-447e-93fe-477f7100e83c}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:32Z</created>
+        <last_modified>2015-06-21T12:37:32Z</last_modified>
+        <name locale="en_US">TT5D7</name>
+        <description locale="en_US">&lt;b>ELECTROLYTIC CAPACITOR&lt;/b>&lt;p>
+diameter 7 mm, grid 5.08 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: TT5D7
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="170" start_x="-1.524000" start_y="0.000000" fill="false" width="0.152400">
+            <segment end_x="-0.635000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-0.635000" start_y="0.000000" fill="false" width="0.152400">
+            <segment end_x="-0.635000" end_y="-1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-0.635000" start_y="-1.270000" fill="false" width="0.152400">
+            <segment end_x="-0.127000" end_y="-1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-0.127000" start_y="-1.270000" fill="false" width="0.152400">
+            <segment end_x="-0.127000" end_y="1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-0.127000" start_y="1.270000" fill="false" width="0.152400">
+            <segment end_x="-0.635000" end_y="1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-0.635000" start_y="1.270000" fill="false" width="0.152400">
+            <segment end_x="-0.635000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="0.635000" start_y="0.000000" fill="false" width="0.152400">
+            <segment end_x="1.524000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-2.286000" start_y="1.524000" fill="false" width="0.152400">
+            <segment end_x="-1.270000" end_y="1.524000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-1.778000" start_y="1.016000" fill="false" width="0.152400">
+            <segment end_x="-1.778000" end_y="2.032000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="0.254000" start_y="-1.270000" fill="true" width="0.000000">
+            <segment end_x="0.762000" end_y="-1.270000" angle="0.000000"/>
+            <segment end_x="0.762000" end_y="1.270000" angle="0.000000"/>
+            <segment end_x="0.254000" end_y="1.270000" angle="0.000000"/>
+            <segment end_x="0.254000" end_y="-1.270000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="3.302000" y="2.032000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="3.175000" y="-3.175000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="1.981200" x="0.635000" y="-2.667000" layer="170" text="TT" h_align="left" angle="0.000000"/>
+        <ellipse radius_x="3.556000" x="0.000000" radius_y="3.556000" grab_area="true" y="0.000000" layer="170" rotation="0.000000" fill="false" width="0.152400"/>
+    </geometry>
+    <pads>
+        <pad height="1.625600" x="-2.540000" drill="0.812800" uuid="{be77e5f5-ff7b-473f-88ef-f67716c93886}" y="0.000000" rotation="90.000000" layer="0" width="1.625600" type="tht_round">
+            <name locale="en_US">+</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.625600" x="2.540000" drill="0.812800" uuid="{1ec1070d-5499-4f0e-92e9-0d0e10265609}" y="0.000000" rotation="90.000000" layer="0" width="1.625600" type="tht_octagon">
+            <name locale="en_US">-</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

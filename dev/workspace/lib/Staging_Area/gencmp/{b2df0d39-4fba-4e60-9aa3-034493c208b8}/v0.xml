@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{b2df0d39-4fba-4e60-9aa3-034493c208b8}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">PL006*</name>
+        <description locale="en_US">&lt;b>PLH006 Series SMD LED&lt;/b> SOT23&lt;p>
+PLH006-WCR21 Super Red&lt;br>
+PLH006-WCR12 High Eff Red&lt;br>
+PLH006-WCG13 Green&lt;br>
+PLH006-WCY01 Yellow&lt;br>
+www.p-tec.net&lt;p>
+Source: http://www.wittig-electronic.de/PTEC/PL006Series.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: PL006*
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">LD</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{0cb5c1af-7fd0-4a7a-8313-4677e8def168}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{0db0bbbe-d3d4-4729-af48-1fa43ba9711a}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{35a0655c-6a71-4707-be66-ee91fc0b9288}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{c828474a-3c3d-40f3-9a98-a04521987d48}" suffix="" symbol="{cb442e56-0ec7-4486-8c43-7bdfa9b47d9a}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{18de942d-8b47-4daf-9e07-d089204e09d0}" signal="{0db0bbbe-d3d4-4729-af48-1fa43ba9711a}"/>
+                        <map display="gen_comp_signal" pin="{2a64f851-340a-43f2-b1cf-06a1d4b54560}" signal="{0cb5c1af-7fd0-4a7a-8313-4677e8def168}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

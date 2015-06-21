@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{59afb62b-0e7f-437c-aa36-3a190eaf5822}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:33Z</created>
+        <last_modified>2015-06-21T12:37:33Z</last_modified>
+        <name locale="en_US">RTRIM3296P</name>
+        <description locale="en_US">&lt;b>Trimm resistor&lt;/b> BOURNS&lt;p>
+Source: &lt;a href="http://www.bourns.com/pdfs/3296.pdf"> Data sheet &lt;/a>
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: RTRIM3296P
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{2122aeaf-6fc7-41eb-8c06-c2aadbf4350f}</footprint>
+    </meta>
+    <categories/>
+</package>

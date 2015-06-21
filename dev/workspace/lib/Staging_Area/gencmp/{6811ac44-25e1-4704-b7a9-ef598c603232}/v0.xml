@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{6811ac44-25e1-4704-b7a9-ef598c603232}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">15KEXXD</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: 15KEXXD
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">D</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{363b6526-af30-4e20-a16e-202e80fe6aa8}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{f34d1554-bb27-4c47-a177-e9e589b3dc0a}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{4058bc27-8f0c-4d2c-bd59-89412106b3c0}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{83c7a087-cd40-4a6c-862a-0d304bb7e615}" suffix="1" symbol="{b4019e5f-dead-4f11-9040-41fa27f7f4bd}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{0c83d4fb-d2f9-4199-b82e-f65cdb357d55}" signal="{363b6526-af30-4e20-a16e-202e80fe6aa8}"/>
+                        <map display="gen_comp_signal" pin="{d1121c89-3dea-4883-9bd1-3cba1d5b038d}" signal="{f34d1554-bb27-4c47-a177-e9e589b3dc0a}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

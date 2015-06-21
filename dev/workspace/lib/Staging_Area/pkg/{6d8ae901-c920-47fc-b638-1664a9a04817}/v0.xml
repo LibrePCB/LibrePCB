@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{6d8ae901-c920-47fc-b638-1664a9a04817}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">R6332W</name>
+        <description locale="en_US">&lt;b>RESISTOR&lt;/b> wave soldering&lt;p>
+Source: http://download.siliconexpert.com/pdfs/2005/02/24/Semi_Ap/2/VSH/Resistor/dcrcwfre.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: R6332W
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{338808c1-9a7c-4de0-89cf-fc7359bcc0fc}</footprint>
+    </meta>
+    <categories/>
+</package>

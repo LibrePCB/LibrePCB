@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{8de0b79a-985e-40e3-b1ee-f01ca54b89cd}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">C1206K</name>
+        <description locale="en_US">&lt;b>Ceramic Chip Capacitor KEMET 1206 reflow solder&lt;/b>&lt;p>
+Metric Code Size 3216
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: C1206K
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{fd070c1b-6aa9-4780-b16e-cc219f1ac9ee}</footprint>
+    </meta>
+    <categories/>
+</package>

@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{6604f8fd-f80a-4d04-9252-48771f3d8757}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:32Z</created>
+        <last_modified>2015-06-21T12:37:32Z</last_modified>
+        <name locale="en_US">P128-50</name>
+        <description locale="en_US">&lt;b>ELECTROLYTIC CAPACITOR&lt;/b>&lt;p>
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: P128-50
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{3b25053b-78c9-4eee-8838-06cdab60f0bb}</footprint>
+    </meta>
+    <categories/>
+</package>

@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{e832008d-f84b-423e-9618-620a720d543f}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">TLLY4400</name>
+        <description locale="en_US">&lt;b>Low Current (2mA) LED 3 mm Tinted Diffused Package&lt;/b> color&lt;b>&lt;font color="#909020"> YELLOW&lt;/font>&lt;/b>&lt;p>
+Source: &lt;a href="http://www.farnell.com/datasheets/391098.pdf"> Data sheet&lt;/a>
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: TLLY4400
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">LED</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{b2092cc0-38d7-4639-b4dc-757a30b2f2ef}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{31771a37-d1ae-4078-8c03-d981fb89f14d}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{7c78bf84-c3cd-4172-870f-2da2a0cb85a0}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{cf26df81-4a2d-4eec-92ee-1ae226ee9880}" suffix="" symbol="{cb442e56-0ec7-4486-8c43-7bdfa9b47d9a}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{18de942d-8b47-4daf-9e07-d089204e09d0}" signal="{31771a37-d1ae-4078-8c03-d981fb89f14d}"/>
+                        <map display="gen_comp_signal" pin="{2a64f851-340a-43f2-b1cf-06a1d4b54560}" signal="{b2092cc0-38d7-4639-b4dc-757a30b2f2ef}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

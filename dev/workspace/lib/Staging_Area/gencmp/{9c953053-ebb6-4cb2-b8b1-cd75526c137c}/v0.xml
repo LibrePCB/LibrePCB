@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{9c953053-ebb6-4cb2-b8b1-cd75526c137c}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">LSG-T676</name>
+        <description locale="en_US">&lt;b>LSG T676 Hyper Multi TOPLED ® Hyper-Bright LED&lt;/b>&lt;p>
+Source: http://docs-europe.electrocomponents.com/webdocs/08c3/0900766b808c36ca.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: LSG-T676
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">LED</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{90f9c543-008b-4ca2-a2bf-db983151f5ec}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{182faa30-e0c8-4ee0-a5ed-db2501bba30f}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{2a9bb8b8-1876-49a4-90a9-b82fc95dfdf9}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{9417dcf3-e446-4077-b7fe-6397aa0179e1}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{3e93470c-eea2-4232-98ca-5bc52e6542af}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{e8d281bd-22e8-4d35-9b7f-19814eebdbb9}" suffix="A" symbol="{cb442e56-0ec7-4486-8c43-7bdfa9b47d9a}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{18de942d-8b47-4daf-9e07-d089204e09d0}" signal="{182faa30-e0c8-4ee0-a5ed-db2501bba30f}"/>
+                        <map display="gen_comp_signal" pin="{2a64f851-340a-43f2-b1cf-06a1d4b54560}" signal="{90f9c543-008b-4ca2-a2bf-db983151f5ec}"/>
+                    </pin_signal_map>
+                </item>
+                <item uuid="{fae06d37-e38a-43b3-b5c6-304c2196f6db}" suffix="B" symbol="{cb442e56-0ec7-4486-8c43-7bdfa9b47d9a}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{18de942d-8b47-4daf-9e07-d089204e09d0}" signal="{9417dcf3-e446-4077-b7fe-6397aa0179e1}"/>
+                        <map display="gen_comp_signal" pin="{2a64f851-340a-43f2-b1cf-06a1d4b54560}" signal="{2a9bb8b8-1876-49a4-90a9-b82fc95dfdf9}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

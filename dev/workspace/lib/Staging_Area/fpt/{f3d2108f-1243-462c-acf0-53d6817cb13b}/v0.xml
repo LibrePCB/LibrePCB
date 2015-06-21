@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{f3d2108f-1243-462c-acf0-53d6817cb13b}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">L1812</name>
+        <description locale="en_US">&lt;b>INDUCTOR&lt;/b>&lt;p>
+chip
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: L1812
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="110" start_x="-1.473200" start_y="1.600200" fill="false" width="0.101600">
+            <segment end_x="1.473200" end_y="1.600200" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-1.447800" start_y="-1.600200" fill="false" width="0.101600">
+            <segment end_x="1.473200" end_y="-1.600200" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-2.387600" start_y="-1.651000" fill="true" width="0.000000">
+            <segment end_x="-1.437600" end_y="-1.651000" angle="0.000000"/>
+            <segment end_x="-1.437600" end_y="1.649000" angle="0.000000"/>
+            <segment end_x="-2.387600" end_y="1.649000" angle="0.000000"/>
+            <segment end_x="-2.387600" end_y="-1.651000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="1.447800" start_y="-1.651000" fill="true" width="0.000000">
+            <segment end_x="2.397800" end_y="-1.651000" angle="0.000000"/>
+            <segment end_x="2.397800" end_y="1.649000" angle="0.000000"/>
+            <segment end_x="1.447800" end_y="1.649000" angle="0.000000"/>
+            <segment end_x="1.447800" end_y="-1.651000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-1.905000" y="1.905000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-1.905000" y="-3.175000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="3.400000" x="-1.950000" drill="0.000000" uuid="{77c06c82-ce11-459c-8a1b-2fd647e593ed}" y="0.000000" rotation="0.000000" layer="200" width="1.900000" type="smd_rect">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="3.400000" x="1.950000" drill="0.000000" uuid="{c9187647-5e3d-4c27-8f2c-873f06c549ec}" y="0.000000" rotation="0.000000" layer="200" width="1.900000" type="smd_rect">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

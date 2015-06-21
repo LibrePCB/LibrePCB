@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{b7497dd0-03c8-4d2b-81b6-4fbaae94020e}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:32Z</created>
+        <last_modified>2015-06-21T12:37:32Z</last_modified>
+        <name locale="en_US">TT2D6</name>
+        <description locale="en_US">&lt;b>ELECTROLYTIC CAPACITOR&lt;/b>&lt;p>
+diameter 6 mm, grid 2.54 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: TT2D6
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{097e993b-07bb-44d4-a289-4b48328ba413}</footprint>
+    </meta>
+    <categories/>
+</package>

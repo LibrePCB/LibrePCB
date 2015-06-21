@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{d2d1d2e1-cc6d-4858-b8d2-7542638c046a}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:36Z</created>
+        <last_modified>2015-06-21T12:37:36Z</last_modified>
+        <name locale="en_US">MA20-1L</name>
+        <description locale="en_US">&lt;b>PIN HEADER&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: con-lstb.lbr
+Name: MA20-1L
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{74906ac2-484c-41e4-9ab6-a184fd93289a}</footprint>
+    </meta>
+    <categories/>
+</package>

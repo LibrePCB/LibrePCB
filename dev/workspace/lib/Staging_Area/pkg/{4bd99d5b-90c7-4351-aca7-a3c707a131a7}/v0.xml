@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{4bd99d5b-90c7-4351-aca7-a3c707a131a7}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">R0805W</name>
+        <description locale="en_US">&lt;b>RESISTOR&lt;/b> wave soldering&lt;p>
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: R0805W
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{b0406006-4268-43c5-b50c-167dfe30e478}</footprint>
+    </meta>
+    <categories/>
+</package>

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{18c63f4a-c7c9-4a7c-8911-a5bc76f5bf5f}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:35Z</created>
+        <last_modified>2015-06-21T12:37:35Z</last_modified>
+        <name locale="en_US">WSC0002</name>
+        <description locale="en_US">&lt;b>Wirewound Resistors, Precision Power&lt;/b>&lt;p>
+Source: VISHAY wscwsn.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: WSC0002
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{07c7bb4b-6cd3-4a60-b926-3f5783494e47}</footprint>
+    </meta>
+    <categories/>
+</package>

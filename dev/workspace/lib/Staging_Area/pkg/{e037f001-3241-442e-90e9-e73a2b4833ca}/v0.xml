@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{e037f001-3241-442e-90e9-e73a2b4833ca}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:32Z</created>
+        <last_modified>2015-06-21T12:37:32Z</last_modified>
+        <name locale="en_US">C225-087X268</name>
+        <description locale="en_US">&lt;b>CAPACITOR&lt;/b>&lt;p>
+grid 22.5 mm, outline 8.7 x 26.8 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: C225-087X268
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{a4763ee6-ca65-4558-a59d-f114b9dd3196}</footprint>
+    </meta>
+    <categories/>
+</package>

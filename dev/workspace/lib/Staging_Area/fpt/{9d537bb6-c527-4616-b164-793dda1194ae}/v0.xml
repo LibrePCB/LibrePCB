@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{9d537bb6-c527-4616-b164-793dda1194ae}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:37Z</created>
+        <last_modified>2015-06-21T12:37:37Z</last_modified>
+        <name locale="en_US">SG-615</name>
+        <description locale="en_US">&lt;b>SOJ HIGH-FREQUENCY CRYSTAL OSCILLATOR&lt;/b>&lt;p>
+Source: Crystal Oscillator SG-615%20Series.pdf
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: SG-615
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="110" start_x="-6.775000" start_y="-0.625000" fill="false" width="0.203200">
+            <segment end_x="-6.775000" end_y="0.625000" angle="-180.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-2.800000" start_y="4.250000" fill="true" width="0.000000">
+            <segment end_x="-2.275000" end_y="4.250000" angle="0.000000"/>
+            <segment end_x="-2.275000" end_y="4.900000" angle="0.000000"/>
+            <segment end_x="-2.800000" end_y="4.900000" angle="0.000000"/>
+            <segment end_x="-2.800000" end_y="4.250000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="2.280000" start_y="4.250000" fill="true" width="0.000000">
+            <segment end_x="2.805000" end_y="4.250000" angle="0.000000"/>
+            <segment end_x="2.805000" end_y="4.900000" angle="0.000000"/>
+            <segment end_x="2.280000" end_y="4.900000" angle="0.000000"/>
+            <segment end_x="2.280000" end_y="4.250000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="2.275000" start_y="-4.900000" fill="true" width="0.000000">
+            <segment end_x="2.800000" end_y="-4.900000" angle="0.000000"/>
+            <segment end_x="2.800000" end_y="-4.250000" angle="0.000000"/>
+            <segment end_x="2.275000" end_y="-4.250000" angle="0.000000"/>
+            <segment end_x="2.275000" end_y="-4.900000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-2.805000" start_y="-4.900000" fill="true" width="0.000000">
+            <segment end_x="-2.280000" end_y="-4.900000" angle="0.000000"/>
+            <segment end_x="-2.280000" end_y="-4.250000" angle="0.000000"/>
+            <segment end_x="-2.805000" end_y="-4.250000" angle="0.000000"/>
+            <segment end_x="-2.805000" end_y="-4.900000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-6.875000" start_y="4.225000" fill="false" width="0.203200">
+            <segment end_x="-6.875000" end_y="-4.225000" angle="0.000000"/>
+            <segment end_x="6.900000" end_y="-4.225000" angle="0.000000"/>
+            <segment end_x="6.900000" end_y="4.225000" angle="0.000000"/>
+            <segment end_x="-6.875000" end_y="4.225000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-7.620000" y="-3.175000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-5.080000" y="-1.270000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="1.200000" x="-2.540000" drill="0.000000" uuid="{9a5242c9-ba39-4838-8238-912a6c4b2a5b}" y="-4.400000" rotation="-90.000000" layer="200" width="3.000000" type="smd_rect">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.200000" x="2.540000" drill="0.000000" uuid="{a575ec00-3106-4bc4-ae22-412d921c9dfe}" y="4.400000" rotation="-270.000000" layer="200" width="3.000000" type="smd_rect">
+            <name locale="en_US">3</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.200000" x="2.540000" drill="0.000000" uuid="{c62ef8a9-c581-4bbc-bcb7-0960de0291c8}" y="-4.400000" rotation="-270.000000" layer="200" width="3.000000" type="smd_rect">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.200000" x="-2.540000" drill="0.000000" uuid="{9cb1b21d-9e0c-49b2-be05-8a112985abe1}" y="4.400000" rotation="-90.000000" layer="200" width="3.000000" type="smd_rect">
+            <name locale="en_US">4</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

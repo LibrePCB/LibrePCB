@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{8c8f1bfe-c38d-46f6-aae0-697a1f2fd4bd}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">W5KM</name>
+        <description locale="en_US">&lt;b>Golden DRAGON® ARGUS® LED&lt;/b>&lt;p>
+Place TH-Gate and connect pins in schematic.&lt;br>
+Set DRC-Clearance - Same Signals to 0mm in board.&lt;br>
+Source: catalog.osram-os.com .. LD_LB_LT_W5KM_Pb_free.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: W5KM
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="170" start_x="-1.250000" start_y="4.500000" fill="false" width="0.203200">
+            <segment end_x="-1.250000" end_y="-4.500000" angle="-148.951778"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="1.250000" start_y="-4.500000" fill="false" width="0.203200">
+            <segment end_x="1.250000" end_y="4.500000" angle="-148.951778"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-0.950000" start_y="-5.600000" fill="true" width="0.000000">
+            <segment end_x="0.950000" end_y="-5.600000" angle="0.000000"/>
+            <segment end_x="0.950000" end_y="-3.200000" angle="0.000000"/>
+            <segment end_x="-0.950000" end_y="-3.200000" angle="0.000000"/>
+            <segment end_x="-0.950000" end_y="-5.600000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-0.950000" start_y="3.200000" fill="true" width="0.000000">
+            <segment end_x="0.950000" end_y="3.200000" angle="0.000000"/>
+            <segment end_x="0.950000" end_y="5.600000" angle="0.000000"/>
+            <segment end_x="-0.950000" end_y="5.600000" angle="0.000000"/>
+            <segment end_x="-0.950000" end_y="3.200000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-5.665000" y="-2.500000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="6.915000" y="-2.500000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+        <ellipse radius_x="4.675000" x="0.000000" radius_y="4.675000" grab_area="true" y="0.000000" layer="110" rotation="0.000000" fill="false" width="0.203200"/>
+        <ellipse radius_x="2.000000" x="0.000000" radius_y="2.000000" grab_area="true" y="0.000000" layer="180" rotation="0.000000" fill="true" width="0.000000"/>
+        <ellipse radius_x="1.802700" x="0.000000" radius_y="1.802700" grab_area="true" y="0.000000" layer="140" rotation="0.000000" fill="true" width="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="7.400000" x="0.000000" drill="0.000000" uuid="{be65cade-1eff-4f10-bdf7-8431d83aed8f}" y="0.000000" rotation="0.000000" layer="200" width="3.350000" type="smd_rect">
+            <name locale="en_US">TH</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="2.300000" x="0.000000" drill="0.000000" uuid="{fa39a094-2847-4b6b-94cc-40b9af2e3b7f}" y="-5.350000" rotation="0.000000" layer="200" width="2.300000" type="smd_rect">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="2.300000" x="0.000000" drill="0.000000" uuid="{31c178cf-c8f7-4ff9-9758-da9cc9a48260}" y="5.350000" rotation="-180.000000" layer="200" width="2.300000" type="smd_rect">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="13.000000" x="-3.325000" drill="0.000000" uuid="{48009612-8404-45ed-9861-11e5203db4ac}" y="0.000000" rotation="0.000000" layer="200" width="3.350000" type="smd_rect">
+            <name locale="en_US">HT@1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="13.000000" x="3.325000" drill="0.000000" uuid="{d1f0b2c4-3898-4623-8960-e0d9352d7df7}" y="0.000000" rotation="-180.000000" layer="200" width="3.350000" type="smd_rect">
+            <name locale="en_US">HT@2</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

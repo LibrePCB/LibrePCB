@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{cbf694ef-f452-4ae6-9731-419d993da793}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:33Z</created>
+        <last_modified>2015-06-21T12:37:33Z</last_modified>
+        <name locale="en_US">RTRIM74W</name>
+        <description locale="en_US">&lt;b>Trimm resistor&lt;/b> Spectrol&lt;p>
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: RTRIM74W
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{9955d887-2620-4889-b937-5a98c28b3814}</footprint>
+    </meta>
+    <categories/>
+</package>

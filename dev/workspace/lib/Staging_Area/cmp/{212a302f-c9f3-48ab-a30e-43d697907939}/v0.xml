@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{212a302f-c9f3-48ab-a30e-43d697907939}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">DIODE_SCHOTTKY2-</name>
+        <description locale="en_US">&lt;b>Schottky Bidirectional Diode&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: DIODE_SCHOTTKY2-
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{ea25a7ed-0ea8-42f4-9862-b7a1327ef82c}</generic_component>
+        <package>{26aef693-39ba-4d18-8207-be2904754495}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{46cebcd3-78f6-4de4-8fa9-e4f6e93fcf8c}" signal="{e203c41a-6b5f-4448-80aa-27029d69a82b}"/>
+        <map pad="{e675c970-a61b-479a-90f4-38af88b05b0f}" signal="{4ac0bbfd-cf86-442f-a60d-85434e43f2e0}"/>
+    </pad_signal_map>
+</component>

@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{c1207df1-c975-474d-a41e-d8762ac7a24a}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">NSSM038A</name>
+        <description locale="en_US">&lt;b>3 LED (RGB) package&lt;/b>&lt;p>
+&lt;i>&lt;b>Set DRC Clearance - Same Signals - Smd | Smd,  0mm&lt;/b>&lt;/i>&lt;p>
+Source: NICIA CORPORATION .. NSSM038AT-E.PDF
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: NSSM038A
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{0c2e76c7-21e8-47e0-92ea-00606fecae31}</footprint>
+    </meta>
+    <categories/>
+</package>

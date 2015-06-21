@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{c03a4254-e3c1-4b60-a895-1672669ba604}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:37Z</created>
+        <last_modified>2015-06-21T12:37:37Z</last_modified>
+        <name locale="en_US">TC46</name>
+        <description locale="en_US">&lt;b>Temperature Compensated Xtal Oscillator&lt;/b>&lt;p>
+HCMOS, Clipped Sine Wave or Sine Wave Compatible&lt;br>
+Source: www.pletronics.com .. tc4.pdf
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: TC46
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{4ff6c575-76aa-4d60-bfe7-b58d9712b49d}</footprint>
+    </meta>
+    <categories/>
+</package>

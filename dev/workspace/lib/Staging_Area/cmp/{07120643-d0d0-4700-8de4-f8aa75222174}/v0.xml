@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{07120643-d0d0-4700-8de4-f8aa75222174}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">SPHWHTHAD605S0W0U4</name>
+        <description locale="en_US">&lt;b>HV-AC HIGH POWER LED&lt;/b>&lt;p>
+Source: SAMSUNG SPHWHTHAD605S0W0U4.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: SPHWHTHAD605S0W0U4
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{68239c28-6752-45d7-9779-4db57fabae60}</generic_component>
+        <package>{38c551e2-b922-4777-999b-a97f0df79a0a}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{ffe09e82-8ffa-4c0d-8a27-aa26bd706036}" signal="{6e678969-f0d0-4945-8c6e-5b8f9bfa155d}"/>
+        <map pad="{f68e7134-5068-47eb-b1d1-a7995cfc2a38}" signal="{fd8c228b-fb9d-49dc-ade9-c23bfe3439b0}"/>
+        <map pad="{99e17160-981c-4858-bdee-59d380d54f90}" signal="{fd8c228b-fb9d-49dc-ade9-c23bfe3439b0}"/>
+        <map pad="{3540654f-f012-46bb-96f3-6dbf4be07dac}" signal="{6e678969-f0d0-4945-8c6e-5b8f9bfa155d}"/>
+        <map pad="{3837dc68-2efe-4dbd-bf6c-a0aaacfa57e1}" signal="{8f2debd3-0f54-4600-af01-5a7b560f98cf}"/>
+        <map pad="{64ac8c8c-28f4-4609-9318-8c71f9d9c584}" signal="{8f2debd3-0f54-4600-af01-5a7b560f98cf}"/>
+        <map pad="{712d6079-2b23-4a1f-83e8-ef6541ca2c21}" signal="{8f2debd3-0f54-4600-af01-5a7b560f98cf}"/>
+        <map pad="{c260eb20-381c-4221-bdef-30d660c66292}" signal="{8f2debd3-0f54-4600-af01-5a7b560f98cf}"/>
+        <map pad="{5bcbbf9d-ca32-4ba3-90b6-088403744d96}" signal="{787275e3-8ac0-4bc1-bb0d-1b30eb20a901}"/>
+        <map pad="{ef4b23eb-4d6f-4189-8d5c-06c91288f138}" signal="{8f2debd3-0f54-4600-af01-5a7b560f98cf}"/>
+        <map pad="{62eeaba9-9b87-45fd-a7f0-355d8a45bf6b}" signal="{742de1a9-95ef-48fa-b7ca-73dc5436d078}"/>
+        <map pad="{0f8e03ee-7406-45a1-882d-04db5cc78821}" signal="{742de1a9-95ef-48fa-b7ca-73dc5436d078}"/>
+        <map pad="{42717ba7-7d92-4639-82e5-d67c43bfbcff}" signal="{8f2debd3-0f54-4600-af01-5a7b560f98cf}"/>
+        <map pad="{0eb1c613-e404-4a81-9a13-7e5bcb8d7cff}" signal="{787275e3-8ac0-4bc1-bb0d-1b30eb20a901}"/>
+    </pad_signal_map>
+</component>

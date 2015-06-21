@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{89b43604-0c41-40c4-85e8-63709a8c787e}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:32Z</created>
+        <last_modified>2015-06-21T12:37:32Z</last_modified>
+        <name locale="en_US">0309V</name>
+        <description locale="en_US">&lt;b>RESISTOR&lt;/b>&lt;p>
+type 0309, grid 2.5 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: 0309V
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{9491d164-fc2d-48b5-9a6f-1fa7d7e21305}</footprint>
+    </meta>
+    <categories/>
+</package>

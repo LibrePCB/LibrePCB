@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{9e6edd00-93dc-4a3a-b81a-cb2d9b56e645}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">SOD323R_INFINEON</name>
+        <description locale="en_US">&lt;b>Diode Package&lt;/b> Reflow soldering&lt;p>
+INFINEON, www.infineon.com/cmc_upload/0/000/010/257/eh_db_5b.pdf
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: SOD323R_INFINEON
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="110" start_x="-0.800000" start_y="-0.550000" fill="true" width="0.000000">
+            <segment end_x="0.000000" end_y="-0.550000" angle="0.000000"/>
+            <segment end_x="0.000000" end_y="0.550000" angle="0.000000"/>
+            <segment end_x="-0.800000" end_y="0.550000" angle="0.000000"/>
+            <segment end_x="-0.800000" end_y="-0.550000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-1.250000" start_y="-0.150000" fill="true" width="0.000000">
+            <segment end_x="-0.800000" end_y="-0.150000" angle="0.000000"/>
+            <segment end_x="-0.800000" end_y="0.150000" angle="0.000000"/>
+            <segment end_x="-1.250000" end_y="0.150000" angle="0.000000"/>
+            <segment end_x="-1.250000" end_y="-0.150000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="0.800000" start_y="-0.150000" fill="true" width="0.000000">
+            <segment end_x="1.250000" end_y="-0.150000" angle="0.000000"/>
+            <segment end_x="1.250000" end_y="0.150000" angle="0.000000"/>
+            <segment end_x="0.800000" end_y="0.150000" angle="0.000000"/>
+            <segment end_x="0.800000" end_y="-0.150000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-0.800000" start_y="-0.550000" fill="false" width="0.101600">
+            <segment end_x="-0.800000" end_y="0.550000" angle="0.000000"/>
+            <segment end_x="0.800000" end_y="0.550000" angle="0.000000"/>
+            <segment end_x="0.800000" end_y="-0.550000" angle="0.000000"/>
+            <segment end_x="-0.800000" end_y="-0.550000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-1.650000" y="0.750000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-1.650000" y="-2.000000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="0.600000" x="1.250000" drill="0.000000" uuid="{06f4e07f-c0bb-4cd9-aa4b-4f0618468d85}" y="0.000000" rotation="0.000000" layer="200" width="0.800000" type="smd_rect">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="0.600000" x="-1.250000" drill="0.000000" uuid="{c06dcbb4-2efd-47d7-aae1-85b312b8d450}" y="0.000000" rotation="0.000000" layer="200" width="0.800000" type="smd_rect">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

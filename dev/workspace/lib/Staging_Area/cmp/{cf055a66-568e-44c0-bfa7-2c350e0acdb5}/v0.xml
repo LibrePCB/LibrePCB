@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{cf055a66-568e-44c0-bfa7-2c350e0acdb5}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">MUR820</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: MUR820
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{f38c4f7f-2116-429b-9116-be80714a93d0}</generic_component>
+        <package>{2cfc92a7-d30f-490e-96ae-190d1bf48db4}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{f4807d6a-1bb6-42ba-92a4-c838d33c96b9}" signal="{db4b8370-686e-4de5-b512-0e761b623659}"/>
+        <map pad="{6cbf7cb7-03e9-46ba-9442-bea88ff6953d}" signal="{593f9008-5adb-4316-9cdc-7ffe3541ebed}"/>
+    </pad_signal_map>
+</component>

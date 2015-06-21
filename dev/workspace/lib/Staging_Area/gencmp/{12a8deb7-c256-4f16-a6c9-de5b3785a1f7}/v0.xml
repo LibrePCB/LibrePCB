@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{12a8deb7-c256-4f16-a6c9-de5b3785a1f7}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:43Z</created>
+        <last_modified>2015-06-21T12:37:43Z</last_modified>
+        <name locale="en_US">HCPL-181</name>
+        <description locale="en_US">
+
+This element was automatically imported from Eagle
+Filepath: 0_ICs.lbr
+Name: HCPL-181
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">OK</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{892e4b90-4e19-4305-9ee4-5e139808fddb}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{c12cbe0b-eef0-4170-8818-03ebbba160fe}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{d7782144-957d-42ec-80bf-4d155805b985}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">3</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{9c9c19b7-0038-472f-a018-ffa9e27a7e9f}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">4</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{57de569f-d857-4127-8450-d4c18100b77d}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{69104197-0f32-4130-8ff1-9d7b3a0d95ac}" suffix="" symbol="{19997639-2dbd-4a84-8612-4602138ae13a}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{fe07f167-cc76-44a5-b1f0-39dfcae9ad71}" signal="{d7782144-957d-42ec-80bf-4d155805b985}"/>
+                        <map display="gen_comp_signal" pin="{898b979d-5808-4a45-9250-574b96a3746a}" signal="{c12cbe0b-eef0-4170-8818-03ebbba160fe}"/>
+                        <map display="gen_comp_signal" pin="{3b5ceb72-f20f-4b28-b807-4677825e369b}" signal="{892e4b90-4e19-4305-9ee4-5e139808fddb}"/>
+                        <map display="gen_comp_signal" pin="{9cec7cba-4a03-495a-a597-eff405bac928}" signal="{9c9c19b7-0038-472f-a018-ffa9e27a7e9f}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

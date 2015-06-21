@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{cb82b983-3be7-4644-bc54-972dfb14ee77}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:35Z</created>
+        <last_modified>2015-06-21T12:37:35Z</last_modified>
+        <name locale="en_US">IRF-1</name>
+        <description locale="en_US">&lt;B>Vishay Dale Inductor&lt;/b>&lt;p>
+Source: www.vishay.com .. irf.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: IRF-1
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{d3bbdad8-151b-4dcc-a737-180185691b93}</footprint>
+    </meta>
+    <categories/>
+</package>

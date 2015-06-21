@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{f9c0896e-27aa-4c35-a510-c2abc966d0c3}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">GM5WA94310A</name>
+        <description locale="en_US">&lt;b>Chip LED&lt;/b> RGB&lt;p>
+Source: http://document.sharpsma.com/files/GM5WA94310A_SS.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: GM5WA94310A
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">LED</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{4e7dfef4-3000-41df-abf5-59f0718df892}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{cb155e73-ed7d-4939-891c-9cd3a8f41d8c}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{b021dec9-e368-4f46-907c-9fbf8b783323}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{5fadb213-e8b3-48ed-9a9c-facee042648e}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{f8d52bd7-dcca-4f91-97c4-2142565e5a78}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{94d65b9f-2b59-4ca9-b555-7e23685ebfdf}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{742824e2-072f-452e-a382-6951afb95eb3}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{761b29f6-f90a-4f57-8ae5-e2edae17fd05}" suffix="R" symbol="{cb442e56-0ec7-4486-8c43-7bdfa9b47d9a}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{18de942d-8b47-4daf-9e07-d089204e09d0}" signal="{94d65b9f-2b59-4ca9-b555-7e23685ebfdf}"/>
+                        <map display="gen_comp_signal" pin="{2a64f851-340a-43f2-b1cf-06a1d4b54560}" signal="{f8d52bd7-dcca-4f91-97c4-2142565e5a78}"/>
+                    </pin_signal_map>
+                </item>
+                <item uuid="{d4b5b780-c870-4e42-8608-617b92acb63b}" suffix="G" symbol="{cb442e56-0ec7-4486-8c43-7bdfa9b47d9a}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{18de942d-8b47-4daf-9e07-d089204e09d0}" signal="{5fadb213-e8b3-48ed-9a9c-facee042648e}"/>
+                        <map display="gen_comp_signal" pin="{2a64f851-340a-43f2-b1cf-06a1d4b54560}" signal="{b021dec9-e368-4f46-907c-9fbf8b783323}"/>
+                    </pin_signal_map>
+                </item>
+                <item uuid="{35b3ed59-5c6d-4cef-ae7b-050d93e497ab}" suffix="B" symbol="{cb442e56-0ec7-4486-8c43-7bdfa9b47d9a}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{18de942d-8b47-4daf-9e07-d089204e09d0}" signal="{cb155e73-ed7d-4939-891c-9cd3a8f41d8c}"/>
+                        <map display="gen_comp_signal" pin="{2a64f851-340a-43f2-b1cf-06a1d4b54560}" signal="{4e7dfef4-3000-41df-abf5-59f0718df892}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

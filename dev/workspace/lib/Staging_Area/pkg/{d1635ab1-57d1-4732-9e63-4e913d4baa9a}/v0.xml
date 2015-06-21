@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{d1635ab1-57d1-4732-9e63-4e913d4baa9a}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:33Z</created>
+        <last_modified>2015-06-21T12:37:33Z</last_modified>
+        <name locale="en_US">E35-14</name>
+        <description locale="en_US">&lt;b>ELECTROLYTIC CAPACITOR&lt;/b>&lt;p>
+grid 30.48 mm, diameter 14 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: E35-14
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{8ee0b6c8-6dc3-4b4a-b84d-1e2a67a5827e}</footprint>
+    </meta>
+    <categories/>
+</package>

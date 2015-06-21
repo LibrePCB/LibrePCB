@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{0aec31e5-79c4-4827-b91f-10c147b41e03}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">ZDIO12.5</name>
+        <description locale="en_US">&lt;b>Z DIODE&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: ZDIO12.5
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{0b2edb45-8603-4497-93a3-2b1e3592c788}</footprint>
+    </meta>
+    <categories/>
+</package>

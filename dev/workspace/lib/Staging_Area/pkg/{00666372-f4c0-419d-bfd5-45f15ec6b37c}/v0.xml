@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{00666372-f4c0-419d-bfd5-45f15ec6b37c}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">SMART-LED</name>
+        <description locale="en_US">&lt;b>SmartLEDTM Hyper-Bright LED&lt;/b>&lt;p>
+Source: http://www.osram.convergy.de/ ... LA_LO_LS_LY L896.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: SMART-LED
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{9fb47b04-5555-42ba-bb7e-d70ccf95048f}</footprint>
+    </meta>
+    <categories/>
+</package>

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{2890dbe8-23d5-4ac2-becc-08a44cf1f2a1}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:32Z</created>
+        <last_modified>2015-06-21T12:37:32Z</last_modified>
+        <name locale="en_US">TAP5-60</name>
+        <description locale="en_US">&lt;b>ELECTROLYTIC CAPACITOR&lt;/b>&lt;p>
+diameter 6.0 mm, grid 5.08 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: TAP5-60
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{2ee4ee1b-6d5e-41ca-b77d-d058e7067226}</footprint>
+    </meta>
+    <categories/>
+</package>

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{b3440fb4-64e7-4297-9ddf-98adfe97d576}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:35Z</created>
+        <last_modified>2015-06-21T12:37:35Z</last_modified>
+        <name locale="en_US">1812X7R</name>
+        <description locale="en_US">&lt;b>Chip Monolithic Ceramic Capacitors&lt;/b> Medium Voltage High Capacitance for General Use&lt;p>
+Source: http://www.murata.com .. GRM43DR72E224KW01.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: 1812X7R
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{4cf54ec3-7a1b-4ec9-8430-d31d70d955b8}</footprint>
+    </meta>
+    <categories/>
+</package>

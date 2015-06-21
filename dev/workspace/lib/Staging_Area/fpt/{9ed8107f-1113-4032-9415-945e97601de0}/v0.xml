@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{9ed8107f-1113-4032-9415-945e97601de0}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">VMTA55</name>
+        <description locale="en_US">&lt;b>Bulk Metal® Foil Technology&lt;/b>, Tubular Axial Lead Resistors, Meets or Exceeds MIL-R-39005 Requirements&lt;p>
+MIL SIZE RNC55&lt;br>
+Source: VISHAY .. vta56.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: VMTA55
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="110" start_x="-5.080000" start_y="0.000000" fill="false" width="0.609600">
+            <segment end_x="-4.260000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="4.235000" start_y="0.000000" fill="false" width="0.609600">
+            <segment end_x="5.080000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-4.260000" start_y="-0.304800" fill="true" width="0.000000">
+            <segment end_x="-3.307500" end_y="-0.304800" angle="0.000000"/>
+            <segment end_x="-3.307500" end_y="0.304800" angle="0.000000"/>
+            <segment end_x="-4.260000" end_y="0.304800" angle="0.000000"/>
+            <segment end_x="-4.260000" end_y="-0.304800" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="3.282500" start_y="-0.304800" fill="true" width="0.000000">
+            <segment end_x="4.235000" end_y="-0.304800" angle="0.000000"/>
+            <segment end_x="4.235000" end_y="0.304800" angle="0.000000"/>
+            <segment end_x="3.282500" end_y="0.304800" angle="0.000000"/>
+            <segment end_x="3.282500" end_y="-0.304800" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-3.362500" start_y="1.450000" fill="false" width="0.152400">
+            <segment end_x="-3.362500" end_y="-1.450000" angle="0.000000"/>
+            <segment end_x="3.337500" end_y="-1.450000" angle="0.000000"/>
+            <segment end_x="3.337500" end_y="1.450000" angle="0.000000"/>
+            <segment end_x="-3.362500" end_y="1.450000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-3.175000" y="1.905000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-3.175000" y="-0.635000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="2.200000" x="-5.080000" drill="1.100000" uuid="{a828220b-38b2-49fa-8eea-32601fbc19c6}" y="0.000000" rotation="90.000000" layer="0" width="2.200000" type="tht_octagon">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="2.200000" x="5.080000" drill="1.100000" uuid="{655b1550-2134-496f-8885-230c5ef80b42}" y="0.000000" rotation="90.000000" layer="0" width="2.200000" type="tht_octagon">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

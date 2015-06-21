@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{24b98885-5b39-4af6-b4a9-1f9719512e0b}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">S6695-01</name>
+        <description locale="en_US">&lt;b>Si PIN Quadrant photodiode&lt;/b>&lt;p>
+Source: http://sales.hamamatsu.com/assets/pdf/parts_S/S7379-01_etc.pdf
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: S6695-01
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">D</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{8dbd1fa6-c543-40fe-ae7f-62dae7977493}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">AA</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{076cd49e-4237-4897-88ec-4b20bcd79156}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">AB</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{6e4d94a4-3d0a-48e8-92be-65e3c305c57d}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">AC</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{e849fb14-79c1-4938-a789-9d36fff93f0f}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">AD</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{07482d84-a073-40f8-a601-1bdd27c439d9}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C1</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{c26b7c1a-627e-4be8-9fc8-2369b004939b}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C2</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{8495ae91-867d-4ff7-a6a8-e17025296bd5}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{0d03a673-d8f4-4e0b-a1c5-13cb379a5618}" suffix="" symbol="{29c75321-a306-4770-947e-7d621f256da3}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{2108cbd3-732f-47e4-bc25-6b03be6245d9}" signal="{c26b7c1a-627e-4be8-9fc8-2369b004939b}"/>
+                        <map display="gen_comp_signal" pin="{b14ddd80-be76-47cc-89cb-05971c0f3162}" signal="{8dbd1fa6-c543-40fe-ae7f-62dae7977493}"/>
+                        <map display="gen_comp_signal" pin="{1002eb00-2319-41ea-819b-91acfafeabb9}" signal="{076cd49e-4237-4897-88ec-4b20bcd79156}"/>
+                        <map display="gen_comp_signal" pin="{b3a2f31a-57a0-435e-90d2-225d07f680cc}" signal="{07482d84-a073-40f8-a601-1bdd27c439d9}"/>
+                        <map display="gen_comp_signal" pin="{19619e53-8957-4b28-9b77-d6caaf2cea6d}" signal="{6e4d94a4-3d0a-48e8-92be-65e3c305c57d}"/>
+                        <map display="gen_comp_signal" pin="{8fd9d849-5c45-41ef-8e02-aca7e69c3ad8}" signal="{e849fb14-79c1-4938-a789-9d36fff93f0f}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

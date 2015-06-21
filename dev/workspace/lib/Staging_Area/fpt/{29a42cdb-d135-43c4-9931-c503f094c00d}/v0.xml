@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{29a42cdb-d135-43c4-9931-c503f094c00d}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:33Z</created>
+        <last_modified>2015-06-21T12:37:33Z</last_modified>
+        <name locale="en_US">RTRIM5X</name>
+        <description locale="en_US">&lt;b>Trimm resistor&lt;/b> Spectrol&lt;p>
+abgedichtet nach &lt;b>IP67&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: RTRIM5X
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="170" start_x="1.250000" start_y="2.350000" fill="false" width="0.254000">
+            <segment end_x="2.350000" end_y="2.350000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="2.350000" start_y="2.350000" fill="false" width="0.254000">
+            <segment end_x="2.350000" end_y="-2.350000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="2.350000" start_y="-2.350000" fill="false" width="0.254000">
+            <segment end_x="2.050000" end_y="-2.350000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-2.050000" start_y="-2.350000" fill="false" width="0.254000">
+            <segment end_x="-2.350000" end_y="-2.350000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-2.350000" start_y="-2.350000" fill="false" width="0.254000">
+            <segment end_x="-2.350000" end_y="2.350000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-2.350000" start_y="2.350000" fill="false" width="0.254000">
+            <segment end_x="-1.250000" end_y="2.350000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="0.250000" start_y="-2.350000" fill="false" width="0.254000">
+            <segment end_x="-0.250000" end_y="-2.350000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-1.100000" start_y="2.250000" fill="false" width="0.101600">
+            <segment end_x="-1.100000" end_y="1.600000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-1.100000" start_y="1.600000" fill="false" width="0.101600">
+            <segment end_x="-2.050000" end_y="1.600000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-2.050000" start_y="1.600000" fill="false" width="0.101600">
+            <segment end_x="-2.050000" end_y="2.250000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="2.350000" start_y="2.350000" fill="false" width="0.254000">
+            <segment end_x="2.350000" end_y="-2.350000" angle="0.000000"/>
+            <segment end_x="-2.350000" end_y="-2.350000" angle="0.000000"/>
+            <segment end_x="-2.350000" end_y="2.350000" angle="0.000000"/>
+            <segment end_x="2.350000" end_y="2.350000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-3.175000" y="-2.540000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="4.445000" y="-2.540000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="2.000000" x="0.000000" drill="0.000000" uuid="{8385b745-5afa-4b69-95be-6d027033a0cf}" y="2.000000" rotation="0.000000" layer="200" width="2.000000" type="smd_rect">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="2.000000" x="1.150000" drill="0.000000" uuid="{f84e4dc6-0d56-4993-b9d2-efbf714e7746}" y="-2.000000" rotation="0.000000" layer="200" width="1.300000" type="smd_rect">
+            <name locale="en_US">3</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="2.000000" x="-1.150000" drill="0.000000" uuid="{b5a5859e-5a8a-49a4-b06a-654958c6746b}" y="-2.000000" rotation="0.000000" layer="200" width="1.300000" type="smd_rect">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

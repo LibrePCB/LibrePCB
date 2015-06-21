@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{0eb71bb9-0b65-437e-b04f-0772fa50ed7a}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:45Z</created>
+        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <name locale="en_US">FA-</name>
+        <description locale="en_US">&lt;b>MHz RANGE CRYSTAL UNIT&lt;/b> &lt;p>
+Source: Epson Toyocom
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: FA-
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{8a0d7780-6150-44fe-831d-de095cd4fc35}</generic_component>
+        <package>{b5277442-2167-4c54-bc67-9532e5cdd2b7}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{edf0356e-5365-4639-b237-49f9f73d88d7}" signal="{39e183fe-cab8-431b-9168-df821178568d}"/>
+        <map pad="{4ee1cd35-c18a-4113-8b9f-5ce2de5f05fe}" signal="{9afbbeb7-632f-47a4-a071-135ce58eaf11}"/>
+        <map pad="{ba93e926-babf-4296-9afe-b12b5173f472}" signal="{32ba994d-e39e-4b2b-9773-0db4e40fdc49}"/>
+        <map pad="{decd54fc-fcb5-457f-a4eb-d1681140850d}" signal="{f1ff2237-ffbb-4f15-b22f-b2d30d9eaadc}"/>
+    </pad_signal_map>
+</component>

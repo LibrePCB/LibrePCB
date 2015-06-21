@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<symbol version="0">
+    <meta>
+        <uuid>{f6fda164-4f17-47be-a31d-50547ee09a2f}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:28Z</created>
+        <last_modified>2015-06-21T12:37:28Z</last_modified>
+        <name locale="en_US">POTEURO</name>
+        <description locale="en_US">
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: POTEURO
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="10" start_x="0.000000" start_y="-1.778000" fill="false" width="0.152400">
+            <segment end_x="2.667000" end_y="3.810000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="0.000000" start_y="-1.778000" fill="false" width="0.152400">
+            <segment end_x="0.000000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="2.540000" start_y="2.540000" fill="false" width="0.152400">
+            <segment end_x="2.667000" end_y="3.810000" angle="0.000000"/>
+            <segment end_x="1.778000" end_y="2.921000" angle="0.000000"/>
+            <segment end_x="2.540000" end_y="2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="2.540000" start_y="-1.270000" fill="false" width="0.254000">
+            <segment end_x="2.540000" end_y="1.270000" angle="0.000000"/>
+            <segment end_x="-2.540000" end_y="1.270000" angle="0.000000"/>
+            <segment end_x="-2.540000" end_y="-1.270000" angle="0.000000"/>
+            <segment end_x="2.540000" end_y="-1.270000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="2.540000" y="-5.080000" layer="20" text="${SYM::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="2.540000" y="-7.620000" layer="21" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pins>
+        <pin length="2.540000" x="5.080000" uuid="{56b187f5-e2f8-4acc-a910-33f56bb852cd}" y="0.000000" angle="-90.000000">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="2.540000" x="0.000000" uuid="{1f5ed495-be56-4af2-b9e1-36a8ad186b73}" y="-5.080000" angle="0.000000">
+            <name locale="en_US">3</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="2.540000" x="-5.080000" uuid="{72362dcb-4478-4858-a277-6701a7828b5f}" y="0.000000" angle="90.000000">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pin>
+    </pins>
+</symbol>

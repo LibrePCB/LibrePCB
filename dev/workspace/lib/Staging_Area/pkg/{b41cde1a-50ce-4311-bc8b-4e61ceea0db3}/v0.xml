@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{b41cde1a-50ce-4311-bc8b-4e61ceea0db3}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">PLCC4-TOPLED-RG</name>
+        <description locale="en_US">&lt;b>Multi TOPLED® RG&lt;/b>&lt;p>
+Source: http://www.osram.convergy.de ... LSG T770.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: PLCC4-TOPLED-RG
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{e1b89b55-e794-4263-9e4e-15a689054df1}</footprint>
+    </meta>
+    <categories/>
+</package>

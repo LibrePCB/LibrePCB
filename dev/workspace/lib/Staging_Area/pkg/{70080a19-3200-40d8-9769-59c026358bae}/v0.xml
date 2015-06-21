@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{70080a19-3200-40d8-9769-59c026358bae}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:33Z</created>
+        <last_modified>2015-06-21T12:37:33Z</last_modified>
+        <name locale="en_US">RTRIM3314J</name>
+        <description locale="en_US">&lt;b>Trimm resistor&lt;/b> BOURNS&lt;p>
+0,25W, 20%&lt;br>
+Source: &lt;a href="http://www.bourns.com/pdfs/3314.pdf"> Data sheet&lt;/a>
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: RTRIM3314J
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{6e9cbce5-76c2-4b7a-9735-748672716f39}</footprint>
+    </meta>
+    <categories/>
+</package>

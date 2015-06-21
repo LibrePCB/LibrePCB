@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{3216c386-c85f-433e-a818-ed9bc8d64ef1}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">DUOLED-RG-C</name>
+        <description locale="en_US">&lt;B>DUO LED&lt;/B>&lt;P>
+2 colors (red/green), 5 mm, round, common Cathode&lt;BR>
+&lt;I>www.ligitek.com&lt;/I> or other producers.
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: DUOLED-RG-C
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">LD</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{699e8bac-c114-47e0-a4b4-8b10a0acfa3a}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">AG</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{7ce1cada-c1e4-45b2-94e7-ecd6b9341882}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">AR</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{19155ad0-192d-443c-b746-377d6580afae}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{5add7375-1325-440c-a1e4-419daa6e2ad1}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{1b674dd7-4e43-4e56-af29-868bb8527b2a}" suffix="" symbol="{5d9a5c33-04e5-43d4-8fee-76a68adfd34f}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{bf6dd80f-71b7-493a-8aff-b7221601a376}" signal="{19155ad0-192d-443c-b746-377d6580afae}"/>
+                        <map display="gen_comp_signal" pin="{4f88000b-7546-436c-9355-7103c566940d}" signal="{7ce1cada-c1e4-45b2-94e7-ecd6b9341882}"/>
+                        <map display="gen_comp_signal" pin="{aa84558f-ab30-4f4f-aefa-5c7b49a8bcf3}" signal="{699e8bac-c114-47e0-a4b4-8b10a0acfa3a}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{f3c08aab-63e5-4993-a408-a90323bbb180}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">F50380</name>
+        <description locale="en_US">&lt;b>Z-POWER LED&lt;/b>&lt;p>
+Source: www.zpowerled.com .. F50380.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: F50380
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{4f05b918-056c-4cb3-8bf2-f966805698c5}</generic_component>
+        <package>{0db36e4a-b316-46c0-aa1c-42ebaacd8d38}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{d2dedb55-693f-45ac-b70f-6fb896e278c9}" signal="{1da1d97e-0aad-46a2-9a13-1ee2d33109fb}"/>
+        <map pad="{7faf8421-1167-441b-9b24-52bc6178759c}" signal="{0231b73e-4be9-42a3-a9e7-552e65359242}"/>
+        <map pad="{3152e4e1-d081-41e0-8266-2dba2af76a17}" signal="{de928edf-c8c4-431a-8c86-8e729ef432b0}"/>
+        <map pad="{cbba0f69-88f8-4bd8-b021-cdf35e1dd42b}" signal="{1c1ba6d2-78c7-4749-911a-34f192e411fa}"/>
+        <map pad="{c2c28ee9-ee41-4472-91fa-6103c6ea7aa1}" signal="{8e88d5de-1f34-4b38-a16d-cd54bc034e5b}"/>
+        <map pad="{009c9041-a9d4-4026-9f32-5fd1d5c6505b}" signal="{1d1f6f70-2e67-4edf-a35b-d2642d395188}"/>
+        <map pad="{49667493-b3aa-4b90-836e-be38c4897dce}" signal="{7530b95e-304e-4888-b117-3f3045b5e2b1}"/>
+    </pad_signal_map>
+</component>

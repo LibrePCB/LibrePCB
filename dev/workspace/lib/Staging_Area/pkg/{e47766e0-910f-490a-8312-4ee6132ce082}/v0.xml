@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{e47766e0-910f-490a-8312-4ee6132ce082}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:38Z</created>
+        <last_modified>2015-06-21T12:37:38Z</last_modified>
+        <name locale="en_US">C1103/</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+2-leaded metal can / 45 deg.
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: C1103/
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{62f20001-439b-45f4-8a8d-b98b5e7c0304}</footprint>
+    </meta>
+    <categories/>
+</package>

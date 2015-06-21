@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{422e6188-723b-4308-a9e3-0371681fa970}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">SOT23</name>
+        <description locale="en_US">&lt;b>SOT-23&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: SOT23
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{c7a65a03-bb01-4f9d-8e19-7485f241c07e}</footprint>
+    </meta>
+    <categories/>
+</package>

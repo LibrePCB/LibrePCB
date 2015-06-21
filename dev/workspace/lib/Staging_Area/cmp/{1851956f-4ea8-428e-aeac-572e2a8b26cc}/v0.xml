@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{1851956f-4ea8-428e-aeac-572e2a8b26cc}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">PL006*</name>
+        <description locale="en_US">&lt;b>PLH006 Series SMD LED&lt;/b> SOT23&lt;p>
+PLH006-WCR21 Super Red&lt;br>
+PLH006-WCR12 High Eff Red&lt;br>
+PLH006-WCG13 Green&lt;br>
+PLH006-WCY01 Yellow&lt;br>
+www.p-tec.net&lt;p>
+Source: http://www.wittig-electronic.de/PTEC/PL006Series.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: PL006*
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{b2df0d39-4fba-4e60-9aa3-034493c208b8}</generic_component>
+        <package>{422e6188-723b-4308-a9e3-0371681fa970}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{2de8b9cc-2951-491d-a30c-4c6c30d2019a}" signal="{0db0bbbe-d3d4-4729-af48-1fa43ba9711a}"/>
+        <map pad="{a7de4ab4-598e-4103-8e39-9dbcd38ac09d}" signal="{0cb5c1af-7fd0-4a7a-8313-4677e8def168}"/>
+    </pad_signal_map>
+</component>

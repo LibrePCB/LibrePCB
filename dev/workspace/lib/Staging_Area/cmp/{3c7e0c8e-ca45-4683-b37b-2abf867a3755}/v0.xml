@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{3c7e0c8e-ca45-4683-b37b-2abf867a3755}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">1N5908</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+schottky
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: 1N5908
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{04e222ac-38b6-474d-ab8a-c9fb19337c79}</generic_component>
+        <package>{1647780b-59cb-41ad-bd28-dbb45f809ed6}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{91db7ca3-52d3-49e4-9dbc-996779243d5f}" signal="{6795ce6b-feb6-4e07-92cc-96c99be9da9a}"/>
+        <map pad="{d73c58b6-cee2-4607-833a-6045ccef0199}" signal="{8c4ad441-0676-4df3-99c1-a0475eaf2d78}"/>
+    </pad_signal_map>
+</component>

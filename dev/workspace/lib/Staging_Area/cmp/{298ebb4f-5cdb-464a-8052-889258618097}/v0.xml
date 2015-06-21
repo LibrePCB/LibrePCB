@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{298ebb4f-5cdb-464a-8052-889258618097}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">X42182</name>
+        <description locale="en_US">&lt;b>Z-Power LED&lt;/b> P4 Series, Dome type&lt;/b>&lt;p>
+Source: http://www.seoulsemicon.co.kr .. X42182.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: X42182
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{d6abf5ea-21a1-43ac-bee7-a963146481dc}</generic_component>
+        <package>{ae92db7b-92c0-42be-b487-a5e3aa2bfd9c}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{65dc15fe-b8e8-4750-99af-a77c6822323a}" signal="{4e8c0481-b923-45b2-b340-699f05574798}"/>
+        <map pad="{3c536d5f-977a-4580-ad9a-a6e6b8195932}" signal="{9fed177f-1336-4311-ba2a-b3589735ed4f}"/>
+    </pad_signal_map>
+</component>

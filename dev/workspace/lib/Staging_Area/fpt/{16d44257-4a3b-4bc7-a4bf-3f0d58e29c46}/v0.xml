@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{16d44257-4a3b-4bc7-a4bf-3f0d58e29c46}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">140CLH-1010</name>
+        <description locale="en_US">&lt;b>Aluminum electrolytic capacitors SMD (Chip)&lt;/b>&lt;p>
+Long life base plate, High temperature 140 CLH&lt;p>
+http://www.bccomponents.com/
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: 140CLH-1010
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="170" start_x="-5.800000" start_y="5.150000" fill="false" width="0.203200">
+            <segment end_x="4.350000" end_y="5.150000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="5.800000" start_y="3.700000" fill="false" width="0.203200">
+            <segment end_x="5.800000" end_y="1.450000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="5.800000" start_y="1.450000" fill="false" width="0.203200">
+            <segment end_x="5.800000" end_y="-1.450000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="5.800000" start_y="-1.450000" fill="false" width="0.203200">
+            <segment end_x="5.800000" end_y="-3.700000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="4.350000" start_y="-5.150000" fill="false" width="0.203200">
+            <segment end_x="-5.800000" end_y="-5.150000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-5.800000" start_y="-5.150000" fill="false" width="0.203200">
+            <segment end_x="-5.800000" end_y="-1.450000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-5.800000" start_y="-1.450000" fill="false" width="0.203200">
+            <segment end_x="-5.800000" end_y="1.450000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-5.800000" start_y="1.450000" fill="false" width="0.203200">
+            <segment end_x="-5.800000" end_y="5.150000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="5.800000" start_y="3.700000" fill="false" width="0.203200">
+            <segment end_x="4.350000" end_y="5.150000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="5.800000" start_y="-3.700000" fill="false" width="0.203200">
+            <segment end_x="4.350000" end_y="-5.150000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="4.700000" start_y="1.400000" fill="false" width="0.203200">
+            <segment end_x="4.700000" end_y="-1.400000" angle="0.000000"/>
+            <segment end_x="-4.700000" end_y="-1.400000" angle="0.000000"/>
+            <segment end_x="-4.700000" end_y="1.400000" angle="0.000000"/>
+            <segment end_x="4.700000" end_y="1.400000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-2.740000" y="1.930000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-3.375000" y="-2.885000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="2.500000" x="-4.150000" drill="0.000000" uuid="{97df94a5-672b-44cb-a2e9-01772f6aae2e}" y="0.000000" rotation="0.000000" layer="200" width="4.300000" type="smd_rect">
+            <name locale="en_US">-</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="2.500000" x="4.150000" drill="0.000000" uuid="{f0e29ea8-2b8a-4fba-91c3-7ea8e20129e7}" y="0.000000" rotation="0.000000" layer="200" width="4.300000" type="smd_rect">
+            <name locale="en_US">+</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{795dd5e7-4579-4145-8c4c-f407f8a42422}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">LZC-00CW40</name>
+        <description locale="en_US">&lt;b>High Luminous Efficacy LED Emitter&lt;/b>&lt;p>
+Source: &lt;a href="http://www.ledengin.com/products/40wLZ/LZC-00CW40.pdf"> Data sheet &lt;/a>
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: LZC-00CW40
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{c640f488-2ae5-48ac-b443-d640b982585f}</footprint>
+    </meta>
+    <categories/>
+</package>

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{ecaa79b1-af92-438f-853a-d13f89aa5f38}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:38Z</created>
+        <last_modified>2015-06-21T12:37:38Z</last_modified>
+        <name locale="en_US">C221B1AS</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+2-lead molded, vertical
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: C221B1AS
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{5aa3d00d-3d7b-4324-93bd-6f2b4d933994}</footprint>
+    </meta>
+    <categories/>
+</package>

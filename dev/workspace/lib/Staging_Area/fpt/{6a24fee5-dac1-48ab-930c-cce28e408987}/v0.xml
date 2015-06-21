@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{6a24fee5-dac1-48ab-930c-cce28e408987}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">SMC_B</name>
+        <description locale="en_US">&lt;b>Chip Capacitor &lt;/b> Polar tantalum capacitors with solid electrolyte&lt;p>
+Siemens Matsushita Components B 45 194, B 45 197, B 45 198&lt;br>
+Source: www.farnell.com/datasheets/247.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: SMC_B
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="110" start_x="-1.750000" start_y="-1.100000" fill="true" width="0.000000">
+            <segment end_x="-1.550000" end_y="-1.100000" angle="0.000000"/>
+            <segment end_x="-1.550000" end_y="1.100000" angle="0.000000"/>
+            <segment end_x="-1.750000" end_y="1.100000" angle="0.000000"/>
+            <segment end_x="-1.750000" end_y="-1.100000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="1.550000" start_y="-1.100000" fill="true" width="0.000000">
+            <segment end_x="1.750000" end_y="-1.100000" angle="0.000000"/>
+            <segment end_x="1.750000" end_y="1.100000" angle="0.000000"/>
+            <segment end_x="1.550000" end_y="1.100000" angle="0.000000"/>
+            <segment end_x="1.550000" end_y="-1.100000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-1.600000" start_y="-1.350000" fill="true" width="0.000000">
+            <segment end_x="-0.950000" end_y="-1.350000" angle="0.000000"/>
+            <segment end_x="-0.950000" end_y="1.350000" angle="0.000000"/>
+            <segment end_x="-1.600000" end_y="1.350000" angle="0.000000"/>
+            <segment end_x="-1.600000" end_y="-1.350000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="1.600000" start_y="-1.350000" fill="false" width="0.101600">
+            <segment end_x="1.600000" end_y="1.350000" angle="0.000000"/>
+            <segment end_x="-1.600000" end_y="1.350000" angle="0.000000"/>
+            <segment end_x="-1.600000" end_y="-1.350000" angle="0.000000"/>
+            <segment end_x="1.600000" end_y="-1.350000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-1.905000" y="1.905000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-1.905000" y="-2.540000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="2.400000" x="1.500000" drill="0.000000" uuid="{f968e830-7b90-4c80-aabf-774a2ee13fdc}" y="0.000000" rotation="-180.000000" layer="200" width="1.600000" type="smd_rect">
+            <name locale="en_US">-</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="2.400000" x="-1.500000" drill="0.000000" uuid="{f3f3882a-a997-4f05-ad23-a5d70dae628d}" y="0.000000" rotation="0.000000" layer="200" width="1.600000" type="smd_rect">
+            <name locale="en_US">+</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

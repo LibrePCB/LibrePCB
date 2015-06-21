@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{0185c986-189c-4f2f-a64c-c636d289ba46}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:37Z</created>
+        <last_modified>2015-06-21T12:37:37Z</last_modified>
+        <name locale="en_US">FC-12M</name>
+        <description locale="en_US">&lt;b>kHz RANGE CRYSTAL UNIT&lt;/b>&lt;p>
+LOW PROFILE SMD&lt;b>
+Source: Epson Toyocom FC-12M.pdf
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: FC-12M
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{fdbf05df-eed1-4721-891e-b607158f46ce}</footprint>
+    </meta>
+    <categories/>
+</package>

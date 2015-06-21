@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{79b3c9db-f019-43fb-b85b-27bc598485d8}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">SOD323_ST</name>
+        <description locale="en_US">&lt;b>SOD-323&lt;/b>&lt;p>
+Source: www.st.com, BAT60J.pdf
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: SOD323_ST
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{36fb5b8c-14a0-40cd-b336-e860ed09297d}</footprint>
+    </meta>
+    <categories/>
+</package>

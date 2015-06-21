@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{58af6cbe-9b8d-4c2d-be57-a67d47d1f155}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:33Z</created>
+        <last_modified>2015-06-21T12:37:33Z</last_modified>
+        <name locale="en_US">RTRIMT93YA</name>
+        <description locale="en_US">&lt;b>Trimm resistor&lt;/b> VISHAY&lt;p>
+Cermet, abgedichtet nach IP67
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: RTRIMT93YA
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="170" start_x="-0.750000" start_y="2.600000" fill="false" width="0.152400">
+            <segment end_x="-0.300000" end_y="3.300000" angle="311.390901"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-0.750000" start_y="2.600000" fill="false" width="0.152400">
+            <segment end_x="-0.300000" end_y="3.300000" angle="-48.609099"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-1.450000" start_y="2.500000" fill="true" width="0.000000">
+            <segment end_x="-1.150000" end_y="2.500000" angle="0.000000"/>
+            <segment end_x="-1.150000" end_y="4.400000" angle="0.000000"/>
+            <segment end_x="-1.450000" end_y="4.400000" angle="0.000000"/>
+            <segment end_x="-1.450000" end_y="2.500000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="2.150000" start_y="-4.750000" fill="false" width="0.254000">
+            <segment end_x="2.150000" end_y="4.750000" angle="0.000000"/>
+            <segment end_x="-2.550000" end_y="4.750000" angle="0.000000"/>
+            <segment end_x="-2.550000" end_y="-4.750000" angle="0.000000"/>
+            <segment end_x="2.150000" end_y="-4.750000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-3.040000" y="-4.890000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="4.010000" y="-4.890000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="1.219200" x="0.000000" drill="0.609600" uuid="{717a7d58-441b-47d5-babb-13353d1af8f4}" y="2.540000" rotation="90.000000" layer="0" width="1.219200" type="tht_round">
+            <name locale="en_US">3</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.219200" x="0.000000" drill="0.609600" uuid="{cf56814c-d66b-40ff-9c4a-b62ff5657c43}" y="-2.540000" rotation="90.000000" layer="0" width="1.219200" type="tht_round">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.219200" x="0.000000" drill="0.609600" uuid="{0222dd30-2471-4c36-b81b-c5ec409c46f9}" y="0.000000" rotation="90.000000" layer="0" width="1.219200" type="tht_round">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

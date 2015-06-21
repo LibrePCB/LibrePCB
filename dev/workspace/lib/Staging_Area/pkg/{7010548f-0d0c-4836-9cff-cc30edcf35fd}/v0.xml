@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{7010548f-0d0c-4836-9cff-cc30edcf35fd}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">SUPERFLUX-7.6X7.6</name>
+        <description locale="en_US">&lt;b>SUPER FLUX LED LAMP&lt;/b> 7.6 mm x 7.6 mm &lt;p>
+Source: www.us.kingbright.com/images/catalog/SPEC/W7676CPBC-H.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: SUPERFLUX-7.6X7.6
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{68edf293-773d-4ce6-8624-d1b6490fd3d5}</footprint>
+    </meta>
+    <categories/>
+</package>

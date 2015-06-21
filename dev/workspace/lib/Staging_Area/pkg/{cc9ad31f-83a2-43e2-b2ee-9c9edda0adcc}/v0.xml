@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{cc9ad31f-83a2-43e2-b2ee-9c9edda0adcc}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:35Z</created>
+        <last_modified>2015-06-21T12:37:35Z</last_modified>
+        <name locale="en_US">L4035M</name>
+        <description locale="en_US">&lt;b>INDUCTOR&lt;/b>&lt;p>
+molded
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: L4035M
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{0f377525-23d9-4787-90c5-a740cb028e35}</footprint>
+    </meta>
+    <categories/>
+</package>

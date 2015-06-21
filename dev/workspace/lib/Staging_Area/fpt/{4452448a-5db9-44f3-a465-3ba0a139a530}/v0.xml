@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{4452448a-5db9-44f3-a465-3ba0a139a530}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:37Z</created>
+        <last_modified>2015-06-21T12:37:37Z</last_modified>
+        <name locale="en_US">UM1</name>
+        <description locale="en_US">&lt;b>Crystal Filter&lt;/b>&lt;p>
+Source: www.ilsiamerica.com .. C1 IXF Series.pdf
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: UM1
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="170" start_x="-2.396000" start_y="-1.411000" fill="false" width="0.406400">
+            <segment end_x="2.421000" end_y="-1.411000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-2.421000" start_y="1.361000" fill="false" width="0.406400">
+            <segment end_x="2.396000" end_y="1.361000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-2.396000" start_y="-0.903000" fill="false" width="0.152400">
+            <segment end_x="2.421000" end_y="-0.903000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="2.396000" start_y="0.853000" fill="false" width="0.152400">
+            <segment end_x="-2.421000" end_y="0.853000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="2.396000" start_y="0.853000" fill="false" width="0.152400">
+            <segment end_x="2.421000" end_y="-0.903000" angle="180.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="2.396000" start_y="1.361000" fill="false" width="0.406400">
+            <segment end_x="2.421000" end_y="-1.411000" angle="180.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-2.421000" start_y="1.361000" fill="false" width="0.406400">
+            <segment end_x="-2.396000" end_y="-1.411000" angle="-180.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-2.421000" start_y="0.853000" fill="false" width="0.152400">
+            <segment end_x="-2.396000" end_y="-0.903000" angle="-180.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-3.810000" y="1.905000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-3.810000" y="-3.175000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="1.200000" x="-1.875000" drill="0.700000" uuid="{f26a8ddb-4132-441e-9bc1-ee73ffff14a2}" y="0.000000" rotation="90.000000" layer="0" width="1.200000" type="tht_round">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.200000" x="1.875000" drill="0.700000" uuid="{a14befb7-5214-4514-b1f5-51ee69176bcd}" y="0.000000" rotation="90.000000" layer="0" width="1.200000" type="tht_round">
+            <name locale="en_US">3</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.200000" x="-0.027000" drill="0.700000" uuid="{ddf4f96d-cc08-4a40-9182-697f00aad890}" y="0.000000" rotation="90.000000" layer="0" width="1.200000" type="tht_round">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

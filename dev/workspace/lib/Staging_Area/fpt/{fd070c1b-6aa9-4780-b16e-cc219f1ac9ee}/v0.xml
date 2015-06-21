@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{fd070c1b-6aa9-4780-b16e-cc219f1ac9ee}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">C1206K</name>
+        <description locale="en_US">&lt;b>Ceramic Chip Capacitor KEMET 1206 reflow solder&lt;/b>&lt;p>
+Metric Code Size 3216
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: C1206K
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="110" start_x="-1.525000" start_y="0.750000" fill="false" width="0.101600">
+            <segment end_x="1.525000" end_y="0.750000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="1.525000" start_y="-0.750000" fill="false" width="0.101600">
+            <segment end_x="-1.525000" end_y="-0.750000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-1.600000" start_y="-0.800000" fill="true" width="0.000000">
+            <segment end_x="-1.100000" end_y="-0.800000" angle="0.000000"/>
+            <segment end_x="-1.100000" end_y="0.800000" angle="0.000000"/>
+            <segment end_x="-1.600000" end_y="0.800000" angle="0.000000"/>
+            <segment end_x="-1.600000" end_y="-0.800000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="1.100000" start_y="-0.800000" fill="true" width="0.000000">
+            <segment end_x="1.600000" end_y="-0.800000" angle="0.000000"/>
+            <segment end_x="1.600000" end_y="0.800000" angle="0.000000"/>
+            <segment end_x="1.100000" end_y="0.800000" angle="0.000000"/>
+            <segment end_x="1.100000" end_y="-0.800000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-1.600000" y="1.100000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-1.600000" y="-2.100000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="2.000000" x="-1.500000" drill="0.000000" uuid="{9974b908-ec3a-413e-ab2c-22773fa230b1}" y="0.000000" rotation="0.000000" layer="200" width="1.500000" type="smd_rect">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="2.000000" x="1.500000" drill="0.000000" uuid="{49c109cd-9147-4c3d-8d22-434e4550b5e0}" y="0.000000" rotation="0.000000" layer="200" width="1.500000" type="smd_rect">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

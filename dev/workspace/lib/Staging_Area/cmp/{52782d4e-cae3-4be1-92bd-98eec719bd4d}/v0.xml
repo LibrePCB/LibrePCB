@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{52782d4e-cae3-4be1-92bd-98eec719bd4d}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:45Z</created>
+        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <name locale="en_US">SM77H</name>
+        <description locale="en_US">&lt;b>3.3V CMOS Clock Oscillator&lt;/b>&lt;p>
+Source: www.pletronics.com .. sm77h%203.3v.pdf
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: SM77H
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{94a413e4-0e48-4742-875c-8d516eb33230}</generic_component>
+        <package>{1126a784-9856-43e9-8f3a-192744ae9075}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{b59de88e-01d8-4390-93b5-548617d7385b}" signal="{c5efad17-6da6-4ed7-9031-0e67172a51f1}"/>
+        <map pad="{b171a8bf-4da5-4ae0-aa1b-cd79d24942bc}" signal="{979eedd2-1e3d-48e1-bf99-e52c2e04e93a}"/>
+        <map pad="{3400da54-a7d7-4f25-95b8-b4df6e3334b4}" signal="{183b22c3-3cb8-4b6c-819d-d8343065035b}"/>
+        <map pad="{78531d61-e28d-4245-807f-e8b21d9026d9}" signal="{929ad3e8-c204-42a1-bcfa-28b41ed39863}"/>
+    </pad_signal_map>
+</component>

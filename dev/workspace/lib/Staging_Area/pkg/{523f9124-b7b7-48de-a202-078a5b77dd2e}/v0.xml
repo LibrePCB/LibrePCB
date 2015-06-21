@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{523f9124-b7b7-48de-a202-078a5b77dd2e}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:38Z</created>
+        <last_modified>2015-06-21T12:37:38Z</last_modified>
+        <name locale="en_US">TO220CSH</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+3-lead molded, vertical
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: TO220CSH
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{53834c48-1fa0-4984-9a76-edd201efb226}</footprint>
+    </meta>
+    <categories/>
+</package>

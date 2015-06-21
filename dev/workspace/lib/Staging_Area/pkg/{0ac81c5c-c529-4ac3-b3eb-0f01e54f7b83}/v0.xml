@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{0ac81c5c-c529-4ac3-b3eb-0f01e54f7b83}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">W51-COOL</name>
+        <description locale="en_US">&lt;b>Golden DRAGON® with Lens&lt;/b> Enhanced Thinfilm LED&lt;p>
+with thermal holes&lt;br>
+Source: LA_LR_LY_W51M_Pb_free[1].pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: W51-COOL
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{248c1e8f-cf52-4ce0-b54e-d34ddad3c8ee}</footprint>
+    </meta>
+    <categories/>
+</package>

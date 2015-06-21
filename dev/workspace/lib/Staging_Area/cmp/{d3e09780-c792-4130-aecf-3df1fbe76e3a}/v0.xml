@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{d3e09780-c792-4130-aecf-3df1fbe76e3a}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">BYD14</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BYD14
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{c6f34eb0-f48a-4d56-8f38-022cbf84711a}</generic_component>
+        <package>{8ad10e1b-ef55-4e7c-8a99-85a36eee9b93}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{8ea7fcb7-d210-4223-9472-9cd44df4ab54}" signal="{9f0bab8e-53b1-41f0-8faa-6a6483c44182}"/>
+        <map pad="{274ed449-4a7a-461f-85ca-ca3c53d2e75d}" signal="{49af5aec-b11b-4129-bc79-3117b42fc5d8}"/>
+    </pad_signal_map>
+</component>

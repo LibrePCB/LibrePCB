@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{b8712144-57f3-4266-9879-65a68eea79e7}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">SCHOTTKY-DIODE</name>
+        <description locale="en_US">Schottky Diode
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: SCHOTTKY-DIODE
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{82207562-d317-4911-96fa-ceb0f45fd806}</generic_component>
+        <package>{80476949-d281-4d63-a1e9-f5f23f8dce5c}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{8e6a451b-6bea-47bc-a57b-fa7f3143a473}" signal="{6dd65f7f-8f6b-4b29-ade1-40bc4f84f4b8}"/>
+        <map pad="{d86e9ec4-4d70-496d-a60a-80e3c33b2f1a}" signal="{69e22be3-d2fb-4b8f-ab4f-7fba3cff0aff}"/>
+    </pad_signal_map>
+</component>

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{a4efa08e-2ad1-41ed-9e44-f12e05e57d43}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:38Z</created>
+        <last_modified>2015-06-21T12:37:38Z</last_modified>
+        <name locale="en_US">C182B</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+2-lead plasic, vertical
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: C182B
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{979e1c15-af4d-47fa-b92b-034293deab25}</footprint>
+    </meta>
+    <categories/>
+</package>

@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{317d0f70-fcff-4340-91f2-e395ca1cabd1}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">GF1</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: GF1
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{b04c2d2f-d144-4eac-a18f-ca0a751afc17}</generic_component>
+        <package>{065d7368-2007-4fae-8542-0dddf95c0fc6}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{42fdfbaa-dfed-4e3e-b079-00fb71c6969b}" signal="{11aca540-30ce-4cf4-ba1e-0bcd48dcb10b}"/>
+        <map pad="{7c9096be-3284-41c5-85fc-ced8c411aecc}" signal="{db3cd934-ea55-4b9e-acea-300bbce5e895}"/>
+    </pad_signal_map>
+</component>

@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{ffb72ec5-6cec-495c-9117-8c650396cabc}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">C/6032-28R</name>
+        <description locale="en_US">&lt;b>Chip Capacitor Type KEMET C / EIA 6032-28 reflow solder&lt;/b>&lt;p>KEMET U / EIA 6032-15
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: C/6032-28R
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{a29084fc-a069-4d71-82e4-0d111205acdf}</footprint>
+    </meta>
+    <categories/>
+</package>

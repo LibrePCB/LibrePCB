@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{10c412fd-ebea-4dc1-b9fa-62c690004355}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">BYV10</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+power diode
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BYV10
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{b080fcb7-8e0a-4db0-9a59-168764da51bb}</generic_component>
+        <package>{2f931593-bf9b-460b-af7f-d8e8f4d2510b}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{d4b82aa7-4f97-4065-9f0a-11c0bb4a1cc7}" signal="{b779b364-deb2-4bcb-95ae-0330b5e08f11}"/>
+        <map pad="{613f34f8-ec74-460b-9203-e64dcd075b58}" signal="{2825c905-f99d-44f4-a973-f8a576d20b66}"/>
+    </pad_signal_map>
+</component>

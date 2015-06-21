@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{e420f838-e7a3-4d73-954a-a2b584707a5a}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">175TMP-0808</name>
+        <description locale="en_US">&lt;b>Aluminum electrolytic capacitors&lt;/b>&lt;p>
+High Temperature solid electrolytic SMD 175 TMP&lt;p>
+http://www.bccomponents.com/
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: 175TMP-0808
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{37a6f5b9-5078-48b5-b0ec-5eb6684d764e}</footprint>
+    </meta>
+    <categories/>
+</package>

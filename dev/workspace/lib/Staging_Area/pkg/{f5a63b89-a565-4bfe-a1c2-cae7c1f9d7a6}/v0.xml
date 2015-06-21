@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{f5a63b89-a565-4bfe-a1c2-cae7c1f9d7a6}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">SOD323W_INFINEON</name>
+        <description locale="en_US">&lt;b>Diode Package&lt;/b> Wave soldering&lt;p>
+INFINEON, www.infineon.com/cmc_upload/0/000/010/257/eh_db_5b.pdf
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: SOD323W_INFINEON
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{de90e90a-1479-421f-94c7-2a4de5332d85}</footprint>
+    </meta>
+    <categories/>
+</package>

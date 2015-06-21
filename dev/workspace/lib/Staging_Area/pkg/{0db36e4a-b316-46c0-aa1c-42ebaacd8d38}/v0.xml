@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{0db36e4a-b316-46c0-aa1c-42ebaacd8d38}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">F50380</name>
+        <description locale="en_US">&lt;b>Z-POWER LED&lt;/b>&lt;p>
+Source: www.zpowerled.com .. F50380.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: F50380
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{21ace5f8-8722-4775-8477-fbb8f6a16921}</footprint>
+    </meta>
+    <categories/>
+</package>

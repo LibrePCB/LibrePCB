@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{f6ef66e9-3d11-45e8-a9a7-49d5f281a4a7}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">R0201</name>
+        <description locale="en_US">&lt;b>RESISTOR&lt;/b> chip&lt;p>
+Source: http://www.vishay.com/docs/20008/dcrcw.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: R0201
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{3739bd6f-bbde-43c9-bda8-72b801569276}</footprint>
+    </meta>
+    <categories/>
+</package>

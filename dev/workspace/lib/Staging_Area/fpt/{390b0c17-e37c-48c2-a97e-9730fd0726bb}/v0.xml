@@ -1,0 +1,231 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{390b0c17-e37c-48c2-a97e-9730fd0726bb}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:35Z</created>
+        <last_modified>2015-06-21T12:37:35Z</last_modified>
+        <name locale="en_US">FE15-2</name>
+        <description locale="en_US">&lt;b>FEMALE HEADER&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: con-lsta.lbr
+Name: FE15-2
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="170" start_x="-19.050000" start_y="-2.413000" fill="false" width="0.152400">
+            <segment end_x="-19.050000" end_y="2.413000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-19.050000" start_y="2.413000" fill="false" width="0.152400">
+            <segment end_x="-18.415000" end_y="3.048000" angle="90.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-19.050000" start_y="-2.413000" fill="false" width="0.152400">
+            <segment end_x="-18.415000" end_y="-3.048000" angle="-90.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-18.415000" start_y="3.048000" fill="false" width="0.152400">
+            <segment end_x="18.415000" end_y="3.048000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="19.050000" start_y="-2.413000" fill="false" width="0.152400">
+            <segment end_x="19.050000" end_y="2.413000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-18.415000" start_y="-3.048000" fill="false" width="0.152400">
+            <segment end_x="18.415000" end_y="-3.048000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="18.415000" start_y="3.048000" fill="false" width="0.152400">
+            <segment end_x="19.050000" end_y="2.413000" angle="90.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="18.415000" start_y="-3.048000" fill="false" width="0.152400">
+            <segment end_x="19.050000" end_y="-2.413000" angle="-90.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-12.700000" y="3.556000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.540000" x="-18.161000" y="3.556000" layer="170" text="1" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.540000" x="16.891000" y="-4.699000" layer="170" text="30" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-19.050000" y="-4.699000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+        <ellipse radius_x="0.127000" x="-17.780000" radius_y="0.127000" grab_area="true" y="-1.270000" layer="110" rotation="0.000000" fill="false" width="0.406400"/>
+        <ellipse radius_x="0.127000" x="-17.780000" radius_y="0.127000" grab_area="true" y="1.270000" layer="110" rotation="0.000000" fill="false" width="0.406400"/>
+        <ellipse radius_x="0.127000" x="-15.240000" radius_y="0.127000" grab_area="true" y="-1.270000" layer="110" rotation="0.000000" fill="false" width="0.406400"/>
+        <ellipse radius_x="0.127000" x="-15.240000" radius_y="0.127000" grab_area="true" y="1.270000" layer="110" rotation="0.000000" fill="false" width="0.406400"/>
+        <ellipse radius_x="0.127000" x="-12.700000" radius_y="0.127000" grab_area="true" y="-1.270000" layer="110" rotation="0.000000" fill="false" width="0.406400"/>
+        <ellipse radius_x="0.127000" x="-12.700000" radius_y="0.127000" grab_area="true" y="1.270000" layer="110" rotation="0.000000" fill="false" width="0.406400"/>
+        <ellipse radius_x="0.127000" x="-10.160000" radius_y="0.127000" grab_area="true" y="-1.270000" layer="110" rotation="0.000000" fill="false" width="0.406400"/>
+        <ellipse radius_x="0.127000" x="-10.160000" radius_y="0.127000" grab_area="true" y="1.270000" layer="110" rotation="0.000000" fill="false" width="0.406400"/>
+        <ellipse radius_x="0.127000" x="-7.620000" radius_y="0.127000" grab_area="true" y="-1.270000" layer="110" rotation="0.000000" fill="false" width="0.406400"/>
+        <ellipse radius_x="0.127000" x="-7.620000" radius_y="0.127000" grab_area="true" y="1.270000" layer="110" rotation="0.000000" fill="false" width="0.406400"/>
+        <ellipse radius_x="0.889000" x="-17.780000" radius_y="0.889000" grab_area="true" y="-1.270000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+        <ellipse radius_x="0.889000" x="-17.780000" radius_y="0.889000" grab_area="true" y="1.270000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+        <ellipse radius_x="0.889000" x="-15.240000" radius_y="0.889000" grab_area="true" y="1.270000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+        <ellipse radius_x="0.889000" x="-12.700000" radius_y="0.889000" grab_area="true" y="1.270000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+        <ellipse radius_x="0.889000" x="-10.160000" radius_y="0.889000" grab_area="true" y="1.270000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+        <ellipse radius_x="0.889000" x="-7.620000" radius_y="0.889000" grab_area="true" y="1.270000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+        <ellipse radius_x="0.889000" x="-15.240000" radius_y="0.889000" grab_area="true" y="-1.270000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+        <ellipse radius_x="0.889000" x="-12.700000" radius_y="0.889000" grab_area="true" y="-1.270000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+        <ellipse radius_x="0.889000" x="-10.160000" radius_y="0.889000" grab_area="true" y="-1.270000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+        <ellipse radius_x="0.889000" x="-7.620000" radius_y="0.889000" grab_area="true" y="-1.270000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+        <ellipse radius_x="0.127000" x="-5.080000" radius_y="0.127000" grab_area="true" y="-1.270000" layer="110" rotation="0.000000" fill="false" width="0.406400"/>
+        <ellipse radius_x="0.127000" x="-5.080000" radius_y="0.127000" grab_area="true" y="1.270000" layer="110" rotation="0.000000" fill="false" width="0.406400"/>
+        <ellipse radius_x="0.127000" x="-2.540000" radius_y="0.127000" grab_area="true" y="-1.270000" layer="110" rotation="0.000000" fill="false" width="0.406400"/>
+        <ellipse radius_x="0.127000" x="-2.540000" radius_y="0.127000" grab_area="true" y="1.270000" layer="110" rotation="0.000000" fill="false" width="0.406400"/>
+        <ellipse radius_x="0.127000" x="0.000000" radius_y="0.127000" grab_area="true" y="-1.270000" layer="110" rotation="0.000000" fill="false" width="0.406400"/>
+        <ellipse radius_x="0.127000" x="0.000000" radius_y="0.127000" grab_area="true" y="1.270000" layer="110" rotation="0.000000" fill="false" width="0.406400"/>
+        <ellipse radius_x="0.127000" x="2.540000" radius_y="0.127000" grab_area="true" y="-1.270000" layer="110" rotation="0.000000" fill="false" width="0.406400"/>
+        <ellipse radius_x="0.127000" x="2.540000" radius_y="0.127000" grab_area="true" y="1.270000" layer="110" rotation="0.000000" fill="false" width="0.406400"/>
+        <ellipse radius_x="0.127000" x="5.080000" radius_y="0.127000" grab_area="true" y="-1.270000" layer="110" rotation="0.000000" fill="false" width="0.406400"/>
+        <ellipse radius_x="0.127000" x="5.080000" radius_y="0.127000" grab_area="true" y="1.270000" layer="110" rotation="0.000000" fill="false" width="0.406400"/>
+        <ellipse radius_x="0.889000" x="-5.080000" radius_y="0.889000" grab_area="true" y="-1.270000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+        <ellipse radius_x="0.889000" x="-5.080000" radius_y="0.889000" grab_area="true" y="1.270000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+        <ellipse radius_x="0.889000" x="-2.540000" radius_y="0.889000" grab_area="true" y="1.270000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+        <ellipse radius_x="0.889000" x="0.000000" radius_y="0.889000" grab_area="true" y="1.270000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+        <ellipse radius_x="0.889000" x="2.540000" radius_y="0.889000" grab_area="true" y="1.270000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+        <ellipse radius_x="0.889000" x="5.080000" radius_y="0.889000" grab_area="true" y="1.270000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+        <ellipse radius_x="0.889000" x="-2.540000" radius_y="0.889000" grab_area="true" y="-1.270000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+        <ellipse radius_x="0.889000" x="0.000000" radius_y="0.889000" grab_area="true" y="-1.270000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+        <ellipse radius_x="0.889000" x="2.540000" radius_y="0.889000" grab_area="true" y="-1.270000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+        <ellipse radius_x="0.889000" x="5.080000" radius_y="0.889000" grab_area="true" y="-1.270000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+        <ellipse radius_x="0.127000" x="7.620000" radius_y="0.127000" grab_area="true" y="-1.270000" layer="110" rotation="0.000000" fill="false" width="0.406400"/>
+        <ellipse radius_x="0.127000" x="7.620000" radius_y="0.127000" grab_area="true" y="1.270000" layer="110" rotation="0.000000" fill="false" width="0.406400"/>
+        <ellipse radius_x="0.127000" x="10.160000" radius_y="0.127000" grab_area="true" y="-1.270000" layer="110" rotation="0.000000" fill="false" width="0.406400"/>
+        <ellipse radius_x="0.127000" x="10.160000" radius_y="0.127000" grab_area="true" y="1.270000" layer="110" rotation="0.000000" fill="false" width="0.406400"/>
+        <ellipse radius_x="0.127000" x="12.700000" radius_y="0.127000" grab_area="true" y="-1.270000" layer="110" rotation="0.000000" fill="false" width="0.406400"/>
+        <ellipse radius_x="0.127000" x="12.700000" radius_y="0.127000" grab_area="true" y="1.270000" layer="110" rotation="0.000000" fill="false" width="0.406400"/>
+        <ellipse radius_x="0.127000" x="15.240000" radius_y="0.127000" grab_area="true" y="-1.270000" layer="110" rotation="0.000000" fill="false" width="0.406400"/>
+        <ellipse radius_x="0.127000" x="15.240000" radius_y="0.127000" grab_area="true" y="1.270000" layer="110" rotation="0.000000" fill="false" width="0.406400"/>
+        <ellipse radius_x="0.127000" x="17.780000" radius_y="0.127000" grab_area="true" y="-1.270000" layer="110" rotation="0.000000" fill="false" width="0.406400"/>
+        <ellipse radius_x="0.127000" x="17.780000" radius_y="0.127000" grab_area="true" y="1.270000" layer="110" rotation="0.000000" fill="false" width="0.406400"/>
+        <ellipse radius_x="0.889000" x="7.620000" radius_y="0.889000" grab_area="true" y="-1.270000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+        <ellipse radius_x="0.889000" x="7.620000" radius_y="0.889000" grab_area="true" y="1.270000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+        <ellipse radius_x="0.889000" x="10.160000" radius_y="0.889000" grab_area="true" y="1.270000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+        <ellipse radius_x="0.889000" x="12.700000" radius_y="0.889000" grab_area="true" y="1.270000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+        <ellipse radius_x="0.889000" x="15.240000" radius_y="0.889000" grab_area="true" y="1.270000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+        <ellipse radius_x="0.889000" x="17.780000" radius_y="0.889000" grab_area="true" y="1.270000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+        <ellipse radius_x="0.889000" x="10.160000" radius_y="0.889000" grab_area="true" y="-1.270000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+        <ellipse radius_x="0.889000" x="12.700000" radius_y="0.889000" grab_area="true" y="-1.270000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+        <ellipse radius_x="0.889000" x="15.240000" radius_y="0.889000" grab_area="true" y="-1.270000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+        <ellipse radius_x="0.889000" x="17.780000" radius_y="0.889000" grab_area="true" y="-1.270000" layer="110" rotation="0.000000" fill="false" width="0.152400"/>
+    </geometry>
+    <pads>
+        <pad height="1.828800" x="5.080000" drill="0.914400" uuid="{04a9aed3-4319-46f1-b137-d16e279bc93d}" y="1.270000" rotation="90.000000" layer="0" width="1.828800" type="tht_octagon">
+            <name locale="en_US">19</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.828800" x="12.700000" drill="0.914400" uuid="{906bd495-83ca-495c-bc70-727e4169faa2}" y="1.270000" rotation="90.000000" layer="0" width="1.828800" type="tht_octagon">
+            <name locale="en_US">25</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.828800" x="12.700000" drill="0.914400" uuid="{1b875ace-2aca-4287-9819-94b46e894d15}" y="-1.270000" rotation="90.000000" layer="0" width="1.828800" type="tht_octagon">
+            <name locale="en_US">26</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.828800" x="15.240000" drill="0.914400" uuid="{225265e9-5497-459c-b001-730d5796f7e9}" y="-1.270000" rotation="90.000000" layer="0" width="1.828800" type="tht_octagon">
+            <name locale="en_US">28</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.828800" x="-10.160000" drill="0.914400" uuid="{39d06450-26e8-4fc3-9645-0a3a1c509f26}" y="-1.270000" rotation="90.000000" layer="0" width="1.828800" type="tht_octagon">
+            <name locale="en_US">8</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.828800" x="0.000000" drill="0.914400" uuid="{1fd8dc70-f127-4661-966a-20e4c6b869d6}" y="-1.270000" rotation="90.000000" layer="0" width="1.828800" type="tht_octagon">
+            <name locale="en_US">16</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.828800" x="-7.620000" drill="0.914400" uuid="{1ea027eb-a1f4-44ef-b26f-aea4178826e6}" y="1.270000" rotation="90.000000" layer="0" width="1.828800" type="tht_octagon">
+            <name locale="en_US">9</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.828800" x="-12.700000" drill="0.914400" uuid="{3f01cf29-ef36-444a-877f-63b6c6065592}" y="-1.270000" rotation="90.000000" layer="0" width="1.828800" type="tht_octagon">
+            <name locale="en_US">6</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.828800" x="-5.080000" drill="0.914400" uuid="{ce78165d-029b-4c96-aab6-afd06747e2b6}" y="1.270000" rotation="90.000000" layer="0" width="1.828800" type="tht_octagon">
+            <name locale="en_US">11</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.828800" x="0.000000" drill="0.914400" uuid="{905058fc-7f77-4052-b9cc-9012a4f1d5b1}" y="1.270000" rotation="90.000000" layer="0" width="1.828800" type="tht_octagon">
+            <name locale="en_US">15</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.828800" x="5.080000" drill="0.914400" uuid="{e20be66d-d565-48db-b011-bf955a78549c}" y="-1.270000" rotation="90.000000" layer="0" width="1.828800" type="tht_octagon">
+            <name locale="en_US">20</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.828800" x="-2.540000" drill="0.914400" uuid="{42735e76-fb04-4b26-8abf-2f091dfaf21d}" y="1.270000" rotation="90.000000" layer="0" width="1.828800" type="tht_octagon">
+            <name locale="en_US">13</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.828800" x="-5.080000" drill="0.914400" uuid="{a32a1c23-316a-4f89-97ac-37f9e2621e98}" y="-1.270000" rotation="90.000000" layer="0" width="1.828800" type="tht_octagon">
+            <name locale="en_US">12</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.828800" x="2.540000" drill="0.914400" uuid="{360d7c8c-93ea-4379-9e7a-cc5faf60fbe2}" y="1.270000" rotation="90.000000" layer="0" width="1.828800" type="tht_octagon">
+            <name locale="en_US">17</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.828800" x="10.160000" drill="0.914400" uuid="{a230a600-6382-4a6c-b247-f238b099a6e9}" y="1.270000" rotation="90.000000" layer="0" width="1.828800" type="tht_octagon">
+            <name locale="en_US">23</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.828800" x="10.160000" drill="0.914400" uuid="{b393967c-caf8-496e-8eaa-a0b1a6681bb0}" y="-1.270000" rotation="90.000000" layer="0" width="1.828800" type="tht_octagon">
+            <name locale="en_US">24</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.828800" x="-15.240000" drill="0.914400" uuid="{f1f36c06-d1f0-48bb-8007-b472ab7c1aaa}" y="1.270000" rotation="90.000000" layer="0" width="1.828800" type="tht_octagon">
+            <name locale="en_US">3</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.828800" x="15.240000" drill="0.914400" uuid="{060759ac-cfd0-49b4-a3cf-12d20e1d0405}" y="1.270000" rotation="90.000000" layer="0" width="1.828800" type="tht_octagon">
+            <name locale="en_US">27</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.828800" x="-17.780000" drill="0.914400" uuid="{e883aeac-f889-4769-a533-35a3e58f9e35}" y="-1.270000" rotation="90.000000" layer="0" width="1.828800" type="tht_octagon">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.828800" x="-10.160000" drill="0.914400" uuid="{62183425-9716-402e-b590-8c51ad32b7e9}" y="1.270000" rotation="90.000000" layer="0" width="1.828800" type="tht_octagon">
+            <name locale="en_US">7</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.828800" x="2.540000" drill="0.914400" uuid="{b0c84c5c-a4c3-4b0a-b154-8ac82ee25dc9}" y="-1.270000" rotation="90.000000" layer="0" width="1.828800" type="tht_octagon">
+            <name locale="en_US">18</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.828800" x="7.620000" drill="0.914400" uuid="{289ff05d-9353-45e2-a211-a90646709eed}" y="1.270000" rotation="90.000000" layer="0" width="1.828800" type="tht_octagon">
+            <name locale="en_US">21</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.828800" x="7.620000" drill="0.914400" uuid="{e2b4f63f-3ced-4be1-9b64-dbb267c438c4}" y="-1.270000" rotation="90.000000" layer="0" width="1.828800" type="tht_octagon">
+            <name locale="en_US">22</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.828800" x="-17.780000" drill="0.914400" uuid="{61208855-ca6b-4af3-a864-502850553bfa}" y="1.270000" rotation="90.000000" layer="0" width="1.828800" type="tht_round">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.828800" x="-15.240000" drill="0.914400" uuid="{8db5638e-4ae1-40e5-97d4-1b3d19ce32f1}" y="-1.270000" rotation="90.000000" layer="0" width="1.828800" type="tht_octagon">
+            <name locale="en_US">4</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.828800" x="-2.540000" drill="0.914400" uuid="{0c220962-a572-41c9-9cdc-561f7928a57b}" y="-1.270000" rotation="90.000000" layer="0" width="1.828800" type="tht_octagon">
+            <name locale="en_US">14</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.828800" x="-7.620000" drill="0.914400" uuid="{59ff4473-f703-44b9-9dc8-9953caa8c92e}" y="-1.270000" rotation="90.000000" layer="0" width="1.828800" type="tht_octagon">
+            <name locale="en_US">10</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.828800" x="17.780000" drill="0.914400" uuid="{36fa13fa-f289-4169-8299-10555950669e}" y="-1.270000" rotation="90.000000" layer="0" width="1.828800" type="tht_octagon">
+            <name locale="en_US">30</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.828800" x="-12.700000" drill="0.914400" uuid="{a6edeec2-45da-48c8-a3e6-4a3e46edd59f}" y="1.270000" rotation="90.000000" layer="0" width="1.828800" type="tht_octagon">
+            <name locale="en_US">5</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.828800" x="17.780000" drill="0.914400" uuid="{0d55bce7-0013-4dc9-a487-927d45d1ccef}" y="1.270000" rotation="90.000000" layer="0" width="1.828800" type="tht_octagon">
+            <name locale="en_US">29</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

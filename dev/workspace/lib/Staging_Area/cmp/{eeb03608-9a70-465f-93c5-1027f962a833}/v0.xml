@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{eeb03608-9a70-465f-93c5-1027f962a833}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">BYV32</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+2 x Si diode&lt;p>
+200 V, 20 A/230 Apeak, 25 ns
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BYV32
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{e4b1faad-e386-44f2-b40b-1abaff345f6c}</generic_component>
+        <package>{0eaf289c-166d-4bd9-a4ba-dbf6bbc76ef1}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{474059df-640b-4b17-98b2-148e340a7152}" signal="{97855b7f-6a0a-4cae-9f74-3ca1f67c8358}"/>
+        <map pad="{ab077e0e-67ff-48c0-b979-66c9ccc6b90f}" signal="{eeb6ae36-6a3f-4c78-98d6-7912e4b03671}"/>
+        <map pad="{dff54bfb-5db6-4934-9282-29dd73df5aec}" signal="{13132b08-faef-40cb-a1e5-3ab8c1ff634d}"/>
+    </pad_signal_map>
+</component>

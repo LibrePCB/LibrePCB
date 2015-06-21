@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{f926ac08-161e-448b-9849-bd035047446f}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">SMBG</name>
+        <description locale="en_US">&lt;b>DO-214AA GULL-WING&lt;/b>&lt;p>
+Source: www.rsonline.de .. SMBJ12/C/15/C/24/C/30/C/5.0/C/7.5/C Voltage Suppressor. Data Sheet
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: SMBG
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="110" start_x="-3.240000" start_y="-1.050000" fill="true" width="0.000000">
+            <segment end_x="-2.230000" end_y="-1.050000" angle="0.000000"/>
+            <segment end_x="-2.230000" end_y="1.050000" angle="0.000000"/>
+            <segment end_x="-3.240000" end_y="1.050000" angle="0.000000"/>
+            <segment end_x="-3.240000" end_y="-1.050000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="2.240000" start_y="-1.050000" fill="true" width="0.000000">
+            <segment end_x="3.240000" end_y="-1.050000" angle="0.000000"/>
+            <segment end_x="3.240000" end_y="1.050000" angle="0.000000"/>
+            <segment end_x="2.240000" end_y="1.050000" angle="0.000000"/>
+            <segment end_x="2.240000" end_y="-1.050000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="2.240000" start_y="-1.850000" fill="false" width="0.101600">
+            <segment end_x="2.240000" end_y="1.850000" angle="0.000000"/>
+            <segment end_x="-2.240000" end_y="1.850000" angle="0.000000"/>
+            <segment end_x="-2.240000" end_y="-1.850000" angle="0.000000"/>
+            <segment end_x="2.240000" end_y="-1.850000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-1.905000" y="2.540000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-1.905000" y="-3.810000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="2.160000" x="-3.170000" drill="0.000000" uuid="{2adc98d7-cc8e-4d9c-a851-04ace0650028}" y="0.000000" rotation="0.000000" layer="200" width="1.270000" type="smd_rect">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="2.160000" x="3.170000" drill="0.000000" uuid="{1115169f-bf14-42c5-95da-30875917a493}" y="0.000000" rotation="-180.000000" layer="200" width="1.270000" type="smd_rect">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{957983a4-2718-42d1-9dbd-f3dd4114423f}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">SML0603</name>
+        <description locale="en_US">&lt;b>SML0603-XXX (HIGH INTENSITY) LED&lt;/b>&lt;p>
+&lt;table>
+&lt;tr>&lt;td>AG3K&lt;/td>&lt;td>AQUA GREEN&lt;/td>&lt;/tr>
+&lt;tr>&lt;td>B1K&lt;/td>&lt;td>SUPER BLUE&lt;/td>&lt;/tr>
+&lt;tr>&lt;td>R1K&lt;/td>&lt;td>SUPER RED&lt;/td>&lt;/tr>
+&lt;tr>&lt;td>R3K&lt;/td>&lt;td>ULTRA RED&lt;/td>&lt;/tr>
+&lt;tr>&lt;td>O3K&lt;/td>&lt;td>SUPER ORANGE&lt;/td>&lt;/tr>
+&lt;tr>&lt;td>O3KH&lt;/td>&lt;td>SOFT ORANGE&lt;/td>&lt;/tr>
+&lt;tr>&lt;td>Y3KH&lt;/td>&lt;td>SUPER YELLOW&lt;/td>&lt;/tr>
+&lt;tr>&lt;td>Y3K&lt;/td>&lt;td>SUPER YELLOW&lt;/td>&lt;/tr>
+&lt;tr>&lt;td>2CW&lt;/td>&lt;td>WHITE&lt;/td>&lt;/tr>
+&lt;/table>
+Source: http://www.ledtronics.com/ds/smd-0603/Dstr0092.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: SML0603
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{7a0ccedd-92c3-4121-9ece-0f2546267524}</footprint>
+    </meta>
+    <categories/>
+</package>

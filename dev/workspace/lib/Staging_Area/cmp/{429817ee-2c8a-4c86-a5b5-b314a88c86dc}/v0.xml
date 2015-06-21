@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{429817ee-2c8a-4c86-a5b5-b314a88c86dc}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">DIODE-2AC|CA</name>
+        <description locale="en_US">Dual &lt;b>DIODE&lt;/b> Anode-Cathode|Cathode-Anode
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: DIODE-2AC|CA
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{4d2771c2-4e3c-44cb-a281-7b04746de560}</generic_component>
+        <package>{4a0cd064-30d4-471d-83a8-15aa6c78c6dd}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{41518afb-fce4-442c-9cb3-1bdf0c0bd25a}" signal="{d1043ea5-f7a7-46f1-9e0e-b3b0188b924d}"/>
+        <map pad="{6fbd5e81-0fa4-405a-864c-e84576b7821f}" signal="{460ae1fa-0357-4cef-87cf-bcbe36d4a531}"/>
+        <map pad="{d5ba1f7d-50ca-42c8-81f8-4f963d0780fb}" signal="{fd89d341-d59f-4bb3-b33b-c9fe4692de46}"/>
+    </pad_signal_map>
+</component>

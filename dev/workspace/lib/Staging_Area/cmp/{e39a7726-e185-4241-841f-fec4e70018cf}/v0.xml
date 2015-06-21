@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{e39a7726-e185-4241-841f-fec4e70018cf}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">1N5060GP</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+controlled avalanche rectifier
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: 1N5060GP
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{c60832bc-bbf4-4fdd-b30e-c72a8870f8d3}</generic_component>
+        <package>{28a1eab5-76ec-4878-a0e3-fb0b660b6209}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{3be318d8-b78f-4fe0-9d74-c38caa462de6}" signal="{96de982e-46da-4930-8420-bcb12e7f7b4a}"/>
+        <map pad="{e48af805-7b94-4ccc-a516-80f45914d9d0}" signal="{38a7ccb1-9f7c-4476-afe5-a51252b68306}"/>
+    </pad_signal_map>
+</component>

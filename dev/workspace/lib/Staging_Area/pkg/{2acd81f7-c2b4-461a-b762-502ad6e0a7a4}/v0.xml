@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{2acd81f7-c2b4-461a-b762-502ad6e0a7a4}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">SMARTLED-TTW</name>
+        <description locale="en_US">&lt;b>SmartLED TTW&lt;/b>&lt;p>
+Recommended Solder Pad useable for SmartLEDTM and Chipled - Package 0603&lt;br>
+Package able to withstand TTW-soldering heat&lt;br>
+Package suitable for TTW-soldering&lt;br>
+Source: http://www.osram.convergy.de/ ... LO_LS_LY L89K.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: SMARTLED-TTW
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{28f3548d-11e3-4a03-b541-3ccebd39fe83}</footprint>
+    </meta>
+    <categories/>
+</package>

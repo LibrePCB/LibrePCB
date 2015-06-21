@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{d4c14ae7-9cb8-4dfc-b583-52d46731eb48}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">D9-1CS</name>
+        <description locale="en_US">8 &lt;B>DIODES&lt;/B>&lt;p>
+SIL, common cathode (single gate)
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: D9-1CS
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{eb87a486-a93a-4409-9a18-2a1f1df40591}</generic_component>
+        <package>{d9d752db-6a12-4866-90ad-57bcd3435bca}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{aec6fa41-f8b3-40d9-9b07-9a0b7f9c002d}" signal="{09002539-7dc0-487d-9d2d-f167195ad85d}"/>
+        <map pad="{670e695d-cb27-42e6-af01-636b63913878}" signal="{4b597fc4-4cb5-47d5-a180-464e5f6eb4cc}"/>
+        <map pad="{8a743a9f-ce4e-41db-89fe-f1e78a5b5660}" signal="{f44f50bd-4115-4c9c-96fd-9b07215ea5c5}"/>
+        <map pad="{a43a1788-8e9c-426a-a6bb-0375ad795385}" signal="{7a2f4c21-f863-43e6-8dc4-85098a1bf5ca}"/>
+        <map pad="{eae443f0-a226-4435-93d6-2a126fe5a845}" signal="{9da51396-9f27-42f5-b028-cd590ac6f15d}"/>
+        <map pad="{76bdb19b-15a4-4cb0-89ab-83acaf919a47}" signal="{f2249552-31b8-47f6-a80e-985be6487833}"/>
+        <map pad="{1559e9ad-f61d-47de-8fca-e32cd58ba874}" signal="{9758230e-c32b-4620-b559-c4f7c5f61c46}"/>
+        <map pad="{187b4a62-5c4d-49ba-887d-6cd498b1f4cb}" signal="{5c622180-7baf-4caa-802b-fadd1a1cfcec}"/>
+        <map pad="{bf39bfce-b1c1-4486-9615-b72f6f62055c}" signal="{e9fcdc96-6583-4816-9ef7-8eefd27377bf}"/>
+    </pad_signal_map>
+</component>

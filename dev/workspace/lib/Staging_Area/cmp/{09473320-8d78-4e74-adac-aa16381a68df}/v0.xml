@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{09473320-8d78-4e74-adac-aa16381a68df}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">ICTE5</name>
+        <description locale="en_US">Transient-suppressor &lt;B>DIODE&lt;/B>
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: ICTE5
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{6a046367-aef3-4383-bfd1-1eaa234381ed}</generic_component>
+        <package>{1647780b-59cb-41ad-bd28-dbb45f809ed6}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{91db7ca3-52d3-49e4-9dbc-996779243d5f}" signal="{d4c5a875-dc90-412b-9836-ff76008953f7}"/>
+        <map pad="{d73c58b6-cee2-4607-833a-6045ccef0199}" signal="{13bd06f3-fa12-4336-9ec3-dc89a48e9750}"/>
+    </pad_signal_map>
+</component>

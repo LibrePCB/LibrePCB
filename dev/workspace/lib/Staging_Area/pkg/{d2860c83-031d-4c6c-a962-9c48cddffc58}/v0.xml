@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{d2860c83-031d-4c6c-a962-9c48cddffc58}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:33Z</created>
+        <last_modified>2015-06-21T12:37:33Z</last_modified>
+        <name locale="en_US">E25-9</name>
+        <description locale="en_US">&lt;b>ELECTROLYTIC CAPACITOR&lt;/b>&lt;p>
+grid 25.4 mm, diameter 9 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: E25-9
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{1fb46379-84ce-4ff8-bfb2-248bf6e4a431}</footprint>
+    </meta>
+    <categories/>
+</package>

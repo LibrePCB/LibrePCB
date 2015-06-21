@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{81bca956-f67c-489d-9189-c540fbb3e86e}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:45Z</created>
+        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <name locale="en_US">MA09-1W</name>
+        <description locale="en_US">&lt;b>PIN HEADER&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: con-lstb.lbr
+Name: MA09-1W
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{1491c9f1-7d84-4c24-ae6f-3849646aa395}</generic_component>
+        <package>{79e33282-9da5-4d53-ad84-71628c3cee2c}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{dc02a8c8-d988-4f75-a8a5-f90fc2260e8c}" signal="{7dd6df19-3318-4253-bd6f-dda3e98f885e}"/>
+        <map pad="{49af2720-412f-4e17-b9c3-53022b892a59}" signal="{97bf9199-3d1e-40e7-8b3f-83b4071a7ed0}"/>
+        <map pad="{011cb620-e20a-4444-80be-3bff218f010f}" signal="{eba2942d-3596-4e8a-9d8b-1e34e65b14e9}"/>
+        <map pad="{e66266cc-4733-4604-b2c2-79e56fd68f4a}" signal="{b484fef6-6f3c-40c3-be8c-33ca39511072}"/>
+        <map pad="{2f08eab3-df07-41bd-88a5-5d2c4e195968}" signal="{c50d6be2-5b45-4434-af6b-56105e042220}"/>
+        <map pad="{18ed8c95-ea2a-43d2-8e11-bf13c6d17bc5}" signal="{a00af6bf-8672-48a0-ba61-58638dc4c072}"/>
+        <map pad="{767b658b-76cf-4441-9a2b-7b2b33d337a0}" signal="{b46b68bc-95d5-4ab7-bf68-dcf8d69ca8c1}"/>
+        <map pad="{053e178c-1509-49ff-8211-a6cfa687ed41}" signal="{6cd3c8ca-2fe8-4f1b-b6f3-16f88928bc3f}"/>
+        <map pad="{ac02527e-a818-46d3-8997-fdcf3ba7309e}" signal="{edfe186c-f3b8-4fae-b665-4ca213a3cab2}"/>
+    </pad_signal_map>
+</component>

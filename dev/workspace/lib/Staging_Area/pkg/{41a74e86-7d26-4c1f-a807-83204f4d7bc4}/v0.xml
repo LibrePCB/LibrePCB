@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{41a74e86-7d26-4c1f-a807-83204f4d7bc4}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">VMTB60</name>
+        <description locale="en_US">&lt;b>Bulk Metal® Foil Technology&lt;/b>, Tubular Axial Lead Resistors, Meets or Exceeds MIL-R-39005 Requirements&lt;p>
+MIL SIZE RNC60&lt;br>
+Source: VISHAY .. vta56.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: VMTB60
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{fe19e80a-d897-40ac-8ee4-eadd6817585c}</footprint>
+    </meta>
+    <categories/>
+</package>

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{493333a9-f7b0-4efc-8438-2bd6cd8d118c}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">L0201</name>
+        <description locale="en_US">&lt;b>NIS02 Chip Inductor&lt;/b>&lt;p>
+Source: http://www.niccomp.com/Catalog/nis.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: L0201
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{9bcda376-4ce7-4fa3-b120-d26b78fcd2c4}</footprint>
+    </meta>
+    <categories/>
+</package>

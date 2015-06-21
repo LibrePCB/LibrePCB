@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{4d7490d5-d6c4-452e-aaf8-ab6dcebfa920}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:38Z</created>
+        <last_modified>2015-06-21T12:37:38Z</last_modified>
+        <name locale="en_US">AG</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+diameter 9 mm, horizontal, grid 10.16 mm
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: AG
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{a8e328a2-d4d5-4862-b495-4ef492065ecc}</footprint>
+    </meta>
+    <categories/>
+</package>

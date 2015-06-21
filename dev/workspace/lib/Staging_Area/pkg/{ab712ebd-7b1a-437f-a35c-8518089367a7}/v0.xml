@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{ab712ebd-7b1a-437f-a35c-8518089367a7}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:38Z</created>
+        <last_modified>2015-06-21T12:37:38Z</last_modified>
+        <name locale="en_US">IW220ACS</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+2-lead molded, vertical
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: IW220ACS
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{0e338d54-2610-4f84-aeec-19225307939b}</footprint>
+    </meta>
+    <categories/>
+</package>

@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{e4b1faad-e386-44f2-b40b-1abaff345f6c}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">BYV32</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+2 x Si diode&lt;p>
+200 V, 20 A/230 Apeak, 25 ns
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BYV32
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">D</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{13132b08-faef-40cb-a1e5-3ab8c1ff634d}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A1</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{97855b7f-6a0a-4cae-9f74-3ca1f67c8358}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A2</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{eeb6ae36-6a3f-4c78-98d6-7912e4b03671}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{3bba9c2f-719c-41b8-aac7-5aaca322f836}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{cd2f1969-6f55-41c4-b9aa-5bbed40d7ff0}" suffix="1" symbol="{bcb4e654-9c8a-4373-8024-4f823afd72b4}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{94b8db6f-6433-4010-9235-4fa2057a18ba}" signal="{13132b08-faef-40cb-a1e5-3ab8c1ff634d}"/>
+                        <map display="gen_comp_signal" pin="{1c997823-be8b-4853-8997-1bdb649731fe}" signal="{97855b7f-6a0a-4cae-9f74-3ca1f67c8358}"/>
+                        <map display="gen_comp_signal" pin="{3fa1746f-f8b7-423e-b582-849abb746ea0}" signal="{eeb6ae36-6a3f-4c78-98d6-7912e4b03671}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

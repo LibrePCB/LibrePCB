@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{46e5d070-d597-4686-a100-02d3c17b3a5d}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">R1206</name>
+        <description locale="en_US">&lt;b>RESISTOR&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: R1206
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{95e55ff1-3db6-46b2-8319-0d0a7420d15f}</footprint>
+    </meta>
+    <categories/>
+</package>

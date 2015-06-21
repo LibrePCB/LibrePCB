@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{11fe8774-ade2-4b36-bde6-1ec36ae627df}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:35Z</created>
+        <last_modified>2015-06-21T12:37:35Z</last_modified>
+        <name locale="en_US">C3640</name>
+        <description locale="en_US">&lt;b>CAPACITOR&lt;/b>&lt;p>
+Source: AVX .. aphvc.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: C3640
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{3433314d-f78a-48ba-a434-944bbee5b139}</footprint>
+    </meta>
+    <categories/>
+</package>

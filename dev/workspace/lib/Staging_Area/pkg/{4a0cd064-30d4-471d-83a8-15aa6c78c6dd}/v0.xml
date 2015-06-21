@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{4a0cd064-30d4-471d-83a8-15aa6c78c6dd}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:38Z</created>
+        <last_modified>2015-06-21T12:37:38Z</last_modified>
+        <name locale="en_US">TO3P</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+3-lead molded, horizontal
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: TO3P
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{684f9ee3-31bc-4c8a-a8e1-7979cd95eb34}</footprint>
+    </meta>
+    <categories/>
+</package>

@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{15651266-3c89-4165-b358-09ac7d3858d9}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">PBYR3035</name>
+        <description locale="en_US">Dual &lt;B>DIODE&lt;/B>&lt;p>
+common cathode
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: PBYR3035
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{1d76ac1a-8fd5-410c-a07d-5cdfef883977}</generic_component>
+        <package>{f7a2023f-8f5a-4789-ad59-494299d4a48a}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{0d6f7409-a96e-4bd6-82c1-dc6496a53ae6}" signal="{b5677ad4-dff4-4edc-aad0-a2349b46c6d6}"/>
+        <map pad="{ad311c4f-3d59-464f-8723-11b8df4e1e72}" signal="{5f4e0f2f-f837-4d27-a504-d4db1bf7e859}"/>
+        <map pad="{ac567fe2-5cf9-4cef-b02d-c67c0bd06106}" signal="{09849289-24ab-4f1a-8910-a48a348f8f64}"/>
+    </pad_signal_map>
+</component>

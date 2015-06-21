@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{b45ebfa3-25c0-48af-a7b2-06c5f48dd103}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">RGP30</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+fast-recovery rectifier
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: RGP30
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{84f7f418-7ac0-4549-a9a1-e5822ac05174}</generic_component>
+        <package>{cdc60685-ebe6-4a3d-9ce1-8873f76a8f24}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{b74315c9-feea-4f7d-94c2-04b9510a1193}" signal="{e4785d33-625f-4162-a499-79d3dfa48936}"/>
+        <map pad="{7403240f-13dc-4614-a9e9-90395e2a0e19}" signal="{27c4c2b8-3a64-4d35-a382-6ef58971cecb}"/>
+    </pad_signal_map>
+</component>

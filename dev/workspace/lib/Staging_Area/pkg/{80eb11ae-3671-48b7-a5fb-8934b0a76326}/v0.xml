@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{80eb11ae-3671-48b7-a5fb-8934b0a76326}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:38Z</created>
+        <last_modified>2015-06-21T12:37:38Z</last_modified>
+        <name locale="en_US">DOP3L</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+2-lead molded, horizontal
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: DOP3L
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{410b0c69-25aa-4544-9cfb-9cfe46c72e97}</footprint>
+    </meta>
+    <categories/>
+</package>

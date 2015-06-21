@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{9f48f690-f3b0-43cb-beca-afa1cefbe802}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:33Z</created>
+        <last_modified>2015-06-21T12:37:33Z</last_modified>
+        <name locale="en_US">CTRIM3050.505</name>
+        <description locale="en_US">&lt;b>Trimm capacitor&lt;/b> STELCO GmbH&lt;p>
+ 5 S-Triko 160 V DC for PCB mounting,&lt;p>
+ Adjustable from both sides, vertical to PCB
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: CTRIM3050.505
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{b3adda1e-350d-4908-aec4-fe88c038139b}</footprint>
+    </meta>
+    <categories/>
+</package>

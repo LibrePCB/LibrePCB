@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{47702189-640a-4060-bcb7-1aa0c8787ed9}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">PANASONIC_F</name>
+        <description locale="en_US">&lt;b>Panasonic Aluminium Electrolytic Capacitor VS-Serie Package F&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: PANASONIC_F
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{e8105b2b-6de3-45f5-8174-6a9135ed428a}</footprint>
+    </meta>
+    <categories/>
+</package>

@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{8352f869-f9ff-46ed-8275-a1c51f5efbd4}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:33Z</created>
+        <last_modified>2015-06-21T12:37:33Z</last_modified>
+        <name locale="en_US">RTRIMCVR42A</name>
+        <description locale="en_US">&lt;b>Trimm resistor&lt;/b> AVX
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: RTRIMCVR42A
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{97964083-5424-4889-b806-d1beef0ab422}</footprint>
+    </meta>
+    <categories/>
+</package>

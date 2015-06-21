@@ -1,0 +1,99 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{7a23d07f-60e8-4491-87ae-c0f3247e5f3c}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">LED</name>
+        <description locale="en_US">&lt;b>LED&lt;/b>&lt;p>
+&lt;u>OSRAM&lt;/u>:&lt;br>
+
+- &lt;u>CHIPLED&lt;/u>&lt;br>
+LG R971, LG N971, LY N971, LG Q971, LY Q971, LO R971, LY R971
+LH N974, LH R974&lt;br>
+LS Q976, LO Q976, LY Q976&lt;br>
+LO Q996&lt;br>
+
+- &lt;u>Hyper CHIPLED&lt;/u>&lt;br>
+LW Q18S&lt;br>
+LB Q993, LB Q99A, LB R99A&lt;br>
+
+- &lt;u>SideLED&lt;/u>&lt;br>
+LS A670, LO A670, LY A670, LG A670, LP A670&lt;br>
+LB A673, LV A673, LT A673, LW A673&lt;br>
+LH A674&lt;br>
+LY A675&lt;br>
+LS A676, LA A676, LO A676, LY A676, LW A676&lt;br>
+LS A679, LY A679, LG A679&lt;br>
+
+-  &lt;u>Hyper Micro SIDELED®&lt;/u>&lt;br>
+LS Y876, LA Y876, LO Y876, LY Y876&lt;br>
+LT Y87S&lt;br>
+
+- &lt;u>SmartLED&lt;/u>&lt;br>
+LW L88C, LW L88S&lt;br>
+LB L89C, LB L89S, LG L890&lt;br>
+LS L89K, LO L89K, LY L89K&lt;br>
+LS L896, LA L896, LO L896, LY L896&lt;br>
+
+- &lt;u>TOPLED&lt;/u>&lt;br>
+LS T670, LO T670, LY T670, LG T670, LP T670&lt;br>
+LSG T670, LSP T670, LSY T670, LOP T670, LYG T670&lt;br>
+LG T671, LOG T671, LSG T671&lt;br>
+LB T673, LV T673, LT T673, LW T673&lt;br>
+LH T674&lt;br>
+LS T676, LA T676, LO T676, LY T676, LB T676, LH T676, LSB T676, LW T676&lt;br>
+LB T67C, LV T67C, LT T67C, LS T67K, LO T67K, LY T67K, LW E67C&lt;br>
+LS E67B, LA E67B, LO E67B, LY E67B, LB E67C, LV E67C, LT E67C&lt;br>
+LW T67C&lt;br>
+LS T679, LY T679, LG T679&lt;br>
+LS T770, LO T770, LY T770, LG T770, LP T770&lt;br>
+LB T773, LV T773, LT T773, LW T773&lt;br>
+LH T774&lt;br>
+LS E675, LA E675, LY E675, LS T675&lt;br>
+LS T776, LA T776, LO T776, LY T776, LB T776&lt;br>
+LHGB T686&lt;br>
+LT T68C, LB T68C&lt;br>
+
+- &lt;u>Hyper Mini TOPLED®&lt;/u>&lt;br>
+LB M676&lt;br>
+
+- &lt;u>Mini TOPLED Santana®&lt;/u>&lt;br>
+LG M470&lt;br>
+LS M47K, LO M47K, LY M47K
+&lt;p>
+Source: http://www.osram.convergy.de&lt;p>
+
+&lt;u>LUXEON:&lt;/u>&lt;br>
+- &lt;u>LUMILED®&lt;/u>&lt;br>
+LXK2-PW12-R00, LXK2-PW12-S00, LXK2-PW14-U00, LXK2-PW14-V00&lt;br>
+LXK2-PM12-R00, LXK2-PM12-S00, LXK2-PM14-U00&lt;br>
+LXK2-PE12-Q00, LXK2-PE12-R00, LXK2-PE12-S00, LXK2-PE14-T00, LXK2-PE14-U00&lt;br>
+LXK2-PB12-K00, LXK2-PB12-L00, LXK2-PB12-M00, LXK2-PB14-N00, LXK2-PB14-P00, LXK2-PB14-Q00&lt;br>
+LXK2-PR12-L00, LXK2-PR12-M00, LXK2-PR14-Q00, LXK2-PR14-R00&lt;br>
+LXK2-PD12-Q00, LXK2-PD12-R00, LXK2-PD12-S00&lt;br>
+LXK2-PH12-R00, LXK2-PH12-S00&lt;br>
+LXK2-PL12-P00, LXK2-PL12-Q00, LXK2-PL12-R00
+&lt;p>
+Source: www.luxeon.com&lt;p>
+
+&lt;u>KINGBRIGHT:&lt;/U>&lt;p>
+KA-3528ASYC&lt;br>
+Source: www.kingbright.com
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: LED
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{2b24b18d-bd95-4fb4-8fe6-bce1d020ead4}</generic_component>
+        <package>{f28bf8f6-2057-4c2f-bc3e-5f414aa79c26}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{faac906c-876a-4e8e-bc55-beecb0218949}" signal="{f1467b5c-cc7d-44b4-8076-d729f35b3a6a}"/>
+        <map pad="{eb639c92-4bc3-463f-9c9c-a2b94747d965}" signal="{7b023430-b68f-403a-80b8-c7deb12e7a0c}"/>
+    </pad_signal_map>
+</component>

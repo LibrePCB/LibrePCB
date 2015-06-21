@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{55bce374-9557-4871-b2bb-6e95a53656e2}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:38Z</created>
+        <last_modified>2015-06-21T12:37:38Z</last_modified>
+        <name locale="en_US">C2672</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+diameter 6.3 mm, horizontal, grid 15.24 mm
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: C2672
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{2380a7c7-8443-4629-84d6-7c0208519d32}</footprint>
+    </meta>
+    <categories/>
+</package>

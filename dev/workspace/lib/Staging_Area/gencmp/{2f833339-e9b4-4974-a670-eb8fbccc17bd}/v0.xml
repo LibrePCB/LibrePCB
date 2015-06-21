@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{2f833339-e9b4-4974-a670-eb8fbccc17bd}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:45Z</created>
+        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <name locale="en_US">TC47</name>
+        <description locale="en_US">&lt;b>Temperature Compensated Xtal Oscillator&lt;/b>&lt;p>
+HCMOS, Clipped Sine Wave or Sine Wave Compatible&lt;br>
+Source: www.pletronics.com .. tc4.pdf
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: TC47
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">QG</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{107dc0cb-d444-4c9b-8f01-bfd8fa8198c4}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">GND</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{0a2174bb-cf88-43b8-82a0-e8538edb1d8c}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">OUT</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{139c9a7c-ab90-4208-8927-f76aa53fc7d6}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">S1</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{6a52037a-84f2-4d6e-ba30-b4a7d0cbe8bc}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">S2</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{3f2daa35-dd8d-4499-bfec-e64c567e9cdb}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">VCC</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{edc6b6dc-1baa-46b5-927b-e7206e49eb94}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{1809e700-d1f3-401f-9f01-8b0aa1f0ee83}" suffix="" symbol="{18de4e9c-63c9-4d88-9fa4-e425f945f800}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{cfb406a5-dd6b-42c0-ba07-8a66c981461c}" signal="{0a2174bb-cf88-43b8-82a0-e8538edb1d8c}"/>
+                        <map display="gen_comp_signal" pin="{ffc7a11b-14ed-4cb6-86ea-31ba061c3876}" signal="{107dc0cb-d444-4c9b-8f01-bfd8fa8198c4}"/>
+                        <map display="gen_comp_signal" pin="{b9d1bad1-8a27-45a6-aa4e-cb5fe210cf6a}" signal="{6a52037a-84f2-4d6e-ba30-b4a7d0cbe8bc}"/>
+                        <map display="gen_comp_signal" pin="{3a383c80-7c31-4623-b1ed-4fd505b769fc}" signal="{139c9a7c-ab90-4208-8927-f76aa53fc7d6}"/>
+                        <map display="gen_comp_signal" pin="{473ef144-f5d6-4ebf-98a7-39240cfe6ced}" signal="{3f2daa35-dd8d-4499-bfec-e64c567e9cdb}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{ff2f7b61-4e01-4620-b742-b370905f69cd}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">NFSG036BT</name>
+        <description locale="en_US">&lt;b>CHIP TYPE GREEN LED&lt;/b> NFSx036xT&lt;p>
+Source: NICHIA CORPORATION .. NFSG036BT-E.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: NFSG036BT
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{9ee79f1c-4263-4a47-a757-f447cd80f7e5}</generic_component>
+        <package>{6e1107dd-4cbd-4f22-a52a-9b263282412f}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{dd6a7b9d-daef-4b4d-8851-1b88235c343b}" signal="{bd3f537b-b6e6-4c4d-9ccf-86a295f3a38c}"/>
+        <map pad="{789e12cd-094b-4d64-b01b-73cbc37f1557}" signal="{8abaac26-6c3e-4fdb-8bac-4719cb72ee7b}"/>
+    </pad_signal_map>
+</component>

@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{a7f3b350-cdd3-44fc-9eb5-1d73f9a49111}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">1N5059</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+controlled avalanche rectifier
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: 1N5059
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{4c098653-f7ee-462f-bf18-e96951a7a96d}</generic_component>
+        <package>{989a4f41-7532-495d-80b8-ac5e9599ed0e}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{9ee4e8ad-adce-4bee-858d-7b8b6d869bec}" signal="{a711bfbf-3dbf-4870-ba96-ca251c22af7a}"/>
+        <map pad="{576a42fd-ef66-431e-ba35-6a07d68ad094}" signal="{aa62b185-4f49-4f30-b461-0de6d42d6254}"/>
+    </pad_signal_map>
+</component>

@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{4d5925a0-f60b-4e6c-b9e2-f24c7730a092}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">153CLV-0405</name>
+        <description locale="en_US">&lt;b>Aluminum electrolytic capacitors&lt;/b>&lt;p>
+SMD (Chip) Long Life Vertical 153 CLV&lt;p>
+http://www.bccomponents.com/
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: 153CLV-0405
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{8a8347b1-34e0-4773-a21f-94f3be7f21e1}</footprint>
+    </meta>
+    <categories/>
+</package>

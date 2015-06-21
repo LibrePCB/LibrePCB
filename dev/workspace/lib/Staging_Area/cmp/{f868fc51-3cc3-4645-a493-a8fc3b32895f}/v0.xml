@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{f868fc51-3cc3-4645-a493-a8fc3b32895f}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">P600</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+high voltage diode, silicon rectifier&lt;p>
+1.0 A to 6.0 A, 50 V to 1300 V&lt;p>
+http://www.kosemi.com/product/diosr.html
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: P600
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{8de88f5f-6b56-4cf9-83b5-5bd0067bd57e}</generic_component>
+        <package>{f327af7b-95b7-4c96-8137-6ccfe46242d2}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{2150b814-a347-445d-9baf-706cd67d29c4}" signal="{1546a4a5-26f2-4d77-8d1f-02376f61388c}"/>
+        <map pad="{6d25fc7d-c2f1-4827-a71c-ea934b958c1f}" signal="{02c7bd38-33bf-4a3b-8267-389eec22dc25}"/>
+    </pad_signal_map>
+</component>

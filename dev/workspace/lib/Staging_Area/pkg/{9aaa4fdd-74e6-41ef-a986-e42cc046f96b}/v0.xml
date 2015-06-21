@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{9aaa4fdd-74e6-41ef-a986-e42cc046f96b}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:33Z</created>
+        <last_modified>2015-06-21T12:37:33Z</last_modified>
+        <name locale="en_US">E2-4</name>
+        <description locale="en_US">&lt;b>ELECTROLYTIC CAPACITOR&lt;/b>&lt;p>
+grid 2 mm, diameter 4 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: E2-4
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{fd2d9878-4d8d-410f-8d23-eabe61b4d7aa}</footprint>
+    </meta>
+    <categories/>
+</package>

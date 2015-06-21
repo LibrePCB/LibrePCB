@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{482750ee-e2a2-4694-b3ca-68c5580c036d}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">D5-1C</name>
+        <description locale="en_US">4 &lt;B>DIODES&lt;/B>&lt;p>
+SIL, common cathode
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: D5-1C
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{ad99b93e-5737-4e82-a8d4-e862386f4917}</generic_component>
+        <package>{facd38ba-d04c-45fa-aa17-3bdce22c3b7f}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{79be8646-b261-4691-bd8c-24c1cb032e3a}" signal="{d982aaec-ffbd-48bd-8e96-d5d23ec03900}"/>
+        <map pad="{a82bedc7-75a6-4cdd-a250-3001c8048696}" signal="{58784e39-24c3-4119-9624-b0735e7272c1}"/>
+        <map pad="{fa0827ad-cff5-4310-bba1-741cee0423da}" signal="{e829eb3c-d0e7-4be8-8685-20d096d3bf73}"/>
+        <map pad="{a424286c-6420-4d53-a9c9-7a88fcf4314c}" signal="{369eef10-f503-46f4-8d1e-e52dc379aa6d}"/>
+        <map pad="{da42265f-344b-4ee9-8be1-c6d394a8a7cf}" signal="{9c5e0796-30cd-4c2d-ad87-385d97d50a12}"/>
+    </pad_signal_map>
+</component>

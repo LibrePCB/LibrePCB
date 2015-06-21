@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{3c9b36b3-acde-43e0-b0ec-2e815efe0f72}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">UF5400</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+ultra fast rectifier, 3 A
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: UF5400
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{b88d90fb-8305-4f48-9107-b2391d6eb67a}</generic_component>
+        <package>{cdc60685-ebe6-4a3d-9ce1-8873f76a8f24}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{b74315c9-feea-4f7d-94c2-04b9510a1193}" signal="{73fa40d1-b3d9-40bb-8908-cbfdf56ae4b0}"/>
+        <map pad="{7403240f-13dc-4614-a9e9-90395e2a0e19}" signal="{b9e09e2e-7ddf-45ff-ba8e-4e07128947cb}"/>
+    </pad_signal_map>
+</component>

@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<symbol version="0">
+    <meta>
+        <uuid>{c597b49a-d7a0-40c8-9d8b-3f25f505e3eb}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:29Z</created>
+        <last_modified>2015-06-21T12:37:29Z</last_modified>
+        <name locale="en_US">DN</name>
+        <description locale="en_US">
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: DN
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="10" start_x="0.762000" start_y="-1.016000" fill="false" width="0.254000">
+            <segment end_x="0.000000" end_y="1.016000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="0.000000" start_y="1.016000" fill="false" width="0.254000">
+            <segment end_x="-0.762000" end_y="-1.016000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-0.762000" start_y="1.016000" fill="false" width="0.254000">
+            <segment end_x="0.000000" end_y="1.016000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-0.762000" start_y="-1.016000" fill="false" width="0.254000">
+            <segment end_x="0.762000" end_y="-1.016000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="0.000000" start_y="1.016000" fill="false" width="0.254000">
+            <segment end_x="0.762000" end_y="1.016000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-1.371600" y="-2.540000" layer="20" text="${SYM::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="2.946400" y="-2.540000" layer="21" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pins>
+        <pin length="2.540000" x="0.000000" uuid="{43da79e2-de6e-4ecd-bab9-212e0f896de3}" y="2.540000" angle="-180.000000">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="2.540000" x="0.000000" uuid="{35240f37-900f-4c16-9d79-8e61d5e00f1e}" y="-2.540000" angle="0.000000">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </pin>
+    </pins>
+</symbol>

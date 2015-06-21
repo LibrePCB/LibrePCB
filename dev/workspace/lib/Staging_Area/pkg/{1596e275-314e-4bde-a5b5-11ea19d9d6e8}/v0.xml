@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{1596e275-314e-4bde-a5b5-11ea19d9d6e8}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:35Z</created>
+        <last_modified>2015-06-21T12:37:35Z</last_modified>
+        <name locale="en_US">R4527</name>
+        <description locale="en_US">&lt;b>Package 4527&lt;/b>&lt;p>
+Source: http://www.vishay.com/docs/31059/wsrhigh.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: R4527
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{8e2c3a89-a999-49da-a765-c2d23c78e3a2}</footprint>
+    </meta>
+    <categories/>
+</package>

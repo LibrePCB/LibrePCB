@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{11145b15-5424-4f93-be67-0c370481328c}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:38Z</created>
+        <last_modified>2015-06-21T12:37:38Z</last_modified>
+        <name locale="en_US">SOT54A</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+3-lead plastic, vertical
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: SOT54A
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="170" start_x="-1.778000" start_y="-1.778000" fill="false" width="0.152400">
+            <segment end_x="1.778000" end_y="-1.778000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="1.796100" start_y="-1.796100" fill="false" width="0.152400">
+            <segment end_x="2.540000" end_y="0.000000" angle="-45.000645"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="0.764900" start_y="2.422100" fill="false" width="0.152400">
+            <segment end_x="2.540000" end_y="0.000000" angle="72.473997"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-2.540000" start_y="0.000000" fill="false" width="0.152400">
+            <segment end_x="-1.796100" end_y="-1.796100" angle="-45.000645"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-2.540000" start_y="0.000000" fill="false" width="0.152400">
+            <segment end_x="-0.764900" end_y="2.422100" angle="72.473997"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="0.000000" start_y="2.540000" fill="false" width="0.152400">
+            <segment end_x="0.920600" end_y="2.367300" angle="21.250166"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-0.878100" start_y="2.383400" fill="false" width="0.152400">
+            <segment end_x="0.000000" end_y="2.540000" angle="20.225015"/>
+        </polygon>
+        <text v_align="bottom" height="2.500000" x="2.921000" y="-1.397000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="3.175000" x="2.921000" y="0.508000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="1.625600" x="-1.270000" drill="0.812800" uuid="{715e57b6-c2f4-43fa-8e82-0d51d13ced88}" y="0.000000" rotation="90.000000" layer="0" width="1.625600" type="tht_octagon">
+            <name locale="en_US">A1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.625600" x="0.000000" drill="0.812800" uuid="{e1cd6940-695c-4f19-8e1a-fccb59b4b6de}" y="1.905000" rotation="90.000000" layer="0" width="1.625600" type="tht_octagon">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.625600" x="1.270000" drill="0.812800" uuid="{ff0db29e-ced8-41e0-8eb8-94b512fa6275}" y="0.000000" rotation="90.000000" layer="0" width="1.625600" type="tht_octagon">
+            <name locale="en_US">A2</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

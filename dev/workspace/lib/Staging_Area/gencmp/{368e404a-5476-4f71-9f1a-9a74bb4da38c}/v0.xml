@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{368e404a-5476-4f71-9f1a-9a74bb4da38c}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:45Z</created>
+        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <name locale="en_US">SG51</name>
+        <description locale="en_US">&lt;b>CRYSTAL RESONATOR&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: SG51
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">QG</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{4715eab1-de99-4e7b-b71d-aa51747c7300}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">FO</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{3f04fead-a08d-49f1-aee0-c00252820f76}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">GND</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{07ff8c59-92a1-4c82-af8c-0348c955b689}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">OE</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{a5caf31e-7972-479c-8c6f-0cd03aa8df41}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">VCC</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{48c5fa05-fa12-4916-9cbe-206c97bc6534}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{d278bc41-e7ab-461a-aff9-b90567aea68c}" suffix="1" symbol="{e24e0a27-d7dc-43d5-8ca6-cef47a36f6ec}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{31ba3c4d-bd94-478f-9d9d-44c3a4873f01}" signal="{a5caf31e-7972-479c-8c6f-0cd03aa8df41}"/>
+                        <map display="gen_comp_signal" pin="{dc5cf84f-31a3-49fb-aa13-19792c2247b4}" signal="{07ff8c59-92a1-4c82-af8c-0348c955b689}"/>
+                        <map display="gen_comp_signal" pin="{19366e0b-bfc6-4b78-b509-815d6c6f0700}" signal="{3f04fead-a08d-49f1-aee0-c00252820f76}"/>
+                        <map display="gen_comp_signal" pin="{604f3601-87d1-40be-98ee-7567fe90557f}" signal="{4715eab1-de99-4e7b-b71d-aa51747c7300}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

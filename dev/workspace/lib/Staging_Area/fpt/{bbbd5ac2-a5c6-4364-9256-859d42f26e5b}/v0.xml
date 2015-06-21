@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{bbbd5ac2-a5c6-4364-9256-859d42f26e5b}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">2200-11.43</name>
+        <description locale="en_US">&lt;b>newport components&lt;/b> 2200 Serie RM 11.43 mm&lt;p>
+Miniatur Axial Lead Inductors&lt;br>
+Source: www.rsonline.de&lt;br>
+Order code 240-517
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: 2200-11.43
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="110" start_x="-5.715000" start_y="0.000000" fill="false" width="0.500000">
+            <segment end_x="-5.080000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="5.715000" start_y="0.000000" fill="false" width="0.500000">
+            <segment end_x="5.080000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-4.900000" start_y="1.900000" fill="false" width="0.203200">
+            <segment end_x="-4.900000" end_y="-1.900000" angle="0.000000"/>
+            <segment end_x="4.900000" end_y="-1.900000" angle="0.000000"/>
+            <segment end_x="4.900000" end_y="1.900000" angle="0.000000"/>
+            <segment end_x="-4.900000" end_y="1.900000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-4.445000" y="2.540000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-3.810000" y="-0.635000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="1.270000" x="-5.715000" drill="0.800000" uuid="{4979a9d0-c1fc-4ced-8518-dd7a98b8846c}" y="0.000000" rotation="90.000000" layer="0" width="1.270000" type="tht_round">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.270000" x="5.715000" drill="0.800000" uuid="{8b4ca9f4-5517-473f-8b2d-1f506c971fc3}" y="0.000000" rotation="90.000000" layer="0" width="1.270000" type="tht_round">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

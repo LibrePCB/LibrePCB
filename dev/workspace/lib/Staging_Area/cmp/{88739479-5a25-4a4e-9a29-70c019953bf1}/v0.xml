@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{88739479-5a25-4a4e-9a29-70c019953bf1}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:43Z</created>
+        <last_modified>2015-06-21T12:37:43Z</last_modified>
+        <name locale="en_US">CY</name>
+        <description locale="en_US">&lt;B>Y CAPACITOR&lt;/B>&lt;p>
+for power line
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: CY
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{a1f65756-4f96-4e7a-a767-75bd879e5aaa}</generic_component>
+        <package>{c4db8df7-86cb-4158-95b6-2865313b50a3}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{919a035d-9fb0-46ad-8cf8-99f6bd1dbf41}" signal="{65038c85-5c1e-4cc2-8a0e-9553a24ab341}"/>
+        <map pad="{476e386a-11fd-4b1c-8c75-2a4181796894}" signal="{f1de620d-f2bd-4ee0-ba92-9153fdc9d6c6}"/>
+    </pad_signal_map>
+</component>

@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{556824fe-afc7-4d8c-a93f-ffafb77bcef6}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:44Z</created>
+        <last_modified>2015-06-21T12:37:44Z</last_modified>
+        <name locale="en_US">FE12-1</name>
+        <description locale="en_US">&lt;b>FEMALE HEADER&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: con-lsta.lbr
+Name: FE12-1
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{458ef947-debb-4892-9461-628a8ff615e7}</generic_component>
+        <package>{61c8b3f6-69a9-4aad-bb4f-ed3ad06fcd4d}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{21eed025-f4d1-495e-824c-8ed077d7bae0}" signal="{7ea3c987-c524-4fd4-84d3-7be34a71e3b7}"/>
+        <map pad="{b2ef1645-ed12-4e53-a9e4-744f12b6ec35}" signal="{98abf746-3a24-4954-a55b-4c755f4ea204}"/>
+        <map pad="{502567ba-428d-41a8-8260-1193d29ac6fc}" signal="{7d81ef3d-9f10-4a05-babd-e11a6fea3b85}"/>
+        <map pad="{32238fa6-9b9e-45c5-8a84-4f9334819dca}" signal="{fc0b9d74-293d-4c67-ab2c-203410cf5ec6}"/>
+        <map pad="{f37417e0-fe0a-4919-bf43-ec7930d0b2a4}" signal="{eb015717-3691-445c-975b-f4401b6fb5dd}"/>
+        <map pad="{9d556dca-061f-45ee-9e25-eb1a11a2ad84}" signal="{59b49176-80d6-4c46-9377-22962e956e60}"/>
+        <map pad="{9cab93b2-481c-43eb-9bb0-be2e399aa417}" signal="{a8bd4277-e81c-4ea3-aed1-069c83ef3591}"/>
+        <map pad="{6facd026-ab8c-4417-85fb-012168a0ac2e}" signal="{75dfa1cb-555c-4773-b669-7858d96d733e}"/>
+        <map pad="{f6b45461-18c5-4590-85d9-2ae428aa676f}" signal="{950d9d47-9491-4c28-b08e-d1cc0a106b12}"/>
+        <map pad="{cec5e7da-3920-4b94-ad1b-5b9f93a2bd74}" signal="{439a38f9-11fa-4ada-9c9b-210d9377d382}"/>
+        <map pad="{89c1c673-c4f2-4b5d-b194-02759595f5c9}" signal="{b393203d-5f96-4e80-8fca-2fa2421eb201}"/>
+        <map pad="{74641435-e24c-4685-be83-07fd1c10ccd0}" signal="{aa7ede64-d3b1-43f4-b7b0-0e1aacb7aca6}"/>
+    </pad_signal_map>
+</component>

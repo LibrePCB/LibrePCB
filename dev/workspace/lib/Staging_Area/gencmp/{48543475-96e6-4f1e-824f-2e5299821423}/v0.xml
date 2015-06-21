@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{48543475-96e6-4f1e-824f-2e5299821423}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:45Z</created>
+        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <name locale="en_US">64M10AUM5</name>
+        <description locale="en_US">&lt;b>Monolithic Crystal Filters&lt;/b>&lt;p>
+Source: www.vanlong.com
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: 64M10AUM5
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">QF</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{9631f443-067b-474a-9683-90f7c96c57f3}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{dc20301e-7b5d-4e14-8fae-8aead221d18e}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{91442c9c-36fb-473b-8d9d-26bed03399e3}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">3</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{e615d3c6-761d-49d2-9559-a8599f7296f8}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{5e0b4595-7ddc-4232-be78-65cdbd20011c}" suffix="" symbol="{a6126794-71cd-44d0-813f-fe1847754a41}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{d2cced97-9b40-4d03-af13-56366de0c62e}" signal="{dc20301e-7b5d-4e14-8fae-8aead221d18e}"/>
+                        <map display="gen_comp_signal" pin="{7a058510-7077-48de-bfdf-f7bde9458f69}" signal="{91442c9c-36fb-473b-8d9d-26bed03399e3}"/>
+                        <map display="gen_comp_signal" pin="{a5bf62e8-174f-4ea6-b364-dc67be3f427f}" signal="{9631f443-067b-474a-9683-90f7c96c57f3}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

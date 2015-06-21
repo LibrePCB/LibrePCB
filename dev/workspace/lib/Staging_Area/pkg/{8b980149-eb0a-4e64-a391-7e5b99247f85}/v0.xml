@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{8b980149-eb0a-4e64-a391-7e5b99247f85}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:33Z</created>
+        <last_modified>2015-06-21T12:37:33Z</last_modified>
+        <name locale="en_US">XC10B5</name>
+        <description locale="en_US">&lt;b>X CAPACITOR&lt;/b>&lt;p>
+body 13 x 5 mm, grid 10.16 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: XC10B5
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{fa50ae2f-2d4d-4d2c-bb94-94d3322e2b63}</footprint>
+    </meta>
+    <categories/>
+</package>

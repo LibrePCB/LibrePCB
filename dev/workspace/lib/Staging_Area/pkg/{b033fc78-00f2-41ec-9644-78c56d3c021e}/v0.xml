@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{b033fc78-00f2-41ec-9644-78c56d3c021e}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">LUXEON_REBEL-REFERENCE</name>
+        <description locale="en_US">Generated from &lt;b>Luxeon Rebel Footprint _customer.dxf&lt;/b>&lt;p>
+from &amp;lt;rudi.hechfellner@philips.com&amp;gt;
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: LUXEON_REBEL-REFERENCE
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{6bc95917-9345-4975-b06b-33be7de28fe6}</footprint>
+    </meta>
+    <categories/>
+</package>

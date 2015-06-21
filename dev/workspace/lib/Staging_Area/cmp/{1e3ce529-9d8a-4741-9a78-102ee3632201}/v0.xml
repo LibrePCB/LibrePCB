@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{1e3ce529-9d8a-4741-9a78-102ee3632201}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:45Z</created>
+        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <name locale="en_US">HC49TL-H</name>
+        <description locale="en_US">&lt;b>CRYSTAL&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: HC49TL-H
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{f76e356b-b923-4623-989c-582cfab2c1ca}</generic_component>
+        <package>{3c7767d9-2a6f-4d0c-99c6-ad8df555d595}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{775e6d0f-8a83-4bdc-8ed9-5a06420e9ed7}" signal="{e5fb91f0-49c3-45da-a6d8-166fcee7040d}"/>
+        <map pad="{cff473c9-22fd-4da3-8e48-8a0b57437d91}" signal="{eb959915-799c-49d1-8414-d25240fbf4b2}"/>
+        <map pad="{087003bb-ce5c-4b8c-92ba-5290fcd595b2}" signal="{fbcfcc3c-b75d-44b2-b76e-f1dfe1a39dfc}"/>
+    </pad_signal_map>
+</component>

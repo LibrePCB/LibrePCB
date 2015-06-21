@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{43ba0568-a0b3-4ae4-9db1-a9872442a22f}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">PB3XX301V050A</name>
+        <description locale="en_US">&lt;b>Self-addressed led , single point control with integrated RGB leds and drive IC&lt;/b>&lt;p>
+Easy control by MCU.&lt;br>
+Source: DycolED.pdf &lt;a href="http://www.kirronlightcomponents.com/index.php/download_file/view/41/83/"> Data sheet &lt;/a>
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: PB3XX301V050A
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">LED</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{05c4fdfc-f222-4bff-ad02-f491a4df563b}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">CI</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{54dfb16d-d8ac-462f-9ec5-6462118277c9}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">CO</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{6fe11f48-61ff-4d77-b67c-2fbbb79c9fb9}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">DI</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{00f754d4-2b31-4386-920f-35b67b1851c3}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">DO</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{aa26a554-d044-4f8b-a054-5a3e3fa4f180}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">VDD</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{f187e635-a2c7-44d2-8424-b565ab8457a6}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">VSS</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{91131125-643f-460a-a5b0-3386b52b486e}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{93f24a56-bbff-4e2d-88fe-eb4c8fb83e96}" suffix="" symbol="{4fcaabb9-2c1c-4783-86bc-0cb97d94edd7}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{0ae60d85-1b39-4c41-95ab-5fc0dfcb7081}" signal="{05c4fdfc-f222-4bff-ad02-f491a4df563b}"/>
+                        <map display="gen_comp_signal" pin="{661f77bf-6797-4da4-8221-f80ba9ef2590}" signal="{6fe11f48-61ff-4d77-b67c-2fbbb79c9fb9}"/>
+                        <map display="gen_comp_signal" pin="{981570e9-efc5-4669-935d-0f7035bf45ea}" signal="{f187e635-a2c7-44d2-8424-b565ab8457a6}"/>
+                        <map display="gen_comp_signal" pin="{9caff111-c8c8-412d-886f-2a7d69afd186}" signal="{54dfb16d-d8ac-462f-9ec5-6462118277c9}"/>
+                        <map display="gen_comp_signal" pin="{699caf59-6e9f-4ee2-84dd-a07c99384dc5}" signal="{aa26a554-d044-4f8b-a054-5a3e3fa4f180}"/>
+                        <map display="gen_comp_signal" pin="{4140b41b-2683-4de6-b6d0-fdb18f058077}" signal="{00f754d4-2b31-4386-920f-35b67b1851c3}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{b4a8f647-2c0c-4a65-8da3-01743a346cf9}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">BY500</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+fast recovery diode, 5 A, 800 V
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BY500
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{e975af27-9c1d-4608-888b-908c96b50f8f}</generic_component>
+        <package>{cdc60685-ebe6-4a3d-9ce1-8873f76a8f24}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{b74315c9-feea-4f7d-94c2-04b9510a1193}" signal="{b493e0ab-cda3-4fa5-b851-aca8d3865c2f}"/>
+        <map pad="{7403240f-13dc-4614-a9e9-90395e2a0e19}" signal="{deffceab-3b83-49a6-a76e-9d76c1293112}"/>
+    </pad_signal_map>
+</component>

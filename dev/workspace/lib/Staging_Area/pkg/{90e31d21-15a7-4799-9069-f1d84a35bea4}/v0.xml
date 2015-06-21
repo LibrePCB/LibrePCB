@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{90e31d21-15a7-4799-9069-f1d84a35bea4}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">SANYO-OSCON_SMD_E12</name>
+        <description locale="en_US">&lt;b>SANYO OSCON Capacitor&lt;/b> SMD type with conductive polymer electrolyte&lt;p>
+Source: e_os_all.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: SANYO-OSCON_SMD_E12
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{e8faeb5f-472e-4a69-9a86-5c6059211243}</footprint>
+    </meta>
+    <categories/>
+</package>

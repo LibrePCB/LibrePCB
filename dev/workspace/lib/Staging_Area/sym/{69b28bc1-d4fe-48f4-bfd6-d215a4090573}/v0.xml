@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<symbol version="0">
+    <meta>
+        <uuid>{69b28bc1-d4fe-48f4-bfd6-d215a4090573}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:29Z</created>
+        <last_modified>2015-06-21T12:37:29Z</last_modified>
+        <name locale="en_US">TLE4242</name>
+        <description locale="en_US">
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: TLE4242
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="10" start_x="-7.620000" start_y="10.160000" fill="false" width="0.254000">
+            <segment end_x="-7.620000" end_y="-10.160000" angle="0.000000"/>
+            <segment end_x="7.620000" end_y="-10.160000" angle="0.000000"/>
+            <segment end_x="7.620000" end_y="10.160000" angle="0.000000"/>
+            <segment end_x="-7.620000" end_y="10.160000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-7.620000" y="11.430000" layer="20" text="${SYM::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-7.620000" y="-12.700000" layer="21" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pins>
+        <pin length="2.540000" x="10.160000" uuid="{cc58fc9b-9eb3-4b22-84f9-c73f26d2234c}" y="-7.620000" angle="-90.000000">
+            <name locale="en_US">ST</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="2.540000" x="-10.160000" uuid="{f5c1c09a-08f6-400b-b585-c9389ee2f94c}" y="-7.620000" angle="90.000000">
+            <name locale="en_US">GND</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="2.540000" x="-10.160000" uuid="{bd235a9d-11e3-422c-88a9-322e7513297a}" y="-2.540000" angle="90.000000">
+            <name locale="en_US">D</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="2.540000" x="-10.160000" uuid="{fae58459-cfa5-4f9e-99dd-a1b17e8c6bab}" y="2.540000" angle="90.000000">
+            <name locale="en_US">PWM</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="2.540000" x="10.160000" uuid="{e197d31c-2cf8-4a02-8747-1cdaec5e1e79}" y="7.620000" angle="-90.000000">
+            <name locale="en_US">Q</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="2.540000" x="10.160000" uuid="{cccd263c-c124-459c-9c32-96dde7d2470e}" y="0.000000" angle="-90.000000">
+            <name locale="en_US">REF</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="2.540000" x="-10.160000" uuid="{6266f161-b958-4954-a638-c9d3638413b7}" y="7.620000" angle="90.000000">
+            <name locale="en_US">IN</name>
+            <description locale="en_US"/>
+        </pin>
+    </pins>
+</symbol>

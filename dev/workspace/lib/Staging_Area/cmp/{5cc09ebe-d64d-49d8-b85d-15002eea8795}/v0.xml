@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{5cc09ebe-d64d-49d8-b85d-15002eea8795}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">GM1BW76340A</name>
+        <description locale="en_US">&lt;b>White LED&lt;/b> 45 lumen 14000 mcd @50 mA&lt;p>
+http://document.sharpsma.com/files/GM1BW76340A_DS.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: GM1BW76340A
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{9b1d6393-fd67-407b-bcd8-62bc8f4b18ea}</generic_component>
+        <package>{0caf07ec-5f0d-440b-b450-76f3471b12c2}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{c145af3e-1db7-4a45-9e1f-2cbb57b12c68}" signal="{c79e8235-727a-48f0-9d40-0505d1ca4868}"/>
+        <map pad="{c8782173-df25-4332-adf6-6ad87f7cf484}" signal="{ba32f06a-6fd4-456c-ba42-f66b2955bc67}"/>
+    </pad_signal_map>
+</component>

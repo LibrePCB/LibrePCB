@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{4c326e5b-a068-47c2-980e-f0ad029d8db1}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">TJ7-U1</name>
+        <description locale="en_US">&lt;b>Inductor&lt;/b>&lt;p>
+Source: TJ-Serie Vishay.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: TJ7-U1
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{8cfeb2c0-6eab-441f-8dfe-ab0152991c3f}</footprint>
+    </meta>
+    <categories/>
+</package>

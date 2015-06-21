@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{a819a286-39ff-4fa2-bf95-a96c3dcb5a37}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">LZ1-00WW03</name>
+        <description locale="en_US">&lt;b>High Luminous Efficacy LED Emitter&lt;/b>&lt;p>
+Source: http://www.ledengin.com/products/3wLZ/LZ1-00WW03.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: LZ1-00WW03
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{ab63558f-1173-49c9-bc9d-0648d13ef992}</footprint>
+    </meta>
+    <categories/>
+</package>

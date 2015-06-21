@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{16c968d4-42b7-48c2-9058-1a950ba25638}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">SFH482</name>
+        <description locale="en_US">&lt;B>IR LED&lt;/B>&lt;p>
+infrared emitting diode, Infineon
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: SFH482
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{434a338f-4a76-459a-9947-d1d1fe9b85a4}</generic_component>
+        <package>{41b68c14-0aad-4543-8a56-8f8ef531d042}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{e0ee067d-fbb3-4c4b-bbc1-9226a5ae2f10}" signal="{d1c6f50c-3f0a-4ebc-ab04-fceebf8c8007}"/>
+        <map pad="{22599c4a-a17a-41fe-a6f5-8fc4fd246d69}" signal="{358e65d8-dbb1-4adb-a20c-499cf6722632}"/>
+    </pad_signal_map>
+</component>

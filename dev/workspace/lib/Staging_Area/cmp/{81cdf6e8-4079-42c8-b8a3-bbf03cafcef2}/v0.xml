@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{81cdf6e8-4079-42c8-b8a3-bbf03cafcef2}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:44Z</created>
+        <last_modified>2015-06-21T12:37:44Z</last_modified>
+        <name locale="en_US">MA03-1</name>
+        <description locale="en_US">&lt;b>PIN HEADER&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: con-lstb.lbr
+Name: MA03-1
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{4db1c5cb-4390-4f3c-b0ca-604c792a4031}</generic_component>
+        <package>{9dd383d0-7252-4780-9e23-b5c263ece85e}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{836e7b5e-2424-4a00-9a1f-8763c4c29f18}" signal="{9bae669e-ebf2-4e78-8d57-f73f9a32dbcd}"/>
+        <map pad="{ec13b80b-d012-46eb-96b9-1ddd81e61cbc}" signal="{ff2a5adb-3150-4e8a-a9c6-4a4ac3111651}"/>
+        <map pad="{8fc457f6-f5a8-421f-b6dc-17de96de7d33}" signal="{6ce632fb-9a70-4ffe-a88e-12d8424629f6}"/>
+    </pad_signal_map>
+</component>

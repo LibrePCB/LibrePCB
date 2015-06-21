@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{1314327d-df62-490e-b522-33f95e3d83e8}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">ACULEDVHL</name>
+        <description locale="en_US">&lt;b>ACULED® VHL&lt;/b> Standard Monochromatic and Multi-Colored Four-Chip LED&lt;p>
+Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_ACULEDVHL.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: ACULEDVHL
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{67fc95c5-2dc8-4c78-9110-9c36056fdf24}</generic_component>
+        <package>{732beb5c-4ed0-4fbd-8704-32a92eedaf26}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{0c6fc925-b0c9-4a05-a294-3d4f900b46c4}" signal="{bdbe47a3-a77b-480a-88f4-354c75c7e593}"/>
+        <map pad="{94dc3c86-42a7-4e21-a86f-1cdcd1eb3c95}" signal="{f8e42f54-d70a-455b-a1ed-3b617b95a8ba}"/>
+        <map pad="{f6b49328-59a2-411e-8e59-46e54b7e4782}" signal="{21acd160-ff30-40d8-ad11-03657e811b9e}"/>
+        <map pad="{1d8a7073-6d08-413c-9b22-605540bae0fa}" signal="{eec7a12e-02d2-4ba6-a683-e77d136ed4f8}"/>
+        <map pad="{e1dab37b-3892-48c6-a4b9-bc105b7b0ecd}" signal="{9a9f449d-cd91-46c2-b458-da8bee5d1ac2}"/>
+        <map pad="{fef69261-c27d-4445-9bcd-a157bfb28cc2}" signal="{11cf1a46-ec77-4e26-ae82-beb6ffb8e8ba}"/>
+        <map pad="{586a1840-d930-43d1-9e52-3722e780b614}" signal="{be64e272-2e08-49b2-b9c2-b9837708fd53}"/>
+        <map pad="{35b0e3bf-8519-41ef-b9f6-fdeef745ca96}" signal="{63c1a555-ad1f-469a-b4da-7eb6732587b0}"/>
+    </pad_signal_map>
+</component>

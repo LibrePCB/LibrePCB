@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{6798da8f-f2b0-4c3b-93f7-0591e814f421}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:33Z</created>
+        <last_modified>2015-06-21T12:37:33Z</last_modified>
+        <name locale="en_US">RTRIMT93YB</name>
+        <description locale="en_US">&lt;b>Trimm resistor&lt;/b> VISHAY&lt;p>
+Cermet, abgedichtet nach IP67
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: RTRIMT93YB
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{83e3af72-49cd-4175-a14e-2f165d1cf8e1}</footprint>
+    </meta>
+    <categories/>
+</package>

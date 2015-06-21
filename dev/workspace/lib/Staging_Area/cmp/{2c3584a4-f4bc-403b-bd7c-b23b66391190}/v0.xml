@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{2c3584a4-f4bc-403b-bd7c-b23b66391190}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">MX3</name>
+        <description locale="en_US">&lt;b>Cree® XLamp® MX-3 LEDs&lt;/b>&lt;p>
+Source: &lt;a href="http://www.cree.com/products/pdf/XLampMX-3.pdf"> Data sheet &lt;/a>
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: MX3
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{6528f17e-c8cd-4687-98e0-967ccb7b86c7}</generic_component>
+        <package>{6f0c54d6-a058-4e96-b1f0-55a83600352c}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{e9fd4747-3a82-4b9d-b743-563a9281cf9b}" signal="{f62daf88-f54b-4f0f-ba21-048edc99c3eb}"/>
+        <map pad="{d6b97f2a-ad25-4336-8382-e61e9efb7be2}" signal="{a98fba11-47b4-4ef4-96ff-2a3ed5a523b5}"/>
+        <map pad="{995e4ef8-1f58-45c8-9fd5-b9ea43935b12}" signal="{f62daf88-f54b-4f0f-ba21-048edc99c3eb}"/>
+        <map pad="{b80692de-cf2a-4b1b-8b31-ab7b38cc24b8}" signal="{e371939c-341c-4112-b9e1-6611c10f22d4}"/>
+        <map pad="{39bb1617-38b8-4557-b362-43e9a73ffc6f}" signal="{f62daf88-f54b-4f0f-ba21-048edc99c3eb}"/>
+        <map pad="{55037692-5515-4482-ba03-4cfef762429b}" signal="{f62daf88-f54b-4f0f-ba21-048edc99c3eb}"/>
+        <map pad="{34868c08-f79a-4d9d-b2b2-a60364870c7a}" signal="{f62daf88-f54b-4f0f-ba21-048edc99c3eb}"/>
+        <map pad="{096a9b1f-b84b-4400-a51e-0d513bdf7828}" signal="{f62daf88-f54b-4f0f-ba21-048edc99c3eb}"/>
+        <map pad="{512f8c7d-bf8a-4fe5-882e-e02a806b83fe}" signal="{f62daf88-f54b-4f0f-ba21-048edc99c3eb}"/>
+        <map pad="{2efe0abb-fa2a-4440-9279-c3e2a763b8f0}" signal="{f62daf88-f54b-4f0f-ba21-048edc99c3eb}"/>
+        <map pad="{954c1e05-c573-499d-9eb6-e858c7d2233c}" signal="{f62daf88-f54b-4f0f-ba21-048edc99c3eb}"/>
+        <map pad="{80668183-972b-4379-b0d9-69764a97a026}" signal="{f62daf88-f54b-4f0f-ba21-048edc99c3eb}"/>
+        <map pad="{a606604f-fc8a-42c7-912f-6393de2f646d}" signal="{f62daf88-f54b-4f0f-ba21-048edc99c3eb}"/>
+        <map pad="{7caefc1f-04e9-40be-84bb-767f21ab544e}" signal="{f62daf88-f54b-4f0f-ba21-048edc99c3eb}"/>
+        <map pad="{589cdbe4-fa4f-4e36-bd2b-0dc95ee69973}" signal="{f62daf88-f54b-4f0f-ba21-048edc99c3eb}"/>
+        <map pad="{65916728-3a63-4547-be35-e3bbd85b24a7}" signal="{f62daf88-f54b-4f0f-ba21-048edc99c3eb}"/>
+        <map pad="{2741d1d9-8af0-45ff-9471-76d6a199d9ea}" signal="{f62daf88-f54b-4f0f-ba21-048edc99c3eb}"/>
+    </pad_signal_map>
+</component>

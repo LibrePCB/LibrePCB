@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{d78dbcc2-c891-45ff-b049-4f87447ffc79}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">SOT323-R</name>
+        <description locale="en_US">&lt;b>SOT323 Reflow soldering&lt;/b>&lt;p>
+Philips SC01_Mounting_1996.pdf
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: SOT323-R
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="110" start_x="-0.800000" start_y="-1.100000" fill="true" width="0.000000">
+            <segment end_x="-0.500000" end_y="-1.100000" angle="0.000000"/>
+            <segment end_x="-0.500000" end_y="-0.500000" angle="0.000000"/>
+            <segment end_x="-0.800000" end_y="-0.500000" angle="0.000000"/>
+            <segment end_x="-0.800000" end_y="-1.100000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="0.500000" start_y="-1.100000" fill="true" width="0.000000">
+            <segment end_x="0.800000" end_y="-1.100000" angle="0.000000"/>
+            <segment end_x="0.800000" end_y="-0.500000" angle="0.000000"/>
+            <segment end_x="0.500000" end_y="-0.500000" angle="0.000000"/>
+            <segment end_x="0.500000" end_y="-1.100000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-0.150000" start_y="0.500000" fill="true" width="0.000000">
+            <segment end_x="0.150000" end_y="0.500000" angle="0.000000"/>
+            <segment end_x="0.150000" end_y="1.100000" angle="0.000000"/>
+            <segment end_x="-0.150000" end_y="1.100000" angle="0.000000"/>
+            <segment end_x="-0.150000" end_y="0.500000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="0.922400" start_y="-0.460400" fill="false" width="0.152400">
+            <segment end_x="0.922400" end_y="0.460400" angle="0.000000"/>
+            <segment end_x="-0.922400" end_y="0.460400" angle="0.000000"/>
+            <segment end_x="-0.922400" end_y="-0.460400" angle="0.000000"/>
+            <segment end_x="0.922400" end_y="-0.460400" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="0.922400" start_y="-0.460400" fill="false" width="0.152400">
+            <segment end_x="0.922400" end_y="0.460400" angle="0.000000"/>
+            <segment end_x="-0.922400" end_y="0.460400" angle="0.000000"/>
+            <segment end_x="-0.922400" end_y="-0.460400" angle="0.000000"/>
+            <segment end_x="0.922400" end_y="-0.460400" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-1.000000" y="1.300000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-1.000000" y="-2.600000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="0.550000" x="-0.650000" drill="0.000000" uuid="{64c794f2-9378-499c-bc2f-adbbc4c2963b}" y="-0.925000" rotation="0.000000" layer="200" width="0.600000" type="smd_rect">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="0.550000" x="0.000000" drill="0.000000" uuid="{7f987b0e-d36b-4302-be1b-117d635217f0}" y="0.925000" rotation="0.000000" layer="200" width="0.600000" type="smd_rect">
+            <name locale="en_US">3</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="0.550000" x="0.650000" drill="0.000000" uuid="{1384e09e-0200-46d6-b65a-952d9087f5fb}" y="-0.925000" rotation="0.000000" layer="200" width="0.600000" type="smd_rect">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{ec7460e7-f221-4754-b6d6-73a0e584cb35}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">SMD2</name>
+        <description locale="en_US">&lt;b>SMD PAD&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: wirepad.lbr
+Name: SMD2
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">PAD</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{ca065998-338e-4ca7-b811-fdec77d4f55c}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">P</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{b4bdaa77-7bd3-4850-bc78-6b79a0d6b2a1}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{38739945-ba1c-42db-b18f-4f2ca65646b2}" suffix="1" symbol="{dce44427-4d53-4881-a77a-3e4faa383e3b}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{01f564d5-9975-4613-bf90-153a031fe625}" signal="{ca065998-338e-4ca7-b811-fdec77d4f55c}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

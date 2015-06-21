@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{bc9128f6-4745-4468-b1ff-3530d03132b7}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">BAT60J</name>
+        <description locale="en_US">&lt;b>Schottky barrier diode&lt;/b>&lt;p>
+Source: www.st.com, BAT60J.pdf
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BAT60J
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{92261d70-d988-45f2-b87e-f1d4ede7f45b}</generic_component>
+        <package>{79b3c9db-f019-43fb-b85b-27bc598485d8}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{4e500c5c-1ad6-498e-a506-6ea13a035270}" signal="{f22d81d3-7865-48cb-b39b-663851cdce73}"/>
+        <map pad="{c8a7b5d9-9eda-4d75-bea9-f29391165a78}" signal="{4fcee70a-d141-4074-b70d-cdd66d0a0fff}"/>
+    </pad_signal_map>
+</component>

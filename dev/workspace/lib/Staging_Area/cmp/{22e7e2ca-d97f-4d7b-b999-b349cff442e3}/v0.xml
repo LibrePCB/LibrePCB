@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{22e7e2ca-d97f-4d7b-b999-b349cff442e3}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:45Z</created>
+        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <name locale="en_US">TC49</name>
+        <description locale="en_US">&lt;b>Temperature Compensated Xtal Oscillator&lt;/b>&lt;p>
+HCMOS, Clipped Sine Wave or Sine Wave Compatible&lt;br>
+Source: www.pletronics.com .. tc4.pdf
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: TC49
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{2de1bd5b-f79c-4576-9934-095bd9a38e47}</generic_component>
+        <package>{3ca1df51-e79d-4669-b263-41053c396436}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{cd727c41-119f-4e59-9dc6-940ddf000705}" signal="{a9a5f976-d2ac-42ed-990e-0b7ad49f0622}"/>
+        <map pad="{2a0fae42-25c5-4621-9c48-6c412d9951c3}" signal="{ef03de90-cad5-4180-9948-78ae00851bb5}"/>
+        <map pad="{fb2cb0a5-7ec3-491f-99bb-cfa25162aa28}" signal="{9b979f8f-5c28-45ad-8421-efe2880199a3}"/>
+        <map pad="{f106b1a3-4271-479d-ad98-e5459a1dec47}" signal="{3b426cdc-a6b7-42f6-81a9-316c46a84184}"/>
+    </pad_signal_map>
+</component>

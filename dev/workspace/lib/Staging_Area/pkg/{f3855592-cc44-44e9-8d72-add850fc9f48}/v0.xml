@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{f3855592-cc44-44e9-8d72-add850fc9f48}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:33Z</created>
+        <last_modified>2015-06-21T12:37:33Z</last_modified>
+        <name locale="en_US">RTRIM3165W</name>
+        <description locale="en_US">&lt;b>Trimm resistor&lt;/b> MEGGIT
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: RTRIM3165W
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{b56292da-554c-4ebd-80a5-d58bab376c4a}</footprint>
+    </meta>
+    <categories/>
+</package>

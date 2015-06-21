@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{c5f59f4f-b666-4456-a3d9-390ceb70248f}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:43Z</created>
+        <last_modified>2015-06-21T12:37:43Z</last_modified>
+        <name locale="en_US">C-TRIMM</name>
+        <description locale="en_US">&lt;b>Trimm capacitor&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: C-TRIMM
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{fd75cd4c-8b11-4f06-8fa7-498e345f5248}</generic_component>
+        <package>{5c77e274-de0a-4f38-ab3a-4a3d706c41c9}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{b44e675b-eae1-4648-8f9e-6c17c528ef6a}" signal="{7950f37e-3fc4-4910-9f8f-27ee3b59dc89}"/>
+        <map pad="{ceed7831-3334-40e8-a196-354274fc515d}" signal="{0aaecffd-ef4a-417b-a142-8a1093ce83b3}"/>
+    </pad_signal_map>
+</component>

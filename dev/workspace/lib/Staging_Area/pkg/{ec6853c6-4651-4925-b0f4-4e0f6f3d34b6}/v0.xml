@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{ec6853c6-4651-4925-b0f4-4e0f6f3d34b6}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:32Z</created>
+        <last_modified>2015-06-21T12:37:32Z</last_modified>
+        <name locale="en_US">0617/17</name>
+        <description locale="en_US">&lt;b>RESISTOR&lt;/b>&lt;p>
+type 0617, grid 17.5 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: 0617/17
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{c8c3e97a-8b05-45dd-9b59-b7654fcd2ebb}</footprint>
+    </meta>
+    <categories/>
+</package>

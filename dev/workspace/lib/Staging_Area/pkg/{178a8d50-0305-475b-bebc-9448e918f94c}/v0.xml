@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{178a8d50-0305-475b-bebc-9448e918f94c}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:32Z</created>
+        <last_modified>2015-06-21T12:37:32Z</last_modified>
+        <name locale="en_US">YC15B7</name>
+        <description locale="en_US">&lt;b>Y CAPACITOR&lt;/b>&lt;p>
+body 17.7 x 7 mm, grid 15 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: YC15B7
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{c87741a0-cb7d-48d8-a94d-25d7337c4385}</footprint>
+    </meta>
+    <categories/>
+</package>

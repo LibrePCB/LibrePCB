@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{30111a68-fb2e-40e0-951f-7c052f8f85ba}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:33Z</created>
+        <last_modified>2015-06-21T12:37:33Z</last_modified>
+        <name locale="en_US">RTRIM64X</name>
+        <description locale="en_US">&lt;b>Trimm resistor&lt;/b> Spectrol&lt;p>
+Cermet MIL-R-22097
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: RTRIM64X
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{9304a545-fa44-405d-b96b-0499f1add857}</footprint>
+    </meta>
+    <categories/>
+</package>

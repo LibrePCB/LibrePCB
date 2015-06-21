@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{7263f03c-4fdc-4126-b51f-2bffe7d57450}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:33Z</created>
+        <last_modified>2015-06-21T12:37:33Z</last_modified>
+        <name locale="en_US">E45-25</name>
+        <description locale="en_US">&lt;b>ELECTROLYTIC CAPACITOR&lt;/b>&lt;p>
+grid 45.72 mm, diameter 25 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: E45-25
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{62c8aa63-6b2a-4d85-aa86-44252953f922}</footprint>
+    </meta>
+    <categories/>
+</package>

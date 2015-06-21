@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{78e041c5-9c12-4bb3-b8d9-eb98d5c7dfd1}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">SUPPRESSOR-</name>
+        <description locale="en_US">&lt;b>Suppressor diode&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: SUPPRESSOR-
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{6f959627-00d2-4652-bfd9-f6ea0162ccdd}</generic_component>
+        <package>{d6527201-0b43-4ec6-96e1-8dde11a38645}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{7294480b-112f-4b6e-9f5b-f9239b95c5dd}" signal="{78fc7eeb-dca2-40c7-9543-9444e527056e}"/>
+        <map pad="{cc97d7ce-a4d0-482c-89d4-f82015f81a0b}" signal="{0b345c41-0429-47f3-917a-5140944c7755}"/>
+    </pad_signal_map>
+</component>

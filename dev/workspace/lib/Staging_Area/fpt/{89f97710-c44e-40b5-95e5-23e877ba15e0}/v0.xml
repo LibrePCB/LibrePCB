@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{89f97710-c44e-40b5-95e5-23e877ba15e0}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">MICROMELF-R</name>
+        <description locale="en_US">&lt;b>Micro Melf Diode Reflow soldering&lt;/b> VISHAY mcl4148.pdf
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: MICROMELF-R
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="110" start_x="-0.650000" start_y="0.550000" fill="false" width="0.152400">
+            <segment end_x="0.650000" end_y="0.550000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-0.650000" start_y="-0.550000" fill="false" width="0.152400">
+            <segment end_x="0.650000" end_y="-0.550000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-0.950000" start_y="-0.650000" fill="true" width="0.000000">
+            <segment end_x="-0.650000" end_y="-0.650000" angle="0.000000"/>
+            <segment end_x="-0.650000" end_y="0.650000" angle="0.000000"/>
+            <segment end_x="-0.950000" end_y="0.650000" angle="0.000000"/>
+            <segment end_x="-0.950000" end_y="-0.650000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="0.650000" start_y="-0.650000" fill="true" width="0.000000">
+            <segment end_x="0.950000" end_y="-0.650000" angle="0.000000"/>
+            <segment end_x="0.950000" end_y="0.650000" angle="0.000000"/>
+            <segment end_x="0.650000" end_y="0.650000" angle="0.000000"/>
+            <segment end_x="0.650000" end_y="-0.650000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-0.500000" start_y="-0.550000" fill="true" width="0.000000">
+            <segment end_x="-0.200000" end_y="-0.550000" angle="0.000000"/>
+            <segment end_x="-0.200000" end_y="0.550000" angle="0.000000"/>
+            <segment end_x="-0.500000" end_y="0.550000" angle="0.000000"/>
+            <segment end_x="-0.500000" end_y="-0.550000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-1.201000" y="0.843000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-1.201000" y="-2.063000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="1.200000" x="-0.800000" drill="0.000000" uuid="{ff634026-cf5c-4159-8173-5484ece310a8}" y="0.000000" rotation="0.000000" layer="200" width="0.800000" type="smd_rect">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.200000" x="0.800000" drill="0.000000" uuid="{d71f883c-6cb9-40a6-aa24-d78089de3452}" y="0.000000" rotation="0.000000" layer="200" width="0.800000" type="smd_rect">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

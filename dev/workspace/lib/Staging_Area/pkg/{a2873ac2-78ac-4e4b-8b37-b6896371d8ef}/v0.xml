@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{a2873ac2-78ac-4e4b-8b37-b6896371d8ef}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:38Z</created>
+        <last_modified>2015-06-21T12:37:38Z</last_modified>
+        <name locale="en_US">TO220AC</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+2-lead molded, horizontal
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: TO220AC
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{ea4c412d-65ff-4d57-b10a-5f8de42d75be}</footprint>
+    </meta>
+    <categories/>
+</package>

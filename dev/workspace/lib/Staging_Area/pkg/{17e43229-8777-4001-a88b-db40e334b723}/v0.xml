@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{17e43229-8777-4001-a88b-db40e334b723}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:32Z</created>
+        <last_modified>2015-06-21T12:37:32Z</last_modified>
+        <name locale="en_US">XC27B13</name>
+        <description locale="en_US">&lt;b>X CAPACITOR&lt;/b>&lt;p>
+body 32 x 13 mm, grid 27.9 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: XC27B13
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{15e4718a-21de-4bf9-87ce-5395eec298c1}</footprint>
+    </meta>
+    <categories/>
+</package>

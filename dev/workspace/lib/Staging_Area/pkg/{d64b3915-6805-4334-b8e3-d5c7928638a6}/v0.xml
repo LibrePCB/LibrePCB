@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{d64b3915-6805-4334-b8e3-d5c7928638a6}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">Q62902-B155</name>
+        <description locale="en_US">&lt;b>LED HOLDER&lt;/b>&lt;p>
+Siemens
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: Q62902-B155
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{ece1a488-16d2-4d4d-b274-c53b2f7f7926}</footprint>
+    </meta>
+    <categories/>
+</package>

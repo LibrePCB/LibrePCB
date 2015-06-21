@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{44d3cbc1-9d2b-4036-98d3-d40984994011}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:35Z</created>
+        <last_modified>2015-06-21T12:37:35Z</last_modified>
+        <name locale="en_US">IR-4</name>
+        <description locale="en_US">&lt;B>Vishay Dale Inductor&lt;/b>&lt;p>
+Source: www.vishay.com .. ir.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: IR-4
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="110" start_x="6.730000" start_y="0.000000" fill="false" width="0.609600">
+            <segment end_x="5.714000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-6.705000" start_y="0.000000" fill="false" width="0.609600">
+            <segment end_x="-5.689000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-4.800000" start_y="1.939000" fill="false" width="0.152400">
+            <segment end_x="-4.525000" end_y="2.200000" angle="90.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-4.800000" start_y="-1.939000" fill="false" width="0.152400">
+            <segment end_x="-4.550000" end_y="-2.200000" angle="-90.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="4.575000" start_y="-2.200000" fill="false" width="0.152400">
+            <segment end_x="4.825000" end_y="-1.939000" angle="-90.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="4.575000" start_y="2.200000" fill="false" width="0.152400">
+            <segment end_x="4.825000" end_y="1.939000" angle="90.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-4.800000" start_y="-1.939000" fill="false" width="0.152400">
+            <segment end_x="-4.800000" end_y="1.939000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="4.575000" start_y="2.200000" fill="false" width="0.152400">
+            <segment end_x="-4.525000" end_y="2.200000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="4.575000" start_y="-2.200000" fill="false" width="0.152400">
+            <segment end_x="-4.550000" end_y="-2.200000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="4.825000" start_y="-1.939000" fill="false" width="0.152400">
+            <segment end_x="4.825000" end_y="1.939000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="4.825000" start_y="-0.304800" fill="true" width="0.000000">
+            <segment end_x="5.688600" end_y="-0.304800" angle="0.000000"/>
+            <segment end_x="5.688600" end_y="0.304800" angle="0.000000"/>
+            <segment end_x="4.825000" end_y="0.304800" angle="0.000000"/>
+            <segment end_x="4.825000" end_y="-0.304800" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-5.663600" start_y="-0.304800" fill="true" width="0.000000">
+            <segment end_x="-4.800000" end_y="-0.304800" angle="0.000000"/>
+            <segment end_x="-4.800000" end_y="0.304800" angle="0.000000"/>
+            <segment end_x="-5.663600" end_y="0.304800" angle="0.000000"/>
+            <segment end_x="-5.663600" end_y="-0.304800" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-3.810000" y="2.540000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-3.175000" y="-0.635000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="1.676400" x="6.730000" drill="1.000000" uuid="{a7a18ecd-3ad0-41b8-b599-483857819e38}" y="0.000000" rotation="90.000000" layer="0" width="1.676400" type="tht_round">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.676400" x="-6.705000" drill="1.000000" uuid="{bf1149d0-df6d-4a70-962f-18aaaa59a055}" y="0.000000" rotation="90.000000" layer="0" width="1.676400" type="tht_round">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

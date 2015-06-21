@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<symbol version="0">
+    <meta>
+        <uuid>{3d1998f3-34a4-4896-9f48-dc572357ea86}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:29Z</created>
+        <last_modified>2015-06-21T12:37:29Z</last_modified>
+        <name locale="en_US">SDD_KAAK</name>
+        <description locale="en_US">
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: SDD_KAAK
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="10" start_x="-1.270000" start_y="-1.270000" fill="false" width="0.254000">
+            <segment end_x="-3.810000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-3.810000" start_y="0.000000" fill="false" width="0.254000">
+            <segment end_x="-1.270000" end_y="1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-2.540000" start_y="0.000000" fill="false" width="0.152400">
+            <segment end_x="-3.810000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-1.270000" start_y="1.270000" fill="false" width="0.254000">
+            <segment end_x="-1.270000" end_y="-1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="1.270000" start_y="1.270000" fill="false" width="0.254000">
+            <segment end_x="3.810000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="3.810000" start_y="0.000000" fill="false" width="0.254000">
+            <segment end_x="1.270000" end_y="-1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="2.540000" start_y="0.000000" fill="false" width="0.152400">
+            <segment end_x="3.810000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="1.270000" start_y="-1.270000" fill="false" width="0.254000">
+            <segment end_x="1.270000" end_y="1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-4.445000" start_y="1.016000" fill="false" width="0.254000">
+            <segment end_x="-4.445000" end_y="1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-4.445000" start_y="1.270000" fill="false" width="0.254000">
+            <segment end_x="-3.810000" end_y="1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-3.810000" start_y="1.270000" fill="false" width="0.254000">
+            <segment end_x="-3.810000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-3.175000" start_y="-1.016000" fill="false" width="0.254000">
+            <segment end_x="-3.175000" end_y="-1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-3.810000" start_y="0.000000" fill="false" width="0.254000">
+            <segment end_x="-3.810000" end_y="-1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-3.810000" start_y="-1.270000" fill="false" width="0.254000">
+            <segment end_x="-3.175000" end_y="-1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="3.175000" start_y="-1.016000" fill="false" width="0.254000">
+            <segment end_x="3.175000" end_y="-1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="3.175000" start_y="-1.270000" fill="false" width="0.254000">
+            <segment end_x="3.810000" end_y="-1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="3.810000" start_y="-1.270000" fill="false" width="0.254000">
+            <segment end_x="3.810000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="4.445000" start_y="1.016000" fill="false" width="0.254000">
+            <segment end_x="4.445000" end_y="1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="3.810000" start_y="0.000000" fill="false" width="0.254000">
+            <segment end_x="3.810000" end_y="1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="3.810000" start_y="1.270000" fill="false" width="0.254000">
+            <segment end_x="4.445000" end_y="1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-3.810000" start_y="0.000000" fill="false" width="0.152400">
+            <segment end_x="3.810000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="0.762000" y="2.006600" layer="20" text="${SYM::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-4.318000" y="-3.962400" layer="21" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+        <ellipse radius_x="0.127000" x="0.000000" radius_y="0.127000" grab_area="true" y="0.000000" layer="10" rotation="0.000000" fill="false" width="0.406400"/>
+    </geometry>
+    <pins>
+        <pin length="2.540000" x="0.000000" uuid="{ec8dfe68-e549-4ee2-971d-002458137bb9}" y="2.540000" angle="-180.000000">
+            <name locale="en_US">AA</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="2.540000" x="-5.080000" uuid="{9e28bcac-1d49-43bc-b63d-9e7851fd10ec}" y="0.000000" angle="90.000000">
+            <name locale="en_US">K1</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="2.540000" x="5.080000" uuid="{91696bdd-e5da-4ab7-bb34-d52f47f783d4}" y="0.000000" angle="-90.000000">
+            <name locale="en_US">K2</name>
+            <description locale="en_US"/>
+        </pin>
+    </pins>
+</symbol>

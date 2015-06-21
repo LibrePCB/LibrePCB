@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{30d65b0b-89e4-4252-9a41-28906b933d12}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">BB141</name>
+        <description locale="en_US">Capacity &lt;b>DIODE&lt;/b>&lt;p>
+variable-capacitance diode
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BB141
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{291ddc29-43f4-481f-991c-079052f730cd}</generic_component>
+        <package>{07e9e4c7-4144-40e8-b9d3-e7b0dfd089df}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{197e0f79-e14a-4e2b-bf19-68efe1f4c67a}" signal="{a246ccb0-0dc0-4df0-b7c0-566662fca716}"/>
+        <map pad="{41d73e87-6e50-49b1-b508-22d825841732}" signal="{3d2bf454-92da-438b-8b31-c3a78054bc9a}"/>
+    </pad_signal_map>
+</component>

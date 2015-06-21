@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{3bb5d00c-cf34-4eed-afd4-a270284ba359}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:37Z</created>
+        <last_modified>2015-06-21T12:37:37Z</last_modified>
+        <name locale="en_US">UM-5S</name>
+        <description locale="en_US">&lt;b>Monolithic Crystal Filters&lt;/b>&lt;p>
+Source: ECM Electronics Limited
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: UM-5S
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{3c80132b-feb5-4638-b406-0a56ac60ff5e}</footprint>
+    </meta>
+    <categories/>
+</package>

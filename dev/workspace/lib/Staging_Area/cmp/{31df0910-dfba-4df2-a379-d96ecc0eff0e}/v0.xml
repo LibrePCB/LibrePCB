@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{31df0910-dfba-4df2-a379-d96ecc0eff0e}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">1N4728</name>
+        <description locale="en_US">&lt;b>Z DIODE&lt;/b>&lt;p>
+3.3 V, 1W, 5 percent
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: 1N4728
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{b4f7c396-e6e7-407c-9e91-44996137c332}</generic_component>
+        <package>{df634fb8-41a4-494b-8b35-6bd7d6467009}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{a8d00fb8-ca0c-4fed-ad4f-96d14fee4f94}" signal="{be312176-0bda-48f5-b2ca-eda262a7cdad}"/>
+        <map pad="{01145a7d-f795-48bf-86a8-645d40637c26}" signal="{e426246c-e943-4756-8039-ae424db9454a}"/>
+    </pad_signal_map>
+</component>

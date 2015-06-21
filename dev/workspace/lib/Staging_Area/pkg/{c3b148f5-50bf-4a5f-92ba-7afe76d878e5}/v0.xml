@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{c3b148f5-50bf-4a5f-92ba-7afe76d878e5}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">LUMILED</name>
+        <description locale="en_US">&lt;b>Lumileds Lighting. LUXEON®&lt;/b> without cool pad&lt;p>
+Source: K2.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: LUMILED
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{a5c62f6c-d035-4022-b994-f905f4103ba8}</footprint>
+    </meta>
+    <categories/>
+</package>

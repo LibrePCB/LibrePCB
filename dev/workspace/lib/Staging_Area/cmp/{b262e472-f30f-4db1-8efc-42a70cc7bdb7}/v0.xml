@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{b262e472-f30f-4db1-8efc-42a70cc7bdb7}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">BAT42</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+ barrier diode
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BAT42
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{97adb4b9-15fa-424c-af88-c6cf82f4a89e}</generic_component>
+        <package>{9af20351-2599-421c-8671-f0355c2548bb}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{03958109-002d-4acc-8e80-e9768ddc69d7}" signal="{07b8fadf-3812-4465-aabf-072b74c39dff}"/>
+        <map pad="{caec7773-5bfc-4b5b-b3eb-4ba251c115ea}" signal="{2ed48e4f-9da9-4edf-b1b2-b816dda886b4}"/>
+    </pad_signal_map>
+</component>

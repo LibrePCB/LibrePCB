@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{29a2fe19-7115-49cb-9d31-05199beee120}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">OSTAR_4-</name>
+        <description locale="en_US">&lt;b>OSTAR - Lighting with / without Optics&lt;/b>&lt;p>
+Source: http://catalog.osram-os.com/media/_en/Graphics/00035766_0.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: OSTAR_4-
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">LED</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{8579e339-fe84-4714-868f-83ba78625545}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{7d0c795d-a6af-4c21-941d-a8f2aa83cbea}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{86f5d68b-e437-4b9f-a555-0daaeeaae6d7}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{f423f299-7b88-42d3-8923-fdf31ff6723a}" suffix="" symbol="{d071a2af-5421-4b65-9931-4841d07f8e43}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{f5604311-0ba1-497d-b330-6d067d6845ba}" signal="{8579e339-fe84-4714-868f-83ba78625545}"/>
+                        <map display="gen_comp_signal" pin="{da559c3d-908a-4d5e-bb95-64b65bf19f1f}" signal="{7d0c795d-a6af-4c21-941d-a8f2aa83cbea}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

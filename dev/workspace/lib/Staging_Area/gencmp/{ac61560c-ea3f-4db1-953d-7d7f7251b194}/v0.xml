@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{ac61560c-ea3f-4db1-953d-7d7f7251b194}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:45Z</created>
+        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <name locale="en_US">HC49GW</name>
+        <description locale="en_US">&lt;b>CRYSTAL&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: HC49GW
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">Q</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{84f94535-d10f-4c11-b29d-3e7d2f854bb5}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{b1173e21-702d-4a05-a6dc-7ff382af41ed}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{9c3ed1bf-5dff-4713-98db-96fb385a1c81}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">3</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{e185870a-0d1c-4501-bed6-5eff2d59afc1}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{cb2d9e09-0047-4a5f-8a47-fa6957b98990}" suffix="" symbol="{52e2bffc-3e84-4f56-9f21-86ac2bc9a806}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{cbab18c8-3bed-4f93-91a6-7577e958aa81}" signal="{84f94535-d10f-4c11-b29d-3e7d2f854bb5}"/>
+                        <map display="gen_comp_signal" pin="{060e8a02-9eea-4564-9713-68785429a1ac}" signal="{b1173e21-702d-4a05-a6dc-7ff382af41ed}"/>
+                        <map display="gen_comp_signal" pin="{5ca0b351-1d63-450c-bacc-53d1fd51b500}" signal="{9c3ed1bf-5dff-4713-98db-96fb385a1c81}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

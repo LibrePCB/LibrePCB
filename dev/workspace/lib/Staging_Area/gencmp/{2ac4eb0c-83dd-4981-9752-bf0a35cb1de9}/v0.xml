@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{2ac4eb0c-83dd-4981-9752-bf0a35cb1de9}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">ACULED-RGB</name>
+        <description locale="en_US">&lt;b>ACULED&lt;/b>&lt;p>
+Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_ACULED.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: ACULED-RGB
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">LED</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{fae27c07-701a-4162-8869-3234d21bf0ae}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">BA</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{b69d8fa1-7f50-4d8c-a664-5d38e97c64d9}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">BC</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{db2f32d0-661d-406e-b40a-6048ef6525b8}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">GA</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{40d2dc95-5d9c-4516-8b9c-7a437b87af58}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">GC</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{49bc6b0e-34a3-4f93-a54f-0132cd462725}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">RA</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{58d7bc7a-1736-4026-813a-696fc432eaa3}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">RC</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{542f0103-5775-4c88-ad06-7b037f0b9502}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{c3b8f780-faab-4db9-a096-cc9b18648cee}" suffix="A" symbol="{2f39ab1f-7628-46bd-955f-f3aadab687de}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{4da6de02-1baa-4ab7-9aa6-a3257acdb641}" signal="{b69d8fa1-7f50-4d8c-a664-5d38e97c64d9}"/>
+                        <map display="gen_comp_signal" pin="{4b820d0d-2ee3-40f3-a387-3b8fa5065d17}" signal="{40d2dc95-5d9c-4516-8b9c-7a437b87af58}"/>
+                        <map display="gen_comp_signal" pin="{d5f88410-aa4b-4807-b87e-13c019d542d4}" signal="{58d7bc7a-1736-4026-813a-696fc432eaa3}"/>
+                        <map display="gen_comp_signal" pin="{8ffb447c-7225-4e7a-9027-cc917db6fe17}" signal="{fae27c07-701a-4162-8869-3234d21bf0ae}"/>
+                        <map display="gen_comp_signal" pin="{72da4047-10ee-4859-84c6-839a0647c6c5}" signal="{db2f32d0-661d-406e-b40a-6048ef6525b8}"/>
+                        <map display="gen_comp_signal" pin="{9bab3b5b-22a2-41aa-be7c-5a1f88585db9}" signal="{49bc6b0e-34a3-4f93-a54f-0132cd462725}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

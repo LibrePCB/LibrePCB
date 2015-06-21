@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{0a0ed9a2-3a21-44c3-82bf-8afe7966a8bc}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">FX08-11</name>
+        <description locale="en_US">&lt;b>Kingbright 20mm (0.8Inch) Single Digit Numeric Display&lt;/b>&lt;p>
+Source: SA08-11SRWA.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: FX08-11
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{0b5cc5f6-2ccc-4f3a-853a-998b0bd5e733}</generic_component>
+        <package>{df2bdc73-136c-4bd9-8fe6-eb0a85e0b165}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{a326d2f6-6f0b-4975-85b6-8f2a3e457364}" signal="{c354e08d-c434-414d-9c46-5b3cffbd324e}"/>
+        <map pad="{17cf0b5a-2551-4492-b79b-b31ba7652d67}" signal="{27e0573a-edcd-4bf8-97d5-5b401cc18a55}"/>
+        <map pad="{8b9c9087-cd4a-4deb-9993-a05005c5eb73}" signal="{60cc524f-b298-462b-8721-0268075b3966}"/>
+        <map pad="{17474775-fa8d-4736-a52f-7fb2ed546334}" signal="{277ad575-32b6-43ec-8013-c57b2681b528}"/>
+        <map pad="{2416befa-5266-494b-83c7-ea09096befb3}" signal="{220077de-0919-4091-89c9-6c4c102c08ac}"/>
+        <map pad="{b29ed638-cd0a-4d9b-a3f4-eb0324d3f681}" signal="{83b5e050-da34-40ac-b2bd-2f3f01eca22a}"/>
+        <map pad="{42aa390a-5e53-4472-ac1c-8cfc594c75f9}" signal="{1d80f114-cf28-4ff4-82de-5cd34c148d1a}"/>
+        <map pad="{a6eb001e-eb5e-4ae6-9883-d5b6298dee59}" signal="{a0afa34a-e10c-43d1-9a67-27035ca06234}"/>
+        <map pad="{a882c1cc-2edb-4917-b62e-9fe14cc75b58}" signal="{332fd13a-f00d-4b90-9659-f4c783534d04}"/>
+        <map pad="{26a7cc81-06ad-42e1-a7e2-472c385136f8}" signal="{fb4fb4d9-5e2d-46a9-adab-4ba380cb85e3}"/>
+        <map pad="{127ee827-fcde-4c56-8814-04e4ad50aafa}" signal="{f8e340ed-aec4-4392-84f0-6d8078fc9945}"/>
+        <map pad="{1ac31884-6159-4824-a4a5-e2f22d42c38f}" signal="{77bc6923-0237-40e4-9101-7d47c2a7c443}"/>
+        <map pad="{9252fbd8-0888-4f0e-b12f-dfd9732ca61a}" signal="{780a5a31-4f3e-4f12-af45-94261e20a0ed}"/>
+    </pad_signal_map>
+</component>

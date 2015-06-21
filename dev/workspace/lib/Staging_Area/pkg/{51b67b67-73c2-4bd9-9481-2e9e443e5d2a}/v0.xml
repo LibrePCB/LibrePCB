@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{51b67b67-73c2-4bd9-9481-2e9e443e5d2a}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">LD260</name>
+        <description locale="en_US">&lt;B>LED&lt;/B>&lt;p>
+5 mm, square, Siemens
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: LD260
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{093f476f-3d5a-4874-9bef-8ce25e7564f8}</footprint>
+    </meta>
+    <categories/>
+</package>

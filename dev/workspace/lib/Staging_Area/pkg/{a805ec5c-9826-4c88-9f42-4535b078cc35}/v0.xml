@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{a805ec5c-9826-4c88-9f42-4535b078cc35}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:33Z</created>
+        <last_modified>2015-06-21T12:37:33Z</last_modified>
+        <name locale="en_US">RTRIMTSM53YL</name>
+        <description locale="en_US">&lt;b>Trimm resistor&lt;/b> VISHAY&lt;p>
+abgedichtet nach &lt;b>IP67&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: RTRIMTSM53YL
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{4449c067-0515-471e-872b-ef9e8b391ff6}</footprint>
+    </meta>
+    <categories/>
+</package>

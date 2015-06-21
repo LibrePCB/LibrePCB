@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{616b0129-cb55-4894-8cb8-bc72c87573f0}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">SANYO-OSCON_F8</name>
+        <description locale="en_US">&lt;b>SANYO OSCON Capacitor&lt;/b>&lt;p>
+Source: e_os_all.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: SANYO-OSCON_F8
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="170" start_x="-3.600000" start_y="3.200000" fill="false" width="0.203200">
+            <segment end_x="-3.600000" end_y="-3.250000" angle="0.000000"/>
+            <segment end_x="-4.850000" end_y="0.000000" angle="0.000000"/>
+            <segment end_x="-3.600000" end_y="3.200000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-2.540000" y="1.905000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-2.540000" y="-3.175000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+        <ellipse radius_x="4.900000" x="0.000000" radius_y="4.900000" grab_area="true" y="0.000000" layer="170" rotation="0.000000" fill="false" width="0.203200"/>
+    </geometry>
+    <pads>
+        <pad height="1.270000" x="2.500000" drill="0.700000" uuid="{e190c7c3-b1b7-4daa-8117-e6475ed4ff98}" y="0.000000" rotation="90.000000" layer="0" width="1.270000" type="tht_round">
+            <name locale="en_US">+</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.270000" x="-2.500000" drill="0.700000" uuid="{a7336070-d8e8-4a1f-8dca-4b948ff6a21c}" y="0.000000" rotation="90.000000" layer="0" width="1.270000" type="tht_round">
+            <name locale="en_US">-</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{4cf54ec3-7a1b-4ec9-8430-d31d70d955b8}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:35Z</created>
+        <last_modified>2015-06-21T12:37:35Z</last_modified>
+        <name locale="en_US">1812X7R</name>
+        <description locale="en_US">&lt;b>Chip Monolithic Ceramic Capacitors&lt;/b> Medium Voltage High Capacitance for General Use&lt;p>
+Source: http://www.murata.com .. GRM43DR72E224KW01.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: 1812X7R
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="110" start_x="-1.100000" start_y="1.500000" fill="false" width="0.203200">
+            <segment end_x="1.100000" end_y="1.500000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="1.100000" start_y="-1.500000" fill="false" width="0.203200">
+            <segment end_x="-1.100000" end_y="-1.500000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-0.600000" start_y="1.500000" fill="false" width="0.203200">
+            <segment end_x="0.600000" end_y="1.500000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="0.600000" start_y="-1.500000" fill="false" width="0.203200">
+            <segment end_x="-0.600000" end_y="-1.500000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-1.400000" start_y="-1.600000" fill="true" width="0.000000">
+            <segment end_x="-1.100000" end_y="-1.600000" angle="0.000000"/>
+            <segment end_x="-1.100000" end_y="1.600000" angle="0.000000"/>
+            <segment end_x="-1.400000" end_y="1.600000" angle="0.000000"/>
+            <segment end_x="-1.400000" end_y="-1.600000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="1.100000" start_y="-1.600000" fill="true" width="0.000000">
+            <segment end_x="1.400000" end_y="-1.600000" angle="0.000000"/>
+            <segment end_x="1.400000" end_y="1.600000" angle="0.000000"/>
+            <segment end_x="1.100000" end_y="1.600000" angle="0.000000"/>
+            <segment end_x="1.100000" end_y="-1.600000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-1.945600" y="1.995800" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-1.945600" y="-3.773800" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="3.500000" x="-1.425000" drill="0.000000" uuid="{a6314793-a43e-4349-b8e1-a43f91a9b5b5}" y="0.000000" rotation="0.000000" layer="200" width="0.800000" type="smd_rect">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="3.500000" x="1.425000" drill="0.000000" uuid="{0663f85c-f15f-477b-bd4b-189fff4aa23b}" y="0.000000" rotation="-180.000000" layer="200" width="0.800000" type="smd_rect">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

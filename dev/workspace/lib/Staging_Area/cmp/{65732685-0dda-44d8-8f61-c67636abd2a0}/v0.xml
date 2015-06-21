@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{65732685-0dda-44d8-8f61-c67636abd2a0}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">MBR3035CT</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+dual barrier rectifier, 30 A, 30 V, common cathode
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: MBR3035CT
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{b26f31c6-5b17-4712-bc80-63e72657cd14}</generic_component>
+        <package>{55ce9a0d-3733-45ec-bece-4aeec4574147}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{5bd4677e-7f33-4ce6-b363-8760228a318c}" signal="{a60ca82d-dba8-4697-8fd2-00273367ee22}"/>
+        <map pad="{7c732d0f-a638-4c5a-9ada-ec0f875c72e2}" signal="{7fabd9c5-cc91-4bca-862e-b63bfe44e4ed}"/>
+        <map pad="{9bad5c27-bdd5-4a89-8248-0d7e8be4f473}" signal="{4730d1c4-56fa-467e-95f4-59ab674a0b94}"/>
+        <map pad="{a8b47f68-b907-4dec-b020-c63a23d42065}" signal="{a60ca82d-dba8-4697-8fd2-00273367ee22}"/>
+    </pad_signal_map>
+</component>

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{b49b397d-343c-4f68-bb09-03d6e3b972df}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:38Z</created>
+        <last_modified>2015-06-21T12:37:38Z</last_modified>
+        <name locale="en_US">DO27Z15</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+diameter 5 mm, horizontal, grid 15.24 mm
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: DO27Z15
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{7d636d87-ab64-4aba-8ed0-bf66e5d6180a}</footprint>
+    </meta>
+    <categories/>
+</package>

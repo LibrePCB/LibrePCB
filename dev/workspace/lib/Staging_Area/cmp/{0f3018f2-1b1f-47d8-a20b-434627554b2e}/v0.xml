@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{0f3018f2-1b1f-47d8-a20b-434627554b2e}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:44Z</created>
+        <last_modified>2015-06-21T12:37:44Z</last_modified>
+        <name locale="en_US">FE07-2W</name>
+        <description locale="en_US">&lt;b>FEMALE HEADER&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: con-lsta.lbr
+Name: FE07-2W
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{2b3cbb2b-0c07-4443-b473-90193b890f9d}</generic_component>
+        <package>{946e3f73-42f1-49dd-a311-e40d404b943d}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{a1a9b643-9699-4ac1-94db-7613926160c8}" signal="{d848f653-06eb-44ff-be2c-1b63245f005e}"/>
+        <map pad="{b30ef70a-1fe9-46bc-bd13-628295e72726}" signal="{3fa3ad8b-f847-4729-bacf-a935ab879120}"/>
+        <map pad="{b6fa1a8d-088c-4289-9f38-310691348ee0}" signal="{7a726aee-8160-404c-8d67-b1a8c6f14231}"/>
+        <map pad="{ff41892c-0f80-444e-aeb9-e0969bf08be1}" signal="{16e98453-296a-4182-9062-dd0f84357bad}"/>
+        <map pad="{fd763b13-b417-4c02-8d15-f88d71ae614e}" signal="{36937966-9dfd-423b-9649-af481a9abc83}"/>
+        <map pad="{e775a096-0227-4c7f-b6fe-0990da3e90d5}" signal="{3ef1fadb-9bc0-4b8a-b94a-00f546a3835b}"/>
+        <map pad="{7dd06c73-c9f9-4a6c-864a-dd54341f449d}" signal="{7a284417-8652-43a5-bbf8-5abe221b489d}"/>
+        <map pad="{400ee43a-ef50-438c-afa0-c292da296199}" signal="{41e2b21e-7c72-4657-b1f4-0c66b94283ac}"/>
+        <map pad="{290ab716-4c9d-48d1-9b48-cf7fdc107f5c}" signal="{76093570-4f58-4a79-976b-5875cc222536}"/>
+        <map pad="{d0e0209d-114b-4587-8f5c-661455d4d514}" signal="{00400ffe-30d2-4392-b216-4eb186e0514c}"/>
+        <map pad="{b899f217-6ae1-43e1-b2dd-0f8b73fede5d}" signal="{6a6ff48a-5c86-4fc5-8c62-654bbbd3b7fa}"/>
+        <map pad="{340b4aca-6936-4d4d-8d4e-b2f8390624aa}" signal="{76af4c1a-cd2f-44f3-8ded-9c42a2d967c8}"/>
+        <map pad="{f27b11b6-7bc8-4f1b-8f87-0fab5f020974}" signal="{9869a321-169d-47dc-9b8a-8a8af75c03ff}"/>
+        <map pad="{d6a94b47-d076-4340-bdd8-f6517c8a81c1}" signal="{5bab6297-e325-4db5-8c75-0ecaa450d58f}"/>
+    </pad_signal_map>
+</component>

@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{2e1fc649-4f8a-4268-9ad7-1b6fdbe18c96}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:37Z</created>
+        <last_modified>2015-06-21T12:37:37Z</last_modified>
+        <name locale="en_US">DIL08S</name>
+        <description locale="en_US">&lt;b>CRYSTAL RESONATOR&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: DIL08S
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{e4f27893-82c3-47ea-a464-f401adce9a49}</footprint>
+    </meta>
+    <categories/>
+</package>

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{0cf9a027-c4e6-4659-ac87-300b082c62bc}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:32Z</created>
+        <last_modified>2015-06-21T12:37:32Z</last_modified>
+        <name locale="en_US">P0817V</name>
+        <description locale="en_US">&lt;b>RESISTOR&lt;/b>&lt;p>
+type 0817, grid 6.35 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: P0817V
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{8ad212af-40b1-4046-afdb-8902ac35f873}</footprint>
+    </meta>
+    <categories/>
+</package>

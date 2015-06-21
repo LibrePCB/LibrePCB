@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{5ebaaadf-b424-4596-b374-7a4a2d2337bf}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">BYW96</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+fast soft-recovery rectifier
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BYW96
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{20f984b3-551a-44b1-b8b2-022443640543}</generic_component>
+        <package>{d8dbdba0-36a4-43fe-9f71-e664fef83ced}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{f7f1a59e-d03e-434a-9353-0aae541bb27a}" signal="{99204de6-f727-411e-97d4-1fe34b90c500}"/>
+        <map pad="{e2a71a3a-bb3c-401d-bb5c-edef66a15488}" signal="{aac587b3-19cb-46ba-b976-cfb7e1c82b3d}"/>
+    </pad_signal_map>
+</component>

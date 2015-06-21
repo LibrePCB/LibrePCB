@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{291691ff-693c-4973-8ec6-93aa0888b35b}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">15KEXXC</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: 15KEXXC
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{06ccf6ed-cde6-4a6b-b534-e97466a2b089}</generic_component>
+        <package>{0fd6ce12-dcb8-49f1-a4eb-9b3ce35b6d45}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{5d9c41b5-51e3-48d9-b7c3-d88c785b76ba}" signal="{e890ef8d-02b4-49eb-87b2-63aa76a2ef4d}"/>
+        <map pad="{2937d965-3380-4221-be61-e38b508b6a08}" signal="{4701d7cc-3273-4653-b495-1dbc07892069}"/>
+    </pad_signal_map>
+</component>

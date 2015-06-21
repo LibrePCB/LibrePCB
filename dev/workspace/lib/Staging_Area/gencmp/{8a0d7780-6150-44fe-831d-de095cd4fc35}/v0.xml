@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{8a0d7780-6150-44fe-831d-de095cd4fc35}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:45Z</created>
+        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <name locale="en_US">FA-</name>
+        <description locale="en_US">&lt;b>MHz RANGE CRYSTAL UNIT&lt;/b> &lt;p>
+Source: Epson Toyocom
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: FA-
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">Q</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{39e183fe-cab8-431b-9168-df821178568d}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{f1ff2237-ffbb-4f15-b22f-b2d30d9eaadc}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{32ba994d-e39e-4b2b-9773-0db4e40fdc49}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">3</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{9afbbeb7-632f-47a4-a071-135ce58eaf11}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">4</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{a91b9c8f-dc37-49de-9d2f-d02a687f14bc}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{d6f333c8-d5f5-4e9a-bea7-893662833f70}" suffix="" symbol="{a909fd73-ff6e-489a-9062-f816b26d5094}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{71358fb5-0c95-491a-9ee8-165ebe8411fc}" signal="{f1ff2237-ffbb-4f15-b22f-b2d30d9eaadc}"/>
+                        <map display="gen_comp_signal" pin="{c22d2d34-fb10-4182-9e99-ee7e7f98d00b}" signal="{9afbbeb7-632f-47a4-a071-135ce58eaf11}"/>
+                        <map display="gen_comp_signal" pin="{1853f7e7-7649-4df8-830f-16b3e5845af2}" signal="{32ba994d-e39e-4b2b-9773-0db4e40fdc49}"/>
+                        <map display="gen_comp_signal" pin="{ba76e64f-63d0-47d0-bcab-180c52799484}" signal="{39e183fe-cab8-431b-9168-df821178568d}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

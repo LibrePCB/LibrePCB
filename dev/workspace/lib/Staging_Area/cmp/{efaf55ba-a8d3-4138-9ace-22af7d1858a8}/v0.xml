@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{efaf55ba-a8d3-4138-9ace-22af7d1858a8}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">LB10</name>
+        <description locale="en_US">&lt;B>LED BLOCK&lt;/B>&lt;p>
+10-LED bar graph, DIL, Siemens
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: LB10
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{99e6caba-6788-4ea0-9eb1-8aed9132552e}</generic_component>
+        <package>{de0fd445-209b-4a4b-8439-b188cfe97178}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{0f3aebda-5636-4ebe-ad60-e30ef721b0f4}" signal="{9439da21-99cd-4583-b8d7-cf9d63db1ec5}"/>
+        <map pad="{bc1a6040-fe33-454d-95fb-9b5d4ccf3269}" signal="{02168dbc-0707-4d30-b040-658811d2d033}"/>
+        <map pad="{6e2b4cda-6376-4264-af6a-dd5166d494f3}" signal="{fc568277-a822-4437-9411-7700bd146b11}"/>
+        <map pad="{83f31479-70ea-42f7-b409-2cdd303e4fc7}" signal="{a5d03108-807d-463c-b445-05d039b48a48}"/>
+        <map pad="{0aa165ec-b56e-4339-83ad-ab1c90a75c9d}" signal="{d0028124-40a1-4dd4-b590-7f69f415d7fc}"/>
+        <map pad="{d5be896b-58ef-4465-8372-9ce6bc38abbb}" signal="{af9a69c7-6d5b-4304-ad46-8f64e727f240}"/>
+        <map pad="{c821b90b-89a3-4010-88eb-fda64618e7dd}" signal="{1d4ee8c3-f25a-4214-bf25-581f75353a5b}"/>
+        <map pad="{12310ec4-c83e-410c-98e9-52851d518f47}" signal="{2d3832cd-6383-4fc9-8069-9b5e3f664355}"/>
+        <map pad="{4e351549-2d18-4611-9153-2854224f1e37}" signal="{aa0befa1-2fbb-4ab4-a22e-31795d4aa139}"/>
+        <map pad="{c1b77eaf-a55e-481a-98d5-7e29d0ddb607}" signal="{f6741647-e571-4772-a841-4c3204ee98c6}"/>
+        <map pad="{b85f6086-f7e6-4435-9eb1-0905ba8e3aa6}" signal="{2b703baa-2d30-4027-ba89-fed00b4c1651}"/>
+        <map pad="{9b150609-051b-4ff4-8db2-f5c0adefa742}" signal="{0979ca36-731a-41e7-9d83-1d5f0666a97c}"/>
+        <map pad="{c53c8dc5-ab3f-4ac6-b03e-a02474041008}" signal="{e447ae87-04a7-4b09-98d8-dc8636bab562}"/>
+        <map pad="{2530c5b6-7cc7-4306-a663-095d0cce18e5}" signal="{78a58f73-fd08-4bf2-a97e-8bcabc76b6ab}"/>
+        <map pad="{d4cc3a3f-d0c2-4dfa-ab4d-2cad28359f47}" signal="{bf6cf9df-f95f-4d78-a7cf-2ec860ca52d9}"/>
+        <map pad="{3f7cfaf2-d993-4352-818f-9aae68c76845}" signal="{031ff0bc-6ec9-4db7-b2d4-14c826ca7dd7}"/>
+        <map pad="{2578dfd4-aae0-4327-9913-660948be11b7}" signal="{1373f628-bddd-41c9-b293-49aa14159e65}"/>
+        <map pad="{250482de-0ccc-41da-bdff-c3603868024c}" signal="{6bfa4b28-0d40-4ca2-9286-698ba59f0f83}"/>
+        <map pad="{26865893-eaed-4670-8035-612afafb202a}" signal="{068c27ba-6833-49cc-aacb-e4934f79fe30}"/>
+        <map pad="{f824cbd7-1a0b-4643-a13d-b77985a8431f}" signal="{cbd54d8a-976e-4177-88d5-d174e168554e}"/>
+    </pad_signal_map>
+</component>

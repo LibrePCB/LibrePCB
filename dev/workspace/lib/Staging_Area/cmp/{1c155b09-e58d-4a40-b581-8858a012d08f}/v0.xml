@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{1c155b09-e58d-4a40-b581-8858a012d08f}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">LZ1-00WW05</name>
+        <description locale="en_US">&lt;b>High Luminous Efficacy 5W Warm White LED&lt;/b>&lt;p>
+Source: http://www.ledengin.com/products/5wLZ/LZ1-00WW05.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: LZ1-00WW05
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{3ece8463-3248-49e1-a93a-9d2938ffd84b}</generic_component>
+        <package>{a819a286-39ff-4fa2-bf95-a96c3dcb5a37}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{be51f5d0-fed4-453b-bfc2-abef65048bf4}" signal="{e30f4fe5-8ae6-4a3c-9a57-7593a6c55729}"/>
+        <map pad="{5f3e1d22-a07e-4b0c-8415-0f3f5e87c06f}" signal="{9da8ad7d-85f1-40c7-ae9b-5eb330f708c2}"/>
+        <map pad="{08d91260-f8fb-41ea-873e-79ea42907aeb}" signal="{9da8ad7d-85f1-40c7-ae9b-5eb330f708c2}"/>
+        <map pad="{b26d594b-ceb9-47ac-bcbc-470413c4ec49}" signal="{e30f4fe5-8ae6-4a3c-9a57-7593a6c55729}"/>
+        <map pad="{dae3505e-2fa4-448a-bd63-8a404b3ef2a4}" signal="{e30f4fe5-8ae6-4a3c-9a57-7593a6c55729}"/>
+    </pad_signal_map>
+</component>

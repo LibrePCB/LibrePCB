@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{6d893aea-7c00-43e2-acd1-60edd788e228}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">GM1WA55311A</name>
+        <description locale="en_US">&lt;b>Chip LED RGB&lt;/b>&lt;p>
+Source: http://document.sharpsma.com/files/GM1WA55311A_SS.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: GM1WA55311A
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{e5e4fb8c-4e61-4185-a2ae-1a36a2df14bc}</footprint>
+    </meta>
+    <categories/>
+</package>

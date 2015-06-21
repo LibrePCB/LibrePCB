@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{2452b4f2-2c4c-40f2-8199-53658e64465c}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">BR220</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+double diode
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BR220
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{c394f834-c11d-4735-9d06-845a98068e3f}</generic_component>
+        <package>{535701cc-a0b8-467c-8c8a-9b8eed521eb7}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{a7e1f118-c69b-4361-a0ab-94c4d52d82b8}" signal="{489091e2-2c81-4c65-becb-5818c7fc1fff}"/>
+        <map pad="{addf4bfc-c4e8-404e-8b45-ff935c7984fa}" signal="{7d6e7aa6-7f10-4117-975a-2d7118c208b2}"/>
+        <map pad="{5bbc257f-8777-4110-9b7e-37705432768f}" signal="{0c0e3e53-2d4b-4e4d-909e-c362f6959076}"/>
+    </pad_signal_map>
+</component>

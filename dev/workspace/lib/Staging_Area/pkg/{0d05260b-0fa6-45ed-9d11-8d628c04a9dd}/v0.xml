@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{0d05260b-0fa6-45ed-9d11-8d628c04a9dd}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:37Z</created>
+        <last_modified>2015-06-21T12:37:37Z</last_modified>
+        <name locale="en_US">CTS406</name>
+        <description locale="en_US">&lt;b>Model 406 6.0x3.5mm Low Cost Surface Mount Crystal&lt;/b>&lt;p>
+Source: 008-0260-0_E.pdf
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: CTS406
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{700839dc-a968-42bf-a92f-e808905006d5}</footprint>
+    </meta>
+    <categories/>
+</package>

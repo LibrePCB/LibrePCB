@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{592771e2-e4fd-45a7-a390-34aeaa4d01c7}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:45Z</created>
+        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <name locale="en_US">ECS-</name>
+        <description locale="en_US">&lt;b>CRYSTAL FILTERS&lt;/b>&lt;p>
+Source: http://www.presto.co.uk
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: ECS-
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{7ea3bae2-3614-4625-ac81-f8e5aca2e994}</generic_component>
+        <package>{19d16e7d-cd59-4f3c-bfc1-f9cfca8c8940}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{d557bfbe-fb35-4610-bb03-99ae693b1c21}" signal="{8034606a-7de2-42eb-b352-1fe57d86a889}"/>
+        <map pad="{2ee9c614-1380-4ea7-8376-7e8ed1f282cc}" signal="{d18a0439-5175-4391-a0b7-a4ec019b70e3}"/>
+        <map pad="{8b53283b-bd6e-490a-9cd6-627e0da9b8d0}" signal="{7f4a670b-5401-40a9-8b5b-be5e4c36f66a}"/>
+        <map pad="{c47a358f-cfaf-4ef0-bf26-64a1de29eb9d}" signal="{0260fdb1-7ca1-4eea-8394-5bd0b73504ad}"/>
+        <map pad="{931e3e8d-ea12-476e-9240-fe887eabab47}" signal="{c1ca4751-3186-4253-90de-b8080a1f6641}"/>
+        <map pad="{f9357b82-c553-4076-a029-5b72f78ff885}" signal="{8034606a-7de2-42eb-b352-1fe57d86a889}"/>
+    </pad_signal_map>
+</component>

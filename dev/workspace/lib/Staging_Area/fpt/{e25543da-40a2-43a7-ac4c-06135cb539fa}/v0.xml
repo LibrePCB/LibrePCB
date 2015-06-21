@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{e25543da-40a2-43a7-ac4c-06135cb539fa}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:33Z</created>
+        <last_modified>2015-06-21T12:37:33Z</last_modified>
+        <name locale="en_US">MINI_MELF-0102W</name>
+        <description locale="en_US">&lt;b>CECC Size RC2211&lt;/b> Wave Soldering&lt;p>
+source Beyschlag
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: MINI_MELF-0102W
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="110" start_x="1.000000" start_y="0.500000" fill="false" width="0.203200">
+            <segment end_x="1.000000" end_y="-0.500000" angle="0.000000"/>
+            <segment end_x="-1.000000" end_y="-0.500000" angle="0.000000"/>
+            <segment end_x="-1.000000" end_y="0.500000" angle="0.000000"/>
+            <segment end_x="1.000000" end_y="0.500000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-1.270000" y="0.952500" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-1.270000" y="-2.222500" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="1.300000" x="0.950000" drill="0.000000" uuid="{a62aac32-e926-4771-a4b1-27a7332b315b}" y="0.000000" rotation="0.000000" layer="200" width="0.600000" type="smd_rect">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.300000" x="-0.950000" drill="0.000000" uuid="{7d84d095-795d-40af-bcc0-9f0378d403df}" y="0.000000" rotation="0.000000" layer="200" width="0.600000" type="smd_rect">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

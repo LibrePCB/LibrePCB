@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{53c3eb73-dc62-483c-a937-53cf0218c276}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:45Z</created>
+        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <name locale="en_US">10M?D</name>
+        <description locale="en_US">&lt;b>Monolithic Crystal Filters&lt;/b>&lt;p>
+Source: www.vanlong.com
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: 10M?D
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{a2718df5-c892-4f23-a000-0bf21f976215}</generic_component>
+        <package>{9d7a6c27-3aca-411e-8d55-26482f1150f6}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{b7a87283-e104-4c4f-bde6-b1dee3379b53}" signal="{a6198c0a-6929-4df9-99a1-78facbf95611}"/>
+        <map pad="{109755da-c569-4792-a900-2986ed145519}" signal="{a07a161f-a840-4207-8e64-31bcea19edeb}"/>
+        <map pad="{e255fd58-e30c-42ce-8ac5-100ce4b9bbaf}" signal="{851cda41-933d-4827-bef5-c460f7e7c531}"/>
+        <map pad="{14fd3bde-ae50-4af0-9492-eab4348d7f36}" signal="{fea04e3a-cb5b-4ae2-ad4a-70b4a1fa2d63}"/>
+        <map pad="{4fe7c2ce-cd3f-41b8-8d38-9667dc71f011}" signal="{851cda41-933d-4827-bef5-c460f7e7c531}"/>
+        <map pad="{e0c2b4f5-e8e7-4d2b-a23c-26818de81fa5}" signal="{43b84f7d-1929-4726-a28d-88b1de319c86}"/>
+    </pad_signal_map>
+</component>

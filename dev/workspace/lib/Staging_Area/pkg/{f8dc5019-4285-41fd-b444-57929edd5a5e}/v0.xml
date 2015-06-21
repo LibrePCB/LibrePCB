@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{f8dc5019-4285-41fd-b444-57929edd5a5e}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">SOD123</name>
+        <description locale="en_US">&lt;b>Diode&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: SOD123
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{d59d066d-b3aa-4a00-9a58-f967a8e56bab}</footprint>
+    </meta>
+    <categories/>
+</package>

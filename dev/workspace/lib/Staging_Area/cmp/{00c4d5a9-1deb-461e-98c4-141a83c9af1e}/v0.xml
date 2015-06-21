@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{00c4d5a9-1deb-461e-98c4-141a83c9af1e}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">*W51M-TH</name>
+        <description locale="en_US">&lt;b>Golden DRAGON® with Lens&lt;/b> Enhanced Thinfilm LED&lt;p>
+Source: LA_LR_LY_W51M_Pb_free[1].pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: *W51M-TH
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{2e41d6e6-e33a-419a-88d9-78647b0cdcd3}</generic_component>
+        <package>{0ac81c5c-c529-4ac3-b3eb-0f01e54f7b83}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{633895a3-06d7-4cdf-8885-1915e9f39cc4}" signal="{abee0c8b-dd3c-4311-8bd5-5dbc2210d5a1}"/>
+        <map pad="{74e37c38-4f4d-41ef-9551-3dce564e912e}" signal="{fb3121f5-f379-4494-9f8b-ad2738f8a8c7}"/>
+        <map pad="{0895c269-8f9d-4851-8799-44a2e78ab212}" signal="{f74b51e7-fa7d-40e9-9642-b058067cfc23}"/>
+        <map pad="{17b7d230-fefa-46f1-9af7-89e3435117a8}" signal="{f74b51e7-fa7d-40e9-9642-b058067cfc23}"/>
+        <map pad="{2b6587f4-c489-49b3-b910-c5cb9fc42078}" signal="{f74b51e7-fa7d-40e9-9642-b058067cfc23}"/>
+        <map pad="{5eeae2ae-f1a1-403b-9719-9178c58af620}" signal="{f74b51e7-fa7d-40e9-9642-b058067cfc23}"/>
+        <map pad="{60162bbe-3fb8-4685-b4fa-b1aa35d16e90}" signal="{f74b51e7-fa7d-40e9-9642-b058067cfc23}"/>
+        <map pad="{763eda18-4650-4cd3-a1a3-069e9ad3ec0d}" signal="{f74b51e7-fa7d-40e9-9642-b058067cfc23}"/>
+        <map pad="{12d8fb43-2581-4cb5-a225-02955b6a0153}" signal="{f74b51e7-fa7d-40e9-9642-b058067cfc23}"/>
+        <map pad="{33b247ea-471b-47d3-a079-3a8a253e2640}" signal="{f74b51e7-fa7d-40e9-9642-b058067cfc23}"/>
+        <map pad="{ddcb0510-b0ef-48ea-9c1f-7c94237f68b0}" signal="{f74b51e7-fa7d-40e9-9642-b058067cfc23}"/>
+        <map pad="{6cd5df09-e125-448d-b995-785b3d2fbf6d}" signal="{f74b51e7-fa7d-40e9-9642-b058067cfc23}"/>
+        <map pad="{41e502a9-5df3-4480-9f16-2c24634666b0}" signal="{f74b51e7-fa7d-40e9-9642-b058067cfc23}"/>
+        <map pad="{c4714c73-96ee-4e26-a6f1-546eaf8f4934}" signal="{f74b51e7-fa7d-40e9-9642-b058067cfc23}"/>
+    </pad_signal_map>
+</component>

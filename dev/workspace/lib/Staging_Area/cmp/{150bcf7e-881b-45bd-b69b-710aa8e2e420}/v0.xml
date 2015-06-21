@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{150bcf7e-881b-45bd-b69b-710aa8e2e420}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:45Z</created>
+        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <name locale="en_US">90M15A</name>
+        <description locale="en_US">&lt;b>Monolithic Crystal Filters&lt;/b>&lt;p>
+Source: www.vanlong.com
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: 90M15A
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{af4c69af-0df2-488e-ba8d-dcfacc41bc94}</generic_component>
+        <package>{a68aa489-0b6a-45e5-a7a4-880e43f63545}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{4f7d8962-be6a-402f-9829-5ff5f9af558c}" signal="{e314c38c-36cc-4f04-a054-6337e286065a}"/>
+        <map pad="{19d42c73-6102-482e-bba7-50cfeda56f04}" signal="{5b4ea9c1-5ad8-428d-8d39-12c4bf1228df}"/>
+        <map pad="{67c2f5d8-ff13-437e-a164-8b028726b47a}" signal="{e0843553-b07e-42af-bf73-88b8467f0ac1}"/>
+    </pad_signal_map>
+</component>

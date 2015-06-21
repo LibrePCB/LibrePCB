@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{b8b81505-281f-4f1a-a8c5-e1191c26cd2b}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">LED_OFF</name>
+        <description locale="en_US">&lt;B>LED OFF&lt;/B>
+Symbol for Silkscreen layer
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: LED_OFF
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{ea1575ca-8ab8-4a58-986f-1d2735f3342a}</footprint>
+    </meta>
+    <categories/>
+</package>

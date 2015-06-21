@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{e2f85c69-d8c2-47b7-8bb3-9de936a2db86}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:33Z</created>
+        <last_modified>2015-06-21T12:37:33Z</last_modified>
+        <name locale="en_US">RTRIMT18</name>
+        <description locale="en_US">&lt;b>Trimm resistor&lt;/b> VISHAY&lt;p>
+abgedichtet nach IP67
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: RTRIMT18
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{018c5fd2-f773-492d-96a2-1c5f0719e9b4}</footprint>
+    </meta>
+    <categories/>
+</package>

@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{040bc142-1044-447c-b3d8-eae65a6d0b87}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">BZY97</name>
+        <description locale="en_US">&lt;b>Z DIODE&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BZY97
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{a6c14a20-0f2e-46cc-b121-785629a62810}</generic_component>
+        <package>{8b7e8efc-9ab9-4b00-b02c-23fc6c9d491d}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{5b51e009-df99-47c7-9801-266693bafc85}" signal="{b68d32a3-32c7-4c6f-94f3-24e24594bbc3}"/>
+        <map pad="{a2ee811d-48df-4efb-9af1-77e839462579}" signal="{3a3350ed-e9fe-49bd-a0c3-13443d73b358}"/>
+    </pad_signal_map>
+</component>

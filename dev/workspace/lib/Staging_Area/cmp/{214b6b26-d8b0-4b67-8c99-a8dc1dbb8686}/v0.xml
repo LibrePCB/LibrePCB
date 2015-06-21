@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{214b6b26-d8b0-4b67-8c99-a8dc1dbb8686}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:42Z</created>
+        <last_modified>2015-06-21T12:37:42Z</last_modified>
+        <name locale="en_US">C-EU</name>
+        <description locale="en_US">&lt;B>CAPACITOR&lt;/B>, European symbol
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: C-EU
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{d167e0e3-6a92-4b76-b013-77b9c230e5f1}</generic_component>
+        <package>{d76cc5f3-da2e-4783-ae5b-11d15cb5ef6e}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{009b4018-934e-4a7b-acec-8ca08388c629}" signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
+        <map pad="{4c40991b-43af-4349-889e-87da63704797}" signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
+    </pad_signal_map>
+</component>

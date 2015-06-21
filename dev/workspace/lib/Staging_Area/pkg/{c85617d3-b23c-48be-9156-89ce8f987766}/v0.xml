@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{c85617d3-b23c-48be-9156-89ce8f987766}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:33Z</created>
+        <last_modified>2015-06-21T12:37:33Z</last_modified>
+        <name locale="en_US">CTRIMCTZ3</name>
+        <description locale="en_US">&lt;b>Trimm capacitor&lt;/b> AVX
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: CTRIMCTZ3
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{c62126ca-3d07-4d7b-9d3e-fe3a8cdcc1af}</footprint>
+    </meta>
+    <categories/>
+</package>

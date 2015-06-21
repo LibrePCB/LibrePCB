@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{5a5d1442-761a-4f14-bfd9-5c6c25cb5dd3}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">BYT51</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+silicon-mesa rectifier (Vishay Telefunken)
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BYT51
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{6f92556b-96c1-443b-8a6d-ade96b8a2bec}</generic_component>
+        <package>{c1e9adc2-ea2a-4cc9-8b36-27621626436f}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{995f593d-0563-450b-b604-36b12e18b340}" signal="{8a9ed2c4-a512-4642-aa19-e76619815e68}"/>
+        <map pad="{69c6a1c9-6265-455a-9c74-7af75ad20cdb}" signal="{3a842fe1-0e46-42fd-8563-86aaec43b489}"/>
+    </pad_signal_map>
+</component>

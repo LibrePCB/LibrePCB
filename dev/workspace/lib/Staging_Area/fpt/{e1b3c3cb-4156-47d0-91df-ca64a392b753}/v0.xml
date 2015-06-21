@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{e1b3c3cb-4156-47d0-91df-ca64a392b753}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:35Z</created>
+        <last_modified>2015-06-21T12:37:35Z</last_modified>
+        <name locale="en_US">WSC01/2</name>
+        <description locale="en_US">&lt;b>Wirewound Resistors, Precision Power&lt;/b>&lt;p>
+Source: VISHAY wscwsn.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: WSC01/2
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="170" start_x="-2.450000" start_y="1.475000" fill="false" width="0.203200">
+            <segment end_x="-2.450000" end_y="1.106000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-2.450000" start_y="-1.106000" fill="false" width="0.203200">
+            <segment end_x="-2.450000" end_y="-1.475000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="2.450000" start_y="1.106000" fill="false" width="0.203200">
+            <segment end_x="2.450000" end_y="1.475000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="2.450000" start_y="-1.475000" fill="false" width="0.203200">
+            <segment end_x="2.450000" end_y="-1.106000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="2.450000" start_y="1.475000" fill="false" width="0.203200">
+            <segment end_x="2.450000" end_y="-1.475000" angle="0.000000"/>
+            <segment end_x="-2.450000" end_y="-1.475000" angle="0.000000"/>
+            <segment end_x="-2.450000" end_y="1.475000" angle="0.000000"/>
+            <segment end_x="2.450000" end_y="1.475000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-2.544000" y="1.904000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-2.544000" y="-3.176000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="1.780000" x="2.100000" drill="0.000000" uuid="{154728aa-cd41-4cd8-b4c5-17a8a4096dd4}" y="0.000000" rotation="0.000000" layer="200" width="2.160000" type="smd_rect">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.780000" x="-2.100000" drill="0.000000" uuid="{2847d7a1-9049-4b87-8aa2-e379cdc1c8dd}" y="0.000000" rotation="0.000000" layer="200" width="2.160000" type="smd_rect">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

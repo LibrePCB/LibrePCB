@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{7a5da9df-7461-4e60-8e70-c563fd7abe46}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">FE2A</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: FE2A
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{39e0ab20-b1e0-4898-9f20-d2d8802cad7e}</generic_component>
+        <package>{989a4f41-7532-495d-80b8-ac5e9599ed0e}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{9ee4e8ad-adce-4bee-858d-7b8b6d869bec}" signal="{ee302da7-8ec6-49c6-aab1-9de1169673f8}"/>
+        <map pad="{576a42fd-ef66-431e-ba35-6a07d68ad094}" signal="{037dc38c-45ab-46c4-b706-e521da03287a}"/>
+    </pad_signal_map>
+</component>

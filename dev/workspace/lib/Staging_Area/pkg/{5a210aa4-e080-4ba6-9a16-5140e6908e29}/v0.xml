@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{5a210aa4-e080-4ba6-9a16-5140e6908e29}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:35Z</created>
+        <last_modified>2015-06-21T12:37:35Z</last_modified>
+        <name locale="en_US">TFI0510</name>
+        <description locale="en_US">&lt;b>Axial Conformal Coated Inductor&lt;/b>&lt;p>
+Source: TOP MAGNETICS CORPORATION .. tfi.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: TFI0510
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{d557088a-5fc1-4ca2-81aa-1704797ec7a9}</footprint>
+    </meta>
+    <categories/>
+</package>

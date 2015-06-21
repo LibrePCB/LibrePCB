@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{e6cc0801-6e65-40a7-a15e-1d77e8489966}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:38Z</created>
+        <last_modified>2015-06-21T12:37:38Z</last_modified>
+        <name locale="en_US">TOP3L</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+3-lead molded, horizontal
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: TOP3L
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{498846a6-b0ed-4d13-8a84-f7d0d396ae5c}</footprint>
+    </meta>
+    <categories/>
+</package>

@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{aaad5173-22ce-4f3c-8b5e-281c5c8a5a06}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:45Z</created>
+        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <name locale="en_US">21M*B</name>
+        <description locale="en_US">&lt;b>Monolithic Crystal Filters&lt;/b>&lt;p>
+Source: www.vanlong.com
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: 21M*B
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{64b7d8c4-18ca-4164-b141-e14bf07b98a3}</generic_component>
+        <package>{a68aa489-0b6a-45e5-a7a4-880e43f63545}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{4f7d8962-be6a-402f-9829-5ff5f9af558c}" signal="{5a50c128-d9f5-4025-b63d-bdba363ce5a0}"/>
+        <map pad="{19d42c73-6102-482e-bba7-50cfeda56f04}" signal="{0942b6e9-1001-4102-b1e8-364fb31b38c5}"/>
+        <map pad="{67c2f5d8-ff13-437e-a164-8b028726b47a}" signal="{be0e16ac-520d-49c4-b396-5542b7ca0218}"/>
+    </pad_signal_map>
+</component>

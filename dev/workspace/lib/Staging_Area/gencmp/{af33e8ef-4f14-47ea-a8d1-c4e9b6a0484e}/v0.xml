@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{af33e8ef-4f14-47ea-a8d1-c4e9b6a0484e}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">DIODE-2CA|AC</name>
+        <description locale="en_US">Dual &lt;b>DIODE&lt;/b> Cathode-Anode|Anode-Cathode
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: DIODE-2CA|AC
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">D</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{cd1a1d7e-b28b-4a06-bb29-bbb5b2808072}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{8747c95b-1da8-457f-8475-f77866767d6e}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">K1</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{51e12fe0-ad29-4d8f-9eb2-8dd4148dc89b}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">K2</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{7be4b55f-a159-4113-9162-a33f576cf473}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{bffd0760-b1c6-4e05-85c0-ecd1025a9f5d}" suffix="" symbol="{04d35015-c691-48d4-a04a-d91083500fcb}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{65f6f8ce-7452-44d3-887c-5e876ccfd6b3}" signal="{51e12fe0-ad29-4d8f-9eb2-8dd4148dc89b}"/>
+                        <map display="gen_comp_signal" pin="{7e80204f-6db7-4ea2-b825-80e0c5f4e2e1}" signal="{8747c95b-1da8-457f-8475-f77866767d6e}"/>
+                        <map display="gen_comp_signal" pin="{cea34ac7-8192-44fb-97c1-d9b7e022e9f4}" signal="{cd1a1d7e-b28b-4a06-bb29-bbb5b2808072}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

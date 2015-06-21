@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{68edf293-773d-4ce6-8624-d1b6490fd3d5}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">SUPERFLUX-7.6X7.6</name>
+        <description locale="en_US">&lt;b>SUPER FLUX LED LAMP&lt;/b> 7.6 mm x 7.6 mm &lt;p>
+Source: www.us.kingbright.com/images/catalog/SPEC/W7676CPBC-H.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: SUPERFLUX-7.6X7.6
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="170" start_x="3.700000" start_y="-3.700000" fill="false" width="0.203200">
+            <segment end_x="-2.600000" end_y="-3.700000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-2.600000" start_y="-3.700000" fill="false" width="0.203200">
+            <segment end_x="-3.700000" end_y="-2.600000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-3.700000" start_y="-2.600000" fill="false" width="0.203200">
+            <segment end_x="-3.700000" end_y="-0.700000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-3.700000" start_y="0.700000" fill="false" width="0.203200">
+            <segment end_x="-3.700000" end_y="3.700000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-3.700000" start_y="3.700000" fill="false" width="0.203200">
+            <segment end_x="3.700000" end_y="3.700000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="3.700000" start_y="3.700000" fill="false" width="0.203200">
+            <segment end_x="3.700000" end_y="0.700000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="3.700000" start_y="-0.700000" fill="false" width="0.203200">
+            <segment end_x="3.700000" end_y="-3.700000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-3.700000" start_y="-0.700000" fill="false" width="0.203200">
+            <segment end_x="-3.700000" end_y="0.700000" angle="-180.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="3.700000" start_y="0.700000" fill="false" width="0.203200">
+            <segment end_x="3.700000" end_y="-0.700000" angle="-180.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-4.445000" y="-3.810000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="5.715000" y="-3.810000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="1.422400" x="2.540000" drill="0.900000" uuid="{12253702-882c-432e-b7e9-6f7f8e55f8cc}" y="-2.540000" rotation="-90.000000" layer="0" width="1.422400" type="tht_round">
+            <name locale="en_US">4</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.422400" x="-2.540000" drill="0.900000" uuid="{2d74b92a-0cb7-403d-a77e-5138fd15e963}" y="-2.540000" rotation="-90.000000" layer="0" width="1.422400" type="tht_round">
+            <name locale="en_US">3</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.422400" x="2.540000" drill="0.900000" uuid="{a7d7300c-f914-4ff0-86f4-4891fe6931fa}" y="2.540000" rotation="-90.000000" layer="0" width="1.422400" type="tht_round">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.422400" x="-2.540000" drill="0.900000" uuid="{20eeca49-74bf-409c-abec-76c3b0927865}" y="2.540000" rotation="-90.000000" layer="0" width="1.422400" type="tht_round">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

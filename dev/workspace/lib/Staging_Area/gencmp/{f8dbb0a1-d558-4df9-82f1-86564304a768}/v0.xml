@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{f8dbb0a1-d558-4df9-82f1-86564304a768}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:43Z</created>
+        <last_modified>2015-06-21T12:37:43Z</last_modified>
+        <name locale="en_US">CX</name>
+        <description locale="en_US">&lt;B>X CAPACITOR&lt;/B>&lt;p>
+for power line
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: CX
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">CX</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{7bdf360c-b2cf-437a-b1cc-b6788994cf8d}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{68690a33-db60-4d6e-864e-745c86d25bff}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{388f0c38-7717-4a44-9a29-5c53954aa567}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{dd331eee-136f-411e-93a2-072d123c79c7}" suffix="" symbol="{26407a68-e278-4464-b15a-44504345524c}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{cb22cc71-d694-41b8-afdf-022acfe65004}" signal="{7bdf360c-b2cf-437a-b1cc-b6788994cf8d}"/>
+                        <map display="gen_comp_signal" pin="{c8472c3d-0737-4ce3-9a71-ae4c2d4ca5ee}" signal="{68690a33-db60-4d6e-864e-745c86d25bff}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

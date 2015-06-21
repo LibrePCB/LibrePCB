@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{69798ffb-089b-47e1-9f2e-abbc1bd997d0}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">BAS70VV</name>
+        <description locale="en_US">&lt;b>Silicon Schottky Diodes&lt;/b>&lt;p>
+General-purpose diode for high-speed switching&lt;br>
+Source: BAS70_1PS7XSB70_SER_8.pdf
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BAS70VV
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{505f3422-6141-4fa0-854c-fac26a0e4a0e}</generic_component>
+        <package>{1e2dc9fd-7268-4235-8f2f-110ddb810cb2}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{4bfbc54b-b55c-4a11-abd6-4eecada85fc2}" signal="{09974453-824b-44d7-a132-15e1f325ba6f}"/>
+        <map pad="{a9f7def5-e7c0-4a47-9936-86775f6e5e19}" signal="{cc142c71-83f4-4101-9be4-3f0e00ed266e}"/>
+        <map pad="{3a6ea356-8371-4596-a4c6-ff9591a757b9}" signal="{8b7b0c87-502a-4ea1-98f1-ddda5d593bfd}"/>
+        <map pad="{c4ab4252-607b-41f4-823f-0ca6c2918b19}" signal="{029ac1e3-f156-40a5-94d9-84271cdaf0f0}"/>
+        <map pad="{a824c6bc-d60a-4916-890f-fec4710bf2d0}" signal="{c3c41994-07e7-40ea-ade0-a80e6fc356ad}"/>
+        <map pad="{c8eb65eb-c097-4042-b392-ee74ff39aebe}" signal="{5cf4e8f4-68ba-4034-876a-7a408dda8183}"/>
+    </pad_signal_map>
+</component>

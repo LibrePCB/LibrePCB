@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{48ed17e8-e190-4f6e-9d43-7a6939bc6079}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">SOT346-W</name>
+        <description locale="en_US">&lt;b>SOT346 Wave soldering&lt;/b> (SC59) Philips SC01_Mounting_1996.pdf
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: SOT346-W
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{81e56ef0-a5e5-40fe-9407-00fa44bc4988}</footprint>
+    </meta>
+    <categories/>
+</package>

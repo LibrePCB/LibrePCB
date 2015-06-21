@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{613c59aa-497a-4993-a490-12a819ad787d}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:33Z</created>
+        <last_modified>2015-06-21T12:37:33Z</last_modified>
+        <name locale="en_US">E5-5</name>
+        <description locale="en_US">&lt;b>ELECTROLYTIC CAPACITOR&lt;/b>&lt;p>
+grid 5.08 mm, diameter 5 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: E5-5
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{18b86191-67fc-4905-92f0-a0a36b2200f6}</footprint>
+    </meta>
+    <categories/>
+</package>

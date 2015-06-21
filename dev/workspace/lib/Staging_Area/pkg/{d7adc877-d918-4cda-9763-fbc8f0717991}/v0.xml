@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{d7adc877-d918-4cda-9763-fbc8f0717991}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:35Z</created>
+        <last_modified>2015-06-21T12:37:35Z</last_modified>
+        <name locale="en_US">IR-2</name>
+        <description locale="en_US">&lt;B>Vishay Dale Inductor&lt;/b>&lt;p>
+Source: www.vishay.com .. ir.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: IR-2
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{190ffe80-4fbe-40bf-8a18-a7f16ab82a50}</footprint>
+    </meta>
+    <categories/>
+</package>

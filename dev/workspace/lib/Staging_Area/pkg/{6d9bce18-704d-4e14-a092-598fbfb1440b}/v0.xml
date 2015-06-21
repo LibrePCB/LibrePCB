@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{6d9bce18-704d-4e14-a092-598fbfb1440b}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:32Z</created>
+        <last_modified>2015-06-21T12:37:32Z</last_modified>
+        <name locale="en_US">ETR1</name>
+        <description locale="en_US">&lt;b>ELECTROLYTIC CAPACITOR&lt;/b>&lt;p>
+rectangle, grid 2.54 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: ETR1
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{8736c06e-65ce-4422-975f-81a59c43d058}</footprint>
+    </meta>
+    <categories/>
+</package>

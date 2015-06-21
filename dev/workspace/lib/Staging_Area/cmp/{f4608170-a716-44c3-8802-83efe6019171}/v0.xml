@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{f4608170-a716-44c3-8802-83efe6019171}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:45Z</created>
+        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <name locale="en_US">ASE</name>
+        <description locale="en_US">&lt;b>3.3Vdc CMOS SMD CRYSTAL CLOCK OSCILLATOR&lt;/b>&lt;p>
+SOurce: www.abracon.com
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: ASE
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{979e570c-2fdc-4a67-91ff-6bfd42fc0b39}</generic_component>
+        <package>{49051ad9-91ca-4063-8e74-5ccbf8127619}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{30fbd335-ef54-4939-be4a-908949222f3f}" signal="{5ea3a4aa-a497-4f92-a56b-4b692952d21a}"/>
+        <map pad="{1e3c10b8-0b1f-4f96-a594-7cac1de031c4}" signal="{04d9c032-5a91-4b43-84f7-ccb5d9409110}"/>
+        <map pad="{dd2c841c-dac6-4b6c-8376-afc41b7cb1d8}" signal="{a247b73f-a1c4-4dcc-9c3d-ebbbbeda445b}"/>
+        <map pad="{df611bb0-47d0-43ca-a0ed-232157ee8a0e}" signal="{5f3e9fcb-5093-4db1-82d2-b9689116cc19}"/>
+    </pad_signal_map>
+</component>

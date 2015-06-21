@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{543864b9-2454-441b-88bd-9b2414177473}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:45Z</created>
+        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <name locale="en_US">SG531</name>
+        <description locale="en_US">&lt;b>CRYSTAL RESONATOR&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: SG531
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{df26b758-350c-43dd-9aa9-ff01ab76f000}</generic_component>
+        <package>{98389d51-4325-43b5-8971-046a440dc22b}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{0291e195-4c67-4638-9655-ba9d55b73c47}" signal="{4a0b8797-ff62-4d09-a2bf-6ee6c5e15574}"/>
+        <map pad="{9c71f77d-8e5e-4112-a0e1-f4cf49c6f269}" signal="{6f32349e-bf2b-46f2-b5cf-f97be7aed36b}"/>
+        <map pad="{849fc37e-b58c-4ba3-b0b1-e539e8840127}" signal="{48435977-30e5-4bbb-bd7b-4a58479e7352}"/>
+    </pad_signal_map>
+</component>

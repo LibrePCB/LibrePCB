@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{f7ff71dc-21a2-47de-910c-fc79942f178e}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">LED-2AC-</name>
+        <description locale="en_US">&lt;b>LEDs with 2 Cathode &amp; 2 Anode&lt;/b>&lt;p>
+- Kingbright SUPER FLUX LED LAMP&lt;br>
+Source: www.us.kingbright.com/images/catalog/SPEC/W7676CPBC-H.pdf&lt;p>
+&lt;b>Cree® P4 LED CP41B-WES/WGS&lt;/b>&lt;p>
+Source: &lt;a href="http://www.cree.com/products/pdf/LEDlamps/CP41B-WES&amp;WGS.pdf"> Data sheet&lt;/a>
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: LED-2AC-
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{72f45351-734b-412b-b5eb-720253e08215}</generic_component>
+        <package>{9eff041f-6c45-4364-9851-7cb66a42dc4a}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{3c84d908-493c-4294-84b6-d8721acbed01}" signal="{f1f9e501-e981-4d35-831d-660994413252}"/>
+        <map pad="{fe7d0157-e884-4d89-9d6c-efaf7ff864d8}" signal="{f1f9e501-e981-4d35-831d-660994413252}"/>
+        <map pad="{032a23b9-6886-48bf-a309-05d1f6a4d5f5}" signal="{bbaaee77-dd73-4710-813f-e201bed287b0}"/>
+        <map pad="{0f3c6b2a-ae67-460c-add7-781860a365d4}" signal="{bbaaee77-dd73-4710-813f-e201bed287b0}"/>
+    </pad_signal_map>
+</component>

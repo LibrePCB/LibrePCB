@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{9eff041f-6c45-4364-9851-7cb66a42dc4a}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">CP41B</name>
+        <description locale="en_US">&lt;b>Cree® P4 LED CP41B-WES/WGS&lt;/b>&lt;p>
+Source: &lt;a href="http://www.cree.com/products/pdf/LEDlamps/CP41B-WES&amp;WGS.pdf"> Data sheet&lt;/a>
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: CP41B
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{ace70421-731d-4191-8131-5586b6ade99f}</footprint>
+    </meta>
+    <categories/>
+</package>

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{9005fba7-6fbd-4a4c-a7d0-4293de815005}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:35Z</created>
+        <last_modified>2015-06-21T12:37:35Z</last_modified>
+        <name locale="en_US">LAN02KR</name>
+        <description locale="en_US">&lt;b>TAYO YUDEN Inductor&lt;/b>&lt;p>
+Source: je999f5.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: LAN02KR
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{9e7674ff-2642-4ace-86b1-cc8c6923db7f}</footprint>
+    </meta>
+    <categories/>
+</package>

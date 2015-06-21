@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{3debf303-f781-4125-b889-6d344a4c9c44}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">LZR185</name>
+        <description locale="en_US">&lt;B>LED BLOCK&lt;/B>&lt;p>
+5 LEDs, Siemens
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: LZR185
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{027ee082-b533-4fce-9d5d-791678876e64}</generic_component>
+        <package>{c23ee681-417f-4e0b-96d0-6be87f538e52}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{eb927b55-b7c8-4701-9d17-514219aff346}" signal="{eebdf83d-7ca4-4b85-ad1b-bdb3f4d2cbef}"/>
+        <map pad="{b1a55b54-101d-45d6-8139-60c0938156b0}" signal="{1b689aec-e8c7-4a4c-9835-4863128058dd}"/>
+        <map pad="{b50940f8-cbd3-4609-a087-261657f8ef30}" signal="{15ca7146-71b0-4b9f-8b9d-f305f1ec8e69}"/>
+        <map pad="{512cf034-55e5-4b81-8508-636642f71c61}" signal="{455fa1d6-1583-4917-af45-3b82c7a06d92}"/>
+        <map pad="{d932f173-61b6-4bf1-88a3-c15d9600e0b6}" signal="{1deaed38-69f5-4b4f-8bf3-3f1cc56125dd}"/>
+        <map pad="{071572a7-98f2-4b5b-bfb9-5842adb4f3df}" signal="{7c40389b-fad4-444b-960a-7d4e27358846}"/>
+        <map pad="{6cf8f8c0-9556-4d77-9ea0-a3899030085c}" signal="{91707c0d-ecd8-47b6-ae82-3dcbd067cf3d}"/>
+        <map pad="{c0c5cf64-ccc2-4f93-946b-60a45b901921}" signal="{d8122a97-1445-4d73-93c7-3b898e8530f5}"/>
+        <map pad="{07cac751-320c-41e6-adad-c470bff742d2}" signal="{09b29f42-ba98-44b0-ac6f-2c3ed373cf99}"/>
+        <map pad="{f1f7840e-46a4-4915-ba98-283ea22dd105}" signal="{bded7b64-a2ce-47cd-a2ef-640624a6ef62}"/>
+    </pad_signal_map>
+</component>

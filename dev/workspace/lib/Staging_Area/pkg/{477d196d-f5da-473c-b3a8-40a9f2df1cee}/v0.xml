@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{477d196d-f5da-473c-b3a8-40a9f2df1cee}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">W57B</name>
+        <description locale="en_US">&lt;b>Golden Dragon® 1 Watt LED&lt;/b>&lt;p>
+Source: OSRAM la_ly_w57b.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: W57B
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{d7ee0de3-b8e5-43e4-90ad-68ad149bb1b8}</footprint>
+    </meta>
+    <categories/>
+</package>

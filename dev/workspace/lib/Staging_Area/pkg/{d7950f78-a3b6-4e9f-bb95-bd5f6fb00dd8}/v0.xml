@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{d7950f78-a3b6-4e9f-bb95-bd5f6fb00dd8}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">SMA</name>
+        <description locale="en_US">&lt;b>SMA&lt;/b> CASE 403D-02&lt;p>
+Source: http://www.onsemi.com/pub_link/Collateral/MBRA340T3-D.PDF
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: SMA
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{79d0cc98-af25-464d-bbb4-9326d4385947}</footprint>
+    </meta>
+    <categories/>
+</package>

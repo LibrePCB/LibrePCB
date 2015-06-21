@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{02c5cc0b-cc01-4867-81a5-3d88aae428ae}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">MICRO-SIDELED</name>
+        <description locale="en_US">&lt;b>Hyper Micro SIDELED®&lt;/b>&lt;p>
+Source: http://www.osram.convergy.de/ ... LA_LO_LS_LY Y876.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: MICRO-SIDELED
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{4704d4f6-966b-43c8-9e5c-a3fdeeb21977}</footprint>
+    </meta>
+    <categories/>
+</package>

@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{47e64fca-35fa-41c7-b8de-fef66009c0f9}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">W724C0</name>
+        <description locale="en_US">&lt;b>Z-Power LED&lt;/b> P7 Series&lt;p>
+Source: http://www.acriche.com .. W724C0.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: W724C0
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{2964ab72-2d94-4d8f-9932-a362c1044032}</generic_component>
+        <package>{ac81968a-a45d-4d7f-bc68-83ec606d2b8b}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{f1c2a625-99e5-4a58-addc-dcbce2711da9}" signal="{af92f8d5-3b20-4de3-9953-7dde5275687c}"/>
+        <map pad="{a4f83dea-aebf-433f-95ca-203bcf07095f}" signal="{af92f8d5-3b20-4de3-9953-7dde5275687c}"/>
+        <map pad="{9451fcd7-a412-4605-a958-67e449bd6a62}" signal="{f03569f1-88cc-4371-9559-92cd35795769}"/>
+        <map pad="{d72d1d43-7188-4c8e-95ce-30eb8a6b573e}" signal="{6154e24a-f7ef-4b7f-ba9d-f370e885e0bc}"/>
+        <map pad="{b13a4009-e8fb-482e-8684-2afc0501a51d}" signal="{6154e24a-f7ef-4b7f-ba9d-f370e885e0bc}"/>
+        <map pad="{056c7a05-5c3b-4263-bb37-e75098793fb7}" signal="{af92f8d5-3b20-4de3-9953-7dde5275687c}"/>
+        <map pad="{54eb3fdf-74ea-4577-ba5b-9c4948b3d538}" signal="{f03569f1-88cc-4371-9559-92cd35795769}"/>
+        <map pad="{06409a55-5166-405a-8047-d2d4acdb41da}" signal="{af92f8d5-3b20-4de3-9953-7dde5275687c}"/>
+        <map pad="{8050e730-445f-41aa-8a6c-0dd7e32811a8}" signal="{af92f8d5-3b20-4de3-9953-7dde5275687c}"/>
+    </pad_signal_map>
+</component>

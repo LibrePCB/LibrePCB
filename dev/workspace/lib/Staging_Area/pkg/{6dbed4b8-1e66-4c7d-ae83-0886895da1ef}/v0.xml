@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{6dbed4b8-1e66-4c7d-ae83-0886895da1ef}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:35Z</created>
+        <last_modified>2015-06-21T12:37:35Z</last_modified>
+        <name locale="en_US">CT3528</name>
+        <description locale="en_US">&lt;b>TANTALUM CAPACITOR&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: CT3528
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{a3218710-c46a-4c2b-b8a6-e8e4817f52b8}</footprint>
+    </meta>
+    <categories/>
+</package>

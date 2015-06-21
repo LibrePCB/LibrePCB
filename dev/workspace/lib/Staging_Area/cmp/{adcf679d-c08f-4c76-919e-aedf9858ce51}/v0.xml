@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{adcf679d-c08f-4c76-919e-aedf9858ce51}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:43Z</created>
+        <last_modified>2015-06-21T12:37:43Z</last_modified>
+        <name locale="en_US">R-TRIMM</name>
+        <description locale="en_US">&lt;b>Trimm resistor&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: R-TRIMM
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{daeed3be-7232-49c4-8d32-003974e84e46}</generic_component>
+        <package>{388476ef-c4f1-456a-ad95-6aef207acbb1}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{4ea0108c-6edc-465a-bcfc-6fcc3fa99c96}" signal="{dc6abef1-4b87-4cf9-9559-480498799fa9}"/>
+        <map pad="{d95e9fd1-4779-437e-be81-9a36548574fa}" signal="{ef7d6004-a9dd-441a-a605-965863019345}"/>
+        <map pad="{22bd0c00-7b98-4847-808e-fd71c5baa446}" signal="{8a87b90b-5d61-46e1-8af1-f554e3c83bf9}"/>
+    </pad_signal_map>
+</component>

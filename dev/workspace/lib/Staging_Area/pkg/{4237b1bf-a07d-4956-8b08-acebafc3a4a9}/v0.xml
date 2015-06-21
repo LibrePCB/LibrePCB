@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{4237b1bf-a07d-4956-8b08-acebafc3a4a9}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">E/7260-38W</name>
+        <description locale="en_US">&lt;b>Chip Capacitor Type KEMET E / EIA 7260-38 Wafe solder&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: E/7260-38W
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{7d7504a0-67b2-4d03-8ffe-47c687bc256b}</footprint>
+    </meta>
+    <categories/>
+</package>

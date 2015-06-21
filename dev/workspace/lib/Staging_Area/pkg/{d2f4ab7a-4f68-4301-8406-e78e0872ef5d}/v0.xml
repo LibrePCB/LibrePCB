@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{d2f4ab7a-4f68-4301-8406-e78e0872ef5d}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:35Z</created>
+        <last_modified>2015-06-21T12:37:35Z</last_modified>
+        <name locale="en_US">UD-6,3X5,8_NICHICON</name>
+        <description locale="en_US">&lt;b>ALUMINUM ELECTROLYTIC CAPACITORS&lt;/b> UD Series 6.3 x 5.8 mm&lt;p>
+Source: http://products.nichicon.co.jp/en/pdf/XJA043/e-ud.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: UD-6,3X5,8_NICHICON
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{92da73cd-ecae-4686-a62f-204782317eb6}</footprint>
+    </meta>
+    <categories/>
+</package>

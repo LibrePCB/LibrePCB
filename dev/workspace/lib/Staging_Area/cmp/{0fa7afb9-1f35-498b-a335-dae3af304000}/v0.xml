@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{0fa7afb9-1f35-498b-a335-dae3af304000}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:45Z</created>
+        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <name locale="en_US">49M8AHC49T</name>
+        <description locale="en_US">&lt;b>Monolithic Crystal Filters&lt;/b>&lt;p>
+Source: www.vanlong.com
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: 49M8AHC49T
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{9f4c5995-bf20-48f7-b1fb-1ea11955099c}</generic_component>
+        <package>{7e56e4bf-037d-46fd-93f3-2e36968cad83}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{8a2384a3-809e-4795-ba3c-e81909ec1069}" signal="{a794ed00-5d45-41d6-a066-60d995774a19}"/>
+        <map pad="{d66d246b-f21f-44a9-a5a5-7f4bef20abf2}" signal="{e5b90308-0430-4b81-aab5-d7bde32b755c}"/>
+        <map pad="{4626fca9-47bb-4b6c-bc6d-dcb44092f981}" signal="{34e86979-6cf5-40a2-93a4-cd5d3fc9d6bf}"/>
+    </pad_signal_map>
+</component>

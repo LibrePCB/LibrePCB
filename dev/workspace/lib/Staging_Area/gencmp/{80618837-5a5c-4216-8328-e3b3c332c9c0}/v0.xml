@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{80618837-5a5c-4216-8328-e3b3c332c9c0}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">MBRA340T3</name>
+        <description locale="en_US">&lt;b>Surface Mount Schottky Power Rectifier&lt;/b>&lt;p>
+Source: http://www.onsemi.com/pub_link/Collateral/MBRA340T3-D.PDF
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: MBRA340T3
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">D</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{7e878a8a-1c0b-415e-94c0-f0556db49ca5}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{f33d08bf-9e27-4e74-82eb-911c4bc6fe41}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{fa162e89-4243-46d8-aa5f-5861b988a0eb}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{6f7c6abf-1fa3-48fb-bd6b-d813fb0bcfef}" suffix="" symbol="{9b75d0ce-ac4e-4a52-a88a-8777f66d3241}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{cd50cc1e-a0d2-460e-818b-c9a4cc03ec42}" signal="{7e878a8a-1c0b-415e-94c0-f0556db49ca5}"/>
+                        <map display="gen_comp_signal" pin="{48dad2d5-4392-4d8f-870e-9e69d9727b83}" signal="{f33d08bf-9e27-4e74-82eb-911c4bc6fe41}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

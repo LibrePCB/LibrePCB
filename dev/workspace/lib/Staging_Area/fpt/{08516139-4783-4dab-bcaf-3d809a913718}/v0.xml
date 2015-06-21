@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{08516139-4783-4dab-bcaf-3d809a913718}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">ZDIO-10</name>
+        <description locale="en_US">&lt;b>Z DIODE&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: ZDIO-10
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="170" start_x="0.000000" start_y="1.270000" fill="false" width="0.254000">
+            <segment end_x="-1.270000" end_y="1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-1.270000" start_y="0.000000" fill="false" width="0.254000">
+            <segment end_x="1.270000" end_y="1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="1.270000" start_y="1.270000" fill="false" width="0.254000">
+            <segment end_x="1.270000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="1.270000" start_y="-1.270000" fill="false" width="0.254000">
+            <segment end_x="-1.270000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-1.270000" start_y="1.270000" fill="false" width="0.254000">
+            <segment end_x="-1.270000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-3.556000" start_y="0.000000" fill="false" width="0.254000">
+            <segment end_x="-1.270000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-1.270000" start_y="0.000000" fill="false" width="0.254000">
+            <segment end_x="-1.270000" end_y="-1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="1.270000" start_y="0.000000" fill="false" width="0.254000">
+            <segment end_x="3.556000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="1.270000" start_y="0.000000" fill="false" width="0.254000">
+            <segment end_x="1.270000" end_y="-1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-1.270000" start_y="-1.270000" fill="false" width="0.254000">
+            <segment end_x="-2.540000" end_y="-1.270000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-2.489200" y="1.828800" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-2.540000" y="-3.048000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="1.625600" x="-5.080000" drill="0.812800" uuid="{dcd4293a-196e-48e6-82a6-6ccfd86dbdf5}" y="0.000000" rotation="180.000000" layer="0" width="3.251200" type="tht_round">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.625600" x="5.080000" drill="0.812800" uuid="{8d6b680a-c253-4584-b2cb-647d3a0cdea4}" y="0.000000" rotation="180.000000" layer="0" width="3.251200" type="tht_round">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

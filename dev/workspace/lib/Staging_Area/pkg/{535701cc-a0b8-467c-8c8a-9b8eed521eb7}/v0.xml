@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{535701cc-a0b8-467c-8c8a-9b8eed521eb7}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:38Z</created>
+        <last_modified>2015-06-21T12:37:38Z</last_modified>
+        <name locale="en_US">BR220S</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+3-lead molded, vertical
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BR220S
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{c6760b24-de8e-4dea-b7e9-64c35527005e}</footprint>
+    </meta>
+    <categories/>
+</package>

@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{9830f0c1-7ffb-487f-a77e-bcfb4cad613f}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">GI820</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+fast-recovery silicon diode, 6 A (Diotec)
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: GI820
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{16cf1a2e-336f-4385-b947-d61e694744cd}</generic_component>
+        <package>{f327af7b-95b7-4c96-8137-6ccfe46242d2}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{2150b814-a347-445d-9baf-706cd67d29c4}" signal="{1ab8feef-97ec-4586-8a03-7f3344bfa399}"/>
+        <map pad="{6d25fc7d-c2f1-4827-a71c-ea934b958c1f}" signal="{238d17ed-e488-4169-90f0-79c0221cbaa2}"/>
+    </pad_signal_map>
+</component>

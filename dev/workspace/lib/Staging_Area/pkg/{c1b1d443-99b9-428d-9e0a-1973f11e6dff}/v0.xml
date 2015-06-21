@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{c1b1d443-99b9-428d-9e0a-1973f11e6dff}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:32Z</created>
+        <last_modified>2015-06-21T12:37:32Z</last_modified>
+        <name locale="en_US">0207/15</name>
+        <description locale="en_US">&lt;b>RESISTOR&lt;/b>&lt;p>
+type 0207, grid 15mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: 0207/15
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{3679fa93-8435-489b-80c4-1da6925b74f1}</footprint>
+    </meta>
+    <categories/>
+</package>

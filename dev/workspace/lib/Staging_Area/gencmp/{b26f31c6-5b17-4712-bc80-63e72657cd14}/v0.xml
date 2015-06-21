@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{b26f31c6-5b17-4712-bc80-63e72657cd14}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">MBR3035CT</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+dual barrier rectifier, 30 A, 30 V, common cathode
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: MBR3035CT
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">D</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{4730d1c4-56fa-467e-95f4-59ab674a0b94}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A1</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{7fabd9c5-cc91-4bca-862e-b63bfe44e4ed}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A2</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{a60ca82d-dba8-4697-8fd2-00273367ee22}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{afed061f-2522-4265-885a-8e8f9b1f8d90}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{4432c338-7933-4c19-ac59-e4e72916a4b4}" suffix="1" symbol="{bcb4e654-9c8a-4373-8024-4f823afd72b4}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{94b8db6f-6433-4010-9235-4fa2057a18ba}" signal="{4730d1c4-56fa-467e-95f4-59ab674a0b94}"/>
+                        <map display="gen_comp_signal" pin="{1c997823-be8b-4853-8997-1bdb649731fe}" signal="{7fabd9c5-cc91-4bca-862e-b63bfe44e4ed}"/>
+                        <map display="gen_comp_signal" pin="{3fa1746f-f8b7-423e-b582-849abb746ea0}" signal="{a60ca82d-dba8-4697-8fd2-00273367ee22}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

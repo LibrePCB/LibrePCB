@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{e2f03448-f509-450a-887a-a8642762367f}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">SC79_INFINEON</name>
+        <description locale="en_US">&lt;b>Diode Package&lt;/b> Reflow soldering&lt;p>
+INFINEON, www.infineon.com/cmc_upload/0/000/010/257/eh_db_5b.pdf
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: SC79_INFINEON
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{9ed30727-7ed1-40c0-a9e1-a7f44a877939}</footprint>
+    </meta>
+    <categories/>
+</package>

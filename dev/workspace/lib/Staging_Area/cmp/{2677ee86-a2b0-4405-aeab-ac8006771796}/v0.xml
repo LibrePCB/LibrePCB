@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{2677ee86-a2b0-4405-aeab-ac8006771796}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">1N5400</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+standard rectifier, 3 A, 50 V (Motorola)
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: 1N5400
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{0ca0993c-bf55-4529-865b-849ef898b28a}</generic_component>
+        <package>{cdc60685-ebe6-4a3d-9ce1-8873f76a8f24}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{b74315c9-feea-4f7d-94c2-04b9510a1193}" signal="{daf86625-d081-4fd6-a925-14976f92263d}"/>
+        <map pad="{7403240f-13dc-4614-a9e9-90395e2a0e19}" signal="{343a05e0-6e9b-4317-a7de-61bd3c774b5c}"/>
+    </pad_signal_map>
+</component>

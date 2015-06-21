@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{d0a75f20-f0af-4e71-8bd0-d54c9635f0f8}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">BY396</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+Si,100 V, 3 A
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BY396
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{f6ebf5bc-2f50-458d-8dd7-5a1d0ba3dc1e}</generic_component>
+        <package>{cdc60685-ebe6-4a3d-9ce1-8873f76a8f24}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{b74315c9-feea-4f7d-94c2-04b9510a1193}" signal="{60ab1017-aee2-4754-a585-a97cbe9979c0}"/>
+        <map pad="{7403240f-13dc-4614-a9e9-90395e2a0e19}" signal="{b647eaed-f575-4d45-b100-117bf4608628}"/>
+    </pad_signal_map>
+</component>

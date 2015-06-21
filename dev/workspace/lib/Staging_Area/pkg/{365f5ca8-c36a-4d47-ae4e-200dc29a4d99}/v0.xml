@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{365f5ca8-c36a-4d47-ae4e-200dc29a4d99}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:32Z</created>
+        <last_modified>2015-06-21T12:37:32Z</last_modified>
+        <name locale="en_US">M3216</name>
+        <description locale="en_US">&lt;b>RESISTOR&lt;/b>&lt;p>
+MELF 0.25 W
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: M3216
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{12675cf2-dc2b-4931-be3e-ba8e5d949c27}</footprint>
+    </meta>
+    <categories/>
+</package>

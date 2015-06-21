@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{dd680200-6bb5-4dee-8248-5f804512a8f9}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:37Z</created>
+        <last_modified>2015-06-21T12:37:37Z</last_modified>
+        <name locale="en_US">HC49U-V</name>
+        <description locale="en_US">&lt;b>CRYSTAL&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: HC49U-V
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="170" start_x="0.635000" start_y="0.889000" fill="false" width="0.152400">
+            <segment end_x="0.635000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="0.635000" start_y="0.000000" fill="false" width="0.152400">
+            <segment end_x="0.635000" end_y="-0.889000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-0.635000" start_y="0.889000" fill="false" width="0.152400">
+            <segment end_x="-0.635000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-0.635000" start_y="0.000000" fill="false" width="0.152400">
+            <segment end_x="-0.635000" end_y="-0.889000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="0.635000" start_y="0.000000" fill="false" width="0.152400">
+            <segment end_x="1.270000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-0.635000" start_y="0.000000" fill="false" width="0.152400">
+            <segment end_x="-1.270000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="2.921000" start_y="2.286000" fill="false" width="0.406400">
+            <segment end_x="2.921000" end_y="-2.286000" angle="0.000000"/>
+            <segment end_x="-2.921000" end_y="-2.286000" angle="0.000000"/>
+            <segment end_x="-2.921000" end_y="2.286000" angle="0.000000"/>
+            <segment end_x="2.921000" end_y="2.286000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="2.921000" start_y="1.778000" fill="false" width="0.152400">
+            <segment end_x="2.921000" end_y="-1.778000" angle="0.000000"/>
+            <segment end_x="-2.921000" end_y="-1.778000" angle="0.000000"/>
+            <segment end_x="-2.921000" end_y="1.778000" angle="0.000000"/>
+            <segment end_x="2.921000" end_y="1.778000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-0.254000" start_y="-0.889000" fill="false" width="0.152400">
+            <segment end_x="-0.254000" end_y="0.889000" angle="0.000000"/>
+            <segment end_x="0.254000" end_y="0.889000" angle="0.000000"/>
+            <segment end_x="0.254000" end_y="-0.889000" angle="0.000000"/>
+            <segment end_x="-0.254000" end_y="-0.889000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-5.080000" y="2.921000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-5.080000" y="-4.191000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="1.625600" x="2.413000" drill="0.812800" uuid="{4d5e86cb-f97c-4c8b-9674-219ff24b9aae}" y="0.000000" rotation="90.000000" layer="0" width="1.625600" type="tht_round">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.625600" x="-2.413000" drill="0.812800" uuid="{ec2fb564-f526-4edf-8bb5-deb24a3fe4e9}" y="0.000000" rotation="90.000000" layer="0" width="1.625600" type="tht_round">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

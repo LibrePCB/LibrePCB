@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{d8263b62-2110-4bcb-9e0b-6f8f2ae7f2cf}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">PMLL41*</name>
+        <description locale="en_US">&lt;b>High-speed diodes&lt;/b>&lt;p>
+Source: http://www.semiconductors.philips.com/acrobat_download/datasheets/PMLL4150_2.pdf
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: PMLL41*
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{b4a24d24-7180-406a-8c77-d506e68b5917}</generic_component>
+        <package>{ffc08592-f3b0-40cd-bc64-d6dc491a740b}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{38887bf5-9b48-40dc-9749-fe22bf86b1dd}" signal="{c153d722-596f-4db4-b057-8bb934a032a3}"/>
+        <map pad="{3ed1bf46-f3d7-4b98-9485-bc9327b4245f}" signal="{2814000c-6976-4734-9a73-60aa434ce225}"/>
+    </pad_signal_map>
+</component>

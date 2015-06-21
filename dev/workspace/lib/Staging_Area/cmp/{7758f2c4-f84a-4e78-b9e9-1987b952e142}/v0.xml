@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{7758f2c4-f84a-4e78-b9e9-1987b952e142}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">BZW50B</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+uni and bidirectional supressor diode
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BZW50B
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{8b536226-188a-4440-8075-a97be9549409}</generic_component>
+        <package>{4d7490d5-d6c4-452e-aaf8-ab6dcebfa920}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{d9bedba8-d3e3-47ae-8c6a-c1f1e6c05e9b}" signal="{4740c40a-9680-4518-a439-140d2e885965}"/>
+        <map pad="{923ef9c1-c2f5-42b3-a780-f9555dafdff7}" signal="{7a27d14f-88a8-4eed-9d1c-33132d72b68f}"/>
+    </pad_signal_map>
+</component>

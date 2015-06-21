@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{15d5007c-0c9d-4548-b6c2-8a47d26e0e44}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:43Z</created>
+        <last_modified>2015-06-21T12:37:43Z</last_modified>
+        <name locale="en_US">CPOL-US</name>
+        <description locale="en_US">&lt;B>POLARIZED CAPACITOR&lt;/B>, American symbol
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: CPOL-US
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{c54375c5-7149-4ded-95c5-7462f7301ee7}</generic_component>
+        <package>{8ec4a19c-6ca8-4a5e-b986-73ecaa9d85cf}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{bbbf1d5f-22a3-4eaf-a616-67eab413f35f}" signal="{af3ffca8-0085-4edb-a775-fcb759f63411}"/>
+        <map pad="{4a91e723-bda0-4e48-8d51-1c059fd05e2f}" signal="{e010ecbb-6210-4da3-9270-ebd58656dbf0}"/>
+    </pad_signal_map>
+</component>

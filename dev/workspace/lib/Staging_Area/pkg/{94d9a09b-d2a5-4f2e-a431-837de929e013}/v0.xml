@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{94d9a09b-d2a5-4f2e-a431-837de929e013}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:37Z</created>
+        <last_modified>2015-06-21T12:37:37Z</last_modified>
+        <name locale="en_US">SC-2</name>
+        <description locale="en_US">&lt;b>CRYSTAL FILTERS&lt;/b>&lt;p>
+Source: http://www.presto.co.uk
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: SC-2
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{7003568a-97fe-4d2f-adba-8fbe3ce190be}</footprint>
+    </meta>
+    <categories/>
+</package>

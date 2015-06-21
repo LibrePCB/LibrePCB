@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{a87c00a1-aa57-4180-a160-7f533ad5ce6c}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:33Z</created>
+        <last_modified>2015-06-21T12:37:33Z</last_modified>
+        <name locale="en_US">MINI_MELF-0207W</name>
+        <description locale="en_US">&lt;b>CECC Size RC6123&lt;/b> Wave Soldering&lt;p>
+source Beyschlag
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: MINI_MELF-0207W
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="170" start_x="1.149000" start_y="1.000000" fill="false" width="0.203200">
+            <segment end_x="-1.149000" end_y="1.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-1.149000" start_y="-1.000000" fill="false" width="0.203200">
+            <segment end_x="1.149000" end_y="-1.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="2.800000" start_y="1.000000" fill="false" width="0.203200">
+            <segment end_x="2.800000" end_y="-1.000000" angle="0.000000"/>
+            <segment end_x="-2.800000" end_y="-1.000000" angle="0.000000"/>
+            <segment end_x="-2.800000" end_y="1.000000" angle="0.000000"/>
+            <segment end_x="2.800000" end_y="1.000000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-2.540000" y="1.587500" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-2.540000" y="-2.540000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="2.500000" x="2.600000" drill="0.000000" uuid="{b321b507-bbb9-4b2b-87a2-bb9e17a3da2c}" y="0.000000" rotation="0.000000" layer="200" width="2.400000" type="smd_rect">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="2.500000" x="-2.600000" drill="0.000000" uuid="{67afa0bd-f539-4eeb-9646-b81963420d5d}" y="0.000000" rotation="0.000000" layer="200" width="2.400000" type="smd_rect">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

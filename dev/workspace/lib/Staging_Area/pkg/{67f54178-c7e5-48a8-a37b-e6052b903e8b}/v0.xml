@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{67f54178-c7e5-48a8-a37b-e6052b903e8b}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:32Z</created>
+        <last_modified>2015-06-21T12:37:32Z</last_modified>
+        <name locale="en_US">C325-162X374</name>
+        <description locale="en_US">&lt;b>CAPACITOR&lt;/b>&lt;p>
+grid 32.5 mm, outline 16.2 x 37.4 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: C325-162X374
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{3204f0d8-8624-407c-81c9-8260ebccf0c9}</footprint>
+    </meta>
+    <categories/>
+</package>

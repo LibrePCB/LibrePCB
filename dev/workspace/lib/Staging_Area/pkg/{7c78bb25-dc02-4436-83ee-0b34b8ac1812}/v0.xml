@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{7c78bb25-dc02-4436-83ee-0b34b8ac1812}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">VMTA55</name>
+        <description locale="en_US">&lt;b>Bulk Metal® Foil Technology&lt;/b>, Tubular Axial Lead Resistors, Meets or Exceeds MIL-R-39005 Requirements&lt;p>
+MIL SIZE RNC55&lt;br>
+Source: VISHAY .. vta56.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: VMTA55
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{9ed8107f-1113-4032-9415-945e97601de0}</footprint>
+    </meta>
+    <categories/>
+</package>

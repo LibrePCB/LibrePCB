@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{443046bf-f63f-4ecb-8ae3-83cdb39198b4}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">BAS40</name>
+        <description locale="en_US">&lt;b>Silicon Schottky Diodes&lt;/b>&lt;p>
+General-purpose diode for high-speed switching
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BAS40
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">D</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{b0ec0b75-6b23-4166-b324-50ed34be6eed}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{c9129cef-c042-43cf-8984-a13d7b967d78}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{d562c36a-2533-43ab-918b-cd003db463c3}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{f9eeb1e6-6090-4646-8fb7-0353f3251931}" suffix="1" symbol="{b9d78750-8ed8-4cc5-af9b-c7673b3f3208}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{865781e2-77f4-4517-a30c-661143cba8bf}" signal="{c9129cef-c042-43cf-8984-a13d7b967d78}"/>
+                        <map display="gen_comp_signal" pin="{42c84b5a-2363-4932-9714-e4548d32a751}" signal="{b0ec0b75-6b23-4166-b324-50ed34be6eed}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

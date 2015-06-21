@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{1fe6bd64-b3c8-4ae0-b021-a6dd48c3d6c0}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">SANYO-OSCON_SMD_F8</name>
+        <description locale="en_US">&lt;b>SANYO OSCON Capacitor&lt;/b> SMD type with conductive polymer electrolyte&lt;p>
+Source: e_os_all.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: SANYO-OSCON_SMD_F8
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{7904d9ce-4599-4e1e-a053-98a0b9c64ef4}</footprint>
+    </meta>
+    <categories/>
+</package>

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{21dcd6b6-dd1f-4ac2-8cea-ea0bc00f7b36}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">OSTAR-LENS_</name>
+        <description locale="en_US">&lt;b>OSTAR® with LENS&lt;/b>&lt;p>
+Source: http://catalog.osram-os.com/media/_en/Graphics/00035766_0.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: OSTAR-LENS_
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{26a0969d-2281-4c2a-b3e7-694c536f5cb7}</footprint>
+    </meta>
+    <categories/>
+</package>

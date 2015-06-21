@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{3f8fdef2-0304-44e7-a44b-770ec67a056d}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">LZR184</name>
+        <description locale="en_US">&lt;B>LED BLOCK&lt;/B>&lt;p>
+4 LEDs, Siemens
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: LZR184
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{ae005283-4fa8-43a5-be35-39df860967b3}</footprint>
+    </meta>
+    <categories/>
+</package>

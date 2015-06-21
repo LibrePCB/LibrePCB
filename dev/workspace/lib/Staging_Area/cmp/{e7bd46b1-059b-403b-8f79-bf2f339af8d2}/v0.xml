@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{e7bd46b1-059b-403b-8f79-bf2f339af8d2}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">GM1BW78140A</name>
+        <description locale="en_US">&lt;b>High Brightness Chip LED (White)&lt;/b> 39 lm @ 150 mA&lt;p>
+Source: http://document.sharpsma.com/files/GM1BW78140A.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: GM1BW78140A
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{955f74a4-8d2a-42c5-8600-469e231820c2}</generic_component>
+        <package>{0caf07ec-5f0d-440b-b450-76f3471b12c2}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{c145af3e-1db7-4a45-9e1f-2cbb57b12c68}" signal="{ab9dce44-fe9e-4ab3-913e-3019304a77a1}"/>
+        <map pad="{c8782173-df25-4332-adf6-6ad87f7cf484}" signal="{df1b2009-bcb8-4c82-b841-ca4ebef9aeea}"/>
+    </pad_signal_map>
+</component>

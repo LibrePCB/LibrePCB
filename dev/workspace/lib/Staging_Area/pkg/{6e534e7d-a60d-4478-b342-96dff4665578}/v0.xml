@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{6e534e7d-a60d-4478-b342-96dff4665578}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:32Z</created>
+        <last_modified>2015-06-21T12:37:32Z</last_modified>
+        <name locale="en_US">P0613/15</name>
+        <description locale="en_US">&lt;b>RESISTOR&lt;/b>&lt;p>
+type 0613, grid 15 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: P0613/15
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{8d13d168-c486-447f-9389-467267e82e7b}</footprint>
+    </meta>
+    <categories/>
+</package>

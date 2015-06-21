@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<symbol version="0">
+    <meta>
+        <uuid>{bf01d206-9391-421a-86d4-8b08d871610a}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:28Z</created>
+        <last_modified>2015-06-21T12:37:28Z</last_modified>
+        <name locale="en_US">PWR+-</name>
+        <description locale="en_US">
+
+This element was automatically imported from Eagle
+Filepath: 0_ICs.lbr
+Name: PWR+-
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <text v_align="bottom" height="1.625600" x="1.270000" y="3.175000" layer="13" text="V+" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="1.625600" x="1.270000" y="-4.445000" layer="13" text="V-" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pins>
+        <pin length="5.080000" x="0.000000" uuid="{f7f13bfc-d026-46f5-a92e-e5225d67d9ac}" y="-7.620000" angle="0.000000">
+            <name locale="en_US">V-</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="0.000000" uuid="{9f7fc0ea-e0af-49a7-aaf8-86248f0d3fa3}" y="7.620000" angle="-180.000000">
+            <name locale="en_US">V+</name>
+            <description locale="en_US"/>
+        </pin>
+    </pins>
+</symbol>

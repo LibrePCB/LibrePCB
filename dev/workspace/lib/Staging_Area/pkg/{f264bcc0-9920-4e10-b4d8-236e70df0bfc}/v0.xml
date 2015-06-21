@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{f264bcc0-9920-4e10-b4d8-236e70df0bfc}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:35Z</created>
+        <last_modified>2015-06-21T12:37:35Z</last_modified>
+        <name locale="en_US">UD-10X10_NICHICON</name>
+        <description locale="en_US">&lt;b>ALUMINUM ELECTROLYTIC CAPACITORS&lt;/b> UD Series 10 x 10 mm&lt;p>
+Source: http://products.nichicon.co.jp/en/pdf/XJA043/e-ud.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: UD-10X10_NICHICON
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{52b84bb0-23c8-41b8-88ef-7cb2e685dbf0}</footprint>
+    </meta>
+    <categories/>
+</package>

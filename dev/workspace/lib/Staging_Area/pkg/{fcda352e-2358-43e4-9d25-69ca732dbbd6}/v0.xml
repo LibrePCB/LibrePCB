@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{fcda352e-2358-43e4-9d25-69ca732dbbd6}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:32Z</created>
+        <last_modified>2015-06-21T12:37:32Z</last_modified>
+        <name locale="en_US">TT2D4L</name>
+        <description locale="en_US">&lt;b>ELECTROLYTIC CAPACITOR&lt;/b>&lt;p>
+diameter 4 mm, grid 2.54 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: TT2D4L
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{c4d3cb89-bd51-4760-adbf-e6583924236e}</footprint>
+    </meta>
+    <categories/>
+</package>

@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{1e6e95ac-acee-464f-a3b7-8f703a702541}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:44Z</created>
+        <last_modified>2015-06-21T12:37:44Z</last_modified>
+        <name locale="en_US">FE05W</name>
+        <description locale="en_US">&lt;b>FEMALE HEADER&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: con-lsta.lbr
+Name: FE05W
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{93338f48-5a97-4719-bace-30bf887083f2}</generic_component>
+        <package>{58e1eb2d-d02d-4081-a440-7a76b13738db}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{94c65bff-ac1c-40e4-b7de-def42cb6984f}" signal="{f3bbda4c-1410-45ce-959f-b3db66da511f}"/>
+        <map pad="{d9e57c9f-643e-4b12-95c1-a6424ffae04d}" signal="{a7b891d9-41c5-48d4-a93a-45c96bfd0c17}"/>
+        <map pad="{3a7fcd8d-0401-4d16-9bf2-a9856c218335}" signal="{6f2f938f-73cd-4062-b5f3-016675fbd03c}"/>
+        <map pad="{61ff3af9-a964-42fc-a592-1cdcf058728c}" signal="{15ef92cb-65f9-4126-82af-8cb123d7914b}"/>
+        <map pad="{9e342d61-4c3f-462c-ba42-d074586ee10c}" signal="{da7b5cbb-072e-4d80-8bd4-4dbde76b0241}"/>
+    </pad_signal_map>
+</component>

@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{26866b42-92e3-41fa-89a7-9e6d6f0e9ac9}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">1,6/0,9</name>
+        <description locale="en_US">&lt;b>THROUGH-HOLE PAD&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: wirepad.lbr
+Name: 1,6/0,9
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{0d6e8efb-f95a-4a6b-a7bf-7cd684dab358}</generic_component>
+        <package>{ae8af3f9-9954-49c5-acd0-b16cb13b7c20}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{d54bab70-f0e6-4d8d-a467-d3adbf472a75}" signal="{5570ea29-9c77-4791-b700-5466390b6d08}"/>
+    </pad_signal_map>
+</component>

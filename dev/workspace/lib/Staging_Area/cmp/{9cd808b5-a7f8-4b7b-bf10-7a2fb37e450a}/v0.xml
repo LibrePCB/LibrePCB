@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{9cd808b5-a7f8-4b7b-bf10-7a2fb37e450a}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">BB112</name>
+        <description locale="en_US">Capacity &lt;b>DIODE&lt;/b>&lt;p>
+variable-capacitance diode
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BB112
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{df5714a4-087e-434c-9990-48f7f6be9197}</generic_component>
+        <package>{3f6470ca-e795-4f1b-8eed-c9383a77bf3b}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{78e93778-5f1e-4a62-9258-ed40b995145d}" signal="{60d16253-3355-4a31-880a-6463cf2d170e}"/>
+        <map pad="{d27beea8-3502-4f25-ab0e-228d324b37a7}" signal="{8dfe4b7b-f9f1-492d-9783-b502196a6ff7}"/>
+    </pad_signal_map>
+</component>

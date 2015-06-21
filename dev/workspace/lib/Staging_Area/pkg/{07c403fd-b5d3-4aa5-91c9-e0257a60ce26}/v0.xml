@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{07c403fd-b5d3-4aa5-91c9-e0257a60ce26}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:32Z</created>
+        <last_modified>2015-06-21T12:37:32Z</last_modified>
+        <name locale="en_US">C025-060X050</name>
+        <description locale="en_US">&lt;b>CAPACITOR&lt;/b>&lt;p>
+grid 2.5 mm, outline 6 x 5 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: C025-060X050
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{d18d4dff-0d15-4116-8275-5e05489462b8}</footprint>
+    </meta>
+    <categories/>
+</package>

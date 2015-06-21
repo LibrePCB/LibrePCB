@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{306883e8-ed01-4c5c-9227-75da35fa73fb}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:37Z</created>
+        <last_modified>2015-06-21T12:37:37Z</last_modified>
+        <name locale="en_US">SON-10</name>
+        <description locale="en_US">&lt;b>SON 10 Pin&lt;/b>&lt;p>
+Source: &lt;a href="http://www.mcrystal.ch/CMSPages/GetFile.aspx?nodeguid=c85958d8-94ca-4325-87c5-e65a30ad4bd5"> Data shhet &lt;/a>
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: SON-10
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{995e964d-1be7-44d3-a13a-0c79cdb54aac}</footprint>
+    </meta>
+    <categories/>
+</package>

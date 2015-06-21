@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{f3dc71e4-cc9d-4b6e-a04d-e849e835d64f}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:32Z</created>
+        <last_modified>2015-06-21T12:37:32Z</last_modified>
+        <name locale="en_US">M1206</name>
+        <description locale="en_US">&lt;b>RESISTOR&lt;/b>&lt;p>
+MELF 0.25 W
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: M1206
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{2e915279-6ed6-465f-b34f-c528d44167e6}</footprint>
+    </meta>
+    <categories/>
+</package>

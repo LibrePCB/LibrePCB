@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{f28bf8f6-2057-4c2f-bc3e-5f414aa79c26}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">CHIPLED_1206</name>
+        <description locale="en_US">&lt;b>CHIPLED&lt;/b>&lt;p>
+Source: http://www.osram.convergy.de/ ... LG_LY N971.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: CHIPLED_1206
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{b446584d-e5b0-4a18-9bf0-3ada4c382c3a}</footprint>
+    </meta>
+    <categories/>
+</package>

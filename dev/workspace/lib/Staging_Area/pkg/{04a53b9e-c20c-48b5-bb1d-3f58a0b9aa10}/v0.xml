@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{04a53b9e-c20c-48b5-bb1d-3f58a0b9aa10}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">MICROMELF-R</name>
+        <description locale="en_US">&lt;b>Micro Melf Diode Reflow soldering&lt;/b> VISHAY mcl4148.pdf
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: MICROMELF-R
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{89f97710-c44e-40b5-95e5-23e877ba15e0}</footprint>
+    </meta>
+    <categories/>
+</package>

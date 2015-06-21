@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{53a213ac-3ad5-4843-b12d-d0612b3d4821}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:32Z</created>
+        <last_modified>2015-06-21T12:37:32Z</last_modified>
+        <name locale="en_US">V526-0</name>
+        <description locale="en_US">&lt;b>RESISTOR&lt;/b>&lt;p>
+type V526-0, grid 2.5 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: V526-0
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{9657249f-a07f-4e1f-8378-1c5eef8e7c35}</footprint>
+    </meta>
+    <categories/>
+</package>

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{8d04be48-cb1b-4724-8f85-543a7c104934}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">R2010W</name>
+        <description locale="en_US">&lt;b>RESISTOR&lt;/b>&lt;p>
+wave soldering
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: R2010W
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{a7b73d25-5341-413a-af88-359e8192d811}</footprint>
+    </meta>
+    <categories/>
+</package>

@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{8d3c26ae-ecb4-4b37-ac1b-c8ac358030cd}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:44Z</created>
+        <last_modified>2015-06-21T12:37:44Z</last_modified>
+        <name locale="en_US">FE05-1</name>
+        <description locale="en_US">&lt;b>FEMALE HEADER&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: con-lsta.lbr
+Name: FE05-1
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">SV</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{a5a2f794-5e78-44d3-9ff4-7e9e358369e6}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{1c8b55b7-09e3-44c6-862d-4e5c1e692a0f}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{7b3b937d-3586-4116-847a-5294d17fd8ea}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">3</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{78a46691-9dc8-48c4-bc8d-3ca18330539c}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">4</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{5048a6c6-b90d-4f71-8014-9bf411b212a3}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">5</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{ccf73df7-7c86-4252-9087-38c73f2e3f2b}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{08de7f29-4fa2-4e42-aab5-b10e36e243e5}" suffix="" symbol="{c5aad03f-5afa-41e7-9334-be4c5cc7c75d}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{77bf4aa8-b699-432a-b864-63c28f80243c}" signal="{a5a2f794-5e78-44d3-9ff4-7e9e358369e6}"/>
+                        <map display="gen_comp_signal" pin="{3722a83e-8bb6-40d8-8a7b-ca3d07d064d7}" signal="{78a46691-9dc8-48c4-bc8d-3ca18330539c}"/>
+                        <map display="gen_comp_signal" pin="{c8eb4bac-bc5b-4f75-99fc-370a5fb9a07c}" signal="{5048a6c6-b90d-4f71-8014-9bf411b212a3}"/>
+                        <map display="gen_comp_signal" pin="{9e623645-d9d0-4b7d-9131-670df03b48eb}" signal="{1c8b55b7-09e3-44c6-862d-4e5c1e692a0f}"/>
+                        <map display="gen_comp_signal" pin="{6f72b6c9-0b6a-4d17-a6e3-785d3e19e093}" signal="{7b3b937d-3586-4116-847a-5294d17fd8ea}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

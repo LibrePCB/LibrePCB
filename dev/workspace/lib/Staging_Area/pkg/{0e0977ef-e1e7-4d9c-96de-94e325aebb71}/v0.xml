@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{0e0977ef-e1e7-4d9c-96de-94e325aebb71}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">LRTB_G6SG</name>
+        <description locale="en_US">&lt;b>LRTB G6SG&lt;/b> 6-lead TOPLED®&lt;p>
+Source: OSRAM Opto Semiconductors ... LRTB_G6SG_Pb_free.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: LRTB_G6SG
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{e6bb0750-31c7-426d-994d-80e8a74a285f}</footprint>
+    </meta>
+    <categories/>
+</package>

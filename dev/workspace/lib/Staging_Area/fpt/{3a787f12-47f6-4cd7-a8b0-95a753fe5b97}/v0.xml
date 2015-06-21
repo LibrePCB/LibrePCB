@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{3a787f12-47f6-4cd7-a8b0-95a753fe5b97}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:38Z</created>
+        <last_modified>2015-06-21T12:37:38Z</last_modified>
+        <name locale="en_US">TO92H</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+2-lead plastic, vertical
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: TO92H
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="170" start_x="-2.286000" start_y="-1.270000" fill="false" width="0.152400">
+            <segment end_x="2.286000" end_y="-1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-2.286000" start_y="-1.270000" fill="false" width="0.152400">
+            <segment end_x="2.270500" end_y="-1.297400" angle="238.798935"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="3.175000" y="0.635000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="3.175000" y="-1.270000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="1.625600" x="1.270000" drill="0.812800" uuid="{bd9891d4-ed5d-49dc-94d5-7bc76d7cc0b8}" y="0.000000" rotation="90.000000" layer="0" width="1.625600" type="tht_octagon">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.625600" x="-1.270000" drill="0.812800" uuid="{f251f435-8459-458b-b816-25077c0b3125}" y="0.000000" rotation="90.000000" layer="0" width="1.625600" type="tht_octagon">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

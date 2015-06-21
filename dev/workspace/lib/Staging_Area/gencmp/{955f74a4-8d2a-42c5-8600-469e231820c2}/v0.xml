@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{955f74a4-8d2a-42c5-8600-469e231820c2}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">GM1BW78140A</name>
+        <description locale="en_US">&lt;b>High Brightness Chip LED (White)&lt;/b> 39 lm @ 150 mA&lt;p>
+Source: http://document.sharpsma.com/files/GM1BW78140A.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: GM1BW78140A
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">LED</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{ab9dce44-fe9e-4ab3-913e-3019304a77a1}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{df1b2009-bcb8-4c82-b841-ca4ebef9aeea}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{ccd2edc0-a7d1-42db-b38c-b62577ced86a}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{b1247a1d-91ff-4843-823e-ced881d7afeb}" suffix="" symbol="{e3a130ce-7c66-46de-ac5a-c5b352150ca2}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{d3b054f4-d86a-45f4-ab67-00325566dba5}" signal="{df1b2009-bcb8-4c82-b841-ca4ebef9aeea}"/>
+                        <map display="gen_comp_signal" pin="{2171e7c7-0c14-4f21-84cd-5faa9e62a478}" signal="{ab9dce44-fe9e-4ab3-913e-3019304a77a1}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

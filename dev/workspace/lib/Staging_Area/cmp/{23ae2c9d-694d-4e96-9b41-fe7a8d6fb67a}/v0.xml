@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{23ae2c9d-694d-4e96-9b41-fe7a8d6fb67a}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">NSSM038A</name>
+        <description locale="en_US">&lt;b>NICHIA CHIP TYPE FULL COLOR LED&lt;/b>&lt;p>
+Source: NICIA CORPORATION .. NSSM038AT-E.PDF
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: NSSM038A
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{fc1a87b3-b84a-45a6-9b4d-61402b1999e6}</generic_component>
+        <package>{c1207df1-c975-474d-a41e-d8762ac7a24a}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{8110d998-7a20-4004-98d7-14cf20cbf88a}" signal="{be730120-d116-43c8-acc1-143ea0f59daf}"/>
+        <map pad="{b7196d42-e214-4a9f-a31b-f2d43a663a30}" signal="{2fcccc50-be0e-45f9-acdf-9899b907e5d4}"/>
+        <map pad="{0254c965-d92f-44ad-b733-c8394f5cb35c}" signal="{4122acbf-d5bc-4484-bc7a-68b3536cb372}"/>
+        <map pad="{ffe13324-2905-4e98-8584-4e32fd907978}" signal="{be730120-d116-43c8-acc1-143ea0f59daf}"/>
+        <map pad="{e5af0b35-21cb-4585-a302-99a30501973b}" signal="{51a5ad75-5438-4103-b43c-a36859d3dfc6}"/>
+        <map pad="{48c2e52a-4465-472b-a669-5f0c99085dfa}" signal="{78b027ea-7a0a-492b-b9f0-63c197a65cc0}"/>
+        <map pad="{1efef51d-e562-43be-a306-da14e38b362c}" signal="{4b5b44a3-d50e-4cad-b781-17c8d47ec940}"/>
+        <map pad="{7955f240-bfdc-4cfc-8052-3daec040f6b8}" signal="{51a5ad75-5438-4103-b43c-a36859d3dfc6}"/>
+    </pad_signal_map>
+</component>

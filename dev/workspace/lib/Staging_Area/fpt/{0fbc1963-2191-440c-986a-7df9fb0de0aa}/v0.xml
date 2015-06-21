@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{0fbc1963-2191-440c-986a-7df9fb0de0aa}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">NFSG036BT</name>
+        <description locale="en_US">&lt;b>CHIP TYPE GREEN LED&lt;/b> NFSx036xT&lt;p>
+Source: &lt;a href="http://www.nichia.co.jp/specification/en/product/led_library/NFSG036BT-E.pdf"> Data sheet &lt;/a>
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: NFSG036BT
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="110" start_x="1.650000" start_y="1.325000" fill="false" width="0.203200">
+            <segment end_x="1.325000" end_y="1.650000" angle="90.035270"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="1.325000" start_y="1.650000" fill="false" width="0.203200">
+            <segment end_x="-1.325000" end_y="1.650000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-1.650000" start_y="1.325000" fill="false" width="0.203200">
+            <segment end_x="-1.650000" end_y="-1.325000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-1.650000" start_y="-1.325000" fill="false" width="0.203200">
+            <segment end_x="-1.325000" end_y="-1.650000" angle="90.035270"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-1.325000" start_y="-1.650000" fill="false" width="0.203200">
+            <segment end_x="1.325000" end_y="-1.650000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="1.325000" start_y="-1.650000" fill="false" width="0.203200">
+            <segment end_x="1.650000" end_y="-1.325000" angle="90.035270"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="1.650000" start_y="-1.325000" fill="false" width="0.203200">
+            <segment end_x="1.650000" end_y="1.325000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-1.325000" start_y="1.650000" fill="false" width="0.203200">
+            <segment end_x="-1.650000" end_y="1.325000" angle="90.035270"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-1.250000" start_y="0.875000" fill="false" width="0.203200">
+            <segment end_x="-0.875000" end_y="1.250000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-0.875000" start_y="-1.250000" fill="false" width="0.203200">
+            <segment end_x="-1.250000" end_y="-0.875000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-0.525000" start_y="1.075000" fill="false" width="0.203200">
+            <segment end_x="0.525000" end_y="1.075000" angle="53.569991"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="0.525000" start_y="-1.075000" fill="false" width="0.203200">
+            <segment end_x="-0.525000" end_y="-1.075000" angle="53.569991"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-0.525000" start_y="1.650000" fill="false" width="0.203200">
+            <segment end_x="0.525000" end_y="1.650000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="0.525000" start_y="-1.650000" fill="false" width="0.203200">
+            <segment end_x="-0.525000" end_y="-1.650000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-1.905000" y="2.540000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-1.905000" y="-3.810000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+        <ellipse radius_x="1.200000" x="0.000000" radius_y="1.200000" grab_area="true" y="0.000000" layer="110" rotation="0.000000" fill="false" width="0.203200"/>
+    </geometry>
+    <pads>
+        <pad height="3.800000" x="1.350000" drill="0.000000" uuid="{dd6a7b9d-daef-4b4d-8851-1b88235c343b}" y="0.000000" rotation="0.000000" layer="200" width="1.300000" type="smd_rect">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="3.800000" x="-1.350000" drill="0.000000" uuid="{789e12cd-094b-4d64-b01b-73cbc37f1557}" y="0.000000" rotation="0.000000" layer="200" width="1.300000" type="smd_rect">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{2f9fc8f2-ab01-4e4e-964e-da1fb4b4651e}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:35Z</created>
+        <last_modified>2015-06-21T12:37:35Z</last_modified>
+        <name locale="en_US">M2012</name>
+        <description locale="en_US">&lt;b>RESISTOR&lt;/b>&lt;p>
+MELF 0.10 W
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: M2012
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{dc524aea-ed7a-4905-876c-e3729516cb45}</footprint>
+    </meta>
+    <categories/>
+</package>

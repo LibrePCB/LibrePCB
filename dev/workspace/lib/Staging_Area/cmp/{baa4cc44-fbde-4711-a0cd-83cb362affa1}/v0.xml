@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{baa4cc44-fbde-4711-a0cd-83cb362affa1}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:45Z</created>
+        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <name locale="en_US">CSM-7X-DU</name>
+        <description locale="en_US">&lt;b>SMD CRYSTAL&lt;/b>&lt;p>
+Source: www.ecsxtal.com .. Crystal 3.6864MHz CSM_7X_DU.PDF
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: CSM-7X-DU
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{4d0c8189-ab65-4260-98c9-51bda03182e2}</generic_component>
+        <package>{4ebed051-648b-4d86-9753-874ad1070498}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{47ed2c1e-bedb-419b-bf04-810cefd87922}" signal="{4cbc42f4-e9a4-4f03-b176-95e80fd33d2c}"/>
+        <map pad="{f35862c9-f9d5-4662-8ace-c63e8bb01bc4}" signal="{4e3717ad-ddc0-4798-a5aa-9798d88c8175}"/>
+    </pad_signal_map>
+</component>

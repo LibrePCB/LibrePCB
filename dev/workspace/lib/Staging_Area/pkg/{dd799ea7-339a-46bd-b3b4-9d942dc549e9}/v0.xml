@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{dd799ea7-339a-46bd-b3b4-9d942dc549e9}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:33Z</created>
+        <last_modified>2015-06-21T12:37:33Z</last_modified>
+        <name locale="en_US">RTRIM5W</name>
+        <description locale="en_US">&lt;b>Trimm resistor&lt;/b> Spectrol&lt;p>
+abgedichtet nach &lt;b>IP67&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: RTRIM5W
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{b7bc6b8a-fe25-4c3b-8821-8e3cb0c08269}</footprint>
+    </meta>
+    <categories/>
+</package>

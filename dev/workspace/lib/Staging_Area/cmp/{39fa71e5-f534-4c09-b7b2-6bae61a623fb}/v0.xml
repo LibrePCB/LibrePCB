@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{39fa71e5-f534-4c09-b7b2-6bae61a623fb}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">DIODE_CAPACITANCE-</name>
+        <description locale="en_US">Capacity &lt;b>DIODE&lt;/b>&lt;p>
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: DIODE_CAPACITANCE-
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{aff2a750-09d6-4da7-b5a0-242d09a33b5b}</generic_component>
+        <package>{07e9e4c7-4144-40e8-b9d3-e7b0dfd089df}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{197e0f79-e14a-4e2b-bf19-68efe1f4c67a}" signal="{cb5624b3-3930-4ac4-8da5-1bf2f89ea788}"/>
+        <map pad="{41d73e87-6e50-49b1-b508-22d825841732}" signal="{30c6df94-bbea-4f7a-a817-5d8ee3ec7984}"/>
+    </pad_signal_map>
+</component>

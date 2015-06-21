@@ -1,0 +1,79 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{17f037ef-b060-416d-b2c0-398584b0c2d2}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:32Z</created>
+        <last_modified>2015-06-21T12:37:32Z</last_modified>
+        <name locale="en_US">TT2D4</name>
+        <description locale="en_US">&lt;b>ELECTROLYTIC CAPACITOR&lt;/b>&lt;p>
+diameter 4 mm, grid 2.54 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: TT2D4
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="110" start_x="-1.016000" start_y="0.000000" fill="false" width="0.152400">
+            <segment end_x="-0.508000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-0.508000" start_y="0.000000" fill="false" width="0.152400">
+            <segment end_x="-0.508000" end_y="-0.889000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-0.508000" start_y="-0.889000" fill="false" width="0.152400">
+            <segment end_x="-0.177800" end_y="-0.889000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-0.177800" start_y="-0.889000" fill="false" width="0.152400">
+            <segment end_x="-0.177800" end_y="0.889000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-0.177800" start_y="0.889000" fill="false" width="0.152400">
+            <segment end_x="-0.508000" end_y="0.889000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-0.508000" start_y="0.889000" fill="false" width="0.152400">
+            <segment end_x="-0.508000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="0.508000" start_y="0.000000" fill="false" width="0.152400">
+            <segment end_x="1.016000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-0.635000" start_y="-1.143000" fill="false" width="0.152400">
+            <segment end_x="-1.143000" end_y="-1.143000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-0.889000" start_y="-1.397000" fill="false" width="0.152400">
+            <segment end_x="-0.889000" end_y="-0.889000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-1.698500" start_y="1.115300" fill="false" width="0.152400">
+            <segment end_x="1.698500" end_y="1.115300" angle="113.419135"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-1.698500" start_y="-1.115300" fill="false" width="0.152400">
+            <segment end_x="1.698500" end_y="-1.115300" angle="-113.419135"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-1.698500" start_y="1.115300" fill="false" width="0.152400">
+            <segment end_x="-1.698500" end_y="-1.115300" angle="-66.580865"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="1.698500" start_y="-1.115300" fill="false" width="0.152400">
+            <segment end_x="1.698500" end_y="1.115300" angle="-66.580865"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="0.127000" start_y="-0.939800" fill="true" width="0.000000">
+            <segment end_x="0.558800" end_y="-0.939800" angle="0.000000"/>
+            <segment end_x="0.558800" end_y="0.939800" angle="0.000000"/>
+            <segment end_x="0.127000" end_y="0.939800" angle="0.000000"/>
+            <segment end_x="0.127000" end_y="-0.939800" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="2.159000" y="0.762000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="2.159000" y="-1.905000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="1.625600" x="-1.270000" drill="0.812800" uuid="{8ed18bff-fece-48fb-babb-93e2aba5f150}" y="0.000000" rotation="90.000000" layer="0" width="1.625600" type="tht_round">
+            <name locale="en_US">+</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.625600" x="1.270000" drill="0.812800" uuid="{550f3a59-d808-4cbf-af84-4039ab30a2b6}" y="0.000000" rotation="90.000000" layer="0" width="1.625600" type="tht_octagon">
+            <name locale="en_US">-</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

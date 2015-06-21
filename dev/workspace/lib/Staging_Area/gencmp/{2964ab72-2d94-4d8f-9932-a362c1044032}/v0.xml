@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{2964ab72-2d94-4d8f-9932-a362c1044032}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">W724C0</name>
+        <description locale="en_US">&lt;b>Z-Power LED&lt;/b> P7 Series&lt;p>
+Source: http://www.acriche.com .. W724C0.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: W724C0
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">LED</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{6154e24a-f7ef-4b7f-ba9d-f370e885e0bc}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{f03569f1-88cc-4371-9559-92cd35795769}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{af92f8d5-3b20-4de3-9953-7dde5275687c}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">TH</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{4820ae4b-91b1-4a45-ae8a-e50cfcba2271}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{6b7eb57b-459d-4f22-a9cd-90cc7a885569}" suffix="" symbol="{b7f8c610-b4b2-4a7a-871b-2ca57f454d0a}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{484c5c95-0abb-48aa-afda-bac448f559f1}" signal="{f03569f1-88cc-4371-9559-92cd35795769}"/>
+                        <map display="gen_comp_signal" pin="{7d8b4ce4-1db7-429e-8835-51bcdc279fce}" signal="{6154e24a-f7ef-4b7f-ba9d-f370e885e0bc}"/>
+                    </pin_signal_map>
+                </item>
+                <item uuid="{65a242f6-d8d8-43c1-b26d-86ae49bc0b5c}" suffix="G$2" symbol="{a49024b3-de81-419e-a4cf-1841b255e637}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{d6cd1e3e-8404-47b3-b588-361810590a72}" signal="{af92f8d5-3b20-4de3-9953-7dde5275687c}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

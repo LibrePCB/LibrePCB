@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{efb48cab-79a1-4d51-97e5-fb5cc0aa8123}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:40Z</created>
+        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <name locale="en_US">GM1BW78140A</name>
+        <description locale="en_US">&lt;b>High Brightness Chip LED (White)&lt;/b>&lt;p>
+Source: http://document.sharpsma.com/files/GM1BW78140A.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: GM1BW78140A
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="110" start_x="-1.320000" start_y="-0.820000" fill="true" width="0.000000">
+            <segment end_x="1.320000" end_y="-0.820000" angle="0.000000"/>
+            <segment end_x="1.320000" end_y="0.820000" angle="0.000000"/>
+            <segment end_x="-1.320000" end_y="0.820000" angle="0.000000"/>
+            <segment end_x="-1.320000" end_y="-0.820000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="140" start_x="0.350000" start_y="-0.675000" fill="true" width="0.000000">
+            <segment end_x="1.175000" end_y="-0.675000" angle="0.000000"/>
+            <segment end_x="1.175000" end_y="0.675000" angle="0.000000"/>
+            <segment end_x="0.350000" end_y="0.675000" angle="0.000000"/>
+            <segment end_x="0.350000" end_y="-0.675000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="180" start_x="0.275000" start_y="-0.775000" fill="true" width="0.000000">
+            <segment end_x="1.275000" end_y="-0.775000" angle="0.000000"/>
+            <segment end_x="1.275000" end_y="0.775000" angle="0.000000"/>
+            <segment end_x="0.275000" end_y="0.775000" angle="0.000000"/>
+            <segment end_x="0.275000" end_y="-0.775000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="180" start_x="-1.250000" start_y="0.750000" fill="false" width="0.050800">
+            <segment end_x="-0.300000" end_y="0.750000" angle="0.000000"/>
+            <segment end_x="-0.300000" end_y="0.200000" angle="0.000000"/>
+            <segment end_x="-0.500000" end_y="0.000000" angle="0.000000"/>
+            <segment end_x="-0.300000" end_y="-0.200000" angle="0.000000"/>
+            <segment end_x="-0.300000" end_y="-0.750000" angle="0.000000"/>
+            <segment end_x="-1.250000" end_y="-0.750000" angle="0.000000"/>
+            <segment end_x="-1.250000" end_y="0.750000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="140" start_x="-1.175000" start_y="0.675000" fill="false" width="0.050800">
+            <segment end_x="-0.375000" end_y="0.675000" angle="0.000000"/>
+            <segment end_x="-0.375000" end_y="0.225000" angle="0.000000"/>
+            <segment end_x="-0.600000" end_y="0.000000" angle="0.000000"/>
+            <segment end_x="-0.375000" end_y="-0.225000" angle="0.000000"/>
+            <segment end_x="-0.375000" end_y="-0.675000" angle="0.000000"/>
+            <segment end_x="-1.175000" end_y="-0.675000" angle="0.000000"/>
+            <segment end_x="-1.175000" end_y="0.675000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-1.270000" y="1.016000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-1.270000" y="-2.286000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="1.440000" x="0.770000" drill="0.000000" uuid="{c145af3e-1db7-4a45-9e1f-2cbb57b12c68}" y="0.000000" rotation="0.000000" layer="200" width="0.900000" type="smd_rect">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.440000" x="-0.770000" drill="0.000000" uuid="{c8782173-df25-4332-adf6-6ad87f7cf484}" y="0.000000" rotation="0.000000" layer="200" width="0.900000" type="smd_rect">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

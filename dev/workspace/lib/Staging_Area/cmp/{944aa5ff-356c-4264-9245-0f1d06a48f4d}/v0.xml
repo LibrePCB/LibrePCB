@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{944aa5ff-356c-4264-9245-0f1d06a48f4d}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:44Z</created>
+        <last_modified>2015-06-21T12:37:44Z</last_modified>
+        <name locale="en_US">JU05</name>
+        <description locale="en_US">&lt;b>PIN HEADER&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: con-lsta.lbr
+Name: JU05
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{49dd61f4-f133-4287-b1a4-dd23488cc2b1}</generic_component>
+        <package>{7e2ebccd-91b9-4100-8c69-9561a5b28a6d}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{f09032ef-240b-49c5-8dcf-323ed633b3d5}" signal="{e4e354b6-ffbd-4737-bf5a-34a40be8e918}"/>
+        <map pad="{f84e16c4-75ed-46c3-9b84-991b66b71e43}" signal="{3214b342-d719-4a0e-b2e6-585cd1bf25af}"/>
+        <map pad="{b6867c6f-1d9c-477f-b4df-c5e47cc4c90f}" signal="{626dfcbd-9dd5-4ebf-b5cd-e9ff7a904459}"/>
+        <map pad="{ba32d2f2-a5e3-493d-9dae-9003164c11bc}" signal="{c26c1491-f376-4585-bd4f-f70058539a7c}"/>
+        <map pad="{b867f043-b732-4a03-892c-9879567aea3f}" signal="{22d540da-1f8b-4062-b4c9-19a543631b93}"/>
+    </pad_signal_map>
+</component>

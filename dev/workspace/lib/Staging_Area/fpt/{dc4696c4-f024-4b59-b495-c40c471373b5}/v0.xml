@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{dc4696c4-f024-4b59-b495-c40c471373b5}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">TJ4-U2</name>
+        <description locale="en_US">&lt;b>Inductor&lt;/b>&lt;p>
+Source: TJ-Serie Vishay.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: TJ4-U2
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <text v_align="bottom" height="3.175000" x="-5.080000" y="0.635000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-5.080000" y="-1.905000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+        <ellipse radius_x="11.100000" x="0.000000" radius_y="11.100000" grab_area="true" y="0.000000" layer="160" rotation="0.000000" fill="false" width="0.203200"/>
+    </geometry>
+    <pads>
+        <pad height="1.800000" x="-9.900000" drill="0.900000" uuid="{dcf98298-0a78-462a-b3a7-e65db31f9d2d}" y="0.000000" rotation="90.000000" layer="0" width="1.800000" type="tht_round">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.800000" x="9.900000" drill="0.900000" uuid="{0fb56963-16d5-4eea-8550-82e64aecb5e5}" y="0.000000" rotation="90.000000" layer="0" width="1.800000" type="tht_round">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

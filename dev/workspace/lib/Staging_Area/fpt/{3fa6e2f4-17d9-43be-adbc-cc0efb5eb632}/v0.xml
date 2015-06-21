@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{3fa6e2f4-17d9-43be-adbc-cc0efb5eb632}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">SOT323-W</name>
+        <description locale="en_US">&lt;b>SOT323 Wave soldering&lt;/b>&lt;p>
+Philips SC01_Mounting_1996.pdf
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: SOT323-W
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="110" start_x="-0.800000" start_y="-1.100000" fill="true" width="0.000000">
+            <segment end_x="-0.500000" end_y="-1.100000" angle="0.000000"/>
+            <segment end_x="-0.500000" end_y="-0.500000" angle="0.000000"/>
+            <segment end_x="-0.800000" end_y="-0.500000" angle="0.000000"/>
+            <segment end_x="-0.800000" end_y="-1.100000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="0.500000" start_y="-1.100000" fill="true" width="0.000000">
+            <segment end_x="0.800000" end_y="-1.100000" angle="0.000000"/>
+            <segment end_x="0.800000" end_y="-0.500000" angle="0.000000"/>
+            <segment end_x="0.500000" end_y="-0.500000" angle="0.000000"/>
+            <segment end_x="0.500000" end_y="-1.100000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-0.150000" start_y="0.500000" fill="true" width="0.000000">
+            <segment end_x="0.150000" end_y="0.500000" angle="0.000000"/>
+            <segment end_x="0.150000" end_y="1.100000" angle="0.000000"/>
+            <segment end_x="-0.150000" end_y="1.100000" angle="0.000000"/>
+            <segment end_x="-0.150000" end_y="0.500000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="0.922400" start_y="-0.460400" fill="false" width="0.152400">
+            <segment end_x="0.922400" end_y="0.460400" angle="0.000000"/>
+            <segment end_x="-0.922400" end_y="0.460400" angle="0.000000"/>
+            <segment end_x="-0.922400" end_y="-0.460400" angle="0.000000"/>
+            <segment end_x="0.922400" end_y="-0.460400" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="0.922400" start_y="-0.460400" fill="false" width="0.152400">
+            <segment end_x="0.922400" end_y="0.460400" angle="0.000000"/>
+            <segment end_x="-0.922400" end_y="0.460400" angle="0.000000"/>
+            <segment end_x="-0.922400" end_y="-0.460400" angle="0.000000"/>
+            <segment end_x="0.922400" end_y="-0.460400" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-1.000000" y="2.200000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-1.000000" y="-3.350000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad height="1.450000" x="0.900000" drill="0.000000" uuid="{e6ba74f5-eb73-4789-8dcd-6941910956d0}" y="-1.275000" rotation="0.000000" layer="200" width="0.900000" type="smd_rect">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.450000" x="0.000000" drill="0.000000" uuid="{4c80785a-01bf-47f5-9645-7bc78dc75c41}" y="1.275000" rotation="0.000000" layer="200" width="2.100000" type="smd_rect">
+            <name locale="en_US">3</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.450000" x="-0.900000" drill="0.000000" uuid="{eea48058-9599-4273-81f2-8fad5e6b9dca}" y="-1.275000" rotation="0.000000" layer="200" width="0.900000" type="smd_rect">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

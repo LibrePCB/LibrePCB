@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{caff792a-de95-4d11-a75a-641d3ba7ed9f}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">BYW51</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+hyperfast dual diode
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BYW51
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{fc31ba59-c01f-4de7-881e-b586f175ae87}</generic_component>
+        <package>{0eaf289c-166d-4bd9-a4ba-dbf6bbc76ef1}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{474059df-640b-4b17-98b2-148e340a7152}" signal="{f1454fee-20ee-4c63-8157-1bfe2149564b}"/>
+        <map pad="{ab077e0e-67ff-48c0-b979-66c9ccc6b90f}" signal="{3c172578-cb57-4ade-a2a0-dcf8ea153461}"/>
+        <map pad="{dff54bfb-5db6-4934-9282-29dd73df5aec}" signal="{4338aa3f-9a97-4952-bfe3-28e5da896d84}"/>
+    </pad_signal_map>
+</component>

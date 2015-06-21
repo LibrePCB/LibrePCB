@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{07eeb8fb-a6bf-4e60-8e09-2b23546221e6}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">C/6032-28W</name>
+        <description locale="en_US">&lt;b>Chip Capacitor Type KEMET C / EIA 6032-28 Wafe solder&lt;/b>&lt;p>
+KEMET U / EIA 6032-15
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: C/6032-28W
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{5a502576-1f63-494d-98ea-3a7b3ae671f4}</footprint>
+    </meta>
+    <categories/>
+</package>

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{cdc60685-ebe6-4a3d-9ce1-8873f76a8f24}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:38Z</created>
+        <last_modified>2015-06-21T12:37:38Z</last_modified>
+        <name locale="en_US">DO201-15</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+diameter 5.6 mm, horizontal, grid 15.24 mm
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: DO201-15
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{3642d756-0546-4dcb-a4f8-2049045e3139}</footprint>
+    </meta>
+    <categories/>
+</package>

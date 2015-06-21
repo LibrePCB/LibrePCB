@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{109fdf62-542e-4f55-9bb5-95e9f6bdaadf}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">Q62902-B153</name>
+        <description locale="en_US">&lt;b>LED HOLDER&lt;/b>&lt;p>
+Siemens
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: Q62902-B153
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="170" start_x="-5.511800" start_y="-3.505200" fill="false" width="0.152400">
+            <segment end_x="-5.511800" end_y="-0.254000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-5.511800" start_y="-0.254000" fill="false" width="0.152400">
+            <segment end_x="-5.511800" end_y="0.254000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-5.511800" start_y="0.254000" fill="false" width="0.152400">
+            <segment end_x="-5.511800" end_y="3.505200" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="5.511800" start_y="-3.505200" fill="false" width="0.152400">
+            <segment end_x="-4.648200" end_y="-3.505200" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-4.648200" start_y="-3.505200" fill="false" width="0.152400">
+            <segment end_x="-5.080000" end_y="-3.505200" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-5.080000" start_y="3.505200" fill="false" width="0.152400">
+            <segment end_x="-4.648200" end_y="3.505200" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-4.648200" start_y="3.505200" fill="false" width="0.152400">
+            <segment end_x="5.511800" end_y="3.505200" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-5.080000" start_y="-3.505200" fill="false" width="0.152400">
+            <segment end_x="-5.080000" end_y="3.505200" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-5.080000" start_y="-3.505200" fill="false" width="0.152400">
+            <segment end_x="-5.511800" end_y="-3.505200" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-5.080000" start_y="3.505200" fill="false" width="0.152400">
+            <segment end_x="-5.511800" end_y="3.505200" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-5.511800" start_y="0.254000" fill="false" width="0.152400">
+            <segment end_x="-5.511800" end_y="-0.254000" angle="-180.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-4.648200" start_y="3.505200" fill="false" width="0.152400">
+            <segment end_x="-4.648200" end_y="-3.505200" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="5.511800" start_y="3.505200" fill="false" width="0.152400">
+            <segment end_x="5.511800" end_y="-3.505200" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="170" start_x="-2.540000" start_y="1.905000" fill="false" width="0.254000">
+            <segment end_x="-2.540000" end_y="-1.905000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="0.000000" start_y="-1.143000" fill="false" width="0.152400">
+            <segment end_x="1.143000" end_y="0.000000" angle="-90.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-1.143000" start_y="0.000000" fill="false" width="0.152400">
+            <segment end_x="0.000000" end_y="1.143000" angle="90.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="0.000000" start_y="-1.651000" fill="false" width="0.152400">
+            <segment end_x="1.651000" end_y="0.000000" angle="-90.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-1.651000" start_y="0.000000" fill="false" width="0.152400">
+            <segment end_x="0.000000" end_y="1.651000" angle="90.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="0.000000" start_y="-2.159000" fill="false" width="0.152400">
+            <segment end_x="2.159000" end_y="0.000000" angle="-90.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="110" start_x="-2.212900" start_y="0.053900" fill="false" width="0.152400">
+            <segment end_x="-0.053900" end_y="2.212900" angle="90.010616"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="-4.191000" y="3.937000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-4.318000" y="-5.080000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+        <ellipse radius_x="2.540000" x="0.000000" radius_y="2.540000" grab_area="true" y="0.000000" layer="170" rotation="0.000000" fill="false" width="0.152400"/>
+        <ellipse radius_x="3.175000" x="0.000000" radius_y="3.175000" grab_area="true" y="0.000000" layer="170" rotation="0.000000" fill="false" width="0.254000"/>
+    </geometry>
+    <pads>
+        <pad height="1.625600" x="-1.270000" drill="0.812800" uuid="{961ea08c-2bd6-41f4-9130-571ebba858ba}" y="0.000000" rotation="90.000000" layer="0" width="3.251200" type="tht_round">
+            <name locale="en_US">K</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad height="1.625600" x="1.270000" drill="0.812800" uuid="{e57da9cd-35da-4654-b18f-563fe08eac43}" y="0.000000" rotation="90.000000" layer="0" width="3.251200" type="tht_round">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

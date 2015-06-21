@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{6237e73f-d5c2-4000-8492-18a306a7f3e7}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">R3216W</name>
+        <description locale="en_US">&lt;b>RESISTOR&lt;/b>&lt;p>
+wave soldering
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: R3216W
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{fa3c194c-f654-43af-b607-b7a079eb9aac}</footprint>
+    </meta>
+    <categories/>
+</package>

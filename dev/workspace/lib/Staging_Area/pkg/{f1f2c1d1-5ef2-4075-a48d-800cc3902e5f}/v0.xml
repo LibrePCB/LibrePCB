@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{f1f2c1d1-5ef2-4075-a48d-800cc3902e5f}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:37Z</created>
+        <last_modified>2015-06-21T12:37:37Z</last_modified>
+        <name locale="en_US">ASF</name>
+        <description locale="en_US">&lt;b>CRYSTAL CLOCK OSCILLATORS&lt;/b>&lt;p>
+5.0 Vdc or 3.3 Vdc - LOW PROFILE ULTRA MINIATURE CERAMIC SURFACE MOUNT&lt;br>
+Source: http://www.abracon.com/Oscillators/asf1-L-L1.pdf
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: ASF
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{d72d9f73-4180-4bd6-9b59-3ff7e8485eda}</footprint>
+    </meta>
+    <categories/>
+</package>

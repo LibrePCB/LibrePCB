@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{8d209b53-558d-482d-8f4d-6eb3c403f78d}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">LSG-T676</name>
+        <description locale="en_US">&lt;b>LSG T676 Hyper Multi TOPLED ® Hyper-Bright LED&lt;/b>&lt;p>
+Source: http://docs-europe.electrocomponents.com/webdocs/08c3/0900766b808c36ca.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: LSG-T676
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{9c953053-ebb6-4cb2-b8b1-cd75526c137c}</generic_component>
+        <package>{536f96ee-9a95-46ed-83ae-8e379b99d539}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{924328f2-d42e-418d-8278-35bb4704c692}" signal="{90f9c543-008b-4ca2-a2bf-db983151f5ec}"/>
+        <map pad="{e57aa496-9e37-40a1-834a-868c5c08e9c0}" signal="{182faa30-e0c8-4ee0-a5ed-db2501bba30f}"/>
+        <map pad="{d26d0fbb-a4b5-4256-afcf-8e2931b82865}" signal="{2a9bb8b8-1876-49a4-90a9-b82fc95dfdf9}"/>
+        <map pad="{4083b86d-ba8d-4b29-9414-9958b2cc17ab}" signal="{9417dcf3-e446-4077-b7fe-6397aa0179e1}"/>
+    </pad_signal_map>
+</component>

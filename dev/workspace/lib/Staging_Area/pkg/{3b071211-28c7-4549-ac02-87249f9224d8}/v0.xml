@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{3b071211-28c7-4549-ac02-87249f9224d8}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">R6332</name>
+        <description locale="en_US">&lt;b>RESISTOR&lt;/b>&lt;p>
+Source: http://download.siliconexpert.com/pdfs/2005/02/24/Semi_Ap/2/VSH/Resistor/dcrcwfre.pdf
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: R6332
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{a7ec7af5-e853-4560-92c4-3f05d97f5ea9}</footprint>
+    </meta>
+    <categories/>
+</package>

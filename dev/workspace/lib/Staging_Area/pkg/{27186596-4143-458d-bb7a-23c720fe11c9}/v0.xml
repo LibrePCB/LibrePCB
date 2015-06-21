@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{27186596-4143-458d-bb7a-23c720fe11c9}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">P-LCC-4/2</name>
+        <description locale="en_US">&lt;b>Hyper TOPLED® &lt;/b>&lt;p>
+Source: http://www.osram.convergy.de/ ... LOG_LSG T671.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: P-LCC-4/2
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{74e90d86-e946-4f2e-bc49-4e8e398e9168}</footprint>
+    </meta>
+    <categories/>
+</package>

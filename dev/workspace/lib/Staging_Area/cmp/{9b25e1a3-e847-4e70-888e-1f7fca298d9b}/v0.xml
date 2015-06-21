@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{9b25e1a3-e847-4e70-888e-1f7fca298d9b}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">D8-3A</name>
+        <description locale="en_US">4 &lt;B>DIODES&lt;/B>&lt;p>
+SIL, anode marked
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: D8-3A
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{a348e2c8-5c77-4bc4-b79a-472359bd8627}</generic_component>
+        <package>{6b967df7-9180-44c9-8345-768fcff9241a}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{06549db0-2f0e-4e7b-ae93-eb43d30018cd}" signal="{2a6155c4-13a9-4234-b383-0a3399170348}"/>
+        <map pad="{4ad76c84-4f75-43c6-b5d7-7face0780b66}" signal="{224885de-5759-4f1a-a4ba-c84efd72cd81}"/>
+        <map pad="{b8747fbe-adf6-4b35-ac4e-fab6e08558ff}" signal="{3ebd71c2-ca98-4fda-8b52-af5c728eb26f}"/>
+        <map pad="{e4b7c041-de85-4cbd-ae77-be3198486463}" signal="{e66c4a65-a6e6-4ae3-aa72-fc90b58383e0}"/>
+        <map pad="{dc82a7c6-ece9-4b71-a5d2-4ba0e0b96612}" signal="{28b4fde6-e060-408c-bd1b-5ded9a43fa65}"/>
+        <map pad="{924b0565-0b37-4aa4-a903-2b37c6d95d67}" signal="{f867ad3e-bea3-4b66-8e88-79e411f03c54}"/>
+        <map pad="{345f0fe1-4ede-4b81-a6eb-455276e9baae}" signal="{755f9290-ba3f-4a90-bc81-bf842affa754}"/>
+        <map pad="{4e8c324f-04b3-488d-ae14-6886d6abea63}" signal="{57c489ef-1231-488c-a150-30d4ab651744}"/>
+    </pad_signal_map>
+</component>

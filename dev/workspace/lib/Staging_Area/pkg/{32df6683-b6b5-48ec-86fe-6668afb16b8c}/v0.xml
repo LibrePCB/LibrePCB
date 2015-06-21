@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{32df6683-b6b5-48ec-86fe-6668afb16b8c}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:34Z</created>
+        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <name locale="en_US">R3225W</name>
+        <description locale="en_US">&lt;b>RESISTOR&lt;/b>&lt;p>
+wave soldering
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: R3225W
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{c5c2c33a-79d9-4424-89a7-03b890071daf}</footprint>
+    </meta>
+    <categories/>
+</package>

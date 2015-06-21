@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{ebc9f167-693b-431c-9d8d-dfbd3fd0be01}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">BAV21</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+high-voltage general purpose diode
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BAV21
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{3efc63ca-fcc4-4cbf-a2d6-977a02898bc6}</generic_component>
+        <package>{9af20351-2599-421c-8671-f0355c2548bb}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{03958109-002d-4acc-8e80-e9768ddc69d7}" signal="{3a6a93ff-a105-412f-af69-3211af042135}"/>
+        <map pad="{caec7773-5bfc-4b5b-b3eb-4ba251c115ea}" signal="{3f05d6f3-87e0-4ae7-be2c-781e2a4e2a87}"/>
+    </pad_signal_map>
+</component>

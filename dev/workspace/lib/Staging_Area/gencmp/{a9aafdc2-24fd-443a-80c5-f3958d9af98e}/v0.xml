@@ -1,0 +1,80 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{a9aafdc2-24fd-443a-80c5-f3958d9af98e}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">BAS70XY</name>
+        <description locale="en_US">&lt;b>Silicon Schottky Diodes&lt;/b>&lt;p>
+General-purpose diode for high-speed switching&lt;br>
+Source: BAS70_1PS7XSB70_SER_8.pdf
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BAS70XY
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">D</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{34b5e1e7-1752-41df-9520-c7818bdd06eb}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A1</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{9b92d308-e719-40c1-a521-1acdb2a4af99}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C1A2</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{0301874b-5a4b-4648-b359-47879c7b67c7}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C2</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{b36dd72b-c101-4d9d-acc0-ffa1cee23e91}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A1</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{f279c5bc-663a-4bf3-b7b1-0ba151001562}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C1A2</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{5a97c8b0-0056-4f00-9cd8-7fcfd82f34b1}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C2</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{9ee18732-d35d-4e1f-9f8d-d015f9314079}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{b6fcb9f8-a13b-47be-aa4d-4670661185d9}" suffix="A" symbol="{d345f71f-20a3-4c6d-a942-bb2d702750c8}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{08f31cfc-5473-41f1-9bba-263e486d3adc}" signal="{34b5e1e7-1752-41df-9520-c7818bdd06eb}"/>
+                        <map display="gen_comp_signal" pin="{49d15d1d-fae5-4e85-844c-276ab5d99cde}" signal="{0301874b-5a4b-4648-b359-47879c7b67c7}"/>
+                        <map display="gen_comp_signal" pin="{9166d3a3-bfe9-47b0-b3df-0dce788d46ae}" signal="{9b92d308-e719-40c1-a521-1acdb2a4af99}"/>
+                    </pin_signal_map>
+                </item>
+                <item uuid="{17b5c0df-cdab-4452-81ea-f290899ab2dc}" suffix="B" symbol="{d345f71f-20a3-4c6d-a942-bb2d702750c8}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{08f31cfc-5473-41f1-9bba-263e486d3adc}" signal="{b36dd72b-c101-4d9d-acc0-ffa1cee23e91}"/>
+                        <map display="gen_comp_signal" pin="{49d15d1d-fae5-4e85-844c-276ab5d99cde}" signal="{5a97c8b0-0056-4f00-9cd8-7fcfd82f34b1}"/>
+                        <map display="gen_comp_signal" pin="{9166d3a3-bfe9-47b0-b3df-0dce788d46ae}" signal="{f279c5bc-663a-4bf3-b7b1-0ba151001562}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{5d2b81ce-77e4-4ca1-952e-f6a3ed372744}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:45Z</created>
+        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <name locale="en_US">FC-12M</name>
+        <description locale="en_US">&lt;b>kHz RANGE CRYSTAL UNIT&lt;/b>&lt;p>
+LOW PROFILE SMD&lt;b>
+Source: Epson Toyocom FC-12M.pdf
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: FC-12M
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">Q</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{e45acefe-756b-4b7d-9159-a85729856e66}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{4c1bbe2b-849e-4cb2-82fd-d0423f3c9252}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{78eaa2f5-b1a9-4326-a3af-5a8424584916}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{c9b3bffa-562e-44c0-976b-5019c84ea270}" suffix="" symbol="{986f38ca-ea17-4c03-97a6-b7d5fc7d8012}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{ac7d1cc8-4a9e-4936-ab7c-ed70c7347195}" signal="{e45acefe-756b-4b7d-9159-a85729856e66}"/>
+                        <map display="gen_comp_signal" pin="{2fa806c9-af1c-457c-a92f-3459e6131fbc}" signal="{4c1bbe2b-849e-4cb2-82fd-d0423f3c9252}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

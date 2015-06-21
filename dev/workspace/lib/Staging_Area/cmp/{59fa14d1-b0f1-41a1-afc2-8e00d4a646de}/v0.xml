@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{59fa14d1-b0f1-41a1-afc2-8e00d4a646de}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">UF4003</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+ultrafast recovery diode, 200 V&lt;p>
+rectifier
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: UF4003
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{fc3c2261-6cf6-4ad6-abe7-586770e00b25}</generic_component>
+        <package>{2f931593-bf9b-460b-af7f-d8e8f4d2510b}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{d4b82aa7-4f97-4065-9f0a-11c0bb4a1cc7}" signal="{224b5c1d-9b9c-4e1a-bd6e-ca30be7cdca4}"/>
+        <map pad="{613f34f8-ec74-460b-9203-e64dcd075b58}" signal="{d69ceb16-7ac4-42d3-8f31-ed0a76a8f2d5}"/>
+    </pad_signal_map>
+</component>

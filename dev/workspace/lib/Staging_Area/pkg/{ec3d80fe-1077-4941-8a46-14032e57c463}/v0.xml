@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{ec3d80fe-1077-4941-8a46-14032e57c463}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:38Z</created>
+        <last_modified>2015-06-21T12:37:38Z</last_modified>
+        <name locale="en_US">SOD57-10</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+diameter 4 mm, vertical, grid 10.16 mm
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: SOD57-10
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{3561c02a-11bd-4bf3-a7e7-ff2e28439728}</footprint>
+    </meta>
+    <categories/>
+</package>

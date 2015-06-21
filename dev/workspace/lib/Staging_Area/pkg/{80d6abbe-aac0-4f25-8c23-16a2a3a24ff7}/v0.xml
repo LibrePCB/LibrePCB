@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{80d6abbe-aac0-4f25-8c23-16a2a3a24ff7}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:33Z</created>
+        <last_modified>2015-06-21T12:37:33Z</last_modified>
+        <name locale="en_US">E22-6</name>
+        <description locale="en_US">&lt;b>ELECTROLYTIC CAPACITOR&lt;/b>&lt;p>
+grid 22.86 mm, diameter 6 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: E22-6
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{34e37736-0cf2-404c-b7d3-3c3f68f9ec08}</footprint>
+    </meta>
+    <categories/>
+</package>

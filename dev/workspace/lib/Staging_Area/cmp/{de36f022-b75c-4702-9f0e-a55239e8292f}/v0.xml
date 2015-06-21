@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{de36f022-b75c-4702-9f0e-a55239e8292f}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">BYD13</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+controlled avalanche rectifier
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BYD13
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{78547953-a927-4e3b-bddb-5369dc351b43}</generic_component>
+        <package>{98dce77c-cfd3-467f-876b-5c329789aaa0}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{9ed61e4e-d007-4648-b021-c8235bf638c5}" signal="{6df7400b-10ab-445a-8d30-68bc53f3322f}"/>
+        <map pad="{2291c861-70ab-487d-9496-909accd3c038}" signal="{ad9c6082-ad79-4d93-b908-6ad9c3883bfc}"/>
+    </pad_signal_map>
+</component>

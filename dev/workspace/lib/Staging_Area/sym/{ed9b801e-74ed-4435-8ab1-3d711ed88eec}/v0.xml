@@ -1,0 +1,143 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<symbol version="0">
+    <meta>
+        <uuid>{ed9b801e-74ed-4435-8ab1-3d711ed88eec}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:28Z</created>
+        <last_modified>2015-06-21T12:37:28Z</last_modified>
+        <name locale="en_US">IR2132</name>
+        <description locale="en_US">
+
+This element was automatically imported from Eagle
+Filepath: 0_ICs.lbr
+Name: IR2132
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="10" start_x="-15.240000" start_y="33.020000" fill="false" width="0.254000">
+            <segment end_x="-15.240000" end_y="-5.080000" angle="0.000000"/>
+            <segment end_x="12.700000" end_y="-5.080000" angle="0.000000"/>
+            <segment end_x="12.700000" end_y="33.020000" angle="0.000000"/>
+            <segment end_x="-15.240000" end_y="33.020000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="3.175000" x="12.700000" y="35.560000" layer="10" text="${SYM::NAME}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="2.500000" x="-15.240000" y="-7.620000" layer="10" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pins>
+        <pin length="5.080000" x="-20.320000" uuid="{19296441-4b54-4ef1-b734-061008618912}" y="22.860000" angle="90.000000">
+            <name locale="en_US">HIN3</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="17.780000" uuid="{c49666f3-29e7-4f4b-ada3-c23278701b90}" y="0.000000" angle="-90.000000">
+            <name locale="en_US">LO1</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="17.780000" uuid="{31d9b7cd-9675-4e00-91cc-4567cbf2114a}" y="25.400000" angle="-90.000000">
+            <name locale="en_US">VS1</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="-20.320000" uuid="{1fdd81b4-a293-449c-848d-abfb7d2a9c15}" y="17.780000" angle="90.000000">
+            <name locale="en_US">LIN2</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="17.780000" uuid="{62545f9c-5c64-4c1f-911c-f9e0d3c099a3}" y="5.080000" angle="-90.000000">
+            <name locale="en_US">VS3</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="17.780000" uuid="{a543736a-e4ca-4960-9070-c278a6926484}" y="22.860000" angle="-90.000000">
+            <name locale="en_US">NC_1</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="-20.320000" uuid="{1653fa57-45aa-4913-8e7b-112ea2484a3a}" y="20.320000" angle="90.000000">
+            <name locale="en_US">LIN1</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="17.780000" uuid="{c58d500e-16f7-402a-ae29-3e0f9cfc5e9a}" y="7.620000" angle="-90.000000">
+            <name locale="en_US">HO3</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="17.780000" uuid="{af5c2859-bea9-43b8-8f8a-2628c720d0cd}" y="30.480000" angle="-90.000000">
+            <name locale="en_US">VB1</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="-20.320000" uuid="{bc0de036-6236-43d3-951a-443694aa029b}" y="12.700000" angle="90.000000">
+            <name locale="en_US">FAULT</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="17.780000" uuid="{8bd52b66-3dcf-4407-ade9-8628e325c059}" y="10.160000" angle="-90.000000">
+            <name locale="en_US">VB3</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="-20.320000" uuid="{458715d9-15fd-4902-9fc9-1094618dab63}" y="27.940000" angle="90.000000">
+            <name locale="en_US">HIN1</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="-20.320000" uuid="{cce3663f-4abc-4a32-b8eb-6010185cb1a9}" y="10.160000" angle="90.000000">
+            <name locale="en_US">ITRIP</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="-20.320000" uuid="{6f87614b-8a21-4d73-88b6-100f857ec4fc}" y="7.620000" angle="90.000000">
+            <name locale="en_US">CA0</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="17.780000" uuid="{3085e9a3-aa52-461b-84be-aa8ca0415ece}" y="-2.540000" angle="-90.000000">
+            <name locale="en_US">LO2</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="17.780000" uuid="{3cc927c8-a2d4-4575-8f0f-e59775881a9e}" y="2.540000" angle="-90.000000">
+            <name locale="en_US">NC_3</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="17.780000" uuid="{5902e95c-c1f5-41e6-8734-2e5c9b573803}" y="15.240000" angle="-90.000000">
+            <name locale="en_US">VS2</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="-20.320000" uuid="{1a721a9a-5121-4cac-97bf-9c7fcf74b04c}" y="15.240000" angle="90.000000">
+            <name locale="en_US">LIN3</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="-20.320000" uuid="{a31387dd-dce7-4d72-a0da-f9a6a4d43c98}" y="30.480000" angle="90.000000">
+            <name locale="en_US">VCC</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="17.780000" uuid="{63a8154c-9118-4b8a-9d48-c68e37f97ec5}" y="27.940000" angle="-90.000000">
+            <name locale="en_US">HO1</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="-20.320000" uuid="{d19c46a2-3d6f-4dbe-ac65-974599f4ea65}" y="5.080000" angle="90.000000">
+            <name locale="en_US">CA-</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="-20.320000" uuid="{a8f13dc8-7365-4660-8e37-4dd11ab8444c}" y="2.540000" angle="90.000000">
+            <name locale="en_US">VSS</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="-20.320000" uuid="{e1ab32cd-182b-41f5-92b6-498c419eb3da}" y="-2.540000" angle="90.000000">
+            <name locale="en_US">LO3</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="-20.320000" uuid="{ea2724cb-f619-4397-8cc6-9513de883d21}" y="0.000000" angle="90.000000">
+            <name locale="en_US">VS0</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="17.780000" uuid="{db80ecbd-e66c-4469-b75f-cd0a91ace31d}" y="12.700000" angle="-90.000000">
+            <name locale="en_US">NC_2</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="-20.320000" uuid="{ad6b8c52-fd83-4df4-9192-f38c6a8b917f}" y="25.400000" angle="90.000000">
+            <name locale="en_US">HIN2</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="17.780000" uuid="{239ebe9a-1dda-4953-9a2f-3c0821ff99ac}" y="17.780000" angle="-90.000000">
+            <name locale="en_US">HO2</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="17.780000" uuid="{03db8f8c-be3d-4bd8-82e7-bb3a019bbfb3}" y="20.320000" angle="-90.000000">
+            <name locale="en_US">VB2</name>
+            <description locale="en_US"/>
+        </pin>
+    </pins>
+</symbol>

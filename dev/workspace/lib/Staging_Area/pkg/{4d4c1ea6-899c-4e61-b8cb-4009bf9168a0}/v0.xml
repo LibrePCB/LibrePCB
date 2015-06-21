@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{4d4c1ea6-899c-4e61-b8cb-4009bf9168a0}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:32Z</created>
+        <last_modified>2015-06-21T12:37:32Z</last_modified>
+        <name locale="en_US">XC22B7</name>
+        <description locale="en_US">&lt;b>X CAPACITOR&lt;/b>&lt;p>
+body 26.6 x 7.5 mm, grid 22.86 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: XC22B7
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{5db49bac-d121-4a7c-b9b6-87e313ed14ea}</footprint>
+    </meta>
+    <categories/>
+</package>

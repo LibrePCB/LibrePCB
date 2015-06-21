@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{c6bb46f3-34be-48f1-b7e4-d9138eb7f7fa}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:45Z</created>
+        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <name locale="en_US">HC49GW</name>
+        <description locale="en_US">&lt;b>CRYSTAL&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: crystal.lbr
+Name: HC49GW
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{ac61560c-ea3f-4db1-953d-7d7f7251b194}</generic_component>
+        <package>{01cffac8-e4ca-4e3b-afed-6aea68d151be}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{62152830-8ecd-44e5-9824-39740f798eef}" signal="{84f94535-d10f-4c11-b29d-3e7d2f854bb5}"/>
+        <map pad="{50c262d1-0a29-4816-81cf-071a5ef1a387}" signal="{9c3ed1bf-5dff-4713-98db-96fb385a1c81}"/>
+        <map pad="{3ac88b6c-ed56-44d7-b48e-8ca6dbe355bc}" signal="{b1173e21-702d-4a05-a6dc-7ff382af41ed}"/>
+    </pad_signal_map>
+</component>

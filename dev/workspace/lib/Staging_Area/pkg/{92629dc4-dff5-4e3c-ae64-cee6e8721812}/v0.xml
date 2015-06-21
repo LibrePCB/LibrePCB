@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{92629dc4-dff5-4e3c-ae64-cee6e8721812}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:33Z</created>
+        <last_modified>2015-06-21T12:37:33Z</last_modified>
+        <name locale="en_US">CTRIM3018_11</name>
+        <description locale="en_US">&lt;b>Trimm capacitor SMD&lt;/b> STELCO GmbH
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: CTRIM3018_11
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{efea1060-3432-4541-bd95-fcf1e41bad50}</footprint>
+    </meta>
+    <categories/>
+</package>

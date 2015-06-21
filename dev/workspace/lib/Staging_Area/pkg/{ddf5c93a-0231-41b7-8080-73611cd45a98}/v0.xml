@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{ddf5c93a-0231-41b7-8080-73611cd45a98}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:32Z</created>
+        <last_modified>2015-06-21T12:37:32Z</last_modified>
+        <name locale="en_US">C275-134X316</name>
+        <description locale="en_US">&lt;b>CAPACITOR&lt;/b>&lt;p>
+grid 27.5 mm, outline 13.4 x 31.6 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: C275-134X316
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{c0f49c78-6b89-45ec-8c6c-58c849b11d82}</footprint>
+    </meta>
+    <categories/>
+</package>

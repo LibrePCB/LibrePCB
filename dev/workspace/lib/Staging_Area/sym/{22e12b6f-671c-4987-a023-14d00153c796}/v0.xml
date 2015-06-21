@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<symbol version="0">
+    <meta>
+        <uuid>{22e12b6f-671c-4987-a023-14d00153c796}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:29Z</created>
+        <last_modified>2015-06-21T12:37:29Z</last_modified>
+        <name locale="en_US">MA13-2</name>
+        <description locale="en_US">
+
+This element was automatically imported from Eagle
+Filepath: con-lstb.lbr
+Name: MA13-2
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" layer="10" start_x="-1.270000" start_y="10.160000" fill="false" width="0.609600">
+            <segment end_x="-2.540000" end_y="10.160000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-1.270000" start_y="12.700000" fill="false" width="0.609600">
+            <segment end_x="-2.540000" end_y="12.700000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-1.270000" start_y="15.240000" fill="false" width="0.609600">
+            <segment end_x="-2.540000" end_y="15.240000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="2.540000" start_y="10.160000" fill="false" width="0.609600">
+            <segment end_x="1.270000" end_y="10.160000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="2.540000" start_y="12.700000" fill="false" width="0.609600">
+            <segment end_x="1.270000" end_y="12.700000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="2.540000" start_y="15.240000" fill="false" width="0.609600">
+            <segment end_x="1.270000" end_y="15.240000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-1.270000" start_y="5.080000" fill="false" width="0.609600">
+            <segment end_x="-2.540000" end_y="5.080000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-1.270000" start_y="7.620000" fill="false" width="0.609600">
+            <segment end_x="-2.540000" end_y="7.620000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="2.540000" start_y="5.080000" fill="false" width="0.609600">
+            <segment end_x="1.270000" end_y="5.080000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="2.540000" start_y="7.620000" fill="false" width="0.609600">
+            <segment end_x="1.270000" end_y="7.620000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-1.270000" start_y="-2.540000" fill="false" width="0.609600">
+            <segment end_x="-2.540000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-1.270000" start_y="0.000000" fill="false" width="0.609600">
+            <segment end_x="-2.540000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-1.270000" start_y="2.540000" fill="false" width="0.609600">
+            <segment end_x="-2.540000" end_y="2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="2.540000" start_y="-2.540000" fill="false" width="0.609600">
+            <segment end_x="1.270000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="2.540000" start_y="0.000000" fill="false" width="0.609600">
+            <segment end_x="1.270000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="2.540000" start_y="2.540000" fill="false" width="0.609600">
+            <segment end_x="1.270000" end_y="2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-1.270000" start_y="-7.620000" fill="false" width="0.609600">
+            <segment end_x="-2.540000" end_y="-7.620000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-1.270000" start_y="-5.080000" fill="false" width="0.609600">
+            <segment end_x="-2.540000" end_y="-5.080000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="2.540000" start_y="-7.620000" fill="false" width="0.609600">
+            <segment end_x="1.270000" end_y="-7.620000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="2.540000" start_y="-5.080000" fill="false" width="0.609600">
+            <segment end_x="1.270000" end_y="-5.080000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-1.270000" start_y="-15.240000" fill="false" width="0.609600">
+            <segment end_x="-2.540000" end_y="-15.240000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-1.270000" start_y="-12.700000" fill="false" width="0.609600">
+            <segment end_x="-2.540000" end_y="-12.700000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="-1.270000" start_y="-10.160000" fill="false" width="0.609600">
+            <segment end_x="-2.540000" end_y="-10.160000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="2.540000" start_y="-15.240000" fill="false" width="0.609600">
+            <segment end_x="1.270000" end_y="-15.240000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="2.540000" start_y="-12.700000" fill="false" width="0.609600">
+            <segment end_x="1.270000" end_y="-12.700000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="2.540000" start_y="-10.160000" fill="false" width="0.609600">
+            <segment end_x="1.270000" end_y="-10.160000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" layer="10" start_x="3.810000" start_y="17.780000" fill="false" width="0.406400">
+            <segment end_x="3.810000" end_y="-17.780000" angle="0.000000"/>
+            <segment end_x="-3.810000" end_y="-17.780000" angle="0.000000"/>
+            <segment end_x="-3.810000" end_y="17.780000" angle="0.000000"/>
+            <segment end_x="3.810000" end_y="17.780000" angle="0.000000"/>
+        </polygon>
+        <text v_align="bottom" height="2.500000" x="-3.810000" y="-20.320000" layer="21" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" height="3.175000" x="-3.810000" y="18.542000" layer="20" text="${SYM::NAME}" h_align="left" angle="0.000000"/>
+    </geometry>
+    <pins>
+        <pin length="5.080000" x="-7.620000" uuid="{58eb814a-9042-4bfb-aa76-b34e5a38c46a}" y="7.620000" angle="90.000000">
+            <name locale="en_US">7</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="7.620000" uuid="{b0853458-ac3a-42f3-833b-0b8ca288185c}" y="15.240000" angle="270.000000">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="7.620000" uuid="{1fb0f2ce-ea5f-4588-a879-05be5d94afa9}" y="0.000000" angle="270.000000">
+            <name locale="en_US">14</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="-7.620000" uuid="{957a0fe9-101f-448a-b187-a61fa4269d6c}" y="15.240000" angle="90.000000">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="-7.620000" uuid="{396e30f5-147e-4491-99bc-68f49977d83d}" y="10.160000" angle="90.000000">
+            <name locale="en_US">5</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="-7.620000" uuid="{f2775dc5-6a2e-4bda-b5bc-dd3ccaffd906}" y="-12.700000" angle="90.000000">
+            <name locale="en_US">23</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="7.620000" uuid="{cbfa3b41-0c32-4338-a0ce-3ca632bad581}" y="2.540000" angle="270.000000">
+            <name locale="en_US">12</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="-7.620000" uuid="{34977910-58e3-4992-b5b9-160c3c88e8e9}" y="-15.240000" angle="90.000000">
+            <name locale="en_US">25</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="-7.620000" uuid="{3400f03d-8222-444e-b9e8-00e28cfb5051}" y="5.080000" angle="90.000000">
+            <name locale="en_US">9</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="-7.620000" uuid="{274918fd-3468-45fe-bef0-2178eaf27ec7}" y="-5.080000" angle="90.000000">
+            <name locale="en_US">17</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="7.620000" uuid="{990ed1d1-96b6-4435-aef5-524665b3b473}" y="-15.240000" angle="270.000000">
+            <name locale="en_US">26</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="-7.620000" uuid="{3a6b0092-f505-4393-a9f2-01d12c752e0e}" y="2.540000" angle="90.000000">
+            <name locale="en_US">11</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="7.620000" uuid="{dae04e47-fa11-4181-ab59-8063422e7aac}" y="10.160000" angle="270.000000">
+            <name locale="en_US">6</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="-7.620000" uuid="{1dd8cdad-b5e3-4e54-a2bc-5997a9af7a2c}" y="-2.540000" angle="90.000000">
+            <name locale="en_US">15</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="7.620000" uuid="{a4cbcc87-7be7-4569-bf0d-94a19aaff446}" y="12.700000" angle="270.000000">
+            <name locale="en_US">4</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="-7.620000" uuid="{c5180a40-998e-44e0-9d79-05dca15f8509}" y="-7.620000" angle="90.000000">
+            <name locale="en_US">19</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="-7.620000" uuid="{69880724-76ae-4164-b400-2a90ad7f3fd0}" y="12.700000" angle="90.000000">
+            <name locale="en_US">3</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="7.620000" uuid="{c5443b5a-96e4-4e06-bcbf-d65eafd1a4a4}" y="-2.540000" angle="270.000000">
+            <name locale="en_US">16</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="-7.620000" uuid="{8d3d8a74-3d88-439d-955b-16d1656d1451}" y="0.000000" angle="90.000000">
+            <name locale="en_US">13</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="7.620000" uuid="{f385149c-812f-4b52-a7b0-f9728b7de99c}" y="-12.700000" angle="270.000000">
+            <name locale="en_US">24</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="7.620000" uuid="{8ea7b770-547b-46f4-a92e-f02145899047}" y="5.080000" angle="270.000000">
+            <name locale="en_US">10</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="7.620000" uuid="{14747297-e137-4510-9c46-a21e0e04a042}" y="7.620000" angle="270.000000">
+            <name locale="en_US">8</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="7.620000" uuid="{6624d6a1-6132-4793-9fff-b5864d09fddc}" y="-5.080000" angle="270.000000">
+            <name locale="en_US">18</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="7.620000" uuid="{1cab9f73-6e57-4004-91e4-68e78d47aa4c}" y="-7.620000" angle="270.000000">
+            <name locale="en_US">20</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="-7.620000" uuid="{23852833-b067-4293-93b9-de1965ba43d9}" y="-10.160000" angle="90.000000">
+            <name locale="en_US">21</name>
+            <description locale="en_US"/>
+        </pin>
+        <pin length="5.080000" x="7.620000" uuid="{73820dec-476d-45e6-b0b3-8d09a6e32e6d}" y="-10.160000" angle="270.000000">
+            <name locale="en_US">22</name>
+            <description locale="en_US"/>
+        </pin>
+    </pins>
+</symbol>

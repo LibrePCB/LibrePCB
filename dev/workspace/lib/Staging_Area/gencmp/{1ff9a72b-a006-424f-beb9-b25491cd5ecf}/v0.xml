@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{1ff9a72b-a006-424f-beb9-b25491cd5ecf}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">BZW04XXB</name>
+        <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
+uni and bidirectional supressor diode
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: BZW04XXB
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">D</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{938466a2-4447-4e0d-a186-20b824419218}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{2e189668-f9e0-4ff0-b566-bb354ad8b2fa}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{bdc9a1b6-afd4-4d29-92d3-5c1c16b2f106}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{bf75583d-185c-495f-bf1d-38c982963211}" suffix="1" symbol="{4a47ee5d-7e92-4b92-a62a-267f2bd5c1fb}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{23ed63d6-d60d-46c0-82f8-3bddacf237d4}" signal="{2e189668-f9e0-4ff0-b566-bb354ad8b2fa}"/>
+                        <map display="gen_comp_signal" pin="{49a7765d-263c-47b8-84b0-ed5e18d23510}" signal="{938466a2-4447-4e0d-a186-20b824419218}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{d9384240-4fc3-496b-811c-7ef5c15becfb}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:39Z</created>
+        <last_modified>2015-06-21T12:37:39Z</last_modified>
+        <name locale="en_US">P-LCC-2-TOPLED-RG</name>
+        <description locale="en_US">&lt;b>Hyper TOPLED® RG Hyper-Bright LED&lt;/b>&lt;p>
+Source: http://www.osram.convergy.de/ ... LA_LO_LS_LY T776.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: P-LCC-2-TOPLED-RG
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{bac45250-4c58-4f3e-afa7-d776a1c20b08}</footprint>
+    </meta>
+    <categories/>
+</package>

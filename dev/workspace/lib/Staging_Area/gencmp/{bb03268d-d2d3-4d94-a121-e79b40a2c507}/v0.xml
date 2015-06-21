@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{bb03268d-d2d3-4d94-a121-e79b40a2c507}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:46Z</created>
+        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <name locale="en_US">PBYR635</name>
+        <description locale="en_US">Dual &lt;B>DIODE&lt;/B>&lt;p>
+common cathode
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: PBYR635
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">D</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{38142ed1-8009-4e4e-b172-9dd748d50166}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A1</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{6da7afd8-769e-4cd9-9933-f8bd27465434}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A2</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{3ccbb2e6-8c2d-4b20-93cd-e066f47904b6}" required="false" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{6f03c54a-391c-4f3f-8df3-744c2d07792b}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{feee47cf-cd42-44f2-8bbf-d467e57c99b7}" suffix="1" symbol="{ef47f640-bc59-44c2-b2c4-ca53f075d392}" required="true">
+                    <pin_signal_map>
+                        <map display="gen_comp_signal" pin="{cb551ac5-c8fc-4a3b-99bc-080295d20ba8}" signal="{38142ed1-8009-4e4e-b172-9dd748d50166}"/>
+                        <map display="gen_comp_signal" pin="{ba59f65f-ab4a-4fb4-9af2-989b4f65808f}" signal="{6da7afd8-769e-4cd9-9933-f8bd27465434}"/>
+                        <map display="gen_comp_signal" pin="{3bb212ed-c465-44f6-9435-ac6a11895a5c}" signal="{3ccbb2e6-8c2d-4b20-93cd-e066f47904b6}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>
