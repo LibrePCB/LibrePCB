@@ -103,6 +103,8 @@ class UnplacedComponentsDock final : public QDockWidget
         GraphicsScene* mFootprintPreviewGraphicsScene;
         GenCompInstance* mSelectedGenComp;
         const library::Component* mSelectedComponent;
+        QMetaObject::Connection mCircuitConnection1;
+        QMetaObject::Connection mCircuitConnection2;
         QMetaObject::Connection mBoardConnection1;
         QMetaObject::Connection mBoardConnection2;
         Point mNextPosition;

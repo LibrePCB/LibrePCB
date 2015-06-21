@@ -51,17 +51,18 @@ UnplacedComponentsDock::UnplacedComponentsDock(Project& project) :
     mUi(new Ui::UnplacedComponentsDock),
     mFootprintPreviewGraphicsView(nullptr), mFootprintPreviewGraphicsScene(nullptr),
     mSelectedGenComp(nullptr), mSelectedComponent(nullptr),
-    mBoardConnection1(), mBoardConnection2(), mDisableListUpdate(false)
+    mCircuitConnection1(), mCircuitConnection2(), mBoardConnection1(), mBoardConnection2(),
+    mDisableListUpdate(false)
 {
     mUi->setupUi(this);
     mFootprintPreviewGraphicsScene = new GraphicsScene();
     mFootprintPreviewGraphicsView = new GraphicsView();
     mFootprintPreviewGraphicsView->setScene(mFootprintPreviewGraphicsScene);
 
-    connect(&mProject.getCircuit(), &Circuit::genCompAdded,
-            [this](GenCompInstance& gc){Q_UNUSED(gc); updateComponentsList();});
-    connect(&mProject.getCircuit(), &Circuit::genCompRemoved,
-            [this](GenCompInstance& gc){Q_UNUSED(gc); updateComponentsList();});
+    mCircuitConnection1 = connect(&mProject.getCircuit(), &Circuit::genCompAdded,
+                                  [this](GenCompInstance& gc){Q_UNUSED(gc); updateComponentsList();});
+    mCircuitConnection2 = connect(&mProject.getCircuit(), &Circuit::genCompRemoved,
+                                  [this](GenCompInstance& gc){Q_UNUSED(gc); updateComponentsList();});
 
     updateComponentsList();
 }
@@ -70,6 +71,8 @@ UnplacedComponentsDock::~UnplacedComponentsDock()
 {
     setBoard(nullptr);
     mDisableListUpdate = true;
+    disconnect(mCircuitConnection1);        mCircuitConnection1 = QMetaObject::Connection();
+    disconnect(mCircuitConnection2);        mCircuitConnection2 = QMetaObject::Connection();
     delete mFootprintPreviewGraphicsView;   mFootprintPreviewGraphicsView = nullptr;
     delete mFootprintPreviewGraphicsScene;  mFootprintPreviewGraphicsScene = nullptr;
     delete mUi;                             mUi = nullptr;
