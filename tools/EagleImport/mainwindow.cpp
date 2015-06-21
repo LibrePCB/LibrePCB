@@ -11,6 +11,7 @@
 #include <librepcblibrary/cmp/component.h>
 #include <librepcblibrary/gencmp/genericcomponent.h>
 #include <librepcbcommon/boardlayer.h>
+#include <librepcbcommon/schematiclayer.h>
 #include "polygonsimplifier.h"
 
 using namespace library;
@@ -25,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent) :
     restoreGeometry(s.value("mainwindow/geometry").toByteArray());
     restoreState(s.value("mainwindow/state").toByteArray());
     mlastInputDirectory = s.value("mainwindow/last_input_directory").toString();
+    ui->edtDuplicateFolders->setText(s.value("mainwindow/last_library_directory").toString());
     ui->input->addItems(s.value("mainwindow/input").toStringList());
     ui->output->setText(s.value("mainwindow/output").toString());
 
@@ -41,6 +43,7 @@ MainWindow::~MainWindow()
     s.setValue("mainwindow/geometry", saveGeometry());
     s.setValue("mainwindow/state", saveState());
     s.setValue("mainwindow/last_input_directory", mlastInputDirectory);
+    s.setValue("mainwindow/last_library_directory", ui->edtDuplicateFolders->text());
     s.setValue("mainwindow/input", QVariant::fromValue(inputList));
     s.setValue("mainwindow/output", ui->output->text());
 
@@ -205,8 +208,8 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                 SymbolPolygon* polygon = new SymbolPolygon();
                 switch (child->getAttribute<uint>("layer"))
                 {
-                    case 94: polygon->setLayerId(10); break;
-                    case 95: polygon->setLayerId(20); break;
+                    case 94: polygon->setLayerId(SchematicLayer::LayerID::SymbolOutlines); break;
+                    case 95: polygon->setLayerId(SchematicLayer::LayerID::ComponentNames); break;
                     default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
                 }
                 polygon->setIsFilled(false);
@@ -214,7 +217,7 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                 polygon->setIsGrabArea(true);
                 Point startpos = Point(child->getAttribute<Length>("x1"), child->getAttribute<Length>("y1"));
                 Point endpos = Point(child->getAttribute<Length>("x2"), child->getAttribute<Length>("y2"));
-                Angle angle = child->hasAttribute("curve") ? Angle::fromDeg(child->getAttribute<int>("curve")) : Angle(0);
+                Angle angle = child->hasAttribute("curve") ? child->getAttribute<Angle>("curve") : Angle(0);
                 if (rotate180)
                 {
                     startpos = Point(-startpos.getX(), -startpos.getY());
@@ -229,7 +232,7 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                 SymbolPolygon* polygon = new SymbolPolygon();
                 switch (child->getAttribute<uint>("layer"))
                 {
-                    case 94: polygon->setLayerId(10); break;
+                    case 94: polygon->setLayerId(SchematicLayer::LayerID::SymbolOutlines); break;
                     default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
                 }
                 polygon->setIsFilled(true);
@@ -248,7 +251,7 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                 SymbolPolygon* polygon = new SymbolPolygon();
                 switch (child->getAttribute<uint>("layer"))
                 {
-                    case 94: polygon->setLayerId(10); break;
+                    case 94: polygon->setLayerId(SchematicLayer::LayerID::SymbolOutlines); break;
                     default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
                 }
                 polygon->setIsFilled(false);
@@ -273,7 +276,7 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                 SymbolEllipse* ellipse = new SymbolEllipse();
                 switch (child->getAttribute<uint>("layer"))
                 {
-                    case 94: ellipse->setLayerId(10); break;
+                    case 94: ellipse->setLayerId(SchematicLayer::LayerID::SymbolOutlines); break;
                     default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
                 }
                 ellipse->setLineWidth(child->getAttribute<Length>("width"));
@@ -289,10 +292,11 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                 SymbolText* text = new SymbolText();
                 switch (child->getAttribute<uint>("layer"))
                 {
-                    case 93: text->setLayerId(13); break;
-                    case 94: text->setLayerId(10); break;
-                    case 95: text->setLayerId(20); break;
-                    case 96: text->setLayerId(21); break;
+                    case 93: text->setLayerId(SchematicLayer::LayerID::SymbolPinNames); break;
+                    case 94: text->setLayerId(SchematicLayer::LayerID::SymbolOutlines); break;
+                    case 95: text->setLayerId(SchematicLayer::LayerID::ComponentNames); break;
+                    case 96: text->setLayerId(SchematicLayer::LayerID::ComponentValues); break;
+                    case 99: text->setLayerId(SchematicLayer::LayerID::OriginCrosses); break; // ???
                     default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
                 }
                 QString textStr = child->getText(true);
@@ -401,7 +405,10 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                     case 25: polygon->setLayerId(BoardLayer::LayerID::TopOverlayNames); break;
                     case 39: polygon->setLayerId(BoardLayer::LayerID::TopKeepout); break;
                     case 46: polygon->setLayerId(BoardLayer::LayerID::BoardOutline); break; // milling
+                    case 48: polygon->setLayerId(BoardLayer::LayerID::TopDeviceOutlines); break; // document
+                    case 49: polygon->setLayerId(BoardLayer::LayerID::OriginCrosses); break; // reference
                     case 51: polygon->setLayerId(BoardLayer::LayerID::TopDeviceOutlines); break;
+                    case 52: polygon->setLayerId(BoardLayer::LayerID::BottomDeviceOutlines); break;
                     default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
                 }
                 polygon->setIsFilled(false);
@@ -409,7 +416,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 polygon->setIsGrabArea(true);
                 Point startpos = Point(child->getAttribute<Length>("x1"), child->getAttribute<Length>("y1"));
                 Point endpos = Point(child->getAttribute<Length>("x2"), child->getAttribute<Length>("y2"));
-                Angle angle = child->hasAttribute("curve") ? Angle::fromDeg(child->getAttribute<Length>("curve").toMm()) : Angle(0);
+                Angle angle = child->hasAttribute("curve") ? child->getAttribute<Angle>("curve") : Angle(0);
                 if (rotate180)
                 {
                     startpos = Point(-startpos.getX(), -startpos.getY());
@@ -425,12 +432,17 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 FootprintPolygon* polygon = new FootprintPolygon();
                 switch (child->getAttribute<uint>("layer"))
                 {
+                    case 1: polygon->setLayerId(BoardLayer::LayerID::TopCopper); break;
+                    case 16: polygon->setLayerId(BoardLayer::LayerID::BottomCopper); break;
                     case 21: polygon->setLayerId(BoardLayer::LayerID::TopOverlay); break;
                     case 29: polygon->setLayerId(BoardLayer::LayerID::TopStopMask); break;
                     case 31: polygon->setLayerId(BoardLayer::LayerID::TopPaste); break;
                     case 35: polygon->setLayerId(BoardLayer::LayerID::TopGlue); break;
+                    case 41: valid = false; break; // tRestrict
+                    case 42: valid = false; break; // bRestrict
                     case 43: valid = false; break; // vRestrict
                     case 51: polygon->setLayerId(BoardLayer::LayerID::TopDeviceOutlines); break;
+                    case 52: polygon->setLayerId(BoardLayer::LayerID::BottomDeviceOutlines); break;
                     default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
                 }
                 polygon->setIsFilled(true);
@@ -452,6 +464,8 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 FootprintPolygon* polygon = new FootprintPolygon();
                 switch (child->getAttribute<uint>("layer"))
                 {
+                    case 1: polygon->setLayerId(BoardLayer::LayerID::TopCopper); break;
+                    case 16: polygon->setLayerId(BoardLayer::LayerID::BottomCopper); break;
                     case 21: polygon->setLayerId(BoardLayer::LayerID::TopOverlay); break;
                     case 29: polygon->setLayerId(BoardLayer::LayerID::TopStopMask); break;
                     case 31: polygon->setLayerId(BoardLayer::LayerID::TopPaste); break;
@@ -475,13 +489,23 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
             }
             else if (child->getName() == "circle")
             {
+                bool valid = true;
                 Length radius(child->getAttribute<Length>("radius"));
                 Point center(child->getAttribute<Length>("x"), child->getAttribute<Length>("y"));
                 FootprintEllipse* ellipse = new FootprintEllipse();
                 switch (child->getAttribute<uint>("layer"))
                 {
+                    case 1: ellipse->setLayerId(BoardLayer::LayerID::TopCopper); break;
+                    case 20: ellipse->setLayerId(BoardLayer::LayerID::BoardOutline); break;
                     case 21: ellipse->setLayerId(BoardLayer::LayerID::TopOverlay); break;
+                    case 22: ellipse->setLayerId(BoardLayer::LayerID::BottomDeviceOutlines); break;
                     case 27: ellipse->setLayerId(BoardLayer::LayerID::TopOverlayValues); break;
+                    case 29: ellipse->setLayerId(BoardLayer::LayerID::TopStopMask); break;
+                    case 31: ellipse->setLayerId(BoardLayer::LayerID::TopPaste); break;
+                    case 41: valid = false; break; // tRestrict
+                    case 42: valid = false; break; // bRestrict
+                    case 43: valid = false; break; // vRestrict
+                    case 49: ellipse->setLayerId(BoardLayer::LayerID::OriginCrosses); break; // reference
                     case 51: ellipse->setLayerId(BoardLayer::LayerID::TopDeviceOutlines); break;
                     case 52: ellipse->setLayerId(BoardLayer::LayerID::BottomDeviceOutlines); break;
                     default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
@@ -492,7 +516,10 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 ellipse->setCenter(center);
                 ellipse->setRadiusX(radius);
                 ellipse->setRadiusY(radius);
-                footprint->addEllipse(ellipse);
+                if (valid)
+                    footprint->addEllipse(ellipse);
+                else
+                    delete ellipse;
             }
             else if (child->getName() == "text")
             {
@@ -502,6 +529,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                     case 21: text->setLayerId(BoardLayer::LayerID::TopOverlay); break;
                     case 25: text->setLayerId(BoardLayer::LayerID::TopOverlayNames); break;
                     case 27: text->setLayerId(BoardLayer::LayerID::TopOverlayValues); break;
+                    case 48: text->setLayerId(BoardLayer::LayerID::TopDeviceOutlines); break; // document
                     case 51: text->setLayerId(BoardLayer::LayerID::TopDeviceOutlines); break;
                     default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
                 }
@@ -531,31 +559,38 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 FootprintPad* pad = new FootprintPad(padUuid, child->getAttribute("name"));
                 Length drill = child->getAttribute<Length>("drill");
                 pad->setDrillDiameter(drill);
+                Length diameter = child->hasAttribute("diameter") ? child->getAttribute<Length>("diameter") : drill * 2;
                 int angleDeg = 0;
                 if (child->hasAttribute("rot")) angleDeg = -child->getAttribute("rot").remove("R").toInt();
                 QString shape = child->hasAttribute("shape") ? child->getAttribute("shape") : "round";
-                if (shape == "octagon")
+                if (shape == "square")
+                {
+                    pad->setType(FootprintPad::Type_t::ThtRect);
+                    pad->setWidth(diameter);
+                    pad->setHeight(diameter);
+                }
+                else if (shape == "octagon")
                 {
                     pad->setType(FootprintPad::Type_t::ThtOctagon);
-                    pad->setWidth(drill * 2);
-                    pad->setHeight(drill * 2);
+                    pad->setWidth(diameter);
+                    pad->setHeight(diameter);
                 }
                 else if (shape == "round")
                 {
                     pad->setType(FootprintPad::Type_t::ThtRound);
-                    pad->setWidth(drill * 2);
-                    pad->setHeight(drill * 2);
+                    pad->setWidth(diameter);
+                    pad->setHeight(diameter);
                 }
                 else if (shape == "long")
                 {
                     pad->setType(FootprintPad::Type_t::ThtRound);
-                    pad->setWidth(drill * 4);
-                    pad->setHeight(drill * 2);
+                    pad->setWidth(diameter * 2);
+                    pad->setHeight(diameter);
                     angleDeg += 90;
                 }
                 else
                 {
-                    throw Exception(__FILE__, __LINE__, "Invalid shape: " % shape);
+                    throw Exception(__FILE__, __LINE__, "Invalid shape: " % shape % " :: " % filepath.toStr());
                 }
                 Point pos = Point(child->getAttribute<Length>("x"), child->getAttribute<Length>("y"));
                 if (rotate180)
@@ -571,6 +606,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
             {
                 QUuid padUuid = getOrCreateUuid(outputSettings, filepath, "footprint_pads", uuid.toString(), child->getAttribute("name"));
                 FootprintPad* pad = new FootprintPad(padUuid, child->getAttribute("name"));
+                pad->setType(FootprintPad::Type_t::SmdRect);
                 Point pos = Point(child->getAttribute<Length>("x"), child->getAttribute<Length>("y"));
                 int angleDeg = 0;
                 if (child->hasAttribute("rot")) angleDeg = -child->getAttribute("rot").remove("R").toInt();
@@ -580,7 +616,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                     angleDeg += 180;
                 }
                 pad->setPosition(pos);
-                pad->setRotation(Angle::fromDeg(angleDeg) + Angle::deg90());
+                pad->setRotation(Angle::fromDeg(angleDeg));
                 pad->setWidth(child->getAttribute<Length>("dx"));
                 pad->setHeight(child->getAttribute<Length>("dy"));
                 switch (child->getAttribute<uint>("layer"))
@@ -658,17 +694,22 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
         gencomp->addSymbolVariant(*symbvar);
 
         // signals
-        XmlDomElement* connects = node->getFirstChild("devices/device/connects", true, true);
-        for (XmlDomElement* connect = connects->getFirstChild("connect", false);
+        XmlDomElement* device = node->getFirstChild("devices/device", true, true);
+        for (XmlDomElement* connect = device->getFirstChild("connects/connect", false, false);
              connect; connect = connect->getNextSibling())
         {
             QString gateName = connect->getAttribute("gate");
             QString pinName = connect->getAttribute("pin");
+            if (pinName.contains("@")) pinName.truncate(pinName.indexOf("@"));
+            if (pinName.contains("#")) pinName.truncate(pinName.indexOf("#"));
             QUuid signalUuid = getOrCreateUuid(outputSettings, filepath, "gatepins_to_gencompsignals", uuid.toString(), gateName % pinName);
 
-            // create signal
-            GenCompSignal* signal = new GenCompSignal(signalUuid, pinName);
-            gencomp->addSignal(*signal);
+            if (!gencomp->getSignalByUuid(signalUuid))
+            {
+                // create signal
+                GenCompSignal* signal = new GenCompSignal(signalUuid, pinName);
+                gencomp->addSignal(*signal);
+            }
         }
 
         // symbol variant items
@@ -683,13 +724,15 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
             GenCompSymbVarItem* item = new GenCompSymbVarItem(symbVarItemUuid, symbolUuid, true, (gateName == "G$1") ? "" : gateName);
 
             // connect pins
-            for (XmlDomElement* connect = connects->getFirstChild("connect", false);
+            for (XmlDomElement* connect = device->getFirstChild("connects/connect", false, false);
                  connect; connect = connect->getNextSibling())
             {
                 if (connect->getAttribute("gate") == gateName)
                 {
                     QString pinName = connect->getAttribute("pin");
                     QUuid pinUuid = getOrCreateUuid(outputSettings, filepath, "symbol_pins", symbolUuid.toString(), pinName);
+                    if (pinName.contains("@")) pinName.truncate(pinName.indexOf("@"));
+                    if (pinName.contains("#")) pinName.truncate(pinName.indexOf("#"));
                     QUuid signalUuid = getOrCreateUuid(outputSettings, filepath, "gatepins_to_gencompsignals", uuid.toString(), gateName % pinName);
                     item->addPinSignalMapping(pinUuid, signalUuid, GenCompSymbVarItem::PinDisplayType_t::GenCompSignal);
                 }
@@ -701,6 +744,8 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
         // create components
         for (XmlDomElement* device = node->getFirstChild("devices/*", true, true); device; device = device->getNextSibling())
         {
+            if (!device->hasAttribute("package")) continue;
+
             QString deviceName = device->getAttribute("name");
             QString packageName = device->getAttribute("package");
             QUuid pkgUuid = getOrCreateUuid(outputSettings, filepath, "packages_to_packages", packageName);
@@ -712,15 +757,25 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
             component->setPackageUuid(pkgUuid);
 
             // connect pads
-            for (XmlDomElement* connect = device->getFirstChild("connects/*", true, false);
+            for (XmlDomElement* connect = device->getFirstChild("connects/*", false, false);
                  connect; connect = connect->getNextSibling())
             {
                 QString gateName = connect->getAttribute("gate");
                 QString pinName = connect->getAttribute("pin");
-                QString padName = connect->getAttribute("pad");
-                QUuid padUuid = getOrCreateUuid(outputSettings, filepath, "footprint_pads", fptUuid.toString(), padName);
-                QUuid signalUuid = getOrCreateUuid(outputSettings, filepath, "gatepins_to_gencompsignals", uuid.toString(), gateName % pinName);
-                component->addPadSignalMapping(padUuid, signalUuid);
+                QString padNames = connect->getAttribute("pad");
+                if (pinName.contains("@")) pinName.truncate(pinName.indexOf("@"));
+                if (pinName.contains("#")) pinName.truncate(pinName.indexOf("#"));
+                if (connect->hasAttribute("route"))
+                {
+                    if (connect->getAttribute("route") != "any")
+                        addError(QString("Unknown connect route: %1/%2").arg(node->getName()).arg(connect->getAttribute("route")), filepath);
+                }
+                foreach (const QString& padName, padNames.split(" ", QString::SkipEmptyParts))
+                {
+                    QUuid padUuid = getOrCreateUuid(outputSettings, filepath, "footprint_pads", fptUuid.toString(), padName);
+                    QUuid signalUuid = getOrCreateUuid(outputSettings, filepath, "gatepins_to_gencompsignals", uuid.toString(), gateName % pinName);
+                    component->addPadSignalMapping(padUuid, signalUuid);
+                }
             }
 
             // save component
@@ -810,4 +865,53 @@ void MainWindow::on_toolButton_clicked()
 void MainWindow::on_toolButton_2_clicked()
 {
     qDeleteAll(ui->input->selectedItems());
+}
+
+void MainWindow::on_toolButton_3_clicked()
+{
+    QString dir = QFileDialog::getExistingDirectory(this, "Select Library Folder", ui->edtDuplicateFolders->text());
+    if (dir.isEmpty()) return;
+    ui->edtDuplicateFolders->setText(dir);
+}
+
+void MainWindow::on_toolButton_4_clicked()
+{
+    if (ui->edtDuplicateFolders->text().isEmpty()) return;
+    if (ui->output->text().isEmpty()) return;
+
+    QDir libDir(ui->edtDuplicateFolders->text());
+    QDir outDir(ui->output->text());
+
+    //QStringList elements;
+    //elements << "3dmdl" << "cmp"
+
+    uint count = 0;
+
+    foreach (const QString& subdir1, libDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot))
+    {
+        if (subdir1 == "EagleImport") continue;
+        if (subdir1 == "Staging_Area") continue;
+        QDir repoDir = libDir.absoluteFilePath(subdir1);
+        foreach (const QString& subdir2, repoDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot))
+        {
+            QDir repoSubDir = repoDir.absoluteFilePath(subdir2);
+            foreach (const QString& elementDir, repoSubDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot))
+            {
+                QUuid elementUuid(elementDir);
+                if (elementUuid.isNull()) continue;
+
+                QDir outDirElement = outDir.absoluteFilePath(subdir2 % "/" % elementDir);
+                if (outDirElement.exists())
+                {
+                    qDebug() << outDirElement.absolutePath();
+                    if (outDirElement.removeRecursively())
+                        count++;
+                    else
+                        qDebug() << "Failed!";
+                }
+            }
+        }
+    }
+
+    QMessageBox::information(this, "Duplicates Removed", QString("%1 duplicates removed.").arg(count));
 }

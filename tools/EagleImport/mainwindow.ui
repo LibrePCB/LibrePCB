@@ -34,6 +34,12 @@
     </item>
     <item row="3" column="2">
      <widget class="QToolButton" name="outputBtn">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="text">
        <string>...</string>
       </property>
@@ -49,6 +55,20 @@
     <item row="3" column="1">
      <widget class="QLineEdit" name="output"/>
     </item>
+    <item row="8" column="0">
+     <widget class="QLabel" name="label_4">
+      <property name="text">
+       <string>Converted Elements:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="11" column="0" colspan="3">
+     <widget class="QPushButton" name="pushButton">
+      <property name="text">
+       <string>Close</string>
+      </property>
+     </widget>
+    </item>
     <item row="9" column="0">
      <widget class="QLabel" name="label_3">
       <property name="text">
@@ -56,20 +76,6 @@
       </property>
       <property name="alignment">
        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-      </property>
-     </widget>
-    </item>
-    <item row="10" column="0" colspan="3">
-     <widget class="QPushButton" name="pushButton">
-      <property name="text">
-       <string>Close</string>
-      </property>
-     </widget>
-    </item>
-    <item row="8" column="0">
-     <widget class="QLabel" name="label_4">
-      <property name="text">
-       <string>Converted Elements:</string>
       </property>
      </widget>
     </item>
@@ -89,10 +95,20 @@
       </property>
      </widget>
     </item>
+    <item row="9" column="1" colspan="2">
+     <widget class="QListWidget" name="errors"/>
+    </item>
     <item row="1" column="1">
      <widget class="QListWidget" name="input">
       <property name="selectionMode">
        <enum>QAbstractItemView::MultiSelection</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="0">
+     <widget class="QLabel" name="label_7">
+      <property name="text">
+       <string>Converted Elements:</string>
       </property>
      </widget>
     </item>
@@ -108,9 +124,6 @@
        <string>%v/%m</string>
       </property>
      </widget>
-    </item>
-    <item row="9" column="1" colspan="2">
-     <widget class="QListWidget" name="errors"/>
     </item>
     <item row="1" column="2">
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -181,17 +194,24 @@
       </item>
      </layout>
     </item>
-    <item row="6" column="0">
-     <widget class="QLabel" name="label_7">
-      <property name="text">
-       <string>Converted Elements:</string>
-      </property>
-     </widget>
-    </item>
     <item row="7" column="0">
      <widget class="QLabel" name="label_8">
       <property name="text">
        <string>Converted Files:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="label_5">
+      <property name="text">
+       <string>UUID List File:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="label_9">
+      <property name="text">
+       <string>Convert:</string>
       </property>
      </widget>
     </item>
@@ -227,26 +247,46 @@
       </item>
      </layout>
     </item>
-    <item row="4" column="0">
-     <widget class="QLabel" name="label_9">
-      <property name="text">
-       <string>Convert:</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="0">
-     <widget class="QLabel" name="label_5">
-      <property name="text">
-       <string>UUID List File:</string>
-      </property>
-     </widget>
-    </item>
     <item row="0" column="1" colspan="2">
      <widget class="QLabel" name="lblUuidList">
       <property name="text">
        <string>TextLabel</string>
       </property>
      </widget>
+    </item>
+    <item row="10" column="0">
+     <widget class="QLabel" name="label_6">
+      <property name="text">
+       <string>Remove Duplicates:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="10" column="1" colspan="2">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLineEdit" name="edtDuplicateFolders"/>
+      </item>
+      <item>
+       <widget class="QToolButton" name="toolButton_3">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="toolButton_4">
+        <property name="text">
+         <string>RUN</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>
