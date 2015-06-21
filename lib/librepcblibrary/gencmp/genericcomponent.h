@@ -55,6 +55,10 @@ class GenericComponent final : public LibraryElement
         explicit GenericComponent(const FilePath& xmlFilePath) throw (Exception);
         ~GenericComponent() noexcept;
 
+        // General
+        bool isSchematicOnly() const noexcept {return mSchematicOnly;}
+        void setIsSchematicOnly(bool schematicOnly) noexcept {mSchematicOnly = schematicOnly;}
+
         // Attributes
         const QList<LibraryElementAttribute*>& getAttributes() const noexcept;
         const LibraryElementAttribute* getAttributeByKey(const QString& key) const noexcept;
@@ -108,6 +112,7 @@ class GenericComponent final : public LibraryElement
 
 
         // Generic Conponent Attributes
+        bool mSchematicOnly; ///< if true, this component is schematic-only (no package)
         QList<LibraryElementAttribute*> mAttributes; ///< all attributes in a specific order
         QMap<QString, QString> mDefaultValues; ///< key: locale (like "en_US"), value: default value
         QMap<QString, QString> mPrefixes; ///< key: norm, value: prefix

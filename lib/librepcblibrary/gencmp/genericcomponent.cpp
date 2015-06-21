@@ -35,7 +35,8 @@ GenericComponent::GenericComponent(const QUuid& uuid, const Version& version,
                                    const QString& author, const QString& name_en_US,
                                    const QString& description_en_US,
                                    const QString& keywords_en_US) throw (Exception) :
-    LibraryElement("generic_component", uuid, version, author, name_en_US, description_en_US, keywords_en_US)
+    LibraryElement("generic_component", uuid, version, author, name_en_US, description_en_US, keywords_en_US),
+    mSchematicOnly(false)
 {
     Q_ASSERT(mUuid.isNull() == false);
 }
@@ -256,6 +257,8 @@ void GenericComponent::parseDomTree(const XmlDomElement& root) throw (Exception)
 {
     LibraryElement::parseDomTree(root);
 
+    mSchematicOnly = root.getFirstChild("properties/schematic_only", true, true)->getText<bool>(true);
+
     // Load all attributes
     for (XmlDomElement* node = root.getFirstChild("attributes/attribute", true, false);
          node; node = node->getNextSibling("attribute"))
@@ -367,6 +370,7 @@ XmlDomElement* GenericComponent::serializeToXmlDomElement() const throw (Excepti
     foreach (const LibraryElementAttribute* attribute, mAttributes)
         attributes->appendChild(attribute->serializeToXmlDomElement());
     XmlDomElement* properties = root->appendChild("properties");
+    properties->appendTextChild("schematic_only", mSchematicOnly);
     XmlDomElement* default_values = properties->appendChild("default_values");
     foreach (const QString& locale, mDefaultValues.keys())
     {

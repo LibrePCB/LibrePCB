@@ -19,6 +19,7 @@
         </attribute>
     </attributes>
     <properties>
+        <schematic_only>false</schematic_only>
         <default_values>
             <value locale="en_US">${COLOR}</value>
         </default_values>

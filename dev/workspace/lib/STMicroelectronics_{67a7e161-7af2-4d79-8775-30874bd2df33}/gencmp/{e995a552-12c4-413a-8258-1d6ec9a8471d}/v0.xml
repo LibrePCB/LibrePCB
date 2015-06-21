@@ -13,6 +13,7 @@
     <categories/>
     <attributes/>
     <properties>
+        <schematic_only>false</schematic_only>
         <default_values>
             <value locale="en_US">STM32F103C</value>
         </default_values>

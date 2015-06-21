@@ -17,6 +17,7 @@
     <attachements/>
     <attributes/>
     <properties>
+        <schematic_only>true</schematic_only>
         <default_values>
             <value locale="en_US">GND</value>
         </default_values>

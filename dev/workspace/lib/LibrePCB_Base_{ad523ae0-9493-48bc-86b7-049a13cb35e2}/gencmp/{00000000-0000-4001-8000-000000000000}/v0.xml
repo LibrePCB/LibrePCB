@@ -48,6 +48,7 @@
         -->
     </attributes>
     <properties>
+        <schematic_only>false</schematic_only>
         <default_values>
             <!--
                 Default values: This is the value of the component after adding it to a schematic. The user then can change the value if needed. The value is always a string and can contain variables which represent an attribute (syntax: ${ATTRIBUTE_NAME}). The default value can be defined for each language separately.
