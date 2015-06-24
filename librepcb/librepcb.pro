@@ -35,7 +35,7 @@ unix:!macx {
     # Linux/UNIX-specific configurations
     target.path = /usr/local/bin
     icon.path = /usr/share/pixmaps
-    icon.files = ../packaging/unix/img/librepcb.xpm
+    icon.files = ../packaging/unix/img/librepcb.svg
     desktop.path = /usr/share/applications
     desktop.files = ../packaging/unix/librepcb.desktop
     mimexml.path = /usr/share/mime/packages
