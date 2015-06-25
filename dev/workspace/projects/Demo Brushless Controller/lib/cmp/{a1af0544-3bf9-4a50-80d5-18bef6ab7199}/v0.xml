@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{a1af0544-3bf9-4a50-80d5-18bef6ab7199}</uuid>
+        <version>0.1</version>
+        <author/>
+        <created/>
+        <last_modified/>
+        <name locale="en_US">MA06-1</name>
+        <description locale="en_US">&lt;b>PIN HEADER&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: con-lstb.lbr
+Name: MA06-1
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"></keywords>
+        <generic_component>{0791310f-63fb-4d8f-8266-ee309d8e5016}</generic_component>
+        <package>{4bc1165d-b6d7-496d-89e1-3669729cf8f3}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map signal="{60a3f21c-4a89-4dad-b4bf-6c756c7df09d}" pad="{4388bea1-d400-4cff-a27b-4dc5809fa8cf}"/>
+        <map signal="{79ad9275-7895-4708-8d6b-3b502a404269}" pad="{97182810-208c-4f4a-a3cb-6c1db3e6dbac}"/>
+        <map signal="{cb80ea12-5702-4ad3-b7bf-662544403995}" pad="{c2c2e9e1-07e7-4a82-99ad-7a3a5983390f}"/>
+        <map signal="{54aea1a2-260b-4cb1-a541-bac92a0457f2}" pad="{60dcdc42-10d8-4df3-9aba-624b974fb306}"/>
+        <map signal="{6651a454-c542-48fc-9056-518546c904dd}" pad="{4300a878-c812-4a49-9d11-2c2721bd6081}"/>
+        <map signal="{0b9eae8a-63ad-4582-94c9-fe30266c86d1}" pad="{2fa8cc79-1106-4e0e-8818-1afa9458e2d3}"/>
+    </pad_signal_map>
+</component>

@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{d3f189de-e0aa-4ecd-8738-7450dfb78e5d}</uuid>
+        <version>0.1</version>
+        <author/>
+        <created/>
+        <last_modified/>
+        <name locale="en_US">CHIP-LED0805</name>
+        <description locale="en_US">&lt;b>Hyper CHIPLED Hyper-Bright LED&lt;/b>&lt;p>
+LB R99A&lt;br>
+Source: http://www.osram.convergy.de/ ... lb_r99a.pdf
+
+This element was automatically imported from Eagle
+Filepath: led.lbr
+Name: CHIP-LED0805
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"></keywords>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" fill="false" layer="110" width="0.101600" start_x="-0.625000" start_y="0.450000">
+            <segment end_x="-0.625000" end_y="-0.450000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" fill="false" layer="110" width="0.101600" start_x="0.625000" start_y="0.450000">
+            <segment end_x="0.625000" end_y="-0.475000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" fill="true" layer="170" width="0.000000" start_x="-0.675000" start_y="0.000000">
+            <segment end_x="-0.525000" end_y="0.000000" angle="0.000000"/>
+            <segment end_x="-0.525000" end_y="0.300000" angle="0.000000"/>
+            <segment end_x="-0.675000" end_y="0.300000" angle="0.000000"/>
+            <segment end_x="-0.675000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" fill="true" layer="170" width="0.000000" start_x="0.525000" start_y="0.000000">
+            <segment end_x="0.675000" end_y="0.000000" angle="0.000000"/>
+            <segment end_x="0.675000" end_y="0.300000" angle="0.000000"/>
+            <segment end_x="0.525000" end_y="0.300000" angle="0.000000"/>
+            <segment end_x="0.525000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" fill="true" layer="170" width="0.000000" start_x="-0.150000" start_y="0.000000">
+            <segment end_x="0.150000" end_y="0.000000" angle="0.000000"/>
+            <segment end_x="0.150000" end_y="0.300000" angle="0.000000"/>
+            <segment end_x="-0.150000" end_y="0.300000" angle="0.000000"/>
+            <segment end_x="-0.150000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" fill="true" layer="110" width="0.000000" start_x="-0.675000" start_y="0.450000">
+            <segment end_x="0.675000" end_y="0.450000" angle="0.000000"/>
+            <segment end_x="0.675000" end_y="1.050000" angle="0.000000"/>
+            <segment end_x="-0.675000" end_y="1.050000" angle="0.000000"/>
+            <segment end_x="-0.675000" end_y="0.450000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" fill="true" layer="110" width="0.000000" start_x="-0.675000" start_y="-1.050000">
+            <segment end_x="0.675000" end_y="-1.050000" angle="0.000000"/>
+            <segment end_x="0.675000" end_y="-0.450000" angle="0.000000"/>
+            <segment end_x="-0.675000" end_y="-0.450000" angle="0.000000"/>
+            <segment end_x="-0.675000" end_y="-1.050000" angle="0.000000"/>
+        </polygon>
+        <text h_align="left" text="${CMP::NAME}" v_align="bottom" layer="150" x="-1.270000" y="-1.270000" height="3.175000" angle="0.000000"/>
+        <text h_align="left" text="${CMP::VALUE}" v_align="bottom" layer="160" x="2.540000" y="-1.270000" height="2.500000" angle="0.000000"/>
+    </geometry>
+    <pads>
+        <pad drill="0.000000" type="smd_rect" layer="200" x="0.000000" y="1.050000" width="1.200000" height="1.200000" uuid="{efa46a8a-87c7-4895-8271-5efb887aec90}" rotation="0.000000">
+            <name locale="en_US">C</name>
+            <description locale="en_US"></description>
+        </pad>
+        <pad drill="0.000000" type="smd_rect" layer="200" x="0.000000" y="-1.050000" width="1.200000" height="1.200000" uuid="{94bdaf51-e15b-46fe-bf4f-964a8969eccd}" rotation="0.000000">
+            <name locale="en_US">A</name>
+            <description locale="en_US"></description>
+        </pad>
+    </pads>
+</footprint>

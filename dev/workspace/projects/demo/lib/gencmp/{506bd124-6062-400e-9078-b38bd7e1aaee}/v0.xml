@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{506bd124-6062-400e-9078-b38bd7e1aaee}</uuid>
+        <version>0.1</version>
+        <author/>
+        <created/>
+        <last_modified/>
+        <name locale="en_US">Inductor</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US">inductor,inductance</keywords>
+    </meta>
+    <categories>
+        <category>{00000000-0000-4001-8000-000000000000}</category>
+    </categories>
+    <attributes>
+        <attribute key="INDUCTANCE" type="inductance" unit="millihenry">
+            <name locale="en_US">Inductance</name>
+            <description locale="en_US">The nominal inductance of the inductor.</description>
+            <default_value locale="en_US"></default_value>
+        </attribute>
+    </attributes>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US">${INDUCTANCE}</value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">L</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal negated="false" forced_net_name="" clock="false" required="true" uuid="{777f11cd-9d4e-4b2b-aafa-7e7a836ff56e}" role="passive">
+            <name locale="en_US">1</name>
+            <description locale="en_US"></description>
+        </signal>
+        <signal negated="false" forced_net_name="" clock="false" required="true" uuid="{5b36d330-6f19-4391-8f95-1c2f6a658286}" role="passive">
+            <name locale="en_US">2</name>
+            <description locale="en_US"></description>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="IEC 60617" uuid="{62a7598c-17fe-41cf-8fa1-4ed274c3adc2}" default="true">
+            <name locale="en_US">European Variant</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item symbol="{11e1f693-0777-48e4-b3bd-b451f3c929b3}" required="true" uuid="{60cec411-a717-4893-b12f-7b698925e15b}" suffix="">
+                    <pin_signal_map>
+                        <map signal="{777f11cd-9d4e-4b2b-aafa-7e7a836ff56e}" display="none" pin="{06d55f94-1316-48cb-a20f-0d4231eced31}"/>
+                        <map signal="{5b36d330-6f19-4391-8f95-1c2f6a658286}" display="none" pin="{1b2d8b3c-b531-48ec-a0f9-07e91687c214}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

@@ -60,22 +60,14 @@ ProjectLibrary::ProjectLibrary(Project& project, bool restore, bool readOnly) th
 
     try
     {
-        // TEMPORARY: load all elements from the whole workspace library
-        QDir dir(Workspace::instance().getLibraryPath().toStr());
-        dir.setFilter(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::Readable);
-        foreach (const QString& dirname, dir.entryList())
-        {
-            mLibraryPath = Workspace::instance().getLibraryPath().getPathTo(dirname);
-
-            // Load all library elements
-            loadElements<Symbol>          (mLibraryPath.getPathTo("sym"),    "symbols",            mSymbols);
-            loadElements<Footprint>       (mLibraryPath.getPathTo("fpt"),    "footprints",         mFootprints);
-            loadElements<Model3D>           (mLibraryPath.getPathTo("3dmdl"),  "3d models",          mModels);
-            loadElements<SpiceModel>      (mLibraryPath.getPathTo("spcmdl"), "spice models",       mSpiceModels);
-            loadElements<Package>         (mLibraryPath.getPathTo("pkg"),    "packages",           mPackages);
-            loadElements<GenericComponent>(mLibraryPath.getPathTo("gencmp"), "generic components", mGenericComponents);
-            loadElements<Component>       (mLibraryPath.getPathTo("cmp"),    "components",         mComponents);
-        }
+        // Load all library elements
+        loadElements<Symbol>          (mLibraryPath.getPathTo("sym"),    "symbols",            mSymbols);
+        loadElements<Footprint>       (mLibraryPath.getPathTo("fpt"),    "footprints",         mFootprints);
+        loadElements<Model3D>         (mLibraryPath.getPathTo("3dmdl"),  "3d models",          mModels);
+        loadElements<SpiceModel>      (mLibraryPath.getPathTo("spcmdl"), "spice models",       mSpiceModels);
+        loadElements<Package>         (mLibraryPath.getPathTo("pkg"),    "packages",           mPackages);
+        loadElements<GenericComponent>(mLibraryPath.getPathTo("gencmp"), "generic components", mGenericComponents);
+        loadElements<Component>       (mLibraryPath.getPathTo("cmp"),    "components",         mComponents);
     }
     catch (Exception &e)
     {

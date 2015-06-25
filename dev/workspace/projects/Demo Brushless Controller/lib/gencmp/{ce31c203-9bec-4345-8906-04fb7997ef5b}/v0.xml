@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{ce31c203-9bec-4345-8906-04fb7997ef5b}</uuid>
+        <version>0.1</version>
+        <author/>
+        <created/>
+        <last_modified/>
+        <name locale="en_US">Simple Voltage Regulator</name>
+        <description locale="en_US">Voltage Regulator with 3 Pins: IN, GND, OUT</description>
+        <keywords locale="en_US"></keywords>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">IC</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal negated="false" forced_net_name="" clock="false" required="false" uuid="{8e074b73-9015-4c28-969f-d2d929af889d}" role="passive">
+            <name locale="en_US">GND</name>
+            <description locale="en_US"></description>
+        </signal>
+        <signal negated="false" forced_net_name="" clock="false" required="false" uuid="{a78ae9aa-1c78-4d1f-98e8-9bd253555a6d}" role="passive">
+            <name locale="en_US">VI</name>
+            <description locale="en_US"></description>
+        </signal>
+        <signal negated="false" forced_net_name="" clock="false" required="false" uuid="{bdd7ce7c-4bfc-4215-9431-3ea24f340e8a}" role="passive">
+            <name locale="en_US">VO</name>
+            <description locale="en_US"></description>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{80db57cd-d3fa-4fec-80f1-3543456340ec}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item symbol="{5062dbe6-4215-4c75-bb61-03e82f2c0734}" required="true" uuid="{52ef2b10-c149-4dfc-a2d8-2805efff2e13}" suffix="">
+                    <pin_signal_map>
+                        <map signal="{8e074b73-9015-4c28-969f-d2d929af889d}" display="none" pin="{61bd9691-1775-4001-b8e3-e44cd98e685a}"/>
+                        <map signal="{bdd7ce7c-4bfc-4215-9431-3ea24f340e8a}" display="gen_comp_signal" pin="{114de26b-3fe5-4a03-89ae-769ab7136879}"/>
+                        <map signal="{a78ae9aa-1c78-4d1f-98e8-9bd253555a6d}" display="gen_comp_signal" pin="{7ad364d0-7508-4dc4-92a3-cf996aa3d5f1}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

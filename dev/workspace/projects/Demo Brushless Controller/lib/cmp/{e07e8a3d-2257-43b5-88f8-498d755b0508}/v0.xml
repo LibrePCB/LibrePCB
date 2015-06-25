@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{e07e8a3d-2257-43b5-88f8-498d755b0508}</uuid>
+        <version>0.1</version>
+        <author/>
+        <created/>
+        <last_modified/>
+        <name locale="en_US">MA04-1</name>
+        <description locale="en_US">&lt;b>PIN HEADER&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: con-lstb.lbr
+Name: MA04-1
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"></keywords>
+        <generic_component>{0d3f9c9a-8e7b-47e8-bbef-6d7c55a9e2e1}</generic_component>
+        <package>{1a4c3000-2467-4764-8d76-8fc505d810f9}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map signal="{d2dd1895-f1c1-4854-87d4-d4edffa73d25}" pad="{746bee7d-59e5-45df-b61c-4a14e9d38f70}"/>
+        <map signal="{62bd0aac-cc16-41d7-8cd8-62d324da77e0}" pad="{d799770d-65fb-4f1f-b480-cc91ebc7873b}"/>
+        <map signal="{951e7836-bf3d-4f88-8dde-c243156cb6fe}" pad="{9b3a2a1a-9a7d-4fd9-9649-53337145c7ec}"/>
+        <map signal="{57377782-02e2-42cc-a1a2-dda3269ade9e}" pad="{0029dcfa-8e10-46c5-bde2-fa75d19ad492}"/>
+    </pad_signal_map>
+</component>

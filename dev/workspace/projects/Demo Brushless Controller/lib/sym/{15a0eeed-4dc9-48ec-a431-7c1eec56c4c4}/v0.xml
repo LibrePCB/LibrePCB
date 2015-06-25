@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<symbol version="0">
+    <meta>
+        <uuid>{15a0eeed-4dc9-48ec-a431-7c1eec56c4c4}</uuid>
+        <version>0.1</version>
+        <author/>
+        <created/>
+        <last_modified/>
+        <name locale="en_US">Unipolar Capacitor (IEC 60617)</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US">capacitor,capacitance,unipolar</keywords>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" fill="false" layer="10" width="0.175000" start_x="-1.900000" start_y="1.016000">
+            <segment end_x="1.900000" end_y="1.016000" angle="0.000000"/>
+            <segment end_x="1.900000" end_y="0.400000" angle="0.000000"/>
+            <segment end_x="-1.900000" end_y="0.400000" angle="0.000000"/>
+            <segment end_x="-1.900000" end_y="1.016000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" fill="true" layer="10" width="0.175000" start_x="-1.900000" start_y="-1.016000">
+            <segment end_x="1.900000" end_y="-1.016000" angle="0.000000"/>
+            <segment end_x="1.900000" end_y="-0.400000" angle="0.000000"/>
+            <segment end_x="-1.900000" end_y="-0.400000" angle="0.000000"/>
+            <segment end_x="-1.900000" end_y="-1.016000" angle="0.000000"/>
+        </polygon>
+        <text h_align="right" text="+" v_align="bottom" layer="10" x="-0.200000" y="0.700000" height="2.540000" angle="0.000000"/>
+        <text h_align="left" text="${SYM::NAME}" v_align="bottom" layer="20" x="3.200000" y="0.000000" height="2.540000" angle="0.000000"/>
+        <text h_align="left" text="${CMP::VALUE}" v_align="top" layer="21" x="3.200000" y="0.000000" height="2.540000" angle="0.000000"/>
+    </geometry>
+    <pins>
+        <pin x="0.000000" y="-2.540000" uuid="{a2f807cc-5b33-46c5-b8aa-6d6daf8c0a6c}" length="1.524000" angle="0.000000">
+            <name locale="en_US">-</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin x="0.000000" y="2.540000" uuid="{56ecc3a3-7957-43e8-a9e1-d0ce28118aed}" length="1.524000" angle="180.000000">
+            <name locale="en_US">+</name>
+            <description locale="en_US"></description>
+        </pin>
+    </pins>
+</symbol>

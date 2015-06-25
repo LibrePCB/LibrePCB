@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<symbol version="0">
+    <meta>
+        <uuid>{2d9ba47b-3ff1-44db-aa4e-0bfec1f12ea8}</uuid>
+        <version>0.1</version>
+        <author/>
+        <created/>
+        <last_modified/>
+        <name locale="en_US">1x4P Male Connector</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US"></keywords>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" fill="false" layer="10" width="0.609600" start_x="0.000000" start_y="-2.540000">
+            <segment end_x="-1.270000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" fill="false" layer="10" width="0.609600" start_x="0.000000" start_y="0.000000">
+            <segment end_x="-1.270000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" fill="false" layer="10" width="0.609600" start_x="0.000000" start_y="2.540000">
+            <segment end_x="-1.270000" end_y="2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" fill="false" layer="10" width="0.609600" start_x="0.000000" start_y="-5.080000">
+            <segment end_x="-1.270000" end_y="-5.080000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" fill="false" layer="10" width="0.254000" start_x="-2.540000" start_y="-7.620000">
+            <segment end_x="-2.540000" end_y="5.080000" angle="0.000000"/>
+            <segment end_x="2.540000" end_y="5.080000" angle="0.000000"/>
+            <segment end_x="2.540000" end_y="-7.620000" angle="0.000000"/>
+            <segment end_x="-2.540000" end_y="-7.620000" angle="0.000000"/>
+        </polygon>
+        <text h_align="left" text="${SYM::NAME}" v_align="bottom" layer="20" x="-2.540000" y="5.080000" height="2.540000" angle="0.000000"/>
+        <text h_align="left" text="${CMP::VALUE}" v_align="top" layer="21" x="-2.540000" y="-7.620000" height="2.540000" angle="0.000000"/>
+    </geometry>
+    <pins>
+        <pin x="-5.080000" y="-5.080000" uuid="{869447cf-4ef1-4d05-b51d-1de77a6a26a9}" length="4.500000" angle="90.000000">
+            <name locale="en_US">4</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin x="-5.080000" y="2.540000" uuid="{ed3e459a-aff0-46a1-8315-c8fbeddb080d}" length="4.500000" angle="90.000000">
+            <name locale="en_US">1</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin x="-5.080000" y="-2.540000" uuid="{84af8edd-e365-48bf-9eec-c926384c38c2}" length="4.500000" angle="90.000000">
+            <name locale="en_US">3</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin x="-5.080000" y="0.000000" uuid="{93a2331f-3fe7-4c49-9d74-1c57ce8ecee2}" length="4.500000" angle="90.000000">
+            <name locale="en_US">2</name>
+            <description locale="en_US"></description>
+        </pin>
+    </pins>
+</symbol>

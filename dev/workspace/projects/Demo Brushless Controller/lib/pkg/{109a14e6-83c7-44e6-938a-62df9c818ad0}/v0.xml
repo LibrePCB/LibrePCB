@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{109a14e6-83c7-44e6-938a-62df9c818ad0}</uuid>
+        <version>0.1</version>
+        <author/>
+        <created/>
+        <last_modified/>
+        <name locale="en_US">SMD2,54-5,08</name>
+        <description locale="en_US">&lt;b>SMD PAD&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: wirepad.lbr
+Name: SMD2,54-5,08
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"></keywords>
+        <footprint>{8ce505c2-d6be-487d-82a5-1d69e962bdd6}</footprint>
+    </meta>
+    <categories/>
+</package>

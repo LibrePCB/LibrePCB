@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{4cdd78c8-182d-4a57-b075-f4c61b4826da}</uuid>
+        <version>0.1</version>
+        <author/>
+        <created/>
+        <last_modified/>
+        <name locale="en_US">SOIC8</name>
+        <description locale="en_US">
+
+This element was automatically imported from Eagle
+Filepath: 0_ICs.lbr
+Name: SOIC8
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"></keywords>
+        <footprint>{916a71c4-4ab6-4244-8aac-f0f7ea56f155}</footprint>
+    </meta>
+    <categories/>
+</package>

@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<symbol version="0">
+    <meta>
+        <uuid>{80f8cd68-69d9-43c4-9ed2-da32ca714b10}</uuid>
+        <version>0.1</version>
+        <author/>
+        <created/>
+        <last_modified/>
+        <name locale="en_US">GND</name>
+        <description locale="en_US">Ground</description>
+        <keywords locale="en_US">gnd,ground</keywords>
+    </meta>
+    <categories>
+        <category>{00000000-0000-4001-8000-000000000000}</category>
+    </categories>
+    <geometry>
+        <polygon grab_area="false" fill="false" layer="10" width="0.254000" start_x="-1.905000" start_y="0.000000">
+            <segment end_x="1.905000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <text h_align="center" text="${CMP::VALUE}" v_align="top" layer="21" x="0.000000" y="0.000000" height="2.540000" angle="0.000000"/>
+    </geometry>
+    <pins>
+        <pin x="0.000000" y="2.540000" uuid="{abcc319b-d09f-437b-a624-3dcf3eff5792}" length="2.540000" angle="180.000000">
+            <name locale="en_US">GND</name>
+            <description locale="en_US"></description>
+        </pin>
+    </pins>
+</symbol>

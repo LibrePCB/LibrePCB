@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{584b7c26-5a8e-4a2b-807a-977edd1df991}</uuid>
+        <version>0.1</version>
+        <author/>
+        <created/>
+        <last_modified/>
+        <name locale="en_US">LQFP48</name>
+        <description locale="en_US">
+
+This element was automatically imported from Eagle
+Filepath: 0_ICs.lbr
+Name: LQFP48
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"></keywords>
+        <footprint>{d5c6e2d9-3717-412a-b2a3-7831bfd8bf55}</footprint>
+    </meta>
+    <categories/>
+</package>

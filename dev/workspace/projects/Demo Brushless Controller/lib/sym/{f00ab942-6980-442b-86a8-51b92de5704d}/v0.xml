@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<symbol version="0">
+    <meta>
+        <uuid>{f00ab942-6980-442b-86a8-51b92de5704d}</uuid>
+        <version>0.1</version>
+        <author/>
+        <created/>
+        <last_modified/>
+        <name locale="en_US">A4 Frame Landscape</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US">frame</keywords>
+    </meta>
+    <categories>
+        <category>{00000000-0000-4001-8000-000000000000}</category>
+    </categories>
+    <geometry>
+        <polygon grab_area="false" fill="false" layer="10" width="0.600000" start_x="0.000000" start_y="0.000000">
+            <segment end_x="0.000000" end_y="190.000000" angle="0.000000"/>
+            <segment end_x="277.000000" end_y="190.000000" angle="0.000000"/>
+            <segment end_x="277.000000" end_y="0.000000" angle="0.000000"/>
+            <segment end_x="0.000000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="false" fill="false" layer="10" width="0.600000" start_x="170.000000" start_y="0.000000">
+            <segment end_x="170.000000" end_y="15.000000" angle="0.000000"/>
+            <segment end_x="277.000000" end_y="15.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="false" fill="false" layer="10" width="0.600000" start_x="240.000000" start_y="0.000000">
+            <segment end_x="240.000000" end_y="15.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="false" fill="false" layer="10" width="0.600000" start_x="170.000000" start_y="5.000000">
+            <segment end_x="277.000000" end_y="5.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="false" fill="false" layer="10" width="0.600000" start_x="240.000000" start_y="10.000000">
+            <segment end_x="277.000000" end_y="10.000000" angle="0.000000"/>
+        </polygon>
+        <text h_align="left" text="${PAGE::NAME}" v_align="center" layer="10" x="172.000000" y="10.000000" height="8.000000" angle="0.000000"/>
+        <text h_align="left" text="${PRJ::NAME}" v_align="center" layer="10" x="172.000000" y="2.500000" height="4.000000" angle="0.000000"/>
+        <text h_align="left" text="${PAGE::LAST_MODIFIED}" v_align="center" layer="10" x="242.000000" y="12.500000" height="4.000000" angle="0.000000"/>
+        <text h_align="left" text="${PAGE::AUTHOR}" v_align="center" layer="10" x="242.000000" y="7.500000" height="4.000000" angle="0.000000"/>
+        <text h_align="left" text="Page ${PAGE::NBR}/${PAGE::CNT}" v_align="center" layer="10" x="242.000000" y="2.500000" height="4.000000" angle="0.000000"/>
+    </geometry>
+    <pins/>
+</symbol>

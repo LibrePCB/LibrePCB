@@ -1,0 +1,98 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<symbol version="0">
+    <meta>
+        <uuid>{b2a17c32-dfca-471f-96c8-5de2333a3be3}</uuid>
+        <version>0.1</version>
+        <author/>
+        <created/>
+        <last_modified/>
+        <name locale="en_US">N-Channel MOSFET</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US"></keywords>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" fill="false" layer="10" width="0.254000" start_x="0.762000" start_y="0.762000">
+            <segment end_x="0.762000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" fill="false" layer="10" width="0.254000" start_x="0.762000" start_y="0.000000">
+            <segment end_x="0.762000" end_y="-0.762000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" fill="false" layer="10" width="0.254000" start_x="0.762000" start_y="3.175000">
+            <segment end_x="0.762000" end_y="2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" fill="false" layer="10" width="0.254000" start_x="0.762000" start_y="2.540000">
+            <segment end_x="0.762000" end_y="1.905000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" fill="false" layer="10" width="0.152400" start_x="0.762000" start_y="0.000000">
+            <segment end_x="2.540000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" fill="false" layer="10" width="0.152400" start_x="2.540000" start_y="0.000000">
+            <segment end_x="2.540000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" fill="false" layer="10" width="0.254000" start_x="0.762000" start_y="-1.905000">
+            <segment end_x="0.762000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" fill="false" layer="10" width="0.254000" start_x="0.762000" start_y="-2.540000">
+            <segment end_x="0.762000" end_y="-3.175000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" fill="false" layer="10" width="0.254000" start_x="0.000000" start_y="2.540000">
+            <segment end_x="0.000000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" fill="false" layer="10" width="0.152400" start_x="2.540000" start_y="-2.540000">
+            <segment end_x="0.762000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" fill="false" layer="10" width="0.152400" start_x="3.810000" start_y="2.540000">
+            <segment end_x="3.810000" end_y="0.508000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" fill="false" layer="10" width="0.152400" start_x="3.810000" start_y="0.508000">
+            <segment end_x="3.810000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" fill="false" layer="10" width="0.152400" start_x="2.540000" start_y="-2.540000">
+            <segment end_x="3.810000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" fill="false" layer="10" width="0.152400" start_x="0.762000" start_y="2.540000">
+            <segment end_x="3.810000" end_y="2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" fill="false" layer="10" width="0.152400" start_x="4.572000" start_y="0.762000">
+            <segment end_x="4.318000" end_y="0.508000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" fill="false" layer="10" width="0.152400" start_x="4.318000" start_y="0.508000">
+            <segment end_x="3.810000" end_y="0.508000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" fill="false" layer="10" width="0.152400" start_x="3.810000" start_y="0.508000">
+            <segment end_x="3.302000" end_y="0.508000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" fill="false" layer="10" width="0.152400" start_x="3.302000" start_y="0.508000">
+            <segment end_x="3.048000" end_y="0.254000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" fill="false" layer="10" width="0.152400" start_x="3.810000" start_y="0.508000">
+            <segment end_x="3.302000" end_y="-0.254000" angle="0.000000"/>
+            <segment end_x="4.318000" end_y="-0.254000" angle="0.000000"/>
+            <segment end_x="3.810000" end_y="0.508000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" fill="false" layer="10" width="0.152400" start_x="1.016000" start_y="0.000000">
+            <segment end_x="2.032000" end_y="0.762000" angle="0.000000"/>
+            <segment end_x="2.032000" end_y="-0.762000" angle="0.000000"/>
+            <segment end_x="1.016000" end_y="0.000000" angle="0.000000"/>
+        </polygon>
+        <text h_align="right" text="${SYM::NAME}" v_align="bottom" layer="20" x="-1.270000" y="1.270000" height="2.540000" angle="0.000000"/>
+        <text h_align="right" text="${CMP::VALUE}" v_align="bottom" layer="21" x="-1.270000" y="-1.270000" height="2.540000" angle="0.000000"/>
+        <ellipse grab_area="true" fill="true" layer="10" radius_x="0.360000" x="2.540000" radius_y="0.360000" width="0.000000" y="-2.540000" rotation="0.000000"/>
+        <ellipse grab_area="true" fill="true" layer="10" radius_x="0.360000" x="2.540000" radius_y="0.360000" width="0.000000" y="2.540000" rotation="0.000000"/>
+    </geometry>
+    <pins>
+        <pin x="2.540000" y="5.080000" uuid="{55014667-bbfc-410a-b0eb-cacd978d1e08}" length="2.540000" angle="-180.000000">
+            <name locale="en_US">D</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin x="-2.540000" y="-2.540000" uuid="{6b08ad4a-ea43-420c-af39-4b08609e9532}" length="2.540000" angle="90.000000">
+            <name locale="en_US">G</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin x="2.540000" y="-5.080000" uuid="{25ed99ff-f079-402d-823c-39eac3d358c2}" length="2.540000" angle="0.000000">
+            <name locale="en_US">S</name>
+            <description locale="en_US"></description>
+        </pin>
+    </pins>
+</symbol>

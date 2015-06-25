@@ -1,0 +1,79 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{cc20c58e-93b5-49cd-b6e1-48c5e5e76ed3}</uuid>
+        <version>0.1</version>
+        <author/>
+        <created/>
+        <last_modified/>
+        <name locale="en_US">Single Half-Bridge MOSFET Driver with "HIN" and "LIN" Input Pins</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US"></keywords>
+    </meta>
+    <categories/>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">IC</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal negated="false" forced_net_name="" clock="false" required="false" uuid="{ff96d3fb-e43d-4391-b30f-ec72cbefb149}" role="passive">
+            <name locale="en_US">VS</name>
+            <description locale="en_US"></description>
+        </signal>
+        <signal negated="false" forced_net_name="" clock="false" required="false" uuid="{0c2b7df1-57c7-47a7-944f-4aece84b05ca}" role="passive">
+            <name locale="en_US">LIN</name>
+            <description locale="en_US"></description>
+        </signal>
+        <signal negated="false" forced_net_name="" clock="false" required="false" uuid="{de468cc9-06de-415f-b1d7-ec82bb8b355a}" role="passive">
+            <name locale="en_US">HIN</name>
+            <description locale="en_US"></description>
+        </signal>
+        <signal negated="false" forced_net_name="" clock="false" required="false" uuid="{7c1df97a-34a0-470c-9d96-ebbd5f281aaa}" role="passive">
+            <name locale="en_US">COM</name>
+            <description locale="en_US"></description>
+        </signal>
+        <signal negated="false" forced_net_name="" clock="false" required="false" uuid="{5f74c850-c401-4600-b6c8-58bb87764a59}" role="passive">
+            <name locale="en_US">VB</name>
+            <description locale="en_US"></description>
+        </signal>
+        <signal negated="false" forced_net_name="" clock="false" required="false" uuid="{922cf4f3-4ced-4ffc-91b2-483129005356}" role="passive">
+            <name locale="en_US">HO</name>
+            <description locale="en_US"></description>
+        </signal>
+        <signal negated="false" forced_net_name="" clock="false" required="false" uuid="{1076d030-d216-467b-8a2d-40338779ad94}" role="passive">
+            <name locale="en_US">VCC</name>
+            <description locale="en_US"></description>
+        </signal>
+        <signal negated="false" forced_net_name="" clock="false" required="false" uuid="{a1b2b926-d1f1-40be-9f2c-e8c4a1e9a883}" role="passive">
+            <name locale="en_US">LO</name>
+            <description locale="en_US"></description>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{4bfd5089-9ea7-4019-a507-583509a32d75}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item symbol="{8f089c97-5f9b-4437-94a6-3d2f958583c7}" required="true" uuid="{dcf1ad9b-0242-450e-bb79-9ad9a1b82bf8}" suffix="">
+                    <pin_signal_map>
+                        <map signal="{7c1df97a-34a0-470c-9d96-ebbd5f281aaa}" display="gen_comp_signal" pin="{8217d867-da05-4630-a4d7-1926324fe9a5}"/>
+                        <map signal="{922cf4f3-4ced-4ffc-91b2-483129005356}" display="gen_comp_signal" pin="{b3f36961-22ee-4e87-9189-68282ae86ad9}"/>
+                        <map signal="{0c2b7df1-57c7-47a7-944f-4aece84b05ca}" display="gen_comp_signal" pin="{f9f7d4ec-6ee7-4634-96b7-50b8838630a2}"/>
+                        <map signal="{ff96d3fb-e43d-4391-b30f-ec72cbefb149}" display="gen_comp_signal" pin="{371eaace-87bd-4780-846c-1cf31e4f1b74}"/>
+                        <map signal="{de468cc9-06de-415f-b1d7-ec82bb8b355a}" display="gen_comp_signal" pin="{4338b443-d96e-4725-9d32-06a76a4680bf}"/>
+                        <map signal="{5f74c850-c401-4600-b6c8-58bb87764a59}" display="gen_comp_signal" pin="{800ff2c4-86ae-43e3-9f05-4dc2b47e28df}"/>
+                        <map signal="{a1b2b926-d1f1-40be-9f2c-e8c4a1e9a883}" display="gen_comp_signal" pin="{8115b469-234c-4f72-bef2-2e46d48daa90}"/>
+                        <map signal="{1076d030-d216-467b-8a2d-40338779ad94}" display="gen_comp_signal" pin="{64b1cf6f-dc2c-4ea1-9f4b-fac229b2df07}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>
