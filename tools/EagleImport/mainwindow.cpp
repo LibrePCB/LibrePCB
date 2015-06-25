@@ -882,9 +882,6 @@ void MainWindow::on_toolButton_4_clicked()
     QDir libDir(ui->edtDuplicateFolders->text());
     QDir outDir(ui->output->text());
 
-    //QStringList elements;
-    //elements << "3dmdl" << "cmp"
-
     uint count = 0;
 
     foreach (const QString& subdir1, libDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot))
