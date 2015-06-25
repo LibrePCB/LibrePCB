@@ -31,6 +31,7 @@
 #include "../../project/project.h"
 #include "../projecttreemodel.h"
 #include "../projecttreeitem.h"
+#include <librepcblibrary/library.h>
 
 using namespace project;
 
@@ -428,6 +429,23 @@ void ControlPanel::on_favoriteProjectsListView_customContextMenuRequested(const 
 
     if (menu.exec(QCursor::pos()) == removeAction)
         Workspace::instance().removeFavoriteProject(FilePath(index.data(Qt::UserRole).toString()));
+}
+
+void ControlPanel::on_actionRescanLibrary_triggered()
+{
+    try
+    {
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        uint count = Workspace::instance().getLibrary().rescan();
+        QApplication::restoreOverrideCursor();
+        QMessageBox::information(this, tr("Rescan Library"),
+            QString("Successfully scanned %1 library elements.").arg(count));
+    }
+    catch (Exception& e)
+    {
+        QApplication::restoreOverrideCursor();
+        QMessageBox::critical(this, tr("Error"), e.getUserMsg());
+    }
 }
 
 /*****************************************************************************************

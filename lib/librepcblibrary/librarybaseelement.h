@@ -72,6 +72,7 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
         const QMap<QString, QString>& getNames() const noexcept {return mNames;}
         const QMap<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
         const QMap<QString, QString>& getKeywords() const noexcept {return mKeywords;}
+        QStringList getAllAvailableLocales() const noexcept;
 
         // Setters
         void setUuid(const QUuid& uuid) noexcept {mUuid = uuid;}

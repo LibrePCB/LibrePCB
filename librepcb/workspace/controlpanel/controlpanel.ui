@@ -334,7 +334,7 @@ QListView::item
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_6">
             <item>
-             <widget class="QWebView" name="webView" native="true">
+             <widget class="QWebView" name="webView">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                 <horstretch>0</horstretch>
@@ -344,7 +344,7 @@ QListView::item
               <property name="styleSheet">
                <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
               </property>
-              <property name="url" stdset="0">
+              <property name="url">
                <url>
                 <string>about:blank</string>
                </url>
@@ -367,7 +367,7 @@ QListView::item
      <x>0</x>
      <y>0</y>
      <width>873</width>
-     <height>20</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -393,6 +393,7 @@ QListView::item
     <property name="title">
      <string>Extras</string>
     </property>
+    <addaction name="actionRescanLibrary"/>
     <addaction name="actionOpen_Library_Editor"/>
     <addaction name="separator"/>
     <addaction name="actionWorkspace_Settings"/>
@@ -488,6 +489,11 @@ QListView::item
    </property>
    <property name="text">
     <string>Close all open projects</string>
+   </property>
+  </action>
+  <action name="actionRescanLibrary">
+   <property name="text">
+    <string>Rescan Library</string>
    </property>
   </action>
  </widget>

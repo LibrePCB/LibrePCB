@@ -77,6 +77,17 @@ QString LibraryBaseElement::getKeywords(const QStringList& localeOrder) const no
     return LibraryBaseElement::localeStringFromList(mKeywords, localeOrder);
 }
 
+QStringList LibraryBaseElement::getAllAvailableLocales() const noexcept
+{
+    QStringList list;
+    list.append(mNames.keys());
+    list.append(mDescriptions.keys());
+    list.append(mKeywords.keys());
+    list.removeDuplicates();
+    list.sort(Qt::CaseSensitive);
+    return list;
+}
+
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/

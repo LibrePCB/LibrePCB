@@ -81,7 +81,7 @@ class ControlPanel final : public QMainWindow
         void on_favoriteProjectsListView_clicked(const QModelIndex &index);
         void on_recentProjectsListView_customContextMenuRequested(const QPoint &pos);
         void on_favoriteProjectsListView_customContextMenuRequested(const QPoint &pos);
-
+        void on_actionRescanLibrary_triggered();
 
     private:
 

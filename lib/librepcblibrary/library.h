@@ -30,6 +30,22 @@
 #include <librepcbcommon/fileio/filepath.h>
 
 /*****************************************************************************************
+ *  Forward Declarations
+ ****************************************************************************************/
+
+class Version;
+
+namespace library {
+class Symbol;
+class Footprint;
+class Model3d;
+class SpiceModel;
+class Package;
+class GenericComponent;
+class Component;
+}
+
+/*****************************************************************************************
  *  Class Library
  ****************************************************************************************/
 
@@ -37,10 +53,8 @@ namespace library {
 
 /**
  * @brief The Library class
- *
- * @todo this is only a stub class...
  */
-class Library : public QObject
+class Library final : public QObject
 {
         Q_OBJECT
 
@@ -59,6 +73,25 @@ class Library : public QObject
         explicit Library(const FilePath& libPath) throw (Exception);
         ~Library();
 
+
+        // Getters
+        QMap<Version, FilePath> getSymbols(const QUuid& uuid) const noexcept;
+        QMap<Version, FilePath> getFootprints(const QUuid& uuid) const noexcept;
+        QMap<Version, FilePath> get3dModels(const QUuid& uuid) const noexcept;
+        QMap<Version, FilePath> getSpiceModels(const QUuid& uuid) const noexcept;
+        QMap<Version, FilePath> getPackages(const QUuid& uuid) const noexcept;
+        QMap<Version, FilePath> getGenericComponents(const QUuid& uuid) const noexcept;
+        QMap<Version, FilePath> getComponents(const QUuid& uuid) const noexcept;
+
+
+        // General Methods
+
+        /**
+         * @brief Rescan the whole library directory and update the SQLite database
+         */
+        uint rescan() throw (Exception);
+
+
     private:
 
         // make some methods inaccessible...
@@ -66,6 +99,19 @@ class Library : public QObject
         Library(const Library& other);
         Library& operator=(const Library& rhs);
 
+
+        // Private Methods
+        template <typename ElementType>
+        uint addElementsToDb(const QString& xmlRootName, const QString& tablename,
+                             const QString& id_rowname) throw (Exception);
+        QMap<Version, FilePath> getElementFilePathsFromDb(const QString& tablename, const QUuid& uuid) const noexcept;
+        void clearDatabaseAndCreateTables() throw (Exception);
+        QStringList getAllXmlFilesInLibDir(const QString& xmlRootName) throw (Exception);
+        QSqlQuery prepareQuery(const QString& query) const throw (Exception);
+        int execQuery(QSqlQuery& query, bool checkId) const throw (Exception);
+
+
+        // Attributes
         FilePath mLibPath; ///< a FilePath object which represents the library directory
         FilePath mLibFilePath; ///<a FiltePath object which represents the lib.db-file
         QSqlDatabase mLibDatabase; ///<a QSqlDatabase object which contents the lib.db-file
