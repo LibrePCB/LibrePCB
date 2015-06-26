@@ -2,4 +2,7 @@ TEMPLATE = subdirs
 CONFIG += ordered
 SUBDIRS = \
     librepcbcommon \
-    librepcblibrary
+    librepcblibrary \
+    librepcblibraryeditor \
+    librepcbproject \
+    librepcbworkspace

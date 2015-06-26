@@ -47,17 +47,26 @@ unix:!macx {
 
 LIBS += \
     -L$${DESTDIR} \
-    -llibrepcblibrary \    # Note: The order of the libraries is very important for the linker!
-    -llibrepcbcommon       # Another order could end up in "undefined reference" errors!
+    -llibrepcbworkspace \
+    -llibrepcbproject \
+    -llibrepcblibraryeditor \
+    -llibrepcblibrary \
+    -llibrepcbcommon
 
 INCLUDEPATH += \
     ../lib
 
 DEPENDPATH += \
+    ../lib/librepcbworkspace \
+    ../lib/librepcbproject \
+    ../lib/librepcblibraryeditor \
     ../lib/librepcblibrary \
     ../lib/librepcbcommon
 
 PRE_TARGETDEPS += \
+    $${DESTDIR}/liblibrepcbworkspace.a \
+    $${DESTDIR}/liblibrepcbproject.a \
+    $${DESTDIR}/liblibrepcblibraryeditor.a \
     $${DESTDIR}/liblibrepcblibrary.a \
     $${DESTDIR}/liblibrepcbcommon.a
 
