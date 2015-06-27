@@ -20,7 +20,12 @@ CONFIG += staticlib
 INCLUDEPATH += \
     ../
 
-HEADERS += 
+SOURCES += \
+    libraryeditor.cpp
 
-SOURCES += 
+HEADERS += \
+    libraryeditor.h
+
+FORMS += \
+    libraryeditor.ui
 
