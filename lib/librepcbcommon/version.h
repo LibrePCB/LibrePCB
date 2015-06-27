@@ -82,11 +82,13 @@ class Version final
         bool isValid() const noexcept {return (mNumbers.count() > 0);}
 
         /**
-         * @brief Get the count of numbers in the version string
+         * @brief Get the numbers in the version string
          *
-         * @return Count of numbers (count==0: invalid object / count>0: valid object)
+         * The first item in the list is the major version number.
+         *
+         * @return List of numbers (empty list = invalid version)
          */
-        unsigned int getNumberCount() const noexcept {return mNumbers.count();}
+        const QList<uint>& getNumbers() const noexcept {return mNumbers;}
 
         /**
          * @brief Get the version as a string in the format "1.2.3"
@@ -161,7 +163,7 @@ class Version final
          * number count == 0: version invalid
          * number count >= 1: version valid
          */
-        QList<unsigned int> mNumbers;
+        QList<uint> mNumbers;
 };
 
 #endif // VERSION_H

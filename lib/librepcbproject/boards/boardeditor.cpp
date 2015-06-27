@@ -26,8 +26,8 @@
 #include "boardeditor.h"
 #include "ui_boardeditor.h"
 #include "../project.h"
-#include "../../workspace/workspace.h"
-#include "../../workspace/settings/workspacesettings.h"
+#include <librepcbworkspace/workspace.h>
+#include <librepcbworkspace/settings/workspacesettings.h>
 #include <librepcbcommon/undostack.h>
 #include "board.h"
 #include "../circuit/circuit.h"
@@ -59,8 +59,7 @@ BoardEditor::BoardEditor(Project& project, bool readOnly) :
     // set window title
     QString filenameStr = mProject.getFilepath().getFilename();
     if (readOnly) filenameStr.append(QStringLiteral(" [Read-Only]"));
-    setWindowTitle(QString("%1 - Board Editor - LibrePCB %2.%3")
-                   .arg(filenameStr).arg(APP_VERSION_MAJOR).arg(APP_VERSION_MINOR));
+    setWindowTitle(QString("%1 - LibrePCB Board Editor").arg(filenameStr));
 
     // Add Dock Widgets
     mErcMsgDock = new ErcMsgDock(mProject);

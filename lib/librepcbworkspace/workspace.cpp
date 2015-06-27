@@ -27,8 +27,8 @@
 #include <librepcbcommon/exceptions.h>
 #include <librepcbcommon/fileio/filepath.h>
 #include <librepcblibrary/library.h>
-#include "../library_editor/libraryeditor.h"
-#include "../project/project.h"
+#include <librepcblibraryeditor/libraryeditor.h>
+#include <librepcbproject/project.h>
 #include "projecttreemodel.h"
 #include "recentprojectsmodel.h"
 #include "favoriteprojectsmodel.h"

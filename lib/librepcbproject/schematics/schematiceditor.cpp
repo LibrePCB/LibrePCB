@@ -26,8 +26,8 @@
 #include "schematiceditor.h"
 #include "ui_schematiceditor.h"
 #include "../project.h"
-#include "../../workspace/workspace.h"
-#include "../../workspace/settings/workspacesettings.h"
+#include <librepcbworkspace/workspace.h>
+#include <librepcbworkspace/settings/workspacesettings.h>
 #include <librepcbcommon/undostack.h>
 #include "schematic.h"
 #include "schematicpagesdock.h"
@@ -58,8 +58,7 @@ SchematicEditor::SchematicEditor(Project& project, bool readOnly) :
     // set window title
     QString filenameStr = mProject.getFilepath().getFilename();
     if (readOnly) filenameStr.append(QStringLiteral(" [Read-Only]"));
-    setWindowTitle(QString("%1 - Schematic Editor - LibrePCB %2.%3")
-                   .arg(filenameStr).arg(APP_VERSION_MAJOR).arg(APP_VERSION_MINOR));
+    setWindowTitle(QString("%1 - LibrePCB Schematic Editor").arg(filenameStr));
 
     // Add Dock Widgets
     mPagesDock = new SchematicPagesDock(mProject, *this);

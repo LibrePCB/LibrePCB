@@ -28,8 +28,8 @@
 #include "../items/bi_footprint.h"
 #include "../board.h"
 #include "../../project.h"
-#include "../../../workspace/workspace.h"
-#include "../../../workspace/settings/workspacesettings.h"
+#include <librepcbworkspace/workspace.h>
+#include <librepcbworkspace/settings/workspacesettings.h>
 #include <librepcblibrary/fpt/footprint.h>
 #include <librepcbcommon/boardlayer.h>
 #include "../componentinstance.h"

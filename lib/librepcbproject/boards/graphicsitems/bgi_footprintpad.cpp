@@ -30,8 +30,8 @@
 #include "../board.h"
 #include "../../project.h"
 #include <librepcbcommon/boardlayer.h>
-#include "../../../workspace/workspace.h"
-#include "../../../workspace/settings/workspacesettings.h"
+#include <librepcbworkspace/workspace.h>
+#include <librepcbworkspace/settings/workspacesettings.h>
 #include <librepcblibrary/fpt/footprintpad.h>
 #include "../../settings/projectsettings.h"
 #include "../componentinstance.h"

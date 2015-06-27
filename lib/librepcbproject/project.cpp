@@ -34,8 +34,8 @@
 #include <librepcbcommon/undostack.h>
 #include <librepcbcommon/schematiclayer.h>
 #include "project.h"
-#include "../workspace/workspace.h"
-#include "../workspace/settings/workspacesettings.h"
+#include <librepcbworkspace/workspace.h>
+#include <librepcbworkspace/settings/workspacesettings.h>
 #include "library/projectlibrary.h"
 #include "circuit/circuit.h"
 #include "schematics/schematiceditor.h"
@@ -480,7 +480,7 @@ void Project::exportSchematicsAsPdf(const FilePath& filepath) throw (Exception)
     printer.setPaperSize(QPrinter::A4);
     printer.setOrientation(QPrinter::Landscape);
     printer.setOutputFormat(QPrinter::PdfFormat);
-    printer.setCreator(QString("LibrePCB %1.%2").arg(APP_VERSION_MAJOR).arg(APP_VERSION_MINOR));
+    printer.setCreator(QString("LibrePCB %1").arg(qApp->applicationVersion()));
     printer.setOutputFileName(filepath.toStr());
 
     QList<uint> pages;

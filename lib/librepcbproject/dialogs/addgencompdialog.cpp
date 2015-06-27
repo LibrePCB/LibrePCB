@@ -34,8 +34,8 @@
 #include <librepcblibrary/sym/symbol.h>
 #include "../settings/projectsettings.h"
 #include <librepcblibrary/sym/symbolpreviewgraphicsitem.h>
-#include "../../workspace/workspace.h"
-#include "../../workspace/settings/workspacesettings.h"
+#include <librepcbworkspace/workspace.h>
+#include <librepcbworkspace/settings/workspacesettings.h>
 
 namespace project {
 

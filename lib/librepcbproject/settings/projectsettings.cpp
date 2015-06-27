@@ -28,8 +28,8 @@
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include "../project.h"
 #include "projectsettingsdialog.h"
-#include "../../workspace/workspace.h"
-#include "../../workspace/settings/workspacesettings.h"
+#include <librepcbworkspace/workspace.h>
+#include <librepcbworkspace/settings/workspacesettings.h>
 
 namespace project {
 

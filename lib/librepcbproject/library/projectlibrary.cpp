@@ -33,7 +33,8 @@
 #include <librepcblibrary/pkg/package.h>
 #include <librepcblibrary/gencmp/genericcomponent.h>
 #include <librepcblibrary/cmp/component.h>
-#include "../../workspace/workspace.h"
+#include <librepcbworkspace/workspace.h>
+
 using namespace library;
 
 namespace project {
@@ -170,7 +171,7 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
 
         if (!subdirPath.isExistingDir())
         {
-            qDebug() << "Directory does not exist:" << subdirPath.toStr();
+            qWarning() << "Directory does not exist:" << subdirPath.toNative();
             continue;
         }
 
@@ -178,12 +179,26 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
         QUuid dirUuid(dirname);
         if (dirUuid.isNull())
         {
-            qDebug() << "Found a directory in the library which is not an UUID:" << subdirPath.toStr();
+            qWarning() << "Found a directory in the library which is not an UUID:" << subdirPath.toNative();
             continue;
         }
 
-        // search for the XML file with the same version as the application
-        FilePath filepath(subdirPath.getPathTo(QString("v%1.xml").arg(APP_VERSION_MAJOR)));
+        // search for the XML file with the newest version (<= application major version)
+        FilePath filepath;
+        Version appVersion(qApp->applicationVersion());
+        if (appVersion.getNumbers().isEmpty()) throw LogicError(__FILE__, __LINE__);
+        uint appMajorVersion = appVersion.getNumbers().first();
+        for (uint i = appMajorVersion; i >= 0; i--)
+        {
+            filepath = subdirPath.getPathTo(QString("v%1.xml").arg(i));
+            if (filepath.isExistingFile()) break;
+        }
+
+        if (!filepath.isExistingFile())
+        {
+            qWarning() << "No valid XML file found in directory:" << subdirPath.toNative();
+            continue;
+        }
 
         // load the library element --> an exception will be thrown on error
         ElementType* element = new ElementType(filepath);

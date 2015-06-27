@@ -28,7 +28,7 @@
 #include "ui_controlpanel.h"
 #include "../workspace.h"
 #include "../settings/workspacesettings.h"
-#include "../../project/project.h"
+#include <librepcbproject/project.h>
 #include "../projecttreemodel.h"
 #include "../projecttreeitem.h"
 #include <librepcblibrary/library.h>

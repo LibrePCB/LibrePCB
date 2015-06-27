@@ -24,7 +24,7 @@
 #include <QtCore>
 #include "libraryeditor.h"
 #include "ui_libraryeditor.h"
-#include "../workspace/workspace.h"
+#include <librepcbworkspace/workspace.h>
 
 namespace library_editor{
 

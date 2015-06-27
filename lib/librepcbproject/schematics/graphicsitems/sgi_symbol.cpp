@@ -30,8 +30,8 @@
 #include "../../project.h"
 #include "../../circuit/gencompinstance.h"
 #include <librepcbcommon/schematiclayer.h>
-#include "../../../workspace/workspace.h"
-#include "../../../workspace/settings/workspacesettings.h"
+#include <librepcbworkspace/workspace.h>
+#include <librepcbworkspace/settings/workspacesettings.h>
 #include <librepcblibrary/sym/symbol.h>
 #include <librepcblibrary/gencmp/genericcomponent.h>
 

@@ -27,7 +27,7 @@
 #include <librepcbcommon/application.h>
 #include <librepcbcommon/debug.h>
 #include <librepcbcommon/exceptions.h>
-#include "workspace/workspace.h"
+#include <librepcbworkspace/workspace.h>
 
 /*****************************************************************************************
  *  app.exec()
@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
     // Set the organization / application names must be done very early because some other
     // classes will use these values (for example QSettings, Debug (for the file logging path))!
     Application::setOrganizationName("LibrePCB");
-    //QCoreApplication::setOrganizationDomain(""); ///< @todo
+    Application::setOrganizationDomain("librepcb.org");
 #ifdef GIT_BRANCH
     Application::setApplicationName(QString("LibrePCB_git-%1").arg(GIT_BRANCH));
 #else
