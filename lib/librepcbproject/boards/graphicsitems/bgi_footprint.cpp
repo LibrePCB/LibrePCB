@@ -221,7 +221,7 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
             painter->fillRect(props.textRect, QBrush(layer->getColor(selected), Qt::Dense5Pattern));
         }
 #ifdef QT_DEBUG
-    if (Workspace::instance().getSettings().getDebugTools()->getShowGraphicsItemsTextBoundingRect())
+    if (mFootprint.getWorkspace().getSettings().getDebugTools()->getShowGraphicsItemsTextBoundingRect())
     {
         // draw text bounding rect
         painter->setPen(QPen(Qt::magenta, 0));
@@ -246,7 +246,7 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     }
 
 #ifdef QT_DEBUG
-    if (Workspace::instance().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect())
+    if (mFootprint.getWorkspace().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect())
     {
         // draw bounding rect
         painter->setPen(QPen(Qt::red, 0));

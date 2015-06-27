@@ -81,8 +81,8 @@ SchematicEditor::SchematicEditor(Project& project, bool readOnly) :
     connect(mUi->actionZoom_In, &QAction::triggered, mGraphicsView, &GraphicsView::zoomIn);
     connect(mUi->actionZoom_Out, &QAction::triggered, mGraphicsView, &GraphicsView::zoomOut);
     connect(mUi->actionZoom_All, &QAction::triggered, mGraphicsView, &GraphicsView::zoomAll);
-    connect(mUi->actionShow_Control_Panel, &QAction::triggered,
-            &Workspace::instance(), &Workspace::showControlPanel);
+    //connect(mUi->actionShow_Control_Panel, &QAction::triggered,
+    //        &Workspace::instance(), &Workspace::showControlPanel);
     connect(mUi->actionShow_Board_Editor, &QAction::triggered,
             &mProject, &Project::showBoardEditor);
     connect(mUi->actionEditNetclasses, &QAction::triggered,

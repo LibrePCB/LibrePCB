@@ -26,11 +26,11 @@
 #include <QFileDialog>
 #include "controlpanel.h"
 #include "ui_controlpanel.h"
-#include "../workspace.h"
-#include "../settings/workspacesettings.h"
+#include <librepcbworkspace/workspace.h>
+#include <librepcbworkspace/settings/workspacesettings.h>
 #include <librepcbproject/project.h>
-#include "../projecttreemodel.h"
-#include "../projecttreeitem.h"
+#include <librepcbworkspace/projecttreemodel.h>
+#include <librepcbworkspace/projecttreeitem.h>
 #include <librepcblibrary/library.h>
 
 using namespace project;
@@ -39,31 +39,29 @@ using namespace project;
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ControlPanel::ControlPanel(QAbstractItemModel* projectTreeModel,
-                           QAbstractItemModel* recentProjectsModel,
-                           QAbstractItemModel* favoriteProjectsModel) :
-    QMainWindow(0), mUi(new Ui::ControlPanel)
+ControlPanel::ControlPanel(Workspace& workspace) :
+    QMainWindow(0), mWorkspace(workspace), mUi(new Ui::ControlPanel)
 {
     mUi->setupUi(this);
 
     setWindowTitle(QString(tr("Control Panel - LibrePCB %1 - %2"))
-        .arg(QCoreApplication::applicationVersion()).arg(Workspace::instance().getPath().toNative()));
+        .arg(QCoreApplication::applicationVersion()).arg(mWorkspace.getPath().toNative()));
     mUi->statusBar->addWidget(new QLabel(QString(tr("Workspace: %1"))
-        .arg(Workspace::instance().getPath().toNative())));
+        .arg(mWorkspace.getPath().toNative())));
 
     // connect some actions which are created with the Qt Designer
     connect(mUi->actionQuit, &QAction::triggered,
             this, &ControlPanel::close);
-    connect(mUi->actionOpen_Library_Editor, &QAction::triggered,
-            &Workspace::instance(), &Workspace::openLibraryEditor);
+    //connect(mUi->actionOpen_Library_Editor, &QAction::triggered,
+    //        &Workspace::instance(), &Workspace::openLibraryEditor);
     connect(mUi->actionAbout_Qt, &QAction::triggered,
             qApp, &QApplication::aboutQt);
     connect(mUi->actionWorkspace_Settings, &QAction::triggered,
-            &Workspace::instance().getSettings(), &WorkspaceSettings::showSettingsDialog);
+            &mWorkspace.getSettings(), &WorkspaceSettings::showSettingsDialog);
 
-    mUi->projectTreeView->setModel(projectTreeModel);
-    mUi->recentProjectsListView->setModel(recentProjectsModel);
-    mUi->favoriteProjectsListView->setModel(favoriteProjectsModel);
+    mUi->projectTreeView->setModel(&mWorkspace.getProjectTreeModel());
+    mUi->recentProjectsListView->setModel(&mWorkspace.getRecentProjectsModel());
+    mUi->favoriteProjectsListView->setModel(&mWorkspace.getFavoriteProjectsModel());
 
     mUi->webView->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
     connect(mUi->webView, &QWebView::linkClicked,
@@ -82,7 +80,7 @@ void ControlPanel::closeEvent(QCloseEvent *event)
     saveSettings();
 
     // close all projects, unsaved projects will ask for saving
-    if (!Workspace::instance().closeAllProjects(true))
+    if (!mWorkspace.closeAllProjects(true))
     {
         event->ignore();
         return; // do NOT close the application, there are still open projects!
@@ -119,7 +117,7 @@ void ControlPanel::saveSettings()
             if (mUi->projectTreeView->isExpanded(index))
             {
                 list.append(FilePath(index.data(Qt::UserRole).toString())
-                            .toRelative(Workspace::instance().getPath()));
+                            .toRelative(mWorkspace.getPath()));
             }
         }
         clientSettings.setValue("expanded_projecttreeview_items", QVariant::fromValue(list));
@@ -146,7 +144,7 @@ void ControlPanel::loadSettings()
         QStringList list = clientSettings.value("expanded_projecttreeview_items").toStringList();
         foreach (QString item, list)
         {
-            FilePath filepath = FilePath::fromRelative(Workspace::instance().getPath(), item);
+            FilePath filepath = FilePath::fromRelative(mWorkspace.getPath(), item);
             QModelIndexList items = model->match(model->index(0, 0), Qt::UserRole,
                 QVariant::fromValue(filepath.toStr()), 1, Qt::MatchExactly | Qt::MatchWrap | Qt::MatchRecursive);
             if (!items.isEmpty())
@@ -169,11 +167,10 @@ void ControlPanel::on_actionAbout_triggered()
 
 void ControlPanel::on_actionNew_Project_triggered()
 {
-    QSettings settings(Workspace::instance().getMetadataPath().getPathTo("settings.ini").toStr(),
-                       QSettings::IniFormat);
+    QSettings settings(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(), QSettings::IniFormat);
     FilePath lastNewFile(settings.value("controlpanel/last_new_project").toString());
     if (!lastNewFile.getParentDir().isExistingDir())
-        lastNewFile.setPath(Workspace::instance().getProjectsPath().toStr());
+        lastNewFile.setPath(mWorkspace.getProjectsPath().toStr());
 
     FilePath filepath(QFileDialog::getSaveFileName(this, tr("New Project"), lastNewFile.toStr(),
                                     tr("LibrePCB project files (%1)").arg("*.lpp")));
@@ -185,15 +182,14 @@ void ControlPanel::on_actionNew_Project_triggered()
 
     settings.setValue("controlpanel/last_new_project", filepath.toNative());
 
-    Workspace::instance().createProject(filepath);
+    mWorkspace.createProject(filepath);
 }
 
 void ControlPanel::on_actionOpen_Project_triggered()
 {
-    QSettings settings(Workspace::instance().getMetadataPath().getPathTo("settings.ini").toStr(),
-                       QSettings::IniFormat);
+    QSettings settings(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(), QSettings::IniFormat);
     QString lastOpenedFile = settings.value("controlpanel/last_open_project",
-                             Workspace::instance().getPath().toStr()).toString();
+                             mWorkspace.getPath().toStr()).toString();
 
     FilePath filepath(QFileDialog::getOpenFileName(this, tr("Open Project"), lastOpenedFile,
                                     tr("LibrePCB project files (%1)").arg("*.lpp")));
@@ -203,12 +199,12 @@ void ControlPanel::on_actionOpen_Project_triggered()
 
     settings.setValue("controlpanel/last_open_project", filepath.toNative());
 
-    Workspace::instance().openProject(filepath);
+    mWorkspace.openProject(filepath);
 }
 
 void ControlPanel::on_actionClose_all_open_projects_triggered()
 {
-    Workspace::instance().closeAllProjects(true);
+    mWorkspace.closeAllProjects(true);
 }
 
 void ControlPanel::on_actionSwitch_Workspace_triggered()
@@ -255,7 +251,7 @@ void ControlPanel::on_projectTreeView_doubleClicked(const QModelIndex& index)
             break;
 
         case ProjectTreeItem::ProjectFile:
-            Workspace::instance().openProject(item->getFilePath());
+            mWorkspace.openProject(item->getFilePath());
             break;
 
         default:
@@ -278,7 +274,7 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(const QPoint& p
         {
             if (item->getType() == ProjectTreeItem::ProjectFile)
             {
-                if (!Workspace::instance().getOpenProject(item->getFilePath()))
+                if (!mWorkspace.getOpenProject(item->getFilePath()))
                 {
                     // this project is not open
                     actions.insert(1, menu.addAction(tr("Open Project")));
@@ -291,7 +287,7 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(const QPoint& p
                     actions.value(2)->setIcon(QIcon(":/img/actions/close.png"));
                 }
 
-                if (Workspace::instance().isFavoriteProject(item->getFilePath()))
+                if (mWorkspace.isFavoriteProject(item->getFilePath()))
                 {
                     // this is a favorite project
                     actions.insert(3, menu.addAction(tr("Remove from favorites")));
@@ -329,19 +325,19 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(const QPoint& p
     switch (actions.key(menu.exec(QCursor::pos()), 0))
     {
         case 1: // open project
-            Workspace::instance().openProject(item->getFilePath());
+            mWorkspace.openProject(item->getFilePath());
             break;
 
         case 2: // close project
-            Workspace::instance().closeProject(item->getFilePath(), true);
+            mWorkspace.closeProject(item->getFilePath(), true);
             break;
 
         case 3: // remove project from favorites
-            Workspace::instance().removeFavoriteProject(item->getFilePath());
+            mWorkspace.removeFavoriteProject(item->getFilePath());
             break;
 
         case 4: // add project to favorites
-            Workspace::instance().addFavoriteProject(item->getFilePath());
+            mWorkspace.addFavoriteProject(item->getFilePath());
             break;
 
         case 10: // new project
@@ -378,13 +374,13 @@ void ControlPanel::on_favoriteProjectsListView_entered(const QModelIndex &index)
 void ControlPanel::on_recentProjectsListView_clicked(const QModelIndex &index)
 {
     FilePath filepath(index.data(Qt::UserRole).toString());
-    Workspace::instance().openProject(filepath);
+    mWorkspace.openProject(filepath);
 }
 
 void ControlPanel::on_favoriteProjectsListView_clicked(const QModelIndex &index)
 {
     FilePath filepath(index.data(Qt::UserRole).toString());
-    Workspace::instance().openProject(filepath);
+    mWorkspace.openProject(filepath);
 }
 
 void ControlPanel::on_recentProjectsListView_customContextMenuRequested(const QPoint &pos)
@@ -393,7 +389,7 @@ void ControlPanel::on_recentProjectsListView_customContextMenuRequested(const QP
     if (!index.isValid())
         return;
 
-    bool isFavorite = Workspace::instance().isFavoriteProject(FilePath(index.data(Qt::UserRole).toString()));
+    bool isFavorite = mWorkspace.isFavoriteProject(FilePath(index.data(Qt::UserRole).toString()));
 
     QMenu menu;
     QAction* action;
@@ -411,9 +407,9 @@ void ControlPanel::on_recentProjectsListView_customContextMenuRequested(const QP
     if (menu.exec(QCursor::pos()) == action)
     {
         if (isFavorite)
-            Workspace::instance().removeFavoriteProject(FilePath(index.data(Qt::UserRole).toString()));
+            mWorkspace.removeFavoriteProject(FilePath(index.data(Qt::UserRole).toString()));
         else
-            Workspace::instance().addFavoriteProject(FilePath(index.data(Qt::UserRole).toString()));
+            mWorkspace.addFavoriteProject(FilePath(index.data(Qt::UserRole).toString()));
     }
 }
 
@@ -428,7 +424,7 @@ void ControlPanel::on_favoriteProjectsListView_customContextMenuRequested(const 
                                            tr("Remove from favorites"));
 
     if (menu.exec(QCursor::pos()) == removeAction)
-        Workspace::instance().removeFavoriteProject(FilePath(index.data(Qt::UserRole).toString()));
+        mWorkspace.removeFavoriteProject(FilePath(index.data(Qt::UserRole).toString()));
 }
 
 void ControlPanel::on_actionRescanLibrary_triggered()
@@ -436,7 +432,7 @@ void ControlPanel::on_actionRescanLibrary_triggered()
     try
     {
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        uint count = Workspace::instance().getLibrary().rescan();
+        uint count = mWorkspace.getLibrary().rescan();
         QApplication::restoreOverrideCursor();
         QMessageBox::information(this, tr("Rescan Library"),
             QString("Successfully scanned %1 library elements.").arg(count));

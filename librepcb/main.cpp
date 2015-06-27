@@ -28,6 +28,7 @@
 #include <librepcbcommon/debug.h>
 #include <librepcbcommon/exceptions.h>
 #include <librepcbworkspace/workspace.h>
+#include "controlpanel/controlpanel.h"
 
 /*****************************************************************************************
  *  app.exec()
@@ -133,10 +134,10 @@ int main(int argc, char* argv[])
 
         try
         {
-            // The Workspace constructor can throw an exception. If the workspace was
-            // opened successfully, the control panel will be shown automatically.
-            Workspace ws(wsPath);
-            Q_UNUSED(ws);
+            Workspace ws(wsPath);   // The Workspace constructor can throw an exception.
+            ControlPanel p(ws);
+            p.show();
+
             return appExec();
         }
         catch (UserCanceled& e)

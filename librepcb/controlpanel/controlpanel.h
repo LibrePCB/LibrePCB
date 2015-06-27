@@ -31,6 +31,8 @@
  *  Forward Declarations
  ****************************************************************************************/
 
+class Workspace;
+
 namespace Ui {
 class ControlPanel;
 }
@@ -52,9 +54,7 @@ class ControlPanel final : public QMainWindow
     public:
 
         // Constructors / Destructor
-        explicit ControlPanel(QAbstractItemModel* projectTreeModel,
-                              QAbstractItemModel* recentProjectsModel,
-                              QAbstractItemModel* favoriteProjectsModel);
+        explicit ControlPanel(Workspace& workspace);
         ~ControlPanel();
 
 
@@ -97,6 +97,7 @@ class ControlPanel final : public QMainWindow
 
 
         // Attributes
+        Workspace& mWorkspace;
         Ui::ControlPanel* mUi;
 };
 

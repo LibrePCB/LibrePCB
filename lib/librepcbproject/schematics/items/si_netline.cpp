@@ -105,6 +105,16 @@ SI_NetLine::~SI_NetLine() noexcept
  *  Getters
  ****************************************************************************************/
 
+Workspace& SI_NetLine::getWorkspace() const noexcept
+{
+    return mSchematic.getWorkspace();
+}
+
+Project& SI_NetLine::getProject() const noexcept
+{
+    return mSchematic.getProject();
+}
+
 NetSignal* SI_NetLine::getNetSignal() const noexcept
 {
     Q_ASSERT(mStartPoint->getNetSignal() == mEndPoint->getNetSignal());

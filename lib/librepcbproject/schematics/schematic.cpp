@@ -161,6 +161,11 @@ Schematic::~Schematic()
  *  Getters: General
  ****************************************************************************************/
 
+Workspace& Schematic::getWorkspace() const noexcept
+{
+    return mProject.getWorkspace();
+}
+
 bool Schematic::isEmpty() const noexcept
 {
     return (mSymbols.isEmpty() && mNetPoints.isEmpty() && mNetLines.isEmpty());

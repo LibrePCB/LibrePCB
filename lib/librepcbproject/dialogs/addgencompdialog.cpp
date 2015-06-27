@@ -193,7 +193,7 @@ void AddGenCompDialog::setSelectedSymbVar(const library::GenCompSymbVar* symbVar
             if (!symbol) continue; // TODO: show warning
             library::SymbolPreviewGraphicsItem* graphicsItem = new library::SymbolPreviewGraphicsItem(
                 mProject, localeOrder, *symbol, mSelectedGenComp, symbVar->getUuid(), item->getUuid());
-            graphicsItem->setDrawBoundingRect(Workspace::instance().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect());
+            graphicsItem->setDrawBoundingRect(mProject.getWorkspace().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect());
             mPreviewSymbolGraphicsItems.append(graphicsItem);
             qreal y = mPreviewScene->itemsBoundingRect().bottom() + graphicsItem->boundingRect().height();
             graphicsItem->setPos(QPointF(0, y));

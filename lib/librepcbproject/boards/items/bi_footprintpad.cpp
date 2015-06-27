@@ -67,6 +67,21 @@ BI_FootprintPad::~BI_FootprintPad()
  *  Getters
  ****************************************************************************************/
 
+Workspace& BI_FootprintPad::getWorkspace() const noexcept
+{
+    return mFootprint.getWorkspace();
+}
+
+Project& BI_FootprintPad::getProject() const noexcept
+{
+    return mFootprint.getProject();
+}
+
+Board& BI_FootprintPad::getBoard() const noexcept
+{
+    return mFootprint.getBoard();
+}
+
 const QUuid& BI_FootprintPad::getLibPadUuid() const noexcept
 {
     return mFootprintPad->getUuid();

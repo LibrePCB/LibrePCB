@@ -137,6 +137,20 @@ ComponentInstance::~ComponentInstance() noexcept
 }
 
 /*****************************************************************************************
+ *  Getters
+ ****************************************************************************************/
+
+Workspace& ComponentInstance::getWorkspace() const noexcept
+{
+    return mBoard.getWorkspace();
+}
+
+Project& ComponentInstance::getProject() const noexcept
+{
+    return mBoard.getProject();
+}
+
+/*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 

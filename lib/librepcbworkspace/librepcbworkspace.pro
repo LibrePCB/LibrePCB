@@ -22,7 +22,6 @@ INCLUDEPATH += \
 
 SOURCES += \
     workspace.cpp \
-    controlpanel/controlpanel.cpp \
     projecttreemodel.cpp \
     projecttreeitem.cpp \
     recentprojectsmodel.cpp \
@@ -40,7 +39,6 @@ SOURCES += \
 
 HEADERS += \
     workspace.h \
-    controlpanel/controlpanel.h \
     projecttreemodel.h \
     projecttreeitem.h \
     recentprojectsmodel.h \
@@ -57,6 +55,5 @@ HEADERS += \
     settings/items/wsi_appearance.h
 
 FORMS += \
-    controlpanel/controlpanel.ui \
     workspacechooserdialog.ui \
     settings/workspacesettingsdialog.ui

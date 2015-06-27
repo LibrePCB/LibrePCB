@@ -32,14 +32,11 @@
 #include "projecttreemodel.h"
 #include "recentprojectsmodel.h"
 #include "favoriteprojectsmodel.h"
-#include "controlpanel/controlpanel.h"
 #include "settings/workspacesettings.h"
 #include <librepcbcommon/schematiclayer.h>
 
 using namespace library;
 using namespace project;
-
-Workspace* Workspace::sInstance = 0;
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -51,12 +48,9 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
     mMetadataPath(wsPath.getPathTo(".metadata")),
     mProjectsPath(wsPath.getPathTo("projects")),
     mLibraryPath(wsPath.getPathTo("lib")),
-    mWorkspaceSettings(0), mControlPanel(0), mLibrary(0), mLibraryEditor(0),
-    mProjectTreeModel(0), mRecentProjectsModel(0), mFavoriteProjectsModel(0)
+    mWorkspaceSettings(0), mLibrary(0), mProjectTreeModel(0), mRecentProjectsModel(0),
+    mFavoriteProjectsModel(0)
 {
-    if (sInstance != 0) throw LogicError(__FILE__, __LINE__); // should never happen...
-    sInstance = this;
-
     try
     {
         // check the workspace path
@@ -103,27 +97,21 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
         foreach (unsigned int id, SchematicLayer::getAllLayerIDs())
             mSchematicLayers.insert(id, new SchematicLayer(id));
 
-        mWorkspaceSettings = new WorkspaceSettings();
-        mRecentProjectsModel = new RecentProjectsModel();
-        mFavoriteProjectsModel = new FavoriteProjectsModel();
-        mProjectTreeModel = new ProjectTreeModel();
+        mWorkspaceSettings = new WorkspaceSettings(*this);
+        mRecentProjectsModel = new RecentProjectsModel(*this);
+        mFavoriteProjectsModel = new FavoriteProjectsModel(*this);
+        mProjectTreeModel = new ProjectTreeModel(*this);
         mLibrary = new Library(mLibraryPath);
-        mControlPanel = new ControlPanel(mProjectTreeModel, mRecentProjectsModel,
-                                         mFavoriteProjectsModel);
-        showControlPanel();
     }
     catch (Exception& e)
     {
         // free allocated memory and rethrow the exception
-        delete mControlPanel;           mControlPanel = 0;
         delete mLibrary;                mLibrary = 0;
         delete mProjectTreeModel;       mProjectTreeModel = 0;
         delete mFavoriteProjectsModel;  mFavoriteProjectsModel = 0;
         delete mRecentProjectsModel;    mRecentProjectsModel = 0;
         delete mWorkspaceSettings;      mWorkspaceSettings = 0;
         qDeleteAll(mSchematicLayers);   mSchematicLayers.clear();
-
-        sInstance = 0;
         throw;
     }
 
@@ -140,37 +128,41 @@ Workspace::~Workspace()
 {
     closeAllProjects(false);
 
-    delete mControlPanel;           mControlPanel = 0;
-    delete mLibraryEditor;          mLibraryEditor = 0;
     delete mLibrary;                mLibrary = 0;
     delete mProjectTreeModel;       mProjectTreeModel = 0;
     delete mFavoriteProjectsModel;  mFavoriteProjectsModel = 0;
     delete mRecentProjectsModel;    mRecentProjectsModel = 0;
     delete mWorkspaceSettings;      mWorkspaceSettings = 0;
     qDeleteAll(mSchematicLayers);   mSchematicLayers.clear();
+}
 
-    sInstance = 0;
+/*****************************************************************************************
+ *  Getters
+ ****************************************************************************************/
+
+QAbstractItemModel& Workspace::getProjectTreeModel() const noexcept
+{
+    return *mProjectTreeModel;
+}
+
+QAbstractItemModel& Workspace::getRecentProjectsModel() const noexcept
+{
+    return *mRecentProjectsModel;
+}
+
+QAbstractItemModel& Workspace::getFavoriteProjectsModel() const noexcept
+{
+    return *mFavoriteProjectsModel;
 }
 
 /*****************************************************************************************
  *  Project Management
  ****************************************************************************************/
 
-Project* Workspace::createProject(const FilePath& filepath) noexcept
+Project* Workspace::createProject(const FilePath& filepath) throw (Exception)
 {
-    Project* project = 0;
+    Project* project = new Project(*this, filepath, true);
 
-    try
-    {
-        project = new Project(filepath, true);
-    }
-    catch (Exception& e)
-    {
-        QMessageBox::critical(mControlPanel, tr("Cannot create the project!"), e.getUserMsg());
-        return nullptr;
-    }
-
-    // project successfully created and opened!
     mOpenProjects.insert(filepath.toUnique().toStr(), project);
     mRecentProjectsModel->setLastRecentProject(filepath);
 
@@ -180,44 +172,13 @@ Project* Workspace::createProject(const FilePath& filepath) noexcept
     return project;
 }
 
-Project* Workspace::openProject(const FilePath& filepath) noexcept
+Project* Workspace::openProject(const FilePath& filepath) throw (Exception)
 {
-    // Check if the filepath is an existing file
-    if (!filepath.isExistingFile())
-    {
-        QMessageBox::critical(0, tr("Invalid filename"), QString(
-            tr("The project filename is not valid: \"%1\"")).arg(filepath.toNative()));
-        return nullptr;
-    }
-
     Project* openProject = getOpenProject(filepath);
 
     if (!openProject)
     {
-        try
-        {
-            // If a fatal error occurs while opening the project, the project's
-            // constructor will throw an exception. We will catch that exception here and
-            // show a message box to print the error message to the monitor. Only
-            // exceptions of type "UserCanceled" are ignored.
-            openProject = new Project(filepath, false);
-        }
-        catch (UserCanceled& e)
-        {
-            // the user has canceled opening the project, so we ignore this exception...
-            qDebug() << "Aborted opening the project!";
-            return nullptr;
-        }
-        catch (Exception& e)
-        {
-            // opening the project was interrupted by an exception!
-            qDebug() << "Aborted opening the project!";
-            QMessageBox::critical(mControlPanel, tr("Cannot open the project!"),
-                                  e.getUserMsg());
-            return nullptr;
-        }
-
-        // project successfully opened!
+        openProject = new Project(*this, filepath, false);
         mOpenProjects.insert(filepath.toUnique().toStr(), openProject);
         mRecentProjectsModel->setLastRecentProject(filepath);
     }
@@ -289,33 +250,6 @@ void Workspace::removeFavoriteProject(const FilePath& filepath) noexcept
 }
 
 /*****************************************************************************************
- *  Public Slots
- ****************************************************************************************/
-
-void Workspace::showControlPanel() const noexcept
-{
-    mControlPanel->show();
-    mControlPanel->raise();
-}
-
-void Workspace::openLibraryEditor() noexcept
-{
-    try
-    {
-        if (!mLibraryEditor)
-            mLibraryEditor = new library_editor::LibraryEditor();
-    }
-    catch (...)
-    {
-        qWarning() << "Could not open the library editor!";
-        return;
-    }
-
-    mLibraryEditor->show();
-    mLibraryEditor->raise();
-}
-
-/*****************************************************************************************
  *  Static Methods
  ****************************************************************************************/
 
@@ -360,7 +294,7 @@ FilePath Workspace::chooseWorkspacePath() noexcept
     if (!isValidWorkspacePath(path))
     {
         int answer = QMessageBox::question(0, tr("Create new workspace?"),
-                        tr("The speciefied workspace does not exist. "
+                        tr("The specified workspace does not exist. "
                            "Do you want to create a new workspace?"));
 
         if (answer == QMessageBox::Yes)

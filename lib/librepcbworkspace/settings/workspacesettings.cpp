@@ -31,8 +31,8 @@
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WorkspaceSettings::WorkspaceSettings() :
-    QObject(0), mMetadataPath(Workspace::instance().getMetadataPath()), mDialog(0),
+WorkspaceSettings::WorkspaceSettings(const Workspace& workspace) :
+    QObject(0), mMetadataPath(workspace.getMetadataPath()), mDialog(0),
     mAppLocale(0), mProjectAutosaveInterval(0), mLibraryLocaleOrder(0),
     mLibraryNormOrder(0), mDebugTools(0), mAppearance(0)
 {

@@ -34,6 +34,8 @@
  *  Forward Declarations
  ****************************************************************************************/
 
+class Workspace;
+
 namespace project {
 class Board;
 class ComponentInstance;
@@ -69,6 +71,9 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
         ~BI_Footprint() noexcept;
 
         // Getters
+        Workspace& getWorkspace() const noexcept;
+        Project& getProject() const noexcept;
+        Board& getBoard() const noexcept;
         ComponentInstance& getComponentInstance() const noexcept {return mComponentInstance;}
         BI_FootprintPad* getPad(const QUuid& padUuid) const noexcept {return mPads.value(padUuid);}
         const QHash<QUuid, BI_FootprintPad*>& getPads() const noexcept {return mPads;}

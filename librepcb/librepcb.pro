@@ -85,11 +85,14 @@ RESOURCES += \
     ../i18n/translations.qrc
 
 SOURCES += \
-    main.cpp
+    main.cpp \
+    controlpanel/controlpanel.cpp
 
-HEADERS += 
+HEADERS += \
+    controlpanel/controlpanel.h
 
-FORMS += 
+FORMS += \
+    controlpanel/controlpanel.ui \
 
 
 # Custom compiler "lrelease" for qm generation

@@ -28,6 +28,12 @@
 #include <librepcbcommon/fileio/filepath.h>
 
 /*****************************************************************************************
+ *  Forward Declarations
+ ****************************************************************************************/
+
+class Workspace;
+
+/*****************************************************************************************
  *  Class FavoriteProjectsModel
  ****************************************************************************************/
 
@@ -41,7 +47,7 @@ class FavoriteProjectsModel : public QAbstractListModel
     public:
 
         // Constructors / Destructor
-        FavoriteProjectsModel();
+        FavoriteProjectsModel(const Workspace& workspace);
         ~FavoriteProjectsModel();
 
         // General Methods
@@ -63,6 +69,7 @@ class FavoriteProjectsModel : public QAbstractListModel
         QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 
         // Attributes
+        const Workspace& mWorkspace;
         QList<FilePath> mFavoriteProjects;
 };
 

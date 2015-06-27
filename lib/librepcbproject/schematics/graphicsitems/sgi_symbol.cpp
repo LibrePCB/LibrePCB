@@ -222,7 +222,7 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
             painter->fillRect(props.textRect, QBrush(layer->getColor(selected), Qt::Dense5Pattern));
         }
 #ifdef QT_DEBUG
-    if (Workspace::instance().getSettings().getDebugTools()->getShowGraphicsItemsTextBoundingRect())
+    if (mSymbol.getWorkspace().getSettings().getDebugTools()->getShowGraphicsItemsTextBoundingRect())
     {
         // draw text bounding rect
         painter->setPen(QPen(Qt::magenta, 0));
@@ -247,7 +247,7 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
     }
 
 #ifdef QT_DEBUG
-    if (Workspace::instance().getSettings().getDebugTools()->getShowGenCompSymbolCount())
+    if (mSymbol.getWorkspace().getSettings().getDebugTools()->getShowGenCompSymbolCount())
     {
         // show symbols count of the generic component
         layer = getSchematicLayer(SchematicLayer::Busses);
@@ -262,7 +262,7 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
                               QString("[%1/%2]").arg(count).arg(maxCount));
         }
     }
-    if (Workspace::instance().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect())
+    if (mSymbol.getWorkspace().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect())
     {
         // draw bounding rect
         painter->setPen(QPen(Qt::red, 0));

@@ -28,6 +28,12 @@
 #include <librepcbcommon/fileio/filepath.h>
 
 /*****************************************************************************************
+ *  Forward Declarations
+ ****************************************************************************************/
+
+class Workspace;
+
+/*****************************************************************************************
  *  Class RecentProjectsModel
  ****************************************************************************************/
 
@@ -41,7 +47,7 @@ class RecentProjectsModel : public QAbstractListModel
     public:
 
         // Constructors / Destructor
-        RecentProjectsModel();
+        RecentProjectsModel(const Workspace& workspace);
         ~RecentProjectsModel();
 
         // General Methods
@@ -60,6 +66,8 @@ class RecentProjectsModel : public QAbstractListModel
         int rowCount(const QModelIndex& parent = QModelIndex()) const;
         QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 
+        // Attributes
+        const Workspace& mWorkspace;
         QList<FilePath> mRecentProjects;
 
 };

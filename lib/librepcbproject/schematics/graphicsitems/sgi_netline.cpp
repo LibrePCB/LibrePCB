@@ -94,7 +94,7 @@ void SGI_NetLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* optio
 
 #ifdef QT_DEBUG
     bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
-    if ((!deviceIsPrinter) && (Workspace::instance().getSettings().getDebugTools()->getShowSchematicNetlinesNetsignals()))
+    if ((!deviceIsPrinter) && (mNetLine.getWorkspace().getSettings().getDebugTools()->getShowSchematicNetlinesNetsignals()))
     {
         // draw net signal name
         QFont font;
@@ -106,7 +106,7 @@ void SGI_NetLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* optio
         painter->setPen(QPen(mLayer->getColor(mNetLine.isSelected()), 0));
         painter->drawText(mLineF.pointAt((qreal)0.5), mNetLine.getNetSignal()->getName());
     }
-    if ((!deviceIsPrinter) && (Workspace::instance().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect()))
+    if ((!deviceIsPrinter) && (mNetLine.getWorkspace().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect()))
     {
         // draw bounding rect
         painter->setPen(QPen(Qt::red, 0));

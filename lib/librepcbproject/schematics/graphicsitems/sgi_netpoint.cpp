@@ -90,14 +90,14 @@ void SGI_NetPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     }
 
 #ifdef QT_DEBUG
-    if ((!mPointVisible) && Workspace::instance().getSettings().getDebugTools()->getShowAllSchematicNetpoints())
+    if ((!mPointVisible) && mNetPoint.getWorkspace().getSettings().getDebugTools()->getShowAllSchematicNetpoints())
     {
         // draw circle
         painter->setPen(QPen(Qt::red, 0));
         painter->setBrush(Qt::NoBrush);
         painter->drawEllipse(sBoundingRect);
     }
-    if (Workspace::instance().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect())
+    if (mNetPoint.getWorkspace().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect())
     {
         // draw bounding rect
         painter->setPen(QPen(Qt::red, 0));

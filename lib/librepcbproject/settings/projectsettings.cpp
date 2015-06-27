@@ -103,7 +103,7 @@ ProjectSettings::~ProjectSettings() noexcept
 QStringList ProjectSettings::getLocaleOrder(bool useWorkspaceSettings) const noexcept
 {
     if (useWorkspaceSettings)
-        return mLocaleOrder + Workspace::instance().getSettings().getLibLocaleOrder()->getLocaleOrder();
+        return mLocaleOrder + mProject.getWorkspace().getSettings().getLibLocaleOrder()->getLocaleOrder();
     else
         return mLocaleOrder;
 }
@@ -111,7 +111,7 @@ QStringList ProjectSettings::getLocaleOrder(bool useWorkspaceSettings) const noe
 QStringList ProjectSettings::getNormOrder(bool useWorkspaceSettings) const noexcept
 {
     if (useWorkspaceSettings)
-        return mNormOrder + Workspace::instance().getSettings().getLibNormOrder()->getNormOrder();
+        return mNormOrder + mProject.getWorkspace().getSettings().getLibNormOrder()->getNormOrder();
     else
         return mNormOrder;
 }

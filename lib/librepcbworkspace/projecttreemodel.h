@@ -31,6 +31,7 @@
  *  Forward Declarations
  ****************************************************************************************/
 
+class Workspace;
 class ProjectTreeItem;
 
 /*****************************************************************************************
@@ -51,7 +52,7 @@ class ProjectTreeModel : public QAbstractItemModel
     public:
 
         // Constructors / Destructor
-        ProjectTreeModel();
+        ProjectTreeModel(const Workspace& workspace);
         ~ProjectTreeModel();
 
         // General

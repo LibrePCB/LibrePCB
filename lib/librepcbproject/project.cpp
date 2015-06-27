@@ -52,10 +52,11 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Project::Project(const FilePath& filepath, bool create) throw (Exception) :
-    QObject(nullptr), IF_AttributeProvider(), mPath(filepath.getParentDir()),
-    mFilepath(filepath), mXmlFile(nullptr), mFileLock(filepath), mIsRestored(false),
-    mIsReadOnly(false), mDescriptionHtmlFile(nullptr), mProjectIsModified(false),
+Project::Project(Workspace& workspace, const FilePath& filepath, bool create) throw (Exception) :
+    QObject(nullptr), IF_AttributeProvider(), mWorkspace(workspace),
+    mPath(filepath.getParentDir()), mFilepath(filepath), mXmlFile(nullptr),
+    mFileLock(filepath), mIsRestored(false), mIsReadOnly(false),
+    mDescriptionHtmlFile(nullptr), mProjectIsModified(false),
     mUndoStack(nullptr), mProjectSettings(nullptr), mProjectLibrary(nullptr),
     mErcMsgList(nullptr), mCircuit(nullptr), mSchematicEditor(nullptr),
     mBoardLayerProvider(nullptr), mBoardEditor(nullptr)
@@ -286,7 +287,7 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
     // project successfully opened! :-)
 
     // setup the timer for automatic backups, if enabled in the settings
-    int intervalSecs =  Workspace::instance().getSettings().getProjectAutosaveInterval()->getInterval();
+    int intervalSecs =  mWorkspace.getSettings().getProjectAutosaveInterval()->getInterval();
     if ((intervalSecs > 0) && (!mIsReadOnly))
     {
         // autosaving is enabled --> start the timer
@@ -300,7 +301,7 @@ Project::Project(const FilePath& filepath, bool create) throw (Exception) :
 Project::~Project() noexcept
 {
     // inform the workspace that this project will get destroyed
-    Workspace::instance().unregisterOpenProject(this);
+    mWorkspace.unregisterOpenProject(this);
 
     // stop the autosave timer
     mAutoSaveTimer.stop();

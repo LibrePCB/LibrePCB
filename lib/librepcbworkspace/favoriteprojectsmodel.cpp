@@ -31,18 +31,16 @@
  *  Constructors / Destructor
  ****************************************************************************************/
 
-FavoriteProjectsModel::FavoriteProjectsModel() :
-    QAbstractListModel(0)
+FavoriteProjectsModel::FavoriteProjectsModel(const Workspace& workspace) :
+    QAbstractListModel(0), mWorkspace(workspace)
 {
-    QSettings settings(Workspace::instance().getMetadataPath().getPathTo("settings.ini").toStr(),
-                       QSettings::IniFormat);
+    QSettings settings(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(), QSettings::IniFormat);
 
     int count = settings.beginReadArray("favorite_projects");
     for (int i = 0; i < count; i++)
     {
         settings.setArrayIndex(i);
-        FilePath filepath = FilePath::fromRelative(Workspace::instance().getPath(),
-                                                   settings.value("filepath").toString());
+        FilePath filepath = FilePath::fromRelative(mWorkspace.getPath(), settings.value("filepath").toString());
         beginInsertRows(QModelIndex(), mFavoriteProjects.count(), mFavoriteProjects.count());
         mFavoriteProjects.append(filepath);
         endInsertRows();
@@ -61,14 +59,13 @@ FavoriteProjectsModel::~FavoriteProjectsModel()
 void FavoriteProjectsModel::save()
 {
     // save the new list in the workspace
-    QSettings settings(Workspace::instance().getMetadataPath().getPathTo("settings.ini").toStr(),
-                       QSettings::IniFormat);
+    QSettings settings(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(), QSettings::IniFormat);
 
     settings.beginWriteArray("favorite_projects");
     for (int i = 0; i < mFavoriteProjects.count(); i++)
     {
         settings.setArrayIndex(i);
-        settings.setValue("filepath", mFavoriteProjects.at(i).toRelative(Workspace::instance().getPath()));
+        settings.setValue("filepath", mFavoriteProjects.at(i).toRelative(mWorkspace.getPath()));
     }
     settings.endArray();
 }

@@ -32,7 +32,6 @@
  *  Forward Declarations
  ****************************************************************************************/
 
-class ControlPanel;
 class ProjectTreeModel;
 class RecentProjectsModel;
 class FavoriteProjectsModel;
@@ -41,10 +40,6 @@ class SchematicLayer;
 
 namespace library{
 class Library;
-}
-
-namespace library_editor{
-class LibraryEditor;
 }
 
 namespace project{
@@ -58,9 +53,6 @@ class Project;
 /**
  * @brief The Workspace class represents a workspace with all its data (library, projects,
  * settings, ...)
- *
- * There can be only one Workspace object in an application instance. That object is
- * created in the main() function and is like the "topmost class of the whole application".
  *
  * To access the settings of the workspace, use the method #getSettings().
  *
@@ -113,6 +105,10 @@ class Workspace final : public QObject
          */
         const FilePath& getLibraryPath() const {return mLibraryPath;}
 
+        QAbstractItemModel& getProjectTreeModel() const noexcept;
+        QAbstractItemModel& getRecentProjectsModel() const noexcept;
+        QAbstractItemModel& getFavoriteProjectsModel() const noexcept;
+
         /**
          * @brief Get the workspace settings
          */
@@ -148,20 +144,18 @@ class Workspace final : public QObject
          *
          * @param filepath  The filepath to the *.lpp project file of the project to create
          *
-         * @return  The pointer to the new project. If an error occurs, this method shows
-         *          the error message box and returns nullptr afterwards.
+         * @return The pointer to the new project
          */
-        project::Project* createProject(const FilePath& filepath) noexcept;
+        project::Project* createProject(const FilePath& filepath) throw (Exception);
 
         /**
          * @brief Open an existing project (or bring an already opened project to front)
          *
          * @param filepath  The filepath to the *.lpp project file to open
          *
-         * @return  The pointer to the opened project. If an error occurs, this method
-         *          shows the error message box and returns nullptr afterwards.
+         * @return The pointer to the opened project
          */
-        project::Project* openProject(const FilePath& filepath) noexcept;
+        project::Project* openProject(const FilePath& filepath) throw (Exception);
 
         /**
          * @brief Close an open project
@@ -285,33 +279,6 @@ class Workspace final : public QObject
          */
         static FilePath chooseWorkspacePath() noexcept;
 
-        /**
-         * @brief Get the Workspace singleton instance
-         *
-         * @warning You must be sure that the singleton Workspace object was already
-         *          created before calling this method the first time! Otherwise the
-         *          application will crash (for debugging purposes there is a Q_ASSERT()
-         *          in this method to detect such an error).
-         *
-         * @return A reference to the singleton Workspace object
-         */
-        static Workspace& instance() noexcept {Q_ASSERT(sInstance); return *sInstance;}
-
-
-    public slots:
-
-        // Public Slots
-
-        /**
-         * @brief Show the control panel (bring it to front if already open)
-         */
-        void showControlPanel() const noexcept;
-
-        /**
-         * @brief Open the library editor (bring it to front if already open)
-         */
-        void openLibraryEditor() noexcept;
-
 
     private:
 
@@ -328,18 +295,12 @@ class Workspace final : public QObject
         FilePath mProjectsPath; ///< the directory "projects"
         FilePath mLibraryPath; ///< the directory "library"
         WorkspaceSettings* mWorkspaceSettings; ///< the WorkspaceSettings object
-        ControlPanel* mControlPanel; ///< the control panel window
         library::Library* mLibrary; ///< the library of the workspace (with SQLite database)
-        library_editor::LibraryEditor* mLibraryEditor; ///< the library editor
         ProjectTreeModel* mProjectTreeModel; ///< a tree model for the whole projects directory
         QHash<QString, project::Project*> mOpenProjects; ///< a list of all open projects
         RecentProjectsModel* mRecentProjectsModel; ///< a list model of all recent projects
         FavoriteProjectsModel* mFavoriteProjectsModel; ///< a list model of all favorite projects
         QHash<unsigned int, SchematicLayer*> mSchematicLayers; ///< all workspace schematic layers
-
-
-        // static variables
-        static Workspace* sInstance;
 };
 
 #endif // WORKSPACE_H

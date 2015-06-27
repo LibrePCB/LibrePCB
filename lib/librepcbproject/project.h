@@ -36,6 +36,7 @@
  *  Forward Declarations
  ****************************************************************************************/
 
+class Workspace;
 class QMainWindow;
 class QPrinter;
 class SmartTextFile;
@@ -110,7 +111,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *                      exceptions of type #UserCanceled should be ignored (no
          *                      msg box) because the user has aborted opening the project.
          */
-        explicit Project(const FilePath& filepath, bool create) throw (Exception);
+        explicit Project(Workspace& workspace, const FilePath& filepath, bool create) throw (Exception);
 
         /**
          * @brief The destructor will close the whole project (without saving!)
@@ -119,6 +120,8 @@ class Project final : public QObject, public IF_AttributeProvider,
 
 
         // Getters: General
+
+        Workspace& getWorkspace() const noexcept {return mWorkspace;}
 
         /**
          * @brief Get the filepath of the project file (*.lpp)
@@ -621,6 +624,7 @@ class Project final : public QObject, public IF_AttributeProvider,
 
 
         // Attributes
+        Workspace& mWorkspace;
 
         // Project File (*.lpp)
         FilePath mPath; ///< the path to the project directory

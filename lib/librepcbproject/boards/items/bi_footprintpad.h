@@ -32,6 +32,8 @@
  *  Forward Declarations
  ****************************************************************************************/
 
+class Workspace;
+
 namespace project {
 class BI_Footprint;
 class Circuit;
@@ -61,6 +63,9 @@ class BI_FootprintPad final : public BI_Base
         ~BI_FootprintPad();
 
         // Getters
+        Workspace& getWorkspace() const noexcept;
+        Project& getProject() const noexcept;
+        Board& getBoard() const noexcept;
         const QUuid& getLibPadUuid() const noexcept;
         //QString getDisplayText(bool returnGenCompSignalNameIfEmpty = false,
         //                       bool returnPinNameIfEmpty = false) const noexcept;

@@ -31,18 +31,16 @@
  *  Constructors / Destructor
  ****************************************************************************************/
 
-RecentProjectsModel::RecentProjectsModel() :
-    QAbstractListModel(0)
+RecentProjectsModel::RecentProjectsModel(const Workspace& workspace) :
+    QAbstractListModel(0), mWorkspace(workspace)
 {
-    QSettings settings(Workspace::instance().getMetadataPath().getPathTo("settings.ini").toStr(),
-                       QSettings::IniFormat);
+    QSettings settings(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(), QSettings::IniFormat);
 
     int count = settings.beginReadArray("recent_projects");
     for (int i = 0; i < count; i++)
     {
          settings.setArrayIndex(i);
-         FilePath filepath = FilePath::fromRelative(Workspace::instance().getPath(),
-                                                    settings.value("filepath").toString());
+         FilePath filepath = FilePath::fromRelative(mWorkspace.getPath(), settings.value("filepath").toString());
          beginInsertRows(QModelIndex(), mRecentProjects.count(), mRecentProjects.count());
          mRecentProjects.append(filepath);
          endInsertRows();
@@ -61,14 +59,13 @@ RecentProjectsModel::~RecentProjectsModel()
 void RecentProjectsModel::save()
 {
     // save the new list in the workspace
-    QSettings settings(Workspace::instance().getMetadataPath().getPathTo("settings.ini").toStr(),
-                       QSettings::IniFormat);
+    QSettings settings(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(), QSettings::IniFormat);
 
     settings.beginWriteArray("recent_projects");
     for (int i = 0; i < mRecentProjects.count(); i++)
     {
         settings.setArrayIndex(i);
-        settings.setValue("filepath", mRecentProjects.at(i).toRelative(Workspace::instance().getPath()));
+        settings.setValue("filepath", mRecentProjects.at(i).toRelative(mWorkspace.getPath()));
     }
     settings.endArray();
 }

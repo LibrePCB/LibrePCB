@@ -165,7 +165,7 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     }
 
 #ifdef QT_DEBUG
-    if ((netsignal) && (Workspace::instance().getSettings().getDebugTools()->getShowSymbolPinNetsignals()))
+    if ((netsignal) && (mPin.getWorkspace().getSettings().getDebugTools()->getShowSymbolPinNetsignals()))
     {
         // draw net signal name
         QFont font;
@@ -180,14 +180,14 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
         painter->drawText(QRectF(), Qt::AlignHCenter | Qt::AlignBottom | Qt::TextSingleLine | Qt::TextDontClip, netsignal->getName());
         painter->restore();
     }
-    if (Workspace::instance().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect())
+    if (mPin.getWorkspace().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect())
     {
         // draw bounding rect
         painter->setPen(QPen(Qt::red, 0));
         painter->setBrush(Qt::NoBrush);
         painter->drawRect(mBoundingRect);
     }
-    if (Workspace::instance().getSettings().getDebugTools()->getShowGraphicsItemsTextBoundingRect())
+    if (mPin.getWorkspace().getSettings().getDebugTools()->getShowGraphicsItemsTextBoundingRect())
     {
         // draw text bounding rect
         painter->setPen(QPen(Qt::magenta, 0));

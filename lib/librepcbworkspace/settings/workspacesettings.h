@@ -40,6 +40,7 @@
  *  Forward Declarations
  ****************************************************************************************/
 
+class Workspace;
 class WorkspaceSettingsDialog;
 
 /*****************************************************************************************
@@ -52,9 +53,6 @@ class WorkspaceSettingsDialog;
  * The ".metadata" directory in a workspace is used to store workspace related settings
  * and other workspace related stuff. This class is an interface to such workspace related
  * stuff. A WorkspaceSettings object is created in the constructor of the Workspace object.
- * As there can be only one Workspace object in an application instance, there is also
- * only one WorkspaceSettings object in an application instance. Never create more
- * WorkspaceSettings objects!
  *
  * This class also provides a graphical dialog to show and edit all these settings. For
  * this purpose, the WorkspaceSettingsDialog class is used. It can be shown by calling
@@ -82,7 +80,7 @@ class WorkspaceSettings final : public QObject
     public:
 
         // Constructors / Destructor
-        WorkspaceSettings();
+        WorkspaceSettings(const Workspace& workspace);
         ~WorkspaceSettings();
 
 

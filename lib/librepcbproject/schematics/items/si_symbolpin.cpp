@@ -82,6 +82,21 @@ SI_SymbolPin::~SI_SymbolPin()
  *  Getters
  ****************************************************************************************/
 
+Workspace& SI_SymbolPin::getWorkspace() const noexcept
+{
+    return mSymbol.getWorkspace();
+}
+
+Project& SI_SymbolPin::getProject() const noexcept
+{
+    return mSymbol.getProject();
+}
+
+Schematic& SI_SymbolPin::getSchematic() const noexcept
+{
+    return mSymbol.getSchematic();
+}
+
 const QUuid& SI_SymbolPin::getLibPinUuid() const noexcept
 {
     return mSymbolPin->getUuid();

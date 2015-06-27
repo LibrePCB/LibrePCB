@@ -93,8 +93,8 @@ BoardEditor::BoardEditor(Project& project, bool readOnly) :
     connect(mUi->actionZoomIn, &QAction::triggered, mGraphicsView, &GraphicsView::zoomIn);
     connect(mUi->actionZoomOut, &QAction::triggered, mGraphicsView, &GraphicsView::zoomOut);
     connect(mUi->actionZoomAll, &QAction::triggered, mGraphicsView, &GraphicsView::zoomAll);
-    connect(mUi->actionShowControlPanel, &QAction::triggered,
-            &Workspace::instance(), &Workspace::showControlPanel);
+    //connect(mUi->actionShowControlPanel, &QAction::triggered,
+    //        &Workspace::instance(), &Workspace::showControlPanel);
     connect(mUi->actionShowSchematicEditor, &QAction::triggered,
             &mProject, &Project::showSchematicEditor);
     connect(mUi->actionProjectSettings, &QAction::triggered,
