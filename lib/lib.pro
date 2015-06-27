@@ -5,4 +5,5 @@ SUBDIRS = \
     librepcblibrary \
     librepcblibraryeditor \
     librepcbproject \
+    librepcbprojecteditor \
     librepcbworkspace

@@ -45,11 +45,14 @@ unix:!macx {
     INSTALLS += target icon desktop mimexml mimedesktop
 }
 
+# Note: The order of the libraries is very important for the linker!
+# Another order could end up in "undefined reference" errors!
 LIBS += \
     -L$${DESTDIR} \
+    -llibrepcbprojecteditor \
+    -llibrepcblibraryeditor \
     -llibrepcbworkspace \
     -llibrepcbproject \
-    -llibrepcblibraryeditor \
     -llibrepcblibrary \
     -llibrepcbcommon
 
@@ -57,16 +60,18 @@ INCLUDEPATH += \
     ../lib
 
 DEPENDPATH += \
+    ../lib/librepcbprojecteditor \
+    ../lib/librepcblibraryeditor \
     ../lib/librepcbworkspace \
     ../lib/librepcbproject \
-    ../lib/librepcblibraryeditor \
     ../lib/librepcblibrary \
     ../lib/librepcbcommon
 
 PRE_TARGETDEPS += \
+    $${DESTDIR}/liblibrepcbprojecteditor.a \
+    $${DESTDIR}/liblibrepcblibraryeditor.a \
     $${DESTDIR}/liblibrepcbworkspace.a \
     $${DESTDIR}/liblibrepcbproject.a \
-    $${DESTDIR}/liblibrepcblibraryeditor.a \
     $${DESTDIR}/liblibrepcblibrary.a \
     $${DESTDIR}/liblibrepcbcommon.a
 
