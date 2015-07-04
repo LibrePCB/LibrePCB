@@ -26,10 +26,13 @@
 
 #include <QtCore>
 #include <QtWidgets>
+#include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
+
+class Workspace;
 
 namespace Ui {
 class LibraryEditor;
@@ -46,15 +49,16 @@ namespace library_editor {
  *
  * @todo this is only a stub class...
  */
-class LibraryEditor : public QMainWindow
+class LibraryEditor final : public QMainWindow
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        LibraryEditor();
-        ~LibraryEditor();
+        explicit LibraryEditor(Workspace& workspace) throw (Exception);
+        ~LibraryEditor() noexcept;
+
 
     private:
 
@@ -63,7 +67,8 @@ class LibraryEditor : public QMainWindow
         LibraryEditor& operator=(const LibraryEditor& rhs);
 
         // Attributes
-        Ui::LibraryEditor* ui;
+        Workspace& mWorkspace;
+        Ui::LibraryEditor* mUi;
 };
 
 } // namespace library_editor
