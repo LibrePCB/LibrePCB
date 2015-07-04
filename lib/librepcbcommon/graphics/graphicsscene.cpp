@@ -24,6 +24,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "graphicsscene.h"
+#include "../units/point.h"
 #include "graphicsitem.h"
 
 /*****************************************************************************************
