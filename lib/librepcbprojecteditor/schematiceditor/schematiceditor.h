@@ -36,6 +36,7 @@ class GraphicsView;
 class GridProperties;
 
 namespace project {
+class ProjectEditor;
 class Project;
 class Schematic;
 class SchematicPagesDock;
@@ -63,10 +64,11 @@ class SchematicEditor final : public QMainWindow, public IF_GraphicsViewEventHan
     public:
 
         // Constructors / Destructor
-        explicit SchematicEditor(Project& project, bool readOnly);
+        explicit SchematicEditor(ProjectEditor& projectEditor, Project& project);
         ~SchematicEditor();
 
         // Getters
+        ProjectEditor& getProjectEditor() const noexcept {return mProjectEditor;}
         Project& getProject() const noexcept {return mProject;}
         int getActiveSchematicIndex() const noexcept {return mActiveSchematicIndex;}
         Schematic* getActiveSchematic() const noexcept;
@@ -100,9 +102,11 @@ class SchematicEditor final : public QMainWindow, public IF_GraphicsViewEventHan
         void on_actionAddGenCmp_vcc_triggered();
         void on_actionProjectProperties_triggered();
 
+
     signals:
 
         void activeSchematicChanged(int oldIndex, int newIndex);
+
 
     private:
 
@@ -115,6 +119,7 @@ class SchematicEditor final : public QMainWindow, public IF_GraphicsViewEventHan
         bool graphicsViewEventHandler(QEvent* event);
 
         // General Attributes
+        ProjectEditor& mProjectEditor;
         Project& mProject;
         Ui::SchematicEditor* mUi;
         GraphicsView* mGraphicsView;

@@ -122,79 +122,10 @@ class Workspace final : public QObject
         // Project Management
 
         /**
-         * @brief Create a new project and open it
-         *
-         * @param filepath  The filepath to the *.lpp project file of the project to create
-         *
-         * @return The pointer to the new project
+         * @brief setLastRecentlyUsedProject
+         * @param filepath
          */
-        project::Project* createProject(const FilePath& filepath) throw (Exception);
-
-        /**
-         * @brief Open an existing project (or bring an already opened project to front)
-         *
-         * @param filepath  The filepath to the *.lpp project file to open
-         *
-         * @return The pointer to the opened project
-         */
-        project::Project* openProject(const FilePath& filepath) throw (Exception);
-
-        /**
-         * @brief Close an open project
-         *
-         * @param project       The pointer to the open project
-         * @param askForSave    If true and the specified project has unsaved changes,
-         *                      a message box appears to ask whether the project should
-         *                      be saved or not.
-         *                      If false, the project will be closed without saving it.
-         *
-         * @return  False if the user has canceled the "save project?" dialog (if appeared).
-         *          True in all other cases (also if the specified project was not open).
-         */
-        bool closeProject(project::Project* project, bool askForSave) noexcept;
-
-        /**
-         * @overload
-         * @brief Close an open project
-         *
-         * @param filepath      The filepath to the open project
-         * @param askForSave    See #closeProject(project::Project*, bool)
-         *
-         * @return See #closeProject(project::Project*, bool)
-         */
-        bool closeProject(const FilePath& filepath, bool askForSave) noexcept;
-
-        /**
-         * @brief Close all open projects
-         *
-         * @param askForSave    See #closeProject(project::Project*, bool)
-         *
-         * @return  False if the user has canceled at least one "save project?" dialog (so
-         *          at least one project is still open after calling this method).
-         *          True in all other cases.
-         */
-        bool closeAllProjects(bool askForSave = false) noexcept;
-
-        /**
-         * @brief Method to unregister an open project
-         *
-         * @warning This method must be called only from the destructor project#Project#~Project()!
-         *
-         * @param project   The pointer to the project which will be closed
-         */
-        void unregisterOpenProject(project::Project* project) noexcept;
-
-        /**
-         * @brief Get the pointer to an already open project by its filepath
-         *
-         * This method can also be used to check whether a project (by its filepath) is
-         * already open or not.
-         *
-         * @param filepath  The filepath to a *.lpp project file
-         *
-         * @return The pointer to the open project, or nullptr if the project is not open
-         */
-        project::Project* getOpenProject(const FilePath& filepath) const noexcept;
+        void setLastRecentlyUsedProject(const FilePath& filepath) noexcept;
 
         /**
          * @brief Check whether a project is in the favorite project list or not
@@ -279,7 +210,6 @@ class Workspace final : public QObject
         WorkspaceSettings* mWorkspaceSettings; ///< the WorkspaceSettings object
         library::Library* mLibrary; ///< the library of the workspace (with SQLite database)
         ProjectTreeModel* mProjectTreeModel; ///< a tree model for the whole projects directory
-        QHash<QString, project::Project*> mOpenProjects; ///< a list of all open projects
         RecentProjectsModel* mRecentProjectsModel; ///< a list model of all recent projects
         FavoriteProjectsModel* mFavoriteProjectsModel; ///< a list model of all favorite projects
 };

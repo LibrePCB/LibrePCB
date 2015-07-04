@@ -126,11 +126,6 @@ Board::~Board()
  *  Getters: General
  ****************************************************************************************/
 
-Workspace& Board::getWorkspace() const noexcept
-{
-    return mProject.getWorkspace();
-}
-
 bool Board::isEmpty() const noexcept
 {
     return false;

@@ -24,7 +24,7 @@
 #include <QtCore>
 #include "bes_base.h"
 #include "../boardeditor.h"
-#include "../../project.h"
+#include <librepcbproject/project.h>
 
 namespace project {
 
@@ -33,9 +33,10 @@ namespace project {
  ****************************************************************************************/
 
 BES_Base::BES_Base(BoardEditor& editor, Ui::BoardEditor& editorUi,
-                   GraphicsView& editorGraphicsView) :
+                   GraphicsView& editorGraphicsView, UndoStack& undoStack) :
     QObject(0), mProject(editor.getProject()), mCircuit(editor.getProject().getCircuit()),
-    mEditor(editor), mEditorUi(editorUi), mEditorGraphicsView(editorGraphicsView)
+    mEditor(editor), mEditorUi(editorUi), mEditorGraphicsView(editorGraphicsView),
+    mUndoStack(undoStack)
 {
 }
 

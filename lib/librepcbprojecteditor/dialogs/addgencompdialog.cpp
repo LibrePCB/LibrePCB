@@ -27,12 +27,12 @@
 #include "ui_addgencompdialog.h"
 #include <librepcbcommon/graphics/graphicsscene.h>
 #include <librepcbcommon/graphics/graphicsview.h>
-#include "../project.h"
-#include "../library/projectlibrary.h"
+#include <librepcbproject/project.h>
+#include <librepcbproject/library/projectlibrary.h>
 #include <librepcblibrary/gencmp/genericcomponent.h>
 #include <librepcblibrary/gencmp/gencompsymbvar.h>
 #include <librepcblibrary/sym/symbol.h>
-#include "../settings/projectsettings.h"
+#include <librepcbproject/settings/projectsettings.h>
 #include <librepcblibrary/sym/symbolpreviewgraphicsitem.h>
 #include <librepcbworkspace/workspace.h>
 #include <librepcbworkspace/settings/workspacesettings.h>
@@ -52,7 +52,7 @@ AddGenCompDialog::AddGenCompDialog(Project& project, QWidget* parent) :
     mUi->graphicsView->setScene(mPreviewScene);
     mUi->graphicsView->setOriginCrossVisible(false);
 
-    const QStringList& localeOrder = mProject.getSettings().getLocaleOrder(true);
+    const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
 
     // list generic components from project (TODO: for temporary use only...)
     foreach (const library::GenericComponent* genComp, mProject.getLibrary().getGenericComponents())
@@ -148,7 +148,7 @@ void AddGenCompDialog::setSelectedGenComp(const library::GenericComponent* genCo
 
     if (genComp)
     {
-        const QStringList& localeOrder = mProject.getSettings().getLocaleOrder(true);
+        const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
 
         mUi->lblGenCompUuid->setText(genComp->getUuid().toString());
         mUi->lblGenCompName->setText(genComp->getName(localeOrder));
@@ -181,7 +181,7 @@ void AddGenCompDialog::setSelectedSymbVar(const library::GenCompSymbVar* symbVar
 
     if (mSelectedGenComp && symbVar)
     {
-        const QStringList& localeOrder = mProject.getSettings().getLocaleOrder(true);
+        const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
 
         mUi->lblSymbVarUuid->setText(symbVar->getUuid().toString());
         mUi->lblSymbVarNorm->setText(symbVar->getNorm());
@@ -193,7 +193,7 @@ void AddGenCompDialog::setSelectedSymbVar(const library::GenCompSymbVar* symbVar
             if (!symbol) continue; // TODO: show warning
             library::SymbolPreviewGraphicsItem* graphicsItem = new library::SymbolPreviewGraphicsItem(
                 mProject, localeOrder, *symbol, mSelectedGenComp, symbVar->getUuid(), item->getUuid());
-            graphicsItem->setDrawBoundingRect(mProject.getWorkspace().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect());
+            //graphicsItem->setDrawBoundingRect(mProject.getWorkspace().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect());
             mPreviewSymbolGraphicsItems.append(graphicsItem);
             qreal y = mPreviewScene->itemsBoundingRect().bottom() + graphicsItem->boundingRect().height();
             graphicsItem->setPos(QPointF(0, y));

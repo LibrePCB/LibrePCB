@@ -31,7 +31,6 @@
 #include "netclass.h"
 #include "netsignal.h"
 #include "gencompinstance.h"
-#include "editnetclassesdialog.h"
 #include <librepcblibrary/gencmp/genericcomponent.h>
 #include "../settings/projectsettings.h"
 
@@ -210,19 +209,6 @@ void Circuit::setNetClassName(NetClass& netclass, const QString& newName) throw 
     netclass.setName(newName);
 }
 
-void Circuit::execEditNetClassesDialog(QWidget* parent) noexcept
-{
-    try
-    {
-        EditNetClassesDialog dialog(*this, parent);
-        dialog.exec();
-    }
-    catch (Exception& e)
-    {
-        QMessageBox::critical(parent, tr("Error"), e.getUserMsg());
-    }
-}
-
 /*****************************************************************************************
  *  NetSignal Methods
  ****************************************************************************************/
@@ -361,7 +347,7 @@ GenCompInstance* Circuit::createGenCompInstance(const library::GenericComponent&
 {
     if (name.isEmpty())
     {
-        QString prefix = genComp.getPrefix(mProject.getSettings().getLocaleOrder(true));
+        QString prefix = genComp.getPrefix(mProject.getSettings().getLocaleOrder());
         if (prefix.isEmpty()) prefix = "?";
         unsigned int i = 1;
         do

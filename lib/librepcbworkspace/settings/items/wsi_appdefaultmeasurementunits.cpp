@@ -44,7 +44,6 @@ WSI_AppDefaultMeasurementUnits::WSI_AppDefaultMeasurementUnits(WorkspaceSettings
         mLengthUnit = LengthUnit::millimeters();
     }
     mLengthUnitTmp = mLengthUnit;
-    LengthUnit::setDefaultUnit(mLengthUnit); // set the default length unit application-wide
 
     // create a QComboBox with all available length units
     mLengthUnitComboBox = new QComboBox();
@@ -76,7 +75,6 @@ void WSI_AppDefaultMeasurementUnits::apply()
         return;
 
     mLengthUnit = mLengthUnitTmp;
-    LengthUnit::setDefaultUnit(mLengthUnit); // set the default length unit application-wide
     saveValue("app_default_length_unit", mLengthUnit.toString());
 }
 

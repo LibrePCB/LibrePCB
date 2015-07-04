@@ -21,6 +21,7 @@ INCLUDEPATH += \
     ../
 
 SOURCES += \
+    projecteditor.cpp \
     schematiceditor/schematiceditor.cpp \
     schematiceditor/schematicpagesdock.cpp \
     schematiceditor/fsm/schematiceditorevent.cpp \
@@ -51,6 +52,7 @@ SOURCES += \
     docks/ercmsgdock.cpp
 
 HEADERS += \
+    projecteditor.h \
     schematiceditor/schematiceditor.h \
     schematiceditor/schematicpagesdock.h \
     schematiceditor/fsm/schematiceditorevent.h \

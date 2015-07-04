@@ -27,9 +27,6 @@
 #include <librepcbcommon/fileio/xmldomdocument.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include "../project.h"
-#include "projectsettingsdialog.h"
-#include <librepcbworkspace/workspace.h>
-#include <librepcbworkspace/settings/workspacesettings.h>
 
 namespace project {
 
@@ -97,32 +94,11 @@ ProjectSettings::~ProjectSettings() noexcept
 }
 
 /*****************************************************************************************
- *  Getters
- ****************************************************************************************/
-
-QStringList ProjectSettings::getLocaleOrder(bool useWorkspaceSettings) const noexcept
-{
-    if (useWorkspaceSettings)
-        return mLocaleOrder + mProject.getWorkspace().getSettings().getLibLocaleOrder()->getLocaleOrder();
-    else
-        return mLocaleOrder;
-}
-
-QStringList ProjectSettings::getNormOrder(bool useWorkspaceSettings) const noexcept
-{
-    if (useWorkspaceSettings)
-        return mNormOrder + mProject.getWorkspace().getSettings().getLibNormOrder()->getNormOrder();
-    else
-        return mNormOrder;
-}
-
-/*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
 void ProjectSettings::restoreDefaults() noexcept
 {
-    //WorkspaceSettings& ws = Workspace::instance().getSettings();
     mLocaleOrder.clear();
     mNormOrder.clear();
 }
@@ -149,19 +125,6 @@ bool ProjectSettings::save(uint version, bool toOriginal, QStringList& errors) n
     }
 
     return success;
-}
-
-void ProjectSettings::showSettingsDialog(QWidget* parent)
-{
-    try
-    {
-        ProjectSettingsDialog dialog(*this, parent);
-        dialog.exec();
-    }
-    catch (Exception& e)
-    {
-        QMessageBox::critical(parent, tr("Error"), e.getUserMsg());
-    }
 }
 
 /*****************************************************************************************

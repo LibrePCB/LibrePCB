@@ -25,9 +25,9 @@
 #include <QtWidgets>
 #include "projectpropertieseditordialog.h"
 #include "ui_projectpropertieseditordialog.h"
-#include "../project.h"
+#include <librepcbproject/project.h>
 #include <librepcbcommon/undostack.h>
-#include "../cmd/cmdprojectsetmetadata.h"
+#include <librepcbproject/cmd/cmdprojectsetmetadata.h>
 
 namespace project {
 
@@ -35,9 +35,11 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ProjectPropertiesEditorDialog::ProjectPropertiesEditorDialog(Project& project, QWidget* parent) :
+ProjectPropertiesEditorDialog::ProjectPropertiesEditorDialog(Project& project,
+                                                             UndoStack& undoStack,
+                                                             QWidget* parent) :
     QDialog(parent), mProject(project), mUi(new Ui::ProjectPropertiesEditorDialog),
-    mCommandActive(false)
+    mUndoStack(undoStack), mCommandActive(false)
 {
     mUi->setupUi(this);
 
@@ -83,7 +85,7 @@ bool ProjectPropertiesEditorDialog::applyChanges() noexcept
 {
     try
     {
-        mProject.getUndoStack().beginCommand(tr("Change project properties"));
+        mUndoStack.beginCommand(tr("Change project properties"));
         mCommandActive = true;
 
         // Metadata
@@ -92,16 +94,16 @@ bool ProjectPropertiesEditorDialog::applyChanges() noexcept
         cmd->setDescription(mUi->edtDescription->toPlainText());
         cmd->setAuthor(mUi->edtAuthor->text());
         cmd->setCreated(mUi->edtCreated->dateTime());
-        mProject.getUndoStack().appendToCommand(cmd);
+        mUndoStack.appendToCommand(cmd);
 
-        mProject.getUndoStack().endCommand();
+        mUndoStack.endCommand();
         mCommandActive = false;
         return true;
     }
     catch (Exception& e)
     {
         QMessageBox::critical(this, tr("Error"), e.getUserMsg());
-        try {if (mCommandActive) mProject.getUndoStack().abortCommand();} catch (...) {}
+        try {if (mCommandActive) mUndoStack.abortCommand();} catch (...) {}
         return false;
     }
 }

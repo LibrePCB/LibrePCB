@@ -26,7 +26,6 @@
 #include "../../project.h"
 #include "../boardeditor.h"
 #include "ui_boardeditor.h"
-#include "../board.h"
 
 namespace project {
 

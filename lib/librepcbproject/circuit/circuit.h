@@ -90,7 +90,6 @@ class Circuit final : public QObject, public IF_XmlSerializableObject
         void addNetClass(NetClass& netclass) throw (Exception);
         void removeNetClass(NetClass& netclass) throw (Exception);
         void setNetClassName(NetClass& netclass, const QString& newName) throw (Exception);
-        void execEditNetClassesDialog(QWidget* parent = 0) noexcept;
 
         // NetSignal Methods
         const QHash<QUuid, NetSignal*>& getNetSignals() const noexcept {return mNetSignals;}

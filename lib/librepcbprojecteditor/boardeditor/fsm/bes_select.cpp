@@ -26,12 +26,12 @@
 #include "../boardeditor.h"
 #include "ui_boardeditor.h"
 #include "../../project.h"
-#include "../board.h"
-#include "../items/bi_footprint.h"
-#include "../items/bi_footprintpad.h"
+#include <librepcbproject/boards/board.h>
+#include <librepcbproject/boards/items/bi_footprint.h>
+#include <librepcbproject/boards/items/bi_footprintpad.h>
 #include <librepcbcommon/gridproperties.h>
 #include <librepcbcommon/undostack.h>
-#include "../cmd/cmdcomponentinstanceedit.h"
+#include <librepcbproject/boards/cmd/cmdcomponentinstanceedit.h>
 
 namespace project {
 
@@ -40,8 +40,8 @@ namespace project {
  ****************************************************************************************/
 
 BES_Select::BES_Select(BoardEditor& editor, Ui::BoardEditor& editorUi,
-                       GraphicsView& editorGraphicsView) :
-    BES_Base(editor, editorUi, editorGraphicsView), mSubState(SubState_Idle),
+                       GraphicsView& editorGraphicsView, UndoStack& undoStack) :
+    BES_Base(editor, editorUi, editorGraphicsView, undoStack), mSubState(SubState_Idle),
     mParentCommand(nullptr)
 {
 }
@@ -286,7 +286,7 @@ BES_Base::ProcRetVal BES_Select::processSubStateMovingSceneEvent(BEE_Base* event
                         else
                         {
                             // items were moved, add commands to the project's undo stack
-                            mProject.getUndoStack().execCmd(mParentCommand); // can throw an exception
+                            mUndoStack.execCmd(mParentCommand); // can throw an exception
                         }
                     }
                     catch (Exception& e)
@@ -400,7 +400,7 @@ bool BES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
     bool commandActive = false;
     try
     {
-        mEditor.getProject().getUndoStack().beginCommand(tr("Rotate Board Elements"));
+        mUndoStack.beginCommand(tr("Rotate Board Elements"));
         commandActive = true;
 
         // rotate all elements
@@ -414,7 +414,7 @@ bool BES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
                     ComponentInstance& component = footprint->getComponentInstance();
                     CmdComponentInstanceEdit* cmd = new CmdComponentInstanceEdit(component, mParentCommand);
                     cmd->rotate(angle, center, false);
-                    mEditor.getProject().getUndoStack().appendToCommand(cmd);
+                    mUndoStack.appendToCommand(cmd);
                     break;
                 }
                 default:
@@ -422,14 +422,14 @@ bool BES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
             }
         }
 
-        mEditor.getProject().getUndoStack().endCommand();
+        mUndoStack.endCommand();
         commandActive = false;
     }
     catch (Exception& e)
     {
         QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
         if (commandActive)
-            try {mEditor.getProject().getUndoStack().abortCommand();} catch (...) {}
+            try {mUndoStack.abortCommand();} catch (...) {}
         return false;
     }
 

@@ -78,7 +78,7 @@ class ErcMsg
         // Setters
         void setMsg(const QString& msg) noexcept;
         void setVisible(bool visible) noexcept;
-        void setIgnored(bool ignored, bool fromUserInput) noexcept;
+        void setIgnored(bool ignored) noexcept;
 
 
     private:

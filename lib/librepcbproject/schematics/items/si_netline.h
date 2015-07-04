@@ -33,8 +33,6 @@
  *  Forward Declarations
  ****************************************************************************************/
 
-class Workspace;
-
 namespace project {
 class NetSignal;
 class Schematic;
@@ -63,7 +61,6 @@ class SI_NetLine final : public SI_Base, public IF_XmlSerializableObject
         ~SI_NetLine() noexcept;
 
         // Getters
-        Workspace& getWorkspace() const noexcept;
         Project& getProject() const noexcept;
         Schematic& getSchematic() const noexcept {return mSchematic;}
         const QUuid& getUuid() const noexcept {return mUuid;}

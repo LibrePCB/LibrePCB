@@ -31,6 +31,8 @@
  *  Forward Declarations
  ****************************************************************************************/
 
+class UndoStack;
+
 namespace project {
 class Project;
 }
@@ -55,7 +57,8 @@ class ProjectPropertiesEditorDialog final : public QDialog
     public:
 
         // Constructors / Destructor
-        explicit ProjectPropertiesEditorDialog(Project& project, QWidget* parent);
+        explicit ProjectPropertiesEditorDialog(Project& project, UndoStack& undoStack,
+                                               QWidget* parent);
         ~ProjectPropertiesEditorDialog() noexcept;
 
 
@@ -75,6 +78,7 @@ class ProjectPropertiesEditorDialog final : public QDialog
         // General
         Project& mProject;
         Ui::ProjectPropertiesEditorDialog* mUi;
+        UndoStack& mUndoStack;
         bool mCommandActive;
 };
 

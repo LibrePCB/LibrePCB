@@ -81,10 +81,6 @@ SI_NetLabel::~SI_NetLabel() noexcept
 /*****************************************************************************************
  *  Getters
  ****************************************************************************************/
-Workspace& SI_NetLabel::getWorkspace() const noexcept
-{
-    return mSchematic.getWorkspace();
-}
 
 Project& SI_NetLabel::getProject() const noexcept
 {

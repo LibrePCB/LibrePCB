@@ -36,6 +36,7 @@ class GraphicsView;
 class GridProperties;
 
 namespace project {
+class ProjectEditor;
 class Project;
 class Board;
 class ErcMsgDock;
@@ -63,7 +64,7 @@ class BoardEditor final : public QMainWindow, public IF_GraphicsViewEventHandler
     public:
 
         // Constructors / Destructor
-        explicit BoardEditor(Project& project, bool readOnly);
+        explicit BoardEditor(ProjectEditor& projectEditor, Project& project);
         ~BoardEditor();
 
         // Getters
@@ -119,6 +120,7 @@ class BoardEditor final : public QMainWindow, public IF_GraphicsViewEventHandler
         bool graphicsViewEventHandler(QEvent* event);
 
         // General Attributes
+        ProjectEditor& mProjectEditor;
         Project& mProject;
         Ui::BoardEditor* mUi;
         GraphicsView* mGraphicsView;

@@ -67,7 +67,6 @@ class SI_SymbolPin final : public SI_Base, public IF_ErcMsgProvider
         ~SI_SymbolPin();
 
         // Getters
-        Workspace& getWorkspace() const noexcept;
         Project& getProject() const noexcept;
         Schematic& getSchematic() const noexcept;
         const QUuid& getLibPinUuid() const noexcept;

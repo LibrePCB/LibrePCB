@@ -93,17 +93,9 @@ class LengthUnit final
         // Constructors / Destructor
 
         /**
-         * @brief Default constructor to create a LengthUnit object with the application's
-         *        default unit (from workspace settings)
-         *
-         * @note Calling this constructor before workspace settings are loaded will always
-         *       create an object with the length unit millimeters. If workspace settings
-         *       are loaded, this constructor will create an object with the application's
-         *       default length unit (defined in workspace settings).
-         *
-         * @see #setDefaultUnit(), #sDefaultUnit
+         * @brief Default constructor which uses millimeters as unit
          */
-        LengthUnit() noexcept : mUnit(sDefaultUnit) {}
+        LengthUnit() noexcept : mUnit(LengthUnit_t::Millimeters) {}
 
         /**
          * @brief Copy constructor
@@ -259,17 +251,6 @@ class LengthUnit final
         static LengthUnit fromString(const QString& unitString) throw (Exception);
 
         /**
-         * @brief Sets the application-wide default measurement unit
-         *
-         * The default constructor #LengthUnit() will always construct the length unit
-         * which was set by this method. This method will be called from workspace settings
-         * after the application was started, so you should not use this method elsewhere.
-         *
-         * @param unit      The default length unit
-         */
-        static void setDefaultUnit(const LengthUnit& unit) noexcept {sDefaultUnit = unit.mUnit;}
-
-        /**
          * @brief Get all available length units
          *
          * This method returns a list of all available length units. The index of the
@@ -312,19 +293,6 @@ class LengthUnit final
          * @brief Holds the length unit of the object
          */
         LengthUnit_t mUnit;
-
-
-        // Static Variables
-
-        /**
-         * @brief The application's default length unit which is used by the default constructor
-         *
-         * Until #setDefaultUnit() was called, this variable contains the value
-         * LengthUnit_millimeters.
-         *
-         * @see #LengthUnit(), #setDefaultUnit()
-         */
-        static LengthUnit_t sDefaultUnit;
 };
 
 // Non-Member Functions

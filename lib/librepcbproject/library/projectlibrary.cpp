@@ -33,7 +33,6 @@
 #include <librepcblibrary/pkg/package.h>
 #include <librepcblibrary/gencmp/genericcomponent.h>
 #include <librepcblibrary/cmp/component.h>
-#include <librepcbworkspace/workspace.h>
 
 using namespace library;
 

@@ -119,11 +119,6 @@ BI_Footprint::~BI_Footprint() noexcept
  *  Getters
  ****************************************************************************************/
 
-Workspace& BI_Footprint::getWorkspace() const noexcept
-{
-    return mComponentInstance.getWorkspace();
-}
-
 Project& BI_Footprint::getProject() const noexcept
 {
     return mComponentInstance.getProject();

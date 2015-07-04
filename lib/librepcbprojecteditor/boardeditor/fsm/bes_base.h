@@ -35,6 +35,8 @@
  *  Forward Declarations
  ****************************************************************************************/
 
+class UndoStack;
+
 namespace project {
 class Project;
 class Circuit;
@@ -64,7 +66,7 @@ class BES_Base : public QObject
 
         // Constructors / Destructor
         explicit BES_Base(BoardEditor& editor, Ui::BoardEditor& editorUi,
-                          GraphicsView& editorGraphicsView);
+                          GraphicsView& editorGraphicsView, UndoStack& undoStack);
         virtual ~BES_Base();
 
         // General Methods
@@ -80,6 +82,7 @@ class BES_Base : public QObject
         BoardEditor& mEditor;
         Ui::BoardEditor& mEditorUi; ///< allows access to BoardEditor UI
         GraphicsView& mEditorGraphicsView; ///< allows access to the board editor graphics view
+        UndoStack& mUndoStack;
 };
 
 } // namespace project

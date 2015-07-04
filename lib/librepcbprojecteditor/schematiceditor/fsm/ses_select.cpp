@@ -25,34 +25,34 @@
 #include "ses_select.h"
 #include "../schematiceditor.h"
 #include "ui_schematiceditor.h"
-#include "../../project.h"
-#include "../items/si_netpoint.h"
-#include "../schematic.h"
-#include "../cmd/cmdsymbolinstanceedit.h"
+#include <librepcbproject/project.h>
+#include <librepcbproject/schematics/items/si_netpoint.h>
+#include <librepcbproject/schematics/schematic.h>
+#include <librepcbproject/schematics/cmd/cmdsymbolinstanceedit.h>
 #include <librepcbcommon/undostack.h>
-#include "../items/si_netline.h"
-#include "../items/si_symbol.h"
-#include "../cmd/cmdsymbolinstanceremove.h"
-#include "../cmd/cmdschematicnetlineremove.h"
-#include "../cmd/cmdschematicnetpointremove.h"
-#include "../cmd/cmdschematicnetpointdetach.h"
-#include "../../circuit/cmd/cmdgencompsiginstsetnetsignal.h"
-#include "../items/si_symbolpin.h"
+#include <librepcbproject/schematics/items/si_netline.h>
+#include <librepcbproject/schematics/items/si_symbol.h>
+#include <librepcbproject/schematics/cmd/cmdsymbolinstanceremove.h>
+#include <librepcbproject/schematics/cmd/cmdschematicnetlineremove.h>
+#include <librepcbproject/schematics/cmd/cmdschematicnetpointremove.h>
+#include <librepcbproject/schematics/cmd/cmdschematicnetpointdetach.h>
+#include <librepcbproject/circuit/cmd/cmdgencompsiginstsetnetsignal.h>
+#include <librepcbproject/schematics/items/si_symbolpin.h>
 #include "../symbolinstancepropertiesdialog.h"
-#include "../../circuit/gencompinstance.h"
-#include "../../circuit/cmd/cmdgencompinstremove.h"
-#include "../items/si_netlabel.h"
-#include "../../circuit/netsignal.h"
-#include "../../circuit/circuit.h"
-#include "../../circuit/cmd/cmdnetsignaledit.h"
-#include "../../circuit/cmd/cmdnetsignaladd.h"
-#include "../../circuit/cmd/cmdgencompsiginstsetnetsignal.h"
-#include "../cmd/cmdschematicnetpointedit.h"
-#include "../../circuit/cmd/cmdnetsignalremove.h"
-#include "../cmd/cmdschematicnetlabeledit.h"
+#include <librepcbproject/circuit/gencompinstance.h>
+#include <librepcbproject/circuit/cmd/cmdgencompinstremove.h>
+#include <librepcbproject/schematics/items/si_netlabel.h>
+#include <librepcbproject/circuit/netsignal.h>
+#include <librepcbproject/circuit/circuit.h>
+#include <librepcbproject/circuit/cmd/cmdnetsignaledit.h>
+#include <librepcbproject/circuit/cmd/cmdnetsignaladd.h>
+#include <librepcbproject/circuit/cmd/cmdgencompsiginstsetnetsignal.h>
+#include <librepcbproject/schematics/cmd/cmdschematicnetpointedit.h>
+#include <librepcbproject/circuit/cmd/cmdnetsignalremove.h>
+#include <librepcbproject/schematics/cmd/cmdschematicnetlabeledit.h>
 #include "../schematicclipboard.h"
-#include "../cmd/cmdsymbolinstanceadd.h"
-#include "../cmd/cmdschematicnetlabelremove.h"
+#include <librepcbproject/schematics/cmd/cmdsymbolinstanceadd.h>
+#include <librepcbproject/schematics/cmd/cmdschematicnetlabelremove.h>
 #include <librepcbcommon/gridproperties.h>
 
 namespace project {
@@ -62,8 +62,8 @@ namespace project {
  ****************************************************************************************/
 
 SES_Select::SES_Select(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
-                       GraphicsView& editorGraphicsView) :
-    SES_Base(editor, editorUi, editorGraphicsView), mSubState(SubState_Idle),
+                       GraphicsView& editorGraphicsView, UndoStack& undoStack) :
+    SES_Base(editor, editorUi, editorGraphicsView, undoStack), mSubState(SubState_Idle),
     mParentCommand(nullptr)
 {
 }
@@ -294,7 +294,7 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneRightClick(QGraphicsSceneMouse
             else if (action == aProperties)
             {
                 // open the properties editor dialog of the selected item
-                SymbolInstancePropertiesDialog dialog(mProject, genComp, *symbol, &mEditor);
+                SymbolInstancePropertiesDialog dialog(mProject, genComp, *symbol, mUndoStack, &mEditor);
                 dialog.exec();
             }
             return ForceStayInState;
@@ -320,7 +320,7 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneDoubleClick(QGraphicsSceneMous
             {
                 SI_Symbol* symbol = dynamic_cast<SI_Symbol*>(items.first()); Q_ASSERT(symbol);
                 GenCompInstance& genComp = symbol->getGenCompInstance();
-                SymbolInstancePropertiesDialog dialog(mProject, genComp, *symbol, &mEditor);
+                SymbolInstancePropertiesDialog dialog(mProject, genComp, *symbol, mUndoStack, &mEditor);
                 dialog.exec();
                 return ForceStayInState;
             }
@@ -339,34 +339,34 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneDoubleClick(QGraphicsSceneMous
                         NetSignal* newSignal = mCircuit.getNetSignalByName(name);
                         if (newSignal)
                         {
-                            mProject.getUndoStack().beginCommand(tr("Combine Net Signals"));
+                            mUndoStack.beginCommand(tr("Combine Net Signals"));
                             foreach (GenCompSignalInstance* signal, netsignal.getGenCompSignals())
                             {
                                 auto cmd = new CmdGenCompSigInstSetNetSignal(*signal, newSignal);
-                                mProject.getUndoStack().appendToCommand(cmd);
+                                mUndoStack.appendToCommand(cmd);
                             }
                             foreach (SI_NetPoint* point, netsignal.getNetPoints())
                             {
                                 auto cmd = new CmdSchematicNetPointEdit(*point);
                                 cmd->setNetSignal(*newSignal);
-                                mProject.getUndoStack().appendToCommand(cmd);
+                                mUndoStack.appendToCommand(cmd);
                             }
                             foreach (SI_NetLabel* label, netsignal.getNetLabels())
                             {
                                 auto cmd = new CmdSchematicNetLabelEdit(*label);
                                 cmd->setNetSignal(*newSignal, false);
-                                mProject.getUndoStack().appendToCommand(cmd);
+                                mUndoStack.appendToCommand(cmd);
                             }
                             auto cmd = new CmdNetSignalRemove(mProject.getCircuit(), netsignal);
-                            mProject.getUndoStack().appendToCommand(cmd);
+                            mUndoStack.appendToCommand(cmd);
 
-                            mProject.getUndoStack().endCommand();
+                            mUndoStack.endCommand();
                         }
                         else
                         {
                             auto cmd = new CmdNetSignalEdit(mCircuit, netsignal);
                             cmd->setName(name, false);
-                            mProject.getUndoStack().execCmd(cmd);
+                            mUndoStack.execCmd(cmd);
                         }
                     }
                     catch (Exception& e)
@@ -435,7 +435,7 @@ SES_Base::ProcRetVal SES_Select::processSubStateMovingSceneEvent(SEE_Base* event
                         else
                         {
                             // items were moved, add commands to the project's undo stack
-                            mProject.getUndoStack().execCmd(mParentCommand); // can throw an exception
+                            mUndoStack.execCmd(mParentCommand); // can throw an exception
                         }
                     }
                     catch (Exception& e)
@@ -568,7 +568,7 @@ bool SES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
     bool commandActive = false;
     try
     {
-        mEditor.getProject().getUndoStack().beginCommand(tr("Rotate Schematic Elements"));
+        mUndoStack.beginCommand(tr("Rotate Schematic Elements"));
         commandActive = true;
 
         // rotate all elements
@@ -581,7 +581,7 @@ bool SES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
                     SI_Symbol* symbol = dynamic_cast<SI_Symbol*>(item); Q_ASSERT(symbol);
                     CmdSymbolInstanceEdit* cmd = new CmdSymbolInstanceEdit(*symbol);
                     cmd->rotate(angle, center, false);
-                    mEditor.getProject().getUndoStack().appendToCommand(cmd);
+                    mUndoStack.appendToCommand(cmd);
                     break;
                 }
                 case SI_Base::Type_t::NetPoint:
@@ -589,7 +589,7 @@ bool SES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
                     SI_NetPoint* netpoint = dynamic_cast<SI_NetPoint*>(item); Q_ASSERT(netpoint);
                     CmdSchematicNetPointEdit* cmd = new CmdSchematicNetPointEdit(*netpoint);
                     cmd->setPosition(netpoint->getPosition().rotated(angle, center), false);
-                    mEditor.getProject().getUndoStack().appendToCommand(cmd);
+                    mUndoStack.appendToCommand(cmd);
                     break;
                 }
                 case SI_Base::Type_t::NetLabel:
@@ -597,7 +597,7 @@ bool SES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
                     SI_NetLabel* netlabel = dynamic_cast<SI_NetLabel*>(item); Q_ASSERT(netlabel);
                     CmdSchematicNetLabelEdit* cmd = new CmdSchematicNetLabelEdit(*netlabel);
                     cmd->rotate(angle, center, false);
-                    mEditor.getProject().getUndoStack().appendToCommand(cmd);
+                    mUndoStack.appendToCommand(cmd);
                     break;
                 }
                 default:
@@ -605,14 +605,14 @@ bool SES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
             }
         }
 
-        mEditor.getProject().getUndoStack().endCommand();
+        mUndoStack.endCommand();
         commandActive = false;
     }
     catch (Exception& e)
     {
         QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
         if (commandActive)
-            try {mEditor.getProject().getUndoStack().abortCommand();} catch (...) {}
+            try {mUndoStack.abortCommand();} catch (...) {}
         return false;
     }
 
@@ -646,7 +646,7 @@ bool SES_Select::removeSelectedItems() noexcept
     bool commandActive = false;
     try
     {
-        mEditor.getProject().getUndoStack().beginCommand(tr("Remove Schematic Elements"));
+        mUndoStack.beginCommand(tr("Remove Schematic Elements"));
         commandActive = true;
         schematic->clearSelection();
 
@@ -657,7 +657,7 @@ bool SES_Select::removeSelectedItems() noexcept
             {
                 SI_NetLabel* netlabel = dynamic_cast<SI_NetLabel*>(item); Q_ASSERT(netlabel);
                 auto cmd = new CmdSchematicNetLabelRemove(*schematic, *netlabel);
-                mEditor.getProject().getUndoStack().appendToCommand(cmd);
+                mUndoStack.appendToCommand(cmd);
             }
         }
 
@@ -668,7 +668,7 @@ bool SES_Select::removeSelectedItems() noexcept
             {
                 SI_NetLine* netline = dynamic_cast<SI_NetLine*>(item); Q_ASSERT(netline);
                 auto cmd = new CmdSchematicNetLineRemove(*schematic, *netline);
-                mEditor.getProject().getUndoStack().appendToCommand(cmd);
+                mUndoStack.appendToCommand(cmd);
             }
         }
 
@@ -682,13 +682,13 @@ bool SES_Select::removeSelectedItems() noexcept
                 if (netpoint->getLines().count() == 0)
                 {
                     CmdSchematicNetPointRemove* cmd = new CmdSchematicNetPointRemove(*schematic, *netpoint);
-                    mEditor.getProject().getUndoStack().appendToCommand(cmd);
+                    mUndoStack.appendToCommand(cmd);
                     if (netpoint->isAttached())
                     {
                         GenCompSignalInstance* signal = netpoint->getSymbolPin()->getGenCompSignalInstance();
                         Q_ASSERT(signal); if (!signal) throw LogicError(__FILE__, __LINE__);
                         CmdGenCompSigInstSetNetSignal* cmd = new CmdGenCompSigInstSetNetSignal(*signal, nullptr);
-                        mEditor.getProject().getUndoStack().appendToCommand(cmd);
+                        mUndoStack.appendToCommand(cmd);
                     }
                 }
                 else if (netpoint->isAttached())
@@ -696,9 +696,9 @@ bool SES_Select::removeSelectedItems() noexcept
                     GenCompSignalInstance* signal = netpoint->getSymbolPin()->getGenCompSignalInstance();
                     Q_ASSERT(signal); if (!signal) throw LogicError(__FILE__, __LINE__);
                     CmdSchematicNetPointDetach* cmd1 = new CmdSchematicNetPointDetach(*netpoint);
-                    mEditor.getProject().getUndoStack().appendToCommand(cmd1);
+                    mUndoStack.appendToCommand(cmd1);
                     CmdGenCompSigInstSetNetSignal* cmd2 = new CmdGenCompSigInstSetNetSignal(*signal, nullptr);
-                    mEditor.getProject().getUndoStack().appendToCommand(cmd2);
+                    mUndoStack.appendToCommand(cmd2);
                 }
             }
         }
@@ -710,7 +710,7 @@ bool SES_Select::removeSelectedItems() noexcept
             {
                 SI_Symbol* symbol = dynamic_cast<SI_Symbol*>(item); Q_ASSERT(symbol);
                 auto cmd = new CmdSymbolInstanceRemove(*schematic, *symbol);
-                mEditor.getProject().getUndoStack().appendToCommand(cmd);
+                mUndoStack.appendToCommand(cmd);
             }
         }
 
@@ -720,11 +720,11 @@ bool SES_Select::removeSelectedItems() noexcept
             if (genComp->getPlacedSymbolsCount() == 0)
             {
                 CmdGenCompInstRemove* cmd = new CmdGenCompInstRemove(mCircuit, *genComp);
-                mEditor.getProject().getUndoStack().appendToCommand(cmd);
+                mUndoStack.appendToCommand(cmd);
             }
         }
 
-        mEditor.getProject().getUndoStack().endCommand();
+        mUndoStack.endCommand();
         commandActive = false;
         return true;
     }
@@ -732,7 +732,7 @@ bool SES_Select::removeSelectedItems() noexcept
     {
         QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
         if (commandActive)
-            try {mEditor.getProject().getUndoStack().abortCommand();} catch (...) {}
+            try {mUndoStack.abortCommand();} catch (...) {}
         return false;
     }
 }

@@ -109,20 +109,10 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
         delete mWorkspaceSettings;      mWorkspaceSettings = 0;
         throw;
     }
-
-    // parse command line arguments and open all project files
-    foreach (const QString& arg, qApp->arguments())
-    {
-        FilePath filepath(arg);
-        if ((filepath.isExistingFile()) && (filepath.getSuffix() == "lpp"))
-            openProject(filepath);
-    }
 }
 
 Workspace::~Workspace()
 {
-    closeAllProjects(false);
-
     delete mLibrary;                mLibrary = 0;
     delete mProjectTreeModel;       mProjectTreeModel = 0;
     delete mFavoriteProjectsModel;  mFavoriteProjectsModel = 0;
@@ -153,79 +143,9 @@ QAbstractItemModel& Workspace::getFavoriteProjectsModel() const noexcept
  *  Project Management
  ****************************************************************************************/
 
-Project* Workspace::createProject(const FilePath& filepath) throw (Exception)
+void Workspace::setLastRecentlyUsedProject(const FilePath& filepath) noexcept
 {
-    Project* project = new Project(*this, filepath, true);
-
-    mOpenProjects.insert(filepath.toUnique().toStr(), project);
     mRecentProjectsModel->setLastRecentProject(filepath);
-
-    if (project->getBoards().count() > 0) project->showBoardEditor();
-    project->showSchematicEditor();
-
-    return project;
-}
-
-Project* Workspace::openProject(const FilePath& filepath) throw (Exception)
-{
-    Project* openProject = getOpenProject(filepath);
-
-    if (!openProject)
-    {
-        openProject = new Project(*this, filepath, false);
-        mOpenProjects.insert(filepath.toUnique().toStr(), openProject);
-        mRecentProjectsModel->setLastRecentProject(filepath);
-    }
-
-    if (openProject->getBoards().count() > 0) openProject->showBoardEditor();
-    openProject->showSchematicEditor();
-
-    return openProject;
-}
-
-bool Workspace::closeProject(Project* project, bool askForSave) noexcept
-{
-    if (!project)
-        return true;
-
-    bool success = true;
-
-    if (askForSave)
-        success = project->close();
-
-    if (success)
-        delete project;
-
-    return success;
-}
-
-bool Workspace::closeProject(const FilePath& filepath, bool askForSave) noexcept
-{
-    return closeProject(getOpenProject(filepath), askForSave);
-}
-
-bool Workspace::closeAllProjects(bool askForSave) noexcept
-{
-    bool success = true;
-    foreach (Project* project, mOpenProjects)
-    {
-        if (!closeProject(project, askForSave))
-            success = false;
-    }
-    return success;
-}
-
-void Workspace::unregisterOpenProject(Project* project) noexcept
-{
-    mOpenProjects.remove(project->getFilepath().toUnique().toStr());
-}
-
-Project* Workspace::getOpenProject(const FilePath& filepath) const noexcept
-{
-    if (mOpenProjects.contains(filepath.toUnique().toStr()))
-        return mOpenProjects.value(filepath.toUnique().toStr());
-    else
-        return nullptr;
 }
 
 bool Workspace::isFavoriteProject(const FilePath& filepath) const noexcept

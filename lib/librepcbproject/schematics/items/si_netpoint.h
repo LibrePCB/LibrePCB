@@ -70,7 +70,6 @@ class SI_NetPoint final : public SI_Base, public IF_XmlSerializableObject,
         ~SI_NetPoint() noexcept;
 
         // Getters
-        Workspace& getWorkspace() const noexcept;
         Project& getProject() const noexcept;
         Schematic& getSchematic() const noexcept {return mSchematic;}
         const QUuid& getUuid() const noexcept {return mUuid;}

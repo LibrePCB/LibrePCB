@@ -44,7 +44,7 @@ class BES_FSM final : public BES_Base
 
         // Constructors / Destructor
         explicit BES_FSM(BoardEditor& editor, Ui::BoardEditor& editorUi,
-                         GraphicsView& editorGraphicsView) noexcept;
+                         GraphicsView& editorGraphicsView, UndoStack& undoStack) noexcept;
         ~BES_FSM() noexcept;
 
         // General Methods

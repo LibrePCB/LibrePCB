@@ -25,12 +25,13 @@
 #include <QtWidgets>
 #include "schematicpagesdock.h"
 #include "ui_schematicpagesdock.h"
-#include "../project.h"
-#include "schematic.h"
+#include <librepcbproject/project.h>
+#include <librepcbproject/schematics/schematic.h>
 #include "schematiceditor.h"
-#include "cmd/cmdschematicadd.h"
-#include "cmd/cmdschematicremove.h"
+#include <librepcbproject/schematics/cmd/cmdschematicadd.h>
+#include <librepcbproject/schematics/cmd/cmdschematicremove.h>
 #include <librepcbcommon/undostack.h>
+#include "../projecteditor.h"
 
 namespace project {
 
@@ -118,7 +119,7 @@ void SchematicPagesDock::on_btnNewSchematic_clicked()
     try
     {
         CmdSchematicAdd* cmd = new CmdSchematicAdd(mProject, name);
-        mProject.getUndoStack().execCmd(cmd);
+        mEditor.getProjectEditor().getUndoStack().execCmd(cmd);
     }
     catch (Exception& e)
     {
@@ -135,7 +136,7 @@ void SchematicPagesDock::on_btnRemoveSchematic_clicked()
     try
     {
         CmdSchematicRemove* cmd = new CmdSchematicRemove(mProject, schematic);
-        mProject.getUndoStack().execCmd(cmd);
+        mEditor.getProjectEditor().getUndoStack().execCmd(cmd);
     }
     catch (Exception& e)
     {

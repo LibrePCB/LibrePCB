@@ -25,16 +25,16 @@
 #include "ses_addcomponents.h"
 #include "../schematiceditor.h"
 #include "ui_schematiceditor.h"
-#include "../../project.h"
-#include "../../library/projectlibrary.h"
+#include <librepcbproject/project.h>
+#include <librepcbproject/library/projectlibrary.h>
 #include <librepcblibrary/gencmp/genericcomponent.h>
-#include "../../circuit/cmd/cmdgencompinstadd.h"
+#include <librepcbproject/circuit/cmd/cmdgencompinstadd.h>
 #include <librepcbcommon/undostack.h>
-#include "../cmd/cmdsymbolinstanceadd.h"
-#include "../../circuit/gencompinstance.h"
-#include "../cmd/cmdsymbolinstanceedit.h"
-#include "../items/si_symbol.h"
-#include "../schematic.h"
+#include <librepcbproject/schematics/cmd/cmdsymbolinstanceadd.h>
+#include <librepcbproject/circuit/gencompinstance.h>
+#include <librepcbproject/schematics/cmd/cmdsymbolinstanceedit.h>
+#include <librepcbproject/schematics/items/si_symbol.h>
+#include <librepcbproject/schematics/schematic.h>
 #include "../../dialogs/addgencompdialog.h"
 #include <librepcbcommon/gridproperties.h>
 
@@ -45,8 +45,8 @@ namespace project {
  ****************************************************************************************/
 
 SES_AddComponents::SES_AddComponents(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
-                                     GraphicsView& editorGraphicsView) :
-    SES_Base(editor, editorUi, editorGraphicsView),
+                                     GraphicsView& editorGraphicsView, UndoStack& undoStack) :
+    SES_Base(editor, editorUi, editorGraphicsView, undoStack),
     mIsUndoCmdActive(false), mAddGenCompDialog(nullptr), mLastAngle(0),
     mGenComp(nullptr), mGenCompSymbVar(nullptr), mCurrentSymbVarItem(nullptr),
     mCurrentSymbolToPlace(nullptr), mCurrentSymbolEditCommand(nullptr)
@@ -205,11 +205,11 @@ SES_Base::ProcRetVal SES_AddComponents::processSceneEvent(SEE_Base* event) noexc
                     {
                         // place the current symbol finally
                         mCurrentSymbolEditCommand->setPosition(pos, false);
-                        mProject.getUndoStack().appendToCommand(mCurrentSymbolEditCommand);
+                        mUndoStack.appendToCommand(mCurrentSymbolEditCommand);
                         mCurrentSymbolEditCommand = nullptr;
-                        mProject.getUndoStack().endCommand();
+                        mUndoStack.endCommand();
                         mIsUndoCmdActive = false;
-                        mProject.getUndoStack().beginCommand(tr("Add Symbol to Schematic"));
+                        mUndoStack.beginCommand(tr("Add Symbol to Schematic"));
                         mIsUndoCmdActive = true;
 
                         // check if there is a next symbol to add
@@ -221,7 +221,7 @@ SES_Base::ProcRetVal SES_AddComponents::processSceneEvent(SEE_Base* event) noexc
                             CmdSymbolInstanceAdd* cmd = new CmdSymbolInstanceAdd(*schematic,
                                 mCurrentSymbolToPlace->getGenCompInstance(),
                                 mCurrentSymbVarItem->getUuid(), pos);
-                            mProject.getUndoStack().appendToCommand(cmd);
+                            mUndoStack.appendToCommand(cmd);
                             mCurrentSymbolToPlace = cmd->getSymbol();
                             Q_ASSERT(mCurrentSymbolToPlace);
 
@@ -236,7 +236,7 @@ SES_Base::ProcRetVal SES_AddComponents::processSceneEvent(SEE_Base* event) noexc
                             // all symbols placed, start adding the next component
                             QUuid genCompUuid = mGenComp->getUuid();
                             QUuid symbVarUuid = mGenCompSymbVar->getUuid();
-                            mProject.getUndoStack().endCommand();
+                            mUndoStack.endCommand();
                             mIsUndoCmdActive = false;
                             abortCommand(false); // reset attributes
                             startAddingComponent(genCompUuid, symbVarUuid);
@@ -346,13 +346,13 @@ void SES_AddComponents::startAddingComponent(const QUuid& genComp, const QUuid& 
                               mEditor.getGridProperties().getInterval());
 
     // start a new command
-    mProject.getUndoStack().beginCommand(tr("Add Generic Component to Schematic"));
+    mUndoStack.beginCommand(tr("Add Generic Component to Schematic"));
     mIsUndoCmdActive = true;
 
     // create a new generic component instance and add it to the circuit
     CmdGenCompInstAdd* cmd = new CmdGenCompInstAdd(mCircuit, *mGenComp,
                                                            *mGenCompSymbVar);
-    mProject.getUndoStack().appendToCommand(cmd);
+    mUndoStack.appendToCommand(cmd);
 
     // create the first symbol instance and add it to the schematic
     mCurrentSymbVarItem = mGenCompSymbVar->getItems().first();
@@ -364,7 +364,7 @@ void SES_AddComponents::startAddingComponent(const QUuid& genComp, const QUuid& 
     }
     CmdSymbolInstanceAdd* cmd2 = new CmdSymbolInstanceAdd(*schematic,
         *(cmd->getGenCompInstance()), mCurrentSymbVarItem->getUuid(), pos);
-    mProject.getUndoStack().appendToCommand(cmd2);
+    mUndoStack.appendToCommand(cmd2);
     mCurrentSymbolToPlace = cmd2->getSymbol();
     Q_ASSERT(mCurrentSymbolToPlace);
 
@@ -385,7 +385,7 @@ bool SES_AddComponents::abortCommand(bool showErrMsgBox) noexcept
         // abort the undo command
         if (mIsUndoCmdActive)
         {
-            mProject.getUndoStack().abortCommand();
+            mUndoStack.abortCommand();
             mIsUndoCmdActive = false;
         }
 

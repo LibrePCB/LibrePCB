@@ -45,7 +45,7 @@ class SES_DrawPolygon final : public SES_Base
 
         // Constructors / Destructor
         explicit SES_DrawPolygon(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
-                                 GraphicsView& editorGraphicsView);
+                                 GraphicsView& editorGraphicsView, UndoStack& undoStack);
         ~SES_DrawPolygon();
 
         // General Methods

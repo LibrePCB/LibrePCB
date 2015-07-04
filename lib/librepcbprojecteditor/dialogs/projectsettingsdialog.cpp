@@ -25,9 +25,9 @@
 #include <QtWidgets>
 #include "projectsettingsdialog.h"
 #include "ui_projectsettingsdialog.h"
-#include "cmd/cmdprojectsettingschange.h"
-#include "projectsettings.h"
-#include "../project.h"
+#include <librepcbproject/settings/cmd/cmdprojectsettingschange.h>
+#include <librepcbproject/settings/projectsettings.h>
+#include <librepcbproject/project.h>
 #include <librepcbcommon/undostack.h>
 
 namespace project {
@@ -36,8 +36,10 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ProjectSettingsDialog::ProjectSettingsDialog(ProjectSettings& settings, QWidget* parent) noexcept :
-    QDialog(parent), mSettings(settings), mUi(new Ui::ProjectSettingsDialog)
+ProjectSettingsDialog::ProjectSettingsDialog(ProjectSettings& settings,
+                                             UndoStack& undoStack, QWidget* parent) noexcept :
+    QDialog(parent), mSettings(settings), mUi(new Ui::ProjectSettingsDialog),
+    mUndoStack(undoStack)
 {
     mUi->setupUi(this);
     mUi->tabWidget->setCurrentIndex(0);
@@ -203,7 +205,7 @@ bool ProjectSettingsDialog::applySettings() noexcept
         cmd->setNormOrder(norms);
 
         // execute cmd
-        mSettings.getProject().getUndoStack().execCmd(cmd);
+        mUndoStack.execCmd(cmd);
         return true;
     }
     catch (Exception& e)
@@ -219,7 +221,7 @@ bool ProjectSettingsDialog::restoreDefaultSettings() noexcept
     {
         CmdProjectSettingsChange* cmd = new CmdProjectSettingsChange(mSettings);
         cmd->restoreDefaults();
-        mSettings.getProject().getUndoStack().execCmd(cmd);
+        mUndoStack.execCmd(cmd);
         updateGuiFromSettings();
         return true;
     }
@@ -234,7 +236,7 @@ void ProjectSettingsDialog::updateGuiFromSettings() noexcept
 {
     // locales
     mUi->lstLocaleOrder->clear();
-    foreach (const QString& localeStr, mSettings.getLocaleOrder(false))
+    foreach (const QString& localeStr, mSettings.getLocaleOrder())
     {
         QLocale locale(localeStr);
         QString str = QString("[%1] %2 (%3)").arg(locale.name(), locale.nativeLanguageName(), locale.nativeCountryName());
@@ -244,7 +246,7 @@ void ProjectSettingsDialog::updateGuiFromSettings() noexcept
 
     // norms
     mUi->lstNormOrder->clear();
-    mUi->lstNormOrder->addItems(mSettings.getNormOrder(false));
+    mUi->lstNormOrder->addItems(mSettings.getNormOrder());
 }
 
 /*****************************************************************************************

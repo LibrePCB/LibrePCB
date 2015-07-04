@@ -32,6 +32,8 @@
 #include <librepcbworkspace/projecttreemodel.h>
 #include <librepcbworkspace/projecttreeitem.h>
 #include <librepcblibrary/library.h>
+#include <librepcbprojecteditor/projecteditor.h>
+#include <librepcbcommon/application.h>
 
 using namespace project;
 
@@ -68,28 +70,44 @@ ControlPanel::ControlPanel(Workspace& workspace) :
             [](const QUrl& url){QDesktopServices::openUrl(url);});
 
     loadSettings();
+
+    // parse command line arguments and open all project files
+    foreach (const QString& arg, qApp->arguments())
+    {
+        FilePath filepath(arg);
+        if ((filepath.isExistingFile()) && (filepath.getSuffix() == "lpp"))
+            openProject(filepath);
+    }
 }
 
 ControlPanel::~ControlPanel()
 {
+    closeAllProjects(false);
     delete mUi;              mUi = 0;
 }
 
 void ControlPanel::closeEvent(QCloseEvent *event)
 {
-    saveSettings();
-
     // close all projects, unsaved projects will ask for saving
-    if (!mWorkspace.closeAllProjects(true))
+    if (!closeAllProjects(true))
     {
         event->ignore();
         return; // do NOT close the application, there are still open projects!
     }
 
+    saveSettings();
+
     QMainWindow::closeEvent(event);
 
     // if the control panel is closed, we will quit the whole application
     QApplication::quit();
+}
+
+void ControlPanel::showControlPanel() noexcept
+{
+    show();
+    raise();
+    activateWindow();
 }
 
 /*****************************************************************************************
@@ -156,13 +174,109 @@ void ControlPanel::loadSettings()
 }
 
 /*****************************************************************************************
+ *  Project Management
+ ****************************************************************************************/
+
+ProjectEditor* ControlPanel::createProject(const FilePath& filepath) noexcept
+{
+    try
+    {
+        Project* project = Project::create(filepath);
+        ProjectEditor* editor = new ProjectEditor(mWorkspace, *project);
+        connect(editor, &ProjectEditor::projectEditorClosed, this, &ControlPanel::projectEditorClosed);
+        connect(editor, &ProjectEditor::showControlPanelClicked, this, &ControlPanel::showControlPanel);
+        mOpenProjectEditors.insert(filepath.toUnique().toStr(), editor);
+        mWorkspace.setLastRecentlyUsedProject(filepath);
+        editor->showAllRequiredEditors();
+        return editor;
+    }
+    catch (Exception& e)
+    {
+        QMessageBox::critical(this, tr("Could not create project"), e.getUserMsg());
+        return nullptr;
+    }
+}
+
+ProjectEditor* ControlPanel::openProject(const FilePath& filepath) noexcept
+{
+    try
+    {
+        ProjectEditor* editor = getOpenProject(filepath);
+        if (!editor)
+        {
+            Project* project = new Project(filepath, false);
+            editor = new ProjectEditor(mWorkspace, *project);
+            connect(editor, &ProjectEditor::projectEditorClosed, this, &ControlPanel::projectEditorClosed);
+            connect(editor, &ProjectEditor::showControlPanelClicked, this, &ControlPanel::showControlPanel);
+            mOpenProjectEditors.insert(filepath.toUnique().toStr(), editor);
+            mWorkspace.setLastRecentlyUsedProject(filepath);
+        }
+        editor->showAllRequiredEditors();
+        return editor;
+    }
+    catch (Exception& e)
+    {
+        QMessageBox::critical(this, tr("Could not open project"), e.getUserMsg());
+        return nullptr;
+    }
+}
+
+bool ControlPanel::closeProject(ProjectEditor& editor, bool askForSave) noexcept
+{
+    const FilePath& filepath = editor.getProject().getFilepath().toUnique();
+    Q_ASSERT(mOpenProjectEditors.contains(filepath.toStr()));
+    return editor.closeAndDestroy(askForSave, this); // this will implicitly call the slot "projectEditorClosed()"!
+}
+
+bool ControlPanel::closeProject(const FilePath& filepath, bool askForSave) noexcept
+{
+    ProjectEditor* editor = getOpenProject(filepath);
+    if (editor)
+        return closeProject(*editor, askForSave);
+    else
+        return false;
+}
+
+bool ControlPanel::closeAllProjects(bool askForSave) noexcept
+{
+    bool success = true;
+    foreach (ProjectEditor* editor, mOpenProjectEditors)
+    {
+        if (!closeProject(*editor, askForSave))
+            success = false;
+    }
+    return success;
+}
+
+ProjectEditor* ControlPanel::getOpenProject(const FilePath& filepath) const noexcept
+{
+    if (mOpenProjectEditors.contains(filepath.toUnique().toStr()))
+        return mOpenProjectEditors.value(filepath.toUnique().toStr());
+    else
+        return nullptr;
+}
+
+/*****************************************************************************************
+ *  Private Slots
+ ****************************************************************************************/
+
+void ControlPanel::projectEditorClosed() noexcept
+{
+    ProjectEditor* editor = dynamic_cast<ProjectEditor*>(QObject::sender());
+    Q_ASSERT(editor); if (!editor) return;
+
+    Project* project = &editor->getProject();
+    mOpenProjectEditors.remove(project->getFilepath().toStr());
+    delete project;
+}
+
+/*****************************************************************************************
  *  Actions
  ****************************************************************************************/
 
 void ControlPanel::on_actionAbout_triggered()
 {
-    QMessageBox::about(this, tr("About"),
-                       tr("LibrePCB is a free & OpenSource Schematic/Layout-Editor"));
+    QMessageBox::about(this, tr("About"), tr("LibrePCB is a free & OpenSource Schematic/Layout-Editor"));
 }
 
 void ControlPanel::on_actionNew_Project_triggered()
@@ -182,7 +296,7 @@ void ControlPanel::on_actionNew_Project_triggered()
 
     settings.setValue("controlpanel/last_new_project", filepath.toNative());
 
-    mWorkspace.createProject(filepath);
+    createProject(filepath);
 }
 
 void ControlPanel::on_actionOpen_Project_triggered()
@@ -199,12 +313,12 @@ void ControlPanel::on_actionOpen_Project_triggered()
 
     settings.setValue("controlpanel/last_open_project", filepath.toNative());
 
-    mWorkspace.openProject(filepath);
+    openProject(filepath);
 }
 
 void ControlPanel::on_actionClose_all_open_projects_triggered()
 {
-    mWorkspace.closeAllProjects(true);
+    closeAllProjects(true);
 }
 
 void ControlPanel::on_actionSwitch_Workspace_triggered()
@@ -251,7 +365,7 @@ void ControlPanel::on_projectTreeView_doubleClicked(const QModelIndex& index)
             break;
 
         case ProjectTreeItem::ProjectFile:
-            mWorkspace.openProject(item->getFilePath());
+            openProject(item->getFilePath());
             break;
 
         default:
@@ -274,7 +388,7 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(const QPoint& p
         {
             if (item->getType() == ProjectTreeItem::ProjectFile)
             {
-                if (!mWorkspace.getOpenProject(item->getFilePath()))
+                if (!getOpenProject(item->getFilePath()))
                 {
                     // this project is not open
                     actions.insert(1, menu.addAction(tr("Open Project")));
@@ -325,11 +439,11 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(const QPoint& p
     switch (actions.key(menu.exec(QCursor::pos()), 0))
     {
         case 1: // open project
-            mWorkspace.openProject(item->getFilePath());
+            openProject(item->getFilePath());
             break;
 
         case 2: // close project
-            mWorkspace.closeProject(item->getFilePath(), true);
+            closeProject(item->getFilePath(), true);
             break;
 
         case 3: // remove project from favorites
@@ -374,13 +488,13 @@ void ControlPanel::on_favoriteProjectsListView_entered(const QModelIndex &index)
 void ControlPanel::on_recentProjectsListView_clicked(const QModelIndex &index)
 {
     FilePath filepath(index.data(Qt::UserRole).toString());
-    mWorkspace.openProject(filepath);
+    openProject(filepath);
 }
 
 void ControlPanel::on_favoriteProjectsListView_clicked(const QModelIndex &index)
 {
     FilePath filepath(index.data(Qt::UserRole).toString());
-    mWorkspace.openProject(filepath);
+    openProject(filepath);
 }
 
 void ControlPanel::on_recentProjectsListView_customContextMenuRequested(const QPoint &pos)

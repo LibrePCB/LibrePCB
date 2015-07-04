@@ -68,12 +68,11 @@ void ErcMsg::setVisible(bool visible) noexcept
         mErcMsgList.remove(this);
 }
 
-void ErcMsg::setIgnored(bool ignored, bool fromUserInput) noexcept
+void ErcMsg::setIgnored(bool ignored) noexcept
 {
     if (ignored == mIsIgnored) return;
     mIsIgnored = ignored;
     mErcMsgList.update(this);
-    if (fromUserInput) mProject.setModifiedFlag();
 }
 
 /*****************************************************************************************

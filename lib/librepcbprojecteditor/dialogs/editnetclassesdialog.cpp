@@ -25,13 +25,13 @@
 #include <QtWidgets>
 #include "editnetclassesdialog.h"
 #include "ui_editnetclassesdialog.h"
-#include "circuit.h"
-#include "../project.h"
+#include <librepcbproject/circuit/circuit.h>
+#include <librepcbproject/project.h>
 #include <librepcbcommon/undostack.h>
-#include "netclass.h"
-#include "cmd/cmdnetclassedit.h"
-#include "cmd/cmdnetclassadd.h"
-#include "cmd/cmdnetclassremove.h"
+#include <librepcbproject/circuit/netclass.h>
+#include <librepcbproject/circuit/cmd/cmdnetclassedit.h>
+#include <librepcbproject/circuit/cmd/cmdnetclassadd.h>
+#include <librepcbproject/circuit/cmd/cmdnetclassremove.h>
 
 namespace project {
 
@@ -39,15 +39,16 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-EditNetClassesDialog::EditNetClassesDialog(Circuit& circuit, QWidget* parent) throw (Exception) :
-    QDialog(parent), mCircuit(circuit), mUi(new Ui::EditNetClassesDialog)
+EditNetClassesDialog::EditNetClassesDialog(Circuit& circuit, UndoStack& undoStack, QWidget* parent) throw (Exception) :
+    QDialog(parent), mCircuit(circuit), mUi(new Ui::EditNetClassesDialog),
+    mUndoStack(undoStack)
 {
     mUi->setupUi(this);
 
     // The next line tries to begin a new command on the project's undo stack. This will
     // block all other commands (neccessary to avoid problems). If another command is
     // active at the moment, this line throws an exception and the constructor is exited.
-    mCircuit.getProject().getUndoStack().beginCommand(tr("Edit Netclasses"));
+    mUndoStack.beginCommand(tr("Edit Netclasses"));
 
     int row = 0;
     mUi->tableWidget->setRowCount(mCircuit.getNetClasses().count());
@@ -75,9 +76,9 @@ EditNetClassesDialog::~EditNetClassesDialog() noexcept
 
     // end the active command
     if (result() == QDialog::Accepted)
-        try {mCircuit.getProject().getUndoStack().endCommand();} catch (...) {}
+        try {mUndoStack.endCommand();} catch (...) {}
     else
-        try {mCircuit.getProject().getUndoStack().abortCommand();} catch (...) {}
+        try {mUndoStack.abortCommand();} catch (...) {}
 
     delete mUi;         mUi = 0;
 }
@@ -99,7 +100,7 @@ void EditNetClassesDialog::on_tableWidget_itemChanged(QTableWidgetItem *item)
             {
                 auto cmd = new CmdNetClassEdit(mCircuit, *netclass);
                 cmd->setName(item->text());
-                mCircuit.getProject().getUndoStack().appendToCommand(cmd);
+                mUndoStack.appendToCommand(cmd);
             }
             catch (Exception& e)
             {
@@ -120,7 +121,7 @@ void EditNetClassesDialog::on_btnAdd_clicked()
     try
     {
         CmdNetClassAdd* cmd = new CmdNetClassAdd(mCircuit, name);
-        mCircuit.getProject().getUndoStack().appendToCommand(cmd);
+        mUndoStack.appendToCommand(cmd);
 
         int row = mUi->tableWidget->rowCount();
         mUi->tableWidget->insertRow(row);
@@ -146,7 +147,7 @@ void EditNetClassesDialog::on_btnRemove_clicked()
     try
     {
         CmdNetClassRemove* cmd = new CmdNetClassRemove(mCircuit, *netclass);
-        mCircuit.getProject().getUndoStack().appendToCommand(cmd);
+        mUndoStack.appendToCommand(cmd);
 
         mUi->tableWidget->removeRow(row);
     }

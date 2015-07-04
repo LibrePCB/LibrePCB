@@ -34,7 +34,6 @@
  *  Forward Declarations
  ****************************************************************************************/
 
-class Workspace;
 class GraphicsScene;
 
 namespace project {
@@ -75,7 +74,6 @@ class ComponentInstance final : public QObject, public IF_AttributeProvider,
         ~ComponentInstance() noexcept;
 
         // Getters
-        Workspace& getWorkspace() const noexcept;
         Project& getProject() const noexcept;
         Board& getBoard() const noexcept {return mBoard;}
         GenCompInstance& getGenCompInstance() const noexcept {return *mGenCompInstance;}

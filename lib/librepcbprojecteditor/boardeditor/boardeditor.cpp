@@ -25,21 +25,22 @@
 #include <QtWidgets>
 #include "boardeditor.h"
 #include "ui_boardeditor.h"
-#include "../project.h"
+#include <librepcbproject/project.h>
 #include <librepcbworkspace/workspace.h>
 #include <librepcbworkspace/settings/workspacesettings.h>
 #include <librepcbcommon/undostack.h>
-#include "board.h"
-#include "../circuit/circuit.h"
+#include <librepcbproject/boards/board.h>
+#include <librepcbproject/circuit/circuit.h>
 #include <librepcbcommon/dialogs/gridsettingsdialog.h>
 #include "../dialogs/projectpropertieseditordialog.h"
-#include "../settings/projectsettings.h"
+#include <librepcbproject/settings/projectsettings.h>
 #include <librepcbcommon/graphics/graphicsview.h>
 #include <librepcbcommon/gridproperties.h>
-#include "cmd/cmdboardadd.h"
-#include "../erc/ercmsgdock.h"
+#include <librepcbproject/boards/cmd/cmdboardadd.h>
+#include "../docks/ercmsgdock.h"
 #include "unplacedcomponentsdock.h"
 #include "fsm/bes_fsm.h"
+#include "../projecteditor.h"
 
 namespace project {
 
@@ -47,24 +48,25 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-BoardEditor::BoardEditor(Project& project, bool readOnly) :
-    QMainWindow(0), mProject(project), mUi(new Ui::BoardEditor),
+BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project) :
+    QMainWindow(0), mProjectEditor(projectEditor), mProject(project),
+    mUi(new Ui::BoardEditor),
     mGraphicsView(nullptr), mGridProperties(nullptr), mActiveBoardIndex(-1),
     mBoardListActionGroup(this), mErcMsgDock(nullptr), mUnplacedComponentsDock(nullptr),
     mFsm(nullptr)
 {
     mUi->setupUi(this);
-    mUi->actionProjectSave->setEnabled(!readOnly);
+    mUi->actionProjectSave->setEnabled(!mProject.isReadOnly());
 
     // set window title
     QString filenameStr = mProject.getFilepath().getFilename();
-    if (readOnly) filenameStr.append(QStringLiteral(" [Read-Only]"));
+    if (mProject.isReadOnly()) filenameStr.append(QStringLiteral(" [Read-Only]"));
     setWindowTitle(QString("%1 - LibrePCB Board Editor").arg(filenameStr));
 
     // Add Dock Widgets
     mErcMsgDock = new ErcMsgDock(mProject);
     addDockWidget(Qt::RightDockWidgetArea, mErcMsgDock, Qt::Vertical);
-    mUnplacedComponentsDock = new UnplacedComponentsDock(mProject);
+    mUnplacedComponentsDock = new UnplacedComponentsDock(mProject, mProjectEditor.getUndoStack());
     addDockWidget(Qt::RightDockWidgetArea, mUnplacedComponentsDock, Qt::Vertical);
 
     // create default grid properties
@@ -87,35 +89,37 @@ BoardEditor::BoardEditor(Project& project, bool readOnly) :
             this, &BoardEditor::boardListActionGroupTriggered);
 
     // connect some actions which are created with the Qt Designer
-    connect(mUi->actionProjectSave, &QAction::triggered, &mProject, &Project::saveProject);
+    connect(mUi->actionProjectSave, &QAction::triggered, &mProjectEditor, &ProjectEditor::saveProject);
     connect(mUi->actionQuit, &QAction::triggered, this, &BoardEditor::close);
     connect(mUi->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
     connect(mUi->actionZoomIn, &QAction::triggered, mGraphicsView, &GraphicsView::zoomIn);
     connect(mUi->actionZoomOut, &QAction::triggered, mGraphicsView, &GraphicsView::zoomOut);
     connect(mUi->actionZoomAll, &QAction::triggered, mGraphicsView, &GraphicsView::zoomAll);
-    //connect(mUi->actionShowControlPanel, &QAction::triggered,
-    //        &Workspace::instance(), &Workspace::showControlPanel);
+    connect(mUi->actionShowControlPanel, &QAction::triggered,
+            &mProjectEditor, &ProjectEditor::showControlPanelClicked);
     connect(mUi->actionShowSchematicEditor, &QAction::triggered,
-            &mProject, &Project::showSchematicEditor);
+            &mProjectEditor, &ProjectEditor::showSchematicEditor);
+    connect(mUi->actionEditNetClasses, &QAction::triggered,
+            [this](){mProjectEditor.execNetClassesEditorDialog(this);});
     connect(mUi->actionProjectSettings, &QAction::triggered,
-            [this](){mProject.getSettings().showSettingsDialog(this);});
+            [this](){mProjectEditor.execProjectSettingsDialog(this);});
 
     // connect the undo/redo actions with the UndoStack of the project
-    connect(&mProject.getUndoStack(), &UndoStack::undoTextChanged,
+    connect(&mProjectEditor.getUndoStack(), &UndoStack::undoTextChanged,
             [this](const QString& text){mUi->actionUndo->setText(text);});
-    mUi->actionUndo->setText(mProject.getUndoStack().getUndoText());
-    connect(&mProject.getUndoStack(), &UndoStack::canUndoChanged,
+    mUi->actionUndo->setText(mProjectEditor.getUndoStack().getUndoText());
+    connect(&mProjectEditor.getUndoStack(), &UndoStack::canUndoChanged,
             mUi->actionUndo, &QAction::setEnabled);
-    mUi->actionUndo->setEnabled(mProject.getUndoStack().canUndo());
-    connect(&mProject.getUndoStack(), &UndoStack::redoTextChanged,
+    mUi->actionUndo->setEnabled(mProjectEditor.getUndoStack().canUndo());
+    connect(&mProjectEditor.getUndoStack(), &UndoStack::redoTextChanged,
             [this](const QString& text){mUi->actionRedo->setText(text);});
-    mUi->actionRedo->setText(mProject.getUndoStack().getRedoText());
-    connect(&mProject.getUndoStack(), &UndoStack::canRedoChanged,
+    mUi->actionRedo->setText(mProjectEditor.getUndoStack().getRedoText());
+    connect(&mProjectEditor.getUndoStack(), &UndoStack::canRedoChanged,
             mUi->actionRedo, &QAction::setEnabled);
-    mUi->actionRedo->setEnabled(mProject.getUndoStack().canRedo());
+    mUi->actionRedo->setEnabled(mProjectEditor.getUndoStack().canRedo());
 
     // build the whole board editor finite state machine with all its substate objects
-    mFsm = new BES_FSM(*this, *mUi, *mGraphicsView);
+    mFsm = new BES_FSM(*this, *mUi, *mGraphicsView, mProjectEditor.getUndoStack());
 
     // connect the "tools" toolbar with the state machine (the second line of the lambda
     // functions is a workaround to set the checked attribute of the QActions properly)
@@ -262,7 +266,7 @@ void BoardEditor::abortAllCommands() noexcept
 
 void BoardEditor::closeEvent(QCloseEvent* event)
 {
-    if (!mProject.windowIsAboutToClose(this))
+    if (!mProjectEditor.windowIsAboutToClose(*this))
         event->ignore();
     else
         QMainWindow::closeEvent(event);
@@ -299,7 +303,7 @@ void BoardEditor::boardRemoved(int oldIndex)
 
 void BoardEditor::on_actionProjectClose_triggered()
 {
-    mProject.close(this);
+    mProjectEditor.closeAndDestroy(this);
 }
 
 void BoardEditor::on_actionNewBoard_triggered()
@@ -312,7 +316,7 @@ void BoardEditor::on_actionNewBoard_triggered()
     try
     {
         CmdBoardAdd* cmd = new CmdBoardAdd(mProject, name);
-        mProject.getUndoStack().execCmd(cmd);
+        mProjectEditor.getUndoStack().execCmd(cmd);
     }
     catch (Exception& e)
     {
@@ -324,7 +328,7 @@ void BoardEditor::on_actionUndo_triggered()
 {
     try
     {
-        mProject.getUndoStack().undo();
+        mProjectEditor.getUndoStack().undo();
     }
     catch (Exception& e)
     {
@@ -336,7 +340,7 @@ void BoardEditor::on_actionRedo_triggered()
 {
     try
     {
-        mProject.getUndoStack().redo();
+        mProjectEditor.getUndoStack().redo();
     }
     catch (Exception& e)
     {
@@ -356,7 +360,7 @@ void BoardEditor::on_actionGrid_triggered()
     {
         foreach (Board* board, mProject.getBoards())
             board->setGridProperties(*mGridProperties);
-        mProject.setModifiedFlag();
+        //mProjectEditor.setModifiedFlag(); TODO
     }
 }
 
@@ -379,7 +383,7 @@ void BoardEditor::on_actionExportAsPdf_triggered()
 
 void BoardEditor::on_actionProjectProperties_triggered()
 {
-    ProjectPropertiesEditorDialog dialog(mProject, this);
+    ProjectPropertiesEditorDialog dialog(mProject, mProjectEditor.getUndoStack(), this);
     dialog.exec();
 }
 

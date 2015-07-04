@@ -32,6 +32,8 @@
  *  Forward Declarations
  ****************************************************************************************/
 
+class UndoStack;
+
 namespace project {
 class Circuit;
 }
@@ -61,7 +63,8 @@ class EditNetClassesDialog final : public QDialog
     public:
 
         // Constructors / Destructor
-        explicit EditNetClassesDialog(Circuit& circuit, QWidget* parent = 0) throw (Exception);
+        explicit EditNetClassesDialog(Circuit& circuit, UndoStack& undoStack,
+                                      QWidget* parent = 0) throw (Exception);
         ~EditNetClassesDialog() noexcept;
 
     private slots:
@@ -80,6 +83,7 @@ class EditNetClassesDialog final : public QDialog
         // General Attributes
         Circuit& mCircuit;
         Ui::EditNetClassesDialog* mUi;
+        UndoStack& mUndoStack;
 };
 
 } // namespace project

@@ -103,7 +103,7 @@ void ErcMsgList::restoreIgnoreState() noexcept
 
     // reset all ignore attributes
     foreach (ErcMsg* ercMsg, mItems)
-        ercMsg->setIgnored(false, false);
+        ercMsg->setIgnored(false);
 
     // scan ignored items and set ignore attributes
     for (XmlDomElement* node = root.getFirstChild("ignore/item", true, false);
@@ -115,7 +115,7 @@ void ErcMsgList::restoreIgnoreState() noexcept
              && (ercMsg->getOwnerKey() == node->getAttribute("owner_key"))
              && (ercMsg->getMsgKey() == node->getAttribute("msg_key")))
             {
-                ercMsg->setIgnored(true, false);
+                ercMsg->setIgnored(true);
             }
         }
     }

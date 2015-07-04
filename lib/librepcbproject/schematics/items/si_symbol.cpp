@@ -137,11 +137,6 @@ SI_Symbol::~SI_Symbol() noexcept
  *  Getters
  ****************************************************************************************/
 
-Workspace& SI_Symbol::getWorkspace() const noexcept
-{
-    return mSchematic.getWorkspace();
-}
-
 Project& SI_Symbol::getProject() const noexcept
 {
     return mSchematic.getProject();

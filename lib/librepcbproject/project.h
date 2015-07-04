@@ -36,23 +36,18 @@
  *  Forward Declarations
  ****************************************************************************************/
 
-class Workspace;
-class QMainWindow;
 class QPrinter;
 class SmartTextFile;
 class SmartXmlFile;
 class SmartIniFile;
-class UndoStack;
 
 namespace project {
 class ProjectSettings;
 class ProjectLibrary;
 class Circuit;
-class SchematicEditor;
 class Schematic;
 class SchematicLayerProvider;
 class ErcMsgList;
-class BoardEditor;
 class Board;
 class BoardLayerProvider;
 }
@@ -64,19 +59,18 @@ class BoardLayerProvider;
 namespace project {
 
 /**
- * @brief The Project class represents a whole (opened!) project with all its content
+ * @brief The Project class represents a whole (opened) project with all its content
  *
  * This class represents a whole project with all the content of its directory:
  *  - circuit, schematics and boards
  *  - the project's library
  *  - project settings
- *  - GUI elements: schematic editor, board editor and other windows
  *  - and much more...
  *
- * Project objects will be created in a Workspace object. The constructor of the Project
- * class needs the filepath to a project file. Then the project will be opened. The
- * destructor will close the project (without saving). Use the slot #save() to write the
- * whole project to the harddisc.
+ * The constructor of the #Project class needs the filepath to a project file. Then the
+ * project will be opened. A new project can be created with the static method #create().
+ * The destructor will close the project (without saving). Use the method #save() to write
+ * the whole project to the harddisc.
  *
  * @note !! A detailed description about projects is available here: @ref doc_project !!
  *
@@ -94,25 +88,14 @@ class Project final : public QObject, public IF_AttributeProvider,
         // Constructors / Destructor
 
         /**
-         * @brief The constructor to create or open a project with all its content
+         * @brief The constructor to open an existing project with all its content
          *
-         * @note    The constructor will always try to open the specified project. You
-         *          cannot create an instance of Project without opening the project.
-         *          The destructor then will close the project. It's not possible to
-         *          close a project without destroying the Project instance.
+         * @param filepath      The filepath to the an existing *.lpp project file
          *
-         * @param filepath      The filepath to the new or existing *.lpp project file
-         * @param create        True if the specified project does not exist already and
-         *                      must be created.
-         *
-         * @throw Exception     If the project could not be created/opened successfully,
-         *                      the constructor will throw an exception of type #Exception
-         *                      (or a subclass of it). The catcher of the exception should
-         *                      then show a message box with the error message. Only
-         *                      exceptions of type #UserCanceled should be ignored (no
-         *                      msg box) because the user has aborted opening the project.
+         * @throw Exception     If the project could not be opened successfully
          */
-        explicit Project(Workspace& workspace, const FilePath& filepath, bool create) throw (Exception);
+        explicit Project(const FilePath& filepath, bool readOnly) throw (Exception) :
+            Project(filepath, false, readOnly) {}
 
         /**
          * @brief The destructor will close the whole project (without saving!)
@@ -121,8 +104,6 @@ class Project final : public QObject, public IF_AttributeProvider,
 
 
         // Getters: General
-
-        Workspace& getWorkspace() const noexcept {return mWorkspace;}
 
         /**
          * @brief Get the filepath of the project file (*.lpp)
@@ -139,11 +120,18 @@ class Project final : public QObject, public IF_AttributeProvider,
         const FilePath& getPath() const noexcept {return mPath;}
 
         /**
-         * @brief Get a reference to the undo stack of the project
+         * @brief Check whether this project was opened in read-only mode or not
          *
-         * @return A reference to the UndoStack object
+         * @return See #mIsReadOnly
          */
-        UndoStack& getUndoStack() const noexcept {return *mUndoStack;}
+        bool isReadOnly() const noexcept {return mIsReadOnly;}
+
+        /**
+         * @brief Check whether this project restored from temporary files or not
+         *
+         * @return See #mIsRestored
+         */
+        bool isRestored() const noexcept {return mIsRestored;}
 
         /**
          * @brief Get the ProjectSettings object which contains all project settings
@@ -446,22 +434,15 @@ class Project final : public QObject, public IF_AttributeProvider,
         // General Methods
 
         /**
-         * @brief Inform the project that a project related window is about to close
+         * @brief Save the whole project to the harddisc
          *
-         * The project will be closed and destroyed automatically after the last opened
-         * window of the project is closed, because without a window the user is no longer
-         * able to close the project himself. So, every project related window have to
-         * "ask" the Project object whether it is allowed to close or not. If the last
-         * opened window wants to close, the project will first ask the user if unsaved
-         * changes should be written to the harddisc. Only if the user accepts this
-         * question and the project is saved successfully, the method will return true
-         * to allow the last window to close. Then it will also close the whole project.
+         * @param toOriginal    If false, the project is saved only to temporary files
          *
-         * @param window    A pointer to the window which is about to close
+         * @note The whole save procedere is described in @ref doc_project_save.
          *
-         * @return true if the window can be closed, false if closing the window is denied
+         * @throw Exception on error
          */
-        bool windowIsAboutToClose(QMainWindow* window) noexcept;
+        void save(uint version, bool toOriginal) throw (Exception);
 
 
         // Helper Methods
@@ -473,68 +454,10 @@ class Project final : public QObject, public IF_AttributeProvider,
                                bool passToParents, QString& value) const noexcept;
 
 
-    public slots:
+        // Static Methods
 
-        /**
-         * @brief Open the schematic editor window and bring it to the front
-         */
-        void showSchematicEditor() noexcept;
-
-        /**
-         * @brief Open the board editor window and bring it to the front
-         */
-        void showBoardEditor() noexcept;
-
-        /**
-         * @brief Set the "modified" flag of this project
-         *
-         * This slot can be used to indicate that the project has been modified WITHOUT
-         * executing an #UndoCommand. So, this slot sets a flag which will be checked
-         * when closing the project to decide whether the project contains unsaved changes
-         * or not.
-         *
-         * @see #mProjectIsModified
-         */
-        void setModifiedFlag() noexcept {mProjectIsModified = true;}
-
-        /**
-         * @brief Save the whole project to the harddisc
-         *
-         * @note The whole save procedere is described in @ref doc_project_save.
-         *
-         * @return true on success, false on failure
-         */
-        bool saveProject() noexcept;
-
-        /**
-         * @brief Make a automatic backup of the project (save to temporary files)
-         *
-         * @note The whole save procedere is described in @ref doc_project_save.
-         *
-         * @return true on success, false on failure
-         */
-        bool autosaveProject() noexcept;
-
-        /**
-         * @brief Close the project (this will destroy this object!)
-         *
-         * If there are unsaved changes to the project, this method will ask the user
-         * whether the changes should be saved or not. If the user clicks on "cancel"
-         * or the project could not be saved successfully, this method will return false.
-         * If there was no such error, this method will call QObject#deleteLater() which
-         * means that this object will be deleted in the Qt's event loop.
-         *
-         * @warning This method can be called both from within this class and from outside
-         *          this class (for example from the Workspace). But if you call this
-         *          method from outside this class, you have to delete the object yourself
-         *          afterwards! In special cases, the deleteLater() mechanism could lead
-         *          in fatal errors otherwise!
-         *
-         * @param msgBoxParent  Here you can specify a parent window for the message box
-         *
-         * @return true on success, false on failure (= project stays open)
-         */
-        bool close(QWidget* msgBoxParent = 0) noexcept;
+        static Project* create(const FilePath& filepath) throw (Exception)
+        {return new Project(filepath, true, false);}
 
 
     signals:
@@ -582,9 +505,18 @@ class Project final : public QObject, public IF_AttributeProvider,
         // Private Methods
 
         /**
-         * @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+         * @brief The constructor to create or open a project with all its content
+         *
+         * @param filepath      The filepath to the new or existing *.lpp project file
+         * @param create        True if the specified project does not exist already and
+         *                      must be created.
+         *
+         * @throw Exception     If the project could not be created/opened successfully
          */
-        bool checkAttributesValidity() const noexcept;
+        explicit Project(const FilePath& filepath, bool create, bool readOnly) throw (Exception);
+
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
 
         /**
          * @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
@@ -612,9 +544,6 @@ class Project final : public QObject, public IF_AttributeProvider,
         void printSchematicPages(QPrinter& printer, QList<uint>& pages) throw (Exception);
 
 
-        // Attributes
-        Workspace& mWorkspace;
-
         // Project File (*.lpp)
         FilePath mPath; ///< the path to the project directory
         FilePath mFilepath; ///< the filepath of the *.lpp project file
@@ -633,21 +562,16 @@ class Project final : public QObject, public IF_AttributeProvider,
         QDateTime mLastModified;    ///< the datetime of the last project modification
 
         // General
-        bool mProjectIsModified; ///< this flag indicates whether the project contains unsaved changed or not (changes using #UndoCommand will NOT set this flag!)
-        QTimer mAutoSaveTimer; ///< the timer for the periodically automatic saving functionality (see also @ref doc_project_save)
-        UndoStack* mUndoStack; ///< See @ref doc_project_undostack
         ProjectSettings* mProjectSettings; ///< all project specific settings
         ProjectLibrary* mProjectLibrary; ///< the library which contains all elements needed in this project
         ErcMsgList* mErcMsgList; ///< A list which contains all electrical rule check (ERC) messages
         Circuit* mCircuit; ///< The whole circuit of this project (contains all netclasses, netsignals, generic component instances, ...)
         QList<Schematic*> mSchematics; ///< All schematics of this project
         QList<Schematic*> mRemovedSchematics; ///< All removed schematics of this project
-        SchematicEditor* mSchematicEditor; ///< The schematic editor (GUI)
         SchematicLayerProvider* mSchematicLayerProvider; ///< All schematic layers of this project
         BoardLayerProvider* mBoardLayerProvider; ///< All board layers of this project
         QList<Board*> mBoards; ///< All boards of this project
         QList<Board*> mRemovedBoards; ///< All removed boards of this project
-        BoardEditor* mBoardEditor; ///< The board editor (GUI)
 };
 
 } // namespace project

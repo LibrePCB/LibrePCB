@@ -25,21 +25,22 @@
 #include <QtWidgets>
 #include "schematiceditor.h"
 #include "ui_schematiceditor.h"
-#include "../project.h"
+#include <librepcbproject/project.h>
 #include <librepcbworkspace/workspace.h>
 #include <librepcbworkspace/settings/workspacesettings.h>
 #include <librepcbcommon/undostack.h>
-#include "schematic.h"
+#include <librepcbproject/schematics/schematic.h>
 #include "schematicpagesdock.h"
-#include "../erc/ercmsgdock.h"
+#include "../docks/ercmsgdock.h"
 #include "fsm/ses_fsm.h"
-#include "../circuit/circuit.h"
+#include <librepcbproject/circuit/circuit.h>
 #include <librepcbcommon/dialogs/gridsettingsdialog.h>
 #include "../dialogs/projectpropertieseditordialog.h"
-#include "../settings/projectsettings.h"
+#include <librepcbproject/settings/projectsettings.h>
 #include <librepcbcommon/graphics/graphicsview.h>
 #include <librepcbcommon/gridproperties.h>
-#include "cmd/cmdschematicadd.h"
+#include <librepcbproject/schematics/cmd/cmdschematicadd.h>
+#include "../projecteditor.h"
 
 namespace project {
 
@@ -47,17 +48,18 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SchematicEditor::SchematicEditor(Project& project, bool readOnly) :
-    QMainWindow(0), mProject(project), mUi(new Ui::SchematicEditor),
+SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project) :
+    QMainWindow(0), mProjectEditor(projectEditor), mProject(project),
+    mUi(new Ui::SchematicEditor),
     mGraphicsView(nullptr), mGridProperties(nullptr), mActiveSchematicIndex(-1),
     mPagesDock(nullptr), mErcMsgDock(nullptr), mFsm(nullptr)
 {
     mUi->setupUi(this);
-    mUi->actionSave_Project->setEnabled(!readOnly);
+    mUi->actionSave_Project->setEnabled(!mProject.isReadOnly());
 
     // set window title
     QString filenameStr = mProject.getFilepath().getFilename();
-    if (readOnly) filenameStr.append(QStringLiteral(" [Read-Only]"));
+    if (mProject.isReadOnly()) filenameStr.append(QStringLiteral(" [Read-Only]"));
     setWindowTitle(QString("%1 - LibrePCB Schematic Editor").arg(filenameStr));
 
     // Add Dock Widgets
@@ -75,37 +77,37 @@ SchematicEditor::SchematicEditor(Project& project, bool readOnly) :
     setCentralWidget(mGraphicsView);
 
     // connect some actions which are created with the Qt Designer
-    connect(mUi->actionSave_Project, &QAction::triggered, &mProject, &Project::saveProject);
+    connect(mUi->actionSave_Project, &QAction::triggered, &mProjectEditor, &ProjectEditor::saveProject);
     connect(mUi->actionQuit, &QAction::triggered, this, &SchematicEditor::close);
     connect(mUi->actionAbout_Qt, &QAction::triggered, qApp, &QApplication::aboutQt);
     connect(mUi->actionZoom_In, &QAction::triggered, mGraphicsView, &GraphicsView::zoomIn);
     connect(mUi->actionZoom_Out, &QAction::triggered, mGraphicsView, &GraphicsView::zoomOut);
     connect(mUi->actionZoom_All, &QAction::triggered, mGraphicsView, &GraphicsView::zoomAll);
-    //connect(mUi->actionShow_Control_Panel, &QAction::triggered,
-    //        &Workspace::instance(), &Workspace::showControlPanel);
+    connect(mUi->actionShow_Control_Panel, &QAction::triggered,
+            &mProjectEditor, &ProjectEditor::showControlPanelClicked);
     connect(mUi->actionShow_Board_Editor, &QAction::triggered,
-            &mProject, &Project::showBoardEditor);
+            &mProjectEditor, &ProjectEditor::showBoardEditor);
     connect(mUi->actionEditNetclasses, &QAction::triggered,
-            [this](){mProject.getCircuit().execEditNetClassesDialog(this);});
+            [this](){mProjectEditor.execNetClassesEditorDialog(this);});
     connect(mUi->actionProjectSettings, &QAction::triggered,
-            [this](){mProject.getSettings().showSettingsDialog(this);});
+            [this](){mProjectEditor.execProjectSettingsDialog(this);});
 
     // connect the undo/redo actions with the UndoStack of the project
-    connect(&mProject.getUndoStack(), &UndoStack::undoTextChanged,
+    connect(&mProjectEditor.getUndoStack(), &UndoStack::undoTextChanged,
             [this](const QString& text){mUi->actionUndo->setText(text);});
-    mUi->actionUndo->setText(mProject.getUndoStack().getUndoText());
-    connect(&mProject.getUndoStack(), &UndoStack::canUndoChanged,
+    mUi->actionUndo->setText(mProjectEditor.getUndoStack().getUndoText());
+    connect(&mProjectEditor.getUndoStack(), &UndoStack::canUndoChanged,
             mUi->actionUndo, &QAction::setEnabled);
-    mUi->actionUndo->setEnabled(mProject.getUndoStack().canUndo());
-    connect(&mProject.getUndoStack(), &UndoStack::redoTextChanged,
+    mUi->actionUndo->setEnabled(mProjectEditor.getUndoStack().canUndo());
+    connect(&mProjectEditor.getUndoStack(), &UndoStack::redoTextChanged,
             [this](const QString& text){mUi->actionRedo->setText(text);});
-    mUi->actionRedo->setText(mProject.getUndoStack().getRedoText());
-    connect(&mProject.getUndoStack(), &UndoStack::canRedoChanged,
+    mUi->actionRedo->setText(mProjectEditor.getUndoStack().getRedoText());
+    connect(&mProjectEditor.getUndoStack(), &UndoStack::canRedoChanged,
             mUi->actionRedo, &QAction::setEnabled);
-    mUi->actionRedo->setEnabled(mProject.getUndoStack().canRedo());
+    mUi->actionRedo->setEnabled(mProjectEditor.getUndoStack().canRedo());
 
     // build the whole schematic editor finite state machine with all its substate objects
-    mFsm = new SES_FSM(*this, *mUi, *mGraphicsView);
+    mFsm = new SES_FSM(*this, *mUi, *mGraphicsView, mProjectEditor.getUndoStack());
 
     // connect the "tools" toolbar with the state machine (the second line of the lambda
     // functions is a workaround to set the checked attribute of the QActions properly)
@@ -253,7 +255,7 @@ void SchematicEditor::abortAllCommands() noexcept
 
 void SchematicEditor::closeEvent(QCloseEvent* event)
 {
-    if (!mProject.windowIsAboutToClose(this))
+    if (!mProjectEditor.windowIsAboutToClose(*this))
         event->ignore();
     else
         QMainWindow::closeEvent(event);
@@ -265,7 +267,7 @@ void SchematicEditor::closeEvent(QCloseEvent* event)
 
 void SchematicEditor::on_actionClose_Project_triggered()
 {
-    mProject.close(this);
+    mProjectEditor.closeAndDestroy(this);
 }
 
 void SchematicEditor::on_actionNew_Schematic_Page_triggered()
@@ -278,7 +280,7 @@ void SchematicEditor::on_actionNew_Schematic_Page_triggered()
     try
     {
         CmdSchematicAdd* cmd = new CmdSchematicAdd(mProject, name);
-        mProject.getUndoStack().execCmd(cmd);
+        mProjectEditor.getUndoStack().execCmd(cmd);
     }
     catch (Exception& e)
     {
@@ -290,7 +292,7 @@ void SchematicEditor::on_actionUndo_triggered()
 {
     try
     {
-        mProject.getUndoStack().undo();
+        mProjectEditor.getUndoStack().undo();
     }
     catch (Exception& e)
     {
@@ -302,7 +304,7 @@ void SchematicEditor::on_actionRedo_triggered()
 {
     try
     {
-        mProject.getUndoStack().redo();
+        mProjectEditor.getUndoStack().redo();
     }
     catch (Exception& e)
     {
@@ -322,7 +324,7 @@ void SchematicEditor::on_actionGrid_triggered()
     {
         foreach (Schematic* schematic, mProject.getSchematics())
             schematic->setGridProperties(*mGridProperties);
-        mProject.setModifiedFlag();
+        //mProjectEditor.setModifiedFlag(); TODO
     }
 }
 
@@ -406,7 +408,7 @@ void SchematicEditor::on_actionAddGenCmp_vcc_triggered()
 
 void SchematicEditor::on_actionProjectProperties_triggered()
 {
-    ProjectPropertiesEditorDialog dialog(mProject, this);
+    ProjectPropertiesEditorDialog dialog(mProject, mProjectEditor.getUndoStack(), this);
     dialog.exec();
 }
 

@@ -35,6 +35,8 @@
  *  Forward Declarations
  ****************************************************************************************/
 
+class UndoStack;
+
 namespace project {
 class Project;
 class Circuit;
@@ -64,7 +66,7 @@ class SES_Base : public QObject
 
         // Constructors / Destructor
         explicit SES_Base(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
-                          GraphicsView& editorGraphicsView);
+                          GraphicsView& editorGraphicsView, UndoStack& undoStack);
         virtual ~SES_Base();
 
         // General Methods
@@ -80,7 +82,7 @@ class SES_Base : public QObject
         SchematicEditor& mEditor;
         Ui::SchematicEditor& mEditorUi; ///< allows access to SchematicEditor UI
         GraphicsView& mEditorGraphicsView; ///< allows access to the schematic editor graphics view
-
+        UndoStack& mUndoStack;
 };
 
 } // namespace project

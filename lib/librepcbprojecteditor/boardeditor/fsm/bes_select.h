@@ -54,7 +54,7 @@ class BES_Select final : public BES_Base
 
         // Constructors / Destructor
         explicit BES_Select(BoardEditor& editor, Ui::BoardEditor& editorUi,
-                            GraphicsView& editorGraphicsView);
+                            GraphicsView& editorGraphicsView, UndoStack& undoStack);
         ~BES_Select();
 
         // General Methods

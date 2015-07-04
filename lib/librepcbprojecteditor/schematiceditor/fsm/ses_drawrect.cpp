@@ -33,8 +33,8 @@ namespace project {
  ****************************************************************************************/
 
 SES_DrawRect::SES_DrawRect(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
-                           GraphicsView& editorGraphicsView) :
-    SES_Base(editor, editorUi, editorGraphicsView)
+                           GraphicsView& editorGraphicsView, UndoStack& undoStack) :
+    SES_Base(editor, editorUi, editorGraphicsView, undoStack)
 {
 }
 

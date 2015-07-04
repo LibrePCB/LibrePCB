@@ -67,11 +67,6 @@ BI_FootprintPad::~BI_FootprintPad()
  *  Getters
  ****************************************************************************************/
 
-Workspace& BI_FootprintPad::getWorkspace() const noexcept
-{
-    return mFootprint.getWorkspace();
-}
-
 Project& BI_FootprintPad::getProject() const noexcept
 {
     return mFootprint.getProject();

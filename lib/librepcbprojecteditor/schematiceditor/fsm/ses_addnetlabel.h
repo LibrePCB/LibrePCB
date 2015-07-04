@@ -54,7 +54,7 @@ class SES_AddNetLabel final : public SES_Base
 
         // Constructors / Destructor
         explicit SES_AddNetLabel(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
-                                 GraphicsView& editorGraphicsView);
+                                 GraphicsView& editorGraphicsView, UndoStack& undoStack);
         ~SES_AddNetLabel();
 
         // General Methods

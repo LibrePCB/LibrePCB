@@ -32,6 +32,8 @@
  *  Forward Declarations
  ****************************************************************************************/
 
+class UndoStack;
+
 namespace project {
 class ProjectSettings;
 class CmdProjectSettingsChange;
@@ -57,7 +59,8 @@ class ProjectSettingsDialog final : public QDialog
     public:
 
         // Constructors / Destructor
-        explicit ProjectSettingsDialog(ProjectSettings& settings, QWidget* parent = 0) noexcept;
+        explicit ProjectSettingsDialog(ProjectSettings& settings, UndoStack& undoStack,
+                                       QWidget* parent = 0) noexcept;
         ~ProjectSettingsDialog() noexcept;
 
     private slots:
@@ -92,6 +95,7 @@ class ProjectSettingsDialog final : public QDialog
         // General
         ProjectSettings& mSettings;
         Ui::ProjectSettingsDialog* mUi;
+        UndoStack& mUndoStack;
 };
 
 } // namespace project

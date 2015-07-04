@@ -36,6 +36,7 @@
 #include <librepcbcommon/graphics/graphicsview.h>
 #include <librepcbcommon/graphics/graphicsscene.h>
 #include <librepcbcommon/gridproperties.h>
+#include <librepcbcommon/application.h>
 
 namespace project {
 
@@ -160,11 +161,6 @@ Schematic::~Schematic()
 /*****************************************************************************************
  *  Getters: General
  ****************************************************************************************/
-
-Workspace& Schematic::getWorkspace() const noexcept
-{
-    return mProject.getWorkspace();
-}
 
 bool Schematic::isEmpty() const noexcept
 {

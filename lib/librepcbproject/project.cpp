@@ -31,20 +31,16 @@
 #include <librepcbcommon/fileio/xmldomdocument.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include <librepcbcommon/systeminfo.h>
-#include <librepcbcommon/undostack.h>
 #include <librepcbcommon/schematiclayer.h>
 #include "project.h"
-#include <librepcbworkspace/workspace.h>
-#include <librepcbworkspace/settings/workspacesettings.h>
 #include "library/projectlibrary.h"
 #include "circuit/circuit.h"
-#include "schematics/schematiceditor.h"
 #include "schematics/schematic.h"
 #include "erc/ercmsglist.h"
 #include "settings/projectsettings.h"
 #include "boards/board.h"
-#include "boards/boardeditor.h"
 #include "boards/boardlayerprovider.h"
+#include <librepcbcommon/application.h>
 #include "schematics/schematiclayerprovider.h"
 
 namespace project {
@@ -53,16 +49,14 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Project::Project(Workspace& workspace, const FilePath& filepath, bool create) throw (Exception) :
-    QObject(nullptr), IF_AttributeProvider(), mWorkspace(workspace),
-    mPath(filepath.getParentDir()), mFilepath(filepath), mXmlFile(nullptr),
-    mFileLock(filepath), mIsRestored(false), mIsReadOnly(false),
-    mDescriptionHtmlFile(nullptr), mProjectIsModified(false),
-    mUndoStack(nullptr), mProjectSettings(nullptr), mProjectLibrary(nullptr),
-    mErcMsgList(nullptr), mCircuit(nullptr), mSchematicEditor(nullptr),
-    mSchematicLayerProvider(nullptr), mBoardLayerProvider(nullptr), mBoardEditor(nullptr)
+Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Exception) :
+    QObject(nullptr), IF_AttributeProvider(), mPath(filepath.getParentDir()),
+    mFilepath(filepath), mXmlFile(nullptr), mFileLock(filepath), mIsRestored(false),
+    mIsReadOnly(readOnly), mDescriptionHtmlFile(nullptr), mProjectSettings(nullptr),
+    mProjectLibrary(nullptr), mErcMsgList(nullptr), mCircuit(nullptr),
+    mSchematicLayerProvider(nullptr), mBoardLayerProvider(nullptr)
 {
-    qDebug() << (create ? "create project..." : "open project...");
+    qDebug() << (create ? "create project:" : "open project:") << filepath.toNative();
 
     // Check if the filepath is valid
     if (mFilepath.getSuffix() != "lpp")
@@ -105,18 +99,21 @@ Project::Project(Workspace& workspace, const FilePath& filepath, bool create) th
 
         case FileLock::LockStatus_t::Locked:
         {
-            // the project is locked by another application instance! open read only?
-            QMessageBox::StandardButton btn = QMessageBox::question(0, tr("Open Read-Only?"),
-                tr("The project is already opened by another application instance or user. "
-                "Do you want to open the project in read-only mode?"), QMessageBox::Yes |
-                QMessageBox::Cancel, QMessageBox::Cancel);
-            switch (btn)
+            if (!mIsReadOnly)
             {
-                case QMessageBox::Yes: // open the project in read-only mode
-                    mIsReadOnly = true;
-                    break;
-                default: // abort opening the project
-                    throw UserCanceled(__FILE__, __LINE__);
+                // the project is locked by another application instance! open read only?
+                QMessageBox::StandardButton btn = QMessageBox::question(0, tr("Open Read-Only?"),
+                    tr("The project is already opened by another application instance or user. "
+                    "Do you want to open the project in read-only mode?"), QMessageBox::Yes |
+                    QMessageBox::Cancel, QMessageBox::Cancel);
+                switch (btn)
+                {
+                    case QMessageBox::Yes: // open the project in read-only mode
+                        mIsReadOnly = true;
+                        break;
+                    default: // abort opening the project
+                        throw UserCanceled(__FILE__, __LINE__);
+                }
             }
             break;
         }
@@ -202,7 +199,6 @@ Project::Project(Workspace& workspace, const FilePath& filepath, bool create) th
         // Create all needed objects
         mProjectSettings = new ProjectSettings(*this, mIsRestored, mIsReadOnly, create);
         mProjectLibrary = new ProjectLibrary(*this, mIsRestored, mIsReadOnly);
-        mUndoStack = new UndoStack();
         mErcMsgList = new ErcMsgList(*this, mIsRestored, mIsReadOnly, create);
         mCircuit = new Circuit(*this, mIsRestored, mIsReadOnly, create);
 
@@ -255,19 +251,18 @@ Project::Project(Workspace& workspace, const FilePath& filepath, bool create) th
         // So we can now restore the ignore state of each ERC message from the XML file.
         mErcMsgList->restoreIgnoreState();
 
-        // create the whole schematic/board editor GUI inclusive FSM and so on
-        mSchematicEditor = new SchematicEditor(*this, mIsReadOnly);
-        mBoardEditor = new BoardEditor(*this, mIsReadOnly);
-
         if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-        if (create) saveProject(); // write all files to harddisc
+        if (create)
+        {
+            // write all files to harddisc
+            uint appVersion = Application::applicationVersion().getNumbers().first();
+            save(appVersion, true);
+        }
     }
     catch (...)
     {
         // free the allocated memory in the reverse order of their allocation...
-        delete mBoardEditor;            mBoardEditor = nullptr;
-        delete mSchematicEditor;        mSchematicEditor = nullptr;
         foreach (Board* board, mBoards)
             try { removeBoard(board, true); } catch (...) {}
         foreach (Schematic* schematic, mSchematics)
@@ -276,7 +271,6 @@ Project::Project(Workspace& workspace, const FilePath& filepath, bool create) th
         delete mSchematicLayerProvider; mSchematicLayerProvider = nullptr;
         delete mCircuit;                mCircuit = nullptr;
         delete mErcMsgList;             mErcMsgList = nullptr;
-        delete mUndoStack;              mUndoStack = nullptr;
         delete mProjectLibrary;         mProjectLibrary = nullptr;
         delete mProjectSettings;        mProjectSettings = nullptr;
         delete mDescriptionHtmlFile;    mDescriptionHtmlFile = nullptr;
@@ -285,40 +279,12 @@ Project::Project(Workspace& workspace, const FilePath& filepath, bool create) th
     }
 
     // project successfully opened! :-)
-
-    // setup the timer for automatic backups, if enabled in the settings
-    int intervalSecs =  mWorkspace.getSettings().getProjectAutosaveInterval()->getInterval();
-    if ((intervalSecs > 0) && (!mIsReadOnly))
-    {
-        // autosaving is enabled --> start the timer
-        connect(&mAutoSaveTimer, &QTimer::timeout, this, &Project::autosaveProject);
-        mAutoSaveTimer.start(1000 * intervalSecs);
-    }
-
     qDebug() << "project successfully loaded!";
 }
 
 Project::~Project() noexcept
 {
-    // inform the workspace that this project will get destroyed
-    mWorkspace.unregisterOpenProject(this);
-
-    // stop the autosave timer
-    mAutoSaveTimer.stop();
-
-    // abort all active commands!
-    mSchematicEditor->abortAllCommands();
-    mBoardEditor->abortAllCommands();
-    Q_ASSERT(mUndoStack->isCommandActive() == false);
-
-    // delete all command objects in the undo stack (must be done before other important
-    // objects are deleted, as undo command objects can hold pointers/references to them!)
-    mUndoStack->clear();
-
     // free the allocated memory in the reverse order of their allocation
-
-    delete mBoardEditor;            mBoardEditor = nullptr;
-    delete mSchematicEditor;        mSchematicEditor = nullptr;
 
     // delete all boards and schematics (and catch all throwed exceptions)
     foreach (Board* board, mBoards)
@@ -332,11 +298,12 @@ Project::~Project() noexcept
     delete mSchematicLayerProvider; mSchematicLayerProvider = nullptr;
     delete mCircuit;                mCircuit = nullptr;
     delete mErcMsgList;             mErcMsgList = nullptr;
-    delete mUndoStack;              mUndoStack = nullptr;
     delete mProjectLibrary;         mProjectLibrary = nullptr;
     delete mProjectSettings;        mProjectSettings = nullptr;
     delete mDescriptionHtmlFile;    mDescriptionHtmlFile = nullptr;
     delete mXmlFile;                mXmlFile = nullptr;
+
+    qDebug() << "closed project:" << mFilepath.toNative();
 }
 
 /*****************************************************************************************
@@ -600,20 +567,17 @@ void Project::removeBoard(Board* board, bool deleteBoard) throw (Exception)
  *  General Methods
  ****************************************************************************************/
 
-bool Project::windowIsAboutToClose(QMainWindow* window) noexcept
+void Project::save(uint version, bool toOriginal) throw (Exception)
 {
-    int countOfOpenWindows = 0;
-    if (mSchematicEditor->isVisible())  {countOfOpenWindows++;}
-    if (mBoardEditor->isVisible())      {countOfOpenWindows++;}
+    QStringList errors;
 
-    if (countOfOpenWindows <= 1)
+    if (!save(toOriginal, version, errors))
     {
-        // the last open window (schematic editor, board editor, ...) is about to close.
-        // --> close the whole project
-        return close(window);
+        QString msg = QString(tr("The project could not be saved!\n\nError Message:\n%1",
+            "variable count of error messages", errors.count())).arg(errors.join("\n"));
+        throw RuntimeError(__FILE__, __LINE__, QString(), msg);
     }
-
-    return true; // this is not the last open window, so no problem to close it...
+    Q_ASSERT(errors.isEmpty());
 }
 
 /*****************************************************************************************
@@ -621,9 +585,9 @@ bool Project::windowIsAboutToClose(QMainWindow* window) noexcept
  ****************************************************************************************/
 
 bool Project::getAttributeValue(const QString& attrNS, const QString& attrKey,
-                                   bool passToParents, QString& value) const noexcept
+                                bool passToParents, QString& value) const noexcept
 {
-    Q_UNUSED(passToParents); // TODO: pass to workspace?!
+    Q_UNUSED(passToParents);
 
     if ((attrNS == QLatin1String("PRJ")) || (attrNS.isEmpty()))
     {
@@ -638,132 +602,6 @@ bool Project::getAttributeValue(const QString& attrNS, const QString& attrKey,
     }
 
     return false;
-}
-
-/*****************************************************************************************
- *  Public Slots
- ****************************************************************************************/
-
-void Project::showSchematicEditor() noexcept
-{
-    mSchematicEditor->show();
-    mSchematicEditor->raise();
-    mSchematicEditor->activateWindow();
-}
-
-void Project::showBoardEditor() noexcept
-{
-    mBoardEditor->show();
-    mBoardEditor->raise();
-    mBoardEditor->activateWindow();
-}
-
-bool Project::saveProject() noexcept
-{
-    QStringList errors;
-
-    // step 1: save whole project to temporary files
-    qDebug() << "Begin saving the project to temporary files...";
-    if (!save(false, errors))
-    {
-        QMessageBox::critical(0, tr("Error while saving the project"),
-            QString(tr("The project could not be saved!\n\nError Message:\n%1",
-            "variable count of error messages", errors.count())).arg(errors.join("\n")));
-        qCritical() << "Project saving (1) finished with" << errors.count() << "errors!";
-        return false;
-    }
-
-    if (errors.count() > 0) // This should not happen! There must be an error in the code!
-    {
-        QMessageBox::critical(0, tr("Error while saving the project"),
-            QString(tr("The project could not be saved!\n\nError Message:\n%1",
-            "variable count of error messages", errors.count())).arg(errors.join("\n")));
-        qCritical() << "save() has returned true, but there are" << errors.count() << "errors!";
-        return false;
-    }
-
-    // step 2: save whole project to original files
-    qDebug() << "Begin saving the project to original files...";
-    if (!save(true, errors))
-    {
-        QMessageBox::critical(0, tr("Error while saving the project"),
-            QString(tr("The project could not be saved!\n\nError Message:\n%1",
-            "variable count of error messages", errors.count())).arg(errors.join("\n")));
-        qCritical() << "Project saving (2) finished with" << errors.count() << "errors!";
-        return false;
-    }
-
-    // saving to the original files was successful --> clean the undo stack and clear the "modified" flag
-    mUndoStack->setClean();
-    mProjectIsModified = false;
-    qDebug() << "Project successfully saved";
-    return true;
-}
-
-bool Project::autosaveProject() noexcept
-{
-    if ((!mIsRestored) && (mUndoStack->isClean()) && (!mProjectIsModified))
-        return false; // do not save if there are no changes
-
-    if (mUndoStack->isCommandActive())
-    {
-        // the user is executing a command at the moment, so we should not save now,
-        // try it a few seconds later instead...
-        QTimer::singleShot(10000, this, &Project::autosaveProject);
-        return false;
-    }
-
-    QStringList errors;
-
-    qDebug() << "Autosave the project...";
-
-    if (!save(false, errors))
-    {
-        qCritical() << "Project autosave finished with" << errors.count() << "errors!";
-        return false;
-    }
-
-    qDebug() << "Project autosave was successful";
-    return true;
-}
-
-bool Project::close(QWidget* msgBoxParent) noexcept
-{
-    if (((!mIsRestored) && (mUndoStack->isClean()) && (!mProjectIsModified)) || (mIsReadOnly))
-    {
-        // no unsaved changes or opened in read-only mode --> the project can be closed
-        deleteLater();  // this project object will be deleted later in the event loop
-        return true;
-    }
-
-    QString msg1 = tr("You have unsaved changes in the project.\n"
-                      "Do you want to save them bevore closing the project?");
-    QString msg2 = tr("Attention: The project was restored from a backup, so if you "
-                      "don't save the project now the current state of the project (and "
-                      "the backup) will be lost forever!");
-
-    QMessageBox::StandardButton choice = QMessageBox::question(msgBoxParent,
-         tr("Save Project?"), (mIsRestored ? msg1 % QStringLiteral("\n\n") % msg2 : msg1),
-         QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
-
-    switch (choice)
-    {
-        case QMessageBox::Yes: // save and close project
-            if (saveProject())
-            {
-                deleteLater(); // this project object will be deleted later in the event loop
-                return true;
-            }
-            else
-                return false;
-
-        case QMessageBox::No: // close project without saving
-            deleteLater(); // this project object will be deleted later in the event loop
-            return true;
-
-        default: // cancel, don't close the project
-            return false;
-    }
 }
 
 /*****************************************************************************************
@@ -812,12 +650,6 @@ bool Project::save(uint version, bool toOriginal, QStringList& errors) noexcept
     if (mIsReadOnly)
     {
         errors.append(tr("The project was opened in read-only mode."));
-        return false;
-    }
-
-    if (mUndoStack->isCommandActive())
-    {
-        errors.append(tr("A command is active at the moment."));
         return false;
     }
 

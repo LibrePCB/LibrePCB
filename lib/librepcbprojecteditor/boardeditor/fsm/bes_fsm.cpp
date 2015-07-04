@@ -37,12 +37,12 @@ namespace project {
  ****************************************************************************************/
 
 BES_FSM::BES_FSM(BoardEditor& editor, Ui::BoardEditor& editorUi,
-                 GraphicsView& editorGraphicsView) noexcept :
-    BES_Base(editor, editorUi, editorGraphicsView),
+                 GraphicsView& editorGraphicsView, UndoStack& undoStack) noexcept :
+    BES_Base(editor, editorUi, editorGraphicsView, undoStack),
     mCurrentState(State_NoState), mPreviousState(State_NoState)
 {
     // create all substates
-    mSubStates.insert(State_Select, new BES_Select(mEditor, mEditorUi, mEditorGraphicsView));
+    mSubStates.insert(State_Select, new BES_Select(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
 
     // go to state "Select"
     if (mSubStates[State_Select]->entry(nullptr))

@@ -27,12 +27,12 @@
 #include "ui_schematiceditor.h"
 #include <librepcbcommon/undostack.h>
 #include "../../project.h"
-#include "../../circuit/circuit.h"
-#include "../items/si_netlabel.h"
-#include "../cmd/cmdschematicnetlabeladd.h"
-#include "../cmd/cmdschematicnetlabeledit.h"
-#include "../schematic.h"
-#include "../items/si_netline.h"
+#include <librepcbproject/circuit/circuit.h>
+#include <librepcbproject/schematics/items/si_netlabel.h>
+#include <librepcbproject/schematics/cmd/cmdschematicnetlabeladd.h>
+#include <librepcbproject/schematics/cmd/cmdschematicnetlabeledit.h>
+#include <librepcbproject/schematics/schematic.h>
+#include <librepcbproject/schematics/items/si_netline.h>
 #include <librepcbcommon/gridproperties.h>
 
 namespace project {
@@ -42,8 +42,8 @@ namespace project {
  ****************************************************************************************/
 
 SES_AddNetLabel::SES_AddNetLabel(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
-                                 GraphicsView& editorGraphicsView) :
-    SES_Base(editor, editorUi, editorGraphicsView),
+                                 GraphicsView& editorGraphicsView, UndoStack& undoStack) :
+    SES_Base(editor, editorUi, editorGraphicsView, undoStack),
     mUndoCmdActive(false), mCurrentNetLabel(nullptr), mEditCmd(nullptr)
 {
 }
@@ -90,7 +90,7 @@ bool SES_AddNetLabel::exit(SEE_Base* event) noexcept
     {
         try
         {
-            mProject.getUndoStack().abortCommand();
+            mUndoStack.abortCommand();
             mUndoCmdActive = false;
         }
         catch (Exception& e)
@@ -169,10 +169,10 @@ bool SES_AddNetLabel::addLabel(Schematic& schematic) noexcept
         if (!signal)
             throw RuntimeError(__FILE__, __LINE__, QString(), tr("No net signal found."));
 
-        mProject.getUndoStack().beginCommand(tr("Add net label to schematic"));
+        mUndoStack.beginCommand(tr("Add net label to schematic"));
         mUndoCmdActive = true;
         CmdSchematicNetLabelAdd* cmdAdd = new CmdSchematicNetLabelAdd(schematic, *signal, Point());
-        mProject.getUndoStack().appendToCommand(cmdAdd);
+        mUndoStack.appendToCommand(cmdAdd);
         mCurrentNetLabel = cmdAdd->getNetLabel();
         mEditCmd = new CmdSchematicNetLabelEdit(*mCurrentNetLabel);
         return true;
@@ -181,7 +181,7 @@ bool SES_AddNetLabel::addLabel(Schematic& schematic) noexcept
     {
         if (mUndoCmdActive)
         {
-            try {mProject.getUndoStack().abortCommand();} catch (...) {}
+            try {mUndoStack.abortCommand();} catch (...) {}
             mUndoCmdActive = false;
         }
         QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
@@ -215,8 +215,8 @@ bool SES_AddNetLabel::fixLabel(const Point& pos) noexcept
     try
     {
         mEditCmd->setPosition(pos, false);
-        mProject.getUndoStack().appendToCommand(mEditCmd);
-        mProject.getUndoStack().endCommand();
+        mUndoStack.appendToCommand(mEditCmd);
+        mUndoStack.endCommand();
         mUndoCmdActive = false;
         return true;
     }
@@ -224,7 +224,7 @@ bool SES_AddNetLabel::fixLabel(const Point& pos) noexcept
     {
         if (mUndoCmdActive)
         {
-            try {mProject.getUndoStack().abortCommand();} catch (...) {}
+            try {mUndoStack.abortCommand();} catch (...) {}
             mUndoCmdActive = false;
         }
         QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());

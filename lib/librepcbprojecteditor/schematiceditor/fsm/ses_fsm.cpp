@@ -46,21 +46,21 @@ namespace project {
  ****************************************************************************************/
 
 SES_FSM::SES_FSM(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
-                 GraphicsView& editorGraphicsView) noexcept :
-    SES_Base(editor, editorUi, editorGraphicsView),
+                 GraphicsView& editorGraphicsView, UndoStack& undoStack) noexcept :
+    SES_Base(editor, editorUi, editorGraphicsView, undoStack),
     mCurrentState(State_NoState), mPreviousState(State_NoState)
 {
     // create all substates
-    mSubStates.insert(State_Select, new SES_Select(mEditor, mEditorUi, mEditorGraphicsView));
-    mSubStates.insert(State_Move, new SES_Move(mEditor, mEditorUi, mEditorGraphicsView));
-    mSubStates.insert(State_DrawText, new SES_DrawText(mEditor, mEditorUi, mEditorGraphicsView));
-    mSubStates.insert(State_DrawRect, new SES_DrawRect(mEditor, mEditorUi, mEditorGraphicsView));
-    mSubStates.insert(State_DrawPolygon, new SES_DrawPolygon(mEditor, mEditorUi, mEditorGraphicsView));
-    mSubStates.insert(State_DrawCircle, new SES_DrawCircle(mEditor, mEditorUi, mEditorGraphicsView));
-    mSubStates.insert(State_DrawEllipse, new SES_DrawEllipse(mEditor, mEditorUi, mEditorGraphicsView));
-    mSubStates.insert(State_DrawWire, new SES_DrawWire(mEditor, mEditorUi, mEditorGraphicsView));
-    mSubStates.insert(State_AddNetLabel, new SES_AddNetLabel(mEditor, mEditorUi, mEditorGraphicsView));
-    mSubStates.insert(State_AddComponent, new SES_AddComponents(mEditor, mEditorUi, mEditorGraphicsView));
+    mSubStates.insert(State_Select, new SES_Select(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
+    mSubStates.insert(State_Move, new SES_Move(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
+    mSubStates.insert(State_DrawText, new SES_DrawText(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
+    mSubStates.insert(State_DrawRect, new SES_DrawRect(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
+    mSubStates.insert(State_DrawPolygon, new SES_DrawPolygon(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
+    mSubStates.insert(State_DrawCircle, new SES_DrawCircle(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
+    mSubStates.insert(State_DrawEllipse, new SES_DrawEllipse(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
+    mSubStates.insert(State_DrawWire, new SES_DrawWire(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
+    mSubStates.insert(State_AddNetLabel, new SES_AddNetLabel(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
+    mSubStates.insert(State_AddComponent, new SES_AddComponents(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
 
     // go to state "Select"
     if (mSubStates[State_Select]->entry(nullptr))

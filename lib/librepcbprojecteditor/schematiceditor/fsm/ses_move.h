@@ -45,7 +45,7 @@ class SES_Move final : public SES_Base
 
         // Constructors / Destructor
         explicit SES_Move(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
-                          GraphicsView& editorGraphicsView);
+                          GraphicsView& editorGraphicsView, UndoStack& undoStack);
         ~SES_Move();
 
         // General Methods

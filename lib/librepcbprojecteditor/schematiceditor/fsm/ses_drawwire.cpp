@@ -27,27 +27,27 @@
 #include "ui_schematiceditor.h"
 #include <librepcbcommon/units/all_length_units.h>
 #include <librepcbcommon/undostack.h>
-#include "../../project.h"
-#include "../../circuit/circuit.h"
-#include "../../circuit/netclass.h"
-#include "../../circuit/netsignal.h"
-#include "../../circuit/cmd/cmdnetsignaladd.h"
-#include "../items/si_netpoint.h"
-#include "../cmd/cmdschematicnetpointadd.h"
-#include "../cmd/cmdschematicnetlineadd.h"
-#include "../schematic.h"
+#include <librepcbproject/project.h>
+#include <librepcbproject/circuit/circuit.h>
+#include <librepcbproject/circuit/netclass.h>
+#include <librepcbproject/circuit/netsignal.h>
+#include <librepcbproject/circuit/cmd/cmdnetsignaladd.h>
+#include <librepcbproject/schematics/items/si_netpoint.h>
+#include <librepcbproject/schematics/cmd/cmdschematicnetpointadd.h>
+#include <librepcbproject/schematics/cmd/cmdschematicnetlineadd.h>
+#include <librepcbproject/schematics/schematic.h>
 #include <librepcblibrary/sym/symbolpin.h>
-#include "../items/si_symbol.h"
-#include "../items/si_symbolpin.h"
-#include "../../circuit/gencompsignalinstance.h"
-#include "../../circuit/cmd/cmdgencompsiginstsetnetsignal.h"
-#include "../../circuit/cmd/cmdnetclassadd.h"
-#include "../cmd/cmdschematicnetlineremove.h"
-#include "../cmd/cmdschematicnetpointremove.h"
-#include "../items/si_netline.h"
-#include "../cmd/cmdschematicnetpointedit.h"
-#include "../../circuit/cmd/cmdnetsignalremove.h"
-#include "../../circuit/cmd/cmdnetsignaledit.h"
+#include <librepcbproject/schematics/items/si_symbol.h>
+#include <librepcbproject/schematics/items/si_symbolpin.h>
+#include <librepcbproject/circuit/gencompsignalinstance.h>
+#include <librepcbproject/circuit/cmd/cmdgencompsiginstsetnetsignal.h>
+#include <librepcbproject/circuit/cmd/cmdnetclassadd.h>
+#include <librepcbproject/schematics/cmd/cmdschematicnetlineremove.h>
+#include <librepcbproject/schematics/cmd/cmdschematicnetpointremove.h>
+#include <librepcbproject/schematics/items/si_netline.h>
+#include <librepcbproject/schematics/cmd/cmdschematicnetpointedit.h>
+#include <librepcbproject/circuit/cmd/cmdnetsignalremove.h>
+#include <librepcbproject/circuit/cmd/cmdnetsignaledit.h>
 #include <librepcbcommon/gridproperties.h>
 
 namespace project {
@@ -57,8 +57,8 @@ namespace project {
  ****************************************************************************************/
 
 SES_DrawWire::SES_DrawWire(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
-                           GraphicsView& editorGraphicsView) :
-    SES_Base(editor, editorUi, editorGraphicsView),
+                           GraphicsView& editorGraphicsView, UndoStack& undoStack) :
+    SES_Base(editor, editorUi, editorGraphicsView, undoStack),
     mSubState(SubState_Idle), mWireMode(WireMode_HV), mFixedNetPoint(nullptr),
     mPositioningNetLine1(nullptr), mPositioningNetPoint1(nullptr),
     mPositioningNetLine2(nullptr), mPositioningNetPoint2(nullptr),
@@ -344,7 +344,7 @@ bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,
 
         // start a new undo command
         Q_ASSERT(mSubState == SubState_Idle);
-        mProject.getUndoStack().beginCommand(tr("Draw Wire"));
+        mUndoStack.beginCommand(tr("Draw Wire"));
         mSubState = SubState_PositioningNetPoint;
 
         // check if the fixed netpoint does already exist in the schematic
@@ -399,7 +399,7 @@ bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,
                 {
                     // add new netclass
                     CmdNetClassAdd* cmdClassAdd = new CmdNetClassAdd(mProject.getCircuit(), netclassName);
-                    mProject.getUndoStack().appendToCommand(cmdClassAdd);
+                    mUndoStack.appendToCommand(cmdClassAdd);
                     netclass = cmdClassAdd->getNetClass();
                     Q_ASSERT(netclass);
                 }
@@ -415,7 +415,7 @@ bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,
                 {
                     CmdNetSignalAdd* cmdSignalAdd = new CmdNetSignalAdd(mCircuit,
                         *netclass, forcedNetSignalName);
-                    mProject.getUndoStack().appendToCommand(cmdSignalAdd);
+                    mUndoStack.appendToCommand(cmdSignalAdd);
                     netsignal = cmdSignalAdd->getNetSignal();
                     Q_ASSERT(netsignal);
                 }
@@ -429,14 +429,14 @@ bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,
                 Q_ASSERT(i); if (!i) throw LogicError(__FILE__, __LINE__);
                 Q_ASSERT(!i->getNetSignal()); if (i->getNetSignal()) throw LogicError(__FILE__, __LINE__);
                 CmdGenCompSigInstSetNetSignal* cmdSetSignal = new CmdGenCompSigInstSetNetSignal(*i, netsignal);
-                mProject.getUndoStack().appendToCommand(cmdSetSignal);
+                mUndoStack.appendToCommand(cmdSetSignal);
                 cmdNetPointAdd1 = new CmdSchematicNetPointAdd(schematic, *pinUnderCursor);
             }
             else
             {
                 cmdNetPointAdd1 = new CmdSchematicNetPointAdd(schematic, *netsignal, pos);
             }
-            mProject.getUndoStack().appendToCommand(cmdNetPointAdd1);
+            mUndoStack.appendToCommand(cmdNetPointAdd1);
             mFixedNetPoint = cmdNetPointAdd1->getNetPoint();
             Q_ASSERT(mFixedNetPoint);
             Q_ASSERT(mFixedNetPoint->getNetSignal());
@@ -448,11 +448,11 @@ bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,
                 SI_NetPoint& p1 = netlineUnderCursor->getStartPoint();
                 SI_NetPoint& p2 = netlineUnderCursor->getEndPoint();
                 CmdSchematicNetLineRemove* cmdRemove = new CmdSchematicNetLineRemove(schematic, *netlineUnderCursor);
-                mProject.getUndoStack().appendToCommand(cmdRemove);
+                mUndoStack.appendToCommand(cmdRemove);
                 CmdSchematicNetLineAdd* cmdAdd1 = new CmdSchematicNetLineAdd(schematic, p1, *mFixedNetPoint);
-                mProject.getUndoStack().appendToCommand(cmdAdd1);
+                mUndoStack.appendToCommand(cmdAdd1);
                 CmdSchematicNetLineAdd* cmdAdd2 = new CmdSchematicNetLineAdd(schematic, *mFixedNetPoint, p2);
-                mProject.getUndoStack().appendToCommand(cmdAdd2);
+                mUndoStack.appendToCommand(cmdAdd2);
             }
         }
 
@@ -463,28 +463,28 @@ bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,
         // add second netpoint
         CmdSchematicNetPointAdd* cmdNetPointAdd2 = new CmdSchematicNetPointAdd(
             schematic, *netsignal, pos);
-        mProject.getUndoStack().appendToCommand(cmdNetPointAdd2);
+        mUndoStack.appendToCommand(cmdNetPointAdd2);
         mPositioningNetPoint1 = cmdNetPointAdd2->getNetPoint();
         Q_ASSERT(mPositioningNetPoint1);
 
         // add first netline
         CmdSchematicNetLineAdd* cmdNetLineAdd1 = new CmdSchematicNetLineAdd(
             schematic, *mFixedNetPoint, *cmdNetPointAdd2->getNetPoint());
-        mProject.getUndoStack().appendToCommand(cmdNetLineAdd1);
+        mUndoStack.appendToCommand(cmdNetLineAdd1);
         mPositioningNetLine1 = cmdNetLineAdd1->getNetLine();
         Q_ASSERT(mPositioningNetLine1);
 
         // add third netpoint
         CmdSchematicNetPointAdd* cmdNetPointAdd3 = new CmdSchematicNetPointAdd(
             schematic, *netsignal, pos);
-        mProject.getUndoStack().appendToCommand(cmdNetPointAdd3);
+        mUndoStack.appendToCommand(cmdNetPointAdd3);
         mPositioningNetPoint2 = cmdNetPointAdd3->getNetPoint();
         Q_ASSERT(mPositioningNetPoint2);
 
         // add second netline
         CmdSchematicNetLineAdd* cmdNetLineAdd2 = new CmdSchematicNetLineAdd(
             schematic, *cmdNetPointAdd2->getNetPoint(), *cmdNetPointAdd3->getNetPoint());
-        mProject.getUndoStack().appendToCommand(cmdNetLineAdd2);
+        mUndoStack.appendToCommand(cmdNetLineAdd2);
         mPositioningNetLine2 = cmdNetLineAdd2->getNetLine();
         Q_ASSERT(mPositioningNetLine2);
 
@@ -519,13 +519,13 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
         if (mPositioningNetPoint1->getPosition() == mFixedNetPoint->getPosition())
         {
             auto cmd1 = new CmdSchematicNetLineRemove(schematic, *mPositioningNetLine1);
-            mProject.getUndoStack().appendToCommand(cmd1);
+            mUndoStack.appendToCommand(cmd1);
             auto cmd2 = new CmdSchematicNetLineRemove(schematic, *mPositioningNetLine2);
-            mProject.getUndoStack().appendToCommand(cmd2);
+            mUndoStack.appendToCommand(cmd2);
             auto cmd3 = new CmdSchematicNetPointRemove(schematic, *mPositioningNetPoint1);
-            mProject.getUndoStack().appendToCommand(cmd3);
+            mUndoStack.appendToCommand(cmd3);
             auto cmd4 = new CmdSchematicNetLineAdd(schematic, *mFixedNetPoint, *mPositioningNetPoint2);
-            mProject.getUndoStack().appendToCommand(cmd4);
+            mUndoStack.appendToCommand(cmd4);
             mPositioningNetLine1 = nullptr;
             mPositioningNetPoint1 = nullptr;
             mPositioningNetLine2 = cmd4->getNetLine();
@@ -543,11 +543,11 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
                 auto start = (&netline->getStartPoint() == netpoint) ? mPositioningNetPoint2 : &netline->getStartPoint();
                 auto end = (&netline->getEndPoint() == netpoint) ? mPositioningNetPoint2 : &netline->getEndPoint();
                 auto cmd1 = new CmdSchematicNetLineRemove(schematic, *netline);
-                mProject.getUndoStack().appendToCommand(cmd1);
+                mUndoStack.appendToCommand(cmd1);
                 if (start != end)
                 {
                     auto cmd2 = new CmdSchematicNetLineAdd(schematic, *start, *end);
-                    mProject.getUndoStack().appendToCommand(cmd2);
+                    mUndoStack.appendToCommand(cmd2);
                     if (netline == mPositioningNetLine1) mPositioningNetLine1 = cmd2->getNetLine();
                     if (netline == mPositioningNetLine2) mPositioningNetLine2 = cmd2->getNetLine();
                 }
@@ -558,7 +558,7 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
                 }
             }
             auto cmd1 = new CmdSchematicNetPointRemove(schematic, *netpoint);
-            mProject.getUndoStack().appendToCommand(cmd1);
+            mUndoStack.appendToCommand(cmd1);
             if (netpoint == mPositioningNetPoint1) mPositioningNetPoint1 = nullptr;
         }
         if (!mPositioningNetPoint1) mPositioningNetPoint1 = mFixedNetPoint; // ugly!
@@ -612,29 +612,29 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
             foreach (GenCompSignalInstance* signal, originalSignal->getGenCompSignals())
             {
                 auto cmd = new CmdGenCompSigInstSetNetSignal(*signal, combinedSignal);
-                mProject.getUndoStack().appendToCommand(cmd);
+                mUndoStack.appendToCommand(cmd);
             }
             foreach (SI_NetPoint* point, originalSignal->getNetPoints())
             {
                 auto cmd = new CmdSchematicNetPointEdit(*point);
                 cmd->setNetSignal(*combinedSignal);
-                mProject.getUndoStack().appendToCommand(cmd);
+                mUndoStack.appendToCommand(cmd);
             }
 
             // remove the original netsignal
             auto cmd = new CmdNetSignalRemove(mProject.getCircuit(), *originalSignal);
-            mProject.getUndoStack().appendToCommand(cmd);
+            mUndoStack.appendToCommand(cmd);
 
             // remove the last netline and netpoint
             auto cmd1 = new CmdSchematicNetLineRemove(schematic, *mPositioningNetLine2);
-            mProject.getUndoStack().appendToCommand(cmd1);
+            mUndoStack.appendToCommand(cmd1);
             auto cmd2 = new CmdSchematicNetPointRemove(schematic, *mPositioningNetPoint2);
-            mProject.getUndoStack().appendToCommand(cmd2);
+            mUndoStack.appendToCommand(cmd2);
             mPositioningNetPoint2 = pointUnderCursor;
             // add a new netline to the netpoint under the cursor
             auto cmd3 = new CmdSchematicNetLineAdd(schematic,
                 *mPositioningNetPoint1, *mPositioningNetPoint2);
-            mProject.getUndoStack().appendToCommand(cmd3);
+            mUndoStack.appendToCommand(cmd3);
             // finish the current command
             finishCommand = true;
 
@@ -664,41 +664,41 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
                         foreach (GenCompSignalInstance* signal, netsignal->getGenCompSignals())
                         {
                             auto cmd = new CmdGenCompSigInstSetNetSignal(*signal, newNetsignal);
-                            mProject.getUndoStack().appendToCommand(cmd);
+                            mUndoStack.appendToCommand(cmd);
                         }
                         foreach (SI_NetPoint* point, netsignal->getNetPoints())
                         {
                             auto cmd = new CmdSchematicNetPointEdit(*point);
                             cmd->setNetSignal(*newNetsignal);
-                            mProject.getUndoStack().appendToCommand(cmd);
+                            mUndoStack.appendToCommand(cmd);
                         }
                         auto cmd = new CmdNetSignalRemove(mProject.getCircuit(), *netsignal);
-                        mProject.getUndoStack().appendToCommand(cmd);
+                        mUndoStack.appendToCommand(cmd);
                     }
                     else
                     {
                         // rename the netsignal
                         auto cmd = new CmdNetSignalEdit(mCircuit, *netsignal);
                         cmd->setName(forcedName, false);
-                        mProject.getUndoStack().appendToCommand(cmd);
+                        mUndoStack.appendToCommand(cmd);
                     }
                 }
                 // add the pin's component signal to the current netsignal
                 auto cmd1 = new CmdGenCompSigInstSetNetSignal(
                     *pin->getGenCompSignalInstance(), mPositioningNetPoint2->getNetSignal());
-                mProject.getUndoStack().appendToCommand(cmd1);
+                mUndoStack.appendToCommand(cmd1);
                 // remove the current point/line
                 auto cmd2 = new CmdSchematicNetLineRemove(schematic, *mPositioningNetLine2);
-                mProject.getUndoStack().appendToCommand(cmd2);
+                mUndoStack.appendToCommand(cmd2);
                 auto cmd3 = new CmdSchematicNetPointRemove(schematic, *mPositioningNetPoint2);
-                mProject.getUndoStack().appendToCommand(cmd3);
+                mUndoStack.appendToCommand(cmd3);
                 // add a new netpoint and netline to the pin
                 auto cmd4 = new CmdSchematicNetPointAdd(schematic, *pin);
-                mProject.getUndoStack().appendToCommand(cmd4);
+                mUndoStack.appendToCommand(cmd4);
                 mPositioningNetPoint2 = cmd4->getNetPoint();
                 auto cmd5 = new CmdSchematicNetLineAdd(schematic,
                     *mPositioningNetPoint1, *mPositioningNetPoint2);
-                mProject.getUndoStack().appendToCommand(cmd5);
+                mUndoStack.appendToCommand(cmd5);
                 mPositioningNetLine2 = cmd5->getNetLine();
                 // finish the current command
                 finishCommand = true;
@@ -790,16 +790,16 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
                         foreach (GenCompSignalInstance* signal, netsignalToRemove->getGenCompSignals())
                         {
                             auto cmd = new CmdGenCompSigInstSetNetSignal(*signal, combinedNetsignal);
-                            mProject.getUndoStack().appendToCommand(cmd);
+                            mUndoStack.appendToCommand(cmd);
                         }
                         foreach (SI_NetPoint* point, netsignalToRemove->getNetPoints())
                         {
                             auto cmd = new CmdSchematicNetPointEdit(*point);
                             cmd->setNetSignal(*combinedNetsignal);
-                            mProject.getUndoStack().appendToCommand(cmd);
+                            mUndoStack.appendToCommand(cmd);
                         }
                         auto cmd = new CmdNetSignalRemove(mProject.getCircuit(), *netsignalToRemove);
-                        mProject.getUndoStack().appendToCommand(cmd);
+                        mUndoStack.appendToCommand(cmd);
                         netsignalUnderCursor = combinedNetsignal;
                         currentNetsignal = combinedNetsignal;
                     }
@@ -808,11 +808,11 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
                     SI_NetPoint& p1 = netlineUnderCursor->getStartPoint();
                     SI_NetPoint& p2 = netlineUnderCursor->getEndPoint();
                     CmdSchematicNetLineRemove* cmdRemove = new CmdSchematicNetLineRemove(schematic, *netlineUnderCursor);
-                    mProject.getUndoStack().appendToCommand(cmdRemove);
+                    mUndoStack.appendToCommand(cmdRemove);
                     CmdSchematicNetLineAdd* cmdAddLine1 = new CmdSchematicNetLineAdd(schematic, p1, *mPositioningNetPoint2);
-                    mProject.getUndoStack().appendToCommand(cmdAddLine1);
+                    mUndoStack.appendToCommand(cmdAddLine1);
                     CmdSchematicNetLineAdd* cmdAddLine2 = new CmdSchematicNetLineAdd(schematic, *mPositioningNetPoint2, p2);
-                    mProject.getUndoStack().appendToCommand(cmdAddLine2);
+                    mUndoStack.appendToCommand(cmdAddLine2);
                     mPositioningNetLine2 = nullptr;
                 }
                 else if (netlinesUnderCursor.count() > 1)
@@ -836,13 +836,13 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
     try
     {
         // finish the current command
-        mProject.getUndoStack().endCommand();
+        mUndoStack.endCommand();
         mSubState = SubState_Idle;
 
         // abort or start a new command
         if (finishCommand)
         {
-            mProject.getUndoStack().beginCommand(QString()); // this is ugly!
+            mUndoStack.beginCommand(QString()); // this is ugly!
             abortPositioning(true);
             return false;
         }
@@ -868,7 +868,7 @@ bool SES_DrawWire::abortPositioning(bool showErrMsgBox) noexcept
         mPositioningNetPoint1 = nullptr;
         mPositioningNetPoint2 = nullptr;
         mNetSignalComboBox->setCurrentIndex(-1);
-        mProject.getUndoStack().abortCommand(); // can throw an exception
+        mUndoStack.abortCommand(); // can throw an exception
         return true;
     }
     catch (Exception& e)

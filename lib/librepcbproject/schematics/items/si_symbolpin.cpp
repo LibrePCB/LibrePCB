@@ -82,11 +82,6 @@ SI_SymbolPin::~SI_SymbolPin()
  *  Getters
  ****************************************************************************************/
 
-Workspace& SI_SymbolPin::getWorkspace() const noexcept
-{
-    return mSymbol.getWorkspace();
-}
-
 Project& SI_SymbolPin::getProject() const noexcept
 {
     return mSymbol.getProject();
@@ -105,7 +100,7 @@ const QUuid& SI_SymbolPin::getLibPinUuid() const noexcept
 QString SI_SymbolPin::getDisplayText(bool returnGenCompSignalNameIfEmpty,
                                      bool returnPinNameIfEmpty) const noexcept
 {
-    const QStringList& localeOrder = mCircuit.getProject().getSettings().getLocaleOrder(true);
+    const QStringList& localeOrder = mCircuit.getProject().getSettings().getLocaleOrder();
 
     QString text;
     switch (mSymbol.getGenCompSymbVarItem().getDisplayTypeOfPin(mSymbolPin->getUuid()))

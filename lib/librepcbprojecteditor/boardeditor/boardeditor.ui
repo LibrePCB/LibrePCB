@@ -79,6 +79,7 @@
     <addaction name="actionPaste"/>
     <addaction name="actionRemove"/>
     <addaction name="separator"/>
+    <addaction name="actionEditNetClasses"/>
     <addaction name="actionDesignRules"/>
    </widget>
    <widget class="QMenu" name="menuView">
@@ -504,6 +505,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="actionEditNetClasses">
+   <property name="text">
+    <string>Net Classes</string>
    </property>
   </action>
  </widget>

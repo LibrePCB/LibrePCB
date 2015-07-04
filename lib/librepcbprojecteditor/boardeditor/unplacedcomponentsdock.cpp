@@ -25,18 +25,18 @@
 #include <QtWidgets>
 #include "unplacedcomponentsdock.h"
 #include "ui_unplacedcomponentsdock.h"
-#include "board.h"
-#include "../circuit/circuit.h"
-#include "../project.h"
-#include "../settings/projectsettings.h"
-#include "../circuit/gencompinstance.h"
+#include <librepcbproject/boards/board.h>
+#include <librepcbproject/circuit/circuit.h>
+#include <librepcbproject/project.h>
+#include <librepcbproject/settings/projectsettings.h>
+#include <librepcbproject/circuit/gencompinstance.h>
 #include <librepcblibrary/gencmp/genericcomponent.h>
 #include <librepcblibrary/cmp/component.h>
 #include <librepcblibrary/pkg/package.h>
-#include "../library/projectlibrary.h"
+#include <librepcbproject/library/projectlibrary.h>
 #include <librepcbcommon/graphics/graphicsview.h>
 #include <librepcbcommon/graphics/graphicsscene.h>
-#include "cmd/cmdcomponentinstanceadd.h"
+#include <librepcbproject/boards/cmd/cmdcomponentinstanceadd.h>
 #include <librepcbcommon/undostack.h>
 #include <librepcbcommon/gridproperties.h>
 
@@ -46,8 +46,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-UnplacedComponentsDock::UnplacedComponentsDock(Project& project) :
-    QDockWidget(0), mProject(project), mBoard(nullptr),
+UnplacedComponentsDock::UnplacedComponentsDock(Project& project, UndoStack& undoStack) :
+    QDockWidget(0), mProject(project), mUndoStack(undoStack), mBoard(nullptr),
     mUi(new Ui::UnplacedComponentsDock),
     mFootprintPreviewGraphicsView(nullptr), mFootprintPreviewGraphicsScene(nullptr),
     mSelectedGenComp(nullptr), mSelectedComponent(nullptr),
@@ -203,7 +203,7 @@ void UnplacedComponentsDock::updateComponentsList() noexcept
             uint compCount = mProject.getLibrary().getComponentsOfGenComp(genComp->getGenComp().getUuid()).count();
             QString name = genComp->getName();
             QString value = genComp->getValue(true).replace("\n", "|");
-            QString genCompName = genComp->getGenComp().getName(mProject.getSettings().getLocaleOrder(true));
+            QString genCompName = genComp->getGenComp().getName(mProject.getSettings().getLocaleOrder());
             QString text = QString("{%1} %2 (%3) [%4]").arg(compCount).arg(name, value, genCompName);
             QListWidgetItem* item = new QListWidgetItem(text, mUi->lstUnplacedComponents);
             item->setData(Qt::UserRole, genComp->getUuid());
@@ -219,7 +219,7 @@ void UnplacedComponentsDock::setSelectedGenCompInstance(GenCompInstance* genComp
 
     if (mBoard && mSelectedGenComp)
     {
-        QStringList localeOrder = mProject.getSettings().getLocaleOrder(true);
+        QStringList localeOrder = mProject.getSettings().getLocaleOrder();
         QHash<QUuid, const library::Component*> components = mProject.getLibrary().getComponentsOfGenComp(mSelectedGenComp->getGenComp().getUuid());
         foreach (const library::Component* component, components)
         {
@@ -256,7 +256,7 @@ void UnplacedComponentsDock::addComponent(GenCompInstance& genComp, const QUuid&
     try
     {
         CmdComponentInstanceAdd* cmd = new CmdComponentInstanceAdd(*mBoard, genComp, component, mNextPosition);
-        mProject.getUndoStack().execCmd(cmd);
+        mUndoStack.execCmd(cmd);
         if (mNextPosition.getX() > Length::fromMm(200))
             mNextPosition = Point::fromMm(0, mNextPosition.getY().toMm() - 10);
         else

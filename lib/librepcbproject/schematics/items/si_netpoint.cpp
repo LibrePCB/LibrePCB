@@ -153,11 +153,6 @@ SI_NetPoint::~SI_NetPoint() noexcept
  *  Getters
  ****************************************************************************************/
 
-Workspace& SI_NetPoint::getWorkspace() const noexcept
-{
-    return mSchematic.getWorkspace();
-}
-
 Project& SI_NetPoint::getProject() const noexcept
 {
     return mSchematic.getProject();

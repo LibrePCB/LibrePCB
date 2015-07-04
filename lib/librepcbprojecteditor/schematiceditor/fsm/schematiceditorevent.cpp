@@ -26,7 +26,7 @@
 #include "../../project.h"
 #include "../schematiceditor.h"
 #include "ui_schematiceditor.h"
-#include "../schematic.h"
+#include <librepcbproject/schematics/schematic.h>
 
 namespace project {
 

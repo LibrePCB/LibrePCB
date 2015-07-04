@@ -37,7 +37,6 @@
  *  Forward Declarations
  ****************************************************************************************/
 
-class Workspace;
 class GridProperties;
 class GraphicsView;
 class GraphicsScene;
@@ -89,7 +88,6 @@ class Board final : public QObject, public IF_AttributeProvider,
         ~Board() noexcept;
 
         // Getters: General
-        Workspace& getWorkspace() const noexcept;
         Project& getProject() const noexcept {return mProject;}
         const FilePath& getFilePath() const noexcept {return mFilePath;}
         const GridProperties& getGridProperties() const noexcept {return *mGridProperties;}

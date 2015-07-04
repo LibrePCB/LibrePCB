@@ -25,22 +25,22 @@
 #include <QtWidgets>
 #include "symbolinstancepropertiesdialog.h"
 #include "ui_symbolinstancepropertiesdialog.h"
-#include "../circuit/gencompinstance.h"
-#include "items/si_symbol.h"
+#include <librepcbproject/circuit/gencompinstance.h>
+#include <librepcbproject/schematics/items/si_symbol.h>
 #include <librepcblibrary/gencmp/genericcomponent.h>
 #include <librepcblibrary/sym/symbol.h>
-#include "../project.h"
+#include <librepcbproject/project.h>
 #include <librepcbcommon/undostack.h>
 #include <librepcbcommon/undocommand.h>
-#include "../circuit/cmd/cmdgencompinstedit.h"
-#include "cmd/cmdsymbolinstanceedit.h"
-#include "../circuit/gencompattributeinstance.h"
-#include "../circuit/cmd/cmdgencompattrinstadd.h"
-#include "../circuit/cmd/cmdgencompattrinstremove.h"
-#include "../circuit/cmd/cmdgencompattrinstedit.h"
+#include <librepcbproject/circuit/cmd/cmdgencompinstedit.h>
+#include <librepcbproject/schematics/cmd/cmdsymbolinstanceedit.h>
+#include <librepcbproject/circuit/gencompattributeinstance.h>
+#include <librepcbproject/circuit/cmd/cmdgencompattrinstadd.h>
+#include <librepcbproject/circuit/cmd/cmdgencompattrinstremove.h>
+#include <librepcbproject/circuit/cmd/cmdgencompattrinstedit.h>
 #include <librepcbcommon/attributes/attributetype.h>
 #include <librepcbcommon/attributes/attributeunit.h>
-#include "../settings/projectsettings.h"
+#include <librepcbproject/settings/projectsettings.h>
 
 namespace project {
 
@@ -51,11 +51,12 @@ namespace project {
 SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(Project& project,
                                                                GenCompInstance& genComp,
                                                                SI_Symbol& symbol,
+                                                               UndoStack& undoStack,
                                                                QWidget* parent) noexcept :
     QDialog(parent), mProject(project), mGenCompInstance(genComp), mSymbol(symbol),
-    mUi(new Ui::SymbolInstancePropertiesDialog), mCommandActive(false),
-    mAttributesEdited(false), mSelectedAttrItem(nullptr), mSelectedAttrType(nullptr),
-    mSelectedAttrUnit(nullptr)
+    mUi(new Ui::SymbolInstancePropertiesDialog), mUndoStack(undoStack),
+    mCommandActive(false), mAttributesEdited(false), mSelectedAttrItem(nullptr),
+    mSelectedAttrType(nullptr), mSelectedAttrUnit(nullptr)
 {
     mUi->setupUi(this);
     setWindowTitle(QString(tr("Properties of %1")).arg(mSymbol.getName()));
@@ -78,7 +79,7 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(Project& project,
     }
     updateAttrTable();
 
-    const QStringList& localeOrder = mProject.getSettings().getLocaleOrder(true);
+    const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
 
     // Generic Component Library Element Attributes
     QString htmlLink("<a href=\"%1\">%2<a>");
@@ -393,19 +394,18 @@ void SymbolInstancePropertiesDialog::execCmd(UndoCommand* cmd)
 {
     if (!mCommandActive)
     {
-        mProject.getUndoStack().beginCommand(QString(tr("Change properties of %1"))
-                                             .arg(mSymbol.getName()));
+        mUndoStack.beginCommand(QString(tr("Change properties of %1")).arg(mSymbol.getName()));
         mCommandActive = true;
     }
 
-    mProject.getUndoStack().appendToCommand(cmd);
+    mUndoStack.appendToCommand(cmd);
 }
 
 void SymbolInstancePropertiesDialog::endCmd()
 {
     if (mCommandActive)
     {
-        mProject.getUndoStack().endCommand();
+        mUndoStack.endCommand();
         mCommandActive = false;
     }
 }
@@ -414,7 +414,7 @@ void SymbolInstancePropertiesDialog::abortCmd()
 {
     if (mCommandActive)
     {
-        mProject.getUndoStack().abortCommand();
+        mUndoStack.abortCommand();
         mCommandActive = false;
     }
 }

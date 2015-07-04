@@ -45,7 +45,7 @@ class SES_DrawRect final : public SES_Base
 
         // Constructors / Destructor
         explicit SES_DrawRect(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
-                              GraphicsView& editorGraphicsView);
+                              GraphicsView& editorGraphicsView, UndoStack& undoStack);
         ~SES_DrawRect();
 
         // General Methods

@@ -25,10 +25,10 @@
 #include <QtWidgets>
 #include "ercmsgdock.h"
 #include "ui_ercmsgdock.h"
-#include "../project.h"
-#include "../circuit/circuit.h"
-#include "ercmsg.h"
-#include "ercmsglist.h"
+#include <librepcbproject/project.h>
+#include <librepcbproject/circuit/circuit.h>
+#include <librepcbproject/erc/ercmsg.h>
+#include <librepcbproject/erc/ercmsglist.h>
 
 namespace project {
 
@@ -182,7 +182,8 @@ void ErcMsgDock::on_btnIgnore_clicked(bool checked)
     {
         ErcMsg* ercMsg = mErcMsgItems.key(item, nullptr);
         if (!ercMsg) continue;
-        ercMsg->setIgnored(checked, true);
+        ercMsg->setIgnored(checked);
+        // TODO: set "project modified" flag
     }
 }
 

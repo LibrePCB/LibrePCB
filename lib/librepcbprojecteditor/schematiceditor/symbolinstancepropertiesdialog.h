@@ -31,6 +31,7 @@
  *  Forward Declarations
  ****************************************************************************************/
 
+class UndoStack;
 class UndoCommand;
 class AttributeType;
 class AttributeUnit;
@@ -62,7 +63,8 @@ class SymbolInstancePropertiesDialog final : public QDialog
 
         // Constructors / Destructor
         explicit SymbolInstancePropertiesDialog(Project& project, GenCompInstance& genComp,
-                                                SI_Symbol& symbol, QWidget* parent) noexcept;
+                                                SI_Symbol& symbol, UndoStack& undoStack,
+                                                QWidget* parent) noexcept;
         ~SymbolInstancePropertiesDialog() noexcept;
 
 
@@ -108,6 +110,7 @@ class SymbolInstancePropertiesDialog final : public QDialog
         GenCompInstance& mGenCompInstance;
         SI_Symbol& mSymbol;
         Ui::SymbolInstancePropertiesDialog* mUi;
+        UndoStack& mUndoStack;
         bool mCommandActive;
         bool mAttributesEdited;
         QList<AttrItem_t*> mAttrItems;

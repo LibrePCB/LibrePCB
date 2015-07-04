@@ -30,10 +30,6 @@
  *  Class LengthUnit
  ****************************************************************************************/
 
-// Static Variables
-
-LengthUnit::LengthUnit_t LengthUnit::sDefaultUnit = LengthUnit::LengthUnit_t::Millimeters;
-
 // General Methods
 
 QString LengthUnit::toString() const noexcept
