@@ -1,116 +1,74 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
-<svg width="62cm" height="32cm" viewBox="319 19 1228 622" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="61cm" height="32cm" viewBox="19 -21 1202 622" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <g>
-    <rect style="fill: #f4fff0" x="320" y="200" width="260" height="120"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="320" y="200" width="260" height="120"/>
-    <rect style="fill: #f4fff0" x="320" y="180" width="142.6" height="20"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="320" y="180" width="142.6" height="20"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="322" y="194">namespace: project</text>
+    <rect style="fill: #92ff92" x="960" y="160" width="260" height="120"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="960" y="160" width="260" height="120"/>
+    <rect style="fill: #92ff92" x="960" y="140" width="158" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="960" y="140" width="158" height="20"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="962" y="154">liblibrepcbproject.a</text>
   </g>
   <g>
-    <rect style="fill: #ffffeb" x="320" y="520" width="260" height="120"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="320" y="520" width="260" height="120"/>
-    <rect style="fill: #ffffeb" x="320" y="500" width="196.5" height="20"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="320" y="500" width="196.5" height="20"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="322" y="514">namespace: library_editor</text>
+    <rect style="fill: #ff6363" x="960" y="480" width="260" height="120"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="960" y="480" width="260" height="120"/>
+    <rect style="fill: #ff6363" x="960" y="460" width="204.2" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="960" y="460" width="204.2" height="20"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="962" y="474">liblibrepcblibraryeditor.a</text>
   </g>
   <g>
-    <rect style="fill: #ffbdbd" x="340" y="220" width="94.7" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="340" y="220" width="94.7" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="387.35" y="236">&lt;&lt;QObject&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="387.35" y="255">Project</text>
+    <rect style="fill: #ffffff" x="980" y="180" width="94.7" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="980" y="180" width="94.7" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1027.35" y="196">&lt;&lt;QObject&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1027.35" y="215">Project</text>
   </g>
   <g>
-    <rect style="fill: #ffbdbd" x="620" y="160" width="108.75" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="620" y="160" width="108.75" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="674.375" y="176">&lt;&lt;QObject&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="674.375" y="195">Workspace</text>
+    <rect style="fill: #ffffff" x="980" y="500" width="128.65" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="980" y="500" width="128.65" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1044.33" y="516">&lt;&lt;QObject&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1044.33" y="535">LibraryEditor</text>
   </g>
   <g>
-    <rect style="fill: #92ff92" x="340" y="540" width="128.65" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="340" y="540" width="128.65" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="404.325" y="556">&lt;&lt;QMainWindow&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="404.325" y="575">LibraryEditor</text>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="892.229,202 882.058,202 979,202 980,202 "/>
+    <polygon style="fill: #000000" points="867.058,202 881.058,197.2 895.058,202 881.058,206.8 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="867.058,202 881.058,197.2 895.058,202 881.058,206.8 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="930.529" y="198"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="899.058" y="198">1</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="976" y="198">0..*</text>
   </g>
   <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="674.375,229.172 674.375,242 434.7,242 "/>
-    <polygon style="fill: #000000" points="674.375,204 679.175,218 674.375,232 669.575,218 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="674.375,204 679.175,218 674.375,232 669.575,218 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="554.538" y="238"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="685.375" y="216">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="438.7" y="238">0..*</text>
+    <rect style="fill: #92ff92" x="740" y="180" width="126.05" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="740" y="180" width="126.05" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="803.025" y="196">&lt;&lt;QMainWindow&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="803.025" y="215">ControlPanel</text>
   </g>
   <g>
-    <rect style="fill: #92ff92" x="800" y="400" width="126.05" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="800" y="400" width="126.05" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="863.025" y="416">&lt;&lt;QMainWindow&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="863.025" y="435">ControlPanel</text>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="678.675,129.172 678.675,202 740,202 "/>
+    <polygon style="fill: #000000" points="678.675,104 683.475,118 678.675,132 673.875,118 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="678.675,104 683.475,118 678.675,132 673.875,118 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="709.338" y="198"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="689.675" y="116">1</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="736" y="198">1</text>
   </g>
   <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="753.922,182 771.375,182 771.375,422 800,422 "/>
-    <polygon style="fill: #000000" points="728.75,182 742.75,177.2 756.75,182 742.75,186.8 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="728.75,182 742.75,177.2 756.75,182 742.75,186.8 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="773.375" y="298"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="760.75" y="178">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="796" y="418">1</text>
+    <rect style="fill: #ffbdbd" x="20" y="160" width="260" height="120"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="20" y="160" width="260" height="120"/>
+    <rect style="fill: #ffbdbd" x="20" y="140" width="158" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="20" y="140" width="158" height="20"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="22" y="154">liblibrepcblibrary.a</text>
   </g>
   <g>
-    <rect style="fill: #eef1ff" x="320" y="360" width="260" height="120"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="320" y="360" width="260" height="120"/>
-    <rect style="fill: #eef1ff" x="320" y="340" width="142.6" height="20"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="320" y="340" width="142.6" height="20"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="322" y="354">namespace: library</text>
+    <rect style="fill: #ffffff" x="40" y="180" width="94.7" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="40" y="180" width="94.7" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="87.35" y="196">&lt;&lt;QObject&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="87.35" y="215">Library</text>
   </g>
   <g>
-    <rect style="fill: #ffbdbd" x="340" y="380" width="94.7" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="340" y="380" width="94.7" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="387.35" y="396">&lt;&lt;QObject&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="387.35" y="415">Library</text>
-  </g>
-  <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="674.375,229.172 674.375,402 434.7,402 "/>
-    <polygon style="fill: #000000" points="674.375,204 679.175,218 674.375,232 669.575,218 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="674.375,204 679.175,218 674.375,232 669.575,218 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="554.538" y="398"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="685.375" y="216">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="438.7" y="398">1</text>
-  </g>
-  <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="674.375,229.172 674.375,562 468.65,562 "/>
-    <polygon style="fill: #000000" points="674.375,204 679.175,218 674.375,232 669.575,218 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="674.375,204 679.175,218 674.375,232 669.575,218 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="571.513" y="558"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="685.375" y="216">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="472.65" y="558">1</text>
-  </g>
-  <g>
-    <rect style="fill: #ffbdbd" x="800" y="160" width="184.25" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="800" y="160" width="184.25" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="892.125" y="176">&lt;&lt;QObject&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="892.125" y="195">WorkspaceSettings</text>
-  </g>
-  <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="753.922,182 743.75,182 799,182 800,182 "/>
-    <polygon style="fill: #000000" points="728.75,182 742.75,177.2 756.75,182 742.75,186.8 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="728.75,182 742.75,177.2 756.75,182 742.75,186.8 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="771.375" y="178"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="760.75" y="178">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="796" y="178">1</text>
-  </g>
-  <g>
-    <rect style="fill: #92ff92" x="1080" y="120" width="241.8" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1080" y="120" width="241.8" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1200.9" y="136">&lt;&lt;QDialog&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1200.9" y="155">WorkspaceSettingsDialog</text>
-  </g>
-  <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1010.43,182 1039.63,182 1039.63,142 1080,142 "/>
-    <polygon style="fill: #000000" points="985.256,182 999.256,177.2 1013.26,182 999.256,186.8 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="985.256,182 999.256,177.2 1013.26,182 999.256,186.8 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1041.63" y="158"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1017.26" y="178">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="1076" y="138">1</text>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="891.222,202 930.025,202 930.025,522 980,522 "/>
+    <polygon style="fill: #000000" points="866.05,202 880.05,197.2 894.05,202 880.05,206.8 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="866.05,202 880.05,197.2 894.05,202 880.05,206.8 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="932.025" y="358"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="898.05" y="198">1</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="976" y="518">1</text>
   </g>
   <g>
     <rect style="fill: #000000" x="620" y="60" width="117.35" height="44"/>
@@ -118,91 +76,72 @@
     <text font-size="12.8" style="fill: #ffffff;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="678.675" y="76">&lt;&lt;main.cpp&gt;&gt;</text>
     <text font-size="16" style="fill: #ffffff;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="678.675" y="95">int main(...)</text>
   </g>
-  <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="678.675,130.175 678.675,139 674.376,139 674.375,159.072 "/>
-    <polygon style="fill: #000000" points="678.675,105.003 683.475,119.003 678.675,133.003 673.875,119.003 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="678.675,105.003 683.475,119.003 678.675,133.003 673.875,119.003 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="676.525" y="135"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="689.675" y="117.003"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="678.375" y="155.072">1</text>
-  </g>
-  <g>
-    <rect style="fill: #ffbdbd" x="800" y="220" width="179.4" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="800" y="220" width="179.4" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="889.7" y="236">&lt;&lt;QAbstractItemModel&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="889.7" y="255">ProjectTreeModel</text>
-  </g>
-  <g>
-    <rect style="fill: #ffbdbd" x="800" y="280" width="200.9" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="800" y="280" width="200.9" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="900.45" y="296">&lt;&lt;QAbstractListModel&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="900.45" y="315">RecentProjectsModel</text>
-  </g>
-  <g>
-    <rect style="fill: #ffbdbd" x="800" y="340" width="212.5" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="800" y="340" width="212.5" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="906.25" y="356">&lt;&lt;QAbstractListModel&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="906.25" y="375">FavoriteProjectsModel</text>
-  </g>
-  <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="754.928,182 771.375,182 771.375,362 798.993,362 "/>
-    <polygon style="fill: #000000" points="729.757,182 743.757,177.2 757.757,182 743.757,186.8 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="729.757,182 743.757,177.2 757.757,182 743.757,186.8 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="773.375" y="268"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="761.757" y="178">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="794.993" y="358">1</text>
-  </g>
-  <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="754.928,182 771.375,182 771.375,302 798.994,302 "/>
-    <polygon style="fill: #000000" points="729.757,182 743.757,177.2 757.757,182 743.757,186.8 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="729.757,182 743.757,177.2 757.757,182 743.757,186.8 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="773.375" y="238"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="761.757" y="178">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="794.994" y="298">1</text>
-  </g>
-  <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="754.928,182 771.376,182 771.376,242 798.994,242 "/>
-    <polygon style="fill: #000000" points="729.757,182 743.757,177.2 757.757,182 743.757,186.8 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="729.757,182 743.757,177.2 757.757,182 743.757,186.8 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="773.376" y="208"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="761.757" y="178">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="794.994" y="238">1</text>
-  </g>
-  <g>
-    <rect style="fill: #ffbdbd" x="1320" y="180" width="225.35" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1320" y="180" width="225.35" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1432.68" y="196">&lt;&lt;QObject&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1432.68" y="215">WorkspaceSettingsItem</text>
-  </g>
-  <g>
-    <rect style="fill: #ffffff" x="1080" y="180" width="192.35" height="42"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1080" y="180" width="192.35" height="42"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1176.18" y="199">WSI_*</text>
-    <text font-size="11.2" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="1176.18" y="214.5">one class/object for each setting</text>
-  </g>
-  <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1300.76,202 1288.17,202 1288.17,201 1273.36,201 "/>
-    <polygon style="fill: #ffffff" points="1300.76,210 1316.76,202 1300.76,194 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1300.76,210 1316.76,202 1300.76,194 "/>
-  </g>
-  <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1009.42,182 1039.12,182 1039.12,201 1080,201 "/>
-    <polygon style="fill: #000000" points="984.25,182 998.25,177.2 1012.25,182 998.25,186.8 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="984.25,182 998.25,177.2 1012.25,182 998.25,186.8 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1041.12" y="187.5"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1016.25" y="178">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="1076" y="197">0..*</text>
-  </g>
-  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="340" y="300">
-    <tspan x="340" y="300">Details in separate class diagram.</tspan>
+  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="980" y="260">
+    <tspan x="980" y="260">Details in separate class diagram.</tspan>
   </text>
-  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="340" y="460">
-    <tspan x="340" y="460">Details in separate class diagram.</tspan>
+  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="40" y="260">
+    <tspan x="40" y="260">Details in separate class diagram.</tspan>
   </text>
-  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="340" y="620">
-    <tspan x="340" y="620">Details in separate class diagram.</tspan>
+  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="980" y="580">
+    <tspan x="980" y="580">Details in separate class diagram.</tspan>
   </text>
-  <text font-size="22.5778" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:700" x="820" y="40">
-    <tspan x="820" y="40">Overview class diagram</tspan>
+  <text font-size="22.5778" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:700" x="520" y="0">
+    <tspan x="520" y="0">Overview class diagram</tspan>
   </text>
+  <g>
+    <rect style="fill: #bfd4ff" x="340" y="160" width="260" height="120"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="340" y="160" width="260" height="120"/>
+    <rect style="fill: #bfd4ff" x="340" y="140" width="173.4" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="340" y="140" width="173.4" height="20"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="342" y="154">liblibrepcbworkspace.a</text>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="360" y="260">
+    <tspan x="360" y="260">Details in separate class diagram.</tspan>
+  </text>
+  <g>
+    <rect style="fill: #ffffff" x="360" y="180" width="108.75" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="360" y="180" width="108.75" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="414.375" y="196">&lt;&lt;QObject&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="414.375" y="215">Workspace</text>
+  </g>
+  <g>
+    <rect style="fill: #00ff00" x="960" y="320" width="260" height="120"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="960" y="320" width="260" height="120"/>
+    <rect style="fill: #00ff00" x="960" y="300" width="204.2" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="960" y="300" width="204.2" height="20"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="962" y="314">liblibrepcbprojecteditor.a</text>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="980" y="420">
+    <tspan x="980" y="420">Details in separate class diagram.</tspan>
+  </text>
+  <g>
+    <rect style="fill: #ffffff" x="980" y="340" width="128.6" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="980" y="340" width="128.6" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1044.3" y="356">&lt;&lt;QObject&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1044.3" y="375">ProjectEditor</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="678.675,129.172 678.675,202 468.75,202 "/>
+    <polygon style="fill: #000000" points="678.675,104 683.475,118 678.675,132 673.875,118 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="678.675,104 683.475,118 678.675,132 673.875,118 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="573.713" y="198"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="689.675" y="116">1</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="472.75" y="198">1</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="334.828,202 345,202 135.7,202 134.7,202 "/>
+    <polygon style="fill: #000000" points="360,202 346,206.8 332,202 346,197.2 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="360,202 346,206.8 332,202 346,197.2 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="240.35" y="198"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="328" y="198">1</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="138.7" y="198">1</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="891.222,202 930.025,202 930.025,362 980,362 "/>
+    <polygon style="fill: #000000" points="866.05,202 880.05,197.2 894.05,202 880.05,206.8 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="866.05,202 880.05,197.2 894.05,202 880.05,206.8 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="932.025" y="278"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="898.05" y="198">1</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="976" y="358">0..*</text>
+  </g>
 </svg>
