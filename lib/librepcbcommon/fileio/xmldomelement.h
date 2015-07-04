@@ -89,7 +89,7 @@ class XmlDomElement final
          * @param docOfTree     If true and this element is not the root element, this
          *                      method will try to return the document of the whole tree.
          *
-         * @retval XmlDomDocument*  The DOM document of this DOM element.
+         * @retval XmlDomDocument*  A pointer to the DOM document of this DOM element.
          * @retval nullptr          If "docOfTree == false" and this element has no
          *                          document or is not the root element in the document.
          * @retval nullptr          If the whole DOM tree of this element has no document.
@@ -109,13 +109,16 @@ class XmlDomElement final
          * @brief Get the filepath of the DOM documents XML file (if available)
          *
          * @return The filepath of the documents XML file (invalid if no document available)
+         *
+         * @note If no document is available or the document is not saved to disc (newly
+         *       created document), this method will return an invalid #FilePath object!
          */
         FilePath getDocFilePath() const noexcept;
 
         /**
          * @brief Get the parent element
          *
-         * @retval XmlDomElement*   The parent element
+         * @retval XmlDomElement*   Pointer to the parent element
          * @retval nullptr          If this element has no parent
          */
         XmlDomElement* getParent() const noexcept {return mParent;}
@@ -153,7 +156,7 @@ class XmlDomElement final
          *
          * @return The text of this text element as a QString
          *
-         * @throw Exception     If this is not a text element
+         * @throw Exception     If this is not a text element (element contains childs)
          * @throw Exception     If the text is empty and "throwIfEmpty == true"
          */
         const QString& getText(bool throwIfEmpty = false) const throw (Exception);
@@ -161,8 +164,8 @@ class XmlDomElement final
         /**
          * @brief Get the text of this text element in the specified type
          *
-         * @tparam T            The text will be converted in this type. Available types:
-         *                      bool, QUuid, QDateTime, #Version (tbc)
+         * @tparam T            The text will be converted to this type. Available types:
+         *                      bool, QUuid, QDateTime, #Version, #Length (tbc)
          *
          * @param throwIfEmpty  If true and the text is empty, an exception will be thrown.
          *                      If false and the text is empty, defaultValue will be returned.
@@ -252,7 +255,7 @@ class XmlDomElement final
          *
          * @return  The count of child elements
          */
-        int getChildCount() const noexcept {return mChilds.count();}
+        uint getChildCount() const noexcept {return mChilds.count();}
 
         /**
          * @brief Remove a child element from the DOM tree
@@ -451,9 +454,9 @@ class XmlDomElement final
     private:
 
         // make some methods inaccessible...
-        XmlDomElement();
-        XmlDomElement(const XmlDomElement& other);
-        XmlDomElement& operator=(const XmlDomElement& rhs);
+        XmlDomElement() = delete;
+        XmlDomElement(const XmlDomElement& other) = delete;
+        XmlDomElement& operator=(const XmlDomElement& rhs) = delete;
 
 
         // Private Methods
@@ -491,7 +494,7 @@ class XmlDomElement final
         QString mName;              ///< the tag name of this element
         QString mText;              ///< the text of this element (only if there are no childs)
         QList<XmlDomElement*> mChilds;      ///< all child elements (only if there is no text)
-        QHash<QString, QString> mAttributes;///< all attributes of this element (key, value)
+        QHash<QString, QString> mAttributes;///< all attributes of this element (key, value) in arbitrary order
 };
 
 #endif // XMLDOMELEMENT_H

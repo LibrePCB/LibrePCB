@@ -185,6 +185,27 @@ Version XmlDomElement::getText<Version>(bool throwIfEmpty, const Version& defaul
     }
 }
 
+template <>
+Length XmlDomElement::getText<Length>(bool throwIfEmpty, const Length& defaultValue) const throw (Exception)
+{
+    QString text = getText(throwIfEmpty);
+    try
+    {
+        Length obj = Length::fromMm(text);
+        return obj;
+    }
+    catch (Exception& exc)
+    {
+        if ((text.isEmpty()) && (!throwIfEmpty))
+            return defaultValue;
+        else
+        {
+            throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, text,
+                                 QString(tr("Invalid length in node \"%1\".")).arg(mName));
+        }
+    }
+}
+
 /// @endcond
 
 /*****************************************************************************************
