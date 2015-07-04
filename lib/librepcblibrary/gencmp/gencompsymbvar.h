@@ -72,7 +72,9 @@ class GenCompSymbVar final : public IF_XmlSerializableObject
         // General Methods
         void clearItems() noexcept;
         void addItem(const GenCompSymbVarItem& item) noexcept;
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
 
 
     private:
@@ -82,7 +84,9 @@ class GenCompSymbVar final : public IF_XmlSerializableObject
         GenCompSymbVar& operator=(const GenCompSymbVar& rhs);
 
         // Private Methods
-        bool checkAttributesValidity() const noexcept;
+
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
 
 
         // Symbol Variant Attributes

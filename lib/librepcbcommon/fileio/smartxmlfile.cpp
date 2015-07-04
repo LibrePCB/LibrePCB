@@ -25,6 +25,7 @@
 #include "smartxmlfile.h"
 #include "xmldomdocument.h"
 #include "xmldomelement.h"
+#include "../application.h"
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -43,15 +44,33 @@ SmartXmlFile::~SmartXmlFile() noexcept
  *  General Methods
  ****************************************************************************************/
 
-QSharedPointer<XmlDomDocument> SmartXmlFile::parseFileAndBuildDomTree() const throw (Exception)
+QSharedPointer<XmlDomDocument> SmartXmlFile::parseFileAndBuildDomTree(bool checkVersion) const throw (Exception)
 {
     QSharedPointer<XmlDomDocument> doc(
         new XmlDomDocument(readContentFromFile(mOpenedFilePath), mOpenedFilePath));
+
+    if (checkVersion)
+    {
+        uint appVersion = Application::applicationVersion().getNumbers().first();
+        uint fileVersion = doc->getFileVersion();
+        if (!(fileVersion <= appVersion))
+        {
+            throw RuntimeError(__FILE__, __LINE__, QString::number(appVersion),
+                QString(tr("The file %1 was created with a newer application version. "
+                           "You need at least version %2.0.0 to open this file."))
+                .arg(mOpenedFilePath.toNative()).arg(fileVersion));
+        }
+    }
+
     return doc;
 }
 
 void SmartXmlFile::save(const XmlDomDocument& domDocument, bool toOriginal) throw (Exception)
 {
+    // check if file version <= application's major version
+    Q_ASSERT(Application::applicationVersion().getNumbers().count() > 0);
+    Q_ASSERT(domDocument.getFileVersion() <= Application::applicationVersion().getNumbers().first());
+
     const FilePath& filepath = prepareSaveAndReturnFilePath(toOriginal);
     saveContentToFile(filepath, domDocument.toByteArray());
     updateMembersAfterSaving(toOriginal);

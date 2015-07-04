@@ -413,7 +413,7 @@ QStringList Library::getAllXmlFilesInLibDir(const QString& xmlRootName) throw (E
     while (it.hasNext()) {
         FilePath xmlFilePath(it.next());
         SmartXmlFile xmlFile(xmlFilePath, false, true);
-        QSharedPointer<XmlDomDocument> doc = xmlFile.parseFileAndBuildDomTree();
+        QSharedPointer<XmlDomDocument> doc = xmlFile.parseFileAndBuildDomTree(false);
         if (doc->getRoot().getName() == xmlRootName)
             list.append(xmlFilePath.toStr());
     }

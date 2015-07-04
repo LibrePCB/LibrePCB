@@ -92,7 +92,9 @@ class ComponentInstance final : public QObject, public IF_AttributeProvider,
         // General Methods
         void addToBoard(GraphicsScene& scene) throw (Exception);
         void removeFromBoard(GraphicsScene& scene) throw (Exception);
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
 
         // Helper Methods
         bool getAttributeValue(const QString& attrNS, const QString& attrKey,
@@ -118,7 +120,10 @@ class ComponentInstance final : public QObject, public IF_AttributeProvider,
         // Private Methods
         void initComponentAndPackage(const QUuid& componentUuid) throw (Exception);
         void init() throw (Exception);
-        bool checkAttributesValidity() const noexcept;
+
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
+
         void updateErcMessages() noexcept;
 
 

@@ -119,8 +119,9 @@ void NetClass::removeFromCircuit() noexcept
     updateErcMessages();
 }
 
-XmlDomElement* NetClass::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* NetClass::serializeToXmlDomElement(uint version) const throw (Exception)
 {
+    Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("netclass"));

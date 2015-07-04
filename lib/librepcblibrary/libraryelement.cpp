@@ -65,9 +65,9 @@ void LibraryElement::parseDomTree(const XmlDomElement& root) throw (Exception)
     }
 }
 
-XmlDomElement* LibraryElement::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* LibraryElement::serializeToXmlDomElement(uint version) const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(LibraryBaseElement::serializeToXmlDomElement());
+    QScopedPointer<XmlDomElement> root(LibraryBaseElement::serializeToXmlDomElement(version));
     XmlDomElement* categories = root->appendChild("categories");
     foreach (const QUuid& uuid, mCategories)
         categories->appendTextChild("category", uuid.toString());

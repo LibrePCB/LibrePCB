@@ -75,7 +75,9 @@ class FootprintEllipse final : public IF_XmlSerializableObject
         void setRotation(const Angle& rotation) noexcept {mRotation = rotation;}
 
         // General Methods
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
 
 
     private:
@@ -85,7 +87,9 @@ class FootprintEllipse final : public IF_XmlSerializableObject
         FootprintEllipse& operator=(const FootprintEllipse& rhs) = delete;
 
         // Private Methods
-        bool checkAttributesValidity() const noexcept;
+
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
 
 
         // Polygon Attributes

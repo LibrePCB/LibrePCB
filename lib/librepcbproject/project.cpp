@@ -171,7 +171,7 @@ Project::Project(Workspace& workspace, const FilePath& filepath, bool create) th
         else
         {
             mXmlFile = new SmartXmlFile(mFilepath, mIsRestored, mIsReadOnly);
-            doc = mXmlFile->parseFileAndBuildDomTree();
+            doc = mXmlFile->parseFileAndBuildDomTree(true);
             root = &doc->getRoot();
         }
 
@@ -776,8 +776,9 @@ bool Project::checkAttributesValidity() const noexcept
     return true;
 }
 
-XmlDomElement* Project::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* Project::serializeToXmlDomElement(uint version) const throw (Exception)
 {
+    Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("project"));
@@ -804,7 +805,7 @@ XmlDomElement* Project::serializeToXmlDomElement() const throw (Exception)
     return root.take();
 }
 
-bool Project::save(bool toOriginal, QStringList& errors) noexcept
+bool Project::save(uint version, bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
 
@@ -824,8 +825,7 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     try
     {
         setLastModified(QDateTime::currentDateTime());
-        XmlDomElement* root = serializeToXmlDomElement();
-        XmlDomDocument doc(*root, true);
+        XmlDomDocument doc(*serializeToXmlDomElement(version));
         mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)
@@ -846,41 +846,41 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     }
 
     // Save circuit
-    if (!mCircuit->save(toOriginal, errors))
+    if (!mCircuit->save(version, toOriginal, errors))
         success = false;
 
     // Save all added schematics (*.xml files)
     foreach (Schematic* schematic, mSchematics)
     {
-        if (!schematic->save(toOriginal, errors))
+        if (!schematic->save(version, toOriginal, errors))
             success = false;
     }
     // Save all removed schematics (*.xml files)
     foreach (Schematic* schematic, mRemovedSchematics)
     {
-        if (!schematic->save(toOriginal, errors))
+        if (!schematic->save(version, toOriginal, errors))
             success = false;
     }
 
     // Save all added boards (*.xml files)
     foreach (Board* board, mBoards)
     {
-        if (!board->save(toOriginal, errors))
+        if (!board->save(version, toOriginal, errors))
             success = false;
     }
     // Save all removed boards (*.xml files)
     foreach (Board* board, mRemovedBoards)
     {
-        if (!board->save(toOriginal, errors))
+        if (!board->save(version, toOriginal, errors))
             success = false;
     }
 
     // Save settings
-    if (!mProjectSettings->save(toOriginal, errors))
+    if (!mProjectSettings->save(version, toOriginal, errors))
         success = false;
 
     // Save ERC messages list
-    if (!mErcMsgList->save(toOriginal, errors))
+    if (!mErcMsgList->save(version, toOriginal, errors))
         success = false;
 
     // if the project was restored from a backup, reset the mIsRestored flag as the current

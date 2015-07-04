@@ -90,8 +90,9 @@ void GenCompAttributeInstance::setTypeValueUnit(const AttributeType& type,
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* GenCompAttributeInstance::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* GenCompAttributeInstance::serializeToXmlDomElement(uint version) const throw (Exception)
 {
+    Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("attribute"));

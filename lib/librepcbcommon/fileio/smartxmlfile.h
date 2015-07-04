@@ -84,10 +84,14 @@ class SmartXmlFile final : public SmartFile
         /**
          * @brief Open and parse the XML file and build the whole DOM tree
          *
+         * @param checkVersion  If true, this method reads the file version and throws
+         *                      an exception if the version number is missing or newer
+         *                      than the application's major version.
+         *
          * @return  A pointer to the created DOM tree. The caller takes the ownership of
          *          the DOM document.
          */
-        QSharedPointer<XmlDomDocument> parseFileAndBuildDomTree() const throw (Exception);
+        QSharedPointer<XmlDomDocument> parseFileAndBuildDomTree(bool checkVersion) const throw (Exception);
 
         /**
          * @brief Write the XML DOM tree to the file system

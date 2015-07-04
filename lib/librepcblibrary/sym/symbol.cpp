@@ -110,19 +110,19 @@ void Symbol::parseDomTree(const XmlDomElement& root) throw (Exception)
     }
 }
 
-XmlDomElement* Symbol::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* Symbol::serializeToXmlDomElement(uint version) const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement());
+    QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement(version));
     XmlDomElement* geometry = root->appendChild("geometry");
     foreach (const SymbolPolygon* polygon, mPolygons)
-        geometry->appendChild(polygon->serializeToXmlDomElement());
+        geometry->appendChild(polygon->serializeToXmlDomElement(version));
     foreach (const SymbolText* text, mTexts)
-        geometry->appendChild(text->serializeToXmlDomElement());
+        geometry->appendChild(text->serializeToXmlDomElement(version));
     foreach (const SymbolEllipse* ellipse, mEllipses)
-        geometry->appendChild(ellipse->serializeToXmlDomElement());
+        geometry->appendChild(ellipse->serializeToXmlDomElement(version));
     XmlDomElement* pins = root->appendChild("pins");
     foreach (const SymbolPin* pin, mPins)
-        pins->appendChild(pin->serializeToXmlDomElement());
+        pins->appendChild(pin->serializeToXmlDomElement(version));
     return root.take();
 }
 

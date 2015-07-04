@@ -59,8 +59,9 @@ GridProperties::~GridProperties() noexcept
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* GridProperties::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* GridProperties::serializeToXmlDomElement(uint version) const throw (Exception)
 {
+    Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("grid_properties"));

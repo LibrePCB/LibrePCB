@@ -63,7 +63,7 @@ class Library final : public QObject
         // Constructors / Destructor
 
         /**
-        * @brief Constructor to open the library in the existing workspace
+        * @brief Constructor to open the library of an existing workspace
         *
         * @param libPath    The filepath to the library directory
         *

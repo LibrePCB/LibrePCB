@@ -154,7 +154,7 @@ void GenCompSymbVar::addItem(const GenCompSymbVarItem& item) noexcept
     mSymbolItems.append(&item);
 }
 
-XmlDomElement* GenCompSymbVar::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* GenCompSymbVar::serializeToXmlDomElement(uint version) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -168,7 +168,7 @@ XmlDomElement* GenCompSymbVar::serializeToXmlDomElement() const throw (Exception
         root->appendTextChild("description", mDescriptions.value(locale))->setAttribute("locale", locale);
     XmlDomElement* symbol_items = root->appendChild("symbol_items");
     foreach (const GenCompSymbVarItem* item, mSymbolItems)
-        symbol_items->appendChild(item->serializeToXmlDomElement());
+        symbol_items->appendChild(item->serializeToXmlDomElement(version));
     return root.take();
 }
 

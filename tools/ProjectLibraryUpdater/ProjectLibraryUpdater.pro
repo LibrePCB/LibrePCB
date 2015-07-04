@@ -13,6 +13,10 @@ GENERATED_DIR = ../../generated
 # Use common project definitions
 include(../../common.pri)
 
+# Define the application version here (needed for XML files)
+DEFINES += APP_VERSION_MAJOR=0
+DEFINES += APP_VERSION_MINOR=1
+
 QT += core widgets opengl webkitwidgets xml printsupport sql
 
 LIBS += \

@@ -589,7 +589,7 @@ class Project final : public QObject, public IF_AttributeProvider,
         /**
          * @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
          */
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception);
 
         /**
          * @brief Save the project to the harddisc (to temporary or original files)
@@ -599,7 +599,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *
          * @return True on success (then the error list should be empty), false otherwise
          */
-        bool save(bool toOriginal, QStringList& errors) noexcept;
+        bool save(uint version, bool toOriginal, QStringList& errors) noexcept;
 
         /**
          * @brief Print some schematics to a QPrinter (printer or file)

@@ -62,7 +62,9 @@ class GridProperties final : public IF_XmlSerializableObject
         void setUnit(const LengthUnit& unit) noexcept {mUnit = unit;}
 
         // General Methods
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
 
         // Operators
         GridProperties& operator=(const GridProperties& rhs) noexcept;
@@ -72,7 +74,10 @@ class GridProperties final : public IF_XmlSerializableObject
 
 
         // Private Methods
-        bool checkAttributesValidity() const noexcept;
+
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
+
 
         // Private Static Methods
         static Type_t stringToType(const QString& type) throw (Exception);

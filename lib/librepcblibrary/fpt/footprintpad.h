@@ -87,7 +87,9 @@ class FootprintPad final : public IF_XmlSerializableObject
         void setDescription(const QString& locale, const QString& description) noexcept;
 
         // General Methods
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
 
         // Static Methods
         static Type_t stringToType(const QString& type) throw (Exception);
@@ -101,7 +103,9 @@ class FootprintPad final : public IF_XmlSerializableObject
         FootprintPad& operator=(const FootprintPad& rhs);
 
         // Private Methods
-        bool checkAttributesValidity() const noexcept;
+
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
 
 
         // Pin Attributes

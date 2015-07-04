@@ -60,7 +60,7 @@ Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create) thr
         else
         {
             mXmlFile = new SmartXmlFile(mXmlFilepath, restore, readOnly);
-            QSharedPointer<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
+            QSharedPointer<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree(true);
             XmlDomElement& root = doc->getRoot();
 
             // OK - XML file is open --> now load the whole circuit stuff
@@ -448,15 +448,14 @@ void Circuit::setGenCompInstanceName(GenCompInstance& genComp, const QString& ne
  *  General Methods
  ****************************************************************************************/
 
-bool Circuit::save(bool toOriginal, QStringList& errors) noexcept
+bool Circuit::save(uint version, bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
 
     // Save "core/circuit.xml"
     try
     {
-        XmlDomElement* root = serializeToXmlDomElement();
-        XmlDomDocument doc(*root, true);
+        XmlDomDocument doc(*serializeToXmlDomElement(version));
         mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)
@@ -477,7 +476,7 @@ bool Circuit::checkAttributesValidity() const noexcept
     return true;
 }
 
-XmlDomElement* Circuit::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* Circuit::serializeToXmlDomElement(uint version) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -485,13 +484,13 @@ XmlDomElement* Circuit::serializeToXmlDomElement() const throw (Exception)
     //XmlDomElement* meta = root->appendChild("meta");
     XmlDomElement* netclasses = root->appendChild("netclasses");
     foreach (NetClass* netclass, mNetClasses)
-        netclasses->appendChild(netclass->serializeToXmlDomElement());
+        netclasses->appendChild(netclass->serializeToXmlDomElement(version));
     XmlDomElement* netsignals = root->appendChild("netsignals");
     foreach (NetSignal* netsignal, mNetSignals)
-        netsignals->appendChild(netsignal->serializeToXmlDomElement());
+        netsignals->appendChild(netsignal->serializeToXmlDomElement(version));
     XmlDomElement* genericComponents = root->appendChild("generic_component_instances");
     foreach (GenCompInstance* instance, mGenCompInstances)
-        genericComponents->appendChild(instance->serializeToXmlDomElement());
+        genericComponents->appendChild(instance->serializeToXmlDomElement(version));
     return root.take();
 }
 

@@ -67,7 +67,9 @@ class GenCompAttributeInstance final : public IF_XmlSerializableObject
                               const AttributeUnit* unit) throw (Exception);
 
         // General Methods
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
 
 
     private:
@@ -78,7 +80,9 @@ class GenCompAttributeInstance final : public IF_XmlSerializableObject
         GenCompAttributeInstance& operator=(const GenCompAttributeInstance& rhs);
 
         // Private Methods
-        bool checkAttributesValidity() const noexcept;
+
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
 
 
         // Attributes

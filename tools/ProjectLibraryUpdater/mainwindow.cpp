@@ -80,11 +80,11 @@ void MainWindow::on_pushButton_2_clicked()
         {
             FilePath projectFilepath(ui->projectfiles->item(i)->text());
             SmartXmlFile projectFile(projectFilepath, false, true);
-            QSharedPointer<XmlDomDocument> projectDoc = projectFile.parseFileAndBuildDomTree();
+            QSharedPointer<XmlDomDocument> projectDoc = projectFile.parseFileAndBuildDomTree(true);
 
             // generic components & symbols
             SmartXmlFile circuitFile(projectFilepath.getParentDir().getPathTo("core/circuit.xml"), false, true);
-            QSharedPointer<XmlDomDocument> circuitDoc = circuitFile.parseFileAndBuildDomTree();
+            QSharedPointer<XmlDomDocument> circuitDoc = circuitFile.parseFileAndBuildDomTree(true);
             for (XmlDomElement* node = circuitDoc->getRoot().getFirstChild("generic_component_instances/*", true, false);
                  node; node = node->getNextSibling())
             {
@@ -96,7 +96,7 @@ void MainWindow::on_pushButton_2_clicked()
                     GenericComponent latestGenComp(filepaths.last());
                     FilePath dest = projectFilepath.getParentDir().getPathTo(
                         QString("lib/gencmp/%1/v0.xml").arg(genCompUuid.toString()));
-                    latestGenComp.saveToFile(dest);
+                    latestGenComp.saveToFile(dest, APP_VERSION_MAJOR);
                     ui->log->addItem(dest.toNative());
 
                     // search all required symbols
@@ -111,7 +111,7 @@ void MainWindow::on_pushButton_2_clicked()
                                 Symbol latestSymbol(filepaths.last());
                                 FilePath dest = projectFilepath.getParentDir().getPathTo(
                                     QString("lib/sym/%1/v0.xml").arg(symbolUuid.toString()));
-                                latestSymbol.saveToFile(dest);
+                                latestSymbol.saveToFile(dest, APP_VERSION_MAJOR);
                                 ui->log->addItem(dest.toNative());
                             }
                             else
@@ -136,7 +136,7 @@ void MainWindow::on_pushButton_2_clicked()
             {
                 FilePath boardFilePath = projectFilepath.getParentDir().getPathTo("boards/" % node->getText(true));
                 SmartXmlFile boardFile(boardFilePath, false, true);
-                QSharedPointer<XmlDomDocument> boardDoc = boardFile.parseFileAndBuildDomTree();
+                QSharedPointer<XmlDomDocument> boardDoc = boardFile.parseFileAndBuildDomTree(true);
                 for (XmlDomElement* node = boardDoc->getRoot().getFirstChild("component_instances/*", true, false);
                      node; node = node->getNextSibling())
                 {
@@ -148,7 +148,7 @@ void MainWindow::on_pushButton_2_clicked()
                         Component latestComp(filepaths.last());
                         FilePath dest = projectFilepath.getParentDir().getPathTo(
                             QString("lib/cmp/%1/v0.xml").arg(compUuid.toString()));
-                        latestComp.saveToFile(dest);
+                        latestComp.saveToFile(dest, APP_VERSION_MAJOR);
                         ui->log->addItem(dest.toNative());
 
                         // get package
@@ -160,7 +160,7 @@ void MainWindow::on_pushButton_2_clicked()
                             Package latestPackage(filepaths.last());
                             FilePath dest = projectFilepath.getParentDir().getPathTo(
                                 QString("lib/pkg/%1/v0.xml").arg(packUuid.toString()));
-                            latestPackage.saveToFile(dest);
+                            latestPackage.saveToFile(dest, APP_VERSION_MAJOR);
                             ui->log->addItem(dest.toNative());
 
                             // get footprint
@@ -172,7 +172,7 @@ void MainWindow::on_pushButton_2_clicked()
                                 Footprint latestFootprint(filepaths.last());
                                 FilePath dest = projectFilepath.getParentDir().getPathTo(
                                     QString("lib/fpt/%1/v0.xml").arg(footprintUuid.toString()));
-                                latestFootprint.saveToFile(dest);
+                                latestFootprint.saveToFile(dest, APP_VERSION_MAJOR);
                                 ui->log->addItem(dest.toNative());
                             }
                             else

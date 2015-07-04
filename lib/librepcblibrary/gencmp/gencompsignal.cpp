@@ -81,8 +81,9 @@ QString GenCompSignal::getDescription(const QStringList& localeOrder) const noex
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* GenCompSignal::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* GenCompSignal::serializeToXmlDomElement(uint version) const throw (Exception)
 {
+    Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("signal"));

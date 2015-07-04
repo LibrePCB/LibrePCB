@@ -75,7 +75,9 @@ class NetClass final : public IF_ErcMsgProvider, public IF_XmlSerializableObject
         // General Methods
         void addToCircuit() noexcept;
         void removeFromCircuit() noexcept;
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
 
 
     private:
@@ -86,7 +88,10 @@ class NetClass final : public IF_ErcMsgProvider, public IF_XmlSerializableObject
         NetClass& operator=(const NetClass& rhs);
 
         // Private Methods
-        bool checkAttributesValidity() const noexcept;
+
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
+
         void updateErcMessages() noexcept;
 
 

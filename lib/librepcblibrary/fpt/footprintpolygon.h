@@ -62,7 +62,9 @@ class FootprintPolygonSegment final : public IF_XmlSerializableObject
         void setAngle(const Angle& angle) noexcept {mAngle = angle;}
 
         // General Methods
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
 
 
     private:
@@ -73,7 +75,9 @@ class FootprintPolygonSegment final : public IF_XmlSerializableObject
         FootprintPolygonSegment& operator=(const FootprintPolygonSegment& rhs);
 
         // Private Methods
-        bool checkAttributesValidity() const noexcept;
+
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
 
 
         // Attributes
@@ -125,7 +129,9 @@ class FootprintPolygon final : public IF_XmlSerializableObject
         // General Methods
         void clearSegments() noexcept;
         void appendSegment(const FootprintPolygonSegment* segment) noexcept;
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
 
 
     private:
@@ -135,7 +141,9 @@ class FootprintPolygon final : public IF_XmlSerializableObject
         FootprintPolygon& operator=(const FootprintPolygon& rhs);
 
         // Private Methods
-        bool checkAttributesValidity() const noexcept;
+
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
 
 
         // Polygon Attributes

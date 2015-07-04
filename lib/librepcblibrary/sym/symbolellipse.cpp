@@ -60,8 +60,9 @@ SymbolEllipse::~SymbolEllipse() noexcept
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* SymbolEllipse::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* SymbolEllipse::serializeToXmlDomElement(uint version) const throw (Exception)
 {
+    Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("ellipse"));

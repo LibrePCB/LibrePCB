@@ -268,8 +268,9 @@ void SI_NetPoint::removeFromSchematic(GraphicsScene& scene) throw (Exception)
     mErcMsgDeadNetPoint->setVisible(false);
 }
 
-XmlDomElement* SI_NetPoint::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* SI_NetPoint::serializeToXmlDomElement(uint version) const throw (Exception)
 {
+    Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("netpoint"));

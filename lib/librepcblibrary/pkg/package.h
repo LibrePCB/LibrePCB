@@ -69,8 +69,12 @@ class Package final : public LibraryElement
 
         // Private Methods
         void parseDomTree(const XmlDomElement& root) throw (Exception);
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
-        bool checkAttributesValidity() const noexcept;
+
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
+
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
 
 
         // Attributes

@@ -77,8 +77,9 @@ QString LibraryElementAttribute::getDefaultValue(const QStringList& localeOrder 
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* LibraryElementAttribute::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* LibraryElementAttribute::serializeToXmlDomElement(uint version) const throw (Exception)
 {
+    Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("attribute"));

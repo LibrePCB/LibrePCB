@@ -98,7 +98,7 @@ void ErcMsgList::restoreIgnoreState() noexcept
 {
     if (mXmlFile->isCreated()) return; // the XML file does not yet exist
 
-    QSharedPointer<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
+    QSharedPointer<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree(true);
     XmlDomElement& root = doc->getRoot();
 
     // reset all ignore attributes
@@ -121,15 +121,14 @@ void ErcMsgList::restoreIgnoreState() noexcept
     }
 }
 
-bool ErcMsgList::save(bool toOriginal, QStringList& errors) noexcept
+bool ErcMsgList::save(uint version, bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
 
     // Save "core/erc.xml"
     try
     {
-        XmlDomElement* root = serializeToXmlDomElement();
-        XmlDomDocument doc(*root, true);
+        XmlDomDocument doc(*serializeToXmlDomElement(version));
         mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)
@@ -150,8 +149,9 @@ bool ErcMsgList::checkAttributesValidity() const noexcept
     return true;
 }
 
-XmlDomElement* ErcMsgList::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* ErcMsgList::serializeToXmlDomElement(uint version) const throw (Exception)
 {
+    Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("erc"));

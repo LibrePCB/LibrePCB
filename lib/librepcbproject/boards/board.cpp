@@ -70,7 +70,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
         else
         {
             mXmlFile = new SmartXmlFile(mFilePath, restore, readOnly);
-            QSharedPointer<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
+            QSharedPointer<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree(true);
             XmlDomElement& root = doc->getRoot();
 
             // the board seems to be ready to open, so we will create all needed objects
@@ -298,7 +298,7 @@ void Board::removeFromProject() throw (Exception)
     updateErcMessages();
 }
 
-bool Board::save(bool toOriginal, QStringList& errors) noexcept
+bool Board::save(uint version, bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
 
@@ -307,8 +307,7 @@ bool Board::save(bool toOriginal, QStringList& errors) noexcept
     {
         if (mAddedToProject)
         {
-            XmlDomElement* root = serializeToXmlDomElement();
-            XmlDomDocument doc(*root, true);
+            XmlDomDocument doc(*serializeToXmlDomElement(version));
             mXmlFile->save(doc, toOriginal);
         }
         else
@@ -394,7 +393,7 @@ bool Board::checkAttributesValidity() const noexcept
     return true;
 }
 
-XmlDomElement* Board::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* Board::serializeToXmlDomElement(uint version) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -403,10 +402,10 @@ XmlDomElement* Board::serializeToXmlDomElement() const throw (Exception)
     meta->appendTextChild("uuid", mUuid);
     meta->appendTextChild("name", mName);
     XmlDomElement* properties = root->appendChild("properties");
-    properties->appendChild(mGridProperties->serializeToXmlDomElement());
+    properties->appendChild(mGridProperties->serializeToXmlDomElement(version));
     XmlDomElement* components = root->appendChild("component_instances");
     foreach (ComponentInstance* component, mComponentInstances)
-        components->appendChild(component->serializeToXmlDomElement());
+        components->appendChild(component->serializeToXmlDomElement(version));
     return root.take();
 }
 

@@ -78,7 +78,9 @@ class GenCompSymbVarItem final : public IF_XmlSerializableObject
 
         // General Methods
         void addPinSignalMapping(const QUuid& pin, const QUuid& signal, PinDisplayType_t display) noexcept;
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
 
 
     private:
@@ -88,7 +90,9 @@ class GenCompSymbVarItem final : public IF_XmlSerializableObject
         GenCompSymbVarItem& operator=(const GenCompSymbVarItem& rhs);
 
         // Private Methods
-        bool checkAttributesValidity() const noexcept;
+
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
 
 
         // Symbol Variant Item Attributes

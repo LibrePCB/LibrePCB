@@ -92,9 +92,9 @@ QStringList LibraryBaseElement::getAllAvailableLocales() const noexcept
  *  General Methods
  ****************************************************************************************/
 
-void LibraryBaseElement::saveToFile(const FilePath& filepath) const throw (Exception)
+void LibraryBaseElement::saveToFile(const FilePath& filepath, uint version) const throw (Exception)
 {
-    XmlDomDocument doc(*serializeToXmlDomElement(), true);
+    XmlDomDocument doc(*serializeToXmlDomElement(version));
     QScopedPointer<SmartXmlFile> file(SmartXmlFile::create(filepath));
     file->save(doc, true);
 }
@@ -109,7 +109,7 @@ void LibraryBaseElement::readFromFile() throw (Exception)
 
     // open XML file
     SmartXmlFile file(mXmlFilepath, false, false);
-    QSharedPointer<XmlDomDocument> doc = file.parseFileAndBuildDomTree();
+    QSharedPointer<XmlDomDocument> doc = file.parseFileAndBuildDomTree(true);
     parseDomTree(doc->getRoot());
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -132,8 +132,10 @@ void LibraryBaseElement::parseDomTree(const XmlDomElement& root) throw (Exceptio
     mDomTreeParsed = true;
 }
 
-XmlDomElement* LibraryBaseElement::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* LibraryBaseElement::serializeToXmlDomElement(uint version) const throw (Exception)
 {
+    Q_UNUSED(version);
+
     bool valid = checkAttributesValidity();
     Q_ASSERT(valid == true);
     if (!valid) throw LogicError(__FILE__, __LINE__);

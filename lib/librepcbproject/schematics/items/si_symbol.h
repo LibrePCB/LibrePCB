@@ -91,7 +91,10 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
         // General Methods
         void addToSchematic(GraphicsScene& scene) throw (Exception);
         void removeFromSchematic(GraphicsScene& scene) throw (Exception);
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
+
 
         // Helper Methods
         Point mapToScene(const Point& relativePos) const noexcept;
@@ -125,7 +128,9 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
 
         // Private Methods
         void init(const QUuid& symbVarItemUuid) throw (Exception);
-        bool checkAttributesValidity() const noexcept;
+
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
 
 
         // General

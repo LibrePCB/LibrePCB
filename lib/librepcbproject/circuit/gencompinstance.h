@@ -127,7 +127,10 @@ class GenCompInstance : public QObject, public IF_AttributeProvider,
         void unregisterSymbol(const SI_Symbol& symbol) throw (Exception);
         void registerComponent(const ComponentInstance& component) throw (Exception);
         void unregisterComponent(const ComponentInstance& component) throw (Exception);
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
+
 
         // Helper Methods
         bool getAttributeValue(const QString& attrNS, const QString& attrKey,
@@ -149,7 +152,10 @@ class GenCompInstance : public QObject, public IF_AttributeProvider,
 
         // Private Methods
         void init() throw (Exception);
-        bool checkAttributesValidity() const noexcept;
+
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
+
         void updateErcMessages() noexcept;
 
 

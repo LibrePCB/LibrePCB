@@ -83,7 +83,9 @@ class GenCompSignal final : public IF_XmlSerializableObject
         void setDescription(const QString& locale, const QString& desc) noexcept {mDescriptions[locale] = desc;}
 
         // General Methods
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
 
 
     private:
@@ -93,7 +95,10 @@ class GenCompSignal final : public IF_XmlSerializableObject
         GenCompSignal& operator=(const GenCompSignal& rhs);
 
         // Private Methods
-        bool checkAttributesValidity() const noexcept;
+
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
+
 
         // Private Static Methods
         static SignalRole_t stringToSignalRole(const QString& role) throw (Exception);

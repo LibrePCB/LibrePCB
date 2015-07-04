@@ -63,12 +63,8 @@ class XmlDomDocument final
          * @param root              The root element which will be added to the document.
          *                          The document will take the ownership over the root
          *                          element object!
-         * @param setAppVersion     If true, this constructor will automatically add the
-         *                          applications major version number to the root element
-         *                          as attribute "version". You can also use
-         *                          #setFileVersion() instead.
          */
-        explicit XmlDomDocument(XmlDomElement& root, bool setAppVersion) noexcept;
+        explicit XmlDomDocument(XmlDomElement& root) noexcept;
 
         /**
          * @brief Constructor to create the whole DOM tree from the content of a XML file

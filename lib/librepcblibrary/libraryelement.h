@@ -70,8 +70,12 @@ class LibraryElement : public LibraryBaseElement
 
         // Protected Methods
         virtual void parseDomTree(const XmlDomElement& root) throw (Exception);
-        virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception);
-        virtual bool checkAttributesValidity() const noexcept;
+
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        virtual XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
+
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        virtual bool checkAttributesValidity() const noexcept override;
 
         // General Library Element Attributes
         QList<QUuid> mCategories;

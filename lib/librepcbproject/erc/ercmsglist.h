@@ -67,7 +67,7 @@ class ErcMsgList final : public QObject, public IF_XmlSerializableObject
         void remove(ErcMsg* ercMsg) noexcept;
         void update(ErcMsg* ercMsg) noexcept;
         void restoreIgnoreState() noexcept;
-        bool save(bool toOriginal, QStringList& errors) noexcept;
+        bool save(uint version, bool toOriginal, QStringList& errors) noexcept;
 
     signals:
 
@@ -85,15 +85,11 @@ class ErcMsgList final : public QObject, public IF_XmlSerializableObject
 
         // Private Methods
 
-        /**
-         * @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-         */
-        bool checkAttributesValidity() const noexcept;
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
 
-        /**
-         * @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-         */
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
 
 
         // General

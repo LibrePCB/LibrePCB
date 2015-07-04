@@ -139,7 +139,7 @@ void MainWindow::convertFile(ConvertFileType_t type, QSettings& outputSettings, 
     {
         // Check input file and read XML content
         SmartXmlFile file(filepath, false, true);
-        QSharedPointer<XmlDomDocument> doc = file.parseFileAndBuildDomTree();
+        QSharedPointer<XmlDomDocument> doc = file.parseFileAndBuildDomTree(true);
         XmlDomElement* node = doc->getRoot().getFirstChild("drawing/library", true, true);
 
         switch (type)
@@ -363,7 +363,8 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
 
         // save symbol to file
         symbol->saveToFile(FilePath(QString("%1/sym/%2/v%3.xml").arg(ui->output->text())
-                                    .arg(uuid.toString()).arg(APP_VERSION_MAJOR)));
+                           .arg(uuid.toString()).arg(APP_VERSION_MAJOR)),
+                           APP_VERSION_MAJOR);
         delete symbol;
     }
     catch (Exception& e)
@@ -648,14 +649,16 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
 
         // save footprint to file
         footprint->saveToFile(FilePath(QString("%1/fpt/%2/v%3.xml").arg(ui->output->text())
-                                      .arg(uuid.toString()).arg(APP_VERSION_MAJOR)));
+                              .arg(uuid.toString()).arg(APP_VERSION_MAJOR)),
+                              APP_VERSION_MAJOR);
 
         // create package
         QUuid pkgUuid = getOrCreateUuid(outputSettings, filepath, "packages_to_packages", name);
         Package* package = new Package(pkgUuid, Version("0.1"), "LibrePCB", name, desc);
         package->setFootprintUuid(footprint->getUuid());
         package->saveToFile(FilePath(QString("%1/pkg/%2/v%3.xml").arg(ui->output->text())
-                                     .arg(pkgUuid.toString()).arg(APP_VERSION_MAJOR)));
+                            .arg(pkgUuid.toString()).arg(APP_VERSION_MAJOR)),
+                            APP_VERSION_MAJOR);
 
         // clean up
         delete package;
@@ -780,13 +783,15 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
 
             // save component
             component->saveToFile(FilePath(QString("%1/cmp/%2/v%3.xml").arg(ui->output->text())
-                                           .arg(compUuid.toString()).arg(APP_VERSION_MAJOR)));
+                                  .arg(compUuid.toString()).arg(APP_VERSION_MAJOR)),
+                                  APP_VERSION_MAJOR);
             delete component;
         }
 
         // save generic component to file
         gencomp->saveToFile(FilePath(QString("%1/gencmp/%2/v%3.xml").arg(ui->output->text())
-                                     .arg(uuid.toString()).arg(APP_VERSION_MAJOR)));
+                            .arg(uuid.toString()).arg(APP_VERSION_MAJOR)),
+                            APP_VERSION_MAJOR);
         delete gencomp;
     }
     catch (Exception& e)

@@ -341,7 +341,7 @@ void GenCompInstance::unregisterComponent(const ComponentInstance& component) th
     updateErcMessages();
 }
 
-XmlDomElement* GenCompInstance::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* GenCompInstance::serializeToXmlDomElement(uint version) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -353,10 +353,10 @@ XmlDomElement* GenCompInstance::serializeToXmlDomElement() const throw (Exceptio
     root->appendTextChild("value", mValue);
     XmlDomElement* attributes = root->appendChild("attributes");
     foreach (GenCompAttributeInstance* attributeInstance, mAttributes)
-        attributes->appendChild(attributeInstance->serializeToXmlDomElement());
+        attributes->appendChild(attributeInstance->serializeToXmlDomElement(version));
     XmlDomElement* signalMapping = root->appendChild("signal_mapping");
     foreach (GenCompSignalInstance* signalInstance, mSignals)
-        signalMapping->appendChild(signalInstance->serializeToXmlDomElement());
+        signalMapping->appendChild(signalInstance->serializeToXmlDomElement(version));
     return root.take();
 }
 

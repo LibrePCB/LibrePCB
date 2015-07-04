@@ -71,7 +71,9 @@ class LibraryElementAttribute final : public IF_XmlSerializableObject
         const QMap<QString, QString>& getDefaultValues() const noexcept {return mDefaultValues;}
 
         // General Methods
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
 
 
     private:
@@ -82,7 +84,9 @@ class LibraryElementAttribute final : public IF_XmlSerializableObject
         LibraryElementAttribute& operator=(const LibraryElementAttribute& rhs);
 
         // Private Methods
-        bool checkAttributesValidity() const noexcept;
+
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
 
 
         // Attributes

@@ -103,7 +103,10 @@ class SI_NetPoint final : public SI_Base, public IF_XmlSerializableObject,
         void unregisterNetLine(SI_NetLine& netline) noexcept;
         void addToSchematic(GraphicsScene& scene) throw (Exception);
         void removeFromSchematic(GraphicsScene& scene) throw (Exception);
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
+
 
         // Inherited from SI_Base
         Type_t getType() const noexcept override {return SI_Base::Type_t::NetPoint;}
@@ -121,7 +124,9 @@ class SI_NetPoint final : public SI_Base, public IF_XmlSerializableObject,
 
         // Private Methods
         void init() throw (Exception);
-        bool checkAttributesValidity() const noexcept;
+
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
 
 
         // General

@@ -76,7 +76,10 @@ class SI_NetLabel final : public SI_Base, public IF_XmlSerializableObject
         void updateText() noexcept;
         void addToSchematic(GraphicsScene& scene) throw (Exception);
         void removeFromSchematic(GraphicsScene& scene) throw (Exception);
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
+
 
         // Inherited from SI_Base
         Type_t getType() const noexcept override {return SI_Base::Type_t::NetLabel;}
@@ -94,7 +97,9 @@ class SI_NetLabel final : public SI_Base, public IF_XmlSerializableObject
 
         // Private Methods
         void init() throw (Exception);
-        bool checkAttributesValidity() const noexcept;
+
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
 
 
         // General

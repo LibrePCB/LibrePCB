@@ -72,7 +72,9 @@ class SymbolEllipse final : public IF_XmlSerializableObject
         void setRotation(const Angle& rotation) noexcept {mRotation = rotation;}
 
         // General Methods
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
 
 
     private:
@@ -82,7 +84,9 @@ class SymbolEllipse final : public IF_XmlSerializableObject
         SymbolEllipse& operator=(const SymbolEllipse& rhs) = delete;
 
         // Private Methods
-        bool checkAttributesValidity() const noexcept;
+
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
 
 
         // Polygon Attributes

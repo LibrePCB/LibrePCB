@@ -127,7 +127,7 @@ class Board final : public QObject, public IF_AttributeProvider,
         // General Methods
         void addToProject() throw (Exception);
         void removeFromProject() throw (Exception);
-        bool save(bool toOriginal, QStringList& errors) noexcept;
+        bool save(uint version, bool toOriginal, QStringList& errors) noexcept;
         void showInView(GraphicsView& view) noexcept;
         void saveViewSceneRect(const QRectF& rect) noexcept {mViewRect = rect;}
         const QRectF& restoreViewSceneRect() const noexcept {return mViewRect;}
@@ -164,13 +164,13 @@ class Board final : public QObject, public IF_AttributeProvider,
                        bool readOnly, bool create, const QString& newName) throw (Exception);
         void updateIcon() noexcept;
 
-        bool checkAttributesValidity() const noexcept;
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
+
         void updateErcMessages() noexcept;
 
-        /**
-         * @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-         */
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
 
 
         // General

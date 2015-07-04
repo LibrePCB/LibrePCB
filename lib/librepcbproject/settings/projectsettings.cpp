@@ -57,7 +57,7 @@ ProjectSettings::ProjectSettings(Project& project, bool restore, bool readOnly, 
         else
         {
             mXmlFile = new SmartXmlFile(mXmlFilepath, restore, readOnly);
-            QSharedPointer<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
+            QSharedPointer<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree(true);
             XmlDomElement& root = doc->getRoot();
 
             // OK - XML file is open --> now load all settings
@@ -132,15 +132,14 @@ void ProjectSettings::triggerSettingsChanged() noexcept
     emit settingsChanged();
 }
 
-bool ProjectSettings::save(bool toOriginal, QStringList& errors) noexcept
+bool ProjectSettings::save(uint version, bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
 
     // Save "core/settings.xml"
     try
     {
-        XmlDomElement* root = serializeToXmlDomElement();
-        XmlDomDocument doc(*root, true);
+        XmlDomDocument doc(*serializeToXmlDomElement(version));
         mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)
@@ -174,8 +173,9 @@ bool ProjectSettings::checkAttributesValidity() const noexcept
     return true;
 }
 
-XmlDomElement* ProjectSettings::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* ProjectSettings::serializeToXmlDomElement(uint version) const throw (Exception)
 {
+    Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("settings"));

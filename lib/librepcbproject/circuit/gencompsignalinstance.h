@@ -99,7 +99,9 @@ class GenCompSignalInstance final : public QObject, public IF_ErcMsgProvider,
         void unregisterSymbolPin(SI_SymbolPin& pin) throw (Exception);
         void addToCircuit() throw (Exception);
         void removeFromCircuit() throw (Exception);
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
 
 
     private slots:
@@ -116,7 +118,9 @@ class GenCompSignalInstance final : public QObject, public IF_ErcMsgProvider,
 
         // Private Methods
         void init() throw (Exception);
-        bool checkAttributesValidity() const noexcept;
+
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
 
 
         // General

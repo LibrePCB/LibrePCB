@@ -29,12 +29,10 @@
  *  Constructors / Destructor
  ****************************************************************************************/
 
-XmlDomDocument::XmlDomDocument(XmlDomElement& root, bool setAppVersion) noexcept :
+XmlDomDocument::XmlDomDocument(XmlDomElement& root) noexcept :
     mFilePath(), mRootElement(&root)
 {
     mRootElement->setDocument(this);
-    if (setAppVersion)
-        mRootElement->setAttribute<uint>("version", /*APP_VERSION_MAJOR*/ 0);
 }
 
 XmlDomDocument::XmlDomDocument(const QByteArray& xmlFileContent, const FilePath& filepath) throw (Exception) :
