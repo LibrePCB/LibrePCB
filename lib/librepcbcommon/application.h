@@ -26,6 +26,7 @@
 
 #include <QtCore>
 #include <QApplication>
+#include "version.h"
 
 /*****************************************************************************************
  *  Class Application
@@ -50,6 +51,10 @@ class Application final : public QApplication
 
         // Reimplemented from QApplication
         bool notify(QObject* receiver, QEvent* e);
+
+        // Static Methods
+        static void setApplicationVersion(const Version& version) noexcept;
+        static Version applicationVersion() noexcept;
 
 
     private:

@@ -44,8 +44,8 @@ ControlPanel::ControlPanel(Workspace& workspace) :
 {
     mUi->setupUi(this);
 
-    setWindowTitle(QString(tr("Control Panel - LibrePCB %1 - %2"))
-        .arg(QCoreApplication::applicationVersion()).arg(mWorkspace.getPath().toNative()));
+    setWindowTitle(QString(tr("Control Panel - LibrePCB %1"))
+                   .arg(Application::applicationVersion().toStr()));
     mUi->statusBar->addWidget(new QLabel(QString(tr("Workspace: %1"))
         .arg(mWorkspace.getPath().toNative())));
 

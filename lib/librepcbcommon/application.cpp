@@ -56,5 +56,21 @@ bool Application::notify(QObject* receiver, QEvent* e)
 }
 
 /*****************************************************************************************
+ *  Static Methods
+ ****************************************************************************************/
+
+void Application::setApplicationVersion(const Version& version) noexcept
+{
+    QApplication::setApplicationVersion(version.toStr());
+}
+
+Version Application::applicationVersion() noexcept
+{
+    Version version(QApplication::applicationVersion());
+    Q_ASSERT(version.isValid());
+    return version;
+}
+
+/*****************************************************************************************
  *  End of File
  ****************************************************************************************/
