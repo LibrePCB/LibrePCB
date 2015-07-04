@@ -71,6 +71,9 @@ class SGI_NetLine final : public SGI_Base
         SGI_NetLine(const SGI_NetLine& other) = delete;
         SGI_NetLine& operator=(const SGI_NetLine& rhs) = delete;
 
+        // Private Methods
+        SchematicLayer* getSchematicLayer(uint id) const noexcept;
+
         // Attributes
         SI_NetLine& mNetLine;
         SchematicLayer* mLayer;

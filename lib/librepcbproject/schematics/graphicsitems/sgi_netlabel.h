@@ -70,10 +70,12 @@ class SGI_NetLabel final : public SGI_Base
         SGI_NetLabel(const SGI_NetLabel& other) = delete;
         SGI_NetLabel& operator=(const SGI_NetLabel& rhs) = delete;
 
+        // Private Methods
+        SchematicLayer* getSchematicLayer(uint id) const noexcept;
+
+
         // Attributes
         SI_NetLabel& mNetLabel;
-        SchematicLayer* mOriginCrossLayer;
-        SchematicLayer* mTextLayer;
 
         // Cached Attributes
         QStaticText mStaticText;

@@ -185,6 +185,12 @@ class BoardLayer final : public QObject
 
             // TODO: keepout, restrict, ...
 
+#ifdef QT_DEBUG
+            // IDs 900-999: debug layers (for developers)
+            DEBUG_GraphicsItemsBoundingRect         = 900,
+            DEBUG_GraphicsItemsTextsBoundingRect    = 901,
+#endif
+
             // Begin of User defined Layers
             UserDefinedBaseId   = 1000
         };
@@ -197,6 +203,7 @@ class BoardLayer final : public QObject
         uint getId() const {return mId;}
         const QString& getName() const {return mName;}
         const QColor& getColor(bool highlighted = false) const;
+        bool isVisible() const noexcept {return mIsVisible;}
 
 
     private:
@@ -212,6 +219,7 @@ class BoardLayer final : public QObject
         QString mName;
         QColor mColor;
         QColor mColorHighlighted;
+        bool mIsVisible;
 };
 
 /*****************************************************************************************

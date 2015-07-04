@@ -64,8 +64,18 @@ class SchematicLayer final : public QObject
             Nets                = 30,
             Busses              = 31,
 
+#ifdef QT_DEBUG
+            // IDs 900-999: debug layers (for developers)
+            DEBUG_GraphicsItemsBoundingRect         = 900,
+            DEBUG_GraphicsItemsTextsBoundingRect    = 901,
+            DEBUG_SymbolPinNetSignalNames           = 902,
+            DEBUG_NetLinesNetSignalNames            = 903,
+            DEBUG_InvisibleNetPoints                = 904,
+            DEBUG_GenCompSymbolsCount               = 905,
+#endif
+
             // Begin of User defined Layers
-            UserDefinedBaseId   = 100
+            UserDefinedBaseId   = 1000
         };
 
         // Constructors / Destructor
@@ -76,9 +86,7 @@ class SchematicLayer final : public QObject
         uint getId() const {return mId;}
         const QString& getName() const {return mName;}
         const QColor& getColor(bool highlighted = false) const;
-
-        // Static Methods
-        static QList<LayerID> getAllLayerIDs() noexcept;
+        bool isVisible() const noexcept {return mIsVisible;}
 
 
     private:
@@ -93,6 +101,7 @@ class SchematicLayer final : public QObject
         QString mName;
         QColor mColor;
         QColor mColorHighlighted;
+        bool mIsVisible;
 };
 
 /*****************************************************************************************

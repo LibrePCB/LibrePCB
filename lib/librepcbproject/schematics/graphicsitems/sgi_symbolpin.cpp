@@ -33,8 +33,6 @@
 #include "../../circuit/gencompinstance.h"
 #include "../../circuit/gencompsignalinstance.h"
 #include <librepcbcommon/schematiclayer.h>
-#include <librepcbworkspace/workspace.h>
-#include <librepcbworkspace/settings/workspacesettings.h>
 #include <librepcblibrary/sym/symbolpin.h>
 #include <librepcblibrary/gencmp/genericcomponent.h>
 #include "../../settings/projectsettings.h"
@@ -49,15 +47,8 @@ SGI_SymbolPin::SGI_SymbolPin(SI_SymbolPin& pin) noexcept :
     SGI_Base(), mPin(pin), mLibPin(pin.getLibPin())
 {
     setZValue(Schematic::ZValue_Symbols);
-    QStringList localeOrder = mPin.getSymbol().getSchematic().getProject().getSettings().getLocaleOrder(true);
+    QStringList localeOrder = mPin.getSymbol().getSchematic().getProject().getSettings().getLocaleOrder();
     setToolTip(mLibPin.getName(localeOrder) % ": " % mLibPin.getDescription(localeOrder));
-
-    mCircleLayer = getSchematicLayer(SchematicLayer::SymbolPinCircles);
-    Q_ASSERT(mCircleLayer);
-    mLineLayer = getSchematicLayer(SchematicLayer::SymbolOutlines);
-    Q_ASSERT(mLineLayer);
-    mTextLayer = getSchematicLayer(SchematicLayer::SymbolPinNames);
-    Q_ASSERT(mTextLayer);
 
     mStaticText.setTextFormat(Qt::PlainText);
     mStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
@@ -131,26 +122,32 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     bool requiredPin = mPin.getGenCompSignal()->isRequired();
 
     // draw line
-    painter->setPen(QPen(mLineLayer->getColor(mPin.isSelected()), Length(158750).toPx(), Qt::SolidLine, Qt::RoundCap));
-    painter->drawLine(QPointF(0, 0), Point(0, mLibPin.getLength()).toPxQPointF());
+    SchematicLayer* layer = getSchematicLayer(SchematicLayer::SymbolOutlines); Q_ASSERT(layer);
+    if (layer->isVisible())
+    {
+        painter->setPen(QPen(layer->getColor(mPin.isSelected()), Length(158750).toPx(), Qt::SolidLine, Qt::RoundCap));
+        painter->drawLine(QPointF(0, 0), Point(0, mLibPin.getLength()).toPxQPointF());
+    }
 
     // draw circle
-    if ((!deviceIsPrinter) && (!netsignal))
+    layer = getSchematicLayer(SchematicLayer::SymbolPinCircles); Q_ASSERT(layer);
+    if ((layer->isVisible()) && (!deviceIsPrinter) && (!netsignal))
     {
-        painter->setPen(QPen(mCircleLayer->getColor(requiredPin), 0));
+        painter->setPen(QPen(layer->getColor(requiredPin), 0));
         painter->setBrush(Qt::NoBrush);
         painter->drawEllipse(QPointF(0, 0), mRadiusPx, mRadiusPx);
     }
 
     // draw text or filled rect
-    if (!mStaticText.text().isEmpty())
+    layer = getSchematicLayer(SchematicLayer::SymbolPinNames); Q_ASSERT(layer);
+    if ((layer->isVisible()) && (!mStaticText.text().isEmpty()))
     {
         if ((deviceIsPrinter) || (lod > 1))
         {
             // draw text
             painter->save();
             painter->rotate(mRotate180 ? 90 : -90);
-            painter->setPen(QPen(mTextLayer->getColor(mPin.isSelected()), 0));
+            painter->setPen(QPen(layer->getColor(mPin.isSelected()), 0));
             painter->setFont(mFont);
             painter->drawStaticText(mTextOrigin, mStaticText);
             painter->restore();
@@ -159,13 +156,14 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
         {
             // draw filled rect
             painter->setPen(Qt::NoPen);
-            painter->setBrush(QBrush(mTextLayer->getColor(mPin.isSelected()), Qt::Dense5Pattern));
+            painter->setBrush(QBrush(layer->getColor(mPin.isSelected()), Qt::Dense5Pattern));
             painter->drawRect(mTextBoundingRect);
         }
     }
 
 #ifdef QT_DEBUG
-    if ((netsignal) && (mPin.getWorkspace().getSettings().getDebugTools()->getShowSymbolPinNetsignals()))
+    layer = getSchematicLayer(SchematicLayer::LayerID::DEBUG_SymbolPinNetSignalNames); Q_ASSERT(layer);
+    if ((layer->isVisible()) && (netsignal))
     {
         // draw net signal name
         QFont font;
@@ -174,23 +172,25 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
         font.setFamily("Monospace");
         font.setPixelSize(3);
         painter->setFont(font);
-        painter->setPen(QPen(mCircleLayer->getColor(requiredPin), 0));
+        painter->setPen(QPen(layer->getColor(mPin.isSelected()), 0));
         painter->save();
         painter->rotate(mRotate180 ? 90 : -90);
         painter->drawText(QRectF(), Qt::AlignHCenter | Qt::AlignBottom | Qt::TextSingleLine | Qt::TextDontClip, netsignal->getName());
         painter->restore();
     }
-    if (mPin.getWorkspace().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect())
+    layer = getSchematicLayer(SchematicLayer::LayerID::DEBUG_GraphicsItemsBoundingRect); Q_ASSERT(layer);
+    if (layer->isVisible())
     {
         // draw bounding rect
-        painter->setPen(QPen(Qt::red, 0));
+        painter->setPen(QPen(layer->getColor(mPin.isSelected()), 0));
         painter->setBrush(Qt::NoBrush);
         painter->drawRect(mBoundingRect);
     }
-    if (mPin.getWorkspace().getSettings().getDebugTools()->getShowGraphicsItemsTextBoundingRect())
+    layer = getSchematicLayer(SchematicLayer::LayerID::DEBUG_GraphicsItemsTextsBoundingRect); Q_ASSERT(layer);
+    if (layer->isVisible())
     {
         // draw text bounding rect
-        painter->setPen(QPen(Qt::magenta, 0));
+        painter->setPen(QPen(layer->getColor(mPin.isSelected()), 0));
         painter->setBrush(Qt::NoBrush);
         painter->drawRect(mTextBoundingRect);
     }

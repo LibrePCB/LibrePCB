@@ -70,6 +70,9 @@ class SGI_NetPoint final : public SGI_Base
         SGI_NetPoint(const SGI_NetPoint& other) = delete;
         SGI_NetPoint& operator=(const SGI_NetPoint& rhs) = delete;
 
+        // Private Methods
+        SchematicLayer* getSchematicLayer(uint id) const noexcept;
+
 
         // General Attributes
         SI_NetPoint& mNetPoint;

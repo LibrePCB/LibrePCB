@@ -31,8 +31,6 @@
 #include "../../project.h"
 #include "../../circuit/netsignal.h"
 #include <librepcbcommon/schematiclayer.h>
-#include <librepcbworkspace/workspace.h>
-#include <librepcbworkspace/settings/workspacesettings.h>
 
 namespace project {
 
@@ -45,7 +43,7 @@ SGI_NetLine::SGI_NetLine(SI_NetLine& netline) noexcept :
 {
     setZValue(Schematic::ZValue_NetLines);
 
-    mLayer = mNetLine.getSchematic().getProject().getSchematicLayer(SchematicLayer::Nets);
+    mLayer = getSchematicLayer(SchematicLayer::Nets);
     Q_ASSERT(mLayer);
 
     updateCacheAndRepaint();
@@ -88,13 +86,16 @@ void SGI_NetLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* optio
     Q_UNUSED(widget);
 
     // draw line
-    QPen pen(mLayer->getColor(mNetLine.isSelected()), mNetLine.getWidth().toPx(), Qt::SolidLine, Qt::RoundCap);
-    painter->setPen(pen);
-    painter->drawLine(mLineF);
+    if (mLayer->isVisible())
+    {
+        QPen pen(mLayer->getColor(mNetLine.isSelected()), mNetLine.getWidth().toPx(), Qt::SolidLine, Qt::RoundCap);
+        painter->setPen(pen);
+        painter->drawLine(mLineF);
+    }
 
 #ifdef QT_DEBUG
-    bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
-    if ((!deviceIsPrinter) && (mNetLine.getWorkspace().getSettings().getDebugTools()->getShowSchematicNetlinesNetsignals()))
+    SchematicLayer* layer = getSchematicLayer(SchematicLayer::LayerID::DEBUG_NetLinesNetSignalNames); Q_ASSERT(layer);
+    if (layer->isVisible())
     {
         // draw net signal name
         QFont font;
@@ -103,17 +104,27 @@ void SGI_NetLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* optio
         font.setFamily("Monospace");
         font.setPixelSize(3);
         painter->setFont(font);
-        painter->setPen(QPen(mLayer->getColor(mNetLine.isSelected()), 0));
+        painter->setPen(QPen(layer->getColor(mNetLine.isSelected()), 0));
         painter->drawText(mLineF.pointAt((qreal)0.5), mNetLine.getNetSignal()->getName());
     }
-    if ((!deviceIsPrinter) && (mNetLine.getWorkspace().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect()))
+    layer = getSchematicLayer(SchematicLayer::LayerID::DEBUG_GraphicsItemsBoundingRect); Q_ASSERT(layer);
+    if (layer->isVisible())
     {
         // draw bounding rect
-        painter->setPen(QPen(Qt::red, 0));
+        painter->setPen(QPen(layer->getColor(mNetLine.isSelected()), 0));
         painter->setBrush(Qt::NoBrush);
         painter->drawRect(mBoundingRect);
     }
 #endif
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+SchematicLayer* SGI_NetLine::getSchematicLayer(uint id) const noexcept
+{
+    return mNetLine.getSchematic().getProject().getSchematicLayer(id);
 }
 
 /*****************************************************************************************

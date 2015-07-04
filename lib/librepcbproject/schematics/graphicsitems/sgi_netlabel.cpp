@@ -30,8 +30,6 @@
 #include "../../project.h"
 #include "../../circuit/netsignal.h"
 #include <librepcbcommon/schematiclayer.h>
-#include <librepcbworkspace/workspace.h>
-#include <librepcbworkspace/settings/workspacesettings.h>
 
 namespace project {
 
@@ -42,14 +40,9 @@ QVector<QLineF> SGI_NetLabel::sOriginCrossLines;
  ****************************************************************************************/
 
 SGI_NetLabel::SGI_NetLabel(SI_NetLabel& netlabel) noexcept :
-    SGI_Base(), mNetLabel(netlabel), mOriginCrossLayer(nullptr), mTextLayer(nullptr)
+    SGI_Base(), mNetLabel(netlabel)
 {
     setZValue(Schematic::ZValue_NetLabels);
-
-    mOriginCrossLayer = mNetLabel.getSchematic().getProject().getSchematicLayer(SchematicLayer::OriginCrosses);
-    Q_ASSERT(mOriginCrossLayer);
-    mTextLayer = mNetLabel.getSchematic().getProject().getSchematicLayer(SchematicLayer::NetLabels);
-    Q_ASSERT(mTextLayer);
 
     mStaticText.setTextFormat(Qt::PlainText);
     mStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
@@ -107,17 +100,19 @@ void SGI_NetLabel::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
     const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
 
-    if ((lod > 2) && (!deviceIsPrinter))
+    SchematicLayer* layer = getSchematicLayer(SchematicLayer::OriginCrosses); Q_ASSERT(layer);
+    if ((layer->isVisible()) && (lod > 2) && (!deviceIsPrinter))
     {
         // draw origin cross
-        painter->setPen(QPen(mOriginCrossLayer->getColor(mNetLabel.isSelected()), 0));
+        painter->setPen(QPen(layer->getColor(mNetLabel.isSelected()), 0));
         painter->drawLines(sOriginCrossLines);
     }
 
-    if ((deviceIsPrinter) || (lod > 1))
+    layer = getSchematicLayer(SchematicLayer::NetLabels); Q_ASSERT(layer);
+    if ((layer->isVisible()) && ((deviceIsPrinter) || (lod > 1)))
     {
         // draw text
-        painter->setPen(QPen(mTextLayer->getColor(mNetLabel.isSelected()), 0));
+        painter->setPen(QPen(layer->getColor(mNetLabel.isSelected()), 0));
         painter->setFont(mFont);
         if (mRotate180)
         {
@@ -133,26 +128,37 @@ void SGI_NetLabel::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     {
         // draw filled rect
         painter->setPen(Qt::NoPen);
-        painter->setBrush(QBrush(mTextLayer->getColor(mNetLabel.isSelected()), Qt::Dense5Pattern));
+        painter->setBrush(QBrush(layer->getColor(mNetLabel.isSelected()), Qt::Dense5Pattern));
         painter->drawRect(mBoundingRect);
     }
 
 #ifdef QT_DEBUG
-    if (mNetLabel.getWorkspace().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect())
+    layer = getSchematicLayer(SchematicLayer::LayerID::DEBUG_GraphicsItemsBoundingRect); Q_ASSERT(layer);
+    if (layer->isVisible())
     {
         // draw bounding rect
-        painter->setPen(QPen(Qt::red, 0));
+        painter->setPen(QPen(layer->getColor(mNetLabel.isSelected()), 0));
         painter->setBrush(Qt::NoBrush);
         painter->drawRect(mBoundingRect);
     }
-    if (mNetLabel.getWorkspace().getSettings().getDebugTools()->getShowGraphicsItemsTextBoundingRect())
+    layer = getSchematicLayer(SchematicLayer::LayerID::DEBUG_GraphicsItemsTextsBoundingRect); Q_ASSERT(layer);
+    if (layer->isVisible())
     {
         // draw text bounding rect
-        painter->setPen(QPen(Qt::magenta, 0));
+        painter->setPen(QPen(layer->getColor(mNetLabel.isSelected()), 0));
         painter->setBrush(Qt::NoBrush);
         painter->drawRect(QRectF(mTextOrigin, mStaticText.size()));
     }
 #endif
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+SchematicLayer* SGI_NetLabel::getSchematicLayer(uint id) const noexcept
+{
+    return mNetLabel.getSchematic().getProject().getSchematicLayer(id);
 }
 
 /*****************************************************************************************

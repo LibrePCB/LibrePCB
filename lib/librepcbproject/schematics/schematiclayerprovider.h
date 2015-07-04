@@ -17,87 +17,68 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SGI_SYMBOLPIN_H
-#define PROJECT_SGI_SYMBOLPIN_H
+#ifndef PROJECT_SCHEMATICLAYERPROVIDER_H
+#define PROJECT_SCHEMATICLAYERPROVIDER_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QtWidgets>
-#include "sgi_base.h"
+#include <librepcbcommon/if_schematiclayerprovider.h>
+#include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
-class SchematicLayer;
-
 namespace project {
-class SI_SymbolPin;
-}
-
-namespace library {
-class SymbolPin;
+class Project;
 }
 
 /*****************************************************************************************
- *  Class SGI_SymbolPin
+ *  Class SchematicLayerProvider
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The SGI_SymbolPin class
- *
- * @author ubruhin
- * @date 2014-08-23
+ * @brief The SchematicLayerProvider class provides and manages all available schematic
+ *        layers which are used in the project#SchematicEditor class
  */
-class SGI_SymbolPin final : public SGI_Base
+class SchematicLayerProvider final : public IF_SchematicLayerProvider
 {
     public:
 
         // Constructors / Destructor
-        explicit SGI_SymbolPin(SI_SymbolPin& pin) noexcept;
-        ~SGI_SymbolPin() noexcept;
+        explicit SchematicLayerProvider(Project& project) throw (Exception);
+        ~SchematicLayerProvider() noexcept;
 
-        // General Methods
-        void updateCacheAndRepaint() noexcept;
+        // Getters
+        Project& getProject() const noexcept {return mProject;}
 
-        // Inherited from QGraphicsItem
-        QRectF boundingRect() const noexcept {return mBoundingRect;}
-        QPainterPath shape() const noexcept {return mShape;}
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
+        /**
+         * @copydoc IF_SchematicLayerProvider#getSchematicLayer()
+         */
+        SchematicLayer* getSchematicLayer(uint id) const noexcept {return mLayers.value(id, nullptr);}
 
 
     private:
 
         // make some methods inaccessible...
-        SGI_SymbolPin() = delete;
-        SGI_SymbolPin(const SGI_SymbolPin& other) = delete;
-        SGI_SymbolPin& operator=(const SGI_SymbolPin& rhs) = delete;
+        SchematicLayerProvider() = delete;
+        SchematicLayerProvider(const SchematicLayerProvider& other) = delete;
+        SchematicLayerProvider& operator=(const SchematicLayerProvider& rhs) = delete;
 
         // Private Methods
-        SchematicLayer* getSchematicLayer(uint id) const noexcept;
+        void addLayer(uint id) noexcept;
 
 
-        // General Attributes
-        SI_SymbolPin& mPin;
-        const library::SymbolPin& mLibPin;
-        QFont mFont;
-        qreal mRadiusPx;
-
-        // Cached Attributes
-        QStaticText mStaticText;
-        bool mRotate180;
-        int mFlags;
-        QRectF mBoundingRect;
-        QPointF mTextOrigin;
-        QRectF mTextBoundingRect;
-        QPainterPath mShape;
+        // General
+        Project& mProject; ///< A reference to the Project object (from the ctor)
+        QMap<uint, SchematicLayer*> mLayers;
 };
 
 } // namespace project
 
-#endif // PROJECT_SGI_SYMBOLPIN_H
+#endif // PROJECT_SCHEMATICLAYERPROVIDER_H

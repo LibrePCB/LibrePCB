@@ -29,8 +29,6 @@
 #include "../schematic.h"
 #include "../../project.h"
 #include <librepcbcommon/schematiclayer.h>
-#include <librepcbworkspace/workspace.h>
-#include <librepcbworkspace/settings/workspacesettings.h>
 
 namespace project {
 
@@ -45,7 +43,7 @@ SGI_NetPoint::SGI_NetPoint(SI_NetPoint& netpoint) noexcept :
 {
     setZValue(Schematic::ZValue_VisibleNetPoints);
 
-    mLayer = mNetPoint.getSchematic().getProject().getSchematicLayer(SchematicLayer::Nets);
+    mLayer = getSchematicLayer(SchematicLayer::Nets);
     Q_ASSERT(mLayer);
 
     if (sBoundingRect.isNull())
@@ -82,7 +80,7 @@ void SGI_NetPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
-    if (mPointVisible)
+    if (mLayer->isVisible() && mPointVisible)
     {
         painter->setPen(Qt::NoPen);
         painter->setBrush(QBrush(mLayer->getColor(mNetPoint.isSelected()), Qt::SolidPattern));
@@ -90,21 +88,32 @@ void SGI_NetPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     }
 
 #ifdef QT_DEBUG
-    if ((!mPointVisible) && mNetPoint.getWorkspace().getSettings().getDebugTools()->getShowAllSchematicNetpoints())
+    SchematicLayer* layer = getSchematicLayer(SchematicLayer::LayerID::DEBUG_InvisibleNetPoints); Q_ASSERT(layer);
+    if ((layer->isVisible()) && (!mPointVisible))
     {
         // draw circle
-        painter->setPen(QPen(Qt::red, 0));
+        painter->setPen(QPen(layer->getColor(mNetPoint.isSelected()), 0));
         painter->setBrush(Qt::NoBrush);
         painter->drawEllipse(sBoundingRect);
     }
-    if (mNetPoint.getWorkspace().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect())
+    layer = getSchematicLayer(SchematicLayer::LayerID::DEBUG_GraphicsItemsBoundingRect); Q_ASSERT(layer);
+    if (layer->isVisible())
     {
         // draw bounding rect
-        painter->setPen(QPen(Qt::red, 0));
+        painter->setPen(QPen(layer->getColor(mNetPoint.isSelected()), 0));
         painter->setBrush(Qt::NoBrush);
         painter->drawRect(sBoundingRect);
     }
 #endif
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+SchematicLayer* SGI_NetPoint::getSchematicLayer(uint id) const noexcept
+{
+    return mNetPoint.getSchematic().getProject().getSchematicLayer(id);
 }
 
 /*****************************************************************************************

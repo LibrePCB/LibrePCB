@@ -30,7 +30,7 @@
  ****************************************************************************************/
 
 BoardLayer::BoardLayer(uint id) :
-    QObject(0), mId(id)
+    QObject(0), mId(id), mName(), mColor(), mColorHighlighted(), mIsVisible(false)
 {
     switch (mId)
     {
@@ -38,108 +38,142 @@ BoardLayer::BoardLayer(uint id) :
             mName = tr("Grid");
             mColor = Qt::white;                 // background
             mColorHighlighted = Qt::lightGray;  // lines
+            mIsVisible = true;
             break;
 
         case OriginCrosses:
             mName = tr("Origin Crosses");
             mColor = QColor(0, 0, 0, 50);
             mColorHighlighted = QColor(0, 0, 0, 80);
+            mIsVisible = true;
             break;
 
         case Unrouted:
             mName = tr("Unrouted");
             mColor = Qt::darkYellow;
             mColorHighlighted = Qt::yellow;
+            mIsVisible = true;
             break;
 
         case FootprintGrabAreas:
             mName = tr("Footprint Grab Areas");
             mColor = QColor(255, 255, 0, 30);
             mColorHighlighted = QColor(255, 255, 0, 50);
+            mIsVisible = true;
             break;
 
         case BoardOutline:
             mName = tr("Board Outline");
             mColor = Qt::lightGray;
             mColorHighlighted = Qt::white;
+            mIsVisible = true;
             break;
 
         case Drills:
             mName = tr("Drills");
             mColor = Qt::lightGray;
             mColorHighlighted = Qt::white;
+            mIsVisible = true;
             break;
 
         case Vias:
             mName = tr("Vias");
             mColor = Qt::darkGreen;
             mColorHighlighted = Qt::green;
+            mIsVisible = true;
             break;
 
         case TopDeviceOutlines:
             mName = tr("TopDeviceOutlines");
             mColor = Qt::gray;
             mColorHighlighted = Qt::lightGray;
+            mIsVisible = true;
             break;
 
         case TopOverlayNames:
             mName = tr("TopOverlayNames");
             mColor = Qt::gray;
             mColorHighlighted = Qt::lightGray;
+            mIsVisible = true;
             break;
 
         case TopOverlayValues:
             mName = tr("TopOverlayValues");
             mColor = Qt::gray;
             mColorHighlighted = Qt::lightGray;
+            mIsVisible = true;
             break;
 
         case TopOverlay:
             mName = tr("TopOverlay");
             mColor = Qt::gray;
             mColorHighlighted = Qt::lightGray;
+            mIsVisible = true;
             break;
 
         case TopCopper:
             mName = tr("TopCopper");
             mColor = Qt::darkRed;
             mColorHighlighted = Qt::red;
+            mIsVisible = true;
             break;
 
         case BottomDeviceOutlines:
             mName = tr("BottomDeviceOutlines");
             mColor = Qt::gray;
             mColorHighlighted = Qt::lightGray;
+            mIsVisible = true;
             break;
 
         case BottomOverlayNames:
             mName = tr("BottomOverlayNames");
             mColor = Qt::gray;
             mColorHighlighted = Qt::lightGray;
+            mIsVisible = true;
             break;
 
         case BottomOverlayValues:
             mName = tr("BottomOverlayValues");
             mColor = Qt::gray;
             mColorHighlighted = Qt::lightGray;
+            mIsVisible = true;
             break;
 
         case BottomOverlay:
             mName = tr("BottomOverlay");
             mColor = Qt::gray;
             mColorHighlighted = Qt::lightGray;
+            mIsVisible = true;
             break;
 
         case BottomCopper:
             mName = tr("BottomCopper");
             mColor = Qt::darkBlue;
             mColorHighlighted = Qt::blue;
+            mIsVisible = true;
             break;
+
+#ifdef QT_DEBUG
+        case DEBUG_GraphicsItemsBoundingRect:
+            mName = tr("DEBUG_GraphicsItemsBoundingRect");
+            mColor = Qt::darkRed;
+            mColorHighlighted = Qt::red;
+            mIsVisible = false;
+            break;
+
+        case DEBUG_GraphicsItemsTextsBoundingRect:
+            mName = tr("DEBUG_GraphicsItemsTextsBoundingRect");
+            mColor = Qt::darkRed;
+            mColorHighlighted = Qt::red;
+            mIsVisible = false;
+            break;
+#endif
 
         default:
             mName = tr("TODO");
             mColor = Qt::darkRed;
             mColorHighlighted = Qt::red;
+            mIsVisible = true;
             break;
 
         /*default:

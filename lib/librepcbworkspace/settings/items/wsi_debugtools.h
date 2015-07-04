@@ -43,14 +43,6 @@ class WSI_DebugTools final : public WSI_Base
         explicit WSI_DebugTools(WorkspaceSettings& settings);
         ~WSI_DebugTools();
 
-        // Getters
-        bool getShowAllSchematicNetpoints() const noexcept {return mCbxShowAllSchematicNetpoints->isChecked();}
-        bool getShowSchematicNetlinesNetsignals() const noexcept {return mCbxShowSchematicNetlinesNetsignals->isChecked();}
-        bool getShowSymbolPinNetsignals() const noexcept {return mCbxShowSymbolPinNetsignals->isChecked();}
-        bool getShowGenCompSymbolCount() const noexcept {return mCbxShowGenCompSymbolCount->isChecked();}
-        bool getShowGraphicsItemsBoundingRect() const noexcept {return mCbxShowGraphicsItemsBoundingRect->isChecked();}
-        bool getShowGraphicsItemsTextBoundingRect() const noexcept {return mCbxShowGraphicsItemsTextBoundingRect->isChecked();}
-
         // Getters: Widgets
         QWidget* getWidget() const {return mWidget;}
 
@@ -70,12 +62,6 @@ class WSI_DebugTools final : public WSI_Base
 
         // Widgets
         QWidget* mWidget;
-        QCheckBox* mCbxShowAllSchematicNetpoints;
-        QCheckBox* mCbxShowSchematicNetlinesNetsignals;
-        QCheckBox* mCbxShowSymbolPinNetsignals;
-        QCheckBox* mCbxShowGenCompSymbolCount;
-        QCheckBox* mCbxShowGraphicsItemsBoundingRect;
-        QCheckBox* mCbxShowGraphicsItemsTextBoundingRect;
 };
 
 #endif // WSI_DEBUGTOOLS_H

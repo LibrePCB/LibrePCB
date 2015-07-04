@@ -45,6 +45,7 @@
 #include "boards/board.h"
 #include "boards/boardeditor.h"
 #include "boards/boardlayerprovider.h"
+#include "schematics/schematiclayerprovider.h"
 
 namespace project {
 
@@ -59,7 +60,7 @@ Project::Project(Workspace& workspace, const FilePath& filepath, bool create) th
     mDescriptionHtmlFile(nullptr), mProjectIsModified(false),
     mUndoStack(nullptr), mProjectSettings(nullptr), mProjectLibrary(nullptr),
     mErcMsgList(nullptr), mCircuit(nullptr), mSchematicEditor(nullptr),
-    mBoardLayerProvider(nullptr), mBoardEditor(nullptr)
+    mSchematicLayerProvider(nullptr), mBoardLayerProvider(nullptr), mBoardEditor(nullptr)
 {
     qDebug() << (create ? "create project..." : "open project...");
 
@@ -206,8 +207,7 @@ Project::Project(Workspace& workspace, const FilePath& filepath, bool create) th
         mCircuit = new Circuit(*this, mIsRestored, mIsReadOnly, create);
 
         // Load all schematic layers
-        foreach (uint id, SchematicLayer::getAllLayerIDs())
-            mSchematicLayers.insert(id, new SchematicLayer(id));
+        mSchematicLayerProvider = new SchematicLayerProvider(*this);
 
         // Load all schematics
         if (create)
@@ -267,13 +267,13 @@ Project::Project(Workspace& workspace, const FilePath& filepath, bool create) th
     {
         // free the allocated memory in the reverse order of their allocation...
         delete mBoardEditor;            mBoardEditor = nullptr;
-        delete mBoardLayerProvider;     mBoardLayerProvider = nullptr;
         delete mSchematicEditor;        mSchematicEditor = nullptr;
         foreach (Board* board, mBoards)
             try { removeBoard(board, true); } catch (...) {}
         foreach (Schematic* schematic, mSchematics)
             try { removeSchematic(schematic, true); } catch (...) {}
-        qDeleteAll(mSchematicLayers);   mSchematicLayers.clear();
+        delete mBoardLayerProvider;     mBoardLayerProvider = nullptr;
+        delete mSchematicLayerProvider; mSchematicLayerProvider = nullptr;
         delete mCircuit;                mCircuit = nullptr;
         delete mErcMsgList;             mErcMsgList = nullptr;
         delete mUndoStack;              mUndoStack = nullptr;
@@ -318,7 +318,6 @@ Project::~Project() noexcept
     // free the allocated memory in the reverse order of their allocation
 
     delete mBoardEditor;            mBoardEditor = nullptr;
-    delete mBoardLayerProvider;     mBoardLayerProvider = nullptr;
     delete mSchematicEditor;        mSchematicEditor = nullptr;
 
     // delete all boards and schematics (and catch all throwed exceptions)
@@ -329,7 +328,8 @@ Project::~Project() noexcept
         try { removeSchematic(schematic, true); } catch (...) {}
     qDeleteAll(mRemovedSchematics); mRemovedSchematics.clear();
 
-    qDeleteAll(mSchematicLayers);   mSchematicLayers.clear();
+    delete mBoardLayerProvider;     mBoardLayerProvider = nullptr;
+    delete mSchematicLayerProvider; mSchematicLayerProvider = nullptr;
     delete mCircuit;                mCircuit = nullptr;
     delete mErcMsgList;             mErcMsgList = nullptr;
     delete mUndoStack;              mUndoStack = nullptr;
@@ -385,6 +385,11 @@ void Project::setLastModified(const QDateTime& newLastModified) noexcept
 /*****************************************************************************************
  *  Schematic Methods
  ****************************************************************************************/
+
+SchematicLayer* Project::getSchematicLayer(uint id) const noexcept
+{
+    return mSchematicLayerProvider->getSchematicLayer(id);
+}
 
 int Project::getSchematicIndex(const Schematic* schematic) const noexcept
 {

@@ -93,10 +93,6 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
 
         // all OK, let's load the workspace stuff!
 
-        // Load all schematic layers
-        foreach (unsigned int id, SchematicLayer::getAllLayerIDs())
-            mSchematicLayers.insert(id, new SchematicLayer(id));
-
         mWorkspaceSettings = new WorkspaceSettings(*this);
         mRecentProjectsModel = new RecentProjectsModel(*this);
         mFavoriteProjectsModel = new FavoriteProjectsModel(*this);
@@ -111,7 +107,6 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
         delete mFavoriteProjectsModel;  mFavoriteProjectsModel = 0;
         delete mRecentProjectsModel;    mRecentProjectsModel = 0;
         delete mWorkspaceSettings;      mWorkspaceSettings = 0;
-        qDeleteAll(mSchematicLayers);   mSchematicLayers.clear();
         throw;
     }
 
@@ -133,7 +128,6 @@ Workspace::~Workspace()
     delete mFavoriteProjectsModel;  mFavoriteProjectsModel = 0;
     delete mRecentProjectsModel;    mRecentProjectsModel = 0;
     delete mWorkspaceSettings;      mWorkspaceSettings = 0;
-    qDeleteAll(mSchematicLayers);   mSchematicLayers.clear();
 }
 
 /*****************************************************************************************

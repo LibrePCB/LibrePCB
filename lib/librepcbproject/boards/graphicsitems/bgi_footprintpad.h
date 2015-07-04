@@ -85,7 +85,6 @@ class BGI_FootprintPad final : public BGI_Base
         // General Attributes
         BI_FootprintPad& mPad;
         const library::FootprintPad& mLibPad;
-        //BoardLayer* mTextLayer;
         QFont mFont;
 
         // Cached Attributes

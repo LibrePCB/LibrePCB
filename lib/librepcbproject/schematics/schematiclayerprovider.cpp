@@ -22,8 +22,8 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <librepcbcommon/boardlayer.h>
-#include "boardlayerprovider.h"
+#include <librepcbcommon/schematiclayer.h>
+#include "schematiclayerprovider.h"
 
 namespace project {
 
@@ -31,35 +31,32 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-BoardLayerProvider::BoardLayerProvider(Project& project) throw (Exception):
+SchematicLayerProvider::SchematicLayerProvider(Project& project) throw (Exception):
     mProject(project)
 {
     // add all required layers
-    addLayer(BoardLayer::LayerID::Grid);
-    addLayer(BoardLayer::LayerID::OriginCrosses);
-    addLayer(BoardLayer::LayerID::Unrouted);
-    addLayer(BoardLayer::LayerID::BoardOutline);
-    addLayer(BoardLayer::LayerID::Drills);
-    addLayer(BoardLayer::LayerID::Vias);
-    addLayer(BoardLayer::LayerID::TopDeviceOutlines);
-    addLayer(BoardLayer::LayerID::TopOverlayNames);
-    addLayer(BoardLayer::LayerID::TopOverlayValues);
-    addLayer(BoardLayer::LayerID::TopOverlay);
-    addLayer(BoardLayer::LayerID::TopStopMask);
-    addLayer(BoardLayer::LayerID::TopCopper);
-    addLayer(BoardLayer::LayerID::BottomCopper);
-    addLayer(BoardLayer::LayerID::BottomStopMask);
-    addLayer(BoardLayer::LayerID::BottomOverlay);
-    addLayer(BoardLayer::LayerID::BottomOverlayValues);
-    addLayer(BoardLayer::LayerID::BottomOverlayNames);
-    addLayer(BoardLayer::LayerID::BottomDeviceOutlines);
+    addLayer(SchematicLayer::LayerID::Grid);
+    addLayer(SchematicLayer::LayerID::OriginCrosses);
+    addLayer(SchematicLayer::LayerID::SymbolOutlines);
+    addLayer(SchematicLayer::LayerID::SymbolGrabAreas);
+    addLayer(SchematicLayer::LayerID::SymbolPinCircles);
+    addLayer(SchematicLayer::LayerID::SymbolPinNames);
+    addLayer(SchematicLayer::LayerID::ComponentNames);
+    addLayer(SchematicLayer::LayerID::ComponentValues);
+    addLayer(SchematicLayer::LayerID::NetLabels);
+    addLayer(SchematicLayer::LayerID::Nets);
+    addLayer(SchematicLayer::LayerID::Busses);
 #ifdef QT_DEBUG
-    addLayer(BoardLayer::DEBUG_GraphicsItemsBoundingRect);
-    addLayer(BoardLayer::DEBUG_GraphicsItemsTextsBoundingRect);
+    addLayer(SchematicLayer::LayerID::DEBUG_GraphicsItemsBoundingRect);
+    addLayer(SchematicLayer::LayerID::DEBUG_GraphicsItemsTextsBoundingRect);
+    addLayer(SchematicLayer::LayerID::DEBUG_SymbolPinNetSignalNames);
+    addLayer(SchematicLayer::LayerID::DEBUG_NetLinesNetSignalNames);
+    addLayer(SchematicLayer::LayerID::DEBUG_InvisibleNetPoints);
+    addLayer(SchematicLayer::LayerID::DEBUG_GenCompSymbolsCount);
 #endif
 }
 
-BoardLayerProvider::~BoardLayerProvider() noexcept
+SchematicLayerProvider::~SchematicLayerProvider() noexcept
 {
     qDeleteAll(mLayers);        mLayers.clear();
 }
@@ -68,9 +65,9 @@ BoardLayerProvider::~BoardLayerProvider() noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void BoardLayerProvider::addLayer(uint id) noexcept
+void SchematicLayerProvider::addLayer(uint id) noexcept
 {
-    mLayers.insert(id, new BoardLayer(id));
+    mLayers.insert(id, new SchematicLayer(id));
 }
 
 /*****************************************************************************************

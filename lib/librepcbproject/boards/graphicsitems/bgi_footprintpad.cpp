@@ -30,8 +30,6 @@
 #include "../board.h"
 #include "../../project.h"
 #include <librepcbcommon/boardlayer.h>
-#include <librepcbworkspace/workspace.h>
-#include <librepcbworkspace/settings/workspacesettings.h>
 #include <librepcblibrary/fpt/footprintpad.h>
 #include "../../settings/projectsettings.h"
 #include "../componentinstance.h"
@@ -46,8 +44,8 @@ BGI_FootprintPad::BGI_FootprintPad(BI_FootprintPad& pad) noexcept :
     BGI_Base(), mPad(pad), mLibPad(pad.getLibPad())
 {
     setZValue(Board::ZValue_FootprintsBottom);
-    //QStringList localeOrder = mPin.getSymbol().getSchematic().getProject().getSettings().getLocaleOrder(true);
-    //setToolTip(mLibPin.getName(localeOrder) % ": " % mLibPin.getDescription(localeOrder));
+    QStringList localeOrder = mPad.getProject().getSettings().getLocaleOrder();
+    setToolTip(mLibPad.getName(localeOrder) % ": " % mLibPad.getDescription(localeOrder));
 
     mStaticText.setTextFormat(Qt::PlainText);
     mStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
@@ -120,59 +118,57 @@ void BGI_FootprintPad::paint(QPainter* painter, const QStyleOptionGraphicsItem* 
         layer = getBoardLayer(BoardLayer::LayerID::TopCopper);
     else
         layer = getBoardLayer(BoardLayer::LayerID::Vias);
+    Q_ASSERT(layer);
 
-    painter->setPen(QPen(layer->getColor(mPad.isSelected()), 0));
-    painter->setBrush(layer->getColor(mPad.isSelected()));
-
-    QRectF rect = QRectF(-mLibPad.getWidth().toPx()/2, -mLibPad.getHeight().toPx()/2,
-                         mLibPad.getWidth().toPx(), mLibPad.getHeight().toPx());
-    switch (mLibPad.getType())
+    if (layer->isVisible())
     {
-        case library::FootprintPad::Type_t::ThtRect:
-        case library::FootprintPad::Type_t::SmdRect:
-            painter->drawRect(rect);
-            break;
-        case library::FootprintPad::Type_t::ThtOctagon:
+        painter->setPen(QPen(layer->getColor(mPad.isSelected()), 0));
+        painter->setBrush(layer->getColor(mPad.isSelected()));
+
+        QRectF rect = QRectF(-mLibPad.getWidth().toPx()/2, -mLibPad.getHeight().toPx()/2,
+                             mLibPad.getWidth().toPx(), mLibPad.getHeight().toPx());
+        switch (mLibPad.getType())
         {
-            qreal rx = mLibPad.getWidth().toPx()/2;
-            qreal ry = mLibPad.getHeight().toPx()/2;
-            qreal a = qMin(rx, ry) * (2 - qSqrt(2));
-            QPolygonF octagon;
-            octagon.append(QPointF(rx, ry-a));
-            octagon.append(QPointF(rx-a, ry));
-            octagon.append(QPointF(a-rx, ry));
-            octagon.append(QPointF(-rx, ry-a));
-            octagon.append(QPointF(-rx, a-ry));
-            octagon.append(QPointF(a-rx, -ry));
-            octagon.append(QPointF(rx-a, -ry));
-            octagon.append(QPointF(rx, a-ry));
-            painter->drawPolygon(octagon);
-            break;
+            case library::FootprintPad::Type_t::ThtRect:
+            case library::FootprintPad::Type_t::SmdRect:
+                painter->drawRect(rect);
+                break;
+            case library::FootprintPad::Type_t::ThtOctagon:
+            {
+                qreal rx = mLibPad.getWidth().toPx()/2;
+                qreal ry = mLibPad.getHeight().toPx()/2;
+                qreal a = qMin(rx, ry) * (2 - qSqrt(2));
+                QPolygonF octagon;
+                octagon.append(QPointF(rx, ry-a));
+                octagon.append(QPointF(rx-a, ry));
+                octagon.append(QPointF(a-rx, ry));
+                octagon.append(QPointF(-rx, ry-a));
+                octagon.append(QPointF(-rx, a-ry));
+                octagon.append(QPointF(a-rx, -ry));
+                octagon.append(QPointF(rx-a, -ry));
+                octagon.append(QPointF(rx, a-ry));
+                painter->drawPolygon(octagon);
+                break;
+            }
+            case library::FootprintPad::Type_t::ThtRound:
+            {
+                qreal radius = qMin(mLibPad.getWidth().toPx(), mLibPad.getHeight().toPx())/2;
+                painter->drawRoundedRect(rect, radius, radius);
+                break;
+            }
+            default: Q_ASSERT(false); break;
         }
-        case library::FootprintPad::Type_t::ThtRound:
-        {
-            qreal radius = qMin(mLibPad.getWidth().toPx(), mLibPad.getHeight().toPx())/2;
-            painter->drawRoundedRect(rect, radius, radius);
-            break;
-        }
-        default: Q_ASSERT(false); break;
     }
 
 #ifdef QT_DEBUG
-    if (mPad.getWorkspace().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect())
+    layer = getBoardLayer(BoardLayer::LayerID::DEBUG_GraphicsItemsBoundingRect); Q_ASSERT(layer);
+    if (layer->isVisible())
     {
         // draw bounding rect
-        painter->setPen(QPen(Qt::red, 0));
+        painter->setPen(QPen(layer->getColor(mPad.isSelected()), 0));
         painter->setBrush(Qt::NoBrush);
         painter->drawRect(mBoundingRect);
     }
-    /*if (mPad.getWorkspace().getSettings().getDebugTools()->getShowGraphicsItemsTextBoundingRect())
-    {
-        // draw text bounding rect
-        painter->setPen(QPen(Qt::magenta, 0));
-        painter->setBrush(Qt::NoBrush);
-        painter->drawRect(mTextBoundingRect);
-    }*/
 #endif
 }
 

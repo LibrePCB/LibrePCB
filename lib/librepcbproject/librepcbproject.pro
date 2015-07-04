@@ -85,7 +85,8 @@ SOURCES += \
     erc/ercmsglist.cpp \
     cmd/cmdprojectsetmetadata.cpp \
     settings/projectsettings.cpp \
-    settings/cmd/cmdprojectsettingschange.cpp
+    settings/cmd/cmdprojectsettingschange.cpp \
+    schematics/schematiclayerprovider.cpp
 
 HEADERS += \
     project.h \
@@ -153,6 +154,7 @@ HEADERS += \
     erc/if_ercmsgprovider.h \
     cmd/cmdprojectsetmetadata.h \
     settings/projectsettings.h \
-    settings/cmd/cmdprojectsettingschange.h
+    settings/cmd/cmdprojectsettingschange.h \
+    schematics/schematiclayerprovider.h
 
 FORMS +=

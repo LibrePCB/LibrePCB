@@ -30,7 +30,7 @@
  ****************************************************************************************/
 
 SchematicLayer::SchematicLayer(uint id) :
-    QObject(0), mId(id)
+    QObject(0), mId(id), mName(), mColor(), mColorHighlighted(), mIsVisible(false)
 {
     switch (mId)
     {
@@ -38,67 +38,122 @@ SchematicLayer::SchematicLayer(uint id) :
             mName = tr("Grid");
             mColor = Qt::white;                 // background
             mColorHighlighted = Qt::lightGray;  // lines
+            mIsVisible = true;
             break;
 
         case OriginCrosses:
             mName = tr("Origin Crosses");
             mColor = QColor(0, 0, 0, 50);
             mColorHighlighted = QColor(0, 0, 0, 80);
+            mIsVisible = true;
             break;
 
         case SymbolOutlines:
             mName = tr("Symbol Outlines");
             mColor = Qt::darkRed;
             mColorHighlighted = Qt::red;
+            mIsVisible = true;
             break;
 
         case SymbolGrabAreas:
             mName = tr("Symbol Grab Areas");
             mColor = QColor(255, 255, 0, 30);
             mColorHighlighted = QColor(255, 255, 0, 50);
+            mIsVisible = true;
             break;
 
         case SymbolPinCircles:
             mName = tr("Symbol Pin Circles");
             mColor = Qt::green;             // optional pin
             mColorHighlighted = Qt::red;    // required pin
+            mIsVisible = true;
             break;
 
         case SymbolPinNames:
             mName = tr("Symbol Pin Names");
             mColor = QColor(64, 64, 64, 255);
             mColorHighlighted = Qt::gray;
+            mIsVisible = true;
             break;
 
         case ComponentNames:
             mName = tr("Component Names");
             mColor = QColor(32, 32, 32, 255);
             mColorHighlighted = Qt::darkGray;
+            mIsVisible = true;
             break;
 
         case ComponentValues:
             mName = tr("Component Values");
             mColor = QColor(80, 80, 80, 255);
             mColorHighlighted = Qt::gray;
+            mIsVisible = true;
             break;
 
         case NetLabels:
             mName = tr("Net Labels");
             mColor = Qt::darkGreen;
             mColorHighlighted = Qt::green;
+            mIsVisible = true;
             break;
 
         case Nets:
             mName = tr("Nets");
             mColor = Qt::darkGreen;
             mColorHighlighted = Qt::green;
+            mIsVisible = true;
             break;
 
         case Busses:
             mName = tr("Busses");
             mColor = Qt::darkBlue;
             mColorHighlighted = Qt::blue;
+            mIsVisible = true;
             break;
+
+#ifdef QT_DEBUG
+        case DEBUG_GraphicsItemsBoundingRect:
+            mName = tr("DEBUG_GraphicsItemsBoundingRect");
+            mColor = Qt::darkRed;
+            mColorHighlighted = Qt::red;
+            mIsVisible = false;
+            break;
+
+        case DEBUG_GraphicsItemsTextsBoundingRect:
+            mName = tr("DEBUG_GraphicsItemsTextsBoundingRect");
+            mColor = Qt::darkRed;
+            mColorHighlighted = Qt::red;
+            mIsVisible = false;
+            break;
+
+        case DEBUG_SymbolPinNetSignalNames:
+            mName = tr("DEBUG_SymbolPinNetSignalNames");
+            mColor = Qt::darkRed;
+            mColorHighlighted = Qt::red;
+            mIsVisible = false;
+            break;
+
+        case DEBUG_NetLinesNetSignalNames:
+            mName = tr("DEBUG_NetLinesNetSignalNames");
+            mColor = Qt::darkRed;
+            mColorHighlighted = Qt::red;
+            mIsVisible = false;
+            break;
+
+        case DEBUG_InvisibleNetPoints:
+            mName = tr("DEBUG_InvisibleNetPoints");
+            mColor = Qt::darkRed;
+            mColorHighlighted = Qt::red;
+            mIsVisible = false;
+            break;
+
+        case DEBUG_GenCompSymbolsCount:
+            mName = tr("DEBUG_GenCompSymbolsCount");
+            mColor = Qt::darkRed;
+            mColorHighlighted = Qt::red;
+            mIsVisible = false;
+            break;
+#endif
 
         default:
             if (mId >= UserDefinedBaseId)
@@ -124,22 +179,6 @@ SchematicLayer::~SchematicLayer()
 const QColor& SchematicLayer::getColor(bool highlighted) const
 {
     return highlighted ? mColorHighlighted : mColor;
-}
-
-/*****************************************************************************************
- *  Static Methods
- ****************************************************************************************/
-
-QList<SchematicLayer::LayerID> SchematicLayer::getAllLayerIDs() noexcept
-{
-    QList<LayerID> IDs;
-    IDs << SchematicLayer::Grid
-        << SchematicLayer::OriginCrosses    << SchematicLayer::SymbolOutlines
-        << SchematicLayer::SymbolPinCircles << SchematicLayer::SymbolPinNames
-        << SchematicLayer::ComponentNames   << SchematicLayer::ComponentValues
-        << SchematicLayer::Nets             << SchematicLayer::Busses
-        << SchematicLayer::SymbolGrabAreas  << SchematicLayer::NetLabels;
-    return IDs;
 }
 
 /*****************************************************************************************

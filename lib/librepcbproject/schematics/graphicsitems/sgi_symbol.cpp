@@ -30,8 +30,6 @@
 #include "../../project.h"
 #include "../../circuit/gencompinstance.h"
 #include <librepcbcommon/schematiclayer.h>
-#include <librepcbworkspace/workspace.h>
-#include <librepcbworkspace/settings/workspacesettings.h>
 #include <librepcblibrary/sym/symbol.h>
 #include <librepcblibrary/gencmp/genericcomponent.h>
 
@@ -153,6 +151,7 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
     {
         // set colors
         layer = getSchematicLayer(polygon->getLayerId());
+        if (!layer) {if (!layer->isVisible()) layer = nullptr;}
         if (layer)
             painter->setPen(QPen(layer->getColor(selected), polygon->getWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
         else
@@ -163,6 +162,7 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
             layer = getSchematicLayer(SchematicLayer::LayerID::SymbolGrabAreas);
         else
             layer = nullptr;
+        if (layer) {if (!layer->isVisible()) layer = nullptr;}
         painter->setBrush(layer ? QBrush(layer->getColor(selected), Qt::SolidPattern) : Qt::NoBrush);
 
         // draw polygon
@@ -173,7 +173,8 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
     foreach (const library::SymbolEllipse* ellipse, mLibSymbol.getEllipses())
     {
         // set colors
-        layer = getSchematicLayer(ellipse->getLayerId()); if (!layer) continue;
+        layer = getSchematicLayer(ellipse->getLayerId());
+        if (layer) {if (!layer->isVisible()) layer = nullptr;}
         if (layer)
             painter->setPen(QPen(layer->getColor(selected), ellipse->getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
         else
@@ -184,6 +185,7 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
             layer = getSchematicLayer(SchematicLayer::LayerID::SymbolGrabAreas);
         else
             layer = nullptr;
+        if (layer) {if (!layer->isVisible()) layer = nullptr;}
         painter->setBrush(layer ? QBrush(layer->getColor(selected), Qt::SolidPattern) : Qt::NoBrush);
 
         // draw ellipse
@@ -196,7 +198,9 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
     foreach (const library::SymbolText* text, mLibSymbol.getTexts())
     {
         // get layer
-        layer = getSchematicLayer(text->getLayerId()); if (!layer) continue;
+        layer = getSchematicLayer(text->getLayerId());
+        if (!layer) continue;
+        if (!layer->isVisible()) continue;
 
         // get cached text properties
         const CachedTextProperties_t& props = mCachedTextProperties.value(text);
@@ -222,13 +226,14 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
             painter->fillRect(props.textRect, QBrush(layer->getColor(selected), Qt::Dense5Pattern));
         }
 #ifdef QT_DEBUG
-    if (mSymbol.getWorkspace().getSettings().getDebugTools()->getShowGraphicsItemsTextBoundingRect())
-    {
-        // draw text bounding rect
-        painter->setPen(QPen(Qt::magenta, 0));
-        painter->setBrush(Qt::NoBrush);
-        painter->drawRect(props.textRect);
-    }
+        layer = getSchematicLayer(SchematicLayer::LayerID::DEBUG_GraphicsItemsTextsBoundingRect); Q_ASSERT(layer);
+        if (layer->isVisible())
+        {
+            // draw text bounding rect
+            painter->setPen(QPen(layer->getColor(selected), 0));
+            painter->setBrush(Qt::NoBrush);
+            painter->drawRect(props.textRect);
+        }
 #endif
         painter->restore();
     }
@@ -236,8 +241,8 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
     // draw origin cross
     if (!deviceIsPrinter)
     {
-        layer = getSchematicLayer(SchematicLayer::OriginCrosses);
-        if (layer)
+        layer = getSchematicLayer(SchematicLayer::OriginCrosses); Q_ASSERT(layer);
+        if (layer->isVisible())
         {
             qreal width = Length(700000).toPx();
             painter->setPen(QPen(layer->getColor(selected), 0));
@@ -247,25 +252,23 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
     }
 
 #ifdef QT_DEBUG
-    if (mSymbol.getWorkspace().getSettings().getDebugTools()->getShowGenCompSymbolCount())
+    layer = getSchematicLayer(SchematicLayer::LayerID::DEBUG_GenCompSymbolsCount); Q_ASSERT(layer);
+    if (layer->isVisible())
     {
         // show symbols count of the generic component
-        layer = getSchematicLayer(SchematicLayer::Busses);
-        if (layer)
-        {
-            uint count = mSymbol.getGenCompInstance().getPlacedSymbolsCount();
-            uint maxCount = mSymbol.getGenCompInstance().getSymbolVariant().getItems().count();
-            mFont.setPixelSize(Length(1000000).toPx());
-            painter->setFont(mFont);
-            painter->setPen(QPen(layer->getColor(selected), 0, Qt::SolidLine, Qt::RoundCap));
-            painter->drawText(QRectF(), Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextSingleLine | Qt::TextDontClip,
-                              QString("[%1/%2]").arg(count).arg(maxCount));
-        }
+        uint count = mSymbol.getGenCompInstance().getPlacedSymbolsCount();
+        uint maxCount = mSymbol.getGenCompInstance().getSymbolVariant().getItems().count();
+        mFont.setPixelSize(Length(1000000).toPx());
+        painter->setFont(mFont);
+        painter->setPen(QPen(layer->getColor(selected), 0, Qt::SolidLine, Qt::RoundCap));
+        painter->drawText(QRectF(), Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextSingleLine | Qt::TextDontClip,
+                          QString("[%1/%2]").arg(count).arg(maxCount));
     }
-    if (mSymbol.getWorkspace().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect())
+    layer = getSchematicLayer(SchematicLayer::LayerID::DEBUG_GraphicsItemsBoundingRect); Q_ASSERT(layer);
+    if (layer->isVisible())
     {
         // draw bounding rect
-        painter->setPen(QPen(Qt::red, 0));
+        painter->setPen(QPen(layer->getColor(selected), 0));
         painter->setBrush(Qt::NoBrush);
         painter->drawRect(mBoundingRect);
     }

@@ -28,8 +28,6 @@
 #include "../items/bi_footprint.h"
 #include "../board.h"
 #include "../../project.h"
-#include <librepcbworkspace/workspace.h>
-#include <librepcbworkspace/settings/workspacesettings.h>
 #include <librepcblibrary/fpt/footprint.h>
 #include <librepcbcommon/boardlayer.h>
 #include "../componentinstance.h"
@@ -152,6 +150,7 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     {
         // set colors
         layer = getBoardLayer(polygon->getLayerId());
+        if (layer) {if (!layer->isVisible()) layer = nullptr;}
         if (layer)
             painter->setPen(QPen(layer->getColor(selected), polygon->getWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
         else
@@ -162,6 +161,7 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
             layer = getBoardLayer(BoardLayer::LayerID::FootprintGrabAreas);
         else
             layer = nullptr;
+        if (layer) {if (!layer->isVisible()) layer = nullptr;}
         painter->setBrush(layer ? QBrush(layer->getColor(selected), Qt::SolidPattern) : Qt::NoBrush);
 
         // draw polygon
@@ -172,7 +172,8 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     foreach (const library::FootprintEllipse* ellipse, mLibFootprint.getEllipses())
     {
         // set colors
-        layer = getBoardLayer(ellipse->getLayerId()); if (!layer) continue;
+        layer = getBoardLayer(ellipse->getLayerId());
+        if (layer) {if (!layer->isVisible()) layer = nullptr;}
         if (layer)
             painter->setPen(QPen(layer->getColor(selected), ellipse->getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
         else
@@ -183,6 +184,7 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
             layer = getBoardLayer(BoardLayer::LayerID::FootprintGrabAreas);
         else
             layer = nullptr;
+        if (layer) {if (!layer->isVisible()) layer = nullptr;}
         painter->setBrush(layer ? QBrush(layer->getColor(selected), Qt::SolidPattern) : Qt::NoBrush);
 
         // draw ellipse
@@ -195,7 +197,9 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     foreach (const library::FootprintText* text, mLibFootprint.getTexts())
     {
         // get layer
-        layer = getBoardLayer(text->getLayerId()); if (!layer) continue;
+        layer = getBoardLayer(text->getLayerId());
+        if (!layer) continue;
+        if (!layer->isVisible()) continue;
 
         // get cached text properties
         const CachedTextProperties_t& props = mCachedTextProperties.value(text);
@@ -221,13 +225,14 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
             painter->fillRect(props.textRect, QBrush(layer->getColor(selected), Qt::Dense5Pattern));
         }
 #ifdef QT_DEBUG
-    if (mFootprint.getWorkspace().getSettings().getDebugTools()->getShowGraphicsItemsTextBoundingRect())
-    {
-        // draw text bounding rect
-        painter->setPen(QPen(Qt::magenta, 0));
-        painter->setBrush(Qt::NoBrush);
-        painter->drawRect(props.textRect);
-    }
+        layer = getBoardLayer(BoardLayer::LayerID::DEBUG_GraphicsItemsTextsBoundingRect); Q_ASSERT(layer);
+        if (layer->isVisible())
+        {
+            // draw text bounding rect
+            painter->setPen(QPen(layer->getColor(selected), 0));
+            painter->setBrush(Qt::NoBrush);
+            painter->drawRect(props.textRect);
+        }
 #endif
         painter->restore();
     }
@@ -246,10 +251,11 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     }
 
 #ifdef QT_DEBUG
-    if (mFootprint.getWorkspace().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect())
+    layer = getBoardLayer(BoardLayer::LayerID::DEBUG_GraphicsItemsBoundingRect); Q_ASSERT(layer);
+    if (layer->isVisible())
     {
         // draw bounding rect
-        painter->setPen(QPen(Qt::red, 0));
+        painter->setPen(QPen(layer->getColor(selected), 0));
         painter->setBrush(Qt::NoBrush);
         painter->drawRect(mBoundingRect);
     }

@@ -50,6 +50,7 @@ class ProjectLibrary;
 class Circuit;
 class SchematicEditor;
 class Schematic;
+class SchematicLayerProvider;
 class ErcMsgList;
 class BoardEditor;
 class Board;
@@ -263,21 +264,9 @@ class Project final : public QObject, public IF_AttributeProvider,
         // Schematic Methods
 
         /**
-         * @brief Get all Schematic Layers
-         *
-         * @return A reference to the QHash with all schematic layers
+         * @copydoc IF_SchematicLayerProvider#getSchematicLayer()
          */
-        const QHash<uint, SchematicLayer*>& getSchematicLayers() const noexcept {return mSchematicLayers;}
-
-        /**
-         * @brief Get a Schematic Layer with a specific ID
-         *
-         * @param id    The ID of the layer
-         *
-         * @return  A pointer to the SchematicLayer object, or nullptr if there is no layer
-         *          with the specified ID
-         */
-        SchematicLayer* getSchematicLayer(uint id) const noexcept {return mSchematicLayers.value(id, nullptr);}
+        SchematicLayer* getSchematicLayer(uint id) const noexcept;
 
         /**
          * @brief Get the page index of a specific schematic
@@ -654,7 +643,7 @@ class Project final : public QObject, public IF_AttributeProvider,
         QList<Schematic*> mSchematics; ///< All schematics of this project
         QList<Schematic*> mRemovedSchematics; ///< All removed schematics of this project
         SchematicEditor* mSchematicEditor; ///< The schematic editor (GUI)
-        QHash<uint, SchematicLayer*> mSchematicLayers; ///< All schematic layers of this project
+        SchematicLayerProvider* mSchematicLayerProvider; ///< All schematic layers of this project
         BoardLayerProvider* mBoardLayerProvider; ///< All board layers of this project
         QList<Board*> mBoards; ///< All boards of this project
         QList<Board*> mRemovedBoards; ///< All removed boards of this project
