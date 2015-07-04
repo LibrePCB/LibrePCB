@@ -91,6 +91,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          * @brief The constructor to open an existing project with all its content
          *
          * @param filepath      The filepath to the an existing *.lpp project file
+         * @param readOnly      It true, the project will be opened in read-only mode
          *
          * @throw Exception     If the project could not be opened successfully
          */
@@ -436,6 +437,7 @@ class Project final : public QObject, public IF_AttributeProvider,
         /**
          * @brief Save the whole project to the harddisc
          *
+         * @param version       The version of the files which will be created/overwritten
          * @param toOriginal    If false, the project is saved only to temporary files
          *
          * @note The whole save procedere is described in @ref doc_project_save.
@@ -510,6 +512,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          * @param filepath      The filepath to the new or existing *.lpp project file
          * @param create        True if the specified project does not exist already and
          *                      must be created.
+         * @param readOnly      If true, the project will be opened in read-only mode
          *
          * @throw Exception     If the project could not be created/opened successfully
          */
@@ -526,6 +529,7 @@ class Project final : public QObject, public IF_AttributeProvider,
         /**
          * @brief Save the project to the harddisc (to temporary or original files)
          *
+         * @param version       The version of the files which will be created/overwritten
          * @param toOriginal    True: save to original files; False: save to temporary files
          * @param errors        All errors will be added to this string list (translated)
          *

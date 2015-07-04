@@ -178,6 +178,9 @@ class ProjectEditor final : public QObject
          *          yourself afterwards! In special cases, the deleteLater() mechanism
          *          could lead in fatal errors otherwise!
          *
+         * @param askForSave    If true and there are unsaved changes, this method shows
+         *                      a message box to ask whether the project should be saved
+         *                      or not. If false, the project will NOT be saved.
          * @param msgBoxParent  Here you can specify a parent window for the message box
          *
          * @return true on success (project closed), false on failure (project stays open)

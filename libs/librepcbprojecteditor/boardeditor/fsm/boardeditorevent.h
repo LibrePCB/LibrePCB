@@ -126,7 +126,7 @@ class BEE_RedirectedQEvent final : public BEE_Base
 
         /**
          * @brief Helper method to get the QEvent from a pointer to BEE_Base
-         * @param see  A BEE_Base pointer to a BEE_RedirectedQEvent object
+         * @param bee  A BEE_Base pointer to a BEE_RedirectedQEvent object
          * @return @li the pointer to the QEvent (if "see" was a pointer to a
          *             BEE_RedirectedQEvent object)
          *         @li nullptr otherwise
