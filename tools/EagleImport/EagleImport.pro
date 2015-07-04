@@ -29,11 +29,11 @@ LIBS += \
     -llibrepcbcommon       # Another order could end up in "undefined reference" errors!
 
 INCLUDEPATH += \
-    ../../lib
+    ../../libs
 
 DEPENDPATH += \
-    ../../lib/librepcblibrary \
-    ../../lib/librepcbcommon
+    ../../libs/librepcblibrary \
+    ../../libs/librepcbcommon
 
 PRE_TARGETDEPS += \
     $${DESTDIR}/liblibrepcblibrary.a \

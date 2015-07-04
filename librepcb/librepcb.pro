@@ -57,15 +57,15 @@ LIBS += \
     -llibrepcbcommon
 
 INCLUDEPATH += \
-    ../lib
+    ../libs
 
 DEPENDPATH += \
-    ../lib/librepcbprojecteditor \
-    ../lib/librepcblibraryeditor \
-    ../lib/librepcbworkspace \
-    ../lib/librepcbproject \
-    ../lib/librepcblibrary \
-    ../lib/librepcbcommon
+    ../libs/librepcbprojecteditor \
+    ../libs/librepcblibraryeditor \
+    ../libs/librepcbworkspace \
+    ../libs/librepcbproject \
+    ../libs/librepcblibrary \
+    ../libs/librepcbcommon
 
 PRE_TARGETDEPS += \
     $${DESTDIR}/liblibrepcbprojecteditor.a \

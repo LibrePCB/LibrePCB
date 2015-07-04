@@ -3,7 +3,7 @@ CONFIG += ordered
 SUBDIRS = \
     librepcbcommon \
     librepcblibrary \
-    librepcblibraryeditor \
     librepcbproject \
-    librepcbprojecteditor \
-    librepcbworkspace
+    librepcbworkspace \
+    librepcblibraryeditor \
+    librepcbprojecteditor

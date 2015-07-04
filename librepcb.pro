@@ -2,7 +2,7 @@ TEMPLATE = subdirs
 CONFIG += ordered
 SUBDIRS = \
     3rdparty \
-    lib \
+    libs \
     librepcb \
     tools \
     tests

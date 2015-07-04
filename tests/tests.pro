@@ -28,11 +28,11 @@ LIBS += \
 INCLUDEPATH += \
     ../3rdparty/gmock/gtest/include \
     ../3rdparty/gmock/include \
-    ../lib
+    ../libs
 
 DEPENDPATH += \
-    ../lib/librepcblibrary \
-    ../lib/librepcbcommon
+    ../libs/librepcblibrary \
+    ../libs/librepcbcommon
 
 PRE_TARGETDEPS += \
     $${DESTDIR}/libgmock.a \
