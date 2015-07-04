@@ -34,7 +34,7 @@
  * @brief The Version class represents a version number in the format "1.42.7"
  *
  * The count of numbers (between the dots) is variable, the minimum is one number (and no
- * dots). Each #Version instance can either be valid or invalid.
+ * dots). Each #Version instance can either be valid or invalid (see #isValid()).
  *
  * @author ubruhin
  * @date 2014-10-30
@@ -93,9 +93,9 @@ class Version final
         /**
          * @brief Get the version as a string in the format "1.2.3"
          *
-         * @return The version as a string
+         * @return The version as a string (empty string = invalid version)
          */
-        const QString& toStr() const noexcept {return mVersionStr;}
+        QString toStr() const noexcept;
 
 
         // Setters
@@ -116,9 +116,6 @@ class Version final
         //@{
         /**
          * @brief Operator overloadings
-         *
-         * @warning Do not use these operator overloadings for invalid objects!
-         *          If you do it anyway, these methods will always return false.
          *
          * @param rhs   The other object to compare
          *
@@ -151,11 +148,6 @@ class Version final
 
 
         // Attributes
-
-        /**
-         * @brief The whole version as a string in the format "1.2.3"
-         */
-        QString mVersionStr;
 
         /**
          * @brief List of all version numbers of the whole version

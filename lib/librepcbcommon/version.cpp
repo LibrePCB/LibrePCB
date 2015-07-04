@@ -38,7 +38,7 @@ Version::Version(const QString& version) noexcept
 }
 
 Version::Version(const Version& other) noexcept :
-    mVersionStr(other.mVersionStr), mNumbers(other.mNumbers)
+    mNumbers(other.mNumbers)
 {
 
 }
@@ -48,14 +48,28 @@ Version::~Version() noexcept
 }
 
 /*****************************************************************************************
+ *  Getters
+ ****************************************************************************************/
+
+QString Version::toStr() const noexcept
+{
+    QString str;
+    for (int i = 0; i < mNumbers.count(); i++)
+    {
+        if (i > 0) str.append(".");
+        str.append(QString::number(mNumbers.at(i)));
+    }
+    return str;
+}
+
+/*****************************************************************************************
  *  Setters
  ****************************************************************************************/
 
 bool Version::setVersion(const QString& version) noexcept
 {
-    mVersionStr = version;
     mNumbers.clear();
-    QStringList numbers = mVersionStr.split('.', QString::KeepEmptyParts, Qt::CaseSensitive);
+    QStringList numbers = version.split('.', QString::KeepEmptyParts, Qt::CaseSensitive);
     foreach (const QString& number, numbers)
     {
         bool ok = false;
@@ -76,68 +90,43 @@ bool Version::setVersion(const QString& version) noexcept
 
 Version& Version::operator=(const Version& rhs) noexcept
 {
-    mVersionStr = rhs.mVersionStr;
     mNumbers = rhs.mNumbers;
     return *this;
 }
 
 bool Version::operator>(const Version& rhs) const noexcept
 {
-    if (mNumbers.isEmpty())
-    {
-        qWarning() << "operators should not be used on invalid Version objects!";
-        return false;
-    }
+    if (mNumbers.isEmpty()) return false;
     return (compare(rhs) > 0);
 }
 
 bool Version::operator<(const Version& rhs) const  noexcept
 {
-    if (mNumbers.isEmpty())
-    {
-        qWarning() << "operators should not be used on invalid Version objects!";
-        return false;
-    }
+    if (mNumbers.isEmpty()) return false;
     return (compare(rhs) < 0);
 }
 
 bool Version::operator>=(const Version& rhs) const noexcept
 {
-    if (mNumbers.isEmpty())
-    {
-        qWarning() << "operators should not be used on invalid Version objects!";
-        return false;
-    }
+    if (mNumbers.isEmpty()) return false;
     return (compare(rhs) >= 0);
 }
 
 bool Version::operator<=(const Version& rhs) const noexcept
 {
-    if (mNumbers.isEmpty())
-    {
-        qWarning() << "operators should not be used on invalid Version objects!";
-        return false;
-    }
+    if (mNumbers.isEmpty()) return false;
     return (compare(rhs) <= 0);
 }
 
 bool Version::operator==(const Version& rhs) const noexcept
 {
-    if (mNumbers.isEmpty())
-    {
-        qWarning() << "operators should not be used on invalid Version objects!";
-        return false;
-    }
+    if (mNumbers.isEmpty()) return false;
     return (compare(rhs) == 0);
 }
 
 bool Version::operator!=(const Version& rhs) const noexcept
 {
-    if (mNumbers.isEmpty())
-    {
-        qWarning() << "operators should not be used on invalid Version objects!";
-        return false;
-    }
+    if (mNumbers.isEmpty()) return false;
     return (compare(rhs) != 0);
 }
 
@@ -158,7 +147,7 @@ int Version::compare(const Version& other) const noexcept
         if (mNumbers[i] > other.mNumbers[i]) return 1;
     }
 
-    qCritical() << "this line should never be reached!";
+    Q_ASSERT_X(false, "Version::compare", "this line should never be reached!");
     return 0;
 }
 
