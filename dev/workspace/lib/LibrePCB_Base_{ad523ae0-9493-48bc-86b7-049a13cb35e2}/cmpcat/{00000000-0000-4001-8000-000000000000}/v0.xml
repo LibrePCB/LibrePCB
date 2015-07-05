@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<component_category file_version="0">
+<component_category version="0">
     <meta>
         <uuid>{00000000-0000-4001-8000-000000000000}</uuid>
         <version>1.1</version>
@@ -7,7 +7,7 @@
         <created>2013-04-13T12:43:52Z</created>
         <last_modified>2013-04-20T18:01:33Z</last_modified>
         <parent></parent>
-        <name locale="en_US">Active Components</name>
+        <name locale="en_US">Test Category</name>
         <description locale="en_US">description...</description>
         <keywords locale="en_US">word1 word2 word3...</keywords>
     </meta>

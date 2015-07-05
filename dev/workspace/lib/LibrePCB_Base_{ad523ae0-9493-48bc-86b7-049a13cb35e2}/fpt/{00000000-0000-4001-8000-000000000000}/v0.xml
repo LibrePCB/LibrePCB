@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <!-- This file contains comments for documentation -->
-<footprint file_version="0">
+<footprint version="0">
     <meta>
         <uuid>{00000000-0000-4001-8000-000000000000}</uuid>
         <version>1</version>
