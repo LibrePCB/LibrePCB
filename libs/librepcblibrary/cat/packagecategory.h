@@ -25,7 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../libraryelement.h"
+#include "librarycategory.h"
 
 /*****************************************************************************************
  *  Class PackageCategory
@@ -36,7 +36,7 @@ namespace library {
 /**
  * @brief The PackageCategory class
  */
-class PackageCategory final : public LibraryElement
+class PackageCategory final : public LibraryCategory
 {
         Q_OBJECT
 

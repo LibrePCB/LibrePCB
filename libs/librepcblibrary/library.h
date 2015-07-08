@@ -36,6 +36,8 @@
 class Version;
 
 namespace library {
+class ComponentCategory;
+class PackageCategory;
 class Symbol;
 class Footprint;
 class Model3d;
@@ -74,14 +76,21 @@ class Library final : public QObject
         ~Library();
 
 
-        // Getters
-        QMap<Version, FilePath> getSymbols(const QUuid& uuid) const noexcept;
-        QMap<Version, FilePath> getFootprints(const QUuid& uuid) const noexcept;
-        QMap<Version, FilePath> get3dModels(const QUuid& uuid) const noexcept;
-        QMap<Version, FilePath> getSpiceModels(const QUuid& uuid) const noexcept;
-        QMap<Version, FilePath> getPackages(const QUuid& uuid) const noexcept;
-        QMap<Version, FilePath> getGenericComponents(const QUuid& uuid) const noexcept;
-        QMap<Version, FilePath> getComponents(const QUuid& uuid) const noexcept;
+        // Getters: Library Elements by their UUID
+        QMultiMap<Version, FilePath> getComponentCategories(const QUuid& uuid) const noexcept;
+        QMultiMap<Version, FilePath> getPackageCategories(const QUuid& uuid) const noexcept;
+        QMultiMap<Version, FilePath> getSymbols(const QUuid& uuid) const noexcept;
+        QMultiMap<Version, FilePath> getFootprints(const QUuid& uuid) const noexcept;
+        QMultiMap<Version, FilePath> get3dModels(const QUuid& uuid) const noexcept;
+        QMultiMap<Version, FilePath> getSpiceModels(const QUuid& uuid) const noexcept;
+        QMultiMap<Version, FilePath> getPackages(const QUuid& uuid) const noexcept;
+        QMultiMap<Version, FilePath> getGenericComponents(const QUuid& uuid) const noexcept;
+        QMultiMap<Version, FilePath> getComponents(const QUuid& uuid) const noexcept;
+
+        // Getters: Special
+        QMultiMap<QUuid, FilePath> getComponentCategoryChilds(const QUuid& parent) const noexcept;
+        QMultiMap<QUuid, FilePath> getPackageCategoryChilds(const QUuid& parent) const noexcept;
+        QMultiMap<QUuid, FilePath> getGenericComponentsByCategory(const QUuid& category) const noexcept;
 
 
         // General Methods
@@ -102,18 +111,27 @@ class Library final : public QObject
 
         // Private Methods
         template <typename ElementType>
-        uint addElementsToDb(const QString& xmlRootName, const QString& tablename,
+        uint addCategoriesToDb(const QList<QString>& xmlFiles, const QString& tablename,
+                               const QString& id_rowname) throw (Exception);
+        template <typename ElementType>
+        uint addElementsToDb(const QList<QString>& xmlFiles, const QString& tablename,
                              const QString& id_rowname) throw (Exception);
-        QMap<Version, FilePath> getElementFilePathsFromDb(const QString& tablename, const QUuid& uuid) const noexcept;
+        QMultiMap<Version, FilePath> getElementFilePathsFromDb(const QString& tablename,
+                                                               const QUuid& uuid) const noexcept;
+        QMultiMap<QUuid, FilePath> getCategoryChilds(const QString& tablename,
+                                                     const QUuid& categoryUuid) const noexcept;
+        QMultiMap<QUuid, FilePath> getElementsByCategory(const QString& tablename,
+                                                         const QString& idrowname,
+                                                         const QUuid& categoryUuid) const noexcept;
         void clearDatabaseAndCreateTables() throw (Exception);
-        QStringList getAllXmlFilesInLibDir(const QString& xmlRootName) throw (Exception);
+        QMultiMap<QString, QString> getAllXmlFilesInLibDir() throw (Exception);
         QSqlQuery prepareQuery(const QString& query) const throw (Exception);
         int execQuery(QSqlQuery& query, bool checkId) const throw (Exception);
 
 
         // Attributes
         FilePath mLibPath; ///< a FilePath object which represents the library directory
-        FilePath mLibFilePath; ///<a FiltePath object which represents the lib.db-file
+        FilePath mLibFilePath; ///<a FiltePath object which represents the lib_v#.db file
         QSqlDatabase mLibDatabase; ///<a QSqlDatabase object which contents the lib.db-file
 };
 

@@ -46,7 +46,10 @@ HEADERS += \
     fpt/footprintpolygon.h \
     fpt/footprintellipse.h \
     fpt/footprinttext.h \
-    fpt/footprintpad.h
+    fpt/footprintpad.h \
+    cat/librarycategory.h \
+    cat/categorytreemodel.h \
+    cat/categorytreeitem.h
 
 SOURCES += \
     3dmdl/model3d.cpp \
@@ -74,5 +77,8 @@ SOURCES += \
     fpt/footprintpolygon.cpp \
     fpt/footprintellipse.cpp \
     fpt/footprinttext.cpp \
-    fpt/footprintpad.cpp
+    fpt/footprintpad.cpp \
+    cat/librarycategory.cpp \
+    cat/categorytreemodel.cpp \
+    cat/categorytreeitem.cpp
 

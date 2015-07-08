@@ -288,7 +288,7 @@ void SES_AddComponents::startAddingComponent(const QUuid& genComp, const QUuid& 
     {
         // show generic component chooser dialog
         if (!mAddGenCompDialog)
-            mAddGenCompDialog = new AddGenCompDialog(mProject, &mEditor);
+            mAddGenCompDialog = new AddGenCompDialog(mWorkspace, mProject, &mEditor);
         if (mAddGenCompDialog->exec() != QDialog::Accepted)
             throw UserCanceled(__FILE__, __LINE__); // abort
 

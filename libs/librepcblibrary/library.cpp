@@ -38,6 +38,7 @@
 #include "gencmp/genericcomponent.h"
 #include "cmp/component.h"
 #include "library.h"
+#include <librepcbcommon/application.h>
 
 namespace library{
 
@@ -48,9 +49,9 @@ namespace library{
 Library::Library(const FilePath& libPath) throw (Exception):
     QObject(0),
     mLibPath(libPath),
-    mLibFilePath(libPath.getPathTo("lib.db"))
+    mLibFilePath(libPath.getPathTo(QString("lib_v%1.db").arg(Application::applicationVersion().getNumbers().first())))
 {
-    //Select and open sqlite library 'lib.db'
+    //Select and open sqlite library 'lib_v#.db'
     mLibDatabase = QSqlDatabase::addDatabase("QSQLITE", mLibFilePath.toNative());
     mLibDatabase.setDatabaseName(mLibFilePath.toNative());
     mLibDatabase.setConnectOptions("foreign_keys = ON");
@@ -75,42 +76,71 @@ Library::~Library()
 }
 
 /*****************************************************************************************
- *  Getters
+ *  Getters: Library Elements by their UUID
  ****************************************************************************************/
 
-QMap<Version, FilePath> Library::getSymbols(const QUuid& uuid) const noexcept
+QMultiMap<Version, FilePath> Library::getComponentCategories(const QUuid& uuid) const noexcept
+{
+    return getElementFilePathsFromDb("component_categories", uuid);
+}
+
+QMultiMap<Version, FilePath> Library::getPackageCategories(const QUuid& uuid) const noexcept
+{
+    return getElementFilePathsFromDb("package_categories", uuid);
+}
+
+QMultiMap<Version, FilePath> Library::getSymbols(const QUuid& uuid) const noexcept
 {
     return getElementFilePathsFromDb("symbols", uuid);
 }
 
-QMap<Version, FilePath> Library::getFootprints(const QUuid& uuid) const noexcept
+QMultiMap<Version, FilePath> Library::getFootprints(const QUuid& uuid) const noexcept
 {
     return getElementFilePathsFromDb("footprints", uuid);
 }
 
-QMap<Version, FilePath> Library::get3dModels(const QUuid& uuid) const noexcept
+QMultiMap<Version, FilePath> Library::get3dModels(const QUuid& uuid) const noexcept
 {
     return getElementFilePathsFromDb("models3d", uuid);
 }
 
-QMap<Version, FilePath> Library::getSpiceModels(const QUuid& uuid) const noexcept
+QMultiMap<Version, FilePath> Library::getSpiceModels(const QUuid& uuid) const noexcept
 {
     return getElementFilePathsFromDb("spice_models", uuid);
 }
 
-QMap<Version, FilePath> Library::getPackages(const QUuid& uuid) const noexcept
+QMultiMap<Version, FilePath> Library::getPackages(const QUuid& uuid) const noexcept
 {
     return getElementFilePathsFromDb("packages", uuid);
 }
 
-QMap<Version, FilePath> Library::getGenericComponents(const QUuid& uuid) const noexcept
+QMultiMap<Version, FilePath> Library::getGenericComponents(const QUuid& uuid) const noexcept
 {
     return getElementFilePathsFromDb("generic_components", uuid);
 }
 
-QMap<Version, FilePath> Library::getComponents(const QUuid& uuid) const noexcept
+QMultiMap<Version, FilePath> Library::getComponents(const QUuid& uuid) const noexcept
 {
     return getElementFilePathsFromDb("components", uuid);
+}
+
+/*****************************************************************************************
+ *  Getters: Special
+ ****************************************************************************************/
+
+QMultiMap<QUuid, FilePath> Library::getComponentCategoryChilds(const QUuid& parent) const noexcept
+{
+    return getCategoryChilds("component_categories", parent);
+}
+
+QMultiMap<QUuid, FilePath> Library::getPackageCategoryChilds(const QUuid& parent) const noexcept
+{
+    return getCategoryChilds("package_categories", parent);
+}
+
+QMultiMap<QUuid, FilePath> Library::getGenericComponentsByCategory(const QUuid& category) const noexcept
+{
+    return getElementsByCategory("generic_components", "gencomp_id", category);
 }
 
 /*****************************************************************************************
@@ -122,13 +152,16 @@ uint Library::rescan() throw (Exception)
     clearDatabaseAndCreateTables();
 
     uint count = 0;
-    count += addElementsToDb<Symbol>("symbol", "symbols", "symbol_id");
-    count += addElementsToDb<Footprint>("footprint", "footprints", "footprint_id");
-    count += addElementsToDb<Model3D>("model", "models3d", "model_id");
-    count += addElementsToDb<SpiceModel>("spice_model", "spice_models", "model_id");
-    count += addElementsToDb<Package>("package", "packages", "package_id");
-    count += addElementsToDb<GenericComponent>("generic_component", "generic_components", "gencomp_id");
-    count += addElementsToDb<Component>("component", "components", "component_id");
+    QMultiMap<QString, QString> files = getAllXmlFilesInLibDir();
+    count += addCategoriesToDb<ComponentCategory>(  files.values("component_category"), "component_categories", "cat_id");
+    count += addCategoriesToDb<PackageCategory>(    files.values("package_category"),   "package_categories",   "cat_id");
+    count += addElementsToDb<Symbol>(               files.values("symbol"),             "symbols",              "symbol_id");
+    count += addElementsToDb<Footprint>(            files.values("footprint"),          "footprints",           "footprint_id");
+    count += addElementsToDb<Model3D>(              files.values("model"),              "models3d",             "model_id");
+    count += addElementsToDb<SpiceModel>(           files.values("spice_model"),        "spice_models",         "model_id");
+    count += addElementsToDb<Package>(              files.values("package"),            "packages",             "package_id");
+    count += addElementsToDb<GenericComponent>(     files.values("generic_component"),  "generic_components",   "gencomp_id");
+    count += addElementsToDb<Component>(            files.values("component"),          "components",           "component_id");
 
     return count;
 }
@@ -138,11 +171,49 @@ uint Library::rescan() throw (Exception)
  ****************************************************************************************/
 
 template <typename ElementType>
-uint Library::addElementsToDb(const QString& xmlRootName, const QString& tablename,
+uint Library::addCategoriesToDb(const QList<QString>& xmlFiles, const QString& tablename,
+                                const QString& id_rowname) throw (Exception)
+{
+    uint count = 0;
+    foreach (const QString& filepathStr, xmlFiles)
+    {
+        FilePath filepath(filepathStr);
+        ElementType element(filepath);
+
+        QSqlQuery query = prepareQuery(
+            "INSERT INTO " % tablename % " "
+            "(filepath, uuid, version, parent_uuid) VALUES "
+            "(:filepath, :uuid, :version, :parent_uuid)");
+        query.bindValue(":filepath",    filepath.toRelative(mLibPath));
+        query.bindValue(":uuid",        element.getUuid().toString());
+        query.bindValue(":version",     element.getVersion().toStr());
+        query.bindValue(":parent_uuid", element.getParentUuid().isNull() ? QVariant(QVariant::String) : element.getParentUuid().toString());
+        int id = execQuery(query, true);
+
+        foreach (const QString& locale, element.getAllAvailableLocales())
+        {
+            QSqlQuery query = prepareQuery(
+                "INSERT INTO " % tablename % "_tr "
+                "(" % id_rowname % ", locale, name, description, keywords) VALUES "
+                "(:element_id, :locale, :name, :description, :keywords)");
+            query.bindValue(":element_id",  id);
+            query.bindValue(":locale",      locale);
+            query.bindValue(":name",        element.getName(QStringList(locale)));
+            query.bindValue(":description", element.getDescription(QStringList(locale)));
+            query.bindValue(":keywords",    element.getKeywords(QStringList(locale)));
+            execQuery(query, false);
+        }
+        count++;
+    }
+    return count;
+}
+
+template <typename ElementType>
+uint Library::addElementsToDb(const QList<QString>& xmlFiles, const QString& tablename,
                               const QString& id_rowname) throw (Exception)
 {
     uint count = 0;
-    foreach (const QString& filepathStr, getAllXmlFilesInLibDir(xmlRootName))
+    foreach (const QString& filepathStr, xmlFiles)
     {
         FilePath filepath(filepathStr);
         ElementType element(filepath);
@@ -169,13 +240,26 @@ uint Library::addElementsToDb(const QString& xmlRootName, const QString& tablena
             query.bindValue(":keywords",    element.getKeywords(QStringList(locale)));
             execQuery(query, false);
         }
+
+        foreach (const QUuid& categoryUuid, element.getCategories())
+        {
+            Q_ASSERT(!categoryUuid.isNull());
+            QSqlQuery query = prepareQuery(
+                "INSERT INTO " % tablename % "_cat "
+                "(" % id_rowname % ", category_uuid) VALUES "
+                "(:element_id, :category_uuid)");
+            query.bindValue(":element_id",  id);
+            query.bindValue(":category_uuid", categoryUuid.toString());
+            execQuery(query, false);
+        }
+
         count++;
     }
     return count;
 }
 
-QMap<Version, FilePath> Library::getElementFilePathsFromDb(const QString& tablename,
-                                                           const QUuid& uuid) const noexcept
+QMultiMap<Version, FilePath> Library::getElementFilePathsFromDb(const QString& tablename,
+                                                                const QUuid& uuid) const noexcept
 {
     QSqlQuery query = prepareQuery(
         "SELECT version, filepath FROM " % tablename % " "
@@ -183,7 +267,7 @@ QMap<Version, FilePath> Library::getElementFilePathsFromDb(const QString& tablen
     query.bindValue(":uuid", uuid.toString());
     execQuery(query, false);
 
-    QMap<Version, FilePath> elements;
+    QMultiMap<Version, FilePath> elements;
     while (query.next())
     {
         QString versionStr = query.value(0).toString();
@@ -192,8 +276,7 @@ QMap<Version, FilePath> Library::getElementFilePathsFromDb(const QString& tablen
         FilePath filepath(FilePath::fromRelative(mLibPath, filepathStr));
         if (version.isValid() && filepath.isValid())
         {
-            if (!elements.contains(version))
-                elements.insert(version, filepath);
+            elements.insert(version, filepath);
         }
         else
         {
@@ -201,7 +284,67 @@ QMap<Version, FilePath> Library::getElementFilePathsFromDb(const QString& tablen
                        << filepathStr << "::" << versionStr;
         }
     }
+    return elements;
+}
 
+QMultiMap<QUuid, FilePath> Library::getCategoryChilds(const QString& tablename,
+                                                      const QUuid& categoryUuid) const noexcept
+{
+    QSqlQuery query = prepareQuery(
+        "SELECT uuid, filepath FROM " % tablename % " "
+        "WHERE parent_uuid " %
+        (categoryUuid.isNull() ? QString("IS NULL") : "= '" % categoryUuid.toString() % "'"));
+    execQuery(query, false);
+
+    QMultiMap<QUuid, FilePath> elements;
+    while (query.next())
+    {
+        QString uuidStr = query.value(0).toString();
+        QString filepathStr = query.value(1).toString();
+        QUuid uuid(uuidStr);
+        FilePath filepath(FilePath::fromRelative(mLibPath, filepathStr));
+        if ((!uuid.isNull()) && (filepath.isValid()))
+        {
+            elements.insert(uuid, filepath);
+        }
+        else
+        {
+            qWarning() << "Invalid category in library:" << tablename << "::"
+                       << uuidStr << "::" << filepathStr;
+        }
+    }
+    return elements;
+}
+
+QMultiMap<QUuid, FilePath> Library::getElementsByCategory(const QString& tablename,
+                                                          const QString& idrowname,
+                                                          const QUuid& categoryUuid) const noexcept
+{
+    QSqlQuery query = prepareQuery(
+        "SELECT uuid, filepath FROM " % tablename % " "
+        "LEFT JOIN " % tablename % "_cat "
+        "ON " % tablename % ".id=" % tablename % "_cat." % idrowname % " "
+        "WHERE category_uuid " %
+        (categoryUuid.isNull() ? QString("IS NULL") : "= '" % categoryUuid.toString() % "'"));
+    execQuery(query, false);
+
+    QMultiMap<QUuid, FilePath> elements;
+    while (query.next())
+    {
+        QString uuidStr = query.value(0).toString();
+        QString filepathStr = query.value(1).toString();
+        QUuid uuid(uuidStr);
+        FilePath filepath(FilePath::fromRelative(mLibPath, filepathStr));
+        if ((!uuid.isNull()) && (filepath.isValid()))
+        {
+            elements.insert(uuid, filepath);
+        }
+        else
+        {
+            qWarning() << "Invalid category in library:" << tablename << "::"
+                       << uuidStr << "::" << filepathStr;
+        }
+    }
     return elements;
 }
 
@@ -209,6 +352,7 @@ void Library::clearDatabaseAndCreateTables() throw (Exception)
 {
     QStringList queries;
 
+    // internal
     queries << QString( "DROP TABLE IF EXISTS internal");
     queries << QString( "CREATE TABLE internal ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
@@ -219,6 +363,7 @@ void Library::clearDatabaseAndCreateTables() throw (Exception)
                         "`value_blob` BLOB "
                         ")");
 
+    // repositories
     queries << QString( "DROP TABLE IF EXISTS repositories_tr");
     queries << QString( "DROP TABLE IF EXISTS repositories");
     queries << QString( "CREATE TABLE repositories ("
@@ -236,13 +381,15 @@ void Library::clearDatabaseAndCreateTables() throw (Exception)
                         "UNIQUE(repo_id, locale)"
                         ")");
 
+    // component categories
     queries << QString( "DROP TABLE IF EXISTS component_categories_tr");
     queries << QString( "DROP TABLE IF EXISTS component_categories");
     queries << QString( "CREATE TABLE component_categories ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
                         "`filepath` TEXT UNIQUE NOT NULL, "
                         "`uuid` TEXT NOT NULL, "
-                        "`version` TEXT NOT NULL"
+                        "`version` TEXT NOT NULL, "
+                        "`parent_uuid` TEXT"
                         ")");
     queries << QString( "CREATE TABLE component_categories_tr ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
@@ -254,13 +401,15 @@ void Library::clearDatabaseAndCreateTables() throw (Exception)
                         "UNIQUE(cat_id, locale)"
                         ")");
 
+    // package categories
     queries << QString( "DROP TABLE IF EXISTS package_categories_tr");
     queries << QString( "DROP TABLE IF EXISTS package_categories");
     queries << QString( "CREATE TABLE package_categories ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
                         "`filepath` TEXT UNIQUE NOT NULL, "
                         "`uuid` TEXT NOT NULL, "
-                        "`version` TEXT NOT NULL"
+                        "`version` TEXT NOT NULL, "
+                        "`parent_uuid` TEXT"
                         ")");
     queries << QString( "CREATE TABLE package_categories_tr ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
@@ -272,7 +421,9 @@ void Library::clearDatabaseAndCreateTables() throw (Exception)
                         "UNIQUE(cat_id, locale)"
                         ")");
 
+    // symbols
     queries << QString( "DROP TABLE IF EXISTS symbols_tr");
+    queries << QString( "DROP TABLE IF EXISTS symbols_cat");
     queries << QString( "DROP TABLE IF EXISTS symbols");
     queries << QString( "CREATE TABLE symbols ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
@@ -289,8 +440,16 @@ void Library::clearDatabaseAndCreateTables() throw (Exception)
                         "`keywords` TEXT, "
                         "UNIQUE(symbol_id, locale)"
                         ")");
+    queries << QString( "CREATE TABLE symbols_cat ("
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                        "`symbol_id` INTEGER REFERENCES symbols(id) NOT NULL, "
+                        "`category_uuid` TEXT NOT NULL, "
+                        "UNIQUE(symbol_id, category_uuid)"
+                        ")");
 
+    // footprints
     queries << QString( "DROP TABLE IF EXISTS footprints_tr");
+    queries << QString( "DROP TABLE IF EXISTS footprints_cat");
     queries << QString( "DROP TABLE IF EXISTS footprints");
     queries << QString( "CREATE TABLE footprints ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
@@ -307,8 +466,16 @@ void Library::clearDatabaseAndCreateTables() throw (Exception)
                         "`keywords` TEXT, "
                         "UNIQUE(footprint_id, locale)"
                         ")");
+    queries << QString( "CREATE TABLE footprints_cat ("
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                        "`footprint_id` INTEGER REFERENCES footprints(id) NOT NULL, "
+                        "`category_uuid` TEXT NOT NULL, "
+                        "UNIQUE(footprint_id, category_uuid)"
+                        ")");
 
+    // 3D models
     queries << QString( "DROP TABLE IF EXISTS models3d_tr");
+    queries << QString( "DROP TABLE IF EXISTS models3d_cat");
     queries << QString( "DROP TABLE IF EXISTS models3d");
     queries << QString( "CREATE TABLE models3d ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
@@ -325,8 +492,16 @@ void Library::clearDatabaseAndCreateTables() throw (Exception)
                         "`keywords` TEXT, "
                         "UNIQUE(model_id, locale)"
                         ")");
+    queries << QString( "CREATE TABLE models3d_cat ("
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                        "`model_id` INTEGER REFERENCES models3d(id) NOT NULL, "
+                        "`category_uuid` TEXT NOT NULL, "
+                        "UNIQUE(model_id, category_uuid)"
+                        ")");
 
+    // spice models
     queries << QString( "DROP TABLE IF EXISTS spice_models_tr");
+    queries << QString( "DROP TABLE IF EXISTS spice_models_cat");
     queries << QString( "DROP TABLE IF EXISTS spice_models");
     queries << QString( "CREATE TABLE spice_models ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
@@ -343,8 +518,16 @@ void Library::clearDatabaseAndCreateTables() throw (Exception)
                         "`keywords` TEXT, "
                         "UNIQUE(model_id, locale)"
                         ")");
+    queries << QString( "CREATE TABLE spice_models_cat ("
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                        "`model_id` INTEGER REFERENCES spice_models(id) NOT NULL, "
+                        "`category_uuid` TEXT NOT NULL, "
+                        "UNIQUE(model_id, category_uuid)"
+                        ")");
 
+    // packages
     queries << QString( "DROP TABLE IF EXISTS packages_tr");
+    queries << QString( "DROP TABLE IF EXISTS packages_cat");
     queries << QString( "DROP TABLE IF EXISTS packages");
     queries << QString( "CREATE TABLE packages ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
@@ -361,8 +544,16 @@ void Library::clearDatabaseAndCreateTables() throw (Exception)
                         "`keywords` TEXT, "
                         "UNIQUE(package_id, locale)"
                         ")");
+    queries << QString( "CREATE TABLE packages_cat ("
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                        "`package_id` INTEGER REFERENCES packages(id) NOT NULL, "
+                        "`category_uuid` TEXT NOT NULL, "
+                        "UNIQUE(package_id, category_uuid)"
+                        ")");
 
+    // generic components
     queries << QString( "DROP TABLE IF EXISTS generic_components_tr");
+    queries << QString( "DROP TABLE IF EXISTS generic_components_cat");
     queries << QString( "DROP TABLE IF EXISTS generic_components");
     queries << QString( "CREATE TABLE generic_components ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
@@ -379,8 +570,16 @@ void Library::clearDatabaseAndCreateTables() throw (Exception)
                         "`keywords` TEXT, "
                         "UNIQUE(gencomp_id, locale)"
                         ")");
+    queries << QString( "CREATE TABLE generic_components_cat ("
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                        "`gencomp_id` INTEGER REFERENCES generic_components(id) NOT NULL, "
+                        "`category_uuid` TEXT NOT NULL, "
+                        "UNIQUE(gencomp_id, category_uuid)"
+                        ")");
 
+    // components
     queries << QString( "DROP TABLE IF EXISTS components_tr");
+    queries << QString( "DROP TABLE IF EXISTS components_cat");
     queries << QString( "DROP TABLE IF EXISTS components");
     queries << QString( "CREATE TABLE components ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
@@ -397,6 +596,12 @@ void Library::clearDatabaseAndCreateTables() throw (Exception)
                         "`keywords` TEXT, "
                         "UNIQUE(component_id, locale)"
                         ")");
+    queries << QString( "CREATE TABLE components_cat ("
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                        "`component_id` INTEGER REFERENCES components(id) NOT NULL, "
+                        "`category_uuid` TEXT NOT NULL, "
+                        "UNIQUE(component_id, category_uuid)"
+                        ")");
 
     // execute queries
     foreach (const QString& string, queries)
@@ -406,18 +611,17 @@ void Library::clearDatabaseAndCreateTables() throw (Exception)
     }
 }
 
-QStringList Library::getAllXmlFilesInLibDir(const QString& xmlRootName) throw (Exception)
+QMultiMap<QString, QString> Library::getAllXmlFilesInLibDir() throw (Exception)
 {
-    QStringList list;
+    QMultiMap<QString, QString> map;
     QDirIterator it(mLibPath.toStr(), QStringList() << "*.xml", QDir::Files, QDirIterator::Subdirectories);
     while (it.hasNext()) {
         FilePath xmlFilePath(it.next());
         SmartXmlFile xmlFile(xmlFilePath, false, true);
         QSharedPointer<XmlDomDocument> doc = xmlFile.parseFileAndBuildDomTree(false);
-        if (doc->getRoot().getName() == xmlRootName)
-            list.append(xmlFilePath.toStr());
+        map.insertMulti(doc->getRoot().getName(), xmlFilePath.toStr());
     }
-    return list;
+    return map;
 }
 
 QSqlQuery Library::prepareQuery(const QString& query) const throw (Exception)

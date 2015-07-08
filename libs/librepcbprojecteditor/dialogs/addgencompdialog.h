@@ -33,6 +33,7 @@
  ****************************************************************************************/
 
 class GraphicsScene;
+class Workspace;
 
 namespace project {
 class Project;
@@ -43,6 +44,8 @@ class GenericComponent;
 class GenCompSymbVar;
 class Symbol;
 class SymbolPreviewGraphicsItem;
+class CategoryTreeModel;
+class ComponentCategory;
 }
 
 namespace Ui {
@@ -70,7 +73,7 @@ class AddGenCompDialog final : public QDialog
     public:
 
         // Constructors / Destructor
-        explicit AddGenCompDialog(Project& project, QWidget* parent = nullptr);
+        explicit AddGenCompDialog(Workspace& workspace, Project& project, QWidget* parent = nullptr);
         ~AddGenCompDialog() noexcept;
 
         // Getters
@@ -80,24 +83,30 @@ class AddGenCompDialog final : public QDialog
 
     private slots:
 
+        void on_treeCategories_clicked(const QModelIndex &index);
         void on_listGenericComponents_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
         void on_cbxSymbVar_currentIndexChanged(int index);
+
 
     private:
 
         // Private Methods
+        void setSelectedCategory(const QUuid& categoryUuid);
         void setSelectedGenComp(const library::GenericComponent* genComp);
         void setSelectedSymbVar(const library::GenCompSymbVar* symbVar);
         void accept() noexcept;
 
 
         // General
+        Workspace& mWorkspace;
         Project& mProject;
         Ui::AddGenCompDialog* mUi;
         GraphicsScene* mPreviewScene;
+        library::CategoryTreeModel* mCategoryTreeModel;
 
 
         // Attributes
+        QUuid mSelectedCategoryUuid;
         const library::GenericComponent* mSelectedGenComp;
         const library::GenCompSymbVar* mSelectedSymbVar;
         QList<library::SymbolPreviewGraphicsItem*> mPreviewSymbolGraphicsItems;

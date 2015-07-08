@@ -31,7 +31,7 @@ namespace library {
  ****************************************************************************************/
 
 PackageCategory::PackageCategory(const FilePath& xmlFilePath) :
-    LibraryElement(xmlFilePath, "package_category")
+    LibraryCategory(xmlFilePath, "package_category")
 {
     readFromFile();
 }
@@ -46,7 +46,7 @@ PackageCategory::~PackageCategory()
 
 void PackageCategory::parseDomTree(const XmlDomElement& root) throw (Exception)
 {
-    LibraryElement::parseDomTree(root);
+    LibraryCategory::parseDomTree(root);
 }
 
 /*****************************************************************************************

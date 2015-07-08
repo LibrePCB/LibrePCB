@@ -17,46 +17,42 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECTTREEMODEL_H
-#define PROJECTTREEMODEL_H
+#ifndef LIBRARY_CATEGORYTREEMODEL_H
+#define LIBRARY_CATEGORYTREEMODEL_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
-class Workspace;
-class ProjectTreeItem;
+namespace library {
+class Library;
+class CategoryTreeItem;
+}
 
 /*****************************************************************************************
- *  Class ProjectTreeModel
+ *  Class CategoryTreeModel
  ****************************************************************************************/
 
+namespace library {
+
 /**
- * @brief The ProjectTreeModel class
- *
- * @author ubruhin
- *
- * @date 2014-06-24
+ * @brief The CategoryTreeModel class
  */
-class ProjectTreeModel : public QAbstractItemModel
+class CategoryTreeModel final : public QAbstractItemModel
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        ProjectTreeModel(const Workspace& workspace);
-        ~ProjectTreeModel();
-
-        // General
-        QModelIndexList getPersistentIndexList() const {return persistentIndexList();}
+        explicit CategoryTreeModel(const Library& library, const QStringList& localeOrder) noexcept;
+        ~CategoryTreeModel() noexcept;
 
         // Inherited Methods
         virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
@@ -66,17 +62,22 @@ class ProjectTreeModel : public QAbstractItemModel
         virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
         virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 
+
     private:
 
         // make some methods inaccessible...
-        ProjectTreeModel(const ProjectTreeModel& other);
-        ProjectTreeModel& operator=(const ProjectTreeModel& rhs);
+        CategoryTreeModel(const CategoryTreeModel& other);
+        CategoryTreeModel& operator=(const CategoryTreeModel& rhs);
+
 
         // Private Methods
-        ProjectTreeItem* getItem(const QModelIndex& index) const;
+        CategoryTreeItem* getItem(const QModelIndex& index) const;
+
 
         // Attributes
-        ProjectTreeItem* mRootProjectDirectory;
+        CategoryTreeItem* mRootItem;
 };
 
-#endif // PROJECTTREEMODEL_H
+} // namespace library
+
+#endif // LIBRARY_CATEGORYTREEMODEL_H

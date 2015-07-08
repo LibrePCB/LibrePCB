@@ -25,7 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../libraryelement.h"
+#include "librarycategory.h"
 
 /*****************************************************************************************
  *  Class ComponentCategory
@@ -36,7 +36,7 @@ namespace library {
 /**
  * @brief The ComponentCategory class
  */
-class ComponentCategory final : public LibraryElement
+class ComponentCategory final : public LibraryCategory
 {
         Q_OBJECT
 

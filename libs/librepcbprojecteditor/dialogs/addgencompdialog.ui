@@ -33,18 +33,10 @@
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <widget class="QTreeWidget" name="treeCategories">
-         <property name="minimumSize">
-          <size>
-           <width>150</width>
-           <height>0</height>
-          </size>
+        <widget class="QTreeView" name="treeCategories">
+         <property name="editTriggers">
+          <set>QAbstractItemView::NoEditTriggers</set>
          </property>
-         <column>
-          <property name="text">
-           <string>Categories</string>
-          </property>
-         </column>
         </widget>
        </item>
        <item>

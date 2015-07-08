@@ -25,6 +25,7 @@
 #include "ses_base.h"
 #include "../schematiceditor.h"
 #include <librepcbproject/project.h>
+#include <librepcbprojecteditor/projecteditor.h>
 
 namespace project {
 
@@ -34,7 +35,8 @@ namespace project {
 
 SES_Base::SES_Base(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
                    GraphicsView& editorGraphicsView, UndoStack& undoStack) :
-    QObject(0), mProject(editor.getProject()), mCircuit(editor.getProject().getCircuit()),
+    QObject(0), mWorkspace(editor.getProjectEditor().getWorkspace()),
+    mProject(editor.getProject()), mCircuit(editor.getProject().getCircuit()),
     mEditor(editor), mEditorUi(editorUi), mEditorGraphicsView(editorGraphicsView),
     mUndoStack(undoStack)
 {

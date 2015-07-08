@@ -22,7 +22,8 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "componentcategory.h"
+#include "librarycategory.h"
+#include <librepcbcommon/fileio/xmldomelement.h>
 
 namespace library {
 
@@ -30,23 +31,47 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ComponentCategory::ComponentCategory(const FilePath& xmlFilePath) :
-    LibraryCategory(xmlFilePath, "component_category")
+LibraryCategory::LibraryCategory(const QString& xmlRootNodeName, const QUuid& uuid,
+                               const Version& version, const QString& author,
+                               const QString& name_en_US, const QString& description_en_US,
+                               const QString& keywords_en_US) throw (Exception) :
+    LibraryBaseElement(xmlRootNodeName, uuid, version, author, name_en_US, description_en_US, keywords_en_US)
 {
-    readFromFile();
 }
 
-ComponentCategory::~ComponentCategory()
+LibraryCategory::LibraryCategory(const FilePath& xmlFilePath,
+                               const QString& xmlRootNodeName) throw (Exception) :
+    LibraryBaseElement(xmlFilePath, xmlRootNodeName)
+{
+}
+
+LibraryCategory::~LibraryCategory() noexcept
 {
 }
 
 /*****************************************************************************************
- *  Private Methods
+ *  Protected Methods
  ****************************************************************************************/
 
-void ComponentCategory::parseDomTree(const XmlDomElement& root) throw (Exception)
+void LibraryCategory::parseDomTree(const XmlDomElement& root) throw (Exception)
 {
-    LibraryCategory::parseDomTree(root);
+    LibraryBaseElement::parseDomTree(root);
+
+    // read parent uuid
+    mParentUuid = root.getFirstChild("meta/parent", true, true)->getText<QUuid>(false);
+}
+
+XmlDomElement* LibraryCategory::serializeToXmlDomElement(uint version) const throw (Exception)
+{
+    QScopedPointer<XmlDomElement> root(LibraryBaseElement::serializeToXmlDomElement(version));
+    root->getFirstChild("meta", true)->appendTextChild("parent", mParentUuid);
+    return root.take();
+}
+
+bool LibraryCategory::checkAttributesValidity() const noexcept
+{
+    if (!LibraryBaseElement::checkAttributesValidity()) return false;
+    return true;
 }
 
 /*****************************************************************************************

@@ -36,6 +36,7 @@
  ****************************************************************************************/
 
 class UndoStack;
+class Workspace;
 
 namespace project {
 class Project;
@@ -77,6 +78,7 @@ class SES_Base : public QObject
     protected:
 
         // General Attributes which are needed by some state objects
+        Workspace& mWorkspace;
         Project& mProject;
         Circuit& mCircuit;
         SchematicEditor& mEditor;
