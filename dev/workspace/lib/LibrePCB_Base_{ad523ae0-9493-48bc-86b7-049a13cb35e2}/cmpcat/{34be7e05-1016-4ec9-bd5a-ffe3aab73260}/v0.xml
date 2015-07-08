@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<component_category version="0">
+    <meta>
+        <uuid>{34be7e05-1016-4ec9-bd5a-ffe3aab73260}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-07-05T12:43:52Z</created>
+        <last_modified>2015-07-05T18:01:33Z</last_modified>
+        <parent>{22fbb140-85e4-46cc-a550-68ae2dc58b1a}</parent>
+        <name locale="en_US">D-Sub</name>
+        <description locale="en_US">D-Sub Connectors</description>
+        <keywords locale="en_US">dsub, d-sub, subd, sub-d, connector</keywords>
+    </meta>
+</component_category>

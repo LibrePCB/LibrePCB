@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<component_category version="0">
+    <meta>
+        <uuid>{1039f038-20a6-4bfe-89c1-99f34fbb45bd}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-07-05T12:43:52Z</created>
+        <last_modified>2015-07-05T18:01:33Z</last_modified>
+        <parent></parent>
+        <name locale="en_US">Resistors</name>
+        <description locale="en_US">Various resistor types</description>
+        <keywords locale="en_US">resistor</keywords>
+    </meta>
+</component_category>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<component_category version="0">
+    <meta>
+        <uuid>{4d1c95f4-2e60-4f50-a15b-ba9186a01b1a}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-07-05T12:43:52Z</created>
+        <last_modified>2015-07-05T18:01:33Z</last_modified>
+        <parent></parent>
+        <name locale="en_US">Diodes</name>
+        <description locale="en_US">Various diode types</description>
+        <keywords locale="en_US">diode</keywords>
+    </meta>
+</component_category>
