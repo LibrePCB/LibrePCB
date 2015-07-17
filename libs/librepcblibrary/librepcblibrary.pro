@@ -49,7 +49,8 @@ HEADERS += \
     fpt/footprintpad.h \
     cat/librarycategory.h \
     cat/categorytreemodel.h \
-    cat/categorytreeitem.h
+    cat/categorytreeitem.h \
+    elements.h
 
 SOURCES += \
     3dmdl/model3d.cpp \
