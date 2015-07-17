@@ -113,6 +113,8 @@ FileLock::LockStatus_t FileLock::getStatus() const throw (Exception)
             pid = entries[3].toInt();
         else if (sizeof(qint64) == sizeof(long))
             pid = entries[3].toLong();
+        else if (sizeof(qint64) == sizeof(long long))
+            pid = entries[3].toLongLong();
         if (pid == 0)
         {
             throw LogicError(__FILE__, __LINE__, QString("%1/%2/%3")
