@@ -49,7 +49,7 @@ namespace library{
 Library::Library(const FilePath& libPath) throw (Exception):
     QObject(0),
     mLibPath(libPath),
-    mLibFilePath(libPath.getPathTo(QString("lib_v%1.db").arg(Application::applicationVersion().getNumbers().first())))
+    mLibFilePath(libPath.getPathTo(QString("lib_v%1.db").arg(Application::majorVersion())))
 {
     //Select and open sqlite library 'lib_v#.db'
     mLibDatabase = QSqlDatabase::addDatabase("QSQLITE", mLibFilePath.toNative());
