@@ -28,3 +28,6 @@ lessThan(QT_MAJOR_VERSION, 5) {
 
 # c++11 is obligatory!
 CONFIG += c++11
+
+# enable compiler warnings
+CONFIG += warn_on
