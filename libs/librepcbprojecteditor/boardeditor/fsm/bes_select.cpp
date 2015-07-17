@@ -25,7 +25,6 @@
 #include "bes_select.h"
 #include "../boardeditor.h"
 #include "ui_boardeditor.h"
-#include "../../project.h"
 #include <librepcbproject/boards/board.h>
 #include <librepcbproject/boards/items/bi_footprint.h>
 #include <librepcbproject/boards/items/bi_footprintpad.h>

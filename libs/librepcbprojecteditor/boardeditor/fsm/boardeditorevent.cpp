@@ -23,7 +23,6 @@
 
 #include <QtCore>
 #include "boardeditorevent.h"
-#include "../../project.h"
 #include "../boardeditor.h"
 #include "ui_boardeditor.h"
 

@@ -20,6 +20,10 @@ CONFIG += staticlib thread
 QMAKE_CXXFLAGS += -Wno-missing-field-initializers
 QMAKE_CXXFLAGS_DEBUG += -Wno-missing-field-initializers
 
+# See gtest/src/gtest-death-test.cc, line 123
+QMAKE_CXXFLAGS += -Wno-unused-variable
+QMAKE_CXXFLAGS_DEBUG += -Wno-unused-variable
+
 INCLUDEPATH += \
     gtest \
     gtest/include \

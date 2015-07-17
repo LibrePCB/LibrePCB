@@ -26,7 +26,6 @@
 #include "../schematiceditor.h"
 #include "ui_schematiceditor.h"
 #include <librepcbcommon/undostack.h>
-#include "../../project.h"
 #include <librepcbproject/circuit/circuit.h>
 #include <librepcbproject/schematics/items/si_netlabel.h>
 #include <librepcbproject/schematics/cmd/cmdschematicnetlabeladd.h>

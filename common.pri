@@ -31,3 +31,5 @@ CONFIG += c++11
 
 # enable compiler warnings
 CONFIG += warn_on
+QMAKE_CXXFLAGS += -Wextra
+QMAKE_CXXFLAGS_DEBUG += -Wextra

@@ -23,10 +23,10 @@
 
 #include <QtCore>
 #include "schematiceditorevent.h"
-#include "../../project.h"
 #include "../schematiceditor.h"
 #include "ui_schematiceditor.h"
 #include <librepcbproject/schematics/schematic.h>
+
 
 namespace project {
 
