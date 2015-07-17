@@ -688,6 +688,7 @@ XmlDomElement* Schematic::serializeToXmlDomElement(uint version) const throw (Ex
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("schematic"));
+    root->setAttribute("version", version);
     XmlDomElement* meta = root->appendChild("meta");
     meta->appendTextChild("uuid", mUuid);
     meta->appendTextChild("name", mName);

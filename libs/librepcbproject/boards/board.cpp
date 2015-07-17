@@ -393,6 +393,7 @@ XmlDomElement* Board::serializeToXmlDomElement(uint version) const throw (Except
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("board"));
+    root->setAttribute("version", version);
     XmlDomElement* meta = root->appendChild("meta");
     meta->appendTextChild("uuid", mUuid);
     meta->appendTextChild("name", mName);

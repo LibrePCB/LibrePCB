@@ -142,6 +142,7 @@ XmlDomElement* ProjectSettings::serializeToXmlDomElement(uint version) const thr
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("settings"));
+    root->setAttribute("version", version);
     XmlDomElement* locale_order = root->appendChild("locale_order");
     foreach (const QString& locale, mLocaleOrder)
         locale_order->appendTextChild("locale", locale);

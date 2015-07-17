@@ -148,7 +148,7 @@ void AddGenCompDialog::on_cbxSymbVar_currentIndexChanged(int index)
 
 void AddGenCompDialog::setSelectedCategory(const QUuid& categoryUuid)
 {
-    if (categoryUuid == mSelectedCategoryUuid) return;
+    if ((categoryUuid == mSelectedCategoryUuid) && (!categoryUuid.isNull())) return;
 
     setSelectedGenComp(nullptr);
     mUi->listGenericComponents->clear();

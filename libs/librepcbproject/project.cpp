@@ -571,7 +571,7 @@ void Project::save(uint version, bool toOriginal) throw (Exception)
 {
     QStringList errors;
 
-    if (!save(toOriginal, version, errors))
+    if (!save(version, toOriginal, errors))
     {
         QString msg = QString(tr("The project could not be saved!\n\nError Message:\n%1",
             "variable count of error messages", errors.count())).arg(errors.join("\n"));
@@ -620,6 +620,7 @@ XmlDomElement* Project::serializeToXmlDomElement(uint version) const throw (Exce
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("project"));
+    root->setAttribute("version", version);
 
     // meta
     XmlDomElement* meta = root->appendChild("meta");

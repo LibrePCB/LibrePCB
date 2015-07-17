@@ -467,6 +467,7 @@ XmlDomElement* Circuit::serializeToXmlDomElement(uint version) const throw (Exce
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("circuit"));
+    root->setAttribute("version", version);
     //XmlDomElement* meta = root->appendChild("meta");
     XmlDomElement* netclasses = root->appendChild("netclasses");
     foreach (NetClass* netclass, mNetClasses)

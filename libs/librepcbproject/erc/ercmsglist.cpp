@@ -155,6 +155,7 @@ XmlDomElement* ErcMsgList::serializeToXmlDomElement(uint version) const throw (E
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("erc"));
+    root->setAttribute("version", version);
     XmlDomElement* ignoreNode = root->appendChild("ignore");
     foreach (ErcMsg* ercMsg, mItems)
     {
