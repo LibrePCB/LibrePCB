@@ -177,14 +177,14 @@ QString GenCompInstance::getValue(bool replaceAttributes) const noexcept
     return value;
 }
 
-uint GenCompInstance::getUnplacedSymbolsCount() const noexcept
+int GenCompInstance::getUnplacedSymbolsCount() const noexcept
 {
     return (mGenCompSymbVar->getItems().count() - mSymbols.count());
 }
 
-uint GenCompInstance::getUnplacedRequiredSymbolsCount() const noexcept
+int GenCompInstance::getUnplacedRequiredSymbolsCount() const noexcept
 {
-    uint count = 0;
+    int count = 0;
     foreach (const library::GenCompSymbVarItem* item, mGenCompSymbVar->getItems())
     {
         if ((item->isRequired()) && (!mSymbols.contains(item->getUuid())))
@@ -193,9 +193,9 @@ uint GenCompInstance::getUnplacedRequiredSymbolsCount() const noexcept
     return count;
 }
 
-uint GenCompInstance::getUnplacedOptionalSymbolsCount() const noexcept
+int GenCompInstance::getUnplacedOptionalSymbolsCount() const noexcept
 {
-    uint count = 0;
+    int count = 0;
     foreach (const library::GenCompSymbVarItem* item, mGenCompSymbVar->getItems())
     {
         if ((!item->isRequired()) && (!mSymbols.contains(item->getUuid())))
@@ -341,7 +341,7 @@ void GenCompInstance::unregisterComponent(const ComponentInstance& component) th
     updateErcMessages();
 }
 
-XmlDomElement* GenCompInstance::serializeToXmlDomElement(uint version) const throw (Exception)
+XmlDomElement* GenCompInstance::serializeToXmlDomElement(int version) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -398,8 +398,8 @@ bool GenCompInstance::checkAttributesValidity() const noexcept
 
 void GenCompInstance::updateErcMessages() noexcept
 {
-    uint required = getUnplacedRequiredSymbolsCount();
-    uint optional = getUnplacedOptionalSymbolsCount();
+    int required = getUnplacedRequiredSymbolsCount();
+    int optional = getUnplacedOptionalSymbolsCount();
     mErcMsgUnplacedRequiredSymbols->setMsg(
         QString(tr("Unplaced required symbols of component \"%1\": %2"))
         .arg(mName).arg(required));

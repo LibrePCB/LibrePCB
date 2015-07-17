@@ -80,7 +80,7 @@ class SGI_Symbol final : public SGI_Base
         SGI_Symbol& operator=(const SGI_Symbol& rhs) = delete;
 
         // Private Methods
-        SchematicLayer* getSchematicLayer(uint id) const noexcept;
+        SchematicLayer* getSchematicLayer(int id) const noexcept;
 
 
         // Types

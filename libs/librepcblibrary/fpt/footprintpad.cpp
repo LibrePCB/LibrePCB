@@ -54,7 +54,7 @@ FootprintPad::FootprintPad(const XmlDomElement& domElement) throw (Exception) :
     mWidth = domElement.getAttribute<Length>("width");
     mHeight = domElement.getAttribute<Length>("height");
     mDrillDiameter = domElement.getAttribute<Length>("drill");
-    mLayerId = domElement.getAttribute<uint>("layer");
+    mLayerId = domElement.getAttribute<uint>("layer"); // use "uint" to automatically check for >= 0
 
     // read names and descriptions in all available languages
     LibraryBaseElement::readLocaleDomNodes(domElement, "name", mNames);
@@ -99,7 +99,7 @@ void FootprintPad::setDescription(const QString& locale, const QString& descript
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* FootprintPad::serializeToXmlDomElement(uint version) const throw (Exception)
+XmlDomElement* FootprintPad::serializeToXmlDomElement(int version) const throw (Exception)
 {
     Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);

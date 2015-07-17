@@ -147,11 +147,11 @@ QMultiMap<QUuid, FilePath> Library::getGenericComponentsByCategory(const QUuid& 
  *  General Methods
  ****************************************************************************************/
 
-uint Library::rescan() throw (Exception)
+int Library::rescan() throw (Exception)
 {
     clearDatabaseAndCreateTables();
 
-    uint count = 0;
+    int count = 0;
     QMultiMap<QString, QString> files = getAllXmlFilesInLibDir();
     count += addCategoriesToDb<ComponentCategory>(  files.values("component_category"), "component_categories", "cat_id");
     count += addCategoriesToDb<PackageCategory>(    files.values("package_category"),   "package_categories",   "cat_id");
@@ -171,10 +171,10 @@ uint Library::rescan() throw (Exception)
  ****************************************************************************************/
 
 template <typename ElementType>
-uint Library::addCategoriesToDb(const QList<QString>& xmlFiles, const QString& tablename,
+int Library::addCategoriesToDb(const QList<QString>& xmlFiles, const QString& tablename,
                                 const QString& id_rowname) throw (Exception)
 {
-    uint count = 0;
+    int count = 0;
     foreach (const QString& filepathStr, xmlFiles)
     {
         FilePath filepath(filepathStr);
@@ -209,10 +209,10 @@ uint Library::addCategoriesToDb(const QList<QString>& xmlFiles, const QString& t
 }
 
 template <typename ElementType>
-uint Library::addElementsToDb(const QList<QString>& xmlFiles, const QString& tablename,
+int Library::addElementsToDb(const QList<QString>& xmlFiles, const QString& tablename,
                               const QString& id_rowname) throw (Exception)
 {
-    uint count = 0;
+    int count = 0;
     foreach (const QString& filepathStr, xmlFiles)
     {
         FilePath filepath(filepathStr);

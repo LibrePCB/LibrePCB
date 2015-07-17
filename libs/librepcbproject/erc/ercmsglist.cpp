@@ -121,7 +121,7 @@ void ErcMsgList::restoreIgnoreState() noexcept
     }
 }
 
-bool ErcMsgList::save(uint version, bool toOriginal, QStringList& errors) noexcept
+bool ErcMsgList::save(int version, bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
 
@@ -149,7 +149,7 @@ bool ErcMsgList::checkAttributesValidity() const noexcept
     return true;
 }
 
-XmlDomElement* ErcMsgList::serializeToXmlDomElement(uint version) const throw (Exception)
+XmlDomElement* ErcMsgList::serializeToXmlDomElement(int version) const throw (Exception)
 {
     Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);

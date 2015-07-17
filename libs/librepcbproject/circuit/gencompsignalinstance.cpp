@@ -178,7 +178,7 @@ void GenCompSignalInstance::removeFromCircuit() throw (Exception)
     updateErcMessages();
 }
 
-XmlDomElement* GenCompSignalInstance::serializeToXmlDomElement(uint version) const throw (Exception)
+XmlDomElement* GenCompSignalInstance::serializeToXmlDomElement(int version) const throw (Exception)
 {
     Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);

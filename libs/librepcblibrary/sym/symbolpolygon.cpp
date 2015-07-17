@@ -40,7 +40,7 @@ SymbolPolygonSegment::SymbolPolygonSegment(const XmlDomElement& domElement) thro
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-XmlDomElement* SymbolPolygonSegment::serializeToXmlDomElement(uint version) const throw (Exception)
+XmlDomElement* SymbolPolygonSegment::serializeToXmlDomElement(int version) const throw (Exception)
 {
     Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
@@ -69,7 +69,7 @@ SymbolPolygon::SymbolPolygon() noexcept :
 SymbolPolygon::SymbolPolygon(const XmlDomElement& domElement) throw (Exception)
 {
     // load general attributes
-    mLayerId = domElement.getAttribute<uint>("layer");
+    mLayerId = domElement.getAttribute<uint>("layer"); // use "uint" to automatically check for >= 0
     mWidth = domElement.getAttribute<Length>("width");
     mIsFilled = domElement.getAttribute<bool>("fill");
     mIsGrabArea = domElement.getAttribute<bool>("grab_area");
@@ -146,7 +146,7 @@ void SymbolPolygon::appendSegment(const SymbolPolygonSegment* segment) noexcept
     mPainterPathPx = QPainterPath(); // invalidate painter path
 }
 
-XmlDomElement* SymbolPolygon::serializeToXmlDomElement(uint version) const throw (Exception)
+XmlDomElement* SymbolPolygon::serializeToXmlDomElement(int version) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

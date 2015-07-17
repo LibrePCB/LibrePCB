@@ -293,7 +293,7 @@ void Board::removeFromProject() throw (Exception)
     updateErcMessages();
 }
 
-bool Board::save(uint version, bool toOriginal, QStringList& errors) noexcept
+bool Board::save(int version, bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
 
@@ -388,7 +388,7 @@ bool Board::checkAttributesValidity() const noexcept
     return true;
 }
 
-XmlDomElement* Board::serializeToXmlDomElement(uint version) const throw (Exception)
+XmlDomElement* Board::serializeToXmlDomElement(int version) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

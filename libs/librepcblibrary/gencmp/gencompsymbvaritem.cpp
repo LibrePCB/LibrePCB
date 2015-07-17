@@ -114,7 +114,7 @@ void GenCompSymbVarItem::addPinSignalMapping(const QUuid& pin, const QUuid& sign
     mPinSignalMap.insert(pin, PinSignalMapItem_t{pin, signal, display});
 }
 
-XmlDomElement* GenCompSymbVarItem::serializeToXmlDomElement(uint version) const throw (Exception)
+XmlDomElement* GenCompSymbVarItem::serializeToXmlDomElement(int version) const throw (Exception)
 {
     Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);

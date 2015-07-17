@@ -128,7 +128,7 @@ class LengthUnit final
          *
          * @see #fromIndex(), #getAllUnits()
          */
-        uint getIndex() const noexcept {return static_cast<uint>(mUnit);}
+        int getIndex() const noexcept {return static_cast<int>(mUnit);}
 
         /**
          * @brief Convert the length unit to a string (for example to save it in files)
@@ -235,7 +235,7 @@ class LengthUnit final
          *
          * @see #getIndex(), #getAllUnits()
          */
-        static LengthUnit fromIndex(uint index) throw (Exception);
+        static LengthUnit fromIndex(int index) throw (Exception);
 
         /**
          * @brief Convert a string to a LengthUnit object (for example to load from files)

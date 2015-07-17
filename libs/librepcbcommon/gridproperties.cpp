@@ -59,7 +59,7 @@ GridProperties::~GridProperties() noexcept
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* GridProperties::serializeToXmlDomElement(uint version) const throw (Exception)
+XmlDomElement* GridProperties::serializeToXmlDomElement(int version) const throw (Exception)
 {
     Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);

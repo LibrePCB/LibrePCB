@@ -181,9 +181,9 @@ Point LengthUnit::convertFromUnit(const QPointF& point) const noexcept
 
 // Static Methods
 
-LengthUnit LengthUnit::fromIndex(uint index) throw (Exception)
+LengthUnit LengthUnit::fromIndex(int index) throw (Exception)
 {
-    if (index >= static_cast<uint>(LengthUnit_t::_COUNT))
+    if (index >= static_cast<int>(LengthUnit_t::_COUNT))
         throw LogicError(__FILE__, __LINE__, QString::number(index));
 
     return LengthUnit(static_cast<LengthUnit_t>(index));

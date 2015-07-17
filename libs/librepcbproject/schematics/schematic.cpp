@@ -556,7 +556,7 @@ void Schematic::removeFromProject() throw (Exception)
     mAddedToProject = false;
 }
 
-bool Schematic::save(uint version, bool toOriginal, QStringList& errors) noexcept
+bool Schematic::save(int version, bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
 
@@ -683,7 +683,7 @@ bool Schematic::checkAttributesValidity() const noexcept
     return true;
 }
 
-XmlDomElement* Schematic::serializeToXmlDomElement(uint version) const throw (Exception)
+XmlDomElement* Schematic::serializeToXmlDomElement(int version) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

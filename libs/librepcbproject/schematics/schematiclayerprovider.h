@@ -60,7 +60,7 @@ class SchematicLayerProvider final : public IF_SchematicLayerProvider
         /**
          * @copydoc IF_SchematicLayerProvider#getSchematicLayer()
          */
-        SchematicLayer* getSchematicLayer(uint id) const noexcept {return mLayers.value(id, nullptr);}
+        SchematicLayer* getSchematicLayer(int id) const noexcept {return mLayers.value(id, nullptr);}
 
 
     private:
@@ -71,12 +71,12 @@ class SchematicLayerProvider final : public IF_SchematicLayerProvider
         SchematicLayerProvider& operator=(const SchematicLayerProvider& rhs) = delete;
 
         // Private Methods
-        void addLayer(uint id) noexcept;
+        void addLayer(int id) noexcept;
 
 
         // General
         Project& mProject; ///< A reference to the Project object (from the ctor)
-        QMap<uint, SchematicLayer*> mLayers;
+        QMap<int, SchematicLayer*> mLayers;
 };
 
 } // namespace project

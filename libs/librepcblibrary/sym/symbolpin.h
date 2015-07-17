@@ -70,7 +70,7 @@ class SymbolPin final : public IF_XmlSerializableObject
         // General Methods
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
+        XmlDomElement* serializeToXmlDomElement(int version) const throw (Exception) override;
 
     private:
 

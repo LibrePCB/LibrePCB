@@ -109,7 +109,7 @@ void SymbolPin::setDescription(const QString& locale, const QString& description
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* SymbolPin::serializeToXmlDomElement(uint version) const throw (Exception)
+XmlDomElement* SymbolPin::serializeToXmlDomElement(int version) const throw (Exception)
 {
     Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);

@@ -69,7 +69,7 @@ class FootprintPad final : public IF_XmlSerializableObject
         const Length& getWidth() const noexcept {return mWidth;}
         const Length& getHeight() const noexcept {return mHeight;}
         const Length& getDrillDiameter() const noexcept {return mDrillDiameter;}
-        uint getLayerId() const noexcept {return mLayerId;}
+        int getLayerId() const noexcept {return mLayerId;}
         QString getName(const QStringList& localeOrder) const noexcept;
         QString getDescription(const QStringList& localeOrder) const noexcept;
         const QMap<QString, QString>& getNames() const noexcept {return mNames;}
@@ -82,14 +82,14 @@ class FootprintPad final : public IF_XmlSerializableObject
         void setWidth(const Length& width) noexcept {mWidth = width;}
         void setHeight(const Length& height) noexcept {mHeight = height;}
         void setDrillDiameter(const Length& diameter) noexcept {mDrillDiameter = diameter;}
-        void setLayerId(uint id) noexcept {mLayerId = id;}
+        void setLayerId(int id) noexcept {mLayerId = id;}
         void setName(const QString& locale, const QString& name) noexcept;
         void setDescription(const QString& locale, const QString& description) noexcept;
 
         // General Methods
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
+        XmlDomElement* serializeToXmlDomElement(int version) const throw (Exception) override;
 
         // Static Methods
         static Type_t stringToType(const QString& type) throw (Exception);
@@ -116,7 +116,7 @@ class FootprintPad final : public IF_XmlSerializableObject
         Length mWidth;
         Length mHeight;
         Length mDrillDiameter;
-        uint mLayerId;
+        int mLayerId;
         QMap<QString, QString> mNames;
         QMap<QString, QString> mDescriptions;
 };

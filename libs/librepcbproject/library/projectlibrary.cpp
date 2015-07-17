@@ -259,7 +259,7 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
 
         // search for the XML file with the newest version (<= application major version)
         FilePath filepath;
-        for (uint i = Application::majorVersion(); i >= 0; i--)
+        for (int i = Application::majorVersion(); i >= 0; i--)
         {
             filepath = subdirPath.getPathTo(QString("v%1.xml").arg(i));
             if (filepath.isExistingFile()) break;
@@ -329,7 +329,7 @@ const ElementType* ProjectLibrary::addElement(const FilePath& rootDir, const Fil
 
     // find the xml file to open
     FilePath xmlFilePath;
-    for (uint i = Application::majorVersion(); i >= 0; i--)
+    for (int i = Application::majorVersion(); i >= 0; i--)
     {
         xmlFilePath = destRootDir.getPathTo(QString("v%1.xml").arg(i));
         if (xmlFilePath.isExistingFile()) break;

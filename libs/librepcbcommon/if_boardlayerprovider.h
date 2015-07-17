@@ -70,7 +70,7 @@ class IF_BoardLayerProvider
          * @retval BoardLayer*      Pointer to the board layer with the specified ID
          * @retval nullptr          If no layer with the specified ID is available
          */
-        virtual BoardLayer* getBoardLayer(uint id) const noexcept = 0;
+        virtual BoardLayer* getBoardLayer(int id) const noexcept = 0;
 
 
     private:

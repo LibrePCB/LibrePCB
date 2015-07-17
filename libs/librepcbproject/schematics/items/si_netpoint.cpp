@@ -263,7 +263,7 @@ void SI_NetPoint::removeFromSchematic(GraphicsScene& scene) throw (Exception)
     mErcMsgDeadNetPoint->setVisible(false);
 }
 
-XmlDomElement* SI_NetPoint::serializeToXmlDomElement(uint version) const throw (Exception)
+XmlDomElement* SI_NetPoint::serializeToXmlDomElement(int version) const throw (Exception)
 {
     Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);

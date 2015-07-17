@@ -122,7 +122,7 @@ void SGI_NetLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* optio
  *  Private Methods
  ****************************************************************************************/
 
-SchematicLayer* SGI_NetLine::getSchematicLayer(uint id) const noexcept
+SchematicLayer* SGI_NetLine::getSchematicLayer(int id) const noexcept
 {
     return mNetLine.getSchematic().getProject().getSchematicLayer(id);
 }

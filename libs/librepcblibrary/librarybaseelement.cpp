@@ -92,7 +92,7 @@ QStringList LibraryBaseElement::getAllAvailableLocales() const noexcept
  *  General Methods
  ****************************************************************************************/
 
-void LibraryBaseElement::saveToFile(const FilePath& filepath, uint version) const throw (Exception)
+void LibraryBaseElement::saveToFile(const FilePath& filepath, int version) const throw (Exception)
 {
     XmlDomDocument doc(*serializeToXmlDomElement(version));
     QScopedPointer<SmartXmlFile> file(SmartXmlFile::create(filepath));
@@ -132,7 +132,7 @@ void LibraryBaseElement::parseDomTree(const XmlDomElement& root) throw (Exceptio
     mDomTreeParsed = true;
 }
 
-XmlDomElement* LibraryBaseElement::serializeToXmlDomElement(uint version) const throw (Exception)
+XmlDomElement* LibraryBaseElement::serializeToXmlDomElement(int version) const throw (Exception)
 {
     Q_UNUSED(version);
 

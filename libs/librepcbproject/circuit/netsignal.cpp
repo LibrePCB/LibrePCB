@@ -181,7 +181,7 @@ void NetSignal::removeFromCircuit() noexcept
     updateErcMessages();
 }
 
-XmlDomElement* NetSignal::serializeToXmlDomElement(uint version) const throw (Exception)
+XmlDomElement* NetSignal::serializeToXmlDomElement(int version) const throw (Exception)
 {
     Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);

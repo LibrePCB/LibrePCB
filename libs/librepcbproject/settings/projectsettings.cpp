@@ -108,7 +108,7 @@ void ProjectSettings::triggerSettingsChanged() noexcept
     emit settingsChanged();
 }
 
-bool ProjectSettings::save(uint version, bool toOriginal, QStringList& errors) noexcept
+bool ProjectSettings::save(int version, bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
 
@@ -136,7 +136,7 @@ bool ProjectSettings::checkAttributesValidity() const noexcept
     return true;
 }
 
-XmlDomElement* ProjectSettings::serializeToXmlDomElement(uint version) const throw (Exception)
+XmlDomElement* ProjectSettings::serializeToXmlDomElement(int version) const throw (Exception)
 {
     Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);

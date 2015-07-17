@@ -70,11 +70,15 @@ bool Version::setVersion(const QString& version) noexcept
 {
     mNumbers.clear();
     QStringList numbers = version.split('.', QString::KeepEmptyParts, Qt::CaseSensitive);
-    foreach (const QString& number, numbers)
+    foreach (const QString& numberStr, numbers)
     {
         bool ok = false;
-        mNumbers.append(number.toUInt(&ok));
-        if (!ok)
+        int number = numberStr.toInt(&ok);
+        if ((ok) && (number >= 0))
+        {
+            mNumbers.append(number);
+        }
+        else
         {
             // version invalid --> clear number list and abort
             mNumbers.clear();

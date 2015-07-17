@@ -156,7 +156,7 @@ void SI_NetLine::removeFromSchematic(GraphicsScene& scene) throw (Exception)
     mEndPoint->unregisterNetLine(*this);
 }
 
-XmlDomElement* SI_NetLine::serializeToXmlDomElement(uint version) const throw (Exception)
+XmlDomElement* SI_NetLine::serializeToXmlDomElement(int version) const throw (Exception)
 {
     Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);

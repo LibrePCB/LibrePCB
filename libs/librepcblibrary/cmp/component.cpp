@@ -67,7 +67,7 @@ void Component::parseDomTree(const XmlDomElement& root) throw (Exception)
     }
 }
 
-XmlDomElement* Component::serializeToXmlDomElement(uint version) const throw (Exception)
+XmlDomElement* Component::serializeToXmlDomElement(int version) const throw (Exception)
 {
     QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement(version));
     root->getFirstChild("meta", true)->appendTextChild("generic_component", mGenericComponentUuid);

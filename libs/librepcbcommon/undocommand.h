@@ -107,7 +107,7 @@ class UndoCommand
          * it. To make this attribute work properly, you must call #redo() of this class
          * from your derived class!
          */
-        uint mRedoCount;
+        int mRedoCount;
 
         /**
          * @brief Counter of how often #undo() was called
@@ -116,7 +116,7 @@ class UndoCommand
          * it. To make this attribute work properly, you must call #undo() of this class
          * from your derived class!
          */
-        uint mUndoCount;
+        int mUndoCount;
 
 
     private:

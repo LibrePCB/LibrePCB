@@ -29,9 +29,11 @@
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SchematicLayer::SchematicLayer(uint id) :
+SchematicLayer::SchematicLayer(int id) :
     QObject(0), mId(id), mName(), mColor(), mColorHighlighted(), mIsVisible(false)
 {
+    Q_ASSERT(mId >= 0);
+
     switch (mId)
     {
         case Grid:

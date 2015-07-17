@@ -196,11 +196,11 @@ class BoardLayer final : public QObject
         };
 
         // Constructors / Destructor
-        explicit BoardLayer(uint id);
+        explicit BoardLayer(int id);
         ~BoardLayer();
 
         // Getters
-        uint getId() const {return mId;}
+        int getId() const {return mId;}
         const QString& getName() const {return mName;}
         const QColor& getColor(bool highlighted = false) const;
         bool isVisible() const noexcept {return mIsVisible;}
@@ -215,7 +215,7 @@ class BoardLayer final : public QObject
 
 
         // Attributes
-        uint mId;
+        int mId;
         QString mName;
         QColor mColor;
         QColor mColorHighlighted;

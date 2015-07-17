@@ -434,7 +434,7 @@ void Circuit::setGenCompInstanceName(GenCompInstance& genComp, const QString& ne
  *  General Methods
  ****************************************************************************************/
 
-bool Circuit::save(uint version, bool toOriginal, QStringList& errors) noexcept
+bool Circuit::save(int version, bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
 
@@ -462,7 +462,7 @@ bool Circuit::checkAttributesValidity() const noexcept
     return true;
 }
 
-XmlDomElement* Circuit::serializeToXmlDomElement(uint version) const throw (Exception)
+XmlDomElement* Circuit::serializeToXmlDomElement(int version) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

@@ -77,10 +77,10 @@ class GenCompInstance : public QObject, public IF_AttributeProvider,
         const QUuid& getUuid() const noexcept {return mUuid;}
         const QString& getName() const noexcept {return mName;}
         QString getValue(bool replaceAttributes = false) const noexcept;
-        uint getPlacedSymbolsCount() const noexcept {return mSymbols.count();}
-        uint getUnplacedSymbolsCount() const noexcept;
-        uint getUnplacedRequiredSymbolsCount() const noexcept;
-        uint getUnplacedOptionalSymbolsCount() const noexcept;
+        int getPlacedSymbolsCount() const noexcept {return mSymbols.count();}
+        int getUnplacedSymbolsCount() const noexcept;
+        int getUnplacedRequiredSymbolsCount() const noexcept;
+        int getUnplacedOptionalSymbolsCount() const noexcept;
         GenCompSignalInstance* getSignalInstance(const QUuid& signalUuid) const noexcept {return mSignals.value(signalUuid);}
         const library::GenericComponent& getGenComp() const noexcept {return *mGenComp;}
         const library::GenCompSymbVar& getSymbolVariant() const noexcept {return *mGenCompSymbVar;}
@@ -129,7 +129,7 @@ class GenCompInstance : public QObject, public IF_AttributeProvider,
         void unregisterComponent(const ComponentInstance& component) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
+        XmlDomElement* serializeToXmlDomElement(int version) const throw (Exception) override;
 
 
         // Helper Methods

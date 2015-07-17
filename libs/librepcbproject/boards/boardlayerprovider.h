@@ -60,7 +60,7 @@ class BoardLayerProvider final : public IF_BoardLayerProvider
         /**
          * @copydoc IF_BoardLayerProvider#getBoardLayer()
          */
-        BoardLayer* getBoardLayer(uint id) const noexcept {return mLayers.value(id, nullptr);}
+        BoardLayer* getBoardLayer(int id) const noexcept {return mLayers.value(id, nullptr);}
 
 
     private:
@@ -71,12 +71,12 @@ class BoardLayerProvider final : public IF_BoardLayerProvider
         BoardLayerProvider& operator=(const BoardLayerProvider& rhs) = delete;
 
         // Private Methods
-        void addLayer(uint id) noexcept;
+        void addLayer(int id) noexcept;
 
 
         // General
         Project& mProject; ///< A reference to the Project object (from the ctor)
-        QMap<uint, BoardLayer*> mLayers;
+        QMap<int, BoardLayer*> mLayers;
 };
 
 } // namespace project

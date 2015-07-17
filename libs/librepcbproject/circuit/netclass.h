@@ -77,7 +77,7 @@ class NetClass final : public IF_ErcMsgProvider, public IF_XmlSerializableObject
         void removeFromCircuit() noexcept;
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
+        XmlDomElement* serializeToXmlDomElement(int version) const throw (Exception) override;
 
 
     private:

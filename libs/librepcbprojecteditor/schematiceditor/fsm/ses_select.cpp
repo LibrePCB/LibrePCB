@@ -744,7 +744,7 @@ bool SES_Select::cutSelectedItems() noexcept
 
     // get all selected items
     QList<QGraphicsItem*> items = schematic->selectedItems();
-    uint count = 0;
+    int count = 0;
     QList<SymbolInstance*> symbols;
     QList<SchematicNetPoint*> netpoints;
     QList<SchematicNetLine*> netlines;
@@ -858,7 +858,7 @@ bool SES_Select::pasteItems() noexcept
         // get clipboard content
         QList<SymbolInstance*> symbols;
         SchematicClipboard::instance().paste(*schematic, symbols);
-        uint countOfElements = symbols.count();
+        int countOfElements = symbols.count();
         Point centerOfElements;
 
         if (countOfElements == 0) return false;

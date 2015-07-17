@@ -88,7 +88,7 @@ class Version final
          *
          * @return List of numbers (empty list = invalid version)
          */
-        const QList<uint>& getNumbers() const noexcept {return mNumbers;}
+        const QList<int>& getNumbers() const noexcept {return mNumbers;}
 
         /**
          * @brief Get the version as a string in the format "1.2.3"
@@ -155,7 +155,7 @@ class Version final
          * number count == 0: version invalid
          * number count >= 1: version valid
          */
-        QList<uint> mNumbers;
+        QList<int> mNumbers;
 };
 
 #endif // VERSION_H

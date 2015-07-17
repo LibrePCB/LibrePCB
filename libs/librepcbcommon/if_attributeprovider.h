@@ -87,7 +87,7 @@ class IF_AttributeProvider
          *
          * @return The count of replaced variables in the text
          */
-        uint replaceVariablesWithAttributes(QString& rawText, bool passToParents) const noexcept;
+        int replaceVariablesWithAttributes(QString& rawText, bool passToParents) const noexcept;
 
         /**
          * @brief Get the value of an attribute which can be used in texts (like "${CMP::NAME}")

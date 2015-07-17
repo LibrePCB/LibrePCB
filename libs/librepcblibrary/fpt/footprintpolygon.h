@@ -64,7 +64,7 @@ class FootprintPolygonSegment final : public IF_XmlSerializableObject
         // General Methods
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
+        XmlDomElement* serializeToXmlDomElement(int version) const throw (Exception) override;
 
 
     private:
@@ -111,7 +111,7 @@ class FootprintPolygon final : public IF_XmlSerializableObject
         ~FootprintPolygon() noexcept;
 
         // Getters
-        uint getLayerId() const noexcept {return mLayerId;}
+        int getLayerId() const noexcept {return mLayerId;}
         const Length& getWidth() const noexcept {return mWidth;}
         bool isFilled() const noexcept {return mIsFilled;}
         bool isGrabArea() const noexcept {return mIsGrabArea;}
@@ -120,7 +120,7 @@ class FootprintPolygon final : public IF_XmlSerializableObject
         const QPainterPath& toQPainterPathPx() const noexcept;
 
         // Setters
-        void setLayerId(uint id) noexcept {mLayerId = id;}
+        void setLayerId(int id) noexcept {mLayerId = id;}
         void setWidth(const Length& width) noexcept {mWidth = width;}
         void setIsFilled(bool isFilled) noexcept {mIsFilled = isFilled;}
         void setIsGrabArea(bool isGrabArea) noexcept {mIsGrabArea = isGrabArea;}
@@ -131,7 +131,7 @@ class FootprintPolygon final : public IF_XmlSerializableObject
         void appendSegment(const FootprintPolygonSegment* segment) noexcept;
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
+        XmlDomElement* serializeToXmlDomElement(int version) const throw (Exception) override;
 
 
     private:
@@ -147,7 +147,7 @@ class FootprintPolygon final : public IF_XmlSerializableObject
 
 
         // Polygon Attributes
-        uint mLayerId;
+        int mLayerId;
         Length mWidth;
         bool mIsFilled;
         bool mIsGrabArea;

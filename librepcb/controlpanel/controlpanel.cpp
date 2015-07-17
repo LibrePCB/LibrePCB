@@ -546,7 +546,7 @@ void ControlPanel::on_actionRescanLibrary_triggered()
     try
     {
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        uint count = mWorkspace.getLibrary().rescan();
+        int count = mWorkspace.getLibrary().rescan();
         QApplication::restoreOverrideCursor();
         QMessageBox::information(this, tr("Rescan Library"),
             QString("Successfully scanned %1 library elements.").arg(count));

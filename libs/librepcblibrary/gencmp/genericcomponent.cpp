@@ -363,7 +363,7 @@ void GenericComponent::parseDomTree(const XmlDomElement& root) throw (Exception)
     }
 }
 
-XmlDomElement* GenericComponent::serializeToXmlDomElement(uint version) const throw (Exception)
+XmlDomElement* GenericComponent::serializeToXmlDomElement(int version) const throw (Exception)
 {
     QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement(version));
     XmlDomElement* attributes = root->appendChild("attributes");

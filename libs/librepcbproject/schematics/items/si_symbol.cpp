@@ -189,7 +189,7 @@ void SI_Symbol::removeFromSchematic(GraphicsScene& scene) throw (Exception)
         pin->removeFromSchematic(scene);
 }
 
-XmlDomElement* SI_Symbol::serializeToXmlDomElement(uint version) const throw (Exception)
+XmlDomElement* SI_Symbol::serializeToXmlDomElement(int version) const throw (Exception)
 {
     Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);

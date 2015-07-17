@@ -112,7 +112,7 @@ class Circuit final : public QObject, public IF_XmlSerializableObject
         void setGenCompInstanceName(GenCompInstance& genComp, const QString& newName) throw (Exception);
 
         // General Methods
-        bool save(uint version, bool toOriginal, QStringList& errors) noexcept;
+        bool save(int version, bool toOriginal, QStringList& errors) noexcept;
 
 
     signals:
@@ -138,7 +138,7 @@ class Circuit final : public QObject, public IF_XmlSerializableObject
         bool checkAttributesValidity() const noexcept override;
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
+        XmlDomElement* serializeToXmlDomElement(int version) const throw (Exception) override;
 
 
         // General

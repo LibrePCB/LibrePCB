@@ -111,7 +111,7 @@ void SGI_NetPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
  *  Private Methods
  ****************************************************************************************/
 
-SchematicLayer* SGI_NetPoint::getSchematicLayer(uint id) const noexcept
+SchematicLayer* SGI_NetPoint::getSchematicLayer(int id) const noexcept
 {
     return mNetPoint.getSchematic().getProject().getSchematicLayer(id);
 }

@@ -71,7 +71,7 @@ class IF_XmlSerializableObject
          *
          * @throw Exception     This method throws an exception if an error occurs.
          */
-        virtual XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) = 0;
+        virtual XmlDomElement* serializeToXmlDomElement(int version) const throw (Exception) = 0;
 
 
     protected:

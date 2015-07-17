@@ -106,7 +106,7 @@ class XmlDomDocument final
          *
          * @throw   If the attribute "version" of the root node is invalid or does not exist
          */
-        uint getFileVersion() const throw (Exception);
+        int getFileVersion() const throw (Exception);
 
 
         // Setters
@@ -117,7 +117,7 @@ class XmlDomDocument final
          *
          * @param version   The file version
          */
-        void setFileVersion(uint version) noexcept;
+        void setFileVersion(int version) noexcept;
 
 
         // General Methods

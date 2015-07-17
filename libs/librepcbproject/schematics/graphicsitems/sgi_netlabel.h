@@ -71,7 +71,7 @@ class SGI_NetLabel final : public SGI_Base
         SGI_NetLabel& operator=(const SGI_NetLabel& rhs) = delete;
 
         // Private Methods
-        SchematicLayer* getSchematicLayer(uint id) const noexcept;
+        SchematicLayer* getSchematicLayer(int id) const noexcept;
 
 
         // Attributes

@@ -255,7 +255,7 @@ class Project final : public QObject, public IF_AttributeProvider,
         /**
          * @copydoc IF_SchematicLayerProvider#getSchematicLayer()
          */
-        SchematicLayer* getSchematicLayer(uint id) const noexcept;
+        SchematicLayer* getSchematicLayer(int id) const noexcept;
 
         /**
          * @brief Get the page index of a specific schematic
@@ -352,7 +352,7 @@ class Project final : public QObject, public IF_AttributeProvider,
         /**
          * @copydoc IF_BoardLayerProvider#getBoardLayer()
          */
-        BoardLayer* getBoardLayer(uint id) const noexcept;
+        BoardLayer* getBoardLayer(int id) const noexcept;
 
         /**
          * @brief Get the index of a specific board
@@ -444,7 +444,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *
          * @throw Exception on error
          */
-        void save(uint version, bool toOriginal) throw (Exception);
+        void save(int version, bool toOriginal) throw (Exception);
 
 
         // Helper Methods
@@ -524,7 +524,7 @@ class Project final : public QObject, public IF_AttributeProvider,
         /**
          * @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
          */
-        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception);
+        XmlDomElement* serializeToXmlDomElement(int version) const throw (Exception);
 
         /**
          * @brief Save the project to the harddisc (to temporary or original files)
@@ -535,7 +535,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *
          * @return True on success (then the error list should be empty), false otherwise
          */
-        bool save(uint version, bool toOriginal, QStringList& errors) noexcept;
+        bool save(int version, bool toOriginal, QStringList& errors) noexcept;
 
         /**
          * @brief Print some schematics to a QPrinter (printer or file)
@@ -545,7 +545,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *
          * @throw Exception     On error
          */
-        void printSchematicPages(QPrinter& printer, QList<uint>& pages) throw (Exception);
+        void printSchematicPages(QPrinter& printer, QList<int>& pages) throw (Exception);
 
 
         // Project File (*.lpp)

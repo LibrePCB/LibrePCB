@@ -98,7 +98,7 @@ class Library final : public QObject
         /**
          * @brief Rescan the whole library directory and update the SQLite database
          */
-        uint rescan() throw (Exception);
+        int rescan() throw (Exception);
 
 
     private:
@@ -111,11 +111,11 @@ class Library final : public QObject
 
         // Private Methods
         template <typename ElementType>
-        uint addCategoriesToDb(const QList<QString>& xmlFiles, const QString& tablename,
-                               const QString& id_rowname) throw (Exception);
+        int addCategoriesToDb(const QList<QString>& xmlFiles, const QString& tablename,
+                              const QString& id_rowname) throw (Exception);
         template <typename ElementType>
-        uint addElementsToDb(const QList<QString>& xmlFiles, const QString& tablename,
-                             const QString& id_rowname) throw (Exception);
+        int addElementsToDb(const QList<QString>& xmlFiles, const QString& tablename,
+                            const QString& id_rowname) throw (Exception);
         QMultiMap<Version, FilePath> getElementFilePathsFromDb(const QString& tablename,
                                                                const QUuid& uuid) const noexcept;
         QMultiMap<QUuid, FilePath> getCategoryChilds(const QString& tablename,

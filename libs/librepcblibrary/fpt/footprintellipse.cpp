@@ -39,7 +39,7 @@ FootprintEllipse::FootprintEllipse() noexcept :
 
 FootprintEllipse::FootprintEllipse(const XmlDomElement& domElement) throw (Exception)
 {
-    mLayerId = domElement.getAttribute<uint>("layer");
+    mLayerId = domElement.getAttribute<uint>("layer"); // use "uint" to automatically check for >= 0
     mLineWidth = domElement.getAttribute<Length>("width");
     mIsFilled = domElement.getAttribute<bool>("fill");
     mIsGrabArea = domElement.getAttribute<bool>("grab_area");
@@ -60,7 +60,7 @@ FootprintEllipse::~FootprintEllipse() noexcept
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* FootprintEllipse::serializeToXmlDomElement(uint version) const throw (Exception)
+XmlDomElement* FootprintEllipse::serializeToXmlDomElement(int version) const throw (Exception)
 {
     Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);

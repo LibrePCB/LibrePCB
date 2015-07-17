@@ -110,7 +110,7 @@ void Symbol::parseDomTree(const XmlDomElement& root) throw (Exception)
     }
 }
 
-XmlDomElement* Symbol::serializeToXmlDomElement(uint version) const throw (Exception)
+XmlDomElement* Symbol::serializeToXmlDomElement(int version) const throw (Exception)
 {
     QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement(version));
     XmlDomElement* geometry = root->appendChild("geometry");

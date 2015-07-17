@@ -53,7 +53,7 @@ class SymbolText final : public IF_XmlSerializableObject
         ~SymbolText() noexcept;
 
         // Getters
-        uint getLayerId() const noexcept {return mLayerId;}
+        int getLayerId() const noexcept {return mLayerId;}
         const Point& getPosition() const noexcept {return mPosition;}
         const Angle& getAngle() const noexcept {return mAngle;}
         const Length& getHeight() const noexcept {return mHeight;}
@@ -61,7 +61,7 @@ class SymbolText final : public IF_XmlSerializableObject
         const QString& getText() const noexcept {return mText;}
 
         // Setters
-        void setLayerId(uint layerId) noexcept {mLayerId = layerId;}
+        void setLayerId(int layerId) noexcept {mLayerId = layerId;}
         void setText(const QString& text) noexcept {mText = text;}
         void setPosition(const Point& pos) noexcept {mPosition = pos;}
         void setAngle(const Angle& angle) noexcept {mAngle = angle;}
@@ -71,7 +71,7 @@ class SymbolText final : public IF_XmlSerializableObject
         // General Methods
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
+        XmlDomElement* serializeToXmlDomElement(int version) const throw (Exception) override;
 
 
     private:
@@ -87,7 +87,7 @@ class SymbolText final : public IF_XmlSerializableObject
 
 
         // Text Attributes
-        uint mLayerId;
+        int mLayerId;
         QString mText;
         Point mPosition;
         Angle mAngle;

@@ -193,7 +193,7 @@ void ErcMsgDock::on_btnIgnore_clicked(bool checked)
 
 void ErcMsgDock::updateTopLevelItemTexts() noexcept
 {
-    uint countOfNonIgnoredErcMessages = 0;
+    int countOfNonIgnoredErcMessages = 0;
     QTreeWidgetItem* item;
     item = mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::CircuitError)];
     item->setText(0, QString(tr("Circuit Errors (%1)")).arg(item->childCount()));

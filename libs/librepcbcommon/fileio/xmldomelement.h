@@ -255,7 +255,7 @@ class XmlDomElement final
          *
          * @return  The count of child elements
          */
-        uint getChildCount() const noexcept {return mChilds.count();}
+        int getChildCount() const noexcept {return mChilds.count();}
 
         /**
          * @brief Remove a child element from the DOM tree

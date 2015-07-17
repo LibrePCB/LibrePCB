@@ -256,8 +256,8 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
     if (layer->isVisible())
     {
         // show symbols count of the generic component
-        uint count = mSymbol.getGenCompInstance().getPlacedSymbolsCount();
-        uint maxCount = mSymbol.getGenCompInstance().getSymbolVariant().getItems().count();
+        int count = mSymbol.getGenCompInstance().getPlacedSymbolsCount();
+        int maxCount = mSymbol.getGenCompInstance().getSymbolVariant().getItems().count();
         mFont.setPixelSize(Length(1000000).toPx());
         painter->setFont(mFont);
         painter->setPen(QPen(layer->getColor(selected), 0, Qt::SolidLine, Qt::RoundCap));
@@ -279,7 +279,7 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
  *  Private Methods
  ****************************************************************************************/
 
-SchematicLayer* SGI_Symbol::getSchematicLayer(uint id) const noexcept
+SchematicLayer* SGI_Symbol::getSchematicLayer(int id) const noexcept
 {
     return mSymbol.getSchematic().getProject().getSchematicLayer(id);
 }

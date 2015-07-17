@@ -65,7 +65,7 @@ SchematicLayerProvider::~SchematicLayerProvider() noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void SchematicLayerProvider::addLayer(uint id) noexcept
+void SchematicLayerProvider::addLayer(int id) noexcept
 {
     mLayers.insert(id, new SchematicLayer(id));
 }

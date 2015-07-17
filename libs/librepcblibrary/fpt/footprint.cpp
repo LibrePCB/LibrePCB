@@ -120,7 +120,7 @@ void Footprint::parseDomTree(const XmlDomElement& root) throw (Exception)
     }
 }
 
-XmlDomElement* Footprint::serializeToXmlDomElement(uint version) const throw (Exception)
+XmlDomElement* Footprint::serializeToXmlDomElement(int version) const throw (Exception)
 {
     QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement(version));
     XmlDomElement* geometry = root->appendChild("geometry");

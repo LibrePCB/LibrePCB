@@ -68,7 +68,7 @@ BoardLayerProvider::~BoardLayerProvider() noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void BoardLayerProvider::addLayer(uint id) noexcept
+void BoardLayerProvider::addLayer(int id) noexcept
 {
     mLayers.insert(id, new BoardLayer(id));
 }

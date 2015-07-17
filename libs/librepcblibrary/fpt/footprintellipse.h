@@ -55,7 +55,7 @@ class FootprintEllipse final : public IF_XmlSerializableObject
         ~FootprintEllipse() noexcept;
 
         // Getters
-        uint getLayerId() const noexcept {return mLayerId;}
+        int getLayerId() const noexcept {return mLayerId;}
         const Length& getLineWidth() const noexcept {return mLineWidth;}
         bool isFilled() const noexcept {return mIsFilled;}
         bool isGrabArea() const noexcept {return mIsGrabArea;}
@@ -65,7 +65,7 @@ class FootprintEllipse final : public IF_XmlSerializableObject
         const Angle& getRotation() const noexcept {return mRotation;}
 
         // Setters
-        void setLayerId(uint id) noexcept {mLayerId = id;}
+        void setLayerId(int id) noexcept {mLayerId = id;}
         void setLineWidth(const Length& width) noexcept {mLineWidth = width;}
         void setIsFilled(bool isFilled) noexcept {mIsFilled = isFilled;}
         void setIsGrabArea(bool isGrabArea) noexcept {mIsGrabArea = isGrabArea;}
@@ -77,7 +77,7 @@ class FootprintEllipse final : public IF_XmlSerializableObject
         // General Methods
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
+        XmlDomElement* serializeToXmlDomElement(int version) const throw (Exception) override;
 
 
     private:
@@ -93,7 +93,7 @@ class FootprintEllipse final : public IF_XmlSerializableObject
 
 
         // Polygon Attributes
-        uint mLayerId;
+        int mLayerId;
         Length mLineWidth;
         bool mIsFilled;
         bool mIsGrabArea;

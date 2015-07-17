@@ -156,7 +156,7 @@ void SGI_NetLabel::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
  *  Private Methods
  ****************************************************************************************/
 
-SchematicLayer* SGI_NetLabel::getSchematicLayer(uint id) const noexcept
+SchematicLayer* SGI_NetLabel::getSchematicLayer(int id) const noexcept
 {
     return mNetLabel.getSchematic().getProject().getSchematicLayer(id);
 }

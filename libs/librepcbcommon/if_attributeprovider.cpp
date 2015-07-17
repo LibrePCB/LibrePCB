@@ -28,9 +28,9 @@
  *  Class IF_AttributeProvider
  ****************************************************************************************/
 
-uint IF_AttributeProvider::replaceVariablesWithAttributes(QString& rawText, bool passToParents) const noexcept
+int IF_AttributeProvider::replaceVariablesWithAttributes(QString& rawText, bool passToParents) const noexcept
 {
-    uint count = 0;
+    int count = 0;
     int startPos = 0;
     int length = 0;
     QString varNS;

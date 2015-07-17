@@ -89,7 +89,7 @@ class NetSignal final : public IF_ErcMsgProvider, public IF_XmlSerializableObjec
         void removeFromCircuit() noexcept;
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
+        XmlDomElement* serializeToXmlDomElement(int version) const throw (Exception) override;
 
 
     private:
@@ -122,7 +122,7 @@ class NetSignal final : public IF_ErcMsgProvider, public IF_XmlSerializableObjec
         QList<GenCompSignalInstance*> mGenCompSignals;
         QList<SI_NetPoint*> mSchematicNetPoints;
         QList<SI_NetLabel*> mSchematicNetLabels;
-        uint mGenCompSignalWithForcedNameCount;
+        int mGenCompSignalWithForcedNameCount;
 
         // Attributes
         QUuid mUuid;

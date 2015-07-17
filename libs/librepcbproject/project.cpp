@@ -256,8 +256,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
         if (create)
         {
             // write all files to harddisc
-            uint appVersion = Application::applicationVersion().getNumbers().first();
-            save(appVersion, true);
+            save(Application::majorVersion(), true);
         }
     }
     catch (...)
@@ -353,7 +352,7 @@ void Project::setLastModified(const QDateTime& newLastModified) noexcept
  *  Schematic Methods
  ****************************************************************************************/
 
-SchematicLayer* Project::getSchematicLayer(uint id) const noexcept
+SchematicLayer* Project::getSchematicLayer(int id) const noexcept
 {
     return mSchematicLayerProvider->getSchematicLayer(id);
 }
@@ -456,7 +455,7 @@ void Project::exportSchematicsAsPdf(const FilePath& filepath) throw (Exception)
     printer.setCreator(QString("LibrePCB %1").arg(qApp->applicationVersion()));
     printer.setOutputFileName(filepath.toStr());
 
-    QList<uint> pages;
+    QList<int> pages;
     for (int i = 0; i < mSchematics.count(); i++)
         pages.append(i);
 
@@ -469,7 +468,7 @@ void Project::exportSchematicsAsPdf(const FilePath& filepath) throw (Exception)
  *  Board Methods
  ****************************************************************************************/
 
-BoardLayer* Project::getBoardLayer(uint id) const noexcept
+BoardLayer* Project::getBoardLayer(int id) const noexcept
 {
     return mBoardLayerProvider->getBoardLayer(id);
 }
@@ -567,7 +566,7 @@ void Project::removeBoard(Board* board, bool deleteBoard) throw (Exception)
  *  General Methods
  ****************************************************************************************/
 
-void Project::save(uint version, bool toOriginal) throw (Exception)
+void Project::save(int version, bool toOriginal) throw (Exception)
 {
     QStringList errors;
 
@@ -614,7 +613,7 @@ bool Project::checkAttributesValidity() const noexcept
     return true;
 }
 
-XmlDomElement* Project::serializeToXmlDomElement(uint version) const throw (Exception)
+XmlDomElement* Project::serializeToXmlDomElement(int version) const throw (Exception)
 {
     Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
@@ -644,7 +643,7 @@ XmlDomElement* Project::serializeToXmlDomElement(uint version) const throw (Exce
     return root.take();
 }
 
-bool Project::save(uint version, bool toOriginal, QStringList& errors) noexcept
+bool Project::save(int version, bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
 
@@ -724,7 +723,7 @@ bool Project::save(uint version, bool toOriginal, QStringList& errors) noexcept
     return success;
 }
 
-void Project::printSchematicPages(QPrinter& printer, QList<uint>& pages) throw (Exception)
+void Project::printSchematicPages(QPrinter& printer, QList<int>& pages) throw (Exception)
 {
     if (pages.isEmpty())
         throw RuntimeError(__FILE__, __LINE__, QString(), tr("No schematic pages selected."));

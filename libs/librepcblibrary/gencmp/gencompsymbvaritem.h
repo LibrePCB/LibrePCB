@@ -80,7 +80,7 @@ class GenCompSymbVarItem final : public IF_XmlSerializableObject
         void addPinSignalMapping(const QUuid& pin, const QUuid& signal, PinDisplayType_t display) noexcept;
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
+        XmlDomElement* serializeToXmlDomElement(int version) const throw (Exception) override;
 
 
     private:

@@ -179,7 +179,7 @@ void ComponentInstance::removeFromBoard(GraphicsScene& scene) throw (Exception)
     updateErcMessages();
 }
 
-XmlDomElement* ComponentInstance::serializeToXmlDomElement(uint version) const throw (Exception)
+XmlDomElement* ComponentInstance::serializeToXmlDomElement(int version) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

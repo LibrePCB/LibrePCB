@@ -82,7 +82,7 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
         void removeFromBoard(GraphicsScene& scene) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
+        XmlDomElement* serializeToXmlDomElement(int version) const throw (Exception) override;
 
         // Helper Methods
         Point mapToScene(const Point& relativePos) const noexcept;

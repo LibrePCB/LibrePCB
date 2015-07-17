@@ -154,7 +154,7 @@ void GenCompSymbVar::addItem(const GenCompSymbVarItem& item) noexcept
     mSymbolItems.append(&item);
 }
 
-XmlDomElement* GenCompSymbVar::serializeToXmlDomElement(uint version) const throw (Exception)
+XmlDomElement* GenCompSymbVar::serializeToXmlDomElement(int version) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

@@ -266,7 +266,7 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
  *  Private Methods
  ****************************************************************************************/
 
-BoardLayer* BGI_Footprint::getBoardLayer(uint id) const noexcept
+BoardLayer* BGI_Footprint::getBoardLayer(int id) const noexcept
 {
     return mFootprint.getComponentInstance().getBoard().getProject().getBoardLayer(id);
 }

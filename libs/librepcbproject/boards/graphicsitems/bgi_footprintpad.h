@@ -79,7 +79,7 @@ class BGI_FootprintPad final : public BGI_Base
         BGI_FootprintPad& operator=(const BGI_FootprintPad& rhs) = delete;
 
         // Private Methods
-        BoardLayer* getBoardLayer(uint id) const noexcept;
+        BoardLayer* getBoardLayer(int id) const noexcept;
 
 
         // General Attributes

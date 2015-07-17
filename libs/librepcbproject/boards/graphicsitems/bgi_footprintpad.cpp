@@ -176,7 +176,7 @@ void BGI_FootprintPad::paint(QPainter* painter, const QStyleOptionGraphicsItem* 
  *  Private Methods
  ****************************************************************************************/
 
-BoardLayer* BGI_FootprintPad::getBoardLayer(uint id) const noexcept
+BoardLayer* BGI_FootprintPad::getBoardLayer(int id) const noexcept
 {
     return mPad.getFootprint().getComponentInstance().getBoard().getProject().getBoardLayer(id);
 }

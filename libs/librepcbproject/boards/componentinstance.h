@@ -92,7 +92,7 @@ class ComponentInstance final : public QObject, public IF_AttributeProvider,
         void removeFromBoard(GraphicsScene& scene) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
+        XmlDomElement* serializeToXmlDomElement(int version) const throw (Exception) override;
 
         // Helper Methods
         bool getAttributeValue(const QString& attrNS, const QString& attrKey,

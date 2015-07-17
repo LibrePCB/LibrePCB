@@ -38,7 +38,7 @@ SymbolText::SymbolText() noexcept :
 
 SymbolText::SymbolText(const XmlDomElement& domElement) throw (Exception)
 {
-    mLayerId = domElement.getAttribute<uint>("layer");
+    mLayerId = domElement.getAttribute<uint>("layer"); // use "uint" to automatically check for >= 0
     mText = domElement.getAttribute("text", true);
 
     // load geometry attributes
@@ -62,7 +62,7 @@ SymbolText::~SymbolText() noexcept
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* SymbolText::serializeToXmlDomElement(uint version) const throw (Exception)
+XmlDomElement* SymbolText::serializeToXmlDomElement(int version) const throw (Exception)
 {
     Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);

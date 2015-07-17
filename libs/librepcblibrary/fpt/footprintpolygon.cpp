@@ -40,7 +40,7 @@ FootprintPolygonSegment::FootprintPolygonSegment(const XmlDomElement& domElement
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-XmlDomElement* FootprintPolygonSegment::serializeToXmlDomElement(uint version) const throw (Exception)
+XmlDomElement* FootprintPolygonSegment::serializeToXmlDomElement(int version) const throw (Exception)
 {
     Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
@@ -69,7 +69,7 @@ FootprintPolygon::FootprintPolygon() noexcept :
 FootprintPolygon::FootprintPolygon(const XmlDomElement& domElement) throw (Exception)
 {
     // load general attributes
-    mLayerId = domElement.getAttribute<uint>("layer");
+    mLayerId = domElement.getAttribute<uint>("layer"); // use "uint" to automatically check for >= 0
     mWidth = domElement.getAttribute<Length>("width");
     mIsFilled = domElement.getAttribute<bool>("fill");
     mIsGrabArea = domElement.getAttribute<bool>("grab_area");
@@ -146,7 +146,7 @@ void FootprintPolygon::appendSegment(const FootprintPolygonSegment* segment) noe
     mPainterPathPx = QPainterPath(); // invalidate painter path
 }
 
-XmlDomElement* FootprintPolygon::serializeToXmlDomElement(uint version) const throw (Exception)
+XmlDomElement* FootprintPolygon::serializeToXmlDomElement(int version) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

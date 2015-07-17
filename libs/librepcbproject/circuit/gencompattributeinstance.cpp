@@ -90,7 +90,7 @@ void GenCompAttributeInstance::setTypeValueUnit(const AttributeType& type,
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* GenCompAttributeInstance::serializeToXmlDomElement(uint version) const throw (Exception)
+XmlDomElement* GenCompAttributeInstance::serializeToXmlDomElement(int version) const throw (Exception)
 {
     Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);

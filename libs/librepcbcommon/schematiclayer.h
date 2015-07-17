@@ -79,11 +79,11 @@ class SchematicLayer final : public QObject
         };
 
         // Constructors / Destructor
-        explicit SchematicLayer(uint id);
+        explicit SchematicLayer(int id);
         ~SchematicLayer();
 
         // Getters
-        uint getId() const {return mId;}
+        int getId() const {return mId;}
         const QString& getName() const {return mName;}
         const QColor& getColor(bool highlighted = false) const;
         bool isVisible() const noexcept {return mIsVisible;}
@@ -97,7 +97,7 @@ class SchematicLayer final : public QObject
         SchematicLayer& operator=(const SchematicLayer& rhs);
 
         // Attributes
-        uint mId;
+        int mId;
         QString mName;
         QColor mColor;
         QColor mColorHighlighted;

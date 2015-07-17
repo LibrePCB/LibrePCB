@@ -101,7 +101,7 @@ class GenCompSignalInstance final : public QObject, public IF_ErcMsgProvider,
         void removeFromCircuit() throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement(uint version) const throw (Exception) override;
+        XmlDomElement* serializeToXmlDomElement(int version) const throw (Exception) override;
 
 
     private slots:

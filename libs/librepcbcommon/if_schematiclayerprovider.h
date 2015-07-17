@@ -70,7 +70,7 @@ class IF_SchematicLayerProvider
          * @retval SchematicLayer*  Pointer to the schematic layer with the specified ID
          * @retval nullptr          If no layer with the specified ID is available
          */
-        virtual SchematicLayer* getSchematicLayer(uint id) const noexcept = 0;
+        virtual SchematicLayer* getSchematicLayer(int id) const noexcept = 0;
 
 
     private:

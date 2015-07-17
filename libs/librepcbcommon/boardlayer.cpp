@@ -29,9 +29,11 @@
  *  Constructors / Destructor
  ****************************************************************************************/
 
-BoardLayer::BoardLayer(uint id) :
+BoardLayer::BoardLayer(int id) :
     QObject(0), mId(id), mName(), mColor(), mColorHighlighted(), mIsVisible(false)
 {
+    Q_ASSERT(mId >= 0);
+
     switch (mId)
     {
         case Grid:
