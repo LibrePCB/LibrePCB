@@ -343,7 +343,7 @@ void SES_AddComponents::startAddingComponent(const QUuid& genComp, const QUuid& 
         {
             // search the generic component in the library
             mGenComp = mProject.getLibrary().getGenComp(genComp);
-            mGenCompSymbVar = mGenComp->getSymbolVariantByUuid(symbVar);
+            if (mGenComp) mGenCompSymbVar = mGenComp->getSymbolVariantByUuid(symbVar);
         }
 
         // check pointers
