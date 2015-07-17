@@ -54,6 +54,12 @@ namespace project {
 
 /**
  * @brief The ProjectLibrary class
+ *
+ * @todo When adding new elements, the directory should be copied only to a temporary
+ *       location. Then after saving the project, the directory must be copied to the
+ *       project library's directory. The same applies to removed elements.
+ * @todo When removing elements, the objects should not be deleted! Undo commands need to
+ *       add removed elements again, and the pointer to the object should remain the same.
  */
 class ProjectLibrary final : public QObject
 {
@@ -85,6 +91,23 @@ class ProjectLibrary final : public QObject
         QHash<QUuid, const library::Component*> getComponentsOfGenComp(const QUuid& genCompUuid) const noexcept;
 
 
+        // General Methods
+        const library::Symbol* addSymbol(const FilePath& elemDirPath) throw (Exception);
+        const library::Footprint* addFootprint(const FilePath& elemDirPath) throw (Exception);
+        const library::Model3D* add3dModel(const FilePath& elemDirPath) throw (Exception);
+        const library::SpiceModel* addSpiceModel(const FilePath& elemDirPath) throw (Exception);
+        const library::Package* addPackage(const FilePath& elemDirPath) throw (Exception);
+        const library::GenericComponent* addGenComp(const FilePath& elemDirPath) throw (Exception);
+        const library::Component* addComp(const FilePath& elemDirPath) throw (Exception);
+        void removeSymbol(const QUuid& uuid) throw (Exception);
+        void removeFootprint(const QUuid& uuid) throw (Exception);
+        void remove3dModel(const QUuid& uuid) throw (Exception);
+        void removeSpiceModel(const QUuid& uuid) throw (Exception);
+        void removePackage(const QUuid& uuid) throw (Exception);
+        void removeGenComp(const QUuid& uuid) throw (Exception);
+        void removeComp(const QUuid& uuid) throw (Exception);
+
+
     private:
 
         // make some methods inaccessible...
@@ -96,6 +119,11 @@ class ProjectLibrary final : public QObject
         template <typename ElementType>
         void loadElements(const FilePath& directory, const QString& type,
                           QHash<QUuid, const ElementType*>& elementList) throw (Exception);
+        template <typename ElementType>
+        const ElementType* addElement(const FilePath& rootDir, const FilePath& destDir,
+                                      QHash<QUuid, const ElementType*>& elementList) throw (Exception);
+        template <typename ElementType>
+        void removeElement(const QUuid& uuid, QHash<QUuid, const ElementType*>& elementList) throw (Exception);
 
         // General
         Project& mProject; ///< a reference to the Project object (from the ctor)

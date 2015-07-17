@@ -55,6 +55,7 @@ class Application final : public QApplication
         // Static Methods
         static void setApplicationVersion(const Version& version) noexcept;
         static Version applicationVersion() noexcept;
+        static uint majorVersion() noexcept {return applicationVersion().getNumbers().first();}
 
 
     private:

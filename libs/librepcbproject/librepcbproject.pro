@@ -86,7 +86,8 @@ SOURCES += \
     cmd/cmdprojectsetmetadata.cpp \
     settings/projectsettings.cpp \
     settings/cmd/cmdprojectsettingschange.cpp \
-    schematics/schematiclayerprovider.cpp
+    schematics/schematiclayerprovider.cpp \
+    library/cmd/cmdprojectlibraryaddelement.cpp
 
 HEADERS += \
     project.h \
@@ -155,6 +156,7 @@ HEADERS += \
     cmd/cmdprojectsetmetadata.h \
     settings/projectsettings.h \
     settings/cmd/cmdprojectsettingschange.h \
-    schematics/schematiclayerprovider.h
+    schematics/schematiclayerprovider.h \
+    library/cmd/cmdprojectlibraryaddelement.h
 
 FORMS +=

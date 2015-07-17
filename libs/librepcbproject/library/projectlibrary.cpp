@@ -33,6 +33,7 @@
 #include <librepcblibrary/pkg/package.h>
 #include <librepcblibrary/gencmp/genericcomponent.h>
 #include <librepcblibrary/cmp/component.h>
+#include <librepcbcommon/application.h>
 
 using namespace library;
 
@@ -152,6 +153,80 @@ QHash<QUuid, const library::Component*> ProjectLibrary::getComponentsOfGenComp(c
 }
 
 /*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+const library::Symbol* ProjectLibrary::addSymbol(const FilePath& elemDirPath) throw (Exception)
+{
+    return addElement<Symbol>(elemDirPath, mLibraryPath.getPathTo("sym"), mSymbols);
+}
+
+const library::Footprint* ProjectLibrary::addFootprint(const FilePath& elemDirPath) throw (Exception)
+{
+    return addElement<Footprint>(elemDirPath, mLibraryPath.getPathTo("fpt"), mFootprints);
+}
+
+const library::Model3D* ProjectLibrary::add3dModel(const FilePath& elemDirPath) throw (Exception)
+{
+    return addElement<Model3D>(elemDirPath, mLibraryPath.getPathTo("3dmdl"), mModels);
+}
+
+const library::SpiceModel* ProjectLibrary::addSpiceModel(const FilePath& elemDirPath) throw (Exception)
+{
+    return addElement<SpiceModel>(elemDirPath, mLibraryPath.getPathTo("spcmdl"), mSpiceModels);
+}
+
+const library::Package* ProjectLibrary::addPackage(const FilePath& elemDirPath) throw (Exception)
+{
+    return addElement<Package>(elemDirPath, mLibraryPath.getPathTo("pkg"), mPackages);
+}
+
+const library::GenericComponent* ProjectLibrary::addGenComp(const FilePath& elemDirPath) throw (Exception)
+{
+    return addElement<GenericComponent>(elemDirPath, mLibraryPath.getPathTo("gencmp"), mGenericComponents);
+}
+
+const library::Component* ProjectLibrary::addComp(const FilePath& elemDirPath) throw (Exception)
+{
+    return addElement<Component>(elemDirPath, mLibraryPath.getPathTo("cmp"), mComponents);
+}
+
+void ProjectLibrary::removeSymbol(const QUuid& uuid) throw (Exception)
+{
+    removeElement<Symbol>(uuid, mSymbols);
+}
+
+void ProjectLibrary::removeFootprint(const QUuid& uuid) throw (Exception)
+{
+    removeElement<Footprint>(uuid, mFootprints);
+}
+
+void ProjectLibrary::remove3dModel(const QUuid& uuid) throw (Exception)
+{
+    removeElement<Model3D>(uuid, mModels);
+}
+
+void ProjectLibrary::removeSpiceModel(const QUuid& uuid) throw (Exception)
+{
+    removeElement<SpiceModel>(uuid, mSpiceModels);
+}
+
+void ProjectLibrary::removePackage(const QUuid& uuid) throw (Exception)
+{
+    removeElement<Package>(uuid, mPackages);
+}
+
+void ProjectLibrary::removeGenComp(const QUuid& uuid) throw (Exception)
+{
+    removeElement<GenericComponent>(uuid, mGenericComponents);
+}
+
+void ProjectLibrary::removeComp(const QUuid& uuid) throw (Exception)
+{
+    removeElement<Component>(uuid, mComponents);
+}
+
+/*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
@@ -184,10 +259,7 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
 
         // search for the XML file with the newest version (<= application major version)
         FilePath filepath;
-        Version appVersion(qApp->applicationVersion());
-        if (appVersion.getNumbers().isEmpty()) throw LogicError(__FILE__, __LINE__);
-        uint appMajorVersion = appVersion.getNumbers().first();
-        for (uint i = appMajorVersion; i >= 0; i--)
+        for (uint i = Application::majorVersion(); i >= 0; i--)
         {
             filepath = subdirPath.getPathTo(QString("v%1.xml").arg(i));
             if (filepath.isExistingFile()) break;
@@ -221,6 +293,80 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
     }
 
     qDebug() << "successfully loaded" << elementList.count() << qPrintable(type);
+}
+
+template <typename ElementType>
+const ElementType* ProjectLibrary::addElement(const FilePath& rootDir, const FilePath& destDir,
+                                              QHash<QUuid, const ElementType*>& elementList) throw (Exception)
+{
+    // root directory must exist
+    if ((!rootDir.isValid()) || (!rootDir.isExistingDir()))
+    {
+        throw RuntimeError(__FILE__, __LINE__, QString(),
+            QString(tr("Invalid directory: \"%1\"")).arg(rootDir.toNative()));
+    }
+
+    // destination directory must NOT exist
+    FilePath destRootDir = destDir.getPathTo(rootDir.getFilename());
+    if (destRootDir.isExistingDir() || destRootDir.isExistingFile() || (!destRootDir.isValid()))
+    {
+        throw RuntimeError(__FILE__, __LINE__, QString(),
+            QString(tr("Directory or file exists already: \"%1\"")).arg(destRootDir.toNative()));
+    }
+
+    // create the destination directory
+    destRootDir.mkPath();
+
+    // copy directory recursive
+    QDirIterator it(rootDir.toStr(), QDir::Files, QDirIterator::Subdirectories);
+    while (it.hasNext())
+    {
+        FilePath rootFilePath(it.next());
+        QString relativePath = rootFilePath.toRelative(rootDir);
+        FilePath destFilePath = FilePath::fromRelative(destRootDir, relativePath);
+        QFile::copy(rootFilePath.toStr(), destFilePath.toStr());
+    }
+
+    // find the xml file to open
+    FilePath xmlFilePath;
+    for (uint i = Application::majorVersion(); i >= 0; i--)
+    {
+        xmlFilePath = destRootDir.getPathTo(QString("v%1.xml").arg(i));
+        if (xmlFilePath.isExistingFile()) break;
+    }
+
+    // load the library element --> an exception will be thrown on error
+    ElementType* element = new ElementType(xmlFilePath);
+
+    // add the element to the list
+    if (elementList.contains(element->getUuid()))
+    {
+        throw RuntimeError(__FILE__, __LINE__, element->getUuid().toString(),
+            QString(tr("There is already a library element with the UUID \"%1\""))
+            .arg(element->getUuid().toString()));
+    }
+    elementList.insert(element->getUuid(), element);
+
+    return element;
+}
+
+template <typename ElementType>
+void ProjectLibrary::removeElement(const QUuid& uuid, QHash<QUuid, const ElementType*>& elementList) throw (Exception)
+{
+    if (!elementList.contains(uuid))
+    {
+        throw RuntimeError(__FILE__, __LINE__, uuid.toString(),
+            QString(tr("There is no library element with the UUID \"%1\""))
+            .arg(uuid.toString()));
+    }
+
+    // remove element from list
+    const ElementType* element = elementList.take(uuid);
+    FilePath elementDir = element->getXmlFilepath().getParentDir();
+    delete element;
+
+    // remove directory
+    QDir(elementDir.toStr()).removeRecursively();
 }
 
 /*****************************************************************************************
