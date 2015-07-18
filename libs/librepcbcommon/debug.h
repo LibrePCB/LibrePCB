@@ -59,13 +59,14 @@ class Debug final
          * Enum for debug levels. Only messages of the current or a higher level are printed.
          */
         enum class DebugLevel_t {
-            Nothing = 0,    ///< 0: nothing
-            Fatal,          ///< 1: fatal errors [qFatal()] --> this will quit the application!
-            Critical,       ///< 2: errors [qCritical()]
-            Exception,      ///< 3: throwed exceptions of (sub)class Exception
-            Warning,        ///< 4: warnings [qWarning()]
-            DebugMsg,       ///< 5: irrelevant debug messages (a lot of messages!) [qDebug()]
-            All,            ///< 6: all
+            Nothing     = 0,    ///< nothing
+            Fatal       = 10,   ///< fatal errors [qFatal()] --> this will quit the application!
+            Critical    = 20,   ///< errors [qCritical()]
+            Exception   = 30,   ///< throwed exceptions of (sub)class Exception
+            Warning     = 40,   ///< warnings [qWarning()]
+            Info        = 50,   ///< info messages [qInfo()]
+            DebugMsg    = 60,   ///< irrelevant debug messages (a lot of messages!) [qDebug()]
+            All         = 100,  ///< all
         };
 
 

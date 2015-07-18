@@ -128,6 +128,9 @@ void Debug::print(DebugLevel_t level, const QString& msg, const char* file, int 
         case DebugLevel_t::DebugMsg:
             levelStr = "DEBUG-MSG";
             break;
+        case DebugLevel_t::Info:
+            levelStr = "  INFO   ";
+            break;
         case DebugLevel_t::Warning:
             levelStr = " WARNING ";
             break;
@@ -173,6 +176,10 @@ void Debug::messageHandler(QtMsgType type, const QMessageLogContext& context, co
             instance()->print(DebugLevel_t::DebugMsg, msg, context.file, context.line);
             break;
 
+        case QtInfoMsg:
+            instance()->print(DebugLevel_t::Info, msg, context.file, context.line);
+            break;
+
         case QtWarningMsg:
             instance()->print(DebugLevel_t::Warning, msg, context.file, context.line);
             break;
@@ -184,6 +191,9 @@ void Debug::messageHandler(QtMsgType type, const QMessageLogContext& context, co
         case QtFatalMsg:
             instance()->print(DebugLevel_t::Fatal, msg, context.file, context.line);
             abort(); // fatal error --> quit the whole application!
+
+        default:
+            Q_ASSERT(false);
     }
 }
 
