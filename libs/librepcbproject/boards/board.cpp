@@ -110,7 +110,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
     }
 }
 
-Board::~Board()
+Board::~Board() noexcept
 {
     // delete all component instances (and catch all throwed exceptions)
     foreach (ComponentInstance* compInstance, mComponentInstances)

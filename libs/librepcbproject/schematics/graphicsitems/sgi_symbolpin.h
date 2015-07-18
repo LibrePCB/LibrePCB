@@ -91,7 +91,6 @@ class SGI_SymbolPin final : public SGI_Base
         // Cached Attributes
         QStaticText mStaticText;
         bool mRotate180;
-        int mFlags;
         QRectF mBoundingRect;
         QPointF mTextOrigin;
         QRectF mTextBoundingRect;

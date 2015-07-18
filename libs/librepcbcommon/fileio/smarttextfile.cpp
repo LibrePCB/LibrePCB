@@ -42,7 +42,7 @@ SmartTextFile::SmartTextFile(const FilePath& filepath, bool restore, bool readOn
     }
 }
 
-SmartTextFile::~SmartTextFile()
+SmartTextFile::~SmartTextFile() noexcept
 {
 }
 

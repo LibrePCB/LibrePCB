@@ -100,7 +100,6 @@ class SymbolPinPreviewGraphicsItem final : public GraphicsItem
         // Cached Attributes
         QStaticText mStaticText;
         bool mRotate180;
-        int mFlags;
         QRectF mBoundingRect;
         QPointF mTextOrigin;
         QRectF mTextBoundingRect;

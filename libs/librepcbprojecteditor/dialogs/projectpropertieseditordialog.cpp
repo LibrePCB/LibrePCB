@@ -49,7 +49,7 @@ ProjectPropertiesEditorDialog::ProjectPropertiesEditorDialog(Project& project,
     mUi->edtCreated->setDateTime(mProject.getCreated());
 }
 
-ProjectPropertiesEditorDialog::~ProjectPropertiesEditorDialog()
+ProjectPropertiesEditorDialog::~ProjectPropertiesEditorDialog() noexcept
 {
     delete mUi;     mUi = nullptr;
 }

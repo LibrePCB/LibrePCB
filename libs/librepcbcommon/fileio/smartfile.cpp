@@ -71,7 +71,7 @@ SmartFile::SmartFile(const FilePath& filepath, bool restore, bool readOnly, bool
     }
 }
 
-SmartFile::~SmartFile()
+SmartFile::~SmartFile() noexcept
 {
     if ((!mIsRestored) && (!mIsReadOnly) && (mTmpFilePath.isExistingFile()))
     {

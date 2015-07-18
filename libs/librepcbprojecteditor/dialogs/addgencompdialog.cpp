@@ -64,7 +64,7 @@ AddGenCompDialog::AddGenCompDialog(Workspace& workspace, Project& project, QWidg
     //setSelectedCategory(QUuid());
 }
 
-AddGenCompDialog::~AddGenCompDialog()
+AddGenCompDialog::~AddGenCompDialog() noexcept
 {
     qDeleteAll(mPreviewSymbolGraphicsItems);    mPreviewSymbolGraphicsItems.clear();
     mSelectedSymbVar = nullptr;

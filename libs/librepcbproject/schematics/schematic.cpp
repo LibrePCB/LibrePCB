@@ -138,7 +138,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
     }
 }
 
-Schematic::~Schematic()
+Schematic::~Schematic() noexcept
 {
     // delete all netlabels (and catch all throwed exceptions)
     foreach (SI_NetLabel* netlabel, mNetLabels)

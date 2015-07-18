@@ -16,13 +16,9 @@ include(../../common.pri)
 CONFIG -= qt app_bundle
 CONFIG += staticlib thread
 
-# See gtest/include/gtest/internal/gtest-port.h, line 1388
-QMAKE_CXXFLAGS += -Wno-missing-field-initializers
-QMAKE_CXXFLAGS_DEBUG += -Wno-missing-field-initializers
-
-# See gtest/src/gtest-death-test.cc, line 123
-QMAKE_CXXFLAGS += -Wno-unused-variable
-QMAKE_CXXFLAGS_DEBUG += -Wno-unused-variable
+# suppress compiler warnings
+QMAKE_CXXFLAGS += -Wno-missing-field-initializers -Wno-unused-variable -Wno-missing-field-initializers
+QMAKE_CXXFLAGS_DEBUG += -Wno-missing-field-initializers -Wno-unused-variable -Wno-missing-field-initializers
 
 INCLUDEPATH += \
     gtest \

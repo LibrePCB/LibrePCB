@@ -260,8 +260,8 @@ void GraphicsView::drawForeground(QPainter* painter, const QRectF& rect)
         QPen originPen(foregroundBrush().color());
         originPen.setWidth(0);
         painter->setPen(originPen);
-        painter->drawLine(-21.6, 0, 21.6, 0);
-        painter->drawLine(0, -21.6, 0, 21.6);
+        painter->drawLine(QLineF(-21.6, 0.0, 21.6, 0.0));
+        painter->drawLine(QLineF(0.0, -21.6, 0.0, 21.6));
     }
 }
 

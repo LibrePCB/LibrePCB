@@ -36,7 +36,7 @@ UndoCommand::UndoCommand(const QString &text, UndoCommand* parent) throw (Except
         mParent->appendChild(this);
 }
 
-UndoCommand::~UndoCommand()
+UndoCommand::~UndoCommand() noexcept
 {
     for (int i = mChilds.count()-1; i >= 0; i--) // reverse
         delete mChilds[i]; // this will call removeChild() to remove the entry in the list
