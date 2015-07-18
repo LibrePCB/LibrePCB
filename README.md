@@ -1,6 +1,8 @@
 LibrePCB Project Description
 ============================
 
+[![Build Status](https://travis-ci.org/LibrePCB/LibrePCB.svg?branch=master)](https://travis-ci.org/LibrePCB/LibrePCB)
+
 ## About LibrePCB
 
 LibrePCB is a free & OpenSource (GPLv3) Schematic / Layout Editor to develop printed circuit boards. The project is still in a quite early development status (no stable release available).
