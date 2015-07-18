@@ -10,8 +10,9 @@ LibrePCB is a free & OpenSource (GPLv3) Schematic / Layout Editor to develop pri
 ## Development Requirements
 
 To compile LibrePCB, you need the following software components:
-- Qt >= 5.4
 - g++ or MinGW >= 4.8 (C++11 support is required)
+- Qt >= 5.4 (http://www.qt.io/download-open-source/)
+- libglu1-mesa-dev (`sudo apt-get install libglu1-mesa-dev`)
 
 ## Workspace
 

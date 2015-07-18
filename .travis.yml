@@ -21,5 +21,5 @@ install:
 
 script: 
   - qmake -r "QMAKE_CXX=$CXX" "QMAKE_CC=$CC"
-  - make -j 8
+  - make -j 2
   - ./generated/unix/tests

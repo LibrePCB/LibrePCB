@@ -17,7 +17,7 @@ UI_DIR = ui
 UI_HEADERS_DIR = ui
 UI_SOURCES_DIR = ui
 
-# Qt >= 5.2 is obligatory!
+# Qt >= 5.4 is obligatory!
 lessThan(QT_MAJOR_VERSION, 5) {
     error("Qt version $$[QT_VERSION] is too old, should be version 5.4 or newer!")
 } else {
