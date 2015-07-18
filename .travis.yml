@@ -5,26 +5,21 @@ compiler:
   - gcc
   
 env:
-- QT_BASE=52
-- QT_BASE=53
 - QT_BASE=54
 - QT_BASE=55
 
 before_install:
 - if [ "$CXX" = "g++" ]; then sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y; fi
-- if [ "$QT_BASE" = "52" ]; then sudo add-apt-repository ppa:beineri/opt-qt521 -y; fi
-- if [ "$QT_BASE" = "53" ]; then sudo add-apt-repository ppa:beineri/opt-qt532 -y; fi
 - if [ "$QT_BASE" = "54" ]; then sudo add-apt-repository ppa:beineri/opt-qt541 -y; fi
 - if [ "$QT_BASE" = "55" ]; then sudo add-apt-repository ppa:beineri/opt-qt55 -y; fi
 - sudo apt-get update -qq
 
 install:
 - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq gcc-4.8 g++-4.8; export CXX="g++-4.8" CC="gcc-4.8"; $CXX --version; fi
-- if [ "$QT_BASE" = "52" ]; then sudo apt-get install -qq qt52base qt52tools qt52webkit-examples libglu1-mesa-dev; source /opt/qt52/bin/qt52-env.sh; fi
-- if [ "$QT_BASE" = "53" ]; then sudo apt-get install -qq qt53base qt53tools qt53webkit-examples libglu1-mesa-dev; source /opt/qt53/bin/qt53-env.sh; fi
 - if [ "$QT_BASE" = "54" ]; then sudo apt-get install -qq qt54base qt54tools qt54webkit-examples libglu1-mesa-dev; source /opt/qt54/bin/qt54-env.sh; fi
 - if [ "$QT_BASE" = "55" ]; then sudo apt-get install -qq qt55base qt55tools qt55webkit-examples libglu1-mesa-dev; source /opt/qt55/bin/qt55-env.sh; fi
 
 script: 
   - qmake -r "QMAKE_CXX=$CXX" "QMAKE_CC=$CC"
-  - make check -j 8
+  - make -j 8
+  - ./generated/unix/tests
