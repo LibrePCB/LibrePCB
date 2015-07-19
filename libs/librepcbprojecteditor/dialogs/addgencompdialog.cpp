@@ -60,6 +60,8 @@ AddGenCompDialog::AddGenCompDialog(Workspace& workspace, Project& project, QWidg
     const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
     mCategoryTreeModel = new library::CategoryTreeModel(mWorkspace.getLibrary(), localeOrder);
     mUi->treeCategories->setModel(mCategoryTreeModel);
+    connect(mUi->treeCategories->selectionModel(), &QItemSelectionModel::currentChanged,
+            this, &AddGenCompDialog::on_treeCategories_currentItemChanged);
 
     //setSelectedCategory(QUuid());
 }
@@ -98,11 +100,13 @@ QUuid AddGenCompDialog::getSelectedSymbVarUuid() const noexcept
  *  Private Slots
  ****************************************************************************************/
 
-void AddGenCompDialog::on_treeCategories_clicked(const QModelIndex &index)
+void AddGenCompDialog::on_treeCategories_currentItemChanged(const QModelIndex& current, const QModelIndex& previous)
 {
+    Q_UNUSED(previous);
+
     try
     {
-        QUuid categoryUuid = index.data(Qt::UserRole).toUuid();
+        QUuid categoryUuid = current.data(Qt::UserRole).toUuid();
         setSelectedCategory(categoryUuid);
     }
     catch (Exception& e)

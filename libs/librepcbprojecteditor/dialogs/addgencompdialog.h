@@ -83,7 +83,7 @@ class AddGenCompDialog final : public QDialog
 
     private slots:
 
-        void on_treeCategories_clicked(const QModelIndex &index);
+        void on_treeCategories_currentItemChanged(const QModelIndex& current, const QModelIndex& previous);
         void on_listGenericComponents_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
         void on_cbxSymbVar_currentIndexChanged(int index);
 
