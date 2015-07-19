@@ -10,7 +10,9 @@
         <description locale="en_US"></description>
         <keywords locale="en_US"/>
     </meta>
-    <categories/>
+    <categories>
+        <category>{22fbb140-85e4-46cc-a550-68ae2dc58b1a}</category>
+    </categories>
     <attributes/>
     <properties>
         <schematic_only>false</schematic_only>

@@ -10,7 +10,9 @@
         <description locale="en_US"></description>
         <keywords locale="en_US"/>
     </meta>
-    <categories/>
+    <categories>
+        <category>{70421345-ae1d-4fed-aa60-e7619524b97f}</category>
+    </categories>
     <attributes>
         <attribute key="COLOR" type="string" unit="">
             <name locale="en_US">Color</name>

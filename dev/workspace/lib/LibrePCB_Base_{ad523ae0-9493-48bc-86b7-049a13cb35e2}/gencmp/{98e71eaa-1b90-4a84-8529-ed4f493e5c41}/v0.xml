@@ -6,12 +6,12 @@
         <author>LibrePCB</author>
         <created>2015-03-01T20:00:00Z</created>
         <last_modified>2015-03-01T20:00:00Z</last_modified>
-        <name locale="en_US">Schematic Frame</name>
+        <name locale="en_US">A4 Landscape Schematic Frame</name>
         <description locale="en_US"></description>
-        <keywords locale="en_US">frame</keywords>
+        <keywords locale="en_US">frame,a4,landscape</keywords>
     </meta>
     <categories>
-        <category>{00000000-0000-4001-8000-000000000000}</category>
+        <category>{e0702c57-f31f-497d-ae1e-e31c4017f3c0}</category>
     </categories>
     <changelog/>
     <attachements/>

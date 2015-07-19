@@ -6,11 +6,13 @@
         <author>LibrePCB</author>
         <created>2015-03-03T20:19:27Z</created>
         <last_modified>2015-03-03T20:19:27Z</last_modified>
-        <name locale="en_US">Simple Voltage Regulator</name>
+        <name locale="en_US">Voltage Regulator 3P</name>
         <description locale="en_US">Voltage Regulator with 3 Pins: IN, GND, OUT</description>
         <keywords locale="en_US"/>
     </meta>
-    <categories/>
+    <categories>
+        <category>{4b890baf-9df3-4d9f-94ed-2808cd9a8781}</category>
+    </categories>
     <attributes/>
     <properties>
         <schematic_only>false</schematic_only>

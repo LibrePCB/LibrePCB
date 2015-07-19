@@ -10,7 +10,9 @@
         <description locale="en_US"></description>
         <keywords locale="en_US"/>
     </meta>
-    <categories/>
+    <categories>
+        <category>{39d4b3d6-4168-4fe2-9420-fbf7eb3ac248}</category>
+    </categories>
     <attributes>
         <attribute key="FREQUENCY" type="frequency" unit="megahertz">
             <name locale="en_US">Frequency</name>

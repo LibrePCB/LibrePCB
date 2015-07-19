@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <component_category version="0">
     <meta>
-        <uuid>{22fbb140-85e4-46cc-a550-68ae2dc58b1a}</uuid>
+        <uuid>{81bc83af-f0b1-4d90-bdf6-d94e5db8e550}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
         <created>2015-07-05T12:43:52Z</created>
         <last_modified>2015-07-05T18:01:33Z</last_modified>
         <parent></parent>
-        <name locale="en_US">Connectors</name>
-        <description locale="en_US">Various connector types</description>
-        <keywords locale="en_US">connector</keywords>
+        <name locale="en_US">Microcontrollers</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US">microcontroller,microprocessor,uc,mc,up</keywords>
     </meta>
 </component_category>

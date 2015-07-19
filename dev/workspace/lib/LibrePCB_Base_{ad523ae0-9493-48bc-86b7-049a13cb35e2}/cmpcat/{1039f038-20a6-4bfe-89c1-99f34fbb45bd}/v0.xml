@@ -8,7 +8,7 @@
         <last_modified>2015-07-05T18:01:33Z</last_modified>
         <parent></parent>
         <name locale="en_US">Resistors</name>
-        <description locale="en_US">Various resistor types</description>
-        <keywords locale="en_US">resistor</keywords>
+        <description locale="en_US"></description>
+        <keywords locale="en_US">resistor,resistance</keywords>
     </meta>
 </component_category>

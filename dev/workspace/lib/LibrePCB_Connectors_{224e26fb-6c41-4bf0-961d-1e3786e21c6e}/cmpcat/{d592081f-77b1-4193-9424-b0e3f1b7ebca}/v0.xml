@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<component_category version="0">
+    <meta>
+        <uuid>{d592081f-77b1-4193-9424-b0e3f1b7ebca}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-07-05T12:43:52Z</created>
+        <last_modified>2015-07-05T18:01:33Z</last_modified>
+        <parent>{22fbb140-85e4-46cc-a550-68ae2dc58b1a}</parent>
+        <name locale="en_US">Wire-to-Board</name>
+        <description locale="en_US">Woard-to-Board Connectors</description>
+        <keywords locale="en_US">wire,board,connector,w2b</keywords>
+    </meta>
+</component_category>

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <component_category version="0">
     <meta>
-        <uuid>{e9663545-80dd-4658-9357-d4ef62e55168}</uuid>
+        <uuid>{e8080ad9-6b53-46bd-8996-a03c30f99ebe}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
         <created>2015-07-05T12:43:52Z</created>
         <last_modified>2015-07-05T18:01:33Z</last_modified>
-        <parent></parent>
-        <name locale="en_US">Transistors / FETs</name>
+        <parent>{b037e5c3-4e14-42e5-b542-cb4d8c7bff71}</parent>
+        <name locale="en_US">MOSFET Drivers</name>
         <description locale="en_US"></description>
-        <keywords locale="en_US">transistor,fet,mosfet</keywords>
+        <keywords locale="en_US">mosfet,drivers</keywords>
     </meta>
 </component_category>

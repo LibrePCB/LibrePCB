@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <component_category version="0">
     <meta>
-        <uuid>{e9663545-80dd-4658-9357-d4ef62e55168}</uuid>
+        <uuid>{39d4b3d6-4168-4fe2-9420-fbf7eb3ac248}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
         <created>2015-07-05T12:43:52Z</created>
         <last_modified>2015-07-05T18:01:33Z</last_modified>
         <parent></parent>
-        <name locale="en_US">Transistors / FETs</name>
+        <name locale="en_US">Crystals / Oscillators / Resonators</name>
         <description locale="en_US"></description>
-        <keywords locale="en_US">transistor,fet,mosfet</keywords>
+        <keywords locale="en_US">crystal,resonator,oscillator,resonator,ceramicresonator,khz,mhz,ghz</keywords>
     </meta>
 </component_category>

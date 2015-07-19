@@ -10,7 +10,9 @@
         <description locale="en_US"></description>
         <keywords locale="en_US">capacitor,capacitance,unipolar</keywords>
     </meta>
-    <categories/>
+    <categories>
+        <category>{c011cc6b-b762-498e-8494-d1994f3043cf}</category>
+    </categories>
     <attributes>
         <attribute key="CAPACITANCE" type="capacitance" unit="microfarad">
             <name locale="en_US">Capacitance</name>
