@@ -27,14 +27,14 @@ install:
 
 script:
   - qmake -r "QMAKE_CXX=$CXX" "QMAKE_CC=$CC"
-  - make -j 16
+  - make -j 8
   - ./generated/unix/tests
 
 after_script:
   - cd ./dev/doxygen
-  - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then git clone $DOXYGEN_REPOSITORY html; fi
+  - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then git clone $DOXYGEN_REPOSITORY output/html; fi
   - doxygen Doxyfile
-  - cd html
+  - cd output/html
   - git config user.name "LibrePCB-Builder"
   - git config user.email "builder@librepcb.org"
   - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then git commit --all -m "updated doxygen documentation"; git push origin master; fi
