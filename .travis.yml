@@ -32,9 +32,9 @@ script:
 
 after_script:
   - cd ./dev/doxygen
-  - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then git clone $DOXYGEN_REPOSITORY output/html; fi
+  - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then git clone -b gh-pages $DOXYGEN_REPOSITORY output/html; fi
   - doxygen Doxyfile
   - cd output/html
   - git config user.name "LibrePCB-Builder"
   - git config user.email "builder@librepcb.org"
-  - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then git add --all; git commit --all -m "updated doxygen documentation"; git push origin master; fi
+  - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then git add --all; git commit --all -m "updated doxygen documentation"; git push origin gh-pages; fi
