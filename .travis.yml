@@ -16,17 +16,18 @@ before_install:
   - if [ "$CXX" = "g++" ]; then sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y; fi
   - if [ "$QT_BASE" = "54" ]; then sudo add-apt-repository ppa:beineri/opt-qt541 -y; fi
   - if [ "$QT_BASE" = "55" ]; then sudo add-apt-repository ppa:beineri/opt-qt55 -y; fi
+  - sudo apt-add-repository -y ppa:libreoffice/libreoffice-4-3
   - sudo apt-get update -qq
 
 install:
   - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq gcc-4.8 g++-4.8; export CXX="g++-4.8" CC="gcc-4.8"; $CXX --version; fi
   - if [ "$QT_BASE" = "54" ]; then sudo apt-get install -qq qt54base qt54tools qt54webkit-examples; source /opt/qt54/bin/qt54-env.sh; fi
   - if [ "$QT_BASE" = "55" ]; then sudo apt-get install -qq qt55base qt55tools qt55webkit-examples; source /opt/qt55/bin/qt55-env.sh; fi
-  - sudo apt-get install -qq libglu1-mesa-dev doxygen
+  - sudo apt-get install -qq libglu1-mesa-dev doxygen graphviz
 
 script:
   - qmake -r "QMAKE_CXX=$CXX" "QMAKE_CC=$CC"
-  - make -j 32
+  - make -j 16
   - ./generated/unix/tests
 
 after_script:
