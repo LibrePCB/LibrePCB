@@ -24,11 +24,11 @@
         </prefixes>
     </properties>
     <signals>
-        <signal negated="false" required="false" clock="false" uuid="{daf86625-d081-4fd6-a925-14976f92263d}" forced_net_name="" role="passive">
+        <signal negated="false" required="true" clock="false" uuid="{daf86625-d081-4fd6-a925-14976f92263d}" forced_net_name="" role="passive">
             <name locale="en_US">A</name>
             <description locale="en_US"/>
         </signal>
-        <signal negated="false" required="false" clock="false" uuid="{343a05e0-6e9b-4317-a7de-61bd3c774b5c}" forced_net_name="" role="passive">
+        <signal negated="false" required="true" clock="false" uuid="{343a05e0-6e9b-4317-a7de-61bd3c774b5c}" forced_net_name="" role="passive">
             <name locale="en_US">C</name>
             <description locale="en_US"/>
         </signal>

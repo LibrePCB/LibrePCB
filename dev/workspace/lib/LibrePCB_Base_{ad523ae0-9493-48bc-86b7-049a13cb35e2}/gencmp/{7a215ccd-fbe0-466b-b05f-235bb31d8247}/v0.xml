@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{7a215ccd-fbe0-466b-b05f-235bb31d8247}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:47Z</created>
+        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <name locale="en_US">2x Schottky Diode in Series</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories>
+        <category>{4d1c95f4-2e60-4f50-a15b-ba9186a01b1a}</category>
+    </categories>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">D</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{1e047b8d-9e39-4df7-8960-8cbd98fc911e}" required="true" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A1</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{4a8bb414-fe14-47c0-93ec-5b30c2e5a341}" required="true" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C1A2</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{df348b9f-73cb-48f5-b3ff-275839f76726}" required="true" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">C2</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{46fc4c92-040c-4906-bf3a-ed41aa28a949}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{3d6feec1-f3aa-404f-a25d-75b962c0d5e5}" suffix="" symbol="{d345f71f-20a3-4c6d-a942-bb2d702750c8}" required="true">
+                    <pin_signal_map>
+                        <map display="none" pin="{08f31cfc-5473-41f1-9bba-263e486d3adc}" signal="{1e047b8d-9e39-4df7-8960-8cbd98fc911e}"/>
+                        <map display="none" pin="{49d15d1d-fae5-4e85-844c-276ab5d99cde}" signal="{df348b9f-73cb-48f5-b3ff-275839f76726}"/>
+                        <map display="none" pin="{9166d3a3-bfe9-47b0-b3df-0dce788d46ae}" signal="{4a8bb414-fe14-47c0-93ec-5b30c2e5a341}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

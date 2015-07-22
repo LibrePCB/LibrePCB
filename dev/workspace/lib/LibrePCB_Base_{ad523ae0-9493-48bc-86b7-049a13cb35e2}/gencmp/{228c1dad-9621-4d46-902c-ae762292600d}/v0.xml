@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<generic_component version="0">
+    <meta>
+        <uuid>{228c1dad-9621-4d46-902c-ae762292600d}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:48Z</created>
+        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <name locale="en_US">RGB LED CA</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories>
+        <category>{70421345-ae1d-4fed-aa60-e7619524b97f}</category>
+    </categories>
+    <attributes/>
+    <properties>
+        <schematic_only>false</schematic_only>
+        <default_values>
+            <value locale="en_US"></value>
+        </default_values>
+        <prefixes>
+            <prefix norm="" default="true">LED</prefix>
+        </prefixes>
+    </properties>
+    <signals>
+        <signal uuid="{629d9077-427d-417f-b204-0e0144716db9}" required="true" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">A</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{c87bdcf6-2200-4536-8fbb-adff360e306f}" required="true" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">CB</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{46350bbf-a664-40fb-bddf-c312906e079c}" required="true" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">CG</name>
+            <description locale="en_US"/>
+        </signal>
+        <signal uuid="{eaa37b79-770c-4bcd-9326-7e98e5f95f60}" required="true" role="passive" forced_net_name="" clock="false" negated="false">
+            <name locale="en_US">CR</name>
+            <description locale="en_US"/>
+        </signal>
+    </signals>
+    <symbol_variants>
+        <variant norm="" uuid="{49635612-4237-43d8-b8b7-c084ebdc7ca9}" default="true">
+            <name locale="en_US">default</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{868b741e-c752-455c-92b6-c021b7a2393f}" suffix="" symbol="{cb9e1ec9-e935-40e0-863e-7946730e8325}" required="true">
+                    <pin_signal_map>
+                        <map display="none" pin="{4a8012fb-c5ee-47a7-85dc-a69e7af5f491}" signal="{46350bbf-a664-40fb-bddf-c312906e079c}"/>
+                        <map display="none" pin="{9e25127e-8f99-4619-86da-f5fcb77ee01d}" signal="{629d9077-427d-417f-b204-0e0144716db9}"/>
+                        <map display="none" pin="{11d0b59a-11b0-4168-ac68-189c24c14f80}" signal="{eaa37b79-770c-4bcd-9326-7e98e5f95f60}"/>
+                        <map display="none" pin="{c0c4769e-3bcf-49cb-ad25-17087a2787be}" signal="{c87bdcf6-2200-4536-8fbb-adff360e306f}"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+    </symbol_variants>
+    <spice_models/>
+</generic_component>

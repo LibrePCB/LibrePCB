@@ -24,15 +24,15 @@
         </prefixes>
     </properties>
     <signals>
-        <signal clock="false" forced_net_name="" uuid="{d7eb84bb-7f47-4e0b-99d1-1ee30019c40e}" role="passive" required="false" negated="false">
+        <signal clock="false" forced_net_name="" uuid="{d7eb84bb-7f47-4e0b-99d1-1ee30019c40e}" role="passive" required="true" negated="false">
             <name locale="en_US">S</name>
             <description locale="en_US">Source</description>
         </signal>
-        <signal clock="false" forced_net_name="" uuid="{4c7edd50-32d2-4098-a286-3536b882967b}" role="passive" required="false" negated="false">
+        <signal clock="false" forced_net_name="" uuid="{4c7edd50-32d2-4098-a286-3536b882967b}" role="passive" required="true" negated="false">
             <name locale="en_US">G</name>
             <description locale="en_US">Gate</description>
         </signal>
-        <signal clock="false" forced_net_name="" uuid="{3982c030-dbdf-4cb9-8d75-0e471e12fabb}" role="passive" required="false" negated="false">
+        <signal clock="false" forced_net_name="" uuid="{3982c030-dbdf-4cb9-8d75-0e471e12fabb}" role="passive" required="true" negated="false">
             <name locale="en_US">D</name>
             <description locale="en_US">Drain</description>
         </signal>
