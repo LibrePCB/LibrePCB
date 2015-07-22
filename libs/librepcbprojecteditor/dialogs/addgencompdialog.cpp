@@ -40,6 +40,7 @@
 #include <librepcbworkspace/workspace.h>
 #include <librepcblibrary/cat/componentcategory.h>
 #include <librepcblibrary/library.h>
+#include <librepcbcommon/gridproperties.h>
 
 namespace project {
 
@@ -237,8 +238,10 @@ void AddGenCompDialog::setSelectedSymbVar(const library::GenCompSymbVar* symbVar
                 mProject, localeOrder, *symbol, mSelectedGenComp, symbVar->getUuid(), item->getUuid());
             //graphicsItem->setDrawBoundingRect(mProject.getWorkspace().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect());
             mPreviewSymbolGraphicsItems.append(graphicsItem);
-            qreal y = mPreviewScene->itemsBoundingRect().bottom() + graphicsItem->boundingRect().height();
-            graphicsItem->setPos(QPointF(0, y));
+            Point pos = Point::fromPx(0, mPreviewScene->itemsBoundingRect().bottom()
+                                      + graphicsItem->boundingRect().height(),
+                                      mUi->graphicsView->getGridProperties().getInterval());
+            graphicsItem->setPos(pos.toPxQPointF());
             mPreviewScene->addItem(*graphicsItem);
             mUi->graphicsView->zoomAll();
         }

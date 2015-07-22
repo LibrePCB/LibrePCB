@@ -56,6 +56,7 @@ class GraphicsView final : public QGraphicsView
         // Getters
         GraphicsScene* getScene() const noexcept {return mScene;}
         QRectF getVisibleSceneRect() const noexcept;
+        const GridProperties& getGridProperties() const noexcept {return *mGridProperties;}
 
         // Setters
         void setGridProperties(const GridProperties& properties) noexcept;
