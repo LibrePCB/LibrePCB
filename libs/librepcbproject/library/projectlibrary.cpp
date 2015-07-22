@@ -62,13 +62,13 @@ ProjectLibrary::ProjectLibrary(Project& project, bool restore, bool readOnly) th
     try
     {
         // Load all library elements
-        loadElements<Symbol>          (mLibraryPath.getPathTo("sym"),    "symbols",            mSymbols);
-        loadElements<Footprint>       (mLibraryPath.getPathTo("fpt"),    "footprints",         mFootprints);
-        loadElements<Model3D>         (mLibraryPath.getPathTo("3dmdl"),  "3d models",          mModels);
-        loadElements<SpiceModel>      (mLibraryPath.getPathTo("spcmdl"), "spice models",       mSpiceModels);
-        loadElements<Package>         (mLibraryPath.getPathTo("pkg"),    "packages",           mPackages);
-        loadElements<GenericComponent>(mLibraryPath.getPathTo("gencmp"), "generic components", mGenericComponents);
-        loadElements<Component>       (mLibraryPath.getPathTo("cmp"),    "components",         mComponents);
+        loadElements<Symbol>          (mLibraryPath.getPathTo("sym"),    "symbols",            "sym",       mSymbols);
+        loadElements<Footprint>       (mLibraryPath.getPathTo("fpt"),    "footprints",         "fpt",       mFootprints);
+        loadElements<Model3D>         (mLibraryPath.getPathTo("3dmdl"),  "3d models",          "3dmdl",     mModels);
+        loadElements<SpiceModel>      (mLibraryPath.getPathTo("spcmdl"), "spice models",       "spcmdl",    mSpiceModels);
+        loadElements<Package>         (mLibraryPath.getPathTo("pkg"),    "packages",           "pkg",       mPackages);
+        loadElements<GenericComponent>(mLibraryPath.getPathTo("gencmp"), "generic components", "gencmp",    mGenericComponents);
+        loadElements<Component>       (mLibraryPath.getPathTo("cmp"),    "components",         "cmp",       mComponents);
     }
     catch (Exception &e)
     {
@@ -158,37 +158,37 @@ QHash<QUuid, const library::Component*> ProjectLibrary::getComponentsOfGenComp(c
 
 const library::Symbol* ProjectLibrary::addSymbol(const FilePath& elemDirPath) throw (Exception)
 {
-    return addElement<Symbol>(elemDirPath, mLibraryPath.getPathTo("sym"), mSymbols);
+    return addElement<Symbol>(elemDirPath, mLibraryPath.getPathTo("sym"), "sym", mSymbols);
 }
 
 const library::Footprint* ProjectLibrary::addFootprint(const FilePath& elemDirPath) throw (Exception)
 {
-    return addElement<Footprint>(elemDirPath, mLibraryPath.getPathTo("fpt"), mFootprints);
+    return addElement<Footprint>(elemDirPath, mLibraryPath.getPathTo("fpt"), "fpt", mFootprints);
 }
 
 const library::Model3D* ProjectLibrary::add3dModel(const FilePath& elemDirPath) throw (Exception)
 {
-    return addElement<Model3D>(elemDirPath, mLibraryPath.getPathTo("3dmdl"), mModels);
+    return addElement<Model3D>(elemDirPath, mLibraryPath.getPathTo("3dmdl"), "3dmdl", mModels);
 }
 
 const library::SpiceModel* ProjectLibrary::addSpiceModel(const FilePath& elemDirPath) throw (Exception)
 {
-    return addElement<SpiceModel>(elemDirPath, mLibraryPath.getPathTo("spcmdl"), mSpiceModels);
+    return addElement<SpiceModel>(elemDirPath, mLibraryPath.getPathTo("spcmdl"), "spcmdl", mSpiceModels);
 }
 
 const library::Package* ProjectLibrary::addPackage(const FilePath& elemDirPath) throw (Exception)
 {
-    return addElement<Package>(elemDirPath, mLibraryPath.getPathTo("pkg"), mPackages);
+    return addElement<Package>(elemDirPath, mLibraryPath.getPathTo("pkg"), "pkg", mPackages);
 }
 
 const library::GenericComponent* ProjectLibrary::addGenComp(const FilePath& elemDirPath) throw (Exception)
 {
-    return addElement<GenericComponent>(elemDirPath, mLibraryPath.getPathTo("gencmp"), mGenericComponents);
+    return addElement<GenericComponent>(elemDirPath, mLibraryPath.getPathTo("gencmp"), "gencmp", mGenericComponents);
 }
 
 const library::Component* ProjectLibrary::addComp(const FilePath& elemDirPath) throw (Exception)
 {
-    return addElement<Component>(elemDirPath, mLibraryPath.getPathTo("cmp"), mComponents);
+    return addElement<Component>(elemDirPath, mLibraryPath.getPathTo("cmp"), "cmp", mComponents);
 }
 
 void ProjectLibrary::removeSymbol(const QUuid& uuid) throw (Exception)
@@ -232,6 +232,7 @@ void ProjectLibrary::removeComp(const QUuid& uuid) throw (Exception)
 
 template <typename ElementType>
 void ProjectLibrary::loadElements(const FilePath& directory, const QString& type,
+                                  const QString& prefix,
                                   QHash<QUuid, const ElementType*>& elementList)
                                   throw (Exception)
 {
@@ -261,7 +262,7 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
         FilePath filepath;
         for (int i = Application::majorVersion(); i >= 0; i--)
         {
-            filepath = subdirPath.getPathTo(QString("v%1.xml").arg(i));
+            filepath = subdirPath.getPathTo(QString("%1_v%2.xml").arg(prefix).arg(i));
             if (filepath.isExistingFile()) break;
         }
 
@@ -297,7 +298,7 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
 
 template <typename ElementType>
 const ElementType* ProjectLibrary::addElement(const FilePath& rootDir, const FilePath& destDir,
-                                              QHash<QUuid, const ElementType*>& elementList) throw (Exception)
+                                              const QString& prefix, QHash<QUuid, const ElementType*>& elementList) throw (Exception)
 {
     // root directory must exist
     if ((!rootDir.isValid()) || (!rootDir.isExistingDir()))
@@ -332,7 +333,7 @@ const ElementType* ProjectLibrary::addElement(const FilePath& rootDir, const Fil
     FilePath xmlFilePath;
     for (int i = Application::majorVersion(); i >= 0; i--)
     {
-        xmlFilePath = destRootDir.getPathTo(QString("v%1.xml").arg(i));
+        xmlFilePath = destRootDir.getPathTo(QString("%1_v%2.xml").arg(prefix).arg(i));
         if (xmlFilePath.isExistingFile()) break;
     }
 

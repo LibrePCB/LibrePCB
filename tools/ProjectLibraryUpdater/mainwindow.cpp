@@ -95,7 +95,7 @@ void MainWindow::on_pushButton_2_clicked()
                     // copy generic component
                     GenericComponent latestGenComp(filepaths.last());
                     FilePath dest = projectFilepath.getParentDir().getPathTo(
-                        QString("lib/gencmp/%1/v0.xml").arg(genCompUuid.toString()));
+                        QString("lib/gencmp/%1/gencmp_v0.xml").arg(genCompUuid.toString()));
                     latestGenComp.saveToFile(dest, APP_VERSION_MAJOR);
                     ui->log->addItem(dest.toNative());
 
@@ -110,7 +110,7 @@ void MainWindow::on_pushButton_2_clicked()
                             {
                                 Symbol latestSymbol(filepaths.last());
                                 FilePath dest = projectFilepath.getParentDir().getPathTo(
-                                    QString("lib/sym/%1/v0.xml").arg(symbolUuid.toString()));
+                                    QString("lib/sym/%1/sym_v0.xml").arg(symbolUuid.toString()));
                                 latestSymbol.saveToFile(dest, APP_VERSION_MAJOR);
                                 ui->log->addItem(dest.toNative());
                             }
@@ -147,7 +147,7 @@ void MainWindow::on_pushButton_2_clicked()
                         // copy component
                         Component latestComp(filepaths.last());
                         FilePath dest = projectFilepath.getParentDir().getPathTo(
-                            QString("lib/cmp/%1/v0.xml").arg(compUuid.toString()));
+                            QString("lib/cmp/%1/cmp_v0.xml").arg(compUuid.toString()));
                         latestComp.saveToFile(dest, APP_VERSION_MAJOR);
                         ui->log->addItem(dest.toNative());
 
@@ -159,7 +159,7 @@ void MainWindow::on_pushButton_2_clicked()
                             // copy package
                             Package latestPackage(filepaths.last());
                             FilePath dest = projectFilepath.getParentDir().getPathTo(
-                                QString("lib/pkg/%1/v0.xml").arg(packUuid.toString()));
+                                QString("lib/pkg/%1/pkg_v0.xml").arg(packUuid.toString()));
                             latestPackage.saveToFile(dest, APP_VERSION_MAJOR);
                             ui->log->addItem(dest.toNative());
 
@@ -171,7 +171,7 @@ void MainWindow::on_pushButton_2_clicked()
                                 // copy footprint
                                 Footprint latestFootprint(filepaths.last());
                                 FilePath dest = projectFilepath.getParentDir().getPathTo(
-                                    QString("lib/fpt/%1/v0.xml").arg(footprintUuid.toString()));
+                                    QString("lib/fpt/%1/fpt_v0.xml").arg(footprintUuid.toString()));
                                 latestFootprint.saveToFile(dest, APP_VERSION_MAJOR);
                                 ui->log->addItem(dest.toNative());
                             }

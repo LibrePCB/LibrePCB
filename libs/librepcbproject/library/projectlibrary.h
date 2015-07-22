@@ -117,10 +117,10 @@ class ProjectLibrary final : public QObject
 
         // Private Methods
         template <typename ElementType>
-        void loadElements(const FilePath& directory, const QString& type,
+        void loadElements(const FilePath& directory, const QString& type, const QString& prefix,
                           QHash<QUuid, const ElementType*>& elementList) throw (Exception);
         template <typename ElementType>
-        const ElementType* addElement(const FilePath& rootDir, const FilePath& destDir,
+        const ElementType* addElement(const FilePath& rootDir, const FilePath& destDir, const QString& prefix,
                                       QHash<QUuid, const ElementType*>& elementList) throw (Exception);
         template <typename ElementType>
         void removeElement(const QUuid& uuid, QHash<QUuid, const ElementType*>& elementList) throw (Exception);
