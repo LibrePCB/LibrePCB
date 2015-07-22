@@ -809,14 +809,14 @@ liblibrepcbprojecteditor.a#</dia:string>
         <dia:point val="61,34"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="61,33.37;87.3275,35.8533"/>
+        <dia:rectangle val="61,33.3502;88.3498,35.8928"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
           <dia:attribute name="string">
             <dia:string>#Common used classes (types, interfaces, file-io, ...)
 - No dependencies to other libraries (except to the Qt framework)
-- Error handling: Exceptions or something like "isValid()" (no message boxes!)#</dia:string>
+- Error handling: Exceptions or something like "isValid()" (avoid message boxes!)#</dia:string>
           </dia:attribute>
           <dia:attribute name="font">
             <dia:font family="sans" style="0" name="Helvetica"/>
@@ -844,16 +844,16 @@ liblibrepcbprojecteditor.a#</dia:string>
         <dia:point val="61,26"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="61,25.37;91.83,29.5467"/>
+        <dia:rectangle val="61,25.3503;91.8498,29.5862"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
           <dia:attribute name="string">
             <dia:string>#Classes which represent LibrePCB library elements (symbols, footprints, ...)
-- Depends only on librepcbcommon.a
+- Depends only on liblibrepcbcommon.a
 - Represents only the data of library elements, contains no GUI widgets to modify them
 - Provides undo commands to modify library elements, but does not provide an undo stack
-- Error handling: Exceptions (no message boxes!)#</dia:string>
+- Error handling: Exceptions (avoid message boxes!)#</dia:string>
           </dia:attribute>
           <dia:attribute name="font">
             <dia:font family="sans" style="0" name="Helvetica"/>
@@ -881,16 +881,16 @@ liblibrepcbprojecteditor.a#</dia:string>
         <dia:point val="61,18"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="61,17.37;89.2725,21.5467"/>
+        <dia:rectangle val="61,17.3503;89.2923,21.5862"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
           <dia:attribute name="string">
             <dia:string>#Classes which represent a whole LibrePCB project (schematics, boards, circuit, ...)
-- Depends on librepcblibrary.a and librepcbcommon.a
+- Depends on liblibrepcblibrary.a and liblibrepcbcommon.a
 - Represents only the data of a project, contains no GUI widgets to modify them
 - Provides undo commands to modify a project, but does not provide an undo stack
-- Error handling: Exceptions (no message boxes!)#</dia:string>
+- Error handling: Exceptions (avoid message boxes!)#</dia:string>
           </dia:attribute>
           <dia:attribute name="font">
             <dia:font family="sans" style="0" name="Helvetica"/>
@@ -918,14 +918,14 @@ liblibrepcbprojecteditor.a#</dia:string>
         <dia:point val="61,10"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="61,9.37;85.2925,11.8533"/>
+        <dia:rectangle val="61,9.35025;87.7272,11.8928"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
           <dia:attribute name="string">
             <dia:string>#Classes which represent a LibrePCB workspace (settings, library, ...)
-- Depends on librepcbproject.a, librepcblibrary.a and librepcbcommon.a
-- Error handling: Exceptions (no message boxes!)#</dia:string>
+- Depends on liblibrepcbproject.a, liblibrepcblibrary.a and liblibrepcbcommon.a
+- Error handling: Exceptions (avoid message boxes!)#</dia:string>
           </dia:attribute>
           <dia:attribute name="font">
             <dia:font family="sans" style="0" name="Helvetica"/>
@@ -953,7 +953,7 @@ liblibrepcbprojecteditor.a#</dia:string>
         <dia:point val="61,2"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="61,1.35025;90.6222,4.7395"/>
+        <dia:rectangle val="61,1.37;90.6025,4.7"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">

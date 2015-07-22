@@ -6,14 +6,21 @@ LibrePCB is a free Schematic / Layout Editor to develop printed circuit boards. 
 
 ![Screenshot](doc/screenshot.png)
 
-## Development Requirements
+## Development
+
+### Requirements
 
 To compile LibrePCB, you need the following software components:
 - g++ >= 4.8, MinGW >= 4.8, or Clang >= 3.3 (C++11 support is required)
 - Qt >= 5.4 (http://www.qt.io/download-open-source/)
 - libglu1-mesa-dev (`sudo apt-get install libglu1-mesa-dev`)
 
-## Workspace
+### Documentation
+
+Doxygen Documentation: http://librepcb.github.io/LibrePCB-Doxygen/
+Some diagrams (partially outdated): https://github.com/LibrePCB/LibrePCB/tree/master/dev/diagrams/svg
+
+### Workspace
 
 At the first startup, LibrePCB asks for a workspace directory where the library elements and projects will be saved.
 For developers there is a demo workspace inclusive library and projects in this repository (subdirectory "dev/workspace/").

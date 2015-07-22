@@ -195,26 +195,26 @@
   <text font-size="13.5467" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="1220" y="680">
     <tspan x="1220" y="680">Common used classes (types, interfaces, file-io, ...)</tspan>
     <tspan x="1220" y="696.933">- No dependencies to other libraries (except to the Qt framework)</tspan>
-    <tspan x="1220" y="713.867">- Error handling: Exceptions or something like "isValid()" (no message boxes!)</tspan>
+    <tspan x="1220" y="713.867">- Error handling: Exceptions or something like "isValid()" (avoid message boxes!)</tspan>
   </text>
   <text font-size="13.5467" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="1220" y="520">
     <tspan x="1220" y="520">Classes which represent LibrePCB library elements (symbols, footprints, ...)</tspan>
-    <tspan x="1220" y="536.933">- Depends only on librepcbcommon.a</tspan>
+    <tspan x="1220" y="536.933">- Depends only on liblibrepcbcommon.a</tspan>
     <tspan x="1220" y="553.867">- Represents only the data of library elements, contains no GUI widgets to modify them</tspan>
     <tspan x="1220" y="570.8">- Provides undo commands to modify library elements, but does not provide an undo stack</tspan>
-    <tspan x="1220" y="587.733">- Error handling: Exceptions (no message boxes!)</tspan>
+    <tspan x="1220" y="587.733">- Error handling: Exceptions (avoid message boxes!)</tspan>
   </text>
   <text font-size="13.5467" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="1220" y="360">
     <tspan x="1220" y="360">Classes which represent a whole LibrePCB project (schematics, boards, circuit, ...)</tspan>
-    <tspan x="1220" y="376.933">- Depends on librepcblibrary.a and librepcbcommon.a</tspan>
+    <tspan x="1220" y="376.933">- Depends on liblibrepcblibrary.a and liblibrepcbcommon.a</tspan>
     <tspan x="1220" y="393.867">- Represents only the data of a project, contains no GUI widgets to modify them</tspan>
     <tspan x="1220" y="410.8">- Provides undo commands to modify a project, but does not provide an undo stack</tspan>
-    <tspan x="1220" y="427.733">- Error handling: Exceptions (no message boxes!)</tspan>
+    <tspan x="1220" y="427.733">- Error handling: Exceptions (avoid message boxes!)</tspan>
   </text>
   <text font-size="13.5467" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="1220" y="200">
     <tspan x="1220" y="200">Classes which represent a LibrePCB workspace (settings, library, ...)</tspan>
-    <tspan x="1220" y="216.933">- Depends on librepcbproject.a, librepcblibrary.a and librepcbcommon.a</tspan>
-    <tspan x="1220" y="233.867">- Error handling: Exceptions (no message boxes!)</tspan>
+    <tspan x="1220" y="216.933">- Depends on liblibrepcbproject.a, liblibrepcblibrary.a and liblibrepcbcommon.a</tspan>
+    <tspan x="1220" y="233.867">- Error handling: Exceptions (avoid message boxes!)</tspan>
   </text>
   <text font-size="13.5467" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="1220" y="40">
     <tspan x="1220" y="40">Classes / GUI widgets &amp; windows to modify LibrePCB projects and library elements</tspan>
