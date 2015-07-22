@@ -17,8 +17,8 @@ To compile LibrePCB, you need the following software components:
 
 ### Documentation
 
-Doxygen Documentation: http://librepcb.github.io/LibrePCB-Doxygen/
-Some diagrams (partially outdated): https://github.com/LibrePCB/LibrePCB/tree/master/dev/diagrams/svg
+- Doxygen: http://librepcb.github.io/LibrePCB-Doxygen/
+- Some diagrams (partially outdated): https://github.com/LibrePCB/LibrePCB/tree/master/dev/diagrams/svg
 
 ### Workspace
 
