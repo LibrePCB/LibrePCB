@@ -308,7 +308,8 @@ const ElementType* ProjectLibrary::addElement(const FilePath& rootDir, const Fil
 
     // destination directory must NOT exist
     FilePath destRootDir = destDir.getPathTo(rootDir.getFilename());
-    if (destRootDir.isExistingDir() || destRootDir.isExistingFile() || (!destRootDir.isValid()))
+    if ((destRootDir.isExistingDir() && destRootDir.isEmptyDir())
+      || destRootDir.isExistingFile() || (!destRootDir.isValid()))
     {
         throw RuntimeError(__FILE__, __LINE__, QString(),
             QString(tr("Directory or file exists already: \"%1\"")).arg(destRootDir.toNative()));
