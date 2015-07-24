@@ -17,6 +17,15 @@ To compile LibrePCB, you need the following software components:
 - Qt >= 5.4 (http://www.qt.io/download-open-source/)
 - libglu1-mesa-dev (`sudo apt-get install libglu1-mesa-dev`)
 
+### Building
+
+#### Using qtcreator
+
+Building with [qtcreator](http://doc.qt.io/qtcreator/) is probably the easiest
+way.  To keep build time as low as possible make sure to set the correct make
+flags to use all available CPU cores to build. See this [stackoverflow
+answer](https://stackoverflow.com/questions/8860712/setting-default-make-options-for-qt-creator).
+
 ### Documentation
 
 - Doxygen: http://librepcb.github.io/LibrePCB-Doxygen/master/
