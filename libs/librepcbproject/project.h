@@ -39,7 +39,6 @@
 class QPrinter;
 class SmartTextFile;
 class SmartXmlFile;
-class SmartIniFile;
 
 namespace project {
 class ProjectSettings;

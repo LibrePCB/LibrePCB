@@ -33,7 +33,6 @@ HEADERS += \
     fileio/filepath.h \
     fileio/if_xmlserializableobject.h \
     fileio/smartfile.h \
-    fileio/smartinifile.h \
     fileio/smarttextfile.h \
     fileio/smartxmlfile.h \
     fileio/xmldomdocument.h \
@@ -75,7 +74,6 @@ SOURCES += \
     fileio/filelock.cpp \
     fileio/filepath.cpp \
     fileio/smartfile.cpp \
-    fileio/smartinifile.cpp \
     fileio/smarttextfile.cpp \
     fileio/smartxmlfile.cpp \
     fileio/xmldomdocument.cpp \

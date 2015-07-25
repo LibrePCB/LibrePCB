@@ -44,6 +44,8 @@ class WorkspaceSettings;
  * this class as base class. The name of all Workspace Settings Items begin with the
  * prefix "WSI_" to easily recognize them.
  *
+ * @todo Use XML instead of INI files to save the workspace settings.
+ *
  * @author ubruhin
  * @date 2014-10-04
  */

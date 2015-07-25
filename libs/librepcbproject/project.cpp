@@ -27,7 +27,6 @@
 #include <librepcbcommon/fileio/filelock.h>
 #include <librepcbcommon/fileio/smarttextfile.h>
 #include <librepcbcommon/fileio/smartxmlfile.h>
-#include <librepcbcommon/fileio/smartinifile.h>
 #include <librepcbcommon/fileio/xmldomdocument.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include <librepcbcommon/systeminfo.h>
