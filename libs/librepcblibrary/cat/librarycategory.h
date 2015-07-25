@@ -44,7 +44,8 @@ class LibraryCategory : public LibraryBaseElement
     public:
 
         // Constructors / Destructor
-        explicit LibraryCategory(const QString& xmlRootNodeName,
+        explicit LibraryCategory(const QString& xmlFileNamePrefix,
+                                 const QString& xmlRootNodeName,
                                  const QUuid& uuid = QUuid::createUuid(),
                                  const Version& version = Version(),
                                  const QString& author = QString(),
@@ -52,6 +53,7 @@ class LibraryCategory : public LibraryBaseElement
                                  const QString& description_en_US = QString(),
                                  const QString& keywords_en_US = QString()) throw (Exception);
         explicit LibraryCategory(const FilePath& xmlFilePath,
+                                 const QString& xmlFileNamePrefix,
                                  const QString& xmlRootNodeName) throw (Exception);
         virtual ~LibraryCategory() noexcept;
 

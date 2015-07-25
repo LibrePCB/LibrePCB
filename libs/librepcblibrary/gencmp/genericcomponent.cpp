@@ -35,14 +35,14 @@ GenericComponent::GenericComponent(const QUuid& uuid, const Version& version,
                                    const QString& author, const QString& name_en_US,
                                    const QString& description_en_US,
                                    const QString& keywords_en_US) throw (Exception) :
-    LibraryElement("generic_component", uuid, version, author, name_en_US, description_en_US, keywords_en_US),
+    LibraryElement("gencmp", "generic_component", uuid, version, author, name_en_US, description_en_US, keywords_en_US),
     mSchematicOnly(false)
 {
     Q_ASSERT(mUuid.isNull() == false);
 }
 
 GenericComponent::GenericComponent(const FilePath& xmlFilePath) throw (Exception) :
-    LibraryElement(xmlFilePath, "generic_component")
+    LibraryElement(xmlFilePath, "gencmp", "generic_component")
 {
     try
     {

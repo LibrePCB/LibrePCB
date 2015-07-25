@@ -34,12 +34,12 @@ namespace library {
 Footprint::Footprint(const QUuid& uuid, const Version& version, const QString& author,
                      const QString& name_en_US, const QString& description_en_US,
                      const QString& keywords_en_US) throw (Exception) :
-    LibraryElement("footprint", uuid, version, author, name_en_US, description_en_US, keywords_en_US)
+    LibraryElement("fpt", "footprint", uuid, version, author, name_en_US, description_en_US, keywords_en_US)
 {
 }
 
 Footprint::Footprint(const FilePath& xmlFilePath) throw (Exception) :
-    LibraryElement(xmlFilePath, "footprint")
+    LibraryElement(xmlFilePath, "fpt", "footprint")
 {
     try
     {

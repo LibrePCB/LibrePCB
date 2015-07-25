@@ -94,9 +94,8 @@ void MainWindow::on_pushButton_2_clicked()
                 {
                     // copy generic component
                     GenericComponent latestGenComp(filepaths.last());
-                    FilePath dest = projectFilepath.getParentDir().getPathTo(
-                        QString("lib/gencmp/%1/gencmp_v0.xml").arg(genCompUuid.toString()));
-                    latestGenComp.saveToFile(dest, APP_VERSION_MAJOR);
+                    FilePath dest = projectFilepath.getParentDir().getPathTo("lib/gencmp");
+                    latestGenComp.saveTo(dest, APP_VERSION_MAJOR);
                     ui->log->addItem(dest.toNative());
 
                     // search all required symbols
@@ -109,9 +108,8 @@ void MainWindow::on_pushButton_2_clicked()
                             if (!filepaths.isEmpty())
                             {
                                 Symbol latestSymbol(filepaths.last());
-                                FilePath dest = projectFilepath.getParentDir().getPathTo(
-                                    QString("lib/sym/%1/sym_v0.xml").arg(symbolUuid.toString()));
-                                latestSymbol.saveToFile(dest, APP_VERSION_MAJOR);
+                                FilePath dest = projectFilepath.getParentDir().getPathTo("lib/sym");
+                                latestSymbol.saveTo(dest, APP_VERSION_MAJOR);
                                 ui->log->addItem(dest.toNative());
                             }
                             else
@@ -146,9 +144,8 @@ void MainWindow::on_pushButton_2_clicked()
                     {
                         // copy component
                         Component latestComp(filepaths.last());
-                        FilePath dest = projectFilepath.getParentDir().getPathTo(
-                            QString("lib/cmp/%1/cmp_v0.xml").arg(compUuid.toString()));
-                        latestComp.saveToFile(dest, APP_VERSION_MAJOR);
+                        FilePath dest = projectFilepath.getParentDir().getPathTo("lib/cmp");
+                        latestComp.saveTo(dest, APP_VERSION_MAJOR);
                         ui->log->addItem(dest.toNative());
 
                         // get package
@@ -158,9 +155,8 @@ void MainWindow::on_pushButton_2_clicked()
                         {
                             // copy package
                             Package latestPackage(filepaths.last());
-                            FilePath dest = projectFilepath.getParentDir().getPathTo(
-                                QString("lib/pkg/%1/pkg_v0.xml").arg(packUuid.toString()));
-                            latestPackage.saveToFile(dest, APP_VERSION_MAJOR);
+                            FilePath dest = projectFilepath.getParentDir().getPathTo("lib/pkg");
+                            latestPackage.saveTo(dest, APP_VERSION_MAJOR);
                             ui->log->addItem(dest.toNative());
 
                             // get footprint
@@ -170,9 +166,8 @@ void MainWindow::on_pushButton_2_clicked()
                             {
                                 // copy footprint
                                 Footprint latestFootprint(filepaths.last());
-                                FilePath dest = projectFilepath.getParentDir().getPathTo(
-                                    QString("lib/fpt/%1/fpt_v0.xml").arg(footprintUuid.toString()));
-                                latestFootprint.saveToFile(dest, APP_VERSION_MAJOR);
+                                FilePath dest = projectFilepath.getParentDir().getPathTo("lib/fpt");
+                                latestFootprint.saveTo(dest, APP_VERSION_MAJOR);
                                 ui->log->addItem(dest.toNative());
                             }
                             else

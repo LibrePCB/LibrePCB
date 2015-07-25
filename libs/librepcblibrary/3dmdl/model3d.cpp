@@ -31,7 +31,7 @@ namespace library {
  ****************************************************************************************/
 
 Model3D::Model3D(const FilePath& xmlFilePath) :
-    LibraryElement(xmlFilePath, "model")
+    LibraryElement(xmlFilePath, "3dmdl", "model3d")
 {
     readFromFile();
 }

@@ -31,7 +31,7 @@ namespace library {
  ****************************************************************************************/
 
 SpiceModel::SpiceModel(const FilePath& xmlFilePath) :
-    LibraryElement(xmlFilePath, "spice_model")
+    LibraryElement(xmlFilePath, "spcmdl", "spice_model")
 {
     readFromFile();
 }

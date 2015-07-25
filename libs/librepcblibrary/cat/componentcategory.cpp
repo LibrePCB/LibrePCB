@@ -31,7 +31,7 @@ namespace library {
  ****************************************************************************************/
 
 ComponentCategory::ComponentCategory(const FilePath& xmlFilePath) :
-    LibraryCategory(xmlFilePath, "component_category")
+    LibraryCategory(xmlFilePath, "cmpcat", "component_category")
 {
     readFromFile();
 }

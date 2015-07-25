@@ -31,7 +31,7 @@ namespace library {
  ****************************************************************************************/
 
 PackageCategory::PackageCategory(const FilePath& xmlFilePath) :
-    LibraryCategory(xmlFilePath, "package_category")
+    LibraryCategory(xmlFilePath, "pkgcat", "package_category")
 {
     readFromFile();
 }

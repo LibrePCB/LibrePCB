@@ -33,12 +33,14 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-LibraryBaseElement::LibraryBaseElement(const QString& xmlRootNodeName, const QUuid& uuid,
+LibraryBaseElement::LibraryBaseElement(const QString& xmlFileNamePrefix,
+                                       const QString& xmlRootNodeName, const QUuid& uuid,
                                        const Version& version, const QString& author,
                                        const QString& name_en_US,
                                        const QString& description_en_US,
                                        const QString& keywords_en_US) throw (Exception) :
-    QObject(nullptr), mXmlFilepath(), mXmlRootNodeName(xmlRootNodeName), mDomTreeParsed(false),
+    QObject(nullptr), mXmlFilepath(), mXmlFileNamePrefix(xmlFileNamePrefix),
+    mXmlRootNodeName(xmlRootNodeName), mDomTreeParsed(false),
     mUuid(uuid), mVersion(version), mAuthor(author),
     mCreated(QDateTime::currentDateTime()), mLastModified(QDateTime::currentDateTime())
 {
@@ -48,9 +50,10 @@ LibraryBaseElement::LibraryBaseElement(const QString& xmlRootNodeName, const QUu
 }
 
 LibraryBaseElement::LibraryBaseElement(const FilePath& xmlFilePath,
+                                       const QString& xmlFileNamePrefix,
                                        const QString& xmlRootNodeName) throw (Exception) :
-    QObject(0), mXmlFilepath(xmlFilePath), mXmlRootNodeName(xmlRootNodeName),
-    mDomTreeParsed(false)
+    QObject(0), mXmlFilepath(xmlFilePath), mXmlFileNamePrefix(xmlFileNamePrefix),
+    mXmlRootNodeName(xmlRootNodeName), mDomTreeParsed(false)
 {
 }
 
@@ -92,11 +95,19 @@ QStringList LibraryBaseElement::getAllAvailableLocales() const noexcept
  *  General Methods
  ****************************************************************************************/
 
-void LibraryBaseElement::saveToFile(const FilePath& filepath, int version) const throw (Exception)
+void LibraryBaseElement::save(int version) const throw (Exception)
 {
+    Q_ASSERT(mXmlFilepath.isValid());
     XmlDomDocument doc(*serializeToXmlDomElement(version));
-    QScopedPointer<SmartXmlFile> file(SmartXmlFile::create(filepath));
+    QScopedPointer<SmartXmlFile> file(SmartXmlFile::create(mXmlFilepath));
     file->save(doc, true);
+}
+
+void LibraryBaseElement::saveTo(const FilePath& parentDir, int version) const throw (Exception)
+{
+    mXmlFilepath = parentDir.getPathTo(QString("%1/%2_v%3.xml")
+        .arg(mUuid.toString()).arg(mXmlFileNamePrefix).arg(version));
+    save(version);
 }
 
 /*****************************************************************************************
@@ -141,6 +152,9 @@ XmlDomElement* LibraryBaseElement::serializeToXmlDomElement(int version) const t
     if (!valid) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement(mXmlRootNodeName));
+    root->setAttribute("version", version);
+
+    // meta
     XmlDomElement* meta = root->appendChild("meta");
     meta->appendTextChild("uuid", mUuid.toString());
     meta->appendTextChild("version", mVersion.toStr());
@@ -153,6 +167,7 @@ XmlDomElement* LibraryBaseElement::serializeToXmlDomElement(int version) const t
         meta->appendTextChild("description", mDescriptions.value(locale))->setAttribute("locale", locale);
     foreach (const QString& locale, mKeywords.keys())
         meta->appendTextChild("keywords", mKeywords.value(locale))->setAttribute("locale", locale);
+
     return root.take();
 }
 

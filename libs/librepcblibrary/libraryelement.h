@@ -44,7 +44,8 @@ class LibraryElement : public LibraryBaseElement
     public:
 
         // Constructors / Destructor
-        explicit LibraryElement(const QString& xmlRootNodeName,
+        explicit LibraryElement(const QString& xmlFileNamePrefix,
+                                const QString& xmlRootNodeName,
                                 const QUuid& uuid = QUuid::createUuid(),
                                 const Version& version = Version(),
                                 const QString& author = QString(),
@@ -52,6 +53,7 @@ class LibraryElement : public LibraryBaseElement
                                 const QString& description_en_US = QString(),
                                 const QString& keywords_en_US = QString()) throw (Exception);
         explicit LibraryElement(const FilePath& xmlFilePath,
+                                const QString& xmlFileNamePrefix,
                                 const QString& xmlRootNodeName) throw (Exception);
         virtual ~LibraryElement() noexcept;
 

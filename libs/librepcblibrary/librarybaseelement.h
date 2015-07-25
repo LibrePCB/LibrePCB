@@ -46,7 +46,8 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
     public:
 
         // Constructors / Destructor
-        explicit LibraryBaseElement(const QString& xmlRootNodeName,
+        explicit LibraryBaseElement(const QString& xmlFileNamePrefix,
+                                    const QString& xmlRootNodeName,
                                     const QUuid& uuid = QUuid::createUuid(),
                                     const Version& version = Version(),
                                     const QString& author = QString(),
@@ -54,11 +55,13 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
                                     const QString& description_en_US = QString(),
                                     const QString& keywords_en_US = QString()) throw (Exception);
         explicit LibraryBaseElement(const FilePath& xmlFilePath,
+                                    const QString& xmlFileNamePrefix,
                                     const QString& xmlRootNodeName) throw (Exception);
         virtual ~LibraryBaseElement() noexcept;
 
         // Getters: General
         const FilePath& getXmlFilepath() const noexcept {return mXmlFilepath;}
+        FilePath getDirectory() const noexcept {return mXmlFilepath.getParentDir();}
 
         // Getters: Attributes
         const QUuid& getUuid() const noexcept {return mUuid;}
@@ -83,7 +86,8 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
         void setAuthor(const QString& author) noexcept {mAuthor = author;}
 
         // General Methods
-        void saveToFile(const FilePath& filepath, int version) const throw (Exception);
+        void save(int version) const throw (Exception);
+        void saveTo(const FilePath& parentDir, int version) const throw (Exception);
 
         // Static Methods
 
@@ -177,7 +181,8 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
 
 
         // General Attributes
-        FilePath mXmlFilepath;
+        mutable FilePath mXmlFilepath;
+        QString mXmlFileNamePrefix;
         QString mXmlRootNodeName;
         bool mDomTreeParsed;
 

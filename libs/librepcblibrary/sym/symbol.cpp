@@ -34,12 +34,12 @@ namespace library {
 Symbol::Symbol(const QUuid& uuid, const Version& version, const QString& author,
                const QString& name_en_US, const QString& description_en_US,
                const QString& keywords_en_US) throw (Exception) :
-    LibraryElement("symbol", uuid, version, author, name_en_US, description_en_US, keywords_en_US)
+    LibraryElement("sym", "symbol", uuid, version, author, name_en_US, description_en_US, keywords_en_US)
 {
 }
 
 Symbol::Symbol(const FilePath& xmlFilePath) throw (Exception) :
-    LibraryElement(xmlFilePath, "symbol")
+    LibraryElement(xmlFilePath, "sym", "symbol")
 {
     try
     {
