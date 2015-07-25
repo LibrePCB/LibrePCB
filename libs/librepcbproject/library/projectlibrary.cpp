@@ -88,6 +88,15 @@ ProjectLibrary::ProjectLibrary(Project& project, bool restore, bool readOnly) th
 
 ProjectLibrary::~ProjectLibrary() noexcept
 {
+    // clean up all removed elements
+    cleanupRemovedElements<Symbol>(mRemovedSymbols);
+    cleanupRemovedElements<Footprint>(mRemovedFootprints);
+    cleanupRemovedElements<Model3D>(mRemovedModels);
+    cleanupRemovedElements<SpiceModel>(mRemovedSpiceModels);
+    cleanupRemovedElements<Package>(mRemovedPackages);
+    cleanupRemovedElements<GenericComponent>(mRemovedGenericComponents);
+    cleanupRemovedElements<Component>(mRemovedComponents);
+
     // Delete all library elements (in reverse order of their creation)
     qDeleteAll(mComponents);            mComponents.clear();
     qDeleteAll(mGenericComponents);     mGenericComponents.clear();
@@ -153,77 +162,105 @@ QHash<QUuid, const library::Component*> ProjectLibrary::getComponentsOfGenComp(c
 }
 
 /*****************************************************************************************
+ *  Add/Remove Methods
+ ****************************************************************************************/
+
+void ProjectLibrary::addSymbol(const library::Symbol& s) throw (Exception)
+{
+    addElement<Symbol>(s, mSymbols, mRemovedSymbols);
+}
+
+void ProjectLibrary::addFootprint(const library::Footprint& f) throw (Exception)
+{
+    addElement<Footprint>(f, mFootprints, mRemovedFootprints);
+}
+
+void ProjectLibrary::add3dModel(const library::Model3D& m) throw (Exception)
+{
+    addElement<Model3D>(m, mModels, mRemovedModels);
+}
+
+void ProjectLibrary::addSpiceModel(const library::SpiceModel& m) throw (Exception)
+{
+    addElement<SpiceModel>(m, mSpiceModels, mRemovedSpiceModels);
+}
+
+void ProjectLibrary::addPackage(const library::Package& p) throw (Exception)
+{
+    addElement<Package>(p, mPackages, mRemovedPackages);
+}
+
+void ProjectLibrary::addGenComp(const library::GenericComponent& gc) throw (Exception)
+{
+    addElement<GenericComponent>(gc, mGenericComponents, mRemovedGenericComponents);
+}
+
+void ProjectLibrary::addComp(const library::Component& c) throw (Exception)
+{
+    addElement<Component>(c, mComponents, mRemovedComponents);
+}
+
+void ProjectLibrary::removeSymbol(const library::Symbol& s) throw (Exception)
+{
+    removeElement<Symbol>(s, mSymbols, mRemovedSymbols);
+}
+
+void ProjectLibrary::removeFootprint(const library::Footprint& f) throw (Exception)
+{
+    removeElement<Footprint>(f, mFootprints, mRemovedFootprints);
+}
+
+void ProjectLibrary::remove3dModel(const library::Model3D& m) throw (Exception)
+{
+    removeElement<Model3D>(m, mModels, mRemovedModels);
+}
+
+void ProjectLibrary::removeSpiceModel(const library::SpiceModel& m) throw (Exception)
+{
+    removeElement<SpiceModel>(m, mSpiceModels, mRemovedSpiceModels);
+}
+
+void ProjectLibrary::removePackage(const library::Package& p) throw (Exception)
+{
+    removeElement<Package>(p, mPackages, mRemovedPackages);
+}
+
+void ProjectLibrary::removeGenComp(const library::GenericComponent& gc) throw (Exception)
+{
+    removeElement<GenericComponent>(gc, mGenericComponents, mRemovedGenericComponents);
+}
+
+void ProjectLibrary::removeComp(const library::Component& c) throw (Exception)
+{
+    removeElement<Component>(c, mComponents, mRemovedComponents);
+}
+
+
+/*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
-const library::Symbol* ProjectLibrary::addSymbol(const FilePath& elemDirPath) throw (Exception)
+bool ProjectLibrary::save(int version, bool toOriginal, QStringList& errors) noexcept
 {
-    return addElement<Symbol>(elemDirPath, mLibraryPath.getPathTo("sym"), "sym", mSymbols);
-}
+    bool success = true;
 
-const library::Footprint* ProjectLibrary::addFootprint(const FilePath& elemDirPath) throw (Exception)
-{
-    return addElement<Footprint>(elemDirPath, mLibraryPath.getPathTo("fpt"), "fpt", mFootprints);
-}
+    // Save all elements
+    if (!saveElements<Symbol>(version, toOriginal, errors, mLibraryPath.getPathTo("sym"), mSymbols, mRemovedSymbols))
+        success = false;
+    if (!saveElements<Footprint>(version, toOriginal, errors, mLibraryPath.getPathTo("fpt"), mFootprints, mRemovedFootprints))
+        success = false;
+    if (!saveElements<Model3D>(version, toOriginal, errors, mLibraryPath.getPathTo("3dmdl"), mModels, mRemovedModels))
+        success = false;
+    if (!saveElements<SpiceModel>(version, toOriginal, errors, mLibraryPath.getPathTo("spcmdl"), mSpiceModels, mRemovedSpiceModels))
+        success = false;
+    if (!saveElements<Package>(version, toOriginal, errors, mLibraryPath.getPathTo("pkg"), mPackages, mRemovedPackages))
+        success = false;
+    if (!saveElements<GenericComponent>(version, toOriginal, errors, mLibraryPath.getPathTo("gencmp"), mGenericComponents, mRemovedGenericComponents))
+        success = false;
+    if (!saveElements<Component>(version, toOriginal, errors, mLibraryPath.getPathTo("cmp"), mComponents, mRemovedComponents))
+        success = false;
 
-const library::Model3D* ProjectLibrary::add3dModel(const FilePath& elemDirPath) throw (Exception)
-{
-    return addElement<Model3D>(elemDirPath, mLibraryPath.getPathTo("3dmdl"), "3dmdl", mModels);
-}
-
-const library::SpiceModel* ProjectLibrary::addSpiceModel(const FilePath& elemDirPath) throw (Exception)
-{
-    return addElement<SpiceModel>(elemDirPath, mLibraryPath.getPathTo("spcmdl"), "spcmdl", mSpiceModels);
-}
-
-const library::Package* ProjectLibrary::addPackage(const FilePath& elemDirPath) throw (Exception)
-{
-    return addElement<Package>(elemDirPath, mLibraryPath.getPathTo("pkg"), "pkg", mPackages);
-}
-
-const library::GenericComponent* ProjectLibrary::addGenComp(const FilePath& elemDirPath) throw (Exception)
-{
-    return addElement<GenericComponent>(elemDirPath, mLibraryPath.getPathTo("gencmp"), "gencmp", mGenericComponents);
-}
-
-const library::Component* ProjectLibrary::addComp(const FilePath& elemDirPath) throw (Exception)
-{
-    return addElement<Component>(elemDirPath, mLibraryPath.getPathTo("cmp"), "cmp", mComponents);
-}
-
-void ProjectLibrary::removeSymbol(const QUuid& uuid) throw (Exception)
-{
-    removeElement<Symbol>(uuid, mSymbols);
-}
-
-void ProjectLibrary::removeFootprint(const QUuid& uuid) throw (Exception)
-{
-    removeElement<Footprint>(uuid, mFootprints);
-}
-
-void ProjectLibrary::remove3dModel(const QUuid& uuid) throw (Exception)
-{
-    removeElement<Model3D>(uuid, mModels);
-}
-
-void ProjectLibrary::removeSpiceModel(const QUuid& uuid) throw (Exception)
-{
-    removeElement<SpiceModel>(uuid, mSpiceModels);
-}
-
-void ProjectLibrary::removePackage(const QUuid& uuid) throw (Exception)
-{
-    removeElement<Package>(uuid, mPackages);
-}
-
-void ProjectLibrary::removeGenComp(const QUuid& uuid) throw (Exception)
-{
-    removeElement<GenericComponent>(uuid, mGenericComponents);
-}
-
-void ProjectLibrary::removeComp(const QUuid& uuid) throw (Exception)
-{
-    removeElement<Component>(uuid, mComponents);
+    return success;
 }
 
 /*****************************************************************************************
@@ -297,78 +334,76 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
 }
 
 template <typename ElementType>
-const ElementType* ProjectLibrary::addElement(const FilePath& rootDir, const FilePath& destDir,
-                                              const QString& prefix, QHash<QUuid, const ElementType*>& elementList) throw (Exception)
+void ProjectLibrary::addElement(const ElementType& element,
+                                QHash<QUuid, const ElementType*>& elementList,
+                                QHash<QUuid, const ElementType*>& removedElementsList) throw (Exception)
 {
-    // root directory must exist
-    if ((!rootDir.isValid()) || (!rootDir.isExistingDir()))
+    if (elementList.contains(element.getUuid()))
     {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
-            QString(tr("Invalid directory: \"%1\"")).arg(rootDir.toNative()));
+        throw LogicError(__FILE__, __LINE__, QString(), QString(tr(
+            "There is already an element with the same UUID in the project's library: %1"))
+            .arg(element.getUuid().toString()));
     }
 
-    // destination directory must NOT exist
-    FilePath destRootDir = destDir.getPathTo(rootDir.getFilename());
-    if ((destRootDir.isExistingDir() && destRootDir.isEmptyDir())
-      || destRootDir.isExistingFile() || (!destRootDir.isValid()))
+    if (removedElementsList.contains(element.getUuid()))
     {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
-            QString(tr("Directory or file exists already: \"%1\"")).arg(destRootDir.toNative()));
+        Q_ASSERT(removedElementsList.value(element.getUuid()) == &element);
+        removedElementsList.remove(element.getUuid());
     }
-
-    // create the destination directory
-    destRootDir.mkPath();
-
-    // copy directory recursive
-    QDirIterator it(rootDir.toStr(), QDir::Files, QDirIterator::Subdirectories);
-    while (it.hasNext())
-    {
-        FilePath rootFilePath(it.next());
-        QString relativePath = rootFilePath.toRelative(rootDir);
-        FilePath destFilePath = FilePath::fromRelative(destRootDir, relativePath);
-        QFile::copy(rootFilePath.toStr(), destFilePath.toStr());
-    }
-
-    // find the xml file to open
-    FilePath xmlFilePath;
-    for (int i = Application::majorVersion(); i >= 0; i--)
-    {
-        xmlFilePath = destRootDir.getPathTo(QString("%1_v%2.xml").arg(prefix).arg(i));
-        if (xmlFilePath.isExistingFile()) break;
-    }
-
-    // load the library element --> an exception will be thrown on error
-    ElementType* element = new ElementType(xmlFilePath);
-
-    // add the element to the list
-    if (elementList.contains(element->getUuid()))
-    {
-        throw RuntimeError(__FILE__, __LINE__, element->getUuid().toString(),
-            QString(tr("There is already a library element with the UUID \"%1\""))
-            .arg(element->getUuid().toString()));
-    }
-    elementList.insert(element->getUuid(), element);
-
-    return element;
+    elementList.insert(element.getUuid(), &element);
 }
 
 template <typename ElementType>
-void ProjectLibrary::removeElement(const QUuid& uuid, QHash<QUuid, const ElementType*>& elementList) throw (Exception)
+void ProjectLibrary::removeElement(const ElementType& element,
+                                   QHash<QUuid, const ElementType*>& elementList,
+                                   QHash<QUuid, const ElementType*>& removedElementsList) throw (Exception)
 {
-    if (!elementList.contains(uuid))
+    Q_ASSERT(elementList.value(element.getUuid()) == &element);
+    Q_ASSERT(!removedElementsList.contains(element.getUuid()));
+    elementList.remove(element.getUuid());
+    removedElementsList.insert(element.getUuid(), &element);
+}
+
+template <typename ElementType>
+bool ProjectLibrary::saveElements(int version, bool toOriginal, QStringList& errors,
+                                  const FilePath& parentDir,
+                                  QHash<QUuid, const ElementType*>& elementList,
+                                  QHash<QUuid, const ElementType*>& removedElementsList) noexcept
+{
+    Q_UNUSED(toOriginal);
+    Q_UNUSED(removedElementsList);
+
+    bool success = true;
+
+    foreach (const ElementType* element, elementList)
     {
-        throw RuntimeError(__FILE__, __LINE__, uuid.toString(),
-            QString(tr("There is no library element with the UUID \"%1\""))
-            .arg(uuid.toString()));
+        try
+        {
+            if (element->getDirectory().getParentDir().getParentDir().toStr() != mLibraryPath.toStr())
+                element->saveTo(parentDir, version);
+        }
+        catch (Exception& e)
+        {
+            success = false;
+            errors.append(e.getUserMsg());
+        }
     }
 
-    // remove element from list
-    const ElementType* element = elementList.take(uuid);
-    FilePath elementDir = element->getXmlFilepath().getParentDir();
-    delete element;
+    return success;
+}
 
-    // remove directory
-    QDir(elementDir.toStr()).removeRecursively();
+template <typename ElementType>
+void ProjectLibrary::cleanupRemovedElements(QHash<QUuid, const ElementType*>& removedElementsList) noexcept
+{
+    foreach (const ElementType* element, removedElementsList)
+    {
+        if (element->getDirectory().getParentDir().getParentDir().toStr() == mLibraryPath.toStr())
+        {
+            QDir dir(element->getDirectory().toStr());
+            dir.removeRecursively();
+        }
+        delete removedElementsList.take(element->getUuid());
+    }
 }
 
 /*****************************************************************************************

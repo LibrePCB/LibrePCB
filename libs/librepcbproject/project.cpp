@@ -707,6 +707,10 @@ bool Project::save(int version, bool toOriginal, QStringList& errors) noexcept
             success = false;
     }
 
+    // Save library
+    if (!mProjectLibrary->save(version, toOriginal, errors))
+        success = false;
+
     // Save settings
     if (!mProjectSettings->save(version, toOriginal, errors))
         success = false;

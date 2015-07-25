@@ -55,11 +55,8 @@ namespace project {
 /**
  * @brief The ProjectLibrary class
  *
- * @todo When adding new elements, the directory should be copied only to a temporary
- *       location. Then after saving the project, the directory must be copied to the
- *       project library's directory. The same applies to removed elements.
- * @todo When removing elements, the objects should not be deleted! Undo commands need to
- *       add removed elements again, and the pointer to the object should remain the same.
+ * @todo Adding and removing elements is very provisional. It does not really work
+ *       together with the automatic backup/restore feature of projects.
  */
 class ProjectLibrary final : public QObject
 {
@@ -91,21 +88,25 @@ class ProjectLibrary final : public QObject
         QHash<QUuid, const library::Component*> getComponentsOfGenComp(const QUuid& genCompUuid) const noexcept;
 
 
+        // Add/Remove Methods
+        void addSymbol(const library::Symbol& s) throw (Exception);
+        void addFootprint(const library::Footprint& f) throw (Exception);
+        void add3dModel(const library::Model3D& m) throw (Exception);
+        void addSpiceModel(const library::SpiceModel& m) throw (Exception);
+        void addPackage(const library::Package& p) throw (Exception);
+        void addGenComp(const library::GenericComponent& gc) throw (Exception);
+        void addComp(const library::Component& c) throw (Exception);
+        void removeSymbol(const library::Symbol& s) throw (Exception);
+        void removeFootprint(const library::Footprint& f) throw (Exception);
+        void remove3dModel(const library::Model3D& m) throw (Exception);
+        void removeSpiceModel(const library::SpiceModel& m) throw (Exception);
+        void removePackage(const library::Package& p) throw (Exception);
+        void removeGenComp(const library::GenericComponent& gc) throw (Exception);
+        void removeComp(const library::Component& c) throw (Exception);
+
+
         // General Methods
-        const library::Symbol* addSymbol(const FilePath& elemDirPath) throw (Exception);
-        const library::Footprint* addFootprint(const FilePath& elemDirPath) throw (Exception);
-        const library::Model3D* add3dModel(const FilePath& elemDirPath) throw (Exception);
-        const library::SpiceModel* addSpiceModel(const FilePath& elemDirPath) throw (Exception);
-        const library::Package* addPackage(const FilePath& elemDirPath) throw (Exception);
-        const library::GenericComponent* addGenComp(const FilePath& elemDirPath) throw (Exception);
-        const library::Component* addComp(const FilePath& elemDirPath) throw (Exception);
-        void removeSymbol(const QUuid& uuid) throw (Exception);
-        void removeFootprint(const QUuid& uuid) throw (Exception);
-        void remove3dModel(const QUuid& uuid) throw (Exception);
-        void removeSpiceModel(const QUuid& uuid) throw (Exception);
-        void removePackage(const QUuid& uuid) throw (Exception);
-        void removeGenComp(const QUuid& uuid) throw (Exception);
-        void removeComp(const QUuid& uuid) throw (Exception);
+        bool save(int version, bool toOriginal, QStringList& errors) noexcept;
 
 
     private:
@@ -120,10 +121,20 @@ class ProjectLibrary final : public QObject
         void loadElements(const FilePath& directory, const QString& type, const QString& prefix,
                           QHash<QUuid, const ElementType*>& elementList) throw (Exception);
         template <typename ElementType>
-        const ElementType* addElement(const FilePath& rootDir, const FilePath& destDir, const QString& prefix,
-                                      QHash<QUuid, const ElementType*>& elementList) throw (Exception);
+        void addElement(const ElementType& element,
+                        QHash<QUuid, const ElementType*>& elementList,
+                        QHash<QUuid, const ElementType*>& removedElementsList) throw (Exception);
         template <typename ElementType>
-        void removeElement(const QUuid& uuid, QHash<QUuid, const ElementType*>& elementList) throw (Exception);
+        void removeElement(const ElementType& element,
+                           QHash<QUuid, const ElementType*>& elementList,
+                           QHash<QUuid, const ElementType*>& removedElementsList) throw (Exception);
+        template <typename ElementType>
+        bool saveElements(int version, bool toOriginal, QStringList& errors,
+                          const FilePath& parentDir,
+                          QHash<QUuid, const ElementType*>& elementList,
+                          QHash<QUuid, const ElementType*>& removedElementsList) noexcept;
+        template <typename ElementType>
+        void cleanupRemovedElements(QHash<QUuid, const ElementType*>& removedElementsList) noexcept;
 
         // General
         Project& mProject; ///< a reference to the Project object (from the ctor)
@@ -138,6 +149,14 @@ class ProjectLibrary final : public QObject
         QHash<QUuid, const library::GenericComponent*> mGenericComponents;
         QHash<QUuid, const library::Component*> mComponents;
 
+        // Removed Library Elements
+        QHash<QUuid, const library::Symbol*> mRemovedSymbols;
+        QHash<QUuid, const library::Footprint*> mRemovedFootprints;
+        QHash<QUuid, const library::Model3D*> mRemovedModels;
+        QHash<QUuid, const library::SpiceModel*> mRemovedSpiceModels;
+        QHash<QUuid, const library::Package*> mRemovedPackages;
+        QHash<QUuid, const library::GenericComponent*> mRemovedGenericComponents;
+        QHash<QUuid, const library::Component*> mRemovedComponents;
 };
 
 } // namespace project

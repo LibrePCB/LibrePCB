@@ -52,12 +52,12 @@ class CmdProjectLibraryAddElement final : public UndoCommand
 
         // Constructors / Destructor
         explicit CmdProjectLibraryAddElement(ProjectLibrary& library,
-                                             const FilePath& elementDirectory,
+                                             const ElementType& element,
                                              UndoCommand* parent = 0) throw (Exception);
         ~CmdProjectLibraryAddElement() noexcept;
 
         // Getters
-        const ElementType* getElement() const noexcept {return mElement;}
+        const ElementType& getElement() const noexcept {return mElement;}
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;
@@ -65,13 +65,12 @@ class CmdProjectLibraryAddElement final : public UndoCommand
 
     private:
 
-        const ElementType* addElement();
+        void addElement();
         void removeElement();
 
 
         ProjectLibrary& mLibrary;
-        FilePath mElemDirPath;
-        const ElementType* mElement;
+        const ElementType& mElement;
 };
 
 } // namespace project

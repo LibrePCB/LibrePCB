@@ -33,10 +33,11 @@ namespace project {
  ****************************************************************************************/
 
 template <typename ElementType>
-CmdProjectLibraryAddElement<ElementType>::CmdProjectLibraryAddElement(
-        ProjectLibrary& library, const FilePath& elementDirectory, UndoCommand* parent) throw (Exception) :
+CmdProjectLibraryAddElement<ElementType>::CmdProjectLibraryAddElement(ProjectLibrary& library,
+                                                                      const ElementType& element,
+                                                                      UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Add element to library"), parent),
-    mLibrary(library), mElemDirPath(elementDirectory), mElement(nullptr)
+    mLibrary(library), mElement(element)
 {
 }
 
@@ -52,9 +53,7 @@ CmdProjectLibraryAddElement<ElementType>::~CmdProjectLibraryAddElement() noexcep
 template <typename ElementType>
 void CmdProjectLibraryAddElement<ElementType>::redo() throw (Exception)
 {
-    mElement = nullptr;
-    mElement = addElement(); // throws an exception on error
-    Q_ASSERT(mElement);
+    addElement(); // throws an exception on error
 
     try
     {
@@ -62,7 +61,7 @@ void CmdProjectLibraryAddElement<ElementType>::redo() throw (Exception)
     }
     catch (Exception &e)
     {
-        removeElement();
+        removeElement(); // throws an exception on error
         throw;
     }
 }
@@ -70,20 +69,15 @@ void CmdProjectLibraryAddElement<ElementType>::redo() throw (Exception)
 template <typename ElementType>
 void CmdProjectLibraryAddElement<ElementType>::undo() throw (Exception)
 {
-    throw RuntimeError(__FILE__, __LINE__, QString(), tr("not supported yet"));
-
-    Q_ASSERT(mElement);
     removeElement(); // throws an exception on error
-    mElement = nullptr;
 
     try
     {
-        UndoCommand::undo();
+        UndoCommand::undo(); // throws an exception on error
     }
     catch (Exception& e)
     {
-        mElement = addElement(); // throws an exception on error
-        Q_ASSERT(mElement);
+        addElement(); // throws an exception on error
         throw;
     }
 }
@@ -93,87 +87,87 @@ void CmdProjectLibraryAddElement<ElementType>::undo() throw (Exception)
  ****************************************************************************************/
 
 template <>
-const library::Symbol* CmdProjectLibraryAddElement<library::Symbol>::addElement()
+void CmdProjectLibraryAddElement<library::Symbol>::addElement()
 {
-    return mLibrary.addSymbol(mElemDirPath);
+    return mLibrary.addSymbol(mElement);
 }
 
 template <>
-const library::Footprint* CmdProjectLibraryAddElement<library::Footprint>::addElement()
+void CmdProjectLibraryAddElement<library::Footprint>::addElement()
 {
-    return mLibrary.addFootprint(mElemDirPath);
+    return mLibrary.addFootprint(mElement);
 }
 
 template <>
-const library::Model3D* CmdProjectLibraryAddElement<library::Model3D>::addElement()
+void CmdProjectLibraryAddElement<library::Model3D>::addElement()
 {
-    return mLibrary.add3dModel(mElemDirPath);
+    return mLibrary.add3dModel(mElement);
 }
 
 template <>
-const library::SpiceModel* CmdProjectLibraryAddElement<library::SpiceModel>::addElement()
+void CmdProjectLibraryAddElement<library::SpiceModel>::addElement()
 {
-    return mLibrary.addSpiceModel(mElemDirPath);
+    return mLibrary.addSpiceModel(mElement);
 }
 
 template <>
-const library::Package* CmdProjectLibraryAddElement<library::Package>::addElement()
+void CmdProjectLibraryAddElement<library::Package>::addElement()
 {
-    return mLibrary.addPackage(mElemDirPath);
+    return mLibrary.addPackage(mElement);
 }
 
 template <>
-const library::GenericComponent* CmdProjectLibraryAddElement<library::GenericComponent>::addElement()
+void CmdProjectLibraryAddElement<library::GenericComponent>::addElement()
 {
-    return mLibrary.addGenComp(mElemDirPath);
+    return mLibrary.addGenComp(mElement);
 }
 
 template <>
-const library::Component* CmdProjectLibraryAddElement<library::Component>::addElement()
+void CmdProjectLibraryAddElement<library::Component>::addElement()
 {
-    return mLibrary.addComp(mElemDirPath);
+    return mLibrary.addComp(mElement);
 }
 
 template <>
 void CmdProjectLibraryAddElement<library::Symbol>::removeElement()
 {
-    mLibrary.removeSymbol(mElement->getUuid());
+    mLibrary.removeSymbol(mElement);
 }
 
 template <>
 void CmdProjectLibraryAddElement<library::Footprint>::removeElement()
 {
-    mLibrary.removeFootprint(mElement->getUuid());
+    mLibrary.removeFootprint(mElement);
 }
 
 template <>
 void CmdProjectLibraryAddElement<library::Model3D>::removeElement()
 {
-    mLibrary.remove3dModel(mElement->getUuid());
+    mLibrary.remove3dModel(mElement);
 }
 
 template <>
 void CmdProjectLibraryAddElement<library::SpiceModel>::removeElement()
 {
-    mLibrary.removeSpiceModel(mElement->getUuid());
+    mLibrary.removeSpiceModel(mElement);
 }
 
 template <>
 void CmdProjectLibraryAddElement<library::Package>::removeElement()
 {
-    mLibrary.removePackage(mElement->getUuid());
+    mLibrary.removePackage(mElement);
 }
 
 template <>
 void CmdProjectLibraryAddElement<library::GenericComponent>::removeElement()
 {
-    mLibrary.removeGenComp(mElement->getUuid());
+    mLibrary.removeGenComp(mElement);
 }
 
 template <>
 void CmdProjectLibraryAddElement<library::Component>::removeElement()
 {
-    mLibrary.removeComp(mElement->getUuid());
+    mLibrary.removeComp(mElement);
 }
 
 /*****************************************************************************************

@@ -40,6 +40,7 @@
 #include "librepcbproject/library/cmd/cmdprojectlibraryaddelement.h"
 #include <librepcbworkspace/workspace.h>
 #include <librepcblibrary/library.h>
+#include <librepcblibrary/sym/symbol.h>
 
 namespace project {
 
@@ -332,10 +333,10 @@ void SES_AddComponents::startAddingComponent(const QUuid& genComp, const QUuid& 
                         .arg(genCompUuid.toString()));
                 }
                 FilePath genCompFilePath = genComps.first();
+                mGenComp = new library::GenericComponent(genCompFilePath);
                 auto cmd = new CmdProjectLibraryAddElement<library::GenericComponent>(
-                    mProject.getLibrary(), genCompFilePath.getParentDir());
+                    mProject.getLibrary(), *mGenComp);
                 mUndoStack.appendToCommand(cmd);
-                mGenComp = cmd->getElement();
             }
             mGenCompSymbVar = mGenComp->getSymbolVariantByUuid(mAddGenCompDialog->getSelectedSymbVarUuid());
         }
@@ -372,8 +373,9 @@ void SES_AddComponents::startAddingComponent(const QUuid& genComp, const QUuid& 
                         QString(tr("Symbol not found in library: %1")).arg(uuid.toString()));
                 }
                 FilePath filepath = symbols.first();
+                library::Symbol* symbol = new library::Symbol(filepath);
                 auto cmd = new CmdProjectLibraryAddElement<library::Symbol>(
-                    mProject.getLibrary(), filepath.getParentDir());
+                    mProject.getLibrary(), *symbol);
                 mUndoStack.appendToCommand(cmd);
             }
         }
