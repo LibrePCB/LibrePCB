@@ -12,11 +12,10 @@ env:
     - QT_BASE=55
 
 before_install:
-  - nproc
   - if [ "$CXX" = "g++" ]; then sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y; fi
   - if [ "$QT_BASE" = "54" ]; then sudo add-apt-repository ppa:beineri/opt-qt541 -y; fi
   - if [ "$QT_BASE" = "55" ]; then sudo add-apt-repository ppa:beineri/opt-qt55 -y; fi
-  - sudo apt-add-repository -y ppa:libreoffice/libreoffice-4-2
+  - sudo apt-add-repository -y ppa:libreoffice/libreoffice-4-2 # used to install an up-to-date doxygen
   - sudo apt-get update -qq
 
 install:
@@ -28,8 +27,10 @@ install:
 script:
   - qmake -r "QMAKE_CXX=$CXX" "QMAKE_CC=$CC"
   - make -j 8
-  - ./generated/unix/tests
+  - ./generated/unix/tests # run all unit tests
+  - make clean
 
+# run doxygen and upload the html output to github (gh-pages of LibrePCB-Doxygen)
 after_script:
   - cd ./dev/doxygen
   - if [ "${TRAVIS_PULL_REQUEST}" = "false" -a "${TRAVIS_BRANCH}" = "master" ]; then git clone -b gh-pages $DOXYGEN_REPOSITORY output/html; fi
