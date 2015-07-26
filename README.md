@@ -26,6 +26,22 @@ way.  To keep build time as low as possible make sure to set the correct make
 flags to use all available CPU cores to build. See this [stackoverflow
 answer](https://stackoverflow.com/questions/8860712/setting-default-make-options-for-qt-creator).
 
+#### Using qmake and make
+
+Since qtcreator is also using qmake and make to build, it's easy to do the same
+on the command line:
+
+```bash
+% qmake librepcb.pro 
+% make -j 8
+```
+
+Then grab a coffee, since the compilation takes about two minutes on a decent
+laptop:
+```
+make -j8  819.54s user 44.92s system 726% cpu 1:58.93 total
+```
+
 ### Documentation
 
 - Doxygen: http://librepcb.github.io/LibrePCB-Doxygen/master/
