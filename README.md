@@ -2,7 +2,7 @@
 
 ## About LibrePCB
 
-LibrePCB is a free Schematic / Layout Editor to develop printed circuit boards. It runs on Linux, Windows and Mac. The project is still in a quite early development status (no stable release available).
+LibrePCB is a free Schematic / Layout Editor to develop printed circuit boards. It runs on Linux, Windows and Mac. The project is still in a quite early development stage (no stable release available).
 
 ![Screenshot](doc/screenshot.png)
 
@@ -17,7 +17,7 @@ To compile LibrePCB, you need the following software components:
 
 ### Documentation
 
-- Doxygen: http://librepcb.github.io/LibrePCB-Doxygen/
+- Doxygen: http://librepcb.github.io/LibrePCB-Doxygen/master/
 - Some diagrams (partially outdated): https://github.com/LibrePCB/LibrePCB/tree/master/dev/diagrams/svg
 
 ### Workspace
@@ -27,4 +27,4 @@ For developers there is a demo workspace inclusive library and projects in this 
 
 ## License
 
-LibrePCB is published under the [GNU GPLv3 license](http://www.gnu.org/licenses/gpl-3.0.html)
+LibrePCB is published under the [GNU GPLv3](http://www.gnu.org/licenses/gpl-3.0.html) license.
