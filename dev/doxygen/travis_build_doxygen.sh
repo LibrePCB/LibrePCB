@@ -1,17 +1,27 @@
 #!/bin/bash
 
-set -ev
+set -e # The -e flag causes the script to exit as soon as one command returns a non-zero exit code.
 
 if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then 
     echo "Build doxygen documentation for branch ${TRAVIS_BRANCH}..."
+    
+    echo "make clean:"
     make clean
+    
+    echo "doxygen Doxyfile:"
     cd ./dev/doxygen
     doxygen Doxyfile
+    
+    echo "git clone -b gh-pages:"
     git clone -b gh-pages $DOXYGEN_REPOSITORY
-    mkdir "LibrePCB-Doxygen/${TRAVIS_BRANCH}"
-    cd "LibrePCB-Doxygen/${TRAVIS_BRANCH}"
-    git rm -r *
-    cp -rf ../../output/html/* .
+    cd LibrePCB-Doxygen
+    
+    echo "rm -rf ${TRAVIS_BRANCH}/*:"
+    mkdir -p ${TRAVIS_BRANCH}
+    rm -rf ${TRAVIS_BRANCH}/*
+    
+    echo "git add/commit/push:"
+    cp -rf ../output/html/* ./${TRAVIS_BRANCH}
     git config user.name "LibrePCB-Builder"
     git config user.email "builder@librepcb.org"
     git add -A
