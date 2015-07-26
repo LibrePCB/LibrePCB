@@ -2,9 +2,10 @@
 
 set -e # The -e flag causes the script to exit as soon as one command returns a non-zero exit code.
 
-if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then 
+BRANCH_NAME=$(echo ${TRAVIS_BRANCH} | sed -e 's/[^A-Za-z0-9._-]/_/g')
+JOB_SUBNUMBER=`echo ${TRAVIS_JOB_NUMBER} | cut -d \. -f 2`
 
-    BRANCH_NAME=$(echo ${TRAVIS_BRANCH} | sed -e 's/[^A-Za-z0-9._-]/_/g')
+if [ "${TRAVIS_PULL_REQUEST}" = "false" -a "$JOB_SUBNUMBER" = "1" ]; then 
     echo "Build doxygen documentation for branch $BRANCH_NAME..."
     
     echo "make clean:"
@@ -30,6 +31,6 @@ if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then
     git commit -m "updated doxygen documentation of branch $BRANCH_NAME"
     git push origin gh-pages
 else
-    echo "Pull request -> Do not build doxygen documentation"
+    echo "Do not build doxygen documentation (PullRequest=${TRAVIS_PULL_REQUEST}, JobSubNumber=$JOB_SUBNUMBER)"
 fi
 
