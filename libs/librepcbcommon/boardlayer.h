@@ -45,7 +45,7 @@ class BoardLayer final : public QObject
 
     public:
 
-        // All Board Layer IDs
+        /// All Board Layer IDs
         enum LayerID {
 
             // Special Layers
@@ -228,13 +228,25 @@ class BoardLayer final : public QObject
 
 /**
     @page doc_board_layers Board Layers Documentation
+
     @tableofcontents
 
     @section doc_board_layer_class Class BoardLayer
         The class #BoardLayer is used to representate footprint/board layers. for
         each layer you need to create an object of that type.
 
-    @todo Add more details. See https://github.com/ubruhin/LibrePCB/issues/4
+    @section doc_board_layer_attributes Layer Attributes
+        Each board layer has the following attibutes:
+            - ID: An unsigned integer which identifies the layer (must be unique)
+            - Name: The name of the layer (translated into the user's language)
+            - Color: The color which is used to draw elements of that layer
+            - Color (highlighted): The color for highlighted (selected) elements
+            - Visible: Defines whether the layer is visible (true) or not (false)
+
+    @section doc_board_layer_ids Layer IDs
+        All available layers are listed in BoardLayer#LayerID.
+
+    @todo Add more details
 
 */
 

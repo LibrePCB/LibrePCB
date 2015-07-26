@@ -42,7 +42,7 @@ class SchematicLayer final : public QObject
 
     public:
 
-        // All Schematic Layer IDs
+        /// All Schematic Layer IDs
         enum LayerID {
 
             // General
@@ -110,6 +110,7 @@ class SchematicLayer final : public QObject
 
 /**
     @page doc_schematic_layers Schematic Layers Documentation
+
     @tableofcontents
 
     @section doc_schematic_layer_class Class SchematicLayer
@@ -118,29 +119,16 @@ class SchematicLayer final : public QObject
 
     @section doc_schematic_layer_attributes Layer Attributes
         Each schematic layer has the following attibutes:
-            - ID:   An unsigned integer which identifies the layer (must be unique)
+            - ID: An unsigned integer which identifies the layer (must be unique)
             - Name: The name of the layer (translated into the user's language)
-            - Color:    The color which is used to draw elements of that layer
+            - Color: The color which is used to draw elements of that layer
             - Color (highlighted): The color for highlighted (selected) elements
+            - Visible: Defines whether the layer is visible (true) or not (false)
 
     @section doc_schematic_layer_ids Layer IDs
-        The following layers exist:
-            - 1:    Origin Crosses
-            - 10:   Symbol Outlines
-            - 11:   Symbol Grab Areas
-            - 12:   Symbol Pin Circles
-            - 13:   Symbol Pin Names (Text)
-            - 20:   Component Names (Text)
-            - 21:   Component Values (Text)
-            - 30:   Nets (in Schematics, see project#SchematicNetPoint and project#SchematicNetLine)
-            - 31:   Busses (in Schematics)
+        All available layers are listed in SchematicLayer#LayerID.
 
-        @todo Add more layers:
-            - Various Texts
-            - Group Frames / Group Names
-            - Custom Layers (user defined)
-
-    @todo Add more details. See https://github.com/ubruhin/LibrePCB/issues/4
+    @todo Add more details
 
 */
 

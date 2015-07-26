@@ -9,20 +9,20 @@
 
     @section doc_developers_git Git
     
-        - The "master" branch must always be compilable and executable! Bugs and non-finished features are allowed in this very early development phase.
+        - The "master" branch must always be compilable and executable. Bugs and non-finished features are allowed in this early development phase.
         - Do not pack lot of changes in one commit. Make one commit per bugfix resp. one commit per new feature.
         
     
     @section doc_developers_internationalization Internationalization (i18n)
     
-        - All files (*.cpp, *.h, *.dox, *.xml, *.ini,...) must be written in english! Only strings which are visible in the GUI should be translatable into other languages.
-        - Always use the ISO 8601 format for date/time in all files! Use always UTC time in all files! Example: "2014-12-20T14:42:30Z". In the GUI, you should normally use the local date/time format. See also https://en.wikipedia.org/wiki/ISO_8601 and https://qt-project.org/doc/qt-5-snapshot/qdatetime.html
-        - All numbers which are stored in files (e.g. XML/INI) must have a locale-independent format. We always use the point '.' as decimal separator, and no thousands separator. Example: "123456789.987654321"
+        - All files (*.cpp, *.h, *.dox, *.xml, *.ini,...) must be written in english. Only strings which are visible in the GUI should be translatable into other languages.
+        - Always use the ISO 8601 format for date/time in all files. Use always UTC time in all files, e.g. "2014-12-20T14:42:30Z". In the GUI, you should normally use the local date/time format. See also https://en.wikipedia.org/wiki/ISO_8601 and https://qt-project.org/doc/qt-5-snapshot/qdatetime.html
+        - All numbers which are stored in files (e.g. XML or INI) must have a locale-independent format. We always use the point '.' as decimal separator, and no thousands separator. Example: "123456789.987654321"
     
     
     @section doc_developers_licenses Licenses
     
-        - All 3rd-party modules and source code (e.g. from the internet) must be compatible with the GNU GPLv3 license! This applies to all kinds of resources, like Icons, Symbols, Text, Sound, Source Code, ...
+        - All 3rd-party modules and source code (e.g. from the internet) must be compatible with the GNU GPLv3 license. This applies to all kinds of resources, like Icons, Symbols, Text, Sound, Source Code, ...
         
     @section doc_developers_exceptions Exceptions
     

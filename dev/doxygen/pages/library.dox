@@ -1,0 +1,80 @@
+/**
+
+    @page doc_library Library Documentation
+
+    @tableofcontents
+
+    @section doc_library_general General Information
+    
+        - UUID: https://de.wikipedia.org/wiki/Universally_Unique_Identifier
+        - The whole library is stored in the "lib" directory in the LibrePCB workspace.
+        - There is always a local repository in the directory "lib/local/".
+        - In directories like "lib/{UUID}/" are the libraries which are downloaded (from repositories) and will be updated automatically over the internet.
+        - Each library element (symbol, footprint, ...) ist stored in a separate directory. These directories can contain files and subdirectories.
+        - Each library element (symbol, footprint, ...) has a unique UUID. So a Symbol from repository A can be combined with a footprint from repository B, because their UUID will guarantee that only the right elements will be combined, and not the wrong ones.
+        - For better performance of the library (searching in filesystem can be quite slow...), we use a SQLite database for caching. With a "scan library" function, the SQLite database will be filled with some metadata of the library and their elements. This can take some time. Searching for elements can now be done with a SELECT statement in the database, which is very fast. To load a searched element, there's the filepath of the elment stored in the database. The elements themselves are not stored completely in the database.
+
+
+    @section doc_library_file_structure File Structure
+    
+        The whole library is located in the workspace directory "lib". This folder contains the following subdirectories:
+            - local:    All local library elements (created by the user or imported)
+            - {UUID}:   For each repository a separate directory. These directories contain all library elements from the appropriate repository.
+            
+        All these directories contain the following subdirectories:
+            - 3dmdl:    3D Models (library#Model3D)
+            - cmp:      Components (library#Component)
+            - cmpcat:   Component Categories (library#ComponentCategory)
+            - fpt:      Footprints (library#Footprint)
+            - gencmp:   Generic Components (library#GenericComponent)
+            - pkg:      Packages (library#Package)
+            - pkgcat:   Package Categories (library#PackageCategory)
+            - sym:      Symbols (library#Symbol)
+
+
+    @section doc_library_sec2 Repositories & Updates
+    
+        TODO
+
+
+    @section doc_library_sec3 Feedback System
+    
+        TODO
+
+
+    @section doc_library_sec4 Identification of Library Elements
+    
+        Each library element gets a UUID at their creation. This UUID is now used to identify this element.
+        For example a library#Package references to a library#Footprint with the UUID of the footprint.
+        This allows also to combine library elements across different repositories.
+        
+        The UUID of an existing library element must never change! It have to be constant over the whole 
+        lifetime. Also the "interface" of a library element must never change. For example the interface of
+        a library#Symbol is defined by their pins (UUID and meaning of every pin). If the count, UUID or the
+        meaning of pins changes, all library#GenericComponent which have references to this library#Symbol
+        will break their functionality! So if the interface of an existing element must be changed, you need
+        to create a new element (with a new UUID) instead.
+        
+        To track changes in existing library elements, each library element has also a version number. See
+        #Version for more information.
+
+
+    @section doc_library_sec6 Element Categories
+    
+        Categories are very similar to "normal" library elements. They also have a UUID and a version number.
+    
+        There are two types of categories:
+            @li Component Categories (e.g. Diodes, Resistors, ...): Used for library#Symbol, library#SpiceModel, library#GenericComponent, library#Component
+            @li Package Categories (e.g. DIP, TQFP, BGA, ...): Used for library#Footprint, library#Model3D, library#Package
+        
+        Each library element can be added to multiple categories.
+
+
+    @section doc_library_sec7 Internationalization of Library Elements
+
+        Each library element must contain english (en_US) texts (name, description, keywords, ...). All other
+        languages are optional. The user can now define his favorite language, and LibrePCB shows all library
+        elements in this language (if available). English is always the fallback language if the desired 
+        language is not available.
+
+*/

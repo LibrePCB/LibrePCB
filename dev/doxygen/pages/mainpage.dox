@@ -1,15 +1,14 @@
 /**
 
     @mainpage LibrePCB Developers Documentation
-
-    @warning    The development is in a very early state, so a lot of information here is not definitively!
-    
     
     @section documentation_pages Documentation
         - @subpage doc_developers
         - @subpage doc_code_style_guide
+        - @subpage doc_architecture_overview
         - @subpage doc_schematic_layers
-        - @subpage doc_lib
+        - @subpage doc_board_layers
+        - @subpage doc_library
         - @subpage doc_project
     
     @section related_pages Related Pages

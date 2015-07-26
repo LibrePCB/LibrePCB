@@ -1,0 +1,9 @@
+/**
+
+    @page doc_architecture_overview Architecture Overview
+
+    LibrePCB is splitted up in several libraries which are statically linked to the LibrePCB application, or to other applications (e.g. developer tools like the EagleImport).
+    
+    @image html architecture_overview.png
+
+*/
