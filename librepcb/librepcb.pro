@@ -15,10 +15,6 @@ include(../common.pri)
 
 QT += core widgets opengl webkitwidgets xml printsupport sql
 
-# Define the application version here
-DEFINES += APP_VERSION_MAJOR=0
-DEFINES += APP_VERSION_MINOR=1
-
 exists(../.git):DEFINES += GIT_BRANCH=\\\"master\\\"
 
 win32 {

@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
 #else
     Application::setApplicationName("LibrePCB");
 #endif
-    Application::setApplicationVersion(Version(QString("%1.%2").arg(APP_VERSION_MAJOR).arg(APP_VERSION_MINOR)));
+    Application::setApplicationVersion(Version(QString("%1.%2.%3").arg(APP_VERSION_MAJOR).arg(APP_VERSION_MINOR).arg(APP_VERSION_PATCH)));
 
 
     Debug::instance(); // this creates the Debug object and installs the message handler.

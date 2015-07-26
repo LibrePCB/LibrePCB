@@ -17,10 +17,6 @@ include(../../common.pri)
 isEmpty(UUID_LIST_FILEPATH):UUID_LIST_FILEPATH = $$absolute_path("UUID_List.ini")
 DEFINES += UUID_LIST_FILEPATH=\\\"$${UUID_LIST_FILEPATH}\\\"
 
-# Define the application version here (needed for XML files)
-DEFINES += APP_VERSION_MAJOR=0
-DEFINES += APP_VERSION_MINOR=1
-
 QT += core widgets opengl webkitwidgets xml printsupport sql
 
 LIBS += \

@@ -25,7 +25,6 @@
 #include "smartxmlfile.h"
 #include "xmldomdocument.h"
 #include "xmldomelement.h"
-#include "../application.h"
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -51,7 +50,7 @@ QSharedPointer<XmlDomDocument> SmartXmlFile::parseFileAndBuildDomTree(bool check
 
     if (checkVersion)
     {
-        int appVersion = Application::majorVersion();
+        int appVersion = APP_VERSION_MAJOR;
         int fileVersion = doc->getFileVersion();
         if (!(fileVersion <= appVersion))
         {
@@ -70,7 +69,7 @@ void SmartXmlFile::save(const XmlDomDocument& domDocument, bool toOriginal) thro
     // check if file version <= application's major version
     Q_ASSERT(domDocument.getRoot().hasAttribute("version"));
     Q_ASSERT(domDocument.getFileVersion() >= 0);
-    Q_ASSERT(domDocument.getFileVersion() <= Application::majorVersion());
+    Q_ASSERT(domDocument.getFileVersion() <= APP_VERSION_MAJOR);
 
     const FilePath& filepath = prepareSaveAndReturnFilePath(toOriginal);
     saveContentToFile(filepath, domDocument.toByteArray());

@@ -86,8 +86,9 @@ int XmlDomDocument::getFileVersion() const throw (Exception)
 void XmlDomDocument::setFileVersion(int version) noexcept
 {
     Q_ASSERT(version >= 0);
+    Q_ASSERT(version <= APP_VERSION_MAJOR);
     Q_ASSERT(mRootElement != nullptr);
-    mRootElement->setAttribute<int>("version", version);
+    mRootElement->setAttribute("version", version);
 }
 
 /*****************************************************************************************
