@@ -106,7 +106,7 @@ class ProjectLibrary final : public QObject
 
 
         // General Methods
-        bool save(int version, bool toOriginal, QStringList& errors) noexcept;
+        bool save(bool toOriginal, QStringList& errors) noexcept;
 
 
     private:
@@ -129,8 +129,7 @@ class ProjectLibrary final : public QObject
                            QHash<QUuid, const ElementType*>& elementList,
                            QHash<QUuid, const ElementType*>& removedElementsList) throw (Exception);
         template <typename ElementType>
-        bool saveElements(int version, bool toOriginal, QStringList& errors,
-                          const FilePath& parentDir,
+        bool saveElements(bool toOriginal, QStringList& errors, const FilePath& parentDir,
                           QHash<QUuid, const ElementType*>& elementList,
                           QHash<QUuid, const ElementType*>& removedElementsList) noexcept;
         template <typename ElementType>

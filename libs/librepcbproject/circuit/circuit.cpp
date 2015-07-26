@@ -434,14 +434,15 @@ void Circuit::setGenCompInstanceName(GenCompInstance& genComp, const QString& ne
  *  General Methods
  ****************************************************************************************/
 
-bool Circuit::save(int version, bool toOriginal, QStringList& errors) noexcept
+bool Circuit::save(bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
 
     // Save "core/circuit.xml"
     try
     {
-        XmlDomDocument doc(*serializeToXmlDomElement(version));
+        XmlDomDocument doc(*serializeToXmlDomElement());
+        doc.setFileVersion(APP_VERSION_MAJOR);
         mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)
@@ -462,22 +463,21 @@ bool Circuit::checkAttributesValidity() const noexcept
     return true;
 }
 
-XmlDomElement* Circuit::serializeToXmlDomElement(int version) const throw (Exception)
+XmlDomElement* Circuit::serializeToXmlDomElement() const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("circuit"));
-    root->setAttribute("version", version);
     //XmlDomElement* meta = root->appendChild("meta");
     XmlDomElement* netclasses = root->appendChild("netclasses");
     foreach (NetClass* netclass, mNetClasses)
-        netclasses->appendChild(netclass->serializeToXmlDomElement(version));
+        netclasses->appendChild(netclass->serializeToXmlDomElement());
     XmlDomElement* netsignals = root->appendChild("netsignals");
     foreach (NetSignal* netsignal, mNetSignals)
-        netsignals->appendChild(netsignal->serializeToXmlDomElement(version));
+        netsignals->appendChild(netsignal->serializeToXmlDomElement());
     XmlDomElement* genericComponents = root->appendChild("generic_component_instances");
     foreach (GenCompInstance* instance, mGenCompInstances)
-        genericComponents->appendChild(instance->serializeToXmlDomElement(version));
+        genericComponents->appendChild(instance->serializeToXmlDomElement());
     return root.take();
 }
 

@@ -189,9 +189,8 @@ void SI_Symbol::removeFromSchematic(GraphicsScene& scene) throw (Exception)
         pin->removeFromSchematic(scene);
 }
 
-XmlDomElement* SI_Symbol::serializeToXmlDomElement(int version) const throw (Exception)
+XmlDomElement* SI_Symbol::serializeToXmlDomElement() const throw (Exception)
 {
-    Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("symbol"));

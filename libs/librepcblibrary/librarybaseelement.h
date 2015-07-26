@@ -86,8 +86,8 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
         void setAuthor(const QString& author) noexcept {mAuthor = author;}
 
         // General Methods
-        void save(int version) const throw (Exception);
-        void saveTo(const FilePath& parentDir, int version) const throw (Exception);
+        void save() const throw (Exception);
+        void saveTo(const FilePath& parentDir) const throw (Exception);
 
         // Static Methods
 
@@ -174,7 +174,7 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
         virtual void parseDomTree(const XmlDomElement& root) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        virtual XmlDomElement* serializeToXmlDomElement(int version) const throw (Exception) override;
+        virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
         virtual bool checkAttributesValidity() const noexcept override;

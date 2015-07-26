@@ -181,9 +181,8 @@ void NetSignal::removeFromCircuit() noexcept
     updateErcMessages();
 }
 
-XmlDomElement* NetSignal::serializeToXmlDomElement(int version) const throw (Exception)
+XmlDomElement* NetSignal::serializeToXmlDomElement() const throw (Exception)
 {
-    Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("netsignal"));

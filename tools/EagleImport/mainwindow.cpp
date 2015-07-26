@@ -362,7 +362,7 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
         polygonSimplifier.convertLineRectsToPolygonRects(false, true);
 
         // save symbol to file
-        symbol->saveTo(FilePath(QString("%1/sym").arg(ui->output->text())), APP_VERSION_MAJOR);
+        symbol->saveTo(FilePath(QString("%1/sym").arg(ui->output->text())));
         delete symbol;
     }
     catch (Exception& e)
@@ -646,13 +646,13 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
         polygonSimplifier.convertLineRectsToPolygonRects(false, true);
 
         // save footprint to file
-        footprint->saveTo(FilePath(QString("%1/fpt").arg(ui->output->text())), APP_VERSION_MAJOR);
+        footprint->saveTo(FilePath(QString("%1/fpt").arg(ui->output->text())));
 
         // create package
         QUuid pkgUuid = getOrCreateUuid(outputSettings, filepath, "packages_to_packages", name);
         Package* package = new Package(pkgUuid, Version("0.1"), "LibrePCB", name, desc);
         package->setFootprintUuid(footprint->getUuid());
-        package->saveTo(FilePath(QString("%1/pkg").arg(ui->output->text())), APP_VERSION_MAJOR);
+        package->saveTo(FilePath(QString("%1/pkg").arg(ui->output->text())));
 
         // clean up
         delete package;
@@ -776,12 +776,12 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
             }
 
             // save component
-            component->saveTo(FilePath(QString("%1/cmp").arg(ui->output->text())), APP_VERSION_MAJOR);
+            component->saveTo(FilePath(QString("%1/cmp").arg(ui->output->text())));
             delete component;
         }
 
         // save generic component to file
-        gencomp->saveTo(FilePath(QString("%1/gencmp").arg(ui->output->text())), APP_VERSION_MAJOR);
+        gencomp->saveTo(FilePath(QString("%1/gencmp").arg(ui->output->text())));
         delete gencomp;
     }
     catch (Exception& e)

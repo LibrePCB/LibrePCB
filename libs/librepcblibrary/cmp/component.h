@@ -80,7 +80,7 @@ class Component final : public LibraryElement
         void parseDomTree(const XmlDomElement& root) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement(int version) const throw (Exception) override;
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;

@@ -108,14 +108,15 @@ void ProjectSettings::triggerSettingsChanged() noexcept
     emit settingsChanged();
 }
 
-bool ProjectSettings::save(int version, bool toOriginal, QStringList& errors) noexcept
+bool ProjectSettings::save(bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
 
     // Save "core/settings.xml"
     try
     {
-        XmlDomDocument doc(*serializeToXmlDomElement(version));
+        XmlDomDocument doc(*serializeToXmlDomElement());
+        doc.setFileVersion(APP_VERSION_MAJOR);
         mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)
@@ -136,13 +137,11 @@ bool ProjectSettings::checkAttributesValidity() const noexcept
     return true;
 }
 
-XmlDomElement* ProjectSettings::serializeToXmlDomElement(int version) const throw (Exception)
+XmlDomElement* ProjectSettings::serializeToXmlDomElement() const throw (Exception)
 {
-    Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("settings"));
-    root->setAttribute("version", version);
     XmlDomElement* locale_order = root->appendChild("locale_order");
     foreach (const QString& locale, mLocaleOrder)
         locale_order->appendTextChild("locale", locale);

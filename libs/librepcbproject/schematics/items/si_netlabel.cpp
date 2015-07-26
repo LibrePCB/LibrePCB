@@ -136,9 +136,8 @@ void SI_NetLabel::removeFromSchematic(GraphicsScene& scene) throw (Exception)
     scene.removeItem(*mGraphicsItem);
 }
 
-XmlDomElement* SI_NetLabel::serializeToXmlDomElement(int version) const throw (Exception)
+XmlDomElement* SI_NetLabel::serializeToXmlDomElement() const throw (Exception)
 {
-    Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("netlabel"));

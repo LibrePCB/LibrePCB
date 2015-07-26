@@ -363,12 +363,12 @@ void GenericComponent::parseDomTree(const XmlDomElement& root) throw (Exception)
     }
 }
 
-XmlDomElement* GenericComponent::serializeToXmlDomElement(int version) const throw (Exception)
+XmlDomElement* GenericComponent::serializeToXmlDomElement() const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement(version));
+    QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement());
     XmlDomElement* attributes = root->appendChild("attributes");
     foreach (const LibraryElementAttribute* attribute, mAttributes)
-        attributes->appendChild(attribute->serializeToXmlDomElement(version));
+        attributes->appendChild(attribute->serializeToXmlDomElement());
     XmlDomElement* properties = root->appendChild("properties");
     properties->appendTextChild("schematic_only", mSchematicOnly);
     XmlDomElement* default_values = properties->appendChild("default_values");
@@ -386,10 +386,10 @@ XmlDomElement* GenericComponent::serializeToXmlDomElement(int version) const thr
     }
     XmlDomElement* signalsNode = root->appendChild("signals");
     foreach (const GenCompSignal* signal, mSignals)
-        signalsNode->appendChild(signal->serializeToXmlDomElement(version));
+        signalsNode->appendChild(signal->serializeToXmlDomElement());
     XmlDomElement* symbol_variants = root->appendChild("symbol_variants");
     foreach (const GenCompSymbVar* variant, mSymbolVariants)
-        symbol_variants->appendChild(variant->serializeToXmlDomElement(version));
+        symbol_variants->appendChild(variant->serializeToXmlDomElement());
     XmlDomElement* spice_models = root->appendChild("spice_models");
     Q_UNUSED(spice_models);
     return root.take();

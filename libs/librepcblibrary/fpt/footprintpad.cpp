@@ -99,9 +99,8 @@ void FootprintPad::setDescription(const QString& locale, const QString& descript
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* FootprintPad::serializeToXmlDomElement(int version) const throw (Exception)
+XmlDomElement* FootprintPad::serializeToXmlDomElement() const throw (Exception)
 {
-    Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("pad"));

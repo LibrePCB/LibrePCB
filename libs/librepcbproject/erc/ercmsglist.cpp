@@ -121,14 +121,15 @@ void ErcMsgList::restoreIgnoreState() noexcept
     }
 }
 
-bool ErcMsgList::save(int version, bool toOriginal, QStringList& errors) noexcept
+bool ErcMsgList::save(bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
 
     // Save "core/erc.xml"
     try
     {
-        XmlDomDocument doc(*serializeToXmlDomElement(version));
+        XmlDomDocument doc(*serializeToXmlDomElement());
+        doc.setFileVersion(APP_VERSION_MAJOR);
         mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)
@@ -149,13 +150,11 @@ bool ErcMsgList::checkAttributesValidity() const noexcept
     return true;
 }
 
-XmlDomElement* ErcMsgList::serializeToXmlDomElement(int version) const throw (Exception)
+XmlDomElement* ErcMsgList::serializeToXmlDomElement() const throw (Exception)
 {
-    Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("erc"));
-    root->setAttribute("version", version);
     XmlDomElement* ignoreNode = root->appendChild("ignore");
     foreach (ErcMsg* ercMsg, mItems)
     {

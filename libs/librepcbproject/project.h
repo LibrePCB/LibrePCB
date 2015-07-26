@@ -443,7 +443,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *
          * @throw Exception on error
          */
-        void save(int version, bool toOriginal) throw (Exception);
+        void save(bool toOriginal) throw (Exception);
 
 
         // Helper Methods
@@ -523,18 +523,17 @@ class Project final : public QObject, public IF_AttributeProvider,
         /**
          * @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
          */
-        XmlDomElement* serializeToXmlDomElement(int version) const throw (Exception);
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
 
         /**
          * @brief Save the project to the harddisc (to temporary or original files)
          *
-         * @param version       The version of the files which will be created/overwritten
          * @param toOriginal    True: save to original files; False: save to temporary files
          * @param errors        All errors will be added to this string list (translated)
          *
          * @return True on success (then the error list should be empty), false otherwise
          */
-        bool save(int version, bool toOriginal, QStringList& errors) noexcept;
+        bool save(bool toOriginal, QStringList& errors) noexcept;
 
         /**
          * @brief Print some schematics to a QPrinter (printer or file)

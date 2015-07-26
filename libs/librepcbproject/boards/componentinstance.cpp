@@ -179,14 +179,14 @@ void ComponentInstance::removeFromBoard(GraphicsScene& scene) throw (Exception)
     updateErcMessages();
 }
 
-XmlDomElement* ComponentInstance::serializeToXmlDomElement(int version) const throw (Exception)
+XmlDomElement* ComponentInstance::serializeToXmlDomElement() const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("component_instance"));
     root->setAttribute("generic_component_instance", mGenCompInstance->getUuid());
     root->setAttribute("component", mComponent->getUuid());
-    root->appendChild(mFootprint->serializeToXmlDomElement(version));
+    root->appendChild(mFootprint->serializeToXmlDomElement());
     XmlDomElement* position = root->appendChild("position");
     position->setAttribute("x", mPosition.getX());
     position->setAttribute("y", mPosition.getY());

@@ -40,9 +40,8 @@ SymbolPolygonSegment::SymbolPolygonSegment(const XmlDomElement& domElement) thro
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-XmlDomElement* SymbolPolygonSegment::serializeToXmlDomElement(int version) const throw (Exception)
+XmlDomElement* SymbolPolygonSegment::serializeToXmlDomElement() const throw (Exception)
 {
-    Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("segment"));
@@ -146,7 +145,7 @@ void SymbolPolygon::appendSegment(const SymbolPolygonSegment* segment) noexcept
     mPainterPathPx = QPainterPath(); // invalidate painter path
 }
 
-XmlDomElement* SymbolPolygon::serializeToXmlDomElement(int version) const throw (Exception)
+XmlDomElement* SymbolPolygon::serializeToXmlDomElement() const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -158,7 +157,7 @@ XmlDomElement* SymbolPolygon::serializeToXmlDomElement(int version) const throw 
     root->setAttribute("start_x", mStartPos.getX().toMmString());
     root->setAttribute("start_y", mStartPos.getY().toMmString());
     foreach (const SymbolPolygonSegment* segment, mSegments)
-        root->appendChild(segment->serializeToXmlDomElement(version));
+        root->appendChild(segment->serializeToXmlDomElement());
     return root.take();
 }
 

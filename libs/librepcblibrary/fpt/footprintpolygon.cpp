@@ -40,9 +40,8 @@ FootprintPolygonSegment::FootprintPolygonSegment(const XmlDomElement& domElement
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-XmlDomElement* FootprintPolygonSegment::serializeToXmlDomElement(int version) const throw (Exception)
+XmlDomElement* FootprintPolygonSegment::serializeToXmlDomElement() const throw (Exception)
 {
-    Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("segment"));
@@ -146,7 +145,7 @@ void FootprintPolygon::appendSegment(const FootprintPolygonSegment* segment) noe
     mPainterPathPx = QPainterPath(); // invalidate painter path
 }
 
-XmlDomElement* FootprintPolygon::serializeToXmlDomElement(int version) const throw (Exception)
+XmlDomElement* FootprintPolygon::serializeToXmlDomElement() const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -158,7 +157,7 @@ XmlDomElement* FootprintPolygon::serializeToXmlDomElement(int version) const thr
     root->setAttribute("start_x", mStartPos.getX().toMmString());
     root->setAttribute("start_y", mStartPos.getY().toMmString());
     foreach (const FootprintPolygonSegment* segment, mSegments)
-        root->appendChild(segment->serializeToXmlDomElement(version));
+        root->appendChild(segment->serializeToXmlDomElement());
     return root.take();
 }
 

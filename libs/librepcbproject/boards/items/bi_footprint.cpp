@@ -152,9 +152,8 @@ void BI_Footprint::removeFromBoard(GraphicsScene& scene) throw (Exception)
         pad->removeFromBoard(scene);
 }
 
-XmlDomElement* BI_Footprint::serializeToXmlDomElement(int version) const throw (Exception)
+XmlDomElement* BI_Footprint::serializeToXmlDomElement() const throw (Exception)
 {
-    Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("footprint"));

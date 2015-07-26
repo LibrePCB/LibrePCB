@@ -252,11 +252,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
 
         if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-        if (create)
-        {
-            // write all files to harddisc
-            save(Application::majorVersion(), true);
-        }
+        if (create) save(true); // write all files to harddisc
     }
     catch (...)
     {
@@ -565,11 +561,11 @@ void Project::removeBoard(Board* board, bool deleteBoard) throw (Exception)
  *  General Methods
  ****************************************************************************************/
 
-void Project::save(int version, bool toOriginal) throw (Exception)
+void Project::save(bool toOriginal) throw (Exception)
 {
     QStringList errors;
 
-    if (!save(version, toOriginal, errors))
+    if (!save(toOriginal, errors))
     {
         QString msg = QString(tr("The project could not be saved!\n\nError Message:\n%1",
             "variable count of error messages", errors.count())).arg(errors.join("\n"));
@@ -612,13 +608,11 @@ bool Project::checkAttributesValidity() const noexcept
     return true;
 }
 
-XmlDomElement* Project::serializeToXmlDomElement(int version) const throw (Exception)
+XmlDomElement* Project::serializeToXmlDomElement() const throw (Exception)
 {
-    Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("project"));
-    root->setAttribute("version", version);
 
     // meta
     XmlDomElement* meta = root->appendChild("meta");
@@ -642,7 +636,7 @@ XmlDomElement* Project::serializeToXmlDomElement(int version) const throw (Excep
     return root.take();
 }
 
-bool Project::save(int version, bool toOriginal, QStringList& errors) noexcept
+bool Project::save(bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
 
@@ -656,7 +650,8 @@ bool Project::save(int version, bool toOriginal, QStringList& errors) noexcept
     try
     {
         setLastModified(QDateTime::currentDateTime());
-        XmlDomDocument doc(*serializeToXmlDomElement(version));
+        XmlDomDocument doc(*serializeToXmlDomElement());
+        doc.setFileVersion(APP_VERSION_MAJOR);
         mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)
@@ -677,45 +672,45 @@ bool Project::save(int version, bool toOriginal, QStringList& errors) noexcept
     }
 
     // Save circuit
-    if (!mCircuit->save(version, toOriginal, errors))
+    if (!mCircuit->save(toOriginal, errors))
         success = false;
 
     // Save all added schematics (*.xml files)
     foreach (Schematic* schematic, mSchematics)
     {
-        if (!schematic->save(version, toOriginal, errors))
+        if (!schematic->save(toOriginal, errors))
             success = false;
     }
     // Save all removed schematics (*.xml files)
     foreach (Schematic* schematic, mRemovedSchematics)
     {
-        if (!schematic->save(version, toOriginal, errors))
+        if (!schematic->save(toOriginal, errors))
             success = false;
     }
 
     // Save all added boards (*.xml files)
     foreach (Board* board, mBoards)
     {
-        if (!board->save(version, toOriginal, errors))
+        if (!board->save(toOriginal, errors))
             success = false;
     }
     // Save all removed boards (*.xml files)
     foreach (Board* board, mRemovedBoards)
     {
-        if (!board->save(version, toOriginal, errors))
+        if (!board->save(toOriginal, errors))
             success = false;
     }
 
     // Save library
-    if (!mProjectLibrary->save(version, toOriginal, errors))
+    if (!mProjectLibrary->save(toOriginal, errors))
         success = false;
 
     // Save settings
-    if (!mProjectSettings->save(version, toOriginal, errors))
+    if (!mProjectSettings->save(toOriginal, errors))
         success = false;
 
     // Save ERC messages list
-    if (!mErcMsgList->save(version, toOriginal, errors))
+    if (!mErcMsgList->save(toOriginal, errors))
         success = false;
 
     // if the project was restored from a backup, reset the mIsRestored flag as the current

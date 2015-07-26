@@ -63,9 +63,9 @@ void LibraryCategory::parseDomTree(const XmlDomElement& root) throw (Exception)
     mParentUuid = root.getFirstChild("meta/parent", true, true)->getText<QUuid>(false);
 }
 
-XmlDomElement* LibraryCategory::serializeToXmlDomElement(int version) const throw (Exception)
+XmlDomElement* LibraryCategory::serializeToXmlDomElement() const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(LibraryBaseElement::serializeToXmlDomElement(version));
+    QScopedPointer<XmlDomElement> root(LibraryBaseElement::serializeToXmlDomElement());
     root->getFirstChild("meta", true)->appendTextChild("parent", mParentUuid);
     return root.take();
 }

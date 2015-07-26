@@ -67,9 +67,9 @@ void Component::parseDomTree(const XmlDomElement& root) throw (Exception)
     }
 }
 
-XmlDomElement* Component::serializeToXmlDomElement(int version) const throw (Exception)
+XmlDomElement* Component::serializeToXmlDomElement() const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement(version));
+    QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement());
     root->getFirstChild("meta", true)->appendTextChild("generic_component", mGenericComponentUuid);
     root->getFirstChild("meta", true)->appendTextChild("package", mPackageUuid);
     XmlDomElement* padSignalMap = root->appendChild("pad_signal_map");

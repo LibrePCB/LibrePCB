@@ -129,7 +129,7 @@ class GenCompInstance : public QObject, public IF_AttributeProvider,
         void unregisterComponent(const ComponentInstance& component) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement(int version) const throw (Exception) override;
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
 
         // Helper Methods

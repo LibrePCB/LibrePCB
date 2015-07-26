@@ -62,9 +62,8 @@ FootprintText::~FootprintText() noexcept
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* FootprintText::serializeToXmlDomElement(int version) const throw (Exception)
+XmlDomElement* FootprintText::serializeToXmlDomElement() const throw (Exception)
 {
-    Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("text"));

@@ -120,16 +120,16 @@ void Footprint::parseDomTree(const XmlDomElement& root) throw (Exception)
     }
 }
 
-XmlDomElement* Footprint::serializeToXmlDomElement(int version) const throw (Exception)
+XmlDomElement* Footprint::serializeToXmlDomElement() const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement(version));
+    QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement());
     XmlDomElement* geometry = root->appendChild("geometry");
     foreach (const FootprintPolygon* polygon, mPolygons)
-        geometry->appendChild(polygon->serializeToXmlDomElement(version));
+        geometry->appendChild(polygon->serializeToXmlDomElement());
     foreach (const FootprintText* text, mTexts)
-        geometry->appendChild(text->serializeToXmlDomElement(version));
+        geometry->appendChild(text->serializeToXmlDomElement());
     foreach (const FootprintEllipse* ellipse, mEllipses)
-        geometry->appendChild(ellipse->serializeToXmlDomElement(version));
+        geometry->appendChild(ellipse->serializeToXmlDomElement());
     foreach (const FootprintHole_t* hole, mHoles)
     {
         XmlDomElement* child = geometry->appendChild("hole");
@@ -139,7 +139,7 @@ XmlDomElement* Footprint::serializeToXmlDomElement(int version) const throw (Exc
     }
     XmlDomElement* pads = root->appendChild("pads");
     foreach (const FootprintPad* pad, mPads)
-        pads->appendChild(pad->serializeToXmlDomElement(version));
+        pads->appendChild(pad->serializeToXmlDomElement());
     return root.take();
 }
 

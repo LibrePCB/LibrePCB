@@ -79,7 +79,7 @@ class SI_NetLine final : public SI_Base, public IF_XmlSerializableObject
         void removeFromSchematic(GraphicsScene& scene) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement(int version) const throw (Exception) override;
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
 
         // Inherited from SI_Base

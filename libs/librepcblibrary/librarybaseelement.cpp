@@ -95,19 +95,19 @@ QStringList LibraryBaseElement::getAllAvailableLocales() const noexcept
  *  General Methods
  ****************************************************************************************/
 
-void LibraryBaseElement::save(int version) const throw (Exception)
+void LibraryBaseElement::save() const throw (Exception)
 {
     Q_ASSERT(mXmlFilepath.isValid());
-    XmlDomDocument doc(*serializeToXmlDomElement(version));
+    XmlDomDocument doc(*serializeToXmlDomElement());
     QScopedPointer<SmartXmlFile> file(SmartXmlFile::create(mXmlFilepath));
     file->save(doc, true);
 }
 
-void LibraryBaseElement::saveTo(const FilePath& parentDir, int version) const throw (Exception)
+void LibraryBaseElement::saveTo(const FilePath& parentDir) const throw (Exception)
 {
     mXmlFilepath = parentDir.getPathTo(QString("%1/%2_v%3.xml")
-        .arg(mUuid.toString()).arg(mXmlFileNamePrefix).arg(version));
-    save(version);
+        .arg(mUuid.toString()).arg(mXmlFileNamePrefix).arg(APP_VERSION_MAJOR));
+    save();
 }
 
 /*****************************************************************************************
@@ -143,16 +143,14 @@ void LibraryBaseElement::parseDomTree(const XmlDomElement& root) throw (Exceptio
     mDomTreeParsed = true;
 }
 
-XmlDomElement* LibraryBaseElement::serializeToXmlDomElement(int version) const throw (Exception)
+XmlDomElement* LibraryBaseElement::serializeToXmlDomElement() const throw (Exception)
 {
-    Q_UNUSED(version);
-
     bool valid = checkAttributesValidity();
     Q_ASSERT(valid == true);
     if (!valid) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement(mXmlRootNodeName));
-    root->setAttribute("version", version);
+    root->setAttribute("version", APP_VERSION_MAJOR);
 
     // meta
     XmlDomElement* meta = root->appendChild("meta");

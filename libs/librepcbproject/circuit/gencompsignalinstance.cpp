@@ -178,9 +178,8 @@ void GenCompSignalInstance::removeFromCircuit() throw (Exception)
     updateErcMessages();
 }
 
-XmlDomElement* GenCompSignalInstance::serializeToXmlDomElement(int version) const throw (Exception)
+XmlDomElement* GenCompSignalInstance::serializeToXmlDomElement() const throw (Exception)
 {
-    Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("map"));

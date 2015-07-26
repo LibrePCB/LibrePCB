@@ -109,9 +109,8 @@ void SymbolPin::setDescription(const QString& locale, const QString& description
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* SymbolPin::serializeToXmlDomElement(int version) const throw (Exception)
+XmlDomElement* SymbolPin::serializeToXmlDomElement() const throw (Exception)
 {
-    Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("pin"));

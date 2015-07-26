@@ -62,16 +62,15 @@ class IF_XmlSerializableObject
          * @brief Serialize the object to a XML DOM element
          *
          * This is a pure virtual method which must be implemented in all subclasses of
-         * the interface #IF_XmlSerializableObject.
-         *
-         * @param version   The desired file version (minimum = 0,
-         *                  maximum = application's major version)
+         * the interface #IF_XmlSerializableObject. The generated XML DOM element has
+         * always the format of the application's major version (it's not possible to
+         * generate XML files of older versions).
          *
          * @return The created XML DOM element (the caller takes the ownership!)
          *
          * @throw Exception     This method throws an exception if an error occurs.
          */
-        virtual XmlDomElement* serializeToXmlDomElement(int version) const throw (Exception) = 0;
+        virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception) = 0;
 
 
     protected:

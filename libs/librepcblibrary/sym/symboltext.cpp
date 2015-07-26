@@ -62,9 +62,8 @@ SymbolText::~SymbolText() noexcept
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* SymbolText::serializeToXmlDomElement(int version) const throw (Exception)
+XmlDomElement* SymbolText::serializeToXmlDomElement() const throw (Exception)
 {
-    Q_UNUSED(version);
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("text"));

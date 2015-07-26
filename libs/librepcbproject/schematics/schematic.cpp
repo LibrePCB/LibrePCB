@@ -556,7 +556,7 @@ void Schematic::removeFromProject() throw (Exception)
     mAddedToProject = false;
 }
 
-bool Schematic::save(int version, bool toOriginal, QStringList& errors) noexcept
+bool Schematic::save(bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
 
@@ -565,7 +565,8 @@ bool Schematic::save(int version, bool toOriginal, QStringList& errors) noexcept
     {
         if (mAddedToProject)
         {
-            XmlDomDocument doc(*serializeToXmlDomElement(version));
+            XmlDomDocument doc(*serializeToXmlDomElement());
+            doc.setFileVersion(APP_VERSION_MAJOR);
             mXmlFile->save(doc, toOriginal);
         }
         else
@@ -683,29 +684,28 @@ bool Schematic::checkAttributesValidity() const noexcept
     return true;
 }
 
-XmlDomElement* Schematic::serializeToXmlDomElement(int version) const throw (Exception)
+XmlDomElement* Schematic::serializeToXmlDomElement() const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("schematic"));
-    root->setAttribute("version", version);
     XmlDomElement* meta = root->appendChild("meta");
     meta->appendTextChild("uuid", mUuid);
     meta->appendTextChild("name", mName);
     XmlDomElement* properties = root->appendChild("properties");
-    properties->appendChild(mGridProperties->serializeToXmlDomElement(version));
+    properties->appendChild(mGridProperties->serializeToXmlDomElement());
     XmlDomElement* symbols = root->appendChild("symbols");
     foreach (SI_Symbol* symbolInstance, mSymbols)
-        symbols->appendChild(symbolInstance->serializeToXmlDomElement(version));
+        symbols->appendChild(symbolInstance->serializeToXmlDomElement());
     XmlDomElement* netpoints = root->appendChild("netpoints");
     foreach (SI_NetPoint* netpoint, mNetPoints)
-        netpoints->appendChild(netpoint->serializeToXmlDomElement(version));
+        netpoints->appendChild(netpoint->serializeToXmlDomElement());
     XmlDomElement* netlines = root->appendChild("netlines");
     foreach (SI_NetLine* netline, mNetLines)
-        netlines->appendChild(netline->serializeToXmlDomElement(version));
+        netlines->appendChild(netline->serializeToXmlDomElement());
     XmlDomElement* netlabels = root->appendChild("netlabels");
     foreach (SI_NetLabel* netlabel, mNetLabels)
-        netlabels->appendChild(netlabel->serializeToXmlDomElement(version));
+        netlabels->appendChild(netlabel->serializeToXmlDomElement());
     return root.take();
 }
 

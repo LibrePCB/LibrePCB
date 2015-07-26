@@ -293,7 +293,7 @@ void Board::removeFromProject() throw (Exception)
     updateErcMessages();
 }
 
-bool Board::save(int version, bool toOriginal, QStringList& errors) noexcept
+bool Board::save(bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
 
@@ -302,7 +302,8 @@ bool Board::save(int version, bool toOriginal, QStringList& errors) noexcept
     {
         if (mAddedToProject)
         {
-            XmlDomDocument doc(*serializeToXmlDomElement(version));
+            XmlDomDocument doc(*serializeToXmlDomElement());
+            doc.setFileVersion(APP_VERSION_MAJOR);
             mXmlFile->save(doc, toOriginal);
         }
         else
@@ -388,20 +389,19 @@ bool Board::checkAttributesValidity() const noexcept
     return true;
 }
 
-XmlDomElement* Board::serializeToXmlDomElement(int version) const throw (Exception)
+XmlDomElement* Board::serializeToXmlDomElement() const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("board"));
-    root->setAttribute("version", version);
     XmlDomElement* meta = root->appendChild("meta");
     meta->appendTextChild("uuid", mUuid);
     meta->appendTextChild("name", mName);
     XmlDomElement* properties = root->appendChild("properties");
-    properties->appendChild(mGridProperties->serializeToXmlDomElement(version));
+    properties->appendChild(mGridProperties->serializeToXmlDomElement());
     XmlDomElement* components = root->appendChild("component_instances");
     foreach (ComponentInstance* component, mComponentInstances)
-        components->appendChild(component->serializeToXmlDomElement(version));
+        components->appendChild(component->serializeToXmlDomElement());
     return root.take();
 }
 

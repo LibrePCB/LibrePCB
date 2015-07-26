@@ -240,24 +240,24 @@ void ProjectLibrary::removeComp(const library::Component& c) throw (Exception)
  *  General Methods
  ****************************************************************************************/
 
-bool ProjectLibrary::save(int version, bool toOriginal, QStringList& errors) noexcept
+bool ProjectLibrary::save(bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
 
     // Save all elements
-    if (!saveElements<Symbol>(version, toOriginal, errors, mLibraryPath.getPathTo("sym"), mSymbols, mRemovedSymbols))
+    if (!saveElements<Symbol>(toOriginal, errors, mLibraryPath.getPathTo("sym"), mSymbols, mRemovedSymbols))
         success = false;
-    if (!saveElements<Footprint>(version, toOriginal, errors, mLibraryPath.getPathTo("fpt"), mFootprints, mRemovedFootprints))
+    if (!saveElements<Footprint>(toOriginal, errors, mLibraryPath.getPathTo("fpt"), mFootprints, mRemovedFootprints))
         success = false;
-    if (!saveElements<Model3D>(version, toOriginal, errors, mLibraryPath.getPathTo("3dmdl"), mModels, mRemovedModels))
+    if (!saveElements<Model3D>(toOriginal, errors, mLibraryPath.getPathTo("3dmdl"), mModels, mRemovedModels))
         success = false;
-    if (!saveElements<SpiceModel>(version, toOriginal, errors, mLibraryPath.getPathTo("spcmdl"), mSpiceModels, mRemovedSpiceModels))
+    if (!saveElements<SpiceModel>(toOriginal, errors, mLibraryPath.getPathTo("spcmdl"), mSpiceModels, mRemovedSpiceModels))
         success = false;
-    if (!saveElements<Package>(version, toOriginal, errors, mLibraryPath.getPathTo("pkg"), mPackages, mRemovedPackages))
+    if (!saveElements<Package>(toOriginal, errors, mLibraryPath.getPathTo("pkg"), mPackages, mRemovedPackages))
         success = false;
-    if (!saveElements<GenericComponent>(version, toOriginal, errors, mLibraryPath.getPathTo("gencmp"), mGenericComponents, mRemovedGenericComponents))
+    if (!saveElements<GenericComponent>(toOriginal, errors, mLibraryPath.getPathTo("gencmp"), mGenericComponents, mRemovedGenericComponents))
         success = false;
-    if (!saveElements<Component>(version, toOriginal, errors, mLibraryPath.getPathTo("cmp"), mComponents, mRemovedComponents))
+    if (!saveElements<Component>(toOriginal, errors, mLibraryPath.getPathTo("cmp"), mComponents, mRemovedComponents))
         success = false;
 
     return success;
@@ -365,8 +365,7 @@ void ProjectLibrary::removeElement(const ElementType& element,
 }
 
 template <typename ElementType>
-bool ProjectLibrary::saveElements(int version, bool toOriginal, QStringList& errors,
-                                  const FilePath& parentDir,
+bool ProjectLibrary::saveElements(bool toOriginal, QStringList& errors, const FilePath& parentDir,
                                   QHash<QUuid, const ElementType*>& elementList,
                                   QHash<QUuid, const ElementType*>& removedElementsList) noexcept
 {
@@ -380,7 +379,7 @@ bool ProjectLibrary::saveElements(int version, bool toOriginal, QStringList& err
         try
         {
             if (element->getDirectory().getParentDir().getParentDir().toStr() != mLibraryPath.toStr())
-                element->saveTo(parentDir, version);
+                element->saveTo(parentDir);
         }
         catch (Exception& e)
         {

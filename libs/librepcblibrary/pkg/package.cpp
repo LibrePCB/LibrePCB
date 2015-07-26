@@ -59,9 +59,9 @@ void Package::parseDomTree(const XmlDomElement& root) throw (Exception)
     mFootprintUuid = root.getFirstChild("meta/footprint", true, true)->getText<QUuid>(true);
 }
 
-XmlDomElement* Package::serializeToXmlDomElement(int version) const throw (Exception)
+XmlDomElement* Package::serializeToXmlDomElement() const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement(version));
+    QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement());
     root->getFirstChild("meta", true)->appendTextChild("footprint", mFootprintUuid);
     return root.take();
 }

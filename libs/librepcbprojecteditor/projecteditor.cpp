@@ -157,11 +157,11 @@ bool ProjectEditor::saveProject() noexcept
     {
         // step 1: save whole project to temporary files
         qDebug() << "Begin saving the project to temporary files...";
-        mProject.save(0, false);
+        mProject.save(false);
 
         // step 2: save whole project to original files
         qDebug() << "Begin saving the project to original files...";
-        mProject.save(0, true);
+        mProject.save(true);
 
         // saving was successful --> clean the undo stack
         mUndoStack->setClean();
@@ -191,7 +191,7 @@ bool ProjectEditor::autosaveProject() noexcept
     try
     {
         qDebug() << "Begin autosaving the project to temporary files...";
-        mProject.save(0, false);
+        mProject.save(false);
         qDebug() << "Project successfully autosaved";
         return true;
     }

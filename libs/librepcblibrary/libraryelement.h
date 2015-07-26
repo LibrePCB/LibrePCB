@@ -74,7 +74,7 @@ class LibraryElement : public LibraryBaseElement
         virtual void parseDomTree(const XmlDomElement& root) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        virtual XmlDomElement* serializeToXmlDomElement(int version) const throw (Exception) override;
+        virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
         virtual bool checkAttributesValidity() const noexcept override;
