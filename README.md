@@ -2,7 +2,9 @@
 
 ## About LibrePCB
 
-LibrePCB is a free Schematic / Layout Editor to develop printed circuit boards. It runs on Linux, Windows and Mac. The project is still in a quite early development stage (no stable release available).
+LibrePCB is a free Schematic / Layout Editor to develop printed circuit boards.
+It runs on Linux, Windows and Mac. The project is still in a quite early
+development stage (no stable release available).
 
 ![Screenshot](doc/screenshot.png)
 
@@ -22,8 +24,9 @@ To compile LibrePCB, you need the following software components:
 
 ### Workspace
 
-At the first startup, LibrePCB asks for a workspace directory where the library elements and projects will be saved.
-For developers there is a demo workspace inclusive library and projects in this repository (subdirectory "dev/workspace/").
+At the first startup, LibrePCB asks for a workspace directory where the library
+elements and projects will be saved.  For developers there is a demo workspace
+inclusive library and projects in this repository (subdirectory "dev/workspace/").
 
 ## License
 
