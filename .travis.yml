@@ -31,4 +31,4 @@ script:
 
 # run doxygen and upload the html output to github (gh-pages of LibrePCB-Doxygen)
 after_script:
-  - ./travis_build_doxygen.sh
+  - ./dev/doxygen/travis_build_doxygen.sh
