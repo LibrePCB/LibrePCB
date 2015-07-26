@@ -28,9 +28,7 @@ script:
   - qmake -r "QMAKE_CXX=$CXX" "QMAKE_CC=$CC"
   - make -j 8
   - ./generated/unix/tests # run all unit tests
-  - make clean # required for doxygen
 
 # run doxygen and upload the html output to github (gh-pages of LibrePCB-Doxygen)
 after_script:
-  - cd ./dev/doxygen
-  - if [ "${TRAVIS_PULL_REQUEST}" = "false" -a "${TRAVIS_BRANCH}" = "master" ]; then ./travis_build_doxygen.sh; fi
+  - ./travis_build_doxygen.sh
