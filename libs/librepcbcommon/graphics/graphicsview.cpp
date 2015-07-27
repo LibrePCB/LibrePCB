@@ -142,7 +142,7 @@ void GraphicsView::handleMouseWheelEvent(QGraphicsSceneWheelEvent* event) noexce
     else
     {
         // Zoom to mouse
-        qreal scaleFactor = (event->delta() > 0) ? sZoomStepFactor : 1 / sZoomStepFactor;
+        qreal scaleFactor = qPow(sZoomStepFactor, event->delta()/qreal(120));
         scale(scaleFactor, scaleFactor);
     }
     event->setAccepted(true);
