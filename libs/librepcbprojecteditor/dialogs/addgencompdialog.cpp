@@ -62,7 +62,7 @@ AddGenCompDialog::AddGenCompDialog(Workspace& workspace, Project& project, QWidg
     mCategoryTreeModel = new library::CategoryTreeModel(mWorkspace.getLibrary(), localeOrder);
     mUi->treeCategories->setModel(mCategoryTreeModel);
     connect(mUi->treeCategories->selectionModel(), &QItemSelectionModel::currentChanged,
-            this, &AddGenCompDialog::on_treeCategories_currentItemChanged);
+            this, &AddGenCompDialog::treeCategories_currentItemChanged);
 
     //setSelectedCategory(QUuid());
 }
@@ -101,7 +101,7 @@ QUuid AddGenCompDialog::getSelectedSymbVarUuid() const noexcept
  *  Private Slots
  ****************************************************************************************/
 
-void AddGenCompDialog::on_treeCategories_currentItemChanged(const QModelIndex& current, const QModelIndex& previous)
+void AddGenCompDialog::treeCategories_currentItemChanged(const QModelIndex& current, const QModelIndex& previous)
 {
     Q_UNUSED(previous);
 
