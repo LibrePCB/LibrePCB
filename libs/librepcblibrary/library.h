@@ -67,12 +67,13 @@ class Library final : public QObject
         /**
         * @brief Constructor to open the library of an existing workspace
         *
-        * @param libPath    The filepath to the library directory
+        * @param libDirPath     The filepath to the library directory
+        * @param cacheFilePath  The filepath to the *.sqlite library cache database
         *
         * @throw Exception If the library could not be opened, this constructor throws
         *                  an exception.
         */
-        explicit Library(const FilePath& libPath) throw (Exception);
+        explicit Library(const FilePath& libDirPath, const FilePath& cacheFilePath) throw (Exception);
         ~Library();
 
 
@@ -131,8 +132,8 @@ class Library final : public QObject
 
         // Attributes
         FilePath mLibPath; ///< a FilePath object which represents the library directory
-        FilePath mLibFilePath; ///<a FiltePath object which represents the lib_v#.db file
-        QSqlDatabase mLibDatabase; ///<a QSqlDatabase object which contents the lib.db-file
+        FilePath mLibFilePath; ///< a #FilePath object which represents the library_cache.sqlite file
+        QSqlDatabase mLibDatabase; ///< the SQLite database of the file #mLibFilePath
 };
 
 } // namespace library

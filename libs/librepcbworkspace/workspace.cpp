@@ -45,9 +45,9 @@ using namespace project;
 Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
     QObject(0),
     mPath(wsPath), mLock(wsPath.getPathTo("workspace")),
-    mMetadataPath(wsPath.getPathTo(".metadata")),
+    mMetadataPath(wsPath.getPathTo(QString(".metadata/v%1").arg(APP_VERSION_MAJOR))),
     mProjectsPath(wsPath.getPathTo("projects")),
-    mLibraryPath(wsPath.getPathTo("lib")),
+    mLibraryPath(wsPath.getPathTo("library")),
     mWorkspaceSettings(0), mLibrary(0), mProjectTreeModel(0), mRecentProjectsModel(0),
     mFavoriteProjectsModel(0)
 {
@@ -97,7 +97,7 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
         mRecentProjectsModel = new RecentProjectsModel(*this);
         mFavoriteProjectsModel = new FavoriteProjectsModel(*this);
         mProjectTreeModel = new ProjectTreeModel(*this);
-        mLibrary = new Library(mLibraryPath);
+        mLibrary = new Library(mLibraryPath, mMetadataPath.getPathTo("library_cache.sqlite"));
     }
     catch (Exception& e)
     {
@@ -182,8 +182,8 @@ bool Workspace::createNewWorkspace(const FilePath& path) noexcept
     if (isValidWorkspacePath(path))
         return true;
 
-    // create directory ".metadata" (and all needed parent directories)
-    return path.getPathTo(".metadata").mkPath();
+    // create directory ".metadata/v#/" (and all needed parent directories)
+    return path.getPathTo(QString(".metadata/v%1").arg(APP_VERSION_MAJOR)).mkPath();
 }
 
 FilePath Workspace::getMostRecentlyUsedWorkspacePath() noexcept

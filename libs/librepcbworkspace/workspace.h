@@ -204,11 +204,11 @@ class Workspace final : public QObject
         // Attributes
         FilePath mPath; ///< a FilePath object which represents the workspace directory
         FileLock mLock; ///< to lock the whole workspace (allow only one app instance)
-        FilePath mMetadataPath; ///< the directory ".metadata"
+        FilePath mMetadataPath; ///< the directory ".metadata/v#"
         FilePath mProjectsPath; ///< the directory "projects"
         FilePath mLibraryPath; ///< the directory "library"
         WorkspaceSettings* mWorkspaceSettings; ///< the WorkspaceSettings object
-        library::Library* mLibrary; ///< the library of the workspace (with SQLite database)
+        library::Library* mLibrary; ///< the library of the workspace
         ProjectTreeModel* mProjectTreeModel; ///< a tree model for the whole projects directory
         RecentProjectsModel* mRecentProjectsModel; ///< a list model of all recent projects
         FavoriteProjectsModel* mFavoriteProjectsModel; ///< a list model of all favorite projects

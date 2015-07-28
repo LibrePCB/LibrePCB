@@ -38,7 +38,6 @@
 #include "gencmp/genericcomponent.h"
 #include "cmp/component.h"
 #include "library.h"
-#include <librepcbcommon/application.h>
 
 namespace library{
 
@@ -46,17 +45,15 @@ namespace library{
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Library::Library(const FilePath& libPath) throw (Exception):
-    QObject(0),
-    mLibPath(libPath),
-    mLibFilePath(libPath.getPathTo(QString("lib_v%1.db").arg(Application::majorVersion())))
+Library::Library(const FilePath& libDirPath, const FilePath& cacheFilePath) throw (Exception):
+    QObject(0), mLibPath(libDirPath), mLibFilePath(cacheFilePath)
 {
-    //Select and open sqlite library 'lib_v#.db'
+    // select and open library cache sqlite database
     mLibDatabase = QSqlDatabase::addDatabase("QSQLITE", mLibFilePath.toNative());
     mLibDatabase.setDatabaseName(mLibFilePath.toNative());
     mLibDatabase.setConnectOptions("foreign_keys = ON");
 
-    //Check if database is valid
+    // check if database is valid
     if ( ! mLibDatabase.isValid())
     {
         throw RuntimeError(__FILE__, __LINE__, mLibFilePath.toStr(),
