@@ -8,9 +8,6 @@ JOB_SUBNUMBER=`echo ${TRAVIS_JOB_NUMBER} | cut -d \. -f 2`
 if [ "${TRAVIS_PULL_REQUEST}" = "false" -a "$JOB_SUBNUMBER" = "1" ]; then 
     echo "Build doxygen documentation for branch $BRANCH_NAME..."
     
-    echo "make clean:"
-    make clean
-    
     echo "doxygen Doxyfile:"
     cd ./dev/doxygen
     doxygen Doxyfile

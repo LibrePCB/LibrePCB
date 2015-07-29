@@ -25,10 +25,13 @@ install:
   - sudo apt-get install -qq libglu1-mesa-dev doxygen graphviz
 
 script:
-  - qmake -r "QMAKE_CXX=$CXX" "QMAKE_CC=$CC"
+  - mkdir build
+  - cd build
+  - qmake ../librepcb.pro -r "QMAKE_CXX=$CXX" "QMAKE_CC=$CC"
   - make -j 8
   - ./generated/unix/tests # run all unit tests
+  - cd ../
 
 # run doxygen and upload the html output to github (gh-pages of LibrePCB-Doxygen)
-after_script:
+after_success:
   - ./dev/doxygen/travis_build_doxygen.sh
