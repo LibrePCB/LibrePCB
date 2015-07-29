@@ -44,7 +44,7 @@ namespace project {
  ****************************************************************************************/
 
 ProjectLibrary::ProjectLibrary(Project& project, bool restore, bool readOnly) throw (Exception) :
-    QObject(0), mProject(project), mLibraryPath(project.getPath().getPathTo("lib"))
+    QObject(0), mProject(project), mLibraryPath(project.getPath().getPathTo("library"))
 {
     qDebug() << "load project library...";
 

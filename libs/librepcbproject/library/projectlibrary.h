@@ -137,7 +137,7 @@ class ProjectLibrary final : public QObject
 
         // General
         Project& mProject; ///< a reference to the Project object (from the ctor)
-        FilePath mLibraryPath; ///< the "lib" directory of the project
+        FilePath mLibraryPath; ///< the "library" directory of the project
 
         // The Library Elements
         QHash<QUuid, const library::Symbol*> mSymbols;
