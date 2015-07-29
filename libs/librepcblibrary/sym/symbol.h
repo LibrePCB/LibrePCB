@@ -53,7 +53,7 @@ class Symbol final : public LibraryElement
                         const QString& name_en_US = QString(),
                         const QString& description_en_US = QString(),
                         const QString& keywords_en_US = QString()) throw (Exception);
-        explicit Symbol(const FilePath& xmlFilePath) throw (Exception);
+        explicit Symbol(const FilePath& elementDirectory) throw (Exception);
         ~Symbol() noexcept;
 
         // Getters

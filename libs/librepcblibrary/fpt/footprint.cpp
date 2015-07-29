@@ -38,8 +38,8 @@ Footprint::Footprint(const QUuid& uuid, const Version& version, const QString& a
 {
 }
 
-Footprint::Footprint(const FilePath& xmlFilePath) throw (Exception) :
-    LibraryElement(xmlFilePath, "fpt", "footprint")
+Footprint::Footprint(const FilePath& elementDirectory) throw (Exception) :
+    LibraryElement(elementDirectory, "fpt", "footprint")
 {
     try
     {

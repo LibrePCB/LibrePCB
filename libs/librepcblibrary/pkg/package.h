@@ -49,7 +49,7 @@ class Package final : public LibraryElement
                          const QString& name_en_US = QString(),
                          const QString& description_en_US = QString(),
                          const QString& keywords_en_US = QString()) throw (Exception);
-        explicit Package(const FilePath& xmlFilePath) throw (Exception);
+        explicit Package(const FilePath& elementDirectory) throw (Exception);
         ~Package() noexcept;
 
         // Getters

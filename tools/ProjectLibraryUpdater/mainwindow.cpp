@@ -93,7 +93,7 @@ void MainWindow::on_pushButton_2_clicked()
                 if (!filepaths.isEmpty())
                 {
                     // copy generic component
-                    GenericComponent latestGenComp(filepaths.last());
+                    GenericComponent latestGenComp(filepaths.last().getParentDir());
                     FilePath dest = projectFilepath.getParentDir().getPathTo("lib/gencmp");
                     latestGenComp.saveTo(dest);
                     ui->log->addItem(dest.toNative());
@@ -107,7 +107,7 @@ void MainWindow::on_pushButton_2_clicked()
                             QMap<Version, FilePath> filepaths = lib.getSymbols(symbolUuid);
                             if (!filepaths.isEmpty())
                             {
-                                Symbol latestSymbol(filepaths.last());
+                                Symbol latestSymbol(filepaths.last().getParentDir());
                                 FilePath dest = projectFilepath.getParentDir().getPathTo("lib/sym");
                                 latestSymbol.saveTo(dest);
                                 ui->log->addItem(dest.toNative());
@@ -143,7 +143,7 @@ void MainWindow::on_pushButton_2_clicked()
                     if (!filepaths.isEmpty())
                     {
                         // copy component
-                        Component latestComp(filepaths.last());
+                        Component latestComp(filepaths.last().getParentDir());
                         FilePath dest = projectFilepath.getParentDir().getPathTo("lib/cmp");
                         latestComp.saveTo(dest);
                         ui->log->addItem(dest.toNative());
@@ -154,7 +154,7 @@ void MainWindow::on_pushButton_2_clicked()
                         if (!filepaths.isEmpty())
                         {
                             // copy package
-                            Package latestPackage(filepaths.last());
+                            Package latestPackage(filepaths.last().getParentDir());
                             FilePath dest = projectFilepath.getParentDir().getPathTo("lib/pkg");
                             latestPackage.saveTo(dest);
                             ui->log->addItem(dest.toNative());
@@ -165,7 +165,7 @@ void MainWindow::on_pushButton_2_clicked()
                             if (!filepaths.isEmpty())
                             {
                                 // copy footprint
-                                Footprint latestFootprint(filepaths.last());
+                                Footprint latestFootprint(filepaths.last().getParentDir());
                                 FilePath dest = projectFilepath.getParentDir().getPathTo("lib/fpt");
                                 latestFootprint.saveTo(dest);
                                 ui->log->addItem(dest.toNative());

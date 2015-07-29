@@ -174,7 +174,7 @@ int Library::addCategoriesToDb(const QList<QString>& xmlFiles, const QString& ta
     int count = 0;
     foreach (const QString& filepathStr, xmlFiles)
     {
-        FilePath filepath(filepathStr);
+        FilePath filepath = FilePath(filepathStr).getParentDir();
         ElementType element(filepath);
 
         QSqlQuery query = prepareQuery(
@@ -212,7 +212,7 @@ int Library::addElementsToDb(const QList<QString>& xmlFiles, const QString& tabl
     int count = 0;
     foreach (const QString& filepathStr, xmlFiles)
     {
-        FilePath filepath(filepathStr);
+        FilePath filepath = FilePath(filepathStr).getParentDir();
         ElementType element(filepath);
 
         QSqlQuery query = prepareQuery(

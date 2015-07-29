@@ -118,7 +118,7 @@ class ProjectLibrary final : public QObject
 
         // Private Methods
         template <typename ElementType>
-        void loadElements(const FilePath& directory, const QString& type, const QString& prefix,
+        void loadElements(const FilePath& directory, const QString& type,
                           QHash<QUuid, const ElementType*>& elementList) throw (Exception);
         template <typename ElementType>
         void addElement(const ElementType& element,

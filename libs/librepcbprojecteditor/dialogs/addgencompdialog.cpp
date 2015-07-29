@@ -84,7 +84,7 @@ AddGenCompDialog::~AddGenCompDialog() noexcept
 FilePath AddGenCompDialog::getSelectedGenCompFilePath() const noexcept
 {
     if (mSelectedGenComp)
-        return mSelectedGenComp->getXmlFilepath();
+        return mSelectedGenComp->getDirectory();
     else
         return FilePath();
 }
@@ -170,7 +170,7 @@ void AddGenCompDialog::setSelectedCategory(const QUuid& categoryUuid)
         library::GenericComponent* genComp = new library::GenericComponent(genComps.first());
 
         QListWidgetItem* item = new QListWidgetItem(genComp->getName(localeOrder));
-        item->setData(Qt::UserRole, genComp->getXmlFilepath().toStr());
+        item->setData(Qt::UserRole, genComp->getDirectory().toStr());
         mUi->listGenericComponents->addItem(item);
     }
 }

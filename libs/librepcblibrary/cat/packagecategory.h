@@ -42,7 +42,7 @@ class PackageCategory final : public LibraryCategory
 
     public:
 
-        explicit PackageCategory(const FilePath& xmlFilePath);
+        explicit PackageCategory(const FilePath& elementDirectory);
         virtual ~PackageCategory();
 
     private:

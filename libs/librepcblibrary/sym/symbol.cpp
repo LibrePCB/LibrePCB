@@ -38,8 +38,8 @@ Symbol::Symbol(const QUuid& uuid, const Version& version, const QString& author,
 {
 }
 
-Symbol::Symbol(const FilePath& xmlFilePath) throw (Exception) :
-    LibraryElement(xmlFilePath, "sym", "symbol")
+Symbol::Symbol(const FilePath& elementDirectory) throw (Exception) :
+    LibraryElement(elementDirectory, "sym", "symbol")
 {
     try
     {

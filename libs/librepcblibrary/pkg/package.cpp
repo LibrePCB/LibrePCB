@@ -38,8 +38,8 @@ Package::Package(const QUuid& uuid, const Version& version, const QString& autho
 {
 }
 
-Package::Package(const FilePath& xmlFilePath) throw (Exception) :
-    LibraryElement(xmlFilePath, "pkg", "package")
+Package::Package(const FilePath& elementDirectory) throw (Exception) :
+    LibraryElement(elementDirectory, "pkg", "package")
 {
     readFromFile();
 }

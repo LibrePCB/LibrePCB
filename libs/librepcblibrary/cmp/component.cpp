@@ -39,8 +39,8 @@ Component::Component(const QUuid& uuid, const Version& version, const QString& a
     Q_ASSERT(mUuid.isNull() == false);
 }
 
-Component::Component(const FilePath& xmlFilePath) throw (Exception) :
-    LibraryElement(xmlFilePath, "cmp", "component")
+Component::Component(const FilePath& elementDirectory) throw (Exception) :
+    LibraryElement(elementDirectory, "cmp", "component")
 {
     readFromFile();
 }

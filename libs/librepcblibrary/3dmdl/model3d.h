@@ -42,7 +42,7 @@ class Model3D final : public LibraryElement
 
     public:
 
-        explicit Model3D(const FilePath& xmlFilePath);
+        explicit Model3D(const FilePath& elementDirectory);
         virtual ~Model3D();
 
     private:

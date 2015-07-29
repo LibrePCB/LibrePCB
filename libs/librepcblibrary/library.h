@@ -55,6 +55,15 @@ namespace library {
 
 /**
  * @brief The Library class
+ *
+ * @todo This class needs some refactoring:
+ *          - rescan() is very slow
+ *          - rescan() does not report its progress
+ *          - rescan() blocks the whole application
+ *          - rescan() does not really have exception handling
+ *          - rescan() searches all XML files instead of element directories
+ *              --> error if there are multiple XML files in one element directory
+ *          - many other issues...
  */
 class Library final : public QObject
 {

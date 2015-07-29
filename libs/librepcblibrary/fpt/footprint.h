@@ -60,7 +60,7 @@ class Footprint final : public LibraryElement
                            const QString& name_en_US = QString(),
                            const QString& description_en_US = QString(),
                            const QString& keywords_en_US = QString()) throw (Exception);
-        explicit Footprint(const FilePath& xmlFilePath) throw (Exception);
+        explicit Footprint(const FilePath& elementDirectory) throw (Exception);
         ~Footprint() noexcept;
 
         // Getters

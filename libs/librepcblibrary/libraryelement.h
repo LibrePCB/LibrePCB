@@ -52,7 +52,7 @@ class LibraryElement : public LibraryBaseElement
                                 const QString& name_en_US = QString(),
                                 const QString& description_en_US = QString(),
                                 const QString& keywords_en_US = QString()) throw (Exception);
-        explicit LibraryElement(const FilePath& xmlFilePath,
+        explicit LibraryElement(const FilePath& elementDirectory,
                                 const QString& xmlFileNamePrefix,
                                 const QString& xmlRootNodeName) throw (Exception);
         virtual ~LibraryElement() noexcept;

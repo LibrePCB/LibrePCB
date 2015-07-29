@@ -62,13 +62,13 @@ ProjectLibrary::ProjectLibrary(Project& project, bool restore, bool readOnly) th
     try
     {
         // Load all library elements
-        loadElements<Symbol>          (mLibraryPath.getPathTo("sym"),    "symbols",            "sym",       mSymbols);
-        loadElements<Footprint>       (mLibraryPath.getPathTo("fpt"),    "footprints",         "fpt",       mFootprints);
-        loadElements<Model3D>         (mLibraryPath.getPathTo("3dmdl"),  "3d models",          "3dmdl",     mModels);
-        loadElements<SpiceModel>      (mLibraryPath.getPathTo("spcmdl"), "spice models",       "spcmdl",    mSpiceModels);
-        loadElements<Package>         (mLibraryPath.getPathTo("pkg"),    "packages",           "pkg",       mPackages);
-        loadElements<GenericComponent>(mLibraryPath.getPathTo("gencmp"), "generic components", "gencmp",    mGenericComponents);
-        loadElements<Component>       (mLibraryPath.getPathTo("cmp"),    "components",         "cmp",       mComponents);
+        loadElements<Symbol>          (mLibraryPath.getPathTo("sym"),    "symbols",            mSymbols);
+        loadElements<Footprint>       (mLibraryPath.getPathTo("fpt"),    "footprints",         mFootprints);
+        loadElements<Model3D>         (mLibraryPath.getPathTo("3dmdl"),  "3d models",          mModels);
+        loadElements<SpiceModel>      (mLibraryPath.getPathTo("spcmdl"), "spice models",       mSpiceModels);
+        loadElements<Package>         (mLibraryPath.getPathTo("pkg"),    "packages",           mPackages);
+        loadElements<GenericComponent>(mLibraryPath.getPathTo("gencmp"), "generic components", mGenericComponents);
+        loadElements<Component>       (mLibraryPath.getPathTo("cmp"),    "components",         mComponents);
     }
     catch (Exception &e)
     {
@@ -269,9 +269,7 @@ bool ProjectLibrary::save(bool toOriginal, QStringList& errors) noexcept
 
 template <typename ElementType>
 void ProjectLibrary::loadElements(const FilePath& directory, const QString& type,
-                                  const QString& prefix,
-                                  QHash<QUuid, const ElementType*>& elementList)
-                                  throw (Exception)
+                                  QHash<QUuid, const ElementType*>& elementList) throw (Exception)
 {
     QDir dir(directory.toStr());
 
@@ -295,30 +293,14 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
             continue;
         }
 
-        // search for the XML file with the newest version (<= application major version)
-        FilePath filepath;
-        for (int i = Application::majorVersion(); i >= 0; i--)
+        if (subdirPath.isEmptyDir())
         {
-            filepath = subdirPath.getPathTo(QString("%1_v%2.xml").arg(prefix).arg(i));
-            if (filepath.isExistingFile()) break;
-        }
-
-        if (!filepath.isExistingFile())
-        {
-            qWarning() << "No valid XML file found in directory:" << subdirPath.toNative();
+            qWarning() << "Found an empty directory in the library:" << subdirPath.toNative();
             continue;
         }
 
         // load the library element --> an exception will be thrown on error
-        ElementType* element = new ElementType(filepath);
-
-        if (element->getUuid() != dirUuid)
-        {
-            throw RuntimeError(__FILE__, __LINE__, filepath.toStr(),
-                QString(tr("Invalid UUID in file \"%1\": \"%2\" instead of \"%3\""))
-                .arg(filepath.toNative(), element->getUuid().toString(),
-                dirUuid.toString()));
-        }
+        ElementType* element = new ElementType(subdirPath);
 
         if (elementList.contains(element->getUuid()))
         {

@@ -42,7 +42,7 @@ class ComponentCategory final : public LibraryCategory
 
     public:
 
-        explicit ComponentCategory(const FilePath& xmlFilePath);
+        explicit ComponentCategory(const FilePath& elementDirectory);
         virtual ~ComponentCategory();
 
     private:

@@ -30,8 +30,8 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Model3D::Model3D(const FilePath& xmlFilePath) :
-    LibraryElement(xmlFilePath, "3dmdl", "model3d")
+Model3D::Model3D(const FilePath& elementDirectory) :
+    LibraryElement(elementDirectory, "3dmdl", "model3d")
 {
     readFromFile();
 }

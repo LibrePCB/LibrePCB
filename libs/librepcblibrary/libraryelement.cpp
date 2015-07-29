@@ -40,10 +40,10 @@ LibraryElement::LibraryElement(const QString& xmlFileNamePrefix,
 {
 }
 
-LibraryElement::LibraryElement(const FilePath& xmlFilePath,
+LibraryElement::LibraryElement(const FilePath& elementDirectory,
                                const QString& xmlFileNamePrefix,
                                const QString& xmlRootNodeName) throw (Exception) :
-    LibraryBaseElement(xmlFilePath, xmlFileNamePrefix, xmlRootNodeName)
+    LibraryBaseElement(elementDirectory, xmlFileNamePrefix, xmlRootNodeName)
 {
 }
 

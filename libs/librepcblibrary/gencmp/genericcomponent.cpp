@@ -41,8 +41,8 @@ GenericComponent::GenericComponent(const QUuid& uuid, const Version& version,
     Q_ASSERT(mUuid.isNull() == false);
 }
 
-GenericComponent::GenericComponent(const FilePath& xmlFilePath) throw (Exception) :
-    LibraryElement(xmlFilePath, "gencmp", "generic_component")
+GenericComponent::GenericComponent(const FilePath& elementDirectory) throw (Exception) :
+    LibraryElement(elementDirectory, "gencmp", "generic_component")
 {
     try
     {

@@ -52,7 +52,7 @@ class GenericComponent final : public LibraryElement
                                   const QString& name_en_US = QString(),
                                   const QString& description_en_US = QString(),
                                   const QString& keywords_en_US = QString()) throw (Exception);
-        explicit GenericComponent(const FilePath& xmlFilePath) throw (Exception);
+        explicit GenericComponent(const FilePath& elementDirectory) throw (Exception);
         ~GenericComponent() noexcept;
 
         // General

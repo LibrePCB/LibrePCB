@@ -49,11 +49,12 @@ LibraryBaseElement::LibraryBaseElement(const QString& xmlFileNamePrefix,
     mKeywords.insert("en_US", keywords_en_US);
 }
 
-LibraryBaseElement::LibraryBaseElement(const FilePath& xmlFilePath,
+LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
                                        const QString& xmlFileNamePrefix,
                                        const QString& xmlRootNodeName) throw (Exception) :
-    QObject(0), mXmlFilepath(xmlFilePath), mXmlFileNamePrefix(xmlFileNamePrefix),
-    mXmlRootNodeName(xmlRootNodeName), mDomTreeParsed(false)
+    QObject(0), mDirectory(elementDirectory), mXmlFilepath(),
+    mXmlFileNamePrefix(xmlFileNamePrefix), mXmlRootNodeName(xmlRootNodeName),
+    mDomTreeParsed(false)
 {
 }
 
@@ -97,6 +98,7 @@ QStringList LibraryBaseElement::getAllAvailableLocales() const noexcept
 
 void LibraryBaseElement::save() const throw (Exception)
 {
+    Q_ASSERT(mDirectory.isValid());
     Q_ASSERT(mXmlFilepath.isValid());
     XmlDomDocument doc(*serializeToXmlDomElement());
     QScopedPointer<SmartXmlFile> file(SmartXmlFile::create(mXmlFilepath));
@@ -105,8 +107,9 @@ void LibraryBaseElement::save() const throw (Exception)
 
 void LibraryBaseElement::saveTo(const FilePath& parentDir) const throw (Exception)
 {
-    mXmlFilepath = parentDir.getPathTo(QString("%1/%2_v%3.xml")
-        .arg(mUuid.toString()).arg(mXmlFileNamePrefix).arg(APP_VERSION_MAJOR));
+    mDirectory = parentDir.getPathTo(mUuid.toString());
+    QString filename = QString("%1_v%2.xml").arg(mXmlFileNamePrefix).arg(APP_VERSION_MAJOR);
+    mXmlFilepath = mDirectory.getPathTo(filename);
     save();
 }
 
@@ -118,10 +121,38 @@ void LibraryBaseElement::readFromFile() throw (Exception)
 {
     Q_ASSERT(mDomTreeParsed == false);
 
+    // check directory
+    QUuid dirUuid = QUuid(mDirectory.getFilename());
+    if ((!mDirectory.isExistingDir()) || (dirUuid.isNull()))
+    {
+        throw RuntimeError(__FILE__, __LINE__, dirUuid.toString(),
+            QString(tr("Directory does not exist or is not a valid UUID: \"%1\""))
+            .arg(mDirectory.toNative()));
+    }
+
+    // find the xml file with the highest file version number
+    for (int version = APP_VERSION_MAJOR; version >= 0; version--)
+    {
+        QString filename = QString("%1_v%2.xml").arg(mXmlFileNamePrefix).arg(version);
+        mXmlFilepath = mDirectory.getPathTo(filename);
+        if (mXmlFilepath.isExistingFile()) break; // file found
+    }
+
     // open XML file
     SmartXmlFile file(mXmlFilepath, false, false);
     QSharedPointer<XmlDomDocument> doc = file.parseFileAndBuildDomTree(true);
     parseDomTree(doc->getRoot());
+
+    // check UUID
+    if (mUuid != dirUuid)
+    {
+        throw RuntimeError(__FILE__, __LINE__,
+            QString("%1/%2").arg(mUuid.toString(), dirUuid.toString()),
+            QString(tr("UUID mismatch between element directory and XML file: \"%1\""))
+            .arg(mXmlFilepath.toNative()));
+    }
+
+    // check attributes
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     Q_ASSERT(mDomTreeParsed == true);
