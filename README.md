@@ -32,8 +32,9 @@ Since qtcreator is also using qmake and make to build, it's easy to do the same
 on the command line:
 
 ```bash
-% qmake librepcb.pro 
-% make -j 8
+$ mkdir build && cd build
+$ qmake -r ../librepcb.pro
+$ make -j 8
 ```
 
 Then grab a coffee, since the compilation takes about two minutes on a decent
