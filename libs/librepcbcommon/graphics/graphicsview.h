@@ -56,9 +56,11 @@ class GraphicsView final : public QGraphicsView
         // Getters
         GraphicsScene* getScene() const noexcept {return mScene;}
         QRectF getVisibleSceneRect() const noexcept;
+        bool getUseOpenGl() const noexcept {return mUseOpenGl;}
         const GridProperties& getGridProperties() const noexcept {return *mGridProperties;}
 
         // Setters
+        void setUseOpenGl(bool useOpenGl) noexcept;
         void setGridProperties(const GridProperties& properties) noexcept;
         void setScene(GraphicsScene* scene) noexcept;
         void setVisibleSceneRect(const QRectF& rect) noexcept;
@@ -95,6 +97,7 @@ class GraphicsView final : public QGraphicsView
         QVariantAnimation* mZoomAnimation;
         GridProperties* mGridProperties;
         bool mOriginCrossVisible;
+        bool mUseOpenGl;
 
         // Static Variables
         static constexpr qreal sZoomStepFactor = 1.5;

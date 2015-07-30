@@ -35,11 +35,10 @@
 
 GraphicsView::GraphicsView(QWidget* parent, IF_GraphicsViewEventHandler* eventHandler) noexcept :
     QGraphicsView(parent), mEventHandlerObject(eventHandler), mScene(nullptr),
-    mZoomAnimation(nullptr), mGridProperties(new GridProperties()), mOriginCrossVisible(true)
+    mZoomAnimation(nullptr), mGridProperties(new GridProperties()), mOriginCrossVisible(true),
+    mUseOpenGl(false)
 {
     setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
-    //if (Workspace::instance().getSettings().getAppearance()->getUseOpenGl())
-    //    setViewport(new QGLWidget(QGLFormat(QGL::DoubleBuffer | QGL::AlphaChannel | QGL::SampleBuffers)));
     setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     setOptimizationFlags(QGraphicsView::DontSavePainterState);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
@@ -70,6 +69,18 @@ QRectF GraphicsView::getVisibleSceneRect() const noexcept
 /*****************************************************************************************
  *  Setters
  ****************************************************************************************/
+
+void GraphicsView::setUseOpenGl(bool useOpenGl) noexcept
+{
+    if (useOpenGl != mUseOpenGl)
+    {
+        if (useOpenGl)
+            setViewport(new QGLWidget(QGLFormat(QGL::DoubleBuffer | QGL::AlphaChannel | QGL::SampleBuffers)));
+        else
+            setViewport(nullptr);
+        mUseOpenGl = useOpenGl;
+    }
+}
 
 void GraphicsView::setGridProperties(const GridProperties& properties) noexcept
 {
