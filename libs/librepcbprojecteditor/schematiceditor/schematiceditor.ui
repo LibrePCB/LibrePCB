@@ -106,10 +106,8 @@
     <addaction name="actionToolDrawPolygon"/>
     <addaction name="actionToolDrawCircle"/>
     <addaction name="actionToolDrawEllipse"/>
-    <addaction name="separator"/>
     <addaction name="actionToolDrawWire"/>
     <addaction name="actionToolAddNetLabel"/>
-    <addaction name="separator"/>
     <addaction name="actionToolAddComponent"/>
    </widget>
    <widget class="QMenu" name="menuProject">
@@ -217,17 +215,14 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionToolSelect"/>
-   <addaction name="actionToolMove"/>
-   <addaction name="separator"/>
    <addaction name="actionToolDrawText"/>
+   <addaction name="actionToolMove"/>
    <addaction name="actionToolDrawRectangle"/>
    <addaction name="actionToolDrawPolygon"/>
    <addaction name="actionToolDrawCircle"/>
    <addaction name="actionToolDrawEllipse"/>
-   <addaction name="separator"/>
    <addaction name="actionToolDrawWire"/>
    <addaction name="actionToolAddNetLabel"/>
-   <addaction name="separator"/>
    <addaction name="actionToolAddComponent"/>
   </widget>
   <widget class="QToolBar" name="commandToolbar">
@@ -528,6 +523,9 @@
    <property name="text">
     <string>Move</string>
    </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionToolDrawText">
    <property name="icon">
@@ -540,6 +538,9 @@
    <property name="toolTip">
     <string>Draw Text</string>
    </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionToolDrawPolygon">
    <property name="icon">
@@ -548,6 +549,9 @@
    </property>
    <property name="text">
     <string>Draw Polygon</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionToolDrawRectangle">
@@ -558,6 +562,9 @@
    <property name="text">
     <string>Draw Rectangle</string>
    </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionToolDrawCircle">
    <property name="icon">
@@ -567,6 +574,9 @@
    <property name="text">
     <string>Draw Circle</string>
    </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionToolDrawEllipse">
    <property name="icon">
@@ -575,6 +585,9 @@
    </property>
    <property name="text">
     <string>Draw Ellipse</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionCommandAbort">

@@ -81,6 +81,12 @@
          <iconset resource="../../../img/images.qrc">
           <normaloff>:/img/actions/plus_2.png</normaloff>:/img/actions/plus_2.png</iconset>
         </property>
+        <property name="iconSize">
+         <size>
+          <width>16</width>
+          <height>16</height>
+         </size>
+        </property>
         <property name="arrowType">
          <enum>Qt::NoArrow</enum>
         </property>
@@ -101,6 +107,12 @@
          <iconset resource="../../../img/images.qrc">
           <normaloff>:/img/actions/minus.png</normaloff>:/img/actions/minus.png</iconset>
         </property>
+        <property name="iconSize">
+         <size>
+          <width>16</width>
+          <height>16</height>
+         </size>
+        </property>
        </widget>
       </item>
       <item>
@@ -113,6 +125,12 @@
         </property>
         <property name="text">
          <string/>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>16</width>
+          <height>16</height>
+         </size>
         </property>
         <property name="arrowType">
          <enum>Qt::UpArrow</enum>
@@ -129,6 +147,12 @@
         </property>
         <property name="text">
          <string/>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>16</width>
+          <height>16</height>
+         </size>
         </property>
         <property name="arrowType">
          <enum>Qt::DownArrow</enum>
