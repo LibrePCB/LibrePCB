@@ -16,6 +16,7 @@ Name: 0309/12
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{127bcb8f-3d85-4fe4-82f4-850d011f50e3}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

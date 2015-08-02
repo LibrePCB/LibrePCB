@@ -16,6 +16,7 @@ Name: DO220L
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{79b5af53-9ac4-481b-8839-45c082332b95}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -15,6 +15,7 @@ Name: CT3216
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{13d9ba4b-13fd-4ab2-86f6-b6c918c22a84}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

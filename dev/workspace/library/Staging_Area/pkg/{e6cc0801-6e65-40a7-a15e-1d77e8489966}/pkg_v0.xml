@@ -16,6 +16,7 @@ Name: TOP3L
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{498846a6-b0ed-4d13-8a84-f7d0d396ae5c}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

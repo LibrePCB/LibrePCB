@@ -16,6 +16,7 @@ Name: M1406
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{f06ac044-dcc7-4e5c-b293-bc363a78ebe5}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

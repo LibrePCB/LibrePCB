@@ -16,6 +16,7 @@ Name: E30-12
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{dd67a2c5-fa7c-472f-a749-14efa737b645}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

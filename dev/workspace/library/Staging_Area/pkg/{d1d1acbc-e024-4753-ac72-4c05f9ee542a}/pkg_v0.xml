@@ -16,6 +16,7 @@ Name: C0805K
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{c7a68879-21d0-45c1-815e-f05cdacf2b20}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

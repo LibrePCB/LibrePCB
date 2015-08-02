@@ -16,6 +16,7 @@ Name: XC22B10
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{1eab9851-6141-4da5-b204-dc18419b07cc}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

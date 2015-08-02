@@ -15,6 +15,7 @@ Name: C2225K
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{4adf44eb-c7e1-4481-ac4e-4f391b8b8d39}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: SOD64-10
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{2f24e250-4b5c-44b0-ace2-e6bdf629e1f1}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

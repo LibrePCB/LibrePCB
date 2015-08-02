@@ -16,6 +16,7 @@ Name: B45181D
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{d6a2e602-df2e-496b-935d-4eeecf0b1743}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

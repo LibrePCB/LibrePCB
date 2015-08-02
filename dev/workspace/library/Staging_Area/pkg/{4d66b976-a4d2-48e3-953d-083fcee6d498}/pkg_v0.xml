@@ -15,6 +15,7 @@ Name: FE18-2W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{432b3c7f-3b9e-4ab6-bc74-5666d4a933e2}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

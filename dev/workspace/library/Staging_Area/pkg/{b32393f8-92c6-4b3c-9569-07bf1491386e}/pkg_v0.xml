@@ -16,6 +16,7 @@ Name: MC-405
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{028a58c1-673e-413f-83d1-62322d48bc64}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

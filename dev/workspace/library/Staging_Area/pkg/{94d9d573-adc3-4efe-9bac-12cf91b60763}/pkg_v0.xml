@@ -16,6 +16,7 @@ Name: WSC6927
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{60efc22e-1875-4e13-bc5f-17462781ae1e}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

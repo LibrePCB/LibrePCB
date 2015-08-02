@@ -16,6 +16,7 @@ Name: EU35-10
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{c3137e29-f275-432f-918c-133a727fc00c}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

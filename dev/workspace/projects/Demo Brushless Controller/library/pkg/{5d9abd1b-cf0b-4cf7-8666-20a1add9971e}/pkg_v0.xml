@@ -15,6 +15,7 @@ Name: R0603
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"></keywords>
         <footprint>{4fceac63-0f89-46c4-8e93-d6ee67d33e69}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -15,6 +15,7 @@ Name: C4564
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{e742d5ea-3df8-4363-bfd7-07c65fe41cdf}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

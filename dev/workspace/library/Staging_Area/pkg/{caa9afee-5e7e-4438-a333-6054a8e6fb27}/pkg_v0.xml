@@ -16,6 +16,7 @@ Name: RTRIM64Y
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{f1f633a7-6df5-45ab-a495-382313fa4b95}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

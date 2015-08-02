@@ -15,6 +15,7 @@ Name: JBK20
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{500f9dfa-25ab-4621-8b70-637a526026e7}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

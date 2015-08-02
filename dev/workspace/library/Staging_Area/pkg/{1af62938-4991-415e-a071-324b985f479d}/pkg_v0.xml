@@ -16,6 +16,7 @@ Name: ETR5
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{31c8fef4-e8d6-4aa3-88c8-b4876e0a7b3c}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: DO34Z7
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{07d6b3be-bdc9-4bb8-9671-021eb3804d70}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

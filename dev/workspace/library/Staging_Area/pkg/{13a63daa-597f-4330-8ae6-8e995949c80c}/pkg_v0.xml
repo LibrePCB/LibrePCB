@@ -15,6 +15,7 @@ Name: DIL14S
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{78481162-23a5-478c-af5a-6e5ebdae93d0}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

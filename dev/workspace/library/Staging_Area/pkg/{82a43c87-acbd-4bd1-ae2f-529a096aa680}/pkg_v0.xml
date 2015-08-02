@@ -15,6 +15,7 @@ Name: TC26H
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{da1d683c-1944-4753-866f-cd4cecd0e789}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

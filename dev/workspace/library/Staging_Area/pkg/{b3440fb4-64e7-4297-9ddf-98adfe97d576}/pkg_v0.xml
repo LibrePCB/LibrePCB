@@ -16,6 +16,7 @@ Name: 1812X7R
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{4cf54ec3-7a1b-4ec9-8430-d31d70d955b8}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

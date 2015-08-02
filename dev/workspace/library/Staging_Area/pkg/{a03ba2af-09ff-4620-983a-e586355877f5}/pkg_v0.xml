@@ -15,6 +15,7 @@ Name: 3,81/1,1
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{5bf59213-6766-4be5-abfe-270ba83859a4}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

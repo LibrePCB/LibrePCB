@@ -15,6 +15,7 @@ Name: P128-60
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{bb136202-e04b-4f63-b5df-cb0207d15a28}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

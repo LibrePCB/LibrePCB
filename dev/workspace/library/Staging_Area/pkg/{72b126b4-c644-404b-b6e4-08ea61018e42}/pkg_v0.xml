@@ -16,6 +16,7 @@ Name: E5R
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{0f242f4c-fcb1-428a-b975-a80b66c27cee}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: MELF-MLL41
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{d1b05294-331c-4e14-92ef-a6a7874fd465}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

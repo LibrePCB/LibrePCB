@@ -15,6 +15,7 @@ Name: HC49U70
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{f47a5fc7-8da0-49dc-9c32-406ee6e02c24}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

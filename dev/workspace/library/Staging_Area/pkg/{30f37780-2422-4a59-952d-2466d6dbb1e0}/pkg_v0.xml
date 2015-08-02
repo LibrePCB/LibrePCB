@@ -15,6 +15,7 @@ Name: C3216
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{dbcdefb5-128a-4842-bd1a-66a51441f98d}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

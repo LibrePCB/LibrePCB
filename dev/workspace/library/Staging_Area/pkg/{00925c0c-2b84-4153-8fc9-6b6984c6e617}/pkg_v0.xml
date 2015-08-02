@@ -16,6 +16,7 @@ Name: DUOLED-A-3MM
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{5792f075-2d27-427d-b952-cca94b711013}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

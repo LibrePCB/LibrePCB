@@ -16,6 +16,7 @@ Name: E45-25
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{62c8aa63-6b2a-4d85-aa86-44252953f922}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

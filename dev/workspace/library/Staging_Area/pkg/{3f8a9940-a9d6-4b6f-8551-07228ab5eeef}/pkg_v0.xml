@@ -16,6 +16,7 @@ Name: P0817/22
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{ad1c6808-3f89-4652-bcb0-e3d1ac755b18}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

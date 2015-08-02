@@ -16,6 +16,7 @@ Name: E22-10
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{8af2fdd8-4726-473e-8334-b4c25ca56c96}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

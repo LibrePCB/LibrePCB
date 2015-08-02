@@ -16,6 +16,7 @@ Name: MINI-TOPLED-SANTANA
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{b3b0e911-27eb-4ccb-b635-5efacc5670b0}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

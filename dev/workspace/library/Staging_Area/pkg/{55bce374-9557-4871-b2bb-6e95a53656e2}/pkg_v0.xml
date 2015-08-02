@@ -16,6 +16,7 @@ Name: C2672
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{2380a7c7-8443-4629-84d6-7c0208519d32}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: EU45-16
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{7d7eaad6-9e60-4453-b267-f96a65ef5978}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -15,6 +15,7 @@ Name: CT7343
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{94833289-0911-4996-90eb-5a8b3cee6261}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

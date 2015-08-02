@@ -16,6 +16,7 @@ Name: RTRIM64Z
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{839371f6-1b95-49c7-864e-2fb0a1e19e28}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

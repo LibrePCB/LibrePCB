@@ -16,6 +16,7 @@ Name: TT2D4
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{17f037ef-b060-416d-b2c0-398584b0c2d2}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

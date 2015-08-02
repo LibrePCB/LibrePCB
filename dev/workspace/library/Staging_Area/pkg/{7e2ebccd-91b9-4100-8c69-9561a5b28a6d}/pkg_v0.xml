@@ -15,6 +15,7 @@ Name: JU05
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{bfc09fd5-692c-449a-b2e3-366e40f5d393}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

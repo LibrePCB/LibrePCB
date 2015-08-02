@@ -16,6 +16,7 @@ Name: M5923
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{6ee861b0-393f-4ce2-be0e-b2518eabc6be}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

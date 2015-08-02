@@ -16,6 +16,7 @@ Name: RAD5G
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{21bac4e1-9b49-43bc-9fdd-ba50e4b4d3c8}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

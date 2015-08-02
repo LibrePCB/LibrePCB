@@ -16,6 +16,7 @@ Name: R6332
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{a7ec7af5-e853-4560-92c4-3f05d97f5ea9}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

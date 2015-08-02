@@ -16,6 +16,7 @@ Name: F15/12B
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{dfa08a5d-e9b8-42b5-8350-6bbd227284e6}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

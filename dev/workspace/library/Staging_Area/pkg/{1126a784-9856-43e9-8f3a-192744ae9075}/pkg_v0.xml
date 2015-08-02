@@ -16,6 +16,7 @@ Name: SM77H
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{29c02918-bd6c-459c-a843-7a8db7864ef9}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

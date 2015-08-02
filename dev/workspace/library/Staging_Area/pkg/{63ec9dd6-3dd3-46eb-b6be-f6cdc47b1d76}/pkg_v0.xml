@@ -17,6 +17,7 @@ Name: PLCC2
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{e887894a-3bf5-475c-8fe5-57d87c5eaefc}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: SOT82S
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{d4fbf11d-d7b1-4539-84d9-cf8b5664852a}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

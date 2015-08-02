@@ -675,15 +675,16 @@ XmlDomElement* XmlDomElement::fromQDomElement(QDomElement domElement, XmlDomDocu
 bool XmlDomElement::isValidXmlTagName(const QString& name) noexcept
 {
     bool valid = !name.isEmpty();
+    if (name.startsWith("xml", Qt::CaseInsensitive)) valid = false;
     for (int i=0; i<name.length(); i++)
     {
+        bool char_valid = false;
         ushort value = name.at(i).unicode();
-        if (value < 'A')
-            valid = false;
-        else if ((value > 'Z') && (value < 'a') && (value != '_'))
-            valid = false;
-        else if (value > 'z')
-            valid = false;
+        if ((i > 0) && (value >= '0') && (value <= '9')) char_valid = true;
+        if ((i > 0) && (value == '_')) char_valid = true;
+        if ((value >= 'A') && (value <= 'Z')) char_valid = true;
+        if ((value >= 'a') && (value <= 'z')) char_valid = true;
+        if (!char_valid) valid = false;
     }
     return valid;
 }

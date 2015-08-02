@@ -16,6 +16,7 @@ Name: LUMILED+
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{e5b3616f-25e2-4c12-887b-48ed6c414abe}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

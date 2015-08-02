@@ -16,6 +16,7 @@ Name: SIL05A
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{3c02cdd6-a94d-432b-bcee-c461013a8d54}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

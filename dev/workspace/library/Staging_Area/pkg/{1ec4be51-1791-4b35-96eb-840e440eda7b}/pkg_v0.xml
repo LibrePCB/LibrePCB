@@ -16,6 +16,7 @@ Name: RTRIM70Y
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{dc7f71c4-cbe0-4134-a789-021320df40d4}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

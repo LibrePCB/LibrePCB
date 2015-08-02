@@ -16,6 +16,7 @@ Name: ER900
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{1a3fbd60-39a8-47cc-a372-e17f401b210a}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

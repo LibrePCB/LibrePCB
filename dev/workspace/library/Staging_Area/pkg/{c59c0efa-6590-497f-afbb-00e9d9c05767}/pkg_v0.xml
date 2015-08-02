@@ -16,6 +16,7 @@ Name: 0922V
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{cbbfdaf9-4fc6-43ad-84d9-e0c67776b697}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

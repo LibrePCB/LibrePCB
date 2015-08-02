@@ -16,6 +16,7 @@ Name: L3225P
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{4cae1180-b96d-4f03-b1a8-8ed9f8917731}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

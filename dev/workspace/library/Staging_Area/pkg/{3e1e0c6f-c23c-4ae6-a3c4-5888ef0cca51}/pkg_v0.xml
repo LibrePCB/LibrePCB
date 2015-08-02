@@ -16,6 +16,7 @@ Name: ML-E
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{7548efd7-9eb2-4318-b504-63d073ac1ff9}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

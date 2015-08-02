@@ -54,9 +54,11 @@ class Package final : public LibraryElement
 
         // Getters
         const QUuid& getFootprintUuid() const noexcept {return mFootprintUuid;}
+        const QUuid& getModel3dUuid() const noexcept {return mModel3dUuid;}
 
         // Setters
         void setFootprintUuid(const QUuid& uuid) noexcept {mFootprintUuid = uuid;}
+        void setModel3dUuid(const QUuid& uuid) noexcept {mModel3dUuid = uuid;}
 
 
     private:
@@ -79,6 +81,7 @@ class Package final : public LibraryElement
 
         // Attributes
         QUuid mFootprintUuid;
+        QUuid mModel3dUuid; ///< may be NULL
 };
 
 } // namespace library

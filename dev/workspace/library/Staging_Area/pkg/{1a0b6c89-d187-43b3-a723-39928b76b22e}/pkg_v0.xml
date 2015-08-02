@@ -16,6 +16,7 @@ Name: C5102
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{add0e091-3a3b-41f7-a1df-49190ab57d84}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -17,6 +17,7 @@ Name: CTRIM3050.505
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{b3adda1e-350d-4908-aec4-fe88c038139b}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

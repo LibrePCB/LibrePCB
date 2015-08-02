@@ -16,6 +16,7 @@ Name: P2-15
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{359c41f6-d94f-4bd0-b78d-b671a1ee3a23}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

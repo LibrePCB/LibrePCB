@@ -16,6 +16,7 @@ Name: E2-4
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{fd2d9878-4d8d-410f-8d23-eabe61b4d7aa}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

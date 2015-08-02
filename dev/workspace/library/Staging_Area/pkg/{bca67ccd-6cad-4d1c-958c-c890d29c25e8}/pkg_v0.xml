@@ -16,6 +16,7 @@ Name: DUOLED5MM
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{46729df5-e49d-46da-9b68-802139407acb}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

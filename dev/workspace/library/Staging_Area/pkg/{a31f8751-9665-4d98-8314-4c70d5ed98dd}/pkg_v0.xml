@@ -16,6 +16,7 @@ Name: SANYO-OSCON_SMD_A5
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{b8b6e309-c7b2-4d06-8b3a-71a0dbc12a9e}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: L5650M
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{115b758b-da9e-44c3-b34b-49451891081a}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

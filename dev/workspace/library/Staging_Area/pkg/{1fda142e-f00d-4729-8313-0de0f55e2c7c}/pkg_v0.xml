@@ -16,6 +16,7 @@ Name: MINI_MELF-0207R
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{c8658053-fe55-46f7-93bc-925ff5d8cac2}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

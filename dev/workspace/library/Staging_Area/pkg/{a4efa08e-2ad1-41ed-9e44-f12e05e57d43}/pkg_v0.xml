@@ -16,6 +16,7 @@ Name: C182B
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{979e1c15-af4d-47fa-b92b-034293deab25}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

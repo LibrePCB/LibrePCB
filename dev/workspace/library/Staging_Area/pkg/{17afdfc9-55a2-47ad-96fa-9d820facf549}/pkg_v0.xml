@@ -17,6 +17,7 @@ Name: CHIP-LED0603
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{971bda70-420e-44fb-9021-ca29dfde3224}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

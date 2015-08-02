@@ -16,6 +16,7 @@ Name: DO34-7
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{6deeec42-4612-4304-8d1e-ee2dfc9e4d81}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -15,6 +15,7 @@ Name: 1100S
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{3f46cec3-55b5-4958-abfa-f990a9927eeb}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: MX6
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{a280232c-705e-4ef2-9b62-0433d07fee0d}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: V235/17
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{f4859db5-83b7-4b0b-be17-be736aefa392}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

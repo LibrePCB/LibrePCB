@@ -16,6 +16,7 @@ Name: C0402K
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{d034aee9-a21d-4949-bb0f-7432be55cdb3}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

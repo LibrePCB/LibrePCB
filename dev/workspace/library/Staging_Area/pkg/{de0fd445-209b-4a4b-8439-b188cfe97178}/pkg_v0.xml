@@ -16,6 +16,7 @@ Name: LB10
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{70dc45e6-c0ed-4f51-a576-6cdf6cd870b2}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

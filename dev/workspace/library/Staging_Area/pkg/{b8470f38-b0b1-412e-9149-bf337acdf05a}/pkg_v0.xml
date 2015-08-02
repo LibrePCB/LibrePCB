@@ -16,6 +16,7 @@ Name: EB20D
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{ed8e26de-2eec-40a3-ab88-d218187d6701}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

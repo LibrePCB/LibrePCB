@@ -15,6 +15,7 @@ Name: FE12
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{e2171dcc-28d3-4b90-9e5c-81253d85880a}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

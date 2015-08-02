@@ -16,6 +16,7 @@ Name: SC-3
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{d5c5cd44-d7bc-4881-9345-274922e2a033}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

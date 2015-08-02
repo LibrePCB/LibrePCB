@@ -16,6 +16,7 @@ Name: OSTAR_4_
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{cc910294-203a-4c77-b835-5561878d6056}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

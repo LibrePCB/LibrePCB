@@ -16,6 +16,7 @@ Name: TO220AB
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{fbe8885e-f1e7-4f31-912d-e26af408c66a}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -15,6 +15,7 @@ Name: FE09
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{120948d9-dd6a-4840-bcab-cf0773bca5ee}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

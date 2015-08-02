@@ -16,6 +16,7 @@ Name: SOD83-12
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{7c950c87-e382-4f27-ad7b-33250c854c53}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

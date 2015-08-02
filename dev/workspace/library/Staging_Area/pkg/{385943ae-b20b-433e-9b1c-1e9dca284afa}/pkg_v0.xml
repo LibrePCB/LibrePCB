@@ -16,6 +16,7 @@ Name: TT2D6L
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{ab5612c4-c480-4e15-9dc6-48bafb8fc71c}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

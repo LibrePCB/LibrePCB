@@ -16,6 +16,7 @@ Name: SOT1862S
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{281f6f70-6d20-45d2-bdf6-4ce01705afef}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

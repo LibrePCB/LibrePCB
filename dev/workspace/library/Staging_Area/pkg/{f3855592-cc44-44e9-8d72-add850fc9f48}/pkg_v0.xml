@@ -15,6 +15,7 @@ Name: RTRIM3165W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{b56292da-554c-4ebd-80a5-d58bab376c4a}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

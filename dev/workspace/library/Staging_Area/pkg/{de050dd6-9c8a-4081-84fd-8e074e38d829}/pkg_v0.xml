@@ -15,6 +15,7 @@ Name: PT-SPIN
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{3713b6c8-7580-43d9-b04c-6707e4a8d4ab}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

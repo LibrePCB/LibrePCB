@@ -15,6 +15,7 @@ Name: C0504
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{f61db50f-8ea5-449d-abb0-2b4929e8840c}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: DO34-5
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{d7214cf9-0cfb-4a82-aacb-ae4ee90337bd}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

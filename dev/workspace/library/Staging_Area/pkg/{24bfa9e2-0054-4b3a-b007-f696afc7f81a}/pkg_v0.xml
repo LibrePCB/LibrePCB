@@ -16,6 +16,7 @@ Name: DO07
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{49a5175e-2f0f-4c54-b655-a75e6ab74f9b}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

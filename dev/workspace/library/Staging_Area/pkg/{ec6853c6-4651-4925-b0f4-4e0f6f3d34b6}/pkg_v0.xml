@@ -16,6 +16,7 @@ Name: 0617/17
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{c8c3e97a-8b05-45dd-9b59-b7654fcd2ebb}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

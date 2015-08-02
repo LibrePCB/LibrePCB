@@ -16,6 +16,7 @@ Name: 0309/20
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{18480dc3-3135-4530-962c-54560affa5bc}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

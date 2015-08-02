@@ -15,6 +15,7 @@ Name: C/6032-28R
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{a29084fc-a069-4d71-82e4-0d111205acdf}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

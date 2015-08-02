@@ -16,6 +16,7 @@ Name: IW220ACS
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{0e338d54-2610-4f84-aeec-19225307939b}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

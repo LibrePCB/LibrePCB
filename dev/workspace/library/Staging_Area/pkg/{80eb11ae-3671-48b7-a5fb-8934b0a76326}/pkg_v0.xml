@@ -16,6 +16,7 @@ Name: DOP3L
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{410b0c69-25aa-4544-9cfb-9cfe46c72e97}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

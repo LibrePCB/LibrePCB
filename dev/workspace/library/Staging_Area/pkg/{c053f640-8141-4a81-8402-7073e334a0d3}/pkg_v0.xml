@@ -15,6 +15,7 @@ Name: FE10-2W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{d91d1a10-ae35-41ef-976a-2491fc23b377}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

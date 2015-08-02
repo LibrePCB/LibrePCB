@@ -16,6 +16,7 @@ Name: CHIPLED_0603
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{d8dda7b2-b1ac-4427-902c-78dbdb784a8b}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

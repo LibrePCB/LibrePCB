@@ -16,6 +16,7 @@ Name: RTRIMTS63Z
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{7e4dde1b-110a-43aa-b3a9-bf1f1dc32bb7}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

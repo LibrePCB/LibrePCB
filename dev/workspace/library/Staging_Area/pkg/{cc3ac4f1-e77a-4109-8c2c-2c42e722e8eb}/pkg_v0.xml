@@ -15,6 +15,7 @@ Name: CTRIM808-BC
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{4f27b4ef-9656-4259-b008-c07827d6ab53}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

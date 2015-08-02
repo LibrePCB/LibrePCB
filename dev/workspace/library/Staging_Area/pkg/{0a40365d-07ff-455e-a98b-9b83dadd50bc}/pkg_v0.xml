@@ -16,6 +16,7 @@ Name: E5-10,5
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{e0098de2-125b-4100-bad2-3c629160bfba}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

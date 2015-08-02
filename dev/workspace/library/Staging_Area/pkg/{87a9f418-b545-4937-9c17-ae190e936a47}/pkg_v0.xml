@@ -15,6 +15,7 @@ Name: MA12-1
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{ef17a22f-2cf1-40b0-b3cc-7950f454f866}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

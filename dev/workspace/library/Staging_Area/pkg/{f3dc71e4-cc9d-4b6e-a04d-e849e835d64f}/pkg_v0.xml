@@ -16,6 +16,7 @@ Name: M1206
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{2e915279-6ed6-465f-b34f-c528d44167e6}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

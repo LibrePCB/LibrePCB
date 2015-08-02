@@ -16,6 +16,7 @@ Name: E5-13
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{09f56c28-1996-4226-a3e7-a503561cf6fe}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

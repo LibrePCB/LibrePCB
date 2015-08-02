@@ -16,6 +16,7 @@ Name: SOT54E
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{bc329059-4fa3-450a-8c23-be9e3b59a69b}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

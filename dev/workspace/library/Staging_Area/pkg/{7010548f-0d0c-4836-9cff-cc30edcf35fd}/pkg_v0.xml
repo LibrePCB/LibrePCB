@@ -16,6 +16,7 @@ Name: SUPERFLUX-7.6X7.6
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{68edf293-773d-4ce6-8624-d1b6490fd3d5}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: S7379-01
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{9c68694b-9e30-493d-af93-c2cda0965668}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

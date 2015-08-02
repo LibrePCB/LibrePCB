@@ -16,6 +16,7 @@ Name: E50-30
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{9e11f40f-260c-4730-bdd3-c430a974e242}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

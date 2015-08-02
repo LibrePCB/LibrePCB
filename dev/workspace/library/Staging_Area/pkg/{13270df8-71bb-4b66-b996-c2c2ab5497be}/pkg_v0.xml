@@ -15,6 +15,7 @@ Name: R2012
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{842f79ec-0e61-4342-a8c3-a46c4be051c0}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

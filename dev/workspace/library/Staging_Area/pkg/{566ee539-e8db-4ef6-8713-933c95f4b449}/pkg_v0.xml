@@ -15,6 +15,7 @@ Name: 4,16O1,6
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{4dbcb001-cdba-4397-b577-6af007603e53}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

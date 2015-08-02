@@ -16,6 +16,7 @@ Name: RTRIMTSM53YL
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{4449c067-0515-471e-872b-ef9e8b391ff6}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: SANYO-OSCON_F13
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{b4a4d110-b132-4de4-9b4b-9201cb61522e}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

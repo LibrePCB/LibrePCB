@@ -16,6 +16,7 @@ Name: TO263AB
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{91e9cab0-915c-43fb-bdd7-ecbb4037d5ec}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

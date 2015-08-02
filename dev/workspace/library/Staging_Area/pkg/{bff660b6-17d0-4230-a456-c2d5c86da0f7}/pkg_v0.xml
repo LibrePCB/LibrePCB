@@ -16,6 +16,7 @@ Name: U57X32
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{0e5f3887-0782-43ef-898c-ccdbf618c458}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: S6695-01
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{0bc132bc-c321-4317-9b64-f53fecc59e2b}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

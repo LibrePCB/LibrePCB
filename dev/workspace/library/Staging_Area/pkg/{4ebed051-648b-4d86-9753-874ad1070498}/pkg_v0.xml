@@ -16,6 +16,7 @@ Name: CSM-7X-DU
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{84e99d03-88ee-4e12-ba11-cf0b3685d5e2}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

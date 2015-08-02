@@ -16,6 +16,7 @@ Name: R1218
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{3d38b934-b6be-439b-9a06-b4c359819908}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

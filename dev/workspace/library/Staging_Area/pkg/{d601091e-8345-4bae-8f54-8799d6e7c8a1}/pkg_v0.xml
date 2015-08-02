@@ -16,6 +16,7 @@ Name: YC15B6
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{47d61d43-2a9e-4f7a-9907-05773b95532d}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: SIL05C
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{bfaabd84-fcbe-4c8e-8f98-5d8b90cb4f37}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

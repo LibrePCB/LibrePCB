@@ -16,6 +16,7 @@ Name: TLUV5300
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{fdd90f82-c071-4800-bb64-ce8fc37d54fb}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

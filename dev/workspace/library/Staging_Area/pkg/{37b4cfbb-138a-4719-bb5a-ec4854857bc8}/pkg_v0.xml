@@ -16,6 +16,7 @@ Name: TO218L
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{e03828ec-cba7-4550-9f56-e04c05d42c2b}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

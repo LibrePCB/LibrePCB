@@ -16,6 +16,7 @@ Name: R4527
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{8e2c3a89-a999-49da-a765-c2d23c78e3a2}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -15,6 +15,7 @@ Name: SOIC8_V2
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{34524631-e2c9-4584-bc1b-720bc35da8e6}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

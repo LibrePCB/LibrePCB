@@ -15,6 +15,7 @@ Name: FE08
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{f436124c-3029-420b-a298-edbd1cf6266c}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: C221B1B
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{d819242f-0157-47bc-b753-3afaf1726472}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: C075-032X103
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{e2644e49-299b-4534-8efa-b88de955616c}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

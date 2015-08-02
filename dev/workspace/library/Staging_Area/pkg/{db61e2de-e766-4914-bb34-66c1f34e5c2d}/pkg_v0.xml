@@ -16,6 +16,7 @@ Name: L2825P
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{459c6138-45a3-46a1-add6-ee17558178f3}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

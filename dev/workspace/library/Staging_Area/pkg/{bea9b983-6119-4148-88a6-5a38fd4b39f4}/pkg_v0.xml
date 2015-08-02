@@ -15,6 +15,7 @@ Name: SOD323-R
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{53b26933-88db-4e56-b22b-04ff1c7ca411}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

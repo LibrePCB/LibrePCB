@@ -17,6 +17,7 @@ Name: LP2C63-ST-RGB-SR0
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{9bc225ef-a68f-4da3-b3f6-dd9ad0c81be3}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -15,6 +15,7 @@ Name: SO20_SOT163-1-R
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{085b809d-73f7-4aef-b9b8-f70915091b7b}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

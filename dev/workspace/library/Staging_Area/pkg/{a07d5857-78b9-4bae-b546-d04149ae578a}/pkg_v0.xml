@@ -16,6 +16,7 @@ Name: P6T15
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{cc7750b4-fbcc-4bab-8229-ddfa74b3247e}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

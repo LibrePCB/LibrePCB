@@ -16,6 +16,7 @@ Name: SG-615
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{9d537bb6-c527-4616-b164-793dda1194ae}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

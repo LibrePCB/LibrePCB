@@ -16,6 +16,7 @@ Name: SANYO-OSCON_SMD_C6
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{be939284-8fca-4fe3-92a0-5cfc5c74a312}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

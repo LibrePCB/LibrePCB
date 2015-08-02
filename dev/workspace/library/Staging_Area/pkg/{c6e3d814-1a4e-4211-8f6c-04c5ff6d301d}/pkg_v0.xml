@@ -17,6 +17,7 @@ Name: VTA56
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{07da0346-526f-4340-8450-a69bbe995ac2}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

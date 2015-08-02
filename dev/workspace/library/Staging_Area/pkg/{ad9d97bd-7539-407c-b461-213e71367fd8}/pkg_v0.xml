@@ -17,6 +17,7 @@ Name: 085CS_1R
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{959a91d8-8d84-4dd3-9417-5d92bea576c6}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

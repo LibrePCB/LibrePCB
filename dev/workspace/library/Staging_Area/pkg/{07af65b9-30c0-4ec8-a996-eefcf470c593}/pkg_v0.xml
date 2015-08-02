@@ -15,6 +15,7 @@ Name: PANASONIC_E
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{c7d5badb-a076-46ca-b54b-3cd65bc77620}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

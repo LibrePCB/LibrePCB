@@ -15,6 +15,7 @@ Name: CTRIMTZBX4
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{3499687f-e242-401b-9323-cdbd026baabc}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

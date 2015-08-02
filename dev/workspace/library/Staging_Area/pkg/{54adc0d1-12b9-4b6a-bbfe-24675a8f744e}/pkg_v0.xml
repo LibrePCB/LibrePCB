@@ -16,6 +16,7 @@ Name: RTRIM3296Y
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{7ddf25cd-67ba-43cc-8e3f-720eb8a646c3}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

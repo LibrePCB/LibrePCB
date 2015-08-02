@@ -16,6 +16,7 @@ Name: W51
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{4b091bc9-4317-445b-905f-04757e3f6fab}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

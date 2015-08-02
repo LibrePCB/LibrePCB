@@ -16,6 +16,7 @@ Name: SMBG
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{f926ac08-161e-448b-9849-bd035047446f}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

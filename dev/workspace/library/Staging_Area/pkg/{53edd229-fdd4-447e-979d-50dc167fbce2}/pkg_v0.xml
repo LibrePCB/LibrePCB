@@ -16,6 +16,7 @@ Name: C102_152-062X184
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{72c3521f-4d10-4638-be4e-2dda50f97275}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

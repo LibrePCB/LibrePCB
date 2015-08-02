@@ -16,6 +16,7 @@ Name: LZC-00CW40
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{c640f488-2ae5-48ac-b443-d640b982585f}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

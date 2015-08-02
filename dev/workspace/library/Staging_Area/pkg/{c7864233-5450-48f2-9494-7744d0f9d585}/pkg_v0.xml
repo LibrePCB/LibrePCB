@@ -16,6 +16,7 @@ Name: GF1
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{5b9f3d96-66d5-4a0e-a38a-62266dc54537}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

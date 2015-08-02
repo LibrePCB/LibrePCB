@@ -15,6 +15,7 @@ Name: MA17-2
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{83552fb8-e2c5-468f-b3a6-afa4bd57a946}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

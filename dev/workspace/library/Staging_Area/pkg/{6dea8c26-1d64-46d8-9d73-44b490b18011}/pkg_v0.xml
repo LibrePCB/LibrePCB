@@ -16,6 +16,7 @@ Name: E7,5-16
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{b0f76b84-2aac-4075-8b39-ef8d8ae3e7d4}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

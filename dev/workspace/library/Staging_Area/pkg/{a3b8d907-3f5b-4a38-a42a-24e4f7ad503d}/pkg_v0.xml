@@ -16,6 +16,7 @@ Name: 6000-XXXX-RC
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{5ebd41be-8f3e-4610-af9b-2ebf26f6b23b}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

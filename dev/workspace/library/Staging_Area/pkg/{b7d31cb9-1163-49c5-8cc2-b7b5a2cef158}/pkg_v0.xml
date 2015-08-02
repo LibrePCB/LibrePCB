@@ -16,6 +16,7 @@ Name: ETR4
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{daaef17d-1c90-44f3-9508-b6ae66ecb393}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

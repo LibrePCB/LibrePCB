@@ -16,6 +16,7 @@ Name: IRL80A
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{22e4b737-5a82-41f6-90d0-510372fc6d2e}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: C225-108X268
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{2df84373-eed8-470d-8b04-ae9a920f2f42}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

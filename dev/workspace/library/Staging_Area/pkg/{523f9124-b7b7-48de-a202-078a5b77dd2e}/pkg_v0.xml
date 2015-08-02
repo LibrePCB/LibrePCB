@@ -16,6 +16,7 @@ Name: TO220CSH
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{53834c48-1fa0-4984-9a76-edd201efb226}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -17,6 +17,7 @@ Name: TC49
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{00eabc0d-e778-47cc-b094-df34cb4158be}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

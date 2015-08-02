@@ -15,6 +15,7 @@ Name: ZDIO-5
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{ed345f2a-f12a-4e57-949b-a7caffcad53d}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

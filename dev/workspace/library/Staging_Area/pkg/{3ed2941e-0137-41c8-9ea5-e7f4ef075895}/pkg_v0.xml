@@ -16,6 +16,7 @@ Name: RTRIM64P
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{a4f5a492-8cf7-4f73-b4a9-f1466a629bda}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

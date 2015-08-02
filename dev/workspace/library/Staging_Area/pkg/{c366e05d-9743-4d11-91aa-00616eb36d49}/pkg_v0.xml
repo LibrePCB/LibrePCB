@@ -15,6 +15,7 @@ Name: MA18-2
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{f3099d77-ef28-4aac-a40d-b54f1f3b6c9c}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

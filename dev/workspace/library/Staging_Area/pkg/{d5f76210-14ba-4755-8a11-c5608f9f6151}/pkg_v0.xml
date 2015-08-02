@@ -16,6 +16,7 @@ Name: LD266
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{c6ef1948-91a1-4f44-bcbe-62143fb57854}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

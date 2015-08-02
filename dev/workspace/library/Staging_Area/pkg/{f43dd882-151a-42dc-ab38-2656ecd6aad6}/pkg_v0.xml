@@ -15,6 +15,7 @@ Name: MM39SL
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{a39753a1-31ac-4948-a3ca-788bd26d2dd0}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

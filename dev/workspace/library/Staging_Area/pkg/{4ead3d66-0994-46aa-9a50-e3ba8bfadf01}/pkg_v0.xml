@@ -16,6 +16,7 @@ Name: M-5
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{d5a49dd2-ed3e-48c4-aa37-2dc8c20a664e}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: TO220ACK
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{8067ec9d-9311-47ec-818a-700f441566d8}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: UD-8X10_NICHICON
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{5de5d527-c703-49b5-bef5-032d7078e4d5}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -15,6 +15,7 @@ Name: C1608
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{61fd8086-130c-4299-b63b-4f2151333365}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

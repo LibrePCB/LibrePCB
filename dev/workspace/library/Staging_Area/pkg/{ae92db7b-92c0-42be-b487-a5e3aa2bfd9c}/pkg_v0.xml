@@ -16,6 +16,7 @@ Name: Z-POWER-LED-DOME-TYPE
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{21b8fbbb-e915-4ea1-a41f-a04b4efdf31d}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

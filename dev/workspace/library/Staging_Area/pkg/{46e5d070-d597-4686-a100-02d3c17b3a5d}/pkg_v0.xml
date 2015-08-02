@@ -15,6 +15,7 @@ Name: R1206
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{95e55ff1-3db6-46b2-8319-0d0a7420d15f}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

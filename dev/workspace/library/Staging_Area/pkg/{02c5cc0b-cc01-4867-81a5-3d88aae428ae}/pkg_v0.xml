@@ -16,6 +16,7 @@ Name: MICRO-SIDELED
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{4704d4f6-966b-43c8-9e5c-a3fdeeb21977}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

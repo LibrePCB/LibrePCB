@@ -15,6 +15,7 @@ Name: DO214BA
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{f94621d3-0fb9-4ff8-83a5-97b0513e5a3b}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

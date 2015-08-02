@@ -15,6 +15,7 @@ Name: MAR05-1
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{3afe33ba-ce71-440c-91fc-78af033ab045}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

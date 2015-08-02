@@ -16,6 +16,7 @@ Name: RTRIMT18
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{018c5fd2-f773-492d-96a2-1c5f0719e9b4}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -15,6 +15,7 @@ Name: MA09-2W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{88625dca-abca-4a7f-8003-a0f8773bcc22}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

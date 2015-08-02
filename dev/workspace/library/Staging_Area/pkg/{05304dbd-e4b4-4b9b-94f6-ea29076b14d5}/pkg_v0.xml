@@ -16,6 +16,7 @@ Name: CTRIM808-1
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{87497a1c-97f2-4ca4-89da-47561c036b5f}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

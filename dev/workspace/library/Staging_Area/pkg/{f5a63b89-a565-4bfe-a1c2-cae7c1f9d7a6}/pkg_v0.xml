@@ -16,6 +16,7 @@ Name: SOD323W_INFINEON
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{de90e90a-1479-421f-94c7-2a4de5332d85}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

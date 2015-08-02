@@ -16,6 +16,7 @@ Name: OSTAR-LENS_
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{26a0969d-2281-4c2a-b3e7-694c536f5cb7}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

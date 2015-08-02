@@ -16,6 +16,7 @@ Name: 0204/5
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{f7c9f0a9-4d39-4280-8edc-aba4e29347e5}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

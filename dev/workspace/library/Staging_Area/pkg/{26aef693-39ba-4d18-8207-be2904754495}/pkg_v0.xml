@@ -16,6 +16,7 @@ Name: P3-15
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{5dd8eda3-13d0-45c3-8005-a5d48837e477}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

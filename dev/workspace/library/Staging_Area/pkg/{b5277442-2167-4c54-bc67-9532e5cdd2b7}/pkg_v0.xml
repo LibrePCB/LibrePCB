@@ -17,6 +17,7 @@ Name: FA-128
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{d56a7628-4f1f-44e1-b7ee-1f41c58a713c}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

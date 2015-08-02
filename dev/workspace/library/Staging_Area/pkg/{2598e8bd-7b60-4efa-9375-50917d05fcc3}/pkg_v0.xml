@@ -16,6 +16,7 @@ Name: MC-306
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{90197db5-36df-456e-bbf9-8347dad1a81e}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

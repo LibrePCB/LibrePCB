@@ -16,6 +16,7 @@ Name: E35-16
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{9dcf70c9-0f47-488a-9b0c-b99ef423a6a9}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

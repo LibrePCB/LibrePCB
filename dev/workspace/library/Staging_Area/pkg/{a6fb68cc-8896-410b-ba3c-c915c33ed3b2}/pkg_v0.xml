@@ -16,6 +16,7 @@ Name: E45-16
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{86fcee20-1d8a-4e1f-a111-b108922c1fbd}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

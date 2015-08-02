@@ -16,6 +16,7 @@ Name: M2012
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{dc524aea-ed7a-4905-876c-e3729516cb45}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: C1702-05
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{b27f6214-6acb-4a57-b97c-46b86a58dc80}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: IRF-3
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{cddf49f3-c1cb-4e86-b561-c3c05e9b3356}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

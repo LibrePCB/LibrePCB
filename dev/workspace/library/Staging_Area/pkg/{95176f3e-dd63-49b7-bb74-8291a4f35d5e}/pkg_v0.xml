@@ -16,6 +16,7 @@ Name: RTRIMT93YA
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{58af6cbe-9b8d-4c2d-be57-a67d47d1f155}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

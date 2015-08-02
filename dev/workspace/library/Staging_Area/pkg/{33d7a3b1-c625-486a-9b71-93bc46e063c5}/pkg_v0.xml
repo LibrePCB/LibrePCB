@@ -16,6 +16,7 @@ Name: PIS2816
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{6643e61a-a2c6-4544-9d02-d5b04f551722}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

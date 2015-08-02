@@ -15,6 +15,7 @@ Name: SC70-3-R
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{e99081de-6edd-4017-8630-3cae804ed29d}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

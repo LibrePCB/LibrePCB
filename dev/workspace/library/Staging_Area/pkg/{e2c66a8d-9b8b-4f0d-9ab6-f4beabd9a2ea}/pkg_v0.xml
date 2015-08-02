@@ -16,6 +16,7 @@ Name: CLN6A
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{7dce68d8-fa1d-46fd-82f4-4e49afa72d00}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

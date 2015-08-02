@@ -16,6 +16,7 @@ Name: EB30D
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{7704d442-6007-40eb-902f-d270bff5ea51}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

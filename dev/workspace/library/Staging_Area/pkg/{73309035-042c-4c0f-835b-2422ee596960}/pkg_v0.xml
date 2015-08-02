@@ -15,6 +15,7 @@ Name: C4532
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{217acf25-3f52-4b58-a51d-53b6869e4cea}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

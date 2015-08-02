@@ -16,6 +16,7 @@ Name: LED_OFF
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{ea1575ca-8ab8-4a58-986f-1d2735f3342a}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

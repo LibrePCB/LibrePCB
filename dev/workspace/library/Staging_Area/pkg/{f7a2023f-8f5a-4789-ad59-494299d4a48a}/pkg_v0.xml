@@ -16,6 +16,7 @@ Name: SOT93S
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{c8aa6ab3-df41-4f40-abaa-d13d0aaa184e}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

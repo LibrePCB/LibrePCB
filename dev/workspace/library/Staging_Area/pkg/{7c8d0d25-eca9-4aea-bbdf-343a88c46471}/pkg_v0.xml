@@ -15,6 +15,7 @@ Name: 1,6/0,8
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{36392aa0-3d51-4b9d-a346-73aa45d522a1}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

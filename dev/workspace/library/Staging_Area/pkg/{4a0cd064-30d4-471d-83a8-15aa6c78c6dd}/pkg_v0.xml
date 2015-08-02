@@ -16,6 +16,7 @@ Name: TO3P
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{684f9ee3-31bc-4c8a-a8e1-7979cd95eb34}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

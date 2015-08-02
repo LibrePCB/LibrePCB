@@ -15,6 +15,7 @@ Name: R3216
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{606f6306-ee41-4f72-be5e-d16c7837ae3b}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

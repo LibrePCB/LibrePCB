@@ -17,6 +17,7 @@ Name: SO-8
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{f57345db-1718-47ec-a70f-b758fa017df8}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

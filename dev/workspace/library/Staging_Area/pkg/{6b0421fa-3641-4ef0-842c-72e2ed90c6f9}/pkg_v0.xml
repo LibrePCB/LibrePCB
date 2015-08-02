@@ -16,6 +16,7 @@ Name: SANYO-OSCON_9E
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{4607c4d2-a95c-412a-b7e6-244d3ab1843a}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

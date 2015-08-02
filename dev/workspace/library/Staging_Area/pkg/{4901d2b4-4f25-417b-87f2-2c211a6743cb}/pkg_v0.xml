@@ -16,6 +16,7 @@ Name: LED10MM
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{1cb16168-46d0-4216-ac47-ac42de54682a}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

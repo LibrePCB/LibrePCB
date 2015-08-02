@@ -15,6 +15,7 @@ Name: CTRIM3018_11
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{efea1060-3432-4541-bd95-fcf1e41bad50}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

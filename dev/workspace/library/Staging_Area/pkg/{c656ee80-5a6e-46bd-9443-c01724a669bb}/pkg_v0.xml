@@ -16,6 +16,7 @@ Name: DO27-15
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{3dad3423-5809-4678-9f2d-2c53357d5a6c}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

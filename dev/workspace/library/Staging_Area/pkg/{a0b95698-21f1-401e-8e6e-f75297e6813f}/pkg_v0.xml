@@ -16,6 +16,7 @@ Name: E45-22
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{69065ffa-1b07-497e-8d96-1e8e66aebde2}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

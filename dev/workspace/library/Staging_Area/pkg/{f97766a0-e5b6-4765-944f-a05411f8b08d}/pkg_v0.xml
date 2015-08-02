@@ -16,6 +16,7 @@ Name: SCD80_INFINEON
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{4d2decbb-c969-492b-aa05-b873dcbe12c4}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

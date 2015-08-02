@@ -16,6 +16,7 @@ Name: M-A
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{7da1c83a-6f1e-493e-95be-1a96fff7e261}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

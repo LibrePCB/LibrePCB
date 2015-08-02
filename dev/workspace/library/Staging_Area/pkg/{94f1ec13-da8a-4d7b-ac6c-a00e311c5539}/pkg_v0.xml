@@ -15,6 +15,7 @@ Name: CTRIMCV05
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{415b7e15-f1b5-463c-9e33-fa4d332a13b7}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

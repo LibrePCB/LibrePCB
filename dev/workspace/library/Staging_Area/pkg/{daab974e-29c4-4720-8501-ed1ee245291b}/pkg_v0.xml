@@ -15,6 +15,7 @@ Name: R0402
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{1abd2df7-4393-46bb-8aa5-fb7c23b2717e}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

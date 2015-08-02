@@ -15,6 +15,7 @@ Name: R0805W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{b0406006-4268-43c5-b50c-167dfe30e478}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

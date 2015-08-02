@@ -16,6 +16,7 @@ Name: E25-9
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{1fb46379-84ce-4ff8-bfb2-248bf6e4a431}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

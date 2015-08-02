@@ -16,6 +16,7 @@ Name: 0207/15
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{3679fa93-8435-489b-80c4-1da6925b74f1}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

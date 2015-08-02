@@ -15,6 +15,7 @@ Name: FE06W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{4c935af3-24a8-449a-a6b9-e22be5d3f0e4}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

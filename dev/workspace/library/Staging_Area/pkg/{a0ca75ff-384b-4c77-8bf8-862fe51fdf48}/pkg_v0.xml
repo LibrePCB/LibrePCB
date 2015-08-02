@@ -15,6 +15,7 @@ Name: HC33U-H
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{7b1b9e90-da32-4ddb-bad4-a7f62225c28b}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -15,6 +15,7 @@ Name: SOT89-W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{7260e635-4112-4519-9d5d-6286682ec660}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

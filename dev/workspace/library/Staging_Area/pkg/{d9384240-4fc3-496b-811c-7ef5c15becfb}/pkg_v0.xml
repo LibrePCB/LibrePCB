@@ -16,6 +16,7 @@ Name: P-LCC-2-TOPLED-RG
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{bac45250-4c58-4f3e-afa7-d776a1c20b08}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

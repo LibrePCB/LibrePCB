@@ -16,6 +16,7 @@ Name: D/7343-31W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{1b881701-e392-44c8-8dc2-2c35d32b99d7}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

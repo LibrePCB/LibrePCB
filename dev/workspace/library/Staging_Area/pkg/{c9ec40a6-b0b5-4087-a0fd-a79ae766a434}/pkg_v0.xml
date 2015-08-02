@@ -16,6 +16,7 @@ Name: E2,5RE
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{d1a3d300-e485-4226-b110-532a14896ed8}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

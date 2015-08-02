@@ -15,6 +15,7 @@ Name: RTRIM4G/J
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{99d8602a-c0f6-40f0-815a-d268f01a2968}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

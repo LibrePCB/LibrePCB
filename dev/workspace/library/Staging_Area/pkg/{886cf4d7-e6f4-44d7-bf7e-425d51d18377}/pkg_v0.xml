@@ -16,6 +16,7 @@ Name: POWERDI323
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{72850286-4196-4903-b8a1-8c1110b96bad}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

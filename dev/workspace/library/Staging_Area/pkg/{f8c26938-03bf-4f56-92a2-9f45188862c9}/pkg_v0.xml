@@ -15,6 +15,7 @@ Name: RTRIM74X
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{81d55630-b264-4cb5-bdf3-db39a156399e}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

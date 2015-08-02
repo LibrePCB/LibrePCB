@@ -16,6 +16,7 @@ Name: TO220CH
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{0fc8b6e0-4b41-46e4-8497-c88b6bc98f47}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: W724C0
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{c291fcd1-e513-4bf7-a1c2-2678ba627af7}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

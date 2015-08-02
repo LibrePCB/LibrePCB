@@ -16,6 +16,7 @@ Name: MINI_MELF-0204W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{a63ad97d-7927-4dc3-8a4b-f1b116b09927}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: UM1
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{4452448a-5db9-44f3-a465-3ba0a139a530}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

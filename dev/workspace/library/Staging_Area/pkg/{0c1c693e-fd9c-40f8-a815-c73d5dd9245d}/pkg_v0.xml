@@ -15,6 +15,7 @@ Name: L2012C
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{475b4255-db0b-487c-b618-89718bf61208}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

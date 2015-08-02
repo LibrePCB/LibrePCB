@@ -16,6 +16,7 @@ Name: LSU260
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{a2fc2abf-1dae-47f7-974c-8e660f826861}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

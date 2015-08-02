@@ -15,6 +15,7 @@ Name: HC49U-V
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{dd680200-6bb5-4dee-8248-5f804512a8f9}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

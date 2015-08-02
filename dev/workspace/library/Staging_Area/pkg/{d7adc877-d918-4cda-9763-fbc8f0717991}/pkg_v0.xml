@@ -16,6 +16,7 @@ Name: IR-2
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{190ffe80-4fbe-40bf-8a18-a7f16ab82a50}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

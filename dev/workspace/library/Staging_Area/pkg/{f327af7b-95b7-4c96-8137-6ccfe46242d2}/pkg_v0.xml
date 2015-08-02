@@ -16,6 +16,7 @@ Name: P6-15
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{a6159652-4216-4f67-800e-b35874cae5a2}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

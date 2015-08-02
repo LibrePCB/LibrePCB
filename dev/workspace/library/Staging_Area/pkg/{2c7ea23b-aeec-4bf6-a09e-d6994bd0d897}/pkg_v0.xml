@@ -15,6 +15,7 @@ Name: SOD123FL
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{e9411116-be6d-4a67-a8e4-895fd21f7d5a}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

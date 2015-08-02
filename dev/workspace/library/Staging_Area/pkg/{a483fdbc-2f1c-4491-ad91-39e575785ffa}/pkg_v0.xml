@@ -16,6 +16,7 @@ Name: C025-024X044
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{ede2e5fb-266e-4953-a5f0-c4532b099c8a}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

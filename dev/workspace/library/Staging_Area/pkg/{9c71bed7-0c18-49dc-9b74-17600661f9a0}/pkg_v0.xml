@@ -15,6 +15,7 @@ Name: SC59-R
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{4d600538-f6c6-4f8f-9524-89a9202310c9}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

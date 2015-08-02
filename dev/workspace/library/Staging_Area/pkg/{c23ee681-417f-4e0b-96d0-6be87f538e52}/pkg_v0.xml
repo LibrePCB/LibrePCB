@@ -16,6 +16,7 @@ Name: LZR185
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{929bddde-fe44-45ca-b3fb-789d26a0e97b}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

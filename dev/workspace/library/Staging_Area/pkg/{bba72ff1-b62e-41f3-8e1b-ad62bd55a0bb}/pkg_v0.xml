@@ -16,6 +16,7 @@ Name: LED3MM
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{00b60b04-991d-4d1c-adaa-26f3c4b3c605}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

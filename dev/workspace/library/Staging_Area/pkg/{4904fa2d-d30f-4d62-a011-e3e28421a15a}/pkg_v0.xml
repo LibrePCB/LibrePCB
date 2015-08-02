@@ -15,6 +15,7 @@ Name: 2,15/1,0
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{283fd380-396a-4e92-a52e-75e67b3c582c}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

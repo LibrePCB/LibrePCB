@@ -16,6 +16,7 @@ Name: LAL03KH
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{74f8c965-688a-4213-b7e4-9b04f1a5a3ca}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

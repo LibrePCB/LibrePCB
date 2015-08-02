@@ -16,6 +16,7 @@ Name: C275-154X316
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{be61a13e-c1bd-4b5e-9054-2cd3cfd12243}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: DO220S
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{6f3af821-ae07-4986-b860-2a5b651f6e12}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

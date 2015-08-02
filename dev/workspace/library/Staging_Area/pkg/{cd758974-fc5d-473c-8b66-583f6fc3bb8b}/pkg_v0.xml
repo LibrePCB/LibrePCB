@@ -15,6 +15,7 @@ Name: P128-35
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{87a51019-0dd4-4b44-a17d-935c9664f6df}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

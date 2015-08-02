@@ -16,6 +16,7 @@ Name: E1,8-4
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"></keywords>
         <footprint>{258e4f57-471f-4d9e-b456-cb441cf16c4a}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -15,6 +15,7 @@ Name: FE05W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{5deeeead-eccf-4371-953c-6490ab1a9c0e}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: C182A
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{b18feeef-ba63-4169-961e-7c5477f32015}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: TAP5-80
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{36055d30-154c-4e54-b84d-6e462c9f40b0}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

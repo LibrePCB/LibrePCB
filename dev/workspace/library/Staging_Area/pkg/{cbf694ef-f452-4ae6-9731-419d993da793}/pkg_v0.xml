@@ -15,6 +15,7 @@ Name: RTRIM74W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{9955d887-2620-4889-b937-5a98c28b3814}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: R1210W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{0e65f972-7f78-4ce7-9728-e8687eb8a7f3}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

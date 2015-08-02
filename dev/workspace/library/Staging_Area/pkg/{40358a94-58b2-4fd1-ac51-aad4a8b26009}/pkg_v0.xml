@@ -16,6 +16,7 @@ Name: E25-10
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{d0d63726-a845-4137-83e7-976ac0fdd692}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

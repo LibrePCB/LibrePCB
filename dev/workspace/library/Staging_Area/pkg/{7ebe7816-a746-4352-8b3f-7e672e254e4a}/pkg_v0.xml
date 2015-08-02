@@ -16,6 +16,7 @@ Name: XC10B6
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{4be58be0-e5a7-4eb9-bfad-aaced90e6239}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

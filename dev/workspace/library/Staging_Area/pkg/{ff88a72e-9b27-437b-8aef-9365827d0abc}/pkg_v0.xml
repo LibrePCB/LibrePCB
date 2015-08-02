@@ -16,6 +16,7 @@ Name: F126Z10
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{469e95a8-ac54-4d13-8361-89039cfdeb54}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

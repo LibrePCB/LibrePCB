@@ -16,6 +16,7 @@ Name: XC27B11
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{90721ea4-a4b7-45ab-8d9d-8dbd0e6dac47}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -17,6 +17,7 @@ Name: OSRAM-SIDELED
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{b63faaa1-18de-4653-bc5f-8d9e5eb95708}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

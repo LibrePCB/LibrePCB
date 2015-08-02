@@ -16,6 +16,7 @@ Name: C225-074X268
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{865b47b4-5b00-4d3e-9441-1409faebf66f}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

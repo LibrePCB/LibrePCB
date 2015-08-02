@@ -16,6 +16,7 @@ Name: E5-8,5
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{90693bd7-934f-4479-9c32-2f8ebe92a438}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

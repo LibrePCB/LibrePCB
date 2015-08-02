@@ -17,6 +17,7 @@ Name: CTRIM3040.448
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{b7fec14d-bbb3-490a-9cf6-6448b82dcbfb}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

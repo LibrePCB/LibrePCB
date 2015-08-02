@@ -15,6 +15,7 @@ Name: FE13-2W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{7039d3ec-36f7-4b89-a8bd-526ced73e3eb}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

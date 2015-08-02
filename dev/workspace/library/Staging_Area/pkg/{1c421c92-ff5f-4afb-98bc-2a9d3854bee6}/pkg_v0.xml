@@ -16,6 +16,7 @@ Name: TO236
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{e0f947fc-457d-4abe-99c5-1d6203053737}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

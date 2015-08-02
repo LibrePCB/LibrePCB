@@ -15,6 +15,7 @@ Name: FE07-2W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{8ddcb28e-317a-4f5d-adbe-11d9a1fb7766}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

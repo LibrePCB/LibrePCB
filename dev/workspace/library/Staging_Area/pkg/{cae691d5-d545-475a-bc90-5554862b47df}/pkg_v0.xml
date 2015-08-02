@@ -16,6 +16,7 @@ Name: C050-030X075
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{6b914d9e-20ae-425a-bd80-fecb43c7ddbf}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

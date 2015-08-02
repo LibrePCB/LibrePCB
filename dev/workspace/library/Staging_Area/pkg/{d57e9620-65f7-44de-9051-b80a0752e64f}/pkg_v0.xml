@@ -16,6 +16,7 @@ Name: LAP02KR
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{bda4ee83-e948-4175-90b6-6ba4ff334030}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

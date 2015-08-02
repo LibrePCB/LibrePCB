@@ -16,6 +16,7 @@ Name: SGB-10
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{e0d8889a-7d27-40e9-b3e1-475d04ba4253}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: SOT54A
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{11145b15-5424-4f93-be67-0c370481328c}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

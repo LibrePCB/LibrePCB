@@ -15,6 +15,7 @@ Name: 86SMX
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{1ef26de0-4655-4841-afcb-8b77e84ef6c4}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

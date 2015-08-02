@@ -15,6 +15,7 @@ Name: C2012
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{2b7ac931-7855-4f1e-bbfe-c07f2c6c0d89}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: EB22,5D
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{9fe5f821-90f2-41c0-b33a-7dde9b1dd659}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

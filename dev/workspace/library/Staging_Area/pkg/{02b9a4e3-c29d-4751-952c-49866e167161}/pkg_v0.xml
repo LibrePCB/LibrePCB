@@ -16,6 +16,7 @@ Name: B/3528-21W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{96cb1cc1-6fbe-4e1c-b6d6-dfdcb1af211a}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

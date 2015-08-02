@@ -15,6 +15,7 @@ Name: FE10
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{1a4fbbaa-c687-407e-96f3-0deeee6a5e68}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

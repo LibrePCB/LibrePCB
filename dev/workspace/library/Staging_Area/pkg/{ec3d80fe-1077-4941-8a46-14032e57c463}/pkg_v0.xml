@@ -16,6 +16,7 @@ Name: SOD57-10
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{3561c02a-11bd-4bf3-a7e7-ff2e28439728}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: CB429-17
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{6cf40b63-11a3-4625-85e5-c3fc35bbc6f9}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

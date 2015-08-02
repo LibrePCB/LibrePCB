@@ -15,6 +15,7 @@ Name: JU20
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{00248abb-7482-4457-89a0-0438a0f8fb9a}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

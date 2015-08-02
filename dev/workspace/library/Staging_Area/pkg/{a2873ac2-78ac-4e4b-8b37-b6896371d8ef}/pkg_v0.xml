@@ -16,6 +16,7 @@ Name: TO220AC
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{ea4c412d-65ff-4d57-b10a-5f8de42d75be}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: SPHWHTHAD605S0W0U4
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{bf92921d-3e4e-4f0e-baf8-83b08dcdb620}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -17,6 +17,7 @@ Name: 153CLV-1012
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{d9383aa5-3754-49eb-bc86-dd2e3af3b8bb}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

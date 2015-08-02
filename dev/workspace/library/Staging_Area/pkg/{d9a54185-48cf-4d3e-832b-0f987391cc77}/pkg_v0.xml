@@ -16,6 +16,7 @@ Name: CREE-XLAMP-XM-L
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{7c166d31-c830-4559-88de-bd3d87763dee}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

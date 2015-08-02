@@ -16,6 +16,7 @@ Name: F126-10
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{24cbc2fd-b993-4a6e-9465-7b21d7608d1d}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

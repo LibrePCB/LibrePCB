@@ -16,6 +16,7 @@ Name: ACULED-RGB
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{3b1c8568-0012-4c9e-8eb9-2903404f29de}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

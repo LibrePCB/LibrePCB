@@ -16,6 +16,7 @@ Name: 0922/22
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{506bde88-bf2c-43c1-8dce-1d2df6f83842}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

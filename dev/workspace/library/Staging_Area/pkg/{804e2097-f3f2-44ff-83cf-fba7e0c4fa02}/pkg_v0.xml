@@ -15,6 +15,7 @@ Name: MA20-2
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{ff8d284a-6fb3-4c7a-9e45-6958fdac4375}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

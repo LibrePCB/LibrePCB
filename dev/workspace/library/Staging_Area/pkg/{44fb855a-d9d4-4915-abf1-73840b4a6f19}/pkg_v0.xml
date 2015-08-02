@@ -16,6 +16,7 @@ Name: C375-192X418
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{df8d1ecd-bfb7-4e4f-aa09-cbc43f3dfdbc}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

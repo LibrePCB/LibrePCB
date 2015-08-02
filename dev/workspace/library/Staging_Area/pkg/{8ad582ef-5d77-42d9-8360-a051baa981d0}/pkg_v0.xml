@@ -15,6 +15,7 @@ Name: MA09-1
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{a2fcac65-1c07-4ac2-9abd-86e1b9ba0c7b}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

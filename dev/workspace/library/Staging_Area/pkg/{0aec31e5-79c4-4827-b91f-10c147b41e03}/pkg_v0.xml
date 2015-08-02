@@ -15,6 +15,7 @@ Name: ZDIO12.5
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{0b2edb45-8603-4497-93a3-2b1e3592c788}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

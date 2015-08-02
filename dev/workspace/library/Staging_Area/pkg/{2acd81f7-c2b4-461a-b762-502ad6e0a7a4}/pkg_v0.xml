@@ -19,6 +19,7 @@ Name: SMARTLED-TTW
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{28f3548d-11e3-4a03-b541-3ccebd39fe83}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

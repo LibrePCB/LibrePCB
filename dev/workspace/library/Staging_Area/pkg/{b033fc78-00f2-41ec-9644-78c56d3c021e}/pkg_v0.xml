@@ -16,6 +16,7 @@ Name: LUXEON_REBEL-REFERENCE
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{6bc95917-9345-4975-b06b-33be7de28fe6}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

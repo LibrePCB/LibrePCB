@@ -16,6 +16,7 @@ Name: L8530M
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{60db7683-35ca-40b0-9478-84354747a674}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

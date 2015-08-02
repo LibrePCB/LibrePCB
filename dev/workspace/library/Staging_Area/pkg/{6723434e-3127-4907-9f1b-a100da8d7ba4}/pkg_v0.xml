@@ -15,6 +15,7 @@ Name: SG51
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{2bfc7802-334e-4490-afda-02ede1fb06aa}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -15,6 +15,7 @@ Name: SOD110-R
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{1a5356a7-9d57-4faf-9b6f-cdd4ce3b9362}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

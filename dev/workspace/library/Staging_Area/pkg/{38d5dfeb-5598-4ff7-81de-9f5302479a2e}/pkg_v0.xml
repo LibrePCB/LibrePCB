@@ -15,6 +15,7 @@ Name: D-12.5
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{ee26f8d1-0448-4247-a6cc-4f82aa3c91ab}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

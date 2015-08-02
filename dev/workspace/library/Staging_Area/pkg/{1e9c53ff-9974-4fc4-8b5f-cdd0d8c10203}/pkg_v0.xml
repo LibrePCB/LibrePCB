@@ -15,6 +15,7 @@ Name: RTRIM3299W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{70772b79-d010-4b82-9df9-dd3e48ad3331}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

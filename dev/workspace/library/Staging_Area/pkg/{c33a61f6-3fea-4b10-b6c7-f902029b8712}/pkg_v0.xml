@@ -16,6 +16,7 @@ Name: SOD61B
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{3322bb71-105a-490e-9065-4d9608f90c00}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

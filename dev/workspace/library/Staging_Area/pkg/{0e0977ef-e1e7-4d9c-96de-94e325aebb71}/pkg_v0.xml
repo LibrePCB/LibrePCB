@@ -16,6 +16,7 @@ Name: LRTB_G6SG
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{e6bb0750-31c7-426d-994d-80e8a74a285f}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

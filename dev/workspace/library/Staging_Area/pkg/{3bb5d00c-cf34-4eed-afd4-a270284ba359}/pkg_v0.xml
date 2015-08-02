@@ -16,6 +16,7 @@ Name: UM-5S
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{3c80132b-feb5-4638-b406-0a56ac60ff5e}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

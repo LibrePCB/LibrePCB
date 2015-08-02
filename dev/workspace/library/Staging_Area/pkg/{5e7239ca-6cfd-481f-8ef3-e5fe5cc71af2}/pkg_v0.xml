@@ -15,6 +15,7 @@ Name: P-LCC4-T676
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{dc0b91f4-22cc-420f-b0de-a7d00f27a2b2}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

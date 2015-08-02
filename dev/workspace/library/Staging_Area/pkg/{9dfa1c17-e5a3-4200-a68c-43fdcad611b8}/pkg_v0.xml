@@ -15,6 +15,7 @@ Name: C3225
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{34003571-13a3-4764-b516-d9c9e4dece53}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

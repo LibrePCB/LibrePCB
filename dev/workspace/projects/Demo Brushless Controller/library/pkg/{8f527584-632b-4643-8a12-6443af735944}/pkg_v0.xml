@@ -15,6 +15,7 @@ Name: SOIC08_IR
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"></keywords>
         <footprint>{8be0901b-7ea3-423a-b28f-91b19e13c6a1}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: TFI0510
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{d557088a-5fc1-4ca2-81aa-1704797ec7a9}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

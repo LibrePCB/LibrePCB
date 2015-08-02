@@ -15,6 +15,7 @@ Name: CTRIMTZ03
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{8bbf98fd-57b5-4afc-828e-1e3d417eda0d}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

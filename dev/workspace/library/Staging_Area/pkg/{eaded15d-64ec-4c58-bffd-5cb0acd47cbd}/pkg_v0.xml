@@ -16,6 +16,7 @@ Name: GM5WA94310A
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{0739f138-7eff-4304-babc-2d5b667e4db4}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

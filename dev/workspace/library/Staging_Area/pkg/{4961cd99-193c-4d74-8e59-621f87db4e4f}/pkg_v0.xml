@@ -16,6 +16,7 @@ Name: P1Z12E
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{5b43865a-6f10-44c3-ad0c-c03623274437}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -15,6 +15,7 @@ Name: SOD106-W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{0d1f8fb8-027d-43ba-93ae-5028d2ce2099}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

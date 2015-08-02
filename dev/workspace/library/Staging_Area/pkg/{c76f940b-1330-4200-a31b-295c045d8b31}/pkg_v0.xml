@@ -19,6 +19,7 @@ Name: CHIPLED-0603-TTW
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{f933c993-3944-4586-b92e-33dce3ac379e}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

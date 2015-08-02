@@ -15,6 +15,7 @@ Name: A/3216-18R
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{cdce61c2-9dfd-4723-8f18-538ea99d30e5}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

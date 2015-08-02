@@ -16,6 +16,7 @@ Name: EU43-14
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{66558d0e-a1b2-471f-b084-53c84eef065b}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

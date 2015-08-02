@@ -15,6 +15,7 @@ Name: SC59-W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{4649e37e-20dd-41a3-acf5-070dd086aa6f}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

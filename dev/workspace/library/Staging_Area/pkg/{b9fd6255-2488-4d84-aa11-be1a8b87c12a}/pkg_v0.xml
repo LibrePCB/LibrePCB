@@ -15,6 +15,7 @@ Name: FE20-2
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{c1d1b66f-3397-447c-a652-f2caba86f5dd}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

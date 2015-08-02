@@ -16,6 +16,7 @@ Name: SOD64-12
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{bf287d89-bd29-415e-8d7e-8253e4fad9e0}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

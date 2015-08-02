@@ -16,6 +16,7 @@ Name: CREE_XLAMP
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{3114730c-52f9-4e06-847b-04c46b3a7aa0}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: C1206K
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{fd070c1b-6aa9-4780-b16e-cc219f1ac9ee}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

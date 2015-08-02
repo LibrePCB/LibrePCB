@@ -16,6 +16,7 @@ Name: 0414V
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{9dc031da-e7d1-4dff-9c22-8905cc55c665}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: LAL04KB
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{3f19a00c-1f28-4352-8206-32c10c5d1412}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

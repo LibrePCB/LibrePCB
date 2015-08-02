@@ -15,6 +15,7 @@ Name: SOD87-W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{f0450c11-3d7b-461c-8fe7-c9790acb2bff}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

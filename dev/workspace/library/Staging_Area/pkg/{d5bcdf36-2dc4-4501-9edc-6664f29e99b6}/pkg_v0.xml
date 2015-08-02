@@ -15,6 +15,7 @@ Name: MA10-1
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{05853627-d8a3-4d6f-8e62-7906b9810b34}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

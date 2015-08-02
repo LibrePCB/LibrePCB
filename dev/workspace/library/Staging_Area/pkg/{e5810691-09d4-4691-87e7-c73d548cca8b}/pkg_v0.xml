@@ -16,6 +16,7 @@ Name: P1Z12
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{63e66347-8e95-4697-9704-beb9ba356a02}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

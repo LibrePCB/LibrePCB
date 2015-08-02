@@ -16,6 +16,7 @@ Name: SANYO-OSCON_SMD_F12
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{a6e9b6d6-fc47-4cd4-9b32-14390da103b7}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

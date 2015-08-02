@@ -15,6 +15,7 @@ Name: FE15
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{96747f3c-4063-49c3-9d20-daa539c48c33}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

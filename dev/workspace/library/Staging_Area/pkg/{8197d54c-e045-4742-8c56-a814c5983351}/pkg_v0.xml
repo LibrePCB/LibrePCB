@@ -16,6 +16,7 @@ Name: F11/8A
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{e9a0f2d7-43eb-4d22-848c-d5511f380911}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: SC-5
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{c46f3992-e71f-4e15-b48f-38dac2311a6b}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

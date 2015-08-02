@@ -16,6 +16,7 @@ Name: SOD81Z
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{64d0555b-5d85-4640-b1d8-9bf97d04f565}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

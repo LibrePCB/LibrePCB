@@ -16,6 +16,7 @@ Name: E22-6
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{34e37736-0cf2-404c-b7d3-3c3f68f9ec08}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: R2512W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{cdf8ff9a-4ab0-4b64-9081-48f7b6418baa}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

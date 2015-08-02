@@ -18,6 +18,7 @@ Name: 2200-15.24
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{53d54d64-68da-45f4-8034-f56465ef403c}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

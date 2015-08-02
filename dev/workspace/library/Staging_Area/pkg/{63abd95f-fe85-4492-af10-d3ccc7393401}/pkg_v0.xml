@@ -16,6 +16,7 @@ Name: TT5D9
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{a843256e-afd6-488a-81a9-71597677d674}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

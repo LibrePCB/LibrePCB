@@ -16,6 +16,7 @@ Name: R6332W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{338808c1-9a7c-4de0-89cf-fc7359bcc0fc}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

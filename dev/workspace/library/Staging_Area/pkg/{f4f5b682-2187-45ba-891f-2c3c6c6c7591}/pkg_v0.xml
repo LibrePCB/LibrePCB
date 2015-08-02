@@ -15,6 +15,7 @@ Name: E/7260-38R
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{bc34b0f1-b8a8-4416-a7b6-432018e601b0}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

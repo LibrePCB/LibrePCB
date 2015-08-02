@@ -16,6 +16,7 @@ Name: M3516
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{4ca00dc1-f01f-4b97-9761-7a772ecb1c21}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: 0411V
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{7d96daf2-9609-47e2-983e-8d9f2e208de1}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

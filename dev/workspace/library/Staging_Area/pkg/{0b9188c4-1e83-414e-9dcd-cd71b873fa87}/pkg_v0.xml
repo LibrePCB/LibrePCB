@@ -16,6 +16,7 @@ Name: P47F-TOP
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{c4e94304-0633-4220-a8ad-558816a1ca29}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

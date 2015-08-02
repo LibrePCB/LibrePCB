@@ -16,6 +16,7 @@ Name: RTRIM3224X
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{a11c18d1-89ed-4bed-90ac-38d02e1b6f03}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

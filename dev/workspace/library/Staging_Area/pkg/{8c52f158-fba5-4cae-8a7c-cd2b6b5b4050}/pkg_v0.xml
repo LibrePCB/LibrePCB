@@ -16,6 +16,7 @@ Name: SANYO-OSCON_B
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{f1a19bca-6f22-4180-b4b9-92045becff3d}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

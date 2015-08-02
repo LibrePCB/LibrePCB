@@ -16,6 +16,7 @@ Name: NFSG036BT
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{0fbc1963-2191-440c-986a-7df9fb0de0aa}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

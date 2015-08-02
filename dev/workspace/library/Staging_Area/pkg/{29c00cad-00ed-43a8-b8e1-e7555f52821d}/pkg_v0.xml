@@ -15,6 +15,7 @@ Name: FE20-2W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{ad23ff76-fa3c-4010-8a7f-e92d059dace6}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

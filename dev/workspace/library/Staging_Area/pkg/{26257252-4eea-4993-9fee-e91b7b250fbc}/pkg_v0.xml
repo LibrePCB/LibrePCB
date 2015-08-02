@@ -15,6 +15,7 @@ Name: FE06-2
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{4345b083-c4b1-47f0-9a69-6e3373058014}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

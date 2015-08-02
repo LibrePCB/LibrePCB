@@ -15,6 +15,7 @@ Name: C1206
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{8f1c52fc-e0ae-4a0a-acae-cb044a6d413c}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

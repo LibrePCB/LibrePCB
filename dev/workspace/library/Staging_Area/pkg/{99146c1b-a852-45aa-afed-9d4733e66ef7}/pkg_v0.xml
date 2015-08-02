@@ -19,6 +19,7 @@ Name: LUXEON_REBEL
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{54a5c2f2-0427-4d62-b747-480563d7e9da}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

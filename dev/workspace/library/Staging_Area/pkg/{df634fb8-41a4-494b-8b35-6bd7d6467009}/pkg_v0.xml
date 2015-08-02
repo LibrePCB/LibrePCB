@@ -16,6 +16,7 @@ Name: DO41Z10
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{96286fca-11ce-49a7-9e24-9201a09506e1}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

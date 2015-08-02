@@ -16,6 +16,7 @@ Name: HPC0201
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{892f2a31-3832-41f3-8331-985f2fb17605}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

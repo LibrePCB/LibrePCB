@@ -16,6 +16,7 @@ Name: POWERMITE
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{a24d08d3-ba30-4e83-a9c3-1be40b039380}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

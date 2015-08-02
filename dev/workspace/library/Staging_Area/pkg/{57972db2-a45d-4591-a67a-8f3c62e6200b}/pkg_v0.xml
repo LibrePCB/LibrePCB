@@ -15,6 +15,7 @@ Name: FE12-2W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{39d8c870-1594-4457-b2b3-32678aecc32a}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

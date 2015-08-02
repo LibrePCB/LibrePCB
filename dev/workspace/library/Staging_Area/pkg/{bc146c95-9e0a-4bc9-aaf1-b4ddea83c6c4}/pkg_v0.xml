@@ -15,6 +15,7 @@ Name: D-7.5
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{61f27d8a-a4bc-406f-84f8-5b876249df67}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: TO92H
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{3a787f12-47f6-4cd7-a8b0-95a753fe5b97}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: RTRIMT93XB
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{890bee07-e9b0-4c6a-8d18-fc3c0e467341}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

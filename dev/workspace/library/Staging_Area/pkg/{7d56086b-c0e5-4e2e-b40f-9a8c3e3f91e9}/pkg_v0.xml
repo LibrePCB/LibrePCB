@@ -16,6 +16,7 @@ Name: DO218L
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{804fb727-9cef-42cf-a2a8-c46eecf27c27}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

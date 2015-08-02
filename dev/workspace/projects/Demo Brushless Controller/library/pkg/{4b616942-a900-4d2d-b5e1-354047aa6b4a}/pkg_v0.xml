@@ -15,6 +15,7 @@ Name: C0603
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"></keywords>
         <footprint>{d61e4907-6a28-4015-a0be-5885f7cc1bc6}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

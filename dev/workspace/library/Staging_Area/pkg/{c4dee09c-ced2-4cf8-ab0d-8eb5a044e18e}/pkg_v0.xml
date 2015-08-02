@@ -15,6 +15,7 @@ Name: CTRIM3008
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{cd92a7dd-6070-44f2-b91b-d281bfcdabaf}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: R2010W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{a7b73d25-5341-413a-af88-359e8192d811}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

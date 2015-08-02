@@ -17,6 +17,7 @@ Name: TC48
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{5f11d155-dfc4-4ab0-812d-053b8d726a5e}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

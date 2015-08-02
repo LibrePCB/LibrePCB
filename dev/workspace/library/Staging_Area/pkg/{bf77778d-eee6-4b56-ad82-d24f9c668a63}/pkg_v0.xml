@@ -15,6 +15,7 @@ Name: 5-2,5
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{b75f70f2-4b7a-428b-8ab6-e8943fc06d7e}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

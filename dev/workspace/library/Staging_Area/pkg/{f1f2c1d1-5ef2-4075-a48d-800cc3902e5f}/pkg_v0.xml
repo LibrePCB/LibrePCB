@@ -17,6 +17,7 @@ Name: ASF
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{d72d9f73-4180-4bd6-9b59-3ff7e8485eda}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

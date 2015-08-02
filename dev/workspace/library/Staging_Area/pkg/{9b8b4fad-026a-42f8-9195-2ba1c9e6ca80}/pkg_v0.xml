@@ -16,6 +16,7 @@ Name: DO41-7
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{c4ecac5f-da12-488a-84a1-96efadb0a0db}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

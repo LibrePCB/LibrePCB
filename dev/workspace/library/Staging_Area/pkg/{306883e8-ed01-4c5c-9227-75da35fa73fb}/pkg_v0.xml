@@ -16,6 +16,7 @@ Name: SON-10
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{995e964d-1be7-44d3-a13a-0c79cdb54aac}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

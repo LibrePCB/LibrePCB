@@ -17,6 +17,7 @@ Name: 139CLL-3W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{3d87650b-c6ac-4e82-9028-4a893ed6348f}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

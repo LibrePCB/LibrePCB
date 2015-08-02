@@ -15,6 +15,7 @@ Name: SMD1,27-2,54
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{5a86f4e2-00c3-48d0-90a4-7280c1038f55}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: SOT82L
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{fc1bbce7-50fd-4730-92a3-0ab44827149a}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

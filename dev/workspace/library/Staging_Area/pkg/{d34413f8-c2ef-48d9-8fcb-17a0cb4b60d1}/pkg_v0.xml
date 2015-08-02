@@ -15,6 +15,7 @@ Name: L4516C
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{16d497c6-4d8d-4b32-a11f-210dba0e38e2}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

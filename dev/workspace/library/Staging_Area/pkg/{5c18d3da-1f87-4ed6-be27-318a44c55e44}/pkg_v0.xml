@@ -16,6 +16,7 @@ Name: MSA5XXX
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{d3a93a29-8ad9-441e-8fe0-4c35a5adcd58}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

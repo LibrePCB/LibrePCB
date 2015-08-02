@@ -16,6 +16,7 @@ Name: 0309V
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{9491d164-fc2d-48b5-9a6f-1fa7d7e21305}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

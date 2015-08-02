@@ -16,6 +16,7 @@ Name: C1812K
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{e699359a-2645-4ff4-9115-03cb318841b7}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

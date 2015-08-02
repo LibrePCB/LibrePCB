@@ -15,6 +15,7 @@ Name: C0402
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{8b20cda7-50e2-45e6-9f9f-82664d8e6f28}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

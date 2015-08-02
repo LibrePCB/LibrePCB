@@ -16,6 +16,7 @@ Name: WSC4527
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{553edea2-83ce-41fc-a55a-6382cf26ce31}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: P-TO263-7-1
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{a9e9f57c-c445-491f-be06-8f3967167d81}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

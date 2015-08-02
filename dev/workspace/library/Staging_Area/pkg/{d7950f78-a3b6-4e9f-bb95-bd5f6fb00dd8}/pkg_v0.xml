@@ -16,6 +16,7 @@ Name: SMA
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{79d0cc98-af25-464d-bbb4-9326d4385947}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: C275-205X316
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{39cd4470-ebe5-4cc8-99c0-efb044fa3429}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

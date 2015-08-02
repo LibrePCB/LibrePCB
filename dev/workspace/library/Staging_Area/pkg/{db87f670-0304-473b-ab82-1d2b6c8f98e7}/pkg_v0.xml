@@ -17,6 +17,7 @@ Name: TC47
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{e18e3c77-f5dc-4830-a2c5-9bb2b7af2d39}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

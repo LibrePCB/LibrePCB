@@ -16,6 +16,7 @@ Name: E30-10
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{e58b15b2-f591-47fe-91a8-4c927473026b}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

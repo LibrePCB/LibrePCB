@@ -16,6 +16,7 @@ Name: UD-6,3X7,7_NICHICON
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{27fa5777-9aaa-4972-9371-c95cbdc47e0b}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

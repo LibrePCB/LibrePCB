@@ -15,6 +15,7 @@ Name: SOT89-R
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{7a3c34c4-0500-480a-bf03-6efe84147be5}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

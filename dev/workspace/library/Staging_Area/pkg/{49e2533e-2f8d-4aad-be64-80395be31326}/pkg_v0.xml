@@ -16,6 +16,7 @@ Name: KA-3528ASYC
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{2b70b8e3-8c59-44b2-bd34-23c98e588f2b}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

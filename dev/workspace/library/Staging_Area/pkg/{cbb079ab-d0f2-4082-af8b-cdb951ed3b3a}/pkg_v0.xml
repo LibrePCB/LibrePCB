@@ -16,6 +16,7 @@ Name: SA08-21
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{538ec0c7-5359-4ce9-ac46-87ab65cff836}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

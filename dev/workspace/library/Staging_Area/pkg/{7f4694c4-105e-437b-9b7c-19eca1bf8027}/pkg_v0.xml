@@ -16,6 +16,7 @@ Name: E2,5-6E
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{7b2aa95e-4c28-4388-93d0-cc8a63b4546a}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

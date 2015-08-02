@@ -16,6 +16,7 @@ Name: 0617V
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{90fb00e1-6d3b-4294-a745-9217b7332526}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

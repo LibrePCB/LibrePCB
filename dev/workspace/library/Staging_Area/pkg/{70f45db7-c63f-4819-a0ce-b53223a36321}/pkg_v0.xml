@@ -16,6 +16,7 @@ Name: L1812
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{f3d2108f-1243-462c-acf0-53d6817cb13b}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

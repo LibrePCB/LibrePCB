@@ -15,6 +15,7 @@ Name: DIP18
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{db58afb2-08ab-48e7-9460-659c03c7446e}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

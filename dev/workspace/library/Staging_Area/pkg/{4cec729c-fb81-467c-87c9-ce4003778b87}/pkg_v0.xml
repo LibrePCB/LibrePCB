@@ -15,6 +15,7 @@ Name: CT6032
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{25524453-d137-4199-96b1-30f942db3962}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

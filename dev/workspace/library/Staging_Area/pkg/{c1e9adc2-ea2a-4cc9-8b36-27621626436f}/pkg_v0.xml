@@ -16,6 +16,7 @@ Name: SGA-10
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{36844cb4-4a2d-4705-8109-b469ee66509e}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

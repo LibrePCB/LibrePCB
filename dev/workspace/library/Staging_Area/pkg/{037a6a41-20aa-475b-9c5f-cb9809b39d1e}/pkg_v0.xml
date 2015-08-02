@@ -17,6 +17,7 @@ Name: FA-20H
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{f981a9b6-9932-4d37-b471-b418a93270b2}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: DO13M
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{059c11d2-6808-4504-9114-47e8deb2d438}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: 0411/15
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{ca71807d-bde6-4645-9d8e-045d146afc4e}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

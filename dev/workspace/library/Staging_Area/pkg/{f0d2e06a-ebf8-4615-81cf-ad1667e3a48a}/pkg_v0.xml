@@ -15,6 +15,7 @@ Name: MA05-1
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{707decca-0429-4268-bc29-72c67ac5fcab}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

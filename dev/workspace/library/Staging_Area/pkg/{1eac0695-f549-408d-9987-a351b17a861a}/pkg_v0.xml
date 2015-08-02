@@ -16,6 +16,7 @@ Name: C102-043X133
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{7e8230bc-fc17-43fa-8d9f-7b1bf2392707}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

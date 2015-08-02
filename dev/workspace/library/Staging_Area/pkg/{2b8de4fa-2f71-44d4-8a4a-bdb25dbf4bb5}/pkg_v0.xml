@@ -15,6 +15,7 @@ Name: MA08-1W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{f6a432ad-7ceb-44ee-819d-23179df6b390}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

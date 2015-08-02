@@ -15,6 +15,7 @@ Name: MA06-1
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"></keywords>
         <footprint>{dbcd8e3c-a1f5-402f-81a5-2a49a63737b7}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

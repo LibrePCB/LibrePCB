@@ -16,6 +16,7 @@ Name: UM-1S
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{12767e42-a2de-4acb-a33c-61bd94c085e0}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

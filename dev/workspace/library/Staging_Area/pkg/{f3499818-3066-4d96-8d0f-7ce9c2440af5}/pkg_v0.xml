@@ -16,6 +16,7 @@ Name: L3230M
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{2bdfd207-a296-40ee-a336-b517341b1842}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

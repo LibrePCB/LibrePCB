@@ -16,6 +16,7 @@ Name: SMART-LED
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{9fb47b04-5555-42ba-bb7e-d70ccf95048f}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

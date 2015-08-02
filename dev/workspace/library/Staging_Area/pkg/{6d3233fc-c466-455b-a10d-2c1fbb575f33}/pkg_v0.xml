@@ -16,6 +16,7 @@ Name: E2,5-4R
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{2b5b4260-1019-4939-981b-6b2181e6bbf6}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

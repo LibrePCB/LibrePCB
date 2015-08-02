@@ -16,6 +16,7 @@ Name: DO27Z15E
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{f2246b0a-6379-42c2-81c6-4432cc8148a3}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

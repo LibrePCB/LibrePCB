@@ -16,6 +16,7 @@ Name: PLCC4-TOPLED-RG
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{e1b89b55-e794-4263-9e4e-15a689054df1}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

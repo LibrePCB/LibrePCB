@@ -16,6 +16,7 @@ Name: LD260
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{093f476f-3d5a-4874-9bef-8ce25e7564f8}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

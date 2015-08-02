@@ -16,6 +16,7 @@ Name: E35-12
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{1f86059f-0894-45e0-a035-7cbd15d9b8ec}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

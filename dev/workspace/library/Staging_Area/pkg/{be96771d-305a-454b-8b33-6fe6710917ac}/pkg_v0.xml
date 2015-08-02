@@ -16,6 +16,7 @@ Name: SML0805
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{eac759dc-5322-4eff-95c0-e81605547fcc}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

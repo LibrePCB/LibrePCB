@@ -15,6 +15,7 @@ Name: R5025
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{9056568e-947b-4575-a46f-707affa4cacc}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

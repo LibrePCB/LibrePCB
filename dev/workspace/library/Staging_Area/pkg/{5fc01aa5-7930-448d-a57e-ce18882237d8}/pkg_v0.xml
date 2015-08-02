@@ -17,6 +17,7 @@ Name: CHIP-LED0805
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{d3f189de-e0aa-4ecd-8738-7450dfb78e5d}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

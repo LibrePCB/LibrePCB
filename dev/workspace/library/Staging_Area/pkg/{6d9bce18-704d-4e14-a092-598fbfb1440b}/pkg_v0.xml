@@ -16,6 +16,7 @@ Name: ETR1
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{8736c06e-65ce-4422-975f-81a59c43d058}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

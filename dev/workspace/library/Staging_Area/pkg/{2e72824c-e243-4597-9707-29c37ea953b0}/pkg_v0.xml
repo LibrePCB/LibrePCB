@@ -17,6 +17,7 @@ Name: SMC_D
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{aae9731b-b3db-4f01-9ec7-f4b06dfe3fcd}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

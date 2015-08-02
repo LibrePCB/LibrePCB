@@ -16,6 +16,7 @@ Name: DO204-10
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{8b5ac559-cefe-48f3-8467-ea9413baa3ad}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

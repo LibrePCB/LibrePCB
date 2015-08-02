@@ -16,6 +16,7 @@ Name: E55-30
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{8a225650-a26c-444e-9770-2f82915c20c6}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

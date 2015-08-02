@@ -15,6 +15,7 @@ Name: HC18U-H
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{57f4e751-ef9e-4cfd-a7d9-565c2f10932d}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

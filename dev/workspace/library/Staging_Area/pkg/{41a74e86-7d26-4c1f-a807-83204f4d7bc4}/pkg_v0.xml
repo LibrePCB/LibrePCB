@@ -17,6 +17,7 @@ Name: VMTB60
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{fe19e80a-d897-40ac-8ee4-eadd6817585c}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

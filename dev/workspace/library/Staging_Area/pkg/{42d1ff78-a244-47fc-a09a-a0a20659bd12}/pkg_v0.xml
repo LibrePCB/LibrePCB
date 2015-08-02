@@ -15,6 +15,7 @@ Name: SO4
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{9a58a584-0bfb-45c8-9876-d909dd0b9c47}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

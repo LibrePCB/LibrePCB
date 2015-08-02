@@ -16,6 +16,7 @@ Name: SOT93L
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{a11b33b3-5a3c-4c38-9db6-63d349c56200}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

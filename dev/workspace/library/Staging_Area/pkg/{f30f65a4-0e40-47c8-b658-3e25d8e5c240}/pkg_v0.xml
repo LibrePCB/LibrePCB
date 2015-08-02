@@ -15,6 +15,7 @@ Name: MA12-1W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{e0dc7704-72bb-48d3-b5e6-41ace970f40f}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

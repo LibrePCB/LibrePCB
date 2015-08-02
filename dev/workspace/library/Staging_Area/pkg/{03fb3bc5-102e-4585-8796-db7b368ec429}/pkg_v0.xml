@@ -16,6 +16,7 @@ Name: IRF36
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{4b824bbe-680f-4a36-b26a-4290843cf2c7}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

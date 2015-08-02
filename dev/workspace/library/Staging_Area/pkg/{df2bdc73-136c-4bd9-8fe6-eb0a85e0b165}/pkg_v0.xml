@@ -16,6 +16,7 @@ Name: FX08
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{646f4b94-3a9e-4e4f-af36-33ab43f6884e}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

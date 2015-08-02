@@ -15,6 +15,7 @@ Name: SOD110-W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{7f6aa798-d08a-44c6-833e-2c66727b9cd6}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

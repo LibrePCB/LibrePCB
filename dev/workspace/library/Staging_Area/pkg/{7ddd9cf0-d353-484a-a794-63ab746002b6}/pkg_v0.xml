@@ -16,6 +16,7 @@ Name: YC22B7
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{21bcdbab-3c2a-4b60-aacc-f8681ad7e502}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

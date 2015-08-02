@@ -16,6 +16,7 @@ Name: E3,5-10
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{ef2001cb-bd6d-4b18-a52e-f00bdde89ab6}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

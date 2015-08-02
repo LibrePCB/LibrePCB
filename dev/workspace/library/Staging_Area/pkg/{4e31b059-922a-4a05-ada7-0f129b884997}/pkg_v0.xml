@@ -16,6 +16,7 @@ Name: CB429-15
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{7b79f76f-f922-4b61-a097-4ab7a3c4dce4}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

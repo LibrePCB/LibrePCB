@@ -15,6 +15,7 @@ Name: SOT346-R
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{75c01992-e50b-4756-80ee-2dd093e251f9}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

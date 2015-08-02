@@ -16,6 +16,7 @@ Name: XC27B15
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{983eacd8-453d-4079-a398-32cb337dc256}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

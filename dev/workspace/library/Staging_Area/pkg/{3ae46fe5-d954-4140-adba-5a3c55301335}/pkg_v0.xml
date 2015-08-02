@@ -16,6 +16,7 @@ Name: IR-4
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{44d3cbc1-9d2b-4036-98d3-d40984994011}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

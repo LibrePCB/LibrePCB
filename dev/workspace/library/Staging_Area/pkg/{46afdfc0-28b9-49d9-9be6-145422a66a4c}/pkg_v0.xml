@@ -15,6 +15,7 @@ Name: SC70-3-W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{b109abf2-6225-4501-b37f-686844fb6d49}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

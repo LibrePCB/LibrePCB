@@ -16,6 +16,7 @@ Name: M-4
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{553df42f-13bf-4ec7-a0f6-0c158d71c6c0}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

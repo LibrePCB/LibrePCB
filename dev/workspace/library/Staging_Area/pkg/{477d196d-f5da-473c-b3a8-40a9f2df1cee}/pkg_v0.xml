@@ -16,6 +16,7 @@ Name: W57B
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{d7ee0de3-b8e5-43e4-90ad-68ad149bb1b8}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

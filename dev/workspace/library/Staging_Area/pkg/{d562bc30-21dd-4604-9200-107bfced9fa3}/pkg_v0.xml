@@ -16,6 +16,7 @@ Name: SIL08C
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{0b542c1f-4ba8-4063-af00-4f8e95f8a3a6}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

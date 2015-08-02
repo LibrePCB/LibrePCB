@@ -16,6 +16,7 @@ Name: E5-6
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{99578327-fc5e-40df-90b7-2815323ea18f}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

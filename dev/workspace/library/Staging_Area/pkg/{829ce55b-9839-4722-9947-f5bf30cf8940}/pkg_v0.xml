@@ -15,6 +15,7 @@ Name: FE20W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{99dd50c3-6f1b-4895-a9a1-b191f7c7ea16}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

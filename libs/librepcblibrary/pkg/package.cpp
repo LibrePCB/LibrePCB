@@ -57,12 +57,14 @@ void Package::parseDomTree(const XmlDomElement& root) throw (Exception)
     LibraryElement::parseDomTree(root);
 
     mFootprintUuid = root.getFirstChild("meta/footprint", true, true)->getText<QUuid>(true);
+    mModel3dUuid = root.getFirstChild("meta/model_3d", true, true)->getText<QUuid>(false);
 }
 
 XmlDomElement* Package::serializeToXmlDomElement() const throw (Exception)
 {
     QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement());
     root->getFirstChild("meta", true)->appendTextChild("footprint", mFootprintUuid);
+    root->getFirstChild("meta", true)->appendTextChild("model_3d", mModel3dUuid);
     return root.take();
 }
 

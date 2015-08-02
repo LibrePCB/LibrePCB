@@ -16,6 +16,7 @@ Name: SMBJ
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{836cfc84-54f9-485e-b810-75afe31a59ba}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

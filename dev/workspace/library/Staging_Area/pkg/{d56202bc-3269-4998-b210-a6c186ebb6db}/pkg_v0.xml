@@ -16,6 +16,7 @@ Name: GT32
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{3def4f7b-144c-46c7-be1d-a233c6779715}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

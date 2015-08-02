@@ -16,6 +16,7 @@ Name: YC10B5
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{92f889d1-b0d0-4258-865c-0e3abeb41543}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

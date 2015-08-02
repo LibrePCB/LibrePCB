@@ -16,6 +16,7 @@ Name: SANYO-OSCON_SMD_F8
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{7904d9ce-4599-4e1e-a053-98a0b9c64ef4}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

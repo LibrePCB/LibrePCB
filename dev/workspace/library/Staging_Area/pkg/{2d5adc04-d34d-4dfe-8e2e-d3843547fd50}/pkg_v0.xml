@@ -16,6 +16,7 @@ Name: M-6
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{85900aff-05b2-4c6a-bc85-23702963f516}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

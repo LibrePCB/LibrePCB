@@ -18,6 +18,7 @@ Name: 2200-11.43
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{bbbd5ac2-a5c6-4364-9256-859d42f26e5b}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

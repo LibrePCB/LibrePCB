@@ -16,6 +16,7 @@ Name: TO18D
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{7c573368-8366-4794-a990-eea3b24dfcd9}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -17,6 +17,7 @@ Name: 150CLZ-1014
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{9116c1fe-bb2e-4c1d-b190-413f44388d82}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

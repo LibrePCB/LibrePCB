@@ -15,6 +15,7 @@ Name: MA13-2W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{b3f9dd8d-e7d0-4c86-beb3-e28b6f57bab5}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

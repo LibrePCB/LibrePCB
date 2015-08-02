@@ -16,6 +16,7 @@ Name: G4-12E
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{508d59e9-6953-4c55-97ff-c02feb50a8ea}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

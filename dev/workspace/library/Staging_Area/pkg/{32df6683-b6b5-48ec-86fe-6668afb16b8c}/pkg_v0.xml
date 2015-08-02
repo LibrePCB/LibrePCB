@@ -16,6 +16,7 @@ Name: R3225W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{c5c2c33a-79d9-4424-89a7-03b890071daf}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

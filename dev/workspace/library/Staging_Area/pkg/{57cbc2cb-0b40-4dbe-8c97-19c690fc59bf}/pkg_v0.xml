@@ -16,6 +16,7 @@ Name: LZ4-00WW10
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{9b2468da-c638-4fb0-a605-6e0836713feb}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

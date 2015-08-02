@@ -16,6 +16,7 @@ Name: P-LCC-4/2
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{74e90d86-e946-4f2e-bc49-4e8e398e9168}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

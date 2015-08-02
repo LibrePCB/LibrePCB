@@ -16,6 +16,7 @@ Name: TT5D11L
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{f4070566-1108-4725-aa4d-4e7e1c945969}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

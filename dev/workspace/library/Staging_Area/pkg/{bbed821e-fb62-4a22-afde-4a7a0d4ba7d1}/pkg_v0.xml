@@ -16,6 +16,7 @@ Name: C2992
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{5db53114-2780-4ade-beca-89604a82a52b}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

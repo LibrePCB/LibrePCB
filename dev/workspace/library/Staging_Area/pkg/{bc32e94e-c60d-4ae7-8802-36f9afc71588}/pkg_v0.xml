@@ -16,6 +16,7 @@ Name: E45-21
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{6d1fb651-0a22-4b9d-83af-e053c5aeb983}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: M0805
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{3c76a15e-8818-498f-b6dc-9feea21308b0}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

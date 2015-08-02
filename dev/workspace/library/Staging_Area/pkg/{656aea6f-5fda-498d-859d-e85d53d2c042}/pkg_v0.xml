@@ -16,6 +16,7 @@ Name: S6058
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{31e7e4aa-cd75-440d-8534-701a98cf2515}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

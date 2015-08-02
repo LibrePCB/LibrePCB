@@ -16,6 +16,7 @@ Name: CTS406
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{700839dc-a968-42bf-a92f-e808905006d5}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

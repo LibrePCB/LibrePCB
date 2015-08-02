@@ -15,6 +15,7 @@ Name: RTRIM3202
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{86466b6f-1fc7-4b05-a81e-2267408bf81a}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

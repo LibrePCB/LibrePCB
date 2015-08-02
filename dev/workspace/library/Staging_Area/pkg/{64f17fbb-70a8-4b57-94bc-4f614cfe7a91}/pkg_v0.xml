@@ -15,6 +15,7 @@ Name: SOD106A-W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{720cd8fd-7dbd-4fc9-bba3-6ea803f438eb}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

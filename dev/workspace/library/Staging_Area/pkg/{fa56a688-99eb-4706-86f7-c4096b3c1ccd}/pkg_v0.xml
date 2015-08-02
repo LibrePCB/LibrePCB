@@ -16,6 +16,7 @@ Name: P-LCC-6_TOPLED
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{7910b35c-d170-488d-ab61-805660565567}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

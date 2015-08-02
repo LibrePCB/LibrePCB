@@ -16,6 +16,7 @@ Name: RTRIM3214W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{3d9d4f29-d05d-4b94-a755-f5c57fdc74b6}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

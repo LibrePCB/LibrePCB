@@ -17,6 +17,7 @@ Name: 175TMP-0810
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{66600171-7cd4-407e-a89a-e6e43b339a9e}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

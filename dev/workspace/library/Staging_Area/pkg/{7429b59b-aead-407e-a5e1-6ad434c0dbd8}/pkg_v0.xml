@@ -17,6 +17,7 @@ Name: VTA53
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{f7ac1824-2613-4464-9bf5-174a5a11b6ab}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

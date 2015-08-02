@@ -16,6 +16,7 @@ Name: L3225M
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{63bdb4ce-6a6e-4fb5-b8e5-c6d70344c829}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

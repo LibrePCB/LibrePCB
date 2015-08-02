@@ -16,6 +16,7 @@ Name: R5025W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{563d94d0-c247-496f-9686-207d14c8c660}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

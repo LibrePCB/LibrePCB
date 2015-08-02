@@ -16,6 +16,7 @@ Name: E45-18
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{f1904406-cd1c-4a38-b369-e01afc9aeec7}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

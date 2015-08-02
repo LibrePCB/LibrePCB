@@ -16,6 +16,7 @@ Name: C/6032-28W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{5a502576-1f63-494d-98ea-3a7b3ae671f4}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

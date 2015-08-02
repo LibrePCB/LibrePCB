@@ -16,6 +16,7 @@ Name: SC79_INFINEON
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{9ed30727-7ed1-40c0-a9e1-a7f44a877939}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

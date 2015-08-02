@@ -16,6 +16,7 @@ Name: BR220S
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{c6760b24-de8e-4dea-b7e9-64c35527005e}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

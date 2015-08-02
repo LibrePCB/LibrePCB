@@ -16,6 +16,7 @@ Name: DO201T15
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{8f72874c-f076-468c-96cc-6722d56f64f9}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

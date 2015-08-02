@@ -16,6 +16,7 @@ Name: EB25D
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{dab7c002-42c6-47cd-beaf-03c085bad241}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

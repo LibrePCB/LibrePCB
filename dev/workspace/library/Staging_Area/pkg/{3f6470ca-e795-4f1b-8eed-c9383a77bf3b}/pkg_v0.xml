@@ -16,6 +16,7 @@ Name: SOT54H
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{cab60586-32ac-410c-adb0-0c843ef06074}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

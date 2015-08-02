@@ -16,6 +16,7 @@ Name: XC27B18
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{5dae4b1c-8ff9-4cd3-aa2e-6b1d5af43486}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

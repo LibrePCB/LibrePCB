@@ -15,6 +15,7 @@ Name: C1825
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{77b78a8a-1839-42d5-acac-b98479b01d49}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: P0613V
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{52f350c2-edc8-4834-b7e9-691b7b19efc1}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

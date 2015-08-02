@@ -16,6 +16,7 @@ Name: SGC-10
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{3e2d7f33-6c02-4c8f-943b-e5ae653b1ae4}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

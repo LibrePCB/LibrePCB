@@ -17,6 +17,7 @@ Name: DUOLED-C-5MM
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{2da74bb2-138b-4074-a179-136203b156d5}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: 0207/2V
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{f9d4b50d-6503-48a9-aec0-84c424440027}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

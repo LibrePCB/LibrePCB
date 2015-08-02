@@ -16,6 +16,7 @@ Name: IRF24
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{74cf9576-0c00-4ba6-b202-8daeab672046}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -17,6 +17,7 @@ Name: RTRIM3314G
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{0cd679e0-9b54-4e6c-aa6e-34c6302927ae}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

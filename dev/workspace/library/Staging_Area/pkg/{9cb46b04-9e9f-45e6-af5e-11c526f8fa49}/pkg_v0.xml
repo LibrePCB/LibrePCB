@@ -15,6 +15,7 @@ Name: SOT223
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{812465e5-1b09-4a04-8863-d80d58c6f334}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

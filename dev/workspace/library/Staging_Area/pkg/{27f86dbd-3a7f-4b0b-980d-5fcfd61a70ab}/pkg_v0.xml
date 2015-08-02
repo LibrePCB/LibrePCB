@@ -15,6 +15,7 @@ Name: PANASONIC_C
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{1dea60c2-417e-4d16-bc0d-ee07ada618f0}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

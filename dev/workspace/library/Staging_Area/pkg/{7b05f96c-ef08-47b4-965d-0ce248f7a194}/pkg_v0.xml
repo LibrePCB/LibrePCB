@@ -16,6 +16,7 @@ Name: SOT363_PHILIPS
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{32f72d8b-6a31-41bf-98bb-eb634d9ccae0}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -17,6 +17,7 @@ Name: VMTA55
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{9ed8107f-1113-4032-9415-945e97601de0}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -17,6 +17,7 @@ Name: NSSM038A
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{0c2e76c7-21e8-47e0-92ea-00606fecae31}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

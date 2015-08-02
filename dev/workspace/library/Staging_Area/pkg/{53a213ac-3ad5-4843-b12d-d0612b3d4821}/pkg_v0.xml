@@ -16,6 +16,7 @@ Name: V526-0
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{9657249f-a07f-4e1f-8378-1c5eef8e7c35}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

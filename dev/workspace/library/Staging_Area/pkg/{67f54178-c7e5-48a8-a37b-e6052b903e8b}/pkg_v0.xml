@@ -16,6 +16,7 @@ Name: C325-162X374
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{3204f0d8-8624-407c-81c9-8260ebccf0c9}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

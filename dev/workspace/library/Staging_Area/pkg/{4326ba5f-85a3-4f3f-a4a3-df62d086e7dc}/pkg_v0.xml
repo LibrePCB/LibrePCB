@@ -17,6 +17,7 @@ Name: VTA54
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{d249573a-958d-4679-8286-67da9c767422}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

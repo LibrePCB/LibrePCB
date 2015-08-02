@@ -17,6 +17,7 @@ Name: CTRIM3040.452
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{82c207bb-d3bf-4cea-98b5-a9633cfc2803}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

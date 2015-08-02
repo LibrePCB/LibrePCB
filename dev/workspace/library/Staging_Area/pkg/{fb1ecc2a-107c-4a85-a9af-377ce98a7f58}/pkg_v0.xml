@@ -16,6 +16,7 @@ Name: CB417-12
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{fa77fdbe-2958-4fa6-9c25-7ff6a96878d6}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

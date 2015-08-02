@@ -16,6 +16,7 @@ Name: SOD64Z10
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{a57e85c1-b6bb-49b5-ac74-bfe7cde2405d}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

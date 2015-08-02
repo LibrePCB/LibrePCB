@@ -16,6 +16,7 @@ Name: LAL02
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{a2c4ca38-a7d1-4d9d-9436-83608149105f}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

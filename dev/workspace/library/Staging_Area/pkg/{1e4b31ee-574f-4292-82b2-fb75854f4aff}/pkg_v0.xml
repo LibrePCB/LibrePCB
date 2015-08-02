@@ -16,6 +16,7 @@ Name: LED5MM
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{a60ca762-ba9c-4af3-95ee-877755c70a08}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

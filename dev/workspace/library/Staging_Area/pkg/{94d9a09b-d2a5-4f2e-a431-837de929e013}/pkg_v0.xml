@@ -16,6 +16,7 @@ Name: SC-2
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{7003568a-97fe-4d2f-adba-8fbe3ce190be}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

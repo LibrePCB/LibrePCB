@@ -16,6 +16,7 @@ Name: XC15B8
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{32493211-3533-44db-9133-c8ecde9fd610}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

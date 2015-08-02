@@ -16,6 +16,7 @@ Name: LZ1-00WW03
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{ab63558f-1173-49c9-bc9d-0648d13ef992}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

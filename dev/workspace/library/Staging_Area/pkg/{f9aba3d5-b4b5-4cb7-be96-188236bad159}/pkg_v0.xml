@@ -16,6 +16,7 @@ Name: MC-406
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{75a1faaa-d537-4db9-b3ad-2aadab6f6c26}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

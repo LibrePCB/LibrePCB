@@ -16,6 +16,7 @@ Name: R2012W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{8de906c7-fffb-4f37-bab7-e75f74b230bd}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

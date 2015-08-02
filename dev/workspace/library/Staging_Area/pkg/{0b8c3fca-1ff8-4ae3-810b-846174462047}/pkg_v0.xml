@@ -16,6 +16,7 @@ Name: SOT143-R
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{6ae289ad-c9c5-47e4-add2-be586c915052}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

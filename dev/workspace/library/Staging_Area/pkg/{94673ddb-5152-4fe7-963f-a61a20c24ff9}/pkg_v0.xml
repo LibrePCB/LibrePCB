@@ -17,6 +17,7 @@ Name: 153CLV-0505
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{043364ad-4e36-486d-9149-c1943da01469}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

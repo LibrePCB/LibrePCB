@@ -16,6 +16,7 @@ Name: E35-18
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{d31f302d-6dbe-4449-b3da-2c9b4a8e2290}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

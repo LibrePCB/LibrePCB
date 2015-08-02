@@ -17,6 +17,7 @@ Name: PB3XX301V050A
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{97957704-fca0-435e-aeae-efb426f855f3}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -15,6 +15,7 @@ Name: P128-50
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{3b25053b-78c9-4eee-8838-06cdab60f0bb}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -17,6 +17,7 @@ Name: 140CLH-1010
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{16d44257-4a3b-4bc7-a4bf-3f0d58e29c46}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

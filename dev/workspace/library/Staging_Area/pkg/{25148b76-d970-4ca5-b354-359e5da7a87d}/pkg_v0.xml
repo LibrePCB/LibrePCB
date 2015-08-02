@@ -16,6 +16,7 @@ Name: RTRIMTS63Y
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{7710c55a-692e-4132-aa2e-2337af98eaf1}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -15,6 +15,7 @@ Name: R1210
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{bf5fe775-1694-4ab4-83f8-0981f878455e}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

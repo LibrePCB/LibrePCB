@@ -16,6 +16,7 @@ Name: 0207/5V
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{140f75c5-38ee-4a20-b30b-b36f70278379}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

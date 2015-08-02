@@ -15,6 +15,7 @@ Name: MA07-2
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{81e7dbff-ee71-4e1a-81b7-a7ff6131ed66}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

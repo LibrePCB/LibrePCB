@@ -16,6 +16,7 @@ Name: TJ7-U1
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{8cfeb2c0-6eab-441f-8dfe-ab0152991c3f}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

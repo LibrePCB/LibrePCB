@@ -15,6 +15,7 @@ Name: MINIMELF
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{c3950175-f6a6-4a16-88a0-4563b00111df}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

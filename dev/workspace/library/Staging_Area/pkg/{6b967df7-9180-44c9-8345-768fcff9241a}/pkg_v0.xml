@@ -16,6 +16,7 @@ Name: SIL08A
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{6a5e5b17-a872-4c9e-93a0-7c5cf8066c80}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

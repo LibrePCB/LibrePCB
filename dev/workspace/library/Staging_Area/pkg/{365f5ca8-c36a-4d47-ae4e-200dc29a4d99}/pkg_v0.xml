@@ -16,6 +16,7 @@ Name: M3216
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{12675cf2-dc2b-4931-be3e-ba8e5d949c27}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

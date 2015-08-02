@@ -16,6 +16,7 @@ Name: OSTAR_6-LEW3A
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{1382905b-4e76-49f6-a158-d4e44068ad5a}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

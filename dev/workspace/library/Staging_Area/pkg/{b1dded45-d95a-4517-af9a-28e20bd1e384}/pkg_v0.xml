@@ -16,6 +16,7 @@ Name: TJ8-U2
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{bfd9edf5-5447-4b55-be03-1c2f4cf412f6}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

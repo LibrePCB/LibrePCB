@@ -16,6 +16,7 @@ Name: P1-10
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{0f890141-095a-4ba0-9c10-a13887a20b99}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

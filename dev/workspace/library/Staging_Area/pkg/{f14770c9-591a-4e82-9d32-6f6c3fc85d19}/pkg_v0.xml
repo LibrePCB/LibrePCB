@@ -16,6 +16,7 @@ Name: GM5BW96385A
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{47ecd834-5ca4-4ebf-95d7-d1921a1c82c4}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

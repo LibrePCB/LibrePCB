@@ -16,6 +16,7 @@ Name: DO35-7B
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{26e59d96-3f2e-47ee-a7cc-c0d88f83746b}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

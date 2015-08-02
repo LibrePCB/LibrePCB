@@ -16,6 +16,7 @@ Name: E30-16
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{e96c4984-5b50-4f94-bb09-f8ad69763bee}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

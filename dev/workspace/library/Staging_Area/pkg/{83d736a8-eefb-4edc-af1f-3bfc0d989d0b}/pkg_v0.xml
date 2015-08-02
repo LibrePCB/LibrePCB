@@ -16,6 +16,7 @@ Name: SOT186L
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{90ef96cb-b539-416c-9117-54db6b0fb84b}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

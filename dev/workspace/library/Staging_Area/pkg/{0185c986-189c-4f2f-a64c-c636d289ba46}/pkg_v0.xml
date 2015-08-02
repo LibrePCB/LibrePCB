@@ -17,6 +17,7 @@ Name: FC-12M
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{fdbf05df-eed1-4721-891e-b607158f46ce}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

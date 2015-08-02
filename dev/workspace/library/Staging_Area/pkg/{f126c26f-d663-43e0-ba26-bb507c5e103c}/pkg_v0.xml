@@ -16,6 +16,7 @@ Name: DO218S
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{7b6656dc-8be3-4e9b-bf8d-df707d80fad0}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

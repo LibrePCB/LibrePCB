@@ -16,6 +16,7 @@ Name: C150-072X183
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{e391484b-8db4-4903-adc7-715ac5092c34}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

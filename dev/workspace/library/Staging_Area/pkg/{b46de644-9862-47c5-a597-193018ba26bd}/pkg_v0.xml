@@ -15,6 +15,7 @@ Name: 2,54/0,9
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{374d4c91-a955-4961-9681-aec63b8a4138}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

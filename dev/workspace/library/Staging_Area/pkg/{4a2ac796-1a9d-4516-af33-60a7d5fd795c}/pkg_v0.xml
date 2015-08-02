@@ -16,6 +16,7 @@ Name: SUPERFLUX-SMD-7.6X7.6
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{c19e6a42-a6a3-478f-beed-9a7d9f4852ab}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -27,6 +27,7 @@ Name: SML0603
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{7a0ccedd-92c3-4121-9ece-0f2546267524}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

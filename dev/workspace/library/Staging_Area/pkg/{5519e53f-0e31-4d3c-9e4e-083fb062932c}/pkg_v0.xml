@@ -15,6 +15,7 @@ Name: SOD80-W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{1816cd59-7a61-4b6f-9f16-0d38dd25fa5c}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

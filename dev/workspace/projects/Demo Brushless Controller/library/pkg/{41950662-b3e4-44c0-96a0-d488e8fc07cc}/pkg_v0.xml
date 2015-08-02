@@ -15,6 +15,7 @@ Name: SMB
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"></keywords>
         <footprint>{7aa6dd7f-6436-4e4d-9276-59480562e78d}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

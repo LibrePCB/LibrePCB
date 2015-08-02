@@ -16,6 +16,7 @@ Name: SA08
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{7532e66c-13af-44f1-a5d7-d04ed891739e}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

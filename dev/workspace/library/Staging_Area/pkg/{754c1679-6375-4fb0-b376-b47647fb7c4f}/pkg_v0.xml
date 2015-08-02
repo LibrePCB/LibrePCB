@@ -16,6 +16,7 @@ Name: TJ5-U1
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{092f625c-6e7c-4b7d-af04-881058b88a24}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

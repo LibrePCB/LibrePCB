@@ -16,6 +16,7 @@ Name: SANYO-OSCON_F8
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{616b0129-cb55-4894-8cb8-bc72c87573f0}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

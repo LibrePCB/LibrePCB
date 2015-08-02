@@ -15,6 +15,7 @@ Name: TC26V
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{72aebdd2-b0da-408d-aba9-a0fc9a300b03}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

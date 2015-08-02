@@ -16,6 +16,7 @@ Name: CEP125
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{6ed066a5-5390-4e22-b131-73ed27f45921}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

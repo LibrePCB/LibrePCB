@@ -15,6 +15,7 @@ Name: DIL08-4
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{e98d84d2-7cd2-4606-9654-207e0985accd}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

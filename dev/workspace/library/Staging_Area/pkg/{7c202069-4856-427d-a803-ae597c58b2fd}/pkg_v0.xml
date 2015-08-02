@@ -16,6 +16,7 @@ Name: BR210S
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{accfcce3-05a8-415a-ac5d-be967bb8c5ed}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

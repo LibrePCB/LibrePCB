@@ -15,6 +15,7 @@ Name: 3,17/1,1
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{020a0534-5b58-4f27-9f3e-5ac035b42076}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -16,6 +16,7 @@ Name: WSC0002
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{07c7bb4b-6cd3-4a60-b926-3f5783494e47}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

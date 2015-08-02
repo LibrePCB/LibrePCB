@@ -16,6 +16,7 @@ Name: RDH/15
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{cdf3b3b3-0d5f-4b10-8be5-bc1832df9827}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

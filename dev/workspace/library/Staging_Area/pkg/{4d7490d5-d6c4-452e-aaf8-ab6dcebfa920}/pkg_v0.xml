@@ -16,6 +16,7 @@ Name: AG
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{a8e328a2-d4d5-4862-b495-4ef492065ecc}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

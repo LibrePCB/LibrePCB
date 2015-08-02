@@ -16,6 +16,7 @@ Name: RTRIM5W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{b7bc6b8a-fe25-4c3b-8821-8e3cb0c08269}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

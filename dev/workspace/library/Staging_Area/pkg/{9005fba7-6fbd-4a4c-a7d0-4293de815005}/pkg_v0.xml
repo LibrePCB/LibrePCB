@@ -16,6 +16,7 @@ Name: LAN02KR
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{9e7674ff-2642-4ace-86b1-cc8c6923db7f}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

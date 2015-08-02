@@ -16,6 +16,7 @@ Name: L4532M
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"></keywords>
         <footprint>{66914412-2e45-4f52-a076-22a0715ab4e0}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

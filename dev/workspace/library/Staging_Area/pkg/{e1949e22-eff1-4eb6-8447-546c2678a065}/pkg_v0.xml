@@ -18,6 +18,7 @@ Name: SFH480
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{50350313-5898-4166-b3d3-f4d67054411a}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

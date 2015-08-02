@@ -16,6 +16,7 @@ Name: LED_BLINK
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{cbfb3ab4-bba4-484a-8a7d-68121d02cebb}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

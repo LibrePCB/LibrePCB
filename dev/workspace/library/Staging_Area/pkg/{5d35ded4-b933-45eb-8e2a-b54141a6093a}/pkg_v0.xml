@@ -16,6 +16,7 @@ Name: RAD2,5L
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{74225862-50ac-4a8e-a57b-4e6ea72ce9de}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

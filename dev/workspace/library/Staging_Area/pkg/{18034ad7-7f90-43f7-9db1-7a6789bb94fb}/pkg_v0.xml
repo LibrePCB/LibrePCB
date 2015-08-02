@@ -16,6 +16,7 @@ Name: L5038P
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{9da3a3f4-03d3-4c8a-9e60-9acbfb233bcd}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

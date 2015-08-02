@@ -15,6 +15,7 @@ Name: RTRIM3006P
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{72d6f6ec-0594-4b27-ba2c-27790a75c4d4}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

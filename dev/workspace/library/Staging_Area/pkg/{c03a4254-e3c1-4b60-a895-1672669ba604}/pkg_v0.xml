@@ -17,6 +17,7 @@ Name: TC46
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{4ff6c575-76aa-4d60-bfe7-b58d9712b49d}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

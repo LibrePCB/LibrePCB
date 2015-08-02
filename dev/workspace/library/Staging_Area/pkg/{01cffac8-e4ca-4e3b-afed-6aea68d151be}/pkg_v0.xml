@@ -15,6 +15,7 @@ Name: HC49GW
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{5daaccd2-52ed-4634-b982-b4ddc0b447f0}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

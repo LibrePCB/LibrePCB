@@ -16,6 +16,7 @@ Name: GM1WA55311A
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{e5e4fb8c-4e61-4185-a2ae-1a36a2df14bc}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

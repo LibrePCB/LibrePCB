@@ -15,6 +15,7 @@ Name: MA08-1
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{6a1fbfd2-6a25-463d-99d7-a5a2161587ec}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

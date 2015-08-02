@@ -15,6 +15,7 @@ Name: SOD323-W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{8a3c6904-151b-4916-87f0-ac6a9c85b83a}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

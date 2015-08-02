@@ -16,6 +16,7 @@ Name: C1103
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{199082ac-e6ab-444b-a536-5cadf58d3016}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

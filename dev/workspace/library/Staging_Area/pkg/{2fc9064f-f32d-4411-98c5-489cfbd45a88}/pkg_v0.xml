@@ -15,6 +15,7 @@ Name: HC49/S
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{6cf49823-7e60-419a-abd4-54cb6db7d830}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

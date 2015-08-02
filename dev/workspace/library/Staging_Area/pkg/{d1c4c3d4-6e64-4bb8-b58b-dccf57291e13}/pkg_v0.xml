@@ -16,6 +16,7 @@ Name: MX6-ALU
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{3c7de7de-33bc-4610-a9d1-0053875cbc9e}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

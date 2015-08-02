@@ -16,6 +16,7 @@ Name: A/3216-18W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{ea168a21-13e4-44fb-b4f7-0b153c9d8519}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

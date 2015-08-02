@@ -16,6 +16,7 @@ Name: SANYO-OSCON_SMD_E7
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{e688dc60-4b61-4d5a-9a33-3adc05c111cc}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

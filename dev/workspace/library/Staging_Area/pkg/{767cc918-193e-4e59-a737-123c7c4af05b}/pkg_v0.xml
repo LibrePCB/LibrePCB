@@ -16,6 +16,7 @@ Name: E15-9
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{c5274e1b-9b02-4b88-9ff9-114c82bf2c5f}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -17,6 +17,7 @@ Name: POWER-CHOKE_WE-TPC
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{6d6952dd-8a16-4d3c-b699-47496df65115}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

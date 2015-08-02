@@ -17,6 +17,7 @@ Name: W51-COOL
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{248c1e8f-cf52-4ce0-b54e-d34ddad3c8ee}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

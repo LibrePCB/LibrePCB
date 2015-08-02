@@ -15,6 +15,7 @@ Name: SOT23-W
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{91c1352e-e595-4ad6-b95b-2bcf12fb492f}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

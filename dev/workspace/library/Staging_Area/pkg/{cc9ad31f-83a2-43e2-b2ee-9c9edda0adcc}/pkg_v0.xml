@@ -16,6 +16,7 @@ Name: L4035M
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{0f377525-23d9-4787-90c5-a740cb028e35}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

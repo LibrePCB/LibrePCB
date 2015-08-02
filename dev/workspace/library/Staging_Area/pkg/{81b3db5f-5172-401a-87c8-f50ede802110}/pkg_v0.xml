@@ -16,6 +16,7 @@ Name: OSRAM-MINI-TOP-LED
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{8e44fa2e-bb42-4043-8662-85e318d54ce5}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

@@ -18,6 +18,7 @@ Name: W5KM
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{8c8f1bfe-c38d-46f6-aae0-697a1f2fd4bd}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

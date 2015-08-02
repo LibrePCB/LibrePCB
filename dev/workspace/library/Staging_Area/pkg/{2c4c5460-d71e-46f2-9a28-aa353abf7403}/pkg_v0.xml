@@ -16,6 +16,7 @@ Name: 2450BL15B100
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{bf3644e6-ce71-419b-9704-4aa97924a023}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

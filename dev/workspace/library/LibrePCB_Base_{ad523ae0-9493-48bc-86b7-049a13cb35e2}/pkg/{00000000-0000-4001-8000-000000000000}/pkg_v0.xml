@@ -8,7 +8,7 @@
         <created>2013-04-13T12:43:52Z</created>
         <last_modified>2013-04-20T18:01:33Z</last_modified>
         <footprint>{00000000-0000-4001-8000-000000000000}</footprint>
-        <model>{00000000-0000-4001-8000-000000000000}</model>
+        <model_3d>{00000000-0000-4001-8000-000000000000}</model_3d>
         <name locale="en_US">test package 1</name>
         <description locale="en_US">description...</description>
         <keywords locale="en_US">word1 word2 word3...</keywords>

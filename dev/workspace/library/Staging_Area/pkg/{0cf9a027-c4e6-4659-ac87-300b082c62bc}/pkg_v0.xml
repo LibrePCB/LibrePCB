@@ -16,6 +16,7 @@ Name: P0817V
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{8ad212af-40b1-4046-afdb-8902ac35f873}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

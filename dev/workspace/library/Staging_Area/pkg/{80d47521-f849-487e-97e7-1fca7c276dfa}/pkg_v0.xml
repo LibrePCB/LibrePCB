@@ -16,6 +16,7 @@ Name: SOD-123_MINI-SMA
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{271fd8ca-f7c8-487e-b8ff-f888d279f433}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

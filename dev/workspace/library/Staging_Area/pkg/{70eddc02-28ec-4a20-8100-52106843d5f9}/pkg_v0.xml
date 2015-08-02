@@ -16,6 +16,7 @@ Name: F13/8A
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{2f9476aa-0abb-4153-80c4-da478d1fa636}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>

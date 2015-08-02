@@ -16,6 +16,7 @@ Name: SANYO-OSCON_E13
 NOTE: Remove this text after manual rework!</description>
         <keywords locale="en_US"/>
         <footprint>{2f28474a-2022-4c28-b070-74ed5dbabeca}</footprint>
+        <model_3d></model_3d>
     </meta>
     <categories/>
 </package>
