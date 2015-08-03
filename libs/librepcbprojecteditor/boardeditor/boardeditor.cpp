@@ -66,7 +66,7 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project) :
     // Add Dock Widgets
     mErcMsgDock = new ErcMsgDock(mProject);
     addDockWidget(Qt::RightDockWidgetArea, mErcMsgDock, Qt::Vertical);
-    mUnplacedComponentsDock = new UnplacedComponentsDock(mProject, mProjectEditor.getUndoStack());
+    mUnplacedComponentsDock = new UnplacedComponentsDock(mProjectEditor);
     addDockWidget(Qt::RightDockWidgetArea, mUnplacedComponentsDock, Qt::Vertical);
 
     // create default grid properties

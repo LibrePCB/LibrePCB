@@ -30,15 +30,17 @@
 #include <librepcbproject/project.h>
 #include <librepcbproject/settings/projectsettings.h>
 #include <librepcbproject/circuit/gencompinstance.h>
-#include <librepcblibrary/gencmp/genericcomponent.h>
-#include <librepcblibrary/cmp/component.h>
-#include <librepcblibrary/pkg/package.h>
+#include <librepcblibrary/library.h>
+#include <librepcblibrary/elements.h>
 #include <librepcbproject/library/projectlibrary.h>
 #include <librepcbcommon/graphics/graphicsview.h>
 #include <librepcbcommon/graphics/graphicsscene.h>
 #include <librepcbproject/boards/cmd/cmdcomponentinstanceadd.h>
 #include <librepcbcommon/undostack.h>
 #include <librepcbcommon/gridproperties.h>
+#include <librepcbworkspace/workspace.h>
+#include "../projecteditor.h"
+#include <librepcbproject/library/cmd/cmdprojectlibraryaddelement.h>
 
 namespace project {
 
@@ -46,8 +48,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-UnplacedComponentsDock::UnplacedComponentsDock(Project& project, UndoStack& undoStack) :
-    QDockWidget(0), mProject(project), mUndoStack(undoStack), mBoard(nullptr),
+UnplacedComponentsDock::UnplacedComponentsDock(ProjectEditor& editor) :
+    QDockWidget(0), mProjectEditor(editor), mProject(editor.getProject()), mBoard(nullptr),
     mUi(new Ui::UnplacedComponentsDock),
     mFootprintPreviewGraphicsView(nullptr), mFootprintPreviewGraphicsScene(nullptr),
     mSelectedGenComp(nullptr), mSelectedComponent(nullptr),
@@ -122,8 +124,16 @@ void UnplacedComponentsDock::on_lstUnplacedComponents_currentItemChanged(QListWi
 void UnplacedComponentsDock::on_cbxSelectedComponent_currentIndexChanged(int index)
 {
     QUuid componentUuid = mUi->cbxSelectedComponent->itemData(index, Qt::UserRole).toUuid();
-    const library::Component* component = mProject.getLibrary().getComponent(componentUuid);
-    setSelectedComponent(component);
+    FilePath cmpFp = mProjectEditor.getWorkspace().getLibrary().getLatestComponent(componentUuid);
+    if (cmpFp.isValid())
+    {
+        const library::Component* component = new library::Component(cmpFp);
+        setSelectedComponent(component);
+    }
+    else
+    {
+        setSelectedComponent(nullptr);
+    }
 }
 
 void UnplacedComponentsDock::on_btnAdd_clicked()
@@ -167,11 +177,10 @@ void UnplacedComponentsDock::on_btnAddAll_clicked()
         GenCompInstance* genComp = mProject.getCircuit().getGenCompInstanceByUuid(genCompUuid);
         if (genComp)
         {
-            QHash<QUuid, const library::Component*> components = mProject.getLibrary().getComponentsOfGenComp(genComp->getGenComp().getUuid());
+            QList<QUuid> components = mProjectEditor.getWorkspace().getLibrary().
+                getComponentsOfGenericComponent(genComp->getGenComp().getUuid()).toList();
             if (components.count() > 0)
-            {
-                addComponent(*genComp, components.keys().first());
-            }
+                addComponent(*genComp, components.first());
         }
     }
     mDisableListUpdate = false;
@@ -220,14 +229,23 @@ void UnplacedComponentsDock::setSelectedGenCompInstance(GenCompInstance* genComp
     if (mBoard && mSelectedGenComp)
     {
         QStringList localeOrder = mProject.getSettings().getLocaleOrder();
-        QHash<QUuid, const library::Component*> components = mProject.getLibrary().getComponentsOfGenComp(mSelectedGenComp->getGenComp().getUuid());
-        foreach (const library::Component* component, components)
+        QSet<QUuid> components = mProjectEditor.getWorkspace().getLibrary().getComponentsOfGenericComponent(mSelectedGenComp->getGenComp().getUuid());
+        foreach (const QUuid& compUuid, components)
         {
-            const library::Package* package = mProject.getLibrary().getPackage(component->getPackageUuid());
-            QString cmpName = component->getName(localeOrder);
-            QString pkgName = package ? package->getName(localeOrder) : "Package not found";
+            // TODO: use library metadata instead of loading the XML files
+            FilePath cmpFp = mProjectEditor.getWorkspace().getLibrary().getLatestComponent(compUuid);
+            if (!cmpFp.isValid()) continue;
+            const library::Component component(cmpFp);
+
+            QUuid pkgUuid;
+            mProjectEditor.getWorkspace().getLibrary().getComponentMetadata(cmpFp, &pkgUuid);
+            FilePath pkgFp = mProjectEditor.getWorkspace().getLibrary().getLatestPackage(pkgUuid);
+            const library::Package package(pkgFp);
+
+            QString cmpName = component.getName(localeOrder);
+            QString pkgName = package.getName(localeOrder);
             QString text = QString("%1 [%2]").arg(cmpName, pkgName);
-            mUi->cbxSelectedComponent->addItem(text, component->getUuid());
+            mUi->cbxSelectedComponent->addItem(text, compUuid);
         }
         if (mUi->cbxSelectedComponent->count() > 0)
             mUi->cbxSelectedComponent->setCurrentIndex(0);
@@ -237,6 +255,7 @@ void UnplacedComponentsDock::setSelectedGenCompInstance(GenCompInstance* genComp
 void UnplacedComponentsDock::setSelectedComponent(const library::Component* component) noexcept
 {
     mUi->btnAdd->setEnabled(false);
+    delete mSelectedComponent;
     mSelectedComponent = nullptr;
 
     if (mBoard && mSelectedGenComp && component)
@@ -252,19 +271,76 @@ void UnplacedComponentsDock::setSelectedComponent(const library::Component* comp
 void UnplacedComponentsDock::addComponent(GenCompInstance& genComp, const QUuid& component) noexcept
 {
     Q_ASSERT(mBoard);
+    bool cmdActive = false;
 
     try
     {
+        mProjectEditor.getUndoStack().beginCommand(tr("Add component to board"));
+        cmdActive = true;
+
+        const library::Component* cmp = mProject.getLibrary().getComponent(component);
+        if (!cmp)
+        {
+            // copy the component to the project's library
+            FilePath cmpFp = mProjectEditor.getWorkspace().getLibrary().getLatestComponent(component);
+            if (!cmpFp.isValid())
+            {
+                throw RuntimeError(__FILE__, __LINE__, QString(),
+                    QString(tr("Component not found in library: %1"))
+                    .arg(component.toString()));
+            }
+            cmp = new library::Component(cmpFp);
+            auto cmd = new CmdProjectLibraryAddElement<library::Component>(mProject.getLibrary(), *cmp);
+            mProjectEditor.getUndoStack().appendToCommand(cmd);
+        }
+
+        const library::Package* pkg = mProject.getLibrary().getPackage(cmp->getPackageUuid());
+        if (!pkg)
+        {
+            // copy the package to the project's library
+            FilePath pkgFp = mProjectEditor.getWorkspace().getLibrary().getLatestPackage(cmp->getPackageUuid());
+            if (!pkgFp.isValid())
+            {
+                throw RuntimeError(__FILE__, __LINE__, QString(),
+                    QString(tr("Package not found in library: %1"))
+                    .arg(cmp->getPackageUuid().toString()));
+            }
+            pkg = new library::Package(pkgFp);
+            auto cmd = new CmdProjectLibraryAddElement<library::Package>(mProject.getLibrary(), *pkg);
+            mProjectEditor.getUndoStack().appendToCommand(cmd);
+        }
+
+        const library::Footprint* fpt = mProject.getLibrary().getFootprint(pkg->getFootprintUuid());
+        if (!fpt)
+        {
+            // copy the package to the project's library
+            FilePath fptFp = mProjectEditor.getWorkspace().getLibrary().getLatestFootprint(pkg->getFootprintUuid());
+            if (!fptFp.isValid())
+            {
+                throw RuntimeError(__FILE__, __LINE__, QString(),
+                    QString(tr("Package not found in library: %1"))
+                    .arg(pkg->getFootprintUuid().toString()));
+            }
+            fpt = new library::Footprint(fptFp);
+            auto cmd = new CmdProjectLibraryAddElement<library::Footprint>(mProject.getLibrary(), *fpt);
+            mProjectEditor.getUndoStack().appendToCommand(cmd);
+        }
+
+        // add component to board
         CmdComponentInstanceAdd* cmd = new CmdComponentInstanceAdd(*mBoard, genComp, component, mNextPosition);
-        mUndoStack.execCmd(cmd);
+        mProjectEditor.getUndoStack().appendToCommand(cmd);
         if (mNextPosition.getX() > Length::fromMm(200))
             mNextPosition = Point::fromMm(0, mNextPosition.getY().toMm() - 10);
         else
             mNextPosition += Point::fromMm(10, 0);
         mNextPosition.mapToGrid(mBoard->getGridProperties().getInterval());
+
+        mProjectEditor.getUndoStack().endCommand();
+        cmdActive = false;
     }
     catch (Exception& e)
     {
+        try {if (cmdActive) mProjectEditor.getUndoStack().abortCommand();} catch (...) {}
         QMessageBox::critical(this, tr("Error"), e.getUserMsg());
     }
 }

@@ -34,7 +34,6 @@
 
 class GraphicsView;
 class GraphicsScene;
-class UndoStack;
 
 namespace library {
 class Component;
@@ -44,6 +43,7 @@ namespace project {
 class Project;
 class Board;
 class GenCompInstance;
+class ProjectEditor;
 }
 
 namespace Ui {
@@ -66,7 +66,7 @@ class UnplacedComponentsDock final : public QDockWidget
     public:
 
         // Constructors / Destructor
-        explicit UnplacedComponentsDock(Project& project, UndoStack& undoStack);
+        explicit UnplacedComponentsDock(project::ProjectEditor& editor);
         ~UnplacedComponentsDock();
 
         // Setters
@@ -97,8 +97,8 @@ class UnplacedComponentsDock final : public QDockWidget
 
 
         // General
+        ProjectEditor& mProjectEditor;
         Project& mProject;
-        UndoStack& mUndoStack;
         Board* mBoard;
         Ui::UnplacedComponentsDock* mUi;
         GraphicsView* mFootprintPreviewGraphicsView;
