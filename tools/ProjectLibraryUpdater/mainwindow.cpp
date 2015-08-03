@@ -97,9 +97,9 @@ void MainWindow::on_pushButton_2_clicked()
                 }
                 // copy generic component
                 GenericComponent latestGenComp(filepath);
-                FilePath dest = projectFilepath.getParentDir().getPathTo("lib/gencmp");
+                FilePath dest = projectFilepath.getParentDir().getPathTo("library/gencmp");
                 latestGenComp.saveTo(dest);
-                ui->log->addItem(dest.toNative());
+                ui->log->addItem(latestGenComp.getDirectory().toNative());
 
                 // search all required symbols
                 foreach (const GenCompSymbVar* symbvar, latestGenComp.getSymbolVariants())
@@ -114,9 +114,9 @@ void MainWindow::on_pushButton_2_clicked()
                                 QString("missing symbol: %1").arg(symbolUuid.toString()));
                         }
                         Symbol latestSymbol(filepath);
-                        FilePath dest = projectFilepath.getParentDir().getPathTo("lib/sym");
+                        FilePath dest = projectFilepath.getParentDir().getPathTo("library/sym");
                         latestSymbol.saveTo(dest);
-                        ui->log->addItem(dest.toNative());
+                        ui->log->addItem(latestSymbol.getDirectory().toNative());
                     }
                 }
             }
@@ -141,9 +141,9 @@ void MainWindow::on_pushButton_2_clicked()
                     }
                     // copy component
                     Component latestComp(filepath);
-                    FilePath dest = projectFilepath.getParentDir().getPathTo("lib/cmp");
+                    FilePath dest = projectFilepath.getParentDir().getPathTo("library/cmp");
                     latestComp.saveTo(dest);
-                    ui->log->addItem(dest.toNative());
+                    ui->log->addItem(latestComp.getDirectory().toNative());
 
                     // get package
                     QUuid packUuid = latestComp.getPackageUuid();
@@ -155,9 +155,9 @@ void MainWindow::on_pushButton_2_clicked()
                     }
                     // copy package
                     Package latestPackage(filepath);
-                    dest = projectFilepath.getParentDir().getPathTo("lib/pkg");
+                    dest = projectFilepath.getParentDir().getPathTo("library/pkg");
                     latestPackage.saveTo(dest);
-                    ui->log->addItem(dest.toNative());
+                    ui->log->addItem(latestPackage.getDirectory().toNative());
 
                     // get footprint
                     QUuid footprintUuid = latestPackage.getFootprintUuid();
@@ -169,9 +169,9 @@ void MainWindow::on_pushButton_2_clicked()
                     }
                     // copy footprint
                     Footprint latestFootprint(filepath);
-                    dest = projectFilepath.getParentDir().getPathTo("lib/fpt");
+                    dest = projectFilepath.getParentDir().getPathTo("library/fpt");
                     latestFootprint.saveTo(dest);
-                    ui->log->addItem(dest.toNative());
+                    ui->log->addItem(latestFootprint.getDirectory().toNative());
                 }
             }
         }

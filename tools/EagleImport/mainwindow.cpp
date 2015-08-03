@@ -139,7 +139,7 @@ void MainWindow::convertFile(ConvertFileType_t type, QSettings& outputSettings, 
     {
         // Check input file and read XML content
         SmartXmlFile file(filepath, false, true);
-        QSharedPointer<XmlDomDocument> doc = file.parseFileAndBuildDomTree(true);
+        QSharedPointer<XmlDomDocument> doc = file.parseFileAndBuildDomTree(false);
         XmlDomElement* node = doc->getRoot().getFirstChild("drawing/library", true, true);
 
         switch (type)
