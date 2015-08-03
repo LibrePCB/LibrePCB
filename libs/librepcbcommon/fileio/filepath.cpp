@@ -90,6 +90,7 @@ bool FilePath::isEmptyDir() const noexcept
         return false;
 
     QDir dir(mFileInfo.filePath());
+    dir.setFilter(QDir::AllEntries | QDir::NoDotAndDotDot);
     return (dir.count() == 0);
 }
 
