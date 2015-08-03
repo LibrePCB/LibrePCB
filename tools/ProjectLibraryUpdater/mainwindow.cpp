@@ -89,41 +89,35 @@ void MainWindow::on_pushButton_2_clicked()
                  node; node = node->getNextSibling())
             {
                 QUuid genCompUuid = node->getAttribute<QUuid>("generic_component", true);
-                QMap<Version, FilePath> filepaths = lib.getGenericComponents(genCompUuid);
-                if (!filepaths.isEmpty())
-                {
-                    // copy generic component
-                    GenericComponent latestGenComp(filepaths.last().getParentDir());
-                    FilePath dest = projectFilepath.getParentDir().getPathTo("lib/gencmp");
-                    latestGenComp.saveTo(dest);
-                    ui->log->addItem(dest.toNative());
-
-                    // search all required symbols
-                    foreach (const GenCompSymbVar* symbvar, latestGenComp.getSymbolVariants())
-                    {
-                        foreach (const GenCompSymbVarItem* item, symbvar->getItems())
-                        {
-                            QUuid symbolUuid = item->getSymbolUuid();
-                            QMap<Version, FilePath> filepaths = lib.getSymbols(symbolUuid);
-                            if (!filepaths.isEmpty())
-                            {
-                                Symbol latestSymbol(filepaths.last().getParentDir());
-                                FilePath dest = projectFilepath.getParentDir().getPathTo("lib/sym");
-                                latestSymbol.saveTo(dest);
-                                ui->log->addItem(dest.toNative());
-                            }
-                            else
-                            {
-                                throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
-                                    QString("missing symbol: %1").arg(symbolUuid.toString()));
-                            }
-                        }
-                    }
-                }
-                else
+                FilePath filepath = lib.getLatestGenericComponent(genCompUuid);
+                if (!filepath.isValid())
                 {
                     throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
                         QString("missing generic component: %1").arg(genCompUuid.toString()));
+                }
+                // copy generic component
+                GenericComponent latestGenComp(filepath);
+                FilePath dest = projectFilepath.getParentDir().getPathTo("lib/gencmp");
+                latestGenComp.saveTo(dest);
+                ui->log->addItem(dest.toNative());
+
+                // search all required symbols
+                foreach (const GenCompSymbVar* symbvar, latestGenComp.getSymbolVariants())
+                {
+                    foreach (const GenCompSymbVarItem* item, symbvar->getItems())
+                    {
+                        QUuid symbolUuid = item->getSymbolUuid();
+                        FilePath filepath = lib.getLatestSymbol(symbolUuid);
+                        if (!filepath.isValid())
+                        {
+                            throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
+                                QString("missing symbol: %1").arg(symbolUuid.toString()));
+                        }
+                        Symbol latestSymbol(filepath);
+                        FilePath dest = projectFilepath.getParentDir().getPathTo("lib/sym");
+                        latestSymbol.saveTo(dest);
+                        ui->log->addItem(dest.toNative());
+                    }
                 }
             }
 
@@ -139,54 +133,45 @@ void MainWindow::on_pushButton_2_clicked()
                      node; node = node->getNextSibling())
                 {
                     QUuid compUuid = node->getAttribute<QUuid>("component", true);
-                    QMap<Version, FilePath> filepaths = lib.getComponents(compUuid);
-                    if (!filepaths.isEmpty())
-                    {
-                        // copy component
-                        Component latestComp(filepaths.last().getParentDir());
-                        FilePath dest = projectFilepath.getParentDir().getPathTo("lib/cmp");
-                        latestComp.saveTo(dest);
-                        ui->log->addItem(dest.toNative());
-
-                        // get package
-                        QUuid packUuid = latestComp.getPackageUuid();
-                        QMap<Version, FilePath> filepaths = lib.getPackages(packUuid);
-                        if (!filepaths.isEmpty())
-                        {
-                            // copy package
-                            Package latestPackage(filepaths.last().getParentDir());
-                            FilePath dest = projectFilepath.getParentDir().getPathTo("lib/pkg");
-                            latestPackage.saveTo(dest);
-                            ui->log->addItem(dest.toNative());
-
-                            // get footprint
-                            QUuid footprintUuid = latestPackage.getFootprintUuid();
-                            QMap<Version, FilePath> filepaths = lib.getFootprints(footprintUuid);
-                            if (!filepaths.isEmpty())
-                            {
-                                // copy footprint
-                                Footprint latestFootprint(filepaths.last().getParentDir());
-                                FilePath dest = projectFilepath.getParentDir().getPathTo("lib/fpt");
-                                latestFootprint.saveTo(dest);
-                                ui->log->addItem(dest.toNative());
-                            }
-                            else
-                            {
-                                throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
-                                    QString("missing footprint: %1").arg(footprintUuid.toString()));
-                            }
-                        }
-                        else
-                        {
-                            throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
-                                QString("missing package: %1").arg(packUuid.toString()));
-                        }
-                    }
-                    else
+                    FilePath filepath = lib.getLatestComponent(compUuid);
+                    if (!filepath.isValid())
                     {
                         throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
                             QString("missing component: %1").arg(compUuid.toString()));
                     }
+                    // copy component
+                    Component latestComp(filepath);
+                    FilePath dest = projectFilepath.getParentDir().getPathTo("lib/cmp");
+                    latestComp.saveTo(dest);
+                    ui->log->addItem(dest.toNative());
+
+                    // get package
+                    QUuid packUuid = latestComp.getPackageUuid();
+                    filepath = lib.getLatestPackage(packUuid);
+                    if (!filepath.isValid())
+                    {
+                        throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
+                            QString("missing package: %1").arg(packUuid.toString()));
+                    }
+                    // copy package
+                    Package latestPackage(filepath);
+                    dest = projectFilepath.getParentDir().getPathTo("lib/pkg");
+                    latestPackage.saveTo(dest);
+                    ui->log->addItem(dest.toNative());
+
+                    // get footprint
+                    QUuid footprintUuid = latestPackage.getFootprintUuid();
+                    filepath = lib.getLatestFootprint(footprintUuid);
+                    if (!filepath.isValid())
+                    {
+                        throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
+                            QString("missing footprint: %1").arg(footprintUuid.toString()));
+                    }
+                    // copy footprint
+                    Footprint latestFootprint(filepath);
+                    dest = projectFilepath.getParentDir().getPathTo("lib/fpt");
+                    latestFootprint.saveTo(dest);
+                    ui->log->addItem(dest.toNative());
                 }
             }
         }

@@ -87,21 +87,35 @@ class Library final : public QObject
 
 
         // Getters: Library Elements by their UUID
-        QMultiMap<Version, FilePath> getComponentCategories(const QUuid& uuid) const noexcept;
-        QMultiMap<Version, FilePath> getPackageCategories(const QUuid& uuid) const noexcept;
-        QMultiMap<Version, FilePath> getSymbols(const QUuid& uuid) const noexcept;
-        QMultiMap<Version, FilePath> getFootprints(const QUuid& uuid) const noexcept;
-        QMultiMap<Version, FilePath> get3dModels(const QUuid& uuid) const noexcept;
-        QMultiMap<Version, FilePath> getSpiceModels(const QUuid& uuid) const noexcept;
-        QMultiMap<Version, FilePath> getPackages(const QUuid& uuid) const noexcept;
-        QMultiMap<Version, FilePath> getGenericComponents(const QUuid& uuid) const noexcept;
-        QMultiMap<Version, FilePath> getComponents(const QUuid& uuid) const noexcept;
+        QMultiMap<Version, FilePath> getComponentCategories(const QUuid& uuid) const throw (Exception);
+        QMultiMap<Version, FilePath> getPackageCategories(const QUuid& uuid) const throw (Exception);
+        QMultiMap<Version, FilePath> getSymbols(const QUuid& uuid) const throw (Exception);
+        QMultiMap<Version, FilePath> getFootprints(const QUuid& uuid) const throw (Exception);
+        QMultiMap<Version, FilePath> get3dModels(const QUuid& uuid) const throw (Exception);
+        QMultiMap<Version, FilePath> getSpiceModels(const QUuid& uuid) const throw (Exception);
+        QMultiMap<Version, FilePath> getPackages(const QUuid& uuid) const throw (Exception);
+        QMultiMap<Version, FilePath> getGenericComponents(const QUuid& uuid) const throw (Exception);
+        QMultiMap<Version, FilePath> getComponents(const QUuid& uuid) const throw (Exception);
+
+        // Getters: Best Match Library Elements by their UUID
+        FilePath getLatestComponentCategory(const QUuid& uuid) const throw (Exception);
+        FilePath getLatestPackageCategory(const QUuid& uuid) const throw (Exception);
+        FilePath getLatestSymbol(const QUuid& uuid) const throw (Exception);
+        FilePath getLatestFootprint(const QUuid& uuid) const throw (Exception);
+        FilePath getLatest3dModel(const QUuid& uuid) const throw (Exception);
+        FilePath getLatestSpiceModel(const QUuid& uuid) const throw (Exception);
+        FilePath getLatestPackage(const QUuid& uuid) const throw (Exception);
+        FilePath getLatestGenericComponent(const QUuid& uuid) const throw (Exception);
+        FilePath getLatestComponent(const QUuid& uuid) const throw (Exception);
+
+        // Getters: Element Metadata
+        void getComponentMetadata(const FilePath& cmpDir, QUuid* pkgUuid) const throw (Exception);
 
         // Getters: Special
-        QMultiMap<QUuid, FilePath> getComponentCategoryChilds(const QUuid& parent) const noexcept;
-        QMultiMap<QUuid, FilePath> getPackageCategoryChilds(const QUuid& parent) const noexcept;
-        QMultiMap<QUuid, FilePath> getGenericComponentsByCategory(const QUuid& category) const noexcept;
-
+        QSet<QUuid> getComponentCategoryChilds(const QUuid& parent) const throw (Exception);
+        QSet<QUuid> getPackageCategoryChilds(const QUuid& parent) const throw (Exception);
+        QSet<QUuid> getGenericComponentsByCategory(const QUuid& category) const throw (Exception);
+        QSet<QUuid> getComponentsOfGenericComponent(const QUuid& genComp) const throw (Exception);
 
         // General Methods
 
@@ -126,13 +140,16 @@ class Library final : public QObject
         template <typename ElementType>
         int addElementsToDb(const QList<QString>& xmlFiles, const QString& tablename,
                             const QString& id_rowname) throw (Exception);
+        int addPackagesToDb(const QList<QString>& xmlFiles, const QString& tablename,
+                            const QString& id_rowname) throw (Exception);
+        int addComponentsToDb(const QList<QString>& xmlFiles, const QString& tablename,
+                              const QString& id_rowname) throw (Exception);
         QMultiMap<Version, FilePath> getElementFilePathsFromDb(const QString& tablename,
                                                                const QUuid& uuid) const noexcept;
-        QMultiMap<QUuid, FilePath> getCategoryChilds(const QString& tablename,
-                                                     const QUuid& categoryUuid) const noexcept;
-        QMultiMap<QUuid, FilePath> getElementsByCategory(const QString& tablename,
-                                                         const QString& idrowname,
-                                                         const QUuid& categoryUuid) const noexcept;
+        FilePath getLatestVersionFilePath(const QMultiMap<Version, FilePath>& list) const noexcept;
+        QSet<QUuid> getCategoryChilds(const QString& tablename, const QUuid& categoryUuid) const throw (Exception);
+        QSet<QUuid> getElementsByCategory(const QString& tablename, const QString& idrowname,
+                                          const QUuid& categoryUuid) const throw (Exception);
         void clearDatabaseAndCreateTables() throw (Exception);
         QMultiMap<QString, QString> getAllXmlFilesInLibDir() throw (Exception);
         QSqlQuery prepareQuery(const QString& query) const throw (Exception);

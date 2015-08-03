@@ -162,15 +162,15 @@ void AddGenCompDialog::setSelectedCategory(const QUuid& categoryUuid)
     const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
 
     mSelectedCategoryUuid = categoryUuid;
-    QMultiMap<QUuid, FilePath> genComps = mWorkspace.getLibrary().getGenericComponentsByCategory(categoryUuid);
-    foreach (const QUuid& genCompUuid, genComps.uniqueKeys())
+    QSet<QUuid> genComps = mWorkspace.getLibrary().getGenericComponentsByCategory(categoryUuid);
+    foreach (const QUuid& genCompUuid, genComps)
     {
-        QMap<Version, FilePath> genComps = mWorkspace.getLibrary().getGenericComponents(genCompUuid);
-        if (genComps.isEmpty()) continue;
-        library::GenericComponent* genComp = new library::GenericComponent(genComps.first());
+        FilePath genCompFp = mWorkspace.getLibrary().getLatestGenericComponent(genCompUuid);
+        if (!genCompFp.isValid()) continue;
+        library::GenericComponent genComp(genCompFp); // TODO: use library metadata instead of loading the whole component
 
-        QListWidgetItem* item = new QListWidgetItem(genComp->getName(localeOrder));
-        item->setData(Qt::UserRole, genComp->getDirectory().toStr());
+        QListWidgetItem* item = new QListWidgetItem(genComp.getName(localeOrder));
+        item->setData(Qt::UserRole, genCompFp.toStr());
         mUi->listGenericComponents->addItem(item);
     }
 }
@@ -231,9 +231,9 @@ void AddGenCompDialog::setSelectedSymbVar(const library::GenCompSymbVar* symbVar
 
         foreach (const library::GenCompSymbVarItem* item, symbVar->getItems())
         {
-            QMultiMap<Version, FilePath> symbols = mWorkspace.getLibrary().getSymbols(item->getSymbolUuid());
-            if (symbols.isEmpty()) continue; // TODO: show warning
-            const library::Symbol* symbol = new library::Symbol(symbols.first());
+            FilePath symbolFp = mWorkspace.getLibrary().getLatestSymbol(item->getSymbolUuid());
+            if (!symbolFp.isValid()) continue; // TODO: show warning
+            const library::Symbol* symbol = new library::Symbol(symbolFp); // TODO: fix memory leak...
             library::SymbolPreviewGraphicsItem* graphicsItem = new library::SymbolPreviewGraphicsItem(
                 mProject, localeOrder, *symbol, mSelectedGenComp, symbVar->getUuid(), item->getUuid());
             //graphicsItem->setDrawBoundingRect(mProject.getWorkspace().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect());

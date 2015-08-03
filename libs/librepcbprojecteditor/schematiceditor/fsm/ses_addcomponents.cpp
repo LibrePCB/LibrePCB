@@ -325,15 +325,14 @@ void SES_AddComponents::startAddingComponent(const QUuid& genComp, const QUuid& 
             else
             {
                 // copy the generic component to the project's library
-                QMultiMap<Version, FilePath> genComps = mWorkspace.getLibrary().getGenericComponents(genCompUuid);
-                if (genComps.isEmpty())
+                FilePath genCmpFp = mWorkspace.getLibrary().getLatestGenericComponent(genCompUuid);
+                if (!genCmpFp.isValid())
                 {
                     throw RuntimeError(__FILE__, __LINE__, QString(),
                         QString(tr("Generic Component not found in library: %1"))
                         .arg(genCompUuid.toString()));
                 }
-                FilePath genCompFilePath = genComps.first();
-                mGenComp = new library::GenericComponent(genCompFilePath);
+                mGenComp = new library::GenericComponent(genCmpFp);
                 auto cmd = new CmdProjectLibraryAddElement<library::GenericComponent>(
                     mProject.getLibrary(), *mGenComp);
                 mUndoStack.appendToCommand(cmd);
@@ -366,14 +365,13 @@ void SES_AddComponents::startAddingComponent(const QUuid& genComp, const QUuid& 
             QUuid uuid = item->getSymbolUuid();
             if (!mProject.getLibrary().getSymbol(uuid))
             {
-                QMultiMap<Version, FilePath> symbols = mWorkspace.getLibrary().getSymbols(uuid);
-                if (symbols.isEmpty())
+                FilePath symbolFp = mWorkspace.getLibrary().getLatestSymbol(uuid);
+                if (!symbolFp.isValid())
                 {
                     throw RuntimeError(__FILE__, __LINE__, QString(),
                         QString(tr("Symbol not found in library: %1")).arg(uuid.toString()));
                 }
-                FilePath filepath = symbols.first();
-                library::Symbol* symbol = new library::Symbol(filepath);
+                library::Symbol* symbol = new library::Symbol(symbolFp);
                 auto cmd = new CmdProjectLibraryAddElement<library::Symbol>(
                     mProject.getLibrary(), *symbol);
                 mUndoStack.appendToCommand(cmd);

@@ -40,14 +40,14 @@ CategoryTreeItem::CategoryTreeItem(const Library& library, const QStringList loc
 {
     if (!mUuid.isNull())
     {
-        QMap<Version, FilePath> xmlFiles = library.getComponentCategories(mUuid);
-        if (!xmlFiles.isEmpty()) mCategory = new ComponentCategory(xmlFiles.first());
+        FilePath fp = library.getLatestComponentCategory(mUuid);
+        if (fp.isValid()) mCategory = new ComponentCategory(fp);
     }
 
     if ((!mUuid.isNull()) || (!mParent))
     {
-        QMultiMap<QUuid, FilePath> childs = library.getComponentCategoryChilds(mUuid);
-        foreach (const QUuid& childUuid, childs.uniqueKeys())
+        QSet<QUuid> childs = library.getComponentCategoryChilds(mUuid);
+        foreach (const QUuid& childUuid, childs)
             mChilds.append(new CategoryTreeItem(library, mLocaleOrder, this, childUuid));
 
         // sort childs
