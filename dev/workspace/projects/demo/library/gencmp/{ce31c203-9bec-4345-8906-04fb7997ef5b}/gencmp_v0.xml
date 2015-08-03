@@ -6,11 +6,13 @@
         <author/>
         <created/>
         <last_modified/>
-        <name locale="en_US">Simple Voltage Regulator</name>
+        <name locale="en_US">Voltage Regulator 3P</name>
         <description locale="en_US">Voltage Regulator with 3 Pins: IN, GND, OUT</description>
         <keywords locale="en_US"></keywords>
     </meta>
-    <categories/>
+    <categories>
+        <category>{4b890baf-9df3-4d9f-94ed-2808cd9a8781}</category>
+    </categories>
     <attributes/>
     <properties>
         <schematic_only>false</schematic_only>
@@ -22,15 +24,15 @@
         </prefixes>
     </properties>
     <signals>
-        <signal negated="false" forced_net_name="" clock="false" required="false" uuid="{8e074b73-9015-4c28-969f-d2d929af889d}" role="passive">
+        <signal required="false" uuid="{8e074b73-9015-4c28-969f-d2d929af889d}" role="passive" forced_net_name="" clock="false" negated="false">
             <name locale="en_US">GND</name>
             <description locale="en_US"></description>
         </signal>
-        <signal negated="false" forced_net_name="" clock="false" required="false" uuid="{a78ae9aa-1c78-4d1f-98e8-9bd253555a6d}" role="passive">
+        <signal required="false" uuid="{a78ae9aa-1c78-4d1f-98e8-9bd253555a6d}" role="passive" forced_net_name="" clock="false" negated="false">
             <name locale="en_US">VI</name>
             <description locale="en_US"></description>
         </signal>
-        <signal negated="false" forced_net_name="" clock="false" required="false" uuid="{bdd7ce7c-4bfc-4215-9431-3ea24f340e8a}" role="passive">
+        <signal required="false" uuid="{bdd7ce7c-4bfc-4215-9431-3ea24f340e8a}" role="passive" forced_net_name="" clock="false" negated="false">
             <name locale="en_US">VO</name>
             <description locale="en_US"></description>
         </signal>
@@ -40,11 +42,11 @@
             <name locale="en_US">default</name>
             <description locale="en_US"></description>
             <symbol_items>
-                <item symbol="{5062dbe6-4215-4c75-bb61-03e82f2c0734}" required="true" uuid="{52ef2b10-c149-4dfc-a2d8-2805efff2e13}" suffix="">
+                <item required="true" uuid="{52ef2b10-c149-4dfc-a2d8-2805efff2e13}" suffix="" symbol="{5062dbe6-4215-4c75-bb61-03e82f2c0734}">
                     <pin_signal_map>
-                        <map signal="{8e074b73-9015-4c28-969f-d2d929af889d}" display="none" pin="{61bd9691-1775-4001-b8e3-e44cd98e685a}"/>
-                        <map signal="{bdd7ce7c-4bfc-4215-9431-3ea24f340e8a}" display="gen_comp_signal" pin="{114de26b-3fe5-4a03-89ae-769ab7136879}"/>
-                        <map signal="{a78ae9aa-1c78-4d1f-98e8-9bd253555a6d}" display="gen_comp_signal" pin="{7ad364d0-7508-4dc4-92a3-cf996aa3d5f1}"/>
+                        <map pin="{7ad364d0-7508-4dc4-92a3-cf996aa3d5f1}" signal="{a78ae9aa-1c78-4d1f-98e8-9bd253555a6d}" display="gen_comp_signal"/>
+                        <map pin="{114de26b-3fe5-4a03-89ae-769ab7136879}" signal="{bdd7ce7c-4bfc-4215-9431-3ea24f340e8a}" display="gen_comp_signal"/>
+                        <map pin="{61bd9691-1775-4001-b8e3-e44cd98e685a}" signal="{8e074b73-9015-4c28-969f-d2d929af889d}" display="none"/>
                     </pin_signal_map>
                 </item>
             </symbol_items>

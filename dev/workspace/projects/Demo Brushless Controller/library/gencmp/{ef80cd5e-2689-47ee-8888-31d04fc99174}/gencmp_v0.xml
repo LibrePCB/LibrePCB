@@ -11,10 +11,10 @@
         <keywords locale="en_US">resistor,resistance</keywords>
     </meta>
     <categories>
-        <category>{00000000-0000-4001-8000-000000000000}</category>
+        <category>{1039f038-20a6-4bfe-89c1-99f34fbb45bd}</category>
     </categories>
     <attributes>
-        <attribute key="RESISTANCE" type="resistance" unit="ohm">
+        <attribute unit="ohm" type="resistance" key="RESISTANCE">
             <name locale="en_US">Resistance</name>
             <description locale="en_US">The nominal resistance of the resistor.</description>
             <default_value locale="en_US"></default_value>
@@ -30,24 +30,36 @@
         </prefixes>
     </properties>
     <signals>
-        <signal negated="false" forced_net_name="" clock="false" required="true" uuid="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}" role="passive">
+        <signal required="true" uuid="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}" role="passive" forced_net_name="" clock="false" negated="false">
             <name locale="en_US">1</name>
             <description locale="en_US"></description>
         </signal>
-        <signal negated="false" forced_net_name="" clock="false" required="true" uuid="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}" role="passive">
+        <signal required="true" uuid="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}" role="passive" forced_net_name="" clock="false" negated="false">
             <name locale="en_US">2</name>
             <description locale="en_US"></description>
         </signal>
     </signals>
     <symbol_variants>
         <variant norm="IEC 60617" uuid="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}" default="true">
-            <name locale="en_US">European Variant</name>
+            <name locale="en_US">European</name>
             <description locale="en_US"></description>
             <symbol_items>
-                <item symbol="{75372c18-3ba4-42e8-b3b2-2eb5039d441e}" required="true" uuid="{5988c66a-f507-487e-9b40-486502e8c9bd}" suffix="">
+                <item required="true" uuid="{5988c66a-f507-487e-9b40-486502e8c9bd}" suffix="" symbol="{75372c18-3ba4-42e8-b3b2-2eb5039d441e}">
                     <pin_signal_map>
-                        <map signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}" display="none" pin="{2e4f8b10-ad5a-443e-b408-e183efaa4758}"/>
-                        <map signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}" display="none" pin="{2731f213-ee20-4eb0-a18b-ad97d9fea7a0}"/>
+                        <map pin="{2e4f8b10-ad5a-443e-b408-e183efaa4758}" signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}" display="none"/>
+                        <map pin="{2731f213-ee20-4eb0-a18b-ad97d9fea7a0}" signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}" display="none"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+        <variant norm="IEEE 315" uuid="{d16e1f44-16af-4773-a310-de370f744548}" default="false">
+            <name locale="en_US">American</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item required="true" uuid="{169660fd-968a-4d3e-83f5-47f973b4ecd8}" suffix="" symbol="{193ef70d-8dab-4a6c-a672-274c5bf09b68}">
+                    <pin_signal_map>
+                        <map pin="{f42020e8-c53f-4ff2-947e-07879cf42546}" signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}" display="none"/>
+                        <map pin="{2b3dd7f8-043b-4d43-9302-9300ba356de7}" signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}" display="none"/>
                     </pin_signal_map>
                 </item>
             </symbol_items>

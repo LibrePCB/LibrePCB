@@ -10,7 +10,9 @@
         <description locale="en_US"></description>
         <keywords locale="en_US"></keywords>
     </meta>
-    <categories/>
+    <categories>
+        <category>{4d1c95f4-2e60-4f50-a15b-ba9186a01b1a}</category>
+    </categories>
     <attributes/>
     <properties>
         <schematic_only>false</schematic_only>
@@ -22,11 +24,11 @@
         </prefixes>
     </properties>
     <signals>
-        <signal negated="false" forced_net_name="" clock="false" required="false" uuid="{daf86625-d081-4fd6-a925-14976f92263d}" role="passive">
+        <signal required="true" uuid="{daf86625-d081-4fd6-a925-14976f92263d}" role="passive" forced_net_name="" clock="false" negated="false">
             <name locale="en_US">A</name>
             <description locale="en_US"></description>
         </signal>
-        <signal negated="false" forced_net_name="" clock="false" required="false" uuid="{343a05e0-6e9b-4317-a7de-61bd3c774b5c}" role="passive">
+        <signal required="true" uuid="{343a05e0-6e9b-4317-a7de-61bd3c774b5c}" role="passive" forced_net_name="" clock="false" negated="false">
             <name locale="en_US">C</name>
             <description locale="en_US"></description>
         </signal>
@@ -36,10 +38,10 @@
             <name locale="en_US">default</name>
             <description locale="en_US"></description>
             <symbol_items>
-                <item symbol="{9b75d0ce-ac4e-4a52-a88a-8777f66d3241}" required="true" uuid="{426e2b17-da88-400b-b1fb-248b24f9c541}" suffix="">
+                <item required="true" uuid="{426e2b17-da88-400b-b1fb-248b24f9c541}" suffix="" symbol="{9b75d0ce-ac4e-4a52-a88a-8777f66d3241}">
                     <pin_signal_map>
-                        <map signal="{daf86625-d081-4fd6-a925-14976f92263d}" display="none" pin="{cd50cc1e-a0d2-460e-818b-c9a4cc03ec42}"/>
-                        <map signal="{343a05e0-6e9b-4317-a7de-61bd3c774b5c}" display="none" pin="{48dad2d5-4392-4d8f-870e-9e69d9727b83}"/>
+                        <map pin="{cd50cc1e-a0d2-460e-818b-c9a4cc03ec42}" signal="{daf86625-d081-4fd6-a925-14976f92263d}" display="none"/>
+                        <map pin="{48dad2d5-4392-4d8f-870e-9e69d9727b83}" signal="{343a05e0-6e9b-4317-a7de-61bd3c774b5c}" display="none"/>
                     </pin_signal_map>
                 </item>
             </symbol_items>

@@ -10,7 +10,9 @@
         <description locale="en_US"></description>
         <keywords locale="en_US"></keywords>
     </meta>
-    <categories/>
+    <categories>
+        <category>{f8ad7e13-8509-45be-acce-68f2589a6814}</category>
+    </categories>
     <attributes/>
     <properties>
         <schematic_only>false</schematic_only>
@@ -22,7 +24,7 @@
         </prefixes>
     </properties>
     <signals>
-        <signal negated="false" forced_net_name="" clock="false" required="true" uuid="{ad6ae81a-7914-49b7-a87b-a0e8574b7398}" role="passive">
+        <signal required="true" uuid="{ad6ae81a-7914-49b7-a87b-a0e8574b7398}" role="passive" forced_net_name="" clock="false" negated="false">
             <name locale="en_US">1</name>
             <description locale="en_US"></description>
         </signal>
@@ -32,9 +34,9 @@
             <name locale="en_US">default</name>
             <description locale="en_US"></description>
             <symbol_items>
-                <item symbol="{dce44427-4d53-4881-a77a-3e4faa383e3b}" required="true" uuid="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}" suffix="">
+                <item required="true" uuid="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}" suffix="" symbol="{dce44427-4d53-4881-a77a-3e4faa383e3b}">
                     <pin_signal_map>
-                        <map signal="{ad6ae81a-7914-49b7-a87b-a0e8574b7398}" display="none" pin="{01f564d5-9975-4613-bf90-153a031fe625}"/>
+                        <map pin="{01f564d5-9975-4613-bf90-153a031fe625}" signal="{ad6ae81a-7914-49b7-a87b-a0e8574b7398}" display="none"/>
                     </pin_signal_map>
                 </item>
             </symbol_items>

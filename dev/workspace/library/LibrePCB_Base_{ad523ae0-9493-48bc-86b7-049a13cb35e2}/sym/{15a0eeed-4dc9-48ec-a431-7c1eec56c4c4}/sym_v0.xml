@@ -6,11 +6,13 @@
         <author>LibrePCB</author>
         <created>2015-03-01T20:23:15Z</created>
         <last_modified>2015-03-01T20:23:15Z</last_modified>
-        <name locale="en_US">Unipolar Capacitor (IEC 60617)</name>
-        <description locale="en_US"></description>
+        <name locale="en_US">CPOL-EU</name>
+        <description locale="en_US">Unipolar Capacitor European (IEC 60617)</description>
         <keywords locale="en_US">capacitor,capacitance,unipolar</keywords>
     </meta>
-    <categories/>
+    <categories>
+        <category>{00000000-0000-4001-8000-000000000000}</category>
+    </categories>
     <geometry>
         <polygon fill="false" start_y="1.016" width="0.175" layer="10" start_x="-1.9" grab_area="true">
             <segment angle="0" end_x="1.9" end_y="1.016"/>

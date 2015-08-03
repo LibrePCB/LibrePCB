@@ -10,7 +10,9 @@
         <description locale="en_US"></description>
         <keywords locale="en_US"></keywords>
     </meta>
-    <categories/>
+    <categories>
+        <category>{e8080ad9-6b53-46bd-8996-a03c30f99ebe}</category>
+    </categories>
     <attributes/>
     <properties>
         <schematic_only>false</schematic_only>
@@ -22,35 +24,35 @@
         </prefixes>
     </properties>
     <signals>
-        <signal negated="false" forced_net_name="" clock="false" required="false" uuid="{54963a72-e95e-407e-af32-8e59055b46aa}" role="passive">
+        <signal required="false" uuid="{54963a72-e95e-407e-af32-8e59055b46aa}" role="passive" forced_net_name="" clock="false" negated="false">
             <name locale="en_US">IN</name>
             <description locale="en_US"></description>
         </signal>
-        <signal negated="false" forced_net_name="" clock="false" required="false" uuid="{898a8f91-061e-40ac-bf29-43a84eda9913}" role="passive">
+        <signal required="false" uuid="{898a8f91-061e-40ac-bf29-43a84eda9913}" role="passive" forced_net_name="" clock="false" negated="false">
             <name locale="en_US">HO</name>
             <description locale="en_US"></description>
         </signal>
-        <signal negated="false" forced_net_name="" clock="false" required="false" uuid="{bafd767f-c42d-463d-b39c-040416284df9}" role="passive">
+        <signal required="false" uuid="{bafd767f-c42d-463d-b39c-040416284df9}" role="passive" forced_net_name="" clock="false" negated="false">
             <name locale="en_US">VCC</name>
             <description locale="en_US"></description>
         </signal>
-        <signal negated="false" forced_net_name="" clock="false" required="false" uuid="{828ababd-e4bb-4c7e-a33e-15c7c1abb572}" role="passive">
+        <signal required="false" uuid="{828ababd-e4bb-4c7e-a33e-15c7c1abb572}" role="passive" forced_net_name="" clock="false" negated="false">
             <name locale="en_US">COM</name>
             <description locale="en_US"></description>
         </signal>
-        <signal negated="false" forced_net_name="" clock="false" required="false" uuid="{f279b33e-53e5-450d-b215-a82b8dfb4009}" role="passive">
+        <signal required="false" uuid="{f279b33e-53e5-450d-b215-a82b8dfb4009}" role="passive" forced_net_name="" clock="false" negated="false">
             <name locale="en_US">/SD</name>
             <description locale="en_US"></description>
         </signal>
-        <signal negated="false" forced_net_name="" clock="false" required="false" uuid="{824128e9-9369-402b-a967-ad4c7feffb86}" role="passive">
+        <signal required="false" uuid="{824128e9-9369-402b-a967-ad4c7feffb86}" role="passive" forced_net_name="" clock="false" negated="false">
             <name locale="en_US">VB</name>
             <description locale="en_US"></description>
         </signal>
-        <signal negated="false" forced_net_name="" clock="false" required="false" uuid="{4f49e0b2-7b6d-4e90-a33f-d95219bf0b27}" role="passive">
+        <signal required="false" uuid="{4f49e0b2-7b6d-4e90-a33f-d95219bf0b27}" role="passive" forced_net_name="" clock="false" negated="false">
             <name locale="en_US">LO</name>
             <description locale="en_US"></description>
         </signal>
-        <signal negated="false" forced_net_name="" clock="false" required="false" uuid="{22538966-fe04-49ce-93d9-2d7a59c60c96}" role="passive">
+        <signal required="false" uuid="{22538966-fe04-49ce-93d9-2d7a59c60c96}" role="passive" forced_net_name="" clock="false" negated="false">
             <name locale="en_US">VS</name>
             <description locale="en_US"></description>
         </signal>
@@ -60,16 +62,16 @@
             <name locale="en_US">default</name>
             <description locale="en_US"></description>
             <symbol_items>
-                <item symbol="{8f089c97-5f9b-4437-94a6-3d2f958583c7}" required="true" uuid="{eb88330e-d961-45aa-bcca-54cc88c9f2fc}" suffix="">
+                <item required="true" uuid="{eb88330e-d961-45aa-bcca-54cc88c9f2fc}" suffix="" symbol="{8f089c97-5f9b-4437-94a6-3d2f958583c7}">
                     <pin_signal_map>
-                        <map signal="{828ababd-e4bb-4c7e-a33e-15c7c1abb572}" display="gen_comp_signal" pin="{8217d867-da05-4630-a4d7-1926324fe9a5}"/>
-                        <map signal="{898a8f91-061e-40ac-bf29-43a84eda9913}" display="gen_comp_signal" pin="{b3f36961-22ee-4e87-9189-68282ae86ad9}"/>
-                        <map signal="{f279b33e-53e5-450d-b215-a82b8dfb4009}" display="gen_comp_signal" pin="{f9f7d4ec-6ee7-4634-96b7-50b8838630a2}"/>
-                        <map signal="{22538966-fe04-49ce-93d9-2d7a59c60c96}" display="gen_comp_signal" pin="{371eaace-87bd-4780-846c-1cf31e4f1b74}"/>
-                        <map signal="{54963a72-e95e-407e-af32-8e59055b46aa}" display="gen_comp_signal" pin="{4338b443-d96e-4725-9d32-06a76a4680bf}"/>
-                        <map signal="{824128e9-9369-402b-a967-ad4c7feffb86}" display="gen_comp_signal" pin="{800ff2c4-86ae-43e3-9f05-4dc2b47e28df}"/>
-                        <map signal="{4f49e0b2-7b6d-4e90-a33f-d95219bf0b27}" display="gen_comp_signal" pin="{8115b469-234c-4f72-bef2-2e46d48daa90}"/>
-                        <map signal="{bafd767f-c42d-463d-b39c-040416284df9}" display="gen_comp_signal" pin="{64b1cf6f-dc2c-4ea1-9f4b-fac229b2df07}"/>
+                        <map pin="{64b1cf6f-dc2c-4ea1-9f4b-fac229b2df07}" signal="{bafd767f-c42d-463d-b39c-040416284df9}" display="gen_comp_signal"/>
+                        <map pin="{b3f36961-22ee-4e87-9189-68282ae86ad9}" signal="{898a8f91-061e-40ac-bf29-43a84eda9913}" display="gen_comp_signal"/>
+                        <map pin="{4338b443-d96e-4725-9d32-06a76a4680bf}" signal="{54963a72-e95e-407e-af32-8e59055b46aa}" display="gen_comp_signal"/>
+                        <map pin="{371eaace-87bd-4780-846c-1cf31e4f1b74}" signal="{22538966-fe04-49ce-93d9-2d7a59c60c96}" display="gen_comp_signal"/>
+                        <map pin="{f9f7d4ec-6ee7-4634-96b7-50b8838630a2}" signal="{f279b33e-53e5-450d-b215-a82b8dfb4009}" display="gen_comp_signal"/>
+                        <map pin="{8115b469-234c-4f72-bef2-2e46d48daa90}" signal="{4f49e0b2-7b6d-4e90-a33f-d95219bf0b27}" display="gen_comp_signal"/>
+                        <map pin="{8217d867-da05-4630-a4d7-1926324fe9a5}" signal="{828ababd-e4bb-4c7e-a33e-15c7c1abb572}" display="gen_comp_signal"/>
+                        <map pin="{800ff2c4-86ae-43e3-9f05-4dc2b47e28df}" signal="{824128e9-9369-402b-a967-ad4c7feffb86}" display="gen_comp_signal"/>
                     </pin_signal_map>
                 </item>
             </symbol_items>

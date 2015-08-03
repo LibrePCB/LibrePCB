@@ -43,13 +43,25 @@
     </signals>
     <symbol_variants>
         <variant uuid="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}" norm="IEC 60617" default="true">
-            <name locale="en_US">European Variant</name>
+            <name locale="en_US">European</name>
             <description locale="en_US"></description>
             <symbol_items>
                 <item uuid="{42989503-2795-4892-9d83-b919cd7dad76}" symbol="{eaa5837a-a451-40ae-8620-d21e9af42151}" required="true" suffix="">
                     <pin_signal_map>
                         <map pin="{fba2100c-f69f-40e1-b6be-8b2f2758ad52}" signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}" display="none"/>
                         <map pin="{99ba7020-af70-432f-9584-c452397065c5}" signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}" display="none"/>
+                    </pin_signal_map>
+                </item>
+            </symbol_items>
+        </variant>
+        <variant uuid="{6e639ff1-4e81-423b-9d0e-b28b35693a61}" norm="IEEE 315" default="false">
+            <name locale="en_US">American</name>
+            <description locale="en_US"></description>
+            <symbol_items>
+                <item uuid="{5e9de029-0af9-477f-afb4-bc05692e4b87}" symbol="{d5aad17b-0d58-4f79-9429-49e8201220b9}" required="true" suffix="">
+                    <pin_signal_map>
+                        <map pin="{83d40864-0a14-496e-a08d-faeb2bbd9af6}" signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}" display="none"/>
+                        <map pin="{c39ca7a0-22c0-4338-83e8-98aba0874d88}" signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}" display="none"/>
                     </pin_signal_map>
                 </item>
             </symbol_items>

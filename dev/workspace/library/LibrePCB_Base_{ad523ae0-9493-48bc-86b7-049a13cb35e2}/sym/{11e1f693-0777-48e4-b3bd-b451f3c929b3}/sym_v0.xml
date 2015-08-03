@@ -6,8 +6,8 @@
         <author>LibrePCB</author>
         <created>2015-03-01T20:00:00Z</created>
         <last_modified>2015-03-01T20:00:00Z</last_modified>
-        <name locale="en_US">Inductor (IEC 60617)</name>
-        <description locale="en_US"></description>
+        <name locale="en_US">L-EU</name>
+        <description locale="en_US">Inductor European (IEC 60617)</description>
         <keywords locale="en_US">inductor,inductance</keywords>
     </meta>
     <categories>

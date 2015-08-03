@@ -6,8 +6,8 @@
         <author>LibrePCB</author>
         <created>2015-03-01T20:00:00Z</created>
         <last_modified>2015-03-01T20:00:00Z</last_modified>
-        <name locale="en_US">Bipolar Capacitor (IEC 60617)</name>
-        <description locale="en_US"></description>
+        <name locale="en_US">C-EU</name>
+        <description locale="en_US">Bipolar Capacitor European (IEC 60617)</description>
         <keywords locale="en_US">capacitor,capacitance,bipolar</keywords>
     </meta>
     <categories>
