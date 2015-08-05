@@ -40,6 +40,7 @@ PRE_TARGETDEPS += \
     $${DESTDIR}/liblibrepcbcommon.a
 
 SOURCES += main.cpp \
-    common/filepathtest.cpp
+    common/filepathtest.cpp \
+    common/pointtest.cpp
 
 HEADERS +=
