@@ -37,7 +37,7 @@ WSI_AppDefaultMeasurementUnits::WSI_AppDefaultMeasurementUnits(WorkspaceSettings
     try
     {
         QString lengthUnitStr = loadValue("app_default_length_unit").toString();
-        mLengthUnit = LengthUnit::fromString(lengthUnitStr);
+        if (!lengthUnitStr.isEmpty()) mLengthUnit = LengthUnit::fromString(lengthUnitStr);
     }
     catch (Exception&)
     {
