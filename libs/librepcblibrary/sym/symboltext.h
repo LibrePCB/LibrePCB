@@ -55,7 +55,7 @@ class SymbolText final : public IF_XmlSerializableObject
         // Getters
         int getLayerId() const noexcept {return mLayerId;}
         const Point& getPosition() const noexcept {return mPosition;}
-        const Angle& getAngle() const noexcept {return mAngle;}
+        const Angle& getRotation() const noexcept {return mRotation;}
         const Length& getHeight() const noexcept {return mHeight;}
         const Alignment& getAlign() const noexcept {return mAlign;}
         const QString& getText() const noexcept {return mText;}
@@ -64,7 +64,7 @@ class SymbolText final : public IF_XmlSerializableObject
         void setLayerId(int layerId) noexcept {mLayerId = layerId;}
         void setText(const QString& text) noexcept {mText = text;}
         void setPosition(const Point& pos) noexcept {mPosition = pos;}
-        void setAngle(const Angle& angle) noexcept {mAngle = angle;}
+        void setRotation(const Angle& rotation) noexcept {mRotation = rotation;}
         void setHeight(const Length& height) noexcept {mHeight = height;}
         void setAlign(const Alignment& align) noexcept {mAlign = align;}
 
@@ -90,7 +90,7 @@ class SymbolText final : public IF_XmlSerializableObject
         int mLayerId;
         QString mText;
         Point mPosition;
-        Angle mAngle;
+        Angle mRotation;
         Length mHeight;
         Alignment mAlign;
 };

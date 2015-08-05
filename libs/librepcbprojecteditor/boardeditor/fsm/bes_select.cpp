@@ -109,10 +109,10 @@ BES_Base::ProcRetVal BES_Select::processSubStateIdle(BEE_Base* event) noexcept
             //pasteItems();
             return ForceStayInState;
         case BEE_Base::Edit_RotateCW:
-            rotateSelectedItems(Angle::deg90(), Point(), true);
+            rotateSelectedItems(-Angle::deg90(), Point(), true);
             return ForceStayInState;
         case BEE_Base::Edit_RotateCCW:
-            rotateSelectedItems(-Angle::deg90(), Point(), true);
+            rotateSelectedItems(Angle::deg90(), Point(), true);
             return ForceStayInState;
         case BEE_Base::Edit_Remove:
             //removeSelectedItems();

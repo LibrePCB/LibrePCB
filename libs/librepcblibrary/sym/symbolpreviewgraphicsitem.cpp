@@ -63,7 +63,7 @@ SymbolPreviewGraphicsItem::SymbolPreviewGraphicsItem(const IF_SchematicLayerProv
         if (mSymbVarItem) displayType = mSymbVarItem->getDisplayTypeOfPin(pin->getUuid());
         SymbolPinPreviewGraphicsItem* item = new SymbolPinPreviewGraphicsItem(layerProvider, localeOrder, *pin, signal, displayType);
         item->setPos(pin->getPosition().toPxQPointF());
-        item->setRotation(pin->getAngle().toDeg());
+        item->setRotation(-pin->getRotation().toDeg());
         item->setZValue(2);
         item->setParentItem(this);
     }
@@ -134,9 +134,9 @@ void SymbolPreviewGraphicsItem::updateCacheAndRepaint() noexcept
                                               Qt::TextDontClip, props.text);
 
         // check rotation
-        Angle absAngle = text->getAngle() + Angle::fromDeg(rotation());
+        Angle absAngle = text->getRotation() + Angle::fromDeg(rotation());
         absAngle.mapTo180deg();
-        props.rotate180 = (absAngle < -Angle::deg90() || absAngle >= Angle::deg90());
+        props.rotate180 = (absAngle <= -Angle::deg90() || absAngle > Angle::deg90());
 
         // calculate text position
         qreal dx, dy;
@@ -259,9 +259,9 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
         // draw text
         painter->save();
         if (props.rotate180)
-            painter->rotate(text->getAngle().toDeg() + 180);
+            painter->rotate(-text->getRotation().toDeg() + 180);
         else
-            painter->rotate(text->getAngle().toDeg());
+            painter->rotate(-text->getRotation().toDeg());
         painter->setPen(QPen(layer->getColor(selected), 0));
         painter->setFont(mFont);
         painter->drawText(props.textRect, props.align | Qt::TextWordWrap, props.text);

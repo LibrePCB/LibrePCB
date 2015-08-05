@@ -54,7 +54,7 @@ class SymbolPin final : public IF_XmlSerializableObject
         const QUuid& getUuid() const noexcept {return mUuid;}
         const Point& getPosition() const noexcept {return mPosition;}
         const Length& getLength() const noexcept {return mLength;}
-        const Angle& getAngle() const noexcept {return mAngle;}
+        const Angle& getRotation() const noexcept {return mRotation;}
         QString getName(const QStringList& localeOrder) const noexcept;
         QString getDescription(const QStringList& localeOrder) const noexcept;
         const QMap<QString, QString>& getNames() const noexcept {return mNames;}
@@ -63,7 +63,7 @@ class SymbolPin final : public IF_XmlSerializableObject
         // Setters
         void setPosition(const Point& pos) noexcept;
         void setLength(const Length& length) noexcept;
-        void setAngle(const Angle& angle) noexcept;
+        void setRotation(const Angle& rotation) noexcept;
         void setName(const QString& locale, const QString& name) noexcept;
         void setDescription(const QString& locale, const QString& description) noexcept;
 
@@ -88,7 +88,7 @@ class SymbolPin final : public IF_XmlSerializableObject
         QUuid mUuid;
         Point mPosition;
         Length mLength;
-        Angle mAngle;
+        Angle mRotation;
         QMap<QString, QString> mNames;
         QMap<QString, QString> mDescriptions;
 };

@@ -34,7 +34,7 @@ namespace project {
 CmdSymbolInstanceEdit::CmdSymbolInstanceEdit(SI_Symbol& symbol, UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Edit symbol instance"), parent), mSymbol(symbol),
     mOldPos(symbol.getPosition()), mNewPos(mOldPos),
-    mOldRotation(symbol.getAngle()), mNewRotation(mOldRotation)
+    mOldRotation(symbol.getRotation()), mNewRotation(mOldRotation)
 {
 }
 
@@ -43,7 +43,7 @@ CmdSymbolInstanceEdit::~CmdSymbolInstanceEdit() noexcept
     if ((mRedoCount == 0) && (mUndoCount == 0))
     {
         mSymbol.setPosition(mOldPos);
-        mSymbol.setAngle(mOldRotation);
+        mSymbol.setRotation(mOldRotation);
     }
 }
 
@@ -69,7 +69,7 @@ void CmdSymbolInstanceEdit::setRotation(const Angle& angle, bool immediate) noex
 {
     Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
     mNewRotation = angle;
-    if (immediate) mSymbol.setAngle(mNewRotation);
+    if (immediate) mSymbol.setRotation(mNewRotation);
 }
 
 void CmdSymbolInstanceEdit::rotate(const Angle& angle, const Point& center, bool immediate) noexcept
@@ -80,7 +80,7 @@ void CmdSymbolInstanceEdit::rotate(const Angle& angle, const Point& center, bool
     if (immediate)
     {
         mSymbol.setPosition(mNewPos);
-        mSymbol.setAngle(mNewRotation);
+        mSymbol.setRotation(mNewRotation);
     }
 }
 
@@ -93,13 +93,13 @@ void CmdSymbolInstanceEdit::redo() throw (Exception)
     try
     {
         mSymbol.setPosition(mNewPos);
-        mSymbol.setAngle(mNewRotation);
+        mSymbol.setRotation(mNewRotation);
         UndoCommand::redo();
     }
     catch (Exception &e)
     {
         mSymbol.setPosition(mOldPos);
-        mSymbol.setAngle(mOldRotation);
+        mSymbol.setRotation(mOldRotation);
         throw;
     }
 }
@@ -109,13 +109,13 @@ void CmdSymbolInstanceEdit::undo() throw (Exception)
     try
     {
         mSymbol.setPosition(mOldPos);
-        mSymbol.setAngle(mOldRotation);
+        mSymbol.setRotation(mOldRotation);
         UndoCommand::undo();
     }
     catch (Exception &e)
     {
         mSymbol.setPosition(mNewPos);
-        mSymbol.setAngle(mNewRotation);
+        mSymbol.setRotation(mNewRotation);
         throw;
     }
 }

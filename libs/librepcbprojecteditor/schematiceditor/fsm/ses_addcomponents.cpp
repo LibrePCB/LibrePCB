@@ -112,10 +112,10 @@ SES_Base::ProcRetVal SES_AddComponents::process(SEE_Base* event) noexcept
             return PassToParentState;
         }
         case SEE_Base::Edit_RotateCW:
-            mCurrentSymbolEditCommand->rotate(Angle::deg90(), mCurrentSymbolToPlace->getPosition(), true);
+            mCurrentSymbolEditCommand->rotate(-Angle::deg90(), mCurrentSymbolToPlace->getPosition(), true);
             return ForceStayInState;
         case SEE_Base::Edit_RotateCCW:
-            mCurrentSymbolEditCommand->rotate(-Angle::deg90(), mCurrentSymbolToPlace->getPosition(), true);
+            mCurrentSymbolEditCommand->rotate(Angle::deg90(), mCurrentSymbolToPlace->getPosition(), true);
             return ForceStayInState;
         case SEE_Base::GraphicsViewEvent:
             return processSceneEvent(event);
@@ -258,7 +258,7 @@ SES_Base::ProcRetVal SES_AddComponents::processSceneEvent(SEE_Base* event) noexc
 
                 case Qt::RightButton:
                     // rotate symbol
-                    mLastAngle -= Angle::deg90();
+                    mLastAngle += Angle::deg90();
                     mCurrentSymbolEditCommand->setRotation(mLastAngle, true);
                     return ForceStayInState;
 

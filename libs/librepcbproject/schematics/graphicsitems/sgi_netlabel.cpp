@@ -74,7 +74,8 @@ void SGI_NetLabel::updateCacheAndRepaint() noexcept
 {
     prepareGeometryChange();
 
-    mRotate180 = (mNetLabel.getAngle() < -Angle::deg90() || mNetLabel.getAngle() >= Angle::deg90());
+    mRotate180 = (mNetLabel.getRotation().mappedTo180deg() <= -Angle::deg90()
+                  || mNetLabel.getRotation().mappedTo180deg() > Angle::deg90());
 
     mStaticText.setText(mNetLabel.getNetSignal().getName());
     mStaticText.prepare(QTransform(), mFont);

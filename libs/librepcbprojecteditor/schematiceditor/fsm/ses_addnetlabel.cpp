@@ -134,7 +134,7 @@ SES_Base::ProcRetVal SES_AddNetLabel::processSceneEvent(SEE_Base* event) noexcep
                 }
                 case Qt::RightButton:
                 {
-                    mEditCmd->rotate(-Angle::deg90(), pos, true);
+                    mEditCmd->rotate(Angle::deg90(), pos, true);
                     return ForceStayInState;
                 }
                 default:

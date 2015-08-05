@@ -127,9 +127,9 @@ QString SI_SymbolPin::getDisplayText(bool returnGenCompSignalNameIfEmpty,
 void SI_SymbolPin::updatePosition() noexcept
 {
     mPosition = mSymbol.mapToScene(mSymbolPin->getPosition());
-    mAngle = mSymbol.getAngle() + mSymbolPin->getAngle();
+    mRotation = mSymbol.getRotation() + mSymbolPin->getRotation();
     mGraphicsItem->setPos(mPosition.toPxQPointF());
-    mGraphicsItem->setRotation(mAngle.toDeg());
+    mGraphicsItem->setRotation(-mRotation.toDeg());
     mGraphicsItem->updateCacheAndRepaint();
     if (mRegisteredNetPoint)
         mRegisteredNetPoint->setPosition(mPosition);

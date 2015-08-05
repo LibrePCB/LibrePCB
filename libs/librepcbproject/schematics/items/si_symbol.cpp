@@ -57,17 +57,17 @@ SI_Symbol::SI_Symbol(Schematic& schematic, const XmlDomElement& domElement) thro
 
     mPosition.setX(domElement.getFirstChild("position", true)->getAttribute<Length>("x"));
     mPosition.setY(domElement.getFirstChild("position", true)->getAttribute<Length>("y"));
-    mAngle = domElement.getFirstChild("position", true)->getAttribute<Angle>("angle");
+    mRotation = domElement.getFirstChild("position", true)->getAttribute<Angle>("rotation");
 
     QUuid symbVarItemUuid = domElement.getAttribute<QUuid>("symbol_item");
     init(symbVarItemUuid);
 }
 
 SI_Symbol::SI_Symbol(Schematic& schematic, GenCompInstance& genCompInstance,
-                     const QUuid& symbolItem, const Point& position, const Angle& angle) throw (Exception) :
+                     const QUuid& symbolItem, const Point& position, const Angle& rotation) throw (Exception) :
     SI_Base(), mSchematic(schematic), mGenCompInstance(&genCompInstance),
     mSymbVarItem(nullptr), mSymbol(nullptr), mGraphicsItem(nullptr), mPosition(position),
-    mAngle(angle)
+    mRotation(rotation)
 {
     mUuid = QUuid::createUuid().toString(); // generate random UUID
     init(symbolItem);
@@ -93,7 +93,7 @@ void SI_Symbol::init(const QUuid& symbVarItemUuid) throw (Exception)
 
     mGraphicsItem = new SGI_Symbol(*this);
     mGraphicsItem->setPos(mPosition.toPxQPointF());
-    mGraphicsItem->setRotation(mAngle.toDeg());
+    mGraphicsItem->setRotation(-mRotation.toDeg());
 
     foreach (const library::SymbolPin* libPin, mSymbol->getPins())
     {
@@ -160,10 +160,10 @@ void SI_Symbol::setPosition(const Point& newPos) throw (Exception)
         pin->updatePosition();
 }
 
-void SI_Symbol::setAngle(const Angle& newAngle) throw (Exception)
+void SI_Symbol::setRotation(const Angle& newRotation) throw (Exception)
 {
-    mAngle = newAngle;
-    mGraphicsItem->setRotation(newAngle.toDeg());
+    mRotation = newRotation;
+    mGraphicsItem->setRotation(-newRotation.toDeg());
     mGraphicsItem->updateCacheAndRepaint();
     foreach (SI_SymbolPin* pin, mPins)
         pin->updatePosition();
@@ -200,7 +200,7 @@ XmlDomElement* SI_Symbol::serializeToXmlDomElement() const throw (Exception)
     XmlDomElement* position = root->appendChild("position");
     position->setAttribute("x", mPosition.getX());
     position->setAttribute("y", mPosition.getY());
-    position->setAttribute("angle", mAngle);
+    position->setAttribute("rotation", mRotation);
     return root.take();
 }
 
@@ -210,7 +210,7 @@ XmlDomElement* SI_Symbol::serializeToXmlDomElement() const throw (Exception)
 
 Point SI_Symbol::mapToScene(const Point& relativePos) const noexcept
 {
-    return (mPosition + relativePos).rotated(mAngle, mPosition);
+    return (mPosition + relativePos).rotated(mRotation, mPosition);
 }
 
 bool SI_Symbol::getAttributeValue(const QString& attrNS, const QString& attrKey,

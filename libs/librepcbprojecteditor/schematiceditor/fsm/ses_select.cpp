@@ -133,10 +133,10 @@ SES_Base::ProcRetVal SES_Select::processSubStateIdle(SEE_Base* event) noexcept
             pasteItems();
             return ForceStayInState;
         case SEE_Base::Edit_RotateCW:
-            rotateSelectedItems(Angle::deg90(), Point(), true);
+            rotateSelectedItems(-Angle::deg90(), Point(), true);
             return ForceStayInState;
         case SEE_Base::Edit_RotateCCW:
-            rotateSelectedItems(-Angle::deg90(), Point(), true);
+            rotateSelectedItems(Angle::deg90(), Point(), true);
             return ForceStayInState;
         case SEE_Base::Edit_Remove:
             removeSelectedItems();

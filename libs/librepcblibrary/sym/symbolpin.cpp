@@ -34,7 +34,7 @@ namespace library {
 
 SymbolPin::SymbolPin(const QUuid& uuid, const QString& name_en_US,
                      const QString& description_en_US) noexcept :
-    mUuid(uuid), mPosition(0, 0), mLength(0), mAngle(0)
+    mUuid(uuid), mPosition(0, 0), mLength(0), mRotation(0)
 {
     Q_ASSERT(mUuid.isNull() == false);
     mNames.insert("en_US", name_en_US);
@@ -42,14 +42,14 @@ SymbolPin::SymbolPin(const QUuid& uuid, const QString& name_en_US,
 }
 
 SymbolPin::SymbolPin(const XmlDomElement& domElement) throw (Exception) :
-    mUuid(), mPosition(), mLength(), mAngle()
+    mUuid(), mPosition(), mLength(), mRotation()
 {
     // read attributes
     mUuid = domElement.getAttribute<QUuid>("uuid");
     mPosition.setX(domElement.getAttribute<Length>("x"));
     mPosition.setY(domElement.getAttribute<Length>("y"));
     mLength = domElement.getAttribute<Length>("length");
-    mAngle = domElement.getAttribute<Angle>("angle");
+    mRotation = domElement.getAttribute<Angle>("rotation");
 
     // read names and descriptions in all available languages
     LibraryBaseElement::readLocaleDomNodes(domElement, "name", mNames);
@@ -90,9 +90,9 @@ void SymbolPin::setLength(const Length& length) noexcept
     mLength = length;
 }
 
-void SymbolPin::setAngle(const Angle& angle) noexcept
+void SymbolPin::setRotation(const Angle& rotation) noexcept
 {
-    mAngle = angle;
+    mRotation = rotation;
 }
 
 void SymbolPin::setName(const QString& locale, const QString& name) noexcept
@@ -118,7 +118,7 @@ XmlDomElement* SymbolPin::serializeToXmlDomElement() const throw (Exception)
     root->setAttribute("x", mPosition.getX().toMmString());
     root->setAttribute("y", mPosition.getY().toMmString());
     root->setAttribute("length", mLength.toMmString());
-    root->setAttribute("angle", mAngle.toDegString());
+    root->setAttribute("rotation", mRotation.toDegString());
     foreach (const QString& locale, mNames.keys())
         root->appendTextChild("name", mNames.value(locale))->setAttribute("locale", locale);
     foreach (const QString& locale, mDescriptions.keys())

@@ -97,7 +97,7 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(Project& project,
     mUi->lblSymbInstName->setText(mSymbol.getName());
     mUi->spbxSymbInstPosX->setValue(mSymbol.getPosition().getX().toMm());
     mUi->spbxSymbInstPosY->setValue(mSymbol.getPosition().getY().toMm());
-    mUi->spbxSymbInstAngle->setValue(mSymbol.getAngle().toDeg());
+    mUi->spbxSymbInstAngle->setValue(mSymbol.getRotation().toDeg());
 
     // Symbol Library Element Attributes
     mUi->lblSymbLibUuid->setText(htmlLink.arg(mSymbol.getLibSymbol().getXmlFilepath().toQUrl().toString(),
@@ -370,7 +370,7 @@ bool SymbolInstancePropertiesDialog::applyChanges() noexcept
         Point pos(Length::fromMm(mUi->spbxSymbInstPosX->value()),
                   Length::fromMm(mUi->spbxSymbInstPosY->value()));
         Angle rotation = Angle::fromDeg(mUi->spbxSymbInstAngle->value());
-        if ((pos != mSymbol.getPosition()) || (rotation != mSymbol.getAngle()))
+        if ((pos != mSymbol.getPosition()) || (rotation != mSymbol.getRotation()))
         {
             CmdSymbolInstanceEdit* cmd = new CmdSymbolInstanceEdit(mSymbol);
             cmd->setPosition(pos, false);

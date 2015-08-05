@@ -68,14 +68,14 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
         explicit SI_Symbol(Schematic& schematic, const XmlDomElement& domElement) throw (Exception);
         explicit SI_Symbol(Schematic& schematic, GenCompInstance& genCompInstance,
                            const QUuid& symbolItem, const Point& position = Point(),
-                           const Angle& angle = Angle()) throw (Exception);
+                           const Angle& rotation = Angle()) throw (Exception);
         ~SI_Symbol() noexcept;
 
         // Getters
         Project& getProject() const noexcept;
         Schematic& getSchematic() const noexcept {return mSchematic;}
         const QUuid& getUuid() const noexcept {return mUuid;}
-        const Angle& getAngle() const noexcept {return mAngle;}
+        const Angle& getRotation() const noexcept {return mRotation;}
         QString getName() const noexcept;
         SI_SymbolPin* getPin(const QUuid& pinUuid) const noexcept {return mPins.value(pinUuid);}
         const QHash<QUuid, SI_SymbolPin*>& getPins() const noexcept {return mPins;}
@@ -85,7 +85,7 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
 
         // Setters
         void setPosition(const Point& newPos) throw (Exception);
-        void setAngle(const Angle& newAngle) throw (Exception);
+        void setRotation(const Angle& newRotation) throw (Exception);
 
         // General Methods
         void addToSchematic(GraphicsScene& scene) throw (Exception);
@@ -143,7 +143,7 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
         // Attributes
         QUuid mUuid;
         Point mPosition;
-        Angle mAngle;
+        Angle mRotation;
 };
 
 } // namespace project

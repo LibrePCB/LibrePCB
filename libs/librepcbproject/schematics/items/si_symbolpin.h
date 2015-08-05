@@ -112,7 +112,7 @@ class SI_SymbolPin final : public SI_Base, public IF_ErcMsgProvider
         const library::GenCompSignal* mGenCompSignal;
         GenCompSignalInstance* mGenCompSignalInstance;
         Point mPosition;
-        Angle mAngle;
+        Angle mRotation;
 
         // Misc
         bool mAddedToSchematic;

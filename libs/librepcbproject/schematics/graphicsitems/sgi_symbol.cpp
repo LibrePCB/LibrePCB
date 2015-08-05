@@ -103,9 +103,9 @@ void SGI_Symbol::updateCacheAndRepaint() noexcept
                                        props.textRect.bottomRight() * props.scaleFactor);
 
         // check rotation
-        Angle absAngle = text->getAngle() + mSymbol.getAngle();
+        Angle absAngle = text->getRotation() + mSymbol.getRotation();
         absAngle.mapTo180deg();
-        props.rotate180 = (absAngle < -Angle::deg90() || absAngle >= Angle::deg90());
+        props.rotate180 = (absAngle <= -Angle::deg90() || absAngle > Angle::deg90());
 
         // calculate text position
         scaledTextRect.translate(text->getPosition().toPxQPointF());
@@ -210,9 +210,9 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
         painter->save();
         painter->scale(props.scaleFactor, props.scaleFactor);
         if (props.rotate180)
-            painter->rotate(text->getAngle().toDeg() + 180);
+            painter->rotate(-text->getRotation().toDeg() + 180);
         else
-            painter->rotate(text->getAngle().toDeg());
+            painter->rotate(-text->getRotation().toDeg());
         if ((deviceIsPrinter) || (lod * text->getHeight().toPx() > 8))
         {
             // draw text

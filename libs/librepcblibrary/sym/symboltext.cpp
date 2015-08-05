@@ -32,7 +32,7 @@ namespace library {
  ****************************************************************************************/
 
 SymbolText::SymbolText() noexcept :
-    mLayerId(0), mText(), mPosition(0, 0), mAngle(0), mHeight(0), mAlign()
+    mLayerId(0), mText(), mPosition(0, 0), mRotation(0), mHeight(0), mAlign()
 {
 }
 
@@ -44,7 +44,7 @@ SymbolText::SymbolText(const XmlDomElement& domElement) throw (Exception)
     // load geometry attributes
     mPosition.setX(domElement.getAttribute<Length>("x"));
     mPosition.setY(domElement.getAttribute<Length>("y"));
-    mAngle = domElement.getAttribute<Angle>("angle");
+    mRotation = domElement.getAttribute<Angle>("rotation");
     mHeight = domElement.getAttribute<Length>("height");
 
     // text alignment
@@ -71,7 +71,7 @@ XmlDomElement* SymbolText::serializeToXmlDomElement() const throw (Exception)
     root->setAttribute("text", mText);
     root->setAttribute("x", mPosition.getX().toMmString());
     root->setAttribute("y", mPosition.getY().toMmString());
-    root->setAttribute("angle", mAngle.toDegString());
+    root->setAttribute("rotation", mRotation.toDegString());
     root->setAttribute("height", mHeight.toMmString());
     root->setAttribute("h_align", mAlign.getH());
     root->setAttribute("v_align", mAlign.getV());

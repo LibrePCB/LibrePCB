@@ -78,7 +78,8 @@ void SGI_SymbolPin::updateCacheAndRepaint() noexcept
     mBoundingRect = QRectF();
 
     // rotation
-    Angle absAngle = mLibPin.getAngle() + mPin.getSymbol().getAngle();
+    Angle absAngle = mLibPin.getRotation() + mPin.getSymbol().getRotation();
+    absAngle.mapTo180deg();
     mRotate180 = (absAngle <= -Angle::deg90() || absAngle > Angle::deg90());
 
     // circle
@@ -86,7 +87,7 @@ void SGI_SymbolPin::updateCacheAndRepaint() noexcept
     mBoundingRect = mBoundingRect.united(mShape.boundingRect());
 
     // line
-    QRectF lineRect = QRectF(QPointF(0, 0), Point(0, mLibPin.getLength()).toPxQPointF()).normalized();
+    QRectF lineRect = QRectF(QPointF(0, 0), Point(mLibPin.getLength(), 0).toPxQPointF()).normalized();
     lineRect.adjust(-Length(79375).toPx(), -Length(79375).toPx(), Length(79375).toPx(), Length(79375).toPx());
     mBoundingRect = mBoundingRect.united(lineRect).normalized();
 
@@ -96,12 +97,12 @@ void SGI_SymbolPin::updateCacheAndRepaint() noexcept
     mStaticText.prepare(QTransform(), mFont);
     mTextOrigin.setX(mRotate180 ? -x-mStaticText.size().width() : x);
     mTextOrigin.setY(-mStaticText.size().height()/2);
-    mStaticText.prepare(QTransform().rotate(mRotate180 ? 90 : -90)
+    mStaticText.prepare(QTransform().rotate(mRotate180 ? 180 : 0)
                                     .translate(mTextOrigin.x(), mTextOrigin.y()), mFont);
     if (mRotate180)
-        mTextBoundingRect = QRectF(mTextOrigin.y(), mTextOrigin.x(), mStaticText.size().height(), mStaticText.size().width()).normalized();
+        mTextBoundingRect = QRectF(-mTextOrigin.x(), -mTextOrigin.y(), -mStaticText.size().width(), -mStaticText.size().height()).normalized();
     else
-        mTextBoundingRect = QRectF(mTextOrigin.y(), -mTextOrigin.x()-mStaticText.size().width(), mStaticText.size().height(), mStaticText.size().width()).normalized();
+        mTextBoundingRect = QRectF(mTextOrigin.x(), -mTextOrigin.y()-mStaticText.size().height(), mStaticText.size().width(), mStaticText.size().height()).normalized();
     mBoundingRect = mBoundingRect.united(mTextBoundingRect).normalized();
 
     update();
@@ -126,7 +127,7 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     if (layer->isVisible())
     {
         painter->setPen(QPen(layer->getColor(mPin.isSelected()), Length(158750).toPx(), Qt::SolidLine, Qt::RoundCap));
-        painter->drawLine(QPointF(0, 0), Point(0, mLibPin.getLength()).toPxQPointF());
+        painter->drawLine(QPointF(0, 0), Point(mLibPin.getLength(), 0).toPxQPointF());
     }
 
     // draw circle
@@ -146,7 +147,7 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
         {
             // draw text
             painter->save();
-            painter->rotate(mRotate180 ? 90 : -90);
+            if (mRotate180) painter->rotate(180);
             painter->setPen(QPen(layer->getColor(mPin.isSelected()), 0));
             painter->setFont(mFont);
             painter->drawStaticText(mTextOrigin, mStaticText);
@@ -174,7 +175,7 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
         painter->setFont(font);
         painter->setPen(QPen(layer->getColor(mPin.isSelected()), 0));
         painter->save();
-        painter->rotate(mRotate180 ? 90 : -90);
+        if (mRotate180) painter->rotate(180);
         painter->drawText(QRectF(), Qt::AlignHCenter | Qt::AlignBottom | Qt::TextSingleLine | Qt::TextDontClip, netsignal->getName());
         painter->restore();
     }

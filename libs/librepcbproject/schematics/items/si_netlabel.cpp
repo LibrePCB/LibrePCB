@@ -50,14 +50,14 @@ SI_NetLabel::SI_NetLabel(Schematic& schematic, const XmlDomElement& domElement) 
     }
     mPosition.setX(domElement.getAttribute<Length>("x"));
     mPosition.setY(domElement.getAttribute<Length>("y"));
-    mAngle = domElement.getAttribute<Angle>("angle");
+    mRotation = domElement.getAttribute<Angle>("rotation");
 
     init();
 }
 
 SI_NetLabel::SI_NetLabel(Schematic& schematic, NetSignal& netsignal, const Point& position) throw (Exception) :
     SI_Base(), mSchematic(schematic), mGraphicsItem(nullptr), mPosition(position),
-    mAngle(0), mNetSignal(&netsignal)
+    mRotation(0), mNetSignal(&netsignal)
 {
     mUuid = QUuid::createUuid(); // generate random UUID
     init();
@@ -68,7 +68,7 @@ void SI_NetLabel::init() throw (Exception)
     // create the graphics item
     mGraphicsItem = new SGI_NetLabel(*this);
     mGraphicsItem->setPos(mPosition.toPxQPointF());
-    mGraphicsItem->setRotation(mAngle.toDeg());
+    mGraphicsItem->setRotation(-mRotation.toDeg());
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -107,11 +107,11 @@ void SI_NetLabel::setPosition(const Point& position) noexcept
     mGraphicsItem->setPos(mPosition.toPxQPointF());
 }
 
-void SI_NetLabel::setAngle(const Angle& angle) noexcept
+void SI_NetLabel::setRotation(const Angle& rotation) noexcept
 {
-    if (angle == mAngle) return;
-    mAngle = angle;
-    mGraphicsItem->setRotation(mAngle.toDeg());
+    if (rotation == mRotation) return;
+    mRotation = rotation;
+    mGraphicsItem->setRotation(-mRotation.toDeg());
     mGraphicsItem->updateCacheAndRepaint();
 }
 
@@ -144,7 +144,7 @@ XmlDomElement* SI_NetLabel::serializeToXmlDomElement() const throw (Exception)
     root->setAttribute("uuid", mUuid);
     root->setAttribute("x", mPosition.getX());
     root->setAttribute("y", mPosition.getY());
-    root->setAttribute("angle", mAngle);
+    root->setAttribute("rotation", mRotation);
     root->setAttribute("netsignal", mNetSignal->getUuid());
     return root.take();
 }

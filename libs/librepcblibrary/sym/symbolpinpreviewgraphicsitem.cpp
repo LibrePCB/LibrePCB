@@ -81,7 +81,8 @@ void SymbolPinPreviewGraphicsItem::updateCacheAndRepaint() noexcept
     mBoundingRect = QRectF();
 
     // rotation
-    Angle absAngle = mPin.getAngle() + Angle::fromDeg(parentItem() ? parentItem()->rotation() : 0);
+    Angle absAngle = mPin.getRotation() + Angle::fromDeg(parentItem() ? -parentItem()->rotation() : 0);
+    absAngle.mapTo180deg();
     mRotate180 = (absAngle <= -Angle::deg90() || absAngle > Angle::deg90());
 
     // circle
@@ -89,7 +90,7 @@ void SymbolPinPreviewGraphicsItem::updateCacheAndRepaint() noexcept
     mBoundingRect = mBoundingRect.united(mShape.boundingRect());
 
     // line
-    QRectF lineRect = QRectF(QPointF(0, 0), Point(0, mPin.getLength()).toPxQPointF()).normalized();
+    QRectF lineRect = QRectF(QPointF(0, 0), Point(mPin.getLength(), 0).toPxQPointF()).normalized();
     lineRect.adjust(-Length(79375).toPx(), -Length(79375).toPx(), Length(79375).toPx(), Length(79375).toPx());
     mBoundingRect = mBoundingRect.united(lineRect).normalized();
 
@@ -110,12 +111,12 @@ void SymbolPinPreviewGraphicsItem::updateCacheAndRepaint() noexcept
     mStaticText.prepare(QTransform(), mFont);
     mTextOrigin.setX(mRotate180 ? -x-mStaticText.size().width() : x);
     mTextOrigin.setY(-mStaticText.size().height()/2);
-    mStaticText.prepare(QTransform().rotate(mRotate180 ? 90 : -90)
+    mStaticText.prepare(QTransform().rotate(mRotate180 ? 180 : 0)
                                     .translate(mTextOrigin.x(), mTextOrigin.y()), mFont);
     if (mRotate180)
-        mTextBoundingRect = QRectF(mTextOrigin.y(), mTextOrigin.x(), mStaticText.size().height(), mStaticText.size().width()).normalized();
+        mTextBoundingRect = QRectF(-mTextOrigin.x(), -mTextOrigin.y(), -mStaticText.size().width(), -mStaticText.size().height()).normalized();
     else
-        mTextBoundingRect = QRectF(mTextOrigin.y(), -mTextOrigin.x()-mStaticText.size().width(), mStaticText.size().height(), mStaticText.size().width()).normalized();
+        mTextBoundingRect = QRectF(mTextOrigin.x(), -mTextOrigin.y()-mStaticText.size().height(), mStaticText.size().width(), mStaticText.size().height()).normalized();
     mBoundingRect = mBoundingRect.united(mTextBoundingRect).normalized();
 
     update();
@@ -135,7 +136,7 @@ void SymbolPinPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
     // draw line
     QPen pen(mLineLayer->getColor(selected), Length(158750).toPx(), Qt::SolidLine, Qt::RoundCap);
     painter->setPen(pen);
-    painter->drawLine(QPointF(0, 0), Point(0, mPin.getLength()).toPxQPointF());
+    painter->drawLine(QPointF(0, 0), Point(mPin.getLength(), 0).toPxQPointF());
 
     // draw circle
     painter->setPen(QPen(mCircleLayer->getColor(requiredPin), 0));
@@ -144,7 +145,7 @@ void SymbolPinPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
 
     // draw text
     painter->save();
-    painter->rotate(mRotate180 ? 90 : -90);
+    if (mRotate180) painter->rotate(180);
     painter->setPen(QPen(mTextLayer->getColor(selected), 0));
     painter->setFont(mFont);
     painter->drawStaticText(mTextOrigin, mStaticText);
