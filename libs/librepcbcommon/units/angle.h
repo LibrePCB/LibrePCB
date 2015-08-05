@@ -38,6 +38,21 @@
  * Layouts and so on. You should never use another angle type, like integer or float!
  * It's very important to have a consistent angle type over the whole project.
  *
+ * An angle is normally interpreted as a CCW rotation from the horizontal line:
+ *
+ * @code
+ * Y
+ * ^   /
+ * |  /
+ * | /  +60°
+ * |/
+ * +--------> X
+ * @endcode
+ *
+ * @warning Please note that the Qt Graphics Framework (QGraphicsView/QGraphicsScene)
+ *          may interpret an angle as a CW rotation! So you may need to negate the angle
+ *          first when used for a rotation in the graphics framework.
+ *
  * All angles are stored in the integer base type int32_t. The internal unit is always
  * microdegrees, but this class provides also some converting methods to other units. The
  * range of the angle is ]-360°...+360°[. So each angle (except 0 degrees) can be

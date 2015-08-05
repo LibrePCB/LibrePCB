@@ -75,8 +75,8 @@ Point& Point::rotate(const Angle& angle, const Point& center) noexcept
     // if angle is a multiple of 90 degrees, rotating can be done without loosing accuracy
     if (angle0_360 == Angle::deg90())
     {
-        setX(center.getX() + dy);
-        setY(center.getY() - dx);
+        setX(center.getX() - dy);
+        setY(center.getY() + dx);
     }
     else if (angle0_360 == Angle::deg180())
     {
@@ -85,16 +85,16 @@ Point& Point::rotate(const Angle& angle, const Point& center) noexcept
     }
     else if (angle0_360 == Angle::deg270())
     {
-        setX(center.getX() - dy);
-        setY(center.getY() + dx);
+        setX(center.getX() + dy);
+        setY(center.getY() - dx);
     }
     else if (angle != Angle::deg0())
     {
         // angle is not a multiple of 90 degrees --> we must use floating point arithmetic
         qreal sin = qSin(angle.toRad());
         qreal cos = qCos(angle.toRad());
-        setX(Length(center.getX().toNm() + cos * dx.toNm() + sin * dy.toNm()));
-        setY(Length(center.getY().toNm() - sin * dx.toNm() + cos * dy.toNm()));
+        setX(Length(center.getX().toNm() + cos * dx.toNm() - sin * dy.toNm()));
+        setY(Length(center.getY().toNm() + sin * dx.toNm() + cos * dy.toNm()));
     } // else: angle == 0°, nothing to do...
 
     return *this;

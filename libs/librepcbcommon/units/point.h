@@ -297,7 +297,7 @@ class Point
          *       work without loosing accuracy (only integer operations). Otherwise, the
          *       result may be not very accurate.
          *
-         * @param angle     The angle to rotate (CW)
+         * @param angle     The angle to rotate (CCW)
          * @param center    The center of the rotation
          *
          * @return A new Point object which is rotated
@@ -313,7 +313,7 @@ class Point
          *       work without loosing accuracy (only integer operations). Otherwise, the
          *       result may be not very accurate.
          *
-         * @param angle     The angle to rotate (CW)
+         * @param angle     The angle to rotate (CCW)
          * @param center    The center of the rotation
          *
          * @return A reference to the modified object
