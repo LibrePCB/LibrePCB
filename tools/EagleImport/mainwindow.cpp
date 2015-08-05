@@ -224,7 +224,7 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                     endpos = Point(-endpos.getX(), -endpos.getY());
                 }
                 polygon->setStartPos(startpos);
-                polygon->appendSegment(new SymbolPolygonSegment(endpos, -angle));
+                polygon->appendSegment(new SymbolPolygonSegment(endpos, angle));
                 symbol->addPolygon(polygon);
             }
             else if (child->getName() == "rectangle")
@@ -313,9 +313,16 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                 else
                     text->setHeight(child->getAttribute<Length>("size")*2);
                 text->setText(textStr);
-                text->setPosition(Point(child->getAttribute<Length>("x"),
-                                        child->getAttribute<Length>("y")));
-                text->setAngle(Angle(0));
+                Point pos = Point(child->getAttribute<Length>("x"), child->getAttribute<Length>("y"));
+                int angleDeg = 0;
+                if (child->hasAttribute("rot")) angleDeg = child->getAttribute("rot").remove("R").toInt();
+                if (rotate180)
+                {
+                    pos = Point(-pos.getX(), -pos.getY());
+                    angleDeg += 180;
+                }
+                text->setPosition(pos);
+                text->setRotation(Angle::fromDeg(angleDeg));
                 text->setAlign(Alignment(HAlign::left(), VAlign::bottom()));
                 symbol->addText(text);
             }
@@ -339,7 +346,7 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                         throw Exception(__FILE__, __LINE__, "Invalid symbol pin length: " % child->getAttribute("length"));
                 }
                 int angleDeg = 0;
-                if (child->hasAttribute("rot")) angleDeg = -child->getAttribute("rot").remove("R").toInt();
+                if (child->hasAttribute("rot")) angleDeg = child->getAttribute("rot").remove("R").toInt();
                 if (rotate180)
                 {
                     pos = Point(-pos.getX(), -pos.getY());
@@ -347,7 +354,7 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                 }
                 pin->setPosition(pos);
                 pin->setLength(len);
-                pin->setAngle(Angle::fromDeg(angleDeg) + Angle::deg90());
+                pin->setRotation(Angle::fromDeg(angleDeg));
                 symbol->addPin(pin);
             }
             else
@@ -422,7 +429,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                     endpos = Point(-endpos.getX(), -endpos.getY());
                 }
                 polygon->setStartPos(startpos);
-                polygon->appendSegment(new FootprintPolygonSegment(endpos, -angle));
+                polygon->appendSegment(new FootprintPolygonSegment(endpos, angle));
                 footprint->addPolygon(polygon);
             }
             else if (child->getName() == "rectangle")
@@ -546,9 +553,16 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 else
                     text->setHeight(child->getAttribute<Length>("size")*2);
                 text->setText(textStr);
-                text->setPosition(Point(child->getAttribute<Length>("x"),
-                                        child->getAttribute<Length>("y")));
-                text->setAngle(Angle(0));
+                Point pos = Point(child->getAttribute<Length>("x"), child->getAttribute<Length>("y"));
+                int angleDeg = 0;
+                if (child->hasAttribute("rot")) angleDeg = child->getAttribute("rot").remove("R").toInt();
+                if (rotate180)
+                {
+                    pos = Point(-pos.getX(), -pos.getY());
+                    angleDeg += 180;
+                }
+                text->setPosition(pos);
+                text->setRotation(Angle::fromDeg(angleDeg));
                 text->setAlign(Alignment(HAlign::left(), VAlign::bottom()));
                 footprint->addText(text);
             }
@@ -560,7 +574,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 pad->setDrillDiameter(drill);
                 Length diameter = child->hasAttribute("diameter") ? child->getAttribute<Length>("diameter") : drill * 2;
                 int angleDeg = 0;
-                if (child->hasAttribute("rot")) angleDeg = -child->getAttribute("rot").remove("R").toInt();
+                if (child->hasAttribute("rot")) angleDeg = child->getAttribute("rot").remove("R").toInt();
                 QString shape = child->hasAttribute("shape") ? child->getAttribute("shape") : "round";
                 if (shape == "square")
                 {
@@ -598,7 +612,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                     angleDeg += 180;
                 }
                 pad->setPosition(pos);
-                pad->setRotation(Angle::fromDeg(angleDeg) + Angle::deg90());
+                pad->setRotation(Angle::fromDeg(angleDeg));
                 footprint->addPad(pad);
             }
             else if (child->getName() == "smd")
@@ -608,7 +622,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 pad->setType(FootprintPad::Type_t::SmdRect);
                 Point pos = Point(child->getAttribute<Length>("x"), child->getAttribute<Length>("y"));
                 int angleDeg = 0;
-                if (child->hasAttribute("rot")) angleDeg = -child->getAttribute("rot").remove("R").toInt();
+                if (child->hasAttribute("rot")) angleDeg = child->getAttribute("rot").remove("R").toInt();
                 if (rotate180)
                 {
                     pos = Point(-pos.getX(), -pos.getY());
