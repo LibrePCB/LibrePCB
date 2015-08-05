@@ -69,7 +69,7 @@ void BI_Footprint::init() throw (Exception)
 
     mGraphicsItem = new BGI_Footprint(*this);
     mGraphicsItem->setPos(mComponentInstance.getPosition().toPxQPointF());
-    mGraphicsItem->setRotation(mComponentInstance.getRotation().toDeg());
+    mGraphicsItem->setRotation(-mComponentInstance.getRotation().toDeg());
 
     const library::Component& libComp = mComponentInstance.getLibComponent();
     foreach (const library::FootprintPad* libPad, mFootprint->getPads())
@@ -216,13 +216,15 @@ void BI_Footprint::componentInstanceAttributesChanged()
 void BI_Footprint::componentInstanceMoved(const Point& pos)
 {
     mGraphicsItem->setPos(pos.toPxQPointF());
+    mGraphicsItem->updateCacheAndRepaint();
     foreach (BI_FootprintPad* pad, mPads)
         pad->updatePosition();
 }
 
 void BI_Footprint::componentInstanceRotated(const Angle& rot)
 {
-    mGraphicsItem->setRotation(rot.toDeg());
+    mGraphicsItem->setRotation(-rot.toDeg());
+    mGraphicsItem->updateCacheAndRepaint();
     foreach (BI_FootprintPad* pad, mPads)
         pad->updatePosition();
 }

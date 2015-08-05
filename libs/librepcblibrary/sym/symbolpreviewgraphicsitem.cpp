@@ -258,10 +258,10 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
 
         // draw text
         painter->save();
-        if (props.rotate180)
-            painter->rotate(-text->getRotation().toDeg() + 180);
-        else
-            painter->rotate(-text->getRotation().toDeg());
+        painter->translate(text->getPosition().toPxQPointF());
+        painter->rotate(-text->getRotation().toDeg());
+        painter->translate(-text->getPosition().toPxQPointF());
+        if (props.rotate180) painter->rotate(180);
         painter->setPen(QPen(layer->getColor(selected), 0));
         painter->setFont(mFont);
         painter->drawText(props.textRect, props.align | Qt::TextWordWrap, props.text);

@@ -543,12 +543,12 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 if (textStr == ">NAME")
                 {
                     textStr = "${CMP::NAME}";
-                    text->setHeight(Length::fromMm(3.175));
+                    text->setHeight(Length::fromMm(2.5));
                 }
                 else if (textStr == ">VALUE")
                 {
                     textStr = "${CMP::VALUE}";
-                    text->setHeight(Length::fromMm(2.5));
+                    text->setHeight(Length::fromMm(2));
                 }
                 else
                     text->setHeight(child->getAttribute<Length>("size")*2);
@@ -599,7 +599,6 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                     pad->setType(FootprintPad::Type_t::ThtRound);
                     pad->setWidth(diameter * 2);
                     pad->setHeight(diameter);
-                    angleDeg += 90;
                 }
                 else
                 {

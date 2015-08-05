@@ -208,11 +208,11 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
 
         // draw text or rect
         painter->save();
+        painter->translate(text->getPosition().toPxQPointF());
+        painter->rotate(-text->getRotation().toDeg());
+        painter->translate(-text->getPosition().toPxQPointF());
         painter->scale(props.scaleFactor, props.scaleFactor);
-        if (props.rotate180)
-            painter->rotate(-text->getRotation().toDeg() + 180);
-        else
-            painter->rotate(-text->getRotation().toDeg());
+        if (props.rotate180) painter->rotate(180);
         if ((deviceIsPrinter) || (lod * text->getHeight().toPx() > 8))
         {
             // draw text

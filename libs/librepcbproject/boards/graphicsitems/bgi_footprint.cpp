@@ -104,7 +104,7 @@ void BGI_Footprint::updateCacheAndRepaint() noexcept
         // check rotation
         Angle absAngle = text->getRotation() + mFootprint.getRotation();
         absAngle.mapTo180deg();
-        props.rotate180 = (absAngle < -Angle::deg90() || absAngle >= Angle::deg90());
+        props.rotate180 = (absAngle <= -Angle::deg90() || absAngle > Angle::deg90());
 
         // calculate text position
         scaledTextRect.translate(text->getPosition().toPxQPointF());
@@ -207,11 +207,11 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
 
         // draw text or rect
         painter->save();
+        painter->translate(text->getPosition().toPxQPointF());
+        painter->rotate(-text->getRotation().toDeg());
+        painter->translate(-text->getPosition().toPxQPointF());
         painter->scale(props.scaleFactor, props.scaleFactor);
-        if (props.rotate180)
-            painter->rotate(-text->getRotation().toDeg() + 180);
-        else
-            painter->rotate(-text->getRotation().toDeg());
+        if (props.rotate180) painter->rotate(180);
         if ((deviceIsPrinter) || (lod * text->getHeight().toPx() > 8))
         {
             // draw text
