@@ -37,7 +37,7 @@
                     - type:     The type of this polygon segment: "line" or "arc"
                     - end_x:    The X coordinate of the end point of this polygon segment (in millimeters)
                     - end_y:    The Y coordinate of the end point of this polygon segment (in millimeters)
-                    - angle:    [only for arc segments] The angle of an arc segment (in degrees). Arc direction from start point: positive=CW, negative=CCW
+                    - angle:    The angle of an arc segment (in degrees). Use 0 for straight lines. Arc direction from start to end point: positive=CCW, negative=CW
                 
             text: This is used to draw texts. Attributes:
                 - layer:    The ID of the layer (see class SchematicLayer)
@@ -46,7 +46,7 @@
                 - x:        X coordinate of the text (in millimeters)
                 - y:        Y coordinate of the text (in millimeters)
                 - height:   Height of the text (in millimeters)
-                - angle:    Angle of the text (in degrees)
+                - rotation: Rotation of the text (in degrees CCW)
                 - h_align:  Horizontal alignment (left, center, right)
                 - v_align:  Vertical alignment (top, center, bottom)
         -->
@@ -56,8 +56,8 @@
             <segment angle="0" end_x="12.7" end_y="-7.62"/>
             <segment angle="0" end_x="-12.7" end_y="-7.62"/>
         </polygon>
-        <text layer="20" v_align="bottom" text="${SYM::NAME}"  height="2.54" angle="0" x="-12.7" y="5.08"  h_align="left"/>
-        <text layer="21" v_align="top"    text="${CMP::VALUE}" height="2.54" angle="0" x="-12.7" y="-7.62" h_align="left"/>
+        <text layer="20" v_align="bottom" text="${SYM::NAME}"  height="2.54" rotation="0" x="-12.7" y="5.08"  h_align="left"/>
+        <text layer="21" v_align="top"    text="${CMP::VALUE}" height="2.54" rotation="0" x="-12.7" y="-7.62" h_align="left"/>
     </geometry>
     <pins>
         <!--
@@ -66,39 +66,39 @@
                 - x:            X coordinate of the pin's connection point (in millimeters)
                 - y:            Y coordinate of the pin's connection point (in millimeters)
                 - length:       Length of the pin's line (in millimeters). The line will be drawn with the same layer as symbol outlines. The length can be zero if no line is wanted.
-                - angle:        The angle of the pin's line (in degrees). With respect to the pin's connection point: 0° = North, 90° = East, 180° = South, 270° = West
+                - rotation:     The rotation of the pin (in degrees CCW). Line direction with respect to the pin's connection point: 0° = East, 90° = North, 180° = West, 270° = South
                 - name:         The name of the pin in different languages
                 - description:  An optional description in different languages
         -->
-        <pin uuid="{702df32a-635f-46e9-85d2-5b7e2c20aa87}" x="-17.78" y="2.54" length="5.08" angle="90">
+        <pin uuid="{702df32a-635f-46e9-85d2-5b7e2c20aa87}" x="-17.78" y="2.54" length="5.08" rotation="0">
             <name locale="en_US">1</name>
             <description locale="en_US">Pin 1</description>
         </pin>
-        <pin uuid="{1339ffc8-afb2-4137-9d37-d9801ac2bfd0}" x="-17.78" y="0" length="5.08" angle="90">
+        <pin uuid="{1339ffc8-afb2-4137-9d37-d9801ac2bfd0}" x="-17.78" y="0" length="5.08" rotation="0">
             <name locale="en_US">2</name>
             <description locale="en_US">Pin 2</description>
         </pin>
-        <pin uuid="{8207ee9b-89e5-41bc-a633-078952a6c370}" x="-17.78" y="-2.54" length="5.08" angle="90">
+        <pin uuid="{8207ee9b-89e5-41bc-a633-078952a6c370}" x="-17.78" y="-2.54" length="5.08" rotation="0">
             <name locale="en_US">3</name>
             <description locale="en_US">Pin 3</description>
         </pin>
-        <pin uuid="{b5ec7a0f-0f26-482e-a68e-e9a8f108cb80}" x="-17.78" y="-5.08" length="5.08" angle="90">
+        <pin uuid="{b5ec7a0f-0f26-482e-a68e-e9a8f108cb80}" x="-17.78" y="-5.08" length="5.08" rotation="0">
             <name locale="en_US">4</name>
             <description locale="en_US">Pin 4</description>
         </pin>
-        <pin uuid="{10f7c99e-9751-409e-aace-d4fa0f21375f}" x="17.78" y="-5.08" length="5.08" angle="270">
+        <pin uuid="{10f7c99e-9751-409e-aace-d4fa0f21375f}" x="17.78" y="-5.08" length="5.08" rotation="180">
             <name locale="en_US">5</name>
             <description locale="en_US">Pin 5</description>
         </pin>
-        <pin uuid="{255e12e0-00b7-4563-b82c-42a4899fddf1}" x="17.78" y="-2.54" length="5.08" angle="270">
+        <pin uuid="{255e12e0-00b7-4563-b82c-42a4899fddf1}" x="17.78" y="-2.54" length="5.08" rotation="180">
             <name locale="en_US">6</name>
             <description locale="en_US">Pin 6</description>
         </pin>
-        <pin uuid="{b8aa2aa5-9b1b-4d9a-90c5-b584fe48f5a4}" x="17.78" y="0" length="5.08" angle="270">
+        <pin uuid="{b8aa2aa5-9b1b-4d9a-90c5-b584fe48f5a4}" x="17.78" y="0" length="5.08" rotation="180">
             <name locale="en_US">7</name>
             <description locale="en_US">Pin 7</description>
         </pin>
-        <pin uuid="{db2223ee-84ce-42ef-93b9-ac6a50b07805}" x="17.78" y="2.54" length="5.08" angle="270">
+        <pin uuid="{db2223ee-84ce-42ef-93b9-ac6a50b07805}" x="17.78" y="2.54" length="5.08" rotation="180">
             <name locale="en_US">8</name>
             <description locale="en_US">Pin 8</description>
         </pin>

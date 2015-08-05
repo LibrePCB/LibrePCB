@@ -4,8 +4,8 @@
         <uuid>{e49b4359-a4a4-4831-af0d-ce847db890c8}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:34Z</created>
-        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <created>2015-08-05T18:39:33Z</created>
+        <last_modified>2015-08-05T18:39:33Z</last_modified>
         <name locale="en_US">SANYO-OSCON_F</name>
         <description locale="en_US">&lt;b>SANYO OSCON Capacitor&lt;/b>&lt;p>
 Source: e_os_all.pdf
@@ -18,20 +18,20 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <geometry>
-        <polygon grab_area="true" layer="170" start_x="-4.500000" start_y="0.000000" fill="false" width="0.406400">
-            <segment end_x="-3.600000" end_y="0.000000" angle="0.000000"/>
+        <polygon fill="false" grab_area="true" start_x="-4.500000" start_y="0.000000" layer="170" width="0.406400">
+            <segment angle="0.000000" end_x="-3.600000" end_y="0.000000"/>
         </polygon>
-        <text v_align="bottom" height="3.175000" x="-1.905000" y="1.270000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
-        <text v_align="bottom" height="2.500000" x="-1.905000" y="-2.540000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
-        <ellipse radius_x="4.900000" x="0.000000" radius_y="4.900000" grab_area="true" y="0.000000" layer="170" rotation="0.000000" fill="false" width="0.203200"/>
+        <text v_align="bottom" x="-1.905000" y="1.270000" height="3.175000" text="${CMP::NAME}" rotation="0.000000" layer="150" h_align="left"/>
+        <text v_align="bottom" x="-1.905000" y="-2.540000" height="2.500000" text="${CMP::VALUE}" rotation="0.000000" layer="160" h_align="left"/>
+        <ellipse x="0.000000" y="0.000000" radius_x="4.900000" radius_y="4.900000" fill="false" grab_area="true" rotation="0.000000" layer="170" width="0.203200"/>
     </geometry>
     <pads>
-        <pad height="1.270000" x="-2.500000" drill="0.800000" uuid="{eb126176-c94f-44bf-98f2-3ea075046ce1}" y="0.000000" rotation="90.000000" layer="0" width="1.270000" type="tht_round">
-            <name locale="en_US">-</name>
+        <pad uuid="{d377bd23-b94b-4dcf-b820-117bc2a31d3e}" x="2.500000" y="0.000000" height="1.270000" drill="0.800000" rotation="0.000000" type="tht_round" layer="0" width="1.270000">
+            <name locale="en_US">+</name>
             <description locale="en_US"/>
         </pad>
-        <pad height="1.270000" x="2.500000" drill="0.800000" uuid="{d377bd23-b94b-4dcf-b820-117bc2a31d3e}" y="0.000000" rotation="90.000000" layer="0" width="1.270000" type="tht_round">
-            <name locale="en_US">+</name>
+        <pad uuid="{eb126176-c94f-44bf-98f2-3ea075046ce1}" x="-2.500000" y="0.000000" height="1.270000" drill="0.800000" rotation="0.000000" type="tht_round" layer="0" width="1.270000">
+            <name locale="en_US">-</name>
             <description locale="en_US"/>
         </pad>
     </pads>

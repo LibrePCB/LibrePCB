@@ -78,19 +78,19 @@
         </polygon>
         <ellipse grab_area="true" fill="true" layer="10" width="0.000000" x="2.540000" y="-2.540000" radius_x="0.36" radius_y="0.36" rotation="0"/>
         <ellipse grab_area="true" fill="true" layer="10" width="0.000000" x="2.540000" y="2.540000" radius_x="0.36" radius_y="0.36" rotation="0"/>
-        <text text="${SYM::NAME}" x="-1.27" angle="0.000000" y="1.27" height="2.54" h_align="right" layer="20" v_align="bottom"/>
-        <text text="${CMP::VALUE}" x="-1.27" angle="0.000000" y="-1.27" height="2.54" h_align="right" layer="21" v_align="bottom"/>
+        <text text="${SYM::NAME}" x="-1.27" rotation="0.000000" y="1.27" height="2.54" h_align="right" layer="20" v_align="bottom"/>
+        <text text="${CMP::VALUE}" x="-1.27" rotation="0.000000" y="-1.27" height="2.54" h_align="right" layer="21" v_align="bottom"/>
     </geometry>
     <pins>
-        <pin x="-2.540000" angle="90.000000" y="-2.540000" uuid="{6b08ad4a-ea43-420c-af39-4b08609e9532}" length="2.540000">
+        <pin x="-2.540000" rotation="0" y="-2.540000" uuid="{6b08ad4a-ea43-420c-af39-4b08609e9532}" length="2.540000">
             <name locale="en_US">G</name>
             <description locale="en_US"/>
         </pin>
-        <pin x="2.540000" angle="-180.000000" y="5.080000" uuid="{55014667-bbfc-410a-b0eb-cacd978d1e08}" length="2.540000">
+        <pin x="2.540000" rotation="-90" y="5.080000" uuid="{55014667-bbfc-410a-b0eb-cacd978d1e08}" length="2.540000">
             <name locale="en_US">D</name>
             <description locale="en_US"/>
         </pin>
-        <pin x="2.540000" angle="0.000000" y="-5.080000" uuid="{25ed99ff-f079-402d-823c-39eac3d358c2}" length="2.540000">
+        <pin x="2.540000" rotation="90" y="-5.080000" uuid="{25ed99ff-f079-402d-823c-39eac3d358c2}" length="2.540000">
             <name locale="en_US">S</name>
             <description locale="en_US"/>
         </pin>

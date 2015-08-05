@@ -19,11 +19,11 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map signal="{cb80ea12-5702-4ad3-b7bf-662544403995}" pad="{c2c2e9e1-07e7-4a82-99ad-7a3a5983390f}"/>
-        <map signal="{60a3f21c-4a89-4dad-b4bf-6c756c7df09d}" pad="{4388bea1-d400-4cff-a27b-4dc5809fa8cf}"/>
         <map signal="{6651a454-c542-48fc-9056-518546c904dd}" pad="{4300a878-c812-4a49-9d11-2c2721bd6081}"/>
-        <map signal="{79ad9275-7895-4708-8d6b-3b502a404269}" pad="{97182810-208c-4f4a-a3cb-6c1db3e6dbac}"/>
-        <map signal="{54aea1a2-260b-4cb1-a541-bac92a0457f2}" pad="{60dcdc42-10d8-4df3-9aba-624b974fb306}"/>
         <map signal="{0b9eae8a-63ad-4582-94c9-fe30266c86d1}" pad="{2fa8cc79-1106-4e0e-8818-1afa9458e2d3}"/>
+        <map signal="{60a3f21c-4a89-4dad-b4bf-6c756c7df09d}" pad="{4388bea1-d400-4cff-a27b-4dc5809fa8cf}"/>
+        <map signal="{54aea1a2-260b-4cb1-a541-bac92a0457f2}" pad="{60dcdc42-10d8-4df3-9aba-624b974fb306}"/>
+        <map signal="{cb80ea12-5702-4ad3-b7bf-662544403995}" pad="{c2c2e9e1-07e7-4a82-99ad-7a3a5983390f}"/>
+        <map signal="{79ad9275-7895-4708-8d6b-3b502a404269}" pad="{97182810-208c-4f4a-a3cb-6c1db3e6dbac}"/>
     </pad_signal_map>
 </component>

@@ -35,11 +35,11 @@
         <polygon layer="10" width="0.6" fill="false" start_x="240" start_y="10" grab_area="false">
             <segment angle="0" end_x="277" end_y="10"/>
         </polygon>
-        <text layer="10" text="${PAGE::NAME}"                  x="172" y="10"   angle="0" height="8" v_align="center" h_align="left"/>
-        <text layer="10" text="${PRJ::NAME}"                   x="172" y="2.5"  angle="0" height="4" v_align="center" h_align="left"/>
-        <text layer="10" text="${PAGE::LAST_MODIFIED}"         x="242" y="12.5" angle="0" height="4" v_align="center" h_align="left"/>
-        <text layer="10" text="${PAGE::AUTHOR}"                x="242" y="7.5"  angle="0" height="4" v_align="center" h_align="left"/>
-        <text layer="10" text="Page ${PAGE::NBR}/${PAGE::CNT}" x="242" y="2.5"  angle="0" height="4" v_align="center" h_align="left"/>
+        <text layer="10" text="${PAGE::NAME}"                  x="172" y="10"   rotation="0" height="8" v_align="center" h_align="left"/>
+        <text layer="10" text="${PRJ::NAME}"                   x="172" y="2.5"  rotation="0" height="4" v_align="center" h_align="left"/>
+        <text layer="10" text="${PAGE::LAST_MODIFIED}"         x="242" y="12.5" rotation="0" height="4" v_align="center" h_align="left"/>
+        <text layer="10" text="${PAGE::AUTHOR}"                x="242" y="7.5"  rotation="0" height="4" v_align="center" h_align="left"/>
+        <text layer="10" text="Page ${PAGE::NBR}/${PAGE::CNT}" x="242" y="2.5"  rotation="0" height="4" v_align="center" h_align="left"/>
     </geometry>
     <pins/>
 </symbol>

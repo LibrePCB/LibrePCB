@@ -20,23 +20,23 @@
             <value locale="en_US">GND</value>
         </default_values>
         <prefixes>
-            <prefix norm="" default="true">SUP</prefix>
+            <prefix default="true" norm="">SUP</prefix>
         </prefixes>
     </properties>
     <signals>
-        <signal required="true" uuid="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}" role="power" forced_net_name="${CMP::VALUE}" clock="false" negated="false">
+        <signal negated="false" forced_net_name="${CMP::VALUE}" clock="false" uuid="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}" required="true" role="power">
             <name locale="en_US">Net</name>
             <description locale="en_US"></description>
         </signal>
     </signals>
     <symbol_variants>
-        <variant norm="" uuid="{f09ad258-595b-4ee9-a1fc-910804a203ae}" default="true">
+        <variant default="true" norm="" uuid="{f09ad258-595b-4ee9-a1fc-910804a203ae}">
             <name locale="en_US">Default</name>
             <description locale="en_US"></description>
             <symbol_items>
-                <item required="true" uuid="{0539fd52-890f-48af-97a9-bacfb79c9475}" suffix="" symbol="{80f8cd68-69d9-43c4-9ed2-da32ca714b10}">
+                <item suffix="" symbol="{80f8cd68-69d9-43c4-9ed2-da32ca714b10}" uuid="{0539fd52-890f-48af-97a9-bacfb79c9475}" required="true">
                     <pin_signal_map>
-                        <map pin="{abcc319b-d09f-437b-a624-3dcf3eff5792}" signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}" display="none"/>
+                        <map pin="{abcc319b-d09f-437b-a624-3dcf3eff5792}" display="none" signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
                     </pin_signal_map>
                 </item>
             </symbol_items>

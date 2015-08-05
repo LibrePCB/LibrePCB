@@ -9,655 +9,655 @@
     </properties>
     <symbols>
         <symbol uuid="{a916d2d1-fb4b-4ac2-ac57-1f27ecc92c6f}" gen_comp_instance="{46dd457e-973b-4718-8ee1-471bce5d6e05}" symbol_item="{426e2b17-da88-400b-b1fb-248b24f9c541}">
-            <position x="114.300000" y="104.140000" angle="0.000000"/>
+            <position x="114.300000" y="104.140000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{4f66f2a1-5335-41aa-808e-c932abaf544e}" gen_comp_instance="{9c1c5892-2b20-401b-9bc2-a20d1910a0d1}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
-            <position x="35.560000" y="73.660000" angle="-270.000000"/>
+            <position x="35.560000" y="73.660000" rotation="-270.000000"/>
         </symbol>
         <symbol uuid="{bff40e03-66ec-4563-9d44-d046fb745575}" gen_comp_instance="{a1d18410-1549-45fb-854b-ddadbcc6787a}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="60.960000" y="12.700000" angle="0.000000"/>
+            <position x="60.960000" y="12.700000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{797ea11e-7e34-491e-bd2c-37325b9215f1}" gen_comp_instance="{c431d7ee-d5cc-4d6f-836c-e55b23898bff}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="271.780000" y="111.760000" angle="0.000000"/>
+            <position x="271.780000" y="111.760000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{5c670dd8-395e-4f18-bab9-4c061a4324d3}" gen_comp_instance="{9d24224e-2211-478f-ba3b-a65d67eceba5}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
-            <position x="160.020000" y="182.880000" angle="0.000000"/>
+            <position x="160.020000" y="182.880000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{ee173d35-314a-4214-a38a-261580a23f19}" gen_comp_instance="{7457f0ec-23d5-4e24-ad79-c7697cf45f5f}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="271.780000" y="27.940000" angle="0.000000"/>
+            <position x="271.780000" y="27.940000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{997dc435-1cc5-4fe9-8c07-9639cb957058}" gen_comp_instance="{9174adc1-ac17-455a-b171-1b911970b529}" symbol_item="{60cec411-a717-4893-b12f-7b698925e15b}">
-            <position x="48.260000" y="45.720000" angle="0.000000"/>
+            <position x="48.260000" y="45.720000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{fab1a1bc-3173-4957-b4c6-b72f1c84f1c4}" gen_comp_instance="{628fb49d-8726-4a99-96ce-216bc45d75d8}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="50.800000" y="182.880000" angle="0.000000"/>
+            <position x="50.800000" y="182.880000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{ea0c10b0-f6f1-4578-9970-533c8f6e0710}" gen_comp_instance="{0d0fb028-3607-46d4-9395-702b70a24cf6}" symbol_item="{abb0fd2d-e3d8-492e-8c53-95575916028b}">
-            <position x="226.060000" y="180.340000" angle="0.000000"/>
+            <position x="226.060000" y="180.340000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{0ef7605f-88ee-4a3d-be30-b57b14fbb8b6}" gen_comp_instance="{2c14a7a2-b292-446b-82d7-fd11e8319207}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
-            <position x="7.620000" y="30.480000" angle="0.000000"/>
+            <position x="7.620000" y="30.480000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{9aceb27e-5279-447b-ad95-8e75b1fc150b}" gen_comp_instance="{e63e0ab8-e632-4319-9a07-4959b903bda4}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="175.260000" y="43.180000" angle="0.000000"/>
+            <position x="175.260000" y="43.180000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{496d9058-68d2-4c17-9887-7613a2c16397}" gen_comp_instance="{dba8389e-cb83-458c-8910-2f83ff1204be}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
-            <position x="269.240000" y="48.260000" angle="-270.000000"/>
+            <position x="269.240000" y="48.260000" rotation="-270.000000"/>
         </symbol>
         <symbol uuid="{301fd7b1-e9e1-44af-bbe8-bea13f246679}" gen_comp_instance="{b25c8402-0d73-4829-bca1-e289e16f3574}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
-            <position x="99.060000" y="5.080000" angle="0.000000"/>
+            <position x="99.060000" y="5.080000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{be19c4cd-9ce9-4491-a36a-11d3658e147b}" gen_comp_instance="{fed311fc-c6b7-4f72-b817-6e58315d0702}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="223.520000" y="48.260000" angle="0.000000"/>
+            <position x="223.520000" y="48.260000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{d8364a82-3bec-4488-9bd9-5ce46cb2ce45}" gen_comp_instance="{aed7cfa4-8f30-49c5-bf93-d250472b9485}" symbol_item="{f7aa65f2-55b5-45d7-a3e1-782e9f3266a8}">
-            <position x="17.780000" y="12.700000" angle="0.000000"/>
+            <position x="17.780000" y="12.700000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{448c1971-f773-4f79-a320-2eb9f98df58d}" gen_comp_instance="{edd8aad2-d6fb-4ab5-b50b-2211bdce32dd}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="208.280000" y="63.500000" angle="0.000000"/>
+            <position x="208.280000" y="63.500000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{b41570e0-ea53-4ee4-a17d-206051e4d27c}" gen_comp_instance="{4eb0a5e1-6690-4141-9e61-d3cf8c4a51f9}" symbol_item="{52ef2b10-c149-4dfc-a2d8-2805efff2e13}">
-            <position x="93.980000" y="25.400000" angle="-90.000000"/>
+            <position x="93.980000" y="25.400000" rotation="-90.000000"/>
         </symbol>
         <symbol uuid="{8864dc9b-9c3d-45e7-af39-43a6787810dd}" gen_comp_instance="{22e2c94e-2c20-49c8-9cce-08e73cac88cf}" symbol_item="{abb0fd2d-e3d8-492e-8c53-95575916028b}">
-            <position x="27.940000" y="157.480000" angle="0.000000"/>
+            <position x="27.940000" y="157.480000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{a26f6dd8-bc4c-4785-ae7e-8854197ff6de}" gen_comp_instance="{4c7f1dcc-99c9-4ed1-9a91-99fd86b8a6b9}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
-            <position x="259.080000" y="132.080000" angle="-270.000000"/>
+            <position x="259.080000" y="132.080000" rotation="-270.000000"/>
         </symbol>
         <symbol uuid="{f4a99918-0962-40f9-b4aa-4632b8c94f62}" gen_comp_instance="{ec95b3d9-0651-4312-b4d6-67d4faf04b8e}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
-            <position x="251.460000" y="81.280000" angle="0.000000"/>
+            <position x="251.460000" y="81.280000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{17aee643-0a5d-472b-9b34-786809271e08}" gen_comp_instance="{16dd5067-49af-4a55-8487-675e7b86fd25}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
-            <position x="99.060000" y="142.240000" angle="0.000000"/>
+            <position x="99.060000" y="142.240000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{9e7ea8c0-d31b-43c1-9cec-bcc58b8d3b12}" gen_comp_instance="{84b8909b-730c-436d-a9ba-763d80ff211c}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="144.780000" y="50.800000" angle="0.000000"/>
+            <position x="144.780000" y="50.800000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{1dc66e17-5d32-4661-b8e2-d4ac3d7d1e9d}" gen_comp_instance="{7cdb580c-8a37-4041-bd6a-98d2cdbb8357}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="93.980000" y="114.300000" angle="0.000000"/>
+            <position x="93.980000" y="114.300000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{76a74fa1-2f8e-4153-9c08-633cac559c19}" gen_comp_instance="{e7abc6f6-f5e9-4d61-99de-903b57a18e4f}" symbol_item="{f7aa65f2-55b5-45d7-a3e1-782e9f3266a8}">
-            <position x="104.140000" y="50.800000" angle="0.000000"/>
+            <position x="104.140000" y="50.800000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{3012afac-d37a-4830-893c-0f115eeee4c4}" gen_comp_instance="{01255cae-c098-45ac-916d-1e00727985a3}" symbol_item="{343a59cd-7b10-4351-a0d3-5149afbc3c78}">
-            <position x="15.240000" y="25.400000" angle="0.000000"/>
+            <position x="15.240000" y="25.400000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{f08cbc7f-7bd0-44d2-bb73-cb88bb76deeb}" gen_comp_instance="{abaafbd6-8ea5-46c8-b991-09edefc6b964}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
-            <position x="182.880000" y="144.780000" angle="0.000000"/>
+            <position x="182.880000" y="144.780000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{96d8246e-b406-4b59-ad82-ddf1fd5462a1}" gen_comp_instance="{0954951f-9635-43a5-868f-5b93a449ce8a}" symbol_item="{fade976e-1f99-41a4-bcfc-b29524c37768}">
-            <position x="40.640000" y="81.280000" angle="0.000000"/>
+            <position x="40.640000" y="81.280000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{81b822d5-0e23-4325-86a1-303b9c43abe9}" gen_comp_instance="{c704174f-ed82-41d5-b1e0-38ddae052fd4}" symbol_item="{f7aa65f2-55b5-45d7-a3e1-782e9f3266a8}">
-            <position x="142.240000" y="101.600000" angle="0.000000"/>
+            <position x="142.240000" y="101.600000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{1c0134c2-7faf-4fee-a9a2-ceb3a97d8230}" gen_comp_instance="{38bd1acf-e663-4089-bf87-f147054c98cb}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="238.760000" y="177.800000" angle="0.000000"/>
+            <position x="238.760000" y="177.800000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{0537cf1b-3ac2-41a1-8927-0f1a8d1ba0b4}" gen_comp_instance="{96ebd29a-67e4-40eb-b871-489162b0bd98}" symbol_item="{60cec411-a717-4893-b12f-7b698925e15b}">
-            <position x="223.520000" y="27.940000" angle="-90.000000"/>
+            <position x="223.520000" y="27.940000" rotation="-90.000000"/>
         </symbol>
         <symbol uuid="{24223695-c4bc-48b3-aa21-2512c059b10e}" gen_comp_instance="{a330a280-5211-49a8-a9d0-78d2a415bf00}" symbol_item="{52ef2b10-c149-4dfc-a2d8-2805efff2e13}">
-            <position x="233.680000" y="60.960000" angle="0.000000"/>
+            <position x="233.680000" y="60.960000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{dd9115c3-6c6c-4f2d-9d70-ee08ca2ac3ff}" gen_comp_instance="{05f65b0b-a4a8-4a45-b496-824faaeb3c1f}" symbol_item="{60cec411-a717-4893-b12f-7b698925e15b}">
-            <position x="40.640000" y="152.400000" angle="0.000000"/>
+            <position x="40.640000" y="152.400000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{0e6b3203-4d96-4578-b8ba-6f543d765d42}" gen_comp_instance="{69acc15b-36ce-4ede-9fd7-a311b2ba9c6e}" symbol_item="{343a59cd-7b10-4351-a0d3-5149afbc3c78}">
-            <position x="190.500000" y="149.860000" angle="0.000000"/>
+            <position x="190.500000" y="149.860000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{72ad452e-7aed-4cef-b531-f1311aaef27d}" gen_comp_instance="{470a8e1a-c8c1-45e3-82bb-d4911fac2e46}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="256.540000" y="154.940000" angle="0.000000"/>
+            <position x="256.540000" y="154.940000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{85ead4dd-ea41-475b-b6aa-2425c36b4989}" gen_comp_instance="{0c34a860-f85c-4abc-81da-fe0db74c6d1e}" symbol_item="{abb0fd2d-e3d8-492e-8c53-95575916028b}">
-            <position x="259.080000" y="35.560000" angle="0.000000"/>
+            <position x="259.080000" y="35.560000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{054577a4-290a-4307-b268-452253342a78}" gen_comp_instance="{c0f2fd5b-3c5a-453a-8246-cff8c6f107b1}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="251.460000" y="170.180000" angle="0.000000"/>
+            <position x="251.460000" y="170.180000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{c95b98ef-276d-42a2-9e5e-29347ea04b64}" gen_comp_instance="{5649c5c8-864d-4e84-9e0a-d1409bca92ee}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="152.400000" y="162.560000" angle="0.000000"/>
+            <position x="152.400000" y="162.560000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{ab8af7c6-dca5-49c8-b07a-1c4658dd721d}" gen_comp_instance="{48902454-42d5-441c-b9ed-48bad446013e}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
-            <position x="241.300000" y="172.720000" angle="0.000000"/>
+            <position x="241.300000" y="172.720000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{2225a9ca-2ada-44f3-83f4-89a97f442449}" gen_comp_instance="{3a08b7b1-b88d-4e3c-90ca-2e65eabfca46}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
-            <position x="30.480000" y="144.780000" angle="-270.000000"/>
+            <position x="30.480000" y="144.780000" rotation="-270.000000"/>
         </symbol>
         <symbol uuid="{5c3770da-72f8-4d65-b1d5-2cda1e310887}" gen_comp_instance="{9576a3e9-0e45-4e14-8ce7-27a91ca53cb3}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
-            <position x="2.540000" y="124.460000" angle="0.000000"/>
+            <position x="2.540000" y="124.460000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{38756d37-225c-4ddb-b261-09423973da5b}" gen_comp_instance="{3801ccdd-ec10-41d8-9521-c6dbce4429d4}" symbol_item="{abb0fd2d-e3d8-492e-8c53-95575916028b}">
-            <position x="177.800000" y="132.080000" angle="0.000000"/>
+            <position x="177.800000" y="132.080000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{ef8dda36-8386-4ff9-a6ab-70dc4359e828}" gen_comp_instance="{410193c1-b673-4924-9b9f-ed4fa328af87}" symbol_item="{fade976e-1f99-41a4-bcfc-b29524c37768}">
-            <position x="40.640000" y="114.300000" angle="0.000000"/>
+            <position x="40.640000" y="114.300000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{4f4ee6c5-61d2-4b74-9b61-7ac8fe8971ac}" gen_comp_instance="{a294fd45-0986-4211-b200-18c83711ad23}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
-            <position x="271.780000" y="180.340000" angle="0.000000"/>
+            <position x="271.780000" y="180.340000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{ac36b254-40fe-41b5-a14b-bb1d5caf86a5}" gen_comp_instance="{6068cb33-59c5-450e-8568-77646b3fc071}" symbol_item="{f7aa65f2-55b5-45d7-a3e1-782e9f3266a8}">
-            <position x="190.500000" y="86.360000" angle="0.000000"/>
+            <position x="190.500000" y="86.360000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{7818ccc8-af21-48ec-ab43-0e539e25515e}" gen_comp_instance="{9e38dd2a-fb09-4dfc-979d-44c450e7841d}" symbol_item="{42e8f509-3f37-4b36-9ef6-98ecd19e8ca4}">
-            <position x="144.780000" y="121.920000" angle="0.000000"/>
+            <position x="144.780000" y="121.920000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{b8ffc85e-3509-4c9c-aed6-f3316a992f38}" gen_comp_instance="{1ce39b18-2d34-4b7e-bc12-36f931cdba20}" symbol_item="{426e2b17-da88-400b-b1fb-248b24f9c541}">
-            <position x="251.460000" y="68.580000" angle="0.000000"/>
+            <position x="251.460000" y="68.580000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{9a8c5d68-4670-40f1-a851-86b1c9514517}" gen_comp_instance="{7a49c9d3-9400-4c0a-97af-143215ae424c}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="78.740000" y="172.720000" angle="0.000000"/>
+            <position x="78.740000" y="172.720000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{4417e4cd-325a-4de4-b7b0-eb55c1be3b1f}" gen_comp_instance="{274f22e2-09f9-4f8f-ace1-f0678efaff68}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="152.400000" y="88.900000" angle="0.000000"/>
+            <position x="152.400000" y="88.900000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{b8f1f40c-7722-481c-bae5-b20bb2b9263e}" gen_comp_instance="{85f5fc23-9d40-4a88-b7e4-193787515ddd}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
-            <position x="124.460000" y="109.220000" angle="0.000000"/>
+            <position x="124.460000" y="109.220000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{37adfd36-b811-4315-870c-6bc9a5c0aa52}" gen_comp_instance="{00dab31c-5b30-45e5-a5d0-81f6ede0084d}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
-            <position x="236.220000" y="33.020000" angle="0.000000"/>
+            <position x="236.220000" y="33.020000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{e09aa153-cbe2-44c3-9c6e-fdeb516fcbe1}" gen_comp_instance="{72fbac49-9b11-43d2-a50a-89a78e7ea638}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
-            <position x="7.620000" y="139.700000" angle="-270.000000"/>
+            <position x="7.620000" y="139.700000" rotation="-270.000000"/>
         </symbol>
         <symbol uuid="{15e525f3-4cf2-437b-877c-b7a9efba6aef}" gen_comp_instance="{e554ee18-453c-4dbe-a0ac-94a3725ff24c}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
-            <position x="182.880000" y="78.740000" angle="0.000000"/>
+            <position x="182.880000" y="78.740000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{2ad6ac74-c0e8-45c8-9901-86a267a239d5}" gen_comp_instance="{1864fbf4-0044-4aa4-8606-cde7f842527c}" symbol_item="{426e2b17-da88-400b-b1fb-248b24f9c541}">
-            <position x="73.660000" y="172.720000" angle="0.000000"/>
+            <position x="73.660000" y="172.720000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{93388800-787a-4863-97e0-716fdd25cd98}" gen_comp_instance="{44192ee1-cfb2-45f4-ac17-547bbecfc026}" symbol_item="{fade976e-1f99-41a4-bcfc-b29524c37768}">
-            <position x="38.100000" y="124.460000" angle="0.000000"/>
+            <position x="38.100000" y="124.460000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{d15bef6a-e55f-4763-940b-15c252f770db}" gen_comp_instance="{1859b148-2699-4c48-8a89-484362790d16}" symbol_item="{42e8f509-3f37-4b36-9ef6-98ecd19e8ca4}">
-            <position x="40.640000" y="30.480000" angle="0.000000"/>
+            <position x="40.640000" y="30.480000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{a1814a7f-33ce-41c8-b12b-ca63b62838a9}" gen_comp_instance="{ab4de5d0-89da-4993-949b-0e9f33fa6a2c}" symbol_item="{0428743a-191b-40d1-82b6-a943bff79846}">
-            <position x="226.060000" y="127.000000" angle="0.000000"/>
+            <position x="226.060000" y="127.000000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{bcede213-6d7f-4ead-8eea-a9d41bb3e4b9}" gen_comp_instance="{0b30bf6c-70ae-43be-a5d8-299b4bf389c4}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="185.420000" y="40.640000" angle="0.000000"/>
+            <position x="185.420000" y="40.640000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{b7a9bd31-80ac-4d3c-8422-dd7e352b8ded}" gen_comp_instance="{86555740-6a7a-4a1e-b91b-3ff29d9477fb}" symbol_item="{f7aa65f2-55b5-45d7-a3e1-782e9f3266a8}">
-            <position x="116.840000" y="81.280000" angle="0.000000"/>
+            <position x="116.840000" y="81.280000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{d5f90b9e-7581-478d-b828-20365c1e9d13}" gen_comp_instance="{9148a39d-1c22-4f43-b6ac-ad3aaf3cc4c8}" symbol_item="{abb0fd2d-e3d8-492e-8c53-95575916028b}">
-            <position x="170.180000" y="165.100000" angle="0.000000"/>
+            <position x="170.180000" y="165.100000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{139103ce-5ea3-4adc-b65b-f15bca522f7d}" gen_comp_instance="{59992a16-46ea-425c-821d-44eac0129f37}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
-            <position x="5.080000" y="76.200000" angle="0.000000"/>
+            <position x="5.080000" y="76.200000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{989a7060-e7f5-4a97-ba9f-9e8cc1d3affe}" gen_comp_instance="{9da5a356-8b88-4503-9eb1-b5abe85e7d47}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="93.980000" y="180.340000" angle="0.000000"/>
+            <position x="93.980000" y="180.340000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{d5a64440-be92-445e-bab2-3dc368a66549}" gen_comp_instance="{1f70ab2e-49e5-4478-a0ee-71f75d48bc65}" symbol_item="{abb0fd2d-e3d8-492e-8c53-95575916028b}">
-            <position x="160.020000" y="50.800000" angle="0.000000"/>
+            <position x="160.020000" y="50.800000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{f98cd216-ed25-4554-b9ec-ce2a69a0f3cb}" gen_comp_instance="{b1ca9c6e-6c76-48d2-88f6-d54c8e5ab998}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="264.160000" y="99.060000" angle="0.000000"/>
+            <position x="264.160000" y="99.060000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{bdbf1018-f301-487e-b1b1-3772371e8f0a}" gen_comp_instance="{43e12fa9-7ff4-4dbc-85fb-8e082185d618}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
-            <position x="111.760000" y="53.340000" angle="-270.000000"/>
+            <position x="111.760000" y="53.340000" rotation="-270.000000"/>
         </symbol>
         <symbol uuid="{4de28a7a-b176-4853-9dce-a93e805b31ef}" gen_comp_instance="{7d96e460-d391-4cae-8329-2b7074d7ec1e}" symbol_item="{60cec411-a717-4893-b12f-7b698925e15b}">
-            <position x="73.660000" y="48.260000" angle="-90.000000"/>
+            <position x="73.660000" y="48.260000" rotation="-90.000000"/>
         </symbol>
         <symbol uuid="{381a6124-d42b-41ed-85b6-bced3689bd1c}" gen_comp_instance="{35f05ac8-39cc-4a6c-9d58-b86eead90eff}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="17.780000" y="182.880000" angle="0.000000"/>
+            <position x="17.780000" y="182.880000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{25ad9f8c-bcd8-4ad6-9b7e-4d3db9527700}" gen_comp_instance="{6f93ab12-f230-4117-aa0b-ed2ff28e0a10}" symbol_item="{c8239abb-cb41-4c06-ae9c-c2568a7cdcb8}">
-            <position x="172.720000" y="35.560000" angle="-270.000000"/>
+            <position x="172.720000" y="35.560000" rotation="-270.000000"/>
         </symbol>
         <symbol uuid="{32d00e8e-786f-4168-bf25-2dfac15c3882}" gen_comp_instance="{65857cc1-de50-4a0a-8b49-295dbd33a065}" symbol_item="{eb88330e-d961-45aa-bcca-54cc88c9f2fc}">
-            <position x="162.560000" y="68.580000" angle="0.000000"/>
+            <position x="162.560000" y="68.580000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{befb0507-67a8-4fc8-9fc1-55308dc183d0}" gen_comp_instance="{2d74997e-d5f0-48a4-94f3-0b15a646df56}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
-            <position x="83.820000" y="180.340000" angle="0.000000"/>
+            <position x="83.820000" y="180.340000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{02661adc-62db-444a-ad87-249270eee931}" gen_comp_instance="{0273f878-4573-4818-ab44-25568ba8090a}" symbol_item="{c8239abb-cb41-4c06-ae9c-c2568a7cdcb8}">
-            <position x="104.140000" y="109.220000" angle="0.000000"/>
+            <position x="104.140000" y="109.220000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{25f654bd-9925-4fa3-922b-d2af82e2f3a1}" gen_comp_instance="{1046a347-03fa-4b40-a485-f8d1420aeb23}" symbol_item="{f7aa65f2-55b5-45d7-a3e1-782e9f3266a8}">
-            <position x="124.460000" y="93.980000" angle="0.000000"/>
+            <position x="124.460000" y="93.980000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{27ece1e0-187d-4ae8-b59b-d6f2dfd8ac42}" gen_comp_instance="{204ae908-ba49-45b1-a244-dbe76e848fbd}" symbol_item="{426e2b17-da88-400b-b1fb-248b24f9c541}">
-            <position x="213.360000" y="20.320000" angle="0.000000"/>
+            <position x="213.360000" y="20.320000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{5cfa6364-48bb-4694-9272-b2f947f8e8b2}" gen_comp_instance="{b421c2fe-dfbe-46b5-bfe5-52bc56c0d8f3}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
-            <position x="198.120000" y="114.300000" angle="0.000000"/>
+            <position x="198.120000" y="114.300000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{a876abd6-2fb2-47e3-8cae-0ee459e8c500}" gen_comp_instance="{9c09b342-672a-4e2d-acc9-00d5818bb2fa}" symbol_item="{abb0fd2d-e3d8-492e-8c53-95575916028b}">
-            <position x="264.160000" y="127.000000" angle="0.000000"/>
+            <position x="264.160000" y="127.000000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{86ae38d3-f449-416f-900a-4256b33b6290}" gen_comp_instance="{1f590315-64c7-47f0-9b6a-5ca0aa526a99}" symbol_item="{343a59cd-7b10-4351-a0d3-5149afbc3c78}">
-            <position x="83.820000" y="40.640000" angle="0.000000"/>
+            <position x="83.820000" y="40.640000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{acc2dc68-b175-4292-b5e8-1cf226165052}" gen_comp_instance="{60bdb53b-8932-4476-8a3f-a453825d70f6}" symbol_item="{f7aa65f2-55b5-45d7-a3e1-782e9f3266a8}">
-            <position x="12.700000" y="60.960000" angle="0.000000"/>
+            <position x="12.700000" y="60.960000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{f2e7d7c3-d696-4036-bd24-c75b483b5056}" gen_comp_instance="{94174f30-3c9c-486d-8c52-f75a59812a99}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
-            <position x="213.360000" y="177.800000" angle="0.000000"/>
+            <position x="213.360000" y="177.800000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{ab6d2721-7cd5-4a60-a400-b55e6dfa9621}" gen_comp_instance="{9c70b458-8cef-4606-a0f9-ce85d5741428}" symbol_item="{426e2b17-da88-400b-b1fb-248b24f9c541}">
-            <position x="246.380000" y="43.180000" angle="0.000000"/>
+            <position x="246.380000" y="43.180000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{bffbd8a7-5029-49f5-93bd-c7803f017d9a}" gen_comp_instance="{bc0101e6-c746-4efd-a66e-a734a7637b2d}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
-            <position x="68.580000" y="38.100000" angle="0.000000"/>
+            <position x="68.580000" y="38.100000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{8cca4d84-e68a-46b8-bc02-cca8bd6fe89d}" gen_comp_instance="{0fd49e32-dbc4-4c68-9164-309a030f564b}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
-            <position x="5.080000" y="48.260000" angle="0.000000"/>
+            <position x="5.080000" y="48.260000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{9e2d18b4-475f-4d75-943c-904ea7ff6d5b}" gen_comp_instance="{3670d157-4f7c-4dca-bfae-5e98f332ab1a}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
-            <position x="40.640000" y="106.680000" angle="0.000000"/>
+            <position x="40.640000" y="106.680000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{6e7d5c6c-4c9c-41fe-aa9c-833f9cd8dca5}" gen_comp_instance="{648d8a84-a028-455d-8cff-1a1ff39512c0}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
-            <position x="129.540000" y="38.100000" angle="-90.000000"/>
+            <position x="129.540000" y="38.100000" rotation="-90.000000"/>
         </symbol>
         <symbol uuid="{9994900b-364b-47d7-a655-75c9ab81b209}" gen_comp_instance="{3fd57d8c-3aba-46f7-92f5-ce59652e3e97}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="259.080000" y="162.560000" angle="0.000000"/>
+            <position x="259.080000" y="162.560000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{b64fa84e-850e-4c87-b10b-16d33876416f}" gen_comp_instance="{1d74729c-4b32-4e54-9fa0-593b5a5736f4}" symbol_item="{42e8f509-3f37-4b36-9ef6-98ecd19e8ca4}">
-            <position x="50.800000" y="167.640000" angle="0.000000"/>
+            <position x="50.800000" y="167.640000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{b5f21c49-f3b3-4e2a-a514-739e85a3363b}" gen_comp_instance="{6304bb8d-c25f-4428-a336-1f6493dd84bc}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
-            <position x="269.240000" y="170.180000" angle="0.000000"/>
+            <position x="269.240000" y="170.180000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{7e2acffd-da79-4cb1-8804-c58fa8a0ad91}" gen_comp_instance="{02201e43-bb21-472c-a660-509d2aaeb1fc}" symbol_item="{60cec411-a717-4893-b12f-7b698925e15b}">
-            <position x="198.120000" y="137.160000" angle="-90.000000"/>
+            <position x="198.120000" y="137.160000" rotation="-90.000000"/>
         </symbol>
         <symbol uuid="{d5e83a33-a000-42d2-9481-1a1ad9f2438b}" gen_comp_instance="{9a50d52a-f9e4-4f0e-8d04-02b0523d4bc9}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
-            <position x="162.560000" y="30.480000" angle="-270.000000"/>
+            <position x="162.560000" y="30.480000" rotation="-270.000000"/>
         </symbol>
         <symbol uuid="{05707652-79fc-4b82-a04f-9e8fb7cfc3ba}" gen_comp_instance="{96db7f9e-c298-45a8-be7a-49766e3d04dd}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="246.380000" y="182.880000" angle="0.000000"/>
+            <position x="246.380000" y="182.880000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{9b077d69-4e4a-4592-98e7-ec4700c47d26}" gen_comp_instance="{53b0e9c0-7cca-4e9c-ac1d-6365505a4d34}" symbol_item="{f7aa65f2-55b5-45d7-a3e1-782e9f3266a8}">
-            <position x="10.160000" y="157.480000" angle="0.000000"/>
+            <position x="10.160000" y="157.480000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{13f41ba6-5baf-4e28-942a-5c94e310df69}" gen_comp_instance="{915938ad-86eb-49ac-b468-9933463fe82c}" symbol_item="{60cec411-a717-4893-b12f-7b698925e15b}">
-            <position x="30.480000" y="5.080000" angle="0.000000"/>
+            <position x="30.480000" y="5.080000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{0953a4ec-7b5f-455b-9a52-3e3212e96f27}" gen_comp_instance="{eaf0a0f5-a5fe-4e37-bb71-776cd1974b1a}" symbol_item="{f7aa65f2-55b5-45d7-a3e1-782e9f3266a8}">
-            <position x="38.100000" y="55.880000" angle="0.000000"/>
+            <position x="38.100000" y="55.880000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{3dae9955-d283-4a11-abe3-ee816943f418}" gen_comp_instance="{3d5bf624-31e7-495d-bc0d-c866ee5540f0}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="142.240000" y="185.420000" angle="0.000000"/>
+            <position x="142.240000" y="185.420000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{1d631f64-7150-4845-be8c-e331283fefa4}" gen_comp_instance="{61dff26a-462b-4735-9205-a37e5ea221a5}" symbol_item="{fade976e-1f99-41a4-bcfc-b29524c37768}">
-            <position x="10.160000" y="170.180000" angle="0.000000"/>
+            <position x="10.160000" y="170.180000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{f473ae0e-7146-4631-9e9d-1e243a95b59c}" gen_comp_instance="{32c61422-8621-4adf-8ece-32a6e3f72a6c}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="149.860000" y="33.020000" angle="0.000000"/>
+            <position x="149.860000" y="33.020000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{e610a925-716a-4e73-ac43-a5d606aa2eb7}" gen_comp_instance="{699d7c7d-411b-4ba5-93ba-2d4e50dc0bcd}" symbol_item="{c8239abb-cb41-4c06-ae9c-c2568a7cdcb8}">
-            <position x="111.760000" y="137.160000" angle="0.000000"/>
+            <position x="111.760000" y="137.160000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{3aa0883e-7e7a-4bb4-9166-b015feab23fd}" gen_comp_instance="{bae7cceb-17a8-4dbb-85c9-b610cbe21df0}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
-            <position x="218.440000" y="172.720000" angle="0.000000"/>
+            <position x="218.440000" y="172.720000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{0a1bd64d-83aa-410c-9ae0-872ecbd919c0}" gen_comp_instance="{c2618778-eb5c-4c8e-8012-652239aa958d}" symbol_item="{c8239abb-cb41-4c06-ae9c-c2568a7cdcb8}">
-            <position x="231.140000" y="43.180000" angle="-270.000000"/>
+            <position x="231.140000" y="43.180000" rotation="-270.000000"/>
         </symbol>
         <symbol uuid="{43051cd5-fb69-4ab2-bc87-159afa7cd68f}" gen_comp_instance="{d622f35c-4882-497c-942e-2acbbe9d420e}" symbol_item="{abb0fd2d-e3d8-492e-8c53-95575916028b}">
-            <position x="15.240000" y="83.820000" angle="0.000000"/>
+            <position x="15.240000" y="83.820000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{21dac494-88a1-4caa-bb82-40d03eca2f15}" gen_comp_instance="{0f062dc3-2540-4860-9786-2fa60aa26cc7}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
-            <position x="185.420000" y="132.080000" angle="0.000000"/>
+            <position x="185.420000" y="132.080000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{83586841-320a-41f4-ab46-0a63b3c5bd4d}" gen_comp_instance="{177c5715-6c91-446a-a562-ab0aac8d00a5}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
-            <position x="10.160000" y="5.080000" angle="0.000000"/>
+            <position x="10.160000" y="5.080000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{34e05638-bf8a-4b01-a8cd-1acbc32d98a9}" gen_comp_instance="{79e152c7-db31-4610-99e7-2d6d4f68e7a2}" symbol_item="{c8239abb-cb41-4c06-ae9c-c2568a7cdcb8}">
-            <position x="109.220000" y="86.360000" angle="0.000000"/>
+            <position x="109.220000" y="86.360000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{1db175cb-98a2-4046-8703-6d6568ddfa3b}" gen_comp_instance="{5546f46a-8ec7-4d3a-ab5e-f63353ae4540}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="154.940000" y="154.940000" angle="0.000000"/>
+            <position x="154.940000" y="154.940000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{01f8a644-3872-4bbf-9d87-f253728b7038}" gen_comp_instance="{70743ebc-963e-4206-8ee0-645aa5e4e8c1}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="190.500000" y="63.500000" angle="0.000000"/>
+            <position x="190.500000" y="63.500000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{9f52e4df-3689-4a52-b2d4-b9cc22932c47}" gen_comp_instance="{d0282daf-c91c-4a95-a869-b8bbfd8a1828}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="96.520000" y="106.680000" angle="0.000000"/>
+            <position x="96.520000" y="106.680000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{de1501eb-15df-4746-8204-a459de901453}" gen_comp_instance="{1b75ec60-1d31-4a4f-9764-d7bdf8830429}" symbol_item="{c8239abb-cb41-4c06-ae9c-c2568a7cdcb8}">
-            <position x="91.440000" y="55.880000" angle="0.000000"/>
+            <position x="91.440000" y="55.880000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{01b73605-85a6-4842-930f-53352948b618}" gen_comp_instance="{e599b283-c5a5-465e-9aca-acb829331ece}" symbol_item="{343a59cd-7b10-4351-a0d3-5149afbc3c78}">
-            <position x="165.100000" y="152.400000" angle="0.000000"/>
+            <position x="165.100000" y="152.400000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{59e808f4-e36a-4eb2-bf33-81cd186be5f9}" gen_comp_instance="{68f99fcf-199c-452b-aeb1-707d59e85f35}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="157.480000" y="144.780000" angle="0.000000"/>
+            <position x="157.480000" y="144.780000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{3d60ba3a-3253-4462-9758-c59006aad7e6}" gen_comp_instance="{bd8a34d4-05bf-4346-88c5-a5391dd39f3d}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="58.420000" y="5.080000" angle="0.000000"/>
+            <position x="58.420000" y="5.080000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{455500f8-28d8-4b1f-b7b1-e3f31e2a774a}" gen_comp_instance="{793c3a65-2139-4bc3-b257-a436bfac2319}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="264.160000" y="142.240000" angle="0.000000"/>
+            <position x="264.160000" y="142.240000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{aa02c35a-847f-4546-bc33-5080b738f0be}" gen_comp_instance="{474d9a28-1a06-4d8c-9bde-ea526ed33da9}" symbol_item="{abb0fd2d-e3d8-492e-8c53-95575916028b}">
-            <position x="165.100000" y="86.360000" angle="0.000000"/>
+            <position x="165.100000" y="86.360000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{ed6f0dd4-cabd-48d5-9c9c-cdf85e0f06ca}" gen_comp_instance="{e4a3da6d-4cbb-4d5c-a56b-92f2f6c90070}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
-            <position x="43.180000" y="134.620000" angle="0.000000"/>
+            <position x="43.180000" y="134.620000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{713feb9f-10d0-46c9-bf3b-351320ec990e}" gen_comp_instance="{604e0379-2577-4cb0-9e79-d0ea013cbff9}" symbol_item="{eb88330e-d961-45aa-bcca-54cc88c9f2fc}">
-            <position x="132.080000" y="10.160000" angle="0.000000"/>
+            <position x="132.080000" y="10.160000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{3396cb11-0df7-4fe0-9b56-67a85f64a534}" gen_comp_instance="{a75f08b5-66e6-4810-b0ce-27d7ffdcdec8}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
-            <position x="66.040000" y="55.880000" angle="0.000000"/>
+            <position x="66.040000" y="55.880000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{fa3228db-5376-4082-98e1-00d1fddb6b4c}" gen_comp_instance="{ecd0c1aa-03da-407c-891e-e425a9a0494a}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
-            <position x="60.960000" y="45.720000" angle="-270.000000"/>
+            <position x="60.960000" y="45.720000" rotation="-270.000000"/>
         </symbol>
         <symbol uuid="{c505eca5-6de0-4d6b-b9c7-2115a220e198}" gen_comp_instance="{7f9e5aae-7199-48c0-96c1-e34ce1fd5ea6}" symbol_item="{abb0fd2d-e3d8-492e-8c53-95575916028b}">
-            <position x="259.080000" y="177.800000" angle="0.000000"/>
+            <position x="259.080000" y="177.800000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{e0e1bb02-076a-4068-a37d-292ed949b819}" gen_comp_instance="{aca69831-daaf-4aef-8035-df28eeef8d77}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
-            <position x="200.660000" y="119.380000" angle="0.000000"/>
+            <position x="200.660000" y="119.380000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{f1ddfd18-06eb-4be0-a01e-7ccf253b83f3}" gen_comp_instance="{1eadb24d-8ebb-407e-92a4-40b3109366d3}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
-            <position x="165.100000" y="137.160000" angle="-90.000000"/>
+            <position x="165.100000" y="137.160000" rotation="-90.000000"/>
         </symbol>
         <symbol uuid="{c12d12d6-d8d1-44f5-8ae8-a601f4ef25fc}" gen_comp_instance="{cbe8aca4-1a27-46ff-a4ec-f965ac99da9f}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
-            <position x="106.680000" y="15.240000" angle="0.000000"/>
+            <position x="106.680000" y="15.240000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{1e1997f9-af3f-47ed-b32f-c3baac2fb230}" gen_comp_instance="{c1ab71b6-ccd0-40a9-a98c-10a1a40dbe8c}" symbol_item="{52ef2b10-c149-4dfc-a2d8-2805efff2e13}">
-            <position x="78.740000" y="12.700000" angle="0.000000"/>
+            <position x="78.740000" y="12.700000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{0889ec1a-54e4-41ef-b2ee-a3377843c540}" gen_comp_instance="{400ac974-b5e8-4ba0-a79d-178e76806e47}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
-            <position x="266.700000" y="154.940000" angle="-270.000000"/>
+            <position x="266.700000" y="154.940000" rotation="-270.000000"/>
         </symbol>
         <symbol uuid="{c71d324c-36ad-4a17-bf8e-1734df3f5871}" gen_comp_instance="{5a1a35a0-ced8-4aa8-a99b-e78f5b7d07ed}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
-            <position x="162.560000" y="7.620000" angle="0.000000"/>
+            <position x="162.560000" y="7.620000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{e702d5b4-5a04-473c-9ebe-b2d3b8edff92}" gen_comp_instance="{60f77f38-175f-40f8-88dd-69a19aa60015}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="63.500000" y="182.880000" angle="0.000000"/>
+            <position x="63.500000" y="182.880000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{94f62efa-b655-410f-a8bf-97ab5c343d0c}" gen_comp_instance="{b3ce5602-9687-46fe-bf2f-1b68427bbe83}" symbol_item="{343a59cd-7b10-4351-a0d3-5149afbc3c78}">
-            <position x="154.940000" y="177.800000" angle="0.000000"/>
+            <position x="154.940000" y="177.800000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{ccb6a864-82cc-4bd0-894e-0b27d01e9ed2}" gen_comp_instance="{36eaec48-20f6-4770-a060-617a1b1118a7}" symbol_item="{f7aa65f2-55b5-45d7-a3e1-782e9f3266a8}">
-            <position x="162.560000" y="99.060000" angle="0.000000"/>
+            <position x="162.560000" y="99.060000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{1ac3bbf5-982e-4443-8778-a8f215167673}" gen_comp_instance="{b8d10639-985a-4614-8856-dc3f77fbfacf}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
-            <position x="2.540000" y="93.980000" angle="0.000000"/>
+            <position x="2.540000" y="93.980000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{6ffc26ce-780d-4041-b781-9b9ecff50181}" gen_comp_instance="{cec87faf-fc4a-4d73-b665-010efcc70ad1}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="10.160000" y="27.940000" angle="0.000000"/>
+            <position x="10.160000" y="27.940000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{e1e8fcde-8108-434a-accf-5fed5a7bee15}" gen_comp_instance="{664c765a-7bdc-43ad-bd5a-ba7f6a793c11}" symbol_item="{f7aa65f2-55b5-45d7-a3e1-782e9f3266a8}">
-            <position x="144.780000" y="38.100000" angle="0.000000"/>
+            <position x="144.780000" y="38.100000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{5fc0b361-77ce-4b1d-b29a-5cc1da3393d5}" gen_comp_instance="{7999011d-fa93-417c-8b4f-26e5c599079a}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="106.680000" y="182.880000" angle="0.000000"/>
+            <position x="106.680000" y="182.880000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{3fc595c9-46cf-4cb0-90ae-57855e1d444f}" gen_comp_instance="{082a452a-7897-43d5-b9c3-44538c20e239}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
-            <position x="233.680000" y="73.660000" angle="-180.000000"/>
+            <position x="233.680000" y="73.660000" rotation="-180.000000"/>
         </symbol>
         <symbol uuid="{c7a5d4b6-8a7e-4125-8292-06a8d048b26e}" gen_comp_instance="{12925f38-2a03-4f10-970f-555908b7857c}" symbol_item="{abb0fd2d-e3d8-492e-8c53-95575916028b}">
-            <position x="66.040000" y="27.940000" angle="0.000000"/>
+            <position x="66.040000" y="27.940000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{5a6147c3-c777-41fc-8cca-4cafbe7ed8b9}" gen_comp_instance="{1a5e4951-7261-4bcc-bd60-cb539643ab1f}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="2.540000" y="12.700000" angle="0.000000"/>
+            <position x="2.540000" y="12.700000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{129ad639-8626-411b-869c-8090b2718c53}" gen_comp_instance="{964b6544-6649-4d3b-9605-fea644a71d3e}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="269.240000" y="134.620000" angle="0.000000"/>
+            <position x="269.240000" y="134.620000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{60da0596-3a87-4cd4-9ee6-6b520106f131}" gen_comp_instance="{f6638990-4269-4570-a360-bf4964c13677}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="45.720000" y="182.880000" angle="0.000000"/>
+            <position x="45.720000" y="182.880000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{647c4eee-17bb-4b20-8239-90afd126b2e8}" gen_comp_instance="{445b146a-dd06-4e09-bba8-eaf4629361bd}" symbol_item="{60cec411-a717-4893-b12f-7b698925e15b}">
-            <position x="195.580000" y="73.660000" angle="0.000000"/>
+            <position x="195.580000" y="73.660000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{c20b2d78-3ef5-4b9d-8a98-10319ef441af}" gen_comp_instance="{797505dc-d693-4966-aa93-b04996fdcf9e}" symbol_item="{60cec411-a717-4893-b12f-7b698925e15b}">
-            <position x="96.520000" y="132.080000" angle="0.000000"/>
+            <position x="96.520000" y="132.080000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{d87f6fa6-a1be-41d0-aeef-9214a364c072}" gen_comp_instance="{ecbd3deb-e53d-493a-99fc-ef0a3a37dae1}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
-            <position x="187.960000" y="20.320000" angle="0.000000"/>
+            <position x="187.960000" y="20.320000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{7f7e8adb-b67f-4108-8efa-094e0b2fe9b9}" gen_comp_instance="{211cd25d-a035-469e-b959-e0d5f26ebb64}" symbol_item="{c8239abb-cb41-4c06-ae9c-c2568a7cdcb8}">
-            <position x="175.260000" y="137.160000" angle="-180.000000"/>
+            <position x="175.260000" y="137.160000" rotation="-180.000000"/>
         </symbol>
         <symbol uuid="{1e146159-d3bd-4bc3-b785-ca212b00f105}" gen_comp_instance="{325e2a0f-3466-438a-ab99-23a769afe53a}" symbol_item="{426e2b17-da88-400b-b1fb-248b24f9c541}">
-            <position x="236.220000" y="22.860000" angle="0.000000"/>
+            <position x="236.220000" y="22.860000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{ce20a9e4-7228-4b34-bed1-918281303b08}" gen_comp_instance="{a65fd0cb-97c9-4b91-9611-b2a869faa674}" symbol_item="{abb0fd2d-e3d8-492e-8c53-95575916028b}">
-            <position x="116.840000" y="25.400000" angle="0.000000"/>
+            <position x="116.840000" y="25.400000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{94b710e5-985a-4c0a-b663-652d47b1e06b}" gen_comp_instance="{0ac0a98a-6384-4af5-888d-c6fbdb7f9649}" symbol_item="{c8239abb-cb41-4c06-ae9c-c2568a7cdcb8}">
-            <position x="27.940000" y="63.500000" angle="0.000000"/>
+            <position x="27.940000" y="63.500000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{6b379907-aa14-4412-861c-0c670455f74d}" gen_comp_instance="{4852b099-6448-417a-8be7-694f41dd23b2}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
-            <position x="20.320000" y="73.660000" angle="0.000000"/>
+            <position x="20.320000" y="73.660000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{c839e98e-6a43-4fee-8784-bf1b24c89cd4}" gen_comp_instance="{4c2972f4-c0ae-4889-944a-13c1b5d4a204}" symbol_item="{343a59cd-7b10-4351-a0d3-5149afbc3c78}">
-            <position x="154.940000" y="167.640000" angle="0.000000"/>
+            <position x="154.940000" y="167.640000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{fc46013e-9449-4215-9662-c657267f7036}" gen_comp_instance="{32b3777a-7b3d-431d-8838-f336a8a6ea53}" symbol_item="{60cec411-a717-4893-b12f-7b698925e15b}">
-            <position x="109.220000" y="165.100000" angle="0.000000"/>
+            <position x="109.220000" y="165.100000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{008bc63f-4f2c-447a-a666-41d827364121}" gen_comp_instance="{b403332f-4daa-4fc0-9329-3c943116e7ba}" symbol_item="{60cec411-a717-4893-b12f-7b698925e15b}">
-            <position x="111.760000" y="147.320000" angle="0.000000"/>
+            <position x="111.760000" y="147.320000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{51453b75-ef58-4d15-b29e-7f1ad6ffb544}" gen_comp_instance="{47f23f36-ff64-4b75-bb54-065e366b1567}" symbol_item="{42e8f509-3f37-4b36-9ef6-98ecd19e8ca4}">
-            <position x="129.540000" y="60.960000" angle="0.000000"/>
+            <position x="129.540000" y="60.960000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{71ffa662-2415-42dc-b010-b827a973fab3}" gen_comp_instance="{caaef428-7179-41c9-a05b-c9908288db9f}" symbol_item="{f7aa65f2-55b5-45d7-a3e1-782e9f3266a8}">
-            <position x="48.260000" y="12.700000" angle="0.000000"/>
+            <position x="48.260000" y="12.700000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{064ed78d-6872-49ab-975e-0547fda31926}" gen_comp_instance="{575ccd88-5d6a-40a8-b594-4f57933f19df}" symbol_item="{dcf1ad9b-0242-450e-bb79-9ad9a1b82bf8}">
-            <position x="22.860000" y="99.060000" angle="0.000000"/>
+            <position x="22.860000" y="99.060000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{255da0bc-746e-4686-87ba-89c4e3997b8a}" gen_comp_instance="{1c3a7d08-50ae-43b5-bc22-ffce3a54c2d2}" symbol_item="{60cec411-a717-4893-b12f-7b698925e15b}">
-            <position x="198.120000" y="27.940000" angle="-90.000000"/>
+            <position x="198.120000" y="27.940000" rotation="-90.000000"/>
         </symbol>
         <symbol uuid="{531aedca-f266-4624-aaf3-0d2adf787cfd}" gen_comp_instance="{f6f2fe17-4d79-480e-9a86-f026ee37093e}" symbol_item="{c8239abb-cb41-4c06-ae9c-c2568a7cdcb8}">
-            <position x="147.320000" y="22.860000" angle="-270.000000"/>
+            <position x="147.320000" y="22.860000" rotation="-270.000000"/>
         </symbol>
         <symbol uuid="{116bb641-b922-4911-a173-67c0eb7633af}" gen_comp_instance="{3052ab5a-a9e5-45bd-b935-4b72026cecbd}" symbol_item="{abb0fd2d-e3d8-492e-8c53-95575916028b}">
-            <position x="93.980000" y="167.640000" angle="0.000000"/>
+            <position x="93.980000" y="167.640000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{ff7e6bd4-d263-46e0-a359-8998319f7b50}" gen_comp_instance="{7996c43e-63db-4d96-aaa0-49d1ae3043f3}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
-            <position x="198.120000" y="149.860000" angle="0.000000"/>
+            <position x="198.120000" y="149.860000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{f0c5fd2e-c334-48e9-ba6a-9a1d5510e706}" gen_comp_instance="{d974a794-23c6-4adc-aa23-32b16de54251}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
-            <position x="30.480000" y="78.740000" angle="-270.000000"/>
+            <position x="30.480000" y="78.740000" rotation="-270.000000"/>
         </symbol>
         <symbol uuid="{6eb64067-5216-4a8a-b52d-53f2a3cbfaa3}" gen_comp_instance="{f8ae921e-89b6-4b68-854c-04ba2e0f9f63}" symbol_item="{426e2b17-da88-400b-b1fb-248b24f9c541}">
-            <position x="99.060000" y="152.400000" angle="0.000000"/>
+            <position x="99.060000" y="152.400000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{cbac72da-ee9c-486b-9df6-cb547a8196fb}" gen_comp_instance="{391b4efa-137c-48e0-b3f9-00f869a7c238}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
-            <position x="99.060000" y="71.120000" angle="0.000000"/>
+            <position x="99.060000" y="71.120000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{10a02854-0f29-4495-b762-002a36ed01d3}" gen_comp_instance="{ce36dd46-bb3a-4db1-9eef-5da6cc3f560d}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="274.320000" y="116.840000" angle="0.000000"/>
+            <position x="274.320000" y="116.840000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{83de5763-6b5c-406a-9ad8-179fba098f45}" gen_comp_instance="{eeeffde1-aa53-4dbc-9454-8bb497fa35ec}" symbol_item="{abb0fd2d-e3d8-492e-8c53-95575916028b}">
-            <position x="17.780000" y="124.460000" angle="0.000000"/>
+            <position x="17.780000" y="124.460000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{f9d569b4-056b-47e0-95fc-ff3067944e68}" gen_comp_instance="{693c4edd-e63b-430f-86e1-90100a4ac1b6}" symbol_item="{c8239abb-cb41-4c06-ae9c-c2568a7cdcb8}">
-            <position x="22.860000" y="116.840000" angle="-90.000000"/>
+            <position x="22.860000" y="116.840000" rotation="-90.000000"/>
         </symbol>
         <symbol uuid="{c4c7179a-f9df-484a-9762-884c7058f09b}" gen_comp_instance="{ee5dd875-dd87-4c45-8ac6-02b2f507a5a8}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
-            <position x="99.060000" y="88.900000" angle="-90.000000"/>
+            <position x="99.060000" y="88.900000" rotation="-90.000000"/>
         </symbol>
         <symbol uuid="{637e2b56-515f-49c6-9f96-b93f92643fca}" gen_comp_instance="{195d0af2-81b0-4d31-83f7-f9e0f0d4f1ee}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="261.620000" y="22.860000" angle="0.000000"/>
+            <position x="261.620000" y="22.860000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{a4d5af46-0f1e-43a9-b7e7-01733a47f08f}" gen_comp_instance="{18732562-4686-4cca-9667-2c6c9eb2fa40}" symbol_item="{0428743a-191b-40d1-82b6-a943bff79846}">
-            <position x="68.580000" y="106.680000" angle="0.000000"/>
+            <position x="68.580000" y="106.680000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{6e74ea6e-acbd-406f-8c39-097ebaee0c65}" gen_comp_instance="{9722e97a-6ac0-48d3-b831-697601044d72}" symbol_item="{426e2b17-da88-400b-b1fb-248b24f9c541}">
-            <position x="182.880000" y="30.480000" angle="0.000000"/>
+            <position x="182.880000" y="30.480000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{9cd2286b-f449-4f09-98ed-cb73dc9e369b}" gen_comp_instance="{7aca848a-5d27-4dcb-b1dc-9d64bafc6ee8}" symbol_item="{52ef2b10-c149-4dfc-a2d8-2805efff2e13}">
-            <position x="137.160000" y="88.900000" angle="-90.000000"/>
+            <position x="137.160000" y="88.900000" rotation="-90.000000"/>
         </symbol>
         <symbol uuid="{fb6ba72b-3dff-42fa-b6af-2bf46e2b7b55}" gen_comp_instance="{01388bfb-42a2-4de1-a989-1d99d708d6a6}" symbol_item="{f7aa65f2-55b5-45d7-a3e1-782e9f3266a8}">
-            <position x="160.020000" y="15.240000" angle="0.000000"/>
+            <position x="160.020000" y="15.240000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{b91a4004-22c8-4293-a034-a4d971ad28f3}" gen_comp_instance="{9166fad5-def6-4891-8e47-34891f0d1779}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
-            <position x="40.640000" y="96.520000" angle="0.000000"/>
+            <position x="40.640000" y="96.520000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{59b070b7-a131-4edb-a560-6eb067adf69c}" gen_comp_instance="{054b68c6-ca94-4c3f-be08-d4ce70df4e8b}" symbol_item="{60cec411-a717-4893-b12f-7b698925e15b}">
-            <position x="78.740000" y="27.940000" angle="-90.000000"/>
+            <position x="78.740000" y="27.940000" rotation="-90.000000"/>
         </symbol>
         <symbol uuid="{6beb23f9-2aad-44aa-a7cd-4a6b0d02e542}" gen_comp_instance="{1a21d8b5-df2d-4699-abd2-cf3368bdc208}" symbol_item="{426e2b17-da88-400b-b1fb-248b24f9c541}">
-            <position x="254.000000" y="144.780000" angle="0.000000"/>
+            <position x="254.000000" y="144.780000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{b1ad36d0-e830-44ab-b44b-4d90a5181775}" gen_comp_instance="{4b8ecb89-14e4-41e4-b319-fd0ae6d3c8aa}" symbol_item="{eb88330e-d961-45aa-bcca-54cc88c9f2fc}">
-            <position x="180.340000" y="114.300000" angle="0.000000"/>
+            <position x="180.340000" y="114.300000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{dacc333b-6978-400b-a9c4-5d064bfb78e5}" gen_comp_instance="{25ce7872-e574-4937-ab44-8ccce5a905ad}" symbol_item="{343a59cd-7b10-4351-a0d3-5149afbc3c78}">
-            <position x="177.800000" y="152.400000" angle="0.000000"/>
+            <position x="177.800000" y="152.400000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{e2174871-6812-402d-9485-cfff72ce70d3}" gen_comp_instance="{f9bb4c46-8894-4366-b087-7f95dcbfddcb}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
-            <position x="76.200000" y="157.480000" angle="0.000000"/>
+            <position x="76.200000" y="157.480000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{03c632c0-6b72-4b76-a0e3-802bb07b0189}" gen_comp_instance="{09d74ae4-83c7-43c2-b2ac-bcd944d5e06e}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
-            <position x="213.360000" y="185.420000" angle="0.000000"/>
+            <position x="213.360000" y="185.420000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{e5a5e042-b57c-4138-be59-6e253a61e316}" gen_comp_instance="{c14aedf3-45dd-4a3b-9d01-e35ea00ab7e5}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
-            <position x="5.080000" y="111.760000" angle="0.000000"/>
+            <position x="5.080000" y="111.760000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{f94b11a6-985c-4e7f-a7b4-9a56a338f519}" gen_comp_instance="{ddf956de-8e26-425f-9722-bedd1abf5198}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="139.700000" y="30.480000" angle="0.000000"/>
+            <position x="139.700000" y="30.480000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{6f77a8c4-e464-4588-8ce4-10b5b710151b}" gen_comp_instance="{0e2915e7-cc97-4b26-b03a-c5343d3f1fb1}" symbol_item="{42e8f509-3f37-4b36-9ef6-98ecd19e8ca4}">
-            <position x="205.740000" y="45.720000" angle="0.000000"/>
+            <position x="205.740000" y="45.720000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{6ea26a8b-ac2a-4e28-a931-c7c47606ecee}" gen_comp_instance="{0ab551b9-d7fe-489c-ae70-b0db34d4f124}" symbol_item="{6ca391c0-1c6d-4176-9607-31bf40d1b406}">
-            <position x="0.000000" y="0.000000" angle="0.000000"/>
+            <position x="0.000000" y="0.000000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{4200d77b-b6bb-414c-a98f-801811a3b01e}" gen_comp_instance="{91034c86-11c0-4b52-a1f7-72756c97ff5e}" symbol_item="{abb0fd2d-e3d8-492e-8c53-95575916028b}">
-            <position x="261.620000" y="63.500000" angle="0.000000"/>
+            <position x="261.620000" y="63.500000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{557db0df-c159-48ac-abb7-a582300a5ff8}" gen_comp_instance="{6d90d042-067f-42ab-aaed-4b4c7e7f6276}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
-            <position x="5.080000" y="55.880000" angle="0.000000"/>
+            <position x="5.080000" y="55.880000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{405db77d-271d-41aa-842b-431ba9a4aef7}" gen_comp_instance="{cc078d0d-97f1-4cbe-9bfe-fa3e4e6915ba}" symbol_item="{52ef2b10-c149-4dfc-a2d8-2805efff2e13}">
-            <position x="137.160000" y="147.320000" angle="0.000000"/>
+            <position x="137.160000" y="147.320000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{14e3a9f7-a0e9-4830-a75b-eaa8fa65ad06}" gen_comp_instance="{94c9d6ff-f113-4ca0-9095-4045d5170a0d}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
-            <position x="254.000000" y="17.780000" angle="0.000000"/>
+            <position x="254.000000" y="17.780000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{9027ab6d-b5e7-4a15-a851-8a33f3bb8daa}" gen_comp_instance="{200e6592-c227-4426-be20-c695692928ff}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="266.700000" y="104.140000" angle="0.000000"/>
+            <position x="266.700000" y="104.140000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{45306ea0-d481-4eaf-9116-a0566d5a107a}" gen_comp_instance="{4913509c-030a-46d8-b963-7d800a832760}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
-            <position x="198.120000" y="104.140000" angle="0.000000"/>
+            <position x="198.120000" y="104.140000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{5f9b4aa4-c3a6-49b8-81ec-d4c241f36bd3}" gen_comp_instance="{257ba81a-7a94-4a59-89c9-ea05128c4293}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
-            <position x="147.320000" y="71.120000" angle="0.000000"/>
+            <position x="147.320000" y="71.120000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{551a354b-8016-49f7-88f0-845590c43db5}" gen_comp_instance="{8b592bb1-ac1f-40af-a291-6b91c58f6def}" symbol_item="{343a59cd-7b10-4351-a0d3-5149afbc3c78}">
-            <position x="106.680000" y="10.160000" angle="0.000000"/>
+            <position x="106.680000" y="10.160000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{1004f111-54c3-4365-89bd-9bfc3ad2f822}" gen_comp_instance="{b2106162-b474-4c11-bce5-820df4e735c5}" symbol_item="{fade976e-1f99-41a4-bcfc-b29524c37768}">
-            <position x="17.780000" y="144.780000" angle="0.000000"/>
+            <position x="17.780000" y="144.780000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{598437f0-9041-45fb-8b08-d181aa2f2aba}" gen_comp_instance="{af2441cf-37a6-4f56-a30d-b2249ce3b273}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
-            <position x="256.540000" y="111.760000" angle="-270.000000"/>
+            <position x="256.540000" y="111.760000" rotation="-270.000000"/>
         </symbol>
         <symbol uuid="{216883d7-ca01-471b-be5f-cc4048a82ce8}" gen_comp_instance="{f02465fe-b10d-4cfd-a3ee-ad64f04ea558}" symbol_item="{52ef2b10-c149-4dfc-a2d8-2805efff2e13}">
-            <position x="15.240000" y="43.180000" angle="-180.000000"/>
+            <position x="15.240000" y="43.180000" rotation="-180.000000"/>
         </symbol>
         <symbol uuid="{29262e36-3de4-44b4-924a-1c906ff40972}" gen_comp_instance="{be6281ea-0fdf-42b2-b9cc-d1b899226ae0}" symbol_item="{f7aa65f2-55b5-45d7-a3e1-782e9f3266a8}">
-            <position x="106.680000" y="68.580000" angle="0.000000"/>
+            <position x="106.680000" y="68.580000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{84ac33aa-a127-4512-8345-95e2481b6792}" gen_comp_instance="{ada87af4-7a53-4806-aed2-0b757d654c80}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
-            <position x="5.080000" y="86.360000" angle="0.000000"/>
+            <position x="5.080000" y="86.360000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{542ef8f1-0085-44bc-98a2-632eda2c1b75}" gen_comp_instance="{acc1658d-25ea-474d-9d9f-86f0764ec2d3}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="259.080000" y="50.800000" angle="0.000000"/>
+            <position x="259.080000" y="50.800000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{139dc0ec-d072-4a17-9e98-a59730775049}" gen_comp_instance="{8b49d77e-acca-45a5-b831-ecee51b09dfa}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="154.940000" y="104.140000" angle="0.000000"/>
+            <position x="154.940000" y="104.140000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{7c58bb19-c473-4700-b992-8c1267e893eb}" gen_comp_instance="{71f841f7-e130-482a-85e3-b00abe141b17}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
-            <position x="106.680000" y="35.560000" angle="-270.000000"/>
+            <position x="106.680000" y="35.560000" rotation="-270.000000"/>
         </symbol>
         <symbol uuid="{91e49b92-26ee-4bb8-8996-b0bc25993be7}" gen_comp_instance="{88890c59-d9f8-4274-a653-136c35c2366b}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
-            <position x="210.820000" y="71.120000" angle="-180.000000"/>
+            <position x="210.820000" y="71.120000" rotation="-180.000000"/>
         </symbol>
         <symbol uuid="{11e74145-cffd-40b8-8d7a-cb1a608f6fab}" gen_comp_instance="{bab0b468-e7ed-4454-a723-6519f18b1339}" symbol_item="{c8239abb-cb41-4c06-ae9c-c2568a7cdcb8}">
-            <position x="30.480000" y="134.620000" angle="-90.000000"/>
+            <position x="30.480000" y="134.620000" rotation="-90.000000"/>
         </symbol>
         <symbol uuid="{f75c4b1e-3cd9-414d-8090-d5f2e392e5bc}" gen_comp_instance="{57cf5c3e-08a6-4fb1-8514-8d30b6cd6e14}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
-            <position x="10.160000" y="68.580000" angle="0.000000"/>
+            <position x="10.160000" y="68.580000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{9a4c2a2e-ec90-4704-9509-4b990315de6d}" gen_comp_instance="{2dd0da0b-0590-44bf-a049-fb8ee86c6241}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="187.960000" y="50.800000" angle="0.000000"/>
+            <position x="187.960000" y="50.800000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{bb625e81-07b5-4820-9290-f4390ca713a4}" gen_comp_instance="{44deaf1a-cddc-4ac3-8716-242db00069a5}" symbol_item="{abb0fd2d-e3d8-492e-8c53-95575916028b}">
-            <position x="22.860000" y="170.180000" angle="0.000000"/>
+            <position x="22.860000" y="170.180000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{3b7436a2-df77-49d0-859d-dc464a659cef}" gen_comp_instance="{65562fc4-33f1-451c-9eb4-5d1353b5646d}" symbol_item="{60cec411-a717-4893-b12f-7b698925e15b}">
-            <position x="111.760000" y="154.940000" angle="0.000000"/>
+            <position x="111.760000" y="154.940000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{249442d0-fddf-406f-8847-78c2fc3b985e}" gen_comp_instance="{a4ef5727-7ab9-470f-afd7-52400bc2bafc}" symbol_item="{c8239abb-cb41-4c06-ae9c-c2568a7cdcb8}">
-            <position x="185.420000" y="68.580000" angle="-180.000000"/>
+            <position x="185.420000" y="68.580000" rotation="-180.000000"/>
         </symbol>
         <symbol uuid="{20cfd1fa-fb25-422d-a736-39bf1b821a16}" gen_comp_instance="{8d27242d-621f-4833-b3d7-0befbca3c5ca}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="165.100000" y="40.640000" angle="0.000000"/>
+            <position x="165.100000" y="40.640000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{4e4ec7ef-70f9-43e0-aa51-01a089ec2e1e}" gen_comp_instance="{87e60181-514a-4d63-b05c-8aa7d0082009}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
-            <position x="30.480000" y="180.340000" angle="-270.000000"/>
+            <position x="30.480000" y="180.340000" rotation="-270.000000"/>
         </symbol>
         <symbol uuid="{992ef96c-820d-4c17-884e-116c373a3f56}" gen_comp_instance="{24ef5fc1-2791-4837-bedf-bf543e878f60}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
-            <position x="177.800000" y="88.900000" angle="0.000000"/>
+            <position x="177.800000" y="88.900000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{0fd91813-ccf2-4ad0-b80b-44db590d2500}" gen_comp_instance="{de5994bd-3f17-4fd4-9068-96ca1e4ad377}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
-            <position x="38.100000" y="139.700000" angle="0.000000"/>
+            <position x="38.100000" y="139.700000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{64acb397-1819-4fb8-92ee-6afc7ff446bb}" gen_comp_instance="{e7fd62f5-167d-4346-8ce4-6afaa54f9148}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="154.940000" y="38.100000" angle="0.000000"/>
+            <position x="154.940000" y="38.100000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{286c0286-20ba-483a-a14a-74fcd76aa838}" gen_comp_instance="{4815ad00-b818-4812-8700-63fb317cdfd8}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
-            <position x="96.520000" y="40.640000" angle="0.000000"/>
+            <position x="96.520000" y="40.640000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{fc0c01e6-87d2-4cae-a13e-cb0b2f85d1a2}" gen_comp_instance="{44a0d3a6-f160-4321-af8e-fe4a86b84c95}" symbol_item="{343a59cd-7b10-4351-a0d3-5149afbc3c78}">
-            <position x="111.760000" y="177.800000" angle="0.000000"/>
+            <position x="111.760000" y="177.800000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{f14c8711-b307-458c-8fdf-67f6d8f4ab2f}" gen_comp_instance="{d4e273a5-06aa-4763-b06f-f46e3592bcec}" symbol_item="{dcf1ad9b-0242-450e-bb79-9ad9a1b82bf8}">
-            <position x="116.840000" y="124.460000" angle="0.000000"/>
+            <position x="116.840000" y="124.460000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{1dfaa578-239c-410b-b1e7-7e813daa9893}" gen_comp_instance="{5c196113-aa36-40a5-91ea-271e497cd1e7}" symbol_item="{426e2b17-da88-400b-b1fb-248b24f9c541}">
-            <position x="180.340000" y="50.800000" angle="0.000000"/>
+            <position x="180.340000" y="50.800000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{e57fb06b-6d2f-468a-9407-9fdd20fde50b}" gen_comp_instance="{193acc71-c467-4c60-9c79-f7014aa746db}" symbol_item="{60cec411-a717-4893-b12f-7b698925e15b}">
-            <position x="264.160000" y="76.200000" angle="0.000000"/>
+            <position x="264.160000" y="76.200000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{1fb1a338-9993-4831-be39-66eb6580be2e}" gen_comp_instance="{aac8963c-7f96-4d52-b6fe-cdb4a6751ab3}" symbol_item="{0539fd52-890f-48af-97a9-bacfb79c9475}">
-            <position x="124.460000" y="185.420000" angle="0.000000"/>
+            <position x="124.460000" y="185.420000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{5abd5fbe-5e97-4cef-be56-80b374120046}" gen_comp_instance="{9b67b198-7b25-446c-8f57-8408dd581597}" symbol_item="{42e8f509-3f37-4b36-9ef6-98ecd19e8ca4}">
-            <position x="132.080000" y="167.640000" angle="0.000000"/>
+            <position x="132.080000" y="167.640000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{9245ff93-3dba-4ce5-b90c-7004d12ddb5c}" gen_comp_instance="{fd7ff622-d96d-4222-875a-abb106bb8ca2}" symbol_item="{c8239abb-cb41-4c06-ae9c-c2568a7cdcb8}">
-            <position x="182.880000" y="101.600000" angle="-180.000000"/>
+            <position x="182.880000" y="101.600000" rotation="-180.000000"/>
         </symbol>
         <symbol uuid="{f145841e-d7be-4a48-9aeb-90ba38376d6b}" gen_comp_instance="{523a9ea4-1c72-4d89-99c7-c907a38c5ad0}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
-            <position x="172.720000" y="22.860000" angle="0.000000"/>
+            <position x="172.720000" y="22.860000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{3c2bddf8-0be9-4168-b5a5-770ab2405708}" gen_comp_instance="{a783b101-b0eb-4c42-ae44-ad9e460c999f}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
-            <position x="147.320000" y="81.280000" angle="0.000000"/>
+            <position x="147.320000" y="81.280000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{e3888fad-8029-4b6e-bf7e-66c498a72c82}" gen_comp_instance="{83a4a209-8a22-4fc4-a2af-66663946636c}" symbol_item="{dcf1ad9b-0242-450e-bb79-9ad9a1b82bf8}">
-            <position x="190.500000" y="172.720000" angle="0.000000"/>
+            <position x="190.500000" y="172.720000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{d38f802c-025c-4fcb-84b2-963ce07a6a69}" gen_comp_instance="{beaa09a7-aee9-4636-a8dc-36155a44f8d6}" symbol_item="{5988c66a-f507-487e-9b40-486502e8c9bd}">
-            <position x="248.920000" y="27.940000" angle="-270.000000"/>
+            <position x="248.920000" y="27.940000" rotation="-270.000000"/>
         </symbol>
         <symbol uuid="{638f2227-32c8-4a3b-9717-8bb9c25795c1}" gen_comp_instance="{11f79290-0822-4fa4-ad26-c3bf37ee9bee}" symbol_item="{09b6d6c4-2d37-432f-9471-a317aad9a499}">
-            <position x="5.080000" y="40.640000" angle="0.000000"/>
+            <position x="5.080000" y="40.640000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{f03402dc-397d-4f13-93cc-8c2ae3960c93}" gen_comp_instance="{1aec9dcc-9f4b-4c75-9871-d75edee97af1}" symbol_item="{52ef2b10-c149-4dfc-a2d8-2805efff2e13}">
-            <position x="264.160000" y="91.440000" angle="0.000000"/>
+            <position x="264.160000" y="91.440000" rotation="0.000000"/>
         </symbol>
         <symbol uuid="{d57a60d4-08a6-48ed-b707-cd2134f171b1}" gen_comp_instance="{118286f3-34df-4226-8e83-be884134f1e4}" symbol_item="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
-            <position x="170.180000" y="182.880000" angle="0.000000"/>
+            <position x="170.180000" y="182.880000" rotation="0.000000"/>
         </symbol>
     </symbols>
     <netpoints>

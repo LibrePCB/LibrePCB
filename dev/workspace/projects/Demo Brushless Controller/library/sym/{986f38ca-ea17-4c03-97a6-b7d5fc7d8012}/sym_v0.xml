@@ -12,28 +12,28 @@
     </meta>
     <categories/>
     <geometry>
-        <polygon layer="10" start_x="1.778000" start_y="1.016000" grab_area="true" width="0.254000" fill="false">
+        <polygon start_x="1.778000" start_y="1.016000" fill="false" layer="10" width="0.254000" grab_area="true">
             <segment end_x="-1.778000" end_y="1.016000" angle="0.000000"/>
         </polygon>
-        <polygon layer="10" start_x="1.778000" start_y="-1.016000" grab_area="true" width="0.254000" fill="false">
+        <polygon start_x="1.778000" start_y="-1.016000" fill="false" layer="10" width="0.254000" grab_area="true">
             <segment end_x="-1.778000" end_y="-1.016000" angle="0.000000"/>
         </polygon>
-        <polygon layer="10" start_x="-1.524000" start_y="0.381000" grab_area="true" width="0.254000" fill="false">
+        <polygon start_x="-1.524000" start_y="0.381000" fill="false" layer="10" width="0.254000" grab_area="true">
             <segment end_x="1.524000" end_y="0.381000" angle="0.000000"/>
             <segment end_x="1.524000" end_y="-0.381000" angle="0.000000"/>
             <segment end_x="-1.524000" end_y="-0.381000" angle="0.000000"/>
             <segment end_x="-1.524000" end_y="0.381000" angle="0.000000"/>
         </polygon>
-        <text height="2.540000" layer="20" x="2.540000" y="0.000000" text="${SYM::NAME}" angle="0.000000" h_align="left" v_align="bottom"/>
-        <text height="2.540000" layer="21" x="2.540000" y="0.000000" text="${CMP::VALUE}" angle="0.000000" h_align="left" v_align="top"/>
+        <text text="${SYM::NAME}" height="2.540000" h_align="left" layer="20" x="2.540000" y="0.000000" v_align="bottom" rotation="0.000000"/>
+        <text text="${CMP::VALUE}" height="2.540000" h_align="left" layer="21" x="2.540000" y="0.000000" v_align="top" rotation="0.000000"/>
     </geometry>
     <pins>
-        <pin length="1.524000" uuid="{ac7d1cc8-4a9e-4936-ab7c-ed70c7347195}" x="0.000000" y="2.540000" angle="180.000000">
-            <name locale="en_US">1</name>
+        <pin length="1.524000" x="0.000000" y="-2.540000" uuid="{2fa806c9-af1c-457c-a92f-3459e6131fbc}" rotation="90.000000">
+            <name locale="en_US">2</name>
             <description locale="en_US"></description>
         </pin>
-        <pin length="1.524000" uuid="{2fa806c9-af1c-457c-a92f-3459e6131fbc}" x="0.000000" y="-2.540000" angle="0.000000">
-            <name locale="en_US">2</name>
+        <pin length="1.524000" x="0.000000" y="2.540000" uuid="{ac7d1cc8-4a9e-4936-ab7c-ed70c7347195}" rotation="-90.000000">
+            <name locale="en_US">1</name>
             <description locale="en_US"></description>
         </pin>
     </pins>

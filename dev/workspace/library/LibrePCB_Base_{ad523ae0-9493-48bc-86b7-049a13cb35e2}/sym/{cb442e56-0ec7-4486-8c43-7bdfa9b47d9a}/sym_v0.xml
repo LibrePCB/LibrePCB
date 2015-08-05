@@ -39,15 +39,15 @@
             <segment angle="0" end_x="-2.413000" end_y="−1.651"/>
             <segment angle="0" end_x="-3.302000" end_y="−2.032"/>
         </polygon>
-        <text height="2.54" text="${SYM::NAME}" layer="20" h_align="left" x="1.7" y="0" angle="0.000000" v_align="bottom"/>
-        <text height="2.54" text="${CMP::VALUE}" layer="21" h_align="left" x="1.7" y="0" angle="0.000000" v_align="top"/>
+        <text height="2.54" text="${SYM::NAME}" layer="20" h_align="left" x="1.7" y="0" rotation="0.000000" v_align="bottom"/>
+        <text height="2.54" text="${CMP::VALUE}" layer="21" h_align="left" x="1.7" y="0" rotation="0.000000" v_align="top"/>
     </geometry>
     <pins>
-        <pin length="1.27" uuid="{18de942d-8b47-4daf-9e07-d089204e09d0}" x="0.000000" y="-2.54" angle="0.000000">
+        <pin length="1.27" uuid="{18de942d-8b47-4daf-9e07-d089204e09d0}" x="0.000000" y="-2.54" rotation="90">
             <name locale="en_US">C</name>
             <description locale="en_US"/>
         </pin>
-        <pin length="1.27" uuid="{2a64f851-340a-43f2-b1cf-06a1d4b54560}" x="0.000000" y="2.540000" angle="180.000000">
+        <pin length="1.27" uuid="{2a64f851-340a-43f2-b1cf-06a1d4b54560}" x="0.000000" y="2.540000" rotation="-90">
             <name locale="en_US">A</name>
             <description locale="en_US"/>
         </pin>

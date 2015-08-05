@@ -12,190 +12,190 @@
     </meta>
     <categories/>
     <geometry>
-        <polygon layer="10" start_x="-15.240000" start_y="-45.720000" grab_area="true" width="0.254000" fill="false">
+        <polygon start_x="-15.240000" start_y="-45.720000" fill="false" layer="10" width="0.254000" grab_area="true">
             <segment end_x="-15.240000" end_y="40.640000" angle="0.000000"/>
             <segment end_x="15.240000" end_y="40.640000" angle="0.000000"/>
             <segment end_x="15.240000" end_y="-45.720000" angle="0.000000"/>
             <segment end_x="-15.240000" end_y="-45.720000" angle="0.000000"/>
         </polygon>
-        <text height="2.540000" layer="20" x="-15.240000" y="40.640000" text="${SYM::NAME}" angle="0.000000" h_align="left" v_align="bottom"/>
-        <text height="2.540000" layer="21" x="-15.240000" y="-45.720000" text="${CMP::VALUE}" angle="0.000000" h_align="left" v_align="top"/>
+        <text text="${SYM::NAME}" height="2.540000" h_align="left" layer="20" x="-15.240000" y="40.640000" v_align="bottom" rotation="0.000000"/>
+        <text text="${CMP::VALUE}" height="2.540000" h_align="left" layer="21" x="-15.240000" y="-45.720000" v_align="top" rotation="0.000000"/>
     </geometry>
     <pins>
-        <pin length="5.080000" uuid="{758c2893-0012-4458-8477-599e8043720d}" x="20.320000" y="0.000000" angle="-90.000000">
-            <name locale="en_US">PB0</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{489a2063-6c59-4491-a716-3930b782ad3c}" x="-20.320000" y="-40.640000" angle="90.000000">
-            <name locale="en_US">PB3/JTDO</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{75f3d086-f180-449d-9724-e1f6c5e5daa2}" x="20.320000" y="20.320000" angle="-90.000000">
-            <name locale="en_US">PA7</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{838d673e-f8c6-490a-9c8b-26b58c8c767f}" x="20.320000" y="15.240000" angle="-90.000000">
-            <name locale="en_US">PA9</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{c3e7ac7b-bfb9-4e54-aeff-84200336d0c5}" x="-20.320000" y="-43.180000" angle="90.000000">
-            <name locale="en_US">PB4/JNTRST</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{9c45125c-deb1-47a7-9de2-62c2da77bc98}" x="20.320000" y="-15.240000" angle="-90.000000">
-            <name locale="en_US">PB9</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{363d906d-8644-42e0-853a-4573ba08e5f4}" x="20.320000" y="-10.160000" angle="-90.000000">
-            <name locale="en_US">PB7</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{9ba061d9-9f96-4757-be62-36f93938f9f8}" x="20.320000" y="27.940000" angle="-90.000000">
-            <name locale="en_US">PA4</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{2fe2711c-3f4f-4ad5-8699-5efa8d25e87f}" x="20.320000" y="-27.940000" angle="-90.000000">
-            <name locale="en_US">PB14</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{f6543ce2-c570-4bb4-a386-72f817e5689b}" x="20.320000" y="17.780000" angle="-90.000000">
+        <pin length="5.080000" x="20.320000" y="17.780000" uuid="{f6543ce2-c570-4bb4-a386-72f817e5689b}" rotation="180.000000">
             <name locale="en_US">PA8</name>
             <description locale="en_US"></description>
         </pin>
-        <pin length="5.080000" uuid="{05e0076e-df1f-44ad-8223-5d331ff5e103}" x="-20.320000" y="-10.160000" angle="90.000000">
-            <name locale="en_US">VSSA</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{fe6a93d7-62fb-4313-93e0-ac962845b776}" x="20.320000" y="35.560000" angle="-90.000000">
-            <name locale="en_US">PA1</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{555381e2-21e8-4dd4-a909-62e9ace76bc8}" x="20.320000" y="25.400000" angle="-90.000000">
-            <name locale="en_US">PA5</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{f0f97c08-ae22-4702-96f7-f2a52879b1a3}" x="20.320000" y="-22.860000" angle="-90.000000">
-            <name locale="en_US">PB12</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{dbe65b48-dad7-4c65-8eeb-800f02a2050b}" x="20.320000" y="-40.640000" angle="-90.000000">
-            <name locale="en_US">PC14</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{959ea080-551b-4472-84f2-6693fcf640d7}" x="20.320000" y="12.700000" angle="-90.000000">
-            <name locale="en_US">PA10</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{dc0b06a7-530d-4a67-b4f9-44896adc5a11}" x="20.320000" y="-20.320000" angle="-90.000000">
-            <name locale="en_US">PB11</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{b66b54dc-3dad-4294-a74d-9622538621b1}" x="20.320000" y="-17.780000" angle="-90.000000">
-            <name locale="en_US">PB10</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{22dbcc0e-8990-43e4-af1a-c75e6bf778cc}" x="-20.320000" y="33.020000" angle="90.000000">
-            <name locale="en_US">BOOT0</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{e2079c07-c1c4-49a3-962f-b4a42d30c473}" x="20.320000" y="-43.180000" angle="-90.000000">
-            <name locale="en_US">PC15</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{0f33736c-9ee9-4c19-ad68-8adb3de6a595}" x="20.320000" y="33.020000" angle="-90.000000">
-            <name locale="en_US">PA2</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{42c890e7-400b-4323-a586-235eb8d7d497}" x="20.320000" y="-7.620000" angle="-90.000000">
-            <name locale="en_US">PB6</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{832317d5-af6a-4664-a333-fca9088517f9}" x="-20.320000" y="38.100000" angle="90.000000">
-            <name locale="en_US">NRST</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{13454311-1e34-471a-885a-9e5374e32533}" x="20.320000" y="38.100000" angle="-90.000000">
-            <name locale="en_US">PA0</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{8273828e-4643-43c1-8ceb-bffec3771a17}" x="20.320000" y="22.860000" angle="-90.000000">
-            <name locale="en_US">PA6</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{d547bcc9-75e2-477a-ba0e-4d4d0a9958d2}" x="-20.320000" y="17.780000" angle="90.000000">
-            <name locale="en_US">VDD</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{391c60ef-9e3a-4302-8e5c-793ac12bdcaf}" x="20.320000" y="-30.480000" angle="-90.000000">
-            <name locale="en_US">PB15</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{2e7bbe49-b004-4956-9925-99dc43560260}" x="20.320000" y="-2.540000" angle="-90.000000">
-            <name locale="en_US">PB1</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{36e3f822-9b84-4b53-8004-0deba57be9f6}" x="-20.320000" y="22.860000" angle="90.000000">
-            <name locale="en_US">VBAT</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{6d284715-9e06-469b-b0b9-581ab28ab064}" x="20.320000" y="-38.100000" angle="-90.000000">
-            <name locale="en_US">PC13</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{c72f4f5a-3933-4153-bf18-5f4c00cbd618}" x="-20.320000" y="0.000000" angle="90.000000">
+        <pin length="5.080000" x="-20.320000" y="0.000000" uuid="{c72f4f5a-3933-4153-bf18-5f4c00cbd618}" rotation="0.000000">
             <name locale="en_US">VDDA</name>
             <description locale="en_US"></description>
         </pin>
-        <pin length="5.080000" uuid="{2eb0b1ea-2a49-41ab-8bd2-72c4b034ddf2}" x="20.320000" y="-25.400000" angle="-90.000000">
-            <name locale="en_US">PB13</name>
+        <pin length="5.080000" x="20.320000" y="-2.540000" uuid="{2e7bbe49-b004-4956-9925-99dc43560260}" rotation="180.000000">
+            <name locale="en_US">PB1</name>
             <description locale="en_US"></description>
         </pin>
-        <pin length="5.080000" uuid="{845e1b22-1dc2-40d1-b00b-e7fe76dbe847}" x="-20.320000" y="-35.560000" angle="90.000000">
-            <name locale="en_US">PA14/JTCK</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{31e20f2e-9b2c-4bbb-bb00-5ac708436428}" x="20.320000" y="-5.080000" angle="-90.000000">
-            <name locale="en_US">PB5</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{37b125f0-79ca-4a76-b578-3651cf909a05}" x="20.320000" y="7.620000" angle="-90.000000">
-            <name locale="en_US">PA12</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{d98e6058-1682-4ebe-8a8d-66fe92030230}" x="-20.320000" y="-20.320000" angle="90.000000">
-            <name locale="en_US">PD0/OSC_IN</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{1d9e3039-eb44-4f5b-a5f3-713a4ccd85a7}" x="20.320000" y="30.480000" angle="-90.000000">
-            <name locale="en_US">PA3</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{39282e36-2a30-4ac4-9cca-0721ab9691c7}" x="-20.320000" y="-38.100000" angle="90.000000">
-            <name locale="en_US">PA15/JTDI</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{1b240880-3963-40f5-b436-923fb9c3371e}" x="-20.320000" y="7.620000" angle="90.000000">
+        <pin length="5.080000" x="-20.320000" y="7.620000" uuid="{1b240880-3963-40f5-b436-923fb9c3371e}" rotation="0.000000">
             <name locale="en_US">VSS</name>
             <description locale="en_US"></description>
         </pin>
-        <pin length="5.080000" uuid="{c8f48322-9870-4afa-8f37-8f9794f9c4aa}" x="20.320000" y="-12.700000" angle="-90.000000">
-            <name locale="en_US">PB8</name>
-            <description locale="en_US"></description>
-        </pin>
-        <pin length="5.080000" uuid="{8dfa7136-ff58-4e0e-b5f0-72192936cb62}" x="-20.320000" y="-33.020000" angle="90.000000">
+        <pin length="5.080000" x="-20.320000" y="-33.020000" uuid="{8dfa7136-ff58-4e0e-b5f0-72192936cb62}" rotation="0.000000">
             <name locale="en_US">PA13/JTMS</name>
             <description locale="en_US"></description>
         </pin>
-        <pin length="5.080000" uuid="{d74cee0f-d1d7-418c-97e7-8d868c31bfca}" x="-20.320000" y="-25.400000" angle="90.000000">
-            <name locale="en_US">PD1/OSC_OUT</name>
+        <pin length="5.080000" x="20.320000" y="10.160000" uuid="{d2a94750-54ce-4353-a50d-bb22e13748c8}" rotation="180.000000">
+            <name locale="en_US">PA11</name>
             <description locale="en_US"></description>
         </pin>
-        <pin length="5.080000" uuid="{5b365f0e-7ce6-46e7-baf9-871193ff9835}" x="-20.320000" y="27.940000" angle="90.000000">
+        <pin length="5.080000" x="20.320000" y="-25.400000" uuid="{2eb0b1ea-2a49-41ab-8bd2-72c4b034ddf2}" rotation="180.000000">
+            <name locale="en_US">PB13</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="20.320000" y="35.560000" uuid="{fe6a93d7-62fb-4313-93e0-ac962845b776}" rotation="180.000000">
+            <name locale="en_US">PA1</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="20.320000" y="-12.700000" uuid="{c8f48322-9870-4afa-8f37-8f9794f9c4aa}" rotation="180.000000">
+            <name locale="en_US">PB8</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="20.320000" y="33.020000" uuid="{0f33736c-9ee9-4c19-ad68-8adb3de6a595}" rotation="180.000000">
+            <name locale="en_US">PA2</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="-20.320000" y="-10.160000" uuid="{05e0076e-df1f-44ad-8223-5d331ff5e103}" rotation="0.000000">
+            <name locale="en_US">VSSA</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="20.320000" y="-30.480000" uuid="{391c60ef-9e3a-4302-8e5c-793ac12bdcaf}" rotation="180.000000">
+            <name locale="en_US">PB15</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="-20.320000" y="27.940000" uuid="{5b365f0e-7ce6-46e7-baf9-871193ff9835}" rotation="0.000000">
             <name locale="en_US">PB2/BOOT1(/NPOR)</name>
             <description locale="en_US"></description>
         </pin>
-        <pin length="5.080000" uuid="{d2a94750-54ce-4353-a50d-bb22e13748c8}" x="20.320000" y="10.160000" angle="-90.000000">
-            <name locale="en_US">PA11</name>
+        <pin length="5.080000" x="20.320000" y="25.400000" uuid="{555381e2-21e8-4dd4-a909-62e9ace76bc8}" rotation="180.000000">
+            <name locale="en_US">PA5</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="20.320000" y="-22.860000" uuid="{f0f97c08-ae22-4702-96f7-f2a52879b1a3}" rotation="180.000000">
+            <name locale="en_US">PB12</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="-20.320000" y="33.020000" uuid="{22dbcc0e-8990-43e4-af1a-c75e6bf778cc}" rotation="0.000000">
+            <name locale="en_US">BOOT0</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="-20.320000" y="-38.100000" uuid="{39282e36-2a30-4ac4-9cca-0721ab9691c7}" rotation="0.000000">
+            <name locale="en_US">PA15/JTDI</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="20.320000" y="15.240000" uuid="{838d673e-f8c6-490a-9c8b-26b58c8c767f}" rotation="180.000000">
+            <name locale="en_US">PA9</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="20.320000" y="22.860000" uuid="{8273828e-4643-43c1-8ceb-bffec3771a17}" rotation="180.000000">
+            <name locale="en_US">PA6</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="-20.320000" y="22.860000" uuid="{36e3f822-9b84-4b53-8004-0deba57be9f6}" rotation="0.000000">
+            <name locale="en_US">VBAT</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="20.320000" y="-5.080000" uuid="{31e20f2e-9b2c-4bbb-bb00-5ac708436428}" rotation="180.000000">
+            <name locale="en_US">PB5</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="20.320000" y="7.620000" uuid="{37b125f0-79ca-4a76-b578-3651cf909a05}" rotation="180.000000">
+            <name locale="en_US">PA12</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="20.320000" y="-20.320000" uuid="{dc0b06a7-530d-4a67-b4f9-44896adc5a11}" rotation="180.000000">
+            <name locale="en_US">PB11</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="20.320000" y="27.940000" uuid="{9ba061d9-9f96-4757-be62-36f93938f9f8}" rotation="180.000000">
+            <name locale="en_US">PA4</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="20.320000" y="-43.180000" uuid="{e2079c07-c1c4-49a3-962f-b4a42d30c473}" rotation="180.000000">
+            <name locale="en_US">PC15</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="-20.320000" y="17.780000" uuid="{d547bcc9-75e2-477a-ba0e-4d4d0a9958d2}" rotation="0.000000">
+            <name locale="en_US">VDD</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="20.320000" y="-7.620000" uuid="{42c890e7-400b-4323-a586-235eb8d7d497}" rotation="180.000000">
+            <name locale="en_US">PB6</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="20.320000" y="-40.640000" uuid="{dbe65b48-dad7-4c65-8eeb-800f02a2050b}" rotation="180.000000">
+            <name locale="en_US">PC14</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="20.320000" y="-15.240000" uuid="{9c45125c-deb1-47a7-9de2-62c2da77bc98}" rotation="180.000000">
+            <name locale="en_US">PB9</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="20.320000" y="38.100000" uuid="{13454311-1e34-471a-885a-9e5374e32533}" rotation="180.000000">
+            <name locale="en_US">PA0</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="20.320000" y="30.480000" uuid="{1d9e3039-eb44-4f5b-a5f3-713a4ccd85a7}" rotation="180.000000">
+            <name locale="en_US">PA3</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="20.320000" y="-27.940000" uuid="{2fe2711c-3f4f-4ad5-8699-5efa8d25e87f}" rotation="180.000000">
+            <name locale="en_US">PB14</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="20.320000" y="0.000000" uuid="{758c2893-0012-4458-8477-599e8043720d}" rotation="180.000000">
+            <name locale="en_US">PB0</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="-20.320000" y="-35.560000" uuid="{845e1b22-1dc2-40d1-b00b-e7fe76dbe847}" rotation="0.000000">
+            <name locale="en_US">PA14/JTCK</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="20.320000" y="-17.780000" uuid="{b66b54dc-3dad-4294-a74d-9622538621b1}" rotation="180.000000">
+            <name locale="en_US">PB10</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="20.320000" y="12.700000" uuid="{959ea080-551b-4472-84f2-6693fcf640d7}" rotation="180.000000">
+            <name locale="en_US">PA10</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="-20.320000" y="-43.180000" uuid="{c3e7ac7b-bfb9-4e54-aeff-84200336d0c5}" rotation="0.000000">
+            <name locale="en_US">PB4/JNTRST</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="-20.320000" y="38.100000" uuid="{832317d5-af6a-4664-a333-fca9088517f9}" rotation="0.000000">
+            <name locale="en_US">NRST</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="20.320000" y="20.320000" uuid="{75f3d086-f180-449d-9724-e1f6c5e5daa2}" rotation="180.000000">
+            <name locale="en_US">PA7</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="-20.320000" y="-25.400000" uuid="{d74cee0f-d1d7-418c-97e7-8d868c31bfca}" rotation="0.000000">
+            <name locale="en_US">PD1/OSC_OUT</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="-20.320000" y="-20.320000" uuid="{d98e6058-1682-4ebe-8a8d-66fe92030230}" rotation="0.000000">
+            <name locale="en_US">PD0/OSC_IN</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="20.320000" y="-38.100000" uuid="{6d284715-9e06-469b-b0b9-581ab28ab064}" rotation="180.000000">
+            <name locale="en_US">PC13</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="20.320000" y="-10.160000" uuid="{363d906d-8644-42e0-853a-4573ba08e5f4}" rotation="180.000000">
+            <name locale="en_US">PB7</name>
+            <description locale="en_US"></description>
+        </pin>
+        <pin length="5.080000" x="-20.320000" y="-40.640000" uuid="{489a2063-6c59-4491-a716-3930b782ad3c}" rotation="0.000000">
+            <name locale="en_US">PB3/JTDO</name>
             <description locale="en_US"></description>
         </pin>
     </pins>

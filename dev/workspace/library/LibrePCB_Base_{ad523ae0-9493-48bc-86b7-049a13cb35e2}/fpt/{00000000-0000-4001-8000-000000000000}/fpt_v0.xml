@@ -24,8 +24,8 @@
             <segment angle="0" end_x="12.7" end_y="-7.62"/>
             <segment angle="0" end_x="-12.7" end_y="-7.62"/>
         </polygon>
-        <text layer="20" v_align="bottom" text="${CMP::NAME}"  height="2.54" angle="0" x="-12.7" y="5.08"  h_align="left"/>
-        <text layer="21" v_align="top"    text="${CMP::VALUE}" height="2.54" angle="0" x="-12.7" y="-7.62" h_align="left"/>
+        <text layer="20" v_align="bottom" text="${CMP::NAME}"  height="2.54" rotation="0" x="-12.7" y="5.08"  h_align="left"/>
+        <text layer="21" v_align="top"    text="${CMP::VALUE}" height="2.54" rotation="0" x="-12.7" y="-7.62" h_align="left"/>
     </geometry>
     <pads>
         <pad uuid="{4385b685-0cdd-4663-9af9-f4b4273c1c0a}" type="tht_round" x="-3.81" y="2.54" rotation="0" width="3" height="2.1" drill="0.8" layer="0">

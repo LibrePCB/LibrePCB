@@ -4,8 +4,8 @@
         <uuid>{07c7bb4b-6cd3-4a60-b926-3f5783494e47}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:35Z</created>
-        <last_modified>2015-06-21T12:37:35Z</last_modified>
+        <created>2015-08-05T18:39:34Z</created>
+        <last_modified>2015-08-05T18:39:34Z</last_modified>
         <name locale="en_US">WSC0002</name>
         <description locale="en_US">&lt;b>Wirewound Resistors, Precision Power&lt;/b>&lt;p>
 Source: VISHAY wscwsn.pdf
@@ -18,22 +18,22 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <geometry>
-        <polygon grab_area="true" layer="170" start_x="5.550000" start_y="-3.375000" fill="false" width="0.203200">
-            <segment end_x="5.550000" end_y="3.375000" angle="0.000000"/>
-            <segment end_x="-5.550000" end_y="3.375000" angle="0.000000"/>
-            <segment end_x="-5.550000" end_y="-3.375000" angle="0.000000"/>
-            <segment end_x="5.550000" end_y="-3.375000" angle="0.000000"/>
+        <polygon fill="false" grab_area="true" start_x="-5.550000" start_y="3.375000" layer="170" width="0.203200">
+            <segment angle="0.000000" end_x="-5.550000" end_y="-3.375000"/>
+            <segment angle="0.000000" end_x="5.550000" end_y="-3.375000"/>
+            <segment angle="0.000000" end_x="5.550000" end_y="3.375000"/>
+            <segment angle="0.000000" end_x="-5.550000" end_y="3.375000"/>
         </polygon>
-        <text v_align="bottom" height="3.175000" x="-5.650000" y="3.900000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
-        <text v_align="bottom" height="2.500000" x="-5.650000" y="-5.150000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" x="-5.650000" y="3.900000" height="3.175000" text="${CMP::NAME}" rotation="0.000000" layer="150" h_align="left"/>
+        <text v_align="bottom" x="-5.650000" y="-5.150000" height="2.500000" text="${CMP::VALUE}" rotation="0.000000" layer="160" h_align="left"/>
     </geometry>
     <pads>
-        <pad height="5.840000" x="4.575000" drill="0.000000" uuid="{d5c6395f-2cff-4387-8b1e-25f2225d18dd}" y="0.000000" rotation="0.000000" layer="200" width="3.940000" type="smd_rect">
-            <name locale="en_US">2</name>
+        <pad uuid="{5cbb31ea-d8d2-47bb-b26e-ff39139c3087}" x="-4.575000" y="0.025000" height="5.840000" drill="0.000000" rotation="0.000000" type="smd_rect" layer="200" width="3.940000">
+            <name locale="en_US">1</name>
             <description locale="en_US"/>
         </pad>
-        <pad height="5.840000" x="-4.575000" drill="0.000000" uuid="{5cbb31ea-d8d2-47bb-b26e-ff39139c3087}" y="0.025000" rotation="0.000000" layer="200" width="3.940000" type="smd_rect">
-            <name locale="en_US">1</name>
+        <pad uuid="{d5c6395f-2cff-4387-8b1e-25f2225d18dd}" x="4.575000" y="0.000000" height="5.840000" drill="0.000000" rotation="0.000000" type="smd_rect" layer="200" width="3.940000">
+            <name locale="en_US">2</name>
             <description locale="en_US"/>
         </pad>
     </pads>

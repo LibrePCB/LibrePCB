@@ -4,8 +4,8 @@
         <uuid>{328e4ae0-a0f1-4d92-87b5-1695afbe98e1}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:34Z</created>
-        <last_modified>2015-06-21T12:37:34Z</last_modified>
+        <created>2015-08-05T18:39:33Z</created>
+        <last_modified>2015-08-05T18:39:33Z</last_modified>
         <name locale="en_US">C0805</name>
         <description locale="en_US">&lt;b>CAPACITOR&lt;/b>&lt;p>
 
@@ -17,46 +17,46 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <geometry>
-        <polygon grab_area="true" layer="110" start_x="-0.381000" start_y="0.660000" fill="false" width="0.101600">
-            <segment end_x="0.381000" end_y="0.660000" angle="0.000000"/>
+        <polygon fill="false" grab_area="true" start_x="-0.381000" start_y="0.660000" layer="110" width="0.101600">
+            <segment angle="0.000000" end_x="0.381000" end_y="0.660000"/>
         </polygon>
-        <polygon grab_area="true" layer="110" start_x="-0.356000" start_y="-0.660000" fill="false" width="0.101600">
-            <segment end_x="0.381000" end_y="-0.660000" angle="0.000000"/>
+        <polygon fill="false" grab_area="true" start_x="-0.356000" start_y="-0.660000" layer="110" width="0.101600">
+            <segment angle="0.000000" end_x="0.381000" end_y="-0.660000"/>
         </polygon>
-        <polygon grab_area="true" layer="110" start_x="-1.092200" start_y="-0.723900" fill="true" width="0.000000">
-            <segment end_x="-0.342100" end_y="-0.723900" angle="0.000000"/>
-            <segment end_x="-0.342100" end_y="0.726200" angle="0.000000"/>
-            <segment end_x="-1.092200" end_y="0.726200" angle="0.000000"/>
-            <segment end_x="-1.092200" end_y="-0.723900" angle="0.000000"/>
+        <polygon fill="true" grab_area="true" start_x="-1.092200" start_y="-0.723900" layer="110" width="0.000000">
+            <segment angle="0.000000" end_x="-0.342100" end_y="-0.723900"/>
+            <segment angle="0.000000" end_x="-0.342100" end_y="0.726200"/>
+            <segment angle="0.000000" end_x="-1.092200" end_y="0.726200"/>
+            <segment angle="0.000000" end_x="-1.092200" end_y="-0.723900"/>
         </polygon>
-        <polygon grab_area="true" layer="110" start_x="0.355600" start_y="-0.723900" fill="true" width="0.000000">
-            <segment end_x="1.105700" end_y="-0.723900" angle="0.000000"/>
-            <segment end_x="1.105700" end_y="0.726200" angle="0.000000"/>
-            <segment end_x="0.355600" end_y="0.726200" angle="0.000000"/>
-            <segment end_x="0.355600" end_y="-0.723900" angle="0.000000"/>
+        <polygon fill="true" grab_area="true" start_x="0.355600" start_y="-0.723900" layer="110" width="0.000000">
+            <segment angle="0.000000" end_x="1.105700" end_y="-0.723900"/>
+            <segment angle="0.000000" end_x="1.105700" end_y="0.726200"/>
+            <segment angle="0.000000" end_x="0.355600" end_y="0.726200"/>
+            <segment angle="0.000000" end_x="0.355600" end_y="-0.723900"/>
         </polygon>
-        <polygon grab_area="true" layer="130" start_x="-0.100100" start_y="-0.400100" fill="true" width="0.000000">
-            <segment end_x="0.100100" end_y="-0.400100" angle="0.000000"/>
-            <segment end_x="0.100100" end_y="0.400100" angle="0.000000"/>
-            <segment end_x="-0.100100" end_y="0.400100" angle="0.000000"/>
-            <segment end_x="-0.100100" end_y="-0.400100" angle="0.000000"/>
+        <polygon fill="true" grab_area="true" start_x="-0.100100" start_y="-0.400100" layer="130" width="0.000000">
+            <segment angle="0.000000" end_x="0.100100" end_y="-0.400100"/>
+            <segment angle="0.000000" end_x="0.100100" end_y="0.400100"/>
+            <segment angle="0.000000" end_x="-0.100100" end_y="0.400100"/>
+            <segment angle="0.000000" end_x="-0.100100" end_y="-0.400100"/>
         </polygon>
-        <polygon grab_area="true" layer="100" start_x="-1.973000" start_y="-0.983000" fill="false" width="0.050800">
-            <segment end_x="-1.973000" end_y="0.983000" angle="0.000000"/>
-            <segment end_x="1.973000" end_y="0.983000" angle="0.000000"/>
-            <segment end_x="1.973000" end_y="-0.983000" angle="0.000000"/>
-            <segment end_x="-1.973000" end_y="-0.983000" angle="0.000000"/>
+        <polygon fill="false" grab_area="true" start_x="-1.973000" start_y="0.983000" layer="100" width="0.050800">
+            <segment angle="0.000000" end_x="-1.973000" end_y="-0.983000"/>
+            <segment angle="0.000000" end_x="1.973000" end_y="-0.983000"/>
+            <segment angle="0.000000" end_x="1.973000" end_y="0.983000"/>
+            <segment angle="0.000000" end_x="-1.973000" end_y="0.983000"/>
         </polygon>
-        <text v_align="bottom" height="3.175000" x="-1.270000" y="1.270000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
-        <text v_align="bottom" height="2.500000" x="-1.270000" y="-2.540000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" x="-1.270000" y="1.270000" height="3.175000" text="${CMP::NAME}" rotation="0.000000" layer="150" h_align="left"/>
+        <text v_align="bottom" x="-1.270000" y="-2.540000" height="2.500000" text="${CMP::VALUE}" rotation="0.000000" layer="160" h_align="left"/>
     </geometry>
     <pads>
-        <pad height="1.500000" x="0.950000" drill="0.000000" uuid="{9902d57d-5b64-4bc3-9a5b-a21052667c9d}" y="0.000000" rotation="0.000000" layer="200" width="1.300000" type="smd_rect">
-            <name locale="en_US">2</name>
+        <pad uuid="{4f6ec20b-c2e7-47d9-ba0e-8cde302966c5}" x="-0.950000" y="0.000000" height="1.500000" drill="0.000000" rotation="0.000000" type="smd_rect" layer="200" width="1.300000">
+            <name locale="en_US">1</name>
             <description locale="en_US"/>
         </pad>
-        <pad height="1.500000" x="-0.950000" drill="0.000000" uuid="{4f6ec20b-c2e7-47d9-ba0e-8cde302966c5}" y="0.000000" rotation="0.000000" layer="200" width="1.300000" type="smd_rect">
-            <name locale="en_US">1</name>
+        <pad uuid="{9902d57d-5b64-4bc3-9a5b-a21052667c9d}" x="0.950000" y="0.000000" height="1.500000" drill="0.000000" rotation="0.000000" type="smd_rect" layer="200" width="1.300000">
+            <name locale="en_US">2</name>
             <description locale="en_US"/>
         </pad>
     </pads>

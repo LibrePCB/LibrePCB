@@ -17,10 +17,10 @@
         <polygon fill="false" start_y="0" width="0.254" layer="10" start_x="-1.905" grab_area="false">
             <segment angle="0" end_x="1.905" end_y="0"/>
         </polygon>
-        <text layer="21" text="${CMP::VALUE}" x="0" y="0" angle="0" height="2.54" v_align="top" h_align="center"/>
+        <text layer="21" text="${CMP::VALUE}" x="0" y="0" rotation="0" height="2.54" v_align="top" h_align="center"/>
     </geometry>
     <pins>
-        <pin x="0" length="2.54" angle="180" y="2.54" uuid="{abcc319b-d09f-437b-a624-3dcf3eff5792}">
+        <pin x="0" length="2.54" rotation="-90" y="2.54" uuid="{abcc319b-d09f-437b-a624-3dcf3eff5792}">
             <name locale="en_US">GND</name>
             <description locale="en_US"></description>
         </pin>

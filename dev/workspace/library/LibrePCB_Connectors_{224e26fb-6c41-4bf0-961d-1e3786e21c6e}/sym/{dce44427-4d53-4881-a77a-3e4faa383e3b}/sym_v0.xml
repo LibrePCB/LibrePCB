@@ -18,11 +18,11 @@
         <polygon fill="false" grab_area="true" layer="10" start_x="-1.016000" start_y="-1.016000" width="0.254000">
             <segment end_x="1.016000" end_y="1.016000" angle="0"/>
         </polygon>
-        <text height="2.54" v_align="bottom" angle="0.000000" text="${SYM::NAME}" x="-1.1" y="1.016000" h_align="left" layer="20"/>
-        <text height="2.54" v_align="center" angle="0.000000" text="${CMP::VALUE}" x="-1.2" y="0" h_align="right" layer="21"/>
+        <text height="2.54" v_align="bottom" rotation="0.000000" text="${SYM::NAME}" x="-1.1" y="1.016000" h_align="left" layer="20"/>
+        <text height="2.54" v_align="center" rotation="0.000000" text="${CMP::VALUE}" x="-1.2" y="0" h_align="right" layer="21"/>
     </geometry>
     <pins>
-        <pin length="2.540000" uuid="{01f564d5-9975-4613-bf90-153a031fe625}" angle="-90.000000" x="2.540000" y="0.000000">
+        <pin length="2.540000" uuid="{01f564d5-9975-4613-bf90-153a031fe625}" rotation="180" x="2.540000" y="0.000000">
             <name locale="en_US">1</name>
             <description locale="en_US"/>
         </pin>

@@ -4,8 +4,8 @@
         <uuid>{b75f70f2-4b7a-428b-8ab6-e8943fc06d7e}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:40Z</created>
-        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <created>2015-08-05T18:39:40Z</created>
+        <last_modified>2015-08-05T18:39:40Z</last_modified>
         <name locale="en_US">5-2,5</name>
         <description locale="en_US">&lt;b>THROUGH-HOLE PAD&lt;/b>
 
@@ -17,17 +17,17 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <geometry>
-        <polygon grab_area="true" layer="170" start_x="1.524000" start_y="2.794000" fill="false" width="0.152400">
-            <segment end_x="1.524000" end_y="-2.794000" angle="0.000000"/>
-            <segment end_x="-1.524000" end_y="-2.794000" angle="0.000000"/>
-            <segment end_x="-1.524000" end_y="2.794000" angle="0.000000"/>
-            <segment end_x="1.524000" end_y="2.794000" angle="0.000000"/>
+        <polygon fill="false" grab_area="true" start_x="-1.524000" start_y="2.794000" layer="170" width="0.152400">
+            <segment angle="0.000000" end_x="-1.524000" end_y="-2.794000"/>
+            <segment angle="0.000000" end_x="1.524000" end_y="-2.794000"/>
+            <segment angle="0.000000" end_x="1.524000" end_y="2.794000"/>
+            <segment angle="0.000000" end_x="-1.524000" end_y="2.794000"/>
         </polygon>
-        <text v_align="bottom" height="3.175000" x="-1.778000" y="-2.540000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
-        <text v_align="bottom" height="2.500000" x="-0.100000" y="2.800000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
+        <text v_align="bottom" x="-1.778000" y="-2.540000" height="3.175000" text="${CMP::NAME}" rotation="90.000000" layer="150" h_align="left"/>
+        <text v_align="bottom" x="-0.100000" y="2.800000" height="2.500000" text="${CMP::VALUE}" rotation="0.000000" layer="160" h_align="left"/>
     </geometry>
     <pads>
-        <pad height="5.080000" x="0.000000" drill="0.000000" uuid="{56588e0b-e32c-4508-82a0-27c3f1429d33}" y="0.000000" rotation="0.000000" layer="200" width="2.540000" type="smd_rect">
+        <pad uuid="{56588e0b-e32c-4508-82a0-27c3f1429d33}" x="0.000000" y="0.000000" height="5.080000" drill="0.000000" rotation="0.000000" type="smd_rect" layer="200" width="2.540000">
             <name locale="en_US">1</name>
             <description locale="en_US"/>
         </pad>

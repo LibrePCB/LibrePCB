@@ -4,8 +4,8 @@
         <uuid>{d72d9f73-4180-4bd6-9b59-3ff7e8485eda}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:37Z</created>
-        <last_modified>2015-06-21T12:37:37Z</last_modified>
+        <created>2015-08-05T18:39:36Z</created>
+        <last_modified>2015-08-05T18:39:36Z</last_modified>
         <name locale="en_US">ASF</name>
         <description locale="en_US">&lt;b>CRYSTAL CLOCK OSCILLATORS&lt;/b>&lt;p>
 5.0 Vdc or 3.3 Vdc - LOW PROFILE ULTRA MINIATURE CERAMIC SURFACE MOUNT&lt;br>
@@ -19,48 +19,48 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <geometry>
-        <polygon grab_area="true" layer="110" start_x="-2.200000" start_y="1.500000" fill="false" width="0.203200">
-            <segment end_x="2.200000" end_y="1.500000" angle="0.000000"/>
+        <polygon fill="false" grab_area="true" start_x="-2.200000" start_y="1.500000" layer="110" width="0.203200">
+            <segment angle="0.000000" end_x="2.200000" end_y="1.500000"/>
         </polygon>
-        <polygon grab_area="true" layer="170" start_x="2.400000" start_y="1.300000" fill="false" width="0.203200">
-            <segment end_x="2.400000" end_y="-1.300000" angle="0.000000"/>
+        <polygon fill="false" grab_area="true" start_x="2.400000" start_y="1.300000" layer="170" width="0.203200">
+            <segment angle="0.000000" end_x="2.400000" end_y="-1.300000"/>
         </polygon>
-        <polygon grab_area="true" layer="110" start_x="2.200000" start_y="-1.500000" fill="false" width="0.203200">
-            <segment end_x="-2.200000" end_y="-1.500000" angle="0.000000"/>
+        <polygon fill="false" grab_area="true" start_x="2.200000" start_y="-1.500000" layer="110" width="0.203200">
+            <segment angle="0.000000" end_x="-2.200000" end_y="-1.500000"/>
         </polygon>
-        <polygon grab_area="true" layer="170" start_x="-2.400000" start_y="-1.300000" fill="false" width="0.203200">
-            <segment end_x="-2.400000" end_y="1.300000" angle="0.000000"/>
+        <polygon fill="false" grab_area="true" start_x="-2.400000" start_y="-1.300000" layer="170" width="0.203200">
+            <segment angle="0.000000" end_x="-2.400000" end_y="1.300000"/>
         </polygon>
-        <polygon grab_area="true" layer="170" start_x="-2.200000" start_y="1.500000" fill="false" width="0.203200">
-            <segment end_x="-2.400000" end_y="1.300000" angle="90.000000"/>
+        <polygon fill="false" grab_area="true" start_x="-2.200000" start_y="1.500000" layer="170" width="0.203200">
+            <segment angle="-90.000000" end_x="-2.400000" end_y="1.300000"/>
         </polygon>
-        <polygon grab_area="true" layer="170" start_x="2.400000" start_y="1.300000" fill="false" width="0.203200">
-            <segment end_x="2.200000" end_y="1.500000" angle="90.000000"/>
+        <polygon fill="false" grab_area="true" start_x="2.400000" start_y="1.300000" layer="170" width="0.203200">
+            <segment angle="-90.000000" end_x="2.200000" end_y="1.500000"/>
         </polygon>
-        <polygon grab_area="true" layer="170" start_x="-2.400000" start_y="-1.300000" fill="false" width="0.203200">
-            <segment end_x="-2.200000" end_y="-1.500000" angle="90.000000"/>
+        <polygon fill="false" grab_area="true" start_x="-2.400000" start_y="-1.300000" layer="170" width="0.203200">
+            <segment angle="-90.000000" end_x="-2.200000" end_y="-1.500000"/>
         </polygon>
-        <polygon grab_area="true" layer="170" start_x="2.200000" start_y="-1.500000" fill="false" width="0.203200">
-            <segment end_x="2.400000" end_y="-1.300000" angle="90.000000"/>
+        <polygon fill="false" grab_area="true" start_x="2.200000" start_y="-1.500000" layer="170" width="0.203200">
+            <segment angle="-90.000000" end_x="2.400000" end_y="-1.300000"/>
         </polygon>
-        <text v_align="bottom" height="3.175000" x="-2.540000" y="2.540000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
-        <text v_align="bottom" height="2.500000" x="-2.540000" y="-3.810000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
-        <ellipse radius_x="0.180200" x="-1.900000" radius_y="0.180200" grab_area="true" y="-0.950000" layer="110" rotation="0.000000" fill="true" width="0.000000"/>
+        <text v_align="bottom" x="-2.540000" y="2.540000" height="3.175000" text="${CMP::NAME}" rotation="0.000000" layer="150" h_align="left"/>
+        <text v_align="bottom" x="-2.540000" y="-3.810000" height="2.500000" text="${CMP::VALUE}" rotation="0.000000" layer="160" h_align="left"/>
+        <ellipse x="-1.900000" y="-0.950000" radius_x="0.180200" radius_y="0.180200" fill="true" grab_area="true" rotation="0.000000" layer="110" width="0.000000"/>
     </geometry>
     <pads>
-        <pad height="1.500000" x="-1.250000" drill="0.000000" uuid="{6f4657b7-1405-4e50-8957-e37a80a0cc3c}" y="-1.150000" rotation="0.000000" layer="200" width="1.600000" type="smd_rect">
-            <name locale="en_US">1</name>
-            <description locale="en_US"/>
-        </pad>
-        <pad height="1.500000" x="-1.250000" drill="0.000000" uuid="{77fc799e-d444-42a1-b0ad-fcbb28b4e92e}" y="1.150000" rotation="-180.000000" layer="200" width="1.600000" type="smd_rect">
+        <pad uuid="{77fc799e-d444-42a1-b0ad-fcbb28b4e92e}" x="-1.250000" y="1.150000" height="1.500000" drill="0.000000" rotation="180.000000" type="smd_rect" layer="200" width="1.600000">
             <name locale="en_US">4</name>
             <description locale="en_US"/>
         </pad>
-        <pad height="1.500000" x="1.250000" drill="0.000000" uuid="{50e8717f-ed60-4624-a5ba-e4dde65ea734}" y="-1.150000" rotation="0.000000" layer="200" width="1.600000" type="smd_rect">
+        <pad uuid="{6f4657b7-1405-4e50-8957-e37a80a0cc3c}" x="-1.250000" y="-1.150000" height="1.500000" drill="0.000000" rotation="0.000000" type="smd_rect" layer="200" width="1.600000">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{50e8717f-ed60-4624-a5ba-e4dde65ea734}" x="1.250000" y="-1.150000" height="1.500000" drill="0.000000" rotation="0.000000" type="smd_rect" layer="200" width="1.600000">
             <name locale="en_US">2</name>
             <description locale="en_US"/>
         </pad>
-        <pad height="1.500000" x="1.250000" drill="0.000000" uuid="{913186ca-3174-4fa6-bf20-b45e070fc688}" y="1.150000" rotation="-180.000000" layer="200" width="1.600000" type="smd_rect">
+        <pad uuid="{913186ca-3174-4fa6-bf20-b45e070fc688}" x="1.250000" y="1.150000" height="1.500000" drill="0.000000" rotation="180.000000" type="smd_rect" layer="200" width="1.600000">
             <name locale="en_US">3</name>
             <description locale="en_US"/>
         </pad>

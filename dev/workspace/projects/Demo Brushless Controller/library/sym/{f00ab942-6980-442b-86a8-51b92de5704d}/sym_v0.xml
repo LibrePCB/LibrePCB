@@ -14,30 +14,30 @@
         <category>{00000000-0000-4001-8000-000000000000}</category>
     </categories>
     <geometry>
-        <polygon layer="10" start_x="0.000000" start_y="0.000000" grab_area="false" width="0.600000" fill="false">
+        <polygon start_x="0.000000" start_y="0.000000" fill="false" layer="10" width="0.600000" grab_area="false">
             <segment end_x="0.000000" end_y="190.000000" angle="0.000000"/>
             <segment end_x="277.000000" end_y="190.000000" angle="0.000000"/>
             <segment end_x="277.000000" end_y="0.000000" angle="0.000000"/>
             <segment end_x="0.000000" end_y="0.000000" angle="0.000000"/>
         </polygon>
-        <polygon layer="10" start_x="170.000000" start_y="0.000000" grab_area="false" width="0.600000" fill="false">
+        <polygon start_x="170.000000" start_y="0.000000" fill="false" layer="10" width="0.600000" grab_area="false">
             <segment end_x="170.000000" end_y="15.000000" angle="0.000000"/>
             <segment end_x="277.000000" end_y="15.000000" angle="0.000000"/>
         </polygon>
-        <polygon layer="10" start_x="240.000000" start_y="0.000000" grab_area="false" width="0.600000" fill="false">
+        <polygon start_x="240.000000" start_y="0.000000" fill="false" layer="10" width="0.600000" grab_area="false">
             <segment end_x="240.000000" end_y="15.000000" angle="0.000000"/>
         </polygon>
-        <polygon layer="10" start_x="170.000000" start_y="5.000000" grab_area="false" width="0.600000" fill="false">
+        <polygon start_x="170.000000" start_y="5.000000" fill="false" layer="10" width="0.600000" grab_area="false">
             <segment end_x="277.000000" end_y="5.000000" angle="0.000000"/>
         </polygon>
-        <polygon layer="10" start_x="240.000000" start_y="10.000000" grab_area="false" width="0.600000" fill="false">
+        <polygon start_x="240.000000" start_y="10.000000" fill="false" layer="10" width="0.600000" grab_area="false">
             <segment end_x="277.000000" end_y="10.000000" angle="0.000000"/>
         </polygon>
-        <text height="8.000000" layer="10" x="172.000000" y="10.000000" text="${PAGE::NAME}" angle="0.000000" h_align="left" v_align="center"/>
-        <text height="4.000000" layer="10" x="172.000000" y="2.500000" text="${PRJ::NAME}" angle="0.000000" h_align="left" v_align="center"/>
-        <text height="4.000000" layer="10" x="242.000000" y="12.500000" text="${PAGE::LAST_MODIFIED}" angle="0.000000" h_align="left" v_align="center"/>
-        <text height="4.000000" layer="10" x="242.000000" y="7.500000" text="${PAGE::AUTHOR}" angle="0.000000" h_align="left" v_align="center"/>
-        <text height="4.000000" layer="10" x="242.000000" y="2.500000" text="Page ${PAGE::NBR}/${PAGE::CNT}" angle="0.000000" h_align="left" v_align="center"/>
+        <text text="${PAGE::NAME}" height="8.000000" h_align="left" layer="10" x="172.000000" y="10.000000" v_align="center" rotation="0.000000"/>
+        <text text="${PRJ::NAME}" height="4.000000" h_align="left" layer="10" x="172.000000" y="2.500000" v_align="center" rotation="0.000000"/>
+        <text text="${PAGE::LAST_MODIFIED}" height="4.000000" h_align="left" layer="10" x="242.000000" y="12.500000" v_align="center" rotation="0.000000"/>
+        <text text="${PAGE::AUTHOR}" height="4.000000" h_align="left" layer="10" x="242.000000" y="7.500000" v_align="center" rotation="0.000000"/>
+        <text text="Page ${PAGE::NBR}/${PAGE::CNT}" height="4.000000" h_align="left" layer="10" x="242.000000" y="2.500000" v_align="center" rotation="0.000000"/>
     </geometry>
     <pins/>
 </symbol>

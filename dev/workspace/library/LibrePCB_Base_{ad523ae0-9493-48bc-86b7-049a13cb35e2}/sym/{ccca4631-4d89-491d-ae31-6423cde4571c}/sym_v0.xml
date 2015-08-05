@@ -42,15 +42,15 @@
             <segment angle="0" end_x="-1.9" end_y="-0.4"/>
             <segment angle="0" end_x="-1.9" end_y="-1.016"/>
         </polygon>
-        <text layer="20" text="${SYM::NAME}" x="2.54" y="0" angle="0" height="2.54" v_align="bottom" h_align="left"/>
-        <text layer="21" text="${CMP::VALUE}" x="2.54" y="0" angle="0" height="2.54" v_align="top" h_align="left"/>
+        <text layer="20" text="${SYM::NAME}" x="2.54" y="0" rotation="0" height="2.54" v_align="bottom" h_align="left"/>
+        <text layer="21" text="${CMP::VALUE}" x="2.54" y="0" rotation="0" height="2.54" v_align="top" h_align="left"/>
     </geometry>
     <pins>
-        <pin length="1.524" x="0.000000" uuid="{1b5d5845-d043-442f-bfaa-25f8fdee8997}" y="-2.54" angle="0.000000">
+        <pin length="1.524" x="0.000000" uuid="{1b5d5845-d043-442f-bfaa-25f8fdee8997}" y="-2.54" rotation="90">
             <name locale="en_US">A</name>
             <description locale="en_US"/>
         </pin>
-        <pin length="1.524" x="0.000000" uuid="{18884b25-28e3-4449-a906-eaf6756398cf}" y="2.540000" angle="-180.000000">
+        <pin length="1.524" x="0.000000" uuid="{18884b25-28e3-4449-a906-eaf6756398cf}" y="2.540000" rotation="-90">
             <name locale="en_US">E</name>
             <description locale="en_US"/>
         </pin>

@@ -18,10 +18,10 @@
             <segment angle="0" end_x="0" end_y="0"/>
             <segment angle="0" end_x="-1.27" end_y="-1.905"/>
         </polygon>
-        <text layer="21" text="${CMP::VALUE}" x="0" y="0" angle="0" height="2.54" v_align="bottom" h_align="center"/>
+        <text layer="21" text="${CMP::VALUE}" x="0" y="0" rotation="0" height="2.54" v_align="bottom" h_align="center"/>
     </geometry>
     <pins>
-        <pin x="0" length="2.54" angle="0" y="-2.54" uuid="{771c2d8b-e4ad-487b-bcb1-fe2bc10c8a03}">
+        <pin x="0" length="2.54" rotation="90" y="-2.54" uuid="{771c2d8b-e4ad-487b-bcb1-fe2bc10c8a03}">
             <name locale="en_US">VCC</name>
             <description locale="en_US"></description>
         </pin>

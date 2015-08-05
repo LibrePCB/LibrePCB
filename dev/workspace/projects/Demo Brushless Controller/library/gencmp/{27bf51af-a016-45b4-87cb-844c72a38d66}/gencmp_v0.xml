@@ -20,33 +20,33 @@
             <value locale="en_US"></value>
         </default_values>
         <prefixes>
-            <prefix norm="" default="true">Q</prefix>
+            <prefix default="true" norm="">Q</prefix>
         </prefixes>
     </properties>
     <signals>
-        <signal required="true" uuid="{d7eb84bb-7f47-4e0b-99d1-1ee30019c40e}" role="passive" forced_net_name="" clock="false" negated="false">
+        <signal negated="false" forced_net_name="" clock="false" uuid="{d7eb84bb-7f47-4e0b-99d1-1ee30019c40e}" required="true" role="passive">
             <name locale="en_US">S</name>
             <description locale="en_US">Source</description>
         </signal>
-        <signal required="true" uuid="{4c7edd50-32d2-4098-a286-3536b882967b}" role="passive" forced_net_name="" clock="false" negated="false">
+        <signal negated="false" forced_net_name="" clock="false" uuid="{4c7edd50-32d2-4098-a286-3536b882967b}" required="true" role="passive">
             <name locale="en_US">G</name>
             <description locale="en_US">Gate</description>
         </signal>
-        <signal required="true" uuid="{3982c030-dbdf-4cb9-8d75-0e471e12fabb}" role="passive" forced_net_name="" clock="false" negated="false">
+        <signal negated="false" forced_net_name="" clock="false" uuid="{3982c030-dbdf-4cb9-8d75-0e471e12fabb}" required="true" role="passive">
             <name locale="en_US">D</name>
             <description locale="en_US">Drain</description>
         </signal>
     </signals>
     <symbol_variants>
-        <variant norm="" uuid="{df7447ce-127b-4827-abe2-767791c96981}" default="true">
+        <variant default="true" norm="" uuid="{df7447ce-127b-4827-abe2-767791c96981}">
             <name locale="en_US">default</name>
             <description locale="en_US"></description>
             <symbol_items>
-                <item required="true" uuid="{abb0fd2d-e3d8-492e-8c53-95575916028b}" suffix="" symbol="{b2a17c32-dfca-471f-96c8-5de2333a3be3}">
+                <item suffix="" symbol="{b2a17c32-dfca-471f-96c8-5de2333a3be3}" uuid="{abb0fd2d-e3d8-492e-8c53-95575916028b}" required="true">
                     <pin_signal_map>
-                        <map pin="{6b08ad4a-ea43-420c-af39-4b08609e9532}" signal="{4c7edd50-32d2-4098-a286-3536b882967b}" display="none"/>
-                        <map pin="{25ed99ff-f079-402d-823c-39eac3d358c2}" signal="{d7eb84bb-7f47-4e0b-99d1-1ee30019c40e}" display="none"/>
-                        <map pin="{55014667-bbfc-410a-b0eb-cacd978d1e08}" signal="{3982c030-dbdf-4cb9-8d75-0e471e12fabb}" display="none"/>
+                        <map pin="{25ed99ff-f079-402d-823c-39eac3d358c2}" display="none" signal="{d7eb84bb-7f47-4e0b-99d1-1ee30019c40e}"/>
+                        <map pin="{55014667-bbfc-410a-b0eb-cacd978d1e08}" display="none" signal="{3982c030-dbdf-4cb9-8d75-0e471e12fabb}"/>
+                        <map pin="{6b08ad4a-ea43-420c-af39-4b08609e9532}" display="none" signal="{4c7edd50-32d2-4098-a286-3536b882967b}"/>
                     </pin_signal_map>
                 </item>
             </symbol_items>

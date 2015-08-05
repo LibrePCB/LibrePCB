@@ -14,22 +14,22 @@
         <category>{00000000-0000-4001-8000-000000000000}</category>
     </categories>
     <geometry>
-        <polygon layer="10" start_x="-3.080000" start_y="-1.016000" grab_area="true" width="0.254000" fill="true">
+        <polygon start_x="-3.080000" start_y="-1.016000" fill="true" layer="10" width="0.254000" grab_area="true">
             <segment end_x="-3.080000" end_y="1.016000" angle="0.000000"/>
             <segment end_x="3.080000" end_y="1.016000" angle="0.000000"/>
             <segment end_x="3.080000" end_y="-1.016000" angle="0.000000"/>
             <segment end_x="-3.080000" end_y="-1.016000" angle="0.000000"/>
         </polygon>
-        <text height="2.540000" layer="20" x="-3.080000" y="1.016000" text="${SYM::NAME}" angle="0.000000" h_align="left" v_align="bottom"/>
-        <text height="2.540000" layer="21" x="-3.080000" y="-1.016000" text="${CMP::VALUE}" angle="0.000000" h_align="left" v_align="top"/>
+        <text text="${SYM::NAME}" height="2.540000" h_align="left" layer="20" x="-3.080000" y="1.016000" v_align="bottom" rotation="0.000000"/>
+        <text text="${CMP::VALUE}" height="2.540000" h_align="left" layer="21" x="-3.080000" y="-1.016000" v_align="top" rotation="0.000000"/>
     </geometry>
     <pins>
-        <pin length="2.000000" uuid="{06d55f94-1316-48cb-a20f-0d4231eced31}" x="-5.080000" y="0.000000" angle="90.000000">
-            <name locale="en_US">1</name>
+        <pin length="2.000000" x="5.080000" y="0.000000" uuid="{1b2d8b3c-b531-48ec-a0f9-07e91687c214}" rotation="180.000000">
+            <name locale="en_US">2</name>
             <description locale="en_US"></description>
         </pin>
-        <pin length="2.000000" uuid="{1b2d8b3c-b531-48ec-a0f9-07e91687c214}" x="5.080000" y="0.000000" angle="270.000000">
-            <name locale="en_US">2</name>
+        <pin length="2.000000" x="-5.080000" y="0.000000" uuid="{06d55f94-1316-48cb-a20f-0d4231eced31}" rotation="0.000000">
+            <name locale="en_US">1</name>
             <description locale="en_US"></description>
         </pin>
     </pins>

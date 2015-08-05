@@ -4,8 +4,8 @@
         <uuid>{97957704-fca0-435e-aeae-efb426f855f3}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:40Z</created>
-        <last_modified>2015-06-21T12:37:40Z</last_modified>
+        <created>2015-08-05T18:39:40Z</created>
+        <last_modified>2015-08-05T18:39:40Z</last_modified>
         <name locale="en_US">PB3XX301V050A</name>
         <description locale="en_US">&lt;b>RGB LED&lt;/b> with integrated controller chip&lt;p>
 Source: &lt;a href="http://www.kirronlightcomponents.com/produkte/dyco-led1/"> Data sheedt &lt;/a> DycoLED.pdf&lt;br>
@@ -19,43 +19,43 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <geometry>
-        <polygon grab_area="true" layer="110" start_x="2.400000" start_y="2.400000" fill="false" width="0.200000">
-            <segment end_x="2.400000" end_y="-2.400000" angle="0.000000"/>
-            <segment end_x="-2.400000" end_y="-2.400000" angle="0.000000"/>
-            <segment end_x="-2.400000" end_y="2.400000" angle="0.000000"/>
-            <segment end_x="2.400000" end_y="2.400000" angle="0.000000"/>
+        <polygon fill="false" grab_area="true" start_x="2.400000" start_y="2.400000" layer="110" width="0.200000">
+            <segment angle="0.000000" end_x="2.400000" end_y="-2.400000"/>
+            <segment angle="0.000000" end_x="-2.400000" end_y="-2.400000"/>
+            <segment angle="0.000000" end_x="-2.400000" end_y="2.400000"/>
+            <segment angle="0.000000" end_x="2.400000" end_y="2.400000"/>
         </polygon>
-        <text v_align="bottom" height="3.175000" x="-3.174400" y="3.455000" layer="150" text="${CMP::NAME}" h_align="left" angle="0.000000"/>
-        <text v_align="bottom" height="2.500000" x="-3.174400" y="-5.233000" layer="160" text="${CMP::VALUE}" h_align="left" angle="0.000000"/>
-        <ellipse radius_x="0.225000" x="-1.760000" radius_y="0.225000" grab_area="true" y="-0.700000" layer="110" rotation="0.000000" fill="false" width="0.200000"/>
+        <text v_align="bottom" x="-3.174400" y="3.455000" height="3.175000" text="${CMP::NAME}" rotation="0.000000" layer="150" h_align="left"/>
+        <text v_align="bottom" x="-3.174400" y="-5.233000" height="2.500000" text="${CMP::VALUE}" rotation="0.000000" layer="160" h_align="left"/>
+        <ellipse x="-1.760000" y="-0.700000" radius_x="0.225000" radius_y="0.225000" fill="false" grab_area="true" rotation="0.000000" layer="110" width="0.200000"/>
     </geometry>
     <pads>
-        <pad height="1.400000" x="-1.850000" drill="0.000000" uuid="{8f131a85-d2a1-4ba8-b76f-52dade6c3e1e}" y="-2.500000" rotation="0.000000" layer="200" width="1.400000" type="smd_rect">
-            <name locale="en_US">1</name>
-            <description locale="en_US"/>
-        </pad>
-        <pad height="2.600000" x="0.000000" drill="0.000000" uuid="{76238209-9f34-406f-86c3-ecebf554c563}" y="0.000000" rotation="0.000000" layer="200" width="6.100000" type="smd_rect">
-            <name locale="en_US">HT</name>
-            <description locale="en_US"/>
-        </pad>
-        <pad height="1.400000" x="1.850000" drill="0.000000" uuid="{4d6d7b49-dfea-41c0-960b-55067837c867}" y="2.500000" rotation="-180.000000" layer="200" width="1.400000" type="smd_rect">
-            <name locale="en_US">6</name>
-            <description locale="en_US"/>
-        </pad>
-        <pad height="1.400000" x="0.000000" drill="0.000000" uuid="{c1e9f4ff-5836-4791-9206-13a1c0221bc8}" y="2.500000" rotation="-180.000000" layer="200" width="1.300000" type="smd_rect">
+        <pad uuid="{c1e9f4ff-5836-4791-9206-13a1c0221bc8}" x="0.000000" y="2.500000" height="1.400000" drill="0.000000" rotation="180.000000" type="smd_rect" layer="200" width="1.300000">
             <name locale="en_US">5</name>
             <description locale="en_US"/>
         </pad>
-        <pad height="1.400000" x="1.850000" drill="0.000000" uuid="{f849ad8f-b655-46bb-b881-61e007e1bf9a}" y="-2.500000" rotation="0.000000" layer="200" width="1.400000" type="smd_rect">
+        <pad uuid="{4d6d7b49-dfea-41c0-960b-55067837c867}" x="1.850000" y="2.500000" height="1.400000" drill="0.000000" rotation="180.000000" type="smd_rect" layer="200" width="1.400000">
+            <name locale="en_US">6</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{8f131a85-d2a1-4ba8-b76f-52dade6c3e1e}" x="-1.850000" y="-2.500000" height="1.400000" drill="0.000000" rotation="0.000000" type="smd_rect" layer="200" width="1.400000">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{b6547b03-9f31-4029-aa96-fcf036b0ae43}" x="-1.850000" y="2.500000" height="1.400000" drill="0.000000" rotation="180.000000" type="smd_rect" layer="200" width="1.400000">
+            <name locale="en_US">4</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{76238209-9f34-406f-86c3-ecebf554c563}" x="0.000000" y="0.000000" height="2.600000" drill="0.000000" rotation="0.000000" type="smd_rect" layer="200" width="6.100000">
+            <name locale="en_US">HT</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{f849ad8f-b655-46bb-b881-61e007e1bf9a}" x="1.850000" y="-2.500000" height="1.400000" drill="0.000000" rotation="0.000000" type="smd_rect" layer="200" width="1.400000">
             <name locale="en_US">3</name>
             <description locale="en_US"/>
         </pad>
-        <pad height="1.400000" x="0.000000" drill="0.000000" uuid="{4418715e-b6db-4615-b938-024c929addbc}" y="-2.500000" rotation="0.000000" layer="200" width="1.300000" type="smd_rect">
+        <pad uuid="{4418715e-b6db-4615-b938-024c929addbc}" x="0.000000" y="-2.500000" height="1.400000" drill="0.000000" rotation="0.000000" type="smd_rect" layer="200" width="1.300000">
             <name locale="en_US">2</name>
-            <description locale="en_US"/>
-        </pad>
-        <pad height="1.400000" x="-1.850000" drill="0.000000" uuid="{b6547b03-9f31-4029-aa96-fcf036b0ae43}" y="2.500000" rotation="-180.000000" layer="200" width="1.400000" type="smd_rect">
-            <name locale="en_US">4</name>
             <description locale="en_US"/>
         </pad>
     </pads>

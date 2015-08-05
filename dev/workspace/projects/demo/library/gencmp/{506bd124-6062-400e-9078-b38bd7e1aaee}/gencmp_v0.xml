@@ -26,40 +26,40 @@
             <value locale="en_US">${INDUCTANCE}</value>
         </default_values>
         <prefixes>
-            <prefix norm="" default="true">L</prefix>
+            <prefix default="true" norm="">L</prefix>
         </prefixes>
     </properties>
     <signals>
-        <signal required="true" uuid="{777f11cd-9d4e-4b2b-aafa-7e7a836ff56e}" role="passive" forced_net_name="" clock="false" negated="false">
+        <signal negated="false" forced_net_name="" clock="false" uuid="{777f11cd-9d4e-4b2b-aafa-7e7a836ff56e}" required="true" role="passive">
             <name locale="en_US">1</name>
             <description locale="en_US"></description>
         </signal>
-        <signal required="true" uuid="{5b36d330-6f19-4391-8f95-1c2f6a658286}" role="passive" forced_net_name="" clock="false" negated="false">
+        <signal negated="false" forced_net_name="" clock="false" uuid="{5b36d330-6f19-4391-8f95-1c2f6a658286}" required="true" role="passive">
             <name locale="en_US">2</name>
             <description locale="en_US"></description>
         </signal>
     </signals>
     <symbol_variants>
-        <variant norm="IEC 60617" uuid="{62a7598c-17fe-41cf-8fa1-4ed274c3adc2}" default="true">
+        <variant default="true" norm="IEC 60617" uuid="{62a7598c-17fe-41cf-8fa1-4ed274c3adc2}">
             <name locale="en_US">European</name>
             <description locale="en_US"></description>
             <symbol_items>
-                <item required="true" uuid="{60cec411-a717-4893-b12f-7b698925e15b}" suffix="" symbol="{11e1f693-0777-48e4-b3bd-b451f3c929b3}">
+                <item suffix="" symbol="{11e1f693-0777-48e4-b3bd-b451f3c929b3}" uuid="{60cec411-a717-4893-b12f-7b698925e15b}" required="true">
                     <pin_signal_map>
-                        <map pin="{06d55f94-1316-48cb-a20f-0d4231eced31}" signal="{777f11cd-9d4e-4b2b-aafa-7e7a836ff56e}" display="none"/>
-                        <map pin="{1b2d8b3c-b531-48ec-a0f9-07e91687c214}" signal="{5b36d330-6f19-4391-8f95-1c2f6a658286}" display="none"/>
+                        <map pin="{1b2d8b3c-b531-48ec-a0f9-07e91687c214}" display="none" signal="{5b36d330-6f19-4391-8f95-1c2f6a658286}"/>
+                        <map pin="{06d55f94-1316-48cb-a20f-0d4231eced31}" display="none" signal="{777f11cd-9d4e-4b2b-aafa-7e7a836ff56e}"/>
                     </pin_signal_map>
                 </item>
             </symbol_items>
         </variant>
-        <variant norm="IEEE 315" uuid="{4245d515-6f6d-48cb-9958-a4ea23d0187f}" default="false">
+        <variant default="false" norm="IEEE 315" uuid="{4245d515-6f6d-48cb-9958-a4ea23d0187f}">
             <name locale="en_US">American</name>
             <description locale="en_US"></description>
             <symbol_items>
-                <item required="true" uuid="{1a96486c-cb0e-4bd2-81cc-926f7b1dd2e4}" suffix="" symbol="{d52c9a67-e522-4e17-8663-2b933b51f9fa}">
+                <item suffix="" symbol="{d52c9a67-e522-4e17-8663-2b933b51f9fa}" uuid="{1a96486c-cb0e-4bd2-81cc-926f7b1dd2e4}" required="true">
                     <pin_signal_map>
-                        <map pin="{d1587bb1-f5be-451c-b0ea-9298743dfc3d}" signal="{777f11cd-9d4e-4b2b-aafa-7e7a836ff56e}" display="none"/>
-                        <map pin="{7c8796e8-a731-4428-ad4e-a85eeeaf58d1}" signal="{5b36d330-6f19-4391-8f95-1c2f6a658286}" display="none"/>
+                        <map pin="{d1587bb1-f5be-451c-b0ea-9298743dfc3d}" display="none" signal="{777f11cd-9d4e-4b2b-aafa-7e7a836ff56e}"/>
+                        <map pin="{7c8796e8-a731-4428-ad4e-a85eeeaf58d1}" display="none" signal="{5b36d330-6f19-4391-8f95-1c2f6a658286}"/>
                     </pin_signal_map>
                 </item>
             </symbol_items>
