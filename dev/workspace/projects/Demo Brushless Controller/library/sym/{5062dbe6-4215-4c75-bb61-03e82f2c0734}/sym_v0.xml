@@ -12,27 +12,27 @@
     </meta>
     <categories/>
     <geometry>
-        <polygon start_x="-7.620000" start_y="-5.080000" fill="false" layer="10" width="0.254000" grab_area="true">
-            <segment end_x="-7.620000" end_y="2.540000" angle="0.000000"/>
-            <segment end_x="7.620000" end_y="2.540000" angle="0.000000"/>
-            <segment end_x="7.620000" end_y="-5.080000" angle="0.000000"/>
-            <segment end_x="-7.620000" end_y="-5.080000" angle="0.000000"/>
+        <polygon width="0.254000" start_x="-7.620000" start_y="-5.080000" fill="false" grab_area="true" layer="10">
+            <segment end_y="2.540000" angle="0.000000" end_x="-7.620000"/>
+            <segment end_y="2.540000" angle="0.000000" end_x="7.620000"/>
+            <segment end_y="-5.080000" angle="0.000000" end_x="7.620000"/>
+            <segment end_y="-5.080000" angle="0.000000" end_x="-7.620000"/>
         </polygon>
-        <text text="${SYM::NAME}" height="2.540000" h_align="left" layer="20" x="-7.620000" y="3.175000" v_align="bottom" rotation="0.000000"/>
-        <text text="${CMP::VALUE}" height="2.540000" h_align="right" layer="21" x="7.620000" y="3.175000" v_align="bottom" rotation="0.000000"/>
-        <text text="GND" height="2.540000" h_align="center" layer="20" x="0.000000" y="-4.318000" v_align="bottom" rotation="0.000000"/>
+        <text text="${SYM::NAME}" x="-7.620000" y="3.175000" h_align="left" rotation="0.000000" layer="20" v_align="bottom" height="2.540000"/>
+        <text text="${CMP::VALUE}" x="7.620000" y="3.175000" h_align="right" rotation="0.000000" layer="21" v_align="bottom" height="2.540000"/>
+        <text text="GND" x="0.000000" y="-4.318000" h_align="center" rotation="0.000000" layer="20" v_align="bottom" height="2.540000"/>
     </geometry>
     <pins>
-        <pin length="2.540000" x="10.160000" y="0.000000" uuid="{114de26b-3fe5-4a03-89ae-769ab7136879}" rotation="180.000000">
+        <pin x="10.160000" y="0.000000" rotation="180.000000" uuid="{114de26b-3fe5-4a03-89ae-769ab7136879}" length="2.540000">
             <name locale="en_US">OUT</name>
             <description locale="en_US"></description>
         </pin>
-        <pin length="2.540000" x="-10.160000" y="0.000000" uuid="{7ad364d0-7508-4dc4-92a3-cf996aa3d5f1}" rotation="0.000000">
-            <name locale="en_US">IN</name>
+        <pin x="0.000000" y="-7.620000" rotation="90.000000" uuid="{61bd9691-1775-4001-b8e3-e44cd98e685a}" length="2.540000">
+            <name locale="en_US">GND</name>
             <description locale="en_US"></description>
         </pin>
-        <pin length="2.540000" x="0.000000" y="-7.620000" uuid="{61bd9691-1775-4001-b8e3-e44cd98e685a}" rotation="90.000000">
-            <name locale="en_US">GND</name>
+        <pin x="-10.160000" y="0.000000" rotation="0.000000" uuid="{7ad364d0-7508-4dc4-92a3-cf996aa3d5f1}" length="2.540000">
+            <name locale="en_US">IN</name>
             <description locale="en_US"></description>
         </pin>
     </pins>

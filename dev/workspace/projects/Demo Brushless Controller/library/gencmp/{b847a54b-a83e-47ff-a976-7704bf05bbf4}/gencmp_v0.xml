@@ -14,7 +14,7 @@
         <category>{39d4b3d6-4168-4fe2-9420-fbf7eb3ac248}</category>
     </categories>
     <attributes>
-        <attribute unit="megahertz" type="frequency" key="FREQUENCY">
+        <attribute unit="megahertz" key="FREQUENCY" type="frequency">
             <name locale="en_US">Frequency</name>
             <description locale="en_US">The nominal frequency of the crystal.</description>
             <default_value locale="en_US"></default_value>
@@ -30,11 +30,11 @@
         </prefixes>
     </properties>
     <signals>
-        <signal negated="false" forced_net_name="" clock="false" uuid="{878301c2-bacc-4ffa-923c-ef5b1f06e5fe}" required="true" role="passive">
+        <signal forced_net_name="" role="passive" required="true" negated="false" uuid="{878301c2-bacc-4ffa-923c-ef5b1f06e5fe}" clock="false">
             <name locale="en_US">1</name>
             <description locale="en_US"></description>
         </signal>
-        <signal negated="false" forced_net_name="" clock="false" uuid="{fd760be8-09ce-411f-a869-fdc1e74229a9}" required="true" role="passive">
+        <signal forced_net_name="" role="passive" required="true" negated="false" uuid="{fd760be8-09ce-411f-a869-fdc1e74229a9}" clock="false">
             <name locale="en_US">2</name>
             <description locale="en_US"></description>
         </signal>
@@ -44,10 +44,10 @@
             <name locale="en_US">default</name>
             <description locale="en_US"></description>
             <symbol_items>
-                <item suffix="" symbol="{986f38ca-ea17-4c03-97a6-b7d5fc7d8012}" uuid="{2408ccc8-11f8-461c-9752-32f4383c2ff6}" required="true">
+                <item suffix="" symbol="{986f38ca-ea17-4c03-97a6-b7d5fc7d8012}" required="true" uuid="{2408ccc8-11f8-461c-9752-32f4383c2ff6}">
                     <pin_signal_map>
-                        <map pin="{2fa806c9-af1c-457c-a92f-3459e6131fbc}" display="none" signal="{fd760be8-09ce-411f-a869-fdc1e74229a9}"/>
-                        <map pin="{ac7d1cc8-4a9e-4936-ab7c-ed70c7347195}" display="none" signal="{878301c2-bacc-4ffa-923c-ef5b1f06e5fe}"/>
+                        <map signal="{878301c2-bacc-4ffa-923c-ef5b1f06e5fe}" pin="{ac7d1cc8-4a9e-4936-ab7c-ed70c7347195}" display="none"/>
+                        <map signal="{fd760be8-09ce-411f-a869-fdc1e74229a9}" pin="{2fa806c9-af1c-457c-a92f-3459e6131fbc}" display="none"/>
                     </pin_signal_map>
                 </item>
             </symbol_items>

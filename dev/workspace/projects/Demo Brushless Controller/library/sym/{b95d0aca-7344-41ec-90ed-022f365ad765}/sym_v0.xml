@@ -14,14 +14,14 @@
         <category>{00000000-0000-4001-8000-000000000000}</category>
     </categories>
     <geometry>
-        <polygon start_x="1.270000" start_y="-1.905000" fill="false" layer="10" width="0.254000" grab_area="false">
-            <segment end_x="0.000000" end_y="0.000000" angle="0.000000"/>
-            <segment end_x="-1.270000" end_y="-1.905000" angle="0.000000"/>
+        <polygon width="0.254000" start_x="1.270000" start_y="-1.905000" fill="false" grab_area="false" layer="10">
+            <segment end_y="0.000000" angle="0.000000" end_x="0.000000"/>
+            <segment end_y="-1.905000" angle="0.000000" end_x="-1.270000"/>
         </polygon>
-        <text text="${CMP::VALUE}" height="2.540000" h_align="center" layer="21" x="0.000000" y="0.000000" v_align="bottom" rotation="0.000000"/>
+        <text text="${CMP::VALUE}" x="0.000000" y="0.000000" h_align="center" rotation="0.000000" layer="21" v_align="bottom" height="2.540000"/>
     </geometry>
     <pins>
-        <pin length="2.540000" x="0.000000" y="-2.540000" uuid="{771c2d8b-e4ad-487b-bcb1-fe2bc10c8a03}" rotation="90.000000">
+        <pin x="0.000000" y="-2.540000" rotation="90.000000" uuid="{771c2d8b-e4ad-487b-bcb1-fe2bc10c8a03}" length="2.540000">
             <name locale="en_US">VCC</name>
             <description locale="en_US"></description>
         </pin>

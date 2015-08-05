@@ -4,8 +4,8 @@
         <uuid>{979e1c15-af4d-47fa-b92b-034293deab25}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-08-05T18:39:37Z</created>
-        <last_modified>2015-08-05T18:39:37Z</last_modified>
+        <created>2015-08-05T21:45:40Z</created>
+        <last_modified>2015-08-05T21:45:40Z</last_modified>
         <name locale="en_US">C182B</name>
         <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
 2-lead plasic, vertical
@@ -18,21 +18,21 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <geometry>
-        <polygon fill="false" grab_area="true" start_x="-2.286000" start_y="-1.270000" layer="170" width="0.152400">
-            <segment angle="0.000000" end_x="2.286000" end_y="-1.270000"/>
+        <polygon layer="170" start_x="-2.286000" fill="false" start_y="-1.270000" width="0.152400" grab_area="true">
+            <segment end_x="2.286000" end_y="-1.270000" angle="0.000000"/>
         </polygon>
-        <polygon fill="false" grab_area="true" start_x="-2.286000" start_y="-1.270000" layer="170" width="0.152400">
-            <segment angle="-239.051371" end_x="2.295500" end_y="-1.247400"/>
+        <polygon layer="170" start_x="-2.286000" fill="false" start_y="-1.270000" width="0.152400" grab_area="true">
+            <segment end_x="2.295500" end_y="-1.247400" angle="-239.051371"/>
         </polygon>
-        <text v_align="bottom" x="3.175000" y="0.635000" height="3.175000" text="${CMP::NAME}" rotation="0.000000" layer="150" h_align="left"/>
-        <text v_align="bottom" x="3.175000" y="-1.270000" height="2.500000" text="${CMP::VALUE}" rotation="0.000000" layer="160" h_align="left"/>
+        <text v_align="bottom" height="2.500000" layer="150" x="3.175000" rotation="0.000000" y="0.635000" text="${CMP::NAME}" h_align="left"/>
+        <text v_align="bottom" height="2.000000" layer="160" x="3.175000" rotation="0.000000" y="-1.270000" text="${CMP::VALUE}" h_align="left"/>
     </geometry>
     <pads>
-        <pad uuid="{23bc2524-a5c8-44fb-a9af-dd2d83f63a2a}" x="1.270000" y="0.000000" height="1.625600" drill="0.812800" rotation="0.000000" type="tht_octagon" layer="0" width="1.625600">
+        <pad uuid="{23bc2524-a5c8-44fb-a9af-dd2d83f63a2a}" height="1.625600" drill="0.812800" x="1.270000" rotation="0.000000" layer="0" y="0.000000" type="tht_octagon" width="1.625600">
             <name locale="en_US">A</name>
             <description locale="en_US"/>
         </pad>
-        <pad uuid="{2143a801-ce10-4b76-bcd3-58cfea1ca09e}" x="-1.270000" y="0.000000" height="1.625600" drill="0.812800" rotation="0.000000" type="tht_octagon" layer="0" width="1.625600">
+        <pad uuid="{2143a801-ce10-4b76-bcd3-58cfea1ca09e}" height="1.625600" drill="0.812800" x="-1.270000" rotation="0.000000" layer="0" y="0.000000" type="tht_octagon" width="1.625600">
             <name locale="en_US">C</name>
             <description locale="en_US"/>
         </pad>

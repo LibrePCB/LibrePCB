@@ -4,8 +4,8 @@
         <uuid>{362b5b4e-96dc-428c-b6e2-0d415cad5e18}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-08-05T18:39:33Z</created>
-        <last_modified>2015-08-05T18:39:33Z</last_modified>
+        <created>2015-08-05T21:45:35Z</created>
+        <last_modified>2015-08-05T21:45:35Z</last_modified>
         <name locale="en_US">MINI_MELF-0102AX</name>
         <description locale="en_US">&lt;b>Mini MELF 0102 Axial&lt;/b>
 
@@ -17,18 +17,18 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <geometry>
-        <text v_align="bottom" x="-1.270000" y="0.952500" height="3.175000" text="${CMP::NAME}" rotation="0.000000" layer="150" h_align="left"/>
-        <text v_align="bottom" x="-1.270000" y="-2.222500" height="2.500000" text="${CMP::VALUE}" rotation="0.000000" layer="160" h_align="left"/>
-        <ellipse x="0.000000" y="0.000000" radius_x="0.600000" radius_y="0.600000" fill="true" grab_area="true" rotation="0.000000" layer="110" width="0.000000"/>
-        <ellipse x="0.000000" y="0.000000" radius_x="0.600000" radius_y="0.600000" fill="true" grab_area="true" rotation="0.000000" layer="380" width="0.000000"/>
+        <text v_align="bottom" height="2.500000" layer="150" x="-1.270000" rotation="0.000000" y="0.952500" text="${CMP::NAME}" h_align="left"/>
+        <text v_align="bottom" height="2.000000" layer="160" x="-1.270000" rotation="0.000000" y="-2.222500" text="${CMP::VALUE}" h_align="left"/>
+        <ellipse radius_x="0.600000" radius_y="0.600000" layer="110" x="0.000000" rotation="0.000000" y="0.000000" fill="true" width="0.000000" grab_area="true"/>
+        <ellipse radius_x="0.600000" radius_y="0.600000" layer="380" x="0.000000" rotation="0.000000" y="0.000000" fill="true" width="0.000000" grab_area="true"/>
         <hole diameter="1.300000" x="0.000000" y="0.000000"/>
     </geometry>
     <pads>
-        <pad uuid="{7925d16a-c00a-4ae4-9372-66c2a4ff905e}" x="0.000000" y="0.000000" height="1.900000" drill="0.000000" rotation="0.000000" type="smd_rect" layer="200" width="1.900000">
+        <pad uuid="{7925d16a-c00a-4ae4-9372-66c2a4ff905e}" height="1.900000" drill="0.000000" x="0.000000" rotation="0.000000" layer="200" y="0.000000" type="smd_rect" width="1.900000">
             <name locale="en_US">1</name>
             <description locale="en_US"/>
         </pad>
-        <pad uuid="{3e7cded5-f0c6-4f70-aae1-7cabcf66dddc}" x="0.000000" y="0.000000" height="1.900000" drill="0.000000" rotation="0.000000" type="smd_rect" layer="299" width="1.900000">
+        <pad uuid="{3e7cded5-f0c6-4f70-aae1-7cabcf66dddc}" height="1.900000" drill="0.000000" x="0.000000" rotation="0.000000" layer="299" y="0.000000" type="smd_rect" width="1.900000">
             <name locale="en_US">2</name>
             <description locale="en_US"/>
         </pad>

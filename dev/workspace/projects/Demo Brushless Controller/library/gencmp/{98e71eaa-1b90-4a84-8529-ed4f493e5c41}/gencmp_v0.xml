@@ -29,7 +29,7 @@
             <name locale="en_US">A4 Landscape</name>
             <description locale="en_US"></description>
             <symbol_items>
-                <item suffix="" symbol="{f00ab942-6980-442b-86a8-51b92de5704d}" uuid="{6ca391c0-1c6d-4176-9607-31bf40d1b406}" required="true">
+                <item suffix="" symbol="{f00ab942-6980-442b-86a8-51b92de5704d}" required="true" uuid="{6ca391c0-1c6d-4176-9607-31bf40d1b406}">
                     <pin_signal_map/>
                 </item>
             </symbol_items>

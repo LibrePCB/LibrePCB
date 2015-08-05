@@ -24,7 +24,7 @@
         </prefixes>
     </properties>
     <signals>
-        <signal negated="false" forced_net_name="" clock="false" uuid="{ad6ae81a-7914-49b7-a87b-a0e8574b7398}" required="true" role="passive">
+        <signal forced_net_name="" role="passive" required="true" negated="false" uuid="{ad6ae81a-7914-49b7-a87b-a0e8574b7398}" clock="false">
             <name locale="en_US">1</name>
             <description locale="en_US"></description>
         </signal>
@@ -34,9 +34,9 @@
             <name locale="en_US">default</name>
             <description locale="en_US"></description>
             <symbol_items>
-                <item suffix="" symbol="{dce44427-4d53-4881-a77a-3e4faa383e3b}" uuid="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}" required="true">
+                <item suffix="" symbol="{dce44427-4d53-4881-a77a-3e4faa383e3b}" required="true" uuid="{c9c1fdcf-17cb-449d-8d27-2fe6ddd270ae}">
                     <pin_signal_map>
-                        <map pin="{01f564d5-9975-4613-bf90-153a031fe625}" display="none" signal="{ad6ae81a-7914-49b7-a87b-a0e8574b7398}"/>
+                        <map signal="{ad6ae81a-7914-49b7-a87b-a0e8574b7398}" pin="{01f564d5-9975-4613-bf90-153a031fe625}" display="none"/>
                     </pin_signal_map>
                 </item>
             </symbol_items>

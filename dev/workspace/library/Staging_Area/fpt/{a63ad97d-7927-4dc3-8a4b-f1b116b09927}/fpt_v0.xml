@@ -4,8 +4,8 @@
         <uuid>{a63ad97d-7927-4dc3-8a4b-f1b116b09927}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-08-05T18:39:32Z</created>
-        <last_modified>2015-08-05T18:39:32Z</last_modified>
+        <created>2015-08-05T21:45:35Z</created>
+        <last_modified>2015-08-05T21:45:35Z</last_modified>
         <name locale="en_US">MINI_MELF-0204W</name>
         <description locale="en_US">&lt;b>CECC Size RC3715&lt;/b> Wave Soldering&lt;p>
 source Beyschlag
@@ -18,28 +18,28 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <geometry>
-        <polygon fill="false" grab_area="true" start_x="0.684000" start_y="0.600000" layer="170" width="0.203200">
-            <segment angle="0.000000" end_x="-0.684000" end_y="0.600000"/>
+        <polygon layer="170" start_x="0.684000" fill="false" start_y="0.600000" width="0.203200" grab_area="true">
+            <segment end_x="-0.684000" end_y="0.600000" angle="0.000000"/>
         </polygon>
-        <polygon fill="false" grab_area="true" start_x="-0.684000" start_y="-0.600000" layer="170" width="0.203200">
-            <segment angle="0.000000" end_x="0.684000" end_y="-0.600000"/>
+        <polygon layer="170" start_x="-0.684000" fill="false" start_y="-0.600000" width="0.203200" grab_area="true">
+            <segment end_x="0.684000" end_y="-0.600000" angle="0.000000"/>
         </polygon>
-        <polygon fill="false" grab_area="true" start_x="1.700000" start_y="0.600000" layer="110" width="0.203200">
-            <segment angle="0.000000" end_x="1.700000" end_y="-0.600000"/>
-            <segment angle="0.000000" end_x="-1.700000" end_y="-0.600000"/>
-            <segment angle="0.000000" end_x="-1.700000" end_y="0.600000"/>
-            <segment angle="0.000000" end_x="1.700000" end_y="0.600000"/>
+        <polygon layer="110" start_x="1.700000" fill="false" start_y="0.600000" width="0.203200" grab_area="true">
+            <segment end_x="1.700000" end_y="-0.600000" angle="0.000000"/>
+            <segment end_x="-1.700000" end_y="-0.600000" angle="0.000000"/>
+            <segment end_x="-1.700000" end_y="0.600000" angle="0.000000"/>
+            <segment end_x="1.700000" end_y="0.600000" angle="0.000000"/>
         </polygon>
-        <text v_align="bottom" x="-1.270000" y="0.952500" height="3.175000" text="${CMP::NAME}" rotation="0.000000" layer="150" h_align="left"/>
-        <text v_align="bottom" x="-1.270000" y="-2.222500" height="2.500000" text="${CMP::VALUE}" rotation="0.000000" layer="160" h_align="left"/>
+        <text v_align="bottom" height="2.500000" layer="150" x="-1.270000" rotation="0.000000" y="0.952500" text="${CMP::NAME}" h_align="left"/>
+        <text v_align="bottom" height="2.000000" layer="160" x="-1.270000" rotation="0.000000" y="-2.222500" text="${CMP::VALUE}" h_align="left"/>
     </geometry>
     <pads>
-        <pad uuid="{18c72503-1acc-4cc8-8fea-6b7ee156cdc9}" x="-1.500000" y="0.000000" height="1.600000" drill="0.000000" rotation="0.000000" type="smd_rect" layer="200" width="1.200000">
-            <name locale="en_US">1</name>
+        <pad uuid="{9322b215-d536-492c-8c48-06215ff2a210}" height="1.600000" drill="0.000000" x="1.500000" rotation="0.000000" layer="200" y="0.000000" type="smd_rect" width="1.200000">
+            <name locale="en_US">2</name>
             <description locale="en_US"/>
         </pad>
-        <pad uuid="{9322b215-d536-492c-8c48-06215ff2a210}" x="1.500000" y="0.000000" height="1.600000" drill="0.000000" rotation="0.000000" type="smd_rect" layer="200" width="1.200000">
-            <name locale="en_US">2</name>
+        <pad uuid="{18c72503-1acc-4cc8-8fea-6b7ee156cdc9}" height="1.600000" drill="0.000000" x="-1.500000" rotation="0.000000" layer="200" y="0.000000" type="smd_rect" width="1.200000">
+            <name locale="en_US">1</name>
             <description locale="en_US"/>
         </pad>
     </pads>

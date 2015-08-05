@@ -24,7 +24,7 @@
         </prefixes>
     </properties>
     <signals>
-        <signal negated="false" forced_net_name="${CMP::VALUE}" clock="false" uuid="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}" required="true" role="power">
+        <signal forced_net_name="${CMP::VALUE}" role="power" required="true" negated="false" uuid="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}" clock="false">
             <name locale="en_US">Net</name>
             <description locale="en_US"></description>
         </signal>
@@ -34,9 +34,9 @@
             <name locale="en_US">Default</name>
             <description locale="en_US"></description>
             <symbol_items>
-                <item suffix="" symbol="{80f8cd68-69d9-43c4-9ed2-da32ca714b10}" uuid="{0539fd52-890f-48af-97a9-bacfb79c9475}" required="true">
+                <item suffix="" symbol="{80f8cd68-69d9-43c4-9ed2-da32ca714b10}" required="true" uuid="{0539fd52-890f-48af-97a9-bacfb79c9475}">
                     <pin_signal_map>
-                        <map pin="{abcc319b-d09f-437b-a624-3dcf3eff5792}" display="none" signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}"/>
+                        <map signal="{ff161c97-29a5-43aa-a9ae-3ca7a66982ce}" pin="{abcc319b-d09f-437b-a624-3dcf3eff5792}" display="none"/>
                     </pin_signal_map>
                 </item>
             </symbol_items>

@@ -14,7 +14,7 @@
         <category>{1039f038-20a6-4bfe-89c1-99f34fbb45bd}</category>
     </categories>
     <attributes>
-        <attribute unit="ohm" type="resistance" key="RESISTANCE">
+        <attribute unit="ohm" key="RESISTANCE" type="resistance">
             <name locale="en_US">Resistance</name>
             <description locale="en_US">The nominal resistance of the resistor.</description>
             <default_value locale="en_US"></default_value>
@@ -30,11 +30,11 @@
         </prefixes>
     </properties>
     <signals>
-        <signal negated="false" forced_net_name="" clock="false" uuid="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}" required="true" role="passive">
+        <signal forced_net_name="" role="passive" required="true" negated="false" uuid="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}" clock="false">
             <name locale="en_US">1</name>
             <description locale="en_US"></description>
         </signal>
-        <signal negated="false" forced_net_name="" clock="false" uuid="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}" required="true" role="passive">
+        <signal forced_net_name="" role="passive" required="true" negated="false" uuid="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}" clock="false">
             <name locale="en_US">2</name>
             <description locale="en_US"></description>
         </signal>
@@ -44,10 +44,10 @@
             <name locale="en_US">European</name>
             <description locale="en_US"></description>
             <symbol_items>
-                <item suffix="" symbol="{75372c18-3ba4-42e8-b3b2-2eb5039d441e}" uuid="{5988c66a-f507-487e-9b40-486502e8c9bd}" required="true">
+                <item suffix="" symbol="{75372c18-3ba4-42e8-b3b2-2eb5039d441e}" required="true" uuid="{5988c66a-f507-487e-9b40-486502e8c9bd}">
                     <pin_signal_map>
-                        <map pin="{2e4f8b10-ad5a-443e-b408-e183efaa4758}" display="none" signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
-                        <map pin="{2731f213-ee20-4eb0-a18b-ad97d9fea7a0}" display="none" signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
+                        <map signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}" pin="{2731f213-ee20-4eb0-a18b-ad97d9fea7a0}" display="none"/>
+                        <map signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}" pin="{2e4f8b10-ad5a-443e-b408-e183efaa4758}" display="none"/>
                     </pin_signal_map>
                 </item>
             </symbol_items>
@@ -56,10 +56,10 @@
             <name locale="en_US">American</name>
             <description locale="en_US"></description>
             <symbol_items>
-                <item suffix="" symbol="{193ef70d-8dab-4a6c-a672-274c5bf09b68}" uuid="{169660fd-968a-4d3e-83f5-47f973b4ecd8}" required="true">
+                <item suffix="" symbol="{193ef70d-8dab-4a6c-a672-274c5bf09b68}" required="true" uuid="{169660fd-968a-4d3e-83f5-47f973b4ecd8}">
                     <pin_signal_map>
-                        <map pin="{f42020e8-c53f-4ff2-947e-07879cf42546}" display="none" signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
-                        <map pin="{2b3dd7f8-043b-4d43-9302-9300ba356de7}" display="none" signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
+                        <map signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}" pin="{f42020e8-c53f-4ff2-947e-07879cf42546}" display="none"/>
+                        <map signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}" pin="{2b3dd7f8-043b-4d43-9302-9300ba356de7}" display="none"/>
                     </pin_signal_map>
                 </item>
             </symbol_items>

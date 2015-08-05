@@ -4,8 +4,8 @@
         <uuid>{cbfb3ab4-bba4-484a-8a7d-68121d02cebb}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-08-05T18:39:39Z</created>
-        <last_modified>2015-08-05T18:39:39Z</last_modified>
+        <created>2015-08-05T21:45:42Z</created>
+        <last_modified>2015-08-05T21:45:42Z</last_modified>
         <name locale="en_US">LED_BLINK</name>
         <description locale="en_US">&lt;B>LED BLINK&lt;/B>
 Symbol for Silkscreen layer
@@ -18,31 +18,31 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <geometry>
-        <polygon fill="false" grab_area="true" start_x="0.000000" start_y="0.762000" layer="170" width="0.127000">
-            <segment angle="0.000000" end_x="0.000000" end_y="1.270000"/>
+        <polygon layer="170" start_x="0.000000" fill="false" start_y="0.762000" width="0.127000" grab_area="true">
+            <segment end_x="0.000000" end_y="1.270000" angle="0.000000"/>
         </polygon>
-        <polygon fill="false" grab_area="true" start_x="0.000000" start_y="-0.762000" layer="170" width="0.127000">
-            <segment angle="0.000000" end_x="0.000000" end_y="-1.270000"/>
+        <polygon layer="170" start_x="0.000000" fill="false" start_y="-0.762000" width="0.127000" grab_area="true">
+            <segment end_x="0.000000" end_y="-1.270000" angle="0.000000"/>
         </polygon>
-        <polygon fill="false" grab_area="true" start_x="0.762000" start_y="0.000000" layer="170" width="0.127000">
-            <segment angle="0.000000" end_x="1.270000" end_y="0.000000"/>
+        <polygon layer="170" start_x="0.762000" fill="false" start_y="0.000000" width="0.127000" grab_area="true">
+            <segment end_x="1.270000" end_y="0.000000" angle="0.000000"/>
         </polygon>
-        <polygon fill="false" grab_area="true" start_x="-0.556900" start_y="-0.557000" layer="170" width="0.127000">
-            <segment angle="0.000000" end_x="-0.916200" end_y="-0.916200"/>
+        <polygon layer="170" start_x="-0.556900" fill="false" start_y="-0.557000" width="0.127000" grab_area="true">
+            <segment end_x="-0.916200" end_y="-0.916200" angle="0.000000"/>
         </polygon>
-        <polygon fill="false" grab_area="true" start_x="-0.762000" start_y="0.000000" layer="170" width="0.127000">
-            <segment angle="0.000000" end_x="-1.270000" end_y="0.000000"/>
+        <polygon layer="170" start_x="-0.762000" fill="false" start_y="0.000000" width="0.127000" grab_area="true">
+            <segment end_x="-1.270000" end_y="0.000000" angle="0.000000"/>
         </polygon>
-        <polygon fill="false" grab_area="true" start_x="-0.920500" start_y="0.920500" layer="170" width="0.127000">
-            <segment angle="0.000000" end_x="-0.561300" end_y="0.561400"/>
+        <polygon layer="170" start_x="-0.920500" fill="false" start_y="0.920500" width="0.127000" grab_area="true">
+            <segment end_x="-0.561300" end_y="0.561400" angle="0.000000"/>
         </polygon>
-        <polygon fill="false" grab_area="true" start_x="0.913100" start_y="0.917400" layer="170" width="0.127000">
-            <segment angle="0.000000" end_x="0.554000" end_y="0.558200"/>
+        <polygon layer="170" start_x="0.913100" fill="false" start_y="0.917400" width="0.127000" grab_area="true">
+            <segment end_x="0.554000" end_y="0.558200" angle="0.000000"/>
         </polygon>
-        <polygon fill="false" grab_area="true" start_x="0.558200" start_y="-0.547800" layer="170" width="0.127000">
-            <segment angle="0.000000" end_x="0.917400" end_y="-0.906900"/>
+        <polygon layer="170" start_x="0.558200" fill="false" start_y="-0.547800" width="0.127000" grab_area="true">
+            <segment end_x="0.917400" end_y="-0.906900" angle="0.000000"/>
         </polygon>
-        <ellipse x="0.000000" y="0.000000" radius_x="0.762000" radius_y="0.762000" fill="false" grab_area="true" rotation="0.000000" layer="170" width="0.127000"/>
+        <ellipse radius_x="0.762000" radius_y="0.762000" layer="170" x="0.000000" rotation="0.000000" y="0.000000" fill="false" width="0.127000" grab_area="true"/>
     </geometry>
     <pads/>
 </footprint>

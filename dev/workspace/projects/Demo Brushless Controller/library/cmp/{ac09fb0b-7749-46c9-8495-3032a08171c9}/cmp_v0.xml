@@ -19,6 +19,6 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map signal="{ad6ae81a-7914-49b7-a87b-a0e8574b7398}" pad="{58788f1b-2136-49a6-b2b0-a9fc72617f49}"/>
+        <map pad="{58788f1b-2136-49a6-b2b0-a9fc72617f49}" signal="{ad6ae81a-7914-49b7-a87b-a0e8574b7398}"/>
     </pad_signal_map>
 </component>

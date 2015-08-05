@@ -4,8 +4,8 @@
         <uuid>{43ad353f-9807-4396-b3a5-04ec5f3de3a9}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-08-05T18:39:34Z</created>
-        <last_modified>2015-08-05T18:39:34Z</last_modified>
+        <created>2015-08-05T21:45:37Z</created>
+        <last_modified>2015-08-05T21:45:37Z</last_modified>
         <name locale="en_US">WSC0001</name>
         <description locale="en_US">&lt;b>Wirewound Resistors, Precision Power&lt;/b>&lt;p>
 Source: VISHAY wscwsn.pdf
@@ -18,33 +18,33 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <geometry>
-        <polygon fill="false" grab_area="true" start_x="-3.075000" start_y="1.800000" layer="170" width="0.203200">
-            <segment angle="0.000000" end_x="-3.075000" end_y="1.606000"/>
+        <polygon layer="170" start_x="-3.075000" fill="false" start_y="1.800000" width="0.203200" grab_area="true">
+            <segment end_x="-3.075000" end_y="1.606000" angle="0.000000"/>
         </polygon>
-        <polygon fill="false" grab_area="true" start_x="-3.075000" start_y="-1.606000" layer="170" width="0.203200">
-            <segment angle="0.000000" end_x="-3.075000" end_y="-1.800000"/>
+        <polygon layer="170" start_x="-3.075000" fill="false" start_y="-1.606000" width="0.203200" grab_area="true">
+            <segment end_x="-3.075000" end_y="-1.800000" angle="0.000000"/>
         </polygon>
-        <polygon fill="false" grab_area="true" start_x="3.075000" start_y="1.606000" layer="170" width="0.203200">
-            <segment angle="0.000000" end_x="3.075000" end_y="1.800000"/>
+        <polygon layer="170" start_x="3.075000" fill="false" start_y="1.606000" width="0.203200" grab_area="true">
+            <segment end_x="3.075000" end_y="1.800000" angle="0.000000"/>
         </polygon>
-        <polygon fill="false" grab_area="true" start_x="3.075000" start_y="-1.800000" layer="170" width="0.203200">
-            <segment angle="0.000000" end_x="3.075000" end_y="-1.606000"/>
+        <polygon layer="170" start_x="3.075000" fill="false" start_y="-1.800000" width="0.203200" grab_area="true">
+            <segment end_x="3.075000" end_y="-1.606000" angle="0.000000"/>
         </polygon>
-        <polygon fill="false" grab_area="true" start_x="-3.075000" start_y="-1.800000" layer="170" width="0.203200">
-            <segment angle="0.000000" end_x="-3.075000" end_y="1.800000"/>
-            <segment angle="0.000000" end_x="3.075000" end_y="1.800000"/>
-            <segment angle="0.000000" end_x="3.075000" end_y="-1.800000"/>
-            <segment angle="0.000000" end_x="-3.075000" end_y="-1.800000"/>
+        <polygon layer="170" start_x="-3.075000" fill="false" start_y="1.800000" width="0.203200" grab_area="true">
+            <segment end_x="-3.075000" end_y="-1.800000" angle="0.000000"/>
+            <segment end_x="3.075000" end_y="-1.800000" angle="0.000000"/>
+            <segment end_x="3.075000" end_y="1.800000" angle="0.000000"/>
+            <segment end_x="-3.075000" end_y="1.800000" angle="0.000000"/>
         </polygon>
-        <text v_align="bottom" x="-2.544000" y="2.229000" height="3.175000" text="${CMP::NAME}" rotation="0.000000" layer="150" h_align="left"/>
-        <text v_align="bottom" x="-2.544000" y="-3.501000" height="2.500000" text="${CMP::VALUE}" rotation="0.000000" layer="160" h_align="left"/>
+        <text v_align="bottom" height="2.500000" layer="150" x="-2.544000" rotation="0.000000" y="2.229000" text="${CMP::NAME}" h_align="left"/>
+        <text v_align="bottom" height="2.000000" layer="160" x="-2.544000" rotation="0.000000" y="-3.501000" text="${CMP::VALUE}" h_align="left"/>
     </geometry>
     <pads>
-        <pad uuid="{558a4ffb-6b15-48cf-b77f-2c3576bdae10}" x="-2.675000" y="0.000000" height="2.920000" drill="0.000000" rotation="0.000000" type="smd_rect" layer="200" width="2.290000">
+        <pad uuid="{558a4ffb-6b15-48cf-b77f-2c3576bdae10}" height="2.920000" drill="0.000000" x="-2.675000" rotation="0.000000" layer="200" y="0.000000" type="smd_rect" width="2.290000">
             <name locale="en_US">1</name>
             <description locale="en_US"/>
         </pad>
-        <pad uuid="{4fd6d6c6-99a6-4e16-98fb-42da121ed85b}" x="2.675000" y="0.000000" height="2.920000" drill="0.000000" rotation="0.000000" type="smd_rect" layer="200" width="2.290000">
+        <pad uuid="{4fd6d6c6-99a6-4e16-98fb-42da121ed85b}" height="2.920000" drill="0.000000" x="2.675000" rotation="0.000000" layer="200" y="0.000000" type="smd_rect" width="2.290000">
             <name locale="en_US">2</name>
             <description locale="en_US"/>
         </pad>

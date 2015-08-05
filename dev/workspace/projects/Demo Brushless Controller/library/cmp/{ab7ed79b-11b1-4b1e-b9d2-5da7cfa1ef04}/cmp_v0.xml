@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map signal="{af3ffca8-0085-4edb-a775-fcb759f63411}" pad="{3089381d-81e4-48da-a2b7-339588281b9b}"/>
-        <map signal="{e010ecbb-6210-4da3-9270-ebd58656dbf0}" pad="{429a4d23-068f-46cf-ace8-80a30af4999e}"/>
+        <map pad="{3089381d-81e4-48da-a2b7-339588281b9b}" signal="{af3ffca8-0085-4edb-a775-fcb759f63411}"/>
+        <map pad="{429a4d23-068f-46cf-ace8-80a30af4999e}" signal="{e010ecbb-6210-4da3-9270-ebd58656dbf0}"/>
     </pad_signal_map>
 </component>

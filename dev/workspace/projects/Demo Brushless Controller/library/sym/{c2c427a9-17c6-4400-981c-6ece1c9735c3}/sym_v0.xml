@@ -12,30 +12,30 @@
     </meta>
     <categories/>
     <geometry>
-        <polygon start_x="-1.270000" start_y="-1.270000" fill="false" layer="10" width="0.254000" grab_area="true">
-            <segment end_x="1.270000" end_y="0.000000" angle="0.000000"/>
-            <segment end_x="-1.270000" end_y="1.270000" angle="0.000000"/>
-            <segment end_x="-1.270000" end_y="-1.270000" angle="0.000000"/>
+        <polygon width="0.254000" start_x="-1.270000" start_y="-1.270000" fill="false" grab_area="true" layer="10">
+            <segment end_y="0.000000" angle="0.000000" end_x="1.270000"/>
+            <segment end_y="1.270000" angle="0.000000" end_x="-1.270000"/>
+            <segment end_y="-1.270000" angle="0.000000" end_x="-1.270000"/>
         </polygon>
-        <polygon start_x="1.270000" start_y="1.270000" fill="false" layer="10" width="0.254000" grab_area="true">
-            <segment end_x="1.270000" end_y="-1.270000" angle="0.000000"/>
+        <polygon width="0.254000" start_x="1.270000" start_y="1.270000" fill="false" grab_area="true" layer="10">
+            <segment end_y="-1.270000" angle="0.000000" end_x="1.270000"/>
         </polygon>
-        <polygon start_x="1.270000" start_y="1.270000" fill="false" layer="10" width="0.254000" grab_area="true">
-            <segment end_x="0.635000" end_y="1.270000" angle="0.000000"/>
+        <polygon width="0.254000" start_x="1.270000" start_y="1.270000" fill="false" grab_area="true" layer="10">
+            <segment end_y="1.270000" angle="0.000000" end_x="0.635000"/>
         </polygon>
-        <polygon start_x="1.270000" start_y="-1.270000" fill="false" layer="10" width="0.254000" grab_area="true">
-            <segment end_x="1.905000" end_y="-1.270000" angle="0.000000"/>
+        <polygon width="0.254000" start_x="1.270000" start_y="-1.270000" fill="false" grab_area="true" layer="10">
+            <segment end_y="-1.270000" angle="0.000000" end_x="1.905000"/>
         </polygon>
-        <text text="${SYM::NAME}" height="2.540000" h_align="left" layer="20" x="-1.270000" y="1.270000" v_align="bottom" rotation="0.000000"/>
-        <text text="${CMP::VALUE}" height="2.540000" h_align="left" layer="21" x="-1.270000" y="-1.270000" v_align="top" rotation="0.000000"/>
+        <text text="${SYM::NAME}" x="-1.270000" y="1.270000" h_align="left" rotation="0.000000" layer="20" v_align="bottom" height="2.540000"/>
+        <text text="${CMP::VALUE}" x="-1.270000" y="-1.270000" h_align="left" rotation="0.000000" layer="21" v_align="top" height="2.540000"/>
     </geometry>
     <pins>
-        <pin length="2.540000" x="2.540000" y="0.000000" uuid="{e433fe3f-c104-4bc8-9e93-312bea6dd368}" rotation="180.000000">
-            <name locale="en_US">C</name>
+        <pin x="-2.540000" y="0.000000" rotation="0.000000" uuid="{b03c23a6-4890-42b5-ad6a-4b4fe1f77fbd}" length="2.540000">
+            <name locale="en_US">A</name>
             <description locale="en_US"></description>
         </pin>
-        <pin length="2.540000" x="-2.540000" y="0.000000" uuid="{b03c23a6-4890-42b5-ad6a-4b4fe1f77fbd}" rotation="0.000000">
-            <name locale="en_US">A</name>
+        <pin x="2.540000" y="0.000000" rotation="180.000000" uuid="{e433fe3f-c104-4bc8-9e93-312bea6dd368}" length="2.540000">
+            <name locale="en_US">C</name>
             <description locale="en_US"></description>
         </pin>
     </pins>

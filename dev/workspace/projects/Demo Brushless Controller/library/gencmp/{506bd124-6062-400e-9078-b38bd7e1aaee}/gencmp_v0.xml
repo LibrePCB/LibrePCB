@@ -14,7 +14,7 @@
         <category>{b3adfa1e-b878-44f6-902a-14ef3dad7a14}</category>
     </categories>
     <attributes>
-        <attribute unit="millihenry" type="inductance" key="INDUCTANCE">
+        <attribute unit="millihenry" key="INDUCTANCE" type="inductance">
             <name locale="en_US">Inductance</name>
             <description locale="en_US">The nominal inductance of the inductor.</description>
             <default_value locale="en_US"></default_value>
@@ -30,11 +30,11 @@
         </prefixes>
     </properties>
     <signals>
-        <signal negated="false" forced_net_name="" clock="false" uuid="{777f11cd-9d4e-4b2b-aafa-7e7a836ff56e}" required="true" role="passive">
+        <signal forced_net_name="" role="passive" required="true" negated="false" uuid="{777f11cd-9d4e-4b2b-aafa-7e7a836ff56e}" clock="false">
             <name locale="en_US">1</name>
             <description locale="en_US"></description>
         </signal>
-        <signal negated="false" forced_net_name="" clock="false" uuid="{5b36d330-6f19-4391-8f95-1c2f6a658286}" required="true" role="passive">
+        <signal forced_net_name="" role="passive" required="true" negated="false" uuid="{5b36d330-6f19-4391-8f95-1c2f6a658286}" clock="false">
             <name locale="en_US">2</name>
             <description locale="en_US"></description>
         </signal>
@@ -44,10 +44,10 @@
             <name locale="en_US">European</name>
             <description locale="en_US"></description>
             <symbol_items>
-                <item suffix="" symbol="{11e1f693-0777-48e4-b3bd-b451f3c929b3}" uuid="{60cec411-a717-4893-b12f-7b698925e15b}" required="true">
+                <item suffix="" symbol="{11e1f693-0777-48e4-b3bd-b451f3c929b3}" required="true" uuid="{60cec411-a717-4893-b12f-7b698925e15b}">
                     <pin_signal_map>
-                        <map pin="{1b2d8b3c-b531-48ec-a0f9-07e91687c214}" display="none" signal="{5b36d330-6f19-4391-8f95-1c2f6a658286}"/>
-                        <map pin="{06d55f94-1316-48cb-a20f-0d4231eced31}" display="none" signal="{777f11cd-9d4e-4b2b-aafa-7e7a836ff56e}"/>
+                        <map signal="{5b36d330-6f19-4391-8f95-1c2f6a658286}" pin="{1b2d8b3c-b531-48ec-a0f9-07e91687c214}" display="none"/>
+                        <map signal="{777f11cd-9d4e-4b2b-aafa-7e7a836ff56e}" pin="{06d55f94-1316-48cb-a20f-0d4231eced31}" display="none"/>
                     </pin_signal_map>
                 </item>
             </symbol_items>
@@ -56,10 +56,10 @@
             <name locale="en_US">American</name>
             <description locale="en_US"></description>
             <symbol_items>
-                <item suffix="" symbol="{d52c9a67-e522-4e17-8663-2b933b51f9fa}" uuid="{1a96486c-cb0e-4bd2-81cc-926f7b1dd2e4}" required="true">
+                <item suffix="" symbol="{d52c9a67-e522-4e17-8663-2b933b51f9fa}" required="true" uuid="{1a96486c-cb0e-4bd2-81cc-926f7b1dd2e4}">
                     <pin_signal_map>
-                        <map pin="{d1587bb1-f5be-451c-b0ea-9298743dfc3d}" display="none" signal="{777f11cd-9d4e-4b2b-aafa-7e7a836ff56e}"/>
-                        <map pin="{7c8796e8-a731-4428-ad4e-a85eeeaf58d1}" display="none" signal="{5b36d330-6f19-4391-8f95-1c2f6a658286}"/>
+                        <map signal="{5b36d330-6f19-4391-8f95-1c2f6a658286}" pin="{7c8796e8-a731-4428-ad4e-a85eeeaf58d1}" display="none"/>
+                        <map signal="{777f11cd-9d4e-4b2b-aafa-7e7a836ff56e}" pin="{d1587bb1-f5be-451c-b0ea-9298743dfc3d}" display="none"/>
                     </pin_signal_map>
                 </item>
             </symbol_items>

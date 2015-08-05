@@ -14,26 +14,26 @@
         <category>{00000000-0000-4001-8000-000000000000}</category>
     </categories>
     <geometry>
-        <polygon start_x="-3.080000" start_y="0.000000" fill="false" layer="10" width="0.203200" grab_area="false">
-            <segment end_x="-2.695000" end_y="1.016000" angle="0.000000"/>
-            <segment end_x="-1.925000" end_y="-1.016000" angle="0.000000"/>
-            <segment end_x="-1.155000" end_y="1.016000" angle="0.000000"/>
-            <segment end_x="-0.385000" end_y="-1.016000" angle="0.000000"/>
-            <segment end_x="0.385000" end_y="1.016000" angle="0.000000"/>
-            <segment end_x="1.155000" end_y="-1.016000" angle="0.000000"/>
-            <segment end_x="1.925000" end_y="1.016000" angle="0.000000"/>
-            <segment end_x="2.695000" end_y="-1.016000" angle="0.000000"/>
-            <segment end_x="3.080000" end_y="0.000000" angle="0.000000"/>
+        <polygon width="0.203200" start_x="-3.080000" start_y="0.000000" fill="false" grab_area="false" layer="10">
+            <segment end_y="1.016000" angle="0.000000" end_x="-2.695000"/>
+            <segment end_y="-1.016000" angle="0.000000" end_x="-1.925000"/>
+            <segment end_y="1.016000" angle="0.000000" end_x="-1.155000"/>
+            <segment end_y="-1.016000" angle="0.000000" end_x="-0.385000"/>
+            <segment end_y="1.016000" angle="0.000000" end_x="0.385000"/>
+            <segment end_y="-1.016000" angle="0.000000" end_x="1.155000"/>
+            <segment end_y="1.016000" angle="0.000000" end_x="1.925000"/>
+            <segment end_y="-1.016000" angle="0.000000" end_x="2.695000"/>
+            <segment end_y="0.000000" angle="0.000000" end_x="3.080000"/>
         </polygon>
-        <text text="${SYM::NAME}" height="2.540000" h_align="left" layer="20" x="-3.080000" y="1.016000" v_align="bottom" rotation="0.000000"/>
-        <text text="${CMP::VALUE}" height="2.540000" h_align="left" layer="21" x="-3.080000" y="-1.016000" v_align="top" rotation="0.000000"/>
+        <text text="${SYM::NAME}" x="-3.080000" y="1.016000" h_align="left" rotation="0.000000" layer="20" v_align="bottom" height="2.540000"/>
+        <text text="${CMP::VALUE}" x="-3.080000" y="-1.016000" h_align="left" rotation="0.000000" layer="21" v_align="top" height="2.540000"/>
     </geometry>
     <pins>
-        <pin length="2.000000" x="-5.080000" y="0.000000" uuid="{f42020e8-c53f-4ff2-947e-07879cf42546}" rotation="0.000000">
+        <pin x="-5.080000" y="0.000000" rotation="0.000000" uuid="{f42020e8-c53f-4ff2-947e-07879cf42546}" length="2.000000">
             <name locale="en_US">1</name>
             <description locale="en_US"></description>
         </pin>
-        <pin length="2.000000" x="5.080000" y="0.000000" uuid="{2b3dd7f8-043b-4d43-9302-9300ba356de7}" rotation="180.000000">
+        <pin x="5.080000" y="0.000000" rotation="180.000000" uuid="{2b3dd7f8-043b-4d43-9302-9300ba356de7}" length="2.000000">
             <name locale="en_US">2</name>
             <description locale="en_US"></description>
         </pin>

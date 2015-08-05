@@ -4,8 +4,8 @@
         <uuid>{995e964d-1be7-44d3-a13a-0c79cdb54aac}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-08-05T18:39:37Z</created>
-        <last_modified>2015-08-05T18:39:37Z</last_modified>
+        <created>2015-08-05T21:45:39Z</created>
+        <last_modified>2015-08-05T21:45:39Z</last_modified>
         <name locale="en_US">SON-10</name>
         <description locale="en_US">&lt;b>SON 10 Pin&lt;/b>&lt;p>
 Source: &lt;a href="http://www.mcrystal.ch/CMSPages/GetFile.aspx?nodeguid=c85958d8-94ca-4325-87c5-e65a30ad4bd5"> Data shhet &lt;/a>
@@ -18,53 +18,53 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <geometry>
-        <polygon fill="false" grab_area="true" start_x="1.500000" start_y="2.400000" layer="110" width="0.203200">
-            <segment angle="0.000000" end_x="1.500000" end_y="-2.400000"/>
-            <segment angle="0.000000" end_x="-1.500000" end_y="-2.400000"/>
-            <segment angle="0.000000" end_x="-1.500000" end_y="2.400000"/>
-            <segment angle="0.000000" end_x="1.500000" end_y="2.400000"/>
+        <polygon layer="110" start_x="-1.500000" fill="false" start_y="2.400000" width="0.203200" grab_area="true">
+            <segment end_x="-1.500000" end_y="-2.400000" angle="0.000000"/>
+            <segment end_x="1.500000" end_y="-2.400000" angle="0.000000"/>
+            <segment end_x="1.500000" end_y="2.400000" angle="0.000000"/>
+            <segment end_x="-1.500000" end_y="2.400000" angle="0.000000"/>
         </polygon>
-        <ellipse x="-0.750000" y="1.800000" radius_x="0.301000" radius_y="0.301000" fill="true" grab_area="true" rotation="0.000000" layer="170" width="0.000000"/>
+        <ellipse radius_x="0.301000" radius_y="0.301000" layer="170" x="-0.750000" rotation="0.000000" y="1.800000" fill="true" width="0.000000" grab_area="true"/>
     </geometry>
     <pads>
-        <pad uuid="{19bc1fd7-010a-4236-9984-64385a7050b3}" x="1.550000" y="-1.000000" height="0.600000" drill="0.000000" rotation="180.000000" type="smd_rect" layer="200" width="0.900000">
+        <pad uuid="{19bc1fd7-010a-4236-9984-64385a7050b3}" height="0.600000" drill="0.000000" x="1.550000" rotation="180.000000" layer="200" y="-1.000000" type="smd_rect" width="0.900000">
             <name locale="en_US">7</name>
             <description locale="en_US"/>
         </pad>
-        <pad uuid="{9458a40a-2c13-4397-a85b-5f9b704006cf}" x="1.550000" y="2.000000" height="0.600000" drill="0.000000" rotation="180.000000" type="smd_rect" layer="200" width="0.900000">
-            <name locale="en_US">10</name>
-            <description locale="en_US"/>
-        </pad>
-        <pad uuid="{ffb651dc-c594-4266-bb57-51477e3e5c88}" x="-1.550000" y="-1.000000" height="0.600000" drill="0.000000" rotation="0.000000" type="smd_rect" layer="200" width="0.900000">
-            <name locale="en_US">4</name>
-            <description locale="en_US"/>
-        </pad>
-        <pad uuid="{9752fed7-f676-4259-a0c1-c884d50080ab}" x="1.550000" y="-2.000000" height="0.600000" drill="0.000000" rotation="180.000000" type="smd_rect" layer="200" width="0.900000">
-            <name locale="en_US">6</name>
-            <description locale="en_US"/>
-        </pad>
-        <pad uuid="{72ab3655-5582-4ad7-bd1f-a4174a955b4c}" x="1.550000" y="0.000000" height="0.600000" drill="0.000000" rotation="180.000000" type="smd_rect" layer="200" width="0.900000">
-            <name locale="en_US">8</name>
-            <description locale="en_US"/>
-        </pad>
-        <pad uuid="{12499bfc-4810-48fb-9604-89b822fb9a88}" x="1.550000" y="1.000000" height="0.600000" drill="0.000000" rotation="180.000000" type="smd_rect" layer="200" width="0.900000">
-            <name locale="en_US">9</name>
-            <description locale="en_US"/>
-        </pad>
-        <pad uuid="{a2ddf71c-7495-4055-8e06-601a949d62fe}" x="-1.550000" y="0.000000" height="0.600000" drill="0.000000" rotation="0.000000" type="smd_rect" layer="200" width="0.900000">
+        <pad uuid="{a2ddf71c-7495-4055-8e06-601a949d62fe}" height="0.600000" drill="0.000000" x="-1.550000" rotation="0.000000" layer="200" y="0.000000" type="smd_rect" width="0.900000">
             <name locale="en_US">3</name>
             <description locale="en_US"/>
         </pad>
-        <pad uuid="{fe181278-c378-4f29-a563-55c9d29bf4dc}" x="-1.550000" y="-2.000000" height="0.600000" drill="0.000000" rotation="0.000000" type="smd_rect" layer="200" width="0.900000">
+        <pad uuid="{ffb651dc-c594-4266-bb57-51477e3e5c88}" height="0.600000" drill="0.000000" x="-1.550000" rotation="0.000000" layer="200" y="-1.000000" type="smd_rect" width="0.900000">
+            <name locale="en_US">4</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{7ddff120-78e0-43e0-b007-1f513f8dc44a}" height="0.600000" drill="0.000000" x="-1.550000" rotation="0.000000" layer="200" y="1.000000" type="smd_rect" width="0.900000">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{9458a40a-2c13-4397-a85b-5f9b704006cf}" height="0.600000" drill="0.000000" x="1.550000" rotation="180.000000" layer="200" y="2.000000" type="smd_rect" width="0.900000">
+            <name locale="en_US">10</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{fe181278-c378-4f29-a563-55c9d29bf4dc}" height="0.600000" drill="0.000000" x="-1.550000" rotation="0.000000" layer="200" y="-2.000000" type="smd_rect" width="0.900000">
             <name locale="en_US">5</name>
             <description locale="en_US"/>
         </pad>
-        <pad uuid="{36bdbb31-8703-42ee-ab60-5cfadb1ed301}" x="-1.550000" y="2.000000" height="0.600000" drill="0.000000" rotation="0.000000" type="smd_rect" layer="200" width="0.900000">
+        <pad uuid="{9752fed7-f676-4259-a0c1-c884d50080ab}" height="0.600000" drill="0.000000" x="1.550000" rotation="180.000000" layer="200" y="-2.000000" type="smd_rect" width="0.900000">
+            <name locale="en_US">6</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{36bdbb31-8703-42ee-ab60-5cfadb1ed301}" height="0.600000" drill="0.000000" x="-1.550000" rotation="0.000000" layer="200" y="2.000000" type="smd_rect" width="0.900000">
             <name locale="en_US">1</name>
             <description locale="en_US"/>
         </pad>
-        <pad uuid="{7ddff120-78e0-43e0-b007-1f513f8dc44a}" x="-1.550000" y="1.000000" height="0.600000" drill="0.000000" rotation="0.000000" type="smd_rect" layer="200" width="0.900000">
-            <name locale="en_US">2</name>
+        <pad uuid="{72ab3655-5582-4ad7-bd1f-a4174a955b4c}" height="0.600000" drill="0.000000" x="1.550000" rotation="180.000000" layer="200" y="0.000000" type="smd_rect" width="0.900000">
+            <name locale="en_US">8</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{12499bfc-4810-48fb-9604-89b822fb9a88}" height="0.600000" drill="0.000000" x="1.550000" rotation="180.000000" layer="200" y="1.000000" type="smd_rect" width="0.900000">
+            <name locale="en_US">9</name>
             <description locale="en_US"/>
         </pad>
     </pads>

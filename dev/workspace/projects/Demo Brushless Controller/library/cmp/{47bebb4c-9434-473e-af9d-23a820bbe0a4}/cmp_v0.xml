@@ -19,13 +19,13 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map signal="{0c2b7df1-57c7-47a7-944f-4aece84b05ca}" pad="{db2b219d-8496-4141-b9f1-78f9d9dfea94}"/>
-        <map signal="{922cf4f3-4ced-4ffc-91b2-483129005356}" pad="{608e7235-74b9-4e99-b76e-dc4cfaab99b6}"/>
-        <map signal="{7c1df97a-34a0-470c-9d96-ebbd5f281aaa}" pad="{4a5fdba4-aa2e-4bac-bc96-d51cc7704990}"/>
-        <map signal="{de468cc9-06de-415f-b1d7-ec82bb8b355a}" pad="{faf5aec0-66e4-46de-b8ed-56d0edbe1877}"/>
-        <map signal="{5f74c850-c401-4600-b6c8-58bb87764a59}" pad="{0bd798f8-8bb1-42cc-9b84-b6a36bbf29ad}"/>
-        <map signal="{ff96d3fb-e43d-4391-b30f-ec72cbefb149}" pad="{06dc035a-d3d9-43a6-8646-96f781547c81}"/>
-        <map signal="{1076d030-d216-467b-8a2d-40338779ad94}" pad="{8e28d6dc-bc1e-48ef-9ade-0d0b31e132b4}"/>
-        <map signal="{a1b2b926-d1f1-40be-9f2c-e8c4a1e9a883}" pad="{042f87a6-77e8-4ff1-bd59-6338f24248b1}"/>
+        <map pad="{06dc035a-d3d9-43a6-8646-96f781547c81}" signal="{ff96d3fb-e43d-4391-b30f-ec72cbefb149}"/>
+        <map pad="{608e7235-74b9-4e99-b76e-dc4cfaab99b6}" signal="{922cf4f3-4ced-4ffc-91b2-483129005356}"/>
+        <map pad="{0bd798f8-8bb1-42cc-9b84-b6a36bbf29ad}" signal="{5f74c850-c401-4600-b6c8-58bb87764a59}"/>
+        <map pad="{042f87a6-77e8-4ff1-bd59-6338f24248b1}" signal="{a1b2b926-d1f1-40be-9f2c-e8c4a1e9a883}"/>
+        <map pad="{8e28d6dc-bc1e-48ef-9ade-0d0b31e132b4}" signal="{1076d030-d216-467b-8a2d-40338779ad94}"/>
+        <map pad="{db2b219d-8496-4141-b9f1-78f9d9dfea94}" signal="{0c2b7df1-57c7-47a7-944f-4aece84b05ca}"/>
+        <map pad="{faf5aec0-66e4-46de-b8ed-56d0edbe1877}" signal="{de468cc9-06de-415f-b1d7-ec82bb8b355a}"/>
+        <map pad="{4a5fdba4-aa2e-4bac-bc96-d51cc7704990}" signal="{7c1df97a-34a0-470c-9d96-ebbd5f281aaa}"/>
     </pad_signal_map>
 </component>
