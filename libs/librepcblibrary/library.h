@@ -135,14 +135,14 @@ class Library final : public QObject
 
         // Private Methods
         template <typename ElementType>
-        int addCategoriesToDb(const QList<QString>& xmlFiles, const QString& tablename,
+        int addCategoriesToDb(const QList<FilePath>& dirs, const QString& tablename,
                               const QString& id_rowname) throw (Exception);
         template <typename ElementType>
-        int addElementsToDb(const QList<QString>& xmlFiles, const QString& tablename,
+        int addElementsToDb(const QList<FilePath>& dirs, const QString& tablename,
                             const QString& id_rowname) throw (Exception);
-        int addPackagesToDb(const QList<QString>& xmlFiles, const QString& tablename,
+        int addPackagesToDb(const QList<FilePath>& dirs, const QString& tablename,
                             const QString& id_rowname) throw (Exception);
-        int addComponentsToDb(const QList<QString>& xmlFiles, const QString& tablename,
+        int addComponentsToDb(const QList<FilePath>& dirs, const QString& tablename,
                               const QString& id_rowname) throw (Exception);
         QMultiMap<Version, FilePath> getElementFilePathsFromDb(const QString& tablename,
                                                                const QUuid& uuid) const noexcept;
@@ -151,7 +151,7 @@ class Library final : public QObject
         QSet<QUuid> getElementsByCategory(const QString& tablename, const QString& idrowname,
                                           const QUuid& categoryUuid) const throw (Exception);
         void clearDatabaseAndCreateTables() throw (Exception);
-        QMultiMap<QString, QString> getAllXmlFilesInLibDir() throw (Exception);
+        QMultiMap<QString, FilePath> getAllElementDirectories() throw (Exception);
         QSqlQuery prepareQuery(const QString& query) const throw (Exception);
         int execQuery(QSqlQuery& query, bool checkId) const throw (Exception);
 

@@ -107,8 +107,9 @@ void LibraryBaseElement::save() const throw (Exception)
 
 void LibraryBaseElement::saveTo(const FilePath& parentDir) const throw (Exception)
 {
-    mDirectory = parentDir.getPathTo(mUuid.toString());
-    QString filename = QString("%1_v%2.xml").arg(mXmlFileNamePrefix).arg(APP_VERSION_MAJOR);
+    QString dirname = QString("%1.%2").arg(mUuid.toString()).arg(mXmlFileNamePrefix);
+    mDirectory = parentDir.getPathTo(dirname);
+    QString filename = QString("v%1/%2.xml").arg(APP_VERSION_MAJOR).arg(mXmlFileNamePrefix);
     mXmlFilepath = mDirectory.getPathTo(filename);
     save();
 }
@@ -133,7 +134,7 @@ void LibraryBaseElement::readFromFile() throw (Exception)
     // find the xml file with the highest file version number
     for (int version = APP_VERSION_MAJOR; version >= 0; version--)
     {
-        QString filename = QString("%1_v%2.xml").arg(mXmlFileNamePrefix).arg(version);
+        QString filename = QString("v%1/%2.xml").arg(version).arg(mXmlFileNamePrefix);
         mXmlFilepath = mDirectory.getPathTo(filename);
         if (mXmlFilepath.isExistingFile()) break; // file found
     }

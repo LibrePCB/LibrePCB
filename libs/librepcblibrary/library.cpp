@@ -239,16 +239,16 @@ int Library::rescan() throw (Exception)
     clearDatabaseAndCreateTables();
 
     int count = 0;
-    QMultiMap<QString, QString> files = getAllXmlFilesInLibDir();
-    count += addCategoriesToDb<ComponentCategory>(  files.values("component_category"), "component_categories", "cat_id");
-    count += addCategoriesToDb<PackageCategory>(    files.values("package_category"),   "package_categories",   "cat_id");
-    count += addElementsToDb<Symbol>(               files.values("symbol"),             "symbols",              "symbol_id");
-    count += addElementsToDb<Footprint>(            files.values("footprint"),          "footprints",           "footprint_id");
-    count += addElementsToDb<Model3D>(              files.values("model"),              "models3d",             "model_id");
-    count += addElementsToDb<SpiceModel>(           files.values("spice_model"),        "spice_models",         "model_id");
-    count += addPackagesToDb(                       files.values("package"),            "packages",             "package_id");
-    count += addElementsToDb<GenericComponent>(     files.values("generic_component"),  "generic_components",   "gencomp_id");
-    count += addComponentsToDb(                     files.values("component"),          "components",           "component_id");
+    QMultiMap<QString, FilePath> dirs = getAllElementDirectories();
+    count += addCategoriesToDb<ComponentCategory>(  dirs.values("cmpcat"),  "component_categories", "cat_id");
+    count += addCategoriesToDb<PackageCategory>(    dirs.values("pkgcat"),  "package_categories",   "cat_id");
+    count += addElementsToDb<Symbol>(               dirs.values("sym"),     "symbols",              "symbol_id");
+    count += addElementsToDb<Footprint>(            dirs.values("fpt"),     "footprints",           "footprint_id");
+    count += addElementsToDb<Model3D>(              dirs.values("3dmdl"),   "models3d",             "model_id");
+    count += addElementsToDb<SpiceModel>(           dirs.values("spcmdl"),  "spice_models",         "model_id");
+    count += addPackagesToDb(                       dirs.values("pkg"),     "packages",             "package_id");
+    count += addElementsToDb<GenericComponent>(     dirs.values("gencmp"),  "generic_components",   "gencomp_id");
+    count += addComponentsToDb(                     dirs.values("cmp"),     "components",           "component_id");
 
     return count;
 }
@@ -258,13 +258,12 @@ int Library::rescan() throw (Exception)
  ****************************************************************************************/
 
 template <typename ElementType>
-int Library::addCategoriesToDb(const QList<QString>& xmlFiles, const QString& tablename,
-                                const QString& id_rowname) throw (Exception)
+int Library::addCategoriesToDb(const QList<FilePath>& dirs, const QString& tablename,
+                               const QString& id_rowname) throw (Exception)
 {
     int count = 0;
-    foreach (const QString& filepathStr, xmlFiles)
+    foreach (const FilePath& filepath, dirs)
     {
-        FilePath filepath = FilePath(filepathStr).getParentDir();
         ElementType element(filepath);
 
         QSqlQuery query = prepareQuery(
@@ -296,13 +295,12 @@ int Library::addCategoriesToDb(const QList<QString>& xmlFiles, const QString& ta
 }
 
 template <typename ElementType>
-int Library::addElementsToDb(const QList<QString>& xmlFiles, const QString& tablename,
-                              const QString& id_rowname) throw (Exception)
+int Library::addElementsToDb(const QList<FilePath>& dirs, const QString& tablename,
+                             const QString& id_rowname) throw (Exception)
 {
     int count = 0;
-    foreach (const QString& filepathStr, xmlFiles)
+    foreach (const FilePath& filepath, dirs)
     {
-        FilePath filepath = FilePath(filepathStr).getParentDir();
         ElementType element(filepath);
 
         QSqlQuery query = prepareQuery(
@@ -345,13 +343,12 @@ int Library::addElementsToDb(const QList<QString>& xmlFiles, const QString& tabl
     return count;
 }
 
-int Library::addPackagesToDb(const QList<QString>& xmlFiles, const QString& tablename,
+int Library::addPackagesToDb(const QList<FilePath>& dirs, const QString& tablename,
                              const QString& id_rowname) throw (Exception)
 {
     int count = 0;
-    foreach (const QString& filepathStr, xmlFiles)
+    foreach (const FilePath& filepath, dirs)
     {
-        FilePath filepath = FilePath(filepathStr).getParentDir();
         Package element(filepath);
 
         QSqlQuery query = prepareQuery(
@@ -396,13 +393,12 @@ int Library::addPackagesToDb(const QList<QString>& xmlFiles, const QString& tabl
     return count;
 }
 
-int Library::addComponentsToDb(const QList<QString>& xmlFiles, const QString& tablename,
+int Library::addComponentsToDb(const QList<FilePath>& dirs, const QString& tablename,
                                const QString& id_rowname) throw (Exception)
 {
     int count = 0;
-    foreach (const QString& filepathStr, xmlFiles)
+    foreach (const FilePath& filepath, dirs)
     {
-        FilePath filepath = FilePath(filepathStr).getParentDir();
         Component element(filepath);
 
         QSqlQuery query = prepareQuery(
@@ -794,15 +790,15 @@ void Library::clearDatabaseAndCreateTables() throw (Exception)
     }
 }
 
-QMultiMap<QString, QString> Library::getAllXmlFilesInLibDir() throw (Exception)
+QMultiMap<QString, FilePath> Library::getAllElementDirectories() throw (Exception)
 {
-    QMultiMap<QString, QString> map;
-    QDirIterator it(mLibPath.toStr(), QStringList() << "*.xml", QDir::Files, QDirIterator::Subdirectories);
+    QMultiMap<QString, FilePath> map;
+    QStringList filter = QStringList() << "*.3dmdl" << "*.cmp" << "*.cmpcat" << "*.fpt"
+                                       << "*.gencmp" << "*.pkg" << "*.pkgcat" << "*.sym";
+    QDirIterator it(mLibPath.toStr(), filter, QDir::Dirs, QDirIterator::Subdirectories);
     while (it.hasNext()) {
-        FilePath xmlFilePath(it.next());
-        SmartXmlFile xmlFile(xmlFilePath, false, true);
-        QSharedPointer<XmlDomDocument> doc = xmlFile.parseFileAndBuildDomTree(false);
-        map.insertMulti(doc->getRoot().getName(), xmlFilePath.toStr());
+        FilePath dirFilePath(it.next());
+        map.insertMulti(dirFilePath.getSuffix(), dirFilePath);
     }
     return map;
 }
