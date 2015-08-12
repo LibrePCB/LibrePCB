@@ -284,9 +284,9 @@ int Library::addCategoriesToDb(const QList<FilePath>& dirs, const QString& table
                 "(:element_id, :locale, :name, :description, :keywords)");
             query.bindValue(":element_id",  id);
             query.bindValue(":locale",      locale);
-            query.bindValue(":name",        element.getName(QStringList(locale)));
-            query.bindValue(":description", element.getDescription(QStringList(locale)));
-            query.bindValue(":keywords",    element.getKeywords(QStringList(locale)));
+            query.bindValue(":name",        element.getNames().value(locale));
+            query.bindValue(":description", element.getDescriptions().value(locale));
+            query.bindValue(":keywords",    element.getKeywords().value(locale));
             execQuery(query, false);
         }
         count++;
@@ -320,9 +320,9 @@ int Library::addElementsToDb(const QList<FilePath>& dirs, const QString& tablena
                 "(:element_id, :locale, :name, :description, :keywords)");
             query.bindValue(":element_id",  id);
             query.bindValue(":locale",      locale);
-            query.bindValue(":name",        element.getName(QStringList(locale)));
-            query.bindValue(":description", element.getDescription(QStringList(locale)));
-            query.bindValue(":keywords",    element.getKeywords(QStringList(locale)));
+            query.bindValue(":name",        element.getNames().value(locale));
+            query.bindValue(":description", element.getDescriptions().value(locale));
+            query.bindValue(":keywords",    element.getKeywords().value(locale));
             execQuery(query, false);
         }
 
@@ -370,9 +370,9 @@ int Library::addPackagesToDb(const QList<FilePath>& dirs, const QString& tablena
                 "(:element_id, :locale, :name, :description, :keywords)");
             query.bindValue(":element_id",  id);
             query.bindValue(":locale",      locale);
-            query.bindValue(":name",        element.getName(QStringList(locale)));
-            query.bindValue(":description", element.getDescription(QStringList(locale)));
-            query.bindValue(":keywords",    element.getKeywords(QStringList(locale)));
+            query.bindValue(":name",        element.getNames().value(locale));
+            query.bindValue(":description", element.getDescriptions().value(locale));
+            query.bindValue(":keywords",    element.getKeywords().value(locale));
             execQuery(query, false);
         }
 
@@ -420,9 +420,9 @@ int Library::addComponentsToDb(const QList<FilePath>& dirs, const QString& table
                 "(:element_id, :locale, :name, :description, :keywords)");
             query.bindValue(":element_id",  id);
             query.bindValue(":locale",      locale);
-            query.bindValue(":name",        element.getName(QStringList(locale)));
-            query.bindValue(":description", element.getDescription(QStringList(locale)));
-            query.bindValue(":keywords",    element.getKeywords(QStringList(locale)));
+            query.bindValue(":name",        element.getNames().value(locale));
+            query.bindValue(":description", element.getDescriptions().value(locale));
+            query.bindValue(":keywords",    element.getKeywords().value(locale));
             execQuery(query, false);
         }
 
