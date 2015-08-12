@@ -159,6 +159,16 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
                                             const QStringList& localeOrder,
                                             QString* usedLocale = nullptr) throw (Exception);
 
+        /**
+         * @brief Check whether a directory contains a valid library element or not
+         *
+         * @param dir   The element's root directory ("{UUID}.type")
+         *
+         * @return True if there is a valid element, false if not (or the library element's
+         *              file version is newer than the application's major version)
+         */
+        static bool isDirectoryValidElement(const FilePath& dir) noexcept;
+
 
     private:
 

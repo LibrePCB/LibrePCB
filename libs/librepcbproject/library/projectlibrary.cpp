@@ -275,27 +275,15 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
 
     // search all subdirectories which have a valid UUID as directory name
     dir.setFilter(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::Readable);
+    dir.setNameFilters(QStringList() << QString("*.%1").arg(directory.getBasename()));
     foreach (const QString& dirname, dir.entryList())
     {
         FilePath subdirPath(directory.getPathTo(dirname));
 
-        if (!subdirPath.isExistingDir())
+        // check if directory is a valid library element
+        if (!LibraryBaseElement::isDirectoryValidElement(subdirPath))
         {
-            qWarning() << "Directory does not exist:" << subdirPath.toNative();
-            continue;
-        }
-
-        // check the directory name (is it a valid UUID?)
-        QUuid dirUuid(dirname);
-        if (dirUuid.isNull())
-        {
-            qWarning() << "Found a directory in the library which is not an UUID:" << subdirPath.toNative();
-            continue;
-        }
-
-        if (subdirPath.isEmptyDir())
-        {
-            qWarning() << "Found an empty directory in the library:" << subdirPath.toNative();
+            qWarning() << "Found an invalid directory in the library:" << subdirPath.toNative();
             continue;
         }
 

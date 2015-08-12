@@ -270,6 +270,18 @@ QString LibraryBaseElement::localeStringFromList(const QMap<QString, QString>& l
     throw RuntimeError(__FILE__, __LINE__, QString(), tr("No translation found."));
 }
 
+bool LibraryBaseElement::isDirectoryValidElement(const FilePath& dir) noexcept
+{
+    // find the xml file with the highest file version number
+    for (int version = APP_VERSION_MAJOR; version >= 0; version--)
+    {
+        QString filename = QString("v%1/%2.xml").arg(version).arg(dir.getSuffix());
+        if (dir.getPathTo(filename).isExistingFile()) return true; // file found
+    }
+
+    return false;
+}
+
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
