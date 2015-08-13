@@ -109,7 +109,10 @@ class Library final : public QObject
         FilePath getLatestComponent(const QUuid& uuid) const throw (Exception);
 
         // Getters: Element Metadata
-        void getComponentMetadata(const FilePath& cmpDir, QUuid* pkgUuid) const throw (Exception);
+        void getComponentMetadata(const FilePath& cmpDir, QUuid* pkgUuid = nullptr,
+                                  QString* nameEn = nullptr) const throw (Exception);
+        void getPackageMetadata(const FilePath& pkgDir, QUuid* fptUuid = nullptr,
+                                QString* nameEn = nullptr) const throw (Exception);
 
         // Getters: Special
         QSet<QUuid> getComponentCategoryChilds(const QUuid& parent) const throw (Exception);

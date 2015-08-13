@@ -17,37 +17,55 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef PROJECT_CMDCOMPONENTINSTANCEREMOVE_H
+#define PROJECT_CMDCOMPONENTINSTANCEREMOVE_H
+
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include "bes_base.h"
-#include "../boardeditor.h"
-#include <librepcbproject/project.h>
-#include <librepcbprojecteditor/projecteditor.h>
+#include <librepcbcommon/undocommand.h>
+
+/*****************************************************************************************
+ *  Forward Declarations
+ ****************************************************************************************/
+
+namespace project {
+class Board;
+class ComponentInstance;
+}
+
+/*****************************************************************************************
+ *  Class CmdComponentInstanceRemove
+ ****************************************************************************************/
 
 namespace project {
 
-/*****************************************************************************************
- *  Constructors / Destructor
- ****************************************************************************************/
-
-BES_Base::BES_Base(BoardEditor& editor, Ui::BoardEditor& editorUi,
-                   GraphicsView& editorGraphicsView, UndoStack& undoStack) :
-    QObject(0), mWorkspace(editor.getProjectEditor().getWorkspace()),
-    mProject(editor.getProject()), mCircuit(editor.getProject().getCircuit()),
-    mEditor(editor), mEditorUi(editorUi), mEditorGraphicsView(editorGraphicsView),
-    mUndoStack(undoStack)
+/**
+ * @brief The CmdComponentInstanceRemove class
+ */
+class CmdComponentInstanceRemove final : public UndoCommand
 {
-}
+    public:
 
-BES_Base::~BES_Base()
-{
-}
+        // Constructors / Destructor
+        explicit CmdComponentInstanceRemove(Board& board, ComponentInstance& cmp,
+                                            UndoCommand* parent = 0) throw (Exception);
+        ~CmdComponentInstanceRemove() noexcept;
 
-/*****************************************************************************************
- *  End of File
- ****************************************************************************************/
+        // Inherited from UndoCommand
+        void redo() throw (Exception) override;
+        void undo() throw (Exception) override;
+
+
+    private:
+
+        // Attributes from the constructor
+        Board& mBoard;
+        ComponentInstance& mComponent;
+};
 
 } // namespace project
+
+#endif // PROJECT_CMDCOMPONENTINSTANCEREMOVE_H

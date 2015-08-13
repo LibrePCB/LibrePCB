@@ -26,7 +26,6 @@
 
 #include <QtCore>
 #include <librepcbcommon/undocommand.h>
-#include <librepcbcommon/exceptions.h>
 #include <librepcbcommon/units/all_length_units.h>
 
 /*****************************************************************************************

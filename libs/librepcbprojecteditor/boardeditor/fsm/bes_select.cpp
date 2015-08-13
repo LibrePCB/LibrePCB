@@ -30,7 +30,17 @@
 #include <librepcbproject/boards/items/bi_footprintpad.h>
 #include <librepcbcommon/gridproperties.h>
 #include <librepcbcommon/undostack.h>
+#include <librepcbproject/boards/cmd/cmdcomponentinstanceadd.h>
 #include <librepcbproject/boards/cmd/cmdcomponentinstanceedit.h>
+#include <librepcbproject/boards/cmd/cmdcomponentinstanceremove.h>
+#include <librepcbproject/boards/componentinstance.h>
+#include <librepcbproject/circuit/gencompinstance.h>
+#include <librepcbworkspace/workspace.h>
+#include <librepcblibrary/library.h>
+#include <librepcblibrary/elements.h>
+#include <librepcbproject/project.h>
+#include <librepcbproject/library/projectlibrary.h>
+#include <librepcbproject/library/cmd/cmdprojectlibraryaddelement.h>
 
 namespace project {
 
@@ -115,7 +125,7 @@ BES_Base::ProcRetVal BES_Select::processSubStateIdle(BEE_Base* event) noexcept
             rotateSelectedItems(Angle::deg90(), Point(), true);
             return ForceStayInState;
         case BEE_Base::Edit_Remove:
-            //removeSelectedItems();
+            removeSelectedItems();
             return ForceStayInState;
         case BEE_Base::GraphicsViewEvent:
             return processSubStateIdleSceneEvent(event);
@@ -219,8 +229,130 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightClick(QGraphicsSceneMouse
     board->clearSelection();
     items.first()->setSelected(true);
 
-    // TODO: build and execute the context menu
+    // build and execute the context menu
+    QMenu menu;
+    switch (items.first()->getType())
+    {
+        case BI_Base::Type_t::Footprint:
+        {
+            BI_Footprint* footprint = dynamic_cast<BI_Footprint*>(items.first()); Q_ASSERT(footprint);
+            ComponentInstance& compInst = footprint->getComponentInstance();
+            GenCompInstance& genCompInst = compInst.getGenCompInstance();
 
+            // get all available alternative components
+            QSet<QUuid> compList = mWorkspace.getLibrary().getComponentsOfGenericComponent(genCompInst.getGenComp().getUuid());
+            //compList.remove(compInst.getLibComponent().getUuid());
+
+            // build the context menu
+            QAction* aRotateCCW = menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("Rotate"));
+            QAction* aFlipH = menu.addAction(QIcon(":/img/actions/flip_horizontal.png"), tr("Flip"));
+            menu.addSeparator();
+            QMenu* aChangeComponentMenu = menu.addMenu(tr("Change Component"));
+            aChangeComponentMenu->setEnabled(compList.count() > 0);
+            foreach (const QUuid& compUuid, compList)
+            {
+                QUuid pkgUuid;
+                QString compName, pkgName;
+                FilePath compFp = mWorkspace.getLibrary().getLatestComponent(compUuid);
+                mWorkspace.getLibrary().getComponentMetadata(compFp, &pkgUuid, &compName);
+                FilePath pkgFp = mWorkspace.getLibrary().getLatestPackage(pkgUuid);
+                mWorkspace.getLibrary().getPackageMetadata(pkgFp, &pkgUuid, &pkgName);
+                QAction* a = aChangeComponentMenu->addAction(QString("%1 [%2]").arg(compName).arg(pkgName));
+                a->setData(compUuid);
+                if (compUuid == compInst.getLibComponent().getUuid())
+                {
+                    a->setCheckable(true);
+                    a->setChecked(true);
+                    a->setEnabled(false);
+                }
+            }
+            QAction* aRemove = menu.addAction(QIcon(":/img/actions/delete.png"), QString(tr("Remove %1")).arg(genCompInst.getName()));
+            menu.addSeparator();
+            QAction* aProperties = menu.addAction(tr("Properties"));
+
+            // execute the context menu
+            QAction* action = menu.exec(mouseEvent->screenPos());
+            if (action == nullptr)
+            {
+                // aborted --> nothing to do
+            }
+            else if (action == aRotateCCW)
+            {
+                rotateSelectedItems(Angle::deg90(), footprint->getPosition());
+            }
+            else if (action == aFlipH)
+            {
+                // TODO
+            }
+            else if (!action->data().toUuid().isNull())
+            {
+                bool cmdActive = false;
+                try
+                {
+                    mUndoStack.beginCommand(tr("Change Component"));
+                    cmdActive = true;
+
+                    // add required elements to project library
+                    QUuid compUuid = action->data().toUuid();
+                    const library::Component* comp = mProject.getLibrary().getComponent(compUuid);
+                    if (!comp)
+                    {
+                        // copy component to project's library
+                        FilePath cmpFp = mWorkspace.getLibrary().getLatestComponent(compUuid);
+                        comp = new library::Component(cmpFp);
+                        auto cmd = new CmdProjectLibraryAddElement<library::Component>(mProject.getLibrary(), *comp);
+                        mUndoStack.appendToCommand(cmd);
+                    }
+                    const library::Package* pkg = mProject.getLibrary().getPackage(comp->getPackageUuid());
+                    if (!pkg)
+                    {
+                        // copy package to project's library
+                        FilePath pkgFp = mWorkspace.getLibrary().getLatestPackage(comp->getPackageUuid());
+                        pkg = new library::Package(pkgFp);
+                        auto cmd = new CmdProjectLibraryAddElement<library::Package>(mProject.getLibrary(), *pkg);
+                        mUndoStack.appendToCommand(cmd);
+                    }
+                    const library::Footprint* fpt = mProject.getLibrary().getFootprint(pkg->getFootprintUuid());
+                    if (!fpt)
+                    {
+                        // copy package to project's library
+                        FilePath fptFp = mWorkspace.getLibrary().getLatestFootprint(pkg->getFootprintUuid());
+                        fpt = new library::Footprint(fptFp);
+                        auto cmd = new CmdProjectLibraryAddElement<library::Footprint>(mProject.getLibrary(), *fpt);
+                        mUndoStack.appendToCommand(cmd);
+                    }
+
+                    // replace component
+                    Point pos = compInst.getPosition();
+                    auto cmdRemove = new CmdComponentInstanceRemove(*board, compInst);
+                    mUndoStack.appendToCommand(cmdRemove);
+                    auto cmdAdd = new CmdComponentInstanceAdd(*board, genCompInst, compUuid, pos);
+                    mUndoStack.appendToCommand(cmdAdd);
+
+                    mUndoStack.endCommand();
+                    cmdActive = false;
+                }
+                catch (Exception& e)
+                {
+                    QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+                    if (cmdActive) try {mUndoStack.abortCommand();} catch (...) {}
+                }
+            }
+            else if (action == aRemove)
+            {
+                removeSelectedItems();
+            }
+            else if (action == aProperties)
+            {
+                // open the properties editor dialog of the selected item
+                //SymbolInstancePropertiesDialog dialog(mProject, genComp, *symbol, mUndoStack, &mEditor);
+                //dialog.exec();
+            }
+            return ForceStayInState;
+        }
+        default:
+            break;
+    }
     return PassToParentState;
 }
 
@@ -433,6 +565,48 @@ bool BES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
     }
 
     return true;
+}
+
+bool BES_Select::removeSelectedItems() noexcept
+{
+    Board* board = mEditor.getActiveBoard();
+    Q_ASSERT(board); if (!board) return false;
+
+    // get all selected items
+    QList<BI_Base*> items = board->getSelectedItems(false /*true, false, true, false, false,
+                                                    false, false, false, false, false*/);
+
+    // abort if no items are selected
+    if (items.isEmpty()) return false;
+
+    bool commandActive = false;
+    try
+    {
+        mUndoStack.beginCommand(tr("Remove Board Elements"));
+        commandActive = true;
+        board->clearSelection();
+
+        // remove all component instances
+        foreach (BI_Base* item, items)
+        {
+            if (item->getType() == BI_Base::Type_t::Footprint)
+            {
+                BI_Footprint* fp = dynamic_cast<BI_Footprint*>(item); Q_ASSERT(fp);
+                auto cmd = new CmdComponentInstanceRemove(*board, fp->getComponentInstance());
+                mUndoStack.appendToCommand(cmd);
+            }
+        }
+
+        mUndoStack.endCommand();
+        commandActive = false;
+        return true;
+    }
+    catch (Exception& e)
+    {
+        QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+        if (commandActive) try {mUndoStack.abortCommand();} catch (...) {}
+        return false;
+    }
 }
 
 /*****************************************************************************************

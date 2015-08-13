@@ -37,7 +37,7 @@
 #include <librepcbproject/schematics/schematic.h>
 #include "../../dialogs/addgencompdialog.h"
 #include <librepcbcommon/gridproperties.h>
-#include "librepcbproject/library/cmd/cmdprojectlibraryaddelement.h"
+#include <librepcbproject/library/cmd/cmdprojectlibraryaddelement.h>
 #include <librepcbworkspace/workspace.h>
 #include <librepcblibrary/library.h>
 #include <librepcblibrary/sym/symbol.h>

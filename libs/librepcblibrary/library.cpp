@@ -174,16 +174,39 @@ FilePath Library::getLatestComponent(const QUuid& uuid) const throw (Exception)
  *  Getters: Element Metadata
  ****************************************************************************************/
 
-void Library::getComponentMetadata(const FilePath& cmpDir, QUuid* pkgUuid) const throw (Exception)
+void Library::getComponentMetadata(const FilePath& cmpDir, QUuid* pkgUuid, QString* nameEn) const throw (Exception)
 {
     QSqlQuery query = prepareQuery(
-        "SELECT package_uuid FROM components WHERE filepath = :filepath");
+        "SELECT package_uuid, components_tr.name FROM components "
+        "LEFT JOIN components_tr ON components.id=components_tr.component_id "
+        "WHERE filepath = :filepath");
     query.bindValue(":filepath", cmpDir.toRelative(mLibPath));
     execQuery(query, false);
 
     if (/*(query.size() == 1) &&*/ (query.first()))
     {
         if (pkgUuid) *pkgUuid = query.value(0).toUuid();
+        if (nameEn) *nameEn = query.value(1).toString();
+    }
+    else
+    {
+        throw RuntimeError(__FILE__, __LINE__, QString::number(query.size()));
+    }
+}
+
+void Library::getPackageMetadata(const FilePath& pkgDir, QUuid* fptUuid, QString* nameEn) const throw (Exception)
+{
+    QSqlQuery query = prepareQuery(
+        "SELECT footprint_uuid, packages_tr.name FROM packages "
+        "LEFT JOIN packages_tr ON packages.id=packages_tr.package_id "
+        "WHERE filepath = :filepath");
+    query.bindValue(":filepath", pkgDir.toRelative(mLibPath));
+    execQuery(query, false);
+
+    if (/*(query.size() == 1) &&*/ (query.first()))
+    {
+        if (fptUuid) *fptUuid = query.value(0).toUuid();
+        if (nameEn) *nameEn = query.value(1).toString();
     }
     else
     {

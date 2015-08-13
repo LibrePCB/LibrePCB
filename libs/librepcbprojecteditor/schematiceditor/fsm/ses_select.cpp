@@ -254,7 +254,7 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneRightClick(QGraphicsSceneMouse
 
             // build the context menu
             QAction* aCopy = menu.addAction(QIcon(":/img/actions/copy.png"), tr("Copy"));
-            QAction* aRotate = menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("Rotate"));
+            QAction* aRotateCCW = menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("Rotate"));
             QAction* aMirror = menu.addAction(QIcon(":/img/actions/flip_horizontal.png"), tr("Mirror"));
             menu.addSeparator();
             QAction* aPlaceUnplacedSymbols = menu.addAction(QString(tr("Place unplaced symbols of %1 (%2)")).arg(genComp.getName()).arg(genComp.getUnplacedSymbolsCount()));
@@ -271,9 +271,9 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneRightClick(QGraphicsSceneMouse
             {
                 // TODO
             }
-            else if (action == aRotate)
+            else if (action == aRotateCCW)
             {
-                rotateSelectedItems(-Angle::deg90(), symbol->getPosition());
+                rotateSelectedItems(Angle::deg90(), symbol->getPosition());
             }
             else if (action == aMirror)
             {

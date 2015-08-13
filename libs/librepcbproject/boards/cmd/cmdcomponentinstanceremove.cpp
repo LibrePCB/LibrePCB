@@ -22,10 +22,9 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "bes_base.h"
-#include "../boardeditor.h"
-#include <librepcbproject/project.h>
-#include <librepcbprojecteditor/projecteditor.h>
+#include "cmdcomponentinstanceremove.h"
+#include "../componentinstance.h"
+#include "../board.h"
 
 namespace project {
 
@@ -33,17 +32,51 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-BES_Base::BES_Base(BoardEditor& editor, Ui::BoardEditor& editorUi,
-                   GraphicsView& editorGraphicsView, UndoStack& undoStack) :
-    QObject(0), mWorkspace(editor.getProjectEditor().getWorkspace()),
-    mProject(editor.getProject()), mCircuit(editor.getProject().getCircuit()),
-    mEditor(editor), mEditorUi(editorUi), mEditorGraphicsView(editorGraphicsView),
-    mUndoStack(undoStack)
+CmdComponentInstanceRemove::CmdComponentInstanceRemove(Board& board, ComponentInstance& cmp,
+                                                       UndoCommand* parent) throw (Exception) :
+    UndoCommand(tr("Remove component instance"), parent),
+    mBoard(board), mComponent(cmp)
 {
 }
 
-BES_Base::~BES_Base()
+CmdComponentInstanceRemove::~CmdComponentInstanceRemove() noexcept
 {
+    if (isExecuted())
+        delete &mComponent;
+}
+
+/*****************************************************************************************
+ *  Inherited from UndoCommand
+ ****************************************************************************************/
+
+void CmdComponentInstanceRemove::redo() throw (Exception)
+{
+    mBoard.removeComponentInstance(mComponent); // throws an exception on error
+
+    try
+    {
+        UndoCommand::redo();
+    }
+    catch (Exception &e)
+    {
+        mBoard.addComponentInstance(mComponent); // throws an exception on error
+        throw;
+    }
+}
+
+void CmdComponentInstanceRemove::undo() throw (Exception)
+{
+    mBoard.addComponentInstance(mComponent); // throws an exception on error
+
+    try
+    {
+        UndoCommand::undo();
+    }
+    catch (Exception &e)
+    {
+        mBoard.removeComponentInstance(mComponent); // throws an exception on error
+        throw;
+    }
 }
 
 /*****************************************************************************************

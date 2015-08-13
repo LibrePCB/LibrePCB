@@ -79,6 +79,7 @@ class BES_Select final : public BES_Base
         bool startMovingSelectedItems(Board* board) noexcept;
         bool rotateSelectedItems(const Angle& angle, Point center = Point(0, 0),
                                  bool centerOfElements = false) noexcept;
+        bool removeSelectedItems() noexcept;
 
 
         // Types

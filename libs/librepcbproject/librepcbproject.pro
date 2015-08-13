@@ -87,7 +87,8 @@ SOURCES += \
     settings/projectsettings.cpp \
     settings/cmd/cmdprojectsettingschange.cpp \
     schematics/schematiclayerprovider.cpp \
-    library/cmd/cmdprojectlibraryaddelement.cpp
+    library/cmd/cmdprojectlibraryaddelement.cpp \
+    boards/cmd/cmdcomponentinstanceremove.cpp
 
 HEADERS += \
     project.h \
@@ -157,6 +158,7 @@ HEADERS += \
     settings/projectsettings.h \
     settings/cmd/cmdprojectsettingschange.h \
     schematics/schematiclayerprovider.h \
-    library/cmd/cmdprojectlibraryaddelement.h
+    library/cmd/cmdprojectlibraryaddelement.h \
+    boards/cmd/cmdcomponentinstanceremove.h
 
 FORMS +=

@@ -68,6 +68,7 @@ class BoardEditor final : public QMainWindow, public IF_GraphicsViewEventHandler
         ~BoardEditor();
 
         // Getters
+        ProjectEditor& getProjectEditor() const noexcept {return mProjectEditor;}
         Project& getProject() const noexcept {return mProject;}
         int getActiveBoardIndex() const noexcept {return mActiveBoardIndex;}
         Board* getActiveBoard() const noexcept;
