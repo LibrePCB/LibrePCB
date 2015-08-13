@@ -58,6 +58,8 @@ class CmdComponentInstanceEdit final : public UndoCommand
         void setDeltaToStartPos(Point& deltaPos, bool immediate) noexcept;
         void setRotation(const Angle& angle, bool immediate) noexcept;
         void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
+        void setMirrored(bool mirrored, bool immediate) noexcept;
+        void mirror(const Point& center, bool vertical, bool immediate) noexcept;
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;
@@ -74,6 +76,8 @@ class CmdComponentInstanceEdit final : public UndoCommand
         Point mNewPos;
         Angle mOldRotation;
         Angle mNewRotation;
+        bool mOldMirrored;
+        bool mNewMirrored;
 };
 
 } // namespace project

@@ -409,7 +409,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 {
                     case 21: polygon->setLayerId(BoardLayer::LayerID::TopOverlay); break;
                     case 25: polygon->setLayerId(BoardLayer::LayerID::TopOverlayNames); break;
-                    case 39: polygon->setLayerId(BoardLayer::LayerID::TopKeepout); break;
+                    case 39: polygon->setLayerId(BoardLayer::LayerID::TopDeviceKeepout); break;
                     case 46: polygon->setLayerId(BoardLayer::LayerID::BoardOutline); break; // milling
                     case 48: polygon->setLayerId(BoardLayer::LayerID::TopDeviceOutlines); break; // document
                     case 49: polygon->setLayerId(BoardLayer::LayerID::OriginCrosses); break; // reference
@@ -444,9 +444,9 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                     case 29: polygon->setLayerId(BoardLayer::LayerID::TopStopMask); break;
                     case 31: polygon->setLayerId(BoardLayer::LayerID::TopPaste); break;
                     case 35: polygon->setLayerId(BoardLayer::LayerID::TopGlue); break;
-                    case 41: valid = false; break; // tRestrict
-                    case 42: valid = false; break; // bRestrict
-                    case 43: valid = false; break; // vRestrict
+                    case 41: polygon->setLayerId(BoardLayer::LayerID::TopCopperRestrict); break;
+                    case 42: polygon->setLayerId(BoardLayer::LayerID::BottomCopperRestrict); break;
+                    case 43: polygon->setLayerId(BoardLayer::LayerID::ViaRestrict); break;
                     case 51: polygon->setLayerId(BoardLayer::LayerID::TopDeviceOutlines); break;
                     case 52: polygon->setLayerId(BoardLayer::LayerID::BottomDeviceOutlines); break;
                     default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
@@ -508,9 +508,9 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                     case 27: ellipse->setLayerId(BoardLayer::LayerID::TopOverlayValues); break;
                     case 29: ellipse->setLayerId(BoardLayer::LayerID::TopStopMask); break;
                     case 31: ellipse->setLayerId(BoardLayer::LayerID::TopPaste); break;
-                    case 41: valid = false; break; // tRestrict
-                    case 42: valid = false; break; // bRestrict
-                    case 43: valid = false; break; // vRestrict
+                    case 41: ellipse->setLayerId(BoardLayer::LayerID::TopCopperRestrict); break;
+                    case 42: ellipse->setLayerId(BoardLayer::LayerID::BottomCopperRestrict); break;
+                    case 43: ellipse->setLayerId(BoardLayer::LayerID::ViaRestrict); break;
                     case 49: ellipse->setLayerId(BoardLayer::LayerID::OriginCrosses); break; // reference
                     case 51: ellipse->setLayerId(BoardLayer::LayerID::TopDeviceOutlines); break;
                     case 52: ellipse->setLayerId(BoardLayer::LayerID::BottomDeviceOutlines); break;

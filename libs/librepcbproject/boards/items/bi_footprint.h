@@ -92,6 +92,7 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
         // Inherited from BI_Base
         Type_t getType() const noexcept override {return BI_Base::Type_t::Footprint;}
         const Point& getPosition() const noexcept override;
+        bool getIsMirrored() const noexcept override;
         QPainterPath getGrabAreaScenePx() const noexcept override;
         void setSelected(bool selected) noexcept override;
 
@@ -101,6 +102,7 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
         void componentInstanceAttributesChanged();
         void componentInstanceMoved(const Point& pos);
         void componentInstanceRotated(const Angle& rot);
+        void componentInstanceMirrored(bool mirrored);
 
 
     signals:

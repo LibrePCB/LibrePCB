@@ -57,10 +57,11 @@ ComponentInstance::ComponentInstance(Board& board, const XmlDomElement& domEleme
     QUuid componentUuid = domElement.getAttribute<QUuid>("component");
     initComponentAndPackage(componentUuid);
 
-    // get position and rotation
+    // get position, rotation and mirrored
     mPosition.setX(domElement.getFirstChild("position", true)->getAttribute<Length>("x"));
     mPosition.setY(domElement.getFirstChild("position", true)->getAttribute<Length>("y"));
     mRotation = domElement.getFirstChild("position", true)->getAttribute<Angle>("rotation");
+    mIsMirrored = domElement.getFirstChild("position", true)->getAttribute<bool>("mirror");
 
     // load footprint
     mFootprint = new BI_Footprint(*this, *domElement.getFirstChild("footprint", true));
@@ -72,7 +73,8 @@ ComponentInstance::ComponentInstance(Board& board, GenCompInstance& genCompInsta
                                      const QUuid& componentUuid, const Point& position,
                                      const Angle& rotation) throw (Exception) :
     QObject(nullptr), mBoard(board), mAddedToBoard(false), mGenCompInstance(&genCompInstance),
-    mComponent(nullptr), mFootprint(nullptr), mPosition(position), mRotation(rotation)
+    mComponent(nullptr), mFootprint(nullptr), mPosition(position), mRotation(rotation),
+    mIsMirrored(false)
 {
     initComponentAndPackage(componentUuid);
 
@@ -161,6 +163,12 @@ void ComponentInstance::setRotation(const Angle& rot) noexcept
     emit rotated(mRotation);
 }
 
+void ComponentInstance::setIsMirrored(bool mirror) noexcept
+{
+    mIsMirrored = mirror;
+    emit mirrored(mIsMirrored);
+}
+
 void ComponentInstance::addToBoard(GraphicsScene& scene) throw (Exception)
 {
     if (mAddedToBoard) throw LogicError(__FILE__, __LINE__);
@@ -191,6 +199,7 @@ XmlDomElement* ComponentInstance::serializeToXmlDomElement() const throw (Except
     position->setAttribute("x", mPosition.getX());
     position->setAttribute("y", mPosition.getY());
     position->setAttribute("rotation", mRotation);
+    position->setAttribute("mirror", mIsMirrored);
     return root.take();
 }
 

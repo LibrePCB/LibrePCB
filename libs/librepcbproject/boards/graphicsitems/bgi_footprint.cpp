@@ -41,8 +41,6 @@ namespace project {
 BGI_Footprint::BGI_Footprint(BI_Footprint& footprint) noexcept :
     BGI_Base(), mFootprint(footprint), mLibFootprint(footprint.getLibFootprint())
 {
-    setZValue(Board::ZValue_FootprintsTop);
-
     mFont.setStyleStrategy(QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
     mFont.setStyleHint(QFont::SansSerif);
     mFont.setFamily("Nimbus Sans L");
@@ -65,6 +63,12 @@ void BGI_Footprint::updateCacheAndRepaint() noexcept
     mBoundingRect = QRectF();
     mShape = QPainterPath();
     mShape.setFillRule(Qt::WindingFill);
+
+    // set Z value
+    if (mFootprint.getIsMirrored())
+        setZValue(Board::ZValue_FootprintsBottom);
+    else
+        setZValue(Board::ZValue_FootprintsTop);
 
     // cross rect
     QRectF crossRect(-4, -4, 8, 8);
@@ -268,6 +272,7 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
 
 BoardLayer* BGI_Footprint::getBoardLayer(int id) const noexcept
 {
+    if (mFootprint.getIsMirrored()) id = BoardLayer::getMirroredLayerId(id);
     return mFootprint.getComponentInstance().getBoard().getProject().getBoardLayer(id);
 }
 

@@ -172,13 +172,13 @@ QList<BI_Base*> Board::getItemsAtScenePos(const Point& pos) const noexcept
     foreach (ComponentInstance* component, mComponentInstances)
     {
         BI_Footprint& footprint = component->getFootprint();
+        if (footprint.getGrabAreaScenePx().contains(scenePosPx))
+            list.append(&footprint);
         foreach (BI_FootprintPad* pad, footprint.getPads())
         {
             if (pad->getGrabAreaScenePx().contains(scenePosPx))
                 list.append(pad);
         }
-        if (footprint.getGrabAreaScenePx().contains(scenePosPx))
-            list.append(&footprint);
     }
     return list;
 }

@@ -322,6 +322,30 @@ class Point
          */
         Point& rotate(const Angle& angle, const Point& center = Point(0, 0)) noexcept;
 
+        /**
+         * @brief Get the point mirrored horizontally or vertically around a specific center
+         *
+         * @param orientation   Qt::Horizontal = mirror X axis; Qt::Vertical = mirror Y axis
+         * @param center        The center of the mirror operation
+         *
+         * @return A new Point object which is mirrored
+         *
+         * @see Point#mirror()
+         */
+        Point mirrored(Qt::Orientation orientation, const Point& center = Point(0, 0)) const noexcept;
+
+        /**
+         * @brief Mirror the point horizontally or vertically around a specific center
+         *
+         * @param orientation   Qt::Horizontal = mirror X axis; Qt::Vertical = mirror Y axis
+         * @param center        The center of the mirror operation
+         *
+         * @return A reference to the modified object
+         *
+         * @see Point#mirrored()
+         */
+        Point& mirror(Qt::Orientation orientation, const Point& center = Point(0, 0)) noexcept;
+
 
         // Static Functions
 

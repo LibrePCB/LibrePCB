@@ -66,92 +66,155 @@ BoardLayer::BoardLayer(int id) :
 
         case BoardOutline:
             mName = tr("Board Outline");
-            mColor = Qt::lightGray;
-            mColorHighlighted = Qt::white;
+            mColor = QColor(255, 255, 255, 150);
+            mColorHighlighted = QColor(255, 255, 255, 220);
             mIsVisible = true;
             break;
 
         case Drills:
             mName = tr("Drills");
-            mColor = Qt::lightGray;
-            mColorHighlighted = Qt::white;
+            mColor = QColor(255, 255, 255, 150);
+            mColorHighlighted = QColor(255, 255, 255, 220);
             mIsVisible = true;
             break;
 
         case Vias:
             mName = tr("Vias");
-            mColor = Qt::darkGreen;
-            mColorHighlighted = Qt::green;
+            mColor = QColor(0, 255, 0, 150);
+            mColorHighlighted = QColor(0, 255, 0, 220);
+            mIsVisible = true;
+            break;
+
+        case ViaRestrict:
+            mName = tr("ViaRestrict");
+            mColor = QColor(255, 255, 0, 50);
+            mColorHighlighted = QColor(255, 255, 0, 80);
             mIsVisible = true;
             break;
 
         case TopDeviceOutlines:
             mName = tr("TopDeviceOutlines");
-            mColor = Qt::gray;
-            mColorHighlighted = Qt::lightGray;
+            mColor = QColor(224, 224, 224, 150);
+            mColorHighlighted = QColor(224, 224, 224, 220);
+            mIsVisible = true;
+            break;
+
+        case TopGlue:
+            mName = tr("TopGlue");
+            mColor = QColor(224, 224, 224, 100);
+            mColorHighlighted = QColor(224, 224, 224, 120);
+            mIsVisible = true;
+            break;
+
+        case TopPaste:
+            mName = tr("TopPaste");
+            mColor = QColor(224, 224, 224, 100);
+            mColorHighlighted = QColor(224, 224, 224, 120);
             mIsVisible = true;
             break;
 
         case TopOverlayNames:
             mName = tr("TopOverlayNames");
-            mColor = Qt::gray;
-            mColorHighlighted = Qt::lightGray;
+            mColor = QColor(224, 224, 224, 150);
+            mColorHighlighted = QColor(224, 224, 224, 220);
             mIsVisible = true;
             break;
 
         case TopOverlayValues:
             mName = tr("TopOverlayValues");
-            mColor = Qt::gray;
-            mColorHighlighted = Qt::lightGray;
+            mColor = QColor(224, 224, 224, 150);
+            mColorHighlighted = QColor(224, 224, 224, 220);
             mIsVisible = true;
             break;
 
         case TopOverlay:
             mName = tr("TopOverlay");
-            mColor = Qt::gray;
-            mColorHighlighted = Qt::lightGray;
+            mColor = QColor(224, 224, 224, 150);
+            mColorHighlighted = QColor(224, 224, 224, 220);
+            mIsVisible = true;
+            break;
+
+        case TopDeviceKeepout:
+            mName = tr("TopDeviceKeepout");
+            mColor = QColor(255, 255, 0, 50);
+            mColorHighlighted = QColor(255, 255, 0, 80);
+            mIsVisible = true;
+            break;
+
+        case TopCopperRestrict:
+            mName = tr("TopCopperRestrict");
+            mColor = QColor(255, 255, 0, 50);
+            mColorHighlighted = QColor(255, 255, 0, 80);
             mIsVisible = true;
             break;
 
         case TopCopper:
             mName = tr("TopCopper");
-            mColor = Qt::darkRed;
-            mColorHighlighted = Qt::red;
+            mColor = QColor(255, 0, 0, 150);
+            mColorHighlighted = QColor(255, 0, 0, 220);
             mIsVisible = true;
             break;
 
         case BottomDeviceOutlines:
             mName = tr("BottomDeviceOutlines");
-            mColor = Qt::gray;
-            mColorHighlighted = Qt::lightGray;
+            mColor = QColor(224, 224, 224, 150);
+            mColorHighlighted = QColor(224, 224, 224, 220);
+            mIsVisible = true;
+            break;
+
+        case BottomGlue:
+            mName = tr("BottomGlue");
+            mColor = QColor(224, 224, 224, 100);
+            mColorHighlighted = QColor(224, 224, 224, 120);
+            mIsVisible = true;
+            break;
+
+        case BottomPaste:
+            mName = tr("BottomPaste");
+            mColor = QColor(224, 224, 224, 100);
+            mColorHighlighted = QColor(224, 224, 224, 120);
             mIsVisible = true;
             break;
 
         case BottomOverlayNames:
             mName = tr("BottomOverlayNames");
-            mColor = Qt::gray;
-            mColorHighlighted = Qt::lightGray;
+            mColor = QColor(224, 224, 224, 150);
+            mColorHighlighted = QColor(224, 224, 224, 220);
             mIsVisible = true;
             break;
 
         case BottomOverlayValues:
             mName = tr("BottomOverlayValues");
-            mColor = Qt::gray;
-            mColorHighlighted = Qt::lightGray;
+            mColor = QColor(224, 224, 224, 150);
+            mColorHighlighted = QColor(224, 224, 224, 220);
             mIsVisible = true;
             break;
 
         case BottomOverlay:
             mName = tr("BottomOverlay");
-            mColor = Qt::gray;
-            mColorHighlighted = Qt::lightGray;
+            mColor = QColor(224, 224, 224, 150);
+            mColorHighlighted = QColor(224, 224, 224, 220);
+            mIsVisible = true;
+            break;
+
+        case BottomDeviceKeepout:
+            mName = tr("BottomDeviceKeepout");
+            mColor = QColor(255, 255, 0, 50);
+            mColorHighlighted = QColor(255, 255, 0, 80);
+            mIsVisible = true;
+            break;
+
+        case BottomCopperRestrict:
+            mName = tr("BottomCopperRestrict");
+            mColor = QColor(255, 255, 0, 50);
+            mColorHighlighted = QColor(255, 255, 0, 80);
             mIsVisible = true;
             break;
 
         case BottomCopper:
             mName = tr("BottomCopper");
-            mColor = Qt::darkBlue;
-            mColorHighlighted = Qt::blue;
+            mColor = QColor(0, 0, 255, 150);
+            mColorHighlighted = QColor(0, 0, 255, 220);
             mIsVisible = true;
             break;
 
@@ -173,8 +236,8 @@ BoardLayer::BoardLayer(int id) :
 
         default:
             mName = tr("TODO");
-            mColor = Qt::darkRed;
-            mColorHighlighted = Qt::red;
+            mColor = QColor(255, 0, 0, 150);
+            mColorHighlighted = QColor(255, 0, 0, 220);
             mIsVisible = true;
             break;
 
@@ -202,6 +265,20 @@ BoardLayer::~BoardLayer()
 const QColor& BoardLayer::getColor(bool highlighted) const
 {
     return highlighted ? mColorHighlighted : mColor;
+}
+
+/*****************************************************************************************
+ *  Static Methods
+ ****************************************************************************************/
+
+int BoardLayer::getMirroredLayerId(int id) noexcept
+{
+    if ((id >= _TOP_LAYERS_START) && (id <= _TOP_LAYERS_END))
+        return _BOTTOM_LAYERS_START + (_TOP_LAYERS_END - id);
+    else if ((id >= _BOTTOM_LAYERS_START) && (id <= _BOTTOM_LAYERS_END))
+        return _TOP_LAYERS_END - (id - _BOTTOM_LAYERS_START);
+    else
+        return id; // Layer cannot be mirrored
 }
 
 /*****************************************************************************************

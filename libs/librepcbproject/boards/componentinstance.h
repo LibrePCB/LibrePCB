@@ -82,10 +82,12 @@ class ComponentInstance final : public QObject, public IF_AttributeProvider,
         BI_Footprint& getFootprint() const noexcept {return *mFootprint;}
         const Angle& getRotation() const noexcept {return mRotation;}
         const Point& getPosition() const noexcept {return mPosition;}
+        bool getIsMirrored() const noexcept {return mIsMirrored;}
 
         // Setters
         void setPosition(const Point& pos) noexcept;
         void setRotation(const Angle& rot) noexcept;
+        void setIsMirrored(bool mirror) noexcept;
 
         // General Methods
         void addToBoard(GraphicsScene& scene) throw (Exception);
@@ -106,6 +108,7 @@ class ComponentInstance final : public QObject, public IF_AttributeProvider,
 
         void moved(const Point& newPos);
         void rotated(const Angle& newRotation);
+        void mirrored(bool newIsMirrored);
 
 
     private:
@@ -136,6 +139,7 @@ class ComponentInstance final : public QObject, public IF_AttributeProvider,
         // Attributes
         Point mPosition;
         Angle mRotation;
+        bool mIsMirrored;
 };
 
 } // namespace project

@@ -124,6 +124,12 @@ BES_Base::ProcRetVal BES_Select::processSubStateIdle(BEE_Base* event) noexcept
         case BEE_Base::Edit_RotateCCW:
             rotateSelectedItems(Angle::deg90(), Point(), true);
             return ForceStayInState;
+        case BEE_Base::Edit_FlipHorizontal:
+            flipSelectedItems(false, Point(), true);
+            return ForceStayInState;
+        case BEE_Base::Edit_FlipVertical:
+            flipSelectedItems(true, Point(), true);
+            return ForceStayInState;
         case BEE_Base::Edit_Remove:
             removeSelectedItems();
             return ForceStayInState;
@@ -545,6 +551,67 @@ bool BES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
                     ComponentInstance& component = footprint->getComponentInstance();
                     CmdComponentInstanceEdit* cmd = new CmdComponentInstanceEdit(component, mParentCommand);
                     cmd->rotate(angle, center, false);
+                    mUndoStack.appendToCommand(cmd);
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+
+        mUndoStack.endCommand();
+        commandActive = false;
+    }
+    catch (Exception& e)
+    {
+        QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+        if (commandActive)
+            try {mUndoStack.abortCommand();} catch (...) {}
+        return false;
+    }
+
+    return true;
+}
+
+bool BES_Select::flipSelectedItems(bool vertical, Point center, bool centerOfElements) noexcept
+{
+    Board* board = mEditor.getActiveBoard();
+    Q_ASSERT(board); if (!board) return false;
+
+    // get all selected items
+    QList<BI_Base*> items = board->getSelectedItems(false /*true, false, true, false, false,
+                                                    false, false, false, false, false*/);
+
+    // abort if no items are selected
+    if (items.isEmpty()) return false;
+
+    // find the center of all elements
+    if (centerOfElements)
+    {
+        center = Point(0, 0);
+        foreach (BI_Base* item, items)
+            center += item->getPosition();
+        center /= items.count();
+        center.mapToGrid(mEditor.getGridProperties().getInterval());
+    }
+
+    bool commandActive = false;
+    try
+    {
+        mUndoStack.beginCommand(tr("Flip Board Elements"));
+        commandActive = true;
+
+        // flip all elements
+        foreach (BI_Base* item, items)
+        {
+            switch (item->getType())
+            {
+                case BI_Base::Type_t::Footprint:
+                {
+                    BI_Footprint* footprint = dynamic_cast<BI_Footprint*>(item); Q_ASSERT(footprint);
+                    ComponentInstance& component = footprint->getComponentInstance();
+                    CmdComponentInstanceEdit* cmd = new CmdComponentInstanceEdit(component, mParentCommand);
+                    cmd->mirror(center, vertical, false);
                     mUndoStack.appendToCommand(cmd);
                     break;
                 }

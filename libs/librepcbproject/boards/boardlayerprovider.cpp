@@ -35,24 +35,41 @@ BoardLayerProvider::BoardLayerProvider(Project& project) throw (Exception):
     mProject(project)
 {
     // add all required layers
+
     addLayer(BoardLayer::LayerID::Grid);
     addLayer(BoardLayer::LayerID::OriginCrosses);
     addLayer(BoardLayer::LayerID::Unrouted);
+    addLayer(BoardLayer::LayerID::FootprintGrabAreas);
+
     addLayer(BoardLayer::LayerID::BoardOutline);
     addLayer(BoardLayer::LayerID::Drills);
     addLayer(BoardLayer::LayerID::Vias);
+    addLayer(BoardLayer::LayerID::ViaRestrict);
+
     addLayer(BoardLayer::LayerID::TopDeviceOutlines);
+    addLayer(BoardLayer::LayerID::TopTestPoint);
+    addLayer(BoardLayer::LayerID::TopGlue);
+    addLayer(BoardLayer::LayerID::TopPaste);
     addLayer(BoardLayer::LayerID::TopOverlayNames);
     addLayer(BoardLayer::LayerID::TopOverlayValues);
     addLayer(BoardLayer::LayerID::TopOverlay);
     addLayer(BoardLayer::LayerID::TopStopMask);
+    addLayer(BoardLayer::LayerID::TopDeviceKeepout);
+    addLayer(BoardLayer::LayerID::TopCopperRestrict);
     addLayer(BoardLayer::LayerID::TopCopper);
     addLayer(BoardLayer::LayerID::BottomCopper);
+
+    addLayer(BoardLayer::LayerID::BottomCopperRestrict);
+    addLayer(BoardLayer::LayerID::BottomDeviceKeepout);
     addLayer(BoardLayer::LayerID::BottomStopMask);
     addLayer(BoardLayer::LayerID::BottomOverlay);
     addLayer(BoardLayer::LayerID::BottomOverlayValues);
     addLayer(BoardLayer::LayerID::BottomOverlayNames);
+    addLayer(BoardLayer::LayerID::BottomPaste);
+    addLayer(BoardLayer::LayerID::BottomGlue);
+    addLayer(BoardLayer::LayerID::BottomTestPoint);
     addLayer(BoardLayer::LayerID::BottomDeviceOutlines);
+
 #ifdef QT_DEBUG
     addLayer(BoardLayer::DEBUG_GraphicsItemsBoundingRect);
     addLayer(BoardLayer::DEBUG_GraphicsItemsTextsBoundingRect);

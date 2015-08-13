@@ -115,6 +115,8 @@ void BI_FootprintPad::updatePosition() noexcept
     mRotation = mFootprint.getRotation() + mFootprintPad->getRotation();
     mGraphicsItem->setPos(mPosition.toPxQPointF());
     mGraphicsItem->setRotation(mRotation.toDeg());
+    bool m = (mGraphicsItem->transform().m11() * mGraphicsItem->transform().m22() < qreal(0));
+    if (getIsMirrored() != m) mGraphicsItem->setTransform(QTransform::fromScale(qreal(-1), qreal(1)), true);
     mGraphicsItem->updateCacheAndRepaint();
     //if (mRegisteredNetPoint)
     //    mRegisteredNetPoint->setPosition(mPosition);
@@ -156,6 +158,11 @@ void BI_FootprintPad::removeFromBoard(GraphicsScene& scene) noexcept
 /*****************************************************************************************
  *  Inherited from BI_Base
  ****************************************************************************************/
+
+bool BI_FootprintPad::getIsMirrored() const noexcept
+{
+    return mFootprint.getIsMirrored();
+}
 
 QPainterPath BI_FootprintPad::getGrabAreaScenePx() const noexcept
 {

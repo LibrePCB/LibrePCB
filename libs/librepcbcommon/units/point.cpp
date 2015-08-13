@@ -100,6 +100,24 @@ Point& Point::rotate(const Angle& angle, const Point& center) noexcept
     return *this;
 }
 
+Point Point::mirrored(Qt::Orientation orientation, const Point& center) const noexcept
+{
+    Point p(*this);
+    p.mirror(orientation, center);
+    return p;
+}
+
+Point& Point::mirror(Qt::Orientation orientation, const Point& center) noexcept
+{
+    switch (orientation)
+    {
+        case Qt::Horizontal:    mX += Length(2) * (center.getX() - mX); break;
+        case Qt::Vertical:      mY += Length(2) * (center.getY() - mY); break;
+        default: Q_ASSERT(false);
+    }
+    return *this;
+}
+
 // Static Methods
 
 Point Point::fromMm(qreal millimetersX, qreal millimetersY, const Length& gridInterval) throw (RangeError)

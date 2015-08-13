@@ -69,8 +69,10 @@ class BEE_Base
             Edit_Copy,          ///< copy the selected elements to clipboard (ctrl+c)
             Edit_Cut,           ///< cut the selected elements (ctrl+x)
             Edit_Paste,         ///< paste the elements from the clipboard (ctrl+v)
-            Edit_RotateCW,      ///< rotate the selected elements 90° CW
-            Edit_RotateCCW,     ///< rotate the selected elements 90° CCW
+            Edit_RotateCCW,     ///< rotate the selected elements 90° CCW (r)
+            Edit_RotateCW,      ///< rotate the selected elements 90° CW (Shift+r)
+            Edit_FlipHorizontal,///< flip the selected elements horizontal (f)
+            Edit_FlipVertical,  ///< flip the selected elements vertical (Shift+f)
             Edit_Remove,        ///< remove the selected elements
             // Redirected QEvent's (SEE_RedirectedQEvent objects, with pointer to a QEvent)
             GraphicsViewEvent,  ///< event from #GraphicsView @see project#SEE_RedirectedQEvent

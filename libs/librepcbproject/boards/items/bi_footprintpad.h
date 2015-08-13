@@ -82,6 +82,7 @@ class BI_FootprintPad final : public BI_Base
         // Inherited from SI_Base
         Type_t getType() const noexcept override {return BI_Base::Type_t::FootprintPad;}
         const Point& getPosition() const noexcept override {return mPosition;}
+        bool getIsMirrored() const noexcept override;
         QPainterPath getGrabAreaScenePx() const noexcept override;
         void setSelected(bool selected) noexcept override;
 

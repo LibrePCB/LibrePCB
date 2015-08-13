@@ -59,6 +59,7 @@ class BI_Base : public QObject
         // Getters
         virtual Type_t getType() const noexcept = 0;
         virtual const Point& getPosition() const noexcept = 0;
+        virtual bool getIsMirrored() const noexcept = 0;
         bool isSelected() const noexcept {return mIsSelected;}
         virtual QPainterPath getGrabAreaScenePx() const noexcept = 0;
 

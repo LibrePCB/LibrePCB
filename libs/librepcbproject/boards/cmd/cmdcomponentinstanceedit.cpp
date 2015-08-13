@@ -34,7 +34,8 @@ namespace project {
 CmdComponentInstanceEdit::CmdComponentInstanceEdit(ComponentInstance& cmp, UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Edit component instance"), parent), mComponent(cmp),
     mOldPos(mComponent.getPosition()), mNewPos(mOldPos),
-    mOldRotation(mComponent.getRotation()), mNewRotation(mOldRotation)
+    mOldRotation(mComponent.getRotation()), mNewRotation(mOldRotation),
+    mOldMirrored(mComponent.getIsMirrored()), mNewMirrored(mOldMirrored)
 {
 }
 
@@ -44,6 +45,7 @@ CmdComponentInstanceEdit::~CmdComponentInstanceEdit() noexcept
     {
         mComponent.setPosition(mOldPos);
         mComponent.setRotation(mOldRotation);
+        mComponent.setIsMirrored(mOldMirrored);
     }
 }
 
@@ -84,6 +86,34 @@ void CmdComponentInstanceEdit::rotate(const Angle& angle, const Point& center, b
     }
 }
 
+void CmdComponentInstanceEdit::setMirrored(bool mirrored, bool immediate) noexcept
+{
+    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    mNewMirrored = mirrored;
+    if (immediate) mComponent.setIsMirrored(mNewMirrored);
+}
+
+void CmdComponentInstanceEdit::mirror(const Point& center, bool vertical, bool immediate) noexcept
+{
+    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    mNewMirrored = !mNewMirrored;
+    if (vertical)
+    {
+        mNewPos.setY(mNewPos.getY() + Length(2) * (center.getY() - mNewPos.getY()));
+        mNewRotation += Angle::deg180();
+    }
+    else
+    {
+        mNewPos.setX(mNewPos.getX() + Length(2) * (center.getX() - mNewPos.getX()));
+    }
+    if (immediate)
+    {
+        mComponent.setIsMirrored(mNewMirrored);
+        mComponent.setPosition(mNewPos);
+        mComponent.setRotation(mNewRotation);
+    }
+}
+
 /*****************************************************************************************
  *  Inherited from UndoCommand
  ****************************************************************************************/
@@ -94,12 +124,14 @@ void CmdComponentInstanceEdit::redo() throw (Exception)
     {
         mComponent.setPosition(mNewPos);
         mComponent.setRotation(mNewRotation);
+        mComponent.setIsMirrored(mNewMirrored);
         UndoCommand::redo();
     }
     catch (Exception &e)
     {
         mComponent.setPosition(mOldPos);
         mComponent.setRotation(mOldRotation);
+        mComponent.setIsMirrored(mOldMirrored);
         throw;
     }
 }
@@ -110,12 +142,14 @@ void CmdComponentInstanceEdit::undo() throw (Exception)
     {
         mComponent.setPosition(mOldPos);
         mComponent.setRotation(mOldRotation);
+        mComponent.setIsMirrored(mOldMirrored);
         UndoCommand::undo();
     }
     catch (Exception &e)
     {
         mComponent.setPosition(mNewPos);
         mComponent.setRotation(mNewRotation);
+        mComponent.setIsMirrored(mNewMirrored);
         throw;
     }
 }

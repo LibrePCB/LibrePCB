@@ -167,6 +167,10 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project) :
             [this](){mFsm->processEvent(new BEE_Base(BEE_Base::Edit_RotateCW), true);});
     connect(mUi->actionRotate_CCW, &QAction::triggered,
             [this](){mFsm->processEvent(new BEE_Base(BEE_Base::Edit_RotateCCW), true);});
+    connect(mUi->actionFlipHorizontal, &QAction::triggered,
+            [this](){mFsm->processEvent(new BEE_Base(BEE_Base::Edit_FlipHorizontal), true);});
+    connect(mUi->actionFlipVertical, &QAction::triggered,
+            [this](){mFsm->processEvent(new BEE_Base(BEE_Base::Edit_FlipVertical), true);});
     connect(mUi->actionRemove, &QAction::triggered,
             [this](){mFsm->processEvent(new BEE_Base(BEE_Base::Edit_Remove), true);});
 

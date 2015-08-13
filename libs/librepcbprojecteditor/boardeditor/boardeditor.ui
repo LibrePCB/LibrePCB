@@ -178,6 +178,9 @@
    </attribute>
    <addaction name="actionRotate_CCW"/>
    <addaction name="actionRotate_CW"/>
+   <addaction name="actionFlipHorizontal"/>
+   <addaction name="actionFlipVertical"/>
+   <addaction name="separator"/>
    <addaction name="actionCut"/>
    <addaction name="actionCopy"/>
    <addaction name="actionPaste"/>
@@ -336,7 +339,7 @@
     <string>Rotate Counterclockwise</string>
    </property>
    <property name="shortcut">
-    <string>Shift+R</string>
+    <string>R</string>
    </property>
   </action>
   <action name="actionRotate_CW">
@@ -348,7 +351,7 @@
     <string>Rotate Clockwise</string>
    </property>
    <property name="shortcut">
-    <string>R</string>
+    <string>Shift+R</string>
    </property>
   </action>
   <action name="actionCopy">
@@ -510,6 +513,30 @@
   <action name="actionEditNetClasses">
    <property name="text">
     <string>Net Classes</string>
+   </property>
+  </action>
+  <action name="actionFlipHorizontal">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/flip_horizontal.png</normaloff>:/img/actions/flip_horizontal.png</iconset>
+   </property>
+   <property name="text">
+    <string>Flip Horizontal</string>
+   </property>
+   <property name="shortcut">
+    <string>F</string>
+   </property>
+  </action>
+  <action name="actionFlipVertical">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/flip_vertical.png</normaloff>:/img/actions/flip_vertical.png</iconset>
+   </property>
+   <property name="text">
+    <string>Flip Vertical</string>
+   </property>
+   <property name="shortcut">
+    <string>Shift+F</string>
    </property>
   </action>
  </widget>

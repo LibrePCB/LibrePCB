@@ -43,7 +43,6 @@ namespace project {
 BGI_FootprintPad::BGI_FootprintPad(BI_FootprintPad& pad) noexcept :
     BGI_Base(), mPad(pad), mLibPad(pad.getLibPad())
 {
-    setZValue(Board::ZValue_FootprintsBottom);
     QStringList localeOrder = mPad.getProject().getSettings().getLocaleOrder();
     setToolTip(mLibPad.getName(localeOrder) % ": " % mLibPad.getDescription(localeOrder));
 
@@ -72,32 +71,20 @@ void BGI_FootprintPad::updateCacheAndRepaint() noexcept
     mShape.setFillRule(Qt::WindingFill);
     mBoundingRect = QRectF();
 
+    // set Z value
+    if ((mLibPad.getType() == library::FootprintPad::Type_t::SmdRect) && (mPad.getIsMirrored()))
+        setZValue(Board::ZValue_FootprintPadsBottom);
+    else
+        setZValue(Board::ZValue_FootprintPadsTop);
+
     // rotation
     Angle absAngle = mLibPad.getRotation() + mPad.getFootprint().getRotation();
     mRotate180 = (absAngle <= -Angle::deg90() || absAngle > Angle::deg90());
 
-    // circle
-    //mShape.addEllipse(-mRadiusPx, -mRadiusPx, 2*mRadiusPx, 2*mRadiusPx);
-    //mBoundingRect = mBoundingRect.united(mShape.boundingRect());
-
-    // line
-    //QRectF lineRect = QRectF(QPointF(0, 0), Point(0, mLibPin.getLength()).toPxQPointF()).normalized();
-    //lineRect.adjust(-Length(79375).toPx(), -Length(79375).toPx(), Length(79375).toPx(), Length(79375).toPx());
-    //mBoundingRect = mBoundingRect.united(lineRect).normalized();
-
-    // text
-    //qreal x = mLibPin.getLength().toPx() + 4;
-    //mStaticText.setText(mPin.getDisplayText());
-    //mStaticText.prepare(QTransform(), mFont);
-    //mTextOrigin.setX(mRotate180 ? -x-mStaticText.size().width() : x);
-    //mTextOrigin.setY(-mStaticText.size().height()/2);
-    //mStaticText.prepare(QTransform().rotate(mRotate180 ? 90 : -90)
-    //                                .translate(mTextOrigin.x(), mTextOrigin.y()), mFont);
-    //if (mRotate180)
-    //    mTextBoundingRect = QRectF(mTextOrigin.y(), mTextOrigin.x(), mStaticText.size().height(), mStaticText.size().width()).normalized();
-    //else
-    //    mTextBoundingRect = QRectF(mTextOrigin.y(), -mTextOrigin.x()-mStaticText.size().width(), mStaticText.size().height(), mStaticText.size().width()).normalized();
-    //mBoundingRect = mBoundingRect.united(mTextBoundingRect).normalized();
+    QRectF rect = QRectF(-mLibPad.getWidth().toPx()/2, -mLibPad.getHeight().toPx()/2,
+                         mLibPad.getWidth().toPx(), mLibPad.getHeight().toPx());
+    mShape.addRect(rect);
+    mBoundingRect = mBoundingRect.united(mShape.boundingRect());
 
     update();
 }
@@ -178,6 +165,7 @@ void BGI_FootprintPad::paint(QPainter* painter, const QStyleOptionGraphicsItem* 
 
 BoardLayer* BGI_FootprintPad::getBoardLayer(int id) const noexcept
 {
+    if (mPad.getIsMirrored()) id = BoardLayer::getMirroredLayerId(id);
     return mPad.getFootprint().getComponentInstance().getBoard().getProject().getBoardLayer(id);
 }
 

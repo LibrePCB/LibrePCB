@@ -70,6 +70,8 @@ void BI_Footprint::init() throw (Exception)
     mGraphicsItem = new BGI_Footprint(*this);
     mGraphicsItem->setPos(mComponentInstance.getPosition().toPxQPointF());
     mGraphicsItem->setRotation(-mComponentInstance.getRotation().toDeg());
+    if (mComponentInstance.getIsMirrored())
+        mGraphicsItem->setTransform(QTransform::fromScale(qreal(-1), qreal(1)), true);
 
     const library::Component& libComp = mComponentInstance.getLibComponent();
     foreach (const library::FootprintPad* libPad, mFootprint->getPads())
@@ -105,6 +107,8 @@ void BI_Footprint::init() throw (Exception)
             this, &BI_Footprint::componentInstanceMoved);
     connect(&mComponentInstance, &ComponentInstance::rotated,
             this, &BI_Footprint::componentInstanceRotated);
+    connect(&mComponentInstance, &ComponentInstance::mirrored,
+            this, &BI_Footprint::componentInstanceMirrored);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -169,7 +173,10 @@ XmlDomElement* BI_Footprint::serializeToXmlDomElement() const throw (Exception)
 
 Point BI_Footprint::mapToScene(const Point& relativePos) const noexcept
 {
-    return (mComponentInstance.getPosition() + relativePos).rotated(mComponentInstance.getRotation(), mComponentInstance.getPosition());
+    if (mComponentInstance.getIsMirrored())
+        return (mComponentInstance.getPosition() + relativePos.mirrored(Qt::Horizontal)).rotated(mComponentInstance.getRotation(), mComponentInstance.getPosition());
+    else
+        return (mComponentInstance.getPosition() + relativePos).rotated(mComponentInstance.getRotation(), mComponentInstance.getPosition());
 }
 
 bool BI_Footprint::getAttributeValue(const QString& attrNS, const QString& attrKey,
@@ -189,6 +196,11 @@ bool BI_Footprint::getAttributeValue(const QString& attrNS, const QString& attrK
 const Point& BI_Footprint::getPosition() const noexcept
 {
     return mComponentInstance.getPosition();
+}
+
+bool BI_Footprint::getIsMirrored() const noexcept
+{
+    return mComponentInstance.getIsMirrored();
 }
 
 QPainterPath BI_Footprint::getGrabAreaScenePx() const noexcept
@@ -224,6 +236,15 @@ void BI_Footprint::componentInstanceMoved(const Point& pos)
 void BI_Footprint::componentInstanceRotated(const Angle& rot)
 {
     mGraphicsItem->setRotation(-rot.toDeg());
+    mGraphicsItem->updateCacheAndRepaint();
+    foreach (BI_FootprintPad* pad, mPads)
+        pad->updatePosition();
+}
+
+void BI_Footprint::componentInstanceMirrored(bool mirrored)
+{
+    bool m = (mGraphicsItem->transform().m11() * mGraphicsItem->transform().m22() < qreal(0));
+    if (mirrored != m) mGraphicsItem->setTransform(QTransform::fromScale(qreal(-1), qreal(1)), true);
     mGraphicsItem->updateCacheAndRepaint();
     foreach (BI_FootprintPad* pad, mPads)
         pad->updatePosition();
