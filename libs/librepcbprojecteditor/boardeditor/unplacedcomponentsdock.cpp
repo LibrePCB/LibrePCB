@@ -209,7 +209,7 @@ void UnplacedComponentsDock::updateComponentsList() noexcept
             if (genComp->getGenComp().isSchematicOnly()) continue;
 
             // add generic component to list
-            int compCount = mProject.getLibrary().getComponentsOfGenComp(genComp->getGenComp().getUuid()).count();
+            int compCount = mProjectEditor.getWorkspace().getLibrary().getComponentsOfGenericComponent(genComp->getGenComp().getUuid()).count();
             QString name = genComp->getName();
             QString value = genComp->getValue(true).replace("\n", "|");
             QString genCompName = genComp->getGenComp().getName(mProject.getSettings().getLocaleOrder());
