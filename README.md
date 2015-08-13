@@ -8,6 +8,23 @@ development stage (no stable release available).
 
 ![Screenshot](doc/screenshot.png)
 
+### Features
+- Cross-platform (UNIX/Linux, Mac OS X, Windows)
+- Multilingual (application and library elements)
+- All-In-One: project management + schematic editor + board editor
+- Intuitive, modern and easy-to-use schematic/board editors
+- Very powerful library design
+- Uses XML as primary file format (allows version control of libraries and projects)
+- Multi-PCB feature (different PCB variants of the same schematic)
+- Automatic netlist synchronisation between schematic and PCB (no manual export/import)
+- Up to 100 copper layers :-)
+
+### Planned Features
+- Integrated 3D PCB viewer + 3D file export
+- Automatic SPICE netlist export
+- Reverse engineering mode (from PCB to schematic)
+
+
 ## Development
 
 ### Requirements
