@@ -762,7 +762,8 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
             QUuid fptUuid = getOrCreateUuid(outputSettings, filepath, "packages_to_footprints", packageName);
 
             QUuid compUuid = getOrCreateUuid(outputSettings, filepath, "devices_to_components", name, deviceName);
-            Component* component = new Component(compUuid, Version("0.1"), "LibrePCB", name, desc);
+            QString compName = deviceName.isEmpty() ? name : QString("%1_%2").arg(name, deviceName);
+            Component* component = new Component(compUuid, Version("0.1"), "LibrePCB", compName, desc);
             component->setGenCompUuid(gencomp->getUuid());
             component->setPackageUuid(pkgUuid);
 
