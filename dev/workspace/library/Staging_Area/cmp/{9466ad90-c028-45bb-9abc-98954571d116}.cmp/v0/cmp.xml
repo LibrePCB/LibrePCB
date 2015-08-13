@@ -4,8 +4,8 @@
         <uuid>{9466ad90-c028-45bb-9abc-98954571d116}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:46Z</created>
-        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <created>2015-08-13T20:22:36Z</created>
+        <last_modified>2015-08-13T20:22:36Z</last_modified>
         <name locale="en_US">ZZ22</name>
         <description locale="en_US">&lt;B>DIODE&lt;/B>
 
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{2b7cfc0e-b210-4548-9e87-1f1a37d5cb6c}" signal="{70bfae8a-9d09-45d9-864a-d8e75597a900}"/>
-        <map pad="{49411533-71c4-4aef-94f5-b10c19df0b72}" signal="{22833955-a5b8-40dc-8080-77e68173a07b}"/>
+        <map signal="{70bfae8a-9d09-45d9-864a-d8e75597a900}" pad="{2b7cfc0e-b210-4548-9e87-1f1a37d5cb6c}"/>
+        <map signal="{22833955-a5b8-40dc-8080-77e68173a07b}" pad="{49411533-71c4-4aef-94f5-b10c19df0b72}"/>
     </pad_signal_map>
 </component>

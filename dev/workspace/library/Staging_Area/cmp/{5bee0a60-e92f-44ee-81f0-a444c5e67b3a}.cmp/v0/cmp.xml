@@ -4,8 +4,8 @@
         <uuid>{5bee0a60-e92f-44ee-81f0-a444c5e67b3a}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:48Z</created>
-        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <created>2015-08-13T20:22:38Z</created>
+        <last_modified>2015-08-13T20:22:38Z</last_modified>
         <name locale="en_US">GM5BW96385A</name>
         <description locale="en_US">&lt;b>High brightness White Color LED&lt;/b> 2300 mcd @ IF = 20mA&lt;p>
 achieved via InGaN Blue LED chip in combination with Yellow Phosphor&lt;br>
@@ -21,7 +21,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{c11318b2-0a77-4ec6-b401-3cf490bd6178}" signal="{7abeb4bc-40ea-4c01-ab24-515b6b1114d1}"/>
-        <map pad="{8e794971-4db5-41a2-b49b-58fd393a60d5}" signal="{413a437d-c5c0-4116-a9e6-4b8a161d2610}"/>
+        <map signal="{7abeb4bc-40ea-4c01-ab24-515b6b1114d1}" pad="{c11318b2-0a77-4ec6-b401-3cf490bd6178}"/>
+        <map signal="{413a437d-c5c0-4116-a9e6-4b8a161d2610}" pad="{8e794971-4db5-41a2-b49b-58fd393a60d5}"/>
     </pad_signal_map>
 </component>

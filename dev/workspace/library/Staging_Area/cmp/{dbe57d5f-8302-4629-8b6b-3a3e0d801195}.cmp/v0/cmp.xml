@@ -4,9 +4,9 @@
         <uuid>{dbe57d5f-8302-4629-8b6b-3a3e0d801195}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:47Z</created>
-        <last_modified>2015-06-21T12:37:47Z</last_modified>
-        <name locale="en_US">DIAC-</name>
+        <created>2015-08-13T20:22:37Z</created>
+        <last_modified>2015-08-13T20:22:37Z</last_modified>
+        <name locale="en_US">DIAC-_GT32</name>
         <description locale="en_US">&lt;b>DIAC&lt;/b>
 
 This element was automatically imported from Eagle
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{30b2bc4e-40cc-43e7-835d-c514f7ed455c}" signal="{b5933321-d574-4dba-be74-02ba467cd8f3}"/>
-        <map pad="{d82eeefa-526f-41d2-9d55-97582fbf3bb5}" signal="{97d4bb0b-844f-4d15-bea4-730e4815418a}"/>
+        <map signal="{b5933321-d574-4dba-be74-02ba467cd8f3}" pad="{30b2bc4e-40cc-43e7-835d-c514f7ed455c}"/>
+        <map signal="{97d4bb0b-844f-4d15-bea4-730e4815418a}" pad="{d82eeefa-526f-41d2-9d55-97582fbf3bb5}"/>
     </pad_signal_map>
 </component>

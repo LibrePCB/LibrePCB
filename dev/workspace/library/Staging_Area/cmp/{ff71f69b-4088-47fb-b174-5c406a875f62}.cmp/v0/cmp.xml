@@ -4,8 +4,8 @@
         <uuid>{ff71f69b-4088-47fb-b174-5c406a875f62}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:47Z</created>
-        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <created>2015-08-13T20:22:37Z</created>
+        <last_modified>2015-08-13T20:22:37Z</last_modified>
         <name locale="en_US">BAS70-07</name>
         <description locale="en_US">&lt;b>Silicon Schottky Diodes&lt;/b>&lt;p>
 General-purpose diode for high-speed switching&lt;br>
@@ -21,9 +21,9 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{7b45d5d9-7c9e-4bd8-8147-043391ae8746}" signal="{9666778f-7710-46ff-a67b-0db057c44c63}"/>
-        <map pad="{bfbcd8c9-eb23-4fa8-8d1e-cd1a8f282d98}" signal="{373b2ffe-7168-4826-9d58-5b236573b774}"/>
-        <map pad="{25e2d2bf-bdf3-4da5-a18e-e0fc59848aee}" signal="{c976670b-a550-4849-a3cc-5bc591572423}"/>
-        <map pad="{c8416ee9-b57a-4ff2-bf4c-6881f9a0aa4f}" signal="{bba0853a-dfa7-4e1b-ae2b-746fc92d9c8e}"/>
+        <map signal="{373b2ffe-7168-4826-9d58-5b236573b774}" pad="{bfbcd8c9-eb23-4fa8-8d1e-cd1a8f282d98}"/>
+        <map signal="{c976670b-a550-4849-a3cc-5bc591572423}" pad="{25e2d2bf-bdf3-4da5-a18e-e0fc59848aee}"/>
+        <map signal="{9666778f-7710-46ff-a67b-0db057c44c63}" pad="{7b45d5d9-7c9e-4bd8-8147-043391ae8746}"/>
+        <map signal="{bba0853a-dfa7-4e1b-ae2b-746fc92d9c8e}" pad="{c8416ee9-b57a-4ff2-bf4c-6881f9a0aa4f}"/>
     </pad_signal_map>
 </component>

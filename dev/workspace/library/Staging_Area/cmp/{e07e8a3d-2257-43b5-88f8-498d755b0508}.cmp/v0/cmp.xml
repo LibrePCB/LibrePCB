@@ -4,8 +4,8 @@
         <uuid>{e07e8a3d-2257-43b5-88f8-498d755b0508}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:44Z</created>
-        <last_modified>2015-06-21T12:37:44Z</last_modified>
+        <created>2015-08-13T20:22:34Z</created>
+        <last_modified>2015-08-13T20:22:34Z</last_modified>
         <name locale="en_US">MA04-1</name>
         <description locale="en_US">&lt;b>PIN HEADER&lt;/b>
 
@@ -19,9 +19,9 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{9b3a2a1a-9a7d-4fd9-9649-53337145c7ec}" signal="{951e7836-bf3d-4f88-8dde-c243156cb6fe}"/>
-        <map pad="{746bee7d-59e5-45df-b61c-4a14e9d38f70}" signal="{d2dd1895-f1c1-4854-87d4-d4edffa73d25}"/>
-        <map pad="{0029dcfa-8e10-46c5-bde2-fa75d19ad492}" signal="{57377782-02e2-42cc-a1a2-dda3269ade9e}"/>
-        <map pad="{d799770d-65fb-4f1f-b480-cc91ebc7873b}" signal="{62bd0aac-cc16-41d7-8cd8-62d324da77e0}"/>
+        <map signal="{d2dd1895-f1c1-4854-87d4-d4edffa73d25}" pad="{746bee7d-59e5-45df-b61c-4a14e9d38f70}"/>
+        <map signal="{62bd0aac-cc16-41d7-8cd8-62d324da77e0}" pad="{d799770d-65fb-4f1f-b480-cc91ebc7873b}"/>
+        <map signal="{951e7836-bf3d-4f88-8dde-c243156cb6fe}" pad="{9b3a2a1a-9a7d-4fd9-9649-53337145c7ec}"/>
+        <map signal="{57377782-02e2-42cc-a1a2-dda3269ade9e}" pad="{0029dcfa-8e10-46c5-bde2-fa75d19ad492}"/>
     </pad_signal_map>
 </component>

@@ -4,9 +4,9 @@
         <uuid>{861e890f-904c-4888-8f16-455ceeb49148}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:47Z</created>
-        <last_modified>2015-06-21T12:37:47Z</last_modified>
-        <name locale="en_US">DIAC2-</name>
+        <created>2015-08-13T20:22:37Z</created>
+        <last_modified>2015-08-13T20:22:37Z</last_modified>
+        <name locale="en_US">DIAC2-_BR220H</name>
         <description locale="en_US">&lt;B>DIAC&lt;/B>&lt;p>
 double diode
 
@@ -20,8 +20,8 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{a7e1f118-c69b-4361-a0ab-94c4d52d82b8}" signal="{ad7af6e3-39a8-400e-9a0a-61a3fc666e17}"/>
-        <map pad="{addf4bfc-c4e8-404e-8b45-ff935c7984fa}" signal="{c77f6b0d-d360-4871-a757-6f79170bc60b}"/>
-        <map pad="{5bbc257f-8777-4110-9b7e-37705432768f}" signal="{bd5e5eff-8b69-412e-8a7f-27a3b6e0442e}"/>
+        <map signal="{ad7af6e3-39a8-400e-9a0a-61a3fc666e17}" pad="{a7e1f118-c69b-4361-a0ab-94c4d52d82b8}"/>
+        <map signal="{c77f6b0d-d360-4871-a757-6f79170bc60b}" pad="{addf4bfc-c4e8-404e-8b45-ff935c7984fa}"/>
+        <map signal="{bd5e5eff-8b69-412e-8a7f-27a3b6e0442e}" pad="{5bbc257f-8777-4110-9b7e-37705432768f}"/>
     </pad_signal_map>
 </component>

@@ -4,8 +4,8 @@
         <uuid>{129e595c-1c47-4a07-8f68-bf4c28bd24e6}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:45Z</created>
-        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <created>2015-08-13T20:22:35Z</created>
+        <last_modified>2015-08-13T20:22:35Z</last_modified>
         <name locale="en_US">TC47</name>
         <description locale="en_US">&lt;b>Temperature Compensated Xtal Oscillator&lt;/b>&lt;p>
 HCMOS, Clipped Sine Wave or Sine Wave Compatible&lt;br>
@@ -21,10 +21,10 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{82b714e3-0d9e-4db8-a871-43aeabbca9b3}" signal="{0a2174bb-cf88-43b8-82a0-e8538edb1d8c}"/>
-        <map pad="{4fea41db-21dd-4329-bc86-8ba281c2f8f5}" signal="{6a52037a-84f2-4d6e-ba30-b4a7d0cbe8bc}"/>
-        <map pad="{907e8ff6-01d5-4c32-b7d9-01e2928cb878}" signal="{3f2daa35-dd8d-4499-bfec-e64c567e9cdb}"/>
-        <map pad="{f128e0d1-6584-45eb-8744-7d797291224c}" signal="{107dc0cb-d444-4c9b-8f01-bfd8fa8198c4}"/>
-        <map pad="{b04d3c7e-0625-4a2c-a0be-c4c6f4df7abd}" signal="{139c9a7c-ab90-4208-8927-f76aa53fc7d6}"/>
+        <map signal="{0a2174bb-cf88-43b8-82a0-e8538edb1d8c}" pad="{82b714e3-0d9e-4db8-a871-43aeabbca9b3}"/>
+        <map signal="{6a52037a-84f2-4d6e-ba30-b4a7d0cbe8bc}" pad="{4fea41db-21dd-4329-bc86-8ba281c2f8f5}"/>
+        <map signal="{139c9a7c-ab90-4208-8927-f76aa53fc7d6}" pad="{b04d3c7e-0625-4a2c-a0be-c4c6f4df7abd}"/>
+        <map signal="{3f2daa35-dd8d-4499-bfec-e64c567e9cdb}" pad="{907e8ff6-01d5-4c32-b7d9-01e2928cb878}"/>
+        <map signal="{107dc0cb-d444-4c9b-8f01-bfd8fa8198c4}" pad="{f128e0d1-6584-45eb-8744-7d797291224c}"/>
     </pad_signal_map>
 </component>

@@ -4,9 +4,9 @@
         <uuid>{68d2c960-a463-4d8d-9eb3-71a8cc91cbde}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:42Z</created>
-        <last_modified>2015-06-21T12:37:42Z</last_modified>
-        <name locale="en_US">R-EU_</name>
+        <created>2015-08-13T20:22:31Z</created>
+        <last_modified>2015-08-13T20:22:31Z</last_modified>
+        <name locale="en_US">R-EU__V235/17</name>
         <description locale="en_US">&lt;B>RESISTOR&lt;/B>, European symbol
 
 This element was automatically imported from Eagle
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{5d07e3cf-1126-423c-a5be-1088f4cde995}" signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
-        <map pad="{f1d70e94-b225-40e1-b359-3c884675e567}" signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
+        <map signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}" pad="{5d07e3cf-1126-423c-a5be-1088f4cde995}"/>
+        <map signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}" pad="{f1d70e94-b225-40e1-b359-3c884675e567}"/>
     </pad_signal_map>
 </component>

@@ -4,9 +4,9 @@
         <uuid>{aec8ad13-f71e-4346-b620-c7b735338f7b}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:48Z</created>
-        <last_modified>2015-06-21T12:37:48Z</last_modified>
-        <name locale="en_US">LED</name>
+        <created>2015-08-13T20:22:38Z</created>
+        <last_modified>2015-08-13T20:22:38Z</last_modified>
+        <name locale="en_US">LED_IRL80A</name>
         <description locale="en_US">&lt;b>LED&lt;/b>&lt;p>
 &lt;u>OSRAM&lt;/u>:&lt;br>
 
@@ -93,7 +93,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{d6618d57-6eb0-45ab-821e-c7af5102fbe8}" signal="{7b023430-b68f-403a-80b8-c7deb12e7a0c}"/>
-        <map pad="{8d9cdbde-9d66-47c4-90f0-757abd033b36}" signal="{f1467b5c-cc7d-44b4-8076-d729f35b3a6a}"/>
+        <map signal="{f1467b5c-cc7d-44b4-8076-d729f35b3a6a}" pad="{8d9cdbde-9d66-47c4-90f0-757abd033b36}"/>
+        <map signal="{7b023430-b68f-403a-80b8-c7deb12e7a0c}" pad="{d6618d57-6eb0-45ab-821e-c7af5102fbe8}"/>
     </pad_signal_map>
 </component>

@@ -4,8 +4,8 @@
         <uuid>{ceb77b1a-c6d7-439b-9d20-5769567d0d9b}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:46Z</created>
-        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <created>2015-08-13T20:22:36Z</created>
+        <last_modified>2015-08-13T20:22:36Z</last_modified>
         <name locale="en_US">MUR810</name>
         <description locale="en_US">&lt;B>DIODE&lt;/B>
 
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{22c59b75-9555-4663-b1ec-2cb2e628e643}" signal="{227d82f3-e638-4e5b-8ac6-78f1040475c1}"/>
-        <map pad="{d3037401-716f-4079-8049-c4fafefac3ec}" signal="{e5f6290f-eb98-4479-905d-2025b5b84f85}"/>
+        <map signal="{227d82f3-e638-4e5b-8ac6-78f1040475c1}" pad="{22c59b75-9555-4663-b1ec-2cb2e628e643}"/>
+        <map signal="{e5f6290f-eb98-4479-905d-2025b5b84f85}" pad="{d3037401-716f-4079-8049-c4fafefac3ec}"/>
     </pad_signal_map>
 </component>

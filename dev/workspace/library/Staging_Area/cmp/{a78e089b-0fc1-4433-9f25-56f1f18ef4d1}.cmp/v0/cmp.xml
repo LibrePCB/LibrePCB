@@ -4,9 +4,9 @@
         <uuid>{a78e089b-0fc1-4433-9f25-56f1f18ef4d1}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:45Z</created>
-        <last_modified>2015-06-21T12:37:45Z</last_modified>
-        <name locale="en_US">45M*B</name>
+        <created>2015-08-13T20:22:35Z</created>
+        <last_modified>2015-08-13T20:22:35Z</last_modified>
+        <name locale="en_US">45M*B_UM5</name>
         <description locale="en_US">&lt;b>Monolithic Crystal Filters&lt;/b>&lt;p>
 Source: www.vanlong.com
 
@@ -20,8 +20,8 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{4f7d8962-be6a-402f-9829-5ff5f9af558c}" signal="{781544c1-488b-439f-80ed-4a7090c63bfb}"/>
-        <map pad="{19d42c73-6102-482e-bba7-50cfeda56f04}" signal="{a0b22c72-e73c-48b0-a9ff-6796fd339f65}"/>
-        <map pad="{67c2f5d8-ff13-437e-a164-8b028726b47a}" signal="{51e77657-5b61-4138-83c9-a86d6248e980}"/>
+        <map signal="{a0b22c72-e73c-48b0-a9ff-6796fd339f65}" pad="{19d42c73-6102-482e-bba7-50cfeda56f04}"/>
+        <map signal="{781544c1-488b-439f-80ed-4a7090c63bfb}" pad="{4f7d8962-be6a-402f-9829-5ff5f9af558c}"/>
+        <map signal="{51e77657-5b61-4138-83c9-a86d6248e980}" pad="{67c2f5d8-ff13-437e-a164-8b028726b47a}"/>
     </pad_signal_map>
 </component>

@@ -4,9 +4,9 @@
         <uuid>{903740f4-30b2-44c4-bcd4-73271cf80066}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:47Z</created>
-        <last_modified>2015-06-21T12:37:47Z</last_modified>
-        <name locale="en_US">DIODE_2SCHOTTKY-</name>
+        <created>2015-08-13T20:22:37Z</created>
+        <last_modified>2015-08-13T20:22:37Z</last_modified>
+        <name locale="en_US">DIODE_2SCHOTTKY-_SOT82H</name>
         <description locale="en_US">Dual &lt;B>SCHOTTKY DIODE&lt;/B>&lt;p>
 common cathode
 
@@ -20,8 +20,8 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{6406df12-a27a-4540-bdc1-606fcabad15a}" signal="{7f593ae8-d0dc-4597-9671-4384b57dd1eb}"/>
-        <map pad="{b5ffe1ad-c5ba-406f-9cab-a6565cfbcb3c}" signal="{c83a5965-2c3f-40a3-b921-9c9257105a0e}"/>
-        <map pad="{28b5b92d-937b-4bf1-99fc-05776e326445}" signal="{dbaea8d9-cc6f-4679-a89c-6c74e12cec6a}"/>
+        <map signal="{7f593ae8-d0dc-4597-9671-4384b57dd1eb}" pad="{6406df12-a27a-4540-bdc1-606fcabad15a}"/>
+        <map signal="{c83a5965-2c3f-40a3-b921-9c9257105a0e}" pad="{b5ffe1ad-c5ba-406f-9cab-a6565cfbcb3c}"/>
+        <map signal="{dbaea8d9-cc6f-4679-a89c-6c74e12cec6a}" pad="{28b5b92d-937b-4bf1-99fc-05776e326445}"/>
     </pad_signal_map>
 </component>

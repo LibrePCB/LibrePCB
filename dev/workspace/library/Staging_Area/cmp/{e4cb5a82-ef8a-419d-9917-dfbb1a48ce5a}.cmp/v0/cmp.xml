@@ -4,9 +4,9 @@
         <uuid>{e4cb5a82-ef8a-419d-9917-dfbb1a48ce5a}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:42Z</created>
-        <last_modified>2015-06-21T12:37:42Z</last_modified>
-        <name locale="en_US">C-US</name>
+        <created>2015-08-13T20:22:32Z</created>
+        <last_modified>2015-08-13T20:22:32Z</last_modified>
+        <name locale="en_US">C-US_325-162X374</name>
         <description locale="en_US">&lt;B>CAPACITOR&lt;/B>, American symbol
 
 This element was automatically imported from Eagle
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{fc082ce0-f727-4238-baa3-efdc4b6e2b77}" signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
-        <map pad="{110687c7-b47d-43b6-8c02-e6b7ae070259}" signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
+        <map signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}" pad="{fc082ce0-f727-4238-baa3-efdc4b6e2b77}"/>
+        <map signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}" pad="{110687c7-b47d-43b6-8c02-e6b7ae070259}"/>
     </pad_signal_map>
 </component>

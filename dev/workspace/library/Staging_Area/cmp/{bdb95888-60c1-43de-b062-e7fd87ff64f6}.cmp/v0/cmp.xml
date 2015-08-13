@@ -4,8 +4,8 @@
         <uuid>{bdb95888-60c1-43de-b062-e7fd87ff64f6}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:46Z</created>
-        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <created>2015-08-13T20:22:36Z</created>
+        <last_modified>2015-08-13T20:22:36Z</last_modified>
         <name locale="en_US">GP15</name>
         <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
 low leakage at high temperature, 2 A (Diotec)
@@ -20,7 +20,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{3be318d8-b78f-4fe0-9d74-c38caa462de6}" signal="{ea60ad2e-9666-4e25-803b-d4501a5c0486}"/>
-        <map pad="{e48af805-7b94-4ccc-a516-80f45914d9d0}" signal="{44b5cf45-4429-4488-bc84-a24e72cee2a4}"/>
+        <map signal="{ea60ad2e-9666-4e25-803b-d4501a5c0486}" pad="{3be318d8-b78f-4fe0-9d74-c38caa462de6}"/>
+        <map signal="{44b5cf45-4429-4488-bc84-a24e72cee2a4}" pad="{e48af805-7b94-4ccc-a516-80f45914d9d0}"/>
     </pad_signal_map>
 </component>

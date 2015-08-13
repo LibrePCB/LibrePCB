@@ -4,9 +4,9 @@
         <uuid>{85a3a449-4807-4cca-90d1-5947f09ab65e}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:43Z</created>
-        <last_modified>2015-06-21T12:37:43Z</last_modified>
-        <name locale="en_US">CX</name>
+        <created>2015-08-13T20:22:32Z</created>
+        <last_modified>2015-08-13T20:22:32Z</last_modified>
+        <name locale="en_US">CX_XC22B7</name>
         <description locale="en_US">&lt;B>X CAPACITOR&lt;/B>&lt;p>
 for power line
 
@@ -20,7 +20,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{a2ec3186-0b83-4883-b22b-51c146a554b5}" signal="{68690a33-db60-4d6e-864e-745c86d25bff}"/>
-        <map pad="{20ff6813-45c8-4e66-b100-8650d03ad4cb}" signal="{7bdf360c-b2cf-437a-b1cc-b6788994cf8d}"/>
+        <map signal="{68690a33-db60-4d6e-864e-745c86d25bff}" pad="{a2ec3186-0b83-4883-b22b-51c146a554b5}"/>
+        <map signal="{7bdf360c-b2cf-437a-b1cc-b6788994cf8d}" pad="{20ff6813-45c8-4e66-b100-8650d03ad4cb}"/>
     </pad_signal_map>
 </component>

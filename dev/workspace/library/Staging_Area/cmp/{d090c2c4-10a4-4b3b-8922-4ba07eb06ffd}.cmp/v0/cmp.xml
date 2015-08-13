@@ -4,8 +4,8 @@
         <uuid>{d090c2c4-10a4-4b3b-8922-4ba07eb06ffd}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:48Z</created>
-        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <created>2015-08-13T20:22:38Z</created>
+        <last_modified>2015-08-13T20:22:38Z</last_modified>
         <name locale="en_US">LD269</name>
         <description locale="en_US">&lt;B>LED BLOCK&lt;/B>&lt;p>
 9 LEDs, Siemens
@@ -20,23 +20,23 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{0b905ea7-ec6b-44d5-a0fa-459ce4470dfa}" signal="{1a243be4-361f-464d-9366-f91d5354da6b}"/>
-        <map pad="{5c4d2d51-6e03-4f96-a95a-a9f058b18219}" signal="{47c45373-ef67-4fff-aa73-a4489b0e475f}"/>
-        <map pad="{3b8a83b0-0f4f-4869-a144-4d9d2ffbfee1}" signal="{4fd5957b-9ba7-4ce8-8cb1-cb885edf9a5c}"/>
-        <map pad="{73619ca5-3ef2-4797-af0e-b07bb4d0c7dc}" signal="{dd4befe7-a573-462a-b199-9ac6cd202e86}"/>
-        <map pad="{5a44b1ce-7839-4c06-bdc5-4bf4de7a64cf}" signal="{f630a91b-bfd1-4d95-8f3e-27c30b587e1c}"/>
-        <map pad="{640dc7e4-ba07-4089-b21b-a7d98c4cea72}" signal="{fd48798e-ff2f-4206-9631-61d41280bd28}"/>
-        <map pad="{654a53c6-611e-4fbc-91f2-ab7152ac0df8}" signal="{41583351-ad98-4304-bb3c-c0fdcc5e8521}"/>
-        <map pad="{70b40ee2-6a64-418f-b063-741883ca28b1}" signal="{dcc2ce1a-b08e-45ad-973c-601855e3bdea}"/>
-        <map pad="{d7a39f9b-7936-4c98-b162-1c307c3aa48c}" signal="{50b2e134-ea43-42df-a241-ab4d03ae3e5b}"/>
-        <map pad="{d451c354-61af-4274-a147-d2a1dedf9173}" signal="{ebbf8628-110e-42dd-b9d7-b0c0f07c427b}"/>
-        <map pad="{ea78a1c6-c80f-43a5-93f7-c2c8bb644fbb}" signal="{ae793df8-5b1f-459b-8bbf-7992a20967f0}"/>
-        <map pad="{140463cb-d928-46f2-8b26-e6dc21275e4f}" signal="{595cb839-bc4a-4669-b50b-4fd56f7a19fe}"/>
-        <map pad="{5b7fc6bc-12ce-4d12-b2b6-28a1cc6cf78f}" signal="{412eafc9-5ada-4d22-82a0-0c74bf71acf6}"/>
-        <map pad="{63f0160f-86a1-4764-82a3-8281b7050c3b}" signal="{e1bfa5fa-202f-4e0d-a431-8f8d8a656a00}"/>
-        <map pad="{47037410-3c94-4741-8575-3c3db90c0485}" signal="{b274d649-6262-41c2-b07f-8ba262dc481b}"/>
-        <map pad="{2d836e47-4693-414c-9663-6fda9674e12e}" signal="{817d5b71-df06-4c36-b737-b40f3791a673}"/>
-        <map pad="{506f42fd-476f-4964-bccb-1880a3bb2524}" signal="{43d2688e-40c0-4013-a38e-cb70ed0839a8}"/>
-        <map pad="{70a72442-7b43-48cd-9dec-bfa5c4dde222}" signal="{270cd374-ba6d-47a9-a187-b7c711a86eef}"/>
+        <map signal="{595cb839-bc4a-4669-b50b-4fd56f7a19fe}" pad="{140463cb-d928-46f2-8b26-e6dc21275e4f}"/>
+        <map signal="{dd4befe7-a573-462a-b199-9ac6cd202e86}" pad="{73619ca5-3ef2-4797-af0e-b07bb4d0c7dc}"/>
+        <map signal="{1a243be4-361f-464d-9366-f91d5354da6b}" pad="{0b905ea7-ec6b-44d5-a0fa-459ce4470dfa}"/>
+        <map signal="{270cd374-ba6d-47a9-a187-b7c711a86eef}" pad="{70a72442-7b43-48cd-9dec-bfa5c4dde222}"/>
+        <map signal="{dcc2ce1a-b08e-45ad-973c-601855e3bdea}" pad="{70b40ee2-6a64-418f-b063-741883ca28b1}"/>
+        <map signal="{4fd5957b-9ba7-4ce8-8cb1-cb885edf9a5c}" pad="{3b8a83b0-0f4f-4869-a144-4d9d2ffbfee1}"/>
+        <map signal="{47c45373-ef67-4fff-aa73-a4489b0e475f}" pad="{5c4d2d51-6e03-4f96-a95a-a9f058b18219}"/>
+        <map signal="{ae793df8-5b1f-459b-8bbf-7992a20967f0}" pad="{ea78a1c6-c80f-43a5-93f7-c2c8bb644fbb}"/>
+        <map signal="{f630a91b-bfd1-4d95-8f3e-27c30b587e1c}" pad="{5a44b1ce-7839-4c06-bdc5-4bf4de7a64cf}"/>
+        <map signal="{b274d649-6262-41c2-b07f-8ba262dc481b}" pad="{47037410-3c94-4741-8575-3c3db90c0485}"/>
+        <map signal="{817d5b71-df06-4c36-b737-b40f3791a673}" pad="{2d836e47-4693-414c-9663-6fda9674e12e}"/>
+        <map signal="{50b2e134-ea43-42df-a241-ab4d03ae3e5b}" pad="{d7a39f9b-7936-4c98-b162-1c307c3aa48c}"/>
+        <map signal="{43d2688e-40c0-4013-a38e-cb70ed0839a8}" pad="{506f42fd-476f-4964-bccb-1880a3bb2524}"/>
+        <map signal="{fd48798e-ff2f-4206-9631-61d41280bd28}" pad="{640dc7e4-ba07-4089-b21b-a7d98c4cea72}"/>
+        <map signal="{e1bfa5fa-202f-4e0d-a431-8f8d8a656a00}" pad="{63f0160f-86a1-4764-82a3-8281b7050c3b}"/>
+        <map signal="{ebbf8628-110e-42dd-b9d7-b0c0f07c427b}" pad="{d451c354-61af-4274-a147-d2a1dedf9173}"/>
+        <map signal="{412eafc9-5ada-4d22-82a0-0c74bf71acf6}" pad="{5b7fc6bc-12ce-4d12-b2b6-28a1cc6cf78f}"/>
+        <map signal="{41583351-ad98-4304-bb3c-c0fdcc5e8521}" pad="{654a53c6-611e-4fbc-91f2-ab7152ac0df8}"/>
     </pad_signal_map>
 </component>

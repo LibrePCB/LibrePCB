@@ -4,8 +4,8 @@
         <uuid>{ee1b31f1-b2cd-4611-927b-37fee791d4cd}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:45Z</created>
-        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <created>2015-08-13T20:22:35Z</created>
+        <last_modified>2015-08-13T20:22:35Z</last_modified>
         <name locale="en_US">TC48</name>
         <description locale="en_US">&lt;b>Temperature Compensated Xtal Oscillator&lt;/b>&lt;p>
 HCMOS, Clipped Sine Wave or Sine Wave Compatible&lt;br>
@@ -21,10 +21,10 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{0dadce82-ee8b-4866-aef6-01755dfd9703}" signal="{8f46d7e4-0836-4549-a414-0456d3567ca5}"/>
-        <map pad="{ccf450a0-f76b-403f-8b30-1260c78e2036}" signal="{8f46d7e4-0836-4549-a414-0456d3567ca5}"/>
-        <map pad="{ff59e806-34e6-490e-8316-1363f7e74cdd}" signal="{c41ff776-7fe4-40df-84ea-1a80765336b0}"/>
-        <map pad="{75898e2c-24df-403d-b3d2-0efe8552f335}" signal="{8f46d7e4-0836-4549-a414-0456d3567ca5}"/>
-        <map pad="{6d19c0a1-9d4e-42d0-ac6e-5f3d97fdb765}" signal="{78bbf7cf-22c4-4ab2-899d-783468e0e434}"/>
+        <map signal="{8f46d7e4-0836-4549-a414-0456d3567ca5}" pad="{75898e2c-24df-403d-b3d2-0efe8552f335}"/>
+        <map signal="{8f46d7e4-0836-4549-a414-0456d3567ca5}" pad="{ccf450a0-f76b-403f-8b30-1260c78e2036}"/>
+        <map signal="{8f46d7e4-0836-4549-a414-0456d3567ca5}" pad="{0dadce82-ee8b-4866-aef6-01755dfd9703}"/>
+        <map signal="{78bbf7cf-22c4-4ab2-899d-783468e0e434}" pad="{6d19c0a1-9d4e-42d0-ac6e-5f3d97fdb765}"/>
+        <map signal="{c41ff776-7fe4-40df-84ea-1a80765336b0}" pad="{ff59e806-34e6-490e-8316-1363f7e74cdd}"/>
     </pad_signal_map>
 </component>

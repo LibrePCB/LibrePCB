@@ -4,8 +4,8 @@
         <uuid>{b2f5c7eb-cdad-4222-98a0-df32eeaabee4}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:46Z</created>
-        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <created>2015-08-13T20:22:36Z</created>
+        <last_modified>2015-08-13T20:22:36Z</last_modified>
         <name locale="en_US">1N5333</name>
         <description locale="en_US">&lt;b>Z DIODE&lt;/b>&lt;p>
 3.3 V, 5W, 5 percent (Motorola)
@@ -20,7 +20,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{5ca68958-53fd-4c16-9296-c4eefa751924}" signal="{1718c701-f5e0-4789-97aa-4d377ee97ec7}"/>
-        <map pad="{08ccebe9-a282-4837-8a78-b250b1c19cde}" signal="{d29d4807-b991-4b43-ac4c-1eb4d4d64dce}"/>
+        <map signal="{1718c701-f5e0-4789-97aa-4d377ee97ec7}" pad="{5ca68958-53fd-4c16-9296-c4eefa751924}"/>
+        <map signal="{d29d4807-b991-4b43-ac4c-1eb4d4d64dce}" pad="{08ccebe9-a282-4837-8a78-b250b1c19cde}"/>
     </pad_signal_map>
 </component>

@@ -5,292 +5,292 @@
         <name>default</name>
     </meta>
     <properties>
-        <grid_properties unit="millimeters" interval="2.540000" type="lines"/>
+        <grid_properties unit="millimeters" type="lines" interval="2.540000"/>
     </properties>
     <component_instances>
-        <component_instance generic_component_instance="{2ebbad7c-7050-4575-a1aa-4f3966506d83}" component="{f7fb22e8-0bbc-4f0f-aa89-596823b5bc3e}">
-            <footprint/>
-            <position rotation="0.000000" x="20.320000" y="-40.640000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{f900538b-090d-482f-9c4c-b0da46d087a8}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
-            <footprint/>
-            <position rotation="0.000000" x="0.000000" y="-20.320000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{90c89ce4-fb19-458d-912b-cf9818efd764}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
-            <footprint/>
-            <position rotation="0.000000" x="0.000000" y="-30.480000"/>
-        </component_instance>
         <component_instance generic_component_instance="{893b43c4-ef31-4853-bfa2-bd7f919ba5e3}" component="{f7fb22e8-0bbc-4f0f-aa89-596823b5bc3e}">
             <footprint/>
-            <position rotation="0.000000" x="30.480000" y="-40.640000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{0184602f-8b64-4bc2-ae5a-624b5f6d8907}" component="{ac09fb0b-7749-46c9-8495-3032a08171c9}">
-            <footprint/>
-            <position rotation="0.000000" x="81.280000" y="-40.640000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{5e0bdeff-3d85-4b74-b94d-097fb1de25ac}" component="{f7fb22e8-0bbc-4f0f-aa89-596823b5bc3e}">
-            <footprint/>
-            <position rotation="0.000000" x="40.640000" y="-40.640000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{8092d8bb-f5df-4a43-b5d4-751cdfb474e9}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
-            <footprint/>
-            <position rotation="0.000000" x="10.160000" y="-30.480000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{82709ca3-4d60-4b8c-9bbb-4c2669acf146}" component="{ac09fb0b-7749-46c9-8495-3032a08171c9}">
-            <footprint/>
-            <position rotation="0.000000" x="91.440000" y="-40.640000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{e69f768b-412d-4fe5-aeb3-c743351a6544}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
-            <footprint/>
-            <position rotation="0.000000" x="20.320000" y="-30.480000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{6c9b623e-6231-4e9c-bf97-944df7a5d3d5}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
-            <footprint/>
-            <position rotation="0.000000" x="30.480000" y="-30.480000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{5a493e46-5b95-4d98-ba08-8bf6a741a817}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
-            <footprint/>
-            <position rotation="0.000000" x="10.160000" y="-20.320000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{b179313a-5fcb-4fb6-8e56-55865ed6ea4b}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
-            <footprint/>
-            <position rotation="0.000000" x="40.640000" y="-30.480000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{ddba5f4c-cacf-45da-91d6-bac636da3a6e}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
-            <footprint/>
-            <position rotation="0.000000" x="20.320000" y="-20.320000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{5295af36-44e2-4a2e-a988-87c9e1026ae9}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
-            <footprint/>
-            <position rotation="0.000000" x="50.800000" y="-30.480000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{5ce9b3be-1fa3-471e-b498-77bfbf6c415a}" component="{ac09fb0b-7749-46c9-8495-3032a08171c9}">
-            <footprint/>
-            <position rotation="0.000000" x="101.600000" y="-40.640000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{1d8a93b9-7ac2-40a0-b1b7-79e987600197}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
-            <footprint/>
-            <position rotation="0.000000" x="60.960000" y="-30.480000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{b9859056-bbef-4848-9b60-978594cce1d4}" component="{37fd1f94-e678-434f-bdbf-2742c334036f}">
-            <footprint/>
-            <position rotation="0.000000" x="182.880000" y="-40.640000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{06d30802-ba7f-431d-843d-42f276aaed22}" component="{37d6efc3-31f9-4657-91dc-50e77929f690}">
-            <footprint/>
-            <position rotation="0.000000" x="91.440000" y="-50.800000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{c2030b99-62f8-4440-81de-fe7c31583926}" component="{a1af0544-3bf9-4a50-80d5-18bef6ab7199}">
-            <footprint/>
-            <position rotation="0.000000" x="132.080000" y="-50.800000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{820e8fe1-b1a9-488d-9610-0a97204391b4}" component="{ac09fb0b-7749-46c9-8495-3032a08171c9}">
-            <footprint/>
-            <position rotation="0.000000" x="111.760000" y="-40.640000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{46601a79-4b4e-401c-826b-6c04056b4080}" component="{f7fb22e8-0bbc-4f0f-aa89-596823b5bc3e}">
-            <footprint/>
-            <position rotation="0.000000" x="50.800000" y="-40.640000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{43bc94dc-6ab0-4bb2-bf66-c034b9f1cfd0}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
-            <footprint/>
-            <position rotation="0.000000" x="71.120000" y="-30.480000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{3499d4eb-40bd-44df-8ef1-9544fae56a75}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
-            <footprint/>
-            <position rotation="0.000000" x="30.480000" y="-20.320000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{aaec816a-e94e-4d00-8ac6-dd105da862e3}" component="{47bebb4c-9434-473e-af9d-23a820bbe0a4}">
-            <footprint/>
-            <position rotation="0.000000" x="152.400000" y="-40.640000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{4ea5b830-f231-4ded-9d0d-3d69b6a938df}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
-            <footprint/>
-            <position rotation="0.000000" x="40.640000" y="-20.320000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{91f8c3d3-c497-4d3f-b7a0-4088b442647b}" component="{61ef5376-825e-4a76-b86d-d7f8fb20b866}">
-            <footprint/>
-            <position rotation="0.000000" x="71.120000" y="-50.800000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{0c451a9f-1e21-4533-8d52-e2aacef8a883}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
-            <footprint/>
-            <position rotation="0.000000" x="50.800000" y="-20.320000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{013aa324-6581-4a59-ba01-cce4dfa14c1c}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
-            <footprint/>
-            <position rotation="0.000000" x="60.960000" y="-20.320000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{ad7d2b6e-21cc-4540-8ec8-bb24a61980ea}" component="{4a2c75c3-f21a-41dc-ae67-f9fbec4fbe15}">
-            <footprint/>
-            <position rotation="0.000000" x="193.040000" y="-40.640000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{04eff528-df9e-4969-bc7e-5633d8011087}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
-            <footprint/>
-            <position rotation="0.000000" x="81.280000" y="-30.480000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{3079e423-f0e6-42fc-8c93-4cd82690bdc1}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
-            <footprint/>
-            <position rotation="0.000000" x="91.440000" y="-30.480000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{26965a1b-09e1-41ee-b463-2684e7a87818}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
-            <footprint/>
-            <position rotation="0.000000" x="71.120000" y="-20.320000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{98757eea-e6bf-4fe5-adaa-a7f407373243}" component="{16164745-2f09-4917-bb4c-d1d704b493ab}">
-            <footprint/>
-            <position rotation="0.000000" x="20.320000" y="-50.800000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{9843ce9e-8e17-4baa-9980-6826fc257abf}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
-            <footprint/>
-            <position rotation="0.000000" x="101.600000" y="-30.480000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{2c8af4fb-cc24-4676-b77e-8d2b64dd73d0}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
-            <footprint/>
-            <position rotation="0.000000" x="81.280000" y="-20.320000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{0c46076b-7882-4e44-942f-2592d2a21879}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
-            <footprint/>
-            <position rotation="0.000000" x="91.440000" y="-20.320000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{c330f5a3-9bd5-4189-a86d-a7020235db20}" component="{ac09fb0b-7749-46c9-8495-3032a08171c9}">
-            <footprint/>
-            <position rotation="0.000000" x="121.920000" y="-40.640000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{bfdf81af-9505-4e77-97e4-d68e4a90ba0f}" component="{8e641299-bdb9-4df2-b5e3-ff15b13703b5}">
-            <footprint/>
-            <position rotation="0.000000" x="0.000000" y="-50.800000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{3110f961-42bd-4e24-bba7-47930f1b2c03}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
-            <footprint/>
-            <position rotation="0.000000" x="101.600000" y="-20.320000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{76c1f0be-1e24-4b1d-beed-edc08bd44118}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
-            <footprint/>
-            <position rotation="0.000000" x="111.760000" y="-20.320000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{3437d160-1c40-458f-9867-f30c7706e0c3}" component="{2e316eb9-a9c4-446a-8544-782b629a018f}">
-            <footprint/>
-            <position rotation="0.000000" x="152.400000" y="-50.800000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{5ef7639d-db84-4bfa-8356-83fc28a1a9f7}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
-            <footprint/>
-            <position rotation="0.000000" x="121.920000" y="-20.320000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{ab96ca5d-43e6-4ecb-8981-1fa3117c1c7d}" component="{47bebb4c-9434-473e-af9d-23a820bbe0a4}">
-            <footprint/>
-            <position rotation="0.000000" x="162.560000" y="-40.640000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{8417e1db-8764-46a7-b5ef-2c606ecab6e1}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
-            <footprint/>
-            <position rotation="0.000000" x="132.080000" y="-20.320000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{69f3d0cf-ca3d-4323-b0c3-67c4fce8b501}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
-            <footprint/>
-            <position rotation="0.000000" x="111.760000" y="-30.480000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{f1121620-c541-46a5-90cc-92578e822b8f}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
-            <footprint/>
-            <position rotation="0.000000" x="121.920000" y="-30.480000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{a2df92fe-89d7-4c67-9d33-c4041c0e8f40}" component="{f7fb22e8-0bbc-4f0f-aa89-596823b5bc3e}">
-            <footprint/>
-            <position rotation="0.000000" x="60.960000" y="-40.640000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{b44652fd-99b6-459a-914b-41e0137146f1}" component="{ac09fb0b-7749-46c9-8495-3032a08171c9}">
-            <footprint/>
-            <position rotation="0.000000" x="132.080000" y="-40.640000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{15e33177-fef9-4030-93f7-b7cf8b9ad9e7}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
-            <footprint/>
-            <position rotation="0.000000" x="132.080000" y="-30.480000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{68c6b6ce-0bad-4965-aa85-c972ab3f16c6}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
-            <footprint/>
-            <position rotation="0.000000" x="142.240000" y="-30.480000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{06d050d5-cea1-4a9b-b92d-9c5114bdb3d1}" component="{8e641299-bdb9-4df2-b5e3-ff15b13703b5}">
-            <footprint/>
-            <position rotation="0.000000" x="10.160000" y="-50.800000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{afd4e910-3c79-46cd-8d71-2ad6c33768d5}" component="{a4167aca-a809-47b0-928e-a223ba0d6ee6}">
-            <footprint/>
-            <position rotation="0.000000" x="30.480000" y="-50.800000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{e8ab7388-1846-4ca4-912d-d533fae37f01}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
-            <footprint/>
-            <position rotation="0.000000" x="152.400000" y="-30.480000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{00df6fcc-ebae-4597-8398-a2d3864d3b43}" component="{a4167aca-a809-47b0-928e-a223ba0d6ee6}">
-            <footprint/>
-            <position rotation="0.000000" x="40.640000" y="-50.800000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{ef27ad46-be54-4b1c-ba51-0446a0853203}" component="{ab7ed79b-11b1-4b1e-b9d2-5da7cfa1ef04}">
-            <footprint/>
-            <position rotation="0.000000" x="0.000000" y="-40.640000"/>
+            <position rotation="0.000000" mirror="false" x="30.480000" y="-40.640000"/>
         </component_instance>
         <component_instance generic_component_instance="{1fe7624e-269b-4fba-880d-abef3d0efa2e}" component="{f7fb22e8-0bbc-4f0f-aa89-596823b5bc3e}">
             <footprint/>
-            <position rotation="0.000000" x="71.120000" y="-40.640000"/>
+            <position rotation="0.000000" mirror="false" x="71.120000" y="-40.640000"/>
         </component_instance>
-        <component_instance generic_component_instance="{d98d04c5-74c7-4b7d-8f09-611ed955dd57}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
+        <component_instance generic_component_instance="{3499d4eb-40bd-44df-8ef1-9544fae56a75}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
             <footprint/>
-            <position rotation="0.000000" x="142.240000" y="-20.320000"/>
+            <position rotation="0.000000" mirror="false" x="30.480000" y="-20.320000"/>
         </component_instance>
-        <component_instance generic_component_instance="{81c6addc-9f55-40ef-9b5a-08816ca0a661}" component="{47bebb4c-9434-473e-af9d-23a820bbe0a4}">
+        <component_instance generic_component_instance="{91f8c3d3-c497-4d3f-b7a0-4088b442647b}" component="{61ef5376-825e-4a76-b86d-d7f8fb20b866}">
             <footprint/>
-            <position rotation="0.000000" x="172.720000" y="-40.640000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{e4a5cdce-be42-4597-a045-6135ecd25ab8}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
-            <footprint/>
-            <position rotation="0.000000" x="162.560000" y="-30.480000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{84e890a4-2a41-4721-8737-a71f79f7d101}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
-            <footprint/>
-            <position rotation="0.000000" x="172.720000" y="-30.480000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{df40333d-b0ea-4b4f-8a7a-a59ae2de610f}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
-            <footprint/>
-            <position rotation="0.000000" x="152.400000" y="-20.320000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{217de8c7-c834-4900-b3b2-7c5b277a5737}" component="{e07e8a3d-2257-43b5-88f8-498d755b0508}">
-            <footprint/>
-            <position rotation="0.000000" x="111.760000" y="-50.800000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{98064fbf-64b1-4958-a0b0-825005d7a6a1}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
-            <footprint/>
-            <position rotation="0.000000" x="162.560000" y="-20.320000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{1b1ac6e2-3309-4447-8fcf-e95221f19090}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
-            <footprint/>
-            <position rotation="0.000000" x="172.720000" y="-20.320000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{709a326c-b6ad-4dcb-95cf-7ce8962bb16c}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
-            <footprint/>
-            <position rotation="0.000000" x="182.880000" y="-20.320000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{0035f2f4-c0fe-4b64-8830-f4e8fd34d204}" component="{ac09fb0b-7749-46c9-8495-3032a08171c9}">
-            <footprint/>
-            <position rotation="0.000000" x="142.240000" y="-40.640000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{2e61020a-4346-4277-8f6b-42d8ec60fe49}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
-            <footprint/>
-            <position rotation="0.000000" x="182.880000" y="-30.480000"/>
-        </component_instance>
-        <component_instance generic_component_instance="{18cf34f6-95e4-48a0-bf4b-6a2d13523f0f}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
-            <footprint/>
-            <position rotation="0.000000" x="193.040000" y="-30.480000"/>
+            <position rotation="0.000000" mirror="false" x="71.120000" y="-50.800000"/>
         </component_instance>
         <component_instance generic_component_instance="{0cd12bfe-4971-4905-8354-c2b2c47bfcde}" component="{ab7ed79b-11b1-4b1e-b9d2-5da7cfa1ef04}">
             <footprint/>
-            <position rotation="0.000000" x="10.160000" y="-40.640000"/>
+            <position rotation="0.000000" mirror="false" x="10.160000" y="-40.640000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{46601a79-4b4e-401c-826b-6c04056b4080}" component="{f7fb22e8-0bbc-4f0f-aa89-596823b5bc3e}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="50.800000" y="-40.640000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{f900538b-090d-482f-9c4c-b0da46d087a8}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="0.000000" y="-20.320000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{d98d04c5-74c7-4b7d-8f09-611ed955dd57}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="142.240000" y="-20.320000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{68c6b6ce-0bad-4965-aa85-c972ab3f16c6}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="142.240000" y="-30.480000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{3110f961-42bd-4e24-bba7-47930f1b2c03}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="101.600000" y="-20.320000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{2e61020a-4346-4277-8f6b-42d8ec60fe49}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="182.880000" y="-30.480000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{b179313a-5fcb-4fb6-8e56-55865ed6ea4b}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="40.640000" y="-30.480000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{3437d160-1c40-458f-9867-f30c7706e0c3}" component="{2e316eb9-a9c4-446a-8544-782b629a018f}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="152.400000" y="-50.800000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{e69f768b-412d-4fe5-aeb3-c743351a6544}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="20.320000" y="-30.480000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{aaec816a-e94e-4d00-8ac6-dd105da862e3}" component="{47bebb4c-9434-473e-af9d-23a820bbe0a4}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="152.400000" y="-40.640000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{f1121620-c541-46a5-90cc-92578e822b8f}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="121.920000" y="-30.480000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{0c451a9f-1e21-4533-8d52-e2aacef8a883}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="50.800000" y="-20.320000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{0184602f-8b64-4bc2-ae5a-624b5f6d8907}" component="{ac09fb0b-7749-46c9-8495-3032a08171c9}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="81.280000" y="-40.640000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{5295af36-44e2-4a2e-a988-87c9e1026ae9}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="50.800000" y="-30.480000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{8417e1db-8764-46a7-b5ef-2c606ecab6e1}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="132.080000" y="-20.320000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{709a326c-b6ad-4dcb-95cf-7ce8962bb16c}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="182.880000" y="-20.320000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{ab96ca5d-43e6-4ecb-8981-1fa3117c1c7d}" component="{47bebb4c-9434-473e-af9d-23a820bbe0a4}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="162.560000" y="-40.640000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{5ef7639d-db84-4bfa-8356-83fc28a1a9f7}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="121.920000" y="-20.320000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{69f3d0cf-ca3d-4323-b0c3-67c4fce8b501}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="111.760000" y="-30.480000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{98757eea-e6bf-4fe5-adaa-a7f407373243}" component="{16164745-2f09-4917-bb4c-d1d704b493ab}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="20.320000" y="-50.800000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{5e0bdeff-3d85-4b74-b94d-097fb1de25ac}" component="{f7fb22e8-0bbc-4f0f-aa89-596823b5bc3e}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="40.640000" y="-40.640000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{0035f2f4-c0fe-4b64-8830-f4e8fd34d204}" component="{ac09fb0b-7749-46c9-8495-3032a08171c9}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="142.240000" y="-40.640000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{06d050d5-cea1-4a9b-b92d-9c5114bdb3d1}" component="{8e641299-bdb9-4df2-b5e3-ff15b13703b5}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="10.160000" y="-50.800000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{04eff528-df9e-4969-bc7e-5633d8011087}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="81.280000" y="-30.480000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{b9859056-bbef-4848-9b60-978594cce1d4}" component="{37fd1f94-e678-434f-bdbf-2742c334036f}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="182.880000" y="-40.640000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{76c1f0be-1e24-4b1d-beed-edc08bd44118}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="111.760000" y="-20.320000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{bfdf81af-9505-4e77-97e4-d68e4a90ba0f}" component="{8e641299-bdb9-4df2-b5e3-ff15b13703b5}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="0.000000" y="-50.800000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{2ebbad7c-7050-4575-a1aa-4f3966506d83}" component="{f7fb22e8-0bbc-4f0f-aa89-596823b5bc3e}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="20.320000" y="-40.640000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{df40333d-b0ea-4b4f-8a7a-a59ae2de610f}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="152.400000" y="-20.320000"/>
         </component_instance>
         <component_instance generic_component_instance="{d00cf83f-e2de-4e12-b176-1c45eb6fcf6c}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
             <footprint/>
-            <position rotation="0.000000" x="193.040000" y="-20.320000"/>
+            <position rotation="0.000000" mirror="false" x="193.040000" y="-20.320000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{43bc94dc-6ab0-4bb2-bf66-c034b9f1cfd0}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="71.120000" y="-30.480000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{c2030b99-62f8-4440-81de-fe7c31583926}" component="{a1af0544-3bf9-4a50-80d5-18bef6ab7199}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="132.080000" y="-50.800000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{82709ca3-4d60-4b8c-9bbb-4c2669acf146}" component="{ac09fb0b-7749-46c9-8495-3032a08171c9}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="91.440000" y="-40.640000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{b44652fd-99b6-459a-914b-41e0137146f1}" component="{ac09fb0b-7749-46c9-8495-3032a08171c9}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="132.080000" y="-40.640000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{ad7d2b6e-21cc-4540-8ec8-bb24a61980ea}" component="{4a2c75c3-f21a-41dc-ae67-f9fbec4fbe15}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="193.040000" y="-40.640000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{9843ce9e-8e17-4baa-9980-6826fc257abf}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="101.600000" y="-30.480000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{3079e423-f0e6-42fc-8c93-4cd82690bdc1}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="91.440000" y="-30.480000"/>
         </component_instance>
         <component_instance generic_component_instance="{8a1420be-e7d4-4a7f-a88d-4dcfa99f67ed}" component="{a4167aca-a809-47b0-928e-a223ba0d6ee6}">
             <footprint/>
-            <position rotation="0.000000" x="50.800000" y="-50.800000"/>
+            <position rotation="0.000000" mirror="false" x="50.800000" y="-50.800000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{afd4e910-3c79-46cd-8d71-2ad6c33768d5}" component="{a4167aca-a809-47b0-928e-a223ba0d6ee6}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="30.480000" y="-50.800000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{2c8af4fb-cc24-4676-b77e-8d2b64dd73d0}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="81.280000" y="-20.320000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{5ce9b3be-1fa3-471e-b498-77bfbf6c415a}" component="{ac09fb0b-7749-46c9-8495-3032a08171c9}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="101.600000" y="-40.640000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{18cf34f6-95e4-48a0-bf4b-6a2d13523f0f}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="193.040000" y="-30.480000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{81c6addc-9f55-40ef-9b5a-08816ca0a661}" component="{47bebb4c-9434-473e-af9d-23a820bbe0a4}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="172.720000" y="-40.640000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{90c89ce4-fb19-458d-912b-cf9818efd764}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="0.000000" y="-30.480000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{5a493e46-5b95-4d98-ba08-8bf6a741a817}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="10.160000" y="-20.320000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{217de8c7-c834-4900-b3b2-7c5b277a5737}" component="{e07e8a3d-2257-43b5-88f8-498d755b0508}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="111.760000" y="-50.800000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{ddba5f4c-cacf-45da-91d6-bac636da3a6e}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="20.320000" y="-20.320000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{e8ab7388-1846-4ca4-912d-d533fae37f01}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="152.400000" y="-30.480000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{013aa324-6581-4a59-ba01-cce4dfa14c1c}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="60.960000" y="-20.320000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{84e890a4-2a41-4721-8737-a71f79f7d101}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="172.720000" y="-30.480000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{ef27ad46-be54-4b1c-ba51-0446a0853203}" component="{ab7ed79b-11b1-4b1e-b9d2-5da7cfa1ef04}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="0.000000" y="-40.640000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{a2df92fe-89d7-4c67-9d33-c4041c0e8f40}" component="{f7fb22e8-0bbc-4f0f-aa89-596823b5bc3e}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="60.960000" y="-40.640000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{820e8fe1-b1a9-488d-9610-0a97204391b4}" component="{ac09fb0b-7749-46c9-8495-3032a08171c9}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="111.760000" y="-40.640000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{06d30802-ba7f-431d-843d-42f276aaed22}" component="{37d6efc3-31f9-4657-91dc-50e77929f690}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="91.440000" y="-50.800000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{00df6fcc-ebae-4597-8398-a2d3864d3b43}" component="{a4167aca-a809-47b0-928e-a223ba0d6ee6}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="40.640000" y="-50.800000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{8092d8bb-f5df-4a43-b5d4-751cdfb474e9}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="10.160000" y="-30.480000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{6c9b623e-6231-4e9c-bf97-944df7a5d3d5}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="30.480000" y="-30.480000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{1b1ac6e2-3309-4447-8fcf-e95221f19090}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="172.720000" y="-20.320000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{c330f5a3-9bd5-4189-a86d-a7020235db20}" component="{ac09fb0b-7749-46c9-8495-3032a08171c9}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="121.920000" y="-40.640000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{e4a5cdce-be42-4597-a045-6135ecd25ab8}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="162.560000" y="-30.480000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{4ea5b830-f231-4ded-9d0d-3d69b6a938df}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="40.640000" y="-20.320000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{98064fbf-64b1-4958-a0b0-825005d7a6a1}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="162.560000" y="-20.320000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{1d8a93b9-7ac2-40a0-b1b7-79e987600197}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="60.960000" y="-30.480000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{15e33177-fef9-4030-93f7-b7cf8b9ad9e7}" component="{e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="132.080000" y="-30.480000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{26965a1b-09e1-41ee-b463-2684e7a87818}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="71.120000" y="-20.320000"/>
+        </component_instance>
+        <component_instance generic_component_instance="{0c46076b-7882-4e44-942f-2592d2a21879}" component="{483a71eb-318e-448e-82ff-f02efc4821aa}">
+            <footprint/>
+            <position rotation="0.000000" mirror="false" x="91.440000" y="-20.320000"/>
         </component_instance>
     </component_instances>
 </board>

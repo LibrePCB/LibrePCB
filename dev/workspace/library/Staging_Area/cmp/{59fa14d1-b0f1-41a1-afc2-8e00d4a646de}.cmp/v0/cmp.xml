@@ -4,8 +4,8 @@
         <uuid>{59fa14d1-b0f1-41a1-afc2-8e00d4a646de}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:46Z</created>
-        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <created>2015-08-13T20:22:36Z</created>
+        <last_modified>2015-08-13T20:22:36Z</last_modified>
         <name locale="en_US">UF4003</name>
         <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
 ultrafast recovery diode, 200 V&lt;p>
@@ -21,7 +21,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{d4b82aa7-4f97-4065-9f0a-11c0bb4a1cc7}" signal="{224b5c1d-9b9c-4e1a-bd6e-ca30be7cdca4}"/>
-        <map pad="{613f34f8-ec74-460b-9203-e64dcd075b58}" signal="{d69ceb16-7ac4-42d3-8f31-ed0a76a8f2d5}"/>
+        <map signal="{d69ceb16-7ac4-42d3-8f31-ed0a76a8f2d5}" pad="{613f34f8-ec74-460b-9203-e64dcd075b58}"/>
+        <map signal="{224b5c1d-9b9c-4e1a-bd6e-ca30be7cdca4}" pad="{d4b82aa7-4f97-4065-9f0a-11c0bb4a1cc7}"/>
     </pad_signal_map>
 </component>

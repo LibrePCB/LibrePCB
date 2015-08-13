@@ -4,9 +4,9 @@
         <uuid>{80b6a8e1-6938-4a76-87f7-9019c5149a4f}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:48Z</created>
-        <last_modified>2015-06-21T12:37:48Z</last_modified>
-        <name locale="en_US">S*08</name>
+        <created>2015-08-13T20:22:38Z</created>
+        <last_modified>2015-08-13T20:22:38Z</last_modified>
+        <name locale="en_US">S*08_-11</name>
         <description locale="en_US">&lt;b>Kingbright 20mm (0.8Inch) Single Digit Numeric Display&lt;/b>&lt;p>
 Source: SA08-11SRWA.pdf
 
@@ -20,17 +20,17 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{c1428fbe-62bd-41fc-a498-d46cfd4d7295}" signal="{520bf0a6-0fe5-4af9-a3cb-7f10160ee10a}"/>
-        <map pad="{693027c6-ddb7-4ee7-89f8-984f464b5ebc}" signal="{520bf0a6-0fe5-4af9-a3cb-7f10160ee10a}"/>
-        <map pad="{a1228e97-e9dd-49dc-9629-b66fe3493a1d}" signal="{520bf0a6-0fe5-4af9-a3cb-7f10160ee10a}"/>
-        <map pad="{b694ff6d-875b-40c6-ac2a-8ec8db040b6a}" signal="{b71bf5be-777a-4f7f-b8e1-acdb8e1daed6}"/>
-        <map pad="{b7da89a0-9747-4225-9827-b91987991250}" signal="{511cd677-466b-4867-bd33-fbf3a88d2f04}"/>
-        <map pad="{7c4be310-312c-42ab-b503-b11a8206bc77}" signal="{4f390054-f836-4ceb-94f8-10fac3c15c04}"/>
-        <map pad="{4300c1d1-5330-4c29-9a56-c1934992063f}" signal="{58b2ece1-7c81-49fa-801e-45720f3ab98f}"/>
-        <map pad="{ab238027-5686-401d-97bc-1714e7077c90}" signal="{c89ba56a-9285-45fc-91dd-fe4b28a2e987}"/>
-        <map pad="{b8a146f4-702e-461c-800a-2bc49f39ae24}" signal="{3e9922de-106c-4754-b6b5-1b3d7c9aee7e}"/>
-        <map pad="{d8366d75-4c9e-47a2-9668-26fed9d5155a}" signal="{dace224a-9797-4cf5-a1d3-6280ce53f801}"/>
-        <map pad="{7645b500-29b4-4c6d-994f-d310bc655fd5}" signal="{0b84be7b-2edd-4a4d-a11d-52bd041ac95d}"/>
-        <map pad="{8fd9ebf3-a335-4b42-9354-f3b4c0ff42be}" signal="{520bf0a6-0fe5-4af9-a3cb-7f10160ee10a}"/>
+        <map signal="{58b2ece1-7c81-49fa-801e-45720f3ab98f}" pad="{4300c1d1-5330-4c29-9a56-c1934992063f}"/>
+        <map signal="{3e9922de-106c-4754-b6b5-1b3d7c9aee7e}" pad="{b8a146f4-702e-461c-800a-2bc49f39ae24}"/>
+        <map signal="{520bf0a6-0fe5-4af9-a3cb-7f10160ee10a}" pad="{a1228e97-e9dd-49dc-9629-b66fe3493a1d}"/>
+        <map signal="{dace224a-9797-4cf5-a1d3-6280ce53f801}" pad="{d8366d75-4c9e-47a2-9668-26fed9d5155a}"/>
+        <map signal="{b71bf5be-777a-4f7f-b8e1-acdb8e1daed6}" pad="{b694ff6d-875b-40c6-ac2a-8ec8db040b6a}"/>
+        <map signal="{520bf0a6-0fe5-4af9-a3cb-7f10160ee10a}" pad="{693027c6-ddb7-4ee7-89f8-984f464b5ebc}"/>
+        <map signal="{c89ba56a-9285-45fc-91dd-fe4b28a2e987}" pad="{ab238027-5686-401d-97bc-1714e7077c90}"/>
+        <map signal="{520bf0a6-0fe5-4af9-a3cb-7f10160ee10a}" pad="{c1428fbe-62bd-41fc-a498-d46cfd4d7295}"/>
+        <map signal="{520bf0a6-0fe5-4af9-a3cb-7f10160ee10a}" pad="{8fd9ebf3-a335-4b42-9354-f3b4c0ff42be}"/>
+        <map signal="{4f390054-f836-4ceb-94f8-10fac3c15c04}" pad="{7c4be310-312c-42ab-b503-b11a8206bc77}"/>
+        <map signal="{511cd677-466b-4867-bd33-fbf3a88d2f04}" pad="{b7da89a0-9747-4225-9827-b91987991250}"/>
+        <map signal="{0b84be7b-2edd-4a4d-a11d-52bd041ac95d}" pad="{7645b500-29b4-4c6d-994f-d310bc655fd5}"/>
     </pad_signal_map>
 </component>

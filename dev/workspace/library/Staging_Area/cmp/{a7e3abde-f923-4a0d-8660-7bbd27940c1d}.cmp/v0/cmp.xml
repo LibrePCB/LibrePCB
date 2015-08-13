@@ -4,9 +4,9 @@
         <uuid>{a7e3abde-f923-4a0d-8660-7bbd27940c1d}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:42Z</created>
-        <last_modified>2015-06-21T12:37:42Z</last_modified>
-        <name locale="en_US">R-US_</name>
+        <created>2015-08-13T20:22:32Z</created>
+        <last_modified>2015-08-13T20:22:32Z</last_modified>
+        <name locale="en_US">R-US__VTA54</name>
         <description locale="en_US">&lt;B>RESISTOR&lt;/B>, American symbol
 
 This element was automatically imported from Eagle
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{1f07720a-09cb-406d-889c-60d4d9984087}" signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
-        <map pad="{5537ed2e-0db9-4f87-88c8-4ea56952bdd2}" signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
+        <map signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}" pad="{1f07720a-09cb-406d-889c-60d4d9984087}"/>
+        <map signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}" pad="{5537ed2e-0db9-4f87-88c8-4ea56952bdd2}"/>
     </pad_signal_map>
 </component>

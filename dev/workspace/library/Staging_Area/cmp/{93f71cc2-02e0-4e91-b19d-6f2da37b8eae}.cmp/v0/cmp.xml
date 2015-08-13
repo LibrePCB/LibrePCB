@@ -4,9 +4,9 @@
         <uuid>{93f71cc2-02e0-4e91-b19d-6f2da37b8eae}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:47Z</created>
-        <last_modified>2015-06-21T12:37:47Z</last_modified>
-        <name locale="en_US">SCHOTTKY-DIODE</name>
+        <created>2015-08-13T20:22:37Z</created>
+        <last_modified>2015-08-13T20:22:37Z</last_modified>
+        <name locale="en_US">SCHOTTKY-DIODE_DO35-7</name>
         <description locale="en_US">Schottky Diode
 
 This element was automatically imported from Eagle
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{d23855a1-d4d6-4299-8d57-96790918c343}" signal="{69e22be3-d2fb-4b8f-ab4f-7fba3cff0aff}"/>
-        <map pad="{d8438c48-6c7c-4b47-80d6-871960b9d6ed}" signal="{6dd65f7f-8f6b-4b29-ade1-40bc4f84f4b8}"/>
+        <map signal="{69e22be3-d2fb-4b8f-ab4f-7fba3cff0aff}" pad="{d23855a1-d4d6-4299-8d57-96790918c343}"/>
+        <map signal="{6dd65f7f-8f6b-4b29-ade1-40bc4f84f4b8}" pad="{d8438c48-6c7c-4b47-80d6-871960b9d6ed}"/>
     </pad_signal_map>
 </component>

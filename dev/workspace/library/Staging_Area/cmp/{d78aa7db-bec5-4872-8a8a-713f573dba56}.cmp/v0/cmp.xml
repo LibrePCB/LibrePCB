@@ -4,9 +4,9 @@
         <uuid>{d78aa7db-bec5-4872-8a8a-713f573dba56}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:43Z</created>
-        <last_modified>2015-06-21T12:37:43Z</last_modified>
-        <name locale="en_US">CPOL-US</name>
+        <created>2015-08-13T20:22:33Z</created>
+        <last_modified>2015-08-13T20:22:33Z</last_modified>
+        <name locale="en_US">CPOL-US_UD-4X5,8</name>
         <description locale="en_US">&lt;B>POLARIZED CAPACITOR&lt;/B>, American symbol
 
 This element was automatically imported from Eagle
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{c4c2653f-ec54-40b6-af1e-4fe545bb9e7e}" signal="{af3ffca8-0085-4edb-a775-fcb759f63411}"/>
-        <map pad="{28fda9be-4683-46f8-b92f-aeb778656261}" signal="{e010ecbb-6210-4da3-9270-ebd58656dbf0}"/>
+        <map signal="{e010ecbb-6210-4da3-9270-ebd58656dbf0}" pad="{28fda9be-4683-46f8-b92f-aeb778656261}"/>
+        <map signal="{af3ffca8-0085-4edb-a775-fcb759f63411}" pad="{c4c2653f-ec54-40b6-af1e-4fe545bb9e7e}"/>
     </pad_signal_map>
 </component>

@@ -4,9 +4,9 @@
         <uuid>{b19fd1f7-d8c6-4a66-89ac-c9b095975401}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:43Z</created>
-        <last_modified>2015-06-21T12:37:43Z</last_modified>
-        <name locale="en_US">IR2104</name>
+        <created>2015-08-13T20:22:33Z</created>
+        <last_modified>2015-08-13T20:22:33Z</last_modified>
+        <name locale="en_US">IR2104_NEU</name>
         <description locale="en_US">
 
 This element was automatically imported from Eagle
@@ -19,13 +19,13 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{0afd493c-f565-4f17-bc86-ba83fc6de278}" signal="{bafd767f-c42d-463d-b39c-040416284df9}"/>
-        <map pad="{2f65515b-b442-4b0d-bd02-c78f93321a32}" signal="{f279b33e-53e5-450d-b215-a82b8dfb4009}"/>
-        <map pad="{2656358c-f5f6-4866-9c5c-5fab4919a8b5}" signal="{898a8f91-061e-40ac-bf29-43a84eda9913}"/>
-        <map pad="{e02df193-a41f-49fe-981c-e85131b9b42e}" signal="{54963a72-e95e-407e-af32-8e59055b46aa}"/>
-        <map pad="{efcaf366-e3e0-431b-8eff-cdcaa91f1a29}" signal="{4f49e0b2-7b6d-4e90-a33f-d95219bf0b27}"/>
-        <map pad="{7f91ed2b-4ead-4da3-82f4-4c255ffe87a1}" signal="{828ababd-e4bb-4c7e-a33e-15c7c1abb572}"/>
-        <map pad="{bdccab71-d68d-4fee-aa60-5e4c7501ad59}" signal="{22538966-fe04-49ce-93d9-2d7a59c60c96}"/>
-        <map pad="{781ece2e-f696-4211-a03d-e9f249b91c11}" signal="{824128e9-9369-402b-a967-ad4c7feffb86}"/>
+        <map signal="{f279b33e-53e5-450d-b215-a82b8dfb4009}" pad="{2f65515b-b442-4b0d-bd02-c78f93321a32}"/>
+        <map signal="{4f49e0b2-7b6d-4e90-a33f-d95219bf0b27}" pad="{efcaf366-e3e0-431b-8eff-cdcaa91f1a29}"/>
+        <map signal="{824128e9-9369-402b-a967-ad4c7feffb86}" pad="{781ece2e-f696-4211-a03d-e9f249b91c11}"/>
+        <map signal="{22538966-fe04-49ce-93d9-2d7a59c60c96}" pad="{bdccab71-d68d-4fee-aa60-5e4c7501ad59}"/>
+        <map signal="{bafd767f-c42d-463d-b39c-040416284df9}" pad="{0afd493c-f565-4f17-bc86-ba83fc6de278}"/>
+        <map signal="{828ababd-e4bb-4c7e-a33e-15c7c1abb572}" pad="{7f91ed2b-4ead-4da3-82f4-4c255ffe87a1}"/>
+        <map signal="{898a8f91-061e-40ac-bf29-43a84eda9913}" pad="{2656358c-f5f6-4866-9c5c-5fab4919a8b5}"/>
+        <map signal="{54963a72-e95e-407e-af32-8e59055b46aa}" pad="{e02df193-a41f-49fe-981c-e85131b9b42e}"/>
     </pad_signal_map>
 </component>

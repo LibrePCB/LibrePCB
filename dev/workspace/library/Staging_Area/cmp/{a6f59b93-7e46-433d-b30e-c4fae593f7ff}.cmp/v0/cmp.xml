@@ -4,8 +4,8 @@
         <uuid>{a6f59b93-7e46-433d-b30e-c4fae593f7ff}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:44Z</created>
-        <last_modified>2015-06-21T12:37:44Z</last_modified>
+        <created>2015-08-13T20:22:34Z</created>
+        <last_modified>2015-08-13T20:22:34Z</last_modified>
         <name locale="en_US">MA08-2W</name>
         <description locale="en_US">&lt;b>PIN HEADER&lt;/b>
 
@@ -19,21 +19,21 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{63bfd293-0117-4079-949a-a967da56b90f}" signal="{753c5263-717f-4e00-b1ae-2891aaafcecd}"/>
-        <map pad="{045c2a64-0df0-4348-b34b-0037ba6bb97d}" signal="{e7accff5-f23a-49b5-9ca3-4fb9e7d0b177}"/>
-        <map pad="{13e776cb-abfb-411d-994f-f6448d1c087d}" signal="{c9e019e1-15ad-49d8-84b6-8993dfe0a1c0}"/>
-        <map pad="{329ee142-9a51-40f7-8115-53680532c5d9}" signal="{9d9d982b-4973-4e43-aa4b-622a9f1c6af8}"/>
-        <map pad="{25d2e790-080c-43dc-a823-cc7868b9b8e7}" signal="{ba466cd4-c341-4b8c-8b54-b6c687258bef}"/>
-        <map pad="{882e2c4e-0a9c-4b26-a27d-2a8069bf42d7}" signal="{c963f697-809a-4735-b375-1835e99c3b69}"/>
-        <map pad="{a0c681c2-68e2-4a2e-9171-534c871a1bbc}" signal="{0a4b1000-240d-4c00-bd7e-858240f0c5b3}"/>
-        <map pad="{92308ef7-dc7b-4b78-a303-19abead3d0bb}" signal="{3dd7ad21-c66e-4e26-8aae-262c4bdd91d7}"/>
-        <map pad="{edda6e5f-b640-4f42-82d0-e1d86a3026ca}" signal="{439bcdcc-3da1-4162-8498-87b0a8a1cd11}"/>
-        <map pad="{58ac35d3-d4b9-454b-bf8e-4c5dd8244b41}" signal="{f256f7a6-19fe-4e57-b065-4cc888fc4a8a}"/>
-        <map pad="{f4fcae91-7248-4ca4-be6d-750f1a94aa55}" signal="{5441a2cd-71fd-4a74-a70f-579b6fe3a554}"/>
-        <map pad="{ac27146d-335e-4f6c-b5f2-3338b6fe65d4}" signal="{4949cde6-cecc-4f74-ba61-91f25e4ae755}"/>
-        <map pad="{a2bc2094-8daf-4c7f-9a6d-49215997ac57}" signal="{036a30d9-cd57-468d-a5b9-cb27d70c5b75}"/>
-        <map pad="{460e021f-c0fc-401d-b68c-eee10d703e3a}" signal="{93e541c4-4041-4327-b490-698e70daedf7}"/>
-        <map pad="{0246d615-235e-4538-b891-d5c5ada35b5d}" signal="{71279d0b-63e8-40f3-b3ac-8eb12cfbe1db}"/>
-        <map pad="{f13d4ab7-f39e-434c-8c73-3a422c14cf45}" signal="{f54bb82a-4f99-4580-910a-7fa0edf1c627}"/>
+        <map signal="{036a30d9-cd57-468d-a5b9-cb27d70c5b75}" pad="{a2bc2094-8daf-4c7f-9a6d-49215997ac57}"/>
+        <map signal="{753c5263-717f-4e00-b1ae-2891aaafcecd}" pad="{63bfd293-0117-4079-949a-a967da56b90f}"/>
+        <map signal="{71279d0b-63e8-40f3-b3ac-8eb12cfbe1db}" pad="{0246d615-235e-4538-b891-d5c5ada35b5d}"/>
+        <map signal="{f256f7a6-19fe-4e57-b065-4cc888fc4a8a}" pad="{58ac35d3-d4b9-454b-bf8e-4c5dd8244b41}"/>
+        <map signal="{ba466cd4-c341-4b8c-8b54-b6c687258bef}" pad="{25d2e790-080c-43dc-a823-cc7868b9b8e7}"/>
+        <map signal="{c9e019e1-15ad-49d8-84b6-8993dfe0a1c0}" pad="{13e776cb-abfb-411d-994f-f6448d1c087d}"/>
+        <map signal="{4949cde6-cecc-4f74-ba61-91f25e4ae755}" pad="{ac27146d-335e-4f6c-b5f2-3338b6fe65d4}"/>
+        <map signal="{e7accff5-f23a-49b5-9ca3-4fb9e7d0b177}" pad="{045c2a64-0df0-4348-b34b-0037ba6bb97d}"/>
+        <map signal="{c963f697-809a-4735-b375-1835e99c3b69}" pad="{882e2c4e-0a9c-4b26-a27d-2a8069bf42d7}"/>
+        <map signal="{93e541c4-4041-4327-b490-698e70daedf7}" pad="{460e021f-c0fc-401d-b68c-eee10d703e3a}"/>
+        <map signal="{9d9d982b-4973-4e43-aa4b-622a9f1c6af8}" pad="{329ee142-9a51-40f7-8115-53680532c5d9}"/>
+        <map signal="{439bcdcc-3da1-4162-8498-87b0a8a1cd11}" pad="{edda6e5f-b640-4f42-82d0-e1d86a3026ca}"/>
+        <map signal="{0a4b1000-240d-4c00-bd7e-858240f0c5b3}" pad="{a0c681c2-68e2-4a2e-9171-534c871a1bbc}"/>
+        <map signal="{5441a2cd-71fd-4a74-a70f-579b6fe3a554}" pad="{f4fcae91-7248-4ca4-be6d-750f1a94aa55}"/>
+        <map signal="{f54bb82a-4f99-4580-910a-7fa0edf1c627}" pad="{f13d4ab7-f39e-434c-8c73-3a422c14cf45}"/>
+        <map signal="{3dd7ad21-c66e-4e26-8aae-262c4bdd91d7}" pad="{92308ef7-dc7b-4b78-a303-19abead3d0bb}"/>
     </pad_signal_map>
 </component>

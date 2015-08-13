@@ -4,8 +4,8 @@
         <uuid>{040bc142-1044-447c-b3d8-eae65a6d0b87}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:46Z</created>
-        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <created>2015-08-13T20:22:36Z</created>
+        <last_modified>2015-08-13T20:22:36Z</last_modified>
         <name locale="en_US">BZY97</name>
         <description locale="en_US">&lt;b>Z DIODE&lt;/b>
 
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{5b51e009-df99-47c7-9801-266693bafc85}" signal="{b68d32a3-32c7-4c6f-94f3-24e24594bbc3}"/>
-        <map pad="{a2ee811d-48df-4efb-9af1-77e839462579}" signal="{3a3350ed-e9fe-49bd-a0c3-13443d73b358}"/>
+        <map signal="{b68d32a3-32c7-4c6f-94f3-24e24594bbc3}" pad="{5b51e009-df99-47c7-9801-266693bafc85}"/>
+        <map signal="{3a3350ed-e9fe-49bd-a0c3-13443d73b358}" pad="{a2ee811d-48df-4efb-9af1-77e839462579}"/>
     </pad_signal_map>
 </component>

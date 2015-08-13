@@ -4,8 +4,8 @@
         <uuid>{944aa5ff-356c-4264-9245-0f1d06a48f4d}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:44Z</created>
-        <last_modified>2015-06-21T12:37:44Z</last_modified>
+        <created>2015-08-13T20:22:34Z</created>
+        <last_modified>2015-08-13T20:22:34Z</last_modified>
         <name locale="en_US">JU05</name>
         <description locale="en_US">&lt;b>PIN HEADER&lt;/b>
 
@@ -19,10 +19,10 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{f09032ef-240b-49c5-8dcf-323ed633b3d5}" signal="{e4e354b6-ffbd-4737-bf5a-34a40be8e918}"/>
-        <map pad="{f84e16c4-75ed-46c3-9b84-991b66b71e43}" signal="{3214b342-d719-4a0e-b2e6-585cd1bf25af}"/>
-        <map pad="{b6867c6f-1d9c-477f-b4df-c5e47cc4c90f}" signal="{626dfcbd-9dd5-4ebf-b5cd-e9ff7a904459}"/>
-        <map pad="{ba32d2f2-a5e3-493d-9dae-9003164c11bc}" signal="{c26c1491-f376-4585-bd4f-f70058539a7c}"/>
-        <map pad="{b867f043-b732-4a03-892c-9879567aea3f}" signal="{22d540da-1f8b-4062-b4c9-19a543631b93}"/>
+        <map signal="{22d540da-1f8b-4062-b4c9-19a543631b93}" pad="{b867f043-b732-4a03-892c-9879567aea3f}"/>
+        <map signal="{3214b342-d719-4a0e-b2e6-585cd1bf25af}" pad="{f84e16c4-75ed-46c3-9b84-991b66b71e43}"/>
+        <map signal="{626dfcbd-9dd5-4ebf-b5cd-e9ff7a904459}" pad="{b6867c6f-1d9c-477f-b4df-c5e47cc4c90f}"/>
+        <map signal="{c26c1491-f376-4585-bd4f-f70058539a7c}" pad="{ba32d2f2-a5e3-493d-9dae-9003164c11bc}"/>
+        <map signal="{e4e354b6-ffbd-4737-bf5a-34a40be8e918}" pad="{f09032ef-240b-49c5-8dcf-323ed633b3d5}"/>
     </pad_signal_map>
 </component>

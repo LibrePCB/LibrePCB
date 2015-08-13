@@ -4,9 +4,9 @@
         <uuid>{c9d00cb4-c096-4089-8e67-7f7ca6895d07}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:42Z</created>
-        <last_modified>2015-06-21T12:37:42Z</last_modified>
-        <name locale="en_US">L-EU</name>
+        <created>2015-08-13T20:22:31Z</created>
+        <last_modified>2015-08-13T20:22:31Z</last_modified>
+        <name locale="en_US">L-EU_TJ5-U1</name>
         <description locale="en_US">&lt;B>INDUCTOR&lt;/B>, European symbol
 
 This element was automatically imported from Eagle
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{20013a3f-4a84-4bf6-8a63-def88ab2555f}" signal="{777f11cd-9d4e-4b2b-aafa-7e7a836ff56e}"/>
-        <map pad="{5f992822-a93e-46e4-b74f-397a8dbc8933}" signal="{5b36d330-6f19-4391-8f95-1c2f6a658286}"/>
+        <map signal="{5b36d330-6f19-4391-8f95-1c2f6a658286}" pad="{5f992822-a93e-46e4-b74f-397a8dbc8933}"/>
+        <map signal="{777f11cd-9d4e-4b2b-aafa-7e7a836ff56e}" pad="{20013a3f-4a84-4bf6-8a63-def88ab2555f}"/>
     </pad_signal_map>
 </component>

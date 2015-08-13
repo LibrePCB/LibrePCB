@@ -4,9 +4,9 @@
         <uuid>{d5cc9b74-d92e-4182-b741-f9f24bb46514}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:48Z</created>
-        <last_modified>2015-06-21T12:37:48Z</last_modified>
-        <name locale="en_US">LED</name>
+        <created>2015-08-13T20:22:38Z</created>
+        <last_modified>2015-08-13T20:22:38Z</last_modified>
+        <name locale="en_US">LED_LZR181</name>
         <description locale="en_US">&lt;b>LED&lt;/b>&lt;p>
 &lt;u>OSRAM&lt;/u>:&lt;br>
 
@@ -93,7 +93,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{7e61fab3-9830-4046-8f1c-277d01a8def4}" signal="{f1467b5c-cc7d-44b4-8076-d729f35b3a6a}"/>
-        <map pad="{afe2968d-2114-4856-b1c1-948b83ed52ac}" signal="{7b023430-b68f-403a-80b8-c7deb12e7a0c}"/>
+        <map signal="{7b023430-b68f-403a-80b8-c7deb12e7a0c}" pad="{afe2968d-2114-4856-b1c1-948b83ed52ac}"/>
+        <map signal="{f1467b5c-cc7d-44b4-8076-d729f35b3a6a}" pad="{7e61fab3-9830-4046-8f1c-277d01a8def4}"/>
     </pad_signal_map>
 </component>

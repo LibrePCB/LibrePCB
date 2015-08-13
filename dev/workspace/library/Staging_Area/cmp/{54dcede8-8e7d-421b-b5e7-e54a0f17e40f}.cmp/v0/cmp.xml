@@ -4,8 +4,8 @@
         <uuid>{54dcede8-8e7d-421b-b5e7-e54a0f17e40f}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:46Z</created>
-        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <created>2015-08-13T20:22:36Z</created>
+        <last_modified>2015-08-13T20:22:36Z</last_modified>
         <name locale="en_US">EGP10A</name>
         <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
 ultra fast-recovery rectifier
@@ -20,7 +20,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{d4b82aa7-4f97-4065-9f0a-11c0bb4a1cc7}" signal="{79051579-1e9b-4510-9712-78cc3d0d4d88}"/>
-        <map pad="{613f34f8-ec74-460b-9203-e64dcd075b58}" signal="{d9a26423-8ec5-4106-a67f-c3f6b9587a1b}"/>
+        <map signal="{d9a26423-8ec5-4106-a67f-c3f6b9587a1b}" pad="{613f34f8-ec74-460b-9203-e64dcd075b58}"/>
+        <map signal="{79051579-1e9b-4510-9712-78cc3d0d4d88}" pad="{d4b82aa7-4f97-4065-9f0a-11c0bb4a1cc7}"/>
     </pad_signal_map>
 </component>

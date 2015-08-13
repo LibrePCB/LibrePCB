@@ -4,8 +4,8 @@
         <uuid>{6de8adf5-fdac-4265-a7ab-e67f06ddda2e}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:47Z</created>
-        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <created>2015-08-13T20:22:38Z</created>
+        <last_modified>2015-08-13T20:22:38Z</last_modified>
         <name locale="en_US">BAT54A</name>
         <description locale="en_US">&lt;b>Schottky Diodes&lt;/b>&lt;p>
 Source: Fairchild .. BAT54.pdf
@@ -20,8 +20,8 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{e084a5a2-054f-4b96-9d35-e5a4a69110c9}" signal="{fc42d582-126d-4884-92ce-832a892ac9ed}"/>
-        <map pad="{5df1620d-1a12-409c-a6dc-4ac9c3ea2160}" signal="{49fc28cd-07c4-4a70-b181-2d72243dff31}"/>
-        <map pad="{0b7e3bae-fd35-4351-876f-73d31fc11e9a}" signal="{b9128271-d1d7-484b-9cfc-65fd251bb86b}"/>
+        <map signal="{b9128271-d1d7-484b-9cfc-65fd251bb86b}" pad="{0b7e3bae-fd35-4351-876f-73d31fc11e9a}"/>
+        <map signal="{fc42d582-126d-4884-92ce-832a892ac9ed}" pad="{e084a5a2-054f-4b96-9d35-e5a4a69110c9}"/>
+        <map signal="{49fc28cd-07c4-4a70-b181-2d72243dff31}" pad="{5df1620d-1a12-409c-a6dc-4ac9c3ea2160}"/>
     </pad_signal_map>
 </component>

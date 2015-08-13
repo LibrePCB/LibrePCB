@@ -4,8 +4,8 @@
         <uuid>{3c6b8703-dcfe-408c-bbaa-3318a43c071d}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:47Z</created>
-        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <created>2015-08-13T20:22:37Z</created>
+        <last_modified>2015-08-13T20:22:37Z</last_modified>
         <name locale="en_US">D8-3C</name>
         <description locale="en_US">4 &lt;B>DIODES&lt;/B>&lt;p>
 SIL, cathode marked
@@ -20,13 +20,13 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{adc67046-3ed9-47a6-9aea-44a02c32c5f6}" signal="{e3dfd620-b342-4c93-8aa6-83074bec6ba1}"/>
-        <map pad="{282ba02b-cecc-465c-affc-fc0cea022ae5}" signal="{4fa662db-deaf-4b3e-838d-f428a286f33b}"/>
-        <map pad="{060b2f57-d12a-45c4-9a46-a7a5b7914b80}" signal="{26d3741d-c682-4cc2-ba05-e305960ab76a}"/>
-        <map pad="{ccd2f519-04f2-4cdc-a6bb-b0b4eaf01722}" signal="{31d2a4d8-783e-4e83-8a60-76ffd0d89dc2}"/>
-        <map pad="{885986f5-3d88-4f7f-a0be-b8692c4e711f}" signal="{9c6df4e2-a45e-4825-abc7-e42b54dd0672}"/>
-        <map pad="{3cf46f33-caf5-4ba6-b7b6-fad8723f369f}" signal="{7734bd24-3824-44f4-a657-64079e64b1ee}"/>
-        <map pad="{01fad0bf-6af8-4360-aa19-3dde19239cca}" signal="{cdec3abd-bac8-419a-b504-ff0233c8a8d5}"/>
-        <map pad="{b0c92d83-9160-4864-82be-44857d5034ce}" signal="{714dfe1e-458d-4a24-89b0-fee52333399e}"/>
+        <map signal="{7734bd24-3824-44f4-a657-64079e64b1ee}" pad="{3cf46f33-caf5-4ba6-b7b6-fad8723f369f}"/>
+        <map signal="{26d3741d-c682-4cc2-ba05-e305960ab76a}" pad="{060b2f57-d12a-45c4-9a46-a7a5b7914b80}"/>
+        <map signal="{cdec3abd-bac8-419a-b504-ff0233c8a8d5}" pad="{01fad0bf-6af8-4360-aa19-3dde19239cca}"/>
+        <map signal="{e3dfd620-b342-4c93-8aa6-83074bec6ba1}" pad="{adc67046-3ed9-47a6-9aea-44a02c32c5f6}"/>
+        <map signal="{31d2a4d8-783e-4e83-8a60-76ffd0d89dc2}" pad="{ccd2f519-04f2-4cdc-a6bb-b0b4eaf01722}"/>
+        <map signal="{9c6df4e2-a45e-4825-abc7-e42b54dd0672}" pad="{885986f5-3d88-4f7f-a0be-b8692c4e711f}"/>
+        <map signal="{714dfe1e-458d-4a24-89b0-fee52333399e}" pad="{b0c92d83-9160-4864-82be-44857d5034ce}"/>
+        <map signal="{4fa662db-deaf-4b3e-838d-f428a286f33b}" pad="{282ba02b-cecc-465c-affc-fc0cea022ae5}"/>
     </pad_signal_map>
 </component>

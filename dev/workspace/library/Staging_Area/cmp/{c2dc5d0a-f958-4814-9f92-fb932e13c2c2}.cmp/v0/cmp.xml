@@ -4,8 +4,8 @@
         <uuid>{c2dc5d0a-f958-4814-9f92-fb932e13c2c2}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:44Z</created>
-        <last_modified>2015-06-21T12:37:44Z</last_modified>
+        <created>2015-08-13T20:22:34Z</created>
+        <last_modified>2015-08-13T20:22:34Z</last_modified>
         <name locale="en_US">FE06-1</name>
         <description locale="en_US">&lt;b>FEMALE HEADER&lt;/b>
 
@@ -19,11 +19,11 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{26422d64-954c-47bc-8bb2-d5fcb8b0be97}" signal="{5edfdf73-39c9-4408-b4a3-aca2a30e9232}"/>
-        <map pad="{4091d39d-bcc9-4caf-b15d-d1ac9de19ba0}" signal="{45ebd44f-89a9-49f7-b881-b3194d9a16c5}"/>
-        <map pad="{aca9c6cb-03bf-4b0a-982b-c9a42e89709f}" signal="{e7adc21d-5c31-4b2b-bd02-4d2783aeaafe}"/>
-        <map pad="{645cb307-dc41-49e2-bae9-37fb33ebe5e3}" signal="{e58a7133-03f5-4c34-88c5-ff0b5916b159}"/>
-        <map pad="{7145d39c-870a-441f-a9a2-b42b82a2686c}" signal="{d7b579dc-866a-42cd-b6e1-ed5201f64ec6}"/>
-        <map pad="{d7f49ab9-7a57-4032-bdff-846364cf6040}" signal="{0f6ae3aa-de8c-4e65-aff9-daf029d76215}"/>
+        <map signal="{e58a7133-03f5-4c34-88c5-ff0b5916b159}" pad="{645cb307-dc41-49e2-bae9-37fb33ebe5e3}"/>
+        <map signal="{0f6ae3aa-de8c-4e65-aff9-daf029d76215}" pad="{d7f49ab9-7a57-4032-bdff-846364cf6040}"/>
+        <map signal="{5edfdf73-39c9-4408-b4a3-aca2a30e9232}" pad="{26422d64-954c-47bc-8bb2-d5fcb8b0be97}"/>
+        <map signal="{d7b579dc-866a-42cd-b6e1-ed5201f64ec6}" pad="{7145d39c-870a-441f-a9a2-b42b82a2686c}"/>
+        <map signal="{45ebd44f-89a9-49f7-b881-b3194d9a16c5}" pad="{4091d39d-bcc9-4caf-b15d-d1ac9de19ba0}"/>
+        <map signal="{e7adc21d-5c31-4b2b-bd02-4d2783aeaafe}" pad="{aca9c6cb-03bf-4b0a-982b-c9a42e89709f}"/>
     </pad_signal_map>
 </component>

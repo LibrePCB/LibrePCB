@@ -4,9 +4,9 @@
         <uuid>{d5ce4e15-d035-43e7-88b6-104e5f551146}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:47Z</created>
-        <last_modified>2015-06-21T12:37:47Z</last_modified>
-        <name locale="en_US">DIODE-</name>
+        <created>2015-08-13T20:22:37Z</created>
+        <last_modified>2015-08-13T20:22:37Z</last_modified>
+        <name locale="en_US">DIODE-_C221B1A</name>
         <description locale="en_US">&lt;b>DIODE&lt;/b>
 
 This element was automatically imported from Eagle
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{f4807d6a-1bb6-42ba-92a4-c838d33c96b9}" signal="{2b1bc88a-66af-4d12-a243-011dcad5944e}"/>
-        <map pad="{6cbf7cb7-03e9-46ba-9442-bea88ff6953d}" signal="{e9c960fd-ff27-4ec4-a801-43ce63e5fe33}"/>
+        <map signal="{e9c960fd-ff27-4ec4-a801-43ce63e5fe33}" pad="{6cbf7cb7-03e9-46ba-9442-bea88ff6953d}"/>
+        <map signal="{2b1bc88a-66af-4d12-a243-011dcad5944e}" pad="{f4807d6a-1bb6-42ba-92a4-c838d33c96b9}"/>
     </pad_signal_map>
 </component>

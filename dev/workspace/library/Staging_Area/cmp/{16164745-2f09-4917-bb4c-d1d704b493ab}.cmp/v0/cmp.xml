@@ -4,9 +4,9 @@
         <uuid>{16164745-2f09-4917-bb4c-d1d704b493ab}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:47Z</created>
-        <last_modified>2015-06-21T12:37:47Z</last_modified>
-        <name locale="en_US">SUPPRESSOR-</name>
+        <created>2015-08-13T20:22:37Z</created>
+        <last_modified>2015-08-13T20:22:37Z</last_modified>
+        <name locale="en_US">SUPPRESSOR-_SMBG</name>
         <description locale="en_US">&lt;b>Suppressor diode&lt;/b>
 
 This element was automatically imported from Eagle
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{2adc98d7-cc8e-4d9c-a851-04ace0650028}" signal="{78fc7eeb-dca2-40c7-9543-9444e527056e}"/>
-        <map pad="{1115169f-bf14-42c5-95da-30875917a493}" signal="{0b345c41-0429-47f3-917a-5140944c7755}"/>
+        <map signal="{78fc7eeb-dca2-40c7-9543-9444e527056e}" pad="{2adc98d7-cc8e-4d9c-a851-04ace0650028}"/>
+        <map signal="{0b345c41-0429-47f3-917a-5140944c7755}" pad="{1115169f-bf14-42c5-95da-30875917a493}"/>
     </pad_signal_map>
 </component>

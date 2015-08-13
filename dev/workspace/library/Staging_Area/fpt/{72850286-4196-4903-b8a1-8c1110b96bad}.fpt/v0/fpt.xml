@@ -4,8 +4,8 @@
         <uuid>{72850286-4196-4903-b8a1-8c1110b96bad}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-08-05T21:45:41Z</created>
-        <last_modified>2015-08-05T21:45:41Z</last_modified>
+        <created>2015-08-13T20:22:15Z</created>
+        <last_modified>2015-08-13T20:22:15Z</last_modified>
         <name locale="en_US">POWERDI323</name>
         <description locale="en_US">1.0A SURFACE MOUNT SCHOTTKY BARRIER RECTIFIER POWERDI ® 323 &lt;p>
 Source: http://www.diodes.com/datasheets/ds30899.pdf
@@ -18,39 +18,39 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <geometry>
-        <polygon layer="110" start_x="-1.300000" fill="true" start_y="-0.537500" width="0.000000" grab_area="true">
+        <polygon layer="200" grab_area="true" fill="true" start_x="-1.300000" start_y="-0.537500" width="0.000000">
             <segment end_x="-0.525000" end_y="-0.537500" angle="0.000000"/>
             <segment end_x="-0.525000" end_y="0.537500" angle="0.000000"/>
             <segment end_x="-1.300000" end_y="0.537500" angle="0.000000"/>
             <segment end_x="-1.300000" end_y="-0.537500" angle="0.000000"/>
         </polygon>
-        <polygon layer="110" start_x="0.837500" fill="true" start_y="-0.400000" width="0.000000" grab_area="true">
+        <polygon layer="200" grab_area="true" fill="true" start_x="0.837500" start_y="-0.400000" width="0.000000">
             <segment end_x="1.300000" end_y="-0.400000" angle="0.000000"/>
             <segment end_x="1.300000" end_y="0.400000" angle="0.000000"/>
             <segment end_x="0.837500" end_y="0.400000" angle="0.000000"/>
             <segment end_x="0.837500" end_y="-0.400000" angle="0.000000"/>
         </polygon>
-        <polygon layer="110" start_x="0.000000" fill="false" start_y="0.350000" width="0.200000" grab_area="true">
+        <polygon layer="200" grab_area="true" fill="false" start_x="0.000000" start_y="0.350000" width="0.200000">
             <segment end_x="-0.425000" end_y="0.000000" angle="0.000000"/>
         </polygon>
-        <polygon layer="110" start_x="-0.425000" fill="false" start_y="0.000000" width="0.200000" grab_area="true">
+        <polygon layer="200" grab_area="true" fill="false" start_x="-0.425000" start_y="0.000000" width="0.200000">
             <segment end_x="0.000000" end_y="-0.350000" angle="0.000000"/>
         </polygon>
-        <polygon layer="110" start_x="-0.875000" fill="false" start_y="-0.550000" width="0.203200" grab_area="true">
+        <polygon layer="200" grab_area="true" fill="false" start_x="-0.875000" start_y="-0.550000" width="0.203200">
             <segment end_x="-0.875000" end_y="0.550000" angle="0.000000"/>
             <segment end_x="0.862500" end_y="0.550000" angle="0.000000"/>
             <segment end_x="0.862500" end_y="-0.550000" angle="0.000000"/>
             <segment end_x="-0.875000" end_y="-0.550000" angle="0.000000"/>
         </polygon>
-        <text v_align="bottom" height="2.500000" layer="150" x="-1.851600" rotation="0.000000" y="0.778600" text="${CMP::NAME}" h_align="left"/>
-        <text v_align="bottom" height="2.000000" layer="160" x="-1.851600" rotation="0.000000" y="-2.556600" text="${CMP::VALUE}" h_align="left"/>
+        <text layer="240" rotation="0.000000" text="${CMP::NAME}" x="-1.851600" y="0.778600" h_align="left" v_align="bottom" height="2.500000"/>
+        <text layer="250" rotation="0.000000" text="${CMP::VALUE}" x="-1.851600" y="-2.556600" h_align="left" v_align="bottom" height="2.000000"/>
     </geometry>
     <pads>
-        <pad uuid="{e5ba0734-9bd9-48ed-9ec6-1922709b0867}" height="1.100000" drill="0.000000" x="-0.750000" rotation="0.000000" layer="200" y="0.000000" type="smd_rect" width="2.000000">
+        <pad layer="300" rotation="0.000000" type="smd_rect" x="-0.750000" y="0.000000" width="2.000000" uuid="{e5ba0734-9bd9-48ed-9ec6-1922709b0867}" height="1.100000" drill="0.000000">
             <name locale="en_US">C</name>
             <description locale="en_US"/>
         </pad>
-        <pad uuid="{2114c098-9e6b-40b2-a119-80260dbf060c}" height="0.800000" drill="0.000000" x="1.150000" rotation="0.000000" layer="200" y="0.000000" type="smd_rect" width="0.800000">
+        <pad layer="300" rotation="0.000000" type="smd_rect" x="1.150000" y="0.000000" width="0.800000" uuid="{2114c098-9e6b-40b2-a119-80260dbf060c}" height="0.800000" drill="0.000000">
             <name locale="en_US">A</name>
             <description locale="en_US"/>
         </pad>

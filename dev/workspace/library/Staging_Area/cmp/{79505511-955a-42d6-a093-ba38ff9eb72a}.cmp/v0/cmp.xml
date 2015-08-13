@@ -4,8 +4,8 @@
         <uuid>{79505511-955a-42d6-a093-ba38ff9eb72a}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:46Z</created>
-        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <created>2015-08-13T20:22:36Z</created>
+        <last_modified>2015-08-13T20:22:36Z</last_modified>
         <name locale="en_US">FEP16AT</name>
         <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
 dual ultra-fast recovery rectifier, common cathode
@@ -20,8 +20,8 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{474059df-640b-4b17-98b2-148e340a7152}" signal="{cb3a35b8-23ce-4356-b428-b0d08c643376}"/>
-        <map pad="{ab077e0e-67ff-48c0-b979-66c9ccc6b90f}" signal="{e78ec09a-2359-4106-b342-bcf0f6b3c571}"/>
-        <map pad="{dff54bfb-5db6-4934-9282-29dd73df5aec}" signal="{c8248bf6-3665-4d1b-bd97-b419e0cdebe3}"/>
+        <map signal="{cb3a35b8-23ce-4356-b428-b0d08c643376}" pad="{474059df-640b-4b17-98b2-148e340a7152}"/>
+        <map signal="{c8248bf6-3665-4d1b-bd97-b419e0cdebe3}" pad="{dff54bfb-5db6-4934-9282-29dd73df5aec}"/>
+        <map signal="{e78ec09a-2359-4106-b342-bcf0f6b3c571}" pad="{ab077e0e-67ff-48c0-b979-66c9ccc6b90f}"/>
     </pad_signal_map>
 </component>

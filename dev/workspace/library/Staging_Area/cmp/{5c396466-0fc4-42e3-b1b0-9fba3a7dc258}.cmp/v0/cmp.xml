@@ -4,8 +4,8 @@
         <uuid>{5c396466-0fc4-42e3-b1b0-9fba3a7dc258}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:46Z</created>
-        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <created>2015-08-13T20:22:36Z</created>
+        <last_modified>2015-08-13T20:22:36Z</last_modified>
         <name locale="en_US">A114</name>
         <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
 germanium
@@ -20,7 +20,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{9ee4e8ad-adce-4bee-858d-7b8b6d869bec}" signal="{9c83133e-efc9-4ee8-8f64-b31662c5618a}"/>
-        <map pad="{576a42fd-ef66-431e-ba35-6a07d68ad094}" signal="{006a5132-1c09-499e-9f15-b7ed2b13d7b2}"/>
+        <map signal="{9c83133e-efc9-4ee8-8f64-b31662c5618a}" pad="{9ee4e8ad-adce-4bee-858d-7b8b6d869bec}"/>
+        <map signal="{006a5132-1c09-499e-9f15-b7ed2b13d7b2}" pad="{576a42fd-ef66-431e-ba35-6a07d68ad094}"/>
     </pad_signal_map>
 </component>

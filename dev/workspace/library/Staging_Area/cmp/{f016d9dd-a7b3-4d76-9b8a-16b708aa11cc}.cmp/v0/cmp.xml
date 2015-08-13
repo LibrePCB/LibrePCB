@@ -4,9 +4,9 @@
         <uuid>{f016d9dd-a7b3-4d76-9b8a-16b708aa11cc}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:48Z</created>
-        <last_modified>2015-06-21T12:37:48Z</last_modified>
-        <name locale="en_US">LED</name>
+        <created>2015-08-13T20:22:38Z</created>
+        <last_modified>2015-08-13T20:22:38Z</last_modified>
+        <name locale="en_US">LED_CHIPLED_0805</name>
         <description locale="en_US">&lt;b>LED&lt;/b>&lt;p>
 &lt;u>OSRAM&lt;/u>:&lt;br>
 
@@ -93,7 +93,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{2dc1fcc5-4a0e-41cd-9a27-9a5ff3322693}" signal="{f1467b5c-cc7d-44b4-8076-d729f35b3a6a}"/>
-        <map pad="{264ac24f-e02c-4af0-82a5-ba4a77d2e9ad}" signal="{7b023430-b68f-403a-80b8-c7deb12e7a0c}"/>
+        <map signal="{f1467b5c-cc7d-44b4-8076-d729f35b3a6a}" pad="{2dc1fcc5-4a0e-41cd-9a27-9a5ff3322693}"/>
+        <map signal="{7b023430-b68f-403a-80b8-c7deb12e7a0c}" pad="{264ac24f-e02c-4af0-82a5-ba4a77d2e9ad}"/>
     </pad_signal_map>
 </component>

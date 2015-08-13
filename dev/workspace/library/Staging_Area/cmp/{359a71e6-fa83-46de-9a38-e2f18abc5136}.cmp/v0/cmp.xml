@@ -4,8 +4,8 @@
         <uuid>{359a71e6-fa83-46de-9a38-e2f18abc5136}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:44Z</created>
-        <last_modified>2015-06-21T12:37:44Z</last_modified>
+        <created>2015-08-13T20:22:34Z</created>
+        <last_modified>2015-08-13T20:22:34Z</last_modified>
         <name locale="en_US">MA08-1W</name>
         <description locale="en_US">&lt;b>PIN HEADER&lt;/b>
 
@@ -19,13 +19,13 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{5168c995-82bf-4a1c-9bef-a15a4db4f9fc}" signal="{b2d42872-1de3-4368-9901-fd85d0b16c56}"/>
-        <map pad="{228bd320-12f3-4621-95fc-4ad5667bd168}" signal="{5a9ecc3d-412a-4b6a-8b74-00c562acb3ed}"/>
-        <map pad="{b0922cac-68ec-454b-82a6-04a2258e282b}" signal="{f3c48bb5-d541-41eb-aa1b-3285b4cb2d21}"/>
-        <map pad="{518626a3-c862-47e1-9144-8e5f29e199eb}" signal="{c4816b07-802f-4a91-92b4-eef86d64c458}"/>
-        <map pad="{711f5a38-6fc7-4070-9ba1-2b8bef05b9e1}" signal="{d06a9237-e2e8-4b57-b264-7cef589161f9}"/>
-        <map pad="{12acda87-8b25-4b4c-b303-498703bfe28c}" signal="{1867221a-dd33-400f-a518-acfed62bb97d}"/>
-        <map pad="{ecc5d11b-9e3a-44af-b08e-2eaab65807fc}" signal="{8550e077-b797-4ee6-bdc6-3e9ebe2ee42b}"/>
-        <map pad="{af46b579-2e45-4e7d-a69f-a8a6a335e58d}" signal="{76184a32-10f6-4932-8903-9476bfc84dc2}"/>
+        <map signal="{1867221a-dd33-400f-a518-acfed62bb97d}" pad="{12acda87-8b25-4b4c-b303-498703bfe28c}"/>
+        <map signal="{8550e077-b797-4ee6-bdc6-3e9ebe2ee42b}" pad="{ecc5d11b-9e3a-44af-b08e-2eaab65807fc}"/>
+        <map signal="{5a9ecc3d-412a-4b6a-8b74-00c562acb3ed}" pad="{228bd320-12f3-4621-95fc-4ad5667bd168}"/>
+        <map signal="{c4816b07-802f-4a91-92b4-eef86d64c458}" pad="{518626a3-c862-47e1-9144-8e5f29e199eb}"/>
+        <map signal="{f3c48bb5-d541-41eb-aa1b-3285b4cb2d21}" pad="{b0922cac-68ec-454b-82a6-04a2258e282b}"/>
+        <map signal="{d06a9237-e2e8-4b57-b264-7cef589161f9}" pad="{711f5a38-6fc7-4070-9ba1-2b8bef05b9e1}"/>
+        <map signal="{76184a32-10f6-4932-8903-9476bfc84dc2}" pad="{af46b579-2e45-4e7d-a69f-a8a6a335e58d}"/>
+        <map signal="{b2d42872-1de3-4368-9901-fd85d0b16c56}" pad="{5168c995-82bf-4a1c-9bef-a15a4db4f9fc}"/>
     </pad_signal_map>
 </component>

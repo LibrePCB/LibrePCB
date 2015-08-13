@@ -4,8 +4,8 @@
         <uuid>{577da91a-fe2f-4346-bb7e-47370455ee75}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:46Z</created>
-        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <created>2015-08-13T20:22:36Z</created>
+        <last_modified>2015-08-13T20:22:36Z</last_modified>
         <name locale="en_US">BYW32</name>
         <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
 fast silicon-mesa rectifier (Vishay Telefunken)
@@ -20,7 +20,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{9ee4e8ad-adce-4bee-858d-7b8b6d869bec}" signal="{42afe4e5-e77a-4d73-9cfb-7367dc8beb29}"/>
-        <map pad="{576a42fd-ef66-431e-ba35-6a07d68ad094}" signal="{9388e1c4-6f24-4f68-8443-ab95e65d11ad}"/>
+        <map signal="{42afe4e5-e77a-4d73-9cfb-7367dc8beb29}" pad="{9ee4e8ad-adce-4bee-858d-7b8b6d869bec}"/>
+        <map signal="{9388e1c4-6f24-4f68-8443-ab95e65d11ad}" pad="{576a42fd-ef66-431e-ba35-6a07d68ad094}"/>
     </pad_signal_map>
 </component>

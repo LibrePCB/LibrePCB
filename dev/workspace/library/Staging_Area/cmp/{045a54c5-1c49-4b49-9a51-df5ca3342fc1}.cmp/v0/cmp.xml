@@ -4,9 +4,9 @@
         <uuid>{045a54c5-1c49-4b49-9a51-df5ca3342fc1}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:47Z</created>
-        <last_modified>2015-06-21T12:37:47Z</last_modified>
-        <name locale="en_US">DIODE-</name>
+        <created>2015-08-13T20:22:37Z</created>
+        <last_modified>2015-08-13T20:22:37Z</last_modified>
+        <name locale="en_US">DIODE-_SOD106-W</name>
         <description locale="en_US">&lt;b>DIODE&lt;/b>
 
 This element was automatically imported from Eagle
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{bc1af2c6-1fe8-406a-a608-c055acc518ab}" signal="{e9c960fd-ff27-4ec4-a801-43ce63e5fe33}"/>
-        <map pad="{40284c9f-53cd-445e-ab32-88f9b3ea24d0}" signal="{2b1bc88a-66af-4d12-a243-011dcad5944e}"/>
+        <map signal="{e9c960fd-ff27-4ec4-a801-43ce63e5fe33}" pad="{bc1af2c6-1fe8-406a-a608-c055acc518ab}"/>
+        <map signal="{2b1bc88a-66af-4d12-a243-011dcad5944e}" pad="{40284c9f-53cd-445e-ab32-88f9b3ea24d0}"/>
     </pad_signal_map>
 </component>

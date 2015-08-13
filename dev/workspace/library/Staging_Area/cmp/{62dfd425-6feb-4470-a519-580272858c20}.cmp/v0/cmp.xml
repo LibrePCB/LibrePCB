@@ -4,8 +4,8 @@
         <uuid>{62dfd425-6feb-4470-a519-580272858c20}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:45Z</created>
-        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <created>2015-08-13T20:22:35Z</created>
+        <last_modified>2015-08-13T20:22:35Z</last_modified>
         <name locale="en_US">54M10AUM1</name>
         <description locale="en_US">&lt;b>Monolithic Crystal Filters&lt;/b>&lt;p>
 Source: www.vanlong.com
@@ -20,8 +20,8 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{f26a8ddb-4132-441e-9bc1-ee73ffff14a2}" signal="{45a65270-0492-4996-a265-997e0db2a441}"/>
-        <map pad="{a14befb7-5214-4514-b1f5-51ee69176bcd}" signal="{0cea47f6-c040-495c-a2d6-c6d74e661620}"/>
-        <map pad="{ddf4f96d-cc08-4a40-9182-697f00aad890}" signal="{4f5750bc-7efc-4780-885a-850dd98d2d80}"/>
+        <map signal="{45a65270-0492-4996-a265-997e0db2a441}" pad="{f26a8ddb-4132-441e-9bc1-ee73ffff14a2}"/>
+        <map signal="{4f5750bc-7efc-4780-885a-850dd98d2d80}" pad="{ddf4f96d-cc08-4a40-9182-697f00aad890}"/>
+        <map signal="{0cea47f6-c040-495c-a2d6-c6d74e661620}" pad="{a14befb7-5214-4514-b1f5-51ee69176bcd}"/>
     </pad_signal_map>
 </component>

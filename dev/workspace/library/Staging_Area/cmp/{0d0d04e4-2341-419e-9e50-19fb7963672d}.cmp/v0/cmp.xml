@@ -4,9 +4,9 @@
         <uuid>{0d0d04e4-2341-419e-9e50-19fb7963672d}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:48Z</created>
-        <last_modified>2015-06-21T12:37:48Z</last_modified>
-        <name locale="en_US">LED</name>
+        <created>2015-08-13T20:22:38Z</created>
+        <last_modified>2015-08-13T20:22:38Z</last_modified>
+        <name locale="en_US">LED_LSU260</name>
         <description locale="en_US">&lt;b>LED&lt;/b>&lt;p>
 &lt;u>OSRAM&lt;/u>:&lt;br>
 
@@ -93,7 +93,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{45d5a3e6-c072-4f4d-aceb-13fbb2461694}" signal="{7b023430-b68f-403a-80b8-c7deb12e7a0c}"/>
-        <map pad="{d4a79aca-bea4-4aaa-8fe5-0fc110488658}" signal="{f1467b5c-cc7d-44b4-8076-d729f35b3a6a}"/>
+        <map signal="{f1467b5c-cc7d-44b4-8076-d729f35b3a6a}" pad="{d4a79aca-bea4-4aaa-8fe5-0fc110488658}"/>
+        <map signal="{7b023430-b68f-403a-80b8-c7deb12e7a0c}" pad="{45d5a3e6-c072-4f4d-aceb-13fbb2461694}"/>
     </pad_signal_map>
 </component>

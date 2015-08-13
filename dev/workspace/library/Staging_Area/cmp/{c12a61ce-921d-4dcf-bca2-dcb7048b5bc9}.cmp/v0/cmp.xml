@@ -4,8 +4,8 @@
         <uuid>{c12a61ce-921d-4dcf-bca2-dcb7048b5bc9}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:48Z</created>
-        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <created>2015-08-13T20:22:38Z</created>
+        <last_modified>2015-08-13T20:22:38Z</last_modified>
         <name locale="en_US">MSA5*C</name>
         <description locale="en_US">&lt;b>16 Segment, Single Digit Alpha-Numeric Display&lt;/b> 0.5 Inch (12.7 mm)&lt;p>
 Source: www.fairchildsemi.com/ds/MS/MSA5480C.pdf
@@ -20,23 +20,23 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{3212e649-3727-419b-9f57-acb347a63f81}" signal="{d0959617-f555-415f-84ed-563e2649a970}"/>
-        <map pad="{e9936697-61d3-4d46-97fc-bb4c5acee1f8}" signal="{4cc629d3-4d49-4619-863e-0478b5cf057b}"/>
-        <map pad="{da120cc2-a6b5-4f7a-b633-b5e116800812}" signal="{4e02ac21-a11c-467d-9899-354401237629}"/>
-        <map pad="{bb78e127-3a8e-462b-a177-f00c9381e582}" signal="{3f74cfe6-d96b-4f26-9d6e-803c83ac7934}"/>
-        <map pad="{bfb4d36c-5947-45df-95c8-09d621435e5b}" signal="{aa3c3ab4-fcd4-4576-acf4-573551834442}"/>
-        <map pad="{66951b08-663a-4883-b135-e711248b73a2}" signal="{176599c8-e990-4f91-8a4e-253730268694}"/>
-        <map pad="{ac3b2a94-b580-4b99-af1a-92308a943827}" signal="{a9b0d884-5260-4724-9ed3-e56fc4231002}"/>
-        <map pad="{1f19611a-64b8-4d48-9c5e-486f84948fad}" signal="{4b4b6eb3-c3f7-4541-b51f-2b6e52d3fcca}"/>
-        <map pad="{9bc87967-ea23-413f-81c4-0e1b72d572fe}" signal="{592b5faa-88fa-4fb4-ab58-0302f7b39d58}"/>
-        <map pad="{e386f0b3-01ac-42c0-94a5-7754ccd4fbd8}" signal="{f2a56215-76eb-4892-93c1-12f2bd34c6bd}"/>
-        <map pad="{7b418f70-5564-4880-aafc-832a0f8b421a}" signal="{8d02ee18-15a8-4e39-937e-0442f461da7e}"/>
-        <map pad="{00eead10-797d-4316-ab8a-3175c0834362}" signal="{7eb74485-4a8d-474a-864b-32e062475643}"/>
-        <map pad="{ed1fc272-939f-4782-b518-a4686da3797f}" signal="{52e144a0-4b73-4959-ad3b-5dc1f264c215}"/>
-        <map pad="{44aff786-4671-48a3-87fb-d83fca5f232d}" signal="{af55caa6-60d3-4d98-8e1f-e0a80859da0c}"/>
-        <map pad="{8d5f7c26-c896-4745-9227-8c6f592f2605}" signal="{bab4d9d2-0327-4fdf-8201-5067f2eea22a}"/>
-        <map pad="{8a73ac80-676c-47ee-9164-71dc4e1e1e48}" signal="{249c47e7-1d6a-454b-8227-5f8ef0647b52}"/>
-        <map pad="{2e939917-1973-4328-93dc-470cbfdf6d36}" signal="{1b24cbfc-6a6a-49a2-95b0-a56d5c6197fc}"/>
-        <map pad="{3b36f83d-4f2f-4e16-9434-455ffc5e198b}" signal="{da46ee18-4dca-4b55-ad6e-8ddfbe39ff15}"/>
+        <map signal="{f2a56215-76eb-4892-93c1-12f2bd34c6bd}" pad="{e386f0b3-01ac-42c0-94a5-7754ccd4fbd8}"/>
+        <map signal="{4b4b6eb3-c3f7-4541-b51f-2b6e52d3fcca}" pad="{1f19611a-64b8-4d48-9c5e-486f84948fad}"/>
+        <map signal="{4cc629d3-4d49-4619-863e-0478b5cf057b}" pad="{e9936697-61d3-4d46-97fc-bb4c5acee1f8}"/>
+        <map signal="{52e144a0-4b73-4959-ad3b-5dc1f264c215}" pad="{ed1fc272-939f-4782-b518-a4686da3797f}"/>
+        <map signal="{1b24cbfc-6a6a-49a2-95b0-a56d5c6197fc}" pad="{2e939917-1973-4328-93dc-470cbfdf6d36}"/>
+        <map signal="{7eb74485-4a8d-474a-864b-32e062475643}" pad="{00eead10-797d-4316-ab8a-3175c0834362}"/>
+        <map signal="{249c47e7-1d6a-454b-8227-5f8ef0647b52}" pad="{8a73ac80-676c-47ee-9164-71dc4e1e1e48}"/>
+        <map signal="{aa3c3ab4-fcd4-4576-acf4-573551834442}" pad="{bfb4d36c-5947-45df-95c8-09d621435e5b}"/>
+        <map signal="{4e02ac21-a11c-467d-9899-354401237629}" pad="{da120cc2-a6b5-4f7a-b633-b5e116800812}"/>
+        <map signal="{3f74cfe6-d96b-4f26-9d6e-803c83ac7934}" pad="{bb78e127-3a8e-462b-a177-f00c9381e582}"/>
+        <map signal="{d0959617-f555-415f-84ed-563e2649a970}" pad="{3212e649-3727-419b-9f57-acb347a63f81}"/>
+        <map signal="{da46ee18-4dca-4b55-ad6e-8ddfbe39ff15}" pad="{3b36f83d-4f2f-4e16-9434-455ffc5e198b}"/>
+        <map signal="{af55caa6-60d3-4d98-8e1f-e0a80859da0c}" pad="{44aff786-4671-48a3-87fb-d83fca5f232d}"/>
+        <map signal="{bab4d9d2-0327-4fdf-8201-5067f2eea22a}" pad="{8d5f7c26-c896-4745-9227-8c6f592f2605}"/>
+        <map signal="{8d02ee18-15a8-4e39-937e-0442f461da7e}" pad="{7b418f70-5564-4880-aafc-832a0f8b421a}"/>
+        <map signal="{592b5faa-88fa-4fb4-ab58-0302f7b39d58}" pad="{9bc87967-ea23-413f-81c4-0e1b72d572fe}"/>
+        <map signal="{a9b0d884-5260-4724-9ed3-e56fc4231002}" pad="{ac3b2a94-b580-4b99-af1a-92308a943827}"/>
+        <map signal="{176599c8-e990-4f91-8a4e-253730268694}" pad="{66951b08-663a-4883-b135-e711248b73a2}"/>
     </pad_signal_map>
 </component>

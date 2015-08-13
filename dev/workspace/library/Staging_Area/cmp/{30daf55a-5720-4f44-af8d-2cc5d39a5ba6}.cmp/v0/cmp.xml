@@ -4,8 +4,8 @@
         <uuid>{30daf55a-5720-4f44-af8d-2cc5d39a5ba6}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:47Z</created>
-        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <created>2015-08-13T20:22:37Z</created>
+        <last_modified>2015-08-13T20:22:37Z</last_modified>
         <name locale="en_US">OA95</name>
         <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
 germanium diode&lt;p>
@@ -21,7 +21,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{e7f487f8-66ce-44c0-b08f-c9b013eaa4db}" signal="{2db8e407-f628-436f-8284-49850e6a0a8e}"/>
-        <map pad="{afd2ecc2-c34e-4a0a-88ef-0ccb3f784d82}" signal="{cdb9ddb1-7347-4e94-8764-6892cd888f5a}"/>
+        <map signal="{2db8e407-f628-436f-8284-49850e6a0a8e}" pad="{e7f487f8-66ce-44c0-b08f-c9b013eaa4db}"/>
+        <map signal="{cdb9ddb1-7347-4e94-8764-6892cd888f5a}" pad="{afd2ecc2-c34e-4a0a-88ef-0ccb3f784d82}"/>
     </pad_signal_map>
 </component>

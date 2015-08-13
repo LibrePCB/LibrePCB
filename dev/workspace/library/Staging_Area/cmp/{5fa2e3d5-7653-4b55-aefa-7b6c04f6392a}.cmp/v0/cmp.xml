@@ -4,8 +4,8 @@
         <uuid>{5fa2e3d5-7653-4b55-aefa-7b6c04f6392a}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:47Z</created>
-        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <created>2015-08-13T20:22:37Z</created>
+        <last_modified>2015-08-13T20:22:37Z</last_modified>
         <name locale="en_US">S6058</name>
         <description locale="en_US">&lt;b>Si PIN Quadrant photodiode&lt;/b>&lt;p>
 Source: http://sales.hamamatsu.com/assets/pdf/parts_S/S7379-01_etc.pdf
@@ -20,11 +20,11 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{b76abdd6-52f3-4ac3-a364-4eb05afbf9bf}" signal="{90c977db-4590-4680-8dff-89fa1e970fa0}"/>
-        <map pad="{a371f116-ee24-489a-a764-1745cbcc557e}" signal="{e8f38fbc-b5b2-4aa5-85ca-817ac88e512a}"/>
-        <map pad="{6c0c5b47-1525-4396-ab64-0ddc826db26d}" signal="{2fc7c3dd-d246-4026-8328-d64821f075cf}"/>
-        <map pad="{e8484711-85db-4688-be6e-d16daf5571a5}" signal="{c985f6ea-d5b2-4aa8-ba8a-be5fad12d5ae}"/>
-        <map pad="{f9b095b7-0a05-4b19-a6f8-11e26d716f89}" signal="{5d8d0b5c-4ce0-404a-bdaa-06f5adff910e}"/>
-        <map pad="{33ddb1a0-7ad6-4a48-a60e-5522c80ba358}" signal="{bebd4e7f-857f-492f-a07c-06bce9eb6530}"/>
+        <map signal="{2fc7c3dd-d246-4026-8328-d64821f075cf}" pad="{6c0c5b47-1525-4396-ab64-0ddc826db26d}"/>
+        <map signal="{5d8d0b5c-4ce0-404a-bdaa-06f5adff910e}" pad="{f9b095b7-0a05-4b19-a6f8-11e26d716f89}"/>
+        <map signal="{c985f6ea-d5b2-4aa8-ba8a-be5fad12d5ae}" pad="{e8484711-85db-4688-be6e-d16daf5571a5}"/>
+        <map signal="{e8f38fbc-b5b2-4aa5-85ca-817ac88e512a}" pad="{a371f116-ee24-489a-a764-1745cbcc557e}"/>
+        <map signal="{bebd4e7f-857f-492f-a07c-06bce9eb6530}" pad="{33ddb1a0-7ad6-4a48-a60e-5522c80ba358}"/>
+        <map signal="{90c977db-4590-4680-8dff-89fa1e970fa0}" pad="{b76abdd6-52f3-4ac3-a364-4eb05afbf9bf}"/>
     </pad_signal_map>
 </component>

@@ -4,9 +4,9 @@
         <uuid>{ac60b376-33f4-44ae-8ae9-14721f00fd98}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:43Z</created>
-        <last_modified>2015-06-21T12:37:43Z</last_modified>
-        <name locale="en_US">R-TRIMM</name>
+        <created>2015-08-13T20:22:32Z</created>
+        <last_modified>2015-08-13T20:22:32Z</last_modified>
+        <name locale="en_US">R-TRIMM_74X</name>
         <description locale="en_US">&lt;b>Trimm resistor&lt;/b>
 
 This element was automatically imported from Eagle
@@ -19,8 +19,8 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{0b51d68f-1038-4fe2-8514-8e5ad273c72b}" signal="{ef7d6004-a9dd-441a-a605-965863019345}"/>
-        <map pad="{c632c92e-1c77-48d1-951d-b48c06085766}" signal="{8a87b90b-5d61-46e1-8af1-f554e3c83bf9}"/>
-        <map pad="{ed7c9dd6-278f-4064-9168-d00c0820a045}" signal="{dc6abef1-4b87-4cf9-9559-480498799fa9}"/>
+        <map signal="{dc6abef1-4b87-4cf9-9559-480498799fa9}" pad="{ed7c9dd6-278f-4064-9168-d00c0820a045}"/>
+        <map signal="{8a87b90b-5d61-46e1-8af1-f554e3c83bf9}" pad="{c632c92e-1c77-48d1-951d-b48c06085766}"/>
+        <map signal="{ef7d6004-a9dd-441a-a605-965863019345}" pad="{0b51d68f-1038-4fe2-8514-8e5ad273c72b}"/>
     </pad_signal_map>
 </component>

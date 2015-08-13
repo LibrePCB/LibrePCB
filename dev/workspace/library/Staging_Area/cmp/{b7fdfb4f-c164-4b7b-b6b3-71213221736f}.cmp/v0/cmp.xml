@@ -4,8 +4,8 @@
         <uuid>{b7fdfb4f-c164-4b7b-b6b3-71213221736f}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:48Z</created>
-        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <created>2015-08-13T20:22:38Z</created>
+        <last_modified>2015-08-13T20:22:38Z</last_modified>
         <name locale="en_US">DUOLED-RY-A</name>
         <description locale="en_US">&lt;B>DUO LED&lt;/B>&lt;P>
 2 colors (red/yellow), 5 mm, round, common Anode&lt;BR>
@@ -21,8 +21,8 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{c5a82d75-3aa5-474f-90d0-7ee255503fd6}" signal="{6b194a29-93e6-427b-adfd-29d7caa8e41f}"/>
-        <map pad="{50066db3-de2d-47c7-a97e-981f4b80569b}" signal="{c5f2d24f-f031-4a54-84fb-60bb051f57db}"/>
-        <map pad="{c3d66b44-cc3e-45a2-b667-5b185bd5dd17}" signal="{281cd9d8-21d2-4115-bde6-ef6671efdae4}"/>
+        <map signal="{c5f2d24f-f031-4a54-84fb-60bb051f57db}" pad="{50066db3-de2d-47c7-a97e-981f4b80569b}"/>
+        <map signal="{6b194a29-93e6-427b-adfd-29d7caa8e41f}" pad="{c5a82d75-3aa5-474f-90d0-7ee255503fd6}"/>
+        <map signal="{281cd9d8-21d2-4115-bde6-ef6671efdae4}" pad="{c3d66b44-cc3e-45a2-b667-5b185bd5dd17}"/>
     </pad_signal_map>
 </component>

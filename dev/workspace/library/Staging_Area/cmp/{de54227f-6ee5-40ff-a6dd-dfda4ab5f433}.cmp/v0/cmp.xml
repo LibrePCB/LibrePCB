@@ -4,8 +4,8 @@
         <uuid>{de54227f-6ee5-40ff-a6dd-dfda4ab5f433}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:47Z</created>
-        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <created>2015-08-13T20:22:37Z</created>
+        <last_modified>2015-08-13T20:22:37Z</last_modified>
         <name locale="en_US">BAT49</name>
         <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
 small signal diode
@@ -20,7 +20,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{d4b82aa7-4f97-4065-9f0a-11c0bb4a1cc7}" signal="{bdef24f5-ff08-47ca-8a5c-b5e2642df101}"/>
-        <map pad="{613f34f8-ec74-460b-9203-e64dcd075b58}" signal="{56ffbe35-d157-4b05-98cb-6225451aed6b}"/>
+        <map signal="{56ffbe35-d157-4b05-98cb-6225451aed6b}" pad="{613f34f8-ec74-460b-9203-e64dcd075b58}"/>
+        <map signal="{bdef24f5-ff08-47ca-8a5c-b5e2642df101}" pad="{d4b82aa7-4f97-4065-9f0a-11c0bb4a1cc7}"/>
     </pad_signal_map>
 </component>

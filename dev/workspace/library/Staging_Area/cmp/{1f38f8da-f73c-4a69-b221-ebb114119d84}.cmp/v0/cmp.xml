@@ -4,8 +4,8 @@
         <uuid>{1f38f8da-f73c-4a69-b221-ebb114119d84}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:46Z</created>
-        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <created>2015-08-13T20:22:36Z</created>
+        <last_modified>2015-08-13T20:22:36Z</last_modified>
         <name locale="en_US">GT32</name>
         <description locale="en_US">Trigger &lt;B>DIODE&lt;/B>
 
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{30b2bc4e-40cc-43e7-835d-c514f7ed455c}" signal="{b0c017fa-29b0-4c87-8485-1ed19a53c37d}"/>
-        <map pad="{d82eeefa-526f-41d2-9d55-97582fbf3bb5}" signal="{414f9c23-ad8a-4416-a554-6df84794dccd}"/>
+        <map signal="{b0c017fa-29b0-4c87-8485-1ed19a53c37d}" pad="{30b2bc4e-40cc-43e7-835d-c514f7ed455c}"/>
+        <map signal="{414f9c23-ad8a-4416-a554-6df84794dccd}" pad="{d82eeefa-526f-41d2-9d55-97582fbf3bb5}"/>
     </pad_signal_map>
 </component>

@@ -4,9 +4,9 @@
         <uuid>{9d2b2a28-b97f-473b-b3ed-9642bd9e0fa4}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:43Z</created>
-        <last_modified>2015-06-21T12:37:43Z</last_modified>
-        <name locale="en_US">CPOL-US</name>
+        <created>2015-08-13T20:22:33Z</created>
+        <last_modified>2015-08-13T20:22:33Z</last_modified>
+        <name locale="en_US">CPOL-US_153CLV-0505</name>
         <description locale="en_US">&lt;B>POLARIZED CAPACITOR&lt;/B>, American symbol
 
 This element was automatically imported from Eagle
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{03acae49-f7bf-46fd-b505-680d58d87ff3}" signal="{af3ffca8-0085-4edb-a775-fcb759f63411}"/>
-        <map pad="{873241d4-a171-413a-9a56-2ca2c6ae9254}" signal="{e010ecbb-6210-4da3-9270-ebd58656dbf0}"/>
+        <map signal="{e010ecbb-6210-4da3-9270-ebd58656dbf0}" pad="{873241d4-a171-413a-9a56-2ca2c6ae9254}"/>
+        <map signal="{af3ffca8-0085-4edb-a775-fcb759f63411}" pad="{03acae49-f7bf-46fd-b505-680d58d87ff3}"/>
     </pad_signal_map>
 </component>

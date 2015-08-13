@@ -4,8 +4,8 @@
         <uuid>{aef0c02f-cad5-4fdf-88bb-74e9c24b3ca1}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:47Z</created>
-        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <created>2015-08-13T20:22:37Z</created>
+        <last_modified>2015-08-13T20:22:37Z</last_modified>
         <name locale="en_US">BYW80</name>
         <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
 high-efficiency fast recovery rectifier (ST)
@@ -20,7 +20,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{22c59b75-9555-4663-b1ec-2cb2e628e643}" signal="{913ecc57-a1b8-42f6-9ea4-dba8a7868ea2}"/>
-        <map pad="{d3037401-716f-4079-8049-c4fafefac3ec}" signal="{e71ea7e6-b3e1-42f3-953d-d32780d1e3e8}"/>
+        <map signal="{913ecc57-a1b8-42f6-9ea4-dba8a7868ea2}" pad="{22c59b75-9555-4663-b1ec-2cb2e628e643}"/>
+        <map signal="{e71ea7e6-b3e1-42f3-953d-d32780d1e3e8}" pad="{d3037401-716f-4079-8049-c4fafefac3ec}"/>
     </pad_signal_map>
 </component>

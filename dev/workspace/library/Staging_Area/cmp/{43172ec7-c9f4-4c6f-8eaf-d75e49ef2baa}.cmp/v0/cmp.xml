@@ -4,8 +4,8 @@
         <uuid>{43172ec7-c9f4-4c6f-8eaf-d75e49ef2baa}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:44Z</created>
-        <last_modified>2015-06-21T12:37:44Z</last_modified>
+        <created>2015-08-13T20:22:33Z</created>
+        <last_modified>2015-08-13T20:22:33Z</last_modified>
         <name locale="en_US">JBK20</name>
         <description locale="en_US">&lt;b>PIN HEADER&lt;/b>
 
@@ -19,25 +19,25 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{3586378e-7d6c-4881-8465-11481df713df}" signal="{9c9c9a45-313c-483b-9e73-463bd5d9ae69}"/>
-        <map pad="{9ac7e569-e166-4e16-a594-46b4ed530e30}" signal="{e85103f7-1556-475e-95d8-a0bf0a79b2c1}"/>
-        <map pad="{4a55f261-9a82-45c5-938e-33707f7163a4}" signal="{49d4e0a8-ab3b-4041-8b4b-84fed6f95807}"/>
-        <map pad="{b11be488-ff6e-42b3-9b8a-741072c01120}" signal="{de64ed2c-a5b8-4bfe-958e-286b9ca32611}"/>
-        <map pad="{998d0f02-960a-44df-af9c-a2dff802dca2}" signal="{d5b86aca-f892-480d-9f81-53df9fee96c9}"/>
-        <map pad="{d83e0f7a-092f-43d6-810a-de8f579d82a7}" signal="{cf57c837-fa7a-490e-81d6-0df1d9c81487}"/>
-        <map pad="{54c336cc-9cbd-4107-b114-7b1a3377c9ba}" signal="{cff12bbe-4d8b-45fd-a6b3-e1c9f59ec6e9}"/>
-        <map pad="{0590b4de-1f1c-4fa2-958d-83acae954e10}" signal="{a138308d-38a1-46b6-acab-43554cc9dbcc}"/>
-        <map pad="{365b276d-48b5-409a-90e2-60598de1e7c9}" signal="{f8ff86c6-04f3-4891-a7be-edb2d0139983}"/>
-        <map pad="{b4810b18-6679-4d69-8482-993189a96a20}" signal="{266bff8f-5495-4b29-9425-30f1997742e0}"/>
-        <map pad="{e187c17e-9ac5-4061-b01d-66dd786289d0}" signal="{cd1470c5-9174-458a-b4d7-d8b5ff3d5eed}"/>
-        <map pad="{13aa0fc0-ade4-4a63-b338-5ab3df26fa62}" signal="{85060b58-a341-45b8-b1c6-d61746e69657}"/>
-        <map pad="{a632cb1e-9d20-4d7c-941d-ded60a950eae}" signal="{a8d579a9-4e0a-425f-9b92-8316ce2f62e1}"/>
-        <map pad="{aaf37a4e-d936-4dbf-a2a7-837dead22660}" signal="{1bab36a2-fc00-4005-b9b3-57378fa0572c}"/>
-        <map pad="{0efce070-3833-4d79-9d51-278b66c1f6b7}" signal="{a7a17290-d532-4fe8-8852-3601cbcdef2e}"/>
-        <map pad="{23b1402a-6f7a-4252-a905-ffb158600312}" signal="{2cbf1997-d94a-4370-b4a2-e475e1873989}"/>
-        <map pad="{a8228f9d-5cec-4bb6-98f5-9998336f8493}" signal="{45df3730-332b-4610-91ad-5fe3ad66ce04}"/>
-        <map pad="{45c9c42e-09a5-40cc-af24-234fe75c24bb}" signal="{5152345f-6dfe-404e-8572-13a7419735e5}"/>
-        <map pad="{9311f99d-6efd-49d1-a978-c17253889a13}" signal="{e4239151-85a5-42a7-99d6-0cade899adff}"/>
-        <map pad="{70ad8c1b-d18b-41bc-b014-2a0d15bc3ffa}" signal="{0233400d-10cf-4ef6-9115-572b182c0426}"/>
+        <map signal="{cff12bbe-4d8b-45fd-a6b3-e1c9f59ec6e9}" pad="{54c336cc-9cbd-4107-b114-7b1a3377c9ba}"/>
+        <map signal="{a7a17290-d532-4fe8-8852-3601cbcdef2e}" pad="{0efce070-3833-4d79-9d51-278b66c1f6b7}"/>
+        <map signal="{d5b86aca-f892-480d-9f81-53df9fee96c9}" pad="{998d0f02-960a-44df-af9c-a2dff802dca2}"/>
+        <map signal="{cf57c837-fa7a-490e-81d6-0df1d9c81487}" pad="{d83e0f7a-092f-43d6-810a-de8f579d82a7}"/>
+        <map signal="{0233400d-10cf-4ef6-9115-572b182c0426}" pad="{70ad8c1b-d18b-41bc-b014-2a0d15bc3ffa}"/>
+        <map signal="{1bab36a2-fc00-4005-b9b3-57378fa0572c}" pad="{aaf37a4e-d936-4dbf-a2a7-837dead22660}"/>
+        <map signal="{5152345f-6dfe-404e-8572-13a7419735e5}" pad="{45c9c42e-09a5-40cc-af24-234fe75c24bb}"/>
+        <map signal="{49d4e0a8-ab3b-4041-8b4b-84fed6f95807}" pad="{4a55f261-9a82-45c5-938e-33707f7163a4}"/>
+        <map signal="{45df3730-332b-4610-91ad-5fe3ad66ce04}" pad="{a8228f9d-5cec-4bb6-98f5-9998336f8493}"/>
+        <map signal="{2cbf1997-d94a-4370-b4a2-e475e1873989}" pad="{23b1402a-6f7a-4252-a905-ffb158600312}"/>
+        <map signal="{9c9c9a45-313c-483b-9e73-463bd5d9ae69}" pad="{3586378e-7d6c-4881-8465-11481df713df}"/>
+        <map signal="{85060b58-a341-45b8-b1c6-d61746e69657}" pad="{13aa0fc0-ade4-4a63-b338-5ab3df26fa62}"/>
+        <map signal="{e85103f7-1556-475e-95d8-a0bf0a79b2c1}" pad="{9ac7e569-e166-4e16-a594-46b4ed530e30}"/>
+        <map signal="{a138308d-38a1-46b6-acab-43554cc9dbcc}" pad="{0590b4de-1f1c-4fa2-958d-83acae954e10}"/>
+        <map signal="{de64ed2c-a5b8-4bfe-958e-286b9ca32611}" pad="{b11be488-ff6e-42b3-9b8a-741072c01120}"/>
+        <map signal="{266bff8f-5495-4b29-9425-30f1997742e0}" pad="{b4810b18-6679-4d69-8482-993189a96a20}"/>
+        <map signal="{a8d579a9-4e0a-425f-9b92-8316ce2f62e1}" pad="{a632cb1e-9d20-4d7c-941d-ded60a950eae}"/>
+        <map signal="{e4239151-85a5-42a7-99d6-0cade899adff}" pad="{9311f99d-6efd-49d1-a978-c17253889a13}"/>
+        <map signal="{f8ff86c6-04f3-4891-a7be-edb2d0139983}" pad="{365b276d-48b5-409a-90e2-60598de1e7c9}"/>
+        <map signal="{cd1470c5-9174-458a-b4d7-d8b5ff3d5eed}" pad="{e187c17e-9ac5-4061-b01d-66dd786289d0}"/>
     </pad_signal_map>
 </component>

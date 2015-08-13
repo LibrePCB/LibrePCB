@@ -4,8 +4,8 @@
         <uuid>{5ddc9a18-e5a6-49a5-82c4-50141a87ffa7}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:46Z</created>
-        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <created>2015-08-13T20:22:36Z</created>
+        <last_modified>2015-08-13T20:22:36Z</last_modified>
         <name locale="en_US">BY609</name>
         <description locale="en_US">&lt;B>DIODE&lt;/B>
 
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{684af2d1-5c41-4d51-9f5f-ad22e7fb2f65}" signal="{6c018879-6642-455b-a109-324a5bcea549}"/>
-        <map pad="{01c901fc-f419-4799-9587-972cbf6dcf23}" signal="{02291380-7a16-43c9-99a5-e2195c22b290}"/>
+        <map signal="{6c018879-6642-455b-a109-324a5bcea549}" pad="{684af2d1-5c41-4d51-9f5f-ad22e7fb2f65}"/>
+        <map signal="{02291380-7a16-43c9-99a5-e2195c22b290}" pad="{01c901fc-f419-4799-9587-972cbf6dcf23}"/>
     </pad_signal_map>
 </component>

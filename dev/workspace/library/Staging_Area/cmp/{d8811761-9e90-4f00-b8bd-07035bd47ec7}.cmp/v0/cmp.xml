@@ -4,8 +4,8 @@
         <uuid>{d8811761-9e90-4f00-b8bd-07035bd47ec7}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:44Z</created>
-        <last_modified>2015-06-21T12:37:44Z</last_modified>
+        <created>2015-08-13T20:22:34Z</created>
+        <last_modified>2015-08-13T20:22:34Z</last_modified>
         <name locale="en_US">FE08W</name>
         <description locale="en_US">&lt;b>FEMALE HEADER&lt;/b>
 
@@ -19,13 +19,13 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{e46dee3d-8d67-4f8f-9601-a21f9e4ac0c2}" signal="{87a95ce6-c8be-4e85-961d-638f41a950d9}"/>
-        <map pad="{d87947ec-d1ca-4472-a2c4-55ac889684a2}" signal="{d8be519a-67cf-41da-9993-42e6b74ac814}"/>
-        <map pad="{8abe725b-b6c6-4a5e-b3f1-5355908d8697}" signal="{d3316117-9ea9-4532-8ad8-29a5e9e8dcc3}"/>
-        <map pad="{d83e1f74-ef95-4b8a-b9f5-219321c85fd1}" signal="{162c0dad-3ea9-401e-b0d5-7ee2c965dbfd}"/>
-        <map pad="{6e0213ad-5368-4f16-8b65-2f2dff16ca37}" signal="{f8b35cf6-ee0f-4100-91d2-1f2d93b7d1df}"/>
-        <map pad="{f897567b-b648-4069-b711-461a51479cda}" signal="{e46e3514-3064-41cf-9714-ee16a023aaf5}"/>
-        <map pad="{5c1c73ce-f071-49b6-bae3-334ee9e95873}" signal="{f263c80c-4665-4069-ba85-0bcd57576ff4}"/>
-        <map pad="{ac6e1ec3-7fb9-48e7-bf1b-66c63511d798}" signal="{0ce2eb66-2408-4e21-affe-7081bc47f65c}"/>
+        <map signal="{87a95ce6-c8be-4e85-961d-638f41a950d9}" pad="{e46dee3d-8d67-4f8f-9601-a21f9e4ac0c2}"/>
+        <map signal="{d3316117-9ea9-4532-8ad8-29a5e9e8dcc3}" pad="{8abe725b-b6c6-4a5e-b3f1-5355908d8697}"/>
+        <map signal="{162c0dad-3ea9-401e-b0d5-7ee2c965dbfd}" pad="{d83e1f74-ef95-4b8a-b9f5-219321c85fd1}"/>
+        <map signal="{f263c80c-4665-4069-ba85-0bcd57576ff4}" pad="{5c1c73ce-f071-49b6-bae3-334ee9e95873}"/>
+        <map signal="{d8be519a-67cf-41da-9993-42e6b74ac814}" pad="{d87947ec-d1ca-4472-a2c4-55ac889684a2}"/>
+        <map signal="{0ce2eb66-2408-4e21-affe-7081bc47f65c}" pad="{ac6e1ec3-7fb9-48e7-bf1b-66c63511d798}"/>
+        <map signal="{e46e3514-3064-41cf-9714-ee16a023aaf5}" pad="{f897567b-b648-4069-b711-461a51479cda}"/>
+        <map signal="{f8b35cf6-ee0f-4100-91d2-1f2d93b7d1df}" pad="{6e0213ad-5368-4f16-8b65-2f2dff16ca37}"/>
     </pad_signal_map>
 </component>

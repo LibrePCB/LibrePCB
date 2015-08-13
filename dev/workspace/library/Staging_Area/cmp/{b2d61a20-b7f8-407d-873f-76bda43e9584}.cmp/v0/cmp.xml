@@ -4,9 +4,9 @@
         <uuid>{b2d61a20-b7f8-407d-873f-76bda43e9584}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:42Z</created>
-        <last_modified>2015-06-21T12:37:42Z</last_modified>
-        <name locale="en_US">R-EU_</name>
+        <created>2015-08-13T20:22:31Z</created>
+        <last_modified>2015-08-13T20:22:31Z</last_modified>
+        <name locale="en_US">R-EU__VMTB60</name>
         <description locale="en_US">&lt;B>RESISTOR&lt;/B>, European symbol
 
 This element was automatically imported from Eagle
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{831c29a8-2f85-4f8c-b1dd-8ff754aa0e3a}" signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
-        <map pad="{78c0b012-b46e-403c-8efc-68be7da0243c}" signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
+        <map signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}" pad="{78c0b012-b46e-403c-8efc-68be7da0243c}"/>
+        <map signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}" pad="{831c29a8-2f85-4f8c-b1dd-8ff754aa0e3a}"/>
     </pad_signal_map>
 </component>

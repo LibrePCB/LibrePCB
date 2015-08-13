@@ -4,9 +4,9 @@
         <uuid>{939e83f3-dfa7-4022-a418-80bf1bfc1b3f}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:48Z</created>
-        <last_modified>2015-06-21T12:37:48Z</last_modified>
-        <name locale="en_US">LED</name>
+        <created>2015-08-13T20:22:38Z</created>
+        <last_modified>2015-08-13T20:22:38Z</last_modified>
+        <name locale="en_US">LED_MINI-TOP</name>
         <description locale="en_US">&lt;b>LED&lt;/b>&lt;p>
 &lt;u>OSRAM&lt;/u>:&lt;br>
 
@@ -93,7 +93,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{12575f32-f86f-4050-b65f-69ca40403ffc}" signal="{7b023430-b68f-403a-80b8-c7deb12e7a0c}"/>
-        <map pad="{25bc8079-984a-46a7-89eb-f1ce1324a41d}" signal="{f1467b5c-cc7d-44b4-8076-d729f35b3a6a}"/>
+        <map signal="{7b023430-b68f-403a-80b8-c7deb12e7a0c}" pad="{12575f32-f86f-4050-b65f-69ca40403ffc}"/>
+        <map signal="{f1467b5c-cc7d-44b4-8076-d729f35b3a6a}" pad="{25bc8079-984a-46a7-89eb-f1ce1324a41d}"/>
     </pad_signal_map>
 </component>

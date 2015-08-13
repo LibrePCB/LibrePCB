@@ -4,8 +4,8 @@
         <uuid>{57cd5dd3-56e3-470c-bd50-d29a2a9b95b4}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:46Z</created>
-        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <created>2015-08-13T20:22:36Z</created>
+        <last_modified>2015-08-13T20:22:36Z</last_modified>
         <name locale="en_US">BY251</name>
         <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
 Si, 200 V, 3 A
@@ -20,7 +20,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{b74315c9-feea-4f7d-94c2-04b9510a1193}" signal="{9c5b093e-fb24-420f-87b9-649da5094db1}"/>
-        <map pad="{7403240f-13dc-4614-a9e9-90395e2a0e19}" signal="{cb11fb78-118d-4fd2-8729-fc6b905296c9}"/>
+        <map signal="{cb11fb78-118d-4fd2-8729-fc6b905296c9}" pad="{7403240f-13dc-4614-a9e9-90395e2a0e19}"/>
+        <map signal="{9c5b093e-fb24-420f-87b9-649da5094db1}" pad="{b74315c9-feea-4f7d-94c2-04b9510a1193}"/>
     </pad_signal_map>
 </component>

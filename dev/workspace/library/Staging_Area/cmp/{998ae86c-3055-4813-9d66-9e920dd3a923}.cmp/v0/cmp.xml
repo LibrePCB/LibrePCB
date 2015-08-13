@@ -4,9 +4,9 @@
         <uuid>{998ae86c-3055-4813-9d66-9e920dd3a923}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:48Z</created>
-        <last_modified>2015-06-21T12:37:48Z</last_modified>
-        <name locale="en_US">LED</name>
+        <created>2015-08-13T20:22:38Z</created>
+        <last_modified>2015-08-13T20:22:38Z</last_modified>
+        <name locale="en_US">LED_SIDELED</name>
         <description locale="en_US">&lt;b>LED&lt;/b>&lt;p>
 &lt;u>OSRAM&lt;/u>:&lt;br>
 
@@ -93,7 +93,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{e52c4503-35a4-47a6-8776-cd140e0545e6}" signal="{f1467b5c-cc7d-44b4-8076-d729f35b3a6a}"/>
-        <map pad="{d798f84d-8678-43fc-be10-d00d2eadb21c}" signal="{7b023430-b68f-403a-80b8-c7deb12e7a0c}"/>
+        <map signal="{7b023430-b68f-403a-80b8-c7deb12e7a0c}" pad="{d798f84d-8678-43fc-be10-d00d2eadb21c}"/>
+        <map signal="{f1467b5c-cc7d-44b4-8076-d729f35b3a6a}" pad="{e52c4503-35a4-47a6-8776-cd140e0545e6}"/>
     </pad_signal_map>
 </component>

@@ -4,8 +4,8 @@
         <uuid>{652ede6c-17e3-4e68-8ee1-c74a60a9ac79}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:48Z</created>
-        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <created>2015-08-13T20:22:38Z</created>
+        <last_modified>2015-08-13T20:22:38Z</last_modified>
         <name locale="en_US">LZ1-00WW03</name>
         <description locale="en_US">&lt;b>High Luminous Efficacy 3W Warm White LED Emitter&lt;/b>&lt;p>
 Source: http://www.ledengin.com/products/3wLZ/LZ1-00WW03.pdf
@@ -20,10 +20,10 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{be51f5d0-fed4-453b-bfc2-abef65048bf4}" signal="{8cd951df-fea2-4de4-912a-a2367833a5e5}"/>
-        <map pad="{5f3e1d22-a07e-4b0c-8415-0f3f5e87c06f}" signal="{3a7b7c0e-4636-497a-b94d-bc98a90969f6}"/>
-        <map pad="{08d91260-f8fb-41ea-873e-79ea42907aeb}" signal="{3a7b7c0e-4636-497a-b94d-bc98a90969f6}"/>
-        <map pad="{b26d594b-ceb9-47ac-bcbc-470413c4ec49}" signal="{8cd951df-fea2-4de4-912a-a2367833a5e5}"/>
-        <map pad="{dae3505e-2fa4-448a-bd63-8a404b3ef2a4}" signal="{8cd951df-fea2-4de4-912a-a2367833a5e5}"/>
+        <map signal="{8cd951df-fea2-4de4-912a-a2367833a5e5}" pad="{b26d594b-ceb9-47ac-bcbc-470413c4ec49}"/>
+        <map signal="{8cd951df-fea2-4de4-912a-a2367833a5e5}" pad="{be51f5d0-fed4-453b-bfc2-abef65048bf4}"/>
+        <map signal="{3a7b7c0e-4636-497a-b94d-bc98a90969f6}" pad="{5f3e1d22-a07e-4b0c-8415-0f3f5e87c06f}"/>
+        <map signal="{8cd951df-fea2-4de4-912a-a2367833a5e5}" pad="{dae3505e-2fa4-448a-bd63-8a404b3ef2a4}"/>
+        <map signal="{3a7b7c0e-4636-497a-b94d-bc98a90969f6}" pad="{08d91260-f8fb-41ea-873e-79ea42907aeb}"/>
     </pad_signal_map>
 </component>

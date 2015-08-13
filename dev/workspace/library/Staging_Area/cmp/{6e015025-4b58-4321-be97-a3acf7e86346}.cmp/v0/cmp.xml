@@ -4,9 +4,9 @@
         <uuid>{6e015025-4b58-4321-be97-a3acf7e86346}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:43Z</created>
-        <last_modified>2015-06-21T12:37:43Z</last_modified>
-        <name locale="en_US">C-TRIMM</name>
+        <created>2015-08-13T20:22:32Z</created>
+        <last_modified>2015-08-13T20:22:32Z</last_modified>
+        <name locale="en_US">C-TRIMM_808</name>
         <description locale="en_US">&lt;b>Trimm capacitor&lt;/b>
 
 This element was automatically imported from Eagle
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{4c35b132-379b-41d8-b7b8-40738dff71f2}" signal="{0aaecffd-ef4a-417b-a142-8a1093ce83b3}"/>
-        <map pad="{7ed4b862-8b67-4ffd-90a4-80422e5f772f}" signal="{7950f37e-3fc4-4910-9f8f-27ee3b59dc89}"/>
+        <map signal="{0aaecffd-ef4a-417b-a142-8a1093ce83b3}" pad="{4c35b132-379b-41d8-b7b8-40738dff71f2}"/>
+        <map signal="{7950f37e-3fc4-4910-9f8f-27ee3b59dc89}" pad="{7ed4b862-8b67-4ffd-90a4-80422e5f772f}"/>
     </pad_signal_map>
 </component>

@@ -4,8 +4,8 @@
         <uuid>{aa97ceac-74df-4c6d-a513-cc3f6120c987}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:47Z</created>
-        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <created>2015-08-13T20:22:37Z</created>
+        <last_modified>2015-08-13T20:22:37Z</last_modified>
         <name locale="en_US">S7379-01</name>
         <description locale="en_US">&lt;b>Si PIN Quadrant photodiode&lt;/b>&lt;p>
 Source: http://sales.hamamatsu.com/assets/pdf/parts_S/S7379-01_etc.pdf
@@ -20,11 +20,11 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{c69e2b03-9021-4959-a2ba-3e618733908c}" signal="{3474d78b-3586-4acb-8f8d-e05ffb7bd10f}"/>
-        <map pad="{18240b74-f1b0-4ed1-8b8f-084971dcff43}" signal="{1a5ef655-f2fe-46b9-a74a-d0facda07ca6}"/>
-        <map pad="{cc1b627f-8b4f-47fc-a7e4-b6adc3e9d953}" signal="{264ef6b7-8fba-44d4-836e-8bb2d58314ee}"/>
-        <map pad="{8b682f1e-9c21-42d4-8213-09069009a420}" signal="{b32c392c-379b-43bc-9627-fd96d51fb1ec}"/>
-        <map pad="{fcda2bcb-de90-4b8d-8545-4703899f9d13}" signal="{ac2177f8-cad9-4515-a538-417a8b1d0525}"/>
-        <map pad="{029f1b76-284d-46c8-a33a-e1384955b68e}" signal="{d9f3bab0-1fde-40ea-a657-f7147db5d7a2}"/>
+        <map signal="{d9f3bab0-1fde-40ea-a657-f7147db5d7a2}" pad="{029f1b76-284d-46c8-a33a-e1384955b68e}"/>
+        <map signal="{3474d78b-3586-4acb-8f8d-e05ffb7bd10f}" pad="{c69e2b03-9021-4959-a2ba-3e618733908c}"/>
+        <map signal="{264ef6b7-8fba-44d4-836e-8bb2d58314ee}" pad="{cc1b627f-8b4f-47fc-a7e4-b6adc3e9d953}"/>
+        <map signal="{b32c392c-379b-43bc-9627-fd96d51fb1ec}" pad="{8b682f1e-9c21-42d4-8213-09069009a420}"/>
+        <map signal="{ac2177f8-cad9-4515-a538-417a8b1d0525}" pad="{fcda2bcb-de90-4b8d-8545-4703899f9d13}"/>
+        <map signal="{1a5ef655-f2fe-46b9-a74a-d0facda07ca6}" pad="{18240b74-f1b0-4ed1-8b8f-084971dcff43}"/>
     </pad_signal_map>
 </component>

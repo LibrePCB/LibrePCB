@@ -4,9 +4,9 @@
         <uuid>{0bb41135-2b27-49c1-af1f-496bb23bbc81}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:47Z</created>
-        <last_modified>2015-06-21T12:37:47Z</last_modified>
-        <name locale="en_US">ZENER-DIODE</name>
+        <created>2015-08-13T20:22:37Z</created>
+        <last_modified>2015-08-13T20:22:37Z</last_modified>
+        <name locale="en_US">ZENER-DIODE_F126-10</name>
         <description locale="en_US">Z-Diode
 
 This element was automatically imported from Eagle
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{62dac825-2124-4888-b3ce-9f5faef9294f}" signal="{a10e2dd7-c855-493d-bc27-dcc34a8be1d5}"/>
-        <map pad="{f8646d98-fce5-4504-8fb3-27ffaaab225c}" signal="{798ebf9f-6adb-4998-a9be-8919af3d3c65}"/>
+        <map signal="{798ebf9f-6adb-4998-a9be-8919af3d3c65}" pad="{f8646d98-fce5-4504-8fb3-27ffaaab225c}"/>
+        <map signal="{a10e2dd7-c855-493d-bc27-dcc34a8be1d5}" pad="{62dac825-2124-4888-b3ce-9f5faef9294f}"/>
     </pad_signal_map>
 </component>

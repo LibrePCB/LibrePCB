@@ -4,8 +4,8 @@
         <uuid>{f6529947-c69f-4a29-a353-71567a27fcb5}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:46Z</created>
-        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <created>2015-08-13T20:22:36Z</created>
+        <last_modified>2015-08-13T20:22:36Z</last_modified>
         <name locale="en_US">BZV10</name>
         <description locale="en_US">&lt;b>Z DIODE&lt;/b>
 
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{1060fbc9-287c-4df7-b7e0-61001a92df3b}" signal="{37af149e-df67-4483-b073-4a58ccb2fc53}"/>
-        <map pad="{3452e2b5-f047-40ec-bc65-6f956c2dbd21}" signal="{0f0f7012-1a19-4fe2-81d8-3dc8dc22ea36}"/>
+        <map signal="{37af149e-df67-4483-b073-4a58ccb2fc53}" pad="{1060fbc9-287c-4df7-b7e0-61001a92df3b}"/>
+        <map signal="{0f0f7012-1a19-4fe2-81d8-3dc8dc22ea36}" pad="{3452e2b5-f047-40ec-bc65-6f956c2dbd21}"/>
     </pad_signal_map>
 </component>

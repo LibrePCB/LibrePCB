@@ -4,8 +4,8 @@
         <uuid>{1f6c1ad3-2330-4799-a87e-654fba1a66b5}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:46Z</created>
-        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <created>2015-08-13T20:22:36Z</created>
+        <last_modified>2015-08-13T20:22:36Z</last_modified>
         <name locale="en_US">BZW50</name>
         <description locale="en_US">&lt;B>DIODE&lt;/B>
 
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{d9bedba8-d3e3-47ae-8c6a-c1f1e6c05e9b}" signal="{eb4d22cf-55b0-43e0-8073-b1ce8fb8e1e1}"/>
-        <map pad="{923ef9c1-c2f5-42b3-a780-f9555dafdff7}" signal="{501482ce-cbb8-4685-9da4-321ceb4b1863}"/>
+        <map signal="{501482ce-cbb8-4685-9da4-321ceb4b1863}" pad="{923ef9c1-c2f5-42b3-a780-f9555dafdff7}"/>
+        <map signal="{eb4d22cf-55b0-43e0-8073-b1ce8fb8e1e1}" pad="{d9bedba8-d3e3-47ae-8c6a-c1f1e6c05e9b}"/>
     </pad_signal_map>
 </component>

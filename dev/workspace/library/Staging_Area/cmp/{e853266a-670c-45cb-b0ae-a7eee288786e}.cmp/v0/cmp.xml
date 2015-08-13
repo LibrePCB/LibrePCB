@@ -4,8 +4,8 @@
         <uuid>{e853266a-670c-45cb-b0ae-a7eee288786e}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:48Z</created>
-        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <created>2015-08-13T20:22:38Z</created>
+        <last_modified>2015-08-13T20:22:38Z</last_modified>
         <name locale="en_US">X42180</name>
         <description locale="en_US">&lt;b>Z-Power LED&lt;/b> P4 Series, Dome type&lt;p>
 Source: http://www.seoulsemicon.co.kr .. X42180.pdf
@@ -20,7 +20,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{65dc15fe-b8e8-4750-99af-a77c6822323a}" signal="{b0e3f9c9-73e6-4d5b-846d-16c9f183da15}"/>
-        <map pad="{3c536d5f-977a-4580-ad9a-a6e6b8195932}" signal="{6269bc92-bea1-4520-ae86-409364662c7a}"/>
+        <map signal="{b0e3f9c9-73e6-4d5b-846d-16c9f183da15}" pad="{65dc15fe-b8e8-4750-99af-a77c6822323a}"/>
+        <map signal="{6269bc92-bea1-4520-ae86-409364662c7a}" pad="{3c536d5f-977a-4580-ad9a-a6e6b8195932}"/>
     </pad_signal_map>
 </component>

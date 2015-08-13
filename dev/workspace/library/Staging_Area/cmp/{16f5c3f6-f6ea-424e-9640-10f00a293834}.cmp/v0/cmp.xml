@@ -4,8 +4,8 @@
         <uuid>{16f5c3f6-f6ea-424e-9640-10f00a293834}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:45Z</created>
-        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <created>2015-08-13T20:22:35Z</created>
+        <last_modified>2015-08-13T20:22:35Z</last_modified>
         <name locale="en_US">21M15D</name>
         <description locale="en_US">&lt;b>Monolithic Crystal Filters&lt;/b>&lt;p>
 Source: www.vanlong.com
@@ -20,11 +20,11 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{203fcbd2-9773-44ed-896f-5f92195dbce6}" signal="{cc7a0ee3-c317-4443-99bd-45b4148113bd}"/>
-        <map pad="{9aba4e7e-5b5a-4122-9a16-fea058011db6}" signal="{ef8d4e0f-aa7d-4c02-8630-f191080812af}"/>
-        <map pad="{f18f836a-3e9d-4a74-864f-adcd79538287}" signal="{8aef1306-1dc9-45ce-b9b4-e200e2724d93}"/>
-        <map pad="{d8cde120-58a2-49c4-aaf0-4c4932400561}" signal="{2d10ac6d-69f2-4b78-85f4-14e85838a071}"/>
-        <map pad="{f8c5c5d6-6dee-4d81-a63d-adb68c61d106}" signal="{f7aa8b33-9c8a-47c2-97cf-87ab3da28687}"/>
-        <map pad="{ab22ab53-4e0b-4186-9e8c-6a29f4b71cca}" signal="{f7aa8b33-9c8a-47c2-97cf-87ab3da28687}"/>
+        <map signal="{8aef1306-1dc9-45ce-b9b4-e200e2724d93}" pad="{f18f836a-3e9d-4a74-864f-adcd79538287}"/>
+        <map signal="{f7aa8b33-9c8a-47c2-97cf-87ab3da28687}" pad="{ab22ab53-4e0b-4186-9e8c-6a29f4b71cca}"/>
+        <map signal="{ef8d4e0f-aa7d-4c02-8630-f191080812af}" pad="{9aba4e7e-5b5a-4122-9a16-fea058011db6}"/>
+        <map signal="{cc7a0ee3-c317-4443-99bd-45b4148113bd}" pad="{203fcbd2-9773-44ed-896f-5f92195dbce6}"/>
+        <map signal="{2d10ac6d-69f2-4b78-85f4-14e85838a071}" pad="{d8cde120-58a2-49c4-aaf0-4c4932400561}"/>
+        <map signal="{f7aa8b33-9c8a-47c2-97cf-87ab3da28687}" pad="{f8c5c5d6-6dee-4d81-a63d-adb68c61d106}"/>
     </pad_signal_map>
 </component>

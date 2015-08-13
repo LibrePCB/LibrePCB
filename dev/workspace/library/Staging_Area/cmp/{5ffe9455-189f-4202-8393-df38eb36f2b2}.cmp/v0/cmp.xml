@@ -4,8 +4,8 @@
         <uuid>{5ffe9455-189f-4202-8393-df38eb36f2b2}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:46Z</created>
-        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <created>2015-08-13T20:22:36Z</created>
+        <last_modified>2015-08-13T20:22:36Z</last_modified>
         <name locale="en_US">BY712</name>
         <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
 fast high-voltage soft-recovery rectifier
@@ -20,7 +20,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{717b641c-6333-4aca-9206-b9efd9245ee9}" signal="{679f7da7-c921-464d-9a85-a811827a0d17}"/>
-        <map pad="{f6eff1cd-576f-40cc-a77f-abbb59d4c127}" signal="{95428a2e-ac67-40df-9170-db30a1336848}"/>
+        <map signal="{679f7da7-c921-464d-9a85-a811827a0d17}" pad="{717b641c-6333-4aca-9206-b9efd9245ee9}"/>
+        <map signal="{95428a2e-ac67-40df-9170-db30a1336848}" pad="{f6eff1cd-576f-40cc-a77f-abbb59d4c127}"/>
     </pad_signal_map>
 </component>

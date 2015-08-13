@@ -4,9 +4,9 @@
         <uuid>{26e611f1-6930-4267-b487-35109c1ee6fe}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:45Z</created>
-        <last_modified>2015-06-21T12:37:45Z</last_modified>
-        <name locale="en_US">MF_</name>
+        <created>2015-08-13T20:22:35Z</created>
+        <last_modified>2015-08-13T20:22:35Z</last_modified>
+        <name locale="en_US">MF__10.7-12C</name>
         <description locale="en_US">&lt;b>CRYSTAL FILTERS&lt;/b>&lt;p>
 Source: http://www.presto.co.uk
 
@@ -20,11 +20,11 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{7d25fc20-d466-454f-a6fe-d18a6ea0980e}" signal="{2130af63-5935-4b20-b704-31aac32eddda}"/>
-        <map pad="{7b43474c-d9bf-4e5a-be87-214ce8b0d067}" signal="{8d002610-6d7e-4276-b918-87879208ac57}"/>
-        <map pad="{79a9d000-b109-4c34-b427-143462abac98}" signal="{9da894ea-39cb-46dd-9cbc-f8a995b0a593}"/>
-        <map pad="{bfa5cfc1-4514-453a-a71a-5efbcb864aaf}" signal="{e5870025-c1a8-4d9b-94a5-cfa0041af592}"/>
-        <map pad="{3db0ffbb-3416-4d27-b597-1797715a4040}" signal="{19892a62-9f2e-4601-a85f-ad33cf7309b6}"/>
-        <map pad="{e01e8468-1f4d-4524-a2bc-eeee1d0cadd3}" signal="{8d002610-6d7e-4276-b918-87879208ac57}"/>
+        <map signal="{8d002610-6d7e-4276-b918-87879208ac57}" pad="{e01e8468-1f4d-4524-a2bc-eeee1d0cadd3}"/>
+        <map signal="{2130af63-5935-4b20-b704-31aac32eddda}" pad="{7d25fc20-d466-454f-a6fe-d18a6ea0980e}"/>
+        <map signal="{19892a62-9f2e-4601-a85f-ad33cf7309b6}" pad="{3db0ffbb-3416-4d27-b597-1797715a4040}"/>
+        <map signal="{e5870025-c1a8-4d9b-94a5-cfa0041af592}" pad="{bfa5cfc1-4514-453a-a71a-5efbcb864aaf}"/>
+        <map signal="{8d002610-6d7e-4276-b918-87879208ac57}" pad="{7b43474c-d9bf-4e5a-be87-214ce8b0d067}"/>
+        <map signal="{9da894ea-39cb-46dd-9cbc-f8a995b0a593}" pad="{79a9d000-b109-4c34-b427-143462abac98}"/>
     </pad_signal_map>
 </component>

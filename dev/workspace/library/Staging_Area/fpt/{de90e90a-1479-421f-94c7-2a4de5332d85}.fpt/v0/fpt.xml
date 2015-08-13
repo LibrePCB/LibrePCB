@@ -4,8 +4,8 @@
         <uuid>{de90e90a-1479-421f-94c7-2a4de5332d85}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-08-05T21:45:41Z</created>
-        <last_modified>2015-08-05T21:45:41Z</last_modified>
+        <created>2015-08-13T20:22:15Z</created>
+        <last_modified>2015-08-13T20:22:15Z</last_modified>
         <name locale="en_US">SOD323W_INFINEON</name>
         <description locale="en_US">&lt;b>Diode Package&lt;/b> Wave soldering&lt;p>
 INFINEON, www.infineon.com/cmc_upload/0/000/010/257/eh_db_5b.pdf
@@ -18,63 +18,63 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <geometry>
-        <polygon layer="110" start_x="0.000000" fill="false" start_y="-0.700000" width="0.127000" grab_area="true">
+        <polygon layer="200" grab_area="true" fill="false" start_x="0.000000" start_y="-0.700000" width="0.127000">
             <segment end_x="0.000000" end_y="0.600000" angle="0.000000"/>
         </polygon>
-        <polygon layer="110" start_x="0.000000" fill="false" start_y="0.600000" width="0.127000" grab_area="true">
+        <polygon layer="200" grab_area="true" fill="false" start_x="0.000000" start_y="0.600000" width="0.127000">
             <segment end_x="-0.200000" end_y="0.200000" angle="0.000000"/>
         </polygon>
-        <polygon layer="110" start_x="-0.200000" fill="false" start_y="0.200000" width="0.127000" grab_area="true">
+        <polygon layer="200" grab_area="true" fill="false" start_x="-0.200000" start_y="0.200000" width="0.127000">
             <segment end_x="0.200000" end_y="0.200000" angle="0.000000"/>
         </polygon>
-        <polygon layer="110" start_x="0.200000" fill="false" start_y="0.200000" width="0.127000" grab_area="true">
+        <polygon layer="200" grab_area="true" fill="false" start_x="0.200000" start_y="0.200000" width="0.127000">
             <segment end_x="0.000000" end_y="0.600000" angle="0.000000"/>
         </polygon>
-        <polygon layer="110" start_x="0.000000" fill="false" start_y="-0.700000" width="0.127000" grab_area="true">
+        <polygon layer="200" grab_area="true" fill="false" start_x="0.000000" start_y="-0.700000" width="0.127000">
             <segment end_x="0.200000" end_y="-0.300000" angle="0.000000"/>
         </polygon>
-        <polygon layer="110" start_x="0.200000" fill="false" start_y="-0.300000" width="0.127000" grab_area="true">
+        <polygon layer="200" grab_area="true" fill="false" start_x="0.200000" start_y="-0.300000" width="0.127000">
             <segment end_x="-0.200000" end_y="-0.300000" angle="0.000000"/>
         </polygon>
-        <polygon layer="110" start_x="-0.200000" fill="false" start_y="-0.300000" width="0.127000" grab_area="true">
+        <polygon layer="200" grab_area="true" fill="false" start_x="-0.200000" start_y="-0.300000" width="0.127000">
             <segment end_x="0.000000" end_y="-0.700000" angle="0.000000"/>
         </polygon>
-        <polygon layer="110" start_x="-0.800000" fill="true" start_y="-0.550000" width="0.000000" grab_area="true">
+        <polygon layer="200" grab_area="true" fill="true" start_x="-0.800000" start_y="-0.550000" width="0.000000">
             <segment end_x="0.000000" end_y="-0.550000" angle="0.000000"/>
             <segment end_x="0.000000" end_y="0.550000" angle="0.000000"/>
             <segment end_x="-0.800000" end_y="0.550000" angle="0.000000"/>
             <segment end_x="-0.800000" end_y="-0.550000" angle="0.000000"/>
         </polygon>
-        <polygon layer="110" start_x="-1.250000" fill="true" start_y="-0.150000" width="0.000000" grab_area="true">
+        <polygon layer="200" grab_area="true" fill="true" start_x="-1.250000" start_y="-0.150000" width="0.000000">
             <segment end_x="-0.800000" end_y="-0.150000" angle="0.000000"/>
             <segment end_x="-0.800000" end_y="0.150000" angle="0.000000"/>
             <segment end_x="-1.250000" end_y="0.150000" angle="0.000000"/>
             <segment end_x="-1.250000" end_y="-0.150000" angle="0.000000"/>
         </polygon>
-        <polygon layer="110" start_x="0.800000" fill="true" start_y="-0.150000" width="0.000000" grab_area="true">
+        <polygon layer="200" grab_area="true" fill="true" start_x="0.800000" start_y="-0.150000" width="0.000000">
             <segment end_x="1.250000" end_y="-0.150000" angle="0.000000"/>
             <segment end_x="1.250000" end_y="0.150000" angle="0.000000"/>
             <segment end_x="0.800000" end_y="0.150000" angle="0.000000"/>
             <segment end_x="0.800000" end_y="-0.150000" angle="0.000000"/>
         </polygon>
-        <polygon layer="170" start_x="0.800000" fill="false" start_y="-0.550000" width="0.101600" grab_area="true">
+        <polygon layer="260" grab_area="true" fill="false" start_x="0.800000" start_y="-0.550000" width="0.101600">
             <segment end_x="0.800000" end_y="0.550000" angle="0.000000"/>
             <segment end_x="-0.800000" end_y="0.550000" angle="0.000000"/>
             <segment end_x="-0.800000" end_y="-0.550000" angle="0.000000"/>
             <segment end_x="0.800000" end_y="-0.550000" angle="0.000000"/>
         </polygon>
-        <text v_align="bottom" height="0.508000" layer="110" x="0.400000" rotation="0.000000" y="0.400000" text="direction of pcb" h_align="left"/>
-        <text v_align="bottom" height="0.508000" layer="110" x="0.400000" rotation="0.000000" y="-0.050000" text="transportation for" h_align="left"/>
-        <text v_align="bottom" height="0.508000" layer="110" x="0.400000" rotation="0.000000" y="-0.500000" text="wavesoldering" h_align="left"/>
-        <text v_align="bottom" height="2.500000" layer="150" x="-1.650000" rotation="0.000000" y="0.750000" text="${CMP::NAME}" h_align="left"/>
-        <text v_align="bottom" height="2.000000" layer="160" x="-1.650000" rotation="0.000000" y="-2.000000" text="${CMP::VALUE}" h_align="left"/>
+        <text layer="200" rotation="0.000000" text="direction of pcb" x="0.400000" y="0.400000" h_align="left" v_align="bottom" height="0.508000"/>
+        <text layer="200" rotation="0.000000" text="transportation for" x="0.400000" y="-0.050000" h_align="left" v_align="bottom" height="0.508000"/>
+        <text layer="200" rotation="0.000000" text="wavesoldering" x="0.400000" y="-0.500000" h_align="left" v_align="bottom" height="0.508000"/>
+        <text layer="240" rotation="0.000000" text="${CMP::NAME}" x="-1.650000" y="0.750000" h_align="left" v_align="bottom" height="2.500000"/>
+        <text layer="250" rotation="0.000000" text="${CMP::VALUE}" x="-1.650000" y="-2.000000" h_align="left" v_align="bottom" height="2.000000"/>
     </geometry>
     <pads>
-        <pad uuid="{b89218a2-5c18-4946-b97e-2441439a31de}" height="0.600000" drill="0.000000" x="1.350000" rotation="0.000000" layer="200" y="0.000000" type="smd_rect" width="1.000000">
+        <pad layer="300" rotation="0.000000" type="smd_rect" x="1.350000" y="0.000000" width="1.000000" uuid="{b89218a2-5c18-4946-b97e-2441439a31de}" height="0.600000" drill="0.000000">
             <name locale="en_US">A</name>
             <description locale="en_US"/>
         </pad>
-        <pad uuid="{b413f9f2-c355-4fde-8ed9-ca12e759f55d}" height="0.600000" drill="0.000000" x="-1.350000" rotation="0.000000" layer="200" y="0.000000" type="smd_rect" width="1.000000">
+        <pad layer="300" rotation="0.000000" type="smd_rect" x="-1.350000" y="0.000000" width="1.000000" uuid="{b413f9f2-c355-4fde-8ed9-ca12e759f55d}" height="0.600000" drill="0.000000">
             <name locale="en_US">C</name>
             <description locale="en_US"/>
         </pad>

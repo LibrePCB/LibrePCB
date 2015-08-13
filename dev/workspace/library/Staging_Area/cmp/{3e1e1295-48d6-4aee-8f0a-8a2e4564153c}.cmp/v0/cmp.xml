@@ -4,9 +4,9 @@
         <uuid>{3e1e1295-48d6-4aee-8f0a-8a2e4564153c}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:45Z</created>
-        <last_modified>2015-06-21T12:37:45Z</last_modified>
-        <name locale="en_US">IXF</name>
+        <created>2015-08-13T20:22:35Z</created>
+        <last_modified>2015-08-13T20:22:35Z</last_modified>
+        <name locale="en_US">IXF_C</name>
         <description locale="en_US">&lt;b>Crystal Filter&lt;/b>&lt;p>
 Source: www.ilsiamerica.com .. C1 IXF Series.pdf
 
@@ -20,8 +20,8 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{e9c67af2-535d-406b-baf2-714164bc6c06}" signal="{4678ec8a-a860-4750-bdca-7402d6b17f77}"/>
-        <map pad="{2e0427f0-5851-49d9-b65f-ac738f2bb7c2}" signal="{3c43165a-5287-44b3-9707-14153aa163cc}"/>
-        <map pad="{a74eba58-ac44-4eaf-9607-463960d3f34c}" signal="{551c1548-d857-4d99-aa9d-d9eaad6b3312}"/>
+        <map signal="{551c1548-d857-4d99-aa9d-d9eaad6b3312}" pad="{a74eba58-ac44-4eaf-9607-463960d3f34c}"/>
+        <map signal="{4678ec8a-a860-4750-bdca-7402d6b17f77}" pad="{e9c67af2-535d-406b-baf2-714164bc6c06}"/>
+        <map signal="{3c43165a-5287-44b3-9707-14153aa163cc}" pad="{2e0427f0-5851-49d9-b65f-ac738f2bb7c2}"/>
     </pad_signal_map>
 </component>

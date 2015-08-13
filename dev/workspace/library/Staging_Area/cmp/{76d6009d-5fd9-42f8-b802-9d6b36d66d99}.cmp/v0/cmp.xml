@@ -4,9 +4,9 @@
         <uuid>{76d6009d-5fd9-42f8-b802-9d6b36d66d99}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:48Z</created>
-        <last_modified>2015-06-21T12:37:48Z</last_modified>
-        <name locale="en_US">LED</name>
+        <created>2015-08-13T20:22:38Z</created>
+        <last_modified>2015-08-13T20:22:38Z</last_modified>
+        <name locale="en_US">LED_CHIP-LED0603</name>
         <description locale="en_US">&lt;b>LED&lt;/b>&lt;p>
 &lt;u>OSRAM&lt;/u>:&lt;br>
 
@@ -93,7 +93,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{9696f882-4e16-4c3c-af74-412076f18504}" signal="{7b023430-b68f-403a-80b8-c7deb12e7a0c}"/>
-        <map pad="{3ed64326-005d-4773-9adc-76f2a43144de}" signal="{f1467b5c-cc7d-44b4-8076-d729f35b3a6a}"/>
+        <map signal="{f1467b5c-cc7d-44b4-8076-d729f35b3a6a}" pad="{3ed64326-005d-4773-9adc-76f2a43144de}"/>
+        <map signal="{7b023430-b68f-403a-80b8-c7deb12e7a0c}" pad="{9696f882-4e16-4c3c-af74-412076f18504}"/>
     </pad_signal_map>
 </component>

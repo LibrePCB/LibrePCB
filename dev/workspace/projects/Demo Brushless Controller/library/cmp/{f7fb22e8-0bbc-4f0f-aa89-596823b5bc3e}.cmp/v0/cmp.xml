@@ -19,10 +19,10 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{6f055e75-0d6f-454b-9122-bea141fd0501}" signal="{d7eb84bb-7f47-4e0b-99d1-1ee30019c40e}"/>
-        <map pad="{66ac93f7-4af4-40a8-9e53-4dbbf128bbc9}" signal="{3982c030-dbdf-4cb9-8d75-0e471e12fabb}"/>
-        <map pad="{08057c6a-86af-474d-955d-7a966c7f73de}" signal="{4c7edd50-32d2-4098-a286-3536b882967b}"/>
         <map pad="{58eea0cf-9ed7-441d-8e14-6a7ef016edc9}" signal="{d7eb84bb-7f47-4e0b-99d1-1ee30019c40e}"/>
+        <map pad="{66ac93f7-4af4-40a8-9e53-4dbbf128bbc9}" signal="{3982c030-dbdf-4cb9-8d75-0e471e12fabb}"/>
         <map pad="{f3e6c95b-1c48-46a6-82bf-f640de0114e3}" signal="{d7eb84bb-7f47-4e0b-99d1-1ee30019c40e}"/>
+        <map pad="{08057c6a-86af-474d-955d-7a966c7f73de}" signal="{4c7edd50-32d2-4098-a286-3536b882967b}"/>
+        <map pad="{6f055e75-0d6f-454b-9122-bea141fd0501}" signal="{d7eb84bb-7f47-4e0b-99d1-1ee30019c40e}"/>
     </pad_signal_map>
 </component>

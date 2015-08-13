@@ -4,8 +4,8 @@
         <uuid>{12cb7516-22f9-4f65-bada-2d96b505a53a}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:46Z</created>
-        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <created>2015-08-13T20:22:36Z</created>
+        <last_modified>2015-08-13T20:22:36Z</last_modified>
         <name locale="en_US">BYT85</name>
         <description locale="en_US">&lt;B>DIODE&lt;/B>
 
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{eea439e1-06e6-430a-98c8-436621998422}" signal="{e3437c97-b504-4d91-bf3e-3350901dd984}"/>
-        <map pad="{ddfa5480-45fa-49bc-a8f6-4ad86f6cd8ea}" signal="{1091e962-caca-4d09-9910-5b0cdbdbbead}"/>
+        <map signal="{1091e962-caca-4d09-9910-5b0cdbdbbead}" pad="{ddfa5480-45fa-49bc-a8f6-4ad86f6cd8ea}"/>
+        <map signal="{e3437c97-b504-4d91-bf3e-3350901dd984}" pad="{eea439e1-06e6-430a-98c8-436621998422}"/>
     </pad_signal_map>
 </component>

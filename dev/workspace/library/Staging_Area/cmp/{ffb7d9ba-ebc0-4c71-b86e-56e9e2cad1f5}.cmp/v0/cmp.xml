@@ -4,9 +4,9 @@
         <uuid>{ffb7d9ba-ebc0-4c71-b86e-56e9e2cad1f5}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:47Z</created>
-        <last_modified>2015-06-21T12:37:47Z</last_modified>
-        <name locale="en_US">DIODE-</name>
+        <created>2015-08-13T20:22:37Z</created>
+        <last_modified>2015-08-13T20:22:37Z</last_modified>
+        <name locale="en_US">DIODE-_SCD80-INFINEON</name>
         <description locale="en_US">&lt;b>DIODE&lt;/b>
 
 This element was automatically imported from Eagle
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{42a92f08-0eed-4563-a6bc-7986498fc138}" signal="{e9c960fd-ff27-4ec4-a801-43ce63e5fe33}"/>
-        <map pad="{4e388bf9-9fb9-476c-9095-bc618b827608}" signal="{2b1bc88a-66af-4d12-a243-011dcad5944e}"/>
+        <map signal="{2b1bc88a-66af-4d12-a243-011dcad5944e}" pad="{4e388bf9-9fb9-476c-9095-bc618b827608}"/>
+        <map signal="{e9c960fd-ff27-4ec4-a801-43ce63e5fe33}" pad="{42a92f08-0eed-4563-a6bc-7986498fc138}"/>
     </pad_signal_map>
 </component>

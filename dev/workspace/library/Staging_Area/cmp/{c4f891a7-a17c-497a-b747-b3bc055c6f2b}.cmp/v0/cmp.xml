@@ -4,8 +4,8 @@
         <uuid>{c4f891a7-a17c-497a-b747-b3bc055c6f2b}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:46Z</created>
-        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <created>2015-08-13T20:22:36Z</created>
+        <last_modified>2015-08-13T20:22:36Z</last_modified>
         <name locale="en_US">BY707</name>
         <description locale="en_US">&lt;B>DIODE&lt;/B>
 
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{1606777b-152e-4418-afb8-d47602f39196}" signal="{364b1184-6cff-45cf-82b0-b3b992bce9eb}"/>
-        <map pad="{3f25efd0-f09c-4646-b190-245ec9f68521}" signal="{9ba11b5a-3000-4650-ae39-c96813179731}"/>
+        <map signal="{9ba11b5a-3000-4650-ae39-c96813179731}" pad="{3f25efd0-f09c-4646-b190-245ec9f68521}"/>
+        <map signal="{364b1184-6cff-45cf-82b0-b3b992bce9eb}" pad="{1606777b-152e-4418-afb8-d47602f39196}"/>
     </pad_signal_map>
 </component>

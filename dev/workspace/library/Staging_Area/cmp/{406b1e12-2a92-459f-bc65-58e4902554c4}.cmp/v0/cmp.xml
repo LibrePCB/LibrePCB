@@ -4,9 +4,9 @@
         <uuid>{406b1e12-2a92-459f-bc65-58e4902554c4}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:42Z</created>
-        <last_modified>2015-06-21T12:37:42Z</last_modified>
-        <name locale="en_US">L-US</name>
+        <created>2015-08-13T20:22:32Z</created>
+        <last_modified>2015-08-13T20:22:32Z</last_modified>
+        <name locale="en_US">L-US_L4532C</name>
         <description locale="en_US">&lt;B>INDUCTOR&lt;/B>, American symbol
 
 This element was automatically imported from Eagle
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{d118f81c-ee81-4abf-93bf-7334e8bcb6a0}" signal="{5b36d330-6f19-4391-8f95-1c2f6a658286}"/>
-        <map pad="{adf0f8a8-7eb8-4766-a491-248d2cf0a336}" signal="{777f11cd-9d4e-4b2b-aafa-7e7a836ff56e}"/>
+        <map signal="{5b36d330-6f19-4391-8f95-1c2f6a658286}" pad="{d118f81c-ee81-4abf-93bf-7334e8bcb6a0}"/>
+        <map signal="{777f11cd-9d4e-4b2b-aafa-7e7a836ff56e}" pad="{adf0f8a8-7eb8-4766-a491-248d2cf0a336}"/>
     </pad_signal_map>
 </component>

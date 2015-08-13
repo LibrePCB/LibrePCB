@@ -17,11 +17,11 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <geometry>
-        <text text="${CMP::VALUE}" x="0.000000" y="0.000000" h_align="left" rotation="0.000000" layer="160" v_align="bottom" height="2.000000"/>
-        <text text="${CMP::NAME}" x="-1.500000" y="-2.500000" h_align="left" rotation="90.000000" layer="150" v_align="bottom" height="2.500000"/>
+        <text v_align="bottom" height="2.000000" x="0.000000" y="0.000000" rotation="0.000000" h_align="left" layer="250" text="${CMP::VALUE}"/>
+        <text v_align="bottom" height="2.500000" x="-1.500000" y="-2.500000" rotation="90.000000" h_align="left" layer="240" text="${CMP::NAME}"/>
     </geometry>
     <pads>
-        <pad width="2.540000" x="0.000000" type="smd_rect" y="0.000000" drill="0.000000" rotation="0.000000" layer="200" height="5.080000" uuid="{58788f1b-2136-49a6-b2b0-a9fc72617f49}">
+        <pad type="smd_rect" height="5.080000" width="2.540000" uuid="{58788f1b-2136-49a6-b2b0-a9fc72617f49}" x="0.000000" y="0.000000" rotation="0.000000" drill="0.000000" layer="300">
             <name locale="en_US">1</name>
             <description locale="en_US"></description>
         </pad>

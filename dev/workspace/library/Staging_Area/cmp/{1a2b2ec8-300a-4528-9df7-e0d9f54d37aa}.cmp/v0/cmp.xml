@@ -4,8 +4,8 @@
         <uuid>{1a2b2ec8-300a-4528-9df7-e0d9f54d37aa}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:47Z</created>
-        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <created>2015-08-13T20:22:37Z</created>
+        <last_modified>2015-08-13T20:22:37Z</last_modified>
         <name locale="en_US">1N581*</name>
         <description locale="en_US">&lt;b>1.0A SCHOTTKY BARRIER RECTIFIER&lt;/b>&lt;p>
 Source: http://www.diodes.com/datasheets/ds23001.pdf
@@ -20,7 +20,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{b2aba97f-2a78-4ce1-a070-fb7d0c480124}" signal="{a0727ed7-2ced-4b79-a393-89b1ef6dbdb9}"/>
-        <map pad="{548dfc84-fc59-40df-94dd-cf8abe1a8f0c}" signal="{a17029be-cc10-4b73-a5fa-2ccae2f20b41}"/>
+        <map signal="{a17029be-cc10-4b73-a5fa-2ccae2f20b41}" pad="{548dfc84-fc59-40df-94dd-cf8abe1a8f0c}"/>
+        <map signal="{a0727ed7-2ced-4b79-a393-89b1ef6dbdb9}" pad="{b2aba97f-2a78-4ce1-a070-fb7d0c480124}"/>
     </pad_signal_map>
 </component>

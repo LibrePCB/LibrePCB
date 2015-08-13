@@ -4,9 +4,9 @@
         <uuid>{87f326a4-784a-40b9-965d-662f65632179}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:42Z</created>
-        <last_modified>2015-06-21T12:37:42Z</last_modified>
-        <name locale="en_US">R-US_</name>
+        <created>2015-08-13T20:22:32Z</created>
+        <last_modified>2015-08-13T20:22:32Z</last_modified>
+        <name locale="en_US">R-US__R2512W</name>
         <description locale="en_US">&lt;B>RESISTOR&lt;/B>, American symbol
 
 This element was automatically imported from Eagle
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{a7441e2f-7f25-4a0e-b897-f6852ecbeb5e}" signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
-        <map pad="{df7ebf9a-828b-4107-aa55-a2684a3b08ad}" signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
+        <map signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}" pad="{a7441e2f-7f25-4a0e-b897-f6852ecbeb5e}"/>
+        <map signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}" pad="{df7ebf9a-828b-4107-aa55-a2684a3b08ad}"/>
     </pad_signal_map>
 </component>

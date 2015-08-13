@@ -4,8 +4,8 @@
         <uuid>{4dbcb001-cdba-4397-b577-6af007603e53}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-08-05T21:45:43Z</created>
-        <last_modified>2015-08-05T21:45:43Z</last_modified>
+        <created>2015-08-13T20:22:17Z</created>
+        <last_modified>2015-08-13T20:22:17Z</last_modified>
         <name locale="en_US">4,16O1,6</name>
         <description locale="en_US">&lt;b>THROUGH-HOLE PAD&lt;/b>
 
@@ -17,11 +17,11 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <geometry>
-        <text v_align="bottom" height="2.000000" layer="160" x="0.000000" rotation="0.000000" y="0.000000" text="${CMP::VALUE}" h_align="left"/>
-        <text v_align="bottom" height="2.500000" layer="150" x="-2.100000" rotation="0.000000" y="2.200000" text="${CMP::NAME}" h_align="left"/>
+        <text layer="250" rotation="0.000000" text="${CMP::VALUE}" x="0.000000" y="0.000000" h_align="left" v_align="bottom" height="2.000000"/>
+        <text layer="240" rotation="0.000000" text="${CMP::NAME}" x="-2.100000" y="2.200000" h_align="left" v_align="bottom" height="2.500000"/>
     </geometry>
     <pads>
-        <pad uuid="{913e2998-c791-4424-97c0-36dbcff883de}" height="4.165600" drill="1.600200" x="0.000000" rotation="0.000000" layer="0" y="0.000000" type="tht_octagon" width="4.165600">
+        <pad layer="0" rotation="0.000000" type="tht_octagon" x="0.000000" y="0.000000" width="4.165600" uuid="{913e2998-c791-4424-97c0-36dbcff883de}" height="4.165600" drill="1.600200">
             <name locale="en_US">1</name>
             <description locale="en_US"/>
         </pad>

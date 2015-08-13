@@ -4,8 +4,8 @@
         <uuid>{b7c886d8-02e4-417c-985f-c6d231a29e41}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:46Z</created>
-        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <created>2015-08-13T20:22:37Z</created>
+        <last_modified>2015-08-13T20:22:37Z</last_modified>
         <name locale="en_US">AA112</name>
         <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
 germanium
@@ -20,7 +20,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{e7f487f8-66ce-44c0-b08f-c9b013eaa4db}" signal="{657c37bd-7616-4e6e-84b4-c38919bc2a57}"/>
-        <map pad="{afd2ecc2-c34e-4a0a-88ef-0ccb3f784d82}" signal="{925b1941-3970-4fdc-981c-1b910c29e954}"/>
+        <map signal="{657c37bd-7616-4e6e-84b4-c38919bc2a57}" pad="{e7f487f8-66ce-44c0-b08f-c9b013eaa4db}"/>
+        <map signal="{925b1941-3970-4fdc-981c-1b910c29e954}" pad="{afd2ecc2-c34e-4a0a-88ef-0ccb3f784d82}"/>
     </pad_signal_map>
 </component>

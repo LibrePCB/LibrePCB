@@ -4,9 +4,9 @@
         <uuid>{bfa425a0-5ee8-4985-98b4-9592edb34320}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:47Z</created>
-        <last_modified>2015-06-21T12:37:47Z</last_modified>
-        <name locale="en_US">DIAC-</name>
+        <created>2015-08-13T20:22:37Z</created>
+        <last_modified>2015-08-13T20:22:37Z</last_modified>
+        <name locale="en_US">DIAC-_DO35-10</name>
         <description locale="en_US">&lt;b>DIAC&lt;/b>
 
 This element was automatically imported from Eagle
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{03958109-002d-4acc-8e80-e9768ddc69d7}" signal="{b5933321-d574-4dba-be74-02ba467cd8f3}"/>
-        <map pad="{caec7773-5bfc-4b5b-b3eb-4ba251c115ea}" signal="{97d4bb0b-844f-4d15-bea4-730e4815418a}"/>
+        <map signal="{b5933321-d574-4dba-be74-02ba467cd8f3}" pad="{03958109-002d-4acc-8e80-e9768ddc69d7}"/>
+        <map signal="{97d4bb0b-844f-4d15-bea4-730e4815418a}" pad="{caec7773-5bfc-4b5b-b3eb-4ba251c115ea}"/>
     </pad_signal_map>
 </component>

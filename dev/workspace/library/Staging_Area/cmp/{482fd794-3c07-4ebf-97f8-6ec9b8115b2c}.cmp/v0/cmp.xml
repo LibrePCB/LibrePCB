@@ -4,9 +4,9 @@
         <uuid>{482fd794-3c07-4ebf-97f8-6ec9b8115b2c}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:47Z</created>
-        <last_modified>2015-06-21T12:37:47Z</last_modified>
-        <name locale="en_US">DIODE-2CAPACITANCE</name>
+        <created>2015-08-13T20:22:37Z</created>
+        <last_modified>2015-08-13T20:22:37Z</last_modified>
+        <name locale="en_US">DIODE-2CAPACITANCE_SOT23</name>
         <description locale="en_US">Capacity &lt;b>DIODE&lt;/b>&lt;p>
 variable-capacitance diode (Infineon)
 
@@ -20,8 +20,8 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{e084a5a2-054f-4b96-9d35-e5a4a69110c9}" signal="{ef09cbb5-cbf9-4091-be97-2da414fa765f}"/>
-        <map pad="{5df1620d-1a12-409c-a6dc-4ac9c3ea2160}" signal="{39f6c885-8aad-4f5f-8f33-d6a766bd5c09}"/>
-        <map pad="{0b7e3bae-fd35-4351-876f-73d31fc11e9a}" signal="{164ba2b1-6295-40c4-b1df-352881f1b36e}"/>
+        <map signal="{164ba2b1-6295-40c4-b1df-352881f1b36e}" pad="{0b7e3bae-fd35-4351-876f-73d31fc11e9a}"/>
+        <map signal="{ef09cbb5-cbf9-4091-be97-2da414fa765f}" pad="{e084a5a2-054f-4b96-9d35-e5a4a69110c9}"/>
+        <map signal="{39f6c885-8aad-4f5f-8f33-d6a766bd5c09}" pad="{5df1620d-1a12-409c-a6dc-4ac9c3ea2160}"/>
     </pad_signal_map>
 </component>

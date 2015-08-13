@@ -4,8 +4,8 @@
         <uuid>{d8263b62-2110-4bcb-9e0b-6f8f2ae7f2cf}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:47Z</created>
-        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <created>2015-08-13T20:22:37Z</created>
+        <last_modified>2015-08-13T20:22:37Z</last_modified>
         <name locale="en_US">PMLL41*</name>
         <description locale="en_US">&lt;b>High-speed diodes&lt;/b>&lt;p>
 Source: http://www.semiconductors.philips.com/acrobat_download/datasheets/PMLL4150_2.pdf
@@ -20,7 +20,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{38887bf5-9b48-40dc-9749-fe22bf86b1dd}" signal="{c153d722-596f-4db4-b057-8bb934a032a3}"/>
-        <map pad="{3ed1bf46-f3d7-4b98-9485-bc9327b4245f}" signal="{2814000c-6976-4734-9a73-60aa434ce225}"/>
+        <map signal="{2814000c-6976-4734-9a73-60aa434ce225}" pad="{3ed1bf46-f3d7-4b98-9485-bc9327b4245f}"/>
+        <map signal="{c153d722-596f-4db4-b057-8bb934a032a3}" pad="{38887bf5-9b48-40dc-9749-fe22bf86b1dd}"/>
     </pad_signal_map>
 </component>

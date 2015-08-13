@@ -4,8 +4,8 @@
         <uuid>{4746fd66-0512-491e-8294-1d050415e263}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:47Z</created>
-        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <created>2015-08-13T20:22:37Z</created>
+        <last_modified>2015-08-13T20:22:37Z</last_modified>
         <name locale="en_US">BY229B</name>
         <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
 Fast Switching Rectifier, 8A (Vishay)
@@ -20,8 +20,8 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{26a19517-37dd-4b69-845d-ee84e152dded}" signal="{22d6ea6f-ff63-4401-853a-c290b43eb873}"/>
-        <map pad="{7ccc5c44-7939-4303-b861-5db42cb90adf}" signal="{f9f876ad-0e81-4e13-8cb3-f46ab07fa7a2}"/>
-        <map pad="{01600930-e255-4d95-990a-b149dab9d21a}" signal="{61cd1e21-81c0-442c-babb-4365bd440d39}"/>
+        <map signal="{22d6ea6f-ff63-4401-853a-c290b43eb873}" pad="{26a19517-37dd-4b69-845d-ee84e152dded}"/>
+        <map signal="{61cd1e21-81c0-442c-babb-4365bd440d39}" pad="{01600930-e255-4d95-990a-b149dab9d21a}"/>
+        <map signal="{f9f876ad-0e81-4e13-8cb3-f46ab07fa7a2}" pad="{7ccc5c44-7939-4303-b861-5db42cb90adf}"/>
     </pad_signal_map>
 </component>

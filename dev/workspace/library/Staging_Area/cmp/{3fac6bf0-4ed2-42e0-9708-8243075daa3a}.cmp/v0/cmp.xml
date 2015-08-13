@@ -4,8 +4,8 @@
         <uuid>{3fac6bf0-4ed2-42e0-9708-8243075daa3a}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:48Z</created>
-        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <created>2015-08-13T20:22:38Z</created>
+        <last_modified>2015-08-13T20:22:38Z</last_modified>
         <name locale="en_US">TOPLED-3</name>
         <description locale="en_US">&lt;b>OSRAM&lt;/b>&lt;p>
 - &lt;u>Hyper Multi TOPLED® (RGB)&lt;/u>&lt;br>
@@ -30,9 +30,9 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{fb6c6c6c-d3b0-42a5-8506-86700833af46}" signal="{23482608-9c7f-4b15-b17f-063b6e1c19bc}"/>
-        <map pad="{ee3e88d0-30f9-4def-a9fe-d28aad2803ae}" signal="{2ebb14e5-180b-4a98-9ad8-47125f58a74b}"/>
-        <map pad="{e5209783-1560-4215-a678-df997ece953d}" signal="{6dd0a4ca-8c19-4c30-85e4-822136325fde}"/>
-        <map pad="{07432c69-b222-4e90-984f-844795a98830}" signal="{be0ecbbd-1ade-4930-93fa-070363edea28}"/>
+        <map signal="{be0ecbbd-1ade-4930-93fa-070363edea28}" pad="{07432c69-b222-4e90-984f-844795a98830}"/>
+        <map signal="{2ebb14e5-180b-4a98-9ad8-47125f58a74b}" pad="{ee3e88d0-30f9-4def-a9fe-d28aad2803ae}"/>
+        <map signal="{6dd0a4ca-8c19-4c30-85e4-822136325fde}" pad="{e5209783-1560-4215-a678-df997ece953d}"/>
+        <map signal="{23482608-9c7f-4b15-b17f-063b6e1c19bc}" pad="{fb6c6c6c-d3b0-42a5-8506-86700833af46}"/>
     </pad_signal_map>
 </component>

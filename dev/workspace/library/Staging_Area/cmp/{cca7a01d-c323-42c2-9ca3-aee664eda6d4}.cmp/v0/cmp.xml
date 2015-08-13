@@ -4,8 +4,8 @@
         <uuid>{cca7a01d-c323-42c2-9ca3-aee664eda6d4}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:46Z</created>
-        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <created>2015-08-13T20:22:36Z</created>
+        <last_modified>2015-08-13T20:22:36Z</last_modified>
         <name locale="en_US">BZX90</name>
         <description locale="en_US">&lt;b>Z DIODE&lt;/b>
 
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{1060fbc9-287c-4df7-b7e0-61001a92df3b}" signal="{1b1dd65b-6d6d-4445-b51a-d87291539667}"/>
-        <map pad="{3452e2b5-f047-40ec-bc65-6f956c2dbd21}" signal="{c7f7d0ed-a5b5-4201-b23f-52a400f9f0f0}"/>
+        <map signal="{1b1dd65b-6d6d-4445-b51a-d87291539667}" pad="{1060fbc9-287c-4df7-b7e0-61001a92df3b}"/>
+        <map signal="{c7f7d0ed-a5b5-4201-b23f-52a400f9f0f0}" pad="{3452e2b5-f047-40ec-bc65-6f956c2dbd21}"/>
     </pad_signal_map>
 </component>

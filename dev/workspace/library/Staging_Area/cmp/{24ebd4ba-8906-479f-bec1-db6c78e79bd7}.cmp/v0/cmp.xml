@@ -4,9 +4,9 @@
         <uuid>{24ebd4ba-8906-479f-bec1-db6c78e79bd7}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:43Z</created>
-        <last_modified>2015-06-21T12:37:43Z</last_modified>
-        <name locale="en_US">EL-</name>
+        <created>2015-08-13T20:22:32Z</created>
+        <last_modified>2015-08-13T20:22:32Z</last_modified>
+        <name locale="en_US">EL-_BI25-10AXIAL</name>
         <description locale="en_US">&lt;B>BIPOLAR ELECTROLYTIC CAPACITOR&lt;/B>
 
 This element was automatically imported from Eagle
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{40d04028-8188-4598-9a57-12b7891680e6}" signal="{3c4ba8a4-d63a-4225-b09e-c337f09bca5b}"/>
-        <map pad="{da25577a-f7b2-4bcf-88cb-e3b78846fa0a}" signal="{5b165fc1-792e-46e9-ab75-5e701608f468}"/>
+        <map signal="{3c4ba8a4-d63a-4225-b09e-c337f09bca5b}" pad="{40d04028-8188-4598-9a57-12b7891680e6}"/>
+        <map signal="{5b165fc1-792e-46e9-ab75-5e701608f468}" pad="{da25577a-f7b2-4bcf-88cb-e3b78846fa0a}"/>
     </pad_signal_map>
 </component>

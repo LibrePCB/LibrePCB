@@ -4,9 +4,9 @@
         <uuid>{c609f6f6-e242-4b7a-8c27-0686b3a6fb7b}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:48Z</created>
-        <last_modified>2015-06-21T12:37:48Z</last_modified>
-        <name locale="en_US">WIREPAD</name>
+        <created>2015-08-13T20:22:39Z</created>
+        <last_modified>2015-08-13T20:22:39Z</last_modified>
+        <name locale="en_US">WIREPAD_2,54/1,1</name>
         <description locale="en_US">&lt;b>Wire PAD&lt;/b> connect wire on PCB
 
 This element was automatically imported from Eagle
@@ -19,6 +19,6 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{b09a5602-f718-4b21-b837-4df8440d34a0}" signal="{ad6ae81a-7914-49b7-a87b-a0e8574b7398}"/>
+        <map signal="{ad6ae81a-7914-49b7-a87b-a0e8574b7398}" pad="{b09a5602-f718-4b21-b837-4df8440d34a0}"/>
     </pad_signal_map>
 </component>

@@ -4,9 +4,9 @@
         <uuid>{3ddda3c7-262c-4047-83ac-52586a33db53}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:48Z</created>
-        <last_modified>2015-06-21T12:37:48Z</last_modified>
-        <name locale="en_US">TOPLED-2-</name>
+        <created>2015-08-13T20:22:38Z</created>
+        <last_modified>2015-08-13T20:22:38Z</last_modified>
+        <name locale="en_US">TOPLED-2-_-</name>
         <description locale="en_US">&lt;b>Multi TOPLED® (two color)&lt;/b>&lt;p>
 LG T672, LP T672&lt;br>
 LSY T67B&lt;br>
@@ -28,9 +28,9 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{a52405d2-a193-47cd-a389-ea85db8936a5}" signal="{ec08ccd9-24ab-4b0f-a234-7cca543cf40f}"/>
-        <map pad="{279b7088-0f16-45ea-85b2-123b914333d3}" signal="{3e97ce01-0022-4a91-94b4-2e544a7d6bf4}"/>
-        <map pad="{965582f3-117e-4e22-b0b4-e8d1d12f984f}" signal="{65713800-933a-42b5-90fe-78d38b3a6757}"/>
-        <map pad="{84f4c92f-be31-4782-ae93-562979fea9ee}" signal="{9c10d616-3df1-4b53-a36f-6a6f80b41bea}"/>
+        <map signal="{ec08ccd9-24ab-4b0f-a234-7cca543cf40f}" pad="{a52405d2-a193-47cd-a389-ea85db8936a5}"/>
+        <map signal="{3e97ce01-0022-4a91-94b4-2e544a7d6bf4}" pad="{279b7088-0f16-45ea-85b2-123b914333d3}"/>
+        <map signal="{65713800-933a-42b5-90fe-78d38b3a6757}" pad="{965582f3-117e-4e22-b0b4-e8d1d12f984f}"/>
+        <map signal="{9c10d616-3df1-4b53-a36f-6a6f80b41bea}" pad="{84f4c92f-be31-4782-ae93-562979fea9ee}"/>
     </pad_signal_map>
 </component>

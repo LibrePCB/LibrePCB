@@ -4,8 +4,8 @@
         <uuid>{6c2b1680-c099-4ac6-b1b3-49722a9ff180}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:48Z</created>
-        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <created>2015-08-13T20:22:38Z</created>
+        <last_modified>2015-08-13T20:22:38Z</last_modified>
         <name locale="en_US">*W57B</name>
         <description locale="en_US">&lt;b>Golden Dragon® 1 Watt LED&lt;/b>&lt;p>
 Place heat sink pads of cathode with INVOKE&lt;br>
@@ -21,12 +21,12 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{b058756e-1488-4b5c-b960-017694ef885e}" signal="{18fd122a-faea-4441-91b9-df55c41fc294}"/>
-        <map pad="{c4af83cd-748d-49e9-a1fc-b4d77bf39bdd}" signal="{645e894f-1fe3-4411-9b98-32e62235d1f0}"/>
-        <map pad="{62444667-9544-47ca-9920-c98496e78e11}" signal="{645e894f-1fe3-4411-9b98-32e62235d1f0}"/>
-        <map pad="{0681b9a6-2469-4fcb-9c14-53e80a928a4e}" signal="{645e894f-1fe3-4411-9b98-32e62235d1f0}"/>
-        <map pad="{b1173830-f9ea-47ee-99d1-48364298b05d}" signal="{645e894f-1fe3-4411-9b98-32e62235d1f0}"/>
-        <map pad="{2218094b-8e88-443c-a9dc-1675c1bfad76}" signal="{645e894f-1fe3-4411-9b98-32e62235d1f0}"/>
-        <map pad="{7a5b9c3f-318e-4cf2-a9cf-d57c3a9d12ec}" signal="{645e894f-1fe3-4411-9b98-32e62235d1f0}"/>
+        <map signal="{18fd122a-faea-4441-91b9-df55c41fc294}" pad="{b058756e-1488-4b5c-b960-017694ef885e}"/>
+        <map signal="{645e894f-1fe3-4411-9b98-32e62235d1f0}" pad="{62444667-9544-47ca-9920-c98496e78e11}"/>
+        <map signal="{645e894f-1fe3-4411-9b98-32e62235d1f0}" pad="{c4af83cd-748d-49e9-a1fc-b4d77bf39bdd}"/>
+        <map signal="{645e894f-1fe3-4411-9b98-32e62235d1f0}" pad="{2218094b-8e88-443c-a9dc-1675c1bfad76}"/>
+        <map signal="{645e894f-1fe3-4411-9b98-32e62235d1f0}" pad="{7a5b9c3f-318e-4cf2-a9cf-d57c3a9d12ec}"/>
+        <map signal="{645e894f-1fe3-4411-9b98-32e62235d1f0}" pad="{b1173830-f9ea-47ee-99d1-48364298b05d}"/>
+        <map signal="{645e894f-1fe3-4411-9b98-32e62235d1f0}" pad="{0681b9a6-2469-4fcb-9c14-53e80a928a4e}"/>
     </pad_signal_map>
 </component>

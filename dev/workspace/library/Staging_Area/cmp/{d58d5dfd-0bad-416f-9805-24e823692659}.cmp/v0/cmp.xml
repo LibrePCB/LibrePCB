@@ -4,9 +4,9 @@
         <uuid>{d58d5dfd-0bad-416f-9805-24e823692659}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:43Z</created>
-        <last_modified>2015-06-21T12:37:43Z</last_modified>
-        <name locale="en_US">EL-</name>
+        <created>2015-08-13T20:22:32Z</created>
+        <last_modified>2015-08-13T20:22:32Z</last_modified>
+        <name locale="en_US">EL-_BI43-14AXIAL</name>
         <description locale="en_US">&lt;B>BIPOLAR ELECTROLYTIC CAPACITOR&lt;/B>
 
 This element was automatically imported from Eagle
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{d281051f-011c-40e2-89bc-81ff9271b747}" signal="{3c4ba8a4-d63a-4225-b09e-c337f09bca5b}"/>
-        <map pad="{8348e08a-16f2-466f-80d7-aa7027bb1bed}" signal="{5b165fc1-792e-46e9-ab75-5e701608f468}"/>
+        <map signal="{5b165fc1-792e-46e9-ab75-5e701608f468}" pad="{8348e08a-16f2-466f-80d7-aa7027bb1bed}"/>
+        <map signal="{3c4ba8a4-d63a-4225-b09e-c337f09bca5b}" pad="{d281051f-011c-40e2-89bc-81ff9271b747}"/>
     </pad_signal_map>
 </component>

@@ -4,9 +4,9 @@
         <uuid>{ad864a10-7928-4771-a1e5-679c37ab4d3e}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:45Z</created>
-        <last_modified>2015-06-21T12:37:45Z</last_modified>
-        <name locale="en_US">FA-</name>
+        <created>2015-08-13T20:22:35Z</created>
+        <last_modified>2015-08-13T20:22:35Z</last_modified>
+        <name locale="en_US">FA-_20H</name>
         <description locale="en_US">&lt;b>MHz RANGE CRYSTAL UNIT&lt;/b> &lt;p>
 Source: Epson Toyocom
 
@@ -20,9 +20,9 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{c27f6237-eda5-4cfb-9a06-111a84ff7b96}" signal="{32ba994d-e39e-4b2b-9773-0db4e40fdc49}"/>
-        <map pad="{96609595-aeff-41ee-a856-8be16cf74b87}" signal="{f1ff2237-ffbb-4f15-b22f-b2d30d9eaadc}"/>
-        <map pad="{caac9acd-b17a-4b2a-ab26-977d6a9029e9}" signal="{39e183fe-cab8-431b-9168-df821178568d}"/>
-        <map pad="{9bd23d08-4256-4b93-aa47-ba8a5e8b2399}" signal="{9afbbeb7-632f-47a4-a071-135ce58eaf11}"/>
+        <map signal="{f1ff2237-ffbb-4f15-b22f-b2d30d9eaadc}" pad="{96609595-aeff-41ee-a856-8be16cf74b87}"/>
+        <map signal="{39e183fe-cab8-431b-9168-df821178568d}" pad="{caac9acd-b17a-4b2a-ab26-977d6a9029e9}"/>
+        <map signal="{32ba994d-e39e-4b2b-9773-0db4e40fdc49}" pad="{c27f6237-eda5-4cfb-9a06-111a84ff7b96}"/>
+        <map signal="{9afbbeb7-632f-47a4-a071-135ce58eaf11}" pad="{9bd23d08-4256-4b93-aa47-ba8a5e8b2399}"/>
     </pad_signal_map>
 </component>

@@ -4,8 +4,8 @@
         <uuid>{092c5708-a269-4627-8c2f-4cdff291ee72}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:45Z</created>
-        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <created>2015-08-13T20:22:35Z</created>
+        <last_modified>2015-08-13T20:22:35Z</last_modified>
         <name locale="en_US">QG5460</name>
         <description locale="en_US">&lt;b>CRYSTAL RESONATOR&lt;/b>
 
@@ -19,8 +19,8 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{90756629-3ebd-43e1-8f14-10040b8a4bae}" signal="{18a64307-7af5-41bf-82ed-dd2d0ae9ff3c}"/>
-        <map pad="{337cfd39-8233-4fea-a787-b8883cafb6ca}" signal="{36ae0a72-34bc-48c2-b666-bc517281b3a4}"/>
-        <map pad="{08e515da-af36-4113-9b0a-e987e8987c9b}" signal="{724ff4d7-851e-4911-a4c1-94df804b8c8f}"/>
+        <map signal="{18a64307-7af5-41bf-82ed-dd2d0ae9ff3c}" pad="{90756629-3ebd-43e1-8f14-10040b8a4bae}"/>
+        <map signal="{724ff4d7-851e-4911-a4c1-94df804b8c8f}" pad="{08e515da-af36-4113-9b0a-e987e8987c9b}"/>
+        <map signal="{36ae0a72-34bc-48c2-b666-bc517281b3a4}" pad="{337cfd39-8233-4fea-a787-b8883cafb6ca}"/>
     </pad_signal_map>
 </component>

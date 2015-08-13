@@ -4,9 +4,9 @@
         <uuid>{8cad7eff-e0dc-4dd3-bf57-e9bf9d27a8d9}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:48Z</created>
-        <last_modified>2015-06-21T12:37:48Z</last_modified>
-        <name locale="en_US">LED-2AC-</name>
+        <created>2015-08-13T20:22:38Z</created>
+        <last_modified>2015-08-13T20:22:38Z</last_modified>
+        <name locale="en_US">LED-2AC-_CP41B-WES</name>
         <description locale="en_US">&lt;b>LEDs with 2 Cathode &amp; 2 Anode&lt;/b>&lt;p>
 - Kingbright SUPER FLUX LED LAMP&lt;br>
 Source: www.us.kingbright.com/images/catalog/SPEC/W7676CPBC-H.pdf&lt;p>
@@ -23,9 +23,9 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{3c84d908-493c-4294-84b6-d8721acbed01}" signal="{f1f9e501-e981-4d35-831d-660994413252}"/>
-        <map pad="{fe7d0157-e884-4d89-9d6c-efaf7ff864d8}" signal="{f1f9e501-e981-4d35-831d-660994413252}"/>
-        <map pad="{032a23b9-6886-48bf-a309-05d1f6a4d5f5}" signal="{bbaaee77-dd73-4710-813f-e201bed287b0}"/>
-        <map pad="{0f3c6b2a-ae67-460c-add7-781860a365d4}" signal="{bbaaee77-dd73-4710-813f-e201bed287b0}"/>
+        <map signal="{f1f9e501-e981-4d35-831d-660994413252}" pad="{fe7d0157-e884-4d89-9d6c-efaf7ff864d8}"/>
+        <map signal="{bbaaee77-dd73-4710-813f-e201bed287b0}" pad="{0f3c6b2a-ae67-460c-add7-781860a365d4}"/>
+        <map signal="{f1f9e501-e981-4d35-831d-660994413252}" pad="{3c84d908-493c-4294-84b6-d8721acbed01}"/>
+        <map signal="{bbaaee77-dd73-4710-813f-e201bed287b0}" pad="{032a23b9-6886-48bf-a309-05d1f6a4d5f5}"/>
     </pad_signal_map>
 </component>

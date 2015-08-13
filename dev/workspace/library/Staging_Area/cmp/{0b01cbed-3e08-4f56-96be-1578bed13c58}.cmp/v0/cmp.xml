@@ -4,8 +4,8 @@
         <uuid>{0b01cbed-3e08-4f56-96be-1578bed13c58}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:46Z</created>
-        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <created>2015-08-13T20:22:37Z</created>
+        <last_modified>2015-08-13T20:22:37Z</last_modified>
         <name locale="en_US">MUR440RL</name>
         <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
 ultra-fast recovery rectifier, Vrrm = 40 V, 4 A
@@ -20,7 +20,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{e4aad232-3b94-40c6-88cc-2bf40167969b}" signal="{86e87c23-5482-4ab1-b247-c8bf609329aa}"/>
-        <map pad="{2f198546-0b85-4bc2-9d59-acdc7518dc89}" signal="{6c26a374-675d-4a31-ab62-fef30c76aa6d}"/>
+        <map signal="{86e87c23-5482-4ab1-b247-c8bf609329aa}" pad="{e4aad232-3b94-40c6-88cc-2bf40167969b}"/>
+        <map signal="{6c26a374-675d-4a31-ab62-fef30c76aa6d}" pad="{2f198546-0b85-4bc2-9d59-acdc7518dc89}"/>
     </pad_signal_map>
 </component>

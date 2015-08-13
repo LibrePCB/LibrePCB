@@ -4,8 +4,8 @@
         <uuid>{d2daa32f-6d51-41fe-8f24-e8e1b473f61d}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:47Z</created>
-        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <created>2015-08-13T20:22:37Z</created>
+        <last_modified>2015-08-13T20:22:37Z</last_modified>
         <name locale="en_US">BBY51</name>
         <description locale="en_US">Capacity &lt;b>DIODE&lt;/b>&lt;p>
 variable-capacitance diode (Infineon)
@@ -20,8 +20,8 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{e084a5a2-054f-4b96-9d35-e5a4a69110c9}" signal="{743c33af-5aaf-4cce-9ef5-0d5e163d84c6}"/>
-        <map pad="{5df1620d-1a12-409c-a6dc-4ac9c3ea2160}" signal="{5612f1ac-cad8-4489-9e41-13201f7dd492}"/>
-        <map pad="{0b7e3bae-fd35-4351-876f-73d31fc11e9a}" signal="{4fc8cac6-df13-4dbc-953f-a3c7f5de644e}"/>
+        <map signal="{4fc8cac6-df13-4dbc-953f-a3c7f5de644e}" pad="{0b7e3bae-fd35-4351-876f-73d31fc11e9a}"/>
+        <map signal="{743c33af-5aaf-4cce-9ef5-0d5e163d84c6}" pad="{e084a5a2-054f-4b96-9d35-e5a4a69110c9}"/>
+        <map signal="{5612f1ac-cad8-4489-9e41-13201f7dd492}" pad="{5df1620d-1a12-409c-a6dc-4ac9c3ea2160}"/>
     </pad_signal_map>
 </component>

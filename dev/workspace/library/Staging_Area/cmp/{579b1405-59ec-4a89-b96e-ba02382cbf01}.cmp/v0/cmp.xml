@@ -4,8 +4,8 @@
         <uuid>{579b1405-59ec-4a89-b96e-ba02382cbf01}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:45Z</created>
-        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <created>2015-08-13T20:22:35Z</created>
+        <last_modified>2015-08-13T20:22:35Z</last_modified>
         <name locale="en_US">MC-306</name>
         <description locale="en_US">&lt;b>kHz RANGE CRYSTAL UNIT&lt;/b> SMD&lt;p>
 Source: MC-306_405_406_E07X.PDF &lt;a href="http://www.epsontoyocom.co.jp"> Homepage &lt;/a>
@@ -20,7 +20,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{44add9e4-900f-4c07-88b8-6bee191f64b4}" signal="{f331b467-2311-4caa-9ff2-5b3a5b259431}"/>
-        <map pad="{b341427a-f736-4d41-84fb-6551822039c8}" signal="{09876c0f-f981-48b3-87c9-fd6e8faa2a0e}"/>
+        <map signal="{09876c0f-f981-48b3-87c9-fd6e8faa2a0e}" pad="{b341427a-f736-4d41-84fb-6551822039c8}"/>
+        <map signal="{f331b467-2311-4caa-9ff2-5b3a5b259431}" pad="{44add9e4-900f-4c07-88b8-6bee191f64b4}"/>
     </pad_signal_map>
 </component>

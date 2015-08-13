@@ -4,8 +4,8 @@
         <uuid>{51545259-8454-4ffd-9ec0-418bfdd2ef52}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:48Z</created>
-        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <created>2015-08-13T20:22:39Z</created>
+        <last_modified>2015-08-13T20:22:39Z</last_modified>
         <name locale="en_US">ML-E</name>
         <description locale="en_US">&lt;b>Cree® XLamp® ML-E LEDs&lt;/b> 1/2 watt, 3.5 x 3.5 mm&lt;p>
 Source: &lt;a href="http://www.cree.com/products/pdf/XLampML-E.pdf"> Data sheet &lt;/a>
@@ -20,10 +20,10 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{b2b6432e-cc21-46db-8423-e33c9b219266}" signal="{704d3738-8425-4836-b1c5-0239937aa8ed}"/>
-        <map pad="{bafacc8a-766a-4cd0-a59a-d62570afde11}" signal="{eab25fb6-353a-40c7-861e-9da625ff9218}"/>
-        <map pad="{958e7ac8-25d1-4eb2-ae07-83e425d2c97d}" signal="{f0ca98b0-8596-43ab-a310-898a79fc479d}"/>
-        <map pad="{0b0a3454-b49f-4b13-a880-6e76357531c8}" signal="{704d3738-8425-4836-b1c5-0239937aa8ed}"/>
-        <map pad="{fadd33d0-240c-4171-806f-c9228972b066}" signal="{eab25fb6-353a-40c7-861e-9da625ff9218}"/>
+        <map signal="{704d3738-8425-4836-b1c5-0239937aa8ed}" pad="{b2b6432e-cc21-46db-8423-e33c9b219266}"/>
+        <map signal="{eab25fb6-353a-40c7-861e-9da625ff9218}" pad="{bafacc8a-766a-4cd0-a59a-d62570afde11}"/>
+        <map signal="{f0ca98b0-8596-43ab-a310-898a79fc479d}" pad="{958e7ac8-25d1-4eb2-ae07-83e425d2c97d}"/>
+        <map signal="{704d3738-8425-4836-b1c5-0239937aa8ed}" pad="{0b0a3454-b49f-4b13-a880-6e76357531c8}"/>
+        <map signal="{eab25fb6-353a-40c7-861e-9da625ff9218}" pad="{fadd33d0-240c-4171-806f-c9228972b066}"/>
     </pad_signal_map>
 </component>

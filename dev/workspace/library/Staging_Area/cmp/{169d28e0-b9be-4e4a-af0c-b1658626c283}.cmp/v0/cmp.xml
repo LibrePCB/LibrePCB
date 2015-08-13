@@ -4,9 +4,9 @@
         <uuid>{169d28e0-b9be-4e4a-af0c-b1658626c283}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:42Z</created>
-        <last_modified>2015-06-21T12:37:42Z</last_modified>
-        <name locale="en_US">C-EU</name>
+        <created>2015-08-13T20:22:31Z</created>
+        <last_modified>2015-08-13T20:22:31Z</last_modified>
+        <name locale="en_US">C-EU_225-108X268</name>
         <description locale="en_US">&lt;B>CAPACITOR&lt;/B>, European symbol
 
 This element was automatically imported from Eagle
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{57e0d0ef-666d-4249-8fc4-2e9cd4021b30}" signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}"/>
-        <map pad="{091d9770-449d-4723-8b3e-9c92dcb40fe8}" signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}"/>
+        <map signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}" pad="{57e0d0ef-666d-4249-8fc4-2e9cd4021b30}"/>
+        <map signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}" pad="{091d9770-449d-4723-8b3e-9c92dcb40fe8}"/>
     </pad_signal_map>
 </component>

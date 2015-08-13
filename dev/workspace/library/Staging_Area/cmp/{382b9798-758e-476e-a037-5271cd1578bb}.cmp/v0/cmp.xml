@@ -4,9 +4,9 @@
         <uuid>{382b9798-758e-476e-a037-5271cd1578bb}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:42Z</created>
-        <last_modified>2015-06-21T12:37:42Z</last_modified>
-        <name locale="en_US">R-US_</name>
+        <created>2015-08-13T20:22:32Z</created>
+        <last_modified>2015-08-13T20:22:32Z</last_modified>
+        <name locale="en_US">R-US__0922V</name>
         <description locale="en_US">&lt;B>RESISTOR&lt;/B>, American symbol
 
 This element was automatically imported from Eagle
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{4b1d5cf2-1a8d-46b5-a949-33fc5ddf25b6}" signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
-        <map pad="{8c851edf-a41f-4ae2-b5e1-db932a4869c8}" signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
+        <map signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}" pad="{8c851edf-a41f-4ae2-b5e1-db932a4869c8}"/>
+        <map signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}" pad="{4b1d5cf2-1a8d-46b5-a949-33fc5ddf25b6}"/>
     </pad_signal_map>
 </component>

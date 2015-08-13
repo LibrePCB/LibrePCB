@@ -4,8 +4,8 @@
         <uuid>{1a4bdb86-be86-4673-8839-f16dee5f2054}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:48Z</created>
-        <last_modified>2015-06-21T12:37:48Z</last_modified>
+        <created>2015-08-13T20:22:38Z</created>
+        <last_modified>2015-08-13T20:22:38Z</last_modified>
         <name locale="en_US">GM5WA94310A</name>
         <description locale="en_US">&lt;b>Chip LED&lt;/b> RGB&lt;p>
 Source: http://document.sharpsma.com/files/GM5WA94310A_SS.pdf
@@ -20,11 +20,11 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{973c3e5f-bb55-47e4-a339-129eed00b046}" signal="{4e7dfef4-3000-41df-abf5-59f0718df892}"/>
-        <map pad="{a8954980-259e-4060-9530-a56261acf154}" signal="{5fadb213-e8b3-48ed-9a9c-facee042648e}"/>
-        <map pad="{20d7ffcc-31e9-4579-b9a9-69150bcea120}" signal="{f8d52bd7-dcca-4f91-97c4-2142565e5a78}"/>
-        <map pad="{f3f7ebe5-1f42-472c-ad9b-9828ff75986c}" signal="{94d65b9f-2b59-4ca9-b555-7e23685ebfdf}"/>
-        <map pad="{99d97785-e411-4839-b057-464989644bfd}" signal="{cb155e73-ed7d-4939-891c-9cd3a8f41d8c}"/>
-        <map pad="{64ac7ee2-b345-4be8-b815-9b4095b2301c}" signal="{b021dec9-e368-4f46-907c-9fbf8b783323}"/>
+        <map signal="{4e7dfef4-3000-41df-abf5-59f0718df892}" pad="{973c3e5f-bb55-47e4-a339-129eed00b046}"/>
+        <map signal="{cb155e73-ed7d-4939-891c-9cd3a8f41d8c}" pad="{99d97785-e411-4839-b057-464989644bfd}"/>
+        <map signal="{5fadb213-e8b3-48ed-9a9c-facee042648e}" pad="{a8954980-259e-4060-9530-a56261acf154}"/>
+        <map signal="{94d65b9f-2b59-4ca9-b555-7e23685ebfdf}" pad="{f3f7ebe5-1f42-472c-ad9b-9828ff75986c}"/>
+        <map signal="{f8d52bd7-dcca-4f91-97c4-2142565e5a78}" pad="{20d7ffcc-31e9-4579-b9a9-69150bcea120}"/>
+        <map signal="{b021dec9-e368-4f46-907c-9fbf8b783323}" pad="{64ac7ee2-b345-4be8-b815-9b4095b2301c}"/>
     </pad_signal_map>
 </component>

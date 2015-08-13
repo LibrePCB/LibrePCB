@@ -4,8 +4,8 @@
         <uuid>{8198b20f-1d24-4fbc-8783-29571270002e}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:46Z</created>
-        <last_modified>2015-06-21T12:37:46Z</last_modified>
+        <created>2015-08-13T20:22:36Z</created>
+        <last_modified>2015-08-13T20:22:36Z</last_modified>
         <name locale="en_US">BAW75</name>
         <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
 silicon-epitaxial planar diode
@@ -20,7 +20,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{03958109-002d-4acc-8e80-e9768ddc69d7}" signal="{095fa809-403a-498f-be0e-cf144cbdf710}"/>
-        <map pad="{caec7773-5bfc-4b5b-b3eb-4ba251c115ea}" signal="{ba97fdf9-3b5c-4f0d-9b5e-ea8b6c668685}"/>
+        <map signal="{095fa809-403a-498f-be0e-cf144cbdf710}" pad="{03958109-002d-4acc-8e80-e9768ddc69d7}"/>
+        <map signal="{ba97fdf9-3b5c-4f0d-9b5e-ea8b6c668685}" pad="{caec7773-5bfc-4b5b-b3eb-4ba251c115ea}"/>
     </pad_signal_map>
 </component>

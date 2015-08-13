@@ -4,8 +4,8 @@
         <uuid>{bc9128f6-4745-4468-b1ff-3530d03132b7}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:47Z</created>
-        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <created>2015-08-13T20:22:38Z</created>
+        <last_modified>2015-08-13T20:22:38Z</last_modified>
         <name locale="en_US">BAT60J</name>
         <description locale="en_US">&lt;b>Schottky barrier diode&lt;/b>&lt;p>
 Source: www.st.com, BAT60J.pdf
@@ -20,7 +20,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{4e500c5c-1ad6-498e-a506-6ea13a035270}" signal="{f22d81d3-7865-48cb-b39b-663851cdce73}"/>
-        <map pad="{c8a7b5d9-9eda-4d75-bea9-f29391165a78}" signal="{4fcee70a-d141-4074-b70d-cdd66d0a0fff}"/>
+        <map signal="{f22d81d3-7865-48cb-b39b-663851cdce73}" pad="{4e500c5c-1ad6-498e-a506-6ea13a035270}"/>
+        <map signal="{4fcee70a-d141-4074-b70d-cdd66d0a0fff}" pad="{c8a7b5d9-9eda-4d75-bea9-f29391165a78}"/>
     </pad_signal_map>
 </component>

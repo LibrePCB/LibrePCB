@@ -4,8 +4,8 @@
         <uuid>{caa5bba6-b226-4be1-86b3-b05a31c1c060}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:45Z</created>
-        <last_modified>2015-06-21T12:37:45Z</last_modified>
+        <created>2015-08-13T20:22:35Z</created>
+        <last_modified>2015-08-13T20:22:35Z</last_modified>
         <name locale="en_US">SG51</name>
         <description locale="en_US">&lt;b>CRYSTAL RESONATOR&lt;/b>
 
@@ -19,9 +19,9 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{710d208e-6264-4f65-96c8-44ed1e699cf3}" signal="{3f04fead-a08d-49f1-aee0-c00252820f76}"/>
-        <map pad="{ba2ea12d-562f-4b90-b098-89e1bd7ff432}" signal="{07ff8c59-92a1-4c82-af8c-0348c955b689}"/>
-        <map pad="{89f4c75e-2c00-4134-81da-ce13e188bd08}" signal="{a5caf31e-7972-479c-8c6f-0cd03aa8df41}"/>
-        <map pad="{1f70c5d0-39a4-46eb-8734-77bb9b56ac9f}" signal="{4715eab1-de99-4e7b-b71d-aa51747c7300}"/>
+        <map signal="{3f04fead-a08d-49f1-aee0-c00252820f76}" pad="{710d208e-6264-4f65-96c8-44ed1e699cf3}"/>
+        <map signal="{a5caf31e-7972-479c-8c6f-0cd03aa8df41}" pad="{89f4c75e-2c00-4134-81da-ce13e188bd08}"/>
+        <map signal="{4715eab1-de99-4e7b-b71d-aa51747c7300}" pad="{1f70c5d0-39a4-46eb-8734-77bb9b56ac9f}"/>
+        <map signal="{07ff8c59-92a1-4c82-af8c-0348c955b689}" pad="{ba2ea12d-562f-4b90-b098-89e1bd7ff432}"/>
     </pad_signal_map>
 </component>

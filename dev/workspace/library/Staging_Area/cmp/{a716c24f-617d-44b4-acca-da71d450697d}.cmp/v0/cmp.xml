@@ -4,8 +4,8 @@
         <uuid>{a716c24f-617d-44b4-acca-da71d450697d}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:47Z</created>
-        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <created>2015-08-13T20:22:37Z</created>
+        <last_modified>2015-08-13T20:22:37Z</last_modified>
         <name locale="en_US">BYT03</name>
         <description locale="en_US">&lt;B>DIODE&lt;/B>&lt;p>
 ultra fast
@@ -20,7 +20,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{a46b1876-4680-481f-9468-c1f0c8c5b8c8}" signal="{3d352566-f112-4ce3-992c-091acc8b1441}"/>
-        <map pad="{5cfdc9a2-8b51-4a99-8b01-b2a0047d58da}" signal="{230ac61f-1c48-451f-b981-38bfec8619b9}"/>
+        <map signal="{230ac61f-1c48-451f-b981-38bfec8619b9}" pad="{5cfdc9a2-8b51-4a99-8b01-b2a0047d58da}"/>
+        <map signal="{3d352566-f112-4ce3-992c-091acc8b1441}" pad="{a46b1876-4680-481f-9468-c1f0c8c5b8c8}"/>
     </pad_signal_map>
 </component>

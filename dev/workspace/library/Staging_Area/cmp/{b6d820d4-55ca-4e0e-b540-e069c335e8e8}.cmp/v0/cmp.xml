@@ -4,9 +4,9 @@
         <uuid>{b6d820d4-55ca-4e0e-b540-e069c335e8e8}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:45Z</created>
-        <last_modified>2015-06-21T12:37:45Z</last_modified>
-        <name locale="en_US">10G</name>
+        <created>2015-08-13T20:22:35Z</created>
+        <last_modified>2015-08-13T20:22:35Z</last_modified>
+        <name locale="en_US">10G_15B-25.0KHZ</name>
         <description locale="en_US">&lt;b>Monolithic Crystal Filters&lt;/b>&lt;p>
 Source: www.golledge.com
 
@@ -20,8 +20,8 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{8a2384a3-809e-4795-ba3c-e81909ec1069}" signal="{34d99d71-facc-4368-b3c4-ab503c206302}"/>
-        <map pad="{d66d246b-f21f-44a9-a5a5-7f4bef20abf2}" signal="{ca5c1d5b-07a7-4324-b78f-2afdbe7062f8}"/>
-        <map pad="{4626fca9-47bb-4b6c-bc6d-dcb44092f981}" signal="{139d8500-c7e2-42b5-826b-8c0cd5e1fef8}"/>
+        <map signal="{ca5c1d5b-07a7-4324-b78f-2afdbe7062f8}" pad="{d66d246b-f21f-44a9-a5a5-7f4bef20abf2}"/>
+        <map signal="{34d99d71-facc-4368-b3c4-ab503c206302}" pad="{8a2384a3-809e-4795-ba3c-e81909ec1069}"/>
+        <map signal="{139d8500-c7e2-42b5-826b-8c0cd5e1fef8}" pad="{4626fca9-47bb-4b6c-bc6d-dcb44092f981}"/>
     </pad_signal_map>
 </component>

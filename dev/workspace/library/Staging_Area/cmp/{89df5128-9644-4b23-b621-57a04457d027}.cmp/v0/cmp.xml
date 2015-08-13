@@ -4,9 +4,9 @@
         <uuid>{89df5128-9644-4b23-b621-57a04457d027}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:45Z</created>
-        <last_modified>2015-06-21T12:37:45Z</last_modified>
-        <name locale="en_US">CRYSTAL</name>
+        <created>2015-08-13T20:22:35Z</created>
+        <last_modified>2015-08-13T20:22:35Z</last_modified>
+        <name locale="en_US">CRYSTAL_HC33U-H</name>
         <description locale="en_US">&lt;b>CRYSTAL&lt;/b>
 
 This element was automatically imported from Eagle
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{e728ac09-d285-40b1-96d9-3b67355e484c}" signal="{878301c2-bacc-4ffa-923c-ef5b1f06e5fe}"/>
-        <map pad="{2f71c85b-664f-465d-ba58-62f292ff6c91}" signal="{fd760be8-09ce-411f-a869-fdc1e74229a9}"/>
+        <map signal="{878301c2-bacc-4ffa-923c-ef5b1f06e5fe}" pad="{e728ac09-d285-40b1-96d9-3b67355e484c}"/>
+        <map signal="{fd760be8-09ce-411f-a869-fdc1e74229a9}" pad="{2f71c85b-664f-465d-ba58-62f292ff6c91}"/>
     </pad_signal_map>
 </component>

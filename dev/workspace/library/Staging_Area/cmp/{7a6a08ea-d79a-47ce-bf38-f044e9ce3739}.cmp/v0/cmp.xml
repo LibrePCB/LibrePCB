@@ -4,9 +4,9 @@
         <uuid>{7a6a08ea-d79a-47ce-bf38-f044e9ce3739}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:48Z</created>
-        <last_modified>2015-06-21T12:37:48Z</last_modified>
-        <name locale="en_US">PL006*</name>
+        <created>2015-08-13T20:22:38Z</created>
+        <last_modified>2015-08-13T20:22:38Z</last_modified>
+        <name locale="en_US">PL006*_-WCR21</name>
         <description locale="en_US">&lt;b>PLH006 Series SMD LED&lt;/b> SOT23&lt;p>
 PLH006-WCR21 Super Red&lt;br>
 PLH006-WCR12 High Eff Red&lt;br>
@@ -25,7 +25,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{2de8b9cc-2951-491d-a30c-4c6c30d2019a}" signal="{0cb5c1af-7fd0-4a7a-8313-4677e8def168}"/>
-        <map pad="{a7de4ab4-598e-4103-8e39-9dbcd38ac09d}" signal="{0db0bbbe-d3d4-4729-af48-1fa43ba9711a}"/>
+        <map signal="{0cb5c1af-7fd0-4a7a-8313-4677e8def168}" pad="{2de8b9cc-2951-491d-a30c-4c6c30d2019a}"/>
+        <map signal="{0db0bbbe-d3d4-4729-af48-1fa43ba9711a}" pad="{a7de4ab4-598e-4103-8e39-9dbcd38ac09d}"/>
     </pad_signal_map>
 </component>

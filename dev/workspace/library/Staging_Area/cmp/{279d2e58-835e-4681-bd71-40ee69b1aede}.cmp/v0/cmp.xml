@@ -4,9 +4,9 @@
         <uuid>{279d2e58-835e-4681-bd71-40ee69b1aede}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:41Z</created>
-        <last_modified>2015-06-21T12:37:41Z</last_modified>
-        <name locale="en_US">CPOL-EU</name>
+        <created>2015-08-13T20:22:31Z</created>
+        <last_modified>2015-08-13T20:22:31Z</last_modified>
+        <name locale="en_US">CPOL-EU_E5-10.5</name>
         <description locale="en_US">&lt;B>POLARIZED CAPACITOR&lt;/B>, European symbol
 
 This element was automatically imported from Eagle
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{dcdbb14e-181e-4839-a109-91c3c3b57856}" signal="{af3ffca8-0085-4edb-a775-fcb759f63411}"/>
-        <map pad="{f191c282-5bdc-4d78-a4c2-f3abf385b8fb}" signal="{e010ecbb-6210-4da3-9270-ebd58656dbf0}"/>
+        <map signal="{af3ffca8-0085-4edb-a775-fcb759f63411}" pad="{dcdbb14e-181e-4839-a109-91c3c3b57856}"/>
+        <map signal="{e010ecbb-6210-4da3-9270-ebd58656dbf0}" pad="{f191c282-5bdc-4d78-a4c2-f3abf385b8fb}"/>
     </pad_signal_map>
 </component>

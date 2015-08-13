@@ -4,9 +4,9 @@
         <uuid>{ecc883fc-b583-42e8-ba5b-1562d661cae5}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:48Z</created>
-        <last_modified>2015-06-21T12:37:48Z</last_modified>
-        <name locale="en_US">OSTAR_4-</name>
+        <created>2015-08-13T20:22:38Z</created>
+        <last_modified>2015-08-13T20:22:38Z</last_modified>
+        <name locale="en_US">OSTAR_4-_LEWE2B-MXPX-6K8L</name>
         <description locale="en_US">&lt;b>OSTAR - Lighting with / without Optics&lt;/b>&lt;p>
 Source: http://catalog.osram-os.com/media/_en/Graphics/00035766_0.pdf
 
@@ -20,7 +20,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{ef1618ea-112e-4149-bdad-53257d1564aa}" signal="{7d0c795d-a6af-4c21-941d-a8f2aa83cbea}"/>
-        <map pad="{aa456ec1-47f3-42ed-b61c-703f78d6679d}" signal="{8579e339-fe84-4714-868f-83ba78625545}"/>
+        <map signal="{7d0c795d-a6af-4c21-941d-a8f2aa83cbea}" pad="{ef1618ea-112e-4149-bdad-53257d1564aa}"/>
+        <map signal="{8579e339-fe84-4714-868f-83ba78625545}" pad="{aa456ec1-47f3-42ed-b61c-703f78d6679d}"/>
     </pad_signal_map>
 </component>

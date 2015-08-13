@@ -4,8 +4,8 @@
         <uuid>{bf38cecb-cba9-443e-b144-938f76bfbc25}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:47Z</created>
-        <last_modified>2015-06-21T12:37:47Z</last_modified>
+        <created>2015-08-13T20:22:37Z</created>
+        <last_modified>2015-08-13T20:22:37Z</last_modified>
         <name locale="en_US">BZX84CSMD</name>
         <description locale="en_US">&lt;b>Z DIODE&lt;/b>
 
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{a49214c3-2331-4eeb-a57c-a37e7bc77cc1}" signal="{207d388e-c5aa-4936-93ba-4fdd6b7126b2}"/>
-        <map pad="{5b6dfb78-c4dc-4393-9ae8-9a094b036ce2}" signal="{a320a34a-c3be-43fe-ab43-2477a0536524}"/>
+        <map signal="{a320a34a-c3be-43fe-ab43-2477a0536524}" pad="{5b6dfb78-c4dc-4393-9ae8-9a094b036ce2}"/>
+        <map signal="{207d388e-c5aa-4936-93ba-4fdd6b7126b2}" pad="{a49214c3-2331-4eeb-a57c-a37e7bc77cc1}"/>
     </pad_signal_map>
 </component>

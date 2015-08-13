@@ -4,9 +4,9 @@
         <uuid>{60fe65fe-ba87-43c0-ae06-1f0eeb3e6e5c}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:47Z</created>
-        <last_modified>2015-06-21T12:37:47Z</last_modified>
-        <name locale="en_US">DIODE-</name>
+        <created>2015-08-13T20:22:37Z</created>
+        <last_modified>2015-08-13T20:22:37Z</last_modified>
+        <name locale="en_US">DIODE-_DO41-7.6</name>
         <description locale="en_US">&lt;b>DIODE&lt;/b>
 
 This element was automatically imported from Eagle
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{b2aba97f-2a78-4ce1-a070-fb7d0c480124}" signal="{2b1bc88a-66af-4d12-a243-011dcad5944e}"/>
-        <map pad="{548dfc84-fc59-40df-94dd-cf8abe1a8f0c}" signal="{e9c960fd-ff27-4ec4-a801-43ce63e5fe33}"/>
+        <map signal="{e9c960fd-ff27-4ec4-a801-43ce63e5fe33}" pad="{548dfc84-fc59-40df-94dd-cf8abe1a8f0c}"/>
+        <map signal="{2b1bc88a-66af-4d12-a243-011dcad5944e}" pad="{b2aba97f-2a78-4ce1-a070-fb7d0c480124}"/>
     </pad_signal_map>
 </component>

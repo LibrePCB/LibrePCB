@@ -4,9 +4,9 @@
         <uuid>{9c49f9f9-2c7b-4e72-8802-f8fbfd76c775}</uuid>
         <version>0.1</version>
         <author>LibrePCB</author>
-        <created>2015-06-21T12:37:45Z</created>
-        <last_modified>2015-06-21T12:37:45Z</last_modified>
-        <name locale="en_US">CRYSTAL</name>
+        <created>2015-08-13T20:22:35Z</created>
+        <last_modified>2015-08-13T20:22:35Z</last_modified>
+        <name locale="en_US">CRYSTAL_CTS406</name>
         <description locale="en_US">&lt;b>CRYSTAL&lt;/b>
 
 This element was automatically imported from Eagle
@@ -19,7 +19,7 @@ NOTE: Remove this text after manual rework!</description>
     </meta>
     <categories/>
     <pad_signal_map>
-        <map pad="{844a591f-b816-4704-94b2-32f7f9fb4bac}" signal="{878301c2-bacc-4ffa-923c-ef5b1f06e5fe}"/>
-        <map pad="{dbccdc10-dfb9-4465-90cb-9b0c6c8153ea}" signal="{fd760be8-09ce-411f-a869-fdc1e74229a9}"/>
+        <map signal="{878301c2-bacc-4ffa-923c-ef5b1f06e5fe}" pad="{844a591f-b816-4704-94b2-32f7f9fb4bac}"/>
+        <map signal="{fd760be8-09ce-411f-a869-fdc1e74229a9}" pad="{dbccdc10-dfb9-4465-90cb-9b0c6c8153ea}"/>
     </pad_signal_map>
 </component>
