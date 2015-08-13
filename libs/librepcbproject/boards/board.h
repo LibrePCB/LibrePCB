@@ -92,7 +92,8 @@ class Board final : public QObject, public IF_AttributeProvider,
         const FilePath& getFilePath() const noexcept {return mFilePath;}
         const GridProperties& getGridProperties() const noexcept {return *mGridProperties;}
         bool isEmpty() const noexcept;
-        QList<BI_Base*> getSelectedItems(/*bool floatingPoints,
+        QList<BI_Base*> getSelectedItems(bool footprintPads
+                                         /*bool floatingPoints,
                                          bool attachedPoints,
                                          bool floatingPointsFromFloatingLines,
                                          bool attachedPointsFromFloatingLines,

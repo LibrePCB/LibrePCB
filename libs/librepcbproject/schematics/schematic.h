@@ -111,7 +111,8 @@ class Schematic final : public QObject, public IF_AttributeProvider,
         const FilePath& getFilePath() const noexcept {return mFilePath;}
         const GridProperties& getGridProperties() const noexcept {return *mGridProperties;}
         bool isEmpty() const noexcept;
-        QList<SI_Base*> getSelectedItems(bool floatingPoints,
+        QList<SI_Base*> getSelectedItems(bool symbolPins,
+                                         bool floatingPoints,
                                          bool attachedPoints,
                                          bool floatingPointsFromFloatingLines,
                                          bool attachedPointsFromFloatingLines,

@@ -167,7 +167,8 @@ bool Schematic::isEmpty() const noexcept
     return (mSymbols.isEmpty() && mNetPoints.isEmpty() && mNetLines.isEmpty());
 }
 
-QList<SI_Base*> Schematic::getSelectedItems(bool floatingPoints,
+QList<SI_Base*> Schematic::getSelectedItems(bool symbolPins,
+                                            bool floatingPoints,
                                             bool attachedPoints,
                                             bool floatingPointsFromFloatingLines,
                                             bool attachedPointsFromFloatingLines,
@@ -189,7 +190,7 @@ QList<SI_Base*> Schematic::getSelectedItems(bool floatingPoints,
         foreach (SI_SymbolPin* pin, symbol->getPins())
         {
             // pin
-            if (pin->isSelected())
+            if (pin->isSelected() && symbolPins)
                 list.append(pin);
 
             // attached netpoints & netlines

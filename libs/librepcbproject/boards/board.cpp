@@ -131,7 +131,8 @@ bool Board::isEmpty() const noexcept
     return false;
 }
 
-QList<BI_Base*> Board::getSelectedItems(/*bool floatingPoints,
+QList<BI_Base*> Board::getSelectedItems(bool footprintPads
+                                        /*bool floatingPoints,
                                         bool attachedPoints,
                                         bool floatingPointsFromFloatingLines,
                                         bool attachedPointsFromFloatingLines,
@@ -154,7 +155,7 @@ QList<BI_Base*> Board::getSelectedItems(/*bool floatingPoints,
         // pads
         foreach (BI_FootprintPad* pad, footprint.getPads())
         {
-            if (pad->isSelected())
+            if (pad->isSelected() && footprintPads)
                 list.append(pad);
         }
     }

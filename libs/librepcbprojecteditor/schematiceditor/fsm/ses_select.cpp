@@ -499,7 +499,7 @@ SES_Base::ProcRetVal SES_Select::processSubStateMovingSceneEvent(SEE_Base* event
 bool SES_Select::startMovingSelectedItems(Schematic* schematic) noexcept
 {
     // get all selected items
-    QList<SI_Base*> items = schematic->getSelectedItems(true, false, true, false, false,
+    QList<SI_Base*> items = schematic->getSelectedItems(false, true, false, true, false, false,
                                                         false, false, false, false, false);
 
     // abort if no items are selected
@@ -549,7 +549,7 @@ bool SES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
     Q_ASSERT(schematic); if (!schematic) return false;
 
     // get all selected items
-    QList<SI_Base*> items = schematic->getSelectedItems(true, false, true, false, false,
+    QList<SI_Base*> items = schematic->getSelectedItems(false, true, false, true, false, false,
                                                         false, false, false, false, false);
 
     // abort if no items are selected
@@ -625,7 +625,7 @@ bool SES_Select::removeSelectedItems() noexcept
     Q_ASSERT(schematic); if (!schematic) return false;
 
     // get all selected items
-    QList<SI_Base*> items = schematic->getSelectedItems(true, true, true, true, true, true,
+    QList<SI_Base*> items = schematic->getSelectedItems(false, true, true, true, true, true, true,
                                                         true, true, true, false);
 
     // abort if no items are selected

@@ -343,7 +343,7 @@ BES_Base::ProcRetVal BES_Select::processSubStateMovingSceneEvent(BEE_Base* event
 bool BES_Select::startMovingSelectedItems(Board* board) noexcept
 {
     // get all selected items
-    QList<BI_Base*> items = board->getSelectedItems(/*true, false, true, false, false,
+    QList<BI_Base*> items = board->getSelectedItems(false /*true, false, true, false, false,
                                                     false, false, false, false, false*/);
 
     // abort if no items are selected
@@ -380,7 +380,7 @@ bool BES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
     Q_ASSERT(board); if (!board) return false;
 
     // get all selected items
-    QList<BI_Base*> items = board->getSelectedItems(/*true, false, true, false, false,
+    QList<BI_Base*> items = board->getSelectedItems(false /*true, false, true, false, false,
                                                     false, false, false, false, false*/);
 
     // abort if no items are selected
