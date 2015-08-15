@@ -371,6 +371,8 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneDoubleClick(QGraphicsSceneMous
         QList<BI_Base*> items = board->getItemsAtScenePos(Point::fromPx(mouseEvent->scenePos()));
         if (items.isEmpty()) return PassToParentState;
         // TODO: open the properties editor dialog of the top most item
+        qDebug() << dynamic_cast<BI_Footprint*>(items.first())->getComponentInstance().getGenCompInstance().getUuid();
+        qDebug() << dynamic_cast<BI_Footprint*>(items.first())->getComponentInstance().getLibComponent().getDirectory().toNative();
     }
     return PassToParentState;
 }

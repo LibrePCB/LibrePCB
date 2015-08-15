@@ -407,8 +407,10 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 FootprintPolygon* polygon = new FootprintPolygon();
                 switch (child->getAttribute<uint>("layer"))
                 {
+                    case 20: polygon->setLayerId(BoardLayer::LayerID::BoardOutline); break;
                     case 21: polygon->setLayerId(BoardLayer::LayerID::TopOverlay); break;
                     case 25: polygon->setLayerId(BoardLayer::LayerID::TopOverlayNames); break;
+                    case 27: polygon->setLayerId(BoardLayer::LayerID::TopOverlayValues); break;
                     case 39: polygon->setLayerId(BoardLayer::LayerID::TopDeviceKeepout); break;
                     case 46: polygon->setLayerId(BoardLayer::LayerID::BoardOutline); break; // milling
                     case 48: polygon->setLayerId(BoardLayer::LayerID::TopDeviceOutlines); break; // document
@@ -444,6 +446,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                     case 29: polygon->setLayerId(BoardLayer::LayerID::TopStopMask); break;
                     case 31: polygon->setLayerId(BoardLayer::LayerID::TopPaste); break;
                     case 35: polygon->setLayerId(BoardLayer::LayerID::TopGlue); break;
+                    case 39: polygon->setLayerId(BoardLayer::LayerID::TopDeviceKeepout); break;
                     case 41: polygon->setLayerId(BoardLayer::LayerID::TopCopperRestrict); break;
                     case 42: polygon->setLayerId(BoardLayer::LayerID::BottomCopperRestrict); break;
                     case 43: polygon->setLayerId(BoardLayer::LayerID::ViaRestrict); break;
@@ -685,6 +688,10 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
     try
     {
         QString name = node->getAttribute("name", true);
+
+        // abort if device name ends with "-US"
+        if (name.endsWith("-US")) return false;
+
         QUuid uuid = getOrCreateUuid(outputSettings, filepath, "devices_to_genericcomponents", name);
         QString desc = node->getFirstChild("description", false) ? node->getFirstChild("description", true)->getText() : "";
         desc.append(createDescription(filepath, name));
