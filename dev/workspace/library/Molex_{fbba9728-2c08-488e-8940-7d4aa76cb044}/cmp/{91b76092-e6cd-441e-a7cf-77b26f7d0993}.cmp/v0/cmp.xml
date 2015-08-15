@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{91b76092-e6cd-441e-a7cf-77b26f7d0993}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:40:37Z</created>
+        <last_modified>2015-08-15T21:40:37Z</last_modified>
+        <name locale="en_US">52745-1090</name>
+        <description locale="en_US">&lt;b>FFC/FPC&lt;/b>-to-Board  0.50mm (.020") SMT Top Contact&lt;p>
+Right Angle, ZIF, Style Receptacle 52745 / 52435&lt;br>
+Source: http://www.molex.com/product/ffc/52745.html
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 52745-1090
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{d9136ca1-6068-4674-bb1b-d05ee4d28721}</generic_component>
+        <package>{6b787e29-71b7-4195-b4a5-c0bd9cf8895a}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{e41d7469-8d95-42a5-85f9-7df9fe7d7791}" signal="{adfd5e7f-27a9-4f3f-9788-77637cca63c5}"/>
+        <map pad="{90385df0-9b11-4893-93b5-ebbe879e3530}" signal="{dfa8df04-d65d-4260-918f-ae8d525efbd3}"/>
+        <map pad="{095abefa-c029-4bd3-8163-5dac7023fd4a}" signal="{72440e64-cdbc-4f71-a2d4-a0a47e500b96}"/>
+        <map pad="{606d35fd-721e-4388-9bf3-fb0e873936dd}" signal="{669ff77b-e8af-4364-8645-c3024f21ebb5}"/>
+        <map pad="{bbab4694-abb4-4dc8-bd4f-4ad41e008804}" signal="{9f0e915e-bdc5-424e-967d-73eb7f399388}"/>
+        <map pad="{cb9bef75-a843-4386-a00f-a7ebf3aa38e2}" signal="{cab1276b-c20a-40bf-bcb6-b1b225e5f618}"/>
+        <map pad="{2b589707-9554-4b15-b77e-dd1678a70e1d}" signal="{d81defe1-0fae-4678-93e0-d127c679e71a}"/>
+        <map pad="{c2fc1335-1066-479d-b395-0cc9faad7751}" signal="{7d1a247d-b4bd-47be-a2bd-a05d9f250176}"/>
+        <map pad="{8b41822d-dd9f-44f5-9382-0d5970141f06}" signal="{167e306a-b651-470f-a2d9-fd66bb83c5c3}"/>
+        <map pad="{76ee4d8c-9c9a-4953-a3db-e9b84f364a9e}" signal="{8bfa32e5-4296-497c-ab42-55972d13a0d8}"/>
+    </pad_signal_map>
+</component>

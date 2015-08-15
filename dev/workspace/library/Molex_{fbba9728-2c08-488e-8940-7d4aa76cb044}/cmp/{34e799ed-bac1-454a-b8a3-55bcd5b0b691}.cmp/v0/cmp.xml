@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{34e799ed-bac1-454a-b8a3-55bcd5b0b691}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:40:37Z</created>
+        <last_modified>2015-08-15T21:40:37Z</last_modified>
+        <name locale="en_US">52746-11</name>
+        <description locale="en_US">&lt;b>FPC Connector ZIF for SMT 0.5mm&lt;/b>&lt;p>
+Source: http://www.farnell.com/datasheets/73044.pdf [DWG. NO. (Sheet 1 OF 2) SD-52746-**17]
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 52746-11
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{f6e32c21-619e-493e-87c9-6abfe2ab020b}</generic_component>
+        <package>{04f0ba15-1c62-49c8-b4aa-dca1a6151cf7}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{081cd28f-7c41-40f7-b708-39f1fac0da50}" signal="{3fd02074-cd2c-4255-b7ae-e1b253ee24e3}"/>
+        <map pad="{10508f75-46ad-4d09-b012-b867a89a789d}" signal="{317d8fbf-4eeb-48f7-bda8-13868da1bb1e}"/>
+        <map pad="{5b974c6b-6bed-4843-93a8-e87a5a3007dc}" signal="{3bc88e81-7b7e-4ac0-a13f-f090feb9e716}"/>
+        <map pad="{031aa435-e8ec-489e-ba23-144a3a0d7903}" signal="{aa2fa089-c626-4b9d-b3d3-650993eb4195}"/>
+        <map pad="{635e8a94-9a84-43fe-ae72-6411edbcd51c}" signal="{b1022d39-2d27-4d32-bc9b-e2ac78612d4a}"/>
+        <map pad="{34ef0229-2f6e-45c1-b65b-cce69ba3b84d}" signal="{51a4f549-6fbd-44f3-85d7-45dbd9f75710}"/>
+        <map pad="{0c123c1d-1826-4cf9-a358-6a6a78cdbf12}" signal="{faf14da7-91aa-433e-a338-ea3ff5504585}"/>
+        <map pad="{7c2cd18a-76b1-4f1a-adfa-5c910be672ae}" signal="{b7d7d590-33ec-44cd-a732-2df278475557}"/>
+        <map pad="{7c8e7871-fd0d-40c1-aa6c-6bcba2ef128a}" signal="{8cbb91c2-a089-42f2-854c-d183518e7761}"/>
+        <map pad="{3d8c2e26-5b9d-41b7-8de9-3df5a52c7a72}" signal="{013c8e3c-493d-4fe6-b0b7-470e40720be4}"/>
+        <map pad="{2c3a44bd-b71e-4c08-a40b-ce27e1cfd845}" signal="{98ada8e3-ce78-4ffa-b731-19bd2d7a5551}"/>
+    </pad_signal_map>
+</component>

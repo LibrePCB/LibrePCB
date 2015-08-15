@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{457f89e8-fa88-406f-8a32-2fa5cf8c9b6f}</uuid>
+        <version>0.1</version>
+        <author/>
+        <created/>
+        <last_modified/>
+        <name locale="en_US">5-1,8</name>
+        <description locale="en_US">&lt;b>THROUGH-HOLE PAD&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: wirepad.lbr
+Name: 5-1,8
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"></keywords>
+        <footprint>{b997971a-d0c0-4bd4-bcfb-798174dc9a18}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

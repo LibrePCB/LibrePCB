@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{d6527201-0b43-4ec6-96e1-8dde11a38645}</uuid>
+        <version>0.1</version>
+        <author/>
+        <created/>
+        <last_modified/>
+        <name locale="en_US">SMBJ</name>
+        <description locale="en_US">&lt;b>DO-214AA Modified J_BEND&lt;/b>&lt;p>
+Source: www.rsonline.de .. SMBJ12/C/15/C/24/C/30/C/5.0/C/7.5/C Voltage Suppressor. Data Sheet
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: SMBJ
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"></keywords>
+        <footprint>{836cfc84-54f9-485e-b810-75afe31a59ba}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

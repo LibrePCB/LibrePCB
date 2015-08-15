@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{d31de7ec-c56a-4bd4-bef3-a80e2c7c6d68}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:40:38Z</created>
+        <last_modified>2015-08-15T21:40:38Z</last_modified>
+        <name locale="en_US">52760-0379</name>
+        <description locale="en_US">&lt;b>MOLEX Connector SD-52760-**79&lt;/b>&lt;p>
+Source: 52760-1079_sd molex.pdf
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 52760-0379
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{c06c7aac-0e9a-4d4a-b9b4-0eec425b9d92}</generic_component>
+        <package>{7c5259f8-db51-4c22-85b6-cbb247907d9a}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{f5b2affb-d54b-4b0a-a065-6806bf6dee81}" signal="{99fbe048-10c4-4690-82ae-0c98ab36205f}"/>
+        <map pad="{683fc628-6177-4cf0-87fe-68dd121c24c3}" signal="{9a9ba811-ef60-4ed0-9ea8-3948e6b54a97}"/>
+        <map pad="{4b6e6390-0744-4119-adf3-4e4fed18ee7d}" signal="{d58ceb39-26de-4afe-adf0-e1489e4ba633}"/>
+        <map pad="{ee01e2d2-fbdb-4b9c-9f60-513ba9d663b7}" signal="{fbd65b31-f4ab-48a4-898e-e6cc3b03f708}"/>
+        <map pad="{9bc240fd-63c2-48c2-a490-9dc461223c2f}" signal="{b266fac4-769a-4db3-be3c-0122f2e8f7e1}"/>
+        <map pad="{acd1ad94-91af-4cd8-be3d-cda92ed6077d}" signal="{78b405bc-5893-4b9b-a713-532221466396}"/>
+        <map pad="{26364584-effb-4ae9-bf53-0387c765c7c6}" signal="{3afc69eb-18d7-4f2f-a072-038aa6ae2736}"/>
+        <map pad="{6def8e2b-1f56-4ff6-9338-f4dce867328c}" signal="{4e90d1b1-adc4-481b-b1f5-0fdc15969fc5}"/>
+        <map pad="{6dd93893-0b91-4e06-895b-1a42cc046d9d}" signal="{c3e24f58-aadd-48b2-94ef-3e7eec88a3fe}"/>
+        <map pad="{9709501f-d978-494c-b951-e0d690334470}" signal="{6649fe73-cba7-46fc-9f6f-de516f2c8cac}"/>
+        <map pad="{2de7e337-9b39-4293-837f-9a6fffc398eb}" signal="{b5bbe0fe-8eab-4490-8d28-9b0ae826662e}"/>
+        <map pad="{791f5d66-3f37-409c-9e33-b7b4d7cbfba0}" signal="{e24ef5dd-5072-4818-a4a1-7705fa24cb70}"/>
+        <map pad="{edcccf93-ba44-47b6-bd2e-a5bcedec9c4b}" signal="{892d6936-9b37-4040-952c-151e588a204c}"/>
+        <map pad="{9032165d-0674-404f-bff8-c30805a8a26e}" signal="{7ffd056c-160d-4434-a032-232a472449ba}"/>
+        <map pad="{08154ed1-f7c4-4b0a-b28b-e71424053a66}" signal="{59e52cbd-315b-4599-97cb-8b6f14b708c0}"/>
+        <map pad="{8fb7ee8d-f1da-4f44-a5c3-3ec905c85201}" signal="{b80bf077-e3c7-42b2-9b21-c47b75f9bf76}"/>
+        <map pad="{abff3b4f-c5aa-436d-bf26-5de2283dea17}" signal="{3811f14b-aba1-41f1-ac68-4b98677de364}"/>
+        <map pad="{6ea7ca4e-00b9-475b-a21a-c8e67b9790b5}" signal="{269df0b0-224a-4ce7-9046-e1562697ebd0}"/>
+        <map pad="{528647a8-688d-444b-a93a-264156c15c6c}" signal="{33ece392-fdf3-4f78-ab2b-826b62eb6300}"/>
+        <map pad="{72740a43-b40f-4c6c-828c-e71c9288fe45}" signal="{1bd4c42e-1d8e-4096-ae70-5d774a776fae}"/>
+        <map pad="{550733ae-21a6-4556-bbdf-e609fa31d96e}" signal="{f69f7459-ab5d-4c28-b868-ed6a05128322}"/>
+        <map pad="{9c9e6e1a-31fe-40d6-b653-20dff67b9a50}" signal="{6c21d6ec-188a-4a4e-80e7-5b043ea04754}"/>
+        <map pad="{f777054f-89a9-4d3d-a927-0277efaca621}" signal="{731a7770-fb26-464a-bcc6-a0e89258f021}"/>
+        <map pad="{15a0fb77-134e-4d08-b0e0-2c486935b9de}" signal="{764475cc-834d-465c-a785-bc9b3168b848}"/>
+        <map pad="{4b6ffd9f-85a1-4208-9529-f2d024d609bd}" signal="{a091be8b-bda6-4a35-b6e6-2d8556e096a5}"/>
+        <map pad="{3d92fbfa-01c4-4423-b6bf-7cba232f9f29}" signal="{25a5a30a-11b7-4711-8b22-81e95a98d05f}"/>
+        <map pad="{309e6831-95d7-4b1b-86e5-d82ac12b3d4d}" signal="{e459650c-7927-4fda-b38b-aa3ca700a3c4}"/>
+        <map pad="{c66168ec-0f0f-4abd-99e4-881f00c580e6}" signal="{897c1f2f-71a0-4384-9ff7-24a8ce5e5d5e}"/>
+        <map pad="{1e134563-0ea5-46a4-90e7-8ce5735ad409}" signal="{fab19fcd-8757-45ff-9e8e-b83027eae98c}"/>
+        <map pad="{2e52e9db-0455-4fa9-8fa0-4fe7a4547c1c}" signal="{183ccad8-4607-458f-ba13-76d2b59f4d50}"/>
+    </pad_signal_map>
+</component>

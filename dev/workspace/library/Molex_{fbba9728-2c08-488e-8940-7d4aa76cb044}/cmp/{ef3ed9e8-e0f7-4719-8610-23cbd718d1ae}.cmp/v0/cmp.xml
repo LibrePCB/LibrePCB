@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{ef3ed9e8-e0f7-4719-8610-23cbd718d1ae}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:40:36Z</created>
+        <last_modified>2015-08-15T21:40:36Z</last_modified>
+        <name locale="en_US">22-23-2021</name>
+        <description locale="en_US">.100" (2.54mm) Center Header - 2 Pin
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 22-23-2021
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{6b448961-e7ab-4b11-96d3-2a40bad6d1d3}</generic_component>
+        <package>{de085226-5473-4dcc-9262-598727dd71b4}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{af305134-95ac-4bb5-8645-b4e14c975ed0}" signal="{8eaa7339-3623-4cfd-b6d7-8dc1dd8c096a}"/>
+        <map pad="{80704cbb-f709-4db9-ab93-7c90e872c4eb}" signal="{59a574d8-9aaa-4f73-9bff-f90ca624fa08}"/>
+    </pad_signal_map>
+</component>

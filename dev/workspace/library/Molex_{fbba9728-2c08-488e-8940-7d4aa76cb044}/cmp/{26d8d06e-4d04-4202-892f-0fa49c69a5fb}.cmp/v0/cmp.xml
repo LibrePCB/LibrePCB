@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{26d8d06e-4d04-4202-892f-0fa49c69a5fb}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:40:35Z</created>
+        <last_modified>2015-08-15T21:40:35Z</last_modified>
+        <name locale="en_US">DVI-D-R</name>
+        <description locale="en_US">&lt;b>CONNECTOR&lt;/b>&lt;p>
+MiroCross(TM)-DVI i/0 plug and receptacle connector system (scart)
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: DVI-D-R
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{f6e2a3b1-9f15-44a8-bf89-6b09d6c206d5}</generic_component>
+        <package>{01d74c86-4137-474a-a02f-185ca8a65d24}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{0c443352-6110-420c-8a7b-30876b48958a}" signal="{0f0321f2-a70b-486c-ae5f-9f6423baee02}"/>
+        <map pad="{1c72902f-65f8-424a-a094-598f2c8bf2e5}" signal="{b2ed8bb2-e532-447c-a9f1-b40626730d1c}"/>
+        <map pad="{0e30cf00-2f8a-4a11-b66b-5c0ea315bd23}" signal="{9b895923-6156-4985-b983-e01f51e6f0f9}"/>
+        <map pad="{6fd45a93-9177-4187-8a67-9952f8524455}" signal="{a8910152-0643-4030-b9e3-4752c26078d5}"/>
+        <map pad="{b17b548a-4b37-46c6-9dc1-198b540e5837}" signal="{c5535543-1373-4430-b0a0-d7e53a01b15e}"/>
+        <map pad="{5e32d2a8-258a-465b-bc04-6200e8124194}" signal="{bfaedf76-d44f-44d3-9afd-a01c1e7256e1}"/>
+        <map pad="{b5976680-7692-4120-99f9-204424f10f47}" signal="{e2fd0d14-5f2d-4fff-a322-f6e73df829aa}"/>
+        <map pad="{62a6f9ad-72e2-4d11-b3df-d1c044b63f30}" signal="{52c49ef3-4d25-4b92-a44b-7c98341ebe67}"/>
+        <map pad="{f3609ac1-a66a-4bf4-8aee-1d0d5e23e7ce}" signal="{6b444abe-7520-4cb6-aeea-f794145e2c39}"/>
+        <map pad="{b694b73d-0da3-4a73-b562-82ecf358e32a}" signal="{0aeaaf90-ee6a-48e5-b4af-7c0cb4a2c4b7}"/>
+        <map pad="{dcdd35e5-e4e0-489a-ae7e-37fbc2867e6e}" signal="{5998a7ed-9d39-4ad8-9262-fe43b89f97a5}"/>
+        <map pad="{53552cfb-3c6c-4768-986c-94d194d44e76}" signal="{e65dcd19-902f-4da7-99df-d614f9b09e9a}"/>
+        <map pad="{0b0a995f-ef8d-41cf-b261-f046c2425420}" signal="{6aaba73d-325b-41e0-aafb-618202455ab5}"/>
+        <map pad="{9210dd1b-381a-4a62-9421-44cb89a93df8}" signal="{a1ed8289-92fc-4e13-a609-4be055ad0834}"/>
+        <map pad="{b8fa5e9f-a8ce-4749-8556-80f7f0b38001}" signal="{d8f51239-f5c4-401a-92a2-a95f6d887f97}"/>
+        <map pad="{c9aebe61-f5eb-428a-baec-031104580b63}" signal="{9358c534-34c8-458a-bb1b-97199eef1a7d}"/>
+        <map pad="{89d4cbcb-59f9-4a3d-8840-34e2ba3752b1}" signal="{264556fc-a1ed-4784-a786-a553af9cd9a5}"/>
+        <map pad="{bf1d6667-6cd7-4c6d-a8c3-3cba22f04979}" signal="{088f75f3-e060-4c81-b657-0e82aa134fb6}"/>
+        <map pad="{929d0f43-0d6f-4c8e-993f-6d8ee3665543}" signal="{323d044a-b89a-4f40-9f8d-14251355e3b4}"/>
+        <map pad="{6693cd79-e2b0-4383-9546-20c228694324}" signal="{ec3aab77-8c0d-4f2c-a64f-8500d9b251a5}"/>
+        <map pad="{f6a507b2-a26e-484d-b76b-44d3d124dc40}" signal="{59fa247d-5aa0-49a0-b349-71c7a1d36058}"/>
+        <map pad="{857c1901-42db-4956-9e48-5283b6e2a38c}" signal="{c276d9bd-60f7-4fdc-a97f-8e96871c9133}"/>
+        <map pad="{56c17d66-77a3-4d90-89ae-406685e8edc0}" signal="{c84a4e68-1b6c-4e71-ac52-c71dd6b6d396}"/>
+        <map pad="{9c9145d8-0a51-40b5-ae0e-9e08b9daf37a}" signal="{8a71ccb5-4b31-42d1-8c29-7e54ec1c6285}"/>
+    </pad_signal_map>
+</component>

@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{06c82f95-117c-486f-a57a-8048ce714d29}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:40:36Z</created>
+        <last_modified>2015-08-15T21:40:36Z</last_modified>
+        <name locale="en_US">22-?-05_05-7058</name>
+        <description locale="en_US">&lt;b>CONNECTOR&lt;/b>&lt;p>
+wire to board 2.54 mm (.1 inch) pitch header
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 22-?-05
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{d4b12a36-de23-4ed7-9b01-e3a20883ec20}</generic_component>
+        <package>{4efc52a5-0674-4707-a139-0ab79ce5c4cf}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{15084ce7-5718-4585-ad1e-854ab60b3876}" signal="{842f3f48-4a6f-4902-90e7-bb80008edf82}"/>
+        <map pad="{a7b7d989-611c-41f8-8cc1-d9c411adf8ed}" signal="{801d5f71-243f-4c31-91a2-a5516e812b8c}"/>
+        <map pad="{ae893f51-348d-48e3-8321-c965a885517f}" signal="{9517f92f-3782-4fd6-8865-a4e642d39da3}"/>
+        <map pad="{1e75ac88-9db6-4984-b17c-7b6f11ac3673}" signal="{7886c807-39de-49bb-9042-29c728b9749b}"/>
+        <map pad="{37984251-0368-4cd1-9bc0-bfd05e8a2eba}" signal="{1179638e-46dd-4c20-9e94-b110455e017f}"/>
+    </pad_signal_map>
+</component>

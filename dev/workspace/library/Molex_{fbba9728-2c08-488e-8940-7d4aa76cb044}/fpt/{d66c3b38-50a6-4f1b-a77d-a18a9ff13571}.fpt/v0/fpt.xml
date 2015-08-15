@@ -1,0 +1,341 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{d66c3b38-50a6-4f1b-a77d-a18a9ff13571}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:38:41Z</created>
+        <last_modified>2015-08-15T21:38:41Z</last_modified>
+        <name locale="en_US">6410-11</name>
+        <description locale="en_US">&lt;b>MOLEX 2.54mm KK  CONNECTOR&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 6410-11
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" start_x="-12.700000" start_y="2.540000" layer="260" fill="false" width="0.127000">
+            <segment end_x="-12.700000" end_y="2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-13.970000" start_y="0.000000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-13.970000" end_y="2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-13.970000" start_y="2.921000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-12.700000" end_y="2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-12.700000" start_y="2.921000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-12.446000" end_y="2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-12.446000" start_y="2.921000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-7.620000" end_y="2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-7.620000" start_y="2.921000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-6.350000" end_y="2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="13.970000" start_y="0.000000" layer="260" fill="false" width="0.254000">
+            <segment end_x="13.970000" end_y="2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="13.970000" start_y="2.921000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-6.350000" end_y="2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-13.970000" start_y="0.000000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-13.970000" end_y="-2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-13.970000" start_y="-2.921000" layer="260" fill="false" width="0.127000">
+            <segment end_x="-9.017000" end_y="-2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="13.970000" start_y="0.000000" layer="260" fill="false" width="0.254000">
+            <segment end_x="13.970000" end_y="-2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="13.970000" start_y="-2.921000" layer="260" fill="false" width="0.127000">
+            <segment end_x="-9.017000" end_y="-2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-13.716000" start_y="-2.921000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-13.335000" end_y="-2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-12.065000" start_y="-2.921000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-13.335000" end_y="-2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-13.335000" start_y="-2.921000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-13.335000" end_y="-2.286000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-13.335000" start_y="-2.286000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-12.065000" end_y="-2.286000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-12.065000" start_y="-2.286000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-12.065000" end_y="-2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-12.065000" start_y="-2.921000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-10.795000" end_y="-2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-10.795000" start_y="-2.921000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-10.795000" end_y="-2.286000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-10.795000" start_y="-2.286000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-9.525000" end_y="-2.286000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-9.525000" start_y="-2.286000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-9.525000" end_y="-2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-9.525000" start_y="-2.921000" layer="260" fill="false" width="0.254000">
+            <segment end_x="6.985000" end_y="-2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="6.985000" start_y="-2.921000" layer="260" fill="false" width="0.254000">
+            <segment end_x="6.985000" end_y="-2.286000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="6.985000" start_y="-2.286000" layer="260" fill="false" width="0.254000">
+            <segment end_x="8.255000" end_y="-2.286000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="8.255000" start_y="-2.286000" layer="260" fill="false" width="0.254000">
+            <segment end_x="8.255000" end_y="-2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="8.255000" start_y="-2.921000" layer="260" fill="false" width="0.254000">
+            <segment end_x="9.525000" end_y="-2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="9.525000" start_y="-2.921000" layer="260" fill="false" width="0.254000">
+            <segment end_x="9.525000" end_y="-2.286000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="9.525000" start_y="-2.286000" layer="260" fill="false" width="0.254000">
+            <segment end_x="10.795000" end_y="-2.286000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="10.795000" start_y="-2.286000" layer="260" fill="false" width="0.254000">
+            <segment end_x="10.795000" end_y="-2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="10.795000" start_y="-2.921000" layer="260" fill="false" width="0.254000">
+            <segment end_x="12.065000" end_y="-2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="12.065000" start_y="-2.921000" layer="260" fill="false" width="0.254000">
+            <segment end_x="12.065000" end_y="-2.286000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="12.065000" start_y="-2.286000" layer="260" fill="false" width="0.254000">
+            <segment end_x="13.335000" end_y="-2.286000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="13.335000" start_y="-2.286000" layer="260" fill="false" width="0.254000">
+            <segment end_x="13.335000" end_y="-2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="13.335000" start_y="-2.921000" layer="260" fill="false" width="0.254000">
+            <segment end_x="13.970000" end_y="-2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-12.700000" start_y="1.905000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-12.700000" end_y="2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-12.700000" start_y="1.905000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-12.446000" end_y="1.905000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-12.446000" start_y="1.905000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-7.620000" end_y="1.905000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-7.620000" start_y="1.905000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-7.620000" end_y="2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="7.620000" start_y="1.905000" layer="260" fill="false" width="0.254000">
+            <segment end_x="7.620000" end_y="2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="7.620000" start_y="1.905000" layer="260" fill="false" width="0.254000">
+            <segment end_x="12.446000" end_y="1.905000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="12.446000" start_y="1.905000" layer="260" fill="false" width="0.254000">
+            <segment end_x="12.700000" end_y="1.905000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="12.700000" start_y="1.905000" layer="260" fill="false" width="0.254000">
+            <segment end_x="12.700000" end_y="2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-12.700000" start_y="1.905000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-12.446000" end_y="1.397000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-12.446000" start_y="1.397000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-7.874000" end_y="1.397000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-7.874000" start_y="1.397000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-7.620000" end_y="1.905000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-12.446000" start_y="2.921000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-12.446000" end_y="1.905000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="7.620000" start_y="1.905000" layer="260" fill="false" width="0.254000">
+            <segment end_x="7.874000" end_y="1.397000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="7.874000" start_y="1.397000" layer="260" fill="false" width="0.254000">
+            <segment end_x="12.446000" end_y="1.397000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="12.446000" start_y="1.397000" layer="260" fill="false" width="0.254000">
+            <segment end_x="12.700000" end_y="1.905000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="12.446000" start_y="2.921000" layer="260" fill="false" width="0.254000">
+            <segment end_x="12.446000" end_y="1.905000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-8.255000" start_y="-2.921000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-8.255000" end_y="-2.286000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-8.255000" start_y="-2.286000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-6.985000" end_y="-2.286000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-6.985000" start_y="-2.286000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-6.985000" end_y="-2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="4.445000" start_y="-2.921000" layer="260" fill="false" width="0.254000">
+            <segment end_x="4.445000" end_y="-2.286000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="4.445000" start_y="-2.286000" layer="260" fill="false" width="0.254000">
+            <segment end_x="5.715000" end_y="-2.286000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="5.715000" start_y="-2.286000" layer="260" fill="false" width="0.254000">
+            <segment end_x="5.715000" end_y="-2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-5.715000" start_y="-2.921000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-5.715000" end_y="-2.286000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-5.715000" start_y="-2.286000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-4.445000" end_y="-2.286000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-4.445000" start_y="-2.286000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-4.445000" end_y="-2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="1.905000" start_y="-2.921000" layer="260" fill="false" width="0.254000">
+            <segment end_x="1.905000" end_y="-2.286000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="1.905000" start_y="-2.286000" layer="260" fill="false" width="0.254000">
+            <segment end_x="3.175000" end_y="-2.286000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="3.175000" start_y="-2.286000" layer="260" fill="false" width="0.254000">
+            <segment end_x="3.175000" end_y="-2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-3.175000" start_y="-2.921000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-3.175000" end_y="-2.286000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-3.175000" start_y="-2.286000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-1.905000" end_y="-2.286000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-1.905000" start_y="-2.286000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-1.905000" end_y="-2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-0.635000" start_y="-2.921000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-0.635000" end_y="-2.286000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-0.635000" start_y="-2.286000" layer="260" fill="false" width="0.254000">
+            <segment end_x="0.635000" end_y="-2.286000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="0.635000" start_y="-2.286000" layer="260" fill="false" width="0.254000">
+            <segment end_x="0.635000" end_y="-2.921000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-12.954000" start_y="-0.254000" layer="200" fill="true" width="0.000000">
+            <segment end_x="-12.446000" end_y="-0.254000" angle="0.000000"/>
+            <segment end_x="-12.446000" end_y="0.254000" angle="0.000000"/>
+            <segment end_x="-12.954000" end_y="0.254000" angle="0.000000"/>
+            <segment end_x="-12.954000" end_y="-0.254000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-10.414000" start_y="-0.254000" layer="200" fill="true" width="0.000000">
+            <segment end_x="-9.906000" end_y="-0.254000" angle="0.000000"/>
+            <segment end_x="-9.906000" end_y="0.254000" angle="0.000000"/>
+            <segment end_x="-10.414000" end_y="0.254000" angle="0.000000"/>
+            <segment end_x="-10.414000" end_y="-0.254000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="7.366000" start_y="-0.254000" layer="200" fill="true" width="0.000000">
+            <segment end_x="7.874000" end_y="-0.254000" angle="0.000000"/>
+            <segment end_x="7.874000" end_y="0.254000" angle="0.000000"/>
+            <segment end_x="7.366000" end_y="0.254000" angle="0.000000"/>
+            <segment end_x="7.366000" end_y="-0.254000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="9.906000" start_y="-0.254000" layer="200" fill="true" width="0.000000">
+            <segment end_x="10.414000" end_y="-0.254000" angle="0.000000"/>
+            <segment end_x="10.414000" end_y="0.254000" angle="0.000000"/>
+            <segment end_x="9.906000" end_y="0.254000" angle="0.000000"/>
+            <segment end_x="9.906000" end_y="-0.254000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="12.446000" start_y="-0.254000" layer="200" fill="true" width="0.000000">
+            <segment end_x="12.954000" end_y="-0.254000" angle="0.000000"/>
+            <segment end_x="12.954000" end_y="0.254000" angle="0.000000"/>
+            <segment end_x="12.446000" end_y="0.254000" angle="0.000000"/>
+            <segment end_x="12.446000" end_y="-0.254000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-7.874000" start_y="-0.254000" layer="200" fill="true" width="0.000000">
+            <segment end_x="-7.366000" end_y="-0.254000" angle="0.000000"/>
+            <segment end_x="-7.366000" end_y="0.254000" angle="0.000000"/>
+            <segment end_x="-7.874000" end_y="0.254000" angle="0.000000"/>
+            <segment end_x="-7.874000" end_y="-0.254000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="4.826000" start_y="-0.254000" layer="200" fill="true" width="0.000000">
+            <segment end_x="5.334000" end_y="-0.254000" angle="0.000000"/>
+            <segment end_x="5.334000" end_y="0.254000" angle="0.000000"/>
+            <segment end_x="4.826000" end_y="0.254000" angle="0.000000"/>
+            <segment end_x="4.826000" end_y="-0.254000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="2.286000" start_y="-0.254000" layer="200" fill="true" width="0.000000">
+            <segment end_x="2.794000" end_y="-0.254000" angle="0.000000"/>
+            <segment end_x="2.794000" end_y="0.254000" angle="0.000000"/>
+            <segment end_x="2.286000" end_y="0.254000" angle="0.000000"/>
+            <segment end_x="2.286000" end_y="-0.254000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-5.334000" start_y="-0.254000" layer="200" fill="true" width="0.000000">
+            <segment end_x="-4.826000" end_y="-0.254000" angle="0.000000"/>
+            <segment end_x="-4.826000" end_y="0.254000" angle="0.000000"/>
+            <segment end_x="-5.334000" end_y="0.254000" angle="0.000000"/>
+            <segment end_x="-5.334000" end_y="-0.254000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-2.794000" start_y="-0.254000" layer="200" fill="true" width="0.000000">
+            <segment end_x="-2.286000" end_y="-0.254000" angle="0.000000"/>
+            <segment end_x="-2.286000" end_y="0.254000" angle="0.000000"/>
+            <segment end_x="-2.794000" end_y="0.254000" angle="0.000000"/>
+            <segment end_x="-2.794000" end_y="-0.254000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-0.254000" start_y="-0.254000" layer="200" fill="true" width="0.000000">
+            <segment end_x="0.254000" end_y="-0.254000" angle="0.000000"/>
+            <segment end_x="0.254000" end_y="0.254000" angle="0.000000"/>
+            <segment end_x="-0.254000" end_y="0.254000" angle="0.000000"/>
+            <segment end_x="-0.254000" end_y="-0.254000" angle="0.000000"/>
+        </polygon>
+        <text x="-13.943100" layer="240" y="-4.725900" rotation="0.000000" h_align="left" text="${CMP::NAME}" height="2.500000" v_align="bottom"/>
+        <text x="14.451100" layer="260" y="-0.484100" rotation="0.000000" h_align="left" text="1" height="2.540000" v_align="bottom"/>
+        <text x="-15.774900" layer="260" y="-0.687300" rotation="0.000000" h_align="left" text="11" height="2.540000" v_align="bottom"/>
+        <text x="7.011900" layer="250" y="-4.725900" rotation="0.000000" h_align="left" text="${CMP::VALUE}" height="2.000000" v_align="bottom"/>
+    </geometry>
+    <pads>
+        <pad uuid="{c51a369b-0d6d-4d64-a517-202ac79eecb2}" x="-12.700000" y="0.000000" layer="0" rotation="90.000000" height="2.032000" width="4.064000" type="tht_round" drill="1.016000">
+            <name locale="en_US">11</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{d964de0b-d3a0-4c5b-8c2f-e2bd2bbdc32c}" x="7.620000" y="0.000000" layer="0" rotation="90.000000" height="2.032000" width="4.064000" type="tht_round" drill="1.016000">
+            <name locale="en_US">3</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{40b0fdda-775a-4dd6-a001-085aef8ab58f}" x="12.700000" y="0.000000" layer="0" rotation="90.000000" height="2.032000" width="4.064000" type="tht_round" drill="1.016000">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{6ede1f41-848a-4476-bf36-39eb431b82d3}" x="2.540000" y="0.000000" layer="0" rotation="90.000000" height="2.032000" width="4.064000" type="tht_round" drill="1.016000">
+            <name locale="en_US">5</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{e2b32545-9e89-4216-b19e-ae4b2e3cd14d}" x="-2.540000" y="0.000000" layer="0" rotation="90.000000" height="2.032000" width="4.064000" type="tht_round" drill="1.016000">
+            <name locale="en_US">7</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{8d01b4d6-463c-4cd6-9c57-bfef1418db23}" x="-5.080000" y="0.000000" layer="0" rotation="90.000000" height="2.032000" width="4.064000" type="tht_round" drill="1.016000">
+            <name locale="en_US">8</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{0bbbbe13-4bbb-4e41-a030-282561fa8188}" x="0.000000" y="0.000000" layer="0" rotation="90.000000" height="2.032000" width="4.064000" type="tht_round" drill="1.016000">
+            <name locale="en_US">6</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{3f0fa17a-121e-41ee-a145-a2c102202e6d}" x="5.080000" y="0.000000" layer="0" rotation="90.000000" height="2.032000" width="4.064000" type="tht_round" drill="1.016000">
+            <name locale="en_US">4</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{d2e3064e-a1f0-4c92-b5db-dc5552f7c353}" x="10.160000" y="0.000000" layer="0" rotation="90.000000" height="2.032000" width="4.064000" type="tht_round" drill="1.016000">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{baae4a70-4d8a-4ee7-a33b-13a8126b9c4c}" x="-10.160000" y="0.000000" layer="0" rotation="90.000000" height="2.032000" width="4.064000" type="tht_round" drill="1.016000">
+            <name locale="en_US">10</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{45b81ec9-cc95-4fae-b0d9-f70a4e5c4e3a}" x="-7.620000" y="0.000000" layer="0" rotation="90.000000" height="2.032000" width="4.064000" type="tht_round" drill="1.016000">
+            <name locale="en_US">9</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{a82fff8f-a67f-4fd4-99ff-8bffd4907d57}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T20:06:05Z</created>
+        <last_modified>2015-08-15T20:06:05Z</last_modified>
+        <name locale="en_US">SMS-REF</name>
+        <description locale="en_US">
+
+This element was automatically imported from Eagle
+Filepath: isabellen.lbr
+Name: SMS-REF
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{256ce0f6-42b4-43cf-9eba-0f637e394866}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

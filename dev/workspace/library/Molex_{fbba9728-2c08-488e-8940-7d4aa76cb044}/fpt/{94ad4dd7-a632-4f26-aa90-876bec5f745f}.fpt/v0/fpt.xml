@@ -1,0 +1,709 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{94ad4dd7-a632-4f26-aa90-876bec5f745f}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:38:44Z</created>
+        <last_modified>2015-08-15T21:38:44Z</last_modified>
+        <name locale="en_US">44520-0003</name>
+        <description locale="en_US">&lt;b>STACKED MODULAR JACK CATEGORY 5&lt;/b>&lt;p>
+Source: http://www.molex.com/pdm_docs/sd/445200006_sd.pdf
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 44520-0003
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" start_x="-59.105800" start_y="-4.368800" layer="260" fill="false" width="0.203200">
+            <segment end_x="-57.785000" end_y="-10.668000" angle="34.851760"/>
+        </polygon>
+        <polygon grab_area="true" start_x="57.785000" start_y="-10.668000" layer="260" fill="false" width="0.203200">
+            <segment end_x="59.105800" end_y="-4.368800" angle="33.083175"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-50.800000" start_y="-8.890000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-49.784000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-49.784000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-48.006000" end_y="-2.540000" angle="-157.206669"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-48.006000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-46.990000" end_y="-8.890000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-50.165000" start_y="-8.890000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-49.149000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-48.641000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-47.625000" end_y="-8.890000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-49.149000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-48.641000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-36.830000" start_y="-8.890000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-35.814000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-35.814000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-34.036000" end_y="-2.540000" angle="-157.206669"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-34.036000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-33.020000" end_y="-8.890000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-36.195000" start_y="-8.890000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-35.179000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-34.671000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-33.655000" end_y="-8.890000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-35.179000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-34.671000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-22.860000" start_y="-8.890000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-21.844000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-21.844000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-20.066000" end_y="-2.540000" angle="-157.206669"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-20.066000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-19.050000" end_y="-8.890000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-22.225000" start_y="-8.890000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-21.209000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-20.701000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-19.685000" end_y="-8.890000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-21.209000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-20.701000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-8.890000" start_y="-8.890000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-7.874000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-7.874000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-6.096000" end_y="-2.540000" angle="-157.206669"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-6.096000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-5.080000" end_y="-8.890000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-8.255000" start_y="-8.890000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-7.239000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-6.731000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-5.715000" end_y="-8.890000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-7.239000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-6.731000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="5.080000" start_y="-8.890000" layer="260" fill="false" width="0.203200">
+            <segment end_x="6.096000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="6.096000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="7.874000" end_y="-2.540000" angle="-157.206669"/>
+        </polygon>
+        <polygon grab_area="true" start_x="7.874000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="8.890000" end_y="-8.890000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="5.715000" start_y="-8.890000" layer="260" fill="false" width="0.203200">
+            <segment end_x="6.731000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="7.239000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="8.255000" end_y="-8.890000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="6.731000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="7.239000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="19.050000" start_y="-8.890000" layer="260" fill="false" width="0.203200">
+            <segment end_x="20.066000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="20.066000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="21.844000" end_y="-2.540000" angle="-157.206669"/>
+        </polygon>
+        <polygon grab_area="true" start_x="21.844000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="22.860000" end_y="-8.890000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="19.685000" start_y="-8.890000" layer="260" fill="false" width="0.203200">
+            <segment end_x="20.701000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="21.209000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="22.225000" end_y="-8.890000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="20.701000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="21.209000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="33.020000" start_y="-8.890000" layer="260" fill="false" width="0.203200">
+            <segment end_x="34.036000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="34.036000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="35.814000" end_y="-2.540000" angle="-157.206669"/>
+        </polygon>
+        <polygon grab_area="true" start_x="35.814000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="36.830000" end_y="-8.890000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="33.655000" start_y="-8.890000" layer="260" fill="false" width="0.203200">
+            <segment end_x="34.671000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="35.179000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="36.195000" end_y="-8.890000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="34.671000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="35.179000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="46.990000" start_y="-8.890000" layer="260" fill="false" width="0.203200">
+            <segment end_x="48.006000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="48.006000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="49.784000" end_y="-2.540000" angle="-157.206669"/>
+        </polygon>
+        <polygon grab_area="true" start_x="49.784000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="50.800000" end_y="-8.890000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="47.625000" start_y="-8.890000" layer="260" fill="false" width="0.203200">
+            <segment end_x="48.641000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="49.149000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="50.165000" end_y="-8.890000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="48.641000" start_y="-2.540000" layer="260" fill="false" width="0.203200">
+            <segment end_x="49.149000" end_y="-2.540000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-57.785000" start_y="-10.668000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-57.785000" end_y="16.764000" angle="0.000000"/>
+            <segment end_x="57.785000" end_y="16.764000" angle="0.000000"/>
+            <segment end_x="57.785000" end_y="-10.668000" angle="0.000000"/>
+            <segment end_x="-57.785000" end_y="-10.668000" angle="0.000000"/>
+        </polygon>
+        <text x="-57.150000" layer="240" y="17.780000" rotation="0.000000" h_align="left" text="${CMP::NAME}" height="2.500000" v_align="bottom"/>
+        <text x="-45.720000" layer="250" y="1.270000" rotation="0.000000" h_align="left" text="${CMP::VALUE}" height="2.000000" v_align="bottom"/>
+        <hole x="-57.404000" y="-4.572000" diameter="1.574800"/>
+        <hole x="54.610000" y="0.000000" diameter="3.251200"/>
+        <hole x="-56.769000" y="9.144000" diameter="1.574800"/>
+        <hole x="-57.404000" y="15.494000" diameter="1.574800"/>
+        <hole x="-41.275000" y="16.764000" diameter="1.574800"/>
+        <hole x="-27.305000" y="16.764000" diameter="1.574800"/>
+        <hole x="-13.335000" y="16.764000" diameter="1.574800"/>
+        <hole x="0.635000" y="16.764000" diameter="1.574800"/>
+        <hole x="14.605000" y="16.764000" diameter="1.574800"/>
+        <hole x="28.575000" y="16.764000" diameter="1.574800"/>
+        <hole x="42.545000" y="16.764000" diameter="1.574800"/>
+        <hole x="0.000000" y="0.000000" diameter="3.251200"/>
+        <hole x="56.769000" y="5.842000" diameter="1.574800"/>
+        <hole x="57.404000" y="11.430000" diameter="1.574800"/>
+        <hole x="-54.610000" y="0.000000" diameter="3.251200"/>
+    </geometry>
+    <pads>
+        <pad uuid="{462c0be2-7ffc-497f-8742-f7efe428ff98}" x="-20.320000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">C2-4</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{99c76947-fcc3-41f6-8836-2cbb3a924cad}" x="-50.800000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">A1-3</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{d5de6cc2-8df0-4b86-adf3-8c952258d865}" x="-52.070000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">A2-7</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{00b59e15-1ce3-4e24-92f8-c24599a9ae10}" x="-21.590000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">C1-4</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{97416280-b21b-48e5-a931-724a50a073e0}" x="48.260000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">H2-5</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{d4baaa71-9d1f-41f4-8931-3db81eae77d7}" x="22.860000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">F1-6</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{6056fc0c-61f7-44ed-a6d1-4b4369793fd6}" x="-49.530000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">A1-4</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{16d61891-5e24-4bee-8cd4-02fe771829d9}" x="-52.070000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">A1-2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{f103b8f3-1c66-4b9c-8711-870dcd744545}" x="7.620000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">E2-4</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{db2da146-27f6-4944-9c59-f040ca57d3e9}" x="50.800000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">H1-6</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{199f437f-139e-45ec-b4f0-afe2ae175832}" x="-16.510000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">C2-1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{a9b8a94c-896d-47e8-b04e-23e9c360a2df}" x="-49.530000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">A2-5</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{2e75bb27-6021-4da5-875c-2997fec743de}" x="35.560000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">G1-5</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{20d82ff7-33b8-4852-aaed-0315dba6c24b}" x="17.780000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">F2-7</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{781f9ddb-7841-4a0d-94e8-c41890a465a7}" x="-31.750000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">B1-7</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{b6b698c0-ab9b-4eae-af28-e429446c6885}" x="-22.860000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">C1-3</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{845c7c9c-0132-4068-ada1-d77a65a464b8}" x="3.810000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">E2-7</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{c92cd6a8-4cab-44ea-bf92-06d4ccf2add4}" x="-50.800000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">A2-6</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{a54c7d1c-87a9-4aff-9ba2-d800c4118099}" x="-21.590000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">C2-5</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{f41601cf-8d0f-4a34-9db3-cbea7bfe5a9b}" x="8.890000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">E2-3</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{d5106a45-bd0d-4652-812a-767159d64825}" x="-10.160000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">D1-2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{bb23682d-ee31-4615-8886-6c1d62c0c6cf}" x="52.070000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">H2-2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{c78a5062-ed49-4227-83fc-22f04cf8a7a6}" x="-5.080000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">D1-6</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{8960235c-02c2-48dd-9e38-28d02c0d53f0}" x="8.890000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">E1-6</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{080a7f35-244b-4db0-9d3e-0fac30241c5e}" x="53.340000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">H1-8</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{3a2dd8e0-e947-4e22-9e90-09a8f834d2b9}" x="-6.350000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">D2-4</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{d2816e77-5d62-4529-b405-b4dd4e42539d}" x="-45.720000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">A2-2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{7e7b430b-7f6e-432a-a9b8-22686ac9d104}" x="39.370000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">G1-8</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{62a354ae-73aa-4da7-b889-ae06b9d3c3a0}" x="52.070000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">H1-7</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{22f30f47-9ad5-41c8-bc9a-d416902562d5}" x="-30.480000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">B1-8</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{8e8dfd52-ad73-4b14-aeee-8cba0649573c}" x="30.480000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">G2-8</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{5f9bc20d-077f-4ff0-a7b7-3670ce89c607}" x="-25.400000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">C1-1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{e427d0af-8b73-4b70-bedc-d27c3d96f7ca}" x="50.800000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">H2-3</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{96957bde-1221-4c8e-a776-41e1d091e7ee}" x="49.530000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">H2-4</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{2f47bafc-cc67-4da0-8c2d-bc1e065de903}" x="10.160000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">E2-2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{5713d4bc-3e0c-4443-aa18-99f39043fd59}" x="35.560000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">G2-4</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{cb598357-57f8-4edf-a31b-6a73e2e54894}" x="22.860000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">F2-3</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{5b8fe0b8-e3b0-4145-acf6-57dd288bb499}" x="6.350000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">E1-4</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{4bee8020-fbdd-4398-ac8d-4749d690f8fa}" x="-44.450000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">A1-8</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{51c0d4d3-a243-4c13-954c-ae671b478d07}" x="-39.370000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">B1-1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{226f4877-cb9b-4ff3-b93c-e9568795b697}" x="20.320000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">F1-4</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{93b514ee-9f4a-41a4-9667-8b4d6c7819d0}" x="17.780000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">F1-2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{878afaab-1cb0-4288-8fda-ecf519c19a1f}" x="-53.340000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">A1-1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{0e939f74-1e3d-4f77-9116-130541487e63}" x="2.540000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">E1-1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{a3fd050d-3230-410a-b880-3d718e3d6659}" x="-8.890000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">D2-6</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{e12676ac-d32b-45be-b17f-c476d1dd9a68}" x="10.160000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">E1-7</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{08e68d05-3314-4332-b1c9-fd4d95f2a85a}" x="21.590000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">F2-4</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{34dd9535-d08f-478a-8231-c93a12c4f966}" x="49.530000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">H1-5</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{34413b32-aff5-4412-94eb-dab4406cb723}" x="-38.100000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">B2-7</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{ae5e7c88-eb30-4820-9eaf-93e75e7bc97c}" x="-31.750000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">B2-2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{08375ee8-7da5-44b4-a8f1-c4bbdc22efdc}" x="-6.350000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">D1-5</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{c40dcd9b-e4e3-4b3c-a46b-9d6a1530dfd0}" x="34.290000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">G2-5</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{4eefd168-e41f-4b0f-b624-4949db29694d}" x="30.480000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">G1-1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{e580e923-4d59-4ad6-865b-ccf9242866a3}" x="36.830000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">G2-3</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{63d4defd-879b-4deb-a59a-6b9abe83672e}" x="24.130000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">F1-7</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{7493fc23-a6b1-40fe-afdd-abd7e42322aa}" x="44.450000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">H2-8</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{9d9f4060-b9be-4e04-92ae-5f08286e527f}" x="-11.430000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">D2-8</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{00b2134e-ba95-4615-bc8b-049215c79049}" x="-5.080000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">D2-3</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{6498ba74-c7d0-46f8-b82a-3bb7af9b7463}" x="-36.830000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">B1-3</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{dd6eae9d-1122-4ee8-9bc8-b3f9e2614878}" x="-19.050000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">C1-6</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{4f69a682-b3c7-4219-9c50-8b12ed1aadcf}" x="-44.450000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">A2-1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{9cbc0441-8837-43fd-bdea-72e5f377309c}" x="-38.100000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">B1-2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{71602c13-5af6-48d9-87d6-6db1b1f90baa}" x="-24.130000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">C1-2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{e52e9900-a6aa-40ac-8d0d-8b22c8055eb1}" x="-19.050000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">C2-3</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{a432c1bf-0d85-4632-8985-7554e996a246}" x="19.050000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">F2-6</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{a9fe74c3-08d9-4aaa-b226-920b1aabf98d}" x="-20.320000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">C1-5</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{a665791f-a3c2-494c-a8be-f1a7f66e366e}" x="38.100000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">G2-2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{f137eda4-ddf2-4dcf-8acf-d3caf727c07e}" x="2.540000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">E2-8</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{4c1cd090-3a3f-481d-a435-7aa91bba553f}" x="16.510000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">F2-8</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{bcf8f991-ef37-4c68-95c6-28f695c224c1}" x="36.830000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">G1-6</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{f316351d-9c34-4be2-bf5d-81d6b8ac8ce7}" x="39.370000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">G2-1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{16fb0794-f1b1-4eef-963b-630147af2869}" x="5.080000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">E1-3</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{dba281a8-37d0-4b18-9da9-be33616b9feb}" x="-24.130000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">C2-7</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{9ba812ea-362f-414a-8d83-98304c8910e8}" x="25.400000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">F2-2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{980621d5-cde5-46a8-ab48-0e97ec5d7d59}" x="7.620000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">E1-5</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{4f24ded7-4c5b-42e5-b40c-2abdcccdc9a7}" x="-17.780000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">C1-7</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{cf425a4d-408c-4d21-ab78-299f291253c5}" x="-36.830000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">B2-6</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{d476a3ae-22d7-4bc1-b029-8db5960f1064}" x="-35.560000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">B1-4</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{6730cae0-af77-414a-9081-0c12e74da6f9}" x="-48.260000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">A2-4</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{466c2a24-5bcc-4b04-99de-8736169c7273}" x="45.720000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">H2-7</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{e25bce0d-e035-4daf-98c9-26bd9d8e86c4}" x="33.020000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">G2-6</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{039607df-9ac2-4e8d-8823-60b81ee2a2ea}" x="44.450000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">H1-1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{70abf4d8-4a6f-49fa-9f0f-1ca735e14e10}" x="-35.560000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">B2-5</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{492a5b6d-572d-414c-8f5c-2a6c66658a2e}" x="53.340000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">H2-1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{193769d0-ff0c-43c3-a003-ab955b5f65db}" x="-33.020000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">B1-6</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{a826576f-c3ed-4223-a3c0-30866e54d08f}" x="-10.160000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">D2-7</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{c94e6208-e166-454a-a818-229637f79f3e}" x="-45.720000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">A1-7</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{5da0ed93-d171-4ab5-82db-3b920e3d71e3}" x="-3.810000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">D2-2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{3c2abd73-6829-4f56-817f-bc9648b6314b}" x="-39.370000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">B2-8</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{5e1f501a-b2e7-4448-a4bb-d411a8067c31}" x="-34.290000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">B1-5</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{ad872f63-9412-4a62-b721-6c2cbb4a10ff}" x="16.510000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">F1-1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{31539fd8-c34c-40f9-8533-e3b33add26c6}" x="-46.990000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">A1-6</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{48be2642-8930-4faa-8453-cbe55a0a889b}" x="25.400000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">F1-8</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{b12b80a2-103a-40ad-bae9-8f2327758785}" x="24.130000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">F2-1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{75464d9b-8699-48b3-b469-093892b06846}" x="-48.260000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">A1-5</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{a4c1c531-70b6-44b6-9686-cc040267fccf}" x="-33.020000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">B2-3</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{a92296af-806a-41d0-b719-ed30fb3ca618}" x="-2.540000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">D1-8</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{fb1c3116-fd10-4bd6-b4b6-e46cd9cf4cb4}" x="48.260000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">H1-4</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{f526df69-5cae-41b5-baa2-eb0cec7d21ba}" x="-46.990000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">A2-3</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{48e44022-1102-4405-bcf5-6f389b6db594}" x="-17.780000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">C2-2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{71d779ac-5f9c-4e36-b629-d48d84fec922}" x="-22.860000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">C2-6</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{c01ae052-a0ad-4a3f-a1b7-a15bbf0cb069}" x="31.750000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">G2-7</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{3fd5b1c8-2185-4d8d-8389-d16b6a8ba5a2}" x="19.050000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">F1-3</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{ddb0a952-7c30-44f8-830a-d8c0327e86e3}" x="-2.540000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">D2-1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{2eafda58-5bb8-44ea-b301-0ce9f7b1bee1}" x="45.720000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">H1-2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{ed6fd21e-82b2-42ae-a568-a0cb69220bd6}" x="34.290000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">G1-4</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{b923746f-d1ae-4380-85c1-5307af057e74}" x="38.100000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">G1-7</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{a53fa962-b344-436a-a792-0af6e65933c2}" x="5.080000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">E2-6</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{a70105cb-3547-4ae6-a1a3-380ba25615b2}" x="33.020000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">G1-3</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{a84a6d6d-30f6-49be-a94d-564d0b79cb0a}" x="11.430000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">E2-1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{08219570-59c4-4f50-a9a3-455ed181d321}" x="46.990000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">H2-6</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{36b2ac49-388c-47c1-a967-6e0a4230af65}" x="-25.400000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">C2-8</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{37388946-e534-4b6b-9036-0ac70c2c80b6}" x="-16.510000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">C1-8</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{a83bf497-0cca-4868-bd33-0d2a69e26992}" x="3.810000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">E1-2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{5811d842-8102-4bf5-907b-46716bbdfcfd}" x="46.990000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">H1-3</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{37dad268-1bc5-4400-8da6-c327f55e18e0}" x="-11.430000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">D1-1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{711f2c54-4cda-4ddc-b09d-c638655a8969}" x="-30.480000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">B2-1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{89ebc835-b5ef-4f3c-a571-5df26b52d8d7}" x="-8.890000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">D1-3</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{b60b0655-e4e6-4af2-b136-dcfeb82d6d68}" x="11.430000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">E1-8</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{edb8928f-ef6e-4278-b028-4a512a3b5529}" x="31.750000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">G1-2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{29429411-c8be-441b-8b8c-0563648ec9a7}" x="-3.810000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">D1-7</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{2849fe05-fb64-413c-98b6-d7f8684e54b4}" x="20.320000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">F2-5</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{be8cfa23-92c0-4a9e-b72a-b6895ec74d3c}" x="-53.340000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">A2-8</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{a553eb9d-f5bf-4901-bb5e-2f82999b3a1b}" x="-7.620000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">D2-5</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{43308937-6cb6-4abf-b225-24441d26acce}" x="6.350000" y="15.494000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">E2-5</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{28344042-4401-46be-b7c8-be0228639b04}" x="-34.290000" y="12.954000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">B2-4</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{2ec01168-7161-4e98-af2d-b35ab8cc4609}" x="-7.620000" y="8.890000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">D1-4</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{b552147a-d3cf-4568-b457-e4d7b47c34f7}" x="21.590000" y="6.350000" layer="0" rotation="0.000000" height="1.600000" width="1.600000" type="tht_round" drill="0.800000">
+            <name locale="en_US">F1-5</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

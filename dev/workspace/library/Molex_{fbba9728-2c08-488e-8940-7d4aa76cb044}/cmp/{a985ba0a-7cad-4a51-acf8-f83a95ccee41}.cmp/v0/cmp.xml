@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{a985ba0a-7cad-4a51-acf8-f83a95ccee41}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:40:36Z</created>
+        <last_modified>2015-08-15T21:40:36Z</last_modified>
+        <name locale="en_US">22-23-2071</name>
+        <description locale="en_US">.100" (2.54mm) Center Header - 7 Pin
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 22-23-2071
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{a2a42349-1a90-4cb0-89d5-b6d847fc0d0a}</generic_component>
+        <package>{ad766ba3-92a2-4e91-bddb-54c55033c6dc}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{fb69f54b-9b30-4f91-a177-7c679a3cd654}" signal="{72d9c3c0-4d35-4d52-8f62-5456d96cc3aa}"/>
+        <map pad="{a81029d5-83b1-4312-9ea7-c724d7c42f33}" signal="{8cbaaa9c-e44d-415c-98c7-7e3ecdf8c04b}"/>
+        <map pad="{47f18047-07fd-48d9-b574-0b3dcdd49e97}" signal="{808f03ee-beb9-4d4d-b0c7-c9fe0bc785f1}"/>
+        <map pad="{091ad24c-fe7d-4f6a-8db7-db23905a36d4}" signal="{53a1afe1-e598-48e2-8a11-fd252749eebe}"/>
+        <map pad="{d56c671a-2e7c-4ab3-9f86-9d60df6c901d}" signal="{b91d88ef-a810-4c5e-813d-4498da1a40f2}"/>
+        <map pad="{a741e87c-3f57-452f-9439-2308f9b7d087}" signal="{0bf0f233-f876-46d4-90e8-329b451abae3}"/>
+        <map pad="{4a754ca9-cfd8-4a00-b4e1-098b1da79035}" signal="{a2be510f-aff7-49a4-b1e7-638ea4be8262}"/>
+    </pad_signal_map>
+</component>

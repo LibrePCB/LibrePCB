@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{121c06df-1bfc-46fa-bda4-9cbcda821867}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-13T20:22:31Z</created>
+        <last_modified>2015-08-13T20:22:31Z</last_modified>
+        <name locale="en_US">C-1005</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US"/>
+        <generic_component>{d167e0e3-6a92-4b76-b013-77b9c230e5f1}</generic_component>
+        <package>{5ad219d5-9810-4d6f-a00f-ec646045b10b}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}" pad="{ba46cda2-ce63-4fa7-afd7-22d1829f254e}"/>
+        <map signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}" pad="{41d10212-aa38-48f2-87a5-65ed241ecf89}"/>
+    </pad_signal_map>
+</component>

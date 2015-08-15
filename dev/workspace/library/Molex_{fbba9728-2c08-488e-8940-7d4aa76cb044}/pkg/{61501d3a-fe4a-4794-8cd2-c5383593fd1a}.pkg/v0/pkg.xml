@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{61501d3a-fe4a-4794-8cd2-c5383593fd1a}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:38:45Z</created>
+        <last_modified>2015-08-15T21:38:45Z</last_modified>
+        <name locale="en_US">87438-15</name>
+        <description locale="en_US">&lt;b>Wire-to-Board  1.50mm (.059") Pitch Header - Right Angle, SMT, Shrouded&lt;/b>&lt;p>
+Source: http://www.molex.com/product/micro/87438.html
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 87438-15
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{da26074b-6df8-4977-b40b-63f079fbddc9}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

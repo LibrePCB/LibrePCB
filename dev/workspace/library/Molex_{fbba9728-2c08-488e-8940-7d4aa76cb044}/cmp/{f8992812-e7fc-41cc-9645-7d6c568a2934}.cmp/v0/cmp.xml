@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{f8992812-e7fc-41cc-9645-7d6c568a2934}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:40:37Z</created>
+        <last_modified>2015-08-15T21:40:37Z</last_modified>
+        <name locale="en_US">52746-6</name>
+        <description locale="en_US">&lt;b>FPC Connector ZIF for SMT 0.5mm&lt;/b>&lt;p>
+Source: http://www.farnell.com/datasheets/73044.pdf [DWG. NO. (Sheet 1 OF 2) SD-52746-**17]
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 52746-6
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{796e5d34-5e5f-422f-aeec-f34b9181bb6e}</generic_component>
+        <package>{7cabfb91-9800-4f01-b1af-6801588241c4}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{4edee78f-8500-4d57-bfdb-63a949bc8a94}" signal="{7b9184c8-023f-4d7d-bf50-b5edea1b3e7e}"/>
+        <map pad="{4ca53085-67e9-4eb9-8edb-079fbcc76e9c}" signal="{835bc19e-b6ad-4757-8b53-ca8d9e04e090}"/>
+        <map pad="{4bdf3a11-75b0-47bd-99e4-3ed3607f5a4b}" signal="{7636b67f-c761-4062-9998-d240fdc56131}"/>
+        <map pad="{f95fcb3f-ff63-4453-9ce5-3910858dc998}" signal="{69e69963-c8da-40b7-8672-389cad364868}"/>
+        <map pad="{7602f998-72bd-474f-8ad4-4e434f3751a0}" signal="{d60a3e80-a778-4a60-91f8-4b75e6f189f2}"/>
+        <map pad="{8a002165-06de-4123-98f8-c29182861cf3}" signal="{b8db6148-b74a-442d-9459-547f1d636af0}"/>
+    </pad_signal_map>
+</component>

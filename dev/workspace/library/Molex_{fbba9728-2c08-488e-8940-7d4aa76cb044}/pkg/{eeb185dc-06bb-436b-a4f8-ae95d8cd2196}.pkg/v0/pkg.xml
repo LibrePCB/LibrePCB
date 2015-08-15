@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{eeb185dc-06bb-436b-a4f8-ae95d8cd2196}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:38:40Z</created>
+        <last_modified>2015-08-15T21:38:40Z</last_modified>
+        <name locale="en_US">53398-12</name>
+        <description locale="en_US">&lt;b>CONNECTOR&lt;/b>&lt;p>
+wire to board 1.25 mm (.049 inch) pitch header&lt;p>
+SMT&lt;p>
+straight
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 53398-12
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{1c5a53a2-0282-4e55-99c9-ad6d6d67805f}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

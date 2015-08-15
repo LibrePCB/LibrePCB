@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{82ed4bd5-1936-4198-a502-d6862536c1b1}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:38:43Z</created>
+        <last_modified>2015-08-15T21:38:43Z</last_modified>
+        <name locale="en_US">70553-22</name>
+        <description locale="en_US">&lt;b>C-Grid SL Connector&lt;/b>&lt;p>
+ right angle, 22 pin
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 70553-22
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{70c68313-6de8-4d6e-90f3-2d1fd07c904b}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

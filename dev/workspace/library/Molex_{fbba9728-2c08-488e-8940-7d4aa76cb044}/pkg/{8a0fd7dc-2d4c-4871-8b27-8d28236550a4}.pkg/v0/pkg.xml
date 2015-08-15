@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{8a0fd7dc-2d4c-4871-8b27-8d28236550a4}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:38:40Z</created>
+        <last_modified>2015-08-15T21:38:40Z</last_modified>
+        <name locale="en_US">53261-10</name>
+        <description locale="en_US">&lt;b>CONNECTOR&lt;/b>&lt;p>
+wire to board 1.25 mm (.049 inch) pitch header&lt;p>
+SMT&lt;p>
+right angle
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 53261-10
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{e0bfa04d-6ca9-44db-9a7a-e161818b1c20}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

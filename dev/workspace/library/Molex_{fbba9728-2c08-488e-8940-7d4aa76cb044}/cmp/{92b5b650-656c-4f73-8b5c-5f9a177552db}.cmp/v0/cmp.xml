@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{92b5b650-656c-4f73-8b5c-5f9a177552db}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:40:36Z</created>
+        <last_modified>2015-08-15T21:40:36Z</last_modified>
+        <name locale="en_US">87832-22</name>
+        <description locale="en_US">&lt;b>Milli-Grid Header&lt;/b>&lt;p> 
+2.00mm (.079") Pitch
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 87832-22
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{88508eba-0520-4b6b-b6ec-4063c9a8e6f5}</generic_component>
+        <package>{5ed93c48-3ca7-40f6-be31-217b4d635964}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{2c0be2ab-45a7-48b0-9e10-c1b249d3d007}" signal="{9bc1631d-d1e4-4815-98c7-7971a73c5479}"/>
+        <map pad="{8c4ee480-270a-4022-a101-f29631e0c813}" signal="{187cee2e-cb76-4a98-bf8b-d36037aa9bf2}"/>
+        <map pad="{06293c96-37ca-4891-b403-df40ac7b3f70}" signal="{de74fec6-b319-47c8-8b88-000d4b7dbc85}"/>
+        <map pad="{6b0148e5-18ef-4ab2-b6d3-23c958dd9900}" signal="{2a1dd2b9-7058-4688-8787-3558c839235d}"/>
+        <map pad="{3dd88f3f-bee6-49cc-972d-d728d4f756fe}" signal="{878dbce2-1659-45be-a5c0-85c9e33c506b}"/>
+        <map pad="{2cb04fa8-aa9b-4a21-aaa0-9c48c102ea84}" signal="{b5e1941a-e9be-4648-ac36-a629b49cb9d4}"/>
+        <map pad="{27cc2602-bd4c-4433-8fca-628338e891d2}" signal="{20f349ae-dbcf-461c-acd1-c2d9d183dff3}"/>
+        <map pad="{523ca01a-c424-457e-b4e2-8e6efde087d1}" signal="{37f0b7c2-f9ec-442f-a449-18b5c4bb1f35}"/>
+        <map pad="{4b1bf540-0781-488d-8cf8-6e6023076e1d}" signal="{66f84e2d-927b-422d-b8fd-d56c644d2484}"/>
+        <map pad="{dc8d36ef-54d5-4cf5-baa8-7c5f229ed076}" signal="{e4e448f2-8eec-44b1-bf3f-ea317cc7a073}"/>
+        <map pad="{03c35af1-6bc4-42d6-9b24-01449db3a2c3}" signal="{397293c4-bae1-418e-828c-71e536db5890}"/>
+        <map pad="{0d6cd957-2fcb-4647-9584-209b6bdac76c}" signal="{0fdd3961-0c56-4f58-bdf2-079acd39306e}"/>
+        <map pad="{8197e4f1-4d3d-45e5-a140-f6f61c090ba2}" signal="{fc319dee-16df-4672-afad-f8f3fe18e1e3}"/>
+        <map pad="{832dfb0d-0f3f-4c1d-b359-75e16de2d6c5}" signal="{8fd2f81f-40ee-44fc-aefe-0edcb5476a6c}"/>
+        <map pad="{b393b3ea-b8f9-4685-8aab-1d86289182cd}" signal="{26d2d923-4916-4efe-8940-0dcc1b1ea689}"/>
+        <map pad="{b5b9dbd5-50cb-4456-9ac4-26c791e06ade}" signal="{d56b228d-6fd3-4386-a91f-d7aff9b58831}"/>
+        <map pad="{4d736d35-90b2-4c2f-8431-07e384d2ec7c}" signal="{fef98d1e-7fd6-43da-802d-a97da07f79ab}"/>
+        <map pad="{01c51f76-357c-4462-8e1b-54bcd623c3ad}" signal="{f9fc3650-a318-4acc-8d31-3b47b029d1b1}"/>
+        <map pad="{9ead19ba-7f84-45cc-a0e4-63b0e74d83d7}" signal="{ef58deb4-6e1d-4547-a596-2ca8ff0f2d50}"/>
+        <map pad="{9e72ddd7-2997-4d42-9cfa-70d5a8e194ca}" signal="{70877932-6bd0-4cde-9b85-404061a093a0}"/>
+        <map pad="{71e44d53-ab68-497d-b3b8-a10405cad5b1}" signal="{4a3d85ac-4aa9-44e2-8466-21349bd11107}"/>
+        <map pad="{24183e5b-df9d-4472-a75f-6345d10e46d8}" signal="{077777ea-3bc1-41d6-a477-1bb0a4d8f704}"/>
+    </pad_signal_map>
+</component>

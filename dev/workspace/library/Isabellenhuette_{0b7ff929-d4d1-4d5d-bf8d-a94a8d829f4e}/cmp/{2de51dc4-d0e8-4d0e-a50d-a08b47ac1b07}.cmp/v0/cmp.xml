@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{2de51dc4-d0e8-4d0e-a50d-a08b47ac1b07}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T20:06:12Z</created>
+        <last_modified>2015-08-15T20:06:12Z</last_modified>
+        <name locale="en_US">SMR-WAV</name>
+        <description locale="en_US">
+
+This element was automatically imported from Eagle
+Filepath: isabellen.lbr
+Name: SMR-WAV
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{ef80cd5e-2689-47ee-8888-31d04fc99174}</generic_component>
+        <package>{be6a9038-3d58-46d0-a4fc-e44a3377907a}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{d42be5dc-8d7d-454c-a17d-142612f4b48d}" signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
+        <map pad="{ba2125ab-ac18-4625-8a34-3862588d4efd}" signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
+    </pad_signal_map>
+</component>

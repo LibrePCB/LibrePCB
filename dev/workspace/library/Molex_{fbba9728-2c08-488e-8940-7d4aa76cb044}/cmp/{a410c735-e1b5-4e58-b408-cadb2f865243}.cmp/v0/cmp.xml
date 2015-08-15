@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{a410c735-e1b5-4e58-b408-cadb2f865243}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:40:37Z</created>
+        <last_modified>2015-08-15T21:40:37Z</last_modified>
+        <name locale="en_US">KK-156-5</name>
+        <description locale="en_US">&lt;b>KK 156 HEADER&lt;/b>&lt;p>
+Source: http://www.molex.com/pdm_docs/sd/026604100_sd.pdf
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: KK-156-5
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{5e729c9b-4bd1-485b-8ee8-0e7f6059d3af}</generic_component>
+        <package>{9cc0af0e-390b-4f3e-a555-8f0c4a976ffe}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{bbb39d25-4cea-4863-8371-ca3fd1fe53ac}" signal="{79214bfa-6da1-4b8a-b70f-595d4e459bb6}"/>
+        <map pad="{0d5a755d-478f-410f-8fac-3ea75b72ac3b}" signal="{d69b6025-04fc-45b7-b599-bcc0d18ef731}"/>
+        <map pad="{84e25593-b34c-4767-bbdb-898675a9ae45}" signal="{7c1b5551-1c44-4f7d-9adc-816f2d945e80}"/>
+        <map pad="{717701d7-9054-4601-88d4-21724c29ac0c}" signal="{36a7bd70-9f8b-4cf0-bfd1-5436d272695f}"/>
+        <map pad="{cbd70c82-c9eb-490b-96af-834fc54d2027}" signal="{33778b95-71de-4a92-acf6-51ed288e8550}"/>
+    </pad_signal_map>
+</component>

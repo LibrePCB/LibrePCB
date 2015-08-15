@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{b943797a-5dec-47c4-85fc-7f8723ddf31a}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:40:37Z</created>
+        <last_modified>2015-08-15T21:40:37Z</last_modified>
+        <name locale="en_US">KK-156-15</name>
+        <description locale="en_US">&lt;b>KK 156 HEADER&lt;/b>&lt;p>
+Source: http://www.molex.com/pdm_docs/sd/026604100_sd.pdf
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: KK-156-15
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{48f6a2f5-8be9-4624-a85e-ca2efeac896e}</generic_component>
+        <package>{93a6f3dd-7662-4f77-8c2a-6d07abe25306}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{a3518d46-6ee3-4906-8b56-191cbdf275b3}" signal="{176dfd4d-0a01-46fc-bb3b-7e984756e90c}"/>
+        <map pad="{a58d0c22-1cf2-45fb-826d-8255a439eca2}" signal="{3990099b-b16a-4cd0-a8cd-485d7f0b1e1e}"/>
+        <map pad="{173cafd3-6a83-4050-8aec-38e428828bf7}" signal="{0661a076-0be9-46a0-8d75-e44c8eb488ed}"/>
+        <map pad="{53685f3f-e714-44db-9cbb-934c0a8677eb}" signal="{4be382e2-4701-4201-8040-8af7ae7858d3}"/>
+        <map pad="{72ee4c79-37d3-4a0d-b9f9-8d21836ff8d5}" signal="{7572d350-7494-433b-9ed0-10356ab8f546}"/>
+        <map pad="{2e9570d9-10c1-4cfe-b244-001e56f74cb4}" signal="{a64f805e-30a2-47b0-b608-bebf8bb69c43}"/>
+        <map pad="{3b1ececa-c295-4f22-863a-3f7d57b3dc8c}" signal="{1ad58a2e-fb71-40bc-8f04-eb893fabd1db}"/>
+        <map pad="{fea24725-c97d-48fc-a30e-7213850024f2}" signal="{40b16a12-0b4a-412e-988e-493bd9d99b93}"/>
+        <map pad="{52ae2c77-22a0-435e-9402-586c02404a84}" signal="{673378b7-aa43-4fdc-a4e6-fd853fa340d4}"/>
+        <map pad="{1f21409e-4b1b-4fff-8abf-d57d3e7a4165}" signal="{9fbb4334-1a63-4782-91bf-781ff44ae8ab}"/>
+        <map pad="{1f35367e-0c7d-4d0f-92eb-232147932f54}" signal="{264b3270-2082-4ea5-a311-24b5af459b44}"/>
+        <map pad="{96fd40b0-2fea-4e08-8281-9f79d1f1bfe1}" signal="{1cb2fd1f-ba1b-4a8c-b766-da30255025bf}"/>
+        <map pad="{02d32c10-b092-42b5-8ca5-8ecea138c3c5}" signal="{ff00f3f9-52e9-43de-ab11-a94903d6590e}"/>
+        <map pad="{4c5bf80c-2085-47f8-bdcd-6fa9bafd66ec}" signal="{6f6e49f0-c638-4cb6-b8e1-033e1124a878}"/>
+        <map pad="{a8ab0151-e25c-49f4-9c41-ef67c3df0fe2}" signal="{790521e1-70ca-4f6c-b69a-1529a5bb927b}"/>
+    </pad_signal_map>
+</component>

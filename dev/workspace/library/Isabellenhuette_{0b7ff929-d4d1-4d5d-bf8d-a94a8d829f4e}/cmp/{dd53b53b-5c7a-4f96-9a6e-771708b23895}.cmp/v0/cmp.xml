@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{dd53b53b-5c7a-4f96-9a6e-771708b23895}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T20:06:12Z</created>
+        <last_modified>2015-08-15T20:06:12Z</last_modified>
+        <name locale="en_US">SMT-WAV</name>
+        <description locale="en_US">
+
+This element was automatically imported from Eagle
+Filepath: isabellen.lbr
+Name: SMT-WAV
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{ef80cd5e-2689-47ee-8888-31d04fc99174}</generic_component>
+        <package>{3ecdb8bd-cba5-4bad-8a08-89da6ed3d5a8}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{659f0b4e-d487-4a91-a83b-65bea415e76a}" signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
+        <map pad="{b914e02d-5815-4558-ace5-81fdb42665cf}" signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
+    </pad_signal_map>
+</component>

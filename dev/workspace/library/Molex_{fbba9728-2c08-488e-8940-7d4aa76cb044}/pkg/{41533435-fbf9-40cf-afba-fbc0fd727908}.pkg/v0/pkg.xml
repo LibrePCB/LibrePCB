@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{41533435-fbf9-40cf-afba-fbc0fd727908}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:38:40Z</created>
+        <last_modified>2015-08-15T21:38:40Z</last_modified>
+        <name locale="en_US">5566-18</name>
+        <description locale="en_US">&lt;b>Mini FIT connector 18 pol&lt;/b>&lt;p>
+Source: http://www.molex.com
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 5566-18
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{2f8dedc3-8e06-4b51-b7b6-bd73e91e3992}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

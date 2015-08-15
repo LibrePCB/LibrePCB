@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{37e6decb-4d59-4676-94d3-e2a1cc414e57}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T20:18:53Z</created>
+        <last_modified>2015-08-15T20:18:53Z</last_modified>
+        <name locale="en_US">SE11</name>
+        <description locale="en_US">&lt;b>SOLDER PAD&lt;/b>&lt;p>
+drill 1.1 mm
+
+This element was automatically imported from Eagle
+Filepath: solpad.lbr
+Name: SE11
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{97269aa3-e816-45af-b29d-1da881d68748}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

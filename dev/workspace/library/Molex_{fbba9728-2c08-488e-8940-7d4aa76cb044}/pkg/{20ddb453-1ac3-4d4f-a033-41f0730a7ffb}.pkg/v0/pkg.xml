@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{20ddb453-1ac3-4d4f-a033-41f0730a7ffb}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:38:42Z</created>
+        <last_modified>2015-08-15T21:38:42Z</last_modified>
+        <name locale="en_US">15-91-02</name>
+        <description locale="en_US">&lt;b>C-Grid SL Connector&lt;/b>&lt;p>
+ right angle SMD, 2 pin
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 15-91-02
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{8ac95c1d-8d78-4f88-b035-6466ee14b646}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

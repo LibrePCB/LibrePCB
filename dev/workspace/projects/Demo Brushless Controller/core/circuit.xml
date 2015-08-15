@@ -59,7 +59,7 @@
     </netsignals>
     <generic_component_instances>
         <generic_component_instance symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}" uuid="{f900538b-090d-482f-9c4c-b0da46d087a8}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}">
-            <name>R15</name>
+            <name>R7</name>
             <value>${RESISTANCE}</value>
             <attributes>
                 <attribute key="RESISTANCE">
@@ -74,7 +74,7 @@
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}" uuid="{90c89ce4-fb19-458d-912b-cf9818efd764}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}">
-            <name>C9</name>
+            <name>C5</name>
             <value>${CAPACITANCE}
 ${VOLTAGE}</value>
             <attributes>
@@ -188,7 +188,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}" uuid="{e69f768b-412d-4fe5-aeb3-c743351a6544}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}">
-            <name>C22</name>
+            <name>C21</name>
             <value>${CAPACITANCE}</value>
             <attributes>
                 <attribute key="CAPACITANCE">
@@ -203,7 +203,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}" uuid="{6c9b623e-6231-4e9c-bf97-944df7a5d3d5}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}">
-            <name>C8</name>
+            <name>C4</name>
             <value>${CAPACITANCE}
 ${VOLTAGE}</value>
             <attributes>
@@ -224,7 +224,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}" uuid="{5a493e46-5b95-4d98-ba08-8bf6a741a817}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}">
-            <name>R18</name>
+            <name>R12</name>
             <value>${RESISTANCE}</value>
             <attributes>
                 <attribute key="RESISTANCE">
@@ -239,7 +239,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}" uuid="{b179313a-5fcb-4fb6-8e56-55865ed6ea4b}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}">
-            <name>C17</name>
+            <name>C13</name>
             <value>${CAPACITANCE}</value>
             <attributes>
                 <attribute key="CAPACITANCE">
@@ -269,7 +269,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}" uuid="{5295af36-44e2-4a2e-a988-87c9e1026ae9}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}">
-            <name>C5</name>
+            <name>C1</name>
             <value>${CAPACITANCE}
 ${VOLTAGE}</value>
             <attributes>
@@ -314,7 +314,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}" uuid="{1d8a93b9-7ac2-40a0-b1b7-79e987600197}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}">
-            <name>C16</name>
+            <name>C14</name>
             <value>${CAPACITANCE}</value>
             <attributes>
                 <attribute key="CAPACITANCE">
@@ -329,7 +329,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{e82fe1cc-0178-4949-ab27-16c8975ffd1d}" uuid="{b9859056-bbef-4848-9b60-978594cce1d4}" generic_component="{01fe9dd4-229f-4083-8c1a-4e1fe7a1fe72}">
-            <name>IC5</name>
+            <name>U5</name>
             <value>SN65HVD230DR</value>
             <attributes/>
             <signal_mapping>
@@ -352,7 +352,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{f73e9091-7c9c-420b-a2a5-d028e0a5fbc0}" uuid="{06d30802-ba7f-431d-843d-42f276aaed22}" generic_component="{e995a552-12c4-413a-8258-1d6ec9a8471d}">
-            <name>U1</name>
+            <name>U4</name>
             <value>STM32F103C</value>
             <attributes/>
             <signal_mapping>
@@ -434,7 +434,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}" uuid="{43bc94dc-6ab0-4bb2-bf66-c034b9f1cfd0}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}">
-            <name>C20</name>
+            <name>C17</name>
             <value>${CAPACITANCE}</value>
             <attributes>
                 <attribute key="CAPACITANCE">
@@ -457,7 +457,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{4bfd5089-9ea7-4019-a507-583509a32d75}" uuid="{aaec816a-e94e-4d00-8ac6-dd105da862e3}" generic_component="{cc20c58e-93b5-49cd-b6e1-48c5e5e76ed3}">
-            <name>IC2</name>
+            <name>U1</name>
             <value>IR25606</value>
             <attributes/>
             <signal_mapping>
@@ -487,7 +487,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}" uuid="{4ea5b830-f231-4ded-9d0d-3d69b6a938df}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}">
-            <name>R13</name>
+            <name>R28</name>
             <value>${RESISTANCE}</value>
             <attributes>
                 <attribute key="RESISTANCE">
@@ -508,7 +508,7 @@ ${VOLTAGE}</value>
             <signal_mapping/>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{1b3fc3ac-2d19-4f11-809a-5c662b3111b8}" uuid="{91f8c3d3-c497-4d3f-b7a0-4088b442647b}" generic_component="{b847a54b-a83e-47ff-a976-7704bf05bbf4}">
-            <name>Q7</name>
+            <name>Q8</name>
             <value>${FREQUENCY}</value>
             <attributes>
                 <attribute key="FREQUENCY">
@@ -531,7 +531,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}" uuid="{0c451a9f-1e21-4533-8d52-e2aacef8a883}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}">
-            <name>R12</name>
+            <name>R13</name>
             <value>${RESISTANCE}</value>
             <attributes>
                 <attribute key="RESISTANCE">
@@ -554,7 +554,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}" uuid="{013aa324-6581-4a59-ba01-cce4dfa14c1c}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}">
-            <name>R10</name>
+            <name>R29</name>
             <value>${RESISTANCE}</value>
             <attributes>
                 <attribute key="RESISTANCE">
@@ -584,7 +584,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}" uuid="{04eff528-df9e-4969-bc7e-5633d8011087}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}">
-            <name>C14</name>
+            <name>C19</name>
             <value>${CAPACITANCE}</value>
             <attributes>
                 <attribute key="CAPACITANCE">
@@ -653,7 +653,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{c864d663-a22e-4814-bc03-017d5bc7d6c6}" uuid="{98757eea-e6bf-4fe5-adaa-a7f407373243}" generic_component="{6f959627-00d2-4652-bfd9-f6ea0162ccdd}">
-            <name>D1</name>
+            <name>D4</name>
             <value>24V</value>
             <attributes/>
             <signal_mapping>
@@ -670,7 +670,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}" uuid="{9843ce9e-8e17-4baa-9980-6826fc257abf}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}">
-            <name>C21</name>
+            <name>C20</name>
             <value>${CAPACITANCE}</value>
             <attributes>
                 <attribute key="CAPACITANCE">
@@ -685,7 +685,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}" uuid="{2c8af4fb-cc24-4676-b77e-8d2b64dd73d0}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}">
-            <name>R9</name>
+            <name>R15</name>
             <value>${RESISTANCE}</value>
             <attributes>
                 <attribute key="RESISTANCE">
@@ -700,7 +700,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}" uuid="{0c46076b-7882-4e44-942f-2592d2a21879}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}">
-            <name>R17</name>
+            <name>R9</name>
             <value>${RESISTANCE}</value>
             <attributes>
                 <attribute key="RESISTANCE">
@@ -739,7 +739,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{ed0f0ca2-43ff-4a10-94c2-2958bc336586}" uuid="{bfdf81af-9505-4e77-97e4-d68e4a90ba0f}" generic_component="{2b24b18d-bd95-4fb4-8fe6-bce1d020ead4}">
-            <name>LED1</name>
+            <name>LED2</name>
             <value>${COLOR}</value>
             <attributes>
                 <attribute key="COLOR">
@@ -764,7 +764,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}" uuid="{3110f961-42bd-4e24-bba7-47930f1b2c03}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}">
-            <name>R19</name>
+            <name>R11</name>
             <value>${RESISTANCE}</value>
             <attributes>
                 <attribute key="RESISTANCE">
@@ -795,7 +795,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}" uuid="{76c1f0be-1e24-4b1d-beed-edc08bd44118}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}">
-            <name>R14</name>
+            <name>R19</name>
             <value>${RESISTANCE}</value>
             <attributes>
                 <attribute key="RESISTANCE">
@@ -826,7 +826,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{80db57cd-d3fa-4fec-80f1-3543456340ec}" uuid="{3437d160-1c40-458f-9867-f30c7706e0c3}" generic_component="{ce31c203-9bec-4345-8906-04fb7997ef5b}">
-            <name>IC1</name>
+            <name>IC2</name>
             <value>LM1117</value>
             <attributes/>
             <signal_mapping>
@@ -836,7 +836,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}" uuid="{5ef7639d-db84-4bfa-8356-83fc28a1a9f7}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}">
-            <name>R20</name>
+            <name>R10</name>
             <value>${RESISTANCE}</value>
             <attributes>
                 <attribute key="RESISTANCE">
@@ -851,7 +851,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{4bfd5089-9ea7-4019-a507-583509a32d75}" uuid="{ab96ca5d-43e6-4ecb-8981-1fa3117c1c7d}" generic_component="{cc20c58e-93b5-49cd-b6e1-48c5e5e76ed3}">
-            <name>IC4</name>
+            <name>U3</name>
             <value>IR25606</value>
             <attributes/>
             <signal_mapping>
@@ -881,7 +881,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}" uuid="{69f3d0cf-ca3d-4323-b0c3-67c4fce8b501}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}">
-            <name>C7</name>
+            <name>C3</name>
             <value>${CAPACITANCE}
 ${VOLTAGE}</value>
             <attributes>
@@ -902,7 +902,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}" uuid="{f1121620-c541-46a5-90cc-92578e822b8f}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}">
-            <name>C13</name>
+            <name>C22</name>
             <value>${CAPACITANCE}</value>
             <attributes>
                 <attribute key="CAPACITANCE">
@@ -967,7 +967,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}" uuid="{15e33177-fef9-4030-93f7-b7cf8b9ad9e7}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}">
-            <name>C2</name>
+            <name>C8</name>
             <value>${CAPACITANCE}
 ${VOLTAGE}</value>
             <attributes>
@@ -988,7 +988,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}" uuid="{68c6b6ce-0bad-4965-aa85-c972ab3f16c6}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}">
-            <name>C3</name>
+            <name>C9</name>
             <value>${CAPACITANCE}
 ${VOLTAGE}</value>
             <attributes>
@@ -1009,7 +1009,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{ed0f0ca2-43ff-4a10-94c2-2958bc336586}" uuid="{06d050d5-cea1-4a9b-b92d-9c5114bdb3d1}" generic_component="{2b24b18d-bd95-4fb4-8fe6-bce1d020ead4}">
-            <name>LED2</name>
+            <name>LED1</name>
             <value>${COLOR}</value>
             <attributes>
                 <attribute key="COLOR">
@@ -1066,7 +1066,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{b9de4767-8626-4d02-8895-6fbce03105e9}" uuid="{afd4e910-3c79-46cd-8d71-2ad6c33768d5}" generic_component="{82207562-d317-4911-96fa-ceb0f45fd806}">
-            <name>D4</name>
+            <name>D3</name>
             <value>BAS21</value>
             <attributes/>
             <signal_mapping>
@@ -1075,7 +1075,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}" uuid="{e8ab7388-1846-4ca4-912d-d533fae37f01}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}">
-            <name>C6</name>
+            <name>C2</name>
             <value>${CAPACITANCE}
 ${VOLTAGE}</value>
             <attributes>
@@ -1096,7 +1096,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{5412add2-af9c-44b8-876d-a0fb7c201897}" uuid="{ef27ad46-be54-4b1c-ba51-0446a0853203}" generic_component="{c54375c5-7149-4ded-95c5-7462f7301ee7}">
-            <name>C4</name>
+            <name>C10</name>
             <value>${CAPACITANCE}
 ${VOLTAGE}</value>
             <attributes>
@@ -1117,7 +1117,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{b9de4767-8626-4d02-8895-6fbce03105e9}" uuid="{00df6fcc-ebae-4597-8398-a2d3864d3b43}" generic_component="{82207562-d317-4911-96fa-ceb0f45fd806}">
-            <name>D2</name>
+            <name>D1</name>
             <value>BAS21</value>
             <attributes/>
             <signal_mapping>
@@ -1136,7 +1136,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}" uuid="{d98d04c5-74c7-4b7d-8f09-611ed955dd57}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}">
-            <name>R7</name>
+            <name>R18</name>
             <value>${RESISTANCE}
 ${POWER}</value>
             <attributes>
@@ -1157,7 +1157,7 @@ ${POWER}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{4bfd5089-9ea7-4019-a507-583509a32d75}" uuid="{81c6addc-9f55-40ef-9b5a-08816ca0a661}" generic_component="{cc20c58e-93b5-49cd-b6e1-48c5e5e76ed3}">
-            <name>IC3</name>
+            <name>U2</name>
             <value>IR25606</value>
             <attributes/>
             <signal_mapping>
@@ -1172,7 +1172,7 @@ ${POWER}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}" uuid="{e4a5cdce-be42-4597-a045-6135ecd25ab8}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}">
-            <name>C19</name>
+            <name>C18</name>
             <value>${CAPACITANCE}</value>
             <attributes>
                 <attribute key="CAPACITANCE">
@@ -1187,7 +1187,7 @@ ${POWER}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}" uuid="{84e890a4-2a41-4721-8737-a71f79f7d101}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}">
-            <name>C18</name>
+            <name>C16</name>
             <value>${CAPACITANCE}</value>
             <attributes>
                 <attribute key="CAPACITANCE">
@@ -1202,7 +1202,7 @@ ${POWER}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}" uuid="{df40333d-b0ea-4b4f-8a7a-a59ae2de610f}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}">
-            <name>R11</name>
+            <name>R30</name>
             <value>${RESISTANCE}</value>
             <attributes>
                 <attribute key="RESISTANCE">
@@ -1252,7 +1252,7 @@ ${POWER}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}" uuid="{98064fbf-64b1-4958-a0b0-825005d7a6a1}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}">
-            <name>R8</name>
+            <name>R27</name>
             <value>${RESISTANCE}</value>
             <attributes>
                 <attribute key="RESISTANCE">
@@ -1297,7 +1297,7 @@ ${POWER}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{8cd7b37f-e5fa-4af5-a8dd-d78830bba3af}" uuid="{2e61020a-4346-4277-8f6b-42d8ec60fe49}" generic_component="{d167e0e3-6a92-4b76-b013-77b9c230e5f1}">
-            <name>C10</name>
+            <name>C6</name>
             <value>${CAPACITANCE}
 ${VOLTAGE}</value>
             <attributes>
@@ -1365,7 +1365,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{5412add2-af9c-44b8-876d-a0fb7c201897}" uuid="{0cd12bfe-4971-4905-8354-c2b2c47bfcde}" generic_component="{c54375c5-7149-4ded-95c5-7462f7301ee7}">
-            <name>C1</name>
+            <name>C7</name>
             <value>${CAPACITANCE}
 ${VOLTAGE}</value>
             <attributes>
@@ -1386,7 +1386,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{a5995314-f535-45d4-8bd8-2d0b8a0dc42a}" uuid="{d00cf83f-e2de-4e12-b176-1c45eb6fcf6c}" generic_component="{ef80cd5e-2689-47ee-8888-31d04fc99174}">
-            <name>R16</name>
+            <name>R8</name>
             <value>${RESISTANCE}</value>
             <attributes>
                 <attribute key="RESISTANCE">
@@ -1409,7 +1409,7 @@ ${VOLTAGE}</value>
             </signal_mapping>
         </generic_component_instance>
         <generic_component_instance symbol_variant="{b9de4767-8626-4d02-8895-6fbce03105e9}" uuid="{8a1420be-e7d4-4a7f-a88d-4dcfa99f67ed}" generic_component="{82207562-d317-4911-96fa-ceb0f45fd806}">
-            <name>D3</name>
+            <name>D2</name>
             <value>BAS21</value>
             <attributes/>
             <signal_mapping>

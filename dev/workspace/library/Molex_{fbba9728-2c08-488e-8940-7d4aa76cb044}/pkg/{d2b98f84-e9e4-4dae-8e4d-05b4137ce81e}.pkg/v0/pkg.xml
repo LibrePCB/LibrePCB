@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{d2b98f84-e9e4-4dae-8e4d-05b4137ce81e}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:38:43Z</created>
+        <last_modified>2015-08-15T21:38:43Z</last_modified>
+        <name locale="en_US">52760-1879</name>
+        <description locale="en_US">&lt;b>MOLEX Connector SD-52760-**79&lt;/b>&lt;p>
+Source: 52760-1079_sd molex.pdf
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 52760-1879
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{d9260f4f-ba32-4e62-9620-545ffc68738f}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

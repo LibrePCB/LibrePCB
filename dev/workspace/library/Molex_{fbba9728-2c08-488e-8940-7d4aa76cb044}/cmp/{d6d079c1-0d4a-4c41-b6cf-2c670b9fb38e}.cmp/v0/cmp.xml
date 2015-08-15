@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{d6d079c1-0d4a-4c41-b6cf-2c670b9fb38e}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:40:37Z</created>
+        <last_modified>2015-08-15T21:40:37Z</last_modified>
+        <name locale="en_US">5566-4</name>
+        <description locale="en_US">&lt;b>Mini FIT connector 4 pol&lt;/b>&lt;p>
+Source: http://www.molex.com
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 5566-4
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{f0965bcf-2145-413e-8bad-93cf65f91534}</generic_component>
+        <package>{f735deae-513b-4bab-86d3-ec544b5efdc7}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{0ba237e1-d93d-40bd-9f23-793bd8249db7}" signal="{c14dc694-f01c-4c0d-a1d1-bff32b112188}"/>
+        <map pad="{b15bb080-720b-446c-9e7d-4e3745736a82}" signal="{58816c36-2045-4edd-aa76-29a4a6501a56}"/>
+        <map pad="{96dc00d6-91ac-4c9e-b2c7-571bd9c75b8e}" signal="{9b070e26-931d-4a85-b543-c1e809935fef}"/>
+        <map pad="{5b5ee05d-93e9-4057-b5b9-663c4ea0c576}" signal="{ee53b80c-28bd-4f4c-9cb2-fe56648da6b0}"/>
+    </pad_signal_map>
+</component>

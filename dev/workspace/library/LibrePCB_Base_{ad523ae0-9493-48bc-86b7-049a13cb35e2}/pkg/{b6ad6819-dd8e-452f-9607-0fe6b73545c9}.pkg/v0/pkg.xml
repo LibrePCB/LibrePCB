@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{b6ad6819-dd8e-452f-9607-0fe6b73545c9}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T20:18:53Z</created>
+        <last_modified>2015-08-15T20:18:53Z</last_modified>
+        <name locale="en_US">MCS10B</name>
+        <description locale="en_US">&lt;b>SOLDER PAD&lt;/b>&lt;p>
+drill 1.0 mm
+
+This element was automatically imported from Eagle
+Filepath: solpad.lbr
+Name: MCS10B
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{04fa5650-4e9f-47a6-800d-307e8bd19958}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

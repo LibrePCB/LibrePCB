@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{b19044b7-d637-43a1-80f0-66bfb647da28}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T20:06:12Z</created>
+        <last_modified>2015-08-15T20:06:12Z</last_modified>
+        <name locale="en_US">SMS-0</name>
+        <description locale="en_US">
+
+This element was automatically imported from Eagle
+Filepath: isabellen.lbr
+Name: SMS-0
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{ef80cd5e-2689-47ee-8888-31d04fc99174}</generic_component>
+        <package>{10caf38f-7ca8-4deb-ba8f-fceba1ccd795}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{7f1d7c11-0ac4-463b-b0cc-92cf27f812bc}" signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}"/>
+        <map pad="{87384824-1809-4e03-b1a7-3cdd8f3964ee}" signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}"/>
+    </pad_signal_map>
+</component>

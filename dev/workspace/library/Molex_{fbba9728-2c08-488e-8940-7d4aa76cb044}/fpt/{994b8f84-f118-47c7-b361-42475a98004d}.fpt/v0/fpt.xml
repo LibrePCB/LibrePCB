@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{994b8f84-f118-47c7-b361-42475a98004d}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:38:43Z</created>
+        <last_modified>2015-08-15T21:38:43Z</last_modified>
+        <name locale="en_US">KK-156-3</name>
+        <description locale="en_US">&lt;b>KK 156 HEADER&lt;/b>&lt;p>
+Source: http://www.molex.com/pdm_docs/sd/026604100_sd.pdf
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: KK-156-3
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" start_x="5.790000" start_y="4.950000" layer="260" fill="false" width="0.203200">
+            <segment end_x="3.990000" end_y="4.950000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="3.990000" start_y="4.950000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-3.965000" end_y="4.950000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-3.965000" start_y="4.950000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-5.765000" end_y="4.950000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-5.765000" start_y="4.950000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-5.765000" end_y="-4.825000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-5.765000" start_y="-4.825000" layer="260" fill="false" width="0.203200">
+            <segment end_x="5.790000" end_y="-4.825000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="5.790000" start_y="-4.825000" layer="260" fill="false" width="0.203200">
+            <segment end_x="5.790000" end_y="4.950000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-3.965000" start_y="2.525000" layer="260" fill="false" width="0.203200">
+            <segment end_x="3.990000" end_y="2.525000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="3.990000" start_y="2.525000" layer="260" fill="false" width="0.203200">
+            <segment end_x="3.990000" end_y="4.950000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-3.965000" start_y="2.525000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-3.965000" end_y="4.950000" angle="0.000000"/>
+        </polygon>
+        <text x="-6.460000" layer="240" y="-4.445000" rotation="90.000000" h_align="left" text="${CMP::NAME}" height="2.500000" v_align="bottom"/>
+        <text x="7.730000" layer="250" y="-4.445000" rotation="90.000000" h_align="left" text="${CMP::VALUE}" height="2.000000" v_align="bottom"/>
+    </geometry>
+    <pads>
+        <pad uuid="{1a15b9c8-16d0-4d33-82dc-1315dd60b7b8}" x="-3.960000" y="0.000000" layer="0" rotation="90.000000" height="2.184400" width="4.368800" type="tht_round" drill="1.700000">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{c3021124-704e-41fb-ad5c-f04947b36f2f}" x="0.000000" y="0.000000" layer="0" rotation="90.000000" height="2.184400" width="4.368800" type="tht_round" drill="1.700000">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{0354f4f8-d323-4bac-b6c1-9f84f14c60cb}" x="3.960000" y="0.000000" layer="0" rotation="90.000000" height="2.184400" width="4.368800" type="tht_round" drill="1.700000">
+            <name locale="en_US">3</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{7fb40415-d28d-4503-9a25-f2693e268791}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:40:39Z</created>
+        <last_modified>2015-08-15T21:40:39Z</last_modified>
+        <name locale="en_US">87438-07</name>
+        <description locale="en_US">&lt;b>Wire-to-Board  1.50mm (.059") Pitch Header - Right Angle, SMT, Shrouded&lt;/b>&lt;p>
+Source: http://www.molex.com/product/micro/87438.html
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 87438-07
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{a6505d1e-87a9-4f29-be5a-d4f600ebdead}</generic_component>
+        <package>{f3732cec-1eda-45e7-a4cd-64ada1351af4}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{018e22a5-2cf1-4993-a948-af5942797bba}" signal="{b5e5bbb0-ad8b-42be-a854-d5748a90ee46}"/>
+        <map pad="{3487dee2-ef87-42cc-a3d9-381b5be6a072}" signal="{2235e2ed-b06b-4e2d-80aa-74605eac2b77}"/>
+        <map pad="{f4202ed3-69d2-4c81-8ecc-308be7f57b5c}" signal="{52d8582f-5c7b-4cb3-829e-02a83cc8a1ba}"/>
+        <map pad="{d5671352-9c0e-4d2c-b49b-da6f7b979863}" signal="{1bb738dc-9561-4790-a797-af20f8af1f20}"/>
+        <map pad="{b0dfb3f4-5ba3-4437-82ab-76e7336b94a3}" signal="{8844581f-89eb-40cd-ae16-78d7051bd4ad}"/>
+        <map pad="{768758a3-826b-486d-ac2d-2308b78bb6bd}" signal="{57c21725-de8a-4fc9-92e0-f4821eb1dc40}"/>
+        <map pad="{b5ee9f88-26d0-4b99-8539-a64d5733d8a8}" signal="{1adda708-d82c-4aa9-bfed-82dc5d8c0668}"/>
+    </pad_signal_map>
+</component>

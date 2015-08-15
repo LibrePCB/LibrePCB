@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{b6209ab2-fd38-4df7-809a-d2ad96c2e23f}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:40:36Z</created>
+        <last_modified>2015-08-15T21:40:36Z</last_modified>
+        <name locale="en_US">53?-11_047</name>
+        <description locale="en_US">&lt;b>CONNECTOR&lt;/b>&lt;p>
+wire to board 1.25 mm (.049 inch) pitch header
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 53?-11
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{83d7c0d9-3623-4996-bc63-5df3e106c1eb}</generic_component>
+        <package>{4cce4577-ab62-40c2-9899-4bebd08f27ad}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{5b334b1c-5f9c-4922-b84b-e25667d0847f}" signal="{686fc702-622b-4ad6-9779-755741eded79}"/>
+        <map pad="{4a5ef9d5-9362-4f84-8d4a-c6fe61aab3e9}" signal="{c833c128-eb8e-42d1-970d-a8320107945e}"/>
+        <map pad="{ad6bff67-d024-44eb-b410-3a03948c85aa}" signal="{a4b561e7-8ea1-4cb4-92ae-1dba8a0614c5}"/>
+        <map pad="{9bfda6c7-e3a8-41bb-b33c-f9e9e9bb0cfb}" signal="{7a7a77dc-827f-4e88-8a5e-b9b254808cc1}"/>
+        <map pad="{bf263e41-9625-4571-ab9f-c6a747210509}" signal="{d6e2f179-9b26-44c0-9c92-0b04acabe6a4}"/>
+        <map pad="{6703a2d6-4b3d-4790-ada9-f395443bba1b}" signal="{cae449c9-0944-4bdf-92fe-6f421725c649}"/>
+        <map pad="{032b3375-9ba4-4fe2-8bd2-62aa7de5b5c9}" signal="{88defc3d-a5fe-4274-9a03-868d056a6fba}"/>
+        <map pad="{c1976bfa-39e4-4726-87b5-44955301a122}" signal="{7f2af89a-b057-45b5-9c45-c21b9f7641c1}"/>
+        <map pad="{e8eb058c-0aac-4d44-b456-fe20ac6b2091}" signal="{0598fc3c-5a93-4caf-9228-032f06ba30ba}"/>
+        <map pad="{554571c5-4f71-4ac9-83b8-bc0621d120a7}" signal="{d3909ed7-6dbe-4c76-b992-4b7298ac46a6}"/>
+        <map pad="{f37555cc-d976-4f61-ae46-1552fd4456c6}" signal="{0ca0d382-539d-4879-bc31-a81cabfd3696}"/>
+    </pad_signal_map>
+</component>

@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{836cfc84-54f9-485e-b810-75afe31a59ba}</uuid>
+        <version>0.1</version>
+        <author/>
+        <created/>
+        <last_modified/>
+        <name locale="en_US">SMBJ</name>
+        <description locale="en_US">&lt;b>DO-214AA Modified J_BEND&lt;/b>&lt;p>
+Source: www.rsonline.de .. SMBJ12/C/15/C/24/C/30/C/5.0/C/7.5/C Voltage Suppressor. Data Sheet
+
+This element was automatically imported from Eagle
+Filepath: diode.lbr
+Name: SMBJ
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"></keywords>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon layer="200" fill="true" width="0.000000" start_x="-2.800000" start_y="-1.100000" grab_area="true">
+            <segment end_x="-2.250000" end_y="-1.100000" angle="0.000000"/>
+            <segment end_x="-2.250000" end_y="1.100000" angle="0.000000"/>
+            <segment end_x="-2.800000" end_y="1.100000" angle="0.000000"/>
+            <segment end_x="-2.800000" end_y="-1.100000" angle="0.000000"/>
+        </polygon>
+        <polygon layer="200" fill="true" width="0.000000" start_x="2.250000" start_y="-1.100000" grab_area="true">
+            <segment end_x="2.800000" end_y="-1.100000" angle="0.000000"/>
+            <segment end_x="2.800000" end_y="1.100000" angle="0.000000"/>
+            <segment end_x="2.250000" end_y="1.100000" angle="0.000000"/>
+            <segment end_x="2.250000" end_y="-1.100000" angle="0.000000"/>
+        </polygon>
+        <polygon layer="260" fill="false" width="0.101600" start_x="2.240000" start_y="1.920000" grab_area="true">
+            <segment end_x="2.240000" end_y="-1.920000" angle="0.000000"/>
+            <segment end_x="-2.240000" end_y="-1.920000" angle="0.000000"/>
+            <segment end_x="-2.240000" end_y="1.920000" angle="0.000000"/>
+            <segment end_x="2.240000" end_y="1.920000" angle="0.000000"/>
+        </polygon>
+        <text layer="240" v_align="bottom" text="${CMP::NAME}" rotation="0.000000" x="-1.905000" y="2.540000" h_align="left" height="2.500000"/>
+        <text layer="250" v_align="bottom" text="${CMP::VALUE}" rotation="0.000000" x="-1.905000" y="-3.810000" h_align="left" height="2.000000"/>
+    </geometry>
+    <pads>
+        <pad layer="300" rotation="180.000000" width="1.780000" type="smd_rect" x="2.040000" y="0.000000" drill="0.000000" uuid="{cc97d7ce-a4d0-482c-89d4-f82015f81a0b}" height="2.160000">
+            <name locale="en_US">A</name>
+            <description locale="en_US"></description>
+        </pad>
+        <pad layer="300" rotation="0.000000" width="1.780000" type="smd_rect" x="-2.030000" y="0.000000" drill="0.000000" uuid="{7294480b-112f-4b6e-9f5b-f9239b95c5dd}" height="2.160000">
+            <name locale="en_US">C</name>
+            <description locale="en_US"></description>
+        </pad>
+    </pads>
+</footprint>

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{3c7800d2-e3ba-4db7-ad8c-e2d2378e65bc}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T20:06:05Z</created>
+        <last_modified>2015-08-15T20:06:05Z</last_modified>
+        <name locale="en_US">SMT-REF</name>
+        <description locale="en_US">
+
+This element was automatically imported from Eagle
+Filepath: isabellen.lbr
+Name: SMT-REF
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{067fdbe4-30ed-4003-b7f9-cc929390db1e}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

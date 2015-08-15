@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{f88d9532-8e86-4d0e-bbe5-63b91e95e782}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:40:36Z</created>
+        <last_modified>2015-08-15T21:40:36Z</last_modified>
+        <name locale="en_US">C-GRID-10_-15-91</name>
+        <description locale="en_US">&lt;b>CONNECTOR&lt;/b>&lt;p>
+wire to board 2.54 mm (0.100") pitch header
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: C-GRID-10
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{30bcd811-0555-4525-b0cc-35fbbf07e2e8}</generic_component>
+        <package>{08808f04-8776-4e81-a419-71cb4438a6e0}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{450d3e1f-3082-4a14-9f3b-f700322c5086}" signal="{4766e85c-60a7-4829-9528-5a954754d724}"/>
+        <map pad="{46c56c60-d3d5-43bb-8936-aa90f54cfc4a}" signal="{731848e2-381d-4780-a3c4-d76d02c024f3}"/>
+        <map pad="{3932f892-07dd-4451-8a2c-dc01ede4675c}" signal="{1801ec05-0e99-46ec-b58c-79e6a5ab9eb3}"/>
+        <map pad="{c0f1c442-59f8-4b40-a389-f2b7cfbba890}" signal="{10d77502-db3b-4e94-bb1f-f45b3960888a}"/>
+        <map pad="{0f25a7a2-1eea-480b-bb85-547cef0108b2}" signal="{bbb968ea-51fd-416e-ba8b-f51a827f029c}"/>
+        <map pad="{5e9d7213-db23-442e-a7d9-cdc011335088}" signal="{d0f903c9-b57c-48a3-bb22-8c2b73e22aba}"/>
+        <map pad="{15e34ea5-5224-4b21-a729-b114abf8597b}" signal="{98179578-89d5-4332-a27f-df347c5e6a95}"/>
+        <map pad="{49e0612e-dbfe-4dd0-a68c-5eee878ab200}" signal="{d8bb019a-2c74-49cc-a10d-3afdaaefa193}"/>
+        <map pad="{402dbaee-bb49-4dbf-aa46-945fe463b52d}" signal="{37caf491-e021-4c90-aca4-5754766bc8bb}"/>
+        <map pad="{37836032-d3fa-4b4e-bfed-274d7041382f}" signal="{f4abd1ea-42c0-47dd-ba32-a71c492ed78b}"/>
+    </pad_signal_map>
+</component>

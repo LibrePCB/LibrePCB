@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{43e73749-223b-4b0c-92cc-0a7c1636166e}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:40:37Z</created>
+        <last_modified>2015-08-15T21:40:37Z</last_modified>
+        <name locale="en_US">5566-24</name>
+        <description locale="en_US">&lt;b>Mini FIT connector 24 pol&lt;/b>&lt;p>
+Source: http://www.molex.com
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 5566-24
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{62327533-f657-4eff-aa22-4f49b1c07028}</generic_component>
+        <package>{3d72d178-0ca9-4fe2-98f4-2d1a4ade0178}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{77c4887f-cac3-4ba7-b510-4cc06cf70add}" signal="{452e01d5-f3d8-4792-a5d5-c85860188060}"/>
+        <map pad="{8ccf27b8-a49e-452e-8cc6-28beafa2137f}" signal="{10aef267-064b-4c28-89b6-b0cd662f1fa7}"/>
+        <map pad="{b02b173f-176f-4054-a87c-761c15070592}" signal="{c523c6a1-8075-4d7d-858e-d1665f5a840b}"/>
+        <map pad="{145fc635-6600-400a-a9d8-fe1256733b41}" signal="{b2e657e5-93a6-4c08-89c9-a608eb9b179d}"/>
+        <map pad="{17f3c4e1-2ac9-42f5-aff8-38bab6c229f4}" signal="{28eb971b-f36c-42e8-a2dd-e8dae8a9be45}"/>
+        <map pad="{cbfd0b81-ddb0-4ad5-867f-b3989eedafd2}" signal="{b88b7aff-6ccd-41b6-aa9c-df31e90a85bc}"/>
+        <map pad="{e94e05d7-6ca3-4a06-88fa-3f990fd22c26}" signal="{5c44622f-9008-4a76-a86c-161f6bfde3c2}"/>
+        <map pad="{e6f795f8-5f46-44b8-980d-3b3955c4b61d}" signal="{eff5a633-51b8-4ea7-92c3-f7400b50b650}"/>
+        <map pad="{1952f3aa-640e-4dcd-8e64-ab2f2ec7fd9f}" signal="{2a0422c2-0947-4db6-a92e-28d7ca5ecc67}"/>
+        <map pad="{9afd73b9-f429-4cec-865b-f46fce13f905}" signal="{97b3eceb-b360-43d1-bcc9-61c2ba62c55e}"/>
+        <map pad="{5ad3aad7-2ccd-48dc-965a-292341196c00}" signal="{ddba4577-c120-4199-bf85-e5f4d331cf0a}"/>
+        <map pad="{c54cdb60-ef42-4acb-b187-73443f37d237}" signal="{86de9622-ca59-4f92-a89b-c850509f1679}"/>
+        <map pad="{2ca0468c-a337-49e5-bcab-1bb3aef985c9}" signal="{05ac6875-a5b0-41ee-a91e-486a1c7449d5}"/>
+        <map pad="{faf2903a-acd6-4001-bee4-3bbecaa4ac7b}" signal="{747b6d4d-05f2-4cac-b8b2-46909d5bcff8}"/>
+        <map pad="{644ce5af-e9d8-4a08-92ec-eae60e126217}" signal="{9f7a7b96-7bfc-4180-a514-622f9235c3bf}"/>
+        <map pad="{dafcc60c-2140-4095-95d9-2cb2aea6e1a1}" signal="{4dcd5a45-1376-44d7-b316-eafe17f9cf61}"/>
+        <map pad="{1a88604d-8dd2-4eb9-8e53-891536866f29}" signal="{8bafed5f-d3cb-4f87-95b4-ee26a0b5a7cb}"/>
+        <map pad="{2f41fb4b-e6fe-49a8-8c83-91b3cfa5963e}" signal="{06f05bac-56a7-44da-8684-fc66c0d3066a}"/>
+        <map pad="{5b58afdd-c491-41ad-8797-1c0beddb80e0}" signal="{aa18f264-ccb0-4ec5-b36a-11632bf5387b}"/>
+        <map pad="{aaf37d84-9c88-4ded-8d5c-b2bde86df339}" signal="{75ff608f-4482-43a4-96b1-366053d221d1}"/>
+        <map pad="{e83516fa-5dbe-4241-969b-0c7fcedebeef}" signal="{2a43abe3-4b3d-4bab-8620-c033b3397382}"/>
+        <map pad="{bb7db279-8589-4a78-9841-7ddce75f27bc}" signal="{1cb3ac23-6011-4853-bff2-7a0f23da4c96}"/>
+        <map pad="{87e1e70d-00be-42ab-be8d-eefa96e7456e}" signal="{092237d8-8f7b-4ab4-bf9e-1c9aa8cfe399}"/>
+        <map pad="{0698f411-348f-4ee9-9cf6-9f117bac3b77}" signal="{865e13d3-311a-48c9-aaac-53c543aaafe7}"/>
+    </pad_signal_map>
+</component>

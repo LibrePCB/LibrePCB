@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{be6a9038-3d58-46d0-a4fc-e44a3377907a}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T20:06:05Z</created>
+        <last_modified>2015-08-15T20:06:05Z</last_modified>
+        <name locale="en_US">SMS-WAV</name>
+        <description locale="en_US">
+
+This element was automatically imported from Eagle
+Filepath: isabellen.lbr
+Name: SMS-WAV
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{35667140-069a-4a31-b473-75a17501adc4}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

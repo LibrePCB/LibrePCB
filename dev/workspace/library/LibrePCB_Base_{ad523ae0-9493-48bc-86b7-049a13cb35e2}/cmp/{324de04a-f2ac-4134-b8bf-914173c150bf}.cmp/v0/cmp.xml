@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{324de04a-f2ac-4134-b8bf-914173c150bf}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-13T20:22:31Z</created>
+        <last_modified>2015-08-13T20:22:31Z</last_modified>
+        <name locale="en_US">R-0201</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US"/>
+        <generic_component>{ef80cd5e-2689-47ee-8888-31d04fc99174}</generic_component>
+        <package>{f6ef66e9-3d11-45e8-a9a7-49d5f281a4a7}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}" pad="{cebb1d91-53a8-4afd-86a5-d3406ebf8942}"/>
+        <map signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}" pad="{6a007f8c-985f-4d06-8e2e-6104b6008441}"/>
+    </pad_signal_map>
+</component>

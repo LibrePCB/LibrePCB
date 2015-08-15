@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{21d005cf-2d0c-4ace-bf6c-f063c4a15047}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:40:36Z</created>
+        <last_modified>2015-08-15T21:40:36Z</last_modified>
+        <name locale="en_US">C-GRID-12_-70553</name>
+        <description locale="en_US">&lt;b>CONNECTOR&lt;/b>&lt;p>
+wire to board 2.54 mm (0.100") pitch header
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: C-GRID-12
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{f697d4e7-6516-4566-a9d2-22534af59526}</generic_component>
+        <package>{2f5b17d8-d53e-48e2-9327-c07df21808c7}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{95840de2-9a98-43e4-be9e-008ae6324c90}" signal="{e26d08a5-7afe-455e-bdc7-a4e7d8c439a2}"/>
+        <map pad="{a25b2ad9-07ac-4cde-8b1f-16a907aa42b6}" signal="{87349036-1606-4bb9-a450-9227b875f638}"/>
+        <map pad="{f8733e1d-cd83-4ae2-a4ac-bebc0b60fbb2}" signal="{dfd6f790-9747-454d-9f2b-904432430cb5}"/>
+        <map pad="{c3786439-4fb6-4081-b63b-8a9b19b14be9}" signal="{2d2ae0c1-d90d-42c8-b202-7dcf9ecd8e67}"/>
+        <map pad="{fa6f7fd0-8bea-4492-8c90-12474d4df9cd}" signal="{f786e58a-1b79-4bb0-9748-ea494e2c60f2}"/>
+        <map pad="{40d2a151-800e-4f95-8b2f-86fb7cfcf8d8}" signal="{07d3943a-6fd8-4873-95ee-dd6bf5881f0b}"/>
+        <map pad="{13ba3cff-63b0-4f39-b454-e4b0661c5406}" signal="{d9c0b8bb-26c8-4ff2-b01d-165dd0b53ac8}"/>
+        <map pad="{1f29b7bb-4484-4ee1-8fb6-ad7919c4c00e}" signal="{aacc4ba2-7ffd-4f55-9f4d-703231076cf6}"/>
+        <map pad="{de1d881c-670d-4acc-ab6d-feff4de26532}" signal="{020ad7c4-5d86-41fd-ba95-88059fc84114}"/>
+        <map pad="{7a3f86f2-17ca-49b4-a677-6077d2fb736e}" signal="{4b1cc531-5e8f-4edb-8f11-670de96a567f}"/>
+        <map pad="{2444ed51-44aa-4eec-8daa-85ab9f320bc4}" signal="{23e436a8-a88f-4bee-aa44-b0908459e50a}"/>
+        <map pad="{c159d25d-dcf1-426a-ac76-6ac043679996}" signal="{b608635e-b0ae-4c89-ac7e-aa9d02be9ed7}"/>
+    </pad_signal_map>
+</component>

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{22b7a237-97b8-4dd1-93b7-45ef9fbde4fd}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T20:06:05Z</created>
+        <last_modified>2015-08-15T20:06:05Z</last_modified>
+        <name locale="en_US">PMD</name>
+        <description locale="en_US">
+
+This element was automatically imported from Eagle
+Filepath: isabellen.lbr
+Name: PMD
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{f30e052c-d5a4-40e7-a16e-c52e9bbd5aa3}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

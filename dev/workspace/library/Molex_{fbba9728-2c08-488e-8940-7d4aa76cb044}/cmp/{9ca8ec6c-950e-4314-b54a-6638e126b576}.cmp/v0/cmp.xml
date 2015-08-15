@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{9ca8ec6c-950e-4314-b54a-6638e126b576}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:40:36Z</created>
+        <last_modified>2015-08-15T21:40:36Z</last_modified>
+        <name locale="en_US">87832-04</name>
+        <description locale="en_US">&lt;b>Milli-Grid Header&lt;/b>&lt;p> 
+2.00mm (.079") Pitch
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 87832-04
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{d9bde848-d597-4264-a3ab-342ffe143054}</generic_component>
+        <package>{8e6b6b8e-4f67-4ab6-bfbb-a443e00731b5}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{b6df17ac-a9d2-4732-9b8b-906b388c6baf}" signal="{3cfb3118-ae69-48c7-9756-3bc8bfd170e8}"/>
+        <map pad="{f6d73e69-aad3-46d2-b6f0-97f5a6bd680d}" signal="{3dad6d23-10df-469b-99b2-aa9046dfe369}"/>
+        <map pad="{365139d8-7fbe-47e4-aa38-f9aa7d062970}" signal="{10667233-ac82-4ffc-b9f9-2cfea3e454d7}"/>
+        <map pad="{4765af34-3e3f-47a4-909c-dd2b7151291d}" signal="{53d9e9a3-d80c-4909-9c4a-11a34394e2d0}"/>
+    </pad_signal_map>
+</component>

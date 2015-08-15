@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{a457f2fc-100c-4431-a441-c4cd3360db9c}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:35Z</created>
+        <last_modified>2015-06-21T12:37:35Z</last_modified>
+        <name locale="en_US">C-1210</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US"/>
+        <footprint>{2b9cf5e4-b75a-4462-99cf-1b4fb65400c9}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

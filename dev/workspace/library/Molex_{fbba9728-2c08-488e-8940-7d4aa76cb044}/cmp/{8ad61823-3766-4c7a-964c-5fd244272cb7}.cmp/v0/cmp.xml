@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{8ad61823-3766-4c7a-964c-5fd244272cb7}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:40:39Z</created>
+        <last_modified>2015-08-15T21:40:39Z</last_modified>
+        <name locale="en_US">87758-1616</name>
+        <description locale="en_US">&lt;b>16 Pin - 2mm Dual Row Single Wafer, Vertical T/H HDR&lt;/b>&lt;p>
+Source: http://www.molex.com/pdm_docs/sd/877580616_sd.pdf
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 87758-1616
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{7e51e913-d395-4f87-9ce9-32dceb23d3f7}</generic_component>
+        <package>{83f1cdbd-5f72-4a41-9c66-1f5b86e77c95}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map/>
+</component>

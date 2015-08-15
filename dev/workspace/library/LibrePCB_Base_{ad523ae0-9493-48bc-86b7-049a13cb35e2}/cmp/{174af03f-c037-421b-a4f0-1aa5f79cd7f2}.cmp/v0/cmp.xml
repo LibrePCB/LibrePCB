@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{174af03f-c037-421b-a4f0-1aa5f79cd7f2}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T20:18:54Z</created>
+        <last_modified>2015-08-15T20:18:54Z</last_modified>
+        <name locale="en_US">MCS08</name>
+        <description locale="en_US">&lt;b>SOLDER PAD&lt;/b>&lt;p> MC S0,8, drill 1.2 mm, distributor Buerklin, 08F130
+
+This element was automatically imported from Eagle
+Filepath: solpad.lbr
+Name: MCS08
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{197dacc7-3785-4054-a538-ced0d6271faa}</generic_component>
+        <package>{f97f525c-c563-4130-bc24-c9e910df4511}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{59ff6f82-4c13-430e-9f72-b07069188bd3}" signal="{ad6ae81a-7914-49b7-a87b-a0e8574b7398}"/>
+    </pad_signal_map>
+</component>

@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{0ff58e44-752b-4314-927f-7305e947ac7d}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:40:36Z</created>
+        <last_modified>2015-08-15T21:40:36Z</last_modified>
+        <name locale="en_US">C-GRID-06_-74099</name>
+        <description locale="en_US">&lt;b>CONNECTOR&lt;/b>&lt;p>
+wire to board 2.54 mm (0.100") pitch header
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: C-GRID-06
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{ed9b27ad-401e-4915-9a1b-5972726b75db}</generic_component>
+        <package>{c42fccd4-0a73-4605-abcd-62792a3dbdd1}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{23e3b9b1-b5cc-410c-86ba-71b52a89b8f5}" signal="{d502ae79-e75c-40ab-8284-2e0166739275}"/>
+        <map pad="{73c5bbd8-92b8-4583-96d1-4ec2f507b20d}" signal="{dce7870a-71b8-412e-bc2d-a0286697241e}"/>
+        <map pad="{c285e444-c5b3-49a9-ab37-c2979ca4eb67}" signal="{62cc9351-ea76-4c77-b502-3e53df9f0e58}"/>
+        <map pad="{8840caea-244c-4c11-a752-499b00be86d5}" signal="{b8b66306-6e34-4554-81c0-aa3e507a06ff}"/>
+        <map pad="{b6043b5d-f317-46f1-bd28-de6e30f50bfa}" signal="{408b86ab-04a3-4a22-8813-e570d20ee0e5}"/>
+        <map pad="{8a4c1bc3-4b85-4d43-a8f3-315e69d57607}" signal="{6f6e1ecc-2c0c-4a73-b6dd-cc36e08ea46f}"/>
+    </pad_signal_map>
+</component>

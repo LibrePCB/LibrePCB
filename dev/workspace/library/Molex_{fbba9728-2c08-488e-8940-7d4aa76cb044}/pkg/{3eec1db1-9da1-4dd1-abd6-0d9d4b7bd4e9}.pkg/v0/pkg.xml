@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{3eec1db1-9da1-4dd1-abd6-0d9d4b7bd4e9}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:38:40Z</created>
+        <last_modified>2015-08-15T21:38:40Z</last_modified>
+        <name locale="en_US">53048-06</name>
+        <description locale="en_US">&lt;b>CONNECTOR&lt;/b>&lt;p>
+wire to board 1.25 mm (.049 inch) pitch header&lt;p>
+right angle
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 53048-06
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{62c9318f-b03f-4d92-8e1d-3c4be2f426a5}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

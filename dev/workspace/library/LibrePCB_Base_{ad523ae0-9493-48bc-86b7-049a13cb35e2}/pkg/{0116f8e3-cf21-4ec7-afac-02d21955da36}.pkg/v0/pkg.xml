@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{0116f8e3-cf21-4ec7-afac-02d21955da36}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T20:18:53Z</created>
+        <last_modified>2015-08-15T20:18:53Z</last_modified>
+        <name locale="en_US">LSP10</name>
+        <description locale="en_US">&lt;b>SOLDER PAD&lt;/b>&lt;p>
+drill 1.0 mm
+
+This element was automatically imported from Eagle
+Filepath: solpad.lbr
+Name: LSP10
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{fbb993dd-c359-44ca-b64f-920225c853bd}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

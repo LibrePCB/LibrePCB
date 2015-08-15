@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{d47c6c3b-1c5a-4a1e-990e-e01ed456b7d3}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:40:39Z</created>
+        <last_modified>2015-08-15T21:40:39Z</last_modified>
+        <name locale="en_US">43160-*02</name>
+        <description locale="en_US">&lt;b>SDA-43160 Connector&lt;/b>&lt;p>
+Source: http://www.molex.com/pdm_docs/sd/431601306_sd.pdf
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 43160-*02
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{a4c14dd6-a43f-47c1-87b6-4100db0c070c}</generic_component>
+        <package>{51ff00fd-b1b7-4df5-98ae-eba2736cf9e8}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{6e4cb96a-5446-47ff-989f-e787b4522ec3}" signal="{6752dedc-4ece-48fb-873c-30a752c59dbc}"/>
+        <map pad="{83110bf0-797a-49e8-90bd-5248fa4e2fd2}" signal="{a2c54435-170f-43c3-8b9b-56bc49846bb3}"/>
+        <map pad="{b8ff3ed8-7532-464c-ba41-f1bd19509628}" signal="{6752dedc-4ece-48fb-873c-30a752c59dbc}"/>
+        <map pad="{694516b7-1f9a-4581-bbbd-6d0bca0d14e3}" signal="{a2c54435-170f-43c3-8b9b-56bc49846bb3}"/>
+    </pad_signal_map>
+</component>

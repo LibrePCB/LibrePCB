@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{41efc3b6-16e3-4525-850a-e678a28a0376}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:27:01Z</created>
+        <last_modified>2015-08-15T21:27:01Z</last_modified>
+        <name locale="en_US">ABM3</name>
+        <description locale="en_US">
+
+This element was automatically imported from Eagle
+Filepath: 0_Standardbauteile.lbr
+Name: ABM3
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{46e587d8-d0df-4403-be4d-4027e6dc9ad6}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

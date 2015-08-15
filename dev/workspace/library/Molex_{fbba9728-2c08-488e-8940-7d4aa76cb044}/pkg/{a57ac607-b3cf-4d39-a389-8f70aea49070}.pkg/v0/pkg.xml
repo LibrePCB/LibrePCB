@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{a57ac607-b3cf-4d39-a389-8f70aea49070}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:38:42Z</created>
+        <last_modified>2015-08-15T21:38:42Z</last_modified>
+        <name locale="en_US">87832-18</name>
+        <description locale="en_US">&lt;b>PCB Headers&lt;/b>&lt;p> 
+2.00mm (.079") Pitch Milli-Grid Header, Vertical, Shrouded
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 87832-18
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{14619ce1-fc89-4b4c-b499-870d3c035536}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

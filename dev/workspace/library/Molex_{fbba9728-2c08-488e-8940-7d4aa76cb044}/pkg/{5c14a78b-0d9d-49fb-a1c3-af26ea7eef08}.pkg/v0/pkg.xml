@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{5c14a78b-0d9d-49fb-a1c3-af26ea7eef08}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:38:42Z</created>
+        <last_modified>2015-08-15T21:38:42Z</last_modified>
+        <name locale="en_US">74099-14</name>
+        <description locale="en_US">&lt;b>C-Grid SL Connector&lt;/b>&lt;p>
+ vertical SMD, 14 pin
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 74099-14
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{e6105394-987c-4812-a094-0e3085e267d4}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

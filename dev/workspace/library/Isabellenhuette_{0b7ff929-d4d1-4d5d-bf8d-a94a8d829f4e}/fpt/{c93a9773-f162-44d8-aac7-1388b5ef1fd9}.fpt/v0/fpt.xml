@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{c93a9773-f162-44d8-aac7-1388b5ef1fd9}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T20:06:05Z</created>
+        <last_modified>2015-08-15T20:06:05Z</last_modified>
+        <name locale="en_US">SMR</name>
+        <description locale="en_US">
+
+This element was automatically imported from Eagle
+Filepath: isabellen.lbr
+Name: SMR
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon width="0.200000" start_y="-2.400000" grab_area="true" layer="200" fill="false" start_x="-5.900000">
+            <segment end_y="2.400000" angle="0.000000" end_x="-5.900000"/>
+        </polygon>
+        <polygon width="0.200000" start_y="2.400000" grab_area="true" layer="200" fill="false" start_x="-5.900000">
+            <segment end_y="2.400000" angle="0.000000" end_x="-4.990800"/>
+        </polygon>
+        <polygon width="0.200000" start_y="2.400000" grab_area="true" layer="200" fill="false" start_x="4.940000">
+            <segment end_y="2.400000" angle="0.000000" end_x="5.900000"/>
+        </polygon>
+        <polygon width="0.200000" start_y="2.400000" grab_area="true" layer="200" fill="false" start_x="5.900000">
+            <segment end_y="-2.400000" angle="0.000000" end_x="5.900000"/>
+        </polygon>
+        <polygon width="0.200000" start_y="-2.400000" grab_area="true" layer="200" fill="false" start_x="5.900000">
+            <segment end_y="-2.400000" angle="0.000000" end_x="4.940000"/>
+        </polygon>
+        <polygon width="0.200000" start_y="-2.400000" grab_area="true" layer="200" fill="false" start_x="-4.940000">
+            <segment end_y="-2.400000" angle="0.000000" end_x="-5.900000"/>
+        </polygon>
+        <polygon width="0.200000" start_y="-3.900000" grab_area="true" layer="260" fill="false" start_x="4.900000">
+            <segment end_y="3.900000" angle="0.000000" end_x="4.900000"/>
+            <segment end_y="3.900000" angle="0.000000" end_x="-4.900000"/>
+            <segment end_y="-3.900000" angle="0.000000" end_x="-4.900000"/>
+            <segment end_y="-3.900000" angle="0.000000" end_x="4.900000"/>
+        </polygon>
+        <text rotation="0.000000" x="-2.844800" h_align="left" y="1.625600" v_align="bottom" layer="240" text="${CMP::NAME}" height="2.500000"/>
+        <text rotation="0.000000" x="-2.844800" h_align="left" y="-2.082800" v_align="bottom" layer="250" text="${CMP::VALUE}" height="2.000000"/>
+    </geometry>
+    <pads>
+        <pad rotation="0.000000" width="2.800000" uuid="{421b7353-d60d-4c73-839b-9739d1a57477}" x="5.029200" y="0.000000" drill="0.000000" layer="300" type="smd_rect" height="5.800000">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad rotation="0.000000" width="2.800000" uuid="{fc41197b-3166-4184-b182-44dc41b88d6e}" x="-5.029200" y="0.000000" drill="0.000000" layer="300" type="smd_rect" height="5.800000">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{1d7fc74c-a80a-40d0-bb8b-46c5a56bbf26}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:38:41Z</created>
+        <last_modified>2015-08-15T21:38:41Z</last_modified>
+        <name locale="en_US">6410-11</name>
+        <description locale="en_US">&lt;b>MOLEX 2.54mm KK  CONNECTOR&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 6410-11
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{d66c3b38-50a6-4f1b-a77d-a18a9ff13571}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

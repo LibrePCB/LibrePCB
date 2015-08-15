@@ -6,13 +6,8 @@
         <author/>
         <created/>
         <last_modified/>
-        <name locale="en_US">R0603</name>
-        <description locale="en_US">&lt;b>RESISTOR&lt;/b>
-
-This element was automatically imported from Eagle
-Filepath: rcl.lbr
-Name: R0603
-NOTE: Remove this text after manual rework!</description>
+        <name locale="en_US">R-0603</name>
+        <description locale="en_US"></description>
         <keywords locale="en_US"></keywords>
         <footprint>{4fceac63-0f89-46c4-8e93-d6ee67d33e69}</footprint>
         <model_3d></model_3d>

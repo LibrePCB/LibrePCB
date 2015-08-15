@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{946032b9-6e92-4364-864a-38cb4a9eec2d}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:40:37Z</created>
+        <last_modified>2015-08-15T21:40:37Z</last_modified>
+        <name locale="en_US">5566-20</name>
+        <description locale="en_US">&lt;b>Mini FIT connector 20 pol&lt;/b>&lt;p>
+ATX PC-Motherboard Power connector&lt;br>
+Source: http://www.molex.com
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 5566-20
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{ecf519e8-682b-4101-8cb6-e645adb5fcc9}</generic_component>
+        <package>{5be04ac8-1940-4d08-9382-e3992897e27c}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{467761d3-2202-4b8d-9119-0987e7cf20c3}" signal="{f45cb89e-e64c-40d9-b79f-55433b2d4cdd}"/>
+        <map pad="{be2f6cfb-03a6-4851-b68d-a2216c009117}" signal="{7a3d130a-8ef8-42f3-97fb-04e7a3379bba}"/>
+        <map pad="{bf7c56e8-4019-4fe7-ae1e-a8467e261af0}" signal="{90bc0dd7-6521-4344-a2f5-fc7380c47911}"/>
+        <map pad="{c8f57323-fca1-477a-8573-031b7eeabcfb}" signal="{2fad70aa-857f-430a-bb61-68034e676383}"/>
+        <map pad="{bcbda261-b4a0-4bfd-a10c-cdd71bd01a43}" signal="{50059c35-c5fd-41f7-85c0-28539eab8c57}"/>
+        <map pad="{2758663d-6933-4bf9-96e8-c740aaac6553}" signal="{efc9ff1e-b2cf-4243-a49c-eb867434d849}"/>
+        <map pad="{396f992b-d2fc-4363-b5e8-b6172eaba55a}" signal="{1a82c56d-4368-474c-92ea-50cb8966b24e}"/>
+        <map pad="{c97cf63a-be70-4232-87e3-da2492de7711}" signal="{4c7f30f0-b174-4344-9b01-44be1a9b018a}"/>
+        <map pad="{47afa166-7c90-40a6-826d-e0f3a24e8f91}" signal="{1b977e52-6a1f-416c-b75b-8158b81b94da}"/>
+        <map pad="{b068d4eb-ce42-46a4-9c82-869aba1b5933}" signal="{b0193290-47ff-4b48-abaa-01ca4f6eed8e}"/>
+        <map pad="{3125cb24-f8db-48be-8815-28a5b481eaae}" signal="{cb2d6c47-d580-4646-9c0e-f18f3b81e7a7}"/>
+        <map pad="{8fb96eaa-0108-4736-b26e-bc7f1d02a3f1}" signal="{021a923f-b1a0-43db-8db6-4edd7a7c4d4f}"/>
+        <map pad="{418944ed-d751-4366-a8f8-1416145b7d2f}" signal="{0bd13a1d-af4b-4505-8c62-1ce693df1c44}"/>
+        <map pad="{095c7858-7ad7-4cee-a8b6-517a5b5364a0}" signal="{de31e538-3966-48c4-817a-5e9f769d80a9}"/>
+        <map pad="{0e4fe2f2-a171-4355-bcca-b78d6a95504f}" signal="{61763195-ff34-4f34-a68e-c23adcec654a}"/>
+        <map pad="{3f2915aa-09b7-4667-ba44-21d4c6839cf0}" signal="{ebe36473-94be-4532-aee9-4bd3e4d85f51}"/>
+        <map pad="{326d18ff-d8b2-4e29-a791-df4ce307d4fc}" signal="{b8064a30-9cfe-47b4-b9f1-c3e9461ddf45}"/>
+        <map pad="{a5f75006-be3e-441a-bf9e-42f2a34b2dfb}" signal="{09bbea2c-c8d6-4fd3-905a-55f519d104c3}"/>
+        <map pad="{f08f17ca-7f78-45d4-8312-37ec65f92f25}" signal="{927dd68d-f465-47d5-a20a-d1f475144ede}"/>
+        <map pad="{d8a7a8dd-db7e-4cce-8fd7-62ca741b1856}" signal="{4f341f01-3805-493d-8dfd-766fed35e3da}"/>
+    </pad_signal_map>
+</component>

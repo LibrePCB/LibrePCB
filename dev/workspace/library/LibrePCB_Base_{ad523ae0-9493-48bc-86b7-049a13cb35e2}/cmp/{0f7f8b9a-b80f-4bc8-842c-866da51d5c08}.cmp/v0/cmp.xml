@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{0f7f8b9a-b80f-4bc8-842c-866da51d5c08}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T20:18:54Z</created>
+        <last_modified>2015-08-15T20:18:54Z</last_modified>
+        <name locale="en_US">SE13</name>
+        <description locale="en_US">&lt;b>SOLDER PAD&lt;/b>&lt;p> E1542,  drill 1,3mm, distributor Buerklin, 07F815
+
+This element was automatically imported from Eagle
+Filepath: solpad.lbr
+Name: SE13
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{197dacc7-3785-4054-a538-ced0d6271faa}</generic_component>
+        <package>{9bcaffad-7d27-4fe8-b156-872b1f48c28f}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{f418135e-83c2-443c-b446-0cf90f813306}" signal="{ad6ae81a-7914-49b7-a87b-a0e8574b7398}"/>
+    </pad_signal_map>
+</component>

@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{75499377-93e9-46ea-947f-b6a3596702a3}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:40:39Z</created>
+        <last_modified>2015-08-15T21:40:39Z</last_modified>
+        <name locale="en_US">43160-*06</name>
+        <description locale="en_US">&lt;b>SDA-43160 Connector&lt;/b>&lt;p>
+Source: http://www.molex.com/pdm_docs/sd/431601306_sd.pdf
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 43160-*06
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{e7216c5e-62f4-43d4-84c1-3e2d3cb98f76}</generic_component>
+        <package>{43835a4c-1fb5-48f9-95d6-3dd28aacab85}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{53e22c6f-d12a-4322-ace1-8dc57203c829}" signal="{0cb33693-35da-4983-9a13-2fa05042522c}"/>
+        <map pad="{9ceb93ed-80f5-476a-8dc0-51e02b2cb854}" signal="{9995c74c-b5ba-41b8-9b81-6ec1e447999a}"/>
+        <map pad="{d16736d5-e1d6-4379-bc6f-ea2175de5cb8}" signal="{bfe03e98-809c-417a-8690-9a7f011bf5f6}"/>
+        <map pad="{617f239e-5f1b-41f2-9e3d-fabcf6a248a2}" signal="{6406e55d-a3bc-4fc9-9793-03d7eae6e0f3}"/>
+        <map pad="{b5cedc94-8175-4c88-b14b-dfd3424a5014}" signal="{3644c176-dcb0-4050-a75a-9801f38af9a1}"/>
+        <map pad="{00ed4e82-f082-4081-8e27-f146dcd1b2ee}" signal="{0cb33693-35da-4983-9a13-2fa05042522c}"/>
+        <map pad="{a82e1d62-060e-45fb-8bcb-db40c62c3819}" signal="{ef9a7832-da8b-44a9-baa4-3981de5628eb}"/>
+        <map pad="{4a7cfe72-5714-4f95-b275-6c8871c8ea3c}" signal="{ef9a7832-da8b-44a9-baa4-3981de5628eb}"/>
+        <map pad="{63071af4-23b9-4c61-9917-24c80c878c06}" signal="{9995c74c-b5ba-41b8-9b81-6ec1e447999a}"/>
+        <map pad="{bb67ef94-b2aa-42af-abb3-e7d8a2b34dac}" signal="{bfe03e98-809c-417a-8690-9a7f011bf5f6}"/>
+        <map pad="{4946aff0-86ca-4267-9028-b026c80f970a}" signal="{6406e55d-a3bc-4fc9-9793-03d7eae6e0f3}"/>
+        <map pad="{acd24085-252b-4bd7-a36f-fdbd8d02413d}" signal="{3644c176-dcb0-4050-a75a-9801f38af9a1}"/>
+    </pad_signal_map>
+</component>

@@ -1,0 +1,97 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{97dc2149-120a-433a-9084-cc91a586c137}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:38:43Z</created>
+        <last_modified>2015-08-15T21:38:43Z</last_modified>
+        <name locale="en_US">KK-156-11</name>
+        <description locale="en_US">&lt;b>KK 156 HEADER&lt;/b>&lt;p>
+Source: http://www.molex.com/pdm_docs/sd/026604100_sd.pdf
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: KK-156-11
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" start_x="21.630000" start_y="4.950000" layer="260" fill="false" width="0.203200">
+            <segment end_x="19.830000" end_y="4.950000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="19.830000" start_y="4.950000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-19.805000" end_y="4.950000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-19.805000" start_y="4.950000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-21.605000" end_y="4.950000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-21.605000" start_y="4.950000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-21.605000" end_y="-4.825000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-21.605000" start_y="-4.825000" layer="260" fill="false" width="0.203200">
+            <segment end_x="21.630000" end_y="-4.825000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="21.630000" start_y="-4.825000" layer="260" fill="false" width="0.203200">
+            <segment end_x="21.630000" end_y="4.950000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-19.805000" start_y="2.525000" layer="260" fill="false" width="0.203200">
+            <segment end_x="19.830000" end_y="2.525000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="19.830000" start_y="2.525000" layer="260" fill="false" width="0.203200">
+            <segment end_x="19.830000" end_y="4.950000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-19.805000" start_y="2.525000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-19.805000" end_y="4.950000" angle="0.000000"/>
+        </polygon>
+        <text x="-22.300000" layer="240" y="-4.445000" rotation="90.000000" h_align="left" text="${CMP::NAME}" height="2.500000" v_align="bottom"/>
+        <text x="23.570000" layer="250" y="-4.445000" rotation="90.000000" h_align="left" text="${CMP::VALUE}" height="2.000000" v_align="bottom"/>
+    </geometry>
+    <pads>
+        <pad uuid="{3ddc992c-a3b8-45b8-9b9b-059d15c5cbd6}" x="7.920000" y="0.000000" layer="0" rotation="90.000000" height="2.184400" width="4.368800" type="tht_round" drill="1.700000">
+            <name locale="en_US">8</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{74eee03b-1e39-4e8e-9fb6-1d080a128483}" x="-19.800000" y="0.000000" layer="0" rotation="90.000000" height="2.184400" width="4.368800" type="tht_round" drill="1.700000">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{6509256c-06a2-4a63-b6a3-12098c5a2396}" x="0.000000" y="0.000000" layer="0" rotation="90.000000" height="2.184400" width="4.368800" type="tht_round" drill="1.700000">
+            <name locale="en_US">6</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{c53f4e8a-42f2-4336-b64f-7a1f9db98bc6}" x="-11.880000" y="0.000000" layer="0" rotation="90.000000" height="2.184400" width="4.368800" type="tht_round" drill="1.700000">
+            <name locale="en_US">3</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{d1234a43-de77-4756-9683-4506631bc22b}" x="-15.840000" y="0.000000" layer="0" rotation="90.000000" height="2.184400" width="4.368800" type="tht_round" drill="1.700000">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{f61df7cf-2423-43dc-ab02-39b179430109}" x="-3.960000" y="0.000000" layer="0" rotation="90.000000" height="2.184400" width="4.368800" type="tht_round" drill="1.700000">
+            <name locale="en_US">5</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{0ed41ddb-4b40-4beb-9524-4f62731f4e1e}" x="-7.920000" y="0.000000" layer="0" rotation="90.000000" height="2.184400" width="4.368800" type="tht_round" drill="1.700000">
+            <name locale="en_US">4</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{fd017c97-6787-443a-9247-4e6e637ab60c}" x="15.840000" y="0.000000" layer="0" rotation="90.000000" height="2.184400" width="4.368800" type="tht_round" drill="1.700000">
+            <name locale="en_US">10</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{e5138882-4b05-442c-b8e6-56089184273a}" x="19.800000" y="0.000000" layer="0" rotation="90.000000" height="2.184400" width="4.368800" type="tht_round" drill="1.700000">
+            <name locale="en_US">11</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{0e9610a8-6806-44ab-9184-c3289e3a9f42}" x="3.960000" y="0.000000" layer="0" rotation="90.000000" height="2.184400" width="4.368800" type="tht_round" drill="1.700000">
+            <name locale="en_US">7</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{c583100f-0854-4d36-b0c1-ae291cd4afb4}" x="11.880000" y="0.000000" layer="0" rotation="90.000000" height="2.184400" width="4.368800" type="tht_round" drill="1.700000">
+            <name locale="en_US">9</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

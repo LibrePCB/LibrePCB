@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{4d0eef91-bf2d-4e01-956f-2332bc5bf8dd}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:38:45Z</created>
+        <last_modified>2015-08-15T21:38:45Z</last_modified>
+        <name locale="en_US">679105700</name>
+        <description locale="en_US">&lt;b>MINI PCI EXPRESS CONNECTOR&lt;/b> 0.8MM PITCH, 52 CIRCUIT&lt;p>
+Source: http://www.molex.com/pdm_docs/sd/679105700_sd.pdf
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 679105700
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{f31e7924-becb-4b68-97e7-de9a37aa2132}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

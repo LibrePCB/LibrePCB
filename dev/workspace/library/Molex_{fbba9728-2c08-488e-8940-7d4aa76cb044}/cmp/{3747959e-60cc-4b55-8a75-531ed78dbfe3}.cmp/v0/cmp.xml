@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{3747959e-60cc-4b55-8a75-531ed78dbfe3}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:40:38Z</created>
+        <last_modified>2015-08-15T21:40:38Z</last_modified>
+        <name locale="en_US">55091-0689</name>
+        <description locale="en_US">&lt;b>0.635 mm PITCH B TO B CONN.&lt;/b>&lt;p>
+Source: http://www.molex.com/pdm_docs/sd/550911609_sd.pdf
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 55091-0689
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{5b1d81d1-f5c3-446b-a77b-88496c49d056}</generic_component>
+        <package>{00ecaa9b-daca-4273-9892-35b404649906}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{d568c69e-1895-4220-bbcf-ecea53204ab3}" signal="{a5520515-48cf-43fc-9aff-6018df83b54b}"/>
+        <map pad="{ffff60dc-edb2-4547-b04c-84e2529f9a58}" signal="{3324708d-c660-4dc1-9514-79e88417948b}"/>
+        <map pad="{74ec1f13-4f37-464d-a1a8-304f7cc0c250}" signal="{afbb91df-e0b5-4a30-ab8b-865bec491a76}"/>
+        <map pad="{b516608f-e0e0-4c65-a2bd-4e0a21b62d35}" signal="{172ed86e-f77f-4885-8dff-f95213482743}"/>
+        <map pad="{961482e7-ed54-40c8-9b5b-ae22bf80c612}" signal="{4459b810-056b-4738-8783-5d6e399bcb22}"/>
+        <map pad="{d1cb23f2-fa0f-4a0c-8a24-ed5f9ca6821f}" signal="{6737d5aa-50eb-4060-b3b8-05da3cd6fbad}"/>
+        <map pad="{9ac38fe9-99af-45f2-86f3-5271d26817fb}" signal="{216266cb-a485-4bc6-bda1-06fd4e9927fd}"/>
+        <map pad="{94347b30-dd4f-48a7-aeb3-8456c56a4c10}" signal="{29793e14-4a09-4a78-8361-62c827a2e5f4}"/>
+        <map pad="{992d4460-5ce7-46db-910d-6f330ba735d1}" signal="{07d0eb84-0d51-48a3-82e0-59bf96be3bb0}"/>
+        <map pad="{6df848d9-cded-4c54-baa0-513ac9d98521}" signal="{65b5ab6d-cfba-445f-92c1-e4fc7d43363f}"/>
+        <map pad="{970c00ad-2c3d-4e56-81e8-fa8b75297570}" signal="{33fb67ee-f9c0-4c98-a8f3-0758e9ad2c47}"/>
+        <map pad="{3eea785d-39fa-4238-919b-661b65471b22}" signal="{33131d78-4228-4db0-be73-163c48b6b0a9}"/>
+        <map pad="{2396ec60-69f7-41ae-9025-3fa2960a42dc}" signal="{3b37568d-641e-44d4-9e07-a61df3c48d6d}"/>
+        <map pad="{aedd7e99-63de-4153-8a61-b605eefcf266}" signal="{079a4599-9316-4a4d-b33d-84b32efe6c26}"/>
+        <map pad="{71c1cae0-68e6-4f60-b2db-9ebd6b4e26e1}" signal="{8b86571c-9688-46a8-8fc0-40101856d795}"/>
+        <map pad="{c3dbd94a-8bad-45f7-9ec1-74cfe96a6f43}" signal="{08dfe389-3b05-43d5-8d25-70de8158b2fc}"/>
+        <map pad="{7db7dff6-8ddf-4b26-8367-ba3cc407681e}" signal="{b7ced86d-a644-4bea-b7cd-4e9d6991b656}"/>
+        <map pad="{698428b6-1e0a-48e3-bbff-c4a082bc13e4}" signal="{2933ca51-5037-424b-8444-dd9ec6e69761}"/>
+        <map pad="{946ca41f-e3a0-4682-be5d-23ae2629a38e}" signal="{6d501b15-6388-4b53-bd52-4b558f312e91}"/>
+        <map pad="{3457f45f-6371-40a7-837c-405ba9fe6359}" signal="{37b566a8-053e-498e-b3db-61874a990192}"/>
+        <map pad="{d95e09eb-33a3-4f48-8bc7-5cf9f055fd8d}" signal="{8dc35b02-7540-4efe-aa8f-c635a165e29d}"/>
+        <map pad="{308d66f4-cc82-444e-b327-114581f06e93}" signal="{8bcc5c0d-516a-42b4-b648-80a56e711600}"/>
+        <map pad="{a4a6fea4-934d-4d6f-bebf-c05c59f08852}" signal="{2ec92d08-7eea-48bd-995e-b19baadfdc08}"/>
+        <map pad="{ed4ace8f-01f1-4365-a23d-685bf0e5aab2}" signal="{3240bb7b-2089-4f0d-9242-03ec4dc7fa71}"/>
+        <map pad="{6af994b2-6f89-4d36-8dc8-70503ca8fe38}" signal="{494aa935-d5d8-4f00-b583-870a09aa8bf7}"/>
+        <map pad="{f2706c2c-8943-41d8-951f-695fa328302e}" signal="{c343a8d1-6a21-4a8d-85e1-b5adb550388e}"/>
+        <map pad="{991ab196-da39-4b98-ae1d-a85c49fcbfe5}" signal="{507d626e-4d83-4b5b-964b-1ff013d32939}"/>
+        <map pad="{2a410c95-4aa0-4a3a-b949-b1596003ef93}" signal="{e07009bf-57e0-441b-88e2-2eb5d3796ac2}"/>
+        <map pad="{6cfa2294-8310-4be4-8b7d-466593979fe7}" signal="{17378a30-ea83-45a5-b189-0850a9b57cab}"/>
+        <map pad="{9c2d56fe-5273-4024-88c0-3ecf2979ce52}" signal="{3c6ac2aa-69b8-4c94-bf94-944e514fd658}"/>
+        <map pad="{6671f600-75b5-4ad7-aeb2-315cc8d501c4}" signal="{27929e60-f035-4beb-8c11-e15327eb4740}"/>
+        <map pad="{a9284235-f7ab-4d45-9b34-f5e6861107e4}" signal="{f82d5558-0ad2-495d-9220-9fc0035e1e8d}"/>
+        <map pad="{3f42e522-e8e1-4234-bc6c-52dff12c332f}" signal="{a61b67a7-f3d6-4731-8d9c-33aeb705456b}"/>
+        <map pad="{5b362667-958b-48f6-91f3-3d095b719771}" signal="{4955e8ff-0ef2-4d9e-bfa6-ff29f8fb0087}"/>
+        <map pad="{3e0703be-1cc7-4780-9609-cbd7c7b77d9e}" signal="{6ac76377-4dc7-4e2f-8f17-56d2698e3207}"/>
+        <map pad="{ca74dde4-5362-45eb-87c2-2a231fe5233d}" signal="{0878f2a4-6999-4990-9f64-8e00b45e8c5d}"/>
+        <map pad="{c9440630-b33a-46e8-a6de-b0241fccacbc}" signal="{1419b35b-8649-43b2-a3fc-45008eda9ca4}"/>
+        <map pad="{104d2792-7612-410f-87b6-230686a6f8dd}" signal="{9decdd28-58b9-4ebf-a6c1-ced03c752377}"/>
+        <map pad="{084c63c9-6b01-4031-b649-ba1882682d34}" signal="{ba570405-58db-48c7-a8ff-fff1ce6beda4}"/>
+        <map pad="{c38afa79-fb57-4056-963a-18f8382b107d}" signal="{9b9a344f-76a5-4c3e-9428-f9e7e21ace07}"/>
+        <map pad="{59546bd2-e045-4382-bf15-200431505b01}" signal="{980d7b72-2449-4fad-91c2-9768f550fdd6}"/>
+        <map pad="{27b90b20-6ace-46aa-8f0e-7a5182908fc7}" signal="{f04356c0-1f8a-46a6-8ab2-02bf1c348b80}"/>
+        <map pad="{6becd4b3-db1e-4263-a40a-c20849ab42f0}" signal="{81259d11-1342-431e-8b9e-5774875a9f59}"/>
+        <map pad="{f34e7293-9813-489e-8993-3014c4013031}" signal="{46d77dcc-038a-4a6a-9c7e-35513f2fa1bb}"/>
+        <map pad="{212cdc59-59c3-48cd-b640-2fa3182feef2}" signal="{1f9c509e-51ea-4722-8d44-1ca123718356}"/>
+        <map pad="{21cad2e9-5df2-4799-a7b5-a2699aa436e0}" signal="{38bbca84-c038-4b56-833e-4822cae242aa}"/>
+        <map pad="{c9f23ddb-942b-4e27-b1b7-dea3bd041bd9}" signal="{449b64bd-c7e4-48e0-92b7-77ca59bae778}"/>
+        <map pad="{609c7442-edc0-40ef-96d1-b2680f1a37e9}" signal="{3b90f793-e68e-4907-ba6c-568d70564a77}"/>
+        <map pad="{381f7d32-4995-4484-adcd-447a281c1aca}" signal="{884318e3-1939-480c-8928-3f8d8d019ce6}"/>
+        <map pad="{521b3618-012c-4a39-8d0c-4cbfd21521b8}" signal="{b0e5977c-f719-4546-9ce6-952d9ec07db6}"/>
+        <map pad="{5858c34c-818f-4bc7-8876-29c3964e6edb}" signal="{efc20d6b-3ff3-420e-880f-176b7d441dfd}"/>
+        <map pad="{f0226b06-b7ce-483e-b2c9-41f81a09beb4}" signal="{b5ef6b10-6904-4b2e-a1db-02eb9e871542}"/>
+        <map pad="{fcaaa808-2deb-4fb7-80e8-15aa99c6fa27}" signal="{482e4cf7-50cc-4e21-abde-7096bd21b874}"/>
+        <map pad="{75313dfe-df14-4a50-b87f-f02f9b262671}" signal="{319dcc11-eec8-4704-bb4b-05d6c1de9a4f}"/>
+        <map pad="{677fa333-b41d-4540-bec9-b109edc6c0f8}" signal="{2cd3ab05-f3d7-480d-b903-6022f90fcc8d}"/>
+        <map pad="{3c117d34-6912-468c-8a8e-d5fd4f6f49a4}" signal="{2d97314d-2b74-44ba-8175-d14a43a9b125}"/>
+        <map pad="{b418b2de-5e6b-4518-8e00-317991f7e2b3}" signal="{faee3d90-47f0-47b7-b898-e740ea6b91fd}"/>
+        <map pad="{a6fe7131-1914-4c57-b9e0-b3bc30558470}" signal="{5bcd867c-9838-460c-9e83-9cabd1e6b345}"/>
+        <map pad="{4a88336a-b29c-45a8-a133-4cc748906650}" signal="{910c8c26-febb-4a7f-9de2-2ce5a58239a7}"/>
+        <map pad="{c52c7768-de91-4d98-9ec1-b6c039ab5eab}" signal="{f8315fcd-1328-4a03-b1be-c40ef970b990}"/>
+        <map pad="{f4c81bc0-00ce-4b61-907f-6344fba2cb4a}" signal="{324e0a6f-c53e-4e31-a6af-c83e13efc94a}"/>
+        <map pad="{a07b87aa-0c78-413b-bae4-755df789a295}" signal="{7b689929-b74d-41e8-9330-b074fb7a3090}"/>
+        <map pad="{3e823984-a285-4267-822d-774b4ff88ac4}" signal="{63609cc3-55e1-41d0-9a31-bece2f1708ab}"/>
+        <map pad="{8a591429-420a-497d-af4e-b791857047e8}" signal="{a2ff0c20-90b8-45e1-9a70-3634cbdc9c53}"/>
+        <map pad="{077fc8be-7a36-46e6-9ff7-78974060dc43}" signal="{968d1d09-dce1-4e32-94e7-e415e2fed6c6}"/>
+        <map pad="{a3623b43-ed54-4515-b123-88a5eaf15994}" signal="{4acfc5f2-8de2-4f9e-9d6b-c29e64c9e78b}"/>
+        <map pad="{8b4424de-f8b8-499a-a690-787268c8e7d8}" signal="{d1171828-986c-4027-a613-dd5504d8c612}"/>
+        <map pad="{69717dcc-c7da-4eb8-a99b-206f4e104fc4}" signal="{e028b02b-3135-4a8b-bc50-b0f8919194c6}"/>
+    </pad_signal_map>
+</component>

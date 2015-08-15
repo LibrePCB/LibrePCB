@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{4f6fcf65-85cd-4d64-a0ab-2e25d1c928b9}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-13T20:22:31Z</created>
+        <last_modified>2015-08-13T20:22:31Z</last_modified>
+        <name locale="en_US">R-3216</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US"/>
+        <generic_component>{ef80cd5e-2689-47ee-8888-31d04fc99174}</generic_component>
+        <package>{75b3e98e-0a30-4987-84ad-3f2fb0bd45da}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}" pad="{f222ce37-1cd1-4930-8f29-72c2649a5fb0}"/>
+        <map signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}" pad="{691e90da-f77d-49fd-b5be-332e6fcbb8d4}"/>
+    </pad_signal_map>
+</component>

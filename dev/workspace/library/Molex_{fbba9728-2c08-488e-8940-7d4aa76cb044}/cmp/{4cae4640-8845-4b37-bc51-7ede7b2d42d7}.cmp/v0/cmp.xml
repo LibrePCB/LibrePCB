@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{4cae4640-8845-4b37-bc51-7ede7b2d42d7}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:40:39Z</created>
+        <last_modified>2015-08-15T21:40:39Z</last_modified>
+        <name locale="en_US">87438-13</name>
+        <description locale="en_US">&lt;b>Wire-to-Board  1.50mm (.059") Pitch Header - Right Angle, SMT, Shrouded&lt;/b>&lt;p>
+Source: http://www.molex.com/product/micro/87438.html
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 87438-13
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{c57c5774-9e31-4060-a415-e5a620a64a89}</generic_component>
+        <package>{7ac2d2e8-9f1c-4b97-9406-cd07cbc3e5d2}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{ab5cffcd-52f0-4c08-8520-fdb40b2899f0}" signal="{b4ef13fe-d0b9-4a51-be52-0dbcb1065699}"/>
+        <map pad="{3398e6b3-7f3d-4d31-8d63-dadb06ef480e}" signal="{f1a85357-eca5-45ed-b241-35249b7eae21}"/>
+        <map pad="{99be347a-d83e-490b-822c-bced98cdddc0}" signal="{96231dc6-398f-49be-99b2-44b9ec440218}"/>
+        <map pad="{f7d95bd4-0b7d-4be4-a43f-6f053b5506ce}" signal="{b4370ea2-876a-4805-8930-94077d42a3a0}"/>
+        <map pad="{ea918353-2546-4d9c-8ed8-a691ed7ee707}" signal="{e7d8765d-2dc4-4ddc-8c2b-57185a5650d7}"/>
+        <map pad="{48f66dfc-5970-4525-b4ef-5515c26f539e}" signal="{3a766d1f-2646-4c7e-a621-aacf75fc99b0}"/>
+        <map pad="{ece40958-58c5-48dd-bd6d-7714b0c9c809}" signal="{d00ae1f7-305f-4dc9-9891-dae7b4030965}"/>
+        <map pad="{d0a2135c-a702-432c-91af-63198bd8f7ad}" signal="{0ef55e1f-6c05-4b39-bb3a-67a639ad249d}"/>
+        <map pad="{af3024be-2013-4060-bca4-9c83027c922e}" signal="{03e57212-c253-49d3-8151-9e591fa4a15d}"/>
+        <map pad="{c2b31657-25d0-41da-9fc4-f65661ebe7d2}" signal="{1514e029-9a20-485b-8a6f-c9139c6f9ea1}"/>
+        <map pad="{f262665c-e32a-484f-a25b-7d3be0420780}" signal="{d2bc20c4-6f1d-45a3-b644-c273a497bf73}"/>
+        <map pad="{3e161e26-2781-4658-8629-2925d1a04428}" signal="{c18262d5-28fa-4d38-aebb-65782ab6495c}"/>
+        <map pad="{1dc40a73-f3c8-4ea2-af92-c29def3ddcff}" signal="{039a7cce-860c-45aa-8302-9f24a14fb241}"/>
+    </pad_signal_map>
+</component>

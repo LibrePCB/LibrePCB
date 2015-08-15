@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{a3701710-ca70-4153-b45f-a13a54f34b83}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:38:41Z</created>
+        <last_modified>2015-08-15T21:38:41Z</last_modified>
+        <name locale="en_US">22-23-2071</name>
+        <description locale="en_US">.100" (2.54mm) Center Header - 7 Pin
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 22-23-2071
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" start_x="-8.890000" start_y="3.175000" layer="260" fill="false" width="0.254000">
+            <segment end_x="8.890000" end_y="3.175000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="8.890000" start_y="3.175000" layer="260" fill="false" width="0.254000">
+            <segment end_x="8.890000" end_y="1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="8.890000" start_y="1.270000" layer="260" fill="false" width="0.254000">
+            <segment end_x="8.890000" end_y="-3.175000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="8.890000" start_y="-3.175000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-8.890000" end_y="-3.175000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-8.890000" start_y="-3.175000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-8.890000" end_y="1.270000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-8.890000" start_y="1.270000" layer="260" fill="false" width="0.254000">
+            <segment end_x="-8.890000" end_y="3.175000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-8.890000" start_y="1.270000" layer="260" fill="false" width="0.254000">
+            <segment end_x="8.890000" end_y="1.270000" angle="0.000000"/>
+        </polygon>
+        <text x="-8.890000" layer="240" y="3.810000" rotation="0.000000" h_align="left" text="${CMP::NAME}" height="2.500000" v_align="bottom"/>
+        <text x="-8.890000" layer="250" y="-5.080000" rotation="0.000000" h_align="left" text="${CMP::VALUE}" height="2.000000" v_align="bottom"/>
+    </geometry>
+    <pads>
+        <pad uuid="{a741e87c-3f57-452f-9439-2308f9b7d087}" x="-7.620000" y="0.000000" layer="0" rotation="90.000000" height="2.000000" width="4.000000" type="tht_round" drill="1.000000">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{fb69f54b-9b30-4f91-a177-7c679a3cd654}" x="0.000000" y="0.000000" layer="0" rotation="90.000000" height="2.000000" width="4.000000" type="tht_round" drill="1.000000">
+            <name locale="en_US">4</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{d56c671a-2e7c-4ab3-9f86-9d60df6c901d}" x="-5.080000" y="0.000000" layer="0" rotation="90.000000" height="2.000000" width="4.000000" type="tht_round" drill="1.000000">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{47f18047-07fd-48d9-b574-0b3dcdd49e97}" x="5.080000" y="0.000000" layer="0" rotation="90.000000" height="2.000000" width="4.000000" type="tht_round" drill="1.000000">
+            <name locale="en_US">6</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{a81029d5-83b1-4312-9ea7-c724d7c42f33}" x="2.540000" y="0.000000" layer="0" rotation="90.000000" height="2.000000" width="4.000000" type="tht_round" drill="1.000000">
+            <name locale="en_US">5</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{091ad24c-fe7d-4f6a-8db7-db23905a36d4}" x="7.620000" y="0.000000" layer="0" rotation="90.000000" height="2.000000" width="4.000000" type="tht_round" drill="1.000000">
+            <name locale="en_US">7</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{4a754ca9-cfd8-4a00-b4e1-098b1da79035}" x="-2.540000" y="0.000000" layer="0" rotation="90.000000" height="2.000000" width="4.000000" type="tht_round" drill="1.000000">
+            <name locale="en_US">3</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

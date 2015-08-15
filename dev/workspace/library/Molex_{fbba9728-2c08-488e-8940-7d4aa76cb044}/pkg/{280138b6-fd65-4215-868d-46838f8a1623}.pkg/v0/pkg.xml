@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{280138b6-fd65-4215-868d-46838f8a1623}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:38:40Z</created>
+        <last_modified>2015-08-15T21:38:40Z</last_modified>
+        <name locale="en_US">71061-0003</name>
+        <description locale="en_US">&lt;b>CONNECTOR&lt;/b>&lt;p>
+68-pin 1.27mm (.050 inch) pitch SCSI+ unshielded receptacle, right angle, all plastic&lt;br>
+Source: http://www.molex.com/product/io/71061.html&lt;br>
+http://www.molex.com .. 710610003_sd.pdf
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 71061-0003
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{dfda476e-e32e-4754-a9dc-7a2206868e1e}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

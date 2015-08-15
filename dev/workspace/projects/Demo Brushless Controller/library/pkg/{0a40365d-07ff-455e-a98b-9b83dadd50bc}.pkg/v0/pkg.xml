@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{0a40365d-07ff-455e-a98b-9b83dadd50bc}</uuid>
+        <version>0.1</version>
+        <author/>
+        <created/>
+        <last_modified/>
+        <name locale="en_US">E5-10,5</name>
+        <description locale="en_US">&lt;b>ELECTROLYTIC CAPACITOR&lt;/b>&lt;p>
+grid 5.08 mm, diameter 10.5 mm
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: E5-10,5
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"></keywords>
+        <footprint>{e0098de2-125b-4100-bad2-3c629160bfba}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{95cc8966-fe7f-4fa6-af76-9e89c08d1065}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:40:37Z</created>
+        <last_modified>2015-08-15T21:40:37Z</last_modified>
+        <name locale="en_US">52746-16</name>
+        <description locale="en_US">&lt;b>FPC Connector ZIF for SMT 0.5mm&lt;/b>&lt;p>
+Source: http://www.farnell.com/datasheets/73044.pdf [DWG. NO. (Sheet 1 OF 2) SD-52746-**17]
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 52746-16
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{bddf1138-aaa7-41b5-a030-d8f328ea2aa8}</generic_component>
+        <package>{ca85c5e5-c996-40b8-b712-a1266bffa107}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{0a4a6374-f8a2-4a74-8bfa-9136a8e866bc}" signal="{66d0bc48-054c-4157-96ef-e8695f6b2c2a}"/>
+        <map pad="{78427295-225e-462f-9a10-aba8bdb90cb6}" signal="{22bbde35-745a-41e3-830d-c0a586886dfc}"/>
+        <map pad="{4865602d-5294-4e06-87fe-e71d9273a58c}" signal="{da1c1fab-1e29-4865-b462-6d3085e10da4}"/>
+        <map pad="{7dc9f85b-83b6-41f8-bab6-99a74001b94f}" signal="{831929fd-eef8-401a-ba39-d914b3183111}"/>
+        <map pad="{dfda9da2-4393-40a4-9d0c-fa47d37d52b3}" signal="{be3732ab-01fd-4e1c-a5eb-8f602c0b8bde}"/>
+        <map pad="{20345e4d-e21f-48a1-9851-d38f86791006}" signal="{60c02ae3-e680-4aa4-81b2-aea8fe102bd3}"/>
+        <map pad="{315bd356-788b-4ac9-8504-bb9072d64da4}" signal="{d753969c-6f05-4ca4-aff5-f6403f755ec5}"/>
+        <map pad="{d886da48-d668-4015-b69c-9838ea8be00e}" signal="{6452ae63-a5b7-429d-83a4-cf0b6e1cd452}"/>
+        <map pad="{608593e4-8d0b-4852-adaf-b78b5e55ad84}" signal="{94e14b6b-b456-4a78-8ace-6dfe93af9d81}"/>
+        <map pad="{99329c0f-e127-486c-8b5e-123bd9f84301}" signal="{15cf2780-95f8-4fab-9a1d-6a0642063b47}"/>
+        <map pad="{2ca74c0d-83fe-427a-8d6b-8bff508ae465}" signal="{d9d5d062-de97-45c6-a217-5b13aea14614}"/>
+        <map pad="{91cbe530-1816-4d87-909e-8d28232feb3f}" signal="{a0f08c48-d696-4422-b140-2cb893cc21a9}"/>
+        <map pad="{a7502bb8-1073-456b-b4d4-5bb8811c0708}" signal="{4b2217fd-e0a3-4485-a636-e130f84a7b34}"/>
+        <map pad="{f2c5e86b-93c7-46c9-b033-f975f3d89624}" signal="{a68a4947-e190-4f2f-9f12-7fffe0260a08}"/>
+        <map pad="{c1cd1adb-ca43-4a5e-8ac0-25cf31782145}" signal="{744be38e-7114-4fa3-94c6-f179be593526}"/>
+        <map pad="{fd171747-6e0f-464f-8d09-0ebee7a710bb}" signal="{84fa4a56-95b1-4401-8d72-dde24686e607}"/>
+    </pad_signal_map>
+</component>

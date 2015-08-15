@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{0c1c693e-fd9c-40f8-a815-c73d5dd9245d}</uuid>
+        <version>0.1</version>
+        <author/>
+        <created/>
+        <last_modified/>
+        <name locale="en_US">L2012C</name>
+        <description locale="en_US">&lt;b>INDUCTOR&lt;/b>
+
+This element was automatically imported from Eagle
+Filepath: rcl.lbr
+Name: L2012C
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"></keywords>
+        <footprint>{475b4255-db0b-487c-b618-89718bf61208}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

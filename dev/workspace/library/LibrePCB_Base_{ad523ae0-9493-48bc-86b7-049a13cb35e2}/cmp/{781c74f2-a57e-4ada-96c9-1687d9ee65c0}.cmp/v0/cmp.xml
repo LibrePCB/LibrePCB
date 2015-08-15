@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{781c74f2-a57e-4ada-96c9-1687d9ee65c0}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-13T20:22:31Z</created>
+        <last_modified>2015-08-13T20:22:31Z</last_modified>
+        <name locale="en_US">C-1608</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US"/>
+        <generic_component>{d167e0e3-6a92-4b76-b013-77b9c230e5f1}</generic_component>
+        <package>{3e9c71fb-04bb-48c1-9aa2-06bf91d3ded1}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map signal="{6d776f4d-2a7c-4128-a98a-dbb1dd861411}" pad="{37f937f7-87f8-4a1a-abf2-a88685718cc6}"/>
+        <map signal="{1c1c7abc-7b40-4f92-b533-f65604644db7}" pad="{3499070b-d90e-4013-a7d4-c4ac64265f45}"/>
+    </pad_signal_map>
+</component>

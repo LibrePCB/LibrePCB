@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{f97f525c-c563-4130-bc24-c9e910df4511}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T20:18:53Z</created>
+        <last_modified>2015-08-15T20:18:53Z</last_modified>
+        <name locale="en_US">MCS08</name>
+        <description locale="en_US">&lt;b>SOLDER PAD&lt;/b>&lt;p>
+drill 1.2 mm
+
+This element was automatically imported from Eagle
+Filepath: solpad.lbr
+Name: MCS08
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{e811707d-f895-4d1e-9cfb-1bd8e660bc6a}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

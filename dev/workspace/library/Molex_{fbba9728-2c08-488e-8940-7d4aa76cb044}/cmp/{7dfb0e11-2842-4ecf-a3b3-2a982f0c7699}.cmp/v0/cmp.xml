@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{7dfb0e11-2842-4ecf-a3b3-2a982f0c7699}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:40:37Z</created>
+        <last_modified>2015-08-15T21:40:37Z</last_modified>
+        <name locale="en_US">KK-156-11</name>
+        <description locale="en_US">&lt;b>KK 156 HEADER&lt;/b>&lt;p>
+Source: http://www.molex.com/pdm_docs/sd/026604100_sd.pdf
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: KK-156-11
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{4c57cf95-955d-4df7-94f6-759440a0b2b5}</generic_component>
+        <package>{f4fe1712-2d32-4d5c-8ccd-0dc513f9e24c}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{3ddc992c-a3b8-45b8-9b9b-059d15c5cbd6}" signal="{d016f125-34fd-406a-80cc-af77d3d9f1e6}"/>
+        <map pad="{c583100f-0854-4d36-b0c1-ae291cd4afb4}" signal="{0de621e7-2366-4832-b85a-cb8463e51cc8}"/>
+        <map pad="{e5138882-4b05-442c-b8e6-56089184273a}" signal="{1ce4a223-b58f-4fbf-842b-032d9548aa8a}"/>
+        <map pad="{c53f4e8a-42f2-4336-b64f-7a1f9db98bc6}" signal="{68604451-4ffb-4005-9efd-d78627080180}"/>
+        <map pad="{0ed41ddb-4b40-4beb-9524-4f62731f4e1e}" signal="{77e8a970-622b-4060-bbdb-089d955b0fa9}"/>
+        <map pad="{f61df7cf-2423-43dc-ab02-39b179430109}" signal="{fa894221-3966-4e6c-8ed5-d69d026d870d}"/>
+        <map pad="{74eee03b-1e39-4e8e-9fb6-1d080a128483}" signal="{78ca8b2f-fafb-4b1a-9c5c-d1a9472af695}"/>
+        <map pad="{d1234a43-de77-4756-9683-4506631bc22b}" signal="{dcf1e838-b6a5-4571-b020-a7247f109ff8}"/>
+        <map pad="{0e9610a8-6806-44ab-9184-c3289e3a9f42}" signal="{2501e5aa-dac8-416a-9206-5106bbcf16e1}"/>
+        <map pad="{fd017c97-6787-443a-9247-4e6e637ab60c}" signal="{126c1939-cfd0-4704-96d5-319aaf2dfb21}"/>
+        <map pad="{6509256c-06a2-4a63-b6a3-12098c5a2396}" signal="{6bb818c5-5c23-440f-b488-d025fa9917e2}"/>
+    </pad_signal_map>
+</component>

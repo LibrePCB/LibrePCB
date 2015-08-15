@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{1b0fc3a7-002c-4068-9c81-9cb4237ddcc7}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:40:37Z</created>
+        <last_modified>2015-08-15T21:40:37Z</last_modified>
+        <name locale="en_US">52559-2892</name>
+        <description locale="en_US">&lt;b>FFC/FPC&lt;/b>-to-Board  0.50mm (.020") SMT, Vertical, ZIF Receptacle&lt;p>
+Source: http://www.molex.com/product/ffc/52559.html
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 52559-2892
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{2fca6069-a0da-4385-8ed4-4920256ade4b}</generic_component>
+        <package>{c8954277-2668-4926-bae4-5159ea587da0}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{3998643f-352a-4450-9fa1-f7aa3e491363}" signal="{ac9249e8-01ed-4423-bfd0-79499777f8ad}"/>
+        <map pad="{499eaef4-65d7-4acf-9ed9-7839994c2924}" signal="{e849b65e-d281-4a49-b729-62ff7800460e}"/>
+        <map pad="{b6c8914e-7611-4011-80f2-1a52a3421ee2}" signal="{131975c2-2f9e-4380-ba6c-1dc926a61096}"/>
+        <map pad="{1475de46-a504-4998-bfa9-f2519ec8993f}" signal="{2a286f57-83b8-47a1-a113-3650c2d8f527}"/>
+        <map pad="{5a517a3c-4f29-452c-a0d4-b9ac71c4160f}" signal="{f0234884-34c5-4e53-8e8e-9a3b4a862ecd}"/>
+        <map pad="{9b70c7ab-e59b-4a0b-b7e3-687a60c0fe94}" signal="{2e315e6b-05e9-475a-b4ce-d73770b72295}"/>
+        <map pad="{d9f40869-5f3c-421a-bcfa-8610d56a97d6}" signal="{24aa97c5-762e-4e84-9147-64a0161b786c}"/>
+        <map pad="{37afbef9-dc1f-4440-9f5a-dfc90a6dc3a0}" signal="{08376152-2a15-4fac-a2d7-42bf4ddbe4ff}"/>
+        <map pad="{0d0b6c04-fdb3-4336-9630-69e414c1c181}" signal="{28dda5a5-548a-4ae9-9a99-0a6000783701}"/>
+        <map pad="{2c2f372f-83e5-4f35-9ed0-e9b2f1563ddc}" signal="{90559909-91f5-4343-a6d2-254ded46dddf}"/>
+        <map pad="{b3f63b03-7963-4c62-abdc-2d9a4c613c1d}" signal="{bd01fe92-72cd-44ee-ae54-268f388aa433}"/>
+        <map pad="{ed917da5-0a80-4c70-a535-4c40c21062ba}" signal="{e6b4aeff-c6c2-458b-bba4-bb2d9818fe8e}"/>
+        <map pad="{42d29ed6-2592-4599-93db-648bead74983}" signal="{5a316af2-385f-4bf9-9904-02bfdcfd8c9d}"/>
+        <map pad="{4a4c16f9-9e88-4487-a36b-93238f2e37d1}" signal="{7caf9c8e-f3b0-41c6-a327-e87a34eb04e7}"/>
+        <map pad="{24348ce1-799c-49f0-969c-bf93aecb1a40}" signal="{5ee1633d-f8f4-457e-a550-df718a6dd95b}"/>
+        <map pad="{96e8c3d0-9822-4425-9c63-b584f92b7d09}" signal="{f1097c2b-b3ce-4bd2-bc39-ad7b88f18629}"/>
+        <map pad="{8d7982c7-0c20-4130-88c1-f3fa71be2b95}" signal="{712a680d-71db-4e18-b505-0bcb6c967742}"/>
+        <map pad="{72e38962-4439-41e4-b64c-d9685e7dbc57}" signal="{ce6cfc0d-3dfa-46fa-ad29-65e4a75b9542}"/>
+        <map pad="{46bb110f-a9f8-402e-ba20-ef7f6f808f18}" signal="{427b0c86-ebb9-4071-b677-537af06574c9}"/>
+        <map pad="{659b906a-22c7-4a07-902d-70b4dee0658e}" signal="{75c04584-8433-4403-a68d-6632ea1f97b6}"/>
+        <map pad="{b08e8bbf-f4cf-41a5-9532-acf7fe6d4c00}" signal="{baba4b41-ee4d-4453-8820-bf6eef8e56c5}"/>
+        <map pad="{807bc2b0-e356-4863-9c80-eb87e8a784d6}" signal="{0a243bb7-36a2-46af-8c0a-9d0bac5e9746}"/>
+        <map pad="{946a2c56-7a82-4a15-b623-534c157555b2}" signal="{eb640948-3767-480d-80c3-fe72f32d1ae4}"/>
+        <map pad="{ee4a63ec-2e31-495d-ac8f-2ac46254118b}" signal="{f46b88d2-3576-4a42-80b4-7b9a84e18433}"/>
+        <map pad="{7bc9aec0-e1dd-4589-b4d4-46121c0c5e86}" signal="{b15af27d-0017-4c6b-98c1-1bfd198651d7}"/>
+        <map pad="{5d0a191b-c8dc-4ecc-af29-d3faa3af75f6}" signal="{158ddd59-5f11-449f-b70f-1553e206536c}"/>
+        <map pad="{c3682e00-9678-43bd-9c6e-775dfd2e6d04}" signal="{df394154-085f-47d1-b699-21784e963959}"/>
+        <map pad="{96b4f175-3a68-4b7c-85f7-9673c6d62067}" signal="{ece8a1ff-7a8f-4b3f-8abc-4e381691d657}"/>
+    </pad_signal_map>
+</component>

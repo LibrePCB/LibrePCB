@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<footprint version="0">
+    <meta>
+        <uuid>{fd8b24c8-c153-40b6-978a-cb79bded8b57}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:38:43Z</created>
+        <last_modified>2015-08-15T21:38:43Z</last_modified>
+        <name locale="en_US">KK-156-4</name>
+        <description locale="en_US">&lt;b>KK 156 HEADER&lt;/b>&lt;p>
+Source: http://www.molex.com/pdm_docs/sd/026604100_sd.pdf
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: KK-156-4
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+    </meta>
+    <categories/>
+    <geometry>
+        <polygon grab_area="true" start_x="7.770000" start_y="4.950000" layer="260" fill="false" width="0.203200">
+            <segment end_x="5.970000" end_y="4.950000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="5.970000" start_y="4.950000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-5.945000" end_y="4.950000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-5.945000" start_y="4.950000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-7.745000" end_y="4.950000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-7.745000" start_y="4.950000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-7.745000" end_y="-4.825000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-7.745000" start_y="-4.825000" layer="260" fill="false" width="0.203200">
+            <segment end_x="7.770000" end_y="-4.825000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="7.770000" start_y="-4.825000" layer="260" fill="false" width="0.203200">
+            <segment end_x="7.770000" end_y="4.950000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-5.945000" start_y="2.525000" layer="260" fill="false" width="0.203200">
+            <segment end_x="5.970000" end_y="2.525000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="5.970000" start_y="2.525000" layer="260" fill="false" width="0.203200">
+            <segment end_x="5.970000" end_y="4.950000" angle="0.000000"/>
+        </polygon>
+        <polygon grab_area="true" start_x="-5.945000" start_y="2.525000" layer="260" fill="false" width="0.203200">
+            <segment end_x="-5.945000" end_y="4.950000" angle="0.000000"/>
+        </polygon>
+        <text x="-8.440000" layer="240" y="-4.445000" rotation="90.000000" h_align="left" text="${CMP::NAME}" height="2.500000" v_align="bottom"/>
+        <text x="9.710000" layer="250" y="-4.445000" rotation="90.000000" h_align="left" text="${CMP::VALUE}" height="2.000000" v_align="bottom"/>
+    </geometry>
+    <pads>
+        <pad uuid="{302eb95f-b06e-49d8-91ef-8c95329f7637}" x="-1.980000" y="0.000000" layer="0" rotation="90.000000" height="2.184400" width="4.368800" type="tht_round" drill="1.700000">
+            <name locale="en_US">2</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{2518c6d3-dfaa-4fad-9e19-f80743263d20}" x="-5.940000" y="0.000000" layer="0" rotation="90.000000" height="2.184400" width="4.368800" type="tht_round" drill="1.700000">
+            <name locale="en_US">1</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{87d4ca37-a9d2-4ef5-8afe-32d8f2de61fe}" x="5.940000" y="0.000000" layer="0" rotation="90.000000" height="2.184400" width="4.368800" type="tht_round" drill="1.700000">
+            <name locale="en_US">4</name>
+            <description locale="en_US"/>
+        </pad>
+        <pad uuid="{b8ea14ae-5dcb-446b-9b36-8105dd869b1b}" x="1.980000" y="0.000000" layer="0" rotation="90.000000" height="2.184400" width="4.368800" type="tht_round" drill="1.700000">
+            <name locale="en_US">3</name>
+            <description locale="en_US"/>
+        </pad>
+    </pads>
+</footprint>

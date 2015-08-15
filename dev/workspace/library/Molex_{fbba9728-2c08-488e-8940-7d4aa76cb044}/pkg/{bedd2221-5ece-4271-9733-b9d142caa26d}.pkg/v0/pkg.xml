@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{bedd2221-5ece-4271-9733-b9d142caa26d}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:38:40Z</created>
+        <last_modified>2015-08-15T21:38:40Z</last_modified>
+        <name locale="en_US">5566-2</name>
+        <description locale="en_US">&lt;b>Mini FIT connector 2 pol&lt;/b>&lt;p>
+Source: http://www.molex.com
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 5566-2
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{ee357b92-583f-4dcb-a7f4-2f55ab9d8d33}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

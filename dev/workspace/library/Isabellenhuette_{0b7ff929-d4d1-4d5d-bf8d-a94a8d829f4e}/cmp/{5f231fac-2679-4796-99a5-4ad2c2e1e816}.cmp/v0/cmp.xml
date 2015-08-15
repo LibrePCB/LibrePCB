@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{5f231fac-2679-4796-99a5-4ad2c2e1e816}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T20:06:12Z</created>
+        <last_modified>2015-08-15T20:06:12Z</last_modified>
+        <name locale="en_US">PMA-B</name>
+        <description locale="en_US">
+
+This element was automatically imported from Eagle
+Filepath: isabellen.lbr
+Name: PMA-B
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{443433ce-6c39-4d6c-9311-909286cb9ce4}</generic_component>
+        <package>{d0a09149-d04c-46d8-911b-e709c5384f4e}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{7193095b-06ae-4a31-833d-c1413c1c8344}" signal="{1b925a3a-ad0d-44c6-b612-9befe5eaf623}"/>
+        <map pad="{f72ea0d7-1e30-45aa-b9f5-db5365026497}" signal="{c65811b0-4b2b-4acb-9578-b211b0373c21}"/>
+        <map pad="{7d114eda-8b0e-4e3a-9b98-d168090c7598}" signal="{d5544591-db41-46de-bf7d-64a2587311e3}"/>
+        <map pad="{c1b480a1-b365-46ee-863e-9bc3253ca215}" signal="{9cdca4f7-ab86-4164-b6bb-a8a4345cfd7f}"/>
+    </pad_signal_map>
+</component>

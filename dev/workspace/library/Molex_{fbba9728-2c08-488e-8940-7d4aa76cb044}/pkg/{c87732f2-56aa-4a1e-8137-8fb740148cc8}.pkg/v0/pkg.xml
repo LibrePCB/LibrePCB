@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{c87732f2-56aa-4a1e-8137-8fb740148cc8}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:38:41Z</created>
+        <last_modified>2015-08-15T21:38:41Z</last_modified>
+        <name locale="en_US">22-23-2031</name>
+        <description locale="en_US">.100" (2.54mm) Center Header - 3 Pin
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 22-23-2031
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{a3150735-895f-4615-ab74-60e2c7d62ab0}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

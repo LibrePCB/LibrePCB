@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{f84d8e75-95ab-4891-8b8c-7b34e7056e8b}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:38:41Z</created>
+        <last_modified>2015-08-15T21:38:41Z</last_modified>
+        <name locale="en_US">7395-08</name>
+        <description locale="en_US">&lt;b>MOLEX 2.54mm KK RA CONNECTOR&lt;/b>
+&lt;br>Fixed Orientation
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 7395-08
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{bbab3ee2-dac7-4f55-950b-8f538acfe1b5}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

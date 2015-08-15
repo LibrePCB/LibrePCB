@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{25e6de3c-df2e-49b1-969a-8cc4d88c6f86}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:38:40Z</created>
+        <last_modified>2015-08-15T21:38:40Z</last_modified>
+        <name locale="en_US">71061-0001</name>
+        <description locale="en_US">&lt;b>CONNECTOR&lt;/b>&lt;p>
+50-pin 1.27mm (.050 inch) pitch SCSI+ unshielded receptacle, right angle, all plastic&lt;br>
+Source: http://www.molex.com/product/io/71061.html
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 71061-0001
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <footprint>{3f7ee593-0451-4547-a0f1-b017bf7ba2ef}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

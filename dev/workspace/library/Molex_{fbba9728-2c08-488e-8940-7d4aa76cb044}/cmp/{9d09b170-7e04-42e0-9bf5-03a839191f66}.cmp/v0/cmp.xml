@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{9d09b170-7e04-42e0-9bf5-03a839191f66}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:40:36Z</created>
+        <last_modified>2015-08-15T21:40:36Z</last_modified>
+        <name locale="en_US">87832-08</name>
+        <description locale="en_US">&lt;b>Milli-Grid Header&lt;/b>&lt;p> 
+2.00mm (.079") Pitch
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: 87832-08
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{d49ad344-e423-4eb9-9a66-0279a8108ae5}</generic_component>
+        <package>{6fd0d884-75c9-4479-bdd2-a7fafc27efe7}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{af0343df-d0b8-40f5-88d0-5b11fc4aeb7f}" signal="{087fa107-9b0e-4c65-8639-f83b085b20df}"/>
+        <map pad="{ab1eaa1e-ec06-4a5c-b0b0-5e9167cdba96}" signal="{77e5cee0-7fa1-49ce-ba78-4f7de5378875}"/>
+        <map pad="{8e5fe04c-6bec-4284-88fb-8d9633688cfa}" signal="{5230b743-1f3f-4796-b45d-9ee830a8a2fa}"/>
+        <map pad="{827a91d7-820d-4676-942f-3a818eec859c}" signal="{75d54af9-df43-4164-94ee-de6834350b2c}"/>
+        <map pad="{459d7590-5596-4ea1-b7fc-7926d546c870}" signal="{c6928fc6-91f5-41f8-a615-46c6ca7421ca}"/>
+        <map pad="{9c141dd9-db9f-459b-8fd4-02df8d2d9544}" signal="{4c5032d6-5c90-412c-b4a7-cf9e544047a1}"/>
+        <map pad="{570b2bd0-4931-4855-8ec2-922c6c96a8d0}" signal="{e1444784-73f4-486a-a21b-cb23aacc03c8}"/>
+        <map pad="{a165e813-5cc3-410f-884a-4848fee36be0}" signal="{4b785ffc-6cd2-4f17-ba1a-3bedd7650606}"/>
+    </pad_signal_map>
+</component>

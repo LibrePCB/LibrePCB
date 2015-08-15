@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{a17f8932-0a63-4452-a3da-24dfb43a34b3}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T20:18:54Z</created>
+        <last_modified>2015-08-15T20:18:54Z</last_modified>
+        <name locale="en_US">LSP13</name>
+        <description locale="en_US">&lt;b>SOLDER PAD&lt;/b>&lt;p> drill 1.3 mm, distributor Buerklin, 12H562
+
+This element was automatically imported from Eagle
+Filepath: solpad.lbr
+Name: LSP13
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{197dacc7-3785-4054-a538-ced0d6271faa}</generic_component>
+        <package>{a063737b-836c-465e-a932-b405ed105d10}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{6eb9fb4f-9477-42ee-8897-e892a1c90bdf}" signal="{ad6ae81a-7914-49b7-a87b-a0e8574b7398}"/>
+    </pad_signal_map>
+</component>

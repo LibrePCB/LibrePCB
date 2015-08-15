@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{3fb83ddf-5342-429f-b7bb-630b1eaec1e9}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-13T20:22:31Z</created>
+        <last_modified>2015-08-13T20:22:31Z</last_modified>
+        <name locale="en_US">R-5025</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US"/>
+        <generic_component>{ef80cd5e-2689-47ee-8888-31d04fc99174}</generic_component>
+        <package>{dfd98273-0c85-4620-8f7b-655c642a025c}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map signal="{3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8}" pad="{f021eaa2-0404-4b5d-9cf1-38c4df1fc471}"/>
+        <map signal="{ad623f98-9e73-49c3-9404-f7cfa99d17cd}" pad="{3b7ed132-6aff-467f-b2f1-6e941a0144d7}"/>
+    </pad_signal_map>
+</component>

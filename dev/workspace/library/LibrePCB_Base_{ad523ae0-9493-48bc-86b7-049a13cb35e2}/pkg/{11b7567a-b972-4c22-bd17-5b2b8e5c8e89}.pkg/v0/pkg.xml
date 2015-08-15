@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<package version="0">
+    <meta>
+        <uuid>{11b7567a-b972-4c22-bd17-5b2b8e5c8e89}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-06-21T12:37:35Z</created>
+        <last_modified>2015-06-21T12:37:35Z</last_modified>
+        <name locale="en_US">C-4564</name>
+        <description locale="en_US"></description>
+        <keywords locale="en_US"/>
+        <footprint>{e742d5ea-3df8-4363-bfd7-07c65fe41cdf}</footprint>
+        <model_3d></model_3d>
+    </meta>
+    <categories/>
+</package>

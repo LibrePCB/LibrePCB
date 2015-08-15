@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<component version="0">
+    <meta>
+        <uuid>{ff418aae-6bf0-4cd0-864c-6fc99f6fb293}</uuid>
+        <version>0.1</version>
+        <author>LibrePCB</author>
+        <created>2015-08-15T21:40:36Z</created>
+        <last_modified>2015-08-15T21:40:36Z</last_modified>
+        <name locale="en_US">C-GRID-21_-70553</name>
+        <description locale="en_US">&lt;b>CONNECTOR&lt;/b>&lt;p>
+wire to board 2.54 mm (0.100") pitch header
+
+This element was automatically imported from Eagle
+Filepath: con-molex.lbr
+Name: C-GRID-21
+NOTE: Remove this text after manual rework!</description>
+        <keywords locale="en_US"/>
+        <generic_component>{c6216984-0305-4362-9126-a00f5af20cd1}</generic_component>
+        <package>{9b49247e-6eaa-4f05-9dec-3a4953c48195}</package>
+    </meta>
+    <categories/>
+    <pad_signal_map>
+        <map pad="{156154cd-386b-4e58-94c3-c2e2bff70579}" signal="{c9fa0229-6872-480b-a668-6100176f2ba0}"/>
+        <map pad="{b6c20fc3-94c3-4f14-a525-eeda98fc1d54}" signal="{87c98e1f-af1b-4197-8c70-d75d626b70ed}"/>
+        <map pad="{daa6cc14-9d8a-4b56-8f72-b2a5b9407a04}" signal="{4ff1e605-4490-4d38-8005-36a48d2167c4}"/>
+        <map pad="{b0830b3b-8d02-4977-82ec-f099a5319d21}" signal="{31f0dc56-54ef-4c17-b5b5-0ccecd7c6b6a}"/>
+        <map pad="{8f8a1447-525c-4a24-813f-639a660f7f16}" signal="{df48ba34-a37f-4d34-9559-f736530e3366}"/>
+        <map pad="{4e274f71-c518-4af7-81ce-7eaa2be6ab83}" signal="{ee6df715-dd2f-4e6a-8555-5ad95375eeb2}"/>
+        <map pad="{5d98e5df-0ead-4054-873c-72b830147758}" signal="{fc6caa6d-d60f-4c27-94cc-eca24bbecb81}"/>
+        <map pad="{c65398cd-8c13-42e8-a804-6240d4c3b5d7}" signal="{3a8815f8-44f1-46fa-9405-4b5e91b23ea8}"/>
+        <map pad="{b3a8ef91-9d24-4e07-86ea-9d341ffa3b2e}" signal="{8c7515f0-f700-4571-b766-09f3f8ffbc7d}"/>
+        <map pad="{451136be-315e-4d1c-b118-2b2e24f96542}" signal="{805016f9-c850-4277-9649-8d28acbe5c0e}"/>
+        <map pad="{f9b9db5b-ad10-4529-a188-a8472ec78b91}" signal="{47a4cc8a-3bed-43dc-a1ad-1f6b63a769ed}"/>
+        <map pad="{b93114b5-a9ad-4a91-974e-c23e73c78c1a}" signal="{05d04151-b312-4cf5-b160-ae622598c9f3}"/>
+        <map pad="{650de2da-fa14-4157-8a86-186f52249d6c}" signal="{5acc7b5d-7361-47c1-9ddb-4e99a7a025f5}"/>
+        <map pad="{b0dcb2ac-0285-40b4-a2b4-ca0f6449ea3b}" signal="{c5f994f6-4b67-4774-b43e-ab9ba59e2885}"/>
+        <map pad="{fa8fd206-a762-4c59-8175-2f4674ab7e32}" signal="{769ccf05-9502-4a9d-9598-c6402b0e0a1e}"/>
+        <map pad="{2c8d40a9-3b66-433f-8845-e0ad200391ff}" signal="{cb8fe359-653b-470e-aba0-7e12bffc3641}"/>
+        <map pad="{4ad68c6a-281d-4195-8184-bdbff11c7184}" signal="{f2313acb-47dd-48a2-9c68-7414b6c8e229}"/>
+        <map pad="{000d9d95-3e9c-4f7a-a0ae-d528775fb31a}" signal="{99245c04-f58d-4438-bf0b-598268402980}"/>
+        <map pad="{e88c3017-4350-4fa0-a6f5-9363d4a32665}" signal="{72ca9597-5909-49ba-954a-955bce2ec463}"/>
+        <map pad="{564b3b1b-e961-4348-a155-58991f63c751}" signal="{3b7b7ae9-7fd1-49a7-9caa-25067b99fdc0}"/>
+        <map pad="{8e4d8fb9-772a-4240-b24b-b964cc61c1d2}" signal="{14bb9938-e817-40f8-bf5d-4942720a3a14}"/>
+    </pad_signal_map>
+</component>
