@@ -69,7 +69,7 @@ make -j8  819.54s user 44.92s system 726% cpu 1:58.93 total
 
 At the first startup, LibrePCB asks for a workspace directory where the library
 elements and projects will be saved.  For developers there is a demo workspace
-inclusive library and projects in this repository (subdirectory "dev/workspace/").
+inclusive library and projects in the submodule "dev/demo-workspace/".
 
 ## License
 

@@ -1,0 +1,4 @@
+[submodule "dev/demo-workspace"]
+	path = dev/demo-workspace
+	url = git@github.com:LibrePCB/demo-workspace.git
+	branch = master
