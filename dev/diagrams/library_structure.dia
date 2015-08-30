@@ -578,7 +578,7 @@
         <dia:string>##</dia:string>
       </dia:attribute>
       <dia:attribute name="multipicity_b">
-        <dia:string>#0..1#</dia:string>
+        <dia:string>#1#</dia:string>
       </dia:attribute>
       <dia:attribute name="visibility_b">
         <dia:enum val="3"/>
@@ -646,10 +646,10 @@
         <dia:boolean val="false"/>
       </dia:attribute>
       <dia:attribute name="role_b">
-        <dia:string>##</dia:string>
+        <dia:string>#&lt;&lt;OR&gt;&gt;#</dia:string>
       </dia:attribute>
       <dia:attribute name="multipicity_b">
-        <dia:string>#0..1#</dia:string>
+        <dia:string>#0..*#</dia:string>
       </dia:attribute>
       <dia:attribute name="visibility_b">
         <dia:enum val="3"/>
@@ -661,7 +661,7 @@
         <dia:point val="47,36.8"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="46.25,36.05;53.7538,41.7495"/>
+        <dia:rectangle val="46.25,36.05;54.5238,40.9995"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
@@ -1690,7 +1690,7 @@ provide all signals of a component (as pins).#</dia:string>
         <dia:point val="17,2"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="17,0.917063;28.3604,2.33338"/>
+        <dia:rectangle val="17,0.95;28.3275,2.2675"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
