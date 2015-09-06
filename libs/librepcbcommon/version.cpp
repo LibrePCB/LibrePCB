@@ -62,6 +62,22 @@ QString Version::toStr() const noexcept
     return str;
 }
 
+QString Version::toComparableStr() const noexcept
+{
+    QString str;
+    if (mNumbers.count() > 0)
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            int number = (mNumbers.count() > i) ? mNumbers.at(i) : 0;
+            if (i > 0) str.append(".");
+            str.append(QString("%1").arg(number, 5, 10, QLatin1Char('0')));
+        }
+        Q_ASSERT(str.length() == 59);
+    }
+    return str;
+}
+
 /*****************************************************************************************
  *  Setters
  ****************************************************************************************/
@@ -74,16 +90,23 @@ bool Version::setVersion(const QString& version) noexcept
     {
         bool ok = false;
         int number = numberStr.toInt(&ok);
-        if ((ok) && (number >= 0))
-        {
+        if ((ok) && (number >= 0) && (number <= 99999))
             mNumbers.append(number);
-        }
         else
-        {
-            // version invalid --> clear number list and abort
-            mNumbers.clear();
-            return false;
-        }
+            return mNumbers.clear(), false; // version invalid => clear number list and abort
+    }
+    // remove trailing zeros
+    for (int i = mNumbers.count()-1; i > 0; i--)
+    {
+        if (mNumbers.at(i) != 0) break;
+        mNumbers.removeAt(i);
+    }
+    // check number count
+    if (mNumbers.count() > 10)
+    {
+        // version invalid --> clear number list and abort
+        mNumbers.clear();
+        return false;
     }
     return (mNumbers.count() > 0);
 }

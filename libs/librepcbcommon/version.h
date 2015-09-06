@@ -33,8 +33,18 @@
 /**
  * @brief The Version class represents a version number in the format "1.42.7"
  *
- * The count of numbers (between the dots) is variable, the minimum is one number (and no
- * dots). Each #Version instance can either be valid or invalid (see #isValid()).
+ * Each #Version instance can either be valid or invalid (see #isValid()).
+ * Rules for a valid version:
+ *  - Minimum count of numbers: 1 (example: "15")
+ *  - Maximum count of numbers: 10 (example: "31.41.5.926.5358.97.9.3.238.462")
+ *  - Minimum count of digits of a number: 1
+ *  - Maximum count of digits of a number: 5
+ *
+ * So the lowest possible version is "0", and the highest possible version is
+ * "99999.99999.99999.99999.99999.99999.99999.99999.99999.99999".
+ *
+ * Leading zeros in numbers are ignored: "002.0005" will be converted to "2.5"
+ * Trailing zero numbers are ignored: "2.5.0.0" will be converted to "2.5"
  *
  * @author ubruhin
  * @date 2014-10-30
@@ -96,6 +106,19 @@ class Version final
          * @return The version as a string (empty string = invalid version)
          */
         QString toStr() const noexcept;
+
+        /**
+         * @brief Get the version as a comparable string (59 characters)
+         *
+         * The version will be returned with all 10x5 decimal places:
+         * "#####.#####.#####.#####.#####.#####.#####.#####.#####.#####"
+         *
+         * This method is useful to compare versions in a database (e.g. SQLite) as you
+         * only need a simple string compare.
+         *
+         * @return The version as a comparable string (empty string = invalid version)
+         */
+        QString toComparableStr() const noexcept;
 
 
         // Setters

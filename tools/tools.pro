@@ -3,4 +3,5 @@ TEMPLATE = subdirs
 SUBDIRS = \
     EagleImport \
     ProjectLibraryUpdater \
-    UuidGenerator
+    UuidGenerator \
+    WorkspaceLibraryUpdater
