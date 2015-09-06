@@ -166,6 +166,9 @@ void LibraryBaseElement::parseDomTree(const XmlDomElement& root) throw (Exceptio
     // read attributes
     mUuid = root.getFirstChild("meta/uuid", true, true)->getText<QUuid>();
     mVersion = root.getFirstChild("meta/version", true, true)->getText<Version>();
+    mAuthor = root.getFirstChild("meta/author", true, true)->getText();
+    mCreated = root.getFirstChild("meta/created", true, true)->getText<QDateTime>();
+    mLastModified = root.getFirstChild("meta/last_modified", true, true)->getText<QDateTime>();
 
     // read names, descriptions and keywords in all available languages
     readLocaleDomNodes(*root.getFirstChild("meta", true), "name", mNames);
@@ -189,8 +192,8 @@ XmlDomElement* LibraryBaseElement::serializeToXmlDomElement() const throw (Excep
     meta->appendTextChild("uuid", mUuid.toString());
     meta->appendTextChild("version", mVersion.toStr());
     meta->appendTextChild("author", mAuthor);
-    meta->appendTextChild("created", mCreated.toUTC().toString(Qt::ISODate));
-    meta->appendTextChild("last_modified", mLastModified.toUTC().toString(Qt::ISODate));
+    meta->appendTextChild("created", mCreated);
+    meta->appendTextChild("last_modified", mLastModified);
     foreach (const QString& locale, mNames.keys())
         meta->appendTextChild("name", mNames.value(locale))->setAttribute("locale", locale);
     foreach (const QString& locale, mDescriptions.keys())
