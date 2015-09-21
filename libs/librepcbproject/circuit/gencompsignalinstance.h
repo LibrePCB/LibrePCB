@@ -106,6 +106,7 @@ class GenCompSignalInstance final : public QObject, public IF_ErcMsgProvider,
 
     private slots:
 
+        void netSignalNameChanged(const QString& newName) noexcept;
         void updateErcMessages() noexcept;
 
 

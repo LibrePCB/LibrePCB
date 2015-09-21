@@ -72,7 +72,6 @@ class SI_NetLabel final : public SI_Base, public IF_XmlSerializableObject
         void setRotation(const Angle& rotation) noexcept;
 
         // General Methods
-        void updateText() noexcept;
         void addToSchematic(GraphicsScene& scene) throw (Exception);
         void removeFromSchematic(GraphicsScene& scene) throw (Exception);
 
@@ -85,6 +84,11 @@ class SI_NetLabel final : public SI_Base, public IF_XmlSerializableObject
         const Point& getPosition() const noexcept override {return mPosition;}
         QPainterPath getGrabAreaScenePx() const noexcept override;
         void setSelected(bool selected) noexcept override;
+
+
+    private slots:
+
+        void netSignalNameChanged(const QString& newName) noexcept;
 
 
     private:

@@ -46,6 +46,7 @@
 #include <librepcbproject/schematics/cmd/cmdschematicnetpointremove.h>
 #include <librepcbproject/schematics/items/si_netline.h>
 #include <librepcbproject/schematics/cmd/cmdschematicnetpointedit.h>
+#include <librepcbproject/schematics/cmd/cmdschematicnetlabeledit.h>
 #include <librepcbproject/circuit/cmd/cmdnetsignalremove.h>
 #include <librepcbproject/circuit/cmd/cmdnetsignaledit.h>
 #include <librepcbcommon/gridproperties.h>
@@ -574,12 +575,12 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
             // determine the resulting netsignal
             NetSignal* originalSignal = nullptr;
             NetSignal* combinedSignal = nullptr;
-            if (mPositioningNetPoint2->getNetSignal()->hasAutoName())
+            if ((mPositioningNetPoint2->getNetSignal()->hasAutoName()) && (!pointUnderCursor->getNetSignal()->hasAutoName()))
             {
                 originalSignal = mPositioningNetPoint2->getNetSignal();
                 combinedSignal = pointUnderCursor->getNetSignal();
             }
-            else if (pointUnderCursor->getNetSignal()->hasAutoName())
+            else if ((pointUnderCursor->getNetSignal()->hasAutoName()) && (!mPositioningNetPoint2->getNetSignal()->hasAutoName()))
             {
                 originalSignal = pointUnderCursor->getNetSignal();
                 combinedSignal = mPositioningNetPoint2->getNetSignal();
@@ -618,6 +619,12 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
             {
                 auto cmd = new CmdSchematicNetPointEdit(*point);
                 cmd->setNetSignal(*combinedSignal);
+                mUndoStack.appendToCommand(cmd);
+            }
+            foreach (SI_NetLabel* label, originalSignal->getNetLabels())
+            {
+                auto cmd = new CmdSchematicNetLabelEdit(*label);
+                cmd->setNetSignal(*combinedSignal, false);
                 mUndoStack.appendToCommand(cmd);
             }
 
@@ -670,6 +677,12 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
                         {
                             auto cmd = new CmdSchematicNetPointEdit(*point);
                             cmd->setNetSignal(*newNetsignal);
+                            mUndoStack.appendToCommand(cmd);
+                        }
+                        foreach (SI_NetLabel* label, netsignal->getNetLabels())
+                        {
+                            auto cmd = new CmdSchematicNetLabelEdit(*label);
+                            cmd->setNetSignal(*newNetsignal, false);
                             mUndoStack.appendToCommand(cmd);
                         }
                         auto cmd = new CmdNetSignalRemove(mProject.getCircuit(), *netsignal);
@@ -725,14 +738,19 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
                         // check which netsignal to remove
                         NetSignal* netsignalToRemove;
                         NetSignal* combinedNetsignal;
-                        if ((!currentNetsignal->isNameForced()) && (!netsignalUnderCursor->isNameForced()))
+                        if ((currentNetsignal->isNameForced()) && (!netsignalUnderCursor->isNameForced()))
                         {
-                            if ((!currentNetsignal->hasAutoName()) && (!netsignalUnderCursor->hasAutoName()))
-                            {
-                                netsignalToRemove = netsignalUnderCursor;
-                                combinedNetsignal = currentNetsignal;
-                            }
-                            else if ((!currentNetsignal->hasAutoName()) && (netsignalUnderCursor->hasAutoName()))
+                            netsignalToRemove = netsignalUnderCursor;
+                            combinedNetsignal = currentNetsignal;
+                        }
+                        else if ((!currentNetsignal->isNameForced()) && (netsignalUnderCursor->isNameForced()))
+                        {
+                            netsignalToRemove = currentNetsignal;
+                            combinedNetsignal = netsignalUnderCursor;
+                        }
+                        else //if ((!currentNetsignal->isNameForced()) && (!netsignalUnderCursor->isNameForced()))
+                        {
+                            if ((!currentNetsignal->hasAutoName()) && (netsignalUnderCursor->hasAutoName()))
                             {
                                 netsignalToRemove = netsignalUnderCursor;
                                 combinedNetsignal = currentNetsignal;
@@ -759,8 +777,8 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
                                 }
                                 else if (a == a2)
                                 {
-                                    netsignalToRemove = netsignalUnderCursor;
-                                    combinedNetsignal = currentNetsignal;
+                                    netsignalToRemove = currentNetsignal;
+                                    combinedNetsignal = netsignalUnderCursor;
                                 }
                                 else
                                 {
@@ -769,22 +787,12 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
                                 }
                             }
                         }
-                        else if ((currentNetsignal->isNameForced()) && (!netsignalUnderCursor->isNameForced()))
-                        {
-                            netsignalToRemove = netsignalUnderCursor;
-                            combinedNetsignal = currentNetsignal;
-                        }
-                        else if ((!currentNetsignal->isNameForced()) && (netsignalUnderCursor->isNameForced()))
-                        {
-                            netsignalToRemove = currentNetsignal;
-                            combinedNetsignal = netsignalUnderCursor;
-                        }
-                        else
+                        /*else
                         {
                             // both netsignals have forced names --> not possible to combine them!
                             throw RuntimeError(__FILE__, __LINE__, QString(),
                                 tr("These nets cannot be connected together as both names are forced."));
-                        }
+                        }*/
 
                         // combine both netsignals
                         foreach (GenCompSignalInstance* signal, netsignalToRemove->getGenCompSignals())
@@ -796,6 +804,12 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
                         {
                             auto cmd = new CmdSchematicNetPointEdit(*point);
                             cmd->setNetSignal(*combinedNetsignal);
+                            mUndoStack.appendToCommand(cmd);
+                        }
+                        foreach (SI_NetLabel* label, netsignalToRemove->getNetLabels())
+                        {
+                            auto cmd = new CmdSchematicNetLabelEdit(*label);
+                            cmd->setNetSignal(*combinedNetsignal, false);
                             mUndoStack.appendToCommand(cmd);
                         }
                         auto cmd = new CmdNetSignalRemove(mProject.getCircuit(), *netsignalToRemove);

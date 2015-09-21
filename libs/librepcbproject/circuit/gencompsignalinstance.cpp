@@ -86,6 +86,9 @@ void GenCompSignalInstance::init() throw (Exception)
     connect(&mGenCompInstance, &GenCompInstance::attributesChanged,
             this, &GenCompSignalInstance::updateErcMessages);
 
+    // register to net signal name changed
+    if (mNetSignal) connect(mNetSignal, &NetSignal::nameChanged, this, &GenCompSignalInstance::netSignalNameChanged);
+
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
@@ -121,12 +124,19 @@ void GenCompSignalInstance::setNetSignal(NetSignal* netsignal) throw (Exception)
         throw LogicError(__FILE__, __LINE__);
 
     if (mNetSignal)
+    {
+        disconnect(mNetSignal, &NetSignal::nameChanged, this, &GenCompSignalInstance::netSignalNameChanged);
         mNetSignal->unregisterGenCompSignal(*this);
-
-    if (netsignal)
-        netsignal->registerGenCompSignal(*this);
+    }
 
     mNetSignal = netsignal;
+
+    if (mNetSignal)
+    {
+        mNetSignal->registerGenCompSignal(*this);
+        connect(mNetSignal, &NetSignal::nameChanged, this, &GenCompSignalInstance::netSignalNameChanged);
+    }
+
     updateErcMessages();
 }
 
@@ -201,6 +211,12 @@ bool GenCompSignalInstance::checkAttributesValidity() const noexcept
 /*****************************************************************************************
  *  Private Slots
  ****************************************************************************************/
+
+void GenCompSignalInstance::netSignalNameChanged(const QString& newName) noexcept
+{
+    Q_UNUSED(newName);
+    updateErcMessages();
+}
 
 void GenCompSignalInstance::updateErcMessages() noexcept
 {
