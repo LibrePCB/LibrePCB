@@ -72,7 +72,7 @@ SchematicPagesDock::~SchematicPagesDock()
  */
 void SchematicPagesDock::resizeEvent(QResizeEvent* event)
 {
-    int iconSize = event->size().width(); // this is not good...
+    int iconSize = event->size().width() - 10; // this is not good...
     mUi->listWidget->setIconSize(QSize(iconSize, iconSize));
     QDockWidget::resizeEvent(event);
 }
