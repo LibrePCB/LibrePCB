@@ -87,6 +87,12 @@
         <file>library/vcc.png</file>
         <file>status/dialog-error.png</file>
         <file>status/dialog-warning.png</file>
+        <file>status/info.png</file>
+        <file>status/success.png</file>
+        <file>logo/32x32.png</file>
+        <file>logo/48x48.png</file>
+        <file>logo/64x64.png</file>
+        <file>wizards/watermark.jpg</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>
