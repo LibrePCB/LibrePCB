@@ -15,7 +15,7 @@ include(../common.pri)
 
 QT += core widgets opengl webkitwidgets xml printsupport sql
 
-exists(../.git):DEFINES += GIT_BRANCH=\\\"master\\\"
+exists(../.git):DEFINES += GIT_BRANCH=\\\"first_run_wizard\\\"
 
 win32 {
     # Windows-specific configurations
@@ -82,13 +82,22 @@ RESOURCES += \
 
 SOURCES += \
     main.cpp \
-    controlpanel/controlpanel.cpp
+    controlpanel/controlpanel.cpp \
+    firstrunwizard/firstrunwizard.cpp \
+    firstrunwizard/firstrunwizardpage_welcome.cpp \
+    firstrunwizard/firstrunwizardpage_workspacepath.cpp
 
 HEADERS += \
-    controlpanel/controlpanel.h
+    controlpanel/controlpanel.h \
+    firstrunwizard/firstrunwizard.h \
+    firstrunwizard/firstrunwizardpage_welcome.h \
+    firstrunwizard/firstrunwizardpage_workspacepath.h
 
 FORMS += \
     controlpanel/controlpanel.ui \
+    firstrunwizard/firstrunwizard.ui \
+    firstrunwizard/firstrunwizardpage_welcome.ui \
+    firstrunwizard/firstrunwizardpage_workspacepath.ui
 
 
 # Custom compiler "lrelease" for qm generation
