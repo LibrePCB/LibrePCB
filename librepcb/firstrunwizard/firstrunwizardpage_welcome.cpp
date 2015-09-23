@@ -37,7 +37,6 @@ FirstRunWizardPage_Welcome::FirstRunWizardPage_Welcome(QWidget *parent) noexcept
 
 FirstRunWizardPage_Welcome::~FirstRunWizardPage_Welcome() noexcept
 {
-    delete mUi;     mUi = nullptr;
 }
 
 /*****************************************************************************************

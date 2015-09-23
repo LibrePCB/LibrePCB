@@ -63,12 +63,11 @@ class FirstRunWizard final : public QWizard
 
     private:
 
-        // make some methods inaccessible...
-        FirstRunWizard(const FirstRunWizard& other) = delete;
-        FirstRunWizard& operator=(const FirstRunWizard& rhs) = delete;
+        // Private Methods
+        Q_DISABLE_COPY(FirstRunWizard)
 
-        // General
-        Ui::FirstRunWizard* mUi;
+        // Private Membervariables
+        QScopedPointer<Ui::FirstRunWizard> mUi;
 };
 
 #endif // FIRSTRUNWIZARD_H

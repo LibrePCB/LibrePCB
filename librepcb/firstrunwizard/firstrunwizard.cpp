@@ -45,7 +45,6 @@ FirstRunWizard::FirstRunWizard(QWidget *parent) noexcept :
 
 FirstRunWizard::~FirstRunWizard() noexcept
 {
-    delete mUi;     mUi = nullptr;
 }
 
 /*****************************************************************************************

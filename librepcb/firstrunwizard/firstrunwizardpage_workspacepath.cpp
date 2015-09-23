@@ -49,7 +49,6 @@ FirstRunWizardPage_WorkspacePath::FirstRunWizardPage_WorkspacePath(QWidget *pare
 
 FirstRunWizardPage_WorkspacePath::~FirstRunWizardPage_WorkspacePath() noexcept
 {
-    delete mUi;     mUi = nullptr;
 }
 
 /*****************************************************************************************

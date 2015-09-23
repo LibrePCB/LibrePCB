@@ -70,8 +70,11 @@ class FirstRunWizardPage_WorkspacePath final : public QWizardPage
 
     private:
 
-        // General
-        Ui::FirstRunWizardPage_WorkspacePath* mUi;
+        // Private Methods
+        Q_DISABLE_COPY(FirstRunWizardPage_WorkspacePath)
+
+        // Private Membervariables
+        QScopedPointer<Ui::FirstRunWizardPage_WorkspacePath> mUi;
 };
 
 #endif // FIRSTRUNWIZARDPAGE_WORKSPACEPATH_H

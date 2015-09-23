@@ -58,8 +58,11 @@ class FirstRunWizardPage_Welcome final : public QWizardPage
 
     private:
 
-        // General
-        Ui::FirstRunWizardPage_Welcome* mUi;
+        // Private Methods
+        Q_DISABLE_COPY(FirstRunWizardPage_Welcome)
+
+        // Private Membervariables
+        QScopedPointer<Ui::FirstRunWizardPage_Welcome> mUi;
 };
 
 #endif // FIRSTRUNWIZARDPAGE_WELCOME_H
