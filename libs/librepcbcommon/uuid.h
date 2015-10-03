@@ -48,7 +48,7 @@ class Uuid final
         /**
          * @brief Default constructor (creates a NULL #Uuid object)
          */
-        Uuid() noexcept = default;
+        Uuid() noexcept : mUuid() {}
 
         /**
          * @brief Constructor which creates a #Uuid object from a string
