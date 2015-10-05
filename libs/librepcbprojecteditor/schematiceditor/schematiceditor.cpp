@@ -168,7 +168,7 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
         setActiveSchematicIndex(0);
 
     // mUi->graphicsView->zoomAll(); does not work properly here, should be executed later...
-    QTimer::singleShot(500, mGraphicsView, &GraphicsView::zoomAll); // ...in the event loop
+    QTimer::singleShot(500, mGraphicsView, SLOT(zoomAll)); // ...in the event loop
 }
 
 SchematicEditor::~SchematicEditor()
