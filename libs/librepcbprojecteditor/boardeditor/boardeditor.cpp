@@ -184,7 +184,7 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project) :
         setActiveBoardIndex(0);
 
     // mUi->graphicsView->zoomAll(); does not work properly here, should be executed later...
-    QTimer::singleShot(200, mGraphicsView, SLOT(zoomAll)); // ...in the event loop
+    QTimer::singleShot(200, mGraphicsView, SLOT(zoomAll())); // ...in the event loop
 }
 
 BoardEditor::~BoardEditor()

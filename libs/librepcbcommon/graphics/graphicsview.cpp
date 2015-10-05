@@ -111,6 +111,31 @@ void GraphicsView::setOriginCrossVisible(bool visible) noexcept
  *  General Methods
  ****************************************************************************************/
 
+void GraphicsView::handleMouseWheelEvent(QGraphicsSceneWheelEvent* event) noexcept
+{
+    if(event->modifiers().testFlag(Qt::ShiftModifier))
+    {
+        // horizontal scrolling
+        horizontalScrollBar()->setValue(horizontalScrollBar()->value() - event->delta());
+    }
+    else if(event->modifiers().testFlag(Qt::ControlModifier))
+    {
+        // vertical scrolling
+        verticalScrollBar()->setValue(verticalScrollBar()->value() - event->delta());
+    }
+    else
+    {
+        // Zoom to mouse
+        qreal scaleFactor = qPow(sZoomStepFactor, event->delta()/qreal(120));
+        scale(scaleFactor, scaleFactor);
+    }
+    event->setAccepted(true);
+}
+
+/*****************************************************************************************
+ *  Public Slots
+ ****************************************************************************************/
+
 void GraphicsView::zoomIn() noexcept
 {
     if (!mScene) return;
@@ -136,27 +161,6 @@ void GraphicsView::zoomAll() noexcept
     mZoomAnimation->setStartValue(getVisibleSceneRect());
     mZoomAnimation->setEndValue(rect);
     mZoomAnimation->start();
-}
-
-void GraphicsView::handleMouseWheelEvent(QGraphicsSceneWheelEvent* event) noexcept
-{
-    if(event->modifiers().testFlag(Qt::ShiftModifier))
-    {
-        // horizontal scrolling
-        horizontalScrollBar()->setValue(horizontalScrollBar()->value() - event->delta());
-    }
-    else if(event->modifiers().testFlag(Qt::ControlModifier))
-    {
-        // vertical scrolling
-        verticalScrollBar()->setValue(verticalScrollBar()->value() - event->delta());
-    }
-    else
-    {
-        // Zoom to mouse
-        qreal scaleFactor = qPow(sZoomStepFactor, event->delta()/qreal(120));
-        scale(scaleFactor, scaleFactor);
-    }
-    event->setAccepted(true);
 }
 
 /*****************************************************************************************
