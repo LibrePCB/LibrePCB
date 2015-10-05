@@ -31,8 +31,14 @@ development stage (no stable release available).
 
 To compile LibrePCB, you need the following software components:
 - g++ >= 4.8, MinGW >= 4.8, or Clang >= 3.3 (C++11 support is required)
-- Qt >= 5.4 (http://www.qt.io/download-open-source/)
+- Qt >= 5.2 (http://www.qt.io/download-open-source/)
 - libglu1-mesa-dev (`sudo apt-get install libglu1-mesa-dev`)
+
+#### Installation on Ubuntu 14.04 and later
+
+```bash
+sudo apt-get install g++ qt5-default libqt5webkit5 libqt5webkit5-dev qttools5-dev-tools qt5-doc qtcreator libglu1-mesa-dev
+```
 
 ### Building
 
