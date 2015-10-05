@@ -130,7 +130,7 @@ void GraphicsView::zoomAll() noexcept
     if (rect.isEmpty()) rect = QRectF(-100, -100, 200, 200);
     qreal xMargins = rect.width() / 50;
     qreal yMargins = rect.height() / 50;
-    rect += QMarginsF(xMargins, yMargins, xMargins, yMargins);
+    rect.adjust(-xMargins, -yMargins, xMargins, yMargins);
     mZoomAnimation->setDuration(500);
     mZoomAnimation->setEasingCurve(QEasingCurve::InOutCubic);
     mZoomAnimation->setStartValue(getVisibleSceneRect());
