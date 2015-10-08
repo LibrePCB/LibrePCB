@@ -67,10 +67,15 @@ class GraphicsView final : public QGraphicsView
         void setOriginCrossVisible(bool visible) noexcept;
 
         // General Methods
+        void handleMouseWheelEvent(QGraphicsSceneWheelEvent* event) noexcept;
+
+
+    public slots:
+
+        // Public Slots
         void zoomIn() noexcept;
         void zoomOut() noexcept;
         void zoomAll() noexcept;
-        void handleMouseWheelEvent(QGraphicsSceneWheelEvent* event) noexcept;
 
 
     private slots:
