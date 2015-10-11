@@ -68,13 +68,13 @@
         <dia:point val="8,3"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="7.95,2.95;65.05,44.05"/>
+        <dia:rectangle val="7.95,2.95;64.05,44.05"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="8,3"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="57"/>
+        <dia:real val="56"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
         <dia:real val="41"/>
@@ -474,17 +474,17 @@
         <dia:boolean val="false"/>
       </dia:attribute>
       <dia:attribute name="obj_pos">
-        <dia:point val="51,17.8"/>
+        <dia:point val="51,23.8"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="50.25,17.05;51.75,33.7495"/>
+        <dia:rectangle val="50.25,23.05;51.75,33.7495"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="51,17.8"/>
-        <dia:point val="51,18.55"/>
+        <dia:point val="51,23.8"/>
+        <dia:point val="51,24.55"/>
         <dia:point val="51,32.8995"/>
         <dia:point val="51,32.9495"/>
       </dia:attribute>
@@ -503,7 +503,7 @@
         <dia:color val="#000000"/>
       </dia:attribute>
       <dia:connections>
-        <dia:connection handle="0" to="O5" connection="6"/>
+        <dia:connection handle="0" to="O34" connection="6"/>
         <dia:connection handle="1" to="O23" connection="8"/>
       </dia:connections>
     </dia:object>
@@ -850,16 +850,16 @@
     </dia:object>
     <dia:object type="UML - State" version="0" id="O15">
       <dia:attribute name="obj_pos">
-        <dia:point val="55,20"/>
+        <dia:point val="38,22"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="54.95,19.95;60.0125,21.85"/>
+        <dia:rectangle val="37.95,21.95;43.0125,23.85"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="55,20"/>
+        <dia:point val="38,22"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="4.9625000000000004"/>
@@ -885,7 +885,7 @@
             <dia:real val="0.80000000000000004"/>
           </dia:attribute>
           <dia:attribute name="pos">
-            <dia:point val="57.4813,21.095"/>
+            <dia:point val="40.4813,23.095"/>
           </dia:attribute>
           <dia:attribute name="color">
             <dia:color val="#000000"/>
@@ -943,20 +943,22 @@
         <dia:boolean val="false"/>
       </dia:attribute>
       <dia:attribute name="obj_pos">
-        <dia:point val="51,17.8"/>
+        <dia:point val="49,22.9"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="50.25,17.05;55.05,21.7"/>
+        <dia:rectangle val="42.9125,22.1;49.75,23.7"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="51,17.8"/>
-        <dia:point val="51,20.9"/>
-        <dia:point val="55,20.9"/>
+        <dia:point val="49,22.9"/>
+        <dia:point val="48.25,22.9"/>
+        <dia:point val="43.0125,22.9"/>
+        <dia:point val="42.9625,22.9"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
+        <dia:enum val="0"/>
         <dia:enum val="1"/>
         <dia:enum val="0"/>
       </dia:attribute>
@@ -970,8 +972,8 @@
         <dia:color val="#000000"/>
       </dia:attribute>
       <dia:connections>
-        <dia:connection handle="0" to="O5" connection="6"/>
-        <dia:connection handle="1" to="O15" connection="3"/>
+        <dia:connection handle="0" to="O34" connection="3"/>
+        <dia:connection handle="1" to="O15" connection="4"/>
       </dia:connections>
     </dia:object>
     <dia:object type="UML - Association" version="2" id="O17">
@@ -1147,10 +1149,10 @@
     </dia:object>
     <dia:object type="Standard - Text" version="1" id="O21">
       <dia:attribute name="obj_pos">
-        <dia:point val="53,18"/>
+        <dia:point val="54,18"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="53,17.405;57.725,18.9525"/>
+        <dia:rectangle val="54,17.405;58.725,18.9525"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -1165,7 +1167,7 @@
             <dia:real val="0.80000000000000004"/>
           </dia:attribute>
           <dia:attribute name="pos">
-            <dia:point val="53,18"/>
+            <dia:point val="54,18"/>
           </dia:attribute>
           <dia:attribute name="color">
             <dia:color val="#000000"/>
@@ -1181,10 +1183,10 @@
     </dia:object>
     <dia:object type="Standard - Text" version="1" id="O22">
       <dia:attribute name="obj_pos">
-        <dia:point val="54,23"/>
+        <dia:point val="38,25"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="54,22.405;61.25,24.7525"/>
+        <dia:rectangle val="38,24.405;45.25,26.7525"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -1200,7 +1202,7 @@ in Component#</dia:string>
             <dia:real val="0.80000000000000004"/>
           </dia:attribute>
           <dia:attribute name="pos">
-            <dia:point val="54,23"/>
+            <dia:point val="38,25"/>
           </dia:attribute>
           <dia:attribute name="color">
             <dia:color val="#000000"/>
@@ -1694,16 +1696,16 @@ provide all signals of a component (as pins).#</dia:string>
     </dia:object>
     <dia:object type="UML - State" version="0" id="O34">
       <dia:attribute name="obj_pos">
-        <dia:point val="42,20"/>
+        <dia:point val="49,22"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="41.95,19.95;46.05,21.85"/>
+        <dia:rectangle val="48.95,21.95;53.05,23.85"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="42,20"/>
+        <dia:point val="49,22"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="4"/>
@@ -1729,7 +1731,7 @@ provide all signals of a component (as pins).#</dia:string>
             <dia:real val="0.80000000000000004"/>
           </dia:attribute>
           <dia:attribute name="pos">
-            <dia:point val="44,21.095"/>
+            <dia:point val="51,23.095"/>
           </dia:attribute>
           <dia:attribute name="color">
             <dia:color val="#000000"/>
@@ -1778,7 +1780,7 @@ provide all signals of a component (as pins).#</dia:string>
         <dia:string>#&lt;&lt;OR&gt;&gt;#</dia:string>
       </dia:attribute>
       <dia:attribute name="multipicity_b">
-        <dia:string>#0..*#</dia:string>
+        <dia:string>#1..*#</dia:string>
       </dia:attribute>
       <dia:attribute name="visibility_b">
         <dia:enum val="3"/>
@@ -1790,19 +1792,21 @@ provide all signals of a component (as pins).#</dia:string>
         <dia:point val="51,17.8"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="45.95,17.05;51.75,21.7"/>
+        <dia:rectangle val="50.25,17.05;53.51,22.05"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
         <dia:point val="51,17.8"/>
-        <dia:point val="51,20.9"/>
-        <dia:point val="46,20.9"/>
+        <dia:point val="51,18.55"/>
+        <dia:point val="51,21.95"/>
+        <dia:point val="51,22"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
         <dia:enum val="0"/>
+        <dia:enum val="1"/>
       </dia:attribute>
       <dia:attribute name="orth_autoroute">
         <dia:boolean val="true"/>
@@ -1815,15 +1819,15 @@ provide all signals of a component (as pins).#</dia:string>
       </dia:attribute>
       <dia:connections>
         <dia:connection handle="0" to="O5" connection="6"/>
-        <dia:connection handle="1" to="O34" connection="4"/>
+        <dia:connection handle="1" to="O34" connection="1"/>
       </dia:connections>
     </dia:object>
     <dia:object type="Standard - Text" version="1" id="O36">
       <dia:attribute name="obj_pos">
-        <dia:point val="39,23"/>
+        <dia:point val="52,25"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="39,22.405;48.5675,23.9525"/>
+        <dia:rectangle val="52,24.405;61.5675,25.9525"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -1838,7 +1842,7 @@ provide all signals of a component (as pins).#</dia:string>
             <dia:real val="0.80000000000000004"/>
           </dia:attribute>
           <dia:attribute name="pos">
-            <dia:point val="39,23"/>
+            <dia:point val="52,25"/>
           </dia:attribute>
           <dia:attribute name="color">
             <dia:color val="#000000"/>
@@ -2393,18 +2397,18 @@ provide all signals of a component (as pins).#</dia:string>
         <dia:boolean val="false"/>
       </dia:attribute>
       <dia:attribute name="obj_pos">
-        <dia:point val="48.8475,7.9"/>
+        <dia:point val="41,7.9"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="27.45,7.1;63.1,28.7"/>
+        <dia:rectangle val="27.45,7.1;41.75,28.7"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="48.8475,7.9"/>
-        <dia:point val="63,7.9"/>
-        <dia:point val="63,27.9"/>
+        <dia:point val="41,7.9"/>
+        <dia:point val="36,7.9"/>
+        <dia:point val="36,27.9"/>
         <dia:point val="27.5,27.9"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
@@ -2422,7 +2426,7 @@ provide all signals of a component (as pins).#</dia:string>
         <dia:color val="#000000"/>
       </dia:attribute>
       <dia:connections>
-        <dia:connection handle="0" to="O46" connection="4"/>
+        <dia:connection handle="0" to="O46" connection="3"/>
         <dia:connection handle="1" to="O32" connection="4"/>
       </dia:connections>
     </dia:object>
