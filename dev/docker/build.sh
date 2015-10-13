@@ -1,3 +1,3 @@
 #!/bin/sh
 
-docker build -t librepcb:master .
+docker build -t librepcb:git .

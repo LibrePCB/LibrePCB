@@ -18,8 +18,17 @@ RUN git clone https://github.com/LibrePCB/LibrePCB.git /opt/LibrePCB \
   && make -j8 \
   && make install
 
-# copy config file
-COPY LibrePCB_git-master.conf /root/.config/LibrePCB/
+# create config file to set the workspace path
+RUN mkdir -p /root/.config/LibrePCB && echo "[workspaces]\nmost_recently_used=/opt/LibrePCB/dev/demo-workspace" > /root/.config/LibrePCB/LibrePCB_git-master.conf
 
+# create a startup shell script to show some information
+RUN echo "#!/bin/bash"                                                                                                  > startup.sh \
+  && echo "echo 'Welcome to LibrePCB! Check out the following commands:'"                                               >> startup.sh \
+  && echo "echo ' - git pull                                                      : update git working copy'"           >> startup.sh \
+  && echo "echo ' - cd build && qmake -r ../librepcb.pro && make && make install  : compile and install LibrePCB'"      >> startup.sh \
+  && echo "echo ' - qtcreator librepcb.pro                                        : open the project with Qt Creator'"  >> startup.sh \
+  && echo "echo ' - librepcb                                                      : run LibrePCB'"                      >> startup.sh
+
+# set working directory and default command to execute
 WORKDIR /opt/LibrePCB
-CMD /bin/bash
+CMD bash -C "/startup.sh";"bash"
