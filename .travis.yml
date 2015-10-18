@@ -17,7 +17,7 @@ before_install:
   - if [ "$CXX" = "g++" ]; then sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y; fi
   - if [ "$QT_BASE" = "52" ]; then sudo add-apt-repository ppa:beineri/opt-qt521 -y; fi
   - if [ "$QT_BASE" = "53" ]; then sudo add-apt-repository ppa:beineri/opt-qt532 -y; fi
-  - if [ "$QT_BASE" = "54" ]; then sudo add-apt-repository ppa:beineri/opt-qt541 -y; fi
+  - if [ "$QT_BASE" = "54" ]; then sudo add-apt-repository ppa:beineri/opt-qt542 -y; fi
   - if [ "$QT_BASE" = "55" ]; then sudo add-apt-repository ppa:beineri/opt-qt55 -y; fi
   - sudo apt-add-repository -y ppa:libreoffice/libreoffice-4-2 # used to install an up-to-date doxygen
   - sudo apt-get update -qq
