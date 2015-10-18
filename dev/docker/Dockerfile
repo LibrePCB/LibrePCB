@@ -7,19 +7,18 @@ RUN DEBIAN_FRONTEND=noninteractive \
   && apt-get -qy install git g++ qt5-default libqt5webkit5 libqt5webkit5-dev qttools5-dev-tools qt5-doc qtcreator libglu1-mesa-dev \
   && apt-get clean
 
-# checkout, build, and install librepcb
+# checkout librepcb
 RUN git clone https://github.com/LibrePCB/LibrePCB.git /opt/LibrePCB \
   && cd /opt/LibrePCB \
   && git submodule init \
-  && git submodule update \
-  && mkdir /opt/build-librepcb-Desktop-Debug \
-  && cd /opt/build-librepcb-Desktop-Debug \
-  && qmake -r ../LibrePCB/librepcb.pro \
-  && make -j8 \
-  && make install
+  && git submodule update
+
+# build and install librepcb
+RUN /opt/LibrePCB/dev/docker/make_librepcb.sh
 
 # copy default config file
-RUN cp /opt/LibrePCB/dev/docker/LibrePCB_git-master.conf /root/.config/LibrePCB/LibrePCB_git-master.conf
+RUN mkdir -p /root/.config/LibrePCB/ \
+  && cp /opt/LibrePCB/dev/docker/LibrePCB_git-master.conf /root/.config/LibrePCB/LibrePCB_git-master.conf
 
 # set working directory and default command to execute
 WORKDIR /opt/LibrePCB

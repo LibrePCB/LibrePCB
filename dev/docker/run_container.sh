@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 XSOCK=/tmp/.X11-unix
 XAUTH=/tmp/.docker.xauth
