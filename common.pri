@@ -1,6 +1,9 @@
 # include user-defined things in every qmake project
 exists(custom.pri):include(custom.pri)
 
+# set prefix for "make install"
+isEmpty(PREFIX):PREFIX = /usr/local
+
 # set destination path for generated files
 isEmpty(GENERATED_DIR):GENERATED_DIR = generated
 

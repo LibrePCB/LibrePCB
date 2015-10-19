@@ -29,14 +29,14 @@ macx {
 
 unix:!macx {
     # Linux/UNIX-specific configurations
-    target.path = /usr/local/bin
-    icon.path = /usr/share/pixmaps
+    target.path = $${PREFIX}/bin
+    icon.path = $${PREFIX}/share/pixmaps
     icon.files = ../packaging/unix/img/librepcb.svg
-    desktop.path = /usr/share/applications
+    desktop.path = $${PREFIX}/share/applications
     desktop.files = ../packaging/unix/librepcb.desktop
-    mimexml.path = /usr/share/mime/packages
+    mimexml.path = $${PREFIX}/share/mime/packages
     mimexml.files = ../packaging/unix/mime/librepcb.xml
-    mimedesktop.path = /usr/share/mimelnk/application
+    mimedesktop.path = $${PREFIX}/share/mimelnk/application
     mimedesktop.files = ../packaging/unix/mime/x-librepcb-project.desktop
     INSTALLS += target icon desktop mimexml mimedesktop
 }
