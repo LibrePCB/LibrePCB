@@ -40,6 +40,10 @@ To compile LibrePCB, you need the following software components:
 sudo apt-get install g++ qt5-default libqt5webkit5 libqt5webkit5-dev qttools5-dev-tools qt5-doc qtcreator libglu1-mesa-dev
 ```
 
+#### Installation on ArchLinux
+
+You can install [librepcb-git](https://aur.archlinux.org/packages/librepcb-git/) from the AUR.
+
 #### Installation in a docker container
 
 To build and run LibrePCB in a [docker](https://www.docker.com/) container (which is pretty cool!), check out [these instructions](https://github.com/LibrePCB/LibrePCB/tree/master/dev/docker).
