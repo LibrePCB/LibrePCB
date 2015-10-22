@@ -140,13 +140,13 @@ bool SES_DrawWire::entry(SEE_Base* event) noexcept
     mNetClassComboBox->model()->sort(0);
     mNetClassComboBox->setCurrentIndex(0);
     mNetClassAddCon = connect(&mProject.getCircuit(), &Circuit::netClassAdded,
-        [this](NetClass& netclass){if (mNetClassComboBox)
+        [this](NetClass& netclass){if (mNetClassComboBox) {
         mNetClassComboBox->addItem(netclass.getName(), netclass.getUuid());
-        mNetClassComboBox->model()->sort(0);});
+        mNetClassComboBox->model()->sort(0);}});
     mNetClassRemoveCon = connect(&mProject.getCircuit(), &Circuit::netClassRemoved,
-        [this](NetClass& netclass){if (mNetClassComboBox)
+        [this](NetClass& netclass){if (mNetClassComboBox) {
         mNetClassComboBox->removeItem(mNetClassComboBox->findData(netclass.getUuid()));
-        mNetClassComboBox->model()->sort(0);});
+        mNetClassComboBox->model()->sort(0);}});
     mEditorUi.commandToolbar->addWidget(mNetClassComboBox);
 
     // add the "Signal:" label to the toolbar
@@ -164,13 +164,13 @@ bool SES_DrawWire::entry(SEE_Base* event) noexcept
     mNetSignalComboBox->model()->sort(0);
     mNetSignalComboBox->setCurrentIndex(-1);
     mNetSignalAddCon = connect(&mProject.getCircuit(), &Circuit::netSignalAdded,
-        [this](NetSignal& netsignal){if (mNetSignalComboBox)
+        [this](NetSignal& netsignal){if (mNetSignalComboBox) {
         mNetSignalComboBox->addItem(netsignal.getName(), netsignal.getUuid());
-        mNetSignalComboBox->model()->sort(0);});
+        mNetSignalComboBox->model()->sort(0);}});
     mNetSignalRemoveCon = connect(&mProject.getCircuit(), &Circuit::netSignalRemoved,
-        [this](NetSignal& netsignal){if (mNetSignalComboBox)
+        [this](NetSignal& netsignal){if (mNetSignalComboBox) {
         mNetSignalComboBox->removeItem(mNetSignalComboBox->findData(netsignal.getUuid()));
-        mNetSignalComboBox->model()->sort(0);});
+        mNetSignalComboBox->model()->sort(0);}});
     mEditorUi.commandToolbar->addWidget(mNetSignalComboBox);
 
     // add the "Width:" label to the toolbar

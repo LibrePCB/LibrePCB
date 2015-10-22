@@ -170,7 +170,7 @@ void UndoStack::beginCommand(const QString& text) throw (Exception)
 
 void UndoStack::appendToCommand(UndoCommand* cmd) throw (Exception)
 {
-    Q_CHECK_PTR(cmd);
+    Q_ASSERT(cmd != nullptr);
     Q_ASSERT(mCurrentIndex == mCommands.count());
 
     if (!mCommandActive)
