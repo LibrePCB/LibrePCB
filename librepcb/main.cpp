@@ -28,6 +28,7 @@
 #include <librepcbcommon/debug.h>
 #include <librepcbcommon/exceptions.h>
 #include <librepcbworkspace/workspace.h>
+#include "firstrunwizard/firstrunwizard.h"
 #include "controlpanel/controlpanel.h"
 
 /*****************************************************************************************
@@ -114,50 +115,46 @@ int main(int argc, char* argv[])
 
 
 
-    // Initialization finished, open the workspace...
-
-    bool chooseAnotherWorkspace = false;
+    // Initialization finished, open the workspace (or show the first run wizard)...
     FilePath wsPath(Workspace::getMostRecentlyUsedWorkspacePath());
-
-    do
+    if (!Workspace::isValidWorkspacePath(wsPath))
     {
-        if ((!Workspace::isValidWorkspacePath(wsPath)) || (chooseAnotherWorkspace))
+        FirstRunWizard wizard;
+        if (wizard.exec() != QDialog::Accepted) return 0;
+        wsPath = wizard.getWorkspaceFilePath();
+        if (wizard.getCreateNewWorkspace())
         {
-            wsPath = Workspace::chooseWorkspacePath();
-            if (!wsPath.isValid())
-                return 0;
-
-            Workspace::setMostRecentlyUsedWorkspacePath(wsPath);
+            if (!Workspace::createNewWorkspace(wsPath))
+            {
+                QMessageBox::critical(0, Application::translate("Workspace",
+                    "Error"), Application::translate("Workspace", "Could not "
+                    "create the workspace directory. Check file permissions."));
+                return 0; // TODO: Show the wizard again instead of closing the application
+            }
         }
+        Workspace::setMostRecentlyUsedWorkspacePath(wsPath);
+    }
 
-        chooseAnotherWorkspace = false;
+    try
+    {
+        Workspace ws(wsPath);   // The Workspace constructor can throw an exception.
+        ControlPanel p(ws);
+        p.show();
 
-        try
-        {
-            Workspace ws(wsPath);   // The Workspace constructor can throw an exception.
-            ControlPanel p(ws);
-            p.show();
-
-            return appExec();
-        }
-        catch (UserCanceled& e)
-        {
-            return 0; // quit the application
-        }
-        catch (Exception& e)
-        {
-            int btn = QMessageBox::question(0, Application::translate("Workspace",
-                        "Cannot open the workspace"), QString(Application::translate(
-                        "Workspace", "The workspace \"%1\" cannot be opened: %2\n\n"
-                        "Do you want to choose another workspace?"))
-                        .arg(wsPath.toNative(), e.getUserMsg()));
-
-            if (btn == QMessageBox::Yes)
-                chooseAnotherWorkspace = true;
-            else
-                return 0; // quit the application
-        }
-    } while (chooseAnotherWorkspace);
+        return appExec();
+    }
+    catch (UserCanceled& e)
+    {
+        return 0; // quit the application
+    }
+    catch (Exception& e)
+    {
+        QMessageBox::critical(0, Application::translate("Workspace",
+            "Cannot open the workspace"), QString(Application::translate(
+            "Workspace", "The workspace \"%1\" cannot be opened: %2"))
+            .arg(wsPath.toNative(), e.getUserMsg()));
+        return 0; // quit the application
+    }
 
     return 0;
 }
