@@ -151,7 +151,7 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
     {
         // set colors
         layer = getSchematicLayer(polygon->getLayerId());
-        if (!layer) {if (!layer->isVisible()) layer = nullptr;}
+        if (layer) {if (!layer->isVisible()) layer = nullptr;}
         if (layer)
             painter->setPen(QPen(layer->getColor(selected), polygon->getWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
         else
