@@ -15,7 +15,7 @@ include(../common.pri)
 
 QT += core widgets opengl webkitwidgets xml printsupport sql
 
-exists(../.git):DEFINES += GIT_BRANCH=\\\"first_run_wizard\\\"
+exists(../.git):DEFINES += GIT_BRANCH=\\\"master\\\"
 
 win32 {
     # Windows-specific configurations
