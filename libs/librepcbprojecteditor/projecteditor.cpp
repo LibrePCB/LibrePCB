@@ -184,7 +184,11 @@ bool ProjectEditor::autosaveProject() noexcept
     {
         // the user is executing a command at the moment, so we should not save now,
         // try it a few seconds later instead...
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
         QTimer::singleShot(10000, this, &ProjectEditor::autosaveProject);
+#else
+        QTimer::singleShot(10000, this, SLOT(autosaveProject()));
+#endif
         return false;
     }
 

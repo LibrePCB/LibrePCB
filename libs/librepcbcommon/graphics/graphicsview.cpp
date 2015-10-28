@@ -111,33 +111,6 @@ void GraphicsView::setOriginCrossVisible(bool visible) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void GraphicsView::zoomIn() noexcept
-{
-    if (!mScene) return;
-    scale(sZoomStepFactor, sZoomStepFactor);
-}
-
-void GraphicsView::zoomOut() noexcept
-{
-    if (!mScene) return;
-    scale(1/sZoomStepFactor, 1/sZoomStepFactor);
-}
-
-void GraphicsView::zoomAll() noexcept
-{
-    if (!mScene) return;
-    QRectF rect = mScene->itemsBoundingRect();
-    if (rect.isEmpty()) rect = QRectF(-100, -100, 200, 200);
-    qreal xMargins = rect.width() / 50;
-    qreal yMargins = rect.height() / 50;
-    rect += QMarginsF(xMargins, yMargins, xMargins, yMargins);
-    mZoomAnimation->setDuration(500);
-    mZoomAnimation->setEasingCurve(QEasingCurve::InOutCubic);
-    mZoomAnimation->setStartValue(getVisibleSceneRect());
-    mZoomAnimation->setEndValue(rect);
-    mZoomAnimation->start();
-}
-
 void GraphicsView::handleMouseWheelEvent(QGraphicsSceneWheelEvent* event) noexcept
 {
     if(event->modifiers().testFlag(Qt::ShiftModifier))
@@ -157,6 +130,37 @@ void GraphicsView::handleMouseWheelEvent(QGraphicsSceneWheelEvent* event) noexce
         scale(scaleFactor, scaleFactor);
     }
     event->setAccepted(true);
+}
+
+/*****************************************************************************************
+ *  Public Slots
+ ****************************************************************************************/
+
+void GraphicsView::zoomIn() noexcept
+{
+    if (!mScene) return;
+    scale(sZoomStepFactor, sZoomStepFactor);
+}
+
+void GraphicsView::zoomOut() noexcept
+{
+    if (!mScene) return;
+    scale(1/sZoomStepFactor, 1/sZoomStepFactor);
+}
+
+void GraphicsView::zoomAll() noexcept
+{
+    if (!mScene) return;
+    QRectF rect = mScene->itemsBoundingRect();
+    if (rect.isEmpty()) rect = QRectF(-100, -100, 200, 200);
+    qreal xMargins = rect.width() / 50;
+    qreal yMargins = rect.height() / 50;
+    rect.adjust(-xMargins, -yMargins, xMargins, yMargins);
+    mZoomAnimation->setDuration(500);
+    mZoomAnimation->setEasingCurve(QEasingCurve::InOutCubic);
+    mZoomAnimation->setStartValue(getVisibleSceneRect());
+    mZoomAnimation->setEndValue(rect);
+    mZoomAnimation->start();
 }
 
 /*****************************************************************************************

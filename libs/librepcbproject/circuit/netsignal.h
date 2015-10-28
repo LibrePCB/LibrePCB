@@ -51,9 +51,9 @@ namespace project {
 /**
  * @brief The NetSignal class
  */
-class NetSignal final : public IF_ErcMsgProvider, public IF_XmlSerializableObject
+class NetSignal final : public QObject, public IF_ErcMsgProvider, public IF_XmlSerializableObject
 {
-        Q_DECLARE_TR_FUNCTIONS(NetSignal)
+        Q_OBJECT
         DECLARE_ERC_MSG_CLASS_NAME(NetSignal)
 
     public:
@@ -90,6 +90,11 @@ class NetSignal final : public IF_ErcMsgProvider, public IF_XmlSerializableObjec
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+
+
+    signals:
+
+        void nameChanged(const QString& newName);
 
 
     private:

@@ -65,6 +65,8 @@ SI_NetLabel::SI_NetLabel(Schematic& schematic, NetSignal& netsignal, const Point
 
 void SI_NetLabel::init() throw (Exception)
 {
+    connect(mNetSignal, &NetSignal::nameChanged, this, &SI_NetLabel::netSignalNameChanged);
+
     // create the graphics item
     mGraphicsItem = new SGI_NetLabel(*this);
     mGraphicsItem->setPos(mPosition.toPxQPointF());
@@ -94,9 +96,12 @@ Project& SI_NetLabel::getProject() const noexcept
 void SI_NetLabel::setNetSignal(NetSignal& netsignal) noexcept
 {
     if (&netsignal == mNetSignal) return;
+
+    disconnect(mNetSignal, &NetSignal::nameChanged, this, &SI_NetLabel::netSignalNameChanged);
     mNetSignal->unregisterSchematicNetLabel(*this);
     mNetSignal = &netsignal;
     mNetSignal->registerSchematicNetLabel(*this);
+    connect(mNetSignal, &NetSignal::nameChanged, this, &SI_NetLabel::netSignalNameChanged);
     mGraphicsItem->updateCacheAndRepaint();
 }
 
@@ -118,11 +123,6 @@ void SI_NetLabel::setRotation(const Angle& rotation) noexcept
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
-
-void SI_NetLabel::updateText() noexcept
-{
-    mGraphicsItem->updateCacheAndRepaint();
-}
 
 void SI_NetLabel::addToSchematic(GraphicsScene& scene) throw (Exception)
 {
@@ -162,6 +162,16 @@ void SI_NetLabel::setSelected(bool selected) noexcept
 {
     SI_Base::setSelected(selected);
     mGraphicsItem->update();
+}
+
+/*****************************************************************************************
+ *  Private Slots
+ ****************************************************************************************/
+
+void SI_NetLabel::netSignalNameChanged(const QString& newName) noexcept
+{
+    Q_UNUSED(newName);
+    mGraphicsItem->updateCacheAndRepaint();
 }
 
 /*****************************************************************************************

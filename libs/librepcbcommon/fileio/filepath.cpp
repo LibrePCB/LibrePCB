@@ -53,14 +53,8 @@ FilePath::FilePath(const FilePath& other) noexcept :
 
 bool FilePath::setPath(const QString& filepath) noexcept
 {
-    mIsValid = false;
     mFileInfo.setFile(makeWellFormatted(filepath));
-
-    if (mFileInfo.isAbsolute()) // check if the filepath is absolute
-        mIsValid = true;
-    else
-        qDebug() << "filepath is not absolute:" << filepath << "-->" << mFileInfo.filePath();
-
+    mIsValid = mFileInfo.isAbsolute(); // check if the filepath is absolute
     return mIsValid;
 }
 

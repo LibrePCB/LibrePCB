@@ -39,7 +39,7 @@ namespace project {
 
 NetSignal::NetSignal(const Circuit& circuit,
                      const XmlDomElement& domElement) throw (Exception) :
-    mCircuit(circuit), mAddedToCircuit(false), mErcMsgUnusedNetSignal(nullptr),
+    QObject(0), mCircuit(circuit), mAddedToCircuit(false), mErcMsgUnusedNetSignal(nullptr),
     mErcMsgConnectedToLessThanTwoPins(nullptr), mGenCompSignalWithForcedNameCount(0),
     // load attributes
     mUuid(domElement.getAttribute<QUuid>("uuid")),
@@ -59,7 +59,7 @@ NetSignal::NetSignal(const Circuit& circuit,
 
 NetSignal::NetSignal(const Circuit& circuit, NetClass& netclass,
                      const QString& name, bool autoName) throw (Exception) :
-    mCircuit(circuit), mAddedToCircuit(false), mErcMsgUnusedNetSignal(nullptr),
+    QObject(0), mCircuit(circuit), mAddedToCircuit(false), mErcMsgUnusedNetSignal(nullptr),
     mErcMsgConnectedToLessThanTwoPins(nullptr), mGenCompSignalWithForcedNameCount(0),
     // load default attributes
     mUuid(QUuid::createUuid()), // generate random UUID
@@ -94,12 +94,11 @@ void NetSignal::setName(const QString& name, bool isAutoName) throw (Exception)
         throw RuntimeError(__FILE__, __LINE__, QString(),
             tr("The new netsignal name must not be empty!"));
     }
+
     mName = name;
     mHasAutoName = isAutoName;
     updateErcMessages();
-
-    foreach (SI_NetLabel* label, mSchematicNetLabels)
-        label->updateText();
+    emit nameChanged(mName);
 }
 
 /*****************************************************************************************
