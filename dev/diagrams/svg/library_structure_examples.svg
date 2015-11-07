@@ -2062,4 +2062,7 @@
     <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2257.44" y="678"/>
     <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="2396" y="776"/>
   </g>
+  <text font-size="14.1111" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:700" x="200" y="1404.88">
+    <tspan x="200" y="1404.88">Note: Component Signals, Symbol Pins and Footprint Pads are not shown in these examples.</tspan>
+  </text>
 </svg>
