@@ -44,7 +44,7 @@ class SmartXmlFile;
 
 namespace project {
 class Project;
-class ComponentInstance;
+class DeviceInstance;
 class BI_Base;
 }
 
@@ -118,12 +118,12 @@ class Board final : public QObject, public IF_AttributeProvider,
         const QString& getName() const noexcept {return mName;}
         const QIcon& getIcon() const noexcept {return mIcon;}
 
-        // ComponentInstance Methods
-        const QHash<QUuid, ComponentInstance*>& getComponentInstances() const noexcept {return mComponentInstances;}
-        ComponentInstance* getCompInstanceByGenCompUuid(const QUuid& uuid) const noexcept;
-        ComponentInstance* createComponentInstance() throw (Exception);
-        void addComponentInstance(ComponentInstance& componentInstance) throw (Exception);
-        void removeComponentInstance(ComponentInstance& componentInstance) throw (Exception);
+        // DeviceInstance Methods
+        const QHash<QUuid, DeviceInstance*>& getDeviceInstances() const noexcept {return mDeviceInstances;}
+        DeviceInstance* getDeviceInstanceByComponentUuid(const QUuid& uuid) const noexcept;
+        DeviceInstance* createDeviceInstance() throw (Exception);
+        void addDeviceInstance(DeviceInstance& instance) throw (Exception);
+        void removeDeviceInstance(DeviceInstance& instance) throw (Exception);
 
         // General Methods
         void addToProject() throw (Exception);
@@ -149,8 +149,8 @@ class Board final : public QObject, public IF_AttributeProvider,
         /// @copydoc IF_AttributeProvider#attributesChanged()
         void attributesChanged();
 
-        void componentAdded(ComponentInstance& comp);
-        void componentRemoved(ComponentInstance& comp);
+        void deviceAdded(DeviceInstance& comp);
+        void deviceRemoved(DeviceInstance& comp);
 
 
     private:
@@ -193,7 +193,7 @@ class Board final : public QObject, public IF_AttributeProvider,
         QHash<QUuid, ErcMsg*> mErcMsgListUnplacedGenCompInstances;
 
         // items
-        QHash<QUuid, ComponentInstance*> mComponentInstances;
+        QHash<QUuid, DeviceInstance*> mDeviceInstances;
 };
 
 } // namespace project

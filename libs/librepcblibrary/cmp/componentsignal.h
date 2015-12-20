@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_GENCOMPSIGNAL_H
-#define LIBRARY_GENCOMPSIGNAL_H
+#ifndef LIBRARY_COMPONENTSIGNAL_H
+#define LIBRARY_COMPONENTSIGNAL_H
 
 /*****************************************************************************************
  *  Includes
@@ -28,17 +28,17 @@
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 
 /*****************************************************************************************
- *  Class GenCompSignal
+ *  Class ComponentSignal
  ****************************************************************************************/
 
 namespace library {
 
 /**
- * @brief The GenCompSignal class
+ * @brief The ComponentSignal class
  */
-class GenCompSignal final : public IF_XmlSerializableObject
+class ComponentSignal final : public IF_XmlSerializableObject
 {
-        Q_DECLARE_TR_FUNCTIONS(GenCompSignal)
+        Q_DECLARE_TR_FUNCTIONS(ComponentSignal)
 
     public:
 
@@ -54,11 +54,11 @@ class GenCompSignal final : public IF_XmlSerializableObject
 
 
         // Constructors / Destructor
-        explicit GenCompSignal(const QUuid& uuid = QUuid::createUuid(),
-                               const QString& name_en_US = QString(),
-                               const QString& description_en_US = QString()) noexcept;
-        explicit GenCompSignal(const XmlDomElement& domElement) throw (Exception);
-        ~GenCompSignal() noexcept;
+        explicit ComponentSignal(const QUuid& uuid = QUuid::createUuid(),
+                                 const QString& name_en_US = QString(),
+                                 const QString& description_en_US = QString()) noexcept;
+        explicit ComponentSignal(const XmlDomElement& domElement) throw (Exception);
+        ~ComponentSignal() noexcept;
 
         // Getters
         const QUuid& getUuid() const noexcept {return mUuid;}
@@ -91,8 +91,8 @@ class GenCompSignal final : public IF_XmlSerializableObject
     private:
 
         // make some methods inaccessible...
-        GenCompSignal(const GenCompSignal& other);
-        GenCompSignal& operator=(const GenCompSignal& rhs);
+        ComponentSignal(const ComponentSignal& other);
+        ComponentSignal& operator=(const ComponentSignal& rhs);
 
         // Private Methods
 
@@ -118,4 +118,4 @@ class GenCompSignal final : public IF_XmlSerializableObject
 
 } // namespace library
 
-#endif // LIBRARY_GENCOMPSIGNAL_H
+#endif // LIBRARY_COMPONENTSIGNAL_H

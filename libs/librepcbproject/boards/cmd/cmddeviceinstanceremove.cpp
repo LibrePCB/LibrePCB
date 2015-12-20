@@ -22,35 +22,65 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "model3d.h"
+#include "cmddeviceinstanceremove.h"
+#include "../deviceinstance.h"
+#include "../board.h"
 
-namespace library {
+namespace project {
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Model3D::Model3D(const FilePath& elementDirectory) :
-    LibraryElement(elementDirectory, "3dmdl", "model_3d")
+CmdDeviceInstanceRemove::CmdDeviceInstanceRemove(Board& board, DeviceInstance& dev,
+                                                 UndoCommand* parent) throw (Exception) :
+    UndoCommand(tr("Remove device instance"), parent),
+    mBoard(board), mDevice(dev)
 {
-    readFromFile();
 }
 
-Model3D::~Model3D()
+CmdDeviceInstanceRemove::~CmdDeviceInstanceRemove() noexcept
 {
+    if (isExecuted())
+        delete &mDevice;
 }
 
 /*****************************************************************************************
- *  Private Methods
+ *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void Model3D::parseDomTree(const XmlDomElement& root) throw (Exception)
+void CmdDeviceInstanceRemove::redo() throw (Exception)
 {
-    LibraryElement::parseDomTree(root);
+    mBoard.removeDeviceInstance(mDevice); // throws an exception on error
+
+    try
+    {
+        UndoCommand::redo();
+    }
+    catch (Exception &e)
+    {
+        mBoard.addDeviceInstance(mDevice); // throws an exception on error
+        throw;
+    }
+}
+
+void CmdDeviceInstanceRemove::undo() throw (Exception)
+{
+    mBoard.addDeviceInstance(mDevice); // throws an exception on error
+
+    try
+    {
+        UndoCommand::undo();
+    }
+    catch (Exception &e)
+    {
+        mBoard.removeDeviceInstance(mDevice); // throws an exception on error
+        throw;
+    }
 }
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace library
+} // namespace project

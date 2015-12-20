@@ -32,9 +32,9 @@
  ****************************************************************************************/
 
 namespace library {
-class GenericComponent;
-class GenCompSymbVar;
-class GenCompSymbVarItem;
+class Component;
+class ComponentSymbolVariant;
+class ComponentSymbolVariantItem;
 }
 
 namespace project {
@@ -85,9 +85,9 @@ class SES_AddComponents final : public SES_Base
         Angle mLastAngle;
 
         // information about the current symbol to place
-        const library::GenericComponent* mGenComp;
-        const library::GenCompSymbVar* mGenCompSymbVar;
-        const library::GenCompSymbVarItem* mCurrentSymbVarItem;
+        const library::Component* mGenComp;
+        const library::ComponentSymbolVariant* mGenCompSymbVar;
+        const library::ComponentSymbolVariantItem* mCurrentSymbVarItem;
         SI_Symbol* mCurrentSymbolToPlace;
         CmdSymbolInstanceEdit* mCurrentSymbolEditCommand;
 };

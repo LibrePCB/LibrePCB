@@ -40,8 +40,8 @@ class Project;
 }
 
 namespace library {
-class GenericComponent;
-class GenCompSymbVar;
+class Component;
+class ComponentSymbolVariant;
 class Symbol;
 class SymbolPreviewGraphicsItem;
 class CategoryTreeModel;
@@ -92,8 +92,8 @@ class AddGenCompDialog final : public QDialog
 
         // Private Methods
         void setSelectedCategory(const QUuid& categoryUuid);
-        void setSelectedGenComp(const library::GenericComponent* genComp);
-        void setSelectedSymbVar(const library::GenCompSymbVar* symbVar);
+        void setSelectedGenComp(const library::Component* genComp);
+        void setSelectedSymbVar(const library::ComponentSymbolVariant* symbVar);
         void accept() noexcept;
 
 
@@ -107,8 +107,8 @@ class AddGenCompDialog final : public QDialog
 
         // Attributes
         QUuid mSelectedCategoryUuid;
-        const library::GenericComponent* mSelectedGenComp;
-        const library::GenCompSymbVar* mSelectedSymbVar;
+        const library::Component* mSelectedGenComp;
+        const library::ComponentSymbolVariant* mSelectedSymbVar;
         QList<library::SymbolPreviewGraphicsItem*> mPreviewSymbolGraphicsItems;
 };
 

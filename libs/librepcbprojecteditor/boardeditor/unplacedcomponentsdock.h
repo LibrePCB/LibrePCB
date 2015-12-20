@@ -36,7 +36,7 @@ class GraphicsView;
 class GraphicsScene;
 
 namespace library {
-class Component;
+class Device;
 }
 
 namespace project {
@@ -90,10 +90,10 @@ class UnplacedComponentsDock final : public QDockWidget
         UnplacedComponentsDock& operator=(const UnplacedComponentsDock& rhs);
 
         // Private Methods
-        void updateComponentsList() noexcept;
+        /*void updateComponentsList() noexcept;
         void setSelectedGenCompInstance(GenCompInstance* genComp) noexcept;
-        void setSelectedComponent(const library::Component* component) noexcept;
-        void addComponent(GenCompInstance& genComp, const QUuid& component) noexcept;
+        void setSelectedDevice(const library::Device* device) noexcept;
+        void addComponent(GenCompInstance& genComp, const QUuid& component) noexcept;*/
 
 
         // General
@@ -104,7 +104,7 @@ class UnplacedComponentsDock final : public QDockWidget
         GraphicsView* mFootprintPreviewGraphicsView;
         GraphicsScene* mFootprintPreviewGraphicsScene;
         GenCompInstance* mSelectedGenComp;
-        const library::Component* mSelectedComponent;
+        const library::Device* mSelectedDevice;
         QMetaObject::Connection mCircuitConnection1;
         QMetaObject::Connection mCircuitConnection2;
         QMetaObject::Connection mBoardConnection1;

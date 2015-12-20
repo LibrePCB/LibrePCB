@@ -22,65 +22,71 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "cmdcomponentinstanceremove.h"
-#include "../componentinstance.h"
-#include "../board.h"
+#include <librepcbcommon/fileio/xmldomelement.h>
+#include "packagepad.h"
 
-namespace project {
+namespace library {
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdComponentInstanceRemove::CmdComponentInstanceRemove(Board& board, ComponentInstance& cmp,
-                                                       UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Remove component instance"), parent),
-    mBoard(board), mComponent(cmp)
+PackagePad::PackagePad(const QUuid& uuid, const QString& name) noexcept :
+    mUuid(uuid), mName(name)
 {
+    Q_ASSERT(mUuid.isNull() == false);
 }
 
-CmdComponentInstanceRemove::~CmdComponentInstanceRemove() noexcept
+PackagePad::PackagePad(const XmlDomElement& domElement) throw (Exception) :
+    mUuid()
 {
-    if (isExecuted())
-        delete &mComponent;
+    // read attributes
+    mUuid = domElement.getAttribute<QUuid>("uuid");
+    mName = domElement.getText(true);
+
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+}
+
+PackagePad::~PackagePad() noexcept
+{
 }
 
 /*****************************************************************************************
- *  Inherited from UndoCommand
+ *  Setters
  ****************************************************************************************/
 
-void CmdComponentInstanceRemove::redo() throw (Exception)
+void PackagePad::setName(const QString& name) noexcept
 {
-    mBoard.removeComponentInstance(mComponent); // throws an exception on error
-
-    try
-    {
-        UndoCommand::redo();
-    }
-    catch (Exception &e)
-    {
-        mBoard.addComponentInstance(mComponent); // throws an exception on error
-        throw;
-    }
+    mName = name;
 }
 
-void CmdComponentInstanceRemove::undo() throw (Exception)
-{
-    mBoard.addComponentInstance(mComponent); // throws an exception on error
+/*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
 
-    try
-    {
-        UndoCommand::undo();
-    }
-    catch (Exception &e)
-    {
-        mBoard.removeComponentInstance(mComponent); // throws an exception on error
-        throw;
-    }
+XmlDomElement* PackagePad::serializeToXmlDomElement() const throw (Exception)
+{
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("pad"));
+    root->setAttribute("uuid", mUuid);
+    root->setText(mName);
+    return root.take();
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+bool PackagePad::checkAttributesValidity() const noexcept
+{
+    if (mUuid.isNull())     return false;
+    if (mName.isEmpty())    return false;
+    return true;
 }
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace project
+} // namespace library

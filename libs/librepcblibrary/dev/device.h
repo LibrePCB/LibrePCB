@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_PACKAGE_H
-#define LIBRARY_PACKAGE_H
+#ifndef LIBRARY_DEVICE_H
+#define LIBRARY_DEVICE_H
 
 /*****************************************************************************************
  *  Includes
@@ -26,49 +26,57 @@
 
 #include <QtCore>
 #include "../libraryelement.h"
-#include "packagepad.h"
 
 /*****************************************************************************************
- *  Class Package
+ *  Class Device
  ****************************************************************************************/
 
 namespace library {
 
 /**
- * @brief The Package class
+ * @brief The Device class
  */
-class Package final : public LibraryElement
+class Device final : public LibraryElement
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit Package(const QUuid& uuid = QUuid::createUuid(),
-                         const Version& version = Version(),
-                         const QString& author = QString(),
-                         const QString& name_en_US = QString(),
-                         const QString& description_en_US = QString(),
-                         const QString& keywords_en_US = QString()) throw (Exception);
-        explicit Package(const FilePath& elementDirectory) throw (Exception);
-        ~Package() noexcept;
+        explicit Device(const QUuid& uuid = QUuid::createUuid(),
+                        const Version& version = Version(),
+                        const QString& author = QString(),
+                        const QString& name_en_US = QString(),
+                        const QString& description_en_US = QString(),
+                        const QString& keywords_en_US = QString()) throw (Exception);
+        explicit Device(const FilePath& elementDirectory) throw (Exception);
+        ~Device() noexcept;
 
-        // Pads
-        const QList<const PackagePad*>& getPads() const noexcept {return mPads;}
-        const PackagePad* getPadByUuid(const QUuid& uuid) const noexcept;
-        void clearPads() noexcept;
-        void addPad(const PackagePad& pad) noexcept;
+        // Getters
+        const QUuid& getComponentUuid() const noexcept {return mComponentUuid;}
+        const QUuid& getPackageUuid() const noexcept {return mPackageUuid;}
+        const QHash<QUuid, QUuid>& getPadSignalMap() const noexcept {return mPadSignalMap;}
+        QUuid getSignalOfPad(const QUuid& pad) const noexcept {return mPadSignalMap.value(pad);}
+
+        // Setters
+        void setComponentUuid(const QUuid& uuid) noexcept {mComponentUuid = uuid;}
+        void setPackageUuid(const QUuid& uuid) noexcept {mPackageUuid = uuid;}
+
+        // General Methods
+        void clearPadSignalMap() noexcept {mPadSignalMap.clear();}
+        void addPadSignalMapping(const QUuid& pad, const QUuid& signal) noexcept {mPadSignalMap.insert(pad, signal);}
 
 
     private:
 
         // make some methods inaccessible...
-        Package() = delete;
-        Package(const Package& other) = delete;
-        Package& operator=(const Package& rhs) = delete;
+        Device();
+        Device(const Device& other);
+        Device& operator=(const Device& rhs);
 
 
         // Private Methods
+
         void parseDomTree(const XmlDomElement& root) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
@@ -79,9 +87,11 @@ class Package final : public LibraryElement
 
 
         // Attributes
-        QList<const PackagePad*> mPads; ///< empty if the package has no pads
+        QUuid mComponentUuid;
+        QUuid mPackageUuid;
+        QHash<QUuid, QUuid> mPadSignalMap; ///< key: pad, value: signal
 };
 
 } // namespace library
 
-#endif // LIBRARY_PACKAGE_H
+#endif // LIBRARY_DEVICE_H

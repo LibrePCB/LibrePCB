@@ -26,6 +26,9 @@
 
 #include <QtCore>
 #include "../libraryelement.h"
+#include "componentsignal.h"
+#include "componentsymbolvariant.h"
+#include "../libraryelementattribute.h"
 
 /*****************************************************************************************
  *  Class Component
@@ -52,31 +55,57 @@ class Component final : public LibraryElement
         explicit Component(const FilePath& elementDirectory) throw (Exception);
         ~Component() noexcept;
 
-        // Getters
-        const QUuid& getGenCompUuid() const noexcept {return mGenericComponentUuid;}
-        const QUuid& getPackageUuid() const noexcept {return mPackageUuid;}
-        const QHash<QUuid, QUuid>& getPadSignalMap() const noexcept {return mPadSignalMap;}
-        QUuid getSignalOfPad(const QUuid& pad) const noexcept {return mPadSignalMap.value(pad);}
+        // General
+        bool isSchematicOnly() const noexcept {return mSchematicOnly;}
+        void setIsSchematicOnly(bool schematicOnly) noexcept {mSchematicOnly = schematicOnly;}
 
-        // Setters
-        void setGenCompUuid(const QUuid& uuid) noexcept {mGenericComponentUuid = uuid;}
-        void setPackageUuid(const QUuid& uuid) noexcept {mPackageUuid = uuid;}
+        // Attributes
+        const QList<LibraryElementAttribute*>& getAttributes() const noexcept;
+        const LibraryElementAttribute* getAttributeByKey(const QString& key) const noexcept;
 
-        // General Methods
-        void clearPadSignalMap() noexcept {mPadSignalMap.clear();}
-        void addPadSignalMapping(const QUuid& pad, const QUuid& signal) noexcept {mPadSignalMap.insert(pad, signal);}
+        // Default Values
+        const QMap<QString, QString>& getDefaultValues() const noexcept;
+        QString getDefaultValue(const QStringList& localeOrder) const noexcept;
+        void clearDefaultValues() noexcept;
+        void addDefaultValue(const QString& locale, const QString& value) noexcept;
 
+        // Prefixes
+        const QMap<QString, QString>& getPrefixes() const noexcept;
+        QString getPrefix(const QStringList& normOrder) const noexcept;
+        const QString& getDefaultPrefixNorm() const noexcept;
+        QString getDefaultPrefix() const noexcept;
+        void clearPrefixes() noexcept;
+        void addPrefix(const QString& norm, const QString& prefix, bool isDefault) noexcept;
+
+        // Signals
+        const QList<const ComponentSignal*>& getSignals() const noexcept;
+        const ComponentSignal* getSignalByUuid(const QUuid& uuid) const noexcept;
+        const ComponentSignal* getSignalOfPin(const QUuid& symbVarUuid, const QUuid& itemUuid,
+                                              const QUuid& pinUuid) const noexcept;
+        void clearSignals() noexcept;
+        void addSignal(const ComponentSignal& signal) noexcept;
+
+        // Symbol Variants
+        const QList<const ComponentSymbolVariant*>& getSymbolVariants() const noexcept;
+        const ComponentSymbolVariant* getSymbolVariantByUuid(const QUuid& uuid) const noexcept;
+        const QUuid& getDefaultSymbolVariantUuid() const noexcept;
+        const ComponentSymbolVariant* getDefaultSymbolVariant() const noexcept;
+        void clearSymbolVariants() noexcept;
+        void addSymbolVariant(const ComponentSymbolVariant& symbolVariant) noexcept;
+
+        // Symbol Variant Items
+        const ComponentSymbolVariantItem* getSymbVarItem(const QUuid& symbVarUuid,
+                                                         const QUuid& itemUuid) const noexcept;
 
     private:
 
         // make some methods inaccessible...
-        Component();
-        Component(const Component& other);
-        Component& operator=(const Component& rhs);
+        Component() = delete;
+        Component(const Component& other) = delete;
+        Component& operator=(const Component& rhs) = delete;
 
 
         // Private Methods
-
         void parseDomTree(const XmlDomElement& root) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
@@ -86,10 +115,15 @@ class Component final : public LibraryElement
         bool checkAttributesValidity() const noexcept override;
 
 
-        // Attributes
-        QUuid mGenericComponentUuid;
-        QUuid mPackageUuid;
-        QHash<QUuid, QUuid> mPadSignalMap; ///< key: pad, value: signal
+        // Generic Conponent Attributes
+        bool mSchematicOnly; ///< if true, this component is schematic-only (no package)
+        QList<LibraryElementAttribute*> mAttributes; ///< all attributes in a specific order
+        QMap<QString, QString> mDefaultValues; ///< key: locale (like "en_US"), value: default value
+        QMap<QString, QString> mPrefixes; ///< key: norm, value: prefix
+        QString mDefaultPrefixNorm; ///< must be an existing key of #mPrefixes
+        QList<const ComponentSignal*> mSignals; ///< empty if the component has no signals
+        QList<const ComponentSymbolVariant*> mSymbolVariants; ///< minimum one entry
+        QUuid mDefaultSymbolVariantUuid; ///< must be an existing key of #mSymbolVariants
 };
 
 } // namespace library

@@ -22,8 +22,8 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "cmdcomponentinstanceedit.h"
-#include "../componentinstance.h"
+#include "cmddeviceinstanceedit.h"
+#include "../deviceinstance.h"
 
 namespace project {
 
@@ -31,21 +31,21 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdComponentInstanceEdit::CmdComponentInstanceEdit(ComponentInstance& cmp, UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Edit component instance"), parent), mComponent(cmp),
-    mOldPos(mComponent.getPosition()), mNewPos(mOldPos),
-    mOldRotation(mComponent.getRotation()), mNewRotation(mOldRotation),
-    mOldMirrored(mComponent.getIsMirrored()), mNewMirrored(mOldMirrored)
+CmdDeviceInstanceEdit::CmdDeviceInstanceEdit(DeviceInstance& dev, UndoCommand* parent) throw (Exception) :
+    UndoCommand(tr("Edit device instance"), parent), mDevice(dev),
+    mOldPos(mDevice.getPosition()), mNewPos(mOldPos),
+    mOldRotation(mDevice.getRotation()), mNewRotation(mOldRotation),
+    mOldMirrored(mDevice.getIsMirrored()), mNewMirrored(mOldMirrored)
 {
 }
 
-CmdComponentInstanceEdit::~CmdComponentInstanceEdit() noexcept
+CmdDeviceInstanceEdit::~CmdDeviceInstanceEdit() noexcept
 {
     if ((mRedoCount == 0) && (mUndoCount == 0))
     {
-        mComponent.setPosition(mOldPos);
-        mComponent.setRotation(mOldRotation);
-        mComponent.setIsMirrored(mOldMirrored);
+        mDevice.setPosition(mOldPos);
+        mDevice.setRotation(mOldRotation);
+        mDevice.setIsMirrored(mOldMirrored);
     }
 }
 
@@ -53,47 +53,47 @@ CmdComponentInstanceEdit::~CmdComponentInstanceEdit() noexcept
  *  General Methods
  ****************************************************************************************/
 
-void CmdComponentInstanceEdit::setPosition(Point& pos, bool immediate) noexcept
+void CmdDeviceInstanceEdit::setPosition(Point& pos, bool immediate) noexcept
 {
     Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
     mNewPos = pos;
-    if (immediate) mComponent.setPosition(mNewPos);
+    if (immediate) mDevice.setPosition(mNewPos);
 }
 
-void CmdComponentInstanceEdit::setDeltaToStartPos(Point& deltaPos, bool immediate) noexcept
+void CmdDeviceInstanceEdit::setDeltaToStartPos(Point& deltaPos, bool immediate) noexcept
 {
     Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
     mNewPos = mOldPos + deltaPos;
-    if (immediate) mComponent.setPosition(mNewPos);
+    if (immediate) mDevice.setPosition(mNewPos);
 }
 
-void CmdComponentInstanceEdit::setRotation(const Angle& angle, bool immediate) noexcept
+void CmdDeviceInstanceEdit::setRotation(const Angle& angle, bool immediate) noexcept
 {
     Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
     mNewRotation = angle;
-    if (immediate) mComponent.setRotation(mNewRotation);
+    if (immediate) mDevice.setRotation(mNewRotation);
 }
 
-void CmdComponentInstanceEdit::rotate(const Angle& angle, const Point& center, bool immediate) noexcept
+void CmdDeviceInstanceEdit::rotate(const Angle& angle, const Point& center, bool immediate) noexcept
 {
     Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
     mNewPos.rotate(angle, center);
     mNewRotation += angle;
     if (immediate)
     {
-        mComponent.setPosition(mNewPos);
-        mComponent.setRotation(mNewRotation);
+        mDevice.setPosition(mNewPos);
+        mDevice.setRotation(mNewRotation);
     }
 }
 
-void CmdComponentInstanceEdit::setMirrored(bool mirrored, bool immediate) noexcept
+void CmdDeviceInstanceEdit::setMirrored(bool mirrored, bool immediate) noexcept
 {
     Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
     mNewMirrored = mirrored;
-    if (immediate) mComponent.setIsMirrored(mNewMirrored);
+    if (immediate) mDevice.setIsMirrored(mNewMirrored);
 }
 
-void CmdComponentInstanceEdit::mirror(const Point& center, bool vertical, bool immediate) noexcept
+void CmdDeviceInstanceEdit::mirror(const Point& center, bool vertical, bool immediate) noexcept
 {
     Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
     mNewMirrored = !mNewMirrored;
@@ -108,9 +108,9 @@ void CmdComponentInstanceEdit::mirror(const Point& center, bool vertical, bool i
     }
     if (immediate)
     {
-        mComponent.setIsMirrored(mNewMirrored);
-        mComponent.setPosition(mNewPos);
-        mComponent.setRotation(mNewRotation);
+        mDevice.setIsMirrored(mNewMirrored);
+        mDevice.setPosition(mNewPos);
+        mDevice.setRotation(mNewRotation);
     }
 }
 
@@ -118,38 +118,38 @@ void CmdComponentInstanceEdit::mirror(const Point& center, bool vertical, bool i
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdComponentInstanceEdit::redo() throw (Exception)
+void CmdDeviceInstanceEdit::redo() throw (Exception)
 {
     try
     {
-        mComponent.setPosition(mNewPos);
-        mComponent.setRotation(mNewRotation);
-        mComponent.setIsMirrored(mNewMirrored);
+        mDevice.setPosition(mNewPos);
+        mDevice.setRotation(mNewRotation);
+        mDevice.setIsMirrored(mNewMirrored);
         UndoCommand::redo();
     }
     catch (Exception &e)
     {
-        mComponent.setPosition(mOldPos);
-        mComponent.setRotation(mOldRotation);
-        mComponent.setIsMirrored(mOldMirrored);
+        mDevice.setPosition(mOldPos);
+        mDevice.setRotation(mOldRotation);
+        mDevice.setIsMirrored(mOldMirrored);
         throw;
     }
 }
 
-void CmdComponentInstanceEdit::undo() throw (Exception)
+void CmdDeviceInstanceEdit::undo() throw (Exception)
 {
     try
     {
-        mComponent.setPosition(mOldPos);
-        mComponent.setRotation(mOldRotation);
-        mComponent.setIsMirrored(mOldMirrored);
+        mDevice.setPosition(mOldPos);
+        mDevice.setRotation(mOldRotation);
+        mDevice.setIsMirrored(mOldMirrored);
         UndoCommand::undo();
     }
     catch (Exception &e)
     {
-        mComponent.setPosition(mNewPos);
-        mComponent.setRotation(mNewRotation);
-        mComponent.setIsMirrored(mNewMirrored);
+        mDevice.setPosition(mNewPos);
+        mDevice.setRotation(mNewRotation);
+        mDevice.setIsMirrored(mNewMirrored);
         throw;
     }
 }

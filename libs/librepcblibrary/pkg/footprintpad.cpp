@@ -24,7 +24,6 @@
 #include <QtCore>
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include "footprintpad.h"
-#include "../librarybaseelement.h"
 
 namespace library {
 
@@ -32,21 +31,17 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-FootprintPad::FootprintPad(const QUuid& uuid, const QString& name_en_US,
-                           const QString& description_en_US) noexcept :
-    mUuid(uuid), mType(Type_t::ThtRect), mPosition(0, 0), mRotation(0), mWidth(0),
+FootprintPad::FootprintPad(const QUuid& padUuid) noexcept :
+    mPadUuid(padUuid), mType(Type_t::ThtRect), mPosition(0, 0), mRotation(0), mWidth(0),
     mHeight(0), mDrillDiameter(0), mLayerId(0)
 {
-    Q_ASSERT(mUuid.isNull() == false);
-    mNames.insert("en_US", name_en_US);
-    mDescriptions.insert("en_US", description_en_US);
 }
 
 FootprintPad::FootprintPad(const XmlDomElement& domElement) throw (Exception) :
-    mUuid(), mPosition()
+    mPadUuid(), mPosition()
 {
     // read attributes
-    mUuid = domElement.getAttribute<QUuid>("uuid");
+    mPadUuid = domElement.getAttribute<QUuid>("uuid");
     mType = stringToType(domElement.getAttribute("type"));
     mPosition.setX(domElement.getAttribute<Length>("x"));
     mPosition.setY(domElement.getAttribute<Length>("y"));
@@ -56,43 +51,11 @@ FootprintPad::FootprintPad(const XmlDomElement& domElement) throw (Exception) :
     mDrillDiameter = domElement.getAttribute<Length>("drill");
     mLayerId = domElement.getAttribute<uint>("layer"); // use "uint" to automatically check for >= 0
 
-    // read names and descriptions in all available languages
-    LibraryBaseElement::readLocaleDomNodes(domElement, "name", mNames);
-    LibraryBaseElement::readLocaleDomNodes(domElement, "description", mDescriptions);
-
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 FootprintPad::~FootprintPad() noexcept
 {
-}
-
-/*****************************************************************************************
- *  Getters
- ****************************************************************************************/
-
-QString FootprintPad::getName(const QStringList& localeOrder) const noexcept
-{
-    return LibraryBaseElement::localeStringFromList(mNames, localeOrder);
-}
-
-QString FootprintPad::getDescription(const QStringList& localeOrder) const noexcept
-{
-    return LibraryBaseElement::localeStringFromList(mDescriptions, localeOrder);
-}
-
-/*****************************************************************************************
- *  Setters
- ****************************************************************************************/
-
-void FootprintPad::setName(const QString& locale, const QString& name) noexcept
-{
-    mNames.insert(locale, name);
-}
-
-void FootprintPad::setDescription(const QString& locale, const QString& description) noexcept
-{
-    mDescriptions.insert(locale, description);
 }
 
 /*****************************************************************************************
@@ -104,7 +67,7 @@ XmlDomElement* FootprintPad::serializeToXmlDomElement() const throw (Exception)
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("pad"));
-    root->setAttribute("uuid", mUuid);
+    root->setAttribute("uuid", mPadUuid);
     root->setAttribute("type", typeToString(mType));
     root->setAttribute("x", mPosition.getX().toMmString());
     root->setAttribute("y", mPosition.getY().toMmString());
@@ -113,10 +76,6 @@ XmlDomElement* FootprintPad::serializeToXmlDomElement() const throw (Exception)
     root->setAttribute("height", mHeight);
     root->setAttribute("drill", mDrillDiameter);
     root->setAttribute("layer", mLayerId);
-    foreach (const QString& locale, mNames.keys())
-        root->appendTextChild("name", mNames.value(locale))->setAttribute("locale", locale);
-    foreach (const QString& locale, mDescriptions.keys())
-        root->appendTextChild("description", mDescriptions.value(locale))->setAttribute("locale", locale);
     return root.take();
 }
 
@@ -126,13 +85,11 @@ XmlDomElement* FootprintPad::serializeToXmlDomElement() const throw (Exception)
 
 bool FootprintPad::checkAttributesValidity() const noexcept
 {
-    if (mUuid.isNull())                     return false;
+    if (mPadUuid.isNull())                  return false;
     if (typeToString(mType).isEmpty())      return false;
     if (mWidth <= 0)                        return false;
     if (mHeight <= 0)                       return false;
     if (mDrillDiameter < 0)                 return false;
-    if (mNames.value("en_US").isEmpty())    return false;
-    if (!mDescriptions.contains("en_US"))   return false;
     return true;
 }
 

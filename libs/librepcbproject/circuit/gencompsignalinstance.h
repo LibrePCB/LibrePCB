@@ -44,7 +44,7 @@ class ErcMsg;
 }
 
 namespace library {
-class GenCompSignal;
+class ComponentSignal;
 }
 
 /*****************************************************************************************
@@ -68,12 +68,12 @@ class GenCompSignalInstance final : public QObject, public IF_ErcMsgProvider,
         explicit GenCompSignalInstance(Circuit& circuit, GenCompInstance& genCompInstance,
                                        const XmlDomElement& domElement) throw (Exception);
         explicit GenCompSignalInstance(Circuit& circuit, GenCompInstance& genCompInstance,
-                                       const library::GenCompSignal& genCompSignal,
+                                       const library::ComponentSignal& genCompSignal,
                                        NetSignal* netsignal = nullptr) throw (Exception);
         ~GenCompSignalInstance() noexcept;
 
         // Getters
-        const library::GenCompSignal& getCompSignal() const noexcept {return *mGenCompSignal;}
+        const library::ComponentSignal& getCompSignal() const noexcept {return *mGenCompSignal;}
         NetSignal* getNetSignal() const noexcept {return mNetSignal;}
         bool isNetSignalNameForced() const noexcept;
         QString getForcedNetSignalName() const noexcept;
@@ -129,7 +129,7 @@ class GenCompSignalInstance final : public QObject, public IF_ErcMsgProvider,
         GenCompInstance& mGenCompInstance;
 
         // Attributes
-        const library::GenCompSignal* mGenCompSignal;
+        const library::ComponentSignal* mGenCompSignal;
         QList<SI_SymbolPin*> mRegisteredSymbolPins;
         NetSignal* mNetSignal;
         bool mAddedToCircuit;

@@ -32,8 +32,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdGenCompInstAdd::CmdGenCompInstAdd(Circuit& circuit, const library::GenericComponent& genComp,
-                                     const library::GenCompSymbVar& symbVar, UndoCommand* parent) throw (Exception) :
+CmdGenCompInstAdd::CmdGenCompInstAdd(Circuit& circuit, const library::Component& genComp,
+                                     const library::ComponentSymbolVariant& symbVar, UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Add generic component"), parent),
     mCircuit(circuit), mGenComp(genComp), mSymbVar(symbVar), mGenCompInstance(nullptr)
 {

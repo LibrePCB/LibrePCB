@@ -55,14 +55,12 @@ class FootprintPad final : public IF_XmlSerializableObject
         };
 
         // Constructors / Destructor
-        explicit FootprintPad(const QUuid& uuid = QUuid::createUuid(),
-                              const QString& name_en_US = QString(),
-                              const QString& description_en_US = QString()) noexcept;
+        explicit FootprintPad(const QUuid& padUuid) noexcept;
         explicit FootprintPad(const XmlDomElement& domElement) throw (Exception);
         ~FootprintPad() noexcept;
 
         // Getters
-        const QUuid& getUuid() const noexcept {return mUuid;}
+        const QUuid& getPadUuid() const noexcept {return mPadUuid;}
         Type_t getType() const noexcept {return mType;}
         const Point& getPosition() const noexcept {return mPosition;}
         const Angle& getRotation() const noexcept {return mRotation;}
@@ -70,10 +68,6 @@ class FootprintPad final : public IF_XmlSerializableObject
         const Length& getHeight() const noexcept {return mHeight;}
         const Length& getDrillDiameter() const noexcept {return mDrillDiameter;}
         int getLayerId() const noexcept {return mLayerId;}
-        QString getName(const QStringList& localeOrder) const noexcept;
-        QString getDescription(const QStringList& localeOrder) const noexcept;
-        const QMap<QString, QString>& getNames() const noexcept {return mNames;}
-        const QMap<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
 
         // Setters
         void setType(Type_t type) noexcept {mType = type;}
@@ -83,8 +77,6 @@ class FootprintPad final : public IF_XmlSerializableObject
         void setHeight(const Length& height) noexcept {mHeight = height;}
         void setDrillDiameter(const Length& diameter) noexcept {mDrillDiameter = diameter;}
         void setLayerId(int id) noexcept {mLayerId = id;}
-        void setName(const QString& locale, const QString& name) noexcept;
-        void setDescription(const QString& locale, const QString& description) noexcept;
 
         // General Methods
 
@@ -109,7 +101,7 @@ class FootprintPad final : public IF_XmlSerializableObject
 
 
         // Pin Attributes
-        QUuid mUuid;
+        QUuid mPadUuid;
         Type_t mType;
         Point mPosition;
         Angle mRotation;
@@ -117,8 +109,6 @@ class FootprintPad final : public IF_XmlSerializableObject
         Length mHeight;
         Length mDrillDiameter;
         int mLayerId;
-        QMap<QString, QString> mNames;
-        QMap<QString, QString> mDescriptions;
 };
 
 } // namespace library

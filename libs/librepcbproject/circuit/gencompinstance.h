@@ -40,14 +40,14 @@ namespace project {
 class Circuit;
 class GenCompAttributeInstance;
 class GenCompSignalInstance;
-class ComponentInstance;
+class DeviceInstance;
 class SI_Symbol;
 class ErcMsg;
 }
 
 namespace library {
-class GenericComponent;
-class GenCompSymbVar;
+class Component;
+class ComponentSymbolVariant;
 }
 
 /*****************************************************************************************
@@ -69,8 +69,8 @@ class GenCompInstance : public QObject, public IF_AttributeProvider,
 
         // Constructors / Destructor
         explicit GenCompInstance(Circuit& circuit, const XmlDomElement& domElement) throw (Exception);
-        explicit GenCompInstance(Circuit& circuit, const library::GenericComponent& genComp,
-                                 const library::GenCompSymbVar& symbVar, const QString& name) throw (Exception);
+        explicit GenCompInstance(Circuit& circuit, const library::Component& genComp,
+                                 const library::ComponentSymbolVariant& symbVar, const QString& name) throw (Exception);
         ~GenCompInstance() noexcept;
 
         // Getters
@@ -82,8 +82,8 @@ class GenCompInstance : public QObject, public IF_AttributeProvider,
         int getUnplacedRequiredSymbolsCount() const noexcept;
         int getUnplacedOptionalSymbolsCount() const noexcept;
         GenCompSignalInstance* getSignalInstance(const QUuid& signalUuid) const noexcept {return mSignals.value(signalUuid);}
-        const library::GenericComponent& getGenComp() const noexcept {return *mGenComp;}
-        const library::GenCompSymbVar& getSymbolVariant() const noexcept {return *mGenCompSymbVar;}
+        const library::Component& getGenComp() const noexcept {return *mGenComp;}
+        const library::ComponentSymbolVariant& getSymbolVariant() const noexcept {return *mGenCompSymbVar;}
 
 
         // Setters
@@ -125,8 +125,8 @@ class GenCompInstance : public QObject, public IF_AttributeProvider,
         void removeFromCircuit() throw (Exception);
         void registerSymbol(const SI_Symbol& symbol) throw (Exception);
         void unregisterSymbol(const SI_Symbol& symbol) throw (Exception);
-        void registerComponent(const ComponentInstance& component) throw (Exception);
-        void unregisterComponent(const ComponentInstance& component) throw (Exception);
+        void registerDevice(const DeviceInstance& device) throw (Exception);
+        void unregisterDevice(const DeviceInstance& device) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
@@ -176,10 +176,10 @@ class GenCompInstance : public QObject, public IF_AttributeProvider,
         QString mValue;
 
         /// @brief Pointer to the generic component in the project's library
-        const library::GenericComponent* mGenComp;
+        const library::Component* mGenComp;
 
         /// @brief Pointer to the used symbol variant of #mGenComp
-        const library::GenCompSymbVar* mGenCompSymbVar;
+        const library::ComponentSymbolVariant* mGenCompSymbVar;
 
         /// @brief All attributes of this generic component
         QList<GenCompAttributeInstance*> mAttributes;
@@ -201,11 +201,11 @@ class GenCompInstance : public QObject, public IF_AttributeProvider,
         QHash<QUuid, const SI_Symbol*> mSymbols;
 
         /**
-         * @brief All registered component instances
+         * @brief All registered device instances
          *
-         * @see #registerComponent(), #unregisterComponent()
+         * @see #registerDevice(), #unregisterDevice()
          */
-        QList<const ComponentInstance*> mComponentInstances;
+        QList<const DeviceInstance*> mDeviceInstances;
 
         /// @brief The ERC message for unplaced required symbols of this generic component
         QScopedPointer<ErcMsg> mErcMsgUnplacedRequiredSymbols;

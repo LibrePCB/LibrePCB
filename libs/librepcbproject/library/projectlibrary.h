@@ -38,12 +38,10 @@ class Project;
 
 namespace library {
 class Symbol;
-class Footprint;
-class Model3D;
 class SpiceModel;
 class Package;
-class GenericComponent;
 class Component;
+class Device;
 }
 
 /*****************************************************************************************
@@ -69,40 +67,32 @@ class ProjectLibrary final : public QObject
         ~ProjectLibrary() noexcept;
 
         // Getters: Library Elements
-        const QHash<QUuid, const library::Symbol*>&             getSymbols()            const noexcept {return mSymbols;}
-        const QHash<QUuid, const library::Footprint*>&          getFootprints()         const noexcept {return mFootprints;}
-        const QHash<QUuid, const library::Model3D*>&            getModels()             const noexcept {return mModels;}
-        const QHash<QUuid, const library::SpiceModel*>&         getSpiceModels()        const noexcept {return mSpiceModels;}
-        const QHash<QUuid, const library::Package*>&            getPackages()           const noexcept {return mPackages;}
-        const QHash<QUuid, const library::GenericComponent*>&   getGenericComponents()  const noexcept {return mGenericComponents;}
-        const QHash<QUuid, const library::Component*>&          getComponents()         const noexcept {return mComponents;}
-        const library::Symbol*           getSymbol(     const QUuid& uuid) const noexcept;
-        const library::Footprint*        getFootprint(  const QUuid& uuid) const noexcept;
-        const library::Model3D*          getModel(      const QUuid& uuid) const noexcept;
-        const library::SpiceModel*       getSpiceModel( const QUuid& uuid) const noexcept;
-        const library::Package*          getPackage(    const QUuid& uuid) const noexcept;
-        const library::GenericComponent* getGenComp(    const QUuid& uuid) const noexcept;
-        const library::Component*        getComponent(  const QUuid& uuid) const noexcept;
+        const QHash<QUuid, const library::Symbol*>&     getSymbols()        const noexcept {return mSymbols;}
+        const QHash<QUuid, const library::SpiceModel*>& getSpiceModels()    const noexcept {return mSpiceModels;}
+        const QHash<QUuid, const library::Package*>&    getPackages()       const noexcept {return mPackages;}
+        const QHash<QUuid, const library::Component*>&  getComponents()     const noexcept {return mComponents;}
+        const QHash<QUuid, const library::Device*>&     getDevices()        const noexcept {return mDevices;}
+        const library::Symbol*      getSymbol(     const QUuid& uuid) const noexcept;
+        const library::SpiceModel*  getSpiceModel( const QUuid& uuid) const noexcept;
+        const library::Package*     getPackage(    const QUuid& uuid) const noexcept;
+        const library::Component*   getComponent(  const QUuid& uuid) const noexcept;
+        const library::Device*      getDevice(     const QUuid& uuid) const noexcept;
 
         // Getters: Special Queries
-        QHash<QUuid, const library::Component*> getComponentsOfGenComp(const QUuid& genCompUuid) const noexcept;
+        QHash<QUuid, const library::Device*> getDevicesOfComponent(const QUuid& compUuid) const noexcept;
 
 
         // Add/Remove Methods
         void addSymbol(const library::Symbol& s) throw (Exception);
-        void addFootprint(const library::Footprint& f) throw (Exception);
-        void add3dModel(const library::Model3D& m) throw (Exception);
         void addSpiceModel(const library::SpiceModel& m) throw (Exception);
         void addPackage(const library::Package& p) throw (Exception);
-        void addGenComp(const library::GenericComponent& gc) throw (Exception);
-        void addComp(const library::Component& c) throw (Exception);
+        void addComponent(const library::Component& c) throw (Exception);
+        void addDevice(const library::Device& d) throw (Exception);
         void removeSymbol(const library::Symbol& s) throw (Exception);
-        void removeFootprint(const library::Footprint& f) throw (Exception);
-        void remove3dModel(const library::Model3D& m) throw (Exception);
         void removeSpiceModel(const library::SpiceModel& m) throw (Exception);
         void removePackage(const library::Package& p) throw (Exception);
-        void removeGenComp(const library::GenericComponent& gc) throw (Exception);
-        void removeComp(const library::Component& c) throw (Exception);
+        void removeComponent(const library::Component& c) throw (Exception);
+        void removeDevice(const library::Device& d) throw (Exception);
 
 
         // General Methods
@@ -141,21 +131,17 @@ class ProjectLibrary final : public QObject
 
         // The Library Elements
         QHash<QUuid, const library::Symbol*> mSymbols;
-        QHash<QUuid, const library::Footprint*> mFootprints;
-        QHash<QUuid, const library::Model3D*> mModels;
         QHash<QUuid, const library::SpiceModel*> mSpiceModels;
         QHash<QUuid, const library::Package*> mPackages;
-        QHash<QUuid, const library::GenericComponent*> mGenericComponents;
         QHash<QUuid, const library::Component*> mComponents;
+        QHash<QUuid, const library::Device*> mDevices;
 
         // Removed Library Elements
         QHash<QUuid, const library::Symbol*> mRemovedSymbols;
-        QHash<QUuid, const library::Footprint*> mRemovedFootprints;
-        QHash<QUuid, const library::Model3D*> mRemovedModels;
         QHash<QUuid, const library::SpiceModel*> mRemovedSpiceModels;
         QHash<QUuid, const library::Package*> mRemovedPackages;
-        QHash<QUuid, const library::GenericComponent*> mRemovedGenericComponents;
         QHash<QUuid, const library::Component*> mRemovedComponents;
+        QHash<QUuid, const library::Device*> mRemovedDevices;
 };
 
 } // namespace project

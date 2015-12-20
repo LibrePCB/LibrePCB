@@ -43,8 +43,8 @@ class GenCompInstance;
 }
 
 namespace library {
-class GenericComponent;
-class GenCompSymbVar;
+class Component;
+class ComponentSymbolVariant;
 }
 
 /*****************************************************************************************
@@ -104,8 +104,8 @@ class Circuit final : public QObject, public IF_XmlSerializableObject
         const QHash<QUuid, GenCompInstance*>& getGenCompInstances() const noexcept {return mGenCompInstances;}
         GenCompInstance* getGenCompInstanceByUuid(const QUuid& uuid) const noexcept;
         GenCompInstance* getGenCompInstanceByName(const QString& name) const noexcept;
-        GenCompInstance* createGenCompInstance(const library::GenericComponent& genComp,
-                                               const library::GenCompSymbVar& symbVar,
+        GenCompInstance* createGenCompInstance(const library::Component& genComp,
+                                               const library::ComponentSymbolVariant& symbVar,
                                                QString name = QString()) throw (Exception);
         void addGenCompInstance(GenCompInstance& genCompInstance) throw (Exception);
         void removeGenCompInstance(GenCompInstance& genCompInstance) throw (Exception);

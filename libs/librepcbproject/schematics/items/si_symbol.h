@@ -42,7 +42,7 @@ class SI_SymbolPin;
 
 namespace library {
 class Symbol;
-class GenCompSymbVarItem;
+class ComponentSymbolVariantItem;
 }
 
 /*****************************************************************************************
@@ -81,7 +81,7 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
         const QHash<QUuid, SI_SymbolPin*>& getPins() const noexcept {return mPins;}
         GenCompInstance& getGenCompInstance() const noexcept {return *mGenCompInstance;}
         const library::Symbol& getLibSymbol() const noexcept {return *mSymbol;}
-        const library::GenCompSymbVarItem& getGenCompSymbVarItem() const noexcept {return *mSymbVarItem;}
+        const library::ComponentSymbolVariantItem& getGenCompSymbVarItem() const noexcept {return *mSymbVarItem;}
 
         // Setters
         void setPosition(const Point& newPos) throw (Exception);
@@ -135,7 +135,7 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
         // General
         Schematic& mSchematic;
         GenCompInstance* mGenCompInstance;
-        const library::GenCompSymbVarItem* mSymbVarItem;
+        const library::ComponentSymbolVariantItem* mSymbVarItem;
         const library::Symbol* mSymbol;
         QHash<QUuid, SI_SymbolPin*> mPins; ///< key: symbol pin UUID
         SGI_Symbol* mGraphicsItem;

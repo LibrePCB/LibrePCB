@@ -39,8 +39,8 @@ class GenCompInstance;
 }
 
 namespace library {
-class GenericComponent;
-class GenCompSymbVar;
+class Component;
+class ComponentSymbolVariant;
 }
 
 /*****************************************************************************************

@@ -22,9 +22,9 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "gencompsymbvaritem.h"
-#include "genericcomponent.h"
-#include "gencompsymbvar.h"
+#include "componentsymbolvariantitem.h"
+#include "component.h"
+#include "componentsymbolvariant.h"
 #include <librepcbcommon/fileio/xmldomelement.h>
 
 namespace library {
@@ -33,14 +33,16 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-GenCompSymbVarItem::GenCompSymbVarItem(const QUuid& uuid, const QUuid& symbolUuid,
-                                       bool isRequired, const QString& suffix) noexcept :
+ComponentSymbolVariantItem::ComponentSymbolVariantItem(const QUuid& uuid,
+                                                       const QUuid& symbolUuid,
+                                                       bool isRequired,
+                                                       const QString& suffix) noexcept :
     mUuid(uuid), mSymbolUuid(symbolUuid), mIsRequired(isRequired), mSuffix(suffix)
 {
     Q_ASSERT(mUuid.isNull() == false);
 }
 
-GenCompSymbVarItem::GenCompSymbVarItem(const XmlDomElement& domElement) throw (Exception)
+ComponentSymbolVariantItem::ComponentSymbolVariantItem(const XmlDomElement& domElement) throw (Exception)
 {
     // read attributes
     mUuid = domElement.getAttribute<QUuid>("uuid");
@@ -65,8 +67,8 @@ GenCompSymbVarItem::GenCompSymbVarItem(const XmlDomElement& domElement) throw (E
             item.displayType = PinDisplayType_t::None;
         else if (node->getAttribute("display") == "pin_name")
             item.displayType = PinDisplayType_t::PinName;
-        else if (node->getAttribute("display") == "gen_comp_signal")
-            item.displayType = PinDisplayType_t::GenCompSignal;
+        else if (node->getAttribute("display") == "component_signal")
+            item.displayType = PinDisplayType_t::ComponentSignal;
         else if (node->getAttribute("display") == "net_signal")
             item.displayType = PinDisplayType_t::NetSignal;
         else
@@ -81,7 +83,7 @@ GenCompSymbVarItem::GenCompSymbVarItem(const XmlDomElement& domElement) throw (E
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-GenCompSymbVarItem::~GenCompSymbVarItem() noexcept
+ComponentSymbolVariantItem::~ComponentSymbolVariantItem() noexcept
 {
 }
 
@@ -89,7 +91,7 @@ GenCompSymbVarItem::~GenCompSymbVarItem() noexcept
  *  Getters
  ****************************************************************************************/
 
-QUuid GenCompSymbVarItem::getSignalOfPin(const QUuid& pinUuid) const noexcept
+QUuid ComponentSymbolVariantItem::getSignalOfPin(const QUuid& pinUuid) const noexcept
 {
     if (mPinSignalMap.contains(pinUuid))
         return mPinSignalMap.value(pinUuid).signal;
@@ -97,7 +99,7 @@ QUuid GenCompSymbVarItem::getSignalOfPin(const QUuid& pinUuid) const noexcept
         return QUuid();
 }
 
-GenCompSymbVarItem::PinDisplayType_t GenCompSymbVarItem::getDisplayTypeOfPin(const QUuid& pinUuid) const noexcept
+ComponentSymbolVariantItem::PinDisplayType_t ComponentSymbolVariantItem::getDisplayTypeOfPin(const QUuid& pinUuid) const noexcept
 {
     if (mPinSignalMap.contains(pinUuid))
         return mPinSignalMap.value(pinUuid).displayType;
@@ -109,12 +111,12 @@ GenCompSymbVarItem::PinDisplayType_t GenCompSymbVarItem::getDisplayTypeOfPin(con
  *  General Methods
  ****************************************************************************************/
 
-void GenCompSymbVarItem::addPinSignalMapping(const QUuid& pin, const QUuid& signal, PinDisplayType_t display) noexcept
+void ComponentSymbolVariantItem::addPinSignalMapping(const QUuid& pin, const QUuid& signal, PinDisplayType_t display) noexcept
 {
     mPinSignalMap.insert(pin, PinSignalMapItem_t{pin, signal, display});
 }
 
-XmlDomElement* GenCompSymbVarItem::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* ComponentSymbolVariantItem::serializeToXmlDomElement() const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -133,7 +135,7 @@ XmlDomElement* GenCompSymbVarItem::serializeToXmlDomElement() const throw (Excep
         {
             case PinDisplayType_t::None:            child->setAttribute<QString>("display", "none"); break;
             case PinDisplayType_t::PinName:         child->setAttribute<QString>("display", "pin_name"); break;
-            case PinDisplayType_t::GenCompSignal:   child->setAttribute<QString>("display", "gen_comp_signal"); break;
+            case PinDisplayType_t::ComponentSignal: child->setAttribute<QString>("display", "component_signal"); break;
             case PinDisplayType_t::NetSignal:       child->setAttribute<QString>("display", "net_signal"); break;
             default: throw LogicError(__FILE__, __LINE__);
         }
@@ -145,7 +147,7 @@ XmlDomElement* GenCompSymbVarItem::serializeToXmlDomElement() const throw (Excep
  *  Private Methods
  ****************************************************************************************/
 
-bool GenCompSymbVarItem::checkAttributesValidity() const noexcept
+bool ComponentSymbolVariantItem::checkAttributesValidity() const noexcept
 {
     if (mUuid.isNull())                     return false;
     if (mSymbolUuid.isNull())               return false;

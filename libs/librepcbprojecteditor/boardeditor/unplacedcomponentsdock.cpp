@@ -35,7 +35,7 @@
 #include <librepcbproject/library/projectlibrary.h>
 #include <librepcbcommon/graphics/graphicsview.h>
 #include <librepcbcommon/graphics/graphicsscene.h>
-#include <librepcbproject/boards/cmd/cmdcomponentinstanceadd.h>
+#include <librepcbproject/boards/cmd/cmddeviceinstanceadd.h>
 #include <librepcbcommon/undostack.h>
 #include <librepcbcommon/gridproperties.h>
 #include <librepcbworkspace/workspace.h>
@@ -52,12 +52,12 @@ UnplacedComponentsDock::UnplacedComponentsDock(ProjectEditor& editor) :
     QDockWidget(0), mProjectEditor(editor), mProject(editor.getProject()), mBoard(nullptr),
     mUi(new Ui::UnplacedComponentsDock),
     mFootprintPreviewGraphicsView(nullptr), mFootprintPreviewGraphicsScene(nullptr),
-    mSelectedGenComp(nullptr), mSelectedComponent(nullptr),
+    mSelectedGenComp(nullptr), mSelectedDevice(nullptr),
     mCircuitConnection1(), mCircuitConnection2(), mBoardConnection1(), mBoardConnection2(),
     mDisableListUpdate(false)
 {
     mUi->setupUi(this);
-    mFootprintPreviewGraphicsScene = new GraphicsScene();
+    /*mFootprintPreviewGraphicsScene = new GraphicsScene();
     mFootprintPreviewGraphicsView = new GraphicsView();
     mFootprintPreviewGraphicsView->setScene(mFootprintPreviewGraphicsScene);
 
@@ -66,7 +66,7 @@ UnplacedComponentsDock::UnplacedComponentsDock(ProjectEditor& editor) :
     mCircuitConnection2 = connect(&mProject.getCircuit(), &Circuit::genCompRemoved,
                                   [this](GenCompInstance& gc){Q_UNUSED(gc); updateComponentsList();});
 
-    updateComponentsList();
+    updateComponentsList();*/
 }
 
 UnplacedComponentsDock::~UnplacedComponentsDock()
@@ -87,7 +87,7 @@ UnplacedComponentsDock::~UnplacedComponentsDock()
 void UnplacedComponentsDock::setBoard(Board* board)
 {
     // clean up
-    mBoard = nullptr;
+    /*mBoard = nullptr;
     disconnect(mBoardConnection1);  mBoardConnection1 = QMetaObject::Connection();
     disconnect(mBoardConnection2);  mBoardConnection2 = QMetaObject::Connection();
     updateComponentsList();
@@ -96,11 +96,11 @@ void UnplacedComponentsDock::setBoard(Board* board)
     mBoard = board;
     if (board)
     {
-        mBoardConnection1 = connect(board, &Board::componentAdded, [this](ComponentInstance& c){Q_UNUSED(c); updateComponentsList();});
-        mBoardConnection2 = connect(board, &Board::componentRemoved, [this](ComponentInstance& c){Q_UNUSED(c); updateComponentsList();});
+        mBoardConnection1 = connect(board, &Board::deviceAdded, [this](DeviceInstance& c){Q_UNUSED(c); updateComponentsList();});
+        mBoardConnection2 = connect(board, &Board::deviceRemoved, [this](DeviceInstance& c){Q_UNUSED(c); updateComponentsList();});
         mNextPosition = Point::fromMm(0, -20).mappedToGrid(board->getGridProperties().getInterval());
         updateComponentsList();
-    }
+    }*/
 }
 
 /*****************************************************************************************
@@ -109,7 +109,7 @@ void UnplacedComponentsDock::setBoard(Board* board)
 
 void UnplacedComponentsDock::on_lstUnplacedComponents_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous)
 {
-    Q_UNUSED(previous);
+    /*Q_UNUSED(previous);
 
     GenCompInstance* genComp = nullptr;
     if (mBoard && current)
@@ -118,34 +118,34 @@ void UnplacedComponentsDock::on_lstUnplacedComponents_currentItemChanged(QListWi
         Q_ASSERT(genCompUuid.isNull() == false);
         genComp = mProject.getCircuit().getGenCompInstanceByUuid(genCompUuid);
     }
-    setSelectedGenCompInstance(genComp);
+    setSelectedGenCompInstance(genComp);*/
 }
 
 void UnplacedComponentsDock::on_cbxSelectedComponent_currentIndexChanged(int index)
 {
-    QUuid componentUuid = mUi->cbxSelectedComponent->itemData(index, Qt::UserRole).toUuid();
-    FilePath cmpFp = mProjectEditor.getWorkspace().getLibrary().getLatestComponent(componentUuid);
-    if (cmpFp.isValid())
+    /*QUuid deviceUuid = mUi->cbxSelectedComponent->itemData(index, Qt::UserRole).toUuid();
+    FilePath devFp = mProjectEditor.getWorkspace().getLibrary().getLatestDevice(deviceUuid);
+    if (devFp.isValid())
     {
-        const library::Component* component = new library::Component(cmpFp);
-        setSelectedComponent(component);
+        const library::Device* device = new library::Device(devFp);
+        setSelectedDevice(device);
     }
     else
     {
-        setSelectedComponent(nullptr);
-    }
+        setSelectedDevice(nullptr);
+    }*/
 }
 
 void UnplacedComponentsDock::on_btnAdd_clicked()
 {
-    if (mBoard && mSelectedGenComp && mSelectedComponent)
+    /*if (mBoard && mSelectedGenComp && mSelectedComponent)
         addComponent(*mSelectedGenComp, mSelectedComponent->getUuid());
-    updateComponentsList();
+    updateComponentsList();*/
 }
 
 void UnplacedComponentsDock::on_pushButton_clicked()
 {
-    if ((!mBoard) || (!mSelectedGenComp) || (!mSelectedComponent)) return;
+    /*if ((!mBoard) || (!mSelectedGenComp) || (!mSelectedComponent)) return;
 
     QUuid genCompLibUuid = mSelectedGenComp->getGenComp().getUuid();
     QUuid compLibUuid = mSelectedComponent->getUuid();
@@ -162,12 +162,12 @@ void UnplacedComponentsDock::on_pushButton_clicked()
     }
     mDisableListUpdate = false;
 
-    updateComponentsList();
+    updateComponentsList();*/
 }
 
 void UnplacedComponentsDock::on_btnAddAll_clicked()
 {
-    if (!mBoard) return;
+    /*if (!mBoard) return;
 
     mDisableListUpdate = true;
     for (int i = 0; i < mUi->lstUnplacedComponents->count(); i++)
@@ -185,14 +185,14 @@ void UnplacedComponentsDock::on_btnAddAll_clicked()
     }
     mDisableListUpdate = false;
 
-    updateComponentsList();
+    updateComponentsList();*/
 }
 
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
-void UnplacedComponentsDock::updateComponentsList() noexcept
+/*void UnplacedComponentsDock::updateComponentsList() noexcept
 {
     if (mDisableListUpdate) return;
 
@@ -252,17 +252,17 @@ void UnplacedComponentsDock::setSelectedGenCompInstance(GenCompInstance* genComp
     }
 }
 
-void UnplacedComponentsDock::setSelectedComponent(const library::Component* component) noexcept
+void UnplacedComponentsDock::setSelectedDevice(const library::Device* device) noexcept
 {
     mUi->btnAdd->setEnabled(false);
     delete mSelectedComponent;
     mSelectedComponent = nullptr;
 
-    if (mBoard && mSelectedGenComp && component)
+    if (mBoard && mSelectedGenComp && device)
     {
-        if (component->getGenCompUuid() == mSelectedGenComp->getGenComp().getUuid())
+        if (device->getGenCompUuid() == mSelectedGenComp->getGenComp().getUuid())
         {
-            mSelectedComponent = component;
+            mSelectedComponent = device;
             mUi->btnAdd->setEnabled(true);
         }
     }
@@ -343,7 +343,7 @@ void UnplacedComponentsDock::addComponent(GenCompInstance& genComp, const QUuid&
         try {if (cmdActive) mProjectEditor.getUndoStack().abortCommand();} catch (...) {}
         QMessageBox::critical(this, tr("Error"), e.getUserMsg());
     }
-}
+}*/
 
 /*****************************************************************************************
  *  End of File

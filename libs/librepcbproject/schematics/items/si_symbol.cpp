@@ -29,7 +29,7 @@
 #include "../../circuit/circuit.h"
 #include "../../library/projectlibrary.h"
 #include "../../circuit/gencompinstance.h"
-#include <librepcblibrary/gencmp/genericcomponent.h>
+#include <librepcblibrary/cmp/component.h>
 #include <librepcblibrary/sym/symbol.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include <librepcbcommon/graphics/graphicsscene.h>

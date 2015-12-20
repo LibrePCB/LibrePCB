@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_GENCOMPSYMBVAR_H
-#define LIBRARY_GENCOMPSYMBVAR_H
+#ifndef LIBRARY_COMPONENTSYMBOLVARIANT_H
+#define LIBRARY_COMPONENTSYMBOLVARIANT_H
 
 /*****************************************************************************************
  *  Includes
@@ -26,28 +26,29 @@
 
 #include <QtCore>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
-#include "gencompsymbvaritem.h"
+#include "componentsymbolvariantitem.h"
 
 /*****************************************************************************************
- *  Class GenCompSymbVar
+ *  Class ComponentSymbolVariant
  ****************************************************************************************/
 
 namespace library {
 
 /**
- * @brief The GenCompSymbVar class
+ * @brief The ComponentSymbolVariant class
  */
-class GenCompSymbVar final : public IF_XmlSerializableObject
+class ComponentSymbolVariant final : public IF_XmlSerializableObject
 {
-        Q_DECLARE_TR_FUNCTIONS(GenCompSymbVar)
+        Q_DECLARE_TR_FUNCTIONS(ComponentSymbolVariant)
 
     public:
 
         // Constructors / Destructor
-        explicit GenCompSymbVar(const QUuid& uuid = QUuid::createUuid(),
-                                const QString& norm = QString(), bool isDefault = false) noexcept;
-        explicit GenCompSymbVar(const XmlDomElement& domElement) throw (Exception);
-        ~GenCompSymbVar() noexcept;
+        explicit ComponentSymbolVariant(const QUuid& uuid = QUuid::createUuid(),
+                                        const QString& norm = QString(),
+                                        bool isDefault = false) noexcept;
+        explicit ComponentSymbolVariant(const XmlDomElement& domElement) throw (Exception);
+        ~ComponentSymbolVariant() noexcept;
 
         // Getters: Attributes
         const QUuid& getUuid() const noexcept {return mUuid;}
@@ -59,9 +60,9 @@ class GenCompSymbVar final : public IF_XmlSerializableObject
         const QMap<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
 
         // Getters: Symbol Items
-        const QList<const GenCompSymbVarItem*>& getItems() const noexcept {return mSymbolItems;}
-        const GenCompSymbVarItem* getItemByUuid(const QUuid& uuid) const noexcept;
-        const GenCompSymbVarItem* getNextItem(const GenCompSymbVarItem* item) const noexcept;
+        const QList<const ComponentSymbolVariantItem*>& getItems() const noexcept {return mSymbolItems;}
+        const ComponentSymbolVariantItem* getItemByUuid(const QUuid& uuid) const noexcept;
+        const ComponentSymbolVariantItem* getNextItem(const ComponentSymbolVariantItem* item) const noexcept;
 
         // Setters
         void setNorm(const QString& norm) noexcept;
@@ -71,7 +72,7 @@ class GenCompSymbVar final : public IF_XmlSerializableObject
 
         // General Methods
         void clearItems() noexcept;
-        void addItem(const GenCompSymbVarItem& item) noexcept;
+        void addItem(const ComponentSymbolVariantItem& item) noexcept;
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
@@ -80,8 +81,8 @@ class GenCompSymbVar final : public IF_XmlSerializableObject
     private:
 
         // make some methods inaccessible...
-        GenCompSymbVar(const GenCompSymbVar& other);
-        GenCompSymbVar& operator=(const GenCompSymbVar& rhs);
+        ComponentSymbolVariant(const ComponentSymbolVariant& other);
+        ComponentSymbolVariant& operator=(const ComponentSymbolVariant& rhs);
 
         // Private Methods
 
@@ -95,9 +96,9 @@ class GenCompSymbVar final : public IF_XmlSerializableObject
         bool mIsDefault;
         QMap<QString, QString> mNames;
         QMap<QString, QString> mDescriptions;
-        QList<const GenCompSymbVarItem*> mSymbolItems; ///< minimum one item
+        QList<const ComponentSymbolVariantItem*> mSymbolItems; ///< minimum one item
 };
 
 } // namespace library
 
-#endif // LIBRARY_GENCOMPSYMBVAR_H
+#endif // LIBRARY_COMPONENTSYMBOLVARIANT_H

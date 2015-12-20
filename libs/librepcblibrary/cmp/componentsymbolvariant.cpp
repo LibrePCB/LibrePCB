@@ -22,8 +22,8 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "gencompsymbvar.h"
-#include "genericcomponent.h"
+#include "componentsymbolvariant.h"
+#include "component.h"
 #include <librepcbcommon/fileio/xmldomelement.h>
 
 namespace library {
@@ -32,13 +32,14 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-GenCompSymbVar::GenCompSymbVar(const QUuid& uuid, const QString& norm, bool isDefault) noexcept :
+ComponentSymbolVariant::ComponentSymbolVariant(const QUuid& uuid, const QString& norm,
+                                               bool isDefault) noexcept :
     mUuid(uuid), mNorm(norm), mIsDefault(isDefault)
 {
     Q_ASSERT(mUuid.isNull() == false);
 }
 
-GenCompSymbVar::GenCompSymbVar(const XmlDomElement& domElement) throw (Exception)
+ComponentSymbolVariant::ComponentSymbolVariant(const XmlDomElement& domElement) throw (Exception)
 {
     try
     {
@@ -55,7 +56,7 @@ GenCompSymbVar::GenCompSymbVar(const XmlDomElement& domElement) throw (Exception
         for (XmlDomElement* node = domElement.getFirstChild("symbol_items/item", true, false);
              node; node = node->getNextSibling("item"))
         {
-            GenCompSymbVarItem* item = new GenCompSymbVarItem(*node);
+            ComponentSymbolVariantItem* item = new ComponentSymbolVariantItem(*node);
             if (getItemByUuid(item->getUuid()))
             {
                 throw RuntimeError(__FILE__, __LINE__, item->getUuid().toString(),
@@ -74,7 +75,7 @@ GenCompSymbVar::GenCompSymbVar(const XmlDomElement& domElement) throw (Exception
     }
 }
 
-GenCompSymbVar::~GenCompSymbVar() noexcept
+ComponentSymbolVariant::~ComponentSymbolVariant() noexcept
 {
     qDeleteAll(mSymbolItems);       mSymbolItems.clear();
 }
@@ -83,19 +84,19 @@ GenCompSymbVar::~GenCompSymbVar() noexcept
  *  Getters
  ****************************************************************************************/
 
-QString GenCompSymbVar::getName(const QStringList& localeOrder) const noexcept
+QString ComponentSymbolVariant::getName(const QStringList& localeOrder) const noexcept
 {
     return LibraryBaseElement::localeStringFromList(mNames, localeOrder);
 }
 
-QString GenCompSymbVar::getDescription(const QStringList& localeOrder) const noexcept
+QString ComponentSymbolVariant::getDescription(const QStringList& localeOrder) const noexcept
 {
     return LibraryBaseElement::localeStringFromList(mDescriptions, localeOrder);
 }
 
-const GenCompSymbVarItem* GenCompSymbVar::getItemByUuid(const QUuid& uuid) const noexcept
+const ComponentSymbolVariantItem* ComponentSymbolVariant::getItemByUuid(const QUuid& uuid) const noexcept
 {
-    foreach (const GenCompSymbVarItem* item, mSymbolItems)
+    foreach (const ComponentSymbolVariantItem* item, mSymbolItems)
     {
         if (item->getUuid() == uuid)
             return item;
@@ -103,7 +104,7 @@ const GenCompSymbVarItem* GenCompSymbVar::getItemByUuid(const QUuid& uuid) const
     return nullptr;
 }
 
-const GenCompSymbVarItem* GenCompSymbVar::getNextItem(const GenCompSymbVarItem* item) const noexcept
+const ComponentSymbolVariantItem* ComponentSymbolVariant::getNextItem(const ComponentSymbolVariantItem* item) const noexcept
 {
     int index = mSymbolItems.indexOf(item);
     Q_ASSERT(index >= 0);
@@ -118,22 +119,22 @@ const GenCompSymbVarItem* GenCompSymbVar::getNextItem(const GenCompSymbVarItem* 
  *  Setters
  ****************************************************************************************/
 
-void GenCompSymbVar::setNorm(const QString& norm) noexcept
+void ComponentSymbolVariant::setNorm(const QString& norm) noexcept
 {
     mNorm = norm;
 }
 
-void GenCompSymbVar::setIsDefault(bool isDefault) noexcept
+void ComponentSymbolVariant::setIsDefault(bool isDefault) noexcept
 {
     mIsDefault = isDefault;
 }
 
-void GenCompSymbVar::setName(const QString& locale, const QString& name) noexcept
+void ComponentSymbolVariant::setName(const QString& locale, const QString& name) noexcept
 {
     mNames.insert(locale, name);
 }
 
-void GenCompSymbVar::setDescription(const QString& locale, const QString& desc) noexcept
+void ComponentSymbolVariant::setDescription(const QString& locale, const QString& desc) noexcept
 {
     mDescriptions.insert(locale, desc);
 }
@@ -142,19 +143,19 @@ void GenCompSymbVar::setDescription(const QString& locale, const QString& desc) 
  *  General Methods
  ****************************************************************************************/
 
-void GenCompSymbVar::clearItems() noexcept
+void ComponentSymbolVariant::clearItems() noexcept
 {
     qDeleteAll(mSymbolItems);
     mSymbolItems.clear();
 }
 
-void GenCompSymbVar::addItem(const GenCompSymbVarItem& item) noexcept
+void ComponentSymbolVariant::addItem(const ComponentSymbolVariantItem& item) noexcept
 {
     Q_ASSERT(getItemByUuid(item.getUuid()) == nullptr);
     mSymbolItems.append(&item);
 }
 
-XmlDomElement* GenCompSymbVar::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* ComponentSymbolVariant::serializeToXmlDomElement() const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -167,7 +168,7 @@ XmlDomElement* GenCompSymbVar::serializeToXmlDomElement() const throw (Exception
     foreach (const QString& locale, mDescriptions.keys())
         root->appendTextChild("description", mDescriptions.value(locale))->setAttribute("locale", locale);
     XmlDomElement* symbol_items = root->appendChild("symbol_items");
-    foreach (const GenCompSymbVarItem* item, mSymbolItems)
+    foreach (const ComponentSymbolVariantItem* item, mSymbolItems)
         symbol_items->appendChild(item->serializeToXmlDomElement());
     return root.take();
 }
@@ -176,7 +177,7 @@ XmlDomElement* GenCompSymbVar::serializeToXmlDomElement() const throw (Exception
  *  Private Methods
  ****************************************************************************************/
 
-bool GenCompSymbVar::checkAttributesValidity() const noexcept
+bool ComponentSymbolVariant::checkAttributesValidity() const noexcept
 {
     if (mUuid.isNull())                     return false;
     if (mNames.value("en_US").isEmpty())    return false;

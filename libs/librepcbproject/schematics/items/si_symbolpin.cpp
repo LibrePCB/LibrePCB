@@ -27,14 +27,14 @@
 #include <librepcblibrary/sym/symbol.h>
 #include <librepcblibrary/sym/symbolpin.h>
 #include "../../circuit/gencompinstance.h"
-#include <librepcblibrary/gencmp/genericcomponent.h>
+#include <librepcblibrary/cmp/component.h>
 #include "si_netpoint.h"
 #include "../../circuit/gencompsignalinstance.h"
 #include "../../erc/ercmsg.h"
 #include "../schematic.h"
 #include "../../project.h"
 #include "../../circuit/circuit.h"
-#include <librepcblibrary/gencmp/gencompsymbvaritem.h>
+#include <librepcblibrary/cmp/componentsymbolvariantitem.h>
 #include "../../circuit/netsignal.h"
 #include "../../settings/projectsettings.h"
 #include <librepcbcommon/graphics/graphicsscene.h>
@@ -105,11 +105,11 @@ QString SI_SymbolPin::getDisplayText(bool returnGenCompSignalNameIfEmpty,
     QString text;
     switch (mSymbol.getGenCompSymbVarItem().getDisplayTypeOfPin(mSymbolPin->getUuid()))
     {
-        case library::GenCompSymbVarItem::PinDisplayType_t::PinName:
+        case library::ComponentSymbolVariantItem::PinDisplayType_t::PinName:
             text = mSymbolPin->getName(localeOrder); break;
-        case library::GenCompSymbVarItem::PinDisplayType_t::GenCompSignal:
+        case library::ComponentSymbolVariantItem::PinDisplayType_t::ComponentSignal:
             if (mGenCompSignal) text = mGenCompSignal->getName(localeOrder); break;
-        case library::GenCompSymbVarItem::PinDisplayType_t::NetSignal:
+        case library::ComponentSymbolVariantItem::PinDisplayType_t::NetSignal:
             if (mGenCompSignalInstance->getNetSignal()) text = mGenCompSignalInstance->getNetSignal()->getName(); break;
         default: break;
     }

@@ -6,10 +6,10 @@
 #include <librepcbcommon/fileio/xmldomdocument.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include <librepcblibrary/sym/symbol.h>
-#include <librepcblibrary/fpt/footprint.h>
+#include <librepcblibrary/pkg/footprint.h>
 #include <librepcblibrary/pkg/package.h>
+#include <librepcblibrary/dev/device.h>
 #include <librepcblibrary/cmp/component.h>
-#include <librepcblibrary/gencmp/genericcomponent.h>
 #include <librepcbcommon/boardlayer.h>
 #include <librepcbcommon/schematiclayer.h>
 #include "polygonsimplifier.h"
@@ -385,7 +385,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
 {
     try
     {
-        QString name = node->getAttribute("name", true);
+        /*QString name = node->getAttribute("name", true);
         QUuid uuid = getOrCreateUuid(outputSettings, filepath, "packages_to_footprints", name);
         QString desc = node->getFirstChild("description", false) ? node->getFirstChild("description", true)->getText() : "";
         desc.append(createDescription(filepath, name));
@@ -672,7 +672,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
 
         // clean up
         delete package;
-        delete footprint;
+        delete footprint;*/
     }
     catch (Exception& e)
     {
@@ -697,7 +697,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
         desc.append(createDescription(filepath, name));
 
         // create generic component
-        GenericComponent* gencomp = new GenericComponent(uuid, Version("0.1"), "LibrePCB", name, desc);
+        Component* gencomp = new Component(uuid, Version("0.1"), "LibrePCB", name, desc);
 
         // properties
         gencomp->addDefaultValue("en_US", "");
@@ -705,7 +705,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
 
         // symbol variant
         QUuid symbVarUuid = getOrCreateUuid(outputSettings, filepath, "gencomp_symbolvariants", uuid.toString());
-        GenCompSymbVar* symbvar = new GenCompSymbVar(symbVarUuid, QString(), true);
+        ComponentSymbolVariant* symbvar = new ComponentSymbolVariant(symbVarUuid, QString(), true);
         symbvar->setName("en_US", "default");
         symbvar->setDescription("en_US", "");
         gencomp->addSymbolVariant(*symbvar);
@@ -724,7 +724,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
             if (!gencomp->getSignalByUuid(signalUuid))
             {
                 // create signal
-                GenCompSignal* signal = new GenCompSignal(signalUuid, pinName);
+                ComponentSignal* signal = new ComponentSignal(signalUuid, pinName);
                 gencomp->addSignal(*signal);
             }
         }
@@ -738,7 +738,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
 
             // create symbol variant item
             QUuid symbVarItemUuid = getOrCreateUuid(outputSettings, filepath, "symbolgates_to_symbvaritems", uuid.toString(), gateName);
-            GenCompSymbVarItem* item = new GenCompSymbVarItem(symbVarItemUuid, symbolUuid, true, (gateName == "G$1") ? "" : gateName);
+            ComponentSymbolVariantItem* item = new ComponentSymbolVariantItem(symbVarItemUuid, symbolUuid, true, (gateName == "G$1") ? "" : gateName);
 
             // connect pins
             for (XmlDomElement* connect = device->getFirstChild("connects/connect", false, false);
@@ -751,7 +751,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
                     if (pinName.contains("@")) pinName.truncate(pinName.indexOf("@"));
                     if (pinName.contains("#")) pinName.truncate(pinName.indexOf("#"));
                     QUuid signalUuid = getOrCreateUuid(outputSettings, filepath, "gatepins_to_gencompsignals", uuid.toString(), gateName % pinName);
-                    item->addPinSignalMapping(pinUuid, signalUuid, GenCompSymbVarItem::PinDisplayType_t::GenCompSignal);
+                    item->addPinSignalMapping(pinUuid, signalUuid, ComponentSymbolVariantItem::PinDisplayType_t::ComponentSignal);
                 }
             }
 
@@ -759,7 +759,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
         }
 
         // create components
-        for (XmlDomElement* device = node->getFirstChild("devices/*", true, true); device; device = device->getNextSibling())
+        /*for (XmlDomElement* device = node->getFirstChild("devices/*", true, true); device; device = device->getNextSibling())
         {
             if (!device->hasAttribute("package")) continue;
 
@@ -770,7 +770,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
 
             QUuid compUuid = getOrCreateUuid(outputSettings, filepath, "devices_to_components", name, deviceName);
             QString compName = deviceName.isEmpty() ? name : QString("%1_%2").arg(name, deviceName);
-            Component* component = new Component(compUuid, Version("0.1"), "LibrePCB", compName, desc);
+            Device* component = new Device(compUuid, Version("0.1"), "LibrePCB", compName, desc);
             component->setGenCompUuid(gencomp->getUuid());
             component->setPackageUuid(pkgUuid);
 
@@ -799,7 +799,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
             // save component
             component->saveTo(FilePath(QString("%1/cmp").arg(ui->output->text())));
             delete component;
-        }
+        }*/
 
         // save generic component to file
         gencomp->saveTo(FilePath(QString("%1/gencmp").arg(ui->output->text())));

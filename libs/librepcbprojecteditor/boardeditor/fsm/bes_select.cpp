@@ -30,10 +30,10 @@
 #include <librepcbproject/boards/items/bi_footprintpad.h>
 #include <librepcbcommon/gridproperties.h>
 #include <librepcbcommon/undostack.h>
-#include <librepcbproject/boards/cmd/cmdcomponentinstanceadd.h>
-#include <librepcbproject/boards/cmd/cmdcomponentinstanceedit.h>
-#include <librepcbproject/boards/cmd/cmdcomponentinstanceremove.h>
-#include <librepcbproject/boards/componentinstance.h>
+#include <librepcbproject/boards/cmd/cmddeviceinstanceadd.h>
+#include <librepcbproject/boards/cmd/cmddeviceinstanceedit.h>
+#include <librepcbproject/boards/cmd/cmddeviceinstanceremove.h>
+#include <librepcbproject/boards/deviceinstance.h>
 #include <librepcbproject/circuit/gencompinstance.h>
 #include <librepcbworkspace/workspace.h>
 #include <librepcblibrary/library.h>
@@ -230,7 +230,7 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightClick(QGraphicsSceneMouse
                                                              Board* board) noexcept
 {
     // handle item selection
-    QList<BI_Base*> items = board->getItemsAtScenePos(Point::fromPx(mouseEvent->scenePos()));
+    /*QList<BI_Base*> items = board->getItemsAtScenePos(Point::fromPx(mouseEvent->scenePos()));
     if (items.isEmpty()) return PassToParentState;
     board->clearSelection();
     items.first()->setSelected(true);
@@ -358,14 +358,14 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightClick(QGraphicsSceneMouse
         }
         default:
             break;
-    }
+    }*/
     return PassToParentState;
 }
 
 BES_Base::ProcRetVal BES_Select::proccessIdleSceneDoubleClick(QGraphicsSceneMouseEvent* mouseEvent,
                                                               Board* board) noexcept
 {
-    if (mouseEvent->buttons() == Qt::LeftButton)
+    /*if (mouseEvent->buttons() == Qt::LeftButton)
     {
         // check if there is an element under the mouse
         QList<BI_Base*> items = board->getItemsAtScenePos(Point::fromPx(mouseEvent->scenePos()));
@@ -373,7 +373,7 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneDoubleClick(QGraphicsSceneMous
         // TODO: open the properties editor dialog of the top most item
         qDebug() << dynamic_cast<BI_Footprint*>(items.first())->getComponentInstance().getGenCompInstance().getUuid();
         qDebug() << dynamic_cast<BI_Footprint*>(items.first())->getComponentInstance().getLibComponent().getDirectory().toNative();
-    }
+    }*/
     return PassToParentState;
 }
 
@@ -390,7 +390,7 @@ BES_Base::ProcRetVal BES_Select::processSubStateMoving(BEE_Base* event) noexcept
 
 BES_Base::ProcRetVal BES_Select::processSubStateMovingSceneEvent(BEE_Base* event) noexcept
 {
-    QEvent* qevent = BEE_RedirectedQEvent::getQEventFromBEE(event);
+    /*QEvent* qevent = BEE_RedirectedQEvent::getQEventFromBEE(event);
     Q_ASSERT(qevent); if (!qevent) return PassToParentState;
 
     switch (qevent->type())
@@ -476,7 +476,7 @@ BES_Base::ProcRetVal BES_Select::processSubStateMovingSceneEvent(BEE_Base* event
             else
                 return PassToParentState;
         }
-    } // switch (qevent->type())
+    } // switch (qevent->type())*/
     return PassToParentState;
 }
 
@@ -490,7 +490,7 @@ bool BES_Select::startMovingSelectedItems(Board* board) noexcept
     if (items.isEmpty()) return false;
 
     // create move commands for all selected items
-    Q_ASSERT(!mParentCommand);
+    /*Q_ASSERT(!mParentCommand);
     Q_ASSERT(mComponentEditCmds.isEmpty());
     mParentCommand = new UndoCommand(tr("Move Board Items"));
     foreach (BI_Base* item, items)
@@ -510,7 +510,7 @@ bool BES_Select::startMovingSelectedItems(Board* board) noexcept
     }
 
     // switch to substate SubState_Moving
-    mSubState = SubState_Moving;
+    mSubState = SubState_Moving;*/
     return true;
 }
 
@@ -527,7 +527,7 @@ bool BES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
     if (items.isEmpty()) return false;
 
     // find the center of all elements
-    if (centerOfElements)
+    /*if (centerOfElements)
     {
         center = Point(0, 0);
         foreach (BI_Base* item, items)
@@ -570,7 +570,7 @@ bool BES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
         if (commandActive)
             try {mUndoStack.abortCommand();} catch (...) {}
         return false;
-    }
+    }*/
 
     return true;
 }
@@ -588,7 +588,7 @@ bool BES_Select::flipSelectedItems(bool vertical, Point center, bool centerOfEle
     if (items.isEmpty()) return false;
 
     // find the center of all elements
-    if (centerOfElements)
+    /*if (centerOfElements)
     {
         center = Point(0, 0);
         foreach (BI_Base* item, items)
@@ -631,7 +631,7 @@ bool BES_Select::flipSelectedItems(bool vertical, Point center, bool centerOfEle
         if (commandActive)
             try {mUndoStack.abortCommand();} catch (...) {}
         return false;
-    }
+    }*/
 
     return true;
 }
@@ -648,7 +648,7 @@ bool BES_Select::removeSelectedItems() noexcept
     // abort if no items are selected
     if (items.isEmpty()) return false;
 
-    bool commandActive = false;
+    /*bool commandActive = false;
     try
     {
         mUndoStack.beginCommand(tr("Remove Board Elements"));
@@ -675,7 +675,7 @@ bool BES_Select::removeSelectedItems() noexcept
         QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
         if (commandActive) try {mUndoStack.abortCommand();} catch (...) {}
         return false;
-    }
+    }*/
 }
 
 /*****************************************************************************************

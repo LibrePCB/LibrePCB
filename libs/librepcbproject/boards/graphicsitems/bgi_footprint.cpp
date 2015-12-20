@@ -28,9 +28,9 @@
 #include "../items/bi_footprint.h"
 #include "../board.h"
 #include "../../project.h"
-#include <librepcblibrary/fpt/footprint.h>
+#include <librepcblibrary/pkg/footprint.h>
 #include <librepcbcommon/boardlayer.h>
-#include "../componentinstance.h"
+#include "../deviceinstance.h"
 
 namespace project {
 
@@ -273,7 +273,7 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
 BoardLayer* BGI_Footprint::getBoardLayer(int id) const noexcept
 {
     if (mFootprint.getIsMirrored()) id = BoardLayer::getMirroredLayerId(id);
-    return mFootprint.getComponentInstance().getBoard().getProject().getBoardLayer(id);
+    return mFootprint.getDeviceInstance().getBoard().getProject().getBoardLayer(id);
 }
 
 /*****************************************************************************************

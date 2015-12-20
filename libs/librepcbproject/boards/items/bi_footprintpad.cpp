@@ -24,14 +24,14 @@
 #include <QtCore>
 #include "bi_footprintpad.h"
 #include "bi_footprint.h"
-#include <librepcblibrary/fpt/footprint.h>
-#include <librepcblibrary/fpt/footprintpad.h>
+#include <librepcblibrary/pkg/footprint.h>
+#include <librepcblibrary/pkg/footprintpad.h>
 #include "../board.h"
 #include "../../project.h"
 #include "../../circuit/circuit.h"
 #include "../../settings/projectsettings.h"
 #include <librepcbcommon/graphics/graphicsscene.h>
-#include "../componentinstance.h"
+#include "../deviceinstance.h"
 
 namespace project {
 
@@ -40,7 +40,7 @@ namespace project {
  ****************************************************************************************/
 
 BI_FootprintPad::BI_FootprintPad(BI_Footprint& footprint, const QUuid& padUuid) :
-    BI_Base(), mCircuit(footprint.getComponentInstance().getBoard().getProject().getCircuit()),
+    BI_Base(), mCircuit(footprint.getDeviceInstance().getBoard().getProject().getCircuit()),
     mFootprint(footprint), mFootprintPad(nullptr), /*mGenCompSignal(nullptr),
     mGenCompSignalInstance(nullptr),*/ mAddedToBoard(false),
     /*mRegisteredNetPoint(nullptr),*/ mGraphicsItem(nullptr)
@@ -79,7 +79,7 @@ Board& BI_FootprintPad::getBoard() const noexcept
 
 const QUuid& BI_FootprintPad::getLibPadUuid() const noexcept
 {
-    return mFootprintPad->getUuid();
+    return mFootprintPad->getPadUuid();
 }
 
 /*QString BI_FootprintPad::getDisplayText(bool returnGenCompSignalNameIfEmpty,

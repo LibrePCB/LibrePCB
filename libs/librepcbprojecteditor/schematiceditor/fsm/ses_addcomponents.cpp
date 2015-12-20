@@ -27,7 +27,7 @@
 #include "ui_schematiceditor.h"
 #include <librepcbproject/project.h>
 #include <librepcbproject/library/projectlibrary.h>
-#include <librepcblibrary/gencmp/genericcomponent.h>
+#include <librepcblibrary/cmp/component.h>
 #include <librepcbproject/circuit/cmd/cmdgencompinstadd.h>
 #include <librepcbcommon/undostack.h>
 #include <librepcbproject/schematics/cmd/cmdsymbolinstanceadd.h>
@@ -304,13 +304,13 @@ void SES_AddComponents::startAddingComponent(const QUuid& genComp, const QUuid& 
                 throw UserCanceled(__FILE__, __LINE__); // abort
 
             // open the XML file
-            library::GenericComponent* genComp = new library::GenericComponent(mAddGenCompDialog->getSelectedGenCompFilePath());
+            library::Component* genComp = new library::Component(mAddGenCompDialog->getSelectedGenCompFilePath());
             QUuid genCompUuid = genComp->getUuid();
             Version genCompVersion = genComp->getVersion();
             delete genComp;
 
             // search the generic component in the library
-            mGenComp = mProject.getLibrary().getGenComp(genCompUuid);
+            mGenComp = mProject.getLibrary().getComponent(genCompUuid);
             if (mGenComp)
             {
                 if (mGenComp->getVersion() != genCompVersion)
@@ -325,15 +325,15 @@ void SES_AddComponents::startAddingComponent(const QUuid& genComp, const QUuid& 
             else
             {
                 // copy the generic component to the project's library
-                FilePath genCmpFp = mWorkspace.getLibrary().getLatestGenericComponent(genCompUuid);
+                FilePath genCmpFp = mWorkspace.getLibrary().getLatestComponent(genCompUuid);
                 if (!genCmpFp.isValid())
                 {
                     throw RuntimeError(__FILE__, __LINE__, QString(),
                         QString(tr("Generic Component not found in library: %1"))
                         .arg(genCompUuid.toString()));
                 }
-                mGenComp = new library::GenericComponent(genCmpFp);
-                auto cmd = new CmdProjectLibraryAddElement<library::GenericComponent>(
+                mGenComp = new library::Component(genCmpFp);
+                auto cmd = new CmdProjectLibraryAddElement<library::Component>(
                     mProject.getLibrary(), *mGenComp);
                 mUndoStack.appendToCommand(cmd);
             }
@@ -342,7 +342,7 @@ void SES_AddComponents::startAddingComponent(const QUuid& genComp, const QUuid& 
         else
         {
             // search the generic component in the library
-            mGenComp = mProject.getLibrary().getGenComp(genComp);
+            mGenComp = mProject.getLibrary().getComponent(genComp);
             if (mGenComp) mGenCompSymbVar = mGenComp->getSymbolVariantByUuid(symbVar);
         }
 
@@ -360,7 +360,7 @@ void SES_AddComponents::startAddingComponent(const QUuid& genComp, const QUuid& 
         }
 
         // copy all required symbols to the project's library
-        foreach (const library::GenCompSymbVarItem* item, mGenCompSymbVar->getItems())
+        foreach (const library::ComponentSymbolVariantItem* item, mGenCompSymbVar->getItems())
         {
             QUuid uuid = item->getSymbolUuid();
             if (!mProject.getLibrary().getSymbol(uuid))

@@ -25,7 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../libraryelement.h"
+#include <librepcbcommon/fileio/if_xmlserializableobject.h>
 #include "footprintpad.h"
 #include "footprintpolygon.h"
 #include "footprintellipse.h"
@@ -40,9 +40,9 @@ namespace library {
 /**
  * @brief The Footprint class
  */
-class Footprint final : public LibraryElement
+class Footprint final : public IF_XmlSerializableObject
 {
-        Q_OBJECT
+        Q_DECLARE_TR_FUNCTIONS(Footprint)
 
     public:
 
@@ -55,15 +55,21 @@ class Footprint final : public LibraryElement
 
         // Constructors / Destructor
         explicit Footprint(const QUuid& uuid = QUuid::createUuid(),
-                           const Version& version = Version(),
-                           const QString& author = QString(),
                            const QString& name_en_US = QString(),
                            const QString& description_en_US = QString(),
-                           const QString& keywords_en_US = QString()) throw (Exception);
-        explicit Footprint(const FilePath& elementDirectory) throw (Exception);
+                           bool isDefault = false) throw (Exception);
+        explicit Footprint(const XmlDomElement& domElement) throw (Exception);
         ~Footprint() noexcept;
 
-        // Getters
+        // Getters: Attributes
+        const QUuid& getUuid() const noexcept {return mUuid;}
+        bool isDefault() const noexcept {return mIsDefault;}
+        QString getName(const QStringList& localeOrder) const noexcept;
+        QString getDescription(const QStringList& localeOrder) const noexcept;
+        const QMap<QString, QString>& getNames() const noexcept {return mNames;}
+        const QMap<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
+
+        // Getters: Items
         const FootprintPad* getPadByUuid(const QUuid& uuid) const noexcept {return mPads.value(uuid);}
         const QHash<QUuid, const FootprintPad*>& getPads() const noexcept {return mPads;}
         const QList<const FootprintPolygon*>& getPolygons() const noexcept {return mPolygons;}
@@ -71,12 +77,18 @@ class Footprint final : public LibraryElement
         const QList<const FootprintEllipse*>& getEllipses() const noexcept {return mEllipses;}
 
         // General Methods
-        void addPad(const FootprintPad* pad) noexcept {mPads.insert(pad->getUuid(), pad);}
+        void addPad(const FootprintPad* pad) noexcept {mPads.insert(pad->getPadUuid(), pad);}
         void addPolygon(const FootprintPolygon* polygon) noexcept {mPolygons.append(polygon);}
         void removePolygon(const FootprintPolygon* polygon) noexcept {mPolygons.removeAll(polygon); delete polygon;}
         void addText(const FootprintText* text) noexcept {mTexts.append(text);}
         void addEllipse(const FootprintEllipse* ellipse) noexcept {mEllipses.append(ellipse);}
         void addHole(const FootprintHole_t* hole) noexcept {mHoles.append(hole);}
+
+        // General Methods
+
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+
 
     private:
 
@@ -88,16 +100,15 @@ class Footprint final : public LibraryElement
 
         // Private Methods
 
-        void parseDomTree(const XmlDomElement& root) throw (Exception);
-
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
-
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 
-        // Symbol Attributes
+        // Footprint Attributes
+        QUuid mUuid;
+        QMap<QString, QString> mNames;
+        QMap<QString, QString> mDescriptions;
+        bool mIsDefault;
         QHash<QUuid, const FootprintPad*> mPads;
         QList<const FootprintPolygon*> mPolygons;
         QList<const FootprintText*> mTexts;

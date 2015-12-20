@@ -49,6 +49,32 @@ Package::~Package() noexcept
 }
 
 /*****************************************************************************************
+ *  Pads
+ ****************************************************************************************/
+
+const PackagePad* Package::getPadByUuid(const QUuid& uuid) const noexcept
+{
+    foreach (const PackagePad* pad, mPads)
+    {
+        if (pad->getUuid() == uuid)
+            return pad;
+    }
+    return nullptr;
+}
+
+void Package::clearPads() noexcept
+{
+    qDeleteAll(mPads);
+    mPads.clear();
+}
+
+void Package::addPad(const PackagePad& pad) noexcept
+{
+    Q_ASSERT(getPadByUuid(pad.getUuid()) == nullptr);
+    mPads.append(&pad);
+}
+
+/*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
@@ -56,22 +82,35 @@ void Package::parseDomTree(const XmlDomElement& root) throw (Exception)
 {
     LibraryElement::parseDomTree(root);
 
-    mFootprintUuid = root.getFirstChild("meta/footprint", true, true)->getText<QUuid>(true);
-    mModel3dUuid = root.getFirstChild("meta/model_3d", true, true)->getText<QUuid>(false);
+    // Load all pads
+    for (XmlDomElement* node = root.getFirstChild("pads/pad", true, false);
+         node; node = node->getNextSibling("pad"))
+    {
+        PackagePad* pad = new PackagePad(*node);
+        if (getPadByUuid(pad->getUuid()))
+        {
+            throw RuntimeError(__FILE__, __LINE__, pad->getUuid().toString(),
+                QString(tr("The pad \"%1\" exists multiple times in \"%2\"."))
+                .arg(pad->getUuid().toString(), mXmlFilepath.toNative()));
+        }
+        mPads.append(pad);
+    }
 }
 
 XmlDomElement* Package::serializeToXmlDomElement() const throw (Exception)
 {
     QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement());
-    root->getFirstChild("meta", true)->appendTextChild("footprint", mFootprintUuid);
-    root->getFirstChild("meta", true)->appendTextChild("model_3d", mModel3dUuid);
+
+    XmlDomElement* padsNode = root->appendChild("pads");
+    foreach (const PackagePad* pad, mPads)
+        padsNode->appendChild(pad->serializeToXmlDomElement());
+
     return root.take();
 }
 
 bool Package::checkAttributesValidity() const noexcept
 {
     if (!LibraryElement::checkAttributesValidity())             return false;
-    if (mFootprintUuid.isNull())                                return false;
     return true;
 }
 

@@ -22,8 +22,8 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "cmdcomponentinstanceadd.h"
-#include "../componentinstance.h"
+#include "cmddeviceinstanceadd.h"
+#include "../deviceinstance.h"
 #include "../board.h"
 
 namespace project {
@@ -32,36 +32,36 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdComponentInstanceAdd::CmdComponentInstanceAdd(Board& board, GenCompInstance& genComp,
-                                                 const QUuid& componentUuid,
-                                                 const Point& position, const Angle& rotation,
-                                                 UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Add component to board"), parent),
-    mBoard(board), mComponentInstance(nullptr)
+CmdDeviceInstanceAdd::CmdDeviceInstanceAdd(Board& board, GenCompInstance& comp,
+                                           const QUuid& deviceUuid,
+                                           const Point& position, const Angle& rotation,
+                                           UndoCommand* parent) throw (Exception) :
+    UndoCommand(tr("Add device to board"), parent),
+    mBoard(board), mDeviceInstance(nullptr)
 {
-    mComponentInstance = new ComponentInstance(board, genComp, componentUuid, position, rotation);
+    mDeviceInstance = new DeviceInstance(board, comp, deviceUuid, position, rotation);
 }
 
-CmdComponentInstanceAdd::CmdComponentInstanceAdd(ComponentInstance& component,
+CmdDeviceInstanceAdd::CmdDeviceInstanceAdd(DeviceInstance& device,
                                                  UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Add component to board"), parent),
-    mBoard(component.getBoard()), mComponentInstance(&component)
+    UndoCommand(tr("Add device to board"), parent),
+    mBoard(device.getBoard()), mDeviceInstance(&device)
 {
 }
 
-CmdComponentInstanceAdd::~CmdComponentInstanceAdd() noexcept
+CmdDeviceInstanceAdd::~CmdDeviceInstanceAdd() noexcept
 {
     if (!isExecuted())
-        delete mComponentInstance;
+        delete mDeviceInstance;
 }
 
 /*****************************************************************************************
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdComponentInstanceAdd::redo() throw (Exception)
+void CmdDeviceInstanceAdd::redo() throw (Exception)
 {
-    mBoard.addComponentInstance(*mComponentInstance); // throws an exception on error
+    mBoard.addDeviceInstance(*mDeviceInstance); // throws an exception on error
 
     try
     {
@@ -69,14 +69,14 @@ void CmdComponentInstanceAdd::redo() throw (Exception)
     }
     catch (Exception &e)
     {
-        mBoard.removeComponentInstance(*mComponentInstance);
+        mBoard.removeDeviceInstance(*mDeviceInstance);
         throw;
     }
 }
 
-void CmdComponentInstanceAdd::undo() throw (Exception)
+void CmdDeviceInstanceAdd::undo() throw (Exception)
 {
-    mBoard.removeComponentInstance(*mComponentInstance); // throws an exception on error
+    mBoard.removeDeviceInstance(*mDeviceInstance); // throws an exception on error
 
     try
     {
@@ -84,7 +84,7 @@ void CmdComponentInstanceAdd::undo() throw (Exception)
     }
     catch (Exception& e)
     {
-        mBoard.addComponentInstance(*mComponentInstance);
+        mBoard.addDeviceInstance(*mDeviceInstance);
         throw;
     }
 }

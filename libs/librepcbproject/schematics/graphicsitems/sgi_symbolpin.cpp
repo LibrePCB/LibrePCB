@@ -34,7 +34,7 @@
 #include "../../circuit/gencompsignalinstance.h"
 #include <librepcbcommon/schematiclayer.h>
 #include <librepcblibrary/sym/symbolpin.h>
-#include <librepcblibrary/gencmp/genericcomponent.h>
+#include <librepcblibrary/cmp/component.h>
 #include "../../settings/projectsettings.h"
 
 namespace project {
@@ -118,7 +118,7 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
     const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
 
-    const library::GenCompSignal* genCompSignal = mPin.getGenCompSignal();
+    const library::ComponentSignal* genCompSignal = mPin.getGenCompSignal();
     const NetSignal* netsignal = (genCompSignal ? mPin.getGenCompSignalInstance()->getNetSignal() : nullptr);
     bool requiredPin = mPin.getGenCompSignal()->isRequired();
 

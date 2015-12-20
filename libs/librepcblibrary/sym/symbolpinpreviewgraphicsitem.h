@@ -27,7 +27,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include <librepcbcommon/graphics/graphicsitem.h>
-#include "../gencmp/gencompsymbvaritem.h"
+#include "../cmp/componentsymbolvariantitem.h"
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -38,7 +38,7 @@ class IF_SchematicLayerProvider;
 
 namespace library {
 class SymbolPin;
-class GenCompSignal;
+class ComponentSignal;
 }
 
 /*****************************************************************************************
@@ -61,8 +61,8 @@ class SymbolPinPreviewGraphicsItem final : public GraphicsItem
         explicit SymbolPinPreviewGraphicsItem(const IF_SchematicLayerProvider& layerProvider,
                                               const QStringList& localeOrder,
                                               const SymbolPin& pin,
-                                              const GenCompSignal* genCompSignal,
-                                              GenCompSymbVarItem::PinDisplayType_t displayType) noexcept;
+                                              const ComponentSignal* genCompSignal,
+                                              ComponentSymbolVariantItem::PinDisplayType_t displayType) noexcept;
         ~SymbolPinPreviewGraphicsItem() noexcept;
 
         // Setters
@@ -87,8 +87,8 @@ class SymbolPinPreviewGraphicsItem final : public GraphicsItem
 
         // General Attributes
         const SymbolPin& mPin;
-        const GenCompSignal* mGenCompSignal;
-        GenCompSymbVarItem::PinDisplayType_t mDisplayType;
+        const ComponentSignal* mGenCompSignal;
+        ComponentSymbolVariantItem::PinDisplayType_t mDisplayType;
         SchematicLayer* mCircleLayer;
         SchematicLayer* mLineLayer;
         SchematicLayer* mTextLayer;

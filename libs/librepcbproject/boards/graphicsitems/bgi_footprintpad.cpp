@@ -30,9 +30,9 @@
 #include "../board.h"
 #include "../../project.h"
 #include <librepcbcommon/boardlayer.h>
-#include <librepcblibrary/fpt/footprintpad.h>
+#include <librepcblibrary/pkg/footprintpad.h>
 #include "../../settings/projectsettings.h"
-#include "../componentinstance.h"
+#include "../deviceinstance.h"
 
 namespace project {
 
@@ -43,8 +43,8 @@ namespace project {
 BGI_FootprintPad::BGI_FootprintPad(BI_FootprintPad& pad) noexcept :
     BGI_Base(), mPad(pad), mLibPad(pad.getLibPad())
 {
-    QStringList localeOrder = mPad.getProject().getSettings().getLocaleOrder();
-    setToolTip(mLibPad.getName(localeOrder) % ": " % mLibPad.getDescription(localeOrder));
+    //QStringList localeOrder = mPad.getProject().getSettings().getLocaleOrder();
+    //setToolTip(mLibPad.getName(localeOrder) % ": " % mLibPad.getDescription(localeOrder));
 
     mStaticText.setTextFormat(Qt::PlainText);
     mStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
@@ -166,7 +166,7 @@ void BGI_FootprintPad::paint(QPainter* painter, const QStyleOptionGraphicsItem* 
 BoardLayer* BGI_FootprintPad::getBoardLayer(int id) const noexcept
 {
     if (mPad.getIsMirrored()) id = BoardLayer::getMirroredLayerId(id);
-    return mPad.getFootprint().getComponentInstance().getBoard().getProject().getBoardLayer(id);
+    return mPad.getFootprint().getDeviceInstance().getBoard().getProject().getBoardLayer(id);
 }
 
 /*****************************************************************************************

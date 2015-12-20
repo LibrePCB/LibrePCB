@@ -31,7 +31,7 @@
 #include "netclass.h"
 #include "netsignal.h"
 #include "gencompinstance.h"
-#include <librepcblibrary/gencmp/genericcomponent.h>
+#include <librepcblibrary/cmp/component.h>
 #include "../settings/projectsettings.h"
 
 namespace project {
@@ -341,8 +341,8 @@ GenCompInstance* Circuit::getGenCompInstanceByName(const QString& name) const no
     return nullptr;
 }
 
-GenCompInstance* Circuit::createGenCompInstance(const library::GenericComponent& genComp,
-                                                const library::GenCompSymbVar& symbVar,
+GenCompInstance* Circuit::createGenCompInstance(const library::Component& genComp,
+                                                const library::ComponentSymbolVariant& symbVar,
                                                 QString name) throw (Exception)
 {
     if (name.isEmpty())

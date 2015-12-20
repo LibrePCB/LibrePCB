@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_GENCOMPSYMBVARITEM_H
-#define LIBRARY_GENCOMPSYMBVARITEM_H
+#ifndef LIBRARY_COMPONENTSYMBOLVARIANTITEM_H
+#define LIBRARY_COMPONENTSYMBOLVARIANTITEM_H
 
 /*****************************************************************************************
  *  Includes
@@ -28,17 +28,17 @@
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 
 /*****************************************************************************************
- *  Class GenCompSymbVarItem
+ *  Class ComponentSymbolVariantItem
  ****************************************************************************************/
 
 namespace library {
 
 /**
- * @brief The GenCompSymbVarItem class
+ * @brief The ComponentSymbolVariantItem class
  */
-class GenCompSymbVarItem final : public IF_XmlSerializableObject
+class ComponentSymbolVariantItem final : public IF_XmlSerializableObject
 {
-        Q_DECLARE_TR_FUNCTIONS(GenCompSymbVarItem)
+        Q_DECLARE_TR_FUNCTIONS(ComponentSymbolVariantItem)
 
     public:
 
@@ -46,7 +46,7 @@ class GenCompSymbVarItem final : public IF_XmlSerializableObject
         enum class PinDisplayType_t {
             None,
             PinName,
-            GenCompSignal,
+            ComponentSignal,
             NetSignal
         };
 
@@ -58,12 +58,12 @@ class GenCompSymbVarItem final : public IF_XmlSerializableObject
         };
 
         // Constructors / Destructor
-        explicit GenCompSymbVarItem(const QUuid& uuid = QUuid::createUuid(),
-                                    const QUuid& symbolUuid = QUuid(),
-                                    bool isRequired = false,
-                                    const QString& suffix = QString()) noexcept;
-        explicit GenCompSymbVarItem(const XmlDomElement& domElement) throw (Exception);
-        ~GenCompSymbVarItem() noexcept;
+        explicit ComponentSymbolVariantItem(const QUuid& uuid = QUuid::createUuid(),
+                                            const QUuid& symbolUuid = QUuid(),
+                                            bool isRequired = false,
+                                            const QString& suffix = QString()) noexcept;
+        explicit ComponentSymbolVariantItem(const XmlDomElement& domElement) throw (Exception);
+        ~ComponentSymbolVariantItem() noexcept;
 
         // Getters: Attributes
         const QUuid& getUuid() const noexcept {return mUuid;}
@@ -86,8 +86,8 @@ class GenCompSymbVarItem final : public IF_XmlSerializableObject
     private:
 
         // make some methods inaccessible...
-        GenCompSymbVarItem(const GenCompSymbVarItem& other);
-        GenCompSymbVarItem& operator=(const GenCompSymbVarItem& rhs);
+        ComponentSymbolVariantItem(const ComponentSymbolVariantItem& other);
+        ComponentSymbolVariantItem& operator=(const ComponentSymbolVariantItem& rhs);
 
         // Private Methods
 
@@ -105,4 +105,4 @@ class GenCompSymbVarItem final : public IF_XmlSerializableObject
 
 } // namespace library
 
-#endif // LIBRARY_GENCOMPSYMBVARITEM_H
+#endif // LIBRARY_COMPONENTSYMBOLVARIANTITEM_H

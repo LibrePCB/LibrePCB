@@ -36,7 +36,7 @@ class AttributeType;
 class AttributeUnit;
 
 namespace library {
-class GenericComponent;
+class Component;
 }
 
 /*****************************************************************************************

@@ -26,7 +26,7 @@
 #include <QPrinter>
 #include "symbolpinpreviewgraphicsitem.h"
 #include "symbolpin.h"
-#include "../gencmp/genericcomponent.h"
+#include "../cmp/component.h"
 #include <librepcbcommon/schematiclayer.h>
 #include <librepcbcommon/if_schematiclayerprovider.h>
 
@@ -39,8 +39,8 @@ namespace library {
 SymbolPinPreviewGraphicsItem::SymbolPinPreviewGraphicsItem(const IF_SchematicLayerProvider& layerProvider,
                                                            const QStringList& localeOrder,
                                                            const SymbolPin& pin,
-                                                           const GenCompSignal* genCompSignal,
-                                                           GenCompSymbVarItem::PinDisplayType_t displayType) noexcept :
+                                                           const ComponentSignal* genCompSignal,
+                                                           ComponentSymbolVariantItem::PinDisplayType_t displayType) noexcept :
     GraphicsItem(), mPin(pin), mGenCompSignal(genCompSignal), mDisplayType(displayType),
     mDrawBoundingRect(false), mLocaleOrder(localeOrder)
 {
@@ -97,13 +97,13 @@ void SymbolPinPreviewGraphicsItem::updateCacheAndRepaint() noexcept
     // text
     switch (mDisplayType)
     {
-        case GenCompSymbVarItem::PinDisplayType_t::None:
+        case ComponentSymbolVariantItem::PinDisplayType_t::None:
             mStaticText.setText(""); break;
-        case GenCompSymbVarItem::PinDisplayType_t::PinName:
+        case ComponentSymbolVariantItem::PinDisplayType_t::PinName:
             mStaticText.setText(mPin.getName(mLocaleOrder)); break;
-        case GenCompSymbVarItem::PinDisplayType_t::GenCompSignal:
+        case ComponentSymbolVariantItem::PinDisplayType_t::ComponentSignal:
             mStaticText.setText(mGenCompSignal ? mGenCompSignal->getName(mLocaleOrder) : ""); break;
-        case GenCompSymbVarItem::PinDisplayType_t::NetSignal:
+        case ComponentSymbolVariantItem::PinDisplayType_t::NetSignal:
             mStaticText.setText(mGenCompSignal ? mGenCompSignal->getForcedNetName() : ""); break;
         default: Q_ASSERT(false);
     }

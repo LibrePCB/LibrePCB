@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_COMPONENTINSTANCE_H
-#define PROJECT_COMPONENTINSTANCE_H
+#ifndef PROJECT_DEVICEINSTANCE_H
+#define PROJECT_DEVICEINSTANCE_H
 
 /*****************************************************************************************
  *  Includes
@@ -44,40 +44,40 @@ class BI_Footprint;
 }
 
 namespace library {
-class Component;
+class Device;
 class Package;
 }
 
 /*****************************************************************************************
- *  Class ComponentInstance
+ *  Class DeviceInstance
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The ComponentInstance class
+ * @brief The DeviceInstance class
  */
-class ComponentInstance final : public QObject, public IF_AttributeProvider,
-                                public IF_ErcMsgProvider, public IF_XmlSerializableObject
+class DeviceInstance final : public QObject, public IF_AttributeProvider,
+                             public IF_ErcMsgProvider, public IF_XmlSerializableObject
 {
         Q_OBJECT
-        DECLARE_ERC_MSG_CLASS_NAME(ComponentInstance)
+        DECLARE_ERC_MSG_CLASS_NAME(DeviceInstance)
 
     public:
 
         // Constructors / Destructor
-        explicit ComponentInstance(Board& board, const XmlDomElement& domElement) throw (Exception);
-        explicit ComponentInstance(Board& board, GenCompInstance& genCompInstance,
-                                   const QUuid& componentUuid,
-                                   const Point& position = Point(),
-                                   const Angle& rotation = Angle()) throw (Exception);
-        ~ComponentInstance() noexcept;
+        explicit DeviceInstance(Board& board, const XmlDomElement& domElement) throw (Exception);
+        explicit DeviceInstance(Board& board, GenCompInstance& compInstance,
+                                const QUuid& deviceUuid,
+                                const Point& position = Point(),
+                                const Angle& rotation = Angle()) throw (Exception);
+        ~DeviceInstance() noexcept;
 
         // Getters
         Project& getProject() const noexcept;
         Board& getBoard() const noexcept {return mBoard;}
-        GenCompInstance& getGenCompInstance() const noexcept {return *mGenCompInstance;}
-        const library::Component& getLibComponent() const noexcept {return *mComponent;}
+        GenCompInstance& getComponentInstance() const noexcept {return *mCompInstance;}
+        const library::Device& getLibDevice() const noexcept {return *mDevice;}
         const library::Package& getLibPackage() const noexcept {return *mPackage;}
         BI_Footprint& getFootprint() const noexcept {return *mFootprint;}
         const Angle& getRotation() const noexcept {return mRotation;}
@@ -114,12 +114,12 @@ class ComponentInstance final : public QObject, public IF_AttributeProvider,
     private:
 
         // make some methods inaccessible...
-        ComponentInstance();
-        ComponentInstance(const ComponentInstance& other);
-        ComponentInstance& operator=(const ComponentInstance& rhs);
+        DeviceInstance();
+        DeviceInstance(const DeviceInstance& other);
+        DeviceInstance& operator=(const DeviceInstance& rhs);
 
         // Private Methods
-        void initComponentAndPackage(const QUuid& componentUuid) throw (Exception);
+        void initDeviceAndPackage(const QUuid& deviceUuid) throw (Exception);
         void init() throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
@@ -131,8 +131,8 @@ class ComponentInstance final : public QObject, public IF_AttributeProvider,
         // General
         Board& mBoard;
         bool mAddedToBoard;
-        GenCompInstance* mGenCompInstance;
-        const library::Component* mComponent;
+        GenCompInstance* mCompInstance;
+        const library::Device* mDevice;
         const library::Package* mPackage;
         BI_Footprint* mFootprint;
 
@@ -144,4 +144,4 @@ class ComponentInstance final : public QObject, public IF_AttributeProvider,
 
 } // namespace project
 
-#endif // PROJECT_COMPONENTINSTANCE_H
+#endif // PROJECT_DEVICEINSTANCE_H

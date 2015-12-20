@@ -29,8 +29,8 @@
 #include <librepcbcommon/graphics/graphicsview.h>
 #include <librepcbproject/project.h>
 #include <librepcbproject/library/projectlibrary.h>
-#include <librepcblibrary/gencmp/genericcomponent.h>
-#include <librepcblibrary/gencmp/gencompsymbvar.h>
+#include <librepcblibrary/cmp/component.h>
+#include <librepcblibrary/cmp/componentsymbolvariant.h>
 #include <librepcblibrary/sym/symbol.h>
 #include <librepcbproject/settings/projectsettings.h>
 #include <librepcblibrary/sym/symbolpreviewgraphicsitem.h>
@@ -123,7 +123,7 @@ void AddGenCompDialog::on_listGenericComponents_currentItemChanged(QListWidgetIt
     {
         if (current)
         {
-            library::GenericComponent* genComp = new library::GenericComponent(
+            library::Component* genComp = new library::Component(
                 FilePath(current->data(Qt::UserRole).toString())); // ugly...
             setSelectedGenComp(genComp);
         }
@@ -162,12 +162,12 @@ void AddGenCompDialog::setSelectedCategory(const QUuid& categoryUuid)
     const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
 
     mSelectedCategoryUuid = categoryUuid;
-    QSet<QUuid> genComps = mWorkspace.getLibrary().getGenericComponentsByCategory(categoryUuid);
+    QSet<QUuid> genComps = mWorkspace.getLibrary().getComponentsByCategory(categoryUuid);
     foreach (const QUuid& genCompUuid, genComps)
     {
-        FilePath genCompFp = mWorkspace.getLibrary().getLatestGenericComponent(genCompUuid);
+        FilePath genCompFp = mWorkspace.getLibrary().getLatestComponent(genCompUuid);
         if (!genCompFp.isValid()) continue;
-        library::GenericComponent genComp(genCompFp); // TODO: use library metadata instead of loading the whole component
+        library::Component genComp(genCompFp); // TODO: use library metadata instead of loading the whole component
 
         QListWidgetItem* item = new QListWidgetItem(genComp.getName(localeOrder));
         item->setData(Qt::UserRole, genCompFp.toStr());
@@ -175,7 +175,7 @@ void AddGenCompDialog::setSelectedCategory(const QUuid& categoryUuid)
     }
 }
 
-void AddGenCompDialog::setSelectedGenComp(const library::GenericComponent* genComp)
+void AddGenCompDialog::setSelectedGenComp(const library::Component* genComp)
 {
     if (genComp == mSelectedGenComp) return;
 
@@ -201,7 +201,7 @@ void AddGenCompDialog::setSelectedGenComp(const library::GenericComponent* genCo
         mSelectedGenComp = genComp;
 
         mUi->cbxSymbVar->clear();
-        foreach (const library::GenCompSymbVar* symbVar, genComp->getSymbolVariants())
+        foreach (const library::ComponentSymbolVariant* symbVar, genComp->getSymbolVariants())
         {
             QString text = symbVar->getName(localeOrder);
             if (symbVar->isDefault()) text.append(tr(" [default]"));
@@ -211,7 +211,7 @@ void AddGenCompDialog::setSelectedGenComp(const library::GenericComponent* genCo
     }
 }
 
-void AddGenCompDialog::setSelectedSymbVar(const library::GenCompSymbVar* symbVar)
+void AddGenCompDialog::setSelectedSymbVar(const library::ComponentSymbolVariant* symbVar)
 {
     if (symbVar == mSelectedSymbVar) return;
     qDeleteAll(mPreviewSymbolGraphicsItems);
@@ -229,7 +229,7 @@ void AddGenCompDialog::setSelectedSymbVar(const library::GenCompSymbVar* symbVar
         mUi->lblSymbVarNorm->setText(symbVar->getNorm());
         mUi->lblSymbVarDescription->setText(symbVar->getDescription(localeOrder));
 
-        foreach (const library::GenCompSymbVarItem* item, symbVar->getItems())
+        foreach (const library::ComponentSymbolVariantItem* item, symbVar->getItems())
         {
             FilePath symbolFp = mWorkspace.getLibrary().getLatestSymbol(item->getSymbolUuid());
             if (!symbolFp.isValid()) continue; // TODO: show warning

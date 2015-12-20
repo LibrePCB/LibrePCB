@@ -23,11 +23,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->cbx_cmpcat->setChecked(s.value("mainwindow/cbx_cmpcat", true).toBool());
     ui->cbx_pkgcat->setChecked(s.value("mainwindow/cbx_pkgcat", true).toBool());
     ui->cbx_sym->setChecked(s.value("mainwindow/cbx_sym", true).toBool());
-    ui->cbx_fpt->setChecked(s.value("mainwindow/cbx_fpt", true).toBool());
-    ui->cbx_3dmdl->setChecked(s.value("mainwindow/cbx_3dmdl", true).toBool());
     ui->cbx_pkg->setChecked(s.value("mainwindow/cbx_pkg", true).toBool());
-    ui->cbx_gencmp->setChecked(s.value("mainwindow/cbx_gencmp", true).toBool());
     ui->cbx_cmp->setChecked(s.value("mainwindow/cbx_cmp", true).toBool());
+    ui->cbx_dev->setChecked(s.value("mainwindow/cbx_dev", true).toBool());
 
     if (ui->libDirs->count() > 0) lastDir = ui->libDirs->item(ui->libDirs->count()-1)->text();
 }
@@ -46,11 +44,9 @@ MainWindow::~MainWindow()
     s.setValue("mainwindow/cbx_cmpcat", ui->cbx_cmpcat->isChecked());
     s.setValue("mainwindow/cbx_pkgcat", ui->cbx_pkgcat->isChecked());
     s.setValue("mainwindow/cbx_sym", ui->cbx_sym->isChecked());
-    s.setValue("mainwindow/cbx_fpt", ui->cbx_fpt->isChecked());
-    s.setValue("mainwindow/cbx_3dmdl", ui->cbx_3dmdl->isChecked());
     s.setValue("mainwindow/cbx_pkg", ui->cbx_pkg->isChecked());
-    s.setValue("mainwindow/cbx_gencmp", ui->cbx_gencmp->isChecked());
     s.setValue("mainwindow/cbx_cmp", ui->cbx_cmp->isChecked());
+    s.setValue("mainwindow/cbx_dev", ui->cbx_dev->isChecked());
 
     delete ui;
 }
@@ -87,11 +83,9 @@ void MainWindow::on_updateBtn_clicked()
         if (ui->cbx_cmpcat->isChecked())    filter.append("*.cmpcat");
         if (ui->cbx_pkgcat->isChecked())    filter.append("*.pkgcat");
         if (ui->cbx_sym->isChecked())       filter.append("*.sym");
-        if (ui->cbx_fpt->isChecked())       filter.append("*.fpt");
-        if (ui->cbx_3dmdl->isChecked())     filter.append("*.3dmdl");
         if (ui->cbx_pkg->isChecked())       filter.append("*.pkg");
-        if (ui->cbx_gencmp->isChecked())    filter.append("*.gencmp");
         if (ui->cbx_cmp->isChecked())       filter.append("*.cmp");
+        if (ui->cbx_dev->isChecked())       filter.append("*.dev");
 
         // search library elements
         QDirIterator it(dirStr, filter, QDir::Dirs, QDirIterator::Subdirectories);
@@ -121,29 +115,19 @@ void MainWindow::on_updateBtn_clicked()
                     library::Symbol elem(dirFilePath);
                     elem.save();
                 }
-                else if (dirFilePath.getSuffix() == "fpt")
-                {
-                    library::Footprint elem(dirFilePath);
-                    elem.save();
-                }
-                else if (dirFilePath.getSuffix() == "3dmdl")
-                {
-                    library::Model3D elem(dirFilePath);
-                    elem.save();
-                }
                 else if (dirFilePath.getSuffix() == "pkg")
                 {
                     library::Package elem(dirFilePath);
                     elem.save();
                 }
-                else if (dirFilePath.getSuffix() == "gencmp")
-                {
-                    library::GenericComponent elem(dirFilePath);
-                    elem.save();
-                }
                 else if (dirFilePath.getSuffix() == "cmp")
                 {
                     library::Component elem(dirFilePath);
+                    elem.save();
+                }
+                else if (dirFilePath.getSuffix() == "dev")
+                {
+                    library::Device elem(dirFilePath);
                     elem.save();
                 }
                 else

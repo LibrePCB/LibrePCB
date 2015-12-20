@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDCOMPONENTINSTANCEREMOVE_H
-#define PROJECT_CMDCOMPONENTINSTANCEREMOVE_H
+#ifndef PROJECT_CMDDEVICEINSTANCEREMOVE_H
+#define PROJECT_CMDDEVICEINSTANCEREMOVE_H
 
 /*****************************************************************************************
  *  Includes
@@ -33,26 +33,26 @@
 
 namespace project {
 class Board;
-class ComponentInstance;
+class DeviceInstance;
 }
 
 /*****************************************************************************************
- *  Class CmdComponentInstanceRemove
+ *  Class CmdDeviceInstanceRemove
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The CmdComponentInstanceRemove class
+ * @brief The CmdDeviceInstanceRemove class
  */
-class CmdComponentInstanceRemove final : public UndoCommand
+class CmdDeviceInstanceRemove final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdComponentInstanceRemove(Board& board, ComponentInstance& cmp,
-                                            UndoCommand* parent = 0) throw (Exception);
-        ~CmdComponentInstanceRemove() noexcept;
+        explicit CmdDeviceInstanceRemove(Board& board, DeviceInstance& dev,
+                                         UndoCommand* parent = 0) throw (Exception);
+        ~CmdDeviceInstanceRemove() noexcept;
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;
@@ -63,9 +63,9 @@ class CmdComponentInstanceRemove final : public UndoCommand
 
         // Attributes from the constructor
         Board& mBoard;
-        ComponentInstance& mComponent;
+        DeviceInstance& mDevice;
 };
 
 } // namespace project
 
-#endif // PROJECT_CMDCOMPONENTINSTANCEREMOVE_H
+#endif // PROJECT_CMDDEVICEINSTANCEREMOVE_H

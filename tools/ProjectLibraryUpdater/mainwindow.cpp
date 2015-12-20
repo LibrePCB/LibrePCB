@@ -6,10 +6,10 @@
 #include <librepcbcommon/fileio/xmldomdocument.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include <librepcblibrary/library.h>
-#include <librepcblibrary/gencmp/genericcomponent.h>
-#include <librepcblibrary/sym/symbol.h>
 #include <librepcblibrary/cmp/component.h>
-#include <librepcblibrary/fpt/footprint.h>
+#include <librepcblibrary/sym/symbol.h>
+#include <librepcblibrary/dev/device.h>
+#include <librepcblibrary/pkg/footprint.h>
 #include <librepcblibrary/pkg/package.h>
 
 using namespace library;
@@ -89,22 +89,22 @@ void MainWindow::on_pushButton_2_clicked()
                  node; node = node->getNextSibling())
             {
                 QUuid genCompUuid = node->getAttribute<QUuid>("generic_component", true);
-                FilePath filepath = lib.getLatestGenericComponent(genCompUuid);
+                FilePath filepath = lib.getLatestComponent(genCompUuid);
                 if (!filepath.isValid())
                 {
                     throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
                         QString("missing generic component: %1").arg(genCompUuid.toString()));
                 }
                 // copy generic component
-                GenericComponent latestGenComp(filepath);
+                Component latestGenComp(filepath);
                 FilePath dest = projectFilepath.getParentDir().getPathTo("library/gencmp");
                 latestGenComp.saveTo(dest);
                 ui->log->addItem(latestGenComp.getDirectory().toNative());
 
                 // search all required symbols
-                foreach (const GenCompSymbVar* symbvar, latestGenComp.getSymbolVariants())
+                foreach (const ComponentSymbolVariant* symbvar, latestGenComp.getSymbolVariants())
                 {
-                    foreach (const GenCompSymbVarItem* item, symbvar->getItems())
+                    foreach (const ComponentSymbolVariantItem* item, symbvar->getItems())
                     {
                         QUuid symbolUuid = item->getSymbolUuid();
                         FilePath filepath = lib.getLatestSymbol(symbolUuid);
@@ -123,7 +123,7 @@ void MainWindow::on_pushButton_2_clicked()
 
 
             // components & footprints
-            for (XmlDomElement* node = projectDoc->getRoot().getFirstChild("boards/*", true, false);
+            /*for (XmlDomElement* node = projectDoc->getRoot().getFirstChild("boards/*", true, false);
                  node; node = node->getNextSibling())
             {
                 FilePath boardFilePath = projectFilepath.getParentDir().getPathTo("boards/" % node->getText(true));
@@ -140,7 +140,7 @@ void MainWindow::on_pushButton_2_clicked()
                             QString("missing component: %1").arg(compUuid.toString()));
                     }
                     // copy component
-                    Component latestComp(filepath);
+                    Device latestComp(filepath);
                     FilePath dest = projectFilepath.getParentDir().getPathTo("library/cmp");
                     latestComp.saveTo(dest);
                     ui->log->addItem(latestComp.getDirectory().toNative());
@@ -173,7 +173,7 @@ void MainWindow::on_pushButton_2_clicked()
                     latestFootprint.saveTo(dest);
                     ui->log->addItem(latestFootprint.getDirectory().toNative());
                 }
-            }
+            }*/
         }
     }
     catch (Exception& e)

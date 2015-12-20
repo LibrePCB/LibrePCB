@@ -103,13 +103,14 @@ void LibraryBaseElement::save() const throw (Exception)
     XmlDomDocument doc(*serializeToXmlDomElement());
     QScopedPointer<SmartXmlFile> file(SmartXmlFile::create(mXmlFilepath));
     file->save(doc, true);
+    // TODO: write version number into file
 }
 
 void LibraryBaseElement::saveTo(const FilePath& parentDir) const throw (Exception)
 {
     QString dirname = QString("%1.%2").arg(mUuid.toString()).arg(mXmlFileNamePrefix);
     mDirectory = parentDir.getPathTo(dirname);
-    QString filename = QString("v%1/%2.xml").arg(APP_VERSION_MAJOR).arg(mXmlFileNamePrefix);
+    QString filename = QString("%1.xml").arg(mXmlFileNamePrefix);
     mXmlFilepath = mDirectory.getPathTo(filename);
     save();
 }
@@ -131,13 +132,11 @@ void LibraryBaseElement::readFromFile() throw (Exception)
             .arg(mDirectory.toNative()));
     }
 
+    // TODO: read version number from file!
+
     // find the xml file with the highest file version number
-    for (int version = APP_VERSION_MAJOR; version >= 0; version--)
-    {
-        QString filename = QString("v%1/%2.xml").arg(version).arg(mXmlFileNamePrefix);
-        mXmlFilepath = mDirectory.getPathTo(filename);
-        if (mXmlFilepath.isExistingFile()) break; // file found
-    }
+    QString filename = QString("%1.xml").arg(mXmlFileNamePrefix);
+    mXmlFilepath = mDirectory.getPathTo(filename);
 
     // open XML file
     SmartXmlFile file(mXmlFilepath, false, false);

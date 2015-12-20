@@ -27,7 +27,7 @@
 #include "ui_symbolinstancepropertiesdialog.h"
 #include <librepcbproject/circuit/gencompinstance.h>
 #include <librepcbproject/schematics/items/si_symbol.h>
-#include <librepcblibrary/gencmp/genericcomponent.h>
+#include <librepcblibrary/cmp/component.h>
 #include <librepcblibrary/sym/symbol.h>
 #include <librepcbproject/project.h>
 #include <librepcbcommon/undostack.h>

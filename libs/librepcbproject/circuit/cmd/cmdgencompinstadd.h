@@ -38,8 +38,8 @@ class GenCompInstance;
 }
 
 namespace library {
-class GenericComponent;
-class GenCompSymbVar;
+class Component;
+class ComponentSymbolVariant;
 }
 
 /*****************************************************************************************
@@ -57,8 +57,8 @@ class CmdGenCompInstAdd final : public UndoCommand
 
         // Constructors / Destructor
         explicit CmdGenCompInstAdd(Circuit& circuit,
-                                   const library::GenericComponent& genComp,
-                                   const library::GenCompSymbVar& symbVar,
+                                   const library::Component& genComp,
+                                   const library::ComponentSymbolVariant& symbVar,
                                    UndoCommand* parent = 0) throw (Exception);
         ~CmdGenCompInstAdd() noexcept;
 
@@ -73,8 +73,8 @@ class CmdGenCompInstAdd final : public UndoCommand
 
         // Attributes from the constructor
         Circuit& mCircuit;
-        const library::GenericComponent& mGenComp;
-        const library::GenCompSymbVar& mSymbVar;
+        const library::Component& mGenComp;
+        const library::ComponentSymbolVariant& mSymbVar;
 
         /// @brief The created generic component instance
         GenCompInstance* mGenCompInstance;

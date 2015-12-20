@@ -23,7 +23,7 @@
 #include "gencompinstance.h"
 #include "circuit.h"
 #include "netsignal.h"
-#include <librepcblibrary/gencmp/genericcomponent.h>
+#include <librepcblibrary/cmp/component.h>
 #include "../erc/ercmsg.h"
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include "../project.h"
@@ -63,7 +63,7 @@ GenCompSignalInstance::GenCompSignalInstance(Circuit& circuit, GenCompInstance& 
 }
 
 GenCompSignalInstance::GenCompSignalInstance(Circuit& circuit, GenCompInstance& genCompInstance,
-                                             const library::GenCompSignal& genCompSignal,
+                                             const library::ComponentSignal& genCompSignal,
                                              NetSignal* netsignal) throw (Exception) :
     QObject(nullptr), mCircuit(circuit), mGenCompInstance(genCompInstance),
     mGenCompSignal(&genCompSignal), mNetSignal(netsignal), mAddedToCircuit(false)

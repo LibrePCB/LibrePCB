@@ -43,7 +43,7 @@ class ErcMsg;
 
 namespace library {
 class SymbolPin;
-class GenCompSignal;
+class ComponentSignal;
 }
 
 /*****************************************************************************************
@@ -75,7 +75,7 @@ class SI_SymbolPin final : public SI_Base, public IF_ErcMsgProvider
         SI_Symbol& getSymbol() const noexcept {return mSymbol;}
         SI_NetPoint* getNetPoint() const noexcept {return mRegisteredNetPoint;}
         const library::SymbolPin& getLibPin() const noexcept {return *mSymbolPin;}
-        const library::GenCompSignal* getGenCompSignal() const noexcept {return mGenCompSignal;}
+        const library::ComponentSignal* getGenCompSignal() const noexcept {return mGenCompSignal;}
         GenCompSignalInstance* getGenCompSignalInstance() const noexcept {return mGenCompSignalInstance;}
 
         // General Methods
@@ -109,7 +109,7 @@ class SI_SymbolPin final : public SI_Base, public IF_ErcMsgProvider
         Circuit& mCircuit;
         SI_Symbol& mSymbol;
         const library::SymbolPin* mSymbolPin;
-        const library::GenCompSignal* mGenCompSignal;
+        const library::ComponentSignal* mGenCompSignal;
         GenCompSignalInstance* mGenCompSignalInstance;
         Point mPosition;
         Angle mRotation;

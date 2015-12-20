@@ -22,8 +22,8 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "gencompsignal.h"
-#include "genericcomponent.h"
+#include "componentsignal.h"
+#include "component.h"
 #include <librepcbcommon/fileio/xmldomelement.h>
 
 namespace library {
@@ -32,8 +32,8 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-GenCompSignal::GenCompSignal(const QUuid& uuid, const QString& name_en_US,
-                             const QString& description_en_US) noexcept :
+ComponentSignal::ComponentSignal(const QUuid& uuid, const QString& name_en_US,
+                                 const QString& description_en_US) noexcept :
     mUuid(uuid), mRole(SignalRole_t::Passive), mForcedNetName(), mIsRequired(false),
     mIsNegated(false), mIsClock(false)
 {
@@ -42,7 +42,7 @@ GenCompSignal::GenCompSignal(const QUuid& uuid, const QString& name_en_US,
     mDescriptions.insert("en_US", description_en_US);
 }
 
-GenCompSignal::GenCompSignal(const XmlDomElement& domElement) throw (Exception)
+ComponentSignal::ComponentSignal(const XmlDomElement& domElement) throw (Exception)
 {
     // read attributes
     mUuid = domElement.getAttribute<QUuid>("uuid");
@@ -59,7 +59,7 @@ GenCompSignal::GenCompSignal(const XmlDomElement& domElement) throw (Exception)
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-GenCompSignal::~GenCompSignal() noexcept
+ComponentSignal::~ComponentSignal() noexcept
 {
 }
 
@@ -67,12 +67,12 @@ GenCompSignal::~GenCompSignal() noexcept
  *  Getters
  ****************************************************************************************/
 
-QString GenCompSignal::getName(const QStringList& localeOrder) const noexcept
+QString ComponentSignal::getName(const QStringList& localeOrder) const noexcept
 {
     return LibraryBaseElement::localeStringFromList(mNames, localeOrder);
 }
 
-QString GenCompSignal::getDescription(const QStringList& localeOrder) const noexcept
+QString ComponentSignal::getDescription(const QStringList& localeOrder) const noexcept
 {
     return LibraryBaseElement::localeStringFromList(mDescriptions, localeOrder);
 }
@@ -81,7 +81,7 @@ QString GenCompSignal::getDescription(const QStringList& localeOrder) const noex
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* GenCompSignal::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* ComponentSignal::serializeToXmlDomElement() const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -103,7 +103,7 @@ XmlDomElement* GenCompSignal::serializeToXmlDomElement() const throw (Exception)
  *  Private Methods
  ****************************************************************************************/
 
-bool GenCompSignal::checkAttributesValidity() const noexcept
+bool ComponentSignal::checkAttributesValidity() const noexcept
 {
     if (mUuid.isNull())                     return false;
     if (mNames.value("en_US").isEmpty())    return false;
@@ -115,7 +115,7 @@ bool GenCompSignal::checkAttributesValidity() const noexcept
  *  Private Static Methods
  ****************************************************************************************/
 
-GenCompSignal::SignalRole_t GenCompSignal::stringToSignalRole(const QString& role) throw (Exception)
+ComponentSignal::SignalRole_t ComponentSignal::stringToSignalRole(const QString& role) throw (Exception)
 {
     if (role == "power")            return SignalRole_t::Power;
     else if (role == "input")       return SignalRole_t::Input;
@@ -130,7 +130,7 @@ GenCompSignal::SignalRole_t GenCompSignal::stringToSignalRole(const QString& rol
     }
 }
 
-QString GenCompSignal::signalRoleToString(SignalRole_t role) noexcept
+QString ComponentSignal::signalRoleToString(SignalRole_t role) noexcept
 {
     switch (role)
     {

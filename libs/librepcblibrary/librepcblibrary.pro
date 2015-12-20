@@ -21,15 +21,9 @@ INCLUDEPATH += \
     ../
 
 HEADERS += \
-    3dmdl/model3d.h \
     cat/componentcategory.h \
     cat/packagecategory.h \
-    cmp/component.h \
-    fpt/footprint.h \
-    gencmp/gencompsignal.h \
-    gencmp/gencompsymbvar.h \
-    gencmp/gencompsymbvaritem.h \
-    gencmp/genericcomponent.h \
+    pkg/footprint.h \
     pkg/package.h \
     spcmdl/spicemodel.h \
     sym/symbol.h \
@@ -43,25 +37,25 @@ HEADERS += \
     librarybaseelement.h \
     libraryelement.h \
     libraryelementattribute.h \
-    fpt/footprintpolygon.h \
-    fpt/footprintellipse.h \
-    fpt/footprinttext.h \
-    fpt/footprintpad.h \
+    pkg/footprintpolygon.h \
+    pkg/footprintellipse.h \
+    pkg/footprinttext.h \
+    pkg/footprintpad.h \
     cat/librarycategory.h \
     cat/categorytreemodel.h \
     cat/categorytreeitem.h \
-    elements.h
+    elements.h \
+    dev/device.h \
+    cmp/component.h \
+    cmp/componentsignal.h \
+    cmp/componentsymbolvariant.h \
+    cmp/componentsymbolvariantitem.h \
+    pkg/packagepad.h
 
 SOURCES += \
-    3dmdl/model3d.cpp \
     cat/componentcategory.cpp \
     cat/packagecategory.cpp \
-    cmp/component.cpp \
-    fpt/footprint.cpp \
-    gencmp/gencompsignal.cpp \
-    gencmp/gencompsymbvar.cpp \
-    gencmp/gencompsymbvaritem.cpp \
-    gencmp/genericcomponent.cpp \
+    pkg/footprint.cpp \
     pkg/package.cpp \
     spcmdl/spicemodel.cpp \
     sym/symbol.cpp \
@@ -75,11 +69,17 @@ SOURCES += \
     librarybaseelement.cpp \
     libraryelement.cpp \
     libraryelementattribute.cpp \
-    fpt/footprintpolygon.cpp \
-    fpt/footprintellipse.cpp \
-    fpt/footprinttext.cpp \
-    fpt/footprintpad.cpp \
+    pkg/footprintpolygon.cpp \
+    pkg/footprintellipse.cpp \
+    pkg/footprinttext.cpp \
+    pkg/footprintpad.cpp \
     cat/librarycategory.cpp \
     cat/categorytreemodel.cpp \
-    cat/categorytreeitem.cpp
+    cat/categorytreeitem.cpp \
+    dev/device.cpp \
+    cmp/componentsignal.cpp \
+    cmp/componentsymbolvariant.cpp \
+    cmp/componentsymbolvariantitem.cpp \
+    cmp/component.cpp \
+    pkg/packagepad.cpp
 

@@ -28,7 +28,7 @@
 #include "../project.h"
 #include "../library/projectlibrary.h"
 #include "gencompsignalinstance.h"
-#include <librepcblibrary/gencmp/genericcomponent.h>
+#include <librepcblibrary/cmp/component.h>
 #include "../erc/ercmsg.h"
 #include "gencompattributeinstance.h"
 #include <librepcbcommon/fileio/xmldomelement.h>
@@ -50,7 +50,7 @@ GenCompInstance::GenCompInstance(Circuit& circuit, const XmlDomElement& domEleme
     mName = domElement.getFirstChild("name", true)->getText(true);
     mValue = domElement.getFirstChild("value", true)->getText();
     QUuid gcUuid = domElement.getAttribute<QUuid>("generic_component");
-    mGenComp = mCircuit.getProject().getLibrary().getGenComp(gcUuid);
+    mGenComp = mCircuit.getProject().getLibrary().getComponent(gcUuid);
     if (!mGenComp)
     {
         throw RuntimeError(__FILE__, __LINE__, gcUuid.toString(),
@@ -105,8 +105,8 @@ GenCompInstance::GenCompInstance(Circuit& circuit, const XmlDomElement& domEleme
     init();
 }
 
-GenCompInstance::GenCompInstance(Circuit& circuit, const library::GenericComponent& genComp,
-                                 const library::GenCompSymbVar& symbVar, const QString& name) throw (Exception) :
+GenCompInstance::GenCompInstance(Circuit& circuit, const library::Component& genComp,
+                                 const library::ComponentSymbolVariant& symbVar, const QString& name) throw (Exception) :
     QObject(nullptr), mCircuit(circuit), mAddedToCircuit(false),
     mGenComp(&genComp), mGenCompSymbVar(&symbVar)
 {
@@ -131,7 +131,7 @@ GenCompInstance::GenCompInstance(Circuit& circuit, const library::GenericCompone
     }
 
     // add signal map
-    foreach (const library::GenCompSignal* signal, genComp.getSignals())
+    foreach (const library::ComponentSignal* signal, genComp.getSignals())
     {
         GenCompSignalInstance* signalInstance = new GenCompSignalInstance(
             mCircuit, *this, *signal, nullptr);
@@ -160,7 +160,7 @@ GenCompInstance::~GenCompInstance() noexcept
 {
     Q_ASSERT(!mAddedToCircuit);
     Q_ASSERT(mSymbols.isEmpty());
-    Q_ASSERT(mComponentInstances.isEmpty());
+    Q_ASSERT(mDeviceInstances.isEmpty());
 
     qDeleteAll(mSignals);       mSignals.clear();
     qDeleteAll(mAttributes);    mAttributes.clear();
@@ -185,7 +185,7 @@ int GenCompInstance::getUnplacedSymbolsCount() const noexcept
 int GenCompInstance::getUnplacedRequiredSymbolsCount() const noexcept
 {
     int count = 0;
-    foreach (const library::GenCompSymbVarItem* item, mGenCompSymbVar->getItems())
+    foreach (const library::ComponentSymbolVariantItem* item, mGenCompSymbVar->getItems())
     {
         if ((item->isRequired()) && (!mSymbols.contains(item->getUuid())))
             count++;
@@ -196,7 +196,7 @@ int GenCompInstance::getUnplacedRequiredSymbolsCount() const noexcept
 int GenCompInstance::getUnplacedOptionalSymbolsCount() const noexcept
 {
     int count = 0;
-    foreach (const library::GenCompSymbVarItem* item, mGenCompSymbVar->getItems())
+    foreach (const library::ComponentSymbolVariantItem* item, mGenCompSymbVar->getItems())
     {
         if ((!item->isRequired()) && (!mSymbols.contains(item->getUuid())))
             count++;
@@ -288,7 +288,7 @@ void GenCompInstance::removeFromCircuit() throw (Exception)
 
 void GenCompInstance::registerSymbol(const SI_Symbol& symbol) throw (Exception)
 {
-    const library::GenCompSymbVarItem* item = &symbol.getGenCompSymbVarItem();
+    const library::ComponentSymbolVariantItem* item = &symbol.getGenCompSymbVarItem();
 
     if (!mAddedToCircuit)
         throw LogicError(__FILE__, __LINE__, item->getUuid().toString());
@@ -309,7 +309,7 @@ void GenCompInstance::registerSymbol(const SI_Symbol& symbol) throw (Exception)
 
 void GenCompInstance::unregisterSymbol(const SI_Symbol& symbol) throw (Exception)
 {
-    const library::GenCompSymbVarItem* item = &symbol.getGenCompSymbVarItem();
+    const library::ComponentSymbolVariantItem* item = &symbol.getGenCompSymbVarItem();
 
     if (!mAddedToCircuit)
         throw LogicError(__FILE__, __LINE__, item->getUuid().toString());
@@ -322,22 +322,22 @@ void GenCompInstance::unregisterSymbol(const SI_Symbol& symbol) throw (Exception
     updateErcMessages();
 }
 
-void GenCompInstance::registerComponent(const ComponentInstance& component) throw (Exception)
+void GenCompInstance::registerDevice(const DeviceInstance& device) throw (Exception)
 {
     if (!mAddedToCircuit) throw LogicError(__FILE__, __LINE__);
-    if (mComponentInstances.contains(&component)) throw LogicError(__FILE__, __LINE__);
+    if (mDeviceInstances.contains(&device)) throw LogicError(__FILE__, __LINE__);
     if (mGenComp->isSchematicOnly()) throw LogicError(__FILE__, __LINE__);
 
-    mComponentInstances.append(&component);
+    mDeviceInstances.append(&device);
     updateErcMessages();
 }
 
-void GenCompInstance::unregisterComponent(const ComponentInstance& component) throw (Exception)
+void GenCompInstance::unregisterDevice(const DeviceInstance& device) throw (Exception)
 {
     if (!mAddedToCircuit) throw LogicError(__FILE__, __LINE__);
-    if (!mComponentInstances.contains(&component)) throw LogicError(__FILE__, __LINE__);
+    if (!mDeviceInstances.contains(&device)) throw LogicError(__FILE__, __LINE__);
 
-    mComponentInstances.removeOne(&component);
+    mDeviceInstances.removeOne(&device);
     updateErcMessages();
 }
 

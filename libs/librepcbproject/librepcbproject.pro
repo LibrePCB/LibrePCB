@@ -71,15 +71,12 @@ SOURCES += \
     boards/board.cpp \
     boards/cmd/cmdboardadd.cpp \
     boards/items/bi_base.cpp \
-    boards/componentinstance.cpp \
     boards/items/bi_footprint.cpp \
     boards/graphicsitems/bgi_base.cpp \
     boards/graphicsitems/bgi_footprint.cpp \
     boards/boardlayerprovider.cpp \
     boards/items/bi_footprintpad.cpp \
     boards/graphicsitems/bgi_footprintpad.cpp \
-    boards/cmd/cmdcomponentinstanceadd.cpp \
-    boards/cmd/cmdcomponentinstanceedit.cpp \
     library/projectlibrary.cpp \
     erc/ercmsg.cpp \
     erc/ercmsglist.cpp \
@@ -88,7 +85,10 @@ SOURCES += \
     settings/cmd/cmdprojectsettingschange.cpp \
     schematics/schematiclayerprovider.cpp \
     library/cmd/cmdprojectlibraryaddelement.cpp \
-    boards/cmd/cmdcomponentinstanceremove.cpp
+    boards/deviceinstance.cpp \
+    boards/cmd/cmddeviceinstanceadd.cpp \
+    boards/cmd/cmddeviceinstanceedit.cpp \
+    boards/cmd/cmddeviceinstanceremove.cpp
 
 HEADERS += \
     project.h \
@@ -141,15 +141,12 @@ HEADERS += \
     boards/board.h \
     boards/cmd/cmdboardadd.h \
     boards/items/bi_base.h \
-    boards/componentinstance.h \
     boards/items/bi_footprint.h \
     boards/graphicsitems/bgi_base.h \
     boards/graphicsitems/bgi_footprint.h \
     boards/boardlayerprovider.h \
     boards/items/bi_footprintpad.h \
     boards/graphicsitems/bgi_footprintpad.h \
-    boards/cmd/cmdcomponentinstanceadd.h \
-    boards/cmd/cmdcomponentinstanceedit.h \
     library/projectlibrary.h \
     erc/ercmsg.h \
     erc/ercmsglist.h \
@@ -159,6 +156,9 @@ HEADERS += \
     settings/cmd/cmdprojectsettingschange.h \
     schematics/schematiclayerprovider.h \
     library/cmd/cmdprojectlibraryaddelement.h \
-    boards/cmd/cmdcomponentinstanceremove.h
+    boards/deviceinstance.h \
+    boards/cmd/cmddeviceinstanceadd.h \
+    boards/cmd/cmddeviceinstanceremove.h \
+    boards/cmd/cmddeviceinstanceedit.h
 
 FORMS +=

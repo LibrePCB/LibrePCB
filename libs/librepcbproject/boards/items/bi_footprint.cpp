@@ -28,12 +28,12 @@
 #include "../../project.h"
 #include "../../circuit/circuit.h"
 #include "../../library/projectlibrary.h"
-#include <librepcblibrary/fpt/footprint.h>
+#include <librepcblibrary/pkg/footprint.h>
 #include <librepcblibrary/pkg/package.h>
-#include <librepcblibrary/cmp/component.h>
+#include <librepcblibrary/dev/device.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include <librepcbcommon/graphics/graphicsscene.h>
-#include "../componentinstance.h"
+#include "../deviceinstance.h"
 
 namespace project {
 
@@ -41,16 +41,16 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-BI_Footprint::BI_Footprint(ComponentInstance& component, const XmlDomElement& domElement) throw (Exception) :
-    BI_Base(), mComponentInstance(component), mFootprint(nullptr),
+BI_Footprint::BI_Footprint(DeviceInstance& device, const XmlDomElement& domElement) throw (Exception) :
+    BI_Base(), mDeviceInstance(device), mFootprint(nullptr),
     mGraphicsItem(nullptr)
 {
     Q_UNUSED(domElement);
     init();
 }
 
-BI_Footprint::BI_Footprint(ComponentInstance& component) throw (Exception) :
-    BI_Base(), mComponentInstance(component), mFootprint(nullptr),
+BI_Footprint::BI_Footprint(DeviceInstance& device) throw (Exception) :
+    BI_Base(), mDeviceInstance(device), mFootprint(nullptr),
     mGraphicsItem(nullptr)
 {
     init();
@@ -58,8 +58,9 @@ BI_Footprint::BI_Footprint(ComponentInstance& component) throw (Exception) :
 
 void BI_Footprint::init() throw (Exception)
 {
-    QUuid footprintUuid = mComponentInstance.getLibPackage().getFootprintUuid();
-    mFootprint = mComponentInstance.getBoard().getProject().getLibrary().getFootprint(footprintUuid);
+    // TODO
+    /*QUuid footprintUuid = mDeviceInstance.getLibPackage().getFootprintUuid();
+    mFootprint = mDeviceInstance.getBoard().getProject().getLibrary().getFootprint(footprintUuid);
     if (!mFootprint)
     {
         throw RuntimeError(__FILE__, __LINE__, footprintUuid.toString(),
@@ -68,12 +69,12 @@ void BI_Footprint::init() throw (Exception)
     }
 
     mGraphicsItem = new BGI_Footprint(*this);
-    mGraphicsItem->setPos(mComponentInstance.getPosition().toPxQPointF());
-    mGraphicsItem->setRotation(-mComponentInstance.getRotation().toDeg());
-    if (mComponentInstance.getIsMirrored())
+    mGraphicsItem->setPos(mDeviceInstance.getPosition().toPxQPointF());
+    mGraphicsItem->setRotation(-mDeviceInstance.getRotation().toDeg());
+    if (mDeviceInstance.getIsMirrored())
         mGraphicsItem->setTransform(QTransform::fromScale(qreal(-1), qreal(1)), true);
 
-    const library::Component& libComp = mComponentInstance.getLibComponent();
+    const library::Device& libDev = mDeviceInstance.getLibDevice();
     foreach (const library::FootprintPad* libPad, mFootprint->getPads())
     {
         BI_FootprintPad* pad = new BI_FootprintPad(*this, libPad->getUuid());
@@ -83,34 +84,34 @@ void BI_Footprint::init() throw (Exception)
                 QString(tr("The footprint pad UUID \"%1\" is defined multiple times."))
                 .arg(libPad->getUuid().toString()));
         }
-        if (!libComp.getPadSignalMap().contains(libPad->getUuid()))
+        if (!libDev.getPadSignalMap().contains(libPad->getUuid()))
         {
             throw RuntimeError(__FILE__, __LINE__, libPad->getUuid().toString(),
-                QString(tr("Footprint pad \"%1\" not found in pad-signal-map of component \"%2\"."))
-                .arg(libPad->getUuid().toString(), libComp.getUuid().toString()));
+                QString(tr("Footprint pad \"%1\" not found in pad-signal-map of device \"%2\"."))
+                .arg(libPad->getUuid().toString(), libDev.getUuid().toString()));
         }
         mPads.insert(libPad->getUuid(), pad);
     }
-    if (mPads.count() != libComp.getPadSignalMap().count())
+    if (mPads.count() != libDev.getPadSignalMap().count())
     {
         throw RuntimeError(__FILE__, __LINE__,
-            QString("%1!=%2").arg(mPads.count()).arg(libComp.getPadSignalMap().count()),
+            QString("%1!=%2").arg(mPads.count()).arg(libDev.getPadSignalMap().count()),
             QString(tr("The pad count of the footprint \"%1\" does not match with "
-            "the pad-signal-map of component \"%2\".")).arg(mFootprint->getUuid().toString(),
-            libComp.getUuid().toString()));
+            "the pad-signal-map of device \"%2\".")).arg(mFootprint->getUuid().toString(),
+            libDev.getUuid().toString()));
     }
 
-    // connect to the "attributes changed" signal of component instance
-    connect(&mComponentInstance, &ComponentInstance::attributesChanged,
-            this, &BI_Footprint::componentInstanceAttributesChanged);
-    connect(&mComponentInstance, &ComponentInstance::moved,
-            this, &BI_Footprint::componentInstanceMoved);
-    connect(&mComponentInstance, &ComponentInstance::rotated,
-            this, &BI_Footprint::componentInstanceRotated);
-    connect(&mComponentInstance, &ComponentInstance::mirrored,
-            this, &BI_Footprint::componentInstanceMirrored);
+    // connect to the "attributes changed" signal of device instance
+    connect(&mDeviceInstance, &DeviceInstance::attributesChanged,
+            this, &BI_Footprint::deviceInstanceAttributesChanged);
+    connect(&mDeviceInstance, &DeviceInstance::moved,
+            this, &BI_Footprint::deviceInstanceMoved);
+    connect(&mDeviceInstance, &DeviceInstance::rotated,
+            this, &BI_Footprint::deviceInstanceRotated);
+    connect(&mDeviceInstance, &DeviceInstance::mirrored,
+            this, &BI_Footprint::deviceInstanceMirrored);
 
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);*/
 }
 
 BI_Footprint::~BI_Footprint() noexcept
@@ -125,17 +126,17 @@ BI_Footprint::~BI_Footprint() noexcept
 
 Project& BI_Footprint::getProject() const noexcept
 {
-    return mComponentInstance.getProject();
+    return mDeviceInstance.getProject();
 }
 
 Board& BI_Footprint::getBoard() const noexcept
 {
-    return mComponentInstance.getBoard();
+    return mDeviceInstance.getBoard();
 }
 
 const Angle& BI_Footprint::getRotation() const noexcept
 {
-    return mComponentInstance.getRotation();
+    return mDeviceInstance.getRotation();
 }
 
 /*****************************************************************************************
@@ -173,10 +174,10 @@ XmlDomElement* BI_Footprint::serializeToXmlDomElement() const throw (Exception)
 
 Point BI_Footprint::mapToScene(const Point& relativePos) const noexcept
 {
-    if (mComponentInstance.getIsMirrored())
-        return (mComponentInstance.getPosition() + relativePos.mirrored(Qt::Horizontal)).rotated(mComponentInstance.getRotation(), mComponentInstance.getPosition());
+    if (mDeviceInstance.getIsMirrored())
+        return (mDeviceInstance.getPosition() + relativePos.mirrored(Qt::Horizontal)).rotated(mDeviceInstance.getRotation(), mDeviceInstance.getPosition());
     else
-        return (mComponentInstance.getPosition() + relativePos).rotated(mComponentInstance.getRotation(), mComponentInstance.getPosition());
+        return (mDeviceInstance.getPosition() + relativePos).rotated(mDeviceInstance.getRotation(), mDeviceInstance.getPosition());
 }
 
 bool BI_Footprint::getAttributeValue(const QString& attrNS, const QString& attrKey,
@@ -184,7 +185,7 @@ bool BI_Footprint::getAttributeValue(const QString& attrNS, const QString& attrK
 {
     // no local attributes available
     if (passToParents)
-        return mComponentInstance.getAttributeValue(attrNS, attrKey, true, value);
+        return mDeviceInstance.getAttributeValue(attrNS, attrKey, true, value);
     else
         return false;
 }
@@ -195,12 +196,12 @@ bool BI_Footprint::getAttributeValue(const QString& attrNS, const QString& attrK
 
 const Point& BI_Footprint::getPosition() const noexcept
 {
-    return mComponentInstance.getPosition();
+    return mDeviceInstance.getPosition();
 }
 
 bool BI_Footprint::getIsMirrored() const noexcept
 {
-    return mComponentInstance.getIsMirrored();
+    return mDeviceInstance.getIsMirrored();
 }
 
 QPainterPath BI_Footprint::getGrabAreaScenePx() const noexcept
@@ -220,12 +221,12 @@ void BI_Footprint::setSelected(bool selected) noexcept
  *  Private Slots
  ****************************************************************************************/
 
-void BI_Footprint::componentInstanceAttributesChanged()
+void BI_Footprint::deviceInstanceAttributesChanged()
 {
     mGraphicsItem->updateCacheAndRepaint();
 }
 
-void BI_Footprint::componentInstanceMoved(const Point& pos)
+void BI_Footprint::deviceInstanceMoved(const Point& pos)
 {
     mGraphicsItem->setPos(pos.toPxQPointF());
     mGraphicsItem->updateCacheAndRepaint();
@@ -233,7 +234,7 @@ void BI_Footprint::componentInstanceMoved(const Point& pos)
         pad->updatePosition();
 }
 
-void BI_Footprint::componentInstanceRotated(const Angle& rot)
+void BI_Footprint::deviceInstanceRotated(const Angle& rot)
 {
     mGraphicsItem->setRotation(-rot.toDeg());
     mGraphicsItem->updateCacheAndRepaint();
@@ -241,7 +242,7 @@ void BI_Footprint::componentInstanceRotated(const Angle& rot)
         pad->updatePosition();
 }
 
-void BI_Footprint::componentInstanceMirrored(bool mirrored)
+void BI_Footprint::deviceInstanceMirrored(bool mirrored)
 {
     bool m = (mGraphicsItem->transform().m11() * mGraphicsItem->transform().m22() < qreal(0));
     if (mirrored != m) mGraphicsItem->setTransform(QTransform::fromScale(qreal(-1), qreal(1)), true);

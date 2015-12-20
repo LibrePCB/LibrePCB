@@ -17,69 +17,68 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDCOMPONENTINSTANCEEDIT_H
-#define PROJECT_CMDCOMPONENTINSTANCEEDIT_H
+#ifndef PROJECT_CMDDEVICEINSTANCEADD_H
+#define PROJECT_CMDDEVICEINSTANCEADD_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include <librepcbcommon/undocommand.h>
 #include <librepcbcommon/units/all_length_units.h>
+#include <librepcbcommon/undocommand.h>
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
 namespace project {
-class ComponentInstance;
+class Board;
+class GenCompInstance;
+class DeviceInstance;
+}
+
+namespace library {
+class Device;
 }
 
 /*****************************************************************************************
- *  Class CmdComponentInstanceEdit
+ *  Class CmdDeviceInstanceAdd
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The CmdComponentInstanceEdit class
+ * @brief The CmdDeviceInstanceAdd class
  */
-class CmdComponentInstanceEdit final : public UndoCommand
+class CmdDeviceInstanceAdd final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdComponentInstanceEdit(ComponentInstance& cmp, UndoCommand* parent = 0) throw (Exception);
-        ~CmdComponentInstanceEdit() noexcept;
+        explicit CmdDeviceInstanceAdd(Board& board, GenCompInstance& comp,
+                                      const QUuid& deviceUuid,
+                                      const Point& position = Point(),
+                                      const Angle& rotation = Angle(), UndoCommand* parent = 0) throw (Exception);
+        explicit CmdDeviceInstanceAdd(DeviceInstance& device, UndoCommand* parent = 0) throw (Exception);
+        ~CmdDeviceInstanceAdd() noexcept;
 
-        // General Methods
-        void setPosition(Point& pos, bool immediate) noexcept;
-        void setDeltaToStartPos(Point& deltaPos, bool immediate) noexcept;
-        void setRotation(const Angle& angle, bool immediate) noexcept;
-        void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
-        void setMirrored(bool mirrored, bool immediate) noexcept;
-        void mirror(const Point& center, bool vertical, bool immediate) noexcept;
+        // Getters
+        DeviceInstance* getDeviceInstance() const noexcept {return mDeviceInstance;}
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;
         void undo() throw (Exception) override;
 
-
     private:
 
         // Attributes from the constructor
-        ComponentInstance& mComponent;
+        Board& mBoard;
 
-        // General Attributes
-        Point mOldPos;
-        Point mNewPos;
-        Angle mOldRotation;
-        Angle mNewRotation;
-        bool mOldMirrored;
-        bool mNewMirrored;
+        /// @brief The created device instance
+        DeviceInstance* mDeviceInstance;
 };
 
 } // namespace project
 
-#endif // PROJECT_CMDCOMPONENTINSTANCEEDIT_H
+#endif // PROJECT_CMDDEVICEINSTANCEADD_H

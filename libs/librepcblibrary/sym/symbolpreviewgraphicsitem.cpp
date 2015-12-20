@@ -29,7 +29,7 @@
 #include <librepcbcommon/schematiclayer.h>
 #include <librepcbcommon/if_schematiclayerprovider.h>
 #include "symbolpinpreviewgraphicsitem.h"
-#include "../gencmp/genericcomponent.h"
+#include "../cmp/component.h"
 
 namespace library {
 
@@ -40,7 +40,7 @@ namespace library {
 SymbolPreviewGraphicsItem::SymbolPreviewGraphicsItem(const IF_SchematicLayerProvider& layerProvider,
                                                      const QStringList& localeOrder,
                                                      const Symbol& symbol,
-                                                     const GenericComponent* genComp,
+                                                     const Component* genComp,
                                                      const QUuid& symbVarUuid,
                                                      const QUuid& symbVarItemUuid) noexcept :
     GraphicsItem(), mLayerProvider(layerProvider), mSymbol(symbol), mGenComp(genComp),
@@ -57,8 +57,8 @@ SymbolPreviewGraphicsItem::SymbolPreviewGraphicsItem(const IF_SchematicLayerProv
 
     foreach (const SymbolPin* pin, symbol.getPins())
     {
-        const GenCompSignal* signal = nullptr;
-        GenCompSymbVarItem::PinDisplayType_t displayType = GenCompSymbVarItem::PinDisplayType_t::PinName;
+        const ComponentSignal* signal = nullptr;
+        ComponentSymbolVariantItem::PinDisplayType_t displayType = ComponentSymbolVariantItem::PinDisplayType_t::PinName;
         if (mGenComp) signal = mGenComp->getSignalOfPin(symbVarUuid, symbVarItemUuid, pin->getUuid());
         if (mSymbVarItem) displayType = mSymbVarItem->getDisplayTypeOfPin(pin->getUuid());
         SymbolPinPreviewGraphicsItem* item = new SymbolPinPreviewGraphicsItem(layerProvider, localeOrder, *pin, signal, displayType);

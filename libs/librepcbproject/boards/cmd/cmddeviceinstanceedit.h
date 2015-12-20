@@ -17,69 +17,69 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDCOMPONENTINSTANCEADD_H
-#define PROJECT_CMDCOMPONENTINSTANCEADD_H
+#ifndef PROJECT_CMDDEVICEINSTANCEEDIT_H
+#define PROJECT_CMDDEVICEINSTANCEEDIT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include <librepcbcommon/units/all_length_units.h>
 #include <librepcbcommon/undocommand.h>
+#include <librepcbcommon/units/all_length_units.h>
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
 namespace project {
-class Board;
-class GenCompInstance;
-class ComponentInstance;
-}
-
-namespace library {
-class Component;
+class DeviceInstance;
 }
 
 /*****************************************************************************************
- *  Class CmdComponentInstanceAdd
+ *  Class CmdDeviceInstanceEdit
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The CmdComponentInstanceAdd class
+ * @brief The CmdDeviceInstanceEdit class
  */
-class CmdComponentInstanceAdd final : public UndoCommand
+class CmdDeviceInstanceEdit final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdComponentInstanceAdd(Board& board, GenCompInstance& genComp,
-                                         const QUuid& componentUuid,
-                                         const Point& position = Point(),
-                                         const Angle& rotation = Angle(), UndoCommand* parent = 0) throw (Exception);
-        explicit CmdComponentInstanceAdd(ComponentInstance& component, UndoCommand* parent = 0) throw (Exception);
-        ~CmdComponentInstanceAdd() noexcept;
+        explicit CmdDeviceInstanceEdit(DeviceInstance& dev, UndoCommand* parent = 0) throw (Exception);
+        ~CmdDeviceInstanceEdit() noexcept;
 
-        // Getters
-        ComponentInstance* getComponentInstance() const noexcept {return mComponentInstance;}
+        // General Methods
+        void setPosition(Point& pos, bool immediate) noexcept;
+        void setDeltaToStartPos(Point& deltaPos, bool immediate) noexcept;
+        void setRotation(const Angle& angle, bool immediate) noexcept;
+        void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
+        void setMirrored(bool mirrored, bool immediate) noexcept;
+        void mirror(const Point& center, bool vertical, bool immediate) noexcept;
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;
         void undo() throw (Exception) override;
 
+
     private:
 
         // Attributes from the constructor
-        Board& mBoard;
-        //const library::Component& mComponent;
+        DeviceInstance& mDevice;
 
-        /// @brief The created component instance
-        ComponentInstance* mComponentInstance;
+        // General Attributes
+        Point mOldPos;
+        Point mNewPos;
+        Angle mOldRotation;
+        Angle mNewRotation;
+        bool mOldMirrored;
+        bool mNewMirrored;
 };
 
 } // namespace project
 
-#endif // PROJECT_CMDCOMPONENTINSTANCEADD_H
+#endif // PROJECT_CMDDEVICEINSTANCEEDIT_H

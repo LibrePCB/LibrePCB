@@ -17,47 +17,67 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_MODEL3D_H
-#define LIBRARY_MODEL3D_H
+#ifndef LIBRARY_PACKAGEPAD_H
+#define LIBRARY_PACKAGEPAD_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include "../libraryelement.h"
+#include <librepcbcommon/fileio/if_xmlserializableobject.h>
 
 /*****************************************************************************************
- *  Class Model3D
+ *  Class PackagePad
  ****************************************************************************************/
 
 namespace library {
 
 /**
- * @brief The Model3D class
+ * @brief The PackagePad class
  */
-class Model3D final : public LibraryElement
+class PackagePad final : public IF_XmlSerializableObject
 {
-        Q_OBJECT
+        Q_DECLARE_TR_FUNCTIONS(PackagePad)
 
     public:
 
-        explicit Model3D(const FilePath& elementDirectory);
-        virtual ~Model3D();
+        // Constructors / Destructor
+        explicit PackagePad(const QUuid& uuid = QUuid::createUuid(),
+                            const QString& name = QString()) noexcept;
+        explicit PackagePad(const XmlDomElement& domElement) throw (Exception);
+        ~PackagePad() noexcept;
+
+        // Getters
+        const QUuid& getUuid() const noexcept {return mUuid;}
+        QString getName() const noexcept {return mName;}
+
+        // Setters
+        void setName(const QString& name) noexcept;
+
+        // General Methods
+
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+
 
     private:
 
         // make some methods inaccessible...
-        Model3D();
-        Model3D(const Model3D& other);
-        Model3D& operator=(const Model3D& rhs);
-
+        PackagePad(const PackagePad& other);
+        PackagePad& operator=(const PackagePad& rhs);
 
         // Private Methods
-        void parseDomTree(const XmlDomElement& root) throw (Exception);
 
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
+
+
+        // Pin Attributes
+        QUuid mUuid;
+        QString mName;
 };
 
 } // namespace library
 
-#endif // LIBRARY_MODEL3D_H
+#endif // LIBRARY_PACKAGEPAD_H

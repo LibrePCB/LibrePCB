@@ -23,7 +23,7 @@
 
 #include <QtCore>
 #include <librepcblibrary/sym/symbol.h>
-#include <librepcblibrary/fpt/footprint.h>
+#include <librepcblibrary/pkg/footprint.h>
 #include "polygonsimplifier.h"
 
 
