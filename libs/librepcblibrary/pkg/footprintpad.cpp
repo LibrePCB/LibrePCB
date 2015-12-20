@@ -49,21 +49,11 @@ FootprintPad::FootprintPad(const XmlDomElement& domElement) throw (Exception) :
     mRotation = domElement.getAttribute<Angle>("rotation");
     mWidth = domElement.getAttribute<Length>("width");
     mHeight = domElement.getAttribute<Length>("height");
-    if (domElement.hasAttribute("drill")) {
-        // TODO: remove this
-        mDrillDiameter = domElement.getAttribute<Length>("drill");
-    } else {
-        mDrillDiameter = domElement.getAttribute<Length>("tht_drill");
-    }
-    if (domElement.hasAttribute("layer")) {
-        // TODO: remove this
-        mLayerId = domElement.getAttribute<uint>("layer"); // use "uint" to automatically check for >= 0
-    } else {
-        if (domElement.getAttribute("smt_side", true) == "bottom")
-            mLayerId = BoardLayer::BottomCopper;
-        else
-            mLayerId = BoardLayer::TopCopper;
-    }
+    mDrillDiameter = domElement.getAttribute<Length>("tht_drill");
+    if (domElement.getAttribute("smt_side", true) == "bottom")
+        mLayerId = BoardLayer::BottomCopper;
+    else
+        mLayerId = BoardLayer::TopCopper;
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -122,7 +112,6 @@ FootprintPad::Type_t FootprintPad::stringToType(const QString& type) throw (Exce
     if      (type == QLatin1String("tht_rect"))     return Type_t::ThtRect;
     else if (type == QLatin1String("tht_octagon"))  return Type_t::ThtOctagon;
     else if (type == QLatin1String("tht_round"))    return Type_t::ThtRound;
-    else if (type == QLatin1String("smd_rect"))     return Type_t::SmtRect; // TODO: remove this
     else if (type == QLatin1String("smt_rect"))     return Type_t::SmtRect;
     else throw RuntimeError(__FILE__, __LINE__, type, type);
 }

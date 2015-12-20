@@ -273,21 +273,10 @@ void Component::parseDomTree(const XmlDomElement& root) throw (Exception)
     }
 
     // Load default values in all available languages
-    if (root.getFirstChild("properties/default_values", true, false)) {
-        // TODO: remove this
-        readLocaleDomNodes(*root.getFirstChild("properties/default_values", true, true),
-                           "value", mDefaultValues);
-    } else {
-        readLocaleDomNodes(*root.getFirstChild("properties", true, true), "value", mDefaultValues);
-    }
+    readLocaleDomNodes(*root.getFirstChild("properties", true, true), "value", mDefaultValues);
 
     // Load all prefixes
-    XmlDomElement* removeThis = root.getFirstChild("properties/prefixes/prefix", false, false);
-    if (!removeThis) {
-        // TODO: remove this
-        removeThis = root.getFirstChild("properties/prefix", true, false);
-    }
-    for (XmlDomElement* node = removeThis;
+    for (XmlDomElement* node = root.getFirstChild("properties/prefix", true, false);
          node; node = node->getNextSibling("prefix"))
     {
         if (mPrefixes.contains(node->getAttribute("norm")))

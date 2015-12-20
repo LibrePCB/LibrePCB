@@ -43,18 +43,12 @@ ComponentSignal::ComponentSignal(const XmlDomElement& domElement) throw (Excepti
 {
     // read attributes
     mUuid = domElement.getAttribute<QUuid>("uuid");
+    mName = domElement.getText(true);
     mRole = stringToSignalRole(domElement.getAttribute("role"));
     mForcedNetName = domElement.getAttribute("forced_net_name");
     mIsRequired = domElement.getAttribute<bool>("required");
     mIsNegated = domElement.getAttribute<bool>("negated");
     mIsClock = domElement.getAttribute<bool>("clock");
-
-    if (domElement.hasChilds()) {
-        // TODO: remove this
-        mName = domElement.getFirstChild("name", true)->getText(true);
-    } else {
-        mName = domElement.getText(true);
-    }
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }

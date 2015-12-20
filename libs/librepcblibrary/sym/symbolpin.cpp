@@ -42,12 +42,7 @@ SymbolPin::SymbolPin(const XmlDomElement& domElement) throw (Exception) :
 {
     // read attributes
     mUuid = domElement.getAttribute<QUuid>("uuid");
-    if (domElement.hasChilds()) {
-        // TODO: remove this
-        mName = domElement.getFirstChild("name")->getText(true);
-    } else {
-        mName = domElement.getText(true);
-    }
+    mName = domElement.getText(true);
     mPosition.setX(domElement.getAttribute<Length>("x"));
     mPosition.setY(domElement.getAttribute<Length>("y"));
     mLength = domElement.getAttribute<Length>("length");

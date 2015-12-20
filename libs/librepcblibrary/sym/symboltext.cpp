@@ -39,13 +39,7 @@ SymbolText::SymbolText() noexcept :
 SymbolText::SymbolText(const XmlDomElement& domElement) throw (Exception)
 {
     mLayerId = domElement.getAttribute<uint>("layer"); // use "uint" to automatically check for >= 0
-
-    if (domElement.hasAttribute("text")) {
-        // TODO: remove this
-        mText = domElement.getAttribute("text", true);
-    } else {
-        mText = domElement.getText(true);
-    }
+    mText = domElement.getText(true);
 
     // load geometry attributes
     mPosition.setX(domElement.getAttribute<Length>("x"));

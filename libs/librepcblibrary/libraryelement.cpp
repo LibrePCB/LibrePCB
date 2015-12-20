@@ -60,19 +60,10 @@ void LibraryElement::parseDomTree(const XmlDomElement& root) throw (Exception)
     LibraryBaseElement::parseDomTree(root);
 
     // read category UUIDs
-    if (root.getFirstChild("categories/category", false, false)) {
-        // TODO: remove this
-        for (XmlDomElement* node = root.getFirstChild("categories/category", true, false);
-             node; node = node->getNextSibling("category"))
-        {
-            mCategories.append(node->getText<QUuid>());
-        }
-    } else {
-        for (XmlDomElement* node = root.getFirstChild("meta/category", true, false);
-             node; node = node->getNextSibling("category"))
-        {
-            mCategories.append(node->getText<QUuid>());
-        }
+    for (XmlDomElement* node = root.getFirstChild("meta/category", true, false);
+         node; node = node->getNextSibling("category"))
+    {
+        mCategories.append(node->getText<QUuid>());
     }
 }
 

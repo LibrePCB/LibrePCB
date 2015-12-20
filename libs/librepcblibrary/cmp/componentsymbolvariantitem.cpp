@@ -68,8 +68,6 @@ ComponentSymbolVariantItem::ComponentSymbolVariantItem(const XmlDomElement& domE
             item.displayType = PinDisplayType_t::PinName;
         else if (node->getAttribute("display") == "component_signal")
             item.displayType = PinDisplayType_t::ComponentSignal;
-        else if (node->getAttribute("display") == "gen_comp_signal")
-            item.displayType = PinDisplayType_t::ComponentSignal; // TODO: remove this
         else if (node->getAttribute("display") == "net_signal")
             item.displayType = PinDisplayType_t::NetSignal;
         else
@@ -78,12 +76,7 @@ ComponentSymbolVariantItem::ComponentSymbolVariantItem(const XmlDomElement& domE
                 QString(tr("Invalid pin display type \"%1\" found in \"%2\"."))
                 .arg(node->getAttribute("display"), domElement.getDocFilePath().toNative()));
         }
-        if (node->hasAttribute("signal")) {
-            // TODO: remove this
-            item.signal = node->getAttribute<QUuid>("signal", false, QUuid());
-        } else {
-            item.signal = QUuid(node->getText(false));
-        }
+        item.signal = node->getText<QUuid>(false);
         mPinSignalMap.insert(item.pin, item);
     }
 
