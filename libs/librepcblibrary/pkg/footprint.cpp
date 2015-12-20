@@ -53,20 +53,6 @@ Footprint::Footprint(const XmlDomElement& domElement) throw (Exception)
         LibraryBaseElement::readLocaleDomNodes(domElement, "name", mNames);
         LibraryBaseElement::readLocaleDomNodes(domElement, "description", mDescriptions);
 
-        // Load all pads
-        for (XmlDomElement* node = domElement.getFirstChild("pads/pad", true, false);
-             node; node = node->getNextSibling("pad"))
-        {
-            FootprintPad* pad = new FootprintPad(*node);
-            if (mPads.contains(pad->getPadUuid()))
-            {
-                throw RuntimeError(__FILE__, __LINE__, pad->getPadUuid().toString(),
-                    QString(tr("The pad \"%1\" exists multiple times in \"%2\"."))
-                    .arg(pad->getPadUuid().toString(), domElement.getDocFilePath().toNative()));
-            }
-            mPads.insert(pad->getPadUuid(), pad);
-        }
-
         // Load all geometry elements
         for (XmlDomElement* node = domElement.getFirstChild("geometry/*", true, false);
              node; node = node->getNextSibling())
@@ -90,6 +76,17 @@ Footprint::Footprint(const XmlDomElement& domElement) throw (Exception)
                 hole->pos.setY(node->getAttribute<Length>("y", true));
                 hole->diameter = node->getAttribute<Length>("diameter", true);
                 mHoles.append(hole);
+            }
+            else if (node->getName() == "pad")
+            {
+                FootprintPad* pad = new FootprintPad(*node);
+                if (mPads.contains(pad->getPadUuid()))
+                {
+                    throw RuntimeError(__FILE__, __LINE__, pad->getPadUuid().toString(),
+                        QString(tr("The pad \"%1\" exists multiple times in \"%2\"."))
+                        .arg(pad->getPadUuid().toString(), domElement.getDocFilePath().toNative()));
+                }
+                mPads.insert(pad->getPadUuid(), pad);
             }
             else
             {
@@ -164,9 +161,8 @@ XmlDomElement* Footprint::serializeToXmlDomElement() const throw (Exception)
         child->setAttribute("y", hole->pos.getY());
         child->setAttribute("diameter", hole->diameter);
     }
-    XmlDomElement* pads = root->appendChild("pads");
     foreach (const FootprintPad* pad, mPads)
-        pads->appendChild(pad->serializeToXmlDomElement());
+        geometry->appendChild(pad->serializeToXmlDomElement());
     return root.take();
 }
 

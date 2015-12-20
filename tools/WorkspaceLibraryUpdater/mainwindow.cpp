@@ -92,7 +92,7 @@ void MainWindow::on_updateBtn_clicked()
         while (it.hasNext())
         {
             FilePath dirFilePath(it.next());
-            if (dirFilePath.getBasename() == "{00000000-0000-4001-8000-000000000000}")
+            if (dirFilePath.getBasename() == "00000000-0000-4001-8000-000000000000")
             {
                 // ignore demo files as they contain documentation which would be removed
                 ignoreCount++;

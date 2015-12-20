@@ -47,8 +47,7 @@ SGI_SymbolPin::SGI_SymbolPin(SI_SymbolPin& pin) noexcept :
     SGI_Base(), mPin(pin), mLibPin(pin.getLibPin())
 {
     setZValue(Schematic::ZValue_Symbols);
-    QStringList localeOrder = mPin.getSymbol().getSchematic().getProject().getSettings().getLocaleOrder();
-    setToolTip(mLibPin.getName(localeOrder) % ": " % mLibPin.getDescription(localeOrder));
+    setToolTip(mLibPin.getName());
 
     mStaticText.setTextFormat(Qt::PlainText);
     mStaticText.setPerformanceHint(QStaticText::AggressiveCaching);

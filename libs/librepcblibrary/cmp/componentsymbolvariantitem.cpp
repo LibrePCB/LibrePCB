@@ -56,7 +56,6 @@ ComponentSymbolVariantItem::ComponentSymbolVariantItem(const XmlDomElement& domE
     {
         PinSignalMapItem_t item;
         item.pin = node->getAttribute<QUuid>("pin");
-        item.signal = node->getAttribute<QUuid>("signal", false, QUuid());
         if (mPinSignalMap.contains(item.pin))
         {
             throw RuntimeError(__FILE__, __LINE__, item.pin.toString(),
@@ -69,6 +68,8 @@ ComponentSymbolVariantItem::ComponentSymbolVariantItem(const XmlDomElement& domE
             item.displayType = PinDisplayType_t::PinName;
         else if (node->getAttribute("display") == "component_signal")
             item.displayType = PinDisplayType_t::ComponentSignal;
+        else if (node->getAttribute("display") == "gen_comp_signal")
+            item.displayType = PinDisplayType_t::ComponentSignal; // TODO: remove this
         else if (node->getAttribute("display") == "net_signal")
             item.displayType = PinDisplayType_t::NetSignal;
         else
@@ -76,6 +77,12 @@ ComponentSymbolVariantItem::ComponentSymbolVariantItem(const XmlDomElement& domE
             throw RuntimeError(__FILE__, __LINE__, node->getAttribute("display"),
                 QString(tr("Invalid pin display type \"%1\" found in \"%2\"."))
                 .arg(node->getAttribute("display"), domElement.getDocFilePath().toNative()));
+        }
+        if (node->hasAttribute("signal")) {
+            // TODO: remove this
+            item.signal = node->getAttribute<QUuid>("signal", false, QUuid());
+        } else {
+            item.signal = QUuid(node->getText(false));
         }
         mPinSignalMap.insert(item.pin, item);
     }
@@ -130,7 +137,6 @@ XmlDomElement* ComponentSymbolVariantItem::serializeToXmlDomElement() const thro
     {
         XmlDomElement* child = pin_signal_map->appendChild("map");
         child->setAttribute("pin", item.pin);
-        child->setAttribute("signal", item.signal);
         switch (item.displayType)
         {
             case PinDisplayType_t::None:            child->setAttribute<QString>("display", "none"); break;
@@ -139,6 +145,7 @@ XmlDomElement* ComponentSymbolVariantItem::serializeToXmlDomElement() const thro
             case PinDisplayType_t::NetSignal:       child->setAttribute<QString>("display", "net_signal"); break;
             default: throw LogicError(__FILE__, __LINE__);
         }
+        child->setText(item.signal.isNull() ? QString() : item.signal.toString());
     }
     return root.take();
 }

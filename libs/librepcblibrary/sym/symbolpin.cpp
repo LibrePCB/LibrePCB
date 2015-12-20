@@ -24,7 +24,6 @@
 #include <QtCore>
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include "symbolpin.h"
-#include "../librarybaseelement.h"
 
 namespace library {
 
@@ -32,13 +31,10 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SymbolPin::SymbolPin(const QUuid& uuid, const QString& name_en_US,
-                     const QString& description_en_US) noexcept :
-    mUuid(uuid), mPosition(0, 0), mLength(0), mRotation(0)
+SymbolPin::SymbolPin(const QUuid& uuid, const QString& name) noexcept :
+    mUuid(uuid), mName(name), mPosition(0, 0), mLength(0), mRotation(0)
 {
     Q_ASSERT(mUuid.isNull() == false);
-    mNames.insert("en_US", name_en_US);
-    mDescriptions.insert("en_US", description_en_US);
 }
 
 SymbolPin::SymbolPin(const XmlDomElement& domElement) throw (Exception) :
@@ -46,14 +42,16 @@ SymbolPin::SymbolPin(const XmlDomElement& domElement) throw (Exception) :
 {
     // read attributes
     mUuid = domElement.getAttribute<QUuid>("uuid");
+    if (domElement.hasChilds()) {
+        // TODO: remove this
+        mName = domElement.getFirstChild("name")->getText(true);
+    } else {
+        mName = domElement.getText(true);
+    }
     mPosition.setX(domElement.getAttribute<Length>("x"));
     mPosition.setY(domElement.getAttribute<Length>("y"));
     mLength = domElement.getAttribute<Length>("length");
     mRotation = domElement.getAttribute<Angle>("rotation");
-
-    // read names and descriptions in all available languages
-    LibraryBaseElement::readLocaleDomNodes(domElement, "name", mNames);
-    LibraryBaseElement::readLocaleDomNodes(domElement, "description", mDescriptions);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -63,22 +61,13 @@ SymbolPin::~SymbolPin() noexcept
 }
 
 /*****************************************************************************************
- *  Getters
- ****************************************************************************************/
-
-QString SymbolPin::getName(const QStringList& localeOrder) const noexcept
-{
-    return LibraryBaseElement::localeStringFromList(mNames, localeOrder);
-}
-
-QString SymbolPin::getDescription(const QStringList& localeOrder) const noexcept
-{
-    return LibraryBaseElement::localeStringFromList(mDescriptions, localeOrder);
-}
-
-/*****************************************************************************************
  *  Setters
  ****************************************************************************************/
+
+void SymbolPin::setName(const QString& name) noexcept
+{
+    mName = name;
+}
 
 void SymbolPin::setPosition(const Point& pos) noexcept
 {
@@ -95,16 +84,6 @@ void SymbolPin::setRotation(const Angle& rotation) noexcept
     mRotation = rotation;
 }
 
-void SymbolPin::setName(const QString& locale, const QString& name) noexcept
-{
-    mNames.insert(locale, name);
-}
-
-void SymbolPin::setDescription(const QString& locale, const QString& description) noexcept
-{
-    mDescriptions.insert(locale, description);
-}
-
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
@@ -119,10 +98,7 @@ XmlDomElement* SymbolPin::serializeToXmlDomElement() const throw (Exception)
     root->setAttribute("y", mPosition.getY().toMmString());
     root->setAttribute("length", mLength.toMmString());
     root->setAttribute("rotation", mRotation.toDegString());
-    foreach (const QString& locale, mNames.keys())
-        root->appendTextChild("name", mNames.value(locale))->setAttribute("locale", locale);
-    foreach (const QString& locale, mDescriptions.keys())
-        root->appendTextChild("description", mDescriptions.value(locale))->setAttribute("locale", locale);
+    root->setText(mName);
     return root.take();
 }
 
@@ -132,10 +108,9 @@ XmlDomElement* SymbolPin::serializeToXmlDomElement() const throw (Exception)
 
 bool SymbolPin::checkAttributesValidity() const noexcept
 {
-    if (mUuid.isNull())                     return false;
-    if (mLength < 0)                        return false;
-    if (mNames.value("en_US").isEmpty())    return false;
-    if (!mDescriptions.contains("en_US"))   return false;
+    if (mUuid.isNull())     return false;
+    if (mLength < 0)        return false;
+    if (mName.isEmpty())    return false;
     return true;
 }
 

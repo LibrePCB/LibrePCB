@@ -60,19 +60,27 @@ void LibraryElement::parseDomTree(const XmlDomElement& root) throw (Exception)
     LibraryBaseElement::parseDomTree(root);
 
     // read category UUIDs
-    for (XmlDomElement* node = root.getFirstChild("categories/category", true, false);
-         node; node = node->getNextSibling("category"))
-    {
-        mCategories.append(node->getText<QUuid>());
+    if (root.getFirstChild("categories/category", false, false)) {
+        // TODO: remove this
+        for (XmlDomElement* node = root.getFirstChild("categories/category", true, false);
+             node; node = node->getNextSibling("category"))
+        {
+            mCategories.append(node->getText<QUuid>());
+        }
+    } else {
+        for (XmlDomElement* node = root.getFirstChild("meta/category", true, false);
+             node; node = node->getNextSibling("category"))
+        {
+            mCategories.append(node->getText<QUuid>());
+        }
     }
 }
 
 XmlDomElement* LibraryElement::serializeToXmlDomElement() const throw (Exception)
 {
     QScopedPointer<XmlDomElement> root(LibraryBaseElement::serializeToXmlDomElement());
-    XmlDomElement* categories = root->appendChild("categories");
     foreach (const QUuid& uuid, mCategories)
-        categories->appendTextChild("category", uuid.toString());
+        root->getFirstChild("meta", true)->appendTextChild("category", uuid.toString());
     return root.take();
 }
 

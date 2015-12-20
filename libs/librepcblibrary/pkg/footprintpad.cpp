@@ -23,6 +23,7 @@
 
 #include <QtCore>
 #include <librepcbcommon/fileio/xmldomelement.h>
+#include <librepcbcommon/boardlayer.h>
 #include "footprintpad.h"
 
 namespace library {
@@ -48,8 +49,21 @@ FootprintPad::FootprintPad(const XmlDomElement& domElement) throw (Exception) :
     mRotation = domElement.getAttribute<Angle>("rotation");
     mWidth = domElement.getAttribute<Length>("width");
     mHeight = domElement.getAttribute<Length>("height");
-    mDrillDiameter = domElement.getAttribute<Length>("drill");
-    mLayerId = domElement.getAttribute<uint>("layer"); // use "uint" to automatically check for >= 0
+    if (domElement.hasAttribute("drill")) {
+        // TODO: remove this
+        mDrillDiameter = domElement.getAttribute<Length>("drill");
+    } else {
+        mDrillDiameter = domElement.getAttribute<Length>("tht_drill");
+    }
+    if (domElement.hasAttribute("layer")) {
+        // TODO: remove this
+        mLayerId = domElement.getAttribute<uint>("layer"); // use "uint" to automatically check for >= 0
+    } else {
+        if (domElement.getAttribute("smt_side", true) == "bottom")
+            mLayerId = BoardLayer::BottomCopper;
+        else
+            mLayerId = BoardLayer::TopCopper;
+    }
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -74,8 +88,11 @@ XmlDomElement* FootprintPad::serializeToXmlDomElement() const throw (Exception)
     root->setAttribute("rotation", mRotation);
     root->setAttribute("width", mWidth);
     root->setAttribute("height", mHeight);
-    root->setAttribute("drill", mDrillDiameter);
-    root->setAttribute("layer", mLayerId);
+    root->setAttribute("tht_drill", mDrillDiameter);
+    if (mLayerId == BoardLayer::BottomCopper)
+        root->setAttribute("smt_side", QString("bottom"));
+    else
+        root->setAttribute("smt_side", QString("top"));
     return root.take();
 }
 
@@ -85,11 +102,14 @@ XmlDomElement* FootprintPad::serializeToXmlDomElement() const throw (Exception)
 
 bool FootprintPad::checkAttributesValidity() const noexcept
 {
-    if (mPadUuid.isNull())                  return false;
-    if (typeToString(mType).isEmpty())      return false;
-    if (mWidth <= 0)                        return false;
-    if (mHeight <= 0)                       return false;
-    if (mDrillDiameter < 0)                 return false;
+    if (mPadUuid.isNull())                      return false;
+    if (typeToString(mType).isEmpty())          return false;
+    if (mWidth <= 0)                            return false;
+    if (mHeight <= 0)                           return false;
+    if (mDrillDiameter < 0)                     return false;
+    if ((mType == Type_t::SmtRect) &&
+        (mLayerId != BoardLayer::TopCopper) &&
+        (mLayerId != BoardLayer::BottomCopper)) return false;
     return true;
 }
 
@@ -102,7 +122,8 @@ FootprintPad::Type_t FootprintPad::stringToType(const QString& type) throw (Exce
     if      (type == QLatin1String("tht_rect"))     return Type_t::ThtRect;
     else if (type == QLatin1String("tht_octagon"))  return Type_t::ThtOctagon;
     else if (type == QLatin1String("tht_round"))    return Type_t::ThtRound;
-    else if (type == QLatin1String("smd_rect"))     return Type_t::SmdRect;
+    else if (type == QLatin1String("smd_rect"))     return Type_t::SmtRect; // TODO: remove this
+    else if (type == QLatin1String("smt_rect"))     return Type_t::SmtRect;
     else throw RuntimeError(__FILE__, __LINE__, type, type);
 }
 
@@ -113,7 +134,7 @@ QString FootprintPad::typeToString(Type_t type) noexcept
         case Type_t::ThtRect:       return QString("tht_rect");
         case Type_t::ThtOctagon:    return QString("tht_octagon");
         case Type_t::ThtRound:      return QString("tht_round");
-        case Type_t::SmdRect:       return QString("smd_rect");
+        case Type_t::SmtRect:       return QString("smt_rect");
         default: Q_ASSERT(false); return QString();
     }
 }

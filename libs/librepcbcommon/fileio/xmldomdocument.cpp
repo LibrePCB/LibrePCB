@@ -101,7 +101,7 @@ QByteArray XmlDomDocument::toByteArray() const noexcept
     doc.implementation().setInvalidDataPolicy(QDomImplementation::ReturnNullNode);
     doc.setContent(QString("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"));
     doc.appendChild(mRootElement->toQDomElement(doc));
-    return doc.toByteArray(4);
+    return doc.toByteArray(1); // indent only 1 space to save disk space
 }
 
 /*****************************************************************************************

@@ -55,32 +55,27 @@ class ComponentSignal final : public IF_XmlSerializableObject
 
         // Constructors / Destructor
         explicit ComponentSignal(const QUuid& uuid = QUuid::createUuid(),
-                                 const QString& name_en_US = QString(),
-                                 const QString& description_en_US = QString()) noexcept;
+                                 const QString& name = QString()) noexcept;
         explicit ComponentSignal(const XmlDomElement& domElement) throw (Exception);
         ~ComponentSignal() noexcept;
 
         // Getters
         const QUuid& getUuid() const noexcept {return mUuid;}
+        QString getName() const noexcept {return mName;}
         SignalRole_t getRole() const noexcept {return mRole;}
         const QString& getForcedNetName() const noexcept {return mForcedNetName;}
         bool isRequired() const noexcept {return mIsRequired;}
         bool isNegated() const noexcept {return mIsNegated;}
         bool isClock() const noexcept {return mIsClock;}
         bool isNetSignalNameForced() const noexcept {return !mForcedNetName.isEmpty();}
-        QString getName(const QStringList& localeOrder) const noexcept;
-        QString getDescription(const QStringList& localeOrder) const noexcept;
-        const QMap<QString, QString>& getNames() const noexcept {return mNames;}
-        const QMap<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
 
         // Setters
+        void setName(const QString& name) noexcept {mName = name;}
         void setRole(SignalRole_t role) noexcept {mRole = role;}
         void setForcedNetName(const QString& name) noexcept {mForcedNetName = name;}
         void setIsRequired(bool required) noexcept {mIsRequired = required;}
         void setIsNegated(bool negated) noexcept {mIsNegated = negated;}
         void setIsClock(bool clock) noexcept {mIsClock = clock;}
-        void setName(const QString& locale, const QString& name) noexcept {mNames[locale] = name;}
-        void setDescription(const QString& locale, const QString& desc) noexcept {mDescriptions[locale] = desc;}
 
         // General Methods
 
@@ -107,13 +102,12 @@ class ComponentSignal final : public IF_XmlSerializableObject
 
         // Signal Attributes
         QUuid mUuid;
+        QString mName;
         SignalRole_t mRole;
         QString mForcedNetName;
         bool mIsRequired;
         bool mIsNegated;
         bool mIsClock;
-        QMap<QString, QString> mNames;
-        QMap<QString, QString> mDescriptions;
 };
 
 } // namespace library

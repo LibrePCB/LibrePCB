@@ -46,6 +46,8 @@ Package::Package(const FilePath& elementDirectory) throw (Exception) :
 
 Package::~Package() noexcept
 {
+    clearPads();
+    clearFootprints();
 }
 
 /*****************************************************************************************
@@ -75,6 +77,32 @@ void Package::addPad(const PackagePad& pad) noexcept
 }
 
 /*****************************************************************************************
+ *  Footprints
+ ****************************************************************************************/
+
+const Footprint* Package::getFootprintByUuid(const QUuid& uuid) const noexcept
+{
+    foreach (const Footprint* footprint, mFootprints)
+    {
+        if (footprint->getUuid() == uuid)
+            return footprint;
+    }
+    return nullptr;
+}
+
+void Package::clearFootprints() noexcept
+{
+    qDeleteAll(mFootprints);
+    mFootprints.clear();
+}
+
+void Package::addFootprint(const Footprint& footprint) noexcept
+{
+    Q_ASSERT(getFootprintByUuid(footprint.getUuid()) == nullptr);
+    mFootprints.append(&footprint);
+}
+
+/*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
@@ -95,6 +123,20 @@ void Package::parseDomTree(const XmlDomElement& root) throw (Exception)
         }
         mPads.append(pad);
     }
+
+    // Load all footprints
+    for (XmlDomElement* node = root.getFirstChild("footprints/footprint", true, true);
+         node; node = node->getNextSibling("footprint"))
+    {
+        Footprint* footprint = new Footprint(*node);
+        if (getFootprintByUuid(footprint->getUuid()))
+        {
+            throw RuntimeError(__FILE__, __LINE__, footprint->getUuid().toString(),
+                QString(tr("The footprint \"%1\" exists multiple times in \"%2\"."))
+                .arg(footprint->getUuid().toString(), mXmlFilepath.toNative()));
+        }
+        mFootprints.append(footprint);
+    }
 }
 
 XmlDomElement* Package::serializeToXmlDomElement() const throw (Exception)
@@ -104,6 +146,9 @@ XmlDomElement* Package::serializeToXmlDomElement() const throw (Exception)
     XmlDomElement* padsNode = root->appendChild("pads");
     foreach (const PackagePad* pad, mPads)
         padsNode->appendChild(pad->serializeToXmlDomElement());
+    XmlDomElement* footprintsNode = root->appendChild("footprints");
+    foreach (const Footprint* footprint, mFootprints)
+        footprintsNode->appendChild(footprint->serializeToXmlDomElement());
 
     return root.take();
 }

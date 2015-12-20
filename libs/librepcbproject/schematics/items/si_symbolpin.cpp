@@ -100,23 +100,21 @@ const QUuid& SI_SymbolPin::getLibPinUuid() const noexcept
 QString SI_SymbolPin::getDisplayText(bool returnGenCompSignalNameIfEmpty,
                                      bool returnPinNameIfEmpty) const noexcept
 {
-    const QStringList& localeOrder = mCircuit.getProject().getSettings().getLocaleOrder();
-
     QString text;
     switch (mSymbol.getGenCompSymbVarItem().getDisplayTypeOfPin(mSymbolPin->getUuid()))
     {
         case library::ComponentSymbolVariantItem::PinDisplayType_t::PinName:
-            text = mSymbolPin->getName(localeOrder); break;
+            text = mSymbolPin->getName(); break;
         case library::ComponentSymbolVariantItem::PinDisplayType_t::ComponentSignal:
-            if (mGenCompSignal) text = mGenCompSignal->getName(localeOrder); break;
+            if (mGenCompSignal) text = mGenCompSignal->getName(); break;
         case library::ComponentSymbolVariantItem::PinDisplayType_t::NetSignal:
             if (mGenCompSignalInstance->getNetSignal()) text = mGenCompSignalInstance->getNetSignal()->getName(); break;
         default: break;
     }
     if (text.isEmpty() && returnGenCompSignalNameIfEmpty && mGenCompSignal)
-        text = mGenCompSignal->getName(localeOrder);
+        text = mGenCompSignal->getName();
     if (text.isEmpty() && returnPinNameIfEmpty)
-        text = mSymbolPin->getName(localeOrder);
+        text = mSymbolPin->getName();
     return text;
 }
 

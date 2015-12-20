@@ -61,7 +61,7 @@ SymbolPreviewGraphicsItem::SymbolPreviewGraphicsItem(const IF_SchematicLayerProv
         ComponentSymbolVariantItem::PinDisplayType_t displayType = ComponentSymbolVariantItem::PinDisplayType_t::PinName;
         if (mGenComp) signal = mGenComp->getSignalOfPin(symbVarUuid, symbVarItemUuid, pin->getUuid());
         if (mSymbVarItem) displayType = mSymbVarItem->getDisplayTypeOfPin(pin->getUuid());
-        SymbolPinPreviewGraphicsItem* item = new SymbolPinPreviewGraphicsItem(layerProvider, localeOrder, *pin, signal, displayType);
+        SymbolPinPreviewGraphicsItem* item = new SymbolPinPreviewGraphicsItem(layerProvider, *pin, signal, displayType);
         item->setPos(pin->getPosition().toPxQPointF());
         item->setRotation(-pin->getRotation().toDeg());
         item->setZValue(2);

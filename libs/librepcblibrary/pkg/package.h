@@ -27,6 +27,7 @@
 #include <QtCore>
 #include "../libraryelement.h"
 #include "packagepad.h"
+#include "footprint.h"
 
 /*****************************************************************************************
  *  Class Package
@@ -59,6 +60,12 @@ class Package final : public LibraryElement
         void clearPads() noexcept;
         void addPad(const PackagePad& pad) noexcept;
 
+        // Footprints
+        const QList<const Footprint*>& getFootprints() const noexcept {return mFootprints;}
+        const Footprint* getFootprintByUuid(const QUuid& uuid) const noexcept;
+        void clearFootprints() noexcept;
+        void addFootprint(const Footprint& footprint) noexcept;
+
 
     private:
 
@@ -80,6 +87,7 @@ class Package final : public LibraryElement
 
         // Attributes
         QList<const PackagePad*> mPads; ///< empty if the package has no pads
+        QList<const Footprint*> mFootprints; ///< minimum one footprint
 };
 
 } // namespace library

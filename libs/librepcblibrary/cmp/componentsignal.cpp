@@ -32,14 +32,11 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ComponentSignal::ComponentSignal(const QUuid& uuid, const QString& name_en_US,
-                                 const QString& description_en_US) noexcept :
-    mUuid(uuid), mRole(SignalRole_t::Passive), mForcedNetName(), mIsRequired(false),
-    mIsNegated(false), mIsClock(false)
+ComponentSignal::ComponentSignal(const QUuid& uuid, const QString& name) noexcept :
+    mUuid(uuid), mName(name), mRole(SignalRole_t::Passive), mForcedNetName(),
+    mIsRequired(false), mIsNegated(false), mIsClock(false)
 {
     Q_ASSERT(mUuid.isNull() == false);
-    mNames.insert("en_US", name_en_US);
-    mDescriptions.insert("en_US", description_en_US);
 }
 
 ComponentSignal::ComponentSignal(const XmlDomElement& domElement) throw (Exception)
@@ -52,29 +49,18 @@ ComponentSignal::ComponentSignal(const XmlDomElement& domElement) throw (Excepti
     mIsNegated = domElement.getAttribute<bool>("negated");
     mIsClock = domElement.getAttribute<bool>("clock");
 
-    // read names and descriptions in all available languages
-    LibraryBaseElement::readLocaleDomNodes(domElement, "name", mNames);
-    LibraryBaseElement::readLocaleDomNodes(domElement, "description", mDescriptions);
+    if (domElement.hasChilds()) {
+        // TODO: remove this
+        mName = domElement.getFirstChild("name", true)->getText(true);
+    } else {
+        mName = domElement.getText(true);
+    }
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 ComponentSignal::~ComponentSignal() noexcept
 {
-}
-
-/*****************************************************************************************
- *  Getters
- ****************************************************************************************/
-
-QString ComponentSignal::getName(const QStringList& localeOrder) const noexcept
-{
-    return LibraryBaseElement::localeStringFromList(mNames, localeOrder);
-}
-
-QString ComponentSignal::getDescription(const QStringList& localeOrder) const noexcept
-{
-    return LibraryBaseElement::localeStringFromList(mDescriptions, localeOrder);
 }
 
 /*****************************************************************************************
@@ -92,10 +78,7 @@ XmlDomElement* ComponentSignal::serializeToXmlDomElement() const throw (Exceptio
     root->setAttribute("required", mIsRequired);
     root->setAttribute("negated", mIsNegated);
     root->setAttribute("clock", mIsClock);
-    foreach (const QString& locale, mNames.keys())
-        root->appendTextChild("name", mNames.value(locale))->setAttribute("locale", locale);
-    foreach (const QString& locale, mDescriptions.keys())
-        root->appendTextChild("description", mDescriptions.value(locale))->setAttribute("locale", locale);
+    root->setText(mName);
     return root.take();
 }
 
@@ -105,9 +88,8 @@ XmlDomElement* ComponentSignal::serializeToXmlDomElement() const throw (Exceptio
 
 bool ComponentSignal::checkAttributesValidity() const noexcept
 {
-    if (mUuid.isNull())                     return false;
-    if (mNames.value("en_US").isEmpty())    return false;
-    if (!mDescriptions.contains("en_US"))   return false;
+    if (mUuid.isNull())     return false;
+    if (mName.isEmpty())    return false;
     return true;
 }
 

@@ -72,7 +72,7 @@ void BGI_FootprintPad::updateCacheAndRepaint() noexcept
     mBoundingRect = QRectF();
 
     // set Z value
-    if ((mLibPad.getType() == library::FootprintPad::Type_t::SmdRect) && (mPad.getIsMirrored()))
+    if ((mLibPad.getType() == library::FootprintPad::Type_t::SmtRect) && (mPad.getIsMirrored()))
         setZValue(Board::ZValue_FootprintPadsBottom);
     else
         setZValue(Board::ZValue_FootprintPadsTop);
@@ -101,7 +101,7 @@ void BGI_FootprintPad::paint(QPainter* painter, const QStyleOptionGraphicsItem* 
     //const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
 
     BoardLayer* layer;
-    if (mLibPad.getType() == library::FootprintPad::Type_t::SmdRect)
+    if (mLibPad.getType() == library::FootprintPad::Type_t::SmtRect)
         layer = getBoardLayer(BoardLayer::LayerID::TopCopper);
     else
         layer = getBoardLayer(BoardLayer::LayerID::Vias);
@@ -117,7 +117,7 @@ void BGI_FootprintPad::paint(QPainter* painter, const QStyleOptionGraphicsItem* 
         switch (mLibPad.getType())
         {
             case library::FootprintPad::Type_t::ThtRect:
-            case library::FootprintPad::Type_t::SmdRect:
+            case library::FootprintPad::Type_t::SmtRect:
                 painter->drawRect(rect);
                 break;
             case library::FootprintPad::Type_t::ThtOctagon:

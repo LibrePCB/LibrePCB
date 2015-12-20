@@ -57,13 +57,24 @@ void Device::parseDomTree(const XmlDomElement& root) throw (Exception)
 {
     LibraryElement::parseDomTree(root);
 
-    mComponentUuid = root.getFirstChild("meta/component", true, true)->getText<QUuid>(true);
+    if (root.getFirstChild("meta/generic_component", true, false)) {
+        // TODO: remove this
+        mComponentUuid = root.getFirstChild("meta/generic_component", true, true)->getText<QUuid>(true);
+    } else {
+        mComponentUuid = root.getFirstChild("meta/component", true, true)->getText<QUuid>(true);
+    }
     mPackageUuid = root.getFirstChild("meta/package", true, true)->getText<QUuid>(true);
     for (XmlDomElement* node = root.getFirstChild("pad_signal_map/map", true, false);
          node; node = node->getNextSibling("map"))
     {
-        mPadSignalMap.insert(node->getAttribute<QUuid>("pad", true),
-                             node->getAttribute<QUuid>("signal", false));
+        if (node->hasAttribute("signal")) {
+            // TODO: remove this
+            mPadSignalMap.insert(node->getAttribute<QUuid>("pad", true),
+                                 node->getAttribute<QUuid>("signal", false));
+        } else {
+            mPadSignalMap.insert(node->getAttribute<QUuid>("pad", true),
+                                 node->getText<QUuid>(false, QUuid()));
+        }
     }
 }
 
@@ -77,7 +88,7 @@ XmlDomElement* Device::serializeToXmlDomElement() const throw (Exception)
     {
         XmlDomElement* child = padSignalMap->appendChild("map");
         child->setAttribute("pad", padUuid);
-        child->setAttribute("signal", mPadSignalMap.value(padUuid));
+        child->setText(mPadSignalMap.value(padUuid).isNull() ? QString() : mPadSignalMap.value(padUuid).toString());
     }
     return root.take();
 }

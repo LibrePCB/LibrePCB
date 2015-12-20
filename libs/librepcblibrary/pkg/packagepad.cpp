@@ -42,7 +42,12 @@ PackagePad::PackagePad(const XmlDomElement& domElement) throw (Exception) :
 {
     // read attributes
     mUuid = domElement.getAttribute<QUuid>("uuid");
-    mName = domElement.getText(true);
+    if (domElement.hasChilds()) {
+        // TODO: remove this
+        mName = domElement.getFirstChild("name", true, true)->getText(true);
+    } else {
+        mName = domElement.getText(true);
+    }
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }

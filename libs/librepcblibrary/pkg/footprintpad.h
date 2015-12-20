@@ -51,7 +51,7 @@ class FootprintPad final : public IF_XmlSerializableObject
             ThtRect,
             ThtOctagon,
             ThtRound,
-            SmdRect
+            SmtRect
         };
 
         // Constructors / Destructor

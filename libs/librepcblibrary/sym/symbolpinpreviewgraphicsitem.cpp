@@ -37,14 +37,13 @@ namespace library {
  ****************************************************************************************/
 
 SymbolPinPreviewGraphicsItem::SymbolPinPreviewGraphicsItem(const IF_SchematicLayerProvider& layerProvider,
-                                                           const QStringList& localeOrder,
                                                            const SymbolPin& pin,
                                                            const ComponentSignal* genCompSignal,
                                                            ComponentSymbolVariantItem::PinDisplayType_t displayType) noexcept :
     GraphicsItem(), mPin(pin), mGenCompSignal(genCompSignal), mDisplayType(displayType),
-    mDrawBoundingRect(false), mLocaleOrder(localeOrder)
+    mDrawBoundingRect(false)
 {
-    setToolTip(mPin.getName(mLocaleOrder) % ": " % mPin.getDescription(mLocaleOrder));
+    setToolTip(mPin.getName());
 
     mCircleLayer = layerProvider.getSchematicLayer(SchematicLayer::SymbolPinCircles);
     Q_ASSERT(mCircleLayer);
@@ -100,9 +99,9 @@ void SymbolPinPreviewGraphicsItem::updateCacheAndRepaint() noexcept
         case ComponentSymbolVariantItem::PinDisplayType_t::None:
             mStaticText.setText(""); break;
         case ComponentSymbolVariantItem::PinDisplayType_t::PinName:
-            mStaticText.setText(mPin.getName(mLocaleOrder)); break;
+            mStaticText.setText(mPin.getName()); break;
         case ComponentSymbolVariantItem::PinDisplayType_t::ComponentSignal:
-            mStaticText.setText(mGenCompSignal ? mGenCompSignal->getName(mLocaleOrder) : ""); break;
+            mStaticText.setText(mGenCompSignal ? mGenCompSignal->getName() : ""); break;
         case ComponentSymbolVariantItem::PinDisplayType_t::NetSignal:
             mStaticText.setText(mGenCompSignal ? mGenCompSignal->getForcedNetName() : ""); break;
         default: Q_ASSERT(false);

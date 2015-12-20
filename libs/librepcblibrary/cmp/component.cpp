@@ -273,11 +273,21 @@ void Component::parseDomTree(const XmlDomElement& root) throw (Exception)
     }
 
     // Load default values in all available languages
-    readLocaleDomNodes(*root.getFirstChild("properties/default_values", true, true),
-                       "value", mDefaultValues);
+    if (root.getFirstChild("properties/default_values", true, false)) {
+        // TODO: remove this
+        readLocaleDomNodes(*root.getFirstChild("properties/default_values", true, true),
+                           "value", mDefaultValues);
+    } else {
+        readLocaleDomNodes(*root.getFirstChild("properties", true, true), "value", mDefaultValues);
+    }
 
     // Load all prefixes
-    for (XmlDomElement* node = root.getFirstChild("properties/prefixes/prefix", true, false);
+    XmlDomElement* removeThis = root.getFirstChild("properties/prefixes/prefix", false, false);
+    if (!removeThis) {
+        // TODO: remove this
+        removeThis = root.getFirstChild("properties/prefix", true, false);
+    }
+    for (XmlDomElement* node = removeThis;
          node; node = node->getNextSibling("prefix"))
     {
         if (mPrefixes.contains(node->getAttribute("norm")))
@@ -370,16 +380,14 @@ XmlDomElement* Component::serializeToXmlDomElement() const throw (Exception)
         attributes->appendChild(attribute->serializeToXmlDomElement());
     XmlDomElement* properties = root->appendChild("properties");
     properties->appendTextChild("schematic_only", mSchematicOnly);
-    XmlDomElement* default_values = properties->appendChild("default_values");
     foreach (const QString& locale, mDefaultValues.keys())
     {
-        XmlDomElement* child = default_values->appendTextChild("value", mDefaultValues.value(locale));
+        XmlDomElement* child = properties->appendTextChild("value", mDefaultValues.value(locale));
         child->setAttribute("locale", locale);
     }
-    XmlDomElement* prefixes = properties->appendChild("prefixes");
     foreach (const QString& norm, mPrefixes.keys())
     {
-        XmlDomElement* child = prefixes->appendTextChild("prefix", mPrefixes.value(norm));
+        XmlDomElement* child = properties->appendTextChild("prefix", mPrefixes.value(norm));
         child->setAttribute("norm", norm);
         child->setAttribute("default", norm == mDefaultPrefixNorm);
     }

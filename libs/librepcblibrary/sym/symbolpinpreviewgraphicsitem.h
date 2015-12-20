@@ -59,7 +59,6 @@ class SymbolPinPreviewGraphicsItem final : public GraphicsItem
 
         // Constructors / Destructor
         explicit SymbolPinPreviewGraphicsItem(const IF_SchematicLayerProvider& layerProvider,
-                                              const QStringList& localeOrder,
                                               const SymbolPin& pin,
                                               const ComponentSignal* genCompSignal,
                                               ComponentSymbolVariantItem::PinDisplayType_t displayType) noexcept;
@@ -95,7 +94,6 @@ class SymbolPinPreviewGraphicsItem final : public GraphicsItem
         QFont mFont;
         qreal mRadiusPx;
         bool mDrawBoundingRect;
-        QStringList mLocaleOrder;
 
         // Cached Attributes
         QStaticText mStaticText;

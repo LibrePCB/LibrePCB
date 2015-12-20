@@ -146,6 +146,8 @@ class XmlDomElement final
          * @warning This method must be called only on elements without child elements!
          *
          * @param text  The text of this element
+         *
+         * @todo Add a template to call this method with different types
          */
         void setText(const QString& text) noexcept;
 

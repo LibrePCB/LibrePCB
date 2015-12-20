@@ -220,15 +220,13 @@ void GenCompSignalInstance::netSignalNameChanged(const QString& newName) noexcep
 
 void GenCompSignalInstance::updateErcMessages() noexcept
 {
-    const QStringList& localeOrder = mCircuit.getProject().getSettings().getLocaleOrder();
-
     mErcMsgUnconnectedRequiredSignal->setMsg(
         QString(tr("Unconnected component signal: \"%1\" from \"%2\""))
-        .arg(mGenCompSignal->getName(localeOrder)).arg(mGenCompInstance.getName()));
+        .arg(mGenCompSignal->getName()).arg(mGenCompInstance.getName()));
     mErcMsgForcedNetSignalNameConflict->setMsg(
         QString(tr("Signal name conflict: \"%1\" != \"%2\" (\"%3\" from \"%4\")"))
         .arg((mNetSignal ? mNetSignal->getName() : QString()), getForcedNetSignalName(),
-        mGenCompSignal->getName(localeOrder), mGenCompInstance.getName()));
+        mGenCompSignal->getName(), mGenCompInstance.getName()));
 
     mErcMsgUnconnectedRequiredSignal->setVisible((mAddedToCircuit) && (!mNetSignal)
         && (mGenCompSignal->isRequired()));
