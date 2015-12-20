@@ -19,8 +19,8 @@
 
 #include <QtCore>
 #include <librepcbcommon/exceptions.h>
-#include "gencompsignalinstance.h"
-#include "gencompinstance.h"
+#include "componentsignalinstance.h"
+#include "componentinstance.h"
 #include "circuit.h"
 #include "netsignal.h"
 #include <librepcblibrary/cmp/component.h>
@@ -35,14 +35,14 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-GenCompSignalInstance::GenCompSignalInstance(Circuit& circuit, GenCompInstance& genCompInstance,
+ComponentSignalInstance::ComponentSignalInstance(Circuit& circuit, ComponentInstance& genCompInstance,
                                              const XmlDomElement& domElement) throw (Exception) :
     QObject(nullptr), mCircuit(circuit), mGenCompInstance(genCompInstance),
     mGenCompSignal(nullptr), mNetSignal(nullptr), mAddedToCircuit(false)
 {
     // read attributes
     QUuid genCompSignalUuid = domElement.getAttribute<QUuid>("comp_signal");
-    mGenCompSignal = mGenCompInstance.getGenComp().getSignalByUuid(genCompSignalUuid);
+    mGenCompSignal = mGenCompInstance.getLibComponent().getSignalByUuid(genCompSignalUuid);
     if(!mGenCompSignal)
     {
         throw RuntimeError(__FILE__, __LINE__, genCompSignalUuid.toString(), QString(
@@ -62,7 +62,7 @@ GenCompSignalInstance::GenCompSignalInstance(Circuit& circuit, GenCompInstance& 
     init();
 }
 
-GenCompSignalInstance::GenCompSignalInstance(Circuit& circuit, GenCompInstance& genCompInstance,
+ComponentSignalInstance::ComponentSignalInstance(Circuit& circuit, ComponentInstance& genCompInstance,
                                              const library::ComponentSignal& genCompSignal,
                                              NetSignal* netsignal) throw (Exception) :
     QObject(nullptr), mCircuit(circuit), mGenCompInstance(genCompInstance),
@@ -71,7 +71,7 @@ GenCompSignalInstance::GenCompSignalInstance(Circuit& circuit, GenCompInstance& 
     init();
 }
 
-void GenCompSignalInstance::init() throw (Exception)
+void ComponentSignalInstance::init() throw (Exception)
 {
     // create ERC messages
     mErcMsgUnconnectedRequiredSignal.reset(new ErcMsg(mCircuit.getProject(), *this,
@@ -83,16 +83,16 @@ void GenCompSignalInstance::init() throw (Exception)
     updateErcMessages();
 
     // register to generic component attributes changed
-    connect(&mGenCompInstance, &GenCompInstance::attributesChanged,
-            this, &GenCompSignalInstance::updateErcMessages);
+    connect(&mGenCompInstance, &ComponentInstance::attributesChanged,
+            this, &ComponentSignalInstance::updateErcMessages);
 
     // register to net signal name changed
-    if (mNetSignal) connect(mNetSignal, &NetSignal::nameChanged, this, &GenCompSignalInstance::netSignalNameChanged);
+    if (mNetSignal) connect(mNetSignal, &NetSignal::nameChanged, this, &ComponentSignalInstance::netSignalNameChanged);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-GenCompSignalInstance::~GenCompSignalInstance() noexcept
+ComponentSignalInstance::~ComponentSignalInstance() noexcept
 {
     Q_ASSERT(!mAddedToCircuit);
     Q_ASSERT(mRegisteredSymbolPins.isEmpty());
@@ -102,12 +102,12 @@ GenCompSignalInstance::~GenCompSignalInstance() noexcept
  *  Getters
  ****************************************************************************************/
 
-bool GenCompSignalInstance::isNetSignalNameForced() const noexcept
+bool ComponentSignalInstance::isNetSignalNameForced() const noexcept
 {
     return mGenCompSignal->isNetSignalNameForced();
 }
 
-QString GenCompSignalInstance::getForcedNetSignalName() const noexcept
+QString ComponentSignalInstance::getForcedNetSignalName() const noexcept
 {
     QString name = mGenCompSignal->getForcedNetName();
     mGenCompInstance.replaceVariablesWithAttributes(name, false);
@@ -118,14 +118,14 @@ QString GenCompSignalInstance::getForcedNetSignalName() const noexcept
  *  Setters
  ****************************************************************************************/
 
-void GenCompSignalInstance::setNetSignal(NetSignal* netsignal) throw (Exception)
+void ComponentSignalInstance::setNetSignal(NetSignal* netsignal) throw (Exception)
 {
     if (!mAddedToCircuit)
         throw LogicError(__FILE__, __LINE__);
 
     if (mNetSignal)
     {
-        disconnect(mNetSignal, &NetSignal::nameChanged, this, &GenCompSignalInstance::netSignalNameChanged);
+        disconnect(mNetSignal, &NetSignal::nameChanged, this, &ComponentSignalInstance::netSignalNameChanged);
         mNetSignal->unregisterGenCompSignal(*this);
     }
 
@@ -134,7 +134,7 @@ void GenCompSignalInstance::setNetSignal(NetSignal* netsignal) throw (Exception)
     if (mNetSignal)
     {
         mNetSignal->registerGenCompSignal(*this);
-        connect(mNetSignal, &NetSignal::nameChanged, this, &GenCompSignalInstance::netSignalNameChanged);
+        connect(mNetSignal, &NetSignal::nameChanged, this, &ComponentSignalInstance::netSignalNameChanged);
     }
 
     updateErcMessages();
@@ -144,7 +144,7 @@ void GenCompSignalInstance::setNetSignal(NetSignal* netsignal) throw (Exception)
  *  General Methods
  ****************************************************************************************/
 
-void GenCompSignalInstance::registerSymbolPin(SI_SymbolPin& pin) throw (Exception)
+void ComponentSignalInstance::registerSymbolPin(SI_SymbolPin& pin) throw (Exception)
 {
     if (!mAddedToCircuit)
         throw LogicError(__FILE__, __LINE__);
@@ -154,7 +154,7 @@ void GenCompSignalInstance::registerSymbolPin(SI_SymbolPin& pin) throw (Exceptio
     mRegisteredSymbolPins.append(&pin);
 }
 
-void GenCompSignalInstance::unregisterSymbolPin(SI_SymbolPin& pin) throw (Exception)
+void ComponentSignalInstance::unregisterSymbolPin(SI_SymbolPin& pin) throw (Exception)
 {
     if (!mAddedToCircuit)
         throw LogicError(__FILE__, __LINE__);
@@ -164,7 +164,7 @@ void GenCompSignalInstance::unregisterSymbolPin(SI_SymbolPin& pin) throw (Except
     mRegisteredSymbolPins.removeAll(&pin);
 }
 
-void GenCompSignalInstance::addToCircuit() throw (Exception)
+void ComponentSignalInstance::addToCircuit() throw (Exception)
 {
     if (!mRegisteredSymbolPins.isEmpty())
         throw LogicError(__FILE__, __LINE__);
@@ -176,7 +176,7 @@ void GenCompSignalInstance::addToCircuit() throw (Exception)
     updateErcMessages();
 }
 
-void GenCompSignalInstance::removeFromCircuit() throw (Exception)
+void ComponentSignalInstance::removeFromCircuit() throw (Exception)
 {
     if (!mRegisteredSymbolPins.isEmpty())
         throw LogicError(__FILE__, __LINE__);
@@ -188,7 +188,7 @@ void GenCompSignalInstance::removeFromCircuit() throw (Exception)
     updateErcMessages();
 }
 
-XmlDomElement* GenCompSignalInstance::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* ComponentSignalInstance::serializeToXmlDomElement() const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -202,7 +202,7 @@ XmlDomElement* GenCompSignalInstance::serializeToXmlDomElement() const throw (Ex
  *  Private Methods
  ****************************************************************************************/
 
-bool GenCompSignalInstance::checkAttributesValidity() const noexcept
+bool ComponentSignalInstance::checkAttributesValidity() const noexcept
 {
     if (mGenCompSignal == nullptr)  return false;
     return true;
@@ -212,13 +212,13 @@ bool GenCompSignalInstance::checkAttributesValidity() const noexcept
  *  Private Slots
  ****************************************************************************************/
 
-void GenCompSignalInstance::netSignalNameChanged(const QString& newName) noexcept
+void ComponentSignalInstance::netSignalNameChanged(const QString& newName) noexcept
 {
     Q_UNUSED(newName);
     updateErcMessages();
 }
 
-void GenCompSignalInstance::updateErcMessages() noexcept
+void ComponentSignalInstance::updateErcMessages() noexcept
 {
     mErcMsgUnconnectedRequiredSignal->setMsg(
         QString(tr("Unconnected component signal: \"%1\" from \"%2\""))

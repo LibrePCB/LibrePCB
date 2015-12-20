@@ -31,7 +31,7 @@
 #include "../erc/ercmsg.h"
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include "../circuit/circuit.h"
-#include "../circuit/gencompinstance.h"
+#include "../circuit/componentinstance.h"
 #include "items/bi_footprint.h"
 
 namespace project {
@@ -46,11 +46,11 @@ DeviceInstance::DeviceInstance(Board& board, const XmlDomElement& domElement) th
 {
     // get component instance
     QUuid compInstUuid = domElement.getAttribute<QUuid>("component_instance");
-    mCompInstance = mBoard.getProject().getCircuit().getGenCompInstanceByUuid(compInstUuid);
+    mCompInstance = mBoard.getProject().getCircuit().getComponentInstanceByUuid(compInstUuid);
     if (!mCompInstance)
     {
         throw RuntimeError(__FILE__, __LINE__, compInstUuid.toString(),
-            QString(tr("Could not found the component instance with UUID \"%1\"!"))
+            QString(tr("Could not find the component instance with UUID \"%1\"!"))
             .arg(compInstUuid.toString()));
     }
     // get device
@@ -69,7 +69,7 @@ DeviceInstance::DeviceInstance(Board& board, const XmlDomElement& domElement) th
     init();
 }
 
-DeviceInstance::DeviceInstance(Board& board, GenCompInstance& compInstance,
+DeviceInstance::DeviceInstance(Board& board, ComponentInstance& compInstance,
                                      const QUuid& deviceUuid, const Point& position,
                                      const Angle& rotation) throw (Exception) :
     QObject(nullptr), mBoard(board), mAddedToBoard(false), mCompInstance(&compInstance),
@@ -95,12 +95,12 @@ void DeviceInstance::initDeviceAndPackage(const QUuid& deviceUuid) throw (Except
             .arg(deviceUuid.toString()));
     }
     // check if the device matches with the component
-    if (mDevice->getComponentUuid() != mCompInstance->getGenComp().getUuid())
+    if (mDevice->getComponentUuid() != mCompInstance->getLibComponent().getUuid())
     {
         throw RuntimeError(__FILE__, __LINE__, QString(),
             QString(tr("The device \"%1\" does not match with the component"
-            "instance \"%2\".")).arg(mDevice->getComponentUuid().toString(),
-            mCompInstance->getGenComp().getUuid().toString()));
+            "instance \"%2\".")).arg(mDevice->getUuid().toString(),
+            mCompInstance->getUuid().toString()));
     }
     // get package from library
     QUuid packageUuid = mDevice->getPackageUuid();

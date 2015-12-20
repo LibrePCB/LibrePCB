@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_GENCOMPINSTANCE_H
-#define PROJECT_GENCOMPINSTANCE_H
+#ifndef PROJECT_COMPONENTINSTANCE_H
+#define PROJECT_COMPONENTINSTANCE_H
 
 /*****************************************************************************************
  *  Includes
@@ -38,8 +38,8 @@ class XmlDomElement;
 
 namespace project {
 class Circuit;
-class GenCompAttributeInstance;
-class GenCompSignalInstance;
+class ComponentAttributeInstance;
+class ComponentSignalInstance;
 class DeviceInstance;
 class SI_Symbol;
 class ErcMsg;
@@ -51,27 +51,27 @@ class ComponentSymbolVariant;
 }
 
 /*****************************************************************************************
- *  Class GenCompInstance
+ *  Class ComponentInstance
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The GenCompInstance class
+ * @brief The ComponentInstance class
  */
-class GenCompInstance : public QObject, public IF_AttributeProvider,
-                        public IF_ErcMsgProvider, public IF_XmlSerializableObject
+class ComponentInstance : public QObject, public IF_AttributeProvider,
+                          public IF_ErcMsgProvider, public IF_XmlSerializableObject
 {
         Q_OBJECT
-        DECLARE_ERC_MSG_CLASS_NAME(GenCompInstance)
+        DECLARE_ERC_MSG_CLASS_NAME(ComponentInstance)
 
     public:
 
         // Constructors / Destructor
-        explicit GenCompInstance(Circuit& circuit, const XmlDomElement& domElement) throw (Exception);
-        explicit GenCompInstance(Circuit& circuit, const library::Component& genComp,
-                                 const library::ComponentSymbolVariant& symbVar, const QString& name) throw (Exception);
-        ~GenCompInstance() noexcept;
+        explicit ComponentInstance(Circuit& circuit, const XmlDomElement& domElement) throw (Exception);
+        explicit ComponentInstance(Circuit& circuit, const library::Component& cmp,
+                                   const library::ComponentSymbolVariant& symbVar, const QString& name) throw (Exception);
+        ~ComponentInstance() noexcept;
 
         // Getters
         const QUuid& getUuid() const noexcept {return mUuid;}
@@ -81,9 +81,9 @@ class GenCompInstance : public QObject, public IF_AttributeProvider,
         int getUnplacedSymbolsCount() const noexcept;
         int getUnplacedRequiredSymbolsCount() const noexcept;
         int getUnplacedOptionalSymbolsCount() const noexcept;
-        GenCompSignalInstance* getSignalInstance(const QUuid& signalUuid) const noexcept {return mSignals.value(signalUuid);}
-        const library::Component& getGenComp() const noexcept {return *mGenComp;}
-        const library::ComponentSymbolVariant& getSymbolVariant() const noexcept {return *mGenCompSymbVar;}
+        ComponentSignalInstance* getSignalInstance(const QUuid& signalUuid) const noexcept {return mSignals.value(signalUuid);}
+        const library::Component& getLibComponent() const noexcept {return *mLibComponent;}
+        const library::ComponentSymbolVariant& getSymbolVariant() const noexcept {return *mCompSymbVar;}
 
 
         // Setters
@@ -114,10 +114,10 @@ class GenCompInstance : public QObject, public IF_AttributeProvider,
 
 
         // Attribute Handling Methods
-        const QList<GenCompAttributeInstance*>& getAttributes() const noexcept {return mAttributes;}
-        GenCompAttributeInstance* getAttributeByKey(const QString& key) const noexcept;
-        void addAttribute(GenCompAttributeInstance& attr) throw (Exception);
-        void removeAttribute(GenCompAttributeInstance& attr) throw (Exception);
+        const QList<ComponentAttributeInstance*>& getAttributes() const noexcept {return mAttributes;}
+        ComponentAttributeInstance* getAttributeByKey(const QString& key) const noexcept;
+        void addAttribute(ComponentAttributeInstance& attr) throw (Exception);
+        void removeAttribute(ComponentAttributeInstance& attr) throw (Exception);
 
 
         // General Methods
@@ -146,9 +146,9 @@ class GenCompInstance : public QObject, public IF_AttributeProvider,
     private:
 
         // make some methods inaccessible...
-        GenCompInstance();
-        GenCompInstance(const GenCompInstance& other);
-        GenCompInstance& operator=(const GenCompInstance& rhs);
+        ComponentInstance();
+        ComponentInstance(const ComponentInstance& other);
+        ComponentInstance& operator=(const ComponentInstance& rhs);
 
         // Private Methods
         void init() throw (Exception);
@@ -175,17 +175,17 @@ class GenCompInstance : public QObject, public IF_AttributeProvider,
         /// @brief The value of this component instance in the circuit (e.g. the resistance of a resistor)
         QString mValue;
 
-        /// @brief Pointer to the generic component in the project's library
-        const library::Component* mGenComp;
+        /// @brief Pointer to the component in the project's library
+        const library::Component* mLibComponent;
 
-        /// @brief Pointer to the used symbol variant of #mGenComp
-        const library::ComponentSymbolVariant* mGenCompSymbVar;
+        /// @brief Pointer to the used symbol variant of #mLibComponent
+        const library::ComponentSymbolVariant* mCompSymbVar;
 
-        /// @brief All attributes of this generic component
-        QList<GenCompAttributeInstance*> mAttributes;
+        /// @brief All attributes of this component
+        QList<ComponentAttributeInstance*> mAttributes;
 
-        /// @brief All signal instances (Key: generic component signal UUID)
-        QHash<QUuid, GenCompSignalInstance*> mSignals;
+        /// @brief All signal instances (Key: component signal UUID)
+        QHash<QUuid, ComponentSignalInstance*> mSignals;
 
 
         // Misc
@@ -216,4 +216,4 @@ class GenCompInstance : public QObject, public IF_AttributeProvider,
 
 } // namespace project
 
-#endif // PROJECT_GENCOMPINSTANCE_H
+#endif // PROJECT_COMPONENTINSTANCE_H

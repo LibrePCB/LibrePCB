@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDGENCOMPATTRINSTADD_H
-#define PROJECT_CMDGENCOMPATTRINSTADD_H
+#ifndef PROJECT_CMDCOMPATTRINSTADD_H
+#define PROJECT_CMDCOMPATTRINSTADD_H
 
 /*****************************************************************************************
  *  Includes
@@ -35,31 +35,31 @@ class AttributeType;
 class AttributeUnit;
 
 namespace project {
-class GenCompInstance;
-class GenCompAttributeInstance;
+class ComponentInstance;
+class ComponentAttributeInstance;
 }
 
 /*****************************************************************************************
- *  Class CmdGenCompAttrInstAdd
+ *  Class CmdCompAttrInstAdd
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The CmdGenCompAttrInstAdd class
+ * @brief The CmdCompAttrInstAdd class
  */
-class CmdGenCompAttrInstAdd final : public UndoCommand
+class CmdCompAttrInstAdd final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdGenCompAttrInstAdd(GenCompInstance& genComp, const QString& key,
-                                       const AttributeType& type, const QString& value,
-                                       const AttributeUnit* unit, UndoCommand* parent = 0) throw (Exception);
-        ~CmdGenCompAttrInstAdd() noexcept;
+        explicit CmdCompAttrInstAdd(ComponentInstance& cmp, const QString& key,
+                                    const AttributeType& type, const QString& value,
+                                    const AttributeUnit* unit, UndoCommand* parent = 0) throw (Exception);
+        ~CmdCompAttrInstAdd() noexcept;
 
         // Getters
-        GenCompAttributeInstance* getAttrInstance() const noexcept {return mAttrInstance;}
+        ComponentAttributeInstance* getAttrInstance() const noexcept {return mAttrInstance;}
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;
@@ -67,14 +67,14 @@ class CmdGenCompAttrInstAdd final : public UndoCommand
 
     private:
 
-        GenCompInstance& mGenCompInstance;
+        ComponentInstance& mComponentInstance;
         QString mKey;
         const AttributeType& mType;
         QString mValue;
         const AttributeUnit* mUnit;
-        GenCompAttributeInstance* mAttrInstance;
+        ComponentAttributeInstance* mAttrInstance;
 };
 
 } // namespace project
 
-#endif // PROJECT_CMDGENCOMPATTRINSTADD_H
+#endif // PROJECT_CMDCOMPATTRINSTADD_H

@@ -39,7 +39,7 @@ class GraphicsScene;
 namespace project {
 class Project;
 class Board;
-class GenCompInstance;
+class ComponentInstance;
 class BI_Footprint;
 }
 
@@ -67,7 +67,7 @@ class DeviceInstance final : public QObject, public IF_AttributeProvider,
 
         // Constructors / Destructor
         explicit DeviceInstance(Board& board, const XmlDomElement& domElement) throw (Exception);
-        explicit DeviceInstance(Board& board, GenCompInstance& compInstance,
+        explicit DeviceInstance(Board& board, ComponentInstance& compInstance,
                                 const QUuid& deviceUuid,
                                 const Point& position = Point(),
                                 const Angle& rotation = Angle()) throw (Exception);
@@ -76,7 +76,7 @@ class DeviceInstance final : public QObject, public IF_AttributeProvider,
         // Getters
         Project& getProject() const noexcept;
         Board& getBoard() const noexcept {return mBoard;}
-        GenCompInstance& getComponentInstance() const noexcept {return *mCompInstance;}
+        ComponentInstance& getComponentInstance() const noexcept {return *mCompInstance;}
         const library::Device& getLibDevice() const noexcept {return *mDevice;}
         const library::Package& getLibPackage() const noexcept {return *mPackage;}
         BI_Footprint& getFootprint() const noexcept {return *mFootprint;}
@@ -131,7 +131,7 @@ class DeviceInstance final : public QObject, public IF_AttributeProvider,
         // General
         Board& mBoard;
         bool mAddedToBoard;
-        GenCompInstance* mCompInstance;
+        ComponentInstance* mCompInstance;
         const library::Device* mDevice;
         const library::Package* mPackage;
         BI_Footprint* mFootprint;

@@ -34,7 +34,7 @@
 
 namespace project {
 class Board;
-class GenCompInstance;
+class ComponentInstance;
 class DeviceInstance;
 }
 
@@ -56,7 +56,7 @@ class CmdDeviceInstanceAdd final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit CmdDeviceInstanceAdd(Board& board, GenCompInstance& comp,
+        explicit CmdDeviceInstanceAdd(Board& board, ComponentInstance& comp,
                                       const QUuid& deviceUuid,
                                       const Point& position = Point(),
                                       const Angle& rotation = Angle(), UndoCommand* parent = 0) throw (Exception);

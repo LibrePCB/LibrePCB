@@ -22,9 +22,9 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "cmdgencompattrinstadd.h"
-#include "../gencompinstance.h"
-#include "../gencompattributeinstance.h"
+#include "cmdcompattrinstadd.h"
+#include "../componentinstance.h"
+#include "../componentattributeinstance.h"
 
 namespace project {
 
@@ -32,16 +32,16 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdGenCompAttrInstAdd::CmdGenCompAttrInstAdd(GenCompInstance& genComp, const QString& key,
-                                             const AttributeType& type, const QString& value,
-                                             const AttributeUnit* unit, UndoCommand* parent) throw (Exception) :
+CmdCompAttrInstAdd::CmdCompAttrInstAdd(ComponentInstance& cmp, const QString& key,
+                                       const AttributeType& type, const QString& value,
+                                       const AttributeUnit* unit, UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Add component attribute"), parent),
-    mGenCompInstance(genComp), mKey(key), mType(type), mValue(value), mUnit(unit),
+    mComponentInstance(cmp), mKey(key), mType(type), mValue(value), mUnit(unit),
     mAttrInstance(nullptr)
 {
 }
 
-CmdGenCompAttrInstAdd::~CmdGenCompAttrInstAdd() noexcept
+CmdCompAttrInstAdd::~CmdCompAttrInstAdd() noexcept
 {
     if (!isExecuted())
         delete mAttrInstance;
@@ -51,12 +51,12 @@ CmdGenCompAttrInstAdd::~CmdGenCompAttrInstAdd() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdGenCompAttrInstAdd::redo() throw (Exception)
+void CmdCompAttrInstAdd::redo() throw (Exception)
 {
     if (!mAttrInstance) // only the first time
-        mAttrInstance = new GenCompAttributeInstance(mKey, mType, mValue, mUnit); // throws an exception on error
+        mAttrInstance = new ComponentAttributeInstance(mKey, mType, mValue, mUnit); // throws an exception on error
 
-    mGenCompInstance.addAttribute(*mAttrInstance); // throws an exception on error
+    mComponentInstance.addAttribute(*mAttrInstance); // throws an exception on error
 
     try
     {
@@ -64,14 +64,14 @@ void CmdGenCompAttrInstAdd::redo() throw (Exception)
     }
     catch (Exception &e)
     {
-        mGenCompInstance.removeAttribute(*mAttrInstance);
+        mComponentInstance.removeAttribute(*mAttrInstance);
         throw;
     }
 }
 
-void CmdGenCompAttrInstAdd::undo() throw (Exception)
+void CmdCompAttrInstAdd::undo() throw (Exception)
 {
-    mGenCompInstance.removeAttribute(*mAttrInstance); // throws an exception on error
+    mComponentInstance.removeAttribute(*mAttrInstance); // throws an exception on error
 
     try
     {
@@ -79,7 +79,7 @@ void CmdGenCompAttrInstAdd::undo() throw (Exception)
     }
     catch (Exception& e)
     {
-        mGenCompInstance.addAttribute(*mAttrInstance);
+        mComponentInstance.addAttribute(*mAttrInstance);
         throw;
     }
 }

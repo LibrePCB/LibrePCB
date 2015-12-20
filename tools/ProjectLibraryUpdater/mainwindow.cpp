@@ -82,27 +82,27 @@ void MainWindow::on_pushButton_2_clicked()
             SmartXmlFile projectFile(projectFilepath, false, true);
             QSharedPointer<XmlDomDocument> projectDoc = projectFile.parseFileAndBuildDomTree(true);
 
-            // generic components & symbols
+            // components & symbols
             SmartXmlFile circuitFile(projectFilepath.getParentDir().getPathTo("core/circuit.xml"), false, true);
             QSharedPointer<XmlDomDocument> circuitDoc = circuitFile.parseFileAndBuildDomTree(true);
-            for (XmlDomElement* node = circuitDoc->getRoot().getFirstChild("generic_component_instances/*", true, false);
+            for (XmlDomElement* node = circuitDoc->getRoot().getFirstChild("component_instances/*", true, false);
                  node; node = node->getNextSibling())
             {
-                QUuid genCompUuid = node->getAttribute<QUuid>("generic_component", true);
-                FilePath filepath = lib.getLatestComponent(genCompUuid);
+                QUuid compUuid = node->getAttribute<QUuid>("component", true);
+                FilePath filepath = lib.getLatestComponent(compUuid);
                 if (!filepath.isValid())
                 {
                     throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
-                        QString("missing generic component: %1").arg(genCompUuid.toString()));
+                        QString("missing component: %1").arg(compUuid.toString()));
                 }
-                // copy generic component
-                Component latestGenComp(filepath);
-                FilePath dest = projectFilepath.getParentDir().getPathTo("library/gencmp");
-                latestGenComp.saveTo(dest);
-                ui->log->addItem(latestGenComp.getDirectory().toNative());
+                // copy component
+                Component latestComp(filepath);
+                FilePath dest = projectFilepath.getParentDir().getPathTo("library/cmp");
+                latestComp.saveTo(dest);
+                ui->log->addItem(latestComp.getDirectory().toNative());
 
                 // search all required symbols
-                foreach (const ComponentSymbolVariant* symbvar, latestGenComp.getSymbolVariants())
+                foreach (const ComponentSymbolVariant* symbvar, latestComp.getSymbolVariants())
                 {
                     foreach (const ComponentSymbolVariantItem* item, symbvar->getItems())
                     {
@@ -122,31 +122,31 @@ void MainWindow::on_pushButton_2_clicked()
             }
 
 
-            // components & footprints
-            /*for (XmlDomElement* node = projectDoc->getRoot().getFirstChild("boards/*", true, false);
+            // devices & footprints
+            for (XmlDomElement* node = projectDoc->getRoot().getFirstChild("boards/*", true, false);
                  node; node = node->getNextSibling())
             {
                 FilePath boardFilePath = projectFilepath.getParentDir().getPathTo("boards/" % node->getText(true));
                 SmartXmlFile boardFile(boardFilePath, false, true);
                 QSharedPointer<XmlDomDocument> boardDoc = boardFile.parseFileAndBuildDomTree(true);
-                for (XmlDomElement* node = boardDoc->getRoot().getFirstChild("component_instances/*", true, false);
+                for (XmlDomElement* node = boardDoc->getRoot().getFirstChild("device_instances/*", true, false);
                      node; node = node->getNextSibling())
                 {
-                    QUuid compUuid = node->getAttribute<QUuid>("component", true);
-                    FilePath filepath = lib.getLatestComponent(compUuid);
+                    QUuid deviceUuid = node->getAttribute<QUuid>("device", true);
+                    FilePath filepath = lib.getLatestDevice(deviceUuid);
                     if (!filepath.isValid())
                     {
                         throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
-                            QString("missing component: %1").arg(compUuid.toString()));
+                            QString("missing device: %1").arg(deviceUuid.toString()));
                     }
-                    // copy component
-                    Device latestComp(filepath);
-                    FilePath dest = projectFilepath.getParentDir().getPathTo("library/cmp");
-                    latestComp.saveTo(dest);
-                    ui->log->addItem(latestComp.getDirectory().toNative());
+                    // copy device
+                    Device latestDevice(filepath);
+                    FilePath dest = projectFilepath.getParentDir().getPathTo("library/dev");
+                    latestDevice.saveTo(dest);
+                    ui->log->addItem(latestDevice.getDirectory().toNative());
 
                     // get package
-                    QUuid packUuid = latestComp.getPackageUuid();
+                    QUuid packUuid = latestDevice.getPackageUuid();
                     filepath = lib.getLatestPackage(packUuid);
                     if (!filepath.isValid())
                     {
@@ -158,22 +158,8 @@ void MainWindow::on_pushButton_2_clicked()
                     dest = projectFilepath.getParentDir().getPathTo("library/pkg");
                     latestPackage.saveTo(dest);
                     ui->log->addItem(latestPackage.getDirectory().toNative());
-
-                    // get footprint
-                    QUuid footprintUuid = latestPackage.getFootprintUuid();
-                    filepath = lib.getLatestFootprint(footprintUuid);
-                    if (!filepath.isValid())
-                    {
-                        throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
-                            QString("missing footprint: %1").arg(footprintUuid.toString()));
-                    }
-                    // copy footprint
-                    Footprint latestFootprint(filepath);
-                    dest = projectFilepath.getParentDir().getPathTo("library/fpt");
-                    latestFootprint.saveTo(dest);
-                    ui->log->addItem(latestFootprint.getDirectory().toNative());
                 }
-            }*/
+            }
         }
     }
     catch (Exception& e)

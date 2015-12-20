@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_GENCOMPATTRIBUTEINSTANCE_H
-#define PROJECT_GENCOMPATTRIBUTEINSTANCE_H
+#ifndef PROJECT_COMPONENTATTRIBUTEINSTANCE_H
+#define PROJECT_COMPONENTATTRIBUTEINSTANCE_H
 
 /*****************************************************************************************
  *  Includes
@@ -35,25 +35,25 @@ class AttributeType;
 class AttributeUnit;
 
 /*****************************************************************************************
- *  Class GenCompAttributeInstance
+ *  Class ComponentAttributeInstance
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The GenCompAttributeInstance class
+ * @brief The ComponentAttributeInstance class
  */
-class GenCompAttributeInstance final : public IF_XmlSerializableObject
+class ComponentAttributeInstance final : public IF_XmlSerializableObject
 {
-        Q_DECLARE_TR_FUNCTIONS(GenCompAttributeInstance)
+        Q_DECLARE_TR_FUNCTIONS(ComponentAttributeInstance)
 
     public:
 
         // Constructors / Destructor
-        explicit GenCompAttributeInstance(const XmlDomElement& domElement) throw (Exception);
-        explicit GenCompAttributeInstance(const QString& key, const AttributeType& type,
-                                          const QString& value, const AttributeUnit* unit) throw (Exception);
-        ~GenCompAttributeInstance() noexcept;
+        explicit ComponentAttributeInstance(const XmlDomElement& domElement) throw (Exception);
+        explicit ComponentAttributeInstance(const QString& key, const AttributeType& type,
+                                            const QString& value, const AttributeUnit* unit) throw (Exception);
+        ~ComponentAttributeInstance() noexcept;
 
         // Getters
         const QString& getKey() const noexcept {return mKey;}
@@ -75,9 +75,9 @@ class GenCompAttributeInstance final : public IF_XmlSerializableObject
     private:
 
         // make some methods inaccessible...
-        GenCompAttributeInstance();
-        GenCompAttributeInstance(const GenCompAttributeInstance& other);
-        GenCompAttributeInstance& operator=(const GenCompAttributeInstance& rhs);
+        ComponentAttributeInstance();
+        ComponentAttributeInstance(const ComponentAttributeInstance& other);
+        ComponentAttributeInstance& operator=(const ComponentAttributeInstance& rhs);
 
         // Private Methods
 
@@ -94,4 +94,4 @@ class GenCompAttributeInstance final : public IF_XmlSerializableObject
 
 } // namespace project
 
-#endif // PROJECT_GENCOMPATTRIBUTEINSTANCE_H
+#endif // PROJECT_COMPONENTATTRIBUTEINSTANCE_H

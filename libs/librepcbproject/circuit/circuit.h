@@ -39,7 +39,7 @@ namespace project {
 class Project;
 class NetClass;
 class NetSignal;
-class GenCompInstance;
+class ComponentInstance;
 }
 
 namespace library {
@@ -100,16 +100,16 @@ class Circuit final : public QObject, public IF_XmlSerializableObject
         void removeNetSignal(NetSignal& netsignal) throw (Exception);
         void setNetSignalName(NetSignal& netsignal, const QString& newName, bool isAutoName) throw (Exception);
 
-        // GenCompInstance Methods
-        const QHash<QUuid, GenCompInstance*>& getGenCompInstances() const noexcept {return mGenCompInstances;}
-        GenCompInstance* getGenCompInstanceByUuid(const QUuid& uuid) const noexcept;
-        GenCompInstance* getGenCompInstanceByName(const QString& name) const noexcept;
-        GenCompInstance* createGenCompInstance(const library::Component& genComp,
-                                               const library::ComponentSymbolVariant& symbVar,
-                                               QString name = QString()) throw (Exception);
-        void addGenCompInstance(GenCompInstance& genCompInstance) throw (Exception);
-        void removeGenCompInstance(GenCompInstance& genCompInstance) throw (Exception);
-        void setGenCompInstanceName(GenCompInstance& genComp, const QString& newName) throw (Exception);
+        // ComponentInstance Methods
+        const QHash<QUuid, ComponentInstance*>& getComponentInstances() const noexcept {return mComponentInstances;}
+        ComponentInstance* getComponentInstanceByUuid(const QUuid& uuid) const noexcept;
+        ComponentInstance* getComponentInstanceByName(const QString& name) const noexcept;
+        ComponentInstance* createComponentInstance(const library::Component& cmp,
+                                                 const library::ComponentSymbolVariant& symbVar,
+                                                 QString name = QString()) throw (Exception);
+        void addComponentInstance(ComponentInstance& cmp) throw (Exception);
+        void removeComponentInstance(ComponentInstance& cmp) throw (Exception);
+        void setComponentInstanceName(ComponentInstance& cmp, const QString& newName) throw (Exception);
 
         // General Methods
         bool save(bool toOriginal, QStringList& errors) noexcept;
@@ -121,8 +121,8 @@ class Circuit final : public QObject, public IF_XmlSerializableObject
         void netClassRemoved(NetClass& netclass);
         void netSignalAdded(NetSignal& netsignal);
         void netSignalRemoved(NetSignal& netsignal);
-        void genCompAdded(GenCompInstance& genComp);
-        void genCompRemoved(GenCompInstance& genComp);
+        void componentAdded(ComponentInstance& genComp);
+        void componentRemoved(ComponentInstance& genComp);
 
 
     private:
@@ -150,7 +150,7 @@ class Circuit final : public QObject, public IF_XmlSerializableObject
 
         QHash<QUuid, NetClass*> mNetClasses;
         QHash<QUuid, NetSignal*> mNetSignals;
-        QHash<QUuid, GenCompInstance*> mGenCompInstances;
+        QHash<QUuid, ComponentInstance*> mComponentInstances;
 };
 
 } // namespace project

@@ -25,22 +25,12 @@ SOURCES += \
     circuit/circuit.cpp \
     circuit/netclass.cpp \
     circuit/netsignal.cpp \
-    circuit/gencompsignalinstance.cpp \
-    circuit/gencompinstance.cpp \
-    circuit/gencompattributeinstance.cpp \
     circuit/cmd/cmdnetclassadd.cpp \
     circuit/cmd/cmdnetclassremove.cpp \
     circuit/cmd/cmdnetsignaladd.cpp \
     circuit/cmd/cmdnetsignalremove.cpp \
-    circuit/cmd/cmdgencompsiginstsetnetsignal.cpp \
-    circuit/cmd/cmdgencompinstedit.cpp \
     circuit/cmd/cmdnetclassedit.cpp \
     circuit/cmd/cmdnetsignaledit.cpp \
-    circuit/cmd/cmdgencompinstadd.cpp \
-    circuit/cmd/cmdgencompinstremove.cpp \
-    circuit/cmd/cmdgencompattrinstadd.cpp \
-    circuit/cmd/cmdgencompattrinstremove.cpp \
-    circuit/cmd/cmdgencompattrinstedit.cpp \
     schematics/schematic.cpp \
     schematics/cmd/cmdschematicadd.cpp \
     schematics/cmd/cmdschematicremove.cpp \
@@ -88,29 +78,29 @@ SOURCES += \
     boards/deviceinstance.cpp \
     boards/cmd/cmddeviceinstanceadd.cpp \
     boards/cmd/cmddeviceinstanceedit.cpp \
-    boards/cmd/cmddeviceinstanceremove.cpp
+    boards/cmd/cmddeviceinstanceremove.cpp \
+    circuit/componentinstance.cpp \
+    circuit/componentattributeinstance.cpp \
+    circuit/componentsignalinstance.cpp \
+    circuit/cmd/cmdcompattrinstadd.cpp \
+    circuit/cmd/cmdcompattrinstedit.cpp \
+    circuit/cmd/cmdcompattrinstremove.cpp \
+    circuit/cmd/cmdcomponentinstanceadd.cpp \
+    circuit/cmd/cmdcomponentinstanceedit.cpp \
+    circuit/cmd/cmdcomponentinstanceremove.cpp \
+    circuit/cmd/cmdcompsiginstsetnetsignal.cpp
 
 HEADERS += \
     project.h \
     circuit/circuit.h \
     circuit/netclass.h \
     circuit/netsignal.h \
-    circuit/gencompsignalinstance.h \
-    circuit/gencompinstance.h \
-    circuit/gencompattributeinstance.h \
     circuit/cmd/cmdnetclassadd.h \
     circuit/cmd/cmdnetclassremove.h \
     circuit/cmd/cmdnetsignaladd.h \
     circuit/cmd/cmdnetsignalremove.h \
-    circuit/cmd/cmdgencompsiginstsetnetsignal.h \
-    circuit/cmd/cmdgencompinstedit.h \
     circuit/cmd/cmdnetclassedit.h \
     circuit/cmd/cmdnetsignaledit.h \
-    circuit/cmd/cmdgencompinstadd.h \
-    circuit/cmd/cmdgencompinstremove.h \
-    circuit/cmd/cmdgencompattrinstadd.h \
-    circuit/cmd/cmdgencompattrinstremove.h \
-    circuit/cmd/cmdgencompattrinstedit.h \
     schematics/schematic.h \
     schematics/cmd/cmdschematicadd.h \
     schematics/cmd/cmdschematicremove.h \
@@ -159,6 +149,16 @@ HEADERS += \
     boards/deviceinstance.h \
     boards/cmd/cmddeviceinstanceadd.h \
     boards/cmd/cmddeviceinstanceremove.h \
-    boards/cmd/cmddeviceinstanceedit.h
+    boards/cmd/cmddeviceinstanceedit.h \
+    circuit/componentinstance.h \
+    circuit/componentattributeinstance.h \
+    circuit/componentsignalinstance.h \
+    circuit/cmd/cmdcompattrinstadd.h \
+    circuit/cmd/cmdcompattrinstedit.h \
+    circuit/cmd/cmdcompattrinstremove.h \
+    circuit/cmd/cmdcomponentinstanceadd.h \
+    circuit/cmd/cmdcomponentinstanceedit.h \
+    circuit/cmd/cmdcomponentinstanceremove.h \
+    circuit/cmd/cmdcompsiginstsetnetsignal.h
 
 FORMS +=

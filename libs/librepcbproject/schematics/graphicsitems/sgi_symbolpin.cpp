@@ -30,8 +30,8 @@
 #include "../schematic.h"
 #include "../../project.h"
 #include "../../circuit/netsignal.h"
-#include "../../circuit/gencompinstance.h"
-#include "../../circuit/gencompsignalinstance.h"
+#include "../../circuit/componentinstance.h"
+#include "../../circuit/componentsignalinstance.h"
 #include <librepcbcommon/schematiclayer.h>
 #include <librepcblibrary/sym/symbolpin.h>
 #include <librepcblibrary/cmp/component.h>

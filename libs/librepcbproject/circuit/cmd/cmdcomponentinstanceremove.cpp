@@ -22,9 +22,9 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "cmdgencompattrinstremove.h"
-#include "../gencompinstance.h"
-#include "../gencompattributeinstance.h"
+#include "cmdcomponentinstanceremove.h"
+#include "../circuit.h"
+#include "../componentinstance.h"
 
 namespace project {
 
@@ -32,27 +32,27 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdGenCompAttrInstRemove::CmdGenCompAttrInstRemove(GenCompInstance& genComp,
-                                                   GenCompAttributeInstance& attr,
-                                                   UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Remove component attribute"), parent),
-    mGenCompInstance(genComp), mAttrInstance(attr)
+CmdComponentInstanceRemove::CmdComponentInstanceRemove(Circuit& circuit,
+                                                       ComponentInstance& cmp,
+                                                       UndoCommand* parent) throw (Exception) :
+    UndoCommand(tr("Remove generic component"), parent),
+    mCircuit(circuit), mComponentInstance(cmp)
 {
 }
 
-CmdGenCompAttrInstRemove::~CmdGenCompAttrInstRemove() noexcept
+CmdComponentInstanceRemove::~CmdComponentInstanceRemove() noexcept
 {
     if (isExecuted())
-        delete &mAttrInstance;
+        delete &mComponentInstance;
 }
 
 /*****************************************************************************************
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdGenCompAttrInstRemove::redo() throw (Exception)
+void CmdComponentInstanceRemove::redo() throw (Exception)
 {
-    mGenCompInstance.removeAttribute(mAttrInstance); // throws an exception on error
+    mCircuit.removeComponentInstance(mComponentInstance); // throws an exception on error
 
     try
     {
@@ -60,14 +60,14 @@ void CmdGenCompAttrInstRemove::redo() throw (Exception)
     }
     catch (Exception &e)
     {
-        mGenCompInstance.addAttribute(mAttrInstance);
+        mCircuit.addComponentInstance(mComponentInstance);
         throw;
     }
 }
 
-void CmdGenCompAttrInstRemove::undo() throw (Exception)
+void CmdComponentInstanceRemove::undo() throw (Exception)
 {
-    mGenCompInstance.addAttribute(mAttrInstance); // throws an exception on error
+    mCircuit.addComponentInstance(mComponentInstance); // throws an exception on error
 
     try
     {
@@ -75,7 +75,7 @@ void CmdGenCompAttrInstRemove::undo() throw (Exception)
     }
     catch (Exception& e)
     {
-        mGenCompInstance.removeAttribute(mAttrInstance);
+        mCircuit.removeComponentInstance(mComponentInstance);
         throw;
     }
 }

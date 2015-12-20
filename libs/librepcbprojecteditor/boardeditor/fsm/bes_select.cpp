@@ -34,7 +34,7 @@
 #include <librepcbproject/boards/cmd/cmddeviceinstanceedit.h>
 #include <librepcbproject/boards/cmd/cmddeviceinstanceremove.h>
 #include <librepcbproject/boards/deviceinstance.h>
-#include <librepcbproject/circuit/gencompinstance.h>
+#include <librepcbproject/circuit/componentinstance.h>
 #include <librepcbworkspace/workspace.h>
 #include <librepcblibrary/library.h>
 #include <librepcblibrary/elements.h>

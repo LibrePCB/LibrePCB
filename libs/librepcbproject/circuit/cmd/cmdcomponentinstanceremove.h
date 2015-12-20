@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDGENCOMPSIGINSTSETNETSIGNAL_H
-#define PROJECT_CMDGENCOMPSIGINSTSETNETSIGNAL_H
+#ifndef PROJECT_CMDCOMPONENTINSTANCEREMOVE_H
+#define PROJECT_CMDCOMPONENTINSTANCEREMOVE_H
 
 /*****************************************************************************************
  *  Includes
@@ -33,28 +33,27 @@
  ****************************************************************************************/
 
 namespace project {
-class GenCompSignalInstance;
-class NetSignal;
+class Circuit;
+class ComponentInstance;
 }
 
 /*****************************************************************************************
- *  Class CmdGenCompSigInstSetNetSignal
+ *  Class CmdComponentInstanceRemove
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The CmdGenCompSigInstSetNetSignal class
+ * @brief The CmdComponentInstanceRemove class
  */
-class CmdGenCompSigInstSetNetSignal final : public UndoCommand
+class CmdComponentInstanceRemove final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdGenCompSigInstSetNetSignal(GenCompSignalInstance& genCompSigInstance,
-                                               NetSignal* netsignal,
-                                               UndoCommand* parent = 0) throw (Exception);
-        ~CmdGenCompSigInstSetNetSignal() noexcept;
+        explicit CmdComponentInstanceRemove(Circuit& circuit, ComponentInstance& cmp,
+                                            UndoCommand* parent = 0) throw (Exception);
+        ~CmdComponentInstanceRemove() noexcept;
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;
@@ -63,13 +62,10 @@ class CmdGenCompSigInstSetNetSignal final : public UndoCommand
     private:
 
         // Attributes from the constructor
-        GenCompSignalInstance& mGenCompSigInstance;
-        NetSignal* mNetSignal;
-
-        // General Attributes
-        NetSignal* mOldNetSignal;
+        Circuit& mCircuit;
+        ComponentInstance& mComponentInstance;
 };
 
 } // namespace project
 
-#endif // PROJECT_CMDGENCOMPSIGINSTSETNETSIGNAL_H
+#endif // PROJECT_CMDCOMPONENTINSTANCEREMOVE_H

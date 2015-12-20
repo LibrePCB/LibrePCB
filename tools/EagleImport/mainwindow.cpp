@@ -147,10 +147,10 @@ void MainWindow::convertFile(ConvertFileType_t type, QSettings& outputSettings, 
             case ConvertFileType_t::Symbols_to_Symbols:
                 node = node->getFirstChild("symbols", true);
                 break;
-            case ConvertFileType_t::Packages_to_FootprintsAndComponents:
+            case ConvertFileType_t::Packages_to_PackagesAndDevices:
                 node = node->getFirstChild("packages", true);
                 break;
-            case ConvertFileType_t::Devices_to_GenericComponents:
+            case ConvertFileType_t::Devices_to_Components:
                 node = node->getFirstChild("devicesets", true);
                 break;
             default:
@@ -385,16 +385,20 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
 {
     try
     {
-        /*QString name = node->getAttribute("name", true);
-        QUuid uuid = getOrCreateUuid(outputSettings, filepath, "packages_to_footprints", name);
+        QString name = node->getAttribute("name", true);
         QString desc = node->getFirstChild("description", false) ? node->getFirstChild("description", true)->getText() : "";
         desc.append(createDescription(filepath, name));
         bool rotate180 = false;
         //if (filepath.getFilename() == "con-lsta.lbr" && name.startsWith("FE")) rotate180 = true;
         //if (filepath.getFilename() == "con-lstb.lbr" && name.startsWith("MA")) rotate180 = true;
 
-        // create footprint
-        Footprint* footprint = new Footprint(uuid, Version("0.1"), "LibrePCB", name, desc);
+        // create package
+        QUuid pkgUuid = getOrCreateUuid(outputSettings, filepath, "packages_to_packages", name);
+        Package* package = new Package(pkgUuid, Version("0.1"), "LibrePCB", name, desc);
+
+        // create default footprint
+        QUuid fptUuid = getOrCreateUuid(outputSettings, filepath, "packages_to_footprints", name);
+        Footprint* footprint = new Footprint(fptUuid, "default", "", true);
 
         for (XmlDomElement* child = node->getFirstChild(); child; child = child->getNextSibling())
         {
@@ -571,37 +575,41 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
             }
             else if (child->getName() == "pad")
             {
-                QUuid padUuid = getOrCreateUuid(outputSettings, filepath, "footprint_pads", uuid.toString(), child->getAttribute("name"));
-                FootprintPad* pad = new FootprintPad(padUuid, child->getAttribute("name"));
+                QUuid padUuid = getOrCreateUuid(outputSettings, filepath, "package_pads", fptUuid.toString(), child->getAttribute("name"));
+                // add package pad
+                PackagePad* pkgPad = new PackagePad(padUuid, child->getAttribute("name"));
+                package->addPad(*pkgPad);
+                // add footprint pad
+                FootprintPad* fptPad = new FootprintPad(padUuid);
                 Length drill = child->getAttribute<Length>("drill");
-                pad->setDrillDiameter(drill);
+                fptPad->setDrillDiameter(drill);
                 Length diameter = child->hasAttribute("diameter") ? child->getAttribute<Length>("diameter") : drill * 2;
                 int angleDeg = 0;
                 if (child->hasAttribute("rot")) angleDeg = child->getAttribute("rot").remove("R").toInt();
                 QString shape = child->hasAttribute("shape") ? child->getAttribute("shape") : "round";
                 if (shape == "square")
                 {
-                    pad->setType(FootprintPad::Type_t::ThtRect);
-                    pad->setWidth(diameter);
-                    pad->setHeight(diameter);
+                    fptPad->setType(FootprintPad::Type_t::ThtRect);
+                    fptPad->setWidth(diameter);
+                    fptPad->setHeight(diameter);
                 }
                 else if (shape == "octagon")
                 {
-                    pad->setType(FootprintPad::Type_t::ThtOctagon);
-                    pad->setWidth(diameter);
-                    pad->setHeight(diameter);
+                    fptPad->setType(FootprintPad::Type_t::ThtOctagon);
+                    fptPad->setWidth(diameter);
+                    fptPad->setHeight(diameter);
                 }
                 else if (shape == "round")
                 {
-                    pad->setType(FootprintPad::Type_t::ThtRound);
-                    pad->setWidth(diameter);
-                    pad->setHeight(diameter);
+                    fptPad->setType(FootprintPad::Type_t::ThtRound);
+                    fptPad->setWidth(diameter);
+                    fptPad->setHeight(diameter);
                 }
                 else if (shape == "long")
                 {
-                    pad->setType(FootprintPad::Type_t::ThtRound);
-                    pad->setWidth(diameter * 2);
-                    pad->setHeight(diameter);
+                    fptPad->setType(FootprintPad::Type_t::ThtRound);
+                    fptPad->setWidth(diameter * 2);
+                    fptPad->setHeight(diameter);
                 }
                 else
                 {
@@ -613,15 +621,19 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                     pos = Point(-pos.getX(), -pos.getY());
                     angleDeg += 180;
                 }
-                pad->setPosition(pos);
-                pad->setRotation(Angle::fromDeg(angleDeg));
-                footprint->addPad(pad);
+                fptPad->setPosition(pos);
+                fptPad->setRotation(Angle::fromDeg(angleDeg));
+                footprint->addPad(fptPad);
             }
             else if (child->getName() == "smd")
             {
-                QUuid padUuid = getOrCreateUuid(outputSettings, filepath, "footprint_pads", uuid.toString(), child->getAttribute("name"));
-                FootprintPad* pad = new FootprintPad(padUuid, child->getAttribute("name"));
-                pad->setType(FootprintPad::Type_t::SmdRect);
+                QUuid padUuid = getOrCreateUuid(outputSettings, filepath, "package_pads", fptUuid.toString(), child->getAttribute("name"));
+                // add package pad
+                PackagePad* pkgPad = new PackagePad(padUuid, child->getAttribute("name"));
+                package->addPad(*pkgPad);
+                // add footprint pad
+                FootprintPad* fptPad = new FootprintPad(padUuid);
+                fptPad->setType(FootprintPad::Type_t::SmtRect);
                 Point pos = Point(child->getAttribute<Length>("x"), child->getAttribute<Length>("y"));
                 int angleDeg = 0;
                 if (child->hasAttribute("rot")) angleDeg = child->getAttribute("rot").remove("R").toInt();
@@ -630,18 +642,18 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                     pos = Point(-pos.getX(), -pos.getY());
                     angleDeg += 180;
                 }
-                pad->setPosition(pos);
-                pad->setRotation(Angle::fromDeg(angleDeg));
-                pad->setWidth(child->getAttribute<Length>("dx"));
-                pad->setHeight(child->getAttribute<Length>("dy"));
+                fptPad->setPosition(pos);
+                fptPad->setRotation(Angle::fromDeg(angleDeg));
+                fptPad->setWidth(child->getAttribute<Length>("dx"));
+                fptPad->setHeight(child->getAttribute<Length>("dy"));
                 switch (child->getAttribute<uint>("layer"))
                 {
-                    case 1: pad->setLayerId(BoardLayer::LayerID::TopCopper); break;
-                    case 16: pad->setLayerId(BoardLayer::LayerID::BottomCopper); break;
+                    case 1: fptPad->setLayerId(BoardLayer::LayerID::TopCopper); break;
+                    case 16: fptPad->setLayerId(BoardLayer::LayerID::BottomCopper); break;
                     default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
                 }
 
-                footprint->addPad(pad);
+                footprint->addPad(fptPad);
             }
             else if (child->getName() == "hole")
             {
@@ -661,18 +673,14 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
         PolygonSimplifier<Footprint, FootprintPolygon, FootprintPolygonSegment> polygonSimplifier(*footprint);
         polygonSimplifier.convertLineRectsToPolygonRects(false, true);
 
-        // save footprint to file
-        footprint->saveTo(FilePath(QString("%1/fpt").arg(ui->output->text())));
+        // add footprint to package
+        package->addFootprint(*footprint);
 
-        // create package
-        QUuid pkgUuid = getOrCreateUuid(outputSettings, filepath, "packages_to_packages", name);
-        Package* package = new Package(pkgUuid, Version("0.1"), "LibrePCB", name, desc);
-        package->setFootprintUuid(footprint->getUuid());
+        // save package to file
         package->saveTo(FilePath(QString("%1/pkg").arg(ui->output->text())));
 
         // clean up
         delete package;
-        delete footprint;*/
     }
     catch (Exception& e)
     {
@@ -692,23 +700,23 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
         // abort if device name ends with "-US"
         if (name.endsWith("-US")) return false;
 
-        QUuid uuid = getOrCreateUuid(outputSettings, filepath, "devices_to_genericcomponents", name);
+        QUuid uuid = getOrCreateUuid(outputSettings, filepath, "devices_to_components", name);
         QString desc = node->getFirstChild("description", false) ? node->getFirstChild("description", true)->getText() : "";
         desc.append(createDescription(filepath, name));
 
-        // create generic component
-        Component* gencomp = new Component(uuid, Version("0.1"), "LibrePCB", name, desc);
+        // create  component
+        Component* component = new Component(uuid, Version("0.1"), "LibrePCB", name, desc);
 
         // properties
-        gencomp->addDefaultValue("en_US", "");
-        gencomp->addPrefix("", node->hasAttribute("prefix") ? node->getAttribute("prefix") : "", true);
+        component->addDefaultValue("en_US", "");
+        component->addPrefix("", node->hasAttribute("prefix") ? node->getAttribute("prefix") : "", true);
 
         // symbol variant
-        QUuid symbVarUuid = getOrCreateUuid(outputSettings, filepath, "gencomp_symbolvariants", uuid.toString());
+        QUuid symbVarUuid = getOrCreateUuid(outputSettings, filepath, "component_symbolvariants", uuid.toString());
         ComponentSymbolVariant* symbvar = new ComponentSymbolVariant(symbVarUuid, QString(), true);
         symbvar->setName("en_US", "default");
         symbvar->setDescription("en_US", "");
-        gencomp->addSymbolVariant(*symbvar);
+        component->addSymbolVariant(*symbvar);
 
         // signals
         XmlDomElement* device = node->getFirstChild("devices/device", true, true);
@@ -719,13 +727,13 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
             QString pinName = connect->getAttribute("pin");
             if (pinName.contains("@")) pinName.truncate(pinName.indexOf("@"));
             if (pinName.contains("#")) pinName.truncate(pinName.indexOf("#"));
-            QUuid signalUuid = getOrCreateUuid(outputSettings, filepath, "gatepins_to_gencompsignals", uuid.toString(), gateName % pinName);
+            QUuid signalUuid = getOrCreateUuid(outputSettings, filepath, "gatepins_to_componentsignals", uuid.toString(), gateName % pinName);
 
-            if (!gencomp->getSignalByUuid(signalUuid))
+            if (!component->getSignalByUuid(signalUuid))
             {
                 // create signal
                 ComponentSignal* signal = new ComponentSignal(signalUuid, pinName);
-                gencomp->addSignal(*signal);
+                component->addSignal(*signal);
             }
         }
 
@@ -750,7 +758,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
                     QUuid pinUuid = getOrCreateUuid(outputSettings, filepath, "symbol_pins", symbolUuid.toString(), pinName);
                     if (pinName.contains("@")) pinName.truncate(pinName.indexOf("@"));
                     if (pinName.contains("#")) pinName.truncate(pinName.indexOf("#"));
-                    QUuid signalUuid = getOrCreateUuid(outputSettings, filepath, "gatepins_to_gencompsignals", uuid.toString(), gateName % pinName);
+                    QUuid signalUuid = getOrCreateUuid(outputSettings, filepath, "gatepins_to_componentsignals", uuid.toString(), gateName % pinName);
                     item->addPinSignalMapping(pinUuid, signalUuid, ComponentSymbolVariantItem::PinDisplayType_t::ComponentSignal);
                 }
             }
@@ -758,24 +766,24 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
             symbvar->addItem(*item);
         }
 
-        // create components
-        /*for (XmlDomElement* device = node->getFirstChild("devices/*", true, true); device; device = device->getNextSibling())
+        // create devices
+        for (XmlDomElement* deviceNode = node->getFirstChild("devices/*", true, true); deviceNode; deviceNode = deviceNode->getNextSibling())
         {
-            if (!device->hasAttribute("package")) continue;
+            if (!deviceNode->hasAttribute("package")) continue;
 
-            QString deviceName = device->getAttribute("name");
-            QString packageName = device->getAttribute("package");
+            QString deviceName = deviceNode->getAttribute("name");
+            QString packageName = deviceNode->getAttribute("package");
             QUuid pkgUuid = getOrCreateUuid(outputSettings, filepath, "packages_to_packages", packageName);
             QUuid fptUuid = getOrCreateUuid(outputSettings, filepath, "packages_to_footprints", packageName);
 
-            QUuid compUuid = getOrCreateUuid(outputSettings, filepath, "devices_to_components", name, deviceName);
+            QUuid compUuid = getOrCreateUuid(outputSettings, filepath, "devices_to_devices", name, deviceName);
             QString compName = deviceName.isEmpty() ? name : QString("%1_%2").arg(name, deviceName);
-            Device* component = new Device(compUuid, Version("0.1"), "LibrePCB", compName, desc);
-            component->setGenCompUuid(gencomp->getUuid());
-            component->setPackageUuid(pkgUuid);
+            Device* device = new Device(compUuid, Version("0.1"), "LibrePCB", compName, desc);
+            device->setComponentUuid(component->getUuid());
+            device->setPackageUuid(pkgUuid);
 
             // connect pads
-            for (XmlDomElement* connect = device->getFirstChild("connects/*", false, false);
+            for (XmlDomElement* connect = deviceNode->getFirstChild("connects/*", false, false);
                  connect; connect = connect->getNextSibling())
             {
                 QString gateName = connect->getAttribute("gate");
@@ -790,20 +798,20 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
                 }
                 foreach (const QString& padName, padNames.split(" ", QString::SkipEmptyParts))
                 {
-                    QUuid padUuid = getOrCreateUuid(outputSettings, filepath, "footprint_pads", fptUuid.toString(), padName);
-                    QUuid signalUuid = getOrCreateUuid(outputSettings, filepath, "gatepins_to_gencompsignals", uuid.toString(), gateName % pinName);
-                    component->addPadSignalMapping(padUuid, signalUuid);
+                    QUuid padUuid = getOrCreateUuid(outputSettings, filepath, "package_pads", fptUuid.toString(), padName);
+                    QUuid signalUuid = getOrCreateUuid(outputSettings, filepath, "gatepins_to_componentsignals", uuid.toString(), gateName % pinName);
+                    device->addPadSignalMapping(padUuid, signalUuid);
                 }
             }
 
-            // save component
-            component->saveTo(FilePath(QString("%1/cmp").arg(ui->output->text())));
-            delete component;
-        }*/
+            // save device
+            device->saveTo(FilePath(QString("%1/dev").arg(ui->output->text())));
+            delete device;
+        }
 
-        // save generic component to file
-        gencomp->saveTo(FilePath(QString("%1/gencmp").arg(ui->output->text())));
-        delete gencomp;
+        // save component to file
+        component->saveTo(FilePath(QString("%1/cmp").arg(ui->output->text())));
+        delete component;
     }
     catch (Exception& e)
     {
@@ -842,12 +850,12 @@ void MainWindow::on_btnConvertSymbols_clicked()
 
 void MainWindow::on_btnConvertDevices_clicked()
 {
-    convertAllFiles(ConvertFileType_t::Devices_to_GenericComponents);
+    convertAllFiles(ConvertFileType_t::Devices_to_Components);
 }
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    convertAllFiles(ConvertFileType_t::Packages_to_FootprintsAndComponents);
+    convertAllFiles(ConvertFileType_t::Packages_to_PackagesAndDevices);
 }
 
 void MainWindow::on_btnPathsFromIni_clicked()

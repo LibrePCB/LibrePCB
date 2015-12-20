@@ -38,7 +38,7 @@ class ComponentSymbolVariantItem;
 }
 
 namespace project {
-class GenCompInstance;
+class ComponentInstance;
 class SI_Symbol;
 class CmdSymbolInstanceEdit;
 class AddGenCompDialog;

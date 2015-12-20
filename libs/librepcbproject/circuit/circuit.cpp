@@ -30,7 +30,7 @@
 #include "../project.h"
 #include "netclass.h"
 #include "netsignal.h"
-#include "gencompinstance.h"
+#include "componentinstance.h"
 #include <librepcblibrary/cmp/component.h>
 #include "../settings/projectsettings.h"
 
@@ -80,12 +80,12 @@ Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create) thr
                 addNetSignal(*netsignal);
             }
 
-            // Load all generic component instances
-            for (XmlDomElement* node = root.getFirstChild("generic_component_instances/generic_component_instance", true, false);
-                 node; node = node->getNextSibling("generic_component_instance"))
+            // Load all component instances
+            for (XmlDomElement* node = root.getFirstChild("component_instances/component_instance", true, false);
+                 node; node = node->getNextSibling("component_instance"))
             {
-                GenCompInstance* genComp = new GenCompInstance(*this, *node);
-                addGenCompInstance(*genComp);
+                ComponentInstance* genComp = new ComponentInstance(*this, *node);
+                addComponentInstance(*genComp);
             }
         }
 
@@ -94,8 +94,8 @@ Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create) thr
     catch (...)
     {
         // free allocated memory (see comments in the destructor) and rethrow the exception
-        foreach (GenCompInstance* genCompInstance, mGenCompInstances)
-            try { removeGenCompInstance(*genCompInstance); delete genCompInstance; } catch (...) {}
+        foreach (ComponentInstance* compInstance, mComponentInstances)
+            try { removeComponentInstance(*compInstance); delete compInstance; } catch (...) {}
         foreach (NetSignal* netsignal, mNetSignals)
             try { removeNetSignal(*netsignal); delete netsignal; } catch (...) {}
         foreach (NetClass* netclass, mNetClasses)
@@ -109,9 +109,9 @@ Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create) thr
 
 Circuit::~Circuit() noexcept
 {
-    // delete all generic component instances (and catch all throwed exceptions)
-    foreach (GenCompInstance* genCompInstance, mGenCompInstances)
-        try { removeGenCompInstance(*genCompInstance); delete genCompInstance; } catch (...) {}
+    // delete all component instances (and catch all throwed exceptions)
+    foreach (ComponentInstance* compInstance, mComponentInstances)
+        try { removeComponentInstance(*compInstance); delete compInstance; } catch (...) {}
 
     // delete all netsignals (and catch all throwed exceptions)
     foreach (NetSignal* netsignal, mNetSignals)
@@ -326,108 +326,108 @@ void Circuit::setNetSignalName(NetSignal& netsignal, const QString& newName, boo
  *  GenCompInstance Methods
  ****************************************************************************************/
 
-GenCompInstance* Circuit::getGenCompInstanceByUuid(const QUuid& uuid) const noexcept
+ComponentInstance* Circuit::getComponentInstanceByUuid(const QUuid& uuid) const noexcept
 {
-    return mGenCompInstances.value(uuid, nullptr);
+    return mComponentInstances.value(uuid, nullptr);
 }
 
-GenCompInstance* Circuit::getGenCompInstanceByName(const QString& name) const noexcept
+ComponentInstance* Circuit::getComponentInstanceByName(const QString& name) const noexcept
 {
-    foreach (GenCompInstance* genCompInstance, mGenCompInstances)
+    foreach (ComponentInstance* compInstance, mComponentInstances)
     {
-        if (genCompInstance->getName() == name)
-            return genCompInstance;
+        if (compInstance->getName() == name)
+            return compInstance;
     }
     return nullptr;
 }
 
-GenCompInstance* Circuit::createGenCompInstance(const library::Component& genComp,
+ComponentInstance* Circuit::createComponentInstance(const library::Component& cmp,
                                                 const library::ComponentSymbolVariant& symbVar,
                                                 QString name) throw (Exception)
 {
     if (name.isEmpty())
     {
-        QString prefix = genComp.getPrefix(mProject.getSettings().getLocaleOrder());
+        QString prefix = cmp.getPrefix(mProject.getSettings().getLocaleOrder());
         if (prefix.isEmpty()) prefix = "?";
         unsigned int i = 1;
         do
         {
             name = QString("%1%2").arg(prefix).arg(i++); // find a new unique component name
-        } while (getGenCompInstanceByName(name));
+        } while (getComponentInstanceByName(name));
     }
     else
     {
-        if (getGenCompInstanceByName(name))
+        if (getComponentInstanceByName(name))
         {
             throw RuntimeError(__FILE__, __LINE__, name, QString(tr("The component "
                 "name \"%1\" does already exist in the circuit.")).arg(name));
         }
     }
-    return new GenCompInstance(*this, genComp, symbVar, name);
+    return new ComponentInstance(*this, cmp, symbVar, name);
 }
 
-void Circuit::addGenCompInstance(GenCompInstance& genCompInstance) throw (Exception)
+void Circuit::addComponentInstance(ComponentInstance& cmp) throw (Exception)
 {
-    // check if there is no generic component with the same uuid in the list
-    if (getGenCompInstanceByUuid(genCompInstance.getUuid()))
+    // check if there is no component with the same uuid in the list
+    if (getComponentInstanceByUuid(cmp.getUuid()))
     {
-        throw RuntimeError(__FILE__, __LINE__, genCompInstance.getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, cmp.getUuid().toString(),
             QString(tr("There is already a component with the UUID \"%1\"!"))
-            .arg(genCompInstance.getUuid().toString()));
+            .arg(cmp.getUuid().toString()));
     }
 
-    // check if there is no generic component with the same name in the list
-    if (getGenCompInstanceByName(genCompInstance.getName()))
+    // check if there is no component with the same name in the list
+    if (getComponentInstanceByName(cmp.getName()))
     {
-        throw RuntimeError(__FILE__, __LINE__, genCompInstance.getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, cmp.getUuid().toString(),
             QString(tr("There is already a component with the name \"%1\"!"))
-            .arg(genCompInstance.getName()));
+            .arg(cmp.getName()));
     }
 
     // add to circuit
-    genCompInstance.addToCircuit();
-    mGenCompInstances.insert(genCompInstance.getUuid(), &genCompInstance);
-    emit genCompAdded(genCompInstance);
+    cmp.addToCircuit();
+    mComponentInstances.insert(cmp.getUuid(), &cmp);
+    emit componentAdded(cmp);
 }
 
-void Circuit::removeGenCompInstance(GenCompInstance& genCompInstance) throw (Exception)
+void Circuit::removeComponentInstance(ComponentInstance& cmp) throw (Exception)
 {
-    Q_ASSERT(mGenCompInstances.contains(genCompInstance.getUuid()) == true);
+    Q_ASSERT(mComponentInstances.contains(cmp.getUuid()) == true);
 
-    // check if the generic component instance is not used by symbols/footprints
-    if (genCompInstance.getPlacedSymbolsCount() > 0)
+    // check if the component instance is not used by symbols/devices
+    if (cmp.getPlacedSymbolsCount() > 0)
     {
-        throw LogicError(__FILE__, __LINE__, genCompInstance.getUuid().toString(),
-            QString(tr("The component \"%1\" is still used!")).arg(genCompInstance.getName()));
+        throw LogicError(__FILE__, __LINE__, cmp.getUuid().toString(),
+            QString(tr("The component \"%1\" is still used!")).arg(cmp.getName()));
     }
 
     // remove from circuit
-    genCompInstance.removeFromCircuit();
-    mGenCompInstances.remove(genCompInstance.getUuid());
-    emit genCompRemoved(genCompInstance);
+    cmp.removeFromCircuit();
+    mComponentInstances.remove(cmp.getUuid());
+    emit componentRemoved(cmp);
 }
 
-void Circuit::setGenCompInstanceName(GenCompInstance& genComp, const QString& newName) throw (Exception)
+void Circuit::setComponentInstanceName(ComponentInstance& cmp, const QString& newName) throw (Exception)
 {
-    Q_ASSERT(mGenCompInstances.contains(genComp.getUuid()) == true);
-    if (newName == genComp.getName()) return;
+    Q_ASSERT(mComponentInstances.contains(cmp.getUuid()) == true);
+    if (newName == cmp.getName()) return;
 
     // check the validity of the new name
     if (newName.isEmpty())
     {
-        throw RuntimeError(__FILE__, __LINE__, genComp.getUuid().toString(),
-            QString(tr("The new generic component name must not be empty!")));
+        throw RuntimeError(__FILE__, __LINE__, cmp.getUuid().toString(),
+            QString(tr("The new component name must not be empty!")));
     }
 
-    // check if there is no generic component with the same name in the list
-    if (getGenCompInstanceByName(newName))
+    // check if there is no component with the same name in the list
+    if (getComponentInstanceByName(newName))
     {
-        throw RuntimeError(__FILE__, __LINE__, genComp.getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, cmp.getUuid().toString(),
             QString(tr("There is already a component with the name \"%1\"!")).arg(newName));
     }
 
     // apply the new name
-    genComp.setName(newName);
+    cmp.setName(newName);
 }
 
 /*****************************************************************************************
@@ -475,8 +475,8 @@ XmlDomElement* Circuit::serializeToXmlDomElement() const throw (Exception)
     XmlDomElement* netsignals = root->appendChild("netsignals");
     foreach (NetSignal* netsignal, mNetSignals)
         netsignals->appendChild(netsignal->serializeToXmlDomElement());
-    XmlDomElement* genericComponents = root->appendChild("generic_component_instances");
-    foreach (GenCompInstance* instance, mGenCompInstances)
+    XmlDomElement* genericComponents = root->appendChild("component_instances");
+    foreach (ComponentInstance* instance, mComponentInstances)
         genericComponents->appendChild(instance->serializeToXmlDomElement());
     return root.take();
 }

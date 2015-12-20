@@ -17,9 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDGENCOMPINSTEDIT_H
-#define PROJECT_CMDGENCOMPINSTEDIT_H
-
+#ifndef PROJECT_CMDCOMPATTRINSTREMOVE_H
+#define PROJECT_CMDCOMPATTRINSTREMOVE_H
 
 /*****************************************************************************************
  *  Includes
@@ -27,43 +26,34 @@
 
 #include <QtCore>
 #include <librepcbcommon/undocommand.h>
-#include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
 namespace project {
-class Circuit;
-class GenCompInstance;
-}
-
-namespace library {
-class Component;
-class ComponentSymbolVariant;
+class ComponentInstance;
+class ComponentAttributeInstance;
 }
 
 /*****************************************************************************************
- *  Class CmdGenCompInstEdit
+ *  Class CmdCompAttrInstRemove
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The CmdGenCompInstEdit class
+ * @brief The CmdCompAttrInstRemove class
  */
-class CmdGenCompInstEdit final : public UndoCommand
+class CmdCompAttrInstRemove final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdGenCompInstEdit(Circuit& circuit, GenCompInstance& genComp,
-                                    UndoCommand* parent = 0) throw (Exception);
-        ~CmdGenCompInstEdit() noexcept;
-
-        // Setters
-        void setName(const QString& name) noexcept;
-        void setValue(const QString& value) noexcept;
+        explicit CmdCompAttrInstRemove(ComponentInstance& cmp,
+                                       ComponentAttributeInstance& attr,
+                                       UndoCommand* parent = 0) throw (Exception);
+        ~CmdCompAttrInstRemove() noexcept;
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;
@@ -71,17 +61,10 @@ class CmdGenCompInstEdit final : public UndoCommand
 
     private:
 
-        // Attributes from the constructor
-        Circuit& mCircuit;
-        GenCompInstance& mGenCompInstance;
-
-        // Misc
-        QString mOldName;
-        QString mNewName;
-        QString mOldValue;
-        QString mNewValue;
+        ComponentInstance& mComponentInstance;
+        ComponentAttributeInstance& mAttrInstance;
 };
 
 } // namespace project
 
-#endif // PROJECT_CMDGENCOMPINSTEDIT_H
+#endif // PROJECT_CMDCOMPATTRINSTREMOVE_H

@@ -22,8 +22,9 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "cmdgencompsiginstsetnetsignal.h"
-#include "../gencompsignalinstance.h"
+#include "cmdcompattrinstedit.h"
+#include "../componentinstance.h"
+#include "../componentattributeinstance.h"
 
 namespace project {
 
@@ -31,16 +32,21 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdGenCompSigInstSetNetSignal::CmdGenCompSigInstSetNetSignal(GenCompSignalInstance& genCompSigInstance,
-                                             NetSignal* netsignal,
-                                             UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Change component signal net"), parent),
-    mGenCompSigInstance(genCompSigInstance), mNetSignal(netsignal),
-    mOldNetSignal(genCompSigInstance.getNetSignal())
+CmdCompAttrInstEdit::CmdCompAttrInstEdit(ComponentInstance& cmp,
+                                               ComponentAttributeInstance& attr,
+                                               const AttributeType& newType,
+                                               const QString& newValue,
+                                               const AttributeUnit* newUnit,
+                                               UndoCommand* parent) throw (Exception) :
+    UndoCommand(tr("Edit generic component attribute"), parent),
+    mComponentInstance(cmp), mAttrInst(attr),
+    mOldType(&attr.getType()), mNewType(&newType),
+    mOldValue(attr.getValue()), mNewValue(newValue),
+    mOldUnit(attr.getUnit()), mNewUnit(newUnit)
 {
 }
 
-CmdGenCompSigInstSetNetSignal::~CmdGenCompSigInstSetNetSignal() noexcept
+CmdCompAttrInstEdit::~CmdCompAttrInstEdit() noexcept
 {
 }
 
@@ -48,32 +54,32 @@ CmdGenCompSigInstSetNetSignal::~CmdGenCompSigInstSetNetSignal() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdGenCompSigInstSetNetSignal::redo() throw (Exception)
+void CmdCompAttrInstEdit::redo() throw (Exception)
 {
-    mGenCompSigInstance.setNetSignal(mNetSignal); // throws an exception on error
-
     try
     {
-        UndoCommand::redo(); // throws an exception on error
+        mAttrInst.setTypeValueUnit(*mNewType, mNewValue, mNewUnit);
+        UndoCommand::redo();
+        emit mComponentInstance.attributesChanged();
     }
     catch (Exception &e)
     {
-        mGenCompSigInstance.setNetSignal(mOldNetSignal);
+        mAttrInst.setTypeValueUnit(*mOldType, mOldValue, mOldUnit);
         throw;
     }
 }
 
-void CmdGenCompSigInstSetNetSignal::undo() throw (Exception)
+void CmdCompAttrInstEdit::undo() throw (Exception)
 {
-    mGenCompSigInstance.setNetSignal(mOldNetSignal); // throws an exception on error
-
     try
     {
+        mAttrInst.setTypeValueUnit(*mOldType, mOldValue, mOldUnit);
         UndoCommand::undo();
+        emit mComponentInstance.attributesChanged();
     }
     catch (Exception& e)
     {
-        mGenCompSigInstance.setNetSignal(mNetSignal);
+        mAttrInst.setTypeValueUnit(*mNewType, mNewValue, mNewUnit);
         throw;
     }
 }

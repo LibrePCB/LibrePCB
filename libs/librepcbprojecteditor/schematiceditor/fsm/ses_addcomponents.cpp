@@ -28,10 +28,10 @@
 #include <librepcbproject/project.h>
 #include <librepcbproject/library/projectlibrary.h>
 #include <librepcblibrary/cmp/component.h>
-#include <librepcbproject/circuit/cmd/cmdgencompinstadd.h>
+#include <librepcbproject/circuit/cmd/cmdcomponentinstanceadd.h>
 #include <librepcbcommon/undostack.h>
 #include <librepcbproject/schematics/cmd/cmdsymbolinstanceadd.h>
-#include <librepcbproject/circuit/gencompinstance.h>
+#include <librepcbproject/circuit/componentinstance.h>
 #include <librepcbproject/schematics/cmd/cmdsymbolinstanceedit.h>
 #include <librepcbproject/schematics/items/si_symbol.h>
 #include <librepcbproject/schematics/schematic.h>
@@ -386,7 +386,7 @@ void SES_AddComponents::startAddingComponent(const QUuid& genComp, const QUuid& 
                                   mEditor.getGridProperties().getInterval());
 
         // create a new generic component instance and add it to the circuit
-        CmdGenCompInstAdd* cmd = new CmdGenCompInstAdd(mCircuit, *mGenComp,
+        CmdComponentInstanceAdd* cmd = new CmdComponentInstanceAdd(mCircuit, *mGenComp,
                                                                *mGenCompSymbVar);
         mUndoStack.appendToCommand(cmd);
 
@@ -399,7 +399,7 @@ void SES_AddComponents::startAddingComponent(const QUuid& genComp, const QUuid& 
                            "any symbol.")).arg(genComp.toString()));
         }
         CmdSymbolInstanceAdd* cmd2 = new CmdSymbolInstanceAdd(*schematic,
-            *(cmd->getGenCompInstance()), mCurrentSymbVarItem->getUuid(), pos);
+            *(cmd->getComponentInstance()), mCurrentSymbVarItem->getUuid(), pos);
         mUndoStack.appendToCommand(cmd2);
         mCurrentSymbolToPlace = cmd2->getSymbol();
         Q_ASSERT(mCurrentSymbolToPlace);

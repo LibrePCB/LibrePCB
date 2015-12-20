@@ -22,9 +22,9 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "cmdgencompinstremove.h"
+#include "cmdcomponentinstanceedit.h"
 #include "../circuit.h"
-#include "../gencompinstance.h"
+#include "../componentinstance.h"
 
 namespace project {
 
@@ -32,49 +32,66 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdGenCompInstRemove::CmdGenCompInstRemove(Circuit& circuit, GenCompInstance& genCompInstance,
-                                           UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Remove generic component"), parent),
-    mCircuit(circuit), mGenCompInstance(genCompInstance)
+CmdComponentInstanceEdit::CmdComponentInstanceEdit(Circuit& circuit, ComponentInstance& cmp,
+                                       UndoCommand* parent) throw (Exception) :
+    UndoCommand(tr("Edit Component"), parent), mCircuit(circuit), mComponentInstance(cmp),
+    mOldName(cmp.getName()), mNewName(mOldName),
+    mOldValue(cmp.getValue()), mNewValue(mOldValue)
 {
 }
 
-CmdGenCompInstRemove::~CmdGenCompInstRemove() noexcept
+CmdComponentInstanceEdit::~CmdComponentInstanceEdit() noexcept
 {
-    if (isExecuted())
-        delete &mGenCompInstance;
+}
+
+/*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
+
+void CmdComponentInstanceEdit::setName(const QString& name) noexcept
+{
+    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    mNewName = name;
+}
+
+void CmdComponentInstanceEdit::setValue(const QString& value) noexcept
+{
+    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    mNewValue = value;
 }
 
 /*****************************************************************************************
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdGenCompInstRemove::redo() throw (Exception)
+void CmdComponentInstanceEdit::redo() throw (Exception)
 {
-    mCircuit.removeGenCompInstance(mGenCompInstance); // throws an exception on error
-
     try
     {
-        UndoCommand::redo(); // throws an exception on error
+        mCircuit.setComponentInstanceName(mComponentInstance, mNewName);
+        mComponentInstance.setValue(mNewValue);
+        UndoCommand::redo();
     }
     catch (Exception &e)
     {
-        mCircuit.addGenCompInstance(mGenCompInstance);
+        mCircuit.setComponentInstanceName(mComponentInstance, mOldName);
+        mComponentInstance.setValue(mOldValue);
         throw;
     }
 }
 
-void CmdGenCompInstRemove::undo() throw (Exception)
+void CmdComponentInstanceEdit::undo() throw (Exception)
 {
-    mCircuit.addGenCompInstance(mGenCompInstance); // throws an exception on error
-
     try
     {
+        mCircuit.setComponentInstanceName(mComponentInstance, mOldName);
+        mComponentInstance.setValue(mOldValue);
         UndoCommand::undo();
     }
     catch (Exception& e)
     {
-        mCircuit.removeGenCompInstance(mGenCompInstance);
+        mCircuit.setComponentInstanceName(mComponentInstance, mNewName);
+        mComponentInstance.setValue(mNewValue);
         throw;
     }
 }

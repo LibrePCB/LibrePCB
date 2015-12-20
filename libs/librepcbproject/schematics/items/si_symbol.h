@@ -36,7 +36,7 @@
 
 namespace project {
 class Schematic;
-class GenCompInstance;
+class ComponentInstance;
 class SI_SymbolPin;
 }
 
@@ -66,7 +66,7 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
 
         // Constructors / Destructor
         explicit SI_Symbol(Schematic& schematic, const XmlDomElement& domElement) throw (Exception);
-        explicit SI_Symbol(Schematic& schematic, GenCompInstance& genCompInstance,
+        explicit SI_Symbol(Schematic& schematic, ComponentInstance& genCompInstance,
                            const QUuid& symbolItem, const Point& position = Point(),
                            const Angle& rotation = Angle()) throw (Exception);
         ~SI_Symbol() noexcept;
@@ -79,7 +79,7 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
         QString getName() const noexcept;
         SI_SymbolPin* getPin(const QUuid& pinUuid) const noexcept {return mPins.value(pinUuid);}
         const QHash<QUuid, SI_SymbolPin*>& getPins() const noexcept {return mPins;}
-        GenCompInstance& getGenCompInstance() const noexcept {return *mGenCompInstance;}
+        ComponentInstance& getGenCompInstance() const noexcept {return *mComponentInstance;}
         const library::Symbol& getLibSymbol() const noexcept {return *mSymbol;}
         const library::ComponentSymbolVariantItem& getGenCompSymbVarItem() const noexcept {return *mSymbVarItem;}
 
@@ -134,7 +134,7 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
 
         // General
         Schematic& mSchematic;
-        GenCompInstance* mGenCompInstance;
+        ComponentInstance* mComponentInstance;
         const library::ComponentSymbolVariantItem* mSymbVarItem;
         const library::Symbol* mSymbol;
         QHash<QUuid, SI_SymbolPin*> mPins; ///< key: symbol pin UUID

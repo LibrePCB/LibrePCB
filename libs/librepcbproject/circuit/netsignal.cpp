@@ -27,7 +27,7 @@
 #include <librepcbcommon/exceptions.h>
 #include "circuit.h"
 #include "../erc/ercmsg.h"
-#include "gencompsignalinstance.h"
+#include "componentsignalinstance.h"
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include "../schematics/items/si_netlabel.h"
 
@@ -105,7 +105,7 @@ void NetSignal::setName(const QString& name, bool isAutoName) throw (Exception)
  *  General Methods
  ****************************************************************************************/
 
-void NetSignal::registerGenCompSignal(GenCompSignalInstance& signal) noexcept
+void NetSignal::registerGenCompSignal(ComponentSignalInstance& signal) noexcept
 {
     Q_ASSERT(mAddedToCircuit == true);
     Q_ASSERT(mGenCompSignals.contains(&signal) == false);
@@ -115,7 +115,7 @@ void NetSignal::registerGenCompSignal(GenCompSignalInstance& signal) noexcept
     updateErcMessages();
 }
 
-void NetSignal::unregisterGenCompSignal(GenCompSignalInstance& signal) noexcept
+void NetSignal::unregisterGenCompSignal(ComponentSignalInstance& signal) noexcept
 {
     Q_ASSERT(mAddedToCircuit == true);
     Q_ASSERT(mGenCompSignals.contains(&signal) == true);

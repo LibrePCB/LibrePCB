@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_GENCOMPSIGNALINSTANCE_H
-#define PROJECT_GENCOMPSIGNALINSTANCE_H
+#ifndef PROJECT_COMPONENTSIGNALINSTANCE_H
+#define PROJECT_COMPONENTSIGNALINSTANCE_H
 
 /*****************************************************************************************
  *  Includes
@@ -36,7 +36,7 @@
 class XmlDomElement;
 
 namespace project {
-class GenCompInstance;
+class ComponentInstance;
 class SI_SymbolPin;
 class NetSignal;
 class Circuit;
@@ -48,29 +48,29 @@ class ComponentSignal;
 }
 
 /*****************************************************************************************
- *  Class GenCompSignalInstance
+ *  Class ComponentSignalInstance
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The GenCompSignalInstance class
+ * @brief The ComponentSignalInstance class
  */
-class GenCompSignalInstance final : public QObject, public IF_ErcMsgProvider,
-                                    public IF_XmlSerializableObject
+class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
+                                      public IF_XmlSerializableObject
 {
         Q_OBJECT
-        DECLARE_ERC_MSG_CLASS_NAME(GenCompSignalInstance)
+        DECLARE_ERC_MSG_CLASS_NAME(ComponentSignalInstance)
 
     public:
 
         // Constructors / Destructor
-        explicit GenCompSignalInstance(Circuit& circuit, GenCompInstance& genCompInstance,
-                                       const XmlDomElement& domElement) throw (Exception);
-        explicit GenCompSignalInstance(Circuit& circuit, GenCompInstance& genCompInstance,
-                                       const library::ComponentSignal& genCompSignal,
-                                       NetSignal* netsignal = nullptr) throw (Exception);
-        ~GenCompSignalInstance() noexcept;
+        explicit ComponentSignalInstance(Circuit& circuit, ComponentInstance& genCompInstance,
+                                         const XmlDomElement& domElement) throw (Exception);
+        explicit ComponentSignalInstance(Circuit& circuit, ComponentInstance& genCompInstance,
+                                         const library::ComponentSignal& genCompSignal,
+                                         NetSignal* netsignal = nullptr) throw (Exception);
+        ~ComponentSignalInstance() noexcept;
 
         // Getters
         const library::ComponentSignal& getCompSignal() const noexcept {return *mGenCompSignal;}
@@ -113,9 +113,9 @@ class GenCompSignalInstance final : public QObject, public IF_ErcMsgProvider,
     private:
 
         // make some methods inaccessible...
-        GenCompSignalInstance();
-        GenCompSignalInstance(const GenCompSignalInstance& other);
-        GenCompSignalInstance& operator=(const GenCompSignalInstance& rhs);
+        ComponentSignalInstance();
+        ComponentSignalInstance(const ComponentSignalInstance& other);
+        ComponentSignalInstance& operator=(const ComponentSignalInstance& rhs);
 
         // Private Methods
         void init() throw (Exception);
@@ -126,7 +126,7 @@ class GenCompSignalInstance final : public QObject, public IF_ErcMsgProvider,
 
         // General
         Circuit& mCircuit;
-        GenCompInstance& mGenCompInstance;
+        ComponentInstance& mGenCompInstance;
 
         // Attributes
         const library::ComponentSignal* mGenCompSignal;
@@ -144,4 +144,4 @@ class GenCompSignalInstance final : public QObject, public IF_ErcMsgProvider,
 
 } // namespace project
 
-#endif // PROJECT_GENCOMPSIGNALINSTANCE_H
+#endif // PROJECT_COMPONENTSIGNALINSTANCE_H

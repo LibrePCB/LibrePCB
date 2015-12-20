@@ -28,7 +28,7 @@
 #include "../items/si_symbol.h"
 #include "../schematic.h"
 #include "../../project.h"
-#include "../../circuit/gencompinstance.h"
+#include "../../circuit/componentinstance.h"
 #include <librepcbcommon/schematiclayer.h>
 #include <librepcblibrary/sym/symbol.h>
 #include <librepcblibrary/cmp/component.h>

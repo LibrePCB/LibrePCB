@@ -22,8 +22,8 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "gencompattributeinstance.h"
-#include "gencompinstance.h"
+#include "componentattributeinstance.h"
+#include "componentinstance.h"
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include <librepcbcommon/attributes/attributetype.h>
 #include <librepcbcommon/attributes/attributeunit.h>
@@ -34,7 +34,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-GenCompAttributeInstance::GenCompAttributeInstance(const XmlDomElement& domElement) throw (Exception) :
+ComponentAttributeInstance::ComponentAttributeInstance(const XmlDomElement& domElement) throw (Exception) :
     mKey(), mType(nullptr), mValue(), mUnit(nullptr)
 {
     mKey = domElement.getAttribute("key", true);
@@ -45,7 +45,7 @@ GenCompAttributeInstance::GenCompAttributeInstance(const XmlDomElement& domEleme
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-GenCompAttributeInstance::GenCompAttributeInstance(const QString& key,
+ComponentAttributeInstance::ComponentAttributeInstance(const QString& key,
                                                    const AttributeType& type,
                                                    const QString& value,
                                                    const AttributeUnit* unit) throw (Exception) :
@@ -54,7 +54,7 @@ GenCompAttributeInstance::GenCompAttributeInstance(const QString& key,
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-GenCompAttributeInstance::~GenCompAttributeInstance() noexcept
+ComponentAttributeInstance::~ComponentAttributeInstance() noexcept
 {
 }
 
@@ -62,7 +62,7 @@ GenCompAttributeInstance::~GenCompAttributeInstance() noexcept
  *  Getters
  ****************************************************************************************/
 
-QString GenCompAttributeInstance::getValueTr(bool showUnit) const noexcept
+QString ComponentAttributeInstance::getValueTr(bool showUnit) const noexcept
 {
     return mType->printableValueTr(mValue, showUnit ? mUnit : nullptr);
 }
@@ -71,7 +71,7 @@ QString GenCompAttributeInstance::getValueTr(bool showUnit) const noexcept
  *  Setters
  ****************************************************************************************/
 
-void GenCompAttributeInstance::setTypeValueUnit(const AttributeType& type,
+void ComponentAttributeInstance::setTypeValueUnit(const AttributeType& type,
                                                 const QString& value,
                                                 const AttributeUnit* unit) throw (Exception)
 {
@@ -90,7 +90,7 @@ void GenCompAttributeInstance::setTypeValueUnit(const AttributeType& type,
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* GenCompAttributeInstance::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* ComponentAttributeInstance::serializeToXmlDomElement() const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -106,7 +106,7 @@ XmlDomElement* GenCompAttributeInstance::serializeToXmlDomElement() const throw 
  *  Private Methods
  ****************************************************************************************/
 
-bool GenCompAttributeInstance::checkAttributesValidity() const noexcept
+bool ComponentAttributeInstance::checkAttributesValidity() const noexcept
 {
     if (mKey.isEmpty())                                                 return false;
     if ((mType->getAvailableUnits().isEmpty()) && (mUnit != nullptr))   return false;

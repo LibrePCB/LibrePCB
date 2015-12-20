@@ -42,7 +42,7 @@ class Device;
 namespace project {
 class Project;
 class Board;
-class GenCompInstance;
+class ComponentInstance;
 class ProjectEditor;
 }
 
@@ -103,7 +103,7 @@ class UnplacedComponentsDock final : public QDockWidget
         Ui::UnplacedComponentsDock* mUi;
         GraphicsView* mFootprintPreviewGraphicsView;
         GraphicsScene* mFootprintPreviewGraphicsScene;
-        GenCompInstance* mSelectedGenComp;
+        ComponentInstance* mSelectedGenComp;
         const library::Device* mSelectedDevice;
         QMetaObject::Connection mCircuitConnection1;
         QMetaObject::Connection mCircuitConnection2;

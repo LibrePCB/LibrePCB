@@ -32,7 +32,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdDeviceInstanceAdd::CmdDeviceInstanceAdd(Board& board, GenCompInstance& comp,
+CmdDeviceInstanceAdd::CmdDeviceInstanceAdd(Board& board, ComponentInstance& comp,
                                            const QUuid& deviceUuid,
                                            const Point& position, const Angle& rotation,
                                            UndoCommand* parent) throw (Exception) :

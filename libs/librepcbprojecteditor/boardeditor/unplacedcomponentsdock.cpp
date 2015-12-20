@@ -29,7 +29,7 @@
 #include <librepcbproject/circuit/circuit.h>
 #include <librepcbproject/project.h>
 #include <librepcbproject/settings/projectsettings.h>
-#include <librepcbproject/circuit/gencompinstance.h>
+#include <librepcbproject/circuit/componentinstance.h>
 #include <librepcblibrary/library.h>
 #include <librepcblibrary/elements.h>
 #include <librepcbproject/library/projectlibrary.h>

@@ -39,8 +39,8 @@
 #include <librepcblibrary/sym/symbolpin.h>
 #include <librepcbproject/schematics/items/si_symbol.h>
 #include <librepcbproject/schematics/items/si_symbolpin.h>
-#include <librepcbproject/circuit/gencompsignalinstance.h>
-#include <librepcbproject/circuit/cmd/cmdgencompsiginstsetnetsignal.h>
+#include <librepcbproject/circuit/componentsignalinstance.h>
+#include <librepcbproject/circuit/cmd/cmdcompsiginstsetnetsignal.h>
 #include <librepcbproject/circuit/cmd/cmdnetclassadd.h>
 #include <librepcbproject/schematics/cmd/cmdschematicnetlineremove.h>
 #include <librepcbproject/schematics/cmd/cmdschematicnetpointremove.h>
@@ -426,10 +426,10 @@ bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,
             CmdSchematicNetPointAdd* cmdNetPointAdd1 = nullptr;
             if (pinUnderCursor)
             {
-                GenCompSignalInstance* i = pinUnderCursor->getGenCompSignalInstance();
+                ComponentSignalInstance* i = pinUnderCursor->getGenCompSignalInstance();
                 Q_ASSERT(i); if (!i) throw LogicError(__FILE__, __LINE__);
                 Q_ASSERT(!i->getNetSignal()); if (i->getNetSignal()) throw LogicError(__FILE__, __LINE__);
-                CmdGenCompSigInstSetNetSignal* cmdSetSignal = new CmdGenCompSigInstSetNetSignal(*i, netsignal);
+                CmdCompSigInstSetNetSignal* cmdSetSignal = new CmdCompSigInstSetNetSignal(*i, netsignal);
                 mUndoStack.appendToCommand(cmdSetSignal);
                 cmdNetPointAdd1 = new CmdSchematicNetPointAdd(schematic, *pinUnderCursor);
             }
@@ -610,9 +610,9 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
             }
 
             // combine both netsignals
-            foreach (GenCompSignalInstance* signal, originalSignal->getGenCompSignals())
+            foreach (ComponentSignalInstance* signal, originalSignal->getGenCompSignals())
             {
-                auto cmd = new CmdGenCompSigInstSetNetSignal(*signal, combinedSignal);
+                auto cmd = new CmdCompSigInstSetNetSignal(*signal, combinedSignal);
                 mUndoStack.appendToCommand(cmd);
             }
             foreach (SI_NetPoint* point, originalSignal->getNetPoints())
@@ -668,9 +668,9 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
                     if (newNetsignal)
                     {
                         // replace the netsignal
-                        foreach (GenCompSignalInstance* signal, netsignal->getGenCompSignals())
+                        foreach (ComponentSignalInstance* signal, netsignal->getGenCompSignals())
                         {
-                            auto cmd = new CmdGenCompSigInstSetNetSignal(*signal, newNetsignal);
+                            auto cmd = new CmdCompSigInstSetNetSignal(*signal, newNetsignal);
                             mUndoStack.appendToCommand(cmd);
                         }
                         foreach (SI_NetPoint* point, netsignal->getNetPoints())
@@ -697,7 +697,7 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
                     }
                 }
                 // add the pin's component signal to the current netsignal
-                auto cmd1 = new CmdGenCompSigInstSetNetSignal(
+                auto cmd1 = new CmdCompSigInstSetNetSignal(
                     *pin->getGenCompSignalInstance(), mPositioningNetPoint2->getNetSignal());
                 mUndoStack.appendToCommand(cmd1);
                 // remove the current point/line
@@ -795,9 +795,9 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
                         }*/
 
                         // combine both netsignals
-                        foreach (GenCompSignalInstance* signal, netsignalToRemove->getGenCompSignals())
+                        foreach (ComponentSignalInstance* signal, netsignalToRemove->getGenCompSignals())
                         {
-                            auto cmd = new CmdGenCompSigInstSetNetSignal(*signal, combinedNetsignal);
+                            auto cmd = new CmdCompSigInstSetNetSignal(*signal, combinedNetsignal);
                             mUndoStack.appendToCommand(cmd);
                         }
                         foreach (SI_NetPoint* point, netsignalToRemove->getNetPoints())

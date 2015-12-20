@@ -22,9 +22,8 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "cmdgencompinstedit.h"
-#include "../circuit.h"
-#include "../gencompinstance.h"
+#include "cmdcompsiginstsetnetsignal.h"
+#include "../componentsignalinstance.h"
 
 namespace project {
 
@@ -32,66 +31,49 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdGenCompInstEdit::CmdGenCompInstEdit(Circuit& circuit, GenCompInstance& genComp,
-                                       UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Edit Component"), parent), mCircuit(circuit), mGenCompInstance(genComp),
-    mOldName(genComp.getName()), mNewName(mOldName),
-    mOldValue(genComp.getValue()), mNewValue(mOldValue)
+CmdCompSigInstSetNetSignal::CmdCompSigInstSetNetSignal(ComponentSignalInstance& genCompSigInstance,
+                                             NetSignal* netsignal,
+                                             UndoCommand* parent) throw (Exception) :
+    UndoCommand(tr("Change component signal net"), parent),
+    mGenCompSigInstance(genCompSigInstance), mNetSignal(netsignal),
+    mOldNetSignal(genCompSigInstance.getNetSignal())
 {
 }
 
-CmdGenCompInstEdit::~CmdGenCompInstEdit() noexcept
+CmdCompSigInstSetNetSignal::~CmdCompSigInstSetNetSignal() noexcept
 {
-}
-
-/*****************************************************************************************
- *  Setters
- ****************************************************************************************/
-
-void CmdGenCompInstEdit::setName(const QString& name) noexcept
-{
-    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
-    mNewName = name;
-}
-
-void CmdGenCompInstEdit::setValue(const QString& value) noexcept
-{
-    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
-    mNewValue = value;
 }
 
 /*****************************************************************************************
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdGenCompInstEdit::redo() throw (Exception)
+void CmdCompSigInstSetNetSignal::redo() throw (Exception)
 {
+    mGenCompSigInstance.setNetSignal(mNetSignal); // throws an exception on error
+
     try
     {
-        mCircuit.setGenCompInstanceName(mGenCompInstance, mNewName);
-        mGenCompInstance.setValue(mNewValue);
-        UndoCommand::redo();
+        UndoCommand::redo(); // throws an exception on error
     }
     catch (Exception &e)
     {
-        mCircuit.setGenCompInstanceName(mGenCompInstance, mOldName);
-        mGenCompInstance.setValue(mOldValue);
+        mGenCompSigInstance.setNetSignal(mOldNetSignal);
         throw;
     }
 }
 
-void CmdGenCompInstEdit::undo() throw (Exception)
+void CmdCompSigInstSetNetSignal::undo() throw (Exception)
 {
+    mGenCompSigInstance.setNetSignal(mOldNetSignal); // throws an exception on error
+
     try
     {
-        mCircuit.setGenCompInstanceName(mGenCompInstance, mOldName);
-        mGenCompInstance.setValue(mOldValue);
         UndoCommand::undo();
     }
     catch (Exception& e)
     {
-        mCircuit.setGenCompInstanceName(mGenCompInstance, mNewName);
-        mGenCompInstance.setValue(mNewValue);
+        mGenCompSigInstance.setNetSignal(mNetSignal);
         throw;
     }
 }

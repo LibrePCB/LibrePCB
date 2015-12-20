@@ -108,7 +108,8 @@ void LibraryBaseElement::save() const throw (Exception)
 
 void LibraryBaseElement::saveTo(const FilePath& parentDir) const throw (Exception)
 {
-    QString dirname = QString("%1.%2").arg(mUuid.toString()).arg(mXmlFileNamePrefix);
+    QString uuid = mUuid.toString().remove("{").remove("}");
+    QString dirname = QString("%1.%2").arg(uuid).arg(mXmlFileNamePrefix);
     mDirectory = parentDir.getPathTo(dirname);
     QString filename = QString("%1.xml").arg(mXmlFileNamePrefix);
     mXmlFilepath = mDirectory.getPathTo(filename);
@@ -274,14 +275,10 @@ QString LibraryBaseElement::localeStringFromList(const QMap<QString, QString>& l
 
 bool LibraryBaseElement::isDirectoryValidElement(const FilePath& dir) noexcept
 {
+    // TODO: check version number
     // find the xml file with the highest file version number
-    for (int version = APP_VERSION_MAJOR; version >= 0; version--)
-    {
-        QString filename = QString("v%1/%2.xml").arg(version).arg(dir.getSuffix());
-        if (dir.getPathTo(filename).isExistingFile()) return true; // file found
-    }
-
-    return false;
+    QString filename = QString("%1.xml").arg(dir.getSuffix());
+    return dir.getPathTo(filename).isExistingFile();
 }
 
 /*****************************************************************************************

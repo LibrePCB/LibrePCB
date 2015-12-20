@@ -22,9 +22,9 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "cmdgencompattrinstedit.h"
-#include "../gencompinstance.h"
-#include "../gencompattributeinstance.h"
+#include "cmdcomponentinstanceadd.h"
+#include "../circuit.h"
+#include "../componentinstance.h"
 
 namespace project {
 
@@ -32,54 +32,54 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdGenCompAttrInstEdit::CmdGenCompAttrInstEdit(GenCompInstance& genComp,
-                                               GenCompAttributeInstance& attr,
-                                               const AttributeType& newType,
-                                               const QString& newValue,
-                                               const AttributeUnit* newUnit,
-                                               UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Edit generic component attribute"), parent),
-    mGenCompInst(genComp), mAttrInst(attr),
-    mOldType(&attr.getType()), mNewType(&newType),
-    mOldValue(attr.getValue()), mNewValue(newValue),
-    mOldUnit(attr.getUnit()), mNewUnit(newUnit)
+CmdComponentInstanceAdd::CmdComponentInstanceAdd(Circuit& circuit, const library::Component& cmp,
+                                     const library::ComponentSymbolVariant& symbVar, UndoCommand* parent) throw (Exception) :
+    UndoCommand(tr("Add generic component"), parent),
+    mCircuit(circuit), mComponent(cmp), mSymbVar(symbVar), mComponentInstance(nullptr)
 {
 }
 
-CmdGenCompAttrInstEdit::~CmdGenCompAttrInstEdit() noexcept
+CmdComponentInstanceAdd::~CmdComponentInstanceAdd() noexcept
 {
+    if (!isExecuted())
+        delete mComponentInstance;
 }
 
 /*****************************************************************************************
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdGenCompAttrInstEdit::redo() throw (Exception)
+void CmdComponentInstanceAdd::redo() throw (Exception)
 {
+    if (!mComponentInstance) // only the first time
+    {
+        mComponentInstance = mCircuit.createComponentInstance(mComponent, mSymbVar); // throws an exception on error
+    }
+
+    mCircuit.addComponentInstance(*mComponentInstance); // throws an exception on error
+
     try
     {
-        mAttrInst.setTypeValueUnit(*mNewType, mNewValue, mNewUnit);
-        UndoCommand::redo();
-        emit mGenCompInst.attributesChanged();
+        UndoCommand::redo(); // throws an exception on error
     }
     catch (Exception &e)
     {
-        mAttrInst.setTypeValueUnit(*mOldType, mOldValue, mOldUnit);
+        mCircuit.removeComponentInstance(*mComponentInstance);
         throw;
     }
 }
 
-void CmdGenCompAttrInstEdit::undo() throw (Exception)
+void CmdComponentInstanceAdd::undo() throw (Exception)
 {
+    mCircuit.removeComponentInstance(*mComponentInstance); // throws an exception on error
+
     try
     {
-        mAttrInst.setTypeValueUnit(*mOldType, mOldValue, mOldUnit);
         UndoCommand::undo();
-        emit mGenCompInst.attributesChanged();
     }
     catch (Exception& e)
     {
-        mAttrInst.setTypeValueUnit(*mNewType, mNewValue, mNewUnit);
+        mCircuit.addComponentInstance(*mComponentInstance);
         throw;
     }
 }

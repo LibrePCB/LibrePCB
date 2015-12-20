@@ -30,7 +30,7 @@
 #include "../../project.h"
 #include "../../circuit/circuit.h"
 #include "../../circuit/netsignal.h"
-#include "../../circuit/gencompsignalinstance.h"
+#include "../../circuit/componentsignalinstance.h"
 #include "../../erc/ercmsg.h"
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include <librepcbcommon/graphics/graphicsscene.h>
@@ -64,7 +64,7 @@ SI_NetPoint::SI_NetPoint(Schematic& schematic, const XmlDomElement& domElement) 
             throw RuntimeError(__FILE__, __LINE__, pinUuid.toString(),
                 QString(tr("Invalid symbol pin UUID: \"%1\"")).arg(pinUuid.toString()));
         }
-        const GenCompSignalInstance* compSignal = mSymbolPin->getGenCompSignalInstance();
+        const ComponentSignalInstance* compSignal = mSymbolPin->getGenCompSignalInstance();
         if (!compSignal)
         {
             throw RuntimeError(__FILE__, __LINE__, pinUuid.toString(),
@@ -112,7 +112,7 @@ SI_NetPoint::SI_NetPoint(Schematic& schematic, SI_SymbolPin& pin) throw (Excepti
 {
     mUuid = QUuid::createUuid(); // generate random UUID
     mAttached = true;
-    const GenCompSignalInstance* compSignal = mSymbolPin->getGenCompSignalInstance();
+    const ComponentSignalInstance* compSignal = mSymbolPin->getGenCompSignalInstance();
     if (!compSignal)
     {
         throw RuntimeError(__FILE__, __LINE__, mSymbolPin->getLibPinUuid().toString(),
@@ -192,7 +192,7 @@ void SI_NetPoint::detachFromPin() throw (Exception)
 void SI_NetPoint::attachToPin(SI_SymbolPin& pin) throw (Exception)
 {
     if (mAttached) throw LogicError(__FILE__, __LINE__);
-    const GenCompSignalInstance* compSignal = pin.getGenCompSignalInstance();
+    const ComponentSignalInstance* compSignal = pin.getGenCompSignalInstance();
     if (!compSignal) throw LogicError(__FILE__, __LINE__);
     const NetSignal* netsignal = compSignal->getNetSignal();
     if (netsignal != mNetSignal) throw LogicError(__FILE__, __LINE__);

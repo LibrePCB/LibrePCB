@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDGENCOMPATTRINSTREMOVE_H
-#define PROJECT_CMDGENCOMPATTRINSTREMOVE_H
+#ifndef PROJECT_CMDCOMPATTRINSTEDIT_H
+#define PROJECT_CMDCOMPATTRINSTEDIT_H
 
 /*****************************************************************************************
  *  Includes
@@ -31,29 +31,35 @@
  *  Forward Declarations
  ****************************************************************************************/
 
+class AttributeType;
+class AttributeUnit;
+
 namespace project {
-class GenCompInstance;
-class GenCompAttributeInstance;
+class ComponentInstance;
+class ComponentAttributeInstance;
 }
 
 /*****************************************************************************************
- *  Class CmdGenCompAttrInstRemove
+ *  Class CmdCompAttrInstEdit
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The CmdGenCompAttrInstRemove class
+ * @brief The CmdCompAttrInstEdit class
  */
-class CmdGenCompAttrInstRemove final : public UndoCommand
+class CmdCompAttrInstEdit final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdGenCompAttrInstRemove(GenCompInstance& genComp,
-                                          GenCompAttributeInstance& attr,
-                                          UndoCommand* parent = 0) throw (Exception);
-        ~CmdGenCompAttrInstRemove() noexcept;
+        explicit CmdCompAttrInstEdit(ComponentInstance& cmp,
+                                     ComponentAttributeInstance& attr,
+                                     const AttributeType& newType,
+                                     const QString& newValue,
+                                     const AttributeUnit* newUnit,
+                                     UndoCommand* parent = 0) throw (Exception);
+        ~CmdCompAttrInstEdit() noexcept;
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;
@@ -61,10 +67,19 @@ class CmdGenCompAttrInstRemove final : public UndoCommand
 
     private:
 
-        GenCompInstance& mGenCompInstance;
-        GenCompAttributeInstance& mAttrInstance;
+        // Attributes from the constructor
+        ComponentInstance& mComponentInstance;
+        ComponentAttributeInstance& mAttrInst;
+
+        // General Attributes
+        const AttributeType* mOldType;
+        const AttributeType* mNewType;
+        QString mOldValue;
+        QString mNewValue;
+        const AttributeUnit* mOldUnit;
+        const AttributeUnit* mNewUnit;
 };
 
 } // namespace project
 
-#endif // PROJECT_CMDGENCOMPATTRINSTREMOVE_H
+#endif // PROJECT_CMDCOMPATTRINSTEDIT_H

@@ -44,7 +44,7 @@ class SmartXmlFile;
 namespace project {
 class Project;
 class NetSignal;
-class GenCompInstance;
+class ComponentInstance;
 class SI_Base;
 class SI_Symbol;
 class SI_SymbolPin;
@@ -137,7 +137,7 @@ class Schematic final : public QObject, public IF_AttributeProvider,
 
         // Symbol Methods
         SI_Symbol* getSymbolByUuid(const QUuid& uuid) const noexcept;
-        SI_Symbol* createSymbol(GenCompInstance& genCompInstance, const QUuid& symbolItem,
+        SI_Symbol* createSymbol(ComponentInstance& genCompInstance, const QUuid& symbolItem,
                                 const Point& position = Point(), const Angle& angle = Angle()) throw (Exception);
         void addSymbol(SI_Symbol& symbol) throw (Exception);
         void removeSymbol(SI_Symbol& symbol) throw (Exception);

@@ -245,7 +245,7 @@ int Library::rescan() throw (Exception)
     count += addCategoriesToDb<PackageCategory>(    dirs.values("pkgcat"),  "package_categories",   "cat_id");
     count += addElementsToDb<Symbol>(               dirs.values("sym"),     "symbols",              "symbol_id");
     count += addElementsToDb<SpiceModel>(           dirs.values("spcmdl"),  "spice_models",         "model_id");
-    count += addPackagesToDb(                       dirs.values("pkg"),     "packages",             "package_id");
+    count += addElementsToDb<Package>(              dirs.values("pkg"),     "packages",             "package_id");
     count += addElementsToDb<Component>(            dirs.values("cmp"),     "components",           "component_id");
     count += addDevicesToDb(                        dirs.values("dev"),     "devices",              "device_id");
 
@@ -342,54 +342,6 @@ int Library::addElementsToDb(const QList<FilePath>& dirs, const QString& tablena
     return count;
 }
 
-int Library::addPackagesToDb(const QList<FilePath>& dirs, const QString& tablename,
-                             const QString& id_rowname) throw (Exception)
-{
-    int count = 0;
-    foreach (const FilePath& filepath, dirs)
-    {
-        Package element(filepath);
-
-        QSqlQuery query = prepareQuery(
-            "INSERT INTO " % tablename % " "
-            "(filepath, uuid, version, footprint_uuid, model3d_uuid) VALUES "
-            "(:filepath, :uuid, :version, :footprint_uuid, :model3d_uuid)");
-        query.bindValue(":filepath",    filepath.toRelative(mLibPath));
-        query.bindValue(":uuid",        element.getUuid().toString());
-        query.bindValue(":version",     element.getVersion().toStr());
-        int id = execQuery(query, true);
-
-        foreach (const QString& locale, element.getAllAvailableLocales())
-        {
-            QSqlQuery query = prepareQuery(
-                "INSERT INTO " % tablename % "_tr "
-                "(" % id_rowname % ", locale, name, description, keywords) VALUES "
-                "(:element_id, :locale, :name, :description, :keywords)");
-            query.bindValue(":element_id",  id);
-            query.bindValue(":locale",      locale);
-            query.bindValue(":name",        element.getNames().value(locale));
-            query.bindValue(":description", element.getDescriptions().value(locale));
-            query.bindValue(":keywords",    element.getKeywords().value(locale));
-            execQuery(query, false);
-        }
-
-        foreach (const QUuid& categoryUuid, element.getCategories())
-        {
-            Q_ASSERT(!categoryUuid.isNull());
-            QSqlQuery query = prepareQuery(
-                "INSERT INTO " % tablename % "_cat "
-                "(" % id_rowname % ", category_uuid) VALUES "
-                "(:element_id, :category_uuid)");
-            query.bindValue(":element_id",  id);
-            query.bindValue(":category_uuid", categoryUuid.toString());
-            execQuery(query, false);
-        }
-
-        count++;
-    }
-    return count;
-}
-
 int Library::addDevicesToDb(const QList<FilePath>& dirs, const QString& tablename,
                             const QString& id_rowname) throw (Exception)
 {
@@ -400,7 +352,7 @@ int Library::addDevicesToDb(const QList<FilePath>& dirs, const QString& tablenam
 
         QSqlQuery query = prepareQuery(
             "INSERT INTO " % tablename % " "
-            "(filepath, uuid, version, device_uuid, package_uuid) VALUES "
+            "(filepath, uuid, version, component_uuid, package_uuid) VALUES "
             "(:filepath, :uuid, :version, :component_uuid, :package_uuid)");
         query.bindValue(":filepath",        filepath.toRelative(mLibPath));
         query.bindValue(":uuid",            element.getUuid().toString());

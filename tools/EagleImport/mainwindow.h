@@ -40,8 +40,8 @@ class MainWindow : public QMainWindow
 
         enum class ConvertFileType_t {
             Symbols_to_Symbols,
-            Packages_to_FootprintsAndComponents,
-            Devices_to_GenericComponents
+            Packages_to_PackagesAndDevices,
+            Devices_to_Components
         };
 
         void reset();

@@ -58,9 +58,9 @@ BI_Footprint::BI_Footprint(DeviceInstance& device) throw (Exception) :
 
 void BI_Footprint::init() throw (Exception)
 {
-    // TODO
-    /*QUuid footprintUuid = mDeviceInstance.getLibPackage().getFootprintUuid();
-    mFootprint = mDeviceInstance.getBoard().getProject().getLibrary().getFootprint(footprintUuid);
+    // TODO: QUuid footprintUuid = mDeviceInstance.getLibPackage().getFootprintUuid();
+    QUuid footprintUuid = mDeviceInstance.getLibPackage().getFootprints().first()->getUuid();
+    mFootprint = mDeviceInstance.getLibPackage().getFootprintByUuid(footprintUuid);
     if (!mFootprint)
     {
         throw RuntimeError(__FILE__, __LINE__, footprintUuid.toString(),
@@ -77,20 +77,20 @@ void BI_Footprint::init() throw (Exception)
     const library::Device& libDev = mDeviceInstance.getLibDevice();
     foreach (const library::FootprintPad* libPad, mFootprint->getPads())
     {
-        BI_FootprintPad* pad = new BI_FootprintPad(*this, libPad->getUuid());
-        if (mPads.contains(libPad->getUuid()))
+        BI_FootprintPad* pad = new BI_FootprintPad(*this, libPad->getPadUuid());
+        if (mPads.contains(libPad->getPadUuid()))
         {
-            throw RuntimeError(__FILE__, __LINE__, libPad->getUuid().toString(),
+            throw RuntimeError(__FILE__, __LINE__, libPad->getPadUuid().toString(),
                 QString(tr("The footprint pad UUID \"%1\" is defined multiple times."))
-                .arg(libPad->getUuid().toString()));
+                .arg(libPad->getPadUuid().toString()));
         }
-        if (!libDev.getPadSignalMap().contains(libPad->getUuid()))
+        if (!libDev.getPadSignalMap().contains(libPad->getPadUuid()))
         {
-            throw RuntimeError(__FILE__, __LINE__, libPad->getUuid().toString(),
+            throw RuntimeError(__FILE__, __LINE__, libPad->getPadUuid().toString(),
                 QString(tr("Footprint pad \"%1\" not found in pad-signal-map of device \"%2\"."))
-                .arg(libPad->getUuid().toString(), libDev.getUuid().toString()));
+                .arg(libPad->getPadUuid().toString(), libDev.getUuid().toString()));
         }
-        mPads.insert(libPad->getUuid(), pad);
+        mPads.insert(libPad->getPadUuid(), pad);
     }
     if (mPads.count() != libDev.getPadSignalMap().count())
     {
@@ -111,7 +111,7 @@ void BI_Footprint::init() throw (Exception)
     connect(&mDeviceInstance, &DeviceInstance::mirrored,
             this, &BI_Footprint::deviceInstanceMirrored);
 
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);*/
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 BI_Footprint::~BI_Footprint() noexcept

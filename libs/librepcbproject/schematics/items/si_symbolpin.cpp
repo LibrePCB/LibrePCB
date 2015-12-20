@@ -26,10 +26,10 @@
 #include "si_symbol.h"
 #include <librepcblibrary/sym/symbol.h>
 #include <librepcblibrary/sym/symbolpin.h>
-#include "../../circuit/gencompinstance.h"
+#include "../../circuit/componentinstance.h"
 #include <librepcblibrary/cmp/component.h>
 #include "si_netpoint.h"
-#include "../../circuit/gencompsignalinstance.h"
+#include "../../circuit/componentsignalinstance.h"
 #include "../../erc/ercmsg.h"
 #include "../schematic.h"
 #include "../../project.h"
@@ -60,7 +60,7 @@ SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const QUuid& pinUuid) :
     }
     QUuid genCompSignalUuid = mSymbol.getGenCompSymbVarItem().getSignalOfPin(pinUuid);
     mGenCompSignalInstance = mSymbol.getGenCompInstance().getSignalInstance(genCompSignalUuid);
-    mGenCompSignal = mSymbol.getGenCompInstance().getGenComp().getSignalByUuid(genCompSignalUuid);
+    mGenCompSignal = mSymbol.getGenCompInstance().getLibComponent().getSignalByUuid(genCompSignalUuid);
 
     mGraphicsItem = new SGI_SymbolPin(*this);
     updatePosition();

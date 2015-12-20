@@ -190,7 +190,7 @@ class Board final : public QObject, public IF_AttributeProvider,
         QIcon mIcon;
 
         // ERC messages
-        QHash<QUuid, ErcMsg*> mErcMsgListUnplacedGenCompInstances;
+        QHash<QUuid, ErcMsg*> mErcMsgListUnplacedComponentInstances;
 
         // items
         QHash<QUuid, DeviceInstance*> mDeviceInstances;

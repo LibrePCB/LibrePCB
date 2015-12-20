@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDGENCOMPATTRINSTEDIT_H
-#define PROJECT_CMDGENCOMPATTRINSTEDIT_H
+#ifndef PROJECT_CMDCOMPSIGINSTSETNETSIGNAL_H
+#define PROJECT_CMDCOMPSIGINSTSETNETSIGNAL_H
 
 /*****************************************************************************************
  *  Includes
@@ -26,40 +26,35 @@
 
 #include <QtCore>
 #include <librepcbcommon/undocommand.h>
+#include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
  *  Forward Declarations
  ****************************************************************************************/
 
-class AttributeType;
-class AttributeUnit;
-
 namespace project {
-class GenCompInstance;
-class GenCompAttributeInstance;
+class ComponentSignalInstance;
+class NetSignal;
 }
 
 /*****************************************************************************************
- *  Class CmdGenCompAttrInstEdit
+ *  Class CmdCompSigInstSetNetSignal
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The CmdGenCompAttrInstEdit class
+ * @brief The CmdCompSigInstSetNetSignal class
  */
-class CmdGenCompAttrInstEdit final : public UndoCommand
+class CmdCompSigInstSetNetSignal final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdGenCompAttrInstEdit(GenCompInstance& genComp,
-                                        GenCompAttributeInstance& attr,
-                                        const AttributeType& newType,
-                                        const QString& newValue,
-                                        const AttributeUnit* newUnit,
-                                        UndoCommand* parent = 0) throw (Exception);
-        ~CmdGenCompAttrInstEdit() noexcept;
+        explicit CmdCompSigInstSetNetSignal(ComponentSignalInstance& genCompSigInstance,
+                                            NetSignal* netsignal,
+                                            UndoCommand* parent = 0) throw (Exception);
+        ~CmdCompSigInstSetNetSignal() noexcept;
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;
@@ -68,18 +63,13 @@ class CmdGenCompAttrInstEdit final : public UndoCommand
     private:
 
         // Attributes from the constructor
-        GenCompInstance& mGenCompInst;
-        GenCompAttributeInstance& mAttrInst;
+        ComponentSignalInstance& mGenCompSigInstance;
+        NetSignal* mNetSignal;
 
         // General Attributes
-        const AttributeType* mOldType;
-        const AttributeType* mNewType;
-        QString mOldValue;
-        QString mNewValue;
-        const AttributeUnit* mOldUnit;
-        const AttributeUnit* mNewUnit;
+        NetSignal* mOldNetSignal;
 };
 
 } // namespace project
 
-#endif // PROJECT_CMDGENCOMPATTRINSTEDIT_H
+#endif // PROJECT_CMDCOMPSIGINSTSETNETSIGNAL_H

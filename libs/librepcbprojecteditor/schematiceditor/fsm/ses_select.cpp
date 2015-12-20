@@ -36,17 +36,17 @@
 #include <librepcbproject/schematics/cmd/cmdschematicnetlineremove.h>
 #include <librepcbproject/schematics/cmd/cmdschematicnetpointremove.h>
 #include <librepcbproject/schematics/cmd/cmdschematicnetpointdetach.h>
-#include <librepcbproject/circuit/cmd/cmdgencompsiginstsetnetsignal.h>
+#include <librepcbproject/circuit/cmd/cmdcompsiginstsetnetsignal.h>
 #include <librepcbproject/schematics/items/si_symbolpin.h>
 #include "../symbolinstancepropertiesdialog.h"
-#include <librepcbproject/circuit/gencompinstance.h>
-#include <librepcbproject/circuit/cmd/cmdgencompinstremove.h>
+#include <librepcbproject/circuit/componentinstance.h>
+#include <librepcbproject/circuit/cmd/cmdcomponentinstanceremove.h>
 #include <librepcbproject/schematics/items/si_netlabel.h>
 #include <librepcbproject/circuit/netsignal.h>
 #include <librepcbproject/circuit/circuit.h>
 #include <librepcbproject/circuit/cmd/cmdnetsignaledit.h>
 #include <librepcbproject/circuit/cmd/cmdnetsignaladd.h>
-#include <librepcbproject/circuit/cmd/cmdgencompsiginstsetnetsignal.h>
+#include <librepcbproject/circuit/cmd/cmdcompsiginstsetnetsignal.h>
 #include <librepcbproject/schematics/cmd/cmdschematicnetpointedit.h>
 #include <librepcbproject/circuit/cmd/cmdnetsignalremove.h>
 #include <librepcbproject/schematics/cmd/cmdschematicnetlabeledit.h>
@@ -250,7 +250,7 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneRightClick(QGraphicsSceneMouse
         case SI_Base::Type_t::Symbol:
         {
             SI_Symbol* symbol = dynamic_cast<SI_Symbol*>(items.first()); Q_ASSERT(symbol);
-            GenCompInstance& genComp = symbol->getGenCompInstance();
+            ComponentInstance& genComp = symbol->getGenCompInstance();
 
             // build the context menu
             QAction* aCopy = menu.addAction(QIcon(":/img/actions/copy.png"), tr("Copy"));
@@ -319,7 +319,7 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneDoubleClick(QGraphicsSceneMous
             case SI_Base::Type_t::Symbol:
             {
                 SI_Symbol* symbol = dynamic_cast<SI_Symbol*>(items.first()); Q_ASSERT(symbol);
-                GenCompInstance& genComp = symbol->getGenCompInstance();
+                ComponentInstance& genComp = symbol->getGenCompInstance();
                 SymbolInstancePropertiesDialog dialog(mProject, genComp, *symbol, mUndoStack, &mEditor);
                 dialog.exec();
                 return ForceStayInState;
@@ -340,9 +340,9 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneDoubleClick(QGraphicsSceneMous
                         if (newSignal)
                         {
                             mUndoStack.beginCommand(tr("Combine Net Signals"));
-                            foreach (GenCompSignalInstance* signal, netsignal.getGenCompSignals())
+                            foreach (ComponentSignalInstance* signal, netsignal.getGenCompSignals())
                             {
-                                auto cmd = new CmdGenCompSigInstSetNetSignal(*signal, newSignal);
+                                auto cmd = new CmdCompSigInstSetNetSignal(*signal, newSignal);
                                 mUndoStack.appendToCommand(cmd);
                             }
                             foreach (SI_NetPoint* point, netsignal.getNetPoints())
@@ -632,7 +632,7 @@ bool SES_Select::removeSelectedItems() noexcept
     if (items.isEmpty()) return false;
 
     // get all involved generic component instances
-    QList<GenCompInstance*> genCompInstances;
+    QList<ComponentInstance*> genCompInstances;
     foreach (SI_Base* item, items)
     {
         if (item->getType() == SI_Base::Type_t::Symbol)
@@ -685,19 +685,19 @@ bool SES_Select::removeSelectedItems() noexcept
                     mUndoStack.appendToCommand(cmd);
                     if (netpoint->isAttached())
                     {
-                        GenCompSignalInstance* signal = netpoint->getSymbolPin()->getGenCompSignalInstance();
+                        ComponentSignalInstance* signal = netpoint->getSymbolPin()->getGenCompSignalInstance();
                         Q_ASSERT(signal); if (!signal) throw LogicError(__FILE__, __LINE__);
-                        CmdGenCompSigInstSetNetSignal* cmd = new CmdGenCompSigInstSetNetSignal(*signal, nullptr);
+                        CmdCompSigInstSetNetSignal* cmd = new CmdCompSigInstSetNetSignal(*signal, nullptr);
                         mUndoStack.appendToCommand(cmd);
                     }
                 }
                 else if (netpoint->isAttached())
                 {
-                    GenCompSignalInstance* signal = netpoint->getSymbolPin()->getGenCompSignalInstance();
+                    ComponentSignalInstance* signal = netpoint->getSymbolPin()->getGenCompSignalInstance();
                     Q_ASSERT(signal); if (!signal) throw LogicError(__FILE__, __LINE__);
                     CmdSchematicNetPointDetach* cmd1 = new CmdSchematicNetPointDetach(*netpoint);
                     mUndoStack.appendToCommand(cmd1);
-                    CmdGenCompSigInstSetNetSignal* cmd2 = new CmdGenCompSigInstSetNetSignal(*signal, nullptr);
+                    CmdCompSigInstSetNetSignal* cmd2 = new CmdCompSigInstSetNetSignal(*signal, nullptr);
                     mUndoStack.appendToCommand(cmd2);
                 }
             }
@@ -719,7 +719,7 @@ bool SES_Select::removeSelectedItems() noexcept
         {
             if (genComp->getPlacedSymbolsCount() == 0)
             {
-                CmdGenCompInstRemove* cmd = new CmdGenCompInstRemove(mCircuit, *genComp);
+                CmdComponentInstanceRemove* cmd = new CmdComponentInstanceRemove(mCircuit, *genComp);
                 mUndoStack.appendToCommand(cmd);
             }
         }

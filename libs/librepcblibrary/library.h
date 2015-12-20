@@ -137,8 +137,6 @@ class Library final : public QObject
         template <typename ElementType>
         int addElementsToDb(const QList<FilePath>& dirs, const QString& tablename,
                             const QString& id_rowname) throw (Exception);
-        int addPackagesToDb(const QList<FilePath>& dirs, const QString& tablename,
-                            const QString& id_rowname) throw (Exception);
         int addDevicesToDb(const QList<FilePath>& dirs, const QString& tablename,
                            const QString& id_rowname) throw (Exception);
         QMultiMap<Version, FilePath> getElementFilePathsFromDb(const QString& tablename,

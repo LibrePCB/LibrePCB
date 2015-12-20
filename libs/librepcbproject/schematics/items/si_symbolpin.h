@@ -35,7 +35,7 @@
 
 namespace project {
 class Circuit;
-class GenCompSignalInstance;
+class ComponentSignalInstance;
 class SI_Symbol;
 class SI_NetPoint;
 class ErcMsg;
@@ -76,7 +76,7 @@ class SI_SymbolPin final : public SI_Base, public IF_ErcMsgProvider
         SI_NetPoint* getNetPoint() const noexcept {return mRegisteredNetPoint;}
         const library::SymbolPin& getLibPin() const noexcept {return *mSymbolPin;}
         const library::ComponentSignal* getGenCompSignal() const noexcept {return mGenCompSignal;}
-        GenCompSignalInstance* getGenCompSignalInstance() const noexcept {return mGenCompSignalInstance;}
+        ComponentSignalInstance* getGenCompSignalInstance() const noexcept {return mGenCompSignalInstance;}
 
         // General Methods
         void updatePosition() noexcept;
@@ -110,7 +110,7 @@ class SI_SymbolPin final : public SI_Base, public IF_ErcMsgProvider
         SI_Symbol& mSymbol;
         const library::SymbolPin* mSymbolPin;
         const library::ComponentSignal* mGenCompSignal;
-        GenCompSignalInstance* mGenCompSignalInstance;
+        ComponentSignalInstance* mGenCompSignalInstance;
         Point mPosition;
         Angle mRotation;
 

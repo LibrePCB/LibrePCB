@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDGENCOMPINSTADD_H
-#define PROJECT_CMDGENCOMPINSTADD_H
+#ifndef PROJECT_CMDCOMPONENTINSTANCEADD_H
+#define PROJECT_CMDCOMPONENTINSTANCEADD_H
 
 /*****************************************************************************************
  *  Includes
@@ -34,7 +34,7 @@
 
 namespace project {
 class Circuit;
-class GenCompInstance;
+class ComponentInstance;
 }
 
 namespace library {
@@ -43,27 +43,27 @@ class ComponentSymbolVariant;
 }
 
 /*****************************************************************************************
- *  Class CmdGenCompInstAdd
+ *  Class CmdComponentInstanceAdd
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The CmdGenCompInstAdd class
+ * @brief The CmdComponentInstanceAdd class
  */
-class CmdGenCompInstAdd final : public UndoCommand
+class CmdComponentInstanceAdd final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdGenCompInstAdd(Circuit& circuit,
-                                   const library::Component& genComp,
-                                   const library::ComponentSymbolVariant& symbVar,
-                                   UndoCommand* parent = 0) throw (Exception);
-        ~CmdGenCompInstAdd() noexcept;
+        explicit CmdComponentInstanceAdd(Circuit& circuit,
+                                         const library::Component& cmp,
+                                         const library::ComponentSymbolVariant& symbVar,
+                                         UndoCommand* parent = 0) throw (Exception);
+        ~CmdComponentInstanceAdd() noexcept;
 
         // Getters
-        GenCompInstance* getGenCompInstance() const noexcept {return mGenCompInstance;}
+        ComponentInstance* getComponentInstance() const noexcept {return mComponentInstance;}
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;
@@ -73,13 +73,13 @@ class CmdGenCompInstAdd final : public UndoCommand
 
         // Attributes from the constructor
         Circuit& mCircuit;
-        const library::Component& mGenComp;
+        const library::Component& mComponent;
         const library::ComponentSymbolVariant& mSymbVar;
 
-        /// @brief The created generic component instance
-        GenCompInstance* mGenCompInstance;
+        /// @brief The created component instance
+        ComponentInstance* mComponentInstance;
 };
 
 } // namespace project
 
-#endif // PROJECT_CMDGENCOMPINSTADD_H
+#endif // PROJECT_CMDCOMPONENTINSTANCEADD_H

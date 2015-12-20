@@ -33,7 +33,7 @@
 #include <librepcbcommon/gridproperties.h>
 #include "../circuit/circuit.h"
 #include "../erc/ercmsg.h"
-#include "../circuit/gencompinstance.h"
+#include "../circuit/componentinstance.h"
 #include "deviceinstance.h"
 #include "items/bi_footprint.h"
 #include "items/bi_footprintpad.h"
@@ -81,9 +81,9 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             // Load grid properties
             mGridProperties = new GridProperties(*root.getFirstChild("properties/grid_properties", true, true));
 
-            // Load all component instances
-            for (XmlDomElement* node = root.getFirstChild("component_instances/component_instance", true, false);
-                 node; node = node->getNextSibling("component_instance"))
+            // Load all device instances
+            for (XmlDomElement* node = root.getFirstChild("device_instances/device_instance", true, false);
+                 node; node = node->getNextSibling("device_instance"))
             {
                 DeviceInstance* comp = new DeviceInstance(*this, *node);
                 addDeviceInstance(*comp);
@@ -116,7 +116,7 @@ Board::~Board() noexcept
     foreach (DeviceInstance* dev, mDeviceInstances)
         try { removeDeviceInstance(*dev); delete dev; } catch (...) {}
 
-    qDeleteAll(mErcMsgListUnplacedGenCompInstances);    mErcMsgListUnplacedGenCompInstances.clear();
+    qDeleteAll(mErcMsgListUnplacedComponentInstances);    mErcMsgListUnplacedComponentInstances.clear();
     delete mGridProperties;         mGridProperties = nullptr;
     delete mXmlFile;                mXmlFile = nullptr;
     delete mGraphicsScene;          mGraphicsScene = nullptr;
@@ -169,9 +169,9 @@ QList<BI_Base*> Board::getItemsAtScenePos(const Point& pos) const noexcept
     QList<BI_Base*> list;   // Note: The order of adding the items is very important (the
                             // top most item must appear as the first item in the list)!
     // footprints & pads
-    foreach (DeviceInstance* component, mDeviceInstances)
+    foreach (DeviceInstance* device, mDeviceInstances)
     {
-        BI_Footprint& footprint = component->getFootprint();
+        BI_Footprint& footprint = device->getFootprint();
         if (footprint.getGrabAreaScenePx().contains(scenePosPx))
             list.append(&footprint);
         foreach (BI_FootprintPad* pad, footprint.getPads())
@@ -400,7 +400,7 @@ XmlDomElement* Board::serializeToXmlDomElement() const throw (Exception)
     meta->appendTextChild("name", mName);
     XmlDomElement* properties = root->appendChild("properties");
     properties->appendChild(mGridProperties->serializeToXmlDomElement());
-    XmlDomElement* components = root->appendChild("component_instances");
+    XmlDomElement* components = root->appendChild("device_instances");
     foreach (DeviceInstance* component, mDeviceInstances)
         components->appendChild(component->serializeToXmlDomElement());
     return root.take();
@@ -411,29 +411,29 @@ void Board::updateErcMessages() noexcept
     // type: UnplacedGenericComponent (GenCompInstances without ComponentInstance)
     if (mAddedToProject)
     {
-        foreach (const GenCompInstance* genComp, mProject.getCircuit().getGenCompInstances())
+        foreach (const ComponentInstance* genComp, mProject.getCircuit().getComponentInstances())
         {
-            if (genComp->getGenComp().isSchematicOnly()) continue;
+            if (genComp->getLibComponent().isSchematicOnly()) continue;
             DeviceInstance* comp = mDeviceInstances.value(genComp->getUuid());
-            ErcMsg* ercMsg = mErcMsgListUnplacedGenCompInstances.value(genComp->getUuid());
+            ErcMsg* ercMsg = mErcMsgListUnplacedComponentInstances.value(genComp->getUuid());
             if ((!comp) && (!ercMsg))
             {
                 ErcMsg* ercMsg = new ErcMsg(mProject, *this, QString("%1/%2").arg(mUuid.toString(),
-                    genComp->getUuid().toString()), "UnplacedGenericComponent", ErcMsg::ErcMsgType_t::BoardError,
+                    genComp->getUuid().toString()), "UnplacedComponent", ErcMsg::ErcMsgType_t::BoardError,
                     QString("Unplaced Component: %1 (Board: %2)").arg(genComp->getName(), mName));
                 ercMsg->setVisible(true);
-                mErcMsgListUnplacedGenCompInstances.insert(genComp->getUuid(), ercMsg);
+                mErcMsgListUnplacedComponentInstances.insert(genComp->getUuid(), ercMsg);
             }
             else if ((comp) && (ercMsg))
             {
-                delete mErcMsgListUnplacedGenCompInstances.take(genComp->getUuid());
+                delete mErcMsgListUnplacedComponentInstances.take(genComp->getUuid());
             }
         }
     }
     else
     {
-        qDeleteAll(mErcMsgListUnplacedGenCompInstances);
-        mErcMsgListUnplacedGenCompInstances.clear();
+        qDeleteAll(mErcMsgListUnplacedComponentInstances);
+        mErcMsgListUnplacedComponentInstances.clear();
     }
 }
 

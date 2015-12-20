@@ -38,7 +38,7 @@ class AttributeUnit;
 
 namespace project {
 class Project;
-class GenCompInstance;
+class ComponentInstance;
 class SI_Symbol;
 }
 
@@ -62,7 +62,7 @@ class SymbolInstancePropertiesDialog final : public QDialog
     public:
 
         // Constructors / Destructor
-        explicit SymbolInstancePropertiesDialog(Project& project, GenCompInstance& genComp,
+        explicit SymbolInstancePropertiesDialog(Project& project, ComponentInstance& genComp,
                                                 SI_Symbol& symbol, UndoStack& undoStack,
                                                 QWidget* parent) noexcept;
         ~SymbolInstancePropertiesDialog() noexcept;
@@ -107,7 +107,7 @@ class SymbolInstancePropertiesDialog final : public QDialog
 
         // General
         Project& mProject;
-        GenCompInstance& mGenCompInstance;
+        ComponentInstance& mGenCompInstance;
         SI_Symbol& mSymbol;
         Ui::SymbolInstancePropertiesDialog* mUi;
         UndoStack& mUndoStack;

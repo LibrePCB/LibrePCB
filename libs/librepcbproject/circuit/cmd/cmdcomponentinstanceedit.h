@@ -17,8 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDGENCOMPINSTREMOVE_H
-#define PROJECT_CMDGENCOMPINSTREMOVE_H
+#ifndef PROJECT_CMDCOMPONENTINSTANCEEDIT_H
+#define PROJECT_CMDCOMPONENTINSTANCEEDIT_H
+
 
 /*****************************************************************************************
  *  Includes
@@ -34,26 +35,35 @@
 
 namespace project {
 class Circuit;
-class GenCompInstance;
+class ComponentInstance;
+}
+
+namespace library {
+class Component;
+class ComponentSymbolVariant;
 }
 
 /*****************************************************************************************
- *  Class CmdGenCompInstRemove
+ *  Class CmdComponentInstanceEdit
  ****************************************************************************************/
 
 namespace project {
 
 /**
- * @brief The CmdGenCompInstRemove class
+ * @brief The CmdComponentInstanceEdit class
  */
-class CmdGenCompInstRemove final : public UndoCommand
+class CmdComponentInstanceEdit final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdGenCompInstRemove(Circuit& circuit, GenCompInstance& genCompInstance,
-                                      UndoCommand* parent = 0) throw (Exception);
-        ~CmdGenCompInstRemove() noexcept;
+        explicit CmdComponentInstanceEdit(Circuit& circuit, ComponentInstance& cmp,
+                                          UndoCommand* parent = 0) throw (Exception);
+        ~CmdComponentInstanceEdit() noexcept;
+
+        // Setters
+        void setName(const QString& name) noexcept;
+        void setValue(const QString& value) noexcept;
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;
@@ -63,9 +73,15 @@ class CmdGenCompInstRemove final : public UndoCommand
 
         // Attributes from the constructor
         Circuit& mCircuit;
-        GenCompInstance& mGenCompInstance;
+        ComponentInstance& mComponentInstance;
+
+        // Misc
+        QString mOldName;
+        QString mNewName;
+        QString mOldValue;
+        QString mNewValue;
 };
 
 } // namespace project
 
-#endif // PROJECT_CMDGENCOMPINSTREMOVE_H
+#endif // PROJECT_CMDCOMPONENTINSTANCEEDIT_H
