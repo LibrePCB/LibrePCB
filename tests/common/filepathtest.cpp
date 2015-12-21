@@ -149,8 +149,7 @@ TEST_P(FilePathTest, testOperatorAssign)
 
 INSTANTIATE_TEST_CASE_P(FilePathTest, FilePathTest, ::testing::Values(
 
-    // valid paths
-    //               {valid, "inputFilePath"         , "inputBasePath"  , "toStr"           , "toWindowsStyle"      , "toRelative"      }
+    // valid paths   {valid, "inputFilePath"         , "inputBasePath"  , "toStr"           , "toWindowsStyle"      , "toRelative"      }
 #ifdef Q_OS_WIN
     FilePathTestData({true , "C:\\foo\\bar"          , "C:/foo"         , "C:/foo/bar"      , "C:\\foo\\bar"        , "bar"             }), // Win path to a dir
     FilePathTestData({true , "C:\\foo\\bar\\"        , "C:/bar"         , "C:/foo/bar"      , "C:\\foo\\bar"        , "../foo/bar"      }), // Win path to a dir + backslash
@@ -166,8 +165,7 @@ INSTANTIATE_TEST_CASE_P(FilePathTest, FilePathTest, ::testing::Values(
     FilePathTestData({true , "//foo/..//bar//"       , "/"              , "/bar"            , "\\bar"               , "bar"             }), // UNIX path with .. and double slashes
     FilePathTestData({true , "/"                     , "/foo"           , "/"               , "\\"                  , ".."              }), // UNIX root path
 
-    // invalid paths
-    //     {valid, "inputFilePath"         , "inputBasePath"  , "toStr"           , "toWindowsStyle"      , "toRelative"      }
+    // invalid paths {valid, "inputFilePath"         , "inputBasePath"  , "toStr"           , "toWindowsStyle"      , "toRelative"      }
 #ifdef Q_OS_WIN
     FilePathTestData({false, "foo\\bar"              , ""               , ""                , ""                    , ""                }), // rel. Win path to a dir
     FilePathTestData({false, "foo\\bar.txt"          , ""               , ""                , ""                    , ""                }), // rel. Win path to a file
