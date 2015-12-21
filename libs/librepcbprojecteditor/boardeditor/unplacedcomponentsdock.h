@@ -27,6 +27,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include <librepcbcommon/units/all_length_units.h>
+#include <librepcbcommon/uuid.h>
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -90,10 +91,10 @@ class UnplacedComponentsDock final : public QDockWidget
         UnplacedComponentsDock& operator=(const UnplacedComponentsDock& rhs);
 
         // Private Methods
-        /*void updateComponentsList() noexcept;
-        void setSelectedGenCompInstance(GenCompInstance* genComp) noexcept;
+        void updateComponentsList() noexcept;
+        void setSelectedComponentInstance(ComponentInstance* cmp) noexcept;
         void setSelectedDevice(const library::Device* device) noexcept;
-        void addComponent(GenCompInstance& genComp, const Uuid& component) noexcept;*/
+        void addDevice(ComponentInstance& cmp, const Uuid& deviceUuid) noexcept;
 
 
         // General
@@ -103,7 +104,7 @@ class UnplacedComponentsDock final : public QDockWidget
         Ui::UnplacedComponentsDock* mUi;
         GraphicsView* mFootprintPreviewGraphicsView;
         GraphicsScene* mFootprintPreviewGraphicsScene;
-        ComponentInstance* mSelectedGenComp;
+        ComponentInstance* mSelectedComponent;
         const library::Device* mSelectedDevice;
         QMetaObject::Connection mCircuitConnection1;
         QMetaObject::Connection mCircuitConnection2;
