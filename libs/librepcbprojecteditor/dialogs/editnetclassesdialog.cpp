@@ -54,7 +54,7 @@ EditNetClassesDialog::EditNetClassesDialog(Circuit& circuit, UndoStack& undoStac
     mUi->tableWidget->setRowCount(mCircuit.getNetClasses().count());
     foreach (NetClass* netclass, mCircuit.getNetClasses())
     {
-        QTableWidgetItem* uuid = new QTableWidgetItem(netclass->getUuid().toString());
+        QTableWidgetItem* uuid = new QTableWidgetItem(netclass->getUuid().toStr());
         QTableWidgetItem* name = new QTableWidgetItem(netclass->getName());
         uuid->setData(Qt::UserRole, qVariantFromValue(static_cast<void*>(netclass)));
         name->setData(Qt::UserRole, qVariantFromValue(static_cast<void*>(netclass)));
@@ -125,7 +125,7 @@ void EditNetClassesDialog::on_btnAdd_clicked()
 
         int row = mUi->tableWidget->rowCount();
         mUi->tableWidget->insertRow(row);
-        QTableWidgetItem* uuid = new QTableWidgetItem(cmd->getNetClass()->getUuid().toString());
+        QTableWidgetItem* uuid = new QTableWidgetItem(cmd->getNetClass()->getUuid().toStr());
         QTableWidgetItem* name = new QTableWidgetItem(cmd->getNetClass()->getName());
         name->setData(Qt::UserRole, qVariantFromValue(static_cast<void*>(cmd->getNetClass())));
         mUi->tableWidget->setVerticalHeaderItem(row, uuid);

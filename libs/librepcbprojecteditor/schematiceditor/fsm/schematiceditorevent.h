@@ -25,6 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <librepcbcommon/uuid.h>
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -157,17 +158,17 @@ class SEE_StartAddComponent final : public SEE_Base
 
         // Constructors / Destructor
         SEE_StartAddComponent();
-        SEE_StartAddComponent(const QUuid& genComp, const QUuid& symbVar);
+        SEE_StartAddComponent(const Uuid& genComp, const Uuid& symbVar);
         ~SEE_StartAddComponent();
 
         // Getters
-        const QUuid& getGenCompUuid() const noexcept {return mGenCompUuid;}
-        const QUuid& getSymbVarUuid() const noexcept {return mSymbVarUuid;}
+        const Uuid& getGenCompUuid() const noexcept {return mGenCompUuid;}
+        const Uuid& getSymbVarUuid() const noexcept {return mSymbVarUuid;}
 
     private:
 
-        QUuid mGenCompUuid;
-        QUuid mSymbVarUuid;
+        Uuid mGenCompUuid;
+        Uuid mSymbVarUuid;
 };
 
 /*****************************************************************************************

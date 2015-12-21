@@ -31,7 +31,7 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Component::Component(const QUuid& uuid, const Version& version, const QString& author,
+Component::Component(const Uuid& uuid, const Version& version, const QString& author,
                      const QString& name_en_US, const QString& description_en_US,
                      const QString& keywords_en_US) throw (Exception) :
     LibraryElement("cmp", "component", uuid, version, author, name_en_US, description_en_US, keywords_en_US),
@@ -159,7 +159,7 @@ const QList<const ComponentSignal*>& Component::getSignals() const noexcept
     return mSignals;
 }
 
-const ComponentSignal* Component::getSignalByUuid(const QUuid& uuid) const noexcept
+const ComponentSignal* Component::getSignalByUuid(const Uuid& uuid) const noexcept
 {
     foreach (const ComponentSignal* signal, mSignals)
     {
@@ -169,13 +169,13 @@ const ComponentSignal* Component::getSignalByUuid(const QUuid& uuid) const noexc
     return nullptr;
 }
 
-const ComponentSignal* Component::getSignalOfPin(const QUuid& symbVarUuid,
-                                                 const QUuid& itemUuid,
-                                                 const QUuid& pinUuid) const noexcept
+const ComponentSignal* Component::getSignalOfPin(const Uuid& symbVarUuid,
+                                                 const Uuid& itemUuid,
+                                                 const Uuid& pinUuid) const noexcept
 {
     const ComponentSymbolVariantItem* item = getSymbVarItem(symbVarUuid, itemUuid);
     if (!item) return nullptr;
-    QUuid signalUuid = item->getSignalOfPin(pinUuid);
+    Uuid signalUuid = item->getSignalOfPin(pinUuid);
     if (signalUuid.isNull()) return nullptr;
     return getSignalByUuid(signalUuid);
 }
@@ -201,7 +201,7 @@ const QList<const ComponentSymbolVariant*>& Component::getSymbolVariants() const
     return mSymbolVariants;
 }
 
-const ComponentSymbolVariant* Component::getSymbolVariantByUuid(const QUuid& uuid) const noexcept
+const ComponentSymbolVariant* Component::getSymbolVariantByUuid(const Uuid& uuid) const noexcept
 {
     foreach (const ComponentSymbolVariant* var, mSymbolVariants)
     {
@@ -211,7 +211,7 @@ const ComponentSymbolVariant* Component::getSymbolVariantByUuid(const QUuid& uui
     return nullptr;
 }
 
-const QUuid& Component::getDefaultSymbolVariantUuid() const noexcept
+const Uuid& Component::getDefaultSymbolVariantUuid() const noexcept
 {
     return mDefaultSymbolVariantUuid;
 }
@@ -225,7 +225,7 @@ void Component::clearSymbolVariants() noexcept
 {
     qDeleteAll(mSymbolVariants);
     mSymbolVariants.clear();
-    mDefaultSymbolVariantUuid = QUuid();
+    mDefaultSymbolVariantUuid = Uuid();
 }
 
 void Component::addSymbolVariant(const ComponentSymbolVariant& symbolVariant) noexcept
@@ -240,8 +240,8 @@ void Component::addSymbolVariant(const ComponentSymbolVariant& symbolVariant) no
  *  Symbol Variant Items
  ****************************************************************************************/
 
-const ComponentSymbolVariantItem* Component::getSymbVarItem(const QUuid& symbVarUuid,
-                                                            const QUuid& itemUuid) const noexcept
+const ComponentSymbolVariantItem* Component::getSymbVarItem(const Uuid& symbVarUuid,
+                                                            const Uuid& itemUuid) const noexcept
 {
     const ComponentSymbolVariant* symbVar = getSymbolVariantByUuid(symbVarUuid);
     if (!symbVar) return nullptr;
@@ -317,9 +317,9 @@ void Component::parseDomTree(const XmlDomElement& root) throw (Exception)
         ComponentSignal* signal = new ComponentSignal(*node);
         if (getSignalByUuid(signal->getUuid()))
         {
-            throw RuntimeError(__FILE__, __LINE__, signal->getUuid().toString(),
+            throw RuntimeError(__FILE__, __LINE__, signal->getUuid().toStr(),
                 QString(tr("The signal \"%1\" exists multiple times in \"%2\"."))
-                .arg(signal->getUuid().toString(), mXmlFilepath.toNative()));
+                .arg(signal->getUuid().toStr(), mXmlFilepath.toNative()));
         }
         mSignals.append(signal);
     }
@@ -331,15 +331,15 @@ void Component::parseDomTree(const XmlDomElement& root) throw (Exception)
         ComponentSymbolVariant* variant = new ComponentSymbolVariant(*node);
         if (getSymbolVariantByUuid(variant->getUuid()))
         {
-            throw RuntimeError(__FILE__, __LINE__, variant->getUuid().toString(),
+            throw RuntimeError(__FILE__, __LINE__, variant->getUuid().toStr(),
                 QString(tr("The symbol variant \"%1\" exists multiple times in \"%2\"."))
-                .arg(variant->getUuid().toString(), mXmlFilepath.toNative()));
+                .arg(variant->getUuid().toStr(), mXmlFilepath.toNative()));
         }
         if (variant->isDefault())
         {
             if (!mDefaultSymbolVariantUuid.isNull())
             {
-                throw RuntimeError(__FILE__, __LINE__, variant->getUuid().toString(),
+                throw RuntimeError(__FILE__, __LINE__, variant->getUuid().toStr(),
                     QString(tr("The file \"%1\" has multiple default symbol variants."))
                     .arg(mXmlFilepath.toNative()));
             }

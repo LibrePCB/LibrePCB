@@ -64,7 +64,7 @@ AddGenCompDialog::AddGenCompDialog(Workspace& workspace, Project& project, QWidg
     connect(mUi->treeCategories->selectionModel(), &QItemSelectionModel::currentChanged,
             this, &AddGenCompDialog::treeCategories_currentItemChanged);
 
-    //setSelectedCategory(QUuid());
+    //setSelectedCategory(Uuid());
 }
 
 AddGenCompDialog::~AddGenCompDialog() noexcept
@@ -89,12 +89,12 @@ FilePath AddGenCompDialog::getSelectedGenCompFilePath() const noexcept
         return FilePath();
 }
 
-QUuid AddGenCompDialog::getSelectedSymbVarUuid() const noexcept
+Uuid AddGenCompDialog::getSelectedSymbVarUuid() const noexcept
 {
     if (mSelectedGenComp && mSelectedSymbVar)
         return mSelectedSymbVar->getUuid();
     else
-        return QUuid();
+        return Uuid();
 }
 
 /*****************************************************************************************
@@ -107,7 +107,7 @@ void AddGenCompDialog::treeCategories_currentItemChanged(const QModelIndex& curr
 
     try
     {
-        QUuid categoryUuid = current.data(Qt::UserRole).toUuid();
+        Uuid categoryUuid = Uuid(current.data(Qt::UserRole).toString());
         setSelectedCategory(categoryUuid);
     }
     catch (Exception& e)
@@ -142,7 +142,7 @@ void AddGenCompDialog::on_listGenericComponents_currentItemChanged(QListWidgetIt
 void AddGenCompDialog::on_cbxSymbVar_currentIndexChanged(int index)
 {
     if ((mSelectedGenComp) && (index >= 0))
-        setSelectedSymbVar(mSelectedGenComp->getSymbolVariantByUuid(mUi->cbxSymbVar->itemData(index).toUuid()));
+        setSelectedSymbVar(mSelectedGenComp->getSymbolVariantByUuid(Uuid(mUi->cbxSymbVar->itemData(index).toString())));
     else
         setSelectedSymbVar(nullptr);
 }
@@ -151,7 +151,7 @@ void AddGenCompDialog::on_cbxSymbVar_currentIndexChanged(int index)
  *  Private Methods
  ****************************************************************************************/
 
-void AddGenCompDialog::setSelectedCategory(const QUuid& categoryUuid)
+void AddGenCompDialog::setSelectedCategory(const Uuid& categoryUuid)
 {
     if ((categoryUuid == mSelectedCategoryUuid) && (!categoryUuid.isNull())) return;
 
@@ -162,8 +162,8 @@ void AddGenCompDialog::setSelectedCategory(const QUuid& categoryUuid)
     const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
 
     mSelectedCategoryUuid = categoryUuid;
-    QSet<QUuid> genComps = mWorkspace.getLibrary().getComponentsByCategory(categoryUuid);
-    foreach (const QUuid& genCompUuid, genComps)
+    QSet<Uuid> genComps = mWorkspace.getLibrary().getComponentsByCategory(categoryUuid);
+    foreach (const Uuid& genCompUuid, genComps)
     {
         FilePath genCompFp = mWorkspace.getLibrary().getLatestComponent(genCompUuid);
         if (!genCompFp.isValid()) continue;
@@ -192,7 +192,7 @@ void AddGenCompDialog::setSelectedGenComp(const library::Component* genComp)
     {
         const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
 
-        mUi->lblGenCompUuid->setText(genComp->getUuid().toString());
+        mUi->lblGenCompUuid->setText(genComp->getUuid().toStr());
         mUi->lblGenCompName->setText(genComp->getName(localeOrder));
         mUi->lblGenCompDescription->setText(genComp->getDescription(localeOrder));
 
@@ -205,9 +205,9 @@ void AddGenCompDialog::setSelectedGenComp(const library::Component* genComp)
         {
             QString text = symbVar->getName(localeOrder);
             if (symbVar->isDefault()) text.append(tr(" [default]"));
-            mUi->cbxSymbVar->addItem(text, symbVar->getUuid());
+            mUi->cbxSymbVar->addItem(text, symbVar->getUuid().toStr());
         }
-        mUi->cbxSymbVar->setCurrentIndex(mUi->cbxSymbVar->findData(genComp->getDefaultSymbolVariantUuid()));
+        mUi->cbxSymbVar->setCurrentIndex(mUi->cbxSymbVar->findData(genComp->getDefaultSymbolVariantUuid().toStr()));
     }
 }
 
@@ -225,7 +225,7 @@ void AddGenCompDialog::setSelectedSymbVar(const library::ComponentSymbolVariant*
     {
         const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
 
-        mUi->lblSymbVarUuid->setText(symbVar->getUuid().toString());
+        mUi->lblSymbVarUuid->setText(symbVar->getUuid().toStr());
         mUi->lblSymbVarNorm->setText(symbVar->getNorm());
         mUi->lblSymbVarDescription->setText(symbVar->getDescription(localeOrder));
 

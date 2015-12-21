@@ -44,14 +44,14 @@ class ComponentSymbolVariant final : public IF_XmlSerializableObject
     public:
 
         // Constructors / Destructor
-        explicit ComponentSymbolVariant(const QUuid& uuid = QUuid::createUuid(),
+        explicit ComponentSymbolVariant(const Uuid& uuid = Uuid::createRandom(),
                                         const QString& norm = QString(),
                                         bool isDefault = false) noexcept;
         explicit ComponentSymbolVariant(const XmlDomElement& domElement) throw (Exception);
         ~ComponentSymbolVariant() noexcept;
 
         // Getters: Attributes
-        const QUuid& getUuid() const noexcept {return mUuid;}
+        const Uuid& getUuid() const noexcept {return mUuid;}
         const QString& getNorm() const noexcept {return mNorm;}
         bool isDefault() const noexcept {return mIsDefault;}
         QString getName(const QStringList& localeOrder) const noexcept;
@@ -61,7 +61,7 @@ class ComponentSymbolVariant final : public IF_XmlSerializableObject
 
         // Getters: Symbol Items
         const QList<const ComponentSymbolVariantItem*>& getItems() const noexcept {return mSymbolItems;}
-        const ComponentSymbolVariantItem* getItemByUuid(const QUuid& uuid) const noexcept;
+        const ComponentSymbolVariantItem* getItemByUuid(const Uuid& uuid) const noexcept;
         const ComponentSymbolVariantItem* getNextItem(const ComponentSymbolVariantItem* item) const noexcept;
 
         // Setters
@@ -91,7 +91,7 @@ class ComponentSymbolVariant final : public IF_XmlSerializableObject
 
 
         // Symbol Variant Attributes
-        QUuid mUuid;
+        Uuid mUuid;
         QString mNorm;
         bool mIsDefault;
         QMap<QString, QString> mNames;

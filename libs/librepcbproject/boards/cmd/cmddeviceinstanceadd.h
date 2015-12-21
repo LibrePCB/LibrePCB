@@ -27,6 +27,7 @@
 #include <QtCore>
 #include <librepcbcommon/units/all_length_units.h>
 #include <librepcbcommon/undocommand.h>
+#include <librepcbcommon/uuid.h>
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -57,7 +58,7 @@ class CmdDeviceInstanceAdd final : public UndoCommand
 
         // Constructors / Destructor
         explicit CmdDeviceInstanceAdd(Board& board, ComponentInstance& comp,
-                                      const QUuid& deviceUuid,
+                                      const Uuid& deviceUuid,
                                       const Point& position = Point(),
                                       const Angle& rotation = Angle(), UndoCommand* parent = 0) throw (Exception);
         explicit CmdDeviceInstanceAdd(DeviceInstance& device, UndoCommand* parent = 0) throw (Exception);

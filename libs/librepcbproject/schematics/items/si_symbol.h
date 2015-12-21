@@ -67,18 +67,18 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
         // Constructors / Destructor
         explicit SI_Symbol(Schematic& schematic, const XmlDomElement& domElement) throw (Exception);
         explicit SI_Symbol(Schematic& schematic, ComponentInstance& genCompInstance,
-                           const QUuid& symbolItem, const Point& position = Point(),
+                           const Uuid& symbolItem, const Point& position = Point(),
                            const Angle& rotation = Angle()) throw (Exception);
         ~SI_Symbol() noexcept;
 
         // Getters
         Project& getProject() const noexcept;
         Schematic& getSchematic() const noexcept {return mSchematic;}
-        const QUuid& getUuid() const noexcept {return mUuid;}
+        const Uuid& getUuid() const noexcept {return mUuid;}
         const Angle& getRotation() const noexcept {return mRotation;}
         QString getName() const noexcept;
-        SI_SymbolPin* getPin(const QUuid& pinUuid) const noexcept {return mPins.value(pinUuid);}
-        const QHash<QUuid, SI_SymbolPin*>& getPins() const noexcept {return mPins;}
+        SI_SymbolPin* getPin(const Uuid& pinUuid) const noexcept {return mPins.value(pinUuid);}
+        const QHash<Uuid, SI_SymbolPin*>& getPins() const noexcept {return mPins;}
         ComponentInstance& getGenCompInstance() const noexcept {return *mComponentInstance;}
         const library::Symbol& getLibSymbol() const noexcept {return *mSymbol;}
         const library::ComponentSymbolVariantItem& getGenCompSymbVarItem() const noexcept {return *mSymbVarItem;}
@@ -126,7 +126,7 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
         SI_Symbol& operator=(const SI_Symbol& rhs);
 
         // Private Methods
-        void init(const QUuid& symbVarItemUuid) throw (Exception);
+        void init(const Uuid& symbVarItemUuid) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
@@ -137,11 +137,11 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
         ComponentInstance* mComponentInstance;
         const library::ComponentSymbolVariantItem* mSymbVarItem;
         const library::Symbol* mSymbol;
-        QHash<QUuid, SI_SymbolPin*> mPins; ///< key: symbol pin UUID
+        QHash<Uuid, SI_SymbolPin*> mPins; ///< key: symbol pin UUID
         SGI_Symbol* mGraphicsItem;
 
         // Attributes
-        QUuid mUuid;
+        Uuid mUuid;
         Point mPosition;
         Angle mRotation;
 };

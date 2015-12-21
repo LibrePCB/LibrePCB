@@ -45,7 +45,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const QUuid& pinUuid) :
+SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const Uuid& pinUuid) :
     SI_Base(), mCircuit(symbol.getSchematic().getProject().getCircuit()),
     mSymbol(symbol), mSymbolPin(nullptr), mGenCompSignal(nullptr),
     mGenCompSignalInstance(nullptr), mAddedToSchematic(false),
@@ -55,10 +55,10 @@ SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const QUuid& pinUuid) :
     mSymbolPin = mSymbol.getLibSymbol().getPinByUuid(pinUuid);
     if (!mSymbolPin)
     {
-        throw RuntimeError(__FILE__, __LINE__, pinUuid.toString(),
-            QString(tr("Invalid symbol pin UUID: \"%1\"")).arg(pinUuid.toString()));
+        throw RuntimeError(__FILE__, __LINE__, pinUuid.toStr(),
+            QString(tr("Invalid symbol pin UUID: \"%1\"")).arg(pinUuid.toStr()));
     }
-    QUuid genCompSignalUuid = mSymbol.getGenCompSymbVarItem().getSignalOfPin(pinUuid);
+    Uuid genCompSignalUuid = mSymbol.getGenCompSymbVarItem().getSignalOfPin(pinUuid);
     mGenCompSignalInstance = mSymbol.getGenCompInstance().getSignalInstance(genCompSignalUuid);
     mGenCompSignal = mSymbol.getGenCompInstance().getLibComponent().getSignalByUuid(genCompSignalUuid);
 
@@ -67,7 +67,7 @@ SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const QUuid& pinUuid) :
 
     // create ERC messages
     mErcMsgUnconnectedRequiredPin.reset(new ErcMsg(mCircuit.getProject(), *this,
-        QString("%1/%2").arg(mSymbol.getUuid().toString()).arg(mSymbolPin->getUuid().toString()),
+        QString("%1/%2").arg(mSymbol.getUuid().toStr()).arg(mSymbolPin->getUuid().toStr()),
         "UnconnectedRequiredPin", ErcMsg::ErcMsgType_t::SchematicError));
     updateErcMessages();
 }
@@ -92,7 +92,7 @@ Schematic& SI_SymbolPin::getSchematic() const noexcept
     return mSymbol.getSchematic();
 }
 
-const QUuid& SI_SymbolPin::getLibPinUuid() const noexcept
+const Uuid& SI_SymbolPin::getLibPinUuid() const noexcept
 {
     return mSymbolPin->getUuid();
 }

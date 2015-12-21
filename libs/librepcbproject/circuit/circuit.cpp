@@ -128,7 +128,7 @@ Circuit::~Circuit() noexcept
  *  NetClass Methods
  ****************************************************************************************/
 
-NetClass* Circuit::getNetClassByUuid(const QUuid& uuid) const noexcept
+NetClass* Circuit::getNetClassByUuid(const Uuid& uuid) const noexcept
 {
     return mNetClasses.value(uuid, nullptr);
 }
@@ -148,15 +148,15 @@ void Circuit::addNetClass(NetClass& netclass) throw (Exception)
     // check if there is no netclass with the same uuid in the list
     if (getNetClassByUuid(netclass.getUuid()))
     {
-        throw RuntimeError(__FILE__, __LINE__, netclass.getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, netclass.getUuid().toStr(),
             QString(tr("There is already a netclass with the UUID \"%1\"!"))
-            .arg(netclass.getUuid().toString()));
+            .arg(netclass.getUuid().toStr()));
     }
 
     // check if there is no netclass with the same name in the list
     if (getNetClassByName(netclass.getName()))
     {
-        throw RuntimeError(__FILE__, __LINE__, netclass.getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, netclass.getUuid().toStr(),
             QString(tr("There is already a netclass with the name \"%1\"!"))
             .arg(netclass.getName()));
     }
@@ -175,7 +175,7 @@ void Circuit::removeNetClass(NetClass& netclass) throw (Exception)
     if (netclass.getNetSignalCount() > 0)
     {
         throw RuntimeError(__FILE__, __LINE__, QString("%1:%2")
-            .arg(netclass.getUuid().toString()).arg(netclass.getNetSignalCount()),
+            .arg(netclass.getUuid().toStr()).arg(netclass.getNetSignalCount()),
             QString(tr("There are already signals in the netclass \"%1\"!"))
             .arg(netclass.getName()));
     }
@@ -194,14 +194,14 @@ void Circuit::setNetClassName(NetClass& netclass, const QString& newName) throw 
     // check the validity of the new name
     if (newName.isEmpty())
     {
-        throw RuntimeError(__FILE__, __LINE__, netclass.getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, netclass.getUuid().toStr(),
             QString(tr("The new netclass name must not be empty!")));
     }
 
     // check if there is no netclass with the same name in the list
     if (getNetClassByName(newName))
     {
-        throw RuntimeError(__FILE__, __LINE__, netclass.getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, netclass.getUuid().toStr(),
             QString(tr("There is already a netclass with the name \"%1\"!")).arg(newName));
     }
 
@@ -213,7 +213,7 @@ void Circuit::setNetClassName(NetClass& netclass, const QString& newName) throw 
  *  NetSignal Methods
  ****************************************************************************************/
 
-NetSignal* Circuit::getNetSignalByUuid(const QUuid& uuid) const noexcept
+NetSignal* Circuit::getNetSignalByUuid(const Uuid& uuid) const noexcept
 {
     return mNetSignals.value(uuid, nullptr);
 }
@@ -256,15 +256,15 @@ void Circuit::addNetSignal(NetSignal& netsignal) throw (Exception)
     // check if there is no netsignal with the same uuid in the list
     if (getNetSignalByUuid(netsignal.getUuid()))
     {
-        throw RuntimeError(__FILE__, __LINE__, netsignal.getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, netsignal.getUuid().toStr(),
             QString(tr("There is already a netsignal with the UUID \"%1\"!"))
-            .arg(netsignal.getUuid().toString()));
+            .arg(netsignal.getUuid().toStr()));
     }
 
     // check if there is no netsignal with the same name in the list
     if (getNetSignalByName(netsignal.getName()))
     {
-        throw RuntimeError(__FILE__, __LINE__, netsignal.getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, netsignal.getUuid().toStr(),
             QString(tr("There is already a netsignal with the name \"%1\"!"))
             .arg(netsignal.getName()));
     }
@@ -286,7 +286,7 @@ void Circuit::removeNetSignal(NetSignal& netsignal) throw (Exception)
     {
         throw LogicError(__FILE__, __LINE__,
             QString("%1:%2/%3")
-            .arg(netsignal.getUuid().toString())
+            .arg(netsignal.getUuid().toStr())
             .arg(netsignal.getGenCompSignals().count())
             .arg(netsignal.getNetPoints().count()),
             QString(tr("There are already elements in the netsignal \"%1\"!"))
@@ -307,14 +307,14 @@ void Circuit::setNetSignalName(NetSignal& netsignal, const QString& newName, boo
     // check the validity of the new name
     if (newName.isEmpty())
     {
-        throw RuntimeError(__FILE__, __LINE__, netsignal.getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, netsignal.getUuid().toStr(),
             QString(tr("The new net signal name must not be empty!")));
     }
 
     // check if there is no net signal with the same name in the list
     if (getNetSignalByName(newName))
     {
-        throw RuntimeError(__FILE__, __LINE__, netsignal.getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, netsignal.getUuid().toStr(),
             QString(tr("There is already a net signal with the name \"%1\"!")).arg(newName));
     }
 
@@ -326,7 +326,7 @@ void Circuit::setNetSignalName(NetSignal& netsignal, const QString& newName, boo
  *  GenCompInstance Methods
  ****************************************************************************************/
 
-ComponentInstance* Circuit::getComponentInstanceByUuid(const QUuid& uuid) const noexcept
+ComponentInstance* Circuit::getComponentInstanceByUuid(const Uuid& uuid) const noexcept
 {
     return mComponentInstances.value(uuid, nullptr);
 }
@@ -371,15 +371,15 @@ void Circuit::addComponentInstance(ComponentInstance& cmp) throw (Exception)
     // check if there is no component with the same uuid in the list
     if (getComponentInstanceByUuid(cmp.getUuid()))
     {
-        throw RuntimeError(__FILE__, __LINE__, cmp.getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, cmp.getUuid().toStr(),
             QString(tr("There is already a component with the UUID \"%1\"!"))
-            .arg(cmp.getUuid().toString()));
+            .arg(cmp.getUuid().toStr()));
     }
 
     // check if there is no component with the same name in the list
     if (getComponentInstanceByName(cmp.getName()))
     {
-        throw RuntimeError(__FILE__, __LINE__, cmp.getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, cmp.getUuid().toStr(),
             QString(tr("There is already a component with the name \"%1\"!"))
             .arg(cmp.getName()));
     }
@@ -397,7 +397,7 @@ void Circuit::removeComponentInstance(ComponentInstance& cmp) throw (Exception)
     // check if the component instance is not used by symbols/devices
     if (cmp.getPlacedSymbolsCount() > 0)
     {
-        throw LogicError(__FILE__, __LINE__, cmp.getUuid().toString(),
+        throw LogicError(__FILE__, __LINE__, cmp.getUuid().toStr(),
             QString(tr("The component \"%1\" is still used!")).arg(cmp.getName()));
     }
 
@@ -415,14 +415,14 @@ void Circuit::setComponentInstanceName(ComponentInstance& cmp, const QString& ne
     // check the validity of the new name
     if (newName.isEmpty())
     {
-        throw RuntimeError(__FILE__, __LINE__, cmp.getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, cmp.getUuid().toStr(),
             QString(tr("The new component name must not be empty!")));
     }
 
     // check if there is no component with the same name in the list
     if (getComponentInstanceByName(newName))
     {
-        throw RuntimeError(__FILE__, __LINE__, cmp.getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, cmp.getUuid().toStr(),
             QString(tr("There is already a component with the name \"%1\"!")).arg(newName));
     }
 

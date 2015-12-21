@@ -25,6 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <librepcbcommon/uuid.h>
 #include <librepcbcommon/units/all_length_units.h>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 
@@ -44,13 +45,13 @@ class SymbolPin final : public IF_XmlSerializableObject
     public:
 
         // Constructors / Destructor
-        explicit SymbolPin(const QUuid& uuid = QUuid::createUuid(),
+        explicit SymbolPin(const Uuid& uuid = Uuid::createRandom(),
                            const QString& name = QString()) noexcept;
         explicit SymbolPin(const XmlDomElement& domElement) throw (Exception);
         ~SymbolPin() noexcept;
 
         // Getters
-        const QUuid& getUuid() const noexcept {return mUuid;}
+        const Uuid& getUuid() const noexcept {return mUuid;}
         QString getName() const noexcept {return mName;}
         const Point& getPosition() const noexcept {return mPosition;}
         const Length& getLength() const noexcept {return mLength;}
@@ -80,7 +81,7 @@ class SymbolPin final : public IF_XmlSerializableObject
 
 
         // Pin Attributes
-        QUuid mUuid;
+        Uuid mUuid;
         QString mName;
         Point mPosition;
         Length mLength;

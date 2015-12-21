@@ -25,6 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <librepcbcommon/uuid.h>
 #include <librepcbcommon/units/all_length_units.h>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 
@@ -55,12 +56,12 @@ class FootprintPad final : public IF_XmlSerializableObject
         };
 
         // Constructors / Destructor
-        explicit FootprintPad(const QUuid& padUuid) noexcept;
+        explicit FootprintPad(const Uuid& padUuid) noexcept;
         explicit FootprintPad(const XmlDomElement& domElement) throw (Exception);
         ~FootprintPad() noexcept;
 
         // Getters
-        const QUuid& getPadUuid() const noexcept {return mPadUuid;}
+        const Uuid& getPadUuid() const noexcept {return mPadUuid;}
         Type_t getType() const noexcept {return mType;}
         const Point& getPosition() const noexcept {return mPosition;}
         const Angle& getRotation() const noexcept {return mRotation;}
@@ -101,7 +102,7 @@ class FootprintPad final : public IF_XmlSerializableObject
 
 
         // Pin Attributes
-        QUuid mPadUuid;
+        Uuid mPadUuid;
         Type_t mType;
         Point mPosition;
         Angle mRotation;

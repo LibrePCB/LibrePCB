@@ -32,7 +32,7 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-FootprintPad::FootprintPad(const QUuid& padUuid) noexcept :
+FootprintPad::FootprintPad(const Uuid& padUuid) noexcept :
     mPadUuid(padUuid), mType(Type_t::ThtRect), mPosition(0, 0), mRotation(0), mWidth(0),
     mHeight(0), mDrillDiameter(0), mLayerId(0)
 {
@@ -42,7 +42,7 @@ FootprintPad::FootprintPad(const XmlDomElement& domElement) throw (Exception) :
     mPadUuid(), mPosition()
 {
     // read attributes
-    mPadUuid = domElement.getAttribute<QUuid>("uuid");
+    mPadUuid = domElement.getAttribute<Uuid>("uuid");
     mType = stringToType(domElement.getAttribute("type"));
     mPosition.setX(domElement.getAttribute<Length>("x"));
     mPosition.setY(domElement.getAttribute<Length>("y"));

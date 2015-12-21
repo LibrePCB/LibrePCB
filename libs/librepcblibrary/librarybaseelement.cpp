@@ -34,7 +34,7 @@ namespace library {
  ****************************************************************************************/
 
 LibraryBaseElement::LibraryBaseElement(const QString& xmlFileNamePrefix,
-                                       const QString& xmlRootNodeName, const QUuid& uuid,
+                                       const QString& xmlRootNodeName, const Uuid& uuid,
                                        const Version& version, const QString& author,
                                        const QString& name_en_US,
                                        const QString& description_en_US,
@@ -108,8 +108,7 @@ void LibraryBaseElement::save() const throw (Exception)
 
 void LibraryBaseElement::saveTo(const FilePath& parentDir) const throw (Exception)
 {
-    QString uuid = mUuid.toString().remove("{").remove("}");
-    QString dirname = QString("%1.%2").arg(uuid).arg(mXmlFileNamePrefix);
+    QString dirname = QString("%1.%2").arg(mUuid.toStr()).arg(mXmlFileNamePrefix);
     mDirectory = parentDir.getPathTo(dirname);
     QString filename = QString("%1.xml").arg(mXmlFileNamePrefix);
     mXmlFilepath = mDirectory.getPathTo(filename);
@@ -125,10 +124,10 @@ void LibraryBaseElement::readFromFile() throw (Exception)
     Q_ASSERT(mDomTreeParsed == false);
 
     // check directory
-    QUuid dirUuid = QUuid(mDirectory.getFilename());
+    Uuid dirUuid = Uuid(mDirectory.getBasename());
     if ((!mDirectory.isExistingDir()) || (dirUuid.isNull()))
     {
-        throw RuntimeError(__FILE__, __LINE__, dirUuid.toString(),
+        throw RuntimeError(__FILE__, __LINE__, dirUuid.toStr(),
             QString(tr("Directory does not exist or is not a valid UUID: \"%1\""))
             .arg(mDirectory.toNative()));
     }
@@ -148,7 +147,7 @@ void LibraryBaseElement::readFromFile() throw (Exception)
     if (mUuid != dirUuid)
     {
         throw RuntimeError(__FILE__, __LINE__,
-            QString("%1/%2").arg(mUuid.toString(), dirUuid.toString()),
+            QString("%1/%2").arg(mUuid.toStr(), dirUuid.toStr()),
             QString(tr("UUID mismatch between element directory and XML file: \"%1\""))
             .arg(mXmlFilepath.toNative()));
     }
@@ -164,7 +163,7 @@ void LibraryBaseElement::parseDomTree(const XmlDomElement& root) throw (Exceptio
     Q_ASSERT(mDomTreeParsed == false);
 
     // read attributes
-    mUuid = root.getFirstChild("meta/uuid", true, true)->getText<QUuid>();
+    mUuid = root.getFirstChild("meta/uuid", true, true)->getText<Uuid>();
     mVersion = root.getFirstChild("meta/version", true, true)->getText<Version>();
     mAuthor = root.getFirstChild("meta/author", true, true)->getText();
     mCreated = root.getFirstChild("meta/created", true, true)->getText<QDateTime>();
@@ -189,8 +188,8 @@ XmlDomElement* LibraryBaseElement::serializeToXmlDomElement() const throw (Excep
 
     // meta
     XmlDomElement* meta = root->appendChild("meta");
-    meta->appendTextChild("uuid", mUuid.toString());
-    meta->appendTextChild("version", mVersion.toStr());
+    meta->appendTextChild("uuid", mUuid);
+    meta->appendTextChild("version", mVersion);
     meta->appendTextChild("author", mAuthor);
     meta->appendTextChild("created", mCreated);
     meta->appendTextChild("last_modified", mLastModified);

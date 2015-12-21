@@ -61,7 +61,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             mXmlFile = SmartXmlFile::create(mFilePath);
 
             // set attributes
-            mUuid = QUuid::createUuid();
+            mUuid = Uuid::createRandom();
             mName = newName;
 
             // load default grid properties
@@ -75,7 +75,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
 
             // the board seems to be ready to open, so we will create all needed objects
 
-            mUuid = root.getFirstChild("meta/uuid", true, true)->getText<QUuid>();
+            mUuid = root.getFirstChild("meta/uuid", true, true)->getText<Uuid>();
             mName = root.getFirstChild("meta/name", true, true)->getText(true);
 
             // Load grid properties
@@ -232,7 +232,7 @@ void Board::setGridProperties(const GridProperties& grid) noexcept
  *  DeviceInstance Methods
  ****************************************************************************************/
 
-DeviceInstance* Board::getDeviceInstanceByComponentUuid(const QUuid& uuid) const noexcept
+DeviceInstance* Board::getDeviceInstanceByComponentUuid(const Uuid& uuid) const noexcept
 {
     return mDeviceInstances.value(uuid, nullptr);
 }
@@ -253,9 +253,9 @@ void Board::addDeviceInstance(DeviceInstance& instance) throw (Exception)
     // check if there is no device with the same component instance in the list
     if (getDeviceInstanceByComponentUuid(instance.getComponentInstance().getUuid()))
     {
-        throw RuntimeError(__FILE__, __LINE__, instance.getComponentInstance().getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, instance.getComponentInstance().getUuid().toStr(),
             QString(tr("There is already a device with the component instance \"%1\"!"))
-            .arg(instance.getComponentInstance().getUuid().toString()));
+            .arg(instance.getComponentInstance().getUuid().toStr()));
     }
 
     // add to circuit
@@ -418,8 +418,8 @@ void Board::updateErcMessages() noexcept
             ErcMsg* ercMsg = mErcMsgListUnplacedComponentInstances.value(genComp->getUuid());
             if ((!comp) && (!ercMsg))
             {
-                ErcMsg* ercMsg = new ErcMsg(mProject, *this, QString("%1/%2").arg(mUuid.toString(),
-                    genComp->getUuid().toString()), "UnplacedComponent", ErcMsg::ErcMsgType_t::BoardError,
+                ErcMsg* ercMsg = new ErcMsg(mProject, *this, QString("%1/%2").arg(mUuid.toStr(),
+                    genComp->getUuid().toStr()), "UnplacedComponent", ErcMsg::ErcMsgType_t::BoardError,
                     QString("Unplaced Component: %1 (Board: %2)").arg(genComp->getName(), mName));
                 ercMsg->setVisible(true);
                 mErcMsgListUnplacedComponentInstances.insert(genComp->getUuid(), ercMsg);

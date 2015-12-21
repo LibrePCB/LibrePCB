@@ -26,6 +26,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
+#include <librepcbcommon/uuid.h>
 #include <librepcbcommon/fileio/filepath.h>
 
 /*****************************************************************************************
@@ -78,7 +79,7 @@ class AddGenCompDialog final : public QDialog
 
         // Getters
         FilePath getSelectedGenCompFilePath() const noexcept;
-        QUuid getSelectedSymbVarUuid() const noexcept;
+        Uuid getSelectedSymbVarUuid() const noexcept;
 
 
     private slots:
@@ -91,7 +92,7 @@ class AddGenCompDialog final : public QDialog
     private:
 
         // Private Methods
-        void setSelectedCategory(const QUuid& categoryUuid);
+        void setSelectedCategory(const Uuid& categoryUuid);
         void setSelectedGenComp(const library::Component* genComp);
         void setSelectedSymbVar(const library::ComponentSymbolVariant* symbVar);
         void accept() noexcept;
@@ -106,7 +107,7 @@ class AddGenCompDialog final : public QDialog
 
 
         // Attributes
-        QUuid mSelectedCategoryUuid;
+        Uuid mSelectedCategoryUuid;
         const library::Component* mSelectedGenComp;
         const library::ComponentSymbolVariant* mSelectedSymbVar;
         QList<library::SymbolPreviewGraphicsItem*> mPreviewSymbolGraphicsItems;

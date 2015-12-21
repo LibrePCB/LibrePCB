@@ -31,7 +31,7 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SymbolPin::SymbolPin(const QUuid& uuid, const QString& name) noexcept :
+SymbolPin::SymbolPin(const Uuid& uuid, const QString& name) noexcept :
     mUuid(uuid), mName(name), mPosition(0, 0), mLength(0), mRotation(0)
 {
     Q_ASSERT(mUuid.isNull() == false);
@@ -41,7 +41,7 @@ SymbolPin::SymbolPin(const XmlDomElement& domElement) throw (Exception) :
     mUuid(), mPosition(), mLength(), mRotation()
 {
     // read attributes
-    mUuid = domElement.getAttribute<QUuid>("uuid");
+    mUuid = domElement.getAttribute<Uuid>("uuid");
     mName = domElement.getText(true);
     mPosition.setX(domElement.getAttribute<Length>("x"));
     mPosition.setY(domElement.getAttribute<Length>("y"));

@@ -2,6 +2,7 @@
 #include <QClipboard>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <librepcbcommon/uuid.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -14,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(on_timer_timeout()));
 
-    //QUuid nullUuid = QUuid(0, 0, 16385, 128, 0, 0, 0, 0, 0, 0, 0);
+    //Uuid nullUuid = Uuid(0, 0, 16385, 128, 0, 0, 0, 0, 0, 0, 0);
 }
 
 MainWindow::~MainWindow()
@@ -26,9 +27,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
-    QUuid uuid = QUuid::createUuid();
-    ui->lineEdit->setText(uuid.toString());
-    QApplication::clipboard()->setText(uuid.toString());
+    Uuid uuid = Uuid::createRandom();
+    ui->lineEdit->setText(uuid.toStr());
+    QApplication::clipboard()->setText(uuid.toStr());
 }
 
 void MainWindow::on_timer_timeout()

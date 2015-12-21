@@ -32,7 +32,7 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Footprint::Footprint(const QUuid& uuid, const QString& name_en_US,
+Footprint::Footprint(const Uuid& uuid, const QString& name_en_US,
                      const QString& description_en_US, bool isDefault) throw (Exception) :
     mUuid(uuid), mIsDefault(isDefault)
 {
@@ -46,7 +46,7 @@ Footprint::Footprint(const XmlDomElement& domElement) throw (Exception)
     try
     {
         // read attributes
-        mUuid = domElement.getAttribute<QUuid>("uuid");
+        mUuid = domElement.getAttribute<Uuid>("uuid");
         mIsDefault = domElement.getAttribute<bool>("default");
 
         // read names and descriptions in all available languages
@@ -82,9 +82,9 @@ Footprint::Footprint(const XmlDomElement& domElement) throw (Exception)
                 FootprintPad* pad = new FootprintPad(*node);
                 if (mPads.contains(pad->getPadUuid()))
                 {
-                    throw RuntimeError(__FILE__, __LINE__, pad->getPadUuid().toString(),
+                    throw RuntimeError(__FILE__, __LINE__, pad->getPadUuid().toStr(),
                         QString(tr("The pad \"%1\" exists multiple times in \"%2\"."))
-                        .arg(pad->getPadUuid().toString(), domElement.getDocFilePath().toNative()));
+                        .arg(pad->getPadUuid().toStr(), domElement.getDocFilePath().toNative()));
                 }
                 mPads.insert(pad->getPadUuid(), pad);
             }

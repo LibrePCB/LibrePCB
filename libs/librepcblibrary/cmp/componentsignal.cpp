@@ -32,7 +32,7 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ComponentSignal::ComponentSignal(const QUuid& uuid, const QString& name) noexcept :
+ComponentSignal::ComponentSignal(const Uuid& uuid, const QString& name) noexcept :
     mUuid(uuid), mName(name), mRole(SignalRole_t::Passive), mForcedNetName(),
     mIsRequired(false), mIsNegated(false), mIsClock(false)
 {
@@ -42,7 +42,7 @@ ComponentSignal::ComponentSignal(const QUuid& uuid, const QString& name) noexcep
 ComponentSignal::ComponentSignal(const XmlDomElement& domElement) throw (Exception)
 {
     // read attributes
-    mUuid = domElement.getAttribute<QUuid>("uuid");
+    mUuid = domElement.getAttribute<Uuid>("uuid");
     mName = domElement.getText(true);
     mRole = stringToSignalRole(domElement.getAttribute("role"));
     mForcedNetName = domElement.getAttribute("forced_net_name");

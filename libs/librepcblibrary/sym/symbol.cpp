@@ -31,7 +31,7 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Symbol::Symbol(const QUuid& uuid, const Version& version, const QString& author,
+Symbol::Symbol(const Uuid& uuid, const Version& version, const QString& author,
                const QString& name_en_US, const QString& description_en_US,
                const QString& keywords_en_US) throw (Exception) :
     LibraryElement("sym", "symbol", uuid, version, author, name_en_US, description_en_US, keywords_en_US)
@@ -78,9 +78,9 @@ void Symbol::parseDomTree(const XmlDomElement& root) throw (Exception)
         SymbolPin* pin = new SymbolPin(*node);
         if (mPins.contains(pin->getUuid()))
         {
-            throw RuntimeError(__FILE__, __LINE__, pin->getUuid().toString(),
+            throw RuntimeError(__FILE__, __LINE__, pin->getUuid().toStr(),
                 QString(tr("The pin \"%1\" exists multiple times in \"%2\"."))
-                .arg(pin->getUuid().toString(), mXmlFilepath.toNative()));
+                .arg(pin->getUuid().toStr(), mXmlFilepath.toNative()));
         }
         mPins.insert(pin->getUuid(), pin);
     }

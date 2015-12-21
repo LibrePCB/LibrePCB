@@ -25,6 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <librepcbcommon/uuid.h>
 #include <librepcbcommon/units/all_length_units.h>
 #include <librepcbcommon/undocommand.h>
 #include <librepcbcommon/exceptions.h>
@@ -54,7 +55,7 @@ class CmdSymbolInstanceAdd final : public UndoCommand
 
         // Constructors / Destructor
         explicit CmdSymbolInstanceAdd(Schematic& schematic, ComponentInstance& genComp,
-                                      const QUuid& symbolItem, const Point& position = Point(),
+                                      const Uuid& symbolItem, const Point& position = Point(),
                                       const Angle& angle = Angle(), UndoCommand* parent = 0) throw (Exception);
         explicit CmdSymbolInstanceAdd(SI_Symbol& symbol, UndoCommand* parent = 0) throw (Exception);
         ~CmdSymbolInstanceAdd() noexcept;

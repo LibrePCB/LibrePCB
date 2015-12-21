@@ -15,6 +15,19 @@ include(../../common.pri)
 
 QT += core widgets
 
+LIBS += \
+    -L$${DESTDIR} \
+    -llibrepcbcommon
+
+INCLUDEPATH += \
+    ../../libs
+
+DEPENDPATH += \
+    ../../libs/librepcbcommon
+
+PRE_TARGETDEPS += \
+    $${DESTDIR}/liblibrepcbcommon.a
+
 SOURCES += main.cpp \
         mainwindow.cpp
 

@@ -44,51 +44,51 @@ SI_Symbol::SI_Symbol(Schematic& schematic, const XmlDomElement& domElement) thro
     SI_Base(), mSchematic(schematic), mComponentInstance(nullptr),
     mSymbVarItem(nullptr), mSymbol(nullptr), mGraphicsItem(nullptr)
 {
-    mUuid = domElement.getAttribute<QUuid>("uuid");
+    mUuid = domElement.getAttribute<Uuid>("uuid");
 
-    QUuid gcUuid = domElement.getAttribute<QUuid>("component_instance");
+    Uuid gcUuid = domElement.getAttribute<Uuid>("component_instance");
     mComponentInstance = schematic.getProject().getCircuit().getComponentInstanceByUuid(gcUuid);
     if (!mComponentInstance)
     {
-        throw RuntimeError(__FILE__, __LINE__, gcUuid.toString(),
+        throw RuntimeError(__FILE__, __LINE__, gcUuid.toStr(),
             QString(tr("No component with the UUID \"%1\" found in the circuit!"))
-            .arg(gcUuid.toString()));
+            .arg(gcUuid.toStr()));
     }
 
     mPosition.setX(domElement.getFirstChild("position", true)->getAttribute<Length>("x"));
     mPosition.setY(domElement.getFirstChild("position", true)->getAttribute<Length>("y"));
     mRotation = domElement.getFirstChild("position", true)->getAttribute<Angle>("rotation");
 
-    QUuid symbVarItemUuid = domElement.getAttribute<QUuid>("symbol_item");
+    Uuid symbVarItemUuid = domElement.getAttribute<Uuid>("symbol_item");
     init(symbVarItemUuid);
 }
 
 SI_Symbol::SI_Symbol(Schematic& schematic, ComponentInstance& genCompInstance,
-                     const QUuid& symbolItem, const Point& position, const Angle& rotation) throw (Exception) :
+                     const Uuid& symbolItem, const Point& position, const Angle& rotation) throw (Exception) :
     SI_Base(), mSchematic(schematic), mComponentInstance(&genCompInstance),
     mSymbVarItem(nullptr), mSymbol(nullptr), mGraphicsItem(nullptr), mPosition(position),
     mRotation(rotation)
 {
-    mUuid = QUuid::createUuid().toString(); // generate random UUID
+    mUuid = Uuid::createRandom(); // generate random UUID
     init(symbolItem);
 }
 
-void SI_Symbol::init(const QUuid& symbVarItemUuid) throw (Exception)
+void SI_Symbol::init(const Uuid& symbVarItemUuid) throw (Exception)
 {
     mSymbVarItem = mComponentInstance->getSymbolVariant().getItemByUuid(symbVarItemUuid);
     if (!mSymbVarItem)
     {
-        throw RuntimeError(__FILE__, __LINE__, symbVarItemUuid.toString(),
+        throw RuntimeError(__FILE__, __LINE__, symbVarItemUuid.toStr(),
             QString(tr("The symbol variant item UUID \"%1\" is invalid."))
-            .arg(symbVarItemUuid.toString()));
+            .arg(symbVarItemUuid.toStr()));
     }
 
     mSymbol = mSchematic.getProject().getLibrary().getSymbol(mSymbVarItem->getSymbolUuid());
     if (!mSymbol)
     {
-        throw RuntimeError(__FILE__, __LINE__, mSymbVarItem->getSymbolUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, mSymbVarItem->getSymbolUuid().toStr(),
             QString(tr("No symbol with the UUID \"%1\" found in the project's library."))
-            .arg(mSymbVarItem->getSymbolUuid().toString()));
+            .arg(mSymbVarItem->getSymbolUuid().toStr()));
     }
 
     mGraphicsItem = new SGI_Symbol(*this);
@@ -100,15 +100,15 @@ void SI_Symbol::init(const QUuid& symbVarItemUuid) throw (Exception)
         SI_SymbolPin* pin = new SI_SymbolPin(*this, libPin->getUuid());
         if (mPins.contains(libPin->getUuid()))
         {
-            throw RuntimeError(__FILE__, __LINE__, libPin->getUuid().toString(),
+            throw RuntimeError(__FILE__, __LINE__, libPin->getUuid().toStr(),
                 QString(tr("The symbol pin UUID \"%1\" is defined multiple times."))
-                .arg(libPin->getUuid().toString()));
+                .arg(libPin->getUuid().toStr()));
         }
         if (!mSymbVarItem->getPinSignalMap().contains(libPin->getUuid()))
         {
-            throw RuntimeError(__FILE__, __LINE__, libPin->getUuid().toString(),
+            throw RuntimeError(__FILE__, __LINE__, libPin->getUuid().toStr(),
                 QString(tr("Symbol pin UUID \"%1\" not found in pin-signal-map."))
-                .arg(libPin->getUuid().toString()));
+                .arg(libPin->getUuid().toStr()));
         }
         mPins.insert(libPin->getUuid(), pin);
     }
@@ -117,7 +117,7 @@ void SI_Symbol::init(const QUuid& symbVarItemUuid) throw (Exception)
         throw RuntimeError(__FILE__, __LINE__,
             QString("%1!=%2").arg(mPins.count()).arg(mSymbVarItem->getPinSignalMap().count()),
             QString(tr("The pin count of the symbol instance \"%1\" does not match with "
-            "the pin-signal-map")).arg(mUuid.toString()));
+            "the pin-signal-map")).arg(mUuid.toStr()));
     }
 
     // connect to the "attributes changes" signal of schematic and generic component

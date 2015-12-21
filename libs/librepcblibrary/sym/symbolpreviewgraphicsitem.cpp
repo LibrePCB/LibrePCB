@@ -41,8 +41,8 @@ SymbolPreviewGraphicsItem::SymbolPreviewGraphicsItem(const IF_SchematicLayerProv
                                                      const QStringList& localeOrder,
                                                      const Symbol& symbol,
                                                      const Component* genComp,
-                                                     const QUuid& symbVarUuid,
-                                                     const QUuid& symbVarItemUuid) noexcept :
+                                                     const Uuid& symbVarUuid,
+                                                     const Uuid& symbVarItemUuid) noexcept :
     GraphicsItem(), mLayerProvider(layerProvider), mSymbol(symbol), mGenComp(genComp),
     mSymbVarItem(nullptr), mDrawBoundingRect(false), mLocaleOrder(localeOrder)
 {

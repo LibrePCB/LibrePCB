@@ -40,13 +40,13 @@ SI_NetLabel::SI_NetLabel(Schematic& schematic, const XmlDomElement& domElement) 
     SI_Base(), mSchematic(schematic), mGraphicsItem(nullptr), mNetSignal(nullptr)
 {
     // read attributes
-    mUuid = domElement.getAttribute<QUuid>("uuid");
-    QUuid netSignalUuid = domElement.getAttribute<QUuid>("netsignal", true);
+    mUuid = domElement.getAttribute<Uuid>("uuid");
+    Uuid netSignalUuid = domElement.getAttribute<Uuid>("netsignal", true);
     mNetSignal = mSchematic.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
     if(!mNetSignal)
     {
-        throw RuntimeError(__FILE__, __LINE__, netSignalUuid.toString(),
-            QString(tr("Invalid net signal UUID: \"%1\"")).arg(netSignalUuid.toString()));
+        throw RuntimeError(__FILE__, __LINE__, netSignalUuid.toStr(),
+            QString(tr("Invalid net signal UUID: \"%1\"")).arg(netSignalUuid.toStr()));
     }
     mPosition.setX(domElement.getAttribute<Length>("x"));
     mPosition.setY(domElement.getAttribute<Length>("y"));
@@ -59,7 +59,7 @@ SI_NetLabel::SI_NetLabel(Schematic& schematic, NetSignal& netsignal, const Point
     SI_Base(), mSchematic(schematic), mGraphicsItem(nullptr), mPosition(position),
     mRotation(0), mNetSignal(&netsignal)
 {
-    mUuid = QUuid::createUuid(); // generate random UUID
+    mUuid = Uuid::createRandom(); // generate random UUID
     init();
 }
 

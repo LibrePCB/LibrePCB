@@ -37,7 +37,7 @@ namespace project {
 
 NetClass::NetClass(const Circuit& circuit, const XmlDomElement& domElement) throw (Exception) :
     mCircuit(circuit), mAddedToCircuit(false), mErcMsgUnusedNetClass(nullptr),
-    mUuid(domElement.getAttribute<QUuid>("uuid")),
+    mUuid(domElement.getAttribute<Uuid>("uuid")),
     mName(domElement.getAttribute("name", true))
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
@@ -45,7 +45,7 @@ NetClass::NetClass(const Circuit& circuit, const XmlDomElement& domElement) thro
 
 NetClass::NetClass(const Circuit& circuit, const QString& name) throw (Exception) :
     mCircuit(circuit), mAddedToCircuit(false), mErcMsgUnusedNetClass(nullptr),
-    mUuid(QUuid::createUuid()), mName(name)
+    mUuid(Uuid::createRandom()), mName(name)
 {
     if (mName.isEmpty())
     {
@@ -147,7 +147,7 @@ void NetClass::updateErcMessages() noexcept
         if (!mErcMsgUnusedNetClass)
         {
             mErcMsgUnusedNetClass = new ErcMsg(mCircuit.getProject(), *this,
-                mUuid.toString(), "Unused", ErcMsg::ErcMsgType_t::CircuitWarning);
+                mUuid.toStr(), "Unused", ErcMsg::ErcMsgType_t::CircuitWarning);
         }
         mErcMsgUnusedNetClass->setMsg(QString(tr("Unused net class: \"%1\"")).arg(mName));
         mErcMsgUnusedNetClass->setVisible(true);

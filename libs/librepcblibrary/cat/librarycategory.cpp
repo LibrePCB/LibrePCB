@@ -32,7 +32,7 @@ namespace library {
  ****************************************************************************************/
 
 LibraryCategory::LibraryCategory(const QString& xmlFileNamePrefix,
-                                 const QString& xmlRootNodeName, const QUuid& uuid,
+                                 const QString& xmlRootNodeName, const Uuid& uuid,
                                  const Version& version, const QString& author,
                                  const QString& name_en_US, const QString& description_en_US,
                                  const QString& keywords_en_US) throw (Exception) :
@@ -60,7 +60,7 @@ void LibraryCategory::parseDomTree(const XmlDomElement& root) throw (Exception)
     LibraryBaseElement::parseDomTree(root);
 
     // read parent uuid
-    mParentUuid = root.getFirstChild("meta/parent", true, true)->getText<QUuid>(false);
+    mParentUuid = root.getFirstChild("meta/parent", true, true)->getText<Uuid>(false);
 }
 
 XmlDomElement* LibraryCategory::serializeToXmlDomElement() const throw (Exception)

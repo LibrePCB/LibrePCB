@@ -246,7 +246,7 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightClick(QGraphicsSceneMouse
             GenCompInstance& genCompInst = compInst.getGenCompInstance();
 
             // get all available alternative components
-            QSet<QUuid> compList = mWorkspace.getLibrary().getComponentsOfGenericComponent(genCompInst.getGenComp().getUuid());
+            QSet<Uuid> compList = mWorkspace.getLibrary().getComponentsOfGenericComponent(genCompInst.getGenComp().getUuid());
             //compList.remove(compInst.getLibComponent().getUuid());
 
             // build the context menu
@@ -255,9 +255,9 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightClick(QGraphicsSceneMouse
             menu.addSeparator();
             QMenu* aChangeComponentMenu = menu.addMenu(tr("Change Component"));
             aChangeComponentMenu->setEnabled(compList.count() > 0);
-            foreach (const QUuid& compUuid, compList)
+            foreach (const Uuid& compUuid, compList)
             {
-                QUuid pkgUuid;
+                Uuid pkgUuid;
                 QString compName, pkgName;
                 FilePath compFp = mWorkspace.getLibrary().getLatestComponent(compUuid);
                 mWorkspace.getLibrary().getComponentMetadata(compFp, &pkgUuid, &compName);
@@ -299,7 +299,7 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightClick(QGraphicsSceneMouse
                     cmdActive = true;
 
                     // add required elements to project library
-                    QUuid compUuid = action->data().toUuid();
+                    Uuid compUuid = action->data().toUuid();
                     const library::Component* comp = mProject.getLibrary().getComponent(compUuid);
                     if (!comp)
                     {

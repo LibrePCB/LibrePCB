@@ -29,6 +29,7 @@
 #include "../erc/if_ercmsgprovider.h"
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 #include <librepcbcommon/exceptions.h>
+#include <librepcbcommon/uuid.h>
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -74,14 +75,14 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
         ~ComponentInstance() noexcept;
 
         // Getters
-        const QUuid& getUuid() const noexcept {return mUuid;}
+        const Uuid& getUuid() const noexcept {return mUuid;}
         const QString& getName() const noexcept {return mName;}
         QString getValue(bool replaceAttributes = false) const noexcept;
         int getPlacedSymbolsCount() const noexcept {return mSymbols.count();}
         int getUnplacedSymbolsCount() const noexcept;
         int getUnplacedRequiredSymbolsCount() const noexcept;
         int getUnplacedOptionalSymbolsCount() const noexcept;
-        ComponentSignalInstance* getSignalInstance(const QUuid& signalUuid) const noexcept {return mSignals.value(signalUuid);}
+        ComponentSignalInstance* getSignalInstance(const Uuid& signalUuid) const noexcept {return mSignals.value(signalUuid);}
         const library::Component& getLibComponent() const noexcept {return *mLibComponent;}
         const library::ComponentSymbolVariant& getSymbolVariant() const noexcept {return *mCompSymbVar;}
 
@@ -167,7 +168,7 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
         // Attributes
 
         /// @brief The unique UUID of this component instance in the circuit
-        QUuid mUuid;
+        Uuid mUuid;
 
         /// @brief The unique name of this component instance in the circuit (e.g. "R42")
         QString mName;
@@ -185,7 +186,7 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
         QList<ComponentAttributeInstance*> mAttributes;
 
         /// @brief All signal instances (Key: component signal UUID)
-        QHash<QUuid, ComponentSignalInstance*> mSignals;
+        QHash<Uuid, ComponentSignalInstance*> mSignals;
 
 
         // Misc
@@ -198,7 +199,7 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
          *
          * @see #registerSymbol(), #unregisterSymbol()
          */
-        QHash<QUuid, const SI_Symbol*> mSymbols;
+        QHash<Uuid, const SI_Symbol*> mSymbols;
 
         /**
          * @brief All registered device instances

@@ -101,27 +101,27 @@ ProjectLibrary::~ProjectLibrary() noexcept
  *  Getters: Library Elements
  ****************************************************************************************/
 
-const Symbol* ProjectLibrary::getSymbol(const QUuid& uuid) const noexcept
+const Symbol* ProjectLibrary::getSymbol(const Uuid& uuid) const noexcept
 {
     return mSymbols.value(uuid, 0);
 }
 
-const SpiceModel* ProjectLibrary::getSpiceModel(const QUuid& uuid) const noexcept
+const SpiceModel* ProjectLibrary::getSpiceModel(const Uuid& uuid) const noexcept
 {
     return mSpiceModels.value(uuid, 0);
 }
 
-const Package* ProjectLibrary::getPackage(const QUuid& uuid) const noexcept
+const Package* ProjectLibrary::getPackage(const Uuid& uuid) const noexcept
 {
     return mPackages.value(uuid, 0);
 }
 
-const Component* ProjectLibrary::getComponent(const QUuid& uuid) const noexcept
+const Component* ProjectLibrary::getComponent(const Uuid& uuid) const noexcept
 {
     return mComponents.value(uuid, 0);
 }
 
-const Device* ProjectLibrary::getDevice(const QUuid& uuid) const noexcept
+const Device* ProjectLibrary::getDevice(const Uuid& uuid) const noexcept
 {
     return mDevices.value(uuid, 0);
 }
@@ -130,9 +130,9 @@ const Device* ProjectLibrary::getDevice(const QUuid& uuid) const noexcept
  *  Getters: Special Queries
  ****************************************************************************************/
 
-QHash<QUuid, const library::Device*> ProjectLibrary::getDevicesOfComponent(const QUuid& compUuid) const noexcept
+QHash<Uuid, const library::Device*> ProjectLibrary::getDevicesOfComponent(const Uuid& compUuid) const noexcept
 {
-    QHash<QUuid, const library::Device*> list;
+    QHash<Uuid, const library::Device*> list;
     foreach (const library::Device* device, mDevices)
     {
         if (device->getComponentUuid() == compUuid)
@@ -225,7 +225,7 @@ bool ProjectLibrary::save(bool toOriginal, QStringList& errors) noexcept
 
 template <typename ElementType>
 void ProjectLibrary::loadElements(const FilePath& directory, const QString& type,
-                                  QHash<QUuid, const ElementType*>& elementList) throw (Exception)
+                                  QHash<Uuid, const ElementType*>& elementList) throw (Exception)
 {
     QDir dir(directory.toStr());
 
@@ -248,7 +248,7 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
 
         if (elementList.contains(element->getUuid()))
         {
-            throw RuntimeError(__FILE__, __LINE__, element->getUuid().toString(),
+            throw RuntimeError(__FILE__, __LINE__, element->getUuid().toStr(),
                 QString(tr("There are multiple library elements with the same "
                 "UUID in the directory \"%1\"")).arg(subdirPath.toNative()));
         }
@@ -261,14 +261,14 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
 
 template <typename ElementType>
 void ProjectLibrary::addElement(const ElementType& element,
-                                QHash<QUuid, const ElementType*>& elementList,
-                                QHash<QUuid, const ElementType*>& removedElementsList) throw (Exception)
+                                QHash<Uuid, const ElementType*>& elementList,
+                                QHash<Uuid, const ElementType*>& removedElementsList) throw (Exception)
 {
     if (elementList.contains(element.getUuid()))
     {
         throw LogicError(__FILE__, __LINE__, QString(), QString(tr(
             "There is already an element with the same UUID in the project's library: %1"))
-            .arg(element.getUuid().toString()));
+            .arg(element.getUuid().toStr()));
     }
 
     if (removedElementsList.contains(element.getUuid()))
@@ -281,8 +281,8 @@ void ProjectLibrary::addElement(const ElementType& element,
 
 template <typename ElementType>
 void ProjectLibrary::removeElement(const ElementType& element,
-                                   QHash<QUuid, const ElementType*>& elementList,
-                                   QHash<QUuid, const ElementType*>& removedElementsList) throw (Exception)
+                                   QHash<Uuid, const ElementType*>& elementList,
+                                   QHash<Uuid, const ElementType*>& removedElementsList) throw (Exception)
 {
     Q_ASSERT(elementList.value(element.getUuid()) == &element);
     Q_ASSERT(!removedElementsList.contains(element.getUuid()));
@@ -292,8 +292,8 @@ void ProjectLibrary::removeElement(const ElementType& element,
 
 template <typename ElementType>
 bool ProjectLibrary::saveElements(bool toOriginal, QStringList& errors, const FilePath& parentDir,
-                                  QHash<QUuid, const ElementType*>& elementList,
-                                  QHash<QUuid, const ElementType*>& removedElementsList) noexcept
+                                  QHash<Uuid, const ElementType*>& elementList,
+                                  QHash<Uuid, const ElementType*>& removedElementsList) noexcept
 {
     Q_UNUSED(toOriginal);
     Q_UNUSED(removedElementsList);
@@ -318,7 +318,7 @@ bool ProjectLibrary::saveElements(bool toOriginal, QStringList& errors, const Fi
 }
 
 template <typename ElementType>
-void ProjectLibrary::cleanupRemovedElements(QHash<QUuid, const ElementType*>& removedElementsList) noexcept
+void ProjectLibrary::cleanupRemovedElements(QHash<Uuid, const ElementType*>& removedElementsList) noexcept
 {
     foreach (const ElementType* element, removedElementsList)
     {

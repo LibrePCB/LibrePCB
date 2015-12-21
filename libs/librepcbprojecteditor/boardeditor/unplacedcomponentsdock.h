@@ -93,7 +93,7 @@ class UnplacedComponentsDock final : public QDockWidget
         /*void updateComponentsList() noexcept;
         void setSelectedGenCompInstance(GenCompInstance* genComp) noexcept;
         void setSelectedDevice(const library::Device* device) noexcept;
-        void addComponent(GenCompInstance& genComp, const QUuid& component) noexcept;*/
+        void addComponent(GenCompInstance& genComp, const Uuid& component) noexcept;*/
 
 
         // General

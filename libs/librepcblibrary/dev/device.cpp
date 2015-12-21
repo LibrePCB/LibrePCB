@@ -31,7 +31,7 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Device::Device(const QUuid& uuid, const Version& version, const QString& author,
+Device::Device(const Uuid& uuid, const Version& version, const QString& author,
                const QString& name_en_US, const QString& description_en_US,
                const QString& keywords_en_US) throw (Exception) :
     LibraryElement("dev", "device", uuid, version, author, name_en_US, description_en_US, keywords_en_US)
@@ -57,13 +57,13 @@ void Device::parseDomTree(const XmlDomElement& root) throw (Exception)
 {
     LibraryElement::parseDomTree(root);
 
-    mComponentUuid = root.getFirstChild("meta/component", true, true)->getText<QUuid>(true);
-    mPackageUuid = root.getFirstChild("meta/package", true, true)->getText<QUuid>(true);
+    mComponentUuid = root.getFirstChild("meta/component", true, true)->getText<Uuid>(true);
+    mPackageUuid = root.getFirstChild("meta/package", true, true)->getText<Uuid>(true);
     for (XmlDomElement* node = root.getFirstChild("pad_signal_map/map", true, false);
          node; node = node->getNextSibling("map"))
     {
-        mPadSignalMap.insert(node->getAttribute<QUuid>("pad", true),
-                             node->getText<QUuid>(false));
+        mPadSignalMap.insert(node->getAttribute<Uuid>("pad", true),
+                             node->getText<Uuid>(false));
     }
 }
 
@@ -73,11 +73,11 @@ XmlDomElement* Device::serializeToXmlDomElement() const throw (Exception)
     root->getFirstChild("meta", true)->appendTextChild("component", mComponentUuid);
     root->getFirstChild("meta", true)->appendTextChild("package", mPackageUuid);
     XmlDomElement* padSignalMap = root->appendChild("pad_signal_map");
-    foreach (const QUuid& padUuid, mPadSignalMap.keys())
+    foreach (const Uuid& padUuid, mPadSignalMap.keys())
     {
         XmlDomElement* child = padSignalMap->appendChild("map");
         child->setAttribute("pad", padUuid);
-        child->setText(mPadSignalMap.value(padUuid).isNull() ? QString() : mPadSignalMap.value(padUuid).toString());
+        child->setText(mPadSignalMap.value(padUuid));
     }
     return root.take();
 }
@@ -87,7 +87,7 @@ bool Device::checkAttributesValidity() const noexcept
     if (!LibraryElement::checkAttributesValidity())             return false;
     if (mComponentUuid.isNull())                                return false;
     if (mPackageUuid.isNull())                                  return false;
-    foreach (const QUuid& padUuid, mPadSignalMap.keys())
+    foreach (const Uuid& padUuid, mPadSignalMap.keys())
     {
         if (padUuid.isNull())                                   return false;
     }

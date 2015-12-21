@@ -41,21 +41,21 @@ ComponentSignalInstance::ComponentSignalInstance(Circuit& circuit, ComponentInst
     mGenCompSignal(nullptr), mNetSignal(nullptr), mAddedToCircuit(false)
 {
     // read attributes
-    QUuid genCompSignalUuid = domElement.getAttribute<QUuid>("comp_signal");
+    Uuid genCompSignalUuid = domElement.getAttribute<Uuid>("comp_signal");
     mGenCompSignal = mGenCompInstance.getLibComponent().getSignalByUuid(genCompSignalUuid);
     if(!mGenCompSignal)
     {
-        throw RuntimeError(__FILE__, __LINE__, genCompSignalUuid.toString(), QString(
-            tr("Invalid component signal UUID: \"%1\"")).arg(genCompSignalUuid.toString()));
+        throw RuntimeError(__FILE__, __LINE__, genCompSignalUuid.toStr(), QString(
+            tr("Invalid component signal UUID: \"%1\"")).arg(genCompSignalUuid.toStr()));
     }
-    QUuid netsignalUuid = domElement.getAttribute<QUuid>("netsignal", false, QUuid());
+    Uuid netsignalUuid = domElement.getAttribute<Uuid>("netsignal", false, Uuid());
     if (!netsignalUuid.isNull())
     {
         mNetSignal = mCircuit.getNetSignalByUuid(netsignalUuid);
         if(!mNetSignal)
         {
-            throw RuntimeError(__FILE__, __LINE__, netsignalUuid.toString(),
-                QString(tr("Invalid netsignal UUID: \"%1\"")).arg(netsignalUuid.toString()));
+            throw RuntimeError(__FILE__, __LINE__, netsignalUuid.toStr(),
+                QString(tr("Invalid netsignal UUID: \"%1\"")).arg(netsignalUuid.toStr()));
         }
     }
 
@@ -75,10 +75,10 @@ void ComponentSignalInstance::init() throw (Exception)
 {
     // create ERC messages
     mErcMsgUnconnectedRequiredSignal.reset(new ErcMsg(mCircuit.getProject(), *this,
-        QString("%1/%2").arg(mGenCompInstance.getUuid().toString()).arg(mGenCompSignal->getUuid().toString()),
+        QString("%1/%2").arg(mGenCompInstance.getUuid().toStr()).arg(mGenCompSignal->getUuid().toStr()),
         "UnconnectedRequiredSignal", ErcMsg::ErcMsgType_t::CircuitError, QString()));
     mErcMsgForcedNetSignalNameConflict.reset(new ErcMsg(mCircuit.getProject(), *this,
-        QString("%1/%2").arg(mGenCompInstance.getUuid().toString()).arg(mGenCompSignal->getUuid().toString()),
+        QString("%1/%2").arg(mGenCompInstance.getUuid().toStr()).arg(mGenCompSignal->getUuid().toStr()),
         "ForcedNetSignalNameConflict", ErcMsg::ErcMsgType_t::SchematicError, QString()));
     updateErcMessages();
 
@@ -194,7 +194,7 @@ XmlDomElement* ComponentSignalInstance::serializeToXmlDomElement() const throw (
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("map"));
     root->setAttribute("comp_signal", mGenCompSignal->getUuid());
-    root->setAttribute("netsignal", mNetSignal ? mNetSignal->getUuid() : QString());
+    root->setAttribute("netsignal", mNetSignal ? mNetSignal->getUuid().toStr() : QString());
     return root.take();
 }
 

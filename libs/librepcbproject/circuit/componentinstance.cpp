@@ -46,24 +46,24 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const XmlDomElement& domE
     mLibComponent(nullptr), mCompSymbVar(nullptr)
 {
     // read general attributes
-    mUuid = domElement.getAttribute<QUuid>("uuid");
+    mUuid = domElement.getAttribute<Uuid>("uuid");
     mName = domElement.getFirstChild("name", true)->getText(true);
     mValue = domElement.getFirstChild("value", true)->getText();
-    QUuid gcUuid = domElement.getAttribute<QUuid>("component");
+    Uuid gcUuid = domElement.getAttribute<Uuid>("component");
     mLibComponent = mCircuit.getProject().getLibrary().getComponent(gcUuid);
     if (!mLibComponent)
     {
-        throw RuntimeError(__FILE__, __LINE__, gcUuid.toString(),
+        throw RuntimeError(__FILE__, __LINE__, gcUuid.toStr(),
             QString(tr("The component with the UUID \"%1\" does not exist in the "
-            "project's library!")).arg(gcUuid.toString()));
+            "project's library!")).arg(gcUuid.toStr()));
     }
-    QUuid symbVarUuid = domElement.getAttribute<QUuid>("symbol_variant");
+    Uuid symbVarUuid = domElement.getAttribute<Uuid>("symbol_variant");
     mCompSymbVar = mLibComponent->getSymbolVariantByUuid(symbVarUuid);
     if (!mCompSymbVar)
     {
-        throw RuntimeError(__FILE__, __LINE__, symbVarUuid.toString(),
+        throw RuntimeError(__FILE__, __LINE__, symbVarUuid.toStr(),
             QString(tr("No symbol variant with the UUID \"%1\" found."))
-            .arg(symbVarUuid.toString()));
+            .arg(symbVarUuid.toStr()));
     }
 
     // load all component attributes
@@ -87,9 +87,9 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const XmlDomElement& domE
         ComponentSignalInstance* signal = new ComponentSignalInstance(mCircuit, *this, *node);
         if (mSignals.contains(signal->getCompSignal().getUuid()))
         {
-            throw RuntimeError(__FILE__, __LINE__, signal->getCompSignal().getUuid().toString(),
+            throw RuntimeError(__FILE__, __LINE__, signal->getCompSignal().getUuid().toStr(),
                 QString(tr("The signal with the UUID \"%1\" is defined multiple times."))
-                .arg(signal->getCompSignal().getUuid().toString()));
+                .arg(signal->getCompSignal().getUuid().toStr()));
         }
         mSignals.insert(signal->getCompSignal().getUuid(), signal);
     }
@@ -99,7 +99,7 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const XmlDomElement& domE
             QString("%1!=%2").arg(mSignals.count()).arg(mLibComponent->getSignals().count()),
             QString(tr("The signal count of the component instance \"%1\" does "
             "not match with the signal count of the component \"%2\"."))
-            .arg(mUuid.toString()).arg(mLibComponent->getUuid().toString()));
+            .arg(mUuid.toStr()).arg(mLibComponent->getUuid().toStr()));
     }
 
     init();
@@ -112,7 +112,7 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const library::Component&
 {
     const QStringList& localeOrder = mCircuit.getProject().getSettings().getLocaleOrder();
 
-    mUuid = QUuid::createUuid().toString(); // generate random UUID
+    mUuid = Uuid::createRandom(); // generate random UUID
     mName = name;
     if (mName.isEmpty())
     {
@@ -144,9 +144,9 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const library::Component&
 void ComponentInstance::init() throw (Exception)
 {
     // create ERC messages
-    mErcMsgUnplacedRequiredSymbols.reset(new ErcMsg(mCircuit.getProject(), *this, mUuid.toString(),
+    mErcMsgUnplacedRequiredSymbols.reset(new ErcMsg(mCircuit.getProject(), *this, mUuid.toStr(),
         "UnplacedRequiredSymbols", ErcMsg::ErcMsgType_t::SchematicError));
-    mErcMsgUnplacedOptionalSymbols.reset(new ErcMsg(mCircuit.getProject(), *this, mUuid.toString(),
+    mErcMsgUnplacedOptionalSymbols.reset(new ErcMsg(mCircuit.getProject(), *this, mUuid.toStr(),
         "UnplacedOptionalSymbols", ErcMsg::ErcMsgType_t::SchematicWarning));
     updateErcMessages();
 
@@ -291,16 +291,16 @@ void ComponentInstance::registerSymbol(const SI_Symbol& symbol) throw (Exception
     const library::ComponentSymbolVariantItem* item = &symbol.getGenCompSymbVarItem();
 
     if (!mAddedToCircuit)
-        throw LogicError(__FILE__, __LINE__, item->getUuid().toString());
+        throw LogicError(__FILE__, __LINE__, item->getUuid().toStr());
     if (!mCompSymbVar->getItems().contains(item))
     {
-        throw RuntimeError(__FILE__, __LINE__, item->getUuid().toString(), QString(tr(
-            "Invalid symbol item in circuit: \"%1\".")).arg(item->getUuid().toString()));
+        throw RuntimeError(__FILE__, __LINE__, item->getUuid().toStr(), QString(tr(
+            "Invalid symbol item in circuit: \"%1\".")).arg(item->getUuid().toStr()));
     }
     if (mSymbols.contains(item->getUuid()))
     {
-        throw RuntimeError(__FILE__, __LINE__, item->getUuid().toString(), QString(tr(
-            "Symbol item UUID already exists in circuit: \"%1\".")).arg(item->getUuid().toString()));
+        throw RuntimeError(__FILE__, __LINE__, item->getUuid().toStr(), QString(tr(
+            "Symbol item UUID already exists in circuit: \"%1\".")).arg(item->getUuid().toStr()));
     }
 
     mSymbols.insert(item->getUuid(), &symbol);
@@ -312,11 +312,11 @@ void ComponentInstance::unregisterSymbol(const SI_Symbol& symbol) throw (Excepti
     const library::ComponentSymbolVariantItem* item = &symbol.getGenCompSymbVarItem();
 
     if (!mAddedToCircuit)
-        throw LogicError(__FILE__, __LINE__, item->getUuid().toString());
+        throw LogicError(__FILE__, __LINE__, item->getUuid().toStr());
     if (!mSymbols.contains(item->getUuid()))
-        throw LogicError(__FILE__, __LINE__, item->getUuid().toString());
+        throw LogicError(__FILE__, __LINE__, item->getUuid().toStr());
     if (&symbol != mSymbols.value(item->getUuid()))
-        throw LogicError(__FILE__, __LINE__, item->getUuid().toString());
+        throw LogicError(__FILE__, __LINE__, item->getUuid().toStr());
 
     mSymbols.remove(item->getUuid());
     updateErcMessages();

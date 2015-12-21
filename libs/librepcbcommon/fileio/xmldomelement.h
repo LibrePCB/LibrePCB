@@ -146,10 +146,22 @@ class XmlDomElement final
          * @warning This method must be called only on elements without child elements!
          *
          * @param text  The text of this element
-         *
-         * @todo Add a template to call this method with different types
          */
         void setText(const QString& text) noexcept;
+
+        /**
+         * @brief Set the text of this text element
+         *
+         * @tparam T            The value of this type will be converted to a QString.
+         *                      Available types:
+         *                      bool, QDateTime, #Uuid, #Version, #Length (tbc)
+         *
+         * @warning This method must be called only on elements without child elements!
+         *
+         * @param value         The value in the template type T
+         */
+        template <typename T>
+        void setText(const T& value) noexcept;
 
         /**
          * @brief Get the text of this text element as a QString
@@ -167,7 +179,7 @@ class XmlDomElement final
          * @brief Get the text of this text element in the specified type
          *
          * @tparam T            The text will be converted to this type. Available types:
-         *                      bool, QUuid, QDateTime, #Version, #Length (tbc)
+         *                      bool, QDateTime, #Uuid, #Version, #Length (tbc)
          *
          * @param throwIfEmpty  If true and the text is empty, an exception will be thrown.
          *                      If false and the text is empty, defaultValue will be returned.
@@ -189,7 +201,7 @@ class XmlDomElement final
          * @brief Set or add an attribute to this element
          *
          * @tparam T        The text will be converted in this type. Available types:
-         *                  bool, const char*, QString, QUuid, #Length, #Angle, #HAlign,
+         *                  bool, const char*, QString, #Uuid, #Length, #Angle, #HAlign,
          *                  #VAlign (tbc)
          *
          * @param name      The tag name (see #isValidXmlTagName() for allowed characters)
@@ -225,7 +237,7 @@ class XmlDomElement final
          * @brief Get the value of a specific attribute in the specified type
          *
          * @tparam T            The value will be converted in this type. Available types:
-         *                      bool, uint, int, QUuid, #Length, #Angle, #HAlign, #VAlign (tbc)
+         *                      bool, uint, int, #Uuid, #Length, #Angle, #HAlign, #VAlign (tbc)
          *
          * @param name          The tag name (see #isValidXmlTagName() for allowed characters)
          * @param throwIfEmpty  If true and the value is empty, an exception will be thrown
@@ -287,7 +299,7 @@ class XmlDomElement final
          * @brief Create a new text child and append it to the list of childs
          *
          * @tparam T        This type will be converted to the text string. Available types:
-         *                  bool, QString, QDateTime, QUuid (tbc)
+         *                  bool, QString, QDateTime, #Uuid, #Version (tbc)
          *
          * @param name      The tag name (see #isValidXmlTagName() for allowed characters)
          * @param value     The attribute value which will be converted to a QString

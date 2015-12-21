@@ -25,6 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <librepcbcommon/uuid.h>
 #include <librepcbcommon/exceptions.h>
 #include <librepcbcommon/fileio/filepath.h>
 
@@ -67,19 +68,19 @@ class ProjectLibrary final : public QObject
         ~ProjectLibrary() noexcept;
 
         // Getters: Library Elements
-        const QHash<QUuid, const library::Symbol*>&     getSymbols()        const noexcept {return mSymbols;}
-        const QHash<QUuid, const library::SpiceModel*>& getSpiceModels()    const noexcept {return mSpiceModels;}
-        const QHash<QUuid, const library::Package*>&    getPackages()       const noexcept {return mPackages;}
-        const QHash<QUuid, const library::Component*>&  getComponents()     const noexcept {return mComponents;}
-        const QHash<QUuid, const library::Device*>&     getDevices()        const noexcept {return mDevices;}
-        const library::Symbol*      getSymbol(     const QUuid& uuid) const noexcept;
-        const library::SpiceModel*  getSpiceModel( const QUuid& uuid) const noexcept;
-        const library::Package*     getPackage(    const QUuid& uuid) const noexcept;
-        const library::Component*   getComponent(  const QUuid& uuid) const noexcept;
-        const library::Device*      getDevice(     const QUuid& uuid) const noexcept;
+        const QHash<Uuid, const library::Symbol*>&     getSymbols()        const noexcept {return mSymbols;}
+        const QHash<Uuid, const library::SpiceModel*>& getSpiceModels()    const noexcept {return mSpiceModels;}
+        const QHash<Uuid, const library::Package*>&    getPackages()       const noexcept {return mPackages;}
+        const QHash<Uuid, const library::Component*>&  getComponents()     const noexcept {return mComponents;}
+        const QHash<Uuid, const library::Device*>&     getDevices()        const noexcept {return mDevices;}
+        const library::Symbol*      getSymbol(     const Uuid& uuid) const noexcept;
+        const library::SpiceModel*  getSpiceModel( const Uuid& uuid) const noexcept;
+        const library::Package*     getPackage(    const Uuid& uuid) const noexcept;
+        const library::Component*   getComponent(  const Uuid& uuid) const noexcept;
+        const library::Device*      getDevice(     const Uuid& uuid) const noexcept;
 
         // Getters: Special Queries
-        QHash<QUuid, const library::Device*> getDevicesOfComponent(const QUuid& compUuid) const noexcept;
+        QHash<Uuid, const library::Device*> getDevicesOfComponent(const Uuid& compUuid) const noexcept;
 
 
         // Add/Remove Methods
@@ -109,39 +110,39 @@ class ProjectLibrary final : public QObject
         // Private Methods
         template <typename ElementType>
         void loadElements(const FilePath& directory, const QString& type,
-                          QHash<QUuid, const ElementType*>& elementList) throw (Exception);
+                          QHash<Uuid, const ElementType*>& elementList) throw (Exception);
         template <typename ElementType>
         void addElement(const ElementType& element,
-                        QHash<QUuid, const ElementType*>& elementList,
-                        QHash<QUuid, const ElementType*>& removedElementsList) throw (Exception);
+                        QHash<Uuid, const ElementType*>& elementList,
+                        QHash<Uuid, const ElementType*>& removedElementsList) throw (Exception);
         template <typename ElementType>
         void removeElement(const ElementType& element,
-                           QHash<QUuid, const ElementType*>& elementList,
-                           QHash<QUuid, const ElementType*>& removedElementsList) throw (Exception);
+                           QHash<Uuid, const ElementType*>& elementList,
+                           QHash<Uuid, const ElementType*>& removedElementsList) throw (Exception);
         template <typename ElementType>
         bool saveElements(bool toOriginal, QStringList& errors, const FilePath& parentDir,
-                          QHash<QUuid, const ElementType*>& elementList,
-                          QHash<QUuid, const ElementType*>& removedElementsList) noexcept;
+                          QHash<Uuid, const ElementType*>& elementList,
+                          QHash<Uuid, const ElementType*>& removedElementsList) noexcept;
         template <typename ElementType>
-        void cleanupRemovedElements(QHash<QUuid, const ElementType*>& removedElementsList) noexcept;
+        void cleanupRemovedElements(QHash<Uuid, const ElementType*>& removedElementsList) noexcept;
 
         // General
         Project& mProject; ///< a reference to the Project object (from the ctor)
         FilePath mLibraryPath; ///< the "library" directory of the project
 
         // The Library Elements
-        QHash<QUuid, const library::Symbol*> mSymbols;
-        QHash<QUuid, const library::SpiceModel*> mSpiceModels;
-        QHash<QUuid, const library::Package*> mPackages;
-        QHash<QUuid, const library::Component*> mComponents;
-        QHash<QUuid, const library::Device*> mDevices;
+        QHash<Uuid, const library::Symbol*> mSymbols;
+        QHash<Uuid, const library::SpiceModel*> mSpiceModels;
+        QHash<Uuid, const library::Package*> mPackages;
+        QHash<Uuid, const library::Component*> mComponents;
+        QHash<Uuid, const library::Device*> mDevices;
 
         // Removed Library Elements
-        QHash<QUuid, const library::Symbol*> mRemovedSymbols;
-        QHash<QUuid, const library::SpiceModel*> mRemovedSpiceModels;
-        QHash<QUuid, const library::Package*> mRemovedPackages;
-        QHash<QUuid, const library::Component*> mRemovedComponents;
-        QHash<QUuid, const library::Device*> mRemovedDevices;
+        QHash<Uuid, const library::Symbol*> mRemovedSymbols;
+        QHash<Uuid, const library::SpiceModel*> mRemovedSpiceModels;
+        QHash<Uuid, const library::Package*> mRemovedPackages;
+        QHash<Uuid, const library::Component*> mRemovedComponents;
+        QHash<Uuid, const library::Device*> mRemovedDevices;
 };
 
 } // namespace project

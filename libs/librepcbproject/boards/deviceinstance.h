@@ -25,6 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <librepcbcommon/uuid.h>
 #include <librepcbcommon/units/all_length_units.h>
 #include <librepcbcommon/if_attributeprovider.h>
 #include "../erc/if_ercmsgprovider.h"
@@ -68,7 +69,7 @@ class DeviceInstance final : public QObject, public IF_AttributeProvider,
         // Constructors / Destructor
         explicit DeviceInstance(Board& board, const XmlDomElement& domElement) throw (Exception);
         explicit DeviceInstance(Board& board, ComponentInstance& compInstance,
-                                const QUuid& deviceUuid,
+                                const Uuid& deviceUuid,
                                 const Point& position = Point(),
                                 const Angle& rotation = Angle()) throw (Exception);
         ~DeviceInstance() noexcept;
@@ -119,7 +120,7 @@ class DeviceInstance final : public QObject, public IF_AttributeProvider,
         DeviceInstance& operator=(const DeviceInstance& rhs);
 
         // Private Methods
-        void initDeviceAndPackage(const QUuid& deviceUuid) throw (Exception);
+        void initDeviceAndPackage(const Uuid& deviceUuid) throw (Exception);
         void init() throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()

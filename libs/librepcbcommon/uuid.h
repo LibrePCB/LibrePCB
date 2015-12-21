@@ -99,6 +99,20 @@ class Uuid final
         bool setUuid(const QString& uuid) noexcept;
 
 
+        //@{
+        /**
+         * @brief Operator overloadings
+         *
+         * @param rhs   The other object to compare
+         *
+         * @return If at least one of both objects is invalid, false will be returned!
+         */
+        Uuid& operator=(const Uuid& rhs) noexcept;
+        bool operator==(const Uuid& rhs) const noexcept;
+        bool operator!=(const Uuid& rhs) const noexcept;
+        //@}
+
+
         // Static Methods
 
         /**
@@ -106,7 +120,7 @@ class Uuid final
          *
          * @return The new UUID
          */
-        static Uuid create() noexcept;
+        static Uuid createRandom() noexcept;
 
 
     private:
@@ -114,5 +128,26 @@ class Uuid final
         // Private Attributes
         QString mUuid;
 };
+
+/*****************************************************************************************
+ *  Non-Member Functions
+ ****************************************************************************************/
+
+inline uint qHash(const Uuid& key, uint seed)
+{
+    return qHash(key.toStr(), seed);
+}
+
+inline QDataStream& operator<<(QDataStream& stream, const Uuid& uuid)
+{
+    stream << uuid.toStr();
+    return stream;
+}
+
+inline QDebug operator<<(QDebug stream, const Uuid& uuid)
+{
+    stream << QString("Uuid(%1)").arg(uuid.toStr());
+    return stream;
+}
 
 #endif // UUID_H

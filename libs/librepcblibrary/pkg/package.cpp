@@ -31,7 +31,7 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Package::Package(const QUuid& uuid, const Version& version, const QString& author,
+Package::Package(const Uuid& uuid, const Version& version, const QString& author,
                  const QString& name_en_US, const QString& description_en_US,
                  const QString& keywords_en_US) throw (Exception) :
     LibraryElement("pkg", "package", uuid, version, author, name_en_US, description_en_US, keywords_en_US)
@@ -54,7 +54,7 @@ Package::~Package() noexcept
  *  Pads
  ****************************************************************************************/
 
-const PackagePad* Package::getPadByUuid(const QUuid& uuid) const noexcept
+const PackagePad* Package::getPadByUuid(const Uuid& uuid) const noexcept
 {
     foreach (const PackagePad* pad, mPads)
     {
@@ -80,7 +80,7 @@ void Package::addPad(const PackagePad& pad) noexcept
  *  Footprints
  ****************************************************************************************/
 
-const Footprint* Package::getFootprintByUuid(const QUuid& uuid) const noexcept
+const Footprint* Package::getFootprintByUuid(const Uuid& uuid) const noexcept
 {
     foreach (const Footprint* footprint, mFootprints)
     {
@@ -117,9 +117,9 @@ void Package::parseDomTree(const XmlDomElement& root) throw (Exception)
         PackagePad* pad = new PackagePad(*node);
         if (getPadByUuid(pad->getUuid()))
         {
-            throw RuntimeError(__FILE__, __LINE__, pad->getUuid().toString(),
+            throw RuntimeError(__FILE__, __LINE__, pad->getUuid().toStr(),
                 QString(tr("The pad \"%1\" exists multiple times in \"%2\"."))
-                .arg(pad->getUuid().toString(), mXmlFilepath.toNative()));
+                .arg(pad->getUuid().toStr(), mXmlFilepath.toNative()));
         }
         mPads.append(pad);
     }
@@ -131,9 +131,9 @@ void Package::parseDomTree(const XmlDomElement& root) throw (Exception)
         Footprint* footprint = new Footprint(*node);
         if (getFootprintByUuid(footprint->getUuid()))
         {
-            throw RuntimeError(__FILE__, __LINE__, footprint->getUuid().toString(),
+            throw RuntimeError(__FILE__, __LINE__, footprint->getUuid().toStr(),
                 QString(tr("The footprint \"%1\" exists multiple times in \"%2\"."))
-                .arg(footprint->getUuid().toString(), mXmlFilepath.toNative()));
+                .arg(footprint->getUuid().toStr(), mXmlFilepath.toNative()));
         }
         mFootprints.append(footprint);
     }

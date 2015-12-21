@@ -46,7 +46,7 @@ class LibraryCategory : public LibraryBaseElement
         // Constructors / Destructor
         explicit LibraryCategory(const QString& xmlFileNamePrefix,
                                  const QString& xmlRootNodeName,
-                                 const QUuid& uuid = QUuid::createUuid(),
+                                 const Uuid& uuid = Uuid::createRandom(),
                                  const Version& version = Version(),
                                  const QString& author = QString(),
                                  const QString& name_en_US = QString(),
@@ -58,10 +58,10 @@ class LibraryCategory : public LibraryBaseElement
         virtual ~LibraryCategory() noexcept;
 
         // Getters: Attributes
-        const QUuid& getParentUuid() const noexcept {return mParentUuid;}
+        const Uuid& getParentUuid() const noexcept {return mParentUuid;}
 
         // Setters: Attributes
-        void setParentUuid(const QUuid& parentUuid) noexcept {mParentUuid = parentUuid;}
+        void setParentUuid(const Uuid& parentUuid) noexcept {mParentUuid = parentUuid;}
 
 
     private:
@@ -83,7 +83,7 @@ class LibraryCategory : public LibraryBaseElement
         virtual bool checkAttributesValidity() const noexcept override;
 
         // General Library Category Attributes
-        QUuid mParentUuid;
+        Uuid mParentUuid;
 };
 
 } // namespace library

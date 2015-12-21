@@ -72,8 +72,8 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
         Project& getProject() const noexcept;
         Board& getBoard() const noexcept;
         DeviceInstance& getDeviceInstance() const noexcept {return mDeviceInstance;}
-        BI_FootprintPad* getPad(const QUuid& padUuid) const noexcept {return mPads.value(padUuid);}
-        const QHash<QUuid, BI_FootprintPad*>& getPads() const noexcept {return mPads;}
+        BI_FootprintPad* getPad(const Uuid& padUuid) const noexcept {return mPads.value(padUuid);}
+        const QHash<Uuid, BI_FootprintPad*>& getPads() const noexcept {return mPads;}
         const library::Footprint& getLibFootprint() const noexcept {return *mFootprint;}
         const Angle& getRotation() const noexcept;
 
@@ -128,7 +128,7 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
         // General
         DeviceInstance& mDeviceInstance;
         const library::Footprint* mFootprint;
-        QHash<QUuid, BI_FootprintPad*> mPads; ///< key: footprint pad UUID
+        QHash<Uuid, BI_FootprintPad*> mPads; ///< key: footprint pad UUID
         BGI_Footprint* mGraphicsItem;
 };
 

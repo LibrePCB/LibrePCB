@@ -65,7 +65,7 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(Project& project,
         mUi->cbxAttrType->addItem(type->getNameTr(), type->getName());
 
     // Generic Component Instance Attributes
-    mUi->lblGenCompInstUuid->setText(mGenCompInstance.getUuid().toString());
+    mUi->lblGenCompInstUuid->setText(mGenCompInstance.getUuid().toStr());
     mUi->edtGenCompInstName->setText(mGenCompInstance.getName());
     mUi->edtGenCompInstValue->setText(mGenCompInstance.getValue());
     foreach (ComponentAttributeInstance* attr, mGenCompInstance.getAttributes())
@@ -84,16 +84,16 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(Project& project,
     // Generic Component Library Element Attributes
     QString htmlLink("<a href=\"%1\">%2<a>");
     mUi->lblGenCompLibUuid->setText(htmlLink.arg(mGenCompInstance.getLibComponent().getXmlFilepath().toQUrl().toString(),
-                                                 mGenCompInstance.getLibComponent().getUuid().toString()));
+                                                 mGenCompInstance.getLibComponent().getUuid().toStr()));
     mUi->lblGenCompLibUuid->setToolTip(mGenCompInstance.getLibComponent().getXmlFilepath().toNative());
     mUi->lblGenCompLibName->setText(mGenCompInstance.getLibComponent().getName(localeOrder));
     mUi->lblGenCompLibName->setToolTip(mGenCompInstance.getLibComponent().getDescription(localeOrder));
-    mUi->lblSymbVarUuid->setText(mGenCompInstance.getSymbolVariant().getUuid().toString());
+    mUi->lblSymbVarUuid->setText(mGenCompInstance.getSymbolVariant().getUuid().toStr());
     mUi->lblSymbVarName->setText(mGenCompInstance.getSymbolVariant().getName(localeOrder));
     mUi->lblSymbVarName->setToolTip(mGenCompInstance.getSymbolVariant().getDescription(localeOrder));
 
     // Symbol Instance Attributes
-    mUi->lblSymbInstUuid->setText(mSymbol.getUuid().toString());
+    mUi->lblSymbInstUuid->setText(mSymbol.getUuid().toStr());
     mUi->lblSymbInstName->setText(mSymbol.getName());
     mUi->spbxSymbInstPosX->setValue(mSymbol.getPosition().getX().toMm());
     mUi->spbxSymbInstPosY->setValue(mSymbol.getPosition().getY().toMm());
@@ -101,7 +101,7 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(Project& project,
 
     // Symbol Library Element Attributes
     mUi->lblSymbLibUuid->setText(htmlLink.arg(mSymbol.getLibSymbol().getXmlFilepath().toQUrl().toString(),
-                                              mSymbol.getLibSymbol().getUuid().toString()));
+                                              mSymbol.getLibSymbol().getUuid().toStr()));
     mUi->lblSymbLibUuid->setToolTip(mSymbol.getLibSymbol().getXmlFilepath().toNative());
     mUi->lblSymbLibName->setText(mSymbol.getLibSymbol().getName(localeOrder));
     mUi->lblSymbLibName->setToolTip(mSymbol.getLibSymbol().getDescription(localeOrder));

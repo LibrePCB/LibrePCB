@@ -72,7 +72,7 @@ class SI_NetPoint final : public SI_Base, public IF_XmlSerializableObject,
         // Getters
         Project& getProject() const noexcept;
         Schematic& getSchematic() const noexcept {return mSchematic;}
-        const QUuid& getUuid() const noexcept {return mUuid;}
+        const Uuid& getUuid() const noexcept {return mUuid;}
         bool isAttached() const noexcept {return mAttached;}
         bool isVisible() const noexcept {return ((mLines.count() > 1) && mAttached) || (mLines.count() > 2);}
         NetSignal* getNetSignal() const noexcept {return mNetSignal;}
@@ -134,7 +134,7 @@ class SI_NetPoint final : public SI_Base, public IF_XmlSerializableObject,
         SGI_NetPoint* mGraphicsItem;
 
         // Attributes
-        QUuid mUuid;
+        Uuid mUuid;
         bool mAttached;
         Point mPosition;
         NetSignal* mNetSignal;

@@ -46,7 +46,7 @@ class Component final : public LibraryElement
     public:
 
         // Constructors / Destructor
-        explicit Component(const QUuid& uuid = QUuid::createUuid(),
+        explicit Component(const Uuid& uuid = Uuid::createRandom(),
                            const Version& version = Version(),
                            const QString& author = QString(),
                            const QString& name_en_US = QString(),
@@ -79,23 +79,23 @@ class Component final : public LibraryElement
 
         // Signals
         const QList<const ComponentSignal*>& getSignals() const noexcept;
-        const ComponentSignal* getSignalByUuid(const QUuid& uuid) const noexcept;
-        const ComponentSignal* getSignalOfPin(const QUuid& symbVarUuid, const QUuid& itemUuid,
-                                              const QUuid& pinUuid) const noexcept;
+        const ComponentSignal* getSignalByUuid(const Uuid& uuid) const noexcept;
+        const ComponentSignal* getSignalOfPin(const Uuid& symbVarUuid, const Uuid& itemUuid,
+                                              const Uuid& pinUuid) const noexcept;
         void clearSignals() noexcept;
         void addSignal(const ComponentSignal& signal) noexcept;
 
         // Symbol Variants
         const QList<const ComponentSymbolVariant*>& getSymbolVariants() const noexcept;
-        const ComponentSymbolVariant* getSymbolVariantByUuid(const QUuid& uuid) const noexcept;
-        const QUuid& getDefaultSymbolVariantUuid() const noexcept;
+        const ComponentSymbolVariant* getSymbolVariantByUuid(const Uuid& uuid) const noexcept;
+        const Uuid& getDefaultSymbolVariantUuid() const noexcept;
         const ComponentSymbolVariant* getDefaultSymbolVariant() const noexcept;
         void clearSymbolVariants() noexcept;
         void addSymbolVariant(const ComponentSymbolVariant& symbolVariant) noexcept;
 
         // Symbol Variant Items
-        const ComponentSymbolVariantItem* getSymbVarItem(const QUuid& symbVarUuid,
-                                                         const QUuid& itemUuid) const noexcept;
+        const ComponentSymbolVariantItem* getSymbVarItem(const Uuid& symbVarUuid,
+                                                         const Uuid& itemUuid) const noexcept;
 
     private:
 
@@ -123,7 +123,7 @@ class Component final : public LibraryElement
         QString mDefaultPrefixNorm; ///< must be an existing key of #mPrefixes
         QList<const ComponentSignal*> mSignals; ///< empty if the component has no signals
         QList<const ComponentSymbolVariant*> mSymbolVariants; ///< minimum one entry
-        QUuid mDefaultSymbolVariantUuid; ///< must be an existing key of #mSymbolVariants
+        Uuid mDefaultSymbolVariantUuid; ///< must be an existing key of #mSymbolVariants
 };
 
 } // namespace library

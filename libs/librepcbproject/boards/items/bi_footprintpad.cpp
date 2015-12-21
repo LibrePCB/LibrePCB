@@ -39,7 +39,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-BI_FootprintPad::BI_FootprintPad(BI_Footprint& footprint, const QUuid& padUuid) :
+BI_FootprintPad::BI_FootprintPad(BI_Footprint& footprint, const Uuid& padUuid) :
     BI_Base(), mCircuit(footprint.getDeviceInstance().getBoard().getProject().getCircuit()),
     mFootprint(footprint), mFootprintPad(nullptr), /*mGenCompSignal(nullptr),
     mGenCompSignalInstance(nullptr),*/ mAddedToBoard(false),
@@ -49,8 +49,8 @@ BI_FootprintPad::BI_FootprintPad(BI_Footprint& footprint, const QUuid& padUuid) 
     mFootprintPad = mFootprint.getLibFootprint().getPadByUuid(padUuid);
     if (!mFootprintPad)
     {
-        throw RuntimeError(__FILE__, __LINE__, padUuid.toString(),
-            QString(tr("Invalid footprint pad UUID: \"%1\"")).arg(padUuid.toString()));
+        throw RuntimeError(__FILE__, __LINE__, padUuid.toStr(),
+            QString(tr("Invalid footprint pad UUID: \"%1\"")).arg(padUuid.toStr()));
     }
 
     mGraphicsItem = new BGI_FootprintPad(*this);
@@ -77,7 +77,7 @@ Board& BI_FootprintPad::getBoard() const noexcept
     return mFootprint.getBoard();
 }
 
-const QUuid& BI_FootprintPad::getLibPadUuid() const noexcept
+const Uuid& BI_FootprintPad::getLibPadUuid() const noexcept
 {
     return mFootprintPad->getPadUuid();
 }

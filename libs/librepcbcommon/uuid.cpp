@@ -40,10 +40,32 @@ bool Uuid::setUuid(const QString& uuid) noexcept
 }
 
 /*****************************************************************************************
+ *  Operators
+ ****************************************************************************************/
+
+Uuid& Uuid::operator=(const Uuid& rhs) noexcept
+{
+    mUuid = rhs.mUuid;
+    return *this;
+}
+
+bool Uuid::operator==(const Uuid& rhs) const noexcept
+{
+    if (mUuid.isEmpty() || rhs.mUuid.isEmpty()) return false;
+    return (mUuid == rhs.mUuid);
+}
+
+bool Uuid::operator!=(const Uuid& rhs) const noexcept
+{
+    if (mUuid.isEmpty() || rhs.mUuid.isEmpty()) return false;
+    return (mUuid != rhs.mUuid);
+}
+
+/*****************************************************************************************
  *  Static Methods
  ****************************************************************************************/
 
-Uuid Uuid::create() noexcept
+Uuid Uuid::createRandom() noexcept
 {
     QString str = QUuid::createUuid().toString().remove("{").remove("}");
     Uuid uuid(str);

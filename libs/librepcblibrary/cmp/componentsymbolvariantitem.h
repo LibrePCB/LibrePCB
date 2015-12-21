@@ -25,6 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <librepcbcommon/uuid.h>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 
 /*****************************************************************************************
@@ -52,32 +53,32 @@ class ComponentSymbolVariantItem final : public IF_XmlSerializableObject
 
         /// Pin-Signal-Map item struct
         struct PinSignalMapItem_t {
-            QUuid pin;                      ///< must be valid
-            QUuid signal;                   ///< NULL if not connected to a signal
+            Uuid pin;                      ///< must be valid
+            Uuid signal;                   ///< NULL if not connected to a signal
             PinDisplayType_t displayType;
         };
 
         // Constructors / Destructor
-        explicit ComponentSymbolVariantItem(const QUuid& uuid = QUuid::createUuid(),
-                                            const QUuid& symbolUuid = QUuid(),
+        explicit ComponentSymbolVariantItem(const Uuid& uuid = Uuid::createRandom(),
+                                            const Uuid& symbolUuid = Uuid(),
                                             bool isRequired = false,
                                             const QString& suffix = QString()) noexcept;
         explicit ComponentSymbolVariantItem(const XmlDomElement& domElement) throw (Exception);
         ~ComponentSymbolVariantItem() noexcept;
 
         // Getters: Attributes
-        const QUuid& getUuid() const noexcept {return mUuid;}
-        const QUuid& getSymbolUuid() const noexcept {return mSymbolUuid;}
+        const Uuid& getUuid() const noexcept {return mUuid;}
+        const Uuid& getSymbolUuid() const noexcept {return mSymbolUuid;}
         bool isRequired() const noexcept {return mIsRequired;}
         const QString& getSuffix() const noexcept {return mSuffix;}
 
         // Getters: Pin-Signal-Map
-        const QHash<QUuid, PinSignalMapItem_t>& getPinSignalMap() const noexcept {return mPinSignalMap;}
-        QUuid getSignalOfPin(const QUuid& pinUuid) const noexcept;
-        PinDisplayType_t getDisplayTypeOfPin(const QUuid& pinUuid) const noexcept;
+        const QHash<Uuid, PinSignalMapItem_t>& getPinSignalMap() const noexcept {return mPinSignalMap;}
+        Uuid getSignalOfPin(const Uuid& pinUuid) const noexcept;
+        PinDisplayType_t getDisplayTypeOfPin(const Uuid& pinUuid) const noexcept;
 
         // General Methods
-        void addPinSignalMapping(const QUuid& pin, const QUuid& signal, PinDisplayType_t display) noexcept;
+        void addPinSignalMapping(const Uuid& pin, const Uuid& signal, PinDisplayType_t display) noexcept;
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
@@ -96,11 +97,11 @@ class ComponentSymbolVariantItem final : public IF_XmlSerializableObject
 
 
         // Symbol Variant Item Attributes
-        QUuid mUuid;
-        QUuid mSymbolUuid;
+        Uuid mUuid;
+        Uuid mSymbolUuid;
         bool mIsRequired;
         QString mSuffix;
-        QHash<QUuid, PinSignalMapItem_t> mPinSignalMap; ///< All pins required!
+        QHash<Uuid, PinSignalMapItem_t> mPinSignalMap; ///< All pins required!
 };
 
 } // namespace library

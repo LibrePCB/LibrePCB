@@ -43,7 +43,7 @@ class Device final : public LibraryElement
     public:
 
         // Constructors / Destructor
-        explicit Device(const QUuid& uuid = QUuid::createUuid(),
+        explicit Device(const Uuid& uuid = Uuid::createRandom(),
                         const Version& version = Version(),
                         const QString& author = QString(),
                         const QString& name_en_US = QString(),
@@ -53,18 +53,18 @@ class Device final : public LibraryElement
         ~Device() noexcept;
 
         // Getters
-        const QUuid& getComponentUuid() const noexcept {return mComponentUuid;}
-        const QUuid& getPackageUuid() const noexcept {return mPackageUuid;}
-        const QHash<QUuid, QUuid>& getPadSignalMap() const noexcept {return mPadSignalMap;}
-        QUuid getSignalOfPad(const QUuid& pad) const noexcept {return mPadSignalMap.value(pad);}
+        const Uuid& getComponentUuid() const noexcept {return mComponentUuid;}
+        const Uuid& getPackageUuid() const noexcept {return mPackageUuid;}
+        const QHash<Uuid, Uuid>& getPadSignalMap() const noexcept {return mPadSignalMap;}
+        Uuid getSignalOfPad(const Uuid& pad) const noexcept {return mPadSignalMap.value(pad);}
 
         // Setters
-        void setComponentUuid(const QUuid& uuid) noexcept {mComponentUuid = uuid;}
-        void setPackageUuid(const QUuid& uuid) noexcept {mPackageUuid = uuid;}
+        void setComponentUuid(const Uuid& uuid) noexcept {mComponentUuid = uuid;}
+        void setPackageUuid(const Uuid& uuid) noexcept {mPackageUuid = uuid;}
 
         // General Methods
         void clearPadSignalMap() noexcept {mPadSignalMap.clear();}
-        void addPadSignalMapping(const QUuid& pad, const QUuid& signal) noexcept {mPadSignalMap.insert(pad, signal);}
+        void addPadSignalMapping(const Uuid& pad, const Uuid& signal) noexcept {mPadSignalMap.insert(pad, signal);}
 
 
     private:
@@ -87,9 +87,9 @@ class Device final : public LibraryElement
 
 
         // Attributes
-        QUuid mComponentUuid;
-        QUuid mPackageUuid;
-        QHash<QUuid, QUuid> mPadSignalMap; ///< key: pad, value: signal
+        Uuid mComponentUuid;
+        Uuid mPackageUuid;
+        QHash<Uuid, Uuid> mPadSignalMap; ///< key: pad, value: signal
 };
 
 } // namespace library

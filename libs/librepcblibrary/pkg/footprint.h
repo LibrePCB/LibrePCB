@@ -54,7 +54,7 @@ class Footprint final : public IF_XmlSerializableObject
 
 
         // Constructors / Destructor
-        explicit Footprint(const QUuid& uuid = QUuid::createUuid(),
+        explicit Footprint(const Uuid& uuid = Uuid::createRandom(),
                            const QString& name_en_US = QString(),
                            const QString& description_en_US = QString(),
                            bool isDefault = false) throw (Exception);
@@ -62,7 +62,7 @@ class Footprint final : public IF_XmlSerializableObject
         ~Footprint() noexcept;
 
         // Getters: Attributes
-        const QUuid& getUuid() const noexcept {return mUuid;}
+        const Uuid& getUuid() const noexcept {return mUuid;}
         bool isDefault() const noexcept {return mIsDefault;}
         QString getName(const QStringList& localeOrder) const noexcept;
         QString getDescription(const QStringList& localeOrder) const noexcept;
@@ -70,8 +70,8 @@ class Footprint final : public IF_XmlSerializableObject
         const QMap<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
 
         // Getters: Items
-        const FootprintPad* getPadByUuid(const QUuid& uuid) const noexcept {return mPads.value(uuid);}
-        const QHash<QUuid, const FootprintPad*>& getPads() const noexcept {return mPads;}
+        const FootprintPad* getPadByUuid(const Uuid& uuid) const noexcept {return mPads.value(uuid);}
+        const QHash<Uuid, const FootprintPad*>& getPads() const noexcept {return mPads;}
         const QList<const FootprintPolygon*>& getPolygons() const noexcept {return mPolygons;}
         const QList<const FootprintText*>& getTexts() const noexcept {return mTexts;}
         const QList<const FootprintEllipse*>& getEllipses() const noexcept {return mEllipses;}
@@ -105,11 +105,11 @@ class Footprint final : public IF_XmlSerializableObject
 
 
         // Footprint Attributes
-        QUuid mUuid;
+        Uuid mUuid;
         QMap<QString, QString> mNames;
         QMap<QString, QString> mDescriptions;
         bool mIsDefault;
-        QHash<QUuid, const FootprintPad*> mPads;
+        QHash<Uuid, const FootprintPad*> mPads;
         QList<const FootprintPolygon*> mPolygons;
         QList<const FootprintText*> mTexts;
         QList<const FootprintEllipse*> mEllipses;

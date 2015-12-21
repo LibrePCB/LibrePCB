@@ -58,14 +58,14 @@ BI_Footprint::BI_Footprint(DeviceInstance& device) throw (Exception) :
 
 void BI_Footprint::init() throw (Exception)
 {
-    // TODO: QUuid footprintUuid = mDeviceInstance.getLibPackage().getFootprintUuid();
-    QUuid footprintUuid = mDeviceInstance.getLibPackage().getFootprints().first()->getUuid();
+    // TODO: Uuid footprintUuid = mDeviceInstance.getLibPackage().getFootprintUuid();
+    Uuid footprintUuid = mDeviceInstance.getLibPackage().getFootprints().first()->getUuid();
     mFootprint = mDeviceInstance.getLibPackage().getFootprintByUuid(footprintUuid);
     if (!mFootprint)
     {
-        throw RuntimeError(__FILE__, __LINE__, footprintUuid.toString(),
+        throw RuntimeError(__FILE__, __LINE__, footprintUuid.toStr(),
             QString(tr("No footprint with the UUID \"%1\" found in the project's library."))
-            .arg(footprintUuid.toString()));
+            .arg(footprintUuid.toStr()));
     }
 
     mGraphicsItem = new BGI_Footprint(*this);
@@ -80,15 +80,15 @@ void BI_Footprint::init() throw (Exception)
         BI_FootprintPad* pad = new BI_FootprintPad(*this, libPad->getPadUuid());
         if (mPads.contains(libPad->getPadUuid()))
         {
-            throw RuntimeError(__FILE__, __LINE__, libPad->getPadUuid().toString(),
+            throw RuntimeError(__FILE__, __LINE__, libPad->getPadUuid().toStr(),
                 QString(tr("The footprint pad UUID \"%1\" is defined multiple times."))
-                .arg(libPad->getPadUuid().toString()));
+                .arg(libPad->getPadUuid().toStr()));
         }
         if (!libDev.getPadSignalMap().contains(libPad->getPadUuid()))
         {
-            throw RuntimeError(__FILE__, __LINE__, libPad->getPadUuid().toString(),
+            throw RuntimeError(__FILE__, __LINE__, libPad->getPadUuid().toStr(),
                 QString(tr("Footprint pad \"%1\" not found in pad-signal-map of device \"%2\"."))
-                .arg(libPad->getPadUuid().toString(), libDev.getUuid().toString()));
+                .arg(libPad->getPadUuid().toStr(), libDev.getUuid().toStr()));
         }
         mPads.insert(libPad->getPadUuid(), pad);
     }
@@ -97,8 +97,8 @@ void BI_Footprint::init() throw (Exception)
         throw RuntimeError(__FILE__, __LINE__,
             QString("%1!=%2").arg(mPads.count()).arg(libDev.getPadSignalMap().count()),
             QString(tr("The pad count of the footprint \"%1\" does not match with "
-            "the pad-signal-map of device \"%2\".")).arg(mFootprint->getUuid().toString(),
-            libDev.getUuid().toString()));
+            "the pad-signal-map of device \"%2\".")).arg(mFootprint->getUuid().toStr(),
+            libDev.getUuid().toStr()));
     }
 
     // connect to the "attributes changed" signal of device instance

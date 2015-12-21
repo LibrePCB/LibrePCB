@@ -47,7 +47,7 @@ class Symbol final : public LibraryElement
     public:
 
         // Constructors / Destructor
-        explicit Symbol(const QUuid& uuid = QUuid::createUuid(),
+        explicit Symbol(const Uuid& uuid = Uuid::createRandom(),
                         const Version& version = Version(),
                         const QString& author = QString(),
                         const QString& name_en_US = QString(),
@@ -57,8 +57,8 @@ class Symbol final : public LibraryElement
         ~Symbol() noexcept;
 
         // Getters
-        const SymbolPin* getPinByUuid(const QUuid& uuid) const noexcept {return mPins.value(uuid);}
-        const QHash<QUuid, const SymbolPin*>& getPins() const noexcept {return mPins;}
+        const SymbolPin* getPinByUuid(const Uuid& uuid) const noexcept {return mPins.value(uuid);}
+        const QHash<Uuid, const SymbolPin*>& getPins() const noexcept {return mPins;}
         const QList<const SymbolPolygon*>& getPolygons() const noexcept {return mPolygons;}
         const QList<const SymbolText*>& getTexts() const noexcept {return mTexts;}
         const QList<const SymbolEllipse*>& getEllipses() const noexcept {return mEllipses;}
@@ -89,7 +89,7 @@ class Symbol final : public LibraryElement
 
 
         // Symbol Attributes
-        QHash<QUuid, const SymbolPin*> mPins;
+        QHash<Uuid, const SymbolPin*> mPins;
         QList<const SymbolPolygon*> mPolygons;
         QList<const SymbolText*> mTexts;
         QList<const SymbolEllipse*> mEllipses;

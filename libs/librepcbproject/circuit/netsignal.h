@@ -26,6 +26,7 @@
 
 #include <QtCore>
 #include "../erc/if_ercmsgprovider.h"
+#include <librepcbcommon/uuid.h>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 #include <librepcbcommon/exceptions.h>
 
@@ -66,7 +67,7 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public IF_XmlS
         ~NetSignal() noexcept;
 
         // Getters
-        const QUuid& getUuid() const noexcept {return mUuid;}
+        const Uuid& getUuid() const noexcept {return mUuid;}
         const QString& getName() const noexcept {return mName;}
         bool hasAutoName() const noexcept {return mHasAutoName;}
         NetClass& getNetClass() const noexcept {return *mNetClass;}
@@ -130,7 +131,7 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public IF_XmlS
         int mGenCompSignalWithForcedNameCount;
 
         // Attributes
-        QUuid mUuid;
+        Uuid mUuid;
         QString mName;
         bool mHasAutoName;
         NetClass* mNetClass;

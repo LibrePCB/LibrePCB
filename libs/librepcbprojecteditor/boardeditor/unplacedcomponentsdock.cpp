@@ -114,7 +114,7 @@ void UnplacedComponentsDock::on_lstUnplacedComponents_currentItemChanged(QListWi
     GenCompInstance* genComp = nullptr;
     if (mBoard && current)
     {
-        QUuid genCompUuid = current->data(Qt::UserRole).toUuid();
+        Uuid genCompUuid = current->data(Qt::UserRole).toUuid();
         Q_ASSERT(genCompUuid.isNull() == false);
         genComp = mProject.getCircuit().getGenCompInstanceByUuid(genCompUuid);
     }
@@ -123,7 +123,7 @@ void UnplacedComponentsDock::on_lstUnplacedComponents_currentItemChanged(QListWi
 
 void UnplacedComponentsDock::on_cbxSelectedComponent_currentIndexChanged(int index)
 {
-    /*QUuid deviceUuid = mUi->cbxSelectedComponent->itemData(index, Qt::UserRole).toUuid();
+    /*Uuid deviceUuid = mUi->cbxSelectedComponent->itemData(index, Qt::UserRole).toUuid();
     FilePath devFp = mProjectEditor.getWorkspace().getLibrary().getLatestDevice(deviceUuid);
     if (devFp.isValid())
     {
@@ -147,13 +147,13 @@ void UnplacedComponentsDock::on_pushButton_clicked()
 {
     /*if ((!mBoard) || (!mSelectedGenComp) || (!mSelectedComponent)) return;
 
-    QUuid genCompLibUuid = mSelectedGenComp->getGenComp().getUuid();
-    QUuid compLibUuid = mSelectedComponent->getUuid();
+    Uuid genCompLibUuid = mSelectedGenComp->getGenComp().getUuid();
+    Uuid compLibUuid = mSelectedComponent->getUuid();
 
     mDisableListUpdate = true;
     for (int i = 0; i < mUi->lstUnplacedComponents->count(); i++)
     {
-        QUuid genCompUuid = mUi->lstUnplacedComponents->item(i)->data(Qt::UserRole).toUuid();
+        Uuid genCompUuid = mUi->lstUnplacedComponents->item(i)->data(Qt::UserRole).toUuid();
         Q_ASSERT(genCompUuid.isNull() == false);
         GenCompInstance* genComp = mProject.getCircuit().getGenCompInstanceByUuid(genCompUuid);
         if (!genComp) continue;
@@ -172,12 +172,12 @@ void UnplacedComponentsDock::on_btnAddAll_clicked()
     mDisableListUpdate = true;
     for (int i = 0; i < mUi->lstUnplacedComponents->count(); i++)
     {
-        QUuid genCompUuid = mUi->lstUnplacedComponents->item(i)->data(Qt::UserRole).toUuid();
+        Uuid genCompUuid = mUi->lstUnplacedComponents->item(i)->data(Qt::UserRole).toUuid();
         Q_ASSERT(genCompUuid.isNull() == false);
         GenCompInstance* genComp = mProject.getCircuit().getGenCompInstanceByUuid(genCompUuid);
         if (genComp)
         {
-            QList<QUuid> components = mProjectEditor.getWorkspace().getLibrary().
+            QList<Uuid> components = mProjectEditor.getWorkspace().getLibrary().
                 getComponentsOfGenericComponent(genComp->getGenComp().getUuid()).toList();
             if (components.count() > 0)
                 addComponent(*genComp, components.first());
@@ -201,8 +201,8 @@ void UnplacedComponentsDock::on_btnAddAll_clicked()
 
     if (mBoard)
     {
-        const QHash<QUuid, GenCompInstance*> genCompList = mProject.getCircuit().getGenCompInstances();
-        const QHash<QUuid, ComponentInstance*> boardCompList = mBoard->getComponentInstances();
+        const QHash<Uuid, GenCompInstance*> genCompList = mProject.getCircuit().getGenCompInstances();
+        const QHash<Uuid, ComponentInstance*> boardCompList = mBoard->getComponentInstances();
         foreach (GenCompInstance* genComp, genCompList)
         {
             if (boardCompList.contains(genComp->getUuid())) continue;
@@ -229,15 +229,15 @@ void UnplacedComponentsDock::setSelectedGenCompInstance(GenCompInstance* genComp
     if (mBoard && mSelectedGenComp)
     {
         QStringList localeOrder = mProject.getSettings().getLocaleOrder();
-        QSet<QUuid> components = mProjectEditor.getWorkspace().getLibrary().getComponentsOfGenericComponent(mSelectedGenComp->getGenComp().getUuid());
-        foreach (const QUuid& compUuid, components)
+        QSet<Uuid> components = mProjectEditor.getWorkspace().getLibrary().getComponentsOfGenericComponent(mSelectedGenComp->getGenComp().getUuid());
+        foreach (const Uuid& compUuid, components)
         {
             // TODO: use library metadata instead of loading the XML files
             FilePath cmpFp = mProjectEditor.getWorkspace().getLibrary().getLatestComponent(compUuid);
             if (!cmpFp.isValid()) continue;
             const library::Component component(cmpFp);
 
-            QUuid pkgUuid;
+            Uuid pkgUuid;
             mProjectEditor.getWorkspace().getLibrary().getComponentMetadata(cmpFp, &pkgUuid);
             FilePath pkgFp = mProjectEditor.getWorkspace().getLibrary().getLatestPackage(pkgUuid);
             const library::Package package(pkgFp);
@@ -268,7 +268,7 @@ void UnplacedComponentsDock::setSelectedDevice(const library::Device* device) no
     }
 }
 
-void UnplacedComponentsDock::addComponent(GenCompInstance& genComp, const QUuid& component) noexcept
+void UnplacedComponentsDock::addComponent(GenCompInstance& genComp, const Uuid& component) noexcept
 {
     Q_ASSERT(mBoard);
     bool cmdActive = false;

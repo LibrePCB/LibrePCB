@@ -34,7 +34,7 @@ namespace library {
  ****************************************************************************************/
 
 CategoryTreeItem::CategoryTreeItem(const Library& library, const QStringList localeOrder, CategoryTreeItem* parent,
-                                   const QUuid& uuid) throw (Exception) :
+                                   const Uuid& uuid) throw (Exception) :
     mLocaleOrder(localeOrder), mParent(parent), mUuid(uuid), mCategory(nullptr),
     mDepth(parent ? parent->getDepth() + 1 : 0)
 {
@@ -46,8 +46,8 @@ CategoryTreeItem::CategoryTreeItem(const Library& library, const QStringList loc
 
     if ((!mUuid.isNull()) || (!mParent))
     {
-        QSet<QUuid> childs = library.getComponentCategoryChilds(mUuid);
-        foreach (const QUuid& childUuid, childs)
+        QSet<Uuid> childs = library.getComponentCategoryChilds(mUuid);
+        foreach (const Uuid& childUuid, childs)
             mChilds.append(new CategoryTreeItem(library, mLocaleOrder, this, childUuid));
 
         // sort childs
@@ -59,7 +59,7 @@ CategoryTreeItem::CategoryTreeItem(const Library& library, const QStringList loc
     if (!mParent)
     {
         // add category for elements without category
-        mChilds.append(new CategoryTreeItem(library, mLocaleOrder, this, QUuid()));
+        mChilds.append(new CategoryTreeItem(library, mLocaleOrder, this, Uuid()));
     }
 }
 
@@ -108,7 +108,7 @@ QVariant CategoryTreeItem::data(int role) const noexcept
                 return "";
 
         case Qt::UserRole:
-            return mUuid;
+            return mUuid.toStr();
 
         default:
             break;

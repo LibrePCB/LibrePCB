@@ -31,6 +31,7 @@
 #include <librepcbcommon/units/all_length_units.h>
 #include <librepcbcommon/fileio/filepath.h>
 #include <librepcbcommon/exceptions.h>
+#include <librepcbcommon/uuid.h>
 #include "../erc/if_ercmsgprovider.h"
 
 /*****************************************************************************************
@@ -114,13 +115,13 @@ class Board final : public QObject, public IF_AttributeProvider,
         void setGridProperties(const GridProperties& grid) noexcept;
 
         // Getters: Attributes
-        const QUuid& getUuid() const noexcept {return mUuid;}
+        const Uuid& getUuid() const noexcept {return mUuid;}
         const QString& getName() const noexcept {return mName;}
         const QIcon& getIcon() const noexcept {return mIcon;}
 
         // DeviceInstance Methods
-        const QHash<QUuid, DeviceInstance*>& getDeviceInstances() const noexcept {return mDeviceInstances;}
-        DeviceInstance* getDeviceInstanceByComponentUuid(const QUuid& uuid) const noexcept;
+        const QHash<Uuid, DeviceInstance*>& getDeviceInstances() const noexcept {return mDeviceInstances;}
+        DeviceInstance* getDeviceInstanceByComponentUuid(const Uuid& uuid) const noexcept;
         DeviceInstance* createDeviceInstance() throw (Exception);
         void addDeviceInstance(DeviceInstance& instance) throw (Exception);
         void removeDeviceInstance(DeviceInstance& instance) throw (Exception);
@@ -185,15 +186,15 @@ class Board final : public QObject, public IF_AttributeProvider,
         GridProperties* mGridProperties;
 
         // Attributes
-        QUuid mUuid;
+        Uuid mUuid;
         QString mName;
         QIcon mIcon;
 
         // ERC messages
-        QHash<QUuid, ErcMsg*> mErcMsgListUnplacedComponentInstances;
+        QHash<Uuid, ErcMsg*> mErcMsgListUnplacedComponentInstances;
 
         // items
-        QHash<QUuid, DeviceInstance*> mDeviceInstances;
+        QHash<Uuid, DeviceInstance*> mDeviceInstances;
 };
 
 } // namespace project

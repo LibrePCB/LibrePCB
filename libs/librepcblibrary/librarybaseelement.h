@@ -29,6 +29,7 @@
 #include <librepcbcommon/exceptions.h>
 #include <librepcbcommon/fileio/filepath.h>
 #include <librepcbcommon/version.h>
+#include <librepcbcommon/uuid.h>
 
 /*****************************************************************************************
  *  Class LibraryBaseElement
@@ -48,7 +49,7 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
         // Constructors / Destructor
         explicit LibraryBaseElement(const QString& xmlFileNamePrefix,
                                     const QString& xmlRootNodeName,
-                                    const QUuid& uuid = QUuid::createUuid(),
+                                    const Uuid& uuid = Uuid::createRandom(),
                                     const Version& version = Version(),
                                     const QString& author = QString(),
                                     const QString& name_en_US = QString(),
@@ -64,7 +65,7 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
         const FilePath& getXmlFilepath() const noexcept {return mXmlFilepath;}
 
         // Getters: Attributes
-        const QUuid& getUuid() const noexcept {return mUuid;}
+        const Uuid& getUuid() const noexcept {return mUuid;}
         const Version& getVersion() const noexcept {return mVersion;}
         const QString& getAuthor() const noexcept {return mAuthor;}
         const QDateTime& getCreated() const noexcept {return mCreated;}
@@ -78,7 +79,7 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
         QStringList getAllAvailableLocales() const noexcept;
 
         // Setters
-        void setUuid(const QUuid& uuid) noexcept {mUuid = uuid;}
+        void setUuid(const Uuid& uuid) noexcept {mUuid = uuid;}
         void setName(const QString& locale, const QString& name) noexcept {mNames[locale] = name;}
         void setDescription(const QString& locale, const QString& desc) noexcept {mDescriptions[locale] = desc;}
         void setKeywords(const QString& locale, const QString& keywords) noexcept {mKeywords[locale] = keywords;}
@@ -198,7 +199,7 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
         bool mDomTreeParsed;
 
         // General Library Element Attributes
-        QUuid mUuid;
+        Uuid mUuid;
         Version mVersion;
         QString mAuthor;
         QDateTime mCreated;

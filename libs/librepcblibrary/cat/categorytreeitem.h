@@ -26,6 +26,7 @@
 
 #include <QtCore>
 #include <librepcbcommon/exceptions.h>
+#include <librepcbcommon/uuid.h>
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -52,11 +53,11 @@ class CategoryTreeItem final
 
         // Constructors / Destructor
         CategoryTreeItem(const Library& library, const QStringList localeOrder,
-                         CategoryTreeItem* parent, const QUuid& uuid) throw (Exception);
+                         CategoryTreeItem* parent, const Uuid& uuid) throw (Exception);
         ~CategoryTreeItem() noexcept;
 
         // Getters
-        const QUuid& getUuid()                  const noexcept {return mUuid;}
+        const Uuid& getUuid()                  const noexcept {return mUuid;}
         unsigned int getDepth()                 const noexcept {return mDepth;}
         int getColumnCount()                    const noexcept {return 1;}
         CategoryTreeItem* getParent()           const noexcept {return mParent;}
@@ -75,7 +76,7 @@ class CategoryTreeItem final
         // Attributes
         QStringList mLocaleOrder;
         CategoryTreeItem* mParent;
-        QUuid mUuid;
+        Uuid mUuid;
         ComponentCategory* mCategory;
         unsigned int mDepth; ///< this is to avoid endless recursion in the parent-child relationship
         QList<CategoryTreeItem*> mChilds;

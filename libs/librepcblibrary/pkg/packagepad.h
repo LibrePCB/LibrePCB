@@ -25,6 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <librepcbcommon/uuid.h>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 
 /*****************************************************************************************
@@ -43,13 +44,13 @@ class PackagePad final : public IF_XmlSerializableObject
     public:
 
         // Constructors / Destructor
-        explicit PackagePad(const QUuid& uuid = QUuid::createUuid(),
+        explicit PackagePad(const Uuid& uuid = Uuid::createRandom(),
                             const QString& name = QString()) noexcept;
         explicit PackagePad(const XmlDomElement& domElement) throw (Exception);
         ~PackagePad() noexcept;
 
         // Getters
-        const QUuid& getUuid() const noexcept {return mUuid;}
+        const Uuid& getUuid() const noexcept {return mUuid;}
         QString getName() const noexcept {return mName;}
 
         // Setters
@@ -74,7 +75,7 @@ class PackagePad final : public IF_XmlSerializableObject
 
 
         // Pin Attributes
-        QUuid mUuid;
+        Uuid mUuid;
         QString mName;
 };
 

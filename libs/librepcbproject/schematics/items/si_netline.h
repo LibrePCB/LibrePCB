@@ -63,7 +63,7 @@ class SI_NetLine final : public SI_Base, public IF_XmlSerializableObject
         // Getters
         Project& getProject() const noexcept;
         Schematic& getSchematic() const noexcept {return mSchematic;}
-        const QUuid& getUuid() const noexcept {return mUuid;}
+        const Uuid& getUuid() const noexcept {return mUuid;}
         const Length& getWidth() const noexcept {return mWidth;}
         SI_NetPoint& getStartPoint() const noexcept {return *mStartPoint;}
         SI_NetPoint& getEndPoint() const noexcept {return *mEndPoint;}
@@ -109,7 +109,7 @@ class SI_NetLine final : public SI_Base, public IF_XmlSerializableObject
         Point mPosition; ///< the center of startpoint and endpoint
 
         // Attributes
-        QUuid mUuid;
+        Uuid mUuid;
         SI_NetPoint* mStartPoint;
         SI_NetPoint* mEndPoint;
         Length mWidth;

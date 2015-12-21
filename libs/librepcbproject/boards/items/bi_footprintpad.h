@@ -57,13 +57,13 @@ class BI_FootprintPad final : public BI_Base
     public:
 
         // Constructors / Destructor
-        explicit BI_FootprintPad(BI_Footprint& footprint, const QUuid& padUuid);
+        explicit BI_FootprintPad(BI_Footprint& footprint, const Uuid& padUuid);
         ~BI_FootprintPad();
 
         // Getters
         Project& getProject() const noexcept;
         Board& getBoard() const noexcept;
-        const QUuid& getLibPadUuid() const noexcept;
+        const Uuid& getLibPadUuid() const noexcept;
         //QString getDisplayText(bool returnGenCompSignalNameIfEmpty = false,
         //                       bool returnPinNameIfEmpty = false) const noexcept;
         BI_Footprint& getFootprint() const noexcept {return mFootprint;}

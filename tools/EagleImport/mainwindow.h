@@ -3,6 +3,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
+#include <librepcbcommon/uuid.h>
 #include <librepcbcommon/fileio/filepath.h>
 
 namespace Ui {
@@ -46,7 +47,7 @@ class MainWindow : public QMainWindow
 
         void reset();
         void addError(const QString& msg, const FilePath& inputFile = FilePath(), int inputLine = 0);
-        QUuid getOrCreateUuid(QSettings& outputSettings, const FilePath& filepath,
+        Uuid getOrCreateUuid(QSettings& outputSettings, const FilePath& filepath,
                               const QString& cat, const QString& key1, const QString& key2 = QString());
         QString createDescription(const FilePath& filepath, const QString& name);
         void convertAllFiles(ConvertFileType_t type);

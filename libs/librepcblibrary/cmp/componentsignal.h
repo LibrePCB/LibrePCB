@@ -25,6 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <librepcbcommon/uuid.h>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 
 /*****************************************************************************************
@@ -54,13 +55,13 @@ class ComponentSignal final : public IF_XmlSerializableObject
 
 
         // Constructors / Destructor
-        explicit ComponentSignal(const QUuid& uuid = QUuid::createUuid(),
+        explicit ComponentSignal(const Uuid& uuid = Uuid::createRandom(),
                                  const QString& name = QString()) noexcept;
         explicit ComponentSignal(const XmlDomElement& domElement) throw (Exception);
         ~ComponentSignal() noexcept;
 
         // Getters
-        const QUuid& getUuid() const noexcept {return mUuid;}
+        const Uuid& getUuid() const noexcept {return mUuid;}
         QString getName() const noexcept {return mName;}
         SignalRole_t getRole() const noexcept {return mRole;}
         const QString& getForcedNetName() const noexcept {return mForcedNetName;}
@@ -101,7 +102,7 @@ class ComponentSignal final : public IF_XmlSerializableObject
 
 
         // Signal Attributes
-        QUuid mUuid;
+        Uuid mUuid;
         QString mName;
         SignalRole_t mRole;
         QString mForcedNetName;

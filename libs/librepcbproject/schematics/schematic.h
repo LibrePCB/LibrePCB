@@ -26,6 +26,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
+#include <librepcbcommon/uuid.h>
 #include <librepcbcommon/if_attributeprovider.h>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 #include <librepcbcommon/units/all_length_units.h>
@@ -131,33 +132,33 @@ class Schematic final : public QObject, public IF_AttributeProvider,
         void setGridProperties(const GridProperties& grid) noexcept;
 
         // Getters: Attributes
-        const QUuid& getUuid() const noexcept {return mUuid;}
+        const Uuid& getUuid() const noexcept {return mUuid;}
         const QString& getName() const noexcept {return mName;}
         const QIcon& getIcon() const noexcept {return mIcon;}
 
         // Symbol Methods
-        SI_Symbol* getSymbolByUuid(const QUuid& uuid) const noexcept;
-        SI_Symbol* createSymbol(ComponentInstance& genCompInstance, const QUuid& symbolItem,
+        SI_Symbol* getSymbolByUuid(const Uuid& uuid) const noexcept;
+        SI_Symbol* createSymbol(ComponentInstance& genCompInstance, const Uuid& symbolItem,
                                 const Point& position = Point(), const Angle& angle = Angle()) throw (Exception);
         void addSymbol(SI_Symbol& symbol) throw (Exception);
         void removeSymbol(SI_Symbol& symbol) throw (Exception);
 
         // NetPoint Methods
-        SI_NetPoint* getNetPointByUuid(const QUuid& uuid) const noexcept;
+        SI_NetPoint* getNetPointByUuid(const Uuid& uuid) const noexcept;
         SI_NetPoint* createNetPoint(NetSignal& netsignal, const Point& position) throw (Exception);
         SI_NetPoint* createNetPoint(SI_SymbolPin& pin) throw (Exception);
         void addNetPoint(SI_NetPoint& netpoint) throw (Exception);
         void removeNetPoint(SI_NetPoint& netpoint) throw (Exception);
 
         // NetLine Methods
-        SI_NetLine* getNetLineByUuid(const QUuid& uuid) const noexcept;
+        SI_NetLine* getNetLineByUuid(const Uuid& uuid) const noexcept;
         SI_NetLine* createNetLine(SI_NetPoint& startPoint, SI_NetPoint& endPoint,
                                   const Length& width) throw (Exception);
         void addNetLine(SI_NetLine& netline) throw (Exception);
         void removeNetLine(SI_NetLine& netline) throw (Exception);
 
         // NetLabel Methods
-        SI_NetLabel* getNetLabelByUuid(const QUuid& uuid) const noexcept;
+        SI_NetLabel* getNetLabelByUuid(const Uuid& uuid) const noexcept;
         SI_NetLabel* createNetLabel(NetSignal& netsignal, const Point& position) throw (Exception);
         void addNetLabel(SI_NetLabel& netlabel) throw (Exception);
         void removeNetLabel(SI_NetLabel& netlabel) throw (Exception);
@@ -218,7 +219,7 @@ class Schematic final : public QObject, public IF_AttributeProvider,
         GridProperties* mGridProperties;
 
         // Attributes
-        QUuid mUuid;
+        Uuid mUuid;
         QString mName;
         QIcon mIcon;
 

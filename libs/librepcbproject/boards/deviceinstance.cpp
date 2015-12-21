@@ -45,16 +45,16 @@ DeviceInstance::DeviceInstance(Board& board, const XmlDomElement& domElement) th
     mDevice(nullptr), mFootprint(nullptr)
 {
     // get component instance
-    QUuid compInstUuid = domElement.getAttribute<QUuid>("component_instance");
+    Uuid compInstUuid = domElement.getAttribute<Uuid>("component_instance");
     mCompInstance = mBoard.getProject().getCircuit().getComponentInstanceByUuid(compInstUuid);
     if (!mCompInstance)
     {
-        throw RuntimeError(__FILE__, __LINE__, compInstUuid.toString(),
+        throw RuntimeError(__FILE__, __LINE__, compInstUuid.toStr(),
             QString(tr("Could not find the component instance with UUID \"%1\"!"))
-            .arg(compInstUuid.toString()));
+            .arg(compInstUuid.toStr()));
     }
     // get device
-    QUuid deviceUuid = domElement.getAttribute<QUuid>("device");
+    Uuid deviceUuid = domElement.getAttribute<Uuid>("device");
     initDeviceAndPackage(deviceUuid);
 
     // get position, rotation and mirrored
@@ -70,7 +70,7 @@ DeviceInstance::DeviceInstance(Board& board, const XmlDomElement& domElement) th
 }
 
 DeviceInstance::DeviceInstance(Board& board, ComponentInstance& compInstance,
-                                     const QUuid& deviceUuid, const Point& position,
+                                     const Uuid& deviceUuid, const Point& position,
                                      const Angle& rotation) throw (Exception) :
     QObject(nullptr), mBoard(board), mAddedToBoard(false), mCompInstance(&compInstance),
     mDevice(nullptr), mFootprint(nullptr), mPosition(position), mRotation(rotation),
@@ -84,45 +84,45 @@ DeviceInstance::DeviceInstance(Board& board, ComponentInstance& compInstance,
     init();
 }
 
-void DeviceInstance::initDeviceAndPackage(const QUuid& deviceUuid) throw (Exception)
+void DeviceInstance::initDeviceAndPackage(const Uuid& deviceUuid) throw (Exception)
 {
     // get device from library
     mDevice = mBoard.getProject().getLibrary().getDevice(deviceUuid);
     if (!mDevice)
     {
-        throw RuntimeError(__FILE__, __LINE__, deviceUuid.toString(),
+        throw RuntimeError(__FILE__, __LINE__, deviceUuid.toStr(),
             QString(tr("No device with the UUID \"%1\" found in the project's library."))
-            .arg(deviceUuid.toString()));
+            .arg(deviceUuid.toStr()));
     }
     // check if the device matches with the component
     if (mDevice->getComponentUuid() != mCompInstance->getLibComponent().getUuid())
     {
         throw RuntimeError(__FILE__, __LINE__, QString(),
             QString(tr("The device \"%1\" does not match with the component"
-            "instance \"%2\".")).arg(mDevice->getUuid().toString(),
-            mCompInstance->getUuid().toString()));
+            "instance \"%2\".")).arg(mDevice->getUuid().toStr(),
+            mCompInstance->getUuid().toStr()));
     }
     // get package from library
-    QUuid packageUuid = mDevice->getPackageUuid();
+    Uuid packageUuid = mDevice->getPackageUuid();
     mPackage = mBoard.getProject().getLibrary().getPackage(packageUuid);
     if (!mPackage)
     {
-        throw RuntimeError(__FILE__, __LINE__, packageUuid.toString(),
+        throw RuntimeError(__FILE__, __LINE__, packageUuid.toStr(),
             QString(tr("No package with the UUID \"%1\" found in the project's library."))
-            .arg(packageUuid.toString()));
+            .arg(packageUuid.toStr()));
     }
 }
 
 void DeviceInstance::init() throw (Exception)
 {
     // check pad-signal-map
-    foreach (const QUuid& signalUuid, mDevice->getPadSignalMap())
+    foreach (const Uuid& signalUuid, mDevice->getPadSignalMap())
     {
         if ((!signalUuid.isNull()) && (!mCompInstance->getSignalInstance(signalUuid)))
         {
-            throw RuntimeError(__FILE__, __LINE__, signalUuid.toString(),
+            throw RuntimeError(__FILE__, __LINE__, signalUuid.toStr(),
                 QString(tr("Unknown signal \"%1\" found in device \"%2\""))
-                .arg(signalUuid.toString(), mDevice->getUuid().toString()));
+                .arg(signalUuid.toStr(), mDevice->getUuid().toStr()));
         }
     }
 

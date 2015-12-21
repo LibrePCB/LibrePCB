@@ -36,7 +36,7 @@ namespace project {
 
 CmdSymbolInstanceAdd::CmdSymbolInstanceAdd(Schematic& schematic,
                                            ComponentInstance& genComp,
-                                           const QUuid& symbolItem, const Point& position,
+                                           const Uuid& symbolItem, const Point& position,
                                            const Angle& angle,
                                            UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Add symbol instance"), parent),

@@ -32,7 +32,7 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ComponentSymbolVariant::ComponentSymbolVariant(const QUuid& uuid, const QString& norm,
+ComponentSymbolVariant::ComponentSymbolVariant(const Uuid& uuid, const QString& norm,
                                                bool isDefault) noexcept :
     mUuid(uuid), mNorm(norm), mIsDefault(isDefault)
 {
@@ -44,7 +44,7 @@ ComponentSymbolVariant::ComponentSymbolVariant(const XmlDomElement& domElement) 
     try
     {
         // read attributes
-        mUuid = domElement.getAttribute<QUuid>("uuid");
+        mUuid = domElement.getAttribute<Uuid>("uuid");
         mNorm = domElement.getAttribute("norm");
         mIsDefault = domElement.getAttribute<bool>("default");
 
@@ -59,9 +59,9 @@ ComponentSymbolVariant::ComponentSymbolVariant(const XmlDomElement& domElement) 
             ComponentSymbolVariantItem* item = new ComponentSymbolVariantItem(*node);
             if (getItemByUuid(item->getUuid()))
             {
-                throw RuntimeError(__FILE__, __LINE__, item->getUuid().toString(),
+                throw RuntimeError(__FILE__, __LINE__, item->getUuid().toStr(),
                     QString(tr("The symbol variant item \"%1\" exists multiple times in \"%2\"."))
-                    .arg(item->getUuid().toString(), domElement.getDocFilePath().toNative()));
+                    .arg(item->getUuid().toStr(), domElement.getDocFilePath().toNative()));
             }
             mSymbolItems.append(item);
         }
@@ -94,7 +94,7 @@ QString ComponentSymbolVariant::getDescription(const QStringList& localeOrder) c
     return LibraryBaseElement::localeStringFromList(mDescriptions, localeOrder);
 }
 
-const ComponentSymbolVariantItem* ComponentSymbolVariant::getItemByUuid(const QUuid& uuid) const noexcept
+const ComponentSymbolVariantItem* ComponentSymbolVariant::getItemByUuid(const Uuid& uuid) const noexcept
 {
     foreach (const ComponentSymbolVariantItem* item, mSymbolItems)
     {

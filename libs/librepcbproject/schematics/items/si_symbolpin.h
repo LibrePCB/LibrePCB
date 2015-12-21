@@ -63,13 +63,13 @@ class SI_SymbolPin final : public SI_Base, public IF_ErcMsgProvider
     public:
 
         // Constructors / Destructor
-        explicit SI_SymbolPin(SI_Symbol& symbol, const QUuid& pinUuid);
+        explicit SI_SymbolPin(SI_Symbol& symbol, const Uuid& pinUuid);
         ~SI_SymbolPin();
 
         // Getters
         Project& getProject() const noexcept;
         Schematic& getSchematic() const noexcept;
-        const QUuid& getLibPinUuid() const noexcept;
+        const Uuid& getLibPinUuid() const noexcept;
         QString getDisplayText(bool returnGenCompSignalNameIfEmpty = false,
                                bool returnPinNameIfEmpty = false) const noexcept;
         SI_Symbol& getSymbol() const noexcept {return mSymbol;}

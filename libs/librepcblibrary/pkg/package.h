@@ -45,7 +45,7 @@ class Package final : public LibraryElement
     public:
 
         // Constructors / Destructor
-        explicit Package(const QUuid& uuid = QUuid::createUuid(),
+        explicit Package(const Uuid& uuid = Uuid::createRandom(),
                          const Version& version = Version(),
                          const QString& author = QString(),
                          const QString& name_en_US = QString(),
@@ -56,13 +56,13 @@ class Package final : public LibraryElement
 
         // Pads
         const QList<const PackagePad*>& getPads() const noexcept {return mPads;}
-        const PackagePad* getPadByUuid(const QUuid& uuid) const noexcept;
+        const PackagePad* getPadByUuid(const Uuid& uuid) const noexcept;
         void clearPads() noexcept;
         void addPad(const PackagePad& pad) noexcept;
 
         // Footprints
         const QList<const Footprint*>& getFootprints() const noexcept {return mFootprints;}
-        const Footprint* getFootprintByUuid(const QUuid& uuid) const noexcept;
+        const Footprint* getFootprintByUuid(const Uuid& uuid) const noexcept;
         void clearFootprints() noexcept;
         void addFootprint(const Footprint& footprint) noexcept;
 

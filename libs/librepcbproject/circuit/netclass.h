@@ -26,6 +26,7 @@
 
 #include <QtCore>
 #include "../erc/if_ercmsgprovider.h"
+#include <librepcbcommon/uuid.h>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 #include <librepcbcommon/exceptions.h>
 
@@ -61,7 +62,7 @@ class NetClass final : public IF_ErcMsgProvider, public IF_XmlSerializableObject
         ~NetClass() noexcept;
 
         // Getters
-        const QUuid& getUuid() const noexcept {return mUuid;}
+        const Uuid& getUuid() const noexcept {return mUuid;}
         const QString& getName() const noexcept {return mName;}
         int getNetSignalCount() const noexcept {return mNetSignals.count();}
 
@@ -103,10 +104,10 @@ class NetClass final : public IF_ErcMsgProvider, public IF_XmlSerializableObject
         /// @brief the ERC message for unused netclasses
         ErcMsg* mErcMsgUnusedNetClass;
         /// @brief all registered netsignals
-        QHash<QUuid, NetSignal*> mNetSignals;
+        QHash<Uuid, NetSignal*> mNetSignals;
 
         // Attributes
-        QUuid mUuid;
+        Uuid mUuid;
         QString mName;
 };
 

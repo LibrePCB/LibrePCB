@@ -357,7 +357,7 @@ int Project::getSchematicIndex(const Schematic* schematic) const noexcept
     return mSchematics.indexOf(const_cast<Schematic*>(schematic));
 }
 
-Schematic* Project::getSchematicByUuid(const QUuid& uuid) const noexcept
+Schematic* Project::getSchematicByUuid(const Uuid& uuid) const noexcept
 {
     foreach (Schematic* schematic, mSchematics)
     {
@@ -393,9 +393,9 @@ void Project::addSchematic(Schematic* schematic, int newIndex) throw (Exception)
 
     if (getSchematicByUuid(schematic->getUuid()))
     {
-        throw RuntimeError(__FILE__, __LINE__, schematic->getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, schematic->getUuid().toStr(),
             QString(tr("There is already a schematic with the UUID \"%1\"!"))
-            .arg(schematic->getUuid().toString()));
+            .arg(schematic->getUuid().toStr()));
     }
 
     if (getSchematicByName(schematic->getName()))
@@ -473,7 +473,7 @@ int Project::getBoardIndex(const Board* board) const noexcept
     return mBoards.indexOf(const_cast<Board*>(board));
 }
 
-Board* Project::getBoardByUuid(const QUuid& uuid) const noexcept
+Board* Project::getBoardByUuid(const Uuid& uuid) const noexcept
 {
     foreach (Board* board, mBoards)
     {
@@ -509,9 +509,9 @@ void Project::addBoard(Board* board, int newIndex) throw (Exception)
 
     if (getBoardByUuid(board->getUuid()))
     {
-        throw RuntimeError(__FILE__, __LINE__, board->getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, board->getUuid().toStr(),
             QString(tr("There is already a board with the UUID \"%1\"!"))
-            .arg(board->getUuid().toString()));
+            .arg(board->getUuid().toStr()));
     }
 
     if (getBoardByName(board->getName()))

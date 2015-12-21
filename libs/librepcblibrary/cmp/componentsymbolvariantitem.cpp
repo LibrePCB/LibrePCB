@@ -33,8 +33,8 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ComponentSymbolVariantItem::ComponentSymbolVariantItem(const QUuid& uuid,
-                                                       const QUuid& symbolUuid,
+ComponentSymbolVariantItem::ComponentSymbolVariantItem(const Uuid& uuid,
+                                                       const Uuid& symbolUuid,
                                                        bool isRequired,
                                                        const QString& suffix) noexcept :
     mUuid(uuid), mSymbolUuid(symbolUuid), mIsRequired(isRequired), mSuffix(suffix)
@@ -45,8 +45,8 @@ ComponentSymbolVariantItem::ComponentSymbolVariantItem(const QUuid& uuid,
 ComponentSymbolVariantItem::ComponentSymbolVariantItem(const XmlDomElement& domElement) throw (Exception)
 {
     // read attributes
-    mUuid = domElement.getAttribute<QUuid>("uuid");
-    mSymbolUuid = domElement.getAttribute<QUuid>("symbol");
+    mUuid = domElement.getAttribute<Uuid>("uuid");
+    mSymbolUuid = domElement.getAttribute<Uuid>("symbol");
     mIsRequired = domElement.getAttribute<bool>("required");
     mSuffix = domElement.getAttribute("suffix");
 
@@ -55,12 +55,12 @@ ComponentSymbolVariantItem::ComponentSymbolVariantItem(const XmlDomElement& domE
          node; node = node->getNextSibling("map"))
     {
         PinSignalMapItem_t item;
-        item.pin = node->getAttribute<QUuid>("pin");
+        item.pin = node->getAttribute<Uuid>("pin");
         if (mPinSignalMap.contains(item.pin))
         {
-            throw RuntimeError(__FILE__, __LINE__, item.pin.toString(),
+            throw RuntimeError(__FILE__, __LINE__, item.pin.toStr(),
                 QString(tr("The pin \"%1\" is assigned to multiple signals in \"%2\"."))
-                .arg(item.pin.toString(), domElement.getDocFilePath().toNative()));
+                .arg(item.pin.toStr(), domElement.getDocFilePath().toNative()));
         }
         if (node->getAttribute("display") == "none")
             item.displayType = PinDisplayType_t::None;
@@ -76,7 +76,7 @@ ComponentSymbolVariantItem::ComponentSymbolVariantItem(const XmlDomElement& domE
                 QString(tr("Invalid pin display type \"%1\" found in \"%2\"."))
                 .arg(node->getAttribute("display"), domElement.getDocFilePath().toNative()));
         }
-        item.signal = node->getText<QUuid>(false);
+        item.signal = node->getText<Uuid>(false);
         mPinSignalMap.insert(item.pin, item);
     }
 
@@ -91,15 +91,15 @@ ComponentSymbolVariantItem::~ComponentSymbolVariantItem() noexcept
  *  Getters
  ****************************************************************************************/
 
-QUuid ComponentSymbolVariantItem::getSignalOfPin(const QUuid& pinUuid) const noexcept
+Uuid ComponentSymbolVariantItem::getSignalOfPin(const Uuid& pinUuid) const noexcept
 {
     if (mPinSignalMap.contains(pinUuid))
         return mPinSignalMap.value(pinUuid).signal;
     else
-        return QUuid();
+        return Uuid();
 }
 
-ComponentSymbolVariantItem::PinDisplayType_t ComponentSymbolVariantItem::getDisplayTypeOfPin(const QUuid& pinUuid) const noexcept
+ComponentSymbolVariantItem::PinDisplayType_t ComponentSymbolVariantItem::getDisplayTypeOfPin(const Uuid& pinUuid) const noexcept
 {
     if (mPinSignalMap.contains(pinUuid))
         return mPinSignalMap.value(pinUuid).displayType;
@@ -111,7 +111,7 @@ ComponentSymbolVariantItem::PinDisplayType_t ComponentSymbolVariantItem::getDisp
  *  General Methods
  ****************************************************************************************/
 
-void ComponentSymbolVariantItem::addPinSignalMapping(const QUuid& pin, const QUuid& signal, PinDisplayType_t display) noexcept
+void ComponentSymbolVariantItem::addPinSignalMapping(const Uuid& pin, const Uuid& signal, PinDisplayType_t display) noexcept
 {
     mPinSignalMap.insert(pin, PinSignalMapItem_t{pin, signal, display});
 }
@@ -138,7 +138,7 @@ XmlDomElement* ComponentSymbolVariantItem::serializeToXmlDomElement() const thro
             case PinDisplayType_t::NetSignal:       child->setAttribute<QString>("display", "net_signal"); break;
             default: throw LogicError(__FILE__, __LINE__);
         }
-        child->setText(item.signal.isNull() ? QString() : item.signal.toString());
+        child->setText(item.signal);
     }
     return root.take();
 }

@@ -25,6 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <librepcbcommon/uuid.h>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 #include <librepcbcommon/exceptions.h>
 #include <librepcbcommon/fileio/filepath.h>
@@ -84,16 +85,16 @@ class Circuit final : public QObject, public IF_XmlSerializableObject
         Project& getProject() const noexcept {return mProject;}
 
         // NetClass Methods
-        const QHash<QUuid, NetClass*>& getNetClasses() const noexcept {return mNetClasses;}
-        NetClass* getNetClassByUuid(const QUuid& uuid) const noexcept;
+        const QHash<Uuid, NetClass*>& getNetClasses() const noexcept {return mNetClasses;}
+        NetClass* getNetClassByUuid(const Uuid& uuid) const noexcept;
         NetClass* getNetClassByName(const QString& name) const noexcept;
         void addNetClass(NetClass& netclass) throw (Exception);
         void removeNetClass(NetClass& netclass) throw (Exception);
         void setNetClassName(NetClass& netclass, const QString& newName) throw (Exception);
 
         // NetSignal Methods
-        const QHash<QUuid, NetSignal*>& getNetSignals() const noexcept {return mNetSignals;}
-        NetSignal* getNetSignalByUuid(const QUuid& uuid) const noexcept;
+        const QHash<Uuid, NetSignal*>& getNetSignals() const noexcept {return mNetSignals;}
+        NetSignal* getNetSignalByUuid(const Uuid& uuid) const noexcept;
         NetSignal* getNetSignalByName(const QString& name) const noexcept;
         NetSignal* createNetSignal(NetClass& netclass, QString name = QString()) throw (Exception);
         void addNetSignal(NetSignal& netsignal) throw (Exception);
@@ -101,8 +102,8 @@ class Circuit final : public QObject, public IF_XmlSerializableObject
         void setNetSignalName(NetSignal& netsignal, const QString& newName, bool isAutoName) throw (Exception);
 
         // ComponentInstance Methods
-        const QHash<QUuid, ComponentInstance*>& getComponentInstances() const noexcept {return mComponentInstances;}
-        ComponentInstance* getComponentInstanceByUuid(const QUuid& uuid) const noexcept;
+        const QHash<Uuid, ComponentInstance*>& getComponentInstances() const noexcept {return mComponentInstances;}
+        ComponentInstance* getComponentInstanceByUuid(const Uuid& uuid) const noexcept;
         ComponentInstance* getComponentInstanceByName(const QString& name) const noexcept;
         ComponentInstance* createComponentInstance(const library::Component& cmp,
                                                  const library::ComponentSymbolVariant& symbVar,
@@ -148,9 +149,9 @@ class Circuit final : public QObject, public IF_XmlSerializableObject
         FilePath mXmlFilepath;
         SmartXmlFile* mXmlFile;
 
-        QHash<QUuid, NetClass*> mNetClasses;
-        QHash<QUuid, NetSignal*> mNetSignals;
-        QHash<QUuid, ComponentInstance*> mComponentInstances;
+        QHash<Uuid, NetClass*> mNetClasses;
+        QHash<Uuid, NetSignal*> mNetSignals;
+        QHash<Uuid, ComponentInstance*> mComponentInstances;
 };
 
 } // namespace project

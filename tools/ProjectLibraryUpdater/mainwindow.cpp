@@ -88,12 +88,12 @@ void MainWindow::on_pushButton_2_clicked()
             for (XmlDomElement* node = circuitDoc->getRoot().getFirstChild("component_instances/*", true, false);
                  node; node = node->getNextSibling())
             {
-                QUuid compUuid = node->getAttribute<QUuid>("component", true);
+                Uuid compUuid = node->getAttribute<Uuid>("component", true);
                 FilePath filepath = lib.getLatestComponent(compUuid);
                 if (!filepath.isValid())
                 {
                     throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
-                        QString("missing component: %1").arg(compUuid.toString()));
+                        QString("missing component: %1").arg(compUuid.toStr()));
                 }
                 // copy component
                 Component latestComp(filepath);
@@ -106,12 +106,12 @@ void MainWindow::on_pushButton_2_clicked()
                 {
                     foreach (const ComponentSymbolVariantItem* item, symbvar->getItems())
                     {
-                        QUuid symbolUuid = item->getSymbolUuid();
+                        Uuid symbolUuid = item->getSymbolUuid();
                         FilePath filepath = lib.getLatestSymbol(symbolUuid);
                         if (!filepath.isValid())
                         {
                             throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
-                                QString("missing symbol: %1").arg(symbolUuid.toString()));
+                                QString("missing symbol: %1").arg(symbolUuid.toStr()));
                         }
                         Symbol latestSymbol(filepath);
                         FilePath dest = projectFilepath.getParentDir().getPathTo("library/sym");
@@ -132,12 +132,12 @@ void MainWindow::on_pushButton_2_clicked()
                 for (XmlDomElement* node = boardDoc->getRoot().getFirstChild("device_instances/*", true, false);
                      node; node = node->getNextSibling())
                 {
-                    QUuid deviceUuid = node->getAttribute<QUuid>("device", true);
+                    Uuid deviceUuid = node->getAttribute<Uuid>("device", true);
                     FilePath filepath = lib.getLatestDevice(deviceUuid);
                     if (!filepath.isValid())
                     {
                         throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
-                            QString("missing device: %1").arg(deviceUuid.toString()));
+                            QString("missing device: %1").arg(deviceUuid.toStr()));
                     }
                     // copy device
                     Device latestDevice(filepath);
@@ -146,12 +146,12 @@ void MainWindow::on_pushButton_2_clicked()
                     ui->log->addItem(latestDevice.getDirectory().toNative());
 
                     // get package
-                    QUuid packUuid = latestDevice.getPackageUuid();
+                    Uuid packUuid = latestDevice.getPackageUuid();
                     filepath = lib.getLatestPackage(packUuid);
                     if (!filepath.isValid())
                     {
                         throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
-                            QString("missing package: %1").arg(packUuid.toString()));
+                            QString("missing package: %1").arg(packUuid.toStr()));
                     }
                     // copy package
                     Package latestPackage(filepath);

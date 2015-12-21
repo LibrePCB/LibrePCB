@@ -52,7 +52,7 @@ SEE_StartAddComponent::SEE_StartAddComponent() :
 {
 }
 
-SEE_StartAddComponent::SEE_StartAddComponent(const QUuid& genComp, const QUuid& symbVar) :
+SEE_StartAddComponent::SEE_StartAddComponent(const Uuid& genComp, const Uuid& symbVar) :
     SEE_Base(EventType_t::StartAddComponent), mGenCompUuid(genComp), mSymbVarUuid(symbVar)
 {
 }

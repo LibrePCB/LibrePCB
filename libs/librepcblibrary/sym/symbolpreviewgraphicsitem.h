@@ -26,6 +26,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
+#include <librepcbcommon/uuid.h>
 #include <librepcbcommon/graphics/graphicsitem.h>
 #include <librepcbcommon/if_attributeprovider.h>
 
@@ -64,8 +65,8 @@ class SymbolPreviewGraphicsItem final : public GraphicsItem, public IF_Attribute
                                            const QStringList& localeOrder,
                                            const Symbol& symbol,
                                            const Component* genComp = nullptr,
-                                           const QUuid& symbVarUuid = QUuid(),
-                                           const QUuid& symbVarItemUuid = QUuid()) noexcept;
+                                           const Uuid& symbVarUuid = Uuid(),
+                                           const Uuid& symbVarItemUuid = Uuid()) noexcept;
         ~SymbolPreviewGraphicsItem() noexcept;
 
         // Setters

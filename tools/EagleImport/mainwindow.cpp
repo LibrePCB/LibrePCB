@@ -69,7 +69,7 @@ void MainWindow::addError(const QString& msg, const FilePath& inputFile, int inp
     ui->errors->addItem(QString("%1 (%2:%3)").arg(msg).arg(inputFile.toNative()).arg(inputLine));
 }
 
-QUuid MainWindow::getOrCreateUuid(QSettings& outputSettings, const FilePath& filepath,
+Uuid MainWindow::getOrCreateUuid(QSettings& outputSettings, const FilePath& filepath,
                                   const QString& cat, const QString& key1, const QString& key2)
 {
     QString allowedChars("_-.0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
@@ -85,16 +85,16 @@ QUuid MainWindow::getOrCreateUuid(QSettings& outputSettings, const FilePath& fil
     }
     settingsKey.prepend(cat % '/');
 
-    QUuid uuid = QUuid::createUuid();
+    Uuid uuid = Uuid::createRandom();
     QString value = outputSettings.value(settingsKey).toString();
-    if (!value.isEmpty()) uuid = QUuid(value); //QUuid(QString("{%1}").arg(value));
+    if (!value.isEmpty()) uuid = Uuid(value); //Uuid(QString("{%1}").arg(value));
 
     if (uuid.isNull())
     {
         addError("Invalid UUID in *.ini file: " % settingsKey, filepath);
-        return QUuid::createUuid();
+        return Uuid::createRandom();
     }
-    outputSettings.setValue(settingsKey, uuid.toString());
+    outputSettings.setValue(settingsKey, uuid.toStr());
     return uuid;
 }
 
@@ -193,7 +193,7 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
     {
         QString name = node->getAttribute("name", true);
         QString desc = createDescription(filepath, name);
-        QUuid uuid = getOrCreateUuid(outputSettings, filepath, "symbols", name);
+        Uuid uuid = getOrCreateUuid(outputSettings, filepath, "symbols", name);
         bool rotate180 = false;
         if (filepath.getFilename() == "con-lsta.lbr" && name.startsWith("FE")) rotate180 = true;
         if (filepath.getFilename() == "con-lstb.lbr" && name.startsWith("MA")) rotate180 = true;
@@ -328,7 +328,7 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
             }
             else if (child->getName() == "pin")
             {
-                QUuid pinUuid = getOrCreateUuid(outputSettings, filepath, "symbol_pins", uuid.toString(), child->getAttribute("name"));
+                Uuid pinUuid = getOrCreateUuid(outputSettings, filepath, "symbol_pins", uuid.toStr(), child->getAttribute("name"));
                 SymbolPin* pin = new SymbolPin(pinUuid, child->getAttribute("name"));
                 Point pos = Point(child->getAttribute<Length>("x"), child->getAttribute<Length>("y"));
                 Length len(7620000);
@@ -393,11 +393,11 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
         //if (filepath.getFilename() == "con-lstb.lbr" && name.startsWith("MA")) rotate180 = true;
 
         // create package
-        QUuid pkgUuid = getOrCreateUuid(outputSettings, filepath, "packages_to_packages", name);
+        Uuid pkgUuid = getOrCreateUuid(outputSettings, filepath, "packages_to_packages", name);
         Package* package = new Package(pkgUuid, Version("0.1"), "LibrePCB", name, desc);
 
         // create default footprint
-        QUuid fptUuid = getOrCreateUuid(outputSettings, filepath, "packages_to_footprints", name);
+        Uuid fptUuid = getOrCreateUuid(outputSettings, filepath, "packages_to_footprints", name);
         Footprint* footprint = new Footprint(fptUuid, "default", "", true);
 
         for (XmlDomElement* child = node->getFirstChild(); child; child = child->getNextSibling())
@@ -575,7 +575,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
             }
             else if (child->getName() == "pad")
             {
-                QUuid padUuid = getOrCreateUuid(outputSettings, filepath, "package_pads", fptUuid.toString(), child->getAttribute("name"));
+                Uuid padUuid = getOrCreateUuid(outputSettings, filepath, "package_pads", fptUuid.toStr(), child->getAttribute("name"));
                 // add package pad
                 PackagePad* pkgPad = new PackagePad(padUuid, child->getAttribute("name"));
                 package->addPad(*pkgPad);
@@ -627,7 +627,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
             }
             else if (child->getName() == "smd")
             {
-                QUuid padUuid = getOrCreateUuid(outputSettings, filepath, "package_pads", fptUuid.toString(), child->getAttribute("name"));
+                Uuid padUuid = getOrCreateUuid(outputSettings, filepath, "package_pads", fptUuid.toStr(), child->getAttribute("name"));
                 // add package pad
                 PackagePad* pkgPad = new PackagePad(padUuid, child->getAttribute("name"));
                 package->addPad(*pkgPad);
@@ -700,7 +700,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
         // abort if device name ends with "-US"
         if (name.endsWith("-US")) return false;
 
-        QUuid uuid = getOrCreateUuid(outputSettings, filepath, "devices_to_components", name);
+        Uuid uuid = getOrCreateUuid(outputSettings, filepath, "devices_to_components", name);
         QString desc = node->getFirstChild("description", false) ? node->getFirstChild("description", true)->getText() : "";
         desc.append(createDescription(filepath, name));
 
@@ -712,7 +712,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
         component->addPrefix("", node->hasAttribute("prefix") ? node->getAttribute("prefix") : "", true);
 
         // symbol variant
-        QUuid symbVarUuid = getOrCreateUuid(outputSettings, filepath, "component_symbolvariants", uuid.toString());
+        Uuid symbVarUuid = getOrCreateUuid(outputSettings, filepath, "component_symbolvariants", uuid.toStr());
         ComponentSymbolVariant* symbvar = new ComponentSymbolVariant(symbVarUuid, QString(), true);
         symbvar->setName("en_US", "default");
         symbvar->setDescription("en_US", "");
@@ -727,7 +727,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
             QString pinName = connect->getAttribute("pin");
             if (pinName.contains("@")) pinName.truncate(pinName.indexOf("@"));
             if (pinName.contains("#")) pinName.truncate(pinName.indexOf("#"));
-            QUuid signalUuid = getOrCreateUuid(outputSettings, filepath, "gatepins_to_componentsignals", uuid.toString(), gateName % pinName);
+            Uuid signalUuid = getOrCreateUuid(outputSettings, filepath, "gatepins_to_componentsignals", uuid.toStr(), gateName % pinName);
 
             if (!component->getSignalByUuid(signalUuid))
             {
@@ -742,10 +742,10 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
         {
             QString gateName = gate->getAttribute("name");
             QString symbolName = gate->getAttribute("symbol");
-            QUuid symbolUuid = getOrCreateUuid(outputSettings, filepath, "symbols", symbolName);
+            Uuid symbolUuid = getOrCreateUuid(outputSettings, filepath, "symbols", symbolName);
 
             // create symbol variant item
-            QUuid symbVarItemUuid = getOrCreateUuid(outputSettings, filepath, "symbolgates_to_symbvaritems", uuid.toString(), gateName);
+            Uuid symbVarItemUuid = getOrCreateUuid(outputSettings, filepath, "symbolgates_to_symbvaritems", uuid.toStr(), gateName);
             ComponentSymbolVariantItem* item = new ComponentSymbolVariantItem(symbVarItemUuid, symbolUuid, true, (gateName == "G$1") ? "" : gateName);
 
             // connect pins
@@ -755,10 +755,10 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
                 if (connect->getAttribute("gate") == gateName)
                 {
                     QString pinName = connect->getAttribute("pin");
-                    QUuid pinUuid = getOrCreateUuid(outputSettings, filepath, "symbol_pins", symbolUuid.toString(), pinName);
+                    Uuid pinUuid = getOrCreateUuid(outputSettings, filepath, "symbol_pins", symbolUuid.toStr(), pinName);
                     if (pinName.contains("@")) pinName.truncate(pinName.indexOf("@"));
                     if (pinName.contains("#")) pinName.truncate(pinName.indexOf("#"));
-                    QUuid signalUuid = getOrCreateUuid(outputSettings, filepath, "gatepins_to_componentsignals", uuid.toString(), gateName % pinName);
+                    Uuid signalUuid = getOrCreateUuid(outputSettings, filepath, "gatepins_to_componentsignals", uuid.toStr(), gateName % pinName);
                     item->addPinSignalMapping(pinUuid, signalUuid, ComponentSymbolVariantItem::PinDisplayType_t::ComponentSignal);
                 }
             }
@@ -773,10 +773,10 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
 
             QString deviceName = deviceNode->getAttribute("name");
             QString packageName = deviceNode->getAttribute("package");
-            QUuid pkgUuid = getOrCreateUuid(outputSettings, filepath, "packages_to_packages", packageName);
-            QUuid fptUuid = getOrCreateUuid(outputSettings, filepath, "packages_to_footprints", packageName);
+            Uuid pkgUuid = getOrCreateUuid(outputSettings, filepath, "packages_to_packages", packageName);
+            Uuid fptUuid = getOrCreateUuid(outputSettings, filepath, "packages_to_footprints", packageName);
 
-            QUuid compUuid = getOrCreateUuid(outputSettings, filepath, "devices_to_devices", name, deviceName);
+            Uuid compUuid = getOrCreateUuid(outputSettings, filepath, "devices_to_devices", name, deviceName);
             QString compName = deviceName.isEmpty() ? name : QString("%1_%2").arg(name, deviceName);
             Device* device = new Device(compUuid, Version("0.1"), "LibrePCB", compName, desc);
             device->setComponentUuid(component->getUuid());
@@ -798,8 +798,8 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
                 }
                 foreach (const QString& padName, padNames.split(" ", QString::SkipEmptyParts))
                 {
-                    QUuid padUuid = getOrCreateUuid(outputSettings, filepath, "package_pads", fptUuid.toString(), padName);
-                    QUuid signalUuid = getOrCreateUuid(outputSettings, filepath, "gatepins_to_componentsignals", uuid.toString(), gateName % pinName);
+                    Uuid padUuid = getOrCreateUuid(outputSettings, filepath, "package_pads", fptUuid.toStr(), padName);
+                    Uuid signalUuid = getOrCreateUuid(outputSettings, filepath, "gatepins_to_componentsignals", uuid.toStr(), gateName % pinName);
                     device->addPadSignalMapping(padUuid, signalUuid);
                 }
             }
@@ -918,7 +918,7 @@ void MainWindow::on_toolButton_4_clicked()
             QDir repoSubDir = repoDir.absoluteFilePath(subdir2);
             foreach (const QString& elementDir, repoSubDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot))
             {
-                QUuid elementUuid(elementDir);
+                Uuid elementUuid(elementDir);
                 if (elementUuid.isNull()) continue;
 
                 QDir outDirElement = outDir.absoluteFilePath(subdir2 % "/" % elementDir);

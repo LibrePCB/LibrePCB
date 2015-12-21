@@ -42,10 +42,10 @@ NetSignal::NetSignal(const Circuit& circuit,
     QObject(0), mCircuit(circuit), mAddedToCircuit(false), mErcMsgUnusedNetSignal(nullptr),
     mErcMsgConnectedToLessThanTwoPins(nullptr), mGenCompSignalWithForcedNameCount(0),
     // load attributes
-    mUuid(domElement.getAttribute<QUuid>("uuid")),
+    mUuid(domElement.getAttribute<Uuid>("uuid")),
     mName(domElement.getAttribute("name", true)),
     mHasAutoName(domElement.getAttribute<bool>("auto_name")),
-    mNetClass(circuit.getNetClassByUuid(domElement.getAttribute<QUuid>("netclass")))
+    mNetClass(circuit.getNetClassByUuid(domElement.getAttribute<Uuid>("netclass")))
 {
     if (!mNetClass)
     {
@@ -62,7 +62,7 @@ NetSignal::NetSignal(const Circuit& circuit, NetClass& netclass,
     QObject(0), mCircuit(circuit), mAddedToCircuit(false), mErcMsgUnusedNetSignal(nullptr),
     mErcMsgConnectedToLessThanTwoPins(nullptr), mGenCompSignalWithForcedNameCount(0),
     // load default attributes
-    mUuid(QUuid::createUuid()), // generate random UUID
+    mUuid(Uuid::createRandom()), // generate random UUID
     mName(name),
     mHasAutoName(autoName),
     mNetClass(&netclass)
@@ -211,7 +211,7 @@ void NetSignal::updateErcMessages() noexcept
         if (!mErcMsgUnusedNetSignal)
         {
             mErcMsgUnusedNetSignal = new ErcMsg(mCircuit.getProject(), *this,
-                mUuid.toString(), "Unused", ErcMsg::ErcMsgType_t::CircuitError, QString());
+                mUuid.toStr(), "Unused", ErcMsg::ErcMsgType_t::CircuitError, QString());
         }
         mErcMsgUnusedNetSignal->setMsg(QString(tr("Unused net signal: \"%1\"")).arg(mName));
         mErcMsgUnusedNetSignal->setVisible(true);
@@ -227,7 +227,7 @@ void NetSignal::updateErcMessages() noexcept
         if (!mErcMsgConnectedToLessThanTwoPins)
         {
             mErcMsgConnectedToLessThanTwoPins = new ErcMsg(mCircuit.getProject(), *this,
-                mUuid.toString(), "ConnectedToLessThanTwoPins", ErcMsg::ErcMsgType_t::CircuitWarning);
+                mUuid.toStr(), "ConnectedToLessThanTwoPins", ErcMsg::ErcMsgType_t::CircuitWarning);
         }
         mErcMsgConnectedToLessThanTwoPins->setMsg(
             QString(tr("Net signal connected to less than two pins: \"%1\"")).arg(mName));

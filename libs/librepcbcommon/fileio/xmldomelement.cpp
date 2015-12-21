@@ -25,6 +25,7 @@
 #include "xmldomelement.h"
 #include "xmldomdocument.h"
 #include "../units/all_length_units.h"
+#include "../uuid.h"
 #include "../version.h"
 #include "../alignment.h"
 
@@ -103,6 +104,40 @@ void XmlDomElement::setText(const QString& text) noexcept
     mText = text;
 }
 
+/// @cond SPECIALIZED_TEMPLATE_IMPLELEMTATIONS
+
+template <>
+void XmlDomElement::setText<bool>(const bool& value) noexcept
+{
+    setText(value ? QString("true") : QString("false"));
+}
+
+template <>
+void XmlDomElement::setText<QDateTime>(const QDateTime& value) noexcept
+{
+    setText(value.toUTC().toString(Qt::ISODate));
+}
+
+template <>
+void XmlDomElement::setText<Uuid>(const Uuid& value) noexcept
+{
+    setText(value.toStr());
+}
+
+template <>
+void XmlDomElement::setText<Version>(const Version& value) noexcept
+{
+    setText(value.toStr());
+}
+
+template <>
+void XmlDomElement::setText<Length>(const Length& value) noexcept
+{
+    setText(value.toMmString());
+}
+
+/// @endcond
+
 const QString& XmlDomElement::getText(bool throwIfEmpty) const throw (Exception)
 {
     if (hasChilds())
@@ -138,22 +173,6 @@ bool XmlDomElement::getText<bool>(bool throwIfEmpty, const bool& defaultValue) c
 }
 
 template <>
-QUuid XmlDomElement::getText<QUuid>(bool throwIfEmpty, const QUuid& defaultValue) const throw (Exception)
-{
-    QString text = getText(throwIfEmpty);
-    QUuid obj(text);
-    if (!obj.isNull())
-        return obj;
-    else if ((text.isEmpty()) && (!throwIfEmpty))
-        return defaultValue;
-    else
-    {
-        throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, text,
-                             QString(tr("Invalid UUID in node \"%1\".")).arg(mName));
-    }
-}
-
-template <>
 QDateTime XmlDomElement::getText<QDateTime>(bool throwIfEmpty, const QDateTime& defaultValue) const throw (Exception)
 {
     QString text = getText(throwIfEmpty);
@@ -166,6 +185,22 @@ QDateTime XmlDomElement::getText<QDateTime>(bool throwIfEmpty, const QDateTime& 
     {
         throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, text,
                              QString(tr("Invalid date/time in node \"%1\".")).arg(mName));
+    }
+}
+
+template <>
+Uuid XmlDomElement::getText<Uuid>(bool throwIfEmpty, const Uuid& defaultValue) const throw (Exception)
+{
+    QString text = getText(throwIfEmpty);
+    Uuid obj(text);
+    if (!obj.isNull())
+        return obj;
+    else if ((text.isEmpty()) && (!throwIfEmpty))
+        return defaultValue;
+    else
+    {
+        throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, text,
+                             QString(tr("Invalid UUID in node \"%1\".")).arg(mName));
     }
 }
 
@@ -245,9 +280,9 @@ void XmlDomElement::setAttribute(const QString& name, const uint& value) noexcep
 }
 
 template <>
-void XmlDomElement::setAttribute(const QString& name, const QUuid& value) noexcept
+void XmlDomElement::setAttribute(const QString& name, const Uuid& value) noexcept
 {
-    setAttribute<QString>(name, value.isNull() ? "" : value.toString());
+    setAttribute<QString>(name, value.isNull() ? "" : value.toStr());
 }
 
 template <>
@@ -350,10 +385,10 @@ int XmlDomElement::getAttribute<int>(const QString& name, bool throwIfEmpty, con
 }
 
 template <>
-QUuid XmlDomElement::getAttribute<QUuid>(const QString& name, bool throwIfEmpty, const QUuid& defaultValue) const throw (Exception)
+Uuid XmlDomElement::getAttribute<Uuid>(const QString& name, bool throwIfEmpty, const Uuid& defaultValue) const throw (Exception)
 {
     QString attr = getAttribute(name, throwIfEmpty);
-    QUuid obj(attr);
+    Uuid obj(attr);
     if (!obj.isNull())
         return obj;
     else if ((attr.isEmpty()) && (!throwIfEmpty))
@@ -508,9 +543,15 @@ XmlDomElement* XmlDomElement::appendTextChild(const QString& name, const QDateTi
 }
 
 template <>
-XmlDomElement* XmlDomElement::appendTextChild(const QString& name, const QUuid& value) noexcept
+XmlDomElement* XmlDomElement::appendTextChild(const QString& name, const Uuid& value) noexcept
 {
-    return appendTextChild<QString>(name, value.isNull() ? "" : value.toString());
+    return appendTextChild<QString>(name, value.isNull() ? "" : value.toStr());
+}
+
+template <>
+XmlDomElement* XmlDomElement::appendTextChild(const QString& name, const Version& value) noexcept
+{
+    return appendTextChild<QString>(name, value.toStr());
 }
 
 /// @endcond

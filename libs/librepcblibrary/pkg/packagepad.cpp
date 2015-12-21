@@ -31,7 +31,7 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-PackagePad::PackagePad(const QUuid& uuid, const QString& name) noexcept :
+PackagePad::PackagePad(const Uuid& uuid, const QString& name) noexcept :
     mUuid(uuid), mName(name)
 {
     Q_ASSERT(mUuid.isNull() == false);
@@ -41,7 +41,7 @@ PackagePad::PackagePad(const XmlDomElement& domElement) throw (Exception) :
     mUuid()
 {
     // read attributes
-    mUuid = domElement.getAttribute<QUuid>("uuid");
+    mUuid = domElement.getAttribute<Uuid>("uuid");
     mName = domElement.getText(true);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);

@@ -238,8 +238,8 @@ SES_Base::ProcRetVal SES_AddComponents::processSceneEvent(SEE_Base* event) noexc
                         else
                         {
                             // all symbols placed, start adding the next component
-                            QUuid genCompUuid = mGenComp->getUuid();
-                            QUuid symbVarUuid = mGenCompSymbVar->getUuid();
+                            Uuid genCompUuid = mGenComp->getUuid();
+                            Uuid symbVarUuid = mGenCompSymbVar->getUuid();
                             mUndoStack.endCommand();
                             mIsUndoCmdActive = false;
                             abortCommand(false); // reset attributes
@@ -283,7 +283,7 @@ SES_Base::ProcRetVal SES_AddComponents::processSceneEvent(SEE_Base* event) noexc
     return PassToParentState;
 }
 
-void SES_AddComponents::startAddingComponent(const QUuid& genComp, const QUuid& symbVar) throw (Exception)
+void SES_AddComponents::startAddingComponent(const Uuid& genComp, const Uuid& symbVar) throw (Exception)
 {
     Schematic* schematic = mEditor.getActiveSchematic();
     Q_ASSERT(schematic); if (!schematic) throw LogicError(__FILE__, __LINE__);
@@ -305,7 +305,7 @@ void SES_AddComponents::startAddingComponent(const QUuid& genComp, const QUuid& 
 
             // open the XML file
             library::Component* genComp = new library::Component(mAddGenCompDialog->getSelectedGenCompFilePath());
-            QUuid genCompUuid = genComp->getUuid();
+            Uuid genCompUuid = genComp->getUuid();
             Version genCompVersion = genComp->getVersion();
             delete genComp;
 
@@ -330,7 +330,7 @@ void SES_AddComponents::startAddingComponent(const QUuid& genComp, const QUuid& 
                 {
                     throw RuntimeError(__FILE__, __LINE__, QString(),
                         QString(tr("Generic Component not found in library: %1"))
-                        .arg(genCompUuid.toString()));
+                        .arg(genCompUuid.toStr()));
                 }
                 mGenComp = new library::Component(genCmpFp);
                 auto cmd = new CmdProjectLibraryAddElement<library::Component>(
@@ -351,25 +351,25 @@ void SES_AddComponents::startAddingComponent(const QUuid& genComp, const QUuid& 
         {
             throw LogicError(__FILE__, __LINE__, QString(),
                 QString(tr("The generic component \"%1\" was not found in the "
-                "project's library.")).arg(genComp.toString()));
+                "project's library.")).arg(genComp.toStr()));
         }
         if (!mGenCompSymbVar)
         {
             throw LogicError(__FILE__, __LINE__, QString(), QString(
-                tr("Invalid symbol variant: \"%1\"")).arg(symbVar.toString()));
+                tr("Invalid symbol variant: \"%1\"")).arg(symbVar.toStr()));
         }
 
         // copy all required symbols to the project's library
         foreach (const library::ComponentSymbolVariantItem* item, mGenCompSymbVar->getItems())
         {
-            QUuid uuid = item->getSymbolUuid();
+            Uuid uuid = item->getSymbolUuid();
             if (!mProject.getLibrary().getSymbol(uuid))
             {
                 FilePath symbolFp = mWorkspace.getLibrary().getLatestSymbol(uuid);
                 if (!symbolFp.isValid())
                 {
                     throw RuntimeError(__FILE__, __LINE__, QString(),
-                        QString(tr("Symbol not found in library: %1")).arg(uuid.toString()));
+                        QString(tr("Symbol not found in library: %1")).arg(uuid.toStr()));
                 }
                 library::Symbol* symbol = new library::Symbol(symbolFp);
                 auto cmd = new CmdProjectLibraryAddElement<library::Symbol>(
@@ -394,9 +394,9 @@ void SES_AddComponents::startAddingComponent(const QUuid& genComp, const QUuid& 
         mCurrentSymbVarItem = mGenCompSymbVar->getItems().first();
         if (!mCurrentSymbVarItem)
         {
-            throw RuntimeError(__FILE__, __LINE__, symbVar.toString(),
+            throw RuntimeError(__FILE__, __LINE__, symbVar.toStr(),
                 QString(tr("The generic component with the UUID \"%1\" does not have "
-                           "any symbol.")).arg(genComp.toString()));
+                           "any symbol.")).arg(genComp.toStr()));
         }
         CmdSymbolInstanceAdd* cmd2 = new CmdSymbolInstanceAdd(*schematic,
             *(cmd->getComponentInstance()), mCurrentSymbVarItem->getUuid(), pos);
