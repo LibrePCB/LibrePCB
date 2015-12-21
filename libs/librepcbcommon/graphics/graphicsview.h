@@ -105,7 +105,7 @@ class GraphicsView final : public QGraphicsView
         bool mUseOpenGl;
 
         // Static Variables
-        static constexpr qreal sZoomStepFactor = 1.5;
+        static constexpr qreal sZoomStepFactor = 1.3;
 };
 
 #endif // GRAPHICSVIEW_H
