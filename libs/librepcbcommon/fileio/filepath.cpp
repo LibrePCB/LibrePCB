@@ -241,6 +241,10 @@ QString FilePath::makeWellFormatted(const QString& filepath) noexcept
     while ((newPath.endsWith("/")) && (newPath != "/")) // the last character is "/"
         newPath.chop(1); // remove the last character
 
+    // convert "." (current directory) to "" (especially required for Qt >= 5.5.1
+    // as QDir::relativeFilePath() now returns a dot instead of an empty string)
+    if (newPath == ".") newPath = QString("");
+
     return newPath;
 }
 
