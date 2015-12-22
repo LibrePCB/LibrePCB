@@ -193,6 +193,7 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
 
         // General Attributes
         mutable FilePath mDirectory;
+        mutable FilePath mVersionFilepath;
         mutable FilePath mXmlFilepath;
         QString mXmlFileNamePrefix;
         QString mXmlRootNodeName;

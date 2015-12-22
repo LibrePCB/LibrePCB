@@ -66,10 +66,9 @@ QSharedPointer<XmlDomDocument> SmartXmlFile::parseFileAndBuildDomTree(bool check
 
 void SmartXmlFile::save(const XmlDomDocument& domDocument, bool toOriginal) throw (Exception)
 {
-    // check if file version <= application's major version
-    Q_ASSERT(domDocument.getRoot().hasAttribute("version"));
-    Q_ASSERT(domDocument.getFileVersion() >= 0);
-    Q_ASSERT(domDocument.getFileVersion() <= APP_VERSION_MAJOR);
+    // check if file version <= application's major version (if available)
+    Q_ASSERT((!domDocument.hasFileVersion()) || (domDocument.getFileVersion() >= 0));
+    Q_ASSERT((!domDocument.hasFileVersion()) || (domDocument.getFileVersion() <= APP_VERSION_MAJOR));
 
     const FilePath& filepath = prepareSaveAndReturnFilePath(toOriginal);
     saveContentToFile(filepath, domDocument.toByteArray());

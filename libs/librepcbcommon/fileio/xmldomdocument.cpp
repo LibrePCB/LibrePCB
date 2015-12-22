@@ -73,6 +73,12 @@ XmlDomDocument::~XmlDomDocument() noexcept
  *  Getters
  ****************************************************************************************/
 
+bool XmlDomDocument::hasFileVersion() const noexcept
+{
+    Q_ASSERT(mRootElement != nullptr);
+    return mRootElement->hasAttribute("version");
+}
+
 int XmlDomDocument::getFileVersion() const throw (Exception)
 {
     Q_ASSERT(mRootElement != nullptr);

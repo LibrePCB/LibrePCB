@@ -23,6 +23,7 @@
 
 #include <QtCore>
 #include "librarybaseelement.h"
+#include <librepcbcommon/fileio/smarttextfile.h>
 #include <librepcbcommon/fileio/smartxmlfile.h>
 #include <librepcbcommon/fileio/xmldomdocument.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
@@ -39,9 +40,9 @@ LibraryBaseElement::LibraryBaseElement(const QString& xmlFileNamePrefix,
                                        const QString& name_en_US,
                                        const QString& description_en_US,
                                        const QString& keywords_en_US) throw (Exception) :
-    QObject(nullptr), mXmlFilepath(), mXmlFileNamePrefix(xmlFileNamePrefix),
-    mXmlRootNodeName(xmlRootNodeName), mDomTreeParsed(false),
-    mUuid(uuid), mVersion(version), mAuthor(author),
+    QObject(nullptr), mVersionFilepath(), mXmlFilepath(),
+    mXmlFileNamePrefix(xmlFileNamePrefix), mXmlRootNodeName(xmlRootNodeName),
+    mDomTreeParsed(false), mUuid(uuid), mVersion(version), mAuthor(author),
     mCreated(QDateTime::currentDateTime()), mLastModified(QDateTime::currentDateTime())
 {
     mNames.insert("en_US", name_en_US);
@@ -52,7 +53,7 @@ LibraryBaseElement::LibraryBaseElement(const QString& xmlFileNamePrefix,
 LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
                                        const QString& xmlFileNamePrefix,
                                        const QString& xmlRootNodeName) throw (Exception) :
-    QObject(0), mDirectory(elementDirectory), mXmlFilepath(),
+    QObject(0), mDirectory(elementDirectory), mVersionFilepath(), mXmlFilepath(),
     mXmlFileNamePrefix(xmlFileNamePrefix), mXmlRootNodeName(xmlRootNodeName),
     mDomTreeParsed(false)
 {
@@ -99,19 +100,26 @@ QStringList LibraryBaseElement::getAllAvailableLocales() const noexcept
 void LibraryBaseElement::save() const throw (Exception)
 {
     Q_ASSERT(mDirectory.isValid());
+    Q_ASSERT(mVersionFilepath.isValid());
     Q_ASSERT(mXmlFilepath.isValid());
+
+    // save xml file
     XmlDomDocument doc(*serializeToXmlDomElement());
-    QScopedPointer<SmartXmlFile> file(SmartXmlFile::create(mXmlFilepath));
-    file->save(doc, true);
-    // TODO: write version number into file
+    QScopedPointer<SmartXmlFile> xmlFile(SmartXmlFile::create(mXmlFilepath));
+    xmlFile->save(doc, true);
+
+    // save version number file
+    QScopedPointer<SmartTextFile> versionFile(SmartTextFile::create(mVersionFilepath));
+    versionFile->setContent(QString::number(APP_VERSION_MAJOR).toUtf8());
+    versionFile->save(true);
 }
 
 void LibraryBaseElement::saveTo(const FilePath& parentDir) const throw (Exception)
 {
     QString dirname = QString("%1.%2").arg(mUuid.toStr()).arg(mXmlFileNamePrefix);
     mDirectory = parentDir.getPathTo(dirname);
-    QString filename = QString("%1.xml").arg(mXmlFileNamePrefix);
-    mXmlFilepath = mDirectory.getPathTo(filename);
+    mVersionFilepath = mDirectory.getPathTo("version");
+    mXmlFilepath = mDirectory.getPathTo(QString("%1.xml").arg(mXmlFileNamePrefix));
     save();
 }
 
@@ -132,15 +140,30 @@ void LibraryBaseElement::readFromFile() throw (Exception)
             .arg(mDirectory.toNative()));
     }
 
-    // TODO: read version number from file!
-
-    // find the xml file with the highest file version number
-    QString filename = QString("%1.xml").arg(mXmlFileNamePrefix);
-    mXmlFilepath = mDirectory.getPathTo(filename);
+    // read version number from version file
+    mVersionFilepath = mDirectory.getPathTo("version");
+    SmartTextFile versionFile(mVersionFilepath, false, true);
+    QString fileVersionStr = QString(versionFile.getContent());
+    bool versionNumberValid;
+    int fileVersion = fileVersionStr.toInt(&versionNumberValid);
+    if ((!versionNumberValid) || (fileVersion < 0))
+    {
+        throw RuntimeError(__FILE__, __LINE__, fileVersionStr,
+            QString(tr("Invalid version number in file %1: \"%2\""))
+            .arg(mVersionFilepath.toNative()).arg(fileVersionStr));
+    }
+    if (!(fileVersion <= APP_VERSION_MAJOR))
+    {
+        throw RuntimeError(__FILE__, __LINE__, QString::number(APP_VERSION_MAJOR),
+            QString(tr("The library element %1 was created with a newer application "
+                       "version. You need at least version %2.0.0 to open this file."))
+            .arg(mDirectory.toNative()).arg(fileVersion));
+    }
 
     // open XML file
-    SmartXmlFile file(mXmlFilepath, false, false);
-    QSharedPointer<XmlDomDocument> doc = file.parseFileAndBuildDomTree(true);
+    mXmlFilepath = mDirectory.getPathTo(QString("%1.xml").arg(mXmlFileNamePrefix));
+    SmartXmlFile xmlFile(mXmlFilepath, false, true);
+    QSharedPointer<XmlDomDocument> doc = xmlFile.parseFileAndBuildDomTree(true);
     parseDomTree(doc->getRoot());
 
     // check UUID
