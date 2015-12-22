@@ -53,7 +53,7 @@ class CategoryTreeItem final
 
         // Constructors / Destructor
         CategoryTreeItem(const Library& library, const QStringList localeOrder,
-                         CategoryTreeItem* parent, const Uuid& uuid) throw (Exception);
+                         CategoryTreeItem* parent, const Uuid& uuid) noexcept;
         ~CategoryTreeItem() noexcept;
 
         // Getters
@@ -79,6 +79,7 @@ class CategoryTreeItem final
         Uuid mUuid;
         ComponentCategory* mCategory;
         unsigned int mDepth; ///< this is to avoid endless recursion in the parent-child relationship
+        QString mExceptionMessage;
         QList<CategoryTreeItem*> mChilds;
 };
 
