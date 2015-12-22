@@ -251,12 +251,12 @@
    <attribute name="toolBarBreak">
     <bool>true</bool>
    </attribute>
-   <addaction name="actionAddGenCmp_Resistor"/>
-   <addaction name="actionAddGenCmp_Inductor"/>
-   <addaction name="actionAddGenCmp_BipolarCapacitor"/>
-   <addaction name="actionAddGenCmp_UnipolarCapacitor"/>
-   <addaction name="actionAddGenCmp_gnd"/>
-   <addaction name="actionAddGenCmp_vcc"/>
+   <addaction name="actionAddComp_Resistor"/>
+   <addaction name="actionAddComp_Inductor"/>
+   <addaction name="actionAddComp_BipolarCapacitor"/>
+   <addaction name="actionAddComp_UnipolarCapacitor"/>
+   <addaction name="actionAddComp_gnd"/>
+   <addaction name="actionAddComp_vcc"/>
   </widget>
   <action name="actionQuit">
    <property name="icon">
@@ -625,7 +625,7 @@
     <string>Net Classes</string>
    </property>
   </action>
-  <action name="actionAddGenCmp_Resistor">
+  <action name="actionAddComp_Resistor">
    <property name="icon">
     <iconset resource="../../../img/images.qrc">
      <normaloff>:/img/library/resistor_eu.png</normaloff>:/img/library/resistor_eu.png</iconset>
@@ -634,7 +634,7 @@
     <string>Add Resistor</string>
    </property>
   </action>
-  <action name="actionAddGenCmp_BipolarCapacitor">
+  <action name="actionAddComp_BipolarCapacitor">
    <property name="icon">
     <iconset resource="../../../img/images.qrc">
      <normaloff>:/img/library/bipolar_capacitor_eu.png</normaloff>:/img/library/bipolar_capacitor_eu.png</iconset>
@@ -646,7 +646,7 @@
     <string>Add Bipolar Capacitor</string>
    </property>
   </action>
-  <action name="actionAddGenCmp_Inductor">
+  <action name="actionAddComp_Inductor">
    <property name="icon">
     <iconset resource="../../../img/images.qrc">
      <normaloff>:/img/library/inductor_eu.png</normaloff>:/img/library/inductor_eu.png</iconset>
@@ -655,7 +655,7 @@
     <string>Add Inductor</string>
    </property>
   </action>
-  <action name="actionAddGenCmp_gnd">
+  <action name="actionAddComp_gnd">
    <property name="icon">
     <iconset resource="../../../img/images.qrc">
      <normaloff>:/img/library/gnd.png</normaloff>:/img/library/gnd.png</iconset>
@@ -664,7 +664,7 @@
     <string>Add GND</string>
    </property>
   </action>
-  <action name="actionAddGenCmp_vcc">
+  <action name="actionAddComp_vcc">
    <property name="icon">
     <iconset resource="../../../img/images.qrc">
      <normaloff>:/img/library/vcc.png</normaloff>:/img/library/vcc.png</iconset>
@@ -696,7 +696,7 @@
     <string>Add Netlabel</string>
    </property>
   </action>
-  <action name="actionAddGenCmp_UnipolarCapacitor">
+  <action name="actionAddComp_UnipolarCapacitor">
    <property name="icon">
     <iconset resource="../../../img/images.qrc">
      <normaloff>:/img/library/unipolar_capacitor_eu.png</normaloff>:/img/library/unipolar_capacitor_eu.png</iconset>

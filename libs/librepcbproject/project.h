@@ -567,7 +567,7 @@ class Project final : public QObject, public IF_AttributeProvider,
         ProjectSettings* mProjectSettings; ///< all project specific settings
         ProjectLibrary* mProjectLibrary; ///< the library which contains all elements needed in this project
         ErcMsgList* mErcMsgList; ///< A list which contains all electrical rule check (ERC) messages
-        Circuit* mCircuit; ///< The whole circuit of this project (contains all netclasses, netsignals, generic component instances, ...)
+        Circuit* mCircuit; ///< The whole circuit of this project (contains all netclasses, netsignals, component instances, ...)
         QList<Schematic*> mSchematics; ///< All schematics of this project
         QList<Schematic*> mRemovedSchematics; ///< All removed schematics of this project
         SchematicLayerProvider* mSchematicLayerProvider; ///< All schematic layers of this project

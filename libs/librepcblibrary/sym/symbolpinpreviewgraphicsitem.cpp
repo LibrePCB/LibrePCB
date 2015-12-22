@@ -38,9 +38,9 @@ namespace library {
 
 SymbolPinPreviewGraphicsItem::SymbolPinPreviewGraphicsItem(const IF_SchematicLayerProvider& layerProvider,
                                                            const SymbolPin& pin,
-                                                           const ComponentSignal* genCompSignal,
+                                                           const ComponentSignal* compSignal,
                                                            ComponentSymbolVariantItem::PinDisplayType_t displayType) noexcept :
-    GraphicsItem(), mPin(pin), mGenCompSignal(genCompSignal), mDisplayType(displayType),
+    GraphicsItem(), mPin(pin), mComponentSignal(compSignal), mDisplayType(displayType),
     mDrawBoundingRect(false)
 {
     setToolTip(mPin.getName());
@@ -101,9 +101,9 @@ void SymbolPinPreviewGraphicsItem::updateCacheAndRepaint() noexcept
         case ComponentSymbolVariantItem::PinDisplayType_t::PinName:
             mStaticText.setText(mPin.getName()); break;
         case ComponentSymbolVariantItem::PinDisplayType_t::ComponentSignal:
-            mStaticText.setText(mGenCompSignal ? mGenCompSignal->getName() : ""); break;
+            mStaticText.setText(mComponentSignal ? mComponentSignal->getName() : ""); break;
         case ComponentSymbolVariantItem::PinDisplayType_t::NetSignal:
-            mStaticText.setText(mGenCompSignal ? mGenCompSignal->getForcedNetName() : ""); break;
+            mStaticText.setText(mComponentSignal ? mComponentSignal->getForcedNetName() : ""); break;
         default: Q_ASSERT(false);
     }
     qreal x = mPin.getLength().toPx() + 4;
@@ -130,7 +130,7 @@ void SymbolPinPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
     Q_UNUSED(widget);
     const bool selected = option->state.testFlag(QStyle::State_Selected);
 
-    bool requiredPin = mGenCompSignal ? mGenCompSignal->isRequired() : false;
+    bool requiredPin = mComponentSignal ? mComponentSignal->isRequired() : false;
 
     // draw line
     QPen pen(mLineLayer->getColor(selected), Length(158750).toPx(), Qt::SolidLine, Qt::RoundCap);

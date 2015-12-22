@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>AddGenCompDialog</class>
- <widget class="QDialog" name="AddGenCompDialog">
+ <class>AddComponentDialog</class>
+ <widget class="QDialog" name="AddComponentDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Add Generic Component</string>
+   <string>Add Component</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -40,7 +40,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QListWidget" name="listGenericComponents">
+        <widget class="QListWidget" name="listComponents">
          <property name="minimumSize">
           <size>
            <width>150</width>
@@ -55,9 +55,9 @@
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
-          <widget class="QGroupBox" name="gbxGenComp">
+          <widget class="QGroupBox" name="gbxComponent">
            <property name="title">
-            <string>Generic Component</string>
+            <string>Component</string>
            </property>
            <layout class="QFormLayout" name="formLayout">
             <property name="fieldGrowthPolicy">
@@ -71,7 +71,7 @@
              </widget>
             </item>
             <item row="0" column="1">
-             <widget class="QLabel" name="lblGenCompName">
+             <widget class="QLabel" name="lblCompName">
               <property name="text">
                <string>TextLabel</string>
               </property>
@@ -91,7 +91,7 @@
              </widget>
             </item>
             <item row="1" column="1">
-             <widget class="QLabel" name="lblGenCompUuid">
+             <widget class="QLabel" name="lblCompUuid">
               <property name="text">
                <string>TextLabel</string>
               </property>
@@ -108,7 +108,7 @@
              </widget>
             </item>
             <item row="2" column="1">
-             <widget class="QLabel" name="lblGenCompDescription">
+             <widget class="QLabel" name="lblCompDescription">
               <property name="text">
                <string>TextLabel</string>
               </property>
@@ -249,7 +249,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>AddGenCompDialog</receiver>
+   <receiver>AddComponentDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -265,7 +265,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>AddGenCompDialog</receiver>
+   <receiver>AddComponentDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

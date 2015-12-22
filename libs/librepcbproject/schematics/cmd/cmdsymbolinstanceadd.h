@@ -54,7 +54,7 @@ class CmdSymbolInstanceAdd final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit CmdSymbolInstanceAdd(Schematic& schematic, ComponentInstance& genComp,
+        explicit CmdSymbolInstanceAdd(Schematic& schematic, ComponentInstance& cmpInstance,
                                       const Uuid& symbolItem, const Point& position = Point(),
                                       const Angle& angle = Angle(), UndoCommand* parent = 0) throw (Exception);
         explicit CmdSymbolInstanceAdd(SI_Symbol& symbol, UndoCommand* parent = 0) throw (Exception);

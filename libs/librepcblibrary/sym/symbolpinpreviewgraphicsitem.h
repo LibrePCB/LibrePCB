@@ -60,7 +60,7 @@ class SymbolPinPreviewGraphicsItem final : public GraphicsItem
         // Constructors / Destructor
         explicit SymbolPinPreviewGraphicsItem(const IF_SchematicLayerProvider& layerProvider,
                                               const SymbolPin& pin,
-                                              const ComponentSignal* genCompSignal,
+                                              const ComponentSignal* compSignal,
                                               ComponentSymbolVariantItem::PinDisplayType_t displayType) noexcept;
         ~SymbolPinPreviewGraphicsItem() noexcept;
 
@@ -86,7 +86,7 @@ class SymbolPinPreviewGraphicsItem final : public GraphicsItem
 
         // General Attributes
         const SymbolPin& mPin;
-        const ComponentSignal* mGenCompSignal;
+        const ComponentSignal* mComponentSignal;
         ComponentSymbolVariantItem::PinDisplayType_t mDisplayType;
         SchematicLayer* mCircleLayer;
         SchematicLayer* mLineLayer;

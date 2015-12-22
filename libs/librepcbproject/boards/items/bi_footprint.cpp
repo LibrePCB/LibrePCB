@@ -163,7 +163,7 @@ XmlDomElement* BI_Footprint::serializeToXmlDomElement() const throw (Exception)
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("footprint"));
     //root->setAttribute("uuid", mUuid);
-    //root->setAttribute("gen_comp_instance", mGenCompInstance->getUuid());
+    //root->setAttribute("gen_comp_instance", mComponentInstance->getUuid());
     //root->setAttribute("symbol_item", mSymbVarItem->getUuid());
     return root.take();
 }
@@ -259,7 +259,7 @@ bool BI_Footprint::checkAttributesValidity() const noexcept
 {
     if (mFootprint == nullptr)          return false;
     //if (mUuid.isNull())                 return false;
-    //if (mGenCompInstance == nullptr)    return false;
+    //if (mComponentInstance == nullptr)    return false;
     return true;
 }
 

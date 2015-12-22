@@ -23,8 +23,8 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include "addgencompdialog.h"
-#include "ui_addgencompdialog.h"
+#include "addcomponentdialog.h"
+#include "ui_addcomponentdialog.h"
 #include <librepcbcommon/graphics/graphicsscene.h>
 #include <librepcbcommon/graphics/graphicsview.h>
 #include <librepcbproject/project.h>
@@ -48,10 +48,10 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-AddGenCompDialog::AddGenCompDialog(Workspace& workspace, Project& project, QWidget* parent) :
+AddComponentDialog::AddComponentDialog(Workspace& workspace, Project& project, QWidget* parent) :
     QDialog(parent), mWorkspace(workspace), mProject(project),
-    mUi(new Ui::AddGenCompDialog), mPreviewScene(nullptr), mCategoryTreeModel(nullptr),
-    mSelectedGenComp(nullptr), mSelectedSymbVar(nullptr)
+    mUi(new Ui::AddComponentDialog), mPreviewScene(nullptr), mCategoryTreeModel(nullptr),
+    mSelectedComponent(nullptr), mSelectedSymbVar(nullptr)
 {
     mUi->setupUi(this);
     mPreviewScene = new GraphicsScene();
@@ -62,16 +62,16 @@ AddGenCompDialog::AddGenCompDialog(Workspace& workspace, Project& project, QWidg
     mCategoryTreeModel = new library::CategoryTreeModel(mWorkspace.getLibrary(), localeOrder);
     mUi->treeCategories->setModel(mCategoryTreeModel);
     connect(mUi->treeCategories->selectionModel(), &QItemSelectionModel::currentChanged,
-            this, &AddGenCompDialog::treeCategories_currentItemChanged);
+            this, &AddComponentDialog::treeCategories_currentItemChanged);
 
     //setSelectedCategory(Uuid());
 }
 
-AddGenCompDialog::~AddGenCompDialog() noexcept
+AddComponentDialog::~AddComponentDialog() noexcept
 {
     qDeleteAll(mPreviewSymbolGraphicsItems);    mPreviewSymbolGraphicsItems.clear();
     mSelectedSymbVar = nullptr;
-    delete mSelectedGenComp;                    mSelectedGenComp = nullptr;
+    delete mSelectedComponent;                    mSelectedComponent = nullptr;
     delete mCategoryTreeModel;                  mCategoryTreeModel = nullptr;
     delete mPreviewScene;                       mPreviewScene = nullptr;
     delete mUi;                                 mUi = nullptr;
@@ -81,17 +81,17 @@ AddGenCompDialog::~AddGenCompDialog() noexcept
  *  Getters
  ****************************************************************************************/
 
-FilePath AddGenCompDialog::getSelectedGenCompFilePath() const noexcept
+FilePath AddComponentDialog::getSelectedComponentFilePath() const noexcept
 {
-    if (mSelectedGenComp)
-        return mSelectedGenComp->getDirectory();
+    if (mSelectedComponent)
+        return mSelectedComponent->getDirectory();
     else
         return FilePath();
 }
 
-Uuid AddGenCompDialog::getSelectedSymbVarUuid() const noexcept
+Uuid AddComponentDialog::getSelectedSymbVarUuid() const noexcept
 {
-    if (mSelectedGenComp && mSelectedSymbVar)
+    if (mSelectedComponent && mSelectedSymbVar)
         return mSelectedSymbVar->getUuid();
     else
         return Uuid();
@@ -101,7 +101,7 @@ Uuid AddGenCompDialog::getSelectedSymbVarUuid() const noexcept
  *  Private Slots
  ****************************************************************************************/
 
-void AddGenCompDialog::treeCategories_currentItemChanged(const QModelIndex& current, const QModelIndex& previous)
+void AddComponentDialog::treeCategories_currentItemChanged(const QModelIndex& current, const QModelIndex& previous)
 {
     Q_UNUSED(previous);
 
@@ -116,33 +116,33 @@ void AddGenCompDialog::treeCategories_currentItemChanged(const QModelIndex& curr
     }
 }
 
-void AddGenCompDialog::on_listGenericComponents_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous)
+void AddComponentDialog::on_listComponents_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous)
 {
     Q_UNUSED(previous);
     try
     {
         if (current)
         {
-            library::Component* genComp = new library::Component(
+            library::Component* component = new library::Component(
                 FilePath(current->data(Qt::UserRole).toString())); // ugly...
-            setSelectedGenComp(genComp);
+            setSelectedComponent(component);
         }
         else
         {
-            setSelectedGenComp(nullptr);
+            setSelectedComponent(nullptr);
         }
     }
     catch (Exception& e)
     {
         QMessageBox::critical(this, tr("Error"), e.getUserMsg());
-        setSelectedGenComp(nullptr);
+        setSelectedComponent(nullptr);
     }
 }
 
-void AddGenCompDialog::on_cbxSymbVar_currentIndexChanged(int index)
+void AddComponentDialog::on_cbxSymbVar_currentIndexChanged(int index)
 {
-    if ((mSelectedGenComp) && (index >= 0))
-        setSelectedSymbVar(mSelectedGenComp->getSymbolVariantByUuid(Uuid(mUi->cbxSymbVar->itemData(index).toString())));
+    if ((mSelectedComponent) && (index >= 0))
+        setSelectedSymbVar(mSelectedComponent->getSymbolVariantByUuid(Uuid(mUi->cbxSymbVar->itemData(index).toString())));
     else
         setSelectedSymbVar(nullptr);
 }
@@ -151,67 +151,67 @@ void AddGenCompDialog::on_cbxSymbVar_currentIndexChanged(int index)
  *  Private Methods
  ****************************************************************************************/
 
-void AddGenCompDialog::setSelectedCategory(const Uuid& categoryUuid)
+void AddComponentDialog::setSelectedCategory(const Uuid& categoryUuid)
 {
     if ((categoryUuid == mSelectedCategoryUuid) && (!categoryUuid.isNull())) return;
 
-    setSelectedGenComp(nullptr);
-    mUi->listGenericComponents->clear();
-    //mUi->listGenericComponents->setEnabled(false);
+    setSelectedComponent(nullptr);
+    mUi->listComponents->clear();
+    //mUi->listComponents->setEnabled(false);
 
     const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
 
     mSelectedCategoryUuid = categoryUuid;
-    QSet<Uuid> genComps = mWorkspace.getLibrary().getComponentsByCategory(categoryUuid);
-    foreach (const Uuid& genCompUuid, genComps)
+    QSet<Uuid> components = mWorkspace.getLibrary().getComponentsByCategory(categoryUuid);
+    foreach (const Uuid& cmpUuid, components)
     {
-        FilePath genCompFp = mWorkspace.getLibrary().getLatestComponent(genCompUuid);
-        if (!genCompFp.isValid()) continue;
-        library::Component genComp(genCompFp); // TODO: use library metadata instead of loading the whole component
+        FilePath cmpFp = mWorkspace.getLibrary().getLatestComponent(cmpUuid);
+        if (!cmpFp.isValid()) continue;
+        library::Component component(cmpFp); // TODO: use library metadata instead of loading the whole component
 
-        QListWidgetItem* item = new QListWidgetItem(genComp.getName(localeOrder));
-        item->setData(Qt::UserRole, genCompFp.toStr());
-        mUi->listGenericComponents->addItem(item);
+        QListWidgetItem* item = new QListWidgetItem(component.getName(localeOrder));
+        item->setData(Qt::UserRole, cmpFp.toStr());
+        mUi->listComponents->addItem(item);
     }
 }
 
-void AddGenCompDialog::setSelectedGenComp(const library::Component* genComp)
+void AddComponentDialog::setSelectedComponent(const library::Component* cmp)
 {
-    if (genComp == mSelectedGenComp) return;
+    if (cmp == mSelectedComponent) return;
 
-    mUi->lblGenCompUuid->clear();
-    mUi->lblGenCompName->clear();
-    mUi->lblGenCompDescription->clear();
-    mUi->gbxGenComp->setEnabled(false);
+    mUi->lblCompUuid->clear();
+    mUi->lblCompName->clear();
+    mUi->lblCompDescription->clear();
+    mUi->gbxComponent->setEnabled(false);
     mUi->gbxSymbVar->setEnabled(false);
     setSelectedSymbVar(nullptr);
-    delete mSelectedGenComp;
-    mSelectedGenComp = nullptr;
+    delete mSelectedComponent;
+    mSelectedComponent = nullptr;
 
-    if (genComp)
+    if (cmp)
     {
         const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
 
-        mUi->lblGenCompUuid->setText(genComp->getUuid().toStr());
-        mUi->lblGenCompName->setText(genComp->getName(localeOrder));
-        mUi->lblGenCompDescription->setText(genComp->getDescription(localeOrder));
+        mUi->lblCompUuid->setText(cmp->getUuid().toStr());
+        mUi->lblCompName->setText(cmp->getName(localeOrder));
+        mUi->lblCompDescription->setText(cmp->getDescription(localeOrder));
 
-        mUi->gbxGenComp->setEnabled(true);
+        mUi->gbxComponent->setEnabled(true);
         mUi->gbxSymbVar->setEnabled(true);
-        mSelectedGenComp = genComp;
+        mSelectedComponent = cmp;
 
         mUi->cbxSymbVar->clear();
-        foreach (const library::ComponentSymbolVariant* symbVar, genComp->getSymbolVariants())
+        foreach (const library::ComponentSymbolVariant* symbVar, cmp->getSymbolVariants())
         {
             QString text = symbVar->getName(localeOrder);
             if (symbVar->isDefault()) text.append(tr(" [default]"));
             mUi->cbxSymbVar->addItem(text, symbVar->getUuid().toStr());
         }
-        mUi->cbxSymbVar->setCurrentIndex(mUi->cbxSymbVar->findData(genComp->getDefaultSymbolVariantUuid().toStr()));
+        mUi->cbxSymbVar->setCurrentIndex(mUi->cbxSymbVar->findData(cmp->getDefaultSymbolVariantUuid().toStr()));
     }
 }
 
-void AddGenCompDialog::setSelectedSymbVar(const library::ComponentSymbolVariant* symbVar)
+void AddComponentDialog::setSelectedSymbVar(const library::ComponentSymbolVariant* symbVar)
 {
     if (symbVar == mSelectedSymbVar) return;
     qDeleteAll(mPreviewSymbolGraphicsItems);
@@ -221,7 +221,7 @@ void AddGenCompDialog::setSelectedSymbVar(const library::ComponentSymbolVariant*
     mUi->lblSymbVarDescription->clear();
     mSelectedSymbVar = symbVar;
 
-    if (mSelectedGenComp && symbVar)
+    if (mSelectedComponent && symbVar)
     {
         const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
 
@@ -235,7 +235,7 @@ void AddGenCompDialog::setSelectedSymbVar(const library::ComponentSymbolVariant*
             if (!symbolFp.isValid()) continue; // TODO: show warning
             const library::Symbol* symbol = new library::Symbol(symbolFp); // TODO: fix memory leak...
             library::SymbolPreviewGraphicsItem* graphicsItem = new library::SymbolPreviewGraphicsItem(
-                mProject, localeOrder, *symbol, mSelectedGenComp, symbVar->getUuid(), item->getUuid());
+                mProject, localeOrder, *symbol, mSelectedComponent, symbVar->getUuid(), item->getUuid());
             //graphicsItem->setDrawBoundingRect(mProject.getWorkspace().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect());
             mPreviewSymbolGraphicsItems.append(graphicsItem);
             Point pos = Point::fromPx(0, mPreviewScene->itemsBoundingRect().bottom()
@@ -248,12 +248,12 @@ void AddGenCompDialog::setSelectedSymbVar(const library::ComponentSymbolVariant*
     }
 }
 
-void AddGenCompDialog::accept() noexcept
+void AddComponentDialog::accept() noexcept
 {
-    if ((!mSelectedGenComp) || (!mSelectedSymbVar))
+    if ((!mSelectedComponent) || (!mSelectedSymbVar))
     {
         QMessageBox::information(this, tr("Invalid Selection"),
-            tr("Please select a generic component and a symbol variant."));
+            tr("Please select a component and a symbol variant."));
         return;
     }
 

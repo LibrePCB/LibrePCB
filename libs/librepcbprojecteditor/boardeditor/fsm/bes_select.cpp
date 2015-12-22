@@ -342,7 +342,7 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightClick(QGraphicsSceneMouse
             else if (action == aProperties)
             {
                 // open the properties editor dialog of the selected item
-                //SymbolInstancePropertiesDialog dialog(mProject, genComp, *symbol, mUndoStack, &mEditor);
+                //SymbolInstancePropertiesDialog dialog(mProject, cmp, *symbol, mUndoStack, &mEditor);
                 //dialog.exec();
             }
             return ForceStayInState;

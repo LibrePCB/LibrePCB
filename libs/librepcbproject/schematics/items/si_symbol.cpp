@@ -63,9 +63,9 @@ SI_Symbol::SI_Symbol(Schematic& schematic, const XmlDomElement& domElement) thro
     init(symbVarItemUuid);
 }
 
-SI_Symbol::SI_Symbol(Schematic& schematic, ComponentInstance& genCompInstance,
-                     const Uuid& symbolItem, const Point& position, const Angle& rotation) throw (Exception) :
-    SI_Base(), mSchematic(schematic), mComponentInstance(&genCompInstance),
+SI_Symbol::SI_Symbol(Schematic& schematic, ComponentInstance& cmpInstance, const Uuid& symbolItem,
+                     const Point& position, const Angle& rotation) throw (Exception) :
+    SI_Base(), mSchematic(schematic), mComponentInstance(&cmpInstance),
     mSymbVarItem(nullptr), mSymbol(nullptr), mGraphicsItem(nullptr), mPosition(position),
     mRotation(rotation)
 {
@@ -120,9 +120,9 @@ void SI_Symbol::init(const Uuid& symbVarItemUuid) throw (Exception)
             "the pin-signal-map")).arg(mUuid.toStr()));
     }
 
-    // connect to the "attributes changes" signal of schematic and generic component
+    // connect to the "attributes changes" signal of schematic and component instance
     connect(mComponentInstance, &ComponentInstance::attributesChanged,
-            this, &SI_Symbol::schematicOrGenCompAttributesChanged);
+            this, &SI_Symbol::schematicOrComponentAttributesChanged);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -254,7 +254,7 @@ void SI_Symbol::setSelected(bool selected) noexcept
  *  Private Slots
  ****************************************************************************************/
 
-void SI_Symbol::schematicOrGenCompAttributesChanged()
+void SI_Symbol::schematicOrComponentAttributesChanged()
 {
     mGraphicsItem->updateCacheAndRepaint();
 }

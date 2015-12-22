@@ -38,7 +38,7 @@ namespace library {
  * @brief The FootprintEllipse class
  *
  * @note If you make changes in this class, please check if you also need to modify
- *       the class library#SymbolEllipse as these classes are very similar.
+ *       the class #library#SymbolEllipse as these classes are very similar.
  *
  * @author ubruhin
  * @date 2015-06-07

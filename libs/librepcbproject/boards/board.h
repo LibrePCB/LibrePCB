@@ -79,10 +79,10 @@ class Board final : public QObject, public IF_AttributeProvider,
          */
         enum ItemZValue {
             ZValue_Default = 0,         ///< this is the default value (behind all other items)
-            ZValue_FootprintsBottom,    ///< Z value for project#BI_Footprint items
-            ZValue_FootprintPadsBottom, ///< Z value for project#BI_FootprintPad items
-            ZValue_FootprintPadsTop,    ///< Z value for project#BI_FootprintPad items
-            ZValue_FootprintsTop,       ///< Z value for project#BI_Footprint items
+            ZValue_FootprintsBottom,    ///< Z value for #project#BI_Footprint items
+            ZValue_FootprintPadsBottom, ///< Z value for #project#BI_FootprintPad items
+            ZValue_FootprintPadsTop,    ///< Z value for #project#BI_FootprintPad items
+            ZValue_FootprintsTop,       ///< Z value for #project#BI_Footprint items
         };
 
         // Constructors / Destructor

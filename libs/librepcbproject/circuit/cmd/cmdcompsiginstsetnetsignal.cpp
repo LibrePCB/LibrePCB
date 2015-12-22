@@ -31,12 +31,12 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdCompSigInstSetNetSignal::CmdCompSigInstSetNetSignal(ComponentSignalInstance& genCompSigInstance,
-                                             NetSignal* netsignal,
-                                             UndoCommand* parent) throw (Exception) :
+CmdCompSigInstSetNetSignal::CmdCompSigInstSetNetSignal(ComponentSignalInstance& cmpSigInstance,
+                                                       NetSignal* netsignal,
+                                                       UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Change component signal net"), parent),
-    mGenCompSigInstance(genCompSigInstance), mNetSignal(netsignal),
-    mOldNetSignal(genCompSigInstance.getNetSignal())
+    mComponentSignalInstance(cmpSigInstance), mNetSignal(netsignal),
+    mOldNetSignal(cmpSigInstance.getNetSignal())
 {
 }
 
@@ -50,7 +50,7 @@ CmdCompSigInstSetNetSignal::~CmdCompSigInstSetNetSignal() noexcept
 
 void CmdCompSigInstSetNetSignal::redo() throw (Exception)
 {
-    mGenCompSigInstance.setNetSignal(mNetSignal); // throws an exception on error
+    mComponentSignalInstance.setNetSignal(mNetSignal); // throws an exception on error
 
     try
     {
@@ -58,14 +58,14 @@ void CmdCompSigInstSetNetSignal::redo() throw (Exception)
     }
     catch (Exception &e)
     {
-        mGenCompSigInstance.setNetSignal(mOldNetSignal);
+        mComponentSignalInstance.setNetSignal(mOldNetSignal);
         throw;
     }
 }
 
 void CmdCompSigInstSetNetSignal::undo() throw (Exception)
 {
-    mGenCompSigInstance.setNetSignal(mOldNetSignal); // throws an exception on error
+    mComponentSignalInstance.setNetSignal(mOldNetSignal); // throws an exception on error
 
     try
     {
@@ -73,7 +73,7 @@ void CmdCompSigInstSetNetSignal::undo() throw (Exception)
     }
     catch (Exception& e)
     {
-        mGenCompSigInstance.setNetSignal(mNetSignal);
+        mComponentSignalInstance.setNetSignal(mNetSignal);
         throw;
     }
 }

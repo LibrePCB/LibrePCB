@@ -94,12 +94,12 @@ class SchematicEditor final : public QMainWindow, public IF_GraphicsViewEventHan
         void on_actionGrid_triggered();
         void on_actionPDF_Export_triggered();
         void on_actionToolAddComponent_triggered();
-        void on_actionAddGenCmp_Resistor_triggered();
-        void on_actionAddGenCmp_BipolarCapacitor_triggered();
-        void on_actionAddGenCmp_UnipolarCapacitor_triggered();
-        void on_actionAddGenCmp_Inductor_triggered();
-        void on_actionAddGenCmp_gnd_triggered();
-        void on_actionAddGenCmp_vcc_triggered();
+        void on_actionAddComp_Resistor_triggered();
+        void on_actionAddComp_BipolarCapacitor_triggered();
+        void on_actionAddComp_UnipolarCapacitor_triggered();
+        void on_actionAddComp_Inductor_triggered();
+        void on_actionAddComp_gnd_triggered();
+        void on_actionAddComp_vcc_triggered();
         void on_actionProjectProperties_triggered();
 
 

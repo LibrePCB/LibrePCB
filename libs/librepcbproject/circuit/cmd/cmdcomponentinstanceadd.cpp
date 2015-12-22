@@ -34,7 +34,7 @@ namespace project {
 
 CmdComponentInstanceAdd::CmdComponentInstanceAdd(Circuit& circuit, const library::Component& cmp,
                                      const library::ComponentSymbolVariant& symbVar, UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Add generic component"), parent),
+    UndoCommand(tr("Add component"), parent),
     mCircuit(circuit), mComponent(cmp), mSymbVar(symbVar), mComponentInstance(nullptr)
 {
 }

@@ -51,7 +51,7 @@ class CmdCompSigInstSetNetSignal final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit CmdCompSigInstSetNetSignal(ComponentSignalInstance& genCompSigInstance,
+        explicit CmdCompSigInstSetNetSignal(ComponentSignalInstance& cmpSigInstance,
                                             NetSignal* netsignal,
                                             UndoCommand* parent = 0) throw (Exception);
         ~CmdCompSigInstSetNetSignal() noexcept;
@@ -63,7 +63,7 @@ class CmdCompSigInstSetNetSignal final : public UndoCommand
     private:
 
         // Attributes from the constructor
-        ComponentSignalInstance& mGenCompSigInstance;
+        ComponentSignalInstance& mComponentSignalInstance;
         NetSignal* mNetSignal;
 
         // General Attributes

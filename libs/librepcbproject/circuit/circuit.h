@@ -58,7 +58,7 @@ namespace project {
  * @brief   The Circuit class represents all electrical connections in a project (drawed
  *          in the schematics)
  *
- * Each project#Project object contains exactly one #Circuit object which contains the
+ * Each #project#Project object contains exactly one #Circuit object which contains the
  * whole electrical components and connections. They are created with the schematic editor
  * and used by the board editor. The whole circuit is saved in the file "circuit.xml" in
  * the project's "core" directory.
@@ -66,7 +66,7 @@ namespace project {
  * Each #Circuit object contains:
  *  - All net classes (project#NetClass objects)
  *  - All net signals (project#NetSignal objects)
- *  - All generic component instances (project#GenCompInstance objects)
+ *  - All component instances (project#ComponentInstance objects)
  *
  * @author ubruhin
  * @date 2014-07-03
@@ -122,8 +122,8 @@ class Circuit final : public QObject, public IF_XmlSerializableObject
         void netClassRemoved(NetClass& netclass);
         void netSignalAdded(NetSignal& netsignal);
         void netSignalRemoved(NetSignal& netsignal);
-        void componentAdded(ComponentInstance& genComp);
-        void componentRemoved(ComponentInstance& genComp);
+        void componentAdded(ComponentInstance& cmp);
+        void componentRemoved(ComponentInstance& cmp);
 
 
     private:

@@ -45,11 +45,11 @@ class SI_Base : public QObject
 
         // Types
         enum class Type_t {
-            NetPoint,   ///< project#SI_NetPoint
-            NetLine,    ///< project#SI_NetLine
-            NetLabel,   ///< project#SI_NetLabel
-            Symbol,     ///< project#SI_Symbol
-            SymbolPin,  ///< project#SI_SymbolPin
+            NetPoint,   ///< #project#SI_NetPoint
+            NetLine,    ///< #project#SI_NetLine
+            NetLabel,   ///< #project#SI_NetLabel
+            Symbol,     ///< #project#SI_Symbol
+            SymbolPin,  ///< #project#SI_SymbolPin
         };
 
         // Constructors / Destructor

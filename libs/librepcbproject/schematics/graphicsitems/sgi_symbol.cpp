@@ -252,12 +252,12 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
     }
 
 #ifdef QT_DEBUG
-    layer = getSchematicLayer(SchematicLayer::LayerID::DEBUG_GenCompSymbolsCount); Q_ASSERT(layer);
+    layer = getSchematicLayer(SchematicLayer::LayerID::DEBUG_ComponentSymbolsCount); Q_ASSERT(layer);
     if (layer->isVisible())
     {
-        // show symbols count of the generic component
-        int count = mSymbol.getGenCompInstance().getPlacedSymbolsCount();
-        int maxCount = mSymbol.getGenCompInstance().getSymbolVariant().getItems().count();
+        // show symbols count of the component
+        int count = mSymbol.getComponentInstance().getPlacedSymbolsCount();
+        int maxCount = mSymbol.getComponentInstance().getSymbolVariant().getItems().count();
         mFont.setPixelSize(Length(1000000).toPx());
         painter->setFont(mFont);
         painter->setPen(QPen(layer->getColor(selected), 0, Qt::SolidLine, Qt::RoundCap));

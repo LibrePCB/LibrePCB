@@ -115,7 +115,7 @@ class Component final : public LibraryElement
         bool checkAttributesValidity() const noexcept override;
 
 
-        // Generic Conponent Attributes
+        // Conponent Attributes
         bool mSchematicOnly; ///< if true, this component is schematic-only (no package)
         QList<LibraryElementAttribute*> mAttributes; ///< all attributes in a specific order
         QMap<QString, QString> mDefaultValues; ///< key: locale (like "en_US"), value: default value

@@ -367,10 +367,10 @@ SI_Symbol* Schematic::getSymbolByUuid(const Uuid& uuid) const noexcept
     return nullptr;
 }
 
-SI_Symbol* Schematic::createSymbol(ComponentInstance& genCompInstance, const Uuid& symbolItem,
+SI_Symbol* Schematic::createSymbol(ComponentInstance& cmpInstance, const Uuid& symbolItem,
                                    const Point& position, const Angle& angle) throw (Exception)
 {
-    return new SI_Symbol(*this, genCompInstance, symbolItem, position, angle);
+    return new SI_Symbol(*this, cmpInstance, symbolItem, position, angle);
 }
 
 void Schematic::addSymbol(SI_Symbol& symbol) throw (Exception)

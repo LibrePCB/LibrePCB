@@ -64,13 +64,13 @@ class BI_FootprintPad final : public BI_Base
         Project& getProject() const noexcept;
         Board& getBoard() const noexcept;
         const Uuid& getLibPadUuid() const noexcept;
-        //QString getDisplayText(bool returnGenCompSignalNameIfEmpty = false,
+        //QString getDisplayText(bool returnCmpSignalNameIfEmpty = false,
         //                       bool returnPinNameIfEmpty = false) const noexcept;
         BI_Footprint& getFootprint() const noexcept {return mFootprint;}
         //SI_NetPoint* getNetPoint() const noexcept {return mRegisteredNetPoint;}
         const library::FootprintPad& getLibPad() const noexcept {return *mFootprintPad;}
-        //const library::GenCompSignal* getGenCompSignal() const noexcept {return mGenCompSignal;}
-        //GenCompSignalInstance* getGenCompSignalInstance() const noexcept {return mGenCompSignalInstance;}
+        //const library::ComponentSignal* getComponentSignal() const noexcept {return mComponentSignal;}
+        //ComponentSignalInstance* getComponentSignalInstance() const noexcept {return mComponentSignalInstance;}
 
         // General Methods
         void updatePosition() noexcept;
@@ -99,8 +99,8 @@ class BI_FootprintPad final : public BI_Base
         Circuit& mCircuit;
         BI_Footprint& mFootprint;
         const library::FootprintPad* mFootprintPad;
-        //const library::GenCompSignal* mGenCompSignal;
-        //GenCompSignalInstance* mGenCompSignalInstance;
+        //const library::ComponentSignal* mComponentSignal;
+        //ComponentSignalInstance* mComponentSignalInstance;
         Point mPosition;
         Angle mRotation;
 

@@ -47,8 +47,8 @@ namespace project {
 
 SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const Uuid& pinUuid) :
     SI_Base(), mCircuit(symbol.getSchematic().getProject().getCircuit()),
-    mSymbol(symbol), mSymbolPin(nullptr), mGenCompSignal(nullptr),
-    mGenCompSignalInstance(nullptr), mAddedToSchematic(false),
+    mSymbol(symbol), mSymbolPin(nullptr), mComponentSignal(nullptr),
+    mComponentSignalInstance(nullptr), mAddedToSchematic(false),
     mRegisteredNetPoint(nullptr), mGraphicsItem(nullptr)
 {
     // read attributes
@@ -58,9 +58,9 @@ SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const Uuid& pinUuid) :
         throw RuntimeError(__FILE__, __LINE__, pinUuid.toStr(),
             QString(tr("Invalid symbol pin UUID: \"%1\"")).arg(pinUuid.toStr()));
     }
-    Uuid genCompSignalUuid = mSymbol.getGenCompSymbVarItem().getSignalOfPin(pinUuid);
-    mGenCompSignalInstance = mSymbol.getGenCompInstance().getSignalInstance(genCompSignalUuid);
-    mGenCompSignal = mSymbol.getGenCompInstance().getLibComponent().getSignalByUuid(genCompSignalUuid);
+    Uuid cmpSignalUuid = mSymbol.getCompSymbVarItem().getSignalOfPin(pinUuid);
+    mComponentSignalInstance = mSymbol.getComponentInstance().getSignalInstance(cmpSignalUuid);
+    mComponentSignal = mSymbol.getComponentInstance().getLibComponent().getSignalByUuid(cmpSignalUuid);
 
     mGraphicsItem = new SGI_SymbolPin(*this);
     updatePosition();
@@ -97,22 +97,22 @@ const Uuid& SI_SymbolPin::getLibPinUuid() const noexcept
     return mSymbolPin->getUuid();
 }
 
-QString SI_SymbolPin::getDisplayText(bool returnGenCompSignalNameIfEmpty,
+QString SI_SymbolPin::getDisplayText(bool returnCmpSignalNameIfEmpty,
                                      bool returnPinNameIfEmpty) const noexcept
 {
     QString text;
-    switch (mSymbol.getGenCompSymbVarItem().getDisplayTypeOfPin(mSymbolPin->getUuid()))
+    switch (mSymbol.getCompSymbVarItem().getDisplayTypeOfPin(mSymbolPin->getUuid()))
     {
         case library::ComponentSymbolVariantItem::PinDisplayType_t::PinName:
             text = mSymbolPin->getName(); break;
         case library::ComponentSymbolVariantItem::PinDisplayType_t::ComponentSignal:
-            if (mGenCompSignal) text = mGenCompSignal->getName(); break;
+            if (mComponentSignal) text = mComponentSignal->getName(); break;
         case library::ComponentSymbolVariantItem::PinDisplayType_t::NetSignal:
-            if (mGenCompSignalInstance->getNetSignal()) text = mGenCompSignalInstance->getNetSignal()->getName(); break;
+            if (mComponentSignalInstance->getNetSignal()) text = mComponentSignalInstance->getNetSignal()->getName(); break;
         default: break;
     }
-    if (text.isEmpty() && returnGenCompSignalNameIfEmpty && mGenCompSignal)
-        text = mGenCompSignal->getName();
+    if (text.isEmpty() && returnCmpSignalNameIfEmpty && mComponentSignal)
+        text = mComponentSignal->getName();
     if (text.isEmpty() && returnPinNameIfEmpty)
         text = mSymbolPin->getName();
     return text;
@@ -152,7 +152,7 @@ void SI_SymbolPin::addToSchematic(GraphicsScene& scene) noexcept
 {
     Q_ASSERT(mAddedToSchematic == false);
     Q_ASSERT(mRegisteredNetPoint == nullptr);
-    mGenCompSignalInstance->registerSymbolPin(*this);
+    mComponentSignalInstance->registerSymbolPin(*this);
     scene.addItem(*mGraphicsItem);
     mAddedToSchematic = true;
     updateErcMessages();
@@ -162,7 +162,7 @@ void SI_SymbolPin::removeFromSchematic(GraphicsScene& scene) noexcept
 {
     Q_ASSERT(mAddedToSchematic == true);
     Q_ASSERT(mRegisteredNetPoint == nullptr);
-    mGenCompSignalInstance->unregisterSymbolPin(*this);
+    mComponentSignalInstance->unregisterSymbolPin(*this);
     scene.removeItem(*mGraphicsItem);
     mAddedToSchematic = false;
     updateErcMessages();
@@ -194,7 +194,7 @@ void SI_SymbolPin::updateErcMessages() noexcept
         .arg(getDisplayText(true, true)).arg(mSymbol.getName()));
 
     mErcMsgUnconnectedRequiredPin->setVisible((mAddedToSchematic)
-        && (mGenCompSignal->isRequired()) && (!mRegisteredNetPoint));
+        && (mComponentSignal->isRequired()) && (!mRegisteredNetPoint));
 }
 
 /*****************************************************************************************

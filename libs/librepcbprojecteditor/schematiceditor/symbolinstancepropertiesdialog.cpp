@@ -49,26 +49,26 @@ namespace project {
  ****************************************************************************************/
 
 SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(Project& project,
-                                                               ComponentInstance& genComp,
+                                                               ComponentInstance& cmp,
                                                                SI_Symbol& symbol,
                                                                UndoStack& undoStack,
                                                                QWidget* parent) noexcept :
-    QDialog(parent), mProject(project), mGenCompInstance(genComp), mSymbol(symbol),
+    QDialog(parent), mProject(project), mComponentInstance(cmp), mSymbol(symbol),
     mUi(new Ui::SymbolInstancePropertiesDialog), mUndoStack(undoStack),
     mCommandActive(false), mAttributesEdited(false), mSelectedAttrItem(nullptr),
     mSelectedAttrType(nullptr), mSelectedAttrUnit(nullptr)
 {
     mUi->setupUi(this);
     setWindowTitle(QString(tr("Properties of %1")).arg(mSymbol.getName()));
-    mUi->tblGenCompInstAttributes->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    mUi->tblCompInstAttributes->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     foreach (const AttributeType* type, AttributeType::getAllTypes())
         mUi->cbxAttrType->addItem(type->getNameTr(), type->getName());
 
-    // Generic Component Instance Attributes
-    mUi->lblGenCompInstUuid->setText(mGenCompInstance.getUuid().toStr());
-    mUi->edtGenCompInstName->setText(mGenCompInstance.getName());
-    mUi->edtGenCompInstValue->setText(mGenCompInstance.getValue());
-    foreach (ComponentAttributeInstance* attr, mGenCompInstance.getAttributes())
+    // Component Instance Attributes
+    mUi->lblCompInstUuid->setText(mComponentInstance.getUuid().toStr());
+    mUi->edtCompInstName->setText(mComponentInstance.getName());
+    mUi->edtCompInstValue->setText(mComponentInstance.getValue());
+    foreach (ComponentAttributeInstance* attr, mComponentInstance.getAttributes())
     {
         AttrItem_t* item = new AttrItem_t();
         item->key = attr->getKey();
@@ -81,16 +81,16 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(Project& project,
 
     const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
 
-    // Generic Component Library Element Attributes
+    // Component Library Element Attributes
     QString htmlLink("<a href=\"%1\">%2<a>");
-    mUi->lblGenCompLibUuid->setText(htmlLink.arg(mGenCompInstance.getLibComponent().getXmlFilepath().toQUrl().toString(),
-                                                 mGenCompInstance.getLibComponent().getUuid().toStr()));
-    mUi->lblGenCompLibUuid->setToolTip(mGenCompInstance.getLibComponent().getXmlFilepath().toNative());
-    mUi->lblGenCompLibName->setText(mGenCompInstance.getLibComponent().getName(localeOrder));
-    mUi->lblGenCompLibName->setToolTip(mGenCompInstance.getLibComponent().getDescription(localeOrder));
-    mUi->lblSymbVarUuid->setText(mGenCompInstance.getSymbolVariant().getUuid().toStr());
-    mUi->lblSymbVarName->setText(mGenCompInstance.getSymbolVariant().getName(localeOrder));
-    mUi->lblSymbVarName->setToolTip(mGenCompInstance.getSymbolVariant().getDescription(localeOrder));
+    mUi->lblCompLibUuid->setText(htmlLink.arg(mComponentInstance.getLibComponent().getXmlFilepath().toQUrl().toString(),
+                                                 mComponentInstance.getLibComponent().getUuid().toStr()));
+    mUi->lblCompLibUuid->setToolTip(mComponentInstance.getLibComponent().getXmlFilepath().toNative());
+    mUi->lblCompLibName->setText(mComponentInstance.getLibComponent().getName(localeOrder));
+    mUi->lblCompLibName->setToolTip(mComponentInstance.getLibComponent().getDescription(localeOrder));
+    mUi->lblSymbVarUuid->setText(mComponentInstance.getSymbolVariant().getUuid().toStr());
+    mUi->lblSymbVarName->setText(mComponentInstance.getSymbolVariant().getName(localeOrder));
+    mUi->lblSymbVarName->setToolTip(mComponentInstance.getSymbolVariant().getDescription(localeOrder));
 
     // Symbol Instance Attributes
     mUi->lblSymbInstUuid->setText(mSymbol.getUuid().toStr());
@@ -107,8 +107,8 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(Project& project,
     mUi->lblSymbLibName->setToolTip(mSymbol.getLibSymbol().getDescription(localeOrder));
 
     // set focus to component instance name
-    mUi->edtGenCompInstName->selectAll();
-    mUi->edtGenCompInstName->setFocus();
+    mUi->edtCompInstName->selectAll();
+    mUi->edtCompInstName->setFocus();
 }
 
 SymbolInstancePropertiesDialog::~SymbolInstancePropertiesDialog() noexcept
@@ -121,14 +121,14 @@ SymbolInstancePropertiesDialog::~SymbolInstancePropertiesDialog() noexcept
  *  Private Slots
  ****************************************************************************************/
 
-void SymbolInstancePropertiesDialog::on_tblGenCompInstAttributes_currentCellChanged(
+void SymbolInstancePropertiesDialog::on_tblCompInstAttributes_currentCellChanged(
         int currentRow, int currentColumn, int previousRow, int previousColumn)
 {
     Q_UNUSED(currentColumn);
     Q_UNUSED(previousColumn);
     if ((currentRow != previousRow) && (currentRow > -1))
     {
-        QTableWidgetItem* item = mUi->tblGenCompInstAttributes->item(currentRow, 0);
+        QTableWidgetItem* item = mUi->tblCompInstAttributes->item(currentRow, 0);
         Q_ASSERT(item);
         QString key = item->text();
         mSelectedAttrItem = nullptr;
@@ -276,18 +276,18 @@ void SymbolInstancePropertiesDialog::on_btnAttrRemove_clicked()
 
 void SymbolInstancePropertiesDialog::updateAttrTable() noexcept
 {
-    QModelIndex index = mUi->tblGenCompInstAttributes->currentIndex();
-    mUi->tblGenCompInstAttributes->setRowCount(0);
+    QModelIndex index = mUi->tblCompInstAttributes->currentIndex();
+    mUi->tblCompInstAttributes->setRowCount(0);
     foreach (const AttrItem_t* item, mAttrItems)
     {
-        int i = mUi->tblGenCompInstAttributes->rowCount();
-        mUi->tblGenCompInstAttributes->insertRow(i);
-        mUi->tblGenCompInstAttributes->setItem(i, 0, new QTableWidgetItem(item->key));
-        mUi->tblGenCompInstAttributes->setItem(i, 1, new QTableWidgetItem(item->type->getNameTr()));
-        mUi->tblGenCompInstAttributes->setItem(i, 2, new QTableWidgetItem(item->type->printableValueTr(item->value, item->unit)));
+        int i = mUi->tblCompInstAttributes->rowCount();
+        mUi->tblCompInstAttributes->insertRow(i);
+        mUi->tblCompInstAttributes->setItem(i, 0, new QTableWidgetItem(item->key));
+        mUi->tblCompInstAttributes->setItem(i, 1, new QTableWidgetItem(item->type->getNameTr()));
+        mUi->tblCompInstAttributes->setItem(i, 2, new QTableWidgetItem(item->type->printableValueTr(item->value, item->unit)));
     }
-    if ((index.isValid()) && (mUi->tblGenCompInstAttributes->item(index.row(), index.column())))
-        mUi->tblGenCompInstAttributes->setCurrentIndex(index);
+    if ((index.isValid()) && (mUi->tblCompInstAttributes->item(index.row(), index.column())))
+        mUi->tblCompInstAttributes->setCurrentIndex(index);
 }
 
 void SymbolInstancePropertiesDialog::keyPressEvent(QKeyEvent* e)
@@ -317,18 +317,18 @@ bool SymbolInstancePropertiesDialog::applyChanges() noexcept
 {
     try
     {
-        // Generic Component Instance
-        QString name = mUi->edtGenCompInstName->text();
-        if (name != mGenCompInstance.getName())
+        // Component Instance
+        QString name = mUi->edtCompInstName->text();
+        if (name != mComponentInstance.getName())
         {
-            auto cmd = new CmdComponentInstanceEdit(mProject.getCircuit(), mGenCompInstance);
+            auto cmd = new CmdComponentInstanceEdit(mProject.getCircuit(), mComponentInstance);
             cmd->setName(name);
             execCmd(cmd);
         }
-        QString value = mUi->edtGenCompInstValue->toPlainText();
-        if (value != mGenCompInstance.getValue())
+        QString value = mUi->edtCompInstValue->toPlainText();
+        if (value != mComponentInstance.getValue())
         {
-            auto cmd = new CmdComponentInstanceEdit(mProject.getCircuit(), mGenCompInstance);
+            auto cmd = new CmdComponentInstanceEdit(mProject.getCircuit(), mComponentInstance);
             cmd->setValue(value);
             execCmd(cmd);
         }
@@ -336,23 +336,23 @@ bool SymbolInstancePropertiesDialog::applyChanges() noexcept
         {
             foreach (const AttrItem_t* item, mAttrItems)
             {
-                ComponentAttributeInstance* attr = mGenCompInstance.getAttributeByKey(item->key);
+                ComponentAttributeInstance* attr = mComponentInstance.getAttributeByKey(item->key);
                 if (attr)
                 {
                     // edit attribute
-                    auto cmd = new CmdCompAttrInstEdit(mGenCompInstance, *attr, *item->type,
+                    auto cmd = new CmdCompAttrInstEdit(mComponentInstance, *attr, *item->type,
                                                           item->value, item->unit);
                     execCmd(cmd);
                 }
                 else
                 {
                     // add attribute
-                    auto cmd = new CmdCompAttrInstAdd(mGenCompInstance, item->key,
+                    auto cmd = new CmdCompAttrInstAdd(mComponentInstance, item->key,
                                                          *item->type, item->value, item->unit);
                     execCmd(cmd);
                 }
             }
-            foreach (ComponentAttributeInstance* inst, mGenCompInstance.getAttributes())
+            foreach (ComponentAttributeInstance* inst, mComponentInstance.getAttributes())
             {
                 bool removed = true;
                 foreach (const AttrItem_t* item, mAttrItems)
@@ -360,7 +360,7 @@ bool SymbolInstancePropertiesDialog::applyChanges() noexcept
                 if (removed)
                 {
                     // remove attribute
-                    auto cmd = new CmdCompAttrInstRemove(mGenCompInstance, *inst);
+                    auto cmd = new CmdCompAttrInstRemove(mComponentInstance, *inst);
                     execCmd(cmd);
                 }
             }

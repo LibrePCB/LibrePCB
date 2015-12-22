@@ -35,7 +35,7 @@ namespace project {
 CmdComponentInstanceRemove::CmdComponentInstanceRemove(Circuit& circuit,
                                                        ComponentInstance& cmp,
                                                        UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Remove generic component"), parent),
+    UndoCommand(tr("Remove component"), parent),
     mCircuit(circuit), mComponentInstance(cmp)
 {
 }

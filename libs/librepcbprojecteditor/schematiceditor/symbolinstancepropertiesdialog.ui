@@ -215,7 +215,7 @@
       </widget>
      </item>
      <item row="2" column="0" colspan="2">
-      <widget class="QGroupBox" name="gbxGenCompLib">
+      <widget class="QGroupBox" name="gbxCmpLib">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -248,12 +248,12 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Generic Component:</string>
+           <string>Component:</string>
           </property>
          </widget>
         </item>
         <item row="0" column="2">
-         <widget class="QLabel" name="lblGenCompLibUuid">
+         <widget class="QLabel" name="lblCompLibUuid">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -275,7 +275,7 @@
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QLabel" name="lblGenCompLibName">
+         <widget class="QLabel" name="lblCompLibName">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -368,7 +368,7 @@
       </widget>
      </item>
      <item row="0" column="0">
-      <widget class="QGroupBox" name="gbxGenCompInst">
+      <widget class="QGroupBox" name="gbxComponentInstance">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -376,7 +376,7 @@
         </sizepolicy>
        </property>
        <property name="title">
-        <string>Generic Component</string>
+        <string>Component</string>
        </property>
        <layout class="QFormLayout" name="formLayout">
         <property name="fieldGrowthPolicy">
@@ -390,7 +390,7 @@
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QLabel" name="lblGenCompInstUuid">
+         <widget class="QLabel" name="lblCompInstUuid">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -413,7 +413,7 @@
          </widget>
         </item>
         <item row="1" column="1">
-         <widget class="QLineEdit" name="edtGenCompInstName"/>
+         <widget class="QLineEdit" name="edtCompInstName"/>
         </item>
         <item row="2" column="0">
          <widget class="QLabel" name="label_4">
@@ -423,7 +423,7 @@
          </widget>
         </item>
         <item row="2" column="1">
-         <widget class="QTextEdit" name="edtGenCompInstValue">
+         <widget class="QTextEdit" name="edtCompInstValue">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
             <horstretch>0</horstretch>
@@ -448,7 +448,7 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
-         <widget class="QTableWidget" name="tblGenCompInstAttributes">
+         <widget class="QTableWidget" name="tblCompInstAttributes">
           <property name="enabled">
            <bool>true</bool>
           </property>

@@ -117,9 +117,9 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
     const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
 
-    const library::ComponentSignal* genCompSignal = mPin.getGenCompSignal();
-    const NetSignal* netsignal = (genCompSignal ? mPin.getGenCompSignalInstance()->getNetSignal() : nullptr);
-    bool requiredPin = mPin.getGenCompSignal()->isRequired();
+    const library::ComponentSignal* cmpSignal = mPin.getComponentSignal();
+    const NetSignal* netsignal = (cmpSignal ? mPin.getComponentSignalInstance()->getNetSignal() : nullptr);
+    bool requiredPin = mPin.getComponentSignal()->isRequired();
 
     // draw line
     SchematicLayer* layer = getSchematicLayer(SchematicLayer::SymbolOutlines); Q_ASSERT(layer);

@@ -44,7 +44,7 @@ namespace project {
 
 /**
  * @brief The BoardLayerProvider class provides and manages all available board layers
- *        which are used in the project#BoardEditor class
+ *        which are used in the #project#BoardEditor class
  */
 class BoardLayerProvider final : public IF_BoardLayerProvider
 {

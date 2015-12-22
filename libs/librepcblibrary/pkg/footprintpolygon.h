@@ -39,7 +39,7 @@ namespace library {
  * @brief The FootprintPolygonSegment class
  *
  * @note If you make changes in this class, please check if you also need to modify
- *       the class library#SymbolPolygonSegment as these classes are very similar.
+ *       the class #library#SymbolPolygonSegment as these classes are very similar.
  */
 class FootprintPolygonSegment final : public IF_XmlSerializableObject
 {
@@ -97,7 +97,7 @@ namespace library {
  * @brief The FootprintPolygon class
  *
  * @note If you make changes in this class, please check if you also need to modify
- *       the class library#SymbolPolygon as these classes are very similar.
+ *       the class #library#SymbolPolygon as these classes are very similar.
  */
 class FootprintPolygon final : public IF_XmlSerializableObject
 {

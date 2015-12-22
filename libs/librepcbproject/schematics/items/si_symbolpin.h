@@ -70,13 +70,13 @@ class SI_SymbolPin final : public SI_Base, public IF_ErcMsgProvider
         Project& getProject() const noexcept;
         Schematic& getSchematic() const noexcept;
         const Uuid& getLibPinUuid() const noexcept;
-        QString getDisplayText(bool returnGenCompSignalNameIfEmpty = false,
+        QString getDisplayText(bool returnCmpSignalNameIfEmpty = false,
                                bool returnPinNameIfEmpty = false) const noexcept;
         SI_Symbol& getSymbol() const noexcept {return mSymbol;}
         SI_NetPoint* getNetPoint() const noexcept {return mRegisteredNetPoint;}
         const library::SymbolPin& getLibPin() const noexcept {return *mSymbolPin;}
-        const library::ComponentSignal* getGenCompSignal() const noexcept {return mGenCompSignal;}
-        ComponentSignalInstance* getGenCompSignalInstance() const noexcept {return mGenCompSignalInstance;}
+        const library::ComponentSignal* getComponentSignal() const noexcept {return mComponentSignal;}
+        ComponentSignalInstance* getComponentSignalInstance() const noexcept {return mComponentSignalInstance;}
 
         // General Methods
         void updatePosition() noexcept;
@@ -109,8 +109,8 @@ class SI_SymbolPin final : public SI_Base, public IF_ErcMsgProvider
         Circuit& mCircuit;
         SI_Symbol& mSymbol;
         const library::SymbolPin* mSymbolPin;
-        const library::ComponentSignal* mGenCompSignal;
-        ComponentSignalInstance* mGenCompSignalInstance;
+        const library::ComponentSignal* mComponentSignal;
+        ComponentSignalInstance* mComponentSignalInstance;
         Point mPosition;
         Angle mRotation;
 

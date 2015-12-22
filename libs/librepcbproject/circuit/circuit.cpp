@@ -84,8 +84,8 @@ Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create) thr
             for (XmlDomElement* node = root.getFirstChild("component_instances/component_instance", true, false);
                  node; node = node->getNextSibling("component_instance"))
             {
-                ComponentInstance* genComp = new ComponentInstance(*this, *node);
-                addComponentInstance(*genComp);
+                ComponentInstance* component = new ComponentInstance(*this, *node);
+                addComponentInstance(*component);
             }
         }
 
@@ -280,14 +280,14 @@ void Circuit::removeNetSignal(NetSignal& netsignal) throw (Exception)
     Q_ASSERT(mNetSignals.contains(netsignal.getUuid()) == true);
 
     // the netsignal cannot be removed if there are already elements with that netsignal!
-    if (   (netsignal.getGenCompSignals().count() > 0)
+    if (   (netsignal.getComponentSignals().count() > 0)
         || (netsignal.getNetPoints().count() > 0)
         || (netsignal.getNetLabels().count() > 0))
     {
         throw LogicError(__FILE__, __LINE__,
             QString("%1:%2/%3")
             .arg(netsignal.getUuid().toStr())
-            .arg(netsignal.getGenCompSignals().count())
+            .arg(netsignal.getComponentSignals().count())
             .arg(netsignal.getNetPoints().count()),
             QString(tr("There are already elements in the netsignal \"%1\"!"))
             .arg(netsignal.getName()));
@@ -323,7 +323,7 @@ void Circuit::setNetSignalName(NetSignal& netsignal, const QString& newName, boo
 }
 
 /*****************************************************************************************
- *  GenCompInstance Methods
+ *  ComponentInstance Methods
  ****************************************************************************************/
 
 ComponentInstance* Circuit::getComponentInstanceByUuid(const Uuid& uuid) const noexcept
@@ -475,9 +475,9 @@ XmlDomElement* Circuit::serializeToXmlDomElement() const throw (Exception)
     XmlDomElement* netsignals = root->appendChild("netsignals");
     foreach (NetSignal* netsignal, mNetSignals)
         netsignals->appendChild(netsignal->serializeToXmlDomElement());
-    XmlDomElement* genericComponents = root->appendChild("component_instances");
+    XmlDomElement* components = root->appendChild("component_instances");
     foreach (ComponentInstance* instance, mComponentInstances)
-        genericComponents->appendChild(instance->serializeToXmlDomElement());
+        components->appendChild(instance->serializeToXmlDomElement());
     return root.take();
 }
 

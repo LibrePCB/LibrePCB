@@ -64,7 +64,7 @@ SI_NetPoint::SI_NetPoint(Schematic& schematic, const XmlDomElement& domElement) 
             throw RuntimeError(__FILE__, __LINE__, pinUuid.toStr(),
                 QString(tr("Invalid symbol pin UUID: \"%1\"")).arg(pinUuid.toStr()));
         }
-        const ComponentSignalInstance* compSignal = mSymbolPin->getGenCompSignalInstance();
+        const ComponentSignalInstance* compSignal = mSymbolPin->getComponentSignalInstance();
         if (!compSignal)
         {
             throw RuntimeError(__FILE__, __LINE__, pinUuid.toStr(),
@@ -112,7 +112,7 @@ SI_NetPoint::SI_NetPoint(Schematic& schematic, SI_SymbolPin& pin) throw (Excepti
 {
     mUuid = Uuid::createRandom(); // generate random UUID
     mAttached = true;
-    const ComponentSignalInstance* compSignal = mSymbolPin->getGenCompSignalInstance();
+    const ComponentSignalInstance* compSignal = mSymbolPin->getComponentSignalInstance();
     if (!compSignal)
     {
         throw RuntimeError(__FILE__, __LINE__, mSymbolPin->getLibPinUuid().toStr(),
@@ -192,7 +192,7 @@ void SI_NetPoint::detachFromPin() throw (Exception)
 void SI_NetPoint::attachToPin(SI_SymbolPin& pin) throw (Exception)
 {
     if (mAttached) throw LogicError(__FILE__, __LINE__);
-    const ComponentSignalInstance* compSignal = pin.getGenCompSignalInstance();
+    const ComponentSignalInstance* compSignal = pin.getComponentSignalInstance();
     if (!compSignal) throw LogicError(__FILE__, __LINE__);
     const NetSignal* netsignal = compSignal->getNetSignal();
     if (netsignal != mNetSignal) throw LogicError(__FILE__, __LINE__);
@@ -234,7 +234,7 @@ void SI_NetPoint::addToSchematic(GraphicsScene& scene) throw (Exception)
     if (mAttached)
     {
         // check if mNetSignal is correct (would be a bug if not)
-        if (mNetSignal != mSymbolPin->getGenCompSignalInstance()->getNetSignal())
+        if (mNetSignal != mSymbolPin->getComponentSignalInstance()->getNetSignal())
             throw LogicError(__FILE__, __LINE__);
     }
 
@@ -252,7 +252,7 @@ void SI_NetPoint::removeFromSchematic(GraphicsScene& scene) throw (Exception)
     if (mAttached)
     {
         // check if mNetSignal is correct (would be a bug if not)
-        if (mNetSignal != mSymbolPin->getGenCompSignalInstance()->getNetSignal())
+        if (mNetSignal != mSymbolPin->getComponentSignalInstance()->getNetSignal())
             throw LogicError(__FILE__, __LINE__);
     }
 

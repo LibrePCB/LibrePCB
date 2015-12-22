@@ -45,11 +45,11 @@ class BI_Base : public QObject
 
         // Types
         enum class Type_t {
-            NetPoint,       ///< project#BI_NetPoint
-            NetLine,        ///< project#BI_NetLine
-            NetLabel,       ///< project#BI_NetLabel
-            Footprint,      ///< project#BI_Footprint
-            FootprintPad,   ///< project#BI_FootprintPad
+            //NetPoint,       ///< #project#BI_NetPoint
+            //NetLine,        ///< #project#BI_NetLine
+            //NetLabel,       ///< #project#BI_NetLabel
+            Footprint,      ///< #project#BI_Footprint
+            FootprintPad,   ///< #project#BI_FootprintPad
         };
 
         // Constructors / Destructor

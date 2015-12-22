@@ -41,7 +41,7 @@ namespace project {
 class ComponentInstance;
 class SI_Symbol;
 class CmdSymbolInstanceEdit;
-class AddGenCompDialog;
+class AddComponentDialog;
 }
 
 /*****************************************************************************************
@@ -75,18 +75,18 @@ class SES_AddComponents final : public SES_Base
 
         // Private Methods
         ProcRetVal processSceneEvent(SEE_Base* event) noexcept;
-        void startAddingComponent(const Uuid& genComp = Uuid(), const Uuid& symbVar = Uuid()) throw (Exception);
+        void startAddingComponent(const Uuid& cmp = Uuid(), const Uuid& symbVar = Uuid()) throw (Exception);
         bool abortCommand(bool showErrMsgBox) noexcept;
 
 
         // Attributes
         bool mIsUndoCmdActive;
-        AddGenCompDialog* mAddGenCompDialog;
+        AddComponentDialog* mAddComponentDialog;
         Angle mLastAngle;
 
         // information about the current symbol to place
-        const library::Component* mGenComp;
-        const library::ComponentSymbolVariant* mGenCompSymbVar;
+        const library::Component* mComponent;
+        const library::ComponentSymbolVariant* mCmpSymbVar;
         const library::ComponentSymbolVariantItem* mCurrentSymbVarItem;
         SI_Symbol* mCurrentSymbolToPlace;
         CmdSymbolInstanceEdit* mCurrentSymbolEditCommand;

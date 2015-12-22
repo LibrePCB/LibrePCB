@@ -38,7 +38,7 @@ namespace library {
  * @brief The SymbolEllipse class
  *
  * @note If you make changes in this class, please check if you also need to modify
- *       the class library#FootprintEllipse as these classes are very similar.
+ *       the class #library#FootprintEllipse as these classes are very similar.
  */
 class SymbolEllipse final : public IF_XmlSerializableObject
 {

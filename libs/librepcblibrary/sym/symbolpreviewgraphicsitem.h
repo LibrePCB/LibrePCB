@@ -64,7 +64,7 @@ class SymbolPreviewGraphicsItem final : public GraphicsItem, public IF_Attribute
         explicit SymbolPreviewGraphicsItem(const IF_SchematicLayerProvider& layerProvider,
                                            const QStringList& localeOrder,
                                            const Symbol& symbol,
-                                           const Component* genComp = nullptr,
+                                           const Component* cmp = nullptr,
                                            const Uuid& symbVarUuid = Uuid(),
                                            const Uuid& symbVarItemUuid = Uuid()) noexcept;
         ~SymbolPreviewGraphicsItem() noexcept;
@@ -114,7 +114,7 @@ class SymbolPreviewGraphicsItem final : public GraphicsItem, public IF_Attribute
         // General Attributes
         const IF_SchematicLayerProvider& mLayerProvider;
         const Symbol& mSymbol;
-        const Component* mGenComp;
+        const Component* mComponent;
         const ComponentSymbolVariantItem* mSymbVarItem;
         QFont mFont;
         bool mDrawBoundingRect;

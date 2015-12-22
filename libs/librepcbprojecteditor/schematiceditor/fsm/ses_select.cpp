@@ -250,18 +250,18 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneRightClick(QGraphicsSceneMouse
         case SI_Base::Type_t::Symbol:
         {
             SI_Symbol* symbol = dynamic_cast<SI_Symbol*>(items.first()); Q_ASSERT(symbol);
-            ComponentInstance& genComp = symbol->getGenCompInstance();
+            ComponentInstance& cmpInstance = symbol->getComponentInstance();
 
             // build the context menu
             QAction* aCopy = menu.addAction(QIcon(":/img/actions/copy.png"), tr("Copy"));
             QAction* aRotateCCW = menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("Rotate"));
             QAction* aMirror = menu.addAction(QIcon(":/img/actions/flip_horizontal.png"), tr("Mirror"));
             menu.addSeparator();
-            QAction* aPlaceUnplacedSymbols = menu.addAction(QString(tr("Place unplaced symbols of %1 (%2)")).arg(genComp.getName()).arg(genComp.getUnplacedSymbolsCount()));
-            aPlaceUnplacedSymbols->setEnabled(genComp.getUnplacedSymbolsCount() > 0);
+            QAction* aPlaceUnplacedSymbols = menu.addAction(QString(tr("Place unplaced symbols of %1 (%2)")).arg(cmpInstance.getName()).arg(cmpInstance.getUnplacedSymbolsCount()));
+            aPlaceUnplacedSymbols->setEnabled(cmpInstance.getUnplacedSymbolsCount() > 0);
             QAction* aRemoveSymbol = menu.addAction(QIcon(":/img/actions/delete.png"), QString(tr("Remove Symbol %1")).arg(symbol->getName()));
-            aRemoveSymbol->setEnabled(genComp.getPlacedSymbolsCount() > 1);
-            QAction* aRemoveGenComp = menu.addAction(QIcon(":/img/actions/cancel.png"), QString(tr("Remove Component %1")).arg(genComp.getName()));
+            aRemoveSymbol->setEnabled(cmpInstance.getPlacedSymbolsCount() > 1);
+            QAction* aRemoveCmp = menu.addAction(QIcon(":/img/actions/cancel.png"), QString(tr("Remove Component %1")).arg(cmpInstance.getName()));
             menu.addSeparator();
             QAction* aProperties = menu.addAction(tr("Properties"));
 
@@ -287,14 +287,14 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneRightClick(QGraphicsSceneMouse
             {
                 // TODO
             }
-            else if (action == aRemoveGenComp)
+            else if (action == aRemoveCmp)
             {
                 // TODO
             }
             else if (action == aProperties)
             {
                 // open the properties editor dialog of the selected item
-                SymbolInstancePropertiesDialog dialog(mProject, genComp, *symbol, mUndoStack, &mEditor);
+                SymbolInstancePropertiesDialog dialog(mProject, cmpInstance, *symbol, mUndoStack, &mEditor);
                 dialog.exec();
             }
             return ForceStayInState;
@@ -319,8 +319,8 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneDoubleClick(QGraphicsSceneMous
             case SI_Base::Type_t::Symbol:
             {
                 SI_Symbol* symbol = dynamic_cast<SI_Symbol*>(items.first()); Q_ASSERT(symbol);
-                ComponentInstance& genComp = symbol->getGenCompInstance();
-                SymbolInstancePropertiesDialog dialog(mProject, genComp, *symbol, mUndoStack, &mEditor);
+                ComponentInstance& cmpInstance = symbol->getComponentInstance();
+                SymbolInstancePropertiesDialog dialog(mProject, cmpInstance, *symbol, mUndoStack, &mEditor);
                 dialog.exec();
                 return ForceStayInState;
             }
@@ -340,7 +340,7 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneDoubleClick(QGraphicsSceneMous
                         if (newSignal)
                         {
                             mUndoStack.beginCommand(tr("Combine Net Signals"));
-                            foreach (ComponentSignalInstance* signal, netsignal.getGenCompSignals())
+                            foreach (ComponentSignalInstance* signal, netsignal.getComponentSignals())
                             {
                                 auto cmd = new CmdCompSigInstSetNetSignal(*signal, newSignal);
                                 mUndoStack.appendToCommand(cmd);
@@ -631,15 +631,15 @@ bool SES_Select::removeSelectedItems() noexcept
     // abort if no items are selected
     if (items.isEmpty()) return false;
 
-    // get all involved generic component instances
-    QList<ComponentInstance*> genCompInstances;
+    // get all involved component instances
+    QList<ComponentInstance*> componentInstances;
     foreach (SI_Base* item, items)
     {
         if (item->getType() == SI_Base::Type_t::Symbol)
         {
             SI_Symbol* symbol = dynamic_cast<SI_Symbol*>(item); Q_ASSERT(symbol);
-            if (!genCompInstances.contains(&symbol->getGenCompInstance()))
-                genCompInstances.append(&symbol->getGenCompInstance());
+            if (!componentInstances.contains(&symbol->getComponentInstance()))
+                componentInstances.append(&symbol->getComponentInstance());
         }
     }
 
@@ -685,7 +685,7 @@ bool SES_Select::removeSelectedItems() noexcept
                     mUndoStack.appendToCommand(cmd);
                     if (netpoint->isAttached())
                     {
-                        ComponentSignalInstance* signal = netpoint->getSymbolPin()->getGenCompSignalInstance();
+                        ComponentSignalInstance* signal = netpoint->getSymbolPin()->getComponentSignalInstance();
                         Q_ASSERT(signal); if (!signal) throw LogicError(__FILE__, __LINE__);
                         CmdCompSigInstSetNetSignal* cmd = new CmdCompSigInstSetNetSignal(*signal, nullptr);
                         mUndoStack.appendToCommand(cmd);
@@ -693,7 +693,7 @@ bool SES_Select::removeSelectedItems() noexcept
                 }
                 else if (netpoint->isAttached())
                 {
-                    ComponentSignalInstance* signal = netpoint->getSymbolPin()->getGenCompSignalInstance();
+                    ComponentSignalInstance* signal = netpoint->getSymbolPin()->getComponentSignalInstance();
                     Q_ASSERT(signal); if (!signal) throw LogicError(__FILE__, __LINE__);
                     CmdSchematicNetPointDetach* cmd1 = new CmdSchematicNetPointDetach(*netpoint);
                     mUndoStack.appendToCommand(cmd1);
@@ -714,12 +714,12 @@ bool SES_Select::removeSelectedItems() noexcept
             }
         }
 
-        // remove generic components
-        foreach (auto genComp, genCompInstances)
+        // remove components
+        foreach (auto component, componentInstances)
         {
-            if (genComp->getPlacedSymbolsCount() == 0)
+            if (component->getPlacedSymbolsCount() == 0)
             {
-                CmdComponentInstanceRemove* cmd = new CmdComponentInstanceRemove(mCircuit, *genComp);
+                CmdComponentInstanceRemove* cmd = new CmdComponentInstanceRemove(mCircuit, *component);
                 mUndoStack.appendToCommand(cmd);
             }
         }
@@ -758,12 +758,12 @@ bool SES_Select::cutSelectedItems() noexcept
     // abort if no items are selected
     if (count == 0) return false;
 
-    // get all involved generic component instances
-    QList<GenCompInstance*> genCompInstances;
+    // get all involved component instances
+    QList<ComponentInstance*> componentInstances;
     foreach (SymbolInstance* symbol, symbols)
     {
-        if (!genCompInstances.contains(&symbol->getGenCompInstance()))
-            genCompInstances.append(&symbol->getGenCompInstance());
+        if (!componentInstances.contains(&symbol->getComponentInstance()))
+            componentInstances.append(&symbol->getComponentInstance());
     }
 
     bool commandActive = false;
@@ -790,19 +790,19 @@ bool SES_Select::cutSelectedItems() noexcept
                 mEditor.getProject().getUndoStack().appendToCommand(cmd);
                 if (point->isAttached())
                 {
-                    GenCompSignalInstance* signal = point->getPinInstance()->getGenCompSignalInstance();
+                    ComponentSignalInstance* signal = point->getPinInstance()->getComponentSignalInstance();
                     Q_ASSERT(signal); if (!signal) throw LogicError(__FILE__, __LINE__);
-                    CmdGenCompSigInstSetNetSignal* cmd = new CmdGenCompSigInstSetNetSignal(*signal, nullptr);
+                    CmdCmpSigInstSetNetSignal* cmd = new CmdCmpSigInstSetNetSignal(*signal, nullptr);
                     mEditor.getProject().getUndoStack().appendToCommand(cmd);
                 }
             }
             else if (point->isAttached())
             {
-                GenCompSignalInstance* signal = point->getPinInstance()->getGenCompSignalInstance();
+                ComponentSignalInstance* signal = point->getPinInstance()->getComponentSignalInstance();
                 Q_ASSERT(signal); if (!signal) throw LogicError(__FILE__, __LINE__);
                 CmdSchematicNetPointDetach* cmd1 = new CmdSchematicNetPointDetach(*point);
                 mEditor.getProject().getUndoStack().appendToCommand(cmd1);
-                CmdGenCompSigInstSetNetSignal* cmd2 = new CmdGenCompSigInstSetNetSignal(*signal, nullptr);
+                CmdCmpSigInstSetNetSignal* cmd2 = new CmdCmpSigInstSetNetSignal(*signal, nullptr);
                 mEditor.getProject().getUndoStack().appendToCommand(cmd2);
             }
         }
@@ -814,12 +814,12 @@ bool SES_Select::cutSelectedItems() noexcept
             mEditor.getProject().getUndoStack().appendToCommand(cmd);
         }
 
-        // remove generic components
-        foreach (GenCompInstance* genComp, genCompInstances)
+        // remove components
+        foreach (ComponentInstance* cmpInstance, componentInstances)
         {
-            if (genComp->getPlacedSymbolsCount() == 0)
+            if (cmpInstance->getPlacedSymbolsCount() == 0)
             {
-                CmdGenCompInstanceRemove* cmd = new CmdGenCompInstanceRemove(mCircuit, *genComp);
+                CmdComponentInstanceRemove* cmd = new CmdComponentInstanceRemove(mCircuit, *cmpInstance);
                 mEditor.getProject().getUndoStack().appendToCommand(cmd);
             }
         }

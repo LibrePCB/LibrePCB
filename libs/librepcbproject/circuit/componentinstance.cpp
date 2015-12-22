@@ -288,7 +288,7 @@ void ComponentInstance::removeFromCircuit() throw (Exception)
 
 void ComponentInstance::registerSymbol(const SI_Symbol& symbol) throw (Exception)
 {
-    const library::ComponentSymbolVariantItem* item = &symbol.getGenCompSymbVarItem();
+    const library::ComponentSymbolVariantItem* item = &symbol.getCompSymbVarItem();
 
     if (!mAddedToCircuit)
         throw LogicError(__FILE__, __LINE__, item->getUuid().toStr());
@@ -309,7 +309,7 @@ void ComponentInstance::registerSymbol(const SI_Symbol& symbol) throw (Exception
 
 void ComponentInstance::unregisterSymbol(const SI_Symbol& symbol) throw (Exception)
 {
-    const library::ComponentSymbolVariantItem* item = &symbol.getGenCompSymbVarItem();
+    const library::ComponentSymbolVariantItem* item = &symbol.getCompSymbVarItem();
 
     if (!mAddedToCircuit)
         throw LogicError(__FILE__, __LINE__, item->getUuid().toStr());

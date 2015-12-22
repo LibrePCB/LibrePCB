@@ -40,14 +40,14 @@ namespace library {
 SymbolPreviewGraphicsItem::SymbolPreviewGraphicsItem(const IF_SchematicLayerProvider& layerProvider,
                                                      const QStringList& localeOrder,
                                                      const Symbol& symbol,
-                                                     const Component* genComp,
+                                                     const Component* cmp,
                                                      const Uuid& symbVarUuid,
                                                      const Uuid& symbVarItemUuid) noexcept :
-    GraphicsItem(), mLayerProvider(layerProvider), mSymbol(symbol), mGenComp(genComp),
+    GraphicsItem(), mLayerProvider(layerProvider), mSymbol(symbol), mComponent(cmp),
     mSymbVarItem(nullptr), mDrawBoundingRect(false), mLocaleOrder(localeOrder)
 {
-    if (mGenComp)
-        mSymbVarItem = mGenComp->getSymbVarItem(symbVarUuid, symbVarItemUuid);
+    if (mComponent)
+        mSymbVarItem = mComponent->getSymbVarItem(symbVarUuid, symbVarItemUuid);
 
     mFont.setStyleStrategy(QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
     mFont.setStyleHint(QFont::SansSerif);
@@ -59,7 +59,7 @@ SymbolPreviewGraphicsItem::SymbolPreviewGraphicsItem(const IF_SchematicLayerProv
     {
         const ComponentSignal* signal = nullptr;
         ComponentSymbolVariantItem::PinDisplayType_t displayType = ComponentSymbolVariantItem::PinDisplayType_t::PinName;
-        if (mGenComp) signal = mGenComp->getSignalOfPin(symbVarUuid, symbVarItemUuid, pin->getUuid());
+        if (mComponent) signal = mComponent->getSignalOfPin(symbVarUuid, symbVarItemUuid, pin->getUuid());
         if (mSymbVarItem) displayType = mSymbVarItem->getDisplayTypeOfPin(pin->getUuid());
         SymbolPinPreviewGraphicsItem* item = new SymbolPinPreviewGraphicsItem(layerProvider, *pin, signal, displayType);
         item->setPos(pin->getPosition().toPxQPointF());
@@ -304,17 +304,17 @@ bool SymbolPreviewGraphicsItem::getAttributeValue(const QString& attrNS, const Q
 
     if ((attrNS == QLatin1String("SYM")) || (attrNS.isEmpty()))
     {
-        if ((attrKey == QLatin1String("NAME")) && (mGenComp) && (mSymbVarItem))
-            return value = mGenComp->getPrefix(mLocaleOrder) % "?" % mSymbVarItem->getSuffix(), true;
+        if ((attrKey == QLatin1String("NAME")) && (mComponent) && (mSymbVarItem))
+            return value = mComponent->getPrefix(mLocaleOrder) % "?" % mSymbVarItem->getSuffix(), true;
     }
 
-    if (((attrNS == QLatin1String("CMP")) || (attrNS.isEmpty())) && (mGenComp))
+    if (((attrNS == QLatin1String("CMP")) || (attrNS.isEmpty())) && (mComponent))
     {
         if (attrKey == QLatin1String("NAME"))
-            return value = mGenComp->getPrefix(mLocaleOrder) % "?", true;
+            return value = mComponent->getPrefix(mLocaleOrder) % "?", true;
         if (attrKey == QLatin1String("VALUE"))
             return value = "VALUE", true;
-        foreach (const LibraryElementAttribute* attr, mGenComp->getAttributes())
+        foreach (const LibraryElementAttribute* attr, mComponent->getAttributes())
         {
             if (attrKey == attr->getKey())
             {

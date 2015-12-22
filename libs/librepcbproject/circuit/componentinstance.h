@@ -90,26 +90,26 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
         // Setters
 
         /**
-         * @brief Set the name of this generic component instance in the circuit
+         * @brief Set the name of this component instance in the circuit
          *
          * @warning You have to check if there is no other component with the same name in
          *          the whole circuit! This method will not check if the name is unique.
-         *          The best way to do this is to call Circuit#setGenCompInstanceName().
+         *          The best way to do this is to call #project#Circuit#setComponentInstanceName().
          *
          * @param name  The new name of this component in the circuit (must not be empty)
          *
          * @throw Exception If the new name is invalid, an exception will be thrown
          *
-         * @undocmd{project#CmdGenCompInstEdit}
+         * @undocmd{#project#CmdComponentInstanceEdit}
          */
         void setName(const QString& name) throw (Exception);
 
         /**
-         * @brief Set the value of this generic component instance in the circuit
+         * @brief Set the value of this component instance in the circuit
          *
          * @param value  The new value
          *
-         * @undocmd{project#CmdGenCompInstEdit}
+         * @undocmd{#project#CmdComponentInstanceEdit}
          */
         void setValue(const QString& value) noexcept;
 
@@ -194,7 +194,7 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
         /**
          * @brief All registered symbols
          *
-         * - Key:   UUID of the symbol variant item (library#GenCompSymbVarItem)
+         * - Key:   UUID of the symbol variant item (#library#ComponentSymbolVariantItem)
          * - Value: Pointer to the registered symbol
          *
          * @see #registerSymbol(), #unregisterSymbol()
@@ -208,10 +208,10 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
          */
         QList<const DeviceInstance*> mDeviceInstances;
 
-        /// @brief The ERC message for unplaced required symbols of this generic component
+        /// @brief The ERC message for unplaced required symbols of this component
         QScopedPointer<ErcMsg> mErcMsgUnplacedRequiredSymbols;
 
-        /// @brief The ERC message for unplaced optional symbols of this generic component
+        /// @brief The ERC message for unplaced optional symbols of this component
         QScopedPointer<ErcMsg> mErcMsgUnplacedOptionalSymbols;
 };
 

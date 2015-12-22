@@ -39,7 +39,7 @@ namespace library {
  * @brief The FootprintText class
  *
  * @note If you make changes in this class, please check if you also need to modify
- *       the class library#SymbolText as these classes are very similar.
+ *       the class #library#SymbolText as these classes are very similar.
  *
  * @author ubruhin
  * @date 2015-06-07

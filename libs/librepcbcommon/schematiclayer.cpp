@@ -149,8 +149,8 @@ SchematicLayer::SchematicLayer(int id) :
             mIsVisible = false;
             break;
 
-        case DEBUG_GenCompSymbolsCount:
-            mName = tr("DEBUG_GenCompSymbolsCount");
+        case DEBUG_ComponentSymbolsCount:
+            mName = tr("DEBUG_ComponentSymbolsCount");
             mColor = Qt::darkRed;
             mColorHighlighted = Qt::red;
             mIsVisible = false;

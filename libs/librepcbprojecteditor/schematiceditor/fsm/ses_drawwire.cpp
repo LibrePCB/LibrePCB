@@ -377,9 +377,9 @@ bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,
             if (pinUnderCursor)
             {
                 // check if the pin's signal forces a net name
-                if (pinUnderCursor->getGenCompSignalInstance()->isNetSignalNameForced())
+                if (pinUnderCursor->getComponentSignalInstance()->isNetSignalNameForced())
                 {
-                    forcedNetSignalName = pinUnderCursor->getGenCompSignalInstance()->getForcedNetSignalName();
+                    forcedNetSignalName = pinUnderCursor->getComponentSignalInstance()->getForcedNetSignalName();
                     netsignal = mProject.getCircuit().getNetSignalByName(forcedNetSignalName);
                     if (netsignal) netclass = &netsignal->getNetClass();
                 }
@@ -426,7 +426,7 @@ bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,
             CmdSchematicNetPointAdd* cmdNetPointAdd1 = nullptr;
             if (pinUnderCursor)
             {
-                ComponentSignalInstance* i = pinUnderCursor->getGenCompSignalInstance();
+                ComponentSignalInstance* i = pinUnderCursor->getComponentSignalInstance();
                 Q_ASSERT(i); if (!i) throw LogicError(__FILE__, __LINE__);
                 Q_ASSERT(!i->getNetSignal()); if (i->getNetSignal()) throw LogicError(__FILE__, __LINE__);
                 CmdCompSigInstSetNetSignal* cmdSetSignal = new CmdCompSigInstSetNetSignal(*i, netsignal);
@@ -610,7 +610,7 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
             }
 
             // combine both netsignals
-            foreach (ComponentSignalInstance* signal, originalSignal->getGenCompSignals())
+            foreach (ComponentSignalInstance* signal, originalSignal->getComponentSignals())
             {
                 auto cmd = new CmdCompSigInstSetNetSignal(*signal, combinedSignal);
                 mUndoStack.appendToCommand(cmd);
@@ -661,14 +661,14 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
 
                 // rename the net signal if required
                 NetSignal* netsignal = mPositioningNetPoint2->getNetSignal();
-                QString forcedName = pin->getGenCompSignalInstance()->getForcedNetSignalName();
-                if ((pin->getGenCompSignalInstance()->isNetSignalNameForced()) && (netsignal->getName() != forcedName))
+                QString forcedName = pin->getComponentSignalInstance()->getForcedNetSignalName();
+                if ((pin->getComponentSignalInstance()->isNetSignalNameForced()) && (netsignal->getName() != forcedName))
                 {
                     NetSignal* newNetsignal = mCircuit.getNetSignalByName(forcedName);
                     if (newNetsignal)
                     {
                         // replace the netsignal
-                        foreach (ComponentSignalInstance* signal, netsignal->getGenCompSignals())
+                        foreach (ComponentSignalInstance* signal, netsignal->getComponentSignals())
                         {
                             auto cmd = new CmdCompSigInstSetNetSignal(*signal, newNetsignal);
                             mUndoStack.appendToCommand(cmd);
@@ -698,7 +698,7 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
                 }
                 // add the pin's component signal to the current netsignal
                 auto cmd1 = new CmdCompSigInstSetNetSignal(
-                    *pin->getGenCompSignalInstance(), mPositioningNetPoint2->getNetSignal());
+                    *pin->getComponentSignalInstance(), mPositioningNetPoint2->getNetSignal());
                 mUndoStack.appendToCommand(cmd1);
                 // remove the current point/line
                 auto cmd2 = new CmdSchematicNetLineRemove(schematic, *mPositioningNetLine2);
@@ -795,7 +795,7 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
                         }*/
 
                         // combine both netsignals
-                        foreach (ComponentSignalInstance* signal, netsignalToRemove->getGenCompSignals())
+                        foreach (ComponentSignalInstance* signal, netsignalToRemove->getComponentSignals())
                         {
                             auto cmd = new CmdCompSigInstSetNetSignal(*signal, combinedNetsignal);
                             mUndoStack.appendToCommand(cmd);

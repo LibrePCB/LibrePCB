@@ -75,10 +75,10 @@ class BEE_Base
             Edit_FlipVertical,  ///< flip the selected elements vertical (Shift+f)
             Edit_Remove,        ///< remove the selected elements
             // Redirected QEvent's (SEE_RedirectedQEvent objects, with pointer to a QEvent)
-            GraphicsViewEvent,  ///< event from #GraphicsView @see project#SEE_RedirectedQEvent
+            GraphicsViewEvent,  ///< event from #GraphicsView @see #project#SEE_RedirectedQEvent
             // Special Events (with some additional parameters)
-            StartAddComponent,      ///< @see project#SEE_StartAddComponent
-            SwitchToSchematicPage,  ///< @see project#SEE_SwitchToSchematicPage
+            StartAddComponent,      ///< @see #project#SEE_StartAddComponent
+            SwitchToSchematicPage,  ///< @see #project#SEE_SwitchToSchematicPage
         };
 
         // Constructors / Destructor

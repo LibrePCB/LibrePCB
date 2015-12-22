@@ -239,12 +239,12 @@ DeviceInstance* Board::getDeviceInstanceByComponentUuid(const Uuid& uuid) const 
 
 DeviceInstance* Board::createDeviceInstance() throw (Exception)
 {
-    /*if (getGenCompInstanceByName(name))
+    /*if (getComponentInstanceByName(name))
     {
         throw RuntimeError(__FILE__, __LINE__, name, QString(tr("The component "
             "name \"%1\" does already exist in the circuit.")).arg(name));
     }
-    return new ComponentInstance(*this, genComp, symbVar, name);*/
+    return new ComponentInstance(*this, cmp, symbVar, name);*/
     return nullptr; // TODO
 }
 
@@ -408,25 +408,25 @@ XmlDomElement* Board::serializeToXmlDomElement() const throw (Exception)
 
 void Board::updateErcMessages() noexcept
 {
-    // type: UnplacedGenericComponent (GenCompInstances without ComponentInstance)
+    // type: UnplacedComponent (ComponentInstances without DeviceInstance)
     if (mAddedToProject)
     {
-        foreach (const ComponentInstance* genComp, mProject.getCircuit().getComponentInstances())
+        foreach (const ComponentInstance* component, mProject.getCircuit().getComponentInstances())
         {
-            if (genComp->getLibComponent().isSchematicOnly()) continue;
-            DeviceInstance* comp = mDeviceInstances.value(genComp->getUuid());
-            ErcMsg* ercMsg = mErcMsgListUnplacedComponentInstances.value(genComp->getUuid());
+            if (component->getLibComponent().isSchematicOnly()) continue;
+            DeviceInstance* comp = mDeviceInstances.value(component->getUuid());
+            ErcMsg* ercMsg = mErcMsgListUnplacedComponentInstances.value(component->getUuid());
             if ((!comp) && (!ercMsg))
             {
                 ErcMsg* ercMsg = new ErcMsg(mProject, *this, QString("%1/%2").arg(mUuid.toStr(),
-                    genComp->getUuid().toStr()), "UnplacedComponent", ErcMsg::ErcMsgType_t::BoardError,
-                    QString("Unplaced Component: %1 (Board: %2)").arg(genComp->getName(), mName));
+                    component->getUuid().toStr()), "UnplacedComponent", ErcMsg::ErcMsgType_t::BoardError,
+                    QString("Unplaced Component: %1 (Board: %2)").arg(component->getName(), mName));
                 ercMsg->setVisible(true);
-                mErcMsgListUnplacedComponentInstances.insert(genComp->getUuid(), ercMsg);
+                mErcMsgListUnplacedComponentInstances.insert(component->getUuid(), ercMsg);
             }
             else if ((comp) && (ercMsg))
             {
-                delete mErcMsgListUnplacedComponentInstances.take(genComp->getUuid());
+                delete mErcMsgListUnplacedComponentInstances.take(component->getUuid());
             }
         }
     }

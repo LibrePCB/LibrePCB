@@ -62,7 +62,7 @@ class SymbolInstancePropertiesDialog final : public QDialog
     public:
 
         // Constructors / Destructor
-        explicit SymbolInstancePropertiesDialog(Project& project, ComponentInstance& genComp,
+        explicit SymbolInstancePropertiesDialog(Project& project, ComponentInstance& cmp,
                                                 SI_Symbol& symbol, UndoStack& undoStack,
                                                 QWidget* parent) noexcept;
         ~SymbolInstancePropertiesDialog() noexcept;
@@ -71,8 +71,8 @@ class SymbolInstancePropertiesDialog final : public QDialog
     private slots:
 
         // GUI Events
-        void on_tblGenCompInstAttributes_currentCellChanged(int currentRow, int currentColumn,
-                                                            int previousRow, int previousColumn);
+        void on_tblCompInstAttributes_currentCellChanged(int currentRow, int currentColumn,
+                                                         int previousRow, int previousColumn);
         void on_cbxAttrType_currentIndexChanged(int index);
         void on_cbxAttrUnit_currentIndexChanged(int index);
         void on_btnAttrApply_clicked();
@@ -107,7 +107,7 @@ class SymbolInstancePropertiesDialog final : public QDialog
 
         // General
         Project& mProject;
-        ComponentInstance& mGenCompInstance;
+        ComponentInstance& mComponentInstance;
         SI_Symbol& mSymbol;
         Ui::SymbolInstancePropertiesDialog* mUi;
         UndoStack& mUndoStack;

@@ -64,12 +64,12 @@ namespace project {
  * @brief The Schematic class represents one schematic page of a project and is always
  * part of a circuit
  *
- * A schematic can contain following items (see project#SI_Base and project#SGI_Base):
- *  - netpoint:         project#SI_NetPoint    + project#SGI_NetPoint
- *  - netline:          project#SI_NetLine     + project#SGI_NetLine
- *  - netlabel:         project#SI_NetLabel    + project#SGI_NetLabel
- *  - symbol:           project#SI_Symbol      + project#SGI_Symbol
- *  - symbol pin:       project#SI_SymbolPin   + project#SGI_SymbolPin
+ * A schematic can contain following items (see #project#SI_Base and #project#SGI_Base):
+ *  - netpoint:         #project#SI_NetPoint    + #project#SGI_NetPoint
+ *  - netline:          #project#SI_NetLine     + #project#SGI_NetLine
+ *  - netlabel:         #project#SI_NetLabel    + #project#SGI_NetLabel
+ *  - symbol:           #project#SI_Symbol      + #project#SGI_Symbol
+ *  - symbol pin:       #project#SI_SymbolPin   + #project#SGI_SymbolPin
  *  - polygon:          TODO
  *  - ellipse:          TODO
  *  - text:             TODO
@@ -94,11 +94,11 @@ class Schematic final : public QObject, public IF_AttributeProvider,
          */
         enum ItemZValue {
             ZValue_Default = 0,         ///< this is the default value (behind all other items)
-            ZValue_Symbols,             ///< Z value for project#SymbolInstance items
-            ZValue_NetLabels,           ///< Z value for project#SchematicNetLabel items
-            ZValue_NetLines,            ///< Z value for project#SchematicNetLine items
-            ZValue_HiddenNetPoints,     ///< Z value for hidden project#SchematicNetPoint items
-            ZValue_VisibleNetPoints,    ///< Z value for visible project#SchematicNetPoint items
+            ZValue_Symbols,             ///< Z value for #project#SI_Symbol items
+            ZValue_NetLabels,           ///< Z value for #project#SI_NetLabel items
+            ZValue_NetLines,            ///< Z value for #project#SI_NetLine items
+            ZValue_HiddenNetPoints,     ///< Z value for hidden #project#SI_NetPoint items
+            ZValue_VisibleNetPoints,    ///< Z value for visible #project#SI_NetPoint items
         };
 
 
@@ -138,7 +138,7 @@ class Schematic final : public QObject, public IF_AttributeProvider,
 
         // Symbol Methods
         SI_Symbol* getSymbolByUuid(const Uuid& uuid) const noexcept;
-        SI_Symbol* createSymbol(ComponentInstance& genCompInstance, const Uuid& symbolItem,
+        SI_Symbol* createSymbol(ComponentInstance& cmpInstance, const Uuid& symbolItem,
                                 const Point& position = Point(), const Angle& angle = Angle()) throw (Exception);
         void addSymbol(SI_Symbol& symbol) throw (Exception);
         void removeSymbol(SI_Symbol& symbol) throw (Exception);

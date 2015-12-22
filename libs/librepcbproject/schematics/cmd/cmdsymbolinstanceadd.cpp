@@ -35,14 +35,14 @@ namespace project {
  ****************************************************************************************/
 
 CmdSymbolInstanceAdd::CmdSymbolInstanceAdd(Schematic& schematic,
-                                           ComponentInstance& genComp,
+                                           ComponentInstance& cmpInstance,
                                            const Uuid& symbolItem, const Point& position,
                                            const Angle& angle,
                                            UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Add symbol instance"), parent),
     mSchematic(schematic), mSymbol(nullptr)
 {
-    mSymbol = mSchematic.createSymbol(genComp, symbolItem, position, angle); // throws an exception on error
+    mSymbol = mSchematic.createSymbol(cmpInstance, symbolItem, position, angle); // throws an exception on error
 }
 
 CmdSymbolInstanceAdd::CmdSymbolInstanceAdd(SI_Symbol& symbol, UndoCommand* parent) throw (Exception) :

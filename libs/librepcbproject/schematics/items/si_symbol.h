@@ -66,7 +66,7 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
 
         // Constructors / Destructor
         explicit SI_Symbol(Schematic& schematic, const XmlDomElement& domElement) throw (Exception);
-        explicit SI_Symbol(Schematic& schematic, ComponentInstance& genCompInstance,
+        explicit SI_Symbol(Schematic& schematic, ComponentInstance& cmpInstance,
                            const Uuid& symbolItem, const Point& position = Point(),
                            const Angle& rotation = Angle()) throw (Exception);
         ~SI_Symbol() noexcept;
@@ -79,9 +79,9 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
         QString getName() const noexcept;
         SI_SymbolPin* getPin(const Uuid& pinUuid) const noexcept {return mPins.value(pinUuid);}
         const QHash<Uuid, SI_SymbolPin*>& getPins() const noexcept {return mPins;}
-        ComponentInstance& getGenCompInstance() const noexcept {return *mComponentInstance;}
+        ComponentInstance& getComponentInstance() const noexcept {return *mComponentInstance;}
         const library::Symbol& getLibSymbol() const noexcept {return *mSymbol;}
-        const library::ComponentSymbolVariantItem& getGenCompSymbVarItem() const noexcept {return *mSymbVarItem;}
+        const library::ComponentSymbolVariantItem& getCompSymbVarItem() const noexcept {return *mSymbVarItem;}
 
         // Setters
         void setPosition(const Point& newPos) throw (Exception);
@@ -109,7 +109,7 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
 
     private slots:
 
-        void schematicOrGenCompAttributesChanged();
+        void schematicOrComponentAttributesChanged();
 
 
     signals:

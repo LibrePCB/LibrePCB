@@ -65,15 +65,15 @@ class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
     public:
 
         // Constructors / Destructor
-        explicit ComponentSignalInstance(Circuit& circuit, ComponentInstance& genCompInstance,
+        explicit ComponentSignalInstance(Circuit& circuit, ComponentInstance& cmpInstance,
                                          const XmlDomElement& domElement) throw (Exception);
-        explicit ComponentSignalInstance(Circuit& circuit, ComponentInstance& genCompInstance,
-                                         const library::ComponentSignal& genCompSignal,
+        explicit ComponentSignalInstance(Circuit& circuit, ComponentInstance& cmpInstance,
+                                         const library::ComponentSignal& cmpSignal,
                                          NetSignal* netsignal = nullptr) throw (Exception);
         ~ComponentSignalInstance() noexcept;
 
         // Getters
-        const library::ComponentSignal& getCompSignal() const noexcept {return *mGenCompSignal;}
+        const library::ComponentSignal& getCompSignal() const noexcept {return *mComponentSignal;}
         NetSignal* getNetSignal() const noexcept {return mNetSignal;}
         bool isNetSignalNameForced() const noexcept;
         QString getForcedNetSignalName() const noexcept;
@@ -126,17 +126,17 @@ class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
 
         // General
         Circuit& mCircuit;
-        ComponentInstance& mGenCompInstance;
+        ComponentInstance& mComponentInstance;
 
         // Attributes
-        const library::ComponentSignal* mGenCompSignal;
+        const library::ComponentSignal* mComponentSignal;
         QList<SI_SymbolPin*> mRegisteredSymbolPins;
         NetSignal* mNetSignal;
         bool mAddedToCircuit;
 
         // Misc
 
-        /// @brief The ERC message for an unconnected required generic component signal
+        /// @brief The ERC message for an unconnected required component signal
         QScopedPointer<ErcMsg> mErcMsgUnconnectedRequiredSignal;
         /// @brief The ERC message for a global net signal name mismatch
         QScopedPointer<ErcMsg> mErcMsgForcedNetSignalNameConflict;

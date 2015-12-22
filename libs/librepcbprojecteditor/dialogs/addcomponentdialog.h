@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_ADDGENCOMPDIALOG_H
-#define PROJECT_ADDGENCOMPDIALOG_H
+#ifndef PROJECT_ADDCOMPONENTDIALOG_H
+#define PROJECT_ADDCOMPONENTDIALOG_H
 
 /*****************************************************************************************
  *  Includes
@@ -50,42 +50,42 @@ class ComponentCategory;
 }
 
 namespace Ui {
-class AddGenCompDialog;
+class AddComponentDialog;
 }
 
 namespace project {
 
 /*****************************************************************************************
- *  Class AddGenCompDialog
+ *  Class AddComponentDialog
  ****************************************************************************************/
 
 /**
- * @brief The AddGenCompDialog class
+ * @brief The AddComponentDialog class
  *
  * @todo This class is VERY provisional!
  *
  * @author ubruhin
  * @date 2015-02-16
  */
-class AddGenCompDialog final : public QDialog
+class AddComponentDialog final : public QDialog
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit AddGenCompDialog(Workspace& workspace, Project& project, QWidget* parent = nullptr);
-        ~AddGenCompDialog() noexcept;
+        explicit AddComponentDialog(Workspace& workspace, Project& project, QWidget* parent = nullptr);
+        ~AddComponentDialog() noexcept;
 
         // Getters
-        FilePath getSelectedGenCompFilePath() const noexcept;
+        FilePath getSelectedComponentFilePath() const noexcept;
         Uuid getSelectedSymbVarUuid() const noexcept;
 
 
     private slots:
 
         void treeCategories_currentItemChanged(const QModelIndex& current, const QModelIndex& previous);
-        void on_listGenericComponents_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
+        void on_listComponents_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
         void on_cbxSymbVar_currentIndexChanged(int index);
 
 
@@ -93,7 +93,7 @@ class AddGenCompDialog final : public QDialog
 
         // Private Methods
         void setSelectedCategory(const Uuid& categoryUuid);
-        void setSelectedGenComp(const library::Component* genComp);
+        void setSelectedComponent(const library::Component* cmp);
         void setSelectedSymbVar(const library::ComponentSymbolVariant* symbVar);
         void accept() noexcept;
 
@@ -101,18 +101,18 @@ class AddGenCompDialog final : public QDialog
         // General
         Workspace& mWorkspace;
         Project& mProject;
-        Ui::AddGenCompDialog* mUi;
+        Ui::AddComponentDialog* mUi;
         GraphicsScene* mPreviewScene;
         library::CategoryTreeModel* mCategoryTreeModel;
 
 
         // Attributes
         Uuid mSelectedCategoryUuid;
-        const library::Component* mSelectedGenComp;
+        const library::Component* mSelectedComponent;
         const library::ComponentSymbolVariant* mSelectedSymbVar;
         QList<library::SymbolPreviewGraphicsItem*> mPreviewSymbolGraphicsItems;
 };
 
 } // namespace project
 
-#endif // PROJECT_ADDGENCOMPDIALOG_H
+#endif // PROJECT_ADDCOMPONENTDIALOG_H

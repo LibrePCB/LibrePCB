@@ -71,7 +71,7 @@ class SchematicLayer final : public QObject
             DEBUG_SymbolPinNetSignalNames           = 902,
             DEBUG_NetLinesNetSignalNames            = 903,
             DEBUG_InvisibleNetPoints                = 904,
-            DEBUG_GenCompSymbolsCount               = 905,
+            DEBUG_ComponentSymbolsCount               = 905,
 #endif
 
             // Begin of User defined Layers

@@ -38,7 +38,7 @@ CmdCompAttrInstEdit::CmdCompAttrInstEdit(ComponentInstance& cmp,
                                                const QString& newValue,
                                                const AttributeUnit* newUnit,
                                                UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Edit generic component attribute"), parent),
+    UndoCommand(tr("Edit component attribute"), parent),
     mComponentInstance(cmp), mAttrInst(attr),
     mOldType(&attr.getType()), mNewType(&newType),
     mOldValue(attr.getValue()), mNewValue(newValue),

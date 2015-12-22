@@ -40,7 +40,7 @@ namespace project {
 NetSignal::NetSignal(const Circuit& circuit,
                      const XmlDomElement& domElement) throw (Exception) :
     QObject(0), mCircuit(circuit), mAddedToCircuit(false), mErcMsgUnusedNetSignal(nullptr),
-    mErcMsgConnectedToLessThanTwoPins(nullptr), mGenCompSignalWithForcedNameCount(0),
+    mErcMsgConnectedToLessThanTwoPins(nullptr), mComponentSignalWithForcedNameCount(0),
     // load attributes
     mUuid(domElement.getAttribute<Uuid>("uuid")),
     mName(domElement.getAttribute("name", true)),
@@ -60,7 +60,7 @@ NetSignal::NetSignal(const Circuit& circuit,
 NetSignal::NetSignal(const Circuit& circuit, NetClass& netclass,
                      const QString& name, bool autoName) throw (Exception) :
     QObject(0), mCircuit(circuit), mAddedToCircuit(false), mErcMsgUnusedNetSignal(nullptr),
-    mErcMsgConnectedToLessThanTwoPins(nullptr), mGenCompSignalWithForcedNameCount(0),
+    mErcMsgConnectedToLessThanTwoPins(nullptr), mComponentSignalWithForcedNameCount(0),
     // load default attributes
     mUuid(Uuid::createRandom()), // generate random UUID
     mName(name),
@@ -75,10 +75,10 @@ NetSignal::~NetSignal() noexcept
     Q_ASSERT(mAddedToCircuit == false);
     Q_ASSERT(mErcMsgUnusedNetSignal == nullptr);
     Q_ASSERT(mErcMsgConnectedToLessThanTwoPins == nullptr);
-    Q_ASSERT(mGenCompSignals.isEmpty() == true);
+    Q_ASSERT(mComponentSignals.isEmpty() == true);
     Q_ASSERT(mSchematicNetPoints.isEmpty() == true);
     Q_ASSERT(mSchematicNetLabels.isEmpty() == true);
-    Q_ASSERT(mGenCompSignalWithForcedNameCount == 0);
+    Q_ASSERT(mComponentSignalWithForcedNameCount == 0);
 }
 
 /*****************************************************************************************
@@ -105,25 +105,25 @@ void NetSignal::setName(const QString& name, bool isAutoName) throw (Exception)
  *  General Methods
  ****************************************************************************************/
 
-void NetSignal::registerGenCompSignal(ComponentSignalInstance& signal) noexcept
+void NetSignal::registerComponentSignal(ComponentSignalInstance& signal) noexcept
 {
     Q_ASSERT(mAddedToCircuit == true);
-    Q_ASSERT(mGenCompSignals.contains(&signal) == false);
-    mGenCompSignals.append(&signal);
+    Q_ASSERT(mComponentSignals.contains(&signal) == false);
+    mComponentSignals.append(&signal);
     if (signal.isNetSignalNameForced())
-        mGenCompSignalWithForcedNameCount++;
+        mComponentSignalWithForcedNameCount++;
     updateErcMessages();
 }
 
-void NetSignal::unregisterGenCompSignal(ComponentSignalInstance& signal) noexcept
+void NetSignal::unregisterComponentSignal(ComponentSignalInstance& signal) noexcept
 {
     Q_ASSERT(mAddedToCircuit == true);
-    Q_ASSERT(mGenCompSignals.contains(&signal) == true);
-    mGenCompSignals.removeOne(&signal);
+    Q_ASSERT(mComponentSignals.contains(&signal) == true);
+    mComponentSignals.removeOne(&signal);
     if (signal.isNetSignalNameForced())
     {
-        Q_ASSERT(mGenCompSignalWithForcedNameCount > 0);
-        mGenCompSignalWithForcedNameCount--;
+        Q_ASSERT(mComponentSignalWithForcedNameCount > 0);
+        mComponentSignalWithForcedNameCount--;
     }
     updateErcMessages();
 }
@@ -161,7 +161,7 @@ void NetSignal::unregisterSchematicNetLabel(SI_NetLabel& netlabel) noexcept
 void NetSignal::addToCircuit() noexcept
 {
     Q_ASSERT(mAddedToCircuit == false);
-    Q_ASSERT(mGenCompSignals.isEmpty() == true);
+    Q_ASSERT(mComponentSignals.isEmpty() == true);
     Q_ASSERT(mSchematicNetPoints.isEmpty() == true);
     Q_ASSERT(mSchematicNetLabels.isEmpty() == true);
     mAddedToCircuit = true;
@@ -172,7 +172,7 @@ void NetSignal::addToCircuit() noexcept
 void NetSignal::removeFromCircuit() noexcept
 {
     Q_ASSERT(mAddedToCircuit == true);
-    Q_ASSERT(mGenCompSignals.isEmpty() == true);
+    Q_ASSERT(mComponentSignals.isEmpty() == true);
     Q_ASSERT(mSchematicNetPoints.isEmpty() == true);
     Q_ASSERT(mSchematicNetLabels.isEmpty() == true);
     mAddedToCircuit = false;
@@ -206,7 +206,7 @@ bool NetSignal::checkAttributesValidity() const noexcept
 
 void NetSignal::updateErcMessages() noexcept
 {
-    if (mAddedToCircuit && mGenCompSignals.isEmpty() && mSchematicNetPoints.isEmpty())
+    if (mAddedToCircuit && mComponentSignals.isEmpty() && mSchematicNetPoints.isEmpty())
     {
         if (!mErcMsgUnusedNetSignal)
         {
@@ -222,7 +222,7 @@ void NetSignal::updateErcMessages() noexcept
         mErcMsgUnusedNetSignal = nullptr;
     }
 
-    if (mAddedToCircuit && (mGenCompSignals.count() < 2))
+    if (mAddedToCircuit && (mComponentSignals.count() < 2))
     {
         if (!mErcMsgConnectedToLessThanTwoPins)
         {

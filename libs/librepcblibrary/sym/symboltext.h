@@ -39,7 +39,7 @@ namespace library {
  * @brief The SymbolText class
  *
  * @note If you make changes in this class, please check if you also need to modify
- *       the class library#FootprintText as these classes are very similar.
+ *       the class #library#FootprintText as these classes are very similar.
  */
 class SymbolText final : public IF_XmlSerializableObject
 {

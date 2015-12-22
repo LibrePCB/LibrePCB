@@ -41,8 +41,8 @@ namespace project {
 
 BI_FootprintPad::BI_FootprintPad(BI_Footprint& footprint, const Uuid& padUuid) :
     BI_Base(), mCircuit(footprint.getDeviceInstance().getBoard().getProject().getCircuit()),
-    mFootprint(footprint), mFootprintPad(nullptr), /*mGenCompSignal(nullptr),
-    mGenCompSignalInstance(nullptr),*/ mAddedToBoard(false),
+    mFootprint(footprint), mFootprintPad(nullptr), /*mComponentSignal(nullptr),
+    mComponentSignalInstance(nullptr),*/ mAddedToBoard(false),
     /*mRegisteredNetPoint(nullptr),*/ mGraphicsItem(nullptr)
 {
     // read attributes
@@ -82,27 +82,10 @@ const Uuid& BI_FootprintPad::getLibPadUuid() const noexcept
     return mFootprintPad->getPadUuid();
 }
 
-/*QString BI_FootprintPad::getDisplayText(bool returnGenCompSignalNameIfEmpty,
+/*QString BI_FootprintPad::getDisplayText(bool returnCmpSignalNameIfEmpty,
                                      bool returnPinNameIfEmpty) const noexcept
 {
-    const QStringList& localeOrder = mCircuit.getProject().getSettings().getLocaleOrder(true);
 
-    QString text;
-    switch (mSymbol.getGenCompSymbVarItem().getDisplayTypeOfPin(mSymbolPin->getUuid()))
-    {
-        case library::GenCompSymbVarItem::PinDisplayType_t::PinName:
-            text = mSymbolPin->getName(localeOrder); break;
-        case library::GenCompSymbVarItem::PinDisplayType_t::GenCompSignal:
-            if (mGenCompSignal) text = mGenCompSignal->getName(localeOrder); break;
-        case library::GenCompSymbVarItem::PinDisplayType_t::NetSignal:
-            if (mGenCompSignalInstance->getNetSignal()) text = mGenCompSignalInstance->getNetSignal()->getName(); break;
-        default: break;
-    }
-    if (text.isEmpty() && returnGenCompSignalNameIfEmpty && mGenCompSignal)
-        text = mGenCompSignal->getName(localeOrder);
-    if (text.isEmpty() && returnPinNameIfEmpty)
-        text = mSymbolPin->getName(localeOrder);
-    return text;
 }*/
 
 /*****************************************************************************************
@@ -141,7 +124,7 @@ void BI_FootprintPad::addToBoard(GraphicsScene& scene) noexcept
 {
     Q_ASSERT(mAddedToBoard == false);
     //Q_ASSERT(mRegisteredNetPoint == nullptr);
-    //mGenCompSignalInstance->registerSymbolPin(*this);
+    //mComponentSignalInstance->registerSymbolPin(*this);
     scene.addItem(*mGraphicsItem);
     mAddedToBoard = true;
 }
@@ -150,7 +133,7 @@ void BI_FootprintPad::removeFromBoard(GraphicsScene& scene) noexcept
 {
     Q_ASSERT(mAddedToBoard == true);
     //Q_ASSERT(mRegisteredNetPoint == nullptr);
-    //mGenCompSignalInstance->unregisterSymbolPin(*this);
+    //mComponentSignalInstance->unregisterSymbolPin(*this);
     scene.removeItem(*mGraphicsItem);
     mAddedToBoard = false;
 }
