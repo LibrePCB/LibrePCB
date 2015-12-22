@@ -98,9 +98,9 @@
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="226.9,202.236 218.9,186.236 210.9,202.236 "/>
   </g>
   <g>
-    <rect style="fill: #ffffff" x="1500" y="380" width="153.05" height="28"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1500" y="380" width="153.05" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1576.53" y="399">SchematicLayer</text>
+    <rect style="fill: #ffffff" x="1500" y="420" width="153.05" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1500" y="420" width="153.05" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1576.53" y="439">SchematicLayer</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="440" y="140" width="110.5" height="28"/>
@@ -114,9 +114,9 @@
     <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1566.6" y="215">Application</text>
   </g>
   <g>
-    <rect style="fill: #ffffff" x="1500" y="340" width="77.7" height="28"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1500" y="340" width="77.7" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1538.85" y="359">Version</text>
+    <rect style="fill: #ffffff" x="1500" y="380" width="77.7" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1500" y="380" width="77.7" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1538.85" y="399">Version</text>
   </g>
   <text font-size="22.5778" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:700" x="800" y="40">
     <tspan x="800" y="40">Common classes</tspan>
@@ -234,9 +234,9 @@
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="836.65,386.236 828.65,370.236 820.65,386.236 "/>
   </g>
   <g>
-    <rect style="fill: #ffffff" x="1500" y="420" width="193.35" height="28"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1500" y="420" width="193.35" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:700" x="1596.67" y="439">IF_AttributeProvider</text>
+    <rect style="fill: #ffffff" x="1500" y="460" width="193.35" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1500" y="460" width="193.35" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:700" x="1596.67" y="479">IF_AttributeProvider</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="1280" y="120" width="180" height="200"/>
@@ -262,5 +262,10 @@
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1300" y="260" width="140.9" height="44"/>
     <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1370.45" y="276">&lt;&lt;QGraphicsItem&gt;&gt;</text>
     <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1370.45" y="295">GraphicsItem</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="1500" y="340" width="51.35" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1500" y="340" width="51.35" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1525.67" y="359">Uuid</text>
   </g>
 </svg>
