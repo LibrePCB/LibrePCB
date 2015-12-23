@@ -33,9 +33,9 @@ namespace library {
 
 FootprintPolygonSegment::FootprintPolygonSegment(const XmlDomElement& domElement) throw (Exception)
 {
-    mEndPos.setX(domElement.getAttribute<Length>("end_x"));
-    mEndPos.setY(domElement.getAttribute<Length>("end_y"));
-    mAngle = domElement.getAttribute<Angle>("angle");
+    mEndPos.setX(domElement.getAttribute<Length>("end_x", true));
+    mEndPos.setY(domElement.getAttribute<Length>("end_y", true));
+    mAngle = domElement.getAttribute<Angle>("angle", true);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -45,9 +45,9 @@ XmlDomElement* FootprintPolygonSegment::serializeToXmlDomElement() const throw (
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("segment"));
-    root->setAttribute("end_x", mEndPos.getX().toMmString());
-    root->setAttribute("end_y", mEndPos.getY().toMmString());
-    root->setAttribute("angle", mAngle.toDegString());
+    root->setAttribute("end_x", mEndPos.getX());
+    root->setAttribute("end_y", mEndPos.getY());
+    root->setAttribute("angle", mAngle);
     return root.take();
 }
 
@@ -68,12 +68,12 @@ FootprintPolygon::FootprintPolygon() noexcept :
 FootprintPolygon::FootprintPolygon(const XmlDomElement& domElement) throw (Exception)
 {
     // load general attributes
-    mLayerId = domElement.getAttribute<uint>("layer"); // use "uint" to automatically check for >= 0
-    mWidth = domElement.getAttribute<Length>("width");
-    mIsFilled = domElement.getAttribute<bool>("fill");
-    mIsGrabArea = domElement.getAttribute<bool>("grab_area");
-    mStartPos.setX(domElement.getAttribute<Length>("start_x"));
-    mStartPos.setY(domElement.getAttribute<Length>("start_y"));
+    mLayerId = domElement.getAttribute<uint>("layer", true); // use "uint" to automatically check for >= 0
+    mWidth = domElement.getAttribute<Length>("width", true);
+    mIsFilled = domElement.getAttribute<bool>("fill", true);
+    mIsGrabArea = domElement.getAttribute<bool>("grab_area", true);
+    mStartPos.setX(domElement.getAttribute<Length>("start_x", true));
+    mStartPos.setY(domElement.getAttribute<Length>("start_y", true));
 
     // load all segments
     for (const XmlDomElement* node = domElement.getFirstChild("segment", true);
@@ -155,11 +155,11 @@ XmlDomElement* FootprintPolygon::serializeToXmlDomElement() const throw (Excepti
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("polygon"));
     root->setAttribute("layer", mLayerId);
-    root->setAttribute("width", mWidth.toMmString());
+    root->setAttribute("width", mWidth);
     root->setAttribute("fill", mIsFilled);
     root->setAttribute("grab_area", mIsGrabArea);
-    root->setAttribute("start_x", mStartPos.getX().toMmString());
-    root->setAttribute("start_y", mStartPos.getY().toMmString());
+    root->setAttribute("start_x", mStartPos.getX());
+    root->setAttribute("start_y", mStartPos.getY());
     foreach (const FootprintPolygonSegment* segment, mSegments)
         root->appendChild(segment->serializeToXmlDomElement());
     return root.take();

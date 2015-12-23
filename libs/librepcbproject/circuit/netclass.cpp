@@ -37,8 +37,8 @@ namespace project {
 
 NetClass::NetClass(const Circuit& circuit, const XmlDomElement& domElement) throw (Exception) :
     mCircuit(circuit), mAddedToCircuit(false), mErcMsgUnusedNetClass(nullptr),
-    mUuid(domElement.getAttribute<Uuid>("uuid")),
-    mName(domElement.getAttribute("name", true))
+    mUuid(domElement.getAttribute<Uuid>("uuid", true)),
+    mName(domElement.getAttribute<QString>("name", true))
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }

@@ -45,7 +45,7 @@ DeviceInstance::DeviceInstance(Board& board, const XmlDomElement& domElement) th
     mDevice(nullptr), mFootprint(nullptr)
 {
     // get component instance
-    Uuid compInstUuid = domElement.getAttribute<Uuid>("component_instance");
+    Uuid compInstUuid = domElement.getAttribute<Uuid>("component_instance", true);
     mCompInstance = mBoard.getProject().getCircuit().getComponentInstanceByUuid(compInstUuid);
     if (!mCompInstance)
     {
@@ -54,14 +54,14 @@ DeviceInstance::DeviceInstance(Board& board, const XmlDomElement& domElement) th
             .arg(compInstUuid.toStr()));
     }
     // get device
-    Uuid deviceUuid = domElement.getAttribute<Uuid>("device");
+    Uuid deviceUuid = domElement.getAttribute<Uuid>("device", true);
     initDeviceAndPackage(deviceUuid);
 
     // get position, rotation and mirrored
-    mPosition.setX(domElement.getFirstChild("position", true)->getAttribute<Length>("x"));
-    mPosition.setY(domElement.getFirstChild("position", true)->getAttribute<Length>("y"));
-    mRotation = domElement.getFirstChild("position", true)->getAttribute<Angle>("rotation");
-    mIsMirrored = domElement.getFirstChild("position", true)->getAttribute<bool>("mirror");
+    mPosition.setX(domElement.getFirstChild("position", true)->getAttribute<Length>("x", true));
+    mPosition.setY(domElement.getFirstChild("position", true)->getAttribute<Length>("y", true));
+    mRotation = domElement.getFirstChild("position", true)->getAttribute<Angle>("rotation", true);
+    mIsMirrored = domElement.getFirstChild("position", true)->getAttribute<bool>("mirror", true);
 
     // load footprint
     mFootprint = new BI_Footprint(*this, *domElement.getFirstChild("footprint", true));

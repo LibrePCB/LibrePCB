@@ -42,15 +42,15 @@ FootprintPad::FootprintPad(const XmlDomElement& domElement) throw (Exception) :
     mPadUuid(), mPosition()
 {
     // read attributes
-    mPadUuid = domElement.getAttribute<Uuid>("uuid");
-    mType = stringToType(domElement.getAttribute("type"));
-    mPosition.setX(domElement.getAttribute<Length>("x"));
-    mPosition.setY(domElement.getAttribute<Length>("y"));
-    mRotation = domElement.getAttribute<Angle>("rotation");
-    mWidth = domElement.getAttribute<Length>("width");
-    mHeight = domElement.getAttribute<Length>("height");
-    mDrillDiameter = domElement.getAttribute<Length>("tht_drill");
-    if (domElement.getAttribute("smt_side", true) == "bottom")
+    mPadUuid = domElement.getAttribute<Uuid>("uuid", true);
+    mType = stringToType(domElement.getAttribute<QString>("type", true));
+    mPosition.setX(domElement.getAttribute<Length>("x", true));
+    mPosition.setY(domElement.getAttribute<Length>("y", true));
+    mRotation = domElement.getAttribute<Angle>("rotation", true);
+    mWidth = domElement.getAttribute<Length>("width", true);
+    mHeight = domElement.getAttribute<Length>("height", true);
+    mDrillDiameter = domElement.getAttribute<Length>("tht_drill", true);
+    if (domElement.getAttribute<QString>("smt_side", true) == "bottom")
         mLayerId = BoardLayer::BottomCopper;
     else
         mLayerId = BoardLayer::TopCopper;
@@ -73,8 +73,8 @@ XmlDomElement* FootprintPad::serializeToXmlDomElement() const throw (Exception)
     QScopedPointer<XmlDomElement> root(new XmlDomElement("pad"));
     root->setAttribute("uuid", mPadUuid);
     root->setAttribute("type", typeToString(mType));
-    root->setAttribute("x", mPosition.getX().toMmString());
-    root->setAttribute("y", mPosition.getY().toMmString());
+    root->setAttribute("x", mPosition.getX());
+    root->setAttribute("y", mPosition.getY());
     root->setAttribute("rotation", mRotation);
     root->setAttribute("width", mWidth);
     root->setAttribute("height", mHeight);

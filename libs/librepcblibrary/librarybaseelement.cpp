@@ -186,11 +186,11 @@ void LibraryBaseElement::parseDomTree(const XmlDomElement& root) throw (Exceptio
     Q_ASSERT(mDomTreeParsed == false);
 
     // read attributes
-    mUuid = root.getFirstChild("meta/uuid", true, true)->getText<Uuid>();
-    mVersion = root.getFirstChild("meta/version", true, true)->getText<Version>();
-    mAuthor = root.getFirstChild("meta/author", true, true)->getText();
-    mCreated = root.getFirstChild("meta/created", true, true)->getText<QDateTime>();
-    mLastModified = root.getFirstChild("meta/last_modified", true, true)->getText<QDateTime>();
+    mUuid = root.getFirstChild("meta/uuid", true, true)->getText<Uuid>(true);
+    mVersion = root.getFirstChild("meta/version", true, true)->getText<Version>(true);
+    mAuthor = root.getFirstChild("meta/author", true, true)->getText<QString>(true);
+    mCreated = root.getFirstChild("meta/created", true, true)->getText<QDateTime>(true);
+    mLastModified = root.getFirstChild("meta/last_modified", true, true)->getText<QDateTime>(true);
 
     // read names, descriptions and keywords in all available languages
     readLocaleDomNodes(*root.getFirstChild("meta", true), "name", mNames);
@@ -247,7 +247,7 @@ void LibraryBaseElement::readLocaleDomNodes(const XmlDomElement& parentNode,
     for (XmlDomElement* node = parentNode.getFirstChild(childNodesName, false); node;
          node = node->getNextSibling(childNodesName))
     {
-        QString locale = node->getAttribute("locale", true);
+        QString locale = node->getAttribute<QString>("locale", true);
         if (locale.isEmpty())
         {
             throw RuntimeError(__FILE__, __LINE__, parentNode.getDocFilePath().toStr(),
@@ -260,7 +260,7 @@ void LibraryBaseElement::readLocaleDomNodes(const XmlDomElement& parentNode,
                 QString(tr("Locale \"%1\" defined multiple times in \"%2\"."))
                 .arg(locale, parentNode.getDocFilePath().toNative()));
         }
-        list.insert(locale, node->getText());
+        list.insert(locale, node->getText<QString>(false));
     }
 
     if (!list.contains("en_US"))

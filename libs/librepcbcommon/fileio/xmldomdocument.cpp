@@ -82,7 +82,7 @@ bool XmlDomDocument::hasFileVersion() const noexcept
 int XmlDomDocument::getFileVersion() const throw (Exception)
 {
     Q_ASSERT(mRootElement != nullptr);
-    return mRootElement->getAttribute<uint>("version"); // use "uint" to automatically check for >= 0
+    return mRootElement->getAttribute<uint>("version", true); // use "uint" to automatically check for >= 0
 }
 
 /*****************************************************************************************

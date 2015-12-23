@@ -126,7 +126,7 @@ void MainWindow::on_pushButton_2_clicked()
             for (XmlDomElement* node = projectDoc->getRoot().getFirstChild("boards/*", true, false);
                  node; node = node->getNextSibling())
             {
-                FilePath boardFilePath = projectFilepath.getParentDir().getPathTo("boards/" % node->getText(true));
+                FilePath boardFilePath = projectFilepath.getParentDir().getPathTo("boards/" % node->getText<QString>(true));
                 SmartXmlFile boardFile(boardFilePath, false, true);
                 QSharedPointer<XmlDomDocument> boardDoc = boardFile.parseFileAndBuildDomTree(true);
                 for (XmlDomElement* node = boardDoc->getRoot().getFirstChild("device_instances/*", true, false);

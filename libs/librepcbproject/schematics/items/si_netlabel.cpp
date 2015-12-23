@@ -40,7 +40,7 @@ SI_NetLabel::SI_NetLabel(Schematic& schematic, const XmlDomElement& domElement) 
     SI_Base(), mSchematic(schematic), mGraphicsItem(nullptr), mNetSignal(nullptr)
 {
     // read attributes
-    mUuid = domElement.getAttribute<Uuid>("uuid");
+    mUuid = domElement.getAttribute<Uuid>("uuid", true);
     Uuid netSignalUuid = domElement.getAttribute<Uuid>("netsignal", true);
     mNetSignal = mSchematic.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
     if(!mNetSignal)
@@ -48,9 +48,9 @@ SI_NetLabel::SI_NetLabel(Schematic& schematic, const XmlDomElement& domElement) 
         throw RuntimeError(__FILE__, __LINE__, netSignalUuid.toStr(),
             QString(tr("Invalid net signal UUID: \"%1\"")).arg(netSignalUuid.toStr()));
     }
-    mPosition.setX(domElement.getAttribute<Length>("x"));
-    mPosition.setY(domElement.getAttribute<Length>("y"));
-    mRotation = domElement.getAttribute<Angle>("rotation");
+    mPosition.setX(domElement.getAttribute<Length>("x", true));
+    mPosition.setY(domElement.getAttribute<Length>("y", true));
+    mRotation = domElement.getAttribute<Angle>("rotation", true);
 
     init();
 }

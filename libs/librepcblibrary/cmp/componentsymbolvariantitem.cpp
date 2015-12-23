@@ -45,36 +45,36 @@ ComponentSymbolVariantItem::ComponentSymbolVariantItem(const Uuid& uuid,
 ComponentSymbolVariantItem::ComponentSymbolVariantItem(const XmlDomElement& domElement) throw (Exception)
 {
     // read attributes
-    mUuid = domElement.getAttribute<Uuid>("uuid");
-    mSymbolUuid = domElement.getAttribute<Uuid>("symbol");
-    mIsRequired = domElement.getAttribute<bool>("required");
-    mSuffix = domElement.getAttribute("suffix");
+    mUuid = domElement.getAttribute<Uuid>("uuid", true);
+    mSymbolUuid = domElement.getAttribute<Uuid>("symbol", true);
+    mIsRequired = domElement.getAttribute<bool>("required", true);
+    mSuffix = domElement.getAttribute<QString>("suffix", false);
 
     // read pin signal map
     for (XmlDomElement* node = domElement.getFirstChild("pin_signal_map/map", true, false);
          node; node = node->getNextSibling("map"))
     {
         PinSignalMapItem_t item;
-        item.pin = node->getAttribute<Uuid>("pin");
+        item.pin = node->getAttribute<Uuid>("pin", true);
         if (mPinSignalMap.contains(item.pin))
         {
             throw RuntimeError(__FILE__, __LINE__, item.pin.toStr(),
                 QString(tr("The pin \"%1\" is assigned to multiple signals in \"%2\"."))
                 .arg(item.pin.toStr(), domElement.getDocFilePath().toNative()));
         }
-        if (node->getAttribute("display") == "none")
+        if (node->getAttribute<QString>("display", true) == "none")
             item.displayType = PinDisplayType_t::None;
-        else if (node->getAttribute("display") == "pin_name")
+        else if (node->getAttribute<QString>("display", true) == "pin_name")
             item.displayType = PinDisplayType_t::PinName;
-        else if (node->getAttribute("display") == "component_signal")
+        else if (node->getAttribute<QString>("display", true) == "component_signal")
             item.displayType = PinDisplayType_t::ComponentSignal;
-        else if (node->getAttribute("display") == "net_signal")
+        else if (node->getAttribute<QString>("display", true) == "net_signal")
             item.displayType = PinDisplayType_t::NetSignal;
         else
         {
-            throw RuntimeError(__FILE__, __LINE__, node->getAttribute("display"),
+            throw RuntimeError(__FILE__, __LINE__, node->getAttribute<QString>("display", false),
                 QString(tr("Invalid pin display type \"%1\" found in \"%2\"."))
-                .arg(node->getAttribute("display"), domElement.getDocFilePath().toNative()));
+                .arg(node->getAttribute<QString>("display", false), domElement.getDocFilePath().toNative()));
         }
         item.signal = node->getText<Uuid>(false);
         mPinSignalMap.insert(item.pin, item);

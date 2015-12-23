@@ -41,8 +41,8 @@ PackagePad::PackagePad(const XmlDomElement& domElement) throw (Exception) :
     mUuid()
 {
     // read attributes
-    mUuid = domElement.getAttribute<Uuid>("uuid");
-    mName = domElement.getText(true);
+    mUuid = domElement.getAttribute<Uuid>("uuid", true);
+    mName = domElement.getText<QString>(true);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }

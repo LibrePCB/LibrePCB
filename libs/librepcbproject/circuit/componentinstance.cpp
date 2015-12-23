@@ -46,10 +46,10 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const XmlDomElement& domE
     mLibComponent(nullptr), mCompSymbVar(nullptr)
 {
     // read general attributes
-    mUuid = domElement.getAttribute<Uuid>("uuid");
-    mName = domElement.getFirstChild("name", true)->getText(true);
-    mValue = domElement.getFirstChild("value", true)->getText();
-    Uuid gcUuid = domElement.getAttribute<Uuid>("component");
+    mUuid = domElement.getAttribute<Uuid>("uuid", true);
+    mName = domElement.getFirstChild("name", true)->getText<QString>(true);
+    mValue = domElement.getFirstChild("value", true)->getText<QString>(false);
+    Uuid gcUuid = domElement.getAttribute<Uuid>("component", true);
     mLibComponent = mCircuit.getProject().getLibrary().getComponent(gcUuid);
     if (!mLibComponent)
     {
@@ -57,7 +57,7 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const XmlDomElement& domE
             QString(tr("The component with the UUID \"%1\" does not exist in the "
             "project's library!")).arg(gcUuid.toStr()));
     }
-    Uuid symbVarUuid = domElement.getAttribute<Uuid>("symbol_variant");
+    Uuid symbVarUuid = domElement.getAttribute<Uuid>("symbol_variant", true);
     mCompSymbVar = mLibComponent->getSymbolVariantByUuid(symbVarUuid);
     if (!mCompSymbVar)
     {

@@ -182,10 +182,10 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
         }
         else
         {
-            mName = root->getFirstChild("meta/name", true, true)->getText();
-            mAuthor = root->getFirstChild("meta/author", true, true)->getText();
-            mCreated = root->getFirstChild("meta/created", true, true)->getText<QDateTime>();
-            mLastModified = root->getFirstChild("meta/last_modified", true, true)->getText<QDateTime>();
+            mName = root->getFirstChild("meta/name", true, true)->getText<QString>(false);
+            mAuthor = root->getFirstChild("meta/author", true, true)->getText<QString>(false);
+            mCreated = root->getFirstChild("meta/created", true, true)->getText<QDateTime>(true);
+            mLastModified = root->getFirstChild("meta/last_modified", true, true)->getText<QDateTime>(true);
         }
 
         // Load description HTML file
@@ -216,7 +216,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
             for (XmlDomElement* node = root->getFirstChild("schematics/schematic", true, false);
                  node; node = node->getNextSibling("schematic"))
             {
-                FilePath fp = FilePath::fromRelative(mPath.getPathTo("schematics"), node->getText(true));
+                FilePath fp = FilePath::fromRelative(mPath.getPathTo("schematics"), node->getText<QString>(true));
                 Schematic* schematic = new Schematic(*this, fp, mIsRestored, mIsReadOnly);
                 addSchematic(schematic);
             }
@@ -238,7 +238,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
             for (XmlDomElement* node = root->getFirstChild("boards/board", true, false);
                  node; node = node->getNextSibling("board"))
             {
-                FilePath fp = FilePath::fromRelative(mPath.getPathTo("boards"), node->getText(true));
+                FilePath fp = FilePath::fromRelative(mPath.getPathTo("boards"), node->getText<QString>(true));
                 Board* board = new Board(*this, fp, mIsRestored, mIsReadOnly);
                 addBoard(board);
             }

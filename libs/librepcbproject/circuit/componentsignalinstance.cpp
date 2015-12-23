@@ -41,7 +41,7 @@ ComponentSignalInstance::ComponentSignalInstance(Circuit& circuit, ComponentInst
     mComponentSignal(nullptr), mNetSignal(nullptr), mAddedToCircuit(false)
 {
     // read attributes
-    Uuid compSignalUuid = domElement.getAttribute<Uuid>("comp_signal");
+    Uuid compSignalUuid = domElement.getAttribute<Uuid>("comp_signal", true);
     mComponentSignal = mComponentInstance.getLibComponent().getSignalByUuid(compSignalUuid);
     if(!mComponentSignal)
     {
@@ -194,7 +194,7 @@ XmlDomElement* ComponentSignalInstance::serializeToXmlDomElement() const throw (
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("map"));
     root->setAttribute("comp_signal", mComponentSignal->getUuid());
-    root->setAttribute("netsignal", mNetSignal ? mNetSignal->getUuid().toStr() : QString());
+    root->setAttribute("netsignal", mNetSignal ? mNetSignal->getUuid() : Uuid());
     return root.take();
 }
 

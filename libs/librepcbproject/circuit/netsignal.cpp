@@ -42,16 +42,16 @@ NetSignal::NetSignal(const Circuit& circuit,
     QObject(0), mCircuit(circuit), mAddedToCircuit(false), mErcMsgUnusedNetSignal(nullptr),
     mErcMsgConnectedToLessThanTwoPins(nullptr), mComponentSignalWithForcedNameCount(0),
     // load attributes
-    mUuid(domElement.getAttribute<Uuid>("uuid")),
-    mName(domElement.getAttribute("name", true)),
-    mHasAutoName(domElement.getAttribute<bool>("auto_name")),
-    mNetClass(circuit.getNetClassByUuid(domElement.getAttribute<Uuid>("netclass")))
+    mUuid(domElement.getAttribute<Uuid>("uuid", true)),
+    mName(domElement.getAttribute<QString>("name", true)),
+    mHasAutoName(domElement.getAttribute<bool>("auto_name", true)),
+    mNetClass(circuit.getNetClassByUuid(domElement.getAttribute<Uuid>("netclass", true)))
 {
     if (!mNetClass)
     {
-        throw RuntimeError(__FILE__, __LINE__, domElement.getAttribute("netclass"),
+        throw RuntimeError(__FILE__, __LINE__, domElement.getAttribute<QString>("netclass", false),
             QString(tr("Invalid netclass UUID: \"%1\""))
-            .arg(domElement.getAttribute("netclass")));
+            .arg(domElement.getAttribute<QString>("netclass", false)));
     }
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);

@@ -42,13 +42,13 @@ ComponentSignal::ComponentSignal(const Uuid& uuid, const QString& name) noexcept
 ComponentSignal::ComponentSignal(const XmlDomElement& domElement) throw (Exception)
 {
     // read attributes
-    mUuid = domElement.getAttribute<Uuid>("uuid");
-    mName = domElement.getText(true);
-    mRole = stringToSignalRole(domElement.getAttribute("role"));
-    mForcedNetName = domElement.getAttribute("forced_net_name");
-    mIsRequired = domElement.getAttribute<bool>("required");
-    mIsNegated = domElement.getAttribute<bool>("negated");
-    mIsClock = domElement.getAttribute<bool>("clock");
+    mUuid = domElement.getAttribute<Uuid>("uuid", true);
+    mName = domElement.getText<QString>(true);
+    mRole = stringToSignalRole(domElement.getAttribute<QString>("role", true));
+    mForcedNetName = domElement.getAttribute<QString>("forced_net_name", false);
+    mIsRequired = domElement.getAttribute<bool>("required", true);
+    mIsNegated = domElement.getAttribute<bool>("negated", true);
+    mIsClock = domElement.getAttribute<bool>("clock", true);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }

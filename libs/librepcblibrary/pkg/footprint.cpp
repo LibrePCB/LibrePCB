@@ -46,8 +46,8 @@ Footprint::Footprint(const XmlDomElement& domElement) throw (Exception)
     try
     {
         // read attributes
-        mUuid = domElement.getAttribute<Uuid>("uuid");
-        mIsDefault = domElement.getAttribute<bool>("default");
+        mUuid = domElement.getAttribute<Uuid>("uuid", true);
+        mIsDefault = domElement.getAttribute<bool>("default", true);
 
         // read names and descriptions in all available languages
         LibraryBaseElement::readLocaleDomNodes(domElement, "name", mNames);

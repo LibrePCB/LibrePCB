@@ -191,7 +191,7 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
 {
     try
     {
-        QString name = node->getAttribute("name", true);
+        QString name = node->getAttribute<QString>("name", true);
         QString desc = createDescription(filepath, name);
         Uuid uuid = getOrCreateUuid(outputSettings, filepath, "symbols", name);
         bool rotate180 = false;
@@ -206,18 +206,18 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
             if (child->getName() == "wire")
             {
                 SymbolPolygon* polygon = new SymbolPolygon();
-                switch (child->getAttribute<uint>("layer"))
+                switch (child->getAttribute<uint>("layer", true))
                 {
                     case 94: polygon->setLayerId(SchematicLayer::LayerID::SymbolOutlines); break;
                     case 95: polygon->setLayerId(SchematicLayer::LayerID::ComponentNames); break;
-                    default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
+                    default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute<QString>("layer", false));
                 }
                 polygon->setIsFilled(false);
-                polygon->setWidth(child->getAttribute<Length>("width"));
+                polygon->setWidth(child->getAttribute<Length>("width", true));
                 polygon->setIsGrabArea(true);
-                Point startpos = Point(child->getAttribute<Length>("x1"), child->getAttribute<Length>("y1"));
-                Point endpos = Point(child->getAttribute<Length>("x2"), child->getAttribute<Length>("y2"));
-                Angle angle = child->hasAttribute("curve") ? child->getAttribute<Angle>("curve") : Angle(0);
+                Point startpos = Point(child->getAttribute<Length>("x1", true), child->getAttribute<Length>("y1", true));
+                Point endpos = Point(child->getAttribute<Length>("x2", true), child->getAttribute<Length>("y2", true));
+                Angle angle = child->hasAttribute("curve") ? child->getAttribute<Angle>("curve", true) : Angle(0);
                 if (rotate180)
                 {
                     startpos = Point(-startpos.getX(), -startpos.getY());
@@ -230,37 +230,37 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
             else if (child->getName() == "rectangle")
             {
                 SymbolPolygon* polygon = new SymbolPolygon();
-                switch (child->getAttribute<uint>("layer"))
+                switch (child->getAttribute<uint>("layer", true))
                 {
                     case 94: polygon->setLayerId(SchematicLayer::LayerID::SymbolOutlines); break;
-                    default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
+                    default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute<QString>("layer", false));
                 }
                 polygon->setIsFilled(true);
                 if (child->hasAttribute("width"))
-                    polygon->setWidth(child->getAttribute<Length>("width"));
+                    polygon->setWidth(child->getAttribute<Length>("width", true));
                 polygon->setIsGrabArea(true);
-                polygon->setStartPos(Point(child->getAttribute<Length>("x1"), child->getAttribute<Length>("y1")));
-                polygon->appendSegment(new SymbolPolygonSegment(Point(child->getAttribute<Length>("x2"), child->getAttribute<Length>("y1"))));
-                polygon->appendSegment(new SymbolPolygonSegment(Point(child->getAttribute<Length>("x2"), child->getAttribute<Length>("y2"))));
-                polygon->appendSegment(new SymbolPolygonSegment(Point(child->getAttribute<Length>("x1"), child->getAttribute<Length>("y2"))));
-                polygon->appendSegment(new SymbolPolygonSegment(Point(child->getAttribute<Length>("x1"), child->getAttribute<Length>("y1"))));
+                polygon->setStartPos(Point(child->getAttribute<Length>("x1", true), child->getAttribute<Length>("y1", true)));
+                polygon->appendSegment(new SymbolPolygonSegment(Point(child->getAttribute<Length>("x2", true), child->getAttribute<Length>("y1", true))));
+                polygon->appendSegment(new SymbolPolygonSegment(Point(child->getAttribute<Length>("x2", true), child->getAttribute<Length>("y2", true))));
+                polygon->appendSegment(new SymbolPolygonSegment(Point(child->getAttribute<Length>("x1", true), child->getAttribute<Length>("y2", true))));
+                polygon->appendSegment(new SymbolPolygonSegment(Point(child->getAttribute<Length>("x1", true), child->getAttribute<Length>("y1", true))));
                 symbol->addPolygon(polygon);
             }
             else if (child->getName() == "polygon")
             {
                 SymbolPolygon* polygon = new SymbolPolygon();
-                switch (child->getAttribute<uint>("layer"))
+                switch (child->getAttribute<uint>("layer", true))
                 {
                     case 94: polygon->setLayerId(SchematicLayer::LayerID::SymbolOutlines); break;
-                    default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
+                    default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute<QString>("layer", false));
                 }
                 polygon->setIsFilled(false);
                 if (child->hasAttribute("width"))
-                    polygon->setWidth(child->getAttribute<Length>("width"));
+                    polygon->setWidth(child->getAttribute<Length>("width", true));
                 polygon->setIsGrabArea(true);
                 for (XmlDomElement* vertex = child->getFirstChild(); vertex; vertex = vertex->getNextSibling())
                 {
-                    Point p(vertex->getAttribute<Length>("x"), vertex->getAttribute<Length>("y"));
+                    Point p(vertex->getAttribute<Length>("x", true), vertex->getAttribute<Length>("y", true));
                     if (vertex == child->getFirstChild())
                         polygon->setStartPos(p);
                     else
@@ -271,15 +271,15 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
             }
             else if (child->getName() == "circle")
             {
-                Length radius(child->getAttribute<Length>("radius"));
-                Point center(child->getAttribute<Length>("x"), child->getAttribute<Length>("y"));
+                Length radius(child->getAttribute<Length>("radius", true));
+                Point center(child->getAttribute<Length>("x", true), child->getAttribute<Length>("y", true));
                 SymbolEllipse* ellipse = new SymbolEllipse();
-                switch (child->getAttribute<uint>("layer"))
+                switch (child->getAttribute<uint>("layer", true))
                 {
                     case 94: ellipse->setLayerId(SchematicLayer::LayerID::SymbolOutlines); break;
-                    default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
+                    default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute<QString>("layer", false));
                 }
-                ellipse->setLineWidth(child->getAttribute<Length>("width"));
+                ellipse->setLineWidth(child->getAttribute<Length>("width", true));
                 ellipse->setIsFilled(ellipse->getLineWidth() == 0);
                 ellipse->setIsGrabArea(true);
                 ellipse->setCenter(center);
@@ -290,16 +290,16 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
             else if (child->getName() == "text")
             {
                 SymbolText* text = new SymbolText();
-                switch (child->getAttribute<uint>("layer"))
+                switch (child->getAttribute<uint>("layer", true))
                 {
                     case 93: text->setLayerId(SchematicLayer::LayerID::SymbolPinNames); break;
                     case 94: text->setLayerId(SchematicLayer::LayerID::SymbolOutlines); break;
                     case 95: text->setLayerId(SchematicLayer::LayerID::ComponentNames); break;
                     case 96: text->setLayerId(SchematicLayer::LayerID::ComponentValues); break;
                     case 99: text->setLayerId(SchematicLayer::LayerID::OriginCrosses); break; // ???
-                    default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
+                    default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute<QString>("layer", false));
                 }
-                QString textStr = child->getText(true);
+                QString textStr = child->getText<QString>(true);
                 if (textStr == ">NAME")
                 {
                     textStr = "${SYM::NAME}";
@@ -311,11 +311,11 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                     text->setHeight(Length::fromMm(2.5));
                 }
                 else
-                    text->setHeight(child->getAttribute<Length>("size")*2);
+                    text->setHeight(child->getAttribute<Length>("size", true)*2);
                 text->setText(textStr);
-                Point pos = Point(child->getAttribute<Length>("x"), child->getAttribute<Length>("y"));
+                Point pos = Point(child->getAttribute<Length>("x", true), child->getAttribute<Length>("y", true));
                 int angleDeg = 0;
-                if (child->hasAttribute("rot")) angleDeg = child->getAttribute("rot").remove("R").toInt();
+                if (child->hasAttribute("rot")) angleDeg = child->getAttribute<QString>("rot", true).remove("R").toInt();
                 if (rotate180)
                 {
                     pos = Point(-pos.getX(), -pos.getY());
@@ -328,25 +328,25 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
             }
             else if (child->getName() == "pin")
             {
-                Uuid pinUuid = getOrCreateUuid(outputSettings, filepath, "symbol_pins", uuid.toStr(), child->getAttribute("name"));
-                SymbolPin* pin = new SymbolPin(pinUuid, child->getAttribute("name"));
-                Point pos = Point(child->getAttribute<Length>("x"), child->getAttribute<Length>("y"));
+                Uuid pinUuid = getOrCreateUuid(outputSettings, filepath, "symbol_pins", uuid.toStr(), child->getAttribute<QString>("name", true));
+                SymbolPin* pin = new SymbolPin(pinUuid, child->getAttribute<QString>("name", true));
+                Point pos = Point(child->getAttribute<Length>("x", true), child->getAttribute<Length>("y", true));
                 Length len(7620000);
                 if (child->hasAttribute("length"))
                 {
-                    if (child->getAttribute("length") == "point")
+                    if (child->getAttribute<QString>("length", true) == "point")
                         len.setLengthNm(0);
-                    else if (child->getAttribute("length") == "short")
+                    else if (child->getAttribute<QString>("length", true) == "short")
                         len.setLengthNm(2540000);
-                    else if (child->getAttribute("length") == "middle")
+                    else if (child->getAttribute<QString>("length", true) == "middle")
                         len.setLengthNm(5080000);
-                    else if (child->getAttribute("length") == "long")
+                    else if (child->getAttribute<QString>("length", true) == "long")
                         len.setLengthNm(7620000);
                     else
-                        throw Exception(__FILE__, __LINE__, "Invalid symbol pin length: " % child->getAttribute("length"));
+                        throw Exception(__FILE__, __LINE__, "Invalid symbol pin length: " % child->getAttribute<QString>("length", false));
                 }
                 int angleDeg = 0;
-                if (child->hasAttribute("rot")) angleDeg = child->getAttribute("rot").remove("R").toInt();
+                if (child->hasAttribute("rot")) angleDeg = child->getAttribute<QString>("rot", true).remove("R").toInt();
                 if (rotate180)
                 {
                     pos = Point(-pos.getX(), -pos.getY());
@@ -385,8 +385,8 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
 {
     try
     {
-        QString name = node->getAttribute("name", true);
-        QString desc = node->getFirstChild("description", false) ? node->getFirstChild("description", true)->getText() : "";
+        QString name = node->getAttribute<QString>("name", true);
+        QString desc = node->getFirstChild("description", false) ? node->getFirstChild("description", true)->getText<QString>(false) : "";
         desc.append(createDescription(filepath, name));
         bool rotate180 = false;
         //if (filepath.getFilename() == "con-lsta.lbr" && name.startsWith("FE")) rotate180 = true;
@@ -409,7 +409,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
             else if (child->getName() == "wire")
             {
                 FootprintPolygon* polygon = new FootprintPolygon();
-                switch (child->getAttribute<uint>("layer"))
+                switch (child->getAttribute<uint>("layer", true))
                 {
                     case 20: polygon->setLayerId(BoardLayer::LayerID::BoardOutline); break;
                     case 21: polygon->setLayerId(BoardLayer::LayerID::TopOverlay); break;
@@ -421,14 +421,14 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                     case 49: polygon->setLayerId(BoardLayer::LayerID::OriginCrosses); break; // reference
                     case 51: polygon->setLayerId(BoardLayer::LayerID::TopDeviceOutlines); break;
                     case 52: polygon->setLayerId(BoardLayer::LayerID::BottomDeviceOutlines); break;
-                    default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
+                    default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute<QString>("layer", false));
                 }
                 polygon->setIsFilled(false);
-                polygon->setWidth(child->getAttribute<Length>("width"));
+                polygon->setWidth(child->getAttribute<Length>("width", true));
                 polygon->setIsGrabArea(true);
-                Point startpos = Point(child->getAttribute<Length>("x1"), child->getAttribute<Length>("y1"));
-                Point endpos = Point(child->getAttribute<Length>("x2"), child->getAttribute<Length>("y2"));
-                Angle angle = child->hasAttribute("curve") ? child->getAttribute<Angle>("curve") : Angle(0);
+                Point startpos = Point(child->getAttribute<Length>("x1", true), child->getAttribute<Length>("y1", true));
+                Point endpos = Point(child->getAttribute<Length>("x2", true), child->getAttribute<Length>("y2", true));
+                Angle angle = child->hasAttribute("curve") ? child->getAttribute<Angle>("curve", true) : Angle(0);
                 if (rotate180)
                 {
                     startpos = Point(-startpos.getX(), -startpos.getY());
@@ -442,7 +442,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
             {
                 bool valid = true;
                 FootprintPolygon* polygon = new FootprintPolygon();
-                switch (child->getAttribute<uint>("layer"))
+                switch (child->getAttribute<uint>("layer", true))
                 {
                     case 1: polygon->setLayerId(BoardLayer::LayerID::TopCopper); break;
                     case 16: polygon->setLayerId(BoardLayer::LayerID::BottomCopper); break;
@@ -456,17 +456,17 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                     case 43: polygon->setLayerId(BoardLayer::LayerID::ViaRestrict); break;
                     case 51: polygon->setLayerId(BoardLayer::LayerID::TopDeviceOutlines); break;
                     case 52: polygon->setLayerId(BoardLayer::LayerID::BottomDeviceOutlines); break;
-                    default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
+                    default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute<QString>("layer", false));
                 }
                 polygon->setIsFilled(true);
                 if (child->hasAttribute("width"))
-                    polygon->setWidth(child->getAttribute<Length>("width"));
+                    polygon->setWidth(child->getAttribute<Length>("width", true));
                 polygon->setIsGrabArea(true);
-                polygon->setStartPos(Point(child->getAttribute<Length>("x1"), child->getAttribute<Length>("y1")));
-                polygon->appendSegment(new FootprintPolygonSegment(Point(child->getAttribute<Length>("x2"), child->getAttribute<Length>("y1"))));
-                polygon->appendSegment(new FootprintPolygonSegment(Point(child->getAttribute<Length>("x2"), child->getAttribute<Length>("y2"))));
-                polygon->appendSegment(new FootprintPolygonSegment(Point(child->getAttribute<Length>("x1"), child->getAttribute<Length>("y2"))));
-                polygon->appendSegment(new FootprintPolygonSegment(Point(child->getAttribute<Length>("x1"), child->getAttribute<Length>("y1"))));
+                polygon->setStartPos(Point(child->getAttribute<Length>("x1", true), child->getAttribute<Length>("y1", true)));
+                polygon->appendSegment(new FootprintPolygonSegment(Point(child->getAttribute<Length>("x2", true), child->getAttribute<Length>("y1", true))));
+                polygon->appendSegment(new FootprintPolygonSegment(Point(child->getAttribute<Length>("x2", true), child->getAttribute<Length>("y2", true))));
+                polygon->appendSegment(new FootprintPolygonSegment(Point(child->getAttribute<Length>("x1", true), child->getAttribute<Length>("y2", true))));
+                polygon->appendSegment(new FootprintPolygonSegment(Point(child->getAttribute<Length>("x1", true), child->getAttribute<Length>("y1", true))));
                 if (valid)
                     footprint->addPolygon(polygon);
                 else
@@ -475,7 +475,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
             else if (child->getName() == "polygon")
             {
                 FootprintPolygon* polygon = new FootprintPolygon();
-                switch (child->getAttribute<uint>("layer"))
+                switch (child->getAttribute<uint>("layer", true))
                 {
                     case 1: polygon->setLayerId(BoardLayer::LayerID::TopCopper); break;
                     case 16: polygon->setLayerId(BoardLayer::LayerID::BottomCopper); break;
@@ -483,15 +483,15 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                     case 29: polygon->setLayerId(BoardLayer::LayerID::TopStopMask); break;
                     case 31: polygon->setLayerId(BoardLayer::LayerID::TopPaste); break;
                     case 51: polygon->setLayerId(BoardLayer::LayerID::TopDeviceOutlines); break;
-                    default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
+                    default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute<QString>("layer", false));
                 }
                 polygon->setIsFilled(false);
                 if (child->hasAttribute("width"))
-                    polygon->setWidth(child->getAttribute<Length>("width"));
+                    polygon->setWidth(child->getAttribute<Length>("width", true));
                 polygon->setIsGrabArea(true);
                 for (XmlDomElement* vertex = child->getFirstChild(); vertex; vertex = vertex->getNextSibling())
                 {
-                    Point p(vertex->getAttribute<Length>("x"), vertex->getAttribute<Length>("y"));
+                    Point p(vertex->getAttribute<Length>("x", true), vertex->getAttribute<Length>("y", true));
                     if (vertex == child->getFirstChild())
                         polygon->setStartPos(p);
                     else
@@ -503,10 +503,10 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
             else if (child->getName() == "circle")
             {
                 bool valid = true;
-                Length radius(child->getAttribute<Length>("radius"));
-                Point center(child->getAttribute<Length>("x"), child->getAttribute<Length>("y"));
+                Length radius(child->getAttribute<Length>("radius", true));
+                Point center(child->getAttribute<Length>("x", true), child->getAttribute<Length>("y", true));
                 FootprintEllipse* ellipse = new FootprintEllipse();
-                switch (child->getAttribute<uint>("layer"))
+                switch (child->getAttribute<uint>("layer", true))
                 {
                     case 1: ellipse->setLayerId(BoardLayer::LayerID::TopCopper); break;
                     case 20: ellipse->setLayerId(BoardLayer::LayerID::BoardOutline); break;
@@ -521,9 +521,9 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                     case 49: ellipse->setLayerId(BoardLayer::LayerID::OriginCrosses); break; // reference
                     case 51: ellipse->setLayerId(BoardLayer::LayerID::TopDeviceOutlines); break;
                     case 52: ellipse->setLayerId(BoardLayer::LayerID::BottomDeviceOutlines); break;
-                    default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
+                    default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute<QString>("layer", false));
                 }
-                ellipse->setLineWidth(child->getAttribute<Length>("width"));
+                ellipse->setLineWidth(child->getAttribute<Length>("width", true));
                 ellipse->setIsFilled(ellipse->getLineWidth() == 0);
                 ellipse->setIsGrabArea(true);
                 ellipse->setCenter(center);
@@ -537,16 +537,16 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
             else if (child->getName() == "text")
             {
                 FootprintText* text = new FootprintText();
-                switch (child->getAttribute<uint>("layer"))
+                switch (child->getAttribute<uint>("layer", true))
                 {
                     case 21: text->setLayerId(BoardLayer::LayerID::TopOverlay); break;
                     case 25: text->setLayerId(BoardLayer::LayerID::TopOverlayNames); break;
                     case 27: text->setLayerId(BoardLayer::LayerID::TopOverlayValues); break;
                     case 48: text->setLayerId(BoardLayer::LayerID::TopDeviceOutlines); break; // document
                     case 51: text->setLayerId(BoardLayer::LayerID::TopDeviceOutlines); break;
-                    default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
+                    default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute<QString>("layer", false));
                 }
-                QString textStr = child->getText(true);
+                QString textStr = child->getText<QString>(true);
                 if (textStr == ">NAME")
                 {
                     textStr = "${CMP::NAME}";
@@ -558,11 +558,11 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                     text->setHeight(Length::fromMm(2));
                 }
                 else
-                    text->setHeight(child->getAttribute<Length>("size")*2);
+                    text->setHeight(child->getAttribute<Length>("size", true)*2);
                 text->setText(textStr);
-                Point pos = Point(child->getAttribute<Length>("x"), child->getAttribute<Length>("y"));
+                Point pos = Point(child->getAttribute<Length>("x", true), child->getAttribute<Length>("y", true));
                 int angleDeg = 0;
-                if (child->hasAttribute("rot")) angleDeg = child->getAttribute("rot").remove("R").toInt();
+                if (child->hasAttribute("rot")) angleDeg = child->getAttribute<QString>("rot", true).remove("R").toInt();
                 if (rotate180)
                 {
                     pos = Point(-pos.getX(), -pos.getY());
@@ -575,18 +575,18 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
             }
             else if (child->getName() == "pad")
             {
-                Uuid padUuid = getOrCreateUuid(outputSettings, filepath, "package_pads", fptUuid.toStr(), child->getAttribute("name"));
+                Uuid padUuid = getOrCreateUuid(outputSettings, filepath, "package_pads", fptUuid.toStr(), child->getAttribute<QString>("name", true));
                 // add package pad
-                PackagePad* pkgPad = new PackagePad(padUuid, child->getAttribute("name"));
+                PackagePad* pkgPad = new PackagePad(padUuid, child->getAttribute<QString>("name", true));
                 package->addPad(*pkgPad);
                 // add footprint pad
                 FootprintPad* fptPad = new FootprintPad(padUuid);
-                Length drill = child->getAttribute<Length>("drill");
+                Length drill = child->getAttribute<Length>("drill", true);
                 fptPad->setDrillDiameter(drill);
-                Length diameter = child->hasAttribute("diameter") ? child->getAttribute<Length>("diameter") : drill * 2;
+                Length diameter = child->hasAttribute("diameter") ? child->getAttribute<Length>("diameter", true) : drill * 2;
                 int angleDeg = 0;
-                if (child->hasAttribute("rot")) angleDeg = child->getAttribute("rot").remove("R").toInt();
-                QString shape = child->hasAttribute("shape") ? child->getAttribute("shape") : "round";
+                if (child->hasAttribute("rot")) angleDeg = child->getAttribute<QString>("rot", true).remove("R").toInt();
+                QString shape = child->hasAttribute("shape") ? child->getAttribute<QString>("shape", true) : "round";
                 if (shape == "square")
                 {
                     fptPad->setType(FootprintPad::Type_t::ThtRect);
@@ -615,7 +615,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 {
                     throw Exception(__FILE__, __LINE__, "Invalid shape: " % shape % " :: " % filepath.toStr());
                 }
-                Point pos = Point(child->getAttribute<Length>("x"), child->getAttribute<Length>("y"));
+                Point pos = Point(child->getAttribute<Length>("x", true), child->getAttribute<Length>("y", true));
                 if (rotate180)
                 {
                     pos = Point(-pos.getX(), -pos.getY());
@@ -627,16 +627,16 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
             }
             else if (child->getName() == "smd")
             {
-                Uuid padUuid = getOrCreateUuid(outputSettings, filepath, "package_pads", fptUuid.toStr(), child->getAttribute("name"));
+                Uuid padUuid = getOrCreateUuid(outputSettings, filepath, "package_pads", fptUuid.toStr(), child->getAttribute<QString>("name", true));
                 // add package pad
-                PackagePad* pkgPad = new PackagePad(padUuid, child->getAttribute("name"));
+                PackagePad* pkgPad = new PackagePad(padUuid, child->getAttribute<QString>("name", true));
                 package->addPad(*pkgPad);
                 // add footprint pad
                 FootprintPad* fptPad = new FootprintPad(padUuid);
                 fptPad->setType(FootprintPad::Type_t::SmtRect);
-                Point pos = Point(child->getAttribute<Length>("x"), child->getAttribute<Length>("y"));
+                Point pos = Point(child->getAttribute<Length>("x", true), child->getAttribute<Length>("y", true));
                 int angleDeg = 0;
-                if (child->hasAttribute("rot")) angleDeg = child->getAttribute("rot").remove("R").toInt();
+                if (child->hasAttribute("rot")) angleDeg = child->getAttribute<QString>("rot", true).remove("R").toInt();
                 if (rotate180)
                 {
                     pos = Point(-pos.getX(), -pos.getY());
@@ -644,13 +644,13 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 }
                 fptPad->setPosition(pos);
                 fptPad->setRotation(Angle::fromDeg(angleDeg));
-                fptPad->setWidth(child->getAttribute<Length>("dx"));
-                fptPad->setHeight(child->getAttribute<Length>("dy"));
-                switch (child->getAttribute<uint>("layer"))
+                fptPad->setWidth(child->getAttribute<Length>("dx", true));
+                fptPad->setHeight(child->getAttribute<Length>("dy", true));
+                switch (child->getAttribute<uint>("layer", true))
                 {
                     case 1: fptPad->setLayerId(BoardLayer::LayerID::TopCopper); break;
                     case 16: fptPad->setLayerId(BoardLayer::LayerID::BottomCopper); break;
-                    default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute("layer"));
+                    default: throw Exception(__FILE__, __LINE__, "Invalid layer: " % child->getAttribute<QString>("layer", false));
                 }
 
                 footprint->addPad(fptPad);
@@ -658,8 +658,8 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
             else if (child->getName() == "hole")
             {
                 Footprint::FootprintHole_t* hole = new Footprint::FootprintHole_t();
-                hole->pos = Point(child->getAttribute<Length>("x"), child->getAttribute<Length>("y"));
-                hole->diameter = child->getAttribute<Length>("drill");
+                hole->pos = Point(child->getAttribute<Length>("x", true), child->getAttribute<Length>("y", true));
+                hole->diameter = child->getAttribute<Length>("drill", true);
                 footprint->addHole(hole);
             }
             else
@@ -695,13 +695,13 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
 {
     try
     {
-        QString name = node->getAttribute("name", true);
+        QString name = node->getAttribute<QString>("name", true);
 
         // abort if device name ends with "-US"
         if (name.endsWith("-US")) return false;
 
         Uuid uuid = getOrCreateUuid(outputSettings, filepath, "devices_to_components", name);
-        QString desc = node->getFirstChild("description", false) ? node->getFirstChild("description", true)->getText() : "";
+        QString desc = node->getFirstChild("description", false) ? node->getFirstChild("description", true)->getText<QString>(false) : "";
         desc.append(createDescription(filepath, name));
 
         // create  component
@@ -709,7 +709,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
 
         // properties
         component->addDefaultValue("en_US", "");
-        component->addPrefix("", node->hasAttribute("prefix") ? node->getAttribute("prefix") : "", true);
+        component->addPrefix("", node->hasAttribute("prefix") ? node->getAttribute<QString>("prefix", false) : "", true);
 
         // symbol variant
         Uuid symbVarUuid = getOrCreateUuid(outputSettings, filepath, "component_symbolvariants", uuid.toStr());
@@ -723,8 +723,8 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
         for (XmlDomElement* connect = device->getFirstChild("connects/connect", false, false);
              connect; connect = connect->getNextSibling())
         {
-            QString gateName = connect->getAttribute("gate");
-            QString pinName = connect->getAttribute("pin");
+            QString gateName = connect->getAttribute<QString>("gate", true);
+            QString pinName = connect->getAttribute<QString>("pin", true);
             if (pinName.contains("@")) pinName.truncate(pinName.indexOf("@"));
             if (pinName.contains("#")) pinName.truncate(pinName.indexOf("#"));
             Uuid signalUuid = getOrCreateUuid(outputSettings, filepath, "gatepins_to_componentsignals", uuid.toStr(), gateName % pinName);
@@ -740,8 +740,8 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
         // symbol variant items
         for (XmlDomElement* gate = node->getFirstChild("gates/*", true, true); gate; gate = gate->getNextSibling())
         {
-            QString gateName = gate->getAttribute("name");
-            QString symbolName = gate->getAttribute("symbol");
+            QString gateName = gate->getAttribute<QString>("name", true);
+            QString symbolName = gate->getAttribute<QString>("symbol", true);
             Uuid symbolUuid = getOrCreateUuid(outputSettings, filepath, "symbols", symbolName);
 
             // create symbol variant item
@@ -752,9 +752,9 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
             for (XmlDomElement* connect = device->getFirstChild("connects/connect", false, false);
                  connect; connect = connect->getNextSibling())
             {
-                if (connect->getAttribute("gate") == gateName)
+                if (connect->getAttribute<QString>("gate", true) == gateName)
                 {
-                    QString pinName = connect->getAttribute("pin");
+                    QString pinName = connect->getAttribute<QString>("pin", true);
                     Uuid pinUuid = getOrCreateUuid(outputSettings, filepath, "symbol_pins", symbolUuid.toStr(), pinName);
                     if (pinName.contains("@")) pinName.truncate(pinName.indexOf("@"));
                     if (pinName.contains("#")) pinName.truncate(pinName.indexOf("#"));
@@ -771,8 +771,8 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
         {
             if (!deviceNode->hasAttribute("package")) continue;
 
-            QString deviceName = deviceNode->getAttribute("name");
-            QString packageName = deviceNode->getAttribute("package");
+            QString deviceName = deviceNode->getAttribute<QString>("name", false);
+            QString packageName = deviceNode->getAttribute<QString>("package", true);
             Uuid pkgUuid = getOrCreateUuid(outputSettings, filepath, "packages_to_packages", packageName);
             Uuid fptUuid = getOrCreateUuid(outputSettings, filepath, "packages_to_footprints", packageName);
 
@@ -786,15 +786,15 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
             for (XmlDomElement* connect = deviceNode->getFirstChild("connects/*", false, false);
                  connect; connect = connect->getNextSibling())
             {
-                QString gateName = connect->getAttribute("gate");
-                QString pinName = connect->getAttribute("pin");
-                QString padNames = connect->getAttribute("pad");
+                QString gateName = connect->getAttribute<QString>("gate", true);
+                QString pinName = connect->getAttribute<QString>("pin", true);
+                QString padNames = connect->getAttribute<QString>("pad", true);
                 if (pinName.contains("@")) pinName.truncate(pinName.indexOf("@"));
                 if (pinName.contains("#")) pinName.truncate(pinName.indexOf("#"));
                 if (connect->hasAttribute("route"))
                 {
-                    if (connect->getAttribute("route") != "any")
-                        addError(QString("Unknown connect route: %1/%2").arg(node->getName()).arg(connect->getAttribute("route")), filepath);
+                    if (connect->getAttribute<QString>("route", true) != "any")
+                        addError(QString("Unknown connect route: %1/%2").arg(node->getName()).arg(connect->getAttribute<QString>("route", false)), filepath);
                 }
                 foreach (const QString& padName, padNames.split(" ", QString::SkipEmptyParts))
                 {

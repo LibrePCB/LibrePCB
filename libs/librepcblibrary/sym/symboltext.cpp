@@ -38,18 +38,18 @@ SymbolText::SymbolText() noexcept :
 
 SymbolText::SymbolText(const XmlDomElement& domElement) throw (Exception)
 {
-    mLayerId = domElement.getAttribute<uint>("layer"); // use "uint" to automatically check for >= 0
-    mText = domElement.getText(true);
+    mLayerId = domElement.getAttribute<uint>("layer", true); // use "uint" to automatically check for >= 0
+    mText = domElement.getText<QString>(true);
 
     // load geometry attributes
-    mPosition.setX(domElement.getAttribute<Length>("x"));
-    mPosition.setY(domElement.getAttribute<Length>("y"));
-    mRotation = domElement.getAttribute<Angle>("rotation");
-    mHeight = domElement.getAttribute<Length>("height");
+    mPosition.setX(domElement.getAttribute<Length>("x", true));
+    mPosition.setY(domElement.getAttribute<Length>("y", true));
+    mRotation = domElement.getAttribute<Angle>("rotation", true);
+    mHeight = domElement.getAttribute<Length>("height", true);
 
     // text alignment
-    mAlign.setH(domElement.getAttribute<HAlign>("h_align"));
-    mAlign.setV(domElement.getAttribute<VAlign>("v_align"));
+    mAlign.setH(domElement.getAttribute<HAlign>("h_align", true));
+    mAlign.setV(domElement.getAttribute<VAlign>("v_align", true));
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -68,10 +68,10 @@ XmlDomElement* SymbolText::serializeToXmlDomElement() const throw (Exception)
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("text"));
     root->setAttribute("layer", mLayerId);
-    root->setAttribute("x", mPosition.getX().toMmString());
-    root->setAttribute("y", mPosition.getY().toMmString());
-    root->setAttribute("rotation", mRotation.toDegString());
-    root->setAttribute("height", mHeight.toMmString());
+    root->setAttribute("x", mPosition.getX());
+    root->setAttribute("y", mPosition.getY());
+    root->setAttribute("rotation", mRotation);
+    root->setAttribute("height", mHeight);
     root->setAttribute("h_align", mAlign.getH());
     root->setAttribute("v_align", mAlign.getV());
     root->setText(mText);

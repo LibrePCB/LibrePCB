@@ -44,9 +44,9 @@ SI_Symbol::SI_Symbol(Schematic& schematic, const XmlDomElement& domElement) thro
     SI_Base(), mSchematic(schematic), mComponentInstance(nullptr),
     mSymbVarItem(nullptr), mSymbol(nullptr), mGraphicsItem(nullptr)
 {
-    mUuid = domElement.getAttribute<Uuid>("uuid");
+    mUuid = domElement.getAttribute<Uuid>("uuid", true);
 
-    Uuid gcUuid = domElement.getAttribute<Uuid>("component_instance");
+    Uuid gcUuid = domElement.getAttribute<Uuid>("component_instance", true);
     mComponentInstance = schematic.getProject().getCircuit().getComponentInstanceByUuid(gcUuid);
     if (!mComponentInstance)
     {
@@ -55,11 +55,11 @@ SI_Symbol::SI_Symbol(Schematic& schematic, const XmlDomElement& domElement) thro
             .arg(gcUuid.toStr()));
     }
 
-    mPosition.setX(domElement.getFirstChild("position", true)->getAttribute<Length>("x"));
-    mPosition.setY(domElement.getFirstChild("position", true)->getAttribute<Length>("y"));
-    mRotation = domElement.getFirstChild("position", true)->getAttribute<Angle>("rotation");
+    mPosition.setX(domElement.getFirstChild("position", true)->getAttribute<Length>("x", true));
+    mPosition.setY(domElement.getFirstChild("position", true)->getAttribute<Length>("y", true));
+    mRotation = domElement.getFirstChild("position", true)->getAttribute<Angle>("rotation", true);
 
-    Uuid symbVarItemUuid = domElement.getAttribute<Uuid>("symbol_item");
+    Uuid symbVarItemUuid = domElement.getAttribute<Uuid>("symbol_item", true);
     init(symbVarItemUuid);
 }
 

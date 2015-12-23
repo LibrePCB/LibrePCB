@@ -74,8 +74,8 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
 
             // the schematic seems to be ready to open, so we will create all needed objects
 
-            mUuid = root.getFirstChild("meta/uuid", true, true)->getText<Uuid>();
-            mName = root.getFirstChild("meta/name", true, true)->getText(true);
+            mUuid = root.getFirstChild("meta/uuid", true, true)->getText<Uuid>(true);
+            mName = root.getFirstChild("meta/name", true, true)->getText<QString>(true);
 
             // Load grid properties
             mGridProperties = new GridProperties(*root.getFirstChild("properties/grid_properties", true, true));

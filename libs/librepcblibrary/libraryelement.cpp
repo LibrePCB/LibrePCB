@@ -63,7 +63,7 @@ void LibraryElement::parseDomTree(const XmlDomElement& root) throw (Exception)
     for (XmlDomElement* node = root.getFirstChild("meta/category", true, false);
          node; node = node->getNextSibling("category"))
     {
-        mCategories.append(node->getText<Uuid>());
+        mCategories.append(node->getText<Uuid>(true));
     }
 }
 

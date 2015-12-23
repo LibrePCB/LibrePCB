@@ -39,15 +39,15 @@ FootprintEllipse::FootprintEllipse() noexcept :
 
 FootprintEllipse::FootprintEllipse(const XmlDomElement& domElement) throw (Exception)
 {
-    mLayerId = domElement.getAttribute<uint>("layer"); // use "uint" to automatically check for >= 0
-    mLineWidth = domElement.getAttribute<Length>("width");
-    mIsFilled = domElement.getAttribute<bool>("fill");
-    mIsGrabArea = domElement.getAttribute<bool>("grab_area");
-    mCenter.setX(domElement.getAttribute<Length>("x"));
-    mCenter.setY(domElement.getAttribute<Length>("y"));
-    mRadiusX = domElement.getAttribute<Length>("radius_x");
-    mRadiusY = domElement.getAttribute<Length>("radius_y");
-    mRotation = domElement.getAttribute<Angle>("rotation");
+    mLayerId = domElement.getAttribute<uint>("layer", true); // use "uint" to automatically check for >= 0
+    mLineWidth = domElement.getAttribute<Length>("width", true);
+    mIsFilled = domElement.getAttribute<bool>("fill", true);
+    mIsGrabArea = domElement.getAttribute<bool>("grab_area", true);
+    mCenter.setX(domElement.getAttribute<Length>("x", true));
+    mCenter.setY(domElement.getAttribute<Length>("y", true));
+    mRadiusX = domElement.getAttribute<Length>("radius_x", true);
+    mRadiusY = domElement.getAttribute<Length>("radius_y", true);
+    mRotation = domElement.getAttribute<Angle>("rotation", true);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -66,14 +66,14 @@ XmlDomElement* FootprintEllipse::serializeToXmlDomElement() const throw (Excepti
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("ellipse"));
     root->setAttribute("layer", mLayerId);
-    root->setAttribute("width", mLineWidth.toMmString());
+    root->setAttribute("width", mLineWidth);
     root->setAttribute("fill", mIsFilled);
     root->setAttribute("grab_area", mIsGrabArea);
-    root->setAttribute("x", mCenter.getX().toMmString());
-    root->setAttribute("y", mCenter.getY().toMmString());
-    root->setAttribute("radius_x", mRadiusX.toMmString());
-    root->setAttribute("radius_y", mRadiusY.toMmString());
-    root->setAttribute("rotation", mRotation.toDegString());
+    root->setAttribute("x", mCenter.getX());
+    root->setAttribute("y", mCenter.getY());
+    root->setAttribute("radius_x", mRadiusX);
+    root->setAttribute("radius_y", mRadiusY);
+    root->setAttribute("rotation", mRotation);
     return root.take();
 }
 

@@ -46,18 +46,18 @@ SI_NetPoint::SI_NetPoint(Schematic& schematic, const XmlDomElement& domElement) 
     mGraphicsItem(nullptr), mNetSignal(nullptr), mSymbolPin(nullptr)
 {
     // read attributes
-    mUuid = domElement.getAttribute<Uuid>("uuid");
-    mAttached = domElement.getFirstChild("attached", true)->getText<bool>();
+    mUuid = domElement.getAttribute<Uuid>("uuid", true);
+    mAttached = domElement.getFirstChild("attached", true)->getText<bool>(true);
     if (mAttached)
     {
-        Uuid symbolUuid = domElement.getFirstChild("symbol", true)->getText<Uuid>();
+        Uuid symbolUuid = domElement.getFirstChild("symbol", true)->getText<Uuid>(true);
         SI_Symbol* symbol = mSchematic.getSymbolByUuid(symbolUuid);
         if (!symbol)
         {
             throw RuntimeError(__FILE__, __LINE__, symbolUuid.toStr(),
                 QString(tr("Invalid symbol UUID: \"%1\"")).arg(symbolUuid.toStr()));
         }
-        Uuid pinUuid = domElement.getFirstChild("pin", true)->getText<Uuid>();
+        Uuid pinUuid = domElement.getFirstChild("pin", true)->getText<Uuid>(true);
         mSymbolPin = symbol->getPin(pinUuid);
         if (!mSymbolPin)
         {
@@ -80,7 +80,7 @@ SI_NetPoint::SI_NetPoint(Schematic& schematic, const XmlDomElement& domElement) 
     }
     else
     {
-        Uuid netSignalUuid = domElement.getFirstChild("netsignal", true)->getText<Uuid>();
+        Uuid netSignalUuid = domElement.getFirstChild("netsignal", true)->getText<Uuid>(true);
         mNetSignal = mSchematic.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
         if(!mNetSignal)
         {
@@ -88,8 +88,8 @@ SI_NetPoint::SI_NetPoint(Schematic& schematic, const XmlDomElement& domElement) 
                 QString(tr("Invalid net signal UUID: \"%1\"")).arg(netSignalUuid.toStr()));
         }
 
-        mPosition.setX(domElement.getFirstChild("position", true)->getAttribute<Length>("x"));
-        mPosition.setY(domElement.getFirstChild("position", true)->getAttribute<Length>("y"));
+        mPosition.setX(domElement.getFirstChild("position", true)->getAttribute<Length>("x", true));
+        mPosition.setY(domElement.getFirstChild("position", true)->getAttribute<Length>("y", true));
     }
 
     init();

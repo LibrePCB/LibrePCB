@@ -44,9 +44,9 @@ ComponentSymbolVariant::ComponentSymbolVariant(const XmlDomElement& domElement) 
     try
     {
         // read attributes
-        mUuid = domElement.getAttribute<Uuid>("uuid");
-        mNorm = domElement.getAttribute("norm");
-        mIsDefault = domElement.getAttribute<bool>("default");
+        mUuid = domElement.getAttribute<Uuid>("uuid", true);
+        mNorm = domElement.getAttribute<QString>("norm", false);
+        mIsDefault = domElement.getAttribute<bool>("default", true);
 
         // read names and descriptions in all available languages
         LibraryBaseElement::readLocaleDomNodes(domElement, "name", mNames);

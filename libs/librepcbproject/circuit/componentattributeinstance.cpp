@@ -37,10 +37,10 @@ namespace project {
 ComponentAttributeInstance::ComponentAttributeInstance(const XmlDomElement& domElement) throw (Exception) :
     mKey(), mType(nullptr), mValue(), mUnit(nullptr)
 {
-    mKey = domElement.getAttribute("key", true);
-    mType = &AttributeType::fromString(domElement.getFirstChild("type", true)->getText(true));
-    mValue = domElement.getFirstChild("value", true)->getText();
-    mUnit = mType->getUnitFromString(domElement.getFirstChild("unit", true)->getText());
+    mKey = domElement.getAttribute<QString>("key", true);
+    mType = &AttributeType::fromString(domElement.getFirstChild("type", true)->getText<QString>(true));
+    mValue = domElement.getFirstChild("value", true)->getText<QString>(false);
+    mUnit = mType->getUnitFromString(domElement.getFirstChild("unit", true)->getText<QString>(false));
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }

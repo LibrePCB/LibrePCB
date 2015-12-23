@@ -42,10 +42,10 @@ SI_NetLine::SI_NetLine(Schematic& schematic, const XmlDomElement& domElement) th
     SI_Base(), mSchematic(schematic), mGraphicsItem(nullptr), mPosition(0, 0),
     mStartPoint(nullptr), mEndPoint(nullptr)
 {
-    mUuid = domElement.getAttribute<Uuid>("uuid");
-    mWidth = domElement.getAttribute<Length>("width");
+    mUuid = domElement.getAttribute<Uuid>("uuid", true);
+    mWidth = domElement.getAttribute<Length>("width", true);
 
-    Uuid spUuid = domElement.getAttribute<Uuid>("start_point");
+    Uuid spUuid = domElement.getAttribute<Uuid>("start_point", true);
     mStartPoint = mSchematic.getNetPointByUuid(spUuid);
     if(!mStartPoint)
     {
@@ -54,7 +54,7 @@ SI_NetLine::SI_NetLine(Schematic& schematic, const XmlDomElement& domElement) th
             .arg(spUuid.toStr()));
     }
 
-    Uuid epUuid = domElement.getAttribute<Uuid>("end_point");
+    Uuid epUuid = domElement.getAttribute<Uuid>("end_point", true);
     mEndPoint = mSchematic.getNetPointByUuid(epUuid);
     if(!mEndPoint)
     {

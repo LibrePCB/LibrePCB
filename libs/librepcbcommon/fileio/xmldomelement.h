@@ -53,6 +53,10 @@ class XmlDomDocument;
  * </root_element>
  * @endcode
  *
+ * @note This class provides some template methods to call them with different types.
+ *       We don't use method overloading because this way we don't need to include
+ *       the header files for our own types (e.g. #Uuid, #Version, ...).
+ *
  * @todo Use libxml2 instead of Qt's DOM classes.
  * @todo Add more template instances (provide more type conversions from/to QString)
  *
@@ -143,18 +147,9 @@ class XmlDomElement final
         /**
          * @brief Set the text of this text element
          *
-         * @warning This method must be called only on elements without child elements!
-         *
-         * @param text  The text of this element
-         */
-        void setText(const QString& text) noexcept;
-
-        /**
-         * @brief Set the text of this text element
-         *
-         * @tparam T            The value of this type will be converted to a QString.
-         *                      Available types:
-         *                      bool, QDateTime, #Uuid, #Version, #Length (tbc)
+         * @tparam T    The value of this type will be converted to a QString.
+         *              Available types:
+         *              bool, QString, QDateTime, #Uuid, #Version, #Length (tbc)
          *
          * @warning This method must be called only on elements without child elements!
          *
@@ -164,22 +159,10 @@ class XmlDomElement final
         void setText(const T& value) noexcept;
 
         /**
-         * @brief Get the text of this text element as a QString
-         *
-         * @param throwIfEmpty  If true and the text is empty, an exception will be thrown
-         *
-         * @return The text of this text element as a QString
-         *
-         * @throw Exception     If this is not a text element (element contains childs)
-         * @throw Exception     If the text is empty and "throwIfEmpty == true"
-         */
-        const QString& getText(bool throwIfEmpty = false) const throw (Exception);
-
-        /**
          * @brief Get the text of this text element in the specified type
          *
-         * @tparam T            The text will be converted to this type. Available types:
-         *                      bool, QDateTime, #Uuid, #Version, #Length (tbc)
+         * @tparam T    The text will be converted to this type. Available types:
+         *              bool, QString, QDateTime, #Uuid, #Version, #Length (tbc)
          *
          * @param throwIfEmpty  If true and the text is empty, an exception will be thrown.
          *                      If false and the text is empty, defaultValue will be returned.
@@ -192,7 +175,7 @@ class XmlDomElement final
          * @throw Exception     If the text is empty and "throwIfEmpty == true"
          */
         template <typename T>
-        T getText(bool throwIfEmpty = true, const T& defaultValue = T()) const throw (Exception);
+        T getText(bool throwIfEmpty, const T& defaultValue = T()) const throw (Exception);
 
 
         // Attribute Handling Methods
@@ -201,8 +184,8 @@ class XmlDomElement final
          * @brief Set or add an attribute to this element
          *
          * @tparam T        The text will be converted in this type. Available types:
-         *                  bool, const char*, QString, #Uuid, #Length, #Angle, #HAlign,
-         *                  #VAlign (tbc)
+         *                  bool, const char*, QString, #Uuid, #LengthUnit, #Length,
+         *                  #Angle, #HAlign, #VAlign (tbc)
          *
          * @param name      The tag name (see #isValidXmlTagName() for allowed characters)
          * @param value     The attribute value
@@ -221,23 +204,11 @@ class XmlDomElement final
         bool hasAttribute(const QString& name) const noexcept;
 
         /**
-         * @brief Get the value of a specific attribute as a QString
-         *
-         * @param name          The tag name (see #isValidXmlTagName() for allowed characters)
-         * @param throwIfEmpty  If true and the value is empty, an exception will be thrown
-         *
-         * @return The text of this text element as a QString
-         *
-         * @throw Exception     If the specified attribute does not exist
-         * @throw Exception     If the value is empty and "throwIfEmpty == true"
-         */
-        QString getAttribute(const QString& name, bool throwIfEmpty = false) const throw (Exception);
-
-        /**
          * @brief Get the value of a specific attribute in the specified type
          *
-         * @tparam T            The value will be converted in this type. Available types:
-         *                      bool, uint, int, #Uuid, #Length, #Angle, #HAlign, #VAlign (tbc)
+         * @tparam T    The value will be converted in this type. Available types:
+         *              bool, uint, int, QString, #Uuid, #LengthUnit, #Length, #Angle,
+         *              #HAlign, #VAlign (tbc)
          *
          * @param name          The tag name (see #isValidXmlTagName() for allowed characters)
          * @param throwIfEmpty  If true and the value is empty, an exception will be thrown
@@ -251,7 +222,7 @@ class XmlDomElement final
          * @throw Exception     If the value is empty and "throwIfEmpty == true"
          */
         template <typename T>
-        T getAttribute(const QString& name, bool throwIfEmpty = true, const T& defaultValue = T()) const throw (Exception);
+        T getAttribute(const QString& name, bool throwIfEmpty, const T& defaultValue = T()) const throw (Exception);
 
 
         // Child Handling Methods

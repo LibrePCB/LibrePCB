@@ -279,23 +279,23 @@ void Component::parseDomTree(const XmlDomElement& root) throw (Exception)
     for (XmlDomElement* node = root.getFirstChild("properties/prefix", true, false);
          node; node = node->getNextSibling("prefix"))
     {
-        if (mPrefixes.contains(node->getAttribute("norm")))
+        if (mPrefixes.contains(node->getAttribute<QString>("norm", false)))
         {
-            throw RuntimeError(__FILE__, __LINE__, node->getAttribute("norm"),
+            throw RuntimeError(__FILE__, __LINE__, node->getAttribute<QString>("norm", false),
                 QString(tr("The prefix \"%1\" exists multiple times in \"%2\"."))
-                .arg(node->getAttribute("norm"), mXmlFilepath.toNative()));
+                .arg(node->getAttribute<QString>("norm", false), mXmlFilepath.toNative()));
         }
-        if (node->getAttribute<bool>("default") == true)
+        if (node->getAttribute<bool>("default", true) == true)
         {
             if (!mDefaultPrefixNorm.isNull())
             {
-                throw RuntimeError(__FILE__, __LINE__, node->getAttribute("norm"),
+                throw RuntimeError(__FILE__, __LINE__, node->getAttribute<QString>("norm", false),
                     QString(tr("The file \"%1\" has multiple default prefix norms."))
                     .arg(mXmlFilepath.toNative()));
             }
-            mDefaultPrefixNorm = node->getAttribute("norm");
+            mDefaultPrefixNorm = node->getAttribute<QString>("norm", false);
         }
-        mPrefixes.insert(node->getAttribute("norm"), node->getText());
+        mPrefixes.insert(node->getAttribute<QString>("norm", false), node->getText<QString>(false));
     }
     if (mPrefixes.isEmpty())
     {
@@ -378,7 +378,7 @@ XmlDomElement* Component::serializeToXmlDomElement() const throw (Exception)
     {
         XmlDomElement* child = properties->appendTextChild("prefix", mPrefixes.value(norm));
         child->setAttribute("norm", norm);
-        child->setAttribute("default", norm == mDefaultPrefixNorm);
+        child->setAttribute("default", (norm == mDefaultPrefixNorm) ? true : false);
     }
     XmlDomElement* signalsNode = root->appendChild("signals");
     foreach (const ComponentSignal* signal, mSignals)
