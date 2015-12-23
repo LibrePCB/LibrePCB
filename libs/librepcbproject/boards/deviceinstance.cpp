@@ -212,13 +212,13 @@ bool DeviceInstance::getAttributeValue(const QString& attrNS, const QString& att
 {
     // no local attributes available
 
-    if (((attrNS == QLatin1String("DEV")) || (attrNS.isEmpty())) && passToParents)
+    if (((attrNS == QLatin1String("CMP")) || (attrNS.isEmpty())) && passToParents)
     {
         if (mCompInstance->getAttributeValue(attrNS, attrKey, false, value))
             return true;
     }
 
-    if ((attrNS != QLatin1String("DEV")) && (passToParents))
+    if ((attrNS != QLatin1String("CMP")) && (passToParents))
         return mBoard.getAttributeValue(attrNS, attrKey, true, value);
     else
         return false;
