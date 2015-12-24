@@ -26,8 +26,7 @@
 #include "board.h"
 #include "../project.h"
 #include "../library/projectlibrary.h"
-#include <librepcblibrary/dev/device.h>
-#include <librepcblibrary/cmp/component.h>
+#include <librepcblibrary/elements.h>
 #include "../erc/ercmsg.h"
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include "../circuit/circuit.h"
@@ -42,7 +41,7 @@ namespace project {
 
 DeviceInstance::DeviceInstance(Board& board, const XmlDomElement& domElement) throw (Exception) :
     QObject(nullptr), mBoard(board), mAddedToBoard(false), mCompInstance(nullptr),
-    mDevice(nullptr), mFootprint(nullptr)
+    mLibDevice(nullptr), mLibFootprint(nullptr), mFootprint(nullptr)
 {
     // get component instance
     Uuid compInstUuid = domElement.getAttribute<Uuid>("component_instance", true);
@@ -53,9 +52,10 @@ DeviceInstance::DeviceInstance(Board& board, const XmlDomElement& domElement) th
             QString(tr("Could not find the component instance with UUID \"%1\"!"))
             .arg(compInstUuid.toStr()));
     }
-    // get device
+    // get device and footprint uuid
     Uuid deviceUuid = domElement.getAttribute<Uuid>("device", true);
-    initDeviceAndPackage(deviceUuid);
+    Uuid footprintUuid = domElement.getAttribute<Uuid>("footprint", true);
+    initDeviceAndPackageAndFootprint(deviceUuid, footprintUuid);
 
     // get position, rotation and mirrored
     mPosition.setX(domElement.getFirstChild("position", true)->getAttribute<Length>("x", true));
@@ -70,13 +70,13 @@ DeviceInstance::DeviceInstance(Board& board, const XmlDomElement& domElement) th
 }
 
 DeviceInstance::DeviceInstance(Board& board, ComponentInstance& compInstance,
-                                     const Uuid& deviceUuid, const Point& position,
-                                     const Angle& rotation) throw (Exception) :
+                               const Uuid& deviceUuid, const Uuid& footprintUuid,
+                               const Point& position, const Angle& rotation) throw (Exception) :
     QObject(nullptr), mBoard(board), mAddedToBoard(false), mCompInstance(&compInstance),
-    mDevice(nullptr), mFootprint(nullptr), mPosition(position), mRotation(rotation),
-    mIsMirrored(false)
+    mLibDevice(nullptr), mLibFootprint(nullptr), mFootprint(nullptr), mPosition(position),
+    mRotation(rotation), mIsMirrored(false)
 {
-    initDeviceAndPackage(deviceUuid);
+    initDeviceAndPackageAndFootprint(deviceUuid, footprintUuid);
 
     // create footprint
     mFootprint = new BI_Footprint(*this);
@@ -84,45 +84,54 @@ DeviceInstance::DeviceInstance(Board& board, ComponentInstance& compInstance,
     init();
 }
 
-void DeviceInstance::initDeviceAndPackage(const Uuid& deviceUuid) throw (Exception)
+void DeviceInstance::initDeviceAndPackageAndFootprint(const Uuid& deviceUuid,
+                                                      const Uuid& footprintUuid) throw (Exception)
 {
     // get device from library
-    mDevice = mBoard.getProject().getLibrary().getDevice(deviceUuid);
-    if (!mDevice)
+    mLibDevice = mBoard.getProject().getLibrary().getDevice(deviceUuid);
+    if (!mLibDevice)
     {
-        throw RuntimeError(__FILE__, __LINE__, deviceUuid.toStr(),
+        throw RuntimeError(__FILE__, __LINE__, mCompInstance->getUuid().toStr(),
             QString(tr("No device with the UUID \"%1\" found in the project's library."))
             .arg(deviceUuid.toStr()));
     }
     // check if the device matches with the component
-    if (mDevice->getComponentUuid() != mCompInstance->getLibComponent().getUuid())
+    if (mLibDevice->getComponentUuid() != mCompInstance->getLibComponent().getUuid())
     {
         throw RuntimeError(__FILE__, __LINE__, QString(),
             QString(tr("The device \"%1\" does not match with the component"
-            "instance \"%2\".")).arg(mDevice->getUuid().toStr(),
+            "instance \"%2\".")).arg(mLibDevice->getUuid().toStr(),
             mCompInstance->getUuid().toStr()));
     }
     // get package from library
-    Uuid packageUuid = mDevice->getPackageUuid();
-    mPackage = mBoard.getProject().getLibrary().getPackage(packageUuid);
-    if (!mPackage)
+    Uuid packageUuid = mLibDevice->getPackageUuid();
+    mLibPackage = mBoard.getProject().getLibrary().getPackage(packageUuid);
+    if (!mLibPackage)
     {
-        throw RuntimeError(__FILE__, __LINE__, packageUuid.toStr(),
+        throw RuntimeError(__FILE__, __LINE__, mCompInstance->getUuid().toStr(),
             QString(tr("No package with the UUID \"%1\" found in the project's library."))
             .arg(packageUuid.toStr()));
+    }
+    // get footprint from package
+    mLibFootprint = mLibPackage->getFootprintByUuid(footprintUuid);
+    if (!mLibFootprint)
+    {
+        throw RuntimeError(__FILE__, __LINE__, mCompInstance->getUuid().toStr(),
+            QString(tr("The package \"%1\" does not have a footprint with the UUID \"%2\"."))
+            .arg(packageUuid.toStr()).arg(footprintUuid.toStr()));
     }
 }
 
 void DeviceInstance::init() throw (Exception)
 {
     // check pad-signal-map
-    foreach (const Uuid& signalUuid, mDevice->getPadSignalMap())
+    foreach (const Uuid& signalUuid, mLibDevice->getPadSignalMap())
     {
         if ((!signalUuid.isNull()) && (!mCompInstance->getSignalInstance(signalUuid)))
         {
             throw RuntimeError(__FILE__, __LINE__, signalUuid.toStr(),
                 QString(tr("Unknown signal \"%1\" found in device \"%2\""))
-                .arg(signalUuid.toStr(), mDevice->getUuid().toStr()));
+                .arg(signalUuid.toStr(), mLibDevice->getUuid().toStr()));
         }
     }
 
@@ -193,7 +202,8 @@ XmlDomElement* DeviceInstance::serializeToXmlDomElement() const throw (Exception
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("device_instance"));
     root->setAttribute("component_instance", mCompInstance->getUuid());
-    root->setAttribute("device", mDevice->getUuid());
+    root->setAttribute("device", mLibDevice->getUuid());
+    root->setAttribute("footprint", mLibFootprint->getUuid());
     root->appendChild(mFootprint->serializeToXmlDomElement());
     XmlDomElement* position = root->appendChild("position");
     position->setAttribute("x", mPosition.getX());
@@ -231,8 +241,8 @@ bool DeviceInstance::getAttributeValue(const QString& attrNS, const QString& att
 bool DeviceInstance::checkAttributesValidity() const noexcept
 {
     if (mCompInstance == nullptr)            return false;
-    if (mDevice == nullptr)                  return false;
-    if (mPackage == nullptr)                    return false;
+    if (mLibDevice == nullptr)                  return false;
+    if (mLibPackage == nullptr)                    return false;
     return true;
 }
 

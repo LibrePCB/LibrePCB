@@ -90,6 +90,16 @@ const Footprint* Package::getFootprintByUuid(const Uuid& uuid) const noexcept
     return nullptr;
 }
 
+const Footprint* Package::getDefaultFootprint() const noexcept
+{
+    foreach (const Footprint* footprint, mFootprints)
+    {
+        if (footprint->isDefault())
+            return footprint;
+    }
+    return nullptr; // TODO: this should not be possible!
+}
+
 void Package::clearFootprints() noexcept
 {
     qDeleteAll(mFootprints);

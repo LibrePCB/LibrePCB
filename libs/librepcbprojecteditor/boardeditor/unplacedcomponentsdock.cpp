@@ -52,7 +52,7 @@ UnplacedComponentsDock::UnplacedComponentsDock(ProjectEditor& editor) :
     QDockWidget(0), mProjectEditor(editor), mProject(editor.getProject()), mBoard(nullptr),
     mUi(new Ui::UnplacedComponentsDock),
     mFootprintPreviewGraphicsView(nullptr), mFootprintPreviewGraphicsScene(nullptr),
-    mSelectedComponent(nullptr), mSelectedDevice(nullptr),
+    mSelectedComponent(nullptr), mSelectedDevice(nullptr), mSelectedPackage(nullptr),
     mCircuitConnection1(), mCircuitConnection2(), mBoardConnection1(), mBoardConnection2(),
     mDisableListUpdate(false)
 {
@@ -125,30 +125,35 @@ void UnplacedComponentsDock::on_cbxSelectedComponent_currentIndexChanged(int ind
 {
     Uuid deviceUuid(mUi->cbxSelectedComponent->itemData(index, Qt::UserRole).toString());
     FilePath devFp = mProjectEditor.getWorkspace().getLibrary().getLatestDevice(deviceUuid);
-    if (devFp.isValid())
-    {
+    if (devFp.isValid()) {
         const library::Device* device = new library::Device(devFp);
-        setSelectedDevice(device);
+        FilePath pkgFp = mProjectEditor.getWorkspace().getLibrary().getLatestPackage(device->getPackageUuid());
+        if (pkgFp.isValid()) {
+            const library::Package* package = new library::Package(pkgFp);
+            setSelectedDeviceAndPackage(device, package);
+        } else {
+            setSelectedDeviceAndPackage(nullptr, nullptr);
+        }
     }
-    else
-    {
-        setSelectedDevice(nullptr);
+    else {
+        setSelectedDeviceAndPackage(nullptr, nullptr);
     }
 }
 
 void UnplacedComponentsDock::on_btnAdd_clicked()
 {
-    if (mBoard && mSelectedComponent && mSelectedComponent)
-        addDevice(*mSelectedComponent, mSelectedDevice->getUuid());
+    if (mBoard && mSelectedComponent && mSelectedDevice && mSelectedPackage)
+        addDevice(*mSelectedComponent, mSelectedDevice->getUuid(), mSelectedPackage->getDefaultFootprint()->getUuid()); // TODO
     updateComponentsList();
 }
 
 void UnplacedComponentsDock::on_pushButton_clicked()
 {
-    if ((!mBoard) || (!mSelectedComponent) || (!mSelectedDevice)) return;
+    if ((!mBoard) || (!mSelectedComponent) || (!mSelectedDevice) || (!mSelectedPackage)) return;
 
     Uuid componentLibUuid = mSelectedComponent->getLibComponent().getUuid();
     Uuid deviceLibUuid = mSelectedDevice->getUuid();
+    Uuid footprintLibUuid = mSelectedPackage->getDefaultFootprint()->getUuid(); // TODO
 
     mDisableListUpdate = true;
     for (int i = 0; i < mUi->lstUnplacedComponents->count(); i++)
@@ -158,7 +163,7 @@ void UnplacedComponentsDock::on_pushButton_clicked()
         ComponentInstance* component = mProject.getCircuit().getComponentInstanceByUuid(componentUuid);
         if (!component) continue;
         if (component->getLibComponent().getUuid() != componentLibUuid) continue;
-        addDevice(*component, deviceLibUuid);
+        addDevice(*component, deviceLibUuid, footprintLibUuid);
     }
     mDisableListUpdate = false;
 
@@ -167,6 +172,8 @@ void UnplacedComponentsDock::on_pushButton_clicked()
 
 void UnplacedComponentsDock::on_btnAddAll_clicked()
 {
+    /* TODO
+
     if (!mBoard) return;
 
     mDisableListUpdate = true;
@@ -185,7 +192,7 @@ void UnplacedComponentsDock::on_btnAddAll_clicked()
     }
     mDisableListUpdate = false;
 
-    updateComponentsList();
+    updateComponentsList();*/
 }
 
 /*****************************************************************************************
@@ -222,7 +229,7 @@ void UnplacedComponentsDock::updateComponentsList() noexcept
 
 void UnplacedComponentsDock::setSelectedComponentInstance(ComponentInstance* cmp) noexcept
 {
-    setSelectedDevice(nullptr);
+    setSelectedDeviceAndPackage(nullptr, nullptr);
     mUi->cbxSelectedComponent->clear();
     mSelectedComponent = cmp;
 
@@ -252,23 +259,26 @@ void UnplacedComponentsDock::setSelectedComponentInstance(ComponentInstance* cmp
     }
 }
 
-void UnplacedComponentsDock::setSelectedDevice(const library::Device* device) noexcept
+void UnplacedComponentsDock::setSelectedDeviceAndPackage(const library::Device* device,
+                                                         const library::Package* package) noexcept
 {
     mUi->btnAdd->setEnabled(false);
-    delete mSelectedDevice;
-    mSelectedDevice = nullptr;
+    delete mSelectedPackage;    mSelectedPackage = nullptr;
+    delete mSelectedDevice;     mSelectedDevice = nullptr;
 
-    if (mBoard && mSelectedComponent && device)
+    if (mBoard && mSelectedComponent && device && package)
     {
         if (device->getComponentUuid() == mSelectedComponent->getLibComponent().getUuid())
         {
             mSelectedDevice = device;
+            mSelectedPackage = package;
             mUi->btnAdd->setEnabled(true);
         }
     }
 }
 
-void UnplacedComponentsDock::addDevice(ComponentInstance& cmp, const Uuid& deviceUuid) noexcept
+void UnplacedComponentsDock::addDevice(ComponentInstance& cmp, const Uuid& deviceUuid,
+                                       const Uuid& footprintUuid) noexcept
 {
     Q_ASSERT(mBoard);
     bool cmdActive = false;
@@ -311,7 +321,7 @@ void UnplacedComponentsDock::addDevice(ComponentInstance& cmp, const Uuid& devic
         }
 
         // add device to board
-        CmdDeviceInstanceAdd* cmd = new CmdDeviceInstanceAdd(*mBoard, cmp, deviceUuid, mNextPosition);
+        CmdDeviceInstanceAdd* cmd = new CmdDeviceInstanceAdd(*mBoard, cmp, deviceUuid, footprintUuid, mNextPosition);
         mProjectEditor.getUndoStack().appendToCommand(cmd);
         if (mNextPosition.getX() > Length::fromMm(200))
             mNextPosition = Point::fromMm(0, mNextPosition.getY().toMm() - 10);

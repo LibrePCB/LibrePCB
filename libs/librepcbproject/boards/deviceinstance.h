@@ -47,6 +47,7 @@ class BI_Footprint;
 namespace library {
 class Device;
 class Package;
+class Footprint;
 }
 
 /*****************************************************************************************
@@ -69,7 +70,7 @@ class DeviceInstance final : public QObject, public IF_AttributeProvider,
         // Constructors / Destructor
         explicit DeviceInstance(Board& board, const XmlDomElement& domElement) throw (Exception);
         explicit DeviceInstance(Board& board, ComponentInstance& compInstance,
-                                const Uuid& deviceUuid,
+                                const Uuid& deviceUuid, const Uuid& footprintUuid,
                                 const Point& position = Point(),
                                 const Angle& rotation = Angle()) throw (Exception);
         ~DeviceInstance() noexcept;
@@ -78,8 +79,8 @@ class DeviceInstance final : public QObject, public IF_AttributeProvider,
         Project& getProject() const noexcept;
         Board& getBoard() const noexcept {return mBoard;}
         ComponentInstance& getComponentInstance() const noexcept {return *mCompInstance;}
-        const library::Device& getLibDevice() const noexcept {return *mDevice;}
-        const library::Package& getLibPackage() const noexcept {return *mPackage;}
+        const library::Device& getLibDevice() const noexcept {return *mLibDevice;}
+        const library::Package& getLibPackage() const noexcept {return *mLibPackage;}
         BI_Footprint& getFootprint() const noexcept {return *mFootprint;}
         const Angle& getRotation() const noexcept {return mRotation;}
         const Point& getPosition() const noexcept {return mPosition;}
@@ -120,7 +121,8 @@ class DeviceInstance final : public QObject, public IF_AttributeProvider,
         DeviceInstance& operator=(const DeviceInstance& rhs);
 
         // Private Methods
-        void initDeviceAndPackage(const Uuid& deviceUuid) throw (Exception);
+        void initDeviceAndPackageAndFootprint(const Uuid& deviceUuid,
+                                              const Uuid& footprintUuid) throw (Exception);
         void init() throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
@@ -133,8 +135,9 @@ class DeviceInstance final : public QObject, public IF_AttributeProvider,
         Board& mBoard;
         bool mAddedToBoard;
         ComponentInstance* mCompInstance;
-        const library::Device* mDevice;
-        const library::Package* mPackage;
+        const library::Device* mLibDevice;
+        const library::Package* mLibPackage;
+        const library::Footprint* mLibFootprint;
         BI_Footprint* mFootprint;
 
         // Attributes

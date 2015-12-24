@@ -63,6 +63,7 @@ class Package final : public LibraryElement
         // Footprints
         const QList<const Footprint*>& getFootprints() const noexcept {return mFootprints;}
         const Footprint* getFootprintByUuid(const Uuid& uuid) const noexcept;
+        const Footprint* getDefaultFootprint() const noexcept;
         void clearFootprints() noexcept;
         void addFootprint(const Footprint& footprint) noexcept;
 

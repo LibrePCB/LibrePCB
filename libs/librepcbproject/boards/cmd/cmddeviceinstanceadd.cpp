@@ -33,13 +33,13 @@ namespace project {
  ****************************************************************************************/
 
 CmdDeviceInstanceAdd::CmdDeviceInstanceAdd(Board& board, ComponentInstance& comp,
-                                           const Uuid& deviceUuid,
+                                           const Uuid& deviceUuid, const Uuid& footprintUuid,
                                            const Point& position, const Angle& rotation,
                                            UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Add device to board"), parent),
     mBoard(board), mDeviceInstance(nullptr)
 {
-    mDeviceInstance = new DeviceInstance(board, comp, deviceUuid, position, rotation);
+    mDeviceInstance = new DeviceInstance(board, comp, deviceUuid, footprintUuid, position, rotation);
 }
 
 CmdDeviceInstanceAdd::CmdDeviceInstanceAdd(DeviceInstance& device,

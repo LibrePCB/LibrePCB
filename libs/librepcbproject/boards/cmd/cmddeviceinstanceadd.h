@@ -58,7 +58,7 @@ class CmdDeviceInstanceAdd final : public UndoCommand
 
         // Constructors / Destructor
         explicit CmdDeviceInstanceAdd(Board& board, ComponentInstance& comp,
-                                      const Uuid& deviceUuid,
+                                      const Uuid& deviceUuid, const Uuid& footprintUuid,
                                       const Point& position = Point(),
                                       const Angle& rotation = Angle(), UndoCommand* parent = 0) throw (Exception);
         explicit CmdDeviceInstanceAdd(DeviceInstance& device, UndoCommand* parent = 0) throw (Exception);
