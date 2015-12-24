@@ -106,8 +106,7 @@ class Library final : public QObject
         // Getters: Element Metadata
         void getDeviceMetadata(const FilePath& devDir, Uuid* pkgUuid = nullptr,
                                QString* nameEn = nullptr) const throw (Exception);
-        void getPackageMetadata(const FilePath& pkgDir, Uuid* fptUuid = nullptr,
-                                QString* nameEn = nullptr) const throw (Exception);
+        void getPackageMetadata(const FilePath& pkgDir, QString* nameEn = nullptr) const throw (Exception);
 
         // Getters: Special
         QSet<Uuid> getComponentCategoryChilds(const Uuid& parent) const throw (Exception);

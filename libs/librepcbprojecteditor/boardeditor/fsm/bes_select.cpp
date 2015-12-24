@@ -262,7 +262,7 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightClick(QGraphicsSceneMouse
                 FilePath devFp = mWorkspace.getLibrary().getLatestDevice(deviceUuid);
                 mWorkspace.getLibrary().getDeviceMetadata(devFp, &pkgUuid, &devName);
                 FilePath pkgFp = mWorkspace.getLibrary().getLatestPackage(pkgUuid);
-                mWorkspace.getLibrary().getPackageMetadata(pkgFp, &pkgUuid, &pkgName);
+                mWorkspace.getLibrary().getPackageMetadata(pkgFp, &pkgName);
                 QAction* a = aChangeDeviceMenu->addAction(QString("%1 [%2]").arg(devName).arg(pkgName));
                 a->setData(deviceUuid.toStr());
                 if (deviceUuid == devInst.getLibDevice().getUuid())

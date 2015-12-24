@@ -172,10 +172,10 @@ void Library::getDeviceMetadata(const FilePath& devDir, Uuid* pkgUuid, QString* 
     }
 }
 
-void Library::getPackageMetadata(const FilePath& pkgDir, Uuid* fptUuid, QString* nameEn) const throw (Exception)
+void Library::getPackageMetadata(const FilePath& pkgDir, QString* nameEn) const throw (Exception)
 {
     QSqlQuery query = prepareQuery(
-        "SELECT footprint_uuid, packages_tr.name FROM packages "
+        "SELECT packages_tr.name FROM packages "
         "LEFT JOIN packages_tr ON packages.id=packages_tr.package_id "
         "WHERE filepath = :filepath");
     query.bindValue(":filepath", pkgDir.toRelative(mLibPath));
@@ -183,8 +183,7 @@ void Library::getPackageMetadata(const FilePath& pkgDir, Uuid* fptUuid, QString*
 
     if (/*(query.size() == 1) &&*/ (query.first()))
     {
-        if (fptUuid) *fptUuid = Uuid(query.value(0).toString());
-        if (nameEn) *nameEn = query.value(1).toString();
+        if (nameEn) *nameEn = query.value(0).toString();
     }
     else
     {
