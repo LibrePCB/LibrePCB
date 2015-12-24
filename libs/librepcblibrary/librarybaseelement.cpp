@@ -110,7 +110,7 @@ void LibraryBaseElement::save() const throw (Exception)
 
     // save version number file
     QScopedPointer<SmartTextFile> versionFile(SmartTextFile::create(mVersionFilepath));
-    versionFile->setContent(QString::number(APP_VERSION_MAJOR).toUtf8());
+    versionFile->setContent(QString("%1\n").arg(APP_VERSION_MAJOR).toUtf8());
     versionFile->save(true);
 }
 
@@ -142,15 +142,19 @@ void LibraryBaseElement::readFromFile() throw (Exception)
 
     // read version number from version file
     mVersionFilepath = mDirectory.getPathTo("version");
+    bool versionNumberValid = false;
+    int fileVersion = 0;
     SmartTextFile versionFile(mVersionFilepath, false, true);
-    QString fileVersionStr = QString(versionFile.getContent());
-    bool versionNumberValid;
-    int fileVersion = fileVersionStr.toInt(&versionNumberValid);
+    QString versionFileContent = QString(versionFile.getContent());
+    QStringList versionFileLines = versionFileContent.split("\n", QString::KeepEmptyParts);
+    if (versionFileLines.count() > 0) {
+        fileVersion = versionFileLines.first().toInt(&versionNumberValid);
+    }
     if ((!versionNumberValid) || (fileVersion < 0))
     {
-        throw RuntimeError(__FILE__, __LINE__, fileVersionStr,
-            QString(tr("Invalid version number in file %1: \"%2\""))
-            .arg(mVersionFilepath.toNative()).arg(fileVersionStr));
+        throw RuntimeError(__FILE__, __LINE__, versionFileContent,
+            QString(tr("Invalid version number in file %1."))
+            .arg(mVersionFilepath.toNative()));
     }
     if (!(fileVersion <= APP_VERSION_MAJOR))
     {
