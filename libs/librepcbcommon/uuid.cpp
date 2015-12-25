@@ -61,6 +61,30 @@ bool Uuid::operator!=(const Uuid& rhs) const noexcept
     return (mUuid != rhs.mUuid);
 }
 
+bool Uuid::operator<(const Uuid& rhs) const noexcept
+{
+    if (mUuid.isEmpty() || rhs.mUuid.isEmpty()) return false;
+    return (mUuid < rhs.mUuid);
+}
+
+bool Uuid::operator>(const Uuid& rhs) const noexcept
+{
+    if (mUuid.isEmpty() || rhs.mUuid.isEmpty()) return false;
+    return (mUuid > rhs.mUuid);
+}
+
+bool Uuid::operator<=(const Uuid& rhs) const noexcept
+{
+    if (mUuid.isEmpty() || rhs.mUuid.isEmpty()) return false;
+    return (mUuid <= rhs.mUuid);
+}
+
+bool Uuid::operator>=(const Uuid& rhs) const noexcept
+{
+    if (mUuid.isEmpty() || rhs.mUuid.isEmpty()) return false;
+    return (mUuid >= rhs.mUuid);
+}
+
 /*****************************************************************************************
  *  Static Methods
  ****************************************************************************************/

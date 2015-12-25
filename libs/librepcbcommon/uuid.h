@@ -110,6 +110,10 @@ class Uuid final
         Uuid& operator=(const Uuid& rhs) noexcept;
         bool operator==(const Uuid& rhs) const noexcept;
         bool operator!=(const Uuid& rhs) const noexcept;
+        bool operator<(const Uuid& rhs) const noexcept;
+        bool operator>(const Uuid& rhs) const noexcept;
+        bool operator<=(const Uuid& rhs) const noexcept;
+        bool operator>=(const Uuid& rhs) const noexcept;
         //@}
 
 
