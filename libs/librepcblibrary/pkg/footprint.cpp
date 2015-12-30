@@ -33,8 +33,8 @@ namespace library {
  ****************************************************************************************/
 
 Footprint::Footprint(const Uuid& uuid, const QString& name_en_US,
-                     const QString& description_en_US, bool isDefault) throw (Exception) :
-    mUuid(uuid), mIsDefault(isDefault)
+                     const QString& description_en_US) throw (Exception) :
+    mUuid(uuid)
 {
     Q_ASSERT(mUuid.isNull() == false);
     mNames.insert("en_US", name_en_US);
@@ -47,7 +47,6 @@ Footprint::Footprint(const XmlDomElement& domElement) throw (Exception)
     {
         // read attributes
         mUuid = domElement.getAttribute<Uuid>("uuid", true);
-        mIsDefault = domElement.getAttribute<bool>("default", true);
 
         // read names and descriptions in all available languages
         LibraryBaseElement::readLocaleDomNodes(domElement, "name", mNames);
@@ -57,39 +56,23 @@ Footprint::Footprint(const XmlDomElement& domElement) throw (Exception)
         for (XmlDomElement* node = domElement.getFirstChild("geometry/*", true, false);
              node; node = node->getNextSibling())
         {
-            if (node->getName() == "polygon")
-            {
-                mPolygons.append(new FootprintPolygon(*node));
-            }
-            else if (node->getName() == "text")
-            {
-                mTexts.append(new FootprintText(*node));
-            }
-            else if (node->getName() == "ellipse")
-            {
-                mEllipses.append(new FootprintEllipse(*node));
-            }
-            else if (node->getName() == "hole")
-            {
-                FootprintHole_t* hole = new FootprintHole_t();
-                hole->pos.setX(node->getAttribute<Length>("x", true));
-                hole->pos.setY(node->getAttribute<Length>("y", true));
-                hole->diameter = node->getAttribute<Length>("diameter", true);
-                mHoles.append(hole);
-            }
-            else if (node->getName() == "pad")
-            {
-                FootprintPad* pad = new FootprintPad(*node);
-                if (mPads.contains(pad->getPadUuid()))
-                {
-                    throw RuntimeError(__FILE__, __LINE__, pad->getPadUuid().toStr(),
+            if (node->getName() == "polygon") {
+                mPolygons.append(new Polygon(*node));
+            } else if (node->getName() == "ellipse") {
+                mEllipses.append(new Ellipse(*node));
+            } else if (node->getName() == "text") {
+                mTexts.append(new Text(*node));
+            } else if (node->getName() == "hole") {
+                mHoles.append(new Hole(*node));
+            } else if (node->getName() == "pad") {
+                FootprintPad* pad = FootprintPad::fromDomElement(*node);
+                if (mPads.contains(pad->getUuid())) {
+                    throw RuntimeError(__FILE__, __LINE__, pad->getUuid().toStr(),
                         QString(tr("The pad \"%1\" exists multiple times in \"%2\"."))
-                        .arg(pad->getPadUuid().toStr(), domElement.getDocFilePath().toNative()));
+                        .arg(pad->getUuid().toStr(), domElement.getDocFilePath().toNative()));
                 }
-                mPads.insert(pad->getPadUuid(), pad);
-            }
-            else
-            {
+                mPads.insert(pad->getUuid(), pad);
+            } else {
                 throw RuntimeError(__FILE__, __LINE__, node->getName(),
                     QString(tr("Unknown geometry element \"%1\" in \"%2\"."))
                     .arg(node->getName(), domElement.getDocFilePath().toNative()));
@@ -98,11 +81,10 @@ Footprint::Footprint(const XmlDomElement& domElement) throw (Exception)
 
         if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
     }
-    catch (Exception& e)
-    {
+    catch (Exception& e) {
         qDeleteAll(mHoles);         mHoles.clear();
-        qDeleteAll(mEllipses);      mEllipses.clear();
         qDeleteAll(mTexts);         mTexts.clear();
+        qDeleteAll(mEllipses);      mEllipses.clear();
         qDeleteAll(mPolygons);      mPolygons.clear();
         qDeleteAll(mPads);          mPads.clear();
         throw;
@@ -112,8 +94,8 @@ Footprint::Footprint(const XmlDomElement& domElement) throw (Exception)
 Footprint::~Footprint() noexcept
 {
     qDeleteAll(mHoles);         mHoles.clear();
-    qDeleteAll(mEllipses);      mEllipses.clear();
     qDeleteAll(mTexts);         mTexts.clear();
+    qDeleteAll(mEllipses);      mEllipses.clear();
     qDeleteAll(mPolygons);      mPolygons.clear();
     qDeleteAll(mPads);          mPads.clear();
 }
@@ -133,6 +115,87 @@ QString Footprint::getDescription(const QStringList& localeOrder) const noexcept
 }
 
 /*****************************************************************************************
+ *  FootprintPad Methods
+ ****************************************************************************************/
+
+void Footprint::addPad(FootprintPad& pad) noexcept
+{
+    Q_ASSERT(!mPads.contains(pad.getUuid()));
+    mPads.insert(pad.getUuid(), &pad);
+}
+
+void Footprint::removePad(FootprintPad& pad) noexcept
+{
+    Q_ASSERT(mPads.contains(pad.getUuid()));
+    Q_ASSERT(mPads.value(pad.getUuid()) == &pad);
+    mPads.remove(pad.getUuid());
+}
+
+/*****************************************************************************************
+ *  Polygon Methods
+ ****************************************************************************************/
+
+void Footprint::addPolygon(Polygon& polygon) noexcept
+{
+    Q_ASSERT(!mPolygons.contains(&polygon));
+    mPolygons.append(&polygon);
+}
+
+void Footprint::removePolygon(Polygon& polygon) noexcept
+{
+    Q_ASSERT(mPolygons.contains(&polygon));
+    mPolygons.removeAll(&polygon);
+}
+
+/*****************************************************************************************
+ *  Ellipse Methods
+ ****************************************************************************************/
+
+void Footprint::addEllipse(Ellipse& ellipse) noexcept
+{
+    Q_ASSERT(!mEllipses.contains(&ellipse));
+    mEllipses.append(&ellipse);
+}
+
+void Footprint::removeEllipse(Ellipse& ellipse) noexcept
+{
+    Q_ASSERT(mEllipses.contains(&ellipse));
+    mEllipses.removeAll(&ellipse);
+}
+
+/*****************************************************************************************
+ *  Text Methods
+ ****************************************************************************************/
+
+void Footprint::addText(Text& text) noexcept
+{
+    Q_ASSERT(!mTexts.contains(&text));
+    mTexts.append(&text);
+}
+
+void Footprint::removeText(Text& text) noexcept
+{
+    Q_ASSERT(mTexts.contains(&text));
+    mTexts.removeAll(&text);
+}
+
+/*****************************************************************************************
+ *  Hole Methods
+ ****************************************************************************************/
+
+void Footprint::addHole(Hole& hole) noexcept
+{
+    Q_ASSERT(!mHoles.contains(&hole));
+    mHoles.append(&hole);
+}
+
+void Footprint::removeHole(Hole& hole) noexcept
+{
+    Q_ASSERT(mHoles.contains(&hole));
+    mHoles.removeAll(&hole);
+}
+
+/*****************************************************************************************
  *  Public Methods
  ****************************************************************************************/
 
@@ -142,25 +205,19 @@ XmlDomElement* Footprint::serializeToXmlDomElement() const throw (Exception)
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("footprint"));
     root->setAttribute("uuid", mUuid);
-    root->setAttribute("default", mIsDefault);
     foreach (const QString& locale, mNames.keys())
         root->appendTextChild("name", mNames.value(locale))->setAttribute("locale", locale);
     foreach (const QString& locale, mDescriptions.keys())
         root->appendTextChild("description", mDescriptions.value(locale))->setAttribute("locale", locale);
     XmlDomElement* geometry = root->appendChild("geometry");
-    foreach (const FootprintPolygon* polygon, mPolygons)
+    foreach (const Polygon* polygon, mPolygons)
         geometry->appendChild(polygon->serializeToXmlDomElement());
-    foreach (const FootprintText* text, mTexts)
+    foreach (const Text* text, mTexts)
         geometry->appendChild(text->serializeToXmlDomElement());
-    foreach (const FootprintEllipse* ellipse, mEllipses)
+    foreach (const Ellipse* ellipse, mEllipses)
         geometry->appendChild(ellipse->serializeToXmlDomElement());
-    foreach (const FootprintHole_t* hole, mHoles)
-    {
-        XmlDomElement* child = geometry->appendChild("hole");
-        child->setAttribute("x", hole->pos.getX());
-        child->setAttribute("y", hole->pos.getY());
-        child->setAttribute("diameter", hole->diameter);
-    }
+    foreach (const Hole* hole, mHoles)
+        geometry->appendChild(hole->serializeToXmlDomElement());
     foreach (const FootprintPad* pad, mPads)
         geometry->appendChild(pad->serializeToXmlDomElement());
     return root.take();

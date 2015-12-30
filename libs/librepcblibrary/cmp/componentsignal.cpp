@@ -33,7 +33,7 @@ namespace library {
  ****************************************************************************************/
 
 ComponentSignal::ComponentSignal(const Uuid& uuid, const QString& name) noexcept :
-    mUuid(uuid), mName(name), mRole(SignalRole_t::Passive), mForcedNetName(),
+    mUuid(uuid), mName(name), mRole(SignalRole_t::PASSIVE), mForcedNetName(),
     mIsRequired(false), mIsNegated(false), mIsClock(false)
 {
     Q_ASSERT(mUuid.isNull() == false);
@@ -93,12 +93,12 @@ bool ComponentSignal::checkAttributesValidity() const noexcept
 
 ComponentSignal::SignalRole_t ComponentSignal::stringToSignalRole(const QString& role) throw (Exception)
 {
-    if (role == "power")            return SignalRole_t::Power;
-    else if (role == "input")       return SignalRole_t::Input;
-    else if (role == "output")      return SignalRole_t::Output;
-    else if (role == "inout")       return SignalRole_t::InOut;
-    else if (role == "opendrain")   return SignalRole_t::OpenDrain;
-    else if (role == "passive")     return SignalRole_t::Passive;
+    if (role == "power")            return SignalRole_t::POWER;
+    else if (role == "input")       return SignalRole_t::INPUT;
+    else if (role == "output")      return SignalRole_t::OUTPUT;
+    else if (role == "inout")       return SignalRole_t::INOUT;
+    else if (role == "opendrain")   return SignalRole_t::OPENDRAIN;
+    else if (role == "passive")     return SignalRole_t::PASSIVE;
     else
     {
         throw RuntimeError(__FILE__, __LINE__, role,
@@ -110,12 +110,12 @@ QString ComponentSignal::signalRoleToString(SignalRole_t role) noexcept
 {
     switch (role)
     {
-        case SignalRole_t::Power:        return "power";
-        case SignalRole_t::Input:        return "input";
-        case SignalRole_t::Output:       return "output";
-        case SignalRole_t::InOut:        return "inout";
-        case SignalRole_t::OpenDrain:    return "opendrain";
-        case SignalRole_t::Passive:      return "passive";
+        case SignalRole_t::POWER:        return "power";
+        case SignalRole_t::INPUT:        return "input";
+        case SignalRole_t::OUTPUT:       return "output";
+        case SignalRole_t::INOUT:        return "inout";
+        case SignalRole_t::OPENDRAIN:    return "opendrain";
+        case SignalRole_t::PASSIVE:      return "passive";
         default:
             Q_ASSERT(false);
             qCritical() << "unknown signal role:" << static_cast<int>(role);

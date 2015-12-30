@@ -53,7 +53,8 @@ SES_AddComponents::SES_AddComponents(SchematicEditor& editor, Ui::SchematicEdito
     SES_Base(editor, editorUi, editorGraphicsView, undoStack),
     mIsUndoCmdActive(false), mAddComponentDialog(nullptr), mLastAngle(0),
     mComponent(nullptr), mCmpSymbVar(nullptr), mCurrentSymbVarItem(nullptr),
-    mCurrentSymbolToPlace(nullptr), mCurrentSymbolEditCommand(nullptr)
+    mCurrentSymbVarItemIndex(-1), mCurrentSymbolToPlace(nullptr),
+    mCurrentSymbolEditCommand(nullptr)
 {
 }
 
@@ -217,7 +218,8 @@ SES_Base::ProcRetVal SES_AddComponents::processSceneEvent(SEE_Base* event) noexc
                         mIsUndoCmdActive = true;
 
                         // check if there is a next symbol to add
-                        mCurrentSymbVarItem = mCmpSymbVar->getNextItem(mCurrentSymbVarItem);
+                        mCurrentSymbVarItemIndex++;
+                        mCurrentSymbVarItem = mCmpSymbVar->getItem(mCurrentSymbVarItemIndex);
 
                         if (mCurrentSymbVarItem)
                         {
@@ -360,16 +362,15 @@ void SES_AddComponents::startAddingComponent(const Uuid& cmp, const Uuid& symbVa
         }
 
         // copy all required symbols to the project's library
-        foreach (const library::ComponentSymbolVariantItem* item, mCmpSymbVar->getItems())
+        foreach (const Uuid& symbolUuid, mCmpSymbVar->getAllItemSymbolUuids())
         {
-            Uuid uuid = item->getSymbolUuid();
-            if (!mProject.getLibrary().getSymbol(uuid))
+            if (!mProject.getLibrary().getSymbol(symbolUuid))
             {
-                FilePath symbolFp = mWorkspace.getLibrary().getLatestSymbol(uuid);
+                FilePath symbolFp = mWorkspace.getLibrary().getLatestSymbol(symbolUuid);
                 if (!symbolFp.isValid())
                 {
                     throw RuntimeError(__FILE__, __LINE__, QString(),
-                        QString(tr("Symbol not found in library: %1")).arg(uuid.toStr()));
+                        QString(tr("Symbol not found in library: %1")).arg(symbolUuid.toStr()));
                 }
                 library::Symbol* symbol = new library::Symbol(symbolFp);
                 auto cmd = new CmdProjectLibraryAddElement<library::Symbol>(
@@ -391,7 +392,8 @@ void SES_AddComponents::startAddingComponent(const Uuid& cmp, const Uuid& symbVa
         mUndoStack.appendToCommand(cmd);
 
         // create the first symbol instance and add it to the schematic
-        mCurrentSymbVarItem = mCmpSymbVar->getItems().first();
+        mCurrentSymbVarItemIndex = 0;
+        mCurrentSymbVarItem = mCmpSymbVar->getItem(mCurrentSymbVarItemIndex);
         if (!mCurrentSymbVarItem)
         {
             throw RuntimeError(__FILE__, __LINE__, symbVar.toStr(),
@@ -435,6 +437,7 @@ bool SES_AddComponents::abortCommand(bool showErrMsgBox) noexcept
         mComponent = nullptr;
         mCmpSymbVar = nullptr;
         mCurrentSymbVarItem = nullptr;
+        mCurrentSymbVarItemIndex = -1;
         mCurrentSymbolToPlace = nullptr;
         return true;
     }

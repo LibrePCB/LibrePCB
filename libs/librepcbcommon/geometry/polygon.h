@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_SYMBOLPOLYGON_H
-#define LIBRARY_SYMBOLPOLYGON_H
+#ifndef POLYGON_H
+#define POLYGON_H
 
 /*****************************************************************************************
  *  Includes
@@ -26,32 +26,27 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcbcommon/units/all_length_units.h>
-#include <librepcbcommon/fileio/if_xmlserializableobject.h>
+#include "../units/all_length_units.h"
+#include "../fileio/if_xmlserializableobject.h"
 
 /*****************************************************************************************
- *  Class SymbolPolygonSegment
+ *  Class PolygonSegment
  ****************************************************************************************/
 
-namespace library {
-
 /**
- * @brief The SymbolPolygonSegment class
- *
- * @note If you make changes in this class, please check if you also need to modify
- *       the class #library#FootprintPolygonSegment as these classes are very similar.
+ * @brief The PolygonSegment class
  */
-class SymbolPolygonSegment final : public IF_XmlSerializableObject
+class PolygonSegment final : public IF_XmlSerializableObject
 {
-        Q_DECLARE_TR_FUNCTIONS(SymbolPolygonSegment)
+        Q_DECLARE_TR_FUNCTIONS(PolygonSegment)
 
     public:
 
         // Constructors / Destructor
-        explicit SymbolPolygonSegment(const Point& endPos, const Angle& angle = Angle(0)) noexcept :
+        explicit PolygonSegment(const Point& endPos, const Angle& angle) noexcept :
             mEndPos(endPos), mAngle(angle) {}
-        explicit SymbolPolygonSegment(const XmlDomElement& domElement) throw (Exception);
-        ~SymbolPolygonSegment() noexcept {}
+        explicit PolygonSegment(const XmlDomElement& domElement) throw (Exception);
+        ~PolygonSegment() noexcept {}
 
         // Getters
         const Point& getEndPos() const noexcept {return mEndPos;}
@@ -70,13 +65,13 @@ class SymbolPolygonSegment final : public IF_XmlSerializableObject
     private:
 
         // make some methods inaccessible...
-        SymbolPolygonSegment();
-        SymbolPolygonSegment(const SymbolPolygonSegment& other);
-        SymbolPolygonSegment& operator=(const SymbolPolygonSegment& rhs);
+        PolygonSegment();
+        PolygonSegment(const PolygonSegment& other);
+        PolygonSegment& operator=(const PolygonSegment& rhs);
 
         // Private Methods
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc #IF_XmlSerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 
@@ -85,79 +80,82 @@ class SymbolPolygonSegment final : public IF_XmlSerializableObject
         Angle mAngle;
 };
 
-} // namespace library
-
 /*****************************************************************************************
- *  Class SymbolPolygon
+ *  Class Polygon
  ****************************************************************************************/
 
-namespace library {
-
 /**
- * @brief The SymbolPolygon class
- *
- * @note If you make changes in this class, please check if you also need to modify
- *       the class #library#FootprintPolygon as these classes are very similar.
+ * @brief The Polygon class
  */
-class SymbolPolygon final : public IF_XmlSerializableObject
+class Polygon final : public IF_XmlSerializableObject
 {
-        Q_DECLARE_TR_FUNCTIONS(SymbolPolygon)
+        Q_DECLARE_TR_FUNCTIONS(Polygon)
 
     public:
 
         // Constructors / Destructor
-        explicit SymbolPolygon() noexcept;
-        explicit SymbolPolygon(const XmlDomElement& domElement) throw (Exception);
-        ~SymbolPolygon() noexcept;
+        explicit Polygon(int layerId, const Length& lineWidth, bool fill, bool isGrabArea,
+                         const Point& startPos) noexcept;
+        explicit Polygon(const XmlDomElement& domElement) throw (Exception);
+        ~Polygon() noexcept;
 
         // Getters
         int getLayerId() const noexcept {return mLayerId;}
-        const Length& getWidth() const noexcept {return mWidth;}
+        const Length& getWidth() const noexcept {return mLineWidth;}
         bool isFilled() const noexcept {return mIsFilled;}
         bool isGrabArea() const noexcept {return mIsGrabArea;}
         const Point& getStartPos() const noexcept {return mStartPos;}
-        const QList<const SymbolPolygonSegment*>& getSegments() const noexcept {return mSegments;}
+        const QList<PolygonSegment*>& getSegments() noexcept {return mSegments;}
+        int getSegmentCount() const noexcept {return mSegments.count();}
+        PolygonSegment* getSegment(int index) noexcept {return mSegments.value(index);}
+        const PolygonSegment* getSegment(int index) const noexcept {return mSegments.value(index);}
         const QPainterPath& toQPainterPathPx() const noexcept;
 
         // Setters
-        void setLayerId(int id) noexcept {mLayerId = id;}
-        void setWidth(const Length& width) noexcept {mWidth = width;}
-        void setIsFilled(bool isFilled) noexcept {mIsFilled = isFilled;}
-        void setIsGrabArea(bool isGrabArea) noexcept {mIsGrabArea = isGrabArea;}
-        void setStartPos(const Point& pos) noexcept {mStartPos = pos; mPainterPathPx = QPainterPath();}
+        void setLayerId(int id) noexcept;
+        void setLineWidth(const Length& width) noexcept;
+        void setIsFilled(bool isFilled) noexcept;
+        void setIsGrabArea(bool isGrabArea) noexcept;
+        void setStartPos(const Point& pos) noexcept;
 
         // General Methods
-        void clearSegments() noexcept;
-        void appendSegment(const SymbolPolygonSegment* segment) noexcept;
+        PolygonSegment* close() noexcept;
+        void appendSegment(PolygonSegment& segment) noexcept;
+        void removeSegment(PolygonSegment& segment) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+
+        // Static Methods
+        static Polygon* createLine(int layerId, const Length& lineWidth, bool fill, bool isGrabArea, const Point& p1, const Point& p2) noexcept;
+        static Polygon* createCurve(int layerId, const Length& lineWidth, bool fill, bool isGrabArea, const Point& p1, const Point& p2, const Angle& angle) noexcept;
+        static Polygon* createRect(int layerId, const Length& lineWidth, bool fill, bool isGrabArea, const Point& pos, const Length& width, const Length& height) noexcept;
+        static Polygon* createCenteredRect(int layerId, const Length& lineWidth, bool fill, bool isGrabArea, const Point& center, const Length& width, const Length& height) noexcept;
 
 
     private:
 
         // make some methods inaccessible...
-        SymbolPolygon(const SymbolPolygon& other);
-        SymbolPolygon& operator=(const SymbolPolygon& rhs);
+        Polygon() = delete;
+        Polygon(const Polygon& other) = delete;
+        Polygon& operator=(const Polygon& rhs) = delete;
 
         // Private Methods
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc #IF_XmlSerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 
         // Polygon Attributes
         int mLayerId;
-        Length mWidth;
+        Length mLineWidth;
         bool mIsFilled;
         bool mIsGrabArea;
         Point mStartPos;
-        QList<const SymbolPolygonSegment*> mSegments;
+        QList<PolygonSegment*> mSegments;
 
         // Cached Attributes
         mutable QPainterPath mPainterPathPx;
 };
 
-} // namespace library
-
-#endif // LIBRARY_SYMBOLPOLYGON_H
+#endif // POLYGON_H

@@ -22,22 +22,26 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "symbolellipse.h"
-#include <librepcbcommon/fileio/xmldomelement.h>
-
-namespace library {
+#include "ellipse.h"
+#include "fileio/xmldomelement.h"
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SymbolEllipse::SymbolEllipse() noexcept :
-    mLayerId(0), mLineWidth(0), mIsGrabArea(false), mCenter(0, 0),
-    mRadiusX(0), mRadiusY(0), mRotation(0)
+Ellipse::Ellipse(int layerId, const Length& lineWidth, bool fill, bool isGrabArea,
+                 const Point& center, const Length& radiusX, const Length& radiusY,
+                 const Angle& rotation) noexcept :
+    mLayerId(layerId), mLineWidth(lineWidth), mIsFilled(fill), mIsGrabArea(isGrabArea),
+    mCenter(center), mRadiusX(radiusX), mRadiusY(radiusY), mRotation(rotation)
 {
+    Q_ASSERT(layerId >= 0);
+    Q_ASSERT(lineWidth >= 0);
+    Q_ASSERT(radiusX > 0);
+    Q_ASSERT(radiusY > 0);
 }
 
-SymbolEllipse::SymbolEllipse(const XmlDomElement& domElement) throw (Exception)
+Ellipse::Ellipse(const XmlDomElement& domElement) throw (Exception)
 {
     mLayerId = domElement.getAttribute<uint>("layer", true); // use "uint" to automatically check for >= 0
     mLineWidth = domElement.getAttribute<Length>("width", true);
@@ -52,15 +56,63 @@ SymbolEllipse::SymbolEllipse(const XmlDomElement& domElement) throw (Exception)
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-SymbolEllipse::~SymbolEllipse() noexcept
+Ellipse::~Ellipse() noexcept
 {
+}
+
+/*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
+
+void Ellipse::setLayerId(int id) noexcept
+{
+    Q_ASSERT(id >= 0);
+    mLayerId = id;
+}
+
+void Ellipse::setLineWidth(const Length& width) noexcept
+{
+    Q_ASSERT(width >= 0);
+    mLineWidth = width;
+}
+
+void Ellipse::setIsFilled(bool isFilled) noexcept
+{
+    mIsFilled = isFilled;
+}
+
+void Ellipse::setIsGrabArea(bool isGrabArea) noexcept
+{
+    mIsGrabArea = isGrabArea;
+}
+
+void Ellipse::setCenter(const Point& center) noexcept
+{
+    mCenter = center;
+}
+
+void Ellipse::setRadiusX(const Length& radius) noexcept
+{
+    Q_ASSERT(radius > 0);
+    mRadiusX = radius;
+}
+
+void Ellipse::setRadiusY(const Length& radius) noexcept
+{
+    Q_ASSERT(radius > 0);
+    mRadiusY = radius;
+}
+
+void Ellipse::setRotation(const Angle& rotation) noexcept
+{
+    mRotation = rotation;
 }
 
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* SymbolEllipse::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* Ellipse::serializeToXmlDomElement() const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -81,7 +133,7 @@ XmlDomElement* SymbolEllipse::serializeToXmlDomElement() const throw (Exception)
  *  Private Methods
  ****************************************************************************************/
 
-bool SymbolEllipse::checkAttributesValidity() const noexcept
+bool Ellipse::checkAttributesValidity() const noexcept
 {
     if (mLayerId <= 0)          return false;
     if (mLineWidth < 0)         return false;
@@ -93,5 +145,3 @@ bool SymbolEllipse::checkAttributesValidity() const noexcept
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
-
-} // namespace library

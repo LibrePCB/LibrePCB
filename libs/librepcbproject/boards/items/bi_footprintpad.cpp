@@ -79,7 +79,7 @@ Board& BI_FootprintPad::getBoard() const noexcept
 
 const Uuid& BI_FootprintPad::getLibPadUuid() const noexcept
 {
-    return mFootprintPad->getPadUuid();
+    return mFootprintPad->getUuid();
 }
 
 /*QString BI_FootprintPad::getDisplayText(bool returnCmpSignalNameIfEmpty,

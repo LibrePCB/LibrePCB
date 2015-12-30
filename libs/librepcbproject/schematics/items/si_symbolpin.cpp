@@ -48,8 +48,8 @@ namespace project {
 SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const Uuid& pinUuid) :
     SI_Base(), mCircuit(symbol.getSchematic().getProject().getCircuit()),
     mSymbol(symbol), mSymbolPin(nullptr), mComponentSignal(nullptr),
-    mComponentSignalInstance(nullptr), mAddedToSchematic(false),
-    mRegisteredNetPoint(nullptr), mGraphicsItem(nullptr)
+    mPinSignalMapItem(nullptr), mComponentSignalInstance(nullptr),
+    mAddedToSchematic(false), mRegisteredNetPoint(nullptr), mGraphicsItem(nullptr)
 {
     // read attributes
     mSymbolPin = mSymbol.getLibSymbol().getPinByUuid(pinUuid);
@@ -58,7 +58,14 @@ SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const Uuid& pinUuid) :
         throw RuntimeError(__FILE__, __LINE__, pinUuid.toStr(),
             QString(tr("Invalid symbol pin UUID: \"%1\"")).arg(pinUuid.toStr()));
     }
-    Uuid cmpSignalUuid = mSymbol.getCompSymbVarItem().getSignalOfPin(pinUuid);
+    mPinSignalMapItem = mSymbol.getCompSymbVarItem().getPinSignalMapItemOfPin(pinUuid);
+    if (!mPinSignalMapItem)
+    {
+        throw RuntimeError(__FILE__, __LINE__, QString(),
+            QString(tr("Pin \"%1\" not found in pin-signal-map of symbol instance \"%2\"."))
+            .arg(pinUuid.toStr(), symbol.getUuid().toStr()));
+    }
+    Uuid cmpSignalUuid = mPinSignalMapItem->getSignalUuid();
     mComponentSignalInstance = mSymbol.getComponentInstance().getSignalInstance(cmpSignalUuid);
     mComponentSignal = mSymbol.getComponentInstance().getLibComponent().getSignalByUuid(cmpSignalUuid);
 
@@ -101,13 +108,14 @@ QString SI_SymbolPin::getDisplayText(bool returnCmpSignalNameIfEmpty,
                                      bool returnPinNameIfEmpty) const noexcept
 {
     QString text;
-    switch (mSymbol.getCompSymbVarItem().getDisplayTypeOfPin(mSymbolPin->getUuid()))
+    using PinDisplayType_t = library::ComponentPinSignalMapItem::PinDisplayType_t;
+    switch (mPinSignalMapItem->getDisplayType())
     {
-        case library::ComponentSymbolVariantItem::PinDisplayType_t::PinName:
+        case PinDisplayType_t::PIN_NAME:
             text = mSymbolPin->getName(); break;
-        case library::ComponentSymbolVariantItem::PinDisplayType_t::ComponentSignal:
+        case PinDisplayType_t::COMPONENT_SIGNAL:
             if (mComponentSignal) text = mComponentSignal->getName(); break;
-        case library::ComponentSymbolVariantItem::PinDisplayType_t::NetSignal:
+        case PinDisplayType_t::NET_SIGNAL:
             if (mComponentSignalInstance->getNetSignal()) text = mComponentSignalInstance->getNetSignal()->getName(); break;
         default: break;
     }

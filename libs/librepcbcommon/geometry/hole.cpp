@@ -22,58 +22,59 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <librepcbcommon/fileio/xmldomelement.h>
-#include "footprintellipse.h"
-
-namespace library {
+#include "hole.h"
+#include "fileio/xmldomelement.h"
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-FootprintEllipse::FootprintEllipse() noexcept :
-    mLayerId(0), mLineWidth(0), mIsGrabArea(false), mCenter(0, 0),
-    mRadiusX(0), mRadiusY(0), mRotation(0)
+Hole::Hole(const Point& position, const Length& diameter) noexcept :
+    mPosition(position), mDiameter(diameter)
 {
+    Q_ASSERT(diameter > 0);
 }
 
-FootprintEllipse::FootprintEllipse(const XmlDomElement& domElement) throw (Exception)
+Hole::Hole(const XmlDomElement& domElement) throw (Exception)
 {
-    mLayerId = domElement.getAttribute<uint>("layer", true); // use "uint" to automatically check for >= 0
-    mLineWidth = domElement.getAttribute<Length>("width", true);
-    mIsFilled = domElement.getAttribute<bool>("fill", true);
-    mIsGrabArea = domElement.getAttribute<bool>("grab_area", true);
-    mCenter.setX(domElement.getAttribute<Length>("x", true));
-    mCenter.setY(domElement.getAttribute<Length>("y", true));
-    mRadiusX = domElement.getAttribute<Length>("radius_x", true);
-    mRadiusY = domElement.getAttribute<Length>("radius_y", true);
-    mRotation = domElement.getAttribute<Angle>("rotation", true);
+    mPosition.setX(domElement.getAttribute<Length>("x", true));
+    mPosition.setY(domElement.getAttribute<Length>("y", true));
+    mDiameter = domElement.getAttribute<Length>("diameter", true);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-FootprintEllipse::~FootprintEllipse() noexcept
+Hole::~Hole() noexcept
 {
+}
+
+/*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
+
+void Hole::setPosition(const Point& position) noexcept
+{
+    mPosition = position;
+}
+
+void Hole::setDiameter(const Length& diameter) noexcept
+{
+    Q_ASSERT(diameter > 0);
+    mDiameter = diameter;
 }
 
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* FootprintEllipse::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* Hole::serializeToXmlDomElement() const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("ellipse"));
-    root->setAttribute("layer", mLayerId);
-    root->setAttribute("width", mLineWidth);
-    root->setAttribute("fill", mIsFilled);
-    root->setAttribute("grab_area", mIsGrabArea);
-    root->setAttribute("x", mCenter.getX());
-    root->setAttribute("y", mCenter.getY());
-    root->setAttribute("radius_x", mRadiusX);
-    root->setAttribute("radius_y", mRadiusY);
-    root->setAttribute("rotation", mRotation);
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("hole"));
+    root->setAttribute("x", mPosition.getX());
+    root->setAttribute("y", mPosition.getY());
+    root->setAttribute("diameter", mDiameter);
     return root.take();
 }
 
@@ -81,17 +82,12 @@ XmlDomElement* FootprintEllipse::serializeToXmlDomElement() const throw (Excepti
  *  Private Methods
  ****************************************************************************************/
 
-bool FootprintEllipse::checkAttributesValidity() const noexcept
+bool Hole::checkAttributesValidity() const noexcept
 {
-    if (mLayerId <= 0)          return false;
-    if (mLineWidth < 0)         return false;
-    if (mRadiusX <= 0)          return false;
-    if (mRadiusY <= 0)          return false;
+    if (mDiameter <= 0)          return false;
     return true;
 }
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
-
-} // namespace library

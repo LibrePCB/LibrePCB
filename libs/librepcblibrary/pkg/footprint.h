@@ -26,10 +26,12 @@
 
 #include <QtCore>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
-#include "footprintpad.h"
-#include "footprintpolygon.h"
-#include "footprintellipse.h"
-#include "footprinttext.h"
+#include <librepcbcommon/geometry/polygon.h>
+#include <librepcbcommon/geometry/ellipse.h>
+#include <librepcbcommon/geometry/text.h>
+#include <librepcbcommon/geometry/hole.h>
+#include "footprintpadsmt.h"
+#include "footprintpadtht.h"
 
 /*****************************************************************************************
  *  Class Footprint
@@ -46,43 +48,59 @@ class Footprint final : public IF_XmlSerializableObject
 
     public:
 
-        // Types
-        struct FootprintHole_t {
-            Point pos;
-            Length diameter;
-        };
-
-
         // Constructors / Destructor
-        explicit Footprint(const Uuid& uuid = Uuid::createRandom(),
-                           const QString& name_en_US = QString(),
-                           const QString& description_en_US = QString(),
-                           bool isDefault = false) throw (Exception);
+        explicit Footprint(const Uuid& uuid, const QString& name_en_US,
+                           const QString& description_en_US) throw (Exception);
         explicit Footprint(const XmlDomElement& domElement) throw (Exception);
         ~Footprint() noexcept;
 
         // Getters: Attributes
         const Uuid& getUuid() const noexcept {return mUuid;}
-        bool isDefault() const noexcept {return mIsDefault;}
         QString getName(const QStringList& localeOrder) const noexcept;
         QString getDescription(const QStringList& localeOrder) const noexcept;
         const QMap<QString, QString>& getNames() const noexcept {return mNames;}
         const QMap<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
 
-        // Getters: Items
+        // FootprintPad Methods
+        const QMap<Uuid, FootprintPad*>& getPads() noexcept {return mPads;}
+        QList<Uuid> getPadUuids() const noexcept {return mPads.keys();}
+        FootprintPad* getPadByUuid(const Uuid& uuid) noexcept {return mPads.value(uuid);}
         const FootprintPad* getPadByUuid(const Uuid& uuid) const noexcept {return mPads.value(uuid);}
-        const QHash<Uuid, const FootprintPad*>& getPads() const noexcept {return mPads;}
-        const QList<const FootprintPolygon*>& getPolygons() const noexcept {return mPolygons;}
-        const QList<const FootprintText*>& getTexts() const noexcept {return mTexts;}
-        const QList<const FootprintEllipse*>& getEllipses() const noexcept {return mEllipses;}
+        void addPad(FootprintPad& pad) noexcept;
+        void removePad(FootprintPad& pad) noexcept;
 
-        // General Methods
-        void addPad(const FootprintPad* pad) noexcept {mPads.insert(pad->getPadUuid(), pad);}
-        void addPolygon(const FootprintPolygon* polygon) noexcept {mPolygons.append(polygon);}
-        void removePolygon(const FootprintPolygon* polygon) noexcept {mPolygons.removeAll(polygon); delete polygon;}
-        void addText(const FootprintText* text) noexcept {mTexts.append(text);}
-        void addEllipse(const FootprintEllipse* ellipse) noexcept {mEllipses.append(ellipse);}
-        void addHole(const FootprintHole_t* hole) noexcept {mHoles.append(hole);}
+        // Polygon Methods
+        const QList<Polygon*>& getPolygons() noexcept {return mPolygons;}
+        int getPolygonCount() const noexcept {return mPolygons.count();}
+        Polygon* getPolygon(int index) noexcept {return mPolygons.value(index);}
+        const Polygon* getPolygon(int index) const noexcept {return mPolygons.value(index);}
+        void addPolygon(Polygon& polygon) noexcept;
+        void removePolygon(Polygon& polygon) noexcept;
+
+        // Ellipse Methods
+        const QList<Ellipse*>& getEllipses() noexcept {return mEllipses;}
+        int getEllipseCount() const noexcept {return mEllipses.count();}
+        Ellipse* getEllipse(int index) noexcept {return mEllipses.value(index);}
+        const Ellipse* getEllipse(int index) const noexcept {return mEllipses.value(index);}
+        void addEllipse(Ellipse& ellipse) noexcept;
+        void removeEllipse(Ellipse& ellipse) noexcept;
+
+        // Text Methods
+        const QList<Text*>& getTexts() noexcept {return mTexts;}
+        int getTextCount() const noexcept {return mTexts.count();}
+        Text* getText(int index) noexcept {return mTexts.value(index);}
+        const Text* getText(int index) const noexcept {return mTexts.value(index);}
+        void addText(Text& text) noexcept;
+        void removeText(Text& text) noexcept;
+
+        // Hole Methods
+        const QList<Hole*>& getHoles() noexcept {return mHoles;}
+        int getHoleCount() const noexcept {return mHoles.count();}
+        Hole* getHole(int index) noexcept {return mHoles.value(index);}
+        const Hole* getHole(int index) const noexcept {return mHoles.value(index);}
+        void addHole(Hole& hole) noexcept;
+        void removeHole(Hole& hole) noexcept;
+
 
         // General Methods
 
@@ -93,14 +111,14 @@ class Footprint final : public IF_XmlSerializableObject
     private:
 
         // make some methods inaccessible...
-        Footprint();
-        Footprint(const Footprint& other);
-        Footprint& operator=(const Footprint& rhs);
+        Footprint() = delete;
+        Footprint(const Footprint& other) = delete;
+        Footprint& operator=(const Footprint& rhs) = delete;
 
 
         // Private Methods
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc #IF_XmlSerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 
@@ -108,12 +126,11 @@ class Footprint final : public IF_XmlSerializableObject
         Uuid mUuid;
         QMap<QString, QString> mNames;
         QMap<QString, QString> mDescriptions;
-        bool mIsDefault;
-        QHash<Uuid, const FootprintPad*> mPads;
-        QList<const FootprintPolygon*> mPolygons;
-        QList<const FootprintText*> mTexts;
-        QList<const FootprintEllipse*> mEllipses;
-        QList<const FootprintHole_t*> mHoles;
+        QMap<Uuid, FootprintPad*> mPads;
+        QList<Polygon*> mPolygons;
+        QList<Ellipse*> mEllipses;
+        QList<Text*> mTexts;
+        QList<Hole*> mHoles;
 };
 
 } // namespace library

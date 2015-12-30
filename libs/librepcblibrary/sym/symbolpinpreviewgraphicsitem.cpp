@@ -36,10 +36,9 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SymbolPinPreviewGraphicsItem::SymbolPinPreviewGraphicsItem(const IF_SchematicLayerProvider& layerProvider,
-                                                           const SymbolPin& pin,
-                                                           const ComponentSignal* compSignal,
-                                                           ComponentSymbolVariantItem::PinDisplayType_t displayType) noexcept :
+SymbolPinPreviewGraphicsItem::SymbolPinPreviewGraphicsItem(
+        const IF_SchematicLayerProvider& layerProvider, const SymbolPin& pin,
+        const ComponentSignal* compSignal, PinDisplayType_t displayType) noexcept :
     GraphicsItem(), mPin(pin), mComponentSignal(compSignal), mDisplayType(displayType),
     mDrawBoundingRect(false)
 {
@@ -96,13 +95,13 @@ void SymbolPinPreviewGraphicsItem::updateCacheAndRepaint() noexcept
     // text
     switch (mDisplayType)
     {
-        case ComponentSymbolVariantItem::PinDisplayType_t::None:
+        case PinDisplayType_t::NONE:
             mStaticText.setText(""); break;
-        case ComponentSymbolVariantItem::PinDisplayType_t::PinName:
+        case PinDisplayType_t::PIN_NAME:
             mStaticText.setText(mPin.getName()); break;
-        case ComponentSymbolVariantItem::PinDisplayType_t::ComponentSignal:
+        case PinDisplayType_t::COMPONENT_SIGNAL:
             mStaticText.setText(mComponentSignal ? mComponentSignal->getName() : ""); break;
-        case ComponentSymbolVariantItem::PinDisplayType_t::NetSignal:
+        case PinDisplayType_t::NET_SIGNAL:
             mStaticText.setText(mComponentSignal ? mComponentSignal->getForcedNetName() : ""); break;
         default: Q_ASSERT(false);
     }

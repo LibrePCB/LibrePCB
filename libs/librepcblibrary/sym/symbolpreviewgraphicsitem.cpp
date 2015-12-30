@@ -30,6 +30,7 @@
 #include <librepcbcommon/if_schematiclayerprovider.h>
 #include "symbolpinpreviewgraphicsitem.h"
 #include "../cmp/component.h"
+#include <librepcbcommon/geometry/text.h>
 
 namespace library {
 
@@ -55,12 +56,18 @@ SymbolPreviewGraphicsItem::SymbolPreviewGraphicsItem(const IF_SchematicLayerProv
 
     updateCacheAndRepaint();
 
-    foreach (const SymbolPin* pin, symbol.getPins())
+    foreach (const Uuid& pinUuid, symbol.getPinUuids())
     {
+        const SymbolPin* pin = symbol.getPinByUuid(pinUuid);
+        Q_ASSERT(pin); if (!pin) continue;
+
         const ComponentSignal* signal = nullptr;
-        ComponentSymbolVariantItem::PinDisplayType_t displayType = ComponentSymbolVariantItem::PinDisplayType_t::PinName;
+        const ComponentPinSignalMapItem* mapItem = nullptr;
+        ComponentPinSignalMapItem::PinDisplayType_t displayType =
+                ComponentPinSignalMapItem::PinDisplayType_t::PIN_NAME;
         if (mComponent) signal = mComponent->getSignalOfPin(symbVarUuid, symbVarItemUuid, pin->getUuid());
-        if (mSymbVarItem) displayType = mSymbVarItem->getDisplayTypeOfPin(pin->getUuid());
+        if (mSymbVarItem) mapItem = mSymbVarItem->getPinSignalMapItemOfPin(pin->getUuid());
+        if (mapItem) displayType = mapItem->getDisplayType();
         SymbolPinPreviewGraphicsItem* item = new SymbolPinPreviewGraphicsItem(layerProvider, *pin, signal, displayType);
         item->setPos(pin->getPosition().toPxQPointF());
         item->setRotation(-pin->getRotation().toDeg());
@@ -105,8 +112,11 @@ void SymbolPreviewGraphicsItem::updateCacheAndRepaint() noexcept
     mShape.addRect(crossRect);
 
     // polygons
-    foreach (const SymbolPolygon* polygon, mSymbol.getPolygons())
+    for (int i = 0; i < mSymbol.getPolygonCount(); i++)
     {
+        const Polygon* polygon = mSymbol.getPolygon(i);
+        Q_ASSERT(polygon); if (!polygon) continue;
+
         QPainterPath polygonPath = polygon->toQPainterPathPx();
         qreal w = polygon->getWidth().toPx() / 2;
         mBoundingRect = mBoundingRect.united(polygonPath.boundingRect().adjusted(-w, -w, w, w));
@@ -115,8 +125,11 @@ void SymbolPreviewGraphicsItem::updateCacheAndRepaint() noexcept
 
     // texts
     mCachedTextProperties.clear();
-    foreach (const SymbolText* text, mSymbol.getTexts())
+    for (int i = 0; i < mSymbol.getTextCount(); i++)
     {
+        const Text* text = mSymbol.getText(i);
+        Q_ASSERT(text); if (!text) continue;
+
         // create static text properties
         CachedTextProperties_t props;
 
@@ -197,8 +210,11 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
     const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
 
     // draw all polygons
-    foreach (const SymbolPolygon* polygon, mSymbol.getPolygons())
+    for (int i = 0; i < mSymbol.getPolygonCount(); i++)
     {
+        const Polygon* polygon = mSymbol.getPolygon(i);
+        Q_ASSERT(polygon); if (!polygon) continue;
+
         // set colors
         layer = mLayerProvider.getSchematicLayer(polygon->getLayerId());
         if (layer)
@@ -221,8 +237,11 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
     }
 
     // draw all ellipses
-    foreach (const SymbolEllipse* ellipse, mSymbol.getEllipses())
+    for (int i = 0; i < mSymbol.getEllipseCount(); i++)
     {
+        const Ellipse* ellipse = mSymbol.getEllipse(i);
+        Q_ASSERT(ellipse); if (!ellipse) continue;
+
         // set colors
         layer = mLayerProvider.getSchematicLayer(ellipse->getLayerId()); if (!layer) continue;
         if (layer)
@@ -247,8 +266,11 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
     }
 
     // draw all texts
-    foreach (const SymbolText* text, mSymbol.getTexts())
+    for (int i = 0; i < mSymbol.getTextCount(); i++)
     {
+        const Text* text = mSymbol.getText(i);
+        Q_ASSERT(text); if (!text) continue;
+
         // get layer
         layer = mLayerProvider.getSchematicLayer(text->getLayerId()); if (!layer) continue;
 
@@ -314,13 +336,10 @@ bool SymbolPreviewGraphicsItem::getAttributeValue(const QString& attrNS, const Q
             return value = mComponent->getPrefix(mLocaleOrder) % "?", true;
         if (attrKey == QLatin1String("VALUE"))
             return value = "VALUE", true;
-        foreach (const LibraryElementAttribute* attr, mComponent->getAttributes())
-        {
-            if (attrKey == attr->getKey())
-            {
-                value = attrKey;
-                return true;
-            }
+        const LibraryElementAttribute* attr = mComponent->getAttributeByKey(attrKey);
+        if (attr) {
+            value = attrKey;
+            return true;
         }
     }
 

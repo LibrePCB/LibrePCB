@@ -50,6 +50,22 @@ Device::~Device() noexcept
 }
 
 /*****************************************************************************************
+ *  Pad-Signal-Map Methods
+ ****************************************************************************************/
+
+void Device::addPadSignalMapping(const Uuid& pad, const Uuid& signal) noexcept
+{
+    Q_ASSERT(!mPadSignalMap.contains(pad));
+    mPadSignalMap.insert(pad, signal);
+}
+
+void Device::removePadSignalMapping(const Uuid& pad) noexcept
+{
+    Q_ASSERT(mPadSignalMap.contains(pad));
+    mPadSignalMap.remove(pad);
+}
+
+/*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
@@ -73,8 +89,7 @@ XmlDomElement* Device::serializeToXmlDomElement() const throw (Exception)
     root->getFirstChild("meta", true)->appendTextChild("component", mComponentUuid);
     root->getFirstChild("meta", true)->appendTextChild("package", mPackageUuid);
     XmlDomElement* padSignalMap = root->appendChild("pad_signal_map");
-    foreach (const Uuid& padUuid, mPadSignalMap.keys())
-    {
+    foreach (const Uuid& padUuid, mPadSignalMap.keys()) {
         XmlDomElement* child = padSignalMap->appendChild("map");
         child->setAttribute("pad", padUuid);
         child->setText(mPadSignalMap.value(padUuid));
@@ -87,8 +102,7 @@ bool Device::checkAttributesValidity() const noexcept
     if (!LibraryElement::checkAttributesValidity())             return false;
     if (mComponentUuid.isNull())                                return false;
     if (mPackageUuid.isNull())                                  return false;
-    foreach (const Uuid& padUuid, mPadSignalMap.keys())
-    {
+    foreach (const Uuid& padUuid, mPadSignalMap.keys()) {
         if (padUuid.isNull())                                   return false;
     }
     return true;

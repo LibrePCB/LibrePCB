@@ -47,8 +47,8 @@ Symbol::Symbol(const FilePath& elementDirectory) throw (Exception) :
     }
     catch (Exception& e)
     {
-        qDeleteAll(mEllipses);      mEllipses.clear();
         qDeleteAll(mTexts);         mTexts.clear();
+        qDeleteAll(mEllipses);      mEllipses.clear();
         qDeleteAll(mPolygons);      mPolygons.clear();
         qDeleteAll(mPins);          mPins.clear();
         throw;
@@ -57,10 +57,75 @@ Symbol::Symbol(const FilePath& elementDirectory) throw (Exception) :
 
 Symbol::~Symbol() noexcept
 {
+
     qDeleteAll(mEllipses);      mEllipses.clear();
-    qDeleteAll(mTexts);         mTexts.clear();
     qDeleteAll(mPolygons);      mPolygons.clear();
     qDeleteAll(mPins);          mPins.clear();
+}
+
+/*****************************************************************************************
+ *  FootprintPad Methods
+ ****************************************************************************************/
+
+void Symbol::addPin(SymbolPin& pin) noexcept
+{
+    Q_ASSERT(!mPins.contains(pin.getUuid()));
+    mPins.insert(pin.getUuid(), &pin);
+}
+
+void Symbol::removePin(SymbolPin& pin) noexcept
+{
+    Q_ASSERT(mPins.contains(pin.getUuid()));
+    Q_ASSERT(mPins.value(pin.getUuid()) == &pin);
+    mPins.remove(pin.getUuid());
+}
+
+/*****************************************************************************************
+ *  Polygon Methods
+ ****************************************************************************************/
+
+void Symbol::addPolygon(Polygon& polygon) noexcept
+{
+    Q_ASSERT(!mPolygons.contains(&polygon));
+    mPolygons.append(&polygon);
+}
+
+void Symbol::removePolygon(Polygon& polygon) noexcept
+{
+    Q_ASSERT(mPolygons.contains(&polygon));
+    mPolygons.removeAll(&polygon);
+}
+
+/*****************************************************************************************
+ *  Ellipse Methods
+ ****************************************************************************************/
+
+void Symbol::addEllipse(Ellipse& ellipse) noexcept
+{
+    Q_ASSERT(!mEllipses.contains(&ellipse));
+    mEllipses.append(&ellipse);
+}
+
+void Symbol::removeEllipse(Ellipse& ellipse) noexcept
+{
+    Q_ASSERT(mEllipses.contains(&ellipse));
+    mEllipses.removeAll(&ellipse);
+}
+
+/*****************************************************************************************
+ *  Text Methods
+ ****************************************************************************************/
+
+void Symbol::addText(Text& text) noexcept
+{
+    Q_ASSERT(!mTexts.contains(&text));
+    mTexts.append(&text);
+}
+
+void Symbol::removeText(Text& text) noexcept
+{
+    Q_ASSERT(mTexts.contains(&text));
+    mTexts.removeAll(&text);
 }
 
 /*****************************************************************************************
@@ -91,15 +156,15 @@ void Symbol::parseDomTree(const XmlDomElement& root) throw (Exception)
     {
         if (node->getName() == "polygon")
         {
-            mPolygons.append(new SymbolPolygon(*node));
+            mPolygons.append(new Polygon(*node));
         }
         else if (node->getName() == "text")
         {
-            mTexts.append(new SymbolText(*node));
+            mTexts.append(new Text(*node));
         }
         else if (node->getName() == "ellipse")
         {
-            mEllipses.append(new SymbolEllipse(*node));
+            mEllipses.append(new Ellipse(*node));
         }
         else
         {
@@ -117,11 +182,11 @@ XmlDomElement* Symbol::serializeToXmlDomElement() const throw (Exception)
     foreach (const SymbolPin* pin, mPins)
         pins->appendChild(pin->serializeToXmlDomElement());
     XmlDomElement* geometry = root->appendChild("geometry");
-    foreach (const SymbolPolygon* polygon, mPolygons)
+    foreach (const Polygon* polygon, mPolygons)
         geometry->appendChild(polygon->serializeToXmlDomElement());
-    foreach (const SymbolText* text, mTexts)
+    foreach (const Text* text, mTexts)
         geometry->appendChild(text->serializeToXmlDomElement());
-    foreach (const SymbolEllipse* ellipse, mEllipses)
+    foreach (const Ellipse* ellipse, mEllipses)
         geometry->appendChild(ellipse->serializeToXmlDomElement());
     return root.take();
 }

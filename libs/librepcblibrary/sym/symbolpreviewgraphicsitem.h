@@ -34,12 +34,12 @@
  *  Forward Declarations
  ****************************************************************************************/
 
+class Text;
 class SchematicLayer;
 class IF_SchematicLayerProvider;
 
 namespace library {
 class Symbol;
-class SymbolText;
 class Component;
 class ComponentSymbolVariantItem;
 }
@@ -123,7 +123,7 @@ class SymbolPreviewGraphicsItem final : public GraphicsItem, public IF_Attribute
         // Cached Attributes
         QRectF mBoundingRect;
         QPainterPath mShape;
-        QHash<const SymbolText*, CachedTextProperties_t> mCachedTextProperties;
+        QHash<const Text*, CachedTextProperties_t> mCachedTextProperties;
 };
 
 } // namespace project

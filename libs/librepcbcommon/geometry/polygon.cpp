@@ -22,16 +22,14 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include "symbolpolygon.h"
-#include <librepcbcommon/fileio/xmldomelement.h>
-
-namespace library {
+#include "polygon.h"
+#include "fileio/xmldomelement.h"
 
 /*****************************************************************************************
- *  Class SymbolPolygonSegment
+ *  Class PolygonSegment
  ****************************************************************************************/
 
-SymbolPolygonSegment::SymbolPolygonSegment(const XmlDomElement& domElement) throw (Exception)
+PolygonSegment::PolygonSegment(const XmlDomElement& domElement) throw (Exception)
 {
     mEndPos.setX(domElement.getAttribute<Length>("end_x", true));
     mEndPos.setY(domElement.getAttribute<Length>("end_y", true));
@@ -40,7 +38,7 @@ SymbolPolygonSegment::SymbolPolygonSegment(const XmlDomElement& domElement) thro
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-XmlDomElement* SymbolPolygonSegment::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* PolygonSegment::serializeToXmlDomElement() const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -51,7 +49,7 @@ XmlDomElement* SymbolPolygonSegment::serializeToXmlDomElement() const throw (Exc
     return root.take();
 }
 
-bool SymbolPolygonSegment::checkAttributesValidity() const noexcept
+bool PolygonSegment::checkAttributesValidity() const noexcept
 {
     return true;
 }
@@ -60,16 +58,20 @@ bool SymbolPolygonSegment::checkAttributesValidity() const noexcept
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SymbolPolygon::SymbolPolygon() noexcept :
-    mLayerId(0), mWidth(0), mIsFilled(false), mIsGrabArea(false), mStartPos(0, 0)
+Polygon::Polygon(int layerId, const Length& lineWidth, bool fill, bool isGrabArea,
+                 const Point& startPos) noexcept :
+    mLayerId(layerId), mLineWidth(lineWidth), mIsFilled(fill), mIsGrabArea(isGrabArea),
+    mStartPos(startPos)
 {
+    Q_ASSERT(layerId >= 0);
+    Q_ASSERT(lineWidth >= 0);
 }
 
-SymbolPolygon::SymbolPolygon(const XmlDomElement& domElement) throw (Exception)
+Polygon::Polygon(const XmlDomElement& domElement) throw (Exception)
 {
     // load general attributes
     mLayerId = domElement.getAttribute<uint>("layer", true); // use "uint" to automatically check for >= 0
-    mWidth = domElement.getAttribute<Length>("width", true);
+    mLineWidth = domElement.getAttribute<Length>("width", true);
     mIsFilled = domElement.getAttribute<bool>("fill", true);
     mIsGrabArea = domElement.getAttribute<bool>("grab_area", true);
     mStartPos.setX(domElement.getAttribute<Length>("start_x", true));
@@ -79,25 +81,29 @@ SymbolPolygon::SymbolPolygon(const XmlDomElement& domElement) throw (Exception)
     for (const XmlDomElement* node = domElement.getFirstChild("segment", true);
          node; node = node->getNextSibling("segment"))
     {
-        mSegments.append(new SymbolPolygonSegment(*node));
+        mSegments.append(new PolygonSegment(*node));
     }
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-SymbolPolygon::~SymbolPolygon() noexcept
+Polygon::~Polygon() noexcept
 {
     qDeleteAll(mSegments);      mSegments.clear();
 }
 
-const QPainterPath& SymbolPolygon::toQPainterPathPx() const noexcept
+/*****************************************************************************************
+ *  Getters
+ ****************************************************************************************/
+
+const QPainterPath& Polygon::toQPainterPathPx() const noexcept
 {
     if (mPainterPathPx.isEmpty())
     {
         mPainterPathPx.setFillRule(Qt::WindingFill);
         Point lastPos = mStartPos;
         mPainterPathPx.moveTo(lastPos.toPxQPointF());
-        foreach (const SymbolPolygonSegment* segment, mSegments)
+        foreach (const PolygonSegment* segment, mSegments)
         {
             if (segment->getAngle() == 0)
             {
@@ -133,52 +139,152 @@ const QPainterPath& SymbolPolygon::toQPainterPathPx() const noexcept
 }
 
 /*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
+
+void Polygon::setLayerId(int id) noexcept
+{
+    Q_ASSERT(id >= 0);
+    mLayerId = id;
+}
+
+void Polygon::setLineWidth(const Length& width) noexcept
+{
+    Q_ASSERT(width >= 0);
+    mLineWidth = width;
+}
+
+void Polygon::setIsFilled(bool isFilled) noexcept
+{
+    mIsFilled = isFilled;
+}
+
+void Polygon::setIsGrabArea(bool isGrabArea) noexcept
+{
+    mIsGrabArea = isGrabArea;
+}
+
+void Polygon::setStartPos(const Point& pos) noexcept
+{
+    mStartPos = pos;
+    mPainterPathPx = QPainterPath(); // invalidate painter path
+}
+
+/*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
-void SymbolPolygon::clearSegments() noexcept
+PolygonSegment* Polygon::close() noexcept
 {
-    qDeleteAll(mSegments);
-    mSegments.clear();
+    if (mSegments.count() > 0) {
+        Point start = mStartPos;
+        Point end = mSegments.last()->getEndPos();
+        if (end != start) {
+            PolygonSegment* s = new PolygonSegment(start, Angle::deg0());
+            appendSegment(*s);
+            return s;
+        }
+    }
+    return nullptr;
+}
+
+void Polygon::appendSegment(PolygonSegment& segment) noexcept
+{
+    Q_ASSERT(!mSegments.contains(&segment));
+    mSegments.append(&segment);
     mPainterPathPx = QPainterPath(); // invalidate painter path
 }
 
-void SymbolPolygon::appendSegment(const SymbolPolygonSegment* segment) noexcept
+void Polygon::removeSegment(PolygonSegment& segment) throw (Exception)
 {
-    mSegments.append(segment);
+    Q_ASSERT(mSegments.contains(&segment));
+    if (mSegments.count() <= 1) {
+        throw RuntimeError(__FILE__, __LINE__, QString(),
+            tr("The last segment of a polygon cannot be removed."));
+    }
+    mSegments.removeAll(&segment);
     mPainterPathPx = QPainterPath(); // invalidate painter path
 }
 
-XmlDomElement* SymbolPolygon::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* Polygon::serializeToXmlDomElement() const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("polygon"));
     root->setAttribute("layer", mLayerId);
-    root->setAttribute("width", mWidth);
+    root->setAttribute("width", mLineWidth);
     root->setAttribute("fill", mIsFilled);
     root->setAttribute("grab_area", mIsGrabArea);
     root->setAttribute("start_x", mStartPos.getX());
     root->setAttribute("start_y", mStartPos.getY());
-    foreach (const SymbolPolygonSegment* segment, mSegments)
+    foreach (const PolygonSegment* segment, mSegments)
         root->appendChild(segment->serializeToXmlDomElement());
     return root.take();
+}
+
+/*****************************************************************************************
+ *  Static Methods
+ ****************************************************************************************/
+
+Polygon* Polygon::createLine(int layerId, const Length& lineWidth, bool fill,
+                                     bool isGrabArea, const Point& p1, const Point& p2) noexcept
+{
+    Polygon* p = new Polygon(layerId, lineWidth, fill, isGrabArea, p1);
+    p->appendSegment(*new PolygonSegment(p2, Angle::deg0()));
+    return p;
+}
+
+Polygon* Polygon::createCurve(int layerId, const Length& lineWidth, bool fill,
+                              bool isGrabArea, const Point& p1, const Point& p2,
+                              const Angle& angle) noexcept
+{
+    Polygon* p = new Polygon(layerId, lineWidth, fill, isGrabArea, p1);
+    p->appendSegment(*new PolygonSegment(p2, angle));
+    return p;
+}
+
+Polygon* Polygon::createRect(int layerId, const Length& lineWidth, bool fill, bool isGrabArea,
+                             const Point& pos, const Length& width, const Length& height) noexcept
+{
+    Point p1 = Point(pos.getX(),            pos.getY());
+    Point p2 = Point(pos.getX() + width,    pos.getY());
+    Point p3 = Point(pos.getX() + width,    pos.getY() + height);
+    Point p4 = Point(pos.getX(),            pos.getY() + height);
+    Polygon* p = new Polygon(layerId, lineWidth, fill, isGrabArea, p1);
+    p->appendSegment(*new PolygonSegment(p2, Angle::deg0()));
+    p->appendSegment(*new PolygonSegment(p3, Angle::deg0()));
+    p->appendSegment(*new PolygonSegment(p4, Angle::deg0()));
+    p->appendSegment(*new PolygonSegment(p1, Angle::deg0()));
+    return p;
+}
+
+Polygon* Polygon::createCenteredRect(int layerId, const Length& lineWidth, bool fill,
+                                     bool isGrabArea, const Point& center,
+                                     const Length& width, const Length& height) noexcept
+{
+    Point p1 = Point(center.getX() - width/2, center.getY() + height/2);
+    Point p2 = Point(center.getX() + width/2, center.getY() + height/2);
+    Point p3 = Point(center.getX() + width/2, center.getY() - height/2);
+    Point p4 = Point(center.getX() - width/2, center.getY() - height/2);
+    Polygon* p = new Polygon(layerId, lineWidth, fill, isGrabArea, p1);
+    p->appendSegment(*new PolygonSegment(p2, Angle::deg0()));
+    p->appendSegment(*new PolygonSegment(p3, Angle::deg0()));
+    p->appendSegment(*new PolygonSegment(p4, Angle::deg0()));
+    p->appendSegment(*new PolygonSegment(p1, Angle::deg0()));
+    return p;
 }
 
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
-bool SymbolPolygon::checkAttributesValidity() const noexcept
+bool Polygon::checkAttributesValidity() const noexcept
 {
     if (mLayerId <= 0)          return false;
-    if (mWidth < 0)             return false;
-    if (mSegments.isEmpty())    return false;
+    if (mLineWidth < 0)         return false;
     return true;
 }
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
-
-} // namespace library

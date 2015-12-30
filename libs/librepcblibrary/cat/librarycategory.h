@@ -46,12 +46,10 @@ class LibraryCategory : public LibraryBaseElement
         // Constructors / Destructor
         explicit LibraryCategory(const QString& xmlFileNamePrefix,
                                  const QString& xmlRootNodeName,
-                                 const Uuid& uuid = Uuid::createRandom(),
-                                 const Version& version = Version(),
-                                 const QString& author = QString(),
-                                 const QString& name_en_US = QString(),
-                                 const QString& description_en_US = QString(),
-                                 const QString& keywords_en_US = QString()) throw (Exception);
+                                 const Uuid& uuid, const Version& version,
+                                 const QString& author, const QString& name_en_US,
+                                 const QString& description_en_US,
+                                 const QString& keywords_en_US ) throw (Exception);
         explicit LibraryCategory(const FilePath& elementDirectory,
                                  const QString& xmlFileNamePrefix,
                                  const QString& xmlRootNodeName) throw (Exception);

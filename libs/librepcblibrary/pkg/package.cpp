@@ -34,82 +34,73 @@ namespace library {
 Package::Package(const Uuid& uuid, const Version& version, const QString& author,
                  const QString& name_en_US, const QString& description_en_US,
                  const QString& keywords_en_US) throw (Exception) :
-    LibraryElement("pkg", "package", uuid, version, author, name_en_US, description_en_US, keywords_en_US)
+    LibraryElement("pkg", "package", uuid, version, author, name_en_US, description_en_US, keywords_en_US),
+    mDefaultFootprintUuid()
 {
 }
 
 Package::Package(const FilePath& elementDirectory) throw (Exception) :
-    LibraryElement(elementDirectory, "pkg", "package")
+    LibraryElement(elementDirectory, "pkg", "package"),
+    mDefaultFootprintUuid()
 {
-    readFromFile();
+    try
+    {
+        readFromFile();
+    }
+    catch (Exception& e)
+    {
+        qDeleteAll(mFootprints);    mFootprints.clear();
+        qDeleteAll(mPads);          mPads.clear();
+        throw;
+    }
 }
 
 Package::~Package() noexcept
 {
-    clearPads();
-    clearFootprints();
+    qDeleteAll(mFootprints);    mFootprints.clear();
+    qDeleteAll(mPads);          mPads.clear();
 }
 
 /*****************************************************************************************
- *  Pads
+ *  PackagePad Methods
  ****************************************************************************************/
 
-const PackagePad* Package::getPadByUuid(const Uuid& uuid) const noexcept
+void Package::addPad(PackagePad& pad) noexcept
 {
-    foreach (const PackagePad* pad, mPads)
-    {
-        if (pad->getUuid() == uuid)
-            return pad;
-    }
-    return nullptr;
+    Q_ASSERT(!mPads.contains(pad.getUuid()));
+    // TODO: check if name is valid
+    mPads.insert(pad.getUuid(), &pad);
 }
 
-void Package::clearPads() noexcept
+void Package::removePad(PackagePad& pad) noexcept
 {
-    qDeleteAll(mPads);
-    mPads.clear();
-}
-
-void Package::addPad(const PackagePad& pad) noexcept
-{
-    Q_ASSERT(getPadByUuid(pad.getUuid()) == nullptr);
-    mPads.append(&pad);
+    Q_ASSERT(mPads.contains(pad.getUuid()));
+    Q_ASSERT(mPads.value(pad.getUuid()) == &pad);
+    mPads.remove(pad.getUuid());
 }
 
 /*****************************************************************************************
- *  Footprints
+ *  Footprint Methods
  ****************************************************************************************/
 
-const Footprint* Package::getFootprintByUuid(const Uuid& uuid) const noexcept
+void Package::setDefaultFootprint(const Uuid& uuid) noexcept
 {
-    foreach (const Footprint* footprint, mFootprints)
-    {
-        if (footprint->getUuid() == uuid)
-            return footprint;
-    }
-    return nullptr;
+    Q_ASSERT(mFootprints.contains(uuid));
+    mDefaultFootprintUuid = uuid;
 }
 
-const Footprint* Package::getDefaultFootprint() const noexcept
+void Package::addFootprint(Footprint& footprint) noexcept
 {
-    foreach (const Footprint* footprint, mFootprints)
-    {
-        if (footprint->isDefault())
-            return footprint;
-    }
-    return nullptr; // TODO: this should not be possible!
+    Q_ASSERT(!mFootprints.contains(footprint.getUuid()));
+    // TODO: check if name is valid
+    mFootprints.insert(footprint.getUuid(), &footprint);
 }
 
-void Package::clearFootprints() noexcept
+void Package::removeFootprint(Footprint& footprint) noexcept
 {
-    qDeleteAll(mFootprints);
-    mFootprints.clear();
-}
-
-void Package::addFootprint(const Footprint& footprint) noexcept
-{
-    Q_ASSERT(getFootprintByUuid(footprint.getUuid()) == nullptr);
-    mFootprints.append(&footprint);
+    Q_ASSERT(mFootprints.contains(footprint.getUuid()));
+    Q_ASSERT(mFootprints.value(footprint.getUuid()) == &footprint);
+    mFootprints.remove(footprint.getUuid());
 }
 
 /*****************************************************************************************
@@ -131,11 +122,12 @@ void Package::parseDomTree(const XmlDomElement& root) throw (Exception)
                 QString(tr("The pad \"%1\" exists multiple times in \"%2\"."))
                 .arg(pad->getUuid().toStr(), mXmlFilepath.toNative()));
         }
-        mPads.append(pad);
+        mPads.insert(pad->getUuid(), pad);
     }
 
     // Load all footprints
-    for (XmlDomElement* node = root.getFirstChild("footprints/footprint", true, true);
+    XmlDomElement* footprintsNode = root.getFirstChild("footprints", true);
+    for (XmlDomElement* node = footprintsNode->getFirstChild("footprint", true);
          node; node = node->getNextSibling("footprint"))
     {
         Footprint* footprint = new Footprint(*node);
@@ -145,7 +137,15 @@ void Package::parseDomTree(const XmlDomElement& root) throw (Exception)
                 QString(tr("The footprint \"%1\" exists multiple times in \"%2\"."))
                 .arg(footprint->getUuid().toStr(), mXmlFilepath.toNative()));
         }
-        mFootprints.append(footprint);
+        mFootprints.insert(footprint->getUuid(), footprint);
+    }
+
+    // load default footprint
+    mDefaultFootprintUuid = footprintsNode->getAttribute<Uuid>("default", true);
+    if (!mFootprints.contains(mDefaultFootprintUuid)) {
+        throw RuntimeError(__FILE__, __LINE__, mDefaultFootprintUuid.toStr(),
+            QString(tr("The package \"%1\" has no valid default footprint set."))
+            .arg(mXmlFilepath.toNative()));
     }
 }
 
@@ -157,8 +157,10 @@ XmlDomElement* Package::serializeToXmlDomElement() const throw (Exception)
     foreach (const PackagePad* pad, mPads)
         padsNode->appendChild(pad->serializeToXmlDomElement());
     XmlDomElement* footprintsNode = root->appendChild("footprints");
-    foreach (const Footprint* footprint, mFootprints)
+    footprintsNode->setAttribute("default", mDefaultFootprintUuid);
+    foreach (const Footprint* footprint, mFootprints) {
         footprintsNode->appendChild(footprint->serializeToXmlDomElement());
+    }
 
     return root.take();
 }
@@ -166,6 +168,9 @@ XmlDomElement* Package::serializeToXmlDomElement() const throw (Exception)
 bool Package::checkAttributesValidity() const noexcept
 {
     if (!LibraryElement::checkAttributesValidity())             return false;
+    if (mFootprints.isEmpty())                                  return false;
+    if (mDefaultFootprintUuid.isNull())                         return false;
+    if (!mFootprints.contains(mDefaultFootprintUuid))           return false;
     return true;
 }
 

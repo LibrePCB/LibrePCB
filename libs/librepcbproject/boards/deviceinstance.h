@@ -81,6 +81,7 @@ class DeviceInstance final : public QObject, public IF_AttributeProvider,
         ComponentInstance& getComponentInstance() const noexcept {return *mCompInstance;}
         const library::Device& getLibDevice() const noexcept {return *mLibDevice;}
         const library::Package& getLibPackage() const noexcept {return *mLibPackage;}
+        const library::Footprint& getLibFootprint() const noexcept {return *mLibFootprint;}
         BI_Footprint& getFootprint() const noexcept {return *mFootprint;}
         const Angle& getRotation() const noexcept {return mRotation;}
         const Point& getPosition() const noexcept {return mPosition;}

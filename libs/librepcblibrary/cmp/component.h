@@ -46,12 +46,9 @@ class Component final : public LibraryElement
     public:
 
         // Constructors / Destructor
-        explicit Component(const Uuid& uuid = Uuid::createRandom(),
-                           const Version& version = Version(),
-                           const QString& author = QString(),
-                           const QString& name_en_US = QString(),
-                           const QString& description_en_US = QString(),
-                           const QString& keywords_en_US = QString()) throw (Exception);
+        explicit Component(const Uuid& uuid, const Version& version, const QString& author,
+                           const QString& name_en_US, const QString& description_en_US,
+                           const QString& keywords_en_US) throw (Exception);
         explicit Component(const FilePath& elementDirectory) throw (Exception);
         ~Component() noexcept;
 
@@ -59,43 +56,57 @@ class Component final : public LibraryElement
         bool isSchematicOnly() const noexcept {return mSchematicOnly;}
         void setIsSchematicOnly(bool schematicOnly) noexcept {mSchematicOnly = schematicOnly;}
 
-        // Attributes
-        const QList<LibraryElementAttribute*>& getAttributes() const noexcept;
+        // Attribute Methods
+        const QList<LibraryElementAttribute*>& getAttributes() noexcept {return mAttributes;}
+        int getAttributeCount() const noexcept {return mAttributes.count();}
+        LibraryElementAttribute* getAttribute(int index) noexcept {return mAttributes.value(index);}
+        const LibraryElementAttribute* getAttribute(int index) const noexcept {return mAttributes.value(index);}
+        LibraryElementAttribute* getAttributeByKey(const QString& key) noexcept;
         const LibraryElementAttribute* getAttributeByKey(const QString& key) const noexcept;
+        void addAttribute(LibraryElementAttribute& attr) noexcept;
+        void removeAttribute(LibraryElementAttribute& attr) noexcept;
 
-        // Default Values
-        const QMap<QString, QString>& getDefaultValues() const noexcept;
-        QString getDefaultValue(const QStringList& localeOrder) const noexcept;
-        void clearDefaultValues() noexcept;
+        // Default Value Methods
+        const QMap<QString, QString>& getDefaultValues() const noexcept {return mDefaultValues;}
+        QString getDefaultValue(const QStringList& localeOrder) const throw (Exception);
         void addDefaultValue(const QString& locale, const QString& value) noexcept;
+        void removeDefaultValue(const QString& locale) noexcept;
 
-        // Prefixes
-        const QMap<QString, QString>& getPrefixes() const noexcept;
+        // Prefix Methods
+        const QMap<QString, QString>& getPrefixes() const noexcept {return mPrefixes;}
         QString getPrefix(const QStringList& normOrder) const noexcept;
-        const QString& getDefaultPrefixNorm() const noexcept;
         QString getDefaultPrefix() const noexcept;
-        void clearPrefixes() noexcept;
-        void addPrefix(const QString& norm, const QString& prefix, bool isDefault) noexcept;
+        void addPrefix(const QString& norm, const QString& prefix) noexcept;
 
-        // Signals
-        const QList<const ComponentSignal*>& getSignals() const noexcept;
+        // Signal Methods
+        const QList<ComponentSignal*>& getSignals() noexcept {return mSignals;}
+        int getSignalCount() const noexcept {return mSignals.count();}
+        ComponentSignal* getSignal(int index) noexcept {return mSignals.value(index);}
+        const ComponentSignal* getSignal(int index) const noexcept {return mSignals.value(index);}
+        ComponentSignal* getSignalByUuid(const Uuid& uuid) noexcept;
         const ComponentSignal* getSignalByUuid(const Uuid& uuid) const noexcept;
-        const ComponentSignal* getSignalOfPin(const Uuid& symbVarUuid, const Uuid& itemUuid,
-                                              const Uuid& pinUuid) const noexcept;
-        void clearSignals() noexcept;
-        void addSignal(const ComponentSignal& signal) noexcept;
+        ComponentSignal* getSignalOfPin(const Uuid& symbVar, const Uuid& item, const Uuid& pin) noexcept;
+        const ComponentSignal* getSignalOfPin(const Uuid& symbVar, const Uuid& item, const Uuid& pin) const noexcept;
+        void addSignal(ComponentSignal& signal) noexcept;
+        void removeSignal(ComponentSignal& signal) noexcept;
 
-        // Symbol Variants
-        const QList<const ComponentSymbolVariant*>& getSymbolVariants() const noexcept;
+        // Symbol Variant Methods
+        const QList<ComponentSymbolVariant*>& getSymbolVariants() noexcept {return mSymbolVariants;}
+        int getSymbolVariantCount() const noexcept {return mSymbolVariants.count();}
+        ComponentSymbolVariant* getSymbolVariant(int index) noexcept {return mSymbolVariants.value(index);}
+        const ComponentSymbolVariant* getSymbolVariant(int index) const noexcept {return mSymbolVariants.value(index);}
+        ComponentSymbolVariant* getSymbolVariantByUuid(const Uuid& uuid) noexcept;
         const ComponentSymbolVariant* getSymbolVariantByUuid(const Uuid& uuid) const noexcept;
-        const Uuid& getDefaultSymbolVariantUuid() const noexcept;
+        const Uuid& getDefaultSymbolVariantUuid() const noexcept {return mDefaultSymbolVariantUuid;}
+        ComponentSymbolVariant* getDefaultSymbolVariant() noexcept;
         const ComponentSymbolVariant* getDefaultSymbolVariant() const noexcept;
-        void clearSymbolVariants() noexcept;
-        void addSymbolVariant(const ComponentSymbolVariant& symbolVariant) noexcept;
+        void addSymbolVariant(ComponentSymbolVariant& symbolVariant) noexcept;
+        void removeSymbolVariant(ComponentSymbolVariant& symbolVariant) noexcept;
 
-        // Symbol Variant Items
-        const ComponentSymbolVariantItem* getSymbVarItem(const Uuid& symbVarUuid,
-                                                         const Uuid& itemUuid) const noexcept;
+        // Symbol Variant Item Methods
+        ComponentSymbolVariantItem* getSymbVarItem(const Uuid& symbVar, const Uuid& item) noexcept;
+        const ComponentSymbolVariantItem* getSymbVarItem(const Uuid& symbVar, const Uuid& item) const noexcept;
+
 
     private:
 
@@ -120,9 +131,8 @@ class Component final : public LibraryElement
         QList<LibraryElementAttribute*> mAttributes; ///< all attributes in a specific order
         QMap<QString, QString> mDefaultValues; ///< key: locale (like "en_US"), value: default value
         QMap<QString, QString> mPrefixes; ///< key: norm, value: prefix
-        QString mDefaultPrefixNorm; ///< must be an existing key of #mPrefixes
-        QList<const ComponentSignal*> mSignals; ///< empty if the component has no signals
-        QList<const ComponentSymbolVariant*> mSymbolVariants; ///< minimum one entry
+        QList<ComponentSignal*> mSignals; ///< empty if the component has no signals
+        QList<ComponentSymbolVariant*> mSymbolVariants; ///< minimum one entry
         Uuid mDefaultSymbolVariantUuid; ///< must be an existing key of #mSymbolVariants
 };
 

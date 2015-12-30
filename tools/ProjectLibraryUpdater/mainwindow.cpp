@@ -104,9 +104,8 @@ void MainWindow::on_pushButton_2_clicked()
                 // search all required symbols
                 foreach (const ComponentSymbolVariant* symbvar, latestComp.getSymbolVariants())
                 {
-                    foreach (const ComponentSymbolVariantItem* item, symbvar->getItems())
+                    foreach (const Uuid& symbolUuid, symbvar->getAllItemSymbolUuids())
                     {
-                        Uuid symbolUuid = item->getSymbolUuid();
                         FilePath filepath = lib.getLatestSymbol(symbolUuid);
                         if (!filepath.isValid())
                         {

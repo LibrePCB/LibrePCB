@@ -45,27 +45,31 @@ class Package final : public LibraryElement
     public:
 
         // Constructors / Destructor
-        explicit Package(const Uuid& uuid = Uuid::createRandom(),
-                         const Version& version = Version(),
-                         const QString& author = QString(),
-                         const QString& name_en_US = QString(),
-                         const QString& description_en_US = QString(),
-                         const QString& keywords_en_US = QString()) throw (Exception);
+        explicit Package(const Uuid& uuid, const Version& version, const QString& author,
+                         const QString& name_en_US, const QString& description_en_US,
+                         const QString& keywords_en_US) throw (Exception);
         explicit Package(const FilePath& elementDirectory) throw (Exception);
         ~Package() noexcept;
 
-        // Pads
-        const QList<const PackagePad*>& getPads() const noexcept {return mPads;}
-        const PackagePad* getPadByUuid(const Uuid& uuid) const noexcept;
-        void clearPads() noexcept;
-        void addPad(const PackagePad& pad) noexcept;
+        // PackagePad Methods
+        const QMap<Uuid, PackagePad*>& getPads() noexcept {return mPads;}
+        QList<Uuid> getPadUuids() const noexcept {return mPads.keys();}
+        PackagePad* getPadByUuid(const Uuid& uuid) noexcept {return mPads.value(uuid);}
+        const PackagePad* getPadByUuid(const Uuid& uuid) const noexcept {return mPads.value(uuid);}
+        void addPad(PackagePad& pad) noexcept;
+        void removePad(PackagePad& pad) noexcept;
 
-        // Footprints
-        const QList<const Footprint*>& getFootprints() const noexcept {return mFootprints;}
-        const Footprint* getFootprintByUuid(const Uuid& uuid) const noexcept;
-        const Footprint* getDefaultFootprint() const noexcept;
-        void clearFootprints() noexcept;
-        void addFootprint(const Footprint& footprint) noexcept;
+        // Footprint Methods
+        const QMap<Uuid, Footprint*>& getFootprints() noexcept {return mFootprints;}
+        QList<Uuid> getFootprintUuids() const noexcept {return mFootprints.keys();}
+        const Footprint* getFootprintByUuid(const Uuid& uuid) const noexcept {return mFootprints.value(uuid);}
+        Footprint* getFootprintByUuid(const Uuid& uuid) noexcept {return mFootprints.value(uuid);}
+        const Footprint* getDefaultFootprint() const noexcept {return mFootprints.value(mDefaultFootprintUuid);}
+        Footprint* getDefaultFootprint() noexcept {return mFootprints.value(mDefaultFootprintUuid);}
+        const Uuid& getDefaultFootprintUuid() const noexcept {return mDefaultFootprintUuid;}
+        void setDefaultFootprint(const Uuid& uuid) noexcept;
+        void addFootprint(Footprint& footprint) noexcept;
+        void removeFootprint(Footprint& footprint) noexcept;
 
 
     private:
@@ -87,8 +91,9 @@ class Package final : public LibraryElement
 
 
         // Attributes
-        QList<const PackagePad*> mPads; ///< empty if the package has no pads
-        QList<const Footprint*> mFootprints; ///< minimum one footprint
+        QMap<Uuid, PackagePad*> mPads; ///< empty if the package has no pads
+        QMap<Uuid, Footprint*> mFootprints; ///< minimum one footprint
+        Uuid mDefaultFootprintUuid; ///< points to one item of #mFootprints
 };
 
 } // namespace library

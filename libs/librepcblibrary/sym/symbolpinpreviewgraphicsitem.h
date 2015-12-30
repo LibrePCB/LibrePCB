@@ -57,11 +57,12 @@ class SymbolPinPreviewGraphicsItem final : public GraphicsItem
 {
     public:
 
+        // Types
+        using PinDisplayType_t = ComponentPinSignalMapItem::PinDisplayType_t;
+
         // Constructors / Destructor
         explicit SymbolPinPreviewGraphicsItem(const IF_SchematicLayerProvider& layerProvider,
-                                              const SymbolPin& pin,
-                                              const ComponentSignal* compSignal,
-                                              ComponentSymbolVariantItem::PinDisplayType_t displayType) noexcept;
+            const SymbolPin& pin, const ComponentSignal* compSignal, PinDisplayType_t displayType) noexcept;
         ~SymbolPinPreviewGraphicsItem() noexcept;
 
         // Setters
@@ -87,7 +88,7 @@ class SymbolPinPreviewGraphicsItem final : public GraphicsItem
         // General Attributes
         const SymbolPin& mPin;
         const ComponentSignal* mComponentSignal;
-        ComponentSymbolVariantItem::PinDisplayType_t mDisplayType;
+        PinDisplayType_t mDisplayType;
         SchematicLayer* mCircleLayer;
         SchematicLayer* mLineLayer;
         SchematicLayer* mTextLayer;

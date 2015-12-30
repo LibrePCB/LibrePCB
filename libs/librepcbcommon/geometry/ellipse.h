@@ -17,42 +17,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_FOOTPRINTELLIPSE_H
-#define LIBRARY_FOOTPRINTELLIPSE_H
+#ifndef ELLIPSE_H
+#define ELLIPSE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include <librepcbcommon/units/all_length_units.h>
-#include <librepcbcommon/fileio/if_xmlserializableobject.h>
+#include "../units/all_length_units.h"
+#include "../fileio/if_xmlserializableobject.h"
 
 /*****************************************************************************************
- *  Class FootprintEllipse
+ *  Class Ellipse
  ****************************************************************************************/
 
-namespace library {
-
 /**
- * @brief The FootprintEllipse class
- *
- * @note If you make changes in this class, please check if you also need to modify
- *       the class #library#SymbolEllipse as these classes are very similar.
- *
- * @author ubruhin
- * @date 2015-06-07
+ * @brief The Ellipse class
  */
-class FootprintEllipse final : public IF_XmlSerializableObject
+class Ellipse final : public IF_XmlSerializableObject
 {
-        Q_DECLARE_TR_FUNCTIONS(FootprintEllipse)
+        Q_DECLARE_TR_FUNCTIONS(Ellipse)
 
     public:
 
         // Constructors / Destructor
-        explicit FootprintEllipse() noexcept;
-        explicit FootprintEllipse(const XmlDomElement& domElement) throw (Exception);
-        ~FootprintEllipse() noexcept;
+        explicit Ellipse(int layerId, const Length& lineWidth, bool fill, bool isGrabArea,
+                         const Point& center, const Length& radiusX, const Length& radiusY,
+                         const Angle& rotation) noexcept;
+        explicit Ellipse(const XmlDomElement& domElement) throw (Exception);
+        ~Ellipse() noexcept;
 
         // Getters
         int getLayerId() const noexcept {return mLayerId;}
@@ -65,30 +59,31 @@ class FootprintEllipse final : public IF_XmlSerializableObject
         const Angle& getRotation() const noexcept {return mRotation;}
 
         // Setters
-        void setLayerId(int id) noexcept {mLayerId = id;}
-        void setLineWidth(const Length& width) noexcept {mLineWidth = width;}
-        void setIsFilled(bool isFilled) noexcept {mIsFilled = isFilled;}
-        void setIsGrabArea(bool isGrabArea) noexcept {mIsGrabArea = isGrabArea;}
-        void setCenter(const Point& center) noexcept {mCenter = center;}
-        void setRadiusX(const Length& radius) noexcept {mRadiusX = radius;}
-        void setRadiusY(const Length& radius) noexcept {mRadiusY = radius;}
-        void setRotation(const Angle& rotation) noexcept {mRotation = rotation;}
+        void setLayerId(int id) noexcept;
+        void setLineWidth(const Length& width) noexcept;
+        void setIsFilled(bool isFilled) noexcept;
+        void setIsGrabArea(bool isGrabArea) noexcept;
+        void setCenter(const Point& center) noexcept;
+        void setRadiusX(const Length& radius) noexcept;
+        void setRadiusY(const Length& radius) noexcept;
+        void setRotation(const Angle& rotation) noexcept;
 
         // General Methods
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc #IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
 
     private:
 
         // make some methods inaccessible...
-        FootprintEllipse(const FootprintEllipse& other) = delete;
-        FootprintEllipse& operator=(const FootprintEllipse& rhs) = delete;
+        Ellipse() = delete;
+        Ellipse(const Ellipse& other) = delete;
+        Ellipse& operator=(const Ellipse& rhs) = delete;
 
         // Private Methods
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc #IF_XmlSerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 
@@ -103,6 +98,4 @@ class FootprintEllipse final : public IF_XmlSerializableObject
         Angle mRotation;
 };
 
-} // namespace library
-
-#endif // LIBRARY_FOOTPRINTELLIPSE_H
+#endif // ELLIPSE_H

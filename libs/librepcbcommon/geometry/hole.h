@@ -17,78 +17,65 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_SYMBOLPIN_H
-#define LIBRARY_SYMBOLPIN_H
+#ifndef HOLE_H
+#define HOLE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
 #include <QtCore>
-#include <librepcbcommon/uuid.h>
-#include <librepcbcommon/units/all_length_units.h>
-#include <librepcbcommon/fileio/if_xmlserializableobject.h>
+#include "../units/all_length_units.h"
+#include "../fileio/if_xmlserializableobject.h"
 
 /*****************************************************************************************
- *  Class SymbolPin
+ *  Class Hole
  ****************************************************************************************/
 
-namespace library {
-
 /**
- * @brief The SymbolPin class
+ * @brief The Hole class
  */
-class SymbolPin final : public IF_XmlSerializableObject
+class Hole final : public IF_XmlSerializableObject
 {
-        Q_DECLARE_TR_FUNCTIONS(SymbolPin)
+        Q_DECLARE_TR_FUNCTIONS(Hole)
 
     public:
 
         // Constructors / Destructor
-        explicit SymbolPin(const Uuid& uuid, const QString& name, const Point& position,
-                           const Length& length, const Angle& rotation) noexcept;
-        explicit SymbolPin(const XmlDomElement& domElement) throw (Exception);
-        ~SymbolPin() noexcept;
+        explicit Hole(const Point& position, const Length& diameter) noexcept;
+        explicit Hole(const XmlDomElement& domElement) throw (Exception);
+        ~Hole() noexcept;
 
         // Getters
-        const Uuid& getUuid() const noexcept {return mUuid;}
-        const QString& getName() const noexcept {return mName;}
         const Point& getPosition() const noexcept {return mPosition;}
-        const Length& getLength() const noexcept {return mLength;}
-        const Angle& getRotation() const noexcept {return mRotation;}
+        const Length& getDiameter() const noexcept {return mDiameter;}
 
         // Setters
-        void setPosition(const Point& pos) noexcept;
-        void setLength(const Length& length) noexcept;
-        void setRotation(const Angle& rotation) noexcept;
-        void setName(const QString& name) noexcept;
+        void setPosition(const Point& position) noexcept;
+        void setDiameter(const Length& diameter) noexcept;
 
         // General Methods
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc #IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+
 
     private:
 
         // make some methods inaccessible...
-        SymbolPin() = delete;
-        SymbolPin(const SymbolPin& other) = delete;
-        SymbolPin& operator=(const SymbolPin& rhs) = delete;
+        Hole() = delete;
+        Hole(const Hole& other) = delete;
+        Hole& operator=(const Hole& rhs) = delete;
 
         // Private Methods
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc #IF_XmlSerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 
-        // Pin Attributes
-        Uuid mUuid;
-        QString mName;
+        // Polygon Attributes
         Point mPosition;
-        Length mLength;
-        Angle mRotation;
+        Length mDiameter;
 };
 
-} // namespace library
-
-#endif // LIBRARY_SYMBOLPIN_H
+#endif // HOLE_H

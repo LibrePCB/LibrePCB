@@ -60,7 +60,11 @@ HEADERS += \
     if_schematiclayerprovider.h \
     boardlayer.h \
     if_boardlayerprovider.h \
-    uuid.h
+    uuid.h \
+    geometry/polygon.h \
+    geometry/ellipse.h \
+    geometry/text.h \
+    geometry/hole.h
 
 SOURCES += \
     attributes/attributetype.cpp \
@@ -99,7 +103,11 @@ SOURCES += \
     undostack.cpp \
     version.cpp \
     boardlayer.cpp \
-    uuid.cpp
+    uuid.cpp \
+    geometry/polygon.cpp \
+    geometry/ellipse.cpp \
+    geometry/text.cpp \
+    geometry/hole.cpp
 
 FORMS += \
     dialogs/gridsettingsdialog.ui

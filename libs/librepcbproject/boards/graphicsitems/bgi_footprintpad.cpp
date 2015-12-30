@@ -30,7 +30,7 @@
 #include "../board.h"
 #include "../../project.h"
 #include <librepcbcommon/boardlayer.h>
-#include <librepcblibrary/pkg/footprintpad.h>
+#include <librepcblibrary/pkg/footprint.h>
 #include "../../settings/projectsettings.h"
 #include "../deviceinstance.h"
 
@@ -71,19 +71,27 @@ void BGI_FootprintPad::updateCacheAndRepaint() noexcept
     mShape.setFillRule(Qt::WindingFill);
     mBoundingRect = QRectF();
 
-    // set Z value
-    if ((mLibPad.getType() == library::FootprintPad::Type_t::SmtRect) && (mPad.getIsMirrored()))
-        setZValue(Board::ZValue_FootprintPadsBottom);
-    else
+    // set Z value and layer
+    if (mLibPad.getTechnology() == library::FootprintPad::Technology_t::SMT) {
+        const library::FootprintPadSmt* smt = dynamic_cast<const library::FootprintPadSmt*>(&mLibPad);
+        Q_ASSERT(smt);
+        if ((smt->getBoardSide() == library::FootprintPadSmt::BoardSide_t::BOTTOM) || (mPad.getIsMirrored())) {
+            mPadLayer = getBoardLayer(BoardLayer::LayerID::BottomCopper);
+            setZValue(Board::ZValue_FootprintPadsBottom);
+        } else {
+            mPadLayer = getBoardLayer(BoardLayer::LayerID::TopCopper);
+            setZValue(Board::ZValue_FootprintPadsTop);
+        }
+    } else {
+        mPadLayer = getBoardLayer(BoardLayer::LayerID::Vias);
         setZValue(Board::ZValue_FootprintPadsTop);
+    }
+    Q_ASSERT(mPadLayer);
 
     // rotation
     Angle absAngle = mLibPad.getRotation() + mPad.getFootprint().getRotation();
     mRotate180 = (absAngle <= -Angle::deg90() || absAngle > Angle::deg90());
-
-    QRectF rect = QRectF(-mLibPad.getWidth().toPx()/2, -mLibPad.getHeight().toPx()/2,
-                         mLibPad.getWidth().toPx(), mLibPad.getHeight().toPx());
-    mShape.addRect(rect);
+    mShape.addRect(mLibPad.getBoundingRectPx());
     mBoundingRect = mBoundingRect.united(mShape.boundingRect());
 
     update();
@@ -100,55 +108,16 @@ void BGI_FootprintPad::paint(QPainter* painter, const QStyleOptionGraphicsItem* 
     //const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
     //const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
 
-    BoardLayer* layer;
-    if (mLibPad.getType() == library::FootprintPad::Type_t::SmtRect)
-        layer = getBoardLayer(BoardLayer::LayerID::TopCopper);
-    else
-        layer = getBoardLayer(BoardLayer::LayerID::Vias);
-    Q_ASSERT(layer);
-
-    if (layer->isVisible())
-    {
-        painter->setPen(QPen(layer->getColor(mPad.isSelected()), 0));
-        painter->setBrush(layer->getColor(mPad.isSelected()));
-
-        QRectF rect = QRectF(-mLibPad.getWidth().toPx()/2, -mLibPad.getHeight().toPx()/2,
-                             mLibPad.getWidth().toPx(), mLibPad.getHeight().toPx());
-        switch (mLibPad.getType())
-        {
-            case library::FootprintPad::Type_t::ThtRect:
-            case library::FootprintPad::Type_t::SmtRect:
-                painter->drawRect(rect);
-                break;
-            case library::FootprintPad::Type_t::ThtOctagon:
-            {
-                qreal rx = mLibPad.getWidth().toPx()/2;
-                qreal ry = mLibPad.getHeight().toPx()/2;
-                qreal a = qMin(rx, ry) * (2 - qSqrt(2));
-                QPolygonF octagon;
-                octagon.append(QPointF(rx, ry-a));
-                octagon.append(QPointF(rx-a, ry));
-                octagon.append(QPointF(a-rx, ry));
-                octagon.append(QPointF(-rx, ry-a));
-                octagon.append(QPointF(-rx, a-ry));
-                octagon.append(QPointF(a-rx, -ry));
-                octagon.append(QPointF(rx-a, -ry));
-                octagon.append(QPointF(rx, a-ry));
-                painter->drawPolygon(octagon);
-                break;
-            }
-            case library::FootprintPad::Type_t::ThtRound:
-            {
-                qreal radius = qMin(mLibPad.getWidth().toPx(), mLibPad.getHeight().toPx())/2;
-                painter->drawRoundedRect(rect, radius, radius);
-                break;
-            }
-            default: Q_ASSERT(false); break;
-        }
+    Q_ASSERT(mPadLayer); if (!mPadLayer) return;
+    if (mPadLayer->isVisible()) {
+        painter->setPen(QPen(mPadLayer->getColor(mPad.isSelected()), 0));
+        painter->setBrush(mPadLayer->getColor(mPad.isSelected()));
+        painter->drawPath(mLibPad.toQPainterPathPx());
     }
 
 #ifdef QT_DEBUG
-    layer = getBoardLayer(BoardLayer::LayerID::DEBUG_GraphicsItemsBoundingRect); Q_ASSERT(layer);
+    BoardLayer* layer = getBoardLayer(BoardLayer::LayerID::DEBUG_GraphicsItemsBoundingRect);
+    Q_ASSERT(layer);
     if (layer->isVisible())
     {
         // draw bounding rect

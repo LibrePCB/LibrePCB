@@ -42,32 +42,20 @@ namespace project {
  ****************************************************************************************/
 
 BI_Footprint::BI_Footprint(DeviceInstance& device, const XmlDomElement& domElement) throw (Exception) :
-    BI_Base(), mDeviceInstance(device), mFootprint(nullptr),
-    mGraphicsItem(nullptr)
+    BI_Base(), mDeviceInstance(device), mGraphicsItem(nullptr)
 {
     Q_UNUSED(domElement);
     init();
 }
 
 BI_Footprint::BI_Footprint(DeviceInstance& device) throw (Exception) :
-    BI_Base(), mDeviceInstance(device), mFootprint(nullptr),
-    mGraphicsItem(nullptr)
+    BI_Base(), mDeviceInstance(device), mGraphicsItem(nullptr)
 {
     init();
 }
 
 void BI_Footprint::init() throw (Exception)
 {
-    // TODO: Uuid footprintUuid = mDeviceInstance.getLibPackage().getFootprintUuid();
-    Uuid footprintUuid = mDeviceInstance.getLibPackage().getFootprints().first()->getUuid();
-    mFootprint = mDeviceInstance.getLibPackage().getFootprintByUuid(footprintUuid);
-    if (!mFootprint)
-    {
-        throw RuntimeError(__FILE__, __LINE__, footprintUuid.toStr(),
-            QString(tr("No footprint with the UUID \"%1\" found in the project's library."))
-            .arg(footprintUuid.toStr()));
-    }
-
     mGraphicsItem = new BGI_Footprint(*this);
     mGraphicsItem->setPos(mDeviceInstance.getPosition().toPxQPointF());
     mGraphicsItem->setRotation(-mDeviceInstance.getRotation().toDeg());
@@ -75,29 +63,32 @@ void BI_Footprint::init() throw (Exception)
         mGraphicsItem->setTransform(QTransform::fromScale(qreal(-1), qreal(1)), true);
 
     const library::Device& libDev = mDeviceInstance.getLibDevice();
-    foreach (const library::FootprintPad* libPad, mFootprint->getPads())
+    foreach (const Uuid& padUuid, getLibFootprint().getPadUuids())
     {
-        BI_FootprintPad* pad = new BI_FootprintPad(*this, libPad->getPadUuid());
-        if (mPads.contains(libPad->getPadUuid()))
+        const library::FootprintPad* libPad = getLibFootprint().getPadByUuid(padUuid);
+        Q_ASSERT(libPad); if (!libPad) continue;
+
+        BI_FootprintPad* pad = new BI_FootprintPad(*this, libPad->getUuid());
+        if (mPads.contains(libPad->getUuid()))
         {
-            throw RuntimeError(__FILE__, __LINE__, libPad->getPadUuid().toStr(),
+            throw RuntimeError(__FILE__, __LINE__, libPad->getUuid().toStr(),
                 QString(tr("The footprint pad UUID \"%1\" is defined multiple times."))
-                .arg(libPad->getPadUuid().toStr()));
+                .arg(libPad->getUuid().toStr()));
         }
-        if (!libDev.getPadSignalMap().contains(libPad->getPadUuid()))
+        if (!libDev.getPadSignalMap().contains(libPad->getUuid()))
         {
-            throw RuntimeError(__FILE__, __LINE__, libPad->getPadUuid().toStr(),
+            throw RuntimeError(__FILE__, __LINE__, libPad->getUuid().toStr(),
                 QString(tr("Footprint pad \"%1\" not found in pad-signal-map of device \"%2\"."))
-                .arg(libPad->getPadUuid().toStr(), libDev.getUuid().toStr()));
+                .arg(libPad->getUuid().toStr(), libDev.getUuid().toStr()));
         }
-        mPads.insert(libPad->getPadUuid(), pad);
+        mPads.insert(libPad->getUuid(), pad);
     }
     if (mPads.count() != libDev.getPadSignalMap().count())
     {
         throw RuntimeError(__FILE__, __LINE__,
             QString("%1!=%2").arg(mPads.count()).arg(libDev.getPadSignalMap().count()),
             QString(tr("The pad count of the footprint \"%1\" does not match with "
-            "the pad-signal-map of device \"%2\".")).arg(mFootprint->getUuid().toStr(),
+            "the pad-signal-map of device \"%2\".")).arg(getLibFootprint().getUuid().toStr(),
             libDev.getUuid().toStr()));
     }
 
@@ -132,6 +123,11 @@ Project& BI_Footprint::getProject() const noexcept
 Board& BI_Footprint::getBoard() const noexcept
 {
     return mDeviceInstance.getBoard();
+}
+
+const library::Footprint& BI_Footprint::getLibFootprint() const noexcept
+{
+    return mDeviceInstance.getLibFootprint();
 }
 
 const Angle& BI_Footprint::getRotation() const noexcept
@@ -257,7 +253,6 @@ void BI_Footprint::deviceInstanceMirrored(bool mirrored)
 
 bool BI_Footprint::checkAttributesValidity() const noexcept
 {
-    if (mFootprint == nullptr)          return false;
     //if (mUuid.isNull())                 return false;
     //if (mComponentInstance == nullptr)    return false;
     return true;

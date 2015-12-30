@@ -31,10 +31,13 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SymbolPin::SymbolPin(const Uuid& uuid, const QString& name) noexcept :
-    mUuid(uuid), mName(name), mPosition(0, 0), mLength(0), mRotation(0)
+SymbolPin::SymbolPin(const Uuid& uuid, const QString& name, const Point& position,
+                     const Length& length, const Angle& rotation) noexcept :
+    mUuid(uuid), mName(name), mPosition(position), mLength(length), mRotation(rotation)
 {
-    Q_ASSERT(mUuid.isNull() == false);
+    Q_ASSERT(!mUuid.isNull());
+    Q_ASSERT(!mName.isEmpty());
+    Q_ASSERT(mLength >= 0);
 }
 
 SymbolPin::SymbolPin(const XmlDomElement& domElement) throw (Exception) :
@@ -42,7 +45,7 @@ SymbolPin::SymbolPin(const XmlDomElement& domElement) throw (Exception) :
 {
     // read attributes
     mUuid = domElement.getAttribute<Uuid>("uuid", true);
-    mName = domElement.getText<QString>(true);
+    mName = domElement.getText<QString>(true); // empty string --> exception
     mPosition.setX(domElement.getAttribute<Length>("x", true));
     mPosition.setY(domElement.getAttribute<Length>("y", true));
     mLength = domElement.getAttribute<Length>("length", true);
@@ -61,6 +64,7 @@ SymbolPin::~SymbolPin() noexcept
 
 void SymbolPin::setName(const QString& name) noexcept
 {
+    Q_ASSERT(!name.isEmpty());
     mName = name;
 }
 
@@ -71,6 +75,7 @@ void SymbolPin::setPosition(const Point& pos) noexcept
 
 void SymbolPin::setLength(const Length& length) noexcept
 {
+    Q_ASSERT(length >= 0);
     mLength = length;
 }
 

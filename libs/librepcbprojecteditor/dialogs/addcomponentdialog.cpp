@@ -201,10 +201,12 @@ void AddComponentDialog::setSelectedComponent(const library::Component* cmp)
         mSelectedComponent = cmp;
 
         mUi->cbxSymbVar->clear();
-        foreach (const library::ComponentSymbolVariant* symbVar, cmp->getSymbolVariants())
-        {
+        for (int i = 0; i < cmp->getSymbolVariantCount(); i++) {
+            const library::ComponentSymbolVariant* symbVar = cmp->getSymbolVariant(i);
+            Q_ASSERT(symbVar); if (!symbVar) continue;
+
             QString text = symbVar->getName(localeOrder);
-            if (symbVar->isDefault()) text.append(tr(" [default]"));
+            if (symbVar == cmp->getDefaultSymbolVariant()) text.append(tr(" [default]"));
             mUi->cbxSymbVar->addItem(text, symbVar->getUuid().toStr());
         }
         mUi->cbxSymbVar->setCurrentIndex(mUi->cbxSymbVar->findData(cmp->getDefaultSymbolVariantUuid().toStr()));
@@ -229,8 +231,10 @@ void AddComponentDialog::setSelectedSymbVar(const library::ComponentSymbolVarian
         mUi->lblSymbVarNorm->setText(symbVar->getNorm());
         mUi->lblSymbVarDescription->setText(symbVar->getDescription(localeOrder));
 
-        foreach (const library::ComponentSymbolVariantItem* item, symbVar->getItems())
-        {
+        for (int i = 0; i < symbVar->getItemCount(); i++) {
+            const library::ComponentSymbolVariantItem* item = symbVar->getItem(i);
+            Q_ASSERT(item); if (!item) continue;
+
             FilePath symbolFp = mWorkspace.getLibrary().getLatestSymbol(item->getSymbolUuid());
             if (!symbolFp.isValid()) continue; // TODO: show warning
             const library::Symbol* symbol = new library::Symbol(symbolFp); // TODO: fix memory leak...

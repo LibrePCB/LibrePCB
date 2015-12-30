@@ -318,7 +318,7 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightClick(QGraphicsSceneMouse
                         auto cmd = new CmdProjectLibraryAddElement<library::Package>(mProject.getLibrary(), *pkg);
                         mUndoStack.appendToCommand(cmd);
                     }
-                    Uuid footprintUuid = pkg->getDefaultFootprint()->getUuid(); // TODO
+                    Uuid footprintUuid = pkg->getDefaultFootprintUuid(); // TODO
 
                     // replace device
                     Point pos = devInst.getPosition();

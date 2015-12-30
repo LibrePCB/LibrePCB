@@ -32,6 +32,7 @@
  *  Forward Declarations
  ****************************************************************************************/
 
+class Text;
 class BoardLayer;
 
 namespace project {
@@ -40,7 +41,6 @@ class BI_Footprint;
 
 namespace library {
 class Footprint;
-class FootprintText;
 }
 
 /*****************************************************************************************
@@ -103,7 +103,7 @@ class BGI_Footprint final : public BGI_Base
         // Cached Attributes
         QRectF mBoundingRect;
         QPainterPath mShape;
-        QHash<const library::FootprintText*, CachedTextProperties_t> mCachedTextProperties;
+        QHash<const Text*, CachedTextProperties_t> mCachedTextProperties;
 };
 
 } // namespace project

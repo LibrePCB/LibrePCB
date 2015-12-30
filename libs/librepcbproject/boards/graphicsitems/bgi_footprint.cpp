@@ -76,8 +76,9 @@ void BGI_Footprint::updateCacheAndRepaint() noexcept
     mShape.addRect(crossRect);
 
     // polygons
-    foreach (const library::FootprintPolygon* polygon, mLibFootprint.getPolygons())
-    {
+    for (int i = 0; i < mLibFootprint.getPolygonCount(); i++) {
+        const Polygon* polygon = mLibFootprint.getPolygon(i);
+        Q_ASSERT(polygon); if (!polygon) continue;
         QPainterPath polygonPath = polygon->toQPainterPathPx();
         qreal w = polygon->getWidth().toPx() / 2;
         mBoundingRect = mBoundingRect.united(polygonPath.boundingRect().adjusted(-w, -w, w, w));
@@ -86,8 +87,10 @@ void BGI_Footprint::updateCacheAndRepaint() noexcept
 
     // texts
     mCachedTextProperties.clear();
-    foreach (const library::FootprintText* text, mLibFootprint.getTexts())
-    {
+    for (int i = 0; i < mLibFootprint.getTextCount(); i++) {
+        const Text* text = mLibFootprint.getText(i);
+        Q_ASSERT(text); if (!text) continue;
+
         // create static text properties
         CachedTextProperties_t props;
 
@@ -150,8 +153,11 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
 
     // draw all polygons
-    foreach (const library::FootprintPolygon* polygon, mLibFootprint.getPolygons())
-    {
+    int polygonCount = mLibFootprint.getPolygonCount();
+    for (int i = 0; i < polygonCount; i++) {
+        const Polygon* polygon = mLibFootprint.getPolygon(i);
+        Q_ASSERT(polygon); if (!polygon) continue;
+
         // set colors
         layer = getBoardLayer(polygon->getLayerId());
         if (layer) {if (!layer->isVisible()) layer = nullptr;}
@@ -173,8 +179,11 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     }
 
     // draw all ellipses
-    foreach (const library::FootprintEllipse* ellipse, mLibFootprint.getEllipses())
-    {
+    int ellipseCount = mLibFootprint.getEllipseCount();
+    for (int i = 0; i < ellipseCount; i++) {
+        const Ellipse* ellipse = mLibFootprint.getEllipse(i);
+        Q_ASSERT(ellipse); if (!ellipse) continue;
+
         // set colors
         layer = getBoardLayer(ellipse->getLayerId());
         if (layer) {if (!layer->isVisible()) layer = nullptr;}
@@ -198,8 +207,11 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     }
 
     // draw all texts
-    foreach (const library::FootprintText* text, mLibFootprint.getTexts())
-    {
+    int textCount = mLibFootprint.getTextCount();
+    for (int i = 0; i < textCount; i++) {
+        const Text* text = mLibFootprint.getText(i);
+        Q_ASSERT(text); if (!text) continue;
+
         // get layer
         layer = getBoardLayer(text->getLayerId());
         if (!layer) continue;

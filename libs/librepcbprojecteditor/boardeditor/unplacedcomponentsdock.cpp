@@ -142,8 +142,10 @@ void UnplacedComponentsDock::on_cbxSelectedComponent_currentIndexChanged(int ind
 
 void UnplacedComponentsDock::on_btnAdd_clicked()
 {
-    if (mBoard && mSelectedComponent && mSelectedDevice && mSelectedPackage)
-        addDevice(*mSelectedComponent, mSelectedDevice->getUuid(), mSelectedPackage->getDefaultFootprint()->getUuid()); // TODO
+    if (mBoard && mSelectedComponent && mSelectedDevice && mSelectedPackage) {
+        Uuid footprintLibUuid = mSelectedPackage->getDefaultFootprintUuid(); // TODO
+        addDevice(*mSelectedComponent, mSelectedDevice->getUuid(), footprintLibUuid);
+    }
     updateComponentsList();
 }
 
@@ -153,7 +155,7 @@ void UnplacedComponentsDock::on_pushButton_clicked()
 
     Uuid componentLibUuid = mSelectedComponent->getLibComponent().getUuid();
     Uuid deviceLibUuid = mSelectedDevice->getUuid();
-    Uuid footprintLibUuid = mSelectedPackage->getDefaultFootprint()->getUuid(); // TODO
+    Uuid footprintLibUuid = mSelectedPackage->getDefaultFootprintUuid(); // TODO
 
     mDisableListUpdate = true;
     for (int i = 0; i < mUi->lstUnplacedComponents->count(); i++)

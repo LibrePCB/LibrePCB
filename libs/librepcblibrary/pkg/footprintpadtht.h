@@ -17,63 +17,65 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_SYMBOLPIN_H
-#define LIBRARY_SYMBOLPIN_H
+#ifndef LIBRARY_FOOTPRINTPADTHT_H
+#define LIBRARY_FOOTPRINTPADTHT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 
-#include <QtCore>
-#include <librepcbcommon/uuid.h>
-#include <librepcbcommon/units/all_length_units.h>
-#include <librepcbcommon/fileio/if_xmlserializableobject.h>
+#include "footprintpad.h"
 
 /*****************************************************************************************
- *  Class SymbolPin
+ *  Class FootprintPadTht
  ****************************************************************************************/
 
 namespace library {
 
 /**
- * @brief The SymbolPin class
+ * @brief The FootprintPadTht class
  */
-class SymbolPin final : public IF_XmlSerializableObject
+class FootprintPadTht final : public FootprintPad
 {
-        Q_DECLARE_TR_FUNCTIONS(SymbolPin)
+        Q_DECLARE_TR_FUNCTIONS(FootprintPadTht)
 
     public:
 
+        // Types
+        enum class Shape_t { ROUND, RECT, OCTAGON };
+
         // Constructors / Destructor
-        explicit SymbolPin(const Uuid& uuid, const QString& name, const Point& position,
-                           const Length& length, const Angle& rotation) noexcept;
-        explicit SymbolPin(const XmlDomElement& domElement) throw (Exception);
-        ~SymbolPin() noexcept;
+        explicit FootprintPadTht(const Uuid& padUuid, const Point& pos, const Angle& rot,
+                                 const Length& width, const Length& height,
+                                 Shape_t shape, const Length& drillDiameter) noexcept;
+        explicit FootprintPadTht(const XmlDomElement& domElement) throw (Exception);
+        ~FootprintPadTht() noexcept;
 
         // Getters
-        const Uuid& getUuid() const noexcept {return mUuid;}
-        const QString& getName() const noexcept {return mName;}
-        const Point& getPosition() const noexcept {return mPosition;}
-        const Length& getLength() const noexcept {return mLength;}
-        const Angle& getRotation() const noexcept {return mRotation;}
+        Shape_t getShape() const noexcept {return mShape;}
+        const Length& getDrillDiameter() const noexcept {return mDrillDiameter;}
+        const QPainterPath& toQPainterPathPx() const noexcept override;
 
         // Setters
-        void setPosition(const Point& pos) noexcept;
-        void setLength(const Length& length) noexcept;
-        void setRotation(const Angle& rotation) noexcept;
-        void setName(const QString& name) noexcept;
+        void setShape(Shape_t shape) noexcept;
+        void setDrillDiameter(const Length& diameter) noexcept;
 
         // General Methods
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
+        // Static Methods
+        static Shape_t stringToShape(const QString& shape) throw (Exception);
+        static QString shapeToString(Shape_t shape) noexcept;
+
+
     private:
 
         // make some methods inaccessible...
-        SymbolPin() = delete;
-        SymbolPin(const SymbolPin& other) = delete;
-        SymbolPin& operator=(const SymbolPin& rhs) = delete;
+        FootprintPadTht() = delete;
+        FootprintPadTht(const FootprintPadTht& other) = delete;
+        FootprintPadTht& operator=(const FootprintPadTht& rhs) = delete;
 
         // Private Methods
 
@@ -82,13 +84,10 @@ class SymbolPin final : public IF_XmlSerializableObject
 
 
         // Pin Attributes
-        Uuid mUuid;
-        QString mName;
-        Point mPosition;
-        Length mLength;
-        Angle mRotation;
+        Shape_t mShape;
+        Length mDrillDiameter;
 };
 
 } // namespace library
 
-#endif // LIBRARY_SYMBOLPIN_H
+#endif // LIBRARY_FOOTPRINTPADTHT_H

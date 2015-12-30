@@ -32,6 +32,7 @@
  *  Forward Declarations
  ****************************************************************************************/
 
+class Text;
 class SchematicLayer;
 
 namespace project {
@@ -40,7 +41,6 @@ class SI_Symbol;
 
 namespace library {
 class Symbol;
-class SymbolText;
 }
 
 /*****************************************************************************************
@@ -103,7 +103,7 @@ class SGI_Symbol final : public SGI_Base
         // Cached Attributes
         QRectF mBoundingRect;
         QPainterPath mShape;
-        QHash<const library::SymbolText*, CachedTextProperties_t> mCachedTextProperties;
+        QHash<const Text*, CachedTextProperties_t> mCachedTextProperties;
 };
 
 } // namespace project

@@ -44,59 +44,61 @@ class ComponentSymbolVariant final : public IF_XmlSerializableObject
     public:
 
         // Constructors / Destructor
-        explicit ComponentSymbolVariant(const Uuid& uuid = Uuid::createRandom(),
-                                        const QString& norm = QString(),
-                                        bool isDefault = false) noexcept;
+        explicit ComponentSymbolVariant(const Uuid& uuid, const QString& norm,
+                                        const QString& name_en_US,
+                                        const QString& desc_en_US) noexcept;
         explicit ComponentSymbolVariant(const XmlDomElement& domElement) throw (Exception);
         ~ComponentSymbolVariant() noexcept;
 
         // Getters: Attributes
         const Uuid& getUuid() const noexcept {return mUuid;}
         const QString& getNorm() const noexcept {return mNorm;}
-        bool isDefault() const noexcept {return mIsDefault;}
         QString getName(const QStringList& localeOrder) const noexcept;
         QString getDescription(const QStringList& localeOrder) const noexcept;
         const QMap<QString, QString>& getNames() const noexcept {return mNames;}
         const QMap<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
 
-        // Getters: Symbol Items
-        const QList<const ComponentSymbolVariantItem*>& getItems() const noexcept {return mSymbolItems;}
-        const ComponentSymbolVariantItem* getItemByUuid(const Uuid& uuid) const noexcept;
-        const ComponentSymbolVariantItem* getNextItem(const ComponentSymbolVariantItem* item) const noexcept;
-
         // Setters
         void setNorm(const QString& norm) noexcept;
-        void setIsDefault(bool isDefault) noexcept;
         void setName(const QString& locale, const QString& name) noexcept;
         void setDescription(const QString& locale, const QString& desc) noexcept;
 
-        // General Methods
-        void clearItems() noexcept;
-        void addItem(const ComponentSymbolVariantItem& item) noexcept;
+        // Symbol Item Methods
+        const QList<ComponentSymbolVariantItem*>& getItems() noexcept {return mSymbolItems;}
+        int getItemCount() const noexcept {return mSymbolItems.count();}
+        ComponentSymbolVariantItem* getItem(int index) noexcept {return mSymbolItems.value(index);}
+        const ComponentSymbolVariantItem* getItem(int index) const noexcept {return mSymbolItems.value(index);}
+        ComponentSymbolVariantItem* getItemByUuid(const Uuid& uuid) noexcept;
+        const ComponentSymbolVariantItem* getItemByUuid(const Uuid& uuid) const noexcept;
+        QSet<Uuid> getAllItemSymbolUuids() const noexcept;
+        void addItem(ComponentSymbolVariantItem& item) noexcept;
+        void removeItem(ComponentSymbolVariantItem& item) noexcept;
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        // General Methods
+
+        /// @copydoc #IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
 
     private:
 
         // make some methods inaccessible...
-        ComponentSymbolVariant(const ComponentSymbolVariant& other);
-        ComponentSymbolVariant& operator=(const ComponentSymbolVariant& rhs);
+        ComponentSymbolVariant() = delete;
+        ComponentSymbolVariant(const ComponentSymbolVariant& other) = delete;
+        ComponentSymbolVariant& operator=(const ComponentSymbolVariant& rhs) = delete;
 
         // Private Methods
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc #IF_XmlSerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 
         // Symbol Variant Attributes
         Uuid mUuid;
         QString mNorm;
-        bool mIsDefault;
         QMap<QString, QString> mNames;
         QMap<QString, QString> mDescriptions;
-        QList<const ComponentSymbolVariantItem*> mSymbolItems; ///< minimum one item
+        QList<ComponentSymbolVariantItem*> mSymbolItems; ///< minimum one item
 };
 
 } // namespace library

@@ -95,8 +95,11 @@ void SI_Symbol::init(const Uuid& symbVarItemUuid) throw (Exception)
     mGraphicsItem->setPos(mPosition.toPxQPointF());
     mGraphicsItem->setRotation(-mRotation.toDeg());
 
-    foreach (const library::SymbolPin* libPin, mSymbol->getPins())
+    foreach (const Uuid& libPinUuid, mSymbol->getPinUuids())
     {
+        const library::SymbolPin* libPin = mSymbol->getPinByUuid(libPinUuid);
+        Q_ASSERT(libPin); if (!libPin) continue;
+
         SI_SymbolPin* pin = new SI_SymbolPin(*this, libPin->getUuid());
         if (mPins.contains(libPin->getUuid()))
         {
@@ -104,21 +107,15 @@ void SI_Symbol::init(const Uuid& symbVarItemUuid) throw (Exception)
                 QString(tr("The symbol pin UUID \"%1\" is defined multiple times."))
                 .arg(libPin->getUuid().toStr()));
         }
-        if (!mSymbVarItem->getPinSignalMap().contains(libPin->getUuid()))
-        {
-            throw RuntimeError(__FILE__, __LINE__, libPin->getUuid().toStr(),
-                QString(tr("Symbol pin UUID \"%1\" not found in pin-signal-map."))
-                .arg(libPin->getUuid().toStr()));
-        }
         mPins.insert(libPin->getUuid(), pin);
     }
-    if (mPins.count() != mSymbVarItem->getPinSignalMap().count())
+    /*if (mPins.count() != mSymbVarItem->getPinSignalMap().count())
     {
         throw RuntimeError(__FILE__, __LINE__,
             QString("%1!=%2").arg(mPins.count()).arg(mSymbVarItem->getPinSignalMap().count()),
             QString(tr("The pin count of the symbol instance \"%1\" does not match with "
             "the pin-signal-map")).arg(mUuid.toStr()));
-    }
+    }*/
 
     // connect to the "attributes changes" signal of schematic and component instance
     connect(mComponentInstance, &ComponentInstance::attributesChanged,

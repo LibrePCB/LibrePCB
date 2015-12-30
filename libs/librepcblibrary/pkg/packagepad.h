@@ -44,8 +44,7 @@ class PackagePad final : public IF_XmlSerializableObject
     public:
 
         // Constructors / Destructor
-        explicit PackagePad(const Uuid& uuid = Uuid::createRandom(),
-                            const QString& name = QString()) noexcept;
+        explicit PackagePad(const Uuid& uuid, const QString& name) noexcept;
         explicit PackagePad(const XmlDomElement& domElement) throw (Exception);
         ~PackagePad() noexcept;
 
@@ -65,8 +64,9 @@ class PackagePad final : public IF_XmlSerializableObject
     private:
 
         // make some methods inaccessible...
-        PackagePad(const PackagePad& other);
-        PackagePad& operator=(const PackagePad& rhs);
+        PackagePad() = delete;
+        PackagePad(const PackagePad& other) = delete;
+        PackagePad& operator=(const PackagePad& rhs) = delete;
 
         // Private Methods
 

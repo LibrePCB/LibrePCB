@@ -25,6 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <QtWidgets>
 #include <librepcbcommon/uuid.h>
 #include <librepcbcommon/units/all_length_units.h>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
@@ -40,76 +41,72 @@ namespace library {
  *
  * @todo add subclasses for each footprint type
  */
-class FootprintPad final : public IF_XmlSerializableObject
+class FootprintPad : public IF_XmlSerializableObject
 {
         Q_DECLARE_TR_FUNCTIONS(FootprintPad)
 
     public:
 
         // Types
-
-        enum class Type_t {
-            ThtRect,
-            ThtOctagon,
-            ThtRound,
-            SmtRect
-        };
+        enum class Technology_t { THT, SMT };
 
         // Constructors / Destructor
-        explicit FootprintPad(const Uuid& padUuid) noexcept;
+        explicit FootprintPad(Technology_t technology, const Uuid& padUuid,
+                              const Point& pos, const Angle& rot, const Length& width,
+                              const Length& height) noexcept;
         explicit FootprintPad(const XmlDomElement& domElement) throw (Exception);
-        ~FootprintPad() noexcept;
+        virtual ~FootprintPad() noexcept;
 
         // Getters
-        const Uuid& getPadUuid() const noexcept {return mPadUuid;}
-        Type_t getType() const noexcept {return mType;}
+        const Uuid& getUuid() const noexcept {return mUuid;}
+        Technology_t getTechnology() const noexcept {return mTechnology;}
         const Point& getPosition() const noexcept {return mPosition;}
         const Angle& getRotation() const noexcept {return mRotation;}
         const Length& getWidth() const noexcept {return mWidth;}
         const Length& getHeight() const noexcept {return mHeight;}
-        const Length& getDrillDiameter() const noexcept {return mDrillDiameter;}
-        int getLayerId() const noexcept {return mLayerId;}
+        QRectF getBoundingRectPx() const noexcept;
+        virtual const QPainterPath& toQPainterPathPx() const noexcept = 0;
 
         // Setters
-        void setType(Type_t type) noexcept {mType = type;}
-        void setPosition(const Point& pos) noexcept {mPosition = pos;}
-        void setRotation(const Angle& rotation) noexcept {mRotation = rotation;}
-        void setWidth(const Length& width) noexcept {mWidth = width;}
-        void setHeight(const Length& height) noexcept {mHeight = height;}
-        void setDrillDiameter(const Length& diameter) noexcept {mDrillDiameter = diameter;}
-        void setLayerId(int id) noexcept {mLayerId = id;}
+        void setPosition(const Point& pos) noexcept;
+        void setRotation(const Angle& rot) noexcept;
+        void setWidth(const Length& width) noexcept;
+        void setHeight(const Length& height) noexcept;
 
         // General Methods
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        virtual bool checkAttributesValidity() const noexcept override;
 
         // Static Methods
-        static Type_t stringToType(const QString& type) throw (Exception);
-        static QString typeToString(Type_t type) noexcept;
+        static Technology_t stringToTechnology(const QString& technology) throw (Exception);
+        static QString technologyToString(Technology_t technology) noexcept;
+        static FootprintPad* fromDomElement(const XmlDomElement& domElement) throw (Exception);
 
 
     private:
 
         // make some methods inaccessible...
-        FootprintPad(const FootprintPad& other);
-        FootprintPad& operator=(const FootprintPad& rhs);
+        FootprintPad() = delete;
+        FootprintPad(const FootprintPad& other) = delete;
+        FootprintPad& operator=(const FootprintPad& rhs) = delete;
 
-        // Private Methods
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
-
+    protected:
 
         // Pin Attributes
-        Uuid mPadUuid;
-        Type_t mType;
+        Technology_t mTechnology;
+        Uuid mUuid;
         Point mPosition;
         Angle mRotation;
         Length mWidth;
         Length mHeight;
-        Length mDrillDiameter;
-        int mLayerId;
+
+        // Cached Attributes
+        mutable QPainterPath mPainterPathPx;
 };
 
 } // namespace library

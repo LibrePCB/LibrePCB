@@ -93,10 +93,10 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const XmlDomElement& domE
         }
         mSignals.insert(signal->getCompSignal().getUuid(), signal);
     }
-    if (mSignals.count() != mLibComponent->getSignals().count())
+    if (mSignals.count() != mLibComponent->getSignalCount())
     {
         throw RuntimeError(__FILE__, __LINE__,
-            QString("%1!=%2").arg(mSignals.count()).arg(mLibComponent->getSignals().count()),
+            QString("%1!=%2").arg(mSignals.count()).arg(mLibComponent->getSignalCount()),
             QString(tr("The signal count of the component instance \"%1\" does "
             "not match with the signal count of the component \"%2\"."))
             .arg(mUuid.toStr()).arg(mLibComponent->getUuid().toStr()));
@@ -122,8 +122,10 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const library::Component&
     mValue = cmp.getDefaultValue(localeOrder);
 
     // add attributes
-    foreach (const library::LibraryElementAttribute* attr, cmp.getAttributes())
-    {
+    for (int i = 0; i < cmp.getAttributeCount(); i++) {
+        const library::LibraryElementAttribute* attr = cmp.getAttribute(i);
+        Q_ASSERT(attr); if (!attr) continue;
+
         ComponentAttributeInstance* attributeInstance = new ComponentAttributeInstance(
             attr->getKey(), attr->getType(), attr->getDefaultValue(localeOrder),
             attr->getDefaultUnit());
@@ -131,8 +133,10 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const library::Component&
     }
 
     // add signal map
-    foreach (const library::ComponentSignal* signal, cmp.getSignals())
-    {
+    for (int i = 0; i < cmp.getSignalCount(); i++) {
+        const library::ComponentSignal* signal = cmp.getSignal(i);
+        Q_ASSERT(signal); if (!signal) continue;
+
         ComponentSignalInstance* signalInstance = new ComponentSignalInstance(
             mCircuit, *this, *signal, nullptr);
         mSignals.insert(signalInstance->getCompSignal().getUuid(), signalInstance);
@@ -179,14 +183,16 @@ QString ComponentInstance::getValue(bool replaceAttributes) const noexcept
 
 int ComponentInstance::getUnplacedSymbolsCount() const noexcept
 {
-    return (mCompSymbVar->getItems().count() - mSymbols.count());
+    return (mCompSymbVar->getItemCount() - mSymbols.count());
 }
 
 int ComponentInstance::getUnplacedRequiredSymbolsCount() const noexcept
 {
     int count = 0;
-    foreach (const library::ComponentSymbolVariantItem* item, mCompSymbVar->getItems())
-    {
+    for (int i = 0; i < mCompSymbVar->getItemCount(); i++) {
+        const library::ComponentSymbolVariantItem* item = mCompSymbVar->getItem(i);
+        Q_ASSERT(item); if (!item) continue;
+
         if ((item->isRequired()) && (!mSymbols.contains(item->getUuid())))
             count++;
     }
@@ -196,8 +202,10 @@ int ComponentInstance::getUnplacedRequiredSymbolsCount() const noexcept
 int ComponentInstance::getUnplacedOptionalSymbolsCount() const noexcept
 {
     int count = 0;
-    foreach (const library::ComponentSymbolVariantItem* item, mCompSymbVar->getItems())
-    {
+    for (int i = 0; i < mCompSymbVar->getItemCount(); i++) {
+        const library::ComponentSymbolVariantItem* item = mCompSymbVar->getItem(i);
+        Q_ASSERT(item); if (!item) continue;
+
         if ((!item->isRequired()) && (!mSymbols.contains(item->getUuid())))
             count++;
     }
@@ -288,22 +296,22 @@ void ComponentInstance::removeFromCircuit() throw (Exception)
 
 void ComponentInstance::registerSymbol(const SI_Symbol& symbol) throw (Exception)
 {
-    const library::ComponentSymbolVariantItem* item = &symbol.getCompSymbVarItem();
+    Uuid itemUuid = symbol.getCompSymbVarItem().getUuid();
 
     if (!mAddedToCircuit)
-        throw LogicError(__FILE__, __LINE__, item->getUuid().toStr());
-    if (!mCompSymbVar->getItems().contains(item))
+        throw LogicError(__FILE__, __LINE__, itemUuid.toStr());
+    if (!mCompSymbVar->getItemByUuid(itemUuid))
     {
-        throw RuntimeError(__FILE__, __LINE__, item->getUuid().toStr(), QString(tr(
-            "Invalid symbol item in circuit: \"%1\".")).arg(item->getUuid().toStr()));
+        throw RuntimeError(__FILE__, __LINE__, itemUuid.toStr(), QString(tr(
+            "Invalid symbol item in circuit: \"%1\".")).arg(itemUuid.toStr()));
     }
-    if (mSymbols.contains(item->getUuid()))
+    if (mSymbols.contains(itemUuid))
     {
-        throw RuntimeError(__FILE__, __LINE__, item->getUuid().toStr(), QString(tr(
-            "Symbol item UUID already exists in circuit: \"%1\".")).arg(item->getUuid().toStr()));
+        throw RuntimeError(__FILE__, __LINE__, itemUuid.toStr(), QString(tr(
+            "Symbol item UUID already exists in circuit: \"%1\".")).arg(itemUuid.toStr()));
     }
 
-    mSymbols.insert(item->getUuid(), &symbol);
+    mSymbols.insert(itemUuid, &symbol);
     updateErcMessages();
 }
 

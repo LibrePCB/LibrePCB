@@ -22,30 +22,38 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <librepcbcommon/fileio/xmldomelement.h>
-#include "footprinttext.h"
-
-namespace library {
+#include "text.h"
+#include "../fileio/xmldomelement.h"
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-FootprintText::FootprintText() noexcept :
-    mLayerId(0), mText(), mPosition(0, 0), mRotation(0), mHeight(0), mAlign()
+Text::Text(int layerId, const QString& text, const Point& pos, const Angle& rotation,
+           const Length& height, const Alignment& align) noexcept :
+    mLayerId(layerId), mText(text), mPosition(pos), mRotation(rotation), mHeight(height),
+    mAlign(align)
 {
+    Q_ASSERT(layerId >= 0);
+    Q_ASSERT(!text.isEmpty());
+    Q_ASSERT(height > 0);
 }
 
-FootprintText::FootprintText(const XmlDomElement& domElement) throw (Exception)
+Text::Text(const XmlDomElement& domElement) throw (Exception)
 {
     mLayerId = domElement.getAttribute<uint>("layer", true); // use "uint" to automatically check for >= 0
-    mText = domElement.getText<QString>(true);
+    mText = domElement.getText<QString>(true); // empty string --> exception
 
     // load geometry attributes
     mPosition.setX(domElement.getAttribute<Length>("x", true));
     mPosition.setY(domElement.getAttribute<Length>("y", true));
     mRotation = domElement.getAttribute<Angle>("rotation", true);
     mHeight = domElement.getAttribute<Length>("height", true);
+    if (!(mHeight > 0)) {
+        throw RuntimeError(__FILE__, __LINE__, QString(),
+            QString(tr("The height of a text element in the file \"%1\" is <= 0."))
+            .arg(domElement.getDocFilePath().toNative()));
+    }
 
     // text alignment
     mAlign.setH(domElement.getAttribute<HAlign>("h_align", true));
@@ -54,15 +62,52 @@ FootprintText::FootprintText(const XmlDomElement& domElement) throw (Exception)
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-FootprintText::~FootprintText() noexcept
+Text::~Text() noexcept
 {
+}
+
+/*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
+
+void Text::setLayerId(int id) noexcept
+{
+    Q_ASSERT(id >= 0);
+    mLayerId = id;
+}
+
+void Text::setText(const QString& text) noexcept
+{
+    Q_ASSERT(!text.isEmpty());
+    mText = text;
+}
+
+void Text::setPosition(const Point& pos) noexcept
+{
+    mPosition = pos;
+}
+
+void Text::setRotation(const Angle& rotation) noexcept
+{
+    mRotation = rotation;
+}
+
+void Text::setHeight(const Length& height) noexcept
+{
+    Q_ASSERT(height > 0);
+    mHeight = height;
+}
+
+void Text::setAlign(const Alignment& align) noexcept
+{
+    mAlign = align;
 }
 
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* FootprintText::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* Text::serializeToXmlDomElement() const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -82,7 +127,7 @@ XmlDomElement* FootprintText::serializeToXmlDomElement() const throw (Exception)
  *  Private Methods
  ****************************************************************************************/
 
-bool FootprintText::checkAttributesValidity() const noexcept
+bool Text::checkAttributesValidity() const noexcept
 {
     if (mText.isEmpty())    return false;
     if (mHeight <= 0)       return false;
@@ -92,5 +137,3 @@ bool FootprintText::checkAttributesValidity() const noexcept
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
-
-} // namespace library

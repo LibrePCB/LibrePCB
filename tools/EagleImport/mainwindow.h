@@ -50,6 +50,8 @@ class MainWindow : public QMainWindow
         Uuid getOrCreateUuid(QSettings& outputSettings, const FilePath& filepath,
                               const QString& cat, const QString& key1, const QString& key2 = QString());
         QString createDescription(const FilePath& filepath, const QString& name);
+        int convertSchematicLayerId(int eagleLayerId);
+        int convertBoardLayerId(int eagleLayerId);
         void convertAllFiles(ConvertFileType_t type);
         void convertFile(ConvertFileType_t type, QSettings& outputSettings, const FilePath& filepath);
         bool convertSymbol(QSettings& outputSettings, const FilePath& filepath, XmlDomElement* node);

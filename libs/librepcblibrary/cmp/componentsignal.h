@@ -45,18 +45,17 @@ class ComponentSignal final : public IF_XmlSerializableObject
 
         // Types
         enum class SignalRole_t {
-            Power,     ///< Power Pins (GND, VCC, VSS,... of Devices)
-            Input,     ///< Input Pins
-            Output,    ///< Output Pins
-            InOut,     ///< Input/Output Pins
-            OpenDrain, ///< Open Collector / Open Drain Pins
-            Passive,   ///< Passive Pins (R, C, L)
+            POWER,     ///< Power Pins (GND, VCC, VSS,... of Devices)
+            INPUT,     ///< Input Pins
+            OUTPUT,    ///< Output Pins
+            INOUT,     ///< Input/Output Pins
+            OPENDRAIN, ///< Open Collector / Open Drain Pins
+            PASSIVE,   ///< Passive Pins (R, C, L)
         };
 
 
         // Constructors / Destructor
-        explicit ComponentSignal(const Uuid& uuid = Uuid::createRandom(),
-                                 const QString& name = QString()) noexcept;
+        explicit ComponentSignal(const Uuid& uuid, const QString& name) noexcept;
         explicit ComponentSignal(const XmlDomElement& domElement) throw (Exception);
         ~ComponentSignal() noexcept;
 
@@ -87,8 +86,9 @@ class ComponentSignal final : public IF_XmlSerializableObject
     private:
 
         // make some methods inaccessible...
-        ComponentSignal(const ComponentSignal& other);
-        ComponentSignal& operator=(const ComponentSignal& rhs);
+        ComponentSignal() = delete;
+        ComponentSignal(const ComponentSignal& other) = delete;
+        ComponentSignal& operator=(const ComponentSignal& rhs) = delete;
 
         // Private Methods
 

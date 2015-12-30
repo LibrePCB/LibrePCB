@@ -88,6 +88,7 @@ class SES_AddComponents final : public SES_Base
         const library::Component* mComponent;
         const library::ComponentSymbolVariant* mCmpSymbVar;
         const library::ComponentSymbolVariantItem* mCurrentSymbVarItem;
+        int mCurrentSymbVarItemIndex;
         SI_Symbol* mCurrentSymbolToPlace;
         CmdSymbolInstanceEdit* mCurrentSymbolEditCommand;
 };

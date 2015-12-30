@@ -25,6 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <librepcbcommon/geometry/polygon.h>
 
 /*****************************************************************************************
  *  Class PolygonSimplifier
@@ -33,7 +34,7 @@
 /**
  * @brief The PolygonSimplifier class
  */
-template <typename LibElemType, typename PolygonType, typename SegmentType>
+template <typename LibElemType>
 class PolygonSimplifier
 {
     public:
@@ -49,11 +50,9 @@ class PolygonSimplifier
     private:
 
         // Private Methods
-        bool findLineRectangle(QList<const PolygonType*>& lines) noexcept;
-        bool findHLine(const QList<const PolygonType*>& lines, Point& p, Length* width,
-                       const PolygonType** line) noexcept;
-        bool findVLine(const QList<const PolygonType*>& lines, Point& p, Length* width,
-                       const PolygonType** line) noexcept;
+        bool findLineRectangle(QList<Polygon*>& lines) noexcept;
+        bool findHLine(const QList<Polygon*>& lines, Point& p, Length* width, Polygon** line) noexcept;
+        bool findVLine(const QList<Polygon*>& lines, Point& p, Length* width, Polygon** line) noexcept;
 
 
         // Attributes

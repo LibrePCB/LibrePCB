@@ -33,10 +33,13 @@ namespace library {
  ****************************************************************************************/
 
 ComponentSymbolVariant::ComponentSymbolVariant(const Uuid& uuid, const QString& norm,
-                                               bool isDefault) noexcept :
-    mUuid(uuid), mNorm(norm), mIsDefault(isDefault)
+                                               const QString& name_en_US,
+                                               const QString& desc_en_US) noexcept :
+    mUuid(uuid), mNorm(norm)
 {
-    Q_ASSERT(mUuid.isNull() == false);
+    Q_ASSERT(!mUuid.isNull());
+    setName("en_US", name_en_US);
+    setDescription("en_US", desc_en_US);
 }
 
 ComponentSymbolVariant::ComponentSymbolVariant(const XmlDomElement& domElement) throw (Exception)
@@ -46,7 +49,6 @@ ComponentSymbolVariant::ComponentSymbolVariant(const XmlDomElement& domElement) 
         // read attributes
         mUuid = domElement.getAttribute<Uuid>("uuid", true);
         mNorm = domElement.getAttribute<QString>("norm", false);
-        mIsDefault = domElement.getAttribute<bool>("default", true);
 
         // read names and descriptions in all available languages
         LibraryBaseElement::readLocaleDomNodes(domElement, "name", mNames);
@@ -81,7 +83,7 @@ ComponentSymbolVariant::~ComponentSymbolVariant() noexcept
 }
 
 /*****************************************************************************************
- *  Getters
+ *  Getters: Attributes
  ****************************************************************************************/
 
 QString ComponentSymbolVariant::getName(const QStringList& localeOrder) const noexcept
@@ -94,27 +96,6 @@ QString ComponentSymbolVariant::getDescription(const QStringList& localeOrder) c
     return LibraryBaseElement::localeStringFromList(mDescriptions, localeOrder);
 }
 
-const ComponentSymbolVariantItem* ComponentSymbolVariant::getItemByUuid(const Uuid& uuid) const noexcept
-{
-    foreach (const ComponentSymbolVariantItem* item, mSymbolItems)
-    {
-        if (item->getUuid() == uuid)
-            return item;
-    }
-    return nullptr;
-}
-
-const ComponentSymbolVariantItem* ComponentSymbolVariant::getNextItem(const ComponentSymbolVariantItem* item) const noexcept
-{
-    int index = mSymbolItems.indexOf(item);
-    Q_ASSERT(index >= 0);
-
-    if (index+1 < mSymbolItems.count())
-        return mSymbolItems.at(index+1);
-    else
-        return nullptr;
-}
-
 /*****************************************************************************************
  *  Setters
  ****************************************************************************************/
@@ -122,11 +103,6 @@ const ComponentSymbolVariantItem* ComponentSymbolVariant::getNextItem(const Comp
 void ComponentSymbolVariant::setNorm(const QString& norm) noexcept
 {
     mNorm = norm;
-}
-
-void ComponentSymbolVariant::setIsDefault(bool isDefault) noexcept
-{
-    mIsDefault = isDefault;
 }
 
 void ComponentSymbolVariant::setName(const QString& locale, const QString& name) noexcept
@@ -140,20 +116,48 @@ void ComponentSymbolVariant::setDescription(const QString& locale, const QString
 }
 
 /*****************************************************************************************
- *  General Methods
+ *  Symbol Item Methods
  ****************************************************************************************/
 
-void ComponentSymbolVariant::clearItems() noexcept
+ComponentSymbolVariantItem* ComponentSymbolVariant::getItemByUuid(const Uuid& uuid) noexcept
 {
-    qDeleteAll(mSymbolItems);
-    mSymbolItems.clear();
+    const ComponentSymbolVariant* const_this = this;
+    return const_cast<ComponentSymbolVariantItem*>(const_this->getItemByUuid(uuid));
 }
 
-void ComponentSymbolVariant::addItem(const ComponentSymbolVariantItem& item) noexcept
+const ComponentSymbolVariantItem* ComponentSymbolVariant::getItemByUuid(const Uuid& uuid) const noexcept
 {
-    Q_ASSERT(getItemByUuid(item.getUuid()) == nullptr);
+    foreach (const ComponentSymbolVariantItem* item, mSymbolItems) {
+        if (item->getUuid() == uuid)
+            return item;
+    }
+    return nullptr;
+}
+
+QSet<Uuid> ComponentSymbolVariant::getAllItemSymbolUuids() const noexcept
+{
+    QSet<Uuid> set;
+    foreach (const ComponentSymbolVariantItem* item, mSymbolItems) {
+        set.insert(item->getSymbolUuid());
+    }
+    return set;
+}
+
+void ComponentSymbolVariant::addItem(ComponentSymbolVariantItem& item) noexcept
+{
+    Q_ASSERT(!mSymbolItems.contains(&item));
     mSymbolItems.append(&item);
 }
+
+void ComponentSymbolVariant::removeItem(ComponentSymbolVariantItem& item) noexcept
+{
+    Q_ASSERT(mSymbolItems.contains(&item));
+    mSymbolItems.removeAll(&item);
+}
+
+/*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
 
 XmlDomElement* ComponentSymbolVariant::serializeToXmlDomElement() const throw (Exception)
 {
@@ -162,7 +166,6 @@ XmlDomElement* ComponentSymbolVariant::serializeToXmlDomElement() const throw (E
     QScopedPointer<XmlDomElement> root(new XmlDomElement("variant"));
     root->setAttribute("uuid", mUuid);
     root->setAttribute("norm", mNorm);
-    root->setAttribute("default", mIsDefault);
     foreach (const QString& locale, mNames.keys())
         root->appendTextChild("name", mNames.value(locale))->setAttribute("locale", locale);
     foreach (const QString& locale, mDescriptions.keys())

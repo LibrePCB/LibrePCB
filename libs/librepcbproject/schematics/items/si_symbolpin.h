@@ -44,6 +44,7 @@ class ErcMsg;
 namespace library {
 class SymbolPin;
 class ComponentSignal;
+class ComponentPinSignalMapItem;
 }
 
 /*****************************************************************************************
@@ -110,6 +111,7 @@ class SI_SymbolPin final : public SI_Base, public IF_ErcMsgProvider
         SI_Symbol& mSymbol;
         const library::SymbolPin* mSymbolPin;
         const library::ComponentSignal* mComponentSignal;
+        const library::ComponentPinSignalMapItem* mPinSignalMapItem;
         ComponentSignalInstance* mComponentSignalInstance;
         Point mPosition;
         Angle mRotation;

@@ -27,6 +27,7 @@
 #include <QtCore>
 #include <librepcbcommon/uuid.h>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
+#include "componentpinsignalmapitem.h"
 
 /*****************************************************************************************
  *  Class ComponentSymbolVariantItem
@@ -43,26 +44,9 @@ class ComponentSymbolVariantItem final : public IF_XmlSerializableObject
 
     public:
 
-        /// Pin Display Type Enum
-        enum class PinDisplayType_t {
-            None,
-            PinName,
-            ComponentSignal,
-            NetSignal
-        };
-
-        /// Pin-Signal-Map item struct
-        struct PinSignalMapItem_t {
-            Uuid pin;                      ///< must be valid
-            Uuid signal;                   ///< NULL if not connected to a signal
-            PinDisplayType_t displayType;
-        };
-
         // Constructors / Destructor
-        explicit ComponentSymbolVariantItem(const Uuid& uuid = Uuid::createRandom(),
-                                            const Uuid& symbolUuid = Uuid(),
-                                            bool isRequired = false,
-                                            const QString& suffix = QString()) noexcept;
+        explicit ComponentSymbolVariantItem(const Uuid& uuid, const Uuid& symbolUuid,
+                                            bool isRequired, const QString& suffix) noexcept;
         explicit ComponentSymbolVariantItem(const XmlDomElement& domElement) throw (Exception);
         ~ComponentSymbolVariantItem() noexcept;
 
@@ -72,27 +56,28 @@ class ComponentSymbolVariantItem final : public IF_XmlSerializableObject
         bool isRequired() const noexcept {return mIsRequired;}
         const QString& getSuffix() const noexcept {return mSuffix;}
 
-        // Getters: Pin-Signal-Map
-        const QHash<Uuid, PinSignalMapItem_t>& getPinSignalMap() const noexcept {return mPinSignalMap;}
-        Uuid getSignalOfPin(const Uuid& pinUuid) const noexcept;
-        PinDisplayType_t getDisplayTypeOfPin(const Uuid& pinUuid) const noexcept;
+        // Pin-Signal-Map Methods
+        const QMap<Uuid, ComponentPinSignalMapItem*>& getPinSignalMappings() noexcept {return mPinSignalMap;}
+        QList<Uuid> getPinUuids() const noexcept {return mPinSignalMap.keys();}
+        ComponentPinSignalMapItem* getPinSignalMapItemOfPin(const Uuid& pinUuid) noexcept {return mPinSignalMap.value(pinUuid);}
+        const ComponentPinSignalMapItem* getPinSignalMapItemOfPin(const Uuid& pinUuid) const noexcept {return mPinSignalMap.value(pinUuid);}
+        void addPinSignalMapItem(ComponentPinSignalMapItem& item) noexcept;
+        void removePinSignalMapItem(ComponentPinSignalMapItem& item) noexcept;
 
-        // General Methods
-        void addPinSignalMapping(const Uuid& pin, const Uuid& signal, PinDisplayType_t display) noexcept;
-
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc #IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
 
     private:
 
         // make some methods inaccessible...
-        ComponentSymbolVariantItem(const ComponentSymbolVariantItem& other);
-        ComponentSymbolVariantItem& operator=(const ComponentSymbolVariantItem& rhs);
+        ComponentSymbolVariantItem() = delete;
+        ComponentSymbolVariantItem(const ComponentSymbolVariantItem& other) = delete;
+        ComponentSymbolVariantItem& operator=(const ComponentSymbolVariantItem& rhs) = delete;
 
         // Private Methods
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc #IF_XmlSerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 
@@ -101,7 +86,7 @@ class ComponentSymbolVariantItem final : public IF_XmlSerializableObject
         Uuid mSymbolUuid;
         bool mIsRequired;
         QString mSuffix;
-        QHash<Uuid, PinSignalMapItem_t> mPinSignalMap; ///< All pins required!
+        QMap<Uuid, ComponentPinSignalMapItem*> mPinSignalMap; ///< Key: Pin UUID (all pins required!)
 };
 
 } // namespace library

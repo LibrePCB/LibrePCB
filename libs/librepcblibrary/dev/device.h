@@ -43,28 +43,25 @@ class Device final : public LibraryElement
     public:
 
         // Constructors / Destructor
-        explicit Device(const Uuid& uuid = Uuid::createRandom(),
-                        const Version& version = Version(),
-                        const QString& author = QString(),
-                        const QString& name_en_US = QString(),
-                        const QString& description_en_US = QString(),
-                        const QString& keywords_en_US = QString()) throw (Exception);
+        explicit Device(const Uuid& uuid, const Version& version, const QString& author,
+                        const QString& name_en_US, const QString& description_en_US,
+                        const QString& keywords_en_US) throw (Exception);
         explicit Device(const FilePath& elementDirectory) throw (Exception);
         ~Device() noexcept;
 
         // Getters
         const Uuid& getComponentUuid() const noexcept {return mComponentUuid;}
         const Uuid& getPackageUuid() const noexcept {return mPackageUuid;}
-        const QHash<Uuid, Uuid>& getPadSignalMap() const noexcept {return mPadSignalMap;}
-        Uuid getSignalOfPad(const Uuid& pad) const noexcept {return mPadSignalMap.value(pad);}
 
         // Setters
         void setComponentUuid(const Uuid& uuid) noexcept {mComponentUuid = uuid;}
         void setPackageUuid(const Uuid& uuid) noexcept {mPackageUuid = uuid;}
 
-        // General Methods
-        void clearPadSignalMap() noexcept {mPadSignalMap.clear();}
-        void addPadSignalMapping(const Uuid& pad, const Uuid& signal) noexcept {mPadSignalMap.insert(pad, signal);}
+        // Pad-Signal-Map Methods
+        const QHash<Uuid, Uuid>& getPadSignalMap() const noexcept {return mPadSignalMap;}
+        Uuid getSignalOfPad(const Uuid& pad) const noexcept {return mPadSignalMap.value(pad);}
+        void addPadSignalMapping(const Uuid& pad, const Uuid& signal) noexcept;
+        void removePadSignalMapping(const Uuid& pad) noexcept;
 
 
     private:

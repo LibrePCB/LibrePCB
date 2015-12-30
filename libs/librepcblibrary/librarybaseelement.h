@@ -49,12 +49,10 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
         // Constructors / Destructor
         explicit LibraryBaseElement(const QString& xmlFileNamePrefix,
                                     const QString& xmlRootNodeName,
-                                    const Uuid& uuid = Uuid::createRandom(),
-                                    const Version& version = Version(),
-                                    const QString& author = QString(),
-                                    const QString& name_en_US = QString(),
-                                    const QString& description_en_US = QString(),
-                                    const QString& keywords_en_US = QString()) throw (Exception);
+                                    const Uuid& uuid, const Version& version,
+                                    const QString& author, const QString& name_en_US,
+                                    const QString& description_en_US,
+                                    const QString& keywords_en_US) throw (Exception);
         explicit LibraryBaseElement(const FilePath& elementDirectory,
                                     const QString& xmlFileNamePrefix,
                                     const QString& xmlRootNodeName) throw (Exception);
@@ -182,6 +180,17 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
 
         // Protected Methods
         void readFromFile() throw (Exception);
+
+        /**
+         * @brief Parse and load a DOM tree into this library element object
+         *
+         * Each subclass of #LibraryBaseElement has to override this method and must call
+         * that method on all base classes before loading its own properties!
+         *
+         * @param root          DOM tree root element
+         *
+         * @throw Exception     On any error (for example invalid content in XML files)
+         */
         virtual void parseDomTree(const XmlDomElement& root) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()

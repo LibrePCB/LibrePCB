@@ -25,11 +25,11 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <librepcbcommon/geometry/polygon.h>
+#include <librepcbcommon/geometry/ellipse.h>
+#include <librepcbcommon/geometry/text.h>
 #include "../libraryelement.h"
 #include "symbolpin.h"
-#include "symbolpolygon.h"
-#include "symboltext.h"
-#include "symbolellipse.h"
 
 /*****************************************************************************************
  *  Class Symbol
@@ -47,52 +47,68 @@ class Symbol final : public LibraryElement
     public:
 
         // Constructors / Destructor
-        explicit Symbol(const Uuid& uuid = Uuid::createRandom(),
-                        const Version& version = Version(),
-                        const QString& author = QString(),
-                        const QString& name_en_US = QString(),
-                        const QString& description_en_US = QString(),
-                        const QString& keywords_en_US = QString()) throw (Exception);
+        explicit Symbol(const Uuid& uuid, const Version& version, const QString& author,
+                        const QString& name_en_US, const QString& description_en_US,
+                        const QString& keywords_en_US) throw (Exception);
         explicit Symbol(const FilePath& elementDirectory) throw (Exception);
         ~Symbol() noexcept;
 
-        // Getters
+        // SymbolPin Methods
+        const QMap<Uuid, SymbolPin*>& getPins() noexcept {return mPins;}
+        QList<Uuid> getPinUuids() const noexcept {return mPins.keys();}
+        SymbolPin* getPinByUuid(const Uuid& uuid) noexcept {return mPins.value(uuid);}
         const SymbolPin* getPinByUuid(const Uuid& uuid) const noexcept {return mPins.value(uuid);}
-        const QHash<Uuid, const SymbolPin*>& getPins() const noexcept {return mPins;}
-        const QList<const SymbolPolygon*>& getPolygons() const noexcept {return mPolygons;}
-        const QList<const SymbolText*>& getTexts() const noexcept {return mTexts;}
-        const QList<const SymbolEllipse*>& getEllipses() const noexcept {return mEllipses;}
+        void addPin(SymbolPin& pin) noexcept;
+        void removePin(SymbolPin& pin) noexcept;
 
-        // General Methods
-        void addPin(const SymbolPin* pin) noexcept {mPins.insert(pin->getUuid(), pin);}
-        void addPolygon(const SymbolPolygon* polygon) noexcept {mPolygons.append(polygon);}
-        void removePolygon(const SymbolPolygon* polygon) noexcept {mPolygons.removeAll(polygon); delete polygon;}
-        void addText(const SymbolText* text) noexcept {mTexts.append(text);}
-        void addEllipse(const SymbolEllipse* ellipse) noexcept {mEllipses.append(ellipse);}
+        // Polygon Methods
+        const QList<Polygon*>& getPolygons() noexcept {return mPolygons;}
+        int getPolygonCount() const noexcept {return mPolygons.count();}
+        Polygon* getPolygon(int index) noexcept {return mPolygons.value(index);}
+        const Polygon* getPolygon(int index) const noexcept {return mPolygons.value(index);}
+        void addPolygon(Polygon& polygon) noexcept;
+        void removePolygon(Polygon& polygon) noexcept;
+
+        // Ellipse Methods
+        const QList<Ellipse*>& getEllipses() noexcept {return mEllipses;}
+        int getEllipseCount() const noexcept {return mEllipses.count();}
+        Ellipse* getEllipse(int index) noexcept {return mEllipses.value(index);}
+        const Ellipse* getEllipse(int index) const noexcept {return mEllipses.value(index);}
+        void addEllipse(Ellipse& ellipse) noexcept;
+        void removeEllipse(Ellipse& ellipse) noexcept;
+
+        // Text Methods
+        const QList<Text*>& getTexts() noexcept {return mTexts;}
+        int getTextCount() const noexcept {return mTexts.count();}
+        Text* getText(int index) noexcept {return mTexts.value(index);}
+        const Text* getText(int index) const noexcept {return mTexts.value(index);}
+        void addText(Text& text) noexcept;
+        void removeText(Text& text) noexcept;
 
 
     private:
 
         // make some methods inaccessible...
-        Symbol(const Symbol& other);
-        Symbol& operator=(const Symbol& rhs);
+        Symbol() = delete;
+        Symbol(const Symbol& other) = delete;
+        Symbol& operator=(const Symbol& rhs) = delete;
 
 
         // Private Methods
         void parseDomTree(const XmlDomElement& root) throw (Exception);
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc #IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc #IF_XmlSerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 
         // Symbol Attributes
-        QHash<Uuid, const SymbolPin*> mPins;
-        QList<const SymbolPolygon*> mPolygons;
-        QList<const SymbolText*> mTexts;
-        QList<const SymbolEllipse*> mEllipses;
+        QMap<Uuid, SymbolPin*> mPins;
+        QList<Polygon*> mPolygons;
+        QList<Ellipse*> mEllipses;
+        QList<Text*> mTexts;
 };
 
 } // namespace library
