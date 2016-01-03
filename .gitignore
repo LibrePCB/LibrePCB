@@ -26,3 +26,6 @@ build/
 
 # Compiled Translation Files
 i18n/*.qm
+
+# Vim
+.swp
