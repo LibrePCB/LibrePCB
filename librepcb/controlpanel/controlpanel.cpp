@@ -281,7 +281,11 @@ void ControlPanel::projectEditorClosed() noexcept
 
 void ControlPanel::on_actionAbout_triggered()
 {
-    QMessageBox::about(this, tr("About"), tr("LibrePCB is a free & OpenSource Schematic/Layout-Editor"));
+    QMessageBox::about(this, tr("About"), tr(
+        "LibrePCB is a free & open source schematic/layout-editor."
+        "<br><br>"
+        "You can find the project on GitHub:<br>"
+        "<a href='https://github.com/LibrePCB/LibrePCB'>https://github.com/LibrePCB/LibrePCB</a>"));
 }
 
 void ControlPanel::on_actionNew_Project_triggered()
