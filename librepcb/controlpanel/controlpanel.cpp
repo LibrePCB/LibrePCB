@@ -214,6 +214,11 @@ ProjectEditor* ControlPanel::openProject(const FilePath& filepath) noexcept
         editor->showAllRequiredEditors();
         return editor;
     }
+    catch (UserCanceled& e)
+    {
+        // do nothing
+        return nullptr;
+    }
     catch (Exception& e)
     {
         QMessageBox::critical(this, tr("Could not open project"), e.getUserMsg());
