@@ -14,7 +14,7 @@
    <string>LibrePCB ControlPanel</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../../../img/images.qrc">
+   <iconset resource="../../img/images.qrc">
     <normaloff>:/img/app.png</normaloff>:/img/app.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
@@ -100,7 +100,7 @@
               <string>New Project</string>
              </property>
              <property name="icon">
-              <iconset resource="../../../img/images.qrc">
+              <iconset resource="../../img/images.qrc">
                <normaloff>:/img/actions/new.png</normaloff>:/img/actions/new.png</iconset>
              </property>
              <property name="iconSize">
@@ -117,7 +117,7 @@
               <string>Open Project</string>
              </property>
              <property name="icon">
-              <iconset resource="../../../img/images.qrc">
+              <iconset resource="../../img/images.qrc">
                <normaloff>:/img/actions/open.png</normaloff>:/img/actions/open.png</iconset>
              </property>
              <property name="iconSize">
@@ -134,7 +134,7 @@
               <string>Library Editor</string>
              </property>
              <property name="icon">
-              <iconset resource="../../../img/images.qrc">
+              <iconset resource="../../img/images.qrc">
                <normaloff>:/img/library/symbol.png</normaloff>:/img/library/symbol.png</iconset>
              </property>
              <property name="iconSize">
@@ -405,7 +405,7 @@ QListView::item
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionQuit">
    <property name="icon">
-    <iconset resource="../../../img/images.qrc">
+    <iconset resource="../../img/images.qrc">
      <normaloff>:/img/actions/quit.png</normaloff>:/img/actions/quit.png</iconset>
    </property>
    <property name="text">
@@ -428,7 +428,7 @@ QListView::item
   </action>
   <action name="actionAbout">
    <property name="icon">
-    <iconset resource="../../../img/images.qrc">
+    <iconset resource="../../img/images.qrc">
      <normaloff>:/img/actions/info.png</normaloff>:/img/actions/info.png</iconset>
    </property>
    <property name="text">
@@ -440,7 +440,7 @@ QListView::item
   </action>
   <action name="actionNew_Project">
    <property name="icon">
-    <iconset resource="../../../img/images.qrc">
+    <iconset resource="../../img/images.qrc">
      <normaloff>:/img/actions/new.png</normaloff>:/img/actions/new.png</iconset>
    </property>
    <property name="text">
@@ -449,7 +449,7 @@ QListView::item
   </action>
   <action name="actionOpen_Project">
    <property name="icon">
-    <iconset resource="../../../img/images.qrc">
+    <iconset resource="../../img/images.qrc">
      <normaloff>:/img/actions/open.png</normaloff>:/img/actions/open.png</iconset>
    </property>
    <property name="text">
@@ -463,7 +463,7 @@ QListView::item
   </action>
   <action name="actionWorkspace_Settings">
    <property name="icon">
-    <iconset resource="../../../img/images.qrc">
+    <iconset resource="../../img/images.qrc">
      <normaloff>:/img/actions/settings.png</normaloff>:/img/actions/settings.png</iconset>
    </property>
    <property name="text">
@@ -475,7 +475,7 @@ QListView::item
   </action>
   <action name="actionOpen_Library_Editor">
    <property name="icon">
-    <iconset resource="../../../img/images.qrc">
+    <iconset resource="../../img/images.qrc">
      <normaloff>:/img/library/symbol.png</normaloff>:/img/library/symbol.png</iconset>
    </property>
    <property name="text">
@@ -484,7 +484,7 @@ QListView::item
   </action>
   <action name="actionClose_all_open_projects">
    <property name="icon">
-    <iconset resource="../../../img/images.qrc">
+    <iconset resource="../../img/images.qrc">
      <normaloff>:/img/actions/close.png</normaloff>:/img/actions/close.png</iconset>
    </property>
    <property name="text">
@@ -506,7 +506,7 @@ QListView::item
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../img/images.qrc"/>
+  <include location="../../img/images.qrc"/>
  </resources>
  <connections>
   <connection>
