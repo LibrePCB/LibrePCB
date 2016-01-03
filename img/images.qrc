@@ -47,9 +47,9 @@
         <file>command_toolbars/wireVH.png</file>
         <file>command_toolbars/cancel.png</file>
         <file>library/3d_model.png</file>
-        <file>library/component.png</file>
+        <file>library/device.png</file>
         <file>library/footprint.png</file>
-        <file>library/generic_component.png</file>
+        <file>library/component.png</file>
         <file>library/package.png</file>
         <file>library/spice_model.png</file>
         <file>library/symbol.png</file>

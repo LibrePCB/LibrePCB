@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>LibrePCB ProjectLibraryUpdater</string>
+   <string>LibrePCB WorkspaceLibraryUpdater</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
@@ -146,20 +146,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="cbx_fpt">
-        <property name="text">
-         <string>fpt</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="cbx_3dmdl">
-        <property name="text">
-         <string>3dmdl</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QCheckBox" name="cbx_pkg">
         <property name="text">
          <string>pkg</string>
@@ -167,16 +153,16 @@
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="cbx_gencmp">
+       <widget class="QCheckBox" name="cbx_cmp">
         <property name="text">
-         <string>gencmp</string>
+         <string>cmp</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="cbx_cmp">
+       <widget class="QCheckBox" name="cbx_dev">
         <property name="text">
-         <string>cmp</string>
+         <string>dev</string>
         </property>
        </widget>
       </item>

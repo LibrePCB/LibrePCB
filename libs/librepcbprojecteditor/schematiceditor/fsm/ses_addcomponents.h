@@ -32,16 +32,16 @@
  ****************************************************************************************/
 
 namespace library {
-class GenericComponent;
-class GenCompSymbVar;
-class GenCompSymbVarItem;
+class Component;
+class ComponentSymbolVariant;
+class ComponentSymbolVariantItem;
 }
 
 namespace project {
-class GenCompInstance;
+class ComponentInstance;
 class SI_Symbol;
 class CmdSymbolInstanceEdit;
-class AddGenCompDialog;
+class AddComponentDialog;
 }
 
 /*****************************************************************************************
@@ -75,19 +75,20 @@ class SES_AddComponents final : public SES_Base
 
         // Private Methods
         ProcRetVal processSceneEvent(SEE_Base* event) noexcept;
-        void startAddingComponent(const QUuid& genComp = QUuid(), const QUuid& symbVar = QUuid()) throw (Exception);
+        void startAddingComponent(const Uuid& cmp = Uuid(), const Uuid& symbVar = Uuid()) throw (Exception);
         bool abortCommand(bool showErrMsgBox) noexcept;
 
 
         // Attributes
         bool mIsUndoCmdActive;
-        AddGenCompDialog* mAddGenCompDialog;
+        AddComponentDialog* mAddComponentDialog;
         Angle mLastAngle;
 
         // information about the current symbol to place
-        const library::GenericComponent* mGenComp;
-        const library::GenCompSymbVar* mGenCompSymbVar;
-        const library::GenCompSymbVarItem* mCurrentSymbVarItem;
+        const library::Component* mComponent;
+        const library::ComponentSymbolVariant* mCmpSymbVar;
+        const library::ComponentSymbolVariantItem* mCurrentSymbVarItem;
+        int mCurrentSymbVarItemIndex;
         SI_Symbol* mCurrentSymbolToPlace;
         CmdSymbolInstanceEdit* mCurrentSymbolEditCommand;
 };

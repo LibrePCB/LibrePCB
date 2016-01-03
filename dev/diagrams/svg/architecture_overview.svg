@@ -198,7 +198,7 @@
     <tspan x="1220" y="713.867">- Error handling: Exceptions or something like "isValid()" (avoid message boxes!)</tspan>
   </text>
   <text font-size="13.5467" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="1220" y="520">
-    <tspan x="1220" y="520">Classes which represent LibrePCB library elements (symbols, footprints, ...)</tspan>
+    <tspan x="1220" y="520">Classes which represent LibrePCB library elements (symbols, components, ...)</tspan>
     <tspan x="1220" y="536.933">- Depends only on liblibrepcbcommon.a</tspan>
     <tspan x="1220" y="553.867">- Represents only the data of library elements, contains no GUI widgets to modify them</tspan>
     <tspan x="1220" y="570.8">- Provides undo commands to modify library elements, but does not provide an undo stack</tspan>

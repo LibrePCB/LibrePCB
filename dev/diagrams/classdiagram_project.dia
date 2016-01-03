@@ -28,7 +28,7 @@
           <dia:boolean val="false"/>
         </dia:attribute>
         <dia:attribute name="scaling">
-          <dia:real val="0.18332234025001526"/>
+          <dia:real val="0.18332231044769287"/>
         </dia:attribute>
         <dia:attribute name="fitto">
           <dia:boolean val="true"/>
@@ -86,7 +86,7 @@
         <dia:real val="2.2000000000000002"/>
       </dia:attribute>
       <dia:attribute name="name">
-        <dia:string>#GenCompInstance#</dia:string>
+        <dia:string>#ComponentInstance#</dia:string>
       </dia:attribute>
       <dia:attribute name="stereotype">
         <dia:string>#IF_XmlSerializableObject,...#</dia:string>
@@ -196,7 +196,7 @@
         <dia:real val="2.2000000000000002"/>
       </dia:attribute>
       <dia:attribute name="name">
-        <dia:string>#SymbolInstance#</dia:string>
+        <dia:string>#SI_Symbol#</dia:string>
       </dia:attribute>
       <dia:attribute name="stereotype">
         <dia:string>#IF_XmlSerializableObject,...#</dia:string>
@@ -306,7 +306,7 @@
         <dia:real val="2.2000000000000002"/>
       </dia:attribute>
       <dia:attribute name="name">
-        <dia:string>#FootprintInstance#</dia:string>
+        <dia:string>#DeviceInstance#</dia:string>
       </dia:attribute>
       <dia:attribute name="stereotype">
         <dia:string>#IF_XmlSerializableObject,...#</dia:string>
@@ -514,19 +514,19 @@
         <dia:point val="35,16"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="34.95,15.95;44.1625,18.25"/>
+        <dia:rectangle val="34.95,15.95;43.635,18.25"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="35,16"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="9.1125000000000007"/>
+        <dia:real val="8.5849999999999991"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
         <dia:real val="2.2000000000000002"/>
       </dia:attribute>
       <dia:attribute name="name">
-        <dia:string>#SymbolPinInstance#</dia:string>
+        <dia:string>#SI_SymbolPin#</dia:string>
       </dia:attribute>
       <dia:attribute name="stereotype">
         <dia:string>#IF_ErcMsgProvider#</dia:string>
@@ -624,19 +624,19 @@
         <dia:point val="89,16"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="88.95,15.95;99.2725,17.45"/>
+        <dia:rectangle val="88.95,15.95;98.1025,17.45"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="89,16"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="10.2225"/>
+        <dia:real val="9.0525000000000002"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
         <dia:real val="1.3999999999999999"/>
       </dia:attribute>
       <dia:attribute name="name">
-        <dia:string>#FootprintPadInstance#</dia:string>
+        <dia:string>#DevicePadInstance#</dia:string>
       </dia:attribute>
       <dia:attribute name="stereotype">
         <dia:string>##</dia:string>
@@ -2154,7 +2154,7 @@
         <dia:real val="2.2000000000000002"/>
       </dia:attribute>
       <dia:attribute name="name">
-        <dia:string>#GenCompSignalInstance#</dia:string>
+        <dia:string>#ComponentSignalInstance#</dia:string>
       </dia:attribute>
       <dia:attribute name="stereotype">
         <dia:string>#IF_XmlSerializableObject,...#</dia:string>
@@ -2850,22 +2850,22 @@
     </dia:object>
     <dia:object type="UML - Note" version="0" id="O30">
       <dia:attribute name="obj_pos">
-        <dia:point val="-20,15"/>
+        <dia:point val="-19,15"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-20.05,14.95;-8.655,21.55"/>
+        <dia:rectangle val="-19.05,14.95;-9.965,19.95"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="-20,15"/>
+        <dia:point val="-19,15"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="11.295"/>
+        <dia:real val="8.9849999999999994"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
-        <dia:real val="6.5"/>
+        <dia:real val="4.8999999999999995"/>
       </dia:attribute>
       <dia:attribute name="line_width">
         <dia:real val="0.10000000000000001"/>
@@ -2880,12 +2880,10 @@
         <dia:composite type="text">
           <dia:attribute name="string">
             <dia:string>#- library::Symbol
-- library::Footprint
-- library::Model
 - library::SpiceModel
 - library::Package
-- library::GenericComponent
-- library::Component#</dia:string>
+- library::Component
+- library::Device#</dia:string>
           </dia:attribute>
           <dia:attribute name="font">
             <dia:font family="monospace" style="0" name="Courier"/>
@@ -2894,7 +2892,7 @@
             <dia:real val="0.80000000000000004"/>
           </dia:attribute>
           <dia:attribute name="pos">
-            <dia:point val="-19.65,16.245"/>
+            <dia:point val="-18.65,16.245"/>
           </dia:attribute>
           <dia:attribute name="color">
             <dia:color val="#000000"/>
@@ -2946,16 +2944,16 @@
         <dia:point val="-14.5412,10.2503"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-15.2912,9.50028;-12.6125,15.7496"/>
+        <dia:rectangle val="-15.2912,9.50028;-12.7675,15.7497"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
         <dia:point val="-14.5412,10.2503"/>
-        <dia:point val="-14.5412,12.9499"/>
-        <dia:point val="-14.3525,12.9499"/>
-        <dia:point val="-14.3525,14.9496"/>
+        <dia:point val="-14.5412,12.95"/>
+        <dia:point val="-14.5075,12.95"/>
+        <dia:point val="-14.5075,14.9497"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -4122,19 +4120,19 @@
         <dia:point val="9,25"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="8.95,24.95;21.8375,27.25"/>
+        <dia:rectangle val="8.95,24.95;22.6825,27.25"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="9,25"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="12.7875"/>
+        <dia:real val="13.632499999999999"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
         <dia:real val="2.2000000000000002"/>
       </dia:attribute>
       <dia:attribute name="name">
-        <dia:string>#GenCompAttributeInstance#</dia:string>
+        <dia:string>#ComponentAttributeInstance#</dia:string>
       </dia:attribute>
       <dia:attribute name="stereotype">
         <dia:string>#IF_XmlSerializableObject#</dia:string>
@@ -4522,7 +4520,7 @@
         <dia:point val="-19,39"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-19,38.3863;-10.9563,39.1899"/>
+        <dia:rectangle val="-19,38.405;-10.975,39.1525"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -4556,19 +4554,19 @@
         <dia:point val="-19,32"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-19.05,31.95;-9.495,34.25"/>
+        <dia:rectangle val="-19.05,31.95;-8.65,34.25"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="-19,32"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="9.4550000000000001"/>
+        <dia:real val="10.300000000000001"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
         <dia:real val="2.2000000000000002"/>
       </dia:attribute>
       <dia:attribute name="name">
-        <dia:string>#AddGenCompDialog#</dia:string>
+        <dia:string>#AddComponentDialog#</dia:string>
       </dia:attribute>
       <dia:attribute name="stereotype">
         <dia:string>#QDialog#</dia:string>
@@ -5361,17 +5359,17 @@
         <dia:boolean val="false"/>
       </dia:attribute>
       <dia:attribute name="obj_pos">
-        <dia:point val="44.1125,17.1"/>
+        <dia:point val="43.585,17.1"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="43.3625,16.3;47.05,17.9"/>
+        <dia:rectangle val="42.835,16.3;47.05,17.9"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="44.1125,17.1"/>
-        <dia:point val="44.8625,17.1"/>
+        <dia:point val="43.585,17.1"/>
+        <dia:point val="44.335,17.1"/>
         <dia:point val="46.95,17.1"/>
         <dia:point val="47,17.1"/>
       </dia:attribute>

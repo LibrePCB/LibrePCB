@@ -93,18 +93,6 @@ void CmdProjectLibraryAddElement<library::Symbol>::addElement()
 }
 
 template <>
-void CmdProjectLibraryAddElement<library::Footprint>::addElement()
-{
-    return mLibrary.addFootprint(mElement);
-}
-
-template <>
-void CmdProjectLibraryAddElement<library::Model3D>::addElement()
-{
-    return mLibrary.add3dModel(mElement);
-}
-
-template <>
 void CmdProjectLibraryAddElement<library::SpiceModel>::addElement()
 {
     return mLibrary.addSpiceModel(mElement);
@@ -117,33 +105,21 @@ void CmdProjectLibraryAddElement<library::Package>::addElement()
 }
 
 template <>
-void CmdProjectLibraryAddElement<library::GenericComponent>::addElement()
+void CmdProjectLibraryAddElement<library::Component>::addElement()
 {
-    return mLibrary.addGenComp(mElement);
+    return mLibrary.addComponent(mElement);
 }
 
 template <>
-void CmdProjectLibraryAddElement<library::Component>::addElement()
+void CmdProjectLibraryAddElement<library::Device>::addElement()
 {
-    return mLibrary.addComp(mElement);
+    return mLibrary.addDevice(mElement);
 }
 
 template <>
 void CmdProjectLibraryAddElement<library::Symbol>::removeElement()
 {
     mLibrary.removeSymbol(mElement);
-}
-
-template <>
-void CmdProjectLibraryAddElement<library::Footprint>::removeElement()
-{
-    mLibrary.removeFootprint(mElement);
-}
-
-template <>
-void CmdProjectLibraryAddElement<library::Model3D>::removeElement()
-{
-    mLibrary.remove3dModel(mElement);
 }
 
 template <>
@@ -159,15 +135,15 @@ void CmdProjectLibraryAddElement<library::Package>::removeElement()
 }
 
 template <>
-void CmdProjectLibraryAddElement<library::GenericComponent>::removeElement()
+void CmdProjectLibraryAddElement<library::Component>::removeElement()
 {
-    mLibrary.removeGenComp(mElement);
+    mLibrary.removeComponent(mElement);
 }
 
 template <>
-void CmdProjectLibraryAddElement<library::Component>::removeElement()
+void CmdProjectLibraryAddElement<library::Device>::removeElement()
 {
-    mLibrary.removeComp(mElement);
+    mLibrary.removeDevice(mElement);
 }
 
 /*****************************************************************************************
@@ -175,12 +151,10 @@ void CmdProjectLibraryAddElement<library::Component>::removeElement()
  ****************************************************************************************/
 
 template class CmdProjectLibraryAddElement<library::Symbol>;
-template class CmdProjectLibraryAddElement<library::Footprint>;
-template class CmdProjectLibraryAddElement<library::Model3D>;
 template class CmdProjectLibraryAddElement<library::SpiceModel>;
 template class CmdProjectLibraryAddElement<library::Package>;
-template class CmdProjectLibraryAddElement<library::GenericComponent>;
 template class CmdProjectLibraryAddElement<library::Component>;
+template class CmdProjectLibraryAddElement<library::Device>;
 
 /*****************************************************************************************
  *  End of File

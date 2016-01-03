@@ -60,7 +60,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             mXmlFile = SmartXmlFile::create(mFilePath);
 
             // set attributes
-            mUuid = QUuid::createUuid();
+            mUuid = Uuid::createRandom();
             mName = newName;
 
             // load default grid properties
@@ -74,8 +74,8 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
 
             // the schematic seems to be ready to open, so we will create all needed objects
 
-            mUuid = root.getFirstChild("meta/uuid", true, true)->getText<QUuid>();
-            mName = root.getFirstChild("meta/name", true, true)->getText(true);
+            mUuid = root.getFirstChild("meta/uuid", true, true)->getText<Uuid>(true);
+            mName = root.getFirstChild("meta/name", true, true)->getText<QString>(true);
 
             // Load grid properties
             mGridProperties = new GridProperties(*root.getFirstChild("properties/grid_properties", true, true));
@@ -357,7 +357,7 @@ void Schematic::setGridProperties(const GridProperties& grid) noexcept
  *  Symbol Methods
  ****************************************************************************************/
 
-SI_Symbol* Schematic::getSymbolByUuid(const QUuid& uuid) const noexcept
+SI_Symbol* Schematic::getSymbolByUuid(const Uuid& uuid) const noexcept
 {
     foreach (SI_Symbol* symbol, mSymbols)
     {
@@ -367,10 +367,10 @@ SI_Symbol* Schematic::getSymbolByUuid(const QUuid& uuid) const noexcept
     return nullptr;
 }
 
-SI_Symbol* Schematic::createSymbol(GenCompInstance& genCompInstance, const QUuid& symbolItem,
+SI_Symbol* Schematic::createSymbol(ComponentInstance& cmpInstance, const Uuid& symbolItem,
                                    const Point& position, const Angle& angle) throw (Exception)
 {
-    return new SI_Symbol(*this, genCompInstance, symbolItem, position, angle);
+    return new SI_Symbol(*this, cmpInstance, symbolItem, position, angle);
 }
 
 void Schematic::addSymbol(SI_Symbol& symbol) throw (Exception)
@@ -378,9 +378,9 @@ void Schematic::addSymbol(SI_Symbol& symbol) throw (Exception)
     // check if there is no symbol with the same uuid in the list
     if (getSymbolByUuid(symbol.getUuid()))
     {
-        throw RuntimeError(__FILE__, __LINE__, symbol.getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, symbol.getUuid().toStr(),
             QString(tr("There is already a symbol with the UUID \"%1\"!"))
-            .arg(symbol.getUuid().toString()));
+            .arg(symbol.getUuid().toStr()));
     }
 
     // add to schematic
@@ -401,7 +401,7 @@ void Schematic::removeSymbol(SI_Symbol& symbol) throw (Exception)
  *  NetPoint Methods
  ****************************************************************************************/
 
-SI_NetPoint* Schematic::getNetPointByUuid(const QUuid& uuid) const noexcept
+SI_NetPoint* Schematic::getNetPointByUuid(const Uuid& uuid) const noexcept
 {
     foreach (SI_NetPoint* netpoint, mNetPoints)
     {
@@ -426,9 +426,9 @@ void Schematic::addNetPoint(SI_NetPoint& netpoint) throw (Exception)
     // check if there is no netpoint with the same uuid in the list
     if (getNetPointByUuid(netpoint.getUuid()))
     {
-        throw RuntimeError(__FILE__, __LINE__, netpoint.getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, netpoint.getUuid().toStr(),
             QString(tr("There is already a netpoint with the UUID \"%1\"!"))
-            .arg(netpoint.getUuid().toString()));
+            .arg(netpoint.getUuid().toStr()));
     }
 
     // add to schematic
@@ -444,9 +444,9 @@ void Schematic::removeNetPoint(SI_NetPoint& netpoint) throw (Exception)
     if (netpoint.getLines().count() > 0)
     {
         throw RuntimeError(__FILE__, __LINE__, QString("%1:%2")
-            .arg(netpoint.getUuid().toString()).arg(netpoint.getLines().count()),
+            .arg(netpoint.getUuid().toStr()).arg(netpoint.getLines().count()),
             QString(tr("There are already netlines connected to the netpoint \"%1\"!"))
-            .arg(netpoint.getUuid().toString()));
+            .arg(netpoint.getUuid().toStr()));
     }
 
     // remove from schematic
@@ -458,7 +458,7 @@ void Schematic::removeNetPoint(SI_NetPoint& netpoint) throw (Exception)
  *  NetLine Methods
  ****************************************************************************************/
 
-SI_NetLine* Schematic::getNetLineByUuid(const QUuid& uuid) const noexcept
+SI_NetLine* Schematic::getNetLineByUuid(const Uuid& uuid) const noexcept
 {
     foreach (SI_NetLine* netline, mNetLines)
     {
@@ -479,9 +479,9 @@ void Schematic::addNetLine(SI_NetLine& netline) throw (Exception)
     // check if there is no netline with the same uuid in the list
     if (getNetLineByUuid(netline.getUuid()))
     {
-        throw RuntimeError(__FILE__, __LINE__, netline.getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, netline.getUuid().toStr(),
             QString(tr("There is already a netline with the UUID \"%1\"!"))
-            .arg(netline.getUuid().toString()));
+            .arg(netline.getUuid().toStr()));
     }
 
     // add to schematic
@@ -502,7 +502,7 @@ void Schematic::removeNetLine(SI_NetLine& netline) throw (Exception)
  *  NetLabel Methods
  ****************************************************************************************/
 
-SI_NetLabel* Schematic::getNetLabelByUuid(const QUuid& uuid) const noexcept
+SI_NetLabel* Schematic::getNetLabelByUuid(const Uuid& uuid) const noexcept
 {
     foreach (SI_NetLabel* netlabel, mNetLabels)
     {
@@ -522,9 +522,9 @@ void Schematic::addNetLabel(SI_NetLabel& netlabel) throw (Exception)
     // check if there is no netlabel with the same uuid in the list
     if (getNetLabelByUuid(netlabel.getUuid()))
     {
-        throw RuntimeError(__FILE__, __LINE__, netlabel.getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, netlabel.getUuid().toStr(),
             QString(tr("There is already a netlabel with the UUID \"%1\"!"))
-            .arg(netlabel.getUuid().toString()));
+            .arg(netlabel.getUuid().toStr()));
     }
 
     // add to schematic

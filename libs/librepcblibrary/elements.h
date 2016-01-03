@@ -27,12 +27,10 @@
 #include "cat/componentcategory.h"
 #include "cat/packagecategory.h"
 #include "sym/symbol.h"
-#include "fpt/footprint.h"
-#include "3dmdl/model3d.h"
 #include "spcmdl/spicemodel.h"
 #include "pkg/package.h"
-#include "gencmp/genericcomponent.h"
 #include "cmp/component.h"
+#include "dev/device.h"
 
 #endif // LIBRARY_ELEMENTS_H
 

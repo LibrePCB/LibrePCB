@@ -35,7 +35,7 @@
 
 namespace project {
 class Circuit;
-class GenCompSignalInstance;
+class ComponentSignalInstance;
 class SI_Symbol;
 class SI_NetPoint;
 class ErcMsg;
@@ -43,7 +43,8 @@ class ErcMsg;
 
 namespace library {
 class SymbolPin;
-class GenCompSignal;
+class ComponentSignal;
+class ComponentPinSignalMapItem;
 }
 
 /*****************************************************************************************
@@ -63,20 +64,20 @@ class SI_SymbolPin final : public SI_Base, public IF_ErcMsgProvider
     public:
 
         // Constructors / Destructor
-        explicit SI_SymbolPin(SI_Symbol& symbol, const QUuid& pinUuid);
+        explicit SI_SymbolPin(SI_Symbol& symbol, const Uuid& pinUuid);
         ~SI_SymbolPin();
 
         // Getters
         Project& getProject() const noexcept;
         Schematic& getSchematic() const noexcept;
-        const QUuid& getLibPinUuid() const noexcept;
-        QString getDisplayText(bool returnGenCompSignalNameIfEmpty = false,
+        const Uuid& getLibPinUuid() const noexcept;
+        QString getDisplayText(bool returnCmpSignalNameIfEmpty = false,
                                bool returnPinNameIfEmpty = false) const noexcept;
         SI_Symbol& getSymbol() const noexcept {return mSymbol;}
         SI_NetPoint* getNetPoint() const noexcept {return mRegisteredNetPoint;}
         const library::SymbolPin& getLibPin() const noexcept {return *mSymbolPin;}
-        const library::GenCompSignal* getGenCompSignal() const noexcept {return mGenCompSignal;}
-        GenCompSignalInstance* getGenCompSignalInstance() const noexcept {return mGenCompSignalInstance;}
+        const library::ComponentSignal* getComponentSignal() const noexcept {return mComponentSignal;}
+        ComponentSignalInstance* getComponentSignalInstance() const noexcept {return mComponentSignalInstance;}
 
         // General Methods
         void updatePosition() noexcept;
@@ -109,8 +110,9 @@ class SI_SymbolPin final : public SI_Base, public IF_ErcMsgProvider
         Circuit& mCircuit;
         SI_Symbol& mSymbol;
         const library::SymbolPin* mSymbolPin;
-        const library::GenCompSignal* mGenCompSignal;
-        GenCompSignalInstance* mGenCompSignalInstance;
+        const library::ComponentSignal* mComponentSignal;
+        const library::ComponentPinSignalMapItem* mPinSignalMapItem;
+        ComponentSignalInstance* mComponentSignalInstance;
         Point mPosition;
         Angle mRotation;
 

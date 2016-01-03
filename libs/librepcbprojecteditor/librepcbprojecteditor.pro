@@ -47,9 +47,9 @@ SOURCES += \
     boardeditor/fsm/bes_select.cpp \
     dialogs/editnetclassesdialog.cpp \
     dialogs/projectpropertieseditordialog.cpp \
-    dialogs/addgencompdialog.cpp \
     dialogs/projectsettingsdialog.cpp \
-    docks/ercmsgdock.cpp
+    docks/ercmsgdock.cpp \
+    dialogs/addcomponentdialog.cpp
 
 HEADERS += \
     projecteditor.h \
@@ -78,9 +78,9 @@ HEADERS += \
     boardeditor/fsm/bes_select.h \
     dialogs/editnetclassesdialog.h \
     dialogs/projectpropertieseditordialog.h \
-    dialogs/addgencompdialog.h \
     dialogs/projectsettingsdialog.h \
-    docks/ercmsgdock.h
+    docks/ercmsgdock.h \
+    dialogs/addcomponentdialog.h
 
 FORMS += \
     schematiceditor/schematiceditor.ui \
@@ -90,7 +90,7 @@ FORMS += \
     boardeditor/unplacedcomponentsdock.ui \
     dialogs/editnetclassesdialog.ui \
     dialogs/projectpropertieseditordialog.ui \
-    dialogs/addgencompdialog.ui \
     dialogs/projectsettingsdialog.ui \
-    docks/ercmsgdock.ui
+    docks/ercmsgdock.ui \
+    dialogs/addcomponentdialog.ui
 

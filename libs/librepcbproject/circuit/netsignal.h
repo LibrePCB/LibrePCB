@@ -26,6 +26,7 @@
 
 #include <QtCore>
 #include "../erc/if_ercmsgprovider.h"
+#include <librepcbcommon/uuid.h>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 #include <librepcbcommon/exceptions.h>
 
@@ -36,7 +37,7 @@
 namespace project {
 class Circuit;
 class NetClass;
-class GenCompSignalInstance;
+class ComponentSignalInstance;
 class SI_NetPoint;
 class SI_NetLabel;
 class ErcMsg;
@@ -66,12 +67,12 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public IF_XmlS
         ~NetSignal() noexcept;
 
         // Getters
-        const QUuid& getUuid() const noexcept {return mUuid;}
+        const Uuid& getUuid() const noexcept {return mUuid;}
         const QString& getName() const noexcept {return mName;}
         bool hasAutoName() const noexcept {return mHasAutoName;}
         NetClass& getNetClass() const noexcept {return *mNetClass;}
-        bool isNameForced() const noexcept {return (mGenCompSignalWithForcedNameCount > 0);}
-        const QList<GenCompSignalInstance*>& getGenCompSignals() const noexcept {return mGenCompSignals;}
+        bool isNameForced() const noexcept {return (mComponentSignalWithForcedNameCount > 0);}
+        const QList<ComponentSignalInstance*>& getComponentSignals() const noexcept {return mComponentSignals;}
         const QList<SI_NetPoint*>& getNetPoints() const noexcept {return mSchematicNetPoints;}
         const QList<SI_NetLabel*>& getNetLabels() const noexcept {return mSchematicNetLabels;}
 
@@ -79,8 +80,8 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public IF_XmlS
         void setName(const QString& name, bool isAutoName) throw (Exception);
 
         // General Methods
-        void registerGenCompSignal(GenCompSignalInstance& signal) noexcept;
-        void unregisterGenCompSignal(GenCompSignalInstance& signal) noexcept;
+        void registerComponentSignal(ComponentSignalInstance& signal) noexcept;
+        void unregisterComponentSignal(ComponentSignalInstance& signal) noexcept;
         void registerSchematicNetPoint(SI_NetPoint& netpoint) noexcept;
         void unregisterSchematicNetPoint(SI_NetPoint& netpoint) noexcept;
         void registerSchematicNetLabel(SI_NetLabel& netlabel) noexcept;
@@ -120,17 +121,17 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public IF_XmlS
 
         /// @brief the ERC message for unused netsignals
         ErcMsg* mErcMsgUnusedNetSignal;
-        /// @brief the ERC messages for netsignals with less than two generic component signals
+        /// @brief the ERC messages for netsignals with less than two component signals
         ErcMsg* mErcMsgConnectedToLessThanTwoPins;
 
         // Registered Elements of this Netclass
-        QList<GenCompSignalInstance*> mGenCompSignals;
+        QList<ComponentSignalInstance*> mComponentSignals;
         QList<SI_NetPoint*> mSchematicNetPoints;
         QList<SI_NetLabel*> mSchematicNetLabels;
-        int mGenCompSignalWithForcedNameCount;
+        int mComponentSignalWithForcedNameCount;
 
         // Attributes
-        QUuid mUuid;
+        Uuid mUuid;
         QString mName;
         bool mHasAutoName;
         NetClass* mNetClass;

@@ -31,6 +31,7 @@
 #include <librepcbcommon/units/all_length_units.h>
 #include <librepcbcommon/fileio/filepath.h>
 #include <librepcbcommon/exceptions.h>
+#include <librepcbcommon/uuid.h>
 #include "../erc/if_ercmsgprovider.h"
 
 /*****************************************************************************************
@@ -44,7 +45,7 @@ class SmartXmlFile;
 
 namespace project {
 class Project;
-class ComponentInstance;
+class DeviceInstance;
 class BI_Base;
 }
 
@@ -78,10 +79,10 @@ class Board final : public QObject, public IF_AttributeProvider,
          */
         enum ItemZValue {
             ZValue_Default = 0,         ///< this is the default value (behind all other items)
-            ZValue_FootprintsBottom,    ///< Z value for project#BI_Footprint items
-            ZValue_FootprintPadsBottom, ///< Z value for project#BI_FootprintPad items
-            ZValue_FootprintPadsTop,    ///< Z value for project#BI_FootprintPad items
-            ZValue_FootprintsTop,       ///< Z value for project#BI_Footprint items
+            ZValue_FootprintsBottom,    ///< Z value for #project#BI_Footprint items
+            ZValue_FootprintPadsBottom, ///< Z value for #project#BI_FootprintPad items
+            ZValue_FootprintPadsTop,    ///< Z value for #project#BI_FootprintPad items
+            ZValue_FootprintsTop,       ///< Z value for #project#BI_Footprint items
         };
 
         // Constructors / Destructor
@@ -114,16 +115,16 @@ class Board final : public QObject, public IF_AttributeProvider,
         void setGridProperties(const GridProperties& grid) noexcept;
 
         // Getters: Attributes
-        const QUuid& getUuid() const noexcept {return mUuid;}
+        const Uuid& getUuid() const noexcept {return mUuid;}
         const QString& getName() const noexcept {return mName;}
         const QIcon& getIcon() const noexcept {return mIcon;}
 
-        // ComponentInstance Methods
-        const QHash<QUuid, ComponentInstance*>& getComponentInstances() const noexcept {return mComponentInstances;}
-        ComponentInstance* getCompInstanceByGenCompUuid(const QUuid& uuid) const noexcept;
-        ComponentInstance* createComponentInstance() throw (Exception);
-        void addComponentInstance(ComponentInstance& componentInstance) throw (Exception);
-        void removeComponentInstance(ComponentInstance& componentInstance) throw (Exception);
+        // DeviceInstance Methods
+        const QHash<Uuid, DeviceInstance*>& getDeviceInstances() const noexcept {return mDeviceInstances;}
+        DeviceInstance* getDeviceInstanceByComponentUuid(const Uuid& uuid) const noexcept;
+        DeviceInstance* createDeviceInstance() throw (Exception);
+        void addDeviceInstance(DeviceInstance& instance) throw (Exception);
+        void removeDeviceInstance(DeviceInstance& instance) throw (Exception);
 
         // General Methods
         void addToProject() throw (Exception);
@@ -149,8 +150,8 @@ class Board final : public QObject, public IF_AttributeProvider,
         /// @copydoc IF_AttributeProvider#attributesChanged()
         void attributesChanged();
 
-        void componentAdded(ComponentInstance& comp);
-        void componentRemoved(ComponentInstance& comp);
+        void deviceAdded(DeviceInstance& comp);
+        void deviceRemoved(DeviceInstance& comp);
 
 
     private:
@@ -185,15 +186,15 @@ class Board final : public QObject, public IF_AttributeProvider,
         GridProperties* mGridProperties;
 
         // Attributes
-        QUuid mUuid;
+        Uuid mUuid;
         QString mName;
         QIcon mIcon;
 
         // ERC messages
-        QHash<QUuid, ErcMsg*> mErcMsgListUnplacedGenCompInstances;
+        QHash<Uuid, ErcMsg*> mErcMsgListUnplacedComponentInstances;
 
         // items
-        QHash<QUuid, ComponentInstance*> mComponentInstances;
+        QHash<Uuid, DeviceInstance*> mDeviceInstances;
 };
 
 } // namespace project

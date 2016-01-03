@@ -26,7 +26,7 @@
 #include <QPrinter>
 #include "symbolpinpreviewgraphicsitem.h"
 #include "symbolpin.h"
-#include "../gencmp/genericcomponent.h"
+#include "../cmp/component.h"
 #include <librepcbcommon/schematiclayer.h>
 #include <librepcbcommon/if_schematiclayerprovider.h>
 
@@ -36,15 +36,13 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SymbolPinPreviewGraphicsItem::SymbolPinPreviewGraphicsItem(const IF_SchematicLayerProvider& layerProvider,
-                                                           const QStringList& localeOrder,
-                                                           const SymbolPin& pin,
-                                                           const GenCompSignal* genCompSignal,
-                                                           GenCompSymbVarItem::PinDisplayType_t displayType) noexcept :
-    GraphicsItem(), mPin(pin), mGenCompSignal(genCompSignal), mDisplayType(displayType),
-    mDrawBoundingRect(false), mLocaleOrder(localeOrder)
+SymbolPinPreviewGraphicsItem::SymbolPinPreviewGraphicsItem(
+        const IF_SchematicLayerProvider& layerProvider, const SymbolPin& pin,
+        const ComponentSignal* compSignal, PinDisplayType_t displayType) noexcept :
+    GraphicsItem(), mPin(pin), mComponentSignal(compSignal), mDisplayType(displayType),
+    mDrawBoundingRect(false)
 {
-    setToolTip(mPin.getName(mLocaleOrder) % ": " % mPin.getDescription(mLocaleOrder));
+    setToolTip(mPin.getName());
 
     mCircleLayer = layerProvider.getSchematicLayer(SchematicLayer::SymbolPinCircles);
     Q_ASSERT(mCircleLayer);
@@ -97,14 +95,14 @@ void SymbolPinPreviewGraphicsItem::updateCacheAndRepaint() noexcept
     // text
     switch (mDisplayType)
     {
-        case GenCompSymbVarItem::PinDisplayType_t::None:
+        case PinDisplayType_t::NONE:
             mStaticText.setText(""); break;
-        case GenCompSymbVarItem::PinDisplayType_t::PinName:
-            mStaticText.setText(mPin.getName(mLocaleOrder)); break;
-        case GenCompSymbVarItem::PinDisplayType_t::GenCompSignal:
-            mStaticText.setText(mGenCompSignal ? mGenCompSignal->getName(mLocaleOrder) : ""); break;
-        case GenCompSymbVarItem::PinDisplayType_t::NetSignal:
-            mStaticText.setText(mGenCompSignal ? mGenCompSignal->getForcedNetName() : ""); break;
+        case PinDisplayType_t::PIN_NAME:
+            mStaticText.setText(mPin.getName()); break;
+        case PinDisplayType_t::COMPONENT_SIGNAL:
+            mStaticText.setText(mComponentSignal ? mComponentSignal->getName() : ""); break;
+        case PinDisplayType_t::NET_SIGNAL:
+            mStaticText.setText(mComponentSignal ? mComponentSignal->getForcedNetName() : ""); break;
         default: Q_ASSERT(false);
     }
     qreal x = mPin.getLength().toPx() + 4;
@@ -131,7 +129,7 @@ void SymbolPinPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
     Q_UNUSED(widget);
     const bool selected = option->state.testFlag(QStyle::State_Selected);
 
-    bool requiredPin = mGenCompSignal ? mGenCompSignal->isRequired() : false;
+    bool requiredPin = mComponentSignal ? mComponentSignal->isRequired() : false;
 
     // draw line
     QPen pen(mLineLayer->getColor(selected), Length(158750).toPx(), Qt::SolidLine, Qt::RoundCap);

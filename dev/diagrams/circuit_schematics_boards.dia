@@ -179,19 +179,19 @@
         <dia:point val="15,5"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="14.95,4.95;23.715,7.25"/>
+        <dia:rectangle val="14.95,4.95;24.56,7.25"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="15,5"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="8.6650000000000009"/>
+        <dia:real val="9.5099999999999998"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
         <dia:real val="2.2000000000000002"/>
       </dia:attribute>
       <dia:attribute name="name">
-        <dia:string>#GenCompInstance#</dia:string>
+        <dia:string>#ComponentInstance#</dia:string>
       </dia:attribute>
       <dia:attribute name="stereotype">
         <dia:string>#QObject#</dia:string>
@@ -289,19 +289,19 @@
         <dia:point val="-37,1"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-37.05,0.95;-29.27,3.25"/>
+        <dia:rectangle val="-37.05,0.95;-31.85,3.25"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="-37,1"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="7.6799999999999997"/>
+        <dia:real val="5.0999999999999996"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
         <dia:real val="2.2000000000000002"/>
       </dia:attribute>
       <dia:attribute name="name">
-        <dia:string>#SymbolInstance#</dia:string>
+        <dia:string>#SI_Symbol#</dia:string>
       </dia:attribute>
       <dia:attribute name="stereotype">
         <dia:string>#QObject#</dia:string>
@@ -506,22 +506,22 @@
     </dia:object>
     <dia:object type="UML - Class" version="0" id="O6">
       <dia:attribute name="obj_pos">
-        <dia:point val="-25,17"/>
+        <dia:point val="-24,17"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-25.05,16.95;-15.8375,19.25"/>
+        <dia:rectangle val="-24.05,16.95;-17.4175,19.25"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="-25,17"/>
+        <dia:point val="-24,17"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="9.1125000000000007"/>
+        <dia:real val="6.5325000000000006"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
         <dia:real val="2.2000000000000002"/>
       </dia:attribute>
       <dia:attribute name="name">
-        <dia:string>#SymbolPinInstance#</dia:string>
+        <dia:string>#SI_SymbolPin#</dia:string>
       </dia:attribute>
       <dia:attribute name="stereotype">
         <dia:string>#QObject#</dia:string>
@@ -1619,7 +1619,7 @@
         <dia:boolean val="false"/>
       </dia:attribute>
       <dia:attribute name="role_b">
-        <dia:string>#mGenericComponents#</dia:string>
+        <dia:string>#mComponents#</dia:string>
       </dia:attribute>
       <dia:attribute name="multipicity_b">
         <dia:string>#0..*#</dia:string>
@@ -1736,19 +1736,19 @@
         <dia:point val="14,13"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="13.95,12.95;25.5225,15.25"/>
+        <dia:rectangle val="13.95,12.95;26.3675,15.25"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="14,13"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="11.4725"/>
+        <dia:real val="12.317499999999999"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
         <dia:real val="2.2000000000000002"/>
       </dia:attribute>
       <dia:attribute name="name">
-        <dia:string>#GenCompSignalInstance#</dia:string>
+        <dia:string>#ComponentSignalInstance#</dia:string>
       </dia:attribute>
       <dia:attribute name="stereotype">
         <dia:string>#QObject#</dia:string>
@@ -1855,7 +1855,7 @@
         <dia:enum val="2"/>
       </dia:attribute>
       <dia:attribute name="role_a">
-        <dia:string>#mGenComp#</dia:string>
+        <dia:string>#mComponent#</dia:string>
       </dia:attribute>
       <dia:attribute name="multipicity_a">
         <dia:string>#1#</dia:string>
@@ -1879,19 +1879,19 @@
         <dia:boolean val="false"/>
       </dia:attribute>
       <dia:attribute name="obj_pos">
-        <dia:point val="19.3325,7.2"/>
+        <dia:point val="19.755,7.2"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="18.5825,6.45;23.0162,13.05"/>
+        <dia:rectangle val="19.005,6.45;24.155,13.05"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="19.3325,7.2"/>
-        <dia:point val="19.3325,10.45"/>
-        <dia:point val="19.7362,10.45"/>
-        <dia:point val="19.7362,13"/>
+        <dia:point val="19.755,7.2"/>
+        <dia:point val="19.755,10.45"/>
+        <dia:point val="20.1587,10.45"/>
+        <dia:point val="20.1587,13"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -1950,17 +1950,17 @@
         <dia:boolean val="false"/>
       </dia:attribute>
       <dia:attribute name="obj_pos">
-        <dia:point val="-33.16,3.2"/>
+        <dia:point val="-34.45,3.2"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-33.91,2.45;-24.95,6.9"/>
+        <dia:rectangle val="-35.2,2.45;-24.95,6.9"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="-33.16,3.2"/>
-        <dia:point val="-33.16,6.1"/>
+        <dia:point val="-34.45,3.2"/>
+        <dia:point val="-34.45,6.1"/>
         <dia:point val="-25,6.1"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
@@ -2266,19 +2266,19 @@
         <dia:point val="-25,5"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-25.05,4.95;-15.1075,7.25"/>
+        <dia:rectangle val="-25.05,4.95;-17.135,7.25"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="-25,5"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="9.8424999999999994"/>
+        <dia:real val="7.8150000000000004"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
         <dia:real val="2.2000000000000002"/>
       </dia:attribute>
       <dia:attribute name="name">
-        <dia:string>#SymbolGraphicsItem#</dia:string>
+        <dia:string>#SGI_Symbol#</dia:string>
       </dia:attribute>
       <dia:attribute name="stereotype">
         <dia:string>#&lt;QGraphicsItem&gt;#</dia:string>
@@ -2409,18 +2409,18 @@
         <dia:boolean val="false"/>
       </dia:attribute>
       <dia:attribute name="obj_pos">
-        <dia:point val="-33.16,3.2"/>
+        <dia:point val="-34.45,3.2"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-33.91,2.45;-24.95,18.9"/>
+        <dia:rectangle val="-35.2,2.45;-23.95,18.9"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="-33.16,3.2"/>
-        <dia:point val="-33.16,18.1"/>
-        <dia:point val="-25,18.1"/>
+        <dia:point val="-34.45,3.2"/>
+        <dia:point val="-34.45,18.1"/>
+        <dia:point val="-24,18.1"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -2466,7 +2466,7 @@
         <dia:boolean val="true"/>
       </dia:attribute>
       <dia:attribute name="role_b">
-        <dia:string>#mGenCompSignals#</dia:string>
+        <dia:string>#mComponentSignals#</dia:string>
       </dia:attribute>
       <dia:attribute name="multipicity_b">
         <dia:string>#0..*#</dia:string>
@@ -2481,15 +2481,15 @@
         <dia:point val="13.9025,26.1"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="13.8525,15.15;26.0613,26.9"/>
+        <dia:rectangle val="13.8525,15.15;27.2537,26.9"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
         <dia:point val="13.9025,26.1"/>
-        <dia:point val="19.7362,26.1"/>
-        <dia:point val="19.7362,15.2"/>
+        <dia:point val="20.1587,26.1"/>
+        <dia:point val="20.1587,15.2"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="0"/>
@@ -2606,7 +2606,7 @@
         <dia:boolean val="true"/>
       </dia:attribute>
       <dia:attribute name="role_b">
-        <dia:string>#mGenCompInstance#</dia:string>
+        <dia:string>#mComponentInstance#</dia:string>
       </dia:attribute>
       <dia:attribute name="multipicity_b">
         <dia:string>#1#</dia:string>
@@ -2618,18 +2618,18 @@
         <dia:boolean val="true"/>
       </dia:attribute>
       <dia:attribute name="obj_pos">
-        <dia:point val="-29.32,2.1"/>
+        <dia:point val="-31.9,2.1"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-29.37,1.3;26.0425,5.05"/>
+        <dia:rectangle val="-31.95,1.3;27.235,5.05"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="-29.32,2.1"/>
-        <dia:point val="19.3325,2.1"/>
-        <dia:point val="19.3325,5"/>
+        <dia:point val="-31.9,2.1"/>
+        <dia:point val="19.755,2.1"/>
+        <dia:point val="19.755,5"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="0"/>
@@ -2663,7 +2663,7 @@
         <dia:enum val="0"/>
       </dia:attribute>
       <dia:attribute name="role_a">
-        <dia:string>#mGenCompSignalInstance#</dia:string>
+        <dia:string>#mComponentSignalInstance#</dia:string>
       </dia:attribute>
       <dia:attribute name="multipicity_a">
         <dia:string>#0..1#</dia:string>
@@ -2690,16 +2690,16 @@
         <dia:point val="14,14.1"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-15.9375,13.3;14.05,18.9"/>
+        <dia:rectangle val="-17.5175,13.3;14.05,18.9"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
         <dia:point val="14,14.1"/>
-        <dia:point val="-4,14.1"/>
-        <dia:point val="-4,18.1"/>
-        <dia:point val="-15.8875,18.1"/>
+        <dia:point val="-5,14.1"/>
+        <dia:point val="-5,18.1"/>
+        <dia:point val="-17.4675,18.1"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="0"/>
@@ -2829,17 +2829,17 @@
         <dia:boolean val="true"/>
       </dia:attribute>
       <dia:attribute name="obj_pos">
-        <dia:point val="-20.4438,19.2"/>
+        <dia:point val="-20.7338,19.2"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-33.2363,19.15;-16.0438,29.05"/>
+        <dia:rectangle val="-33.2363,19.15;-16.3337,29.05"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="-20.4438,19.2"/>
-        <dia:point val="-20.4438,26"/>
+        <dia:point val="-20.7338,19.2"/>
+        <dia:point val="-20.7338,26"/>
         <dia:point val="-32.4363,26"/>
         <dia:point val="-32.4363,29"/>
       </dia:attribute>
@@ -2936,19 +2936,19 @@
         <dia:point val="-25,11"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-25.05,10.95;-13.675,13.25"/>
+        <dia:rectangle val="-25.05,10.95;-17.135,13.25"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="-25,11"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="11.275"/>
+        <dia:real val="7.8150000000000004"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
         <dia:real val="2.2000000000000002"/>
       </dia:attribute>
       <dia:attribute name="name">
-        <dia:string>#SymbolPinGraphicsItem#</dia:string>
+        <dia:string>#SGI_SymbolPin#</dia:string>
       </dia:attribute>
       <dia:attribute name="stereotype">
         <dia:string>#&lt;QGraphicsItem&gt;#</dia:string>
@@ -3079,19 +3079,19 @@
         <dia:boolean val="false"/>
       </dia:attribute>
       <dia:attribute name="obj_pos">
-        <dia:point val="-20.0787,7.2"/>
+        <dia:point val="-21.0925,7.2"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-20.8287,6.45;-15.2937,11.05"/>
+        <dia:rectangle val="-21.8425,6.45;-16.3075,11.05"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="-20.0787,7.2"/>
-        <dia:point val="-20.0787,9.45"/>
-        <dia:point val="-19.3625,9.45"/>
-        <dia:point val="-19.3625,11"/>
+        <dia:point val="-21.0925,7.2"/>
+        <dia:point val="-21.0925,7.95"/>
+        <dia:point val="-21.0925,10.95"/>
+        <dia:point val="-21.0925,11"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -3150,19 +3150,19 @@
         <dia:boolean val="true"/>
       </dia:attribute>
       <dia:attribute name="obj_pos">
-        <dia:point val="-19.3625,13.2"/>
+        <dia:point val="-21.0925,13.2"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-21.2438,13.15;-10.3425,17.05"/>
+        <dia:rectangle val="-21.8925,13.15;-12.0725,17.05"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="-19.3625,13.2"/>
-        <dia:point val="-19.3625,15.1"/>
-        <dia:point val="-20.4438,15.1"/>
-        <dia:point val="-20.4438,17"/>
+        <dia:point val="-21.0925,13.2"/>
+        <dia:point val="-21.0925,15.1"/>
+        <dia:point val="-20.7338,15.1"/>
+        <dia:point val="-20.7338,17"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -3518,19 +3518,19 @@
         <dia:point val="21,46"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="20.95,45.95;28.67,48.25"/>
+        <dia:rectangle val="20.95,45.95;29.515,48.25"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="21,46"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="7.6200000000000001"/>
+        <dia:real val="8.4649999999999999"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
         <dia:real val="2.2000000000000002"/>
       </dia:attribute>
       <dia:attribute name="name">
-        <dia:string>#GenCompSignal#</dia:string>
+        <dia:string>#ComponentSignal#</dia:string>
       </dia:attribute>
       <dia:attribute name="stereotype">
         <dia:string>#QObject#</dia:string>
@@ -3625,22 +3625,22 @@
     </dia:object>
     <dia:object type="UML - Class" version="0" id="O42">
       <dia:attribute name="obj_pos">
-        <dia:point val="-7,46"/>
+        <dia:point val="-6,46"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-7.05,45.95;2.165,48.25"/>
+        <dia:rectangle val="-6.05,45.95;-0.2925,48.25"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="-7,46"/>
+        <dia:point val="-6,46"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="9.1150000000000002"/>
+        <dia:real val="5.6575000000000006"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
         <dia:real val="2.2000000000000002"/>
       </dia:attribute>
       <dia:attribute name="name">
-        <dia:string>#GenericComponent#</dia:string>
+        <dia:string>#Component#</dia:string>
       </dia:attribute>
       <dia:attribute name="stereotype">
         <dia:string>#QObject#</dia:string>
@@ -3735,22 +3735,22 @@
     </dia:object>
     <dia:object type="UML - Class" version="0" id="O43">
       <dia:attribute name="obj_pos">
-        <dia:point val="13,52"/>
+        <dia:point val="9,52"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="12.95,51.95;21.8775,54.25"/>
+        <dia:rectangle val="8.95,51.95;21.315,54.25"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="13,52"/>
+        <dia:point val="9,52"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="8.8275000000000006"/>
+        <dia:real val="12.265000000000001"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
         <dia:real val="2.2000000000000002"/>
       </dia:attribute>
       <dia:attribute name="name">
-        <dia:string>#GenCompSymbVar#</dia:string>
+        <dia:string>#ComponentSymbolVariant#</dia:string>
       </dia:attribute>
       <dia:attribute name="stereotype">
         <dia:string>#QObject#</dia:string>
@@ -3845,22 +3845,22 @@
     </dia:object>
     <dia:object type="UML - Class" version="0" id="O44">
       <dia:attribute name="obj_pos">
-        <dia:point val="30,56"/>
+        <dia:point val="27,56"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="29.95,55.95;40.9325,58.25"/>
+        <dia:rectangle val="26.95,55.95;41.37,58.25"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="30,56"/>
+        <dia:point val="27,56"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="10.8825"/>
+        <dia:real val="14.319999999999999"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
         <dia:real val="2.2000000000000002"/>
       </dia:attribute>
       <dia:attribute name="name">
-        <dia:string>#GenCompSymbVarItem#</dia:string>
+        <dia:string>#ComponentSymbolVariantItem#</dia:string>
       </dia:attribute>
       <dia:attribute name="stereotype">
         <dia:string>#QObject#</dia:string>
@@ -4121,7 +4121,7 @@
         <dia:boolean val="false"/>
       </dia:attribute>
       <dia:attribute name="role_b">
-        <dia:string>#mGenericComponents#</dia:string>
+        <dia:string>#mComponents#</dia:string>
       </dia:attribute>
       <dia:attribute name="multipicity_b">
         <dia:string>#0..*#</dia:string>
@@ -4136,15 +4136,15 @@
         <dia:point val="-29.0825,56.1"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-29.8325,48.15;4.6875,56.9"/>
+        <dia:rectangle val="-29.8325,48.15;1.26375,56.9"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
         <dia:point val="-29.0825,56.1"/>
-        <dia:point val="-2.4425,56.1"/>
-        <dia:point val="-2.4425,48.2"/>
+        <dia:point val="-3.17125,56.1"/>
+        <dia:point val="-3.17125,48.2"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="0"/>
@@ -4249,7 +4249,7 @@
         <dia:enum val="2"/>
       </dia:attribute>
       <dia:attribute name="role_a">
-        <dia:string>#mGenComp#</dia:string>
+        <dia:string>#mComponent#</dia:string>
       </dia:attribute>
       <dia:attribute name="multipicity_a">
         <dia:string>#1#</dia:string>
@@ -4273,17 +4273,17 @@
         <dia:boolean val="false"/>
       </dia:attribute>
       <dia:attribute name="obj_pos">
-        <dia:point val="2.115,47.1"/>
+        <dia:point val="-0.3425,47.1"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="1.365,46.3;21.05,47.9"/>
+        <dia:rectangle val="-1.0925,46.3;21.05,47.9"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="2.115,47.1"/>
-        <dia:point val="2.865,47.1"/>
+        <dia:point val="-0.3425,47.1"/>
+        <dia:point val="0.4075,47.1"/>
         <dia:point val="20.95,47.1"/>
         <dia:point val="21,47.1"/>
       </dia:attribute>
@@ -4344,19 +4344,19 @@
         <dia:boolean val="false"/>
       </dia:attribute>
       <dia:attribute name="obj_pos">
-        <dia:point val="2.115,47.1"/>
+        <dia:point val="-0.3425,47.1"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="1.365,46.3;13.05,53.9"/>
+        <dia:rectangle val="-1.0925,46.3;9.05,53.9"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="2.115,47.1"/>
-        <dia:point val="6,47.1"/>
-        <dia:point val="6,53.1"/>
-        <dia:point val="13,53.1"/>
+        <dia:point val="-0.3425,47.1"/>
+        <dia:point val="3,47.1"/>
+        <dia:point val="3,53.1"/>
+        <dia:point val="9,53.1"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="0"/>
@@ -4415,19 +4415,19 @@
         <dia:boolean val="false"/>
       </dia:attribute>
       <dia:attribute name="obj_pos">
-        <dia:point val="21.8275,53.1"/>
+        <dia:point val="21.265,53.1"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="21.0775,52.3;30.05,57.9"/>
+        <dia:rectangle val="20.515,52.3;28.255,57.9"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="21.8275,53.1"/>
-        <dia:point val="26.2638,53.1"/>
-        <dia:point val="26.2638,57.1"/>
-        <dia:point val="30,57.1"/>
+        <dia:point val="21.265,53.1"/>
+        <dia:point val="24.4825,53.1"/>
+        <dia:point val="24.4825,57.1"/>
+        <dia:point val="27,57.1"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="0"/>
@@ -4489,7 +4489,7 @@
         <dia:point val="-37,3.2"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-37.05,3.15;40.6112,56.05"/>
+        <dia:rectangle val="-37.05,3.15;39.33,56.05"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
@@ -4499,8 +4499,8 @@
         <dia:point val="-37,22"/>
         <dia:point val="-17,22"/>
         <dia:point val="-17,43"/>
-        <dia:point val="35.4412,43"/>
-        <dia:point val="35.4412,56"/>
+        <dia:point val="34.16,43"/>
+        <dia:point val="34.16,56"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -4561,17 +4561,17 @@
         <dia:boolean val="true"/>
       </dia:attribute>
       <dia:attribute name="obj_pos">
-        <dia:point val="-15.8875,19.2"/>
+        <dia:point val="-17.4675,19.2"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-15.9375,19.15;-3.97,52.05"/>
+        <dia:rectangle val="-17.5175,19.15;-3.97,52.05"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="-15.8875,19.2"/>
-        <dia:point val="-15.8875,42"/>
+        <dia:point val="-17.4675,19.2"/>
+        <dia:point val="-17.4675,42"/>
         <dia:point val="-8.37,42"/>
         <dia:point val="-8.37,52"/>
       </dia:attribute>
@@ -4691,7 +4691,7 @@
         <dia:boolean val="false"/>
       </dia:attribute>
       <dia:attribute name="role_b">
-        <dia:string>#mGenCompSignal#</dia:string>
+        <dia:string>#mComponentSignal#</dia:string>
       </dia:attribute>
       <dia:attribute name="multipicity_b">
         <dia:string>#1#</dia:string>
@@ -4703,18 +4703,18 @@
         <dia:boolean val="true"/>
       </dia:attribute>
       <dia:attribute name="obj_pos">
-        <dia:point val="25.4725,14.1"/>
+        <dia:point val="26.3175,14.1"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="25.4225,13.3;34.56,46.05"/>
+        <dia:rectangle val="26.2675,13.3;36.175,46.05"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="25.4725,14.1"/>
-        <dia:point val="28.62,14.1"/>
-        <dia:point val="28.62,46"/>
+        <dia:point val="26.3175,14.1"/>
+        <dia:point val="29.465,14.1"/>
+        <dia:point val="29.465,46"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="0"/>
@@ -4760,7 +4760,7 @@
         <dia:boolean val="false"/>
       </dia:attribute>
       <dia:attribute name="role_b">
-        <dia:string>#mGenComp#</dia:string>
+        <dia:string>#mLibComponent#</dia:string>
       </dia:attribute>
       <dia:attribute name="multipicity_b">
         <dia:string>#1#</dia:string>
@@ -4775,7 +4775,7 @@
         <dia:point val="15,7.2"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-3.2425,7.15;15.2,46.05"/>
+        <dia:rectangle val="-3.97125,7.15;15.2,46.05"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
@@ -4783,8 +4783,8 @@
       <dia:attribute name="orth_points">
         <dia:point val="15,7.2"/>
         <dia:point val="15,9"/>
-        <dia:point val="-2.4425,9"/>
-        <dia:point val="-2.4425,46"/>
+        <dia:point val="-3.17125,9"/>
+        <dia:point val="-3.17125,46"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -4831,7 +4831,7 @@
         <dia:boolean val="false"/>
       </dia:attribute>
       <dia:attribute name="role_b">
-        <dia:string>#mGenCompSymbVar#</dia:string>
+        <dia:string>#mComponentSymbolVariant#</dia:string>
       </dia:attribute>
       <dia:attribute name="multipicity_b">
         <dia:string>#1#</dia:string>
@@ -4846,7 +4846,7 @@
         <dia:point val="15,7.2"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-1.05,7.15;23.7388,52.05"/>
+        <dia:rectangle val="-1.05,7.15;24.5375,52.05"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
@@ -4856,8 +4856,8 @@
         <dia:point val="15,10"/>
         <dia:point val="-1,10"/>
         <dia:point val="-1,41"/>
-        <dia:point val="17.4138,41"/>
-        <dia:point val="17.4138,52"/>
+        <dia:point val="15.1325,41"/>
+        <dia:point val="15.1325,52"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -4906,7 +4906,7 @@
         <dia:boolean val="false"/>
       </dia:attribute>
       <dia:attribute name="role_b">
-        <dia:string>#mGenCompSignal#</dia:string>
+        <dia:string>#mComponentSignal#</dia:string>
       </dia:attribute>
       <dia:attribute name="multipicity_b">
         <dia:string>#1#</dia:string>
@@ -4918,17 +4918,17 @@
         <dia:boolean val="true"/>
       </dia:attribute>
       <dia:attribute name="obj_pos">
-        <dia:point val="-15.8875,19.2"/>
+        <dia:point val="-17.4675,19.2"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-15.9375,19.15;26.94,46.05"/>
+        <dia:rectangle val="-17.5175,19.15;27.71,46.05"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="-15.8875,19.2"/>
-        <dia:point val="-15.8875,42"/>
+        <dia:point val="-17.4675,19.2"/>
+        <dia:point val="-17.4675,42"/>
         <dia:point val="21,42"/>
         <dia:point val="21,46"/>
       </dia:attribute>

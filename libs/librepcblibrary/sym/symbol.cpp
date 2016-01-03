@@ -31,7 +31,7 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Symbol::Symbol(const QUuid& uuid, const Version& version, const QString& author,
+Symbol::Symbol(const Uuid& uuid, const Version& version, const QString& author,
                const QString& name_en_US, const QString& description_en_US,
                const QString& keywords_en_US) throw (Exception) :
     LibraryElement("sym", "symbol", uuid, version, author, name_en_US, description_en_US, keywords_en_US)
@@ -47,8 +47,8 @@ Symbol::Symbol(const FilePath& elementDirectory) throw (Exception) :
     }
     catch (Exception& e)
     {
-        qDeleteAll(mEllipses);      mEllipses.clear();
         qDeleteAll(mTexts);         mTexts.clear();
+        qDeleteAll(mEllipses);      mEllipses.clear();
         qDeleteAll(mPolygons);      mPolygons.clear();
         qDeleteAll(mPins);          mPins.clear();
         throw;
@@ -57,10 +57,75 @@ Symbol::Symbol(const FilePath& elementDirectory) throw (Exception) :
 
 Symbol::~Symbol() noexcept
 {
+
     qDeleteAll(mEllipses);      mEllipses.clear();
-    qDeleteAll(mTexts);         mTexts.clear();
     qDeleteAll(mPolygons);      mPolygons.clear();
     qDeleteAll(mPins);          mPins.clear();
+}
+
+/*****************************************************************************************
+ *  FootprintPad Methods
+ ****************************************************************************************/
+
+void Symbol::addPin(SymbolPin& pin) noexcept
+{
+    Q_ASSERT(!mPins.contains(pin.getUuid()));
+    mPins.insert(pin.getUuid(), &pin);
+}
+
+void Symbol::removePin(SymbolPin& pin) noexcept
+{
+    Q_ASSERT(mPins.contains(pin.getUuid()));
+    Q_ASSERT(mPins.value(pin.getUuid()) == &pin);
+    mPins.remove(pin.getUuid());
+}
+
+/*****************************************************************************************
+ *  Polygon Methods
+ ****************************************************************************************/
+
+void Symbol::addPolygon(Polygon& polygon) noexcept
+{
+    Q_ASSERT(!mPolygons.contains(&polygon));
+    mPolygons.append(&polygon);
+}
+
+void Symbol::removePolygon(Polygon& polygon) noexcept
+{
+    Q_ASSERT(mPolygons.contains(&polygon));
+    mPolygons.removeAll(&polygon);
+}
+
+/*****************************************************************************************
+ *  Ellipse Methods
+ ****************************************************************************************/
+
+void Symbol::addEllipse(Ellipse& ellipse) noexcept
+{
+    Q_ASSERT(!mEllipses.contains(&ellipse));
+    mEllipses.append(&ellipse);
+}
+
+void Symbol::removeEllipse(Ellipse& ellipse) noexcept
+{
+    Q_ASSERT(mEllipses.contains(&ellipse));
+    mEllipses.removeAll(&ellipse);
+}
+
+/*****************************************************************************************
+ *  Text Methods
+ ****************************************************************************************/
+
+void Symbol::addText(Text& text) noexcept
+{
+    Q_ASSERT(!mTexts.contains(&text));
+    mTexts.append(&text);
+}
+
+void Symbol::removeText(Text& text) noexcept
+{
+    Q_ASSERT(mTexts.contains(&text));
+    mTexts.removeAll(&text);
 }
 
 /*****************************************************************************************
@@ -78,9 +143,9 @@ void Symbol::parseDomTree(const XmlDomElement& root) throw (Exception)
         SymbolPin* pin = new SymbolPin(*node);
         if (mPins.contains(pin->getUuid()))
         {
-            throw RuntimeError(__FILE__, __LINE__, pin->getUuid().toString(),
+            throw RuntimeError(__FILE__, __LINE__, pin->getUuid().toStr(),
                 QString(tr("The pin \"%1\" exists multiple times in \"%2\"."))
-                .arg(pin->getUuid().toString(), mXmlFilepath.toNative()));
+                .arg(pin->getUuid().toStr(), mXmlFilepath.toNative()));
         }
         mPins.insert(pin->getUuid(), pin);
     }
@@ -91,15 +156,15 @@ void Symbol::parseDomTree(const XmlDomElement& root) throw (Exception)
     {
         if (node->getName() == "polygon")
         {
-            mPolygons.append(new SymbolPolygon(*node));
+            mPolygons.append(new Polygon(*node));
         }
         else if (node->getName() == "text")
         {
-            mTexts.append(new SymbolText(*node));
+            mTexts.append(new Text(*node));
         }
         else if (node->getName() == "ellipse")
         {
-            mEllipses.append(new SymbolEllipse(*node));
+            mEllipses.append(new Ellipse(*node));
         }
         else
         {
@@ -113,16 +178,16 @@ void Symbol::parseDomTree(const XmlDomElement& root) throw (Exception)
 XmlDomElement* Symbol::serializeToXmlDomElement() const throw (Exception)
 {
     QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement());
-    XmlDomElement* geometry = root->appendChild("geometry");
-    foreach (const SymbolPolygon* polygon, mPolygons)
-        geometry->appendChild(polygon->serializeToXmlDomElement());
-    foreach (const SymbolText* text, mTexts)
-        geometry->appendChild(text->serializeToXmlDomElement());
-    foreach (const SymbolEllipse* ellipse, mEllipses)
-        geometry->appendChild(ellipse->serializeToXmlDomElement());
     XmlDomElement* pins = root->appendChild("pins");
     foreach (const SymbolPin* pin, mPins)
         pins->appendChild(pin->serializeToXmlDomElement());
+    XmlDomElement* geometry = root->appendChild("geometry");
+    foreach (const Polygon* polygon, mPolygons)
+        geometry->appendChild(polygon->serializeToXmlDomElement());
+    foreach (const Text* text, mTexts)
+        geometry->appendChild(text->serializeToXmlDomElement());
+    foreach (const Ellipse* ellipse, mEllipses)
+        geometry->appendChild(ellipse->serializeToXmlDomElement());
     return root.take();
 }
 

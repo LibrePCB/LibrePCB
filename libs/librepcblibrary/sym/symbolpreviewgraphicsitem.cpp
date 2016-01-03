@@ -29,7 +29,8 @@
 #include <librepcbcommon/schematiclayer.h>
 #include <librepcbcommon/if_schematiclayerprovider.h>
 #include "symbolpinpreviewgraphicsitem.h"
-#include "../gencmp/genericcomponent.h"
+#include "../cmp/component.h"
+#include <librepcbcommon/geometry/text.h>
 
 namespace library {
 
@@ -40,14 +41,14 @@ namespace library {
 SymbolPreviewGraphicsItem::SymbolPreviewGraphicsItem(const IF_SchematicLayerProvider& layerProvider,
                                                      const QStringList& localeOrder,
                                                      const Symbol& symbol,
-                                                     const GenericComponent* genComp,
-                                                     const QUuid& symbVarUuid,
-                                                     const QUuid& symbVarItemUuid) noexcept :
-    GraphicsItem(), mLayerProvider(layerProvider), mSymbol(symbol), mGenComp(genComp),
+                                                     const Component* cmp,
+                                                     const Uuid& symbVarUuid,
+                                                     const Uuid& symbVarItemUuid) noexcept :
+    GraphicsItem(), mLayerProvider(layerProvider), mSymbol(symbol), mComponent(cmp),
     mSymbVarItem(nullptr), mDrawBoundingRect(false), mLocaleOrder(localeOrder)
 {
-    if (mGenComp)
-        mSymbVarItem = mGenComp->getSymbVarItem(symbVarUuid, symbVarItemUuid);
+    if (mComponent)
+        mSymbVarItem = mComponent->getSymbVarItem(symbVarUuid, symbVarItemUuid);
 
     mFont.setStyleStrategy(QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
     mFont.setStyleHint(QFont::SansSerif);
@@ -55,13 +56,19 @@ SymbolPreviewGraphicsItem::SymbolPreviewGraphicsItem(const IF_SchematicLayerProv
 
     updateCacheAndRepaint();
 
-    foreach (const SymbolPin* pin, symbol.getPins())
+    foreach (const Uuid& pinUuid, symbol.getPinUuids())
     {
-        const GenCompSignal* signal = nullptr;
-        GenCompSymbVarItem::PinDisplayType_t displayType = GenCompSymbVarItem::PinDisplayType_t::PinName;
-        if (mGenComp) signal = mGenComp->getSignalOfPin(symbVarUuid, symbVarItemUuid, pin->getUuid());
-        if (mSymbVarItem) displayType = mSymbVarItem->getDisplayTypeOfPin(pin->getUuid());
-        SymbolPinPreviewGraphicsItem* item = new SymbolPinPreviewGraphicsItem(layerProvider, localeOrder, *pin, signal, displayType);
+        const SymbolPin* pin = symbol.getPinByUuid(pinUuid);
+        Q_ASSERT(pin); if (!pin) continue;
+
+        const ComponentSignal* signal = nullptr;
+        const ComponentPinSignalMapItem* mapItem = nullptr;
+        ComponentPinSignalMapItem::PinDisplayType_t displayType =
+                ComponentPinSignalMapItem::PinDisplayType_t::PIN_NAME;
+        if (mComponent) signal = mComponent->getSignalOfPin(symbVarUuid, symbVarItemUuid, pin->getUuid());
+        if (mSymbVarItem) mapItem = mSymbVarItem->getPinSignalMapItemOfPin(pin->getUuid());
+        if (mapItem) displayType = mapItem->getDisplayType();
+        SymbolPinPreviewGraphicsItem* item = new SymbolPinPreviewGraphicsItem(layerProvider, *pin, signal, displayType);
         item->setPos(pin->getPosition().toPxQPointF());
         item->setRotation(-pin->getRotation().toDeg());
         item->setZValue(2);
@@ -105,8 +112,11 @@ void SymbolPreviewGraphicsItem::updateCacheAndRepaint() noexcept
     mShape.addRect(crossRect);
 
     // polygons
-    foreach (const SymbolPolygon* polygon, mSymbol.getPolygons())
+    for (int i = 0; i < mSymbol.getPolygonCount(); i++)
     {
+        const Polygon* polygon = mSymbol.getPolygon(i);
+        Q_ASSERT(polygon); if (!polygon) continue;
+
         QPainterPath polygonPath = polygon->toQPainterPathPx();
         qreal w = polygon->getWidth().toPx() / 2;
         mBoundingRect = mBoundingRect.united(polygonPath.boundingRect().adjusted(-w, -w, w, w));
@@ -115,8 +125,11 @@ void SymbolPreviewGraphicsItem::updateCacheAndRepaint() noexcept
 
     // texts
     mCachedTextProperties.clear();
-    foreach (const SymbolText* text, mSymbol.getTexts())
+    for (int i = 0; i < mSymbol.getTextCount(); i++)
     {
+        const Text* text = mSymbol.getText(i);
+        Q_ASSERT(text); if (!text) continue;
+
         // create static text properties
         CachedTextProperties_t props;
 
@@ -197,8 +210,11 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
     const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
 
     // draw all polygons
-    foreach (const SymbolPolygon* polygon, mSymbol.getPolygons())
+    for (int i = 0; i < mSymbol.getPolygonCount(); i++)
     {
+        const Polygon* polygon = mSymbol.getPolygon(i);
+        Q_ASSERT(polygon); if (!polygon) continue;
+
         // set colors
         layer = mLayerProvider.getSchematicLayer(polygon->getLayerId());
         if (layer)
@@ -221,8 +237,11 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
     }
 
     // draw all ellipses
-    foreach (const SymbolEllipse* ellipse, mSymbol.getEllipses())
+    for (int i = 0; i < mSymbol.getEllipseCount(); i++)
     {
+        const Ellipse* ellipse = mSymbol.getEllipse(i);
+        Q_ASSERT(ellipse); if (!ellipse) continue;
+
         // set colors
         layer = mLayerProvider.getSchematicLayer(ellipse->getLayerId()); if (!layer) continue;
         if (layer)
@@ -247,8 +266,11 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
     }
 
     // draw all texts
-    foreach (const SymbolText* text, mSymbol.getTexts())
+    for (int i = 0; i < mSymbol.getTextCount(); i++)
     {
+        const Text* text = mSymbol.getText(i);
+        Q_ASSERT(text); if (!text) continue;
+
         // get layer
         layer = mLayerProvider.getSchematicLayer(text->getLayerId()); if (!layer) continue;
 
@@ -304,23 +326,20 @@ bool SymbolPreviewGraphicsItem::getAttributeValue(const QString& attrNS, const Q
 
     if ((attrNS == QLatin1String("SYM")) || (attrNS.isEmpty()))
     {
-        if ((attrKey == QLatin1String("NAME")) && (mGenComp) && (mSymbVarItem))
-            return value = mGenComp->getPrefix(mLocaleOrder) % "?" % mSymbVarItem->getSuffix(), true;
+        if ((attrKey == QLatin1String("NAME")) && (mComponent) && (mSymbVarItem))
+            return value = mComponent->getPrefix(mLocaleOrder) % "?" % mSymbVarItem->getSuffix(), true;
     }
 
-    if (((attrNS == QLatin1String("CMP")) || (attrNS.isEmpty())) && (mGenComp))
+    if (((attrNS == QLatin1String("CMP")) || (attrNS.isEmpty())) && (mComponent))
     {
         if (attrKey == QLatin1String("NAME"))
-            return value = mGenComp->getPrefix(mLocaleOrder) % "?", true;
+            return value = mComponent->getPrefix(mLocaleOrder) % "?", true;
         if (attrKey == QLatin1String("VALUE"))
             return value = "VALUE", true;
-        foreach (const LibraryElementAttribute* attr, mGenComp->getAttributes())
-        {
-            if (attrKey == attr->getKey())
-            {
-                value = attrKey;
-                return true;
-            }
+        const LibraryElementAttribute* attr = mComponent->getAttributeByKey(attrKey);
+        if (attr) {
+            value = attrKey;
+            return true;
         }
     }
 

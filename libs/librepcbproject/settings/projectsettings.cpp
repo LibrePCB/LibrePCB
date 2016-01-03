@@ -63,14 +63,14 @@ ProjectSettings::ProjectSettings(Project& project, bool restore, bool readOnly, 
             for (XmlDomElement* node = root.getFirstChild("locale_order/locale", true, false);
                  node; node = node->getNextSibling("locale"))
             {
-                mLocaleOrder.append(node->getText(true));
+                mLocaleOrder.append(node->getText<QString>(true));
             }
 
             // norm order
             for (XmlDomElement* node = root.getFirstChild("norm_order/norm", true, false);
                  node; node = node->getNextSibling("norm"))
             {
-                mNormOrder.append(node->getText(true));
+                mNormOrder.append(node->getText<QString>(true));
             }
         }
 

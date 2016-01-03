@@ -5,19 +5,19 @@
     <rect style="fill: #ffffff" x="0" y="360" width="256.4" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="0" y="360" width="256.4" height="44"/>
     <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="128.2" y="376">&lt;&lt;IF_XmlSerializableObject,...&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="128.2" y="395">GenCompInstance</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="128.2" y="395">ComponentInstance</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="520" y="240" width="256.4" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="520" y="240" width="256.4" height="44"/>
     <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="648.2" y="256">&lt;&lt;IF_XmlSerializableObject,...&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="648.2" y="275">SymbolInstance</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="648.2" y="275">SI_Symbol</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="1600" y="240" width="256.4" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1600" y="240" width="256.4" height="44"/>
     <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1728.2" y="256">&lt;&lt;IF_XmlSerializableObject,...&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1728.2" y="275">FootprintInstance</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1728.2" y="275">DeviceInstance</text>
   </g>
   <g>
     <rect style="fill: #ffbdbd" x="540" y="40" width="464.3" height="44"/>
@@ -26,15 +26,15 @@
     <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="772.15" y="75">Project</text>
   </g>
   <g>
-    <rect style="fill: #ffffff" x="700" y="320" width="182.25" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="700" y="320" width="182.25" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="791.125" y="336">&lt;&lt;IF_ErcMsgProvider&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="791.125" y="355">SymbolPinInstance</text>
+    <rect style="fill: #ffffff" x="700" y="320" width="171.7" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="700" y="320" width="171.7" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="785.85" y="336">&lt;&lt;IF_ErcMsgProvider&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="785.85" y="355">SI_SymbolPin</text>
   </g>
   <g>
-    <rect style="fill: #ffffff" x="1780" y="320" width="204.45" height="28"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1780" y="320" width="204.45" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1882.22" y="339">FootprintPadInstance</text>
+    <rect style="fill: #ffffff" x="1780" y="320" width="181.05" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1780" y="320" width="181.05" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1870.53" y="339">DevicePadInstance</text>
   </g>
   <g>
     <rect style="fill: #ffff94" x="300" y="160" width="333.4" height="44"/>
@@ -142,7 +142,7 @@
     <rect style="fill: #ffffff" x="180" y="440" width="256.4" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="180" y="440" width="256.4" height="44"/>
     <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="308.2" y="456">&lt;&lt;IF_XmlSerializableObject,...&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="308.2" y="475">GenCompSignalInstance</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="308.2" y="475">ComponentSignalInstance</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="128.2,429.172 128.2,462 180,462 "/>
@@ -207,26 +207,24 @@
     <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="-290.825" y="195">ProjectLibrary</text>
   </g>
   <g>
-    <polygon style="fill: #ffffff" points="-400,300 -186.1,300 -174.1,312 -174.1,430 -400,430 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-400,300 -186.1,300 -174.1,312 -174.1,430 -400,430 "/>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" points="-186.1,300 -186.1,312 -174.1,312 "/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-393" y="324.9">
-      <tspan x="-393" y="324.9">- library::Symbol</tspan>
-      <tspan x="-393" y="340.9">- library::Footprint</tspan>
-      <tspan x="-393" y="356.9">- library::Model</tspan>
-      <tspan x="-393" y="372.9">- library::SpiceModel</tspan>
-      <tspan x="-393" y="388.9">- library::Package</tspan>
-      <tspan x="-393" y="404.9">- library::GenericComponent</tspan>
-      <tspan x="-393" y="420.9">- library::Component</tspan>
+    <polygon style="fill: #ffffff" points="-380,300 -212.3,300 -200.3,312 -200.3,398 -380,398 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-380,300 -212.3,300 -200.3,312 -200.3,398 -380,398 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" points="-212.3,300 -212.3,312 -200.3,312 "/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-373" y="324.9">
+      <tspan x="-373" y="324.9">- library::Symbol</tspan>
+      <tspan x="-373" y="340.9">- library::SpiceModel</tspan>
+      <tspan x="-373" y="356.9">- library::Package</tspan>
+      <tspan x="-373" y="372.9">- library::Component</tspan>
+      <tspan x="-373" y="388.9">- library::Device</tspan>
     </text>
   </g>
   <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-290.825,230.177 -290.825,258.999 -287.05,258.999 -287.05,298.992 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-290.825,230.177 -290.825,259 -290.15,259 -290.15,298.994 "/>
     <polygon style="fill: #000000" points="-290.825,205.006 -286.025,219.006 -290.825,233.006 -295.625,219.006 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-290.825,205.006 -286.025,219.006 -290.825,233.006 -295.625,219.006 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-288.938" y="254.999"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-290.487" y="255"/>
     <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-279.825" y="217.006">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-283.05" y="294.992">0..*</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-286.15" y="294.994">0..*</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="466.7,229.172 466.7,462 520,462 "/>
@@ -330,10 +328,10 @@
     <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-286.825" y="156">1</text>
   </g>
   <g>
-    <rect style="fill: #ffffff" x="180" y="500" width="255.75" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="180" y="500" width="255.75" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="307.875" y="516">&lt;&lt;IF_XmlSerializableObject&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="307.875" y="535">GenCompAttributeInstance</text>
+    <rect style="fill: #ffffff" x="180" y="500" width="272.65" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="180" y="500" width="272.65" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="316.325" y="516">&lt;&lt;IF_XmlSerializableObject&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="316.325" y="535">ComponentAttributeInstance</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="0" y="620" width="260" height="120"/>
@@ -370,10 +368,10 @@
     <tspan x="-380" y="780">+ some undo commands</tspan>
   </text>
   <g>
-    <rect style="fill: #92ff92" x="-380" y="640" width="189.1" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-380" y="640" width="189.1" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-285.45" y="656">&lt;&lt;QDialog&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="-285.45" y="675">AddGenCompDialog</text>
+    <rect style="fill: #92ff92" x="-380" y="640" width="206" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-380" y="640" width="206" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-277" y="656">&lt;&lt;QDialog&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="-277" y="675">AddComponentDialog</text>
   </g>
   <g>
     <rect style="fill: #92ff92" x="-380" y="700" width="280.5" height="44"/>
@@ -412,11 +410,11 @@
     <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1088.9" y="355">library::SymbolPinGraphicsItem</text>
   </g>
   <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="907.422,342 897.25,342 939,342 940,342 "/>
-    <polygon style="fill: #000000" points="882.25,342 896.25,337.2 910.25,342 896.25,346.8 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="882.25,342 896.25,337.2 910.25,342 896.25,346.8 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="918.125" y="338"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="914.25" y="338">1</text>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="896.872,342 886.7,342 939,342 940,342 "/>
+    <polygon style="fill: #000000" points="871.7,342 885.7,337.2 899.7,342 885.7,346.8 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="871.7,342 885.7,337.2 899.7,342 885.7,346.8 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="912.85" y="338"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="903.7" y="338">1</text>
     <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="936" y="338">1</text>
   </g>
   <g>

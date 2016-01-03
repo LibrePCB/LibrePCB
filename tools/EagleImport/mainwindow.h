@@ -3,6 +3,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
+#include <librepcbcommon/uuid.h>
 #include <librepcbcommon/fileio/filepath.h>
 
 namespace Ui {
@@ -40,15 +41,17 @@ class MainWindow : public QMainWindow
 
         enum class ConvertFileType_t {
             Symbols_to_Symbols,
-            Packages_to_FootprintsAndComponents,
-            Devices_to_GenericComponents
+            Packages_to_PackagesAndDevices,
+            Devices_to_Components
         };
 
         void reset();
         void addError(const QString& msg, const FilePath& inputFile = FilePath(), int inputLine = 0);
-        QUuid getOrCreateUuid(QSettings& outputSettings, const FilePath& filepath,
+        Uuid getOrCreateUuid(QSettings& outputSettings, const FilePath& filepath,
                               const QString& cat, const QString& key1, const QString& key2 = QString());
         QString createDescription(const FilePath& filepath, const QString& name);
+        int convertSchematicLayerId(int eagleLayerId);
+        int convertBoardLayerId(int eagleLayerId);
         void convertAllFiles(ConvertFileType_t type);
         void convertFile(ConvertFileType_t type, QSettings& outputSettings, const FilePath& filepath);
         bool convertSymbol(QSettings& outputSettings, const FilePath& filepath, XmlDomElement* node);

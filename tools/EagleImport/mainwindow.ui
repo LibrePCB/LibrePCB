@@ -227,14 +227,14 @@
       <item>
        <widget class="QPushButton" name="pushButton_2">
         <property name="text">
-         <string>Packages --&gt; Footprints + Packages</string>
+         <string>Packages --&gt; Packages</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="btnConvertDevices">
         <property name="text">
-         <string>Devices --&gt; Generic Components + Components</string>
+         <string>Devices --&gt; Components + Devices</string>
         </property>
        </widget>
       </item>

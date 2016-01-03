@@ -30,7 +30,7 @@
 #include "../../project.h"
 #include "../../circuit/circuit.h"
 #include "../../circuit/netsignal.h"
-#include "../../circuit/gencompsignalinstance.h"
+#include "../../circuit/componentsignalinstance.h"
 #include "../../erc/ercmsg.h"
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include <librepcbcommon/graphics/graphicsscene.h>
@@ -46,50 +46,50 @@ SI_NetPoint::SI_NetPoint(Schematic& schematic, const XmlDomElement& domElement) 
     mGraphicsItem(nullptr), mNetSignal(nullptr), mSymbolPin(nullptr)
 {
     // read attributes
-    mUuid = domElement.getAttribute<QUuid>("uuid");
-    mAttached = domElement.getFirstChild("attached", true)->getText<bool>();
+    mUuid = domElement.getAttribute<Uuid>("uuid", true);
+    mAttached = domElement.getFirstChild("attached", true)->getText<bool>(true);
     if (mAttached)
     {
-        QUuid symbolUuid = domElement.getFirstChild("symbol", true)->getText<QUuid>();
+        Uuid symbolUuid = domElement.getFirstChild("symbol", true)->getText<Uuid>(true);
         SI_Symbol* symbol = mSchematic.getSymbolByUuid(symbolUuid);
         if (!symbol)
         {
-            throw RuntimeError(__FILE__, __LINE__, symbolUuid.toString(),
-                QString(tr("Invalid symbol UUID: \"%1\"")).arg(symbolUuid.toString()));
+            throw RuntimeError(__FILE__, __LINE__, symbolUuid.toStr(),
+                QString(tr("Invalid symbol UUID: \"%1\"")).arg(symbolUuid.toStr()));
         }
-        QUuid pinUuid = domElement.getFirstChild("pin", true)->getText<QUuid>();
+        Uuid pinUuid = domElement.getFirstChild("pin", true)->getText<Uuid>(true);
         mSymbolPin = symbol->getPin(pinUuid);
         if (!mSymbolPin)
         {
-            throw RuntimeError(__FILE__, __LINE__, pinUuid.toString(),
-                QString(tr("Invalid symbol pin UUID: \"%1\"")).arg(pinUuid.toString()));
+            throw RuntimeError(__FILE__, __LINE__, pinUuid.toStr(),
+                QString(tr("Invalid symbol pin UUID: \"%1\"")).arg(pinUuid.toStr()));
         }
-        const GenCompSignalInstance* compSignal = mSymbolPin->getGenCompSignalInstance();
+        const ComponentSignalInstance* compSignal = mSymbolPin->getComponentSignalInstance();
         if (!compSignal)
         {
-            throw RuntimeError(__FILE__, __LINE__, pinUuid.toString(),
-                QString(tr("The symbol pin instance \"%1\" has no signal.")).arg(pinUuid.toString()));
+            throw RuntimeError(__FILE__, __LINE__, pinUuid.toStr(),
+                QString(tr("The symbol pin instance \"%1\" has no signal.")).arg(pinUuid.toStr()));
         }
         mNetSignal = compSignal->getNetSignal();
         if (!mNetSignal)
         {
-            throw RuntimeError(__FILE__, __LINE__, pinUuid.toString(), QString(tr("The pin of the "
-                "netpoint \"%1\" has no netsignal.")).arg(mUuid.toString()));
+            throw RuntimeError(__FILE__, __LINE__, pinUuid.toStr(), QString(tr("The pin of the "
+                "netpoint \"%1\" has no netsignal.")).arg(mUuid.toStr()));
         }
         mPosition = mSymbolPin->getPosition();
     }
     else
     {
-        QUuid netSignalUuid = domElement.getFirstChild("netsignal", true)->getText<QUuid>();
+        Uuid netSignalUuid = domElement.getFirstChild("netsignal", true)->getText<Uuid>(true);
         mNetSignal = mSchematic.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
         if(!mNetSignal)
         {
-            throw RuntimeError(__FILE__, __LINE__, netSignalUuid.toString(),
-                QString(tr("Invalid net signal UUID: \"%1\"")).arg(netSignalUuid.toString()));
+            throw RuntimeError(__FILE__, __LINE__, netSignalUuid.toStr(),
+                QString(tr("Invalid net signal UUID: \"%1\"")).arg(netSignalUuid.toStr()));
         }
 
-        mPosition.setX(domElement.getFirstChild("position", true)->getAttribute<Length>("x"));
-        mPosition.setY(domElement.getFirstChild("position", true)->getAttribute<Length>("y"));
+        mPosition.setX(domElement.getFirstChild("position", true)->getAttribute<Length>("x", true));
+        mPosition.setY(domElement.getFirstChild("position", true)->getAttribute<Length>("y", true));
     }
 
     init();
@@ -99,7 +99,7 @@ SI_NetPoint::SI_NetPoint(Schematic& schematic, NetSignal& netsignal, const Point
     SI_Base(), mCircuit(schematic.getProject().getCircuit()), mSchematic(schematic),
     mGraphicsItem(nullptr), mNetSignal(nullptr), mSymbolPin(nullptr)
 {
-    mUuid = QUuid::createUuid(); // generate random UUID
+    mUuid = Uuid::createRandom(); // generate random UUID
     mAttached = false;
     mNetSignal = &netsignal;
     mPosition = position;
@@ -110,20 +110,20 @@ SI_NetPoint::SI_NetPoint(Schematic& schematic, SI_SymbolPin& pin) throw (Excepti
     SI_Base(), mCircuit(schematic.getProject().getCircuit()), mSchematic(schematic),
     mGraphicsItem(nullptr), mNetSignal(nullptr), mSymbolPin(&pin)
 {
-    mUuid = QUuid::createUuid(); // generate random UUID
+    mUuid = Uuid::createRandom(); // generate random UUID
     mAttached = true;
-    const GenCompSignalInstance* compSignal = mSymbolPin->getGenCompSignalInstance();
+    const ComponentSignalInstance* compSignal = mSymbolPin->getComponentSignalInstance();
     if (!compSignal)
     {
-        throw RuntimeError(__FILE__, __LINE__, mSymbolPin->getLibPinUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, mSymbolPin->getLibPinUuid().toStr(),
             QString(tr("The symbol pin instance \"%1\" has no signal."))
-            .arg(mSymbolPin->getLibPinUuid().toString()));
+            .arg(mSymbolPin->getLibPinUuid().toStr()));
     }
     mNetSignal = compSignal->getNetSignal();
     if (!mNetSignal)
     {
-        throw RuntimeError(__FILE__, __LINE__, mSymbolPin->getLibPinUuid().toString(),
-            QString(tr("The pin of the netpoint \"%1\" has no netsignal.")).arg(mUuid.toString()));
+        throw RuntimeError(__FILE__, __LINE__, mSymbolPin->getLibPinUuid().toStr(),
+            QString(tr("The pin of the netpoint \"%1\" has no netsignal.")).arg(mUuid.toStr()));
     }
     mPosition = mSymbolPin->getPosition();
     init();
@@ -137,9 +137,9 @@ void SI_NetPoint::init() throw (Exception)
 
     // create ERC messages
     mErcMsgDeadNetPoint.reset(new ErcMsg(mCircuit.getProject(), *this,
-        mUuid.toString(), "Dead", ErcMsg::ErcMsgType_t::SchematicError,
+        mUuid.toStr(), "Dead", ErcMsg::ErcMsgType_t::SchematicError,
         QString(tr("Dead net point in schematic page \"%1\": %2"))
-        .arg(mSchematic.getName()).arg(mUuid.toString())));
+        .arg(mSchematic.getName()).arg(mUuid.toStr())));
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -192,7 +192,7 @@ void SI_NetPoint::detachFromPin() throw (Exception)
 void SI_NetPoint::attachToPin(SI_SymbolPin& pin) throw (Exception)
 {
     if (mAttached) throw LogicError(__FILE__, __LINE__);
-    const GenCompSignalInstance* compSignal = pin.getGenCompSignalInstance();
+    const ComponentSignalInstance* compSignal = pin.getComponentSignalInstance();
     if (!compSignal) throw LogicError(__FILE__, __LINE__);
     const NetSignal* netsignal = compSignal->getNetSignal();
     if (netsignal != mNetSignal) throw LogicError(__FILE__, __LINE__);
@@ -234,7 +234,7 @@ void SI_NetPoint::addToSchematic(GraphicsScene& scene) throw (Exception)
     if (mAttached)
     {
         // check if mNetSignal is correct (would be a bug if not)
-        if (mNetSignal != mSymbolPin->getGenCompSignalInstance()->getNetSignal())
+        if (mNetSignal != mSymbolPin->getComponentSignalInstance()->getNetSignal())
             throw LogicError(__FILE__, __LINE__);
     }
 
@@ -252,7 +252,7 @@ void SI_NetPoint::removeFromSchematic(GraphicsScene& scene) throw (Exception)
     if (mAttached)
     {
         // check if mNetSignal is correct (would be a bug if not)
-        if (mNetSignal != mSymbolPin->getGenCompSignalInstance()->getNetSignal())
+        if (mNetSignal != mSymbolPin->getComponentSignalInstance()->getNetSignal())
             throw LogicError(__FILE__, __LINE__);
     }
 

@@ -69,6 +69,8 @@ class IF_XmlSerializableObject
          * @return The created XML DOM element (the caller takes the ownership!)
          *
          * @throw Exception     This method throws an exception if an error occurs.
+         *
+         * @todo maybe better return a QSharedPointer instead of a raw pointer?
          */
         virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception) = 0;
 

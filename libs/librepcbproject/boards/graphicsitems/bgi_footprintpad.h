@@ -88,6 +88,7 @@ class BGI_FootprintPad final : public BGI_Base
         QFont mFont;
 
         // Cached Attributes
+        BoardLayer* mPadLayer;
         QStaticText mStaticText;
         bool mRotate180;
         QRectF mBoundingRect;

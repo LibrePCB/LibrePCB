@@ -26,6 +26,9 @@
 
 #include <QtCore>
 #include "../libraryelement.h"
+#include "componentsignal.h"
+#include "componentsymbolvariant.h"
+#include "../libraryelementattribute.h"
 
 /*****************************************************************************************
  *  Class Component
@@ -43,40 +46,77 @@ class Component final : public LibraryElement
     public:
 
         // Constructors / Destructor
-        explicit Component(const QUuid& uuid = QUuid::createUuid(),
-                           const Version& version = Version(),
-                           const QString& author = QString(),
-                           const QString& name_en_US = QString(),
-                           const QString& description_en_US = QString(),
-                           const QString& keywords_en_US = QString()) throw (Exception);
+        explicit Component(const Uuid& uuid, const Version& version, const QString& author,
+                           const QString& name_en_US, const QString& description_en_US,
+                           const QString& keywords_en_US) throw (Exception);
         explicit Component(const FilePath& elementDirectory) throw (Exception);
         ~Component() noexcept;
 
-        // Getters
-        const QUuid& getGenCompUuid() const noexcept {return mGenericComponentUuid;}
-        const QUuid& getPackageUuid() const noexcept {return mPackageUuid;}
-        const QHash<QUuid, QUuid>& getPadSignalMap() const noexcept {return mPadSignalMap;}
-        QUuid getSignalOfPad(const QUuid& pad) const noexcept {return mPadSignalMap.value(pad);}
+        // General
+        bool isSchematicOnly() const noexcept {return mSchematicOnly;}
+        void setIsSchematicOnly(bool schematicOnly) noexcept {mSchematicOnly = schematicOnly;}
 
-        // Setters
-        void setGenCompUuid(const QUuid& uuid) noexcept {mGenericComponentUuid = uuid;}
-        void setPackageUuid(const QUuid& uuid) noexcept {mPackageUuid = uuid;}
+        // Attribute Methods
+        const QList<LibraryElementAttribute*>& getAttributes() noexcept {return mAttributes;}
+        int getAttributeCount() const noexcept {return mAttributes.count();}
+        LibraryElementAttribute* getAttribute(int index) noexcept {return mAttributes.value(index);}
+        const LibraryElementAttribute* getAttribute(int index) const noexcept {return mAttributes.value(index);}
+        LibraryElementAttribute* getAttributeByKey(const QString& key) noexcept;
+        const LibraryElementAttribute* getAttributeByKey(const QString& key) const noexcept;
+        void addAttribute(LibraryElementAttribute& attr) noexcept;
+        void removeAttribute(LibraryElementAttribute& attr) noexcept;
 
-        // General Methods
-        void clearPadSignalMap() noexcept {mPadSignalMap.clear();}
-        void addPadSignalMapping(const QUuid& pad, const QUuid& signal) noexcept {mPadSignalMap.insert(pad, signal);}
+        // Default Value Methods
+        const QMap<QString, QString>& getDefaultValues() const noexcept {return mDefaultValues;}
+        QString getDefaultValue(const QStringList& localeOrder) const throw (Exception);
+        void addDefaultValue(const QString& locale, const QString& value) noexcept;
+        void removeDefaultValue(const QString& locale) noexcept;
+
+        // Prefix Methods
+        const QMap<QString, QString>& getPrefixes() const noexcept {return mPrefixes;}
+        QString getPrefix(const QStringList& normOrder) const noexcept;
+        QString getDefaultPrefix() const noexcept;
+        void addPrefix(const QString& norm, const QString& prefix) noexcept;
+
+        // Signal Methods
+        const QList<ComponentSignal*>& getSignals() noexcept {return mSignals;}
+        int getSignalCount() const noexcept {return mSignals.count();}
+        ComponentSignal* getSignal(int index) noexcept {return mSignals.value(index);}
+        const ComponentSignal* getSignal(int index) const noexcept {return mSignals.value(index);}
+        ComponentSignal* getSignalByUuid(const Uuid& uuid) noexcept;
+        const ComponentSignal* getSignalByUuid(const Uuid& uuid) const noexcept;
+        ComponentSignal* getSignalOfPin(const Uuid& symbVar, const Uuid& item, const Uuid& pin) noexcept;
+        const ComponentSignal* getSignalOfPin(const Uuid& symbVar, const Uuid& item, const Uuid& pin) const noexcept;
+        void addSignal(ComponentSignal& signal) noexcept;
+        void removeSignal(ComponentSignal& signal) noexcept;
+
+        // Symbol Variant Methods
+        const QList<ComponentSymbolVariant*>& getSymbolVariants() noexcept {return mSymbolVariants;}
+        int getSymbolVariantCount() const noexcept {return mSymbolVariants.count();}
+        ComponentSymbolVariant* getSymbolVariant(int index) noexcept {return mSymbolVariants.value(index);}
+        const ComponentSymbolVariant* getSymbolVariant(int index) const noexcept {return mSymbolVariants.value(index);}
+        ComponentSymbolVariant* getSymbolVariantByUuid(const Uuid& uuid) noexcept;
+        const ComponentSymbolVariant* getSymbolVariantByUuid(const Uuid& uuid) const noexcept;
+        const Uuid& getDefaultSymbolVariantUuid() const noexcept {return mDefaultSymbolVariantUuid;}
+        ComponentSymbolVariant* getDefaultSymbolVariant() noexcept;
+        const ComponentSymbolVariant* getDefaultSymbolVariant() const noexcept;
+        void addSymbolVariant(ComponentSymbolVariant& symbolVariant) noexcept;
+        void removeSymbolVariant(ComponentSymbolVariant& symbolVariant) noexcept;
+
+        // Symbol Variant Item Methods
+        ComponentSymbolVariantItem* getSymbVarItem(const Uuid& symbVar, const Uuid& item) noexcept;
+        const ComponentSymbolVariantItem* getSymbVarItem(const Uuid& symbVar, const Uuid& item) const noexcept;
 
 
     private:
 
         // make some methods inaccessible...
-        Component();
-        Component(const Component& other);
-        Component& operator=(const Component& rhs);
+        Component() = delete;
+        Component(const Component& other) = delete;
+        Component& operator=(const Component& rhs) = delete;
 
 
         // Private Methods
-
         void parseDomTree(const XmlDomElement& root) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
@@ -86,10 +126,14 @@ class Component final : public LibraryElement
         bool checkAttributesValidity() const noexcept override;
 
 
-        // Attributes
-        QUuid mGenericComponentUuid;
-        QUuid mPackageUuid;
-        QHash<QUuid, QUuid> mPadSignalMap; ///< key: pad, value: signal
+        // Conponent Attributes
+        bool mSchematicOnly; ///< if true, this component is schematic-only (no package)
+        QList<LibraryElementAttribute*> mAttributes; ///< all attributes in a specific order
+        QMap<QString, QString> mDefaultValues; ///< key: locale (like "en_US"), value: default value
+        QMap<QString, QString> mPrefixes; ///< key: norm, value: prefix
+        QList<ComponentSignal*> mSignals; ///< empty if the component has no signals
+        QList<ComponentSymbolVariant*> mSymbolVariants; ///< minimum one entry
+        Uuid mDefaultSymbolVariantUuid; ///< must be an existing key of #mSymbolVariants
 };
 
 } // namespace library

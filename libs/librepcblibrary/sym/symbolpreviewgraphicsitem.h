@@ -26,6 +26,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
+#include <librepcbcommon/uuid.h>
 #include <librepcbcommon/graphics/graphicsitem.h>
 #include <librepcbcommon/if_attributeprovider.h>
 
@@ -33,14 +34,14 @@
  *  Forward Declarations
  ****************************************************************************************/
 
+class Text;
 class SchematicLayer;
 class IF_SchematicLayerProvider;
 
 namespace library {
 class Symbol;
-class SymbolText;
-class GenericComponent;
-class GenCompSymbVarItem;
+class Component;
+class ComponentSymbolVariantItem;
 }
 
 /*****************************************************************************************
@@ -63,9 +64,9 @@ class SymbolPreviewGraphicsItem final : public GraphicsItem, public IF_Attribute
         explicit SymbolPreviewGraphicsItem(const IF_SchematicLayerProvider& layerProvider,
                                            const QStringList& localeOrder,
                                            const Symbol& symbol,
-                                           const GenericComponent* genComp = nullptr,
-                                           const QUuid& symbVarUuid = QUuid(),
-                                           const QUuid& symbVarItemUuid = QUuid()) noexcept;
+                                           const Component* cmp = nullptr,
+                                           const Uuid& symbVarUuid = Uuid(),
+                                           const Uuid& symbVarItemUuid = Uuid()) noexcept;
         ~SymbolPreviewGraphicsItem() noexcept;
 
         // Setters
@@ -113,8 +114,8 @@ class SymbolPreviewGraphicsItem final : public GraphicsItem, public IF_Attribute
         // General Attributes
         const IF_SchematicLayerProvider& mLayerProvider;
         const Symbol& mSymbol;
-        const GenericComponent* mGenComp;
-        const GenCompSymbVarItem* mSymbVarItem;
+        const Component* mComponent;
+        const ComponentSymbolVariantItem* mSymbVarItem;
         QFont mFont;
         bool mDrawBoundingRect;
         QStringList mLocaleOrder;
@@ -122,7 +123,7 @@ class SymbolPreviewGraphicsItem final : public GraphicsItem, public IF_Attribute
         // Cached Attributes
         QRectF mBoundingRect;
         QPainterPath mShape;
-        QHash<const SymbolText*, CachedTextProperties_t> mCachedTextProperties;
+        QHash<const Text*, CachedTextProperties_t> mCachedTextProperties;
 };
 
 } // namespace project

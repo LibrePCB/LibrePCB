@@ -30,11 +30,11 @@
 #include "../schematic.h"
 #include "../../project.h"
 #include "../../circuit/netsignal.h"
-#include "../../circuit/gencompinstance.h"
-#include "../../circuit/gencompsignalinstance.h"
+#include "../../circuit/componentinstance.h"
+#include "../../circuit/componentsignalinstance.h"
 #include <librepcbcommon/schematiclayer.h>
 #include <librepcblibrary/sym/symbolpin.h>
-#include <librepcblibrary/gencmp/genericcomponent.h>
+#include <librepcblibrary/cmp/component.h>
 #include "../../settings/projectsettings.h"
 
 namespace project {
@@ -47,8 +47,7 @@ SGI_SymbolPin::SGI_SymbolPin(SI_SymbolPin& pin) noexcept :
     SGI_Base(), mPin(pin), mLibPin(pin.getLibPin())
 {
     setZValue(Schematic::ZValue_Symbols);
-    QStringList localeOrder = mPin.getSymbol().getSchematic().getProject().getSettings().getLocaleOrder();
-    setToolTip(mLibPin.getName(localeOrder) % ": " % mLibPin.getDescription(localeOrder));
+    setToolTip(mLibPin.getName());
 
     mStaticText.setTextFormat(Qt::PlainText);
     mStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
@@ -118,9 +117,9 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
     const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
 
-    const library::GenCompSignal* genCompSignal = mPin.getGenCompSignal();
-    const NetSignal* netsignal = (genCompSignal ? mPin.getGenCompSignalInstance()->getNetSignal() : nullptr);
-    bool requiredPin = mPin.getGenCompSignal()->isRequired();
+    const library::ComponentSignal* cmpSignal = mPin.getComponentSignal();
+    const NetSignal* netsignal = (cmpSignal ? mPin.getComponentSignalInstance()->getNetSignal() : nullptr);
+    bool requiredPin = mPin.getComponentSignal()->isRequired();
 
     // draw line
     SchematicLayer* layer = getSchematicLayer(SchematicLayer::SymbolOutlines); Q_ASSERT(layer);

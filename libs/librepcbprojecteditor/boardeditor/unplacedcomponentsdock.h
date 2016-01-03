@@ -27,6 +27,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include <librepcbcommon/units/all_length_units.h>
+#include <librepcbcommon/uuid.h>
 
 /*****************************************************************************************
  *  Forward Declarations
@@ -36,13 +37,15 @@ class GraphicsView;
 class GraphicsScene;
 
 namespace library {
-class Component;
+class Device;
+class Package;
+class Footprint;
 }
 
 namespace project {
 class Project;
 class Board;
-class GenCompInstance;
+class ComponentInstance;
 class ProjectEditor;
 }
 
@@ -91,9 +94,11 @@ class UnplacedComponentsDock final : public QDockWidget
 
         // Private Methods
         void updateComponentsList() noexcept;
-        void setSelectedGenCompInstance(GenCompInstance* genComp) noexcept;
-        void setSelectedComponent(const library::Component* component) noexcept;
-        void addComponent(GenCompInstance& genComp, const QUuid& component) noexcept;
+        void setSelectedComponentInstance(ComponentInstance* cmp) noexcept;
+        void setSelectedDeviceAndPackage(const library::Device* device,
+                                         const library::Package* package) noexcept;
+        void addDevice(ComponentInstance& cmp, const Uuid& deviceUuid,
+                       const Uuid& footprintUuid) noexcept;
 
 
         // General
@@ -103,8 +108,9 @@ class UnplacedComponentsDock final : public QDockWidget
         Ui::UnplacedComponentsDock* mUi;
         GraphicsView* mFootprintPreviewGraphicsView;
         GraphicsScene* mFootprintPreviewGraphicsScene;
-        GenCompInstance* mSelectedGenComp;
-        const library::Component* mSelectedComponent;
+        ComponentInstance* mSelectedComponent;
+        const library::Device* mSelectedDevice;
+        const library::Package* mSelectedPackage;
         QMetaObject::Connection mCircuitConnection1;
         QMetaObject::Connection mCircuitConnection2;
         QMetaObject::Connection mBoardConnection1;

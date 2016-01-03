@@ -33,33 +33,40 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CategoryTreeItem::CategoryTreeItem(const Library& library, const QStringList localeOrder, CategoryTreeItem* parent,
-                                   const QUuid& uuid) throw (Exception) :
+CategoryTreeItem::CategoryTreeItem(const Library& library, const QStringList localeOrder,
+                                   CategoryTreeItem* parent, const Uuid& uuid) noexcept :
     mLocaleOrder(localeOrder), mParent(parent), mUuid(uuid), mCategory(nullptr),
-    mDepth(parent ? parent->getDepth() + 1 : 0)
+    mDepth(parent ? parent->getDepth() + 1 : 0), mExceptionMessage()
 {
-    if (!mUuid.isNull())
+    try
     {
-        FilePath fp = library.getLatestComponentCategory(mUuid);
-        if (fp.isValid()) mCategory = new ComponentCategory(fp);
+        if (!mUuid.isNull())
+        {
+            FilePath fp = library.getLatestComponentCategory(mUuid);
+            if (fp.isValid()) mCategory = new ComponentCategory(fp);
+        }
+
+        if ((!mUuid.isNull()) || (!mParent))
+        {
+            QSet<Uuid> childs = library.getComponentCategoryChilds(mUuid);
+            foreach (const Uuid& childUuid, childs)
+                mChilds.append(new CategoryTreeItem(library, mLocaleOrder, this, childUuid));
+
+            // sort childs
+            qSort(mChilds.begin(), mChilds.end(),
+                  [](const CategoryTreeItem* a, const CategoryTreeItem* b)
+                  {return a->data(Qt::DisplayRole) < b->data(Qt::DisplayRole);});
+        }
+
+        if (!mParent)
+        {
+            // add category for elements without category
+            mChilds.append(new CategoryTreeItem(library, mLocaleOrder, this, Uuid()));
+        }
     }
-
-    if ((!mUuid.isNull()) || (!mParent))
+    catch (Exception& e)
     {
-        QSet<QUuid> childs = library.getComponentCategoryChilds(mUuid);
-        foreach (const QUuid& childUuid, childs)
-            mChilds.append(new CategoryTreeItem(library, mLocaleOrder, this, childUuid));
-
-        // sort childs
-        qSort(mChilds.begin(), mChilds.end(),
-              [](const CategoryTreeItem* a, const CategoryTreeItem* b)
-              {return a->data(Qt::DisplayRole) < b->data(Qt::DisplayRole);});
-    }
-
-    if (!mParent)
-    {
-        // add category for elements without category
-        mChilds.append(new CategoryTreeItem(library, mLocaleOrder, this, QUuid()));
+        mExceptionMessage = e.getUserMsg();
     }
 }
 
@@ -91,7 +98,7 @@ QVariant CategoryTreeItem::data(int role) const noexcept
             else if (mCategory)
                 return mCategory->getName(mLocaleOrder);
             else
-                return "UNKNOWN";
+                return "(ERROR)";
 
         case Qt::DecorationRole:
             break;
@@ -100,15 +107,16 @@ QVariant CategoryTreeItem::data(int role) const noexcept
             break;
 
         case Qt::StatusTipRole:
+        case Qt::ToolTipRole:
             if (mUuid.isNull())
                 return "All library elements without a category";
             else if (mCategory)
                 return mCategory->getDescription(mLocaleOrder);
             else
-                return "";
+                return mExceptionMessage;
 
         case Qt::UserRole:
-            return mUuid;
+            return mUuid.toStr();
 
         default:
             break;

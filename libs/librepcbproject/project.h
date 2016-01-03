@@ -30,6 +30,7 @@
 #include <librepcbcommon/if_schematiclayerprovider.h>
 #include <librepcbcommon/if_boardlayerprovider.h>
 #include <librepcbcommon/exceptions.h>
+#include <librepcbcommon/uuid.h>
 #include <librepcbcommon/fileio/filelock.h>
 
 /*****************************************************************************************
@@ -286,7 +287,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *
          * @return A pointer to the specified schematic, or nullptr if uuid is invalid
          */
-        Schematic* getSchematicByUuid(const QUuid& uuid) const noexcept;
+        Schematic* getSchematicByUuid(const Uuid& uuid) const noexcept;
 
         /**
          * @brief Get the schematic page with a specific name
@@ -383,7 +384,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *
          * @return A pointer to the specified board, or nullptr if uuid is invalid
          */
-        Board* getBoardByUuid(const QUuid& uuid) const noexcept;
+        Board* getBoardByUuid(const Uuid& uuid) const noexcept;
 
         /**
          * @brief Get the board with a specific name
@@ -436,7 +437,6 @@ class Project final : public QObject, public IF_AttributeProvider,
         /**
          * @brief Save the whole project to the harddisc
          *
-         * @param version       The version of the files which will be created/overwritten
          * @param toOriginal    If false, the project is saved only to temporary files
          *
          * @note The whole save procedere is described in @ref doc_project_save.
@@ -567,7 +567,7 @@ class Project final : public QObject, public IF_AttributeProvider,
         ProjectSettings* mProjectSettings; ///< all project specific settings
         ProjectLibrary* mProjectLibrary; ///< the library which contains all elements needed in this project
         ErcMsgList* mErcMsgList; ///< A list which contains all electrical rule check (ERC) messages
-        Circuit* mCircuit; ///< The whole circuit of this project (contains all netclasses, netsignals, generic component instances, ...)
+        Circuit* mCircuit; ///< The whole circuit of this project (contains all netclasses, netsignals, component instances, ...)
         QList<Schematic*> mSchematics; ///< All schematics of this project
         QList<Schematic*> mRemovedSchematics; ///< All removed schematics of this project
         SchematicLayerProvider* mSchematicLayerProvider; ///< All schematic layers of this project

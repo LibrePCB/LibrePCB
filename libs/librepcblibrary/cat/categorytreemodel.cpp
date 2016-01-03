@@ -36,7 +36,7 @@ namespace library {
 CategoryTreeModel::CategoryTreeModel(const Library& library, const QStringList& localeOrder) noexcept :
     QAbstractItemModel(nullptr)
 {
-    mRootItem = new CategoryTreeItem(library, localeOrder, nullptr, QUuid());
+    mRootItem = new CategoryTreeItem(library, localeOrder, nullptr, Uuid());
 }
 
 CategoryTreeModel::~CategoryTreeModel() noexcept

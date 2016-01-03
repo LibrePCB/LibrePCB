@@ -44,7 +44,7 @@ namespace project {
 
 /**
  * @brief The SchematicLayerProvider class provides and manages all available schematic
- *        layers which are used in the project#SchematicEditor class
+ *        layers which are used in the #project#SchematicEditor class
  */
 class SchematicLayerProvider final : public IF_SchematicLayerProvider
 {

@@ -36,7 +36,7 @@ class AttributeType;
 class AttributeUnit;
 
 namespace library {
-class GenericComponent;
+class Component;
 }
 
 /*****************************************************************************************
@@ -79,9 +79,9 @@ class LibraryElementAttribute final : public IF_XmlSerializableObject
     private:
 
         // make some methods inaccessible...
-        LibraryElementAttribute();
-        LibraryElementAttribute(const LibraryElementAttribute& other);
-        LibraryElementAttribute& operator=(const LibraryElementAttribute& rhs);
+        LibraryElementAttribute() = delete;
+        LibraryElementAttribute(const LibraryElementAttribute& other) = delete;
+        LibraryElementAttribute& operator=(const LibraryElementAttribute& rhs) = delete;
 
         // Private Methods
 

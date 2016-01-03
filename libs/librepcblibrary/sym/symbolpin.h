@@ -25,6 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
+#include <librepcbcommon/uuid.h>
 #include <librepcbcommon/units/all_length_units.h>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 
@@ -44,28 +45,23 @@ class SymbolPin final : public IF_XmlSerializableObject
     public:
 
         // Constructors / Destructor
-        explicit SymbolPin(const QUuid& uuid = QUuid::createUuid(),
-                           const QString& name_en_US = QString(),
-                           const QString& description_en_US = QString()) noexcept;
+        explicit SymbolPin(const Uuid& uuid, const QString& name, const Point& position,
+                           const Length& length, const Angle& rotation) noexcept;
         explicit SymbolPin(const XmlDomElement& domElement) throw (Exception);
         ~SymbolPin() noexcept;
 
         // Getters
-        const QUuid& getUuid() const noexcept {return mUuid;}
+        const Uuid& getUuid() const noexcept {return mUuid;}
+        const QString& getName() const noexcept {return mName;}
         const Point& getPosition() const noexcept {return mPosition;}
         const Length& getLength() const noexcept {return mLength;}
         const Angle& getRotation() const noexcept {return mRotation;}
-        QString getName(const QStringList& localeOrder) const noexcept;
-        QString getDescription(const QStringList& localeOrder) const noexcept;
-        const QMap<QString, QString>& getNames() const noexcept {return mNames;}
-        const QMap<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
 
         // Setters
         void setPosition(const Point& pos) noexcept;
         void setLength(const Length& length) noexcept;
         void setRotation(const Angle& rotation) noexcept;
-        void setName(const QString& locale, const QString& name) noexcept;
-        void setDescription(const QString& locale, const QString& description) noexcept;
+        void setName(const QString& name) noexcept;
 
         // General Methods
 
@@ -75,8 +71,9 @@ class SymbolPin final : public IF_XmlSerializableObject
     private:
 
         // make some methods inaccessible...
-        SymbolPin(const SymbolPin& other);
-        SymbolPin& operator=(const SymbolPin& rhs);
+        SymbolPin() = delete;
+        SymbolPin(const SymbolPin& other) = delete;
+        SymbolPin& operator=(const SymbolPin& rhs) = delete;
 
         // Private Methods
 
@@ -85,12 +82,11 @@ class SymbolPin final : public IF_XmlSerializableObject
 
 
         // Pin Attributes
-        QUuid mUuid;
+        Uuid mUuid;
+        QString mName;
         Point mPosition;
         Length mLength;
         Angle mRotation;
-        QMap<QString, QString> mNames;
-        QMap<QString, QString> mDescriptions;
 };
 
 } // namespace library

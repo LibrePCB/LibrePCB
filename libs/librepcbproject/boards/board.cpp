@@ -33,11 +33,11 @@
 #include <librepcbcommon/gridproperties.h>
 #include "../circuit/circuit.h"
 #include "../erc/ercmsg.h"
-#include "../circuit/gencompinstance.h"
-#include "componentinstance.h"
+#include "../circuit/componentinstance.h"
+#include "deviceinstance.h"
 #include "items/bi_footprint.h"
 #include "items/bi_footprintpad.h"
-#include <librepcblibrary/gencmp/genericcomponent.h>
+#include <librepcblibrary/cmp/component.h>
 
 namespace project {
 
@@ -61,7 +61,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             mXmlFile = SmartXmlFile::create(mFilePath);
 
             // set attributes
-            mUuid = QUuid::createUuid();
+            mUuid = Uuid::createRandom();
             mName = newName;
 
             // load default grid properties
@@ -75,18 +75,18 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
 
             // the board seems to be ready to open, so we will create all needed objects
 
-            mUuid = root.getFirstChild("meta/uuid", true, true)->getText<QUuid>();
-            mName = root.getFirstChild("meta/name", true, true)->getText(true);
+            mUuid = root.getFirstChild("meta/uuid", true, true)->getText<Uuid>(true);
+            mName = root.getFirstChild("meta/name", true, true)->getText<QString>(true);
 
             // Load grid properties
             mGridProperties = new GridProperties(*root.getFirstChild("properties/grid_properties", true, true));
 
-            // Load all component instances
-            for (XmlDomElement* node = root.getFirstChild("component_instances/component_instance", true, false);
-                 node; node = node->getNextSibling("component_instance"))
+            // Load all device instances
+            for (XmlDomElement* node = root.getFirstChild("device_instances/device_instance", true, false);
+                 node; node = node->getNextSibling("device_instance"))
             {
-                ComponentInstance* comp = new ComponentInstance(*this, *node);
-                addComponentInstance(*comp);
+                DeviceInstance* comp = new DeviceInstance(*this, *node);
+                addDeviceInstance(*comp);
             }
         }
 
@@ -101,8 +101,8 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
     catch (...)
     {
         // free the allocated memory in the reverse order of their allocation...
-        foreach (ComponentInstance* compInstance, mComponentInstances)
-            try { removeComponentInstance(*compInstance); delete compInstance; } catch (...) {}
+        foreach (DeviceInstance* dev, mDeviceInstances)
+            try { removeDeviceInstance(*dev); delete dev; } catch (...) {}
         delete mGridProperties;         mGridProperties = nullptr;
         delete mXmlFile;                mXmlFile = nullptr;
         delete mGraphicsScene;          mGraphicsScene = nullptr;
@@ -113,10 +113,10 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
 Board::~Board() noexcept
 {
     // delete all component instances (and catch all throwed exceptions)
-    foreach (ComponentInstance* compInstance, mComponentInstances)
-        try { removeComponentInstance(*compInstance); delete compInstance; } catch (...) {}
+    foreach (DeviceInstance* dev, mDeviceInstances)
+        try { removeDeviceInstance(*dev); delete dev; } catch (...) {}
 
-    qDeleteAll(mErcMsgListUnplacedGenCompInstances);    mErcMsgListUnplacedGenCompInstances.clear();
+    qDeleteAll(mErcMsgListUnplacedComponentInstances);    mErcMsgListUnplacedComponentInstances.clear();
     delete mGridProperties;         mGridProperties = nullptr;
     delete mXmlFile;                mXmlFile = nullptr;
     delete mGraphicsScene;          mGraphicsScene = nullptr;
@@ -144,7 +144,7 @@ QList<BI_Base*> Board::getSelectedItems(bool footprintPads
                                         bool attachedLinesFromFootprints*/) const noexcept
 {
     QList<BI_Base*> list;
-    foreach (ComponentInstance* component, mComponentInstances)
+    foreach (DeviceInstance* component, mDeviceInstances)
     {
         BI_Footprint& footprint = component->getFootprint();
 
@@ -169,9 +169,9 @@ QList<BI_Base*> Board::getItemsAtScenePos(const Point& pos) const noexcept
     QList<BI_Base*> list;   // Note: The order of adding the items is very important (the
                             // top most item must appear as the first item in the list)!
     // footprints & pads
-    foreach (ComponentInstance* component, mComponentInstances)
+    foreach (DeviceInstance* device, mDeviceInstances)
     {
-        BI_Footprint& footprint = component->getFootprint();
+        BI_Footprint& footprint = device->getFootprint();
         if (footprint.getGrabAreaScenePx().contains(scenePosPx))
             list.append(&footprint);
         foreach (BI_FootprintPad* pad, footprint.getPads())
@@ -229,51 +229,51 @@ void Board::setGridProperties(const GridProperties& grid) noexcept
 }
 
 /*****************************************************************************************
- *  ComponentInstance Methods
+ *  DeviceInstance Methods
  ****************************************************************************************/
 
-ComponentInstance* Board::getCompInstanceByGenCompUuid(const QUuid& uuid) const noexcept
+DeviceInstance* Board::getDeviceInstanceByComponentUuid(const Uuid& uuid) const noexcept
 {
-    return mComponentInstances.value(uuid, nullptr);
+    return mDeviceInstances.value(uuid, nullptr);
 }
 
-ComponentInstance* Board::createComponentInstance() throw (Exception)
+DeviceInstance* Board::createDeviceInstance() throw (Exception)
 {
-    /*if (getGenCompInstanceByName(name))
+    /*if (getComponentInstanceByName(name))
     {
         throw RuntimeError(__FILE__, __LINE__, name, QString(tr("The component "
             "name \"%1\" does already exist in the circuit.")).arg(name));
     }
-    return new ComponentInstance(*this, genComp, symbVar, name);*/
+    return new ComponentInstance(*this, cmp, symbVar, name);*/
     return nullptr; // TODO
 }
 
-void Board::addComponentInstance(ComponentInstance& componentInstance) throw (Exception)
+void Board::addDeviceInstance(DeviceInstance& instance) throw (Exception)
 {
-    // check if there is no component with the same generic component instance in the list
-    if (getCompInstanceByGenCompUuid(componentInstance.getGenCompInstance().getUuid()))
+    // check if there is no device with the same component instance in the list
+    if (getDeviceInstanceByComponentUuid(instance.getComponentInstance().getUuid()))
     {
-        throw RuntimeError(__FILE__, __LINE__, componentInstance.getGenCompInstance().getUuid().toString(),
-            QString(tr("There is already a component with the generic component instance \"%1\"!"))
-            .arg(componentInstance.getGenCompInstance().getUuid().toString()));
+        throw RuntimeError(__FILE__, __LINE__, instance.getComponentInstance().getUuid().toStr(),
+            QString(tr("There is already a device with the component instance \"%1\"!"))
+            .arg(instance.getComponentInstance().getUuid().toStr()));
     }
 
     // add to circuit
-    componentInstance.addToBoard(*mGraphicsScene);
-    mComponentInstances.insert(componentInstance.getGenCompInstance().getUuid(), &componentInstance);
+    instance.addToBoard(*mGraphicsScene);
+    mDeviceInstances.insert(instance.getComponentInstance().getUuid(), &instance);
     updateErcMessages();
-    emit componentAdded(componentInstance);
+    emit deviceAdded(instance);
 }
 
-void Board::removeComponentInstance(ComponentInstance& componentInstance) throw (Exception)
+void Board::removeDeviceInstance(DeviceInstance& instance) throw (Exception)
 {
-    Q_ASSERT(mComponentInstances.contains(componentInstance.getGenCompInstance().getUuid()) == true);
+    Q_ASSERT(mDeviceInstances.contains(instance.getComponentInstance().getUuid()) == true);
 
     // remove from circuit
-    componentInstance.removeFromBoard(*mGraphicsScene);
-    mComponentInstances.remove(componentInstance.getGenCompInstance().getUuid());
+    instance.removeFromBoard(*mGraphicsScene);
+    mDeviceInstances.remove(instance.getComponentInstance().getUuid());
     updateErcMessages();
-    emit componentRemoved(componentInstance);
+    emit deviceRemoved(instance);
 }
 
 /*****************************************************************************************
@@ -332,7 +332,7 @@ void Board::setSelectionRect(const Point& p1, const Point& p2, bool updateItems)
     if (updateItems)
     {
         QRectF rectPx = QRectF(p1.toPxQPointF(), p2.toPxQPointF()).normalized();
-        foreach (ComponentInstance* component, mComponentInstances)
+        foreach (DeviceInstance* component, mDeviceInstances)
         {
             BI_Footprint& footprint = component->getFootprint();
             bool selectFootprint = footprint.getGrabAreaScenePx().intersects(rectPx);
@@ -348,7 +348,7 @@ void Board::setSelectionRect(const Point& p1, const Point& p2, bool updateItems)
 
 void Board::clearSelection() const noexcept
 {
-    foreach (ComponentInstance* component, mComponentInstances)
+    foreach (DeviceInstance* component, mDeviceInstances)
         component->getFootprint().setSelected(false);
 }
 
@@ -400,40 +400,40 @@ XmlDomElement* Board::serializeToXmlDomElement() const throw (Exception)
     meta->appendTextChild("name", mName);
     XmlDomElement* properties = root->appendChild("properties");
     properties->appendChild(mGridProperties->serializeToXmlDomElement());
-    XmlDomElement* components = root->appendChild("component_instances");
-    foreach (ComponentInstance* component, mComponentInstances)
+    XmlDomElement* components = root->appendChild("device_instances");
+    foreach (DeviceInstance* component, mDeviceInstances)
         components->appendChild(component->serializeToXmlDomElement());
     return root.take();
 }
 
 void Board::updateErcMessages() noexcept
 {
-    // type: UnplacedGenericComponent (GenCompInstances without ComponentInstance)
+    // type: UnplacedComponent (ComponentInstances without DeviceInstance)
     if (mAddedToProject)
     {
-        foreach (const GenCompInstance* genComp, mProject.getCircuit().getGenCompInstances())
+        foreach (const ComponentInstance* component, mProject.getCircuit().getComponentInstances())
         {
-            if (genComp->getGenComp().isSchematicOnly()) continue;
-            ComponentInstance* comp = mComponentInstances.value(genComp->getUuid());
-            ErcMsg* ercMsg = mErcMsgListUnplacedGenCompInstances.value(genComp->getUuid());
+            if (component->getLibComponent().isSchematicOnly()) continue;
+            DeviceInstance* comp = mDeviceInstances.value(component->getUuid());
+            ErcMsg* ercMsg = mErcMsgListUnplacedComponentInstances.value(component->getUuid());
             if ((!comp) && (!ercMsg))
             {
-                ErcMsg* ercMsg = new ErcMsg(mProject, *this, QString("%1/%2").arg(mUuid.toString(),
-                    genComp->getUuid().toString()), "UnplacedGenericComponent", ErcMsg::ErcMsgType_t::BoardError,
-                    QString("Unplaced Component: %1 (Board: %2)").arg(genComp->getName(), mName));
+                ErcMsg* ercMsg = new ErcMsg(mProject, *this, QString("%1/%2").arg(mUuid.toStr(),
+                    component->getUuid().toStr()), "UnplacedComponent", ErcMsg::ErcMsgType_t::BoardError,
+                    QString("Unplaced Component: %1 (Board: %2)").arg(component->getName(), mName));
                 ercMsg->setVisible(true);
-                mErcMsgListUnplacedGenCompInstances.insert(genComp->getUuid(), ercMsg);
+                mErcMsgListUnplacedComponentInstances.insert(component->getUuid(), ercMsg);
             }
             else if ((comp) && (ercMsg))
             {
-                delete mErcMsgListUnplacedGenCompInstances.take(genComp->getUuid());
+                delete mErcMsgListUnplacedComponentInstances.take(component->getUuid());
             }
         }
     }
     else
     {
-        qDeleteAll(mErcMsgListUnplacedGenCompInstances);
-        mErcMsgListUnplacedGenCompInstances.clear();
+        qDeleteAll(mErcMsgListUnplacedComponentInstances);
+        mErcMsgListUnplacedComponentInstances.clear();
     }
 }
 

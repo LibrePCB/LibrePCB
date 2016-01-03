@@ -42,25 +42,25 @@ SI_NetLine::SI_NetLine(Schematic& schematic, const XmlDomElement& domElement) th
     SI_Base(), mSchematic(schematic), mGraphicsItem(nullptr), mPosition(0, 0),
     mStartPoint(nullptr), mEndPoint(nullptr)
 {
-    mUuid = domElement.getAttribute<QUuid>("uuid");
-    mWidth = domElement.getAttribute<Length>("width");
+    mUuid = domElement.getAttribute<Uuid>("uuid", true);
+    mWidth = domElement.getAttribute<Length>("width", true);
 
-    QUuid spUuid = domElement.getAttribute<QUuid>("start_point");
+    Uuid spUuid = domElement.getAttribute<Uuid>("start_point", true);
     mStartPoint = mSchematic.getNetPointByUuid(spUuid);
     if(!mStartPoint)
     {
-        throw RuntimeError(__FILE__, __LINE__, spUuid.toString(),
+        throw RuntimeError(__FILE__, __LINE__, spUuid.toStr(),
             QString(tr("Invalid net point UUID: \"%1\""))
-            .arg(spUuid.toString()));
+            .arg(spUuid.toStr()));
     }
 
-    QUuid epUuid = domElement.getAttribute<QUuid>("end_point");
+    Uuid epUuid = domElement.getAttribute<Uuid>("end_point", true);
     mEndPoint = mSchematic.getNetPointByUuid(epUuid);
     if(!mEndPoint)
     {
-        throw RuntimeError(__FILE__, __LINE__, epUuid.toString(),
+        throw RuntimeError(__FILE__, __LINE__, epUuid.toStr(),
             QString(tr("Invalid net point UUID: \"%1\""))
-            .arg(epUuid.toString()));
+            .arg(epUuid.toStr()));
     }
 
     init();
@@ -71,7 +71,7 @@ SI_NetLine::SI_NetLine(Schematic& schematic, SI_NetPoint& startPoint,
     SI_Base(), mSchematic(schematic), mGraphicsItem(nullptr),
     mStartPoint(&startPoint), mEndPoint(&endPoint), mWidth(width)
 {
-    mUuid = QUuid::createUuid().toString(); // generate random UUID
+    mUuid = Uuid::createRandom(); // generate random UUID
     init();
 }
 

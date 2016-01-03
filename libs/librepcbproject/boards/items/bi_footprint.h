@@ -36,7 +36,7 @@
 
 namespace project {
 class Board;
-class ComponentInstance;
+class DeviceInstance;
 class BI_FootprintPad;
 }
 
@@ -64,17 +64,17 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
     public:
 
         // Constructors / Destructor
-        explicit BI_Footprint(ComponentInstance& component, const XmlDomElement& domElement) throw (Exception);
-        explicit BI_Footprint(ComponentInstance& component) throw (Exception);
+        explicit BI_Footprint(DeviceInstance& device, const XmlDomElement& domElement) throw (Exception);
+        explicit BI_Footprint(DeviceInstance& device) throw (Exception);
         ~BI_Footprint() noexcept;
 
         // Getters
         Project& getProject() const noexcept;
         Board& getBoard() const noexcept;
-        ComponentInstance& getComponentInstance() const noexcept {return mComponentInstance;}
-        BI_FootprintPad* getPad(const QUuid& padUuid) const noexcept {return mPads.value(padUuid);}
-        const QHash<QUuid, BI_FootprintPad*>& getPads() const noexcept {return mPads;}
-        const library::Footprint& getLibFootprint() const noexcept {return *mFootprint;}
+        DeviceInstance& getDeviceInstance() const noexcept {return mDeviceInstance;}
+        BI_FootprintPad* getPad(const Uuid& padUuid) const noexcept {return mPads.value(padUuid);}
+        const QHash<Uuid, BI_FootprintPad*>& getPads() const noexcept {return mPads;}
+        const library::Footprint& getLibFootprint() const noexcept;
         const Angle& getRotation() const noexcept;
 
         // General Methods
@@ -99,10 +99,10 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
 
     private slots:
 
-        void componentInstanceAttributesChanged();
-        void componentInstanceMoved(const Point& pos);
-        void componentInstanceRotated(const Angle& rot);
-        void componentInstanceMirrored(bool mirrored);
+        void deviceInstanceAttributesChanged();
+        void deviceInstanceMoved(const Point& pos);
+        void deviceInstanceRotated(const Angle& rot);
+        void deviceInstanceMirrored(bool mirrored);
 
 
     signals:
@@ -126,9 +126,8 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
 
 
         // General
-        ComponentInstance& mComponentInstance;
-        const library::Footprint* mFootprint;
-        QHash<QUuid, BI_FootprintPad*> mPads; ///< key: footprint pad UUID
+        DeviceInstance& mDeviceInstance;
+        QHash<Uuid, BI_FootprintPad*> mPads; ///< key: footprint pad UUID
         BGI_Footprint* mGraphicsItem;
 };
 

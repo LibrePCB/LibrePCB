@@ -809,7 +809,7 @@ liblibrepcbprojecteditor.a#</dia:string>
         <dia:point val="61,34"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="61,33.3502;88.3498,35.8928"/>
+        <dia:rectangle val="61,33.37;88.33,35.8533"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -849,7 +849,7 @@ liblibrepcbprojecteditor.a#</dia:string>
       <dia:attribute name="text">
         <dia:composite type="text">
           <dia:attribute name="string">
-            <dia:string>#Classes which represent LibrePCB library elements (symbols, footprints, ...)
+            <dia:string>#Classes which represent LibrePCB library elements (symbols, components, ...)
 - Depends only on liblibrepcbcommon.a
 - Represents only the data of library elements, contains no GUI widgets to modify them
 - Provides undo commands to modify library elements, but does not provide an undo stack
@@ -881,7 +881,7 @@ liblibrepcbprojecteditor.a#</dia:string>
         <dia:point val="61,18"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="61,17.3503;89.2923,21.5862"/>
+        <dia:rectangle val="61,17.37;89.2725,21.5467"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -918,7 +918,7 @@ liblibrepcbprojecteditor.a#</dia:string>
         <dia:point val="61,10"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="61,9.35025;87.7272,11.8928"/>
+        <dia:rectangle val="61,9.37;87.7075,11.8533"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">

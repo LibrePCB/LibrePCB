@@ -24,14 +24,14 @@
 #include <QtCore>
 #include "bi_footprintpad.h"
 #include "bi_footprint.h"
-#include <librepcblibrary/fpt/footprint.h>
-#include <librepcblibrary/fpt/footprintpad.h>
+#include <librepcblibrary/pkg/footprint.h>
+#include <librepcblibrary/pkg/footprintpad.h>
 #include "../board.h"
 #include "../../project.h"
 #include "../../circuit/circuit.h"
 #include "../../settings/projectsettings.h"
 #include <librepcbcommon/graphics/graphicsscene.h>
-#include "../componentinstance.h"
+#include "../deviceinstance.h"
 
 namespace project {
 
@@ -39,18 +39,18 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-BI_FootprintPad::BI_FootprintPad(BI_Footprint& footprint, const QUuid& padUuid) :
-    BI_Base(), mCircuit(footprint.getComponentInstance().getBoard().getProject().getCircuit()),
-    mFootprint(footprint), mFootprintPad(nullptr), /*mGenCompSignal(nullptr),
-    mGenCompSignalInstance(nullptr),*/ mAddedToBoard(false),
+BI_FootprintPad::BI_FootprintPad(BI_Footprint& footprint, const Uuid& padUuid) :
+    BI_Base(), mCircuit(footprint.getDeviceInstance().getBoard().getProject().getCircuit()),
+    mFootprint(footprint), mFootprintPad(nullptr), /*mComponentSignal(nullptr),
+    mComponentSignalInstance(nullptr),*/ mAddedToBoard(false),
     /*mRegisteredNetPoint(nullptr),*/ mGraphicsItem(nullptr)
 {
     // read attributes
     mFootprintPad = mFootprint.getLibFootprint().getPadByUuid(padUuid);
     if (!mFootprintPad)
     {
-        throw RuntimeError(__FILE__, __LINE__, padUuid.toString(),
-            QString(tr("Invalid footprint pad UUID: \"%1\"")).arg(padUuid.toString()));
+        throw RuntimeError(__FILE__, __LINE__, padUuid.toStr(),
+            QString(tr("Invalid footprint pad UUID: \"%1\"")).arg(padUuid.toStr()));
     }
 
     mGraphicsItem = new BGI_FootprintPad(*this);
@@ -77,32 +77,15 @@ Board& BI_FootprintPad::getBoard() const noexcept
     return mFootprint.getBoard();
 }
 
-const QUuid& BI_FootprintPad::getLibPadUuid() const noexcept
+const Uuid& BI_FootprintPad::getLibPadUuid() const noexcept
 {
     return mFootprintPad->getUuid();
 }
 
-/*QString BI_FootprintPad::getDisplayText(bool returnGenCompSignalNameIfEmpty,
+/*QString BI_FootprintPad::getDisplayText(bool returnCmpSignalNameIfEmpty,
                                      bool returnPinNameIfEmpty) const noexcept
 {
-    const QStringList& localeOrder = mCircuit.getProject().getSettings().getLocaleOrder(true);
 
-    QString text;
-    switch (mSymbol.getGenCompSymbVarItem().getDisplayTypeOfPin(mSymbolPin->getUuid()))
-    {
-        case library::GenCompSymbVarItem::PinDisplayType_t::PinName:
-            text = mSymbolPin->getName(localeOrder); break;
-        case library::GenCompSymbVarItem::PinDisplayType_t::GenCompSignal:
-            if (mGenCompSignal) text = mGenCompSignal->getName(localeOrder); break;
-        case library::GenCompSymbVarItem::PinDisplayType_t::NetSignal:
-            if (mGenCompSignalInstance->getNetSignal()) text = mGenCompSignalInstance->getNetSignal()->getName(); break;
-        default: break;
-    }
-    if (text.isEmpty() && returnGenCompSignalNameIfEmpty && mGenCompSignal)
-        text = mGenCompSignal->getName(localeOrder);
-    if (text.isEmpty() && returnPinNameIfEmpty)
-        text = mSymbolPin->getName(localeOrder);
-    return text;
 }*/
 
 /*****************************************************************************************
@@ -141,7 +124,7 @@ void BI_FootprintPad::addToBoard(GraphicsScene& scene) noexcept
 {
     Q_ASSERT(mAddedToBoard == false);
     //Q_ASSERT(mRegisteredNetPoint == nullptr);
-    //mGenCompSignalInstance->registerSymbolPin(*this);
+    //mComponentSignalInstance->registerSymbolPin(*this);
     scene.addItem(*mGraphicsItem);
     mAddedToBoard = true;
 }
@@ -150,7 +133,7 @@ void BI_FootprintPad::removeFromBoard(GraphicsScene& scene) noexcept
 {
     Q_ASSERT(mAddedToBoard == true);
     //Q_ASSERT(mRegisteredNetPoint == nullptr);
-    //mGenCompSignalInstance->unregisterSymbolPin(*this);
+    //mComponentSignalInstance->unregisterSymbolPin(*this);
     scene.removeItem(*mGraphicsItem);
     mAddedToBoard = false;
 }

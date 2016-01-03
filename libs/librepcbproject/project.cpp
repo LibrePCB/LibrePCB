@@ -182,10 +182,10 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
         }
         else
         {
-            mName = root->getFirstChild("meta/name", true, true)->getText();
-            mAuthor = root->getFirstChild("meta/author", true, true)->getText();
-            mCreated = root->getFirstChild("meta/created", true, true)->getText<QDateTime>();
-            mLastModified = root->getFirstChild("meta/last_modified", true, true)->getText<QDateTime>();
+            mName = root->getFirstChild("meta/name", true, true)->getText<QString>(false);
+            mAuthor = root->getFirstChild("meta/author", true, true)->getText<QString>(false);
+            mCreated = root->getFirstChild("meta/created", true, true)->getText<QDateTime>(true);
+            mLastModified = root->getFirstChild("meta/last_modified", true, true)->getText<QDateTime>(true);
         }
 
         // Load description HTML file
@@ -216,7 +216,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
             for (XmlDomElement* node = root->getFirstChild("schematics/schematic", true, false);
                  node; node = node->getNextSibling("schematic"))
             {
-                FilePath fp = FilePath::fromRelative(mPath.getPathTo("schematics"), node->getText(true));
+                FilePath fp = FilePath::fromRelative(mPath.getPathTo("schematics"), node->getText<QString>(true));
                 Schematic* schematic = new Schematic(*this, fp, mIsRestored, mIsReadOnly);
                 addSchematic(schematic);
             }
@@ -238,7 +238,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
             for (XmlDomElement* node = root->getFirstChild("boards/board", true, false);
                  node; node = node->getNextSibling("board"))
             {
-                FilePath fp = FilePath::fromRelative(mPath.getPathTo("boards"), node->getText(true));
+                FilePath fp = FilePath::fromRelative(mPath.getPathTo("boards"), node->getText<QString>(true));
                 Board* board = new Board(*this, fp, mIsRestored, mIsReadOnly);
                 addBoard(board);
             }
@@ -357,7 +357,7 @@ int Project::getSchematicIndex(const Schematic* schematic) const noexcept
     return mSchematics.indexOf(const_cast<Schematic*>(schematic));
 }
 
-Schematic* Project::getSchematicByUuid(const QUuid& uuid) const noexcept
+Schematic* Project::getSchematicByUuid(const Uuid& uuid) const noexcept
 {
     foreach (Schematic* schematic, mSchematics)
     {
@@ -393,9 +393,9 @@ void Project::addSchematic(Schematic* schematic, int newIndex) throw (Exception)
 
     if (getSchematicByUuid(schematic->getUuid()))
     {
-        throw RuntimeError(__FILE__, __LINE__, schematic->getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, schematic->getUuid().toStr(),
             QString(tr("There is already a schematic with the UUID \"%1\"!"))
-            .arg(schematic->getUuid().toString()));
+            .arg(schematic->getUuid().toStr()));
     }
 
     if (getSchematicByName(schematic->getName()))
@@ -473,7 +473,7 @@ int Project::getBoardIndex(const Board* board) const noexcept
     return mBoards.indexOf(const_cast<Board*>(board));
 }
 
-Board* Project::getBoardByUuid(const QUuid& uuid) const noexcept
+Board* Project::getBoardByUuid(const Uuid& uuid) const noexcept
 {
     foreach (Board* board, mBoards)
     {
@@ -509,9 +509,9 @@ void Project::addBoard(Board* board, int newIndex) throw (Exception)
 
     if (getBoardByUuid(board->getUuid()))
     {
-        throw RuntimeError(__FILE__, __LINE__, board->getUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, board->getUuid().toStr(),
             QString(tr("There is already a board with the UUID \"%1\"!"))
-            .arg(board->getUuid().toString()));
+            .arg(board->getUuid().toStr()));
     }
 
     if (getBoardByName(board->getName()))

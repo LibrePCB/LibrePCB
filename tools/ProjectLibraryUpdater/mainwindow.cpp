@@ -6,10 +6,10 @@
 #include <librepcbcommon/fileio/xmldomdocument.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include <librepcblibrary/library.h>
-#include <librepcblibrary/gencmp/genericcomponent.h>
-#include <librepcblibrary/sym/symbol.h>
 #include <librepcblibrary/cmp/component.h>
-#include <librepcblibrary/fpt/footprint.h>
+#include <librepcblibrary/sym/symbol.h>
+#include <librepcblibrary/dev/device.h>
+#include <librepcblibrary/pkg/footprint.h>
 #include <librepcblibrary/pkg/package.h>
 
 using namespace library;
@@ -82,36 +82,35 @@ void MainWindow::on_pushButton_2_clicked()
             SmartXmlFile projectFile(projectFilepath, false, true);
             QSharedPointer<XmlDomDocument> projectDoc = projectFile.parseFileAndBuildDomTree(true);
 
-            // generic components & symbols
+            // components & symbols
             SmartXmlFile circuitFile(projectFilepath.getParentDir().getPathTo("core/circuit.xml"), false, true);
             QSharedPointer<XmlDomDocument> circuitDoc = circuitFile.parseFileAndBuildDomTree(true);
-            for (XmlDomElement* node = circuitDoc->getRoot().getFirstChild("generic_component_instances/*", true, false);
+            for (XmlDomElement* node = circuitDoc->getRoot().getFirstChild("component_instances/*", true, false);
                  node; node = node->getNextSibling())
             {
-                QUuid genCompUuid = node->getAttribute<QUuid>("generic_component", true);
-                FilePath filepath = lib.getLatestGenericComponent(genCompUuid);
+                Uuid compUuid = node->getAttribute<Uuid>("component", true);
+                FilePath filepath = lib.getLatestComponent(compUuid);
                 if (!filepath.isValid())
                 {
                     throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
-                        QString("missing generic component: %1").arg(genCompUuid.toString()));
+                        QString("missing component: %1").arg(compUuid.toStr()));
                 }
-                // copy generic component
-                GenericComponent latestGenComp(filepath);
-                FilePath dest = projectFilepath.getParentDir().getPathTo("library/gencmp");
-                latestGenComp.saveTo(dest);
-                ui->log->addItem(latestGenComp.getDirectory().toNative());
+                // copy component
+                Component latestComp(filepath);
+                FilePath dest = projectFilepath.getParentDir().getPathTo("library/cmp");
+                latestComp.saveTo(dest);
+                ui->log->addItem(latestComp.getDirectory().toNative());
 
                 // search all required symbols
-                foreach (const GenCompSymbVar* symbvar, latestGenComp.getSymbolVariants())
+                foreach (const ComponentSymbolVariant* symbvar, latestComp.getSymbolVariants())
                 {
-                    foreach (const GenCompSymbVarItem* item, symbvar->getItems())
+                    foreach (const Uuid& symbolUuid, symbvar->getAllItemSymbolUuids())
                     {
-                        QUuid symbolUuid = item->getSymbolUuid();
                         FilePath filepath = lib.getLatestSymbol(symbolUuid);
                         if (!filepath.isValid())
                         {
                             throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
-                                QString("missing symbol: %1").arg(symbolUuid.toString()));
+                                QString("missing symbol: %1").arg(symbolUuid.toStr()));
                         }
                         Symbol latestSymbol(filepath);
                         FilePath dest = projectFilepath.getParentDir().getPathTo("library/sym");
@@ -122,56 +121,42 @@ void MainWindow::on_pushButton_2_clicked()
             }
 
 
-            // components & footprints
+            // devices & footprints
             for (XmlDomElement* node = projectDoc->getRoot().getFirstChild("boards/*", true, false);
                  node; node = node->getNextSibling())
             {
-                FilePath boardFilePath = projectFilepath.getParentDir().getPathTo("boards/" % node->getText(true));
+                FilePath boardFilePath = projectFilepath.getParentDir().getPathTo("boards/" % node->getText<QString>(true));
                 SmartXmlFile boardFile(boardFilePath, false, true);
                 QSharedPointer<XmlDomDocument> boardDoc = boardFile.parseFileAndBuildDomTree(true);
-                for (XmlDomElement* node = boardDoc->getRoot().getFirstChild("component_instances/*", true, false);
+                for (XmlDomElement* node = boardDoc->getRoot().getFirstChild("device_instances/*", true, false);
                      node; node = node->getNextSibling())
                 {
-                    QUuid compUuid = node->getAttribute<QUuid>("component", true);
-                    FilePath filepath = lib.getLatestComponent(compUuid);
+                    Uuid deviceUuid = node->getAttribute<Uuid>("device", true);
+                    FilePath filepath = lib.getLatestDevice(deviceUuid);
                     if (!filepath.isValid())
                     {
                         throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
-                            QString("missing component: %1").arg(compUuid.toString()));
+                            QString("missing device: %1").arg(deviceUuid.toStr()));
                     }
-                    // copy component
-                    Component latestComp(filepath);
-                    FilePath dest = projectFilepath.getParentDir().getPathTo("library/cmp");
-                    latestComp.saveTo(dest);
-                    ui->log->addItem(latestComp.getDirectory().toNative());
+                    // copy device
+                    Device latestDevice(filepath);
+                    FilePath dest = projectFilepath.getParentDir().getPathTo("library/dev");
+                    latestDevice.saveTo(dest);
+                    ui->log->addItem(latestDevice.getDirectory().toNative());
 
                     // get package
-                    QUuid packUuid = latestComp.getPackageUuid();
+                    Uuid packUuid = latestDevice.getPackageUuid();
                     filepath = lib.getLatestPackage(packUuid);
                     if (!filepath.isValid())
                     {
                         throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
-                            QString("missing package: %1").arg(packUuid.toString()));
+                            QString("missing package: %1").arg(packUuid.toStr()));
                     }
                     // copy package
                     Package latestPackage(filepath);
                     dest = projectFilepath.getParentDir().getPathTo("library/pkg");
                     latestPackage.saveTo(dest);
                     ui->log->addItem(latestPackage.getDirectory().toNative());
-
-                    // get footprint
-                    QUuid footprintUuid = latestPackage.getFootprintUuid();
-                    filepath = lib.getLatestFootprint(footprintUuid);
-                    if (!filepath.isValid())
-                    {
-                        throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
-                            QString("missing footprint: %1").arg(footprintUuid.toString()));
-                    }
-                    // copy footprint
-                    Footprint latestFootprint(filepath);
-                    dest = projectFilepath.getParentDir().getPathTo("library/fpt");
-                    latestFootprint.saveTo(dest);
-                    ui->log->addItem(latestFootprint.getDirectory().toNative());
                 }
             }
         }

@@ -21,65 +21,59 @@ INCLUDEPATH += \
     ../
 
 HEADERS += \
-    3dmdl/model3d.h \
     cat/componentcategory.h \
     cat/packagecategory.h \
-    cmp/component.h \
-    fpt/footprint.h \
-    gencmp/gencompsignal.h \
-    gencmp/gencompsymbvar.h \
-    gencmp/gencompsymbvaritem.h \
-    gencmp/genericcomponent.h \
+    pkg/footprint.h \
     pkg/package.h \
     spcmdl/spicemodel.h \
     sym/symbol.h \
-    sym/symbolellipse.h \
     sym/symbolpin.h \
     sym/symbolpinpreviewgraphicsitem.h \
-    sym/symbolpolygon.h \
     sym/symbolpreviewgraphicsitem.h \
-    sym/symboltext.h \
     library.h \
     librarybaseelement.h \
     libraryelement.h \
     libraryelementattribute.h \
-    fpt/footprintpolygon.h \
-    fpt/footprintellipse.h \
-    fpt/footprinttext.h \
-    fpt/footprintpad.h \
+    pkg/footprintpad.h \
     cat/librarycategory.h \
     cat/categorytreemodel.h \
     cat/categorytreeitem.h \
-    elements.h
+    elements.h \
+    dev/device.h \
+    cmp/component.h \
+    cmp/componentsignal.h \
+    cmp/componentsymbolvariant.h \
+    cmp/componentsymbolvariantitem.h \
+    pkg/packagepad.h \
+    pkg/footprintpadtht.h \
+    pkg/footprintpadsmt.h \
+    cmp/componentpinsignalmapitem.h
 
 SOURCES += \
-    3dmdl/model3d.cpp \
     cat/componentcategory.cpp \
     cat/packagecategory.cpp \
-    cmp/component.cpp \
-    fpt/footprint.cpp \
-    gencmp/gencompsignal.cpp \
-    gencmp/gencompsymbvar.cpp \
-    gencmp/gencompsymbvaritem.cpp \
-    gencmp/genericcomponent.cpp \
+    pkg/footprint.cpp \
     pkg/package.cpp \
     spcmdl/spicemodel.cpp \
     sym/symbol.cpp \
-    sym/symbolellipse.cpp \
     sym/symbolpin.cpp \
     sym/symbolpinpreviewgraphicsitem.cpp \
-    sym/symbolpolygon.cpp \
     sym/symbolpreviewgraphicsitem.cpp \
-    sym/symboltext.cpp \
     library.cpp \
     librarybaseelement.cpp \
     libraryelement.cpp \
     libraryelementattribute.cpp \
-    fpt/footprintpolygon.cpp \
-    fpt/footprintellipse.cpp \
-    fpt/footprinttext.cpp \
-    fpt/footprintpad.cpp \
+    pkg/footprintpad.cpp \
     cat/librarycategory.cpp \
     cat/categorytreemodel.cpp \
-    cat/categorytreeitem.cpp
+    cat/categorytreeitem.cpp \
+    dev/device.cpp \
+    cmp/componentsignal.cpp \
+    cmp/componentsymbolvariant.cpp \
+    cmp/componentsymbolvariantitem.cpp \
+    cmp/component.cpp \
+    pkg/packagepad.cpp \
+    pkg/footprintpadtht.cpp \
+    pkg/footprintpadsmt.cpp \
+    cmp/componentpinsignalmapitem.cpp
 

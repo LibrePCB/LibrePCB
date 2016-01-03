@@ -29,6 +29,7 @@
 #include <librepcbcommon/exceptions.h>
 #include <librepcbcommon/fileio/filepath.h>
 #include <librepcbcommon/version.h>
+#include <librepcbcommon/uuid.h>
 
 /*****************************************************************************************
  *  Class LibraryBaseElement
@@ -48,12 +49,10 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
         // Constructors / Destructor
         explicit LibraryBaseElement(const QString& xmlFileNamePrefix,
                                     const QString& xmlRootNodeName,
-                                    const QUuid& uuid = QUuid::createUuid(),
-                                    const Version& version = Version(),
-                                    const QString& author = QString(),
-                                    const QString& name_en_US = QString(),
-                                    const QString& description_en_US = QString(),
-                                    const QString& keywords_en_US = QString()) throw (Exception);
+                                    const Uuid& uuid, const Version& version,
+                                    const QString& author, const QString& name_en_US,
+                                    const QString& description_en_US,
+                                    const QString& keywords_en_US) throw (Exception);
         explicit LibraryBaseElement(const FilePath& elementDirectory,
                                     const QString& xmlFileNamePrefix,
                                     const QString& xmlRootNodeName) throw (Exception);
@@ -64,7 +63,7 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
         const FilePath& getXmlFilepath() const noexcept {return mXmlFilepath;}
 
         // Getters: Attributes
-        const QUuid& getUuid() const noexcept {return mUuid;}
+        const Uuid& getUuid() const noexcept {return mUuid;}
         const Version& getVersion() const noexcept {return mVersion;}
         const QString& getAuthor() const noexcept {return mAuthor;}
         const QDateTime& getCreated() const noexcept {return mCreated;}
@@ -78,7 +77,7 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
         QStringList getAllAvailableLocales() const noexcept;
 
         // Setters
-        void setUuid(const QUuid& uuid) noexcept {mUuid = uuid;}
+        void setUuid(const Uuid& uuid) noexcept {mUuid = uuid;}
         void setName(const QString& locale, const QString& name) noexcept {mNames[locale] = name;}
         void setDescription(const QString& locale, const QString& desc) noexcept {mDescriptions[locale] = desc;}
         void setKeywords(const QString& locale, const QString& keywords) noexcept {mKeywords[locale] = keywords;}
@@ -181,6 +180,17 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
 
         // Protected Methods
         void readFromFile() throw (Exception);
+
+        /**
+         * @brief Parse and load a DOM tree into this library element object
+         *
+         * Each subclass of #LibraryBaseElement has to override this method and must call
+         * that method on all base classes before loading its own properties!
+         *
+         * @param root          DOM tree root element
+         *
+         * @throw Exception     On any error (for example invalid content in XML files)
+         */
         virtual void parseDomTree(const XmlDomElement& root) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
@@ -192,13 +202,14 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
 
         // General Attributes
         mutable FilePath mDirectory;
+        mutable FilePath mVersionFilepath;
         mutable FilePath mXmlFilepath;
         QString mXmlFileNamePrefix;
         QString mXmlRootNodeName;
         bool mDomTreeParsed;
 
         // General Library Element Attributes
-        QUuid mUuid;
+        Uuid mUuid;
         Version mVersion;
         QString mAuthor;
         QDateTime mCreated;

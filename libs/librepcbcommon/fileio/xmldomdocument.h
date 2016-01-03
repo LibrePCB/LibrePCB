@@ -99,6 +99,14 @@ class XmlDomDocument final
         XmlDomElement& getRoot() const noexcept {Q_ASSERT(mRootElement); return *mRootElement;}
 
         /**
+         * @brief Check if the document has a file version number (attribute "version" of
+         *        the root element)
+         *
+         * @return  true/false
+         */
+        bool hasFileVersion() const noexcept;
+
+        /**
          * @brief Get the file version number of the document (attribute "version" of the
          *        root element)
          *

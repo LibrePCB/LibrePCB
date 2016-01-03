@@ -39,8 +39,8 @@
 #include <librepcblibrary/sym/symbolpin.h>
 #include <librepcbproject/schematics/items/si_symbol.h>
 #include <librepcbproject/schematics/items/si_symbolpin.h>
-#include <librepcbproject/circuit/gencompsignalinstance.h>
-#include <librepcbproject/circuit/cmd/cmdgencompsiginstsetnetsignal.h>
+#include <librepcbproject/circuit/componentsignalinstance.h>
+#include <librepcbproject/circuit/cmd/cmdcompsiginstsetnetsignal.h>
 #include <librepcbproject/circuit/cmd/cmdnetclassadd.h>
 #include <librepcbproject/schematics/cmd/cmdschematicnetlineremove.h>
 #include <librepcbproject/schematics/cmd/cmdschematicnetpointremove.h>
@@ -136,16 +136,16 @@ bool SES_DrawWire::entry(SEE_Base* event) noexcept
     mNetClassComboBox->setInsertPolicy(QComboBox::NoInsert);
     mNetClassComboBox->setEditable(true);
     foreach (NetClass* netclass, mEditor.getProject().getCircuit().getNetClasses())
-        mNetClassComboBox->addItem(netclass->getName(), netclass->getUuid());
+        mNetClassComboBox->addItem(netclass->getName(), netclass->getUuid().toStr());
     mNetClassComboBox->model()->sort(0);
     mNetClassComboBox->setCurrentIndex(0);
     mNetClassAddCon = connect(&mProject.getCircuit(), &Circuit::netClassAdded,
         [this](NetClass& netclass){if (mNetClassComboBox) {
-        mNetClassComboBox->addItem(netclass.getName(), netclass.getUuid());
+        mNetClassComboBox->addItem(netclass.getName(), netclass.getUuid().toStr());
         mNetClassComboBox->model()->sort(0);}});
     mNetClassRemoveCon = connect(&mProject.getCircuit(), &Circuit::netClassRemoved,
         [this](NetClass& netclass){if (mNetClassComboBox) {
-        mNetClassComboBox->removeItem(mNetClassComboBox->findData(netclass.getUuid()));
+        mNetClassComboBox->removeItem(mNetClassComboBox->findData(netclass.getUuid().toStr()));
         mNetClassComboBox->model()->sort(0);}});
     mEditorUi.commandToolbar->addWidget(mNetClassComboBox);
 
@@ -160,16 +160,16 @@ bool SES_DrawWire::entry(SEE_Base* event) noexcept
     mNetSignalComboBox->setInsertPolicy(QComboBox::NoInsert);
     mNetSignalComboBox->setEditable(true);
     foreach (NetSignal* netsignal, mEditor.getProject().getCircuit().getNetSignals())
-        mNetSignalComboBox->addItem(netsignal->getName(), netsignal->getUuid());
+        mNetSignalComboBox->addItem(netsignal->getName(), netsignal->getUuid().toStr());
     mNetSignalComboBox->model()->sort(0);
     mNetSignalComboBox->setCurrentIndex(-1);
     mNetSignalAddCon = connect(&mProject.getCircuit(), &Circuit::netSignalAdded,
         [this](NetSignal& netsignal){if (mNetSignalComboBox) {
-        mNetSignalComboBox->addItem(netsignal.getName(), netsignal.getUuid());
+        mNetSignalComboBox->addItem(netsignal.getName(), netsignal.getUuid().toStr());
         mNetSignalComboBox->model()->sort(0);}});
     mNetSignalRemoveCon = connect(&mProject.getCircuit(), &Circuit::netSignalRemoved,
         [this](NetSignal& netsignal){if (mNetSignalComboBox) {
-        mNetSignalComboBox->removeItem(mNetSignalComboBox->findData(netsignal.getUuid()));
+        mNetSignalComboBox->removeItem(mNetSignalComboBox->findData(netsignal.getUuid().toStr()));
         mNetSignalComboBox->model()->sort(0);}});
     mEditorUi.commandToolbar->addWidget(mNetSignalComboBox);
 
@@ -377,9 +377,9 @@ bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,
             if (pinUnderCursor)
             {
                 // check if the pin's signal forces a net name
-                if (pinUnderCursor->getGenCompSignalInstance()->isNetSignalNameForced())
+                if (pinUnderCursor->getComponentSignalInstance()->isNetSignalNameForced())
                 {
-                    forcedNetSignalName = pinUnderCursor->getGenCompSignalInstance()->getForcedNetSignalName();
+                    forcedNetSignalName = pinUnderCursor->getComponentSignalInstance()->getForcedNetSignalName();
                     netsignal = mProject.getCircuit().getNetSignalByName(forcedNetSignalName);
                     if (netsignal) netclass = &netsignal->getNetClass();
                 }
@@ -426,10 +426,10 @@ bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,
             CmdSchematicNetPointAdd* cmdNetPointAdd1 = nullptr;
             if (pinUnderCursor)
             {
-                GenCompSignalInstance* i = pinUnderCursor->getGenCompSignalInstance();
+                ComponentSignalInstance* i = pinUnderCursor->getComponentSignalInstance();
                 Q_ASSERT(i); if (!i) throw LogicError(__FILE__, __LINE__);
                 Q_ASSERT(!i->getNetSignal()); if (i->getNetSignal()) throw LogicError(__FILE__, __LINE__);
-                CmdGenCompSigInstSetNetSignal* cmdSetSignal = new CmdGenCompSigInstSetNetSignal(*i, netsignal);
+                CmdCompSigInstSetNetSignal* cmdSetSignal = new CmdCompSigInstSetNetSignal(*i, netsignal);
                 mUndoStack.appendToCommand(cmdSetSignal);
                 cmdNetPointAdd1 = new CmdSchematicNetPointAdd(schematic, *pinUnderCursor);
             }
@@ -458,8 +458,8 @@ bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,
         }
 
         // update the command toolbar
-        mNetClassComboBox->setCurrentIndex(mNetClassComboBox->findData(netclass->getUuid()));
-        mNetSignalComboBox->setCurrentIndex(mNetSignalComboBox->findData(netsignal->getUuid()));
+        mNetClassComboBox->setCurrentIndex(mNetClassComboBox->findData(netclass->getUuid().toStr()));
+        mNetSignalComboBox->setCurrentIndex(mNetSignalComboBox->findData(netsignal->getUuid().toStr()));
 
         // add second netpoint
         CmdSchematicNetPointAdd* cmdNetPointAdd2 = new CmdSchematicNetPointAdd(
@@ -610,9 +610,9 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
             }
 
             // combine both netsignals
-            foreach (GenCompSignalInstance* signal, originalSignal->getGenCompSignals())
+            foreach (ComponentSignalInstance* signal, originalSignal->getComponentSignals())
             {
-                auto cmd = new CmdGenCompSigInstSetNetSignal(*signal, combinedSignal);
+                auto cmd = new CmdCompSigInstSetNetSignal(*signal, combinedSignal);
                 mUndoStack.appendToCommand(cmd);
             }
             foreach (SI_NetPoint* point, originalSignal->getNetPoints())
@@ -661,16 +661,16 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
 
                 // rename the net signal if required
                 NetSignal* netsignal = mPositioningNetPoint2->getNetSignal();
-                QString forcedName = pin->getGenCompSignalInstance()->getForcedNetSignalName();
-                if ((pin->getGenCompSignalInstance()->isNetSignalNameForced()) && (netsignal->getName() != forcedName))
+                QString forcedName = pin->getComponentSignalInstance()->getForcedNetSignalName();
+                if ((pin->getComponentSignalInstance()->isNetSignalNameForced()) && (netsignal->getName() != forcedName))
                 {
                     NetSignal* newNetsignal = mCircuit.getNetSignalByName(forcedName);
                     if (newNetsignal)
                     {
                         // replace the netsignal
-                        foreach (GenCompSignalInstance* signal, netsignal->getGenCompSignals())
+                        foreach (ComponentSignalInstance* signal, netsignal->getComponentSignals())
                         {
-                            auto cmd = new CmdGenCompSigInstSetNetSignal(*signal, newNetsignal);
+                            auto cmd = new CmdCompSigInstSetNetSignal(*signal, newNetsignal);
                             mUndoStack.appendToCommand(cmd);
                         }
                         foreach (SI_NetPoint* point, netsignal->getNetPoints())
@@ -697,8 +697,8 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
                     }
                 }
                 // add the pin's component signal to the current netsignal
-                auto cmd1 = new CmdGenCompSigInstSetNetSignal(
-                    *pin->getGenCompSignalInstance(), mPositioningNetPoint2->getNetSignal());
+                auto cmd1 = new CmdCompSigInstSetNetSignal(
+                    *pin->getComponentSignalInstance(), mPositioningNetPoint2->getNetSignal());
                 mUndoStack.appendToCommand(cmd1);
                 // remove the current point/line
                 auto cmd2 = new CmdSchematicNetLineRemove(schematic, *mPositioningNetLine2);
@@ -795,9 +795,9 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
                         }*/
 
                         // combine both netsignals
-                        foreach (GenCompSignalInstance* signal, netsignalToRemove->getGenCompSignals())
+                        foreach (ComponentSignalInstance* signal, netsignalToRemove->getComponentSignals())
                         {
-                            auto cmd = new CmdGenCompSigInstSetNetSignal(*signal, combinedNetsignal);
+                            auto cmd = new CmdCompSigInstSetNetSignal(*signal, combinedNetsignal);
                             mUndoStack.appendToCommand(cmd);
                         }
                         foreach (SI_NetPoint* point, netsignalToRemove->getNetPoints())

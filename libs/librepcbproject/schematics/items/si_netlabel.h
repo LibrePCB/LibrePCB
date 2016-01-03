@@ -62,7 +62,7 @@ class SI_NetLabel final : public SI_Base, public IF_XmlSerializableObject
         // Getters
         Project& getProject() const noexcept;
         Schematic& getSchematic() const noexcept {return mSchematic;}
-        const QUuid& getUuid() const noexcept {return mUuid;}
+        const Uuid& getUuid() const noexcept {return mUuid;}
         const Angle& getRotation() const noexcept {return mRotation;}
         NetSignal& getNetSignal() const noexcept {return *mNetSignal;}
 
@@ -110,7 +110,7 @@ class SI_NetLabel final : public SI_Base, public IF_XmlSerializableObject
         SGI_NetLabel* mGraphicsItem;
 
         // Attributes
-        QUuid mUuid;
+        Uuid mUuid;
         Point mPosition;
         Angle mRotation;
         NetSignal* mNetSignal;

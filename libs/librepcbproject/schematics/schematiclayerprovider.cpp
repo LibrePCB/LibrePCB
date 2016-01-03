@@ -52,7 +52,7 @@ SchematicLayerProvider::SchematicLayerProvider(Project& project) throw (Exceptio
     addLayer(SchematicLayer::LayerID::DEBUG_SymbolPinNetSignalNames);
     addLayer(SchematicLayer::LayerID::DEBUG_NetLinesNetSignalNames);
     addLayer(SchematicLayer::LayerID::DEBUG_InvisibleNetPoints);
-    addLayer(SchematicLayer::LayerID::DEBUG_GenCompSymbolsCount);
+    addLayer(SchematicLayer::LayerID::DEBUG_ComponentSymbolsCount);
 #endif
 }
 

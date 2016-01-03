@@ -28,8 +28,8 @@
 #include "../../project.h"
 #include "../../circuit/circuit.h"
 #include "../../library/projectlibrary.h"
-#include "../../circuit/gencompinstance.h"
-#include <librepcblibrary/gencmp/genericcomponent.h>
+#include "../../circuit/componentinstance.h"
+#include <librepcblibrary/cmp/component.h>
 #include <librepcblibrary/sym/symbol.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include <librepcbcommon/graphics/graphicsscene.h>
@@ -41,88 +41,85 @@ namespace project {
  ****************************************************************************************/
 
 SI_Symbol::SI_Symbol(Schematic& schematic, const XmlDomElement& domElement) throw (Exception) :
-    SI_Base(), mSchematic(schematic), mGenCompInstance(nullptr),
+    SI_Base(), mSchematic(schematic), mComponentInstance(nullptr),
     mSymbVarItem(nullptr), mSymbol(nullptr), mGraphicsItem(nullptr)
 {
-    mUuid = domElement.getAttribute<QUuid>("uuid");
+    mUuid = domElement.getAttribute<Uuid>("uuid", true);
 
-    QUuid gcUuid = domElement.getAttribute<QUuid>("gen_comp_instance");
-    mGenCompInstance = schematic.getProject().getCircuit().getGenCompInstanceByUuid(gcUuid);
-    if (!mGenCompInstance)
+    Uuid gcUuid = domElement.getAttribute<Uuid>("component_instance", true);
+    mComponentInstance = schematic.getProject().getCircuit().getComponentInstanceByUuid(gcUuid);
+    if (!mComponentInstance)
     {
-        throw RuntimeError(__FILE__, __LINE__, gcUuid.toString(),
-            QString(tr("No generic component with the UUID \"%1\" found in the circuit!"))
-            .arg(gcUuid.toString()));
+        throw RuntimeError(__FILE__, __LINE__, gcUuid.toStr(),
+            QString(tr("No component with the UUID \"%1\" found in the circuit!"))
+            .arg(gcUuid.toStr()));
     }
 
-    mPosition.setX(domElement.getFirstChild("position", true)->getAttribute<Length>("x"));
-    mPosition.setY(domElement.getFirstChild("position", true)->getAttribute<Length>("y"));
-    mRotation = domElement.getFirstChild("position", true)->getAttribute<Angle>("rotation");
+    mPosition.setX(domElement.getFirstChild("position", true)->getAttribute<Length>("x", true));
+    mPosition.setY(domElement.getFirstChild("position", true)->getAttribute<Length>("y", true));
+    mRotation = domElement.getFirstChild("position", true)->getAttribute<Angle>("rotation", true);
 
-    QUuid symbVarItemUuid = domElement.getAttribute<QUuid>("symbol_item");
+    Uuid symbVarItemUuid = domElement.getAttribute<Uuid>("symbol_item", true);
     init(symbVarItemUuid);
 }
 
-SI_Symbol::SI_Symbol(Schematic& schematic, GenCompInstance& genCompInstance,
-                     const QUuid& symbolItem, const Point& position, const Angle& rotation) throw (Exception) :
-    SI_Base(), mSchematic(schematic), mGenCompInstance(&genCompInstance),
+SI_Symbol::SI_Symbol(Schematic& schematic, ComponentInstance& cmpInstance, const Uuid& symbolItem,
+                     const Point& position, const Angle& rotation) throw (Exception) :
+    SI_Base(), mSchematic(schematic), mComponentInstance(&cmpInstance),
     mSymbVarItem(nullptr), mSymbol(nullptr), mGraphicsItem(nullptr), mPosition(position),
     mRotation(rotation)
 {
-    mUuid = QUuid::createUuid().toString(); // generate random UUID
+    mUuid = Uuid::createRandom(); // generate random UUID
     init(symbolItem);
 }
 
-void SI_Symbol::init(const QUuid& symbVarItemUuid) throw (Exception)
+void SI_Symbol::init(const Uuid& symbVarItemUuid) throw (Exception)
 {
-    mSymbVarItem = mGenCompInstance->getSymbolVariant().getItemByUuid(symbVarItemUuid);
+    mSymbVarItem = mComponentInstance->getSymbolVariant().getItemByUuid(symbVarItemUuid);
     if (!mSymbVarItem)
     {
-        throw RuntimeError(__FILE__, __LINE__, symbVarItemUuid.toString(),
+        throw RuntimeError(__FILE__, __LINE__, symbVarItemUuid.toStr(),
             QString(tr("The symbol variant item UUID \"%1\" is invalid."))
-            .arg(symbVarItemUuid.toString()));
+            .arg(symbVarItemUuid.toStr()));
     }
 
     mSymbol = mSchematic.getProject().getLibrary().getSymbol(mSymbVarItem->getSymbolUuid());
     if (!mSymbol)
     {
-        throw RuntimeError(__FILE__, __LINE__, mSymbVarItem->getSymbolUuid().toString(),
+        throw RuntimeError(__FILE__, __LINE__, mSymbVarItem->getSymbolUuid().toStr(),
             QString(tr("No symbol with the UUID \"%1\" found in the project's library."))
-            .arg(mSymbVarItem->getSymbolUuid().toString()));
+            .arg(mSymbVarItem->getSymbolUuid().toStr()));
     }
 
     mGraphicsItem = new SGI_Symbol(*this);
     mGraphicsItem->setPos(mPosition.toPxQPointF());
     mGraphicsItem->setRotation(-mRotation.toDeg());
 
-    foreach (const library::SymbolPin* libPin, mSymbol->getPins())
+    foreach (const Uuid& libPinUuid, mSymbol->getPinUuids())
     {
+        const library::SymbolPin* libPin = mSymbol->getPinByUuid(libPinUuid);
+        Q_ASSERT(libPin); if (!libPin) continue;
+
         SI_SymbolPin* pin = new SI_SymbolPin(*this, libPin->getUuid());
         if (mPins.contains(libPin->getUuid()))
         {
-            throw RuntimeError(__FILE__, __LINE__, libPin->getUuid().toString(),
+            throw RuntimeError(__FILE__, __LINE__, libPin->getUuid().toStr(),
                 QString(tr("The symbol pin UUID \"%1\" is defined multiple times."))
-                .arg(libPin->getUuid().toString()));
-        }
-        if (!mSymbVarItem->getPinSignalMap().contains(libPin->getUuid()))
-        {
-            throw RuntimeError(__FILE__, __LINE__, libPin->getUuid().toString(),
-                QString(tr("Symbol pin UUID \"%1\" not found in pin-signal-map."))
-                .arg(libPin->getUuid().toString()));
+                .arg(libPin->getUuid().toStr()));
         }
         mPins.insert(libPin->getUuid(), pin);
     }
-    if (mPins.count() != mSymbVarItem->getPinSignalMap().count())
+    /*if (mPins.count() != mSymbVarItem->getPinSignalMap().count())
     {
         throw RuntimeError(__FILE__, __LINE__,
             QString("%1!=%2").arg(mPins.count()).arg(mSymbVarItem->getPinSignalMap().count()),
             QString(tr("The pin count of the symbol instance \"%1\" does not match with "
-            "the pin-signal-map")).arg(mUuid.toString()));
-    }
+            "the pin-signal-map")).arg(mUuid.toStr()));
+    }*/
 
-    // connect to the "attributes changes" signal of schematic and generic component
-    connect(mGenCompInstance, &GenCompInstance::attributesChanged,
-            this, &SI_Symbol::schematicOrGenCompAttributesChanged);
+    // connect to the "attributes changes" signal of schematic and component instance
+    connect(mComponentInstance, &ComponentInstance::attributesChanged,
+            this, &SI_Symbol::schematicOrComponentAttributesChanged);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -144,7 +141,7 @@ Project& SI_Symbol::getProject() const noexcept
 
 QString SI_Symbol::getName() const noexcept
 {
-    return mGenCompInstance->getName() % mSymbVarItem->getSuffix();
+    return mComponentInstance->getName() % mSymbVarItem->getSuffix();
 }
 
 /*****************************************************************************************
@@ -175,7 +172,7 @@ void SI_Symbol::setRotation(const Angle& newRotation) throw (Exception)
 
 void SI_Symbol::addToSchematic(GraphicsScene& scene) throw (Exception)
 {
-    mGenCompInstance->registerSymbol(*this);
+    mComponentInstance->registerSymbol(*this);
     scene.addItem(*mGraphicsItem);
     foreach (SI_SymbolPin* pin, mPins)
         pin->addToSchematic(scene);
@@ -183,7 +180,7 @@ void SI_Symbol::addToSchematic(GraphicsScene& scene) throw (Exception)
 
 void SI_Symbol::removeFromSchematic(GraphicsScene& scene) throw (Exception)
 {
-    mGenCompInstance->unregisterSymbol(*this);
+    mComponentInstance->unregisterSymbol(*this);
     scene.removeItem(*mGraphicsItem);
     foreach (SI_SymbolPin* pin, mPins)
         pin->removeFromSchematic(scene);
@@ -195,7 +192,7 @@ XmlDomElement* SI_Symbol::serializeToXmlDomElement() const throw (Exception)
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("symbol"));
     root->setAttribute("uuid", mUuid);
-    root->setAttribute("gen_comp_instance", mGenCompInstance->getUuid());
+    root->setAttribute("component_instance", mComponentInstance->getUuid());
     root->setAttribute("symbol_item", mSymbVarItem->getUuid());
     XmlDomElement* position = root->appendChild("position");
     position->setAttribute("x", mPosition.getX());
@@ -224,7 +221,7 @@ bool SI_Symbol::getAttributeValue(const QString& attrNS, const QString& attrKey,
 
     if ((attrNS != QLatin1String("SYM")) && (passToParents))
     {
-        if (mGenCompInstance->getAttributeValue(attrNS, attrKey, false, value))
+        if (mComponentInstance->getAttributeValue(attrNS, attrKey, false, value))
             return true;
         if (mSchematic.getAttributeValue(attrNS, attrKey, true, value))
             return true;
@@ -254,7 +251,7 @@ void SI_Symbol::setSelected(bool selected) noexcept
  *  Private Slots
  ****************************************************************************************/
 
-void SI_Symbol::schematicOrGenCompAttributesChanged()
+void SI_Symbol::schematicOrComponentAttributesChanged()
 {
     mGraphicsItem->updateCacheAndRepaint();
 }
@@ -268,7 +265,7 @@ bool SI_Symbol::checkAttributesValidity() const noexcept
     if (mSymbVarItem == nullptr)        return false;
     if (mSymbol == nullptr)             return false;
     if (mUuid.isNull())                 return false;
-    if (mGenCompInstance == nullptr)    return false;
+    if (mComponentInstance == nullptr)    return false;
     return true;
 }
 

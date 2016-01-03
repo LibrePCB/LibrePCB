@@ -26,15 +26,15 @@
 #include "si_symbol.h"
 #include <librepcblibrary/sym/symbol.h>
 #include <librepcblibrary/sym/symbolpin.h>
-#include "../../circuit/gencompinstance.h"
-#include <librepcblibrary/gencmp/genericcomponent.h>
+#include "../../circuit/componentinstance.h"
+#include <librepcblibrary/cmp/component.h>
 #include "si_netpoint.h"
-#include "../../circuit/gencompsignalinstance.h"
+#include "../../circuit/componentsignalinstance.h"
 #include "../../erc/ercmsg.h"
 #include "../schematic.h"
 #include "../../project.h"
 #include "../../circuit/circuit.h"
-#include <librepcblibrary/gencmp/gencompsymbvaritem.h>
+#include <librepcblibrary/cmp/componentsymbolvariantitem.h>
 #include "../../circuit/netsignal.h"
 #include "../../settings/projectsettings.h"
 #include <librepcbcommon/graphics/graphicsscene.h>
@@ -45,29 +45,36 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const QUuid& pinUuid) :
+SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const Uuid& pinUuid) :
     SI_Base(), mCircuit(symbol.getSchematic().getProject().getCircuit()),
-    mSymbol(symbol), mSymbolPin(nullptr), mGenCompSignal(nullptr),
-    mGenCompSignalInstance(nullptr), mAddedToSchematic(false),
-    mRegisteredNetPoint(nullptr), mGraphicsItem(nullptr)
+    mSymbol(symbol), mSymbolPin(nullptr), mComponentSignal(nullptr),
+    mPinSignalMapItem(nullptr), mComponentSignalInstance(nullptr),
+    mAddedToSchematic(false), mRegisteredNetPoint(nullptr), mGraphicsItem(nullptr)
 {
     // read attributes
     mSymbolPin = mSymbol.getLibSymbol().getPinByUuid(pinUuid);
     if (!mSymbolPin)
     {
-        throw RuntimeError(__FILE__, __LINE__, pinUuid.toString(),
-            QString(tr("Invalid symbol pin UUID: \"%1\"")).arg(pinUuid.toString()));
+        throw RuntimeError(__FILE__, __LINE__, pinUuid.toStr(),
+            QString(tr("Invalid symbol pin UUID: \"%1\"")).arg(pinUuid.toStr()));
     }
-    QUuid genCompSignalUuid = mSymbol.getGenCompSymbVarItem().getSignalOfPin(pinUuid);
-    mGenCompSignalInstance = mSymbol.getGenCompInstance().getSignalInstance(genCompSignalUuid);
-    mGenCompSignal = mSymbol.getGenCompInstance().getGenComp().getSignalByUuid(genCompSignalUuid);
+    mPinSignalMapItem = mSymbol.getCompSymbVarItem().getPinSignalMapItemOfPin(pinUuid);
+    if (!mPinSignalMapItem)
+    {
+        throw RuntimeError(__FILE__, __LINE__, QString(),
+            QString(tr("Pin \"%1\" not found in pin-signal-map of symbol instance \"%2\"."))
+            .arg(pinUuid.toStr(), symbol.getUuid().toStr()));
+    }
+    Uuid cmpSignalUuid = mPinSignalMapItem->getSignalUuid();
+    mComponentSignalInstance = mSymbol.getComponentInstance().getSignalInstance(cmpSignalUuid);
+    mComponentSignal = mSymbol.getComponentInstance().getLibComponent().getSignalByUuid(cmpSignalUuid);
 
     mGraphicsItem = new SGI_SymbolPin(*this);
     updatePosition();
 
     // create ERC messages
     mErcMsgUnconnectedRequiredPin.reset(new ErcMsg(mCircuit.getProject(), *this,
-        QString("%1/%2").arg(mSymbol.getUuid().toString()).arg(mSymbolPin->getUuid().toString()),
+        QString("%1/%2").arg(mSymbol.getUuid().toStr()).arg(mSymbolPin->getUuid().toStr()),
         "UnconnectedRequiredPin", ErcMsg::ErcMsgType_t::SchematicError));
     updateErcMessages();
 }
@@ -92,31 +99,30 @@ Schematic& SI_SymbolPin::getSchematic() const noexcept
     return mSymbol.getSchematic();
 }
 
-const QUuid& SI_SymbolPin::getLibPinUuid() const noexcept
+const Uuid& SI_SymbolPin::getLibPinUuid() const noexcept
 {
     return mSymbolPin->getUuid();
 }
 
-QString SI_SymbolPin::getDisplayText(bool returnGenCompSignalNameIfEmpty,
+QString SI_SymbolPin::getDisplayText(bool returnCmpSignalNameIfEmpty,
                                      bool returnPinNameIfEmpty) const noexcept
 {
-    const QStringList& localeOrder = mCircuit.getProject().getSettings().getLocaleOrder();
-
     QString text;
-    switch (mSymbol.getGenCompSymbVarItem().getDisplayTypeOfPin(mSymbolPin->getUuid()))
+    using PinDisplayType_t = library::ComponentPinSignalMapItem::PinDisplayType_t;
+    switch (mPinSignalMapItem->getDisplayType())
     {
-        case library::GenCompSymbVarItem::PinDisplayType_t::PinName:
-            text = mSymbolPin->getName(localeOrder); break;
-        case library::GenCompSymbVarItem::PinDisplayType_t::GenCompSignal:
-            if (mGenCompSignal) text = mGenCompSignal->getName(localeOrder); break;
-        case library::GenCompSymbVarItem::PinDisplayType_t::NetSignal:
-            if (mGenCompSignalInstance->getNetSignal()) text = mGenCompSignalInstance->getNetSignal()->getName(); break;
+        case PinDisplayType_t::PIN_NAME:
+            text = mSymbolPin->getName(); break;
+        case PinDisplayType_t::COMPONENT_SIGNAL:
+            if (mComponentSignal) text = mComponentSignal->getName(); break;
+        case PinDisplayType_t::NET_SIGNAL:
+            if (mComponentSignalInstance->getNetSignal()) text = mComponentSignalInstance->getNetSignal()->getName(); break;
         default: break;
     }
-    if (text.isEmpty() && returnGenCompSignalNameIfEmpty && mGenCompSignal)
-        text = mGenCompSignal->getName(localeOrder);
+    if (text.isEmpty() && returnCmpSignalNameIfEmpty && mComponentSignal)
+        text = mComponentSignal->getName();
     if (text.isEmpty() && returnPinNameIfEmpty)
-        text = mSymbolPin->getName(localeOrder);
+        text = mSymbolPin->getName();
     return text;
 }
 
@@ -154,7 +160,7 @@ void SI_SymbolPin::addToSchematic(GraphicsScene& scene) noexcept
 {
     Q_ASSERT(mAddedToSchematic == false);
     Q_ASSERT(mRegisteredNetPoint == nullptr);
-    mGenCompSignalInstance->registerSymbolPin(*this);
+    mComponentSignalInstance->registerSymbolPin(*this);
     scene.addItem(*mGraphicsItem);
     mAddedToSchematic = true;
     updateErcMessages();
@@ -164,7 +170,7 @@ void SI_SymbolPin::removeFromSchematic(GraphicsScene& scene) noexcept
 {
     Q_ASSERT(mAddedToSchematic == true);
     Q_ASSERT(mRegisteredNetPoint == nullptr);
-    mGenCompSignalInstance->unregisterSymbolPin(*this);
+    mComponentSignalInstance->unregisterSymbolPin(*this);
     scene.removeItem(*mGraphicsItem);
     mAddedToSchematic = false;
     updateErcMessages();
@@ -196,7 +202,7 @@ void SI_SymbolPin::updateErcMessages() noexcept
         .arg(getDisplayText(true, true)).arg(mSymbol.getName()));
 
     mErcMsgUnconnectedRequiredPin->setVisible((mAddedToSchematic)
-        && (mGenCompSignal->isRequired()) && (!mRegisteredNetPoint));
+        && (mComponentSignal->isRequired()) && (!mRegisteredNetPoint));
 }
 
 /*****************************************************************************************
