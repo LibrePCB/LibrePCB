@@ -1,4 +1,4 @@
-# LibrePCB [![Build Status](https://travis-ci.org/LibrePCB/LibrePCB.svg?branch=master)](https://travis-ci.org/LibrePCB/LibrePCB)
+# LibrePCB [![Travis Build Status](https://travis-ci.org/LibrePCB/LibrePCB.svg?branch=master)](https://travis-ci.org/LibrePCB/LibrePCB) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/3npw66djux4kv82f/branch/master?svg=true)](https://ci.appveyor.com/project/ubruhin/librepcb/branch/master)
 
 ## About LibrePCB
 

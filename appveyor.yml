@@ -1,0 +1,25 @@
+version: 1.0.{build}-{branch}
+os: Windows Server 2012
+configuration: Debug
+build: off
+test: off
+deploy: off
+
+environment:
+  global:
+    MINGW: C:\Qt\Tools\mingw492_32
+  matrix:
+    - QTDIR: C:\Qt\5.5\mingw492_32
+
+init:
+  - git config --global core.autocrlf input
+  - set PATH=%PATH%;%QTDIR%\bin;%MINGW%\bin;C:\Qt\Tools\QtCreator\bin
+
+build_script:
+  - mkdir build
+  - cd build
+  - qmake ..\librepcb.pro -r
+  - mingw32-make -j 4
+  - .\generated\windows\tests.exe # run all unit tests
+  - cd ..\
+
