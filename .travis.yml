@@ -1,43 +1,79 @@
 language: cpp
 
-compiler:
-  - clang
-  - gcc
-  
+matrix:
+  include:
+    - os: linux
+      compiler: gcc
+      env: QT_BASE=52 BUILD_DOXYGEN=true
+    - os: linux
+      compiler: gcc
+      env: QT_BASE=53 BUILD_DOXYGEN=false
+    - os: linux
+      compiler: gcc
+      env: QT_BASE=54 BUILD_DOXYGEN=false
+    - os: linux
+      compiler: gcc
+      env: QT_BASE=55 BUILD_DOXYGEN=false
+    - os: linux
+      compiler: clang
+      env: QT_BASE=52 BUILD_DOXYGEN=false
+    - os: linux
+      compiler: clang
+      env: QT_BASE=55 BUILD_DOXYGEN=false
+    - os: osx
+      compiler: gcc
+      env: BUILD_DOXYGEN=false
+    - os: osx
+      compiler: clang
+      env: BUILD_DOXYGEN=false
+
 env:
   global:
     - secure: "QW5QTwmLqovoDDrwVGXIOh+jd+ArwWSAy2P1U5xDW3C7oE5lgHQH3bqStEv63aOxvpN9cgqjroXQfCpKz+nNO7Rur0MY7UXCUxk0VizCOn4CUg7K7XeHTJEvzGRke2j7QUNigE5GTu9ABAeSN/AfHAtWVCFrecMINqTLWWC3pB/dTalCX6NoQb2f1z2nbdHa+suT8NoUo14eXrQfIZ9xnVrQ7NYuMXyb5A0akyQSq1oNb+5yj1o1wdmaNaCkalGyN2Oj/aD8urSU65sahwOQlhCwnxKDVuFqhcgV4ux6k42B7VJuVhxC2j71vCS4Kfka00/WVTNJXmdDxB873o+GqGVElvc5QeimQX34Zw2b+u77teZku4y33wm1wazh6mGh13/4EzA325rqjaxlge4EE5Bzq5qIhmaLspwob1EQD/waEhSDptNCK5bgP+OBtGi1f8vAnjlhh/3U10oWtAV1faV88zx9q0mWb4yYyoLP6D3ViglL62E9hKpwL2uXpGeb6yTCHfcpNMqkwFwYFt+Dj5vJ9RG4kmlsg4oXUn47zCOwj2ynOR24q9xgR+7d2Zj2vzfE/PPWbn8UGO6VcZtn6CpBUn6kMpfh5BcvBA06aFh/neW9WxAe9W7X6w1n1whpkTE2ro3iJDlVDiY+QTlCuZJg6EvLmKuHMf6oKM5WNC0="
-  matrix:
-    - QT_BASE=52
-    - QT_BASE=53
-    - QT_BASE=54
-    - QT_BASE=55
 
 before_install:
-  - if [ "$CXX" = "g++" ]; then sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y; fi
-  - if [ "$QT_BASE" = "52" ]; then sudo add-apt-repository ppa:beineri/opt-qt521 -y; fi
-  - if [ "$QT_BASE" = "53" ]; then sudo add-apt-repository ppa:beineri/opt-qt532 -y; fi
-  - if [ "$QT_BASE" = "54" ]; then sudo add-apt-repository ppa:beineri/opt-qt542 -y; fi
-  - if [ "$QT_BASE" = "55" ]; then sudo add-apt-repository ppa:beineri/opt-qt551 -y; fi
-  - sudo apt-add-repository -y ppa:libreoffice/libreoffice-4-2 # used to install an up-to-date doxygen
-  - sudo apt-get update -qq
+  - | 
+    if [ "${TRAVIS_OS_NAME}" = "linux" ]
+    then
+      if [ "$CXX" = "g++" ];    then sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y; fi
+      if [ "$QT_BASE" = "52" ]; then sudo add-apt-repository ppa:beineri/opt-qt521 -y; fi
+      if [ "$QT_BASE" = "53" ]; then sudo add-apt-repository ppa:beineri/opt-qt532 -y; fi
+      if [ "$QT_BASE" = "54" ]; then sudo add-apt-repository ppa:beineri/opt-qt542 -y; fi
+      if [ "$QT_BASE" = "55" ]; then sudo add-apt-repository ppa:beineri/opt-qt551 -y; fi
+      if [ "$QT_BASE" = "55" ]; then sudo apt-add-repository -y ppa:libreoffice/libreoffice-4-2; fi # used to install an up-to-date doxygen
+      sudo apt-get update -qq
+    fi
 
 install:
-  - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq gcc-4.8 g++-4.8; export CXX="g++-4.8" CC="gcc-4.8"; $CXX --version; fi
-  - if [ "$QT_BASE" = "52" ]; then sudo apt-get install -qq qt52base qt52tools qt52webkit-examples libxslt-dev libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev; source /opt/qt52/bin/qt52-env.sh; fi
-  - if [ "$QT_BASE" = "53" ]; then sudo apt-get install -qq qt53base qt53tools qt53webkit-examples; source /opt/qt53/bin/qt53-env.sh; fi
-  - if [ "$QT_BASE" = "54" ]; then sudo apt-get install -qq qt54base qt54tools qt54webkit-examples; source /opt/qt54/bin/qt54-env.sh; fi
-  - if [ "$QT_BASE" = "55" ]; then sudo apt-get install -qq qt55base qt55tools qt55webkit-examples; source /opt/qt55/bin/qt55-env.sh; fi
-  - sudo apt-get install -qq libglu1-mesa-dev doxygen graphviz
+  - |
+    if [ "${TRAVIS_OS_NAME}" = "linux" ]
+    then
+      if [ "$CXX" = "g++" ];    then sudo apt-get install -qq gcc-4.8 g++-4.8; export CXX="g++-4.8" CC="gcc-4.8"; fi
+      if [ "$QT_BASE" = "52" ]; then sudo apt-get install -qq qt52base qt52tools qt52webkit-examples libxslt-dev libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev; source /opt/qt52/bin/qt52-env.sh; fi
+      if [ "$QT_BASE" = "53" ]; then sudo apt-get install -qq qt53base qt53tools qt53webkit-examples; source /opt/qt53/bin/qt53-env.sh; fi
+      if [ "$QT_BASE" = "54" ]; then sudo apt-get install -qq qt54base qt54tools qt54webkit-examples; source /opt/qt54/bin/qt54-env.sh; fi
+      if [ "$QT_BASE" = "55" ]; then sudo apt-get install -qq qt55base qt55tools qt55webkit-examples; source /opt/qt55/bin/qt55-env.sh; fi
+      if [ "$BUILD_DOXYGEN" = "true" ]; then sudo apt-get install -qq doxygen graphviz; fi
+      sudo apt-get install -qq libglu1-mesa-dev
+    elif [ "${TRAVIS_OS_NAME}" = "osx" ]
+    then 
+      brew update && brew install qt5 && brew link --force qt5
+    fi
 
 script:
-  - mkdir build
-  - cd build
-  - qmake ../librepcb.pro -r "QMAKE_CXX=$CXX" "QMAKE_CC=$CC"
-  - make -j 8
-  - ./generated/unix/tests # run all unit tests
-  - cd ../
+  - mkdir build && cd build && qmake ../librepcb.pro -r "QMAKE_CXX=$CXX" "QMAKE_CC=$CC" && make -j8 && cd ../   # build librepcb
+  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then ./build/generated/unix/tests; fi                                 # run all unit tests (linux)
+  - if [ "${TRAVIS_OS_NAME}" = "osx" ];   then ./build/generated/mac/tests; fi                                  # run all unit tests (mac)
 
 # run doxygen and upload the html output to github (gh-pages of LibrePCB-Doxygen)
 after_success:
-  - ./dev/doxygen/travis_build_doxygen.sh
+  - |
+    if [ "${TRAVIS_PULL_REQUEST}" = "false" -a "${BUILD_DOXYGEN}" = "true" ]
+    then 
+      BRANCH_NAME=$(echo ${TRAVIS_BRANCH} | sed -e 's/[^A-Za-z0-9._-]/_/g')
+      cd ./dev/doxygen && doxygen Doxyfile
+      git clone -b gh-pages $DOXYGEN_REPOSITORY && cd LibrePCB-Doxygen
+      mkdir -p $BRANCH_NAME && rm -rf $BRANCH_NAME/* && cp -rf ../output/html/* ./$BRANCH_NAME
+      git config user.name "LibrePCB-Builder" && git config user.email "builder@librepcb.org"
+      git add -A > /dev/null && git commit -m "updated doxygen documentation of branch $BRANCH_NAME" && git push origin gh-pages
+    fi
