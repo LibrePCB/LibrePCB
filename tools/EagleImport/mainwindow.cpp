@@ -13,8 +13,8 @@
 #include <librepcbcommon/schematiclayer.h>
 #include "polygonsimplifier.h"
 
-using namespace librepcb;
-using namespace librepcb::library;
+namespace librepcb {
+using namespace library;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent), ui(new Ui::MainWindow)
@@ -845,4 +845,6 @@ void MainWindow::on_toolButton_4_clicked()
     }
 
     QMessageBox::information(this, "Duplicates Removed", QString("%1 duplicates removed.").arg(count));
+}
+
 }

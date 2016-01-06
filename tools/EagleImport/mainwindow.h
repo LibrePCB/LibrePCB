@@ -11,6 +11,8 @@ namespace Ui {
 class MainWindow;
 }
 
+namespace librepcb {
+
 class MainWindow : public QMainWindow
 {
         Q_OBJECT
@@ -70,5 +72,7 @@ class MainWindow : public QMainWindow
         int mReadedElementsCount;
         int mConvertedElementsCount;
 };
+
+}
 
 #endif // MAINWINDOW_H
